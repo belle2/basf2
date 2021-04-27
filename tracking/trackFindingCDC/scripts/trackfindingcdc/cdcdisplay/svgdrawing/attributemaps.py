@@ -2,20 +2,17 @@
 # -*- coding: utf-8 -*-
 
 from ROOT import gSystem
-gSystem.Load('libframework')  # for PyStoreArray
-gSystem.Load('libcdc')  # for CDCSimHit
-gSystem.Load('libtracking')  # for CDCWire and so on
-gSystem.Load('libgenfit2')  # for GFTrackCands
-
-gSystem.Load('libdataobjects')
 
 from ROOT import Belle2  # make Belle2 namespace available
-from ROOT import std
-from ROOT import genfit
 
 import bisect
 import colorsys
 
+gSystem.Load('libframework')  # for PyStoreArray
+gSystem.Load('libcdc')  # for CDCSimHit
+gSystem.Load('libtracking')  # for CDCWire and so on
+gSystem.Load('libgenfit2')  # for GFTrackCands
+gSystem.Load('libdataobjects')
 # Standard color map for id types
 listColors = [  # 'magenta',
                 # 'gold',

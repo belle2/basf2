@@ -1,14 +1,17 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marco Milesi
+ * Contributors: Marco Milesi, Giacomo De Pietro                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
+/* Own header. */
 #include <reconstruction/modules/EventsOfDoomBuster/EventsOfDoomBusterModule.h>
 
+/* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
@@ -23,13 +26,6 @@ Module that flags an event destined for doom at reconstruction,
 * This is meant to be registered in the path *after* the unpacking, but *before* reconstruction.
 )DOC");
 
-  addParam("nCDCHitsMax", m_nCDCHitsMax, 
-R"DOC(the max number of CDC hits for an event to be kept for reconstruction. 
-By default, no events are skipped based upon this requirement.)DOC", m_nCDCHitsMax);
-  addParam("nSVDShaperDigitsMax", m_nSVDShaperDigitsMax,
-           R"DOC(the max number of SVD shaper digits for an event to be kept for reconstruction.
-By default, no events are skipped based upon this requirement.)DOC", m_nSVDShaperDigitsMax);
-
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -42,11 +38,18 @@ void EventsOfDoomBusterModule::initialize()
   m_svdShaperDigits.isOptional();
 }
 
+void EventsOfDoomBusterModule::beginRun()
+{
+  if (!m_eventsOfDoomParameters.isValid())
+    B2FATAL("EventsOfDoom parameters are not available.");
+  m_nCDCHitsMax = m_eventsOfDoomParameters->getNCDCHitsMax();
+  m_nSVDShaperDigitsMax = m_eventsOfDoomParameters->getNSVDShaperDigitsMax();
+}
 
 void EventsOfDoomBusterModule::event()
 {
-  const unsigned int nCDCHits = m_cdcHits.isOptional() ? m_cdcHits.getEntries() : 0;
-  const unsigned int nSVDShaperDigits = m_svdShaperDigits.isOptional() ? m_svdShaperDigits.getEntries() : 0;
+  const uint32_t nCDCHits = m_cdcHits.isOptional() ? m_cdcHits.getEntries() : 0;
+  const uint32_t nSVDShaperDigits = m_svdShaperDigits.isOptional() ? m_svdShaperDigits.getEntries() : 0;
 
   B2DEBUG(20, "Event: " << m_eventInfo->getEvent() << " - nCDCHits: " << nCDCHits << ", nSVDShaperDigits: " << nSVDShaperDigits);
 
@@ -54,7 +57,7 @@ void EventsOfDoomBusterModule::event()
   const bool doomSVD = nSVDShaperDigits > m_nSVDShaperDigitsMax;
 
   if (doomCDC) {
-    B2ERROR("Skip event --> Too much occupancy for reco!" <<
+    B2ERROR("Skip event --> Too much occupancy from CDC for reconstruction!" <<
             LogVar("event", m_eventInfo->getEvent()) <<
             LogVar("run", m_eventInfo->getRun()) <<
             LogVar("exp", m_eventInfo->getExperiment()) <<
@@ -63,7 +66,7 @@ void EventsOfDoomBusterModule::event()
   }
 
   if (doomSVD) {
-    B2ERROR("Skip event --> Too much occupancy for reco!" <<
+    B2ERROR("Skip event --> Too much occupancy from SVD for reconstruction!" <<
             LogVar("event", m_eventInfo->getEvent()) <<
             LogVar("run", m_eventInfo->getRun()) <<
             LogVar("exp", m_eventInfo->getExperiment()) <<

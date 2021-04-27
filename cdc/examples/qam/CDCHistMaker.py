@@ -5,16 +5,17 @@ Example script storing ADC, TDC and Hit distribution histograms.
 Usage :
 basf2 CDCHistMaker exp run
 '''
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
-from ROOT import TH1D, TH2D, TCanvas, TFile
+from ROOT import TFile, TH1D, TH2D
 import argparse
 import glob
+import os
 
 
-reset_database()
-use_database_chain()
-use_central_database("Calibration_Offline_Development", LogLevel.INFO)
+b2.reset_database()
+b2.use_database_chain()
+b2.use_central_database("Calibration_Offline_Development", b2.LogLevel.INFO)
 
 
 nWires = [160, 160, 160, 160, 160, 160, 160, 160,  # SL0
@@ -46,33 +47,33 @@ histADC = []
 histTDC = []
 histADCinLayer = []
 
-for l in range(56):
-    histADCinLayer.append(TH1D('h' + str(500000 + l),
-                               'ADC Layer' + str(l),
+for l_adc in range(56):
+    histADCinLayer.append(TH1D('h' + str(500000 + l_adc),
+                               'ADC Layer' + str(l_adc),
                                400, 0.0, 400.))
-    for w in range(nWires[l]):
-        hid = getHistID(l, w)
+    for w in range(nWires[l_adc]):
+        hid = getHistID(l_adc, w)
         hADC = TH1D('h' + str(100000 + hid),
-                    'ADC Layer' + str(l) + 'Wire' + str(w),
+                    'ADC Layer' + str(l_adc) + 'Wire' + str(w),
                     400, 0.0, 400.)
         hTDC = TH1D('h' + str(200000 + hid),
-                    'TDC Layer' + str(l) + 'Wire' + str(w),
+                    'TDC Layer' + str(l_adc) + 'Wire' + str(w),
                     2000, 4000., 6000.)
         histADC.append(hADC)
         histTDC.append(hTDC)
 
 
-histADCTDC = [TH2D('h' + str(300000 + l),
-                   'ADC2TDC Layer' + str(l),
+histADCTDC = [TH2D('h' + str(300000 + l_adc),
+                   'ADC2TDC Layer' + str(l_adc),
                    200, 0.0, 400., 200, 4000, 6000)
-              for l in range(56)]
+              for l_adc in range(56)]
 
-histHit = [TH1D('h' + str(400000 + l),
-                'HitDist Layer' + str(l),
-                400, 0.0, 400.) for l in range(56)]
+histHit = [TH1D('h' + str(400000 + l_adc),
+                'HitDist Layer' + str(l_adc),
+                400, 0.0, 400.) for l_adc in range(56)]
 
 
-class CDCHistMakerModule(Module):
+class CDCHistMakerModule(b2.Module):
 
     """
     Class description.
@@ -97,7 +98,7 @@ class CDCHistMakerModule(Module):
 
     def event(self):
         """
-        reimplement Module::event()
+        reimplement b2.Module::event()
         """
 
         hits = Belle2.PyStoreArray('CDCHits')
@@ -105,15 +106,15 @@ class CDCHistMakerModule(Module):
         for hit in hits:
             #            rawhit = hit.getRelatedTo('CDCRawHits')
             sl = hit.getISuperLayer()
-            l = hit.getILayer()
-            cl = l if sl == 0 else 8 + (sl - 1) * 6 + l
+            l_hit = hit.getILayer()
+            cl = l_hit if sl == 0 else 8 + (sl - 1) * 6 + l_hit
             w = hit.getIWire()
             adc = hit.getADCCount()
             tdc = hit.getTDCCount()
 
             #            b = rawhit.getBoardId()
             #            c = rawhit.getFEChannel()
-            #            B2DEBUG(99, 'sl ' + str(sl) + ' l ' + str(l) +
+            #            B2DEBUG(99, 'sl ' + str(sl) + ' l_hit ' + str(l_hit) +
             #                    ' cl ' + str(cl) + ' w ' + str(w) +
             #                    ' b ' + str(b) + ' c ' + str(c))
             hid = getHistID(cl, w)
@@ -146,7 +147,7 @@ def main(exp=1, run=3118, prefix='', dest=''):
     # Seach dst files.
     files = glob.glob(prefix + '/dst.cosmic.{0:0>4}.{1:0>5}'.format(exp, run) + '*.root')
     # create path
-    main = create_path()
+    main = b2.create_path()
     # Input (ROOT file).
     main.add_module('RootInput',
                     inputFileNames=files)
@@ -154,8 +155,8 @@ def main(exp=1, run=3118, prefix='', dest=''):
     main.add_module(CDCHistMakerModule(exp, run, dest))
     main.add_module('Progress')
     # process events and print call statistics
-    process(main)
-    print(statistics)
+    b2.process(main)
+    print(b2.statistics)
 
 
 if __name__ == "__main__":

@@ -99,6 +99,7 @@ namespace Belle2 {
       addVariable(identifier + "_min", variables);
       addVariable(identifier + "_mean", variables);
       addVariable(identifier + "_std", variables);
+      addVariable(identifier + "_sum", variables);
     }
 
     /// calculated statistics and saves them in variable set
@@ -110,10 +111,12 @@ namespace Belle2 {
         m_variables.at(identifier + "_min") = NAN;
         m_variables.at(identifier + "_mean") = NAN;
         m_variables.at(identifier + "_std") = NAN;
+        m_variables.at(identifier + "_sum") = NAN;
         return;
       }
       // mean
       float sum = std::accumulate(values.begin(), values.end(), 0.0);
+      m_variables.at(identifier + "_sum") = sum;
       float mean = sum / size;
       m_variables.at(identifier + "_mean") = mean;
       // variance and standard deviation

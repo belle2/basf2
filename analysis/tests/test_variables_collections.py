@@ -2,7 +2,6 @@
 
 import unittest
 import variables.collections as vc
-from variables import utils
 from variables import variables as vm
 
 
@@ -19,6 +18,7 @@ class TestVariableCollections(unittest.TestCase):
             for variable_name in var_collection:
                 variable = vm.getVariable(variable_name)
                 self.assertNotEqual(variable, None)
+
 
 if __name__ == '__main__':
     unittest.main()

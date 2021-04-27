@@ -12,8 +12,10 @@
 
 #include <framework/core/Module.h>
 
-// DataStore
+// framework - DataStore
 #include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 // Rave
 #include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
@@ -26,9 +28,11 @@
 #include <CLHEP/Vector/LorentzVector.h>
 
 // DataObjects
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/TagVertex.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <analysis/dataobjects/FlavorTaggerInfo.h>
 #include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -80,6 +84,9 @@ namespace Belle2 {
 
   private:
 
+    StoreArray<TagVertex> m_verArray; /**< StoreArray of TagVertexes */
+    StoreArray<MCParticle> m_mcParticles; /**< StoreArray of MCParticles */
+    StoreObjPtr<ParticleList> m_plist; /**< input particle list */
     //std::string m_EventType;      /**< Btag decay type */
     std::string m_listName;         /**< Breco particle list name */
     double m_confidenceLevel;       /**< required fit confidence level */

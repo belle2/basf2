@@ -10,21 +10,30 @@
 #pragma once
 
 #include <daq/hbasf2/apps/ZMQApp.h>
+#include <fstream>
+#include <nlohmann/json.hpp>
 
 namespace Belle2 {
 
   template <class AInputConnection, class AOutputConnection>
   void ZMQStandardApp<AInputConnection, AOutputConnection>::initFromConsole(const std::string& description, int argc, char* argv[])
   {
+
     po::options_description desc(description);
+    std::string connection_file;
+    int debugLevel(0);
+    desc.add_options()
+    ("connection-file", boost::program_options::value<std::string>(&connection_file),
+     "if given print the connection information for input/output and monitoring socket to the given filename "
+     "in json format")
+    ("debug", boost::program_options::value<int>(&debugLevel), "Enable debug logging");
     addOptions(desc);
 
     po::positional_options_description p;
 
     po::variables_map vm;
     try {
-      po::store(
-        po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
+      po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
     } catch (std::exception& e) {
       B2FATAL(e.what());
     }
@@ -40,7 +49,34 @@ namespace Belle2 {
       B2FATAL(e.what());
     }
 
+    if (debugLevel > 0) {
+      auto& logging = LogSystem::Instance();
+      logging.getLogConfig()->setLogLevel(LogConfig::c_Debug);
+      logging.getLogConfig()->setDebugLevel(debugLevel);
+      B2DEBUG(1, "Enabled debug logging");
+    }
+
     initialize();
+
+    if (not connection_file.empty()) {
+      B2DEBUG(1, "Write connection file" << LogVar("connection_file", connection_file));
+      nlohmann::json json;
+      try {
+        json["input"] = m_input->getEndPoint();
+      } catch (zmq::error_t& e) {
+        B2WARNING(e.what());
+      }
+      try {
+        json["output"] = m_output->getEndPoint();
+      } catch (zmq::error_t& e) {
+        B2WARNING(e.what());
+      }
+      std::ofstream connections(connection_file, std::ofstream::trunc);
+      if (!connections) {
+        B2FATAL("Cannot write connection file" << LogVar("connection_file", connection_file));
+      }
+      connections << std::setw(4) << json << std::endl;
+    }
   }
 
   template <class AInputConnection, class AOutputConnection>

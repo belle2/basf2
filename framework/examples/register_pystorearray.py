@@ -6,16 +6,11 @@
 # create data store contents from Python modules.
 ######################################################
 
-import os
 import math
-import random
-import numpy as np
 
 import basf2
 import ROOT
 from ROOT import Belle2
-
-import simulation
 
 
 class SillyGeneratorModule(basf2.Module):
@@ -40,7 +35,6 @@ class SillyGeneratorModule(basf2.Module):
         phi = ROOT.gRandom.Uniform(0.0, 2.0 * math.pi)
         costheta = ROOT.gRandom.Uniform(-1.0, 1.0)
         theta = math.acos(costheta)
-        r = max(0, ROOT.gRandom.Gaus(1, 0.2))
         momentum = ROOT.TVector3(0, 0, 0)
         momentum.SetMagThetaPhi(1, theta, phi)
 

@@ -38,6 +38,11 @@ DQMHistAnalysisOutputMonObjModule::DQMHistAnalysisOutputMonObjModule()
   addParam("Filename", m_filename, "Output root filename (if not set mon_e{exp}r{run}.root is used", std::string(""));
   addParam("TreeFile", m_treeFile, "If set, entry to run summary TTree from TreeFile is made", std::string(""));
   addParam("ProcID", m_procID, "Processing id (online,proc10, etc.)", std::string("online"));
+  addParam("run", m_run, "Run number", 0);
+  addParam("exp", m_exp, "Experiment number", 0);
+  addParam("nevt", m_nevt, "Number of events", 0);
+  addParam("runtype", m_runtype, "Run type", std::string(""));
+
   B2DEBUG(20, "DQMHistAnalysisOutputMonObj: Constructor done.");
 }
 
@@ -47,7 +52,6 @@ DQMHistAnalysisOutputMonObjModule::~DQMHistAnalysisOutputMonObjModule() { }
 void DQMHistAnalysisOutputMonObjModule::initialize()
 {
   B2DEBUG(20, "DQMHistAnalysisOutputMonObj: initialized.");
-
   // create file metadata
   m_metaData = new DQMFileMetaData();
   m_metaData->setProcessingID(m_procID);
@@ -75,22 +79,24 @@ void DQMHistAnalysisOutputMonObjModule::endRun()
   TH1* hrun = findHist("DQMInfo/runno");
   TH1* hexp = findHist("DQMInfo/expno");
 
-  int run = hrun ? std::stoi(hrun->GetTitle()) : 0;//lastEvtMeta->getRun();
-  int exp = hexp ? std::stoi(hexp->GetTitle()) : 0;//lastEvtMeta->getExperiment();
+  int run = hrun ? std::stoi(hrun->GetTitle()) : m_run;
+  int exp = hexp ? std::stoi(hexp->GetTitle()) : m_exp;
   TString fname;
   if (m_filename.length()) fname = m_filename;
-  else fname = TString::Format("mon_e%04dr%06d.root", exp, run);
+  else fname = TString::Format("mon_e%04dr%06d_%s.root", exp, run, m_procID.c_str());
 
   TH1* runtype = findHist("DQMInfo/rtype");
   if (runtype) m_metaData->setRunType(std::string(runtype->GetTitle()));
-
+  else m_metaData->setRunType(m_runtype);
   TH1* hnevt = findHist("DAQ/Nevent");
   if (hnevt) m_metaData->setNEvents(hnevt->GetEntries());
+  else m_metaData->setNEvents(m_nevt);
 
   TFile f(fname, "NEW");
 
   if (f.IsZombie()) {
-    B2WARNING("File " << fname << "already exists and it will not be rewritten. If desired please delete file and re-run.");
+    B2WARNING("File " << LogVar("MonitoringObject file",
+                                fname) << " already exists and it will not be rewritten. If desired please delete file and re-run.");
     return;
   }
 
@@ -100,6 +106,7 @@ void DQMHistAnalysisOutputMonObjModule::endRun()
   time_t ts = lastEvtMeta->getTime() / 1e9;
   struct tm* timeinfo;
   timeinfo = localtime(&ts);
+  // cppcheck-suppress asctimeCalled
   m_metaData->setRunDate(asctime(timeinfo));
 
   m_metaData->Write();

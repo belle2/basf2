@@ -18,6 +18,9 @@ CCCCCC
       common /KK_cntl/ Pb1(4), Pb2(4), BoostV(3), cosA, sinA, ctau, xpar
       double precision dum(4)
 
+      integer m_Read_PythiaFile
+      common /Read_PythiaFile/ m_Read_PythiaFile
+      
 C   Input environment
       open(16,FILE=DatX_o,STATUS='new',ACTION='write')
 
@@ -77,8 +80,10 @@ c     input particle data file for pythia
       open(1,FILE=DatX_p,STATUS='old',ACTION='read',ERR=101)
       call PYUPDA(3,1)
       close(1)
+      m_Read_PythiaFile=1
       goto 100
  101  Print *,'KK  No input for Pythia'
+      m_Read_PythiaFile=0 
  100  continue
 
 C   TAUOLA fifo initialize
@@ -184,12 +189,17 @@ c
       integer ijetset
       common /KK_pythia/ ijetset
 
+      integer m_Read_PythiaFile
+      common /Read_PythiaFile/ m_Read_PythiaFile
+
 C   TAUOLA fifo clear
       call TAUFIF(0)
 
 C   Select decay channel
-      call KK_select_decay_channel(-15)  !tau+
-      call KK_select_decay_channel(15)   !tau-
+      IF (m_Read_PythiaFile.EQ.1) THEN 
+         call KK_select_decay_channel(-15) !tau+
+         call KK_select_decay_channel(15) !tau-
+      ENDIF
 C   Make single event by KK2f
       CALL KK2f_Make
 C   Switch on internal JETSET? (this is the default of Belle)
@@ -649,10 +659,11 @@ c     use PYTHIA  JAK=-1
 c     store for TAUOLA
       if(id.eq.15) then
          JAK2 = JAK
+C         PRINT *,'KK_select_decay_channel (tau-) jak2 = ',jak2,' IDC = ',IDC, MDME(IDC,2)
       else
          JAK1 = JAK
+C         PRINT *,'KK_select_decay_channel (tau+) jak1 = ',jak1,' IDC = ',IDC, MDME(IDC,2)
       endif
-
       return
       end
 CCCCCC

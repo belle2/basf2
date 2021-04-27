@@ -1,9 +1,0 @@
-add 
-
---This line, and those below, will be ignored--
-
-M    dataobjects/include/linkdef.h
-M    simulation/include/SensitiveDetector.h
-M    simulation/src/SensitiveDetector.cc
-M    modules/SConscript
-M    data/detector.xml

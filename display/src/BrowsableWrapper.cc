@@ -29,6 +29,6 @@ void BrowsableWrapper::padClosed()
     return;
   }
 
-  B2WARNING("TODO remove – deleting pad");
+  B2WARNING("TODO remove - deleting pad");
   s_pads.erase(pad);
 }

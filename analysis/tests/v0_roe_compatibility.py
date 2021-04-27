@@ -23,18 +23,21 @@ fsp_tag_side = 'pi-'
 # a new ParticleLoader for each fsp
 testpath = create_path()
 testpath.add_module('RootInput', inputFileNames=testinput)
-testpath.add_module('ParticleLoader', decayStringsWithCuts=[(fsp_signal_side, 'isSignal == 1')])
-testpath.add_module('ParticleLoader', decayStringsWithCuts=[(fsp_tag_side, '')])
+testpath.add_module('ParticleLoader', decayStrings=[fsp_signal_side])
+testpath.add_module('ParticleListManipulator', outputListName=fsp_signal_side,
+                    inputListNames=[fsp_signal_side + ':all'], cut='isSignal == 1')
+testpath.add_module('ParticleLoader', decayStrings=[fsp_tag_side])
+testpath.add_module('ParticleListManipulator', outputListName=fsp_tag_side, inputListNames=[fsp_tag_side + ':all'])
 testpath.add_module('ParticleStats', particleLists=[fsp_signal_side])
 
 signal_side_name = 'B0'
 testpath.add_module('ParticleCombiner',
-                    decayString=signal_side_name+' -> mu+ mu-',
+                    decayString=signal_side_name + ' -> mu+ mu-',
                     cut='')
 
 testpath.add_module('RestOfEventBuilder', particleList=signal_side_name,
                     particleListsInput=[fsp_tag_side])
-mask = ('cleanMask', '', '')
+mask = ('cleanMask', '', '', '')
 testpath.add_module('RestOfEventInterpreter', particleList=signal_side_name,
                     ROEMasks=mask)
 
@@ -46,8 +49,9 @@ v0list = ['gamma:conv -> e+ e-',
           'K_S0 -> pi+ pi-']
 cut = "daughter(0, isSignal) > 0 and daughter(1, isSignal) >0"
 for v0 in v0list:
-    roe_path.add_module('ParticleLoader', decayStringsWithCuts=[(v0, '-0.1 < dM < 0.1')],
-                        addDaughters=True)
+    roe_path.add_module('ParticleLoader', decayStrings=[v0], addDaughters=True)
+    roe_path.add_module('ParticleListManipulator', outputListName=v0.split()[0],
+                        inputListNames=[v0.split()[0].split(":")[0] + ':V0'], cut='-0.1 < dM < 0.1')
     roe_path.add_module('ParticleSelector',
                         decayString=v0.split(' ->', 1)[0],
                         cut=cut)
@@ -61,5 +65,7 @@ roe_path.add_module('RestOfEventPrinter',
                     fullPrint=False)
 testpath.for_each('RestOfEvent', 'RestOfEvents', path=roe_path)
 ###############################################################################
+testpath.add_module('ParticlePrinter', listName=signal_side_name, fullPrint=False,
+                    variables=['nROE_Composites(cleanMask)'])
 
 process(testpath, 2)

@@ -24,7 +24,7 @@ ve = Particle(
     charge=0,
     GhostNumber=0,
     LeptonNumber=1,
-    )
+)
 
 ve__tilde__ = ve.anti()
 
@@ -41,7 +41,7 @@ vm = Particle(
     charge=0,
     GhostNumber=0,
     LeptonNumber=1,
-    )
+)
 
 vm__tilde__ = vm.anti()
 
@@ -58,7 +58,7 @@ vt = Particle(
     charge=0,
     GhostNumber=0,
     LeptonNumber=1,
-    )
+)
 
 vt__tilde__ = vt.anti()
 
@@ -75,7 +75,7 @@ e__minus__ = Particle(
     charge=-1,
     GhostNumber=0,
     LeptonNumber=1,
-    )
+)
 
 e__plus__ = e__minus__.anti()
 
@@ -92,7 +92,7 @@ m__minus__ = Particle(
     charge=-1,
     GhostNumber=0,
     LeptonNumber=1,
-    )
+)
 
 m__plus__ = m__minus__.anti()
 
@@ -109,7 +109,7 @@ tt__minus__ = Particle(
     charge=-1,
     GhostNumber=0,
     LeptonNumber=1,
-    )
+)
 
 tt__plus__ = tt__minus__.anti()
 
@@ -126,7 +126,7 @@ u = Particle(
     charge=2 / 3,
     GhostNumber=0,
     LeptonNumber=0,
-    )
+)
 
 u__tilde__ = u.anti()
 
@@ -143,7 +143,7 @@ c = Particle(
     charge=2 / 3,
     GhostNumber=0,
     LeptonNumber=0,
-    )
+)
 
 c__tilde__ = c.anti()
 
@@ -160,7 +160,7 @@ t = Particle(
     charge=2 / 3,
     GhostNumber=0,
     LeptonNumber=0,
-    )
+)
 
 t__tilde__ = t.anti()
 
@@ -177,7 +177,7 @@ d = Particle(
     charge=-1 / 3,
     GhostNumber=0,
     LeptonNumber=0,
-    )
+)
 
 d__tilde__ = d.anti()
 
@@ -194,7 +194,7 @@ s = Particle(
     charge=-1 / 3,
     GhostNumber=0,
     LeptonNumber=0,
-    )
+)
 
 s__tilde__ = s.anti()
 
@@ -211,7 +211,7 @@ b = Particle(
     charge=-1 / 3,
     GhostNumber=0,
     LeptonNumber=0,
-    )
+)
 
 b__tilde__ = b.anti()
 
@@ -228,7 +228,7 @@ chi = Particle(
     charge=0,
     GhostNumber=0,
     LeptonNumber=0,
-    )
+)
 
 chi__tilde__ = chi.anti()
 
@@ -245,7 +245,7 @@ ghA = Particle(
     charge=0,
     GhostNumber=1,
     LeptonNumber=0,
-    )
+)
 
 ghA__tilde__ = ghA.anti()
 
@@ -262,7 +262,7 @@ ghZ = Particle(
     charge=0,
     GhostNumber=1,
     LeptonNumber=0,
-    )
+)
 
 ghZ__tilde__ = ghZ.anti()
 
@@ -279,7 +279,7 @@ ghWp = Particle(
     charge=1,
     GhostNumber=1,
     LeptonNumber=0,
-    )
+)
 
 ghWp__tilde__ = ghWp.anti()
 
@@ -296,7 +296,7 @@ ghWm = Particle(
     charge=-1,
     GhostNumber=1,
     LeptonNumber=0,
-    )
+)
 
 ghWm__tilde__ = ghWm.anti()
 
@@ -313,7 +313,7 @@ ghG = Particle(
     charge=0,
     GhostNumber=1,
     LeptonNumber=0,
-    )
+)
 
 ghG__tilde__ = ghG.anti()
 
@@ -330,7 +330,7 @@ ghAp = Particle(
     charge=0,
     GhostNumber=1,
     LeptonNumber=0,
-    )
+)
 
 ghAp__tilde__ = ghAp.anti()
 
@@ -347,7 +347,7 @@ A = Particle(
     charge=0,
     GhostNumber=0,
     LeptonNumber=0,
-    )
+)
 
 Z = Particle(
     pdg_code=23,
@@ -362,7 +362,7 @@ Z = Particle(
     charge=0,
     GhostNumber=0,
     LeptonNumber=0,
-    )
+)
 
 W__plus__ = Particle(
     pdg_code=24,
@@ -377,7 +377,7 @@ W__plus__ = Particle(
     charge=1,
     GhostNumber=0,
     LeptonNumber=0,
-    )
+)
 
 W__minus__ = W__plus__.anti()
 
@@ -394,7 +394,7 @@ G = Particle(
     charge=0,
     GhostNumber=0,
     LeptonNumber=0,
-    )
+)
 
 Ap = Particle(
     pdg_code=9000008,
@@ -409,7 +409,7 @@ Ap = Particle(
     charge=0,
     GhostNumber=0,
     LeptonNumber=0,
-    )
+)
 
 H = Particle(
     pdg_code=25,
@@ -424,7 +424,7 @@ H = Particle(
     charge=0,
     GhostNumber=0,
     LeptonNumber=0,
-    )
+)
 
 phi0 = Particle(
     pdg_code=250,
@@ -440,7 +440,7 @@ phi0 = Particle(
     charge=0,
     GhostNumber=0,
     LeptonNumber=0,
-    )
+)
 
 phi__plus__ = Particle(
     pdg_code=251,
@@ -456,7 +456,7 @@ phi__plus__ = Particle(
     charge=1,
     GhostNumber=0,
     LeptonNumber=0,
-    )
+)
 
 phi__minus__ = phi__plus__.anti()
 
@@ -473,7 +473,6 @@ pi__plus__ = Particle(
     charge=1,
     GhostNumber=0,
     LeptonNumber=0,
-    )
+)
 
 pi__minus__ = pi__plus__.anti()
-

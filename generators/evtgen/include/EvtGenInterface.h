@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVTGENINTERFACE_H
-#define EVTGENINTERFACE_H
+#pragma once
 
 
 #include <EvtGen/EvtGen.hh>
@@ -86,4 +85,3 @@ namespace Belle2 {
 
 } //! end of Belle2 namespace
 
-#endif //EVTGENINTERFACE_H

@@ -25,12 +25,12 @@ from basf2 import B2INFO, B2ERROR, B2WARNING
 
 class ClassVersionError(Exception):
     """Exception to report class version errors"""
-    pass
 
 
 class ErrorWithExtraVariables(Exception):
     """Exception class with extra keyword arguments to show in log message"""
     #: Initialize the class.
+
     def __init__(self, *args, **argk):
         super().__init__(*args)
         #: Class variables.
@@ -53,7 +53,7 @@ def check_dictionary(classname):
     """Make sure we have a dictionary for the class and all its members"""
     tclass = ROOT.TClass.GetClass(classname)
     if not tclass:
-        raise ClassVersionError(f"Cannot find TClass object")
+        raise ClassVersionError("Cannot find TClass object")
     streamerinfo = tclass.GetStreamerInfo()
     if streamerinfo:
         for element in streamerinfo.GetElements():
@@ -67,7 +67,7 @@ def get_class_version(classname):
     """Get the Class version and checksum for a fully qualified C++ class name"""
     tclass = ROOT.TClass.GetClass(classname)
     if not tclass:
-        raise ClassVersionError(f"Cannot find TClass object")
+        raise ClassVersionError("Cannot find TClass object")
     # good time to also check base classes
     check_base_classes(tclass)
     version = tclass.GetClassVersion()
@@ -176,12 +176,6 @@ def check_linkdef(filename, message_style="belle2"):
 
         line, column, classname, clingflags, options = content
 
-        # check if we can actually load the class
-        try:
-            version, checksum = get_class_version(classname)
-        except ClassVersionError as e:
-            print_message("error", e)
-
         # no need to check anything else if we don't have storage enabled
         if "nostreamer" in clingflags:
             if "evolution" in clingflags:
@@ -195,8 +189,14 @@ def check_linkdef(filename, message_style="belle2"):
             print_message("warning", "using old ROOT3 streamer format without evolution. "
                           "Please add + or - (for classes not to be written to file) after the classname.")
 
+        # check if we can actually load the class
+        try:
+            version, checksum = get_class_version(classname)
+        except ClassVersionError as e:
+            print_message("error", e)
+
         # This class seems to be intended to be serialized so make sure we can
-        if version != 0:
+        if "version" in locals() and version != 0:
             try:
                 check_dictionary(classname)
             except ClassVersionError as e:

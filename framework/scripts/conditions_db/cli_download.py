@@ -14,7 +14,6 @@ import requests
 import shutil
 import fnmatch
 import re
-import sqlite3
 import functools
 import textwrap
 from urllib.parse import urljoin
@@ -83,8 +82,8 @@ def download_payload(db, payload, directory):
         os.makedirs(os.path.dirname(local), exist_ok=True)
     except OSError as e:
         B2ERROR(f"Cannot download payload: {e}")
-        return
-    download_file(db, local, remote, payload.checksum)
+        return None
+    return download_file(db, local, remote, payload.checksum, iovlist=local)
 
 
 def get_tagnames(db, patterns, use_regex=False):
@@ -179,6 +178,7 @@ def command_legacydownload(args, db=None):
     if args.tag_pattern or args.tag_regex:
         tagnames = get_tagnames(db, tagnames, args.tag_regex)
 
+    failed = 0
     for tagname in sorted(tagnames):
         try:
             req = db.request("GET", "/globalTag/{}/globalTagPayloads".format(encode_name(tagname)),
@@ -199,7 +199,6 @@ def command_legacydownload(args, db=None):
 
         # do the downloading
         full_iovlist = []
-        failed = 0
         with ThreadPoolExecutor(max_workers=args.nprocess) as pool:
             for iovlist in pool.map(lambda x: download_file(db, *x), download_list.values()):
                 if iovlist is None:
@@ -263,6 +262,10 @@ def command_download(args, db=None):
                            help="Don't download any payloads, just fetch the metadata information")
         group.add_argument("--only-download", action="store_true", default=False,
                            help="Assume the metadata file is already filled, just make sure all payloads are downloaded")
+        args.add_argument("--delete-extra-payloads", default=False, action="store_true",
+                          help="if given this script will delete all extra files "
+                          "that follow the payload naming convention ``AB/{name}_r{revision}.root`` "
+                          "if they are not referenced in the database file.")
         args.add_argument("--ignore-missing", action="store_true", default=False,
                           help="Ignore missing globaltags and download all other tags")
         args.add_argument("-j", type=int, default=1, dest="nprocess",
@@ -291,26 +294,26 @@ def command_download(args, db=None):
             B2ERROR("No tags selected, cannot continue")
             return 1
 
-    def get_taginfo(tagname):
-        """return the important information about all our globaltags"""
-        tag_info = db.get_globalTagInfo(tagname)
-        if not tag_info:
-            B2ERROR(f"Cannot find globaltag {tagname}")
-            return None
-        return tag_info['globalTagId'], tag_info['name'], tag_info['globalTagStatus']['name']
+        def get_taginfo(tagname):
+            """return the important information about all our globaltags"""
+            tag_info = db.get_globalTagInfo(tagname)
+            if not tag_info:
+                B2ERROR(f"Cannot find globaltag {tagname}")
+                return None
+            return tag_info['globalTagId'], tag_info['name'], tag_info['globalTagStatus']['name']
 
-    # so lets get info on all our tags and check if soem are missing ...
-    with ThreadPoolExecutor(max_workers=args.nprocess) as pool:
-        tags = list(pool.map(get_taginfo, args.tag))
+        # so lets get info on all our tags and check if soem are missing ...
+        with ThreadPoolExecutor(max_workers=args.nprocess) as pool:
+            tags = list(pool.map(get_taginfo, args.tag))
 
-    if not args.ignore_missing and None in tags:
-        return 1
-    # ok, remove tags that didn't exist ... and print the final list
-    tags = sorted((e for e in tags if e is not None), key=lambda tag: tag[1])
-    taglist = ["Selected globaltags:"]
-    taglist += textwrap.wrap(", ".join(tag[1] for tag in tags), width=get_terminal_width(),
-                             initial_indent=" "*4, subsequent_indent=" "*4)
-    B2INFO('\n'.join(taglist))
+        if not args.ignore_missing and None in tags:
+            return 1
+        # ok, remove tags that didn't exist ... and print the final list
+        tags = sorted((e for e in tags if e is not None), key=lambda tag: tag[1])
+        taglist = ["Selected globaltags:"]
+        taglist += textwrap.wrap(", ".join(tag[1] for tag in tags), width=get_terminal_width(),
+                                 initial_indent=" "*4, subsequent_indent=" "*4)
+        B2INFO('\n'.join(taglist))
 
     # ok, we either download something or need to modify the db file, make sure
     # the output directory exists ...
@@ -356,7 +359,27 @@ def command_download(args, db=None):
         if args.no_download:
             return 0
 
-        # ok download all files mentioned in this database file ...
+        # make sure all the payloads referenced in the file are present
         downloader = functools.partial(download_payload, db, directory=destination)
-        # we don't really care for the result, we just collect it to be sure there are no delayed exceptions
-        list(pool.map(downloader, database.get_payloads()))
+        all_payloads = set(pool.map(downloader, database.get_payloads()))
+
+        if args.delete_extra_payloads:
+            existing_files = set()
+            for dirname, subdirs, filenames in os.walk(destination):
+                # only look in sub directories matching a hex substring
+                subdirs[:] = (e for e in subdirs if re.match('[0-9a-f]{2}', e))
+                # and don't check files in top dir
+                if dirname == destination:
+                    continue
+                # and add all others
+                for filename in filenames:
+                    if not re.match(r"(.+)_r(\d+).root", filename):
+                        continue
+                    existing_files.add(os.path.join(dirname, filename))
+
+            extra_files = existing_files - all_payloads
+            B2INFO(f"Deleting {len(extra_files)} additional payload files")
+            # delete all the files and consume the results to trigger any errors
+            list(pool.map(os.remove, extra_files))
+
+        return 1 if None in all_payloads else 0

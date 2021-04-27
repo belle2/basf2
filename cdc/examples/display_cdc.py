@@ -14,18 +14,18 @@
 # If you want custom settings for b2display, you thus only need to
 # edit this steering file.
 
-from basf2 import *
+import basf2 as b2
 
 # create paths
-main = create_path()
+main = b2.create_path()
 
-rootinput = register_module('RootInput')
+rootinput = b2.register_module('RootInput')
 # rootinput = register_module('SeqRootInput')
 # no input file set, use -i
 
 # create geometry
-gearbox = register_module('Gearbox')
-geometry = register_module('Geometry')
+gearbox = b2.register_module('Gearbox')
+geometry = b2.register_module('Geometry')
 # Since Geometry is only required for track extrapolation in inner detectors,
 # we'll exclude ECL (saves about 10s in startup time)
 # geometry.param('excludedComponents', ['ECL','CDC','PXD','SVD','EKLM','ARICH','BKLM'])
@@ -35,7 +35,7 @@ main.add_module(rootinput)
 main.add_module(gearbox)
 main.add_module(geometry)
 
-display = register_module('Display')
+display = b2.register_module('Display')
 
 # The options parameter is a combination of:
 # D draw detectors - draw simple detector representation (with different size)
@@ -87,5 +87,5 @@ display.param('showCDCHits', True)
 
 main.add_module(display)
 
-process(main)
+b2.process(main)
 # print statistics(statistics.INIT)

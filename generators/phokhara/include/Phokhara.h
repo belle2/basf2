@@ -30,7 +30,7 @@ namespace Belle2 {
      */
     Phokhara();
 
-    /** Destrucotr. */
+    /** Destructor. */
     ~Phokhara();
 
     /** Sets the default settings for the BhWide Fortran generator. */
@@ -57,42 +57,42 @@ namespace Belle2 {
     void setNLOIFI(int NLOIFI) { m_NLOIFI = NLOIFI; }
 
     /** Sets alpha qed options
-      * @param Alpha Vacuum polarization switch: off (0), on (1,[by Fred Jegerlehner], default), on (2,[by Thomas Teubner])
+      * @param alpha Vacuum polarization switch: off (0), on (1,[by Fred Jegerlehner], default), on (2,[by Thomas Teubner])
     */
     void setAlpha(int alpha) { m_alpha = alpha; }
 
     /** Sets pion formfactors
-      * @param PionFF KS Pionformfactor(0), GS Pionformfactor(1) old, GS Pionformfactor new(2)
+      * @param pionff KS Pionformfactor(0), GS Pionformfactor(1) old, GS Pionformfactor new(2)
     */
     void setPionFF(int pionff) { m_pionff = pionff; }
 
     /** Sets kaon formfactors
-      * @param KaonFF KaonFormFactor constrained (0),KaonFormFactor unconstrained (1),KaonFormFactor old (2)
+      * @param kaonff KaonFormFactor constrained (0),KaonFormFactor unconstrained (1),KaonFormFactor old (2)
     */
     void setKaonFF(int kaonff) { m_kaonff = kaonff; }
 
     /** Sets Pion Structure
-      * @param PionStructure f0+f0(600): KK model(0), no structure(1), no f0+f0(600)(2), f0 KLOE(3)
+      * @param pionstructure f0+f0(600): KK model(0), no structure(1), no f0+f0(600)(2), f0 KLOE(3)
     */
     void setPionStructure(int pionstructure) { m_pionstructure = pionstructure; }
 
     /** Sets narrow resonances
-      * @param NarrowRes no narrow resonances (0), J/Psi (1), Psi(2S) (2) (narro resonances only for pion = 0, 1, 6, 7
+      * @param narres no narrow resonances (0), J/Psi (1), Psi(2S) (2) (narro resonances only for pion = 0, 1, 6, 7
     */
     void setNarrowRes(int narres) { m_narres = narres; }
 
     /** Sets Proton formfactors
-      * @param ProtonFF f0+f0(600): KK model(0), no structure(1), no f0+f0(600)(2), f0 KLOE(3)
+      * @param protonff f0+f0(600): KK model(0), no structure(1), no f0+f0(600)(2), f0 KLOE(3)
     */
     void setProtonFF(int protonff) { m_protonff = protonff; }
 
     /** Sets the theta scattering angle range for the photon.
-      * @param ScatteringAngleRangePhoton A pair of values, representing the min and max theta angle of the photon in [deg].
+      * @param angleRange A pair of values, representing the min and max theta angle of the photon in [deg].
       */
     void setScatteringAngleRangePhoton(std::pair<double, double> angleRange) { m_ScatteringAngleRangePhoton = angleRange; }
 
     /** Sets the theta scattering angle range for the final state particles.
-       * @param ScatteringAngleRangeFinalStates A pair of values, representing the min and max theta angle of the final state particles in [deg].
+       * @param angleRange A pair of values, representing the min and max theta angle of the final state particles in [deg].
        */
     void setScatteringAngleRangeFinalStates(std::pair<double, double> angleRange) { m_ScatteringAngleRangeFinalStates = angleRange; }
 
@@ -155,8 +155,7 @@ namespace Belle2 {
     void setNMaxTrials(int nMaxTrials) { m_nMaxTrials = nMaxTrials; }
 
     /** Initializes the generator.
-     * @param dataPath The path to the default input param file for Phokhara.
-     * @param userDataFile The path and filename of the user input data file, which defines the parameter settings for the generator.
+     * @param paramFile The path to the input param file for Phokhara.
      */
     void init(const std::string& paramFile);
 

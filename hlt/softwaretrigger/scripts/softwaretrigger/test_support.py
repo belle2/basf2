@@ -14,7 +14,6 @@ from L1trigger import add_tsim
 from softwaretrigger import constants
 from softwaretrigger.constants import DEFAULT_EXPRESSRECO_COMPONENTS, RAWDATA_OBJECTS, DEFAULT_HLT_COMPONENTS
 from ROOT import Belle2
-find_file = Belle2.FileSystem.findFile
 
 
 class CheckForCorrectHLTResults(basf2.Module):
@@ -33,7 +32,7 @@ class CheckForCorrectHLTResults(basf2.Module):
             basf2.B2FATAL("ROIs are not present")
 
 
-def generate_input_file(run_type, location, output_file_name, exp_number):
+def generate_input_file(run_type, location, output_file_name, exp_number, passthrough):
     """
     Generate an input file for usage in the test.
     Simulate uubar for "beam" and two muons for "cosmic" setting.
@@ -43,6 +42,7 @@ def generate_input_file(run_type, location, output_file_name, exp_number):
     :param location: Whether to simulate expressreco (with ROIs) or hlt (no PXD)
     :param output_file_name: where to store the result file
     :param exp_number: which experiment number to simulate
+    :param passthrough: if true don't generate a trigger result in the input file
     """
     if os.path.exists(output_file_name):
         return
@@ -50,7 +50,7 @@ def generate_input_file(run_type, location, output_file_name, exp_number):
     basf2.set_random_seed(12345)
 
     path = basf2.Path()
-    path.add_module('EventInfoSetter', evtNumList=[1], expList=[exp_number])
+    path.add_module('EventInfoSetter', evtNumList=[4], expList=[exp_number])
 
     if run_type == constants.RunTypes.beam:
         generators.add_continuum_generator(path, finalstate="uubar")
@@ -75,27 +75,51 @@ def generate_input_file(run_type, location, output_file_name, exp_number):
     add_packers(path, components=components)
 
     # express reco expects to have an HLT results, so lets add a fake one
-    if location == constants.Location.expressreco:
+    if location == constants.Location.expressreco and not passthrough:
         class FakeHLTResult(basf2.Module):
             def initialize(self):
                 self.results = Belle2.PyStoreObj(Belle2.SoftwareTriggerResult.Class(), "SoftwareTriggerResult")
                 self.results.registerInDataStore()
 
+                self.EventMetaData = Belle2.PyStoreObj("EventMetaData")
+
             def event(self):
                 self.results.create()
-                self.results.addResult("software_trigger_cut&all&total_result", 1)
+                # First event: Add all the results that are used on express reco just to test all paths
+                if (self.EventMetaData.obj().getEvent() == 1):
+                    self.results.addResult("software_trigger_cut&all&total_result", 1)
+                    self.results.addResult("software_trigger_cut&skim&accept_mumutight", 1)
+                    self.results.addResult("software_trigger_cut&skim&accept_dstar_1", 1)
+                    self.results.addResult("software_trigger_cut&filter&L1_trigger", 1)
+                # Second event: No skim lines to replicate a HLT discared event with filter ON
+                elif (self.EventMetaData.obj().getEvent() == 2):
+                    self.results.addResult("software_trigger_cut&all&total_result", 1)
+                    self.results.addResult("software_trigger_cut&filter&L1_trigger", 1)
+                # Third event: Does not pass through L1 passthrough
+                elif (self.EventMetaData.obj().getEvent() == 3):
+                    self.results.addResult("software_trigger_cut&all&total_result", 1)
+                    self.results.addResult("software_trigger_cut&skim&accept_mumutight", 1)
+                    self.results.addResult("software_trigger_cut&skim&accept_dstar_1", 1)
+                    self.results.addResult("software_trigger_cut&filter&L1_trigger", 0)
+                # Fourth event: HLT discarded but passes HLT skims (possible in HLT filter OFF mode)
+                elif (self.EventMetaData.obj().getEvent() == 4):
+                    self.results.addResult("software_trigger_cut&all&total_result", 0)
+                    self.results.addResult("software_trigger_cut&skim&accept_mumutight", 1)
+                    self.results.addResult("software_trigger_cut&skim&accept_dstar_1", 1)
+                    self.results.addResult("software_trigger_cut&filter&L1_trigger", 0)
 
         path.add_module(FakeHLTResult())
 
     # remove everything but HLT input raw objects
-    branch_names = RAWDATA_OBJECTS + ["EventMetaData", "TRGSummary", "SoftwareTriggerResult"]
+    branch_names = RAWDATA_OBJECTS + ["EventMetaData", "TRGSummary"]
+    if not passthrough:
+        branch_names += ["SoftwareTriggerResult"]
     if location == constants.Location.hlt:
         branch_names.remove("RawPXDs")
         branch_names.remove("ROIs")
 
-    # There us no packer for these objects :-(
+    # There is no packer for the following objects :(
     branch_names.remove("RawTRGs")
-    branch_names.remove("RawFTSWs")
 
     path.add_module("RootOutput", outputFileName=output_file_name, branchNames=branch_names)
 
@@ -144,7 +168,7 @@ def test_script(script_location, input_file_name, temp_dir):
         basf2.process(test_path)
 
 
-def test_folder(location, run_type, exp_number, phase):
+def test_folder(location, run_type, exp_number, phase, passthrough=False):
     """
     Run all hlt operation scripts in a given folder
     and test the outputs of the files.
@@ -160,13 +184,18 @@ def test_folder(location, run_type, exp_number, phase):
     :param exp_number: which experiment number to simulate
     :param phase:    where to look for the operation files (will search in the folder
                      hlt/operation/{phase}/global/{location}/evp_scripts/)
+    :param passthrough: only relevant for express reco: If true don't create a
+                     software trigger result in the input file to test running
+                     express reco if hlt is in passthrough mode
+
     """
     temp_dir = tempfile.mkdtemp()
     output_file_name = os.path.join(temp_dir, f"{location.name}_{run_type.name}.root")
     generate_input_file(run_type=run_type, location=location,
-                        output_file_name=output_file_name, exp_number=exp_number)
+                        output_file_name=output_file_name, exp_number=exp_number,
+                        passthrough=passthrough)
 
-    script_dir = find_file(f"hlt/operation/{phase}/global/{location.name}/evp_scripts/")
+    script_dir = basf2.find_file(f"hlt/operation/{phase}/global/{location.name}/evp_scripts/")
     run_at_least_one = False
     for script_location in glob(os.path.join(script_dir, f"run_{run_type.name}*.py")):
         run_at_least_one = True

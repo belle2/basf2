@@ -75,7 +75,7 @@ static bool compareDistance(const KLMHit2d& hit1, const KLMHit2d& hit2)
 
 void KLMClustersReconstructorModule::event()
 {
-  //static double mass = TDatabasePDG::Instance()->GetParticle(130)->Mass();
+  //static double mass = Const::Klong.getMass();
   int i, nLayers, innermostLayer, nHits;
   int nLayersBKLM = BKLMElementNumbers::getMaximalLayerNumber();
   int nLayersEKLM = EKLMElementNumbers::getMaximalLayerNumber();

@@ -15,10 +15,12 @@ __authors__ = [
 import basf2 as b2
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
-from variables import variables
-
+from stdCharged import stdE, stdK, stdMu, stdPi
+from stdPhotons import stdPhotons
+from variables import variables as vm
 
 __liaison__ = "Trevor Shillington <trshillington@hep.physics.mcgill.ca>"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header
@@ -32,12 +34,12 @@ class BtoXgamma(BaseSkim):
 
     * :math:`\\text{foxWolframR2} < 0.5` constructed using tracks with
       :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
-    * :math:`n_{\\text{tracks}} >= 3`
+    * :math:`n_{\\text{tracks}} \\geq 3`
 
     Cuts on photons:
 
     * :math:`\\text{clusterE9E21}>0.9`
-    * :math:`1.4\\,\\text{GeV}<\\text{E_{\\gamma}}<3.4\\,\\text{GeV}` in CMS frame
+    * :math:`1.4\\,\\text{GeV}<\\E_{\\gamma}<3.4\\,\\text{GeV}` in CMS frame
     """
 
     __authors__ = ["Trevor Shillington"]
@@ -45,17 +47,15 @@ class BtoXgamma(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, electroweak penguins, radiative decays"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdPi": ["all"],
-        },
-        "stdPhotons": {
-            "stdPhotons": ["all", "loose"],
-        },
-    }
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        stdPhotons("all", path=path)
+        stdPhotons("loose", path=path)
 
     def build_lists(self, path):
-        """Build the skim list for :math:`B \\to X_{(s,d)}\\gamma` decays."""
+        """Build the skim list for :math:`B \\to X\\gamma` decays."""
         # event level cuts: R2 and require a minimum number of tracks + decent photons
         ma.fillParticleList(decayString='pi+:BtoXgamma_eventshape', cut='pt > 0.1', path=path)
         ma.fillParticleList(decayString='gamma:BtoXgamma_eventshape', cut='E > 0.1', path=path)
@@ -82,6 +82,33 @@ class BtoXgamma(BaseSkim):
 
         self.SkimLists = ['B+:gamma']
 
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        histogram_filename = f'{self}_Validation.root'
+
+        stdK('all', path=path)
+        stdPhotons('cdc', path=path)
+        ma.cutAndCopyList('gamma:sig', 'gamma:cdc', 'clusterNHits > 1.5 and E > 1.5', True, path)
+
+        ma.reconstructDecay('K*0:sig  -> K+:all pi-:all', '0.6 < M < 1.6', path=path)
+        ma.reconstructDecay('B0:sig ->  K*0:sig gamma:sig', '5.22 < Mbc < 5.3 and  abs(deltaE)< .5', path=path)
+
+        # the variables that are printed out are: Mbc and deltaE
+        create_validation_histograms(
+            rootfile=histogram_filename,
+            particlelist='B0:sig',
+            variables_1d=[
+                ('Mbc', 100, 5.2, 5.3, 'Signal B0 Mbc', __liaison__,
+                 'Mbc of the signal B0', '', 'Mbc [GeV/c^2]', 'Candidates'),
+                ('deltaE', 100, -1, 1, 'Signal B0 deltaE', __liaison__,
+                 'deltaE of the signal B0', '', 'deltaE [GeV]', 'Candidates')
+            ],
+            variables_2d=[],
+            path=path)
+
 
 @fancy_skim_header
 class BtoXll(BaseSkim):
@@ -98,19 +125,19 @@ class BtoXll(BaseSkim):
 
       * :math:`\\text{foxWolframR2} < 0.5` constructed using tracks with
         :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
-      * :math:`n_{\\text{tracks}} >= 3`
+      * :math:`n_{\\text{tracks}} \\geq 3`
 
       Cuts on electrons:
 
       * :math:`\\text{electronID} > 0.1`
       * :math:`p > 0.395\\,\\text{GeV}` in lab frame
-      * :math:'dr<0.5 and abs(dz)<2'
+      * :math:`dr<0.5 and abs(dz)<2`
 
       Cuts on muons:
 
       * :math:`\\text{muonID} > 0.5`
       * :math:`p > 0.395\\,\\text{GeV}` in lab frame
-      * :math:'dr<0.5 and abs(dz)<2'
+      * :math:`dr<0.5 and abs(dz)<2`
 
 
       Cut on dilepton energy:
@@ -123,16 +150,13 @@ class BtoXll(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, electroweak penguins, radiative decays"
 
-    RequiredStandardLists = {
-            "stdCharged": {
-                "stdE": ["all"],
-                "stdMu": ["all"],
-                "stdPi": ["all"],
-            },
-            "stdPhotons": {
-                "stdPhotons": ["all"],
-            },
-        }
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdMu("all", path=path)
+        stdPi("all", path=path)
+        stdPhotons("all", path=path)
 
     def build_lists(self, path):
         """Build the skim list for :math:`B \\to X\\ell\\ell` non-LFV decays."""
@@ -178,6 +202,28 @@ class BtoXll(BaseSkim):
 
         self.SkimLists = ['B+:xll']
 
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        histogram_filename = f'{self}_Validation.root'
+
+        stdK(listtype='good', path=path)
+        stdMu(listtype='good', path=path)
+        ma.reconstructDecay("B+:signal -> K+:good mu+:good mu-:good", "Mbc > 5.2 and deltaE < 0.5 and deltaE > -0.5", path=path)
+
+        create_validation_histograms(
+            rootfile=histogram_filename,
+            particlelist='B+:signal',
+            variables_1d=[
+                ('deltaE', 100, -0.5, 0.5, 'Signal B deltaE', __liaison__,
+                 'deltaE of the Signal B', '', 'deltaE [GeV]', 'Candidates'),
+                ('Mbc', 100, 5.2, 5.3, 'Signal B Mbc', __liaison__,
+                 'Mbc of the signal B', '', 'Mbc [GeV/c^2]', 'Candidates')],
+            variables_2d=[],
+            path=path)
+
 
 @fancy_skim_header
 class BtoXll_LFV(BaseSkim):
@@ -193,19 +239,19 @@ class BtoXll_LFV(BaseSkim):
 
     * :math:`\\text{foxWolframR2} < 0.5` constructed using tracks with
       :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
-    * :math:`n_{\\text{tracks}} >= 3`
+    * :math:`n_{\\text{tracks}} \\geq 3`
 
     Cuts on electrons:
 
     * :math:`\\text{electronID} > 0.1`
     * :math:`p > 0.395\\,\\text{GeV}` in lab frame
-    * :math:'dr<0.5 and abs(dz)<2'
+    * :math:`dr<0.5 and abs(dz)<2`
 
     Cuts on muons:
 
     * :math:`\\text{muonID} > 0.5`
     * :math:`p > 0.395\\,\\text{GeV}` in lab frame
-    * :math:'dr<0.5 and abs(dz)<2'
+    * :math:`dr<0.5 and abs(dz)<2`
 
 
     Cut on dilepton energy:
@@ -218,16 +264,11 @@ class BtoXll_LFV(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, electroweak penguins, radiative decays"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["all"],
-            "stdMu": ["all"],
-            "stdPi": ["all"],
-        },
-        "stdPhotons": {
-            "stdPhotons": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdMu("all", path=path)
+        stdPi("all", path=path)
+        stdPhotons("all", path=path)
 
     def build_lists(self, path):
         """Build the skim list for :math:`B \\to X\\ell\\ell` LFV decays."""
@@ -280,22 +321,22 @@ class inclusiveBplusToKplusNuNu(BaseSkim):
     * :math:`B^+ \\to K\\nu\\nu` inclusive
 
     Track cleanup:
-    * :math:'p_t>0.1'
-    * :math:'thetaInCDCAcceptance'
-    * :math:'dr<0.5 and abs(dz)<3.0'
+    * :math:`p_t > 0.1`
+    * :math:`thetaInCDCAcceptance`
+    * :math:`dr<0.5 and abs(dz)<3.0`
 
     Event cleanup:
     * :math:`3 < nCleanedTracks < 11`
 
     Kaon cuts:
-    * :math:'track cleanup + event cleanup + nPXDHits>0'
-    * :math:'p_t rank=1'
-    * :math:'kaonID>0.01'
+    * :math:`track cleanup + event cleanup + nPXDHits > 0`
+    * :math:`p_t rank=1`
+    * :math:`kaonID>0.01`
 
     MVA info and cuts:
     * mva_identifier: MVAFastBDT_InclusiveBplusToKplusNuNu_Skim
     * Global Tag: mva_inclusiveBplusToKplusNuNu
-    * :math:'mva\\_identifier>0.5'
+    * :math:`mva\\_identifier > 0.5`
     """
 
     __authors__ = ["Cyrille Praz"]
@@ -304,8 +345,7 @@ class inclusiveBplusToKplusNuNu(BaseSkim):
     __category__ = "physics, electroweak penguins, radiative decays"
 
     NoisyModules = ["ParticleCombiner"]
-
-    RequiredStandardLists = None
+    validation_sample = _VALIDATION_SAMPLE
 
     def build_lists(self, path):
 
@@ -346,7 +386,61 @@ class inclusiveBplusToKplusNuNu(BaseSkim):
         b2.conditions.append_globaltag('mva_inclusiveBplusToKplusNuNu')
         path.add_module('MVAExpert', listNames=['B+:inclusiveBplusToKplusNuNu'],
                         extraInfoName=mva_identifier, identifier=mva_identifier)
-        variables.addAlias(mva_identifier, 'extraInfo({})'.format(mva_identifier))
-        ma.applyCuts('B+:inclusiveBplusToKplusNuNu', mva_identifier+'>0.5', path=path)
+        vm.addAlias(mva_identifier, f'extraInfo({mva_identifier})')
+        ma.applyCuts('B+:inclusiveBplusToKplusNuNu', mva_identifier + '>0.5', path=path)
 
         self.SkimLists = ['B+:inclusiveBplusToKplusNuNu']
+
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        histogram_filename = f'{self}_Validation.root'
+        # Default cleanup also used in and ma.buildEventShape
+        track_cleanup = 'pt > 0.1'
+        track_cleanup += ' and thetaInCDCAcceptance'
+        track_cleanup += ' and abs(dz) < 3.0'
+        track_cleanup += ' and abs(dr) < 0.5'
+
+        # Define a couple of aliases
+        vm.addAlias('kaon_pt', 'daughter(0,pt)')
+        vm.addAlias('nCleanedTracks_simple_cleanup', 'nCleanedTracks({})'.format(track_cleanup))
+
+        # Output validation histograms
+        create_validation_histograms(
+            rootfile=histogram_filename,
+            particlelist='B+:inclusiveBplusToKplusNuNu',
+            variables_1d=[
+                ('kaon_pt',
+                 10,
+                 0,
+                 5,
+                 'Kaon pt',
+                 __liaison__,
+                 'Transverse momentum of the kaon candidate',
+                 'Maximum between 1.5 and 2 GeV/c',
+                 'Kaon pt [GeV/c]',
+                 'Candidates'),
+                ('nCleanedTracks_simple_cleanup',
+                 12,
+                 0,
+                 12,
+                 'Number of cleaned tracks',
+                 __liaison__,
+                 'Number of cleaned tracks in the event',
+                 'Should be between 4 and 10, with two local maxima at 4 and 6',
+                 'Number of cleaned tracks',
+                 'Events'),
+                ('sphericity',
+                 10,
+                 0,
+                 1,
+                 'Event Sphericity',
+                 __liaison__,
+                 'Sphericity computed by ma.buildEventShape',
+                 'Maximum around 0.3',
+                 'Event Sphericity',
+                 'Events')],
+            variables_2d=[],
+            path=path)

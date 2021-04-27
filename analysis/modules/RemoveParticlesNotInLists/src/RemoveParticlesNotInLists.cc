@@ -30,9 +30,8 @@ RemoveParticlesNotInListsModule::RemoveParticlesNotInListsModule(): m_nRemoved(0
 
 void RemoveParticlesNotInListsModule::initialize()
 {
-  StoreArray<Particle> particles;
-  particles.isRequired();
-  m_subset.registerSubset(particles);
+  m_particles.isRequired();
+  m_subset.registerSubset(m_particles);
 
   for (const auto& l : m_particleLists) {
     StoreObjPtr<ParticleList>(l).isRequired();
@@ -41,12 +40,11 @@ void RemoveParticlesNotInListsModule::initialize()
 
 void RemoveParticlesNotInListsModule::event()
 {
-  StoreArray<Particle> particles;
-  const int nBefore = particles.getEntries();
+  const int nBefore = m_particles.getEntries();
 
   m_subset.removeParticlesNotInLists(m_particleLists);
 
-  const int nAfter = particles.getEntries();
+  const int nAfter = m_particles.getEntries();
 
   m_nTotal += nBefore;
   m_nRemoved += nBefore - nAfter;

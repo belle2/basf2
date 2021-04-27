@@ -17,8 +17,7 @@
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
-#include "TH1I.h"
-#include "TH1F.h"
+#include "TH1D.h"
 
 namespace Belle2 {
 
@@ -29,13 +28,13 @@ namespace Belle2 {
 
     /** Constructor */
     PXDDQMExpressRecoModule();
-    /* Destructor */
-    virtual ~PXDDQMExpressRecoModule();
 
   private:
-    /** Module functions */
+    /** Initialize */
     void initialize() override final;
+    /** Begin run */
     void beginRun() override final;
+    /** Event */
     void event() override final;
 
     /**
@@ -46,8 +45,14 @@ namespace Belle2 {
 
   private:
 
-    /** cut for accepting to hitmap histogram, using pixels only, default = 0 */
-    float m_CutPXDCharge = 0.0;
+    /** cut for accepting filtered pixel */
+    int m_CutMinCharge;
+    /** cut for accepting filtered cluster, using cluster charge */
+    int m_CutMinClusterCharge;
+    /** cut for accepting to filtered hitmap histogram, using cluster seed */
+    int m_CutMinSeedCharge;
+    /** cut for accepting to filtered hitmap histogram, maximum cluster size */
+    int m_CutMaxClusterSize;
 
     std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
 
@@ -62,34 +67,43 @@ namespace Belle2 {
     StoreArray<PXDCluster> m_storePXDClusters;
 
     /** Hitmaps of Digits */
-    TH1I* m_hitMapCounts = {};
+    TH1D* m_hitMapCounts = {};
+    /** Hitmaps of filtered Digits */
+    TH1D* m_hitMapFilterCounts = {};
     /** Hitmaps of Clusters*/
-    TH1I* m_hitMapClCounts = {};
+    TH1D* m_hitMapClCounts = {};
+    /** Hitmaps of filtered Clusters*/
+    TH1D* m_hitMapClFilterCounts = {};
+
     /** Hitmaps of digits on chips */
-    TH1I* m_hitMapCountsChip = {};
+    TH1D* m_hitMapCountsChip = {};
     /** Hitmaps of clusters on chips */
-    TH1I* m_hitMapClCountsChip = {};
+    TH1D* m_hitMapClCountsChip = {};
     /** Fired pixels per event */
-    TH1F** m_fired = {};
+    std::vector <TH1D*> m_fired = {};
+    /** Filtered fired pixels per event */
+    std::vector<TH1D*> m_goodfired = {};
     /** Clusters per event */
-    TH1F** m_clusters = {};
+    std::vector <TH1D*> m_clusters = {};
+    /** filtered Clusters per event */
+    std::vector<TH1D*> m_goodclusters = {};
     // FIXME: Startrow related histos are expert debugging, not for shifter (-> remove this)
     /** Start row distribution */
-    //TH1F** m_startRow={};
+    //std::vector <TH1D*> m_startRow={};
     /** Cluster seed charge by distance from the start row */
-    //TH1F** m_chargStartRow={};
+    //std::vector <TH1D*> m_chargStartRow={};
     /** counter for Cluster seed charge by distance from the start row */
-    //TH1F** m_startRowCount={};
+    //std::vector <TH1D*> m_startRowCount={};
     /** Charge of clusters */
-    TH1F** m_clusterCharge = {};
+    std::vector <TH1D*> m_clusterCharge = {};
     /** Charge of pixels */
-    TH1F** m_pixelSignal = {};
+    std::vector <TH1D*> m_pixelSignal = {};
     /** u cluster size */
-    TH1F** m_clusterSizeU = {};
+    std::vector <TH1D*> m_clusterSizeU = {};
     /** v cluster size */
-    TH1F** m_clusterSizeV = {};
+    std::vector <TH1D*> m_clusterSizeV = {};
     /** Cluster size */
-    TH1F** m_clusterSizeUV = {};
+    std::vector <TH1D*> m_clusterSizeUV = {};
 
   };
 

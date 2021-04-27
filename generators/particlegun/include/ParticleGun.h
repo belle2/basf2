@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLEGUN_H
-#define PARTICLEGUN_H
+#pragma once
 
 #include <mdst/dataobjects/MCParticleGraph.h>
 
@@ -134,4 +133,3 @@ namespace Belle2 {
 
 } //end namespace Belle2
 
-#endif //PARTICLEGUN_H

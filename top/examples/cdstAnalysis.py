@@ -6,14 +6,14 @@
 # Sam Cunliffe (sam.cunliffe@desy.de)
 # November 2018
 
+from basf2 import create_path, use_central_database, process, statistics
+from modularAnalysis import variablesToNtuple
+from ROOT import gSystem
+
 # you need to choose a consistent global tag that corresponds to the data
 # you are analysing this will change from production to production
 inputdata = "/hsm/belle2/bdata/Data/release-02-00-01/DB00000425/prod00000005/e0003/4S/r00784/all/cdst/sub00/*.root"
 datadbtag = "data_reprocessing_prod5"
-
-from basf2 import create_path, use_central_database, process, statistics
-from modularAnalysis import variablesToNtuple
-from ROOT import gSystem
 
 # Load the top libraries -- needed until the "top/variables" directory
 # gets upgraded and variables linked automatically

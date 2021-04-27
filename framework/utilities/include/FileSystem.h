@@ -39,9 +39,9 @@ namespace Belle2 {
 
     /**
      * Search for given file or directory in the directory given by the
-     * environment variable BELLE2_<DATATYPE>_DATA_DIR or subdirectory
-     * <datatype>-data of $VO_BELLE2_SW_DIR or local/central release directory
-     * and return absolute path if found.
+     * environment variable BELLE2_<DATATYPE>_DATA_DIR or local/central release
+     * directory and return absolute path if found.
+     *
      * If the file isn't found in either of these, absolute paths and paths
      * relative to the current working directory are also accepted.
      *
@@ -68,9 +68,14 @@ namespace Belle2 {
     static bool isFile(const std::string& filename);
     /** Check if filename points to an existing directory */
     static bool isDir(const std::string& filename);
+    /** Check if filename points to an existing symbolic link */
+    static bool isSymLink(const std::string& filename);
 
-    /** calculate the MD5 checksum of a given file */
+    /** Calculate the MD5 checksum of a given file */
     static std::string calculateMD5(const std::string& filename);
+
+    /** Calculate the Adler-32 checksum of a given file */
+    static std::string calculateAdler32(const std::string& filename);
 
     /**
      * Load a shared library.

@@ -9,15 +9,14 @@
 
 # avoid race conditions beetween pyroot and GUI thread
 from ROOT import PyConfig
-PyConfig.StartGuiThread = False
+PyConfig.StartGuiThread = False  # noqa
 
-from basf2 import *
-import sys
+import basf2 as b2
 from ROOT import Belle2
 from ROOT import TH1F, TCanvas, TGraph
 
 
-class WFDisplay(Module):
+class WFDisplay(b2.Module):
 
     '''
     Simple event display of waveforms with feature extraction points
@@ -52,22 +51,17 @@ class WFDisplay(Module):
     def wait(self):
         ''' wait for user respond '''
 
-        try:
-            q = 0
-            Q = 0
-            p = 1
-            P = 1
-            abc = eval(input('Type <CR> to continue, P to print or Q to quit '))
-            if abc == 1:
-                filename = self.pdfFile + '.pdf'
-                self.c1.SaveAs(filename)
-                print('Canvas saved to file:', filename)
-                return False
-            else:
-                evtMetaData = Belle2.PyStoreObj('EventMetaData')
-                evtMetaData.obj().setEndOfData()
-                return True
-        except BaseException:
+        user_input = input("Press Enter to continue, P to print, or Q to quit ").lower().strip()
+        if user_input == "p":
+            filename = self.pdfFile + '.pdf'
+            self.c1.SaveAs(filename)
+            print('Canvas saved to file:', filename)
+            return False
+        elif user_input == "q":
+            evtMetaData = Belle2.PyStoreObj('EventMetaData')
+            evtMetaData.obj().setEndOfData()
+            return True
+        else:
             return False
 
     def draw(self, k, event, run):
@@ -130,7 +124,7 @@ class WFDisplay(Module):
         waveforms = Belle2.PyStoreArray('TOPRawWaveforms')
 
         k = 0
-        nHits = 0
+        # nHits = 0
         fname = 'waveforms_run' + str(run) + '_event' + str(event) + '_chan'
         #: output file name
         self.pdfFile = fname
@@ -203,36 +197,36 @@ class WFDisplay(Module):
             self.draw(k, event, run)
 
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 # Define a global tag (note: the one given bellow will become out-dated!)
-use_central_database('data_reprocessing_proc8')
+b2.use_central_database('data_reprocessing_proc8')
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # input
-roinput = register_module('SeqRootInput')
+roinput = b2.register_module('SeqRootInput')
 # roinput = register_module('RootInput')
 main.add_module(roinput)
 
 # conversion from RawCOPPER or RawDataBlock to RawTOP (needed only in PocketDAQ)
-rawconverter = register_module('Convert2RawDet')
+rawconverter = b2.register_module('Convert2RawDet')
 main.add_module(rawconverter)
 
 # Initialize TOP geometry parameters (creation of Geant geometry is not needed)
 main.add_module('TOPGeometryParInitializer')
 
 # Unpacking
-unpack = register_module('TOPUnpacker')
+unpack = b2.register_module('TOPUnpacker')
 main.add_module(unpack)
 
 # Add multiple hits from waveforms
-featureExtractor = register_module('TOPWaveformFeatureExtractor')
+featureExtractor = b2.register_module('TOPWaveformFeatureExtractor')
 main.add_module(featureExtractor)
 
 # Convert to TOPDigits
-converter = register_module('TOPRawDigitConverter')
+converter = b2.register_module('TOPRawDigitConverter')
 converter.param('useSampleTimeCalibration', False)
 converter.param('useChannelT0Calibration', False)
 converter.param('useModuleT0Calibration', False)
@@ -243,11 +237,11 @@ main.add_module(converter)
 main.add_module(WFDisplay())
 
 # Print progress
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print statistics
-print(statistics)
+print(b2.statistics)

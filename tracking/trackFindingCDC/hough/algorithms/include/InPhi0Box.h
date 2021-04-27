@@ -31,10 +31,11 @@ namespace Belle2 {
 
     public:
       /** Function that gives the sign of the distance from an observed drift circle to the familiy of curves
+       *  @param houghBox
        *  @param x x coordinate of the center of the drift circle
        *  @param y y coordinate of the center of the drift circle
        *  @param l the signed drift length of the drift circle - sign is the right left passage hypotheses
-       *  @returns
+       *  @return
        *   * ESign::c_Plus if the drift circle is always on the positive / right site
        *   * ESign::c_Minus means the drift circle is always on the negative / left site
        *   * ESign::c_Zero if the dirft circle lies on any of the curves

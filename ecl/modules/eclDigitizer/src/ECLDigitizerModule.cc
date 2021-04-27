@@ -404,8 +404,7 @@ void ECLDigitizerModule::event()
     for (int id = 0; id < ECL::ECL_CRATES; id++) m_ttime[id] = DeltaT;
   }
 
-  StoreObjPtr<Belle2::EventMetaData> emd;
-  int triggerTag0 = emd->getEvent();
+  int triggerTag0 = m_EventMetaData->getEvent();
   for (int id = 0; id < ECL::ECL_CRATES; id++) {
     auto eclTrig = m_eclTrigs.appendNew();
     int triggerPhase0 = 2 * (m_ttime[id] + m_ttime[id] / 3);

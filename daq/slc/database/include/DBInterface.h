@@ -2,6 +2,7 @@
 #define _Belle2_DBInterface_hh
 
 #include "daq/slc/database/DBRecord.h"
+#include "daq/slc/system/Mutex.h"
 
 #include <vector>
 #include <map>
@@ -55,6 +56,10 @@ namespace Belle2 {
     std::string m_user;
     std::string m_password;
     int m_port;
+
+  private:
+    Mutex m_mutex;
+    static const int m_buf_size = 1024 * 1000;
     char* m_buf;
 
   };

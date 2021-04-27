@@ -40,8 +40,10 @@ namespace Belle2 {
 
       /**
        *  Main method that extracts the variable values from the complex object.
-       *  @returns  Indication whether the extraction could be completed successfully.
-       *            Base implementation returns always true.
+       *  Returns indication whether the extraction could be completed successfully.
+       *  Base implementation returns always true.
+       *  @param obj: dummy object not used
+       *  @return: always true for the base implementation
        */
       virtual bool extract(const Object* obj __attribute__((unused)))
       {
@@ -57,7 +59,8 @@ namespace Belle2 {
       /**
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
-       *  @param prefix Name prefix to apply to all variable names.
+       *  @param prefix: Name prefix to apply to all variable names.
+       *  @return: in base implementation always an empty vector
        */
       virtual std::vector<Named<Float_t*> > getNamedVariables(const std::string& prefix __attribute__((unused)))
       {

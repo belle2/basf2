@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
 import basf2_mva
 import pandas as pd
 from root_pandas import to_root, read_root

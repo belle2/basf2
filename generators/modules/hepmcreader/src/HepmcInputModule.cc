@@ -28,7 +28,7 @@ REG_MODULE(HepMCInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-HepMCInputModule::HepMCInputModule() : Module(), m_evtNum(0), m_minEvent(-1), m_maxEvent(INT_MAX), m_initial(0)
+HepMCInputModule::HepMCInputModule() : Module(), m_evtNum(0), m_minEvent(-1), m_maxEvent(INT_MAX), m_totalEvents(-1), m_initial(0)
 {
   //Set module properties
   setDescription("HepMC file input. This module loads an event record from HEPMC2 format and store the content into the MCParticle collection. HEPMC format is used by for example pythia8.");
@@ -79,7 +79,7 @@ void HepMCInputModule::initialize()
 
   //Do we need to boost?
   if (m_boost2Lab) {
-    MCInitialParticles& initial = m_initial.generate();
+    const MCInitialParticles& initial = m_initial.generate();
     TLorentzRotation boost = initial.getCMSToLab();
     m_hepmcreader->m_labboost = boost;
   }
@@ -106,7 +106,7 @@ void HepMCInputModule::event()
           "Event ________________________________________________________________________________________________________________________________________________________________________________________________");
   if (m_beamParams.hasChanged()) {
     if (m_boost2Lab) {
-      MCInitialParticles& initial = m_initial.generate();
+      const MCInitialParticles& initial = m_initial.generate();
       TLorentzRotation boost = initial.getCMSToLab();
       m_hepmcreader->m_labboost = boost;
     }

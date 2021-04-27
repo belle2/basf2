@@ -9,6 +9,7 @@ import tempfile
 
 import numpy as np
 from B2Tools import b2latex, format
+from basf2 import B2INFO
 
 import ROOT
 
@@ -27,15 +28,15 @@ def getCommandLineOptions():
     parser.add_argument('-data', '--datafiles', dest='datafiles', type=str, required=True, action='append', nargs='+',
                         help='Data file containing ROOT TTree with independent test data')
     parser.add_argument('-tree', '--treename', dest='treename', type=str, default='tree', help='Treename in data file')
-    parser.add_argument('-out', '--outputfile', dest='outputfile', type=str, default='output.pdf',
-                        help='Name of the outputted pdf file')
+    parser.add_argument('-out', '--outputfile', dest='outputfile', type=str, default='output.zip',
+                        help='Name of the created .zip archive file if not compiling or a pdf file if compilation is successful.')
     parser.add_argument('-w', '--working_directory', dest='working_directory', type=str, default='',
                         help="""Working directory where the created images and root files are stored,
                               default is to create a temporary directory.""")
     parser.add_argument('-n', '--fillnan', dest='fillnan', action='store_true',
                         help='Fill nan and inf values with actual numbers')
     parser.add_argument('-c', '--compile', dest='compile', action='store_true',
-                        help='Compile latex to pdf (does not work on KEKCC)')
+                        help='Compile latex to pdf')
     args = parser.parse_args()
     return args
 
@@ -129,7 +130,7 @@ if __name__ == '__main__':
 
     print("Create latex file")
     # Change working directory after experts run, because they might want to access
-    # a locadb in the current working directory
+    # a localdb in the current working directory.
     with tempfile.TemporaryDirectory() as tempdir:
         if args.working_directory == '':
             os.chdir(tempdir)
@@ -322,13 +323,21 @@ if __name__ == '__main__':
                 o += graphics.finish()
 
         if args.compile:
-            filetype = 'pdf'
+            B2INFO(f"Creating a PDF file at {args.outputfile}. Please remove the '-c' switch if this fails.")
+            o.save('latex.tex', compile=True)
         else:
-            filetype = 'tex'
+            B2INFO(f"Creating a .zip archive containing plots and a TeX file at {args.outputfile}."
+                   f"Please unpack the archive and compile the latex.tex file with pdflatex.")
+            o.save('latex.tex', compile=False)
 
-        o.save(f'latex.{filetype}', compile=args.compile)
         os.chdir(old_cwd)
         if args.working_directory == '':
-            shutil.copy(os.path.join(tempdir, f'latex.{filetype}'), args.outputfile)
+            working_directory = tempdir
         else:
-            shutil.copy(os.path.join(args.working_directory, f'latex.{filetype}'), args.outputfile)
+            working_directory = args.working_directory
+
+        if args.compile:
+            shutil.copy(os.path.join(working_directory, 'latex.pdf'), args.outputfile)
+        else:
+            base_name = os.path.join(old_cwd, args.outputfile.rsplit('.', 1)[0])
+            shutil.make_archive(base_name, 'zip', working_directory)

@@ -18,6 +18,11 @@ namespace Belle2 {
   namespace Variable {
 
     /**
+     * returns True if the environment is MC and False for data
+     */
+    double isMC(const Particle*);
+
+    /**
      * returns true if event doesn't contain an Y(4S)
      */
     double isContinuumEvent(const Particle*);
@@ -194,6 +199,11 @@ namespace Belle2 {
     double missingMomentumOfEventCMS(const Particle*);
 
     /**
+    * return the generated magnitude of the missing momentum of the event in CMS
+    */
+    double genMissingMomentumOfEventCMS(const Particle*);
+
+    /**
     * return the x component of the missing momentum of the event in CMS
     */
     double missingMomentumOfEventCMS_Px(const Particle*);
@@ -219,9 +229,20 @@ namespace Belle2 {
     double missingEnergyOfEventCMS(const Particle*);
 
     /**
-    * return the missing mass squred
+    * return difference between the total energy of tracks (pion mass hypothesis) and photons in CMS and the beam energy
+    * using generator information
+    */
+    double genMissingEnergyOfEventCMS(const Particle*);
+
+    /**
+    * return the missing mass squared
     */
     double missingMass2OfEvent(const Particle*);
+
+    /**
+    * return the generated missing mass squared
+    */
+    double genMissingMass2OfEvent(const Particle*);
 
     /**
     * return the visible energy of the event
@@ -229,9 +250,19 @@ namespace Belle2 {
     double visibleEnergyOfEventCMS(const Particle*);
 
     /**
+    * return the generated visible energy of the event
+    */
+    double genVisibleEnergyOfEventCMS(const Particle*);
+
+    /**
     * return the energy of the photons of all the event
     */
     double totalPhotonsEnergyOfEvent(const Particle*);
+
+    /**
+    * return the generated energy of the photons of all the event
+    */
+    double genTotalPhotonsEnergyOfEvent(const Particle*);
 
     /**
      * return the event date

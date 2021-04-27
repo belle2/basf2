@@ -29,7 +29,6 @@ import argparse
 import textwrap
 import json
 import difflib
-from urllib.parse import urljoin
 import shutil
 import pprint
 import requests
@@ -45,6 +44,7 @@ from .cli_utils import ItemFilter
 # this if pylama/pylint is used to check
 from .cli_upload import command_upload  # noqa
 from .cli_download import command_download, command_legacydownload  # noqa
+from .cli_management import command_tag_merge, command_tag_runningupdate  # noqa
 
 
 def escape_ctrl_chars(name):
@@ -451,7 +451,7 @@ def remove_repeated_values(table, columns, keep=None):
 
     If we want to remove duplicates in all columns in order it would look like this:
 
-        >>> remove_repated_values(table, [0,1])
+        >>> remove_repeated_values(table, [0,1])
         [
             ["A", "a"],
             ["B", "a"],
@@ -473,7 +473,7 @@ def remove_repeated_values(table, columns, keep=None):
     were identical but keep the values of the previous column. For this one can
     supply ``keep``:
 
-        >>> remove_repated_values(table, [0,1,2], keep=[0])
+        >>> remove_repeated_values(table, [0,1,2], keep=[0])
         [
             ["A", "a"],
             ["B", "a"],

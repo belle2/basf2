@@ -63,7 +63,6 @@ namespace Belle2 {
 
     GeoCDCCreator::GeoCDCCreator()
     {
-      //      std::cout << "GeoCDCCreator constructor called" << std::endl;
       // Set job control params. before sensitivedetector and gometry construction
       CDCSimControlPar::getInstance();
       CDCGeoControlPar::getInstance();
@@ -91,7 +90,6 @@ namespace Belle2 {
 
       m_sensitive = new CDCSensitiveDetector("CDCSensitiveDetector", (2 * 24)* CLHEP::eV, 10 * CLHEP::MeV);
 
-      //      std::cout << "createGeometry called" << std::endl;
       const G4double realTemperture = (273.15 + 23.) * CLHEP::kelvin;
       G4Material* medHelium = geometry::Materials::get("CDCHeGas");
       G4Material* medEthane = geometry::Materials::get("CDCEthaneGas");
@@ -729,6 +727,7 @@ namespace Belle2 {
 
       // Construct electronics boards
       for (const auto& frontend : geo.getFrontends()) {
+
         const int iEB = frontend.getId();
         const double ebInnerR = frontend.getRmin();
         const double ebOuterR = frontend.getRmax();
@@ -1003,8 +1002,10 @@ namespace Belle2 {
                                                      );
 
         G4LogicalVolume* logicalV = new G4LogicalVolume(sqHoleBase, medCopper,  logicalName, 0, 0, 0);
-        if (id < 19)
+        if (id < 19) {
           logicalV = new G4LogicalVolume(sqHoleBase, medNEMA_G10_Plate,  logicalName, 0, 0, 0);
+          logicalV->SetSensitiveDetector(new BkgSensitiveDetector("CDC", 2000 + id));
+        }
 
         logicalV->SetVisAttributes(m_VisAttributes.back());
 
@@ -1026,7 +1027,6 @@ namespace Belle2 {
         }
 
       }
-
       //
       // Construct rib5s.
       //

@@ -23,11 +23,10 @@
 #################################################################
 
 import sys
-from basf2 import *
-from simulation import add_simulation
+import basf2 as b2
 from beamparameters import add_beamparameters
 
-set_random_seed(1509)
+b2.set_random_seed(1509)
 
 release = sys.argv[1]
 
@@ -37,21 +36,21 @@ output_filename = './' + release + '/TV_data_' + release + '.root'
 
 print(output_filename)
 
-path = create_path()
+path = b2.create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('evtNumList', [10000])
 
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 
-evtgeninput = register_module('EvtGenInput')
-evtgeninput.logging.log_level = LogLevel.WARNING
+evtgeninput = b2.register_module('EvtGenInput')
+evtgeninput.logging.log_level = b2.LogLevel.WARNING
 
 beamparameters = add_beamparameters(path, "Y4S")
 
-root_output = register_module('RootOutput')
+root_output = b2.register_module('RootOutput')
 root_output.param('outputFileName', output_filename)
 
 path.add_module(eventinfosetter)
@@ -60,5 +59,5 @@ path.add_module(beamparameters)
 path.add_module(evtgeninput)
 path.add_module(root_output)
 
-process(path)
-print(statistics)
+b2.process(path)
+print(b2.statistics)

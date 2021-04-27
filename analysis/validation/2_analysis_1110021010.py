@@ -12,16 +12,15 @@
 # in a format for the validation server. There are better example analysis
 # scripts in analysis/examples and analysis/examples/tutorials.
 
-DECAY_MODE_ID = 1110021010
-INPUT_FILENAME = "../%i.dst.root" % DECAY_MODE_ID
-OUTPUT_FILENAME = "%i_Validation.root" % DECAY_MODE_ID
-
 import basf2
 from modularAnalysis import inputMdst, reconstructDecay, matchMCTruth
 from stdPhotons import stdPhotons
 from stdCharged import stdPi
 from validation_tools.metadata import create_validation_histograms
-from variables import variables as vm  # shorthand for the variable manager instance
+
+DECAY_MODE_ID = 1110021010
+INPUT_FILENAME = "../%i.dst.root" % DECAY_MODE_ID
+OUTPUT_FILENAME = "%i_Validation.root" % DECAY_MODE_ID
 
 main = basf2.Path()
 inputMdst('default', INPUT_FILENAME, path=main)
@@ -52,7 +51,7 @@ create_validation_histograms(
             "Sam Cunliffe <sam.cunliffe@desy.de>; Torben Ferber <torben.ferber@desy.de>",
             "Sharp distribution at 2.5 GeV. Look for differences in "
             "the abslute scale. This could be an indication of a loss of photon efficiency.",
-            "E_{\gamma} [GeV]", "Candidates",
+            r"E_{\gamma} [GeV]", "Candidates",
         ),
     ]
 )

@@ -5,7 +5,7 @@
 It is run as a test to make sure the memcheck does not fail because of issues in the script."""
 
 from b2test_utils import skip_test_if_light
-skip_test_if_light()  # light builds don't contain simulation, reconstruction etc; skip before trying to import
+skip_test_if_light()  # light builds don't contain simulation, reconstruction etc; skip before trying to import # noqa
 
 from basf2 import set_random_seed, set_log_level, LogLevel, create_path, Module, find_file, process, statistics
 from simulation import add_simulation

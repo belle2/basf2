@@ -5,6 +5,6 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::TOP::TOPGeometryPar+;
+#pragma link C++ class Belle2::TOP::TOPGeometryPar-;
 
 #endif

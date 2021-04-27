@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SADINPUTMODULE_H_
-#define SADINPUTMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -85,4 +84,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif /* SADINPUTMODULE_H_ */

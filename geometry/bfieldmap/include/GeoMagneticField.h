@@ -48,6 +48,8 @@ namespace Belle2 {
      * Creates the global ROOT objects and prepares everything for other creators.
      *
      * @param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
+     * @param topVolume Geant4 logical top volume.
+     * @param type Geometry type.
      */
     virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override;
 

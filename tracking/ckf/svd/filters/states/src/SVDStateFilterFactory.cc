@@ -81,7 +81,7 @@ std::string SVDStateFilterFactory::getIdentifier() const
 
 std::string SVDStateFilterFactory::getFilterPurpose() const
 {
-  return "Reject svd states";
+  return "Reject SVD CKF states. ";
 }
 
 std::map<std::string, std::string> SVDStateFilterFactory::getValidFilterNamesAndDescriptions() const
@@ -98,7 +98,10 @@ std::map<std::string, std::string> SVDStateFilterFactory::getValidFilterNamesAnd
     {"simple", "simple filter to be used in svd"},
     {"residual", "residual filter to be used in svd"},
     {"recording", "record variables to a TTree"},
+    {"recording_and_truth", "record variables to a TTree and store truth information"},
+    {"recording_with_direction_check", "record variables to a TTree with direction check"},
     {"mva", "MVA filter"},
+    {"mva_with_direction_check", "MVA filter with direction check"},
     {"sloppy_recording", "record variables to a TTree"},
   };
 }
@@ -128,13 +131,20 @@ SVDStateFilterFactory::create(const std::string& filterName) const
     return std::make_unique<SloppyMCSVDStateFilter>();
   } else if (filterName == "recording") {
     return std::make_unique<RecordingSVDStateFilter>("SVDStateFilter.root");
+  } else if (filterName == "recording_and_truth") {
+    return std::make_unique<AndSVDStateFilter>(
+             std::make_unique<RecordingSVDStateFilter>("SVDStateFilter.root"),
+             std::make_unique<MCSVDStateFilter>());
+  } else if (filterName == "recording_with_direction_check") {
+    return std::make_unique<AndSVDStateFilter>(
+             std::make_unique<NonIPCrossingSVDStateFilter>(),
+             std::make_unique<RecordingSVDStateFilter>("SVDStateFilter.root"));
   } else if (filterName == "mva") {
     return std::make_unique<MVASVDStateFilter>("ckf_CDCSVDStateFilter_1");
   } else if (filterName == "mva_with_direction_check") {
     return std::make_unique<AndSVDStateFilter>(
              std::make_unique<NonIPCrossingSVDStateFilter>(),
-             std::make_unique<MVASVDStateFilter>("ckf_CDCSVDStateFilter_1")
-           );
+             std::make_unique<MVASVDStateFilter>("ckf_CDCSVDStateFilter_1"));
   } else if (filterName == "sloppy_recording") {
     return std::make_unique<SloppyRecordingSVDStateFilter>("SVDStateFilter.root");
   } else {

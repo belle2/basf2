@@ -219,6 +219,29 @@ Modules
    option :code:`useRollBack = True` switches that on.
  * Added an argument to the `ParticleCombiner` module that allows to deactivate the automatic reconstruction of the
    charge-conjugated mode. In `reconstructDecay` the option is called ``chargeConjugation``, which is ``True`` by default.
+ * The MC matching with the :ref:`DecayString` properly works in hierarchical decay. For example,
+
+   .. code-block:: python
+
+        from modularAnalysis import reconstructDecay, matchMCTruth
+        reconstructDecay('B0:signal      -> mu+ mu- ... ?gamma',   '', path=mypath)
+        reconstructDecay('B0:generic     -> D*-:Dpi pi+:all',      '', path=mypath)
+        reconstructDecay('Upsilon(4S):BB -> B0:generic B0:signal', '', path=mypath)
+        matchMCTruth('Upsilon(4S)', path=mypath)
+
+   In the above case, missing daughters (massive FSP and gamma) of ``B0:signal`` are accepted for not only ``B0:signal`` but also ``Upsilon(4S)``, so that `isSignal` can be 1.
+   Another example,
+
+   .. code-block:: python
+
+        reconstructDecay('D-:pipi0 -> pi-:all pi0:all',      '', path=mypath)
+	reconstructDecay('B0:Dpi   -> D-:pipi0 pi+:all ...', '', path=mypath)
+        matchMCTruth('B0:Dpi', path=mypath)
+
+   In this case, one wants to accept missing massive daughters in ``B0:Dpi`` decay but not in ``D-:pipi0`` decay.
+   So, if the decay of ``D-:pipi0`` in the MC truth level is ``D- -> pi+ pi- pi- pi0``, `isSignal` of ``D-:pipi0`` and ``B0:Dpi`` will be 0, 
+   since there are missing daughters in ``D-:pipi0`` decay. If one wants to accept missing daughters in ``D-:pipi0``, please use the 
+   :ref:`DecayString` grammar in the reconstruction of ``D-:pipi0`` or use `isSignalAcceptMissing` variable instead of `isSignal`.
 
 Utilities and core objects
 ++++++++++++++++++++++++++

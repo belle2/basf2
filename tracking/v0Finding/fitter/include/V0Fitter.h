@@ -5,6 +5,8 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/V0.h>
 #include <tracking/dataobjects/V0ValidationVertex.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <genfit/Track.h>
 
 #include <TVector3.h>
 
@@ -33,19 +35,69 @@ namespace Belle2 {
     V0Fitter(const std::string& trackFitResultsName = "", const std::string& v0sName = "",
              const std::string& v0ValidationVerticesName = "",
              const std::string& recoTracksName = "",
+             const std::string& copiedRecoTracksName = "CopiedRecoTracks",
              bool enableValidation = false);
 
     /// Initialize the cuts which will be applied during the fit and store process.
     void initializeCuts(double beamPipeRadius,
                         double vertexChi2CutOutside);
 
+    /// set V0 fitter mode.
+    /// switch the mode of fitAndStore function.
+    ///   0: store V0 at the first vertex fit, regardless of inner hits
+    ///   1: remove hits inside the V0 vertex position
+    ///   2: mode 1 +  don't use SVD hits if there is only one available SVD hit-pair (default)
+    void setFitterMode(int fitterMode);
+
     /// Fit V0 with given hypothesis and store if fit was successful.
     bool fitAndStore(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis);
 
     /// Get track hypotheses for a given v0 hypothesis.
-    std::pair<Const::ParticleType, Const::ParticleType> getTrackHypotheses(const Const::ParticleType& v0Hypothesis);
+    std::pair<Const::ParticleType, Const::ParticleType> getTrackHypotheses(const Const::ParticleType& v0Hypothesis) const;
 
   private:
+
+    /** fit V0 vertex using RecoTrack's as inputs.
+     * Return true (false) if the vertex fit has done well (failed).
+     * If RecoTracks have hits inside the fitted V0 vertex position, bits in hasInnerHitStatus are set.
+     * If there are no inside hits, store the V0 to the DataStore.
+     * @param trackPlus Track of positively-charged daughter
+     * @param trackMinus Track of negatively-charged daughter
+     * @param recoTrackPlus RecoTrack of positively-charged daughter
+     * @param recoTrackMinus RecoTrack of negatively-charged daughter
+     * @param v0Hypothesis ParticleType used in vertex fitting
+     * @param hasInnerHitStatus store a result of this function. if the plus(minus) track has hits inside the V0 vertex position, 0x1(0x2) bit is set.
+     * @param vertexPos store a result of this function. the fitted vertex position is stored.
+     * @param forceStore if true, store the fitted V0 to the DataStore even if there are some inside hits.
+     * @return
+     */
+    bool vertexFitWithRecoTracks(const Track* trackPlus, const Track* trackMinus,
+                                 RecoTrack* recoTrackPlus, RecoTrack* recoTrackMinus,
+                                 const Const::ParticleType& v0Hypothesis,
+                                 unsigned int& hasInnerHitStatus, TVector3& vertexPos,
+                                 const bool forceStore);
+
+    /** Create a copy of RecoTrack.
+     * @param origRecoTrack original RecoTrack
+     * @param trackPDG signed PDG used for the track fit hypothesis
+     * @return copied RecoTrack stored in the m_copiedRecoTracks, nullptr if track fit fails (this should not happen)
+     */
+    RecoTrack* copyRecoTrack(RecoTrack* origRecoTrack, const int trackPDG);
+
+    /** Remove inner hits from RecoTrack.
+     * Hits are removed from the minus-end of the momentum direction.
+     * For SVD hits, remove U- and V- hit pair at once.
+     * Input RecoTrack is fitted in the funcion.
+     * If track fit fails, return false.
+     * @param origRecoTrack original RecoTrack
+     * @param recoTrack input RecoTrack, updated in this function
+     * @param trackPDG signed PDG used for the track fit hypothesis
+     * @param nRemoveHits the number of removed hits. This can be incremented in the function if the outermost removed hit is an SVD U-hit.
+     * @return
+     */
+    bool removeInnerHits(RecoTrack* origRecoTrack, RecoTrack* recoTrack,
+                         const int trackPDG, unsigned int& nRemoveHits);
+
 
     /** Starting point: point closest to axis where either track is defined
      * This is intended to reject tracks that curl away before
@@ -56,8 +108,8 @@ namespace Belle2 {
      * -- while still being part of the V0.  Unlikely, I didn't find
      * a single example in MC.  On the other hand it rejects
      * impossible candidates.
-     * @param stPlus
-     * @param stMinus
+     * @param stPlus MeasuredStateOnPlane of positively-charged daughter
+     * @param stMinus MeasuredStateOnPlane of negatively-charged daughter
      * @return
      */
     bool rejectCandidate(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus);
@@ -75,24 +127,34 @@ namespace Belle2 {
     bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus,
                              const TVector3& vertexPosition);
 
+    /// Extrapolate the fit results to the perigee to the vertex.
+    /// If the daughter tracks have hits inside the V0 vertex, bits in the hasInnerHiStatus variable are set.
+    bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus,
+                             const TVector3& vertexPosition, unsigned int& hasInnerHitStatus);
+
     /// Getter for magnetic field in z direction at the vertex position.
     double getBzAtVertex(const TVector3& vertexPosition);
 
     /// Build TrackFitResult of V0 Track and set relation to genfit Track.
-    TrackFitResult* buildTrackFitResult(const genfit::Track& track, const genfit::MeasuredStateOnPlane& msop, const double Bz,
+    TrackFitResult* buildTrackFitResult(const genfit::Track& track, const RecoTrack* recoTrack,
+                                        const genfit::MeasuredStateOnPlane& msop, const double Bz,
                                         const Const::ParticleType& trackHypothesis);
 
 
   private:
     bool m_validation;  ///< Validation flag.
     std::string m_recoTracksName;   ///< RecoTrackColName (input).
-
-    StoreArray<TrackFitResult> m_trackFitResults;  ///< TrackFitResultColName (output).
-    StoreArray<V0> m_v0s;  ///< V0ColName (output).
-    StoreArray<V0ValidationVertex> m_validationV0s;  ///< V0ValidationVertexColName (output, optional).
+    StoreArray<RecoTrack> m_recoTracks; ///< RecoTrack (input)
+    StoreArray<TrackFitResult> m_trackFitResults;  ///< TrackFitResult (output).
+    StoreArray<V0> m_v0s;  ///< V0 (output).
+    StoreArray<V0ValidationVertex> m_validationV0s;  ///< V0ValidationVertex (output, optional).
+    StoreArray<RecoTrack> m_copiedRecoTracks; ///< RecoTrack used to refit tracks (output)
 
     double m_beamPipeRadius;  ///< Radius where inside/outside beampipe is defined.
     double m_vertexChi2CutOutside;  ///< Chi2 cut outside beampipe.
+    int    m_v0FitterMode;  ///< 0: store V0 at the first vertex fit, regardless of inner hits, 1: remove hits inside the V0 vertex position, 2: mode 1 +  don't use SVD hits if there is only one available SVD hit-pair (default)
+    bool   m_forcestore;///< true only if the V0Fitter mode is 1
+    bool   m_useOnlyOneSVDHitPair;///< false only if the V0Fitter mode is 3
   };
 
 }

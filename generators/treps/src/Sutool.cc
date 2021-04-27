@@ -18,7 +18,6 @@
 // Modofied to be suitable to Belle II style
 // $Log$
 
-
 // system include files
 #include <iostream>
 #include <fstream>
@@ -30,6 +29,8 @@
 
 // user include files
 #include <generators/treps/Sutool.h>
+
+using namespace std;
 
 namespace Belle2 {
 
@@ -67,7 +68,7 @@ namespace Belle2 {
   }
 
   int Sutool::pdecy(double mpr, double* mse,
-                    TVector3& ppri, TLorentzVector* psec, int nums)
+                    const TVector3& ppri, TLorentzVector* psec, int nums)
   // multi-body decay by phase space
   // translated from EPOCS PDECY$
   // original EPOCS version gives a good approximation for nums = 3

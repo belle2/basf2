@@ -10,7 +10,7 @@
 # Contributors: Jonas Wagner, Sebastian Racs
 #####################################################################
 
-from basf2 import *
+import basf2 as b2
 from tracking import add_vxd_track_finding_vxdtf2, add_mc_matcher, add_hit_preparation_modules
 
 estimationMethod = 'tripletFit'
@@ -23,16 +23,16 @@ sector_map = None  # Default SectorMap
 name = 'VXDEQE_CollectedTrainingData_Default'
 
 # Logging and Debug Level
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
-path = create_path()
+path = b2.create_path()
 
-rootInput = register_module('RootInput')
+rootInput = b2.register_module('RootInput')
 rootInput.param('inputFileName', eval_file_train)
 path.add_module(rootInput)
 
 # Event Info Module
-eventinfoprinter = register_module('EventInfoPrinter')
+eventinfoprinter = b2.register_module('EventInfoPrinter')
 path.add_module(eventinfoprinter)
 
 path.add_module("Gearbox")
@@ -44,7 +44,7 @@ add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=['SVD'],
 
 add_mc_matcher(path, components=['SVD'])
 
-data = register_module('VXDQETrainingDataCollector')
+data = b2.register_module('VXDQETrainingDataCollector')
 data.param('EstimationMethod', estimationMethod)
 data.param('ClusterInformation', clusterInfo)
 data.param('TrainingDataOutputName', name + '.root')
@@ -52,6 +52,6 @@ data.param('SpacePointTrackCandsStoreArrayName', 'SPTrackCands')
 data.param('MCRecoTracksStoreArrayName', 'MCRecoTracks')
 path.add_module(data)
 
-print_path(path)
-process(path)
-print(statistics)
+b2.print_path(path)
+b2.process(path)
+print(b2.statistics)

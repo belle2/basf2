@@ -15,7 +15,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/TRGSummary.h>
-
+#include <trg/cdc/Unpacker.h>
 #include <framework/gearbox/Unit.h>
 
 namespace Belle2::SoftwareTrigger {
@@ -32,7 +32,7 @@ namespace Belle2::SoftwareTrigger {
   class FilterCalculator : public SoftwareTriggerCalculation {
   public:
     /// Set the default names for the store object particle lists.
-    FilterCalculator() = default;
+    FilterCalculator();
 
     /// Require the particle list. We do not need more here.
     void requireStoreArrays() override;
@@ -47,6 +47,8 @@ namespace Belle2::SoftwareTrigger {
     StoreArray<ECLCluster> m_eclClusters;
     /// Store Object with the trigger result
     StoreObjPtr<TRGSummary> m_l1Trigger;
+    /// Store Object with the trigger NN bits
+    StoreArray<CDCTriggerUnpacker::NNBitStream> m_bitsNN;
 
     /// which Z0 defines a loose track
     double m_looseTrkZ0 = 10 * Unit::cm;
@@ -72,5 +74,9 @@ namespace Belle2::SoftwareTrigger {
     double m_cosmicMinPt = 0.5 * Unit::GeV;
     /// which LAB cluster energy vetoes a cosmic candidate
     double m_cosmicMaxClusterEnergy = 1.0 * Unit::GeV;
+    /// maximum z0 for well understood magnetic field (cm)
+    double m_goodMagneticRegionZ0 = 57.;
+    /// minimum d0 for well understood magnetic field, if z0 is large (cm)
+    double m_goodMagneticRegionD0 = 26.5;
   };
 }

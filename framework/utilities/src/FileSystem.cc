@@ -24,6 +24,7 @@
 #include <fcntl.h>
 
 #include <TMD5.h>
+#include <zlib.h>
 
 using namespace std;
 using namespace Belle2;
@@ -54,6 +55,12 @@ bool FileSystem::isDir(const string& filename)
   return (fs::exists(fullPath)) && (fs::is_directory(fullPath));
 }
 
+bool FileSystem::isSymLink(const string& filename)
+{
+  fs::path fullPath = fs::absolute(filename);
+  return (fs::exists(fullPath)) && (fs::is_symlink(fullPath));
+}
+
 bool FileSystem::loadLibrary(std::string library, bool fullname)
 {
   if (!fullname) library = "lib" + library + ".so";
@@ -77,19 +84,59 @@ std::string FileSystem::calculateMD5(const std::string& filename)
   return md5->AsString();
 }
 
+std::string FileSystem::calculateAdler32(const std::string& filename)
+{
+  string chksum;
+  if (not isFile(filename)) return "";
+  fs::path fullPath = fs::absolute(filename);
+  FILE* fp = fopen(fullPath.c_str(), "rb");
+  if (fp) {
+    uLong i, sum = adler32(0, 0, 0);
+    char hexdigest[9];
+    Bytef* buf = (Bytef*) malloc(1024 * 1024 * sizeof(Bytef));
+    if (!buf) {
+      fclose(fp);
+      return "";
+    }
+    while ((i = fread((void*) buf, 1, sizeof(buf), fp)) > 0) {
+      sum = adler32(sum, buf, i);
+    }
+    fclose(fp);
+    free(buf);
+    // Adler32 checksums hex digests ARE zero padded although
+    // HLT legacy presentation may differ.
+    sprintf(hexdigest, "%08lx", sum);
+    chksum = hexdigest;
+  } else {
+    chksum = "";
+  }
+  return chksum;
+}
+
 std::string FileSystem::findFile(const string& path, const std::vector<std::string>& dirs, bool silent)
 {
   // check given directories
   string fullpath;
   for (auto dir : dirs) {
-    if (dir.empty()) continue;
+    if (dir.empty())
+      continue;
     fullpath = (fs::path(dir) / path).string();
-    if (fileExists(fullpath)) return fullpath;
+    if (fileExists(fullpath)) {
+      if (isSymLink(fullpath) or isSymLink(dir))
+        return fullpath;
+      else
+        return fs::canonical(fullpath).string();
+    }
   }
 
   // check local directory
   fullpath = fs::absolute(path).string();
-  if (fileExists(fullpath)) return fullpath;
+  if (fileExists(fullpath)) {
+    if (isSymLink(fullpath))
+      return fullpath;
+    else
+      return fs::canonical(fullpath).string();
+  }
 
   // nothing found
   if (!silent)
@@ -116,11 +163,6 @@ std::string FileSystem::findFile(const string& path, const std::string& dataType
   if (getenv(envVar.c_str())) {
     dirs.emplace_back(getenv(envVar.c_str()));
   }
-  std::string dirName = boost::to_lower_copy(dataType) + "-data";
-  if (getenv("VO_BELL2_SW_DIR")) {
-    dirs.push_back((fs::path(getenv("VO_BELL2_SW_DIR")) / dirName).string());
-  }
-  dirs.push_back(dirName);
   std::string result = findFile(path, dirs, true);
   if (result.empty() && !silent)
     B2ERROR("findFile(): Could not find data file. You may want to use the 'b2install-data' tool to get the file."

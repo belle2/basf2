@@ -2,18 +2,16 @@
 
 """Custom calibration strategy for KLM channel status."""
 
-import collections
 import numpy
-import os
 
 import basf2
 import ROOT
 from ROOT import Belle2
 
-from caf.utils import ExpRun, IoV, AlgResult
+from caf.utils import AlgResult, IoV
 from caf.utils import runs_overlapping_iov, runs_from_vector
 from caf.utils import split_runs_by_exp
-from caf.strategies import AlgorithmStrategy
+from caf.strategies import AlgorithmStrategy, StrategyError
 from caf.state_machines import AlgorithmMachine
 from ROOT.Belle2 import KLMChannelStatusAlgorithm, KLMChannelIndex
 from klm_strategies_common import get_lowest_exprun, get_highest_exprun, \
@@ -412,15 +410,15 @@ class KLMChannelStatus(AlgorithmStrategy):
                         newNormalChannels(run_data[i + 1][3].getModuleStatus())
                     basf2.B2INFO('There are %d new active modules in run %d '
                                  'relatively to run %d.' %
-                                 (new_planes_next, run_data[i][0],
+                                 (new_modules_next, run_data[i][0],
                                   run_data[i + 1][0]))
                 if (i > 0):
                     new_modules_previous = run_data[i][3].getModuleStatus(). \
                         newNormalChannels(run_data[i - 1][3].getModuleStatus())
                     basf2.B2INFO('There are %d new active modules in run %d '
                                  'relatively to run %d.' %
-                                 (new_planes_previous,
-                                  run_data[i][0], run_data[i - 1][0]))
+                                 (new_modules_previous, run_data[i][0],
+                                  run_data[i - 1][0]))
                 run_for_merging = -1
                 # If a forced merge of the normal run with another run from
                 # a different range of runs with not enough data has already

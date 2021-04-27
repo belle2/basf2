@@ -3,7 +3,6 @@
 
 import glob
 import subprocess
-from functools import reduce
 import argparse
 
 parser = argparse.ArgumentParser()

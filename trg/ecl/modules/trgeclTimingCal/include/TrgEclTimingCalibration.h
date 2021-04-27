@@ -150,7 +150,7 @@ namespace Belle2 {
     std::vector<double> tcal_result_err;
 
     //! Flag matrix solved (0 : not solved  1 : solved)
-    int FlagMatrixSolved;
+    int FlagMatrixSolved = 0;
 
     //! Time offset
     //! Input time offset (iteration mode)

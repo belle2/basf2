@@ -56,6 +56,7 @@ class TestCalculation(TestCase):
 
         return calculations, process2
 
+
 if __name__ == "__main__":
     main()
 # @endcond

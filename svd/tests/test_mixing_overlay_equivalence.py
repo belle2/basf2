@@ -37,8 +37,9 @@ class SetAsideSimHits(basf2.Module):
     def __init__(self):
         '''initialize python module'''
         super().__init__()
+
+        #: selected sensor info
         self.selected_sensorID = Belle2.VxdID(3, 1, 1)
-        '''selected sensor info'''
 
     def event(self):
         '''event'''
@@ -55,8 +56,9 @@ class InjectSimHits(basf2.Module):
     def __init__(self):
         '''initialize python module'''
         super().__init__()
+        #: simHits store array
+
         self.simhits = Belle2.PyStoreArray("SVDSimHits")
-        '''sim hit store array'''
 
     def initialize(self):
         '''initialize'''
@@ -97,9 +99,6 @@ if __name__ == "__main__":
         create_ovrfile.add_module('BeamBkgMixer', backgroundFiles=['bgForMixing.root'], minTime=-150, maxTime=150)
         # Turn off generation of noise digits in SVDDigitizer.
         add_svd_simulation(create_ovrfile)
-        for m in create_ovrfile.modules():
-            if m.name() == "SVDDigitizer":
-                m.param('ElectronicEffects', False)
 
         create_ovrfile.add_module(SetAsideSimHits())
         create_ovrfile.add_module('RootOutput', outputFileName='bgForOverlay.root', branchNames=['SVDShaperDigits'])
@@ -118,9 +117,6 @@ if __name__ == "__main__":
         produce_mixed.add_module('BeamBkgMixer', backgroundFiles=['bgForMixing.root'], minTime=-150, maxTime=150)
         # Turn off generation of noise digits in SVDDigitizer.
         add_svd_simulation(produce_mixed)
-        for m in produce_mixed.modules():
-            if m.name() == "SVDDigitizer":
-                m.param('ElectronicEffects', False)
 
         produce_mixed.add_module('SVDShaperDigitSorter')
         produce_mixed.add_module('RootOutput', outputFileName='mixedBg.root')
@@ -137,9 +133,6 @@ if __name__ == "__main__":
         produce_overlaid.add_module(InjectSimHits())
 
         add_svd_simulation(produce_overlaid)
-        for m in produce_overlaid.modules():
-            if m.name() == "SVDDigitizer":
-                m.param('ElectronicEffects', False)
 
         produce_overlaid.add_module('BGOverlayExecutor')
         # Sort digits after overlay

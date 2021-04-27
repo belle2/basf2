@@ -70,44 +70,62 @@
 # author: benjamin.schwenker@pyhs.uni-goettingen.de, maiko.takahashi@desy.de
 
 
-from basf2 import *
-set_log_level(LogLevel.INFO)
-
-import pickle
-import glob
-import os
-import ROOT
-
-from ROOT.Belle2 import PXDDataMCGainCalibrationAlgorithm
-from caf.framework import Calibration, CAF
-from caf import backends
-from caf.backends import LSF
-from caf.utils import ExpRun, IoV
-from caf.utils import get_iov_from_file
-from caf.utils import find_absolute_file_paths
-from caf.utils import LocalDatabase
-from caf.utils import CentralDatabase
-from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
-from rawdata import add_unpackers
-from tracking import add_tracking_reconstruction
-
 import argparse
-parser = argparse.ArgumentParser(description="Compute gain correction maps for PXD from beam data")
-parser.add_argument('--runLow', default=0, type=int, help='Compute mask for specific IoV')
-parser.add_argument('--runHigh', default=-1, type=int, help='Compute mask for specific IoV')
-parser.add_argument('--expNo', default=3, type=int, help='Compute mask for specific IoV')
-parser.add_argument('--maxSubRuns', default=-1, type=int, help='Maximum number of subruns to use')
-parser.add_argument('--localDB', default="", type=str, help='path to local DB database.txt')
-parser.add_argument('--ignoreRuns', default="DefaultFromKEKCC", type=str,
-                    help='Full paths to list of runs to ignore, separate multiple by a comma , ')
-parser.add_argument('--mcOnly', dest='mcOnly', action="store_true",
-                    help='Run charge calibration for MC only, otherwise specify --dataOnly \
+from tracking import add_tracking_reconstruction
+from rawdata import add_unpackers
+from caf.strategies import SequentialRunByRun
+from caf.utils import CentralDatabase
+from caf.utils import LocalDatabase
+from caf.utils import ExpRun, IoV
+from caf.backends import LSF
+from caf.framework import Calibration, CAF
+from ROOT.Belle2 import PXDDataMCGainCalibrationAlgorithm
+import ROOT
+import pickle
+import basf2 as b2
+b2.set_log_level(b2.LogLevel.INFO)
+
+
+parser = argparse.ArgumentParser(
+    description="Compute gain correction maps for PXD from beam data")
+parser.add_argument(
+    '--runLow',
+    default=0,
+    type=int,
+    help='Compute mask for specific IoV')
+parser.add_argument('--runHigh', default=-1, type=int,
+                    help='Compute mask for specific IoV')
+parser.add_argument(
+    '--expNo',
+    default=3,
+    type=int,
+    help='Compute mask for specific IoV')
+parser.add_argument('--maxSubRuns', default=-1, type=int,
+                    help='Maximum number of subruns to use')
+parser.add_argument('--localDB', default="", type=str,
+                    help='path to local DB database.txt')
+parser.add_argument(
+    '--ignoreRuns',
+    default="DefaultFromKEKCC",
+    type=str,
+    help='Full paths to list of runs to ignore, separate multiple by a comma , ')
+parser.add_argument(
+    '--mcOnly',
+    dest='mcOnly',
+    action="store_true",
+    help='Run charge calibration for MC only, otherwise specify --dataOnly \
                           or run the full gain calibration on data using MC charge from DB')
-parser.add_argument('--dataOnly', dest='dataOnly', action="store_true",
-                    help='Run charge calibration for Data only, otherwise specify --mcOnly \
+parser.add_argument(
+    '--dataOnly',
+    dest='dataOnly',
+    action="store_true",
+    help='Run charge calibration for Data only, otherwise specify --mcOnly \
                           or run the full gain calibration on data using MC charge from DB')
-parser.add_argument('--useTrackClusters', default=0, type=int,
-                    help='Flag to use track matched clusters (=1) and apply theta angle projection to cluster charge (=2)')
+parser.add_argument(
+    '--useTrackClusters',
+    default=0,
+    type=int,
+    help='Flag to use track matched clusters (=1) and apply theta angle projection to cluster charge (=2)')
 
 args = parser.parse_args()
 
@@ -118,7 +136,11 @@ ROOT.gROOT.SetBatch(True)
 ###############
 
 # Set the IoV range for this calibration
-iov_to_calibrate = IoV(exp_low=args.expNo, run_low=args.runLow, exp_high=args.expNo, run_high=args.runHigh)
+iov_to_calibrate = IoV(
+    exp_low=args.expNo,
+    run_low=args.runLow,
+    exp_high=args.expNo,
+    run_high=args.runHigh)
 
 input_files = []
 pxd_ignore_run_list = []
@@ -134,10 +156,12 @@ else:
 
     # odd runs to ignore for data
     pxd_ignore_run_list = [ExpRun(3, 484), ExpRun(3, 485), ExpRun(3, 486), ExpRun(3, 524),  # from Phase2
-                           ExpRun(7, 1000),    # 19 modules excluded, and 1 remaining module with high occupancy
-                           ExpRun(8, 106),     # problem processing one file, anyway a short 'debug' beam run
-                           ExpRun(8, 676),     # LER beam lost at early point
-                           ]
+                           ExpRun(
+        7, 1000),    # 19 modules excluded, and 1 remaining module with high occupancy
+        # problem processing one file, anyway a short 'debug' beam run
+        ExpRun(8, 106),
+        ExpRun(8, 676),     # LER beam lost at early point
+    ]
 
     # load ignore run list
     ignoreRuns = args.ignoreRuns
@@ -176,7 +200,7 @@ else:
 
 # Charge collector for MC or data
 
-charge_collector = register_module("PXDClusterChargeCollector")
+charge_collector = b2.register_module("PXDClusterChargeCollector")
 charge_collector.param("granularity", "run")
 charge_collector.param("minClusterCharge", 8)
 charge_collector.param("minClusterSize", 2)
@@ -185,17 +209,20 @@ charge_collector.param("nBinsU", 4)
 charge_collector.param("nBinsV", 6)
 # For gain calibration, collect charge for data and use MC charge from DB
 if not args.mcOnly and not args.dataOnly:
-    charge_collector.param("chargePayloadName", "PXDMCClusterChargeMapPar")  # MC from DB
+    charge_collector.param(
+        "chargePayloadName",
+        "PXDMCClusterChargeMapPar")  # MC from DB
 charge_collector.param("fillChargeHistogram", True)
 charge_collector.param("matchTrack", args.useTrackClusters)
 
 # The pre collector path for MC or data
 
-pre_charge_collector_path = create_path()
+pre_charge_collector_path = b2.create_path()
 pre_charge_collector_path.add_module("Gearbox")
 pre_charge_collector_path.add_module("Geometry")
 if args.mcOnly:
-    pre_charge_collector_path.add_module("PXDDigitizer")  # only needed when starting from PXDSimHits
+    # only needed when starting from PXDSimHits
+    pre_charge_collector_path.add_module("PXDDigitizer")
     if args.useTrackClusters:
         add_tracking_reconstruction(pre_charge_collector_path)
     else:
@@ -223,19 +250,27 @@ for module in pre_charge_collector_path.modules():
 datamc_algo = PXDDataMCGainCalibrationAlgorithm()
 
 # We can play around with algo parameters
-datamc_algo.minClusters = 5000             # Minimum number of collected clusters for estimating gains
-datamc_algo.noiseSigma = 0.0               # Artificial noise sigma for smearing cluster charge
-datamc_algo.forceContinue = False          # Force continue algorithm instead of c_notEnoughData, set True for Cosmics
+# Minimum number of collected clusters for estimating gains
+datamc_algo.minClusters = 5000
+# Artificial noise sigma for smearing cluster charge
+datamc_algo.noiseSigma = 0.0
+# Force continue algorithm instead of c_notEnoughData, set True for Cosmics
+datamc_algo.forceContinue = False
 datamc_algo.strategy = 0	           # 0: medians, 1: landau fit
 if args.mcOnly or args.dataOnly:
-    datamc_algo.doCalibration = False      # only estimate charge MPV from median or landau fit
+    # only estimate charge MPV from median or landau fit
+    datamc_algo.doCalibration = False
     if args.mcOnly:
-        datamc_algo.chargePayloadName = "PXDMCClusterChargeMapPar"  # payload name to store on DB for MC
+        # payload name to store on DB for MC
+        datamc_algo.chargePayloadName = "PXDMCClusterChargeMapPar"
     if args.dataOnly:
-        datamc_algo.chargePayloadName = "PXDClusterChargeMapPar"   # payload name to store on DB for data
+        # payload name to store on DB for data
+        datamc_algo.chargePayloadName = "PXDClusterChargeMapPar"
 else:
-    datamc_algo.doCalibration = True       # do gain calibration on data against MC from DB
-datamc_algo.useChargeHistogram = True  # use histogram rather than tree input to save time
+    # do gain calibration on data against MC from DB
+    datamc_algo.doCalibration = True
+# use histogram rather than tree input to save time
+datamc_algo.useChargeHistogram = True
 # We want to use a specific collector
 datamc_algo.setPrefix("PXDClusterChargeCollector")
 
@@ -246,8 +281,11 @@ charge_cal = Calibration(
     algorithms=datamc_algo,
     input_files=input_files,
     pre_collector_path=pre_charge_collector_path,
-    database_chain=[CentralDatabase("data_reprocessing_prompt"), CentralDatabase("pxd_calibration"), LocalDatabase(args.localDB)]
-)
+    database_chain=[
+        CentralDatabase("data_reprocessing_prompt"),
+        CentralDatabase("pxd_calibration"),
+        LocalDatabase(
+            args.localDB)])
 
 # Apply the map to this calibration, now the CAF doesn't have to do it
 charge_cal.files_to_iovs = files_to_iovs
@@ -268,5 +306,6 @@ cal_fw = CAF()
 cal_fw.add_calibration(charge_cal)
 cal_fw.backend = LSF()  # KEKCC batch
 # cal_fw.backend = backends.Local(max_processes=20) # interactive
-cal_fw.output_dir = 'pxd_calibration_results_e{}_range_{}_{}'.format(args.expNo, args.runLow, args.runHigh)
+cal_fw.output_dir = 'pxd_calibration_results_e{}_range_{}_{}'.format(
+    args.expNo, args.runLow, args.runHigh)
 cal_fw.run(iov=iov_to_calibrate)

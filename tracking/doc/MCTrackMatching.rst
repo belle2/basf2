@@ -90,7 +90,7 @@ MC track candidates are classified into three categories:
     which in turn however better describes a MC track candidate different form this.
 
 * MISSING
-  * There is no highest efficiency PR track candidate to this MC track candidate, which also fullfills the minimal purity requirement.
+  * There is no highest efficiency PR track candidate to this MC track candidate, which also fulfills the minimal purity requirement.
 
 
 Four examples are shown in the pictures. 

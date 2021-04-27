@@ -131,6 +131,7 @@ namespace Belle2 {
         addParameter(section + "." + name, value);
       }
       if (content.exists("Material")) addParameter(section + ".Material", content.getString("Material"));
+      if (content.exists("HeadMaterial")) addParameter(section + ".HeadMaterial", content.getString("HeadMaterial"));
       if (content.exists("Intersect")) addParameter(section + ".Intersect", content.getString("Intersect"));
       if (content.exists("Subtract")) addParameter(section + ".Subtract", content.getString("Subtract"));
       if (content.exists("MotherVolume")) addParameter(section + ".MotherVolume", content.getString("MotherVolume"));

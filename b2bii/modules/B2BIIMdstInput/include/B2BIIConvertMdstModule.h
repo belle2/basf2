@@ -33,6 +33,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
+#include <b2bii/dataobjects/BelleTrkExtra.h>
 
 // Replace BeamParameters
 #include <mdst/dbobjects/BeamSpot.h>
@@ -130,6 +131,9 @@ namespace Belle2 {
     // false = mc
     bool m_realData;
 
+    //! Convert beam parameters or use information stored in Belle II database.
+    bool m_convertBeamParameters;
+
     //! flag that tells which form of covariance matrix should be used in the conversion of charged tracks
     // true = use 6x6 (position, momentum) covariance matrix
     // false = use 5x5 (helix parameters) covariance matrix
@@ -146,6 +150,8 @@ namespace Belle2 {
     bool m_nisEnable; /**< Flag to switch on conversion of nisKsFinder info */
 
     bool m_convertRecTrg; /**< Flag to switch on conversion of rectrg_summary3 */
+
+    bool m_convertTrkExtra; /**< Flag to switch on conversion of first(last)_{x,y,z} of mdst_trk_fit */
 
     /**
      * E9/E25 threshold value
@@ -255,7 +261,8 @@ namespace Belle2 {
                                         const Const::ParticleType& pType,
                                         const float pValue,
                                         const uint64_t hitPatternCDCInitializer,
-                                        const uint32_t hitPatternVXDInitializer);
+                                        const uint32_t hitPatternVXDInitializer,
+                                        const uint16_t ndf);
 
     /**
      * Fills Helix parameters (converted to Belle II version), 5x5 error matrix, 4-momentum, position and 7x7 error matrix from Belle Helix stored in Mdst_trk_fit.
@@ -388,6 +395,9 @@ namespace Belle2 {
 
     /** Particles. */
     StoreArray<Particle> m_particles;
+
+    /** Belle CDC extra information. */
+    StoreArray<BelleTrkExtra> m_belleTrkExtra;
 
     /** output PIDLikelihood array. */
     StoreArray<PIDLikelihood> m_pidLikelihoods;

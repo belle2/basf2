@@ -16,7 +16,7 @@ Variables
  * Fixed ``goodBelleLambda`` and now it returns ``extraInfo(goodLambda)`` on Belle data.
  * Allow use of meta variables in creation of aliases by replacing non
    alphanumeric characters with underscores in the alias name
- * Modified :b2:var:`daughterAngle` to accept generalized variable indeces instead of simple indeces. A
+ * Modified :b2:var:`daughterAngle` to accept generalized variable indices instead of simple indices. A
    generalized index is a column-separated string of daughter indexes belonging to different generations,
    starting from the root particle. For example, ``0:2:1`` indicates the second daughter (0) of the third daughter
    (2) of the first daughter (0) of the particle. Of course, conventional indexes are still working as expected:

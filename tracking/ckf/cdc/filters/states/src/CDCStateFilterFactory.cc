@@ -55,7 +55,7 @@ std::string CDCStateFilterFactory::getIdentifier() const
 
 std::string CDCStateFilterFactory::getFilterPurpose() const
 {
-  return "Reject cdc states";
+  return "Reject CDC CKF states. ";
 }
 
 std::map<std::string, std::string> CDCStateFilterFactory::getValidFilterNamesAndDescriptions() const

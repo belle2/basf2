@@ -23,7 +23,7 @@ cabi = Parameter(
     texname='\\theta _c',
     lhablock='CKMBLOCK',
     lhacode=[1],
-    )
+)
 
 aEWM1 = Parameter(
     name='aEWM1',
@@ -33,7 +33,7 @@ aEWM1 = Parameter(
     texname='\\text{aEWM1}',
     lhablock='SMINPUTS',
     lhacode=[1],
-    )
+)
 
 Gf = Parameter(
     name='Gf',
@@ -43,7 +43,7 @@ Gf = Parameter(
     texname='G_f',
     lhablock='SMINPUTS',
     lhacode=[2],
-    )
+)
 
 aS = Parameter(
     name='aS',
@@ -53,7 +53,7 @@ aS = Parameter(
     texname='\\text{aS}',
     lhablock='SMINPUTS',
     lhacode=[3],
-    )
+)
 
 ymdo = Parameter(
     name='ymdo',
@@ -63,7 +63,7 @@ ymdo = Parameter(
     texname='\\text{ymdo}',
     lhablock='YUKAWA',
     lhacode=[1],
-    )
+)
 
 ymup = Parameter(
     name='ymup',
@@ -73,7 +73,7 @@ ymup = Parameter(
     texname='\\text{ymup}',
     lhablock='YUKAWA',
     lhacode=[2],
-    )
+)
 
 yms = Parameter(
     name='yms',
@@ -83,7 +83,7 @@ yms = Parameter(
     texname='\\text{yms}',
     lhablock='YUKAWA',
     lhacode=[3],
-    )
+)
 
 ymc = Parameter(
     name='ymc',
@@ -93,7 +93,7 @@ ymc = Parameter(
     texname='\\text{ymc}',
     lhablock='YUKAWA',
     lhacode=[4],
-    )
+)
 
 ymb = Parameter(
     name='ymb',
@@ -103,7 +103,7 @@ ymb = Parameter(
     texname='\\text{ymb}',
     lhablock='YUKAWA',
     lhacode=[5],
-    )
+)
 
 ymt = Parameter(
     name='ymt',
@@ -113,7 +113,7 @@ ymt = Parameter(
     texname='\\text{ymt}',
     lhablock='YUKAWA',
     lhacode=[6],
-    )
+)
 
 yme = Parameter(
     name='yme',
@@ -123,7 +123,7 @@ yme = Parameter(
     texname='\\text{yme}',
     lhablock='YUKAWA',
     lhacode=[11],
-    )
+)
 
 ymm = Parameter(
     name='ymm',
@@ -133,7 +133,7 @@ ymm = Parameter(
     texname='\\text{ymm}',
     lhablock='YUKAWA',
     lhacode=[13],
-    )
+)
 
 ymtau = Parameter(
     name='ymtau',
@@ -143,7 +143,7 @@ ymtau = Parameter(
     texname='\\text{ymtau}',
     lhablock='YUKAWA',
     lhacode=[15],
-    )
+)
 
 Ge = Parameter(
     name='Ge',
@@ -153,7 +153,7 @@ Ge = Parameter(
     texname='\\text{Ge}',
     lhablock='FRBlock',
     lhacode=[1],
-    )
+)
 
 GChi = Parameter(
     name='GChi',
@@ -163,7 +163,7 @@ GChi = Parameter(
     texname='\\text{GChi}',
     lhablock='FRBlock',
     lhacode=[2],
-    )
+)
 
 Me = Parameter(
     name='Me',
@@ -173,7 +173,7 @@ Me = Parameter(
     texname='\\text{Me}',
     lhablock='MASS',
     lhacode=[11],
-    )
+)
 
 MM = Parameter(
     name='MM',
@@ -183,7 +183,7 @@ MM = Parameter(
     texname='\\text{MM}',
     lhablock='MASS',
     lhacode=[13],
-    )
+)
 
 MTA = Parameter(
     name='MTA',
@@ -193,7 +193,7 @@ MTA = Parameter(
     texname='\\text{MTA}',
     lhablock='MASS',
     lhacode=[15],
-    )
+)
 
 MU = Parameter(
     name='MU',
@@ -203,7 +203,7 @@ MU = Parameter(
     texname='M',
     lhablock='MASS',
     lhacode=[2],
-    )
+)
 
 MC = Parameter(
     name='MC',
@@ -213,7 +213,7 @@ MC = Parameter(
     texname='\\text{MC}',
     lhablock='MASS',
     lhacode=[4],
-    )
+)
 
 MT = Parameter(
     name='MT',
@@ -223,7 +223,7 @@ MT = Parameter(
     texname='\\text{MT}',
     lhablock='MASS',
     lhacode=[6],
-    )
+)
 
 MD = Parameter(
     name='MD',
@@ -233,7 +233,7 @@ MD = Parameter(
     texname='\\text{MD}',
     lhablock='MASS',
     lhacode=[1],
-    )
+)
 
 MS = Parameter(
     name='MS',
@@ -243,7 +243,7 @@ MS = Parameter(
     texname='\\text{MS}',
     lhablock='MASS',
     lhacode=[3],
-    )
+)
 
 MB = Parameter(
     name='MB',
@@ -253,7 +253,7 @@ MB = Parameter(
     texname='\\text{MB}',
     lhablock='MASS',
     lhacode=[5],
-    )
+)
 
 MChi = Parameter(
     name='MChi',
@@ -263,7 +263,7 @@ MChi = Parameter(
     texname='\\text{MChi}',
     lhablock='MASS',
     lhacode=[9000001],
-    )
+)
 
 MZ = Parameter(
     name='MZ',
@@ -273,7 +273,7 @@ MZ = Parameter(
     texname='\\text{MZ}',
     lhablock='MASS',
     lhacode=[23],
-    )
+)
 
 MAp = Parameter(
     name='MAp',
@@ -283,7 +283,7 @@ MAp = Parameter(
     texname='\\text{MAp}',
     lhablock='MASS',
     lhacode=[9000008],
-    )
+)
 
 MH = Parameter(
     name='MH',
@@ -293,7 +293,7 @@ MH = Parameter(
     texname='\\text{MH}',
     lhablock='MASS',
     lhacode=[25],
-    )
+)
 
 Mpi = Parameter(
     name='Mpi',
@@ -303,7 +303,7 @@ Mpi = Parameter(
     texname='\\text{Mpi}',
     lhablock='MASS',
     lhacode=[211],
-    )
+)
 
 WT = Parameter(
     name='WT',
@@ -313,7 +313,7 @@ WT = Parameter(
     texname='\\text{WT}',
     lhablock='DECAY',
     lhacode=[6],
-    )
+)
 
 WZ = Parameter(
     name='WZ',
@@ -323,7 +323,7 @@ WZ = Parameter(
     texname='\\text{WZ}',
     lhablock='DECAY',
     lhacode=[23],
-    )
+)
 
 WW = Parameter(
     name='WW',
@@ -333,7 +333,7 @@ WW = Parameter(
     texname='\\text{WW}',
     lhablock='DECAY',
     lhacode=[24],
-    )
+)
 
 WAp = Parameter(
     name='WAp',
@@ -343,7 +343,7 @@ WAp = Parameter(
     texname='\\text{WAp}',
     lhablock='DECAY',
     lhacode=[9000008],
-    )
+)
 
 WH = Parameter(
     name='WH',
@@ -353,7 +353,7 @@ WH = Parameter(
     texname='\\text{WH}',
     lhablock='DECAY',
     lhacode=[25],
-    )
+)
 
 Lam = Parameter(name='Lam', nature='internal', type='real',
                 value='MAp/(GChi*Ge)', texname='\\text{Lam}')
@@ -370,8 +370,7 @@ CKM1x1 = Parameter(name='CKM1x1', nature='internal', type='complex',
 CKM1x2 = Parameter(name='CKM1x2', nature='internal', type='complex',
                    value='cmath.sin(cabi)', texname='\\text{CKM1x2}')
 
-CKM1x3 = Parameter(name='CKM1x3', nature='internal', type='complex', value='0'
-                   , texname='\\text{CKM1x3}')
+CKM1x3 = Parameter(name='CKM1x3', nature='internal', type='complex', value='0', texname='\\text{CKM1x3}')
 
 CKM2x1 = Parameter(name='CKM2x1', nature='internal', type='complex',
                    value='-cmath.sin(cabi)', texname='\\text{CKM2x1}')
@@ -379,21 +378,16 @@ CKM2x1 = Parameter(name='CKM2x1', nature='internal', type='complex',
 CKM2x2 = Parameter(name='CKM2x2', nature='internal', type='complex',
                    value='cmath.cos(cabi)', texname='\\text{CKM2x2}')
 
-CKM2x3 = Parameter(name='CKM2x3', nature='internal', type='complex', value='0'
-                   , texname='\\text{CKM2x3}')
+CKM2x3 = Parameter(name='CKM2x3', nature='internal', type='complex', value='0', texname='\\text{CKM2x3}')
 
-CKM3x1 = Parameter(name='CKM3x1', nature='internal', type='complex', value='0'
-                   , texname='\\text{CKM3x1}')
+CKM3x1 = Parameter(name='CKM3x1', nature='internal', type='complex', value='0', texname='\\text{CKM3x1}')
 
-CKM3x2 = Parameter(name='CKM3x2', nature='internal', type='complex', value='0'
-                   , texname='\\text{CKM3x2}')
+CKM3x2 = Parameter(name='CKM3x2', nature='internal', type='complex', value='0', texname='\\text{CKM3x2}')
 
-CKM3x3 = Parameter(name='CKM3x3', nature='internal', type='complex', value='1'
-                   , texname='\\text{CKM3x3}')
+CKM3x3 = Parameter(name='CKM3x3', nature='internal', type='complex', value='1', texname='\\text{CKM3x3}')
 
 MW = Parameter(name='MW', nature='internal', type='real',
-               value='cmath.sqrt(MZ**2/2. + cmath.sqrt(MZ**4/4. - (aEW*cmath.pi*MZ**2)/(Gf*cmath.sqrt(2))))'
-               , texname='M_W')
+               value='cmath.sqrt(MZ**2/2. + cmath.sqrt(MZ**4/4. - (aEW*cmath.pi*MZ**2)/(Gf*cmath.sqrt(2))))', texname='M_W')
 
 ee = Parameter(name='ee', nature='internal', type='real',
                value='2*cmath.sqrt(aEW)*cmath.sqrt(cmath.pi)', texname='e')
@@ -448,4 +442,3 @@ yup = Parameter(name='yup', nature='internal', type='real',
 
 muH = Parameter(name='muH', nature='internal', type='real',
                 value='cmath.sqrt(lam*v**2)', texname='\\mu')
-

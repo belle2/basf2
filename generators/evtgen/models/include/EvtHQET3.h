@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EvtHQET3_HH
-#define EvtHQET3_HH
+#pragma once
 
 #include "EvtGenBase/EvtDecayAmp.hh"
 #include "EvtGenBase/EvtSemiLeptonicFF.hh"
@@ -53,7 +52,6 @@ private:
   EvtSemiLeptonicAmp* calcamp;
 
 };
-#endif
 
 
 

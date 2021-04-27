@@ -14,7 +14,7 @@ namespace Belle2 {
 
     /** constructor with arguments */
     CDCTriggerHoughCluster(int x1, int x2, int y1, int y2,
-                           std::vector<TVector2>& cellList):
+                           const std::vector<TVector2>& cellList):
       xmin(x1), xmax(x2), ymin(y1), ymax(y2), cells(cellList) { }
 
     /** destructor, empty because we don't allocate memory anywhere. */

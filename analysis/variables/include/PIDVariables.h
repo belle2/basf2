@@ -60,7 +60,7 @@ namespace Belle2 {
     * probability of pi hypothesis, using TOP and CDC only =  particleProbability(211, TOP, CDC);
     * probability of K hypothesis, using ARICH, TOP, CDC only =  particleProbability(321, ARICH, TOP, CDC);
     */
-    Manager::FunctionPtr pidParticleProbabilityExpert(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr pidProbabilityExpert(const std::vector<std::string>& arguments);
 
     /**
     * @return  returns 1 if the PID probabiliy is missing for the provided detector list, otherwise 0.
@@ -107,6 +107,26 @@ namespace Belle2 {
      * return binary PID between two particle hypotheses
      */
     double binaryPID(const Particle* part, const std::vector<double>& arguments);
+
+    /**
+     * return pion ID to be used in the physics analyses. SVD is included.
+     */
+    double pionID_SVD(const Particle* part);
+
+    /**
+     * return kaon ID to be used in the physics analyses. SVD is included.
+     */
+    double kaonID_SVD(const Particle* part);
+
+    /**
+     * return proton ID to be used in the physics analyses. SVD is included.
+     */
+    double protonID_SVD(const Particle* part);
+
+    /**
+     * return binary PID between two particle hypotheses. SVD is included.
+     */
+    double binaryPID_SVD(const Particle* part, const std::vector<double>& arguments);
 
     /**
      * @return the charged PID BDT score for a certain mass hypothesis with respect to all other charged stable particle hypotheses.
@@ -163,6 +183,10 @@ namespace Belle2 {
      **/
     double eIDBelle(const Particle*);
 
+    /**
+     * Parses the detector list for the PID metafunctions.
+     **/
+    Const::PIDDetectorSet parseDetectors(const std::vector<std::string>& arguments);
 
   }
 } // Belle2 namespace

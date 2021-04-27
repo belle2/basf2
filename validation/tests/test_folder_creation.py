@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import os
 import shutil
@@ -21,7 +20,7 @@ def main():
 
     # will create a temporary folder and delete it once this block is left
     with tempfile.TemporaryDirectory() as tmpdir:
-        print("Created temporary test folder {}".format(tmpdir))
+        print(f"Created temporary test folder {tmpdir}")
 
         expect_html_plots_comparison_json = \
             validationpath.get_html_plots_tag_comparison_json(str(tmpdir),

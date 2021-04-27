@@ -1,3 +1,4 @@
+.. _analysis_variablemanager_class:
 
 VariableManager
 ===============
@@ -19,7 +20,7 @@ The C++ documentation is `here <https://b2-master.belle2.org/software/developmen
         .. code-block:: python
 
             from variables import variables
-                
+
         To avoid confusion, example/tutorial scripts often use a namespace alias ``vm``.
         You might want to use this in your scripts.
 
@@ -46,14 +47,14 @@ The C++ documentation is `here <https://b2-master.belle2.org/software/developmen
           >>> from variables import variables as vm
           >>> vm.addAlias("shortname", "aReallyLongAndSpecificVariableName(1, 2, 3)")
 
-      .. seealso:: 
+      .. seealso::
 
-          `variables.utils.create_aliases` and `variables.utils.create_aliases_for_selected` 
+          `variables.utils.create_aliases` and `variables.utils.create_aliases_for_selected`
           might be helpful if you find yourself setting many aliases in your analysis script.
 
-      .. warning:: 
+      .. warning::
 
-          The VariableManager instance is configured independently of the `basf2.Path`. 
+          The VariableManager instance is configured independently of the `basf2.Path`.
           In case of adding the same alias twice, the configuration just before calling `basf2.process` is what wins.
 
       :param str alias: New alias to create
@@ -65,9 +66,9 @@ The C++ documentation is `here <https://b2-master.belle2.org/software/developmen
 
       Get a list of all alias names (in reverse order added)
 
-      .. tip:: 
+      .. tip::
 
-          This returns a ``ROOT.vector`` which you will probably 
+          This returns a ``ROOT.vector`` which you will probably
           need to convert into a python ``list(str)``.
 
           >>> my_aliases = list(vm.getAliasNames())
@@ -78,7 +79,7 @@ The C++ documentation is `here <https://b2-master.belle2.org/software/developmen
 
       Create a new variable collection.
 
-      .. tip:: 
+      .. tip::
 
          This method takes a ``ROOT.vector<string>`` as input.
          It's probably easier to use `variables.utils.add_collection` which wraps this function for you.
@@ -89,7 +90,7 @@ The C++ documentation is `here <https://b2-master.belle2.org/software/developmen
       :returns: True if the collection was successfully added
 
    .. py:method:: getCollection(collection)
-  
+
       Get a list of all variables in the ``collection``.
 
       :param str collection: The name of the existing variable collection
@@ -97,7 +98,7 @@ The C++ documentation is `here <https://b2-master.belle2.org/software/developmen
       :returns: ``ROOT.vector`` list of variable names
 
    .. py:method:: printAliases()
- 
+
       Prints all aliases currently registered.
       Useful to call just before calling `basf2.process` on an analysis `basf2.Path` when debugging.
 
@@ -109,14 +110,14 @@ Variables by group
 
 Here is a categorised list of variables known to ``basf2``.
 You can also look at the alphabetical index: :ref:`b2-varindex`.
- 
-Kinematics 
+
+Kinematics
 ~~~~~~~~~~
 
 .. b2-variables::
    :group: Kinematics
 
-Helicity 
+Helicity
 ~~~~~~~~
 
 .. b2-variables::
@@ -130,18 +131,40 @@ Here is a list of track variables:
 .. b2-variables::
    :group: Tracking
 
+V0 Tracking
+~~~~~~~~~~~
+
+Here is a list of track variables for V0 daughters:
+
+.. b2-variables::
+   :group: V0Daughter
+
 PID
 ~~~
 
 Here is a list of particle identification variables:
 
 .. warning ::
+  The **standard** global and binary PID variables - namely `electronID`, `pionID`... `binaryPID` - currently use information
+  from all detectors **except for the SVD**.
+  This is because at the moment "physical" SVD :math:`dE/dx` PDFs are available only for some particle hypotheses (:math:`\pi,K,p`) but not for others (:math:`e,\mu,d`), which could potentially bias the PID definition.
+
+  For **hadronID** only, a set of convenience variables have been defined that include the SVD:
+
+    * For *global* PID, :math:`\text{<Part>ID}=\mathcal{L}_{\text{<Part>}}/(\mathcal{L}_\pi+\mathcal{L}_K+\mathcal{L}_p)`, where :math:`\text{<Part>}\in[\pi,K,p]` : `pionID_SVD`, `kaonID_SVD`, `protonID_SVD`.
+    * For *binary* PID, :math:`\pi/K,\pi/p,K/p` : `binaryPID_SVD`.
+
+  Note that in the above the particle hypotheses :math:`e,\mu,d` have been excluded in the PID definition.
+
+  Please note, this distinction is meant to be only temporary: as soon as SVD PDFs are available for all particle hypotheses and thoroughly validated, the standard PID variables will include the SVD information back.
+
+.. warning ::
   The **definitions** of the default PID variables have changed between
-  release-01 and release-02. 
+  release-01 and release-02.
 
   Prior to release-02-00-00 (i.e. in release-01-XX-YY) each ID was calculated
   against the pion likelihood alone, or the kaon in the case of the pion itself.
-  Namely the pair probability (also known as the binary probability) was returned: 
+  Namely the pair probability (also known as the binary probability) was returned:
 
     * for all particles: :math:`\text{<Part>ID}=\mathcal{L}_{\text{<Part>}}/\mathcal{L}_\pi`, where :math:`\text{<Part>}\in[e,\mu,K,p,d]`.
 
@@ -151,7 +174,7 @@ Here is a list of particle identification variables:
   the pion-proton or pion-muon mis-identification.
 
 .. b2-variables::
-   :group: PID   
+   :group: PID
 
 Basic particle information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -168,7 +191,7 @@ detector codes are SVD, TOP, CDC, ARICH, ECL, KLM and ALL.
 
 If a likelihood is not available from the selected detector list, **NaN** is returned.
 
-.. warning :: 
+.. warning ::
   These variables are not to be used in physics analyses, but only by experts doing performance studies.
 
 .. b2-variables::
@@ -185,13 +208,13 @@ All ECLCluster-based variables return NaN if no ECLCluster is found.
 .. note::
     All floating type variables in the mdst dataobject ECLCluster use ROOT Double32_t types with
     specific range declaration to save disk storage. This has two important consequences for a user:
-        
+
         - All ECL cluster variables have a limited precision. This precision is always better than
           the intrinsic ECL data acquisition precision. However, if these variables are histogrammed,
           binning effects are likely.
         - All ECL cluster variables are clipped at the lower and upper boundaries: Values below (above)
           these boundaries will be set to the lower (upper) bound.
-    
+
     Lower and upper limits, and precision of these variables are mentioned inside the note box below them.
     One should note this in the context of binning effects.
 
@@ -229,7 +252,7 @@ Event
 Here is a list of event variables:
 
 .. b2-variables::
-   :group: Event   
+   :group: Event
 
 Parameter Functions
 ~~~~~~~~~~~~~~~~~~~
@@ -237,7 +260,7 @@ Parameter Functions
 Here is a list of variables that require a parameter:
 
 .. b2-variables::
-   :group: ParameterFunctions   
+   :group: ParameterFunctions
 
 Meta Functions
 ~~~~~~~~~~~~~~
@@ -245,7 +268,7 @@ Meta Functions
 Here is a list of variables that returns extra info of a given particle:
 
 .. b2-variables::
-   :group: MetaFunctions   
+   :group: MetaFunctions
 
 MC matching and MC truth
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -292,8 +315,8 @@ Here is a list of KLM Cluster and :math:`K_{L}^0` identification variables:
   Please note that these variables refer to KLMClusters, which are designed to reconstruct :math:`K_{L}^0` and other
   neutral particles with the KLM subdetector. These variables **must not be used to do particle identification of
   charged tracks** (for example, they must not be used to identify muons), otherwise there is a serious risk to spoil
-  a physics analysis. 
-  
+  a physics analysis.
+
   For particle identification of charged tracks, please use the canonical PID variables.
 
 .. b2-variables::
@@ -355,7 +378,7 @@ The variable collection ``event_kinematics`` allows to add all of them comfortab
 
 .. b2-variables::
     :group: EventKinematics
-         
+
 .. _flight_information:
 
 Flight Information
@@ -364,7 +387,7 @@ Flight Information
 Here is a list of flight time and distance variables of a (grand)daughter particle w.r.t. its (grand)mother decay vertex:
 
 .. b2-variables::
-   :group: Flight Information   
+   :group: Flight Information
 
 .. _vertex_information:
 
@@ -374,7 +397,7 @@ Vertex Information
 Here is a list of production and decay vertex variables:
 
 .. b2-variables::
-   :group: Vertex Information   
+   :group: Vertex Information
 
 For fully-inclusive particles
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -382,21 +405,21 @@ For fully-inclusive particles
 Here is a list of useful variables to work with fully-inclusive particles, which are produced via :doc:`RestOfEvent`, `AllParticleCombiner` or other inclusive reconstruction modules:
 
 .. b2-variables::
-   :group: For fully-inclusive particles   
+   :group: For fully-inclusive particles
 
 Specific kinematic variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This variables group is reserved for the variables for analyses of specific decays like, :math:`B \to h l \nu`, :math:`B \to h l^\pm l^\mp`, etc. 
+This variables group is reserved for the variables for analyses of specific decays like, :math:`B \to h l \nu`, :math:`B \to h l^\pm l^\mp`, etc.
 
 .. b2-variables::
-   :group: Specific kinematic variables   
+   :group: Specific kinematic variables
 
 
 Belle and ``b2bii`` variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Several legacy Belle variables are provided. 
+Several legacy Belle variables are provided.
 
 .. note::
    These are intended for studies with ``b2bii`` and for comparison between Belle and Belle II.
@@ -407,7 +430,7 @@ Several legacy Belle variables are provided.
 PID for B2BII
 """""""""""""
 
-.. warning:: 
+.. warning::
    These variables are to be used only when analysing converted Belle samples.
 
 .. b2-variables::
@@ -445,7 +468,7 @@ Collections and Lists
 To avoid very long lists of variable names in `variablesToNtuple <modularAnalysis.variablesToNtuple>`,
 it is possible to use collections of variables or lists of variables instead.
 
-Lists of variables are just python lists of variables names. 
+Lists of variables are just python lists of variables names.
 One can use the list in the steering file as follows:
 
 .. code:: python
@@ -522,7 +545,7 @@ Below are step-by-step instructions for implementation of helicity angle for arb
 Step 1. Check whether your function would fit in any of the existing source files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If yes, go to the next step. 
+If yes, go to the next step.
 
 If not, create new header/source files. In case of our example, we will create ``AngularVariables.h`` and ``AngularVariables.cc``
 
@@ -533,16 +556,16 @@ If not, create new header/source files. In case of our example, we will create `
   #pragma once
   // include VariableManager
   #include <analysis/VariableManager/Manager.h>
- 
+
   // include the Belle II Particle class
   #include <analysis/dataobjects/Particle.h>
- 
+
   // put variable in the Belle2::Variable namespace
   namespace Belle2 {
     namespace Variable {
- 
+
       // Your code goes here
- 
+
     } // Variable namespace
   } // Belle2 namespace
 
@@ -553,11 +576,11 @@ If not, create new header/source files. In case of our example, we will create `
 
   // Own include
   #include <analysis/VariableManager/AngularVariables.h>
-   
+
   // put variable in the Belle2::Variable namespace
   namespace Belle2 {
     namespace Variable {
-   
+
       // Your code goes here
     } // Variable namespace
   } // Belle2 namespace
@@ -599,26 +622,26 @@ Step 3. Implement the function in the source file
     // and granddaughter are specified as the indices in the vector (second argument)
     // daughter_indices[0] = index of the daughter
     // daughter_indices[1] = index of the granddaughter
-   
+
     if (!particle)
       return std::numeric_limits<float>::quiet_NaN();
     int nDaughters = particle->getNDaughters();
     if(nDaughters < 2)
       return std::numeric_limits<float>::quiet_NaN();
-    if (daughter_indices.size() != 2) 
+    if (daughter_indices.size() != 2)
       return std::numeric_limits<float>::quiet_NaN();
-   
+
     // get the daughter particle
     int daughterIndex = daughter_indices[0];
     const Particle *daughter = particle->getDaughter(daughterIndex);
     nDaughters = daughter->getNDaughters();
     if(nDaughters < 2)
       return std::numeric_limits<float>::quiet_NaN();
-   
+
     // get the granddaughter
     int grandDaughterIndex = daughter_indices[1];
     const Particle *grandDaughter = daughter->getDaughter(grandDaughterIndex);
-   
+
     // do the calculation
     TLorentzVector particle4Vector = particle->get4Vector();
     TLorentzVector daughter4Vector = daughter->get4Vector();
@@ -654,8 +677,8 @@ Step 6. Done!
 
 You can check if your variable is visible to VariableManager
 
->>> basf2 analysis/scripts/variables.py  
-AngularVariables: helicityAngle(i,j) cosine of the angle between particle->getDaughter(i)->getDaughter(j) and this particle in the particle->getDaughter(i) rest frame. 
+>>> basf2 analysis/scripts/variables.py
+AngularVariables: helicityAngle(i,j) cosine of the angle between particle->getDaughter(i)->getDaughter(j) and this particle in the particle->getDaughter(i) rest frame.
 
 You can use your variable in the same way as you use standard variables.
 
@@ -664,11 +687,11 @@ How to use my variable at grid?
 
   * Prepare the environment with the ``b2analysis-create`` tool.
 
->>> b2analysis-create myanalysis <current central release, e.g. release-04-00-00> 
+>>> b2analysis-create myanalysis <current central release, e.g. release-04-00-00>
 >>> cd myanalysis
 >>> setupana
 
-  * Define the new variables/functions in a .cc and register them with the variable manager. 
+  * Define the new variables/functions in a .cc and register them with the variable manager.
     This means that in the new .cc you should add:
 
 .. code:: C++
@@ -702,15 +725,15 @@ Then:
   from variables import variables
   print(variables.getVariable("myVar").description)
 
-These lines will add the local directory to the module search path and instantiate the module we created. 
-This is enough to load the library and register the variables. 
-Now you should be able to use your custom variables for your analysis and there is no need to add this 
+These lines will add the local directory to the module search path and instantiate the module we created.
+This is enough to load the library and register the variables.
+Now you should be able to use your custom variables for your analysis and there is no need to add this
 module to the path, it just needs to be registered to load the library.
 
-In the end you can run your analysis on the grid adding the ``.so`` and ``.map`` files to the input sandbox 
+In the end you can run your analysis on the grid adding the ``.so`` and ``.map`` files to the input sandbox
 with the -f option of ``gbasf2``:
 
 >>> gbasf2 ./steering.py -p project -i dataset -f myanalysis.so myanalysis.b2modmap
 
-.. warning:: This line implies that you already have working ``gbasf2`` installation and ``gbasf2`` syntax didn't 
+.. warning:: This line implies that you already have working ``gbasf2`` installation and ``gbasf2`` syntax didn't
   change since the moment of writing. Please refer gbasf2 `documentation <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ for more details.

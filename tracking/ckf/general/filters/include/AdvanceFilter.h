@@ -76,7 +76,7 @@ namespace Belle2 {
         genfit::SharedPlanePtr plane = currentState->getPlane(mSoP);
         returnValue = m_advancer.extrapolateToPlane(mSoP, plane);
       } catch (genfit::Exception& e) {
-        B2DEBUG(50, "Plane extraction failed: " << e.what());
+        B2DEBUG(29, "Plane extraction failed: " << e.what());
       }
 
       if (not std::isnan(returnValue)) {

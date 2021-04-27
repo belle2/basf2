@@ -6,15 +6,15 @@
 # event data is buffered in shared memory, previous events may be overwritten
 # once the buffer is full.
 
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 
 # register necessary modules
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [5000])
 
-main = create_path()
+main = b2.create_path()
 
 # add modules to paths
 main.add_module(eventinfosetter)
@@ -40,10 +40,10 @@ add_simulation(main, components)
 add_reconstruction(main, components)
 
 # default parameters
-display = register_module('AsyncDisplay')
+display = b2.register_module('AsyncDisplay')
 # make some room in the buffer when full
 display.param('discardOldEvents', True)
 main.add_module(display)
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

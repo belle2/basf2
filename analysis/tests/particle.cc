@@ -7,6 +7,7 @@
 #include <mdst/dataobjects/V0.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/gearbox/Const.h>
 #include <framework/utilities/TestHelpers.h>
 
 #include <analysis/utility/ParticleCopy.h>
@@ -326,10 +327,11 @@ namespace {
     Particle* T3Gamma    = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
                                                         2));
     // T4KL
-    Particle* T4KL       = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 130, Particle::c_Unflavored, Particle::c_ECLCluster,
+    Particle* T4KL       = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), Const::Klong.getPDGCode(), Particle::c_Unflavored,
+                                                        Particle::c_ECLCluster,
                                                         3));
     MCParticle* MC1Pion = mcparticles. appendNew(MCParticle());
-    MC1Pion->setPDG(211);
+    MC1Pion->setPDG(Const::pion.getPDGCode());
     MC1Pion->set4Vector(TLorentzVector(0, 0, 0, 0));
     Particle* T1PionFromMC     = particles.appendNew(Particle(MC1Pion));
 

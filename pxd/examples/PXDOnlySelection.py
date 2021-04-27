@@ -7,15 +7,13 @@
 # Contributors: Peter Kodys                                              *
 #############################################################
 
-from basf2 import *
-import glob
-import rawdata
+import basf2 as b2
 
 # output filename, can be overriden with -o
 output_filename = "RootOutput_PXDOnly.root"
 
 # create path
-main = create_path()
+main = b2.create_path()
 
 main.add_module('Progress')
 
@@ -30,5 +28,5 @@ main.add_module('RootInput', branchNames=branches)
 main.add_module("RootOutput", outputFileName=output_filename)
 
 # process events and print call statistics
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

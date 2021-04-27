@@ -51,7 +51,10 @@ class RetentionCheck(b2.Module):
     summary = {}  # static dictionary containing the results (retention rates, number of candidates, ...)
     output_override = None  # if the -o option is provided to basf2, this variable store the ouptut for the plotting
 
-    def __init__(self, module_name='', module_number=0, particle_lists=[]):
+    def __init__(self, module_name='', module_number=0, particle_lists=None):
+
+        if particle_lists is None:
+            particle_lists = []
 
         self.module_name = str(module_name)
         self.module_number = int(module_number)

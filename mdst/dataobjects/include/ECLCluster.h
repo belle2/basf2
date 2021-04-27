@@ -187,10 +187,6 @@ namespace Belle2 {
     /** Set E9/E21 energy ratio. */
     void setE9oE21(double E9oE21) { m_E9oE21 = E9oE21; }
 
-    /** set Cluster Hadron Component Intensity. */
-    [[deprecated("will be removed in release-04.")]]
-    void setClusterHadronIntensity(double ClusterHadronIntensity) { m_ClusterHadronIntensity = ClusterHadronIntensity; }
-
     /** set Pulse Shape Discrimination MVA */
     void setPulseShapeDiscriminationMVA(double PulseShapeDiscriminationMVA) { m_PulseShapeDiscriminationMVA = PulseShapeDiscriminationMVA; }
 
@@ -248,15 +244,6 @@ namespace Belle2 {
     /** Return connected region id. */
     int getConnectedRegionId() const {return m_connectedRegionId;}
 
-    /** Return hypothesis id */
-    [[deprecated("Please use hasHypothesis().")]]
-    int getHypothesisId() const
-    {
-      if (hasHypothesis(EHypothesisBit::c_nPhotons)) return 5;
-      else if (hasHypothesis(EHypothesisBit::c_neutralHadron)) return 6;
-      else return 0;
-    }
-
     /** Return cluster id */
     int getClusterId() const {return m_clusterId;}
 
@@ -280,10 +267,6 @@ namespace Belle2 {
 
     /** Return E9/E21 (shower shape variable). */
     double getE9oE21() const { return m_E9oE21; }
-
-    /** Return Cluster hadron intensity*/
-    [[deprecated("will be removed in release-04.")]]
-    double getClusterHadronIntensity() const { return m_ClusterHadronIntensity; }
 
     /** Return MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers.*/
     double getPulseShapeDiscriminationMVA() const { return m_PulseShapeDiscriminationMVA; }
@@ -341,10 +324,6 @@ namespace Belle2 {
 
     /** Return detector region: 0: below acceptance, 1: FWD, 2: BRL, 3: BWD, 11: FWDGAP, 13: BWDGAP */
     int getDetectorRegion() const;
-
-    /** Return (pseudo) unique Id based on CRId, ShowerId and HypothesisID */
-    [[deprecated("will be removed in release-04.")]]
-    int getUniqueId() const;
 
     /**
      * Return if specific status bit is set.

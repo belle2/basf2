@@ -1,25 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from .svgdrawing import attributemaps
+from . import svgdrawing
+from datetime import datetime
+import subprocess
+import os.path
+import os
+from ROOT import Belle2  # make Belle2 namespace available
 import basf2
 
 from ROOT import gSystem
 gSystem.Load('libframework')  # for PyStoreArray
 gSystem.Load('libcdc')  # for CDCSimHit
 gSystem.Load('libtracking')  # for CDCHit and so on
-
-from ROOT import Belle2  # make Belle2 namespace available
-from ROOT import std
-
-import os
-import os.path
-import math
-
-import subprocess
-from datetime import datetime
-import itertools
-from . import svgdrawing
-from .svgdrawing import attributemaps
 
 
 class CDCSVGDisplayModule(basf2.Module):
@@ -1036,9 +1030,9 @@ class CDCSVGDisplayModule(basf2.Module):
 
             # 'display' is part of the ImageMagic package commonly installed in linux
             if self.use_python:
-                procDisplay = subprocess.Popen(['eog', fileName])
+                subprocess.Popen(['eog', fileName])
             if self.use_cpp:
-                procDisplay = subprocess.Popen(['eog', cppfileName])
+                subprocess.Popen(['eog', cppfileName])
             # procDisplay = subprocess.Popen(['display','-background','white',
             # '-flatten',fileName])
             # procConverter = subprocess.Popen(['rsvg', root + '.svg', root + '.png'])

@@ -37,6 +37,7 @@ namespace Belle2 {
     /**
      * @param sensorID Sensor compact ID.
      * @param data raw data pointer
+     * @param len size of data
      */
     PXDRawAdc(VxdID sensorID, void* data, int len);
 

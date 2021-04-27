@@ -32,6 +32,7 @@ namespace {
   using NoneTrackFilter = NoneFilter<BaseTrackFilter>;
   using MCTrackFilter = TruthVarFilter<TruthTrackVarSet>;
   using RecordingTrackFilter = RecordingFilter<VariadicUnionVarSet<TruthTrackVarSet, BasicTrackVarSet>>;
+  using RecordingDataTrackFilter = RecordingFilter<BasicTrackVarSet>;
   using MVATrackFilter = MVAFilter<BasicTrackVarSet>;
 }
 
@@ -60,6 +61,7 @@ TrackFilterFactory::getValidFilterNamesAndDescriptions() const
     {"all", "set all tracks as good"},
     {"truth", "monte carlo truth"},
     {"recording", "record variables to a TTree"},
+    {"recording_data", "record reco-variables to a TTree (no truth information)"},
     {"eval", "record truth and the mva response for insitu comparision"},
     {"mva", "test with a mva method"}
   };
@@ -76,6 +78,8 @@ TrackFilterFactory::create(const std::string& filterName) const
     return std::make_unique<MCTrackFilter>();
   } else if (filterName == "recording") {
     return std::make_unique<RecordingTrackFilter>("TrackFilter.root");
+  } else if (filterName == "recording_data") {
+    return std::make_unique<RecordingDataTrackFilter>("TrackFilter.root");
   } else if (filterName == "eval") {
     auto recordedVarSets = std::make_unique<UnionVarSet<CDCTrack>>();
     using TrackFilterVarSet = FilterVarSet<BaseTrackFilter>;

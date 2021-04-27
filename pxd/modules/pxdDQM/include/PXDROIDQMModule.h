@@ -34,12 +34,16 @@ namespace Belle2 {
       PXDROIDQMModule();
 
     private:
+      /** Initialize */
       void initialize() override final;
 
+      /** Begin run */
       void beginRun() override final;
 
+      /** Event */
       void event() override final;
 
+      /** Define histograms */
       void defineHisto() override final;
 
     private:
@@ -86,7 +90,6 @@ namespace Belle2 {
       TH1F* hrawROIDCsizeU = nullptr; /** Histogram  */
 
       TH2F* hrawROINrDCvsNrHLT = nullptr; /** Histogram  */
-      TH2F* hrawROIEVTsWithOneSource = nullptr; /** Histogram  */
 
     };//end class declaration
 

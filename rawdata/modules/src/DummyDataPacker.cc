@@ -11,6 +11,8 @@
 using namespace std;
 using namespace Belle2;
 
+#define USE_PCIE40
+
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -118,7 +120,23 @@ void DummyDataPackerModule::event()
 //     RawKLM* raw_klm = raw_klmarray.appendNew();
 //     RawTRG* raw_trg = raw_trgarray.appendNew();
 
+#ifdef USE_PCIE40
+    int* buf_pcie40[MAX_PCIE40_CH];
+    int nwords_ch[MAX_PCIE40_CH];
 
+    for (int j = 0; j < MAX_PCIE40_CH; j++) {
+      nwords_ch[j] = n_basf2evt % 10 + 1;
+      buf_pcie40[j] = new int[ nwords_ch[j]];
+      for (int k = 0; k < nwords_ch[j]; k++) {
+        buf_pcie40[j][k] = i + j + k;
+      }
+    }
+    raw_svd->PackDetectorBuf(buf_pcie40, nwords_ch, rawcprpacker_info);
+
+    for (int j = 0; j < MAX_PCIE40_CH; j++) {
+      delete [] buf_pcie40[j];
+    }
+#else
     int* buf_hslb1, *buf_hslb2, *buf_hslb3, *buf_hslb4;
     int nwords_1st_hslb = 0, nwords_2nd_hslb = 0, nwords_3rd_hslb = 0, nwords_4th_hslb = 0;
 
@@ -157,6 +175,7 @@ void DummyDataPackerModule::event()
     delete [] buf_hslb2;
     delete [] buf_hslb3;
     delete [] buf_hslb4;
+#endif
 
   }
 

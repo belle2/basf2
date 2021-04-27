@@ -17,17 +17,17 @@
 # Example steering file - 2011 Belle II Collaboration
 ######################################################
 
-from basf2 import *
+import basf2 as b2
 
 # Set the log level to show only error and fatal messages
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 
 # Modules
-receiver = register_module('DeSerializer')
-dump = register_module('PrintCollections')
+receiver = b2.register_module('DeSerializer')
+dump = b2.register_module('PrintCollections')
 # perf = register_module('DAQPerf')
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 
 # RxSocket
 receiver.param('Port', [99999])
@@ -39,7 +39,7 @@ receiver.param('Port', [99999])
 output.param('outputFileName', 'rawcopperM.root')
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Add modules to main path
 main.add_module(receiver)
@@ -48,4 +48,4 @@ main.add_module(output)
 # main.add_module(perf)
 
 # Process all events
-process(main)
+b2.process(main)

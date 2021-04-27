@@ -36,6 +36,12 @@ namespace Belle2 {
       return svdVector.at(strip);
     }
 
+    /** get a reference to the calibration of the strip*/
+    const static inline calibrationType& getReference(const payloadContainerType& svdVector, unsigned int strip)
+    {
+      return svdVector.at(strip);
+    }
+
     /** set the calibration of the strip*/
     static inline void set(payloadContainerType& svdVector, unsigned int strip,
                            calibrationType value)

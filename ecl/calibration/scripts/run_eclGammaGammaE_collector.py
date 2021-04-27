@@ -22,13 +22,11 @@
 # run_eclGammaGammaE_algorithm.py is then used to perform calibration using these histograms, or to simply copy
 # them to an output file.
 
-import os
 import sys
-from basf2 import *
-from ROOT import Belle2
+import basf2 as b2
 
 
-main = create_path()
+main = b2.create_path()
 DR2 = '/ghi/fs01/belle2/bdata/users/karim/MC/DR2/release-01-00-00/gg/mdst/gg_0.root'
 main.add_module('RootInput', inputFileNames=[DR2])
 
@@ -38,7 +36,7 @@ if(narg >= 2):
     outputName = sys.argv[1]
 main.add_module("HistoManager", histoFileName=outputName)
 
-eclGammaGammaE = register_module('eclGammaGammaECollector')
+eclGammaGammaE = b2.register_module('eclGammaGammaECollector')
 eclGammaGammaE.param('thetaLabMinDeg', 0.)
 eclGammaGammaE.param('thetaLabMaxDeg', 180.)
 eclGammaGammaE.param('minPairMass', 9.)
@@ -51,15 +49,15 @@ main.add_module(eclGammaGammaE)
 
 main.add_module('Progress')
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 # It is possible to force the job to use the specified global tag.
 # Default localdb is the subdirectory of current working directory, but can be overwritten
-reset_database()
-use_database_chain()
-use_central_database("development")
-use_local_database("localdb/database.txt")
+b2.reset_database()
+b2.use_database_chain()
+b2.use_central_database("development")
+b2.use_local_database("localdb/database.txt")
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

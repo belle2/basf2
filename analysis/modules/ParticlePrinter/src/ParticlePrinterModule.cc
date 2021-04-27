@@ -11,14 +11,10 @@
 // Own include
 #include <analysis/modules/ParticlePrinter/ParticlePrinterModule.h>
 
-// framework - DataStore
-#include <framework/datastore/StoreObjPtr.h>
-
 // framework aux
 #include <framework/logging/Logger.h>
 
 // dataobjects
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
 
 using namespace std;
@@ -53,8 +49,7 @@ namespace Belle2 {
   void ParticlePrinterModule::initialize()
   {
     if (!m_listName.empty()) {
-      StoreObjPtr<ParticleList> plist(m_listName);
-      plist.isRequired();
+      m_plist.isRequired(m_listName);
 
       // obtain the input and output particle lists from the decay string
       bool valid = m_decaydescriptor.init(m_listName);
@@ -79,20 +74,19 @@ namespace Belle2 {
     }
 
     // Print variables for all particles in the list
-    StoreObjPtr<ParticleList> plist(m_listName);
-    if (!plist) {
+    if (!m_plist) {
       B2ERROR("ParticleList " << m_listName << " not found");
       return;
     }
 
-    if (!m_listName.empty() && plist->getListSize() == 0) return;
+    if (!m_listName.empty() && m_plist->getListSize() == 0) return;
 
     B2INFO("[ParticlePrinterModule] START ------------------------------");
 
-    plist->print();
+    m_plist->print();
 
-    for (unsigned i = 0; i < plist->getListSize(); i++) {
-      const Particle* particle = plist->getParticle(i);
+    for (unsigned i = 0; i < m_plist->getListSize(); i++) {
+      const Particle* particle = m_plist->getParticle(i);
       if (m_fullPrint) {
         particle->print();
       }

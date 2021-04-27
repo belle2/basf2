@@ -37,7 +37,7 @@ namespace Belle2 {
 
     /**
       * Constructor with basic values
-      * @param trackID unique ID of track
+      * @param ID unique ID of track
       * @param radius radius of track estimated by hough trafo algorithm
       * @param phi phi of track estimated by hough trafo algorithm
       * @param zzero vertical coordinate of the theta Hough Space to compute z0
@@ -52,7 +52,7 @@ namespace Belle2 {
     /**
       * Constructor with basic values plus hitIDList
       * @param hitIDList list of hits assigned to the track
-      * @param trackID unique ID of track
+      * @param ID unique ID of track
       * @param radius radius of track estimated by hough trafo algorithm
       * @param phi phi of track estimated by hough trafo algorithm
       * @param zzero vertical coordinate of the theta Hough Space to compute z0

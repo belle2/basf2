@@ -2,7 +2,7 @@
 [INFO] The random number seed is set to "something important"
 [[[]] -> EventInfoSetter -> [SelectOddEvents -> EventInfoPrinter] -> PrintCollections]
 [INFO] Starting event processing, random seed is set to 'something important'
-[INFO] Begin of new run
+[INFO] Begin of new run.
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -22,11 +22,11 @@
 [ERROR] In module ReturnFalse1Condition  { module: ReturnFalse1Condition }
 [ERROR] In module final  { module: final }
 [INFO] Setting return value to True
-[INFO] Processed:   1 runs,      1 events
+[INFO] Processed:   1 runs,      1/     3 events.
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 1
 [INFO] ========================================================================
-[INFO] Begin of new run
+[INFO] Begin of new run.
 [INFO] ========================================================================
 [INFO] >>> Start new run: 2
 [INFO] ------------------------------------------------------------------------
@@ -48,7 +48,7 @@
 [INFO] second process() call follows...
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
-[INFO] Begin of new run
+[INFO] Begin of new run.
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -68,11 +68,11 @@
 [ERROR] In module ReturnFalse1Condition  { module: ReturnFalse1Condition }
 [ERROR] In module final  { module: final }
 [INFO] Setting return value to True
-[INFO] Processed:   1 runs,      1 events
+[INFO] Processed:   3 runs,      2/     3 events.
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 1
 [INFO] ========================================================================
-[INFO] Begin of new run
+[INFO] Begin of new run.
 [INFO] ========================================================================
 [INFO] >>> Start new run: 2
 [INFO] ------------------------------------------------------------------------

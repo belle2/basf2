@@ -45,6 +45,9 @@ namespace Belle2 {
                 const CLHEP::Hep3Vector& momentum,
                 double charge);
 
+    /// Default copy constructor
+    TRGCDCHelix(const TRGCDCHelix&) = default;
+
     /// Destructor
     virtual ~TRGCDCHelix();
 

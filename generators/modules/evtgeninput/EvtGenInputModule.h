@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVTGENINPUTMODULE_H
-#define EVTGENINPUTMODULE_H
+#pragma once
 
 #include <generators/evtgen/EvtGenInterface.h>
 
@@ -85,4 +84,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif // EVTGENINPUTMODULE_H

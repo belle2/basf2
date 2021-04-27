@@ -3,15 +3,15 @@
 # calibration/examples/1_create_sample_DSTs.sh or just make your own
 # and change the input data below.
 
-from basf2 import *
-set_log_level(LogLevel.INFO)
+import basf2 as b2
 
 import os
 import sys
 
-import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
+
+b2.set_log_level(b2.LogLevel.INFO)
 
 
 def main(argv):

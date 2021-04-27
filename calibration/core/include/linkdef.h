@@ -5,6 +5,6 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::MergeableNamed+;
+#pragma link C++ class Belle2::MergeableNamed+; // checksum=0x3d49b510, version=0
 
 #endif

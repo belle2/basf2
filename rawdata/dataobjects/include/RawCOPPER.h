@@ -11,9 +11,6 @@
 
 // Includes
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/time.h>
 
 #include <rawdata/dataobjects/RawDataBlock.h>
 #include <rawdata/dataobjects/RawDataBlockFormat.h>
@@ -21,10 +18,11 @@
 #include <rawdata/dataobjects/RawCOPPERFormat_latest.h>
 #include <rawdata/dataobjects/RawCOPPERFormat_v0.h>
 #include <rawdata/dataobjects/RawCOPPERFormat_v1.h>
+#include <rawdata/dataobjects/RawCOPPERFormat_v2.h>
 #include <rawdata/dataobjects/PreRawCOPPERFormat_v1.h>
+#include <rawdata/dataobjects/PreRawCOPPERFormat_v2.h>
 #include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
 #include <rawdata/RawCOPPERPackerInfo.h>
-#include <TObject.h>
 
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 
@@ -35,7 +33,7 @@
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //
 // The latest DAQformat version number
-#define LATEST_POSTREDUCTION_FORMAT_VER 2 // Since Apr. 21, 2015
+#define LATEST_POSTREDUCTION_FORMAT_VER 4 // Since Aug. 18, 2020
 //
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -62,6 +60,7 @@ namespace Belle2 {
     //
 
     //! set buffer ( delete_flag : m_buffer is freeed( = 0 )/ not freeed( = 1 ) in Destructer )
+    /* cppcheck-suppress missingOverride */
     void SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes) OVERRIDE_CPP17;
 
     ///////////////////////////////////////////////////////////////////////////////////////
@@ -100,6 +99,7 @@ namespace Belle2 {
     ///////////////////////////////////////////////////////////////////////////////////////
 
     //! get posistion of COPPER block in unit of word
+    /* cppcheck-suppress missingOverride */
     virtual int GetBufferPos(int n) OVERRIDE_CPP17;
 
     //! get buffer pointer of rawcopper header(Currently same as GetBufferPos)
@@ -200,9 +200,6 @@ namespace Belle2 {
 
     //! get data size of  FINESSE slot D buffer
     int Get4thFINESSENwords(int n);
-
-    //! For copying FTSW word1 (FEE header)
-    unsigned int GetB2LHeaderWord(int n, int finesse_buffer_pos);
 
     //
     // Get information from "B2link(attached by FEE and HLSB) header"
@@ -306,6 +303,16 @@ namespace Belle2 {
                                    int* detector_buf_4th, int nwords_4th,
                                    RawCOPPERPackerInfo rawcprpacker_info);
 
+    //! Pack data for PCIe40 data-format
+    void PackDetectorBuf(int* const(&detector_buf_ch)[MAX_PCIE40_CH],
+                         int const(&nwords_ch)[MAX_PCIE40_CH],
+                         RawCOPPERPackerInfo  rawcprpacker_info);
+
+    //! Get the max number of channels in a readout board
+    int GetMaxNumOfCh(int n);
+
+    //! Compare value from different channels and make a statistics table
+    void CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH] , std::vector<std::vector< unsigned int>>& result);
 
     /** Return a short summary of this object's contents in HTML format. */
     std::string getInfoHTML() const;
@@ -708,12 +715,6 @@ namespace Belle2 {
     return m_access->CheckUtimeCtimeTRGType(n);
   }
 
-  inline  unsigned int RawCOPPER::GetB2LHeaderWord(int n, int finesse_buffer_pos)
-  {
-    CheckVersionSetBuffer();
-    return m_access->GetB2LHeaderWord(n, finesse_buffer_pos);
-  }
-
   inline  unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int prev_eve32,
                                                         unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
   {
@@ -738,6 +739,13 @@ namespace Belle2 {
     }
     m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
   }
+
+  inline int RawCOPPER::GetMaxNumOfCh(int n)
+  {
+    CheckVersionSetBuffer();
+    return m_access->GetMaxNumOfCh(n);
+  }
+
 }
 
 #endif

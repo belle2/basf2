@@ -1,0 +1,28 @@
+[INFO] Steering file: analysis/tests/event_kinematics_variables.py
+[INFO] The random number seed is set to "1337"
+[INFO] Starting event processing, random seed is set to '1337'
+[INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/mdst.root
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: pi-:all (pi+:all)
+[INFO]    -> MDST source: Tracks
+[INFO]  o) creating (anti-)ParticleList with name: gamma:all (gamma:all)
+[INFO]    -> MDST source: ECLClusters and KLMClusters
+[INFO] ParticleSelector: gamma:all
+[INFO]    -> With cuts  : isFromECL
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltags (highest priority first) are master_2018-12-24, Legacy_IP_Information
+[INFO]      o) missingMomentumOfEvent = 1.24636
+[INFO]      o) missingMomentumOfEvent_Px = -0.0605931
+[INFO]      o) missingMomentumOfEvent_Py = 0.484798
+[INFO]      o) missingMomentumOfEvent_Pz = 1.14661
+[INFO]      o) missingMomentumOfEvent_theta = 0.402803
+[INFO]      o) missingMomentumOfEventCMS = 0.642823
+[INFO]      o) missingMomentumOfEventCMS_Px = -0.176792
+[INFO]      o) missingMomentumOfEventCMS_Py = 0.484798
+[INFO]      o) missingMomentumOfEventCMS_Pz = 0.383324
+[INFO]      o) missingMomentumOfEventCMS_theta = 0.931896
+[INFO]      o) missingEnergyOfEventCMS = 2.64273
+[INFO]      o) missingMass2OfEvent = 6.57082
+[INFO]      o) visibleEnergyOfEventCMS = 7.93682
+[INFO]      o) totalPhotonsEnergyOfEvent = 0.449785

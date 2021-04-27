@@ -12,6 +12,7 @@
 
 #include <framework/core/Module.h>
 
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <analysis/dataobjects/Particle.h>
@@ -51,6 +52,8 @@ namespace Belle2 {
     virtual void event() override;
 
   private:
+    /** StoreArray of Particles */
+    StoreArray<Particle> m_particles;
     /** name of input particle list. */
     std::string m_inputListName;
     /** input particle list */

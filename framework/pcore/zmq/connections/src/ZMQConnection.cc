@@ -79,10 +79,21 @@ bool ZMQConnection::poll(const std::map<const ZMQConnection*, ZMQConnection::Rea
 
 ZMQConnectionOverSocket::ZMQConnectionOverSocket(const std::shared_ptr<ZMQParent>& parent) : m_parent(parent)
 {
-
 }
 
 std::vector<zmq::socket_t*> ZMQConnectionOverSocket::getSockets() const
 {
   return {m_socket.get()};
+}
+
+std::string ZMQConnectionOverSocket::getEndPoint() const
+{
+  std::string endpoint{""};
+  if (m_socket) {
+    endpoint.resize(1024);
+    size_t size{1024};
+    m_socket->getsockopt(ZMQ_LAST_ENDPOINT, endpoint.data(), &size);
+    endpoint.resize(size - 1);
+  }
+  return endpoint;
 }

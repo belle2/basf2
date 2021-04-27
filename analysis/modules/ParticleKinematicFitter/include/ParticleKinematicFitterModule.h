@@ -27,8 +27,9 @@
 // Fitobjects
 #include <analysis/OrcaKinFit/ParticleFitObject.h>
 
-// extrainfo
+// analysis dataobjects
 #include <analysis/dataobjects/EventExtraInfo.h>
+#include <analysis/dataobjects/ParticleList.h>
 
 // framework datastore
 #include <framework/datastore/StoreObjPtr.h>
@@ -64,17 +65,6 @@ namespace Belle2 {
       virtual void initialize() override;
 
       /**
-       * Called when entering a new run.
-       * Set run dependent things like run header parameters, alignment, etc.
-       */
-      virtual void beginRun() override;
-
-      /**
-       * Called when ending a new run.
-       */
-      virtual void endRun() override;
-
-      /**
        * termination.
        */
       virtual void terminate() override;
@@ -99,13 +89,14 @@ namespace Belle2 {
       bool m_updateMother;               /**< update mother kinematics*/
       bool m_updateDaughters;            /**< update daughter kinematics*/
       double m_recoilMass;               /**< Recoil mass for RecoilMass constraint */
-      double m_invMass;                  /**< Inviriant mass for Mass constraint */
+      double m_invMass;                  /**< Invariant mass for Mass constraint */
 
       // internal variables
       TextTracer* m_textTracer;                           /**< internal text output variable */
       StoreObjPtr<EventExtraInfo> m_eventextrainfo;       /**< StoreObjPtr for the EventExtraInfo in this mode */
       std::vector <double> m_unmeasuredLeptonFitObject;   /**< unmeasured fit object */
       std::vector <double> m_unmeasuredGammaFitObject;    /**< unmeasured fit object */
+      StoreObjPtr<ParticleList> m_plist;                  /**< StoreObjPtr for the particle list */
 
       // hard constraints
       MomentumConstraint m_hardConstraintPx;  /**< hard beam constraint px */
@@ -141,7 +132,7 @@ namespace Belle2 {
       bool fillFitParticles(Particle* mother, std::vector<Particle*>& particleChildren);
 
       /**
-       * Added four vectors and calcuated a covariance matrix for a combined particles
+       * Added four vectors and calculated a covariance matrix for a combined particles
        * @param mother pointer to particle
       */
       bool AddFour(Particle* mother);

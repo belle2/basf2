@@ -1,6 +1,12 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
+import array
+import argparse
+import ROOT
+
+
 description = """
 eclChargedPidDatabaseImporter.py :
 script to perform fits of PDFs for ECL charged PID for different charged particle hypotheses,
@@ -11,12 +17,6 @@ __author__ = "Marco Milesi"
 __email__ = "marco.milesi@unimelb.edu.au"
 __maintainer__ = "Marco Milesi"
 __date__ = "June 2018"
-
-import os
-import sys
-import array
-import glob
-import argparse
 
 # NB: do NOT modify these lists, unless you really know what you're doing!
 g_hypotheses = [11, -11, 13, -13, 211, -211, 321, -321, 2212, -2212]
@@ -45,7 +45,6 @@ parser.add_argument("-op", "--outputplots",
 
 args = parser.parse_args()
 
-import ROOT
 
 # Silence ROOT!
 ROOT.gROOT.SetBatch(True)
@@ -54,11 +53,11 @@ ROOT.gErrorIgnoreLevel = ROOT.kWarning
 ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
 ROOT.RooMsgService.instance().setSilentMode(True)
 
-from electrons_pdf import fit_electron_eop
-from muons_pdf import fit_muon_eop
-from pions_pdf import fit_pion_eop
-from kaons_pdf import fit_kaon_eop
-from protons_pdf import fit_proton_eop
+from electrons_pdf import fit_electron_eop  # noqa
+from muons_pdf import fit_muon_eop  # noqa
+from pions_pdf import fit_pion_eop  # noqa
+from kaons_pdf import fit_kaon_eop  # noqa
+from protons_pdf import fit_proton_eop  # noqa
 
 if __name__ == "__main__":
 

@@ -285,6 +285,43 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
   }
 }
 
+void Variable::Manager::deprecateVariable(const std::string& name, bool make_fatal, const std::string& version,
+                                          const std::string& description)
+{
+  auto varIter = m_deprecated.find(name);
+  if (varIter == m_deprecated.end())
+    m_deprecated.insert(std::make_pair(name, std::make_pair(make_fatal, description)));
+  else
+    B2FATAL("There seem to be two calls to deprecate the variable: Please remove one.");
+
+  auto mapIter = m_variables.find(name);
+  if (mapIter != m_variables.end()) {
+    if (make_fatal) {
+      mapIter->second.get()->extendDescriptionString("\n.. warning:: ");
+    } else {
+      mapIter->second.get()->extendDescriptionString("\n.. note:: ");
+    }
+    mapIter->second.get()->extendDescriptionString(".. deprecated:: " + version + "\n " + description);
+  }
+
+}
+
+void Variable::Manager::checkDeprecatedVariable(const std::string& name)
+{
+  auto varIter = m_deprecated.find(name);
+
+  if (varIter == m_deprecated.end())
+    return;
+  else {
+    bool make_fatal = varIter->second.first;
+    std::string message = varIter->second.second;
+    if (make_fatal)
+      B2FATAL("Variable " << name << " is deprecated. " << message);
+    else
+      B2WARNING("Variable " << name << " is deprecated. " << message);
+  }
+}
+
 
 std::vector<std::string> Variable::Manager::getNames() const
 {

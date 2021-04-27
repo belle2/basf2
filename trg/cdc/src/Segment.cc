@@ -149,7 +149,7 @@ namespace Belle2 {
 
   void
   TCSegment::simulate(bool clockSimulation, bool logicLUTFlag,
-                      string cdcCollectionName, string tsCollectionName)
+                      const string& cdcCollectionName, const string& tsCollectionName)
   {
     //...Get wire informtion for speed-up...
     unsigned nHits = 0;

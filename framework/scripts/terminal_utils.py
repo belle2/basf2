@@ -22,6 +22,142 @@ import io
 import shutil
 import tempfile
 import shlex
+import enum
+
+
+class ANSIColors(enum.Enum):
+    """
+    Simple class to handle color output to the terminal.
+
+    This class allows to very easily add color output to the terminal
+
+    >>> from terminal_utils import ANSIColors as ac
+    >>> print(f"{ac.fg('red')}Some text in {ac.color(underline=True)}RED{ac.reset()}")
+
+    The basic colors can be specified by name (case insensitive) or by enum value.
+    Custom colors can be supplied using hex notation like ``#rgb`` or ``#rrggbb``
+    (Hint: ``matplotlib.colors.to_hex`` might be useful here). As an example to
+    use the viridis colormap to color the output on the terminal::
+
+        from matplotlib import cm
+        from matplotlib.colors import to_hex
+        from terminal_utils import ANSIColors as ac
+
+        # sample the viridis colormap at 16 points
+        for i in range(16):
+            # convert i to be in [0..1] and get the hex color
+            color = to_hex(cm.viridis(i/15))
+            # and print the hex color in the correct color
+            print(f"{i}. {ac.fg(color)}{color}{ac.reset()}")
+
+
+    If the output is not to a terminal color output will be disabled and nothing
+    will be added to the output, for example when redirecting the output to a
+    logfile.
+
+    .. sphinx bug, classes inheriting from enum don't show class methods:
+       https://github.com/sphinx-doc/sphinx/issues/6857. So until that is fixed
+       we need to add them manually here
+
+    .. automethod:: color
+    .. automethod:: convert_color
+    .. automethod:: fg
+    .. automethod:: bg
+    .. automethod:: reset
+    .. automethod:: supported
+    """
+    BLACK = 0
+    RED = 1
+    GREEN = 2
+    YELLOW = 3
+    BLUE = 4
+    MAGENTA = 5
+    CYAN = 6
+    WHITE = 7
+
+    @staticmethod
+    def supported():
+        """
+        Check whether the output is a terminal.
+
+        If this is False, the methods `color`, `fg`, `bg` and `reset` will only
+        return an empty string as color output will be disabled
+        """
+        return sys.stdout.isatty()
+
+    @classmethod
+    def convert_color(cls, color):
+        """Convert a color to the necessary ansi code. The argument can either bei
+
+        * an integer corresponding to the ansi color (see the enum values of this class)
+        * the name (case insensitive) of one of the enum values of this class
+        * a hex color code of the form ``#rgb`` or ``#rrggbb``
+
+        Raises:
+            KeyError: if the argument is a string not matching to one of the known colors
+        """
+        if isinstance(color, str):
+            if color[0] == '#':
+                if len(color) == 4:
+                    r, g, b = (int(e, 16)*17 for e in color[1:])
+                else:
+                    r, g, b = (int(color[i:i+2], 16) for i in [1, 3, 5])
+                return f"2;{r};{g};{b}"
+            try:
+                color = cls[color.upper()].value
+            except KeyError as e:
+                raise KeyError(f"Unknown color: '{color}'") from e
+        return f"5;{color}"
+
+    @classmethod
+    def color(cls, foreground=None, background=None, bold=False, underline=False, inverted=False):
+        """
+        Change terminal colors to the given foreground/background colors and attributes.
+
+        This will return a string to be printed to change the color on the terminal.
+        To revert to default print the output of `reset()`
+
+        Parameters:
+            foreground (int or str): foreground color to use, can be any value accepted by `convert_color`
+                                     If None is given the current color will not be changed.
+            background (int or str): background color to use, can be any value accepted by `convert_color`.
+                                     If None is given the current color will not be changed.
+            bold (bool): Use bold font
+            underline (bool): Underline the text
+            inverted (bool): Flip background and foreground color
+        """
+        if not cls.supported():
+            return ""
+
+        codes = []
+        if foreground is not None:
+            codes.append(f"38;{cls.convert_color(foreground)}")
+        if background is not None:
+            codes.append(f"48;{cls.convert_color(background)}")
+        if bold:
+            codes.append(1)
+        if underline:
+            codes.append(4)
+        if inverted:
+            codes.append(7)
+        if not codes:
+            return ""
+        return '\x1b[{}m'.format(";".join(map(str, codes)))
+
+    @classmethod
+    def fg(cls, color):
+        """Shorthand for `color(foreground=color) <color>`"""
+        return cls.color(foreground=color)
+
+    @classmethod
+    def bg(cls, color):
+        """Shorthand for `color(background=color) <color>`"""
+        return cls.color(background=color)
+
+    @classmethod
+    def reset(cls):
+        """Reset colors to default"""
+        return '\x1b[0m' if cls.supported() else ''
 
 
 class Pager(object):
@@ -82,6 +218,10 @@ class Pager(object):
         self._original_stdout = None
         #: Original sys.__stderr__ before entering the context
         self._original_stderr = None
+        #: Original sys.stdout.isatty
+        self._original_stdout_isatty = None
+        #: Original sys.stderr.isatty
+        self._original_stderr_isatty = None
 
     def __enter__(self):
         """ entering context """
@@ -95,7 +235,7 @@ class Pager(object):
             # and duplicate the current output file descriptors
             self._original_stdout_fd = os.dup(sys.stdout.fileno())
             self._original_stderr_fd = os.dup(sys.stderr.fileno())
-        except Exception:
+        except AttributeError:
             # jupyter notebook stdout/stderr objects don't have a fileno so
             # don't support paging
             return
@@ -114,7 +254,14 @@ class Pager(object):
         # that they behave as expected, i.e. as if we would only have
         # redirected sys.stdout and sys.stderr ...
         sys.__stdout__ = io.TextIOWrapper(os.fdopen(self._original_stdout_fd, "wb"))
-        sys.__stderr__ = io.TextIOWrapper(os.fdopen(self._original_stdout_fd, "wb"))
+        sys.__stderr__ = io.TextIOWrapper(os.fdopen(self._original_stderr_fd, "wb"))
+
+        # also monkey patch the isatty() function of stdout to actually keep
+        # returning True even if we moved the file descriptor
+        self._original_stdout_isatty = sys.stdout.isatty
+        sys.stdout.isatty = lambda: True
+        self._original_stderr_isatty = sys.stderr.isatty
+        sys.stderr.isatty = lambda: True
 
         # fine, everything is saved, start the pager
         pager_cmd = [self._pager]
@@ -136,10 +283,19 @@ class Pager(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """ exiting context """
-        sys.stdout.flush()
         # no pager, nothing to do
         if self._pager_process is None:
             return
+
+        # otherwise let's try to flush whatever is left
+        try:
+            sys.stdout.flush()
+        except BrokenPipeError:
+            # apparently pager died before we could flush ... so let's move the
+            # remaining output to /dev/null and flush whatever is left
+            devnull = os.open(os.devnull, os.O_WRONLY)
+            os.dup2(devnull, sys.stdout.fileno())
+            sys.stdout.flush()
 
         # restore output
         os.dup2(self._original_stdout_fd, sys.stdout.fileno())
@@ -148,9 +304,15 @@ class Pager(object):
         # close the copied file descriptors
         sys.__stderr__ = self._original_stderr
         sys.__stdout__ = self._original_stdout
+        # and clean up our monkey patch of isatty
+        sys.stdout.isatty = self._original_stdout_isatty
+        sys.stderr.isatty = self._original_stderr_isatty
 
         # wait for pager
         self._pager_process.communicate()
+
+        # and if we exited due to broken pipe ... then ignore it
+        return exc_type == BrokenPipeError
 
 
 class InputEditor():
@@ -210,9 +372,9 @@ class InputEditor():
                 input_string = tmpfile.read().strip()
             input_string = self._remove_comment_lines(input_string)
 
-        except (FileNotFoundError, subprocess.CalledProcessError) as e:
-                # If editor not found or other problem with subprocess call, fall back to terminal input
-            print("Could not open {}.".format(self.get_editor_command()))
+        except (FileNotFoundError, subprocess.CalledProcessError):
+            # If editor not found or other problem with subprocess call, fall back to terminal input
+            print(f"Could not open {self.get_editor_command()}.")
             print("Try to set your $VISUAL or $EDITOR environment variables properly.\n")
             sys.exit(1)
 

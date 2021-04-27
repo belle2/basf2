@@ -13,14 +13,11 @@ Example usage:
 Note: data writing uses AwkwardArrays (tested with v0.12.6).
 """
 
-from basf2 import *
-import ROOT
+import basf2 as b2
 from ROOT import Belle2
-from tracking import add_tracking_reconstruction, add_cr_tracking_reconstruction
+from tracking import add_tracking_reconstruction
 from svd import add_svd_reconstruction, add_svd_simulation
 from pxd import add_pxd_reconstruction, add_pxd_simulation
-from simulation import add_simulation
-from reconstruction import add_reconstruction
 
 from argparse import ArgumentParser
 import numpy as np
@@ -44,7 +41,7 @@ ap.add_argument('--zVertex',        type=float, default=0.,   help='z-coordinate
 opts = ap.parse_args()
 
 
-class WriteData(Module):
+class WriteData(b2.Module):
     """
     Data collector module. Gathers TOP Cherenkov photon data for each event.
     On terminate(), writes gathered data to given output file.
@@ -127,27 +124,28 @@ class WriteData(Module):
         """Writes data to given output file."""
         awk.save(opts.output, self.data, mode="w")
 
+
 # Suppress messages and warnings during processing:
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Set number of events to generate
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [10000]})
 main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # Geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 main.add_module(geometry)
 
 # Particle gun: generate multiple tracks
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 particlegun.param('pdgCodes', [opts.particle])
 particlegun.param('nTracks', 1)
 particlegun.param('varyNTracks', False)
@@ -165,7 +163,7 @@ particlegun.param('zVertexParams', [opts.zVertex])
 main.add_module(particlegun)
 
 # Simulation
-simulation = register_module('FullSim')
+simulation = b2.register_module('FullSim')
 main.add_module(simulation)
 
 add_svd_simulation(main)
@@ -178,27 +176,27 @@ add_pxd_reconstruction(main)
 add_svd_reconstruction(main)
 
 # CDC digitization
-cdcDigitizer = register_module('CDCDigitizer')
+cdcDigitizer = b2.register_module('CDCDigitizer')
 main.add_module(cdcDigitizer)
 
 # TOP digitization
-topdigi = register_module('TOPDigitizer')
+topdigi = b2.register_module('TOPDigitizer')
 main.add_module(topdigi)
 
 add_tracking_reconstruction(main)
 
 # Track extrapolation
-ext = register_module('Ext')
+ext = b2.register_module('Ext')
 main.add_module(ext)
 
 # TOP reconstruction
-top_cm = register_module('TOPChannelMasker')
+top_cm = b2.register_module('TOPChannelMasker')
 main.add_module(top_cm)
 
-topreco = register_module('TOPReconstructor')
+topreco = b2.register_module('TOPReconstructor')
 main.add_module(topreco)
 
-pdfdebug = register_module("TOPPDFDebugger")
+pdfdebug = b2.register_module("TOPPDFDebugger")
 pdfdebug.pdfOption = 'fine'  # other options: 'optimal', 'rough'
 main.add_module(pdfdebug)
 
@@ -206,8 +204,8 @@ data_getter = WriteData()
 main.add_module(data_getter)
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)

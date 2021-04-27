@@ -3,6 +3,7 @@
 
 import basf2
 from ROOT import Belle2
+from b2test_utils import safe_process
 
 basf2.set_random_seed("something important")
 
@@ -83,8 +84,7 @@ for skipNEvents in range(10):
 
     main.add_module(EvtMetaDataTest())
 
-    basf2.process(main)
-
+    safe_process(main)
 
 # test skipping to specific events
 skipToEvents = [
@@ -103,4 +103,4 @@ for event in skipToEvents:
     main.add_module("EventInfoSetter", evtNumList=[3, 3, 3, 3], expList=[0, 0, 0, 1],
                     runList=[0, 1, 2, 0], skipToEvent=event)
     main.add_module(EvtMetaDataTest())
-    basf2.process(main)
+    safe_process(main)

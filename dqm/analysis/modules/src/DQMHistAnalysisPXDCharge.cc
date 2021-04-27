@@ -33,14 +33,17 @@ DQMHistAnalysisPXDChargeModule::DQMHistAnalysisPXDChargeModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDER"));
   addParam("RangeLow", m_rangeLow, "Lower boarder for fit", 30.);
   addParam("RangeHigh", m_rangeHigh, "High border for fit", 85.);
-  addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Charge:"));
+  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Charge:"));
+  addParam("useEpics", m_useEpics, "useEpics", true);
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: Constructor done.");
 }
 
 DQMHistAnalysisPXDChargeModule::~DQMHistAnalysisPXDChargeModule()
 {
 #ifdef _BELLE2_EPICS
-  if (ca_current_context()) ca_context_destroy();
+  if (m_useEpics) {
+    if (ca_current_context()) ca_context_destroy();
+  }
 #endif
 }
 
@@ -48,6 +51,7 @@ void DQMHistAnalysisPXDChargeModule::initialize()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: initialized.");
 
+  m_monObj = getMonitoringObject("pxd");
   const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   //collect the list of all PXD Modules in the geometry here
@@ -56,14 +60,14 @@ void DQMHistAnalysisPXDChargeModule::initialize()
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_PXDModules.push_back(aVxdID); // reorder, sort would be better
-
   }
   std::sort(m_PXDModules.begin(), m_PXDModules.end());  // back to natural order
 
   gROOT->cd(); // this seems to be important, or strange things happen
 
   m_cCharge = new TCanvas((m_histogramDirectoryName + "/c_Charge").data());
-  m_hCharge = new TH1F("Cluster Charge", "Cluster Charge; Module; Track Cluster Charge", m_PXDModules.size(), 0, m_PXDModules.size());
+  m_hCharge = new TH1F("hPXDClusterCharge", "PXD Cluster Charge; Module; Track Cluster Charge", m_PXDModules.size(), 0,
+                       m_PXDModules.size());
   m_hCharge->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCharge->SetStats(false);
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
@@ -72,6 +76,8 @@ void DQMHistAnalysisPXDChargeModule::initialize()
   }
   //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
   m_hCharge->Draw("");
+
+  m_monObj->addCanvas(m_cCharge);
 
   /// FIXME were to put the lines depends ...
 //   m_line1 = new TLine(0, 10, m_PXDModules.size(), 10);
@@ -104,12 +110,14 @@ void DQMHistAnalysisPXDChargeModule::initialize()
   m_fMean->SetNumberFitPoints(m_PXDModules.size());
 
 #ifdef _BELLE2_EPICS
-  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  mychid.resize(3);
-  SEVCHK(ca_create_channel((m_pvPrefix + "Mean").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
-  SEVCHK(ca_create_channel((m_pvPrefix + "Diff").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
-  SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid[2]), "ca_create_channel failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    mychid.resize(3);
+    SEVCHK(ca_create_channel((m_pvPrefix + "Mean").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Diff").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid[2]), "ca_create_channel failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
 }
 
@@ -182,15 +190,18 @@ void DQMHistAnalysisPXDChargeModule::event()
   }
 
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
-  SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
+  if (m_useEpics) {
+    SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
+    SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
+  }
 #endif
+
   int status = 0;
 
   if (!enough) {
     // not enough Entries
     m_cCharge->Pad()->SetFillColor(kGray);// Magenta or Gray
-    // status = 0; default
+    status = 0; // default
   } else {
     /// FIXME: what is the accpetable limit?
     if (fabs(data - 50.) > 20. || diff > 30) {
@@ -209,11 +220,13 @@ void DQMHistAnalysisPXDChargeModule::event()
   }
 
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_put(DBR_INT, mychid[2], (void*)&status), "ca_set failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    SEVCHK(ca_put(DBR_INT, mychid[2], (void*)&status), "ca_set failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
 
-  auto tt = new TLatex(5.5, 0, "1.3.2 Module is broken, please ignore");
+  auto tt = new TLatex(5.5, 0, "1.3.2 Module is excluded, please ignore");
   tt->SetTextAngle(90);// Rotated
   tt->SetTextAlign(12);// Centered
   tt->Draw();
@@ -232,8 +245,10 @@ void DQMHistAnalysisPXDChargeModule::terminate()
 {
   // should delete canvas here, maybe hist, too? Who owns it?
 #ifdef _BELLE2_EPICS
-  for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: terminate called");
 }

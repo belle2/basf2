@@ -46,7 +46,7 @@ double ARICHReconstructionPar::getBackgroundPerPad(double th_cer, const std::vec
   return m_bkgPDF->Eval(th_cer) + m_flatBkgPerPad;
 }
 
-double ARICHReconstructionPar::getExpectedBackgroundHits(std::vector<double>& pars, double minThc, double maxThc) const
+double ARICHReconstructionPar::getExpectedBackgroundHits(const std::vector<double>& pars, double minThc, double maxThc) const
 {
 
   int ipar = 0;

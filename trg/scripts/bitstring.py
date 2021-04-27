@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""
+r"""
 This package defines classes that simplify bit-wise creation, manipulation and
 interpretation of data.
 
@@ -536,7 +536,7 @@ def structparser(token):
     return tokens
 
 
-def tokenparser(fmt, keys=None, token_cache={}):
+def tokenparser(fmt, keys=None, token_cache=None):
     """Divide the format string into tokens and parse them.
 
     Return stretchy token and list of [initialiser, length, value]
@@ -549,6 +549,8 @@ def tokenparser(fmt, keys=None, token_cache={}):
     tokens must be of the form: [factor*][initialiser][:][length][=value]
 
     """
+    if token_cache is None:
+        token_cache = {}
     try:
         return token_cache[(fmt, keys)]
     except KeyError:
@@ -773,11 +775,12 @@ class Bits(object):
                   initialising using 'bytes' or 'filename'.
 
         """
-        pass
 
-    def __new__(cls, auto=None, length=None, offset=None, _cache={}, **kwargs):
+    def __new__(cls, auto=None, length=None, offset=None, _cache=None, **kwargs):
         # For instances auto-initialised with a string we intern the
         # instance for re-use.
+        if _cache is None:
+            _cache = {}
         try:
             if isinstance(auto, basestring):
                 try:
@@ -1959,13 +1962,15 @@ class Bits(object):
                               self.len, self._offset)
 
     @classmethod
-    def _converttobitstring(cls, bs, offset=0, cache={}):
+    def _converttobitstring(cls, bs, offset=0, cache=None):
         """Convert bs to a bitstring and return it.
 
         offset gives the suggested bit offset of first significant
         bit, to optimise append etc.
 
         """
+        if cache is None:
+            cache = {}
         if isinstance(bs, Bits):
             return bs
         try:
@@ -3342,9 +3347,9 @@ class BitArray(Bits):
             # Prevent self assignment woes
             new = copy.copy(self)
         positions = [lengths[0] + start]
-        for l in lengths[1:-1]:
+        for k in lengths[1:-1]:
             # Next position is the previous one plus the length of the next section.
-            positions.append(positions[-1] + l)
+            positions.append(positions[-1] + k)
         # We have all the positions that need replacements. We do them
         # in reverse order so that they won't move around as we replace.
         positions.reverse()

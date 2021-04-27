@@ -75,7 +75,8 @@ namespace Belle2 {
 
     /**
      * Sets the filename of the magnetic field map.
-     * @param filename The filname of the magnetic field map.
+     * @param filename_her The filname of the HER magnetic field map.
+     * @param filename_ler The filname of the LER magnetic field map.
      */
     void setMapFilename(const std::string& filename_her, const std::string& filename_ler)
     {

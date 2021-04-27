@@ -4,9 +4,8 @@ Changes in the framework package since release-04-00-00
 Conditions Database
 +++++++++++++++++++
 
-* The format in which local database payloads are created has changed slightly, see :ref:`cdb_payload_creation`
 * :ref:`b2conditionsdb` has been optimized to work with larger globaltags.
-* ``b2conditionsdb-diff`` and ``b2conditionsdb-iov`` by default don't show any database internal ids anymore but those can be reenabled with ``--show-ids``
+* ``b2conditionsdb-diff`` and ``b2conditionsdb-iov`` by default don't show any database internal ids anymore but those can be re-enabled with ``--show-ids``
 * ``b2conditionsdb-dump`` has learned a new argument to show the content of a payload valid for a given run in a given globaltag
 * There are new python classes to handle iovs, see `conditions_db.iov`
 
@@ -16,7 +15,6 @@ Logging
 
 * Added support to escape newlines in all log messages by setting
   `logging.enable_escape_newlines <basf2.LogPythonInterface.enable_escape_newlines>`.
-* Added support to supress messages if they repeated for a certain number of times.
 * Added support to suppress messages if they repeated for a certain number of times.
   This is disabled by default but can be enabled with
   `logging.max_repetitions <basf2.LogPythonInterface.max_repetitions>`.

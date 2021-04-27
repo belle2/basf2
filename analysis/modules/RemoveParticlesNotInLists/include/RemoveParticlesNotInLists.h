@@ -12,6 +12,10 @@
 
 #include <framework/core/Module.h>
 
+#include <framework/datastore/StoreArray.h>
+
+#include <analysis/dataobjects/Particle.h>
+
 #include <analysis/utility/ParticleSubset.h>
 
 #include <string>
@@ -48,6 +52,7 @@ namespace Belle2 {
 
 
   private:
+    StoreArray<Particle> m_particles; /**< StoreArray of Particles */
     std::vector<std::string>  m_particleLists; /**< keep Particles and daughters in these lists. */
     ParticleSubset m_subset; /**< reduces the Particles array. */
     unsigned long m_nRemoved; /**< number of particles removed. */

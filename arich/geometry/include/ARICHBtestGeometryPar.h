@@ -107,6 +107,9 @@ namespace Belle2 {
     //! Destructor
     virtual ~ARICHBtestGeometryPar();
 
+    //! Operator = (disabled)
+    ARICHBtestGeometryPar& operator=(const ARICHBtestGeometryPar&) = delete;
+
     //! Static method to get a reference to the ARICHBtestGeometryPar instance.
     /*!
     \return A reference to an instance of this class.

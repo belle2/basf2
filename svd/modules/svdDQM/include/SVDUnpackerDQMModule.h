@@ -14,6 +14,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <svd/dataobjects/SVDDAQDiagnostic.h>
+#include <svd/dataobjects/SVDEventInfo.h>
+#include <mdst/dataobjects/TRGSummary.h>
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <svd/online/SVDOnlineToOfflineMap.h>
@@ -59,11 +61,17 @@ namespace Belle2 {
     /** Required input for EventMetaData */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
-    /** SVDShaperDigits StoreArray name */
-    std::string m_ShaperDigitName;
+    /** SVDEventInfo StoreObjectPointer */
+    StoreObjPtr<SVDEventInfo> m_svdEventInfo;
+
+    /** Trigger Summary data object */
+    StoreObjPtr<TRGSummary> m_objTrgSummary;
 
     /** SVD diagnostics module name */
     std::string m_SVDDAQDiagnosticsName;
+
+    /** SVDEventInfo name */
+    std::string m_SVDEventInfoName;
 
     /** mapping implementation */
     std::unique_ptr<SVDOnlineToOfflineMap> m_map;
@@ -73,39 +81,42 @@ namespace Belle2 {
     StoreArray<SVDDAQDiagnostic> m_svdDAQDiagnostics; /**<SVDDAQDiagnostic StoreArray*/
     StoreObjPtr<EventMetaData> m_eventMetaData; /**<EvtMetaData StoreObjectPointer*/
 
-    bool changeFADCaxis = false; /**<change FADC (y) axis*/
-    bool shutUpNoData = true; /**<shut up if no data comes*/
+    bool m_changeFADCaxis = false; /**<change FADC (y) axis*/
+    bool m_shutUpNoData = true; /**<shut up if no data comes*/
 
-    int expNumber = 0; /**< experiment number*/
-    int runNumber = 0; /**< run number*/
+    int m_expNumber = 0; /**< experiment number*/
+    int m_runNumber = 0; /**< run number*/
 
-    bool badEvent = false; /**<indicates if the particular event has any SVD error*/
-    unsigned int nEvents = 0;  /**<event counter */
-    unsigned int nBadEvents = 0;  /**<counter of events with any kind of error*/
-    float errorFraction = 0; /**<fraction of events with any kind of error*/
+    bool m_badEvent = false; /**<indicates if the particular event has any SVD error*/
+    unsigned int m_nEvents = 0;  /**<event counter */
+    unsigned int m_nBadEvents = 0;  /**<counter of events with any kind of error*/
+    float m_errorFraction = 0; /**<fraction of events with any kind of error*/
 
-    uint16_t ftbError = 0; /**<FTB error container*/
-    uint16_t ftbFlags = 0; /**<FTB flags container*/
-    uint16_t apvError = 0; /**<APV error container*/
-    bool apvMatch = true; /**<apv match error*/
-    bool fadcMatch = true; /**<fadcc match error*/
-    bool upsetAPV = false; /**<upset APV error*/
-    bool badMapping = false; /**<bad mapping error*/
-    bool badHeader = false; /**<bad header error*/
-    bool badTrailer = false; /**<bad trailer error*/
-    bool missedHeader = false; /**<missed Header error*/
-    bool missedTrailer = false; /**<missed Trailer error*/
+    uint16_t m_ftbError = 0; /**<FTB error container*/
+    uint16_t m_ftbFlags = 0; /**<FTB flags container*/
+    uint16_t m_apvError = 0; /**<APV error container*/
+    bool m_apvMatch = true; /**<apv match error*/
+    bool m_fadcMatch = true; /**<fadcc match error*/
+    bool m_upsetAPV = false; /**<upset APV error*/
+    bool m_badMapping = false; /**<bad mapping error*/
+    bool m_badHeader = false; /**<bad header error*/
+    bool m_badTrailer = false; /**<bad trailer error*/
+    bool m_missedHeader = false; /**<missed Header error*/
+    bool m_missedTrailer = false; /**<missed Trailer error*/
 
-    unsigned short fadcNo = 0; /**<fadc number*/
+    unsigned short m_fadcNo = 0; /**<fadc number*/
     //unsigned short apvNo;
 
-    std::unordered_set<unsigned char>* FADCs; /**< FADC boards number*/
-    std::unordered_map<unsigned short, unsigned short> fadc_map; /**< FADC board number map*/
-    std::vector<unsigned short> vec_fadc; /**<vector of FADC boards*/
+    std::unordered_set<unsigned char>* m_FADCs; /**< FADC boards number*/
+    std::unordered_map<unsigned short, unsigned short> m_fadc_map; /**< FADC board number map*/
+    std::vector<unsigned short> m_vec_fadc; /**<vector of FADC boards*/
 
     //histogram
-    TH2S* DQMUnpackerHisto = nullptr; /**< TH2S histogram with Unpacking errors*/
-    TH1S* DQMEventFractionHisto = nullptr; /**< TH1S histogram showing the fraction of events affected by errors*/
+    TH2F* m_DQMUnpackerHisto = nullptr; /**< TH2F histogram with Unpacking errors*/
+    TH1F* m_DQMEventFractionHisto = nullptr; /**< TH1F histogram showing the fraction of events affected by errors*/
+    TH2F* m_DQMnSamplesHisto = nullptr; /**< TH2F histogram showing number of samples in data VS daqMode */
+    TH2F* m_DQMnSamplesHisto2 = nullptr; /**< TH2F histogram showing number of samples in data VS daqMode (2bins only) */
+    TH2F* m_DQMtrgQuality = nullptr; /**< TH2F histogram showing number of samples in data VS Trigger Quality */
 
   };
 

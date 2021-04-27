@@ -5,6 +5,22 @@ from b2test_utils.datastoreprinter import DataStorePrinter, PrintObjectsModule
 from ROOT.Belle2 import Const
 
 
+MDST_OBJECTS = (
+    'ECLClusters',
+    'ECLClustersToTracksNamedBremsstrahlung',
+    'EventLevelClusteringInfo',
+    'EventLevelTrackingInfo',
+    'KLMClusters',
+    'KlIds',
+    'PIDLikelihoods',
+    'SoftwareTriggerResult',
+    'TrackFitResults',
+    'Tracks',
+    'TRGSummary',
+    'V0s',
+)
+
+
 def add_mdst_output(
     path,
     mc=True,
@@ -24,27 +40,10 @@ def add_mdst_output(
         dataDescription (dict or None): Additional key->value pairs to be added as data description
            fields to the output FileMetaData
     """
-    branches = [
-        'Tracks',
-        'V0s',
-        'TrackFitResults',
-        'EventLevelTrackingInfo',
-        'PIDLikelihoods',
-        'TracksToPIDLikelihoods',
-        'ECLClusters',
-        'ECLClustersToTracksNamedBremsstrahlung',
-        'EventLevelClusteringInfo',
-        'TracksToECLClusters',
-        'KLMClusters',
-        'KlIds',
-        'KLMClustersToKlIds',
-        'TRGSummary',
-        'SoftwareTriggerResult',
-    ]
+    branches = list(MDST_OBJECTS)
     persistentBranches = ['FileMetaData']
     if mc:
-        branches += ['MCParticles', 'TracksToMCParticles',
-                     'ECLClustersToMCParticles', 'KLMClustersToMCParticles']
+        branches += ['MCParticles']
         persistentBranches += ['BackgroundInfo']
     branches += additionalBranches
     # set dataDescription correctly
@@ -78,72 +77,76 @@ def add_mdst_dump(path, print_untested=False):
             "getErrorFlag", "getEvent", "getRun", "getSubrun", "getExperiment",
             "getProduction", "getTime", "getParentLfn", "getGeneratedWeight",
             "isEndOfRun"
-            ], array=False),
+        ], array=False),
         DataStorePrinter("Track", ["getNumberOfFittedHypotheses", "getQualityIndicator"], {
             "getTrackFitResult": charged_stables,
             "getTrackFitResultWithClosestMass": charged_stables,
             "getRelationsWith": ["ECLClusters", "KLMClusters", "MCParticles", "PIDLikelihoods"],
-            }),
+        }),
         DataStorePrinter("V0", ["getTracks", "getTrackFitResults", "getV0Hypothesis"], {
             "getRelationsWith": ["MCParticles"],
-            }),
+        }),
         DataStorePrinter("TrackFitResult", [
             "getPosition", "getMomentum", "get4Momentum", "getEnergy", "getTransverseMomentum",
             "getCovariance6", "getParticleType", "getChargeSign", "getPValue", "getD0", "getPhi0",
             "getPhi", "getOmega", "getZ0", "getTanLambda", "getCotTheta",
-            "getTau", "getCov", "getCovariance5", "getHitPatternCDC", "getHitPatternVXD"
-            ]),
+            "getTau", "getCov", "getCovariance5", "getHitPatternCDC", "getHitPatternVXD", "getNDF", "getChi2"
+        ]),
         DataStorePrinter("EventLevelTrackingInfo", [
             "getNCDCHitsNotAssigned", "getNCDCHitsNotAssignedPostCleaning",
             "getNCDCSegments", "getSVDFirstSampleTime", "hasAnErrorFlag",
             "hasUnspecifiedTrackFindingFailure", "hasVXDTF2AbortionFlag",
             "hasSVDCKFAbortionFlag", "hasPXDCKFAbortionFlag"], {
-                             "hasCDCLayer": range(56)
-                             }, array=False),
+            "hasCDCLayer": range(56)
+        }, array=False),
         DataStorePrinter("PIDLikelihood", ["getMostLikely"], {
             "isAvailable": pid_detectors,
             "getLogL": charged_stables,
             "getProbability": charged_stables,
-            }),
+        }),
         DataStorePrinter("ECLCluster", [
             "isTrack", "isNeutral", "getStatus", "getConnectedRegionId",
             "getClusterId", "getMinTrkDistance", "getDeltaL",
             "getAbsZernike40", "getAbsZernike51", "getZernikeMVA", "getE1oE9",
-            "getE9oE21", "getClusterHadronIntensity", "getNumberOfHadronDigits",
+            "getE9oE21", "getNumberOfHadronDigits", "getR", "getHypotheses",
             "getSecondMoment", "getLAT", "getNumberOfCrystals", "getTime",
-            "getDeltaTime99", "hasFailedFitTime", "hasFailedTimeResolution", "getPhi", "getTheta", "getR", "getHypotheses",
+            "getDeltaTime99", "hasFailedFitTime", "hasFailedTimeResolution", "getPhi", "getTheta",
             "getEnergyRaw", "getEnergyHighestCrystal", "getUncertaintyEnergy",
             "getUncertaintyTheta", "getUncertaintyPhi", "getClusterPosition",
-            "getCovarianceMatrix3x3", "getDetectorRegion", "getUniqueId",
+            "getCovarianceMatrix3x3", "getDetectorRegion",
             "isTriggerCluster", "hasTriggerClusterMatching", "hasPulseShapeDiscrimination",
             "getPulseShapeDiscriminationMVA", "getMaxECellId",
-            ], {
-                "getEnergy": [16, 32],
-                "hasHypothesis": [16, 32],
-                "getRelationsWith": ["KlIds", "MCParticles"],
-                             }),
+        ], {
+            "getEnergy": [16, 32],
+            "hasHypothesis": [16, 32],
+            "getRelationsWith": ["KlIds", "MCParticles"],
+        }),
         DataStorePrinter("EventLevelClusteringInfo", [
             "getNECLCalDigitsOutOfTimeFWD", "getNECLCalDigitsOutOfTimeBarrel",
             "getNECLCalDigitsOutOfTimeBWD", "getNECLCalDigitsOutOfTime",
             "getNECLShowersRejectedFWD", "getNECLShowersRejectedBarrel",
             "getNECLShowersRejectedBWD", "getNECLShowersRejected"
-            ], array=False),
+        ], array=False),
         DataStorePrinter("KLMCluster", [
             "getTime", "getLayers", "getInnermostLayer",
             "getClusterPosition", "getPosition", "getMomentumMag", "getEnergy",
             "getMomentum", "getError4x4", "getError7x7",
             "getAssociatedEclClusterFlag", "getAssociatedTrackFlag",
-            ], {
-                             "getRelationsWith": ["KlIds", "MCParticles"],
-                             }),
+        ], {
+            "getRelationsWith": ["KlIds", "MCParticles"],
+        }),
         DataStorePrinter("KlId", ["isKLM", "isECL", "getKlId"]),
-        DataStorePrinter("TRGSummary", ["getTimType"], {
+        DataStorePrinter("TRGSummary", [
+            # getter functions to be called without arguments
+            "getTimType", "getTimQuality", "isPoissonInInjectionVeto"
+        ], {
+            # getter functions to be called with arguments
             "getTRGSummary": range(10),
             "getPreScale": [[int(i / 32), i % 32] for i in list(range(320))],
             "getInputBits": range(10),
             "getFtdlBits": range(10),
-            "getPsnmBits": range(10),
-            }, array=False),
+            "getPsnmBits": range(10)
+        }, array=False),
         DataStorePrinter("SoftwareTriggerResult", ["getResults", "getNonPrescaledResults"], array=False),
         DataStorePrinter("MCParticle", [
             "getPDG", "getStatus", "getMass", "getCharge", "getEnergy", "hasValidVertex",
@@ -153,6 +156,6 @@ def add_mdst_dump(path, print_untested=False):
             "getFirstDaughter", "getLastDaughter", "getDaughters", "getNDaughters", "getMother",
             "getSecondaryPhysicsProcess", "getSeenInDetector",
             "isVirtual", "isInitial", "isPrimaryParticle", "getName"
-            ]),
-        ]
+        ]),
+    ]
     path.add_module(PrintObjectsModule(mdst_dataobjects, print_untested))

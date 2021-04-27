@@ -31,14 +31,20 @@ ma.inputMdst(environmentType='default',
 # and for photons (E > 0.05 and thetaInCDCAcceptance)
 ma.buildEventKinematics(default_cleanup=True, fillWithMostLikely=True, path=my_path)
 
+# The event kinematic variables can also be calculated based on the generated
+# particles:
+ma.buildEventKinematicsFromMC(path=my_path)
+
 # The predefined collection 'event_kinematics' contains all variables that
 # require the Event Kinematics module to be run. Those are the total missing
 # momentum of the event as well as its x-, y-, and z-component, both in the
 # lab and in the CMS frame. Furthermore, the variable collection contains the
 # missing energy of the event in the CMS frame, the missing mass squared of
 # the event, the total visible energy of the event in the CMS frame and the
-# total energy of all photons in the event.
-ma.variablesToNtuple('', vc.event_kinematics, filename='B2A705-EventKinematics.root', path=my_path)
+# total energy of all photons in the event. Similarly, the MC version of this
+# collection 'mc_event_kinematics' contains the missing mass squared, missing
+# energy and missing momentum based on the MC particles.
+ma.variablesToNtuple('', [*vc.event_kinematics, *vc.mc_event_kinematics], filename='B2A705-EventKinematics.root', path=my_path)
 
 # Process the events
 b2.process(my_path)

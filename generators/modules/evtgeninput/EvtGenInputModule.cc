@@ -82,7 +82,7 @@ TLorentzVector EvtGenInputModule::createBeamParticle(double minMass, double maxM
 {
   // try to generate the 4 momentum a m_maxTries amount of times before we give up
   for (int i = 0; i < m_maxTries; ++i) {
-    MCInitialParticles& initial = m_initial.generate();
+    const MCInitialParticles& initial = m_initial.generate();
 
     // check if we fullfill the mass window
     if (initial.getMass() >= minMass && initial.getMass() < maxMass) {

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVTGENFWRANDENGINE_H
-#define EVTGENFWRANDENGINE_H
+#pragma once
 
 #include <EvtGenBase/EvtRandomEngine.hh>
 #include <TRandom3.h>
@@ -25,4 +24,3 @@ public:
   } //! end of random()
 }; //! end of EvtRandomEngine
 
-#endif /* EVTGENFWRANDENGINE_H */

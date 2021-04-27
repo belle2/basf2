@@ -149,6 +149,7 @@ class TestOngoingLoggingCalculationProcess(TestCase):
 
         self.assertEqual(self.process.get_log(), "")
 
+
 if __name__ == "__main__":
     main()
 # @endcond

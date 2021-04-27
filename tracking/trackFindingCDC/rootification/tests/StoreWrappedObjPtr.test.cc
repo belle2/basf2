@@ -48,7 +48,7 @@ using RootifiedTypes =
   std::vector<CDCTrack>,
   std::vector<WeightedRelation<const CDCTrack> > >;
 
-TYPED_TEST_CASE(DISABLED_TrackFindingCDCTestRootification, RootifiedTypes);
+TYPED_TEST_SUITE(DISABLED_TrackFindingCDCTestRootification, RootifiedTypes);
 
 TYPED_TEST(DISABLED_TrackFindingCDCTestRootification, rootification_UsableAsStoreWrappedObjPtr)
 {

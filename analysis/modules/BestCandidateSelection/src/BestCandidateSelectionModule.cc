@@ -13,9 +13,7 @@
 #include <analysis/utility/ValueIndexPairSorting.h>
 
 #include <analysis/VariableManager/Utility.h>
-#include <analysis/dataobjects/Particle.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/MakeROOTCompatible.h>
 
@@ -79,7 +77,7 @@ BestCandidateSelectionModule::~BestCandidateSelectionModule() = default;
 
 void BestCandidateSelectionModule::initialize()
 {
-  StoreArray<Particle>().isRequired();
+  m_particles.isRequired();
   m_inputList.isRequired(m_inputListName);
 
   m_variable = Variable::Manager::Instance().getVariable(m_variableName);
@@ -101,7 +99,6 @@ void BestCandidateSelectionModule::initialize()
 void BestCandidateSelectionModule::event()
 {
   // input list
-  StoreArray<Particle> particles;
   if (!m_inputList) {
     B2WARNING("Input list " << m_inputList.getName() << " was not created?");
     return;
@@ -131,7 +128,7 @@ void BestCandidateSelectionModule::event()
   double previous_val{0};
   bool first_candidate{true};
   for (const auto& candidate : valueToIndex) {
-    Particle* p = particles[candidate.second];
+    Particle* p = m_particles[candidate.second];
     if (!m_cut->check(p)) {
       p->addExtraInfo(m_outputVariableName, -1);
       m_inputList->addParticle(p);
@@ -143,7 +140,8 @@ void BestCandidateSelectionModule::event()
       if (!m_allowMultiRank || (candidate.first != previous_val))  ++rank;
     }
 
-    p->addExtraInfo(m_outputVariableName, rank);
+    if (!p->hasExtraInfo(m_outputVariableName))
+      p->addExtraInfo(m_outputVariableName, rank);
     m_inputList->addParticle(p);
 
     previous_val = candidate.first;

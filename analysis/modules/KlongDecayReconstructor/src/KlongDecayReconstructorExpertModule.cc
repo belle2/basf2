@@ -14,9 +14,6 @@
 // framework aux
 #include <framework/logging/Logger.h>
 
-// dataobjects
-#include <analysis/dataobjects/Particle.h>
-
 // decay descriptor
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 
@@ -65,6 +62,8 @@ namespace Belle2 {
 
   void KlongDecayReconstructorExpertModule::initialize()
   {
+    m_particles.isRequired();
+
     // clear everything, initialize private members
     m_listName = "";
     m_generator = nullptr;
@@ -109,12 +108,10 @@ namespace Belle2 {
 
     m_generator = std::make_unique<ParticleGenerator>(newDecayString, m_cutParameter);
 
-    StoreObjPtr<ParticleList> particleList(m_listName);
     DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
-    particleList.registerInDataStore(flags);
+    m_outputList.registerInDataStore(m_listName, flags);
     if (!m_isSelfConjugatedParticle) {
-      StoreObjPtr<ParticleList> antiParticleList(m_antiListName);
-      antiParticleList.registerInDataStore(flags);
+      m_outputAntiList.registerInDataStore(m_antiListName, flags);
     }
 
     m_cut = Variable::Cut::compile(m_cutParameter);
@@ -123,18 +120,14 @@ namespace Belle2 {
 
   void KlongDecayReconstructorExpertModule::event()
   {
-    StoreArray<Particle> particles;
-
-    StoreObjPtr<ParticleList> outputList(m_listName);
-    outputList.create();
-    outputList->initialize(m_pdgCode, m_listName);
+    m_outputList.create();
+    m_outputList->initialize(m_pdgCode, m_listName);
 
     if (!m_isSelfConjugatedParticle) {
-      StoreObjPtr<ParticleList> outputAntiList(m_antiListName);
-      outputAntiList.create();
-      outputAntiList->initialize(-1 * m_pdgCode, m_antiListName);
+      m_outputAntiList.create();
+      m_outputAntiList->initialize(-1 * m_pdgCode, m_antiListName);
 
-      outputList->bindAntiParticleList(*(outputAntiList));
+      m_outputList->bindAntiParticleList(*(m_outputAntiList));
     }
 
     m_generator->init();
@@ -191,13 +184,13 @@ namespace Belle2 {
       numberOfCandidates++;
 
       if (m_maximumNumberOfCandidates > 0 and numberOfCandidates > m_maximumNumberOfCandidates) {
-        outputList->clear();
+        m_outputList->clear();
         break;
       }
 
-      Particle* newParticle = particles.appendNew(particle);
+      Particle* newParticle = m_particles.appendNew(particle);
 
-      outputList->addParticle(newParticle);
+      m_outputList->addParticle(newParticle);
       newParticle->addExtraInfo("decayModeID", m_decayModeID);
 
     } //while

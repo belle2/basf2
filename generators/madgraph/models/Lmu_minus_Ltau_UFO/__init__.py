@@ -43,6 +43,6 @@ else:
 gauge = [0]
 
 
-__author__ = "N. Christensen, C. Duhr, <>(B. Fuks\[CloseCurlyDoubleQuote],  B . Shuve\[CloseCurlyDoubleQuote])"
+__author__ = r"N. Christensen, C. Duhr, <>(B. Fuks\[CloseCurlyDoubleQuote],  B . Shuve\[CloseCurlyDoubleQuote])"
 __date__ = "28. 09. 2016"
 __version__ = "1.4.7"

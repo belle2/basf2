@@ -118,8 +118,9 @@ void SVDPackerModule::event()
 
   uint8_t triggerBin = modeByte.getTriggerBin();
   uint8_t runType = modeByte.getRunType();
-  uint8_t eventType = modeByte.getEventType();
   uint8_t daqMode = modeByte.getDAQMode();
+  uint8_t daqType = 0;
+  if (daqMode == 3) daqType = 1;
 
   uint8_t xTalk = m_svdEventInfoPtr->isCrossTalkEvent();
   uint8_t triggerType = (m_svdEventInfoPtr->getTriggerType()).getType();
@@ -217,7 +218,7 @@ void SVDPackerModule::event()
     m_MainHeader.trgTiming = triggerBin;
     m_MainHeader.xTalk = xTalk;
     m_MainHeader.FADCnum = FADCorg; // write original FADC number
-    m_MainHeader.evtType = eventType;
+    m_MainHeader.DAQType = daqType;
     m_MainHeader.DAQMode = daqMode;
 
     m_MainHeader.runType = runType; //zero-suppressed mode
@@ -255,7 +256,7 @@ void SVDPackerModule::event()
           // here go DATA words
 
           //skip 1st data frame if simulate 3-sample data
-          if (daqMode == 2) {
+          if (m_svdEventInfoPtr->getNSamples() == 6) {
             m_data_A.sample1 = apv_data->data[0];
             m_data_A.sample2 = apv_data->data[1];
             m_data_A.sample3 = apv_data->data[2];

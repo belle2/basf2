@@ -6,25 +6,25 @@
 # Input file can be prepared with top/analysis/makeMCParticlesFromGCRData.py
 # ---------------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_cosmics_reconstruction
 
 # Suppress messages and warnings during processing:
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # Define a global tag (note: the one given bellow will become out-dated!)
-use_central_database('data_reprocessing_proc8')
+b2.use_central_database('data_reprocessing_proc8')
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # input
-roinput = register_module('RootInput')
+roinput = b2.register_module('RootInput')
 main.add_module(roinput)
 
 # Geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 main.add_module(geometry)
 
 # Detector simulation
@@ -34,17 +34,17 @@ add_simulation(main)
 add_cosmics_reconstruction(main, components=['CDC'], merge_tracks=False)
 
 # output
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 output.param('branchNames', ['TOPDigits', 'ExtHits', 'Tracks', 'TrackFitResults',
                              'MCParticles', 'TOPBarHits', 'EventT0'])
 main.add_module(output)
 
 # Print progress
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print statistics
-print(statistics)
+print(b2.statistics)

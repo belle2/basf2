@@ -16,6 +16,14 @@ CHANGES since release-00-09-03:
 - Track:
   * getTrackFitResult behavior changed for non-pion tracks
   + getQualityIndicator
+- TrackFitResult:
+  + ndf
+  + chi2
+- TRGSummary:
+  + getTimQuality added
+  + isPoissonInInjectionVeto()
+  * added getters to map bit names to numbers (getInputBitNumber, getOutputBitNumber)
+    The mapping is from the database and doesn't affect mdst content and is thus not tested here.
 - ECLCluster:
   + getPulseShapeDiscriminationMVA
   + getClusterHadronIntensity
@@ -27,8 +35,6 @@ CHANGES since release-00-09-03:
   + hasFailedTimeResolution
   * getCovarianceMatrixAsArray removed
 - KlIds are added
-- TRGSummary:
-  * getTimTypeBits is replaced by getTimType
 - SoftwareTriggerResult:
   * getTotalResult removed
   * non-prescaled results added

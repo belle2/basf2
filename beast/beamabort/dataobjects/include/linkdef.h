@@ -5,7 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::BeamabortSimHit+;
-#pragma link C++ class Belle2::BeamabortHit+;
+#pragma link C++ class Belle2::BeamabortSimHit+; // checksum=0x67a167c7, version=1
+#pragma link C++ class Belle2::BeamabortHit+; // checksum=0xcf276ea1, version=1
 
 #endif

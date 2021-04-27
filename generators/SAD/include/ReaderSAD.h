@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef READERSAD_H
-#define READERSAD_H
+#pragma once
 
 #include <framework/core/FrameworkExceptions.h>
 
@@ -201,4 +200,3 @@ namespace Belle2 {
 
 }
 
-#endif /* READERSAD_H */

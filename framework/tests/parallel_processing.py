@@ -79,15 +79,15 @@ assert basf2.statistics.get_global().calls(basf2.statistics.EVENT) == 6
 file = TFile('parallel_processing_test.root')
 tree = file.Get('tree')
 if tree.GetEntries() != 5:
-    B2FATAL('Created output file contains wrong number of events! (' + str(tree.GetEntries()) + ')')
+    basf2.B2FATAL('Created output file contains wrong number of events! (' + str(tree.GetEntries()) + ')')
 
 nummcparticles = tree.Project("", "MCParticles.m_pdg")
 if nummcparticles < 5:
-    B2FATAL('Output file should contain at least five MCParticles!')
+    basf2.B2FATAL('Output file should contain at least five MCParticles!')
 
 numhits = tree.Project("", "PXDSimHits.getArrayIndex()")
 if numhits < 5:  # usually much more, existence is most important thing here
-    B2FATAL('Output file should contain at least 5 hits!')
+    basf2.B2FATAL('Output file should contain at least 5 hits!')
 
 
 os.remove('parallel_processing_test.root')

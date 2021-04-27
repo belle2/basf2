@@ -1,4 +1,3 @@
-import basf2
 from basf2 import _constwrapper
 from b2test_utils import configure_logging_for_tests
 import ROOT

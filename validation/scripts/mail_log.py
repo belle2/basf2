@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # std
 import copy
@@ -15,6 +14,7 @@ import validationpath
 from validationfunctions import available_revisions
 # martin's mail utils
 import mail_utils
+from validationscript import Script
 
 
 def parse_mail_address(obj: Union[str, List[str]]) -> List[str]:
@@ -110,13 +110,9 @@ class Mails:
         for failed_script in failed_scripts:
 
             # get_script_by_name works with _ only ...
-            for suffix in ["py", "C"]:
-                failed_script = failed_script.replace("." + suffix,
-                                                      "_" + suffix)
-            if self._validator.get_script_by_name(failed_script):
-                script = self._validator.get_script_by_name(failed_script)
-            else:
-                # can't do anything if script is not found
+            failed_script = Script.sanitize_file_name(failed_script)
+            script = self._validator.get_script_by_name(failed_script)
+            if script is None:
                 continue
 
             script.load_header()
@@ -126,22 +122,15 @@ class Mails:
             # give failed_script the same format as error_data in method
             # create_mail_log
             failed_script["package"] = script.package
-            try:
-                failed_script["rootfile"] = ", ".join(script.header["input"])
-            except (KeyError, TypeError):
-                # TypeError occurs if script.header is None
-                failed_script["rootfile"] = " -- "
+            failed_script["rootfile"] = ", ".join(script.input_files)
             failed_script["comparison_text"] = " -- "
-            try:
-                failed_script["description"] = script.header["description"]
-            except (KeyError, TypeError):
-                failed_script["description"] = " -- "
+            failed_script["description"] = script.description
             # this is called comparison_result but it is handled as error
             # type when composing mail
             failed_script["comparison_result"] = "script failed to execute"
             # add contact of failed script to mail_log
             try:
-                for contact in parse_mail_address(script.header["contact"]):
+                for contact in parse_mail_address(script.contact):
                     if contact not in mail_log:
                         mail_log[contact] = {}
                     mail_log[contact][script.name] = failed_script

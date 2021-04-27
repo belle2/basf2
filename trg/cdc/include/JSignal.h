@@ -82,12 +82,12 @@ namespace Belle2 {
                        TRGCDCJSignal const& reference, std::vector<std::vector<TRGCDCJSignal> > data, int targetClock);
     /// Chooes method. Also has input for target min and target max signal.
     static void choose(TRGCDCJSignal& target, TRGCDCJSignal const& targetMin, TRGCDCJSignal const& targetMax,
-                       TRGCDCJSignal const& reference, std::vector<std::vector<TRGCDCJSignal> >& data);
+                       TRGCDCJSignal const& reference, const std::vector<std::vector<TRGCDCJSignal> >& data);
     /// Choose with target clock.
-    static void choose(TRGCDCJSignal& target, TRGCDCJSignal const& reference, std::vector<std::vector<TRGCDCJSignal> > data,
+    static void choose(TRGCDCJSignal& target, TRGCDCJSignal const& reference, const std::vector<std::vector<TRGCDCJSignal> >& data,
                        int targetClock);
     /// Choose method.
-    static void choose(TRGCDCJSignal& target, TRGCDCJSignal const& reference, std::vector<std::vector<TRGCDCJSignal> >& data);
+    static void choose(TRGCDCJSignal& target, TRGCDCJSignal const& reference, const std::vector<std::vector<TRGCDCJSignal> >& data);
     /// If else implementation with target clock.
     static void ifElse(std::vector<std::pair<TRGCDCJSignal, std::vector<std::pair<TRGCDCJSignal*, TRGCDCJSignal> > > >& data,
                        int targetClock);
@@ -124,7 +124,7 @@ namespace Belle2 {
     static TRGCDCJSignal const unsignedToSlv(TRGCDCJSignal const& in);
 
     /// Compare two signals.
-    static TRGCDCJSignal comp(TRGCDCJSignal const& lhs, std::string operate, TRGCDCJSignal const& rhs);
+    static TRGCDCJSignal comp(TRGCDCJSignal const& lhs, const std::string& operate, TRGCDCJSignal const& rhs);
 
 
     /// Setters, Getters
@@ -217,7 +217,7 @@ namespace Belle2 {
     /// Calculates integer value with unit of a TRGCDCJSignal.
     static signed long long calInt(double value, TRGCDCJSignal const& mother);
     /// Calculates vhdl bitwidth and type for operation.
-    static void calVhdlTypeBitwidth(TRGCDCJSignal const& first, std::string& operation, TRGCDCJSignal const& second, int& type,
+    static void calVhdlTypeBitwidth(TRGCDCJSignal const& first, const std::string& operation, TRGCDCJSignal const& second, int& type,
                                     int& bitwidth);
     /// Initializes the argument signals for the signal.
     void initArgumentSignals();
@@ -247,9 +247,9 @@ namespace Belle2 {
     static std::string ifElseVhdlCode(std::vector<std::pair<TRGCDCJSignal, std::vector<std::pair<TRGCDCJSignal*, TRGCDCJSignal> > > >
                                       const& data);
     /// Prints vhdl code.
-    void printVhdl(std::string& vhdlCode);
+    void printVhdl(const std::string& vhdlCode) const;
     /// Checks underflow or overflow for TRGCDCJSignal.
-    void checkInt(std::string name) const;
+    void checkInt(const std::string& name) const;
     /// Checks if signal is same signal
     static bool isSameSignal(TRGCDCJSignal const& lhs, TRGCDCJSignal const& rhs);
     /// Values => [name, value, bitwidth, min, max, clock]

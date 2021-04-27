@@ -10,6 +10,10 @@
 
 #pragma once
 
+#include <mdst/dataobjects/MCParticle.h>
+
+#include <TLorentzVector.h>
+
 #include <vector>
 
 namespace Belle2 {
@@ -206,6 +210,16 @@ namespace Belle2 {
     double particleMCMatchP(const Particle* particle);
 
     /**
+     * Helper function: return total 4-momentum of all daughter neutrinos, recursively down decay tree
+     */
+    TLorentzVector MCInvisibleP4(const MCParticle* mcparticle);
+
+    /**
+     * return cosThetaBetweenParticleAndNominalB using B momentum with all (grand^n)daughter neutrino momenta subtracted
+     */
+    double particleMCCosThetaBetweenParticleAndNominalB(const Particle* particle);
+
+    /**
      * return recoiling mass against the particles appended as particle's daughters.
      * MC truth values are used in the calculations.
      */
@@ -309,12 +323,12 @@ namespace Belle2 {
      */
     double particleClusterBestMCPDGCode(const Particle*);
 
-
     /**
-     * returns True if the environment is MC and False for data
+     * returns 1 for crossfeed in reconstruction of a B meson, 0 for no crossfeed and
+     * nan for no true B meson or failed truthmatching. Iterates over final state daughters
+     * of a given B meson and searches for common identical B meson ancestor at generator level.
      */
-    double isMC(const Particle*);
-
+    double isBBCrossfeed(const Particle*);
   }
 }
 

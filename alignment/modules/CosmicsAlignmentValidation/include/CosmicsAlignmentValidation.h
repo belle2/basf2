@@ -1,6 +1,8 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
 #include <genfit/Track.h>
@@ -62,8 +64,16 @@ namespace Belle2 {
   private:
     std::string m_gfTrackColName; ///< m_gfTrackColName
     std::string m_outputFileName; ///< ouput filename string
+
+    /** Genfit tracks. */
+    StoreArray<genfit::Track> m_GenfitTracks;
+
+    /** MC particles. */
+    StoreArray<MCParticle> m_MCParticles;
+
     TFile* file;    /**< data file  */
     TTree* tree;    /**< data tree  */
+
     float t_p1 = 0;     /**< momentum p1 */
     float t_p1MC = 0;     /**< momentum in MC */
     float t_p2MC = 0;     /**< momentum in MC */

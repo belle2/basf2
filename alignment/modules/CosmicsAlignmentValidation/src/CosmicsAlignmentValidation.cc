@@ -1,11 +1,8 @@
 
 #include <alignment/modules/CosmicsAlignmentValidation/CosmicsAlignmentValidation.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <mdst/dataobjects/MCParticle.h>
-
-#include <genfit/Track.h>
 
 #include <root/TFile.h>
 #include <root/TTree.h>
@@ -44,6 +41,8 @@ void CosmicsAlignmentValidationModule::initialize()
 {
   B2INFO(
     "[CosmicsAlignmentValidation Module]: Starting initialization of CosmicsAlignmentValidation Module. Give me Cosmics!");
+  m_GenfitTracks.isRequired(m_gfTrackColName);
+  m_MCParticles.isRequired();
   file = new TFile(m_outputFileName.c_str(), "RECREATE");
   tree = new TTree("cosmics", "cosmics");
   tree->Branch("p1", &t_p1);
@@ -90,12 +89,9 @@ void CosmicsAlignmentValidationModule::event()
 {
   B2DEBUG(99, "[CosmicsAlignmentValidationModule] begin event");
 
-  //simulated truth information
-  StoreArray < genfit::Track > gfTracks(m_gfTrackColName);
-  StoreArray < MCParticle > mcParticles;
   //genfit stuff
   //StoreArray<genfit::Track> fittedTracks(""); // the results of the track fit
-  const int nFittedTracks = gfTracks.getEntries();
+  const int nFittedTracks = m_GenfitTracks.getEntries();
 
   //RelationArray gfTracksToMCPart(fittedTracks, mcParticles);
 
@@ -114,8 +110,8 @@ void CosmicsAlignmentValidationModule::event()
 
   else {
 
-    genfit::Track* tr1 = gfTracks[0];
-    genfit::Track* tr2 = gfTracks[1];
+    genfit::Track* tr1 = m_GenfitTracks[0];
+    genfit::Track* tr2 = m_GenfitTracks[1];
 
     const TrackFitResult* fitResult1 = findRelatedTrackFitResult(tr1);
     const TrackFitResult* fitResult2 = findRelatedTrackFitResult(tr2);
@@ -157,7 +153,7 @@ void CosmicsAlignmentValidationModule::event()
       t_cotTheta2 = fitResult2->getCotTheta();
     }
 
-    t_p1MC = mcParticles[0]->getMomentum().Mag();
+    t_p1MC = m_MCParticles[0]->getMomentum().Mag();
 
     if (fitResult2 != NULL && fitResult1 != NULL) {
       t_dz = fitResult1->getPosition().Z()

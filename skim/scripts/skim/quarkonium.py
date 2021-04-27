@@ -11,9 +11,13 @@ __authors__ = [
 
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
-
+from stdCharged import stdE, stdMu
+from stdPhotons import stdPhotons
+from stdV0s import stdLambdas
+from variables import variables as v
 
 __liaison__ = "Sen Jia <jiasen@buaa.edu.cn>"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header
@@ -35,11 +39,8 @@ class BottomoniumEtabExclusive(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, quarkonium"
 
-    RequiredStandardLists = {
-        "stdPhotons": {
-            "stdPhotons": ["loose"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPhotons("loose", path=path)
 
     def build_lists(self, path):
         # create and fill hard photon
@@ -97,11 +98,8 @@ class BottomoniumUpsilon(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, quarkonium"
 
-    RequiredStandardLists = {
-        "stdPhotons": {
-            "stdPhotons": ["loose"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPhotons("loose", path=path)
 
     def build_lists(self, path):
         Ycuts = ""
@@ -153,77 +151,137 @@ class BottomoniumUpsilon(BaseSkim):
 
 
 @fancy_skim_header
-class ISRpipicc(BaseSkim):
+class CharmoniumPsi(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * ``e+e- -> pi+ pi- J/psi -> e+e-``
-    * ``e+e- -> pi+ pi- J/psi -> mu+mu-``
-    * ``e+e- -> pi+ pi- psi(2S) -> pi+ pi- J/psi -> e+e-``
-    * ``e+e- -> pi+ pi- psi(2S) -> pi+ pi- J/psi -> mu+mu-``
+    * J/psi -> l^+ l^- (l = e or mu)
+    * psi(2S) -> l^+ l^- (l = e or mu)
 
     Selection criteria:
 
-    * Standard ``e/mu/pi ParticleLists``
-    * Mass window cut for ``J/psi`` and ``psi(2S)`` candidates
-    * Apply ``-4 < the recoil mass square of hadrons < 4 GeV^{2}/c^{4}`` to extract ISR signal events
+    * 2 tracks with electronID > 0.1 or muonID > 0.1 and 2.7 < M < 4.
+      Track-quality requirements are not applied.
     """
-    __authors__ = []
-    __description__ = ""
+    __authors__ = ["Kirill Chilikin"]
+    __description__ = "Selection of J/psi and psi(2S) via leptonic decays."
     __contact__ = __liaison__
     __category__ = "physics, quarkonium"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["loose"],
-            "stdMu": ["loose"],
-            "stdPi": ["loose"],
-        },
-    }
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        stdE('loosepid', path=path)
+        stdMu('loosepid', path=path)
+        stdPhotons('all', path=path)
 
     def build_lists(self, path):
-        # intermediate state J/psi and psi(2S) are reconstructed
-        # add mass window cut for J/psi and psi(2S) candidates
-        ma.reconstructDecay("J/psi:ee_ISR -> e+:loose e-:loose", "M>3.0 and M<3.2", path=path)
-        ma.reconstructDecay("J/psi:mumu_ISR -> mu+:loose mu-:loose", "M>3.0 and M<3.2", path=path)
-        ma.reconstructDecay("psi(2S):ee -> pi+:loose pi-:loose e+:loose e-:loose", "M>3.64 and M<3.74", path=path)
-        ma.reconstructDecay("psi(2S):mumu -> pi+:loose pi-:loose mu+:loose mu-:loose", "M>3.64 and M<3.74", path=path)
 
-        # the requirement of recoil mass square of hadrons
-        MMScuts = "-4 < m2Recoil < 4"
+        # Mass cuts.
+        jpsi_mass_cut = '2.85 < M < 3.3'
+        psi2s_mass_cut = '3.45 < M < 3.9'
 
-        # four ISR modes are reconstructed
-        # e+e- -> pi+ pi- J/psi -> e+e- via ISR
-        # e+e- -> pi+ pi- J/psi -> mu+mu- via ISR
-        # e+e- -> pi+ pi- psi(2S) -> pi+ pi- J/psi -> e+e- via ISR
-        # e+e- -> pi+ pi- psi(2S) -> pi+ pi- J/psi -> mu+mu- via ISR
-        vpho_Channels = [
-            "pi+:loose pi-:loose J/psi:ee_ISR",
-            "pi+:loose pi-:loose J/psi:mumu_ISR",
-            "pi+:loose pi-:loose psi(2S):ee",
-            "pi+:loose pi-:loose psi(2S):mumu"
-        ]
+        # Electrons with bremsstrahlung correction.
+        # Use both correction algorithms as well as uncorrected electrons
+        # to allow for algorithm comparison in analysis.
+        # The recommeneded list for further reconstruction is J/psi:eebrems.
+        # The estimated ratio of efficiencies in B decays in release 5.1.5 is
+        # 1.00 (J/psi:eebrems) : 0.95 (J/psi:eebrems2) : 0.82 (J/psi:ee).
+        ma.correctBremsBelle('e+:brems', 'e+:loosepid', 'gamma:all',
+                             angleThreshold=0.05,
+                             path=path)
+        ma.correctBrems('e+:brems2', 'e+:loosepid', 'gamma:all', path=path)
 
-        # define the ISR process list
-        vphoList = []
+        # Reconstruct J/psi or psi(2S).
+        ma.reconstructDecay('J/psi:ee -> e+:loosepid e-:loosepid',
+                            jpsi_mass_cut, path=path)
+        ma.reconstructDecay('psi(2S):ee -> e+:loosepid e-:loosepid',
+                            psi2s_mass_cut, path=path)
 
-        # reconstruct the different ISR channels and append to the virtual photon
-        for chID, channel in enumerate(vpho_Channels):
-            ma.reconstructDecay("vpho:myCombination" + str(chID) + " -> " + channel, MMScuts, chID, path=path)
-            vphoList.append("vpho:myCombination" + str(chID))
+        ma.reconstructDecay('J/psi:eebrems -> e+:brems e-:brems',
+                            jpsi_mass_cut, path=path)
+        ma.reconstructDecay('psi(2S):eebrems -> e+:brems e-:brems',
+                            psi2s_mass_cut, path=path)
 
-        self.SkimLists = vphoList
+        ma.reconstructDecay('J/psi:eebrems2 -> e+:brems2 e-:brems2',
+                            jpsi_mass_cut, path=path)
+        ma.reconstructDecay('psi(2S):eebrems2 -> e+:brems2 e-:brems2',
+                            psi2s_mass_cut, path=path)
+
+        ma.reconstructDecay('J/psi:mumu -> mu+:loosepid mu-:loosepid',
+                            jpsi_mass_cut, path=path)
+        ma.reconstructDecay('psi(2S):mumu -> mu+:loosepid mu-:loosepid',
+                            psi2s_mass_cut, path=path)
+
+        # Return the lists.
+        self.SkimLists = ['J/psi:ee', 'psi(2S):ee',
+                          'J/psi:eebrems', 'psi(2S):eebrems',
+                          'J/psi:eebrems2', 'psi(2S):eebrems2',
+                          'J/psi:mumu', 'psi(2S):mumu']
 
     def validation_histograms(self, path):
-        # [ee -> ISR pi+pi- [J/psi -> mu+mu-]] decay
-        ma.reconstructDecay("J/psi:mumu_validation -> mu+:95eff mu-:95eff", "2.9 < M < 3.3", path=path)
-        ma.reconstructDecay("vpho:myCombinations_validation -> J/psi:mumu_validation pi+:95eff pi-:95eff", "", path=path)
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
 
-        ma.variablesToHistogram(
-            filename="ISRpipimumu_Validation.root",
-            decayString="vpho:myCombinations_validation",
-            variables=[
-                ("daughterInvariantMass(0)", 80, 2.9, 3.3),
-                ("useCMSFrame(cosTheta)", 50, -1, 1),
-                ("m2Recoil", 50, -1, 1)
-            ], path=path)
+        # [Y(3S) -> pi+pi- [Y(1S,2S) -> mu+mu-]] decay
+        ma.reconstructDecay('J/psi:mumu_test -> mu+:loosepid mu-:loosepid', '', path=path)
+        ma.reconstructDecay('J/psi:ee_test -> e+:loosepid e-:loosepid', '', path=path)
+        ma.copyList('J/psi:ll', 'J/psi:mumu_test', path=path)
+        ma.copyList('J/psi:ll', 'J/psi:ee_test', path=path)
+
+        # Print histograms.
+        create_validation_histograms(
+            rootfile=f'{self}_Validation.root',
+            particlelist='J/psi:ll',
+            variables_1d=[(
+                'InvM', 65, 2.7, 4.0,
+                'J/#psi mass',
+                __liaison__,
+                'J/psi mass',
+                'J/psi peak is seen.',
+                'M [GeV/c^{2}]', 'Events / (20 MeV/c^{2})',
+                'shifter'
+            )],
+            path=path
+        )
+
+
+@fancy_skim_header
+class InclusiveLambda(BaseSkim):
+    """
+    Reconstructed decay
+    * :math:`\\Lambda \\to p \\pi^-` (and charge conjugate)
+
+    Selection criteria:
+    * proton
+    ``protonID > 0.1``
+    * Lambda:
+    ``cosAngleBetweenMomentumAndVertexVector > 0.99``
+    ``flightDistance/flightDistanceErr > 3.``
+    * ``0.6 < p,proton/p,Lambda < 1.0 GeV/c``
+
+    """
+    __authors__ = ["Bianca Scavino"]
+    __description__ = "Inclusive Lambda skim"
+    __contact__ = __liaison__
+    __category__ = "physics, quarkonium"
+
+    def load_standard_lists(self, path):
+        stdLambdas(path=path)
+
+    def build_lists(self, path):
+
+        # Add useful alias
+        v.addAlias("protonID_proton", "daughter(0, protonID)")
+        v.addAlias("momRatio_protonLambda", "formula(daughter(0, p)/p)")
+        v.addAlias('flightSignificance', 'formula(flightDistance/flightDistanceErr)')
+
+        # Apply selection to Lambdas
+        ma.applyCuts("Lambda0:merged", "cosAngleBetweenMomentumAndVertexVector > 0.99", path=path)
+        ma.applyCuts("Lambda0:merged", "0.6 < momRatio_protonLambda < 1.", path=path)
+        ma.applyCuts("Lambda0:merged", "flightSignificance > 3.", path=path)
+        ma.applyCuts("Lambda0:merged", "protonID_proton > 0.1", path=path)
+
+        # Return the lists.
+        self.SkimLists = ["Lambda0:merged"]

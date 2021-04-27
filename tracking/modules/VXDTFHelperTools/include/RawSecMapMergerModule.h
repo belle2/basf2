@@ -51,6 +51,9 @@ namespace Belle2 {
 
     /** If true, the full trained graphs will be printed to screen. WARNING: produces a lot of output for full detector-cases! */
     bool m_PARAMprintFullGraphs;
+
+    /** Relative threshold for pruning the sector maps (in %). */
+    int m_RelThreshold;
     // ///////////////////////////////////////////////////////////////////////////////// member variables END:
   public:
 
@@ -155,7 +158,7 @@ namespace Belle2 {
 
 
     /// updates the sublayer ID of the FullSecIDs used in the VXDTFFilters with the one used during the training contained in the SectorGraph
-    /// @param mainGrapgh : the graph from which the updated FullSecIDs are retrieved
+    /// @param mainGraph  : the graph from which the updated FullSecIDs are retrieved
     /// @param segFilters : the filters which need to be updated
     template <class FilterType> unsigned updateFilterSubLayerIDs(SectorGraph<FilterType>& mainGraph,
         VXDTFFilters<SpacePoint>& segFilters);
@@ -199,6 +202,14 @@ namespace Belle2 {
       for (auto& subgraph : mainGraph) {
         subgraph.second.prepareDataCollection(config.quantiles); // TODO small-sample-case!
       }
+
+      // Get the absolute threshold (nfound) from the relative threshold
+      int absThreshold = mainGraph.getAbsThreshold(m_RelThreshold);
+
+      // Prune the sector map
+      nKilled += mainGraph.pruneGraphBeforeTraining(absThreshold);
+
+      B2INFO("processSectorCombinations: nKilled before the training: " << nKilled);
 
       trainGraph(mainGraph, chain, sectorBranches, filterBranches);
       /// TODO next steps: implement nice and neat way to take care of the ram-threshold!

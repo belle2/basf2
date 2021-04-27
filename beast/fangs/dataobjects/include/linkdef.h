@@ -5,7 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::FANGSSimHit+;
-#pragma link C++ class Belle2::FANGSHit+;
+#pragma link C++ class Belle2::FANGSSimHit+; // checksum=0x838574eb, version=1
+#pragma link C++ class Belle2::FANGSHit+; // checksum=0x882a0983, version=1
 
 #endif

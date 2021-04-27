@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Thomas Keck 2016
 
@@ -14,16 +13,35 @@ if __name__ == "__main__":
         'localdb/database.txt'
     ]
 
-    variables = ['M', 'p', 'pt', 'pz',
-                 'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)',
-                 'daughter(1, p)', 'daughter(1, pz)', 'daughter(1, pt)',
-                 'daughter(2, p)', 'daughter(2, pz)', 'daughter(2, pt)',
-                 'chiProb', 'dr', 'dz',
-                 'daughter(0, dr)', 'daughter(1, dr)',
-                 'daughter(0, dz)', 'daughter(1, dz)',
-                 'daughter(0, chiProb)', 'daughter(1, chiProb)', 'daughter(2, chiProb)',
-                 'daughter(0, kaonID)', 'daughter(0, pionID)',
-                 'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
+    variables = [
+        'M',
+        'p',
+        'pt',
+        'pz',
+        'daughter(0, p)',
+        'daughter(0, pz)',
+        'daughter(0, pt)',
+        'daughter(1, p)',
+        'daughter(1, pz)',
+        'daughter(1, pt)',
+        'daughter(2, p)',
+        'daughter(2, pz)',
+        'daughter(2, pt)',
+        'chiProb',
+        'dr',
+        'dz',
+        'daughter(0, dr)',
+        'daughter(1, dr)',
+        'daughter(0, dz)',
+        'daughter(1, dz)',
+        'daughter(0, chiProb)',
+        'daughter(1, chiProb)',
+        'daughter(2, chiProb)',
+        'daughter(0, kaonID)',
+        'daughter(0, pionID)',
+        'daughterInvariantMass(0, 1)',
+        'daughterInvariantMass(0, 2)',
+        'daughterInvariantMass(1, 2)']
 
     # Train a MVA method and directly upload it to the database
     general_options = basf2_mva.GeneralOptions()
@@ -65,5 +83,5 @@ if __name__ == "__main__":
         print(label, training_time, inference_time, auc)
         stats.append((label, training_time, inference_time, auc))
 
-    for l in stats:
-        print(*l)
+    for line in stats:
+        print(*line)

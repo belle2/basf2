@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
+import argparse
+import ROOT
+
 description = """
 This script loops over the particle hypotheses and feeds the NTuples
 into the ROOT Selector for processing.  Within this processing, histograms for EoP, etc.
@@ -11,10 +15,6 @@ These histograms are later used as input for the PDF fitter.
 __author__ = "Caitlin MacQueen, Marco Milesi"
 __email__ = "cmq.centaurus@gmail.com, marco.milesi@unimelb.edu.au"
 __date__ = "June 2018"
-
-import os
-import sys
-import argparse
 
 parser = argparse.ArgumentParser(description=description)
 
@@ -35,7 +35,6 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-import ROOT
 
 # Silence ROOT!
 ROOT.gROOT.SetBatch(True)

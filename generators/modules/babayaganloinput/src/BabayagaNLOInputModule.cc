@@ -10,9 +10,9 @@
 
 #include <generators/modules/babayaganloinput/BabayagaNLOInputModule.h>
 
-#include <framework/utilities/FileSystem.h>
-
 #include <framework/datastore/StoreArray.h>
+#include <framework/utilities/FileSystem.h>
+#include <framework/utilities/IOIntercept.h>
 
 using namespace std;
 using namespace Belle2;
@@ -39,7 +39,7 @@ InitialParticleGeneration BabayagaNLOInputModule::s_initial{BeamParameters::c_sm
 BabayagaNLOInputModule::BabayagaNLOInputModule() : Module()
 {
   //Set module properties
-  setDescription("Generates radiative Bhabha scattering and exclusive two-photon events with Babayaga.NLO.");
+  setDescription("Generates radiative Bhabha scattering and exclusive two-photon events with the high precision QED generator called BabaYaga@NLO.");
 
   //Parameter definition
   addParam("VacuumPolarization", m_vacPol, "Vacuum polarization: off, hadr5 (Jegerlehner) or hlmnt (Teubner, default)",
@@ -86,7 +86,6 @@ BabayagaNLOInputModule::BabayagaNLOInputModule() : Module()
 
 BabayagaNLOInputModule::~BabayagaNLOInputModule()
 {
-
 }
 
 void BabayagaNLOInputModule::initialize()
@@ -107,13 +106,10 @@ void BabayagaNLOInputModule::initialize()
 
   // Initialize ExtraInfo (hold prescale values)
   m_generator.initExtraInfo();
-
-
 }
 
 void BabayagaNLOInputModule::event()
 {
-
   // Check if the BeamParameters have changed (if they do, abort the job! otherwise cross section calculation will be a nightmare.)
   if (m_beamParams.hasChanged()) {
     if (!m_initialized) {
@@ -124,7 +120,7 @@ void BabayagaNLOInputModule::event()
   }
 
   // initial particle from beam parameters
-  MCInitialParticles& initial = s_initial.generate();
+  const MCInitialParticles& initial = s_initial.generate();
 
   // CM energy
   double ecm = initial.getMass();
@@ -139,18 +135,15 @@ void BabayagaNLOInputModule::event()
   m_generator.generateEvent(m_mcGraph, ecm, vertex, boost); // actual generator call
 
   m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
-
 }
 
 void BabayagaNLOInputModule::terminate()
 {
-
   m_generator.term();
 }
 
 void BabayagaNLOInputModule::initializeGenerator()
 {
-
   // generator parameters
   m_generator.setScatAngle(vectorToPair(m_ScatteringAngleRange, "ScatteringAngleRange"));
   m_generator.setMaxAcollinearity(m_maxAcollinearity);
@@ -190,7 +183,8 @@ void BabayagaNLOInputModule::initializeGenerator()
 
   // check if a maximum weight is provided
   if (m_fMax > 0. && (m_mode == "unweighted" || m_mode == "uw")) {
-    B2INFO("Setting FMAX manually (no maximum search performed) =" << m_fMax);
+    B2INFO("Setting FMax manually (no maximum search is performed)." <<
+           LogVar("FMax", m_fMax));
     m_generator.setFMax(m_fMax);
     m_generator.setNSearchMax(-1);
   } else if (m_mode == "weighted" || m_mode == "w") {
@@ -199,8 +193,10 @@ void BabayagaNLOInputModule::initializeGenerator()
     m_generator.setNSearchMax(m_nSearchMax);
   }
 
+  IOIntercept::OutputToLogMessages initLogCapture("BabaYaga@NLO", LogConfig::c_Info, LogConfig::c_Info, 100, 100);
+  initLogCapture.start();
   m_generator.init();
+  initLogCapture.finish();
 
   m_initialized = true;
-
 }

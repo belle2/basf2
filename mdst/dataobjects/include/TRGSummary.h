@@ -39,25 +39,25 @@ namespace Belle2 {
 
     /** types of trigger timing source defined in b2tt firmware */
     enum ETimingType {
-      /** events triggered by top timing */
-      TTYP_PID0 = 0,
-      /** events triggered by top timing */
-      TTYP_PID1 = 4,
-      /** events triggered by top timing */
-      TTYP_PID2 = 8,
-      /** events triggered by top timing */
-      TTYP_PID3 = 12,
+      /** events triggered by ECL timing */
+      TTYP_ECL  = 0,
       /** reserved (not defined yet) */
-      TTYP_RSV0 = 2,
+      TTYP_PID1 = 4,
+      /** reserved (not defined yet) */
+      TTYP_PID2 = 8,
+      /** reserved (not defined yet) */
+      TTYP_PID3 = 12,
+      /** events triggered by self trigger */
+      TTYP_SELF = 2,
       /** reserved (not defined yet) */
       TTYP_RSV1 = 6,
       /** reserved (not defined yet) */
       TTYP_RSV2 = 10,
       /** reserved (not defined yet) */
       TTYP_RSV3 = 14,
-      /** events triggered by ecl timing */
-      TTYP_ECL = 1,
-      /** events triggered by cdc timing */
+      /** events triggered by TOP timing */
+      TTYP_TOP = 1,
+      /** events triggered by CDC timing */
       TTYP_CDC = 3,
       /** delayed physics events for background */
       TTYP_DPHY = 5,
@@ -67,10 +67,22 @@ namespace Belle2 {
       TTYP_TEST = 9,
       /** reserved (not defined yet) */
       TTYP_RSV4 = 11,
-      /** f also used for begin-run */
-      TTYP_RSV5 = 13,
+      /** poisson random trigger */
+      TTYP_POIS = 13,
       /** reserved (not defined yet) */
       TTYP_NONE = 15
+    };
+
+    /** trigger timing type quality */
+    enum ETimingQuality {
+      /* Non. Must not happen for TOP/ECL/CDC timing events */
+      TTYQ_NONE = 0,
+      /* Coarse */
+      TTYQ_CORS = 1,
+      /* Fine */
+      TTYQ_FINE = 2,
+      /* Super Fine */
+      TTYQ_SFIN = 3,
     };
 
     /*! default constructor: xxx */
@@ -123,6 +135,21 @@ namespace Belle2 {
      */
     bool testPsnm(const std::string& name) const {return testPsnm(getOutputBitNumber(name));}
 
+    /*! check whether poisson random trigger is within injection veto
+     * @return True if poisson random trigger is within injection veto
+     */
+    bool isPoissonInInjectionVeto() const
+    {
+      return m_isPoissonInInjectionVeto;
+    }
+
+    /*! set true if poisson random trigger is within injection veto
+     */
+    void setPoissonInInjectionVeto()
+    {
+      m_isPoissonInInjectionVeto = true;
+    }
+
     /**set the Final Trigger Decision Logic bit*/
     void setTRGSummary(int i, int word) { m_ftdlBits[i] = word;}
 
@@ -146,6 +173,9 @@ namespace Belle2 {
 
     /**set the timType */
     void setTimType(ETimingType timType) {m_timType = timType;}
+
+    /**set the timQuality */
+    void setTimQuality(ETimingQuality timQuality) {m_timQuality = timQuality;}
 
     /*! get input bits
      * @param i index: 0, 1, 2 for bit 0-31, 32-63, 64-95, respectively.
@@ -182,10 +212,16 @@ namespace Belle2 {
       return m_timType;
     }
 
+    /*! get timing source quality
+     * @return     timing type quality
+     */
+    ETimingQuality getTimQuality() const
+    {
+      return m_timQuality;
+    }
+
     /** Return a short summary of this object's contents in HTML format. */
     std::string getInfoHTML() const override;
-
-  private:
 
     /** get number of an input trigger bit
      * @param name input trigger bit name
@@ -198,6 +234,8 @@ namespace Belle2 {
      * @return     output trigger bit number
     */
     unsigned int getOutputBitNumber(const std::string& name) const;
+
+  private:
 
     /** return the td part of an HTML table with green of the bit is > 0 */
     std::string outputBitWithColor(bool bit) const;
@@ -221,11 +259,17 @@ namespace Belle2 {
     /** types of trigger timing source defined in b2tt firmware */
     ETimingType m_timType = TTYP_NONE;
 
+    /** trigger timing type quality */
+    ETimingQuality m_timQuality = TTYQ_NONE;
+
     /** the prescale factor of each bit*/
     unsigned int m_prescaleBits[c_ntrgWords][c_trgWordSize] = {0};
 
+    /** Poisson random trigger in injection veto or not */
+    bool m_isPoissonInInjectionVeto = false;
+
     /**  Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source. */
-    ClassDefOverride(TRGSummary, 5);
+    ClassDefOverride(TRGSummary, 7);
   };
 
 

@@ -10,6 +10,7 @@
 // #include <time.h>
 #include <syslog.h>
 // #include <framework/core/Module.h>
+#include <rawdata/switch_basf2_standalone.h>
 
 using namespace std;
 using namespace Belle2;

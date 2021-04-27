@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
+import pathlib
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("input_data", help=("The path to the input data directory you want to use."
@@ -24,37 +25,28 @@ parser.add_argument("--resetdb-after-execute",
 
 args = parser.parse_args()
 
-set_log_level(LogLevel.DEBUG)
+b2.set_log_level(b2.LogLevel.DEBUG)
 # View the framework debugging
-set_debug_level(100)
+b2.set_debug_level(100)
 # For just the Algorithm debugging
 # set_debug_level(29)
 
 algo = Belle2.TestDBAccessAlgorithm()
 
-import pathlib
 # Can use a Python list of input files/wildcards. It will resolve the existing files
 inputFileNames = [pathlib.Path(args.input_data, "CollectorOutput.root").absolute().as_posix()]
 algo.setInputFileNames(inputFileNames)
 
 if not args.reset:
-    reset_database()
-    use_database_chain()
     # The local db that we will both write to and read from
-    use_local_database("localdb/database.txt",
-                       directory="localdb",
-                       readonly=False)
+    b2.conditions.prepend_testing_payloads("localdb/database.txt")
 
 # We iterate over some runs and execute separately.
 # This means that we repeatedly access the DB interface after committing
 for i in range(1, 5):
     if args.reset:
         # We're doing this here to test what happens when resetting in a single Python process
-        reset_database()
-        use_database_chain()
         # The local db that we will both write to and read from
-        use_local_database("localdb/database.txt",
-                           directory="localdb",
-                           readonly=False)
+        b2.conditions.prepend_testing_payloads("localdb/database.txt")
     print("Result of calibration =", algo.execute([(0, i)], args.iteration))
     algo.commit()

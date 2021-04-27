@@ -29,8 +29,8 @@ On the right side, particles can be replaced by decaying particles which have to
 
 Selection
 ---------
-Particles can be selected with a preceeding upper carret symbol, :code:`'^'`. 
-This line selectes B+, anti-D0 and pi+ from the anti-D0 decay:
+Particles can be selected with a preceding upper caret symbol, :code:`'^'`. 
+This line selects B+, anti-D0 and pi+ from the anti-D0 decay:
 
 :code:`'^B+ -> [^anti-D0 -> K- ^pi+] pi^+'`
 
@@ -53,7 +53,7 @@ One can configure :b2:var:`isSignal` to accept missing particles or not to accep
 Marker of unspecified particle
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Particle can be marked as unspecified particle with an at-sign, :code:`'@'`, in the decayString.
+Particle can be marked as unspecified particle with an at-sign, :code:`'@'`, in the DecayString.
 If the particle is marked as unspecified it will not checked for its identity when doing :ref:`MCMatching`. Any particle which decays into the correct daughters will be flagged as correct. 
 For example the DecayString :code:`'@Xsd -> K+ pi-'` would match all particles which decay into a Kaon and a pion, for example K*, B0, D0, ...
 Still the daughters need to be stated correctly so this can be used for "sum of exclusive" decays.
@@ -109,7 +109,7 @@ If one put the following keywords at the end of the decay string, :b2:var:`isSig
 
 These are useful to analyze inclusive processes with fully-inclusive method. 
 
-Keywords must be placed at the end of the decay string. It is not allowed to put keywords in front of particles. Here is an exapmle of use:
+Keywords must be placed at the end of the decay string. It is not allowed to put keywords in front of particles. Here is an example of use:
 
 .. code-block:: python
  
@@ -128,14 +128,15 @@ Keywords must be placed at the end of the decay string. It is not allowed to put
 
 Arrows
 ^^^^^^
-In addition to the common arrow :code:`'->'`, one can use different types of arrows. If the following verbose arrow is used, :b2:var:`isSignal` will consider missing radiated photons and/or missing intermediate resonances. 
+In addition to the common arrow :code:`'->'`, one can use different types of arrows. 
+If any of the following verbose arrows are used, :b2:var:`isSignal` will behave differently with additional (unspecified) radiated photons and/or unspecified intermediate resonances. 
 
-* :code:`'->'` intermediate resonances and radiated photons are ignored
-* :code:`'=direct=>'` intermediate resonances are considered but radiated photons are ignored
-* :code:`'=norad=>'` radiated photons are considered but intermediate resonances are ignored
-* :code:`'=exact=>'` exact match of the decay including intermediate resonances and radiated photons
+* :code:`'->'` decays that proceed via intermediate resonances and/or with radiated photons are counted as signal even if they weren't exactly specified in the decay string
+* :code:`'=direct=>'` decays with intermediate resonances are not counted as signal unless included in the decay string, but decays with radiated photons are counted as signal even if they are not specified in the decay string
+* :code:`'=norad=>'` radiated photons are not counted as signal but decays via an intermediate resonance are
+* :code:`'=exact=>'` exact match of the decay forbidding any intermediate resonances and radiated photons unless explicitly specified in the decay string
 
-Here is an exapmle of use:
+Here is an example of use:
 
 .. code-block:: python
  

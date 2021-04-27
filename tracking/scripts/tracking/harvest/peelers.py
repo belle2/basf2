@@ -9,13 +9,13 @@ import numpy as np
 
 import ROOT
 
-ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
-Belle2.RecoTrack.getRightLeftInformation("Belle2::CDCHit")
 
 import basf2
 from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
 
+Belle2.RecoTrack.getRightLeftInformation["Belle2::CDCHit"]
+ROOT.gSystem.Load("libtracking")
 #: string formatter that handles missing keys gracefully
 formatter = TolerateMissingKeyFormatter()
 
@@ -607,7 +607,9 @@ def peel_hit_information(hit_info, reco_track, key="{part_name}"):
 
 #: Peeler for module statistics
 @format_crop_keys
-def peel_module_statistics(modules=[], key="{part_name}"):
+def peel_module_statistics(modules=None, key="{part_name}"):
+    if modules is None:
+        modules = []
     module_stats = dict()
 
     for module in basf2.statistics.modules:
@@ -644,6 +646,8 @@ def get_seed_track_fit_result(reco_track):
     b_field = Belle2.BFieldManager.getField(position).Z() / Belle2.Unit.T
     cdc_hit_pattern = 0
     svd_hit_pattern = 0
+    # the value 0xFFFF will cause the TrackFitResult::getNDF() to return -1
+    ndf = 0xFFFF
 
     track_fit_result = Belle2.TrackFitResult(
         position,
@@ -655,6 +659,7 @@ def get_seed_track_fit_result(reco_track):
         b_field,
         cdc_hit_pattern,
         svd_hit_pattern,
+        ndf,
     )
 
     return track_fit_result

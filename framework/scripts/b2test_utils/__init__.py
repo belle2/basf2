@@ -264,22 +264,27 @@ def check_error_free(tool, toolname, package, filter=lambda x: False, toolopts=N
     if "BELLE2_LOCAL_DIR" not in os.environ:
         skip_test("No local release is setup")
 
+    args = [tool]
+    if toolopts:
+        args += toolopts
+    if package is not None:
+        args += [package]
+
     with local_software_directory():
         try:
-            output = subprocess.check_output(
-                [tool] + toolopts + [package] if toolopts else [tool, package],
-                encoding="utf8")
+            output = subprocess.check_output(args, encoding="utf8")
         except subprocess.CalledProcessError as error:
             print(error)
             output = error.output
 
     clean_log = [e for e in output.splitlines() if e and not filter(e)]
     if len(clean_log) > 0:
+        subject = f"{package} package" if package is not None else "repository"
         print(f"""\
-The {package} package has some {toolname} issues, which is now not allowed.
+The {subject} has some {toolname} issues, which is now not allowed.
 Please run:
 
-  $ {tool} {package}
+  $ {" ".join(args)}
 
 and fix any issues you have introduced. Here is what {toolname} found:\n""")
         print("\n".join(clean_log))
@@ -348,6 +353,6 @@ def skip_test_if_light(py_case=None):
             native unittest then pass the TestCase instance
     """
     try:
-        import generators
+        import generators  # noqa
     except ModuleNotFoundError:
         skip_test(reason="We're in a light build.", py_case=py_case)

@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
 #include <hlt/softwaretrigger/core/SoftwareTriggerCut.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <hlt/softwaretrigger/core/utilities.h>
@@ -27,7 +28,7 @@ namespace Belle2 {
     }
 
     std::pair<SoftwareTriggerCutResult, SoftwareTriggerCutResult> SoftwareTriggerCut::check(const
-        SoftwareTriggerVariableManager::Object& prefilledObject) const
+        SoftwareTriggerVariableManager::Object& prefilledObject, uint32_t* counter) const
     {
       if (not m_cut) {
         B2FATAL("Software Trigger is not initialized!");
@@ -46,7 +47,7 @@ namespace Belle2 {
         // First check if the cut gives a positive result. If not, we can definitely return "noResult".
         if (cutCondition) {
           // if yes, we have to use the prescale factor to see, if the result is really yes.
-          if (makePreScale(getPreScaleFactor())) {
+          if (makePreScale(getPreScaleFactor(), counter)) {
             return {SoftwareTriggerCutResult::c_accept, SoftwareTriggerCutResult::c_accept};
           } else {
             // This is the only case were prescaled and non-prescaled results are different.

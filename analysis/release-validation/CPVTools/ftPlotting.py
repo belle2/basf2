@@ -5,9 +5,19 @@
 
 # Thomas Keck 2015
 
+import basf2_mva_util
+from basf2 import B2INFO, B2WARNING
+import basf2_mva_evaluation.histogram as histogram
+import matplotlib.ticker
+import matplotlib.patches
+import matplotlib.colors
+import matplotlib.gridspec
+import matplotlib.figure
+import matplotlib.artist
+import matplotlib.pyplot as plt
 import copy
 import math
-
+import pandas
 import numpy
 import numpy as np
 import matplotlib
@@ -17,19 +27,6 @@ matplotlib.use("svg")
 matplotlib.rcParams.update({'font.size': 40})
 matplotlib.rcParams['text.usetex'] = True
 matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
-import matplotlib.pyplot as plt
-import matplotlib.artist
-import matplotlib.figure
-import matplotlib.gridspec
-import matplotlib.colors
-import matplotlib.patches
-import matplotlib.ticker
-
-import basf2_mva_evaluation.histogram as histogram
-
-from basf2 import B2INFO, B2WARNING
-
-import basf2_mva_util
 
 
 class Plotter(object):
@@ -685,7 +682,7 @@ class Box(Plotter):
             mask = numpy.ones(len(data)).astype('bool')
         x = data[column][mask]
         if weight_column is not None:
-            weight = data[weight_column][mask]
+            # weight = data[weight_column][mask]
             B2WARNING("Weights are currently not used in boxplot, due to limitations in matplotlib")
 
         if len(x) == 0:
@@ -1431,7 +1428,7 @@ class CorrelationMatrix(Plotter):
         cRdBu = plt.get_cmap('RdBu')
         new_RdBu = truncate_colormap(cRdBu, 0.15, 0.85)
         signal_heatmap = self.signal_axis.pcolor(mirrored_signal_corr, cmap=new_RdBu, vmin=-100.0, vmax=100.0)
-        bckgrd_heatmap = self.bckgrd_axis.pcolor(mirrored_bckgrd_corr, cmap=new_RdBu, vmin=-100.0, vmax=100.0)
+        # bckgrd_heatmap = self.bckgrd_axis.pcolor(mirrored_bckgrd_corr, cmap=new_RdBu, vmin=-100.0, vmax=100.0)
 
         # cvir = plt.get_cmap('viridis_r')
         # new_cvir = truncate_colormap(cvir, 0, 0.75)

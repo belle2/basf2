@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BBBREM_H
-#define BBBREM_H
+#pragma once
 
 #include <mdst/dataobjects/MCParticleGraph.h>
 
@@ -196,4 +195,3 @@ namespace Belle2 {
 }
 
 
-#endif /* BBBREM_H */

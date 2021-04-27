@@ -172,7 +172,8 @@ namespace Belle2 {
        * @param p1 first Lorentz vector
        * @param p2 second Lorentz vector
        * @param e (7x7) error matrix
-       * @param is_fix_mass true to recalculate energy term from other parameters, false to do nothing
+       * @param is_fix_mass1 true to recalculate energy term from other parameters, false to do nothing
+       * @param is_fix_mass2 true to recalculate energy term from other parameters, false to do nothing
        * @return (7x7) error matrix
        */
       const CLHEP::HepMatrix    makeError3(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzVector& p2,

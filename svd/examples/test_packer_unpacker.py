@@ -1,33 +1,32 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
+
+from simulation import add_simulation
 
 numEvents = 10
 nodeid = 0
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('evtNumList', [numEvents])
 
-evtgeninput = register_module('EvtGenInput')
+evtgeninput = b2.register_module('EvtGenInput')
 
-from simulation import add_simulation
-from reconstruction import add_reconstruction
+rootoutput = b2.register_module('RootOutput')
 
-rootoutput = register_module('RootOutput')
-
-Packer = register_module('SVDPacker')
+Packer = b2.register_module('SVDPacker')
 Packer.param('NodeID', nodeid)
 Packer.param('svdShaperDigitListName', 'SVDShaperDigits')
 Packer.param('rawSVDListName', 'SVDRaw')
 
-unPacker = register_module('SVDUnpacker')
+unPacker = b2.register_module('SVDUnpacker')
 unPacker.param('rawSVDListName', 'SVDRaw')
 unPacker.param('svdShaperDigitListName', 'newSVDShaperDigits')
 
 
-main = create_path()
+main = b2.create_path()
 
 main.add_module(eventinfosetter)
 main.add_module(evtgeninput)
@@ -37,4 +36,4 @@ add_simulation(main)
 main.add_module(Packer)
 main.add_module(unPacker)
 
-process(main)
+b2.process(main)

@@ -2,7 +2,7 @@
 
 """ECL timing calibration that performs the crate calibrations, one for each physics run."""
 
-from prompt import CalibrationSettings
+from prompt import CalibrationSettings, input_data_filters
 from reconstruction import prepare_cdst_analysis
 
 ##############################
@@ -14,13 +14,19 @@ from reconstruction import prepare_cdst_analysis
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
 #: Tells the automated system some details of this script.
-#     Default is to read in "hlt_bhabha" since we want to
-#     run over cdst hlt_bhabha skim files.
+#     Default is to read bhabha skim files.
 settings = CalibrationSettings(name="ECL crate time calibrations",
                                expert_username="ehill",
                                description=__doc__,
                                input_data_formats=["cdst"],
-                               input_data_names=["hlt_bhabha"],
+                               input_data_names=["bhabha_all_calib"],
+                               input_data_filters={"bhabha_all_calib": [input_data_filters["Data Tag"]["bhabha_all_calib"],
+                                                                        input_data_filters["Beam Energy"]["4S"],
+                                                                        input_data_filters["Beam Energy"]["Continuum"],
+                                                                        input_data_filters["Beam Energy"]["Scan"],
+                                                                        input_data_filters["Data Quality Tag"]["Good"],
+                                                                        input_data_filters["Run Type"]["physics"],
+                                                                        input_data_filters["Magnet"]["On"]]},
                                depends_on=[])
 
 ##############################
@@ -59,7 +65,7 @@ def get_calibrations(input_data, **kwargs):
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
     # The input data should be the hlt bhabha skim
-    file_to_iov_physics = input_data["hlt_bhabha"]
+    file_to_iov_physics = input_data["bhabha_all_calib"]
 
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!
@@ -78,9 +84,7 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     import basf2
     from basf2 import register_module, create_path
-    import ROOT
     from ROOT import Belle2
-    from ROOT.Belle2 import TestCalibrationAlgorithm
     from caf.framework import Collection
 
     ###################################################

@@ -72,7 +72,11 @@ namespace Belle2 {
        * The energy deposit is modelled at a Gaussian whose
        * parameters are given as inputs.
        *
-       * @param TO BE COMPLETED
+       * @param _energy TO BE COMPLETED
+       * @param _timeAvg TO BE COMPLETED
+       * @param _timeRMS TO BE COMPLETED
+       * @param iChannel TO BE COMPLETED
+       * @param _save TO BE COMPLETED
        */
       Signal genTimeSignal(double _energy, double _timeAvg, double _timeRMS, int iChannel, bool _save = 0);
 
@@ -81,7 +85,13 @@ namespace Belle2 {
        * each are recorded at specific times so the energies and times
        * vectors are given as inputs.
        *
-       * @param TO BE COMPLETED
+       * @param _output TO BE COMPLETED
+       * @param _energies TO BE COMPLETED
+       * @param _times TO BE COMPLETED
+       * @param _iChannel TO BE COMPLETED
+       * @param _dt TO BE COMPLETED
+       * @param _nsam TO BE COMPLETED
+       * @param _save TO BE COMPLETED
        */
       double genTimeSignal(Signal* _output, Signal _energies, Signal _times,  int _iChannel, int _dt, int _nsam, bool _save = 0);
 

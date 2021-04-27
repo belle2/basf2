@@ -27,7 +27,7 @@ namespace Belle2 {
                   unsigned long patternMask,
                   unsigned short tmax,
                   bool calcT0,
-                  std::string etoption);
+                  const std::string& etoption);
 
     /** destructor, empty because we don't allocate memory anywhere. */
     ~CDCTriggerMLP() { }

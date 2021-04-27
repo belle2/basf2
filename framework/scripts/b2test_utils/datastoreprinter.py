@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from ROOT import Belle2, kIsPublic, kIsStatic, TVector3, TLorentzVector
-from basf2 import Module
+from basf2 import Module, B2FATAL
 
 
 def get_public_members(classname):
@@ -91,7 +91,7 @@ class DataStorePrinter(object):
         # remain in same relative order
         self.object_members.sort(key=lambda x: x[0])
 
-    def add_member(self, name, arguments=[], print_callback=None, display=None):
+    def add_member(self, name, arguments=None, print_callback=None, display=None):
         """
         Add an additional member to be printed.
 
@@ -118,6 +118,8 @@ class DataStorePrinter(object):
                 the default output will be ``{membername}({arguments}):``
                 followed by the result.
         """
+        if arguments is None:
+            arguments = []
         self.object_members.append((name, arguments, print_callback, display))
         # return self for method chaining
         return self
@@ -293,5 +295,8 @@ class PrintObjectsModule(Module):
 
     def event(self):
         """print the contents of the mdst mdst_dataobjects"""
-        for printer in self.objects_to_print:
-            printer.print()
+        try:
+            for printer in self.objects_to_print:
+                printer.print()
+        except Exception as e:
+            B2FATAL("Error in datastore printer: ", e)

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PRINTTAUTAUMCPARTICLESMODULE_H
-#define PRINTTAUTAUMCPARTICLESMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -61,4 +60,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif // PRINTTAUTAUMCPARTICLESMODULE_H

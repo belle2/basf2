@@ -23,7 +23,8 @@
 namespace Belle2 {
 
   Part_cont::Part_cont(int icodex, double pmassx, double pchargx,
-                       int ndecx, double pwidthx)
+                       int ndecx, double pwidthx) :
+    pmassp(0.)
   {
     icode = icodex ;
     pmass = pmassx ;
@@ -32,7 +33,10 @@ namespace Belle2 {
     pwidth = pwidthx ;
   }
 
-  Part_cont::Part_cont(int icodex, double pmassx, double pchargx)
+  Part_cont::Part_cont(int icodex, double pmassx, double pchargx) :
+    ndec(0),
+    pwidth(0.),
+    pmassp(0.)
   {
     icode = icodex ;
     pmass = pmassx ;

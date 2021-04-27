@@ -12,7 +12,7 @@ namespace Belle2 {
   public:
     /** default constructor, initializing everything to 0. */
     CDCTriggerTrack(): Helix(), m_chi2D(0.), m_chi3D(0.), m_time(0), m_quadrant(-1), m_foundoldtrack(6, false), m_driftthreshold(9,
-          false), m_valstereobit(false) , m_expert(-1), m_tsvector(9, false) { }
+          false), m_valstereobit(false) , m_expert(-1), m_tsvector(9, false), m_qualityvector(0) { }
 
     /** 2D constructor, initializing 3D values to 0.
      *  @param phi0      The angle between the transverse momentum and the x axis and in [-pi, pi].
@@ -22,21 +22,37 @@ namespace Belle2 {
      *  @param quadrant  iTracker of the unpacked quadrant.
      *
      */
-    CDCTriggerTrack(double phi0, double omega, double chi2, std::vector<bool> foundoldtrack, std::vector<bool> driftthreshold,
-                    bool valstereobit, int expert = -1, short time = 0, short quadrant = -1):
-      Helix(0., phi0, omega, 0., 0.), m_chi2D(chi2), m_chi3D(0.), m_time(time), m_quadrant(quadrant), m_foundoldtrack(foundoldtrack),
-      m_driftthreshold(driftthreshold), m_valstereobit(valstereobit), m_expert(expert), m_tsvector(9, false) { }
-
-    CDCTriggerTrack(double phi0, double omega, double chi2D, double z0, double cotTheta, double chi3D, std::vector<bool> foundoldtrack,
-                    std::vector<bool> driftthreshold,
-                    bool valstereobit, int expert, std::vector<bool> tsvector, short time = 0, short quadrant = -1):
-      Helix(0., phi0, omega, z0, cotTheta), m_chi2D(chi2D), m_chi3D(chi3D), m_time(time), m_quadrant(quadrant),
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
+    CDCTriggerTrack(double phi0, double omega, double chi2,
+                    const std::vector<bool>& foundoldtrack,
+                    const std::vector<bool>& driftthreshold,
+                    bool valstereobit = false,
+                    int expert = -1,
+                    short time = 0,
+                    short quadrant = -1):
+      Helix(0., phi0, omega, 0., 0.), m_chi2D(chi2), m_chi3D(0.),
+      m_time(time),
+      m_quadrant(quadrant),
       m_foundoldtrack(foundoldtrack),
-      m_driftthreshold(driftthreshold), m_valstereobit(valstereobit), m_expert(expert), m_tsvector(tsvector) { }
+      m_driftthreshold(driftthreshold),
+      m_valstereobit(valstereobit),
+      m_expert(expert),
+      m_tsvector(9, false),
+      m_qualityvector(0) { }
 
-    CDCTriggerTrack(double phi0, double omega, double chi2, short time = 0, short quadrant = -1):
-      Helix(0., phi0, omega, 0., 0.), m_chi2D(chi2), m_chi3D(0.), m_time(time), m_quadrant(quadrant), m_foundoldtrack(6, false),
-      m_driftthreshold(9, false), m_valstereobit(false), m_expert(-1), m_tsvector(9, false) { }
+    CDCTriggerTrack(double phi0, double omega, double chi2,
+                    short time = 0,
+                    short quadrant = -1):
+      Helix(0., phi0, omega, 0., 0.), m_chi2D(chi2), m_chi3D(0.),
+      m_time(time),
+      m_quadrant(quadrant),
+      m_foundoldtrack(6, false),
+      m_driftthreshold(9, false),
+      m_valstereobit(false),
+      m_expert(-1),
+      m_tsvector(9, false),
+      m_qualityvector(0) { }
 
     /** 3D constructor
      *  @param phi0      The angle between the transverse momentum and the x axis and in [-pi, pi].
@@ -49,10 +65,21 @@ namespace Belle2 {
      *  @param quadrant  iTracker of the unpacked quadrant.
      */
     CDCTriggerTrack(double phi0, double omega, double chi2D,
-                    double z0, double cotTheta, double chi3D, short time = 0, short quadrant = -1):
-      Helix(0., phi0, omega, z0, cotTheta), m_chi2D(chi2D), m_chi3D(chi3D), m_time(time), m_quadrant(quadrant), m_foundoldtrack(6, false),
-      m_driftthreshold(9, false), m_valstereobit(false), m_expert(-1), m_tsvector(9, false) { }
-
+                    double z0, double cotTheta, double chi3D,
+                    const std::vector<bool>& foundoldtrack = std::vector<bool>(6, false),
+                    const std::vector<bool>& driftthreshold = std::vector<bool>(9, false),
+                    bool valstereobit = false,
+                    int expert = -1,
+                    const std::vector<bool>& tsvector = std::vector<bool>(9, false),
+                    short time = 0, short quadrant = -1,
+                    unsigned qualityvector = 0):
+      Helix(0., phi0, omega, z0, cotTheta), m_chi2D(chi2D), m_chi3D(chi3D), m_time(time), m_quadrant(quadrant),
+      m_foundoldtrack(foundoldtrack),
+      m_driftthreshold(driftthreshold),
+      m_valstereobit(valstereobit),
+      m_expert(expert),
+      m_tsvector(tsvector),
+      m_qualityvector(qualityvector) { }
     /** destructor, empty because we don't allocate memory anywhere. */
     ~CDCTriggerTrack() { }
 
@@ -91,6 +118,15 @@ namespace Belle2 {
     /** return the vector of used Track Segments.
      *  The First bit is the innermost TS, the last bit the outermost. */
     std::vector<bool> getTSVector() const {return m_tsvector;}
+    /** setter and getter for the quality vector. For the setter, the given
+     * uint is xored with the current qualityvector, thus all bits with
+     * a 1 are changed.
+     */
+    void setQualityVector(const unsigned newbits)
+    {
+      m_qualityvector = m_qualityvector ^ newbits;
+    }
+    unsigned getQualityVector() const {return m_qualityvector;}
 
   protected:
     /** chi2 value from 2D fitter */
@@ -112,8 +148,12 @@ namespace Belle2 {
     /** store which track segments were used.
      *  The First bit is the innermost TS, the last bit the outermost. */
     std::vector<bool> m_tsvector;
+    /** store bits for different quality flags.
+     * 2^0 : 0 if all axial ts are contained in the related 2dfindertrack; 1 otherwise.
+     */
+    unsigned m_qualityvector;
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerTrack, 8);
+    ClassDef(CDCTriggerTrack, 9);
   };
 }
 #endif

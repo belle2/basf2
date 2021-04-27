@@ -6,7 +6,6 @@ import numpy as np
 from scipy.interpolate import UnivariateSpline
 
 import basf2
-import ROOT
 from ROOT.Belle2 import FileSystem
 from ROOT.Belle2 import CDCDatabaseImporter
 from ROOT import TH1F, TFile
@@ -28,10 +27,10 @@ def getEff(var, cut, n=40, limits=(0., 2500.)):
     x = 0.5*(a[1][1:]+a[1][:-1])
     return x, eff, effErr
 
+
 #
 # Specify file name here:
 #
-
 #: Input root file, produced by AsicBackgroundLibraryCreator
 InputFile = "cosmic.0008.03420_03427.root"
 

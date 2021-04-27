@@ -4,9 +4,7 @@
 
 # William Sutcliffe 2019
 
-# To properly read the Belle database the user name is set to g0db
 import os
-os.environ['PGUSER'] = 'g0db'
 
 import basf2 as b2
 import modularAnalysis as ma
@@ -15,12 +13,14 @@ import b2biiConversion
 
 import fei
 
+# To properly read the Belle database the user name is set to g0db
+os.environ['PGUSER'] = 'g0db'
 # Get FEI default channels for Belle conversion
 # Utilise the arguments to toggle on and off certain channels
-particles = fei.get_default_channels(convertedFromBelle=True)
+particles = fei.get_default_channels()
 
 # Set up FEI configuration specifying the FEI prefix
-configuration = fei.config.FeiConfiguration(prefix='FEI_TEST', b2bii=True, training=True)
+configuration = fei.config.FeiConfiguration(prefix='FEI_TEST', training=True)
 
 # Get FEI path
 feistate = fei.get_path(particles, configuration)
@@ -37,6 +37,7 @@ if feistate.stage <= 0:
             False),
         applySkim=True,
         enableNisKsFinder=False,
+        enableLocalDB=False,
         path=path)
 else:
     ma.inputMdstList('Belle', [], path)

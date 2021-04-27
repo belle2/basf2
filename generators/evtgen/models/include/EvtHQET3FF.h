@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EvtHQET3FF_HH
-#define EvtHQET3FF_HH
+#pragma once
 
 #include "EvtGenBase/EvtSemiLeptonicFF.hh"
 
@@ -77,7 +76,6 @@ private:
 
 };
 
-#endif
 
 
 

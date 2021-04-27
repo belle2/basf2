@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BHWIDE_H
-#define BHWIDE_H
+#pragma once
 
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <TLorentzRotation.h>
@@ -259,4 +258,3 @@ namespace Belle2 {
 }
 
 
-#endif /* BHWIDE_H */

@@ -42,6 +42,8 @@ namespace Belle2 {
       c_B2LinkPacketCRCError = 0x1, /**< Belle2link CRC error  is detected in the event */
       c_B2LinkEventCRCError = 0x2, /**< HSLB_COPPER CRC error  is detected in the event */
       c_HLTCrash = 0x4, /**< The HLT reconstruction crashed in this event or the event before. */
+      c_ReconstructionAbort = 0x8,  /**< The event was not reconstructed, e.g. because of too high occupancy. */
+      c_HLTDiscard = 0x10,  /**< The HLT discarded the event and only metadata is kept. */
     };
 
     /** Event Setter.

@@ -5,6 +5,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *               Sam Cunliffe  (sam.cunliffe@desy.de)                     *
+ *               Giacomo De Pietro                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -27,9 +28,14 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/utilities/Conversion.h>
 
 // boost
 #include <boost/algorithm/string.hpp>
+
+// C++
+#include <limits>
+#include <stdexcept>
 
 namespace Belle2 {
   namespace {
@@ -64,7 +70,8 @@ namespace Belle2 {
     {
       // get trigger result object
       StoreObjPtr<SoftwareTriggerResult> swtr;
-      if (!swtr) return std::numeric_limits<float>::quiet_NaN();
+      if (!swtr)
+        return std::numeric_limits<double>::quiet_NaN();
 
       // check that the trigger ID provided by the user exists in the SWTR
       SoftwareTriggerCutResult swtcr;
@@ -87,7 +94,8 @@ namespace Belle2 {
     double L1Trigger(const Particle*)
     {
       StoreObjPtr<TRGSummary> trg;
-      if (!trg) return std::numeric_limits<float>::quiet_NaN();
+      if (!trg)
+        return std::numeric_limits<double>::quiet_NaN();
       return trg->test();
     }
 
@@ -97,12 +105,46 @@ namespace Belle2 {
         auto name = arguments[0];
         auto func = [name](const Particle*) -> double {
           StoreObjPtr<TRGSummary> trg;
-          if (!trg) return std::numeric_limits<float>::quiet_NaN();
-          return trg->testPsnm(name);
+          if (!trg)
+            return std::numeric_limits<double>::quiet_NaN();
+          try {
+            return trg->testPsnm(name);
+          } catch (const std::exception&)
+          {
+            // Something went wrong, return NaN.
+            return std::numeric_limits<double>::quiet_NaN();
+          }
         };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for L1PSNM function. The only argument must be the name of the PSNM trigger bit.");
+      }
+    }
+
+    Manager::FunctionPtr L1PSNMBit(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        int testBit;
+        try {
+          testBit = Belle2::convertString<int>(arguments[0]);
+        } catch (const std::invalid_argument&) {
+          B2FATAL("Invalid argument for L1PSNMBit function. The argument must be an integer representing the PSNM trigger bit.");
+        }
+        auto func = [testBit](const Particle*) -> double {
+          StoreObjPtr<TRGSummary> trg;
+          if (!trg)
+            return std::numeric_limits<double>::quiet_NaN();
+          try {
+            return trg->testPsnm(testBit);
+          } catch (const std::exception&)
+          {
+            // Something went wrong, return NaN.
+            return std::numeric_limits<double>::quiet_NaN();
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for L1PSNMBit function. The only argument must be the number of the PSNM trigger bit.");
       }
     }
 
@@ -112,12 +154,46 @@ namespace Belle2 {
         auto name = arguments[0];
         auto func = [name](const Particle*) -> double {
           StoreObjPtr<TRGSummary> trg;
-          if (!trg) return std::numeric_limits<float>::quiet_NaN();
-          return trg->testFtdl(name);
+          if (!trg)
+            return std::numeric_limits<double>::quiet_NaN();
+          try {
+            return trg->testFtdl(name);
+          } catch (const std::exception&)
+          {
+            // Something went wrong, return NaN.
+            return std::numeric_limits<double>::quiet_NaN();
+          }
         };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for L1FTDL function. The only argument must be the name of the FTDL trigger bit.");
+      }
+    }
+
+    Manager::FunctionPtr L1FTDLBit(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        int testBit;
+        try {
+          testBit = Belle2::convertString<int>(arguments[0]);
+        } catch (const std::invalid_argument&) {
+          B2FATAL("Invalid argument for L1FTDLBit function. The argument must be an integer representing the FTDL trigger bit.");
+        }
+        auto func = [testBit](const Particle*) -> double {
+          StoreObjPtr<TRGSummary> trg;
+          if (!trg)
+            return std::numeric_limits<double>::quiet_NaN();
+          try {
+            return trg->testFtdl(testBit);
+          } catch (const std::exception&)
+          {
+            // Something went wrong, return NaN.
+            return std::numeric_limits<double>::quiet_NaN();
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for L1FTDLBit function. The only argument must be the number of the FTDL trigger bit.");
       }
     }
 
@@ -127,8 +203,15 @@ namespace Belle2 {
         auto name = arguments[0];
         auto func = [name](const Particle*) -> double {
           StoreObjPtr<TRGSummary> trg;
-          if (!trg) return std::numeric_limits<float>::quiet_NaN();
-          return trg->testInput(name);
+          if (!trg)
+            return std::numeric_limits<double>::quiet_NaN();
+          try {
+            return trg->testInput(name);
+          } catch (const std::exception&)
+          {
+            // Something went wrong, return NaN.
+            return std::numeric_limits<double>::quiet_NaN();
+          }
         };
         return func;
       } else {
@@ -136,20 +219,50 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr L1Prescale(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr L1InputBit(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        int testBit;
+        try {
+          testBit = Belle2::convertString<int>(arguments[0]);
+        } catch (const std::invalid_argument&) {
+          B2FATAL("Invalid argument for L1InputBit function. The argument must be an integer representing the input trigger bit.");
+        }
+        auto func = [testBit](const Particle*) -> double {
+          StoreObjPtr<TRGSummary> trg;
+          if (!trg)
+            return std::numeric_limits<double>::quiet_NaN();
+          try {
+            return trg->testInput(testBit);
+          } catch (const std::exception&)
+          {
+            // Something went wrong, return NaN.
+            return std::numeric_limits<double>::quiet_NaN();
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for L1Input function. The only argument must be the number of the input trigger bit.");
+      }
+    }
+
+    Manager::FunctionPtr L1PSNMPrescale(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
         auto name = arguments[0];
         auto func = [name](const Particle*) -> double {
           static DBObjPtr<TRGGDLDBFTDLBits> ftdlBits;
+          if (!ftdlBits.isValid())
+            return std::numeric_limits<double>::quiet_NaN();
           static DBObjPtr<TRGGDLDBPrescales> prescales;
+          if (!prescales.isValid())
+            return std::numeric_limits<double>::quiet_NaN();
           for (unsigned int bit = 0; bit < TRGSummary::c_trgWordSize * TRGSummary::c_ntrgWords; bit++)
           {
-            if (std::string(ftdlBits->getoutbitname((int)bit)) == name) {
+            if (std::string(ftdlBits->getoutbitname((int)bit)) == name)
               return prescales->getprescales(bit);
-            }
           }
-          return std::numeric_limits<float>::quiet_NaN();
+          return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
       } else {
@@ -157,110 +270,51 @@ namespace Belle2 {
       }
     }
 
-    double L1PSNMBit(const Particle*, const std::vector<double>& bit)
+    Manager::FunctionPtr L1PSNMBitPrescale(const std::vector<std::string>& arguments)
     {
-      double isL1Trigger = 0.0;
-
-      if (bit.size() != 1) return isL1Trigger;
-
-      // The number of trigger words is hardcoded in the mdst dataobject and no getter for the full array exists
-      const unsigned int trgWordSize = 32;
-      const unsigned int ntrgWords = 10;
-      if (bit[0] >= trgWordSize * ntrgWords or bit[0] < 0)  return isL1Trigger;
-
-      // Get the trigger word that contains this bit (we could also convert the full array into a bitset or vector<bool> but that is a bit slower)
-      const unsigned int ntrgWord = (int) bit[0] / trgWordSize;
-
-      // Get the bit by right shifting the desired bit into the least significant position and masking it with 1.
-      StoreObjPtr<TRGSummary> trg;
-      if (!trg) return std::numeric_limits<float>::quiet_NaN();
-      const unsigned int trgWord = trg->getPsnmBits(ntrgWord);
-      const unsigned int bitInWord = ((unsigned int) bit[0] - ntrgWord * trgWordSize);
-      isL1Trigger = (trgWord >> bitInWord) & 1;
-
-      return isL1Trigger;
+      if (arguments.size() == 1) {
+        int testBit;
+        try {
+          testBit = Belle2::convertString<int>(arguments[0]);
+        } catch (const std::invalid_argument&) {
+          B2FATAL("Invalid argument for L1PSNMBitPrescale function. The argument must be an integer representing the PSNM trigger bit.");
+        }
+        auto func = [testBit](const Particle*) -> double {
+          if (testBit < 0 or testBit >= TRGSummary::c_trgWordSize * TRGSummary::c_ntrgWords)
+            return std::numeric_limits<double>::quiet_NaN();
+          static DBObjPtr<TRGGDLDBPrescales> prescales;
+          if (!prescales.isValid())
+            return std::numeric_limits<double>::quiet_NaN();
+          return prescales->getprescales(testBit);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for L1BitPrescale function. The only argument must be the number of the PSNM trigger bit.");
+      }
     }
 
-    double L1FTDLBit(const Particle*, const std::vector<double>& bit)
-    {
-      double isL1Trigger = 0.0;
-
-      if (bit.size() != 1) return isL1Trigger;
-
-      // The number of trigger words is hardcoded in the mdst dataobject and no getter for the full array exists
-
-      const unsigned int trgWordSize = 32;
-      const unsigned int ntrgWords = 10;
-      if (bit[0] >= trgWordSize * ntrgWords or bit[0] < 0)  return isL1Trigger;
-
-      // Get the trigger word that contains this bit (we could also convert the full array into a bitset or vector<bool> but that is a bit slower)
-
-      const unsigned int ntrgWord = (int) bit[0] / trgWordSize;
-
-      // Get the bit by right shifting the desired bit into the least significant position and masking it with 1.
-
-      StoreObjPtr<TRGSummary> trg;
-      if (!trg) return std::numeric_limits<float>::quiet_NaN();
-      const unsigned int trgWord = trg->getFtdlBits(ntrgWord);
-      const unsigned int bitInWord = ((unsigned int) bit[0] - ntrgWord * trgWordSize);
-      isL1Trigger = (trgWord >> bitInWord) & 1;
-
-      return isL1Trigger;
-    }
-
-
-    double L1InputBit(const Particle*, const std::vector<double>& bit)
-    {
-      double isL1Trigger = 0.0;
-
-      if (bit.size() != 1) return isL1Trigger;
-
-      // The number of trigger words is hardcoded in the mdst dataobject and no getter for the full array exists
-      const unsigned int trgWordSize = 32;
-      const unsigned int ntrgWords = 10;
-      if (bit[0] >= trgWordSize * ntrgWords or bit[0] < 0)  return isL1Trigger;
-
-      // Get the trigger word that contains this bit (we could also convert the full array into a bitset or vector<bool> but that is a bit slower)
-      const unsigned int ntrgWord = (int) bit[0] / trgWordSize;
-
-      // Get the bit by right shifting the desired bit into the least significant position and masking it with 1.
-      StoreObjPtr<TRGSummary> trg;
-      if (!trg) return std::numeric_limits<float>::quiet_NaN();
-      const unsigned int trgWord = trg->getInputBits(ntrgWord);
-      const unsigned int bitInWord = ((unsigned int) bit[0] - ntrgWord * trgWordSize);
-      isL1Trigger = (trgWord >> bitInWord) & 1;
-
-      return isL1Trigger;
-    }
-
-    double L1PSNMBitPrescale(const Particle*, const std::vector<double>& bit)
-    {
-      double prescale = 0.0;
-
-      if (bit.size() != 1) return prescale;
-
-      // The number of trigger words is hardcoded in the mdst dataobject
-      const unsigned int trgWordSize = 32;
-      const unsigned int ntrgWords = 10;
-      if (bit[0] >= trgWordSize * ntrgWords or bit[0] < 0)  return prescale;
-
-
-      // Get the prescale word that contains this bit
-      const unsigned int ntrgWord = (int) bit[0] / trgWordSize;
-      const unsigned int bitInWord = ((unsigned int) bit[0] - ntrgWord * trgWordSize);
-
-      StoreObjPtr<TRGSummary> trg;
-      if (!trg) return std::numeric_limits<float>::quiet_NaN();
-      prescale = trg->getPreScale(ntrgWord, bitInWord);
-
-      return prescale;
-    }
-
-    double getTimType(const Particle*)
+    double L1TimeType(const Particle*)
     {
       StoreObjPtr<TRGSummary> trg;
-      if (!trg) return std::numeric_limits<float>::quiet_NaN();
+      if (!trg)
+        return std::numeric_limits<double>::quiet_NaN();
       return trg->getTimType();
+    }
+
+    double L1TimeQuality(const Particle*)
+    {
+      StoreObjPtr<TRGSummary> trg;
+      if (!trg)
+        return std::numeric_limits<double>::quiet_NaN();
+      return trg->getTimQuality();
+    }
+
+    double isPoissonInInjectionVeto(const Particle*)
+    {
+      StoreObjPtr<TRGSummary> trg;
+      if (!trg)
+        return std::numeric_limits<double>::quiet_NaN();
+      return trg->isPoissonInInjectionVeto();
     }
 
     Manager::FunctionPtr softwareTriggerResult(const std::vector<std::string>& args)
@@ -335,25 +389,29 @@ namespace Belle2 {
     //-------------------------------------------------------------------------
     VARIABLE_GROUP("L1 Trigger");
     REGISTER_VARIABLE("L1Trigger", L1Trigger ,
-                      "Returns 1 if at least one PSNM L1 trigger bit is true.");
+                      "[Eventbased] Returns 1 if at least one PSNM L1 trigger bit is true.");
     REGISTER_VARIABLE("L1PSNM(name)", L1PSNM ,
-                      "Returns the PSNM (Prescale And Mask, after prescale) status of the trigger bit with the given name.");
+                      "[Eventbased] Returns the PSNM (Prescale And Mask, after prescale) status of the trigger bit with the given name.");
     REGISTER_VARIABLE("L1FTDL(name)", L1FTDL ,
-                      "Returns the FTDL (Final Trigger Decision Logic, before prescale) status of the trigger bit with the given name.");
+                      "[Eventbased] Returns the FTDL (Final Trigger Decision Logic, before prescale) status of the trigger bit with the given name.");
     REGISTER_VARIABLE("L1Input(name)", L1Input,
-                      "Returns the input bit status of the trigger bit with the given name.");
-    REGISTER_VARIABLE("L1Prescale(name)", L1Prescale,
-                      "Returns the PSNM (prescale and mask) prescale of the trigger bit with the given name.");
-    REGISTER_VARIABLE("L1PSNMBit(i)", L1PSNMBit ,
-                      "Returns the PSNM (Prescale And Mask, after prescale) status of i-th trigger bit.");
-    REGISTER_VARIABLE("L1FTDLBit(i)", L1FTDLBit ,
-                      "Returns the FTDL (Final Trigger Decision Logic, before prescale) status of i-th trigger bit.");
+                      "[Eventbased] Returns the input bit status of the trigger bit with the given name.");
+    REGISTER_VARIABLE("L1Prescale(name)", L1PSNMPrescale,
+                      "[Eventbased] Returns the PSNM (prescale and mask) prescale of the trigger bit with the given name.");
+    REGISTER_VARIABLE("L1PSNMBit(i)", L1PSNMBit,
+                      "[Eventbased] Returns the PSNM (Prescale And Mask, after prescale) status of i-th trigger bit.");
+    REGISTER_VARIABLE("L1FTDLBit(i)", L1FTDLBit,
+                      "[Eventbased] Returns the FTDL (Final Trigger Decision Logic, before prescale) status of i-th trigger bit.");
     REGISTER_VARIABLE("L1InputBit(i)", L1InputBit,
-                      "Returns the input bit status of the i-th input trigger bit.");
+                      "[Eventbased] Returns the input bit status of the i-th input trigger bit.");
     REGISTER_VARIABLE("L1PSNMBitPrescale(i)", L1PSNMBitPrescale,
-                      "Returns the PSNM (prescale and mask) prescale of i-th trigger bit.");
-    REGISTER_VARIABLE("L1TimType", getTimType ,
-                      "Returns ETimingType time type.");
+                      "[Eventbased] Returns the PSNM (prescale and mask) prescale of i-th trigger bit.");
+    REGISTER_VARIABLE("L1TimeType", L1TimeType,
+                      "[Eventbased] Returns ETimingType time type.");
+    REGISTER_VARIABLE("L1TimeQuality", L1TimeQuality,
+                      "[Eventbased] Returns ETimingQuality time quality.");
+    REGISTER_VARIABLE("isPoissonTriggerInInjectionVeto", isPoissonInInjectionVeto,
+                      "[Eventbased] Returns 1 if the poisson random trigger is within the injection veto window.");
     //-------------------------------------------------------------------------
     VARIABLE_GROUP("Software Trigger");
     REGISTER_VARIABLE("SoftwareTriggerResult(triggerIdentifier)", softwareTriggerResult, R"DOC(

@@ -43,7 +43,7 @@ class PathViewer(viewer.IPythonWidget):
         #: The path to show
         try:
             self.path = path.modules()
-        except:
+        except BaseException:
             self.path = path
 
         #: In the standalone mode, the basic parameters of the modules are shown

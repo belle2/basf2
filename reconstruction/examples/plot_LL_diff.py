@@ -13,10 +13,12 @@
 # Example steering file - 2011 Belle II Collaboration
 #############################################################
 
-from basf2 import *
+import basf2 as b2
 
 from ROOT import Belle2
-from ROOT import TH1F, TH2F, TCanvas
+from ROOT import TCanvas, TH2F
+from simulation import add_simulation
+from reconstruction import add_reconstruction
 
 # the histograms to fill
 hist = [TH2F(
@@ -38,7 +40,7 @@ hist[3].SetTitle('True kaons, TOP')
 # define the python module to extract and plot PID information
 
 
-class MinModule(Module):
+class MinModule(b2.Module):
 
     """
     Get LL differences from PIDLikelihood and fill them into histograms
@@ -63,7 +65,7 @@ class MinModule(Module):
                 mcpart = track.getRelatedTo('MCParticles')
             if not track or not mcpart:
                 # some tracks don't have an mcparticle
-                B2WARNING('problems with track <-> mcparticle relations')
+                b2.B2WARNING('problems with track <-> mcparticle relations')
                 event = Belle2.PyStoreObj('EventMetaData').obj().getEvent()
                 print('event: %d, track: %d' % (event, track.getArrayIndex()))
             else:
@@ -72,7 +74,7 @@ class MinModule(Module):
                 momentum = momentumVec.Mag()
                 if momentum > 3.5:  # cut off
                     continue
-                theta = momentumVec.CosTheta()
+                # theta = momentumVec.CosTheta()
 
                 # particle to compare with pions
                 selectedpart = Belle2.Const.kaon
@@ -111,17 +113,15 @@ class MinModule(Module):
 
 
 # create path
-main = create_path()
+main = b2.create_path()
 
 # define number of events
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [20])
 main.add_module(eventinfosetter)
 main.add_module('EvtGenInput')
 
 # do full simulation and reconstruction
-from simulation import add_simulation
-from reconstruction import add_reconstruction
 add_simulation(main)
 add_reconstruction(main)
 
@@ -129,5 +129,5 @@ add_reconstruction(main)
 main.add_module(MinModule())
 
 # process events and print call statistics
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

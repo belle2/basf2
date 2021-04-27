@@ -13,6 +13,9 @@
 
 #include <TH2I.h>
 #include <TH1I.h>
+#include "trg/ecl/TrgEclMapping.h"
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
 
 namespace Belle2 {
 
@@ -41,7 +44,7 @@ namespace Belle2 {
 
   protected:
     //number of skims
-    static const int nskim_gdldqm = 9;
+    static const int nskim_gdldqm = 11;
     int start_skim_gdldqm = 0;
     int end_skim_gdldqm = 0;
     int m_skim = -1;
@@ -94,6 +97,9 @@ namespace Belle2 {
     TH1I* h_psn_rise[N_BITS_RESERVED][nskim_gdldqm] = {nullptr};
     TH1I* h_psn_fall[N_BITS_RESERVED][nskim_gdldqm] = {nullptr};
     TH1I* h_psn_extra[nskim_gdldqm] = {nullptr};
+    TH1I* h_psn_overlap[nskim_gdldqm] = {nullptr};
+    TH1I* h_psn_nooverlap[nskim_gdldqm] = {nullptr};
+    TH1I* h_psn_pure_extra[nskim_gdldqm] = {nullptr};
     //! timtype
     TH1I* h_timtype[nskim_gdldqm] = {nullptr};
     //! event by event psnm timing distribution
@@ -116,6 +122,8 @@ namespace Belle2 {
     std::string m_postScriptName;
     void fillRiseFallTimings(void);
     void fillOutputExtra(void);
+    void fillOutputOverlap(void);
+    void fillOutputPureExtra(void);
 
     void genVcd(void);
     bool anaBitCondition(void);
@@ -128,8 +136,12 @@ namespace Belle2 {
     //private:
     //StoreArray<TRGGDLUnpackerStore> store;
 
-    static const int n_output_extra = 62;
+    static const int n_output_extra = 94;
     static const char* output_extra[n_output_extra];
+    static const int n_output_overlap = 10;
+    static const char* output_overlap[n_output_overlap];
+    static const int n_output_pure_extra = 13;
+    static const char* output_pure_extra[n_output_pure_extra];
 
     //condition database for unpacker
     DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
@@ -167,8 +179,10 @@ namespace Belle2 {
       "software_trigger_cut&skim&accept_mumu_2trk",
       "software_trigger_cut&skim&accept_gamma_gamma",
       "software_trigger_cut&skim&accept_bhabha",
-      "software_trigger_cut&skim&accept_HadronB",
-      "software_trigger_cut&skim&accept_Dimuon"
+      "software_trigger_cut&skim&accept_hadronb",
+      "software_trigger_cut&skim&accept_hadronb1",
+      "software_trigger_cut&skim&accept_hadronb2",
+      "software_trigger_cut&skim&accept_mumutight"
     };
 
     //name of histgrams
@@ -180,9 +194,16 @@ namespace Belle2 {
       "mumu2trk",
       "gammagamma",
       "bhabha",
-      "HadronB",
-      "Dimuon"
+      "hadronb",
+      "hadronb1",
+      "hadronb2",
+      "mumutight"
     };
+
+    //ecltrg<->ecl mappint
+    TrgEclMapping* trgeclmap = nullptr;
+    StoreArray<ECLCalDigit> m_ECLCalDigitData;
+    StoreArray<ECLDigit>    m_ECLDigitData;
 
   };
 

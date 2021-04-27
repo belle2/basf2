@@ -11,13 +11,13 @@
 # validation. This script is NOT AN OFFICIAL DATA PRODUCTION script. Always
 # always refer to the B2P project for the latest official scripts.
 
-DECAY_MODE_ID = 1110021010
-OUTPUT_FILENAME = "../%i.dst.root" % DECAY_MODE_ID
-
 import basf2
 from generators import add_evtgen_generator
 from simulation import add_simulation
 from reconstruction import add_reconstruction, add_mdst_output
+
+DECAY_MODE_ID = 1110021010
+OUTPUT_FILENAME = "../%i.dst.root" % DECAY_MODE_ID
 
 basf2.set_random_seed(12345)  # for reproducibility
 main = basf2.Path()

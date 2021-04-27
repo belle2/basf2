@@ -17,6 +17,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <unordered_set>
@@ -190,17 +191,19 @@ namespace {
         continue;
       }
 
-      if (static_cast<unsigned int>(daug->getExtraInfo(MCMatching::c_extraInfoMCErrors)) & MCMatching::c_DecayInFlight) {
-        //now daug does not have any daughters.
-        //particle at the bottom of reconstructed decay tree, reconstructed from an MCParticle that is actually slightly deeper than we want,
-        //so we'll also add all mother MCParticles until the first primary mother
-        mcParticle = mcParticle->getMother();
-        while (mcParticle) {
-          mcMatchedParticles.insert(mcParticle);
-          if (mcParticle->hasStatus(MCParticle::c_PrimaryParticle))
-            break;
-
+      if (daug->hasExtraInfo(MCMatching::c_extraInfoMCErrors)) {
+        if (static_cast<unsigned int>(daug->getExtraInfo(MCMatching::c_extraInfoMCErrors)) & MCMatching::c_DecayInFlight) {
+          //now daug does not have any daughters.
+          //particle at the bottom of reconstructed decay tree, reconstructed from an MCParticle that is actually slightly deeper than we want,
+          //so we'll also add all mother MCParticles until the first primary mother
           mcParticle = mcParticle->getMother();
+          while (mcParticle) {
+            mcMatchedParticles.insert(mcParticle);
+            if (mcParticle->hasStatus(MCParticle::c_PrimaryParticle))
+              break;
+
+            mcParticle = mcParticle->getMother();
+          }
         }
       }
 
@@ -219,24 +222,72 @@ namespace {
       appendParticles(daug, children);
     }
   }
+
+  // Check if mcDaug is accepted to be missed by the property of part.
+  bool isDaughterAccepted(const MCParticle* mcDaug, const Particle* part)
+  {
+    const int property = part->getProperty();
+
+    const int absPDG = abs(mcDaug->getPDG());
+
+    // if mcDaug is not FSP, check c_IsIgnoreIntermediate property
+    if (!MCMatching::isFSP(absPDG)) {
+      if (property & Particle::PropertyFlags::c_IsIgnoreIntermediate)
+        return true;
+    } else if (absPDG == Const::photon.getPDGCode()) { // gamma
+      if (MCMatching::isFSR(mcDaug) or mcDaug->hasStatus(MCParticle::c_IsPHOTOSPhoton)
+          or (AnalysisConfiguration::instance()->useLegacyMCMatching() and MCMatching::isFSRLegacy(mcDaug))) {
+        if (property & Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons)
+          return true;
+      } else {
+        if (property & Particle::PropertyFlags::c_IsIgnoreGamma)
+          return true;
+      }
+    } else if (absPDG == 12 or absPDG == 14 or absPDG == 16) { // neutrino
+      if (property & Particle::PropertyFlags::c_IsIgnoreNeutrino)
+        return true;
+    } else { // otherwise, massive FSP
+      if (property & Particle::PropertyFlags::c_IsIgnoreMassive)
+        return true;
+    }
+
+    return false;
+  }
+
+  /** Recursively gather all daughters which are accepted to be missed. */
+  void appendAcceptedMissingDaughters(const Particle* p, unordered_set<const MCParticle*>& acceptedParticles)
+  {
+    const MCParticle* mcParticle = p->getRelatedTo<MCParticle>();
+    if (mcParticle) {
+      vector<const MCParticle*> genDaughters;
+      appendParticles(mcParticle, genDaughters);
+
+      for (auto mcDaug : genDaughters) {
+        if (isDaughterAccepted(mcDaug, p))
+          acceptedParticles.insert(mcDaug);
+        else
+          acceptedParticles.erase(mcDaug);
+      }
+    }
+
+    for (unsigned i = 0; i < p->getNDaughters(); ++i) {
+      const Particle* daug = p->getDaughter(i);
+      appendAcceptedMissingDaughters(daug, acceptedParticles);
+    }
+
+  }
+
+
 }
 
-int MCMatching::getMCErrors(const Particle* particle, const MCParticle* mcParticle, const bool honorProperty)
+int MCMatching::getMCErrors(const Particle* particle, const MCParticle* mcParticle)
 {
   if (particle->hasExtraInfo(c_extraInfoMCErrors)) {
-    if (honorProperty) {
-      return (int(particle->getExtraInfo(c_extraInfoMCErrors)) & ~(getFlagsIgnoredByProperty(particle)));
-    } else {
-      return particle->getExtraInfo(c_extraInfoMCErrors);
-    }
+    return particle->getExtraInfo(c_extraInfoMCErrors);
   } else {
     if (!mcParticle)
       mcParticle = particle->getRelatedTo<MCParticle>();
-    if (honorProperty) {
-      return (int(setMCErrorsExtraInfo(const_cast<Particle*>(particle), mcParticle)) & ~(getFlagsIgnoredByProperty(particle)));
-    } else {
-      return setMCErrorsExtraInfo(const_cast<Particle*>(particle), mcParticle);
-    }
+    return setMCErrorsExtraInfo(const_cast<Particle*>(particle), mcParticle);
   }
 }
 
@@ -271,7 +322,9 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
         B2WARNING("Special treatment in MCMatching for tau is called for a non-tau particle. Check if you discovered another special case here, or if we have a bug! "
                   << mother->getPDG() << " " << particle->getPDGCode() << " " << mcParticle->getPDG());
       }
-      status |= MCErrorFlags::c_MissingResonance;
+      // if particle has c_IsIgnoreIntermediate flag, c_MissingResonance will not be added.
+      if (not(particle->getProperty() & Particle::PropertyFlags::c_IsIgnoreIntermediate))
+        status |= MCErrorFlags::c_MissingResonance;
     } else if (!(particle->getProperty() & Particle::PropertyFlags::c_IsUnspecified)) {
       // Check if the particle is unspecified. If so the flag of c_AddedWrongParticle will be ignored.
       status |= MCErrorFlags::c_AddedWrongParticle;
@@ -451,14 +504,21 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
 {
   int flags = 0;
 
-  unordered_set<const MCParticle*> mcMatchedParticles;
-  appendParticles(particle, mcMatchedParticles);
   vector<const MCParticle*> genParts;
   appendParticles(mcParticle, genParts);
 
+  unordered_set<const MCParticle*> mcMatchedParticles;
+  appendParticles(particle, mcMatchedParticles);
+  unordered_set<const MCParticle*> acceptedParticles;
+  appendAcceptedMissingDaughters(particle, acceptedParticles);
+  for (auto part : acceptedParticles) {
+    mcMatchedParticles.insert(part);
+  }
+
+
   for (const MCParticle* genPart : genParts) {
 
-    // if genPart exists in mcMatchedParticles, continue
+    // if genPart exists in mcMatchedParticles, continue.
     if (mcMatchedParticles.find(genPart) != mcMatchedParticles.end())
       continue;
 
@@ -468,7 +528,7 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
 
     if (!isFSP(generatedPDG)) {
       flags |= c_MissingResonance;
-    } else if (generatedPDG == 22) { //missing photon
+    } else if (generatedPDG == Const::photon.getPDGCode()) { //missing photon
       if (AnalysisConfiguration::instance()->useLegacyMCMatching()) {
         if (flags & (c_MissFSR | c_MissGamma)) {
           // if flags already have c_MissFSR or c_MissGamm, do nothing.
@@ -492,7 +552,7 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
       flags |= c_MissNeutrino;
     } else { //neither photon nor neutrino -> massive
       flags |= c_MissMassiveParticle;
-      if (absGeneratedPDG == 130)
+      if (absGeneratedPDG == Const::Klong.getPDGCode())
         flags |= c_MissKlong;
     }
   }
@@ -502,6 +562,8 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
 int MCMatching::countMissingParticle(const Particle* particle, const MCParticle* mcParticle, const vector<int>& daughterPDG)
 {
   unordered_set<const MCParticle*> mcMatchedParticles;
+  // Missing particles which are accepted by the property flags are NOT stored.
+  // --> Such particles are also counted in nMissingDaughter.
   appendParticles(particle, mcMatchedParticles);
   vector<const MCParticle*> genParts;
   appendParticles(mcParticle, genParts);
@@ -528,17 +590,6 @@ int MCMatching::getFlagsIgnoredByProperty(const Particle* part)
 {
   int flags = 0;
 
-  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons) {
-    flags |= (MCMatching::c_MissFSR);
-    flags |= (MCMatching::c_MissPHOTOS);
-  }
-  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreIntermediate) flags |= (MCMatching::c_MissingResonance);
-  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreMassive) {
-    flags |= (MCMatching::c_MissMassiveParticle);
-    flags |= (MCMatching::c_MissKlong);
-  }
-  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreNeutrino) flags |= (MCMatching::c_MissNeutrino);
-  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreGamma) flags |= (MCMatching::c_MissGamma);
   if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreBrems) flags |= (MCMatching::c_AddedRecoBremsPhoton);
 
   return flags;

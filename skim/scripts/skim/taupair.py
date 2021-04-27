@@ -7,13 +7,16 @@ __authors__ = [
     "Kenji Inami"
 ]
 
-import basf2 as b2
 import modularAnalysis as ma
+from skim.standardlists.lightmesons import (loadStdAllF_0, loadStdAllKstar0,
+                                            loadStdAllPhi, loadStdAllRho0)
 from skimExpertFunctions import BaseSkim, fancy_skim_header
+from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
+from stdPhotons import stdPhotons
 from variables import variables as vm
 
-
 __liaison__ = "Kenji Inami <kenji.inami@desy.de>"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header
@@ -25,33 +28,29 @@ class TauLFV(BaseSkim):
     ``gamma:taulfv, pi0:taulfv, K_S0:taulfv, eta:taulfv, eta':taulfv``,
     ``omega:taulfv``
 
-    **Criteria for 1 prong final states**: Number of good tracks < 5, :math:`1.0 < M < 2.0` GeV, :math:`-1.5 < \Delta E < 0.5` GeV
+    **Criteria for 1 prong final states**: Number of good tracks < 5, :math:`1.0 < M < 2.0` GeV, :math:`-1.5 < \\Delta E < 0.5` GeV
 
-    **Criteria for >1 prong final states** : Number of good tracks < 7, :math:`1.4 < M < 2.0` GeV, :math:`-1.0 < \Delta E < 0.5` GeV
+    **Criteria for >1 prong final states**: Number of good tracks < 7, :math:`1.4 < M < 2.0` GeV, :math:`-1.0 < \\Delta E < 0.5` GeV
     """
     __authors__ = ["Kenji Inami"]
     __description__ = "Skim for Tau LFV decays."
     __contact__ = __liaison__
     __category__ = "physics, tau"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["all"],
-            "stdK": ["all"],
-            "stdMu": ["all"],
-            "stdPi": ["all"],
-            "stdPr": ["all"],
-        },
-        "stdPhotons": {
-            "stdPhotons": ["all"],
-        },
-        "skim.standardlists.lightmesons": {
-            "loadStdAllRho0": [],
-            "loadStdAllKstar0": [],
-            "loadStdAllPhi": [],
-            "loadStdAllF_0": [],
-        },
-    }
+    produce_on_tau_samples = False  # retention is too high on taupair
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdK("all", path=path)
+        stdMu("all", path=path)
+        stdPi("all", path=path)
+        stdPr("all", path=path)
+        stdPhotons("all", path=path)
+        loadStdAllRho0(path=path)
+        loadStdAllKstar0(path=path)
+        loadStdAllPhi(path=path)
+        loadStdAllF_0(path=path)
 
     def build_lists(self, path):
         # particle selection
@@ -194,16 +193,24 @@ class TauLFV(BaseSkim):
         self.SkimLists = tau_lfv_lists
 
     def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
         ma.copyLists('tau+:LFV', self.SkimLists, path=path)
 
+        # add contact information to histogram
+        contact = "kenji@hepl.phys.nagoya-u.ac.jp"
+
         # the variables that are printed out are: M, deltaE
-        ma.variablesToHistogram(
-            filename='TauLFV_Validation.root',
-            decayString='tau+:LFV',
-            variables=[('M', 100, 1.00, 2.00), ('deltaE', 120, -1.6, 0.6)],
-            variables_2d=[('M', 50, 1.00, 2.00, 'deltaE', 60, -1.6, 0.6)],
-            path=path
-        )
+        create_validation_histograms(
+            rootfile=f'{self}_Validation.root',
+            particlelist='tau+:LFV',
+            variables_1d=[
+                ('M', 100, 1.00, 2.00, '', contact, '', ''),
+                ('deltaE', 120, -1.6, 0.6, '', contact, '', '')],
+            variables_2d=[('M', 50, 1.00, 2.00, 'deltaE', 60, -1.6, 0.6, '', contact, '', '')],
+            path=path)
 
 
 @fancy_skim_header
@@ -240,14 +247,12 @@ class TauGeneric(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, tau"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdPi": ["all"],
-        },
-        "stdPhotons": {
-            "stdPhotons": ["all"],
-        },
-    }
+    produce_on_tau_samples = False  # retention is too high on taupair
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        stdPhotons("all", path=path)
 
     def additional_setup(self, path):
         """
@@ -328,29 +333,28 @@ class TauGeneric(BaseSkim):
         self.SkimLists = eventParticle
 
     def validation_histograms(self, path):
-        self.additional_setup(path)
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
 
         vm.addAlias('Theta_miss', 'formula(missingMomentumOfEvent_theta*180/3.14159)')
 
-        # contact = "kenji@hepl.phys.nagoya-u.ac.jp"
+        # add contact information to histogram
+        contact = "kenji@hepl.phys.nagoya-u.ac.jp"
 
-        #       validation_tools.metadata.create_validation_histograms, to add contact
-        #       info without reopening and closing ROOT file and add 'shifter' flag
-
-        ma.variablesToHistogram(
-            filename='TauGeneric_Validation.root',
-            decayString='',
-            variables=[('nGoodTracks', 7, 1, 8),
-                       ('visibleEnergyOfEventCMS', 40, 0, 12),
-                       ('E_ECLtrk', 70, 0, 7),
-                       ('maxPt', 60, 0, 6),
-                       ('invMS1', 60, 0, 3),
-                       ('invMS2', 60, 0, 3),
-                       ('Theta_miss', 30, 0, 180)],
-            variables_2d=[('invMS1', 30, 0, 3, 'invMS2', 30, 0, 3)],
-            path=path
-        )
-        b2.process(path)
+        create_validation_histograms(
+            rootfile=f'{self}_Validation.root',
+            particlelist='',
+            variables_1d=[
+                ('nGoodTracks', 7, 1, 8, '', contact, '', ''),
+                ('visibleEnergyOfEventCMS', 40, 0, 12, '', contact, '', ''),
+                ('E_ECLtrk', 70, 0, 7, '', contact, '', ''),
+                ('maxPt', 30, 0, 6, '', contact, '', ''),
+                ('invMS1', 60, 0, 3, '', contact, '', '', '', ''),
+                ('invMS2', 60, 0, 3, '', contact, '', ''),
+                ('Theta_miss', 30, 0, 180, '', contact, '', '')],
+            variables_2d=[('invMS1', 30, 0, 3, 'invMS2', 30, 0, 3, '', contact, '', '')],
+            path=path)
 
 
 @fancy_skim_header
@@ -372,14 +376,12 @@ class TauThrust(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, tau"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdPi": ["all"],
-        },
-        "stdPhotons": {
-            "stdPhotons": ["all"],
-        },
-    }
+    produce_on_tau_samples = False  # retention is too high on taupair
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        stdPhotons("all", path=path)
 
     def additional_setup(self, path):
         """
@@ -442,16 +444,17 @@ class TauThrust(BaseSkim):
         self.SkimLists = eventParticle
 
     def validation_histograms(self, path):
-        self.additional_setup(path)
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
 
-        #       validation_tools.metadata.create_validation_histograms, to add contact
-        #       info without reopening and closing ROOT file and add 'shifter' flag
+        contact = "kenji@hepl.phys.nagoya-u.ac.jp"
 
-        ma.variablesToHistogram(
-            filename='TauThrust_Validation.root',
-            decayString='',
-            variables=[('nGoodTracksThrust', 7, 1, 8),
-                       ('visibleEnergyOfEventCMS', 40, 0, 12),
-                       ('thrust', 50, 0.75, 1)],
-            path=path
-        )
+        create_validation_histograms(
+            rootfile=f'{self}_Validation.root',
+            particlelist='',
+            variables_1d=[
+                ('nGoodTracksThrust', 7, 1, 8, '', contact, '', ''),
+                ('visibleEnergyOfEventCMS', 40, 0, 12, '', contact, '', ''),
+                ('thrust', 50, 0.75, 1, '', contact, '', '')],
+            path=path)

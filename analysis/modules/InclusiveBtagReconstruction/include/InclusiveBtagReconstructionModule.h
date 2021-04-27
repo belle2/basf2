@@ -11,6 +11,10 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 #include <map>
@@ -48,7 +52,14 @@ namespace Belle2 {
     std::string m_btagListName;  /**< Name of the Btag ParticleList */
     std::vector<std::string> m_inputListsNames;  /**< Names of the ParticleLists to be used to reconstruct Btag */
 
-    DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specifed DecayString */
+    DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specified DecayString */
+
+    StoreArray<Particle> m_particles; /**< StoreArray of Particles */
+
+    StoreObjPtr<ParticleList> m_bsigList; /**< particle list of signal B */
+    StoreObjPtr<ParticleList> m_btagList; /**< particle list of tag B */
+    StoreObjPtr<ParticleList> m_antiBtagList; /**< particle list of tag anti-B */
+    StoreObjPtr<ParticleList> m_upsilonList; /**< particle list of Y(4S) */
   };
 
 

@@ -111,9 +111,10 @@ namespace Belle2 {
 
     if (_size <= storageSize) {
       if (a) {
-        const unsigned position = _size % (sizeof(unsigned) * 8) - 1;
-        unsigned& last = * _stream.back();
-        last |= (1 << position);
+        // TODO This block does nothing, is it ok?
+        //const unsigned position = _size % (sizeof(unsigned) * 8) - 1;
+        //unsigned& last = * _stream.back();
+        //last |= (1 << position);
       }
     } else {
       if (a)

@@ -828,13 +828,13 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
     hist_background.Draw('hist same')
 
     if category == 'MaximumPstar':
-        l = ROOT.TLegend(0.4, 0.75, 0.6, 0.9)
+        legend = ROOT.TLegend(0.4, 0.75, 0.6, 0.9)
     else:
-        l = ROOT.TLegend(0.6, 0.75, 0.8, 0.9)
-    l.AddEntry(hist_signal, 'true B0')
-    l.AddEntry(hist_background, 'true B0bar')
-    l.SetTextSize(0.05)
-    l.Draw()
+        legend = ROOT.TLegend(0.6, 0.75, 0.8, 0.9)
+    legend.AddEntry(hist_signal, 'true B0')
+    legend.AddEntry(hist_background, 'true B0bar')
+    legend.SetTextSize(0.05)
+    legend.Draw()
 
     Canvas.Update()
     with Quiet(ROOT.kError):

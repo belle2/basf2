@@ -41,6 +41,9 @@ RawSecMapMergerModule::RawSecMapMergerModule() : Module()
   addParam("printFullGraphs", m_PARAMprintFullGraphs,
            "If true, the full trained graphs will be printed to screen. WARNING: produces a lot of output for full detector-cases!",
            bool(false));
+
+  addParam("threshold", m_RelThreshold,
+           "Relative threshold (in %) used to prune the sector maps. Will remove X % of the least used subgraphs.", {0});
 }
 
 

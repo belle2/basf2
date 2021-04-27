@@ -26,7 +26,7 @@ def print_summary(p):
             monitoring.MonitorMbcPlot(p, monitoring.removeJPsiSlash(p.particle.identifier + '_Money'))
         if p.particle.identifier in ['B+:semileptonic', 'B0:semileptonic']:
             monitoring.MonitorCosBDLPlot(p, monitoring.removeJPsiSlash(p.particle.identifier + '_Money'))
-    except:
+    except BaseException:
         pass
     print(bold(p.particle.identifier))
     print('Total cpu time spent reconstructing this particle: ',

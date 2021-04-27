@@ -10,38 +10,34 @@ The actual processing code is mostly in the `caf.state_machines` module.
 __all__ = ["CalibrationBase", "Calibration", "Algorithm", "CAF"]
 
 import os
-import sys
 from threading import Thread
 from time import sleep
 from pathlib import Path
-import sqlite3
 import shutil
+from glob import glob
 
 from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL, B2DEBUG
+from basf2 import find_file
 from basf2 import conditions as b2conditions
 
 from abc import ABC, abstractmethod
-import ROOT
 
-from .utils import B2INFO_MULTILINE
-from .utils import past_from_future_dependencies
-from .utils import topological_sort
-from .utils import all_dependencies
-from .utils import decode_json_string
-from .utils import method_dispatch
-from .utils import find_sources
-from .utils import AlgResult
-from .utils import temporary_workdir
-from .utils import IoV
-from .utils import IoV_Result
-from .utils import find_int_dirs
-from .utils import LocalDatabase
-from .utils import CentralDatabase
+import caf
+from caf.utils import B2INFO_MULTILINE
+from caf.utils import past_from_future_dependencies
+from caf.utils import topological_sort
+from caf.utils import all_dependencies
+from caf.utils import method_dispatch
+from caf.utils import temporary_workdir
+from caf.utils import find_int_dirs
+from caf.utils import LocalDatabase
+from caf.utils import CentralDatabase
+from caf.utils import parse_file_uri
 
-from caf import strategies
-from caf import runners
-import caf.backends
-from .state_machines import CalibrationMachine, MachineError, ConditionError, TransitionError
+import caf.strategies as strategies
+import caf.runners as runners
+from caf.backends import MaxSubjobsSplitter, MaxFilesSplitter
+from caf.state_machines import CalibrationMachine, ConditionError, MachineError
 from caf.database import CAFDB
 
 
@@ -55,8 +51,18 @@ class Collection():
         output_patterns (list[str]): Output patterns of files produced by collector which will be used to pass to the
             `Algorithm.data_input` function. Setting this here, replaces the default completely.
         max_files_for_collector_job (int): Maximum number of input files sent to each collector subjob for this `Collection`.
+            Technically this sets the SubjobSplitter to be used, not compatible with max_collector_jobs.
+        max_collector_jobs (int): Maximum number of collector subjobs for this `Collection`.
+            Input files are split evenly between them. Technically this sets the SubjobSplitter to be used. Not compatible with
+            max_files_for_collector_job.
         backend_args (dict): The args for the backend submission of this `Collection`.
     """
+    #: The default maximum number of collector jobs to create. Only used if max_collector_jobs or max_files_per_collector_job
+    #  are not set.
+    default_max_collector_jobs = 1000
+    #: The name of the file containing the collector Job's dictionary. Useful for recovery of the job
+    #  configuration of the ones that ran previously.
+    job_config = "collector_job.json"
 
     def __init__(self,
                  collector=None,
@@ -64,7 +70,8 @@ class Collection():
                  pre_collector_path=None,
                  database_chain=None,
                  output_patterns=None,
-                 max_files_per_collector_job=-1,
+                 max_files_per_collector_job=None,
+                 max_collector_jobs=None,
                  backend_args=None
                  ):
         #: Collector module of this collection
@@ -91,16 +98,24 @@ class Collection():
         #: You can set these to anything understood by `glob.glob`, but if you want to specify this you should also specify
         #: the `Algorithm.data_input` function to handle the different types of files and call the
         #: CalibrationAlgorithm.setInputFiles() with the correct ones.
-        self.output_patterns = ['CollectorOutput.root']
+        self.output_patterns = ["CollectorOutput.root"]
         if output_patterns:
             self.output_patterns = output_patterns
 
-        #: Maximum number of input files per subjob during the collector step (passed to a `caf.backends.Job` object).
-        #: -1 is the default meaning that all input files are run in one big collector job.
-        self.max_files_per_collector_job = max_files_per_collector_job
+        #: The SubjobSplitter to use when constructing collector subjobs from the overall Job object. If this is not set
+        #  then your collector will run as one big job with all input files included.
+        self.splitter = None
+        if max_files_per_collector_job and max_collector_jobs:
+            B2FATAL("Cannot set both 'max_files_per_collector_job' and 'max_collector_jobs' of a collection!")
+        elif max_files_per_collector_job:
+            self.max_files_per_collector_job = max_files_per_collector_job
+        elif max_collector_jobs:
+            self.max_collector_jobs = max_collector_jobs
+        else:
+            self.max_collector_jobs = self.default_max_collector_jobs
+
         #: Dictionary passed to the collector Job object to configure how the `caf.backends.Backend` instance should treat
-        #: the collector job. Currently only useful for setting the 'queue' of the batch system backends that the collector
-        #: jobs are submitted to e.g. cal.backend_args = {"queue":"short"}
+        #: the collector job when submitting. The choice of arguments here depends on which backend you plan on using.
         self.backend_args = {}
         if backend_args:
             self.backend_args = backend_args
@@ -118,10 +133,17 @@ class Collection():
             for tag in reversed(b2conditions.default_globaltags):
                 self.use_central_database(tag)
 
+        self.job_script = Path(find_file("calibration/scripts/caf/run_collector_path.py")).absolute()
+        """The basf2 steering file that will be used for Collector jobs run by this collection.
+This script will be copied into subjob directories as part of the input sandbox."""
+
+        #: The Collector `caf.backends.Job.cmd` attribute. Probably using the `job_script` to run basf2.
+        self.job_cmd = ["basf2", self.job_script.name, "--job-information job_info.json"]
+
     def reset_database(self):
         """
         Remove everything in the database_chain of this Calibration, including the default central database
-        tag automatically included from `basf2.conditions.default_globaltags <ConditionsConfiguration.default_globaltags>`
+        tag automatically included from `basf2.conditions.default_globaltags <ConditionsConfiguration.default_globaltags>`.
         """
         self.database_chain = []
 
@@ -140,12 +162,12 @@ class Collection():
 
         Alternatively you could set an empty list as the input database_chain when adding the Collection to the Calibration.
 
-        NOTE!! Since release-04-00-00 the behaviour of basf2 conditions databases has changed.
+        NOTE!! Since ``release-04-00-00`` the behaviour of basf2 conditions databases has changed.
         All local database files MUST now be at the head of the 'chain', with all central database global tags in their own
         list which will be checked after all local database files have been checked.
 
-        So even if you ask for ["global_tag1", "localdb/database.txt", "global_tag2"] to be the database chain, the real order
-        that basf2 will use them is ["global_tag1", "global_tag2", "localdb/database.txt"] where the file is checked first.
+        So even if you ask for ``["global_tag1", "localdb/database.txt", "global_tag2"]`` to be the database chain, the real order
+        that basf2 will use them is ``["global_tag1", "global_tag2", "localdb/database.txt"]`` where the file is checked first.
         """
         central_db = CentralDatabase(global_tag)
         self.database_chain.append(central_db)
@@ -154,8 +176,6 @@ class Collection():
         """
         Parameters:
             filename (str): The path to the database.txt of the local database
-
-        Keyword Argumemts:
             directory (str): The path to the payloads directory for this local database.
 
         Append a local database to the chain for this collection.
@@ -171,6 +191,44 @@ class Collection():
         """
         local_db = LocalDatabase(filename, directory)
         self.database_chain.append(local_db)
+
+    @staticmethod
+    def uri_list_from_input_file(input_file):
+        """
+        Parameters:
+            input_file (str): A local file/glob pattern or XROOTD URI
+
+        Returns:
+            list: A list of the URIs found from the initial string.
+        """
+        # By default we assume it is a local file path if no "scheme" is given
+        uri = parse_file_uri(input_file)
+        if uri.scheme == "file":
+            # For local files we also perform a glob just in case it is a wildcard pattern.
+            # That way we will have all the uris of files separately
+            uris = [parse_file_uri(f).geturl() for f in glob(input_file)]
+        else:
+            # Just let everything else through and hop the backend can figure it out
+            uris = [input_file]
+        return uris
+
+    @property
+    def input_files(self):
+        return self._input_files
+
+    @input_files.setter
+    def input_files(self, value):
+        if isinstance(value, str):
+            # If it's a string, we convert to a list of URIs
+            self._input_files = self.uri_list_from_input_file(value)
+        elif isinstance(value, list):
+            # If it's a list we loop and do the same thing
+            total_files = []
+            for pattern in value:
+                total_files.extend(self.uri_list_from_input_file(pattern))
+            self._input_files = total_files
+        else:
+            raise TypeError("Input files must be a list or string")
 
     @property
     def collector(self):
@@ -199,6 +257,34 @@ class Collection():
             return False
         else:
             return True
+
+    @property
+    def max_collector_jobs(self):
+        if self.splitter:
+            return self.splitter.max_subjobs
+        else:
+            return None
+
+    @max_collector_jobs.setter
+    def max_collector_jobs(self, value):
+        if value is None:
+            self.splitter = None
+        else:
+            self.splitter = MaxSubjobsSplitter(max_subjobs=value)
+
+    @property
+    def max_files_per_collector_job(self):
+        if self.splitter:
+            return self.splitter.max_files_per_subjob
+        else:
+            return None
+
+    @max_files_per_collector_job.setter
+    def max_files_per_collector_job(self, value):
+        if value is None:
+            self.splitter = None
+        else:
+            self.splitter = MaxFilesSplitter(max_files_per_subjob=value)
 
 
 class CalibrationBase(ABC, Thread):
@@ -254,19 +340,22 @@ class CalibrationBase(ABC, Thread):
         #: Marks this Calibration as one which has payloads that should be copied and uploaded.
         #: Defaults to True, and should only be False if this is an intermediate Calibration who's payloads are never needed.
         self.save_payloads = True
+        #: A simple list of jobs that this Calibration wants submitted at some point.
+        self.jobs_to_submit = []
 
     @abstractmethod
     def run(self):
-        """The most important method. Runs inside a new Thread and is called from `CalibrationBase.start`
-        once the dependencies of this `CalibrationBase` have returned with state == end_state i.e. "completed"
         """
-        pass
+        The most important method. Runs inside a new Thread and is called from `CalibrationBase.start`
+        once the dependencies of this `CalibrationBase` have returned with state == end_state i.e. "completed".
+        """
 
     @abstractmethod
     def is_valid(self):
-        """A simple method you should implement that will return True or False depending on whether
-        the Calibration has been set up correctly and can be run safely."""
-        pass
+        """
+        A simple method you should implement that will return True or False depending on whether
+        the Calibration has been set up correctly and can be run safely.
+        """
 
     def depends_on(self, calibration):
         """
@@ -293,12 +382,12 @@ class CalibrationBase(ABC, Thread):
             if self not in calibration.dependencies:
                 calibration.future_dependencies.append(self)
         else:
-            B2WARNING(("Tried to add {0} as a dependency for {1} but they have the same name."
-                       "Dependency was not added.".format(calibration, self)))
+            B2WARNING((f"Tried to add {calibration} as a dependency for {self} but they have the same name."
+                       "Dependency was not added."))
 
     def dependencies_met(self):
         """
-        Checks if all of the Calibrations that this one depends on have reached a successful end state
+        Checks if all of the Calibrations that this one depends on have reached a successful end state.
         """
         return all(map(lambda x: x.state == x.end_state, self.dependencies))
 
@@ -322,7 +411,7 @@ class CalibrationBase(ABC, Thread):
                 if getattr(self, key) is None:
                     setattr(self, key, value)
             except AttributeError:
-                print("The calibration", self.name, "does not support the attribute", key)
+                print(f"The calibration {self.name} does not support the attribute {key}.")
 
 
 class Calibration(CalibrationBase):
@@ -337,9 +426,9 @@ class Calibration(CalibrationBase):
     Parameters:
         name (str): Name of this calibration. It should be unique for use in the `CAF`
     Keyword Arguments:
-        collector (str or `basf2.Module`): Should be set to a CalibrationCollectorModule() or a string with the module name.
-        algorithms (list or ``ROOT.Belle2.CalibrationAlgorithm``): The algorithm(s) to use for this `Calibration`.
-        input_files (str or list[str]): Input files for use by this Calibration. May contain wildcards useable by `glob.glob`
+        collector (str, `basf2.Module`): Should be set to a CalibrationCollectorModule() or a string with the module name.
+        algorithms (list, ``ROOT.Belle2.CalibrationAlgorithm``): The algorithm(s) to use for this `Calibration`.
+        input_files (str, list[str]): Input files for use by this Calibration. May contain wildcards useable by `glob.glob`
 
     A Calibration won't be valid in the `CAF` until it has all of these four attributes set. For example:
 
@@ -424,7 +513,8 @@ class Calibration(CalibrationBase):
                  pre_collector_path=None,
                  database_chain=None,
                  output_patterns=None,
-                 max_files_per_collector_job=-1,
+                 max_files_per_collector_job=None,
+                 max_collector_jobs=None,
                  backend_args=None
                  ):
         """
@@ -443,6 +533,7 @@ class Calibration(CalibrationBase):
                                        database_chain,
                                        output_patterns,
                                        max_files_per_collector_job,
+                                       max_collector_jobs,
                                        backend_args
                                        ))
 
@@ -481,14 +572,15 @@ class Calibration(CalibrationBase):
         #: Plugin your own runner class to change how your calibration will run the list of algorithms.
         self.algorithms_runner = runners.SeqAlgorithmsRunner
         #: The `backend <backends.Backend>` we'll use for our collector submission in this calibration.
-        #: It will be set by the CAF if not here
+        #: If `None` it will be set by the CAF used to run this Calibration (recommended!).
         self.backend = None
         #: While checking if the collector is finished we don't bother wastefully checking every subjob's status.
         #: We exit once we find the first subjob that isn't ready.
         #: But after this interval has elapsed we do a full :py:meth:`caf.backends.Job.update_status` call and
         #: print the fraction of SubJobs completed.
-        self.collector_full_update_interval = 300
-        self.setup_defaults()
+        self.collector_full_update_interval = 30
+        #: This calibration's sleep time before rechecking to see if it can move state
+        self.heartbeat = 3
         #: The `caf.state_machines.CalibrationMachine` that we will run to process this calibration start to finish.
         self.machine = None
         #: Location of a SQLite database that will save the state of the calibration so that it can be restarted from failure.
@@ -510,8 +602,8 @@ class Calibration(CalibrationBase):
         if name not in self.collections:
             self.collections[name] = collection
         else:
-            B2WARNING(("A Collection with the name '{}' already exists in this Calibration. It has not been added."
-                       "Please use another name.").format(name))
+            B2WARNING(f"A Collection with the name '{name}' already exists in this Calibration. It has not been added."
+                      "Please use another name.")
 
     def is_valid(self):
         """
@@ -523,11 +615,11 @@ class Calibration(CalibrationBase):
             3) Any of our Collectors have granularities that don't match what our Strategy can use.
         """
         if not self.algorithms:
-            B2WARNING("Empty algorithm list for {}.".format(self.name))
+            B2WARNING(f"Empty algorithm list for {self.name}.")
             return False
 
         if not any([collection.is_valid() for collection in self.collections.values()]):
-            B2WARNING("No valid Collections for {}.".format(self.name))
+            B2WARNING(f"No valid Collections for {self.name}.")
             return False
 
         granularities = []
@@ -545,8 +637,7 @@ class Calibration(CalibrationBase):
             alg_type = type(alg.algorithm).__name__
             incorrect_gran = [granularity not in alg.strategy.allowed_granularities for granularity in granularities]
             if any(incorrect_gran):
-                B2WARNING("Selected strategy for {} does not match a collector's "
-                          "granularity.".format(alg_type))
+                B2WARNING(f"Selected strategy for {alg_type} does not match a collector's granularity.")
                 return False
         return True
 
@@ -654,18 +745,20 @@ class Calibration(CalibrationBase):
         if self.default_collection_name in self.collections:
             return getattr(self.collections[self.default_collection_name], attr)
         else:
-            B2WARNING(("You tried to get the attribute '{}' from the Calibration '{}', but the default collection doesn't exist."
-                       "You should use the cal.collections['CollectionName'].{} to access a custom "
-                       "collection's attributes directly.".format(attr, self.name, attr)))
+            B2WARNING(f"You tried to get the attribute '{attr}' from the Calibration '{self.name}', "
+                      "but the default collection doesn't exist."
+                      f"You should use the cal.collections['CollectionName'].{attr} to access a custom "
+                      "collection's attributes directly.")
             return None
 
     def _set_default_collection_attribute(self, attr, value):
         if self.default_collection_name in self.collections:
             setattr(self.collections[self.default_collection_name], attr, value)
         else:
-            B2WARNING(("You tried to set the attribute '{}' from the Calibration '{}', but the default collection doesn't exist."
-                       "You should use the cal.collections['CollectionName'].{} to access a custom "
-                       "collection's attributes directly.".format(attr, self.name, attr)))
+            B2WARNING(f"You tried to set the attribute '{attr}' from the Calibration '{self.name}', "
+                      "but the default collection doesn't exist."
+                      f"You should use the cal.collections['CollectionName'].{attr} to access a custom "
+                      "collection's attributes directly.")
 
     @property
     def collector(self):
@@ -749,6 +842,18 @@ class Calibration(CalibrationBase):
         self._set_default_collection_attribute("max_files_per_collector_job", max_files)
 
     @property
+    def max_collector_jobs(self):
+        """
+        """
+        return self._get_default_collection_attribute("max_collector_jobs")
+
+    @max_collector_jobs.setter
+    def max_collector_jobs(self, max_jobs):
+        """
+        """
+        self._set_default_collection_attribute("max_collector_jobs", max_jobs)
+
+    @property
     def backend_args(self):
         """
         """
@@ -775,14 +880,14 @@ class Calibration(CalibrationBase):
         if isinstance(value, CalibrationAlgorithm):
             self._algorithms = [Algorithm(value)]
         else:
-            B2ERROR(("Something other than CalibrationAlgorithm instance passed in ({0})."
-                     "Algorithm needs to inherit from Belle2::CalibrationAlgorithm".format(type(value))))
+            B2ERROR(f"Something other than CalibrationAlgorithm instance passed in ({type(value)}). "
+                    "Algorithm needs to inherit from Belle2::CalibrationAlgorithm")
 
     @algorithms.fset.register(tuple)
     @algorithms.fset.register(list)
     def _(self, value):
         """
-        Alternate algorithms setter for lists and tuples of CalibrationAlgorithms
+        Alternate algorithms setter for lists and tuples of CalibrationAlgorithms.
         """
         from ROOT.Belle2 import CalibrationAlgorithm
         if value:
@@ -791,8 +896,8 @@ class Calibration(CalibrationBase):
                 if isinstance(alg, CalibrationAlgorithm):
                     self._algorithms.append(Algorithm(alg))
                 else:
-                    B2ERROR(("Something other than CalibrationAlgorithm instance passed in {0}."
-                             "Algorithm needs to inherit from Belle2::CalibrationAlgorithm".format(type(value))))
+                    B2ERROR((f"Something other than CalibrationAlgorithm instance passed in {type(value)}."
+                             "Algorithm needs to inherit from Belle2::CalibrationAlgorithm"))
 
     @property
     def pre_algorithms(self):
@@ -894,7 +999,7 @@ class Calibration(CalibrationBase):
         while self.state != self.end_state and self.state != self.fail_state:
             if self.state == "init":
                 try:
-                    B2INFO("Attempting collector submission for calibration {}.".format(self.name))
+                    B2INFO(f"Attempting collector submission for calibration {self.name}.")
                     self.machine.submit_collector()
                 except Exception as err:
                     B2FATAL(str(err))
@@ -910,7 +1015,7 @@ class Calibration(CalibrationBase):
             # to some problems e.g. Missing collector output files
             # We catch the error and exit with failed state so the CAF will stop
             try:
-                B2INFO("Attempting to run algorithms for calibration {}".format(self.name))
+                B2INFO(f"Attempting to run algorithms for calibration {self.name}.")
                 self.machine.run_algorithms()
             except MachineError as err:
                 B2ERROR(str(err))
@@ -926,30 +1031,15 @@ class Calibration(CalibrationBase):
         """
         while self.state == "running_collector":
             try:
-                B2INFO("Checking if collector jobs for calibration {} have finished successfully.".format(self.name))
                 self.machine.complete()
             # ConditionError is thrown when the condtions for the transition have returned false, it's not serious.
             except ConditionError:
                 try:
-                    B2DEBUG(29, "Checking if collector jobs for calibration {} have failed.".format(self.name))
+                    B2DEBUG(29, f"Checking if collector jobs for calibration {self.name} have failed.")
                     self.machine.fail()
                 except ConditionError:
                     pass
             sleep(self.heartbeat)  # Sleep until we want to check again
-
-    def setup_defaults(self):
-        """
-        Anything that is setup by outside config files by default goes here.
-        """
-        import configparser
-        config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
-        if config_file_path:
-            config = configparser.ConfigParser()
-            config.read(config_file_path)
-        else:
-            B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
-        #: This calibration's sleep time before rechecking to see if it can move state
-        self.heartbeat = decode_json_string(config['CAF_DEFAULTS']['Heartbeat'])
 
     @property
     def state(self):
@@ -957,38 +1047,40 @@ class Calibration(CalibrationBase):
         The current major state of the calibration in the database file. The machine may have a different state.
         """
         with CAFDB(self._db_path, read_only=True) as db:
-            return db.get_calibration_value(self.name, "state")
+            state = db.get_calibration_value(self.name, "state")
+        return state
 
     @state.setter
     def state(self, state):
         """
         """
-        B2DEBUG(29, "Setting {} to state {}".format(self.name, str(state)))
+        B2DEBUG(29, f"Setting {self.name} to state {state}.")
         with CAFDB(self._db_path) as db:
             db.update_calibration_value(self.name, "state", str(state))
             if state in self.checkpoint_states:
                 db.update_calibration_value(self.name, "checkpoint", str(state))
-        B2DEBUG(29, "{} set to {}".format(self.name, self.state))
+        B2DEBUG(29, f"{self.name} set to {state}.")
 
     @property
     def iteration(self):
         """
-        Retrieves the current iteration number in the database file
+        Retrieves the current iteration number in the database file.
 
         Returns:
             int: The current iteration number
         """
         with CAFDB(self._db_path, read_only=True) as db:
-            return db.get_calibration_value(self.name, "iteration")
+            iteration = db.get_calibration_value(self.name, "iteration")
+        return iteration
 
     @iteration.setter
     def iteration(self, iteration):
         """
         """
-        B2DEBUG(29, "Setting {} to {}".format(self.name, iteration))
+        B2DEBUG(29, f"Setting {self.name} to {iteration}.")
         with CAFDB(self._db_path) as db:
             db.update_calibration_value(self.name, "iteration", iteration)
-        B2DEBUG(29, "{} set to {}".format(self.name, self.iteration))
+        B2DEBUG(29, f"{self.name} set to {self.iteration}.")
 
 
 class Algorithm():
@@ -1048,7 +1140,7 @@ class Algorithm():
         """
         collector_output_files = list(filter(lambda file_path: "CollectorOutput.root" == Path(file_path).name,
                                              input_file_paths))
-        info_lines = ["Input files used in {}:".format(self.name)]
+        info_lines = [f"Input files used in {self.name}:"]
         info_lines.extend(collector_output_files)
         B2INFO_MULTILINE(info_lines)
         self.algorithm.setInputFileNames(collector_output_files)
@@ -1072,27 +1164,17 @@ class CAF():
     `CalibrationBase` instances.
     """
 
-    #: Default attributes and their config file Key, that will be used to assign values to Calibrations
-    #: if they weren't set directly on the Calibration
-    _calibration_default_setup = {"max_iterations": "MaxIterations", "ignored_runs": "IgnoredRuns"}
-
     #: The name of the SQLite DB that gets created
     _db_name = "caf_state.db"
+    #: The defaults for Calibrations
+    default_calibration_config = {
+                                  "max_iterations": 5,
+                                  "ignored_runs": []
+                                 }
 
     def __init__(self, calibration_defaults=None):
         """
         """
-        import ROOT
-        config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
-        if config_file_path:
-            import configparser
-            #: Configuration object for `CAF`, can change the defaults through a single config file
-            #: or can directly alter this config object if you want to.
-            self.config = configparser.ConfigParser()
-            self.config.read(config_file_path)
-        else:
-            B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
-
         #: Dictionary of calibrations for this `CAF` instance. You should use `add_calibration` to add to this.
         self.calibrations = {}
         #: Dictionary of future dependencies of `Calibration` objects, where the value is all
@@ -1102,20 +1184,19 @@ class CAF():
         #: that the key depends on. This attribute is filled during self.run()
         self.dependencies = {}
         #: Output path to store results of calibration and bookkeeping information
-        self.output_dir = self.config['CAF_DEFAULTS']['ResultsDir']
+        self.output_dir = "calibration_results"
         #: The ordering and explicit future dependencies of calibrations. Will be filled during `CAF.run()` for you.
         self.order = None
         #: Private backend attribute
         self._backend = None
+        #: The heartbeat (seconds) between polling for Calibrations that are finished
+        self.heartbeat = 5
 
         if not calibration_defaults:
             calibration_defaults = {}
-        for attribute_name, config_key in self._calibration_default_setup.items():
-            if attribute_name not in calibration_defaults:
-                calibration_defaults[attribute_name] = decode_json_string(self.config["CAF_DEFAULTS"][config_key])
         #: Default options applied to each calibration known to the `CAF`, if the `Calibration` has these defined by the user
         #: then the defaults aren't applied. A simple way to define the same configuration to all calibrations in the `CAF`.
-        self.calibration_defaults = calibration_defaults
+        self.calibration_defaults = {**self.default_calibration_config, **calibration_defaults}
         #: The path of the SQLite DB
         self._db_path = None
 
@@ -1130,10 +1211,10 @@ class CAF():
             if calibration.name not in self.calibrations:
                 self.calibrations[calibration.name] = calibration
             else:
-                B2WARNING('Tried to add a calibration with the name ' + calibration.name + ' twice.')
+                B2WARNING(f"Tried to add a calibration with the name {calibration.name} twice.")
         else:
-            B2WARNING(("Tried to add incomplete/invalid calibration ({0}) to the framwork."
-                       "It was not added and will not be part of the final process.".format(calibration.name)))
+            B2WARNING((f"Tried to add incomplete/invalid calibration ({calibration.name}) to the framwork."
+                       "It was not added and will not be part of the final process."))
 
     def _remove_missing_dependencies(self):
         """
@@ -1149,8 +1230,8 @@ class CAF():
             """
             dependency_in_caf = dependency.name in calibration_names
             if not dependency_in_caf:
-                B2WARNING(("The calibration {0} is a required dependency but is not in the CAF."
-                           " It has been removed as a dependency.").format(dependency.name))
+                B2WARNING(f"The calibration {dependency.name} is a required dependency but is not in the CAF."
+                          " It has been removed as a dependency.")
             return dependency_in_caf
 
         # Check that there aren't dependencies on calibrations not added to the framework
@@ -1214,10 +1295,6 @@ class CAF():
         if not isinstance(self._backend, caf.backends.Backend):
             #: backend property
             self.backend = caf.backends.Local()
-        if isinstance(self._backend, caf.backends.Local):
-            self._algorithm_backend = self.backend
-        else:
-            self._algorithm_backend = caf.backends.Local()
 
     def _prune_invalid_collections(self):
         """
@@ -1230,7 +1307,7 @@ class CAF():
                 if collection.is_valid():
                     valid_collections[name] = collection
                 else:
-                    B2WARNING("Removing invalid Collection '{}' from Calibration '{}'".format(name, calibration.name))
+                    B2WARNING(f"Removing invalid Collection '{name}' from Calibration '{calibration.name}'.")
             calibration.collections = valid_collections
 
     def run(self, iov=None):
@@ -1261,14 +1338,13 @@ class CAF():
         # Creates the overall output directory and reset the attribute to use an absolute path to it.
         self.output_dir = self._make_output_dir()
 
-        # The sleep heartbeat when checking calibration statuses
-        caf_heartbeat = int(self.config["CAF_DEFAULTS"]["HeartBeat"])
-
         #  Creates a SQLite DB to save the status of the various calibrations
         self._make_database()
 
         # Enter the overall output dir during processing and opena  connection to the DB
-        with temporary_workdir(self.output_dir), CAFDB(self._db_path) as db:
+        with temporary_workdir(self.output_dir):
+            db = CAFDB(self._db_path)
+            db.open()
             db_initial_calibrations = db.query("select * from calibrations").fetchall()
             for calibration in self.calibrations.values():
                 # Apply defaults given to the `CAF` to the calibrations if they aren't set
@@ -1287,13 +1363,15 @@ class CAF():
                         if cal_info[0] == calibration.name:
                             cal_initial_state = cal_info[2]
                             cal_initial_iteration = cal_info[3]
-                    B2INFO("Previous entry in database found for {}".format(calibration.name))
-                    B2INFO("Setting {} state to checkpoint state '{}'".format(calibration.name, cal_initial_state))
+                    B2INFO(f"Previous entry in database found for {calibration.name}.")
+                    B2INFO(f"Setting {calibration.name} state to checkpoint state '{cal_initial_state}'.")
                     calibration.state = cal_initial_state
-                    B2INFO("Setting {} iteration to '{}'".format(calibration.name, cal_initial_iteration))
+                    B2INFO(f"Setting {calibration.name} iteration to '{cal_initial_iteration}'.")
                     calibration.iteration = cal_initial_iteration
                 # Daemonize so that it exits if the main program exits
                 calibration.daemon = True
+
+            db.close()
 
             # Is it possible to keep going?
             keep_running = True
@@ -1307,12 +1385,12 @@ class CAF():
                     if (calibration.state == CalibrationBase.end_state or calibration.state == CalibrationBase.fail_state):
                         # Search for any alive Calibrations and join them
                         if calibration.is_alive():
-                            B2DEBUG(29, "joining {}".format(calibration.name))
+                            B2DEBUG(29, f"Joining {calibration.name}.")
                             calibration.join()
                     else:
                         if calibration.dependencies_met():
                             if not calibration.is_alive():
-                                B2DEBUG(29, "Starting {}".format(calibration.name))
+                                B2DEBUG(29, f"Starting {calibration.name}.")
                                 calibration.start()
                             remaining_calibrations.append(calibration)
                         else:
@@ -1320,22 +1398,24 @@ class CAF():
                                 remaining_calibrations.append(calibration)
                 if remaining_calibrations:
                     keep_running = True
-                sleep(caf_heartbeat)
+                    # Loop over jobs that the calibrations want submitted and submit them.
+                    # We do this here because some backends don't like us submitting in parallel from multiple CalibrationThreads
+                    # So this is like a mini job queue without getting too clever with it
+                    for calibration in remaining_calibrations:
+                        for job in calibration.jobs_to_submit[:]:
+                            calibration.backend.submit(job)
+                            calibration.jobs_to_submit.remove(job)
+                sleep(self.heartbeat)
 
             B2INFO("Printing summary of final CAF status.")
-            print(db.output_calibration_table())
-
-        # Close down our processing pools nicely
-        if isinstance(self.backend, caf.backends.Local):
-            self.backend.join()
-        else:
-            self._algorithm_backend.join()
+            with CAFDB(self._db_path, read_only=True) as db:
+                print(db.output_calibration_table())
 
     @property
     def backend(self):
         """
         The `backend <backends.Backend>` that runs the collector job.
-        Whe set, this is checked that a `backends.Backend` class instance was passed in.
+        When set, this is checked that a `backends.Backend` class instance was passed in.
         """
         return self._backend
 
@@ -1346,7 +1426,7 @@ class CAF():
         if isinstance(backend, caf.backends.Backend):
             self._backend = backend
         else:
-            B2ERROR('backend property must inherit from Backend class')
+            B2ERROR('Backend property must inherit from Backend class.')
 
     def _make_output_dir(self):
         """
@@ -1357,15 +1437,15 @@ class CAF():
         """
         p = Path(self.output_dir).resolve()
         if p.is_dir():
-            B2INFO('{0} output directory already exists. '
-                   'We will try to restart from the previous finishing state.'.format(p.as_posix()))
+            B2INFO(f"{p.as_posix()} output directory already exists. "
+                   "We will try to restart from the previous finishing state.")
             return p.as_posix()
         else:
             p.mkdir(parents=True)
             if p.is_dir():
                 return p.as_posix()
             else:
-                raise FileNotFoundError("Attempted to create output_dir {0}, but it didn't work.".format(p.as_posix()))
+                raise FileNotFoundError(f"Attempted to create output_dir {p.as_posix()}, but it didn't work.")
 
     def _make_database(self):
         """
@@ -1373,7 +1453,7 @@ class CAF():
         """
         self._db_path = Path(self.output_dir, self._db_name).absolute()
         if self._db_path.exists():
-            B2INFO('Previous CAF database found {}'.format(self._db_path))
+            B2INFO(f"Previous CAF database found {self._db_path}")
         # Will create a new database + tables, or do nothing but checks we can connect to existing one
-        with CAFDB(self._db_path) as db:
+        with CAFDB(self._db_path):
             pass

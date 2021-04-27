@@ -73,7 +73,7 @@ namespace Belle2 {
 
     StoreArray<MCParticle> m_mcparticles; /**< MCParticle collection */
 
-    bool m_useDiscreteAndSortedW; /* if it is true, W-list table is used for discrete and sorted W */
+    bool m_useDiscreteAndSortedW; /**< if it is true, W-list table is used for discrete and sorted W */
 
     /**
      * Maximal Q^2 = -q^2, where q is the difference between the initial

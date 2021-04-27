@@ -38,6 +38,8 @@
       INTEGER Jak1,Jak2
       INTEGER ITAUXPAR
       PARAMETER ( ITAUXPAR=2000)
+      INTEGER TAUOLA_BBB
+      COMMON /TAUOLA_BBB/ TAUOLA_BBB
 *=====================================================================================
 
       m_out   = xpar(4)
@@ -50,13 +52,16 @@ C switches of tau+ tau- decay modes !!
       Jak1            = xpar(ITAUXPAR+1)   ! Decay Mask for first tau
       Jak2            = xpar(ITAUXPAR+2)   ! Decay Mask for second tau
       IF( (Jak1.EQ.-1) .AND. (Jak2.EQ.-1) ) m_IsInitialized = 0
-
-        m_KeyClone      = 1       ! dip-switch for cloning procedure, =1,2
-        m_KeyClone      = 2       ! dip-switch for cloning procedure, =1,2
-        WRITE(m_out,bxope)
-        WRITE(m_out,bxtxt) ' KK interface of Tauola                  '
-        WRITE(m_out,bxl1i) m_KeyClone,'Cloning procedure   ','KeyClone','t01'
-        WRITE(m_out,bxclo)
+      TAUOLA_BBB = xpar(ITAUXPAR+900)
+      WRITE(m_out,*) 'Taupair_Init: Jak1, Jak2, IsInitialized, BBB = ', 
+     c                              Jak1, Jak2, m_IsInitialized, TAUOLA_BBB
+      m_KeyClone      = 1       ! dip-switch for cloning procedure, =1,2
+      m_KeyClone      = 2       ! dip-switch for cloning procedure, =1,2
+      WRITE(m_out,bxope)
+      WRITE(m_out,bxtxt) ' KK interface of Tauola                  '
+      WRITE(m_out,bxl1i) m_KeyClone,
+     c                  'Cloning procedure   ','KeyClone','t01'
+      WRITE(m_out,bxclo)
 
 * Initialisation of tau decay package TAUOLA; ITAUXPAR is for indirect adressing.
       CALL INIETC(ITAUXPAR,xpar)
@@ -66,10 +71,18 @@ C switches of tau+ tau- decay modes !!
          WRITE(m_out,bxclo)
       ELSE
         CALL INIMAS(ITAUXPAR,xpar)
-        CALL INITDK(ITAUXPAR,xpar)
+        IF (TAUOLA_BBB.EQ.1) THEN
+           CALL INITDK_BBB(ITAUXPAR,xpar)
+        ELSE
+           CALL INITDK(ITAUXPAR,xpar)
+        ENDIF
         xk0qed = 0.1D0            ! <=== It seems to be never used
         CALL INIPHY(xk0qed)
-        CALL DEKAY(-1,HvecDummy)
+        IF (TAUOLA_BBB.EQ.1) THEN
+           CALL DEKAY_BBB(-1,HvecDummy)
+        ELSE
+           CALL DEKAY(-1,HvecDummy)
+        ENDIF
 
 * Initialization of PHOTOS
         IF(m_IFPHOT .EQ. 1)   CALL PHOINI
@@ -92,10 +105,16 @@ C switches of tau+ tau- decay modes !!
 *
       DOUBLE PRECISION  HvecDummy(4)
       DOUBLE PRECISION   awt30,dwt30,WtSup30
+      INTEGER TAUOLA_BBB
+      COMMON /TAUOLA_BBB/ TAUOLA_BBB
 *-------------------------------------------------------------------------------------
       IF( m_IsInitialized .EQ. 0) RETURN
 
-      CALL DEKAY(100,HvecDummy)
+      IF (TAUOLA_BBB.EQ.1) THEN
+         CALL DEKAY_BBB(100,HvecDummy)
+      ELSE
+         CALL DEKAY(100,HvecDummy)
+      ENDIF
 
       CALL  GLK_MgetAve(m_idyfs+30,awt30,dwt30,WtSup30)
 
@@ -118,10 +137,17 @@ C switches of tau+ tau- decay modes !!
 */////////////////////////////////////////////////////////////////////////////////////
       IMPLICIT NONE
       INCLUDE 'Taupair.fi'
+      INTEGER TAUOLA_BBB
+      COMMON /TAUOLA_BBB/ TAUOLA_BBB
 *-------------------------------------------------------------------------------------
       IF( m_IsInitialized .EQ. 0) RETURN
-      CALL DEKAY(1,m_HvecTau1)
-      CALL DEKAY(2,m_HvecTau2)
+      IF (TAUOLA_BBB.EQ.1) THEN
+         CALL DEKAY_BBB(1,m_HvecTau1)
+         CALL DEKAY_BBB(2,m_HvecTau2)
+      ELSE
+         CALL DEKAY(1,m_HvecTau1)
+         CALL DEKAY(2,m_HvecTau2)
+      ENDIF
       END
 
       SUBROUTINE Taupair_ImprintSpin
@@ -175,6 +201,8 @@ C switches of tau+ tau- decay modes !!
       INCLUDE 'Taupair.fi'
       DOUBLE PRECISION     p3(4),p4(4)
       INTEGER ih1,ih2
+      INTEGER TAUOLA_BBB
+      COMMON /TAUOLA_BBB/ TAUOLA_BBB
 
       CALL KarFin_GetFermions( p3,p4)
       CALL GPS_tralorPrepare(p3,1)
@@ -184,8 +212,13 @@ C switches of tau+ tau- decay modes !!
       CALL HepEvt_GetFbar(ih2)  ! antifermion is here
       CALL Taupair_SetFermPos(ih1,ih2)  ! set ffbar positions in Tauola &&&
 
-      CALL DEKAY(1+10,m_HvecTau1)
-      CALL DEKAY(2+10,m_HvecTau2)
+      IF (TAUOLA_BBB.EQ.1) THEN
+         CALL DEKAY_BBB(1+10,m_HvecTau1)
+         CALL DEKAY_BBB(2+10,m_HvecTau2)
+      ELSE
+         CALL DEKAY(1+10,m_HvecTau1)
+         CALL DEKAY(2+10,m_HvecTau2)
+      ENDIF
 */////////////////////////////////////////////////////////////////////////////////////
 *//                    Photos comes last                                            //
 */////////////////////////////////////////////////////////////////////////////////////

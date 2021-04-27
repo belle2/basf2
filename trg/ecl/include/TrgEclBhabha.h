@@ -10,7 +10,6 @@
 //---------------------------------------------------------
 // $Log$
 //---------------------------------------------------------
-
 #ifndef TRGECLBHABHA_FLAG_
 #define TRGECLBHABHA_FLAG_
 
@@ -39,6 +38,12 @@ namespace Belle2 {
     /** Destructor */
     virtual ~TrgEclBhabha();/// Destructor
 
+    /** Copy constructor, deleted. */
+    TrgEclBhabha(TrgEclBhabha&) = delete;
+
+    /** Assignement operator, deleted. */
+    TrgEclBhabha& operator=(TrgEclBhabha&) = delete;
+
   public:
     //!  Belle 2D Bhabha veto method
     bool GetBhabha00(std::vector<double>);
@@ -53,30 +58,132 @@ namespace Belle2 {
     //! Save
     void save(int);
     //! set 2D Bhabha Energy Threshold
-    void set2DBhabhaThreshold(std::vector<double> i2DBhabhaThresholdFWD, std::vector<double> i2DBhabhaThresholdBWD)
+    void set2DBhabhaThreshold(const std::vector<double>& i2DBhabhaThresholdFWD,
+                              const std::vector<double>& i2DBhabhaThresholdBWD)
     {
       _2DBhabhaThresholdFWD = i2DBhabhaThresholdFWD;
       _2DBhabhaThresholdBWD = i2DBhabhaThresholdBWD;
     }
     //! set 3D selection Bhabha Energy Threshold
-    void set3DBhabhaSelectionThreshold(std::vector<double> i3DBhabhaSelectionThreshold) { _3DBhabhaSelectionThreshold = i3DBhabhaSelectionThreshold; };
+    void set3DBhabhaSelectionThreshold(const std::vector<double>& i3DBhabhaSelectionThreshold)
+    {
+      _3DBhabhaSelectionThreshold = i3DBhabhaSelectionThreshold;
+    };
     //! set 3D veto Bhabha Energy Threshold
-    void set3DBhabhaVetoThreshold(std::vector<double> i3DBhabhaVetoThreshold) { _3DBhabhaVetoThreshold = i3DBhabhaVetoThreshold; };
-
+    void set3DBhabhaVetoThreshold(const std::vector<double>& i3DBhabhaVetoThreshold)
+    {
+      _3DBhabhaVetoThreshold = i3DBhabhaVetoThreshold;
+    };
     //! set 3D selection Bhabha Energy Angle
-    void set3DBhabhaSelectionAngle(std::vector<double> i3DBhabhaSelectionAngle) { _3DBhabhaSelectionAngle = i3DBhabhaSelectionAngle; };
+    void set3DBhabhaSelectionAngle(const std::vector<double>& i3DBhabhaSelectionAngle)
+    {
+      _3DBhabhaSelectionAngle = i3DBhabhaSelectionAngle;
+    };
     //! set 3D veto Bhabha Energy Angle
-    void set3DBhabhaVetoAngle(std::vector<double> i3DBhabhaVetoAngle) { _3DBhabhaVetoAngle = i3DBhabhaVetoAngle; };
+    void set3DBhabhaVetoAngle(const std::vector<double>& i3DBhabhaVetoAngle)
+    {
+      _3DBhabhaVetoAngle = i3DBhabhaVetoAngle;
+    };
     //! set mumu bit Threshold
     void setmumuThreshold(int mumuThreshold) {_mumuThreshold = mumuThreshold; }
     //! set mumu bit Angle selection
-    void setmumuAngle(std::vector<double>  imumuAngle) {_mumuAngle = imumuAngle; }
+    void setmumuAngle(const std::vector<double>&  imumuAngle) {_mumuAngle = imumuAngle; }
+    // set ThetaID (low and high) for 3DBhabhaVetoInTrack
+    void set3DBhabhaVetoInTrackThetaRegion(const std::vector<int>& i3DBhabhaVetoInTrackThetaRegion)
+    {
+      m_3DBhabhaVetoInTrackThetaRegion = i3DBhabhaVetoInTrackThetaRegion;
+    }
+    // get trigger bit of flag(1bit) whether two clusters statisfy 3D Bhabha veto
+    // are in CDCTRG region in theta (="InTrack") or not
+    int get3DBhabhaVetoInTrackFlag(void)
+    {
+      return m_3DBhabhaVetoInTrackFlag;
+    }
+    // get each TCID(most energetic TC in a cluster) of two clusters of 3D Bhabha veto
+    int get3DBhabhaVetoClusterTCId(int cl_idx)
+    {
+      if (cl_idx < 0 || cl_idx > 1 || m_3DBhabhaVetoClusterTCIds.size() != 2) {
+        return -10;
+      }
+      return m_3DBhabhaVetoClusterTCIds[cl_idx];
+    }
+    // get each TC theta ID(most energetic TC in a cluster) of
+    // two clusters of 3D Bhabha veto
+    int get3DBhabhaVetoClusterThetaId(int cl_idx)
+    {
+      if (cl_idx < 0 || cl_idx > 1 || m_3DBhabhaVetoClusterThetaIds.size() != 2) {
+        return -10;
+      }
+      return m_3DBhabhaVetoClusterThetaIds[cl_idx];
+    }
+    // get each cluster energy of two clusters of 3D Bhabha veto (GeV)
+    double get3DBhabhaVetoClusterEnergy(int cl_idx)
+    {
+      if (cl_idx < 0 || cl_idx > 1 || m_3DBhabhaVetoClusterEnergies.size() != 2) {
+        return -10;
+      }
+      return m_3DBhabhaVetoClusterEnergies[cl_idx];
+    }
+    // get each cluster timing of two clusters of 3D Bhabha veto (ns)
+    double get3DBhabhaVetoClusterTiming(int cl_idx)
+    {
+      if (cl_idx < 0 || cl_idx > 1 || m_3DBhabhaVetoClusterTimings.size() != 2) {
+        return -1000;
+      }
+      return m_3DBhabhaVetoClusterTimings[cl_idx];
+    }
+    // get trigger bit(2bits) of flag which shows theta position of clusters
+    // of 3DBhabha Selection.
+    // flag=0 : one of clusters goes to ThetaID=1
+    // flag=1 : one of clusters goes to ThetaID=2
+    // flag=2 : one of clusters goes to ThetaID=3
+    // flag=3 : none of clusters fly to ThetaID=1-3
+    // Based on this flag, pre-scale is applied on GDL to have flat entry of
+    // Bhabha event in theta for calibration purpose
+    int get3DBhabhaSelectionThetaFlag(void)
+    {
+      return m_3DBhabhaSelectionThetaFlag;
+    }
+    // get each TCID(most energetic TC in a cluster) of two clusters of 3D Bhabha selection
+    int get3DBhabhaSelectionClusterTCId(int cl_idx)
+    {
+      if (cl_idx < 0 || cl_idx > 1 || m_3DBhabhaSelectionClusterTCIds.size() != 2) {
+        return -10;
+      }
+      return m_3DBhabhaSelectionClusterTCIds[cl_idx];
+    }
+    // get each TC theta ID(most energetic TC in a cluster) of
+    // two clusters of 3D Bhabha selection
+    int get3DBhabhaSelectionClusterThetaId(int cl_idx)
+    {
+      if (cl_idx < 0 || cl_idx > 1 || m_3DBhabhaSelectionClusterThetaIds.size() != 2) {
+        return -10;
+      }
+      return m_3DBhabhaSelectionClusterThetaIds[cl_idx];
+    }
+    // get each cluster energy of two clusters of 3D Bhabha selection (GeV)
+    double get3DBhabhaSelectionClusterEnergy(int cl_idx)
+    {
+      if (cl_idx < 0 || cl_idx > 1 || m_3DBhabhaSelectionClusterEnergies.size() != 2) {
+        return -10;
+      }
+      return m_3DBhabhaSelectionClusterEnergies[cl_idx];
+    }
+    // get each cluster timing of two clusters of 3D Bhabha selection (ns)
+    double get3DBhabhaSelectionClusterTiming(int cl_idx)
+    {
+      if (cl_idx < 0 || cl_idx > 1 || m_3DBhabhaSelectionClusterTimings.size() != 2) {
+        return -1000;
+      }
+      return m_3DBhabhaSelectionClusterTimings[cl_idx];
+    }
 
   private:
     /** Object of TC Mapping */
-    TrgEclMapping* _TCMap;
+    TrgEclMapping* _TCMap = nullptr;
     /** Object of Trigger ECL DataBase */
-    TrgEclDataBase* _database;
+    // cppcheck-suppress unsafeClassCanLeak
+    TrgEclDataBase* _database = nullptr;
 
     /** Bhabha Combination*/
     std::vector<double> BhabhaComb;
@@ -104,7 +211,29 @@ namespace Belle2 {
     double _mumuThreshold;
     //! mumu bit  Angle
     std::vector<double> _mumuAngle;
-
+    // trigger bit of flag(1bit) whether two clusters statisfy 3D Bhabha veto
+    // are in CDCTRG region in theta (="InTrack") or not
+    int                 m_3DBhabhaVetoInTrackFlag;
+    // TCIDs of two clusters of 3D Bhabha veto
+    std::vector<int>    m_3DBhabhaVetoClusterTCIds;
+    // ThetaIds of two clusters of 3D Bhabha veto
+    std::vector<int>    m_3DBhabhaVetoClusterThetaIds;
+    // Energies of two clusters of 3D Bhabha veto (GeV)
+    std::vector<double> m_3DBhabhaVetoClusterEnergies;
+    // Timings of two clusters of 3D Bhabha veto (ns)
+    std::vector<double> m_3DBhabhaVetoClusterTimings;
+    // theta region(low and high) of 3D Bhbabha veto InTrack
+    std::vector<int> m_3DBhabhaVetoInTrackThetaRegion;
+    // flag which shows theta position of clusters of 3DBhabha Selection.
+    int m_3DBhabhaSelectionThetaFlag = std::numeric_limits<int>::quiet_NaN();
+    // TCIDs of two clusters of 3D Bhabha selection
+    std::vector<int>    m_3DBhabhaSelectionClusterTCIds;
+    // ThetaIDs of two clusters used for 3D Bhabha selection
+    std::vector<int>    m_3DBhabhaSelectionClusterThetaIds;
+    // Energies of two clusters used for 3D Bhabha selection (GeV)
+    std::vector<double> m_3DBhabhaSelectionClusterEnergies;
+    // Timings of two clusters used for 3D Bhabha selection (ns)
+    std::vector<double> m_3DBhabhaSelectionClusterTimings;
 
   };
 //

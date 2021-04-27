@@ -32,6 +32,8 @@
 #include <reconstruction/dbobjects/CDCDedxCosineCor.h>
 #include <reconstruction/dbobjects/CDCDedx2DCell.h>
 #include <reconstruction/dbobjects/CDCDedx1DCell.h>
+#include <reconstruction/dbobjects/CDCDedxADCNonLinearity.h> //new in rel5
+#include <reconstruction/dbobjects/CDCDedxCosineEdge.h> //new in rel5
 #include <mdst/dbobjects/BeamSpot.h>
 
 #include <analysis/dataobjects/ParticleList.h>
@@ -151,6 +153,7 @@ namespace Belle2 {
     // calibration constants
     double m_scale{ -1.};   /**< calibration scale factor */
     double m_cosCor{ -1.};  /**< calibration cosine correction */
+    double m_cosEdgeCor{ -1.};  /**< calibration cosine edge correction */
     double m_runGain{ -1.}; /**< calibration run gain */
 
     // hadron cal and PID related variables
@@ -194,6 +197,7 @@ namespace Belle2 {
     double h_path[kMaxHits] = {};   /**< path length in cell */
     double h_dedx[kMaxHits] = {};   /**< charge per path length */
     double h_adcraw[kMaxHits] = {}; /**< charge per hit */
+    double h_adccorr[kMaxHits] = {}; /**< charge per hit corr by nonlinear ADC */
     double h_doca[kMaxHits] = {};   /**< distance of closest approach */
     double h_ndoca[kMaxHits] = {};  /**< normalized distance of closest approach */
     double h_ndocaRS[kMaxHits] = {}; /**< normalized +RS distance of closest approach */
@@ -201,6 +205,7 @@ namespace Belle2 {
     double h_entaRS[kMaxHits] = {};   /**< normalized + RS distance of entrance angle */
     double h_driftT[kMaxHits] = {};   /**< drift time */
     double h_driftD[kMaxHits] = {};   /**< drift distance */
+    double h_facnladc[kMaxHits] = {}; /**< calibration hit gain */
     double h_wireGain[kMaxHits] = {}; /**< calibration hit gain */
     double h_twodCor[kMaxHits] = {};  /**< calibration 2D correction */
     double h_onedCor[kMaxHits] = {};  /**< calibration 1D cleanup correction */
@@ -218,7 +223,10 @@ namespace Belle2 {
     DBObjPtr<CDCDedxCosineCor> m_DBCosineCor;     /**< Electron saturation correction DB object */
     DBObjPtr<CDCDedx2DCell> m_DB2DCell; /**< 2D correction DB object */
     DBObjPtr<CDCDedx1DCell> m_DB1DCell; /**< 1D correction DB object */
+    DBObjPtr<CDCDedxADCNonLinearity> m_DBNonlADC; /**< hadron saturation non linearity */
+    DBObjPtr<CDCDedxCosineEdge> m_DBCosEdgeCor; /**< cosine edge calibration */
 
+    bool nodeadwire; /**< write only active wires */
     //Flag to enable and disable set of variables
     bool enableHitLevel; /**< Flag to switch on/off hit level info */
     bool enableExtraVar; /**< Flag to switch on/off extra level info and some available w/ release/5 only */

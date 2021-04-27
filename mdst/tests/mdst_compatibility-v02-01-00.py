@@ -17,14 +17,22 @@ CHANGES since release-02-01-00:
   + hasFailedFitTime
   + hasFailedTimeResolution
   - getCovarianceMatrixAsArray removed
+- TRGSummary:
+  + getTimQuality added
+  + isPoissonInInjectionVeto
+  * added getters to map bit names to numbers (getInputBitNumber, getOutputBitNumber)
+    The mapping is from the database and doesn't affect mdst content and is thus not tested here.
 - SoftwareTriggerResult:
   * non-prescaled results added
+- TrackFitResult:
+  + ndf
+  + chi2
 - Particle masses:
   * The particle masses have been updated to PDG 2020. As a result, the
     energies corresponding to the measured momenta became slightly different.
 """
 
-from basf2 import create_path, process, set_random_seed, find_file, LogLevel, logging
+from basf2 import create_path, process, set_random_seed, find_file
 from b2test_utils import configure_logging_for_tests
 from mdst import add_mdst_dump
 

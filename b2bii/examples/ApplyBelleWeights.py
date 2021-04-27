@@ -14,9 +14,6 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-import variables.collections as vc
-import variables.utils as vu
-import stdCharged as stdc
 import variables as va
 import os
 from b2biiConversion import convertBelleMdstToBelleIIMdst
@@ -29,7 +26,7 @@ os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
 my_path = b2.create_path()
 
 # Adding database with weight tables
-b2.use_central_database("BellePID")
+b2.conditions.prepend_globaltag("BellePID")
 
 # Read in and convert Belle mdst
 inputfile = b2.find_file('b2bii_input_evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst', 'examples', False)

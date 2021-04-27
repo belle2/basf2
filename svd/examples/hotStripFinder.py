@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from basf2 import *
-from svd import *
-import glob
+import basf2 as b2
+from basf2 import conditions as b2conditions
 
 #########
 #
@@ -38,16 +37,13 @@ outputfile = "SVDHotStripFinderZS5_exp" + str(exp) + "run" + str(run) + "_V1_" +
 if useLauraAlg:
     outputfile = "SVDHotStripFinderZS5_exp" + str(exp) + "run" + str(run) + "_V2_" + str(myflag) + ".root"
 
-use_database_chain()
-use_central_database("data_reprocessing_prompt_bucket6")
-use_central_database("svd_basic")
-use_central_database("svd_onlySVDinGeoConfiguration")
+b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
+b2conditions.prepend_globaltag("data_reprocessing_prompt")
+b2conditions.prepend_globaltag("svd_basic")
 
-use_local_database("localDB_HSF/database.txt", "localDB_HSF")
+main = b2.create_path()
 
-main = create_path()
-
-set_random_seed(1)
+b2.set_random_seed(1)
 
 main.add_module(
     'RootInput',
@@ -76,8 +72,8 @@ main.add_module('SVDHotStripFinder', ShaperDigits='SVDShaperDigitsZS5', outputFi
 
 main.add_module('Progress')
 
-print_path(main)
+b2.print_path(main)
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

@@ -10,16 +10,17 @@
 </header>
 """
 
+from tracking.validation.run import TrackingValidationRun
+import tracking
+import logging
+import basf2
+import svd
+
 VALIDATION_OUTPUT_FILE = 'toCDCCKFTrackingValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
 
-import basf2
 basf2.set_random_seed(1337)
-
-import logging
-import tracking
-from tracking.validation.run import TrackingValidationRun
 
 
 class toCDCCKFValidationBkg(TrackingValidationRun):
@@ -38,7 +39,7 @@ class toCDCCKFValidationBkg(TrackingValidationRun):
         path.add_module('SetupGenfitExtrapolation',
                         energyLossBrems=False, noiseBrems=False)
 
-        tracking.add_svd_reconstruction(path)
+        svd.add_svd_reconstruction(path)
         tracking.add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracksSVD", components=["SVD"])
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracksSVD")
 

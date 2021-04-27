@@ -15,17 +15,17 @@
 <header>
     <input>muon-ExtMuidValidation.root,
            pion-ExtMuidValidation.root</input>
-    <contact>piilonen@vt.edu</contact>
+    <contact>depietro@infn.it</contact>
     <description>Create validation plots for Ext and Muid</description>
 </header>
 """
 
 import ROOT
 
-ROOT.PyConfig.IgnoreCommandLineOptions = True
-ROOT.gROOT.SetBatch(True)
+ROOT.PyConfig.IgnoreCommandLineOptions = True  # noqa
+ROOT.gROOT.SetBatch(True)  # noqa
 
-from ROOT import TFile, TChain, TTree, TH1F, TH2F, TCanvas, TNamed, gStyle
+from ROOT import TChain, TFile, TH1F, TH2F, TNamed, gStyle
 import sys
 import math
 import numpy as np
@@ -33,8 +33,8 @@ from optparse import OptionParser
 
 # contact person information
 # is added to the plot descriptions
-CONTACT_PERSON = {'Name': 'Leo Piilonen',
-                  'Email': 'piilonen@vt.edu'}
+CONTACT_PERSON = {'Name': 'Giacomo De Pietro',
+                  'Email': 'depietro@infn.it'}
 
 
 def main():
@@ -85,14 +85,16 @@ def draw_exthits(file_chain):
     Draw the ExtHit-related distributions.
     """
 
+    contact_mail = "depietro@infn.it"
+
     # NOTE: *.Draw() must precede *.GetListOfFunctions().Add() or the latter will be discarded!
     detectorID = TH1F('DetectorID', 'Detector ID for ExtHits', 8, -0.5, 7.5)
     file_chain.Draw('ExtHits.m_DetectorID&0x0F>>DetectorID', '')
     detectorID.GetXaxis().SetTitle('0=undefined, 1=PXD, 2=SVD, 3=CDC, 4=TOP, 5=ARICH, 6=ECL, 7=KLM')
     detectorID.GetListOfFunctions().Add(TNamed('Description', "0=undefined, 1=PXD, 2=SVD, 3=CDC, 4=TOP, 5=ARICH, 6=ECL, 7=KLM"))
     detectorID.GetListOfFunctions().Add(TNamed('Check', "ECL > (KLM ~ TOP) >> ARICH; others ~ 0"))
-    detectorID.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
-    detectorID.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
+    detectorID.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
+    detectorID.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.50,pvalue-error=0.10'))
     detectorID.Write()
 
     tof = TH1F('TOF', 'Time of Flight for non-KLM ExtHits', 100, 0.0, 25.0)
@@ -100,7 +102,7 @@ def draw_exthits(file_chain):
     tof.GetXaxis().SetTitle('t (ns)')
     tof.GetListOfFunctions().Add(TNamed('Description', "Time of flight along track from IP to each ExtHit"))
     tof.GetListOfFunctions().Add(TNamed('Check', "Dominant peak at ~4.5 ns, secondary peak at ~6 ns"))
-    tof.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    tof.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     tof.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
     tof.Write()
 
@@ -109,7 +111,7 @@ def draw_exthits(file_chain):
     tofKLM.GetXaxis().SetTitle('t (ns)')
     tofKLM.GetListOfFunctions().Add(TNamed('Description', "Time of flight along track from IP to each ExtHit"))
     tofKLM.GetListOfFunctions().Add(TNamed('Check', "Broad rising distribution at 7-11 ns, then falling to ~17 ns"))
-    tofKLM.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    tofKLM.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     tofKLM.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
     tofKLM.Write()
 
@@ -118,7 +120,7 @@ def draw_exthits(file_chain):
     r.GetXaxis().SetTitle('r (cm)')
     r.GetListOfFunctions().Add(TNamed('Description', "Radial position in transverse plane of each ExtHit"))
     r.GetListOfFunctions().Add(TNamed('Check', "Sharp peak at 120 cm; broad peak at 140 cm"))
-    r.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    r.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     r.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
     r.Write()
 
@@ -127,7 +129,7 @@ def draw_exthits(file_chain):
     z.GetXaxis().SetTitle('z (cm)')
     z.GetListOfFunctions().Add(TNamed('Description', "Axial position of each ExtHit"))
     z.GetListOfFunctions().Add(TNamed('Check', "Broad peak centered at 0 cm; sharp dip at 0; secondary peak at 170"))
-    z.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    z.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     z.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
     z.Write()
 
@@ -136,7 +138,7 @@ def draw_exthits(file_chain):
     rKLM.GetXaxis().SetTitle('r (cm)')
     rKLM.GetListOfFunctions().Add(TNamed('Description', "Radial position in transverse plane of each ExtHit"))
     rKLM.GetListOfFunctions().Add(TNamed('Check', "Low shoulder below 200 cm (EKLM); comb-like pattern above 200 cm (BKLM)"))
-    rKLM.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    rKLM.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     rKLM.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
     rKLM.Write()
 
@@ -145,7 +147,7 @@ def draw_exthits(file_chain):
     zKLM.GetXaxis().SetTitle('z (cm)')
     zKLM.GetListOfFunctions().Add(TNamed('Description', "Axial position of each ExtHit"))
     zKLM.GetListOfFunctions().Add(TNamed('Check', "Comb-like pattern at z<-180 and z>280 cm (EKLM); broad peak at 0 (BKLM)"))
-    zKLM.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    zKLM.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     zKLM.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
     zKLM.Write()
 
@@ -155,7 +157,7 @@ def draw_exthits(file_chain):
     xy.GetYaxis().SetTitle('y (cm)')
     xy.GetListOfFunctions().Add(TNamed('Description', "Position projected into transverse plane of each ExtHit"))
     xy.GetListOfFunctions().Add(TNamed('Check', "Cylindrical, with most hits in ECL and TOP"))
-    xy.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    xy.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     xy.GetListOfFunctions().Add(TNamed('MetaOptions', "box, expert"))
     xy.Write()
 
@@ -165,7 +167,7 @@ def draw_exthits(file_chain):
     xz.GetYaxis().SetTitle('x (cm)')
     xz.GetListOfFunctions().Add(TNamed('Description', "Position projected into x-z plane of each ExtHit"))
     xz.GetListOfFunctions().Add(TNamed('Check', " "))
-    xz.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    xz.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     xz.GetListOfFunctions().Add(TNamed('MetaOptions', "box, expert"))
     xz.Write()
 
@@ -175,7 +177,7 @@ def draw_exthits(file_chain):
     yz.GetYaxis().SetTitle('y (cm)')
     yz.GetListOfFunctions().Add(TNamed('Description', "Position projected into y-z plane of each ExtHit"))
     yz.GetListOfFunctions().Add(TNamed('Check', " "))
-    yz.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    yz.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     yz.GetListOfFunctions().Add(TNamed('MetaOptions', "box, expert"))
     yz.Write()
 
@@ -185,7 +187,7 @@ def draw_exthits(file_chain):
     xyKLM.GetYaxis().SetTitle('y (cm)')
     xyKLM.GetListOfFunctions().Add(TNamed('Description', "Position projected into transverse plane of each ExtHit"))
     xyKLM.GetListOfFunctions().Add(TNamed('Check', "Octagonal (BKLM) and cylindrical (EKLM)"))
-    xyKLM.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    xyKLM.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     xyKLM.GetListOfFunctions().Add(TNamed('MetaOptions', "box, expert"))
     xyKLM.Write()
 
@@ -195,7 +197,7 @@ def draw_exthits(file_chain):
     xzKLM.GetYaxis().SetTitle('x (cm)')
     xzKLM.GetListOfFunctions().Add(TNamed('Description', "Position projected into x-z plane of each ExtHit"))
     xzKLM.GetListOfFunctions().Add(TNamed('Check', " "))
-    xzKLM.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    xzKLM.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     xzKLM.GetListOfFunctions().Add(TNamed('MetaOptions', "box, expert"))
     xzKLM.Write()
 
@@ -205,7 +207,7 @@ def draw_exthits(file_chain):
     yzKLM.GetYaxis().SetTitle('y (cm)')
     yzKLM.GetListOfFunctions().Add(TNamed('Description', "Position projected into y-z plane of each ExtHit"))
     yzKLM.GetListOfFunctions().Add(TNamed('Check', " "))
-    yzKLM.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    yzKLM.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     yzKLM.GetListOfFunctions().Add(TNamed('MetaOptions', "box, expert"))
     yzKLM.Write()
 
@@ -214,6 +216,8 @@ def draw_likelihoods(file_chain):
     """
     Draw the Muid likelihood-based distributions.
     """
+
+    contact_mail = "depietro@infn.it"
 
     outcome = TH1F('Outcome', 'Outcome', 5, -0.5, 4.5)
 
@@ -375,120 +379,120 @@ def draw_likelihoods(file_chain):
     # NOTE: *.Fill() must precede *.GetListOfFunctions().Add() or the latter will be discarded!
     outcome.GetListOfFunctions().Add(TNamed('Description', "0=not in KLM, 1/2=barrel/endcap stop, 3/4=barrel/endcap exit"))
     outcome.GetListOfFunctions().Add(TNamed('Check', "Peak at 3; rest ~ flat"))
-    outcome.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    outcome.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     outcome.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
     outcome.SetMinimum(0.0)
 
     llMu_mu.GetListOfFunctions().Add(TNamed('Description', "Log-likelihood of muon hypothesis for true muons"))
     llMu_mu.GetListOfFunctions().Add(TNamed('Check', "Sharp peak at 0 with tail on negative side"))
-    llMu_mu.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    llMu_mu.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     llMu_mu.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
     llMu_pi.GetListOfFunctions().Add(TNamed('Description', "Log-likelihood of muon hypothesis for true pions"))
     llMu_pi.GetListOfFunctions().Add(TNamed('Check', "Sharp double peak at ~52 with tail up to 0"))
-    llMu_pi.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    llMu_pi.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     llMu_pi.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
     llPi_mu.GetListOfFunctions().Add(TNamed('Description', "Log-likelihood of pion hypothesis for true muons"))
     llPi_mu.GetListOfFunctions().Add(TNamed('Check', "Sharp peak at ~-42 with tail up to 0"))
-    llPi_mu.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    llPi_mu.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     llPi_mu.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
     llPi_pi.GetListOfFunctions().Add(TNamed('Description', "Log-likelihood of pion hypothesis for true pions"))
     llPi_pi.GetListOfFunctions().Add(TNamed('Check', "Sharp peak at 0 with tail on negative side"))
-    llPi_pi.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    llPi_pi.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     llPi_pi.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
     llDiff_mu.GetListOfFunctions().Add(TNamed('Description', "Log-likelihood difference of muon-pion hypotheses for true muons"))
     llDiff_mu.GetListOfFunctions().Add(TNamed('Check', "Sharp peak at ~+42 with tail on lower side"))
-    llDiff_mu.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
-    llDiff_mu.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
+    llDiff_mu.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
+    llDiff_mu.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.50,pvalue-error=0.10'))
     llDiff_pi.GetListOfFunctions().Add(TNamed('Description', "Log-likelihood difference of muon-pion hypotheses for true pions"))
     llDiff_pi.GetListOfFunctions().Add(TNamed('Check', "Sharp peak at ~-52 with tail on higher side"))
-    llDiff_pi.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
-    llDiff_pi.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
+    llDiff_pi.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
+    llDiff_pi.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.50,pvalue-error=0.10'))
 
     barrelLayer_mu.GetListOfFunctions().Add(TNamed('Description', "Outermost barrel layer with matching hit for true muons"))
     barrelLayer_mu.GetListOfFunctions().Add(TNamed('Check', "Sharp peak at layer 14"))
-    barrelLayer_mu.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    barrelLayer_mu.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     barrelLayer_mu.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
     barrelLayer_pi.GetListOfFunctions().Add(TNamed('Description', "Outermost barrel layer with matching hit for true pions"))
     barrelLayer_pi.GetListOfFunctions().Add(TNamed('Check', "Peak at layers 0-1 with tail above that"))
-    barrelLayer_pi.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    barrelLayer_pi.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     barrelLayer_pi.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
     endcapLayer_mu.GetListOfFunctions().Add(TNamed('Description', "Outermost endcap layer with matching hit for true muons"))
     endcapLayer_mu.GetListOfFunctions().Add(TNamed('Check', "Sharp peaks at layers 11 (backward) and 13 (forward)"))
-    endcapLayer_mu.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    endcapLayer_mu.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     endcapLayer_mu.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
     endcapLayer_pi.GetListOfFunctions().Add(TNamed('Description', "Outermost endcap layer with matching hit for true pions"))
     endcapLayer_pi.GetListOfFunctions().Add(TNamed('Check', "Peak at layers 0-1 with tail above that"))
-    endcapLayer_pi.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    endcapLayer_pi.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     endcapLayer_pi.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
 
     diffLayer_mu.GetListOfFunctions().Add(TNamed('Description', "Outermost extrapolated-vs-hit layer difference for true muons"))
     diffLayer_mu.GetListOfFunctions().Add(TNamed('Check', "Sharp peak at 0"))
-    diffLayer_mu.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
-    diffLayer_mu.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
+    diffLayer_mu.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
+    diffLayer_mu.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.50,pvalue-error=0.10'))
     diffLayer_mu.GetXaxis().SetTitle('Last Ext Layer - Last Hit Layer')
     diffLayer_pi.GetListOfFunctions().Add(TNamed('Description', "Outermost extrapolated-vs-hit layer difference for true pions"))
     diffLayer_pi.GetListOfFunctions().Add(TNamed('Check', "Sharp peak at 15 with tail below that"))
-    diffLayer_pi.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
-    diffLayer_pi.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
+    diffLayer_pi.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
+    diffLayer_pi.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.50,pvalue-error=0.10'))
     diffLayer_pi.GetXaxis().SetTitle('Last Ext Layer - Last Hit Layer')
 
     ndof_mu.GetListOfFunctions().Add(TNamed('Description', "(Number of matching-hit layers) x 2 for true muons"))
     ndof_mu.GetListOfFunctions().Add(TNamed('Check', "Even-only entries; peak at 30 with tail below"))
-    ndof_mu.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    ndof_mu.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     ndof_mu.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
     ndof_mu.GetXaxis().SetTitle('#dof')
     ndof_pi.GetListOfFunctions().Add(TNamed('Description', "(Number of matching-hit layers) x 2 for true pions"))
     ndof_pi.GetListOfFunctions().Add(TNamed('Check', "Even-only entries; sharp peak at 0 with tail above"))
-    ndof_pi.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    ndof_pi.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     ndof_pi.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
     ndof_pi.GetXaxis().SetTitle('#dof')
 
     rchisq_mu.GetListOfFunctions().Add(TNamed('Description', "Transverse-deviation chi-squared/#dof for true muons"))
     rchisq_mu.GetListOfFunctions().Add(TNamed('Check', "Narrow peak at 1"))
-    rchisq_mu.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    rchisq_mu.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     rchisq_mu.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
     rchisq_mu.GetXaxis().SetTitle('#chi^{2} / #ndof')
     rchisq_pi.GetListOfFunctions().Add(TNamed('Description', "Transverse-deviation chi-squared/#dof for true pions"))
     rchisq_pi.GetListOfFunctions().Add(TNamed('Check', "Broad peak at ~1"))
-    rchisq_pi.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    rchisq_pi.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     rchisq_pi.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.50,pvalue-error=0.10'))
     rchisq_pi.GetXaxis().SetTitle('#chi^{2} / #ndof')
 
     efficiency_momentum.GetListOfFunctions().Add(TNamed('Description', "Muon ID efficiency vs p for logL(mu) > logL(pi)"))
     efficiency_momentum.GetListOfFunctions().Add(TNamed('Check', "90-95% for p > 0.6 GeV/c"))
-    efficiency_momentum.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    efficiency_momentum.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     efficiency_momentum.GetListOfFunctions().Add(TNamed('MetaOptions', 'pvalue-warn=0.50,pvalue-error=0.10'))
     efficiency_momentum.GetXaxis().SetTitle('p (GeV/#it{c})')
     efficiency_momentum.SetMinimum(0.0)
     fakerate_momentum.GetListOfFunctions().Add(TNamed('Description', "Pion fake rate vs p for logL(mu) > logL(pi)"))
     fakerate_momentum.GetListOfFunctions().Add(TNamed('Check', "Peak of 11% below 1 GeV/c, 2-6% above 1 GeV/c"))
-    fakerate_momentum.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    fakerate_momentum.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     fakerate_momentum.GetListOfFunctions().Add(TNamed('MetaOptions', 'pvalue-warn=0.50,pvalue-error=0.10'))
     fakerate_momentum.GetXaxis().SetTitle('p (GeV/#it{c})')
     fakerate_momentum.SetMinimum(0.0)
 
     efficiency_theta.GetListOfFunctions().Add(TNamed('Description', "Muon ID efficiency vs theta for logL(mu) > logL(pi)"))
     efficiency_theta.GetListOfFunctions().Add(TNamed('Check', "Somewhat flat (80-100%) in KLM range (17 < theta < 145 degrees)"))
-    efficiency_theta.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    efficiency_theta.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     efficiency_theta.GetListOfFunctions().Add(TNamed('MetaOptions', 'pvalue-warn=0.50,pvalue-error=0.10'))
     efficiency_theta.GetXaxis().SetTitle('#theta (deg)')
     efficiency_theta.SetMinimum(0.0)
     fakerate_theta.GetListOfFunctions().Add(TNamed('Description', "Pion fake rate vs theta for logL(mu) > logL(pi)"))
     fakerate_theta.GetListOfFunctions().Add(TNamed('Check', "Roughly flat (3-7%) in KLM range (17 < theta < 145 degrees)"))
-    fakerate_theta.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    fakerate_theta.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     fakerate_theta.GetListOfFunctions().Add(TNamed('MetaOptions', 'pvalue-warn=0.50,pvalue-error=0.10'))
     fakerate_theta.GetXaxis().SetTitle('#theta (deg)')
     fakerate_theta.SetMinimum(0.0)
 
     efficiency_phi.GetListOfFunctions().Add(TNamed('Description', "Muon identification efficiency vs phi for logL(mu) > logL(pi)"))
     efficiency_phi.GetListOfFunctions().Add(TNamed('Check', "Somewhat flat distribution (85-100%)"))
-    efficiency_phi.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    efficiency_phi.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     efficiency_phi.GetListOfFunctions().Add(TNamed('MetaOptions', 'pvalue-warn=0.50,pvalue-error=0.10'))
     efficiency_phi.GetXaxis().SetTitle('#phi (deg)')
     efficiency_phi.SetMinimum(0.0)
     fakerate_phi.GetListOfFunctions().Add(TNamed('Description', "Pion fake rate vs phi for logL(mu) > logL(pi)"))
     fakerate_phi.GetListOfFunctions().Add(TNamed('Check', "Roughly flat distribution (2-7%)"))
-    fakerate_phi.GetListOfFunctions().Add(TNamed('Contact', "piilonen@vt.edu"))
+    fakerate_phi.GetListOfFunctions().Add(TNamed('Contact', contact_mail))
     fakerate_phi.GetListOfFunctions().Add(TNamed('MetaOptions', 'pvalue-warn=0.50,pvalue-error=0.10'))
     fakerate_phi.GetXaxis().SetTitle('#phi (deg)')
     fakerate_phi.SetMinimum(0.0)
@@ -516,6 +520,7 @@ def draw_likelihoods(file_chain):
     fakerate_momentum.Write()
     fakerate_theta.Write()
     fakerate_phi.Write()
+
 
 ####################################################################
 # Entry point of this script: call the main() function             #

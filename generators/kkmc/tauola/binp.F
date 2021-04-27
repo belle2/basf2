@@ -40,7 +40,7 @@ C
 
       if(MNUM.eq.2) then
          
-         IMOD=-1
+C        IMOD=-1
 C     Calculation Matrix element for tau -> pi,A1 -> pi+pi0pi0pi0
 C                                           via rho,pi
          call t1(p2,p3,p1,p4,z_vec)

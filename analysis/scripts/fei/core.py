@@ -43,11 +43,11 @@
 # FEI defines own command line options, therefore we disable
 # the ROOT command line options, which otherwise interfere sometimes.
 from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = True
+PyConfig.IgnoreCommandLineOptions = True  # noqa
 
 # FEI uses multi-threading for parallel execution of tasks therefore
 # the ROOT gui-thread is disabled, which otherwise interferes sometimes
-PyConfig.StartGuiThread = False
+PyConfig.StartGuiThread = False  # noqa
 import ROOT
 from ROOT import Belle2
 
@@ -56,6 +56,7 @@ import basf2
 from basf2 import B2INFO, B2WARNING
 import pybasf2
 import modularAnalysis as ma
+import b2bii
 
 import basf2_mva
 
@@ -66,7 +67,6 @@ from fei import config
 
 # Standard python modules
 import collections
-import argparse
 import os
 import shutil
 import typing
@@ -75,7 +75,6 @@ import re
 import functools
 import subprocess
 import multiprocessing
-import pickle
 
 # Simple object containing the output of fei
 FeiState = collections.namedtuple('FeiState', 'path, stage, plists')
@@ -176,17 +175,17 @@ class FSPLoader(object):
         """
         path = basf2.create_path()
 
-        if self.config.b2bii:
+        if b2bii.isB2BII():
             ma.fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                  ('mu+:FSP', ''), ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, path=path)
+                                  ('mu+:FSP', ''), ('p+:FSP', '')], writeOut=True, path=path)
             for outputList, inputList in [('gamma:FSP', 'gamma:mdst'), ('K_S0:V0', 'K_S0:mdst'),
-                                          ('Lambda0:V0', 'Lambda0:mdst'),
+                                          ('Lambda0:V0', 'Lambda0:mdst'), ('K_L0:FSP', 'K_L0:mdst'),
                                           ('pi0:FSP', 'pi0:mdst'), ('gamma:V0', 'gamma:v0mdst')]:
                 ma.copyParticles(outputList, inputList, writeOut=True, path=path)
         else:
             ma.fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
                                   ('mu+:FSP', ''), ('gamma:FSP', ''),
-                                  ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, path=path)
+                                  ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, loadPhotonBeamBackgroundMVA=False, path=path)
             ma.fillParticleList('K_S0:V0 -> pi+ pi-', '', writeOut=True, path=path)
             ma.fillParticleList('Lambda0:V0 -> p+ pi-', '', writeOut=True, path=path)
             ma.fillConvertedPhotonsList('gamma:V0 -> e+ e-', '', writeOut=True, path=path)
@@ -310,7 +309,13 @@ class PreReconstruction(object):
 
                 if len(channel.daughters) == 1:
                     ma.cutAndCopyList(channel.name, channel.daughters[0], channel.preCutConfig.userCut, writeOut=True, path=path)
-                    ma.variablesToExtraInfo(channel.name, {f'constant({channel.decayModeID})': 'decayModeID'}, path=path)
+                    v2EI = basf2.register_module('VariablesToExtraInfo')
+                    v2EI.set_name('VariablesToExtraInfo_' + channel.name)
+                    v2EI.param('particleList', channel.name)
+                    v2EI.param('variables', {f'constant({channel.decayModeID})': 'decayModeID'})
+                    # suppress warning that decay mode ID won't be overwritten if it already exists
+                    v2EI.set_log_level(basf2.logging.log_level.ERROR)
+                    path.add_module(v2EI)
                 else:
                     ma.reconstructDecay(channel.decayString, channel.preCutConfig.userCut, channel.decayModeID,
                                         writeOut=True, path=path)
@@ -357,8 +362,17 @@ class PreReconstruction(object):
                 elif self.config.training:
                     ma.matchMCTruth(channel.name, path=path)
 
-                if re.findall(r"[\w']+", channel.decayString).count('pi0') > 1:
-                    basf2.B2INFO(f"Ignoring vertex fit because multiple pi0 are not supported yet {channel.name}.")
+                if b2bii.isB2BII() and particle.name in ['K_S0', 'Lambda0']:
+                    pvfit = basf2.register_module('ParticleVertexFitter')
+                    pvfit.set_name('ParticleVertexFitter_' + channel.name)
+                    pvfit.param('listName', channel.name)
+                    pvfit.param('confidenceLevel', channel.preCutConfig.vertexCut)
+                    pvfit.param('vertexFitter', 'KFit')
+                    pvfit.param('fitType', 'vertex')
+                    pvfit.set_log_level(basf2.logging.log_level.ERROR)  # let's not produce gigabytes of uninteresting warnings
+                    path.add_module(pvfit)
+                elif re.findall(r"[\w']+", channel.decayString).count('pi0') > 1 and particle.name != 'pi0':
+                    basf2.B2INFO(f"Ignoring vertex fit for {channel.name} because multiple pi0 are not supported yet.")
                 elif len(channel.daughters) > 1:
                     pvfit = basf2.register_module('ParticleVertexFitter')
                     pvfit.set_name('ParticleVertexFitter_' + channel.name)
@@ -438,6 +452,8 @@ class PostReconstruction(object):
                     expert.param('identifier', self.config.prefix + '_' + channel.label)
                 expert.param('extraInfoName', 'SignalProbability')
                 expert.param('listNames', [channel.name])
+                # suppress warning that signal probability won't be overwritten if it already exists
+                expert.set_log_level(basf2.logging.log_level.ERROR)
                 path.add_module(expert)
 
                 uniqueSignal = basf2.register_module('TagUniqueSignal')
@@ -445,6 +461,8 @@ class PostReconstruction(object):
                 uniqueSignal.param('target', channel.mvaConfig.target)
                 uniqueSignal.param('extraInfoName', 'uniqueSignal')
                 uniqueSignal.set_name('TagUniqueSignal_' + channel.name)
+                # suppress warning that unique signal extra info won't be overwritten if it already exists
+                uniqueSignal.set_log_level(basf2.logging.log_level.ERROR)
                 path.add_module(uniqueSignal)
 
                 if self.config.monitor:
@@ -609,30 +627,30 @@ class Teacher(object):
                 if not basf2_mva.available(weightfile) and os.path.isfile(filename):
                     f = ROOT.TFile(filename)
                     if not f:
-                        B2WARNING(f"Training of MVC failed. Couldn't find ROOT file. "
-                                  "Ignoring channel {channel.label}.")
+                        B2WARNING("Training of MVC failed. Couldn't find ROOT file. "
+                                  f"Ignoring channel {channel.label}.")
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
-                    l = [m for m in f.GetListOfKeys()]
-                    if not l:
-                        B2WARNING(f"Training of MVC failed. ROOT file does not contain a tree. "
-                                  "Ignoring channel {channel.label}.")
+                    keys = [m for m in f.GetListOfKeys()]
+                    if not keys:
+                        B2WARNING("Training of MVC failed. ROOT file does not contain a tree. "
+                                  f"Ignoring channel {channel.label}.")
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
-                    tree = l[0].ReadObj()
+                    tree = keys[0].ReadObj()
                     nSig = tree.GetEntries(channel.mvaConfig.target + ' == 1.0')
                     nBg = tree.GetEntries(channel.mvaConfig.target + ' != 1.0')
                     if nSig < Teacher.MinimumNumberOfMVASamples:
-                        B2WARNING(f"Training of MVC failed."
-                                  "Tree contains too few signal events {nSig}. Ignoring channel {channel}.")
+                        B2WARNING("Training of MVC failed. "
+                                  f"Tree contains too few signal events {nSig}. Ignoring channel {channel}.")
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
                     if nBg < Teacher.MinimumNumberOfMVASamples:
-                        B2WARNING(f"Training of MVC failed."
-                                  "Tree contains too few bckgrd events {nBg}. Ignoring channel {channel}.")
+                        B2WARNING("Training of MVC failed. "
+                                  f"Tree contains too few bckgrd events {nBg}. Ignoring channel {channel}.")
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
@@ -734,7 +752,7 @@ def save_summary(particles: typing.Sequence[config.Particle], configuration: con
     @param config config.FeiConfiguration object
     @param cache current cache level
     """
-    configuration = config.FeiConfiguration(configuration.prefix, cache, configuration.b2bii,
+    configuration = config.FeiConfiguration(configuration.prefix, cache,
                                             configuration.monitor, configuration.legacy, configuration.externTeacher,
                                             configuration.training)
     # Backup existing Summary.pickle files
@@ -776,7 +794,7 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
     @param particles list of config.Particle objects
     @param config config.FeiConfiguration object
     """
-    print("""
+    print(r"""
     ____ _  _ _    _       ____ _  _ ____ _  _ ___    _ _  _ ___ ____ ____ ___  ____ ____ ___ ____ ___ _ ____ _  _
     |___ |  | |    |       |___ |  | |___ |\ |  |     | |\ |  |  |___ |__/ |__] |__/ |___  |  |__|  |  | |  | |\ |
     |    |__| |___ |___    |___  \/  |___ | \|  |     | | \|  |  |___ |  \ |    |  \ |___  |  |  |  |  | |__| | \|

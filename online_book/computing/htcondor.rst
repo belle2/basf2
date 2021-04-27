@@ -1,4 +1,6 @@
+.. _onlinebook_htcondor:
+
 htcondor
 ========
 
-.. include:: ../todo.rst
+.. include:: ../todo.rstinclude

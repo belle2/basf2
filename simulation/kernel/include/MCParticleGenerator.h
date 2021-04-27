@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MCPARTICLEGENERATOR_H_
-#define MCPARTICLEGENERATOR_H_
+#pragma once
 
 #include <mdst/dataobjects/MCParticleGraph.h>
 
@@ -18,6 +17,8 @@
 #include <G4Event.hh>
 
 #include <string>
+
+class G4VSolid;
 
 namespace Belle2 {
 
@@ -51,7 +52,8 @@ namespace Belle2 {
 
 
     protected:
-
+      /** Pointer to the top level solid to check if particles are inside the simulation volume */
+      G4VSolid* m_topSolid{nullptr};
       std::string m_mcCollectionName;     /**< Name of the MCParticle collection */
       MCParticleGraph& m_mcParticleGraph; /**< Reference to the MCParticle graph */
 
@@ -71,10 +73,27 @@ namespace Belle2 {
                        int motherIndex,
                        bool useTime);
 
+      /**
+       * Create a simulation vertex for the given particle.
+       *
+       * This checks if the particle starts inside the simulation volume. If
+       * it's inside trivially just create a vertex at the given position and
+       * time. If not check if the particle intersects with the simulation
+       * volume.
+       *
+       * If it does intersect and will survive long enough to get there we
+       * create a vertex at the simulation volume boundary and also set
+       * productionTimeShift to the flight time to get to the simulation volume.
+       *
+       * @param p Particle to create the vertex for
+       * @param productionTimeShift return the flight time of the particle
+       *    before reaching the simulation volume
+       * @returns a new G4PrimaryVertex or nullptr if the particle didn't
+       *    intersect with the simulation volume in time.
+       */
+      G4PrimaryVertex* determineVertex(const MCParticleGraph::GraphParticle& p, double& productionTimeShift);
     };
 
   } //end of Simulation namespace
 
 } //end of Belle2 namespace
-
-#endif /* MCPARTICLEGENERATOR_H_ */

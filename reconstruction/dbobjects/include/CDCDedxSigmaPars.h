@@ -61,7 +61,8 @@ namespace Belle2 {
     void setVersion(short version) {m_version = version; };
 
     /** Set sigma parameter
-     * @param sigma parameter
+     * @param par parameter value
+     * @param value parameter key
      */
     void setSigmaPar(int par, double value) {m_sigmapars[par] = value; };
 

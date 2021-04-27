@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef REMOVEMCPARTICLESMODULE_H
-#define REMOVEMCPARTICLESMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
@@ -71,4 +70,3 @@ namespace Belle2 {
 } // end namespace Belle2
 
 
-#endif /* REMOVEMCPARTICLESMODULE_H */

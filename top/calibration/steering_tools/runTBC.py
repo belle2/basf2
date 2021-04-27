@@ -10,14 +10,13 @@
 # Contributors: Marko Staric, Umberto Tamponi
 #
 
-from basf2 import *
-import os
+import basf2 as b2
 import sys
 
 # read parameters
 
 argvs = sys.argv
-if len(argvs) is not 5:
+if len(argvs) != 5:
     print('usage: basf2', argvs[0],
           '-i <file_sroot> (pocket|local) <slot> <channel> <output_dir>')
     sys.exit()
@@ -31,37 +30,37 @@ print('data type:', datatype, ' slot:', slot, ' calibration channel:', channel,
       ' output to:', outdir)
 
 # Define a global tag (note: the one given bellow can be out-dated!)
-use_central_database('data_reprocessing_proc8')
+b2.use_central_database('data_reprocessing_proc8')
 
 # Suppress messages and warnings during processing
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # input
-roinput = register_module('SeqRootInput')
+roinput = b2.register_module('SeqRootInput')
 main.add_module(roinput)
 
 # conversion from RawCOPPER or RawDataBlock to RawDetector objects
 if datatype == 'pocket':
     print('pocket DAQ data assumed')
-    converter = register_module('Convert2RawDet')
+    converter = b2.register_module('Convert2RawDet')
     main.add_module(converter)
 
 # Initialize TOP geometry parameters (creation of Geant geometry is not needed)
 main.add_module('TOPGeometryParInitializer')
 
 # Unpacking (format auto detection works now)
-unpack = register_module('TOPUnpacker')
+unpack = b2.register_module('TOPUnpacker')
 main.add_module(unpack)
 
 # Add multiple hits by running feature extraction offline
-featureExtractor = register_module('TOPWaveformFeatureExtractor')
+featureExtractor = b2.register_module('TOPWaveformFeatureExtractor')
 main.add_module(featureExtractor)
 
 # Convert to TOPDigits
-converter = register_module('TOPRawDigitConverter')
+converter = b2.register_module('TOPRawDigitConverter')
 converter.param('useSampleTimeCalibration', False)
 converter.param('useChannelT0Calibration', False)
 converter.param('useModuleT0Calibration', False)
@@ -75,20 +74,20 @@ converter.param('lookBackWindows', 29)  # in number of windows
 main.add_module(converter)
 
 # TB calibrator
-calib = register_module('TOPTimeBaseCalibrator')
+calib = b2.register_module('TOPTimeBaseCalibrator')
 calib.param('moduleID', slot)
 calib.param('method', 1)  # Matrix inversion or iterative
 calib.param('directoryName', outdir)
-calib.logging.log_level = LogLevel.INFO
+calib.logging.log_level = b2.LogLevel.INFO
 main.add_module(calib)
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
-print(statistics(statistics.TERM))
+print(b2.statistics)
+print(b2.statistics(b2.statistics.TERM))

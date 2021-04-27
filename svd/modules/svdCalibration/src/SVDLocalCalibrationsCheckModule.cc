@@ -539,8 +539,8 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
   TH2F* checkU = nullptr;
   TH2F* checkV = nullptr;
 
-  Int_t minY;
-  Int_t maxY;
+  Int_t minY = 0;
+  Int_t maxY = 0;
 
   Float_t leftLine = 0;
   Float_t rightLine = 0;

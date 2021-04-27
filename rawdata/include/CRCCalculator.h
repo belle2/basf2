@@ -1,11 +1,5 @@
 #ifndef CRCCALCULATOR_H
 #define CRCCALCULATOR_H
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <limits.h>
-#include <cstddef>
-
 
 //namespace Belle2 {
 

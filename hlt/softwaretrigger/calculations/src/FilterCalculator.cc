@@ -16,6 +16,7 @@
 #include <mdst/dataobjects/HitPatternCDC.h>
 
 #include <numeric>
+#include <stdexcept>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
@@ -61,11 +62,18 @@ struct SelectedECLCluster {
 /// the boundaries for the eeFlatXX cuts
 const double flatBoundaries[10] = {0., 19., 22., 25., 30., 35., 45., 60., 90., 180.};
 
+
+FilterCalculator::FilterCalculator() : m_bitsNN("CDCTriggerNNBits")
+{
+
+}
+
 void FilterCalculator::requireStoreArrays()
 {
   m_tracks.isRequired();
   m_eclClusters.isRequired();
   m_l1Trigger.isOptional();
+  m_bitsNN.isOptional();
 }
 
 void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
@@ -80,6 +88,11 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["nE300Lab"] = 0; /**< number of clusters with Elab > m_EminLab4Cluster outside of high background endcap region */
   calculationResult["nE500Lab"] = 0; /**< number of clusters with Elab > m_EminLab3Cluster outside of high background endcap region */
   calculationResult["nE2000CMS"] = 0; /**< number of clusters with Ecms > m_Ehigh outside of high background endcap region */
+  calculationResult["nE4000CMS"] = 0; /**< number of clusters with E*>4 GeV */
+  calculationResult["nE250Lab"] = 0; /**< neutral clusters with Elab>250 MeV (anywhere) */
+  calculationResult["nMaxEPhotonAcc"] = 0; /**< Neutral, zmva>0.5, in [17,150], max 2 energy clusters*/
+  calculationResult["dphiCmsClust"] = NAN; /**< dphi* between 2 max E clusters */
+
   calculationResult["netChargeLoose"] = 0; /**< net charge of loose tracks */
   calculationResult["maximumPCMS"] = NAN; /**< maximum p* of loose tracks (GeV/c) */
   calculationResult["eexx"] = 0;
@@ -93,6 +106,9 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["nEsingleElectronExtendedBarrel"] = 0; /**< charged clusters with E*> 1 GeV in [32,130] */
   calculationResult["nReducedEsinglePhotonReducedBarrel"] = 0; /**< charged clusters with E*> 0.5 GeV in [44,98] */
   calculationResult["nVetoClust"] = 0; /**< clusters with E>m_Emedium and |t|/dt99 < 10 */
+  calculationResult["chrgClust2GeV"] = 0; /**< charged clusters with E*>2 GeV */
+  calculationResult["neutClust045GeVAcc"] = 0; /**< neutral clusters with E*>0.45 GeV in [17,150] */
+  calculationResult["neutClust045GeVBarrel"] = 0; /**< neutral clusters with E*>0.45 GeV in [30,130] */
   calculationResult["singleTagLowMass"] = 0;
   calculationResult["singleTagHighMass"] = 0;
   calculationResult["n2GeVNeutBarrel"] = 0;
@@ -134,14 +150,51 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["eeFlat6"] = 0;
   calculationResult["eeFlat7"] = 0;
   calculationResult["eeFlat8"] = 0;
+  calculationResult["eeOneClust"] = 0;
   // Passed on L1 information
   if (m_l1Trigger.isValid()) {
     calculationResult["l1_trigger_random"] = m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND;
     calculationResult["l1_trigger_delayed_bhabha"] = m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_DPHY;
+    calculationResult["l1_trigger_poisson"] = m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_POIS;
+    bool bha3d;
+    try {
+      bha3d = m_l1Trigger->testPsnm("bha3d");
+    } catch (const std::exception&) {
+      bha3d = false;
+    }
+    bool bhapurPsnm;
+    try {
+      bhapurPsnm = m_l1Trigger->testPsnm("bhapur");
+    } catch (const std::exception&) {
+      bhapurPsnm = false;
+    }
+    bool bhapurFtdl;
+    try {
+      bhapurFtdl = m_l1Trigger->testFtdl("bhapur");
+    } catch (const std::exception&) {
+      bhapurFtdl = false;
+    }
+    bool lml1;
+    try {
+      lml1 = m_l1Trigger->testPsnm("lml1");
+    } catch (const std::exception&) {
+      lml1 = false;
+    }
+    calculationResult["bha3d"] = bha3d;
+    calculationResult["bhapur"] = bhapurPsnm;
+    calculationResult["bhapur_lml1"] = lml1 and bhapurFtdl;
   } else {
-    calculationResult["l1_trigger_random"] = -1;
-    calculationResult["l1_trigger_delayed_bhabha"] = -1;
+    calculationResult["l1_trigger_random"] = 1; // save every event if no L1 trigger info
+    calculationResult["l1_trigger_delayed_bhabha"] = 0;
+    calculationResult["l1_trigger_poisson"] = 0;
+    calculationResult["bha3d"] = 0;
+    calculationResult["bhapur"] = 0;
+    calculationResult["bhapur_lml1"] = 0;
   }
+
+  // Every 256th event has CDC NN trigger information
+  calculationResult["l1_trg_NN_info"] = 0;
+  if (m_bitsNN.isValid() and m_bitsNN.getEntries() > 0) {calculationResult["l1_trg_NN_info"] = 1;}
 
   calculationResult["true"] = 1;
   calculationResult["false"] = 0;
@@ -272,11 +325,23 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       calculationResult["nVetoClust"] += 1;
     }
 
+
     //..Single cluster trigger objects use charge, Zernike moment, and thetaLab
     const double thetaLab = selectedCluster.p4Lab.Theta() * TMath::RadToDeg();
     const double zmva = cluster.getZernikeMVA();
     const bool photon = zmva > 0.5 and not selectedCluster.isTrack;
     const bool electron = zmva > 0.5 and selectedCluster.isTrack;
+
+    //..For 1 track radiative Bhabha control sample
+    if (selectedCluster.energyCMS > 2. and selectedCluster.isTrack) {
+      calculationResult["chrgClust2GeV"] += 1;
+    }
+    if (selectedCluster.energyCMS > 0.45 and not selectedCluster.isTrack) {
+      const bool isInAcceptance = 17. < thetaLab and thetaLab < 150.;
+      if (isInAcceptance) {calculationResult["neutClust045GeVAcc"] += 1;}
+      const bool isInBarrel = 30. < thetaLab and thetaLab < 130.;
+      if (isInBarrel) {calculationResult["neutClust045GeVBarrel"] += 1;}
+    }
 
 
     // improved 3 cluster (4 cluster) trigger
@@ -297,6 +362,15 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       calculationResult["nE2000CMS"] += 1;
     }
 
+    //..For two-photon fusion ALP trigger
+    if (selectedCluster.energyLab > 0.25) {
+      calculationResult["nE250Lab"] += 1;
+    }
+    if (selectedCluster.energyCMS > 4.) {
+      calculationResult["nE4000CMS"] += 1;
+    }
+
+    //..Single cluster triggers
     if (selectedCluster.energyCMS > m_EsinglePhoton) {
       calculationResult["nEsingleClust"] += 1;
 
@@ -495,6 +569,17 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     double thetaSum = (firstCluster.p4CMS.Theta() + secondCluster.p4CMS.Theta()) * TMath::RadToDeg();
     double dthetaSum = std::abs(thetaSum - 180);
 
+    //..Quantities for two-photon fusion triggers
+    calculationResult["dphiCmsClust"] = dphi;
+    for (int ic = 0; ic < 2; ic++) {
+      const double thetaLab = selectedClusters[ic].p4Lab.Theta() * TMath::RadToDeg();
+      const bool isInAcceptance = 17. < thetaLab and thetaLab < 150.;
+      const ECLCluster* cluster = selectedClusters[ic].cluster;
+      const double zmva = cluster->getZernikeMVA();
+      const bool photon = zmva > 0.5 and not selectedClusters[ic].isTrack;
+      if (isInAcceptance and photon) {calculationResult["nMaxEPhotonAcc"] += 1;}
+    }
+
     const double firstEnergy = firstCluster.p4CMS.E();
     const double secondEnergy = secondCluster.p4CMS.E();
 
@@ -603,6 +688,13 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     }
 
     thetaFlatten = negativeTrack.p4Lab.Theta() * TMath::RadToDeg();
+
+    // Two tracks but (exactly) 1 high energy cluster
+    const bool missNegClust = positiveTrack.clusterEnergySumCMS > 4.5 and negativeTrack.clusterEnergySumCMS < 1.;
+    const bool missPosClust = negativeTrack.clusterEnergySumCMS > 4.5 and positiveTrack.clusterEnergySumCMS < 1.;
+    if ((invMass > 9.) and (missNegClust or missPosClust)) {
+      calculationResult["eeOneClust"] = 1;
+    }
   }
 
   if (calculationResult["selectee1leg1trk"] == 1 or calculationResult["selectee1leg1clst"] == 1) {
@@ -658,8 +750,8 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     }
   }
 
-  // Cosmic selection
-  if (calculationResult["nTrkLoose"] <= 2) {
+  //..Cosmic selection. Need exactly two tracks.
+  if (m_tracks.getEntries() == 2) {
 
     const auto negTrack = maximumPtTracksWithoutZCut.at(-1);
     const auto posTrack = maximumPtTracksWithoutZCut.at(1);
@@ -683,9 +775,16 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       const TLorentzVector& momentumLabNeg(negTrack->p4Lab);
       const TLorentzVector& momentumLabPos(posTrack->p4Lab);
 
+      const double& z0Neg = negTrack->track->getTrackFitResultWithClosestMass(Const::pion)->getZ0();
+      const double& d0Neg = negTrack->track->getTrackFitResultWithClosestMass(Const::pion)->getD0();
+      const double& z0Pos = posTrack->track->getTrackFitResultWithClosestMass(Const::pion)->getZ0();
+      const double& d0Pos = posTrack->track->getTrackFitResultWithClosestMass(Const::pion)->getD0();
+
       // Select cosmic using these tracks
+      const bool goodMagneticRegion = (z0Neg<m_goodMagneticRegionZ0 or abs(d0Neg)>m_goodMagneticRegionD0)
+                                      and (z0Pos<m_goodMagneticRegionZ0 or abs(d0Pos)>m_goodMagneticRegionD0);
       if (maxNegpT > m_cosmicMinPt and maxPospT > m_cosmicMinPt and maxClusterENeg < m_cosmicMaxClusterEnergy
-          and maxClusterEPos < m_cosmicMaxClusterEnergy) {
+          and maxClusterEPos < m_cosmicMaxClusterEnergy and goodMagneticRegion) {
         double dphiLab = std::abs(momentumLabNeg.Phi() - momentumLabPos.Phi()) * TMath::RadToDeg();
         if (dphiLab > 180) {
           dphiLab = 360 - dphiLab;

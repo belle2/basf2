@@ -9,8 +9,8 @@
 also generating combined steering files.
 
 YAML files are used by this tool to define the LPNs of datasets. Below are examples of
-valid YAML entries for data and MC. The tool ``skim/tools/lpn2yaml.py`` is provided to
-create these YAML files from a list of LPNs.
+valid YAML entries for data and MC. The tool :ref:`lpns2yaml.py<lpns2yaml>` is provided
+to create these YAML files from a list of LPNs.
 
 .. code-block:: yaml
 
@@ -80,8 +80,7 @@ create these YAML files from a list of LPNs.
         runNumber: 0
 
 To produce JSON files for a list of combined skims, pass this tool the YAML file and the
-names of the skims. The combined skims must be defined in
-`skim.registry.combined_skims`. The other required arguments include the skim campaign,
+names of the skims. The other required arguments include the skim campaign,
 intended release to be used, and base directory of the repository to output the JSON
 files in.
 
@@ -154,8 +153,11 @@ import re
 import sys
 import yaml
 
-from basf2 import B2ERROR, B2INFO, B2WARNING
+import jinja2
+
+from basf2 import B2ERROR, B2INFO, B2WARNING, find_file
 from conditions_db import ConditionsDB, encode_name
+from skimExpertFunctions import resolve_skim_modules
 from skim.registry import Registry
 
 
@@ -405,7 +407,7 @@ def get_output_directory(args, sampleRegistry):
     DBGlobalTag = get_DBGlobalTag(args.release)
     beamEnergy = get_beam_energy_from_registry(sampleRegistry)
 
-    return Path(baseDirectory, args.campaign, args.release, DBGlobalTag, beamEnergy)
+    return Path(baseDirectory, "skim", args.campaign, args.release, DBGlobalTag, beamEnergy)
 
 
 def get_lpn_list(sampleInfo, mc):
@@ -653,6 +655,27 @@ def strip_campaign(label):
     return re.sub(MCCampaignRegex, "", label)
 
 
+def produce_on_tau_samples(skims):
+    """
+    Determine whether the combined skim should be produced on taupair samples, based on
+    the values of `BaseSkim.produce_on_tau_samples`. The values of
+    `BaseSkim.produce_on_tau_samples` must be either all True or all False.
+
+    Parameters:
+        skims (list(str)): List of skim names in combined skim.
+
+    Returns:
+        ProduceOnTau (bool): True if combined skim should be produced on taupair samples.
+    """
+    from skimExpertFunctions import CombinedSkim  # noqa
+
+    # Create the CombinedSkim object, and try to access produce_on_tau_samples.
+    # If the skims contain a mix of True and False, then the CombinedSkim method will
+    # raise a ValueError, and the user will be made aware of the problem.
+    SkimObject = CombinedSkim(*[Registry.get_skim_function(skim)() for skim in skims])
+    return SkimObject.produce_on_tau_samples
+
+
 def warn_local_script(args):
     """If a local script is given print a warning that a local script will be used.
 
@@ -687,62 +710,38 @@ def make_combined_steering_file(
     SkimName, CombinedSkimDefinitions, SteeringFileDirectory, LocalModule=None
 ):
     """Construct a steering file for the requested combined skim."""
+    SteeringFileDirectory = Path(SteeringFileDirectory)
     SteeringFileDirectory.mkdir(parents=True, exist_ok=True)
     SteeringFile = SteeringFileDirectory / f"{SkimName}_Skim.py"
 
     # Retrieve the list of individual skims going into this combined skim
     SingleSkims = CombinedSkimDefinitions[SkimName]
 
-    # And then group them into the modules they belong to, so we can put together some
-    # nice import statements
-    modules = sorted({Registry.get_skim_module(skim) for skim in SingleSkims})
-    GroupedSkims = {
-        f"skim.{module}": [
-            skim for skim in SingleSkims if Registry.get_skim_module(skim) == module
-        ]
-        for module in modules
-    }
-
-    # Handle local override of skim script, in case we need to replace a skim module at production time
-    if LocalModule and len(modules) > 1:
+    try:
+        skims, modules = resolve_skim_modules(SingleSkims, LocalModule=LocalModule)
+    except ValueError:
         B2ERROR(
             f"Local module {LocalModule} specified, but combined skim {SkimName} uses\n"
             "        more than one skim module. Not sure what to do in this situation, so \n"
             f"        please modify {SteeringFile} yourself."
         )
-    elif LocalModule:
-        # Replace the normal module with the local one
-        LocalModule = LocalModule.rstrip(".py")
-        NormalModule = modules[0]
-        GroupedSkims[LocalModule] = GroupedSkims.pop(f"skim.{NormalModule}")
+        skims, modules = resolve_skim_modules(SingleSkims)
 
-    BasicImports = """import basf2 as b2
-import modularAnalysis as ma
-from skimExpertFunctions import CombinedSkim
-"""
-    if LocalModule:
-        BasicImports += "\n"
+    loader = jinja2.FileSystemLoader(find_file("skim/tools/resources"))
+    env = jinja2.Environment(loader=loader)
+    env.lstrip_blocks = True
 
-    SkimImports = "".join(
-        [
-            f"from {module} import {', '.join(skims)}\n"
-            for (module, skims) in GroupedSkims.items()
-        ]
+    template = env.get_template("skim_steering_file_template.jinja2")
+    CodeString = template.render(
+        skims=skims,
+        modules=modules,
+        stats=False,
+        hints=False,
+        mdstOutput=False,
     )
-    SkimObjects = [f"    {skim}(),\n" for skim in SingleSkims]
-    MainProcessing = f"""
-path = b2.Path()
-ma.inputMdstList("default", [], path=path)
-skim = CombinedSkim(
-{''.join(SkimObjects)})
-skim(path)
-b2.process(path)
-"""
-
-    SteeringFileCode = BasicImports + SkimImports + MainProcessing
 
     with open(SteeringFile, "w") as f:
-        f.write(SteeringFileCode)
+        f.write(CodeString)
 
     B2INFO(f"Steering file for {SkimName} combined skim written to {SteeringFile}")
 
@@ -787,6 +786,7 @@ def make_request_dict(
         fabricationType = "DataSkim"
         LPNPrefix = "/belle/Data"
 
+    SkimScriptsDirectory = f"skim/{args.campaign}/{args.release}/SkimScripts"
     skimRequestDict = {
         "FabricationType": fabricationType,
         "ProductionName": f"{args.campaign}_{skimName}_{strip_campaign(sampleLabel)}",
@@ -803,11 +803,11 @@ def make_request_dict(
         "ExpectedEventSize": (
             skimStatsDict[skimName]["udstSizePerInputEvent"][statsSampleLabel]
         ),
-        "InputSandboxFilePrefix": f"{args.campaign}/{args.release}/SkimScripts",
+        "InputSandboxFilePrefix": SkimScriptsDirectory,
         "InputData": LPNList,
         "Priority": 8,
-        "SteeringFile": f"{skimName}_Skim_Standalone.py",
-        "SteeringFilePrefix": f"{args.campaign}/{args.release}/SkimScripts",
+        "SteeringFile": f"{skimName}_Skim.py",
+        "SteeringFilePrefix": SkimScriptsDirectory,
         "LPNPrefix": LPNPrefix,
         "DataDescription": [
             {
@@ -833,9 +833,8 @@ def make_request_dict(
         if not skimScript.endswith(".py"):
             skimScript += ".py"
 
-        localScriptDirectory = str(Path(args.campaign, args.release, "SkimScripts"))
         skimRequestDict["InputSandboxFile"] = [skimScript]
-        skimRequestDict["InputSandboxFilePrefix"] = localScriptDirectory
+        skimRequestDict["InputSandboxFilePrefix"] = SkimScriptsDirectory
 
     return skimRequestDict
 
@@ -859,7 +858,7 @@ def write_json_files(sampleRegistry, args, outputDirectory):
     for skimName in args.skims:
         _, CombinedSkimDefinitions = get_skim_stats_dict(args.SkimStatsJson)
         SteeringFileDirectory = Path(
-            args.output_base_directory, args.campaign, args.release, "SkimScripts"
+            get_base_directory(args), "skim", args.campaign, args.release, "SkimScripts"
         )
         make_combined_steering_file(
             skimName,
@@ -869,6 +868,12 @@ def write_json_files(sampleRegistry, args, outputDirectory):
         )
 
         for sampleLabel, sampleInfo in sampleRegistry.items():
+            # Skip taupair sample if the combined skim is not to be produced on taupair
+            if (
+                    "taupair" in sampleLabel and
+                    not produce_on_tau_samples(CombinedSkimDefinitions[skimName])
+            ):
+                continue
 
             SampleLPNList = get_lpn_list(sampleInfo, args.mc)
 
@@ -946,8 +951,7 @@ def get_argument_parser():
         required=True,
         nargs="+",
         metavar="CombinedSkim",
-        help="List of skims to produce request files for. "
-        "Only accepts combined skims listed in `skim.registry.combined_skims`.",
+        help="List of skims to produce request files for."
     )
     parser.add_argument(
         "-o",

@@ -246,7 +246,7 @@ namespace {
     TVector3 shift = generator.updateVertex();
     EXPECT_EQ(shift, TVector3(0, 1, 2));
     // create a new initial particle. Particle exists now, no smearing allowed so no change in shift
-    MCInitialParticles& initial = generator.generate();
+    const MCInitialParticles& initial = generator.generate();
     auto nominal = initial.getVertex();
     shift = generator.updateVertex();
     EXPECT_EQ(shift, TVector3(0, 0, 0));

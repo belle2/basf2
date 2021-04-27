@@ -42,7 +42,10 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
 
   //tree initialization
   m_tree = new TTree("calibLocal", "RECREATE");
+  b_exp = m_tree->Branch("exp", &m_exp, "exp/i");
   b_run = m_tree->Branch("run", &m_run, "run/i");
+  b_date = m_tree->Branch("date", m_date, "date/C");
+  b_hv = m_tree->Branch("hv", &m_hv, "hv/F");
   b_layer = m_tree->Branch("layer", &m_layer, "layer/i");
   b_ladder = m_tree->Branch("ladder", &m_ladder, "ladder/i");
   b_sensor = m_tree->Branch("sensor", &m_sensor, "sensor/i");
@@ -53,6 +56,8 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
   b_pedestalRMS = m_tree->Branch("pedestalRMS", &m_pedestalRMS, "pedestalRMS/F");
   b_noiseAVE = m_tree->Branch("noiseAVE", &m_noiseAVE, "noiseAVE/F");
   b_noiseRMS = m_tree->Branch("noiseRMS", &m_noiseRMS, "noiseRMS/F");
+  b_noiseElAVE = m_tree->Branch("noiseElAVE", &m_noiseElAVE, "noiseElAVE/F");
+  b_noiseElRMS = m_tree->Branch("noiseElRMS", &m_noiseElRMS, "noiseElRMS/F");
   b_occupancyAVE = m_tree->Branch("occupancyAVE", &m_occupancyAVE, "occupancyAVE/F");
   b_occupancyRMS = m_tree->Branch("occupancyRMS", &m_occupancyRMS, "occupancyRMS/F");
   b_gainAVE = m_tree->Branch("gainAVE", &m_gainAVE, "gainAVE/F");
@@ -65,7 +70,10 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
   b_pulseWidthRMS = m_tree->Branch("pulseWidthRMS", &m_pulseWidthRMS, "pulseWidthRMS/F");
 
   m_treeDetailed = new TTree("calibLocalDetailed", "RECREATE");
+  b_exp = m_treeDetailed->Branch("exp", &m_exp, "exp/i");
   b_run = m_treeDetailed->Branch("run", &m_run, "run/i");
+  b_date = m_treeDetailed->Branch("date", m_date, "date/C");
+  b_hv = m_treeDetailed->Branch("hv", &m_hv, "hv/F");
   b_layer = m_treeDetailed->Branch("layer", &m_layer, "layer/i");
   b_ladder = m_treeDetailed->Branch("ladder", &m_ladder, "ladder/i");
   b_sensor = m_treeDetailed->Branch("sensor", &m_sensor, "sensor/i");
@@ -87,15 +95,17 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
     B2WARNING("No valid SVDFADCMaskedStrip for the requested IoV");
   if (!m_NoiseCal.isValid())
     B2WARNING("No valid SVDNoiseCalibration for the requested IoV");
+  if (!m_DetectorConf.isValid())
+    B2WARNING("No valid SVDDetectorConfiguration for the requested IoV");
   if (!m_PedestalCal.isValid())
     B2WARNING("No valid SVDPedestalCalibration for the requested IoV");
   if (! m_PulseShapeCal.isValid())
     B2WARNING("No valid SVDPulseShapeCalibrations for the requested IoV");
-  if (!m_OccupancyCal.isValid())
+  /*  if (!m_OccupancyCal.isValid())
     B2WARNING("No valid SVDOccupancyCalibrations for the requested IoV");
   if (!m_HotStripsCal.isValid())
     B2WARNING("No valid SVDHotStripsCalibrations for the requested IoV");
-
+  */
 
   ///OCCUPANCY
   TH1F hOccupancy("occupancy_L@layerL@ladderS@sensor@view",
@@ -176,7 +186,7 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
   ///NOISE ADC
   TH1F hNoise("noiseADC_L@layerL@ladderS@sensor@view",
               "noise in ADC in @layer.@ladder.@sensor @view/@side",
-              80, -0.5, 9.5);
+              160, -0.5, 19.5);
   hNoise.GetXaxis()->SetTitle("strip noise (ADC)");
   m_hNoise = new SVDHistograms<TH1F>(hNoise);
 
@@ -328,8 +338,12 @@ void SVDLocalCalibrationsMonitorModule::event()
 {
 
   StoreObjPtr<EventMetaData> meta;
+  m_exp = meta->getExperiment();
   m_run = meta->getRun();
 
+  m_hv = m_DetectorConf.getHV();
+  m_DetectorConf.getCalibDate().copy(m_date, 10);
+  m_date[10] = '\0';
 
   //call for a geometry instance
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
@@ -367,16 +381,16 @@ void SVDLocalCalibrationsMonitorModule::event()
 
           for (m_strip = 0; m_strip < Ncells; m_strip++) {
             m_occupancy = -1;
-            if (m_OccupancyCal.isValid()) {
-              m_occupancy = m_OccupancyCal.getOccupancy(theVxdID, m_side, m_strip);
-            }
+            /*            if (m_OccupancyCal.isValid()) {
+                    m_occupancy = m_OccupancyCal.getOccupancy(theVxdID, m_side, m_strip);
+              }*/
             m_hOccupancy->fill(theVxdID, m_side, m_occupancy);
             m_h2Occupancy->fill(theVxdID, m_side, m_strip, m_occupancy);
 
 
             m_hotstrips = -1;
-            if (m_HotStripsCal.isValid())
-              m_hotstrips = m_HotStripsCal.isHot(theVxdID, m_side, m_strip);
+            /*            if (m_HotStripsCal.isValid())
+              m_hotstrips = m_HotStripsCal.isHot(theVxdID, m_side, m_strip);*/
 
             //aux histo for hotStripSummary table
             hm_hot_strips->getHistogram(*itSvdSensors, m_side)->SetBinContent(m_strip + 1, m_hotstrips);
@@ -466,6 +480,8 @@ void SVDLocalCalibrationsMonitorModule::event()
           m_pedestalRMS = (m_hPedestal->getHistogram(theVxdID, m_side))->GetRMS();
           m_noiseAVE = (m_hNoise->getHistogram(theVxdID, m_side))->GetMean();
           m_noiseRMS = (m_hNoise->getHistogram(theVxdID, m_side))->GetRMS();
+          m_noiseElAVE = (m_hNoiseEl->getHistogram(theVxdID, m_side))->GetMean();
+          m_noiseElRMS = (m_hNoiseEl->getHistogram(theVxdID, m_side))->GetRMS();
           m_occupancyAVE = (m_hOccupancy->getHistogram(theVxdID, m_side))->GetMean();
           m_occupancyRMS = (m_hOccupancy->getHistogram(theVxdID, m_side))->GetRMS();
           m_gainAVE = (m_hGain->getHistogram(theVxdID, m_side))->GetMean();
@@ -500,7 +516,7 @@ void SVDLocalCalibrationsMonitorModule::endRun()
   B2RESULT("** UNIQUE IDs of calibration DB objects **");
   B2RESULT("");
 
-  if (m_OccupancyCal.isValid())
+  /*  if (m_OccupancyCal.isValid())
     B2RESULT("   - SVDOccupancyCalibrations:" << m_OccupancyCal.getUniqueID());
   else
     B2WARNING("No valid SVDOccupancyCalibrations for the requested IoV");
@@ -508,7 +524,7 @@ void SVDLocalCalibrationsMonitorModule::endRun()
   if (m_HotStripsCal.isValid())
     B2RESULT("   - SVDHotStripsCalibrations:" << m_HotStripsCal.getUniqueID());
   else
-    B2WARNING("No valid SVDHotStripsCalibrations for the requested IoV");
+  B2WARNING("No valid SVDHotStripsCalibrations for the requested IoV");*/
 
 
   if (m_MaskedStr.isValid())

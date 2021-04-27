@@ -15,6 +15,11 @@
 #include <vxd/geometry/GeoCache.h>
 #include <TKey.h>
 
+#include <RooDataHist.h>
+#include <RooAbsPdf.h>
+#include <RooPlot.h>
+
+
 using namespace std;
 using namespace Belle2;
 
@@ -34,20 +39,24 @@ DQMHistAnalysisPXDTrackChargeModule::DQMHistAnalysisPXDTrackChargeModule()
 
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDER"));
-  addParam("RangeLow", m_rangeLow, "Lower boarder for fit", 10.);
-  addParam("RangeHigh", m_rangeHigh, "High border for fit", 100.);
-  addParam("PeakBefore", m_peakBefore, "Range for fit before peak (positive)", 5.);
-  addParam("PeakAfter", m_peakAfter, "Range for after peak", 40.);
-  addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:TrackCharge:"));
+  addParam("RangeLow", m_rangeLow, "Lower border for fit", 20.);
+  addParam("RangeHigh", m_rangeHigh, "High border for fit", 80.);
+//   addParam("PeakBefore", m_peakBefore, "Range for fit before peak (positive)", 5.);
+//   addParam("PeakAfter", m_peakAfter, "Range for after peak", 40.);
+  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:TrackCharge:"));
+  addParam("useEpics", m_useEpics, "useEpics", true);
   addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("refHisto.root"));
   addParam("ColorAlert", m_color, "Whether to show the color alert", true);
+
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: Constructor done.");
 }
 
 DQMHistAnalysisPXDTrackChargeModule::~DQMHistAnalysisPXDTrackChargeModule()
 {
 #ifdef _BELLE2_EPICS
-  if (ca_current_context()) ca_context_destroy();
+  if (m_useEpics) {
+    if (ca_current_context()) ca_context_destroy();
+  }
 #endif
 }
 
@@ -55,14 +64,21 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: initialized.");
 
-  m_monObj = getMonitoringObject("pxd");
-
   m_refFile = NULL;
   if (m_refFileName != "") {
     m_refFile = new TFile(m_refFileName.data());
   }
 
+  m_monObj = getMonitoringObject("pxd");
   const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+
+  m_rfws = new RooWorkspace("w");
+  m_rfws->factory("Landau::landau(x[0,100],ml[20,10,50],sl[5,1,30])");
+  m_rfws->factory("Gaussian::gauss(x,mg[0],sg[2,0.1,10])");
+  m_rfws->factory("FCONV::lxg(x,landau,gauss)");
+
+  m_x = m_rfws->var("x");
+  m_x->setRange("signal", m_rangeLow, m_rangeHigh);
 
   // collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
@@ -80,7 +96,8 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
           m_cChargeModASIC[aVxdID][s][d] = new TCanvas((m_histogramDirectoryName + "/c_Fit_" + name + Form("_s%d_d%d", s + 1, d + 1)).data());
         }
       }
-      m_hChargeModASIC2d[aVxdID] = new TH2F(("PXD_TCChargeMPV_" + name).data(), ("PXD TCCharge MPV " + name + ";Switcher;DCD;MPV").data(),
+      m_hChargeModASIC2d[aVxdID] = new TH2F(("hPXD_TCChargeMPV_" + name).data(),
+                                            ("PXD TCCharge MPV " + name + ";Switcher;DCD;MPV").data(),
                                             6, 0.5, 6.5, 4, 0.5, 4.5);
       m_cChargeModASIC2d[aVxdID] = new TCanvas((m_histogramDirectoryName + "/c_TCCharge_MPV_" + name).data());
     }
@@ -90,7 +107,7 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
   gROOT->cd(); // this seems to be important, or strange things happen
 
   m_cTrackedClusters = new TCanvas((m_histogramDirectoryName + "/c_TrackedClusters").data());
-  m_hTrackedClusters = new TH1F("Tracked_Clusters", "Tracked Clusters/Event;Module", 40, 0, 40);
+  m_hTrackedClusters = new TH1F("hPXDTrackedClusters", "PXD Tracked Clusters/Event;Module", 40, 0, 40);
   m_hTrackedClusters->Draw();
   auto ax = m_hTrackedClusters->GetXaxis();
   if (ax) {
@@ -125,18 +142,6 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
   m_line_low->SetLineWidth(3);
   m_line_low->SetLineStyle(7);
 
-  m_fConv = new TF1Convolution("landau", "gaus", m_rangeLow, m_rangeHigh);
-  m_fConv->SetRange(m_rangeLow, m_rangeHigh);
-  m_fFit = new TF1("fitfunc", *m_fConv, m_rangeLow, m_rangeHigh, m_fConv->GetNpar());
-  m_fFit->SetRange(m_rangeLow, m_rangeHigh);
-
-  m_fFit->SetParameter(0, 1000);
-  m_fFit->SetParLimits(0, 10, 1e7);
-  m_fConv->SetNofPointsFFT(1000);
-  m_fFit->SetNpx(100);
-  m_fFit->SetNumberFitPoints(100);
-  m_fFit->SetParNames("N", "MPV", "width", "mean", "sigma");
-
   m_fMean = new TF1("f_Mean", "pol0", 0, m_PXDModules.size());
   m_fMean->SetParameter(0, 50);
   m_fMean->SetLineColor(kYellow);
@@ -146,12 +151,14 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
   m_fMean->SetNumberFitPoints(m_PXDModules.size());
 
 #ifdef _BELLE2_EPICS
-  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  mychid.resize(3);
-  SEVCHK(ca_create_channel((m_pvPrefix + "Mean").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
-  SEVCHK(ca_create_channel((m_pvPrefix + "Diff").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
-  SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid[2]), "ca_create_channel failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    mychid.resize(3);
+    SEVCHK(ca_create_channel((m_pvPrefix + "Mean").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Diff").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid[2]), "ca_create_channel failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
 }
 
@@ -172,6 +179,15 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   gStyle->SetOptDate(22);// Date and Time in Bottom Right, does no work
 
   bool enough = false;
+
+//   auto landau = m_rfws->pdf("landau");
+//   auto gauss = m_rfws->pdf("gauss");
+  auto model = m_rfws->pdf("lxg");
+
+  auto ml = m_rfws->var("ml");
+//   auto sl = m_rfws->var("sl");
+//   auto mg = m_rfws->var("mg");
+//   auto sg = m_rfws->var("sg");
 
   {
     m_cTrackedClusters->Clear();
@@ -213,7 +229,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         href2->Draw("same,hist");
       }
 
-      auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is broken, please ignore");
+      auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is excluded, please ignore");
       tt->SetTextAngle(90);// Rotated
       tt->SetTextAlign(12);// Centered
       tt->Draw();
@@ -235,28 +251,30 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     TH1* hh1 = findHist(m_histogramDirectoryName, name);
     if (hh1) {
 
-      if (hh1->GetEntries() > 100) {
-        m_fFit->SetParameter(0, 1000);
-        m_fFit->SetParLimits(0, 10, 1e9);
-        m_fFit->SetParameter(1, 50);
-        m_fFit->SetParLimits(1, 10, 80);
-        m_fFit->SetParameter(2, 10);
-        m_fFit->SetParLimits(2, 1, 100);
-        m_fFit->FixParameter(3, 0);
-        m_fFit->SetParameter(4, 10);
-        m_fFit->SetParLimits(4, 1, 50);
+      if (hh1->GetEntries() > 50) {
 
-        for (int f = 0; f < 5; f++) {
-          hh1->Fit(m_fFit, "R");
-          m_fFit->SetRange(m_fFit->GetParameter(1) - m_peakBefore - m_fFit->GetParameter(4) / 2 , m_fFit->GetParameter(1) + m_peakAfter);
-          m_fConv->SetRange(m_fFit->GetParameter(1) - m_peakBefore - m_fFit->GetParameter(4) / 2 , m_fFit->GetParameter(1) + m_peakAfter);
-        }
+        auto hdata = new RooDataHist(hh1->GetName(), hh1->GetTitle(), *m_x, (const TH1*) hh1);
+        auto plot = m_x->frame(RooFit::Title(hh1->GetTitle()));
+        /*auto r =*/ model->fitTo(*hdata, RooFit::Range("signal"));
+
+        model->paramOn(plot, RooFit::Format("NELU", RooFit::AutoPrecision(2)), RooFit::Layout(0.6, 0.9, 0.9));
+        hdata->plotOn(plot, RooFit::LineColor(kBlue)/*, RooFit::Range("plot"), RooFit::NormRange("signal")*/);
+        model->plotOn(plot, RooFit::LineColor(kRed), RooFit::Range("signal"), RooFit::NormRange("signal"));
+
+        plot->Draw("");
+
+//            model->Print("");
+//            ml->Print("");
+//            sl->Print("");
+//            mg->Print("");
+//            sg->Print("");
+//            cout << "ZZZ , " << Form("%d%02d%d ,", std::get<0>(t), std::get<1>(t), std::get<2>(t)) << ml->getValV() << "," << ml->getError() << "," << sl->getValV() << "," << sl->getError() << "," << sg->getValV() << "," << sg->getError() << endl;
+
 
         int p = m_gCharge->GetN();
-        m_gCharge->SetPoint(p, i + 0.49, m_fFit->GetParameter(1));
-        m_gCharge->SetPointError(p, 0.1, m_fFit->GetParError(1)); // error in x is useless
-        m_monObj->setVariable(("trackcharge_" + (std::string)m_PXDModules[i]).c_str(), m_fFit->GetParameter(1),
-                              m_fFit->GetParError(1));
+        m_gCharge->SetPoint(p, i + 0.49, ml->getValV());
+        m_gCharge->SetPointError(p, 0.1, ml->getError()); // error in x is useless
+        m_monObj->setVariable(("trackcharge_" + (std::string)m_PXDModules[i]).c_str(), ml->getValV(), ml->getError());
       }
 
       TH1* hist2 = GetHisto("ref/" + m_histogramDirectoryName + "/" + name);
@@ -279,34 +297,30 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         canvas->cd();
 
         // if draw normalized
-        TH1* h = (TH1*)hist2->Clone(); // Anoying ... Maybe an memory leak? TODO
-        if (abs(hist2->Integral()) > 0)
-          h->Scale(hh1->Integral() / hist2->Integral());
+        TH1* h = (TH1*)hist2->Clone(); // Annoying ... Maybe an memory leak? TODO
+        if (abs(hist2->GetEntries()) > 0) h->Scale(hh1->GetEntries() / hist2->GetEntries());
 
-        h->SetFillColor(kWhite);
         h->SetStats(kFALSE);
-        hh1->SetFillColor(kWhite);
-        if (h->GetMaximum() > hh1->GetMaximum())
-          hh1->SetMaximum(1.1 * h->GetMaximum());
-        hh1->Draw("hist");
-        h->Draw("same hist");
-
-        canvas->Pad()->SetFrameFillColor(10);
-        if (m_color) {
-          if (hh1->GetEntries() < 1000) {
-            // not enough Entries
-            canvas->Pad()->SetFillColor(kGray);
-          } else {
-            canvas->Pad()->SetFillColor(kGreen);
-          }
-        } else {
-          canvas->Pad()->SetFillColor(kWhite);// White
-        }
-
+        h->Draw("same,hist");
       }
+
+      // add coloring, cuts? based on fit, compare with ref?
+      canvas->Pad()->SetFrameFillColor(10);
+      if (m_color) {
+        if (hh1->GetEntries() < 100) {
+          // not enough Entries
+          canvas->Pad()->SetFillColor(kGray);
+        } else {
+          canvas->Pad()->SetFillColor(kGreen);
+        }
+      } else {
+        canvas->Pad()->SetFillColor(kWhite);// White
+      }
+
       canvas->Modified();
       canvas->Update();
 
+      // means if ANY plot is > 100 entries, all plots are assumed to be o.k.
       if (hh1->GetEntries() >= 1000) enough = true;
     }
   }
@@ -324,32 +338,27 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         std::string name = "PXD_Track_Cluster_Charge_" + (std::string)m_PXDModules[i] + Form("_sw%d_dcd%d", s, d);
         std::replace(name.begin(), name.end(), '.', '_');
 
+        if (m_cChargeModASIC[aVxdID][s - 1][d - 1]) {
+          m_cChargeModASIC[aVxdID][s - 1][d - 1]->Clear();
+          m_cChargeModASIC[aVxdID][s - 1][d - 1]->cd();
+        }
+
         TH1* hh1 = findHist(m_histogramDirectoryName, name);
         if (hh1) {
           double mpv = 0.0;
-          if (hh1->GetEntries() > 100) {
-            m_fFit->SetParameter(0, 1000);
-            m_fFit->SetParLimits(0, 10, 1e9);
-            m_fFit->SetParameter(1, 50);
-            m_fFit->SetParLimits(1, 10, 80);
-            m_fFit->SetParameter(2, 10);
-            m_fFit->SetParLimits(2, 1, 100);
-            m_fFit->FixParameter(3, 0);
-            m_fFit->SetParameter(4, 10);
-            m_fFit->SetParLimits(4, 1, 50);
+          if (hh1->GetEntries() > 50) {
+            auto hdata = new RooDataHist(hh1->GetName(), hh1->GetTitle(), *m_x, (const TH1*) hh1);
+            auto plot = m_x->frame(RooFit::Title(hh1->GetTitle()));
+            /*auto r =*/ model->fitTo(*hdata, RooFit::Range("signal"));
 
-            for (int f = 0; f < 5; f++) {
-              hh1->Fit(m_fFit, "R");
-              m_fFit->SetRange(m_fFit->GetParameter(1) - m_peakBefore - m_fFit->GetParameter(4) / 2 , m_fFit->GetParameter(1) + m_peakAfter);
-              m_fConv->SetRange(m_fFit->GetParameter(1) - m_peakBefore - m_fFit->GetParameter(4) / 2 , m_fFit->GetParameter(1) + m_peakAfter);
+            if (m_cChargeModASIC[aVxdID][s - 1][d - 1]) {
+              model->paramOn(plot, RooFit::Format("NELU", RooFit::AutoPrecision(2)), RooFit::Layout(0.6, 0.9, 0.9));
+              hdata->plotOn(plot, RooFit::LineColor(kBlue)/*, RooFit::Range("plot"), RooFit::NormRange("signal")*/);
+              model->plotOn(plot, RooFit::LineColor(kRed), RooFit::Range("signal"), RooFit::NormRange("signal"));
             }
-            mpv = m_fFit->GetParameter(1);
-          }
+            plot->Draw("");
 
-          if (m_cChargeModASIC[aVxdID][s - 1][d - 1]) {
-            m_cChargeModASIC[aVxdID][s - 1][d - 1]->Clear();
-            m_cChargeModASIC[aVxdID][s - 1][d - 1]->cd();
-            hh1->Draw("hist");
+            mpv = ml->getValV();
           }
 
           if (m_hChargeModASIC2d[aVxdID]) {
@@ -384,7 +393,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   m_gCharge->SetMarkerStyle(8);
   m_gCharge->Draw("AP");
   {
-    auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is broken, please ignore");
+    auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is excluded, please ignore");
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered
     tt->Draw();
@@ -419,8 +428,10 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   }
 
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
-  SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
+  if (m_useEpics) {
+    SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
+    SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
+  }
 #endif
 
   int status = 0;
@@ -428,7 +439,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   if (!enough) {
     // not enough Entries
     m_cCharge->Pad()->SetFillColor(kGray);// Magenta or Gray
-    // status = 0; default
+    status = 0; // default
   } else {
     /// FIXME: what is the accpetable limit?
     if (fabs(data - 30.) > 20. || diff > 12) {
@@ -448,8 +459,10 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   }
 
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_put(DBR_INT, mychid[2], (void*)&status), "ca_set failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    SEVCHK(ca_put(DBR_INT, mychid[2], (void*)&status), "ca_set failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
 
 }
@@ -465,8 +478,10 @@ void DQMHistAnalysisPXDTrackChargeModule::terminate()
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: terminate called");
   // should delete canvas here, maybe hist, too? Who owns it?
 #ifdef _BELLE2_EPICS
-  for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
   if (m_refFile) delete m_refFile;
 
@@ -477,6 +492,7 @@ TH1* DQMHistAnalysisPXDTrackChargeModule::GetHisto(TString histoname)
   TH1* hh1 = nullptr;
   gROOT->cd();
 //   hh1 = findHist(histoname.Data());
+  // cppcheck-suppress knownConditionTrueFalse
   if (hh1 == NULL) {
     B2DEBUG(20, "findHisto failed " << histoname << " not in memfile");
     // the following code sux ... is there no root function for that?

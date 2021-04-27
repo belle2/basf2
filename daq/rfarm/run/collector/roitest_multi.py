@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 import sys
 
-from basf2 import *
+import basf2 as b2
 # from simulation import register_simulation
 # from reconstruction import register_reconstruction
 
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 argvs = sys.argv
 argc = len(argvs)
@@ -34,22 +33,22 @@ components = [
 # register_reconstruction(components)
 
 # register modules for object definitions
-gearbox = register_module('Gearbox')
-SVDUnpack = register_module('SVDUnpacker')
-SVDClust = register_module('SVDClusterizer')
-vxdtf = register_module('VXDTF')
-SVD_DQM = register_module('SVDDQM')
-vxdtf_dqm = register_module('VXDTFDQM')
-trackfitter = register_module('GenFitter')
-roiprod = register_module('PXDROIFinder')
-roipayload = register_module('ROIPayloadAssembler')
+gearbox = b2.register_module('Gearbox')
+SVDUnpack = b2.register_module('SVDUnpacker')
+SVDClust = b2.register_module('SVDClusterizer')
+vxdtf = b2.register_module('VXDTF')
+SVD_DQM = b2.register_module('SVDDQM')
+vxdtf_dqm = b2.register_module('VXDTFDQM')
+trackfitter = b2.register_module('GenFitter')
+roiprod = b2.register_module('PXDROIFinder')
+roipayload = b2.register_module('ROIPayloadAssembler')
 
 # create a main path
-main = create_path()
+main = b2.create_path()
 
 # Load Geometry module
-gearbox = register_module('Gearbox')
-geometry = register_module('Geometry')
+gearbox = b2.register_module('Gearbox')
+geometry = b2.register_module('Geometry')
 
 # Add input module
 # input = register_module("SeqRootInput")
@@ -62,27 +61,27 @@ geometry = register_module('Geometry')
 # main.add_module(output)
 
 # Add Rbuf2Ds
-rbuf2ds = register_module("Rbuf2Ds")
+rbuf2ds = b2.register_module("Rbuf2Ds")
 rbuf2ds.param("RingBufferName", argvs[1])
 main.add_module(rbuf2ds)
 
 # HLT Tagger
-tagger = register_module("HLTTagger")
+tagger = b2.register_module("HLTTagger")
 main.add_module(tagger)
 
 # RoI sender
-roisender = register_module('ROISender')
+roisender = b2.register_module('ROISender')
 roisender.param("MessageQueueDepth", 20)
 roisender.param("MessageSize", 16384)
 roisender.param("ROIpayloadName", "ROIpayload")
 main.add_module(roisender)
 
 # Add Progress
-progress = register_module("Progress")
+progress = b2.register_module("Progress")
 main.add_module(progress)
 
 # Add Elapsed Time
-elapsed = register_module("ElapsedTime")
+elapsed = b2.register_module("ElapsedTime")
 elapsed.param("EventInterval", 1000)
 main.add_module(elapsed)
 
@@ -92,7 +91,7 @@ main.add_module(elapsed)
 # main.add_module(ds2rbuf)
 
 # Add Ds2Raw
-ds2rbuf = register_module("Ds2Raw")
+ds2rbuf = b2.register_module("Ds2Raw")
 ds2rbuf.param("RingBufferName", argvs[2])
 main.add_module(ds2rbuf)
 
@@ -103,4 +102,4 @@ main.add_module(ds2rbuf)
 # main.add_module(output)
 
 # Run
-process(main)
+b2.process(main)

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLEGUNMODULE_H
-#define PARTICLEGUNMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -71,4 +70,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif // PARTICLEGUNMODULE_H

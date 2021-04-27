@@ -7,21 +7,13 @@
 
 import os
 import sys
-from tools import *
-from basf2 import *
-from modularAnalysis import inputMdstList
-from modularAnalysis import reconstructDecay
-from modularAnalysis import matchMCTruth
+from tools import getBelleUrl_data, getBelleUrl_mc
+import basf2 as b2
 from modularAnalysis import variablesToNtuple
 from modularAnalysis import fillParticleList
-from modularAnalysis import fillConvertedPhotonsList
 from modularAnalysis import loadGearbox
-from modularAnalysis import printVariableValues
-from stdCharged import *
 
 import b2biiConversion
-import ROOT
-from ROOT import Belle2
 
 
 # ------- Arguments sorting
@@ -65,7 +57,7 @@ else:
     url = getBelleUrl_data(expNo, minRunNo, maxRunNo,
                            skimType, dataType, belleLevel)
 
-mypath = create_path()
+mypath = b2.create_path()
 b2biiConversion.convertBelleMdstToBelleIIMdst(url, applySkim=True, path=mypath)
 loadGearbox(mypath)
 
@@ -90,10 +82,10 @@ variablesToNtuple(
     'pi+:all', kinematic_variables, filename=outputFileName, path=mypath)
 
 # progress
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 mypath.add_module(progress)
 
-process(mypath)
+b2.process(mypath)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

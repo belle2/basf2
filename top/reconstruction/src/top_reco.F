@@ -311,7 +311,7 @@
             IF(ABS(HYPID).EQ.ABS(HYP)) CALL STORE_PULLS(T,TERR,ICH,TYP)
          ENDIF
       ENDDO
-      PLKH=PLKH+POIS_LOG(SFOT,FLOAT(NFOT))
+      PLKH=PLKH+POIS_LOG(SFOT,NFOT)
       
       END
 
@@ -332,7 +332,7 @@
       INTEGER I, ICH, M, NUMCH, NFOT, TYP
       REAL T, TERR, F, SFOT, PLKH, PS, PD, PB
       REAL FUNC_PDF, POIS_LOG
-      REAL PS_CH(0:NUM_CHA-1)
+      REAL PS_CH(0:NUM_CHA-1), N_D
       
       GET_LOGL=0.
       IF(N_RTRA.NE.1) RETURN
@@ -343,7 +343,7 @@
          TMIN=T_MIN
       ENDIF
       
-      CALL GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH)
+      CALL GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH,N_D)
       SFOT=STFS*PS+STFD*PD+STFB*PB
       IF(SFOT.EQ.0) RETURN
 
@@ -364,7 +364,7 @@
             PLKH=PLKH+LOG(F)
          ENDIF
       ENDDO
-      GET_LOGL=PLKH+POIS_LOG(SFOT,FLOAT(NFOT))
+      GET_LOGL=PLKH+POIS_LOG(SFOT,NFOT)
       RTRA_NFOT(1)=NFOT
       
       END
@@ -387,7 +387,7 @@
       INTEGER I, ICH, M, NUMCH, NFOT, TYP
       REAL T, TERR, F, SFOT, PS, PD, PB
       REAL FUNC_PDF, POIS_LOG
-      REAL PS_CH(0:NUM_CHA-1)
+      REAL PS_CH(0:NUM_CHA-1), N_D
       REAL SFOT_CH(0:NUM_CHA-1)
       INTEGER NFOT_CH(0:NUM_CHA-1)
       
@@ -399,7 +399,7 @@
          TMIN=T_MIN
       ENDIF
       
-      CALL GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH)
+      CALL GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH,N_D)
       SFOT=STFS*PS+STFD*PD+STFB*PB
       IF(SFOT.EQ.0) RETURN
       
@@ -407,7 +407,7 @@
       NUMCH=NCH(0)+NCH(1)
 
       DO ICH=0,NUMCH-1
-         SFOT_CH(ICH)=STFS*PS_CH(ICH)+STFD*PD*PIK_DELTA(ICH)+
+         SFOT_CH(ICH)=STFS*PS_CH(ICH)+STFD*PD*PIK_DELTA(ICH)*N_D+
      &        STFB*PIK_BGR(ICH)*(TMAX-TMIN)
          NFOT_CH(ICH)=0
       ENDDO
@@ -428,7 +428,7 @@
          ENDIF
       ENDDO
       DO ICH=0,NUMCH-1
-         PLKH(ICH)=PLKH(ICH)+POIS_LOG(SFOT_CH(ICH),FLOAT(NFOT_CH(ICH)))
+         PLKH(ICH)=PLKH(ICH)+POIS_LOG(SFOT_CH(ICH),NFOT_CH(ICH))
       ENDDO
       
       RTRA_NFOT(1)=NFOT
@@ -454,7 +454,7 @@
       INTEGER I, ICH, M, NUMCH, NFOT, TYP
       REAL T, TERR, F, SFOT, PS, PD, PB
       REAL FUNC_PDF, POIS_LOG
-      REAL PS_CH(0:NUM_CHA-1)
+      REAL PS_CH(0:NUM_CHA-1), N_D
       INTEGER NFOT_CH(0:NUM_CHA-1)
       
       IF(N_RTRA.NE.1) RETURN
@@ -465,7 +465,7 @@
          TMIN=T_MIN
       ENDIF
       
-      CALL GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH)
+      CALL GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH,N_D)
       SFOT=STFS*PS+STFD*PD+STFB*PB
       IF(SFOT.EQ.0) RETURN
       
@@ -473,7 +473,7 @@
       NUMCH=NCH(0)+NCH(1)
 
       DO ICH=0,NUMCH-1
-         SFOT_CH(ICH)=STFS*PS_CH(ICH)+STFD*PD*PIK_DELTA(ICH)+
+         SFOT_CH(ICH)=STFS*PS_CH(ICH)+STFD*PD*PIK_DELTA(ICH)*N_D+
      &        STFB*PIK_BGR(ICH)*(TMAX-TMIN)
          NFOT_CH(ICH)=0
       ENDDO
@@ -494,7 +494,7 @@
          ENDIF
       ENDDO
       DO ICH=0,NUMCH-1
-         PLKH(ICH)=PLKH(ICH)+POIS_LOG(SFOT_CH(ICH),FLOAT(NFOT_CH(ICH)))
+         PLKH(ICH)=PLKH(ICH)+POIS_LOG(SFOT_CH(ICH),NFOT_CH(ICH))
       ENDDO
       
       RTRA_NFOT(1)=NFOT
@@ -517,7 +517,7 @@
 #include "TOP_PMTTYPE.fi"
       INTEGER ICH, NUMCH
       REAL SFOT, PS, PD, PB
-      REAL PS_CH(0:NUM_CHA-1)
+      REAL PS_CH(0:NUM_CHA-1), N_D
       
       IF(N_RTRA.NE.1) RETURN
       IF(RTRA_FLAG(1).NE.1) RETURN
@@ -527,21 +527,21 @@
          TMIN=T_MIN
       ENDIF
       
-      CALL GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH)
+      CALL GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH,N_D)
       SFOT=STFS*PS+STFD*PD+STFB*PB
       IF(SFOT.EQ.0) RETURN
       
       NUMCH=NCH(0)+NCH(1)
 
       DO ICH=0,NUMCH-1
-         SFOT_CH(ICH)=STFS*PS_CH(ICH)+STFD*PD*PIK_DELTA(ICH)+
+         SFOT_CH(ICH)=STFS*PS_CH(ICH)+STFD*PD*PIK_DELTA(ICH)*N_D+
      &        STFB*PIK_BGR(ICH)*(TMAX-TMIN)
       ENDDO
       
       END
 
 
-      SUBROUTINE GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH)
+      SUBROUTINE GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH,N_D)
       
       IMPLICIT NONE
       REAL T0                   ! time shift
@@ -549,6 +549,7 @@
       REAL TMAX                 ! time window upper edge
       REAL PS, PD, PB           ! new normalizations for signal, delta-ray and background
       REAL PS_CH(0:*)           ! per channel
+      REAL N_D                  ! default normalization of delta-ray
 #include "TOP_PIK.fi"
       INTEGER ICH, NUMCH, K
       REAL NORM_DELTA
@@ -566,7 +567,8 @@
       ENDDO
 
       PB=(TMAX-TMIN)/(T_MAX-T_MIN)
-      PD=NORM_DELTA(TMIN-T0,TMAX-T0)/NORM_DELTA(T_MIN,T_MAX)
+      N_D=NORM_DELTA(T_MIN,T_MAX)
+      PD=NORM_DELTA(TMIN-T0,TMAX-T0)/N_D
       
       END
 
@@ -639,7 +641,7 @@ c--   background PDF normalized to 1
 
       IMPLICIT NONE
       REAL MEAN
-      REAL N
+      INTEGER N
 
       IF(MEAN.EQ.0) THEN
          IF(N.EQ.0) THEN
@@ -1303,12 +1305,12 @@ c--   for debugging only - very much time consuming
       INTEGER NUMCH, ICH, I, TYP
       INTEGER N /1000/
       REAL T, DT, S, S1, SFOT
-      REAL PS, PD, PB, PS_CH(0:NUM_CHA-1)
+      REAL PS, PD, PB, PS_CH(0:NUM_CHA-1), N_D
       REAL FUNC_PDF, PDF_DELTA
       
       DT=(TMAX-TMIN)/N
       NUMCH=NCH(0)+NCH(1)
-      CALL GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH)
+      CALL GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH,N_D)
       SFOT=STFS*PS+STFD*PD+STFB*PB
       S=0
       S1=0

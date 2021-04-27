@@ -10,12 +10,7 @@
 #define RAWSVD_H
 
 // Includes
-#include <stdio.h>
-#include <stdlib.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
-#include <framework/datastore/DataStore.h>
-
-#include <TObject.h>
 
 namespace Belle2 {
 

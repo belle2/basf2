@@ -3,7 +3,7 @@
 import basf2
 
 
-def adjust_module(path, module_type, params={}, **kwds):
+def adjust_module(path, module_type, params=None, **kwds):
     """Set parameters of the module with the given type in the path to the given parameters
 
     Arguments
@@ -17,6 +17,8 @@ def adjust_module(path, module_type, params={}, **kwds):
     **kwds
        Keyword parameters served to Module.param(params)
     """
+    if params is None:
+        params = {}
     for module in path.modules():
         if module.type() == module_type:
             module.param(params)

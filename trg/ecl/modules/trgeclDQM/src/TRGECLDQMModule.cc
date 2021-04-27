@@ -354,8 +354,6 @@ void TRGECLDQMModule::event()
   TrgEclMapping* a = new TrgEclMapping();
   double max = 0;
   double caltrgtiming = 0;
-  double timing;
-  double trgtiming = 0;
 
   for (int ihit = 0; ihit < NofTCHit ; ihit ++) {
     h_TCId -> Fill(TCId[ihit]);
@@ -381,11 +379,11 @@ void TRGECLDQMModule::event()
 
     totalEnergy += TCEnergy[ihit];
     h_n_TChit_event -> Fill(NofTCHit);
-    timing = 8 * HitRevoTrg - (128 * RevoFAM[ihit] + TCTiming[ihit]);
+    double timing = 8 * HitRevoTrg - (128 * RevoFAM[ihit] + TCTiming[ihit]);
     if (timing < 0) {timing = timing + 10240;}
     h_TCTiming->Fill(timing);
   }
-  trgtiming = 8 * HitRevoTrg - (128 *     HitRevoEvtTiming + HitFineTiming);
+  double trgtiming = 8 * HitRevoTrg - (128 *     HitRevoEvtTiming + HitFineTiming);
 
   if (trgtiming < 0) {trgtiming = trgtiming + 10240;}
   h_TRGTiming -> Fill(trgtiming);

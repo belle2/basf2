@@ -39,8 +39,7 @@
 //
 //------------------------------------------------------------------------
 
-#ifndef EVTYMSTOYNSPIPICLEOBOOST_HH
-#define EVTYMSTOYNSPIPICLEOBOOST_HH
+#pragma once
 
 // #include "EvtGenBase/EvtDecayProb.hh"
 #include "EvtGenBase/EvtDecayAmp.hh"
@@ -67,5 +66,4 @@ public:
 
 };
 
-#endif
 

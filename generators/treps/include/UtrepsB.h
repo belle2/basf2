@@ -32,13 +32,13 @@ namespace Belle2 {
     Interps b00, b20, b22; // Parameter sets
 
     // FormFactor effect */
-    double tpform(double, double) const ;
+    double tpform(double, double) const override ;
 
     // angular distribution for final 2-body case */
-    double tpangd(double, double) ;
+    double tpangd(double, double) override ;
 
     // user decision routine for extra generation conditions. */
-    int tpuser(TLorentzVector, TLorentzVector, Part_gen*, int) ;
+    int tpuser(TLorentzVector, TLorentzVector, Part_gen*, int) override ;
 
   private:
     double d2func(double) const;

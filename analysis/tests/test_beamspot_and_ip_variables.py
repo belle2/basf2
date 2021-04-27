@@ -16,6 +16,7 @@ def check_file(input_file_name):
         "", ["IPX", "IPY", "IPZ", "genIPX", "genIPY", "genIPZ"], path=pa)
     b2tu.safe_process(pa, 1)
 
+
 if __name__ == "__main__":
     b2.set_random_seed(":-)")
     b2tu.configure_logging_for_tests()

@@ -24,8 +24,8 @@ class TestStdCharged(unittest.TestCase):
         actually added to the ParticleLoader
         """
         for param in particleloader.available_params():
-            if param.name == 'decayStringsWithCuts':
-                name = param.values[0][0].split(':')[1]
+            if param.name == 'decayStrings':
+                name = param.values[0].split(':')[1]
                 self.assertTrue(
                     name == target,
                     "Name: \"%s\" added by function %s, expecting \"%s\""
@@ -37,7 +37,7 @@ class TestStdCharged(unittest.TestCase):
             testpath = create_path()
             f(listtype, path=testpath)
             self.assertEqual(
-                len(testpath.modules()), 1,
+                len(testpath.modules()), 1 if listtype == 'all' else 3,
                 "List %s doesn't work with function %s" % (listtype, f.__name__))
             self.assertTrue(any(module.type() == "ParticleLoader" for module in testpath.modules()))
 
@@ -52,7 +52,7 @@ class TestStdCharged(unittest.TestCase):
             testpath = create_path()
             f(path=testpath)
             self.assertEqual(
-                len(testpath.modules()), 1,
+                len(testpath.modules()), 3,
                 "Function %s doesn't work" % f.__name__)
             self.assertTrue(any(module.type() == "ParticleLoader" for module in testpath.modules()))
             loader = testpath.modules()[0]
@@ -113,11 +113,12 @@ class TestStdCharged(unittest.TestCase):
         testpath = create_path()
         stdCharged.stdMostLikely(path=testpath)
         self.assertEqual(
-            len(testpath.modules()), nLists,
+            len(testpath.modules()), 3 * nLists,
             "There should be %i fillParticleList calls" % nLists)
         self.assertTrue(any(module.type() == "ParticleLoader" for module in testpath.modules()))
         for module in testpath.modules():
             self._check_list_name('mostlikely', 'stdMostLikely', module)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -8,34 +8,27 @@
 import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
+from datcon.datcon_functions import add_datcon
 from L1trigger import add_tsim
 
-# background (collision) files
-bg = None
+b2.set_random_seed(1337)
 
-b2.set_random_seed(3)
+num_events = 10
 
-num_events = 100
+output_filename = "datconPXDDataReduction.root"
 
-output_filename = "datconsvdreconstruction.root"
-
-output_branches = ["DATCONSVDDigits", "DATCONSimpleSVDCluster", "DATCONSVDSpacePoints"]
+additionalBranchNames = ["DATCONRecoTracks", "DATCONPXDIntercepts", "DATCONROIs"]
 
 # create path
 main = b2.create_path()
 
-# specify number of events to be generated
-# the experiment number for phase2 MC has to be 1002, otherwise the wrong payloads (for VXDTF2 the SectorMap) are loaded
 main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=num_events)
-
-# in case you need to fix seed of random numbers
-# set_random_seed('some fixed value')
 
 # generate BBbar events
 main.add_module('EvtGenInput')
 
-# detector simulation
-add_simulation(main, bkgfiles=bg, bkgOverlay=True)
+# detector simulation, don't perform data reduction per default, but use DATCON instead
+add_simulation(main, bkgOverlay=True, forceSetPXDDataReduction=True, usePXDDataReduction=False, cleanupPXDDataReduction=False)
 
 # trigger simulation
 add_tsim(main)
@@ -43,16 +36,13 @@ add_tsim(main)
 # reconstruction
 add_reconstruction(main)
 
-main.add_module('SVDShaperDigitToDATCONSVDDigitConverter')
-
-main.add_module('DATCONSVDSimpleClusterizer')
-
-main.add_module('DATCONSVDSpacePointCreator')
+# add DATCON simulation using the optimized DATCON
+add_datcon(main)
 
 main.add_module('Progress')
 
 # Finally add output
-main.add_module("RootOutput", outputFileName=output_filename, branchNames=output_branches)
+main.add_module("RootOutput", outputFileName=output_filename, additionalBranchNames=additionalBranchNames)
 
 # process events and print call statistics
 b2.process(main)

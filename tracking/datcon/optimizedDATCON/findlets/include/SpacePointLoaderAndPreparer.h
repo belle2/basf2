@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christian Wessel                                         *
@@ -45,26 +45,20 @@ namespace Belle2 {
     {
       Super::exposeParameters(moduleParamList, prefix);
 
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "SVDSpacePointStoreArrayName"),
-                                    m_param_SVDSpacePointStoreArrayName,
-                                    "Name of the SVDSpacePoints Store Array.",
-                                    m_param_SVDSpacePointStoreArrayName);
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumUClusterTime"),
-                                    m_param_minimumUClusterTime,
-                                    "Minimum time of the u cluster (in ns).",
-                                    m_param_minimumUClusterTime);
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumVClusterTime"),
-                                    m_param_minimumVClusterTime,
-                                    "Minimum time of the v cluster (in ns).",
-                                    m_param_minimumVClusterTime);
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumUClusterTime"),
-                                    m_param_maximumUClusterTime,
-                                    "Maximum time of the u cluster (in ns).",
-                                    m_param_maximumUClusterTime);
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumVClusterTime"),
-                                    m_param_maximumVClusterTime,
-                                    "Maximum time of the v cluster (in ns).",
-                                    m_param_maximumVClusterTime);
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "SVDSpacePointStoreArrayName"), m_param_SVDSpacePointStoreArrayName,
+                                    "Name of the SVDSpacePoints Store Array.", m_param_SVDSpacePointStoreArrayName);
+
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumUClusterTime"), m_param_minimumUClusterTime,
+                                    "Minimum time of the u cluster (in ns).", m_param_minimumUClusterTime);
+
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumVClusterTime"), m_param_minimumVClusterTime,
+                                    "Minimum time of the v cluster (in ns).", m_param_minimumVClusterTime);
+
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumUClusterTime"), m_param_maximumUClusterTime,
+                                    "Maximum time of the u cluster (in ns).", m_param_maximumUClusterTime);
+
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumVClusterTime"), m_param_maximumVClusterTime,
+                                    "Maximum time of the v cluster (in ns).", m_param_maximumVClusterTime);
     };
 
     /// Create the store arrays

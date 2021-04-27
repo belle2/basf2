@@ -86,12 +86,12 @@ namespace Belle2 {
     std::vector<SpacePointTrackCand> m_filteredResults;
 
     /// maximum number of relations that can be created per track candidate
-    uint m_maxRelations = 200;
+    uint m_param_maxRelations = 200;
 
 
     /// ROOT histograms for debugging. Will be deleted when optimization and debugging is done.
     /// ROOT file name
-    std::string m_rootFileName;
+    std::string m_param_rootFileName;
 
     TFile* m_rootFile;
 

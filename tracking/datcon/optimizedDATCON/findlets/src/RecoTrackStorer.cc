@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christian Wessel                                         *
@@ -43,18 +43,18 @@ void RecoTrackStorer::exposeParameters(ModuleParamList* moduleParamList, const s
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "RecoTracksStoreArrayName"),
-                                m_param_RecoTracksStoreArrayName,
-                                "Name of the RecoTracks Store Array.",
-                                m_param_RecoTracksStoreArrayName);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "RecoTracksStoreArrayName"), m_param_RecoTracksStoreArrayName,
+                                "Name of the RecoTracks Store Array.", m_param_RecoTracksStoreArrayName);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ResultStorerQualityEstimationMethod"), m_param_EstimationMethod,
-                                "Identifier which estimation method to use. Valid identifiers are: [mcInfo, circleFit, tripletFit, helixFit]",
+                                "Identifier which estimation method to use. Valid identifiers are: [mcInfo, circleFit, tripletFit, helixFit].",
                                 m_param_EstimationMethod);
+
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ResultStorerMCRecoTracksStoreArrayName"),
                                 m_param_MCRecoTracksStoreArrayName,
                                 "Only required for MCInfo method. Name of StoreArray containing MCRecoTracks.",
                                 m_param_MCRecoTracksStoreArrayName);
+
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ResultStorerMCStrictQualityEstimator"),
                                 m_param_MCStrictQualityEstimator,
                                 "Only required for MCInfo method. If false combining several MCTracks is allowed.",
@@ -135,7 +135,7 @@ void RecoTrackStorer::apply(std::vector<SpacePointTrackCand>& finishedResults,
     RecoTrack* newRecoTrack = m_storeRecoTracks.appendNew(trackPosition, trackMomentum, trackChargeSeed);
 
 
-    // TODO: the following lines are basically just a 1-to-1 copy from tracking/modules/spacePointCreator/SPTCmomentumSeedRetrieverModule
+    // ATTENTION: the following lines are basically just a 1-to-1 copy from tracking/modules/spacePointCreator/SPTCmomentumSeedRetrieverModule
     TVectorD stateSeed(6); //(x,y,z,px,py,pz)
     TMatrixDSym covSeed(6);
     // TODO: find out where these numbers come from! [This is copied from the VXDTF2 counterpart!]

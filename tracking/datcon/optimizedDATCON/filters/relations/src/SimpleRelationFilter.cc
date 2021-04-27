@@ -16,6 +16,17 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+void SimpleRelationFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "simpleThetaCutDeltaL0"), m_param_SimpleThetaCutDeltaL0,
+                                "Simple cut in theta for the overlay region of different ladders in the same layer.",
+                                m_param_SimpleThetaCutDeltaL0);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "simpleThetaCutDeltaL1"), m_param_SimpleThetaCutDeltaL1,
+                                "Simple cut in theta for relations between hits with Delta_Layer = +-1.", m_param_SimpleThetaCutDeltaL1);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "simpleThetaCutDeltaL2"), m_param_SimpleThetaCutDeltaL2,
+                                "Simple cut in theta for relations between hits with Delta_Layer = +-2.", m_param_SimpleThetaCutDeltaL2);
+}
+
 TrackFindingCDC::Weight
 SimpleRelationFilter::operator()(const std::pair<const HitData*, const HitData*>& relation)
 {
@@ -44,15 +55,4 @@ SimpleRelationFilter::operator()(const std::pair<const HitData*, const HitData*>
 
   return NAN;
 
-}
-
-void SimpleRelationFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
-{
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "simpleThetaCutDeltaL0"), m_param_SimpleThetaCutDeltaL0,
-                                "Simple cut in theta for the overlay region of different ladders in the same layer.",
-                                m_param_SimpleThetaCutDeltaL0);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "simpleThetaCutDeltaL1"), m_param_SimpleThetaCutDeltaL1,
-                                "Simple cut in theta for relations between hits with Delta_Layer = +-1.", m_param_SimpleThetaCutDeltaL1);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "simpleThetaCutDeltaL2"), m_param_SimpleThetaCutDeltaL2,
-                                "Simple cut in theta for relations between hits with Delta_Layer = +-2.", m_param_SimpleThetaCutDeltaL2);
 }

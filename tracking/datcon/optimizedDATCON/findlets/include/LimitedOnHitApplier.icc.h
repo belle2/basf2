@@ -25,6 +25,15 @@ namespace Belle2 {
   };
 
   template <class AHit, class AFilter>
+  void LimitedOnHitApplier<AHit, AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+  {
+    m_filter.exposeParameters(moduleParamList, prefix);
+
+    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useNBestHits"), m_param_useNHits, "Only use the best N hits",
+                                  m_param_useNHits);
+  };
+
+  template <class AHit, class AFilter>
   void LimitedOnHitApplier<AHit, AFilter>::apply(const std::vector<TrackFindingCDC::WithWeight<const AHit*>>& currentPath,
                                                  std::vector<TrackFindingCDC::WithWeight<AHit*>>& childHits)
   {
@@ -40,14 +49,5 @@ namespace Belle2 {
   TrackFindingCDC::Weight LimitedOnHitApplier<AHit, AFilter>::operator()(const Object& object)
   {
     return m_filter(object);
-  };
-
-  template <class AHit, class AFilter>
-  void LimitedOnHitApplier<AHit, AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
-  {
-    m_filter.exposeParameters(moduleParamList, prefix);
-
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useNBestHits"), m_param_useNHits, "Only use the best N hits",
-                                  m_param_useNHits);
   };
 }

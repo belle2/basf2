@@ -27,6 +27,15 @@ namespace Belle2 {
   }
 
   template <class AFilter>
+  void LayerRelationFilter<AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+  {
+    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "hitJumping"), m_param_hitJumping,
+                                  "Make it possible to jump over N layers.", m_param_hitJumping);
+
+    m_filter.exposeParameters(moduleParamList, prefix);
+  }
+
+  template <class AFilter>
   void LayerRelationFilter<AFilter>::beginRun()
   {
     Super::beginRun();
@@ -105,15 +114,6 @@ namespace Belle2 {
     }
 
     return possibleNextHits;
-  }
-
-  template <class AFilter>
-  void LayerRelationFilter<AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
-  {
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "hitJumping"), m_param_hitJumping,
-                                  "Make it possible to jump over N layers.", m_param_hitJumping);
-
-    m_filter.exposeParameters(moduleParamList, prefix);
   }
 
   template <class AFilter>

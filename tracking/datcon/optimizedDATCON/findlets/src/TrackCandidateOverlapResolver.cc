@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christian Wessel                                         *
@@ -42,11 +42,10 @@ void TrackCandidateOverlapResolver::exposeParameters(ModuleParamList* modulePara
                                 "Strategy used to resolve overlaps. Currently implemented are \"greedy\" and \"hopfield\".",
                                 m_param_resolveMethod);
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "NameSVDClusters"), m_param_nameSVDClusters,
-                                "Name of expected SVDClusters StoreArray.",
-                                std::string(""));
+                                "Name of expected SVDClusters StoreArray.", std::string(""));
+
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minActivityState"), m_param_minActivityState,
-                                "Sets the minimal value of activity for acceptance. [0,1]",
-                                m_param_minActivityState);
+                                "Sets the minimal value of activity for acceptance. [0,1]", m_param_minActivityState);
 }
 
 void TrackCandidateOverlapResolver::initialize()

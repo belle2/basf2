@@ -17,6 +17,13 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+void FiveHitFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "helixFitPocaDCut"), m_param_helixFitPocaDCut,
+                                "Cut on the POCA difference in xy with the POCA obtained from a .",
+                                m_param_helixFitPocaDCut);
+}
+
 void FiveHitFilter::beginRun()
 {
   const double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
@@ -33,12 +40,4 @@ FiveHitFilter::operator()(const BasePathFilter::Object& pair)
   }
 
   return 1.0;
-}
-
-void FiveHitFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
-{
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "helixFitPocaDCut"), m_helixFitPocaDCut,
-                                "Cut on the POCA difference in xy with the POCA obtained from a .",
-                                m_helixFitPocaDCut);
-
 }

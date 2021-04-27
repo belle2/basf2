@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christian Wessel                                         *
@@ -9,7 +9,6 @@
  **************************************************************************/
 #include <tracking/datcon/optimizedDATCON/findlets/RawTrackCandCleaner.dcl.h>
 
-// #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
@@ -50,13 +49,11 @@ void RawTrackCandCleaner<AHit>::exposeParameters(ModuleParamList* moduleParamLis
   m_treeSearcher.exposeParameters(moduleParamList, prefix);
   m_resultRefiner.exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxRelations"), m_maxRelations,
-                                "Maximum number of relations allowed for entering tree search.",
-                                m_maxRelations);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxRelations"), m_param_maxRelations,
+                                "Maximum number of relations allowed for entering tree search.", m_param_maxRelations);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "rootFileName"), m_rootFileName,
-                                "Name of the root output file.",
-                                std::string(""));
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "rootFileName"), m_param_rootFileName,
+                                "Name of the root output file.", std::string(""));
 }
 
 template<class AHit>
@@ -93,7 +90,7 @@ void RawTrackCandCleaner<AHit>::apply(std::vector<std::vector<AHit*>>& rawTrackC
     m_nRelationsVsRawTrackCand->Fill(family, m_relations.size());
     m_nRelationsVsRawTrackCandSize->Fill(rawTrackCand.size(), m_relations.size());
 
-    if (m_relations.size() > m_maxRelations) {
+    if (m_relations.size() > m_param_maxRelations) {
       m_relations.clear();
       continue;
     }
@@ -172,8 +169,8 @@ void RawTrackCandCleaner<AHit>::apply(std::vector<std::vector<AHit*>>& rawTrackC
 template<class AHit>
 void RawTrackCandCleaner<AHit>::initializeHists()
 {
-  if (!m_rootFileName.empty()) {
-    m_rootFile = new TFile(m_rootFileName.c_str(), "RECREATE");
+  if (!m_param_rootFileName.empty()) {
+    m_rootFile = new TFile(m_param_rootFileName.c_str(), "RECREATE");
     m_rootFile->cd();
     m_nRawTrackCandsPerEvent = new TH1D("RawTrackCandsPerEvent", "Number of RawTCs per Event;Number of RawTCs;count", 200, 0, 200);
     m_nRelationsPerRawTrackCand = new TH1D("RelationsPerRawTrackCand", "Relations per RawTC;Relations per RawTC;count", 1000, 0, 1000);

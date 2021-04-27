@@ -22,6 +22,24 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+void QualityIndicatorFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "trackQualityEstimationMethod"), m_param_EstimationMethod,
+                                "Identifier which estimation method to use. Valid identifiers are: [mcInfo, circleFit, tripletFit, helixFit]",
+                                m_param_EstimationMethod);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "MCRecoTracksStoreArrayName"), m_param_MCRecoTracksStoreArrayName,
+                                "Only required for MCInfo method. Name of StoreArray containing MCRecoTracks.",
+                                m_param_MCRecoTracksStoreArrayName);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "MCStrictQualityEstimator"), m_param_MCStrictQualityEstimator,
+                                "Only required for MCInfo method. If false combining several MCTracks is allowed.",
+                                m_param_MCStrictQualityEstimator);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "QICut"), m_param_QIcut,
+                                "Cut on the quality indicator. Only process QI values larger than this.", m_param_QIcut);
+}
+
 void QualityIndicatorFilter::beginRun()
 {
   const double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
@@ -77,26 +95,9 @@ QualityIndicatorFilter::operator()(const BasePathFilter::Object& pair)
 
   const auto& estimatorResult = m_estimator->estimateQualityAndProperties(spacePoints);
 
-  if (estimatorResult.qualityIndicator < m_QIcut) {
+  if (estimatorResult.qualityIndicator < m_param_QIcut) {
     return NAN;
   }
 
   return estimatorResult.qualityIndicator;
-}
-
-void QualityIndicatorFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
-{
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "trackQualityEstimationMethod"), m_param_EstimationMethod,
-                                "Identifier which estimation method to use. Valid identifiers are: [mcInfo, circleFit, tripletFit, helixFit]",
-                                m_param_EstimationMethod);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "MCRecoTracksStoreArrayName"), m_param_MCRecoTracksStoreArrayName,
-                                "Only required for MCInfo method. Name of StoreArray containing MCRecoTracks.",
-                                m_param_MCRecoTracksStoreArrayName);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "MCStrictQualityEstimator"), m_param_MCStrictQualityEstimator,
-                                "Only required for MCInfo method. If false combining several MCTracks is allowed.",
-                                m_param_MCStrictQualityEstimator);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "QICut"), m_QIcut,
-                                "Cut on the quality indicator. Only process QI values larger than this.",
-                                m_QIcut);
-
 }

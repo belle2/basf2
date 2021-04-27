@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christian Wessel                                         *
@@ -35,55 +35,35 @@ void MultiHoughSpaceFastInterceptFinder::exposeParameters(ModuleParamList* modul
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumRecursionLevel"),
-                                m_param_maxRecursionLevel,
-                                "Maximum recursion level for the fast Hough trafo algorithm.",
-                                m_param_maxRecursionLevel);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumRecursionLevel"), m_param_maxRecursionLevel,
+                                "Maximum recursion level for the fast Hough trafo algorithm.", m_param_maxRecursionLevel);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "nAngleSectors"),
-                                m_param_nAngleSectors,
-                                "Number of angle sectors (= x-axis) dividing the Hough space.",
-                                m_param_nAngleSectors);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "nAngleSectors"), m_param_nAngleSectors,
+                                "Number of angle sectors (= x-axis) dividing the Hough space.", m_param_nAngleSectors);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "nVerticalSectors"),
-                                m_param_nVerticalSectors,
-                                "Number of vertical sectors (= y-axis) dividing the Hough space.",
-                                m_param_nVerticalSectors);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "nVerticalSectors"), m_param_nVerticalSectors,
+                                "Number of vertical sectors (= y-axis) dividing the Hough space.", m_param_nVerticalSectors);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "verticalHoughSpaceSize"),
-                                m_param_verticalHoughSpaceSize,
-                                "Vertical size of the Hough space.",
-                                m_param_verticalHoughSpaceSize);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "verticalHoughSpaceSize"), m_param_verticalHoughSpaceSize,
+                                "Vertical size of the Hough space.", m_param_verticalHoughSpaceSize);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "HoughSpaceMinimumX"),
-                                m_param_minimumX,
-                                "Minimum x value of the Hough space.",
-                                m_param_minimumX);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "HoughSpaceMinimumX"), m_param_minimumX,
+                                "Minimum x value of the Hough space.", m_param_minimumX);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "HoughSpaceMaximumX"),
-                                m_param_maximumX,
-                                "Maximum x value of the Hough space.",
-                                m_param_maximumX);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "HoughSpaceMaximumX"), m_param_maximumX,
+                                "Maximum x value of the Hough space.", m_param_maximumX);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumHSClusterSize"),
-                                m_param_MinimumHSClusterSize,
-                                "Maximum x value of the Hough space.",
-                                m_param_MinimumHSClusterSize);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumHSClusterSize"), m_param_MinimumHSClusterSize,
+                                "Maximum x value of the Hough space.", m_param_MinimumHSClusterSize);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSize"),
-                                m_param_MaximumHSClusterSize,
-                                "Maximum x value of the Hough space.",
-                                m_param_MaximumHSClusterSize);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSize"), m_param_MaximumHSClusterSize,
+                                "Maximum x value of the Hough space.", m_param_MaximumHSClusterSize);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSizeX"),
-                                m_param_MaximumHSClusterSizeX,
-                                "Maximum x value of the Hough space.",
-                                m_param_MaximumHSClusterSizeX);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSizeX"), m_param_MaximumHSClusterSizeX,
+                                "Maximum x value of the Hough space.", m_param_MaximumHSClusterSizeX);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSizeY"),
-                                m_param_MaximumHSClusterSizeY,
-                                "Maximum x value of the Hough space.",
-                                m_param_MaximumHSClusterSizeY);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSizeY"), m_param_MaximumHSClusterSizeY,
+                                "Maximum x value of the Hough space.", m_param_MaximumHSClusterSizeY);
 
 }
 
@@ -139,19 +119,6 @@ void MultiHoughSpaceFastInterceptFinder::apply(std::vector<HitData>& hits, std::
     fastInterceptFinder2d(m_currentSensorsHitList, 0, m_param_nAngleSectors, 0, m_param_nVerticalSectors, 0);
 
     FindHoughSpaceCluster();
-
-    if (m_breakFlag) {
-      gnuplotoutput(m_currentSensorsHitList);
-      uint count = 0;
-      for (auto& hit : hits) {
-        double X = hit.getDataCache().x;
-        double Y = hit.getDataCache().y;
-        double Z = hit.getDataCache().z;
-        B2INFO("hit " << count << ":  " << X << "  " << Y << "  " << Z << "  on sensor:   " << hit.getDataCache().sensorID);
-        count++;
-      }
-      B2FATAL("Too many SPs in a SPTC for sensor  " << friends.first << " ,  aborting DATCON!");
-    }
   }
 
   for (auto& trackCand : m_trackCandidates) {
@@ -270,15 +237,15 @@ void MultiHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vector
 
     if (left == right) continue;
 
-    const double& sinLeft     = m_HSSinValuesLUT[left];
-    const double& cosLeft     = m_HSCosValuesLUT[left];
-    const double& sinRight    = m_HSSinValuesLUT[right];
-    const double& cosRight    = m_HSCosValuesLUT[right];
+    const double& sinLeft   = m_HSSinValuesLUT[left];
+    const double& cosLeft   = m_HSCosValuesLUT[left];
+    const double& sinRight  = m_HSSinValuesLUT[right];
+    const double& cosRight  = m_HSCosValuesLUT[right];
 
     // the sin and cos of the current center can't be stored in a LUT, as the number of possible centers
     // is quite large and the logic would become rather complex
-    const double sinCenter   = m_HSCenterSinValuesLUT[(left + right) / 2];
-    const double cosCenter   = m_HSCenterCosValuesLUT[(left + right) / 2];
+    const double sinCenter  = m_HSCenterSinValuesLUT[(left + right) / 2];
+    const double cosCenter  = m_HSCenterCosValuesLUT[(left + right) / 2];
 
     for (int j = 0; j < 2; ++j) {
       const uint lowerIndex = yIndexCache[j];
@@ -360,10 +327,6 @@ void MultiHoughSpaceFastInterceptFinder::FindHoughSpaceCluster()
     if (m_clusterSize >= m_param_MinimumHSClusterSize and m_clusterSize <= m_param_MaximumHSClusterSize) {
 
       m_trackCandidates.emplace_back(m_currentTrackCandidate);
-//       if (m_currentTrackCandidate.size() > 200) {
-// //         m_breakFlag = true;
-//         gnuplotoutput(m_currentTrackCandidate);
-//       }
       m_currentTrackCandidate.clear();
     }
     m_clusterCount++;
@@ -401,45 +364,10 @@ void MultiHoughSpaceFastInterceptFinder::DepthFirstSearch(uint lastIndexX, uint 
               m_currentTrackCandidate.emplace_back(hit);
             }
           }
-
           // search in the next Hough Space cells...
           DepthFirstSearch(currentIndexX, currentIndexY);
         }
-
       }
     }
   }
-}
-
-
-void MultiHoughSpaceFastInterceptFinder::gnuplotoutput(const std::vector<HitData*>& hits)
-{
-  std::ofstream outstream;
-  outstream.open("gnuplotlog.plt", std::ios::trunc);
-  outstream << "set style line 3 lt rgb 'black' lw 1 pt 6" << std::endl;
-  outstream << "set style line 4 lt rgb 'blue' lw 1 pt 6" << std::endl;
-  outstream << "set style line 5 lt rgb 'green' lw 1 pt 6" << std::endl;
-  outstream << "set style line 6 lt rgb 'red' lw 1 pt 6" << std::endl;
-  outstream << "set xrange [-pi-0.5:pi+0.5]" << std::endl;
-  outstream << std::endl;
-
-  uint count = 0;
-  for (auto& hit : hits) {
-    const HitData::DataCache& hitData = hit->getDataCache();
-    double xc = hitData.xConformal;
-    double yc = hitData.yConformal;
-    VxdID id = hitData.sensorID;
-    int layer = hitData.layer;
-    double x = hitData.x;
-    double y = hitData.y;
-    double z = hitData.z;
-
-    outstream << "plot " << xc << " * -sin(x) + " << yc << " * cos(x) > 0 ? " << xc << " * cos(x) + " << yc <<
-              " * sin(x) : 1/0 notitle linestyle " << layer << " # " << id << "    " << x << "   " << y << "   " << z << std::endl;
-    if (count < hits.size() - 1) outstream << "re";
-    count++;
-  }
-
-  outstream << std::endl << "pause -1" << std::endl;
-  outstream.close();
 }

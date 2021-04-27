@@ -34,12 +34,10 @@ namespace Belle2 {
 
   private:
     /// cut for cosine in RZ between the two vectors (oHit - cHit) and (cHit - iHit)
-    double m_cosRZCut = 0.95;
+    double m_param_cosRZCut = 0.95;
     /// cut on the difference between circle radius and circle center position in the x-y plane
     /// to check if the track is compatible with passing through the IP
-    double m_circleIPDistanceCut = 2.0;
-    /// cut on the POCA distance in xy obtained from the helixFitEstimator
-    double m_helixFitPocaDCut = 2.0;
+    double m_param_circleIPDistanceCut = 2.0;
 
     /// Construct empty ThreeHitVariables instance
     ThreeHitVariables m_threeHitVariables;

@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Christian Wessel                                        *
+ * Contributors: Christian Wessel                                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -37,13 +37,11 @@ void ROIFinder::exposeParameters(ModuleParamList* moduleParamList, const std::st
                                 "Calculate PXDIntercepts and ROIs in this findlet based on a simple circle extrapolation (r-phi) and straigh line extrapolation (z, theta)?",
                                 m_param_calculateROI);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storePXDInterceptsName"),
-                                m_param_storePXDInterceptsName,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storePXDInterceptsName"), m_param_storePXDInterceptsName,
                                 "Name of the PXDIntercepts StoreArray produced by DATCON using a simple circle extrapolation in r-phi and a straight line extrapolation in theta.",
                                 m_param_storePXDInterceptsName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storeROIsName"),
-                                m_param_storeROIsName,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storeROIsName"), m_param_storeROIsName,
                                 "Name of the ROIs StoreArray produced by DATCON using a simple circle extrapolation in r-phi and a straight line extrapolation in theta.",
                                 m_param_storeROIsName);
 
@@ -72,6 +70,7 @@ void ROIFinder::exposeParameters(ModuleParamList* moduleParamList, const std::st
                                 "Minimum ROI size (in pixel) in u direction on L2.", m_param_minimumROISizeUL2);
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumROISizeVL2"), m_param_minimumROISizeVL2,
                                 "Minimum ROI size (in pixel) in v direction on L2.", m_param_minimumROISizeVL2);
+
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "multiplierUL1"), m_param_multiplierUL1,
                                 "Multiplier term for ROI size estimation for L1 u direction. Usage: multiplierUL1 * 1/R + minimumROISizeUL1, with R in cm.",
                                 m_param_multiplierUL1);

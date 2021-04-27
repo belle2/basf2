@@ -41,6 +41,6 @@ namespace Belle2 {
     std::unique_ptr<QualityEstimatorBase> m_estimator;
 
     /// cut on quality indicator
-    double m_QIcut = 0.0;
+    double m_param_QIcut = 0.0;
   };
 }

@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christian Wessel                                         *
@@ -182,11 +182,5 @@ namespace Belle2 {
 
     /// vector containing track candidates, consisting of the found intersection values in the Hough Space
     std::vector<std::vector<HitData*>> m_trackCandidates;
-
-    /// save debug information for checking sinosoidal lines in gnuplot
-    void gnuplotoutput(const std::vector<HitData*>& hits);
-    /// flag to indicate when to stop because of high occupancy
-    bool m_breakFlag = false;
-
   };
 }

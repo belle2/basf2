@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christian Wessel                                         *
@@ -61,8 +61,7 @@ void TrackCandidateResultRefiner::exposeParameters(ModuleParamList* moduleParamL
                                 "Cut on quality indicator value for track candidates of size 5. Only accept SpacePointTrackCands with QI above this value.",
                                 m_param_minQualitiyIndicatorSize5);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxNumberOfEachPathLength"),
-                                m_param_maxNumberOfEachPathLength,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxNumberOfEachPathLength"), m_param_maxNumberOfEachPathLength,
                                 "Maximum number of SpacePointTrackCands with a length of 3, 4, 5, or 6 each.",
                                 m_param_maxNumberOfEachPathLength);
 }

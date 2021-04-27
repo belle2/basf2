@@ -21,6 +21,24 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+void TwoHitVirtualIPQIFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "helixFitPocaVirtIPDCut"), m_param_helixFitPocaVirtIPDCut,
+                                "Cut on the POCA difference in xy with the POCA obtained from a helix fit, adding a virtual IP at the origin "
+                                "(tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit).",
+                                m_param_helixFitPocaVirtIPDCut);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "trackQualityEstimationMethod"), m_param_EstimationMethod,
+                                "Identifier which estimation method to use. Valid identifiers are: [mcInfo, tripletFit, helixFit]",
+                                m_param_EstimationMethod);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "MCRecoTracksStoreArrayName"), m_param_MCRecoTracksStoreArrayName,
+                                "Only required for MCInfo method. Name of StoreArray containing MCRecoTracks.",
+                                m_param_MCRecoTracksStoreArrayName);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "MCStrictQualityEstimator"), m_param_MCStrictQualityEstimator,
+                                "Only required for MCInfo method. If false combining several MCTracks is allowed.",
+                                m_param_MCStrictQualityEstimator);
+}
+
 void TwoHitVirtualIPQIFilter::beginRun()
 {
   const double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
@@ -91,22 +109,4 @@ TwoHitVirtualIPQIFilter::operator()(const BasePathFilter::Object& pair)
   const auto& estimatorResultVirtIP = m_estimator->estimateQualityAndProperties(spacePointsVirtIP);
 
   return estimatorResultVirtIP.qualityIndicator;
-}
-
-void TwoHitVirtualIPQIFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
-{
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "helixFitPocaVirtIPDCut"), m_param_helixFitPocaVirtIPDCut,
-                                "Cut on the POCA difference in xy with the POCA obtained from a helix fit, adding a virtual IP at the origin "
-                                "(tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit).",
-                                m_param_helixFitPocaVirtIPDCut);
-
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "trackQualityEstimationMethod"), m_param_EstimationMethod,
-                                "Identifier which estimation method to use. Valid identifiers are: [mcInfo, tripletFit, helixFit]",
-                                m_param_EstimationMethod);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "MCRecoTracksStoreArrayName"), m_param_MCRecoTracksStoreArrayName,
-                                "Only required for MCInfo method. Name of StoreArray containing MCRecoTracks.",
-                                m_param_MCRecoTracksStoreArrayName);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "MCStrictQualityEstimator"), m_param_MCStrictQualityEstimator,
-                                "Only required for MCInfo method. If false combining several MCTracks is allowed.",
-                                m_param_MCStrictQualityEstimator);
 }

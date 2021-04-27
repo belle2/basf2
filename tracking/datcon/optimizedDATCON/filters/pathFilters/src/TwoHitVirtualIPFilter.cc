@@ -17,6 +17,16 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+void TwoHitVirtualIPFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "cosRZCut"), m_param_cosRZCut,
+                                "Cut on the absolute value of cosine between the vectors (oHit - cHit) and (cHit - iHit).",
+                                m_param_cosRZCut);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "circleIPDistanceCut"), m_param_circleIPDistanceCut,
+                                "Cut on the difference between circle radius and circle center to check whether the circle is compatible with passing through the IP.",
+                                m_param_circleIPDistanceCut);
+}
+
 void TwoHitVirtualIPFilter::beginRun()
 {
   const double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
@@ -48,25 +58,15 @@ TwoHitVirtualIPFilter::operator()(const BasePathFilter::Object& pair)
   // filter expects hits from outer to inner
   m_threeHitVariables.setHits(lastHitPos, currentHitPos, m_virtualIPPosition);
 
-  if (m_threeHitVariables.getCosAngleRZSimple() < m_cosRZCut) {
+  if (m_threeHitVariables.getCosAngleRZSimple() < m_param_cosRZCut) {
     return NAN;
   }
 
   const double circleDistanceIP = m_threeHitVariables.getCircleDistanceIP();
 
-  if (circleDistanceIP > m_circleIPDistanceCut) {
+  if (circleDistanceIP > m_param_circleIPDistanceCut) {
     return NAN;
   }
 
   return fabs(1.0 / circleDistanceIP);
-}
-
-void TwoHitVirtualIPFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
-{
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "cosRZCut"), m_cosRZCut,
-                                "Cut on the absolute value of cosine between the vectors (oHit - cHit) and (cHit - iHit).",
-                                m_cosRZCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "circleIPDistanceCut"), m_circleIPDistanceCut,
-                                "Cut on the difference between circle radius and circle center to check whether the circle is compatible with passing through the IP.",
-                                m_circleIPDistanceCut);
 }

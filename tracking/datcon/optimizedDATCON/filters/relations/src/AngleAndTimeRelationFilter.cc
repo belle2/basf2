@@ -16,6 +16,22 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+void AngleAndTimeRelationFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "AngleAndTimeThetaCutDeltaL0"), m_param_ThetaCutDeltaL0,
+                                "Simple cut in theta for the overlay region of different ladders in the same layer.",
+                                m_param_ThetaCutDeltaL0);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "AngleAndTimeThetaCutDeltaL1"), m_param_ThetaCutDeltaL1,
+                                "Simple cut in theta for relations between hits with Delta_Layer = +-1.", m_param_ThetaCutDeltaL1);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "AngleAndTimeThetaCutDeltaL2"), m_param_ThetaCutDeltaL2,
+                                "Simple cut in theta for relations between hits with Delta_Layer = +-2.", m_param_ThetaCutDeltaL2);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "AngleAndTimeDeltaUTime"), m_param_DeltaTU,
+                                "Cut on the difference in u-side cluster time between two hits during relation creation.", m_param_DeltaTU);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "AngleAndTimeDeltaVTime"), m_param_DeltaTV,
+                                "Cut on the difference in v-side cluster time between two hits during relation creation.", m_param_DeltaTV);
+}
+
 TrackFindingCDC::Weight
 AngleAndTimeRelationFilter::operator()(const std::pair<const HitData*, const HitData*>& relation)
 {
@@ -49,20 +65,4 @@ AngleAndTimeRelationFilter::operator()(const std::pair<const HitData*, const Hit
 
   return NAN;
 
-}
-
-void AngleAndTimeRelationFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
-{
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "AngleAndTimeThetaCutDeltaL0"), m_param_ThetaCutDeltaL0,
-                                "Simple cut in theta for the overlay region of different ladders in the same layer.",
-                                m_param_ThetaCutDeltaL0);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "AngleAndTimeThetaCutDeltaL1"), m_param_ThetaCutDeltaL1,
-                                "Simple cut in theta for relations between hits with Delta_Layer = +-1.", m_param_ThetaCutDeltaL1);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "AngleAndTimeThetaCutDeltaL2"), m_param_ThetaCutDeltaL2,
-                                "Simple cut in theta for relations between hits with Delta_Layer = +-2.", m_param_ThetaCutDeltaL2);
-
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "AngleAndTimeDeltaUTime"), m_param_DeltaTU,
-                                "Cut on the difference in u-side cluster time between two hits during relation creation.", m_param_DeltaTU);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "AngleAndTimeDeltaVTime"), m_param_DeltaTV,
-                                "Cut on the difference in v-side cluster time between two hits during relation creation.", m_param_DeltaTV);
 }

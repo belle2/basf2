@@ -17,6 +17,18 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+void FourHitFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "circleRadiusDifferenceCut"), m_param_CircleRadiusDifferenceCut,
+                                "TODO: Cut on the absolute value of cosine between the vectors (oHit - cHit) and (cHit - iHit).",
+                                m_param_CircleRadiusDifferenceCut);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "circleCenterPositionDifferenceCut"),
+                                m_param_CircleCenterPositionDifferenceCut,
+                                "TODO: Cut on the difference between circle radius and circle center to check whether the circle is compatible with passing through the IP.",
+                                m_param_CircleCenterPositionDifferenceCut);
+}
+
 void FourHitFilter::beginRun()
 {
   const double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
@@ -48,17 +60,4 @@ FourHitFilter::operator()(const BasePathFilter::Object& pair)
   }
 
   return fabs(1.0 / m_fourHitVariables.getCircleRadiusDifference());
-
-
-}
-
-void FourHitFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
-{
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "circleRadiusDifferenceCut"), m_param_CircleRadiusDifferenceCut,
-                                "TODO: Cut on the absolute value of cosine between the vectors (oHit - cHit) and (cHit - iHit).",
-                                m_param_CircleRadiusDifferenceCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "circleCenterPositionDifferenceCut"),
-                                m_param_CircleCenterPositionDifferenceCut,
-                                "TODO: Cut on the difference between circle radius and circle center to check whether the circle is compatible with passing through the IP.",
-                                m_param_CircleCenterPositionDifferenceCut);
 }

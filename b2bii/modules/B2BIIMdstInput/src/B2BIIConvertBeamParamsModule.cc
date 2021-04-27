@@ -4,6 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter                                            *
+ *               Umberto Tamponi                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -24,6 +25,7 @@
 #include <mdst/dbobjects/CollisionInvariantMass.h>
 
 #include <list>
+#include <map>
 
 namespace Belle {
   /** This is needed by some utility function from belle so let's provide a
@@ -102,13 +104,20 @@ namespace Belle2 {
     const double angleLer = M_PI; //parallel to negative z axis (different from Belle II!)
     const double angleHer = crossingAngle; //in positive z and x direction, verified to be consistent with Upsilon(4S) momentum
 
-    std::vector<double> covariance; //0 entries = no error
+    // Beam energy spread taken from the hard-coded values in the Belle evtgen:
+    // /sw/belle/belle/b20090127_0910/src/util/evtgenutil/basf_if/evtgen.cc
+    // The beam energy spread seems not have been logged in the belle DB at all.
+    // If you are reading this and you know how to access the run-dependent beam energy spread,
+    // please fix this (April 2021)!
+    std::vector<double> covarianceHer = {0.00513 * 0.00513}; // Energy spread only. No idea about the direction spread
+    std::vector<double> covarianceLer = {0.002375 * 0.002375}; // Energy spread only. No idea about the direction spread
+    std::vector<double> covariance; //this is used later on
 
     IntervalOfValidity iov(m_event->getExperiment(), m_event->getRun(), m_event->getExperiment(), m_event->getRun());
 
     BeamParameters beamParams;
-    beamParams.setLER(Eler, angleLer, covariance);
-    beamParams.setHER(Eher, angleHer, covariance);
+    beamParams.setLER(Eler, angleLer, covarianceHer);
+    beamParams.setHER(Eher, angleHer, covarianceLer);
 
     CollisionBoostVector collisionBoostVector;
     CollisionInvariantMass collisionInvM;

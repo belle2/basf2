@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christian Wessel                                         *
@@ -10,17 +10,17 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <framework/datastore/StoreArray.h>
 
 #include <string>
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
+#include <cmath>
 
 namespace Belle2 {
-  class VxdID;
-
   class ModuleParamList;
+  class VxdID;
 
   /**
    * Findlet for finging intersections of sinosoidal curves in the 2D Hough space by iteratively calling

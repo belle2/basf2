@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christian Wessel                                         *
@@ -56,11 +56,11 @@ void DATCONSVDClusterLoaderAndPreparer::apply(std::vector<SVDCluster>& uClusters
     const long localPosition = convertToInt(cluster.getPosition(), 4); // convert the cluster position from cm to µm
 
     m_nClusterPerLayer.at(layerNumber - 3)++;
-    const double rotangle = initialAngle[layerNumber - 3] + (ladderNumber - 1) * angleStep[layerNumber - 3];
+    const double rotangle = m_const_InitialAngle[layerNumber - 3] + (ladderNumber - 1) * m_const_AngleStep[layerNumber - 3];
     const double cosRotAngle = cos(rotangle);
     const double sinRotAngle = sin(rotangle);
-    const int    sensorRadius = svdRadii[layerNumber - 3];
-    const int    ytmp = localPosition + rPhiShiftsOfLayers[layerNumber - 3];
+    const int    sensorRadius = m_const_SVDRadii[layerNumber - 3];
+    const int    ytmp = localPosition + m_const_RPhiShiftsOfLayers[layerNumber - 3];
 
     // perform 2D rotation
     const long x = round(sensorRadius * cosRotAngle - ytmp * sinRotAngle); // x is in µm
@@ -82,31 +82,31 @@ void DATCONSVDClusterLoaderAndPreparer::apply(std::vector<SVDCluster>& uClusters
     const long localPosition = convertToInt(cluster.getPosition(), 4); // convert the cluster position from cm to µm
 
     m_nClusterPerLayer.at(4 + layerNumber - 3)++;
-    const int radius = svdRadii[layerNumber - 3];
+    const int radius = m_const_SVDRadii[layerNumber - 3];
     int z = 0;
     if (layerNumber == 3) {
-      z = localPosition + zShiftL3[sensorNumber - 1];
+      z = localPosition + m_const_ZShiftL3[sensorNumber - 1];
     } else {
       switch (layerNumber) {
         case 4:
           if (sensorNumber == 1) {
-            z = localPosition * cosSlantedAngles[layerNumber - 3] + zShiftL4[sensorNumber - 1];
+            z = localPosition * m_const_CosSlantedAngles[layerNumber - 3] + m_const_ZShiftL4[sensorNumber - 1];
           } else {
-            z = localPosition + zShiftL4[sensorNumber - 1];
+            z = localPosition + m_const_ZShiftL4[sensorNumber - 1];
           }
           break;
         case 5:
           if (sensorNumber == 1) {
-            z = localPosition * cosSlantedAngles[layerNumber - 3] + zShiftL5[sensorNumber - 1];
+            z = localPosition * m_const_CosSlantedAngles[layerNumber - 3] + m_const_ZShiftL5[sensorNumber - 1];
           } else {
-            z = localPosition + zShiftL5[sensorNumber - 1];
+            z = localPosition + m_const_ZShiftL5[sensorNumber - 1];
           }
           break;
         case 6:
           if (sensorNumber == 1) {
-            z = localPosition * cosSlantedAngles[layerNumber - 3] + zShiftL6[sensorNumber - 1];
+            z = localPosition * m_const_CosSlantedAngles[layerNumber - 3] + m_const_ZShiftL6[sensorNumber - 1];
           } else {
-            z = localPosition + zShiftL6[sensorNumber - 1];
+            z = localPosition + m_const_ZShiftL6[sensorNumber - 1];
           }
           break;
       }

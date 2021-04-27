@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christian Wessel                                         *
@@ -16,10 +16,9 @@
 #include <vector>
 
 namespace Belle2 {
+  class ModuleParamList;
   class SVDCluster;
   class VxdID;
-
-  class ModuleParamList;
 
   /**
    * Findlet for loading SVDClusters that were created by the DATCONSVDClusterizer findlet and prepare them
@@ -52,33 +51,31 @@ namespace Belle2 {
   private:
     // Parameters
     /// Cut value for aborting tracking if more than this number of clusters is found on one layer
-    uint m_param_maxClustersPerLayer = 50;
+    uint m_param_maxClustersPerLayer = 200;
 
     /// array containing the number of clusters per layer. If this exceeds a cut value, tracking is aborted
     std::array<uint, 8> m_nClusterPerLayer = {0};
 
     // ATTENTION: all the values below are hardcoded and taken from svd/data/SVD-Components.xml
     /// Radii of the SVD layers, in µm
-    const std::array<int, 4> svdRadii = {38990, 80000, 104000, 135150};
+    const std::array<int, 4> m_const_SVDRadii = {38990, 80000, 104000, 135150};
     /// shift in r-phi to create windmill structure, in µm
-    const std::array<int, 4> rPhiShiftsOfLayers = { -4680, -10780, -11036, -19076};
+    const std::array<int, 4> m_const_RPhiShiftsOfLayers = { -4680, -10780, -11036, -19076};
     /// phi-value of the first ladder in each layer, i.e. sensors X.1.Y, in rad
-    const std::array<double, 4> initialAngle = {(342.195 - 360.) / 180. * M_PI, 8. / 180. * M_PI, -8. / 180. * M_PI, -4. / 180. * M_PI};
+    const std::array<double, 4> m_const_InitialAngle = {(342.195 - 360.) / 180. * M_PI, 8. / 180. * M_PI, -8. / 180. * M_PI, -4. / 180. * M_PI};
     /// angle difference between two consecutive ladders, in rad
-    const std::array<double, 4> angleStep = {2. * M_PI / 7., M_PI / 5., M_PI / 6., M_PI / 8.};
+    const std::array<double, 4> m_const_AngleStep = {2. * M_PI / 7., M_PI / 5., M_PI / 6., M_PI / 8.};
     /// cosine values of the slanted sensors
-    const std::array<double, 4> cosSlantedAngles = {1, cos(0.207694180987), cos(0.279252680319), cos(0.368264472171)};
-    /// sine values of the slanted sensors
-    const std::array<double, 4> sinSlantedAngles = {1, sin(0.207694180987), sin(0.279252680319), sin(0.368264472171)};
+    const std::array<double, 4> m_const_CosSlantedAngles = {1, cos(0.207694180987), cos(0.279252680319), cos(0.368264472171)};
 
     /// shift along z of the L3 senosrs, in µn
-    const std::array<int, 2> zShiftL3 = {92350, -32650};
+    const std::array<int, 2> m_const_ZShiftL3 = {92350, -32650};
     /// shift along z of the L4 senosrs, in µn
-    const std::array<int, 3> zShiftL4 = {149042, 24760, -100240};
+    const std::array<int, 3> m_const_ZShiftL4 = {149042, 24760, -100240};
     /// shift along z of the L5 senosrs, in µn
-    const std::array<int, 4> zShiftL5 = {233754, 110560, -14440, -139440};
+    const std::array<int, 4> m_const_ZShiftL5 = {233754, 110560, -14440, -139440};
     /// shift along z of the L6 senosrs, in µn
-    const std::array<int, 5> zShiftL6 = {303471, 182060, 57060, -67940, -192940};
+    const std::array<int, 5> m_const_ZShiftL6 = {303471, 182060, 57060, -67940, -192940};
 
     /// convert double to long int for more similarity to the FPGA implementation
     /// @param value to be converted

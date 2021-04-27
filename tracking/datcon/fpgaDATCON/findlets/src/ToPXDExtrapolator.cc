@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christian Wessel                                         *
@@ -31,25 +31,19 @@ void ToPXDExtrapolator::exposeParameters(ModuleParamList* moduleParamList, const
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "extrapolationPhiCutL1"),
-                                m_param_phiCutL1,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "extrapolationPhiCutL1"), m_param_phiCutL1,
                                 "Only extrapolate to PXD sensors within this value away from the track phi value, L1.",
                                 m_param_phiCutL1);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "extrapolationPhiCutL2"),
-                                m_param_phiCutL2,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "extrapolationPhiCutL2"), m_param_phiCutL2,
                                 "Only extrapolate to PXD sensors within this value away from the track phi value, L2.",
                                 m_param_phiCutL2);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "createPXDIntercepts"),
-                                m_param_createPXDIntercepts,
-                                "Store PXDIntercepts to StoreArray?",
-                                m_param_createPXDIntercepts);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "createPXDIntercepts"), m_param_createPXDIntercepts,
+                                "Store PXDIntercepts to StoreArray?", m_param_createPXDIntercepts);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storePXDInterceptsName"),
-                                m_param_PXDInterceptStoreArrayName,
-                                "Name of the PXDIntercepts StoreArray?",
-                                m_param_PXDInterceptStoreArrayName);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storePXDInterceptsName"), m_param_PXDInterceptStoreArrayName,
+                                "Name of the PXDIntercepts StoreArray?", m_param_PXDInterceptStoreArrayName);
 
 }
 
@@ -75,8 +69,6 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
     const double trackPhi = uTrack.first;
     const double trackRadius = uTrack.second;
 
-    B2DEBUG(29, "trackPhi (in rad): " << trackPhi <<  " trackRadius (in um): " << trackRadius);
-
     // layer 1 extrapolation
     uint layer = 1;
     long sensorPerpRadius = layerRadius[layer - 1];
@@ -94,11 +86,6 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
         angleDiff += 2. * M_PI;
       }
       if (fabs(angleDiff) >= m_param_phiCutL1) continue;
-      B2DEBUG(29, "angleDiff: " << angleDiff);
-      B2DEBUG(29, "trackRadius * trackRadius: " << trackRadius * trackRadius);
-      B2DEBUG(29, "trackRadius * cos(angleDiff): " << trackRadius * cos(angleDiff));
-      B2DEBUG(29, "trackRadius * sin(angleDiff): " << trackRadius * sin(angleDiff));
-      B2DEBUG(29, "sensorPerpRadius - trackRadius * sin(angleDiff): " << sensorPerpRadius - trackRadius * sin(angleDiff));
 
       // additional factor of 10^3, as the sine and cosine values are also multiplied by 1000
       long trackRadiusSquared = convertToInt(trackRadius, 3) * convertToInt(trackRadius, 3);
@@ -106,11 +93,8 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
       long b = convertToInt(sensorPerpRadius, 3) - trackRadius * convertToInt(sin(angleDiff), 3);
       double y = -trackRadius * convertToInt(cos(angleDiff), 3) + sqrt(trackRadiusSquared - b * b);
 
-      B2DEBUG(29, "y from extrapolation: " << y);
-
       if (y >= sensorMinY && y <= sensorMaxY) {
         long localUPosition = y - shiftY;
-        B2DEBUG(29, "I hit a sensor!!! " << y << " on sensor: " << layer << "." << ladder << ".X, with localUPosition: " << localUPosition);
 
         // store extrapolated hit for first sensor in ladder
         sensorID = VxdID(layer, ladder, 1);
@@ -139,11 +123,6 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
         angleDiff += 2. * M_PI;
       }
       if (fabs(angleDiff) >= m_param_phiCutL2) continue;
-      B2DEBUG(29, "angleDiff: " << angleDiff);
-      B2DEBUG(29, "trackRadius * trackRadius: " << trackRadius * trackRadius);
-      B2DEBUG(29, "trackRadius * cos(angleDiff): " << trackRadius * cos(angleDiff));
-      B2DEBUG(29, "trackRadius * sin(angleDiff): " << trackRadius * sin(angleDiff));
-      B2DEBUG(29, "sensorPerpRadius - trackRadius * sin(angleDiff): " << sensorPerpRadius - trackRadius * sin(angleDiff));
 
       // additional factor of 10^3, as the sine and cosine values are also multiplied by 1000
       long trackRadiusSquared = convertToInt(trackRadius, 3) * convertToInt(trackRadius, 3);
@@ -151,11 +130,8 @@ void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, s
       long b = convertToInt(sensorPerpRadius, 3) - trackRadius * convertToInt(sin(angleDiff), 3);
       double y = -trackRadius * convertToInt(cos(angleDiff), 3) + sqrt(trackRadiusSquared - b * b);
 
-      B2DEBUG(29, "y from extrapolation: " << y);
-
       if (y >= sensorMinY && y <= sensorMaxY) {
         long localUPosition = y - shiftY;
-        B2DEBUG(29, "I hit a sensor!!! " << y << " on sensor: " << layer << "." << ladder << ".X, with localUPosition: " << localUPosition);
 
         // store extrapolated hit for first sensor in ladder
         sensorID = VxdID(layer, ladder, 1);

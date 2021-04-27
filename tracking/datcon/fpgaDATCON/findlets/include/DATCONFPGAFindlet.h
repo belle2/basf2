@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Christian Wessel                                        *
+ * Contributors: Christian Wessel                                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,8 +20,6 @@
 #include <tracking/datcon/fpgaDATCON/entities/DATCONSVDDigit.h>
 
 #include <svd/dataobjects/SVDCluster.h>
-
-#include <framework/datastore/StoreArray.h>
 
 #include <string>
 #include <vector>

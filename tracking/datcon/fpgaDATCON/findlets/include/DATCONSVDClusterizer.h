@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christian Wessel                                         *
@@ -21,13 +21,14 @@
 #include <numeric>
 
 namespace Belle2 {
+  class ModuleParamList;
   class DATCONSVDDigit;
   class SVDCluster;
-  class ModuleParamList;
 
   /**
    * Findlet for clustering DATCONSVDDigits and creating SVDClusters that are used for tracking in DATCON.
-   * This finldet only clusters strips on one side
+   * This finldet only clusters strips on one side.
+   * The created SVDClusters can be stored in the DataStore by setting m_param_saveClusterToDataStore to true.
    */
   class DATCONSVDClusterizer : public TrackFindingCDC::Findlet<DATCONSVDDigit, SVDCluster> {
     /// Parent class
@@ -53,7 +54,6 @@ namespace Belle2 {
     void apply(std::vector<DATCONSVDDigit>& digits, std::vector<SVDCluster>& clusters) override;
 
   private:
-
     /// fill the noise map to be used for SNR cuts
     void fillDATCONSVDNoiseMap();
 

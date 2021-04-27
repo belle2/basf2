@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christian Wessel                                         *
@@ -27,77 +27,50 @@ void FastInterceptFinder2DFPGA::exposeParameters(ModuleParamList* moduleParamLis
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "isUFinder"),
-                                m_param_isUFinder,
-                                "Intercept finder for u-side or v-side?",
-                                m_param_isUFinder);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "isUFinder"), m_param_isUFinder,
+                                "Intercept finder for u-side or v-side?", m_param_isUFinder);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "writeGnuplotOutput"),
-                                m_param_writeGnuplotOutput,
-                                "Write gnuplot debugging output to file?",
-                                m_param_writeGnuplotOutput);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "gnuplotHSOutputFileName"),
-                                m_param_gnuplotHSOutputFileName,
-                                "Name of the gnuplot debug file.",
-                                m_param_gnuplotHSOutputFileName);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "gnuplotHSRectOutputFileName"),
-                                m_param_gnuplotHSRectOutputFileName,
-                                "Name of the gnuplot debug HS sectors file.",
-                                m_param_gnuplotHSRectOutputFileName);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "gnuplotHSCoGOutputFileName"),
-                                m_param_gnuplotHSCoGOutputFileName,
-                                "Name of the gnuplot debug cluster CoG file.",
-                                m_param_gnuplotHSCoGOutputFileName);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "writeGnuplotOutput"), m_param_writeGnuplotOutput,
+                                "Write gnuplot debugging output to file?", m_param_writeGnuplotOutput);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumRecursionLevel"),
-                                m_param_maxRecursionLevel,
-                                "Maximum recursion level for the fast Hough trafo algorithm.",
-                                m_param_maxRecursionLevel);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "gnuplotHSOutputFileName"), m_param_gnuplotHSOutputFileName,
+                                "Name of the gnuplot debug file.", m_param_gnuplotHSOutputFileName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "nAngleSectors"),
-                                m_param_nAngleSectors,
-                                "Number of angle sectors (= x-axis) dividing the Hough space.",
-                                m_param_nAngleSectors);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "gnuplotHSRectOutputFileName"), m_param_gnuplotHSRectOutputFileName,
+                                "Name of the gnuplot debug HS sectors file.", m_param_gnuplotHSRectOutputFileName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "nVerticalSectors"),
-                                m_param_nVerticalSectors,
-                                "Number of vertical sectors (= y-axis) dividing the Hough space.",
-                                m_param_nVerticalSectors);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "gnuplotHSCoGOutputFileName"), m_param_gnuplotHSCoGOutputFileName,
+                                "Name of the gnuplot debug cluster CoG file.", m_param_gnuplotHSCoGOutputFileName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "verticalHoughSpaceSize"),
-                                m_param_verticalHoughSpaceSize,
-                                "data type: long. Vertical size of the Hough space.",
-                                m_param_verticalHoughSpaceSize);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumRecursionLevel"), m_param_maxRecursionLevel,
+                                "Maximum recursion level for the fast Hough trafo algorithm.", m_param_maxRecursionLevel);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumX"),
-                                m_param_minimumX,
-                                "Minimum x value of the Hough space.",
-                                m_param_minimumX);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "nAngleSectors"), m_param_nAngleSectors,
+                                "Number of angle sectors (= x-axis) dividing the Hough space.", m_param_nAngleSectors);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumX"),
-                                m_param_maximumX,
-                                "Maximum x value of the Hough space.",
-                                m_param_maximumX);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "nVerticalSectors"), m_param_nVerticalSectors,
+                                "Number of vertical sectors (= y-axis) dividing the Hough space.", m_param_nVerticalSectors);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumHSClusterSize"),
-                                m_param_MinimumHSClusterSize,
-                                "Maximum x value of the Hough space.",
-                                m_param_MinimumHSClusterSize);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "verticalHoughSpaceSize"), m_param_verticalHoughSpaceSize,
+                                "data type: long. Vertical size of the Hough space.", m_param_verticalHoughSpaceSize);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSize"),
-                                m_param_MaximumHSClusterSize,
-                                "Maximum x value of the Hough space.",
-                                m_param_MaximumHSClusterSize);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumX"), m_param_minimumX,
+                                "Minimum x value of the Hough space.", m_param_minimumX);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSizeX"),
-                                m_param_MaximumHSClusterSizeX,
-                                "Maximum x value of the Hough space.",
-                                m_param_MaximumHSClusterSizeX);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumX"), m_param_maximumX,
+                                "Maximum x value of the Hough space.", m_param_maximumX);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSizeY"),
-                                m_param_MaximumHSClusterSizeY,
-                                "Maximum x value of the Hough space.",
-                                m_param_MaximumHSClusterSizeY);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumHSClusterSize"), m_param_MinimumHSClusterSize,
+                                "Maximum x value of the Hough space.", m_param_MinimumHSClusterSize);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSize"), m_param_MaximumHSClusterSize,
+                                "Maximum x value of the Hough space.", m_param_MaximumHSClusterSize);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSizeX"), m_param_MaximumHSClusterSizeX,
+                                "Maximum x value of the Hough space.", m_param_MaximumHSClusterSizeX);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSizeY"), m_param_MaximumHSClusterSizeY,
+                                "Maximum x value of the Hough space.", m_param_MaximumHSClusterSizeY);
 
 }
 
@@ -109,6 +82,8 @@ void FastInterceptFinder2DFPGA::initialize()
   B2ASSERT("The maximum number of currentRecursion in u must not be larger than 14, but it is " << m_param_maxRecursionLevel,
            m_param_maxRecursionLevel <= 14);
   m_unitX = (m_param_maximumX - m_param_minimumX) / m_param_nAngleSectors;
+  // If Hough trafo for theta, divide Hough space not linear in theta, but linear in tan(theta).
+  // This leads to smaller HS sectors in the forward and backward regions, but an even distributions of extrapolated PXD hits.
   if (not m_param_isUFinder) {
     m_unitX = (tan(m_param_maximumX) - tan(m_param_minimumX)) / m_param_nAngleSectors;
   }
@@ -255,6 +230,7 @@ void FastInterceptFinder2DFPGA::fastInterceptFinder2d(std::vector<std::pair<VxdI
           }
 
           fastInterceptFinder2d(containedHits, left, right, lowerIndex, upperIndex, currentRecursion + 1);
+
         } else {
           m_SectorArray[localIndexY * m_param_nAngleSectors + localIndexX] = -layerFilter(layerHits);
           m_activeSectorArray.push_back(std::make_pair(localIndexX, localIndexY));
@@ -265,6 +241,7 @@ void FastInterceptFinder2DFPGA::fastInterceptFinder2d(std::vector<std::pair<VxdI
                             m_const_rectColor[currentRecursion % 8] << "\" fs solid 0.5 behind" << std::endl;
             m_rectcounter++;
           }
+
         }
       }
     }
@@ -296,10 +273,6 @@ void FastInterceptFinder2DFPGA::FindHoughSpaceCluster()
     return ((int)b.second - (int)a.second) * 16384 < (int)b.first - (int)a.first;
   };
   std::sort(m_activeSectorArray.begin(), m_activeSectorArray.end(), sortSectors);
-//   for (const auto& currentCell : m_activeSectorArray) {
-//     B2INFO(currentCell.first << "\t" << currentCell.second);
-//   }
-//   B2INFO("    end this side");
 
   for (const auto& currentCell : m_activeSectorArray) {
     const uint currentIndex = currentCell.second * m_param_nAngleSectors + currentCell.first;

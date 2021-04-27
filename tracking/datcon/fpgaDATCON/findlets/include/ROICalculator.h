@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christian Wessel                                         *
@@ -16,10 +16,9 @@
 #include <vector>
 
 namespace Belle2 {
+  class ModuleParamList;
   class VxdID;
   class ROIid;
-
-  class ModuleParamList;
 
   /**
    * Findlet to calculate ROI on the PXD sensors based on input hits

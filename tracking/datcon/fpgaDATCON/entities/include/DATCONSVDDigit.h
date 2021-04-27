@@ -1,19 +1,16 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christian Wessel                                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
 #include <vxd/dataobjects/VxdID.h>
 
-#include <cstdint>
-#include <sstream>
 #include <algorithm>
 #include <limits>
 
@@ -78,9 +75,7 @@ namespace Belle2 {
     /** Default constructor for the ROOT IO. */
     // cppcheck does not recognize initialization through other constructor
     // cppcheck-suppress uninitMemberVar
-    DATCONSVDDigit() : DATCONSVDDigit(
-        0, true, 0, APVFloatSamples( {{0, 0, 0, 0, 0, 0}})
-    )
+    DATCONSVDDigit() : DATCONSVDDigit(0, true, 0, APVFloatSamples( {{0, 0, 0, 0, 0, 0}}))
     {}
 
     /** Getter for the sensor ID. */

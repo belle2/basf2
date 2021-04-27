@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christian Wessel                                         *
@@ -28,10 +28,8 @@ void SVDShaperDigitConverter::exposeParameters(ModuleParamList* moduleParamList,
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storeSVDShaperDigitsName"),
-                                m_param_storeSVDShaperDigitsName,
-                                "StoreArray name of the SVDShaperDigits StoreArray.",
-                                m_param_storeSVDShaperDigitsName);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storeSVDShaperDigitsName"), m_param_storeSVDShaperDigitsName,
+                                "StoreArray name of the SVDShaperDigits StoreArray.", m_param_storeSVDShaperDigitsName);
 }
 
 void SVDShaperDigitConverter::initialize()

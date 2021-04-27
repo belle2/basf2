@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Christian Wessel                                         *
@@ -29,20 +29,20 @@ void ROICalculator::exposeParameters(ModuleParamList* moduleParamList, const std
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ROIsStoreArrayName"),
-                                m_param_ROIsStoreArrayName, "Name of the ROIs StoreArray?", m_param_ROIsStoreArrayName);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ROIsStoreArrayName"), m_param_ROIsStoreArrayName,
+                                "Name of the ROIs StoreArray?", m_param_ROIsStoreArrayName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "uROIsizeL1"),
-                                m_param_uROIsizeL1, "u direction ROI size on L1.", m_param_uROIsizeL1);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "uROIsizeL1"), m_param_uROIsizeL1,
+                                "u direction ROI size on L1.", m_param_uROIsizeL1);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "uROIsizeL2"),
-                                m_param_uROIsizeL2, "u direction ROI size on L2.", m_param_uROIsizeL2);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "uROIsizeL2"), m_param_uROIsizeL2,
+                                "u direction ROI size on L2.", m_param_uROIsizeL2);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "vROIsizeL1"),
-                                m_param_vROIsizeL1, "v direction ROI size on L1.", m_param_vROIsizeL1);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "vROIsizeL1"), m_param_vROIsizeL1,
+                                "v direction ROI size on L1.", m_param_vROIsizeL1);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "vROIsizeL2"),
-                                m_param_vROIsizeL2, "v direction ROI size on L2.", m_param_vROIsizeL2);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "vROIsizeL2"), m_param_vROIsizeL2,
+                                "v direction ROI size on L2.", m_param_vROIsizeL2);
 
 }
 

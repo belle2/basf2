@@ -632,7 +632,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("foxWolframH(i)", foxWolframH,
                       "[Eventbased] Returns i-th order Fox Wolfram moment. The order can go from 0 up to 8th.");
     REGISTER_VARIABLE("harmonicMoment(i, axisName)", harmonicMoment,
-                      "[Eventbased] Returns i-th order harmonic moment, calculated respect to the axis ``axisName``. The order can go from 0 up to 8th, the ``axisName`` can be either 'thrust' or 'collision'.");
+                      "[Eventbased] Returns i-th order harmonic moment, calculated with respect to the axis ``axisName``. The order can go from 0 up to 8th, the ``axisName`` can be either 'thrust' or 'collision'.");
     REGISTER_VARIABLE("cleoCone(i, axisName)", cleoCone,
                       "[Eventbased] Returns i-th order Cleo cone, calculated with respect to the axis ``axisName``. The order can go from 0 up to 8th, the ``axisName`` can be either 'thrust' or 'collision'.");
     REGISTER_VARIABLE("useThrustFrame(variable)", useThrustFrame, "Evaluates a variable value in the thrust reference frame.");

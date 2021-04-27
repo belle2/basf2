@@ -110,6 +110,13 @@ void SVDDQMDoseModule::defineHisto()
                nb1, 0, m_noInjectionTime));
   }
 
+  // Include directory name in title: this histogram's canvas is made automatically,
+  // so no analysis modules changes its title to show the event selection used.
+  title = "SVDBunchNumVSNStrips - ";
+  title += m_histogramDirectoryName;
+  title += ";Bunch No.;Number of fired strips;Events / bin";
+  h_bunchNumVsNHits = new TH2F("SVDBunchNumVSNStrips", title, 1280, 0, 1280, 10, 0, 10000);
+
   oldDir->cd();
 }
 
@@ -153,6 +160,7 @@ void SVDDQMDoseModule::beginRun()
     histPtr->Reset();
   for (const auto& histPtr : m_groupNHits1U)
     histPtr->Reset();
+  h_bunchNumVsNHits->Reset();
 }
 
 void SVDDQMDoseModule::event()
@@ -223,6 +231,9 @@ void SVDDQMDoseModule::event()
   // Compute instantaneous occupancy
   for (unsigned int i = 0; i < c_sensorGroups.size(); i++)
     m_groupOccupanciesU[i]->Fill(groupHitsU[i] * 100.0 / c_sensorGroups[i].nStripsU);
+
+  // Bunch num vs fired strips
+  h_bunchNumVsNHits->Fill(theTTD->GetBunchNumber(0), m_digits.getEntries());
 }
 
 const std::vector<SVDDQMDoseModule::SensorGroup> SVDDQMDoseModule::c_sensorGroups = {

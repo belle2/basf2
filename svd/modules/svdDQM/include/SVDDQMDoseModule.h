@@ -97,6 +97,8 @@ namespace Belle2 {
       TH1F* h_nEvtsVsTime1 = nullptr;
       /// Hists of the number of hits in each time bin (1D) per sensor group, U-side.
       std::vector<TH1F*> m_groupNHits1U;
+      /// Hist of bunch number vs number of fired strips (copied from SVDDQMInjection).
+      TH2F* h_bunchNumVsNHits = nullptr;
 
       // Other stuff
       /** List of interesting groups of sensors to average over. Defined in SVDDQMDoseModule.cc . */

@@ -25,7 +25,6 @@
 #include <mdst/dbobjects/CollisionInvariantMass.h>
 
 #include <list>
-#include <map>
 
 namespace Belle {
   /** This is needed by some utility function from belle so let's provide a

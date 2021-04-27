@@ -14,53 +14,53 @@ from basf2 import conditions as b2conditions
 now = datetime.datetime.now()
 
 
-# release-05 equivalent values:
+# new values (to be used in release-06):
 # c0,1,2,3 = coupling constants
 # ew = electronWeight
 
 # L3 u/V
 ew_L3_U = 0.8828
-c0_L3_U = 0.9305
-c1_L3_U = 0.448
-c2_L3_U = 0.03
-c3_L3_U = 0
+c0_L3_U = 0.76
+c1_L3_U = 0.42
+c2_L3_U = 0.12
+c3_L3_U = 0.08
 ew_L3_V = 0.8529
-c0_L3_V = 0.9782
-c1_L3_V = 0.3713
-c2_L3_V = 0.0065
+c0_L3_V = 0.98
+c1_L3_V = 0.37
+c2_L3_V = 0
 c3_L3_V = 0
 # forward U/V
 ew_fw_U = 0.9163
-c0_fw_U = 0.964
-c1_fw_U = 0.4295
-c2_fw_U = 0.0139
-c3_fw_U = 0
+c0_fw_U = 0.82
+c1_fw_U = 0.42
+c2_fw_U = 0.09
+c3_fw_U = 0.08
 ew_fw_V = 0.9486
-c0_fw_V = 0.9677
-c1_fw_V = 0.3552
-c2_fw_V = 0.0091
+c0_fw_V = 0.92
+c1_fw_V = 0.30
+c2_fw_V = 0
 c3_fw_V = 0
 # backward U/V
 ew_bk_U = 0.9128
-c0_bk_U = 0.9665
-c1_bk_U = 0.4202
-c2_bk_U = 0.0125
-c3_bk_U = 0
+c0_bk_U = 0.80
+c1_bk_U = 0.42
+c2_bk_U = 0.10
+c3_bk_U = 0.08
 ew_bk_V = 0.9
-c0_bk_V = 0.9687
-c1_bk_V = 0.3615
-c2_bk_V = 0.0091
+c0_bk_V = 0.94
+c1_bk_V = 0.32
+c2_bk_V = 0
 c3_bk_V = 0
 # origami U/v
 ew_or_U = 0.9138
-c0_or_U = 0.9665
-c1_or_U = 0.4202
-c2_or_U = 0.0125
-c3_or_U = 0
+c0_or_U = 0.80
+c1_or_U = 0.42
+c2_or_U = 0.10
+c3_or_U = 0.08
 ew_or_V = 0.9472
-c0_or_V = 0.9687
-c1_or_V = 0.3615
-c2_or_V = 0.0091
+c0_or_V = 0.83
+c1_or_V = 0.29
+c2_or_V = 0
 c3_or_V = 0
 
 

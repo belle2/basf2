@@ -300,14 +300,39 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Continuum Suppression");
     REGISTER_VARIABLE("R2EventLevel", R2EventLevel,
-                      "[Eventbased] Event-Level Reduced Fox-Wolfram moment R2. Deprecated, please use :b2:var:`foxWolframR`.");
-    REGISTER_VARIABLE("R2"          , R2          ,
-                      "Returns reduced Fox-Wolfram R2, defined as ratio of the i-th to the 0-th order Fox Wolfram moments.");
-    REGISTER_VARIABLE("thrustBm"    , thrustBm    , "Returns magnitude of the signal B thrust axis.");
-    REGISTER_VARIABLE("thrustOm"    , thrustOm    , "Returns magnitude of the ROE thrust axis.");
-    REGISTER_VARIABLE("cosTBTO"     , cosTBTO     ,
-                      "Returns cosine of angle between thrust axis of the signal B and thrust axis of ROE.");
-    REGISTER_VARIABLE("cosTBz"      , cosTBz      , "Returns cosine of angle between thrust axis of the signal B and z-axis.");
+                      "[Eventbased] Event-Level Reduced Fox-Wolfram moment R2.");
+    MAKE_DEPRECATED("R2EventLevel", false, "release-06-00-00", R"DOC(
+                     The same value can be calculated with the Event Shape module, see  :b2:var:`foxWolframR`.)DOC");
+    REGISTER_VARIABLE("R2"          , R2          , R"DOC(
+Returns reduced Fox-Wolfram R2, defined as ratio of the i-th to the 0-th order Fox Wolfram moments.
+
+.. warning:: You have to run the Contiunuum Suppression builder module for these variables to be meaningful.
+.. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
+)DOC");
+    REGISTER_VARIABLE("thrustBm"    , thrustBm    , R"DOC(
+Returns magnitude of the signal B thrust axis.
+
+.. warning:: You have to run the Contiunuum Suppression builder module for these variables to be meaningful.
+.. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
+)DOC");
+    REGISTER_VARIABLE("thrustOm"    , thrustOm    , R"DOC(
+Returns magnitude of the ROE thrust axis.
+
+.. warning:: You have to run the Contiunuum Suppression builder module for these variables to be meaningful.
+.. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
+)DOC");
+    REGISTER_VARIABLE("cosTBTO"     , cosTBTO     , R"DOC(
+Returns cosine of angle between thrust axis of the signal B and thrust axis of ROE.
+
+.. warning:: You have to run the Contiunuum Suppression builder module for these variables to be meaningful.
+.. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
+)DOC");
+    REGISTER_VARIABLE("cosTBz"      , cosTBz      , R"DOC(
+Returns cosine of angle between thrust axis of the signal B and z-axis.
+
+.. warning:: You have to run the Contiunuum Suppression builder module for these variables to be meaningful.
+.. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
+)DOC");
     REGISTER_VARIABLE("KSFWVariables(variable,string)", KSFWVariables,  R"DOC(
 Returns variable et, mm2, or one of the 16 KSFW moments. If only the ``variable`` argument is specified, the KSFW moment calculated from the B primary daughters is returned. 
 If string is set to ``FS1``, the KSFW moment calculated from the B final state daughters is returned.
@@ -318,12 +343,18 @@ Allowed input values for ``variable`` argument are the following:
 * hso10, hso12, hso14
 * hso20, hso22, hso24
 * hoo0,  hoo1,  hoo2,  hoo3,  hoo4.
+
+.. warning:: You have to run the Contiunuum Suppression builder module for these variables to be meaningful.
+.. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
 )DOC");
 
     REGISTER_VARIABLE("CleoConeCS(integer,string)", CleoConesCS, R"DOC(
 Returns i-th cleo cones from the continuum suppression. The allowed inputs for ``integer`` argument are integers from 1 to 9. 
 If only the ``integer`` argument is specified, the CleoCones are calculated from all final state particles. 
 The ``string`` argument is optional and the only allowed input value is 'ROE', which sets the CleoCones to be calculated only from ROE particles.
+
+.. warning:: You have to run the Contiunuum Suppression builder module for these variables to be meaningful.
+.. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
 )DOC");
 
     REGISTER_VARIABLE("transformedNetworkOutput(name, low, high)", transformedNetworkOutput, R"DOC(
@@ -341,6 +372,9 @@ Returns the variable with respect to rotated coordinates, in which z lies on the
 If mode is set to ``Signal`` it will use the thrust axis of the reconstructed B candidate, if mode is set to ROE it will use the ROE thrust axis.
 If mode is set to ``Auto`` the function use the thrust axis based on Rest Of Event (ROE) particles.
 Like :b2:var:`isInRestOfEvent`, one has to use this metavariable in ROE loop.
+
+.. warning:: You have to run the Contiunuum Suppression builder module for these variables to be meaningful.
+.. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
 )DOC");
 
   }

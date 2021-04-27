@@ -78,7 +78,7 @@ Again, as shown in this example, you can store both cases in your ntuple.
 Continuum Suppression variables
 -------------------------------
 
-The Continuum Suppression are defined as following:
+The Continuum Suppression variables are defined as following:
 
 Thrust and thrust axis
   For a set of :math:`N` particles with momenta :math:`p_i` the thrust axis :math:`\vec{T}` is defined as the unit vector along which their total projection is maximal.

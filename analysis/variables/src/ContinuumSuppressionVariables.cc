@@ -301,7 +301,7 @@ namespace Belle2 {
     VARIABLE_GROUP("Continuum Suppression");
     REGISTER_VARIABLE("R2EventLevel", R2EventLevel,
                       "[Eventbased] Event-Level Reduced Fox-Wolfram moment R2.");
-    MAKE_DEPRECATED("R2EventLevel", false, "release-06-00-00", R"DOC(
+    MAKE_DEPRECATED("R2EventLevel", false, "release-05-00-00", R"DOC(
                      The same value can be calculated with the Event Shape module, see  :b2:var:`foxWolframR`.)DOC");
     REGISTER_VARIABLE("R2"          , R2          , R"DOC(
 Returns reduced Fox-Wolfram R2, defined as ratio of the i-th to the 0-th order Fox Wolfram moments.
@@ -349,7 +349,7 @@ Allowed input values for ``variable`` argument are the following:
 )DOC");
 
     REGISTER_VARIABLE("CleoConeCS(integer,string)", CleoConesCS, R"DOC(
-Returns i-th cleo cones from the continuum suppression. The allowed inputs for ``integer`` argument are integers from 1 to 9. 
+Returns i-th cleo cones from the continuum suppression. The allowed inputs for ``integer`` argument are integers from *1* to *9*. 
 If only the ``integer`` argument is specified, the CleoCones are calculated from all final state particles. 
 The ``string`` argument is optional and the only allowed input value is 'ROE', which sets the CleoCones to be calculated only from ROE particles.
 

@@ -34,6 +34,8 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
+#include <framework/geometry/BFieldManager.h>
+#include <framework/gearbox/Const.h>
 
 #include <TLorentzVector.h>
 #include <TRandom.h>
@@ -396,24 +398,16 @@ namespace Belle2 {
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
 
-      double px = particle->getPx();
-      double py = particle->getPy();
+      TVector3 mom = particle->getMomentum();
 
-      if (py == py && px == px) {
+      TVector3 r = particle->getVertex() - beamSpotDB->getIPPosition();
 
-        double x = particle->getX() - (beamSpotDB->getIPPosition()).X();
-        double y = particle->getY() - (beamSpotDB->getIPPosition()).Y();
+      TVector3 Bfield = BFieldManager::getInstance().getFieldInTesla(beamSpotDB->getIPPosition());
 
-        double pt = sqrt(px * px + py * py);
+      TVector3 curvature = - Bfield * Const::speedOfLight * particle->getCharge(); //Curvature of the track
+      double T = TMath::Sqrt(mom.Perp2() - 2 * curvature * r.Cross(mom) + curvature.Mag2() * r.Perp2());
 
-//       const TVector3 m_BeamSpotCenter = TVector3(0., 0., 0.);
-//       TVector3 Bfield= BFieldMap::Instance().getBField(m_BeamSpotCenter); # TODO check why this produces a linking bug
-
-        double a = -0.2998 * 1.5 * particle->getCharge(); //Curvature of the track,
-        double T = TMath::Sqrt(pt * pt - 2 * a * (x * py - y * px) + a * a * (x * x + y * y));
-
-        return TMath::Abs((-2 * (x * py - y * px) + a * (x * x + y * y)) / (T + pt));
-      } else return std::numeric_limits<double>::quiet_NaN();
+      return TMath::Abs((-2 * r.Cross(mom).z() + curvature.Mag() * r.Perp2()) / (T + mom.Perp()));
     }
 
     double ArmenterosLongitudinalMomentumAsymmetry(const Particle* part)
@@ -883,7 +877,7 @@ namespace Belle2 {
           continue;
 
         nPrimaryParticleDaughters++;
-        if (abs(daughter->getPDG()) > 22)
+        if (abs(daughter->getPDG()) > Const::photon.getPDGCode())
           nHadronicParticles++;
       }
 
@@ -923,7 +917,8 @@ namespace Belle2 {
       const auto& daughters = particle->getFinalStateDaughters();
       for (const auto& daughter : daughters) {
         int pdg = abs(daughter->getPDGCode());
-        if (pdg == 11 or pdg == 13 or pdg == 211 or pdg == 321 or pdg == 2212)
+        if (pdg == Const::electron.getPDGCode() or pdg == Const::muon.getPDGCode() or pdg == Const::pion.getPDGCode()
+            or pdg == Const::kaon.getPDGCode() or pdg == Const::proton.getPDGCode())
           par_tracks++;
       }
       return event_tracks - par_tracks;
@@ -1105,9 +1100,14 @@ Note that this is context-dependent variable and can take different values depen
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
                       "Number of tracks in the event - Number of tracks( = charged FSPs) of particle.");
-    REGISTER_VARIABLE("trackMatchType", trackMatchType,
-                      "-1 particle has no ECL cluster, 0 particle has no associated track, 1 there is a matched track"
-                      "called connected - region(CR) track match");
+    REGISTER_VARIABLE("trackMatchType", trackMatchType, R"DOC(
+
+                      * -1 particle has no ECL cluster
+                      *  0 particle has no associated track
+                      *  1 there is a matched track called connected - region(CR) track match
+                      )DOC");
+    MAKE_DEPRECATED("trackMatchType", false, "light-minos-2012", R"DOC(
+                     Use better variables like `trackNECLClusters`, `clusterTrackMatch`, and `nECLClusterTrackMatches`.)DOC");
 
     REGISTER_VARIABLE("decayTypeRecoil", recoilMCDecayType,
                       "type of the particle decay(no related mcparticle = -1, hadronic = 0, direct leptonic = 1, direct semileptonic = 2,"

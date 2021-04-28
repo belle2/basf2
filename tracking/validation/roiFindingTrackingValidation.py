@@ -15,7 +15,6 @@
 from tracking import add_tracking_for_PXDDataReduction_simulation
 from tracking.validation.plot import ValidationPlot
 from ROOT import Belle2
-import math
 import collections
 import ROOT
 import basf2
@@ -128,7 +127,6 @@ class ROIFindingTrackingValidationPlots(basf2.Module):
     def terminate(self):
         """Receive signal at the end of event processing"""
 
-        name = self.validation_name
         contact = self.contact
         basf2.B2RESULT("total nROIs = {}".format(self.nROIs))
 

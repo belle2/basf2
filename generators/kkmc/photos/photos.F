@@ -1920,7 +1920,7 @@ C--   Check on kinematical bounds
       ELSE
        IF (PRSOFT.LT.0.1D0) THEN
          DATA=PRSOFT
-         CALL PHOERR(2,'PHOENE',DATA)
+         CALL PHOERR(2,'PHOENE',DATA) 
        ENDIF
       ENDIF
 
@@ -2732,6 +2732,8 @@ C K.I      DATA ISEC /.TRUE./
       IF (IMES.LE.PHOMES) STATUS(IMES)=STATUS(IMES)+1
 C--
 C--   Count number of non-fatal errors...
+      IF ((IMES.EQ. 2).AND.(STATUS(IMES).GE.2)) RETURN ! Too much bremsstrahlung happens for e-e+ pair emissions [SwB]
+      IF ((IMES.EQ. 3).AND.(STATUS(IMES).GE.2)) RETURN ! Overweighted events happens for e-e+ pair emissions [SwB]
       IF ((IMES.EQ. 6).AND.(STATUS(IMES).GE.2)) RETURN
       IF ((IMES.EQ.10).AND.(STATUS(IMES).GE.2)) RETURN
       SDATA=DATA

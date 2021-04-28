@@ -1,0 +1,31 @@
+# EventType: 1290001005
+# Descriptor: [B+ -> Xs gamma]cc, MXs is flat in the range of [0.64, 3.4] GeV
+# NickName: Bu_Xsgamma
+# Documentation: Rare b->s gamma process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Yo Sato, Takayuki Ueno
+# Email: yosato@epx.phys.tohoku.ac.jp
+# Cuts: None
+# Date: 20201001
+#
+#
+
+Particle Xsu 2.02 1.38
+LSFLAT Xsu
+#
+Particle anti-Xsu 2.02 1.38
+LSFLAT anti-Xsu
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.0  Xsu gamma  PHSP;
+Enddecay
+CDecay B-sig
+
+#
+End

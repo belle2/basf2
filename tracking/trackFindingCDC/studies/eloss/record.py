@@ -2,20 +2,14 @@
 # -*- coding: utf-8 -*-
 
 # Fix TLS bug
-import ctypes
 # ctypes.cdll.LoadLibrary('/space/ofrost/basf2/release/lib/Linux_x86_64/opt/libtracking_trackFindingCDC.so')
 
-import basf2
 
-import ROOT
 from ROOT import Belle2  # make Belle2 namespace available
-from ROOT import std
 from ROOT.Belle2 import TrackFindingCDC as TFCDC
 
-import os
 import sys
 import math
-import random
 import numpy as np
 
 from tracking.validation.utilities import is_primary
@@ -24,7 +18,6 @@ import tracking.harvest.harvesting as harvesting
 import tracking.harvest.refiners as refiners
 from tracking.harvest.run import HarvestingRun
 
-import argparse
 
 import logging
 
@@ -39,7 +32,7 @@ CONTACT = "oliver.frost@desy.de"
 def getNaiveBetheEnergyLoss(p, pdg_code, s):
     eloss = s * 0.00008  # Miriam's / Sasha's value
     eloss = s * 1 * 10**-4  # Miriam's / Sasha's value
-    return eLoss
+    return eloss
 
 
 def getBetheStoppingPower(p, pdg_code):
@@ -70,7 +63,7 @@ def getBetheStoppingPower(p, pdg_code):
     I2 = m_I * m_I
 
     factor = 178.6 * 0.00015e-04 / 2  # Miriam's / Sasha's value - to big...
-    eDensity = factor / K
+    # eDensity = factor / K
     dEdx = factor / beta2 * (math.log(2 * eMass * beta2 * gamma2 * Wmax / I2) - beta2)
 
     # Miriam's / Sasha's original
@@ -198,9 +191,6 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
     def peel(self, track):
         """Aggregate the track and MC information for dE/dx analysis"""
         mc_track_lookup = self.mc_track_lookup
-        mc_hit_lookup = self.mc_hit_lookup
-
-        track_fitter = self.track_fitter
 
         # rl_drift_circle = 1
         # unit_variance = 0
@@ -239,7 +229,7 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
             return
         # Make sure we start the track in the last layer to avoid some confusion
         # if last_sim_hit.getWireID().getICLayer() != 55: return
-        last_sim_mom3D = TFCDC.Vector3D(last_sim_hit.getMomentum())
+        # last_sim_mom3D = TFCDC.Vector3D(last_sim_hit.getMomentum())
 
         first_sim_pos3D = TFCDC.Vector3D(first_sim_hit.getPosTrack())
         first_sim_mom3D = TFCDC.Vector3D(first_sim_hit.getMomentum())

@@ -44,7 +44,7 @@ that is, consult this page again: :ref:`conditionsdb_overview`).
 
     Add a line to your previous steering file that adds the
     ``analysis_tools_release-04-02`` global tag. For this you need to call the
-    `prepend_globaltag` method of the `basf.conditions` object (which is an
+    `prepend_globaltag` method of the `basf2.conditions` object (which is an
     instance of the `ConditionsConfiguration` class).
 
 .. admonition:: Solution
@@ -77,22 +77,22 @@ start right away!
     and call the function:
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
-        :lines: 78-79
-        :lineno-start: 78
+        :lines: 77-78
+        :lineno-start: 77
 
 .. admonition:: Exercise
     :class: stacked exercise
 
     Add the the
-    `flavorTagger.flavor_tagging` variable collection to your output
+    ``flavorTagger.flavor_tagging`` variable collection to your output
     variables
 
 .. admonition:: Solution
     :class: toggle solution
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
-        :lines: 106
-        :lineno-start: 106
+        :lines: 105
+        :lineno-start: 105
 
 .. admonition:: Exercise
     :class: stacked exercise
@@ -114,7 +114,7 @@ Now let's talk about the output of the flavor tagger. This is the value
 if the algorighm can't decide between both options for :math:`q` and 1 if the
 algorithm is certain about it's decision.
 
-The variable `FBDT_qrCombined` is the :math:`q\cdot r` result of one of the
+The variable ``FBDT_qrCombined`` is the :math:`q\cdot r` result of one of the
 models of the `FlavorTagger` (a *fast boosted decision tree*).
 It can also be ``NaN`` to signal that not a single charged
 track in the ROE was found, so that the algorithm can't work.
@@ -130,7 +130,7 @@ It can take the numbers
 (some problems with MC matching in the ROE).
 
 That means that we can check how well our flavor tagger performed by comparing
-it to `FBDT_qrCombined`!
+it to ``FBDT_qrCombined``!
 
 .. admonition:: Exercise (optional)
     :class: exercise
@@ -141,14 +141,14 @@ it to `FBDT_qrCombined`!
     :class: exercise stacked
 
     Only consider candidates with clearly defined MC level flavor tag.
-    Compare the output of ``qrMC`` to that of `FBDT_qrCombined`.
+    Compare the output of ``qrMC`` to that of ``FBDT_qrCombined``.
 
 .. admonition:: Hint
     :class: xhint stacked toggle
 
     For clearly defined MC flavor tag, you only have to distinguish between
     ``qrMC == 0`` and ``qrMC == 1``. For these two cases you can then plot
-    the distribution of `FBDT_qrCombined`.
+    the distribution of ``FBDT_qrCombined``.
 
 .. admonition:: Solution
     :class: solution toggle
@@ -174,6 +174,8 @@ it to `FBDT_qrCombined`!
       :math:`\bar B_\text{tag}^0`
     * The output is of the form :math:`\pm 1` times the confidence between 0 and
       1.
+
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Authors of this lesson
 

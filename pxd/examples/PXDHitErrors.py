@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
 import math
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
 from ROOT import Belle2
 
 
-class PXDHitErrors(Module):
+class PXDHitErrors(b2.Module):
 
     """A simple module to check the reconstruction of PXDTrueHits."""
 
@@ -40,16 +39,16 @@ class PXDHitErrors(Module):
         """Find clusters with a truehit and print some stats."""
 
         truehits = Belle2.PyStoreArray('PXDTrueHits')
-        nTruehits = truehits.getEntries()
+        # nTruehits = truehits.getEntries()
         clusters = Belle2.PyStoreArray('PXDClusters')
         nClusters = clusters.getEntries()
-        digits = Belle2.PyStoreArray('PXDDigits')
-        nDigits = digits.getEntries()
+        # digits = Belle2.PyStoreArray('PXDDigits')
+        # nDigits = digits.getEntries()
         relClustersToTrueHits = \
             Belle2.PyRelationArray('PXDClustersToPXDTrueHits')
-        nClusterRelations = relClustersToTrueHits.getEntries()
-        relClustersToDigits = Belle2.PyRelationArray('PXDClustersToPXDDigits')
-        nDigitRelations = relClustersToDigits.getEntries()
+        # nClusterRelations = relClustersToTrueHits.getEntries()
+        # relClustersToDigits = Belle2.PyRelationArray('PXDClustersToPXDDigits')
+        # nDigitRelations = relClustersToDigits.getEntries()
 
         # Start with clusters and use the relation to get the corresponding
         # digits and truehits.
@@ -97,11 +96,11 @@ class PXDHitErrors(Module):
                         / cluster.getUSigma()
                     cluster_pull_v = (cluster.getV() - truehit.getV()) \
                         / cluster.getVSigma()
-                except ZeroDivisionError as e:
+                except ZeroDivisionError:
                     if cluster.getUSigma() < 1.0e-8:
-                        B2ERROR('Zero error in u, clsize {cl}.'.format(cl=cluster.getUSize()))
+                        b2.B2ERROR('Zero error in u, clsize {cl}.'.format(cl=cluster.getUSize()))
                     else:
-                        B2ERROR('Zero error in v, clsize {cl}.'.format(cl=cluster.getVSize()))
+                        b2.B2ERROR('Zero error in v, clsize {cl}.'.format(cl=cluster.getVSize()))
 
                 s_cl = \
                     '{u:10.5f} {v:10.5f} {uEr:10.5f} {vEr:10.5f} {rho:10.4f} '.format(

@@ -248,6 +248,10 @@ namespace Belle2 {
     /** Produce ERROR message if no relation of given durability exists between fromArray and toArray (in that direction).
      *
      *  @note can only be used in initialize() function
+     *  @param fromArray  Origin of the relation
+     *  @param toArray    Target of the relation
+     *  @param durability Decide with which durability map you want to perform the requested action.
+     *  @param namedRelation Additional name for the relation, or "" for the default naming
      *  @return           True if the requested object exists.
      *  @sa DependencyMap
      */
@@ -268,7 +272,10 @@ namespace Belle2 {
     /** Register the given relation as an optional input.
      *
      *  Mainly useful for creating diagrams of module inputs and outputs.
-     *  @param namedRelation Additional name for the relation, or "" for the default naming
+     *  @param fromArray  Origin of the relation
+     *  @param toArray    Target of the relation
+     *  @param durability Decide with which durability map you want to perform the requested action.
+     *  @param namedRelation Additional name for the relation, or "" for the default naming1
      *  @return           True if the requested object exists.
      *  @sa DependencyMap
      */

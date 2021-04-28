@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Thomas Keck 2016
 
 import basf2_mva
 import basf2_mva_util
+import collections
+import numpy as np
 import time
 
 
@@ -26,7 +27,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 def end_fit(state):
     """
     Merge received data together and fit estimator.
-    Neural network do not support weights at the moment (slearn 0.18.1).
+    Neural network do not support weights at the moment (sklearn 0.18.1).
     So these are ignored here!
     """
     state.estimator = state.estimator.fit(np.vstack(state.X), np.hstack(state.y))

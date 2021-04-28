@@ -30,13 +30,10 @@
 #   PDF file named bklmPlots-e#r#.pdf, using the experiment number and run number
 #
 
-import basf2
-from basf2 import *
 import EventInspectorPocketDAQ
-from EventInspectorPocketDAQ import *
-import ROOT
 from ROOT import TFile
-from optparse import Option, OptionValueError, OptionParser
+import sys
+from optparse import OptionParser
 import glob
 
 parser = OptionParser()

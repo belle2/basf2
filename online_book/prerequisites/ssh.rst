@@ -305,8 +305,10 @@ server.
 
 .. warning::
 
-    This second step needs to be done in the terminal connected to the gateway
-    server
+    * This second step needs to be done in the terminal connected to the gateway
+      server
+    * The initial password for ``login.cc.kek.jp`` is not the same as that of
+      ``sshcc1.kek.jp``.
 
 Now you should be connected to KEKCC but you needed to enter two commands. And
 trying to copy files from KEKCC to your home machine becomes very complicated as
@@ -320,6 +322,24 @@ the optimal solution.
     * ``scp`` can be used to copy files from and to remote computers
     * you can jump between hosts by executing ssh in a ssh connection
     * ssh uses host keys to ensure the identity of the server you connect to
+
+Debugging
+---------
+
+If you run into trouble in one of the following sections it can be very
+instructive to switch on debugging output by using the ``-v`` option of ssh:
+
+.. code-block:: bash
+
+    ssh -v username@servername
+
+Once you have created a configuration file (next section) it can also sometimes
+be helpful to disable it to rule out this source of error. This can be done
+by using the ``-F`` option to specify a blank config file:
+
+.. code-block:: bash
+
+    ssh -F /dev/null username@servername
 
 SSH Configuration File
 ----------------------
@@ -726,7 +746,6 @@ should see a notebook interface open up.
       ``remotehost`` at port ``remoteport`` on ``server``
     * this allows to open jupyter notebooks on kekcc or other computing centers
 
-
 Additional Tips and Tricks (Optional)
 -------------------------------------
 
@@ -961,6 +980,8 @@ also find keyboard shortcuts for most of them.
       :linenos:
 
    Then ``ssh ccw01`` will also work from outside KEKCC.
+
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Author(s) of this lesson
 

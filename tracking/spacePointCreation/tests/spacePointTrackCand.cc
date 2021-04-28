@@ -8,6 +8,8 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
+#include <framework/gearbox/Const.h>
+
 // google test framework
 #include <gtest/gtest.h>
 
@@ -75,7 +77,7 @@ namespace Belle2 {
     // check if all SpacePoints are actually in the TrackCand
     EXPECT_EQ(aSpacePointTC.getNHits(), aSpacePointVec.size());
     // check pdg, charge, etc...
-    EXPECT_EQ(aSpacePointTC.getPdgCode(), 11);
+    EXPECT_EQ(aSpacePointTC.getPdgCode(), Const::electron.getPDGCode());
     EXPECT_DOUBLE_EQ(aSpacePointTC.getChargeSeed(), -1);
     EXPECT_EQ(aSpacePointTC.getMcTrackID(), 23);
 
@@ -122,7 +124,7 @@ namespace Belle2 {
     EXPECT_TRUE(aSpacePointTC == anotherSpacePointTC);
 
     // change pdg code and compare again (should not have any influence)
-    anotherSpacePointTC.setPdgCode(-11);
+    anotherSpacePointTC.setPdgCode(-Const::electron.getPDGCode());
     EXPECT_TRUE(aSpacePointTC == anotherSpacePointTC);
 
     // add a space point with arbitrary sorting parameter and compare again, should now give false
@@ -156,11 +158,11 @@ namespace Belle2 {
   {
     SpacePointTrackCand aSpacePointTC;
 
-    // pdg code of electron is 11
-    aSpacePointTC.setPdgCode(11);
+    // electron
+    aSpacePointTC.setPdgCode(Const::electron.getPDGCode());
     EXPECT_DOUBLE_EQ(aSpacePointTC.getChargeSeed(), -1);
     // positron
-    aSpacePointTC.setPdgCode(-11);
+    aSpacePointTC.setPdgCode(-Const::electron.getPDGCode());
     EXPECT_DOUBLE_EQ(aSpacePointTC.getChargeSeed(), 1);
 
     // B+ Meson

@@ -1,21 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
-import math
-from basf2 import *
+import basf2 as b2
 
 # Import xml parser
 import xml.etree.ElementTree as xml
 
 # Load the required libraries
-import ROOT
-from ROOT import Belle2
 
-logging.log_level = LogLevel.WARNING
+b2.logging.log_level = b2.LogLevel.WARNING
 
 
-class SetVXDSensitiveThreshold(Module):
+class SetVXDSensitiveThreshold(b2.Module):
 
     """A utility module to manipulate the threshold on deposited energy
      in PXD and SVD SensitiveDetector.
@@ -73,29 +69,29 @@ class SetVXDSensitiveThreshold(Module):
 
 
 # Particle gun module
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 # Create Event information
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 # Manipulate the energy threshold in VXD SensitiveDetectors.
 set_thr = SetVXDSensitiveThreshold(-0.01)
 # Load parameters
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 # Create geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 # Run simulation
-simulation = register_module('FullSim')
+simulation = b2.register_module('FullSim')
 # PXD digitization module
-pxddigi = register_module('PXDDigitizer')
+pxddigi = b2.register_module('PXDDigitizer')
 # PXD clustering module
-pxdclust = register_module('PXDClusterizer')
+pxdclust = b2.register_module('PXDClusterizer')
 # SVD digitization module
-svddigi = register_module('SVDDigitizer')
+svddigi = b2.register_module('SVDDigitizer')
 # SVD clustering module
-svdclust = register_module('SVDClusterizer')
+svdclust = b2.register_module('SVDClusterizer')
 # Simpleoutput
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 
 # Specify number of events to generate
 eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
@@ -138,7 +134,7 @@ geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
 # set_thr.param('threshold',-1.0)
 
 # create processing path
-main = create_path()
+main = b2.create_path()
 main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(particlegun)
@@ -153,7 +149,7 @@ main.add_module(svdclust)
 main.add_module(output)
 
 # generate events
-process(main)
+b2.process(main)
 
 # show call statistics
-print(statistics)
+print(b2.statistics)

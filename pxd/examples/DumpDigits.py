@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
-import math
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
-import ROOT
 from ROOT import Belle2
 
 
-class DumpDigits(Module):
+class DumpDigits(b2.Module):
 
     """A simple module to dump PXD digits."""
 
@@ -32,7 +29,7 @@ class DumpDigits(Module):
         """Find clusters with a truehit and print some stats."""
 
         digits = Belle2.PyStoreArray('PXDDigits')
-        nDigits = digits.getEntries()
+        # nDigits = digits.getEntries()
         # Start with clusters and use the relation to get the corresponding
         # digits and truehits.
         with open(self.dumpfile, 'a') as dumpfile:

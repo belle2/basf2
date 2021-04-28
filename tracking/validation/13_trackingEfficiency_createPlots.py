@@ -29,13 +29,13 @@
 import ROOT
 
 ROOT.PyConfig.IgnoreCommandLineOptions = True  # noqa
-from ROOT import TFile, TChain, TTree, TH1F, TCanvas, TGraphErrors, TGraph, \
-    gStyle, TNamed, TF1, TProfile
+from ROOT import TFile, TChain, TH1F, \
+    gStyle, TNamed, TProfile
 import sys
 import math
 import numpy as np
 from optparse import OptionParser
-from tracking.validation.tracking_efficiency_helpers import *
+from tracking.validation.tracking_efficiency_helpers import get_generated_pt_values
 
 DELTA_PT = 0.0001
 
@@ -155,8 +155,6 @@ def draw_hit_counts(data_tree, pt_values):
     """
     Draw the hit count distribution.
     """
-
-    number_entries = data_tree.GetEntries()
 
     pt_lower = -0.025
     pt_upper = 4.025
@@ -423,8 +421,6 @@ def get_scaled_rms_90(values, scale_factor=0.79):
     param values: list of numbers
     return scaled RMS90 of the distribution in values
     """
-
-    number_entries = len(values)
 
     (vMin, vMax) = (np.nanpercentile(values, 5), np.nanpercentile(values, 95))
     final_list = np.array(values)[np.logical_and(values > vMin, values < vMax)]

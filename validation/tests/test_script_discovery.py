@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import sys
 import os
@@ -17,7 +16,7 @@ def main():
 
     # will create a temporary folder and delete it once this block is left
     with tempfile.TemporaryDirectory() as tmpdir:
-        print("Created temporary test folder {}".format(tmpdir))
+        print(f"Created temporary test folder {tmpdir}")
 
         # create a couple of fake validation scripts
         create_fake_scripts(
@@ -77,7 +76,7 @@ def main():
 
     # test for release and local case
     with tempfile.TemporaryDirectory() as tmpdir:
-        print("Created temporary test folder {}".format(tmpdir))
+        print(f"Created temporary test folder {tmpdir}")
 
         # create a couple of fake validation scripts
         create_fake_scripts(

@@ -29,13 +29,13 @@ namespace Belle2 {
     typedef double (SVDCoGCalibrationFunction::*cogFunctionErr)(double, double, int) const;
 
     /** returns the calibrated value of raw_time, depending on the trigger bin*/
-    double calibratedValue(double raw_time, int trigger_bin)
+    double calibratedValue(double raw_time, int trigger_bin) const
     {
       cogFunction f = m_implementations[m_current];
       return (this->*f)(raw_time, trigger_bin) ;
     }
     /** returns the error of the calibrated value of raw_time, depending on the trigger bin*/
-    double calibratedValueError(double raw_time, double raw_timeErr, int trigger_bin)
+    double calibratedValueError(double raw_time, double raw_timeErr, int trigger_bin) const
     {
       cogFunctionErr fErr = m_implementationsErr[m_current];
       return (this->*fErr)(raw_time, raw_timeErr, trigger_bin) ;

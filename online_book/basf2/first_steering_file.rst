@@ -155,42 +155,28 @@ former.
 
 In a later lesson you'll learn how and where to find input files for your
 analysis. For the purpose of this tutorial we have prepared some local input
-files.
+files. They should be available in the
+``${BELLE2_EXAMPLES_DATA_DIR}/starterkit/2021`` directory on KEKCC, DESY and
+other servers.
 
-.. admonition:: If you're working at kekcc (recommended)
-    :class: stacked
-
-    The data files are located on kekcc at
-
-    .. code-block::
-
-        /group/belle2/users/tenchini/prerelease-05-00-00a/1111540100/
-
-    This is also the location that is assumed in the solutions that are presented
-    below.
-
-.. admonition:: If you're working at DESY NAF
-    :class: stacked toggle
-
-    Please use the files at
-
-    .. code-block::
-
-        /nfs/dust/belle2/user/b2soft/1111540100
-
-    instead. This means that you have to change the data file in all of the
-    solutions below.
-
-.. admonition:: If you're working from another machine
+.. admonition:: If you're working from an institute server
     :class: toggle
 
-    Perhaps you are working on the server of your home institute or even on
-    your own local machine. In this case you first need to copy the
-    data files to your home directory on your local machine from kekcc or DESY
-    via a SSH connection (cf. :ref:`onlinebook_ssh`) and then change the path
-    accordingly. Note that we might not
-    be able to provide you with the same level of support on other machines
-    though.
+    Perhaps you are working on the server of your home institute and this folder
+    is not available. In this case please talk to your administrators to make
+    the ``${BELLE2_EXAMPLES_DATA_DIR}`` available for you and make sure that it
+    is synchronized. Note that we might not  be able to provide you with the
+    same level of support on other machines though.
+
+.. admonition:: If you're working on your own machine
+    :class: toggle
+
+    In this case you might first need to copy the data files to your home
+    directory on your local machine from kekcc or DESY via a SSH connection (cf.
+    :ref:`onlinebook_ssh`) and then either change the  path accordingly or set
+    the ``BELLE2_EXAMPLES_DATA_DIR`` environment  variable to point to the right
+    directory. Note that we might not be able to provide you with the same level
+    of support on other machines though.
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -198,16 +184,27 @@ files.
     Check out the location of the files mentioned above. Which two settings of
     MC are provided?
 
+.. admonition:: Hint
+    :class: xhint toggle stacked
+
+    Remember the ``ls`` (and ``cd``) bash command?
+
 .. admonition:: Solution
     :class: toggle solution
 
     .. code-block:: bash
 
-        ls /group/belle2/users/tenchini/prerelease-05-00-00a/1111540100/
+        ls ${BELLE2_EXAMPLES_DATA_DIR}/starterkit/2021
 
-    There are each 100 files with and without beam background (BGx1 and BGx0).
+    Alternatively, you can first navigate to the directory with ``cd`` and then
+    just call ``ls`` without any arguments.
+
+    There are each 10 files with and without beam background (BGx1 and BGx0).
     Their names only differ by the final suffix, which is an integer between 0
-    and 99.
+    and 9.
+
+A helpful function to get common data files from the examples directory is
+`basf2.find_file`.
 
 .. admonition:: Task
     :class: exercise stacked
@@ -269,6 +266,18 @@ having to change anything in the script itself.
 .. admonition:: Hint
     :class: toggle xhint stacked
 
+    Get the integer from the command line with
+
+    .. code-block:: python
+
+        import sys
+
+
+        filenumber = sys.argv[1]
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
     Rather than concatenating strings with ``+`` (``"file_" + str(filenumber) + ".root"``),
     you can also use so-called f-strings: ``f"file_{filenumber}.root"``. They
     are great for both readability and performance.
@@ -279,6 +288,21 @@ having to change anything in the script itself.
     .. literalinclude:: steering_files/011_first_steering_file.py
         :linenos:
         :emphasize-lines: 8, 14
+
+
+.. admonition:: Tip
+
+    Make sure that from now on you always supply a number every time you run your
+    steering file, e.g. ``basf2 myanalysis.py 1``.
+
+    Else you will get an exception like
+
+    .. code-block::
+
+        Traceback (most recent call last):
+          File "myanalysis.py", line 3, in <module>
+            filenumber = sys.argv[1]
+        IndexError: list index out of range
 
 Filling particle lists
 ----------------------
@@ -474,8 +498,8 @@ of the CDC (`thetaInCDCAcceptance`).
     :class: toggle solution
 
     .. literalinclude:: steering_files/013_first_steering_file.py
-        :lines: 23-27
-        :lineno-start: 23
+        :lines: 22-26
+        :lineno-start: 22
 
 
 Combining particles
@@ -495,7 +519,9 @@ The wrapper function (convenience function) for the `ParticleCombiner` is
 called `reconstructDecay`. Its first argument is a `DecayString`, which is a
 combination of a mother particle (list), an arrow, and daughter particles. The
 `DecayString` has its own grammar with several markers, keywords, and arrow
-types. It is especially useful for inclusive reconstructions. Follow the
+types. It is especially useful for inclusive reconstructions (reconstructions
+in which only part of the decay products are specified, e.g. only requiring
+charged leptons in the final state; opposite: exclusive). Follow the
 provided link if you want to learn more about the `DecayString`. For the
 purpose of this tutorial we do not need any of those fancy extensions, the
 default arrow type ``->`` suffices. However, it is important to know how the
@@ -542,14 +568,14 @@ particles themselves need to be written in the decay string.
     The :math:`J/\Psi` reconstruction looks like this:
 
     .. literalinclude:: steering_files/013_first_steering_file.py
-        :lines: 30-33
-        :lineno-start: 30
+        :lines: 29-32
+        :lineno-start: 29
 
 .. admonition:: Solution
     :class: toggle solution
 
     .. literalinclude:: steering_files/013_first_steering_file.py
-        :lines: 1-41, 51-55
+        :lines: 1-40, 50-54
         :linenos:
 
 Writing out information to an ntuple
@@ -609,7 +635,7 @@ mass.
 
     .. literalinclude:: steering_files/013_first_steering_file.py
         :linenos:
-        :emphasize-lines: 45
+        :emphasize-lines: 44
 
 Although you are analyzing a signal MC sample, the reconstruction will find
 many candidates that are actually not signal, but random combinations that
@@ -720,7 +746,7 @@ definitely read it to understand at least the basics.
 
     .. literalinclude:: steering_files/014_first_steering_file.py
         :linenos:
-        :emphasize-lines: 42-43, 48
+        :emphasize-lines: 41-42, 47
 
 .. --------------
 
@@ -780,7 +806,7 @@ variable that can be used to cut away background is :math:`\Delta E` (`deltaE`).
     :class: solution toggle
 
     .. literalinclude:: steering_files/015_first_steering_file.py
-        :lines: 36-41
+        :lines: 35-40
         :lineno-start: 35
 
 Variable collections
@@ -828,6 +854,15 @@ documentation.
     .. literalinclude:: steering_files/015_first_steering_file.py
         :linenos:
 
+.. hint::
+
+    If you have trouble to understand what we are doing with the ``b_vars``
+    list, simply add a couple of ``print(b_vars)`` between the definition and
+    the operations on it. You might also want to take another look at `your
+    training on lists
+    <https://swcarpentry.github.io/python-novice-inflammation/05-lists/index.html>`_.
+
+
 Variable aliases
 ----------------
 
@@ -836,17 +871,33 @@ information of the other daughter and granddaughter variables. You can access
 them via the `daughter` meta variable, which takes an integer and a variable
 name as input arguments. The integer (0-based) counts through the daughter
 particles, ``daughter(0, p)`` would for example be the momentum of the first
-daughter, in our case of the :math:`J/\Psi`. The function can be used
-recursively, so ``daughter(daughter(0, E))`` is the energy of the positive
-muon. In principle, one can add these nested variables directly to the ntuple
-but the brackets have to be escaped and the resulting variable name in the
-ntuple is not very user-friendly or intuitive. Instead, one can define aliases
-to translate the variables using `addAlias`.
+daughter, in our case of the :math:`J/\Psi`. This function can also be used
+recursively.
 
 .. admonition:: Exercise
     :class: exercise stacked
 
-    How can you replace ``daughter(daughter(0, E))`` with ``mup_E``?
+    What does ``daughter(0, daughter(0, E))`` denote?
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    It's the energy of the positive muon.
+
+In principle, one can add these nested variables directly to the ntuple
+but the brackets have to be escaped (i.e. replaced with "normal" characters)
+and the resulting variable name in the ntuple is not very user-friendly or
+intuitive. For example ``daughter(0, daughter(0, E))`` becomes
+``daughter__bo0__cm__spdaughter__bo0__cm__spE__bc__bc``. Not exactly pretty,
+right?
+
+So instead, let's define aliases to translate the variable names!
+This can be done with `addAlias`.
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    How can you replace ``daughter(0, daughter(0, E))`` with ``mup_E``?
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -859,7 +910,9 @@ to translate the variables using `addAlias`.
     .. code-block:: python
 
         from variables import variables as vm
-        vm.addAlias("mup_E", "daughter(daughter(0, E))")
+
+
+        vm.addAlias("mup_E", "daughter(0, daughter(0, E))")
 
 However, this can quickly fill up many, many lines. Therefore, there are utils
 to easily create aliases. The most useful is probably
@@ -890,8 +943,8 @@ or `matchedMC`.
     This is how we add variables to the final state particles:
 
     .. literalinclude:: steering_files/019_first_steering_file.py
-        :lines: 54-60
-        :lineno-start: 54
+        :lines: 53-59
+        :lineno-start: 53
 
     Next, do the same for the :math:`J/\Psi` and the :math:`K_S^0` in a similar
     fashion.
@@ -912,14 +965,20 @@ or `matchedMC`.
     This is the code for the first part of the last hint:
 
     .. literalinclude:: steering_files/019_first_steering_file.py
-        :lines: 64-68
-        :lineno-start: 64
+        :lines: 63-67
+        :lineno-start: 63
 
 .. admonition:: Solution
     :class: toggle solution
 
     .. literalinclude:: steering_files/019_first_steering_file.py
         :linenos:
+
+.. hint::
+
+    To get more information about the aliases that we are creating, simply use
+    `VariableManager.printAliases` (``vm.printAliases()``) just before
+    processing your path.
 
 .. seealso::
 
@@ -941,6 +1000,8 @@ or `matchedMC`.
     * ``matchMCTruth`` matches MC
     * ``variablesToNtuple`` saves an output file
     * Don't forget ``process(path)`` or nothing happens
+
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Authors of this lesson
 

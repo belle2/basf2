@@ -219,10 +219,14 @@ namespace Belle2 {
         digit->setChannel(m_channel);
         digit->setFirstWindow(rawDigit->getASICWindow());
         digit->setStatus(TOPDigit::c_OffsetSubtracted);
+        if (m_sampleTimes->isCalibrated()) {
+          digit->addStatus(TOPDigit::c_TimeBaseCalibrated);
+        }
         digit->addRelationTo(rawDigit);
 
         // set relations to simulated hits and MC particles
 
+        std::map<MCParticle*, double> relatedMCParticles;
         for (unsigned j = 0; j < simHits.size(); j++) {
           const auto* simHit = simHits[j];
           const double& weight = weights[j];
@@ -230,10 +234,11 @@ namespace Belle2 {
             digit->addRelationTo(simHit, weight);
             RelationVector<MCParticle> particles = simHit->getRelationsFrom<MCParticle>();
             for (unsigned i = 0; i < particles.size(); ++i) {
-              digit->addRelationTo(particles[i], particles.weight(i) * weight);
+              relatedMCParticles[particles[i]] += particles.weight(i) * weight;
             }
           }
         }
+        for (const auto& x : relatedMCParticles) digit->addRelationTo(x.first, x.second);
 
       } // end loop over splitted regions
     }
@@ -260,7 +265,7 @@ namespace Belle2 {
       int offsetWindows = s_offsetWindows + m_windowShift;
       int winnum = s_window + offsetWindows;
       if (winnum < 0) winnum += s_storageDepth;
-      windowNumbers.push_back(winnum);
+      windowNumbers.push_back(winnum % s_storageDepth);
       for (unsigned i = 1; i < s_readoutWindows; i++) {
         windowNumbers.push_back((windowNumbers.back() + 1) % s_storageDepth);
       }
@@ -390,6 +395,8 @@ namespace Belle2 {
         double sum = 0;
         for (const auto& w : weights) sum += w.first;
         if (sum == 0) continue; // noisy hit
+
+        std::map<MCParticle*, double> relatedMCParticles;
         for (const auto& w : weights) {
           auto weight = w.first / sum;
           const auto* simHit = w.second->simHit;
@@ -397,12 +404,13 @@ namespace Belle2 {
             digit->addRelationTo(simHit, weight);
             RelationVector<MCParticle> particles = simHit->getRelationsFrom<MCParticle>();
             for (unsigned i = 0; i < particles.size(); ++i) {
-              digit->addRelationTo(particles[i], particles.weight(i) * weight);
+              relatedMCParticles[particles[i]] += particles.weight(i) * weight;
             }
           } else if (w.second->type == c_CalPulse and weight > 0.90) {
             digit->setHitQuality(TOPDigit::c_CalPulse);
           }
         }
+        for (const auto& x : relatedMCParticles) digit->addRelationTo(x.first, x.second);
       }
 
     }

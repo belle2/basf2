@@ -202,12 +202,12 @@ namespace Belle2 {
       }
 
       int index  = -999;
-      if (abs(pdgCode) == 11)index = 0;
-      else if (abs(pdgCode) == 13)index = 1;
-      else if (abs(pdgCode) == 211)index = 2;
-      else if (abs(pdgCode) == 321)index = 3;
-      else if (abs(pdgCode) == 2212)index = 4;
-      else if (abs(pdgCode) == 1000010020)index = 5;
+      if (abs(pdgCode) == Const::electron.getPDGCode())index = 0;
+      else if (abs(pdgCode) == Const::muon.getPDGCode())index = 1;
+      else if (abs(pdgCode) == Const::pion.getPDGCode())index = 2;
+      else if (abs(pdgCode) == Const::kaon.getPDGCode())index = 3;
+      else if (abs(pdgCode) == Const::proton.getPDGCode())index = 4;
+      else if (abs(pdgCode) == Const::deuteron.getPDGCode())index = 5;
 
       auto func = [index, var](const Particle * part) -> double {
         const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);

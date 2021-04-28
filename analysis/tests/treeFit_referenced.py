@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import unittest
-import os
 import tempfile
 import basf2
 import b2test_utils
 import modularAnalysis as ma
-from ROOT import Belle2
 from ROOT import TFile
-from ROOT import TNtuple
 
 
 class TestTreeFits(unittest.TestCase):

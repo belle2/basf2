@@ -20,7 +20,7 @@
 #
 ########################################################
 
-import basf2 as b2
+import basf2
 import generators as gen
 import simulation as sim
 import reconstruction as rec
@@ -32,7 +32,7 @@ from ROOT import gSystem
 gSystem.Load('libklm.so')
 
 # Create the main path
-main = b2.create_path()
+main = basf2.create_path()
 
 #############################################
 # GENERATION, SIMULATION AND RECONSTRUCTION #
@@ -109,5 +109,5 @@ ma.variablesToNtuple('mu+:muid',
                      path=main)
 
 # Process the path
-b2.process(main)
-print(b2.statistics)
+basf2.process(main)
+print(basf2.statistics)

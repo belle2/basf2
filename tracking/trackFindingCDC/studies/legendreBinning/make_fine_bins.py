@@ -1,18 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import basf2
 
-import ROOT
-from ROOT import Belle2  # make Belle2 namespace available
-from ROOT import std
+from ROOT import Belle2  # make Belle2 namespace available # noqa
 from ROOT.Belle2 import TrackFindingCDC as TFCDC
-
-import os
-import sys
-import math
-import random
-import numpy as np
 
 
 def is_power_of_two(x):

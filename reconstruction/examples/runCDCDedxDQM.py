@@ -14,11 +14,10 @@
 # Example steering file - 2011 Belle II Collaboration
 #############################################################
 
-import os
-from basf2 import *
+import basf2 as b2
 
 # main path
-main = create_path()
+main = b2.create_path()
 
 # read in a sample
 input_file = 'B2Electrons.root'
@@ -31,4 +30,4 @@ main.add_module("HistoManager", histoFileName="CDCDedxDQM.root")
 main.add_module("CDCDedxDQM")
 
 # Process events
-process(main)
+b2.process(main)

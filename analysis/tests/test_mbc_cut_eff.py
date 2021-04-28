@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import unittest
-import os
 import tempfile
 import basf2
 import b2test_utils
 import modularAnalysis as ma
-from ROOT import Belle2
 from ROOT import TFile
-from ROOT import TNtuple
 
 
 class TestMbcEff(unittest.TestCase):
@@ -25,8 +22,8 @@ class TestMbcEff(unittest.TestCase):
             'analysis/1000_B_DstD0Kpi_skimmed.root', 'validation', py_case=self)
         ma.inputMdst('default', inputfile, path=main)
 
-        ma.fillParticleList('pi+:a', 'pionID > 0.5', path=main)
-        ma.fillParticleList('K+:a', 'kaonID > 0.5', path=main)
+        ma.fillParticleList('pi+:a', 'pidProbabilityExpert(211, ALL) > 0.5', path=main)
+        ma.fillParticleList('K+:a', 'pidProbabilityExpert(321, ALL) > 0.5', path=main)
 
         ma.reconstructDecay('D0:rec -> K-:a pi+:a', '', 0, path=main)
         ma.reconstructDecay('D*+:rec -> D0:rec pi+:a', '', 0, path=main)
@@ -57,7 +54,7 @@ class TestMbcEff(unittest.TestCase):
 
         self.assertTrue(
             allSig == sig_expected,
-            f"Mbc cut efficency has changed! n_sig expected: {sig_expected} found: {sig_expected}.")
+            f"Mbc cut efficency has changed! n_sig expected: {sig_expected} found: {allSig}.")
         self.assertTrue(allBkg == bkg_expected, f"Mbc cut background has changed! n_bkg expected: {bkg_expected} found: {allBkg}.")
 
         print("Test passed, cleaning up.")

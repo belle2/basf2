@@ -4,7 +4,7 @@
 import basf2
 from basf2 import conditions as b2conditions
 from basf2 import create_path, process
-from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL, B2DEBUG
+from basf2 import B2FATAL, B2INFO, B2WARNING
 
 # The backend provides the input data files to the job and you can get the list of
 # files from this function
@@ -19,8 +19,6 @@ def run_collectors():
     from basf2.pickle_path import get_path_from_file
     import glob
     import os
-    import sys
-    import pickle
     import json
 
     # We pass in basf2 and CAF options via the config.json file

@@ -1,6 +1,6 @@
-.. _onlinebook_how_to_contribute:
-
 Why contribute? Read our propaganda at :doc:`/online_book/contribute`.
+
+.. _onlinebook_how_to_contribute:
 
 How to contribute
 =================
@@ -13,9 +13,6 @@ How to contribute
     or per email. You can either assign the JIRA ticket to someone you like or submit a pull request for it yourself (preferred).
   * If it is already marked as a todo item, check if someone else is working on it (search on JIRA) and if not,
     submit a pull request
-
-Technical side
-==============
 
 Understanding Sphinx and RST
 ----------------------------
@@ -42,11 +39,18 @@ Submitting a PR
 
 You need to 
 
-1. Clone the software repository or create a development setup as explained in
+1. Create a development setup as explained in
    :ref:`build/tools_doc/index-01-tools:Development Setup`
-2. Change to a new branch ``feature/...`` or ``bugfix/...``
+2. Change to a new branch ``feature/describe-your-change`` or ``bugfix/something`` (if your PR is based on a
+   JIRA issue ``BII-XXXX`` you can include it in the name ``feature/BII-XXXX-improve-docs``).
+   You will not be able to push your branch if it isn't prefixed with ``feature/`` or ``bugfix/``
 3. Make your changes
 4. Optionally: Preview them locally as described in :doc:`/framework/doc/atend-doctools`
 5. Push your branch
-6. Create a PR
+6. Create a PR following the guidelines outlined at :ref:`pr_best_practices`
+
+.. seealso::
+
+    You already opened a PR for a test repository in :ref:`onlinebook_git`, remember?
+    Basically this is exactly the same procedure.
 

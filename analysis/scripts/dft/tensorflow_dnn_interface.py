@@ -20,7 +20,6 @@ import tensorflow as tf
 import pandas
 
 # was still important for some shared libraries at some point
-import basf2_mva
 
 from basf2_mva_python_interface.tensorflow import State
 
@@ -282,7 +281,7 @@ def end_fit(state):
 
     # sample pdfs of trained model on test_dataset, return test df
     state.get_from_collection()
-    y_hat = apply(state, state.Xtest)
+    y_hat = state(*state.Xtest)
     test_df = pandas.DataFrame.from_dict({'y': state.ytest.reshape(-1), 'y_hat': y_hat.reshape(-1)})
     (sig_pdf, back_pdf) = binning.get_signal_background_pdf(test_df)
     seed = state.seed

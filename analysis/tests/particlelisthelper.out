@@ -10,6 +10,7 @@ False True
  mdstIndex=0 arrayIndex=2 identifier=-1 daughterIndices:  (none)
  mass=0
  momentum=(1.00, 0.00, 0.00) p=1
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -29,6 +30,7 @@ False True
  mdstIndex=0 arrayIndex=6 identifier=-1 daughterIndices:  (none)
  mass=0
  momentum=(3.00, 0.00, 0.00) p=3
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -48,6 +50,7 @@ False True
  mdstIndex=0 arrayIndex=0 identifier=-1 daughterIndices:  (none)
  mass=0
  momentum=(0.00, 0.00, 0.00) p=0
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -67,6 +70,7 @@ False True
  mdstIndex=0 arrayIndex=4 identifier=-1 daughterIndices:  (none)
  mass=0
  momentum=(2.00, 0.00, 0.00) p=2
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -86,6 +90,7 @@ False True
  mdstIndex=0 arrayIndex=8 identifier=-1 daughterIndices:  (none)
  mass=0
  momentum=(4.00, 0.00, 0.00) p=4
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -108,6 +113,7 @@ False True
  mdstIndex=0 arrayIndex=1 identifier=-1 daughterIndices:  (none)
  mass=0
  momentum=(0.00, 0.00, 0.00) p=0
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -127,6 +133,7 @@ False True
  mdstIndex=0 arrayIndex=3 identifier=-1 daughterIndices:  (none)
  mass=0
  momentum=(1.00, 0.00, 0.00) p=1
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -146,6 +153,7 @@ False True
  mdstIndex=0 arrayIndex=5 identifier=-1 daughterIndices:  (none)
  mass=0
  momentum=(2.00, 0.00, 0.00) p=2
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -165,6 +173,7 @@ False True
  mdstIndex=0 arrayIndex=7 identifier=-1 daughterIndices:  (none)
  mass=0
  momentum=(3.00, 0.00, 0.00) p=3
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -184,6 +193,7 @@ False True
  mdstIndex=0 arrayIndex=9 identifier=-1 daughterIndices:  (none)
  mass=0
  momentum=(4.00, 0.00, 0.00) p=4
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -206,6 +216,7 @@ False True
  mdstIndex=0 arrayIndex=2 identifier=-1 daughterIndices:  (none)
  mass=0
  momentum=(1.00, 0.00, 0.00) p=1
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -225,6 +236,7 @@ False True
  mdstIndex=0 arrayIndex=6 identifier=-1 daughterIndices:  (none)
  mass=0
  momentum=(3.00, 0.00, 0.00) p=3
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -244,6 +256,7 @@ False True
  mdstIndex=0 arrayIndex=0 identifier=-1 daughterIndices:  (none)
  mass=0
  momentum=(0.00, 0.00, 0.00) p=0
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -263,6 +276,7 @@ False True
  mdstIndex=0 arrayIndex=4 identifier=-1 daughterIndices:  (none)
  mass=0
  momentum=(2.00, 0.00, 0.00) p=2
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -282,6 +296,7 @@ False True
  mdstIndex=0 arrayIndex=8 identifier=-1 daughterIndices:  (none)
  mass=0
  momentum=(4.00, 0.00, 0.00) p=4
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -304,6 +319,7 @@ False True
  mdstIndex=0 arrayIndex=1 identifier=-1 daughterIndices:  (none)
  mass=0
  momentum=(0.00, 0.00, 0.00) p=0
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -323,6 +339,7 @@ False True
  mdstIndex=0 arrayIndex=3 identifier=-1 daughterIndices:  (none)
  mass=0
  momentum=(1.00, 0.00, 0.00) p=1
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -342,6 +359,7 @@ False True
  mdstIndex=0 arrayIndex=5 identifier=-1 daughterIndices:  (none)
  mass=0
  momentum=(2.00, 0.00, 0.00) p=2
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -361,6 +379,7 @@ False True
  mdstIndex=0 arrayIndex=7 identifier=-1 daughterIndices:  (none)
  mass=0
  momentum=(3.00, 0.00, 0.00) p=3
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -380,6 +399,7 @@ False True
  mdstIndex=0 arrayIndex=9 identifier=-1 daughterIndices:  (none)
  mass=0
  momentum=(4.00, 0.00, 0.00) p=4
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):

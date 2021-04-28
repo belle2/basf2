@@ -30,7 +30,7 @@ namespace Belle2 {
 
     /// Default constructor.
 //  TRGSignalBundle(const TRGClock & = Belle2_GDL::GDLSystemClock);
-    TRGSignalBundle(const TRGClock&);
+    explicit TRGSignalBundle(const TRGClock&);
 
     /// Constructor with name.
     TRGSignalBundle(const std::string& name,

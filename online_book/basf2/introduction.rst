@@ -62,7 +62,7 @@ https://doi.org/10.1007/s41781-018-0017-9
 
 ... and a logo.
 
-.. figure:: ../../../../_static/b2logo.svg
+.. figure:: introduction/b2logo.svg
     :align: center
     :width: 300px
     :alt: The basf2 logo.
@@ -544,9 +544,9 @@ To find information about a basf2 module, try:
 
 .. code-block:: bash
 
-    basf2 -m # this lists all of them
-    basf2 -m | grep "Particle"
-    basf2 -m ParticleCombiner
+    b2help-modules # this lists all of them
+    b2help-modules | grep "Particle"
+    b2help-modules ParticleCombiner
 
 Listing the basf2 variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -561,8 +561,8 @@ To check the list of basf2 variables known to the :ref:`analysis_variablemanager
 
 .. code-block:: bash
 
-    basf2 variables.py
-    basf2 variables.py | grep "invariant"
+    b2help-variables
+    b2help-variables | grep "invariant"
 
 There is a :ref:`analysis_variables` section in this documentation which you might find
 more helpful than the big dump.
@@ -608,6 +608,57 @@ there is a tool ``b2help-particles``.
     #b2help-particles          # lists them all (this is a lot of output)
 
 .. note:: In the next lesson you will need to use these names.
+
+
+.. admonition:: Question
+     :class: exercise stacked
+
+     What was the luminosity collected in experiment 8?
+
+.. admonition:: Hint
+     :class: toggle xhint stacked
+
+     There is a command line tool for that.
+     Try tabcompletion ``b2<tab>``.
+
+.. admonition:: Another hint
+     :class: toggle xhint stacked
+
+     .. code-block:: bash
+
+         $ b2info-<tab>
+
+.. admonition:: Are you sure you really need another hint?
+     :class: toggle xhint stacked
+
+     .. code-block:: bash
+
+          $ b2info-luminosity --help
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     .. code-block:: bash
+
+          $ b2info-luminosity  --exp 8 --what offline
+          Read 697 runs for experiment 8
+          TOTAL offline   : L = 5464553.60 /nb =  5464.55 /pb =    5.465 /fb =   0.0055 /ab
+
+     So the answer is :math:`\sim 5.5\textrm{ fb}^{-1}`.
+
+     .. admonition:: It didn't work
+
+         Did you get an error like this?
+
+         ::
+
+             [INFO] ===Error Summary================================================================
+             [FATAL] DB /group/belle2/dataprod/Luminosity/OffLineLuminosity.db not found. The live luminosity is only available on KEKCC (sorry)
+             [INFO] ================================================================================
+
+         Sorry about that. Can you try this command at KEK ?
+         This should be fixed properly soon.
+
 
 Other useful features
 ^^^^^^^^^^^^^^^^^^^^^
@@ -660,41 +711,6 @@ To leave interactive basf2 / IPython, simply:
    In [15]: exit
 
 
-.. admonition:: Question
-     :class: exercise stacked
-
-     What was the luminosity collected in experiment 8?
-
-.. admonition:: Hint
-     :class: toggle xhint stacked
-
-     There is a command line tool for that.
-     Try tabcompletion ``b2<tab>``.
-
-.. admonition:: Another hint
-     :class: toggle xhint stacked
-
-     .. code-block:: bash
-
-         b2info-<tab>
-
-.. admonition:: Are you sure you really need another hint?
-     :class: toggle xhint stacked
-
-     .. code-block:: bash
-
-          b2info-luminosity --help
-
-.. admonition:: Solution
-     :class: toggle solution
-
-     .. code-block:: bash
-
-          $ b2info-luminosity  --exp 8 --what offline
-          Read 697 runs for experiment 8
-          TOTAL offline   : L = 5464553.60 /nb =  5464.55 /pb =    5.465 /fb =   0.0055 /ab
-
-     So the answer is :math:`\sim 5.5\textrm{ fb}^{-1}`.
 
 
 Other useful things in your environment
@@ -948,6 +964,8 @@ Good luck.
     files step by step, there are also some comple examples for steering files
     `in the main software repository <https://stash.desy.de/projects/B2/repos/software/browse/analysis/examples>`_.
     You might want to take a look there after the starterkit.
+
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Author of this lesson
 

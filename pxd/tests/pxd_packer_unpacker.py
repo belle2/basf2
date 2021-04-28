@@ -2,11 +2,10 @@
 # -*- coding: utf-8 -*-
 
 
-import sys
 # print("TEST SKIPPED: Test fails due to changes in packer which were not propagated to unpacker. See BII-1647", file=sys.stderr)
 # sys.exit(1)
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 import numpy
 
@@ -18,10 +17,10 @@ pxd_rawhits_pack_unpack_collection = "PXDRawHits_test"
 pxd_rawhits_pack_unpack_collection_digits = "PXDDigits_test"
 pxd_rawhits_pack_unpack_collection_adc = pxd_rawhits_pack_unpack_collection + "_adc"
 pxd_rawhits_pack_unpack_collection_roi = pxd_rawhits_pack_unpack_collection + "_roi"
-set_random_seed(42)
+b2.set_random_seed(42)
 
 
-class PxdPackerUnpackerTestModule(Module):
+class PxdPackerUnpackerTestModule(b2.Module):
 
     """
     Module which checks if a collection of PXDDigits and
@@ -88,7 +87,7 @@ class PxdPackerUnpackerTestModule(Module):
         pxdRawHitsPackedUnpacked = self.sortRawHits(pxdRawHitsPackedUnpacked_unsorted)
 
         if not len(pxdDigits) == len(pxdRawHitsPackedUnpacked):
-            B2FATAL("PXDDigits and PXDRawHits count not equal after packing and unpacking")
+            b2.B2FATAL("PXDDigits and PXDRawHits count not equal after packing and unpacking")
 
         print("Comparing %i pxd digits " % len(pxdDigits))
 
@@ -109,23 +108,23 @@ class PxdPackerUnpackerTestModule(Module):
 
 
 # to run the framework the used modules need to be registered
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 particlegun.param('pdgCodes', [13, -13])
 particlegun.param('nTracks', 10)
 
 # Create Event information
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [50]})
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 
-main = create_path()
+main = b2.create_path()
 # init path
 main.add_module(eventinfosetter)
 main.add_module(particlegun)
 # add simulation for pxd only
 simulation.add_simulation(main, components=['PXD'], forceSetPXDDataReduction=True, usePXDDataReduction=False)
-set_module_parameters(main, type="Geometry", useDB=False, components=["PXD"])
+b2.set_module_parameters(main, type="Geometry", useDB=False, components=["PXD"])
 
 main.add_module(progress)
 
@@ -161,4 +160,4 @@ main.add_module(
 
 
 # Process events
-process(main)
+b2.process(main)

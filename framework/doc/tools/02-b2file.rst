@@ -42,13 +42,13 @@ additional information not otherwise included in the metadata.
 At the moment the only commonly used keys are
 
 dataLevel
-  is automatically set when using `reconstruction.add_mdst_output`,
-  `modularAnalysis.outputMdst`, `modularAnalysis.outputUdst`, or
-  `modularAnalysis.skimOutputUdst` functions and will be set to either "mdst"
+  is automatically set when using `mdst.add_mdst_output`,
+  `modularAnalysis.outputMdst`, `udst.add_udst_output`, or
+  `udst.add_skimmed_udst_output` functions and will be set to either "mdst"
   or "udst".
 
 skimDecayMode
-  is automatically set when using `modularAnalysis.skimOutputUdst` and will
+  is automatically set when using `udst.add_skimmed_udst_output` and will
   contain the name of the skim.
 
 ::

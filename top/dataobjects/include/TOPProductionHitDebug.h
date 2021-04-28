@@ -28,7 +28,14 @@ namespace Belle2 {
 
     /**
      * Full constructor
-     * @param scrodID hardware SCROD ID
+     * @param hasWaveform has waveform or not
+     * @param isOnHeap is on heap or not
+     * @param logicWindow logic window
+     * @param physicalWindow physical window
+     * @param isWindowStraddle is window straddle
+     * @param isOnHeapStraddle is on heap straddle
+     * @param logicWindowStraddle logic window straddle
+     * @param physicalWindowStraddle physical window straddle
      */
     TOPProductionHitDebug(bool hasWaveform,
                           bool isOnHeap,

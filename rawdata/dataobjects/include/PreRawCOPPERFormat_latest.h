@@ -231,7 +231,7 @@ namespace Belle2 {
 
 
 
-  inline unsigned int PreRawCOPPERFormat_latest::GetMagicDriverHeader(int n)
+  inline unsigned int PreRawCOPPERFormat_latest::GetMagicDriverHeader(int/* n */)
   {
     char err_buf[500];
     sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
@@ -241,7 +241,7 @@ namespace Belle2 {
     return 0;
   }
 
-  inline unsigned int PreRawCOPPERFormat_latest::GetMagicFPGAHeader(int n)
+  inline unsigned int PreRawCOPPERFormat_latest::GetMagicFPGAHeader(int/* n */)
   {
     char err_buf[500];
     sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
@@ -275,7 +275,7 @@ namespace Belle2 {
   }
 
 
-  inline unsigned int PreRawCOPPERFormat_latest::GetCOPPERCounter(int n)
+  inline unsigned int PreRawCOPPERFormat_latest::GetCOPPERCounter(int/* n */)
   {
     char err_buf[500];
     sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",

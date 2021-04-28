@@ -5,33 +5,30 @@
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltags (highest priority first) are master_2018-12-24, Legacy_IP_Information
 [INFO] ParticleLoader's Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: pi+:fromPV (pi-:fromPV)
+[INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
 [INFO]    -> MDST source: Tracks
+[INFO] ParticleSelector: pi+:fromPV
 [INFO]    -> With cuts  : dr < 2 and abs(dz) < 5
 [INFO] ParticleSelector: pi+:fromPV
 [INFO]    -> With cuts  : abs(dzFromMedianDz) < 0.05
 [INFO] ParticleVertexFitter: Performing vertex fit on vpho:PVFit using KFit
 [INFO] ParticleVertexFitter: Additional iptube will be applied
-[INFO] Number of ParticleLists studied 1 
-[INFO] ParticleStats Summary: 
-
-[INFO] =======================================================================
-			|Retention|	    0| Unique 
-    vpho:PVFit( 0)	|	1.0000	1.0000	1.0000
-
+[INFO] Number of ParticleLists to be studied: 1 
+[INFO] ParticleStats Summary:
 [INFO] 
 ======================================================================
  Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
-			| All Particles 		| Particles     		| AntiParticles 		
-			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
-    vpho:PVFit( 0)	|	  1.0000	  1.0000	  0.0000	  0.0000	  0.0000	  0.0000	  1.0000	  1.0000
+
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+    vpho:PVFit( 0)|    1.0000|   1.0000|   1.0000|   0.0000|   0.0000|   0.0000|   0.0000|   1.0000|   1.0000|
 
 [INFO] 
-=======================================================
-Total Retention: 1.0000
+======================================================================
+Total Retention: 50 events passing / 50 events processed = 1.0000
 Total Number of Particles created in the DataStore: 620
-=======================================================
+======================================================================
 
 [INFO] Writing NTuple ntuple
-[WARNING] There were 1 tracks skipped because of zero charge for pi+:fromPV
+[WARNING] There were 1 tracks skipped because of zero charge for pi+:all
 Test passed, cleaning up.

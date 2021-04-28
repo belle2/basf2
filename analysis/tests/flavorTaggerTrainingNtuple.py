@@ -14,11 +14,11 @@ import b2test_utils
 import basf2
 from basf2 import set_random_seed, create_path, process
 import modularAnalysis as ma
+from variables import variables as vm
 import flavorTagger as ft
 import ROOT
 import os
 import math
-import unittest
 
 # make logging more reproducible by replacing some strings
 b2test_utils.configure_logging_for_tests()
@@ -30,9 +30,8 @@ testinput = [b2test_utils.require_file('analysis/tests/Btonunubar.root')]
 testpath = create_path()
 testpath.add_module('RootInput', inputFileNames=testinput)
 
-ma.findMCDecay(list_name='B0:sig', decay='B0 -> nu_tau anti-nu_tau', writeOut=True, path=testpath)
-
-ma.matchMCTruth('B0:sig', path=testpath)
+ma.fillParticleListFromMC('nu_tau', '', path=testpath)
+ma.reconstructMCDecay(decayString='B0:sig -> nu_tau anti-nu_tau', cut='', path=testpath)
 
 # Test to build a rest of event from the MC B0 decaying to two neutrinos
 ma.buildRestOfEvent('B0:sig', path=testpath)
@@ -73,8 +72,9 @@ ntuple.param('fileName', methodPrefixEventLevel + "sampled0.root")
 ntuple.param('treeName', methodPrefixEventLevel + "_tree")
 
 # Call variable aliases from flavor tagger
-ft.setBelleOrBelle2("Belle2")
 ft.set_FlavorTagger_pid_aliases()
+# Alias for pidProbabilityExpert(11, ALL)
+vm.addAlias("eid_ALL", "pidProbabilityExpert(11, ALL)")
 
 variablesToBeSaved = ['useCMSFrame(p)',
                       'useCMSFrame(pt)',
@@ -82,6 +82,7 @@ variablesToBeSaved = ['useCMSFrame(p)',
                       'pt',
                       'cosTheta',
                       'electronID',
+                      'eid_ALL',
                       'eid_TOP',
                       'eid_ARICH',
                       'eid_ECL',
@@ -134,7 +135,7 @@ with b2test_utils.clean_working_directory():
         assert abs(t1.p) > 0, " p should be greater than 0"
         assert abs(t1.pt) > 0, " pt should be greater than 0"
         assert abs(t1.cosTheta) > 0, " cosTheta should be greater than 0"
-        assert abs(t1.electronID) > 0, " electronID should be greater than 0"
+        assert abs(t1.eid_ALL) > 0, " electronID should be greater than 0"
         assert abs(t1.eid_TOP) > 0, " eid_TOP should be greater than 0"
         assert abs(t1.eid_ARICH) > 0, " eid_ARICH should be greater than 0"
         assert abs(t1.eid_ECL) > 0, "eid_ECL should be greater than 0"

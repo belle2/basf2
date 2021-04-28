@@ -1,6 +1,6 @@
 /*************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2013-2018 Belle II Collaboration                          *
+* Copyright(C) 2013-2020 Belle II Collaboration                          *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
 * Contributors: Christian Pulvermacher                                   *
@@ -69,6 +69,7 @@ namespace Belle2 {
     int m_event{ -1};                /**< event number */
     int m_run{ -1};                  /**< run number */
     int m_experiment{ -1};           /**< experiment number */
+    int m_production{ -1};           /**< production ID (to distinguish MC samples) */
     int m_candidate{ -1};            /**< candidate counter */
     unsigned int m_ncandidates{0};   /**< total n candidates */
     /** Variable branch addresses */

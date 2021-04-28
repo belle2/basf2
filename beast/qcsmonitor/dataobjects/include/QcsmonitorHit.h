@@ -31,7 +31,11 @@ namespace Belle2 {
 
 
     /** Standard constructor
-     * @param energyDep Deposited energy in electrons
+     * @param detNb the PIN diode number
+     * @param time the time
+     * @param edep the energy deposited
+     * @param mip MIP
+     * @param pe PE
      */
     QcsmonitorHit(int detNb, int time, float edep, float mip, float pe):
       m_detNb(detNb), m_time(time), m_edep(edep), m_mip(mip), m_pe(pe)

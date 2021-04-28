@@ -17,8 +17,12 @@
 
 #include <algorithm>
 
+#include <array>
+
+
 /* defines */
 #define CDC_SUPER_LAYERS 9
+#define CDC_ETF_SECTOR 64
 
 using namespace std;
 using namespace Belle2;
@@ -420,7 +424,7 @@ CDCTriggerHoughETFModule::findAllCrossingHits(std::vector<unsigned>& list,
   double m, a, y1_h, y2_h;
   for (int iHit = 0; iHit < m_segmentHits.getEntries(); iHit++) {
     unsigned short iSL = m_segmentHits[iHit]->getISuperLayer();
-    if (iSL % 2) continue; //ysue
+    if (iSL % 2) continue;
     // associate only the hits actually used to form the cluster
     if (m_suppressClone && inputMap.find(iHit) == inputMap.end()) continue;
     //TODO: add options: center cell / active priority cell / all priority cells
@@ -454,8 +458,7 @@ CDCTriggerHoughETFModule::selectHits(std::vector<unsigned>& list,
                                      std::vector<unsigned>& selected,
                                      std::vector<unsigned>& unselected)
 {
-  std::vector<int> bestPerSL(5, -1);//ysue
-  //std::vector<int> bestPerSL(10, -1);
+  std::vector<int> bestPerSL(5, -1);
   for (unsigned i = 0; i < list.size(); ++i) {
     unsigned iax = m_segmentHits[list[i]]->getISuperLayer() / 2;
     bool firstPriority = (m_segmentHits[list[i]]->getPriorityPosition() == 3);
@@ -599,8 +602,6 @@ CDCTriggerHoughETFModule::patternClustering(const cdcMap& inputMap)
         B2DEBUG(100, "skipping cluster of size 1");
         continue;
       }
-
-
       float centerX = 2 * ix + (ixTR + ixBL) / 2.;
       if (centerX >= m_nCellsPhi) centerX -= m_nCellsPhi;
       float centerY = 2 * iy + (iyTR + iyBL) / 2.;
@@ -640,23 +641,36 @@ CDCTriggerHoughETFModule::patternClustering(const cdcMap& inputMap)
       selectHits(idList, selectedList, unselectedList);
 
       associatedTSHits.clear();
-      for (unsigned i = 0; i < selectedList.size(); ++i)
-        associatedTSHits.push_back(m_segmentHits[selectedList[i]]);
-      associatedTSHitsList.push_back(associatedTSHits);
+      if (m_useHighPassTimingList) {
+        for (unsigned i = 0; i < selectedList.size(); ++i)
+          associatedTSHits.push_back(m_segmentHits[selectedList[i]]);
+        associatedTSHitsList.push_back(associatedTSHits);
+      } else {
+        for (unsigned i = 0; i < idList.size(); ++i)
+          associatedTSHits.push_back(m_segmentHits[idList[i]]);
+        associatedTSHitsList.push_back(associatedTSHits);
+      }
 
       // save track
       if (m_storeTracks) {
         const CDCTriggerTrack* track =
           m_tracks.appendNew(x, 2. * y, 0.);
-        // relations to selected hits
-        for (unsigned i = 0; i < selectedList.size(); ++i) {
-          unsigned its = selectedList[i];
-          track->addRelationTo(m_segmentHits[its]);
-        }
-        // relations to additional hits get a negative weight
-        for (unsigned i = 0; i < unselectedList.size(); ++i) {
-          unsigned its = unselectedList[i];
-          track->addRelationTo(m_segmentHits[its], -1.);
+        if (m_useHighPassTimingList) {
+          // relations to selected hits
+          for (unsigned i = 0; i < selectedList.size(); ++i) {
+            unsigned its = selectedList[i];
+            track->addRelationTo(m_segmentHits[its]);
+          }
+          // relations to additional hits get a negative weight
+          for (unsigned i = 0; i < unselectedList.size(); ++i) {
+            unsigned its = unselectedList[i];
+            track->addRelationTo(m_segmentHits[its], -1.);
+          }
+        } else {
+          for (unsigned i = 0; i < idList.size(); ++i) {
+            unsigned its = idList[i];
+            track->addRelationTo(m_segmentHits[its], -1.);
+          }
         }
         // save detail information about the cluster
         const CDCTriggerHoughCluster* cluster =
@@ -671,8 +685,8 @@ CDCTriggerHoughETFModule::patternClustering(const cdcMap& inputMap)
 }
 
 /*
- * connection definitions for 2 x 2 squares
- */
+* connection definitions for 2 x 2 squares
+*/
 bool
 CDCTriggerHoughETFModule::connectedLR(unsigned patternL, unsigned patternR)
 {
@@ -808,18 +822,74 @@ CDCTriggerHoughETFModule::bottomLeftCorner(unsigned pattern)
   if ((pattern >> 1) & 1) return 1;
   return 3;
 }
+std::vector<int>
+CDCTriggerHoughETFModule::highPassTimingList()
+{
+  std::vector<int> ftlists;
 
-float
+  for (long unsigned int iTrack = 0; iTrack < associatedTSHitsList.size(); iTrack++) {
+    for (long unsigned int iHit = 0; iHit < associatedTSHitsList[iTrack].size(); iHit++) {
+      short ft = (!m_usePriorityTiming) ? associatedTSHitsList[iTrack][iHit]->fastestTime()
+                 : associatedTSHitsList[iTrack][iHit]->priorityTime();
+      ftlists.push_back(ft * 2);
+    }
+  }
+  return ftlists;
+}
+
+int
+CDCTriggerHoughETFModule::getSector(int id, int sl)
+{
+  unsigned int localid = id - TSoffset[sl];
+  unsigned int base = NTS[sl] / NSEC[sl];
+  return localid / base + NSecOffset[sl];
+}
+
+std::vector<int>
+CDCTriggerHoughETFModule::sectorTimingList()
+{
+  std::vector<int> ftlists;
+  std::array<std::vector<std::pair<int, int>>, CDC_ETF_SECTOR> arr_sector;
+
+  // distribute into each sector
+  for (long unsigned int iTrack = 0; iTrack < associatedTSHitsList.size(); iTrack++) {
+    for (long unsigned int iHit = 0; iHit < associatedTSHitsList[iTrack].size(); iHit++) {
+      int sl   = associatedTSHitsList[iTrack][iHit]->getISuperLayer();
+      int id   = associatedTSHitsList[iTrack][iHit]->getSegmentID();
+      int pp   = associatedTSHitsList[iTrack][iHit]->getPriorityPosition();
+      int ft   = associatedTSHitsList[iTrack][iHit]->fastestTime() * 2; // 2ns -> 1ns
+
+      arr_sector [getSector(id, sl)].push_back(make_pair(ft, pp));
+    }
+  }
+
+  //fastest && 1st pp in each sector
+  for (int sec = 0; sec < CDC_ETF_SECTOR; sec++) {
+    if (!arr_sector[sec].size()) continue;
+    int minft = 1e9;
+    int pp = 0;
+    for (auto& ift : arr_sector[sec]) {
+      if ((minft > ift.first) && (pp <= ift.second)) {
+        minft = ift.first;
+        pp = ift.second;
+      }
+    }
+    ftlists.push_back(minft);
+  }
+
+  return ftlists;
+}
+
+int
 CDCTriggerHoughETFModule::calcEventTiming()
 {
   std::vector<int> ftlists;
-  for (long unsigned int iTrack = 0; iTrack < associatedTSHitsList.size(); iTrack++) {
-    for (long unsigned int iHit = 0; iHit < associatedTSHitsList[iTrack].size(); iHit++) {
-      short fts = (!m_usePriorityTiming) ? associatedTSHitsList[iTrack][iHit]->fastestTime()
-                  : associatedTSHitsList[iTrack][iHit]->priorityTime();
-      ftlists.push_back(fts);
-    }
+  if (m_useHighPassTimingList) {
+    ftlists = highPassTimingList();
+  } else {
+    ftlists = sectorTimingList();
   }
+
   if (m_t0CalcMethod == 0) {
     std::sort(ftlists.begin(), ftlists.end());
     return ftlists[m_arrivalOrder];
@@ -837,7 +907,7 @@ CDCTriggerHoughETFModule::median(std::vector<int> v)
   std::vector<int> _v;
   copy(v.begin(), v.end(), back_inserter(_v));
   std::sort(_v.begin(), _v.end());
-  if (size % 2 == 1) {
+  if (size % 2) {
     return _v[(size - 1) / 2];
   } else {
     return (_v[(size / 2) - 1] + _v[size / 2]) / 2;
@@ -848,15 +918,16 @@ int
 CDCTriggerHoughETFModule::medianInTimeWindow(std::vector<int> v)
 {
   int med = median(v);
-  int tstart = med - m_timeWindowStart;
-  int tend   = med - m_timeWindowEnd;
+  int tbegin = med - abs(m_timeWindowBegin);
+  int tend   = med + abs(m_timeWindowEnd);
 
   std::vector<int> _inWindow;
 
-  for (auto& t : v)  if (t > tstart && t <= tend) _inWindow.push_back(t);
-  if (_inWindow.size() == 0) {
-    return med;
-  } else {
+  for (auto& t : v)  if (t > tbegin && t < tend) _inWindow.push_back(t);
+
+  if (_inWindow.size()) {
     return median(_inWindow);
+  } else {
+    return med;
   }
 }

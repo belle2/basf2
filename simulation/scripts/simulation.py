@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 from geometry import check_components
-from ROOT import Belle2
 from pxd import add_pxd_simulation
 from svd import add_svd_simulation
 from svd import add_svd_reconstruction
@@ -23,7 +22,7 @@ def check_simulation(path):
         if module_type in required:
             # unless it is already in there
             if module_type in found:
-                B2ERROR("Duplicate module in path: %s" % module_type)
+                b2.B2ERROR("Duplicate module in path: %s" % module_type)
             else:
                 found.append(module.type())
 
@@ -31,11 +30,11 @@ def check_simulation(path):
         # Apparently at least one module is missing
         for r in required:
             if r not in found:
-                B2ERROR("No '%s' module found but needed for simulation" % r)
+                b2.B2ERROR("No '%s' module found but needed for simulation" % r)
     # We have all modules but do they have the correct order?
     elif required != found:
-        B2ERROR("Simulation modules in wrong order. Should be '%s' but is '%s'"
-                % (", ".join(required), ", ".join(found)))
+        b2.B2ERROR("Simulation modules in wrong order. Should be '%s' but is '%s'"
+                   % (", ".join(required), ", ".join(found)))
 
 
 def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered_digits',
@@ -49,7 +48,7 @@ def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered
     """
 
     # SVD reconstruction
-    svd_cluster = '__ROIsvdClusters'
+    # svd_cluster = '__ROIsvdClusters'
     add_svd_reconstruction(path, isROIsimulation=True)
 
     # SVD tracking
@@ -60,7 +59,7 @@ def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered
     add_roiFinder(path, svd_reco_tracks)
 
     # Filtering of PXDDigits
-    pxd_digifilter = register_module('PXDdigiFilter')
+    pxd_digifilter = b2.register_module('PXDdigiFilter')
     pxd_digifilter.param('ROIidsName', 'ROIs')
     pxd_digifilter.param('PXDDigitsName', pxd_unfiltered_digits)
     pxd_digifilter.param('PXDDigitsInsideROIName', 'PXDDigits')
@@ -70,7 +69,7 @@ def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered
 
     # empty the StoreArrays which were used for the PXDDatareduction as those are not needed anymore
     if doCleanup:
-        datastore_cleaner = register_module('PruneDataStore')
+        datastore_cleaner = b2.register_module('PruneDataStore')
         datastore_cleaner.param('keepMatchedEntries', False)
         datastore_cleaner.param('matchEntries', ['ROIs', '__ROIsvdRecoDigits', '__ROIsvdClusters', '__ROIsvdRecoTracks',
                                                  'SPTrackCands__ROI', 'SpacePoints__ROI', pxd_unfiltered_digits,
@@ -93,7 +92,7 @@ def add_roiFinder(path, reco_tracks):
     :param reco_tracks: Which tracks to use in the extrapolation step.
     """
 
-    pxdDataRed = register_module('PXDROIFinder')
+    pxdDataRed = b2.register_module('PXDROIFinder')
     param_pxdDataRed = {
         'recoTrackListName': reco_tracks,
         'PXDInterceptListName': 'PXDIntercepts',
@@ -135,11 +134,11 @@ def add_simulation(
     # background mixing or overlay input before process forking
     if bkgfiles is not None:
         if bkgOverlay:
-            bkginput = register_module('BGOverlayInput')
+            bkginput = b2.register_module('BGOverlayInput')
             bkginput.param('inputFileNames', bkgfiles)
             path.add_module(bkginput)
         else:
-            bkgmixer = register_module('BeamBkgMixer')
+            bkgmixer = b2.register_module('BeamBkgMixer')
             bkgmixer.param('backgroundFiles', bkgfiles)
             if components:
                 bkgmixer.param('components', components)
@@ -150,28 +149,28 @@ def add_simulation(
                     bkgmixer.param('minTimePXD', -20000.0)
                     bkgmixer.param('maxTimePXD', 20000.0)
                     # Emulate injection vetos for PXD
-                    pxd_veto_emulator = register_module('PXDInjectionVetoEmulator')
+                    pxd_veto_emulator = b2.register_module('PXDInjectionVetoEmulator')
                     path.add_module(pxd_veto_emulator)
 
     # geometry parameter database
     if 'Gearbox' not in path:
-        gearbox = register_module('Gearbox')
+        gearbox = b2.register_module('Gearbox')
         path.add_module(gearbox)
 
     # detector geometry
     if 'Geometry' not in path:
         path.add_module('Geometry', useDB=True)
         if components is not None:
-            B2WARNING("Custom detector components specified: Will still build full geometry")
+            b2.B2WARNING("Custom detector components specified: Will still build full geometry")
 
     # event T0 jitter simulation
     if simulateT0jitter and 'EventT0Generator' not in path:
-        eventt0 = register_module('EventT0Generator')
+        eventt0 = b2.register_module('EventT0Generator')
         path.add_module(eventt0)
 
     # detector simulation
     if 'FullSim' not in path:
-        g4sim = register_module('FullSim')
+        g4sim = b2.register_module('FullSim')
         path.add_module(g4sim)
 
     check_simulation(path)
@@ -186,7 +185,7 @@ def add_simulation(
 
     # CDC digitization
     if components is None or 'CDC' in components:
-        cdc_digitizer = register_module('CDCDigitizer')
+        cdc_digitizer = b2.register_module('CDCDigitizer')
         cdc_digitizer.param("Output2ndHit", generate_2nd_cdc_hits)
         path.add_module(cdc_digitizer)
 
@@ -199,36 +198,36 @@ def add_simulation(
             add_pxd_simulation(path, digitsName=pxd_digits_name)
         else:
             # use DB conditional module to decide whether ROI finding should be activated
-            path_disableROI_Sim = create_path()
-            path_enableROI_Sim = create_path()
+            path_disableROI_Sim = b2.create_path()
+            path_enableROI_Sim = b2.create_path()
 
             add_pxd_simulation(path_disableROI_Sim, digitsName='PXDDigits')
             add_pxd_simulation(path_enableROI_Sim, digitsName='pxd_unfiltered_digits')
 
             roi_condition_module_Sim = path.add_module("ROIfindingConditionFromDB")
-            roi_condition_module_Sim.if_true(path_enableROI_Sim, AfterConditionPath.CONTINUE)
-            roi_condition_module_Sim.if_false(path_disableROI_Sim, AfterConditionPath.CONTINUE)
+            roi_condition_module_Sim.if_true(path_enableROI_Sim, b2.AfterConditionPath.CONTINUE)
+            roi_condition_module_Sim.if_false(path_disableROI_Sim, b2.AfterConditionPath.CONTINUE)
 
     # TOP digitization
     if components is None or 'TOP' in components:
-        top_digitizer = register_module('TOPDigitizer')
+        top_digitizer = b2.register_module('TOPDigitizer')
         path.add_module(top_digitizer)
 
     # ARICH digitization
     if components is None or 'ARICH' in components:
-        arich_digitizer = register_module('ARICHDigitizer')
+        arich_digitizer = b2.register_module('ARICHDigitizer')
         path.add_module(arich_digitizer)
 
     # ECL digitization
     if components is None or 'ECL' in components:
-        ecl_digitizer = register_module('ECLDigitizer')
+        ecl_digitizer = b2.register_module('ECLDigitizer')
         if bkgfiles is not None:
             ecl_digitizer.param('Background', 1)
         path.add_module(ecl_digitizer)
 
     # KLM digitization
     if components is None or 'KLM' in components:
-        klm_digitizer = register_module('KLMDigitizer')
+        klm_digitizer = b2.register_module('KLMDigitizer')
         path.add_module(klm_digitizer)
 
     # background overlay executor - after all digitizers
@@ -243,8 +242,8 @@ def add_simulation(
             if components is None or 'SVD' in components:
                 path.add_module("SVDShaperDigitSorter")
         else:
-            path_disableROI_Bkg = create_path()
-            path_enableROI_Bkg = create_path()
+            path_disableROI_Bkg = b2.create_path()
+            path_enableROI_Bkg = b2.create_path()
 
             path_disableROI_Bkg.add_module('BGOverlayExecutor', PXDDigitsName='PXDDigits')
             if components is None or 'PXD' in components:
@@ -259,8 +258,11 @@ def add_simulation(
                 path_enableROI_Bkg.add_module("SVDShaperDigitSorter")
 
             roi_condition_module_Bkg = path.add_module("ROIfindingConditionFromDB")
-            roi_condition_module_Bkg.if_true(path_enableROI_Bkg, AfterConditionPath.CONTINUE)
-            roi_condition_module_Bkg.if_false(path_disableROI_Bkg, AfterConditionPath.CONTINUE)
+            roi_condition_module_Bkg.if_true(path_enableROI_Bkg, b2.AfterConditionPath.CONTINUE)
+            roi_condition_module_Bkg.if_false(path_disableROI_Bkg, b2.AfterConditionPath.CONTINUE)
+
+    if components is None or 'SVD' in components:
+        path.add_module("SVDZeroSuppressionEmulator")
 
     # PXD data reduction - after background overlay executor
     if components is None or 'PXD' in components:
@@ -269,7 +271,7 @@ def add_simulation(
                 add_PXDDataReduction(path, components, pxd_digits_name, doCleanup=cleanupPXDDataReduction,
                                      overrideDB=forceSetPXDDataReduction, usePXDDataReduction=usePXDDataReduction)
         else:
-            path_enableROI_Red = create_path()
+            path_enableROI_Red = b2.create_path()
             add_PXDDataReduction(
                 path_enableROI_Red,
                 components,
@@ -277,7 +279,7 @@ def add_simulation(
                 doCleanup=cleanupPXDDataReduction)
 
             roi_condition_module_Red = path.add_module("ROIfindingConditionFromDB")
-            roi_condition_module_Red.if_true(path_enableROI_Red, AfterConditionPath.CONTINUE)
+            roi_condition_module_Red.if_true(path_enableROI_Red, b2.AfterConditionPath.CONTINUE)
 
     # statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Simulation')

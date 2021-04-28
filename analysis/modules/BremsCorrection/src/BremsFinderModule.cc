@@ -52,7 +52,7 @@ namespace Belle2 {
     setDescription(R"DOC(
     This module copies each particle in the ``inputList`` to the ``outputList`` and uses
     the results of the **eclTrackBremFinder** module to look for possible bremsstrahlung photons; if these 
-    photons exists, it adds their four momentum to the particle in the ``outputList``. 
+    photons exist, it adds their four momentum to the particle in the ``outputList``.
     It also adds the original particle and these photons as daughters of the new, corrected particle. 
     Track and PID information of the original particle are copied onto the new one to facilitate their access 
     in the analysis scripts.
@@ -67,11 +67,11 @@ namespace Belle2 {
                    
        \text{max}\left(\frac{\left|\phi_{\text{cluster}}-\phi_{\text{hit}}\right|}{\Delta\phi_{\text{cluster}}+\Delta\phi_{\text{hit}}}, \, \frac{\left|\theta_{\text{cluster}}-\theta_{\text{hit}}\right|}{\Delta\theta_{\text{cluster}}+\Delta\theta_{\text{hit}}}\right)
 
-    where :math:`\phi_i` and :math:`\theta_i` are the azimutal and polar angles of the ECL cluster and the 
-    extrapolated hit, and :math:`\Delta x` represents the uncertainty of the value :math:`x`. The details of 
-    the calculation of these quantities are `here`_. By default, only relations with a weight
-    smaller than 3.0 are stored. The user can further determine the maximum value of this weight required in order 
-    to perform the bremsstrahlung correction.
+    where :math:`\phi_i` and :math:`\theta_i` are the azimuthal and polar angles of the ECL cluster and the
+    extrapolated hit, and :math:`\Delta x` represents the uncertainty of the value :math:`x`. The details of the
+    calculation of these quantities are `here`_. By default, only relations with a weight smaller than 3.0 are stored.
+    The user can further reduce the maximally allowed value of this weight to remove unwanted photons from the
+    bremsstrahlung correction.
 
     This module looks for photons in the ``gammaList`` whose clusters have a *Bremsstrahlung* relation with the track 
     of one of the particles in the ``inputList``, and adds their 4-momentum to the particle's one. It also stores the value
@@ -82,6 +82,11 @@ namespace Belle2 {
     Warning:
       Even in the event of no bremsstrahlung photons found, a new particle is still created, and the original one is still 
       added as its daughter.
+
+    Warning:
+      Studies have shown that the requirements that the energy of the photon must be between 0.2 and 1 times the track energy and
+      that only track-photon relations with a weight below three are considered, are too tight. Until these are relaxed and a new
+      processing is done (MC15 and proc 13) it might be better to use the alternative `BelleBremRecovery` module.
                   
     See also:
       `eclTrackBremFinder module`_

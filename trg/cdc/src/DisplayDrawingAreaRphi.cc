@@ -50,16 +50,17 @@ namespace Belle2 {
       _y(0),
       _winx(0), _winy(0), _winw(0), _winh(0), _wind(0),
       _innerR(innerR),
-      _outerR(outerR)
+      _outerR(outerR),
+
+      _blue(Gdk::Color("blue")),
+      _red(Gdk::Color("red")),
+      _green(Gdk::Color("green")),
+      _black(Gdk::Color("black")),
+      _white(Gdk::Color("white")),
+      _grey(Gdk::Color("grey")),
+      _yellow(Gdk::Color("yellow")),
+      _grey0(Gdk::Color("gray90"))
   {
-    _blue = Gdk::Color("blue");
-    _red = Gdk::Color("red");
-    _green = Gdk::Color("green");
-    _black = Gdk::Color("black");
-    _white = Gdk::Color("white");
-    _grey = Gdk::Color("grey");
-    _yellow = Gdk::Color("yellow");
-    _grey0 = Gdk::Color("gray90");
 
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
     colormap->alloc_color(_blue);
@@ -409,10 +410,10 @@ namespace Belle2 {
       const vector<TCLink*>& links = t.links(i);
       for (unsigned j = 0; j < links.size(); j++) {
         const TCLink& l = * links[j];
-        const TCSegment* t = dynamic_cast<const TCSegment*>(l.cell());
+        const TCSegment* seg = dynamic_cast<const TCSegment*>(l.cell());
 
-        if (t)
-          drawSegment(* t,
+        if (seg)
+          drawSegment(* seg,
                       lineWidth,
                       c,
                       s);

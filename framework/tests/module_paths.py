@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import random
 import basf2  # also test non-polluting import
 from ROOT import Belle2
 

@@ -6,12 +6,11 @@
 # for high or low multiplicity events
 #############################################################
 
-from basf2 import *
+import basf2 as b2
 from generators import add_kkmc_generator
 from simulation import add_simulation
 from L1trigger import add_tsim
 from reconstruction import add_reconstruction
-from ROOT import TFile
 from argparse import ArgumentParser
 import os
 import glob
@@ -25,12 +24,12 @@ parser.add_argument('-f', '--file', help='Name of benchmark output file')
 args = parser.parse_args()
 
 # create path and reduce log level
-main = create_path()
-set_log_level(LogLevel.ERROR)
+main = b2.create_path()
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # specify number of events to be generated
 main.add_module('EventInfoSetter', evtNumList=[1000])
-main.add_module('EventInfoPrinter').set_log_level(LogLevel.INFO)
+main.add_module('EventInfoPrinter').set_log_level(b2.LogLevel.INFO)
 
 if args.multiplicity == 'high':
     # generate BBbar events if high multiplicity is selected
@@ -49,8 +48,8 @@ add_tsim(main)
 add_reconstruction(main)
 
 # process events and print call statistics
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)
 
 # read limits
 limits = {}
@@ -68,13 +67,13 @@ if limits_file is not None:
 # get execution times
 categories = ['Simulation', 'TriggerSimulation', 'Tracking', 'PID', 'Clustering']
 times = {}
-for module in statistics.modules:
+for module in b2.statistics.modules:
     if module.name not in ['Sum_' + category for category in categories]:
         continue
     category = module.name[4:]
     if category not in times.keys():
         times[category] = 0
-    times[category] += module.time_mean(statistics.EVENT) * 1e-6
+    times[category] += module.time_mean(b2.statistics.EVENT) * 1e-6
 
 # open output file
 output = None
@@ -82,7 +81,7 @@ if args.file is not None:
     output = open(args.file, 'wt')
 
 # print benchmark results and write them to the output file
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 max_fraction = -1
 for category in categories:
     if category not in times.keys():
@@ -96,13 +95,13 @@ for category in categories:
             max_fraction = fraction
         message += ' = %.f%% of the limit.' % (100 * fraction)
         if fraction <= 0.9:
-            B2INFO(message)
+            b2.B2INFO(message)
         elif fraction <= 1:
-            B2WARNING(message)
+            b2.B2WARNING(message)
         else:
-            B2ERROR(message)
+            b2.B2ERROR(message)
     else:
-        B2INFO(message)
+        b2.B2INFO(message)
 
     if output is not None:
         output.write('%s %.2f' % (category, time))

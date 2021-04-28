@@ -325,7 +325,7 @@ a given skim, as inherited from data production.
     This is a known bug and will be improved in future developments of the dataset searcher.
 
 For now, a workaround in order is described on the
-`Skim Confluence page <https://confluence.desy.de/pages/viewpage.action?pageId=167963852>_`
+`Skim Confluence page <https://confluence.desy.de/pages/viewpage.action?pageId=167963852>`_
 to run your analysis script on the full set
 of skimmed data samples available for a given campaign.
 
@@ -365,6 +365,7 @@ documentation helpful.
       between analysts and skim liaisons, so don't hesitate to contact your
       working group's liaison.
 
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Authors of this lesson
 

@@ -16,6 +16,7 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/utilities/Conversion.h>
 
 #include <TLorentzVector.h>
 #include <TVectorF.h>
@@ -28,12 +29,18 @@ namespace Belle2 {
 
     Manager::FunctionPtr foxWolframR(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() < 1) {
+      if (arguments.size() != 1) {
         B2ERROR("foxWolframR cannot be called without providing the moment order");
         return nullptr;
       }
 
-      int order = std::stoi(arguments[0]);
+      int order = -1;
+      try {
+        order = Belle2::convertString<int>(arguments[0]);
+      } catch (std::invalid_argument&) {
+        B2ERROR("Argument of foxWolframR must be an integer");
+        return nullptr;
+      }
 
       if (order < 0 || order > 8) {
         B2ERROR("The Fox-Wolfram moment order must be within 0 and 8.");
@@ -62,12 +69,18 @@ namespace Belle2 {
 
     Manager::FunctionPtr foxWolframH(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() < 1) {
+      if (arguments.size() != 1) {
         B2ERROR("foxWolframH cannot be called without providing the moment order");
         return nullptr;
       }
 
-      int order = std::stoi(arguments[0]);
+      int order = -1;
+      try {
+        order = Belle2::convertString<int>(arguments[0]);
+      } catch (std::invalid_argument&) {
+        B2ERROR("Argument of foxWolframH must be an integer");
+        return nullptr;
+      }
 
       if (order < 0 || order > 8) {
         B2ERROR("The Fox-Wolfram moment order must be within 0 and 8.");
@@ -91,12 +104,18 @@ namespace Belle2 {
 
     Manager::FunctionPtr harmonicMoment(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() < 2) {
+      if (arguments.size() != 2) {
         B2ERROR("harmonicMoment requires two arguments: the harmonic order (0-8) and the reference axis name (thrust or collision)");
         return nullptr;
       }
 
-      int order = std::stoi(arguments[0]);
+      int order = -1;
+      try {
+        order = Belle2::convertString<int>(arguments[0]);
+      } catch (std::invalid_argument&) {
+        B2ERROR("First argument of harmonicMoment must be an integer");
+        return nullptr;
+      }
       std::string axisName =  arguments[1];
       boost::to_lower(axisName);
 
@@ -127,12 +146,18 @@ namespace Belle2 {
 
     Manager::FunctionPtr cleoCone(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() < 2) {
+      if (arguments.size() != 2) {
         B2ERROR("cleoCone requires two arguments: the cone order (0-9) and the reference axis name (thrust or collision)");
         return nullptr;
       }
 
-      int order = std::stoi(arguments[0]);
+      int order = -1;
+      try {
+        order = Belle2::convertString<int>(arguments[0]);
+      } catch (std::invalid_argument&) {
+        B2ERROR("Argument of cleoCone must be an integer");
+        return nullptr;
+      }
       std::string axisName =  arguments[1];
       boost::to_lower(axisName);
 

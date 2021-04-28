@@ -1,27 +1,18 @@
-import basf2
-from basf2 import *
+import basf2 as b2
 
-import os
 import sys
-import multiprocessing
 import datetime
-import glob
 
-import ROOT
-from ROOT import Belle2, TFile
 from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
 
-from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
+from caf.framework import Calibration
 from prompt import CalibrationSettings
-from caf import backends
 from caf import strategies
-from caf.utils import ExpRun, IoV
+from caf.utils import IoV
 
 import svd as svd
-import modularAnalysis as ana
-from caf.strategies import SequentialBoundaries
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 now = datetime.datetime.now()
 
 settings = CalibrationSettings(name="SVDCoGTimeCalibrationPrompt",
@@ -37,7 +28,7 @@ settings = CalibrationSettings(name="SVDCoGTimeCalibrationPrompt",
 
 def remove_module(path, name):
 
-    new_path = create_path()
+    new_path = b2.create_path()
     for m in path.modules():
         if name != m.name():
             new_path.add_module(m)
@@ -49,7 +40,7 @@ def remove_module(path, name):
 def get_calibrations(input_data, **kwargs):
 
     # Set-up re-processing path
-    path = create_path()
+    path = b2.create_path()
 
     path.add_module("Gearbox")
     path.add_module("Geometry", useDB=True)
@@ -83,7 +74,7 @@ def get_calibrations(input_data, **kwargs):
     reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, max_files_per_run, min_events_per_file=1)
     # input_files_physics = list(reduced_file_to_iov_physics.keys())
     good_input_files = list(reduced_file_to_iov_physics.keys())
-    basf2.B2INFO(f"Total number of files actually used as input = {len(good_input_files)}")
+    b2.B2INFO(f"Total number of files actually used as input = {len(good_input_files)}")
 
     exps = [i.exp_low for i in reduced_file_to_iov_physics.values()]
     runs = sorted([i.run_low for i in reduced_file_to_iov_physics.values()])
@@ -108,7 +99,7 @@ def get_calibrations(input_data, **kwargs):
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
     # collector setup
-    collector = register_module('SVDTimeCalibrationCollector')
+    collector = b2.register_module('SVDTimeCalibrationCollector')
     collector.param("SVDClustersFromTracksName", "SVDClustersFromTracks")
     collector.param("SVDEventInfoName", "SVDEventInfo")
     collector.param("EventT0Name", "EventT0")

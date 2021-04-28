@@ -10,19 +10,19 @@
 #        TOPDigits.root is the output file of unpackToTOPDigitsWithTBC.py
 # -------------------------------------------------------------------------------------------
 
-from basf2 import *
-from sys import argv
+import basf2 as b2
+import sys
 args = sys.argv
 barid = int(args[1])
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Input
-roinput = register_module('RootInput')
+roinput = b2.register_module('RootInput')
 main.add_module(roinput)
 
-lasercalib = register_module('TOPLaserCalibrator')
+lasercalib = b2.register_module('TOPLaserCalibrator')
 lasercalib.param('dataFitOutput', "t0datafit_slot" + str(args[1]) + ".root")
 lasercalib.param('mcInput', "t0mc.root")
 lasercalib.param('channelT0constant', "t0const_slot" + str(args[1]) + ".root")
@@ -34,11 +34,11 @@ main.add_module(lasercalib)
 
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

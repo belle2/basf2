@@ -13,27 +13,15 @@
 #################################################################################
 
 
-from basf2 import *
-from svd import *
-import os
-import math
-from array import array
-import basf2
+import basf2 as b2
 import sys
-from ROOT.Belle2 import SVDCoGCalibrationFunction
-from ROOT.Belle2 import SVDCoGTimeCalibrations
-from svd import *
-from rawdata import *
+from svd import add_svd_reconstruction
 from svd.CoGCalibration_utils_checkCalibration import SVDCoGTimeCalibrationCheckModule
-from basf2 import conditions
 import rawdata as raw
-
-import matplotlib.pyplot as plt
-import simulation
 
 
 def remove_module(path, name):
-    new_path = create_path()
+    new_path = b2.create_path()
     for m in path.modules():
         if name != m.name():
             new_path.add_module(m)
@@ -59,20 +47,20 @@ else:
     with open(filename, 'r') as f:
         inputFileList = [line.strip() for line in f]
 
-conditions.override_globaltags()
-conditions.globaltags = [
+b2.conditions.override_globaltags()
+b2.conditions.globaltags = [
     "svd_NOCoGCorrections",
     "staging_data_reprocessing_proc11",
     "data_reprocessing_proc11_baseline",
     "online_proc11"]
 
-conditions.testing_payloads = [
+b2.conditions.testing_payloads = [
     str(localdb) + "/database.txt",
 ]
 
-main = create_path()
+main = b2.create_path()
 
-rootinput = register_module('RootInput')
+rootinput = b2.register_module('RootInput')
 rootinput.param('inputFileNames', inputFileList)
 rootinput.param('branchNames', branches)
 main.add_module(rootinput)
@@ -81,7 +69,7 @@ main.add_module("Gearbox")
 main.add_module("Geometry", useDB=True)
 
 # unpack raw data to get SVDEventInfo
-add_unpackers(main, components=['SVD'])
+raw.add_unpackers(main, components=['SVD'])
 
 # re-reconstruct SVDShaperDigitsFromTracks using the localDB
 add_svd_reconstruction(main)
@@ -106,12 +94,12 @@ check.set_exp_number(exp)
 main.add_module(check)
 
 # Show progress of processing
-progress = register_module('ProgressBar')
+progress = b2.register_module('ProgressBar')
 main.add_module(progress)
 
-print_path(main)
+b2.print_path(main)
 
 # Process events
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

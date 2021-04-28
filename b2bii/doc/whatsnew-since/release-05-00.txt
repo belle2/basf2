@@ -5,6 +5,7 @@ Conversion
 ++++++++++
 
  * Added ``first_x, _y, _z`` and ``last_x, _y, _z`` in ``Mdst_TRK_Fit`` table. 
+ * Added ``SmearTrack`` option to the ``convertBelleMdstToBelleIIMdst`` function.
 
 Objects
 +++++++

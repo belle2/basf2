@@ -7,9 +7,7 @@
 
 import glob
 import basf2 as b2
-from ROOT import Belle2, gSystem, gInterpreter
-from ROOT import TFile, TTree
-from array import array
+from ROOT import Belle2
 
 __author__ = 'Mikhail Remnev'
 __copyright__ = 'Copyright 2020 - Belle II Collaboration'
@@ -38,7 +36,7 @@ if len(output_arg) > 0:
 verbose = False
 
 
-class ShapeFitterModule(Module):
+class ShapeFitterModule(b2.Module):
 
     """Module that prints ShaperDSP emulator discrepancies
        for ECL data.
@@ -88,7 +86,7 @@ class ShapeFitterModule(Module):
                 print()
                 print('RealData: %4d %6d %6d %6d' % (cid, amp, time, qual))
                 print('Emulator: %4d %6d %6d %6d' % (cid, amp2, time2, qual2))
-                if VERBOSE:
+                if verbose:
                     print('Event : %d Trigger time: %d' % (self.evtn, trigger_time))
                     print('CellID: %d AmpData: %d TimeData: %d QualityData: %d' % (cid, amp, time, qual))
                     print(' '.join([str(x) for x in adc]), end='')
@@ -103,7 +101,7 @@ b2.set_log_level(b2.LogLevel.ERROR)
 mainPath = b2.create_path()
 
 # Add '(Seq)RootInput' module
-if file_list[0].endswith('sroot'):
+if inputFile_list[0].endswith('sroot'):
     mainPath.add_module('SeqRootInput',
                         inputFileName='',
                         inputFileNames=inputFile_list)

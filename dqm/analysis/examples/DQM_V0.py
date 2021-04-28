@@ -1,23 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-from ROOT import Belle2
+import basf2 as b2
 import sys
 argv = sys.argv
 
 
 # Set the log level to show only error and fatal messages
 # set_log_level(LogLevel.ERROR)
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 # set_log_level(LogLevel.DEBUG)
 # set_debug_level(1000)
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Modules
-inroot = register_module('DQMHistAnalysisInputRootFile')
+inroot = b2.register_module('DQMHistAnalysisInputRootFile')
 inroot.param('InputRootFile', sys.argv[1])
 main.add_module(inroot)
 
@@ -32,7 +31,7 @@ main.add_module(inroot)
 # v0a.param('OverlayPath', Belle2.FileSystem.findFile('/dqm/analysis/CAD'))
 # main.add_module(v0a)
 
-epicsarray = register_module('DQMHistOutputToEPICS')
+epicsarray = b2.register_module('DQMHistOutputToEPICS')
 epicsarray.param('HistoList', [
     ['V0Objects/xvsz', 'DQM:Beam:V0:XZ', 'DQM:Beam:V0:XZ:Last'],
     ['V0Objects/xvsy[0]', 'DQM:Beam:V0:XY0', 'DQM:Beam:V0:XY0:Last'],
@@ -77,12 +76,12 @@ main.add_module(epicsarray)
 # outroot.param('SaveCanvases', True)  # save canvases
 # main.add_module(outroot)
 
-output = register_module('DQMHistAnalysisOutputRelayMsg')
+output = b2.register_module('DQMHistAnalysisOutputRelayMsg')
 # check that port fit your root canvas server
 output.param('Port', int(argv[2]))
 main.add_module(output)
 
 
-print_path(main)
+b2.print_path(main)
 # Process all events
-process(main)
+b2.process(main)

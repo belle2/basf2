@@ -12,10 +12,8 @@
 # 2020 Belle II Collaboration
 #############################################################
 
-import os
-from basf2 import *
+import basf2 as b2
 from basf2 import conditions as b2conditions
-from svd import add_svd_reconstruction
 from tracking import add_tracking_reconstruction
 from rawdata import add_unpackers
 
@@ -24,7 +22,7 @@ b2conditions.override_globaltags()
 b2conditions.globaltags = ['klm_alignment_testing', 'online']
 
 # main main
-main = create_path()
+main = b2.create_path()
 
 # RAW
 files = [' /group/belle2/dataprod/Data/Raw/e0010/r04295/sub00/physics.0010.04295.HLT1*.root']
@@ -94,9 +92,9 @@ SVDHitTimeDQMmodule = main.add_module("SVDDQMHitTime")
 # == Show progress
 main.add_module('Progress')
 
-print_path(main)
+b2.print_path(main)
 
 # Process events
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

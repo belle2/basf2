@@ -33,6 +33,7 @@ namespace Belle2 {
     TRGState(unsigned bitSize, unsigned value);
 
     /// Constructor.
+    // cppcheck-suppress noExplicitConstructor
     TRGState(std::vector<bool> states);
 
     /// Constructor.

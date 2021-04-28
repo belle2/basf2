@@ -106,7 +106,7 @@ namespace Belle2 {
         unsigned int trgTiming : 2; /**< Trigger Timing */
         unsigned int xTalk     : 2; /**< cross talk tag */
         unsigned int FADCnum   : 8; /**< FADC number */
-        unsigned int evtType   : 1; /**< Event type(0): 0…TTD event, 1…standalone event */
+        unsigned int DAQType   : 1; /**< (from 2020c) Event type(0): "0"…3 or …6 acquisition mode, "1"…3-mixed-6 acquisition mode */
         unsigned int DAQMode   : 2; /**< Event type(2:1): "00"…1-sample, "01"…3-sample, "10"…6-sample */
         unsigned int runType   : 2; /**< Run Type */
         unsigned int check     : 3; /**< MSB "110" - for FADC Header identification */

@@ -106,7 +106,7 @@ namespace Belle2 {
     const TRGCDCWireHitMC* hit(TRGCDCWireHitMC*);
 
     /// set signal |= newSignal
-    void addSignal(TRGSignal& newSignal);
+    void addSignal(const TRGSignal& newSignal);
 
   public:// TRG
 
@@ -132,14 +132,16 @@ namespace Belle2 {
   const TRGCDCWireHit*
   TRGCDCWire::hit(const TRGCDCWireHit* h)
   {
-    return (const TRGCDCWireHit*) TRGCDCCell::hit((const TRGCDCCellHit*) h);
+    //TODO only this strong retyping work, is it OK?
+    return reinterpret_cast<const TRGCDCWireHit*>(TRGCDCCell::hit(reinterpret_cast<const TRGCDCCellHit*>(h)));
   }
 
   inline
   const TRGCDCWireHit*
   TRGCDCWire::hit(void) const
   {
-    return (const TRGCDCWireHit*) TRGCDCCell::hit();
+    //TODO only this strong retyping work, is it OK?
+    return reinterpret_cast<const TRGCDCWireHit*>(TRGCDCCell::hit());
   }
 
   inline
@@ -152,7 +154,7 @@ namespace Belle2 {
 
   inline
   void
-  TRGCDCWire::addSignal(TRGSignal& newSignal)
+  TRGCDCWire::addSignal(const TRGSignal& newSignal)
   {
     _signal |= newSignal;
   }

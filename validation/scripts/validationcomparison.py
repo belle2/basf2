@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """ Compare ROOT objects and perform e.g. chi2 tests.
 A small command line interface for testing/debugging purposes is included.
@@ -33,7 +32,6 @@ class ComparisonFailed(Exception):
     The comparison failed for some reason. For example
     because ROOT was not able to compute the Chi^2 properly
     """
-    pass
 
 
 class ObjectsNotSupported(Exception):
@@ -41,7 +39,6 @@ class ObjectsNotSupported(Exception):
     The type and/or combination of provided ROOT objects
     is not supported for comparison
     """
-    pass
 
 
 class DifferingBinCount(Exception):
@@ -49,14 +46,12 @@ class DifferingBinCount(Exception):
     The two ROOT objects provided have a different bin count
     and therefor, cannot be compared using the Chi2 test
     """
-    pass
 
 
 class TooFewBins(Exception):
     """
     Not sufficient bins to perform the Chi^2 test
     """
-    pass
 
 
 # ==============================================================================
@@ -198,12 +193,10 @@ class ComparisonBase(ABC):
     @abstractmethod
     def _get_comparison_result(self) -> str:
         """ Used to format the value of :attr:`_comparison_result`. """
-        pass
 
     @abstractmethod
     def _get_comparison_result_long(self) -> str:
         """ Used to format the value of :attr:`_comparison_result_long`. """
-        pass
 
     @property
     def comparison_result(self):
@@ -220,7 +213,6 @@ class ComparisonBase(ABC):
     @abstractmethod
     def _compute(self):
         """ This method performs the actual computations. """
-        pass
 
     def can_compare(self):
         """
@@ -670,7 +662,7 @@ class AndersonDarlingTest(PvalueTest):
 # ==============================================================================
 
 
-class TablePrinter(object):
+class TablePrinter:
     """ A tiny class to print columns of fixed width numbers. """
 
     def __init__(self, ncols, width=None):
@@ -713,7 +705,7 @@ class TablePrinter(object):
         for icol, col in enumerate(cols):
             width = self.widths[icol]
             if isinstance(col, int):
-                form = "{{:{}d}}".format(width)
+                form = f"{{:{width}d}}"
                 out.append(form.format(col))
             elif isinstance(col, float):
                 form = "{{:{}.{}f}}".format(width, width // 2)

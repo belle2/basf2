@@ -14,15 +14,14 @@
 #
 # By: Luka Santelj
 
-from basf2 import *
+import basf2 as b2
 import os
 from optparse import OptionParser
-from reconstruction import add_cosmics_reconstruction
 home = os.environ['BELLE2_LOCAL_DIR']
 
 
-reset_database()
-use_central_database("332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000")
+b2.reset_database()
+b2.use_central_database("332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000")
 
 # parameters
 parser = OptionParser()
@@ -37,48 +36,48 @@ parser.add_option('-s', '--display', dest='display', default=0)
 (options, args) = parser.parse_args()
 
 # create paths
-main = create_path()
-displ = create_path()
+main = b2.create_path()
+displ = b2.create_path()
 
 
 # root input module
-input_module = register_module('RootInput')
+input_module = b2.register_module('RootInput')
 input_module.param('inputFileName', options.filename)
 # input_module.param('entrySequences',['5100:5300']) # select subrange of events
 main.add_module(input_module)
 
 # Histogram manager module
-histo = register_module('HistoManager')
+histo = b2.register_module('HistoManager')
 histo.param('histoFileName', "histograms.root")  # File to save histograms
 main.add_module(histo)
 
 
 # build geometry if display option
 if int(options.display):
-    gearbox = register_module('Gearbox')
+    gearbox = b2.register_module('Gearbox')
     main.add_module(gearbox)
-    geometry = register_module('Geometry')
+    geometry = b2.register_module('Geometry')
     geometry.param('components', ['ARICH'])
     main.add_module(geometry)
 
 # unpack raw data
-unPacker = register_module('ARICHUnpacker')
+unPacker = b2.register_module('ARICHUnpacker')
 unPacker.param('debug', int(options.debug))
 main.add_module(unPacker)
 
 # create ARICHHits from ARICHDigits
-arichHits = register_module('ARICHFillHits')
+arichHits = b2.register_module('ARICHFillHits')
 main.add_module(arichHits)
 
 # create simple DQM histograms
-arichHists = register_module('ARICHDQM')
+arichHists = b2.register_module('ARICHDQM')
 arichHists.param('MaxHits', 40)
 arichHists.param('MinHits', 5)
 main.add_module(arichHists)
 
 # add display module if display option
 if int(options.display):
-    display = register_module('Display')
+    display = b2.register_module('Display')
     # show arich hits
     display.param('showARICHHits', True)
     # show full geometry
@@ -86,23 +85,23 @@ if int(options.display):
     displ.add_module(display)
 
 # store dataobjects
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 output.param('outputFileName', options.output)
 branches = ['ARICHDigits', 'ARICHHits']
 output.param('branchNames', branches)
 main.add_module(output)
 
 # show progress
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 arichHists.if_value('==1', displ)
 
 # process
-process(main)
+b2.process(main)
 
 # print stats
-print(statistics)
+print(b2.statistics)
 
 # plot DQM histograms
 if not int(options.display):

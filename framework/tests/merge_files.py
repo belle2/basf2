@@ -8,7 +8,7 @@ import subprocess
 import itertools
 from shutil import copyfile
 import ROOT
-from ROOT.Belle2 import FileMetaData, EventMetaData
+from ROOT.Belle2 import FileMetaData
 # we don't really need basf2 but it fixes the print buffering problem
 import basf2
 from b2test_utils import clean_working_directory, skip_test_if_light
@@ -95,8 +95,7 @@ import sys
 import basf2
 basf2.set_log_level(basf2.LogLevel.ERROR)
 if "BELLE2_GLOBALTAG" in os.environ:
-    basf2.reset_database()
-    basf2.use_central_database(os.environ["BELLE2_GLOBALTAG"])
+    basf2.conditions.override_globaltags([os.environ["BELLE2_GLOBALTAG"]])
 if "BELLE2_SEED" in os.environ:
     basf2.set_random_seed(os.environ["BELLE2_SEED"])
 main = basf2.create_path()

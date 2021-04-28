@@ -30,6 +30,7 @@ def submit_job(listArgs, logDir, myCmd):
     # summary
     print('Submitted job for: ' + ' '.join(listArgs))
 
+
 if len(sys.argv) != 3:
     sys.exit('Need two arguments: 1) path of look up table, 2) mc or data')
 
@@ -41,14 +42,15 @@ lookUpTablePath = sys.argv[1]
 mc_or_data = sys.argv[2].lower()
 isMC = {"mc": True, "data": False}.get(mc_or_data, None)
 if isMC is None:
-    sys.exit('Second parameter must be "mc" or "data" to indicate whether we run on MC or real data')
+    sys.exit(
+        'Second parameter must be "mc" or "data" to indicate whether we run on MC or real data')
 
 # the job we are submitting
 # myCmd = yourWorkingDirectoryPath + '/analysisJob.sh'
 myCmd = './analysisJob.sh'
 logDir = './analysisLog'
 
-# ================================= Submit jobs ! ==============================
+# ================================= Submit jobs ! ========================
 print('Jobs submission ..')
 
 # open look up table

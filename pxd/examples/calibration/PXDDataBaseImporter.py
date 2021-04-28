@@ -9,12 +9,12 @@
 ##############################################################################
 
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 import ROOT
 
 # set some random seed
-set_random_seed(10346)
+b2.set_random_seed(10346)
 
 
 def importEmptyHotPixelMask(expLow=0, runLow=0, expHigh=-1, runHigh=-1):

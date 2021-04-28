@@ -137,7 +137,7 @@ namespace Belle2 {
                 lastICLayer = wire.getICLayer();
               }
             }
-            B2DEBUG(100, lastICLayer << " (d=" << minDist << ")");
+            B2DEBUG(29, lastICLayer << " (d=" << minDist << ")");
           }
         }
       } else {

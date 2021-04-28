@@ -16,6 +16,7 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
+#include <framework/gearbox/Const.h>
 
 //c++
 #include <cmath>
@@ -116,7 +117,7 @@ void He3DigitizerModule::event()
         if (mom == NULL) continue;
 
         //if(processNum==121){
-        if (mom->getPDG() == 2112) {
+        if (mom->getPDG() == Const::neutron.getPDGCode()) {
           He3tubeSimHit* aHit = He3SimHits[relation.indexTo];
           int detNB = aHit->getdetNb();
           definiteNeutron[detNB] = true;
@@ -132,7 +133,7 @@ void He3DigitizerModule::event()
     for (int i = 0; i < nentries; i++) {
       He3tubeSimHit* aHit = He3SimHits[i];
       int pdg = aHit->gettkPDG();
-      if (pdg == 2212 || pdg == 1000010030) ProcessHit(aHit, lowTime, edepDet, NbEle_tot);
+      if (pdg == Const::proton.getPDGCode() || pdg == 1000010030) ProcessHit(aHit, lowTime, edepDet, NbEle_tot);
     }
 
   }

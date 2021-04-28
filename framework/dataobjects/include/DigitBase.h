@@ -53,6 +53,12 @@ namespace Belle2 {
      */
     virtual EAppendStatus addBGDigit(const DigitBase* bg) = 0;
 
+    /**
+     * Virtual method for possible modification of BG digit
+     * which is just appended to simulation store array
+     */
+    virtual void adjustAppendedBGDigit() {}
+
   private:
     ClassDef(DigitBase, 2); /**< ClassDef */
   };

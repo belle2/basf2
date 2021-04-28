@@ -258,15 +258,49 @@ Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type
   //TODO: gamma quality can be written here
   m_pValue = 1;
 
+  // get error matrix.
+  updateJacobiMatrix();
+
+}
+
+
+void Particle::updateJacobiMatrix()
+{
+  ClusterUtils C;
+
+  const ECLCluster* cluster = this->getECLCluster();
+
+  const TVector3 clustervertex = C.GetIPPosition();
+
+  // Get Jacobi matrix.
+  TMatrixD jacobi = C.GetJacobiMatrix4x6FromCluster(cluster, clustervertex, getECLClusterEHypothesisBit());
+  storeJacobiMatrix(jacobi);
+
+  // Propagate the photon energy scaling to jacobian elements that were calculated using energy.
+  TMatrixD scaledJacobi(4, 6);
+
+  int element = 0;
+
+  for (int irow = 0; irow < 4; irow++) {
+    for (int icol = 0; icol < 6; icol++) {
+      if (icol != 0 && irow != 3) {
+        scaledJacobi(irow, icol) = m_jacobiMatrix[element] * m_momentumScale;
+      } else {
+        scaledJacobi(irow, icol) = m_jacobiMatrix[element];
+      }
+      element++;
+    }
+  }
+
+  storeJacobiMatrix(scaledJacobi);
+
   // Get covariance matrix of IP distribution.
   const TMatrixDSym clustervertexcovmat = C.GetIPPositionCovarianceMatrix();
 
   // Set error matrix.
-  TMatrixDSym clustercovmat = C.GetCovarianceMatrix7x7FromCluster(eclCluster, clustervertex, clustervertexcovmat,
-                              getECLClusterEHypothesisBit());
+  TMatrixDSym clustercovmat = C.GetCovarianceMatrix7x7FromCluster(cluster, clustervertexcovmat, scaledJacobi);
   storeErrorMatrix(clustercovmat);
 }
-
 
 Particle::Particle(const KLMCluster* klmCluster, const int pdgCode) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
@@ -380,6 +414,20 @@ void Particle::setMomentumVertexErrorMatrix(const TMatrixFSym& m)
     return;
   }
   storeErrorMatrix(m);
+
+}
+
+
+void Particle::setJacobiMatrix(const TMatrixF& m)
+{
+  // check if provided Jacobi Matrix is of dimension 4x6
+  // if not, reset the error matrix and print warning
+  if (m.GetNrows() != 4 || m.GetNcols() != 6) {
+    resetJacobiMatrix();
+    B2WARNING("Jacobi Matrix is not 4x6 ");
+    return;
+  }
+  storeJacobiMatrix(m);
 }
 
 
@@ -642,7 +690,7 @@ void Particle::appendDaughter(const Particle* daughter, const bool updateType)
   m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
 }
 
-void Particle::removeDaughter(const Particle* daughter)
+void Particle::removeDaughter(const Particle* daughter, const bool updateType)
 {
   if (getNDaughters() == 0)
     return;
@@ -655,7 +703,7 @@ void Particle::removeDaughter(const Particle* daughter)
     }
   }
 
-  if (getNDaughters() == 0)
+  if (getNDaughters() == 0 and updateType)
     m_particleSource = c_Undefined;
 }
 
@@ -844,6 +892,7 @@ const ECLCluster* Particle::getECLCluster() const
 double Particle::getECLClusterEnergy() const
 {
   const ECLCluster* cluster = this->getECLCluster();
+  if (!cluster) return 0;
   return cluster->getEnergy(this->getECLClusterEHypothesisBit());
 }
 
@@ -924,7 +973,7 @@ const Particle* Particle::getParticleFromGeneralizedIndexString(const std::strin
 
 void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
 {
-  // set momenum
+  // set momentum
   m_px = trackFit->getMomentum().Px();
   m_py = trackFit->getMomentum().Py();
   m_pz = trackFit->getMomentum().Pz();
@@ -1006,12 +1055,29 @@ void Particle::resetErrorMatrix()
     i = 0.0;
 }
 
+void Particle::resetJacobiMatrix()
+{
+  for (float& i : m_jacobiMatrix)
+    i = 0.0;
+}
+
 void Particle::storeErrorMatrix(const TMatrixFSym& m)
 {
   int element = 0;
   for (int irow = 0; irow < c_DimMatrix; irow++) {
     for (int icol = irow; icol < c_DimMatrix; icol++) {
       m_errMatrix[element] = m(irow, icol);
+      element++;
+    }
+  }
+}
+
+void Particle::storeJacobiMatrix(const TMatrixF& m)
+{
+  int element = 0;
+  for (int irow = 0; irow < 4; irow++) {
+    for (int icol = 0; icol < 6; icol++) {
+      m_jacobiMatrix[element] = m(irow, icol);
       element++;
     }
   }
@@ -1045,9 +1111,9 @@ void Particle::setFlavorType()
 {
   m_flavorType = c_Flavored;
   if (m_pdgCode < 0) return;
-  if (m_pdgCode == 22) {m_flavorType = c_Unflavored; return;} // gamma
-  if (m_pdgCode == 310) {m_flavorType = c_Unflavored; return;} // K_s
-  if (m_pdgCode == 130) {m_flavorType = c_Unflavored; return;} // K_L
+  if (m_pdgCode == Const::photon.getPDGCode()) {m_flavorType = c_Unflavored; return;} // gamma
+  if (m_pdgCode == Const::Kshort.getPDGCode()) {m_flavorType = c_Unflavored; return;} // K_s
+  if (m_pdgCode == Const::Klong.getPDGCode()) {m_flavorType = c_Unflavored; return;} // K_L
   if (m_pdgCode == 43) {m_flavorType = c_Unflavored; return;} // Xu0
   int nnn = m_pdgCode / 10;
   int q3 = nnn % 10; nnn /= 10;
@@ -1119,6 +1185,9 @@ std::string Particle::getInfoHTML() const
 
   stream << " <b>momentum</b>=" << HTML::getString(getMomentum());
   stream << " <b>p</b>=" << getP();
+  stream << "<br>";
+
+  stream << " <b>momentum scaling factor</b>=" << m_momentumScale;
   stream << "<br>";
 
   stream << " <b>position</b>=" << HTML::getString(getVertex());
@@ -1274,4 +1343,11 @@ int Particle::generatePDGCodeFromCharge(const int chargeSign, const Const::Charg
   // flip sign of PDG code for leptons: their PDG code is positive if the lepton charge is negative and vice versa
   if (chargedStable == Const::muon || chargedStable == Const::electron) PDGCode = -PDGCode;
   return PDGCode;
+}
+
+bool Particle::isMostLikely() const
+{
+  const PIDLikelihood* likelihood = Particle::getPIDLikelihood();
+  if (likelihood) return likelihood->getMostLikely().getPDGCode() == std::abs(m_pdgCode);
+  else return false;
 }

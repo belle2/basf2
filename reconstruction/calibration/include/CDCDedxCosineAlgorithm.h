@@ -102,6 +102,7 @@ namespace Belle2 {
     int fHistbins; /**< number of bins for dedx histogram */
     double fdEdxMin; /**< min dedx range for gain cal */
     double fdEdxMax; /**< max dedx range for gain cal */
+    int fStartRun; /**< boundary start at this run */
     DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron saturation correction DB object */
   };
 } // namespace Belle2

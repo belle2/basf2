@@ -151,10 +151,11 @@ With all of these tools, it might be hard to work out where to go to get help.
 
 .. hint::
 
-    If you get stuck or have any questions during a StarterKit workshop you don't need
+    If you get stuck or have any questions during a StarterKit workshop or with
+    the training lessons in the online book you don't need
     to think about where to ask:
     The `#starterkit-workshop channel <https://chat.belle2.org/channel/starterkit-workshop>`_
-    in our chat will provide instant help.
+    in our chat will provide fast help.
     Please also check out the quick tips section below: :ref:`onlinebook_collaborative_tools_b2chat_howto`.
 
 ... meta
@@ -216,9 +217,10 @@ Asking a question in #starterkit-workshop
 .. note::
 
     The `#starterkit-workshop channel <https://chat.belle2.org/channel/starterkit-workshop>`_
-    is usually only active during the StarterKit workshop.
-    After the workshop, we recommend you to try one of the other alternatives
-    (but you can always try, of course).
+    is for beginner's questions about the online book material and for everything
+    that happens during a StarterKit workshop.
+    It's not the right place for specific or very detailed questions about your
+    own analysis.
 
 Our chat works like any other chat with a couple of nice features. For example you can
 put small parts of code in backticks ```print("hello world")``` and you can add larger
@@ -406,7 +408,7 @@ When writing your questions post, you can turn on "preview" (this is helpful).
 You can use simple markdown syntax.
 Code is indented by four spaces, and you can use latex!
 
-.. code:: markdown
+.. code-block::
 
         This is some normal text.
         This is normal text with inline code `[ x*x for x in range(10) ]`.
@@ -471,6 +473,7 @@ A bit more about working with stash and JIRA
      * Find the main Belle II software repository.
      * Look at the commits.
 
+
 .. admonition:: Solution
    :class: toggle solution
 
@@ -479,6 +482,15 @@ A bit more about working with stash and JIRA
    The main software repository is:
    https://stash.desy.de/projects/B2/repos/software , and the list of commits
    is `here <https://stash.desy.de/projects/B2/repos/software/commits>`__.
+
+.. seealso::
+
+  In this video we will show you around stash. It will also contain the solution
+  to the last exercise.
+
+  .. raw:: html
+
+      <iframe width="640" height="400" src="https://rebrand.ly/axdfhy4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 .. admonition:: Exercise
      :class: exercise stacked
@@ -494,6 +506,16 @@ A bit more about working with stash and JIRA
 
    The Belle II project is:
    https://agira.desy.de/projects/BII
+
+.. seealso::
+
+  In this video we will show you around JIRA. It will also contain the solution
+  to the last exercise.
+
+  .. raw:: html
+
+      <iframe width="640" height="400" src="https://rebrand.ly/zzbewnf" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 
 Here is a rough workflow for working with stash and JIRA.
 
@@ -597,6 +619,8 @@ Help us out with documentation: as a beginner, you know best what is missing!
 .. tip:: Good questions are also documentation and are also helpful!
 
 .. tip:: Bugs do exist, don't hesitate too much to report them.
+
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Author(s) of this lesson
 

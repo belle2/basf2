@@ -17,7 +17,7 @@ bool ParticleWeightingAxis::isOverlappingBin(ParticleWeightingBinLimits* bin)
 {
   for (auto i_bin : m_unnamedAxis) {
     /**
-     * Checkin gif lower border is within some bin
+     * Checking if lower border is within some bin
      * existing binning:     |   |
      * new binning:            |     |
      */
@@ -52,7 +52,7 @@ int ParticleWeightingAxis::addBin(ParticleWeightingBinLimits* bin)
     return existing_id;
   }
   if (this->isOverlappingBin(bin)) {
-    B2FATAL("Attepting to add overlapping or existing bin");
+    B2FATAL("Attempting to add overlapping or existing bin");
   } else {
     int id = m_unnamedAxis.size() + 1;
     m_unnamedAxis.insert(std::make_pair(id, bin));
@@ -61,7 +61,7 @@ int ParticleWeightingAxis::addBin(ParticleWeightingBinLimits* bin)
 }
 
 
-int ParticleWeightingAxis::findBin(ParticleWeightingBinLimits* bin)
+int ParticleWeightingAxis::findBin(ParticleWeightingBinLimits* bin) const
 {
   for (auto i_bin : m_unnamedAxis) {
     if ((bin->first() == i_bin.second->first()) and (bin->second() == i_bin.second->second())) {
@@ -72,7 +72,7 @@ int ParticleWeightingAxis::findBin(ParticleWeightingBinLimits* bin)
 }
 
 
-int ParticleWeightingAxis::findBin(double value)
+int ParticleWeightingAxis::findBin(double value) const
 {
   for (auto i_bin : m_unnamedAxis) {
     if ((value >= i_bin.second->first()) and (value < i_bin.second->second())) {
@@ -82,7 +82,7 @@ int ParticleWeightingAxis::findBin(double value)
   return m_outOfRangeBinID;
 }
 
-void ParticleWeightingAxis::printAxis()
+void ParticleWeightingAxis::printAxis() const
 {
   B2INFO("Printing axis " + m_axisName);
   int len = 10;

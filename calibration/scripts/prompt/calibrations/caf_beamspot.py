@@ -7,13 +7,16 @@ Airflow script to perform BeamSpot calibration.
 from prompt import CalibrationSettings
 
 #: Tells the automated system some details of this script
-settings = CalibrationSettings(name="BeamSpot Calibrations",
-                               expert_username="zlebcr",
-                               description=__doc__,
-                               input_data_formats=["cdst"],
-                               input_data_names=["hlt_mumu"],
-                               expert_config={"size_interval_len": 2.0, "position_interval_len": 0.5, "gap_penalty": 10},
-                               depends_on=[])
+settings = CalibrationSettings(
+    name="BeamSpot Calibrations",
+    expert_username="zlebcr",
+    description=__doc__,
+    input_data_formats=["cdst"],
+    input_data_names=["hlt_mumu"],
+    expert_config={
+        "outerLoss": "pow(rawTime - 2.0, 2) + 10 * pow(maxGap, 2)",
+        "innerLoss": "pow(rawTime - 0.5, 2) + 10 * pow(maxGap, 2)"},
+    depends_on=[])
 
 ##############################
 
@@ -66,7 +69,6 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     # Algorithm setup
 
-    import ROOT
     from ROOT.Belle2 import BeamSpotAlgorithm
     from basf2 import create_path, register_module
     import modularAnalysis as ana
@@ -87,8 +89,8 @@ def get_calibrations(input_data, **kwargs):
 
     collector_bs = register_module('BeamSpotCollector', Y4SPListName='Upsilon(4S):BS')
     algorithm_bs = BeamSpotAlgorithm()
-    algorithm_bs.setIntervalsLength(kwargs['expert_config']["size_interval_len"],  kwargs['expert_config']["position_interval_len"])
-    algorithm_bs.setGapPenalty(kwargs['expert_config']["gap_penalty"])
+    algorithm_bs.setOuterLoss(kwargs['expert_config']['outerLoss'])
+    algorithm_bs.setInnerLoss(kwargs['expert_config']['innerLoss'])
 
     calibration_bs = Calibration('BeamSpot',
                                  collector=collector_bs,

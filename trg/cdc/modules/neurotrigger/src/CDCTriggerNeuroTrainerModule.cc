@@ -517,7 +517,7 @@ CDCTriggerNeuroTrainerModule::updateRelevantID(unsigned isector)
   B2DEBUG(50, "Setting relevant ID ranges for sector " << isector);
   vector<float> relevantID;
   relevantID.assign(18, 0.);
-  CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
+  const CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
   int layerId = 3;
   for (unsigned iSL = 0; iSL < 9; ++iSL) {
     int nWires = cdc.nWiresInLayer(layerId);

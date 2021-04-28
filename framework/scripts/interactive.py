@@ -16,7 +16,6 @@ be used. Use Ctrl+D to exit the shell.
 See framework/examples/interactive.py for an example.
 """
 
-from IPython import embed
 from traitlets.config.loader import Config
 from IPython.terminal.prompts import Prompts, Token
 

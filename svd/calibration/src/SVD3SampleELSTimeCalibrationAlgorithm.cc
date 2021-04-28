@@ -165,9 +165,15 @@ bool SVD3SampleELSTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration
   auto rawTimeL3V = getObjectPtr<TH1F>("hRawTimeL3V");
   // float meanEventT0 = eventT0Hist->GetMean();
   if (!rawTimeL3V) {
-    meanRawTimeL3V = m_previousRawTimeMeanL3V.value();
+    if (m_previousRawTimeMeanL3V)
+      meanRawTimeL3V = m_previousRawTimeMeanL3V.value();
   } else {
-    meanRawTimeL3V = rawTimeL3V->GetMean();
+    if (rawTimeL3V->GetEntries() > m_minEntries)
+      meanRawTimeL3V = rawTimeL3V->GetMean();
+    else {
+      if (m_previousRawTimeMeanL3V)
+        meanRawTimeL3V = m_previousRawTimeMeanL3V.value();
+    }
   }
   if (!m_previousRawTimeMeanL3V) {
     B2INFO("Setting start payload boundary to be the first run ("
@@ -185,4 +191,3 @@ bool SVD3SampleELSTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration
     return false;
   }
 }
-

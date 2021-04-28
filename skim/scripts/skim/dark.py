@@ -19,8 +19,10 @@ import pdg
 from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
 from stdCharged import stdE, stdMu
 from stdPhotons import stdPhotons
+import vertex as vertex
 
 __liaison__ = "Sascha Dreyer <sascha.dreyer@desy.de>"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header
@@ -31,7 +33,7 @@ class SinglePhotonDark(BaseSkim):
     Skim list contains single photon candidates for the dark photon to invisible final
     state analysis.
     """
-    __authors__ = ["Sam Cunliffe"]
+    __authors__ = ["Sam Cunliffe", "Chris Hearty"]
     __contact__ = __liaison__
     __description__ = "Single photon skim list for the dark photon analysis."
     __category__ = "physics, dark sector"
@@ -40,27 +42,48 @@ class SinglePhotonDark(BaseSkim):
         stdPhotons("all", path=path)
 
     def build_lists(self, path):
-        # no good tracks in the event
-        cleaned = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
 
-        # no other photon above 100 MeV
-        angle = "0.296706 < theta < 2.61799"  # rad, (17 -- 150 deg)
-        minimum = "E > 0.1"  # GeV
-        ma.cutAndCopyList("gamma:100", "gamma:all", minimum + " and " + angle, path=path)
+        # start with all photons with E* above 500 MeV in the tracking acceptance
+        in_tracking_acceptance = "0.296706 < theta < 2.61799"  # rad = [17, 150] degrees
+        ma.cutAndCopyList(
+            "gamma:singlePhoton", "gamma:all",
+            f"useCMSFrame(E) > 0.5 and {in_tracking_acceptance}", path=path)
 
-        path = self.skim_event_cuts(
-            f"0 < nParticlesInList(gamma:100) <  2 and nCleanedTracks({cleaned}) < 1",
-            path=path
-        )
-
-        # all remaining single photon events (== candidates) with region
-        # dependent minimum energy in GeV
-        region_dependent = " [clusterReg ==  2 and useCMSFrame(E) > 1.0] or "  # barrel
+        # require a region-dependent minimum energy of the candidate, we have
+        # a new 0.5 GeV trigger in the inner barrel: [44.2, 94.8] degrees @ L1
+        region_dependent = " [clusterTheta < 1.65457213 and clusterTheta > 0.77143553] or "
+        region_dependent += "[clusterReg ==  2 and useCMSFrame(E) > 1.0] or "  # barrel
         region_dependent += "[clusterReg ==  1 and useCMSFrame(E) > 2.0] or "  # fwd
         region_dependent += "[clusterReg ==  3 and useCMSFrame(E) > 2.0] or "  # bwd
         region_dependent += "[clusterReg == 11 and useCMSFrame(E) > 2.0] or "  # between fwd and barrel
-        region_dependent += "[clusterReg == 13 and useCMSFrame(E) > 2.0] "     # between bwd and barrel
-        ma.cutAndCopyList("gamma:singlePhoton", "gamma:100", region_dependent, path=path)
+        region_dependent += "[clusterReg == 13 and useCMSFrame(E) > 2.0]"      # between bwd and barrel
+        ma.applyCuts("gamma:singlePhoton", region_dependent, path=path)
+
+        # require only one single photon candidate and no good tracks in the event
+        good_tracks = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
+        path = self.skim_event_cuts(
+            f"nParticlesInList(gamma:singlePhoton) == 1 and nCleanedTracks({good_tracks}) == 0",
+            path=path
+        )
+
+        # check the second-most-energetic photon (above 550 MeV is unlikely to
+        # be beam-induced background) and veto if it's in time with our signal
+        # candidate -- do after the event cuts since it uses a ParticleCombiner
+        # and should not be done for all events (save event-processing time)
+        not_in_signal_list = "isInList(gamma:singlePhoton) < 1"
+        in_time = "maxWeightedDistanceFromAverageECLTime < 1"
+        ma.cutAndCopyList("gamma:to_veto", "gamma:all",
+                          f"E > 0.55 and {not_in_signal_list}", path=path)
+        ma.rankByHighest("gamma:to_veto", "E", numBest=1, path=path)
+        ma.reconstructDecay("vpho:veto -> gamma:singlePhoton gamma:to_veto",
+                            in_time, path=path)
+        veto_additional_in_time_cluster = 'nParticlesInList(vpho:veto) < 1'
+
+        # final signal selection must pass the 'in-time' veto on the
+        # second-most-energetic cluster -- this is also an event cut, but apply
+        # to the list (which is anyway a maximum one candidate per event) since
+        # we can only call skim_event_cuts once
+        ma.applyCuts("gamma:singlePhoton", veto_additional_in_time_cluster, path=path)
         self.SkimLists = ["gamma:singlePhoton"]
 
 
@@ -367,7 +390,7 @@ class GammaGammaControlKLMDark(BaseSkim):
         # unpack prescales and convert from trigger convention to a number we can
         # compare with a float
         prescale_high, prescale_low = self.prescale_high, self.prescale_low
-        if (prescale_high, prescale_low) is not (1, 1):
+        if (prescale_high, prescale_low) != (1, 1):
             b2.B2INFO(
                 "GammaGammaControlKLMDarkList is prescaled. "
                 f"prescale_high={prescale_high}, prescale_low={prescale_low}"
@@ -400,7 +423,7 @@ class GammaGammaControlKLMDark(BaseSkim):
         prescale = f"[ {probe_high} ] or [ {probe_low} ]"
 
         # ~back-to-back in phi in the CMS (3.1066... radians = 178 degrees)
-        delta_phi_cut = "daughterDiffOfPhiCMS(0, 1) > 3.1066860685499065"
+        delta_phi_cut = "abs(daughterDiffOfPhiCMS(0, 1)) > 3.1066860685499065"
 
         # sum theta in the cms 178 --> 182 degrees
         sum_th = "daughterSumOf(useCMSFrame(theta))"
@@ -464,6 +487,53 @@ class DielectronPlusMissingEnergy(BaseSkim):
 
 
 @fancy_skim_header
+class RadBhabhaV0Control(BaseSkim):
+
+    """
+    Control sample: :math:`e^{+}e^{-} \\to e^{+}e^{-}V^{0};`"
+    """
+
+    __authors__ = "Savino Longo"
+    __description__ = (
+        "iDM control sample skim. :math:`e^{+}e^{-} \\to e^{+}e^{-}V^{0};`"
+    )
+    __contact__ = __liaison__
+    __category__ = "physics, dark sector"
+
+    def load_standard_lists(self, path):
+        stdPhotons("all", path=path)
+        stdE("all", path=path)
+
+    def build_lists(self, path):
+
+        # require Bhabha tracks are high p and E/p is consitent with e+/e-
+        BhabhaTrackCuts = 'abs(dr)<0.5 and abs(dz)<2 and pt>0.2 and 0.8<clusterEoP<1.2 and p>1.0 and clusterReg==2 and nCDCHits>4'
+        BhabhaSystemCuts = '4<M<10 and 0.5<pRecoilTheta<2.25'
+        V0TrackCuts = 'nCDCHits>4 and p<3.0'
+        V0Cuts = 'dr>0.5'
+        PhotonVetoCuts = 'p>1.0'  # event should have no high E photons
+
+        ma.cutAndCopyList("gamma:HighEGammaVeto", "gamma:all", PhotonVetoCuts, path=path)
+        ma.cutAndCopyList("e+:BhabhaTrack", "e+:all", BhabhaTrackCuts, path=path)
+        ma.cutAndCopyList("e+:V0Track", "e+:all", V0TrackCuts, path=path)
+
+        ma.reconstructDecay("vpho:BhabhaSysyem -> e+:BhabhaTrack e-:BhabhaTrack", BhabhaSystemCuts, path=path)
+
+        ma.reconstructDecay("vpho:V0System -> e+:V0Track e-:V0Track", '', path=path)
+        vertex.treeFit('vpho:V0System', conf_level=0.0, path=path)
+        ma.applyCuts('vpho:V0System', V0Cuts, path=path)
+
+        ma.reconstructDecay('vpho:Total -> vpho:BhabhaSysyem vpho:V0System', '', path=path)
+
+        eventCuts = ('nParticlesInList(gamma:HighEGammaVeto)<1 and '
+                     'nParticlesInList(vpho:Total)>0')
+
+        path = self.skim_event_cuts(eventCuts, path=path)
+
+        self.SkimLists = ["vpho:Total"]
+
+
+@fancy_skim_header
 class InelasticDarkMatter(BaseSkim):
     """
     Skim list contains events with no tracks from IP, no high E tracks and only one high E photon.
@@ -506,4 +576,4 @@ class InelasticDarkMatter(BaseSkim):
 
         path = self.skim_event_cuts(idmEventCuts, path=path)
 
-        self.SkimLists = ["gamma:all", 'e-:all']
+        self.SkimLists = ['gamma:ISR']

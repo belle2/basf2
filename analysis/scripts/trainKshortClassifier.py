@@ -3,7 +3,8 @@
 # Author: Marcel Hohmann (marcel.hohmann@desy.de)
 
 import basf2
-from modularAnalysis import inputMdst, matchMCTruth, variablesToNtuple, process, statistics
+from basf2 import process, statistics
+from modularAnalysis import inputMdst, matchMCTruth, variablesToNtuple
 from stdV0s import stdKshorts
 import sys
 import os

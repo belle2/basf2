@@ -323,8 +323,10 @@ namespace Belle2 {
      * MapType has to have key value pairs of pair<int,TrueHitInfo>
      * throws: + NoTrueHitToCluster
      *         + NoSpacePointToCluster
+     * @param spacePoint:  pointer to the SpacePoint of interest
      * @param clusterName: Name of the StoreArray of Clusters to be searched (defaults to "ALL")
      * @param trueHitName: Name of the StoreArray of TrueHits to be searched (defaults to "ALL")
+     * @return multimap containing the related TrueHitInfos
      */
     template<typename MapType, typename ClusterType, typename TrueHitType>
     MapType getRelatedTrueHits(Belle2::SpacePoint* spacePoint, std::string clusterName = "ALL", std::string trueHitName = "ALL");

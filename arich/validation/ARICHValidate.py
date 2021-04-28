@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-##############################################################################
-#
-# This is a steering file to generate and analyze 10000 events used for ARICH
-# validation plots.
-# Author: Luka Santelj
-# 11.3.2014
-#
-##############################################################################
+"""
+<header>
+<contact>Luka Santelj</contact>
+<description>This is a steering file to generate and analyze 10000 events used for ARICH
+validation plots.
+</description>
+<output>../ARICHEvents.root</output>
+</header>
+"""
 
-from basf2 import *
+import basf2 as b2
 from optparse import OptionParser
 from simulation import add_simulation
 from reconstruction import add_mc_reconstruction
-import glob
 
 # Options from command line
 parser = OptionParser()
@@ -29,20 +28,20 @@ filename = options.filename
 debugLevel = int(options.debugLevel)
 
 # suppress messages and warnings during processing DEBUG, INFO, WARNING, ERROR
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # specify number of events to be generated
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [nevents]})
 main.add_module(eventinfosetter)
 
 # Particle gun module
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 # Setting the random seed for particle generation:
-set_random_seed(123456)
+b2.set_random_seed(123456)
 # Setting the list of particle codes (PDG codes) for the generated particles
 particlegun.param('pdgCodes', [-211, 211, 321, -321])
 # Setting the number of tracks to be generated per event:
@@ -61,7 +60,7 @@ particlegun.param('yVertexParams', [0.0, 0.0])
 particlegun.param('zVertexParams', [0.0, 0.0])
 particlegun.param('independentVertices', False)
 # Print the parameters of the particle gun
-print_params(particlegun)
+b2.print_params(particlegun)
 main.add_module(particlegun)
 
 # Add simulation
@@ -73,18 +72,18 @@ add_simulation(main)
 add_mc_reconstruction(main)
 
 # Add module fpr ARICH efficiency analysis
-arichEfficiency = register_module('ARICHNtuple')
-arichEfficiency.logging.log_level = LogLevel.DEBUG
+arichEfficiency = b2.register_module('ARICHNtuple')
+arichEfficiency.logging.log_level = b2.LogLevel.DEBUG
 arichEfficiency.logging.debug_level = debugLevel
 arichEfficiency.param('outputFile', filename)
 main.add_module(arichEfficiency)
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

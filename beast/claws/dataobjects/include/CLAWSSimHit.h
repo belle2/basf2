@@ -35,7 +35,16 @@ namespace Belle2 {
     }
 
     /** Standard constructor
+     * @param ladder Ladder number
+     * @param sensor Sensor number
+     * @param pdg PDG number of the track
+     * @param time Global time
      * @param energyDep Deposited energy in GeV
+     * @param energyVisble Non-ionization energy in electrons
+     * @param length Track length
+     * @param posEntry Entry track position
+     * @param posExit Exit track position
+     * @param momEntry Track momentum
      */
     CLAWSSimHit(int ladder, int sensor, int pdg, float time, float energyDep, float energyVisble,
                 float length, const float* posEntry, const float* posExit, const float* momEntry):

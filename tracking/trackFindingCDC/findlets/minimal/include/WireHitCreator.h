@@ -78,6 +78,12 @@ namespace Belle2 {
       /// Parameter : List of super layers to be used - mostly for debugging
       std::vector<int> m_param_useSuperLayers;
 
+      /// Parameter : List of layers to be used
+      std::vector<uint> m_param_useLayers;
+
+      /// Parameter : List of layers to be ignored in tracking e.g. for simulating too high occupancy
+      std::vector<uint> m_param_ignoreLayers;
+
       /// Parameter : If true, the second hit information will be used to create Wire Hits
       bool m_param_useSecondHits = false;
 
@@ -102,6 +108,10 @@ namespace Belle2 {
 
       /// Bits for the used super layers
       std::array<bool, ISuperLayerUtil::c_N> m_useSuperLayers{};
+
+      /// Bits for the used layers
+      /// ATTENTION: hardcoded value for number of layers
+      std::array<bool, 56> m_useLayers{};
 
       /// Unit vectors denoting the sector for which hits should be created
       std::array<Vector2D, 2> m_useSector{};

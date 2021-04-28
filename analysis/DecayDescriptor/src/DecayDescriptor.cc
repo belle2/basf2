@@ -19,6 +19,7 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <TDatabasePDG.h>
@@ -179,7 +180,7 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
   // 3rd case: the descriptor and the particle have daughters
   // There are two cases that can happen when matching the
   // DecayDescriptor daughters to the particle daughters:
-  // 1. The match is unambigous -> no problem
+  // 1. The match is unambiguous -> no problem
   // 2. Multiple particle daughters match the same DecayDescriptor daughter
   // -> in the latter case the ambiguity is resolved later
 
@@ -204,7 +205,7 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
         iPDGCode_daughter_p = mc_test->getPDG();
 
       if (iDaughter_d == 0 && (this->isIgnoreRadiatedPhotons() or this->isIgnoreGamma() or this->isIgnoreBrems())
-          && iPDGCode_daughter_p == 22)
+          && iPDGCode_daughter_p == Const::photon.getPDGCode())
         matches_global.insert(jDaughter_p);
 
       int iMatchResult = m_daughters[iDaughter_d].match(daughter, jDaughter_p);
@@ -227,7 +228,7 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
       && int(matches_global.size()) != nDaughters_p) return 0;
 
   // In case that there are DecayDescriptor daughters with multiple matches, try to solve the problem
-  // by removing the daughter candidates which are already used in other unambigous relations.
+  // by removing the daughter candidates which are already used in other unambiguous relations.
   // This is done iteratively. We limit the maximum number of attempts to 20 to avoid an infinit loop.
   bool isModified = true;
   for (int iTry = 0; iTry < 20; iTry++) {
@@ -299,7 +300,7 @@ vector<const Particle*> DecayDescriptor::getSelectionParticles(const Particle* p
     // retrieve the particle daughter ID from this DecayDescriptor daughter
     int iDaughter_p = m_daughters[iDaughter_d].getMatchedDaughter();
     // If the particle daughter ID is below one, the match function was not called before
-    // or the match was ambigous. In this case try to use the daughter ID of the DecayDescriptor.
+    // or the match was ambiguous. In this case try to use the daughter ID of the DecayDescriptor.
     // This corresponds to using the particle order in the decay string.
     if (iDaughter_p < 0) iDaughter_p = iDaughter_d;
     const Particle* daughter = particle->getDaughter(iDaughter_p);

@@ -24,10 +24,8 @@
 
 # run_ee5x5_algorithm_XXX.py is then used to find payloads or output merged histograms.
 
-import os
 import sys
 import basf2 as b2
-from ROOT import Belle2
 
 
 main = b2.create_path()

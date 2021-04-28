@@ -59,6 +59,12 @@ class SVD4Layer(TrackingValidationRun):
     #: output file of plots
     output_file_name = VALIDATION_OUTPUT_FILE
 
+    # tweak sectormap
+    # def adjust_path(self, path):
+    #     basf2.set_module_parameters( path, "SectorMapBootstrap", ReadSecMapFromDB=False)
+    #     basf2.set_module_parameters( path, "SectorMapBootstrap", ReadSectorMap=True)
+    #     basf2.set_module_parameters( path, "SectorMapBootstrap", SectorMapsInputFile="mymap.root")
+
 
 def main():
     """

@@ -1,5 +1,10 @@
 # !/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+"""
+<header>
+<noexecute>Used as library.</noexecute>
+</header>
+"""
 
 import ROOT as R
 
@@ -35,12 +40,9 @@ cut_U = R.TCut('strip_dir==0')  # U_P
 cut_V = R.TCut('strip_dir==1')  # V_N
 cut_noU = R.TCut('strip_dir!=0')  # V_P or -1
 cut_noV = R.TCut('strip_dir!=1')  # U_N or -1
-cut_Usize1 = R.TCut('(cluster_size==1)&&(strip_dir==0)')
-cut_Vsize1 = R.TCut('(cluster_size==1)&&(strip_dir==1)')
-cut_Usize2 = R.TCut('(cluster_size==2)&&(strip_dir==0)')
-cut_Vsize2 = R.TCut('(cluster_size==2)&&(strip_dir==1)')
-cut_Usize3plus = R.TCut('(cluster_size>2)&&(strip_dir==0)')
-cut_Vsize3plus = R.TCut('(cluster_size>2)&&(strip_dir==1)')
+cut_size1 = R.TCut('(cluster_size==1)')
+cut_size2 = R.TCut('(cluster_size==2)')
+cut_size3plus = R.TCut('(cluster_size>2)')
 cut_oneTH = R.TCut('cluster_truehits_number==1')  # one TrueHit associated with SVDCluster
 cut_noUV = R.TCut('strip_dir==-1')  # no U, no V
 
@@ -73,11 +75,13 @@ granulesTD = ((cut_L3, 'L3-L4'),
 
 granulesL3456 = ((cut_L3, 'L3456'),)  # characteristic of track saved in 3rd layer cluster
 
+g_L3_V = ((cut_L3 + cut_V, 'L3_V'),)
 
-def ploter(name, title, nbins, xmin, xmax, x_label, y_label,
-           granules,
-           tree, expr, cut,
-           descr, check, contact_str=SVDContact, isShifter=False):
+
+def plotter(name, title, nbins, xmin, xmax, x_label, y_label,
+            granules,
+            tree, expr, cut,
+            descr, check, contact_str=SVDContact, isShifter=False):
     for g in granules:
         hName = f'{name}_{g[1]}'
         h = create1DHist(hName, title, nbins, xmin, xmax, x_label, y_label)

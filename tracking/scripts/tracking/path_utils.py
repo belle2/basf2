@@ -1,12 +1,10 @@
 from pybasf2 import B2WARNING
 
-from basf2 import register_module, create_path
+from basf2 import register_module
 from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf, add_cosmics_pxd_ckf
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
 from tracking.adjustments import adjust_module
-
-from iov_conditional import phase_2_conditional
 
 
 def use_local_sectormap(path, pathToLocalSM):
@@ -447,7 +445,7 @@ def add_svd_track_finding(
 
 
 def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
-                          use_second_hits=False, add_mva_quality_indicator=False,
+                          use_second_hits=False, add_mva_quality_indicator=True,
                           reattach_hits=False):
     """
     Convenience function for adding all cdc track finder modules
@@ -535,9 +533,9 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
             "TFCDC_TrackQualityEstimator",
             inputTracks=output_tracks,
             filter='mva',
-            filterParameters={"cut": 0.0},
-            deleteTracks=False,
-            resetTakenFlag=False
+            filterParameters={"cut": 0.7},
+            deleteTracks=True,
+            resetTakenFlag=True
         )
 
     # Export CDCTracks to RecoTracks representation

@@ -39,6 +39,12 @@ namespace Belle2 {
     /** Destructor.*/
     virtual ~MCMatcherTRGECLModule();
 
+    /** Copy constructor, deleted. */
+    MCMatcherTRGECLModule(MCMatcherTRGECLModule&) = delete;
+
+    /** Assignment operator, deleted. */
+    MCMatcherTRGECLModule& operator=(MCMatcherTRGECLModule&) = delete;
+
     /** Initialize variables, print info, and start CPU clock. */
     virtual void initialize() override;
 

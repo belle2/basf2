@@ -17,7 +17,6 @@
 
 #include <TEfficiency.h>
 #include <TCanvas.h>
-#include <TLine.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Efficiency */
@@ -60,6 +59,10 @@ namespace Belle2 {
     double m_errorlevel;
     /** Update entry intervall */
     int m_minEntries = 1000;
+    /** use alarm level per module */
+    bool m_perModuleAlarm;
+    /** generate alarm from adhoc values */
+    bool m_alarmAdhoc;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
@@ -84,9 +87,13 @@ namespace Belle2 {
 
 
     /** TLine object for warning limit */
-    TLine* m_line_warn{};
+    TH1F* m_hWarnLine{};
     /** TLine object for error error */
-    TLine* m_line_error{};
+    TH1F* m_hErrorLine{};
+    //! warn level for alarm per module
+    std::map<VxdID, double> m_warnlevelmod;
+    //! error level for alarm per module
+    std::map<VxdID, double> m_errorlevelmod;
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
@@ -96,7 +103,8 @@ namespace Belle2 {
 
 #ifdef _BELLE2_EPICS
     //! one EPICS PV
-    chid  mychid;
+    std::vector <chid>  mychid_status;
+    std::map <VxdID, chid> mychid_eff;
 #endif
   };
 } // end namespace Belle2

@@ -10,44 +10,44 @@
 </header>
 """
 
-from basf2 import *
+import basf2 as b2
 
 # ---------------------------------------------------------------
 # Make a flat ntuple for validation of top package
 # ---------------------------------------------------------------
 
 # Suppress messages and warnings during processing:
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Input
-roinput = register_module('RootInput')
+roinput = b2.register_module('RootInput')
 roinput.param('inputFileNames', ['../EvtGenSimRec_B2Kpi.root',
                                  '../EvtGenSimRec.root'])
 main.add_module(roinput)
 
 # Gearbox: access to database (xml files)
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # Geometry (only TOP is needed and B-field)
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('components', ['MagneticField', 'TOP'])
 main.add_module(geometry)
 
 # Output: make flat ntuple from TOPLikelihoods, tracking info and MC truth
-output = register_module('TOPNtuple')
+output = b2.register_module('TOPNtuple')
 output.param('outputFileName', '../TOPNtuple.root')
 main.add_module(output)
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

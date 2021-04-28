@@ -243,12 +243,11 @@ namespace Belle2 {
         if (! s.active())
           skip = true;
 
-        if (skip && (! skipLast)) {
-          cout << "... (all zero)" << endl;
-          skipLast = true;
-        }
-
         if (skip) {
+          if (!skipLast) {
+            cout << "... (all zero)" << endl;
+          }
+
           skipLast = true;
           continue;
         }
@@ -367,8 +366,8 @@ namespace Belle2 {
     return TRGState(stack);
   }
 
-  TRGState&
-  TRGState::operator=(const TRGState& a)
+  // cppcheck-suppress operatorEqToSelf
+  TRGState& TRGState::operator=(const TRGState& a)
   {
     if (_state)
       free(_state);

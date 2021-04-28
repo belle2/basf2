@@ -8,8 +8,7 @@
 # --------------------------------------
 
 import settings
-import os
-from colours import warning, mesg
+from colours import warning
 
 partdict = {}
 mesgdict = []

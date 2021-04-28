@@ -13,7 +13,7 @@
 #
 #
 # Contributors: A. Zupanc (June 2014)
-#               I. Komarov (Demeber 2017)
+#               I. Komarov (December 2017)
 #               I. Komarov (September 2018)
 #
 ################################################################################

@@ -95,12 +95,17 @@ namespace Belle2 {
       double m_cutCluster = 0;
       /** if true takes the clusterizer cuts from the DB object*/
       bool m_useDB = true;
-      /** selects the algorithm to compute the cluster tim
+      /** selects the algorithm to compute the cluster time
        *  0 = 6-sample CoG (default)
        *  1 = 3-sample CoG (TO DO: default if 3-sample acquisition mode)
        *  2 = 3-sample ELS
        */
       int m_timeAlgorithm = 0;
+      /** Name of the SVDEventInfo to be used instead of SVDEventInfo.
+       * The defauls is SVDEventInfoSim */
+      std::string m_svdEventInfoSet;
+      /** if true returns the calibrated time instead of the raw time for 3-sample time algorithms*/
+      bool m_calibrate3SampleWithEventT0 = true;
 
       //calibration objects
       SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShape calibrations db object*/

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Dennis Weyland 2017
 # Justin Tan 2017
@@ -9,21 +8,16 @@
 # Relevant paper: https://arxiv.org/abs/1611.01046
 # use basf2_mva_evaluation.py with train.root and test.root at the end to see the impact on the spectator variables.
 
-import basf2
 import basf2_mva
 from basf2_mva_python_interface.contrib_keras import State
-import h5py
-import tensorflow as tf
 import tensorflow.contrib.keras as keras
-import keras
 
-from keras.layers import Input, Dense, Concatenate, Lambda
-from keras.models import Model, load_model
+from keras.layers import Dense, Input
+from keras.models import Model
 from keras.optimizers import adam
 from keras.losses import binary_crossentropy, sparse_categorical_crossentropy
 from keras.activations import sigmoid, tanh, softmax
-from keras import backend as K
-from keras.callbacks import Callback, EarlyStopping
+from keras.callbacks import EarlyStopping
 from keras.utils import plot_model
 
 import numpy as np

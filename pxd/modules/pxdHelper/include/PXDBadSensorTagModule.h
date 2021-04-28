@@ -38,6 +38,7 @@ namespace Belle2 {
 
       /** Initialize the module */
       void initialize() override final;
+      /** Event */
       void event() override final;
 
       std::string m_PXDDAQEvtStatsName;  /**< The name of the StoreObjPtr of PXDDAQStatus to be generated */

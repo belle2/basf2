@@ -12,9 +12,7 @@
 #
 ######################################################
 
-import sys
 import basf2 as b2
-import modularAnalysis as ma
 import random
 
 # Add some bin constructors
@@ -37,7 +35,7 @@ def make_3D_bin(bin_x, bin_y, bin_z):
 
 
 # Define bin ranges. Bins may be of different size
-# They shouldn't event cover the whole paerameter space
+# They shouldn't event cover the whole parameter space
 bins_x = [make_1D_bin("p", 0, 2),
           make_1D_bin("p", 2, 3),
           make_1D_bin("p", 3, 4)]
@@ -46,8 +44,8 @@ bins_y = [make_1D_bin("pz", 0, 1),
           make_1D_bin("pz", 1, 5)]
 
 
-# Here whould be input from the experts.
-# We don't have real caolibration tables yet
+# Here would be input from the experts.
+# We don't have real calibration tables yet
 # So we use randomized info.
 # Bin IDs will be automatically assigned as follows:
 #
@@ -69,7 +67,7 @@ for xbin in bins_x:
         weightInfo["SystErr"] = float(10)
         tableIDNotSpec.append([weightInfo, make_2D_bin(xbin, ybin)])
 
-# Now let's assign binIDs manually (to be able to assigne identical IDs for different bins)
+# Now let's assign binIDs manually (to be able to assign identical IDs for different bins)
 # Let's do this structure of bins (out-of-range bin -1 is assigned later):
 #
 #    p|0-2|2-3|3-4|

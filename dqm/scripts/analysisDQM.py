@@ -12,7 +12,7 @@ import modularAnalysis as ma
 
 def add_analysis_dqm(path):
     """Add the analysis DQM modules to the ``path``.
-    Builds a list of pi0's, Kshorts and the Fox Wolfram event shape variables
+    Builds a list of pi0's, Kshorts and the Fox Wolfram event shape variables.
 
     Parameters:
         path (basf2.Path): modules are loaded onto this path
@@ -46,6 +46,13 @@ def add_analysis_dqm(path):
 
 
 def add_mirabelle_dqm(path):
+    """Add the mirabelle DQM modules to the ``path``.
+    Runs on conditional paths depending on the software trigger results.
+    Building D*'s or dimuons on the conditional paths.
+
+    Parameters:
+        path (basf2.Path): modules are loaded onto this path
+    """
     # Software Trigger to divert the path
     MiraBelleMumu_path = b2.create_path()
     MiraBelleDst1_path = b2.create_path()
@@ -99,7 +106,7 @@ def add_mirabelle_dqm(path):
     # MiraBelle D* (followed by D0 -> K pi pi0) path
     ma.fillParticleList('pi+:MiraBelleDst2', 'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst2_path)
     ma.fillParticleList('K+:MiraBelleDst2', 'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst2_path)
-    stdPi0s(listtype='eff60_May2020', path=MiraBelleDst2_path)
+    stdPi0s(listtype='eff60_May2020', path=MiraBelleDst2_path, loadPhotonBeamBackgroundMVA=False)
     ma.reconstructDecay(
         'D0:MiraBelleDst2_kpipi0 -> K-:MiraBelleDst2 pi+:MiraBelleDst2 pi0:eff60_May2020',
         '1.7 < M < 2.1',

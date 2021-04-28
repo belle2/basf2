@@ -944,6 +944,9 @@ match the true photon energy in MC:
       resolution for high energetic photons, the remaining difference between MC and data must be calibrated
       using kinematically fit muon pairs. This calibration is only applied to data and not to MC and will
       take time to develop.
+    
+    - Energy Bias Correction module, sub-percent correction, is NOT applied on clusterE, but on photon energy 
+      and momentum. Only applied to data.  
 
 It is important to note that after perfect leakage correction and cluster energy calibration,
 the :math:`\pi^{0}` mass peak will be shifted slightly to smaller values than the PDG average

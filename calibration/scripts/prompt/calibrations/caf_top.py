@@ -13,7 +13,7 @@ from caf.strategies import SequentialBoundaries
 from top_calibration import BS13d_calibration_cdst
 from top_calibration import moduleT0_calibration_DeltaT, moduleT0_calibration_LL
 from top_calibration import commonT0_calibration_BF
-
+from prompt.calibrations.caf_top_pre import settings as top_pretracking
 
 #: Required variable - tells the automated system some details of this script
 settings = CalibrationSettings(
@@ -27,7 +27,7 @@ settings = CalibrationSettings(
             input_data_filters["Data Tag"]["bhabha_all_calib"],
             input_data_filters["Run Type"]["physics"],
             input_data_filters["Data Quality Tag"]["Good Or Recoverable"]]},
-    depends_on=[],
+    depends_on=[top_pretracking],
     expert_config={
         "max_files_per_run": 10,
         "payload_boundaries": None,
@@ -43,7 +43,7 @@ def get_calibrations(input_data, **kwargs):
     :**kwargs: Configuration options to be sent in.
     '''
 
-    file_to_iov = input_data["bhabha_all_calib"]  # changed to the new input name, is this correct?
+    file_to_iov = input_data["bhabha_all_calib"]
     sample = 'bhabha'
     inputFiles = list(file_to_iov.keys())
     requested_iov = kwargs.get("requested_iov", None)
@@ -53,7 +53,7 @@ def get_calibrations(input_data, **kwargs):
     cal = [BS13d_calibration_cdst(inputFiles),  # this is run-dep
            moduleT0_calibration_DeltaT(inputFiles),  # this cal cannot span across experiments
            moduleT0_calibration_LL(inputFiles, sample),  # this cal cannot span across experiments
-           commonT0_calibration_BF(inputFiles)]
+           commonT0_calibration_BF(inputFiles)]  # this is run-dep
 
     for c in cal:
         # If it's a SequentialBoundary calibration, check if there is any boundary in the config file

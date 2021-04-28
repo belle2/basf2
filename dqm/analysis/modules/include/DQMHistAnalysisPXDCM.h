@@ -55,6 +55,10 @@ namespace Belle2 {
     double m_warnMeanAdhoc{};
     /** error level for mean adhoc plot */
     double m_errorMeanAdhoc{};
+    /** warn level for outside fraction */
+    double m_warnOutside{};
+    /** error level for outside fraction */
+    double m_errorOutside{};
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;

@@ -16,6 +16,12 @@
 #include "trg/ecl/TrgEclMapping.h"
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include "trg/ecl/dataobjects/TRGECLCluster.h"
+
 
 namespace Belle2 {
 
@@ -102,12 +108,13 @@ namespace Belle2 {
     TH1I* h_psn_pure_extra[nskim_gdldqm] = {nullptr};
     //! timtype
     TH1I* h_timtype[nskim_gdldqm] = {nullptr};
-    //! event by event psnm timing distribution
-    TH2I* h_p = nullptr;
-    //! event by event ftdl timing distribution
-    TH2I* h_f = nullptr;
-    //! event by event input timing distribution
-    TH2I* h_i = nullptr;
+    std::vector<int> h_0_vec;
+    ////! event by event psnm timing distribution
+    std::vector<int> h_p_vec;
+    ////! event by event ftdl timing distribution
+    std::vector<int> h_f_vec;
+    ////! event by event input timing distribution
+    std::vector<int> h_i_vec;
 
     TDirectory* oldDir = nullptr;
     TDirectory* dirDQM = nullptr;
@@ -128,13 +135,14 @@ namespace Belle2 {
     void genVcd(void);
     bool anaBitCondition(void);
     bool isFired(std::string bitname);
+    bool isFired_quick(const std::string& bitname, const bool& isPsnm);
+    int getinbitnum(const char* c) const;
+    int getoutbitnum(const char* c) const;
     unsigned n_clocks = 0;
     unsigned evtno = 0;
     unsigned _exp = 0;
     unsigned _run = 0;
     std::vector<int> skim;
-    //private:
-    //StoreArray<TRGGDLUnpackerStore> store;
 
     static const int n_output_extra = 94;
     static const char* output_extra[n_output_extra];
@@ -159,6 +167,11 @@ namespace Belle2 {
     int ee_psn[10] = {0};
     int ee_ftd[10] = {0};
     int ee_itd[10] = {0};
+    int n_leafs = 0;
+    int n_leafsExtra = 0;
+    int nconf = 0;
+    int nword_input  = 0;
+    int nword_output = 0;
 
     //condition database for input bits
     DBObjPtr<TRGGDLDBInputBits>m_dbinput;
@@ -169,6 +182,7 @@ namespace Belle2 {
     DBObjPtr<TRGGDLDBFTDLBits> m_dbftdl;
     unsigned  n_outbit = 0;
     char outbitname[320][100]  = {""};
+
 
     //name of skim from hlt/softwaretrigger/scripts/softwaretrigger/db_access.py
     std::string skim_menu[nskim_gdldqm] = {
@@ -200,8 +214,25 @@ namespace Belle2 {
       "mumutight"
     };
 
+  private:
+
     //ecltrg<->ecl mappint
     TrgEclMapping* trgeclmap = nullptr;
+
+    //Input store array of GDL data
+    StoreArray<TRGGDLUnpackerStore> entAry;
+
+    //Input store array of metadata
+    StoreObjPtr<EventMetaData> bevt;
+
+    //Input store array of HLT
+    StoreObjPtr<SoftwareTriggerResult> result_soft;
+
+    //Input store array of track
+    StoreArray<Track> Tracks;
+
+    //Input store array of ECL
+    //StoreArray<ECLCluster> ECLClusters;
     StoreArray<ECLCalDigit> m_ECLCalDigitData;
     StoreArray<ECLDigit>    m_ECLDigitData;
 

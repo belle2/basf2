@@ -1,5 +1,4 @@
-.. can link to this as `ContinuumSuppression`
-   no need to define an anker here, it will confuse sphinx
+.. _analysis_continuumsuppression:
 
 Continuum suppression
 =====================

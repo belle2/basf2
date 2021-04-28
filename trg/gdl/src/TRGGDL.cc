@@ -33,6 +33,8 @@
 
 #include <TH1I.h>
 
+#include <stdexcept>
+
 #define N_TIMING_REGISTERS 4
 
 using namespace std;
@@ -363,7 +365,10 @@ namespace Belle2 {
       _ftdBits.clear();
       _psnBits.clear();
       for (int i = 0; i < N_InputBits; i++) {
-        _inpBits.push_back(GDLResult->testInput(i));
+        bool inputBit;
+        try { inputBit = GDLResult->testInput(i); }
+        catch (const std::exception&) { inputBit = false; }
+        _inpBits.push_back(inputBit);
       }
 
       if (_algFromDB) {

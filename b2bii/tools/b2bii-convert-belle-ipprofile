@@ -128,7 +128,6 @@ def run_conversion(rundata):
     # get rid of some annoying messages about random seed and globaltags
     b2.logging.log_level = b2.LogLevel.WARNING
 
-    print(args.skipBeamParameters)
     # and create and run the conversion path
     main = b2.Path()
     main.add_module("EventInfoSetter", expList=experiments, runList=runs, evtNumList=events)

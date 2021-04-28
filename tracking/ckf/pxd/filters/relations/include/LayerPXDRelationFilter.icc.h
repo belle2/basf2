@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun, Christian Wessel                             *
+ * Contributors: Nils Braun, Christian Wessel, Simon Kurz                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -47,9 +47,9 @@ namespace Belle2 {
     Super::initialize();
 
     if (m_prefix == "seed") {
-      m_ckfParameters = new OptionalDBObjPtr<CKFParameters>("PXDCKFSeedHitParameters");
+      m_ckfParameters = std::make_unique<OptionalDBObjPtr<CKFParameters>>("PXDCKFSeedHitParameters");
     } else if (m_prefix == "hit") {
-      m_ckfParameters = new OptionalDBObjPtr<CKFParameters>("PXDCKFHitHitParameters");
+      m_ckfParameters = std::make_unique<OptionalDBObjPtr<CKFParameters>>("PXDCKFHitHitParameters");
     } else {
       B2ERROR("Unknown prefix. Apparently, some non-trivial changes to code were done.");
     }
@@ -62,7 +62,7 @@ namespace Belle2 {
 
     // use values from payload if parameter is set to -1
     if (m_param_hitJumping == -1) {
-      if ((*m_ckfParameters).isValid()) {
+      if (m_ckfParameters->isValid()) {
         m_layerJumpPtThreshold = (*m_ckfParameters)->getLayerJumpPtThreshold();
         m_layerJumpLowPt = (*m_ckfParameters)->getLayerJumpLowPt();
         m_layerJumpHighPt = (*m_ckfParameters)->getLayerJumpHighPt();

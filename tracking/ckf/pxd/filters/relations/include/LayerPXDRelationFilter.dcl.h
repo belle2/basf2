@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun, Christian Wessel                             *
+ * Contributors: Nils Braun, Christian Wessel, Simon Kurz                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -57,6 +57,6 @@ namespace Belle2 {
     /// Used to get correct payload
     std::string m_prefix = "";
     /// LayerJump parameter can be read from DB (use pointer as payload name contains 'prefix')
-    DBObjPtr<CKFParameters>* m_ckfParameters;
+    std::unique_ptr<DBObjPtr<CKFParameters>> m_ckfParameters;
   };
 }

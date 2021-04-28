@@ -121,10 +121,10 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, loos
         )
 
     if loose_settings:
-        module_parameters["seedHitJumping"] = 1  # we be set to -1 (read from payload) as soon as payload exists
+        module_parameters["seedHitJumping"] = 1  # will be set to -1 (read from payload) as soon as payload exists
         module_parameters["hitHitJumping"] = 0
     else:
-        module_parameters["seedHitJumping"] = 0  # we be set to -1 (read from payload) as soon as payload exists
+        module_parameters["seedHitJumping"] = 0  # will be set to -1 (read from payload) as soon as payload exists
         module_parameters["hitHitJumping"] = 0
 
     path.add_module("ToPXDCKF",

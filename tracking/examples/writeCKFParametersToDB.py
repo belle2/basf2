@@ -4,6 +4,10 @@ from ROOT import Belle2
 
 
 def writeCKFParametersToDB(iovList=(0, 0, 0, 0), ptThreshold=-1., layerJumpLowPt=1, layerJumpHighPt=1):
+    """
+    run this script to create db file storing the payload information of the CKFParameters
+    see `tracking/dbobjects/include/CKFParameters.h` for definition of the parameters
+    """
 
     # just a small sanity check (expLow, runLow, expHigh, runHigh)
     if len(iovList) != 4:

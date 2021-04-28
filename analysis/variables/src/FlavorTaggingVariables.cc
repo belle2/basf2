@@ -1806,7 +1806,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosTPTO"  , cosTPTO , "Returns cosine of angle between thrust axis of given particle and thrust axis of ROE.");
     REGISTER_VARIABLE("lambdaFlavor", lambdaFlavor,
                       "Returns 1.0 if particle is ``Lambda0``, -1.0 in case of ``anti-Lambda0``, 0.0 otherwise.");
-    REGISTER_VARIABLE("isLambda", isLambda,  "1.0 if particle is truth-matched to ``Lambda0``, 0.0 otherwise.");
+    REGISTER_VARIABLE("isLambda", isLambda,  "Returns 1.0 if particle is truth-matched to ``Lambda0``, 0.0 otherwise.");
     REGISTER_VARIABLE("lambdaZError", lambdaZError,  "Returns the variance of the z-component of the decay vertex.");
     REGISTER_VARIABLE("momentumOfSecondDaughter", momentumOfSecondDaughter,
                       "Returns the momentum of second daughter if exists, 0. otherwise.");
@@ -1841,7 +1841,7 @@ The output of the variable is 0 otherwise.
 If one particle in the RestOfEvent is found to belong the reconstructed ``B0``, the output is -2(2) for a ``anti-B0`` (``B0``) on the recostructed side.");
 )DOC");
     REGISTER_VARIABLE("ancestorHasWhichFlavor", ancestorHasWhichFlavor,
-                      "Checks the decay chain of the given particle upwards up to the Y(4S) resonance and outputs 0 (1) if an ancestor is found to be a ``anti-B0`` (``B0``), if not -2.");
+                      "Checks the decay chain of the given particle upwards up to the ``Upsilon(4S)`` resonance and outputs 0 (1) if an ancestor is found to be a ``anti-B0`` (``B0``), if not -2.");
     REGISTER_VARIABLE("B0mcErrors", B0mcErrors, "Returns MC-matching flag, see :b2:var:`mcErrors` for the particle, e.g. ``B0`` .");
     REGISTER_VARIABLE("isRelatedRestOfEventMajorityB0Flavor", isRelatedRestOfEventMajorityB0Flavor,
                       "Returns 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a ``anti-B0`` (``B0``).");
@@ -1901,7 +1901,7 @@ The probability is accessed via ``extraInfoName``, which can have the following 
 
     REGISTER_VARIABLE("isRightTrack(particleName)", isRightTrack, R"DOC(
 Returns 1.0 if the given particle was really from a B-meson depending on category provided in ``particleName`` argument, 0.0 otherwise.
-Allowed input values for ``particleName`` argument for this variable are the following:
+Allowed input values for ``particleName`` argument in this variable are the following:
 
 * Electron,
 * IntermediateElectron,
@@ -1918,7 +1918,7 @@ Allowed input values for ``particleName`` argument for this variable are the fol
 )DOC");
     REGISTER_VARIABLE("isRightCategory(particleName)", isRightCategory,  R"DOC(
 Returns 1.0 if the class track by ``particleName`` category has the same flavor as the MC target track, 0.0 otherwise.
-Allowed input values for ``particleName`` argument for this variable are the following:
+Allowed input values for ``particleName`` argument in this variable are the following:
 
 * Electron,
 * IntermediateElectron,
@@ -1937,23 +1937,23 @@ Allowed input values for ``particleName`` argument for this variable are the fol
 
 )DOC");
     REGISTER_VARIABLE("QpOf(particleListName, outputExtraInfo, rankingExtraInfo)", QpOf,  R"DOC(
-[Eventbased] Returns the :math:`q*p` value for a given particle list provided in the 1st argument, 
-where p is the probability of a category stored as extraInfo, provided in the 2nd argument, 
+[Eventbased] Returns the :math:`q*p` value for a given particle list provided as the 1st argument, 
+where math:`p` is the probability of a category stored as extraInfo, provided as the 2nd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.
-The particle is selected after ranking according to a flavor tagging extraInfo, provided in the 3rd argument, 
+The particle is selected after ranking according to a flavor tagging extraInfo, provided as the 3rd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.
 )DOC");
     REGISTER_VARIABLE("weightedQpOf(particleListName, outputExtraInfo, rankingExtraInfo)", weightedQpOf, R"DOC(
-[Eventbased] Returns the weighted :math:`q*p` value for a given particle list, provided in the  1st argument, 
-where p is the probability of a category stored as extraInfo, provided in the 2nd argument, 
+[Eventbased] Returns the weighted :math:`q*p` value for a given particle list, provided as the  1st argument, 
+where math:`p` is the probability of a category stored as extraInfo, provided in the 2nd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.
-The particles in the list are ranked according to a flavor tagging extraInfo, provided in the 3rd argument, 
+The particles in the list are ranked according to a flavor tagging extraInfo, provided as the 3rd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.
 The values for the three top particles is combined into an effective (weighted) output.
 )DOC");
     REGISTER_VARIABLE("variableOfTarget(particleListName, inputVariable, rankingExtraInfo)", variableOfTarget, R"DOC(
-[Eventbased] Returns the value of an input variable (argument[1]) for a particle selected from the given list  provided in the 1st argument.
-The particles are ranked according to a flavor tagging extraInfo, provided in the 2nd argument, 
+[Eventbased] Returns the value of an input variable provided as the 2nd argument for a particle selected from the given list provided as the 1st argument.
+The particles are ranked according to a flavor tagging extraInfo, provided as the 2nd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.
 )DOC");
 
@@ -1962,20 +1962,21 @@ allowed values are same as in :b2:var:`hasHighestProbInCat`.
     REGISTER_VARIABLE("isTrueCategory(categoryName)", isTrueCategory,
                       "Returns 1 if the given category tags the B0 MC flavor correctly, 0 otherwise.");
     REGISTER_VARIABLE("qrOutput(combinerMethod)", qrOutput,
-                      "Returns the output of the flavorTagger for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.");
+                      "Returns the output of the flavorTagger for the given combinerMethod. The available combiner methods are 'FBDT' or 'FANN'.");
     REGISTER_VARIABLE("qOutput(combinerMethod)", qOutput,
-                      "Returns the flavor tag q output of the flavorTagger for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.");
+                      "Returns the flavor tag q output of the flavorTagger for the given combinerMethod. The available combiner methods are 'FBDT' or 'FANN'.");
     REGISTER_VARIABLE("rBinBelle(combinerMethod)", rBinBelle, R"DOC(
-Returns the corresponding :math:`r` (dilution) bin according to the Belle binning for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.
+Returns the corresponding :math:`r` (dilution) bin according to the Belle binning for the given ``combinerMethod``. 
+The available combiner methods are 'FBDT' and 'FANN'.
 The return values and the corresponding dilution ranges are the following:
 
-* 0: :math:`0 < r < 0.1`;
-* 1: :math:`0.1 < r < 0.25`;
-* 2: :math:`0.25 < r < 0.5`;
-* 3: :math:`0.5 < r < 0.625`;
-* 4: :math:`0.625 < r < 0.75`;
-* 5: :math:`0.75 < r < 0.875`;
-* 6: :math:`0.875 < r < 1.`.
+* 0: :math:`0.000 < r < 0.100`;
+* 1: :math:`0.100 < r < 0.250`;
+* 2: :math:`0.250 < r < 0.500`;
+* 3: :math:`0.500 < r < 0.625`;
+* 4: :math:`0.625 < r < 0.750`;
+* 5: :math:`0.750 < r < 0.875`;
+* 6: :math:`0.875 < r < 1.000`.
 
 )DOC");
 
@@ -1985,11 +1986,11 @@ The allowed categories are the official Flavor Tagger Category Names.
 )DOC");
     REGISTER_VARIABLE("isTrueFTCategory(categoryName)", isTrueFTCategory, R"DOC(
 Returns 1 if the target particle (checking the decay chain) of the category with the given name is found in the MC particles, 
-and if it provides the right flavor. The allowed categories are the official Flavor Tagger Category Names.");
+and if it provides the right flavor. The allowed categories are the official Flavor Tagger Category Names.
 )DOC");
     REGISTER_VARIABLE("hasTrueTargets(categoryName)", hasTrueTargets, R"DOC(
 Returns 1 if target particles (checking only the decay chain) of the category with the given name is found in the MC particles. 
-The allowed categories are the official Flavor Tagger Category Names.");
+The allowed categories are the official Flavor Tagger Category Names.
 )DOC");
   }
 }

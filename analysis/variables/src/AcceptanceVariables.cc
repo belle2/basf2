@@ -167,17 +167,17 @@ namespace Belle2 {
     REGISTER_VARIABLE("thetaInCDCAcceptance",   thetaInCDCAcceptance, R"DOC(
 Returns 1.0 if particle is within CDC angular acceptance, 0.0 otherwise.
 This variable checks if the particle polar angle :math:`\theta` is within the range :math:`17^\circ < \theta < 150^\circ`.
-The polar angle is computed using the reconstructed particle momentum.
+The polar angle is computed using only the initial particle momentum.
 )DOC");
     REGISTER_VARIABLE("thetaInTOPAcceptance",   thetaInTOPAcceptance, R"DOC(
 Returns 1.0 if particle is within TOP angular acceptance, 0.0 otherwise.
 This variable checks if the particle polar angle :math:`\theta` is within the range :math:`31^\circ < \theta < 128^\circ`.
-The polar angle is computed using the reconstructed particle momentum.
+The polar angle is computed using only the initial particle momentum.
 )DOC");
     REGISTER_VARIABLE("thetaInARICHAcceptance", thetaInARICHAcceptance, R"DOC(
 Returns 1.0 if particle is within ARICH angular acceptance, 0.0 otherwise.
 This variable checks if the particle polar angle :math:`\theta` is within the range :math:`14^\circ < \theta < 30^\circ`.
-The polar angle is computed using the reconstructed particle momentum.
+The polar angle is computed using only the initial particle momentum.
 )DOC");
     REGISTER_VARIABLE("thetaInECLAcceptance",   thetaInECLAcceptance, R"DOC(
 Checks if particle is within ECL angular acceptance. 
@@ -189,18 +189,18 @@ Return values and the corresponding :math:`\theta` ranges are the following:
 * 2: Barrel ECL,   :math:`32.2^\circ < \theta < 128.7^\circ`; 
 * 3: Backward ECL, :math:`130.7^\circ < \theta < 155.1^\circ`.
 
-The polar angle is computed using the reconstructed particle momentum.
+The polar angle is computed using only the initial particle momentum.
 )DOC");
     REGISTER_VARIABLE("thetaInBECLAcceptance",  thetaInBECLAcceptance, R"DOC(
 Returns 1.0 if particle is within Barrel ECL angular acceptance, 0.0 otherwise.
 This variable checks if the particle polar angle :math:`\theta` is within the range :math:`32.2^\circ < \theta < 128.7^\circ`.
-The polar angle is computed using the reconstructed particle momentum.
+The polar angle is computed using only the initial particle momentum.
 )DOC");
     REGISTER_VARIABLE("thetaInEECLAcceptance",  thetaInEECLAcceptance, R"DOC(
 Returns 1.0 if particle is within Endcap ECL angular acceptance, 0.0 otherwise.
 This variable checks if the particle polar angle :math:`\theta` is within the range :math:`12.4^\circ < \theta < 31.4^\circ` 
 or :math:`130.7^\circ < \theta < 155.1^\circ`.
-The polar angle is computed using the reconstructed particle momentum.
+The polar angle is computed using only the initial particle momentum.
 )DOC");
     REGISTER_VARIABLE("thetaInKLMAcceptance",   thetaInKLMAcceptance,  R"DOC(
 Checks if particle is within KLM angular acceptance. 
@@ -213,22 +213,24 @@ Return values and the corresponding :math:`\theta` ranges are the following:
 * 3: Barrel,           :math:`47^\circ < \theta < 122^\circ`; 
 * 4: Backward overlap, :math:`122^\circ < \theta < 130^\circ`; 
 * 5: Backward endcap,  :math:`130^\circ < \theta < 155^\circ`.
+
+The polar angle is computed using only the initial particle momentum.
 )DOC");
 
     REGISTER_VARIABLE("thetaInBKLMAcceptance",  thetaInBKLMAcceptance, R"DOC(
 Returns 1.0 if particle is within Barrel KLM angular acceptance, 0.0 otherwise.
 This variable checks if the particle polar angle :math:`\theta` is within the range :math:`37^\circ < \theta < 130^\circ`.
-The polar angle is computed using the reconstructed particle momentum.
+The polar angle is computed using only the initial particle momentum.
 )DOC");
     REGISTER_VARIABLE("thetaInEKLMAcceptance",  thetaInEKLMAcceptance, R"DOC(
 Returns 1.0 if particle is within Endcap KLM angular acceptance, 0.0 otherwise.
 This variable checks if the particle polar angle :math:`\theta` is within the range :math:`18^\circ < \theta < 47^\circ` or :math:`122^\circ < \theta < 155^\circ`.
-The polar angle is computed using the reconstructed particle momentum.
+The polar angle is computed using only the initial particle momentum.
 )DOC");
     REGISTER_VARIABLE("thetaInKLMOverlapAcceptance",  thetaInKLMOverlapAcceptance, R"DOC(
 Returns 1.0 if particle is within the angular region where KLM barrel and endcaps overlap, 0.0 otherwise.
 This variable checks if the particle polar angle :math:`\theta` is within the range :math:`37^\circ < \theta < 47^\circ` or :math:`122^\circ < \theta < 130^\circ`.
-The polar angle is computed using the reconstructed particle momentum.
+The polar angle is computed using only the initial particle momentum.
 )DOC");
 
     REGISTER_VARIABLE("ptInTOPAcceptance",   ptInTOPAcceptance,  "Returns 1.0 if particle transverse momentum :math:`p_t` is within TOP acceptance, :math:`p_t > 0.27` GeV, 0.0 otherwise.");

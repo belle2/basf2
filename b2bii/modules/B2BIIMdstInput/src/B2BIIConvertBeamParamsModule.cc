@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015-2018 Belle II Collaboration                          *
+ * Copyright(C) 2015-2021 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter                                            *
@@ -61,6 +61,15 @@ namespace Belle2 {
     addParam("mcFlag", m_mcFlag, "which mc flag to use", m_mcFlag);
     addParam("missingBenergy", m_missingBenergy, "where to store information about runs with missing database info", m_missingBenergy);
     addParam("missingIp", m_missingIp, "where to store information about runs with missing IP profile info", m_missingIp);
+    addParam("smearEnergy", m_SmearEnergy, "Allow beam energy smearing for MC generation", true);
+    addParam("smearDirection", m_SmearDirection, "Allow beam direction smearing for MC generation", true);
+    addParam("smearVertex", m_SmearVertex, "Allow IP position smearing for MC generation", true);
+    addParam("generateCMS", m_GenerateCMS, "Generate events in CMS, not lab system.", false);
+    addParam("storeBeamParameters", m_storeBeamParameters, "Store the BeamParameters payloads in the localDB", true);
+    addParam("storeCollisionInvariantMass", m_storeCollisionInvariantMass, "Store the CollisionInvariantMass payloads in the localDB",
+             true);
+    addParam("storeCollisionBoostVector", m_storeCollisionBoostVector, "Store the CollisionBoostVector payloads in the localDB", true);
+    addParam("storeBeamSpot", m_storeBeamSpot, "Store the BeamSpot payloads in the localDB", true);
   }
 
   void B2BIIConvertBeamParamsModule::initialize()
@@ -110,13 +119,24 @@ namespace Belle2 {
     // please fix this (April 2021)!
     std::vector<double> covarianceHer = {0.00513 * 0.00513}; // Energy spread only. No idea about the direction spread
     std::vector<double> covarianceLer = {0.002375 * 0.002375}; // Energy spread only. No idea about the direction spread
-    std::vector<double> covariance; //this is used later on
 
     IntervalOfValidity iov(m_event->getExperiment(), m_event->getRun(), m_event->getExperiment(), m_event->getRun());
 
     BeamParameters beamParams;
     beamParams.setLER(Eler, angleLer, covarianceHer);
     beamParams.setHER(Eher, angleHer, covarianceLer);
+
+    // set the flags according to the module settings
+    int flags = 0;
+    if (m_GenerateCMS)
+      flags |= BeamParameters::c_generateCMS;
+    if (m_SmearEnergy)
+      flags |= BeamParameters::c_smearBeamEnergy;
+    if (m_SmearDirection)
+      flags |= BeamParameters::c_smearBeamDirection;
+    if (m_SmearVertex)
+      flags |= BeamParameters::c_smearVertex;
+    beamParams.setGenerationFlags(flags);
 
     CollisionBoostVector collisionBoostVector;
     CollisionInvariantMass collisionInvM;
@@ -126,8 +146,10 @@ namespace Belle2 {
     collisionInvM.setMass(cms.M(), 0.0 , 0.0);
 
     // Boost vector and invariant mass are not intra-run dependent, store now
-    Database::Instance().storeData("CollisionBoostVector", &collisionBoostVector, iov);
-    Database::Instance().storeData("CollisionInvariantMass", &collisionInvM, iov);
+    if (m_storeCollisionBoostVector)
+      Database::Instance().storeData("CollisionBoostVector", &collisionBoostVector, iov);
+    if (m_storeCollisionInvariantMass)
+      Database::Instance().storeData("CollisionInvariantMass", &collisionInvM, iov);
 
     // and now we continue with the vertex
     if (!Belle::IpProfile::usable()) {
@@ -138,11 +160,13 @@ namespace Belle2 {
         std::ofstream file(m_missingIp.c_str(), std::ios::app);
         file << m_event->getExperiment() << "," << m_event->getRun() << std::endl;
       }
+      std::vector<double> covariance; // 0 = no error
       beamParams.setVertex(TVector3(
                              std::numeric_limits<double>::quiet_NaN(),
                              std::numeric_limits<double>::quiet_NaN(),
                              std::numeric_limits<double>::quiet_NaN()), covariance);
-      Database::Instance().storeData("BeamParameters", &beamParams, iov);
+      if (m_storeBeamParameters)
+        Database::Instance().storeData("BeamParameters", &beamParams, iov);
 
       BeamSpot beamSpot;
       beamSpot.setIP(
@@ -151,8 +175,10 @@ namespace Belle2 {
                  std::numeric_limits<double>::quiet_NaN()
                 ), TMatrixTSym<double>(3)
       );
-      Database::Instance().storeData("BeamSpot", &beamSpot, iov);
-      B2INFO("No IpProfile, created BeamEnergy Payload");
+      if (m_storeBeamSpot) {
+        Database::Instance().storeData("BeamSpot", &beamSpot, iov);
+        B2INFO("No IpProfile, created BeamSpot Payload");
+      }
       return;
     }
 
@@ -205,13 +231,17 @@ namespace Belle2 {
     }
     if (beamparamsList.size() == 1) {
       // just one bin? no need to store event dependency
-      Database::Instance().storeData("BeamParameters", &beamparamsList.back(), iov);
-      Database::Instance().storeData("BeamSpot", &beamspotList.back(), iov);
+      if (m_storeBeamParameters)
+        Database::Instance().storeData("BeamParameters", &beamparamsList.back(), iov);
+      if (m_storeBeamSpot)
+        Database::Instance().storeData("BeamSpot", &beamspotList.back(), iov);
       B2INFO("Created event independent payload");
     } else {
       // otherwise store full information
-      Database::Instance().storeData("BeamParameters", beamparams.get(), iov);
-      Database::Instance().storeData("BeamSpot", beamspots.get(), iov);
+      if (m_storeBeamParameters)
+        Database::Instance().storeData("BeamParameters", beamparams.get(), iov);
+      if (m_storeBeamSpot)
+        Database::Instance().storeData("BeamSpot", beamspots.get(), iov);
       B2INFO("Created event dependent payload with " << beamparamsList.size() << " entries");
     }
   }

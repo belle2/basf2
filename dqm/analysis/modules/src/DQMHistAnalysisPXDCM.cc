@@ -36,6 +36,8 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 10000);
   addParam("warnMeanAdhoc", m_warnMeanAdhoc, "warn level for peak position", 1.0);
   addParam("errorMeanAdhoc", m_errorMeanAdhoc, "error level for peak position", 2.0);
+  addParam("warnOutside", m_warnOutside, "warn level for outside fraction", 1e-5);
+  addParam("errorOutside", m_errorOutside, "error level for outside fraction", 1e-4);
   B2DEBUG(99, "DQMHistAnalysisPXDCM: Constructor done.");
 }
 
@@ -67,14 +69,16 @@ void DQMHistAnalysisPXDCMModule::initialize()
   m_cCommonMode = new TCanvas((m_histogramDirectoryName + "/c_CommonMode").data());
   m_cCommonModeDelta = new TCanvas((m_histogramDirectoryName + "/c_CommonModeDelta").data());
 
-  m_hCommonMode = new TH2D("CommonMode", "CommonMode; Module; CommonMode", m_PXDModules.size(), 0, m_PXDModules.size(), 63, 0, 63);
+  m_hCommonMode = new TH2D("hPXDCommonMode", "PXD CommonMode; Module; CommonMode", m_PXDModules.size(), 0, m_PXDModules.size(), 63, 0,
+                           63);
   m_hCommonMode->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonMode->SetStats(false);
-  m_hCommonModeDelta = new TH2D("CommonModeAdhoc", "CommonMode Adhoc; Module; CommonMode", m_PXDModules.size(), 0,
+  m_hCommonModeDelta = new TH2D("hPXDCommonModeAdhoc", "PXD CommonMode Adhoc; Module; CommonMode", m_PXDModules.size(), 0,
                                 m_PXDModules.size(), 63, 0, 63);
   m_hCommonModeDelta->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonModeDelta->SetStats(false);
-  m_hCommonModeOld = new TH2D("CommonModeOld", "CommonMode Old; Module; CommonMode", m_PXDModules.size(), 0, m_PXDModules.size(),
+  m_hCommonModeOld = new TH2D("hPXDCommonModeOld", "PXD CommonMode Old; Module; CommonMode", m_PXDModules.size(), 0,
+                              m_PXDModules.size(),
                               63, 0, 63);
   m_hCommonModeOld->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonModeOld->SetStats(false);
@@ -187,7 +191,7 @@ void DQMHistAnalysisPXDCMModule::event()
 
       /// TODO: integration intervalls depend on CM default value, this seems to be agreed =10
       // Attention, Integral uses the bin nr, not the value!
-      outside_full += hh1->Integral(16, 63);
+      outside_full += hh1->Integral(16 + 1, 63);
       // FIXME currently we have to much noise below the line ... thus excluding this to avoid false alarms
       // outside_full += hh1->Integral(1 /*0*/, 5); /// FIXME we exclude bin 0 as we use it for debugging/timing pixels
       all_outside += outside_full;
@@ -195,8 +199,8 @@ void DQMHistAnalysisPXDCMModule::event()
       double dhpc = hh1->GetBinContent(64);
       all_cm += dhpc;
       if (current_full > 1) {
-        error_flag |= (outside_full / current_full > 1e-5); /// TODO level might need adjustment
-        warn_flag |= (outside_full / current_full > 1e-6); /// TODO level might need adjustment
+        error_flag |= (outside_full / current_full > m_errorOutside); /// TODO level might need adjustment
+        warn_flag |= (outside_full / current_full > m_warnOutside); /// TODO level might need adjustment
 //         error_flag |= (dhpc / current_full > 1e-5); // DHP Fifo overflow ... might be critical/unrecoverable
 //         warn_flag |= (dhpc / current_full > 1e-6); // DHP Fifo overflow ... might be critical/unrecoverable
       }

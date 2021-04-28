@@ -188,7 +188,7 @@ class CharmoniumPsi(BaseSkim):
         # The estimated ratio of efficiencies in B decays in release 5.1.5 is
         # 1.00 (J/psi:eebrems) : 0.95 (J/psi:eebrems2) : 0.82 (J/psi:ee).
         ma.correctBremsBelle('e+:brems', 'e+:loosepid', 'gamma:all',
-                             minimumEnergy=0.001, angleThreshold=0.05,
+                             angleThreshold=0.05,
                              path=path)
         ma.correctBrems('e+:brems2', 'e+:loosepid', 'gamma:all', path=path)
 

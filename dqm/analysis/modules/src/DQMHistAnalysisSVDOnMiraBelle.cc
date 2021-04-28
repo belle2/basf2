@@ -416,16 +416,16 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("avgEffL6X2V", avgEffL6X2[1]);
     m_monObj->setVariable("avgEffL6X3V", avgEffL6X3[1]);
     m_monObj->setVariable("avgEffL6X4V", avgEffL6X4[1]);
-    m_monObj->setVariable("avgEffL311U", avgEffL311UV[1]);
-    m_monObj->setVariable("avgEffL312U", avgEffL312UV[1]);
-    m_monObj->setVariable("avgEffL321U", avgEffL321UV[1]);
-    m_monObj->setVariable("avgEffL322U", avgEffL322UV[1]);
-    m_monObj->setVariable("avgEffL461U", avgEffL461UV[1]);
-    m_monObj->setVariable("avgEffL462U", avgEffL462UV[1]);
-    m_monObj->setVariable("avgEffL581U", avgEffL581UV[1]);
-    m_monObj->setVariable("avgEffL582U", avgEffL582UV[1]);
-    m_monObj->setVariable("avgEffL6101U", avgEffL6101UV[1]);
-    m_monObj->setVariable("avgEffL6102U", avgEffL6102UV[1]);
+    m_monObj->setVariable("avgEffL311V", avgEffL311UV[1]);
+    m_monObj->setVariable("avgEffL312V", avgEffL312UV[1]);
+    m_monObj->setVariable("avgEffL321V", avgEffL321UV[1]);
+    m_monObj->setVariable("avgEffL322V", avgEffL322UV[1]);
+    m_monObj->setVariable("avgEffL461V", avgEffL461UV[1]);
+    m_monObj->setVariable("avgEffL462V", avgEffL462UV[1]);
+    m_monObj->setVariable("avgEffL581V", avgEffL581UV[1]);
+    m_monObj->setVariable("avgEffL582V", avgEffL582UV[1]);
+    m_monObj->setVariable("avgEffL6101V", avgEffL6101UV[1]);
+    m_monObj->setVariable("avgEffL6102V", avgEffL6102UV[1]);
   }
 
 

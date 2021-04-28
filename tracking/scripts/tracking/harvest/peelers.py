@@ -668,7 +668,7 @@ def get_seed_track_fit_result(reco_track):
 
 
 def is_correct_rl_information(cdc_hit, reco_track, hit_lookup):
-    rl_info = reco_track.getRightLeftInformation("const Belle2::CDCHit")(cdc_hit)
+    rl_info = reco_track.getRightLeftInformation["const Belle2::CDCHit"](cdc_hit)
     truth_rl_info = hit_lookup.getRLInfo(cdc_hit)
 
     if rl_info == Belle2.RecoHitInformation.c_right and truth_rl_info == 1:

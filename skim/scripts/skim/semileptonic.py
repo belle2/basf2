@@ -13,7 +13,11 @@ __authors__ = [
 import modularAnalysis as ma
 from skim.standardlists.charm import (loadKForBtoHadrons, loadPiForBtoHadrons,
                                       loadStdD0, loadStdDplus, loadStdDstar0,
-                                      loadStdDstarPlus)
+                                      loadStdDstarPlus, loadPiSkimHighEff,
+                                      loadKSkimHighEff, loadSlowPi,
+                                      loadSkimHighEffD0_Kpi, loadSkimHighEffDstarPlus_D0pi_Kpi,
+                                      loadSkimHighEffD0_Kpipipi, loadSkimHighEffDstarPlus_D0pi_Kpipipi,
+                                      loadStdD0_eff20_Kpipi0, loadStdDstarPlus_D0pi_Kpipi0_eff20)
 from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons
 from skimExpertFunctions import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi
@@ -175,8 +179,8 @@ class SLUntagged(BaseSkim):
 
     __authors__ = ["Phillip Urquijo", "Racha Cheaib"]
     __description__ = (
-        "Skim for semileptonic decays, :math:`B: decays "
-        "(:math:`B \\to D \\ell\\nu,` where :math:`\\ell=e,\\mu`)"
+        "Skim for semileptonic decays, :math:`B` decays "
+        "(:math:`B \\to D \\ell\\nu`, where :math:`\\ell=e,\\mu`)"
     )
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
@@ -261,3 +265,92 @@ class SLUntagged(BaseSkim):
             ],
             variables_2d=[('deltaE', 100, -5, 5, 'Mbc', 100, 4.0, 5.3, 'Mbc vs deltaE', __liaison__, '', '')],
             path=path)
+
+
+@fancy_skim_header
+class B0toDstarl_Kpi_Kpipi0_Kpipipi(BaseSkim):
+    """
+    Cuts applied:
+
+    * ``SkimHighEff tracks thetaInCDCAcceptance AND abs(dr) < 2 AND abs(dz) < 5 AND PID>=0.01``
+    * ``slowPi tracks thetaInCDCAcceptance AND abs(dr) < 2 AND abs(dz) < 5 AND useCMSFrame(p) < 0.4``
+    * :math:`2.5 > p_{\\ell} > 1.1\\,\\text{GeV}`
+    * ``lepton with abs(d0) < 0.5 AND abs(z0) < 2 AND thetaInCDCAcceptance AND ID >= 0.95 AND 1.1 < useCMSFrame(p) < 2.5``
+    * ``1.8 < M_D0 < 2.0``
+    * ``DM_Dstar_D < 0.16``
+
+    Reconstructed decays:
+
+    * :math:`B^{0}\\to D^{*-} (D^{0} \\to K^+ \\pi^-) e^+`,
+    * :math:`B^{0}\\to D^{*-} (D^{0} \\to K^+ \\pi^- \\pi^0) e^+`,
+    * :math:`B^{0}\\to D^{*-} (D^{0} \\to K^+ \\pi^- \\pi^- \\pi^+) e^+`,
+    * :math:`B^{0}\\to D^{*-} (D^{0} \\to K^+ \\pi^-) mu^+`,
+    * :math:`B^{0}\\to D^{*-} (D^{0} \\to K^+ \\pi^- \\pi^0) mu^+`,
+    * :math:`B^{0}\\to D^{*-} (D^{0} \\to K^+ \\pi^- \\pi^- \\pi^+) mu^+`,
+
+    Note:
+
+        This skim uses `skim.standardlists.charm.loadSkimHighEffD0_Kpi`,
+        `skim.standardlists.charm.loadSkimHighEffD0_Kpipipi` and
+        `skim.standardlists.charm.loadStdD0_eff20_Kpipi0`, where :math:`D^0`
+        channel is defined.
+        `skim.standardlists.charm.loadSkimHighEffDstarPlus_D0pi_Kpi`,
+        `skim.standardlists.charm.loadSkimHighEffDstarPlus_D0pi_Kpipipi`,
+        `skim.standardlists.charm.loadStdDstarPlus_D0pi_Kpipi0_eff20`,where the
+        :math:`D^{*-}` channel is defined.
+
+        The pion and kaon lists used to define :math:`D^0` and :math:`D^{*-}` are:
+        `skim.standardlists.charm.loadPiSkimHighEff`, `skim.standardlists.charm.loadKSkimHighEff` and
+        `skim.standardlists.charm.loadSlowPi`
+    """
+    __authors__ = ["Bae Hanwook, Chiara La Licata"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, semileptonic"
+
+    ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
+
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdMu("all", path=path)
+        stdPi("all", path=path)
+        stdK("all", path=path)
+        stdPi0s("eff20_May2020", path=path)
+        loadPiSkimHighEff(path=path)
+        loadKSkimHighEff(path=path)
+        loadSlowPi(path=path)
+        loadSkimHighEffD0_Kpi(path=path)
+        loadSkimHighEffDstarPlus_D0pi_Kpi(path=path)
+        loadSkimHighEffD0_Kpipipi(path=path)
+        loadSkimHighEffDstarPlus_D0pi_Kpipipi(path=path)
+        loadStdD0_eff20_Kpipi0(path=path)
+        loadStdDstarPlus_D0pi_Kpipi0_eff20(path=path)
+
+    def build_lists(self, path):
+
+        ma.cutAndCopyList(
+            'e+:sig',
+            'e+:all',
+            'abs(d0) < 0.5 and abs(z0) < 2 and thetaInCDCAcceptance and electronID >= 0.95 and 1.1 < useCMSFrame(p) < 2.5 ',
+            path=path)
+        ma.cutAndCopyList(
+            'mu+:sig',
+            'mu+:all',
+            'abs(d0) < 0.5 and abs(z0) < 2 and thetaInCDCAcceptance and muonID >= 0.95 and 1.1 < useCMSFrame(p) < 2.5',
+            path=path)
+
+        B0_channels = ["D*-:D0_Kpi_skimhigheff e+:sig",
+                       "D*-:D0_Kpipi0_eff20 e+:sig",
+                       "D*-:D0_Kpipipi_skimhigheff e+:sig",
+                       "D*-:D0_Kpi_skimhigheff mu+:sig",
+                       "D*-:D0_Kpipi0_eff20 mu+:sig",
+                       "D*-:D0_Kpipipi_skimhigheff mu+:sig"]
+
+        B0_list = []
+
+        for chID, channel in enumerate(B0_channels):
+            ma.reconstructDecay("B0:Dstl_kpi_kpipi0_kpipipi" + str(chID) + " -> " + channel, "", chID, path=path)
+            B0_list.append("B0:Dstl_kpi_kpipi0_kpipipi" + str(chID))
+
+        self.SkimLists = B0_list

@@ -55,6 +55,12 @@ namespace Belle2 {
     std::map<std::string, std::pair<TCanvas*, TH1F*>> m_hl1Ratios;
     /// Histogram with retention rate per unit of some hlt filter lines
     std::map<std::string, std::pair<TCanvas*, TH1F*>> m_hRetentionPerUnit;
+    /// Histogram with mean processing time per process
+    std::pair<TCanvas*, TH1F*> m_hMeanTime = {nullptr, nullptr};
+    /// Histogram with fraction of events with error flags
+    std::pair<TCanvas*, TH1D*> m_hErrorFlagFraction = {nullptr, nullptr};
+    /// Histogram with fraction of events filtered per unit
+    std::pair<TCanvas*, TH1D*> m_hFilteredFractionPerUnit = {nullptr, nullptr};
 
 #ifdef _BELLE2_EPICS
     //! one EPICS PV

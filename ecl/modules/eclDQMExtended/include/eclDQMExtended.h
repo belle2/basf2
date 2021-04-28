@@ -26,6 +26,7 @@
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 //ECL
 #include <ecl/dataobjects/ECLDigit.h>

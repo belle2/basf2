@@ -43,12 +43,12 @@ def add_hlt_dqm(path, run_type, components, dqm_mode, create_hlt_unit_histograms
     path.add_module('StatisticsSummary').set_name('Sum_HLT_DQM_' + dqm_mode.name)
 
 
-def add_expressreco_dqm(path, run_type, components):
+def add_expressreco_dqm(path, run_type, components, dqm_mode=constants.DQMModes.dont_care.name):
     """
     Add all the DQM modules for ExpressReco to the path
     """
     add_online_dqm(path, run_type=run_type, dqm_environment=constants.Location.expressreco.name, components=components,
-                   dqm_mode=constants.DQMModes.dont_care.name)
+                   dqm_mode=dqm_mode)
 
 
 def add_geometry_if_not_present(path):

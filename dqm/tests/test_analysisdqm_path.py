@@ -5,7 +5,7 @@ should, and runs without errors (or problematic database accesses).
 """
 
 # Sam Cunliffe
-# (but in case this test breaks, better check with Boqun and/or Lonke)
+# (but in case this test breaks, better check with Boqun and/or Longke)
 
 import basf2 as b2
 import b2test_utils

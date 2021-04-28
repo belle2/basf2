@@ -85,6 +85,15 @@ def get_argument_parser():
                         help="File containing exp,run numbers per line to exclude from conversion.")
     parser.add_argument("--exp", default=None, type=int,
                         help="If present limit the conversion to all runs in this experiment")
+    parser.add_argument("--skipCollisionBoostVector", default=False, action="store_true",
+                        help="Skip the CollisionBoostVector payload")
+    parser.add_argument("--skipBeamParameters", default=False, action="store_true",
+                        help="Skip the BeamParameters payload")
+    parser.add_argument("--skipCollisionInvariantMass", default=False, action="store_true",
+                        help="Skip the CollisionInvariantMass payload")
+    parser.add_argument("--skipBeamSpot", default=False, action="store_true",
+                        help="Skip the BeamSpot payload")
+
     return parser
 
 
@@ -119,11 +128,20 @@ def run_conversion(rundata):
     # get rid of some annoying messages about random seed and globaltags
     b2.logging.log_level = b2.LogLevel.WARNING
 
+    print(args.skipBeamParameters)
     # and create and run the conversion path
     main = b2.Path()
     main.add_module("EventInfoSetter", expList=experiments, runList=runs, evtNumList=events)
     main.add_module(TCPWaiter())
     main.add_module("B2BIIConvertBeamParams", mcFlag=1, missingBenergy=missing_benergy, missingIp=missing_ip, logLevel=b2.LogLevel.INFO)
+    if args.skipBeamParameters:
+       	b2.set_module_parameters(main, "B2BIIConvertBeamParams", storeBeamParameters=False)
+    if args.skipCollisionInvariantMass:
+       	b2.set_module_parameters(main, "B2BIIConvertBeamParams", storeCollisionInvariantMass=False)
+    if args.skipCollisionBoostVector:
+       	b2.set_module_parameters(main, "B2BIIConvertBeamParams", storeCollisionBoostVector=False)
+    if args.skipBeamSpot:
+       	b2.set_module_parameters(main, "B2BIIConvertBeamParams", storeBeamSpot=False)
     b2.process(main)
     # and revert to normal logging
     b2.logging.log_level = b2.LogLevel.INFO

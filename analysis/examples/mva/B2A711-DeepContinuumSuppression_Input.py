@@ -20,6 +20,8 @@
 
 import basf2
 import modularAnalysis as ma
+from stdV0s import stdKshorts
+from stdPi0s import stdPi0s
 from vertex import TagV
 import glob
 import sys
@@ -30,52 +32,41 @@ from root_pandas import read_root
 basf2.set_log_level(basf2.LogLevel.ERROR)
 
 # --I/O----------------------------------------------------------------------------------------
-if (len(sys.argv) < 2 or sys.argv[1] not in ['train', 'test', 'apply_signal', 'apply_qqbar']):
-    sys.exit("usage:\n\tbasf2 B2A701-ContinuumSuppression_Input.py <train,test,apply_signal,apply_qqbar>")
+step = 'train'
 
-step = str(sys.argv[1])
-
-path = '/group/belle2/tutorial/release_01-00-00/DCS_Bd_KsPi0'
-train_inputfiles = glob.glob(path + '/*/*/*8.root.mdst')
-val_inputfiles = glob.glob(path + '/*/*/*2.root.mdst')
-signal_inputfiles = glob.glob(path + '/*/*/*1.root.mdst')
-qqbar_inputfiles = glob.glob(path + '/*/*/*7.root.mdst')
-
-# shuffle file names
-np.random.shuffle(train_inputfiles)
-np.random.shuffle(val_inputfiles)
-np.random.shuffle(signal_inputfiles)
-np.random.shuffle(qqbar_inputfiles)
+if len(sys.argv) >= 2:
+    if sys.argv[1] not in ['train', 'test', 'apply_signal', 'apply_qqbar']:
+        sys.exit("usage:\n\tbasf2 B2A711-DeepContinuumSuppression_Input.py <train,test,apply_signal,apply_qqbar>")
+    else:
+        step = str(sys.argv[1])
 
 if step == 'train':
-    input = train_inputfiles
+    input_file_list = [basf2.find_file('ccbar_sample_to_train.root', 'examples', False),
+                       basf2.find_file('Bd2K0spi0_to_train.root', 'examples', False)]
 elif step == 'test':
-    input = val_inputfiles
+    input_file_list = [basf2.find_file('ccbar_sample_to_test.root', 'examples', False),
+                       basf2.find_file('Bd2K0spi0_to_test.root', 'examples', False)]
 elif step == 'apply_signal':
-    input = signal_inputfiles
+    input_file_list = [basf2.find_file('Bd2K0spi0_to_test.root', 'examples', False)]
 elif step == 'apply_qqbar':
-    input = qqbar_inputfiles
+    input_file_list = [basf2.find_file('ccbar_sample_to_test.root', 'examples', False)]
 else:
     sys.exit('Step does not match any of the available samples: `train`, `test`, `apply_signal`or `apply_qqbar`')
 
-outfile = step + '.root'
+outfile = 'DNN_' + step + '.root'
 # ---------------------------------------------------------------------------------------------
 
 # Perform analysis.
 firstpath = basf2.Path()
 
-ma.inputMdstList('default', input, path=firstpath)
+ma.inputMdstList('MC10', input_file_list, path=firstpath)
 
 firstpath.add_module('ProgressBar')
 
 # Build B candidate like in B2A701-ContinuumSuppression_Input.py
-ma.fillParticleList('gamma', 'goodGamma == 1', path=firstpath)
-
-ma.fillParticleList('pi+:good', 'chiProb > 0.001 and pionID > 0.5', path=firstpath)
-
-ma.reconstructDecay('K_S0 -> pi+:good pi-:good', '0.480<=M<=0.516', path=firstpath)
-ma.reconstructDecay('pi0  -> gamma gamma', '0.115<=M<=0.152', path=firstpath)
-ma.reconstructDecay('B0   -> K_S0 pi0', '5.2 < Mbc < 5.3 and -0.3 < deltaE < 0.2', path=firstpath)
+stdKshorts(path=firstpath)
+stdPi0s('eff40_May2020', path=firstpath)
+ma.reconstructDecay('B0 -> K_S0:merged pi0:eff40_May2020', '5.2 < Mbc < 5.3 and -0.3 < deltaE < 0.2', path=firstpath)
 
 ma.matchMCTruth('B0', path=firstpath)
 ma.buildRestOfEvent('B0', path=firstpath)
@@ -99,8 +90,8 @@ deadEndPath = basf2.create_path()
 ma.signalSideParticleFilter('B0', '', roe_path, deadEndPath)
 
 # Build particle lists for low level variables
-ma.fillParticleList('gamma:roe', 'isInRestOfEvent == 1 and goodGamma == 1', path=roe_path)
-ma.fillParticleList('gamma:signal', 'isInRestOfEvent == 0 and goodGamma == 1', path=roe_path)
+ma.fillParticleList('gamma:roe', 'isInRestOfEvent == 1 and goodBelleGamma == 1', path=roe_path)
+ma.fillParticleList('gamma:signal', 'isInRestOfEvent == 0 and goodBelleGamma == 1', path=roe_path)
 ma.fillParticleList('pi+:chargedProe', 'isInRestOfEvent == 1', path=roe_path)
 ma.fillParticleList('pi+:chargedPsignal', 'isInRestOfEvent == 0', path=roe_path)
 ma.fillParticleList('pi-:chargedMroe', 'isInRestOfEvent == 1', path=roe_path)
@@ -138,15 +129,15 @@ contVars = [
     'KSFWVariables(hoo2)',
     'KSFWVariables(hoo3)',
     'KSFWVariables(hoo4)',
-    'CleoCone(1)',
-    'CleoCone(2)',
-    'CleoCone(3)',
-    'CleoCone(4)',
-    'CleoCone(5)',
-    'CleoCone(6)',
-    'CleoCone(7)',
-    'CleoCone(8)',
-    'CleoCone(9)'
+    'CleoConeCS(1)',
+    'CleoConeCS(2)',
+    'CleoConeCS(3)',
+    'CleoConeCS(4)',
+    'CleoConeCS(5)',
+    'CleoConeCS(6)',
+    'CleoConeCS(7)',
+    'CleoConeCS(8)',
+    'CleoConeCS(9)'
 ]
 
 # Define additional low level variables

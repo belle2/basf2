@@ -1800,7 +1800,7 @@ namespace Belle2 {
       return func;
     }
 
-    VARIABLE_GROUP("Flavor Tagger Variables");
+    VARIABLE_GROUP("Flavor Tagger Expert Variables");
 
     REGISTER_VARIABLE("pMissTag", momentumMissingTagSide,  "Calculates the missing momentum for a given particle on the tag side.");
     REGISTER_VARIABLE("cosTPTO"  , cosTPTO , "Returns cosine of angle between thrust axis of given particle and thrust axis of ROE.");
@@ -1828,12 +1828,7 @@ namespace Belle2 {
                       "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a ``anti-B0``.");
     REGISTER_VARIABLE("hasRestOfEventTracks", hasRestOfEventTracks,
                       "Returns the amount of tracks in the RestOfEvent related to the given Particle. -2 if the RestOfEvent is empty.");
-    REGISTER_VARIABLE("isRelatedRestOfEventB0Flavor", isRelatedRestOfEventB0Flavor,  R"DOC(
-Returns -1 (1) if the RestOfEvent related to the given particle is related to a ``anti-B0`` (``B0``). 
-The ``MCError`` bit of Breco has to be 0, 1, 2, 16 or 1024. 
-The output of the variable is 0 otherwise. 
-If one particle in the RestOfEvent is found to belong the reconstructed ``B0``, the output is -2(2) for a ``anti-B0`` (``B0``) on the reconstructed side.
-)DOC");
+
     REGISTER_VARIABLE("qrCombined", isRestOfEventB0Flavor, R"DOC(
 [Eventbased] Returns -1 (1) if current RestOfEvent is related to a ``anti-B0`` (``B0``). 
 The ``MCError`` bit of Breco has to be 0, 1, 2, 16 or 1024. 
@@ -1852,7 +1847,6 @@ Returns the MC flavor (+1 or -1) of the accompaning tag-side B meson if the give
 In other words, this variable checks the generated flavor of the other generated ``Upsilon(4S)`` daughter.");
 )DOC");
 
-    VARIABLE_GROUP("Flavor Tagger MetaFunctions")
 
     REGISTER_VARIABLE("BtagToWBosonVariables(requestedVariable)", BtagToWBosonVariables, R"DOC(
 [Eventbased] Returns values of FlavorTagging-specific kinematical variables assuming a semileptonic decay with the given particle as target.
@@ -1961,10 +1955,22 @@ allowed values are same as in :b2:var:`hasHighestProbInCat`.
                       "Returns 1 if the given category has a target, 0 otherwise.");
     REGISTER_VARIABLE("isTrueCategory(categoryName)", isTrueCategory,
                       "Returns 1 if the given category tags the B0 MC flavor correctly, 0 otherwise.");
-    REGISTER_VARIABLE("qrOutput(combinerMethod)", qrOutput,
-                      "Returns the output of the flavorTagger for the given combinerMethod. The available combiner methods are 'FBDT' or 'FANN'.");
-    REGISTER_VARIABLE("qOutput(combinerMethod)", qOutput,
-                      "Returns the flavor tag q output of the flavorTagger for the given combinerMethod. The available combiner methods are 'FBDT' or 'FANN'.");
+
+    REGISTER_VARIABLE("qpCategory(categoryName)", qpCategory, R"DOC(
+Returns the output :math:`q` (charge of target track) times :math:`p` (probability that this is the right category) of the category with the given name. 
+The allowed categories are the official Flavor Tagger Category Names.
+)DOC");
+    REGISTER_VARIABLE("isTrueFTCategory(categoryName)", isTrueFTCategory, R"DOC(
+Returns 1 if the target particle (checking the decay chain) of the category with the given name is found in the MC particles, 
+and if it provides the right flavor. The allowed categories are the official Flavor Tagger Category Names.
+)DOC");
+    REGISTER_VARIABLE("hasTrueTargets(categoryName)", hasTrueTargets, R"DOC(
+Returns 1 if target particles (checking only the decay chain) of the category with the given name is found in the MC particles. 
+The allowed categories are the official Flavor Tagger Category Names.
+)DOC");
+
+    VARIABLE_GROUP("Flavor Tagger Analysis Variables")
+
     REGISTER_VARIABLE("rBinBelle(combinerMethod)", rBinBelle, R"DOC(
 Returns the corresponding :math:`r` (dilution) bin according to the Belle binning for the given ``combinerMethod``. 
 The available combiner methods are 'FBDT' and 'FANN'.
@@ -1979,18 +1985,17 @@ The return values and the corresponding dilution ranges are the following:
 * 6: :math:`0.875 < r < 1.000`.
 
 )DOC");
-
-    REGISTER_VARIABLE("qpCategory(categoryName)", qpCategory, R"DOC(
-Returns the output :math:`q` (charge of target track) times :math:`p` (probability that this is the right category) of the category with the given name. 
-The allowed categories are the official Flavor Tagger Category Names.
+    REGISTER_VARIABLE("qrOutput(combinerMethod)", qrOutput, R"DOC(
+Returns the output of the flavorTagger, flavor tag :math:`q` times the dilution factor :math:`r`, for the given a combiner method. 
+The available combiner methods are 'FBDT' or 'FANN'.
 )DOC");
-    REGISTER_VARIABLE("isTrueFTCategory(categoryName)", isTrueFTCategory, R"DOC(
-Returns 1 if the target particle (checking the decay chain) of the category with the given name is found in the MC particles, 
-and if it provides the right flavor. The allowed categories are the official Flavor Tagger Category Names.
-)DOC");
-    REGISTER_VARIABLE("hasTrueTargets(categoryName)", hasTrueTargets, R"DOC(
-Returns 1 if target particles (checking only the decay chain) of the category with the given name is found in the MC particles. 
-The allowed categories are the official Flavor Tagger Category Names.
+    REGISTER_VARIABLE("qOutput(combinerMethod)", qOutput,
+                      "Returns the flavor tag :math:`q` output of the flavorTagger for the given combinerMethod. The available combiner methods are 'FBDT' or 'FANN'.");
+    REGISTER_VARIABLE("isRelatedRestOfEventB0Flavor", isRelatedRestOfEventB0Flavor,  R"DOC(
+Returns -1 (1) if the RestOfEvent related to the given particle is related to a ``anti-B0`` (``B0``). 
+The ``MCError`` bit of Breco has to be 0, 1, 2, 16 or 1024. 
+The output of the variable is 0 otherwise. 
+If one particle in the RestOfEvent is found to belong the reconstructed ``B0``, the output is -2(2) for a ``anti-B0`` (``B0``) on the reconstructed side.
 )DOC");
   }
 }

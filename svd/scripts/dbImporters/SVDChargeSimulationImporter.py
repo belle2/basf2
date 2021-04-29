@@ -75,7 +75,7 @@ class defaultChargeSimulationImporter(b2.Module):
         chargeSimCal = SVDChargeSimCal()
 
         payload = Belle2.SVDChargeSimulationCalibrations.t_payload(chargeSimCal, "ChargeSimulationCalibrations_default_" +
-                                                                   str(now.isoformat()) + "_INFO:_rel05values")
+                                                                   str(now.isoformat()) + "_INFO:_rel06values_step1")
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 

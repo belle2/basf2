@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2018, 2021 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -8,25 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-// Own include
 #include <top/modules/TOPChannelT0Calibrator/TOPChannelT0CalibratorModule.h>
 #include <top/geometry/TOPGeometryPar.h>
-#include <top/reconstruction/TOPreco.h>
-#include <top/reconstruction/TOPtrack.h>
-#include <top/reconstruction/TOPconfigure.h>
-
-// framework - DataStore
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
+#include <top/reconstruction_cpp/TOPTrack.h>
+#include <top/reconstruction_cpp/PDFConstructor.h>
+#include <top/reconstruction_cpp/TOPRecoManager.h>
 #include <framework/dataobjects/EventMetaData.h>
-
-// framework aux
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-
-// root
 #include <TRandom.h>
-
 
 using namespace std;
 
@@ -57,10 +47,6 @@ namespace Belle2 {
     addParam("numBins", m_numBins, "number of bins of the search region", 200);
     addParam("timeRange", m_timeRange,
              "time range in which to search for the minimum [ns]", 10.0);
-    addParam("minBkgPerBar", m_minBkgPerBar,
-             "minimal number of background photons per module", 0.0);
-    addParam("scaleN0", m_scaleN0,
-             "Scale factor for figure-of-merit N0", 1.0);
     addParam("sigmaSmear", m_sigmaSmear,
              "sigma in [ns] for additional smearing of PDF", 0.0);
     addParam("sample", m_sample,
@@ -85,10 +71,6 @@ namespace Belle2 {
 
   }
 
-  TOPChannelT0CalibratorModule::~TOPChannelT0CalibratorModule()
-  {
-  }
-
   void TOPChannelT0CalibratorModule::initialize()
   {
     // input collections
@@ -97,16 +79,13 @@ namespace Belle2 {
     m_extHits.isRequired();
     m_recBunch.isOptional();
 
-    // Configure TOP detector for reconstruction
-    TOPconfigure config;
-
     // Parse PDF option
     if (m_pdfOption == "rough") {
-      m_PDFOption = TOPreco::c_Rough;
+      m_PDFOption = PDFConstructor::c_Rough;
     } else if (m_pdfOption == "fine") {
-      m_PDFOption = TOPreco::c_Fine;
+      m_PDFOption = PDFConstructor::c_Fine;
     } else if (m_pdfOption == "optimal") {
-      m_PDFOption = TOPreco::c_Optimal;
+      m_PDFOption = PDFConstructor::c_Optimal;
     } else {
       B2ERROR("TOPPDFDebuggerModule: unknown PDF option '" << m_pdfOption << "'");
     }
@@ -192,10 +171,6 @@ namespace Belle2 {
 
   }
 
-  void TOPChannelT0CalibratorModule::beginRun()
-  {
-  }
-
   void TOPChannelT0CalibratorModule::event()
   {
     /* check bunch reconstruction status and run alignment:
@@ -204,43 +179,27 @@ namespace Belle2 {
     */
 
     if (m_recBunch.isValid()) {
-      if (!m_recBunch->isReconstructed()) return;
+      if (not m_recBunch->isReconstructed()) return;
     }
 
-    // create reconstruction object and set various options
-
-    int Nhyp = 1;
-    double mass = m_selector.getChargedStable().getMass();
-    int pdg = m_selector.getChargedStable().getPDGCode();
-    TOPreco reco(Nhyp, &mass, &pdg, m_minBkgPerBar, m_scaleN0);
-    reco.setPDFoption(m_PDFOption);
-    const auto& tdc = TOPGeometryPar::Instance()->getGeometry()->getNominalTDC();
-    double timeMin = tdc.getTimeMin();
-    double timeMax = tdc.getTimeMax();
-
+    TOPRecoManager::setDefaultTimeWindow();
+    double timeMin = TOPRecoManager::getMinTime();
+    double timeMax = TOPRecoManager::getMaxTime();
     const auto& chMapper = TOPGeometryPar::Instance()->getChannelMapper();
-
-    // add photon hits to reconstruction object
-
-    for (const auto& digit : m_digits) {
-      if (digit.getHitQuality() == TOPDigit::c_Good)
-        reco.addData(digit.getModuleID(), digit.getPixelID(), digit.getTime(),
-                     digit.getTimeError());
-    }
 
     // loop over reconstructed tracks, make a selection and accumulate log likelihoods
 
     for (const auto& track : m_tracks) {
 
       // track selection
-      TOPtrack trk(&track);
-      if (!trk.isValid()) continue;
+      TOPTrack trk(track);
+      if (not trk.isValid()) continue;
 
-      if (!m_selector.isSelected(trk)) continue;
+      if (not m_selector.isSelected(trk)) continue;
 
-      // run reconstruction
-      reco.reconstruct(trk);
-      if (reco.getFlag() != 1) continue; // track is not in the acceptance of TOP
+      // construct PDF
+      PDFConstructor pdfConstructor(trk, m_selector.getChargedStable(), m_PDFOption);
+      if (not pdfConstructor.isValid()) continue;
 
       // minimization procedure: accumulate
       const unsigned module = trk.getModuleID() - 1;
@@ -250,21 +209,21 @@ namespace Belle2 {
       const auto& binCenters = finders[0].getBinCenters();
       for (unsigned ibin = 0; ibin < binCenters.size(); ibin++) {
         double t0 = binCenters[ibin];
-        std::vector<float> logL;
-        logL.resize(c_numChannels, 0);
-        reco.getLogL(t0, timeMin, timeMax, m_sigmaSmear, logL.data());
+        const auto& pixelLogLs = pdfConstructor.getPixelLogLs(t0, m_sigmaSmear);
         for (unsigned channel = 0; channel < c_numChannels; channel++) {
           int pix = chMapper.getPixelID(channel) - 1;
-          finders[channel].add(ibin, -2 * logL[pix]);
+          finders[channel].add(ibin, -2 * pixelLogLs[pix].logL);
         }
       }
 
       // fill histograms of hits
+      m_numPhotons = 0;
       for (const auto& digit : m_digits) {
         if (digit.getHitQuality() != TOPDigit::c_Good) continue;
         if (digit.getModuleID() != trk.getModuleID()) continue;
         if (digit.getTime() < timeMin) continue;
         if (digit.getTime() > timeMax) continue;
+        m_numPhotons++;
         auto& h1 = m_hits1D[module];
         h1.Fill(digit.getChannel());
         auto& h2 = m_hits2D[module];
@@ -273,7 +232,6 @@ namespace Belle2 {
 
       // fill output tree
       m_moduleID = trk.getModuleID();
-      m_numPhotons = reco.getNumOfPhotons();
       const auto& localPosition = m_selector.getLocalPosition();
       m_x = localPosition.X();
       m_y = localPosition.Y();
@@ -289,16 +247,12 @@ namespace Belle2 {
       m_pocaY = pocaPosition.Y();
       m_cmsE = m_selector.getCMSEnergy();
       m_charge = trk.getCharge();
-      m_PDG = trk.getPDGcode();
+      m_PDG = trk.getPDGCode();
       m_tree->Fill();
     }
 
   }
 
-
-  void TOPChannelT0CalibratorModule::endRun()
-  {
-  }
 
   void TOPChannelT0CalibratorModule::terminate()
   {

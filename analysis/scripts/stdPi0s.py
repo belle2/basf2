@@ -68,7 +68,7 @@ def stdPi0s(listtype="eff60_May2020", path=None, loadPhotonBeamBackgroundMVA=Tru
                             1,
                             True,
                             path)
-        ma.matchMCTruth('pi0:eff30_May2020', path, loadPhotonBeamBackgroundMVA)
+        ma.matchMCTruth('pi0:eff30_May2020', path)
     elif 'eff40_May2020' == listtype:
         stdPhotons('pi0eff40_May2020', path)
         ma.reconstructDecay('pi0:eff40_May2020 -> gamma:pi0eff40_May2020 gamma:pi0eff40_May2020', '0.120<InvM<0.145', 1, True, path)

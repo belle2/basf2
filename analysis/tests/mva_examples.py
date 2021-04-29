@@ -12,14 +12,10 @@ class ExamplesTest(b2tua.ExamplesTest):
         """
         Test supported mva examples.
         """
-        # list of the broken examples (to be removed when they are individually fixed)
-        broken_mva_egs = ['B2A711-DeepContinuumSuppression_Input.py',  # BII-4279
-                          'B2A713-DeepContinuumSuppression_MVAExpert.py',  # BII-4279
-                          'B2A712-DeepContinuumSuppression_MVATrain.py',  # BII-4279
-                          'B2A714-DeepContinuumSuppression_MVAModel.py'  # BII-4279
-                          ]
+        # B2A714 is a MVA model description and not a standalone example script
+        excluded_python_file = ['B2A714-DeepContinuumSuppression_MVAModel.py']
 
-        self._test_examples_dir('analysis/examples/mva/', broken_mva_egs)
+        self._test_examples_dir('analysis/examples/mva/', excluded_python_file)
 
 
 if __name__ == '__main__':

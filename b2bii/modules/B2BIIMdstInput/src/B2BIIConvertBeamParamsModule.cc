@@ -126,7 +126,7 @@ namespace Belle2 {
     beamParams.setLER(Eler, angleLer, covarianceHer);
     beamParams.setHER(Eher, angleHer, covarianceLer);
 
-    // set the flags according to the module settings
+    // set the flags according to the module settings.
     int flags = 0;
     if (m_GenerateCMS)
       flags |= BeamParameters::c_generateCMS;

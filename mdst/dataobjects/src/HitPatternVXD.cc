@@ -180,7 +180,7 @@ short HitPatternVXD::getLastPXDLayer(const PXDMode& mode) const
   return -1;
 }
 
-std::string HitPatternVXD::__repr__() const
+std::string HitPatternVXD::__str__() const
 {
   return m_pattern.to_string();
 }

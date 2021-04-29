@@ -4,6 +4,7 @@ import subprocess
 import validation_gt as vgt
 import b2test_utils
 
+calibration_path = b2test_utils.require_file('calibration', 'validation')
 
 with b2test_utils.clean_working_directory():
 
@@ -19,12 +20,12 @@ with b2test_utils.clean_working_directory():
     # Prepare the input files for the calibration and dump them into a JSON file.
     input_files = {
         "raw_physics": [
-            [f"{os.environ['BELLE2_VALIDATION_DATA_DIR']}/calibration/cdst_e0008_r3121_hadronSkim/", [8, 3121]],
-            [f"{os.environ['BELLE2_VALIDATION_DATA_DIR']}/calibration/cdst_e0010_r5095_hadronSkim/", [10, 5095]]
+            [f"{calibration_path}/cdst_e0008_r3121_hadronSkim/", [8, 3121]],
+            [f"{calibration_path}/cdst_e0010_r5095_hadronSkim/", [10, 5095]]
         ],
         "raw_cosmic": [
-            [f"{os.environ['BELLE2_VALIDATION_DATA_DIR']}/calibration/cdst_e0008_r3121_cosmicSkim/", [8, 3121]],
-            [f"{os.environ['BELLE2_VALIDATION_DATA_DIR']}/calibration/cdst_e0010_r5095_cosmicSkim/", [10, 5095]]
+            [f"{calibration_path}/cdst_e0008_r3121_cosmicSkim/", [8, 3121]],
+            [f"{calibration_path}/cdst_e0010_r5095_cosmicSkim/", [10, 5095]]
         ],
         "raw_beam": []
     }

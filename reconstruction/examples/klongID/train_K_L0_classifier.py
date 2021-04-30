@@ -23,9 +23,6 @@ ex_b = 0   # experiment begin, 0 for all of them
 ex_e = -1   # experiment end, -1 for all of them
 run_b = 0   # run begin, 0 for all
 run_e = -1   # run end, -1 for all of them
-upload = True  # upload to conditions database
-remove_db = False  # delete local db
-tag_name = "development"  # global tag name
 
 training_string = ('basf2_mva_teacher --datafiles {data_path} --treename KLMdata --identifier {identifier} ' +
                    '--variable "KLMnLayer" "KLMnInnermostlayer" "KLMglobalZ" "KLMtime" "KLMdistToNextCl" ' +
@@ -38,7 +35,7 @@ os.system(training_string)
 
 # "upload" to localdb
 os.system(
-    ('basf2_mva_upload --identifier {identifier} --db_identifier {identifier_db}' +
+    ('basf2_mva_upload --identifier {identifier} --db_identifier {identifier_db} ' +
      '--begin_experiment {ex_b} --end_experiment {ex_e} --begin_run {run_b} --end_run {run_e}').format(
         identifier=identifier,
         identifier_db=identifier.split(".xml")[0],
@@ -46,10 +43,3 @@ os.system(
         ex_e=ex_e,
         run_b=run_b,
         run_e=run_e))
-
-here = os.getcwd()
-data_base_file = here + "/localdb/database.txt"
-if upload:
-    os.system("b2conditionsdb upload {TAGNAME} {DATABASEFILE}".format(TAGNAME=tag_name, DATABASEFILE=data_base_file))
-if remove_db:
-    os.system("rm -r {}".format(data_base_file.split("database.txt")[0]))

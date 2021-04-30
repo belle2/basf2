@@ -255,7 +255,7 @@ def add_expressreco_processing(path,
         path.add_module("PruneDataStore", matchEntries=constants.EXPRESSRECO_INPUT_OBJECTS)
 
     path_utils.add_geometry_if_not_present(path)
-    add_unpackers(path, components=unpacker_components)
+    add_unpackers(path, components=unpacker_components, writeKLMDigitRaws=True)
 
     if do_reconstruction:
         if run_type == constants.RunTypes.beam:

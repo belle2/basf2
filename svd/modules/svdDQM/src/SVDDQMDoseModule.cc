@@ -199,7 +199,10 @@ void SVDDQMDoseModule::event()
   if (m_rawTTD.getEntries() == 0)
     return;
   RawFTSW* theTTD = m_rawTTD[0];
-  const double timeSinceInj = theTTD->GetTimeSinceLastInjection(0) / (m_clockSettings->getGlobalClockFrequency() * 1e3);
+  // 127 MHz is the (inexactly rounded) clock of the ticks
+  // Can't use the exact value because m_revolutionTime is using the approximated value too
+  // See the docs of m_revolutionTime (in SVDDQMDoseModule.h) for the reason
+  const double timeSinceInj = theTTD->GetTimeSinceLastInjection(0) / 127.0;
   const bool isHER = theTTD->GetIsHER(0);
   const EEventType eventType = timeSinceInj > m_noInjectionTime ? c_NoInjection : (isHER ? c_HERInjection : c_LERInjection);
   if (((unsigned int)eventType & m_eventFilter) == 0U)

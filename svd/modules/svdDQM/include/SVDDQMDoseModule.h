@@ -13,8 +13,6 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/dbobjects/HardwareClockSettings.h>
 #include <TH1.h>
 #include <TH2.h>
 #include <string>
@@ -84,7 +82,6 @@ namespace Belle2 {
       StoreArray<RawFTSW> m_rawTTD; /**< Input: DAQ status. Has timing and injection info. */
       StoreArray<SVDShaperDigit> m_digits; /**< Input: raw hits. */
       StoreObjPtr<TRGSummary> m_trgSummary; /**< Input: trigger type. */
-      DBObjPtr<HardwareClockSettings> m_clockSettings; /**< hardware clock settings */
 
       // Outputs (histograms)
       /** Hist of the total evts in each time bin (time since inj. and time in cycle). */

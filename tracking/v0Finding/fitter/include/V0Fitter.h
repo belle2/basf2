@@ -40,7 +40,10 @@ namespace Belle2 {
 
     /// Initialize the cuts which will be applied during the fit and store process.
     void initializeCuts(double beamPipeRadius,
-                        double vertexChi2CutOutside);
+                        double vertexChi2CutOutside,
+                        std::tuple<double, double> invMassRangeKshort,
+                        std::tuple<double, double> invMassRangeLambda,
+                        std::tuple<double, double> invMassRangePhoton);
 
     /// set V0 fitter mode.
     /// switch the mode of fitAndStore function.
@@ -136,6 +139,9 @@ namespace Belle2 {
 
     double m_beamPipeRadius;  ///< Radius where inside/outside beampipe is defined.
     double m_vertexChi2CutOutside;  ///< Chi2 cut outside beampipe.
+    std::tuple<double, double> m_invMassRangeKshort; ///< invariant mass cut for Kshort.
+    std::tuple<double, double> m_invMassRangeLambda; ///< invariant mass cut for Lambda.
+    std::tuple<double, double> m_invMassRangePhoton; ///< invariant mass cut for Photon.
     int    m_v0FitterMode;  ///< 0: store V0 at the first vertex fit, regardless of inner hits, 1: remove hits inside the V0 vertex position, 2: mode 1 +  don't use SVD hits if there is only one available SVD hit-pair (default)
     bool   m_forcestore;///< true only if the V0Fitter mode is 1
     bool   m_useOnlyOneSVDHitPair;///< false only if the V0Fitter mode is 3

@@ -55,6 +55,15 @@ V0FinderModule::V0FinderModule() : Module()
   addParam("vertexChi2CutOutside", m_vertexChi2CutOutside,
            "Maximum chi² for the vertex fit (NDF = 1)", 10000.);
 
+  addParam("invMassRangeKshort", m_invMassRangeKshort,
+           "mass range in GeV for reconstructed Kshort after removing material effects and inner hits", m_invMassRangeKshort);
+
+  addParam("invMassRangeLambda", m_invMassRangeLambda,
+           "mass range in GeV for reconstructed Lambda after removing material effects and inner hits", m_invMassRangeLambda);
+
+  addParam("invMassRangePhoton", m_invMassRangePhoton,
+           "mass range in GeV for reconstructed Photon after removing material effects and inner hits", m_invMassRangePhoton);
+
   addParam("v0FitterMode", m_v0FitterMode,
            "designate which fitAndStore function is called in V0Fitter.\n"
            "    0: store V0 at the first vertex fit, regardless of inner hits \n"
@@ -79,7 +88,8 @@ void V0FinderModule::initialize()
                                           m_arrayNameV0ValidationVertex, m_arrayNameRecoTrack,
                                           m_arrayNameCopiedRecoTrack, m_validation);
 
-  m_v0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside);
+  m_v0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside,
+                             m_invMassRangeKshort, m_invMassRangeLambda, m_invMassRangePhoton);
   m_v0Fitter->setFitterMode(m_v0FitterMode);
 
   // safeguard for users that try to break the code

@@ -83,10 +83,16 @@ void V0Fitter::setFitterMode(int fitterMode)
 }
 
 void V0Fitter::initializeCuts(double beamPipeRadius,
-                              double vertexChi2CutOutside)
+                              double vertexChi2CutOutside,
+                              std::tuple<double, double> invMassRangeKshort,
+                              std::tuple<double, double> invMassRangeLambda,
+                              std::tuple<double, double> invMassRangePhoton)
 {
   m_beamPipeRadius = beamPipeRadius;
   m_vertexChi2CutOutside = vertexChi2CutOutside;
+  m_invMassRangeKshort = invMassRangeKshort;
+  m_invMassRangeLambda = invMassRangeLambda;
+  m_invMassRangePhoton = invMassRangePhoton;
 }
 
 
@@ -375,6 +381,32 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
 
   /// store V0
   if (forceStore || hasInnerHitStatus == 0) {
+    /// Before storing, apply invariant mass cut.
+    const genfit::GFRaveTrackParameters* tr0 = vert.getParameters(0);
+    const genfit::GFRaveTrackParameters* tr1 = vert.getParameters(1);
+    TLorentzVector lv0, lv1;
+    /// Reconstruct invariant mass.
+    lv0.SetVectM(tr0->getMom(), trackHypotheses.first.getMass());
+    lv1.SetVectM(tr1->getMom(), trackHypotheses.second.getMass());
+    double v0InvMass = (lv0 + lv1).M();
+    if (v0Hypothesis == Const::Kshort) {
+      if (v0InvMass < std::get<0>(m_invMassRangeKshort) || v0InvMass > std::get<1>(m_invMassRangeKshort)) {
+        B2DEBUG(22, "Kshort vertex rejected, invariant mass out of range.");
+        return false;
+      }
+    } else if (v0Hypothesis == Const::Lambda || v0Hypothesis == Const::antiLambda) {
+      if (v0InvMass < std::get<0>(m_invMassRangeLambda) || v0InvMass > std::get<1>(m_invMassRangeLambda)) {
+        B2DEBUG(22, "Lambda vertex rejected, invariant mass out of range.");
+        return false;
+      }
+    } else if (v0Hypothesis == Const::photon) {
+      if (v0InvMass < std::get<0>(m_invMassRangePhoton) || v0InvMass > std::get<1>(m_invMassRangePhoton)) {
+        B2DEBUG(22, "Photon vertex rejected, invariant mass out of range.");
+        return false;
+      }
+    }
+
+
     /// To build the trackFitResult, use the magnetic field at the origin;
     /// the helix is extrapolated to the IP in a constant magnetic field and material effects are neglected
     /// so that the vertexing tool executed on the MDST object will find again this vertex position
@@ -390,12 +422,6 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
 
     if (m_validation) {
       B2DEBUG(24, "Create StoreArray and Output for validation.");
-      const genfit::GFRaveTrackParameters* tr0 = vert.getParameters(0);
-      const genfit::GFRaveTrackParameters* tr1 = vert.getParameters(1);
-      TLorentzVector lv0, lv1;
-      /// Reconstruct invariant mass.
-      lv0.SetVectM(tr0->getMom(), trackHypotheses.first.getMass());
-      lv1.SetVectM(tr1->getMom(), trackHypotheses.second.getMass());
       auto validationV0 = m_validationV0s.appendNew(
                             std::make_pair(trackPlus, tfrPlusVtx),
                             std::make_pair(trackMinus, tfrMinusVtx),

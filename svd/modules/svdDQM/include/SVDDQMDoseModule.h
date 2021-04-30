@@ -13,6 +13,8 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 #include <TH1.h>
 #include <TH2.h>
 #include <string>
@@ -35,8 +37,6 @@ namespace Belle2 {
      * revolution cycle. The primary purpose is to monitor the
      * correlation coefficients between the dose rate in the diamonds
      * and that in the layers of SVD.
-     *
-     * @sa https://agira.desy.de/browse/BII-7853
      */
     class SVDDQMDoseModule : public HistoModule {
     public:
@@ -61,11 +61,11 @@ namespace Belle2 {
         const char* nameSuffix;
         /** The title will be "SVD Instantaneous Occupancy @titleSuffix @side;Occupancy [%];Count / bin". */
         const char* titleSuffix;
-        /// The number of bins for the instantaneous occupancy histo
+        /** The number of bins for the instantaneous occupancy histo */
         int nBins;
-        /// The lower limit for the instantaneous occupancy histo
+        /** The lower limit for the instantaneous occupancy histo */
         double xMin;
-        /// The upper limit for the instantaneous occupancy histo
+        /** The upper limit for the instantaneous occupancy histo */
         double xMax;
         /** Function that says if a sensor is in this group. */
         std::function<bool(const VxdID&)> contains;
@@ -78,29 +78,59 @@ namespace Belle2 {
       std::string m_histogramDirectoryName; /**< Name of the histograms' directory in the ROOT file. */
       std::string m_SVDShaperDigitsName; /**< Name of the StoreArray of SVDShaperDigit to use. */
       double m_noInjectionTime; /**< After this time (in microseconds) from last injection the event falls in the "No Injection" category. */
-      double m_revolutionTime; /**< Beam revolution time in microseconds. */
-      std::vector<int> m_trgTypes;
+      std::vector<int> m_trgTypes; /**< Trigger types to accept (all if the vector is empty). */
 
       // Inputs
       StoreArray<RawFTSW> m_rawTTD; /**< Input: DAQ status. Has timing and injection info. */
       StoreArray<SVDShaperDigit> m_digits; /**< Input: raw hits. */
       StoreObjPtr<TRGSummary> m_trgSummary; /**< Input: trigger type. */
+      DBObjPtr<HardwareClockSettings> m_clockSettings; /**< hardware clock settings */
 
       // Outputs (histograms)
       /** Hist of the total evts in each time bin (time since inj. and time in cycle). */
       TH2F* h_nEvtsVsTime = nullptr;
-      /// Hists of the number of hits in each time bin per sensor group, U-side.
+      /** Hists of the number of hits in each time bin per sensor group, U-side. */
       std::vector<TH2F*> m_groupNHitsU;
       /** Hists of the instantaneous occupancy per sensor group (see c_sensorGroups), U-side. */
       std::vector<TH1F*> m_groupOccupanciesU;
       /** Hist of the total evts in each time bin (1D, time since inj. only). */
       TH1F* h_nEvtsVsTime1 = nullptr;
-      /// Hists of the number of hits in each time bin (1D) per sensor group, U-side.
+      /** Hists of the number of hits in each time bin (1D) per sensor group, U-side. */
       std::vector<TH1F*> m_groupNHits1U;
-      /// Hist of bunch number vs number of fired strips (copied from SVDDQMInjection).
+      /** Hist of bunch number vs number of fired strips (copied from SVDDQMInjection). */
       TH2F* h_bunchNumVsNHits = nullptr;
 
       // Other stuff
+      /** Beam revolution time in microseconds (approximated).
+       *
+       * The exact time could be obtained as
+       * `5120 / m_clockSettings->getAcceleratorRF() * 1e3`
+       * but this would run after defineHisto() if used in initialize().
+       * Since defineHisto() uses this value, using a run-independent
+       * approximated constant value is the only way.
+       */
+      static constexpr double m_revolutionTime = 5120.0 / 508.0;
+
+      /** Default minimum of the instantaneous occupancy histograms. */
+      static constexpr double defaultOccuMin = 0.0;
+      /** Default number of bins of the instantaneous occupancy histograms.
+       * Optimized to get a maximum around 5%.
+       * @sa defaultOccuMax
+       */
+      static const int defaultNBins = 90;
+      /** Default maximum of the instantaneous occupancy histograms.
+       * This value is optimized for a single ladder of layer 3, which has two sensors
+       * with 768 strips each (on both sides). The occupancy resolution on one event
+       * in this case is (in %) 100/nStrips = 100/1536 (exactly this value).
+       *
+       * Using a bin width different from the resolution would result in artefacts
+       * (some bins have zero entries because the resolution can never assume a value
+       * in that range, as it is a discrete measure); using bins much larger than the
+       * resolution would not resolve anything, as they would be too large to read
+       * anything; hence, using the exact resolution as bin width is necessary.
+       */
+      static constexpr double defaultOccuMax = 100.0 / 1536.0 * defaultNBins;
+
       /** List of interesting groups of sensors to average over. Defined in SVDDQMDoseModule.cc . */
       static const std::vector<SensorGroup> c_sensorGroups;
     };

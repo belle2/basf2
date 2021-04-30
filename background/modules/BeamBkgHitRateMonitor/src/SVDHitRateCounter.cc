@@ -16,6 +16,7 @@
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
+#include <vxd/geometry/GeoCache.h>
 
 using namespace std;
 
@@ -236,13 +237,17 @@ namespace Belle2 {
             if (layer == 0)
               rates_lowE.l3LadderSensorAverageRates[ladder][sensor] ++;
           }
+          int nSamp = m_eventInfo.isValid() ? m_eventInfo->getNSamples() : 6; // Assume 6 samples if real value unknown
+          if (nSamp < 2) nSamp = 2; // Avoid division by zero if nSamp = 1. Not sure it's correct, but I don't expect nSamp = 1 to happen.
+          double integrationTimeSeconds = (nSamp - 1) / m_clockSettings->getClockFrequency(Const::SVD, "sampling") / Unit::s;
+          double chargePerUnitTime = cluster.getCharge() / integrationTimeSeconds;
           if (cluster.isUCluster()) {
-            rates_energyU.layerAverageRates[layer] += cluster.getCharge();
-            rates_energyU.layerLadderAverageRates[layer][ladder] += cluster.getCharge();
-            rates_energyU.layerSensorAverageRates[layer][sensor] += cluster.getCharge();
-            rates_energyU.averageRate += cluster.getCharge();
+            rates_energyU.layerAverageRates[layer] += chargePerUnitTime;
+            rates_energyU.layerLadderAverageRates[layer][ladder] += chargePerUnitTime;
+            rates_energyU.layerSensorAverageRates[layer][sensor] += chargePerUnitTime;
+            rates_energyU.averageRate += chargePerUnitTime;
             if (layer == 0)
-              rates_energyU.l3LadderSensorAverageRates[ladder][sensor] += cluster.getCharge();
+              rates_energyU.l3LadderSensorAverageRates[ladder][sensor] += chargePerUnitTime;
             clustersU.layerAverageRates[layer]++;
             clustersU.layerLadderAverageRates[layer][ladder]++;
             clustersU.layerSensorAverageRates[layer][sensor]++;
@@ -250,12 +255,12 @@ namespace Belle2 {
             if (layer == 0)
               clustersU.l3LadderSensorAverageRates[ladder][sensor]++;
           } else {
-            rates_energyV.layerAverageRates[layer] += cluster.getCharge();
-            rates_energyV.layerLadderAverageRates[layer][ladder] += cluster.getCharge();
-            rates_energyV.layerSensorAverageRates[layer][sensor] += cluster.getCharge();
-            rates_energyV.averageRate += cluster.getCharge();
+            rates_energyV.layerAverageRates[layer] += chargePerUnitTime;
+            rates_energyV.layerLadderAverageRates[layer][ladder] += chargePerUnitTime;
+            rates_energyV.layerSensorAverageRates[layer][sensor] += chargePerUnitTime;
+            rates_energyV.averageRate += chargePerUnitTime;
             if (layer == 0)
-              rates_energyV.l3LadderSensorAverageRates[ladder][sensor] += cluster.getCharge();
+              rates_energyV.l3LadderSensorAverageRates[ladder][sensor] += chargePerUnitTime;
             clustersV.layerAverageRates[layer]++;
             clustersV.layerLadderAverageRates[layer][ladder]++;
             clustersV.layerSensorAverageRates[layer][sensor]++;
@@ -340,10 +345,8 @@ namespace Belle2 {
     void SVDHitRateCounter::normalize_energy_rates(TreeStruct& rates)
     {
       static const double ehEnergyJoules = Const::ehEnergy / Unit::J;
-      static const double integrationTime = 155 * Unit::ns;
-      static const double integrationTimeSeconds = integrationTime / Unit::s;
-      // Convert charge to mrad/s by multiplying by this constant and dividing by the mass
-      static const double conv = ehEnergyJoules / integrationTimeSeconds * 100e3;
+      // Convert charge/s to mrad/s by multiplying by energy/pair and dividing by the mass
+      static const double conv = ehEnergyJoules * 100e3;
 
       if (!rates.valid) return;
 
@@ -363,23 +366,15 @@ namespace Belle2 {
           rates.l3LadderSensorAverageRates[ladder][sensor] *= conv / massOfSensor(layer, ladder, sensor);
     }
 
-    // layer is unused, but this may be changed in the future. Better keep it.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
     double SVDHitRateCounter::massOfSensor(int layer, int ladder, int sensor)
     {
       static const double rho_Si = 2.329 * Unit::g_cm3;
-      static const double activeAreaHPKSmall = 122.9 * 38.55 * Unit::mm2;
-      static const double activeAreaHPKLarge = 122.9 * 57.72 * Unit::mm2;
-      static const double activeAreaMicron = 122.76 * (57.59 + 38.42) / 2 * Unit::mm2;
-      static const double thicknessHPK = 320 * Unit::um;
-      static const double thicknessMicron = 280 * Unit::um;
-      static const double massHPKSmallKg = activeAreaHPKSmall * thicknessHPK * rho_Si / 1e3;
-      static const double massHPKLargeKg = activeAreaHPKLarge * thicknessHPK * rho_Si / 1e3;
-      static const double massMicronKg = activeAreaMicron * thicknessMicron * rho_Si / 1e3;
-      return layer == 0 ? massHPKSmallKg : (sensor == 0 ? massMicronKg : massHPKLargeKg);
+      auto& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(VxdID(layer + 3, ladder + 1, sensor + 1));
+      double length = sensorInfo.getLength();
+      double width = (sensorInfo.getForwardWidth() + sensorInfo.getBackwardWidth()) / 2.0;
+      double thickness = sensorInfo.getWSize();
+      return length * width * thickness * rho_Si / 1e3;
     }
-#pragma GCC diagnostic pop
 
     bool SVDHitRateCounter::isStripActive(const VxdID& sensorID, const bool& isU,
                                           const unsigned short& strip)

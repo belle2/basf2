@@ -31,23 +31,23 @@ REG_MODULE(SVDDQMDose)
 
 SVDDQMDoseModule::SVDDQMDoseModule() : HistoModule()
 {
-  setDescription("Monitor SVD dose TODO...");
+  setDescription("The SVD dose-monitoring DQM module. Fills histograms of the SVD's instantaneous occupancy and "
+                 "of SVD occupancy vs time since last injection and time in beam revolution cycle.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("eventTypeFilter", m_eventFilter,
-           "Types of events to include in the plots (see SVDDQMDoseModule::EEventType).", 7U);
+           "Types of events to include in the plots (1 = less than noInjectionTimeout after HER injection, "
+           "2 = less than noInjectionTimeout after LER injection, 4 = more than noInjectionTimeout after any "
+           "injection; bitwise or combinations are possible; see SVDDQMDoseModule::EEventType).", 7U);
   addParam("histogramDirectoryName", m_histogramDirectoryName,
            "Name of the directory where histograms will be placed in the ROOT file.",
            std::string("SVDDose"));
   addParam("offlineZSShaperDigits", m_SVDShaperDigitsName,
-           "Name of the SVDShaperDigits to use for computing occupancy (with ZS5).",
+           "Name of the SVDShaperDigits to use for computing occupancy (default is SVDShaperDigitsZS5).",
            std::string("SVDShaperDigitsZS5"));
   addParam("noInjectionTimeout", m_noInjectionTime,
            "Time (microseconds) since last injection after which an event is considered \"No Injection\". "
            "Also the limit for the x axis of the 2D histograms.",
            30e3);
-  addParam("beamRevolutionCycle", m_revolutionTime,
-           "Beam revolution cycle in microseconds. It's the limit for the y axis of the 2D histograms.",
-           5120 / 508.0);
   m_trgTypes.push_back(TRGSummary::TTYP_POIS);
   addParam("trgTypes", m_trgTypes,
            "Trigger types for event selection. Empty to select everything. "
@@ -199,8 +199,7 @@ void SVDDQMDoseModule::event()
   if (m_rawTTD.getEntries() == 0)
     return;
   RawFTSW* theTTD = m_rawTTD[0];
-  // 127 MHz is the (inexactly rounded) clock of the ticks
-  const double timeSinceInj = theTTD->GetTimeSinceLastInjection(0) / 127.0;
+  const double timeSinceInj = theTTD->GetTimeSinceLastInjection(0) / (m_clockSettings->getGlobalClockFrequency() * 1e3);
   const bool isHER = theTTD->GetIsHER(0);
   const EEventType eventType = timeSinceInj > m_noInjectionTime ? c_NoInjection : (isHER ? c_HERInjection : c_LERInjection);
   if (((unsigned int)eventType & m_eventFilter) == 0U)
@@ -237,28 +236,10 @@ void SVDDQMDoseModule::event()
 }
 
 const std::vector<SVDDQMDoseModule::SensorGroup> SVDDQMDoseModule::c_sensorGroups = {
-  {"L3XX", "L3", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 3; }},
-  {"L4XX", "L4", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 4; }},
-  {"L5XX", "L5", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 5; }},
-  {"L6XX", "L6", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6; }},
-  {"L31X", "L3.1", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 3 && s.getLadderNumber() == 1; }},
-  {"L32X", "L3.2", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 3 && s.getLadderNumber() == 2; }}
-  // {"L3X1", "L3.X.1", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 3 && s.getSensorNumber() == 1; }},
-  // {"L3X2", "L3.X.2", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 3 && s.getSensorNumber() == 2; }},
-  // {"L4X1", "L4.X.1", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 4 && s.getSensorNumber() == 1; }},
-  // {"L4X2", "L4.X.2", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 4 && s.getSensorNumber() == 2; }},
-  // {"L4X3", "L4.X.3", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 4 && s.getSensorNumber() == 3; }},
-  // {"L5X1", "L5.X.1", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 5 && s.getSensorNumber() == 1; }},
-  // {"L5X2", "L5.X.2", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 5 && s.getSensorNumber() == 2; }},
-  // {"L5X3", "L5.X.3", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 5 && s.getSensorNumber() == 3; }},
-  // {"L5X4", "L5.X.4", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 5 && s.getSensorNumber() == 4; }},
-  // {"L6X1", "L6.X.1", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6 && s.getSensorNumber() == 1; }},
-  // {"L6X2", "L6.X.2", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6 && s.getSensorNumber() == 2; }},
-  // {"L6X3", "L6.X.3", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6 && s.getSensorNumber() == 3; }},
-  // {"L6X4", "L6.X.4", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6 && s.getSensorNumber() == 4; }},
-  // {"L6X5", "L6.X.5", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6 && s.getSensorNumber() == 5; }},
-  // {"L3mid", "L3 mid plane (L3.1.X and L3.2.X)", 90, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 3 && s.getLadderNumber() < 3; }},
-  // {"L4mid", "L4 mid plane (L4.6.1 and L4.6.2)", 30, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 4 && s.getLadderNumber() == 6 && s.getSensorNumber() < 3; }},
-  // {"L5mid", "L5 mid plane (L5.8.1 and L5.8.2)", 30, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 5 && s.getLadderNumber() == 8 && s.getSensorNumber() < 3; }},
-  // {"L6mid", "L6 mid plane (L6.10.1 and L6.10.2)", 30, 0.0, 5.859375, [](const VxdID & s) { return s.getLayerNumber() == 6 && s.getLadderNumber() == 10 && s.getSensorNumber() < 3; }}
+  {"L3XX", "L3", defaultNBins, defaultOccuMin, defaultOccuMax, [](const VxdID & s) { return s.getLayerNumber() == 3; }},
+  {"L4XX", "L4", defaultNBins, defaultOccuMin, defaultOccuMax, [](const VxdID & s) { return s.getLayerNumber() == 4; }},
+  {"L5XX", "L5", defaultNBins, defaultOccuMin, defaultOccuMax, [](const VxdID & s) { return s.getLayerNumber() == 5; }},
+  {"L6XX", "L6", defaultNBins, defaultOccuMin, defaultOccuMax, [](const VxdID & s) { return s.getLayerNumber() == 6; }},
+  {"L31X", "L3.1", defaultNBins, defaultOccuMin, defaultOccuMax, [](const VxdID & s) { return s.getLayerNumber() == 3 && s.getLadderNumber() == 1; }},
+  {"L32X", "L3.2", defaultNBins, defaultOccuMin, defaultOccuMax, [](const VxdID & s) { return s.getLayerNumber() == 3 && s.getLadderNumber() == 2; }}
 };

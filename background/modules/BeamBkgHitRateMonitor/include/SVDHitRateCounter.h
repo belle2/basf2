@@ -12,9 +12,12 @@
 
 #include <background/modules/BeamBkgHitRateMonitor/HitRateBase.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <svd/calibration/SVDHotStripsCalibrations.h>
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <TTree.h>
@@ -173,8 +176,8 @@ namespace Belle2 {
       TreeStruct m_rates_lowE; /**< tree variables for low-energy clusters */
       TreeStruct m_clustersU; /**< tree variables for U-side clusters */
       TreeStruct m_clustersV; /**< tree variables for V-side clusters */
-      TreeStruct m_rates_energyU; /**< Tree variables for deposited energy, then converted to dose rate (U-side) */
-      TreeStruct m_rates_energyV; /**< Tree variables for deposited energy, then converted to dose rate (V-side) */
+      TreeStruct m_rates_energyU; /**< Tree variables for deposited charge per unit time, then converted to dose rate (U-side) */
+      TreeStruct m_rates_energyV; /**< Tree variables for deposited charge per unit time, then converted to dose rate (V-side) */
 
       // buffer
       std::map<unsigned, TreeStruct> m_buffer; /**< average strip occupancies in time stamps */
@@ -193,10 +196,12 @@ namespace Belle2 {
 
       // store object
       StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer; /**< trigger decision */
+      StoreObjPtr<SVDEventInfo> m_eventInfo;
 
       // DB payloads
       SVDHotStripsCalibrations m_HotStripsCalib; /**< payload for hot strips */
       SVDFADCMaskedStrips m_FADCMaskedStrips; /**< payload for strips masked on FADC level */
+      DBObjPtr<HardwareClockSettings> m_clockSettings; /**< hardware clock settings */
 
       // other
       std::string m_svdShaperDigitsName; /**< name of the input SVDShaperDigits collection */

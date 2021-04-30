@@ -3,6 +3,7 @@
 
 import basf2 as b2
 from svd import add_svd_create_recodigits
+from svd.dqm_utils import add_svd_dqm_dose
 from geometry import check_components
 from analysisDQM import add_analysis_dqm, add_mirabelle_dqm
 
@@ -78,24 +79,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             # SVD CLUSTERS ON TRACK
             path.add_module('SVDDQMClustersOnTrack')
             # SVD DOSE
-            path.add_module(
-                'SVDDQMDose', offlineZSShaperDigits="SVDShaperDigitsZS5", eventTypeFilter=1,
-                histogramDirectoryName="SVDDoseHERInjPois").set_name("SVDDQMDose_HERInjPois")
-            path.add_module(
-                'SVDDQMDose', offlineZSShaperDigits="SVDShaperDigitsZS5", eventTypeFilter=2,
-                histogramDirectoryName="SVDDoseLERInjPois").set_name("SVDDQMDose_LERInjPois")
-            path.add_module(
-                'SVDDQMDose', offlineZSShaperDigits="SVDShaperDigitsZS5", eventTypeFilter=4,
-                histogramDirectoryName="SVDDoseNoInjPois").set_name("SVDDQMDose_NoInjPois")
-            path.add_module(
-                'SVDDQMDose', offlineZSShaperDigits="SVDShaperDigitsZS5", eventTypeFilter=1,
-                histogramDirectoryName="SVDDoseHERInjAll", trgTypes=[]).set_name("SVDDQMDose_HERInjAll")
-            path.add_module(
-                'SVDDQMDose', offlineZSShaperDigits="SVDShaperDigitsZS5", eventTypeFilter=2,
-                histogramDirectoryName="SVDDoseLERInjAll", trgTypes=[]).set_name("SVDDQMDose_LERInjAll")
-            path.add_module(
-                'SVDDQMDose', offlineZSShaperDigits="SVDShaperDigitsZS5", eventTypeFilter=4,
-                histogramDirectoryName="SVDDoseNoInjAll", trgTypes=[]).set_name("SVDDQMDose_NoInjAll")
+            add_svd_dqm_dose(path, 'SVDShaperDigitsZS5')
 
         # Event time measuring detectors
         if components is None or 'CDC' in components or 'ECL' in components or 'TOP' in components:

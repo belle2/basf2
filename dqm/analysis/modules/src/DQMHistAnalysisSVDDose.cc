@@ -29,9 +29,9 @@ DQMHistAnalysisSVDDoseModule::DQMHistAnalysisSVDDoseModule()
   addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", true);
   addParam("epicsUpdateSeconds", m_epicsUpdateSeconds,
            "Minimum interval between two successive PV updates (in seconds).", 300.0);
-  addParam("pvSuffix", m_pvSuffix, "Suffix for EPICS PVs.", std::string(":OccPois:Avg"));
+  addParam("pvSuffix", m_pvSuffix, "Suffix for EPICS PVs.", std::string(":Occ:Pois:Avg"));
   addParam("deltaTPVSuffix", m_deltaTPVSuffix, "Suffix for the PV that monitors the update interval of the PVs.",
-           std::string("OccPoisUpdateInterval"));
+           std::string("Occ:Pois:UpdateInterval"));
 }
 
 DQMHistAnalysisSVDDoseModule::~DQMHistAnalysisSVDDoseModule()
@@ -212,7 +212,6 @@ void DQMHistAnalysisSVDDoseModule::endRun()
             << LogVar("nEvts", nEvts) << LogVar("nHits", nHits));
 
     double occ = nEvts ? (nHits / nEvts * 100.0 / group.nStrips) : -1.0;
-    // TODO is this the best name for the MonitoringObject variable?
     TString vName = group.nameSuffix + "OccPoisAvg"; // e.g. L3XXUOccPoisAvg
     m_monObj->setVariable(vName.Data(), occ);
   }

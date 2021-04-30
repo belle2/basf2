@@ -51,18 +51,18 @@ namespace Belle2 {
      * See Belle2::SVD::SVDDQMDoseModule::SensorGroup.
      */
     typedef struct SensorGroup {
-      TString nameSuffix; ///< Suffix of the name of the histograms
-      TString titleSuffix; ///< Suffix for the title of the canvases
-      const char* pvMiddle; ///< Middle part of the PV name. See also m_pvPrefix and m_pvSuffix.
-      int nStrips; ///< Total number of strips in the sensor group.
+      TString nameSuffix; /**< Suffix of the name of the histograms */
+      TString titleSuffix; /**< Suffix for the title of the canvases */
+      const char* pvMiddle; /**< Middle part of the PV name. See also m_pvPrefix and m_pvSuffix. */
+      int nStrips; /**< Total number of strips in the sensor group. */
     } SensorGroup;
 
 #ifdef _BELLE2_EPICS
-    /// A struct to keep EPICS PV-related data.
+    /** A struct to keep EPICS PV-related data. */
     typedef struct MyPV {
-      chid mychid; ///< Channel id
-      double lastNHits = 0.0; ///< Hit count at last report. Needed for the delta.
-      double lastNEvts = 0.0; ///< Events count at last report. Needed for the delta.
+      chid mychid; /**< Channel id */
+      double lastNHits = 0.0; /**< Hit count at last report. Needed for the delta. */
+      double lastNEvts = 0.0; /**< Events count at last report. Needed for the delta. */
     } MyPV;
 #endif
 
@@ -72,7 +72,7 @@ namespace Belle2 {
 
     void updateCanvases();
 
-    /// Utility method
+    /** Utility method */
     template<typename T>
     inline T* findHistT(TString name) { return dynamic_cast<T*>(findHist(name.Data())); }
 
@@ -99,43 +99,43 @@ namespace Belle2 {
       return res;
     }
 
-    /// Carries the content of the overflow bin into the last bin
+    /** Carries the content of the overflow bin into the last bin */
     static void carryOverflowOver(TH1F* h);
 
     // Steerable data members (parameters)
-    std::string m_pvPrefix; ///< Prefix for EPICS PVs
-    bool m_useEpics; ///< Whether to update EPICS PVs
-    double m_epicsUpdateSeconds; ///< Minimum interval between successive PV updates
-    std::string m_pvSuffix; ///< Suffix for EPICS PVs
-    std::string m_deltaTPVSuffix; ///< Suffix of the update-time monitoring PV
+    std::string m_pvPrefix; /**< Prefix for EPICS PVs */
+    bool m_useEpics; /**< Whether to update EPICS PVs */
+    double m_epicsUpdateSeconds; /**< Minimum interval between successive PV updates */
+    std::string m_pvSuffix; /**< Suffix for EPICS PVs */
+    std::string m_deltaTPVSuffix; /**< Suffix of the update-time monitoring PV */
 
     // Data members for outputs
-    MonitoringObject* m_monObj = nullptr; ///< Monitoring object for MiraBelle
-    TPaveText* m_legend = nullptr; ///< Legend of the inst. occu. plots
+    MonitoringObject* m_monObj = nullptr; /**< Monitoring object for MiraBelle */
+    TPaveText* m_legend = nullptr; /**< Legend of the inst. occu. plots */
     // Canvases & output histos for Poisson trigger (TTYP_POIS) events
-    std::vector<TCanvas*> m_c_instOccu; ///< Canvases for the instantaneous occupancy
-    std::vector<TCanvas*> m_c_occuLER; ///< Canvases for the occu. vs time after LER inj.
-    std::vector<TCanvas*> m_c_occuHER; ///< Canvases for the occu. vs time after HER inj.
-    std::vector<TCanvas*> m_c_occuLER1; ///< Canvases for the 1D occu. vs time after LER inj.
-    std::vector<TCanvas*> m_c_occuHER1; ///< Canvases for the 1D occu. vs time after HER inj.
-    std::vector<TH2F*> m_h_occuLER; ///< Histograms for the occu. vs time after LER inj.
-    std::vector<TH2F*> m_h_occuHER; ///< Histograms for the occu. vs time after HER inj.
-    std::vector<TH1F*> m_h_occuLER1; ///< Histograms for the 1D occu. vs time after LER inj.
-    std::vector<TH1F*> m_h_occuHER1; ///< Histograms for the 1D occu. vs time after HER inj.
+    std::vector<TCanvas*> m_c_instOccu; /**< Canvases for the instantaneous occupancy */
+    std::vector<TCanvas*> m_c_occuLER; /**< Canvases for the occu. vs time after LER inj. */
+    std::vector<TCanvas*> m_c_occuHER; /**< Canvases for the occu. vs time after HER inj. */
+    std::vector<TCanvas*> m_c_occuLER1; /**< Canvases for the 1D occu. vs time after LER inj. */
+    std::vector<TCanvas*> m_c_occuHER1; /**< Canvases for the 1D occu. vs time after HER inj. */
+    std::vector<TH2F*> m_h_occuLER; /**< Histograms for the occu. vs time after LER inj. */
+    std::vector<TH2F*> m_h_occuHER; /**< Histograms for the occu. vs time after HER inj. */
+    std::vector<TH1F*> m_h_occuLER1; /**< Histograms for the 1D occu. vs time after LER inj. */
+    std::vector<TH1F*> m_h_occuHER1; /**< Histograms for the 1D occu. vs time after HER inj. */
     // Canvases & output histos for all events
-    std::vector<TCanvas*> m_c_instOccuAll; ///< Canvases for the instantaneous occupancy
-    std::vector<TCanvas*> m_c_occuLERAll; ///< Canvases for the occu. vs time after LER inj.
-    std::vector<TCanvas*> m_c_occuHERAll; ///< Canvases for the occu. vs time after HER inj.
-    std::vector<TCanvas*> m_c_occuLER1All; ///< Canvases for the 1D occu. vs time after LER inj.
-    std::vector<TCanvas*> m_c_occuHER1All; ///< Canvases for the 1D occu. vs time after HER inj.
-    std::vector<TH2F*> m_h_occuLERAll; ///< Histograms for the occu. vs time after LER inj.
-    std::vector<TH2F*> m_h_occuHERAll; ///< Histograms for the occu. vs time after HER inj.
-    std::vector<TH1F*> m_h_occuLER1All; ///< Histograms for the 1D occu. vs time after LER inj.
-    std::vector<TH1F*> m_h_occuHER1All; ///< Histograms for the 1D occu. vs time after HER inj.
+    std::vector<TCanvas*> m_c_instOccuAll; /**< Canvases for the instantaneous occupancy */
+    std::vector<TCanvas*> m_c_occuLERAll; /**< Canvases for the occu. vs time after LER inj. */
+    std::vector<TCanvas*> m_c_occuHERAll; /**< Canvases for the occu. vs time after HER inj. */
+    std::vector<TCanvas*> m_c_occuLER1All; /**< Canvases for the 1D occu. vs time after LER inj. */
+    std::vector<TCanvas*> m_c_occuHER1All; /**< Canvases for the 1D occu. vs time after HER inj. */
+    std::vector<TH2F*> m_h_occuLERAll; /**< Histograms for the occu. vs time after LER inj. */
+    std::vector<TH2F*> m_h_occuHERAll; /**< Histograms for the occu. vs time after HER inj. */
+    std::vector<TH1F*> m_h_occuLER1All; /**< Histograms for the 1D occu. vs time after LER inj. */
+    std::vector<TH1F*> m_h_occuHER1All; /**< Histograms for the 1D occu. vs time after HER inj. */
 
 #ifdef _BELLE2_EPICS
-    std::vector<MyPV> m_myPVs; ///< EPICS stuff for each sensor group / PV
-    double m_lastPVUpdate; ///< Time of the last PV update (seconds)
+    std::vector<MyPV> m_myPVs; /**< EPICS stuff for each sensor group / PV */
+    double m_lastPVUpdate; /**< Time of the last PV update (seconds) */
     chid m_timeSinceLastPVUpdateChan;
     double m_timeSinceLastPVUpdate = -1.0;
 #endif

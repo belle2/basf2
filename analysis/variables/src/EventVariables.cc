@@ -569,8 +569,12 @@ namespace Belle2 {
                       R"DOC([Eventbased] Returns 1.0 if the event contains opposite flavor neutral B-mesons on generator level,
 0.0 in case of same flavor B-mesons and NaN if the event has no generated neutral B.)DOC");
 
-    REGISTER_VARIABLE("nTracks", nTracks,
-                      "[Eventbased] Return number of tracks in the event.");
+    REGISTER_VARIABLE("nTracks", nTracks, R"DOC(
+[Eventbased] Returns the total number of tracks (unfiltered) in the event.
+
+.. warning:: This variable is exceedingly background-dependent and should not really be used in any selections (other than perhaps for monitoring purposes).
+.. seealso:: :b2:var:`nCleanedTracks` for a more useful variable for use in selections.
+)DOC");
     REGISTER_VARIABLE("nChargeZeroTrackFits", nChargeZeroTrackFits, R"DOC(
 [Eventbased] Returns number of track fits with zero charge.
 
@@ -585,16 +589,27 @@ namespace Belle2 {
 [Eventbased][Legacy] Returns total energy in ECL in the event as used in Belle 1 analyses. 
 
 .. warning::
-  For Belle II please use ``totalEnergyOfParticlesInList(gamma:all)`` instead.
+
+  For Belle II use cases use either ``totalEnergyOfParticlesInList(gamma:all)``, 
+  or (probably better) fill a photon list with some minimal cleanup cuts and use that instea
+  
+  .. code-block:: python
+
+    from variables import variables as vm
+    fillParticleList("gamma:cleaned", "E > 0.05 and isFromECL==1", path=path)
+    fillParticleList("e+:cleaned", "clusterE > 0.05", path=path)
+    vm.addAlias("myNeutralECLEnergy", "totalEnergyOfParticlesInList(gamma:cleaned)")
+    vm.addAlias("myChargedECLEnergy", "totalEnergyOfParticlesInList(e+:cleaned)")
+    vm.addAlias("myECLEnergy", "formula(myNeutralECLEnergy+myChargedECLEnergy)")
 )DOC");
     REGISTER_VARIABLE("nKLMClusters", nKLMClusters,
                       "[Eventbased] Returns number of KLM clusters in the event.");
     REGISTER_VARIABLE("nMCParticles", nMCParticles,
                       "[Eventbased] Returns number of MCParticles in the event.");
 
-    REGISTER_VARIABLE("expNum", expNum, "[Eventbased] Returns experiment number.");
-    REGISTER_VARIABLE("evtNum", evtNum, "[Eventbased] Returns event number.");
-    REGISTER_VARIABLE("runNum", runNum, "[Eventbased] Returns run number.");
+    REGISTER_VARIABLE("expNum", expNum, "[Eventbased] Returns the experiment number.");
+    REGISTER_VARIABLE("evtNum", evtNum, "[Eventbased] Returns the event number.");
+    REGISTER_VARIABLE("runNum", runNum, "[Eventbased] Returns the run number.");
     REGISTER_VARIABLE("productionIdentifier", productionIdentifier, R"DOC(
 [Eventbased] Production identifier.
 Uniquely identifies an MC sample by the (grid-jargon) production ID. 

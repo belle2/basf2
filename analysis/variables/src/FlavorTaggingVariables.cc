@@ -1984,13 +1984,23 @@ The return values and the corresponding dilution ranges are the following:
 * 5: :math:`0.750 < r < 0.875`;
 * 6: :math:`0.875 < r < 1.000`.
 
+.. warning:: You have to run the Flavor Tagger for this variable to be meaningful.
+.. seealso:: :ref:`FlavorTagger` and :func:`flavorTagger.flavorTagger`.
 )DOC");
     REGISTER_VARIABLE("qrOutput(combinerMethod)", qrOutput, R"DOC(
 Returns the output of the flavorTagger, flavor tag :math:`q` times the dilution factor :math:`r`, for the given a combiner method. 
 The available combiner methods are 'FBDT' or 'FANN'.
+
+.. warning:: You have to run the Flavor Tagger for this variable to be meaningful.
+.. seealso:: :ref:`FlavorTagger` and :func:`flavorTagger.flavorTagger`.
 )DOC");
-    REGISTER_VARIABLE("qOutput(combinerMethod)", qOutput,
-                      "Returns the flavor tag :math:`q` output of the flavorTagger for the given combinerMethod. The available combiner methods are 'FBDT' or 'FANN'.");
+    REGISTER_VARIABLE("qOutput(combinerMethod)", qOutput, R"DOC(
+Returns the flavor tag :math:`q` output of the flavorTagger for the given combinerMethod. 
+The available combiner methods are 'FBDT' or 'FANN'.
+
+.. warning:: You have to run the Flavor Tagger for this variable to be meaningful.
+.. seealso:: :ref:`FlavorTagger` and :func:`flavorTagger.flavorTagger`.
+)DOC");
     REGISTER_VARIABLE("isRelatedRestOfEventB0Flavor", isRelatedRestOfEventB0Flavor,  R"DOC(
 Returns -1 (1) if the RestOfEvent related to the given particle is related to a ``anti-B0`` (``B0``). 
 The ``MCError`` bit of Breco has to be 0, 1, 2, 16 or 1024. 

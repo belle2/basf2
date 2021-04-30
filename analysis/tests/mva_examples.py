@@ -12,10 +12,13 @@ class ExamplesTest(b2tua.ExamplesTest):
         """
         Test supported mva examples.
         """
-        # B2A714 is a MVA model description and not a standalone example script
-        excluded_python_file = ['B2A714-DeepContinuumSuppression_MVAModel.py']
+        # list of examples that cannot be tested
+        broken_mva_egs = ['B2A712-DeepContinuumSuppression_MVATrain.py',  # training takes too long and cannot be shortened
+                          'B2A713-DeepContinuumSuppression_MVAExpert.py',  # requires weight file created in previous example
+                          'B2A714-DeepContinuumSuppression_MVAModel.py'  # MVA model description and not standalone example script
+                          ]
 
-        self._test_examples_dir('analysis/examples/mva/', excluded_python_file)
+        self._test_examples_dir('analysis/examples/mva/', broken_mva_egs)
 
 
 if __name__ == '__main__':

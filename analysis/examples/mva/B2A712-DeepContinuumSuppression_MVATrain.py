@@ -142,7 +142,7 @@ if __name__ == "__main__":
         'adversary_steps': 5}
     specific_options.m_config = json.dumps(keras_dic)
 
-    # Train a MVA method and store the weightfile (MVAFastBDT.root) locally.
+    # Train a MVA method and store the weightfile (Deep_Feed_Forward.xml) locally.
     basf2_mva.teacher(general_options, specific_options)
 
     # Evaluate training.

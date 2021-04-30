@@ -90,24 +90,6 @@ void V0Fitter::initializeCuts(double beamPipeRadius,
 }
 
 
-bool V0Fitter::rejectCandidate(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus)
-{
-  const TVector3& posPlus = stPlus.getPos();
-  const TVector3& posMinus = stMinus.getPos();
-
-  const double Rstart = std::min(posPlus.Perp(), posMinus.Perp());
-  try {
-    stPlus.extrapolateToCylinder(Rstart);
-    stMinus.extrapolateToCylinder(Rstart);
-  } catch (...) {
-    B2DEBUG(22, "Extrapolation to cylinder failed.");
-    return true;
-  }
-
-  return false;
-}
-
-
 bool V0Fitter::fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex)
 {
   VertexVector vertexVector;
@@ -359,10 +341,6 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
   /// make a clone, not use the reference so that the genfit::MeasuredStateOnPlane and its TrackReps will not be altered.
   genfit::MeasuredStateOnPlane stPlus  = recoTrackPlus->getMeasuredStateOnPlaneFromFirstHit(plusRepresentation);
   genfit::MeasuredStateOnPlane stMinus = recoTrackMinus->getMeasuredStateOnPlaneFromFirstHit(minusRepresentation);
-
-  if (rejectCandidate(stPlus, stMinus)) {
-    return false;
-  }
 
   genfit::GFRaveVertex vert;
   if (not fitGFRaveVertex(gfTrackPlus, gfTrackMinus, vert)) {

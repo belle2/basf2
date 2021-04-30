@@ -28,6 +28,15 @@ def skip_expensive_tests() -> bool:
     ]
 
 
+def light_release() -> bool:
+    """ Returns true if we're in a light release """
+    try:
+        import generators  # noqa
+    except ModuleNotFoundError:
+        return True
+    return False
+
+
 class SteeringFileTest(unittest.TestCase):
     """ Test steering files """
 
@@ -37,6 +46,7 @@ class SteeringFileTest(unittest.TestCase):
         broken: Optional[List[str]] = None,
         additional_arguments: Optional[List[str]] = None,
         expensive_tests: Optional[List[str]] = None,
+        skip_in_light: Optional[List[str]] = None,
         change_working_directory=True,
     ):
         """
@@ -60,6 +70,8 @@ class SteeringFileTest(unittest.TestCase):
             broken = []
         if expensive_tests is None:
             expensive_tests = []
+        if skip_in_light is None:
+            skip_in_light = []
         working_dir = find_file(path_to_glob)
         all_egs = sorted(glob.glob(working_dir + "/*.py"))
         for eg in all_egs:
@@ -67,6 +79,8 @@ class SteeringFileTest(unittest.TestCase):
             if filename in broken:
                 continue
             if skip_expensive_tests and filename in expensive_tests:
+                continue
+            if filename in skip_in_light and light_release:
                 continue
             with self.subTest(msg=filename):
                 result = subprocess.run(
@@ -102,6 +116,10 @@ class SteeringFileTest(unittest.TestCase):
             expensive_tests=[
                 "065_generate_mc.py",
                 "067_generate_mc.py"
+            ],
+            skip_in_light=[
+                "085_module.py",
+                "087_module.py"
             ],
             change_working_directory=True,
         )

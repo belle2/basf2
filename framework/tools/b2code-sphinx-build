@@ -30,7 +30,7 @@ while [[ $# -gt 0 ]]; do
         -h|--help)
         cat <<EOT
 This script will run sphinx with the appropriate arguments to build the user
-documentation and optionally only show the warnings.
+documentation.
 
 Optional Arguments:
   --light           Create documentation only for the light release, that is only

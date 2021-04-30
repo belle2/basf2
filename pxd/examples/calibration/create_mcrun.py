@@ -19,37 +19,66 @@
 # author: benjamin.schwenker@phys.uni-goettingen.de
 
 
-from basf2 import *
+import glob
+import basf2 as b2
 
 import argparse
-parser = argparse.ArgumentParser(description="Create SimHits for a run with user specified ExpRun")
-parser.add_argument('--tag', default='Calibration_Offline_Development', type=str, help='Set name of GT')
-parser.add_argument('--expNo', default=3, type=int, help='Set experiment number')
+parser = argparse.ArgumentParser(
+    description="Create SimHits for a run with user specified ExpRun")
+parser.add_argument(
+    '--tag',
+    default='Calibration_Offline_Development',
+    type=str,
+    help='Set name of GT')
+parser.add_argument(
+    '--expNo',
+    default=3,
+    type=int,
+    help='Set experiment number')
 parser.add_argument('--runNo', default=3360, type=int, help='Set run number')
-parser.add_argument('--setNo', default=0, type=int, help='setnumber for bg simulation')
-parser.add_argument('--bg', default='/group/belle2/BGFile/OfficialBKG/15thCampaign/phase2', type=str, help='Path to mixer sets')
-parser.add_argument('--scaleFactor', default=1.0, type=float, help='Scale factor for mixer')
+parser.add_argument(
+    '--setNo',
+    default=0,
+    type=int,
+    help='setnumber for bg simulation')
+parser.add_argument(
+    '--bg',
+    default='/group/belle2/BGFile/OfficialBKG/15thCampaign/phase2',
+    type=str,
+    help='Path to mixer sets')
+parser.add_argument(
+    '--scaleFactor',
+    default=1.0,
+    type=float,
+    help='Scale factor for mixer')
 args = parser.parse_args()
 
-import glob
 bg = glob.glob(args.bg + '/set' + str(args.setNo) + '/*.root')
 
 
-reset_database()
-use_central_database(args.tag)
+b2.reset_database()
+b2.use_central_database(args.tag)
 
-main = create_path()
-main.add_module("EventInfoSetter", expList=[args.expNo], runList=[args.runNo], evtNumList=[1000])
+main = b2.create_path()
+main.add_module(
+    "EventInfoSetter", expList=[
+        args.expNo], runList=[
+            args.runNo], evtNumList=[1000])
 main.add_module("Gearbox", fileName='geometry/Beast2_phase2.xml')
 main.add_module("Geometry", useDB=False)
-bkgmixer = register_module('BeamBkgMixer')
+bkgmixer = b2.register_module('BeamBkgMixer')
 bkgmixer.param('backgroundFiles', bg)
 bkgmixer.param('overallScaleFactor', args.scaleFactor)
 main.add_module(bkgmixer)
 output = main.add_module('RootOutput')
-output.param('outputFileName', 'beam.{:0>4}.{:0>5}.HLT2.f{:0>5}.root'.format(args.expNo, args.runNo, args.setNo))
+output.param(
+    'outputFileName',
+    'beam.{:0>4}.{:0>5}.HLT2.f{:0>5}.root'.format(
+        args.expNo,
+        args.runNo,
+        args.setNo))
 output.param('branchNames', ['PXDSimHits', 'EventMetaData'])
 main.add_module("Progress")
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

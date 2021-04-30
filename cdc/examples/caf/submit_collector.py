@@ -4,15 +4,12 @@
 import sys
 from pathlib import Path
 import time
-import glob
+from caf import backends
 
 # Add timestamp to all INFO messages
 from basf2 import B2INFO, logging, LogLevel, LogInfo
 currentInfo = logging.get_info(LogLevel.INFO)
 logging.set_info(LogLevel.INFO, currentInfo | LogInfo.TIMESTAMP)
-
-from caf import backends
-import ROOT
 
 
 probcut = float(sys.argv[1]) if len(sys.argv) == 2 else 0.001

@@ -6,9 +6,15 @@
 // Date : Nov. 22, 2015
 //-
 //#include <daq/rawdata/modules/DAQConsts.h>
+
 #include <rawdata/dataobjects/RawPXD.h>
 #include <rawdata/modules/MakeDumHSLBData.h>
-#include <framework/core/InputController.h>
+
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 
 using namespace std;
 using namespace Belle2;

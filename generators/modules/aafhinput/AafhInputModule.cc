@@ -106,7 +106,7 @@ void AafhInputModule::event()
   }
 
   // Initial particle from beam parameters (for random vertex)
-  MCInitialParticles& initial = m_initial.generate();
+  const MCInitialParticles& initial = m_initial.generate();
 
   // True boost.
   TLorentzRotation boost = initial.getCMSToLab();

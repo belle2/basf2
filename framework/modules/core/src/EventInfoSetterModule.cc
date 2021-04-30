@@ -132,7 +132,9 @@ void EventInfoSetterModule::initialize()
     totalevents++;
   }
   B2DEBUG(100, "EventInfoSetter: will process " << totalevents << " events in total.");
-
+  if (totalevents == 0) {
+    B2FATAL("Total processed number of events is 0, please check your inputs, -n and --skip-events arguments!");
+  }
   Environment::Instance().setNumberOfMCEvents(totalevents);
 }
 

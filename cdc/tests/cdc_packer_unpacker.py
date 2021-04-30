@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
 import simulation
 
 cdc_hits = "CDCHits"
 cdc_hits_pack_unpack_collection = "CDCHits_test_output"
-set_random_seed(42)
+b2.set_random_seed(42)
 
 
-class PackerUnpackerTestModule(Module):
+class PackerUnpackerTestModule(b2.Module):
 
     """
     module which checks if two collection of CDCHits are equal
@@ -49,7 +49,7 @@ class PackerUnpackerTestModule(Module):
         cdcHits = self.sortHits(cdcHits_unsorted)
 
         if not len(cdcHits) == len(cdcHitsPackedUnpacked):
-            B2FATAL("CDC Hit count not equal after packing and unpacking")
+            b2.B2FATAL("CDC Hit count not equal after packing and unpacking")
 
         # check all quantities between the direct and the packed/unpacked CDC hit
         for i in range(len(cdcHits)):
@@ -65,30 +65,30 @@ class PackerUnpackerTestModule(Module):
             assert hit.getStatus() == hitPackedUnpacked.getStatus()
 
 
-main = create_path()
+main = b2.create_path()
 # Create Event information
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [10]})
 main.add_module(eventinfosetter)
 
 # to run the framework the used modules need to be registered
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 particlegun.param('pdgCodes', [13, -13])
 particlegun.param('nTracks', 10)
 main.add_module(particlegun)
 
 # add simulation for CDC only
 simulation.add_simulation(main, components=['CDC'])
-set_module_parameters(main, type="Geometry", useDB=False, components=["CDC"])
+b2.set_module_parameters(main, type="Geometry", useDB=False, components=["CDC"])
 
 # add the packer which packs the CDCHits resulting from the simulation
-cdc_packer = register_module('CDCPacker')
+cdc_packer = b2.register_module('CDCPacker')
 cdc_packer.param('cdcHitName', "CDCHits")
 main.add_module(cdc_packer)
 
 # add the unpacker which unpacks the RawCDC hits and stores
 # them in the dedicated store array "cdcHit_test_output"
-cdc_unpacker = register_module('CDCUnpacker')
+cdc_unpacker = b2.register_module('CDCUnpacker')
 cdc_unpacker.param('cdcHitName', cdc_hits_pack_unpack_collection)
 cdc_unpacker.param('enablePrintOut', False)
 cdc_unpacker.param('pedestalSubtraction', False)
@@ -99,4 +99,4 @@ main.add_module(cdc_unpacker)
 main.add_module(PackerUnpackerTestModule())
 
 # Process events
-process(main)
+b2.process(main)

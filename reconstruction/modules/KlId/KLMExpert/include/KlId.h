@@ -10,14 +10,13 @@
 
 #pragma once
 
-
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
-
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/Exception.h>
@@ -25,7 +24,7 @@
 #include <math.h>
 
 /** Helper functions for all klid modules to improve readability of the code */
-namespace KlId {
+namespace Belle2::KlongId {
 
   /**get Belle stle track flag */
   int BelleTrackFlag(const Belle2::KLMCluster& cluster, const float angle = 0.26)
@@ -83,7 +82,7 @@ namespace KlId {
     bool stop = false;
     while (!stop) {
       ++hirachy_counter;
-      if (part -> getPDG() == 130) {
+      if (part -> getPDG() == Const::Klong.getPDGCode()) {
         return hirachy_counter;
       }
       if ((part -> getMother() == nullptr)) {
@@ -156,35 +155,35 @@ namespace KlId {
 
     bool stop = false;
     while (!stop) {
-      if (isMCParticlePDG(part, 130)) {
-        return 130;
+      if (isMCParticlePDG(part, Const::Klong.getPDGCode())) {
+        return Const::Klong.getPDGCode();
       }
-      if (isMCParticlePDG(part, 310)) {
-        return 310;
+      if (isMCParticlePDG(part, Const::Kshort.getPDGCode())) {
+        return Const::Kshort.getPDGCode();
       }
-      if (isMCParticlePDG(part, 321)) {
-        return 321;
+      if (isMCParticlePDG(part, Const::kaon.getPDGCode())) {
+        return Const::kaon.getPDGCode();
       }
-      if (isMCParticlePDG(part, 2112)) {
-        return 2112;
+      if (isMCParticlePDG(part, Const::neutron.getPDGCode())) {
+        return Const::neutron.getPDGCode();
       }
-      if (isMCParticlePDG(part, 2212)) {
-        return 2212;
+      if (isMCParticlePDG(part, Const::proton.getPDGCode())) {
+        return Const::proton.getPDGCode();
       }
-      if (isMCParticlePDG(part, 211)) {
-        return 211;
+      if (isMCParticlePDG(part, Const::pion.getPDGCode())) {
+        return Const::pion.getPDGCode();
       }
-      if (isMCParticlePDG(part, 111)) {
-        return 111;
+      if (isMCParticlePDG(part, Const::pi0.getPDGCode())) {
+        return Const::pi0.getPDGCode();
       }
-      if (isMCParticlePDG(part, 13)) {
-        return 13;
+      if (isMCParticlePDG(part, Const::muon.getPDGCode())) {
+        return Const::muon.getPDGCode();
       }
-      if (isMCParticlePDG(part, 11)) {
-        return 11;
+      if (isMCParticlePDG(part, Const::electron.getPDGCode())) {
+        return Const::electron.getPDGCode();
       }
-      if (isMCParticlePDG(part, 22)) {
-        return 22;
+      if (isMCParticlePDG(part, Const::photon.getPDGCode())) {
+        return Const::photon.getPDGCode();
       }
       if ((part -> getMother() == nullptr)) {
         stop = true;

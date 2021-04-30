@@ -147,7 +147,7 @@ Inserting Figures
 While properly documenting the code itself is the first step to take, you may want to include figures that explain
 overall concepts of a package, module, or class (see :numref:`framework_modpath_diagram`).
 To do this, first simply place the image file you would like to display into your ``<package>/doc>`` directory.
-you can then place the image (in this case ``cat.jpg``) into the documentation by using
+You can then place the image (in this case ``cat.jpg``) into the documentation by using
 
 .. code-block:: rst
 
@@ -529,9 +529,24 @@ The output will be produced in ``$BELLE2_LOCAL_DIR/build/html`` and you can
 navigate it with your favorite browser to check if the output is what you
 expect.
 
+Alternatively you can also build the sphinx documentation without building any
+code with
+
+.. code:: bash
+
+    b2code-sphinx-build
+
+which will be slightly faster. If you're only interested in sphinx warnings,
+use
+
+.. code:: bash
+
+    b2code-sphinx-warnings
+
 If you are working on a remote server with port ``8XXXX`` forwarded to your local
 machine (as when running a Jupyter notebook), you can also start a tiny web server on
-the remote machine and access it from your local machine:
+the remote machine and access it from your local machine to view the rendered
+documentation:
 
 .. code:: bash
 
@@ -548,7 +563,7 @@ web pages.
 Previewing documentation changes in a pull request
 --------------------------------------------------
 
-1. Open your PR
+1. Open your PR following the guidelines outlined at :ref:`here <pr_best_practices>`
 2. Wait for it to build
 3. click on the build status and open the detailed build results
 4. open the "Artifacts" tab

@@ -65,13 +65,15 @@ namespace Belle2 {
                              It is assumed, that the B-field is parallel to the z-Axis.
      *  @param hitPatternCDCInitializer  bits for initializing CDC hit pattern.
      *  @param hitPatternVXDInitializer  bits for initializing VXD hit pattern.
+     *  @param NDF  number of degrees of freedom for the fit
      */
     TrackFitResult(const TVector3& position, const TVector3& momentum,
                    const TMatrixDSym& covariance, const short int charge,
                    const Const::ParticleType& particleType, const float pValue,
                    const float bField,
                    const uint64_t hitPatternCDCInitializer,
-                   const uint32_t hitPatternVXDInitializer);
+                   const uint32_t hitPatternVXDInitializer,
+                   const uint16_t NDF);
 
     /** Constructor initializing class with perigee parameters.
      *
@@ -82,11 +84,14 @@ namespace Belle2 {
      *  @param pValue        p-value of the corresponding track fit.
      *  @param hitPatternCDCInitializer  bits for initializing CDC hit pattern.
      *  @param hitPatternVXDInitializer  bits for initializing VXD hit pattern.
+     *  @param NDF  number of degrees of freedom for the fit
      */
     TrackFitResult(const std::vector<float>& tau, const std::vector<float>& cov5,
                    const Const::ParticleType& particleType, const float pValue,
                    const uint64_t hitPatternCDCInitializer,
-                   const uint32_t hitPatternVXDInitializer);
+                   const uint32_t hitPatternVXDInitializer,
+                   const uint16_t NDF
+                  );
 
     /** Getter for vector of position at closest approach of track in r/phi projection. */
     TVector3 getPosition() const { return getHelix().getPerigee(); }
@@ -144,6 +149,12 @@ namespace Belle2 {
 
     /** Getter for Chi2 Probability of the track fit. */
     double getPValue() const { return m_pValue; }
+
+    /** Getter for number of degrees of freedom of the track fit. */
+    int getNDF() const;
+
+    /** Get chi2 given NDF and p-value */
+    double getChi2() const;
 
     //------------------------------------------------------------------------
     // --- Getters for perigee helix parameters
@@ -206,6 +217,10 @@ namespace Belle2 {
     /** Conversion to framework Helix (without covariance).  */
     Helix getHelix() const
     { return Helix(getD0(), getPhi0(), getOmega(), getZ0(), getTanLambda()); }
+
+    /** Conversion to framework Helix with momentum scaling (without covariance).  */
+    Helix getHelix(float momentumScale) const
+    { return Helix(getD0(), getPhi0(), getOmega() / momentumScale, getZ0(), getTanLambda()); }
 
     /** Conversion to framework Uncertain Helix (i.e., with covariance).  */
     UncertainHelix getUncertainHelix() const
@@ -272,8 +287,15 @@ namespace Belle2 {
      */
     const uint32_t m_hitPatternVXDInitializer;
 
-    ClassDefOverride(TrackFitResult, 7); /**< Values of the result of a track fit with a given particle hypothesis. */
+    /** backward compatibility initialisation for NDF */
+    static const uint16_t c_NDFFlag = 0xFFFF;
+
+    /** Memeber for number of degrees of freedom*/
+    uint16_t m_NDF;
+
+    ClassDefOverride(TrackFitResult, 8); /**< Values of the result of a track fit with a given particle hypothesis. */
     /* Version history:
+       ver 8: add NDF
        ver 7: fixed sign errors in the translation of position and momentum covariances.
        ver 6: use fixed size arrays instead of vectors (add schema evolution rule), use Double32_t.
        ver 5: CDC Hit Pattern now a single variable (add schema evolution rule).

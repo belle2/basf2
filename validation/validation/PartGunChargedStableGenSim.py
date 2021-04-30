@@ -11,10 +11,24 @@ runs the fullsim w/ mixed in background, and dumps full output (*Digits containe
 </header>
 """
 
-import basf2
-from simulation import add_simulation
-from background import get_background_files
-from ROOT import Belle2
+# NB. Argument parsing is done *before* any import from the ROOT module, otherwise PyROOT will hijack the command-line options
+# in case of clashing option names. Most notably, this would happen with the '-h', '--help' option.
+import argparse
+
+parser = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+parser.add_argument("--bkg_dir",
+                    type=str,
+                    default=None,
+                    help="The directory containing beam bkg files.\n"
+                    "If not set, basf2 will search for the 'BELLE2_BACKGROUND_DIR' env variable by default,\n"
+                    "which is defined on the validation server.")
+args = parser.parse_args()
+
+from ROOT import Belle2  # noqa
+from background import get_background_files  # noqa
+from simulation import add_simulation  # noqa
+import basf2  # noqa
 
 # Pdg code of the charged stable particles & antiparticles.
 chargedStableList = []
@@ -52,7 +66,7 @@ pGun.param(param_pGun)
 main.add_module(pGun)
 
 # Detector simulation + bkg.
-add_simulation(main, bkgfiles=get_background_files())
+add_simulation(main, bkgfiles=get_background_files(folder=args.bkg_dir))
 
 # Memory profile.
 main.add_module("Profile")

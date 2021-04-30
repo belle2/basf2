@@ -16,6 +16,10 @@
 
 #include <mdst/dataobjects/TRGSummary.h>
 
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/TRGGDLDBInputBits.h>
+#include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
+
 #include <string.h>
 
 
@@ -48,6 +52,7 @@ void TRGGDLSummaryModule::initialize()
   }
 
   _e_timtype = 0;
+  _e_rvcout = 0;
   for (int i = 0; i < 10; i++) {
     ee_psn[i] = 0;
     ee_ftd[i] = 0;
@@ -55,6 +60,7 @@ void TRGGDLSummaryModule::initialize()
   }
   for (int i = 0; i < 320; i++) {
     if (strcmp(LeafNames[i], "timtype") == 0)_e_timtype = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "rvcout") == 0) _e_rvcout = LeafBitMap[i];
     if (strcmp(LeafNames[i], "psn0") == 0)   ee_psn[0] = LeafBitMap[i];
     if (strcmp(LeafNames[i], "psn1") == 0)   ee_psn[1] = LeafBitMap[i];
     if (strcmp(LeafNames[i], "psn2") == 0)   ee_psn[2] = LeafBitMap[i];
@@ -209,8 +215,8 @@ void TRGGDLSummaryModule::event()
     }
   }
 
-
-  GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[_e_timtype][n_clocks - 1];
+  // reg_tmdl_timtype in header. 3bit, no quality info.
+  GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[_e_timtype][0];
 
   //get prescales
   for (int i = 0; i < 320; i++) {
@@ -219,19 +225,68 @@ void TRGGDLSummaryModule::event()
     GDLResult->setPreScale(bit1, bit2, m_prescales->getprescales(i));
   }
 
-  TRGSummary::ETimingType tt = TRGSummary::TTYP_NONE;
+  TRGSummary::ETimingType tt;
   if (gtt == GDL::e_tt_cdc) {
     tt = TRGSummary::TTYP_CDC;
   } else if (gtt == GDL::e_tt_ecl) {
-    tt = TRGSummary::TTYP_PID0;
+    tt = TRGSummary::TTYP_ECL;
+  } else if (gtt == GDL::e_tt_top) {
+    tt = TRGSummary::TTYP_TOP;
   } else if (gtt == GDL::e_tt_dphy) {
     tt = TRGSummary::TTYP_DPHY;
   } else if (gtt == GDL::e_tt_rand) {
     tt = TRGSummary::TTYP_RAND;
+  } else if (gtt == GDL::e_tt_psnm) {
+    tt = TRGSummary::TTYP_SELF;
   } else {
     tt = TRGSummary::TTYP_NONE;
   }
 
+  StoreObjPtr<EventMetaData> bevt;
+  unsigned _exp = bevt->getExperiment();
+  unsigned _run = bevt->getRun();
+  unsigned exprun = _exp * 1000000 + _run;
+  if (exprun < 13000500) {
+    GDLResult->setTimQuality(TRGSummary::TTYQ_CORS); // coarse
+  } else {
+    int rvcout = _data[_e_rvcout][0];
+    int q = (rvcout >> 1) & 3;
+    TRGSummary::ETimingQuality timQuality = TRGSummary::TTYQ_NONE;
+    switch (q) {
+      case 1:
+        timQuality = TRGSummary::TTYQ_CORS;
+        break;
+      case 2:
+        timQuality = TRGSummary::TTYQ_FINE;
+        break;
+      case 3:
+        timQuality = TRGSummary::TTYQ_SFIN;
+        break;
+      default:
+        timQuality = TRGSummary::TTYQ_NONE;
+        break;
+    }
+    GDLResult->setTimQuality(timQuality);
+  }
+
+  if (exprun > 16000271) {
+    if (tt == TRGSummary::TTYP_RAND) {
+      int i_poissonin = GDLResult->getInputBitNumber(std::string("poissonin"));
+      int j_poissonin = i_poissonin / TRGSummary::c_trgWordSize;
+      int k_poissonin = i_poissonin % TRGSummary::c_trgWordSize;
+      int i_veto      = GDLResult->getInputBitNumber(std::string("veto"));
+      int j_veto      = i_veto / TRGSummary::c_trgWordSize;
+      int k_veto      = i_veto % TRGSummary::c_trgWordSize;
+      for (int clk = 5; clk < n_clocks - 5; clk++) {
+        if ((1 << k_poissonin) & _data[ee_itd[j_poissonin]][clk]) {
+          tt = TRGSummary::TTYP_POIS;
+          if ((1 << k_veto) & _data[ee_itd[j_veto]][clk]) {
+            GDLResult->setPoissonInInjectionVeto();
+          }
+        }
+      }
+    }
+  }
   GDLResult->setTimType(tt);
 
 }

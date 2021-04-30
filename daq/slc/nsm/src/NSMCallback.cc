@@ -5,6 +5,8 @@
 #include "daq/slc/nsm/NSMCommunicator.h"
 #include "daq/slc/nsm/NSMHandlerException.h"
 
+#include "daq/slc/version/Version.h"
+
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
@@ -24,7 +26,22 @@ NSMCallback::NSMCallback(const int timeout)
   reg(NSMCommand::VLISTGET);
   reg(NSMCommand::VLISTSET);
 
-  add(new NSMVHandlerText("rcstate", true, false, NSMState::ONLINE_S.getLabel()), false, true);
+  addDefaultHandlers();
+}
+
+
+int NSMCallback::reset()
+{
+  int revision = Callback::reset();
+
+  addDefaultHandlers();
+
+  return revision;
+}
+
+int NSMCallback::addDefaultHandlers()
+{
+  return add(new NSMVHandlerText("version", true, false, DAQ_SLC_VERSION::DAQ_SLC_VERSION), false, true);
 }
 
 void NSMCallback::addNode(const NSMNode& node)
@@ -55,7 +72,7 @@ void NSMCallback::log(LogFile::Priority pri, const char* format, ...)
   va_list ap;
   char ss[1024 * 10];
   va_start(ap, format);
-  vsprintf(ss, format, ap);
+  vsnprintf(ss, sizeof(ss), format, ap);
   va_end(ap);
   log(pri, std::string(ss));
 }

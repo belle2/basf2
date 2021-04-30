@@ -14,9 +14,25 @@
 
 #include <framework/core/Module.h>
 
-#include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <analysis/VariableManager/Utility.h>
+
+// framework - DataStore
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+
+// dataobjects
+#include <mdst/dataobjects/V0.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
+
+#include <analysis/dataobjects/RestOfEvent.h>
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/ParticleExtraInfoMap.h>
+#include <analysis/dataobjects/EventExtraInfo.h>
 
 #include <vector>
 #include <tuple>
@@ -59,14 +75,14 @@ namespace Belle2 {
 
     /**
      * tuple for collecting everything we know about the ParticlList to be created.
-     * The elements are: PDGCode, name, anti-list name, isListSelfConjugated, and the cut sequence
+     * The elements are: PDGCode, name, anti-list name, and isListSelfConjugated
      */
-    typedef std::tuple<int, std::string, std::string, bool, std::shared_ptr<Variable::Cut>> PList;
+    typedef std::tuple<int, std::string, std::string, bool> PList;
     /**
      * Enum for describing each element in the above tuple
      */
     enum PListIndex {
-      c_PListPDGCode, c_PListName, c_AntiPListName, c_IsPListSelfConjugated, c_CutPointer
+      c_PListPDGCode, c_PListName, c_AntiPListName, c_IsPListSelfConjugated
     };
 
   public:
@@ -111,14 +127,9 @@ namespace Belle2 {
     void tracksToParticles();
 
     /**
-     * Loads ECLCluster object as Particle to StoreArray<Particle> and adds it to the ParticleList
+     * Loads ECLCluster and KLMCluster object as Particle to StoreArray<Particle> and adds it to the ParticleList
      */
-    void eclClustersToParticles();
-
-    /**
-     * Loads KLMCluster object as Particle to StoreArray<Particle> and adds it to the ParticleList
-     */
-    void klmClustersToParticles();
+    void eclAndKLMClustersToParticles();
 
     /**
      * Loads V0 object as Particle of specified type to StoreArray<Particle> and adds it to the ParticleList
@@ -133,7 +144,7 @@ namespace Belle2 {
     /**
      * Helper method to load ROE object as Particle
      */
-    void addROEToParticleList(RestOfEvent* roe, int pdgCode = 0, bool isSelfConjugatedParticle = true);
+    void addROEToParticleList(RestOfEvent* roe, int mdstIndex, int pdgCode = 0, bool isSelfConjugatedParticle = true);
 
     /**
      * returns true if the PDG code determined from the decayString is valid
@@ -145,22 +156,32 @@ namespace Belle2 {
      */
     void appendDaughtersRecursive(Particle* mother);
 
+    StoreArray<Particle> m_particles; /**< StoreArray of Particles */
+    StoreArray<MCParticle> m_mcparticles; /**< StoreArray of MCParticles */
+    StoreArray<ECLCluster> m_eclclusters; /**< StoreArray of ECLCluster */
+    StoreArray<KLMCluster> m_klmclusters; /**< StoreArray of KLMCluster */
+    StoreArray<PIDLikelihood> m_pidlikelihoods; /**< StoreArray of PIDLikelihoods */
+    StoreArray<Track> m_tracks; /**< StoreArray of Tracks */
+    StoreArray<TrackFitResult> m_trackfitresults; /**< StoreArray of TrackFitResults */
+    StoreObjPtr<EventExtraInfo> m_eventExtraInfo; /**< object pointer to event extra info */
+    StoreObjPtr<ParticleExtraInfoMap> m_particleExtraInfoMap; /**< object pointer to extra info map */
+    StoreArray<RestOfEvent> m_roes; /**< StoreArray of ROEs */
+    StoreArray<V0> m_v0s; /**< StoreArray of V0s */
+
     bool m_useMCParticles;  /**< Load MCParticle as Particle instead of the corresponding MDST dataobject */
 
     bool m_useROEs;  /**< Switch to load ROE as Particle */
 
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specified DecayString */
 
-    std::vector<std::tuple<std::string, std::string>>
-                                                   m_decayStringsWithCuts; /**< Input DecayString specifying the particle being created/loaded. Particles need as well pass the selection criteria */
-
+    std::vector<std::string> m_decayStrings; /**< Input decay strings specifying the particles being created/loaded */
 
     std::vector<PList> m_MCParticles2Plists; /**< Collection of PLists that will collect Particles created from MCParticles */
     std::vector<PList> m_Tracks2Plists; /**< Collection of PLists that will collect Particles created from Tracks */
     std::vector<PList> m_V02Plists; /**< Collection of PLists that will collect Particles created from V0 */
     std::vector<PList> m_ROE2Plists; /**< Collection of PLists that will collect Particles created from V0 */
-    std::vector<PList> m_ECLClusters2Plists; /**< Collection of PLists that will collect Particles created from ECLClusters */
-    std::vector<PList> m_KLMClusters2Plists; /**< Collection of PLists that will collect Particles created from KLMClusters */
+    std::vector<PList>
+    m_ECLKLMClusters2Plists; /**< Collection of PLists that will collect Particles created from ECLClusters and KLMClusters */
 
     bool m_writeOut;  /**< toggle particle list btw. transient/persistent */
     bool m_addDaughters; /**< toggle addition of the bottom part of the particle's decay chain */

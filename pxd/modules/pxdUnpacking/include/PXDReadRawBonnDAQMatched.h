@@ -41,10 +41,14 @@ namespace Belle2 {
 
       ~PXDReadRawBonnDAQMatchedModule() override final;
 
+      /** Initialize */
       void initialize() override final;
-      void event() override final;
-      void terminate() override final;
 
+      /** Event */
+      void event() override final;
+
+      /** Terminate */
+      void terminate() override final;
 
       // Data members
 
@@ -76,4 +80,3 @@ namespace Belle2 {
 
   } // end namespace PXD
 } // end namespace Belle2
-

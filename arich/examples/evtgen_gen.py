@@ -19,7 +19,7 @@
 # Author: Luka Santelj (Oct. 2016)
 ######################################################
 
-from basf2 import *
+import basf2 as b2
 from generators import add_evtgen_generator
 from modularAnalysis import setupEventInfo
 from modularAnalysis import loadGearbox
@@ -35,13 +35,13 @@ parser.add_option('-f', '--file', dest='filename',
 (options, args) = parser.parse_args()
 
 # Suppress messages and warnings during processing:
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 
 # generation of 1000 events according to the specified DECAY table
 # Y(4S) -> B0 B0bar
 # one B0->K+pi-, other generic decay
-mypath = create_path()
+mypath = b2.create_path()
 setupEventInfo(int(options.nevents), mypath)
 add_evtgen_generator(mypath, 'signal', Belle2.FileSystem.findFile('arich/examples/B2kpi.dec'))
 
@@ -53,7 +53,7 @@ loadGearbox(mypath)
 add_mdst_output(mypath, True, options.filename)
 
 # process all modules added to the mypath path
-process(mypath)
+b2.process(mypath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

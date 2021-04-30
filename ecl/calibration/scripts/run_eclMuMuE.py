@@ -22,10 +22,8 @@
 # Primary output is a histogram of calibration constant vs cellID0;
 # output file RootOutput.root contains many additional diagnostic histograms.
 
-from basf2 import *
-set_log_level(LogLevel.INFO)
+import basf2 as b2
 
-import ROOT
 from ROOT.Belle2 import eclMuMuEAlgorithm
 from caf.framework import Calibration, CAF
 
@@ -33,9 +31,10 @@ from caf.framework import Calibration, CAF
 import glob
 inputFileNames = glob.glob('/nfs/dust/belle2/user/ferber/data/kkmc_mumu/kkmc-mumu-1485213008/*.root')
 print(inputFileNames)
+b2.set_log_level(b2.LogLevel.INFO)
 
 # The collector module
-eclMuMuE = register_module('eclMuMuECollector')
+eclMuMuE = b2.register_module('eclMuMuECollector')
 eclMuMuE.param('minPairMass', 9.0)
 eclMuMuE.param('minTrackLength', 30.)
 eclMuMuE.param('MaxNeighborAmp', 200.)
@@ -46,13 +45,13 @@ eclMuMuE.param('thetaLabMaxDeg', 134.)
 eclMuMuE.param('useTrueEnergy', False)
 
 # Set up the modules needed for geometry and track extrapolation by the collector module
-pre_path = create_path()
-gearbox = register_module('Gearbox')
+pre_path = b2.create_path()
+gearbox = b2.register_module('Gearbox')
 pre_path.add_module(gearbox)
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 pre_path.add_module(geometry)
 pre_path.add_module('SetupGenfitExtrapolation')
-ext = register_module('Ext')
+ext = b2.register_module('Ext')
 pdgcodes = [13]
 ext.param('pdgCodes', pdgcodes)
 pre_path.add_module(ext)

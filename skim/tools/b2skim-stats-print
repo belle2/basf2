@@ -30,16 +30,18 @@ import argparse
 from functools import lru_cache
 from itertools import product
 import json
+import os
 import pandas as pd
 from pathlib import Path
 import re
+import subprocess
 import sys
 from textwrap import wrap
 
 from basf2 import B2WARNING, B2ERROR
 from basf2.utils import pretty_print_table
 from skim.registry import Registry
-from skimExpertFunctions import get_test_file, get_total_infiles, get_events_per_file
+from skimExpertFunctions import get_eventN, get_test_file
 
 
 class SkimNotRunException(Exception):
@@ -148,22 +150,11 @@ def getArgumentParser():
         metavar="OutputFilename",
         help="Save the tables of statistics to a JSON file.",
     )
-    OutputGroup.add_argument(
-        "--average-over",
-        nargs="+",
-        default=[],
-        choices=["skims", "samples"],
-        action=required_length(max=2),
-        help=(
-            "If this argument is given, this tool will produce stat averages over "
-            "all given skims or all given samples. These are printed in JSON format."
-        ),
-    )
 
     parser.add_argument(
         "--mccampaign",
         default="MC13",
-        choices=["MC12", "MC13"],
+        choices=["MC12", "MC13", "MC14"],
         help="The MC campaign to test on.",
     )
 
@@ -306,6 +297,23 @@ def nInputEvents(skim, sample, TestingCombined):
     return jsonFileContents["basf2_status"]["total_events"]
 
 
+def nTotalInputEvents(skim, sample, TestingCombined):
+    """Get the total number of events in the input MDST using ``b2file-metadata-show``.
+
+    Args:
+        skim (str): The name of the skim being tested.
+        sample (str): The label of the sample being tested.
+        TestingCombined (bool): True if this tool is being run on combined skims.
+
+    Returns:
+        nInputEvents (int): Total number of events in the input file. This may be
+            greater than the result of ``nInputEvents`` if the ``-n`` flag was passed.
+    """
+
+    filename = get_test_file(sample)
+    return get_eventN(filename)
+
+
 def nSkimmedEvents(skim, sample, TestingCombined):
     """Read the number of output uDST events from the JSON output file from
     ``--job-information``. If more than one output file is present, take the
@@ -350,6 +358,29 @@ def udstSize(skim, sample, TestingCombined):
     ]
 
     return max(udstSizeList)
+
+
+def inputFileSize(skim, sample, TestingCombined):
+    """
+    Calculate the size of the input file multiplied by the fraction of events used. If
+    the ``-n`` flag was passed, this may be less than the full file size.
+
+    Args:
+        skim (str): The name of the skim being tested.
+        sample (str): The label of the sample being tested.
+        TestingCombined (bool): True if this tool is being run on combined skims.
+
+    Returns:
+        mdstSize (float): Size (in kB) of the MDST file multiplied by fraction of events
+            from file used in test.
+    """
+    filename = get_test_file(sample)
+    TotalFileSize = os.path.getsize(filename) / 1024
+    FractionOfEventsUsed = nInputEvents(
+        skim, sample, TestingCombined
+    ) / nTotalInputEvents(skim, sample, TestingCombined)
+
+    return TotalFileSize * FractionOfEventsUsed
 
 
 def logSize(skim, sample, TestingCombined):
@@ -457,21 +488,6 @@ def memoryMaximum(skim, sample, TestingCombined):
     logFileContents = getLogFile(skim, sample, TestingCombined)
 
     return getStatFromLog("Max Memory", logFileContents)
-
-
-@lru_cache()
-def nTotalEvents(sample):
-    """Get an estimate for the total number of events in the dataset of a given
-    sample type. This is used for the purposes of estimating the total storage
-    space required.
-
-    Args:
-        sample (str): The label of the sample being tested.
-
-    Returns:
-        nTotalEvents (int): The total number of events in the sample dataset.
-    """
-    return get_events_per_file(sample) * get_total_infiles(sample)
 
 
 def testJsonFile(jsonFileContents):
@@ -609,11 +625,21 @@ def getAllSamples(mcCampaign):
         f"{mcCampaign}_taupairBGx0": f"{mcCampaign}: taupair BGx0",
     }
 
+    mcCampaignNumber = int(re.search(r"\d+", mcCampaign).group())
+    # TODO: Temporary workaround while only some MC14 samples are available on KEKCC
+    if mcCampaignNumber == 14:
+        mcSampleLabels = {k: v for (k, v) in mcSampleLabels.items() if k.endswith("BGx1")}
+        mcSampleLabels.update(
+            {
+                f"{mcCampaign}_ggBGx1": f"{mcCampaign}: gg BGx1",
+                f"{mcCampaign}_mumuBGx1": f"{mcCampaign}: mumu BGx1",
+                f"{mcCampaign}_eeeeBGx1": f"{mcCampaign}: eeee BGx1",
+            }
+        )
     # For MC13 the low mult test samples exist (but they don't for MC12
     # and older) so here is a hack.
     # TODO: remove once when we regularly add the same low mult samples
-    mcCampaignNumber = int(re.search(r"\d+", mcCampaign).group())
-    if mcCampaignNumber > 12:
+    elif mcCampaignNumber > 12:
         mcSampleLabels.update(
             {
                 f"{mcCampaign}_ggBGx1": f"{mcCampaign}: gg BGx1",
@@ -621,7 +647,6 @@ def getAllSamples(mcCampaign):
                 f"{mcCampaign}_mumuBGx1": f"{mcCampaign}: mumu BGx1",
                 f"{mcCampaign}_eeeeBGx1": f"{mcCampaign}: eeee BGx1",
                 f"{mcCampaign}_eemumuBGx1": f"{mcCampaign}: eemumu BGx1",
-
                 # f"{mcCampaign}_eeBGx0": f"{mcCampaign}: ee BGx0",
                 f"{mcCampaign}_mumuBGx0": f"{mcCampaign}: mumu BGx0",
                 f"{mcCampaign}_eeeeBGx0": f"{mcCampaign}: eeee BGx0",
@@ -630,14 +655,18 @@ def getAllSamples(mcCampaign):
         )
 
     dataSampleLabels = {
-        "proc11_exp10": "Data: proc11 exp. 10 (hlt_hadron)",
-        "proc11_exp8": "Data: proc11 exp. 8 (hlt_hadron)",
-        "proc11_exp7": "Data: proc11 exp. 7 (hlt_hadron)",
+        "proc11_exp10": "Data: proc11 exp. 10",
+        "proc11_exp8": "Data: proc11 exp. 8",
+        "proc11_exp7": "Data: proc11 exp. 7",
         "proc10_exp8": "Data: proc10 exp. 8",
         "proc10_exp7": "Data: proc10 exp. 7",
         "proc9_exp3": "Data: proc9 exp. 3",
         "proc9_exp7": "Data: proc9 exp. 7",
         "proc9_exp8": "Data: proc9 exp. 8",
+        "bucket9_exp12": "Data: bucket9 exp. 12",
+        "bucket10_exp12": "Data: bucket10 exp. 12",
+        "bucket11_exp12": "Data: bucket11 exp. 12",
+        "bucket12_exp12_4S_offres": "Data: bucket12 exp. 12 off-res",
     }
 
     return mcSampleLabels, dataSampleLabels
@@ -686,9 +715,6 @@ def getStatSpecifier():
     * ``'PrintToConfluence'`` (`bool`): Determines whether the statistic is
       included in the Confluence table.
 
-    * ``'PrintAverages'`` (`bool`): Determines whether to print this statistic
-      when running tool with ``--average-over`` argument.
-
     * ``'Calculate'`` (`function`): An anonymous function which calculates a
       statistic for one skim and one sample. The arguments of this function must
       the names of the skim, sample being tested and a boolean which is True if
@@ -717,11 +743,28 @@ def getStatSpecifier():
             "FloatFormat": ".2f",
             "PrintToScreen": True,
             "PrintToConfluence": True,
-            "PrintAverages": True,
             "Calculate": lambda skim, sample, combined: 100
             * nSkimmedEvents(skim, sample, combined)
             / nInputEvents(skim, sample, combined),
             "CalculationDescription": "Number of skimmed events divided by number of input events.",
+            "CombineMC": lambda statDict, mcCampaign, beamBackground: (
+                mcWeightedAverage(statDict, mcCampaign, beamBackground)
+            ),
+        },
+        "FilesizeRetentionRate": {
+            "LongName": "File size-based retention rate (%)",
+            "FloatFormat": ".2f",
+            "PrintToScreen": True,
+            "PrintToConfluence": True,
+            "Calculate": lambda skim, sample, combined: (
+                100
+                * udstSize(skim, sample, TestingCombined)
+                / inputFileSize(skim, sample, TestingCombined)
+            ),
+            "CalculationDescription": (
+                "Output file size divided by "
+                "(input file size)*(fraction of events from file used in test)."
+            ),
             "CombineMC": lambda statDict, mcCampaign, beamBackground: (
                 mcWeightedAverage(statDict, mcCampaign, beamBackground)
             ),
@@ -731,7 +774,6 @@ def getStatSpecifier():
             "FloatFormat": ".0f",
             "PrintToScreen": False,
             "PrintToConfluence": True,
-            "PrintAverages": False,
             "Calculate": lambda skim, sample, combined: nInputEvents(
                 skim, sample, combined
             ),
@@ -743,7 +785,6 @@ def getStatSpecifier():
             "FloatFormat": ".0f",
             "PrintToScreen": False,
             "PrintToConfluence": True,
-            "PrintAverages": False,
             "Calculate": lambda skim, sample, combined: nSkimmedEvents(
                 skim, sample, combined
             ),
@@ -755,7 +796,6 @@ def getStatSpecifier():
             "FloatFormat": ".1f",
             "PrintToScreen": False,
             "PrintToConfluence": True,
-            "PrintAverages": False,
             "Calculate": lambda skim, sample, combined: cpuTime(skim, sample, combined),
             "CalculationDescription": (
                 "CPU time of test job as printed in the output logs."
@@ -767,7 +807,6 @@ def getStatSpecifier():
             "FloatFormat": ".3f",
             "PrintToScreen": False,
             "PrintToConfluence": False,
-            "PrintAverages": False,
             "Calculate": lambda skim, sample, combined: (
                 cpuTime(skim, sample, combined) / nInputEvents(skim, sample, combined)
             ),
@@ -783,7 +822,6 @@ def getStatSpecifier():
             "FloatFormat": ".3f",
             "PrintToScreen": True,
             "PrintToConfluence": True,
-            "PrintAverages": True,
             "Calculate": lambda skim, sample, combined: (
                 cpuTime(skim, sample, combined)
                 / nInputEvents(skim, sample, combined)
@@ -796,32 +834,11 @@ def getStatSpecifier():
                 mcWeightedAverage(statDict, mcCampaign, beamBackground)
             ),
         },
-        "HS06TimePerFile": {
-            "LongName": "Estimated CPU time per file (HS06)",
-            "FloatFormat": ".3f",
-            "PrintToScreen": False,
-            "PrintToConfluence": True,
-            "PrintAverages": False,
-            "Calculate": lambda skim, sample, combined: (
-                cpuTime(skim, sample, combined)
-                / nInputEvents(skim, sample, combined)
-                * get_events_per_file(sample)
-                * HEPSpecPerCore
-            ),
-            "CalculationDescription": (
-                "CPU time of test job, divided by number of input events, multiplied "
-                "by average number of events in a file of this sample type."
-            ),
-            "CombineMC": lambda statDict, mcCampaign, beamBackground: (
-                mcWeightedAverage(statDict, mcCampaign, beamBackground)
-            ),
-        },
         "udstSize": {
             "LongName": "uDST size of test (MB)",
             "FloatFormat": ".2f",
             "PrintToScreen": False,
             "PrintToConfluence": True,
-            "PrintAverages": False,
             "Calculate": lambda skim, sample, combined: (
                 udstSize(skim, sample, combined) / 1024
             ),
@@ -833,7 +850,6 @@ def getStatSpecifier():
             "FloatFormat": ".3f",
             "PrintToScreen": True,
             "PrintToConfluence": True,
-            "PrintAverages": True,
             "Calculate": lambda skim, sample, combined: (
                 udstSize(skim, sample, combined)
                 / nSkimmedEvents(skim, sample, combined)
@@ -850,7 +866,6 @@ def getStatSpecifier():
             "FloatFormat": ".3f",
             "PrintToScreen": False,
             "PrintToConfluence": True,
-            "PrintAverages": True,
             "Calculate": lambda skim, sample, combined: (
                 udstSize(skim, sample, combined) / nInputEvents(skim, sample, combined)
             ),
@@ -861,32 +876,11 @@ def getStatSpecifier():
                 mcWeightedAverage(statDict, mcCampaign, beamBackground)
             ),
         },
-        "udstSizePerFile": {
-            "LongName": "Estimated average uDST size per file (MB)",
-            "FloatFormat": ".2f",
-            "PrintToScreen": False,
-            "PrintToConfluence": True,
-            "PrintAverages": False,
-            "Calculate": lambda skim, sample, combined: (
-                udstSize(skim, sample, combined)
-                / nInputEvents(skim, sample, combined)
-                * get_events_per_file(sample)
-                / 1024
-            ),
-            "CalculationDescription": (
-                "uDST size per event multiplied by average number of events in a file "
-                "of this sample type."
-            ),
-            "CombineMC": lambda statDict, mcCampaign, beamBackground: (
-                mcWeightedAverage(statDict, mcCampaign, beamBackground)
-            ),
-        },
         "logSize": {
             "LongName": "Log size of test (kB)",
             "FloatFormat": ".1f",
             "PrintToScreen": True,
             "PrintToConfluence": True,
-            "PrintAverages": False,
             "Calculate": lambda skim, sample, combined: logSize(skim, sample, combined),
             "CalculationDescription": "File size of the output logs.",
             "CombineMC": None,
@@ -896,7 +890,6 @@ def getStatSpecifier():
             "FloatFormat": ".2f",
             "PrintToScreen": False,
             "PrintToConfluence": True,
-            "PrintAverages": False,
             "Calculate": lambda skim, sample, combined: (
                 logSize(skim, sample, combined)
                 / nInputEvents(skim, sample, combined)
@@ -914,7 +907,6 @@ def getStatSpecifier():
             "FloatFormat": ".2f",
             "PrintToScreen": True,
             "PrintToConfluence": True,
-            "PrintAverages": False,
             "Calculate": lambda skim, sample, combined: (
                 averageCandidateMultiplicity(skim, sample, combined)
             ),
@@ -931,7 +923,6 @@ def getStatSpecifier():
             "FloatFormat": ".0f",
             "PrintToScreen": True,
             "PrintToConfluence": True,
-            "PrintAverages": False,
             "Calculate": lambda skim, sample, combined: memoryAverage(
                 skim, sample, combined
             ),
@@ -945,53 +936,12 @@ def getStatSpecifier():
             "FloatFormat": ".0f",
             "PrintToScreen": True,
             "PrintToConfluence": True,
-            "PrintAverages": False,
             "Calculate": lambda skim, sample, combined: memoryMaximum(
                 skim, sample, combined
             ),
             "CalculationDescription": "Maximum memory usage, as listed in output logs.",
             "CombineMC": lambda statDict, mcCampaign, beamBackground: (
                 mcMax(statDict, mcCampaign, beamBackground)
-            ),
-        },
-        "udstSizePerEntireSample": {
-            "LongName": "Estimated uDST size for entire sample (GB)",
-            "FloatFormat": ".2f",
-            "PrintToScreen": False,
-            "PrintToConfluence": True,
-            "PrintAverages": False,
-            "Calculate": lambda skim, sample, combined: (
-                udstSize(skim, sample, combined)
-                * nTotalEvents(sample)
-                / nInputEvents(skim, sample, combined)
-                / 1024 ** 2
-            ),
-            "CalculationDescription": (
-                "Output uDST size per event multiplied by total number of events in "
-                "the full sample."
-            ),
-            "CombineMC": lambda statDict, mcCampaign, beamBackground: (
-                mcSum(statDict, mcCampaign, beamBackground)
-            ),
-        },
-        "logSizePerEntireSample": {
-            "LongName": "Estimated log size for entire sample (GB)",
-            "FloatFormat": ".2f",
-            "PrintToScreen": False,
-            "PrintToConfluence": True,
-            "PrintAverages": False,
-            "Calculate": lambda skim, sample, combined: (
-                logSize(skim, sample, combined)
-                * nTotalEvents(sample)
-                / nInputEvents(skim, sample, combined)
-                / 1024 ** 2
-            ),
-            "CalculationDescription": (
-                "Output log file size per event multiplied by total number of events "
-                "in the full sample."
-            ),
-            "CombineMC": lambda statDict, mcCampaign, beamBackground: (
-                mcSum(statDict, mcCampaign, beamBackground)
             ),
         },
     }
@@ -1489,88 +1439,6 @@ def printToMarkdown(
     )
 
 
-def printAverages(allSkimStats, skims, samples, statSpecifier, averageRequest):
-    """Produce averages for statistics over all given skims or all given samples.
-
-    Args:
-        allSkimStats (dict): A nested dict of statistics, as returned by
-            ``getSkimStatsDict``.
-        skims (list): List of skims to run.
-        samples (list): List of sample labels to test on.
-        statSpecifier (dict): A nested dict specifying how each statistic should
-            be calculated and printed, as returned by ``getStatSpecifier``.
-        averageRequest (list): A list containing 'skims' or 'samples' (or both).
-            This indicates what the user wants to average over.
-    """
-    if not averageRequest:
-        return
-
-    confluenceFileName = "ConfluenceAverages.txt"
-
-    selectedStats = [
-        stat for (stat, statSpec) in statSpecifier.items() if statSpec["PrintAverages"]
-    ]
-    headers = [statSpecifier[stat]["LongName"] for stat in selectedStats]
-    floatFormat = [""] + [statSpecifier[stat]["FloatFormat"] for stat in selectedStats]
-
-    # Construct a multi-index dataframe to simplify averaging.
-    # Also replace NaN values with 0, to avoid breaking later calculations.
-    DataFrames = {
-        key: pd.DataFrame(value, columns=selectedStats)
-        for key, value in allSkimStats.items()
-    }
-    df = pd.concat(DataFrames, axis=0)
-    df.fillna(value=0, inplace=True)
-    # We don't want to include our earlier averages in these averages
-    df.drop(["Combined MC BGx1", "Combined MC BGx0"], level=1, inplace=True)
-
-    averagesString = ["h1. Averages"]
-    if "skims" in averageRequest:
-        averagesString.append("h2. Statistics for samples, averaged over skims")
-        averagesString.append(
-            "Skims averaged over: " + ", ".join(f"{{{{{s}}}}}" for s in skims)
-        )
-        averagedDataFrame = df.mean(level=1)
-        averagedDataFrame.replace({0: None}, inplace=True)
-
-        table = tabulate(
-            averagedDataFrame, headers=headers, tablefmt="jira", floatfmt=floatFormat
-        )
-        table = re.sub(r"^\| ", "|| ", table, flags=re.MULTILINE)
-        table = table.replace(" nan ", " --  ")
-
-        averagesString.append(table)
-
-        print(
-            "Calculated stats for each sample, averaged over all given skims. "
-            f"Results saved to file {confluenceFileName}"
-        )
-
-    if "samples" in averageRequest:
-        averagesString.append("h2. Statistics for skims, averaged over samples")
-        averagesString.append(
-            "Samples averaged over: " + ", ".join(f"{{{{{s}}}}}" for s in samples)
-        )
-        averagedDataFrame = df.mean(level=0)
-        averagedDataFrame.replace({0: None}, inplace=True)
-
-        table = tabulate(
-            averagedDataFrame, headers=headers, tablefmt="jira", floatfmt=floatFormat
-        )
-        table = re.sub(r"^\| ", "|| ", table, flags=re.MULTILINE)
-        table = table.replace(" nan ", " --  ")
-
-        averagesString.append(table)
-
-        print(
-            "Calculated stats for each skim, averaged over all given samples. "
-            f"Results saved to file {confluenceFileName}"
-        )
-
-    with open(confluenceFileName, "w") as confluenceFile:
-        confluenceFile.write("\n".join(averagesString))
-
-
 if __name__ == "__main__":
     parser = getArgumentParser()
     args = parser.parse_args()
@@ -1656,8 +1524,6 @@ if __name__ == "__main__":
             args.dataonly,
             OutputFilename=args.markdown,
         )
-    elif args.average_over:
-        printAverages(allSkimStats, skims, samples, statSpecifier, args.average_over)
     else:
         printToScreen(
             allSkimStats,

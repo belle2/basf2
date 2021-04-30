@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Dennis Weyland 2017
 
@@ -9,8 +8,8 @@ import basf2_mva
 import basf2_mva_util
 import time
 
-import tensorflow as tf
-import tensorflow.contrib.keras as keras
+import numpy as np
+
 
 from keras.layers import Input, Dense, Dropout
 from keras.layers.normalization import BatchNormalization
@@ -78,7 +77,7 @@ def partial_fit(state, X, S, y, w, epoch):
     state.preprocessor_state = preprocessor.export_state()
 
     class TestCallback(Callback):
-        def on_epoch_end(self, epoch, logs={}):
+        def on_epoch_end(self, epoch, logs=None):
             loss, acc = state.model.evaluate(state.Xtest, state.ytest, verbose=0, batch_size=1000)
             loss2, acc2 = state.model.evaluate(X[:10000], y[:10000], verbose=0, batch_size=1000)
             print('\nTesting loss: {}, acc: {}'.format(loss, acc))

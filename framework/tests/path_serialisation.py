@@ -8,7 +8,6 @@ from unittest import TestCase, main
 
 import basf2
 from basf2 import pickle_path as b2pp
-from ROOT import Belle2
 
 # @cond internal_test
 
@@ -81,7 +80,7 @@ class PathSerialisationTestCase(TestCase):
         pathFile = tempfile.NamedTemporaryFile(prefix='b2pathtest_')
 
         # uses Python modules, this should fail
-        steeringFile = Belle2.FileSystem.findFile('framework/tests/module_paths.py')
+        steeringFile = basf2.find_file('framework/tests/module_paths.py')
         self.assertNotEqual(0, os.system('basf2 --dump-path ' + pathFile.name + ' ' + steeringFile))
 
         # test actual execution

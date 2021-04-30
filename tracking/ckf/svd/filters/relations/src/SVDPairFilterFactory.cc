@@ -36,7 +36,7 @@ std::string SVDPairFilterFactory::getIdentifier() const
 
 std::string SVDPairFilterFactory::getFilterPurpose() const
 {
-  return "Reject svd pairs. ";
+  return "Reject SVD state pairs. ";
 }
 
 std::map<std::string, std::string> SVDPairFilterFactory::getValidFilterNamesAndDescriptions() const

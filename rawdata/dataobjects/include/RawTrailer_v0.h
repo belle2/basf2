@@ -10,8 +10,6 @@
 #define RAWTRAILER_V0_H
 
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <rawdata/switch_basf2_standalone.h>
 
 /* #include <framework/datastore/DataStore.h> */

@@ -23,7 +23,6 @@ namespace Belle2 {
   constexpr
   static char const* const pxdStateTruthVarNames[] = {
     "truth",
-    "truth_inverted",
     "truth_position_x",
     "truth_position_y",
     "truth_position_z",

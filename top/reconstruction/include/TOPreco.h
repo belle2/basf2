@@ -327,6 +327,9 @@ namespace Belle2 {
        * Returns k-th PDF peak for given pixel describing signal PDF
        * @param pixelID pixel ID (1-based)
        * @param k peak counter (in C++ sense - starts with 0)
+       * @param position pisition
+       * @param width width
+       * @param numPhotons number of photons
        */
       void getPDFPeak(int pixelID, int k,
                       float& position, float& width, float& numPhotons) const;

@@ -5,6 +5,6 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::SADMetaHit+;
+#pragma link C++ class Belle2::SADMetaHit+; // checksum=0x5df4c418, version=2
 
 #endif

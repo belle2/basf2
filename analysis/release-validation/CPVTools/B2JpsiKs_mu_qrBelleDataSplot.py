@@ -18,19 +18,17 @@
 #                                                                                          *
 # ******************************************************************************************
 
+import math
+import glob
+import sys
+from array import array
+import matplotlib.pyplot as plt
+from defaultEvaluationParameters import r_size, r_subsample, rbins
 import ROOT
 import numpy as np
 import matplotlib as mpl
 mpl.use('Agg')
 mpl.rcParams['text.usetex'] = True
-from defaultEvaluationParameters import categories, rbins, r_subsample, r_size
-import matplotlib.pyplot as plt
-from array import array
-import pylab
-import sys
-import glob
-import math
-import random
 
 
 PATH = "."
@@ -129,7 +127,6 @@ def efficiencyCalculator(mc, data, method):
     mc_wvalueB0bar = array('f', [0] * r_size)
     mc_wvalueDiff = array('f', [0] * r_size)
     mc_wvalueDiffUncertainty = array('f', [0] * r_size)
-    mc_entries = array('f', [0] * r_size)
     mc_iEffEfficiency = array('f', [0] * r_size)
     mc_iEffEfficiencyUncertainty = array('f', [0] * r_size)
     mc_iEffEfficiencyB0Uncertainty = array('f', [0] * r_size)
@@ -627,15 +624,12 @@ def plotWithResiduals(rooFitFrame, rooRealVar, dots, modelCurve, units, nameOfPl
     rooFitFrame.GetYaxis().SetTitleOffset(0.98)
     rooFitFrame.GetYaxis().SetLabelSize(0.055)
 
-    yLabelBin = 0
-    yLabelBin = '{:0.0f}'.format(float(dots.GetErrorXlow(1) + dots.GetErrorXhigh(1)))
-
     pointsHist = ROOT.RooHist()
 
     iBin = 0
 
-    xValModel = ROOT.Double(-1.E30)
-    yValModel = ROOT.Double(-1.E30)
+    # xValModel = ROOT.Double(-1.E30)
+    # yValModel = ROOT.Double(-1.E30)
     xValDot = ROOT.Double(-1.E30)
     yValDot = ROOT.Double(-1.E30)
 
@@ -1032,15 +1026,15 @@ for treename in treenames:
     signalCurve.SetFillColor(ROOT.kWhite)
     continuumCurve.SetFillColor(ROOT.kWhite)
 
-    l = ROOT.TLegend(0.25, 0.43, 0.5, 0.89)
-    l.AddEntry(dots, "Belle data")
-    l.AddEntry(modelCurve, 'Fit result')
-    l.AddEntry(signalCurve, "Signal")
-    l.AddEntry(continuumCurve, 'Continuum')
+    legend = ROOT.TLegend(0.25, 0.43, 0.5, 0.89)
+    legend.AddEntry(dots, "Belle data")
+    legend.AddEntry(modelCurve, 'Fit result')
+    legend.AddEntry(signalCurve, "Signal")
+    legend.AddEntry(continuumCurve, 'Continuum')
 
-    l.SetTextSize(0.055)
+    legend.SetTextSize(0.055)
 
-    plotWithResiduals(mbcFrame, B0_mbc, dots, modelCurve, "[GeV/#it{c}^{2}]", "Mbc", l, False)
+    plotWithResiduals(mbcFrame, B0_mbc, dots, modelCurve, "[GeV/#it{c}^{2}]", "Mbc", legend, False)
 
     signalData = ROOT.RooDataSet("signalData", "signalData", fitData, fitData.get(), "", "mbcSignYield_sw")
 

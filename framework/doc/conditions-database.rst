@@ -11,7 +11,7 @@ payloads and iovs for a certain dataset is called a **globaltag** and is
 identified by a unique name.
 
 Payload
-    An atom of conditons data identified by name and revision number
+    An atom of conditions data identified by name and revision number
 
     * usually ROOT files containing custom objects
     * a payload cannot be modified after creation.
@@ -74,6 +74,8 @@ If multiple globaltags are selected the software will look for all necessary
 payloads in each of them in turn and always take each payload from the first
 globaltag it can be found in.
 
+.. _configuring_cdb:
+
 Configuring the Conditions Database
 ===================================
 
@@ -82,7 +84,7 @@ By default the software will look for conditions data in
 1. user globaltags: Look in all globaltags provided by the user by setting `conditions.globaltags <ConditionsConfiguration.globaltags>`
 2. globaltag replay: Look in different base globaltags depending on the use case:
 
-    - **Procesing existing files (i.e. mdst)**: the globaltags specified in the input file are used.
+    - **Processing existing files (i.e. mdst)**: the globaltags specified in the input file are used.
     - **Generating and events**: the default globaltags for the current software version (`conditions.default_globaltags <ConditionsConfiguration.default_globaltags>` are used.
 
 The globaltag replay can be disabled by calling `conditions.override_globaltags() <ConditionsConfiguration.override_globaltags>`
@@ -95,9 +97,7 @@ database or where to look for previously downloaded payloads.
 
 .. versionchanged:: release-04-00-00
    In release-04 the configuration interface has been changed completely to
-   before. Now all settings are grouped via the `conditions` object and before
-   we had only a few free functions. Please see :ref:`cdb_config_transition` for
-   more details.
+   before. Now all settings are grouped via the `conditions` object.
 
 .. attribute:: basf2.conditions
 
@@ -284,41 +284,3 @@ These payloads can then be tested by adding the filename of the text file to
 `conditions.testing_payloads <basf2.ConditionsConfiguration.testing_payloads>`
 and once satisfied can be uploaded with :ref:`b2conditionsdb-upload <b2conditionsdb>`
 or :ref:`b2conditionsdb-request <b2conditionsdb-request>`
-
-.. _cdb_config_transition:
-
-Transition from older releases
-==============================
-
-The configuration interface changed for release-04 and the old configuration
-functions now create warnings but should still work in most cases. Only expert
-settings like custom log levels and database parameters are no longer supported.
-
-* `basf2.reset_database()`: Not really needed anymore as the default settings will be
-  more suitable for everyone. Still works but behaves slightly different as it
-  will reset to default settings instead of completely empty settings
-
-* `basf2.use_database_chain()` is no longer needed and can be removed. We now always have a list of globaltags.
-
-* `basf2.use_central_database()` should be replaced with `conditions.prepend_globaltag() <ConditionsConfiguration.prepend_globaltag>`
-
-* `basf2.use_local_database()` should be replaced with `conditions.prepend_testing_payloads() <ConditionsConfiguration.prepend_testing_payloads>`
-
-* the payloads in ``localdb/database.txt`` are no longer used by default, you have to explicitly enable that
-  using `conditions.prepend_testing_payloads("localdb/database.txt") <ConditionsConfiguration.prepend_testing_payloads>`
-
-* you can now inspect what are the settings (``print(conditions.globaltags)``)
-  and also edit that list (``conditions.globaltags += ["some", "other", "tags"]``).
-  Lists are highest priority first
-
-* globaltag replay is new, see above for details about this. To disable this
-  feature you can call `conditions.disable_globaltag_replay() <ConditionsConfiguration.disable_globaltag_replay>`
-  to revert to the behavior in previous releases.
-
-
-.. autofunction:: basf2.get_default_global_tags
-.. autofunction:: basf2.reset_database
-.. autofunction:: basf2.use_database_chain
-.. autofunction:: basf2.use_local_database
-.. autofunction:: basf2.use_central_database
-.. autofunction:: basf2.set_central_database_networkparams

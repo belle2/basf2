@@ -22,25 +22,19 @@
 import basf2 as b2
 import modularAnalysis as ma
 import sys
+import os
 
 
 # --I/O----------------------------------------------------------------------------------------
-if (len(sys.argv) < 2 or sys.argv[1] not in ['signal', 'qqbar']):
-    sys.exit("usage:\n\tbasf2 B2A703-ContinuumSuppression_MVAExpert.py <signal,qqbar>")
+step = 'signal'
 
-import os
-if not os.getenv('BELLE2_EXAMPLES_DATA_DIR'):
-    b2.B2FATAL("You need the example data installed. Run `b2install-data example` in terminal for it.")
-
-step = str(sys.argv[1])
-
-path = os.getenv('BELLE2_EXAMPLES_DATA_DIR')+'/mva/'
-input_file = ''
+if len(sys.argv) >= 2:
+    step = str(sys.argv[1])
 
 if step == 'signal':
-    input_file = [path + 'Bd_KsPi0_expert/*']
+    input_file = b2.find_file('Bd2K0spi0_to_test.root', 'examples', False)
 elif step == 'qqbar':
-    input_file = [path + '*bar_expert/*']
+    input_file = b2.find_file('ccbar_sample_to_test.root', 'examples', False)
 else:
     sys.exit('Step does not match any of the available samples: `signal` or `qqbar`')
 
@@ -76,7 +70,7 @@ ma.reconstructDecay(decayString='B0   -> K_S0 pi0',
                     path=main)
 
 ma.matchMCTruth(list_name='B0', path=main)
-ma.buildRestOfEvent(list_name='B0', path=main)
+ma.buildRestOfEvent(target_list_name='B0', path=main)
 
 # The momentum cuts used to be hard-coded in the continuum suppression module. They can now be applied
 # via this mask. The nCDCHits requirement is new, and is recommended to remove VXD-only fake tracks.
@@ -116,15 +110,15 @@ trainVars = [
     'KSFWVariables(hoo2)',
     'KSFWVariables(hoo3)',
     'KSFWVariables(hoo4)',
-    'CleoCone(1)',
-    'CleoCone(2)',
-    'CleoCone(3)',
-    'CleoCone(4)',
-    'CleoCone(5)',
-    'CleoCone(6)',
-    'CleoCone(7)',
-    'CleoCone(8)',
-    'CleoCone(9)'
+    'CleoConeCS(1)',
+    'CleoConeCS(2)',
+    'CleoConeCS(3)',
+    'CleoConeCS(4)',
+    'CleoConeCS(5)',
+    'CleoConeCS(6)',
+    'CleoConeCS(7)',
+    'CleoConeCS(8)',
+    'CleoConeCS(9)'
 ]
 
 # Target variable used in training.

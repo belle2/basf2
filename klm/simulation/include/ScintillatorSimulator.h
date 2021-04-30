@@ -12,10 +12,9 @@
 
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMSimHit.h>
-#include <klm/dataobjects/eklm/EKLMHitMCTime.h>
 #include <klm/dataobjects/eklm/EKLMSimHit.h>
-#include <klm/dbobjects/eklm/EKLMChannelData.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
+#include <klm/dbobjects/KLMScintillatorFEEData.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 
 namespace Belle2 {
@@ -25,7 +24,7 @@ namespace Belle2 {
     /**
      * Digitize EKLMSim2Hits to get EKLM StripHits.
      */
-    class ScintillatorSimulator : public EKLMHitMCTime {
+    class ScintillatorSimulator {
 
     public:
 
@@ -108,9 +107,9 @@ namespace Belle2 {
       double getEnergy();
 
       /**
-       * Set channel data.
+       * Set FEE data.
        */
-      void setChannelData(const EKLMChannelData* channelData);
+      void setFEEData(const KLMScintillatorFEEData* FEEData);
 
       /**
        * Generate photoelectrons.
@@ -132,7 +131,63 @@ namespace Belle2 {
        */
       void fillSiPMOutput(float* hist, bool useDirect, bool useReflected);
 
+      /**
+       * Get MC time.
+       * @return MC time.
+       */
+      float getMCTime() const
+      {
+        return m_MCTime;
+      }
+
+      /**
+       * Get SiPM MC time.
+       * @return SiPM MC yime.
+       */
+      float getSiPMMCTime() const
+      {
+        return m_SiPMMCTime;
+      }
+
     private:
+
+      /**
+       * Reallocate photoelectron buffers.
+       * @param[in] size New size of buffers.
+       */
+      void reallocPhotoElectronBuffers(int size);
+
+      /**
+       * Prepare simulation.
+       */
+      void prepareSimulation();
+
+      /**
+       *  Perform common simulation stage.
+       */
+      void performSimulation();
+
+      /**
+       * Sort photoelectrons.
+       * @param[in] nPhotoelectrons Number of photoelectrons.
+       * @return Pointer to index array.
+       */
+      int* sortPhotoelectrons(int nPhotoelectrons);
+
+      /**
+       * Add random noise to the signal (amplitude-dependend).
+       */
+      void addRandomSiPMNoise();
+
+      /**
+       * Simulate ADC (create digital signal from analog),
+       */
+      void simulateADC();
+
+      /**
+       * Debug output (signal and fit result histograms).
+       */
+      void debugOutput();
 
       /** Parameters. */
       const KLMScintillatorDigitizationParameters* m_DigPar;
@@ -203,43 +258,11 @@ namespace Belle2 {
       /** Threshold. */
       int m_Threshold;
 
-      /**
-       * Reallocate photoelectron buffers.
-       * @param[in] size New size of buffers.
-       */
-      void reallocPhotoElectronBuffers(int size);
+      /** MC time. */
+      float m_MCTime;
 
-      /**
-       * Prepare simulation.
-       */
-      void prepareSimulation();
-
-      /**
-       *  Perform common simulation stage.
-       */
-      void performSimulation();
-
-      /**
-       * Sort photoelectrons.
-       * @param[in] nPhotoelectrons Number of photoelectrons.
-       * @return Pointer to index array.
-       */
-      int* sortPhotoelectrons(int nPhotoelectrons);
-
-      /**
-       * Add random noise to the signal (amplitude-dependend).
-       */
-      void addRandomSiPMNoise();
-
-      /**
-       * Simulate ADC (create digital signal from analog),
-       */
-      void simulateADC();
-
-      /**
-       * Debug output (signal and fit result histograms).
-       */
-      void debugOutput();
+      /** MC time at SiPM. */
+      float m_SiPMMCTime;
 
     };
 

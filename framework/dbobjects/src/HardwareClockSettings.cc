@@ -9,6 +9,7 @@
  **************************************************************************/
 #include <framework/dbobjects/HardwareClockSettings.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Unit.h>
 #include <iostream>
 
 using namespace Belle2;
@@ -89,7 +90,8 @@ void HardwareClockSettings::setAcceleratorRF(Double_t acceleratorRF)
 void HardwareClockSettings::print() const
 {
   std::cout << std::endl;
-  std::cout << "Clock prescales:" << std::endl;
+  std::cout << "Accelerator RF: " << m_acceleratorRF / Unit::MHz << " MHz" << std::endl;
+  std::cout << "Clock prescale factors:" << std::endl;
   std::cout << "===================================" << std::endl;
 
   for (const auto& det : m_prescaleMap) {
@@ -102,7 +104,10 @@ void HardwareClockSettings::print() const
   std::cout << "===================================" << std::endl;
   for (const auto& det : m_clocksMap) {
     std::cout << Const::parseDetectors(det.first) << ":" << std::endl;
-    for (const auto& clock : det.second)  std::cout << " " << clock.first << " " << clock.second << std::endl;
+    for (const auto& clock : det.second) {
+      std::cout << " " << clock.first << " " << clock.second / Unit::MHz << " MHz" << std::endl;
+    }
   }
   std::cout << "===================================" << std::endl;
 }
+

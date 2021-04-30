@@ -1,5 +1,4 @@
 import basf2
-from ROOT import Belle2
 
 from tracking.run.event_generation import StandardEventGenerationRun
 from trackfindingcdc.quadtree.quadTreePlotter import SegmentQuadTreePlotter
@@ -15,7 +14,11 @@ class SegmentQuadTreeRun(StandardEventGenerationRun):
     """ Create segments and plot them in a segment quad tree """
 
     #: Use CDCSVGDisplay to draw the MCTrackCand segments
-    display_module_segments = CDCSVGDisplayModule(interactive=True)
+    display_module_segments = CDCSVGDisplayModule(
+        #: \cond
+        interactive=True
+        #: \endcond
+    )
     #: Do not draw the genfit MCTrackCand trajectories
     display_module_segments.draw_gftrackcand_trajectories = False
     #: Draw the genfit MCTrackCands
@@ -26,14 +29,22 @@ class SegmentQuadTreeRun(StandardEventGenerationRun):
     display_module_segments.track_cands_store_array_name = "MCTrackCands"
 
     #: Use CDCSVGDisplay to draw the TrackCand information
-    display_module_tracks = CDCSVGDisplayModule(interactive=True)
+    display_module_tracks = CDCSVGDisplayModule(
+        #: \cond
+        interactive=True
+        #: \endcond
+    )
     #: Draw the genfit TrackCands
     display_module_tracks.draw_gftrackcands = True
     #: Tell the plotter where to find the information
     display_module_tracks.track_cands_store_array_name = "TrackCands"
 
     #: Use CDCSVGDisplay to draw the MC tracks
-    display_module_mc = CDCSVGDisplayModule(interactive=True)
+    display_module_mc = CDCSVGDisplayModule(
+        #: \cond
+        interactive=True
+        #: \endcond
+    )
     #: Draw the genfit MCTrackCand trajectories
     display_module_mc.draw_gftrackcand_trajectories = True
     #: Draw the track IDs
@@ -65,7 +76,7 @@ class SegmentQuadTreeRun(StandardEventGenerationRun):
         })
         main_path.add_module(segment_finder)
 
-        main_path.add_module(Filler())
+        # main_path.add_module(Filler())
 
         segment_quad_tree = basf2.register_module("SegmentQuadTree")
         segment_quad_tree.param({
@@ -84,6 +95,7 @@ class SegmentQuadTreeRun(StandardEventGenerationRun):
 def main():
     run = SegmentQuadTreeRun()
     run.configure_and_execute_from_commandline()
+
 
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')

@@ -22,12 +22,10 @@ import basf2
 import modularAnalysis as ma
 from vertex import TagV
 import glob
-import os
 import sys
 import numpy as np
 import variables as v
-from root_pandas import read_root, to_root
-import pandas
+from root_pandas import read_root
 
 basf2.set_log_level(basf2.LogLevel.ERROR)
 

@@ -12,7 +12,6 @@
 #include <analysis/modules/TrackingSystematics/TrackingSystematics.h>
 
 // dataobjects
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
 #include <framework/datastore/StoreObjPtr.h>
@@ -109,18 +108,34 @@ void TrackingMomentumModule::event()
       continue;
     }
 
-    if (!Const::chargedStableSet.contains(Const::ParticleType(abs(particleList->getPDGCode())))) {
-      B2ERROR("The provided particlelist " << iList << " does not contain track-based particles.");
-    }
-
     size_t nPart = particleList->getListSize();
     for (size_t iPart = 0; iPart < nPart; iPart++) {
       auto particle = particleList->getParticle(iPart);
-
-      double m = particle->getMass();
-      TVector3 p = m_scale * particle->getMomentum();
-      double e = sqrt(p.Mag2() + m * m);
-      particle->set4Vector(TLorentzVector(p, e));
+      setMomentumScalingFactor(particle);
     }
+  }
+}
+
+void TrackingMomentumModule::setMomentumScalingFactor(Particle* particle)
+{
+  if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite or
+      particle->getParticleSource() == Particle::EParticleSourceObject::c_V0) {
+    for (auto daughter : particle->getDaughters()) {
+      setMomentumScalingFactor(daughter);
+    }
+    double px = 0;
+    double py = 0;
+    double pz = 0;
+    double E = 0;
+    for (auto daughter : particle->getDaughters()) {
+      px += daughter->getPx();
+      py += daughter->getPy();
+      pz += daughter->getPz();
+      E  += daughter->getEnergy();
+    }
+    const TLorentzVector vec(px, py, pz, E);
+    particle->set4Vector(vec);
+  } else if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Track) {
+    particle->setMomentumScalingFactor(m_scale);
   }
 }

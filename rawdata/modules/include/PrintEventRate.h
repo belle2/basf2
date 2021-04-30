@@ -8,18 +8,12 @@
 
 #ifndef PRINTEVENTRATE_H
 #define PRINTEVENTRATE_H
-#include <stdlib.h>
-#include <string>
 
 #include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
-
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 #include <rawdata/dataobjects/RawDataBlock.h>
 #include <rawdata/dataobjects/RawFTSW.h>

@@ -13,4 +13,4 @@ if __name__ == "__main__":
     # run the check ignoring OrcaKinFit errors
     ignoreme = 'Belle2::OrcaKinFit'
     check_error_free("b2code-doxygen-warnings", "doxygen", "analysis",
-                     lambda x: re.findall(ignoreme, x) or x is "'")
+                     lambda x: re.findall(ignoreme, x) or x == "'")

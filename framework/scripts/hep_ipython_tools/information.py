@@ -1,4 +1,3 @@
-import re
 from datetime import datetime
 from subprocess import check_output
 
@@ -65,5 +64,5 @@ class EnvironmentInformation:
         """
         try:
             return check_output(["git", "log", "-1", "--format='%H'"], cwd=self.release_folder).decode()
-        except:
+        except BaseException:
             return ""

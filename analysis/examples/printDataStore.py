@@ -9,15 +9,16 @@ for each event. To be used for debugging.
 
 Execute script with:
   $> basf2 printDataStore.py -i [input_ROOT_file]
-
 """
 
 import basf2
-from modularAnalysis import printDataStore
+import modularAnalysis as ma
 
 path = basf2.Path()
-path.add_module('RootInput')
-printDataStore(path=path)
+ma.inputMdst(environmentType='default',
+             filename=basf2.find_file('mdst14.root', 'validation', True),
+             path=path)
+ma.printDataStore(path=path)
 basf2.process(path)
 
 # @endcond

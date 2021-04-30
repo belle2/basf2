@@ -43,7 +43,7 @@ namespace Belle2 {
    *
    * Please note however that the multi-dimensional likelihood approach is based on the the assumption that PDFs of the observables can be factorised into a simple product:
    *
-   \f{equation*}{
+   \f{equation}{
    \mathcal{L}_{\mathrm{ECL}} = \prod_{i}^{N_{\mathrm{obs}}} \mathcal{L}(\mathrm{obs}_{i}),
    \f}
    *

@@ -1,10 +1,7 @@
-import basf2
-import ROOT
 import datetime
-import os
-import subprocess
-from basf2 import *
-from ROOT import Belle2
+import re
+import sys
+import basf2 as b2
 from tracking import add_cr_tracking_reconstruction
 
 # reset_database()
@@ -35,7 +32,6 @@ elif argc == 2:
 
 probcut = float(probcut)
 # print(probcut)
-import re
 
 rootdir = None
 prefix = None
@@ -81,8 +77,8 @@ print("log   : ", logfilename)
 
 # Compose basf2 module path #
 #############################
-main_path = basf2.create_path()
-logging.log_level = LogLevel.ERROR
+main_path = b2.create_path()
+b2.logging.log_level = b2.LogLevel.ERROR
 
 # Master module: RootInput
 main_path.add_module('RootInput',
@@ -138,7 +134,7 @@ main_path.add_module('CDCCosmicAnalysis',
                      noBFit = False
                      )
 '''
-main_path.add_module('CDCCRTest', logLevel=LogLevel.ERROR,
+main_path.add_module('CDCCRTest', logLevel=b2.LogLevel.ERROR,
                      RecoTracksColName='RecoTracks',
                      histogramDirectoryName='trackfit',
                      MinimumPt=0.1,
@@ -159,9 +155,9 @@ main_path.add_module('HistoManager', histoFileName=outputfilename)
 # main_path.add_module('RootOutput',
 #                     outputFileName = datadir + "evtT0." +prefix + name+'.root',
 #                     branchNames = ['CDCHits','EventT0'])
-basf2.print_path(main_path)
-basf2.process(main_path)
+b2.print_path(main_path)
+b2.process(main_path)
 
 d = datetime.datetime.today()
-print(statistics)
+print(b2.statistics)
 print(d.strftime('Finish at : %y-%m-%d %H:%M:%S\n'))

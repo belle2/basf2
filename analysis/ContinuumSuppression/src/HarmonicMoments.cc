@@ -24,7 +24,7 @@ void HarmonicMoments::calculateBasicMoments()
     double cTheta = p.Dot(m_axis) / pMag;
 
     // Fills the momenta.
-    // This part is quite ugly, but hard-coding the legendre polinimials makes the code
+    // This part is quite ugly, but hard-coding the Legendre polynomials makes the code
     // much faster than using the boost libraries, which are implementing the recursive formulas.
     // This implementation should also be faster than a switch...case one.
     double cTheta2 = cTheta * cTheta;
@@ -50,7 +50,7 @@ void HarmonicMoments::calculateAllMoments()
     double cTheta = p.Dot(m_axis) / pMag;
 
     // Fills the momenta.
-    // This part is quite ugly, but hard-coding the legendre polinimials makes the code
+    // This part is quite ugly, but hard-coding the Legendre polynomials makes the code
     // much faster than using the boost libraries, which are implementing the recursive formulas.
     // This implementation should also be faster than a switch...case one.
     double cTheta2 = cTheta * cTheta;

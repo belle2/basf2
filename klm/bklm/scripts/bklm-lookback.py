@@ -35,13 +35,11 @@
 #
 
 import basf2
-from basf2 import *
 import sys
 import re
 import EventInspectorLookback
-from EventInspectorLookback import *
 import rawdata
-from optparse import Option, OptionValueError, OptionParser
+from optparse import OptionParser
 import glob
 
 parser = OptionParser()
@@ -89,7 +87,7 @@ if (options.window[0] < 0) or (options.window[1] < options.window[0]) or (option
     sys.exit()
 window = options.window
 
-inputName = re.sub("HLT.\.f0....", "HLT*.f*", options.infilename)
+inputName = re.sub(r"HLT.\.f0....", "HLT*.f*", options.infilename)
 fileList = glob.glob(inputName)
 if len(fileList) == 0:
     print("No file(s) match {0}".format(inputName))
@@ -109,11 +107,9 @@ pdfName = 'bklmPlots-e{0}r{1}.pdf'.format(exp, run)
 
 print('bklm-windowstart: exp=' + exp + ' run=' + run + ' input=' + inputName + '. Analyze all events using ' + tagName)
 
-reset_database()
-use_database_chain()
-use_central_database(tagName)
+basf2.conditions.prepend_globaltag(tagName)
 
-main = create_path()
+main = basf2.create_path()
 if inputName.find(".sroot") >= 0:
     main.add_module('SeqRootInput', inputFileNames=fileList)
 else:
@@ -125,5 +121,5 @@ rawdata.add_unpackers(main, components=['KLM'])
 main.add_module('KLMReconstructor')
 main.add_module(eventInspector)
 
-process(main)
-print(statistics)
+basf2.process(main)
+print(basf2.statistics)

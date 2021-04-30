@@ -5,19 +5,18 @@ import ROOT
 import re
 import functools
 import numpy as np
-#: ignore invalid floating-point operations
-np.seterr(invalid='ignore')
+import collections
+from tracking.validation.plot import ValidationPlot
+
+import logging
 
 import sys
+#: ignore invalid floating-point operations
+np.seterr(invalid='ignore')
 #: largest possible floating-point value
 flt_max = sys.float_info.max
 #: smallest possible floating-point value
 flt_min = sys.float_info.min
-
-import collections
-from .plot import ValidationPlot
-
-import logging
 
 
 def get_logger():
@@ -31,7 +30,6 @@ try:
     matplotlib.use('Agg')
 
     import matplotlib.pyplot as plt
-    import matplotlib.transforms as transforms
 except ImportError:
     raise ImportError("matplotlib is not installed in your basf2 environment. "
                       "You may install it with 'pip install matplotlib'")
@@ -45,6 +43,7 @@ class defaults:
     legend = True
     #: show label by default
     label = True
+
 
 #: A list of classes that are implemented as plotable
 plotable_classes = (
@@ -96,8 +95,6 @@ def plot(tobject, **kwd):
 
     else:
         raise ValueError("Plotting to matplot lib only supported for TH1, TProfile, and THStack.")
-
-    return fig
 
 
 def use_style(plot_function):
@@ -364,7 +361,7 @@ def put_legend_outside(ax,
     if exclude_handles:
         select_handles = [handle for handle in select_handles if handle not in exclude_handles]
 
-    fig = ax.get_figure()
+    # fig = ax.get_figure()
     # trans = transforms.blended_transform_factory(fig.transFigure, ax.transAxes)
 
     if bottom:
@@ -483,7 +480,7 @@ def get_stats_from_th(th):
     th.GetStats(stats_values)
 
     sum_w = stats_values[0]
-    sum_w2 = stats_values[1]
+    # sum_w2 = stats_values[1]
     sum_wx = stats_values[2]
     sum_wx2 = stats_values[3]
     sum_wy = stats_values[4]  # Only for TH2 and TProfile
@@ -509,9 +506,10 @@ def get_stats_from_th(th):
     return stats
 
 
-def compose_stats_label(title, additional_stats={}):
+def compose_stats_label(title, additional_stats=None):
     """Render the summary statistics to a label string."""
-    keys = list(additional_stats.keys())
+    if additional_stats is None:
+        additional_stats = {}
     labeled_value_template = "{0:<9}: {1:.3g}"
     labeled_string_template = "{0:<9}: {1:>9s}"
     label_elements = []
@@ -788,8 +786,8 @@ def plot_th2_data_into(ax,
     # May set these from th2 properties
     log_scale = False
 
-    root_color_index = th2.GetLineColor()
-    linecolor = root_color_to_matplot_color(root_color_index)
+    # root_color_index = th2.GetLineColor()
+    # linecolor = root_color_to_matplot_color(root_color_index)
 
     if plot_3d:
         raise NotImplementedError("3D plotting of two dimensional histograms not implemented yet")

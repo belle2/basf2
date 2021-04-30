@@ -3,6 +3,7 @@
 import basf2
 from ROOT import Belle2
 
+import generators as gen
 import simulation as sim
 import rawdata as raw
 import reconstruction as reco
@@ -20,12 +21,6 @@ from caf import backends
 
 
 def generate_test_data(filename):
-    kkgeninput = basf2.register_module('KKGenInput')
-    kkgeninput.param('tauinputFile', Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat'))
-    kkgeninput.param('KKdefaultFile', Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat'))
-    kkgeninput.param('taudecaytableFile', '')
-    kkgeninput.param('kkmcoutputfilename', 'kkmc_mumu.txt')
-
     main = basf2.create_path()
 
     main.add_module("EventInfoSetter", evtNumList=[200])
@@ -33,7 +28,7 @@ def generate_test_data(filename):
     main.add_module('Gearbox')
     main.add_module('Geometry')
 
-    main.add_module(kkgeninput)
+    gen.add_kkmc_generator(main, 'mu-mu+')
 
     sim.add_simulation(main)
 

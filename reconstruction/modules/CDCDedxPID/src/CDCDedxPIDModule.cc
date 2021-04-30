@@ -264,6 +264,12 @@ void CDCDedxPIDModule::event()
     // get the cosine correction only for data!
     dedxTrack->m_cosCor = (m_DBCosineCor && m_usePrediction && numMCParticles == 0) ? m_DBCosineCor->getMean(costh) : 1.0;
 
+    // get the cosine edge correction only for data!
+    bool isEdge = false;
+    if ((abs(costh + 0.860) < 0.010) || (abs(costh - 0.955) <= 0.005))isEdge = true;
+    dedxTrack->m_cosEdgeCor = (m_DBCosEdgeCor && m_usePrediction && numMCParticles == 0
+                               && isEdge) ? m_DBCosEdgeCor->getMean(costh) : 1.0;
+
     // initialize a few variables to be used in the loop over track points
     double layerdE = 0.0; // total charge in current layer
     double layerdx = 0.0; // total path length in current layer
@@ -439,8 +445,9 @@ void CDCDedxPIDModule::event()
 
         LinearGlobalADCCountTranslator translator;
         int adcbaseCount = cdcHit->getADCCount(); // pedestal subtracted?
-        double nlFactor = 1.6;
-        int adcCount = nlFactor * NonLinearityADCMap(adcbaseCount / nlFactor);
+        int adcCount = (m_DBNonlADC && m_usePrediction
+                        && numMCParticles == 0) ? m_DBNonlADC->getCorrectedADC(adcbaseCount, currentLayer) : adcbaseCount;
+
         double hitCharge = translator.getCharge(adcCount, wireID, false, pocaOnWire.Z(), pocaMom.Phi());
         int driftT = cdcHit->getTDCCount();
 
@@ -454,7 +461,6 @@ void CDCDedxPIDModule::event()
                                     pocaMom.Theta());
 
         // now calculate the path length for this hit
-        // std::cout << "--Jitendra0: doca = " << doca << ", docaRS = " << docaRS << ", entAng = " << entAng << ", entAngRS = " << entAngRS << std::endl;
         double celldx = c.dx(doca, entAng);
         if (c.isValid()) {
           // get the wire gain constant
@@ -471,15 +477,31 @@ void CDCDedxPIDModule::event()
           // apply the calibration to dE to propagate to both hit and layer measurements
           // Note: could move the sin(theta) here since it is common accross the track
           //       It is applied in two places below (hit level and layer level)
+          double correction = dedxTrack->m_runGain * dedxTrack->m_cosCor * dedxTrack->m_cosEdgeCor * wiregain * twodcor * onedcor;
 
+          // --------------------
+          // save individual hits (even for dead wires)
+          // --------------------
+          if (correction != 0) dadcCount = dadcCount / correction;
+          else dadcCount = 0;
 
-          double correction = dedxTrack->m_runGain * dedxTrack->m_cosCor * wiregain * twodcor * onedcor;
+          double cellDedx = (dadcCount / celldx);
+
+          // correct for path length through the cell
+          if (nomom) cellDedx *= std::sin(std::atan(1 / fitResult->getCotTheta()));
+          else cellDedx *= std::sin(trackMom.Theta());
+
+          if (m_enableDebugOutput)
+            dedxTrack->addHit(wire, iwire, currentLayer, doca, docaRS, entAng, entAngRS,
+                              adcCount, adcbaseCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
+                              driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor,
+                              foundByTrackFinder, weightPionHypo, weightKaonHypo, weightProtHypo);
+
+          // --------------------
+          // save layer hits only with active wires
+          // --------------------
           if (correction != 0) {
-            dadcCount = dadcCount / correction;
 
-            // --------------------
-            // save layer hits
-            // --------------------
             layerdE += dadcCount;
             layerdx += celldx;
 
@@ -487,21 +509,6 @@ void CDCDedxPIDModule::event()
               longesthit = celldx;
               wirelongesthit = iwire;
             }
-
-            // --------------------
-            // save individual hits
-            // --------------------
-            double cellDedx = (dadcCount / celldx);
-
-            // correct for path length through the cell
-            if (nomom) cellDedx *= std::sin(std::atan(1 / fitResult->getCotTheta()));
-            else cellDedx *= std::sin(trackMom.Theta());
-
-            if (m_enableDebugOutput)
-              dedxTrack->addHit(wire, iwire, currentLayer, doca, docaRS, entAng, entAngRS, adcCount, hitCharge, celldx, cellDedx, cellHeight,
-                                cellHalfWidth, driftT,
-                                driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor,
-                                foundByTrackFinder, weightPionHypo, weightKaonHypo, weightProtHypo);
             nhitscombined++;
           }
         }
@@ -540,6 +547,7 @@ void CDCDedxPIDModule::event()
     } // end of loop over CDC hits for this track
 
     // Determine the number of hits to be used
+    //m_lDedx is a ector for layerDedx and created w/ ->adddedx method above
     if (dedxTrack->m_lDedx.empty()) {
       B2DEBUG(29, "Found track with no hits, ignoring.");
       continue;
@@ -572,8 +580,8 @@ void CDCDedxPIDModule::event()
     // If this is a MC track, get the track-level dE/dx
     if (numMCParticles != 0 && dedxTrack->m_mcmass > 0 && dedxTrack->m_pTrue != 0) {
       // determine the predicted mean and resolution
-      double mean = getMean(dedxTrack->m_pTrue / dedxTrack->m_mcmass);
-      double sigma = getSigma(mean, dedxTrack->m_lNHitsUsed, std::sqrt(1 - dedxTrack->m_cosThetaTrue * dedxTrack->m_cosThetaTrue));
+      double mean = getMean(dedxTrack->m_pCDC / dedxTrack->m_mcmass);
+      double sigma = getSigma(mean, dedxTrack->m_lNHitsUsed, std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta));
       dedxTrack->m_simDedx = gRandom->Gaus(mean, sigma);
       while (dedxTrack->m_simDedx < 0)
         dedxTrack->m_simDedx = gRandom->Gaus(mean, sigma);
@@ -874,33 +882,4 @@ void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize
     // fill the chi value for this particle type
     if (sigma != 0) chi[pdgIter.getIndex()] = ((dedx - mean) / (sigma));
   }
-}
-
-Int_t CDCDedxPIDModule::NonLinearityADCMap(const int& ADC)
-{
-
-  // added by Roy on 29.Apr.20
-  // piecewise linear map
-  // y values are the saturated ADC readout
-  // x are the corrected ADC values
-
-  const double x[11] = {
-    0.0, 200.0, 248.5, 344.0, 487.0, 642.5,
-    787.6, 932.6, 1171.0, 1471.5, 1906.7
-  };
-  const double y[11] = {
-    0.0, 200.0, 248.5, 344.0, 475.9, 572.4,
-    634.5, 682.8, 758.6, 827.6, 910.3
-  };
-
-  int ibin = 9;
-  for (int i = 0; i < 10; i++) {
-    if (ADC >= y[i] && ADC < y[i + 1]) {ibin = i;}
-  }
-
-  // Invert
-  Double_t slope = (y[ibin + 1] - y[ibin]) / (x[ibin + 1] - x[ibin]);
-  Int_t ADC_Modified =  Int_t(x[ibin] + (ADC - y[ibin]) / slope);
-
-  return ADC_Modified;
 }

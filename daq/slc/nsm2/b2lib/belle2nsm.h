@@ -7,7 +7,7 @@
 #ifndef __belle2nsm_h__
 #define __belle2nsm_h__
 
-#include <nsm2/nsm2.h>
+#include "nsm2.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -28,9 +28,9 @@ int b2nsm_reqid(const char* reqname);
 int b2nsm_loghook(NSMmsg* msg, NSMcontext* nsmc);
 void b2nsm_checkpoint(NSMcontext* nsmc, int val);
 int b2nsm_debuglevel(int val);
-void b2nsm_logging(FILE* fp);
-void b2nsm_logging2(FILE* fp, const char* prefix);
-void b2nsm_context(NSMcontext* context);
+FILE* b2nsm_logging(FILE* fp);
+FILE* b2nsm_logging2(FILE* fp, const char* prefix);
+NSMcontext* b2nsm_context(NSMcontext* context);
 const char* b2nsm_strerror();
 int b2nsm_callback(const char* name, NSMcallback_t callback);
 int b2nsm_sendany(const char* node, const char* req, int npar, int32_t* pars,

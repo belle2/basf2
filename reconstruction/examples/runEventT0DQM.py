@@ -18,11 +18,10 @@
 # Example steering file - 2011 Belle II Collaboration
 #############################################################
 
-import os
-from basf2 import *
+import basf2 as b2
 
 # main path
-main = create_path()
+main = b2.create_path()
 
 # read in a sample
 input_file = 'cdst_hadronEvents.root'
@@ -33,13 +32,13 @@ main.add_module("HistoManager", histoFileName="EventT0DQM.root")
 
 # run the DQM module
 eventT0DQMmodule = main.add_module("EventT0DQM")
-eventT0DQMmodule.set_log_level(LogLevel.INFO)  # LogLevel.DEBUG / LogLevel.INFO
+eventT0DQMmodule.set_log_level(b2.LogLevel.INFO)  # LogLevel.DEBUG / LogLevel.INFO
 eventT0DQMmodule.set_debug_level(21)
 
 # == Show progress
 main.add_module('Progress')
 
 # Process events
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

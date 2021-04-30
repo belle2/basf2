@@ -10,23 +10,16 @@
 </header>
 """
 
+from tracking.validation.run import TrackingValidationRun
+import tracking
+import logging
+import reconstruction
+import basf2
 VALIDATION_OUTPUT_FILE = 'fullTrackingValidation_plusECL.root'
 N_EVENTS = 10000
 ACTIVE = True
 
-import basf2
 basf2.set_random_seed(1337)
-
-from basf2 import *
-
-from tracking.path_utils import *
-from tracking import *
-import reconstruction
-
-import logging
-import tracking
-
-from tracking.validation.run import TrackingValidationRun
 
 
 class fullTrackingValidation_plusECL(TrackingValidationRun):

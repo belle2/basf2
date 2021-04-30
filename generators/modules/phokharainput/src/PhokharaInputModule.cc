@@ -10,9 +10,9 @@
 
 #include <generators/modules/phokharainput/PhokharaInputModule.h>
 
-#include <framework/utilities/FileSystem.h>
-
 #include <framework/datastore/StoreArray.h>
+#include <framework/utilities/FileSystem.h>
+#include <framework/utilities/IOIntercept.h>
 
 using namespace std;
 using namespace Belle2;
@@ -140,7 +140,7 @@ void PhokharaInputModule::event()
   }
 
   // initial particle from beam parameters
-  MCInitialParticles& initial = m_initial.generate();
+  const MCInitialParticles& initial = m_initial.generate();
 
   // true boost
   TLorentzRotation boost = initial.getCMSToLab();
@@ -152,8 +152,12 @@ void PhokharaInputModule::event()
   if (m_BeamEnergySpread) {
     // PHOKHARA does not support beam-energy spread. To simulate it,
     // the generator is initialized with the new energy for every event.
+    IOIntercept::OutputToLogMessages initLogCapture(
+      "PHOKHARA", LogConfig::c_Debug, LogConfig::c_Debug, 100, 100);
+    initLogCapture.start();
     m_generator.setCMSEnergy(initial.getMass());
     m_generator.init(m_ParameterFile);
+    initLogCapture.finish();
   }
   m_generator.generateEvent(m_mcGraph, vertex, boost);
   m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);

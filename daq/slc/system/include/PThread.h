@@ -54,7 +54,7 @@ namespace Belle2 {
   public:
     PThread() : m_th(0) {}
     template<class WORKER>
-    PThread(WORKER* worker, bool destroyed = true, bool detached = true)
+    PThread(WORKER* worker, bool destroyed = true, bool detached = true, std::string thread_name = "")
     {
       m_th = 0;
       if (destroyed) {
@@ -68,6 +68,22 @@ namespace Belle2 {
           m_th = 0;
         }
       }
+#if (defined(__GLIBC__) && defined(__GNU_SOURCE) && __GLIBC__ >= 2 && __GLIBC_MINOR__ >= 12)
+      if ((m_th != 0) && (thread_name != "")) {
+        try {
+          if (pthread_setname_np(m_th, thread_name.c_str()) != 0) {
+            LogFile::info("Failed to set process name %d", m_th);
+          }
+          char comp_name[64];
+          pthread_getname_np(m_th, comp_name, 16);
+          if (strcmp(thread_name.c_str(), comp_name) != 0) {
+            prctl(PR_SET_NAME, thread_name.c_str());
+          }
+        } catch (const std::exception& e) {
+          LogFile::error(e.what());
+        }
+      }
+#endif
       if (detached) {
         detach();
         m_th = 0;

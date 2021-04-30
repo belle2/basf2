@@ -24,7 +24,19 @@ REG_MODULE(PrintEventRate)
 //                 Implementation
 //-----------------------------------------------------------------
 
-PrintEventRateModule::PrintEventRateModule()
+PrintEventRateModule::PrintEventRateModule() :
+  m_subrun(0),
+  m_size(0),
+  m_cpr(0),
+  m_cpr_svd(0),
+  m_cpr_cdc(0),
+  m_cpr_top(0),
+  m_cpr_arich(0),
+  m_cpr_ecl(0),
+  m_cpr_klm(0),
+  m_cpr_trg(0),
+  m_cpr_others(0),
+  m_evecnt(0)
 {
   addParam("PrintInterval", m_print_interval, "Print Interval", 60);
 
@@ -292,10 +304,11 @@ void PrintEventRateModule::event()
     m_prev_tot_bytes = m_tot_bytes;
     m_prev_event = m_n_basf2evt;
 
-
-
+    /* cppcheck-suppress redundantAssignment */
     m_prev_tot_bytes = m_tot_bytes;
+    /* cppcheck-suppress redundantAssignment */
     m_prev_event = m_n_basf2evt;
+    /* cppcheck-suppress redundantAssignment */
     m_prev_utime = m_cur_utime;
   }
 

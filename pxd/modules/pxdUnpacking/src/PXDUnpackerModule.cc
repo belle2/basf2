@@ -444,7 +444,6 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
                                    PXDDAQPacketStatus& daqpktstat)
 {
   unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
-  bool printflag = false;
   ubig16_t* dhp_pix = (ubig16_t*)data;
 
   unsigned int dhp_readout_frame_lo = 0;
@@ -453,6 +452,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   unsigned int dhp_dhe_id       = 0;
   unsigned int dhp_dhp_id       = 0;
 
+  // cppcheck-suppress unreadVariable
   unsigned int dhp_row = 0, dhp_col = 0, dhp_adc = 0, dhp_cm = 0;
 //  unsigned int dhp_offset = 0;
   bool rowflag = false;
@@ -464,22 +464,18 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
     return;
   }
 
-  if (printflag)
-    B2DEBUG(29, "HEADER -- $" << hex << dhp_pix[0] << hex << dhp_pix[1] << hex << dhp_pix[2] << hex << dhp_pix[3] << " -- ");
+  B2DEBUG(29, "HEADER -- $" << hex << dhp_pix[0] << hex << dhp_pix[1] << hex << dhp_pix[2] << hex << dhp_pix[3] << " -- ");
 
-  if (printflag)
-    B2DEBUG(29, "DHP Header   | $" << hex << dhp_pix[2] << " ( " << dec << dhp_pix[2] << " ) ");
+  B2DEBUG(29, "DHP Header   | $" << hex << dhp_pix[2] << " ( " << dec << dhp_pix[2] << " ) ");
   dhp_header_type  = (dhp_pix[2] & 0xE000) >> 13;
   dhp_reserved     = (dhp_pix[2] & 0x1F00) >> 8;
   dhp_dhe_id       = (dhp_pix[2] & 0x00FC) >> 2;
   dhp_dhp_id       =  dhp_pix[2] & 0x0003;
 
-  if (printflag) {
-    B2DEBUG(29, "DHP type     | $" << hex << dhp_header_type << " ( " << dec << dhp_header_type << " ) ");
-    B2DEBUG(29, "DHP reserved | $" << hex << dhp_reserved << " ( " << dec << dhp_reserved << " ) ");
-    B2DEBUG(29, "DHP DHE ID   | $" << hex << dhp_dhe_id << " ( " << dec << dhp_dhe_id << " ) ");
-    B2DEBUG(29, "DHP DHP ID   | $" << hex << dhp_dhp_id << " ( " << dec << dhp_dhp_id << " ) ");
-  }
+  B2DEBUG(29, "DHP type     | $" << hex << dhp_header_type << " ( " << dec << dhp_header_type << " ) ");
+  B2DEBUG(29, "DHP reserved | $" << hex << dhp_reserved << " ( " << dec << dhp_reserved << " ) ");
+  B2DEBUG(29, "DHP DHE ID   | $" << hex << dhp_dhe_id << " ( " << dec << dhp_dhe_id << " ) ");
+  B2DEBUG(29, "DHP DHP ID   | $" << hex << dhp_dhp_id << " ( " << dec << dhp_dhp_id << " ) ");
 
   if (dhe_ID != dhp_dhe_id) {
     if (!(m_suppressErrorMask & c_DHE_DHP_DHEID)) {
@@ -509,8 +505,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
 //   dhp_offset = offtab[dhp_dhp_id];
 
   dhp_readout_frame_lo  = dhp_pix[3] & 0xFFFF;
-  if (printflag)
-    B2DEBUG(29, "DHP Frame Nr     |  $" << hex << dhp_readout_frame_lo << " ( " << dec << dhp_readout_frame_lo << " ) ");
+  B2DEBUG(29, "DHP Frame Nr     |  $" << hex << dhp_readout_frame_lo << " ( " << dec << dhp_readout_frame_lo << " ) ");
 
   /* // TODO removed because data format error is not to be fixed soon
   if (((dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F) > m_maxDHPFrameDiff) {
@@ -570,8 +565,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   // Start with offset 4, thus skipping header words
   for (unsigned int i = 4; i < nr_words ; i++) {
 
-    if (printflag)
-      B2DEBUG(29, "-- $" << hex << dhp_pix[i] << " --   " << dec << i);
+    B2DEBUG(29, "-- $" << hex << dhp_pix[i] << " --   " << dec << i);
     {
       if (((dhp_pix[i] & 0x8000) >> 15) == 0) {
         rowflag = true;
@@ -596,8 +590,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
             daqpktstat.dhc_back().dhe_back().addCM(cm);
           }
         }
-        if (printflag)
-          B2DEBUG(29, "SetRow: $" << hex << dhp_row << " CM $" << hex << dhp_cm);
+        B2DEBUG(29, "SetRow: $" << hex << dhp_row << " CM $" << hex << dhp_cm);
       } else {
         if (!rowflag) {
           if (!(m_suppressErrorMask & c_DHP_PIX_WO_ROW)) B2WARNING("DHP Unpacking: Pix without Row!!! skip dhp data ");
@@ -637,36 +630,32 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
             m_errorMask |= c_COL_OVERFLOW;
           }
           dhp_adc = dhp_pix[i] & 0xFF;
-          if (printflag)
-            B2DEBUG(29, "SetPix: Row $" << hex << dhp_row << " Col $" << hex << dhp_col << " ADC $" << hex << dhp_adc
-                    << " CM $" << hex << dhp_cm);
+          B2DEBUG(29, "SetPix: Row $" << hex << dhp_row << " Col $" << hex << dhp_col << " ADC $" << hex << dhp_adc
+                  << " CM $" << hex << dhp_cm);
 
-          /*if (m_verbose) {
-            B2DEBUG(29, "raw    |   " << hex << d[i]);
-            B2DEBUG(29, "row " << hex << ((d[i] >> 20) & 0xFFF) << "(" << ((d[i] >> 20) & 0xFFF) << ")" << " col " << "(" << hex << ((d[i] >> 8) & 0xFFF) << ((d[i] >> 8) & 0xFFF)
-                   << " adc " << "(" << hex << (d[i] & 0xFF) << (d[i] & 0xFF) << ")");
-            B2DEBUG(29, "dhe_ID " << dhe_ID);
-            B2DEBUG(29, "start-Frame-Nr " << dec << dhe_first_readout_frame_id_lo);
-          };*/
-
-          if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
-                                                        (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F);
+          if (dhp_adc == 0) {
+            // if !supress error flag
+            B2WARNING("DHE Event truncation in DHE " << dhe_ID << " DHP " << dhp_dhp_id);
+            // m_errorMask |= c_DHE_EVENT_TRUNC;
+            daqpktstat.dhc_back().dhe_back().dhp_back().setTruncated();
+          } else {
+            if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
+                                                          (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F);
+          }
         }
       }
     }
   }
 
-  if (printflag) {
-    B2DEBUG(29, "(DHE) DHE_ID $" << hex << dhe_ID << " (DHE) DHP ID $" << hex << dhe_DHPport << " (DHP) DHE_ID $" << hex << dhp_dhe_id
-            << " (DHP) DHP ID $" << hex << dhp_dhp_id);
-    /*for (int i = 0; i < raw_nr_words ; i++) {
-      B2DEBUG(29, "RAW      |   " << hex << p_pix[i]);
-      printf("raw %08X  |  ", p_pix[i]);
-      B2DEBUG(29, "row " << hex << ((p_pix[i] >> 20) & 0xFFF) << dec << " ( " << ((p_pix[i] >> 20) & 0xFFF) << " ) " << " col " << hex << ((p_pix[i] >> 8) & 0xFFF)
-             << " ( " << dec << ((p_pix[i] >> 8) & 0xFFF) << " ) " << " adc " << hex << (p_pix[i] & 0xFF) << " ( " << (p_pix[i] & 0xFF) << " ) "
-            );
-    }*/
-  }
+  B2DEBUG(29, "(DHE) DHE_ID $" << hex << dhe_ID << " (DHE) DHP ID $" << hex << dhe_DHPport << " (DHP) DHE_ID $" << hex << dhp_dhe_id
+          << " (DHP) DHP ID $" << hex << dhp_dhp_id);
+  /*for (int i = 0; i < raw_nr_words ; i++) {
+    B2DEBUG(29, "RAW      |   " << hex << p_pix[i]);
+    printf("raw %08X  |  ", p_pix[i]);
+    B2DEBUG(29, "row " << hex << ((p_pix[i] >> 20) & 0xFFF) << dec << " ( " << ((p_pix[i] >> 20) & 0xFFF) << " ) " << " col " << hex << ((p_pix[i] >> 8) & 0xFFF)
+           << " ( " << dec << ((p_pix[i] >> 8) & 0xFFF) << " ) " << " adc " << hex << (p_pix[i] & 0xFF) << " ( " << (p_pix[i] & 0xFF) << " ) "
+          );
+  }*/
 };
 
 int PXDUnpackerModule::nr5bits(int i)
@@ -698,6 +687,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   static int mask_active_dhp = 0;// DHP active mask, 4 bit, per current DHE
   static int found_mask_active_dhp = 0;// mask which DHP send data and check on DHE END frame if it matches
   static unsigned int dhe_first_readout_frame_id_lo = 0;
+  // cppcheck-suppress variableScope
   static unsigned int dhe_first_triggergate = 0;
   static unsigned int currentDHCID = 0xFFFFFFFF;
   static unsigned int currentDHEID = 0xFFFFFFFF;

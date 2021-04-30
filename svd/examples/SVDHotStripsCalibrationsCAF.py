@@ -5,26 +5,22 @@
 # Laura Zani (September 2019)
 ############################################################
 
-from basf2 import *
-
-set_log_level(LogLevel.INFO)
+import basf2 as b2
 
 import os
 import sys
 import multiprocessing
 
-import ROOT
-from ROOT import Belle2
 from ROOT.Belle2 import SVDHotStripsCalibrationsAlgorithm
 
-from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
+from caf.framework import CAF, Calibration, CentralDatabase
 from caf import backends
 from caf import strategies
 
 import rawdata as raw
-import reconstruction as reco
-import modularAnalysis as ana
 # import vertex as vx
+
+b2.set_log_level(b2.LogLevel.INFO)
 
 input_branches = [
     'RawSVDs'
@@ -36,7 +32,7 @@ input_branches = [
 def SVDHotStripsCalibrations(files, tags):
 
     # Set-up re-processing path
-    path = create_path()
+    path = b2.create_path()
 
     # logging.log_level = LogLevel.WARNING
 
@@ -55,7 +51,7 @@ def SVDHotStripsCalibrations(files, tags):
     # with possibly changed global tags
     raw.add_unpackers(path, components=['SVD'])
 
-    collector = register_module('SVDOccupancyCalibrationsCollector')
+    collector = b2.register_module('SVDOccupancyCalibrationsCollector')
     collector.param("SVDShaperDigitsName", "SVDShaperDigits")
     algorithm = SVDHotStripsCalibrationsAlgorithm("SVDHotStripsCAF")
 

@@ -11,6 +11,10 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+
+// dataobjects
+#include <analysis/dataobjects/Particle.h>
 
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
 
@@ -61,6 +65,8 @@ namespace Belle2 {
 
   private:
 
+    StoreArray<Particle> m_particles; /**< StoreArray of Particles */
+
     int m_pdgCode;                /**< PDG code of the combined mother particle */
 
     std::string m_decayString;   /**< Input DecayString specifying the decay being reconstructed */
@@ -69,6 +75,8 @@ namespace Belle2 {
 
     std::string m_listName;   /**< output particle list name */
     std::string m_antiListName;   /**< output anti-particle list name */
+
+    int m_decayModeID; /**< user specified decay mode identifier */
 
     std::vector<std::string> m_vector_listName;   /**< vector of output particle list name */
 
@@ -79,6 +87,8 @@ namespace Belle2 {
     std::unique_ptr<Variable::Cut> m_cut;  /**< cut object which performs the cuts */
 
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
+
+    bool m_chargeConjugation; /**< boolean to control whether charge conjugated decay should be reconstructed as well */
 
   };
 

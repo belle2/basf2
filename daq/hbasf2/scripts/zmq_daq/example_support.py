@@ -2,7 +2,6 @@
 import basf2
 from time import sleep
 import zmq
-import pandas as pd
 
 
 class SleepOnInitModule(basf2.Module):

@@ -6,6 +6,7 @@ import shlex
 import config
 import subprocess
 
+from SCons.Script import AddOption, Command, Dir, Environment, Exit, GetOption, Help, SetOption, Tool, VariantDir
 
 # determine whether we have an analysis or a local release
 analysis = 'BELLE2_ANALYSIS_DIR' in os.environ
@@ -27,6 +28,9 @@ AddOption('--ignore-externals-version', dest='check_externals', action='store_fa
 AddOption('--light', dest='light', action='store_true', default=False, help='Build a light release')
 AddOption('--create-json', dest="create_json", action="store_true", default=False,
           help="Create a compile_commands.json suitable for clang tools and many code completion libraries")
+AddOption('--sphinx', dest='sphinx', action='store_true', default=False, help='Build sphinx documentation ')
+AddOption('--doxygen', dest='doxygen', nargs=1, default=False,
+          help='Build doxygen documentation. The argument will be used as release name')
 SetOption('warn', 'no-fortran-cxx-mix')
 try:
     import multiprocessing
@@ -76,7 +80,7 @@ if GetOption("check_externals"):
 global_env = Environment(
     ENV=os.environ,
     tools=['default', 'root_dict', 'sym_link', 'process_dir', 'reg_map', 'output', 'autoclean_dir',
-           'check_libraries', 'strip_debug'],
+           'check_libraries', 'strip_debug', 'doxygen'],
     BUILDERS={},
     BUILDDIR=os.path.join('#build', subdir),
     INCDIR='#include',
@@ -114,6 +118,7 @@ global_env = Environment(
     TOOLS_LIBPATH={},
     TEST_LIBS=[],
     TEST_FILES=[],
+    MODULE_IO=False,
     LINKFLAGS=[
         # don't add library dependencies which we don't actually need
         "-Wl,--as-needed",
@@ -129,7 +134,23 @@ global_env = Environment(
         # in an dependency to boost_python so let's keep it for now.
         "-Wl,--copy-dt-needed-entries"
     ],
+    # scripts and python modules that have to be installed before we can run b2code-classversion-check
+    REQUIRED_TOOLS=[os.path.join('$BINDIR', 'b2code-classversion-check'),
+        os.path.join('$BINDIR', 'b2code-classversion-update'),
+        os.path.join('$LIBDIR', 'b2test_utils', 'classversion.py'),
+        os.path.join('$LIBDIR', 'pybasf2.so'),
+        os.path.join('$DATADIR', 'framework', 'particledb', 'evt.pdl')]
 )
+
+if analysis:
+    global_env['REQUIRED_TOOLS'] = []
+else:
+    for entry in os.listdir(os.path.join('framework', 'scripts', 'basf2')):
+        if entry.endswith('.py'):
+            global_env['REQUIRED_TOOLS'].append(os.path.join('$LIBDIR', 'basf2', entry))
+
+if global_env.GetOption('doxygen'):
+    global_env['MODULE_IO'] = True
 
 # add this early because we want to be sure it's enabled before we create any
 # targets as it needs to modify the object/shared object builders
@@ -153,14 +174,17 @@ if GetOption('extralibpath'):
 if GetOption('extraccflags'):
     global_env.Append(CCFLAGS=GetOption('extraccflags').split())
 
-# check for debug flag
+# check for compiler and debug flags
 option = os.environ['BELLE2_OPTION']
+print(f'Compilation option from environment (see "b2code-option"): {option}')
 if option == 'debug':
     global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-g'])
     global_env.Append(FORTRANFLAGS='-g')
+    global_env.Append(F90FLAGS='-g')
 elif option == 'opt':
     global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-O3', '-flto'])
     global_env.Append(FORTRANFLAGS=['-O3'])
+    global_env.Append(F90FLAGS=['-O3'])
     # Parallel LTO avoids sequential bottlenecks when large libraries are
     # linked, but causes oversubscription when linking libraries concurrently.
     # Performance and RAM usage measurements suggest that between these two
@@ -207,7 +231,7 @@ elif option == 'clang':
     global_env['CXX'] = 'clang++'
     # enable a few extra warnings warnings but disable the missing braces warning, because it can lead
     # to false positives in conjuction with std::array : https://llvm.org/bugs/show_bug.cgi?id=21629
-    global_env.Append(CCFLAGS=["-O2", "-Wno-missing-braces", '-Wmissing-field-initializers', '-Wshadow', '-Wno-unused-command-line-argument'],
+    global_env.Append(CCFLAGS=["-O3", "-Wno-missing-braces", '-Wmissing-field-initializers', '-Wshadow', '-Wno-unused-command-line-argument'],
                       CXXFLAGS=["-Wheader-hygiene"])
     # make sure clang uses the correct paths to the gcc std c++ and not the
     # system ones. First we disable the default c++ include path
@@ -288,6 +312,12 @@ if analysis:
 else:
     # loop over directory entries and select package directories
     exclude_dirs = {'build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons'}
+    if (os.path.exists('.excluded_directories')):
+        f = open('.excluded_directories', 'r')
+        for line in f.readlines():
+            exclude_dirs.add(line.rstrip('\n'))
+        f.close()
+        print(f'Excluded directories: {exclude_dirs}')
     available_packages = set()
     for entry in os.listdir(os.getcwd()):
         if entry.find('.') > -1 or os.path.isfile(entry) or entry in exclude_dirs:
@@ -334,16 +364,25 @@ if len(global_env['TEST_FILES']) > 0:
     global_env.Alias('tests', [test, debug])
 
 # build sphinx documentation if the --sphinx option is used
-AddOption("--sphinx", dest="sphinx", action="store_true", default=False, help="if given sphinx documentation will be generated")
 if global_env.GetOption("sphinx"):
     light_option = " --light " if GetOption('light') else ""
     sphinx_targets = ['html', 'latex', 'json']
     for sphinx_target in sphinx_targets:
         sphinx = global_env.Command(f'build/{sphinx_target}', 'index.rst', f"b2code-sphinx-build {light_option} -t {sphinx_target}")
-        global_env.Depends(sphinx, ['scripts', 'data', 'lib', 'bin'])
+        global_env.Depends(sphinx, ['scripts', 'data', 'lib', 'bin', 'modules'])
         global_env.SideEffect('PreventParallelSphinxBuilds', sphinx)
         global_env.AlwaysBuild(sphinx)
         global_env.Alias(sphinx_target, sphinx)
+
+# build doxygen documentation if the --doxygen option is used
+if global_env.GetOption('doxygen'):
+    doxygen_groups = global_env.DoxygenGroups()
+    doxyfile = global_env.Doxyfile(os.path.join('build', 'Doxyfile'), os.path.join('site_scons', 'doxygen', 'Doxyfile'))
+    doxygen = global_env.Doxygen([doxyfile, doxygen_groups])
+    global_env.Depends(doxygen, ['scripts', 'data', 'lib', 'bin', 'modules'])
+    if global_env.get('HAS_DOT', False):
+        global_env.Depends(doxygen, ['module-io'])
+    global_env.AlwaysBuild(doxygen)
 
 # auto clean include and modules dir
 #

@@ -6,15 +6,9 @@
 import copy
 import math
 
+import pandas
 import numpy
 import numpy as np
-import matplotlib
-
-# Do not use standard backend TkAgg, because it is NOT thread-safe
-# You will get an RuntimeError: main thread is not in main loop otherwise!
-matplotlib.use("svg")
-matplotlib.rcParams.update({'font.size': 36})
-
 import matplotlib.pyplot as plt
 import matplotlib.artist
 import matplotlib.figure
@@ -25,9 +19,15 @@ import matplotlib.ticker
 
 from . import histogram
 
-from basf2 import *
+import basf2 as b2
 
 import basf2_mva_util
+import matplotlib
+
+# Do not use standard backend TkAgg, because it is NOT thread-safe
+# You will get an RuntimeError: main thread is not in main loop otherwise!
+matplotlib.use("svg")
+matplotlib.rcParams.update({'font.size': 36})
 
 
 class Plotter(object):
@@ -70,7 +70,7 @@ class Plotter(object):
         @param figure default draw figure which is used
         @param axis default draw axis which is used
         """
-        B2INFO("Create new figure for class " + str(type(self)))
+        b2.B2INFO("Create new figure for class " + str(type(self)))
         if figure is None:
             self.figure = matplotlib.figure.Figure(figsize=(32, 18))
             self.figure.set_tight_layout(False)
@@ -122,7 +122,7 @@ class Plotter(object):
         Save the figure into a file
         @param filename of the file
         """
-        B2INFO("Save figure for class " + str(type(self)))
+        b2.B2INFO("Save figure for class " + str(type(self)))
         from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
         canvas = FigureCanvas(self.figure)
         canvas.print_figure(filename, dpi=50)
@@ -684,11 +684,11 @@ class Box(Plotter):
             mask = numpy.ones(len(data)).astype('bool')
         x = data[column][mask]
         if weight_column is not None:
-            weight = data[weight_column][mask]
-            B2WARNING("Weights are currently not used in boxplot, due to limitations in matplotlib")
+            # weight = data[weight_column][mask]
+            b2.B2WARNING("Weights are currently not used in boxplot, due to limitations in matplotlib")
 
         if len(x) == 0:
-            B2WARNING("Ignore empty boxplot.")
+            b2.B2WARNING("Ignore empty boxplot.")
             return self
 
         p = self.axis.boxplot(x, sym='k.', whis=1.5, vert=False, patch_artist=True, showmeans=True, widths=1,
@@ -699,7 +699,7 @@ class Box(Plotter):
         self.plots.append(p)
         self.labels.append(column)
         self.x_axis_label = column
-        """
+        r"""
         self.axis.text(0.1, 0.9, (r'$     \mu = {:.2f}$' + '\n' + r'$median = {:.2f}$').format(x.mean(), x.median()),
                        fontsize=28, verticalalignment='top', horizontalalignment='left', transform=self.axis.transAxes)
         self.axis.text(0.4, 0.9, (r'$  \sigma = {:.2f}$' + '\n' + r'$IQD = {:.2f}$').format(x.std(),
@@ -862,12 +862,14 @@ class Overtraining(Plotter):
         distribution.add(data, column, test_mask & signal_mask, weight_column)
         distribution.add(data, column, test_mask & bckgrd_mask, weight_column)
 
-        distribution.set_plot_options({'color': distribution.plots[0][0][0].get_color(), 'linestyle': 'steps-mid-', 'lw': 4})
+        distribution.set_plot_options(
+            {'color': distribution.plots[0][0][0].get_color(), 'linestyle': '-', 'lw': 4, 'drawstyle': 'steps-mid'})
         distribution.set_fill_options({'color': distribution.plots[0][0][0].get_color(), 'alpha': 0.5, 'step': 'mid'})
         distribution.set_errorbar_options(None)
         distribution.set_errorband_options(None)
         distribution.add(data, column, train_mask & signal_mask, weight_column)
-        distribution.set_plot_options({'color': distribution.plots[1][0][0].get_color(), 'linestyle': 'steps-mid-', 'lw': 4})
+        distribution.set_plot_options(
+            {'color': distribution.plots[1][0][0].get_color(), 'linestyle': '-', 'lw': 4, 'drawstyle': 'steps-mid'})
         distribution.set_fill_options({'color': distribution.plots[1][0][0].get_color(), 'alpha': 0.5, 'step': 'mid'})
         distribution.add(data, column, train_mask & bckgrd_mask, weight_column)
 
@@ -900,14 +902,14 @@ class Overtraining(Plotter):
             import scipy.stats
             # Kolmogorov smirnov test
             if len(data[column][train_mask & signal_mask]) == 0 or len(data[column][test_mask & signal_mask]) == 0:
-                B2WARNING("Cannot calculate kolmogorov smirnov test for signal due to missing data")
+                b2.B2WARNING("Cannot calculate kolmogorov smirnov test for signal due to missing data")
             else:
                 ks = scipy.stats.ks_2samp(data[column][train_mask & signal_mask], data[column][test_mask & signal_mask])
                 props = dict(boxstyle='round', edgecolor='gray', facecolor='white', linewidth=0.1, alpha=0.5)
                 self.axis_d1.text(0.1, 0.9, r'signal (train - test) difference $p={:.2f}$'.format(ks[1]), fontsize=36, bbox=props,
                                   verticalalignment='top', horizontalalignment='left', transform=self.axis_d1.transAxes)
             if len(data[column][train_mask & bckgrd_mask]) == 0 or len(data[column][test_mask & bckgrd_mask]) == 0:
-                B2WARNING("Cannot calculate kolmogorov smirnov test for background due to missing data")
+                b2.B2WARNING("Cannot calculate kolmogorov smirnov test for background due to missing data")
             else:
                 ks = scipy.stats.ks_2samp(data[column][train_mask & bckgrd_mask], data[column][test_mask & bckgrd_mask])
                 props = dict(boxstyle='round', edgecolor='gray', facecolor='white', linewidth=0.1, alpha=0.5)
@@ -915,7 +917,7 @@ class Overtraining(Plotter):
                                   bbox=props,
                                   verticalalignment='top', horizontalalignment='left', transform=self.axis_d2.transAxes)
         except ImportError:
-            B2WARNING("Cannot calculate kolmogorov smirnov test please install scipy!")
+            b2.B2WARNING("Cannot calculate kolmogorov smirnov test please install scipy!")
 
         return self
 
@@ -1050,7 +1052,7 @@ class Correlation(Plotter):
         @param weight_column column in data containing the weights for each event
         """
         if len(data[cut_column]) == 0:
-            B2WARNING("Ignore empty Correlation.")
+            b2.B2WARNING("Ignore empty Correlation.")
             return self
 
         axes = [self.axis, self.axis_d1, self.axis_d2]
@@ -1222,8 +1224,6 @@ class CorrelationMatrix(Plotter):
         bckgrd_corr = numpy.corrcoef(numpy.vstack([data[column][bckgrd_mask] for column in columns])) * 100
 
         signal_heatmap = self.signal_axis.pcolor(signal_corr, cmap=plt.cm.RdBu, vmin=-100.0, vmax=100.0)
-
-        bckgrd_heatmap = self.bckgrd_axis.pcolor(bckgrd_corr, cmap=plt.cm.RdBu, vmin=-100.0, vmax=100.0)
 
         self.signal_axis.invert_yaxis()
         self.signal_axis.xaxis.tick_top()

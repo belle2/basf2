@@ -30,11 +30,12 @@ namespace Belle2 {
    * It will record if the data of this sensor (readout by this DHE) is useable.
    *
    */
-  class PXDDAQDHEStatus {
+  class PXDDAQDHEStatus final {
   public:
 
     /** Default constructor for the ROOT IO. */
     PXDDAQDHEStatus() : m_errorMask(0), m_critErrorMask(0), m_usable(true), m_sensorID(0), m_dheID(0), m_triggerGate(0), m_frameNr(0),
+      m_dhp_found_mask(0),
       m_rawCount(0), m_redCount(0), m_errorinfo(0) {}
 
     /** constructor setting the error mask, dheid, raw and reduced data counters, ...
@@ -46,8 +47,11 @@ namespace Belle2 {
      */
     PXDDAQDHEStatus(VxdID id, int dheid, PXDErrorFlags mask, unsigned short tg,
                     unsigned short fn) : m_errorMask(mask), m_critErrorMask(0), m_usable(true), m_sensorID(id), m_dheID(dheid),
-      m_triggerGate(tg), m_frameNr(fn), m_rawCount(0), m_redCount(0), m_errorinfo(0)
+      m_triggerGate(tg), m_frameNr(fn), m_dhp_found_mask(0), m_rawCount(0), m_redCount(0), m_errorinfo(0)
     {}
+
+    /** destructor */
+    virtual ~PXDDAQDHEStatus() {};
 
     /** Return Usability of data
      * @return conclusion if data is useable
@@ -110,6 +114,12 @@ namespace Belle2 {
     void setFrameNr(unsigned int fn) { m_frameNr = fn;};
     /** get Readout Frame number */
     unsigned short getFrameNr(void) const { return  m_frameNr;};
+
+
+    /** get Mask for found DHPs with valid data */
+    unsigned short getDHPFoundMask(void) { return m_dhp_found_mask;};
+    /** set Mask for found DHPs with valid data */
+    void setDHPFoundMask(unsigned short dhpmask) { m_dhp_found_mask = dhpmask;};
 
     /** set erroinfo from the DHE END **/
     void setEndErrorInfo(uint32_t e) { m_errorinfo = e;};
@@ -174,6 +184,7 @@ namespace Belle2 {
     unsigned short m_dheID;/**< DHE ID as delivered by DAQ.*/
     unsigned short m_triggerGate; /**< Trigger Gate ("Startrow") from DHE header */
     unsigned short m_frameNr; /**< Frame number (low bits) from DHE header */
+    unsigned short m_dhp_found_mask; /**< Mask for DHP with valid data */
     uint32_t m_rawCount; /**< raw byte count for monitoring */
     uint32_t m_redCount; /**< reduced byte count for monitoring */
     uint32_t m_errorinfo; /**< erroinfo from the DHE END **/
@@ -185,7 +196,7 @@ namespace Belle2 {
     std::vector < PXDDAQDHPComMode> m_commode;
 
     /** necessary for ROOT */
-    ClassDef(PXDDAQDHEStatus, 6);
+    ClassDef(PXDDAQDHEStatus, 7);
 
   }; // class PXDDAQDHEStatus
 

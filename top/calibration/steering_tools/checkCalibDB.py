@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-import os
+import basf2 as b2
 import sys
 from ROOT import Belle2
 
@@ -24,7 +23,7 @@ if len(argvs) == 4:
     tag = argvs[3]
 
 
-class CheckCalibDB(Module):
+class CheckCalibDB(b2.Module):
     ''' print calibration status of TOPCal payloads '''
 
     def printChannel(self, payload):
@@ -32,7 +31,7 @@ class CheckCalibDB(Module):
 
         db = Belle2.PyDBObj(payload)
         if not db:
-            B2ERROR(payload + ' not found')
+            b2.B2ERROR(payload + ' not found')
             return
         calibrated = 0
         all = 0
@@ -49,7 +48,7 @@ class CheckCalibDB(Module):
         payload = 'TOPCalChannelMask'
         db = Belle2.PyDBObj(payload)
         if not db:
-            B2ERROR(payload + ' not found')
+            b2.B2ERROR(payload + ' not found')
             return
         active = db.getNumOfActiveChannels()
         all = db.getNumOfChannels()
@@ -60,7 +59,7 @@ class CheckCalibDB(Module):
 
         db = Belle2.PyDBObj(payload)
         if not db:
-            B2ERROR(payload + ' not found')
+            b2.B2ERROR(payload + ' not found')
             return
         calibrated = 0
         all = 0
@@ -75,7 +74,7 @@ class CheckCalibDB(Module):
 
         db = Belle2.PyDBObj(payload)
         if not db:
-            B2ERROR(payload + ' not found')
+            b2.B2ERROR(payload + ' not found')
             return
         calibrated = 0
         all = 1
@@ -89,7 +88,7 @@ class CheckCalibDB(Module):
         payload = 'TOPCalTimebase'
         db = Belle2.PyDBObj(payload)
         if not db:
-            B2ERROR(payload + ' not found')
+            b2.B2ERROR(payload + ' not found')
             return
         calibrated = 0
         all = 8192
@@ -122,13 +121,13 @@ class CheckCalibDB(Module):
 
 # Central database
 if len(argvs) == 4:
-    use_central_database(tag)
+    b2.use_central_database(tag)
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Set number of events to generate
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'runList': [runNo], 'expList': [expNo]})
 main.add_module(eventinfosetter)
 
@@ -136,4 +135,4 @@ main.add_module(eventinfosetter)
 main.add_module(CheckCalibDB())
 
 # Process events
-process(main)
+b2.process(main)

@@ -72,7 +72,7 @@ void HepevtInputModule::initialize()
 
   //Do we need to boost?
   if (m_boost2Lab) {
-    MCInitialParticles& initial = m_initial.generate();
+    const MCInitialParticles& initial = m_initial.generate();
     TLorentzRotation boost = initial.getCMSToLab();
     m_hepevt.m_labboost = boost;
   }

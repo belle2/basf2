@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 # Thomas Keck 2016
 
 from b2test_utils import skip_test_if_light
-skip_test_if_light()  # light builds don't contain generators; skip before trying to import
+skip_test_if_light()  # light builds don't contain generators; skip before trying to import  # noqa
 
-from basf2 import *
+import basf2 as b2
 
-from modularAnalysis import *
+import modularAnalysis as ma
 from generators import add_evtgen_generator
 
 import tempfile
@@ -17,8 +16,8 @@ from ROOT import Belle2
 
 if __name__ == "__main__":
 
-    path = create_path()
-    setupEventInfo(100, path)
+    path = b2.create_path()
+    ma.setupEventInfo(100, path)
     add_evtgen_generator(path, 'signal', Belle2.FileSystem.findFile('analysis/examples/simulations/B2A101-Y4SEventGeneration.dec'))
     path.add_module('MVAPrototype', identifier='fake.xml')
 
@@ -47,4 +46,4 @@ if __name__ == "__main__":
         with open("fake.xml", "w") as f:
             f.write(content)
 
-        process(path)
+        b2.process(path)

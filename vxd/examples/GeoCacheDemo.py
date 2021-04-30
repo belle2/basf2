@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import math
-from sets import Set
-from basf2 import *
+import basf2 as b2
 import ROOT
 from ROOT import Belle2
 
-logging.log_level = LogLevel.WARNING
+b2.logging.log_level = b2.LogLevel.WARNING
 
 
-class PrintPXDHits(Module):
+class PrintPXDHits(b2.Module):
 
     """Prints global coordinates of PXD hits to demonstrate the Pythonized
     VXD::GeoCache.
@@ -44,45 +42,45 @@ class PrintPXDHits(Module):
             id = pxd_clusters[0].getSensorID()
             info = geoCache.get(id)
         else:
-            B2INFO("No PXD hits in this event.")
+            b2.B2INFO("No PXD hits in this event.")
 
         for cluster in pxd_clusters:
             if id != cluster.getSensorID():  # next sensor
                 id = cluster.getSensorID()
                 info = geoCache.get(id)
-                B2INFO("Layer: {layer}, Ladder: {ladder}, Sensor: {sensor}"
-                       .format(layer=id.getLayerNumber(),
-                               ladder=id.getLadderNumber(),
-                               sensor=id.getSensorNumber()))
+                b2.B2INFO("Layer: {layer}, Ladder: {ladder}, Sensor: {sensor}"
+                          .format(layer=id.getLayerNumber(),
+                                  ladder=id.getLadderNumber(),
+                                  sensor=id.getSensorNumber()))
 
             r_local = ROOT.TVector3(cluster.getU(), cluster.getV(), 0)
             r_global = info.pointToGlobal(r_local)
-            B2INFO('PXD hit: {x:10.5f} {y:10.5f} {z:10.5f}'
-                   .format(x=r_global.X(), y=r_global.Y(), z=r_global.Z()))
+            b2.B2INFO('PXD hit: {x:10.5f} {y:10.5f} {z:10.5f}'
+                      .format(x=r_global.X(), y=r_global.Y(), z=r_global.Z()))
 
     def terminate(self):
         """ Do nothing """
 
 
 # Particle gun module
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 # Create Event information
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 # Load parameters
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 # Create geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 # Run simulation
-simulation = register_module('FullSim')
+simulation = b2.register_module('FullSim')
 # PXD digitization module
-pxddigi = register_module('PXDDigitizer')
+pxddigi = b2.register_module('PXDDigitizer')
 # PXD clustering module
-pxdclust = register_module('PXDClusterizer')
+pxdclust = b2.register_module('PXDClusterizer')
 # Print hits
 printHits = PrintPXDHits()
-printHits.set_log_level(LogLevel.INFO)
+printHits.set_log_level(b2.LogLevel.INFO)
 
 # Specify number of events to generate
 eventinfosetter.param({'evtNumList': [5], 'runList': [1]})
@@ -121,7 +119,7 @@ particlegun.param({  # Generate 5 tracks on average
 geometry.param('components', ['MagneticField', 'PXD'])
 
 # create processing path
-main = create_path()
+main = b2.create_path()
 main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(particlegun)
@@ -133,7 +131,7 @@ main.add_module(pxdclust)
 main.add_module(printHits)
 
 # generate events
-process(main)
+b2.process(main)
 
 # show call statistics
-print(statistics)
+print(b2.statistics)

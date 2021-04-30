@@ -8,10 +8,7 @@
 
 #ifndef MAKEDUMHSLBDATA_H
 #define MAKEDUMHSLBDATA_H
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
+
 #include <rawdata/modules/PrintDataTemplate.h>
 
 

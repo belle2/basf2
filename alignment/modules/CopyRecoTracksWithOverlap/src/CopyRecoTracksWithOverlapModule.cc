@@ -38,36 +38,29 @@ CopyRecoTracksWithOverlapModule::CopyRecoTracksWithOverlapModule() : Module()
 
   addParam("overlapRecoTracksStoreArrayName", m_overlapRecoTracksArrayName, "Name of StoreArray with output RecoTracks with overlaps",
            m_overlapRecoTracksArrayName);
-  addParam("particleList", m_particleList, "Name of particle list for which associated RecoTracks should be copied", m_particleList);
+  addParam("particleList", m_particleListName, "Name of particle list for which associated RecoTracks should be copied",
+           m_particleListName);
 
 }
 
 void CopyRecoTracksWithOverlapModule::initialize()
 {
-  StoreArray<RecoTrack> tracks;
-  StoreArray<RecoTrack> overlapTracks(m_overlapRecoTracksArrayName);
-
-  tracks.isRequired();
-  overlapTracks.registerInDataStore();
+  m_RecoTracks.isRequired();
+  m_OverlappingRecoTracks.registerInDataStore(m_overlapRecoTracksArrayName);
 
   // Register all the relations
-  RecoTrack::registerRequiredRelations(overlapTracks);
+  RecoTrack::registerRequiredRelations(m_OverlappingRecoTracks);
 
-  if (!m_particleList.empty()) {
-    StoreObjPtr<ParticleList> particleList(m_particleList);
-    particleList.isRequired();
-  }
-
+  if (!m_particleListName.empty())
+    m_ParticleList.isRequired(m_particleListName);
 }
 
 void CopyRecoTracksWithOverlapModule::event()
 {
-  if (!m_particleList.empty()) {
-    StoreObjPtr<ParticleList> particleList(m_particleList);
-
-    auto nParticles = particleList->getListSize();
+  if (!m_particleListName.empty()) {
+    auto nParticles = m_ParticleList->getListSize();
     for (unsigned int iParticle = 0; iParticle < nParticles; ++iParticle) {
-      auto particle = particleList->getParticle(iParticle);
+      auto particle = m_ParticleList->getParticle(iParticle);
       auto track = particle->getTrack();
       if (!track) {
         B2ERROR("No Track for particle.");
@@ -82,18 +75,14 @@ void CopyRecoTracksWithOverlapModule::event()
       processRecoTrack(*recoTrack);
     }
   } else {
-    StoreArray<RecoTrack> recoTracks;
-    for (auto& recoTrack : recoTracks) {
+    for (auto& recoTrack : m_RecoTracks)
       processRecoTrack(recoTrack);
-    }
   }
 }
 
 
-void CopyRecoTracksWithOverlapModule::processRecoTrack(const RecoTrack& track) const
+void CopyRecoTracksWithOverlapModule::processRecoTrack(const RecoTrack& track)
 {
-  StoreArray<RecoTrack> overlapTracks(m_overlapRecoTracksArrayName);
-
   std::array<int, 6> nHitsInLayer = {0, 0, 0, 0, 0, 0};
 
   // PXD clusters
@@ -121,7 +110,7 @@ void CopyRecoTracksWithOverlapModule::processRecoTrack(const RecoTrack& track) c
 
   if (hasOverlap) {
     // copy RecoTrack to a new array
-    auto overlapTrack = track.copyToStoreArray(overlapTracks);
+    auto overlapTrack = track.copyToStoreArray(m_OverlappingRecoTracks);
     overlapTrack->addHitsFromRecoTrack(&track);
   }
 

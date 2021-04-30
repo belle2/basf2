@@ -4,9 +4,9 @@
 import basf2
 import tracking
 
-from tracking.metamodules import IfMCParticlesPresentModule, IfStoreArrayPresentModule
-from . import utilities
-from .event_generation import ReadOrGenerateEventsRun
+from tracking.metamodules import IfMCParticlesPresentModule
+from tracking.run import utilities
+from tracking.run.event_generation import ReadOrGenerateEventsRun
 
 import logging
 

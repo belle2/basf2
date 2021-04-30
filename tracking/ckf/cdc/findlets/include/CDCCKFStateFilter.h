@@ -62,15 +62,15 @@ namespace Belle2 {
 
       TrackFindingCDC::Weight weight;
 
-      B2DEBUG(100, "On layer: " << (lastState.isSeed() ? -1 : lastState.getWireHit()->getWire().getICLayer()));
+      B2DEBUG(29, "On layer: " << (lastState.isSeed() ? -1 : lastState.getWireHit()->getWire().getICLayer()));
 
       for (CDCCKFState& nextState : nextStates) {
-        B2DEBUG(100, "Checking layer: " << nextState.getWireHit()->getWire().getICLayer());
+        B2DEBUG(29, "Checking layer: " << nextState.getWireHit()->getWire().getICLayer());
 
         weight = m_preFilter({&path, &nextState});
         nextState.setWeight(weight);
         if (std::isnan(weight)) {
-          B2DEBUG(100, "Fails PreFilter");
+          B2DEBUG(29, "Fails PreFilter");
           continue;
         }
 
@@ -80,7 +80,7 @@ namespace Belle2 {
         weight = m_basicFilter({&path, &nextState});
         nextState.setWeight(weight);
         if (std::isnan(weight)) {
-          B2DEBUG(100, "Fails BasicFilter");
+          B2DEBUG(29, "Fails BasicFilter");
           continue;
         }
 
@@ -88,7 +88,7 @@ namespace Belle2 {
         weight = m_extrapolationFilter({&path, &nextState});
         nextState.setWeight(weight);
         if (std::isnan(weight)) {
-          B2DEBUG(100, "Fails ExtrapolationFilter");
+          B2DEBUG(29, "Fails ExtrapolationFilter");
           continue;
         }
 
@@ -99,17 +99,17 @@ namespace Belle2 {
         weight = m_finalSelection({&path, &nextState});
         nextState.setWeight(weight);
         if (std::isnan(weight)) {
-          B2DEBUG(100, "Fails FinalFilter");
+          B2DEBUG(29, "Fails FinalFilter");
           continue;
         }
       }
 
-      B2DEBUG(100, "Starting with " << nextStates.size() << " possible hits");
+      B2DEBUG(29, "Starting with " << nextStates.size() << " possible hits");
 
       TrackFindingCDC::erase_remove_if(nextStates,
                                        TrackFindingCDC::Composition<TrackFindingCDC::IsNaN, TrackFindingCDC::GetWeight>());
 
-      B2DEBUG(100, "Now have " << nextStates.size());
+      B2DEBUG(29, "Now have " << nextStates.size());
 
       std::sort(nextStates.begin(), nextStates.end(), TrackFindingCDC::GreaterWeight());
 

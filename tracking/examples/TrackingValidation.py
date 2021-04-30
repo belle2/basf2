@@ -21,17 +21,16 @@
 </header>
 """
 
+import ROOT
+from tracking.validation.run import TrackingValidationRun
+import argparse
+import basf2
 CONTACT = 'thomas.hauth@kit.edu'
 # run at most over this amount of events
 N_EVENTS = 100
 ACTIVE = True
 
-import basf2
 basf2.set_random_seed(1337)
-
-import argparse
-from tracking.validation.run import TrackingValidationRun
-import ROOT
 
 
 class Standalone(TrackingValidationRun):

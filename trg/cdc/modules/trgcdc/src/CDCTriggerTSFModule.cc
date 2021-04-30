@@ -60,6 +60,10 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
            m_outerTrueLRTableFilename,
            "Filename for the true left/right table for the outer super layers.",
            string("outerTrueLRTable.dat"));
+  addParam("Deadchannel",
+           m_deadchflag,
+           "Mask dead channels based on database. True:mask False:unmask",
+           false);
 }
 
 void
@@ -82,7 +86,7 @@ CDCTriggerTSFModule::initialize()
   // Prepare track segment shapes.
   // First a structure of wires is created for all layers and super layers.
   // Each track segment consists of pointers to wires in this structure.
-  CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
+  const CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
   const unsigned nLayers = cdc.nWireLayers();
   TRGClock* clockTDC = new TRGClock("CDCTrigger TDC clock", 0, 500. / cdc.getTdcBinWidth());
   TRGClock* clockData = new TRGClock("CDCTrigger data clock", *clockTDC, 1, 16);
@@ -252,12 +256,34 @@ CDCTriggerTSFModule::initialize()
       layer->push_back(ts);
     }
   }
+
+  if (m_deadchflag) {
+    if (!m_db_deadchannel) {
+      B2INFO("No database for CDCTRG dead channel mapping. Channel masking is skipped.");
+      for (unsigned int i = 0; i < nSuperLayers; i++) { //SL
+        for (unsigned int j = 0; j < MAX_N_LAYERS; j++) { //Layer
+          for (unsigned int k = 0; k < MAX_N_SCELLS; k++) { //
+            deadch_map[i][j][k] = true;
+          }
+        }
+      }
+    } else {
+      for (unsigned int i = 0; i < nSuperLayers; i++) { //SL
+        for (unsigned int j = 0; j < MAX_N_LAYERS; j++) { //Layer
+          for (unsigned int k = 0; k < MAX_N_SCELLS; k++) { //
+            deadch_map[i][j][k] = m_db_deadchannel->getdeadch(i, j, k);
+          }
+        }
+      }
+    }
+  }
+
 }
 
 void
 CDCTriggerTSFModule::event()
 {
-  CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
+  const CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
 
   // fill CDCHits into track segment shapes
 
@@ -265,6 +291,12 @@ CDCTriggerTSFModule::event()
   for (int i = 0; i < m_cdcHits.getEntries(); ++i) {
     // get the wire
     const CDCHit& h = *m_cdcHits[i];
+    // mask dead channel
+    if (m_deadchflag) {
+      if (!deadch_map[h.getISuperLayer()][h.getILayer()][h.getIWire()]) {
+        continue;
+      }
+    }
     TRGCDCWire& w =
       (TRGCDCWire&) superLayers[h.getISuperLayer()][h.getILayer()]->cell(h.getIWire());
 
@@ -412,6 +444,7 @@ CDCTriggerTSFModule::terminate()
       outerFile << "\n";
     }
   }
+
 }
 
 void

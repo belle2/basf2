@@ -9,7 +9,17 @@
 **************************************************************************/
 
 #pragma once
+
 #include <framework/core/Module.h>
+
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+
+#include <analysis/dataobjects/EventExtraInfo.h>
+#include <analysis/dataobjects/RestOfEvent.h>
+
+#include <mdst/dataobjects/MCParticle.h>
+
 #include <string>
 
 namespace Belle2 {
@@ -27,6 +37,12 @@ namespace Belle2 {
 
   class FlavorTaggerInfoFillerModule : public Module {
   private:
+
+    StoreObjPtr<EventExtraInfo> m_eventExtraInfo; /**< event extra info object pointer */
+
+    StoreArray<MCParticle> m_mcparticles; /**< StoreArray of MCParticles */
+
+    StoreObjPtr<RestOfEvent> m_roe; /**< ROE object pointer */
 
     /** Used Flavor Tagger trackLevel Categories of the lists */
     std::vector<std::tuple<std::string, std::string>> m_trackLevelParticleLists;

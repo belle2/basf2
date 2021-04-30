@@ -14,7 +14,13 @@
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
+// dataobjects
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
+
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 #include <string>
 #include <memory>
@@ -53,6 +59,10 @@ namespace Belle2 {
     virtual void event() override;
 
   private:
+
+    StoreArray<Particle> m_particles; /**< StoreArray of Particles */
+    StoreObjPtr<ParticleList> m_particleList; /**< output particle list */
+    StoreObjPtr<ParticleList> m_antiParticleList; /**< output anti-particle list */
 
     int m_pdgCode; /**< PDG code of the particles */
 

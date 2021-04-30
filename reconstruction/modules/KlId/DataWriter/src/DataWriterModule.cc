@@ -25,9 +25,9 @@
 
 #include "reconstruction/modules/KlId/KLMExpert/KlId.h"
 
-using namespace Belle2;
 using namespace std;
-using namespace KlId;
+using namespace Belle2;
+using namespace Belle2::KlongId;
 
 
 // --------------------------------------Module----------------------------------------------

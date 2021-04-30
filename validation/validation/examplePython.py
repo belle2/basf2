@@ -2,13 +2,18 @@
 # -*- coding: utf-8 -*-
 
 """
+<header>
+<contact>Kilian Lieret, Kilian.Lieret@campus.lmu.de</contact>
+<description>
 This file contains example for generating validation plots using python
+</description>
+</header>
 """
 
 import basf2
 import array
 import numpy as np
-from ROOT import TFile, TNtuple, TH1F, TF1, TH2F, TF2, TRandom3, gRandom, TNamed, TEfficiency, TGraphErrors
+from ROOT import TEfficiency, TF1, TFile, TGraphErrors, TH1F, TH2F, TNamed, TNtuple, gRandom
 
 basf2.set_random_seed(1337)
 
@@ -20,15 +25,17 @@ prefix = "examplePython"
 array_of_values = array.array('f', [23.4, 4.4, 5.12, -23.0])
 tntuple.Fill(array_of_values)
 
-tntuple.SetAlias('Description', "This is a description test. "
-                 "Lorem ipsum sit dolor amet.  We also support $\LaTeX$! "
+tntuple.SetAlias('Description', r"This is a description test. "
+                 r"Lorem ipsum sit dolor amet.  We also support $\LaTeX$! "
                  "\n <br> \n For example, here is the infamous "
                  "Einstein-Pythagoras-theorem: \n "
-                 "$$a^2 + b^2 = \\frac{E}{m}$$ \n Of course, you can also"
-                 "do other things, like $\\theta = 90^\circ$ or $D^- "
-                 "\\rightarrow D^0 \pi^- \pi^+$. \n Sometimes it is "
-                 "necessary to escape commands with a double backslash, "
-                 "because e.g. \\theta will be interpreted as [tab]heta.")
+                 r"$$a^2 + b^2 = \frac{E}{m}$$ "
+                 "\n Of course, you can also "
+                 r"do other things, like $\theta = 90^\circ$ or $D^- "
+                 r"\rightarrow D^0 \pi^- \pi^+$. "
+                 "\n Sometimes it is necessary to escape commands "
+                 "with a double backslash, "
+                 r"because e.g. \\theta will be interpreted as [tab]heta.")
 tntuple.SetAlias('Check', "This is the check text.")
 tntuple.SetAlias('Contact', "Name of the contact person.")
 tntuple.SetAlias('MetaOptions', "some_meta_options")

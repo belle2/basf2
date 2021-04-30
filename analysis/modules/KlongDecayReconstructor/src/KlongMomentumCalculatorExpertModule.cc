@@ -65,6 +65,8 @@ namespace Belle2 {
 
   void KlongMomentumCalculatorExpertModule::initialize()
   {
+    StoreArray<Particle>().isRequired();
+
     // clear everything, initialize private members
     m_pdgCode = 0;
     m_listName = "";
@@ -105,9 +107,8 @@ namespace Belle2 {
 
     m_generator = std::make_unique<ParticleGenerator>(m_decayString, m_cutParameter);
 
-    StoreObjPtr<ParticleList> KparticleList(m_klistName);
     DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
-    KparticleList.registerInDataStore(flags);
+    m_koutputList.registerInDataStore(m_klistName, flags);
 
     m_cut = Variable::Cut::compile(m_cutParameter);
 
@@ -115,11 +116,8 @@ namespace Belle2 {
 
   void KlongMomentumCalculatorExpertModule::event()
   {
-    StoreArray<Particle> particles;
-
-    StoreObjPtr<ParticleList> koutputList(m_klistName);
-    koutputList.create();
-    koutputList->initialize(Const::Klong.getPDGCode(), m_klistName);
+    m_koutputList.create();
+    m_koutputList->initialize(Const::Klong.getPDGCode(), m_klistName);
 
     m_generator->init();
 
@@ -220,11 +218,11 @@ namespace Belle2 {
       numberOfCandidates++;
 
       if (m_maximumNumberOfCandidates > 0 and numberOfCandidates > m_maximumNumberOfCandidates) {
-        koutputList->clear();
+        m_koutputList->clear();
         break;
       }
 
-      koutputList->addParticle(kparticle);
+      m_koutputList->addParticle(kparticle);
       kparticle->addExtraInfo("permID", idx);
 
     } //while

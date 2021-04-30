@@ -67,6 +67,7 @@ class TestEnvironmentInformation(TestCase):
     def test_get_current_revision(self):
         pass
 
+
 if __name__ == "__main__":
     main()
 # @endcond

@@ -65,11 +65,11 @@ whitespace, comma or semi-colon -->
       <dz_Vessel unit="cm">31.0</dz_Vessel>
       <AngleX unit="deg">0.0</AngleX>
       <AngleZ unit="deg">90.0</AngleZ>
-      <TPCpos_x unit="cm">201</TPCpos_x>
-      <TPCpos_y unit="cm">16</TPCpos_y>
+      <TPCpos_x unit="cm">175.0</TPCpos_x>
+      <TPCpos_y unit="cm">16.0</TPCpos_y>
       <TPCpos_z unit="cm">1600</TPCpos_z>
-      <SensVol_x unit="cm">201</SensVol_x>
-      <SensVol_y unit="cm">16</SensVol_y>
+      <SensVol_x unit="cm">175.0</SensVol_x>
+      <SensVol_y unit="cm">16.0</SensVol_y>
       <SensVol_z unit="cm">1601.171</SensVol_z>
     </Active>
     
@@ -81,10 +81,10 @@ whitespace, comma or semi-colon -->
       <dz_Vessel unit="cm">31.0</dz_Vessel>
       <AngleX unit="deg">0.0</AngleX>
       <AngleZ unit="deg">90.0</AngleZ>
-      <TPCpos_x unit="cm">201</TPCpos_x>
-      <TPCpos_y unit="cm">16</TPCpos_y>
+      <TPCpos_x unit="cm">177.0</TPCpos_x>
+      <TPCpos_y unit="cm">16.0</TPCpos_y>
       <TPCpos_z unit="cm">1400</TPCpos_z>
-      <SensVol_x unit="cm">201</SensVol_x>
+      <SensVol_x unit="cm">177.0</SensVol_x>
       <SensVol_y unit="cm">16</SensVol_y>
       <SensVol_z unit="cm">1401.171</SensVol_z>
     </Active>
@@ -97,10 +97,10 @@ whitespace, comma or semi-colon -->
       <dz_Vessel unit="cm">31.0</dz_Vessel>
       <AngleX unit="deg">180.0</AngleX>
       <AngleZ unit="deg">90.0</AngleZ>
-      <TPCpos_x unit="cm">-182.9</TPCpos_x>
-      <TPCpos_y unit="cm">16</TPCpos_y>
+      <TPCpos_x unit="cm">-194.4</TPCpos_x>
+      <TPCpos_y unit="cm">16.0</TPCpos_y>
       <TPCpos_z unit="cm">656.5</TPCpos_z>
-      <SensVol_x unit="cm">-182.9</SensVol_x>
+      <SensVol_x unit="cm">-194.4</SensVol_x>
       <SensVol_y unit="cm">16</SensVol_y>
       <SensVol_z unit="cm">655.329</SensVol_z>
     </Active>
@@ -113,10 +113,10 @@ whitespace, comma or semi-colon -->
       <dz_Vessel unit="cm">31.0</dz_Vessel>
       <AngleX unit="deg">180.0</AngleX>
       <AngleZ unit="deg">90.0</AngleZ>
-      <TPCpos_x unit="cm">-181.4</TPCpos_x>
+      <TPCpos_x unit="cm">-184.0</TPCpos_x>
       <TPCpos_y unit="cm">16.0</TPCpos_y>
       <TPCpos_z unit="cm">-562.5</TPCpos_z>
-      <SensVol_x unit="cm">-181.4</SensVol_x>
+      <SensVol_x unit="cm">-184.0</SensVol_x>
       <SensVol_y unit="cm">16</SensVol_y>
       <SensVol_z unit="cm">-563.671</SensVol_z>
     </Active>
@@ -133,10 +133,10 @@ whitespace, comma or semi-colon -->
       <dz_Vessel unit="cm">31.0</dz_Vessel>
       <AngleX unit="deg">0.0</AngleX>
       <AngleZ unit="deg">90.0</AngleZ>
-      <TPCpos_x unit="cm">204</TPCpos_x>
+      <TPCpos_x unit="cm">196.0</TPCpos_x>
       <TPCpos_y unit="cm">16.0</TPCpos_y>
       <TPCpos_z unit="cm">-800</TPCpos_z>
-      <SensVol_x unit="cm">204</SensVol_x>
+      <SensVol_x unit="cm">196.0</SensVol_x>
       <SensVol_y unit="cm">16</SensVol_y>
       <SensVol_z unit="cm">-798.829</SensVol_z>
     </Active>
@@ -149,10 +149,10 @@ whitespace, comma or semi-colon -->
       <dz_Vessel unit="cm">31.0</dz_Vessel>
       <AngleX unit="deg">0.0</AngleX>
       <AngleZ unit="deg">90.0</AngleZ>
-      <TPCpos_x unit="cm">204</TPCpos_x>
+      <TPCpos_x unit="cm">201.0</TPCpos_x>
       <TPCpos_y unit="cm">16.0</TPCpos_y>
       <TPCpos_z unit="cm">-1400</TPCpos_z>
-      <SensVol_x unit="cm">204</SensVol_x>
+      <SensVol_x unit="cm">201.0</SensVol_x>
       <SensVol_y unit="cm">16.0</SensVol_y>
       <SensVol_z unit="cm">-1398.829</SensVol_z>
     </Active>

@@ -106,6 +106,8 @@ namespace Belle2 {
 
     /** Test mode for null histograms */
     bool m_null_histo_mode = false;
+    /** Whether to automatically generate canvases for histograms */
+    bool m_autocanvas = true;
   };
 } // end namespace Belle2
 

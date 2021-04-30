@@ -45,7 +45,7 @@ PrintDataModule::PrintDataModule() : Module()
   for (int i = 0; i < 10; i++) hist[ i ] = NULL;
   for (int i = 0; i < 1000; i++) prev_tv_eve[ i ] = 0;
   prev_tv_pos = 0;
-
+  for (int i = 0; i < 1000; i++) tv_flag[ i ] = 0;
 
 }
 
@@ -182,7 +182,7 @@ void PrintDataModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
   timeval tv;
   int n = 0;
   rawftsw.GetTTTimeVal(n , &tv);
-  printf("eve %d TLU %d: %d %d %.8x: tv %d %d\n",
+  printf("eve %u TLU %d: %d %d %.8x: tv %d %d\n",
          rawftsw.GetEveNo(n),
          rawftsw.Get15bitTLUTag(n),
          rawftsw.GetBlockNwords(n),
@@ -251,7 +251,7 @@ void PrintDataModule::printCOPPEREvent(RawCOPPER* raw_copper, int n, int array_i
     if (eve % 10000 == 0)   printf("1 %d %d\n", (int)(tv.tv_sec) - 1422134556, (int)eve);
     if (prev_tv_pos > 100) {
       for (int i = 0; i < prev_tv_pos ; i++) {
-        printf(" a %d %d %d\n", i, prev_tv_eve[i ], tv_flag[ i ]);
+        printf(" a %d %u %d\n", i, prev_tv_eve[i ], tv_flag[ i ]);
       }
       exit(1);
     }
@@ -274,7 +274,12 @@ void PrintDataModule::printCOPPEREvent(RawCOPPER* raw_copper, int n, int array_i
   }
 
   return;
-  printf(": Event # %d : node ID 0x%.8x : block size %d bytes\n",
+
+  /* The following code is commented out since it's placed after a return
+   * and it causes a cppcheck warning unreachableCode */
+
+  /*
+  printf(": Event # %u : node ID 0x%.8x : block size %d bytes\n",
          raw_copper->GetEveNo(n), raw_copper->GetNodeID(n),
          (int)(raw_copper->GetBlockNwords(n) * sizeof(int)));
 
@@ -283,18 +288,18 @@ void PrintDataModule::printCOPPEREvent(RawCOPPER* raw_copper, int n, int array_i
   printf("===== Raw COPPER data block(including 4 FINESSE buffers )\n");
   printBuffer(raw_copper->GetBuffer(n), raw_copper->GetBlockNwords(n));
 
-//   if (!(raw_copper->CheckCOPPERMagic( i ))) {
-//     ErrorMessage print_err;
-//     char err_buf[500];
-//     sprintf(err_buf, "Invalid Magic word 0x7FFFF0008=%x 0xFFFFFAFA=%x 0xFFFFF5F5=%x 0x7FFF0009=%x\n",
-//             raw_copper->GetMagicDriverHeader( i ),
-//             raw_copper->GetMagicFPGAHeader( i ),
-//             raw_copper->GetMagicFPGATrailer( i ),
-//             raw_copper->GetMagicDriverTrailer( i ));
-//     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-//     sleep(12345678);
-//     exit(-1);
-//   }
+  //   if (!(raw_copper->CheckCOPPERMagic( i ))) {
+  //     ErrorMessage print_err;
+  //     char err_buf[500];
+  //     sprintf(err_buf, "Invalid Magic word 0x7FFFF0008=%x 0xFFFFFAFA=%x 0xFFFFF5F5=%x 0x7FFF0009=%x\n",
+  //             raw_copper->GetMagicDriverHeader( i ),
+  //             raw_copper->GetMagicFPGAHeader( i ),
+  //             raw_copper->GetMagicFPGATrailer( i ),
+  //             raw_copper->GetMagicDriverTrailer( i ));
+  //     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  //     sleep(12345678);
+  //     exit(-1);
+  //   }
   //#endif
 
   //
@@ -302,7 +307,7 @@ void PrintDataModule::printCOPPEREvent(RawCOPPER* raw_copper, int n, int array_i
   //
 
   m_ncpr++;
-
+  */
 }
 
 void PrintDataModule::printPXDEvent(RawPXD* raw_pxd)

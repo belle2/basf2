@@ -9,7 +9,12 @@
 
 #pragma once
 
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/StringWrapper.h>
+
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/pcore/SetMergeable.h>
 #include <framework/pcore/RootMergeable.h>
@@ -80,6 +85,9 @@ namespace Belle2 {
 
   private:
 
+    StoreObjPtr<ParticleList> m_pList; /**< input particle list */
+    StoreArray<StringWrapper> m_stringWrapperArray; /**< StoreArray of StringWrappers */
+
     std::string m_listName; /**< Name of the particle list **/
 
     std::string m_fileName; /**< Filename in which the hash strings are saved, if empty the strings are not saved */
@@ -87,7 +95,7 @@ namespace Belle2 {
 
     TFile* m_file; /**< ROOT file to store the hashes and strings */
 
-    StoreObjPtr<RootMergeable<TTree>> m_tree; /**< ROOT TNtuple containting the saved hashes and strings */
+    StoreObjPtr<RootMergeable<TTree>> m_tree; /**< ROOT TNtuple containing the saved hashes and strings */
 
     StoreObjPtr<SetMergeable<std::unordered_set<uint64_t>>> m_hashset; /**< Mergeable unordered set containing the encountered hashes */
 

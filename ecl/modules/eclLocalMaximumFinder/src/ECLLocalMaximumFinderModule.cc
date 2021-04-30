@@ -23,6 +23,7 @@
 
 // FRAMEWORK
 #include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // MDST
@@ -252,9 +253,8 @@ void ECLLocalMaximumFinderModule::event()
             m_geom->Mapping(m_cellId - 1);
             m_thetaId                 = static_cast < float >(m_geom->GetThetaID());
             m_phiId                   = static_cast < float >(m_geom->GetPhiID());
-          }
 
-          if (m_isTrainingMode > 0) { // This requires MC matching before this stage!
+            // This requires MC matching before this stage!
             int pi0index    = -1;
             int maxtype     = 0;
             int maxpos      = 0;
@@ -441,15 +441,16 @@ void ECLLocalMaximumFinderModule::getEnteringMother(const MCParticle& particle, 
   };
 
   // For photon mother: are they from a pi0? This can be used to improved overlap/merged pi0 reconstruction.
-  if (m_mcParticles[index]->getPDG() == 22) {
-    if (m_mcParticles[index]->getMother()->getPDG() == 111) {
+  if (m_mcParticles[index]->getPDG() == Const::photon.getPDGCode()) {
+    if (m_mcParticles[index]->getMother()->getPDG() == Const::pi0.getPDGCode()) {
       pi0index = m_mcParticles[index]->getMother()->getArrayIndex();
     }
   }
 
   // Dont include mother if its energy is too low or if its a photon from a neutron interaction.
   if ((m_mcParticles[index]->getEnergy() < 5.0 * Belle2::Unit::MeV)
-      or (m_mcParticles[index]->getPDG() == 22 and abs(m_mcParticles[index]->getMother()->getPDG()) == 2212)) {
+      or (m_mcParticles[index]->getPDG() == Const::photon.getPDGCode()
+          and abs(m_mcParticles[index]->getMother()->getPDG()) == Const::proton.getPDGCode())) {
     pdg = -1;
     arrayindex = -1;
     pi0arrayindex = -1;
@@ -513,11 +514,11 @@ void ECLLocalMaximumFinderModule::getMax(int& type, int& id)
 
 }
 
-void ECLLocalMaximumFinderModule::addToSignalEnergy(int& motherpdg, int& motherindex, int& pi0index, const double& weight)
+void ECLLocalMaximumFinderModule::addToSignalEnergy(int motherpdg, int motherindex, int pi0index, double weight)
 {
 
   // for the LM training and CR/LM debugging
-  if (motherpdg == 22) {
+  if (motherpdg == Const::photon.getPDGCode()) {
     if (pi0index >= 0) { // photon from pi0
       int idpos = getIdPosition(1, motherindex);
       m_signalEnergy[1][idpos] += weight;
@@ -525,16 +526,17 @@ void ECLLocalMaximumFinderModule::addToSignalEnergy(int& motherpdg, int& motheri
       int idpos = getIdPosition(0, motherindex);
       m_signalEnergy[0][idpos] += weight; // photon from another source
     }
-  } else if (abs(motherpdg) == 11) { // electron
+  } else if (abs(motherpdg) == Const::electron.getPDGCode()) { // electron
     int idpos = getIdPosition(2, motherindex);
     m_signalEnergy[2][idpos] += weight;
-  } else if (abs(motherpdg) == 13) { // muon
+  } else if (abs(motherpdg) == Const::muon.getPDGCode()) { // muon
     int idpos = getIdPosition(3, motherindex);
     m_signalEnergy[3][idpos] += weight;
-  } else if (abs(motherpdg) == 130 or abs(motherpdg) == 2112) { // neutral hadron
+  } else if (abs(motherpdg) == Const::Klong.getPDGCode() or abs(motherpdg) == Const::neutron.getPDGCode()) { // neutral hadron
     int idpos = getIdPosition(4, motherindex);
     m_signalEnergy[4][idpos] += weight;
-  } else if (abs(motherpdg) == 211 or abs(motherpdg) == 321 or abs(motherpdg) == 2212) { // charged hadron
+  } else if (abs(motherpdg) == Const::pion.getPDGCode() or abs(motherpdg) == Const::kaon.getPDGCode()
+             or abs(motherpdg) == Const::proton.getPDGCode()) { // charged hadron
     int idpos = getIdPosition(5, motherindex);
     m_signalEnergy[5][idpos] += weight;
   } else { // everything else

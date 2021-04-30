@@ -53,7 +53,7 @@ def get_json_object_list(results_folder: str, json_file_name: str) -> List[str]:
     for r_file in found_revs:
         # try loading json file
         with open(r_file) as json_file:
-            data = json.load(json_file)
+            data = json.load(json_file)  # noqa
 
             # always use the folder name as label
             found_rev_labels.append(
@@ -128,7 +128,7 @@ def start_plotting_request(revision_names: List[str], results_folder: str) -> st
 
     # still running a plotting for this combination ?
     if rev_key in g_plottingProcesses:
-        logging.info("Plotting request for {} still running".format(rev_key))
+        logging.info(f"Plotting request for {rev_key} still running")
         return rev_key
 
     # create queue to stream progress, only one directional from parent to
@@ -151,12 +151,12 @@ def start_plotting_request(revision_names: List[str], results_folder: str) -> st
     p.start()
     g_plottingProcesses[rev_key] = (p, qu, None)
 
-    logging.info("Started process for plotting request {}".format(rev_key))
+    logging.info(f"Started process for plotting request {rev_key}")
 
     return rev_key
 
 
-class ValidationRoot(object):
+class ValidationRoot:
 
     """
     Root Validation class to handle non-static HTTP requests into the
@@ -311,7 +311,7 @@ class ValidationRoot(object):
                     f"Misformatted label encountered: '{label}' (doesn't seem "
                     f"to belong to any known category?)"
                 )
-            return "{}-{}".format(index, datetag)
+            return f"{index}-{datetag}"
 
         combined_list.sort(
             key=lambda rev: sort_key(rev["label"]),
@@ -541,7 +541,7 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
     cherry_config["/static"] = {
         'tools.staticdir.on': True,
         # only serve js, css, html and png files
-        'tools.staticdir.match': "^.*\.(js|css|html|png|js.map)$",
+        'tools.staticdir.match': r"^.*\.(js|css|html|png|js.map)$",
         'tools.staticdir.dir': static_folder
     }
     setup_gzip_compression("/static", cherry_config)
@@ -550,7 +550,7 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
     cherry_config["/plots"] = {
         'tools.staticdir.on': True,
         # only serve json and png files
-        'tools.staticdir.match': "^.*\.(png|json|pdf)$",
+        'tools.staticdir.match': r"^.*\.(png|json|pdf)$",
         'tools.staticdir.dir': comparison_folder
     }
     setup_gzip_compression("/plots", cherry_config)
@@ -560,7 +560,7 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
         'tools.staticdir.on': True,
         'tools.staticdir.dir': results_folder,
         # only serve root files
-        'tools.staticdir.match': "^.*\.(log|root)$",
+        'tools.staticdir.match': r"^.*\.(log|root)$",
         # server the log files as plain text files, and make sure to use
         # utf-8 encoding. Firefox might decide different, if the files
         # are located on a .jp domain and use Shift_JIS

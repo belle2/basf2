@@ -12,11 +12,16 @@
 
 #include <framework/core/Module.h>
 
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
+
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <string>
 
@@ -65,8 +70,10 @@ namespace Belle2 {
     StoreObjPtr<ParticleList>  m_gammaList; /**<StoreObjptr for gamma list */
     StoreObjPtr<ParticleList>  m_outputparticleList; /**<StoreObjptr for output particlelist */
     StoreObjPtr<ParticleList>  m_outputAntiparticleList; /**<StoreObjptr for output antiparticlelist */
+    StoreArray<Particle> m_particles; /**< StoreArray of Particle objects */
+    StoreArray<MCParticle> m_mcParticles; /**< StoreArray of MCParticle objects */
+    StoreArray<PIDLikelihood> m_pidlikelihoods; /**< StoreArray of PIDLikelihood objects */
     double m_angleThres; /**< input max angle to be accepted (in radian) */
-    double m_minimumEnergy; /**< min energy of gamma to be accepted(in GeV) */
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
     bool m_isMultiPho; /**<multiple or one bremphoton addition option  */
   };

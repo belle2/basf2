@@ -68,4 +68,3 @@ class HarvestingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin)
 
 class HarvestingRun(HarvestingRunMixin, StandardEventGenerationRun):
     """Harvester to generate MC events followed by crop selection, postprocessing, inspection"""
-    pass

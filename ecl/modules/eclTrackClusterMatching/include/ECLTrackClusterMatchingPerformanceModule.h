@@ -10,7 +10,9 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -52,6 +54,9 @@ namespace Belle2 {
     StoreArray<MCParticle> m_mcParticles; /**< Required input array of MCParticles */
     StoreArray<Track> m_tracks; /**< Required input array of Tracks */
     StoreArray<TrackFitResult> m_trackFitResults; /**< Required input array of TrackFitResults */
+
+    /** Event metadata. */
+    StoreObjPtr<EventMetaData> m_EventMetaData;
 
     TFile* m_outputFile{nullptr}; /**< output root file */
     TTree* m_tracksTree{nullptr}; /**< MCParticle based root tree with all output data. Tree will be written to the output root file */

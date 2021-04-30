@@ -35,7 +35,7 @@ std::string PXDPairFilterFactory::getIdentifier() const
 
 std::string PXDPairFilterFactory::getFilterPurpose() const
 {
-  return "Reject pxd pairs. ";
+  return "Reject PXD state pairs. ";
 }
 
 std::map<std::string, std::string> PXDPairFilterFactory::getValidFilterNamesAndDescriptions() const

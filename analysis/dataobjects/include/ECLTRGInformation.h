@@ -123,7 +123,7 @@ namespace Belle2 {
     }
 
     /** Get m_phiIdTC */
-    int getPhiIdTC(const int& tcid)
+    int getPhiIdTC(const int& tcid) const
     {
       if (tcid >= 1 and tcid < c_nTCs + 1) {
         return m_phiIdTC[tcid];
@@ -134,7 +134,7 @@ namespace Belle2 {
     }
 
     /** Get m_thetaIdTC */
-    int getThetaIdTC(const int& tcid)
+    int getThetaIdTC(const int& tcid) const
     {
       if (tcid > 0 and tcid < c_nTCs + 1) {
         return m_thetaIdTC[tcid];
@@ -145,7 +145,7 @@ namespace Belle2 {
     }
 
     /** Get m_energyTC */
-    float getEnergyTC(const int& tcid)
+    float getEnergyTC(const int& tcid) const
     {
       if (tcid > 0 and tcid < c_nTCs + 1) {
         return m_energyTC[tcid];
@@ -156,7 +156,7 @@ namespace Belle2 {
     }
 
     /** Get m_timingTC */
-    float getTimingTC(const int& tcid)
+    float getTimingTC(const int& tcid) const
     {
       if (tcid > 0 and tcid < c_nTCs + 1) {
         return m_timingTC[tcid];
@@ -167,7 +167,7 @@ namespace Belle2 {
     }
 
     /** Get m_revoGDLTC */
-    float getRevoGDLTC(const int& tcid)
+    float getRevoGDLTC(const int& tcid) const
     {
       if (tcid > 0 and tcid < c_nTCs + 1) {
         return m_revoGDLTC[tcid];
@@ -178,7 +178,7 @@ namespace Belle2 {
     }
 
     /** Get m_revoFAMTC */
-    float getRevoFAMTC(const int& tcid)
+    float getRevoFAMTC(const int& tcid) const
     {
       if (tcid > 0 and tcid < c_nTCs + 1) {
         return m_revoFAMTC[tcid];
@@ -189,7 +189,7 @@ namespace Belle2 {
     }
 
     /** Get m_hitWinTC */
-    float getHitWinTC(const int& tcid)
+    float getHitWinTC(const int& tcid) const
     {
       if (tcid > 0 and tcid < c_nTCs + 1) {
         return m_hitWinTC[tcid];
@@ -210,7 +210,7 @@ namespace Belle2 {
     }
 
     /** Get m_energyTCECLCalDigit */
-    float getEnergyTCECLCalDigit(const int& tcid)
+    float getEnergyTCECLCalDigit(const int& tcid) const
     {
       if (tcid > 0 and tcid < c_nTCs + 1) {
         return m_energyTCECLCalDigit[tcid];
@@ -231,7 +231,7 @@ namespace Belle2 {
     }
 
     /** Get m_timingTCECLCalDigit */
-    float getTimingTCECLCalDigit(const int& tcid)
+    float getTimingTCECLCalDigit(const int& tcid) const
     {
       if (tcid > 0 and tcid < c_nTCs + 1) {
         return m_timingTCECLCalDigit[tcid];

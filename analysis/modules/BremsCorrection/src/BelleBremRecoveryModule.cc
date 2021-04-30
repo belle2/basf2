@@ -13,12 +13,8 @@
 // framework aux
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/StoreArray.h>
 
 // dataobjects
-#include <analysis/dataobjects/Particle.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
 
 // utilities
@@ -51,10 +47,10 @@ namespace Belle2 {
   {
     // set module description (e.g. insert text)
     setDescription(R"DOC(
-                   Takes the charged particle from the given charged particle list(``inputListName``) and
-                   copies them to the output list(``outputListName``) and adds the 4-vector of nearest(all) photon(s)
-                   from ``gammaListName`` (considered as radiative) to the charged particle, if the given
-                   criteria for maximum angle(``angleThreshold``) and minimum energy(``minimumEnergy``) are fulfilled.
+                   Takes the charged particle from the given charged particle list (``inputListName``) and
+                   copies it to the output list (``outputListName``). The 4-vector of the nearest (all) photon(s)
+                   from ``gammaListName`` (considered as radiative) is added to the charged particle, if it is
+                   found inside the cone around the charged particle with the given maximum angle (``angleThreshold``).
                    )DOC");
     setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -65,10 +61,9 @@ namespace Belle2 {
     addParam("gammaListName", m_gammaListName, "The gammas list containing possibly radiative gammas, should already exist.");
     addParam("angleThreshold", m_angleThres,
              "The maximum angle in radians between the charged particle  and the (radiative) gamma to be accepted.", 0.05);
-    addParam("minimumEnergy", m_minimumEnergy, "The minimum energy in GeV of the (radiative) gamma to be accepted.", 0.05);
     addParam("multiplePhotons", m_isMultiPho, "If only the nearest photon to add then make it False otherwise true", true);
     addParam("writeOut", m_writeOut,
-             "Set to false if you want to add only the nearest photon, otherwise all eligible photons will be added", false);
+             "Set to true if you want to write out the output list to a root file", false);
 
   }
 
@@ -104,18 +99,13 @@ namespace Belle2 {
     m_outputparticleList.registerInDataStore(m_outputListName, flags);
     m_outputAntiparticleList.registerInDataStore(m_outputAntiListName, flags);
 
-    StoreArray<Particle> particles;
-    StoreArray<PIDLikelihood> pidlikelihoods;
-    particles.registerRelationTo(pidlikelihoods);
+    m_particles.registerRelationTo(m_pidlikelihoods);
   }
 
 
   void BelleBremRecoveryModule::event()
   {
-    StoreArray<Particle> particles;
-    StoreArray<MCParticle> mcParticles;
-
-    RelationArray particlesToMCParticles(particles, mcParticles);
+    RelationArray particlesToMCParticles(m_particles, m_mcParticles);
 
     // new output particle list
     m_outputparticleList.create();
@@ -137,8 +127,6 @@ namespace Belle2 {
       // look for all possible (radiative) gamma
       for (unsigned j = 0; j < nGam; j++) {
         Particle* gamma = m_gammaList->getParticle(j);
-        // check if gamma energy is within allowed energy range
-        if (gamma->getEnergy() < m_minimumEnergy) continue;
         // get angle (in lab system)
         TVector3 pi = lepton->getMomentum();
         TVector3 pj = gamma->getMomentum();
@@ -182,7 +170,7 @@ namespace Belle2 {
       correctedLepton.addExtraInfo("bremsCorrected", float(selectedGammas.size() > 0));
       correctedLepton.addExtraInfo("bremsCorrectedPhotonEnergy", bremsGammaEnergySum);
       // add the mc relation
-      Particle* newLepton = particles.appendNew(correctedLepton);
+      Particle* newLepton = m_particles.appendNew(correctedLepton);
       const MCParticle* mcLepton = lepton->getRelated<MCParticle>();
       const PIDLikelihood* pid = lepton->getPIDLikelihood();
       if (pid)

@@ -79,7 +79,7 @@ void HepMCInputModule::initialize()
 
   //Do we need to boost?
   if (m_boost2Lab) {
-    MCInitialParticles& initial = m_initial.generate();
+    const MCInitialParticles& initial = m_initial.generate();
     TLorentzRotation boost = initial.getCMSToLab();
     m_hepmcreader->m_labboost = boost;
   }
@@ -106,7 +106,7 @@ void HepMCInputModule::event()
           "Event ________________________________________________________________________________________________________________________________________________________________________________________________");
   if (m_beamParams.hasChanged()) {
     if (m_boost2Lab) {
-      MCInitialParticles& initial = m_initial.generate();
+      const MCInitialParticles& initial = m_initial.generate();
       TLorentzRotation boost = initial.getCMSToLab();
       m_hepmcreader->m_labboost = boost;
     }

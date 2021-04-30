@@ -62,12 +62,13 @@ PXDPackerModule::PXDPackerModule() :
   addParam("dhe_to_dhc", m_dhe_to_dhc,  "DHE to DHC mapping (DHC_ID, DHE1, DHE2, ..., DHE5) ; -1 disable port");
   addParam("InvertMapping",  m_InvertMapping, "Use invers mapping to DHP row/col instead of \"remapped\" coordinates", false);
   addParam("Clusterize",  m_Clusterize, "Use clusterizer (FCE format)", false);
+  addParam("overrideFirmwareVersion", m_overrideFirmwareVersion, "Overwrite Firmware Version from DB with this value", 0);
 
 }
 
 void PXDPackerModule::initialize()
 {
-  //Register output collections
+  // Register output collections
   m_storeRaws.registerInDataStore(m_RawPXDsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeDigits.isRequired(m_PXDDigitsName);
   m_storeInjectionBGTiming.isOptional(m_InjectionBGTimingName);
@@ -128,6 +129,19 @@ void PXDPackerModule::initialize()
 
 }
 
+void PXDPackerModule::beginRun()
+{
+  if (m_overrideFirmwareVersion == 0) {
+    if (m_firmwareFromDB.isValid()) m_firmware = (*m_firmwareFromDB).getDHHFirmwareVersion();
+    else {
+      B2WARNING("Could not read PXD Firmware version from db, assume default (new) firmware");
+      m_firmware = 10;
+    }
+  } else {
+    m_firmware = m_overrideFirmwareVersion;
+  }
+}
+
 void PXDPackerModule::terminate()
 {
 }
@@ -136,11 +150,13 @@ void PXDPackerModule::event()
 {
   StoreObjPtr<EventMetaData> evtPtr;
 
-//   B2ERROR("Test : " << evtPtr->getEvent() << ","  << evtPtr->getRun() << "," << evtPtr->getSubrun() << "," << evtPtr->getExperiment() << "," << evtPtr->getTime() << " ==");
-
   // First, throw the dices for a few event-wise properties
+  // optional, use simulated trigger information to calculate it
 
   m_trigger_dhp_framenr = gRandom->Integer(0x10000);
+  // we use the very same m_trigger_dhp_framenr in DHE and DHP header, no second DHP frame is generated anyway
+  // (-> like in the new firmware)
+
   if (m_storeInjectionBGTiming.isValid()) {
     m_trigger_dhe_gate = m_storeInjectionBGTiming->getTriggerGate();
   } else {
@@ -153,7 +169,7 @@ void PXDPackerModule::event()
 
   startOfVxdID.clear();
 
-  VxdID lastVxdId = -1; /// invalid ... force to set first itertor/index
+  VxdID lastVxdId = -1; /// invalid ... force to set first iterator/index
   /// We assume the Digits are sorted by VxdID (P.K. says they are)
   /// This saves some iterating lateron
   for (auto it = m_storeDigits.begin() ; it != m_storeDigits.end(); ++it) {
@@ -312,10 +328,11 @@ void PXDPackerModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
     dhe_active >>= 1;
   }
 
-  /// lets copy the HLT/ROI frame
+  /// optional: copy the HLT/ROI frame, see no big reason to emulate it. TODO
 
   //  start_frame();
   //  append_int32((EDHCFrameHeaderDataType::c_ONSEN_ROI<<27) | (m_trigger_nr & 0xFFFF));
+  ///  loop over ROIs and add for the DHEs in this DHC
   //  add_frame_to_payload();
 
   /// DHC End
@@ -337,6 +354,7 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
   if (m_InvertMapping) {
     // problem, we do not have an exact definition of if this bit is set in the new firmware and under which circumstances
     // and its not clear if we have to translate the coordinates back to "DHP" layout! (look up tabel etc!)
+    // this code has never been completed as pxd cluster format will anyway need mapping in firmware
     B2FATAL("Inverse Mapping not implemented in Packer");
   }
 
@@ -417,6 +435,7 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
         if (dhp_active & 0x1) {
           pack_dhp(i, dhe_id, dhe_has_remapped ? 1 : 0);
           /// The following lines "simulate" a full frame readout frame ... not for production yet!
+          /// pedestals taking frames are normally not transfered to Belle2 DAQ (unless decided otherwise)
 //         if (m_trigger_nr == 0x11) {
 //           pack_dhp_raw(i, dhe_id, false);
 //           pack_dhp_raw(i, dhe_id, true);
@@ -442,6 +461,7 @@ void PXDPackerModule::do_the_reverse_mapping(unsigned int& /*row*/, unsigned int
 {
   B2FATAL("code needs to be written");
   // work to be done
+  // I suspect this code will never be written.
   //
   // PXDMappingLookup::map_uv_to_rc_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id, unsigned int dhe_ID)
   // PXDMappingLookup::map_uv_to_rc_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id, unsigned int dhe_ID)
@@ -487,7 +507,7 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped, in
   if (dhe_has_remapped == 0) {
     // problem, we do not have an exact definition of if this bit is set in the new firmware and under which circumstances
     // and its not clear if we have to translate the coordinates back to "DHP" layout! (look up tabel etc!)
-    assert(dhe_has_remapped == 0);
+    B2FATAL("dhe_has_remapped == 0");
   }
 
   start_frame();
@@ -503,9 +523,14 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped, in
   if (c2 >= PACKER_NUM_COLS) c2 = PACKER_NUM_COLS;
   for (int rr = startrow; rr < startrow + PACKER_NUM_ROWS; rr++) {
     int row = (rr % PACKER_NUM_ROWS); // warp around
+    /// we do not create a second frame (thats what the old firmware would have been doing)
+    /// thus the behaviour is like in the new firmware, but old unpacker can handle that
+    /// we do not support some "extra" readout gates before trigger and/or at the end of the full frame
     bool rowstart = true;
     for (int col = c1; col < c2; col++) {
       if (halfladder_pixmap[row][col] != 0) {
+        // Attention, we decided to (mis)use ADC=0 values as truncation marker in future firmware! (discussion 15.1.2021)
+        // ADC cut for sim should have been done already
         B2DEBUG(26, "Pixel: ROW: " << row << ", COL: " << col << ", Ch " << (int)halfladder_pixmap[row][col]);
         if (rowstart) {
           last_rowstart = ((row & 0x3FE) << (6 - 1)) | 0; // plus common mode 6 bits ... set to 0
@@ -523,18 +548,23 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped, in
     append_int16(last_rowstart);
   }
 
-
   if (empty) {
     B2DEBUG(27, "Found no data for halfladder! DHEID: " << dhe_id << " Chip: " << chip_id);
-    // we DROP the frame, thus we have to correct DHE and DHC counters
-    dhc_byte_count -= 8; // fixed size of Header
-    dhe_byte_count -= 8; // fixed size of Header
-    start_frame();
-    /// Ghost Frame ... start frame overwrites frame info set above
-    append_int32((EDHCFrameHeaderDataType::c_GHOST << 27) | ((dhe_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) |
-                 (m_trigger_nr & 0xFFFF));
-  } else {
-    //B2DEBUG(20,"Found data for halfladder DHEID: " << dhe_id << " Chip: " << chip_id);
+    /// This behaviour has changed in the overlapping trigger firmware.
+    /// Ghost frames are ALWAYS an indication for a data flow/daq problem
+    /// need to be consistent for simulation!
+    if (m_firmware < 10) {
+      // behaviour of old firmware is not upward comaptible, but for simulation (=Packing) the new behaviour
+      // would work even for the old unpacking, even so not according to firmware documentation
+      // -> maybe we remove this code?
+      // we DROP the frame, thus we have to correct DHE and DHC counters
+      dhc_byte_count -= 8; // fixed size of Header
+      dhe_byte_count -= 8; // fixed size of Header
+      start_frame();
+      /// Ghost Frame ... start frame overwrites frame info set above
+      append_int32((EDHCFrameHeaderDataType::c_GHOST << 27) | ((dhe_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) |
+                   (m_trigger_nr & 0xFFFF));
+    }
   }
   add_frame_to_payload();
 

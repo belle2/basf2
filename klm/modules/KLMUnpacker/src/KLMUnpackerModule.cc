@@ -30,8 +30,7 @@ REG_MODULE(KLMUnpacker)
 
 KLMUnpackerModule::KLMUnpackerModule() : Module(),
   m_ElementNumbers(&(KLMElementNumbers::Instance())),
-  m_triggerCTimeOfPreviousEvent(0),
-  m_eklmElementNumbers(&(EKLMElementNumbers::Instance()))
+  m_triggerCTimeOfPreviousEvent(0)
 {
   setDescription("KLM unpacker (creates KLMDigits from RawKLM).");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -56,11 +55,6 @@ KLMUnpackerModule::KLMUnpackerModule() : Module(),
   addParam("keepEvenPackages", m_keepEvenPackages,
            "Keep packages that have even length normally indicating that "
            "data was corrupted ", false);
-  addParam("SciThreshold", m_scintThreshold,
-           "Scintillator strip hits with charge lower this value will be "
-           "marked as bad.", double(140.0));
-  addParam("loadThresholdFromDB", m_loadThresholdFromDB,
-           "Load threshold from database (true) or not (false)", true);
 }
 
 KLMUnpackerModule::~KLMUnpackerModule()
@@ -89,15 +83,10 @@ void KLMUnpackerModule::beginRun()
 {
   if (!m_ElectronicsMap.isValid())
     B2FATAL("KLM electronics map is not available.");
+  if (!m_FEEParameters.isValid())
+    B2FATAL("KLM scintillator FEE parameters are not available.");
   if (!m_TimeConversion.isValid())
     B2FATAL("EKLM time conversion parameters are not available.");
-  if (!m_eklmChannels.isValid())
-    B2FATAL("EKLM channel data are not available.");
-  if (m_loadThresholdFromDB) {
-    if (!m_bklmADCParams.isValid())
-      B2FATAL("BKLM ADC threshold paramenters are not available.");
-    m_scintThreshold = m_bklmADCParams->getADCThreshold();
-  }
   m_triggerCTimeOfPreviousEvent = 0;
 }
 
@@ -135,23 +124,15 @@ void KLMUnpackerModule::createDigit(
     double time = m_TimeConversion->getScintillatorTime(
                     raw->getCTime(), klmDigitEventInfo->getTriggerCTime());
     klmDigit->setTime(time);
-    if (subdetector == KLMElementNumbers::c_BKLM) {
-      if (raw->getCharge() < m_scintThreshold)
-        klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
-      else
-        klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
-    } else {
-      int stripGlobal = m_eklmElementNumbers->stripNumber(
-                          section, layer, sector, plane, strip);
-      const EKLMChannelData* channelData =
-        m_eklmChannels->getChannelData(stripGlobal);
-      if (channelData == nullptr)
-        B2FATAL("Incomplete EKLM channel data.");
-      if (raw->getCharge() < channelData->getThreshold())
-        klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
-      else
-        klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
-    }
+    uint16_t channelNumber = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
+    const KLMScintillatorFEEData* FEEData =
+      m_FEEParameters->getFEEData(channelNumber);
+    if (FEEData == nullptr)
+      B2FATAL("Incomplete KLM scintillator FEE data.");
+    if (raw->getCharge() < FEEData->getThreshold())
+      klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
+    else
+      klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
   }
   klmDigit->setSubdetector(subdetector);
   klmDigit->setSection(section);
@@ -317,6 +298,21 @@ void KLMUnpackerModule::unpackKLMDigit(
   }
 }
 
+void KLMUnpackerModule::convertPCIe40ToCOPPER(int channel, unsigned int* copper, int* hslb) const
+{
+  if (channel >= 0 && channel < 16) {
+    int id = channel / 4;
+    *copper = BKLM_ID + id + 1;
+    *hslb = channel - id * 4;
+  } else if (channel >= 16 && channel < 32) {
+    int id = (channel - 16) / 4;
+    *copper = EKLM_ID + id + 1;
+    *hslb = (channel - 16) - id * 4;
+  } else
+    B2FATAL("The PCIe40 channel is invalid."
+            << LogVar("Channel", channel));
+}
+
 void KLMUnpackerModule::event()
 {
   /*
@@ -332,27 +328,41 @@ void KLMUnpackerModule::event()
       continue;
     }
     /*
-     * getNumEntries is defined in RawDataBlock.h and gives the
-     * numberOfNodes*numberOfEvents. Number of nodes is num copper boards.
+     * GetNumEntries is defined in RawDataBlock.h and gives the numberOfNodes*numberOfEvents.
+     * Number of nodes is the number of COPPER boards.
      */
     for (int j = 0; j < m_RawKLMs[i]->GetNumEntries(); j++) {
-      unsigned int copperId = m_RawKLMs[i]->GetNodeID(j);
-      int subdetector;
-      if ((copperId >= EKLM_ID) && (copperId <= EKLM_ID + 4))
-        subdetector = KLMElementNumbers::c_EKLM;
-      else if ((copperId >= BKLM_ID) && (copperId <= BKLM_ID + 4))
-        subdetector = KLMElementNumbers::c_BKLM;
-      else
-        continue;
+      unsigned int copper = m_RawKLMs[i]->GetNodeID(j);
+      int hslb, subdetector;
       m_RawKLMs[i]->GetBuffer(j);
-      for (int hslb = 0; hslb < 4; hslb++) {
+      for (int channelReadoutBoard = 0; channelReadoutBoard < m_RawKLMs[i]->GetMaxNumOfCh(j); channelReadoutBoard++) {
+        if (m_RawKLMs[i]->GetMaxNumOfCh(j) == 4) { // COPPER data
+          hslb = channelReadoutBoard;
+          if ((copper >= EKLM_ID) && (copper <= EKLM_ID + 4))
+            subdetector = KLMElementNumbers::c_EKLM;
+          else if ((copper >= BKLM_ID) && (copper <= BKLM_ID + 4))
+            subdetector = KLMElementNumbers::c_BKLM;
+          else
+            continue;
+        } else if (m_RawKLMs[i]->GetMaxNumOfCh(j) == 48) { // PCIe40 data
+          if (channelReadoutBoard >= 0 && channelReadoutBoard < 16)
+            subdetector = KLMElementNumbers::c_BKLM;
+          else if (channelReadoutBoard >= 16 && channelReadoutBoard < 32)
+            subdetector = KLMElementNumbers::c_EKLM;
+          else
+            continue;
+          convertPCIe40ToCOPPER(channelReadoutBoard, &copper, &hslb);
+        } else {
+          B2FATAL("The maximum number of channels per readout board is invalid."
+                  << LogVar("Number of channels", m_RawKLMs[i]->GetMaxNumOfCh(j)));
+        }
         KLMDigitEventInfo* klmDigitEventInfo =
           m_DigitEventInfos.appendNew(m_RawKLMs[i], j);
         klmDigitEventInfo->setPreviousEventTriggerCTime(
           m_triggerCTimeOfPreviousEvent);
         m_triggerCTimeOfPreviousEvent = klmDigitEventInfo->getTriggerCTime();
-        int numDetNwords = m_RawKLMs[i]->GetDetectorNwords(j, hslb);
-        int* hslbBuffer = m_RawKLMs[i]->GetDetectorBuffer(j, hslb);
+        int numDetNwords = m_RawKLMs[i]->GetDetectorNwords(j, channelReadoutBoard);
+        int* hslbBuffer = m_RawKLMs[i]->GetDetectorBuffer(j, channelReadoutBoard);
         int numHits = numDetNwords / hitLength;
         if (numDetNwords % hitLength != 1 && numDetNwords != 0) {
           B2ERROR("Incorrect number of data words."
@@ -375,7 +385,7 @@ void KLMUnpackerModule::event()
           klmDigitEventInfo->setUserWord(0);
         }
         for (int iHit = 0; iHit < numHits; iHit++) {
-          unpackKLMDigit(&hslbBuffer[iHit * hitLength], copperId, hslb,
+          unpackKLMDigit(&hslbBuffer[iHit * hitLength], copper, hslb,
                          subdetector, klmDigitEventInfo);
         }
       }

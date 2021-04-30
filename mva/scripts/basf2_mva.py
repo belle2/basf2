@@ -7,23 +7,23 @@ import sys
 
 
 from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = True
+PyConfig.IgnoreCommandLineOptions = True  # noqa
 
 # FEI uses multi-threading for parallel execution of tasks therefore
 # the ROOT gui-thread is disabled, which otherwise interferes sometimes
-PyConfig.StartGuiThread = False
+PyConfig.StartGuiThread = False  # noqa
 
 # First load the required shared library
 from ROOT import gSystem
+from ROOT import Belle2
 gSystem.Load('libmva.so')
 gSystem.Load('libframework.so')
 gSystem.Load('libanalysis.so')
-from ROOT import Belle2
 
 # For some strange reason we need to do this to makeROOTCompatible be available.
 Belle2.Variable.Manager
 Belle2.Variable.Manager.Instance()
-import ROOT
+import ROOT  # noqa
 
 
 class ForwardBelle2MVANamespace(object):
@@ -40,6 +40,7 @@ class ForwardBelle2MVANamespace(object):
         for x in args:
             v.push_back(x)
         return v
+
 
 Belle2.MVA.AbstractInterface.initSupportedInterfaces()
 ROOT.gROOT.SetBatch(True)

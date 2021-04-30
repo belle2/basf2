@@ -9,11 +9,9 @@
 #
 # ---------------------------------------------------------------------------------------
 
-from basf2 import *
-import ROOT
+import basf2 as b2
 from ROOT.Belle2 import TOPDatabaseImporter
-from ROOT import TH1F, TFile
-import os
+from ROOT import TFile
 import sys
 import glob
 
@@ -28,8 +26,8 @@ localDB = argvs[2]
 # Determine experiment number from the path name
 try:
     expNo = int((pathToFiles.split('/e')[-1]).split('/')[0])
-except:
-    B2ERROR("Cannot determine experiment number from path name: " + pathToFiles)
+except BaseException:
+    b2.B2ERROR("Cannot determine experiment number from path name: " + pathToFiles)
     sys.exit()
 
 # Check root files and prepare IOV's
@@ -41,7 +39,7 @@ for fileName in allFileNames:
     file = TFile.Open(fileName)
     h = file.Get('moduleT0')
     if not h:
-        B2WARNING(fileName + ': no histogram with name moduleT0, file skipped.')
+        b2.B2WARNING(fileName + ': no histogram with name moduleT0, file skipped.')
         file.Close()
         continue
     file.Close()
@@ -50,38 +48,38 @@ for fileName in allFileNames:
         runFirst.append(runNum + 1)
         runLast.append(runNum)
         fileNames.append(fileName)
-    except:
-        B2WARNING(fileName +
-                  ': cannot determine last run number from file name, file skipped.')
+    except BaseException:
+        b2.B2WARNING(fileName +
+                     ': cannot determine last run number from file name, file skipped.')
         continue
 
 if len(fileNames) == 0:
-    B2ERROR('No selected files found in ' + pathToFiles)
+    b2.B2ERROR('No selected files found in ' + pathToFiles)
     sys.exit()
 
 runFirst.pop()
 runLast[-1] = -1
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1])
 main.add_module(eventinfosetter)
 
 # Gearbox - access to xml files
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # Initialize TOP geometry parameters from gearbox
 main.add_module('TOPGeometryParInitializer', useDB=False)
 
 # process single event
-process(main)
+b2.process(main)
 
 # define a local database (will be created automatically, if doesn't exist)
-use_local_database(localDB, readonly=False)
+b2.use_local_database(localDB, readonly=False)
 
 # and then run the importer
 dbImporter = TOPDatabaseImporter()
@@ -94,4 +92,4 @@ for i, fileName in enumerate(fileNames):
     dbImporter.importModuleT0(fileName, expNo, runFirst[i], runLast[i])
     print()
 
-B2RESULT("Done. Constants imported to " + localDB)
+b2.B2RESULT("Done. Constants imported to " + localDB)

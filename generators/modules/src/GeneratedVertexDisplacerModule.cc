@@ -141,7 +141,8 @@ void GeneratedVertexDisplacerModule::displaceDaughter(TLorentzVector& motherDisp
 }
 
 
-void GeneratedVertexDisplacerModule::getDisplacement(MCParticle& particle, float lifetime, TLorentzVector& displacement)
+void GeneratedVertexDisplacerModule::getDisplacement(
+  const MCParticle& particle, float lifetime, TLorentzVector& displacement)
 {
   TLorentzVector fourVector_mcp = particle.get4Vector();
   float decayLength_mcp = 0;

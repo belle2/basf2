@@ -15,10 +15,8 @@ cluster -> cluster parameters
 cog -> cog calibration parameters
 """
 
-from basf2 import *
-import ROOT
+import basf2 as b2
 import argparse
-from basf2 import conditions
 
 
 parser = argparse.ArgumentParser(description="SVD Calibration Monitor")
@@ -26,8 +24,12 @@ parser.add_argument('--exp', metavar='expNumber', dest='exp', type=int, nargs=1,
 parser.add_argument('--run', metavar='runNumber', dest='run', type=int, nargs=1, help='Run Number')
 parser.add_argument('--local', dest='doLocal', action='store_const', const=True,
                     default=False, help='produce Local Calibration Monitor plots')
-parser.add_argument('--cog', dest='doCoG', action='store_const', const=True,
-                    default=False, help='produce CoG Calibration Monitor plots')
+parser.add_argument('--cog6', dest='doCoG6', action='store_const', const=True,
+                    default=False, help='produce CoG6 Calibration Monitor plots')
+parser.add_argument('--cog3', dest='doCoG3', action='store_const', const=True,
+                    default=False, help='produce CoG3 Calibration Monitor plots')
+parser.add_argument('--els3', dest='doELS3', action='store_const', const=True,
+                    default=False, help='produce ELS3 Calibration Monitor plots')
 parser.add_argument('--cluster', dest='doCluster', action='store_const', const=True,
                     default=False, help='produce Cluster Calibration Monitor plots')
 parser.print_help()
@@ -37,78 +39,72 @@ RunList = args.run
 ExpList = args.exp
 
 
-conditions.override_globaltags()
-# conditions.globaltags = ["svd_offlineCalibrations", "svd_loadedOnFADC", "Reco_master_patch_rel5", "online"]
+b2.conditions.prepend_globaltag("online")
+b2.conditions.prepend_globaltag("svd_basic")
+b2.conditions.prepend_globaltag("svd_loadedOnFADC")
+b2.conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 
 myLocalDB = None
-# if you want to use the localdb and not the occupancy paylaods on a GT uncomment-out the following line:
-conditions.globaltags = ["svd_loadedOnFADC", "Reco_master_patch_rel5", "online"]
-"""
-    "svd_basic", "svd_loadedOnFADC",
-    "data_reprocessing_prompt_rel4_patchb",
-    "giulia_CDCEDepToADCConversions_rel4_patch"]
-"""
 
-localDB_tag = ""  # "_notRegistered"
-myLocalDB = "/home/belle2/zani/svd/current_master/exp"+str(ExpList[0])\
-    + "/run"+str(RunList[0]) + "/calibration_results"+str(localDB_tag)\
-    + "/SVDOccupancyAndHotStrips/outputdb/database.txt"
-print('Your are plotting occupancy from payloads belongin to the local DB:')
-print('')
-print(myLocalDB)
-print('')
-
-# -- end of localDB setup --
-
-# if(myLocalDB != "none"):
 if myLocalDB is not None:
-    conditions.testing_payloads = [str(myLocalDB)]
+    b2.conditions.testing_payloads = [str(myLocalDB)]
 else:
-    B2INFO("No local DB provided, monitoring payloads from GTs.")
-
-# TO BE USED before release 04, with previous database version:
-# reset_database()
-# use_database_chain()
-# uncomment if using a local database:
-# use_local_database(str(myLocalDB)+"database.txt", str(myLocalDB), invertLogging=True)
-# use_local_database("localDB/database.txt", "localDB", invertLogging=True)
-# use_central_database(GLOBAL_TAG)
+    b2.B2INFO("No local DB provided, monitoring payloads from GTs.")
 
 if myLocalDB is not None:
     filenameLocal = "SVDLocalCalibrationMonitor_experiment" + \
-        str(ExpList[0]) + "_run" + str(RunList[0]) + "_fromLocalDB"+str(localDB_tag)+".root"
+        str(ExpList[0]) + "_run" + str(RunList[0]) + "_fromLocalDB" + str(myLocalDB) + ".root"
+    filenameCoG = "SVDCoGTimeCalibrationMonitor_experiment" + \
+        str(ExpList[0]) + "_run" + str(RunList[0]) + "_fromLocalDB" + str(myLocalDB) + ".root"
+    filenameCluster = "SVDClusterCalibrationMonitor_experiment" + \
+        str(ExpList[0]) + "_run" + str(RunList[0]) + "_fromLocalDB" + str(myLocalDB) + ".root"
 else:
     filenameLocal = "SVDLocalCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
-filenameCoG = "SVDCoGTimeCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
-filenameCluster = "SVDClusterCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
+    filenameCoG6 = "SVDCoG6TimeCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
+    filenameCoG3 = "SVDCoG3TimeCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
+    filenameELS3 = "SVDELS3TimeCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
+    filenameCluster = "SVDClusterCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
 
+main = b2.create_path()
 
-main = create_path()
-
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': ExpList, 'runList': RunList})
 main.add_module(eventinfosetter)
 main.add_module("Gearbox")
 main.add_module("Geometry")
 
 # add calibration monitor modules
-
-
 if args.doLocal:
-    local = register_module('SVDLocalCalibrationsMonitor')
+    local = b2.register_module('SVDLocalCalibrationsMonitor')
     local. param('outputFileName', filenameLocal)
     main.add_module(local)
 
-if args.doCoG:
-    cog = register_module('SVDCoGTimeCalibrationsMonitor')
-    cog. param('outputFileName', filenameCoG)
-    main.add_module(cog)
+if args.doCoG6:
+    time = b2.register_module('SVDTimeCalibrationsMonitor')
+    time.set_name("SVDTimeCalibrationsMonitor_CoG6")
+    time.param('outputFileName', filenameCoG6)
+    time.param('timeAlgo', "CoG6")
+    main.add_module(time)
+
+if args.doCoG3:
+    time = b2.register_module('SVDTimeCalibrationsMonitor')
+    time.set_name("SVDTimeCalibrationsMonitor_CoG3")
+    time.param('outputFileName', filenameCoG3)
+    time.param('timeAlgo', "CoG3")
+    main.add_module(time)
+
+if args.doELS3:
+    time = b2.register_module('SVDTimeCalibrationsMonitor')
+    time.set_name("SVDTimeCalibrationsMonitor_ELS3")
+    time.param('outputFileName', filenameELS3)
+    time.param('timeAlgo', "ELS3")
+    main.add_module(time)
 
 if args.doCluster:
-    cluster = register_module('SVDClusterCalibrationsMonitor')
+    cluster = b2.register_module('SVDClusterCalibrationsMonitor')
     cluster. param('outputFileName', filenameCluster)
     main.add_module(cluster)
 
 # process single event
-print_path(main)
-process(main)
+b2.print_path(main)
+b2.process(main)

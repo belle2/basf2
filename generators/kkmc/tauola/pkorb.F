@@ -120,21 +120,21 @@ C needed in tauola/fpik, tauola/bwigs, formf/form* , formf/curr :
         IF (IMIXPP(213).NE.0) PARM(3,21) = -0.110
         IF (IMIXPP(215).NE.0) PARM(3,22) = -0.110
 
-        PRINT *,' KORB: rho/rhop -> pi-pi0 mixing:'
-        PRINT *,' KORB: rho   =',PARM(1,9) ,PARM(2,9)
-        PRINT *,' KORB: rhop  =',PARM(1,15),PARM(2,15),PARM(3,15)
-        PRINT *,' KORB: K*/K*prime -> Kpi mixing:'
-        PRINT *,' KORB: kstp  =',PARM(1,16),PARM(2,16),PARM(3,16)
-        PRINT *,' KORB: a1/a1prime -> 3pi, KKpi mixing:'
-        PRINT *,' KORB: a1    =',PARM(1,10),PARM(2,10)
-        PRINT *,' KORB: a1prim=',PARM(1,17),PARM(2,17),PARM(3,17)
-        PRINT *,' KORB: K1A/K1B -> Kpipi mixing:'
-        PRINT *,' KORB: K1A   =',PARM(1,19),PARM(2,19),PARM(3,19)
-        PRINT *,' KORB: K1B   =',PARM(1,20),PARM(2,20),PARM(3,20)
-        PRINT *,' KORB: rho/rhop/rhopp -> 4pi mixing:'
-        PRINT *,' KORB: rho   =',PARM(1,9) ,PARM(2,9)
-        PRINT *,' KORB: rhopp =',PARM(1,21),PARM(2,21),PARM(3,21)
-        PRINT *,' KORB: rhoppp=',PARM(1,22),PARM(2,22),PARM(3,22)
+C        PRINT *,' KORB: rho/rhop -> pi-pi0 mixing:'
+C        PRINT *,' KORB: rho   =',PARM(1,9) ,PARM(2,9)
+C        PRINT *,' KORB: rhop  =',PARM(1,15),PARM(2,15),PARM(3,15)
+C        PRINT *,' KORB: K*/K*prime -> Kpi mixing:'
+C        PRINT *,' KORB: kstp  =',PARM(1,16),PARM(2,16),PARM(3,16)
+C        PRINT *,' KORB: a1/a1prime -> 3pi, KKpi mixing:'
+C        PRINT *,' KORB: a1    =',PARM(1,10),PARM(2,10)
+C        PRINT *,' KORB: a1prim=',PARM(1,17),PARM(2,17),PARM(3,17)
+C        PRINT *,' KORB: K1A/K1B -> Kpipi mixing:'
+C        PRINT *,' KORB: K1A   =',PARM(1,19),PARM(2,19),PARM(3,19)
+C        PRINT *,' KORB: K1B   =',PARM(1,20),PARM(2,20),PARM(3,20)
+C        PRINT *,' KORB: rho/rhop/rhopp -> 4pi mixing:'
+C        PRINT *,' KORB: rho   =',PARM(1,9) ,PARM(2,9)
+C        PRINT *,' KORB: rhopp =',PARM(1,21),PARM(2,21),PARM(3,21)
+C        PRINT *,' KORB: rhoppp=',PARM(1,22),PARM(2,22),PARM(3,22)
 
 C amplitudes for curr_cleo.F:
 C for (3pi)-pi0: 4pi phase space; rho0pi-pi0; rho-pi+pi-; rho+pi-pi-; pi-omega
@@ -160,8 +160,8 @@ CCC        IF (IPLIST(2,282).EQ.5) THEN
         PARM(3,37) = 1.0000
         END IF
 
-        PRINT *,' KORB: 3PI-PI0 PARAMS:',(PARM(3,I),I=31,35)
-        PRINT *,' KORB: PI-3PI0 PARAMS:',(PARM(3,I),I=36,37)
+C        PRINT *,' KORB: 3PI-PI0 PARAMS:',(PARM(3,I),I=31,35)
+C        PRINT *,' KORB: PI-3PI0 PARAMS:',(PARM(3,I),I=36,37)
 
 C The 4pi models are the most complicated in TAUOLA.
 C If the user has not modified any parameters of the 4pi model,

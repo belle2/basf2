@@ -2,7 +2,6 @@ import ROOT
 
 import math
 import numpy as np
-import array
 
 
 def TH2Hex(name,
@@ -58,8 +57,6 @@ def TH2Hex(name,
     # Construct points of a hexagon with unit radius
     # Go clockwise such that root understands what the interal of the polygon is
     pi = math.pi
-    sin = math.sin
-    cos = math.cos
 
     unit_radius_hex_xs = np.array([math.sin(2.0 * pi * i / 6.0) for i in range(-2, 4)])
     unit_radius_hex_ys = np.array([math.cos(2.0 * pi * i / 6.0) for i in range(-2, 4)])
@@ -161,6 +158,7 @@ def test():
 
     hex_histogram.Draw("colz")
     input()
+
 
 if __name__ == "__main__":
     test()

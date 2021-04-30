@@ -61,7 +61,7 @@ It produces also evaluation plots for the global performance and for the single 
 
 `pythonFlavorTaggerEfficiency.py` : It evaluates the performance of the flavor tagger in a similar way as in the previous script
 but produces nicer plots using matplotlib. Additionally, it produces plots evaluating the performance depending on the number 
-of categories to which an event can be atributed. It evaluates also the performance of the individual categories
+of categories to which an event can be attributed. It evaluates also the performance of the individual categories
 for events to which the respective category cannot be attributed, and for events to which no category can be attributed. 
 
 `deltaTVertexTagVResolution.py` : Evaluates the resolution and the bias of deltaT and of 

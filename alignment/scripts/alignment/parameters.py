@@ -3,7 +3,7 @@ from ROOT import Belle2
 
 def cdc_layers(layers=None):
     if layers is None:
-        layers = [l for l in range(0, 56)]
+        layers = [lyr for lyr in range(0, 56)]
 
     result = []
 
@@ -198,6 +198,7 @@ def svd():
 def all():
     # TODO: klm
     return beamspot() + pxd() + svd() + cdc_layers() + cdc_wires() + cdc_t0s()
+
 
 if __name__ == '__main__':
     print("Number of available parameters:")

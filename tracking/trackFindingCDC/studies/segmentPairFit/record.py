@@ -3,15 +3,12 @@
 
 import basf2
 
-import ROOT
 from ROOT import Belle2  # make Belle2 namespace available
-from ROOT import std
 
 import os
 import sys
 
 from tracking.validation.utilities import is_primary
-from tracking.validation.plot import ValidationPlot
 
 import tracking.harvest.harvesting as harvesting
 import tracking.harvest.refiners as refiners
@@ -274,10 +271,10 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
         """Aggregate the track and MC information for track-segment analysis"""
         mc_segment_lookup = self.mc_segment_lookup
 
-        from_segment = segment_pair.getFromSegment()
+        # from_segment = segment_pair.getFromSegment()
         to_segment = segment_pair.getToSegment()
 
-        mc_particle = mc_segment_lookup.getMCParticle(from_segment)
+        # mc_particle = mc_segment_lookup.getMCParticle(from_segment)
 
         # Take the fit best at the middle of the segment pair
         fit3d_truth = mc_segment_lookup.getTrajectory3D(to_segment)

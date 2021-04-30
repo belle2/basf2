@@ -55,7 +55,7 @@ namespace Belle2 {
     void displaceDaughter(TLorentzVector& motherDisplacementVector,
                           std::vector<MCParticle*>
                           daughters); /**< Helper function to loop over subsequent daughters and displaces their vertices corresponding to their mother decay vertex. */
-    void getDisplacement(MCParticle& particle, float lifetime,
+    void getDisplacement(const MCParticle& particle, float lifetime,
                          TLorentzVector& displacement); /**< Helper function to calculate the numerical value of the vertex displacement (x,y,z,t) */
     std::string m_particleList; /**< The name of the MCParticle collection. */
     StoreArray<MCParticle> m_mcparticles; /**< store array for the MCParticles */

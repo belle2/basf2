@@ -18,6 +18,7 @@
 #include <svd/dataobjects/SVDEventInfo.h>
 
 #include <string>
+#include <cmath>
 
 namespace Belle2 {
   /**This module takes the SVDShaperDigit as input and select three consecutive samples starting from the one choosen by the user. The modules creates a new StoreArray of the class ShaperDigit whit three samples only, selected from the original ShaperDigits. The three samples are stored in the first three positions of the APVSamples store array, and the last three are set to 0.
@@ -58,6 +59,12 @@ namespace Belle2 {
     std::string m_outputArrayName;  /**< StoreArray with the 3-samples output shaperdigits, with DAQMode = 1*/
     std::string m_svdEventInfoName; /**< Name of the input SVDEventInfo object */
     std::string m_svdEventInfoOutName; /**< Name of the output SVDEventInfo object */
+    bool m_chooseStartingSample; /**< Set it True if you want to choose the starting sample manually */
+    bool m_chooseRelativeShift; /**< Set it True if you want to choose the relative shift manually */
+    int m_relativeShift; /**< Relative shift */
+    /** return the starting sample */
+    int getFirstSample(const SVDModeByte
+                       modeByte); /**< return the starting sample from the information of the Trigger Bin and relative shift */
   };
 }
 

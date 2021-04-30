@@ -1,26 +1,23 @@
+import logging
+from tracking.validation.utilities import prob
+from ROOT import Belle2  # make Belle2 namespace available
+from ROOT import gSystem
+import matplotlib.pyplot as plt
 import numpy as np
 import numpy.random
 
 import matplotlib as mpl
 mpl.use('Agg')
-import matplotlib.pyplot as plt
 
-import basf2
 
-from ROOT import gSystem
 gSystem.Load('libframework')
 gSystem.Load('libtracking')
 gSystem.Load('libtracking_trackFindingCDC')
 
-from ROOT import Belle2  # make Belle2 namespace available
-
-from tracking.validation.utilities import prob
-
-import logging
-
 
 def get_logger():
     return logging.getLogger(__name__)
+
 
 CONTACT = "oliver.frost@desy.de"
 

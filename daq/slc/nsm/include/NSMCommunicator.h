@@ -44,6 +44,8 @@ namespace Belle2 {
     void init(const NSMNode& node, const std::string& host, int port)
     ;
     void setCallback(NSMCallback* callback);
+    // 20191004 nakao
+    // handling nsmlib_recv inside a user program is against the usage of NSM2
     void callContext();
 
   public:
@@ -55,8 +57,10 @@ namespace Belle2 {
     const NSMNode& getNode() const { return m_node; }
     int getNodeIdByName(const std::string& name);
     int getNodePidByName(const std::string& name);
-    const std::string getNodeHost(const std::string& nodename);
-    const std::string getNodeHost();
+    // 20191004 nakao
+    // making hostname visible to application is against the philosophy of NSM2
+    //const std::string getNodeHost(const std::string& nodename);
+    //const std::string getNodeHost();
     const std::string& getHostName() { return m_host; }
     int getPort() { return m_port; }
     NSMCallback& getCallback();

@@ -238,14 +238,19 @@ or in bash::
 Evaluation / Validation
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-You can create a PDF file with evaluation plots using the ``basf2_mva_evaluate.py`` tool::
+You can create a zip file with a LaTeX report and evaluation plots using the ``basf2_mva_evaluate.py`` tool::
 
     basf2_mva_evaluate.py -id DatabaseIdentifier \
                           -train train.root \
                           -data test.root \
-                          -o validation.pdf
+                          -o validation.zip
 
-Some example plots included in such a PDF are:
+
+The LaTeX file can also be compiled directly to PDF by passing the ``-c`` command line argument.                          
+If this fails, you can transfer the ``.zip`` archive to a working LaTeX environment, unpack it there and compile 
+the ``latex.tex`` with ``pdflatex`` there.
+
+Some example plots included in the resulting PDF are:
 
 .. _correlation:
 
@@ -460,62 +465,48 @@ Machine Learning Frameworks
 
 Websites and papers for the frameworks which are supported by the mva package
 
-FastBDT
-"""""""
+* FastBDT
 
-`<https://github.com/thomaskeck/FastBDT>`_
+  * `<https://github.com/thomaskeck/FastBDT>`_
+  * Thomas Keck. "FastBDT: A speed-optimized and cache-friendly implementation of stochastic gradient-boosted decision trees for multivariate classification". `<http://arxiv.org/abs/1609.06119.>`_
 
-- Thomas Keck. „FastBDT: A speed-optimized and cache-friendly implementation of stochastic gradient-boosted decision trees for multivariate classification“. `<http://arxiv.org/abs/1609.06119.>`_
+* TMVA
 
-TMVA
-""""
+  * `<http://tmva.sourceforge.net/>`_
+  * Andreas Hoecker et al. „TMVA: Toolkit for Multivariate Data Analysis“. `<https://arxiv.org/abs/physics/0703039>`_
 
-`<http://tmva.sourceforge.net/>`_
+* FANN
 
-- Andreas Hoecker et al. „TMVA: Toolkit for Multivariate Data Analysis“. `<https://arxiv.org/abs/physics/0703039>`_
+  * S. Nissen. Implementation of a Fast Artificial Neural Network Library (fann). `<http://fann.sourceforge.net/fann.pdf>`_
 
-FANN
-""""
+* SKLearn
 
-- S. Nissen. Implementation of a Fast Artificial Neural Network Library (fann). `<http://fann.sourceforge.net/fann.pdf>`_
+  * Website `<http://scikit-learn.org/>`_
+  * F. Pedregosa et al. "Scikit-learn: Machine Learning in Python". `<http://www.jmlr.org/papers/volume12/pedregosa11a/pedregosa11a.pdf>`_
 
-SKLearn
-"""""""
+* hep_ml
 
-Website `<http://scikit-learn.org/>`_
+  * Website `<https://arogozhnikov.github.io/hep_ml/>`_
 
-- F. Pedregosa et al. „Scikit-learn: Machine Learning in Python“. `<http://www.jmlr.org/papers/volume12/pedregosa11a/pedregosa11a.pdf>`_
+* XGBoost
 
-hep_ml
-""""""
+  * Website `<https://xgboost.readthedocs.io/en/latest/>`_
+  * Tianqi Chen and Carlos Guestrin. "XGBoost: A Scalable Tree Boosting System". `<https://arxiv.org/abs/1603.02754>`_
 
-Website `<https://arogozhnikov.github.io/hep_ml/>`_
+* Tensorflow
 
-XGBoost
-"""""""
+  * Website `<https://www.tensorflow.org/>`_
+  * Martin Abadi et al. "TensorFlow: A system for large-scale machine learning" `<https://arxiv.org/abs/1605.08695>`_
 
-Website `<https://xgboost.readthedocs.io/en/latest/>`_
+* Theano
 
-- Tianqi Chen and Carlos Guestrin. „XGBoost: A Scalable Tree Boosting System“. `<https://arxiv.org/abs/1603.02754>`_
+  * Website `<http://deeplearning.net/software/theano/>`_
+  * Rami Al-Rfou et al. "Theano: A Python framework for fast computation of mathematical expressions" `<https://arxiv.org/abs/1605.02688>`_
 
-Tensorflow
-""""""""""
+* NeuroBayes
 
-Website `<https://www.tensorflow.org/>`_
+  * M. Feindt and U. Kerzel. "The NeuroBayes neural network package" `<http://www-ekp.physik.uni-karlsruhe.de/~feindt/acat05-neurobayes>`_
 
-- Martin Abadi et al. „TensorFlow: A system for large-scale machine learning“ `<https://arxiv.org/abs/1605.08695>`_
-
-Theano
-""""""
-
-Website `<http://deeplearning.net/software/theano/>`_
-
-- Rami Al-Rfou et al. „Theano: A Python framework for fast computation of mathematical expressions“ `<https://arxiv.org/abs/1605.02688>`_
-
-NeuroBayes
-""""""""""
-
-- M. Feindt and U. Kerzel. „The NeuroBayes neural network package“ `<http://www-ekp.physik.uni-karlsruhe.de/~feindt/acat05-neurobayes>`_
 
 Meetings
 ^^^^^^^^

@@ -3,6 +3,12 @@
    <Creator library="ir">CryostatCreator</Creator>
    <Content>
       <LimitStepLength desc="select 1 to limit step length inside beam pipes to be less than 5mm">0</LimitStepLength>
+
+      <CrossingAngle>
+         <sec name="HER" unit="rad">0.0415</sec>
+         <sec name="LER" unit="rad">-0.0415</sec>
+      </CrossingAngle>
+
       <TubeR>
          <N desc="Number of planes">4</N>
          <sec name="Z0" unit="cm">63.35</sec>
@@ -2610,7 +2616,7 @@
          <Desc>Magnet 3 part 5</Desc>
       </Straight>
       <F1wal1>
-         <N desc="Number of planes">19</N>
+         <N desc="Number of planes">20</N>
          <sec name="Z0" unit="cm">-62.73</sec>
          <sec name="Z1" unit="cm">-74.34</sec>
          <sec name="Z2" unit="cm">-74.34</sec>
@@ -2629,7 +2635,8 @@
          <sec name="Z15" unit="cm">-331.557</sec>
          <sec name="Z16" unit="cm">-336.941</sec>
          <sec name="Z17" unit="cm">-339.10</sec>
-         <sec name="Z18" unit="cm">-716.10</sec>
+         <sec name="Z18" unit="cm">-339.10</sec>
+         <sec name="Z19" unit="cm">-716.10</sec>
          <sec name="R0" unit="cm">12.805</sec>
          <sec name="R1" unit="cm">17.018</sec>
          <sec name="R2" unit="cm">20.25</sec>
@@ -2649,6 +2656,7 @@
          <sec name="R16" unit="cm">63.00</sec>
          <sec name="R17" unit="cm">63.00</sec>
          <sec name="R18" unit="cm">75.00</sec>
+         <sec name="R19" unit="cm">75.00</sec>
          <Material>SUS316L</Material>
          <Desc>Vacuum vessel</Desc>
       </F1wal1>
@@ -2722,8 +2730,10 @@
       <Straight name="F2spc3">
          <N desc="Number of planes">4</N>
          <sec name="Z0" unit="cm">-318.663</sec>
-         <sec name="Z1" unit="cm">-335.175</sec>
-         <sec name="Z2" unit="cm">-335.175</sec>
+         <sec name="Z10" unit="cm">-335.175</sec>
+         <sec name="Z20" unit="cm">-335.175</sec>
+         <sec name="Z1" unit="cm">-343.175</sec>
+         <sec name="Z2" unit="cm">-343.175</sec>
          <sec name="Z3" unit="cm">-716.10</sec>
          <sec name="R0" unit="cm">51.00</sec>
          <sec name="R1" unit="cm">51.00</sec>

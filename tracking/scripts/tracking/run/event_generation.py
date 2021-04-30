@@ -8,8 +8,8 @@ import simulation
 import generators
 import beamparameters
 
-from . import utilities
-from .minimal import MinimalRun
+from tracking.run import utilities
+from tracking.run.minimal import MinimalRun
 import tracking.adjustments as adjustments
 
 import argparse
@@ -22,6 +22,7 @@ def get_logger():
 
 # Standard run for generating or reading event #
 ################################################
+
 
 class ReadOrGenerateEventsRun(MinimalRun):
     """Read generated events or generate new events"""
@@ -179,8 +180,8 @@ class ReadOrGenerateEventsRun(MinimalRun):
 
         # early write out if simulation output was requested
         if self.simulation_output:
-            root_output_module = path.add_module('RootOutput',
-                                                 outputFileName=self.simulation_output)
+            path.add_module('RootOutput',
+                            outputFileName=self.simulation_output)
 
         return path
 
@@ -368,7 +369,7 @@ def add_cry_tb_generator(path):
 def add_no_generator(path):
     """Add no generator for e.g. background only studies"""
     # Nothing to do here since the background files are included in the add_simulation
-    pass
+
 
 # Generator module names hashed by shorthand menomics. Includes
 # None as a special value for background only simulation
@@ -462,6 +463,7 @@ def setup_cdc_top_test(path):
 
     adjustments.adjust_module(path, "Geometry", components=components)
     return components
+
 
 detector_setups_by_short_name = {
     "Default": setup_default_detector,

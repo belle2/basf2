@@ -5,7 +5,6 @@ import modularAnalysis as ma
 from variables import variables as vm
 import variables.collections as vc
 import variables.utils as vu
-from ROOT import Belle2
 
 
 myMain = basf2.create_path()

@@ -1,4 +1,5 @@
 Import('env')
+env['TOOLS_LIBS']['trg-cdc-deadch-writedb'] = ['framework', 'trg', 'trg_cdc', 'trg_cdc_dbobjects', '$ROOT_LIBS']
 env['TOOLS_LIBS']['trg-cdc-2d-writedb'] = ['framework', 'trg', 'trg_cdc', 'trg_cdc_dbobjects', '$ROOT_LIBS']
 env['TOOLS_LIBS']['trg-cdc-neurotrigger-writedb'] = ['framework', 'trg', 'trg_cdc', 'trg_cdc_dbobjects', '$ROOT_LIBS']
 env['TOOLS_LIBS']['NeuroTriggerMLPToTextfile'] = ['trg_cdc_dataobjects']

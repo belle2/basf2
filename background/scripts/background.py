@@ -54,7 +54,7 @@ def get_background_files(folder=None, output_file_info=True):
     return bg
 
 
-def add_output(path, bgType, realTime, sampleType, phase=3, fileName='output.root', excludeBranches=[]):
+def add_output(path, bgType, realTime, sampleType, phase=3, fileName='output.root', excludeBranches=None):
     '''
     A function to be used for output of BG simulation.
     @param path path name
@@ -64,6 +64,8 @@ def add_output(path, bgType, realTime, sampleType, phase=3, fileName='output.roo
     @param specify the Phase, 1 for Phase 1, 2 for Phase 2, and 3 for Physics Run or Phase 3
     @param fileName optional file name, can be overridden by basf2 -o
     '''
+    if excludeBranches is None:
+        excludeBranches = []
 
     if sampleType == 'study':
         madeFor = ''

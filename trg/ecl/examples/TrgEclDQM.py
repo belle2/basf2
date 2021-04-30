@@ -8,7 +8,7 @@
 #
 # -----------------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 ################
 import sys  # get argv
 argvs = sys.argv  # get arg
@@ -19,30 +19,30 @@ if argc == 2:
     f_in_root = argvs[1]
 
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
-main = create_path()
+main = b2.create_path()
 
 # input
-input = register_module('RootInput')
+input = b2.register_module('RootInput')
 input.param('inputFileName', f_in_root)
 main.add_module(input)
 
-histo = register_module('HistoManager')
+histo = b2.register_module('HistoManager')
 histo.param("histoFileName", "./histo_output.root")
 
 # Unpacker
-trgeclUnpacker = register_module("TRGECLUnpacker")
+trgeclUnpacker = b2.register_module("TRGECLUnpacker")
 main.add_module(trgeclUnpacker)
 main.add_module(histo)
 
 # DQM
-trgecldqm = register_module('TRGECLDQM')
+trgecldqm = b2.register_module('TRGECLDQM')
 main.add_module(trgecldqm)
 
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

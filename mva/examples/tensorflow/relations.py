@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Dennis Weyland 2017
 
@@ -36,6 +35,7 @@ class early_stopping():
                 return False
         return True
 
+
 EARLY_STOPPER = early_stopping()
 
 
@@ -49,7 +49,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
     def layer(x, shape, name, unit=tf.sigmoid):
         """Build one hidden layer in feed forward net"""
-        with tf.name_scope(name) as scope:
+        with tf.name_scope(name):
             weights = tf.Variable(tf.truncated_normal(shape, stddev=1.0 / np.sqrt(float(shape[0]))), name='weights')
             biases = tf.Variable(tf.constant(0.0, shape=[shape[1]]), name='biases')
             layer = unit(tf.matmul(x, weights) + biases)
@@ -81,7 +81,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
         tracks = []
         [tracks.append(tf.slice(x, [0, i * 6], [-1, 6])) for i in range(int(number_of_features / 6))]
 
-        # Number of features per reation. Each feature is a net with shared variables across all combinations.
+        # Number of features per relation. Each feature is a net with shared variables across all combinations.
         # Number of Features is also the number of different set of variables for relational nets.
         number_of_features_per_relation = 1
         relations = []
@@ -90,7 +90,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
             # Build the variables, which will be shared across all combinations
             relational_variables = build_relation_net_variables([12, 50, 50, 1],
                                                                 'tracks_relational_{}'.format(feature_number))
-            # Loop over everx combination of input groups.
+            # Loop over every combination of input groups.
             for counter, track1 in enumerate(tracks):
                 for track2 in tracks[counter + 1:]:
                     # Build the net wit pre-build variables.
@@ -185,7 +185,6 @@ if __name__ == "__main__":
     import tempfile
     import json
 
-    import basf2
     import basf2_mva
     import basf2_mva_util
     # ##############Building Data samples ###########################
@@ -292,7 +291,7 @@ if __name__ == "__main__":
         p1, t1 = method1.apply_expert(test_data, general_options.m_treename)
         print('Apply relational net')
         p2, t2 = method2.apply_expert(test_data, general_options.m_treename)
-        print('Aplly special relational net')
+        print('Apply special relational net')
         p3, t3 = method3.apply_expert(test_data, general_options.m_treename)
 
         print('Feed Forward Net AUC: ', basf2_mva_util.calculate_roc_auc(p1, t1))

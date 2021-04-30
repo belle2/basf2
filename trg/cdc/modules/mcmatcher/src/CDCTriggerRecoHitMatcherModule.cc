@@ -9,7 +9,7 @@ namespace {
   //with range based for
   template<class Iter>
   struct iter_pair_range : std::pair<Iter, Iter> {
-    iter_pair_range(std::pair<Iter, Iter> const& x) : std::pair<Iter, Iter>(x) {}
+    explicit iter_pair_range(std::pair<Iter, Iter> const& x) : std::pair<Iter, Iter>(x) {}
     Iter begin() const {return this->first;}
     Iter end()   const {return this->second;}
   };
@@ -81,46 +81,48 @@ CDCTriggerRecoHitMatcherModule::initialize()
 void
 CDCTriggerRecoHitMatcherModule::event()
 {
+  /*
   // create relations from RecoTracks to SegmentHits via CDCHits
   for (int ireco = 0; ireco < m_recoTracks.getEntries(); ++ireco) {
-    RecoTrack* recoTrack = m_recoTracks[ireco];
-    // if relations exist already, skip this step
-    // (matching may be done several times with different trigger tracks)
-    bool relateReco = true;
-    if (recoTrack->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName).size() > 0)
-      relateReco = false;
-    if (recoTrack->getRelationsTo<Track>(m_TrackCollectionName).size() == 0)
-      continue;
-    Track* ttrack = recoTrack->getRelatedFrom<Track>(m_TrackCollectionName);
-    const TrackFitResult* fitres = ttrack->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(
-                                     211));
+  RecoTrack* recoTrack = m_recoTracks[ireco];
+  // if relations exist already, skip this step
+  // (matching may be done several times with different trigger tracks)
+  bool relateReco = true;
+  if (recoTrack->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName).size() > 0)
+    relateReco = false;
+  if (recoTrack->getRelationsTo<Track>(m_TrackCollectionName).size() == 0)
     continue;
-    if (fitres) {
-      // double omega = fitres->getOmega();
-      TVector3 mom = fitres->getMomentum();
-      //   double pt = mom.Pt();
-      //   double phi = mom.Phi();
-      //   double theta = mom.theta();
-      TVector3 vtx = fitres->getPosition();
+  Track* ttrack = recoTrack->getRelatedFrom<Track>(m_TrackCollectionName);
+  const TrackFitResult* fitres = ttrack->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(
+                                   211));
+  continue;
+  if (fitres) {
+    // double omega = fitres->getOmega();
+    TVector3 mom = fitres->getMomentum();
+    //   double pt = mom.Pt();
+    //   double phi = mom.Phi();
+    //   double theta = mom.theta();
+    TVector3 vtx = fitres->getPosition();
 
 
-      MCParticle* recoTrackable = m_recoTrackable.appendNew();
-      recoTrackable->setProductionVertex(vtx);
-      recoTrackable->setMomentum(mom);
-      recoTrackable->addRelationTo(recoTrack);
-    }
+    MCParticle* recoTrackable = m_recoTrackable.appendNew();
+    recoTrackable->setProductionVertex(vtx);
+    recoTrackable->setMomentum(mom);
+    recoTrackable->addRelationTo(recoTrack);
+  }
 
-    vector<CDCHit*> cdcHits = recoTrack->getCDCHitList();
-    for (unsigned iHit = 0; iHit < cdcHits.size(); ++iHit) {
-      RelationVector<CDCTriggerSegmentHit> relHits =
-        cdcHits[iHit]->getRelationsFrom<CDCTriggerSegmentHit>(m_hitCollectionName);
-      for (unsigned iTS = 0; iTS < relHits.size(); ++iTS) {
-        // create relations only for priority hits (relation weight 2)
-        if (relHits.weight(iTS) > 1) {
-          if (relateReco)
-            recoTrack->addRelationTo(relHits[iTS]);
-        }
+  vector<CDCHit*> cdcHits = recoTrack->getCDCHitList();
+  for (unsigned iHit = 0; iHit < cdcHits.size(); ++iHit) {
+    RelationVector<CDCTriggerSegmentHit> relHits =
+      cdcHits[iHit]->getRelationsFrom<CDCTriggerSegmentHit>(m_hitCollectionName);
+    for (unsigned iTS = 0; iTS < relHits.size(); ++iTS) {
+      // create relations only for priority hits (relation weight 2)
+      if (relHits.weight(iTS) > 1) {
+        if (relateReco)
+          recoTrack->addRelationTo(relHits[iTS]);
       }
     }
   }
+  }
+  */
 }

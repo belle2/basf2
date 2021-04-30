@@ -10,17 +10,13 @@
 
 # *****************************************************************************
 
-from basf2 import *
-from modularAnalysis import *
-
-
-import sys
 import math
-from basf2 import *
+import basf2 as b2
 
 import ROOT
 from ROOT import Belle2
 from ROOT import gROOT, AddressOf
+import reconstruction as reco
 
 gROOT.ProcessLine('struct TrackData {\
     float chi2;\
@@ -38,10 +34,10 @@ gROOT.ProcessLine('struct DEDXData {\
     float distanceKLM;\
 };')
 
-from ROOT import TrackData, DEDXData
+from ROOT import TrackData, DEDXData  # noqa
 
 
-class CosmicAnalysis(Module):
+class CosmicAnalysis(b2.Module):
 
     """A module to analyse residuals in overlaps of ladders."""
 
@@ -192,9 +188,9 @@ class CosmicAnalysis(Module):
                 if track.hasPXDHits():
 
                     # Print number of PXD hits
-                    EventMetaData = Belle2.PyStoreObj('EventMetaData')
-                    event = EventMetaData.getEvent()
-                    nPxdHits = track.getNumberOfPXDHits()
+                    # EventMetaData = Belle2.PyStoreObj('EventMetaData')
+                    # event = EventMetaData.getEvent()
+                    # nPxdHits = track.getNumberOfPXDHits()
                     # print('Event', event, 'has PXD', nPxdHits, 'hit(s):')
 
                     # First loop over PXD Hits
@@ -203,7 +199,6 @@ class CosmicAnalysis(Module):
                         sensorID = Belle2.VxdID(pxdHit.getSensorID())
                         info = geoCache.get(sensorID)
                         layer = sensorID.getLayerNumber()
-                        ladder = sensorID.getLadderNumber()
                         sensor = sensorID.getSensorNumber()
                         # print('Hit information: #hit:', n, 'sensor information:', layer, ladder, sensor)
                         self.HitsVsLayer.Fill(totalNumberOfHits, layer)
@@ -215,26 +210,23 @@ class CosmicAnalysis(Module):
                 if track.hasSVDHits():
 
                     # Print number of SVD hits
-                    EventMetaData = Belle2.PyStoreObj('EventMetaData')
-                    event = EventMetaData.getEvent()
-                    nSvdHits = track.getNumberOfSVDHits()
+                    # EventMetaData = Belle2.PyStoreObj('EventMetaData')
+                    # event = EventMetaData.getEvent()
+                    # nSvdHits = track.getNumberOfSVDHits()
                     # print('Event', event, 'has SVD', nSvdHits, 'hit(s):')
 
                     # First loop over SVD Hits
-                    measured = ROOT.TVector3(0, 0, 0)
-                    expected = ROOT.TVector3(0, 0, 0)
                     for n in range(0, len(track.getSVDHitList())):
                         svdHit = track.getSVDHitList()[n]
                         sensorID = Belle2.VxdID(svdHit.getSensorID())
                         info = geoCache.get(sensorID)
                         layer = sensorID.getLayerNumber()
-                        ladder = sensorID.getLadderNumber()
                         sensor = sensorID.getSensorNumber()
 
                         if svdHit.isUCluster():
                             # print('Hit information: #hit:', n, 'sensor information:', layer, ladder, sensor, 'isU')
-                            for l in range(0, len(track.getSVDHitList())):
-                                svdHitA = track.getSVDHitList()[l]
+                            for lst in range(0, len(track.getSVDHitList())):
+                                svdHitA = track.getSVDHitList()[lst]
                                 sensorIDA = Belle2.VxdID(svdHitA.getSensorID())
                                 if info == geoCache.get(sensorIDA):
                                     if svdHitA.isUCluster() == 0:
@@ -422,13 +414,13 @@ class CosmicAnalysis(Module):
         self.rootfile.Write()
         self.rootfile.Close()
 
-main = create_path()
+
+main = b2.create_path()
 
 main.add_module('RootInput')
 main.add_module('Gearbox')
 main.add_module('Geometry')
 
-import reconstruction as reco
 reco.add_cosmics_reconstruction(main, pruneTracks=False, merge_tracks=True)
 main.add_module('DAFRecoFitter', pdgCodesToUseForFitting=[13])
 main.add_module("CDCDedxPID")
@@ -436,10 +428,10 @@ main.add_module("CDCDedxPID")
 CosmicAnalysis = CosmicAnalysis()
 main.add_module(CosmicAnalysis)
 
-progress = register_module('ProgressBar')
+progress = b2.register_module('ProgressBar')
 main.add_module(progress)
 
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

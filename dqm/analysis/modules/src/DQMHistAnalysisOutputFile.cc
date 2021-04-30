@@ -109,8 +109,11 @@ void DQMHistAnalysisOutputFileModule::endRun()
               TObject* obj ;
 
               while ((key = (TKey*)next())) {
-                obj = key->ReadObj() ;
-                if (obj->InheritsFrom("TH1")) {
+                TString skey(key->GetClassName());
+                if (skey.BeginsWith(TString("Belle2::"))) continue;
+                TClass clkey(key->GetClassName());
+                if (clkey.InheritsFrom("TH1")) {
+                  obj = key->ReadObj() ;
                   B2INFO("Histo name: " << obj->GetName() << " title " << obj->GetTitle());
                   TDirectory* old, *d;
                   d = old = gDirectory;

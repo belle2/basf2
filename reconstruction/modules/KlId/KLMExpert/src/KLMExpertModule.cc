@@ -23,9 +23,9 @@
 // here's where the functions are hidden
 #include "reconstruction/modules/KlId/KLMExpert/KlId.h"
 
-using namespace KlId;
-using namespace Belle2;
 using namespace std;
+using namespace Belle2;
+using namespace Belle2::KlongId;
 
 REG_MODULE(KLMExpert);
 

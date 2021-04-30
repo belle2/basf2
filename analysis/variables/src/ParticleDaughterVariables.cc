@@ -20,6 +20,7 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 #include <iostream>
 #include <cmath>
@@ -46,7 +47,7 @@ namespace Belle2 {
       }
 
       // Check if MC particle exists
-      const MCParticle* mcp = particle->getRelated<MCParticle>();
+      const MCParticle* mcp = particle->getMCParticle();
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
 
@@ -94,7 +95,7 @@ namespace Belle2 {
       }
 
       // Check if MC particle exists
-      const MCParticle* mcp = particle->getRelated<MCParticle>();
+      const MCParticle* mcp = particle->getMCParticle();
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
 
@@ -146,7 +147,7 @@ namespace Belle2 {
         int PDGcode = daughters[iDaughter]->getPDGCode();
 
         // Is it a real photon?
-        if (PDGcode == 22 && photosFlag > -0.5 && photosFlag < 0.5) {  // must not be from PHOTOS
+        if (PDGcode == Const::photon.getPDGCode() && photosFlag > -0.5 && photosFlag < 0.5) {  // must not be from PHOTOS
           Status = 1.0;
         }
       }

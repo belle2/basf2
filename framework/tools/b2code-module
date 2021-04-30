@@ -83,9 +83,7 @@ if __name__ == "__main__":
         author = getuser()
 
     # get module description
-    short_desc = input('Short module description: ')
-    print('Long module description (finish with ctrl-D):', flush=True)
-    long_desc = sys.stdin.readlines()
+    module_desc = input('Short module description: ')
 
     # get module parameters
     params_header = ''
@@ -202,7 +200,7 @@ if __name__ == "__main__":
         if selected:
             if method == 'destructor':
                 methods_header = '''    /** %s */
-        virtual ~%sModule() override;
+        ~%sModule() override;
 
     ''' \
                     % (method_desc, module) + methods_header
@@ -215,7 +213,7 @@ if __name__ == "__main__":
             else:
                 methods_header = methods_header \
                     + '''    /** %s */
-        virtual void %s() override;
+        void %s() override;
 
     ''' % (method_desc,
                         method)
@@ -269,14 +267,14 @@ if __name__ == "__main__":
     # write the header file
     f = open(header, 'w')
     f.write("""/**************************************************************************
-    * BASF2 (Belle Analysis Framework 2)                                     *
-    * Copyright(C) %(year)d - Belle II Collaboration                             *
-    *                                                                        *
-    * Author: The Belle II Collaboration                                     *
-    * Contributors: %(author)-50s       *
-    *                                                                        *
-    * This software is provided "as is" without any warranty.                *
-    **************************************************************************/
+* BASF2 (Belle Analysis Framework 2)                                     *
+* Copyright(C) %(year)d - Belle II Collaboration                             *
+*                                                                        *
+* Author: The Belle II Collaboration                                     *
+* Contributors: %(author)-50s       *
+*                                                                        *
+* This software is provided "as is" without any warranty.                *
+**************************************************************************/
 
     #pragma once
 
@@ -285,17 +283,15 @@ if __name__ == "__main__":
 
     namespace Belle2 {
     /**
-    * %(short_description)s
-    *
-    * %(long_description)s
-    */
+     * %(module_description)s
+     */
     class %(module)sModule : public Module {
 
     public:
 
         /**
-        * Constructor: Sets the description, the properties and the parameters of the module.
-        */
+         * Constructor: Sets the description, the properties and the parameters of the module.
+         */
         %(module)sModule();
 
     %(methods)s
@@ -307,8 +303,7 @@ if __name__ == "__main__":
         'year': datetime.datetime.now().year,
         'author': author,
         'includes': includes_header,
-        'short_description': short_desc,
-        'long_description': '   * '.join(long_desc),
+        'module_description': module_desc,
         'module': module,
         'methods': methods_header,
         'members': params_header + init_header,
@@ -319,14 +314,14 @@ if __name__ == "__main__":
     path = ''
     f = open(src, 'w')
     f.write("""/**************************************************************************
-    * BASF2 (Belle Analysis Framework 2)                                     *
-    * Copyright(C) %(year)d - Belle II Collaboration                             *
-    *                                                                        *
-    * Author: The Belle II Collaboration                                     *
-    * Contributors: %(author)-50s       *
-    *                                                                        *
-    * This software is provided "as is" without any warranty.                *
-    **************************************************************************/
+* BASF2 (Belle Analysis Framework 2)                                     *
+* Copyright(C) %(year)d - Belle II Collaboration                             *
+*                                                                        *
+* Author: The Belle II Collaboration                                     *
+* Contributors: %(author)-50s       *
+*                                                                        *
+* This software is provided "as is" without any warranty.                *
+**************************************************************************/
 
     #include <%(module_header)s>
 
@@ -341,22 +336,12 @@ if __name__ == "__main__":
 
     using namespace Belle2;
 
-    //-----------------------------------------------------------------
-    //                 Register the Module
-    //-----------------------------------------------------------------
     REG_MODULE(%(module)s)
-
-    //-----------------------------------------------------------------
-    //                 Implementation
-    //-----------------------------------------------------------------
 
     %(module)sModule::%(module)sModule() : Module()%(constructor)s
     {
     // Set module properties
-    setDescription(R"DOC("%(short_description)s
-
-    %(long_description)s
-    )DOC");
+    setDescription(R"DOC(%(module_description)s)DOC");
 
     // Parameter definitions
     %(params)s
@@ -368,8 +353,7 @@ if __name__ == "__main__":
         'author': author,
         'module_header': os.path.relpath(os.path.join(os.getcwd(), '%sModule.h' % module), local_dir),
         'includes': includes_src,
-        'short_description': short_desc,
-        'long_description': '\n'.join(e.strip() for e in long_desc),
+        'module_description': module_desc,
         'module': module,
         'constructor': ctor_src,
         'methods': methods_src,
@@ -377,5 +361,7 @@ if __name__ == "__main__":
     })
     f.close()
 
-    # add new files to git
-    subprocess.call(['git', 'add', header, src])
+    # fix the style of the new files and add them to git
+    for file in [header, src]:
+        subprocess.call(['b2code-style-fix', file])
+        subprocess.call(['git', 'add', file])

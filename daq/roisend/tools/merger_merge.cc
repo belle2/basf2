@@ -11,22 +11,22 @@
 #include <set>
 #include <vector>
 #include <arpa/inet.h>
+#include <fcntl.h>
+#include <netdb.h>
 
-#include "daq/roisend/util.h"
-#include "daq/roisend/b2_socket.h"
-#include "daq/roisend/config.h"
-#include "daq/roisend/h2m.h"
+#define ROI_MAX_PACKET_SIZE       (16384) /* bytes */
 
-#include "daq/rfarm/manager/RFFlowStat.h"
+#define NETWORK_ESTABLISH_TIMEOUT (-1)     /* seconds (0 or negative specifies forever wait) */
+#define NETWORK_IO_TIMEOUT        (-1)     /* seconds (0 or negative specifies forever wait) */
+
 #include <boost/spirit/home/support/detail/endian.hpp>
 
 using namespace std;
 
-#define HRP_MALLOC_BUFFER_SIZE (ROI_MAX_PACKET_SIZE * 64) /* byte */
-
 
 #define LOG_FPRINTF (fprintf)
 #define ERR_FPRINTF (fprintf)
+#define ERROR(func) { fprintf(stderr, "[ERROR] %s:%d: "#func"(): %s\n", __FILE__, __LINE__, strerror(errno));}
 
 std::map<int, std::string> myconn;
 std::map<int, unsigned int> mycount;
@@ -42,6 +42,21 @@ bool got_sigusr2 = false;
 bool got_sigint = false;
 bool got_sigpipe = false;
 bool got_sigterm = false;
+
+void
+dump_binary(FILE* fp, const void* ptr, const size_t size)
+{
+  const unsigned int* p = (const unsigned int*)ptr;
+  const size_t _size = size / sizeof(unsigned int);
+
+
+  for (size_t i = 0; i < _size; i++) {
+    fprintf(fp, "%08x ", p[i]);
+    if (i % 8 == 7) fprintf(fp, "\n");
+  }
+  if (_size % 8 != 0) fprintf(fp, "\n");
+}
+
 
 static void catch_usr1_function(int /*signo*/)
 {
@@ -130,6 +145,268 @@ void check_event_nr(unsigned int event_number)
     missing_walk_index--;
   }
 }
+
+int
+b2_timed_blocking_io(const int sd, const int timeout /* secs */)
+{
+  int ret;
+
+
+  if (timeout > 0) {
+    struct timeval tv;
+
+    tv.tv_sec = timeout;
+    tv.tv_usec = 0;
+    ret = setsockopt(sd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(struct timeval));
+    if (ret == -1) {
+      ERROR(setsockopt);
+      return -1;
+    }
+
+    tv.tv_sec = timeout;
+    tv.tv_usec = 0;
+    ret = setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(struct timeval));
+    if (ret == -1) {
+      ERROR(setsockopt);
+      return -1;
+    }
+  } else if (timeout == 0) {
+    ret = fcntl(sd, F_SETFL, O_NDELAY);
+    if (ret == -1) {
+      ERROR(fcntl);
+      return -1;
+    }
+  } else if (timeout < 0) {
+    ret = fcntl(sd, F_GETFL, O_NDELAY);
+    if (ret == -1) {
+      ERROR(fcntl);
+      return -1;
+    }
+    ret &= ~O_NDELAY;
+    ret = fcntl(sd, F_SETFL, ret);
+    if (ret == -1) {
+      ERROR(fcntl);
+      return -1;
+    }
+  }
+
+
+  return 0;
+}
+
+
+int
+b2_build_sockaddr_in(const char* hostname, const unsigned short port, struct sockaddr_in* in)
+{
+  memset(in, 0, sizeof(struct sockaddr_in));
+
+  in->sin_family = AF_INET;
+  {
+    struct hostent* hoste;
+    hoste = gethostbyname(hostname);
+    if (!hoste) {
+      ERROR(gethostbyname);
+      return -1;
+    }
+    in->sin_addr = *(struct in_addr*)(hoste->h_addr);
+  }
+  in->sin_port = htons(port);
+
+
+  return 0;
+}
+
+
+static int
+b2_create_tcp_socket(void)
+{
+  int sd, ret, one = 1;
+
+
+  sd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+  if (sd == -1) {
+    ERROR(socket);
+    return -1;
+  }
+
+#if 0
+  ret = b2_timed_blocking_io(sd, 0);
+  if (ret == -1) {
+    ERROR(b2_timed_blocking_io);
+    return -1;
+  }
+#endif
+
+  ret = setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&one, sizeof(int));
+  if (ret == -1) {
+    ERROR(setsockopt);
+    return -1;
+  }
+
+
+  return sd;
+}
+
+
+int /* returns socket descriptor */
+b2_create_accept_socket(const unsigned short port) /* in reality DOES NOT accept */
+{
+  int sd, ret;
+  struct sockaddr_in in;
+
+
+  sd = b2_create_tcp_socket();
+  if (sd < 0) {
+    ERROR(b2_create_tcp_socket);
+    return -1;
+  }
+
+  ret = b2_build_sockaddr_in("0.0.0.0", port, &in);
+  if (ret == -1) {
+    ERROR(b2_build_sockaddr_in);
+    return -1;
+  }
+
+  ret = bind(sd, (const struct sockaddr*)&in, sizeof(struct sockaddr_in));
+  if (ret == -1) {
+    ERROR(bind);
+    return -1;
+  }
+
+  ret = listen(sd, 1);
+  if (ret == -1) {
+    ERROR(listen);
+    return -1;
+  }
+
+
+  return sd;
+}
+
+
+int /* returns socket descriptor */
+b2_create_connect_socket(const char* hostname, const unsigned short port)
+{
+  int sd, ret;
+  struct sockaddr_in in;
+
+
+  sd = b2_create_tcp_socket();
+  if (sd < 0) {
+    ERROR(b2_create_tcp_socket);
+    return -1;
+  }
+
+  ret = b2_build_sockaddr_in(hostname, port, &in);
+  if (ret == -1) {
+    ERROR(b2_build_sockaddr_in);
+    return -1;
+  }
+
+  ret = connect(sd, (const struct sockaddr*)&in, sizeof(struct sockaddr_in));
+  if (ret == -1 && errno != EINPROGRESS) {
+    ERROR(connect);
+    return -1;
+  }
+
+
+  return sd;
+}
+
+
+int
+b2_send(const int sd, const void* buf, const size_t size)
+{
+  unsigned char* ptr = (unsigned char*)buf;
+  size_t n_bytes_remained = size;
+
+
+  for (;;) {
+    int ret, n_bytes_send;
+
+    ret = send(sd, ptr, n_bytes_remained, 0);
+    if (ret == -1 && errno != EINTR) {
+      ERROR(send);
+      return -1;
+    }
+    if (ret == -1 && errno == EINTR) {
+      fprintf(stderr, "%s:%d: recv(): Packet send timed out\n", __FILE__, __LINE__);
+      return -1;
+    }
+    if (ret == 0) {
+      fprintf(stderr, "%s:%d: send(): Connection closed\n", __FILE__, __LINE__);
+      return -1;
+    }
+
+    n_bytes_send      = ret;
+    ptr              += n_bytes_send;
+
+    if (n_bytes_remained < size_t(n_bytes_send))
+      /* overrun: internal error */
+    {
+      fprintf(stderr, "%s:%d: send(): Internal error\n", __FILE__, __LINE__);
+      return -1;
+    }
+    n_bytes_remained -= n_bytes_send;
+
+    if (n_bytes_remained == 0)
+      /* fully sendout */
+    {
+      break;
+    }
+  }
+
+
+  return size;
+}
+
+
+int
+b2_recv(const int sd,       void* buf, const size_t size)
+{
+  unsigned char* ptr = (unsigned char*)buf;
+  size_t n_bytes_remained = size;
+
+
+  for (;;) {
+    int ret, n_bytes_recv;
+
+    ret = recv(sd, ptr, n_bytes_remained, 0);
+    if (ret == -1 && (errno != EINTR && errno != EWOULDBLOCK)) {
+      ERROR(recv);
+      return -1;
+    }
+    if (ret == -1 && (errno == EINTR || errno == EWOULDBLOCK)) {
+      fprintf(stderr, "%s:%d: recv(): Packet receive timed out\n", __FILE__, __LINE__);
+      return -1;
+    }
+    if (ret == 0) {
+      fprintf(stderr, "%s:%d: recv(): Connection closed\n", __FILE__, __LINE__);
+      return -1;
+    }
+
+    n_bytes_recv      = ret;
+    ptr              += n_bytes_recv;
+    if (n_bytes_remained < size_t(n_bytes_recv))
+      /* overrun: internal error */
+    {
+      fprintf(stderr, "%s:%d: recv(): Internal error\n", __FILE__, __LINE__);
+      return -1;
+    }
+    n_bytes_remained -= n_bytes_recv;
+
+    if (n_bytes_remained == 0)
+      /* fully readout */
+    {
+      break;
+    }
+  }
+
+
+  return size;
+}
+
+
 
 static int
 MM_init_connect_to_onsen(const char* host, const unsigned int port)
@@ -358,9 +635,6 @@ main(int argc, char* argv[])
   //  unsigned short accept_port[MM_MAX_HLTOUT];
   unsigned short accept_port;
 
-  char shmname[1024];
-  int shmid;
-
   LOG_FPRINTF(stderr, "[INFO] merger_merge: Process invoked [ver(%s %s)]\n", __DATE__, __TIME__);
 
   if (argc < 4) {
@@ -371,11 +645,11 @@ main(int argc, char* argv[])
   /* argv copy */
   char* p;
 
-  p = argv[1];
-  strcpy(shmname, p);
-
-  p = argv[2];
-  shmid = atoi(p);
+//   p = argv[1];
+//   strcpy(shmname, p);
+//
+//   p = argv[2];
+//   shmid = atoi(p);
 
   p = argv[3];
   strcpy(onsen_host, p);
@@ -385,9 +659,6 @@ main(int argc, char* argv[])
 
   p = argv[5];
   accept_port = atoi(p);
-
-  /* Flow monitor */
-  Belle2::RFFlowStat* flstat = new Belle2::RFFlowStat(shmname, shmid, NULL);
 
   signal(SIGPIPE, catch_pipe_function);
   signal(SIGTERM, catch_term_function);
@@ -639,8 +910,6 @@ main(int argc, char* argv[])
             exit(1);
           }
 
-          flstat->log(n_bytes_to_onsen);
-
           mycount[0]++;
           if (0 /*event_count < 5 || event_count % 10000 == 0*/) {
             LOG_FPRINTF(stderr, "[INFO] merger_merge: ---- [ %d] sent event to ONSEN\n", event_count);
@@ -653,9 +922,16 @@ main(int argc, char* argv[])
       if (event_count % 10000 == 0) {
         int hltcount = hltused.size();
         int mod = *triggers.begin() % hltcount;
-        ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low %u high %u missing %u inflight %lu delta %u max %u low mod %d low HLT %d\n",
-                    *triggers.begin(), *(--triggers.end()), missing_walk_index, triggers.size(),
-                    *(--triggers.end()) - *triggers.begin(), event_number_max, mod, hlts[mod]);
+        if (triggers.empty()) {
+          // workaround for empty vector, but keep same structure for monitor parsing (kibana)
+          ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low %u high %u missing %u inflight %lu delta %u max %u low mod %d low HLT %d\n",
+                      event_number_max, event_number_max, missing_walk_index, triggers.size(),
+                      0, event_number_max, mod, hlts[mod]);
+        } else {
+          ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low %u high %u missing %u inflight %lu delta %u max %u low mod %d low HLT %d\n",
+                      *triggers.begin(), *(--triggers.end()), missing_walk_index, triggers.size(),
+                      *(--triggers.end()) - *triggers.begin(), event_number_max, mod, hlts[mod]);
+        }
       }
     }
   }

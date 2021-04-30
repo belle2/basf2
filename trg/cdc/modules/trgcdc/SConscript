@@ -2,11 +2,13 @@ Import('env')
 
 env['LIBS'] = ['framework',
                'trg_trg',
+               'trg_trg_dataobjects',
                'mdst_dataobjects',
                'cdc_dataobjects',
                'cdc',
                'trg_cdc',
-               'trg_cdc_dataobjects']
+               'trg_cdc_dataobjects',
+               'trg_cdc_dbobjects']
 #print env.Dump()
 
 # loader = env.SharedObject(source='../houghtracking/src/xsi_loader.cpp', CPPPATH=['../houghtracking/include'])

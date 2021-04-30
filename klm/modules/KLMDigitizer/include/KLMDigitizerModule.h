@@ -13,12 +13,11 @@
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMSimHit.h>
 #include <klm/dataobjects/eklm/EKLMSimHit.h>
-#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/dbobjects/eklm/EKLMChannels.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
+#include <klm/dbobjects/KLMScintillatorFEEParameters.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
 #include <klm/simulation/ScintillatorFirmware.h>
@@ -88,9 +87,9 @@ namespace Belle2 {
     };
 
     /**
-     * Check channel parameters for channel-specific simulation.
+     * Check scintillator FEE parameters for channel-specific simulation.
      */
-    void checkChannelParameters();
+    void checkScintillatorFEEParameters();
 
     /**
      * Digitization in BKLM.
@@ -115,26 +114,23 @@ namespace Belle2 {
      */
     bool efficiencyCorrection(float efficiency);
 
-    /** Digitization parameters. */
-    DBObjPtr<KLMScintillatorDigitizationParameters> m_DigPar;
-
-    /** Time conversion. */
-    DBObjPtr<KLMTimeConversion> m_TimeConversion;
-
-    /** Channel data. */
-    DBObjPtr<EKLMChannels> m_Channels;
-
     /** Channel status. */
     DBObjPtr<KLMChannelStatus> m_ChannelStatus;
+
+    /** Scintillator digitization parameters. */
+    DBObjPtr<KLMScintillatorDigitizationParameters> m_DigPar;
+
+    /** Scintillator FEE parameters. */
+    DBObjPtr<KLMScintillatorFEEParameters> m_FEEPar;
 
     /** Strip efficiency. */
     DBObjPtr<KLMStripEfficiency> m_StripEfficiency;
 
+    /** Time conversion. */
+    DBObjPtr<KLMTimeConversion> m_TimeConversion;
+
     /** Element numbers. */
     const KLMElementNumbers* m_ElementNumbers;
-
-    /** EKLM element numbers. */
-    const EKLMElementNumbers* m_eklmElementNumbers;
 
     /** Simulation mode. */
     std::string m_SimulationMode;
@@ -142,8 +138,8 @@ namespace Belle2 {
     /** Whether the simulation is channel-specific. */
     bool m_ChannelSpecificSimulation;
 
-    /** Initial digitization time. */
-    double m_DigitizationInitialTime;
+    /** Initial digitization time in TDC periods. */
+    int m_DigitizationInitialTime;
 
     /** Save FPGA fit data (KLMScintillatorFirmwareFitResult). */
     bool m_SaveFPGAFit;

@@ -23,9 +23,11 @@
    20180912 1990 logflush also at the end of sendany
    20180926 1990 b2nsm_reqname is added, uprcase fix in b2nsm_callback
    20181126 1994 b2nsm_nodeproc is added
+   20190913 1999 b2nsm_logging and b2nsm_context return previous value
+   20191002 1999 avoid nsmsys2.h as much as possible
 \* ---------------------------------------------------------------------- */
 
-const char *belle2nsm_version = "belle2nsm 1.9.94";
+const char *belle2nsm_version = "belle2nsm 1.9.99";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,9 +37,12 @@ const char *belle2nsm_version = "belle2nsm 1.9.94";
 #include <time.h>
 #include <sys/time.h>
 
-#include <nsm2/nsm2.h>
-#include <nsm2/nsmlib2.h>
-#include "belle2nsm.h"
+#include "nsm2/nsm2.h"
+#include "nsm2/nsmsys2.h"
+/* NSM_TCPMSGSIZ is the only unavoidable dependence to nsmsys2.h
+   from belle2nsm.c */
+#include "nsm2/nsmlib2.h"
+#include "nsm2/belle2nsm.h"
 
 /* checkpoint of signal handler to be studied with gdb
    0: never called, -1: done, 1..1000 user checkpoint, 1001.. corelib/b2lib
@@ -121,9 +126,9 @@ b2nsm_nodeid(const char *nodename)
 int 
 b2nsm_nodepid(const char *nodename)
 {
-  int inod = b2nsm_nodeid(nodename);
-  if (inod < 0) return -1;
-  return ntohl(nsm->sysp->nod[inod].nodpid);
+  char nodename_uprcase[NSMSYS_NAME_SIZ + 1];
+  xuprcpy(nodename_uprcase, nodename, NSMSYS_NAME_SIZ + 1);
+  return nsmlib_nodepid(nsm, nodename_uprcase);
 }
 /* -- b2nsm_nodeproc ---------------------------------------------------- */
 int
@@ -208,32 +213,36 @@ b2nsm_debuglevel(int val)
   return prev | (nsmlib_debuglevel(val >> 16) << 16);
 }
 /* -- b2nsm_logging ----------------------------------------------------- */
-void
+FILE *
 b2nsm_logging(FILE *fp)
 {
   logfp = fp;
-  nsmlib_logging(fp);
+  fp = nsmlib_logging(fp);
   if (nsm) {
     nsm->hook = b2nsm_loghook;
     nsm->hookptr = 0;
   }
+  return fp;
 }
 /* -- b2nsm_logging2 ---------------------------------------------------- */
-void
+FILE *
 b2nsm_logging2(FILE *fp, const char *prefix)
 {
   logfp = fp;
-  nsmlib_logging(fp);
+  fp = nsmlib_logging(fp);
   if (nsm) {
     nsm->hook = b2nsm_loghook;
     nsm->hookptr = (const void *)prefix;
   }
+  return fp;
 }
 /* -- b2nsm_context ----------------------------------------------------- */
-void
+NSMcontext *
 b2nsm_context(NSMcontext *context)
 {
+  NSMcontext *prev = nsm;
   nsm = context;
+  return prev;
 }
 /* -- b2nsm_strerror ---------------------------------------------------- */
 const char *
@@ -374,6 +383,7 @@ b2nsm_error(NSMmsg *msg, const char *fmt, ...)
   va_list ap;
   const char *node = nsmlib_nodename(nsm, msg->node);
   char buf[256];
+  char *ptr = buf;
   int  len;
   int  pars[2];
   
@@ -386,13 +396,14 @@ b2nsm_error(NSMmsg *msg, const char *fmt, ...)
     va_end(ap);
     len = strlen(buf) + 1;
   } else {
-    strcpy(buf, "(no message)");
+    ptr = 0;
+    len = 0;
   }
 
   pars[0] = msg->req;
   pars[1] = msg->seq;
   
-  return b2nsm_sendany(node, "ERROR", 2, pars, len, buf, "error");
+  return b2nsm_sendany(node, "ERROR", 2, pars, len, ptr, "error");
 }
 /* -- b2nsm_readmem ----------------------------------------------------- */
 int
@@ -499,15 +510,15 @@ b2nsm_wait(float timeout)
 
   if (! nsmc) return 0;
 
-  /* receive */
-  if (nsmlib_recv(nsmc, (NSMtcphead *)buf, 1000) <= 0) { /* 1 sec */
+  /* receive (wait 1 sec) */
+  if (nsmlib_recv(nsmc, (struct NSMtcphead_struct *)buf, 1000) <= 0) {
     return -1;
   }
 
   /* callback function */
   nsmsav = nsm;
   nsm = nsmc;
-  nsmlib_call(nsmc, (NSMtcphead *)buf);
+  nsmlib_call(nsmc, (struct NSMtcphead_struct *)buf);
   nsm = nsmsav;
   return 1;
 }

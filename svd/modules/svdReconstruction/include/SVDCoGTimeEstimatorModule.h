@@ -166,8 +166,6 @@ namespace Belle2 {
     float CalculateAmplitudeError(VxdID ThisSensorID, bool ThisSide, int ThisCellID);
     /** Function to calculate chi2, that is not used here, so just set at 0.01 */
     float CalculateChi2();
-    /** Function to convert SVDModeByte into the number of samples used */
-    int fromModeToNumberOfSample(int modality);
 
     //calibration objects
     SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShaper calibrations db object*/

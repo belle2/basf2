@@ -1,10 +1,10 @@
 # Test for the parallel certified flag in all modules in the standard simulation.
 
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
 
 # Create an empty path
-path = create_path()
+path = b2.create_path()
 
 # Add only the simulation
 add_simulation(path, bkgfiles="some_file", simulateT0jitter=True)
@@ -16,4 +16,4 @@ if modules[0].name() == 'BGOverlayInput':
 
 for m in modules:
     assert m.has_properties(
-        ModulePropFlags.PARALLELPROCESSINGCERTIFIED), '%s is missing c_ParallelProcessingCertified flag!' % (m)
+        b2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED), '%s is missing c_ParallelProcessingCertified flag!' % (m)

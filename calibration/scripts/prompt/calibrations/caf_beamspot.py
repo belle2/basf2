@@ -7,12 +7,16 @@ Airflow script to perform BeamSpot calibration.
 from prompt import CalibrationSettings
 
 #: Tells the automated system some details of this script
-settings = CalibrationSettings(name="BeamSpot Calibrations",
-                               expert_username="casarosa",
-                               description=__doc__,
-                               input_data_formats=["cdst"],
-                               input_data_names=["hlt_mumu"],
-                               depends_on=[])
+settings = CalibrationSettings(
+    name="BeamSpot Calibrations",
+    expert_username="zlebcr",
+    description=__doc__,
+    input_data_formats=["cdst"],
+    input_data_names=["hlt_mumu"],
+    expert_config={
+        "outerLoss": "pow(rawTime - 2.0, 2) + 10 * pow(maxGap, 2)",
+        "innerLoss": "pow(rawTime - 0.5, 2) + 10 * pow(maxGap, 2)"},
+    depends_on=[])
 
 ##############################
 
@@ -44,7 +48,7 @@ def get_calibrations(input_data, **kwargs):
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!
     # Lets set some limits because this calibration doesn't need that much to run.
-    max_files_per_run = 100
+    max_files_per_run = 1000000
 
     # We filter out any more than 100 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
     # already. This procedure respects that ordering
@@ -65,17 +69,15 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     # Algorithm setup
 
-    import ROOT
     from ROOT.Belle2 import BeamSpotAlgorithm
     from basf2 import create_path, register_module
     import modularAnalysis as ana
-    import vertex as vx
 
     ###################################################
     # Calibration setup
 
     from caf.framework import Calibration
-    from caf.strategies import SequentialRunByRun
+    from caf.strategies import SingleIOV
 
     # module to be run prior the collector
     rec_path_1 = create_path()
@@ -84,20 +86,19 @@ def get_calibrations(input_data, **kwargs):
     muSelection += ' and nPXDHits >=1 and nSVDHits >= 8 and nCDCHits >= 20'
     ana.fillParticleList('mu+:BS', muSelection, path=rec_path_1)
     ana.reconstructDecay('Upsilon(4S):BS -> mu+:BS mu-:BS', '9.5<M<11.5', path=rec_path_1)
-    vx.kFit('Upsilon(4S):BS', conf_level=0, path=rec_path_1)
 
     collector_bs = register_module('BeamSpotCollector', Y4SPListName='Upsilon(4S):BS')
     algorithm_bs = BeamSpotAlgorithm()
+    algorithm_bs.setOuterLoss(kwargs['expert_config']['outerLoss'])
+    algorithm_bs.setInnerLoss(kwargs['expert_config']['innerLoss'])
 
     calibration_bs = Calibration('BeamSpot',
                                  collector=collector_bs,
                                  algorithms=algorithm_bs,
                                  input_files=input_files_physics,
-                                 pre_collector_path=rec_path_1,
-                                 output_patterns=None,
-                                 max_files_per_collector_job=1)
+                                 pre_collector_path=rec_path_1)
 
-    calibration_bs.strategies = SequentialRunByRun
+    calibration_bs.strategies = SingleIOV
 
     # Do this for the default AlgorithmStrategy to force the output payload IoV
     # It may be different if you are using another strategy like SequentialRunByRun

@@ -19,8 +19,8 @@
  *
  *  - what we accept as reasonable stack usage (MAX_MATRIX_SIZE)
  *
- * To give you a feeling: 100x100 results in the cov upddate function
- * in the Kalman class beeing 300kb big.
+ * To give you a feeling: 100x100 results in the cov update function
+ * in the Kalman class being 300kb big.
  * 120x120 already exceeds the Eigen limit (for a single matrix).
 */
 

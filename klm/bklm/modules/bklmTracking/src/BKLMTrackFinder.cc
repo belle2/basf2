@@ -67,13 +67,16 @@ bool BKLMTrackFinder::filter(const std::list<BKLMHit2d*>& seed,
     // no duplicate hit is alreday guaranteed and now we allow hits on same layer so the following is commented out
     // bool skip = false;
     // for (j = track.begin(); j != track.end(); ++j) {
-    //  if ((*j)->getLayer() == (*i)->getLayer()) skip = true;
+    //  if ((*j)->getLayer() == (*i)->getLayer())
+    //    skip = true;
     // }
-    // if (skip == true) continue;
+    // if (skip == true)
+    //   continue;
 
     if ((*i)->isOnStaTrack() == false) {
       double error, sigma;
-      if (m_globalFit) m_Fitter->globalDistanceToHit(*i, error, sigma);
+      if (m_globalFit)
+        m_Fitter->globalDistanceToHit(*i, error, sigma);
       else m_Fitter->distanceToHit(*i, error, sigma);
       //B2INFO("BKLMTrackFinder" << " Error: " << error << " Sigma: " << sigma);
       if (sigma < 5.0) {
@@ -82,7 +85,8 @@ bool BKLMTrackFinder::filter(const std::list<BKLMHit2d*>& seed,
     }
   }
 
-  if (track.size() < 3) return false;
+  if (track.size() < 3)
+    return false;
 
   // Fit with new hits
   double chisqr = m_Fitter->fit(track);

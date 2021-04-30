@@ -11,18 +11,20 @@
 
           For example:
 
-          LLL1: PHI=  -42.40 mrad
+          LLL1: PHI=  -41.50 mrad
 
-          LHL1: PHT=  41.60 mrad 
+          LHL1: PHT=  41.50 mrad 
 
 
 
-          LHR1: PHI=  41.58 mrad
+          LHR1: PHI=  41.50 mrad
 
-          LLR1: PHI= -40.51 mrad
+          LLR1: PHI= -41.50 mrad
 
 	 -->
+
       <!-- limits -->
+
       <TubeR>
          <N desc="Number of planes">4</N>
          <sec name="Z0" unit="cm">373.45</sec>
@@ -56,34 +58,36 @@
          <sec name="r2" unit="cm">0.0</sec>
          <sec name="r3" unit="cm">0.0</sec>
       </TubeL>
+
       <!-- straight parts of vacuum tube -->
+
       <Straight type="pipe" name="LHR1">
          <sec name="X0" unit="m">0.0</sec>
          <sec name="Z0" unit="m">0.0</sec>
-         <sec name="L" unit="m">8.190</sec>
-         <sec name="PHI" unit="rad">0.04158</sec>
+         <sec name="L" unit="m">8.187</sec>
+         <sec name="PHI" unit="rad">0.04150</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
-         <Material>Cu</Material>
+	 <Material>Cu</Material>
          <Desc>Right HER far beam pipe straight part 1</Desc>
          <Intersect>TubeR</Intersect>
       </Straight>
       <Straight type="pipe" name="LHR2">
-         <sec name="X0" unit="m">0.427</sec>
-         <sec name="Z0" unit="m">10.411</sec>
-         <sec name="L" unit="m">20.000</sec>
-         <sec name="PHI" unit="rad">0.03573</sec>
+         <sec name="X0" unit="m">0.425</sec>
+         <sec name="Z0" unit="m">10.414</sec>
+         <sec name="L" unit="m">25.000</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
-         <Material>Cu</Material>
+	 <Material>Cu</Material>
          <Desc>Right HER far beam pipe straight part 2</Desc>
          <Intersect>TubeR</Intersect>
       </Straight>
       <Straight type="pipe" name="LLR1">
          <sec name="X0" unit="m">0.0</sec>
          <sec name="Z0" unit="m">0.0</sec>
-         <sec name="L" unit="m">4.000</sec>
-         <sec name="PHI" unit="rad">-0.04051</sec>
+         <sec name="L" unit="m">4.031</sec>
+         <sec name="PHI" unit="rad">-0.04150</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
@@ -91,10 +95,10 @@
          <Intersect>TubeR</Intersect>
       </Straight>
       <Straight type="pipe" name="LLR2">
-         <sec name="X0" unit="m">-0.176</sec>
-         <sec name="Z0" unit="m">4.341</sec>
-         <sec name="L" unit="m">1.194</sec>
-         <sec name="PHI" unit="rad">-0.03998</sec>
+         <sec name="X0" unit="m">-0.175</sec>
+         <sec name="Z0" unit="m">4.309</sec>
+         <sec name="L" unit="m">1.223</sec>
+         <sec name="PHI" unit="rad">-0.04008</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
@@ -102,29 +106,29 @@
       </Straight>
       <Straight type="pipe" name="LLR3">
          <sec name="X0" unit="m">-0.297</sec>
-         <sec name="Z0" unit="m">7.763</sec>
-         <sec name="L" unit="m">0.300</sec>
-         <sec name="PHI" unit="rad">-0.02554</sec>
+         <sec name="Z0" unit="m">7.765</sec>
+         <sec name="L" unit="m">0.495</sec>
+         <sec name="PHI" unit="rad">-0.02424</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
          <Desc>Right LER far beam pipe straight part 3</Desc>
       </Straight>
       <Straight type="pipe" name="LLR4">
-         <sec name="X0" unit="m">-0.329</sec>
-         <sec name="Z0" unit="m">10.293</sec>
-         <sec name="L" unit="m">9.924</sec>
-         <sec name="PHI" unit="rad">0.00358</sec>
+         <sec name="X0" unit="m">-0.334</sec>
+         <sec name="Z0" unit="m">10.495</sec>
+         <sec name="L" unit="m">10.063</sec>
+         <sec name="PHI" unit="rad">0.00278</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
          <Desc>Right LER far beam pipe straight part 4</Desc>
       </Straight>
       <Straight type="pipe" name="LLR5">
-         <sec name="X0" unit="m">-0.408</sec>
-         <sec name="Z0" unit="m">24.404</sec>
-         <sec name="L" unit="m">3.494</sec>
-         <sec name="PHI" unit="rad">-0.05842</sec>
+         <sec name="X0" unit="m">-0.423</sec>
+         <sec name="Z0" unit="m">24.715</sec>
+         <sec name="L" unit="m">3.524</sec>
+         <sec name="PHI" unit="rad">-0.05849</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
@@ -134,8 +138,8 @@
       <Straight type="pipe" name="LHL1">
          <sec name="X0" unit="m">0.0</sec>
          <sec name="Z0" unit="m">0.0</sec>
-         <sec name="L" unit="m">7.505</sec>
-         <sec name="PHI" unit="rad">-3.09999</sec>
+         <sec name="L" unit="m">7.504</sec>
+         <sec name="PHI" unit="rad">-3.10014</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
@@ -143,23 +147,23 @@
          <Intersect>TubeL</Intersect>
       </Straight>
       <Straight type="pipe" name="LHL2">
-         <sec name="X0" unit="m">-0.451</sec>
-         <sec name="Z0" unit="m">-11.096</sec>
-         <sec name="L" unit="m">18.701</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+         <sec name="X0" unit="m">-0.449</sec>
+         <sec name="Z0" unit="m">-11.098</sec>
+	 <!-- use shorter than actual length to fit inside +-29m -->
+	 <!-- <sec name="L" unit="m">24.980</sec> -->
+         <sec name="L" unit="m">14.980</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="R" unit="cm">4.4</sec>
-         <!--r unit="cm">4.0</r-->
-         <!-- movable collimator -->
-         <sec name="r" unit="cm">0.0</sec>
+         <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
          <Desc>Left HER far beam pipe straight part 2</Desc>
-         <Intersect>TubeL</Intersect>
+	 <!-- <Intersect>TubeL</Intersect> -->
       </Straight>
       <Straight type="pipe" name="LLL1">
          <sec name="X0" unit="m">0.0</sec>
          <sec name="Z0" unit="m">0.0</sec>
-         <sec name="L" unit="m">4.000</sec>
-         <sec name="PHI" unit="rad">-3.18399</sec>
+         <sec name="L" unit="m">4.032</sec>
+         <sec name="PHI" unit="rad">3.10010</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
@@ -167,103 +171,115 @@
          <Intersect>TubeL</Intersect>
       </Straight>
       <Straight type="pipe" name="LLL2">
-         <sec name="X0" unit="m">0.185</sec>
-         <sec name="Z0" unit="m">-4.340</sec>
-         <sec name="L" unit="m">1.194</sec>
-         <sec name="PHI" unit="rad">-3.18479</sec>
+         <sec name="X0" unit="m">0.182</sec>
+         <sec name="Z0" unit="m">-4.309</sec>
+         <sec name="L" unit="m">1.174</sec>
+         <sec name="PHI" unit="rad">3.09900</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
          <Desc>Left LER far beam pipe straight part 2</Desc>
       </Straight>
       <Straight type="pipe" name="LLL3">
-         <sec name="X0" unit="m">0.482</sec>
-         <sec name="Z0" unit="m">-9.515</sec>
-         <sec name="L" unit="m">12.008</sec>
-         <sec name="PHI" unit="rad">-3.22169</sec>
+         <sec name="X0" unit="m">0.321</sec>
+         <sec name="Z0" unit="m">-7.082</sec>
+         <sec name="L0" unit="m">1.600</sec>
+         <sec name="L" unit="m">0.446</sec>
+         <sec name="PHI" unit="rad">3.07428</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
          <Desc>Left LER far beam pipe straight part 3</Desc>
       </Straight>
       <Straight type="pipe" name="LLL4">
-         <sec name="X0" unit="m">1.645</sec>
-         <sec name="Z0" unit="m">-25.668</sec>
-         <sec name="L" unit="m">3.494</sec>
-         <sec name="PHI" unit="rad">-3.15809</sec>
+         <sec name="X0" unit="m">0.513</sec>
+         <sec name="Z0" unit="m">-9.757</sec>
+         <sec name="L" unit="m">12.404</sec>
+         <sec name="PHI" unit="rad">3.06429</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
          <Desc>Left LER far beam pipe straight part 4</Desc>
-         <Intersect>TubeL</Intersect>
       </Straight>
-      <!-- bending parts: pipes and magnets -->
-      <Bending type="pipe" name="BLC2RE">
-         <sec name="X0" unit="m">-380.884</sec>
-         <sec name="Z0" unit="m">24.041</sec>
-         <sec name="RT" unit="m">381.554</sec>
-         <sec name="SPHI" unit="rad">-0.04158</sec>
-         <sec name="DPHI" unit="rad">0.00585</sec>
+      <Straight type="pipe" name="LLL5">
+         <sec name="X0" unit="m">1.661</sec>
+         <sec name="Z0" unit="m">-26.279</sec>
+	 <!-- use shorter than actual length to fit inside +-29m -->
+	 <!-- <sec name="L" unit="m">3.524</sec> -->
+	 <sec name="L" unit="m">2.524</sec>
+         <sec name="PHI" unit="rad">3.12741</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
+         <Desc>Left LER far beam pipe straight part 5</Desc>
+         <Intersect>TubeL</Intersect>
+      </Straight>
+
+      <!-- bending parts: pipes and magnets -->
+
+      <Bending type="pipe" name="BLC2RE">
+         <sec name="X0" unit="m">-376.985</sec>
+         <sec name="Z0" unit="m">23.848</sec>
+         <sec name="RT" unit="m">377.649</sec>
+         <sec name="SPHI" unit="rad">-0.04150</sec>
+         <sec name="DPHI" unit="rad">0.00592</sec>
+         <sec name="R" unit="cm">4.4</sec>
+         <sec name="r" unit="cm">4.0</sec>
+	 <Material>Cu</Material>
          <Desc>Right HER far beam pipe bending part 1</Desc>
-         <Subtract>LHR1</Subtract>
+         <Subtract>LHR2</Subtract>
       </Bending>
       <Bending type="magnet" name="BLC2REcoil">
-         <sec name="X0" unit="m">-380.884</sec>
-         <sec name="Z0" unit="m">24.041</sec>
-         <sec name="RT" unit="m">381.554</sec>
-         <sec name="SPHI" unit="rad">-0.04158</sec>
-         <sec name="DPHI" unit="rad">0.00585</sec>
+         <sec name="X0" unit="m">-376.985</sec>
+         <sec name="Z0" unit="m">23.848</sec>
+         <sec name="RT" unit="m">377.649</sec>
+         <sec name="SPHI" unit="rad">-0.04150</sec>
+         <sec name="DPHI" unit="rad">0.00592</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
-         <Material>Cu</Material>
+	 <Material>Cu</Material>
          <Desc>BLC2RE magnet coil</Desc>
       </Bending>
       <Bending type="magnet" name="BLC2REyoke">
-         <sec name="X0" unit="m">-380.884</sec>
-         <sec name="Z0" unit="m">24.041</sec>
-         <sec name="RT" unit="m">381.554</sec>
-         <sec name="SPHI" unit="rad">-0.04158</sec>
-         <sec name="DPHI" unit="rad">0.00585</sec>
+         <sec name="X0" unit="m">-376.985</sec>
+         <sec name="Z0" unit="m">23.848</sec>
+         <sec name="RT" unit="m">377.649</sec>
+         <sec name="SPHI" unit="rad">-0.04150</sec>
+         <sec name="DPHI" unit="rad">0.00592</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
-         <Material>Fe</Material>
+	 <Material>Fe</Material>
          <Desc>BLC2RE magnet yoke</Desc>
       </Bending>
       <Bending type="pipe" name="BC1RP">
-         <sec name="X0" unit="m">656.907</sec>
-         <sec name="Z0" unit="m">30.627</sec>
-         <sec name="RT" unit="m">657.608</sec>
-         <sec name="SPHI" unit="rad">-3.10161</sec>
-         <sec name="SPHI1" unit="rad">-3.10109</sec>
-         <sec name="DPHI" unit="rad">0.000524</sec>
+         <sec name="X0" unit="m">197.942</sec>
+         <sec name="Z0" unit="m">12.254</sec>
+         <sec name="RT" unit="m">198.278</sec>
+         <sec name="SPHI" unit="rad">-3.101511</sec>
+         <sec name="DPHI" unit="rad">0.001421</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
          <Desc>Right LER far beam pipe bending part 1</Desc>
-         <Subtract>LLR2</Subtract>
+         <Subtract>LLR1</Subtract>
       </Bending>
       <Bending type="magnet" name="BC1RPcoil">
-         <sec name="X0" unit="m">656.907</sec>
-         <sec name="Z0" unit="m">30.627</sec>
-         <sec name="RT" unit="m">657.608</sec>
-         <sec name="SPHI" unit="rad">-3.10161</sec>
-         <sec name="SPHI1" unit="rad">-3.10109</sec>
-         <sec name="DPHI" unit="rad">0.000524</sec>
+         <sec name="X0" unit="m">197.942</sec>
+         <sec name="Z0" unit="m">12.254</sec>
+         <sec name="RT" unit="m">198.278</sec>
+         <sec name="SPHI" unit="rad">-3.10151</sec>
+         <sec name="DPHI" unit="rad">0.00142</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>BC1RP magnet coil</Desc>
       </Bending>
       <Bending type="magnet" name="BC1RPyoke">
-         <sec name="X0" unit="m">656.907</sec>
-         <sec name="Z0" unit="m">30.627</sec>
-         <sec name="RT" unit="m">657.608</sec>
-         <sec name="SPHI" unit="rad">-3.10161</sec>
-         <sec name="SPHI1" unit="rad">-3.10109</sec>
-         <sec name="DPHI" unit="rad">0.000524</sec>
+         <sec name="X0" unit="m">197.942</sec>
+         <sec name="Z0" unit="m">12.254</sec>
+         <sec name="RT" unit="m">198.278</sec>
+         <sec name="SPHI" unit="rad">-3.10151</sec>
+         <sec name="DPHI" unit="rad">0.00142</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
@@ -271,80 +287,81 @@
          <Subtract>QKAREyoke</Subtract>
       </Bending>
       <Bending type="pipe" name="BLCWRP">
-         <sec name="X0" unit="m">154.031</sec>
-         <sec name="Z0" unit="m">11.705</sec>
-         <sec name="RT" unit="m">154.378</sec>
-         <sec name="SPHI" unit="rad">-3.116055</sec>
-         <sec name="DPHI" unit="rad">0.014445</sec>
+         <sec name="X0" unit="m">140.774</sec>
+         <sec name="Z0" unit="m">11.185</sec>
+         <sec name="RT" unit="m">141.112</sec>
+         <sec name="SPHI" unit="rad">-3.11735</sec>
+         <sec name="DPHI" unit="rad">0.01584</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
          <Desc>Right LER far beam pipe bending part 2</Desc>
+         <Subtract>LLR2</Subtract>
       </Bending>
       <Bending type="magnet" name="BLCWRPcoil">
-         <sec name="X0" unit="m">154.031</sec>
-         <sec name="Z0" unit="m">11.705</sec>
-         <sec name="RT" unit="m">154.378</sec>
-         <sec name="SPHI" unit="rad">-3.116055</sec>
-         <sec name="DPHI" unit="rad">0.014445</sec>
+         <sec name="X0" unit="m">140.774</sec>
+         <sec name="Z0" unit="m">11.185</sec>
+         <sec name="RT" unit="m">141.112</sec>
+         <sec name="SPHI" unit="rad">-3.11735</sec>
+         <sec name="DPHI" unit="rad">0.01584</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>BLCWRP magnet coil</Desc>
       </Bending>
       <Bending type="magnet" name="BLCWRPyoke">
-         <sec name="X0" unit="m">154.031</sec>
-         <sec name="Z0" unit="m">11.705</sec>
-         <sec name="RT" unit="m">154.378</sec>
-         <sec name="SPHI" unit="rad">-3.116055</sec>
-         <sec name="DPHI" unit="rad">0.014445</sec>
+         <sec name="X0" unit="m">140.774</sec>
+         <sec name="Z0" unit="m">11.185</sec>
+         <sec name="RT" unit="m">141.112</sec>
+         <sec name="SPHI" unit="rad">-3.11735</sec>
+         <sec name="DPHI" unit="rad">0.01584</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>BLCWRP magnet yoke</Desc>
       </Bending>
       <Bending type="pipe" name="BLC1RP">
-         <sec name="X0" unit="m">76.280</sec>
-         <sec name="Z0" unit="m">10.019</sec>
-         <sec name="RT" unit="m">76.609</sec>
-         <sec name="SPHI" unit="rad">-3.14516</sec>
-         <sec name="DPHI" unit="rad">0.02911</sec>
+         <sec name="X0" unit="m">82.390</sec>
+         <sec name="Z0" unit="m">10.265</sec>
+         <sec name="RT" unit="m">82.724</sec>
+         <sec name="SPHI" unit="rad">-3.14437</sec>
+         <sec name="DPHI" unit="rad">0.02702</sec>
          <sec name="R" unit="cm">4.4</sec>
-         <!--r unit="cm">4.0</r-->
-         <!-- movable collimator -->
-         <sec name="r" unit="cm">0.0</sec>
+         <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
          <Desc>Right LER far beam pipe bending part 3</Desc>
          <Subtract>LLR3</Subtract>
       </Bending>
       <Bending type="magnet" name="BLC1RPcoil">
-         <sec name="X0" unit="m">76.280</sec>
-         <sec name="Z0" unit="m">10.019</sec>
-         <sec name="RT" unit="m">76.609</sec>
-         <sec name="SPHI" unit="rad">-3.14516</sec>
-         <sec name="DPHI" unit="rad">0.02911</sec>
+         <sec name="X0" unit="m">82.390</sec>
+         <sec name="Z0" unit="m">10.265</sec>
+         <sec name="RT" unit="m">82.724</sec>
+         <sec name="SPHI" unit="rad">-3.14437</sec>
+         <sec name="DPHI" unit="rad">0.02702</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>BLC1RP magnet coil</Desc>
       </Bending>
       <Bending type="magnet" name="BLC1RPyoke">
-         <sec name="X0" unit="m">76.280</sec>
-         <sec name="Z0" unit="m">10.019</sec>
-         <sec name="RT" unit="m">76.609</sec>
-         <sec name="SPHI" unit="rad">-3.14516</sec>
-         <sec name="DPHI" unit="rad">0.02911</sec>
+         <sec name="X0" unit="m">82.390</sec>
+         <sec name="Z0" unit="m">10.265</sec>
+         <sec name="RT" unit="m">82.724</sec>
+         <sec name="SPHI" unit="rad">-3.14437</sec>
+         <sec name="DPHI" unit="rad">0.02702</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>BLC1RP magnet yoke</Desc>
       </Bending>
+      <!-- Following torus goes through zero angle which causes strange visualization - divide it in two -->
       <Bending type="pipe" name="BLC2RP">
-         <sec name="X0" unit="m">-67.871</sec>
-         <sec name="Z0" unit="m">20.459</sec>
-         <sec name="RT" unit="m">67.578</sec>
-         <sec name="SPHI" unit="rad">-0.00358</sec>
-         <sec name="DPHI" unit="rad">0.06200</sec>
+         <sec name="X0" unit="m">-68.191</sec>
+         <sec name="Z0" unit="m">20.747</sec>
+         <sec name="RT" unit="m">67.885</sec>
+         <sec name="SPHI" unit="rad">-0.00278</sec>
+         <sec name="DPHI" unit="rad">0.00278</sec>
+         <sec name="DPHI0" unit="rad">0.06127</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
@@ -352,70 +369,138 @@
          <Subtract>LLR5</Subtract>
       </Bending>
       <Bending type="magnet" name="BLC2RPcoil">
-         <sec name="X0" unit="m">-67.871</sec>
-         <sec name="Z0" unit="m">20.459</sec>
-         <sec name="RT" unit="m">67.578</sec>
-         <sec name="SPHI" unit="rad">-0.00358</sec>
-         <sec name="DPHI" unit="rad">0.06200</sec>
+         <sec name="X0" unit="m">-68.191</sec>
+         <sec name="Z0" unit="m">20.747</sec>
+         <sec name="RT" unit="m">67.885</sec>
+         <sec name="SPHI" unit="rad">-0.00278</sec>
+         <sec name="DPHI" unit="rad">0.00278</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>BLC2RP magnet coil</Desc>
       </Bending>
       <Bending type="magnet" name="BLC2RPyoke">
-         <sec name="X0" unit="m">-67.871</sec>
-         <sec name="Z0" unit="m">20.459</sec>
-         <sec name="RT" unit="m">67.578</sec>
-         <sec name="SPHI" unit="rad">-0.00358</sec>
-         <sec name="DPHI" unit="rad">0.06200</sec>
+         <sec name="X0" unit="m">-68.191</sec>
+         <sec name="Z0" unit="m">20.747</sec>
+         <sec name="RT" unit="m">67.885</sec>
+         <sec name="SPHI" unit="rad">-0.00278</sec>
+         <sec name="DPHI" unit="rad">0.00278</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>BLC2RP magnet yoke</Desc>
       </Bending>
+
+      <Bending type="pipe" name="BLC2RP.2">
+         <sec name="X0" unit="m">-68.191</sec>
+         <sec name="Z0" unit="m">20.747</sec>
+         <sec name="RT" unit="m">67.885</sec>
+         <sec name="SPHI" unit="rad">0.0</sec>
+         <sec name="DPHI" unit="rad">0.05849</sec>
+         <sec name="R" unit="cm">4.4</sec>
+         <sec name="r" unit="cm">4.0</sec>
+         <Material>Cu</Material>
+         <Desc>Right LER far beam pipe bending part 4</Desc>
+         <Subtract>LLR5</Subtract>
+      </Bending>
+      <Bending type="magnet" name="BLC2RP2coil">
+         <sec name="X0" unit="m">-68.191</sec>
+         <sec name="Z0" unit="m">20.747</sec>
+         <sec name="RT" unit="m">67.885</sec>
+         <sec name="SPHI" unit="rad">0.0</sec>
+         <sec name="DPHI" unit="rad">0.05849</sec>
+         <sec name="R" unit="cm">10.0</sec>
+         <sec name="r" unit="cm">5.0</sec>
+         <Material>Cu</Material>
+         <Desc>BLC2RP magnet coil</Desc>
+      </Bending>
+      <Bending type="magnet" name="BLC2RP2yoke">
+         <sec name="X0" unit="m">-68.191</sec>
+         <sec name="Z0" unit="m">20.747</sec>
+         <sec name="RT" unit="m">67.885</sec>
+         <sec name="SPHI" unit="rad">0.0</sec>
+         <sec name="DPHI" unit="rad">0.05849</sec>
+         <sec name="R" unit="cm">20.0</sec>
+         <sec name="r" unit="cm">10.0</sec>
+         <Material>Fe</Material>
+         <Desc>BLC2RP magnet yoke</Desc>
+      </Bending>
+
+
+      <Bending type="pipe" name="BLY2RP.2">
+         <sec name="X0" unit="m">-68.369</sec>
+         <sec name="Z0" unit="m">24.266</sec>
+         <sec name="RT" unit="m">67.856</sec>
+         <sec name="SPHI" unit="rad">0.05849</sec>
+         <sec name="DPHI" unit="rad">0.06131</sec>
+         <sec name="R" unit="cm">4.4</sec>
+         <sec name="r" unit="cm">4.0</sec>
+         <Material>Cu</Material>
+         <Desc>Right LER far beam pipe bending part 5</Desc>
+         <Subtract>LLR5</Subtract>
+      </Bending>
+      <Bending type="magnet" name="BLY2RP.2coil">
+         <sec name="X0" unit="m">-68.369</sec>
+         <sec name="Z0" unit="m">24.266</sec>
+         <sec name="RT" unit="m">67.856</sec>
+         <sec name="SPHI" unit="rad">0.05849</sec>
+         <sec name="DPHI" unit="rad">0.06131</sec>
+         <sec name="R" unit="cm">10.0</sec>
+         <sec name="r" unit="cm">5.0</sec>
+         <Material>Cu</Material>
+         <Desc>BLY2RP.2 magnet coil</Desc>
+      </Bending>
+      <Bending type="magnet" name="BLY2RP.2yoke">
+         <sec name="X0" unit="m">-68.369</sec>
+         <sec name="Z0" unit="m">24.266</sec>
+         <sec name="RT" unit="m">67.856</sec>
+         <sec name="SPHI" unit="rad">0.05849</sec>
+         <sec name="DPHI" unit="rad">0.06131</sec>
+         <sec name="R" unit="cm">20.0</sec>
+         <sec name="r" unit="cm">10.0</sec>
+         <Material>Fe</Material>
+         <Desc>BLY2RP.2 magnet yoke</Desc>
+      </Bending>
       <Bending type="pipe" name="BLC1LE">
-         <sec name="X0" unit="m">616.500</sec>
-         <sec name="Z0" unit="m">-33.150</sec>
-         <sec name="RT" unit="m">617.345</sec>
-         <sec name="SPHI" unit="rad">3.10000</sec>
-         <sec name="DPHI" unit="rad">0.00586</sec>
-         <sec name="DPHI1" unit="rad">0.00583</sec>
+         <sec name="X0" unit="m">612.901</sec>
+         <sec name="Z0" unit="m">-32.932</sec>
+         <sec name="RT" unit="m">613.739</sec>
+         <sec name="SPHI" unit="rad">3.10014</sec>
+         <sec name="DPHI" unit="rad">0.00587</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
          <Desc>Left HER far beam pipe bending part 1</Desc>
-         <Subtract>LHL1</Subtract>
+         <Subtract>LHL2</Subtract>
       </Bending>
       <Bending type="magnet" name="BLC1LEcoil">
-         <sec name="X0" unit="m">616.500</sec>
-         <sec name="Z0" unit="m">-33.150</sec>
-         <sec name="RT" unit="m">617.345</sec>
-         <sec name="SPHI" unit="rad">3.10000</sec>
-         <sec name="DPHI" unit="rad">0.00586</sec>
-         <sec name="DPHI1" unit="rad">0.00583</sec>
+         <sec name="X0" unit="m">612.901</sec>
+         <sec name="Z0" unit="m">-32.932</sec>
+         <sec name="RT" unit="m">613.739</sec>
+         <sec name="SPHI" unit="rad">3.10014</sec>
+         <sec name="DPHI" unit="rad">0.00587</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>BLC1LE magnet coil</Desc>
       </Bending>
       <Bending type="magnet" name="BLC1LEyoke">
-         <sec name="X0" unit="m">616.500</sec>
-         <sec name="Z0" unit="m">-33.150</sec>
-         <sec name="RT" unit="m">617.345</sec>
-         <sec name="SPHI" unit="rad">3.10000</sec>
-         <sec name="DPHI" unit="rad">0.00586</sec>
-         <sec name="DPHI1" unit="rad">0.00583</sec>
+         <sec name="X0" unit="m">612.901</sec>
+         <sec name="Z0" unit="m">-32.932</sec>
+         <sec name="RT" unit="m">613.739</sec>
+         <sec name="SPHI" unit="rad">3.10014</sec>
+         <sec name="DPHI" unit="rad">0.00587</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>BLC1LE magnet yoke</Desc>
       </Bending>
       <Bending type="pipe" name="BC1LP">
-         <sec name="X0" unit="m">449.227</sec>
-         <sec name="Z0" unit="m">15.073</sec>
-         <sec name="RT" unit="m">449.462</sec>
-         <sec name="SPHI" unit="rad">-3.099152</sec>
-         <sec name="DPHI" unit="rad">0.000766</sec>
+         <sec name="X0" unit="m">255.260</sec>
+         <sec name="Z0" unit="m">6.562</sec>
+         <sec name="RT" unit="m">255.311</sec>
+         <sec name="SPHI" unit="rad">-3.10010</sec>
+         <sec name="DPHI" unit="rad">0.00110</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
@@ -423,1057 +508,1055 @@
          <Subtract>LLL2</Subtract>
       </Bending>
       <Bending type="magnet" name="BC1LPcoil">
-         <sec name="X0" unit="m">449.227</sec>
-         <sec name="Z0" unit="m">15.073</sec>
-         <sec name="RT" unit="m">449.462</sec>
-         <sec name="SPHI" unit="rad">-3.099152</sec>
-         <sec name="DPHI" unit="rad">0.000766</sec>
+         <sec name="X0" unit="m">255.260</sec>
+         <sec name="Z0" unit="m">6.562</sec>
+         <sec name="RT" unit="m">255.311</sec>
+         <sec name="SPHI" unit="rad">-3.10010</sec>
+         <sec name="DPHI" unit="rad">0.00110</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>BC1LP magnet coil</Desc>
       </Bending>
       <Bending type="magnet" name="BC1LPyoke">
-         <sec name="X0" unit="m">449.227</sec>
-         <sec name="Z0" unit="m">15.073</sec>
-         <sec name="RT" unit="m">449.462</sec>
-         <sec name="SPHI" unit="rad">-3.099152</sec>
-         <sec name="DPHI" unit="rad">0.000766</sec>
+         <sec name="X0" unit="m">255.260</sec>
+         <sec name="Z0" unit="m">6.562</sec>
+         <sec name="RT" unit="m">255.311</sec>
+         <sec name="SPHI" unit="rad">-3.10010</sec>
+         <sec name="DPHI" unit="rad">0.00110</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>BC1LP magnet yoke</Desc>
-         <Subtract>QKALEyoke</Subtract>
       </Bending>
-      <Bending type="pipe" name="BLC1LP">
-         <sec name="X0" unit="m">108.176</sec>
-         <sec name="Z0" unit="m">-0.867</sec>
-         <sec name="RT" unit="m">108.041</sec>
-         <sec name="SPHI" unit="rad">-3.098387</sec>
-         <sec name="DPHI" unit="rad">0.036927</sec>
+      <Bending type="pipe" name="BLC1LP1">
+         <sec name="X0" unit="m">65.000</sec>
+         <sec name="Z0" unit="m">-2.721</sec>
+         <sec name="RT" unit="m">64.827</sec>
+         <sec name="SPHI" unit="rad">-3.09900</sec>
+         <sec name="DPHI" unit="rad">0.02472</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
          <Desc>Left LER far beam pipe bending part 2</Desc>
-         <Subtract>LLL3</Subtract>
+         <Subtract>LLL2</Subtract>
       </Bending>
-      <Bending type="magnet" name="BLC1LPcoil">
-         <sec name="X0" unit="m">108.176</sec>
-         <sec name="Z0" unit="m">-0.867</sec>
-         <sec name="RT" unit="m">108.041</sec>
-         <sec name="SPHI" unit="rad">-3.098387</sec>
-         <sec name="DPHI" unit="rad">0.036927</sec>
+      <Bending type="magnet" name="BLC1LP1coil">
+         <sec name="X0" unit="m">65.000</sec>
+         <sec name="Z0" unit="m">-2.721</sec>
+         <sec name="RT" unit="m">64.827</sec>
+         <sec name="SPHI" unit="rad">-3.09900</sec>
+         <sec name="DPHI" unit="rad">0.02472</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
-         <Desc>BLC1LP magnet coil</Desc>
+         <Desc>BLC1LP1 magnet coil</Desc>
       </Bending>
-      <Bending type="magnet" name="BLC1LPyoke">
-         <sec name="X0" unit="m">108.176</sec>
-         <sec name="Z0" unit="m">-0.867</sec>
-         <sec name="RT" unit="m">108.041</sec>
-         <sec name="SPHI" unit="rad">-3.098387</sec>
-         <sec name="DPHI" unit="rad">0.036927</sec>
+      <Bending type="magnet" name="BLC1LP1yoke">
+         <sec name="X0" unit="m">65.000</sec>
+         <sec name="Z0" unit="m">-2.721</sec>
+         <sec name="RT" unit="m">64.827</sec>
+         <sec name="SPHI" unit="rad">-3.09900</sec>
+         <sec name="DPHI" unit="rad">0.02472</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
-         <Desc>BLC1LP magnet yoke</Desc>
+         <Desc>BLC1LP1 magnet yoke</Desc>
       </Bending>
-      <Bending type="pipe" name="BLC2LP">
-         <sec name="X0" unit="m">-64.139</sec>
-         <sec name="Z0" unit="m">-26.750</sec>
-         <sec name="RT" unit="m">65.793</sec>
-         <sec name="SPHI" unit="rad">0.016455</sec>
-         <sec name="DPHI" unit="rad">0.063678</sec>
+      <Bending type="pipe" name="BLC1LP2">
+         <sec name="X0" unit="m">223.657</sec>
+         <sec name="Z0" unit="m">7.527</sec>
+         <sec name="RT" unit="m">223.8125</sec>
+         <sec name="SPHI" unit="rad">-3.07428</sec>
+         <sec name="DPHI" unit="rad">0.009985</sec>
          <sec name="R" unit="cm">4.4</sec>
          <sec name="r" unit="cm">4.0</sec>
          <Material>Cu</Material>
          <Desc>Left LER far beam pipe bending part 3</Desc>
          <Subtract>LLL3</Subtract>
       </Bending>
+      <Bending type="magnet" name="BLC1LP2coil">
+         <sec name="X0" unit="m">223.657</sec>
+         <sec name="Z0" unit="m">7.528</sec>
+         <sec name="RT" unit="m">223.8125</sec>
+         <sec name="SPHI" unit="rad">-3.07428</sec>
+         <sec name="DPHI" unit="rad">0.00999</sec>
+         <sec name="R" unit="cm">10.0</sec>
+         <sec name="r" unit="cm">5.0</sec>
+         <Material>Cu</Material>
+	 <Desc>BLC1LP2 magnet coil</Desc>
+      </Bending>
+      <Bending type="magnet" name="BLC1LP2yoke">
+         <sec name="X0" unit="m">223.657</sec>
+         <sec name="Z0" unit="m">7.528</sec>
+         <sec name="RT" unit="m">223.8125</sec>
+         <sec name="SPHI" unit="rad">-3.07428</sec>
+         <sec name="DPHI" unit="rad">0.00999</sec>
+         <sec name="R" unit="cm">20.0</sec>
+         <sec name="r" unit="cm">10.0</sec>
+         <Material>Fe</Material>
+         <Desc>BLC1LP2 magnet yoke</Desc>
+      </Bending>
+      <Bending type="pipe" name="BLC2LP">
+         <sec name="X0" unit="m">-64.239</sec>
+         <sec name="Z0" unit="m">-27.214</sec>
+         <sec name="RT" unit="m">65.907</sec>
+         <sec name="SPHI" unit="rad">0.01418</sec>
+         <sec name="DPHI" unit="rad">0.06312</sec>
+         <sec name="R" unit="cm">4.4</sec>
+         <sec name="r" unit="cm">4.0</sec>
+         <Material>Cu</Material>
+         <Desc>Left LER far beam pipe bending part 4</Desc>
+         <Subtract>LLL5</Subtract>
+      </Bending>
       <Bending type="magnet" name="BLC2LPcoil">
-         <sec name="X0" unit="m">-64.139</sec>
-         <sec name="Z0" unit="m">-26.750</sec>
-         <sec name="RT" unit="m">65.793</sec>
-         <sec name="SPHI" unit="rad">0.016455</sec>
-         <sec name="DPHI" unit="rad">0.063678</sec>
+         <sec name="X0" unit="m">-64.239</sec>
+         <sec name="Z0" unit="m">-27.214</sec>
+         <sec name="RT" unit="m">65.907</sec>
+         <sec name="SPHI" unit="rad">0.01418</sec>
+         <sec name="DPHI" unit="rad">0.06312</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>BLC2LP magnet coil</Desc>
       </Bending>
       <Bending type="magnet" name="BLC2LPyoke">
-         <sec name="X0" unit="m">-64.139</sec>
-         <sec name="Z0" unit="m">-26.750</sec>
-         <sec name="RT" unit="m">65.793</sec>
-         <sec name="SPHI" unit="rad">0.016455</sec>
-         <sec name="DPHI" unit="rad">0.063678</sec>
+         <sec name="X0" unit="m">-64.239</sec>
+         <sec name="Z0" unit="m">-27.214</sec>
+         <sec name="RT" unit="m">65.907</sec>
+         <sec name="SPHI" unit="rad">0.01418</sec>
+         <sec name="DPHI" unit="rad">0.06312</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>BLC2LP magnet yoke</Desc>
       </Bending>
+
       <!-- magnets -->
-      <Straight type="magnet" name="BKC1REcoil">
-         <sec name="X0" unit="m">0.563</sec>
-         <sec name="Z0" unit="m">14.220</sec>
-         <sec name="L" unit="m">0.3444</sec>
-         <sec name="PHI" unit="rad">0.03573</sec>
+
+      <Straight type="magnet" name="BC1REcoil">
+         <sec name="X0" unit="m">0.558</sec>
+         <sec name="Z0" unit="m">14.132</sec>
+         <sec name="L" unit="m">0.361</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="r" unit="cm">5.0</sec>
          <sec name="R" unit="cm">10.0</sec>
          <Material>Cu</Material>
-         <Desc>Magnet BKC1RE coil</Desc>
+         <Desc>Magnet BC1RE coil</Desc>
       </Straight>
-      <Straight type="magnet" name="BKC1REyoke">
-         <sec name="X0" unit="m">0.563</sec>
-         <sec name="Z0" unit="m">14.220</sec>
-         <sec name="L" unit="m">0.3444</sec>
-         <sec name="PHI" unit="rad">0.03573</sec>
+      <Straight type="magnet" name="BC1REyoke">
+         <sec name="X0" unit="m">0.558</sec>
+         <sec name="Z0" unit="m">14.132</sec>
+         <sec name="L" unit="m">0.361</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="r" unit="cm">10.0</sec>
          <sec name="R" unit="cm">20.0</sec>
          <Material>Fe</Material>
-         <Desc>Magnet BKC1RE yoke</Desc>
+         <Desc>Magnet BC1RE yoke</Desc>
       </Straight>
-      <Straight type="magnet" name="BKC2REcoil">
-         <sec name="X0" unit="m">0.687</sec>
-         <sec name="Z0" unit="m">17.688</sec>
-         <sec name="L" unit="m">0.3444</sec>
-         <sec name="PHI" unit="rad">0.03573</sec>
+      <Straight type="magnet" name="BC2REcoil">
+         <sec name="X0" unit="m">0.684</sec>
+         <sec name="Z0" unit="m">17.679</sec>
+         <sec name="L" unit="m">0.361</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="r" unit="cm">5.0</sec>
          <sec name="R" unit="cm">10.0</sec>
          <Material>Cu</Material>
-         <Desc>Magnet BKC2RE coil</Desc>
+         <Desc>Magnet BC2RE coil</Desc>
       </Straight>
-      <Straight type="magnet" name="BKC2REyoke">
-         <sec name="X0" unit="m">0.687</sec>
-         <sec name="Z0" unit="m">17.688</sec>
-         <sec name="L" unit="m">0.3444</sec>
-         <sec name="PHI" unit="rad">0.03573</sec>
+      <Straight type="magnet" name="BC2REyoke">
+         <sec name="X0" unit="m">0.684</sec>
+         <sec name="Z0" unit="m">17.679</sec>
+         <sec name="L" unit="m">0.361</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="r" unit="cm">10.0</sec>
          <sec name="R" unit="cm">20.0</sec>
          <Material>Fe</Material>
-         <Desc>Magnet BKC2RE yoke</Desc>
+         <Desc>Magnet BC2RE yoke</Desc>
       </Straight>
-      <Straight type="magnet" name="BKC3REcoil">
-         <sec name="X0" unit="m">0.873</sec>
-         <sec name="Z0" unit="m">22.909</sec>
-         <sec name="L" unit="m">0.3444</sec>
-         <sec name="PHI" unit="rad">0.03573</sec>
+      <Straight type="magnet" name="BC3REcoil">
+         <sec name="X0" unit="m">0.870</sec>
+         <sec name="Z0" unit="m">22.901</sec>
+         <sec name="L" unit="m">0.361</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="r" unit="cm">5.0</sec>
          <sec name="R" unit="cm">10.0</sec>
          <Material>Cu</Material>
-         <Desc>Magnet BKC3RE coil</Desc>
+         <Desc>Magnet BC3RE coil</Desc>
       </Straight>
-      <Straight type="magnet" name="BKC3REyoke">
-         <sec name="X0" unit="m">0.873</sec>
-         <sec name="Z0" unit="m">22.909</sec>
-         <sec name="L" unit="m">0.3444</sec>
-         <sec name="PHI" unit="rad">0.03573</sec>
+      <Straight type="magnet" name="BC3REyoke">
+         <sec name="X0" unit="m">0.870</sec>
+         <sec name="Z0" unit="m">22.901</sec>
+         <sec name="L" unit="m">0.361</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="r" unit="cm">10.0</sec>
          <sec name="R" unit="cm">20.0</sec>
          <Material>Fe</Material>
-         <Desc>Magnet BKC3RE yoke</Desc>
+         <Desc>Magnet BC3RE yoke</Desc>
       </Straight>
-      <Straight type="magnet" name="BKC4REcoil">
-         <sec name="X0" unit="m">0.978</sec>
-         <sec name="Z0" unit="m">25.828</sec>
-         <sec name="L" unit="m">0.3444</sec>
-         <sec name="PHI" unit="rad">0.03573</sec>
+      <Straight type="magnet" name="BC4REcoil">
+         <sec name="X0" unit="m">0.974</sec>
+         <sec name="Z0" unit="m">25.820</sec>
+         <sec name="L" unit="m">0.361</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="r" unit="cm">5.0</sec>
          <sec name="R" unit="cm">10.0</sec>
          <Material>Cu</Material>
-         <Desc>Magnet BKC4RE coil</Desc>
+         <Desc>Magnet BC4RE coil</Desc>
       </Straight>
-      <Straight type="magnet" name="BKC4REyoke">
-         <sec name="X0" unit="m">0.978</sec>
-         <sec name="Z0" unit="m">25.828</sec>
-         <sec name="L" unit="m">0.3444</sec>
-         <sec name="PHI" unit="rad">0.03573</sec>
+      <Straight type="magnet" name="BC4REyoke">
+         <sec name="X0" unit="m">0.974</sec>
+         <sec name="Z0" unit="m">25.820</sec>
+         <sec name="L" unit="m">0.361</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="r" unit="cm">10.0</sec>
          <sec name="R" unit="cm">20.0</sec>
          <Material>Fe</Material>
-         <Desc>Magnet BKC4RE yoke</Desc>
+         <Desc>Magnet BC4RE yoke</Desc>
       </Straight>
-      <Straight type="magnet" name="BKC1LEcoil">
-         <sec name="X0" unit="m">-0.563</sec>
-         <sec name="Z0" unit="m">-14.221</sec>
-         <sec name="L" unit="m">0.3444</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+      <Straight type="magnet" name="BC1LEcoil">
+         <sec name="X0" unit="m">-0.564</sec>
+         <sec name="Z0" unit="m">-14.313</sec>
+         <sec name="L" unit="m">0.361</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="r" unit="cm">5.0</sec>
          <sec name="R" unit="cm">10.0</sec>
          <Material>Cu</Material>
-         <Desc>Magnet BKC1LE coil</Desc>
+         <Desc>Magnet BC1LE coil</Desc>
       </Straight>
-      <Straight type="magnet" name="BKC1LEyoke">
-         <sec name="X0" unit="m">-0.563</sec>
-         <sec name="Z0" unit="m">-14.221</sec>
-         <sec name="L" unit="m">0.3444</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+      <Straight type="magnet" name="BC1LEyoke">
+         <sec name="X0" unit="m">-0.564</sec>
+         <sec name="Z0" unit="m">-14.313</sec>
+         <sec name="L" unit="m">0.361</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="r" unit="cm">10.0</sec>
          <sec name="R" unit="cm">20.0</sec>
          <Material>Fe</Material>
-         <Desc>Magnet BKC1LE yoke</Desc>
+         <Desc>Magnet BC1LE yoke</Desc>
       </Straight>
-      <Straight type="magnet" name="BKC2LEcoil">
-         <sec name="X0" unit="m">-0.687</sec>
-         <sec name="Z0" unit="m">-17.688</sec>
-         <sec name="L" unit="m">0.3444</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+      <Straight type="magnet" name="BC2LEcoil">
+         <sec name="X0" unit="m">-0.684</sec>
+         <sec name="Z0" unit="m">-17.680</sec>
+         <sec name="L" unit="m">0.361</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="r" unit="cm">5.0</sec>
          <sec name="R" unit="cm">10.0</sec>
          <Material>Cu</Material>
-         <Desc>Magnet BKC2LE coil</Desc>
+         <Desc>Magnet BC2LE coil</Desc>
       </Straight>
-      <Straight type="magnet" name="BKC2LEyoke">
-         <sec name="X0" unit="m">-0.687</sec>
-         <sec name="Z0" unit="m">-17.688</sec>
-         <sec name="L" unit="m">0.3444</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+      <Straight type="magnet" name="BC2LEyoke">
+         <sec name="X0" unit="m">-0.684</sec>
+         <sec name="Z0" unit="m">-17.680</sec>
+         <sec name="L" unit="m">0.361</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="r" unit="cm">10.0</sec>
          <sec name="R" unit="cm">20.0</sec>
          <Material>Fe</Material>
-         <Desc>Magnet BKC2LE yoke</Desc>
+         <Desc>Magnet BC2LE yoke</Desc>
       </Straight>
-      <Straight type="magnet" name="BKC3LEcoil">
-         <sec name="X0" unit="m">-0.870</sec>
-         <sec name="Z0" unit="m">-22.810</sec>
-         <sec name="L" unit="m">0.3444</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+      <Straight type="magnet" name="BC3LEcoil">
+         <sec name="X0" unit="m">-0.866</sec>
+         <sec name="Z0" unit="m">-22.802</sec>
+         <sec name="L" unit="m">0.361</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="r" unit="cm">5.0</sec>
          <sec name="R" unit="cm">10.0</sec>
          <Material>Cu</Material>
-         <Desc>Magnet BKC3LE coil</Desc>
+         <Desc>Magnet BC3LE coil</Desc>
       </Straight>
-      <Straight type="magnet" name="BKC3LEyoke">
-         <sec name="X0" unit="m">-0.870</sec>
-         <sec name="Z0" unit="m">-22.810</sec>
-         <sec name="L" unit="m">0.3444</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+      <Straight type="magnet" name="BC3LEyoke">
+         <sec name="X0" unit="m">-0.866</sec>
+         <sec name="Z0" unit="m">-22.802</sec>
+         <sec name="L" unit="m">0.361</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="r" unit="cm">10.0</sec>
          <sec name="R" unit="cm">20.0</sec>
          <Material>Fe</Material>
-         <Desc>Magnet BKC3LE yoke</Desc>
+         <Desc>Magnet BC3LE yoke</Desc>
       </Straight>
-      <Straight type="magnet" name="BKC4LEcoil">
-         <sec name="X0" unit="m">-0.981</sec>
-         <sec name="Z0" unit="m">-25.929</sec>
-         <sec name="L" unit="m">0.3444</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+      <Straight type="magnet" name="BC4LEcoil">
+         <sec name="X0" unit="m">-0.977</sec>
+         <sec name="Z0" unit="m">-25.921</sec>
+         <sec name="L" unit="m">0.361</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="r" unit="cm">5.0</sec>
          <sec name="R" unit="cm">10.0</sec>
          <Material>Cu</Material>
-         <Desc>Magnet BKC4LE coil</Desc>
+         <Desc>Magnet BC4LE coil</Desc>
       </Straight>
-      <Straight type="magnet" name="BKC4LEyoke">
-         <sec name="X0" unit="m">-0.981</sec>
-         <sec name="Z0" unit="m">-25.929</sec>
-         <sec name="L" unit="m">0.3444</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+      <Straight type="magnet" name="BC4LEyoke">
+         <sec name="X0" unit="m">-0.977</sec>
+         <sec name="Z0" unit="m">-25.921</sec>
+         <sec name="L" unit="m">0.361</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="r" unit="cm">10.0</sec>
          <sec name="R" unit="cm">20.0</sec>
          <Material>Fe</Material>
-         <Desc>Magnet BKC4LE yoke</Desc>
+         <Desc>Magnet BC4LE yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QKAREcoil">
-         <sec name="X0" unit="m">0.170114</sec>
-         <sec name="Z0" unit="m">4.09647</sec>
-         <sec name="L" unit="m">0.344400</sec>
-         <sec name="PHI" unit="rad">0.0416498</sec>
+         <sec name="X0" unit="m">0.169</sec>
+         <sec name="Z0" unit="m">4.096</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">0.04150</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QKARE coil</Desc>
       </Straight>
       <Straight type="magnet" name="QKAREyoke">
-         <sec name="X0" unit="m">0.170114</sec>
-         <sec name="Z0" unit="m">4.09647</sec>
-         <sec name="L" unit="m">0.344400</sec>
-         <sec name="PHI" unit="rad">0.0416498</sec>
+         <sec name="X0" unit="m">0.169</sec>
+         <sec name="Z0" unit="m">4.096</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">0.04150</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QKARE yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QLC2REcoil">
-         <sec name="X0" unit="m">0.242756</sec>
-         <sec name="Z0" unit="m">5.83968</sec>
-         <sec name="L" unit="m">0.560000</sec>
-         <sec name="PHI" unit="rad">0.0416463</sec>
+         <sec name="X0" unit="m">0.242</sec>
+         <sec name="Z0" unit="m">5.851</sec>
+         <sec name="L" unit="m">0.538</sec>
+         <sec name="PHI" unit="rad">0.04150</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QLC2RE coil</Desc>
       </Straight>
       <Straight type="magnet" name="QLC2REyoke">
-         <sec name="X0" unit="m">0.242756</sec>
-         <sec name="Z0" unit="m">5.83968</sec>
-         <sec name="L" unit="m">0.560000</sec>
-         <sec name="PHI" unit="rad">0.0416463</sec>
+         <sec name="X0" unit="m">0.242</sec>
+         <sec name="Z0" unit="m">5.851</sec>
+         <sec name="L" unit="m">0.538</sec>
+         <sec name="PHI" unit="rad">0.04150</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QLC2RE yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QKBREcoil">
-         <sec name="X0" unit="m">0.27648</sec>
-         <sec name="Z0" unit="m">6.64898</sec>
-         <sec name="L" unit="m">0.344400</sec>
-         <sec name="PHI" unit="rad">0.0416469</sec>
+         <sec name="X0" unit="m">0.275</sec>
+         <sec name="Z0" unit="m">6.649</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">0.04150</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QKBRE coil</Desc>
       </Straight>
       <Straight type="magnet" name="QKBREyoke">
-         <sec name="X0" unit="m">0.27648</sec>
-         <sec name="Z0" unit="m">6.64898</sec>
-         <sec name="L" unit="m">0.344400</sec>
-         <sec name="PHI" unit="rad">0.0416469</sec>
+         <sec name="X0" unit="m">0.275</sec>
+         <sec name="Z0" unit="m">6.649</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">0.04150</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QKBRE yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QKCREcoil">
-         <sec name="X0" unit="m">0.469175</sec>
-         <sec name="Z0" unit="m">11.6009</sec>
-         <sec name="L" unit="m">0.344400</sec>
-         <sec name="PHI" unit="rad">0.0357418</sec>
+         <sec name="X0" unit="m">0.467</sec>
+         <sec name="Z0" unit="m">11.601</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QKCRE coil</Desc>
       </Straight>
       <Straight type="magnet" name="QKCREyoke">
-         <sec name="X0" unit="m">0.469175</sec>
-         <sec name="Z0" unit="m">11.6009</sec>
-         <sec name="L" unit="m">0.344400</sec>
-         <sec name="PHI" unit="rad">0.0357418</sec>
+         <sec name="X0" unit="m">0.467</sec>
+         <sec name="Z0" unit="m">11.601</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QKCRE yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QLC3REcoil">
-         <sec name="X0" unit="m">0.490409</sec>
-         <sec name="Z0" unit="m">12.1949</sec>
-         <sec name="L" unit="m">0.560000</sec>
-         <sec name="PHI" unit="rad">0.0357317</sec>
+         <sec name="X0" unit="m">0.488</sec>
+         <sec name="Z0" unit="m">12.190</sec>
+         <sec name="L" unit="m">0.570</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QLC3RE coil</Desc>
       </Straight>
       <Straight type="magnet" name="QLC3REyoke">
-         <sec name="X0" unit="m">0.490409</sec>
-         <sec name="Z0" unit="m">12.1949</sec>
-         <sec name="L" unit="m">0.560000</sec>
-         <sec name="PHI" unit="rad">0.0357317</sec>
+         <sec name="X0" unit="m">0.488</sec>
+         <sec name="Z0" unit="m">12.190</sec>
+         <sec name="L" unit="m">0.570</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QLC3RE yoke</Desc>
       </Straight>
-      <Straight type="magnet" name="QKDREcoil">
-         <sec name="X0" unit="m">0.540577</sec>
-         <sec name="Z0" unit="m">13.5984</sec>
-         <sec name="L" unit="m">0.372300</sec>
-         <sec name="PHI" unit="rad">0.0357375</sec>
-         <sec name="R" unit="cm">10.0</sec>
-         <sec name="r" unit="cm">5.0</sec>
-         <Material>Cu</Material>
-         <Desc>Magnet QKDRE coil</Desc>
-      </Straight>
-      <Straight type="magnet" name="QKDREyoke">
-         <sec name="X0" unit="m">0.540577</sec>
-         <sec name="Z0" unit="m">13.5984</sec>
-         <sec name="L" unit="m">0.372300</sec>
-         <sec name="PHI" unit="rad">0.0357375</sec>
-         <sec name="R" unit="cm">20.0</sec>
-         <sec name="r" unit="cm">10.0</sec>
-         <Material>Fe</Material>
-         <Desc>Magnet QKDRE yoke</Desc>
-      </Straight>
       <Straight type="magnet" name="QLC5REcoil">
-         <sec name="X0" unit="m">0.708</sec>
-         <sec name="Z0" unit="m">18.282</sec>
-         <sec name="L" unit="m">0.560</sec>
-         <sec name="PHI" unit="rad">0.0357</sec>
+         <sec name="X0" unit="m">0.705</sec>
+         <sec name="Z0" unit="m">18.277</sec>
+         <sec name="L" unit="m">0.570</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QLC5RE coil</Desc>
       </Straight>
       <Straight type="magnet" name="QLC5REyoke">
-         <sec name="X0" unit="m">0.708</sec>
-         <sec name="Z0" unit="m">18.282</sec>
-         <sec name="L" unit="m">0.560</sec>
-         <sec name="PHI" unit="rad">0.0357</sec>
+         <sec name="X0" unit="m">0.705</sec>
+         <sec name="Z0" unit="m">18.277</sec>
+         <sec name="L" unit="m">0.570</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QLC5RE yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QLC6REcoil">
-         <sec name="X0" unit="m">0.840892</sec>
-         <sec name="Z0" unit="m">21.9999</sec>
-         <sec name="L" unit="m">0.560000</sec>
-         <sec name="PHI" unit="rad">0.0357254</sec>
+         <sec name="X0" unit="m">0.837</sec>
+         <sec name="Z0" unit="m">21.995</sec>
+         <sec name="L" unit="m">0.570</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QLC6RE coil</Desc>
       </Straight>
       <Straight type="magnet" name="QLC6REyoke">
-         <sec name="X0" unit="m">0.840892</sec>
-         <sec name="Z0" unit="m">21.9999</sec>
-         <sec name="L" unit="m">0.560000</sec>
-         <sec name="PHI" unit="rad">0.0357254</sec>
+         <sec name="X0" unit="m">0.837</sec>
+         <sec name="Z0" unit="m">21.995</sec>
+         <sec name="L" unit="m">0.570</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QLC6RE yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QLC7REcoil">
-         <sec name="X0" unit="m">0.998972</sec>
-         <sec name="Z0" unit="m">26.4224</sec>
-         <sec name="L" unit="m">0.560000</sec>
-         <sec name="PHI" unit="rad">0.0357389</sec>
+         <sec name="X0" unit="m">0.995</sec>
+         <sec name="Z0" unit="m">26.417</sec>
+         <sec name="L" unit="m">0.570</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QLC7RE coil</Desc>
       </Straight>
       <Straight type="magnet" name="QLC7REyoke">
-         <sec name="X0" unit="m">0.998972</sec>
-         <sec name="Z0" unit="m">26.4224</sec>
-         <sec name="L" unit="m">0.560000</sec>
-         <sec name="PHI" unit="rad">0.0357389</sec>
+         <sec name="X0" unit="m">0.995</sec>
+         <sec name="Z0" unit="m">26.417</sec>
+         <sec name="L" unit="m">0.570</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QLC7RE yoke</Desc>
       </Straight>
-      <Straight type="magnet" name="SLYTRE2coil">
-         <sec name="X0" unit="m">1.03327</sec>
-         <sec name="Z0" unit="m">27.3817</sec>
-         <sec name="L" unit="m">0.600000</sec>
-         <sec name="PHI" unit="rad">0.0357193</sec>
+      <Straight type="magnet" name="SLYTRE.2coil">
+         <sec name="X0" unit="m">1.029</sec>
+         <sec name="Z0" unit="m">27.382</sec>
+         <sec name="L" unit="m">0.600</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
-         <Desc>Magnet SLYTRE2 coil</Desc>
+         <Desc>Magnet SLYTRE.2 coil</Desc>
       </Straight>
-      <Straight type="magnet" name="SLYTRE2yoke">
-         <sec name="X0" unit="m">1.03327</sec>
-         <sec name="Z0" unit="m">27.3817</sec>
-         <sec name="L" unit="m">0.600000</sec>
-         <sec name="PHI" unit="rad">0.0357193</sec>
+      <Straight type="magnet" name="SLYTRE.2yoke">
+         <sec name="X0" unit="m">1.029</sec>
+         <sec name="Z0" unit="m">27.382</sec>
+         <sec name="L" unit="m">0.600</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
-         <Desc>Magnet SLYTRE2 yoke</Desc>
+         <Desc>Magnet SLYTRE.2 yoke</Desc>
       </Straight>
-      <Straight type="magnet" name="QLY2RE2coil">
-         <sec name="X0" unit="m">1.07435</sec>
-         <sec name="Z0" unit="m">28.531</sec>
-         <sec name="L" unit="m">0.460000</sec>
-         <sec name="PHI" unit="rad">0.0357255</sec>
+      <Straight type="magnet" name="QLY2RE.2coil">
+         <sec name="X0" unit="m">1.070</sec>
+         <sec name="Z0" unit="m">28.530</sec>
+         <sec name="L" unit="m">0.462</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
-         <Desc>Magnet QLY2RE2 coil</Desc>
+         <Desc>Magnet QLY2RE.2 coil</Desc>
       </Straight>
-      <Straight type="magnet" name="QLY2RE2yoke">
-         <sec name="X0" unit="m">1.07435</sec>
-         <sec name="Z0" unit="m">28.531</sec>
-         <sec name="L" unit="m">0.460000</sec>
-         <sec name="PHI" unit="rad">0.0357255</sec>
+      <Straight type="magnet" name="QLY2RE.2yoke">
+         <sec name="X0" unit="m">1.070</sec>
+         <sec name="Z0" unit="m">28.530</sec>
+         <sec name="L" unit="m">0.462</sec>
+         <sec name="PHI" unit="rad">0.03558</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
-         <Desc>Magnet QLY2RE2 yoke</Desc>
+         <Desc>Magnet QLY2RE.2 yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QKARPcoil">
-         <sec name="X0" unit="m">-0.187742</sec>
-         <sec name="Z0" unit="m">4.64059</sec>
-         <sec name="L" unit="m">0.313740</sec>
-         <sec name="PHI" unit="rad">-0.0399863</sec>
+         <sec name="X0" unit="m">-0.188</sec>
+         <sec name="Z0" unit="m">4.625</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">-0.04008</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QKARP coil</Desc>
       </Straight>
       <Straight type="magnet" name="QKARPyoke">
-         <sec name="X0" unit="m">-0.187742</sec>
-         <sec name="Z0" unit="m">4.64059</sec>
-         <sec name="L" unit="m">0.313740</sec>
-         <sec name="PHI" unit="rad">-0.0399863</sec>
+         <sec name="X0" unit="m">-0.188</sec>
+         <sec name="Z0" unit="m">4.625</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">-0.04008</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QKARP yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QKBRPcoil">
-         <sec name="X0" unit="m">-0.326594</sec>
-         <sec name="Z0" unit="m">10.8727</sec>
-         <sec name="L" unit="m">0.313740</sec>
-         <sec name="PHI" unit="rad">0.00357665</sec>
+         <sec name="X0" unit="m">-0.333</sec>
+         <sec name="Z0" unit="m">11.057</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">0.00278</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QKBRP coil</Desc>
       </Straight>
       <Straight type="magnet" name="QKBRPyoke">
-         <sec name="X0" unit="m">-0.326594</sec>
-         <sec name="Z0" unit="m">10.8727</sec>
-         <sec name="L" unit="m">0.313740</sec>
-         <sec name="PHI" unit="rad">0.00357665</sec>
+         <sec name="X0" unit="m">-0.333</sec>
+         <sec name="Z0" unit="m">11.057</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">0.00278</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QKBRP yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QLC1RPcoil">
-         <sec name="X0" unit="m">-0.319116</sec>
-         <sec name="Z0" unit="m">12.9633</sec>
-         <sec name="L" unit="m">0.583720</sec>
-         <sec name="PHI" unit="rad">0.00357778</sec>
+         <sec name="X0" unit="m">-0.327</sec>
+         <sec name="Z0" unit="m">12.984</sec>
+         <sec name="L" unit="m">0.584</sec>
+         <sec name="PHI" unit="rad">0.00278</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QLC1RP coil</Desc>
       </Straight>
       <Straight type="magnet" name="QLC1RPyoke">
-         <sec name="X0" unit="m">-0.319116</sec>
-         <sec name="Z0" unit="m">12.9633</sec>
-         <sec name="L" unit="m">0.583720</sec>
-         <sec name="PHI" unit="rad">0.00357778</sec>
+         <sec name="X0" unit="m">-0.327</sec>
+         <sec name="Z0" unit="m">12.984</sec>
+         <sec name="L" unit="m">0.584</sec>
+         <sec name="PHI" unit="rad">0.00278</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QLC1RP yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QKCRPcoil">
-         <sec name="X0" unit="m">-0.316999</sec>
-         <sec name="Z0" unit="m">13.5551</sec>
-         <sec name="L" unit="m">0.313740</sec>
-         <sec name="PHI" unit="rad">0.00357232</sec>
+         <sec name="X0" unit="m">-0.325</sec>
+         <sec name="Z0" unit="m">13.862</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">0.00278</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QKCRP coil</Desc>
       </Straight>
       <Straight type="magnet" name="QKCRPyoke">
-         <sec name="X0" unit="m">-0.316999</sec>
-         <sec name="Z0" unit="m">13.5551</sec>
-         <sec name="L" unit="m">0.313740</sec>
-         <sec name="PHI" unit="rad">0.00357232</sec>
+         <sec name="X0" unit="m">-0.325</sec>
+         <sec name="Z0" unit="m">13.862</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">0.00278</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QKCRP yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QLC2RPcoil">
-         <sec name="X0" unit="m">-0.298485</sec>
-         <sec name="Z0" unit="m">18.7314</sec>
-         <sec name="L" unit="m">0.583720</sec>
-         <sec name="PHI" unit="rad">0.00357655</sec>
+         <sec name="X0" unit="m">-0.311</sec>
+         <sec name="Z0" unit="m">18.765</sec>
+         <sec name="L" unit="m">0.584</sec>
+         <sec name="PHI" unit="rad">0.00278</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QLC2RP coil</Desc>
       </Straight>
       <Straight type="magnet" name="QLC2RPyoke">
-         <sec name="X0" unit="m">-0.298485</sec>
-         <sec name="Z0" unit="m">18.7314</sec>
-         <sec name="L" unit="m">0.583720</sec>
-         <sec name="PHI" unit="rad">0.00357655</sec>
+         <sec name="X0" unit="m">-0.311</sec>
+         <sec name="Z0" unit="m">18.765</sec>
+         <sec name="L" unit="m">0.584</sec>
+         <sec name="PHI" unit="rad">0.00278</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QLC2RP yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QKDRPcoil">
-         <sec name="X0" unit="m">-0.296368</sec>
-         <sec name="Z0" unit="m">19.3233</sec>
-         <sec name="L" unit="m">0.313740</sec>
-         <sec name="PHI" unit="rad">0.00357984</sec>
+         <sec name="X0" unit="m">-0.309</sec>
+         <sec name="Z0" unit="m">19.634</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">0.00278</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QKDRP coil</Desc>
       </Straight>
       <Straight type="magnet" name="QKDRPyoke">
-         <sec name="X0" unit="m">-0.296368</sec>
-         <sec name="Z0" unit="m">19.3233</sec>
-         <sec name="L" unit="m">0.313740</sec>
-         <sec name="PHI" unit="rad">0.00357984</sec>
+         <sec name="X0" unit="m">-0.309</sec>
+         <sec name="Z0" unit="m">19.634</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">0.00278</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QKDRP yoke</Desc>
       </Straight>
-      <Straight type="magnet" name="QKFRPcoil">
-         <sec name="X0" unit="m">-0.441882</sec>
-         <sec name="Z0" unit="m">24.9833</sec>
-         <sec name="L" unit="m">0.313740</sec>
-         <sec name="PHI" unit="rad">-0.05842</sec>
+      <Straight type="magnet" name="QKERPcoil">
+         <sec name="X0" unit="m">-0.457</sec>
+         <sec name="Z0" unit="m">25.294</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">-0.05849</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
-         <Desc>Magnet QKFRP coil</Desc>
+         <Desc>Magnet QKERP coil</Desc>
       </Straight>
-      <Straight type="magnet" name="QKFRPyoke">
-         <sec name="X0" unit="m">-0.441882</sec>
-         <sec name="Z0" unit="m">24.9833</sec>
-         <sec name="L" unit="m">0.313740</sec>
-         <sec name="PHI" unit="rad">-0.05842</sec>
+      <Straight type="magnet" name="QKERPyoke">
+         <sec name="X0" unit="m">-0.457</sec>
+         <sec name="Z0" unit="m">25.294</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">-0.05849</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
-         <Desc>Magnet QKFRP yoke</Desc>
+         <Desc>Magnet QKERP yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QLC3RPcoil">
-         <sec name="X0" unit="m">-0.51811</sec>
-         <sec name="Z0" unit="m">26.2867</sec>
-         <sec name="L" unit="m">0.583720</sec>
-         <sec name="PHI" unit="rad">-0.0584235</sec>
+         <sec name="X0" unit="m">-0.517</sec>
+         <sec name="Z0" unit="m">26.321</sec>
+         <sec name="L" unit="m">0.584</sec>
+         <sec name="PHI" unit="rad">-0.05849</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QLC3RP coil</Desc>
       </Straight>
       <Straight type="magnet" name="QLC3RPyoke">
-         <sec name="X0" unit="m">-0.51811</sec>
-         <sec name="Z0" unit="m">26.2867</sec>
-         <sec name="L" unit="m">0.583720</sec>
-         <sec name="PHI" unit="rad">-0.0584235</sec>
+         <sec name="X0" unit="m">-0.517</sec>
+         <sec name="Z0" unit="m">26.321</sec>
+         <sec name="L" unit="m">0.584</sec>
+         <sec name="PHI" unit="rad">-0.05849</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QLC3RP yoke</Desc>
       </Straight>
-      <Straight type="magnet" name="SLYTRP2coil">
-         <sec name="X0" unit="m">-0.558505</sec>
-         <sec name="Z0" unit="m">26.9774</sec>
-         <sec name="L" unit="m">0.334000</sec>
-         <sec name="PHI" unit="rad">-0.0584217</sec>
+      <Straight type="magnet" name="SLYTRP.2coil">
+         <sec name="X0" unit="m">-0.575</sec>
+         <sec name="Z0" unit="m">27.303</sec>
+         <sec name="L" unit="m">0.334</sec>
+         <sec name="PHI" unit="rad">-0.05849</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
-         <Desc>Magnet SLYTRP2 coil</Desc>
+         <Desc>Magnet SLYTRP.2 coil</Desc>
       </Straight>
-      <Straight type="magnet" name="SLYTRP2yoke">
-         <sec name="X0" unit="m">-0.558505</sec>
-         <sec name="Z0" unit="m">26.9774</sec>
-         <sec name="L" unit="m">0.334000</sec>
-         <sec name="PHI" unit="rad">-0.0584217</sec>
+      <Straight type="magnet" name="SLYTRP.2yoke">
+         <sec name="X0" unit="m">-0.575</sec>
+         <sec name="Z0" unit="m">27.303</sec>
+         <sec name="L" unit="m">0.334</sec>
+         <sec name="PHI" unit="rad">-0.05849</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
-         <Desc>Magnet SLYTRP2 yoke</Desc>
+         <Desc>Magnet SLYTRP.2 yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QKALEcoil">
-         <sec name="X0" unit="m">-0.170083</sec>
-         <sec name="Z0" unit="m">-4.09647</sec>
-         <sec name="L" unit="m">0.344400</sec>
-         <sec name="PHI" unit="rad">-3.09995</sec>
+         <sec name="X0" unit="m">-0.184</sec>
+         <sec name="Z0" unit="m">-4.441</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">-3.10014</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QKALE coil</Desc>
       </Straight>
       <Straight type="magnet" name="QKALEyoke">
-         <sec name="X0" unit="m">-0.170083</sec>
-         <sec name="Z0" unit="m">-4.09647</sec>
-         <sec name="L" unit="m">0.344400</sec>
-         <sec name="PHI" unit="rad">-3.09995</sec>
+         <sec name="X0" unit="m">-0.184</sec>
+         <sec name="Z0" unit="m">-4.441</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">-3.10014</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QKALE yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QLC2LEcoil">
-         <sec name="X0" unit="m">-0.242749</sec>
-         <sec name="Z0" unit="m">-5.84043</sec>
-         <sec name="L" unit="m">0.560000</sec>
-         <sec name="PHI" unit="rad">-3.09995</sec>
+         <sec name="X0" unit="m">-0.242</sec>
+         <sec name="Z0" unit="m">-5.851</sec>
+         <sec name="L" unit="m">0.538</sec>
+         <sec name="PHI" unit="rad">-3.10014</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QLC2LE coil</Desc>
       </Straight>
       <Straight type="magnet" name="QLC2LEyoke">
-         <sec name="X0" unit="m">-0.242749</sec>
-         <sec name="Z0" unit="m">-5.84043</sec>
-         <sec name="L" unit="m">0.560000</sec>
-         <sec name="PHI" unit="rad">-3.09995</sec>
+         <sec name="X0" unit="m">-0.242</sec>
+         <sec name="Z0" unit="m">-5.851</sec>
+         <sec name="L" unit="m">0.538</sec>
+         <sec name="PHI" unit="rad">-3.10014</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QLC2LE yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QKBLEcoil">
-         <sec name="X0" unit="m">-0.276469</sec>
-         <sec name="Z0" unit="m">-6.64973</sec>
-         <sec name="L" unit="m">0.344400</sec>
-         <sec name="PHI" unit="rad">-3.09995</sec>
+         <sec name="X0" unit="m">-0.275</sec>
+         <sec name="Z0" unit="m">-6.650</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">-3.10014</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QKBLE coil</Desc>
       </Straight>
       <Straight type="magnet" name="QKBLEyoke">
-         <sec name="X0" unit="m">-0.276469</sec>
-         <sec name="Z0" unit="m">-6.64973</sec>
-         <sec name="L" unit="m">0.344400</sec>
-         <sec name="PHI" unit="rad">-3.09995</sec>
+         <sec name="X0" unit="m">-0.275</sec>
+         <sec name="Z0" unit="m">-6.650</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">-3.10014</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QKBLE yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QKCLEcoil">
-         <sec name="X0" unit="m">-0.469155</sec>
-         <sec name="Z0" unit="m">-11.6016</sec>
-         <sec name="L" unit="m">0.344400</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+         <sec name="X0" unit="m">-0.467</sec>
+         <sec name="Z0" unit="m">-11.602</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QKCLE coil</Desc>
       </Straight>
       <Straight type="magnet" name="QKCLEyoke">
-         <sec name="X0" unit="m">-0.469155</sec>
-         <sec name="Z0" unit="m">-11.6016</sec>
-         <sec name="L" unit="m">0.344400</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+         <sec name="X0" unit="m">-0.467</sec>
+         <sec name="Z0" unit="m">-11.602</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QKCLE yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QLC3LEcoil">
-         <sec name="X0" unit="m">-0.49039</sec>
-         <sec name="Z0" unit="m">-12.1956</sec>
-         <sec name="L" unit="m">0.560000</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+         <sec name="X0" unit="m">-0.488</sec>
+         <sec name="Z0" unit="m">-12.191</sec>
+         <sec name="L" unit="m">0.570</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QLC3LE coil</Desc>
       </Straight>
       <Straight type="magnet" name="QLC3LEyoke">
-         <sec name="X0" unit="m">-0.49039</sec>
-         <sec name="Z0" unit="m">-12.1956</sec>
-         <sec name="L" unit="m">0.560000</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+         <sec name="X0" unit="m">-0.488</sec>
+         <sec name="Z0" unit="m">-12.191</sec>
+         <sec name="L" unit="m">0.570</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QLC3LE yoke</Desc>
       </Straight>
-      <Straight type="magnet" name="QKDLEcoil">
-         <sec name="X0" unit="m">-0.541</sec>
-         <sec name="Z0" unit="m">-13.599</sec>
-         <sec name="L" unit="m">0.372</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
-         <sec name="R" unit="cm">10.0</sec>
-         <sec name="r" unit="cm">5.0</sec>
-         <Material>Cu</Material>
-         <Desc>Magnet QKDLE coil</Desc>
-      </Straight>
-      <Straight type="magnet" name="QKDLEyoke">
-         <sec name="X0" unit="m">-0.541</sec>
-         <sec name="Z0" unit="m">-13.599</sec>
-         <sec name="L" unit="m">0.372</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
-         <sec name="R" unit="cm">20.0</sec>
-         <sec name="r" unit="cm">10.0</sec>
-         <Material>Fe</Material>
-         <Desc>Magnet QKDLE yoke</Desc>
-      </Straight>
       <Straight type="magnet" name="QLC4LEcoil">
-         <sec name="X0" unit="m">-0.707962</sec>
-         <sec name="Z0" unit="m">-18.2823</sec>
-         <sec name="L" unit="m">0.560000</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+         <sec name="X0" unit="m">-0.705</sec>
+         <sec name="Z0" unit="m">-18.277</sec>
+         <sec name="L" unit="m">0.570</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QLC4LE coil</Desc>
       </Straight>
       <Straight type="magnet" name="QLC4LEyoke">
-         <sec name="X0" unit="m">-0.707962</sec>
-         <sec name="Z0" unit="m">-18.2823</sec>
-         <sec name="L" unit="m">0.560000</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+         <sec name="X0" unit="m">-0.705</sec>
+         <sec name="Z0" unit="m">-18.277</sec>
+         <sec name="L" unit="m">0.570</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QLC4LE yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QLC5LEcoil">
-         <sec name="X0" unit="m">-0.840878</sec>
-         <sec name="Z0" unit="m">-22.0007</sec>
-         <sec name="L" unit="m">0.560000</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+         <sec name="X0" unit="m">-0.837</sec>
+         <sec name="Z0" unit="m">-21.996</sec>
+         <sec name="L" unit="m">0.570</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QLC5LE coil</Desc>
       </Straight>
       <Straight type="magnet" name="QLC5LEyoke">
-         <sec name="X0" unit="m">-0.840878</sec>
-         <sec name="Z0" unit="m">-22.0007</sec>
-         <sec name="L" unit="m">0.560000</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+         <sec name="X0" unit="m">-0.837</sec>
+         <sec name="Z0" unit="m">-21.996</sec>
+         <sec name="L" unit="m">0.570</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QLC5LE yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QLC7LEcoil">
-         <sec name="X0" unit="m">-1.00253</sec>
-         <sec name="Z0" unit="m">-26.523</sec>
-         <sec name="L" unit="m">0.560000</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+         <sec name="X0" unit="m">-0.998</sec>
+         <sec name="Z0" unit="m">-26.518</sec>
+         <sec name="L" unit="m">0.570</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QLC7LE coil</Desc>
       </Straight>
       <Straight type="magnet" name="QLC7LEyoke">
-         <sec name="X0" unit="m">-1.00253</sec>
-         <sec name="Z0" unit="m">-26.523</sec>
-         <sec name="L" unit="m">0.560000</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+         <sec name="X0" unit="m">-0.998</sec>
+         <sec name="Z0" unit="m">-26.518</sec>
+         <sec name="L" unit="m">0.570</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QLC7LE yoke</Desc>
       </Straight>
-      <Straight type="magnet" name="SLYTLE1coil">
-         <sec name="X0" unit="m">-1.03683</sec>
-         <sec name="Z0" unit="m">-27.4824</sec>
-         <sec name="L" unit="m">0.600000</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+      <Straight type="magnet" name="SLYTLE.1coil">
+         <sec name="X0" unit="m">-1.033</sec>
+         <sec name="Z0" unit="m">-27.483</sec>
+         <sec name="L" unit="m">0.600</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
-         <Desc>Magnet SLYTLE1 coil</Desc>
+         <Desc>Magnet SLYTLE.1 coil</Desc>
       </Straight>
-      <Straight type="magnet" name="SLYTLE1yoke">
-         <sec name="X0" unit="m">-1.03683</sec>
-         <sec name="Z0" unit="m">-27.4824</sec>
-         <sec name="L" unit="m">0.600000</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+      <Straight type="magnet" name="SLYTLE.1yoke">
+         <sec name="X0" unit="m">-1.033</sec>
+         <sec name="Z0" unit="m">-27.483</sec>
+         <sec name="L" unit="m">0.600</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
-         <Desc>Magnet SLYTLE1 yoke</Desc>
+         <Desc>Magnet SLYTLE.1 yoke</Desc>
       </Straight>
-      <Straight type="magnet" name="QLY1LE1coil">
-         <sec name="X0" unit="m">-1.07791</sec>
-         <sec name="Z0" unit="m">-28.6317</sec>
-         <sec name="L" unit="m">0.460000</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+      <Straight type="magnet" name="QLY1LE.1coil">
+         <sec name="X0" unit="m">-1.074</sec>
+         <sec name="Z0" unit="m">-28.631</sec>
+         <sec name="L" unit="m">0.462</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
-         <Desc>Magnet QLY1LE1 coil</Desc>
+         <Desc>Magnet QLY1LE.1 coil</Desc>
       </Straight>
-      <Straight type="magnet" name="QLY1LE1yoke">
-         <sec name="X0" unit="m">-1.07791</sec>
-         <sec name="Z0" unit="m">-28.6317</sec>
-         <sec name="L" unit="m">0.460000</sec>
-         <sec name="PHI" unit="rad">-3.10589</sec>
+      <Straight type="magnet" name="QLY1LE.1yoke">
+         <sec name="X0" unit="m">-1.074</sec>
+         <sec name="Z0" unit="m">-28.631</sec>
+         <sec name="L" unit="m">0.462</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
-         <Desc>Magnet QLY1LE1 yoke</Desc>
+         <Desc>Magnet QLY1LE.1 yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QKALPcoil">
-         <sec name="X0" unit="m">0.197543</sec>
-         <sec name="Z0" unit="m">-4.64021</sec>
-         <sec name="L" unit="m">0.313740</sec>
-         <sec name="PHI" unit="rad">3.09839</sec>
+         <sec name="X0" unit="m">0.196</sec>
+         <sec name="Z0" unit="m">-4.625</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">3.09900</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QKALP coil</Desc>
       </Straight>
       <Straight type="magnet" name="QKALPyoke">
-         <sec name="X0" unit="m">0.197543</sec>
-         <sec name="Z0" unit="m">-4.64021</sec>
-         <sec name="L" unit="m">0.313740</sec>
-         <sec name="PHI" unit="rad">3.09839</sec>
+         <sec name="X0" unit="m">0.196</sec>
+         <sec name="Z0" unit="m">-4.625</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">3.09900</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QKALP yoke</Desc>
+	 <Subtract>QKALEyoke</Subtract>
       </Straight>
       <Straight type="magnet" name="QKBLPcoil">
-         <sec name="X0" unit="m">0.528438</sec>
-         <sec name="Z0" unit="m">-10.093</sec>
-         <sec name="L" unit="m">0.313740</sec>
-         <sec name="PHI" unit="rad">3.06148</sec>
+         <sec name="X0" unit="m">0.556</sec>
+         <sec name="Z0" unit="m">-10.317</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">3.06429</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QKBLP coil</Desc>
       </Straight>
       <Straight type="magnet" name="QKBLPyoke">
-         <sec name="X0" unit="m">0.528438</sec>
-         <sec name="Z0" unit="m">-10.093</sec>
-         <sec name="L" unit="m">0.313740</sec>
-         <sec name="PHI" unit="rad">3.06148</sec>
+         <sec name="X0" unit="m">0.556</sec>
+         <sec name="Z0" unit="m">-10.317</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">3.06429</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QKBLP yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QLC1LPcoil">
-         <sec name="X0" unit="m">0.817333</sec>
-         <sec name="Z0" unit="m">-13.6905</sec>
-         <sec name="L" unit="m">0.583720</sec>
-         <sec name="PHI" unit="rad">3.06147</sec>
+         <sec name="X0" unit="m">0.839</sec>
+         <sec name="Z0" unit="m">-13.972</sec>
+         <sec name="L" unit="m">0.584</sec>
+         <sec name="PHI" unit="rad">3.06429</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QLC1LP coil</Desc>
       </Straight>
       <Straight type="magnet" name="QLC1LPyoke">
-         <sec name="X0" unit="m">0.817333</sec>
-         <sec name="Z0" unit="m">-13.6905</sec>
-         <sec name="L" unit="m">0.583720</sec>
-         <sec name="PHI" unit="rad">3.06147</sec>
+         <sec name="X0" unit="m">0.839</sec>
+         <sec name="Z0" unit="m">-13.972</sec>
+         <sec name="L" unit="m">0.584</sec>
+         <sec name="PHI" unit="rad">3.06429</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QLC1LP yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QKCLPcoil">
-         <sec name="X0" unit="m">0.888072</sec>
-         <sec name="Z0" unit="m">-14.5714</sec>
-         <sec name="L" unit="m">0.313740</sec>
-         <sec name="PHI" unit="rad">3.06148</sec>
+         <sec name="X0" unit="m">0.907</sec>
+         <sec name="Z0" unit="m">-14.847</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">3.06429</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QKCLP coil</Desc>
       </Straight>
       <Straight type="magnet" name="QKCLPyoke">
-         <sec name="X0" unit="m">0.888072</sec>
-         <sec name="Z0" unit="m">-14.5714</sec>
-         <sec name="L" unit="m">0.313740</sec>
-         <sec name="PHI" unit="rad">3.06148</sec>
+         <sec name="X0" unit="m">0.907</sec>
+         <sec name="Z0" unit="m">-14.847</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">3.06429</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QKCLP yoke</Desc>
       </Straight>
       <Straight type="magnet" name="QLC2LPcoil">
-         <sec name="X0" unit="m">1.3009</sec>
-         <sec name="Z0" unit="m">-19.7122</sec>
-         <sec name="L" unit="m">0.583720</sec>
-         <sec name="PHI" unit="rad">3.06146</sec>
+         <sec name="X0" unit="m">1.333</sec>
+         <sec name="Z0" unit="m">-20.337</sec>
+         <sec name="L" unit="m">0.584</sec>
+         <sec name="PHI" unit="rad">3.06429</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QLC2LP coil</Desc>
       </Straight>
       <Straight type="magnet" name="QLC2LPyoke">
-         <sec name="X0" unit="m">1.3009</sec>
-         <sec name="Z0" unit="m">-19.7122</sec>
-         <sec name="L" unit="m">0.583720</sec>
-         <sec name="PHI" unit="rad">3.06146</sec>
+         <sec name="X0" unit="m">1.333</sec>
+         <sec name="Z0" unit="m">-20.337</sec>
+         <sec name="L" unit="m">0.584</sec>
+         <sec name="PHI" unit="rad">3.06429</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QLC2LP yoke</Desc>
       </Straight>
+      <Straight type="magnet" name="QKDLPcoil">
+         <sec name="X0" unit="m">1.400</sec>
+         <sec name="Z0" unit="m">-21.203</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">3.06429</sec>
+         <sec name="R" unit="cm">10.0</sec>
+         <sec name="r" unit="cm">5.0</sec>
+         <Material>Cu</Material>
+         <Desc>Magnet QKDLP coil</Desc>
+      </Straight>
+      <Straight type="magnet" name="QKDLPyoke">
+         <sec name="X0" unit="m">1.400</sec>
+         <sec name="Z0" unit="m">-21.203</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">3.06429</sec>
+         <sec name="R" unit="cm">20.0</sec>
+         <sec name="r" unit="cm">10.0</sec>
+         <Material>Fe</Material>
+         <Desc>Magnet QKDLP yoke</Desc>
+      </Straight>
       <Straight type="magnet" name="QKELPcoil">
-         <sec name="X0" unit="m">1.37164</sec>
-         <sec name="Z0" unit="m">-20.5931</sec>
-         <sec name="L" unit="m">0.313740</sec>
-         <sec name="PHI" unit="rad">3.06146</sec>
+         <sec name="X0" unit="m">1.669</sec>
+         <sec name="Z0" unit="m">-26.858</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">3.12741</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QKELP coil</Desc>
       </Straight>
       <Straight type="magnet" name="QKELPyoke">
-         <sec name="X0" unit="m">1.37164</sec>
-         <sec name="Z0" unit="m">-20.5931</sec>
-         <sec name="L" unit="m">0.313740</sec>
-         <sec name="PHI" unit="rad">3.06146</sec>
+         <sec name="X0" unit="m">1.669</sec>
+         <sec name="Z0" unit="m">-26.858</sec>
+         <sec name="L" unit="m">0.344</sec>
+         <sec name="PHI" unit="rad">3.12741</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QKELP yoke</Desc>
       </Straight>
-      <Straight type="magnet" name="QKFLPcoil">
-         <sec name="X0" unit="m">1.65494</sec>
-         <sec name="Z0" unit="m">-26.2478</sec>
-         <sec name="L" unit="m">0.313740</sec>
-         <sec name="PHI" unit="rad">3.12515</sec>
-         <sec name="R" unit="cm">10.0</sec>
-         <sec name="r" unit="cm">5.0</sec>
-         <Material>Cu</Material>
-         <Desc>Magnet QKFLP coil</Desc>
-      </Straight>
-      <Straight type="magnet" name="QKFLPyoke">
-         <sec name="X0" unit="m">1.65494</sec>
-         <sec name="Z0" unit="m">-26.2478</sec>
-         <sec name="L" unit="m">0.313740</sec>
-         <sec name="PHI" unit="rad">3.12515</sec>
-         <sec name="R" unit="cm">20.0</sec>
-         <sec name="r" unit="cm">10.0</sec>
-         <Material>Fe</Material>
-         <Desc>Magnet QKFLP yoke</Desc>
-      </Straight>
       <Straight type="magnet" name="QLC3LPcoil">
-         <sec name="X0" unit="m">1.67162</sec>
-         <sec name="Z0" unit="m">-27.2614</sec>
-         <sec name="L" unit="m">0.583720</sec>
-         <sec name="PHI" unit="rad">3.12513</sec>
+         <sec name="X0" unit="m">1.684</sec>
+         <sec name="Z0" unit="m">-27.887</sec>
+         <sec name="L" unit="m">0.584</sec>
+         <sec name="PHI" unit="rad">3.12741</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
          <Desc>Magnet QLC3LP coil</Desc>
       </Straight>
       <Straight type="magnet" name="QLC3LPyoke">
-         <sec name="X0" unit="m">1.67162</sec>
-         <sec name="Z0" unit="m">-27.2614</sec>
-         <sec name="L" unit="m">0.583720</sec>
-         <sec name="PHI" unit="rad">3.12513</sec>
+         <sec name="X0" unit="m">1.684</sec>
+         <sec name="Z0" unit="m">-27.887</sec>
+         <sec name="L" unit="m">0.584</sec>
+         <sec name="PHI" unit="rad">3.12741</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
          <Desc>Magnet QLC3LP yoke</Desc>
       </Straight>
-      <Straight type="magnet" name="SLYTLP1coil">
-         <sec name="X0" unit="m">1.68781</sec>
-         <sec name="Z0" unit="m">-28.245</sec>
+      <Straight type="magnet" name="SLYTLP.1coil">
+         <sec name="X0" unit="m">1.698</sec>
+         <sec name="Z0" unit="m">-28.871</sec>
          <sec name="L" unit="m">0.334000</sec>
-         <sec name="PHI" unit="rad">3.12513</sec>
+         <sec name="PHI" unit="rad">3.12741</sec>
          <sec name="R" unit="cm">10.0</sec>
          <sec name="r" unit="cm">5.0</sec>
          <Material>Cu</Material>
-         <Desc>Magnet SLYTLP1 coil</Desc>
+         <Desc>Magnet SLYTLP.1 coil</Desc>
       </Straight>
-      <Straight type="magnet" name="SLYTLP1yoke">
-         <sec name="X0" unit="m">1.68781</sec>
-         <sec name="Z0" unit="m">-28.245</sec>
+      <Straight type="magnet" name="SLYTLP.1yoke">
+         <sec name="X0" unit="m">1.698</sec>
+         <sec name="Z0" unit="m">-28.871</sec>
          <sec name="L" unit="m">0.334000</sec>
-         <sec name="PHI" unit="rad">3.12513</sec>
+         <sec name="PHI" unit="rad">3.12741</sec>
          <sec name="R" unit="cm">20.0</sec>
          <sec name="r" unit="cm">10.0</sec>
          <Material>Fe</Material>
-         <Desc>Magnet SLYTLP1 yoke</Desc>
+         <Desc>Magnet SLYTLP.1 yoke</Desc>
       </Straight>
+
+
       <!--
 
          Following geometry should be parallel to Gx, so we need to rotate by -8.5 mrad.
@@ -1548,6 +1631,66 @@
          <Material>G4_CONCRETE</Material>
          <Desc>Concrete shield</Desc>
       </ConcreteShieldL>
+
+      <!-- Collimators -->
+      <!-- Approximated as trapezoids -->
+
+      <Collimator type="horizontal" name="D01H5">
+         <sec name="d1" unit="cm">-0.944</sec>
+         <sec name="d2" unit="cm">0.954</sec>
+         <sec name="fullH" unit="cm">4.0</sec>
+         <sec name="headH" unit="cm">0.5</sec>
+         <sec name="minW" unit="cm">1.0</sec>
+	 <sec name="maxW" unit="cm">38.62</sec>
+         <sec name="th" unit="cm">1.2</sec>
+         <sec name="Z" unit="m">5.719</sec>
+         <MotherVolume>LHL2</MotherVolume>
+         <Material>Cu</Material>
+         <HeadMaterial>W</HeadMaterial>
+         <Desc>Horizontal collimator D01H5</Desc>
+      </Collimator>
+
+      <Collimator type="horizontal" name="D02H4">
+         <sec name="d1" unit="cm">-0.862</sec>
+         <sec name="d2" unit="cm">0.935</sec>
+         <sec name="fullH" unit="cm">4.0</sec>
+         <sec name="headH" unit="cm">0.5</sec>
+         <sec name="minW" unit="cm">1.0</sec>
+	 <sec name="maxW" unit="cm">38.62</sec>
+         <sec name="th" unit="cm">1.2</sec>
+         <sec name="Z" unit="m">5.381</sec>
+         <MotherVolume>LLR4</MotherVolume>
+         <Material>Cu</Material>
+         <HeadMaterial>W</HeadMaterial>
+         <Desc>Horizontal collimator D02H4</Desc>
+      </Collimator>
+
+      <!-- Collimator Shields -->
+
+      <CollimatorShield name="FC29078.2">
+         <sec name="X0" unit="m">-1.064</sec>
+         <sec name="Z0" unit="m">-28.357</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
+         <sec name="W" unit="mm">460</sec>
+         <sec name="H" unit="mm">330</sec>
+         <sec name="L" unit="mm">250</sec>
+         <sec name="d" unit="mm">50</sec>
+         <Material>Pb</Material>
+         <Desc>Shield for collimator D01H4 part 2</Desc>
+      </CollimatorShield>
+
+      <CollimatorShield name="FC29078.3">
+         <sec name="X0" unit="m">-0.928</sec>
+         <sec name="Z0" unit="m">-24.541</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
+         <sec name="W" unit="mm">460</sec>
+         <sec name="H" unit="mm">330</sec>
+         <sec name="L" unit="mm">2620</sec>
+         <sec name="d" unit="mm">50</sec>
+         <Material>Pb</Material>
+         <Desc>Shield for collimator D01H4 part 3</Desc>
+      </CollimatorShield>
+
    </Content>
 </DetectorComponent>
 

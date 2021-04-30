@@ -25,12 +25,19 @@
 //FRAMEWORK
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 //ECL
-#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dbobjects/ECLDspData.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/utility/ECLChannelMapper.h>
 
+//TRG
+#include <mdst/dataobjects/TRGSummary.h>
 
 class TH1F;
 class TH2F;
@@ -75,6 +82,14 @@ namespace Belle2 {
     std::string m_RunName;
     /** Save detailed fit data for failed fits */
     bool m_SaveDetailedFitData;
+    /** Use modified time determination algorithm in emulator, same as in ShaperDSP version >= 1.4.3 */
+    bool m_adjusted_timing;
+
+    /**
+     * Skip events with specified type of timing source
+     * (see TRGSummary class, ETimingType enum)
+     */
+    std::vector<int> m_skipEvents = {};
 
     /** DBArray for payload 'ECLDSPPars0'. */
     DBArray<ECLDspData> m_ECLDspDataArray0;
@@ -82,6 +97,18 @@ namespace Belle2 {
     DBArray<ECLDspData> m_ECLDspDataArray1;
     /** DBArray for payload 'ECLDSPPars2'. */
     DBArray<ECLDspData> m_ECLDspDataArray2;
+
+    /** ECL digits. */
+    StoreArray<ECLDigit> m_ECLDigits;
+
+    /** ECL trigger data. */
+    StoreArray<ECLTrig> m_ECLTrigs;
+
+    /** ECL DSP data. */
+    StoreArray<ECLDsp> m_ECLDsps;
+
+    /** StoreObjPtr TRGSummary  */
+    StoreObjPtr<TRGSummary> m_TRGSummary;
 
     /** Low amplitude threshold. */
     DBObjPtr<ECLCrystalCalib> m_calibrationThrA0;
@@ -93,10 +120,6 @@ namespace Belle2 {
     /** ECL channel mapper. */
     ECL::ECLChannelMapper mapper;
 
-    /** Map to store DSP coeffs. for one shaper */
-    std::map<std::string, std::vector<short int>> map_vec;
-    /** Map to store auxiliary constants for one shaper. */
-    std::map<std::string, short int> map_coef;
     /** Map to store DSP coeffs. for all shapers. */
     std::map<int, std::map<std::string, std::vector<short int>>> map_container_vec;
     /** Map to store auxiliary constants for all shapers. */
@@ -194,11 +217,11 @@ namespace Belle2 {
     /** Convert a CellID number to the global Shaper number. */
     int conversion(int);
     /** Select from vector of DSP coeffs a subvector corresponding to accurate channel number. */
-    short int* vectorsplit(std::vector<short int>&, int);
+    const short int* vectorsplit(const std::vector<short int>&, int);
     /** Read calibration values for thresholds from DBObject. */
     void callbackCalibration(DBObjPtr<ECLCrystalCalib>&, std::vector<short int>&);
     /** Read DSP coeffs and auxiliary constants from DBObject. */
-    void callbackCalibration(ECLDspData*, std::map<std::string, std::vector<short int>>&, std::map<std::string, short int>&);
+    void callbackCalibration(const ECLDspData*, std::map<std::string, std::vector<short int>>&, std::map<std::string, short int>&);
     /** Get DSP coeffs and auxiliary constants from DB. */
     void initDspfromDB();
     /** Get DSP coeffs and auxiliary constants from Files. */

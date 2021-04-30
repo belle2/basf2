@@ -11,11 +11,9 @@
 #include <analysis/modules/InclusiveDstarReconstruction/InclusiveDstarReconstructionModule.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/DecayDescriptor/ParticleListName.h>
+
+#include <framework/gearbox/Const.h>
 
 #include <TVector3.h>
 #include <TDatabasePDG.h>
@@ -65,7 +63,7 @@ void InclusiveDstarReconstructionModule::initialize()
   int pion_pdg_code = 0;
   const DecayDescriptorParticle* daughter = m_decaydescriptor.getDaughter(0)->getMother();
   m_pionListName = daughter->getFullName();
-  StoreObjPtr<ParticleList>().isRequired(m_pionListName);
+  m_inputPionList.isRequired(m_pionListName);
   pion_pdg_code = daughter->getPDGCode();
 
   if (!pionCompatibleWithDstar(pion_pdg_code))
@@ -73,12 +71,10 @@ void InclusiveDstarReconstructionModule::initialize()
 
   // create and register output particle list
   m_outputListName = mother->getFullName();
-  StoreObjPtr<ParticleList> outputDstarList(m_outputListName);
-  outputDstarList.registerInDataStore();
+  m_outputDstarList.registerInDataStore(m_outputListName);
   // create and register output antiparticle list
   m_outputAntiListName = ParticleListName::antiParticleListName(m_outputListName);
-  StoreObjPtr<ParticleList> outputAntiDstarList(m_outputAntiListName);
-  outputAntiDstarList.registerInDataStore();
+  m_outputAntiDstarList.registerInDataStore(m_outputAntiListName);
 
   m_cut_dstar = Variable::Cut::compile(m_DstarCut);
   m_cut_pion = Variable::Cut::compile(m_slowPionCut);
@@ -93,7 +89,7 @@ void InclusiveDstarReconstructionModule::initialize()
   */
   int d_pdg_code = 0;
   if (abs(m_dstar_pdg_code) == 413) {
-    d_pdg_code = (pion_pdg_code == 111) ? 411 : 421;
+    d_pdg_code = (pion_pdg_code == Const::pi0.getPDGCode()) ? 411 : 421;
   } else {
     d_pdg_code = 421;
   }
@@ -102,22 +98,18 @@ void InclusiveDstarReconstructionModule::initialize()
 
 void InclusiveDstarReconstructionModule::event()
 {
-  StoreArray<Particle> particles;
 
-  StoreObjPtr<ParticleList> outputDstarList(m_outputListName);
-  outputDstarList.create();
-  outputDstarList->initialize(m_dstar_pdg_code, outputDstarList.getName());
+  m_outputDstarList.create();
+  m_outputDstarList->initialize(m_dstar_pdg_code, m_outputDstarList.getName());
 
-  StoreObjPtr<ParticleList> outputAntiDstarList(m_outputAntiListName);
-  outputAntiDstarList.create();
-  outputAntiDstarList->initialize(-m_dstar_pdg_code, m_outputAntiListName);
-  outputDstarList->bindAntiParticleList(*outputAntiDstarList);
+  m_outputAntiDstarList.create();
+  m_outputAntiDstarList->initialize(-m_dstar_pdg_code, m_outputAntiListName);
+  m_outputDstarList->bindAntiParticleList(*m_outputAntiDstarList);
 
-  StoreObjPtr<ParticleList> inputPionList(m_pionListName);
-  unsigned int num_pions = inputPionList->getListSize();
+  unsigned int num_pions = m_inputPionList->getListSize();
 
   for (unsigned int pion_index = 0; pion_index < num_pions; pion_index++) {
-    const Particle* pion = inputPionList->getParticle(pion_index);
+    const Particle* pion = m_inputPionList->getParticle(pion_index);
 
     if (!m_cut_pion->check(pion)) continue;
 
@@ -147,9 +139,9 @@ void InclusiveDstarReconstructionModule::event()
                               Particle::EFlavorType::c_Flavored, {pion->getArrayIndex()},
                               particle_properties, pion->getArrayPointer());
 
-    Particle* new_dstar = particles.appendNew(dstar);
+    Particle* new_dstar = m_particles.appendNew(dstar);
     if (!m_cut_dstar->check(new_dstar)) continue;
-    outputDstarList->addParticle(new_dstar);
+    m_outputDstarList->addParticle(new_dstar);
 
     // for decay 2/3 with negative flavor
     if (pion->getCharge() == 0) {
@@ -157,9 +149,9 @@ void InclusiveDstarReconstructionModule::event()
                                     Particle::EFlavorType::c_Flavored, {pion->getArrayIndex()},
                                     particle_properties, pion->getArrayPointer());
 
-      Particle* new_antidstar = particles.appendNew(antidstar);
+      Particle* new_antidstar = m_particles.appendNew(antidstar);
       if (!m_cut_dstar->check(new_antidstar)) continue;
-      outputAntiDstarList->addParticle(new_antidstar);
+      m_outputAntiDstarList->addParticle(new_antidstar);
     }
   }
 }
@@ -170,7 +162,7 @@ TLorentzVector InclusiveDstarReconstructionModule::estimateDstarFourMomentum(con
   double energy_dstar = pion->getEnergy() * m_dstar_pdg_mass / (m_dstar_pdg_mass - m_d_pdg_mass);
   double abs_momentum_dstar = sqrt(energy_dstar * energy_dstar - m_dstar_pdg_mass * m_dstar_pdg_mass);
 
-  // dstar momentum approximated colinear to pion direction
+  // dstar momentum approximated collinear to pion direction
   TVector3 momentum_vector_pion =  pion->getMomentum();
   TVector3 momentum_vec_dstar = abs_momentum_dstar * momentum_vector_pion.Unit();
 
@@ -180,11 +172,11 @@ TLorentzVector InclusiveDstarReconstructionModule::estimateDstarFourMomentum(con
 bool InclusiveDstarReconstructionModule::pionCompatibleWithDstar(int pion_pdg_code)
 {
   bool is_compatible = false;
-  if (pion_pdg_code == 111) {
+  if (pion_pdg_code == Const::pi0.getPDGCode()) {
     is_compatible = true;
-  } else if (pion_pdg_code == 211) {
+  } else if (pion_pdg_code == Const::pion.getPDGCode()) {
     is_compatible = (m_dstar_pdg_code == 413);
-  } else if (pion_pdg_code == -211) {
+  } else if (pion_pdg_code == -Const::pion.getPDGCode()) {
     is_compatible = (m_dstar_pdg_code == -413);
   }
   return is_compatible;

@@ -31,7 +31,11 @@ namespace Belle2 {
 
 
     /** Standard constructor
-     * @param energyDep Deposited energy in electrons
+     * @param edep Deposited energy in electrons
+     * @param I amplitude in volts
+     * @param time time in seconds
+     * @param detNb Detector number
+     * @param pdg Particle PDG
      */
     BeamabortHit(float edep, float I, float time, int detNb, int pdg):
       m_edep(edep), m_I(I), m_time(time), m_detNb(detNb), m_pdg(pdg)

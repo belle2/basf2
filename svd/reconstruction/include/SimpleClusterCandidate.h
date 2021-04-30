@@ -53,7 +53,9 @@ namespace Belle2 {
       /**
        * Add a Strip to the current cluster.
        * Update the cluster seed seed.
-       * @param stripInCluster aStrip to add to the cluster
+       * @param vxdID sensorID
+       * @param isUside is u
+       * @param aStrip to add to the cluster
        * @return true if the strip is on the expected side and sensor and it's next to the last strip added to the cluster candidate
        */
       bool add(VxdID vxdID, bool isUside, struct  stripInCluster& aStrip);

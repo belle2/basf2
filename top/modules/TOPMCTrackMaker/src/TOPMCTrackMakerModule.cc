@@ -112,7 +112,7 @@ namespace Belle2 {
                            1.0,            // pValue
                            BFieldManager::getField(0, 0, 0).Z() / Unit::T,
                            0x38FFFFFFFFFFFFFF, // 56 hits, in all CDC layers
-                           0);
+                           0, 56 - 5); // NDF = 56-5
       auto* track = tracks.appendNew();
       track->setTrackFitResultIndex(Const::pion, fitResults.getEntries() - 1);
       track->addRelationTo(&mcParticle);

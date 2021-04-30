@@ -14,8 +14,6 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <analysis/dataobjects/EventExtraInfo.h>
-
 using namespace std;
 using namespace Belle2;
 
@@ -59,8 +57,6 @@ void VariablesToEventExtraInfoModule::initialize()
 
 void VariablesToEventExtraInfoModule::event()
 {
-  StoreArray<Particle> particles;
-
   if (!m_inputList) {
     B2WARNING("Input list " << m_inputList.getName() << " was not created?");
     return;
@@ -76,29 +72,28 @@ void VariablesToEventExtraInfoModule::event()
 
 void VariablesToEventExtraInfoModule::addEventExtraInfo(const Particle* source)
 {
-  StoreObjPtr<EventExtraInfo> eventExtraInfo;
-  if (not eventExtraInfo.isValid()) eventExtraInfo.create();
+  if (not m_eventExtraInfo.isValid()) m_eventExtraInfo.create();
 
   const unsigned int nVars = m_functions.size();
   for (unsigned int iVar = 0; iVar < nVars; iVar++) {
     double value = m_functions[iVar](source);
 
-    if (eventExtraInfo->hasExtraInfo(m_extraInfoNames[iVar])) {
-      double current = eventExtraInfo->getExtraInfo(m_extraInfoNames[iVar]);
+    if (m_eventExtraInfo->hasExtraInfo(m_extraInfoNames[iVar])) {
+      double current = m_eventExtraInfo->getExtraInfo(m_extraInfoNames[iVar]);
       if (m_overwrite == -1) {
         if (value < current)
-          eventExtraInfo->setExtraInfo(m_extraInfoNames[iVar], value);
+          m_eventExtraInfo->setExtraInfo(m_extraInfoNames[iVar], value);
       } else if (m_overwrite == 1) {
         if (value > current)
-          eventExtraInfo->setExtraInfo(m_extraInfoNames[iVar], value);
+          m_eventExtraInfo->setExtraInfo(m_extraInfoNames[iVar], value);
       } else if (m_overwrite == 0) {
         B2WARNING("Extra info with given name " << m_extraInfoNames[iVar] << " already set, I won't set it again.");
       } else if (m_overwrite == 2) {
-        eventExtraInfo->setExtraInfo(m_extraInfoNames[iVar], value);
+        m_eventExtraInfo->setExtraInfo(m_extraInfoNames[iVar], value);
       }
 
     } else {
-      eventExtraInfo->addExtraInfo(m_extraInfoNames[iVar], value);
+      m_eventExtraInfo->addExtraInfo(m_extraInfoNames[iVar], value);
     }
   }
 }

@@ -81,7 +81,7 @@ namespace Belle2 {
       using CandidateReceiver = AxialHitQuadTreeProcessor::CandidateReceiver;
       /**
        * Performs quadtree search
-       * @param candidateProcessor lambda interface process found leaves in the legendre search
+       * @param candidateReceiver lambda interface process found leaves in the legendre search
        * @param qtProcessor reference to the AxialHitQuadTreeProcessor instance
        */
       void executeRelaxation(const CandidateReceiver& candidateReceiver,

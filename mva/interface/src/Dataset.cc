@@ -344,7 +344,7 @@ namespace Belle2 {
       TDirectory* dir = gDirectory;
       for (const auto& filename : filenames) {
         if (not boost::filesystem::exists(filename)) {
-          B2ERROR("Error given ROOT file dies not exists " << filename);
+          B2ERROR("Error given ROOT file does not exist " << filename);
           throw std::runtime_error("Error during open of ROOT file named " + filename);
         }
 

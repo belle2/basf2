@@ -13,35 +13,28 @@
 
 // kinfitter
 #include <analysis/modules/ParticleKinematicFitter/ParticleKinematicFitterModule.h>
-#include <analysis/OrcaKinFit/BaseFitter.h>
 #include <analysis/OrcaKinFit/BaseFitObject.h>
 #include <analysis/OrcaKinFit/OPALFitterGSL.h>
 #include <analysis/OrcaKinFit/JetFitObject.h>
 #include <analysis/OrcaKinFit/NewtonFitterGSL.h>
 #include <analysis/OrcaKinFit/NewFitterGSL.h>
 #include <analysis/OrcaKinFit/PxPyPzMFitObject.h>
-#include <analysis/OrcaKinFit/TextTracer.h>
 
 #include <mdst/dataobjects/ECLCluster.h>
 
 // framework utilities
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // analysis dataobjects
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 
 // analysis utilities
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ParticleCopy.h>
 
-// CLHEP
-#include <CLHEP/Matrix/SymMatrix.h>
-#include <CLHEP/Vector/LorentzVector.h>
-
 using namespace CLHEP;
 using namespace std;
-//using namespace OrcaKinFit;
 
 namespace Belle2 {
   namespace OrcaKinFit {
@@ -83,7 +76,6 @@ namespace Belle2 {
 
     }
 
-
     void ParticleKinematicFitterModule::initialize()
     {
       m_eventextrainfo.registerInDataStore();
@@ -92,17 +84,8 @@ namespace Belle2 {
         m_decaydescriptor.init(m_decayString);
         B2INFO("ParticleKinematicFitter: Using specified decay string: " << m_decayString);
       }
-    }
 
-
-    void ParticleKinematicFitterModule::beginRun()
-    {
-      B2INFO("ParticleKinematicFitterModule::beginRun");
-    }
-
-    void ParticleKinematicFitterModule::endRun()
-    {
-      B2INFO("ParticleKinematicFitterModule::endRun");
+      m_plist.isRequired(m_listName);
     }
 
     void ParticleKinematicFitterModule::terminate()
@@ -110,22 +93,14 @@ namespace Belle2 {
       B2INFO("ParticleKinematicFitterModule::terminate");
     }
 
-
     void ParticleKinematicFitterModule::event()
     {
       B2DEBUG(17, "ParticleKinematicFitterModule::event");
 
-      StoreObjPtr<ParticleList> plist(m_listName);
-      if (!plist) {
-        B2ERROR("ParticleList " << m_listName << " not found");
-        return;
-      }
-
-      unsigned int n = plist->getListSize();
+      unsigned int n = m_plist->getListSize();
 
       for (unsigned i = 0; i < n; i++) {
-//       Particle* particle = const_cast<Particle*> (plist->getParticle(i));
-        Particle* particle = plist->getParticle(i);
+        Particle* particle = m_plist->getParticle(i);
 
         if (m_updateDaughters == true) {
           if (m_decayString.empty()) ParticleCopy::copyDaughters(particle);
@@ -138,7 +113,6 @@ namespace Belle2 {
       }
 
     }
-
 
     bool ParticleKinematicFitterModule::doKinematicFit(Particle* mother)
     {
@@ -208,7 +182,7 @@ namespace Belle2 {
       int debugfitter = 0;
       if (m_debugFitter) debugfitter = m_debugFitterLevel;
 
-      // choos eminimization
+      // choose minimization
       if (m_orcaFitterEngine == "OPALFitterGSL") {
         pfitter = new OPALFitterGSL(); // OPAL fitter has no debugger
       } else if (m_orcaFitterEngine == "NewtonFitterGSL") {
@@ -301,6 +275,7 @@ namespace Belle2 {
       }
 
       delete pfitter;
+      delete m_textTracer;
       return true;
     }
 
@@ -353,7 +328,7 @@ namespace Belle2 {
       B2DEBUG(17, "ParticleKinematicFitterModule: adding a particle to the fitter!");
 
       if (m_add3CPhoton && index == 0) {
-        if (particle -> getPDGCode() != 22) {
+        if (particle -> getPDGCode() != Const::photon.getPDGCode()) {
           B2ERROR("In 3C Kinematic fit, the first daughter should be the Unmeasured Photon!");
         }
 
@@ -666,7 +641,7 @@ namespace Belle2 {
             } else {
               B2FATAL("ParticleKinematicFitterModule:   no fitObject could be used to update the daughter!");
             }
-            TVector3 pos          = allparticles[iDaug]->getVertex(); // we dont update the vertex yet
+            TVector3 pos          = allparticles[iDaug]->getVertex(); // we don't update the vertex yet
             TMatrixFSym errMatrix = allparticles[iDaug]->getMomentumVertexErrorMatrix();
             TMatrixFSym errMatrixMom = allparticles[iDaug]->getMomentumErrorMatrix();
             TMatrixFSym errMatrixVer = allparticles[iDaug]->getVertexErrorMatrix();
@@ -685,7 +660,7 @@ namespace Belle2 {
 
         return true;
       } else {
-        B2ERROR("updateOrcaKinFitDaughters: Cannot update daughters, mismatch betwen number of daughters and number of fitobjects!");
+        B2ERROR("updateOrcaKinFitDaughters: Cannot update daughters, mismatch between number of daughters and number of fitobjects!");
         return false;
       }
 

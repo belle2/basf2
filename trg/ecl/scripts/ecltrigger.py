@@ -1,19 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 
 
 def add_ecl_trigger(path):
     """
     add ecl trigger module to path
     """
-    trgeclfam = register_module("TRGECLFAM")
-    trgeclfam.param('TCWaveform', 0)  # Output TC Waveform (0 : no save, 1 : save)
+    trgeclfam = b2.register_module("TRGECLFAM")
+    # Output TC Waveform (0 : no save, 1 : save)
+    trgeclfam.param('TCWaveform', 0)
+    # save only measured TC data(=0) or both measured and true TC data(=1)
+    trgeclfam.param('FAMAnaTable', 0)
+    #
     path.add_module(trgeclfam)
+    #
+    trgecl = b2.register_module("TRGECL")
+    # trgecl.logging.log_level = LogLevel.DEBUG
 
-    trgecl = register_module("TRGECL")
     # Output Clustering method(0: Use only ICN, 1: ICN + Max TC)
     trgecl.param('Clustering', 1)
-    trgecl.param('ClusterLimit', 6)  # The limit # of cluster
+    # The limit # of cluster in clustering logic
+    trgecl.param('ClusterLimit', 6)
+    # Theta ID region(low and high) of 3DBhabhaVetoInTrack
+    trgecl.param('3DBhabhaVetoInTrackThetaRegion', [3, 15])
+    #
     path.add_module(trgecl)

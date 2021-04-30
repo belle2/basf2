@@ -15,12 +15,16 @@
 #
 ######################################################
 
+import os
+import glob
+import sys
+from matplotlib.ticker import FormatStrFormatter
+import matplotlib.pyplot as plt
 import ROOT
 from ROOT import Belle2
+import basf2 as b2
 import flavorTagger as ft
-import basf2_mva
-from defaultEvaluationParameters import r_subsample, r_size, categories
-from array import array
+from defaultEvaluationParameters import categories
 
 import numpy as np
 import matplotlib as mpl
@@ -28,12 +32,6 @@ mpl.use('Agg')
 mpl.rcParams.update({'font.size': 22})
 mpl.rcParams['text.usetex'] = True
 mpl.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
-import matplotlib.pyplot as plt
-from matplotlib.ticker import FormatStrFormatter
-import math
-import sys
-import glob
-import os
 
 ROOT.gROOT.SetBatch(True)
 
@@ -60,7 +58,6 @@ allInputVariables = []
 
 
 ft.WhichCategories(categories)
-ft.setBelleOrBelle2(belleOrBelle2)
 ft.setVariables()
 
 belleOrBelle2Flag = belleOrBelle2
@@ -156,7 +153,7 @@ variablesPlotParamsDict = {
     'daughter(1,protonID)': ['daughter__bo1__cmprotonID__bc', dBw, 0, 1.01, r'$\mathcal{L}_{p}$', ""],
     'daughter(0,pionID)': ['daughter__bo0__cmpionID__bc', dBw, 0, 1.01, r'$\mathcal{L}_{\pi}$', ""]}
 
-if not Belle2.FileSystem.findFile('./InputVariablesPlots', True):
+if not b2.find_file('InputVariablesPlots', silent=True):
     os.mkdir('./InputVariablesPlots')
 
 
@@ -172,7 +169,7 @@ def plotInputVariablesOfFlavorTagger():
         # if category != "SlowPion":
         #     continue
 
-        if not Belle2.FileSystem.findFile('./InputVariablesPlots/' + category, True):
+        if not b2.find_file('InputVariablesPlots/' + category, silent=True):
             os.mkdir('./InputVariablesPlots/' + category)
 
         if particleList not in identifiersExtraInfosDict and category != 'KaonPion':
@@ -189,7 +186,6 @@ def plotInputVariablesOfFlavorTagger():
         # workingFiles = glob.glob(filesDirectory + '/' + methodPrefixEventLevel + 'sampled1?.root')
 
         for iFile in workingFiles:
-            # if Belle2.FileSystem.findFile(workingFile):
             tree.AddFile(iFile)
 
         categoryInputVariables = []

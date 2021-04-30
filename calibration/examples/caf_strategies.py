@@ -3,19 +3,18 @@
 # calibration/examples/1_create_sample_DSTs.sh or just make your own
 # and change the input data below.
 
-from basf2 import *
-set_log_level(LogLevel.INFO)
-# add time stamp to all INFO messages
-# currentInfo = logging.get_info(LogLevel.INFO)
-# logging.set_info(LogLevel.INFO, currentInfo | LogInfo.TIMESTAMP)
+import basf2 as b2
 
 import os
 import sys
 
-import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
-from caf.utils import IoV
+
+b2.set_log_level(b2.LogLevel.INFO)
+# add time stamp to all INFO messages
+# currentInfo = logging.get_info(LogLevel.INFO)
+# logging.set_info(LogLevel.INFO, currentInfo | LogInfo.TIMESTAMP)
 
 
 def main(argv):
@@ -42,7 +41,7 @@ def main(argv):
     cal_test = Calibration(name="TestCalibration", collector="CaTest", algorithms=alg_test, input_files=input_files_test)
 
     # Here we set the AlgorithmStrategy for our algorithm
-    from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
+    from caf.strategies import SingleIOV, SequentialRunByRun, SimpleRunByRun, SequentialBoundaries  # noqa
     # The default value is SingleIOV, you don't have to set this, it is done automatically.
     # SingleIOV just takes all of the runs as one big IoV and executes the algorithm once on all of their data.
     # You can use granularity='run' or granularity='all' for the collector when using this strategy.
@@ -64,6 +63,19 @@ def main(argv):
     # You should only use granularity='run' for the collector when using this strategy.
 
     # cal_test.strategies = SimpleRunByRun
+
+    # The SequentialBoundaries strategy executes your algorithm over all
+    # the runs in a time period contained between two boundaries to give
+    # you payloads for each one time period (if successful)
+    # If there wasn't enough data in a run to give a success, it tries to
+    # merge with the next time period's data and re-execute.
+    # You should only use granularity='run' for the collector when using this strategy.
+    # The run Boundaries can be either passed directy in the parameter dictionary
+    # of the algorithm (key `payload_boundaries`) or calculated by the algorithm itself
+    # in the function `isBoundaryRequired`.
+
+    # cal_test.strategies = SequentialBoundaries
+    # cal_test.algorithms[0].params = {"payload_boundaries" : [(0,1), (0,4), (0,7)]}
 
     ###################################################
     # Create a CAF instance and add the calibration to it. Should run on one CPU core locally by default.

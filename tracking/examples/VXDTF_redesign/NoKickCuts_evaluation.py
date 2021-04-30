@@ -18,10 +18,7 @@
 # Contributors: Valerio Bertacchi
 #####################################################################
 
-from basf2 import *
-from simulation import add_simulation
-from reconstruction import add_reconstruction, add_mdst_output
-from ROOT import Belle2
+import basf2 as b2
 
 import argparse
 parser = argparse.ArgumentParser(description="NoKickCuts evaluation module")
@@ -45,28 +42,28 @@ use_Validation = args.use_validation
 use_fit = args.use_fitMethod
 
 
-main_path = create_path()
+main_path = b2.create_path()
 
-mctrackfinder = register_module('TrackFinderMCTruthRecoTracks')
+mctrackfinder = b2.register_module('TrackFinderMCTruthRecoTracks')
 mctrackfinder.param('WhichParticles', ['SVD'])
 mctrackfinder.param('EnergyCut', 0)
 
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 
-rootinput = register_module('RootInput')
+rootinput = b2.register_module('RootInput')
 # param("inputFileNames", "/home/belle2/vberta/storage/release1_validation/training_sample/simulated*.root")
 
-progressbar = register_module('ProgressBar')
+progressbar = b2.register_module('ProgressBar')
 
-mctrackmatcher = register_module('MCRecoTracksMatcher')
+mctrackmatcher = b2.register_module('MCRecoTracksMatcher')
 mctrackmatcher.param('UseCDCHits', False)
 mctrackmatcher.param('UseSVDHits', True)
 mctrackmatcher.param('UsePXDHits', True)
 mctrackmatcher.param('mcRecoTracksStoreArrayName', 'MCRecoTracks')
 
-NoKickCuts = register_module('NoKickCutsEval')
+NoKickCuts = b2.register_module('NoKickCutsEval')
 NoKickCuts.param('useValidation', use_Validation)
 NoKickCuts.param('useFitMethod', use_fit)
 
@@ -78,5 +75,5 @@ main_path.add_module(mctrackfinder)
 main_path.add_module(NoKickCuts)
 main_path.add_module(progressbar)
 
-process(main_path)
-print(statistics)
+b2.process(main_path)
+print(b2.statistics)

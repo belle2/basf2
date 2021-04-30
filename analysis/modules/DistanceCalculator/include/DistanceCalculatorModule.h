@@ -19,8 +19,10 @@
 
 #include <analysis/dataobjects/Btube.h>
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
+#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
   /**
@@ -60,6 +62,7 @@ namespace Belle2 {
     std::string m_mode; /**< option string */
     Eigen::Vector3d m_distance; /**< distance between two objects (track/vertex/Btube and vertex/track) */
     TMatrixFSym m_distanceCovMatrix; /**< covariance matrix of distance */
+    StoreObjPtr<ParticleList> m_plist; /**< input particle list */
   };
 }
 

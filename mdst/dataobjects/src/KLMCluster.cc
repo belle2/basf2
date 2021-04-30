@@ -8,12 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
-#include <TDatabasePDG.h>
+/* Own header. */
+#include <mdst/dataobjects/KLMCluster.h>
 
 /* Belle2 headers. */
+#include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/Track.h>
 
 using namespace Belle2;
@@ -43,7 +43,7 @@ float KLMCluster::getMomentumMag() const
 
 float KLMCluster::getEnergy() const
 {
-  static double mass = TDatabasePDG::Instance()->GetParticle(130)->Mass();
+  static double mass = Const::Klong.getMass();
   return sqrt(mass * mass + m_p * m_p);
 }
 

@@ -14,11 +14,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-// FRAMEWORK
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-
 // ECL
 #include <ecl/modules/eclLocalRunCalibration/ECLLocalRunCalibratorModule.h>
 #include <ecl/dataobjects/ECLTrig.h>
@@ -162,12 +157,11 @@ void ECLLocalRunCalibratorModule::beginRun()
 void ECLLocalRunCalibratorModule::event()
 {
   // Getting amplitude and time input values.
-  StoreArray<ECLDigit> eclDigits("ECLDigits");
-  if (!eclDigits.isValid()) {
-    B2FATAL("eclDigits not valid");
+  if (!m_ECLDigits.isValid()) {
+    B2FATAL("ECLDigits not valid");
   }
   // Loop over the input array.
-  for (const auto& digit : eclDigits) {
+  for (const auto& digit : m_ECLDigits) {
     // Getting cell id and setting the
     // corresponding index.
     auto cellid = digit.getCellId();
@@ -236,9 +230,8 @@ void ECLLocalRunCalibratorModule::writeCalibResultsToDB()
 {
   // Getting experiment and run
   // numbers.
-  StoreObjPtr<EventMetaData> evtPtr;
-  int exp = evtPtr->getExperiment();
-  int run = evtPtr->getRun();
+  int exp = m_EventMetaData->getExperiment();
+  int run = m_EventMetaData->getRun();
   int lowrun;
   // Setting low run
   // of validity interval.

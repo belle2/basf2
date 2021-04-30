@@ -8,15 +8,15 @@
 </header>
 """
 
-from basf2 import *
+import basf2
 import ROOT
 from ROOT import Belle2
-from ROOT import TFile, TH1F, TNamed
+from ROOT import TNamed
 import math
 import numpy
 
 
-class KLMK0LPlotModule(Module):
+class KLMK0LPlotModule(basf2.Module):
     """ Class for creation of KLM K0L validation plots. """
 
     def __init__(self, output_file, evtgen, check_eklm):
@@ -35,89 +35,89 @@ class KLMK0LPlotModule(Module):
                                   5, -0.5, 4.5)
         self.hist_nkl.SetXTitle('KLM clusters')
         self.hist_nkl.SetYTitle('Events')
-        l = self.hist_nkl.GetListOfFunctions()
-        l.Add(TNamed('Description', 'Number of KLM clusters per 1 MC particle'))
-        l.Add(TNamed('Check', 'No efficiency decrease or multiple candidates \
+        functions = self.hist_nkl.GetListOfFunctions()
+        functions.Add(TNamed('Description', 'Number of KLM clusters per 1 MC particle'))
+        functions.Add(TNamed('Check', 'No efficiency decrease or multiple candidates \
                      increase'))
-        l.Add(TNamed('Contact', contact))
-        l.Add(TNamed('MetaOptions', 'shifter'))
+        functions.Add(TNamed('Contact', contact))
+        functions.Add(TNamed('MetaOptions', 'shifter'))
         #: X resolution histogram.
         self.hist_xres = ROOT.TH1F('k0l_xres',
                                    'KLM K0L decay vertex X resolution',
                                    100, -50, 50)
         self.hist_xres.SetXTitle('cm')
         self.hist_xres.SetYTitle('Events')
-        l = self.hist_xres.GetListOfFunctions()
-        l.Add(TNamed('Description', 'X resolution'))
-        l.Add(TNamed('Check', 'No bias, resolution ~ 16 cm.'))
-        l.Add(TNamed('Contact', contact))
-        l.Add(TNamed('MetaOptions', 'shifter'))
+        functions = self.hist_xres.GetListOfFunctions()
+        functions.Add(TNamed('Description', 'X resolution'))
+        functions.Add(TNamed('Check', 'No bias, resolution ~ 16 cm.'))
+        functions.Add(TNamed('Contact', contact))
+        functions.Add(TNamed('MetaOptions', 'shifter'))
         #: Y resolution histogram.
         self.hist_yres = ROOT.TH1F('k0l_yres',
                                    'KLM K0L decay vertex Y resolution',
                                    100, -50, 50)
         self.hist_yres.SetXTitle('cm')
         self.hist_yres.SetYTitle('Events')
-        l = self.hist_yres.GetListOfFunctions()
-        l.Add(TNamed('Description', 'Y resolution'))
-        l.Add(TNamed('Check', 'No bias, resolution ~ 16 cm.'))
-        l.Add(TNamed('Contact', contact))
-        l.Add(TNamed('MetaOptions', 'shifter'))
+        functions = self.hist_yres.GetListOfFunctions()
+        functions.Add(TNamed('Description', 'Y resolution'))
+        functions.Add(TNamed('Check', 'No bias, resolution ~ 16 cm.'))
+        functions.Add(TNamed('Contact', contact))
+        functions.Add(TNamed('MetaOptions', 'shifter'))
         #: Z resolution histogram.
         self.hist_zres = ROOT.TH1F('k0l_zres',
                                    'KLM K0L decay vertex Z resolution',
                                    100, -50, 50)
         self.hist_zres.SetXTitle('cm')
         self.hist_zres.SetYTitle('Events')
-        l = self.hist_zres.GetListOfFunctions()
-        l.Add(TNamed('Description', 'Z resolution'))
-        l.Add(TNamed('Check', 'No bias, resolution ~ 16 cm.'))
-        l.Add(TNamed('Contact', contact))
-        l.Add(TNamed('MetaOptions', 'shifter'))
+        functions = self.hist_zres.GetListOfFunctions()
+        functions.Add(TNamed('Description', 'Z resolution'))
+        functions.Add(TNamed('Check', 'No bias, resolution ~ 16 cm.'))
+        functions.Add(TNamed('Contact', contact))
+        functions.Add(TNamed('MetaOptions', 'shifter'))
         #: Time resolution histogram.
         self.hist_tres = ROOT.TH1F('k0l_tres',
                                    'KLM K0L decay time resolution',
                                    100, -20., 10.)
         self.hist_tres.SetXTitle('ns')
         self.hist_tres.SetYTitle('Events')
-        l = self.hist_tres.GetListOfFunctions()
-        l.Add(TNamed('Description', 'Time resolution'))
-        l.Add(TNamed('Check', 'No bias.'))
-        l.Add(TNamed('Contact', contact))
-        l.Add(TNamed('MetaOptions', 'shifter'))
+        functions = self.hist_tres.GetListOfFunctions()
+        functions.Add(TNamed('Description', 'Time resolution'))
+        functions.Add(TNamed('Check', 'No bias.'))
+        functions.Add(TNamed('Contact', contact))
+        functions.Add(TNamed('MetaOptions', 'shifter'))
         #: Momentum resolution histogram.
         self.hist_pres = ROOT.TH1F('k0l_pres',
                                    'KLM K0L momentum resolution',
                                    100, -3., 3.)
         self.hist_pres.SetXTitle('GeV')
         self.hist_pres.SetYTitle('Events')
-        l = self.hist_pres.GetListOfFunctions()
-        l.Add(TNamed('Description', 'Momentum resolution'))
-        l.Add(TNamed('Check', 'No bias.'))
-        l.Add(TNamed('Contact', contact))
-        l.Add(TNamed('MetaOptions', 'shifter'))
+        functions = self.hist_pres.GetListOfFunctions()
+        functions.Add(TNamed('Description', 'Momentum resolution'))
+        functions.Add(TNamed('Check', 'No bias.'))
+        functions.Add(TNamed('Contact', contact))
+        functions.Add(TNamed('MetaOptions', 'shifter'))
         #: Momentum theta resolution histogram.
         self.hist_ptres = ROOT.TH1F('k0l_ptres',
                                     'KLM K0L momentum theta resolution',
                                     100, -0.2, 0.2)
         self.hist_ptres.SetXTitle('rad')
         self.hist_ptres.SetYTitle('Events')
-        l = self.hist_ptres.GetListOfFunctions()
-        l.Add(TNamed('Description', 'Momentum theta resolution'))
-        l.Add(TNamed('Check', 'No bias, resolution ~ 0.06'))
-        l.Add(TNamed('Contact', contact))
-        l.Add(TNamed('MetaOptions', 'shifter'))
+        functions = self.hist_ptres.GetListOfFunctions()
+        functions.Add(TNamed('Description', 'Momentum theta resolution'))
+        functions.Add(TNamed('Check', 'No bias, resolution ~ 0.06'))
+        functions.Add(TNamed('Contact', contact))
+        functions.Add(TNamed('MetaOptions', 'shifter'))
         #: Momentum phi resolution histogram.
         self.hist_ppres = ROOT.TH1F('k0l_ppres',
                                     'KLM K0L momentum phi resolution',
                                     100, -0.2, 0.2)
         self.hist_ppres.SetXTitle('rad')
         self.hist_ppres.SetYTitle('Events')
-        l = self.hist_ppres.GetListOfFunctions()
-        l.Add(TNamed('Description', 'Momentum phi resolution'))
-        l.Add(TNamed('Check', 'No bias, resolution ~ 0.07'))
-        l.Add(TNamed('Contact', contact))
-        l.Add(TNamed('MetaOptions', 'shifter'))
+        functions = self.hist_ppres.GetListOfFunctions()
+        functions.Add(TNamed('Description', 'Momentum phi resolution'))
+        functions.Add(TNamed('Check', 'No bias, resolution ~ 0.07'))
+        functions.Add(TNamed('Contact', contact))
+        functions.Add(TNamed('MetaOptions', 'shifter'))
         #: Covariance matrix histogram.
         self.hist_covmat = ROOT.TH1F('k0l_covmat',
                                      'KLM K0L coordinates covariance matrix',
@@ -129,11 +129,11 @@ class KLMK0LPlotModule(Module):
         self.hist_covmat.GetXaxis().SetBinLabel(5, 'yz')
         self.hist_covmat.GetXaxis().SetBinLabel(6, 'zz')
         self.hist_covmat.SetYTitle('Covariance, cm^{2}')
-        l = self.hist_covmat.GetListOfFunctions()
-        l.Add(TNamed('Description', 'Momentum phi resolution'))
-        l.Add(TNamed('Check', 'No large off-diagonal elements.'))
-        l.Add(TNamed('Contact', contact))
-        l.Add(TNamed('MetaOptions', 'shifter'))
+        functions = self.hist_covmat.GetListOfFunctions()
+        functions.Add(TNamed('Description', 'Momentum phi resolution'))
+        functions.Add(TNamed('Check', 'No large off-diagonal elements.'))
+        functions.Add(TNamed('Contact', contact))
+        functions.Add(TNamed('MetaOptions', 'shifter'))
         #: Correlation matrix histogram.
         self.hist_corrmat = ROOT.TH1F('k0l_corrmat',
                                       'KLM K0L correlation matrix',
@@ -149,11 +149,11 @@ class KLMK0LPlotModule(Module):
         self.hist_corrmat.GetXaxis().SetBinLabel(9, 'zp')
         self.hist_corrmat.GetXaxis().SetBinLabel(10, 'pp')
         self.hist_corrmat.SetYTitle('Correlation coefficient')
-        l = self.hist_corrmat.GetListOfFunctions()
-        l.Add(TNamed('Description', 'Momentum phi resolution'))
-        l.Add(TNamed('Check', 'No large off-diagonal elements.'))
-        l.Add(TNamed('Contact', contact))
-        l.Add(TNamed('MetaOptions', 'shifter'))
+        functions = self.hist_corrmat.GetListOfFunctions()
+        functions.Add(TNamed('Description', 'Momentum phi resolution'))
+        functions.Add(TNamed('Check', 'No large off-diagonal elements.'))
+        functions.Add(TNamed('Contact', contact))
+        functions.Add(TNamed('MetaOptions', 'shifter'))
         #: Average vertex.
         self.vertex_k_av = ROOT.TVector3(0, 0, 0)
         #: Vertex list.

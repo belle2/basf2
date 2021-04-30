@@ -32,8 +32,10 @@ namespace Belle2 {
       PXDROIPlotModule();
 
     private:
+      /** Initialize */
       void initialize() override final;
 
+      /** Event */
       void event() override final;
 
     private:
@@ -41,6 +43,7 @@ namespace Belle2 {
       std::string m_ROIsName;        /**< ROIs StoreArray name */
       std::string m_DCROIsName;        /**< DC ROIs StoreArray name */
       std::string m_HLTROIsName;        /**< HLT ROIs StoreArray name */
+      std::string m_prefix; /**< prefix for plot names */
 
       StoreObjPtr<EventMetaData> m_eventMetaData;/**< Event Metadata StorePtr */
 

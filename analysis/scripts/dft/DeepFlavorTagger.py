@@ -11,21 +11,20 @@
 # This software is provided "as is" without any warranty.                #
 ##########################################################################
 
+import json
+import os
+import basf2_mva
+from basf2 import B2ERROR, B2FATAL
+import basf2
+from ROOT import Belle2
+import variables.utils as vu
+import modularAnalysis as ma
 from ROOT import gSystem
 gSystem.Load('libanalysis.so')
-import modularAnalysis as ma
-import variables.utils as vu
-from ROOT import Belle2
-import basf2
-from basf2 import B2ERROR, B2FATAL
-import basf2_mva
 
 # make ROOT compatible available
 Belle2.Variable.Manager
 Belle2.Variable.Manager.Instance()
-
-import os
-import json
 
 
 def get_variables(particle_list, ranked_variable, variables=None, particleNumber=1):
@@ -122,7 +121,7 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
         variable_list = ['useCMSFrame(p)', 'useCMSFrame(cosTheta)', 'useCMSFrame(phi)', 'Kid', 'eid', 'muid', 'prid',
                          'nCDCHits', 'nPXDHits', 'nSVDHits', 'dz', 'dr', 'chiProb']
 
-    if variable_list is not None and mode is 'expert':
+    if variable_list is not None and mode == 'expert':
         B2ERROR('DFT: Variables from identifier file are used. Input variables will be ignored.')
 
     if classifier_args is None:
@@ -166,14 +165,14 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
     # rank_variable = 'useCMSFrame(p)'
 
     # create tagging specific variables
-    if mode is not 'expert':
+    if mode != 'expert':
         features = get_variables(dft_particle_lists[0], rank_variable, variable_list, particleNumber=5)
         features += get_variables(dft_particle_lists[1], rank_variable, variable_list, particleNumber=5)
 
     for particles in dft_particle_lists:
         ma.rankByHighest(particles, rank_variable, path=roe_path)
 
-    if mode is 'sampler':
+    if mode == 'sampler':
         if os.path.isfile(output_file_name) and not overwrite:
             B2FATAL('Outputfile %s already exists. Aborting writeout.' % output_file_name)
 
@@ -198,7 +197,7 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
         with open(os.path.join(working_dir, uniqueIdentifier + '_teacher_command'), 'w') as f:
             f.write(extern_command)
 
-    elif mode is 'teacher':
+    elif mode == 'teacher':
         if not os.path.isfile(output_file_name):
             B2FATAL('There is no training data file available. Run flavor tagger in sampler mode first.')
         general_options = basf2_mva.GeneralOptions()
@@ -219,7 +218,7 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
 
         basf2_mva.teacher(general_options, specific_options)
 
-    elif mode is 'expert':
+    elif mode == 'expert':
         # TODO: implement filling flavor tagger info in the FlavorTaggerInfoMap
 
         # flavor tagger info

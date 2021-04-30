@@ -187,6 +187,7 @@ class TestIPythonHandler(TestCase):
         assert_is_in_processes(2, "bc")
         assert_is_in_processes(3, "bc")
 
+
 if __name__ == "__main__":
     main()
 # @endcond

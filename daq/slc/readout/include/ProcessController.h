@@ -40,7 +40,15 @@ namespace Belle2 {
     bool pause();
     bool resume();
     bool stop();
-    bool abort();
+
+    /***
+     * Guaranteed abort by sending first SIGINT and after the given timeout SIGABRT in case SIGINT is not able to kill
+     * the process. Same cleanup procedure as the abort method, but circumvents hanging SIGINT calls.
+     * @param timeout time (in seconds)
+     * @return
+     */
+    bool abort(unsigned int timeout = 60);
+
     const std::string& getName() { return m_name; }
     const std::string& getParName() { return m_parname; }
     const std::string& getExecutable() { return m_exename; }
@@ -56,7 +64,7 @@ namespace Belle2 {
     template<typename T>
     void addArgument(T arg);
     void clearArguments() { m_arg_v = std::vector<std::string>(); }
-    bool isAlive() { return m_process.isAlive(); }
+    bool isAlive() const { return m_process.isAlive(); }
     bool waitReady(int timeout);
 
   public:

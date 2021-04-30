@@ -12,6 +12,14 @@
 """
 #   <input>EvtGenSimNoBkg.root</input>
 
+from tracking import add_tracking_for_PXDDataReduction_simulation
+from tracking.validation.plot import ValidationPlot
+from ROOT import Belle2
+import collections
+import ROOT
+import basf2
+from svd import add_svd_reconstruction
+from simulation import add_simulation
 NAME = 'ROIFinding'  # not used?
 CONTACT = 'software-tracking@belle2.org'
 # INPUT_FILE = '../EvtGenSimNoBkg.root' #can't use it because PXDDataReduction in simulated
@@ -21,21 +29,8 @@ N_EVENTS = 1000
 
 ACTIVE = True
 
-from simulation import add_simulation
-from svd import add_svd_reconstruction
-
-import basf2
-import ROOT
-import collections
-import math
-from ROOT import Belle2
-
-from tracking.validation.plot import ValidationPlot
-
 
 basf2.set_random_seed(1509)
-
-from tracking import add_tracking_for_PXDDataReduction_simulation
 
 
 class ROIFindingTrackingValidationPlots(basf2.Module):
@@ -132,7 +127,6 @@ class ROIFindingTrackingValidationPlots(basf2.Module):
     def terminate(self):
         """Receive signal at the end of event processing"""
 
-        name = self.validation_name
         contact = self.contact
         basf2.B2RESULT("total nROIs = {}".format(self.nROIs))
 

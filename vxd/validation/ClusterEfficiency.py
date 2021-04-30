@@ -10,18 +10,17 @@
   </description>
 </header>
 """
-import sys
 import math
-from basf2 import *
+import basf2 as b2
 from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = 1
-from svd import *
-from pxd import *
+PyConfig.IgnoreCommandLineOptions = 1  # noqa
+import svd
+import pxd
 import ROOT
 from ROOT import Belle2
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 # set some random seed
-set_random_seed(10346)
+b2.set_random_seed(10346)
 
 # momenta to generate the plots for
 momenta = [3.0]
@@ -29,10 +28,11 @@ momenta = [3.0]
 theta_params = [90, 0.1]
 
 
-class ClusterEfficiency(Module):
+class ClusterEfficiency(b2.Module):
     """
     Plot Efficiency to find a U and V cluster for each given truehit.
     """
+
     def initialize(self):
         """
         Create ROOT TProfiles for all layers and momenta.
@@ -164,8 +164,8 @@ class ClusterEfficiency(Module):
 
             # meh, something strange with the momentum, ignore this one
             if p_gen is None:
-                B2WARNING("Strange particle momentum: %f, expected one of %s" %
-                          (p.Mag(), ", ".join(str() for p in momenta)))
+                b2.B2WARNING("Strange particle momentum: %f, expected one of %s" %
+                             (p.Mag(), ", ".join(str() for p in momenta)))
                 continue
 
             # and check all truehits
@@ -174,9 +174,10 @@ class ClusterEfficiency(Module):
             svdtruehits = mcp.getRelationsTo("SVDTrueHits")
             self.fill_truehits(math.degrees(p.Phi()), p_gen, svdtruehits)
 
+
 # Now let's create a path to simulate our events. We need a bit of statistics but
 # that's not too bad since we only simulate single muons
-main = create_path()
+main = b2.create_path()
 main.add_module("EventInfoSetter", evtNumList=[10000])
 main.add_module("Gearbox")
 # we only need the vxd for this
@@ -193,14 +194,14 @@ particlegun.param({
     "thetaParams": theta_params,
 })
 main.add_module("FullSim")
-add_pxd_simulation(main)
-add_svd_simulation(main)
-add_pxd_reconstruction(main)
-add_svd_reconstruction(main)
+pxd.add_pxd_simulation(main)
+svd.add_svd_simulation(main)
+pxd.add_pxd_reconstruction(main)
+svd.add_svd_reconstruction(main)
 
 clusterefficiency = ClusterEfficiency()
 main.add_module(clusterefficiency)
 main.add_module("Progress")
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

@@ -10,15 +10,16 @@
 
 #pragma once
 
+#include <vector>
+
 #include <calibration/CalibrationCollectorModule.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
-#include <reconstruction/dbobjects/CDCDedxWireGain.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-
 #include <framework/datastore/StoreArray.h>
 
-#include <vector>
+#include <reconstruction/dbobjects/CDCDedxWireGain.h>
 
 namespace Belle2 {
   /**
@@ -45,24 +46,19 @@ namespace Belle2 {
     virtual void collect() override;
 
     /**
-    * if bad phi region removal is demanded
-    */
-    void setBadPhiRejection(bool value) {IsBadPhiRej = value;}
-
-    /**
-    * if bad phi region removal is demanded
+    * Set range for EoP cut
     */
     void setEoverPCutValue(double value) {fSetEoverP = value;}
 
 
   private:
-
     /**
     * Electron collector variables
     */
     bool m_cuts; /**< Boolean to apply cuts during collection */
 
     /// required input
+    StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Store array for Trigger selection */
     StoreArray<CDCDedxTrack> m_dedxTracks; /**< Required array for CDCDedxTracks */
     StoreArray<Track> m_tracks; /**< Required array for Tracks */
     StoreArray<TrackFitResult> m_trackFitResults; /**< Required array for TrackFitResults */
@@ -89,18 +85,19 @@ namespace Belle2 {
     std::vector<double> m_dedxhit; /**< dE/dx for the hit */
 
 
-    bool Iscosth; /**< flag to write costh in tree  */
-    bool Isp;/**< flag to write momentum in treet */
-    bool Ischarge;/**< flag to write charge in treet */
-    bool Isrun;/**< flag to write run number in tree */
-    bool Iswire;/**< flag to write wire number in tree */
-    bool Islayer;/**< flag to write layer number in tree */
-    bool Isdoca;/**< flag to write doca in tree */
-    bool Isenta;/**< flag to write enta in tree */
-    bool IsdocaRS;/**< flag to write rescaled doca in tree */
-    bool IsentaRS;/**< flag to write rescaled enta in tree */
+    bool IsCosth; /**< flag to write costh in tree  */
+    bool IsMom;/**< flag to write momentum in treet */
+    bool IsCharge;/**< flag to write charge in treet */
+    bool IsRun;/**< flag to write run number in tree */
+    bool IsWire;/**< flag to write wire number in tree */
+    bool IsLayer;/**< flag to write layer number in tree */
+    bool IsDoca;/**< flag to write doca in tree */
+    bool IsEnta;/**< flag to write enta in tree */
+    bool IsDocaRS;/**< flag to write rescaled doca in tree */
+    bool IsEntaRS;/**< flag to write rescaled enta in tree */
     bool Isdedxhit;    /**< flag to write dedxhits in tree */
-    bool IsBadPhiRej;/**< flag to remove bad phi region */
-    bool IsRadbhabha; /**< flag to dedx cut on partner track */
+    bool IsBhabhaEvt; /**< flag to select bhabha event */
+    bool IsRadBhabhaEvt; /**< flag to select radee event */
+    bool enableTrgSel; /**< flag to enable trigger skim selected in the module (off deafult) */
   };
 }

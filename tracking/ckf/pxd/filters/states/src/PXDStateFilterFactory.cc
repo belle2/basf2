@@ -80,7 +80,7 @@ std::string PXDStateFilterFactory::getIdentifier() const
 
 std::string PXDStateFilterFactory::getFilterPurpose() const
 {
-  return "Reject pxd states";
+  return "Reject PXD CKF states. ";
 }
 
 std::map<std::string, std::string> PXDStateFilterFactory::getValidFilterNamesAndDescriptions() const
@@ -95,6 +95,8 @@ std::map<std::string, std::string> PXDStateFilterFactory::getValidFilterNamesAnd
     {"sloppy_truth", "sloppy monte carlo truth"},
     {"simple", "simple filter to be used in pxd"},
     {"recording", "record variables to a TTree"},
+    {"recording_and_truth", "record variables to a TTree and store truth information"},
+    {"recording_with_direction_check", "record variables to a TTree with direction check"},
     {"mva_with_direction_check", "MVA filter with direction check"},
     {"mva", "MVA filter"},
     {"sloppy_recording", "record variables to a TTree"},
@@ -122,11 +124,18 @@ PXDStateFilterFactory::create(const std::string& filterName) const
     return std::make_unique<SloppyMCPXDStateFilter>();
   } else if (filterName == "recording") {
     return std::make_unique<RecordingPXDStateFilter>("PXDStateFilter.root");
+  } else if (filterName == "recording_and_truth") {
+    return std::make_unique<AndPXDStateFilter>(
+             std::make_unique<RecordingPXDStateFilter>("PXDStateFilter.root"),
+             std::make_unique<MCPXDStateFilter>());
+  } else if (filterName == "recording_with_direction_check") {
+    return std::make_unique<AndPXDStateFilter>(
+             std::make_unique<NonIPCrossingPXDStateFilter>(),
+             std::make_unique<RecordingPXDStateFilter>("PXDStateFilter.root"));
   } else if (filterName == "mva_with_direction_check") {
     return std::make_unique<AndPXDStateFilter>(
              std::make_unique<NonIPCrossingPXDStateFilter>(),
-             std::make_unique<MVAPXDStateFilter>("ckf_CDCPXDStateFilter_1")
-           );
+             std::make_unique<MVAPXDStateFilter>("ckf_CDCPXDStateFilter_1"));
   } else if (filterName == "mva") {
     return std::make_unique<AndPXDStateFilter>(
              std::make_unique<MVAPXDStateFilter>("ckf_CDCPXDStateFilter_1"),

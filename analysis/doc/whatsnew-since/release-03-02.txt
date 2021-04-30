@@ -63,7 +63,7 @@ Variables
 
 * The chi2 and ndf from KFit vertices are stored as extraInfo for debugging.
 
-* Added :b2:var:`trackFitHypothesisPDG` which returns the PDG code of the successfull track fit hypothesis 
+* Added :b2:var:`trackFitHypothesisPDG` which returns the PDG code of the successful track fit hypothesis 
   that was used to create this particle (that might be different from the PDG code of the particle list)
 
 * Added variables for 2D Armenteros-Podolanski plot, :b2:var:`ArmenterosLongitudinalMomentumAsymmetry`, 

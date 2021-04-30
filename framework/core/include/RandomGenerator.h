@@ -46,7 +46,7 @@ namespace Belle2 {
     };
 
     /** Default constructor, does not initialize the generator. */
-    RandomGenerator();
+    explicit RandomGenerator(const std::string& name = "Belle2 Random Generator");
 
     /** Destructor to free the seed information */
     virtual ~RandomGenerator() {}
@@ -64,6 +64,9 @@ namespace Belle2 {
 
     /** Set the generator mode */
     void setMode(EGeneratorMode mode) { m_mode = mode; }
+
+    /** Get the generator mode */
+    EGeneratorMode getMode() const { return m_mode; }
 
     /** return the seed object */
     const std::vector<unsigned char>& getSeed() const { return m_seed; }

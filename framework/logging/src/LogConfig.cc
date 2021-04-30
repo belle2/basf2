@@ -36,6 +36,7 @@ void LogConfig::setLogLevel(ELogLevel logLevel)
                                               PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__, 0));
     logLevel = c_Error;
   }
+  if (logLevel == c_Debug) Belle2::LogSystem::enableDebug();
   m_logLevel = logLevel;
 }
 
@@ -44,4 +45,11 @@ const char* LogConfig::logLevelToString(LogConfig::ELogLevel logLevelType)
 {
   static const char* logLevelString[] = {"DEBUG", "INFO", "RESULT", "WARNING", "ERROR", "FATAL", "default"};
   return logLevelString[logLevelType];
+}
+
+
+const char* LogConfig::logRealmToString(LogConfig::ELogRealm realm)
+{
+  static const char* logRealmString[] = {"none", "online", "production"};
+  return logRealmString[realm];
 }

@@ -40,8 +40,6 @@ void eclChargedPidSelector::Begin(TTree * /*tree*/)
     // When running with PROOF Begin() is only called on the client.
     // The tree argument is deprecated (on PROOF 0 is passed).
 
-    TString option = GetOption();
-
     TH1F* hflow = new TH1F( "hflow", " Flow ", 6, 0., 6. );  fOutput->Add( hflow );
 
     TH1F* h_Eop_0_0 = new TH1F( "h_Eop_0_0", "ECL E/p", 130, 0., 2.6 );    fOutput->Add( h_Eop_0_0 );
@@ -268,8 +266,6 @@ void eclChargedPidSelector::SlaveBegin(TTree * /*tree*/)
     // The SlaveBegin() function is called after the Begin() function.
     // When running with PROOF SlaveBegin() is called on each slave server.
     // The tree argument is deprecated (on PROOF 0 is passed).
-
-    TString option = GetOption();
 
 }
 

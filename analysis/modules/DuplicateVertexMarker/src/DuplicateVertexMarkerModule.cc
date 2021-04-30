@@ -15,9 +15,7 @@
 #include <analysis/modules/DuplicateVertexMarker/DuplicateVertexMarkerModule.h>
 
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;
@@ -47,7 +45,7 @@ DuplicateVertexMarkerModule::DuplicateVertexMarkerModule() : Module(), m_targetV
 
 void DuplicateVertexMarkerModule::initialize()
 {
-  StoreObjPtr<ParticleList>().isRequired(m_particleList);
+  m_inPList.isRequired(m_particleList);
 
   Variable::Manager& manager = Variable::Manager::Instance();
   m_targetVar = manager.getVariable("chiProb");
@@ -58,13 +56,9 @@ void DuplicateVertexMarkerModule::initialize()
 
 void DuplicateVertexMarkerModule::event()
 {
-  const StoreObjPtr<ParticleList> inPList(m_particleList);
-  if (!inPList)
-    return;
-
-  const int size = inPList->getListSize();
+  const int size = m_inPList->getListSize();
   for (int i = 0; i < size; i++) {
-    Particle* part = inPList->getParticle(i);
+    Particle* part = m_inPList->getParticle(i);
     if (part->getNDaughters() != 2) { //ignore 3+ vertices
       B2WARNING("Vertex does not have exactly 2 daughters! SKIP.");
       continue;
@@ -75,7 +69,7 @@ void DuplicateVertexMarkerModule::event()
       continue;
     }
     for (int j = 0; j < size; j++) {//look for a clone among other particles in the event
-      Particle* cloneCand = inPList->getParticle(j);
+      Particle* cloneCand = m_inPList->getParticle(j);
       bool particleFight = false;
       if (cloneCand->getNDaughters() == 2) { //check if it's another 2-vertex with the same exact daughters
         if (part == cloneCand) continue; //but not itself

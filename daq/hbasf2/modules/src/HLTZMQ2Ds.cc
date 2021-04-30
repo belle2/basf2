@@ -110,13 +110,15 @@ void HLTZMQ2DsModule::event()
       m_lastExperiment = m_eventMetaData->getExperiment();
     };
 
-    ZMQConnection::poll({{m_input.get(), reactToInput}}, -1);
-  } catch (zmq::error_t& error) {
-    if (error.num() == EINTR) {
-      // Well, that is probably ok. It will be handled by the framework, just go out here.
-      B2DEBUG(10, "Received an signal interrupt during the event call. Will return");
-      return;
+    bool result = ZMQConnection::poll({{m_input.get(), reactToInput}}, -1);
+    if (!result) {
+      // didn't get any events, probably interrupted by a signal.
+      // We're the input module so let's better have some event meta data
+      // even if it's not useful
+      m_eventMetaData.create();
+      m_eventMetaData->setEndOfData();
     }
+  } catch (zmq::error_t& error) {
     // This is an unexpected error: better report it.
     B2ERROR("ZMQ Error while calling the event: " << error.num());
   }

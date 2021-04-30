@@ -12,6 +12,11 @@
 #include <framework/core/Module.h>
 #include <analysis/modules/MCDecayFinder/DecayTree.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/ParticleExtraInfoMap.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 namespace Belle2 {
   /** Find decays in MCParticle list matching a given DecayString.
@@ -27,6 +32,12 @@ namespace Belle2 {
     bool m_isSelfConjugatedParticle; /**< Is the particle list for a self-conjugated particle */
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
     std::string m_particleStore; /**< name of Particle store array */
+
+    StoreObjPtr<ParticleList> m_outputList; /**< output particle list */
+    StoreObjPtr<ParticleList> m_antiOutputList; /**< output anti-particle list */
+    StoreArray<Particle> m_particles; /**< StoreArray of Particles */
+    StoreObjPtr<ParticleExtraInfoMap> m_extraInfoMap; /**< object pointer to ParticleExtraInfoMaps */
+    StoreArray<MCParticle> m_mcparticles; /**< StoreArray of MCParticles */
 
   public:
     /** Constructor. */

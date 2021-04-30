@@ -19,6 +19,11 @@ const std::string DBRecord::get(int i) const
   else return "";
 }
 
+unsigned long long int DBRecord::getULLInt(const std::string& name) const
+{
+  return std::strtoull(get(name).c_str(), NULL, 10);
+}
+
 int DBRecord::getInt(const std::string& name) const
 {
   return atoi(get(name).c_str());

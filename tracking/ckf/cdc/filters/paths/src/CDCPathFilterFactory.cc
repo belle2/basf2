@@ -51,13 +51,14 @@ std::string CDCPathFilterFactory::getIdentifier() const
 
 std::string CDCPathFilterFactory::getFilterPurpose() const
 {
-  return "Reject cdc ckf paths";
+  return "Reject CDC CKF paths. ";
 }
 
 std::map<std::string, std::string> CDCPathFilterFactory::getValidFilterNamesAndDescriptions() const
 {
   return {
     {"none", "no track combination is valid"},
+    {"all", "set all track combinations as good"},
     {"size", "very rough filtering"},
     {"recording", "record variables to a TTree"},
     {"size_and_recording", "record variables to a TTree"},

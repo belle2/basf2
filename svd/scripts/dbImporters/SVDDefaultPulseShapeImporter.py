@@ -5,15 +5,11 @@
 SVD Default PulseShape Calibration importer (MC).
 Script to Import Calibrations into a local DB
 """
-import basf2
-from basf2 import *
-from svd import *
-import ROOT
+import basf2 as b2
 from ROOT import Belle2
 from ROOT.Belle2 import SVDStripCalAmp
 import datetime
 
-import os
 
 now = datetime.datetime.now()
 
@@ -51,7 +47,7 @@ peakTime_fwd_U = 60
 peakTime_fwd_V = 51
 
 
-class defaultPulseShapeImporter(basf2.Module):
+class defaultPulseShapeImporter(b2.Module):
     '''default pulse shape calibrations importer'''
 
     def beginRun(self):
@@ -124,25 +120,23 @@ class defaultPulseShapeImporter(basf2.Module):
         Belle2.Database.Instance().storeData(Belle2.SVDPulseShapeCalibrations.calAmp_name, calAmp_payload, iov)
 
 
-use_database_chain()
-use_central_database("svd_onlySVDinGeoConfiguration")
-use_local_database("localDB_defaultPulseShapeCalibrations/database.txt", "localDB_defaultPulseShapeCalibrations")
+b2.conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 
-main = create_path()
+main = b2.create_path()
 
 # Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
 main.add_module("Gearbox")
-main.add_module("Geometry", components=['SVD'])
+main.add_module("Geometry")
 
 main.add_module(defaultPulseShapeImporter())
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)

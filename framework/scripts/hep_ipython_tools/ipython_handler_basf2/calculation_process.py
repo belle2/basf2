@@ -1,7 +1,6 @@
 import basf2.core as _basf2
 import sys
 import os
-import ctypes
 
 from hep_ipython_tools.calculation_process import CalculationProcess
 from hep_ipython_tools.ipython_handler_basf2.entities import Basf2CalculationQueueStatistics

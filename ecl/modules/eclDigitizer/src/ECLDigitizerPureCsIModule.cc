@@ -104,8 +104,6 @@ void ECLDigitizerPureCsIModule::beginRun()
 
 void ECLDigitizerPureCsIModule::event()
 {
-  StoreArray<ECLHit> eclHits;
-
   /* add trigger resolution defined in a module paramer
      shifting the waveform starting time by a random deltaT,
      assuming that t0=0 adc channel is determined by the trigger */
@@ -117,7 +115,7 @@ void ECLDigitizerPureCsIModule::event()
   // emulate response for ECL hits after ADC measurements
   vector< vector< const ECLHit*> > hitmap(EclConfigurationPure::m_nch);
 
-  for (const auto& eclHit : eclHits) {
+  for (const auto& eclHit : m_hitLists) {
     int j = eclHit.getCellId() - 1; //0~8735
     if (isPureCsI(j + 1)) {
       assert(j < EclConfigurationPure::m_nch);

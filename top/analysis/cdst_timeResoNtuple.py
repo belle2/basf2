@@ -11,14 +11,13 @@
 # Usage: basf2 cdst_timeResoNtuple.py -i <cdst_file-dimuon_skim.root> [mc]
 # ---------------------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
-from ROOT import TH1F, TH2F, TFile
-from ROOT import gROOT, AddressOf, gRandom
+from ROOT import TH1F, TH2F
+from ROOT import AddressOf, gROOT
 from ROOT import TLorentzVector
 import math
 import ROOT
-import glob
 import sys
 
 MC = False
@@ -81,10 +80,10 @@ int_arrays = ['channel', 'pixel', 'pulseHeight', 'sample', 'status', 'type', 'nx
 float_arrays = ['time', 'timeErr', 'pulseWidth', 't0', 'wid0', 't1', 't_pdf', 'alpha',
                 'xd', 'yd', 'xm', 'kx', 'ky']
 
-from ROOT import TreeStruct
+from ROOT import TreeStruct  # noqa
 
 
-class Ntuple(Module):
+class Ntuple(b2.Module):
     ''' Makes a flat ntuple '''
 
     #: histogram counter
@@ -193,7 +192,7 @@ class Ntuple(Module):
         lorentzLab.SetXYZM(mom.X(), mom.Y(), mom.Z(), mass)
         T = Belle2.PCmsLabTransform()
         lorentzCms = T.labToCms(lorentzLab)
-        return [lorentzCms.Energy(), T.getCMSEnergy()/2]
+        return [lorentzCms.Energy(), T.getCMSEnergy() / 2]
 
     def trackSelected(self):
         ''' returns true if track fulfills selection criteria  '''
@@ -234,7 +233,7 @@ class Ntuple(Module):
 
         recBunch = Belle2.PyStoreObj('TOPRecBunch')
         if not recBunch:
-            B2ERROR('no TOPRecBunch')
+            b2.B2ERROR('no TOPRecBunch')
             return
         if not recBunch.isReconstructed():
             return
@@ -260,8 +259,8 @@ class Ntuple(Module):
             self.data.tof = self.getTOF(track, 13, self.data.slot)
             try:
                 tfit = track.getTrackFitResultWithClosestMass(Belle2.Const.muon)
-            except:
-                B2ERROR("No trackFitResult available")
+            except BaseException:
+                b2.B2ERROR("No trackFitResult available")
                 continue
             self.data.charge = tfit.getChargeSign()
             pocaPosition = tfit.getPosition()
@@ -279,7 +278,7 @@ class Ntuple(Module):
                 timeZero = extHit.getRelated('TOPTimeZeros')
                 self.data.rec_t0 = timeZero.getTime()
                 self.data.valid_t0 = timeZero.isValid()
-            except:
+            except BaseException:
                 self.data.rec_t0 = 0
                 self.data.valid_t0 = 0
 
@@ -296,8 +295,8 @@ class Ntuple(Module):
             self.h_Ecms.Fill(Ecms[0])
             try:
                 pdf = pdfs.getHypothesisPDF(13)
-            except:
-                B2ERROR("No PDF available for PDG = 13")
+            except BaseException:
+                b2.B2ERROR("No PDF available for PDG = 13")
                 continue
             self.data.itrk += 1
             self.pdfHistogram(pdf)
@@ -380,7 +379,7 @@ class Ntuple(Module):
 
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Input: cdst file(s), use -i option
 main.add_module('RootInput')
@@ -398,11 +397,11 @@ main.add_module('TOPPDFDebugger', pdgCodes=[13])  # default
 main.add_module(Ntuple())
 
 # Print progress
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

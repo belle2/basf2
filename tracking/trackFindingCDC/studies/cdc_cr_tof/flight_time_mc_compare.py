@@ -1,3 +1,9 @@
+from tracking.harvest.refiners import (
+    save_tree,
+    save_pull_analysis,
+)
+from tracking.harvest.harvesting import harvest
+import tracking
 import basf2
 from ROOT import Belle2
 from ROOT import gSystem
@@ -7,14 +13,6 @@ gSystem.Load('libcdc')
 gSystem.Load('libtracking')
 gSystem.Load('libtracking_trackFindingCDC')
 
-import tracking
-from tracking.harvest.harvesting import harvest
-from tracking.harvest.refiners import (
-    save_tree,
-    save_pull_analysis,
-    save_profiles,
-    save_scatters,
-)
 
 DriftTimeUtil = Belle2.TrackFindingCDC.DriftTimeUtil
 
@@ -191,7 +189,7 @@ def main():
             kalman_fitter_info = track_point.getKalmanFitterInfo()
             try:
                 measurement_on_plane = kalman_fitter_info.getFittedState()
-            except:
+            except BaseException:
                 # Sometimes a throw happens from Genfit, skip track point
                 continue
 
@@ -268,7 +266,7 @@ def main():
             kalman_fitter_info = track_point.getKalmanFitterInfo()
             try:
                 measurement_on_plane = kalman_fitter_info.getFittedState()
-            except:
+            except BaseException:
                 # Sometimes a throw happens from Genfit, skip track point
                 continue
             abs_measurement = track_point.getRawMeasurement(0)

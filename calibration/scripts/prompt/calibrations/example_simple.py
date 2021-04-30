@@ -3,7 +3,7 @@
 """A simple example calibration that takes one input data list from raw data and performs
 a single calibration."""
 
-from prompt import CalibrationSettings
+from prompt import CalibrationSettings, input_data_filters
 
 ##############################
 # REQUIRED VARIABLE #
@@ -13,12 +13,17 @@ from prompt import CalibrationSettings
 # Will be used to construct the calibration in the automated system, as well as set up the submission web forms.
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
-#: Tells the automated system some details of this script
+#: Tells the automated system some details of this script. The input_data_filters is only used for automated calibration (optional).
 settings = CalibrationSettings(name="Example Simple",
                                expert_username="ddossett",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["physics"],
+                               input_data_filters={"physics": [f"NOT {input_data_filters['Magnet']['On']}",
+                                                               input_data_filters["Data Tag"]["hadron_calib"],
+                                                               input_data_filters["Data Quality Tag"]["Good"],
+                                                               input_data_filters["Beam Energy"]["4S"],
+                                                               input_data_filters["Run Type"]["physics"]]},
                                depends_on=[],
                                expert_config={})
 
@@ -31,8 +36,7 @@ settings = CalibrationSettings(name="Example Simple",
 # that have had their input files assigned and any configuration applied. The final output payload IoV(s)
 # should also be set correctly to be open-ended e.g. IoV(exp_low, run_low, -1, -1)
 #
-# The database_chain, backend_args, backend, max_files_per_collector_job, and heartbeat of these
-# calibrations will all be set/overwritten by the b2caf-prompt-run tool.
+# The database_chain of these calibrations will all be set/overwritten by the b2caf-prompt-run tool.
 
 
 def get_calibrations(input_data, **kwargs):
@@ -87,7 +91,7 @@ def get_calibrations(input_data, **kwargs):
     requested_iov = kwargs.get("requested_iov", None)
 
     # Get the expert configurations if you have something you might configure from them. It should always be available
-    expert_config = kwargs.get("expert_config")
+    # expert_config = kwargs.get("expert_config")
 
     from caf.utils import IoV
     # The actual value our output IoV payload should have. Notice that we've set it open ended.
@@ -96,7 +100,6 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     # Algorithm setup
 
-    import ROOT
     from ROOT.Belle2 import TestCalibrationAlgorithm
 
     alg_test = TestCalibrationAlgorithm()

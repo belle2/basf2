@@ -14,15 +14,9 @@
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
-
-// dataobjects
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
@@ -73,6 +67,8 @@ namespace Belle2 {
 
   void ParticleListManipulatorModule::initialize()
   {
+    m_particles.isRequired();
+
     m_pdgCode  = 0;
 
     // check the validity of output ParticleList name
@@ -84,6 +80,23 @@ namespace Belle2 {
     const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
 
     m_pdgCode  = mother->getPDGCode();
+
+    // Some labels are reserved for the particle loader which loads all particles of the corresponding type.
+    // If people apply cuts or merge particle lists, the resulting particle lists are not allowed to have these names.
+    // Otherwise, very dangerous bugs could be introduced.
+    string listLabel = mother->getLabel();
+    // For final state particles we protect the label "all".
+    if (Const::finalStateParticlesSet.contains(Const::ParticleType(abs(m_pdgCode))) and listLabel == "all") {
+      B2FATAL("You have tried to create the list " << m_outputListName <<
+              " but the label 'all' is forbidden for user-defined lists of final-state particles." <<
+              " It could introduce *very* dangerous bugs.");
+    } else if ((listLabel == "MC") or (listLabel == "ROE") or (listLabel == "V0" and not(("K_S0:mdst" == m_inputListNames[0])
+                                                               or ("Lambda0:mdst" == m_inputListNames[0]) or ("gamma:v0mdst" == m_inputListNames[0])))) {
+      // the labels MC, ROE, and V0 are also protected
+      // copying of some B2BII V0 lists has to be allowed to not break the FEI
+      B2FATAL("You have tried to create the list " << m_outputListName <<
+              " but the label " << listLabel << " is not allowed for merged or copied particle lists.");
+    }
 
     m_outputAntiListName = ParticleListName::antiParticleListName(m_outputListName);
     m_isSelfConjugatedParticle = (m_outputListName == m_outputAntiListName);
@@ -100,12 +113,10 @@ namespace Belle2 {
       }
     }
 
-    StoreObjPtr<ParticleList> particleList(m_outputListName);
     DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
-    particleList.registerInDataStore(flags);
+    m_particleList.registerInDataStore(m_outputListName, flags);
     if (!m_isSelfConjugatedParticle) {
-      StoreObjPtr<ParticleList> antiParticleList(m_outputAntiListName);
-      antiParticleList.registerInDataStore(flags);
+      m_antiParticleList.registerInDataStore(m_outputAntiListName, flags);
     }
 
     m_variable = Variable::Manager::Instance().getVariable(m_variableName);
@@ -120,34 +131,28 @@ namespace Belle2 {
     // clear the list
     m_particlesInTheList.clear();
 
-    const StoreArray<Particle> particles;
-    StoreObjPtr<ParticleList> plist(m_outputListName);
-    bool existingList = plist.isValid();
+    bool existingList = m_particleList.isValid();
 
     if (!existingList) {
       // new particle list: create it
-      plist.create();
-      plist->initialize(m_pdgCode, m_outputListName);
+      m_particleList.create();
+      m_particleList->initialize(m_pdgCode, m_outputListName);
 
       if (!m_isSelfConjugatedParticle) {
-        StoreObjPtr<ParticleList> antiPlist(m_outputAntiListName);
-        antiPlist.create();
-        antiPlist->initialize(-1 * m_pdgCode, m_outputAntiListName);
+        m_antiParticleList.create();
+        m_antiParticleList->initialize(-1 * m_pdgCode, m_outputAntiListName);
 
-        antiPlist->bindAntiParticleList(*(plist));
+        m_antiParticleList->bindAntiParticleList(*(m_particleList));
       }
     } else {
       // output list already contains Particles
       // fill m_particlesInTheList with unique
       // identifiers of particles already in
-      for (unsigned i = 0; i < plist->getListSize(); i++) {
-        const Particle* particle = plist->getParticle(i);
+      for (unsigned i = 0; i < m_particleList->getListSize(); i++) {
+        const Particle* particle = m_particleList->getParticle(i);
 
         std::vector<int> idSeq;
         fillUniqueIdentifier(particle, idSeq);
-        // the unique identifier sequence is sorted so that different orders of
-        // daughter particles are registered as duplicates
-        sort(idSeq.begin(), idSeq.end());
         m_particlesInTheList.push_back(idSeq);
       }
     }
@@ -159,6 +164,7 @@ namespace Belle2 {
     // fill all particles from input lists that pass selection criteria into comparison list
     for (const auto& inputListName : m_inputListNames) {
       const StoreObjPtr<ParticleList> inPList(inputListName);
+      if (!inPList.isValid()) continue;
 
       std::vector<int> fsParticles = inPList->getList(ParticleList::EParticleType::c_FlavorSpecificParticle, false);
       const std::vector<int>& scParticles     = inPList->getList(ParticleList::EParticleType::c_SelfConjugatedParticle, false);
@@ -168,7 +174,7 @@ namespace Belle2 {
       fsParticles.insert(fsParticles.end(), fsAntiParticles.begin(), fsAntiParticles.end());
 
       for (int fsParticle : fsParticles) {
-        const Particle* part = particles[fsParticle];
+        const Particle* part = m_particles[fsParticle];
 
         if (m_cut->check(part)) {
           valueToIndex.emplace_back(m_variable->function(part), part->getArrayIndex());
@@ -186,18 +192,14 @@ namespace Belle2 {
 
     // starting from the best candidate add all particles to output list that are not already in it
     for (const auto& candidate : valueToIndex) {
-      const Particle* part = particles[candidate.second];
+      const Particle* part = m_particles[candidate.second];
 
       std::vector<int> idSeq;
       fillUniqueIdentifier(part, idSeq);
-      // before checking whether the sequence is already present it is sorted so
-      // that a different order of daughter particles is registered as a
-      // duplicated candidate
-      sort(idSeq.begin(), idSeq.end());
       bool uniqueSeq = isUnique(idSeq);
 
       if (uniqueSeq) {
-        plist->addParticle(part);
+        m_particleList->addParticle(part);
         m_particlesInTheList.push_back(idSeq);
       }
     }
@@ -211,9 +213,14 @@ namespace Belle2 {
       idSequence.push_back(p->getMdstArrayIndex());
     } else {
       idSequence.push_back(p->getNDaughters());
+      auto daughters = p->getDaughters();
+      // sorting the daughters by their pdgCode to identify decay chains only differing by the order of their daughters
+      sort(daughters.begin(), daughters.end(), [](const auto a, const auto b) {
+        return a->getPDGCode() > b->getPDGCode();
+      });
       // this is not FSP (go one level down)
-      for (unsigned i = 0; i < p->getNDaughters(); i++)
-        fillUniqueIdentifier(p->getDaughter(i), idSequence);
+      for (const auto& daughter : daughters)
+        fillUniqueIdentifier(daughter, idSequence);
     }
   }
 

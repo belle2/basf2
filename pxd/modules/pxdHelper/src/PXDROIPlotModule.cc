@@ -38,6 +38,7 @@ PXDROIPlotModule::PXDROIPlotModule() : Module()
   addParam("ROIsName", m_ROIsName, "name of the list of ROIs (plotted in red)", string("__unusedROIs__"));
   addParam("DCROIsName", m_DCROIsName, "name of the list of DatCon ROIs (optional, plotted in blue)", string("__unusedROIs__"));
   addParam("HLTROIsName", m_HLTROIsName, "name of the list of HLT ROIs (optional, plotted in green)", string("__unusedROIs__"));
+  addParam("Prefix", m_prefix, "prefix for plots", string(""));
 }
 
 void PXDROIPlotModule::initialize()
@@ -84,7 +85,7 @@ void PXDROIPlotModule::event()
     h->Reset();
 
     VxdID currentVxdId = f.first;
-    histoname = boost::str(boost::format("Run_%d_Evt_%d_") % evtRun % evtNr) + string(currentVxdId);
+    histoname = m_prefix + boost::str(boost::format("Run_%d_Evt_%d_") % evtRun % evtNr) + string(currentVxdId);
     h->SetTitle(histoname.data());
 
     for (auto& pix : m_storeRawHits) {

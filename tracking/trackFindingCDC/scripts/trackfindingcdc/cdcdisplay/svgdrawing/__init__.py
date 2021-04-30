@@ -5,9 +5,10 @@ import math
 
 from ROOT import gSystem
 import collections
-gSystem.Load('libtracking_trackFindingCDC')
 
 from ROOT import Belle2  # make Belle2 namespace available
+
+gSystem.Load('libtracking_trackFindingCDC')
 
 
 class CDCSVGPlotter:

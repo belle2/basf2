@@ -3,7 +3,6 @@
 
 import ROOT
 from ROOT import Belle2
-import sys
 
 """
 Create and fill ECLChannelMap class.
@@ -37,15 +36,15 @@ def main():
     coefs_fwd = []
     coefs_bwd = []
 
-    for crate in range(1, 52+1):
+    for crate in range(1, 52 + 1):
         if crate < 37:
             sh_count = 12
         elif crate < 45:
             sh_count = 10
         else:
             sh_count = 8
-        for shaper in range(1, sh_count+1):
-            for channel in range(1, 16+1):
+        for shaper in range(1, sh_count + 1):
+            for channel in range(1, 16 + 1):
                 val = getValue(crate, shaper, channel)
                 if crate < 37:
                     coefs_bar.append(val)
@@ -67,6 +66,7 @@ def main():
     db = Belle2.Database.Instance()
     iov = Belle2.IntervalOfValidity(FIRST_EXP, FIRST_RUN, LAST_EXP, LAST_RUN)
     db.storeData(DBOBJECT_NAME, coefs, iov)
+
 
 if __name__ == '__main__':
     main()

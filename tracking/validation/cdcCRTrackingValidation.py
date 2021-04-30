@@ -10,19 +10,16 @@
 </header>
 """
 
+from tracking.validation.run import TrackingValidationRun
+import tracking
+import logging
+import basf2
 VALIDATION_OUTPUT_FILE = 'CDCCRTrackingValidation.root'
 CONTACT = 'software-tracking@belle2.org'
 N_EVENTS = 10000
 ACTIVE = False
 
-import basf2
 basf2.set_random_seed(1337)
-
-import logging
-
-import tracking
-from tracking.adjustments import adjust_module
-from tracking.validation.run import TrackingValidationRun
 
 
 class CDCCR(TrackingValidationRun):

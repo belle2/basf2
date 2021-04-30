@@ -116,14 +116,14 @@ def ratio_measured_ratio(ecms, ecut):
     me = 0.510998928e-3
     riemann_zeta_3 = 1.2020569032
     pi = math.pi
-    l = math.log(ecms / 2 / ecut)
+    l_e = math.log(ecms / 2 / ecut)
     L = 2.0 * math.log(ecms / me)
-    r1 = -2.0 * l * (L - 1) + 1.5 * L + pi * pi / 3 - 2
-    r2 = 0.5 * pow(-2.0 * l * (L - 1), 2) + \
-        (1.5 * L + pi * pi / 3 - 2) * (-2.0 * l * (L - 1)) + L * L * (-l / 3 + 11. / 8 - pi * pi / 3) + \
-        L * (2.0 * l * l / 3 + 10. * l / 9 - 203. / 48 + 11. * pi * pi / 12 + 3.0 * riemann_zeta_3) - \
-        (4. * l * l * l / 9 + 10. * l * l / 9 + 2. * l / 9 * (28. / 3 - pi * pi)) - \
-        (pow(L - 2. * l, 3) / 18 - 5. / 18 * pow(L - 2. * l, 2) + (28. / 3 - pi * pi) * (L - 2. * l) / 9)
+    r1 = -2.0 * l_e * (L - 1) + 1.5 * L + pi * pi / 3 - 2
+    r2 = 0.5 * pow(-2.0 * l_e * (L - 1), 2) + \
+        (1.5 * L + pi * pi / 3 - 2) * (-2.0 * l_e * (L - 1)) + L * L * (-l_e / 3 + 11. / 8 - pi * pi / 3) + \
+        L * (2.0 * l_e * l_e / 3 + 10. * l_e / 9 - 203. / 48 + 11. * pi * pi / 12 + 3.0 * riemann_zeta_3) - \
+        (4. * l_e * l_e * l_e / 9 + 10. * l_e * l_e / 9 + 2. * l_e / 9 * (28. / 3 - pi * pi)) - \
+        (pow(L - 2. * l_e, 3) / 18 - 5. / 18 * pow(L - 2. * l_e, 2) + (28. / 3 - pi * pi) * (L - 2. * l_e) / 9)
     r = 1. + alpha / pi * r1 + alpha * alpha / pi / pi * r2
     return r
 
@@ -221,9 +221,9 @@ for i in range(0, n):
 for i in range(nbins_ratio, 0, -1):
     emin = emin_ratio + (emax_ratio - emin_ratio) / nbins_ratio * (i - 1)
     emax = emin_ratio + (emax_ratio - emin_ratio) / nbins_ratio * i
-    l = effective_luminosity_integral(ecms, emin, emax)
+    eff_lumi = effective_luminosity_integral(ecms, emin, emax)
     xs = cross_section_ee_mumu(h_ratio.GetBinLowEdge(i)) * vacpol_coef[i - 1]
-    h_mgamma_exp.SetBinContent(i, xs * l)
+    h_mgamma_exp.SetBinContent(i, xs * eff_lumi)
 
 h_mgamma_exp.Scale(n / h_mgamma_exp.Integral())
 
@@ -235,18 +235,21 @@ for i in range(nbins_ratio, 0, -1):
     h_ratio.SetBinError(i, err / exp)
 
 contact = 'Kirill Chilikin (chilikin@lebedev.ru)'
-l = h_ratio.GetListOfFunctions()
-l.Add(ROOT.TNamed('Description', 'Number of events / theoretical expectation'))
-l.Add(ROOT.TNamed('Check', 'Should be consistent with 1'))
-l.Add(ROOT.TNamed('Contact', contact))
-l = h_helicity_gamma.GetListOfFunctions()
-l.Add(ROOT.TNamed('Description', 'Virtual photon helicity angle'))
-l.Add(ROOT.TNamed('Check', 'Should be distributed as (1 + cos^2 theta)'))
-l.Add(ROOT.TNamed('Contact', contact))
-l = h_helicity_jpsi.GetListOfFunctions()
-l.Add(ROOT.TNamed('Description', 'J/psi helicity angle'))
-l.Add(ROOT.TNamed('Check', 'Should be distributed as (1 + cos^2 theta)'))
-l.Add(ROOT.TNamed('Contact', contact))
+func_list = h_ratio.GetListOfFunctions()
+func_list.Add(ROOT.TNamed('Description', 'Number of events / theoretical expectation'))
+func_list.Add(ROOT.TNamed('Check', 'Should be consistent with 1'))
+func_list.Add(ROOT.TNamed('Contact', contact))
+func_list.Add(ROOT.TNamed('MetaOptions', 'shifter'))
+func_list = h_helicity_gamma.GetListOfFunctions()
+func_list.Add(ROOT.TNamed('Description', 'Virtual photon helicity angle'))
+func_list.Add(ROOT.TNamed('Check', 'Should be distributed as (1 + cos^2 theta)'))
+func_list.Add(ROOT.TNamed('Contact', contact))
+func_list.Add(ROOT.TNamed('MetaOptions', 'shifter'))
+func_list = h_helicity_jpsi.GetListOfFunctions()
+func_list.Add(ROOT.TNamed('Description', 'J/psi helicity angle'))
+func_list.Add(ROOT.TNamed('Check', 'Should be distributed as (1 + cos^2 theta)'))
+func_list.Add(ROOT.TNamed('Contact', contact))
+func_list.Add(ROOT.TNamed('MetaOptions', 'shifter'))
 
 output_file.cd()
 h_ratio.Write()

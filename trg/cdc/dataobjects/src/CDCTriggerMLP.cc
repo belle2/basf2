@@ -33,7 +33,7 @@ CDCTriggerMLP::CDCTriggerMLP(std::vector<unsigned short>& nodes,
                              unsigned long patternMask,
                              unsigned short tmax,
                              bool calcT0,
-                             std::string  etoption):
+                             const std::string&  etoption):
   nNodes(nodes), trained(false), targetVars(targets), outputScale(outputscale),
   phiRange(phirange), invptRange(invptrange), thetaRange(thetarange),
   maxHitsPerSL(maxHits), SLpattern(pattern), SLpatternMask(patternMask),

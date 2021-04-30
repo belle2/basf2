@@ -5,7 +5,7 @@ Conditions Database
 +++++++++++++++++++
 
 * :ref:`b2conditionsdb` has been optimized to work with larger globaltags.
-* ``b2conditionsdb-diff`` and ``b2conditionsdb-iov`` by default don't show any database internal ids anymore but those can be reenabled with ``--show-ids``
+* ``b2conditionsdb-diff`` and ``b2conditionsdb-iov`` by default don't show any database internal ids anymore but those can be re-enabled with ``--show-ids``
 * ``b2conditionsdb-dump`` has learned a new argument to show the content of a payload valid for a given run in a given globaltag
 * There are new python classes to handle iovs, see `conditions_db.iov`
 

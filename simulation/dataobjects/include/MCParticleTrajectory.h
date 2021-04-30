@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MCPARTICLETRAJECTORY_H
-#define MCPARTICLETRAJECTORY_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <simulation/dataobjects/MCTrajectoryPoint.h>
@@ -45,9 +44,12 @@ namespace Belle2 {
     /** return reference to the last point */
     const MCTrajectoryPoint& back() const { return m_points.back(); }
     /** Add a point to the trajectory
-     * @param x x coordinate
-     * @param y y coordinate
-     * @param z z coordinate
+     * @param x x coordinate of position
+     * @param y y coordinate of position
+     * @param z z coordinate of position
+     * @param px x coordinate of momentum
+     * @param py y coordinate of momentum
+     * @param pz z coordinate of momentum
      */
     void addPoint(float x, float y, float z, float px, float py, float pz)
     {
@@ -70,4 +72,3 @@ namespace Belle2 {
   };
 
 } //Belle2 namespace
-#endif

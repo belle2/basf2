@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import sys
 from array import array
-from ROOT import gROOT, gStyle
-from ROOT import TFile, TF1, TH1D, TCanvas
-from ROOT import TH2D, TGraph, TLine, TBox
-from ROOT import kFullCircle, kOpenCircle
-from ROOT import kRed, kBlue, kGreen
-from ROOT import TGraphErrors
+from ROOT import TCanvas, TF1, TFile
+from ROOT import TGraph, TH2D, TLine
+from ROOT import kFullCircle
 import argparse
 
 nWires = [160, 160, 160, 160, 160, 160, 160, 160,
@@ -121,7 +117,7 @@ class DQM():
         #: array cell
         self.x = array("d", [i for i in range(14336)])
         #: array layer
-        self.l = array("d", [i for i in range(56)])
+        self.l_array = array("d", [i for i in range(56)])
         #: TGraph
         self.graph = TGraph(len(self.x))
         #: Marker style
@@ -130,7 +126,7 @@ class DQM():
         self.graph.SetMarkerSize(0.3)
 
         #: TGraph
-        self.graph2 = TGraph(len(self.l))
+        self.graph2 = TGraph(len(self.l_array))
         #: Marker style
         self.graph2.SetMarkerStyle(kFullCircle)
         #: Marker size
@@ -143,9 +139,9 @@ class DQM():
             x0 = x0 + nWiresSL[i]
             line = TLine(x0, 0, x0, 200)
             self.line.append(line)
-        for l in self.line:
-            l.SetLineColorAlpha(8, 0.5)
-            l.SetLineStyle(2)
+        for l_i in self.line:
+            l_i.SetLineColorAlpha(8, 0.5)
+            l_i.SetLineStyle(2)
 
     def fitADC(self, xmin=8, xmax=200):
         """
@@ -187,11 +183,11 @@ class DQM():
                     break
             return [layer, wire]
 
-    def drawADC(self, l=0, w=0):
+    def drawADC(self, lay=0, w=0):
         """
         Draw ADC histgrams w.r.t (lay,wire).
         """
-        i = self.getHistID(l, w)
+        i = self.getHistID(lay, w)
         for j in range(self.ndiv):
             self.hid = i + j
             self.canvas.cd(j + 1)
@@ -201,11 +197,11 @@ class DQM():
         self.type = 'adc'
         self.canvas.Update()
 
-    def drawTDC(self, l=0, w=0):
+    def drawTDC(self, lay=0, w=0):
         """
         Draw TDC histgrams w.r.t (lay,wire).
         """
-        i = self.getHistID(l, w)
+        i = self.getHistID(lay, w)
         for j in range(self.ndiv):
             self.hid = i + j
             self.canvas.cd(j + 1)
@@ -215,12 +211,12 @@ class DQM():
         self.canvas.Update()
         self.type = 'tdc'
 
-    def drawHit(self, l=0):
+    def drawHit(self, lay=0):
         """
         Draw Hit histgrams w.r.t layer ID.
         """
         for j in range(self.ndiv):
-            self.hid = l + j
+            self.hid = lay + j
             if self.hid > 55:
                 break
             self.canvas.cd(j + 1)
@@ -334,23 +330,23 @@ class DQM():
         """
         self.next()
 
-    def dh(self, l):
+    def dh(self, lay):
         """
         Alias to drawHit()
         """
-        self.drawHit(l)
+        self.drawHit(lay)
 
-    def da(self, l, w):
+    def da(self, lay, w):
         """
         Alias to drawADC()
         """
-        self.drawADC(l, w)
+        self.drawADC(lay, w)
 
-    def dt(self, l, w):
+    def dt(self, lay, w):
         """
         Alias to drawTDC()
         """
-        self.drawTDC(l, w)
+        self.drawTDC(lay, w)
 
 
 if __name__ == "__main__":

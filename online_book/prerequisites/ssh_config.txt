@@ -1,0 +1,35 @@
+# use control hub to use only one ssh channel for all connections.
+# faster connection and password only needed for first connection
+# changes behavior of ssh a bit so uncomment if you want it
+# ControlMaster auto
+# ControlPath ~/.ssh/%r@%h:%p.control
+# ControlPersist 60m
+
+# make all locally present ssh keys available at the remote site
+ForwardAgent yes
+# try to keep the connection alive, this avoids connection timeouts
+ServerAliveInterval 60
+
+Host desy
+    User YOUR_DESY_USERNAME
+    Hostname bastion.desy.de
+
+Host kekcc
+    User YOUR_KEKCC_USERNAME
+    Hostname login.cc.kek.jp
+    Compression yes
+    # Don't connect directly but rather via the gateway server
+    ProxyJump sshcc1.kek.jp
+
+Host sshcc1.kek.jp
+    User YOUR_SSHLOGIN_USERNAME
+    IdentityFile ~/.ssh/id_kekccgateway
+    IdentitiesOnly yes
+
+# Configuration for directly connecting to specific KEKCC nodes
+# useful for connecting to a terminal multiplexer on a specific node
+Host ccw?? ccx??
+    HostName %h.cc.kek.jp
+    User YOUR_KEKCC_USERNAME
+    Compression yes
+    ProxyJump sshcc1.kek.jp

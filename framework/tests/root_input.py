@@ -64,22 +64,30 @@ with clean_working_directory():
     # 7, 6, 3, 8, 9, 12, 4, 11, 10, 16, 13, 17, 18, 14, 15
     input_module.param('entrySequences', ['0,3:4,10:100', '1:2,4,12:13'])
 
-    expected_event_numbers = [2, 9, 10, 15, 16, 6, 3, 9, 18, 14]
-    processed_event_numbers = []
-
     class TestingModule(basf2.Module):
         """
         Test module which writes out the processed event numbers
         into the global processed_event_numbers list
         """
 
+        def __init__(self, expected):
+            """
+            Initialize this nice class with the list of expected event
+            numbers to see in the correct order
+            """
+            super().__init__()
+            #: event metadata
+            self.emd = Belle2.PyStoreObj('EventMetaData')
+            #: list of expected event numbers
+            self._expected_event_numbers = expected
+            #: list of seen event numbers
+            self._processed_event_numbers = []
+
         def event(self):
             """
             Called for each event
             """
-            global processed_event_numbers
-            emd = Belle2.PyStoreObj('EventMetaData')
-            processed_event_numbers.append(emd.obj().getEvent())
+            self._processed_event_numbers.append(self.emd.getEvent())
 
         def terminate(self):
             """
@@ -88,9 +96,9 @@ with clean_working_directory():
             # We only want to do the check if we actually execute the process() but
             # since this script is called from basf2_args with --dry-run this is not
             # always the case
-            assert expected_event_numbers == processed_event_numbers
+            assert self._expected_event_numbers == self._processed_event_numbers
 
-    main.add_module(TestingModule())
+    main.add_module(TestingModule([2, 9, 10, 15, 16, 6, 3, 9, 18, 14]))
     assert safe_process(main) == 0
 
     basf2.set_random_seed("something important")
@@ -110,9 +118,7 @@ with clean_working_directory():
     input_module.param('entrySequences', [':', '1:2,4,12:13'])
 
     expected_event_numbers = [2, 6, 5, 9, 10, 11, 8, 12, 0, 13, 15, 16, 6, 3, 9, 18, 14]
-    processed_event_numbers = []
-
-    main.add_module(TestingModule())
+    main.add_module(TestingModule(expected_event_numbers))
 
     assert safe_process(main) == 0
 
@@ -122,3 +128,39 @@ with clean_working_directory():
         main.add_module('RootInput', inputFileNames=full_list[:i + 1])
         main.add_module("EventInfoPrinter")
         safe_process(main)
+
+    class BrokenEventsModule(basf2.Module):
+        """
+        Small module to mark all events except for the ones in the given list as
+        discarded by the HLT
+        """
+
+        def __init__(self, accepted):
+            """
+            Initialize this nice class with the list/set of accepted event
+            numbers to see. Order not important. All other events will be flagged
+            as discarded.
+            """
+            super().__init__()
+            #: event metadata
+            self.emd = Belle2.PyStoreObj('EventMetaData')
+            #: list/set of accepted events
+            self._accepted = accepted
+
+        def event(self):
+            """Set error flag if required"""
+            if self.emd.getEvent() not in self._accepted:
+                error = Belle2.EventMetaData.c_HLTDiscard if self.emd.getEvent() % 2 == 0 else \
+                    Belle2.EventMetaData.c_HLTCrash
+                self.emd.addErrorFlag(error)
+
+    main = basf2.Path()
+    main.add_module("EventInfoSetter", evtNumList=10)
+    main.add_module(BrokenEventsModule({3, 5, 6, 8}))
+    main.add_module("RootOutput", outputFileName="brokenevents.root")
+    assert safe_process(main) == 0
+
+    main = basf2.Path()
+    main.add_module("RootInput", inputFileName="brokenevents.root")
+    main.add_module(TestingModule([3, 5, 6, 8]))
+    assert safe_process(main) == 0

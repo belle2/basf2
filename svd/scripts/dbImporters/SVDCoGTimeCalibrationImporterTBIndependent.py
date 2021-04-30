@@ -17,20 +17,12 @@
 #################################################################################
 
 
-from basf2 import *
-from svd import *
+import basf2 as b2
+import svd
 import os
-import math
-from array import array
-import basf2
 import sys
-from ROOT.Belle2 import SVDCoGCalibrationFunction
-from ROOT.Belle2 import SVDCoGTimeCalibrations
-from svd import *
 from svd.CoGCalibration_utils_tbindependent import SVDCoGTimeCalibrationImporterModule
-
-import matplotlib.pyplot as plt
-import simulation
+from basf2 import conditions as b2conditions
 
 localdb = sys.argv[1]
 # filename = sys.argv[2]
@@ -54,36 +46,33 @@ else:
     with open(filename, 'r') as f:
         inputFileList = [line.strip() for line in f]
 '''
-reset_database()
-use_database_chain()
-use_central_database('data_reprocessing_proc9')
 
+b2conditions.prepend_globaltag("svd_loadedOnFADC")
 if '_CHECK' not in localdb:
-    use_central_database('svd_NOCoGCorrections')
+    b2conditions.prepend_globaltag('svd_NOCoGCorrections')
     if os.path.isdir(localdb):
         print('WARNING, you are using CoG corrections in ' + localdb + ' exiting')
         sys.exit(1)
     else:
-        use_local_database(localdb + "/database.txt", localdb, invertLogging=True)
+        b2conditions.testing_payloads = [str(localdb)]
 else:
     localdb = localdb.split('_')
     if not os.path.isdir(localdb[0]):
         print('WARNING, the localDB ' + localdb[0] + ' containing the corrections is missing, exiting.')
         sys.exit(1)
     else:
-        use_local_database(localdb[0] + "/database.txt", localdb[0], invertLogging=True)
+        b2conditions.testing_payloads = [str(localdb)]
     localdb = sys.argv[1]
     if os.path.isdir(localdb):
         print('WARNING, you are using CoG corrections in ' + localdb + ' exiting')
         sys.exit(1)
     else:
-        use_local_database(localdb + "/database.txt", localdb, invertLogging=True)
+        b2conditions.testing_payloads = [str(localdb)]
 
-# use_local_database("outputdb/database.txt", "outputdb", invertLogging=True)
 
-main = create_path()
+main = b2.create_path()
 
-rootinput = register_module('RootInput')
+rootinput = b2.register_module('RootInput')
 rootinput.param('inputFileNames', inputFileList)
 rootinput.param('branchNames', branches)
 main.add_module(rootinput)
@@ -92,7 +81,7 @@ main.add_module("Gearbox")
 main.add_module("Geometry", useDB=True)
 
 # Track selection - NOT YET
-trkFlt = register_module('TrackFilter')
+trkFlt = b2.register_module('TrackFilter')
 trkFlt.param('outputFileName', trk_outputFile)
 trkFlt.param('outputINArrayName', 'SelectedTracks')
 trkFlt.param('outputOUTArrayName', 'ExcludedTracks')
@@ -106,7 +95,7 @@ trkFlt.param('min_Pvalue', pVal)
 # fil.param('outputINArrayName', 'SVDShaperDigitsFromTracks')
 # main.add_module(fil)
 
-add_svd_reconstruction(main)
+svd.add_svd_reconstruction(main)
 
 for moda in main.modules():
     if moda.name() == 'SVDCoGTimeEstimator':
@@ -124,12 +113,12 @@ calib.notApplyCorrectForCDCLatency(False)  # False = apply correction, True = no
 main.add_module(calib)
 
 # Show progress of processing
-progress = register_module('ProgressBar')
+progress = b2.register_module('ProgressBar')
 main.add_module(progress)
 
-print_path(main)
+b2.print_path(main)
 
 # Process events
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

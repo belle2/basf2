@@ -177,7 +177,7 @@ void SVDB4CommissioningPlotsModule::event()
   }
   BOOST_FOREACH(Track & track, m_Tracks) {
 
-    const TrackFitResult* tfr = track.getTrackFitResult(Const::pion);
+    const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
     if (tfr) {
       m_Pvalue->Fill(tfr->getPValue());
       m_mom->Fill(tfr->getMomentum().Mag());

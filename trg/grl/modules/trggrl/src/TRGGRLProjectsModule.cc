@@ -185,7 +185,7 @@ void TRGGRLProjectsModule::initialize()
 void
 TRGGRLProjectsModule::beginRun()
 {
-  B2DEBUG(200, "TRGGDLModule ... beginRun called ");
+  B2DEBUG(20, "TRGGDLModule ... beginRun called ");
   //...GDL config. name...
 }
 //-----------------------------------------------------------------------------------------
@@ -542,7 +542,7 @@ void TRGGRLProjectsModule::event()
   // bha_type10: 30
   bool bha_type10 = (ECLtoGDL[0] & (1 << (30 - 32 * 0))) != 0;
   // bha_type11: 31
-  bool bha_type11 = (ECLtoGDL[0] & (1 << (31 - 32 * 0))) != 0;
+  bool bha_type11 = (ECLtoGDL[0] & (1u << (31 - 32 * 0))) != 0;
   // bha_type12: 32
   bool bha_type12 = (ECLtoGDL[1] & (1 << (32 - 32 * 1))) != 0;
   // bha_type13: 33
@@ -577,7 +577,7 @@ void TRGGRLProjectsModule::event()
   // ecl_lml_0: 62
   bool ecl_lml_0 = (ECLtoGDL[1] & (1 << (62 - 32 * 1))) != 0;
   // ecl_lml_1: 63
-  bool ecl_lml_1 = (ECLtoGDL[1] & (1 << (63 - 32 * 1))) != 0;
+  bool ecl_lml_1 = (ECLtoGDL[1] & (1u << (63 - 32 * 1))) != 0;
   // ecl_lml_2: 64
   bool ecl_lml_2 = (ECLtoGDL[2] & (1 << (64 - 32 * 2))) != 0;
   // ecl_lml_3: 65
@@ -597,7 +597,15 @@ void TRGGRLProjectsModule::event()
   // ecl_lml_10: 72
   bool ecl_lml_10 = (ECLtoGDL[2] & (1 << (72 - 32 * 2))) != 0;
   // ecl_lml_11: 73
-  // bool ecl_lml_11 = (ECLtoGDL[2]&(1<<(73-32*2))) != 0;
+  bool ecl_lml_11 = (ECLtoGDL[2] & (1 << (73 - 32 * 2))) != 0;
+  // ecl_lml_11: 78
+  bool ecl_lml_12 = (ECLtoGDL[2] & (1 << (78 - 32 * 2))) != 0;
+  // ecl_lml_11: 79
+  bool ecl_lml_13 = (ECLtoGDL[2] & (1 << (79 - 32 * 2))) != 0;
+  // ecl_mumu: 75
+  bool ecl_mumu = (ECLtoGDL[2] & (1 << (75 - 32 * 2))) != 0;
+  // ecl_bst: 77
+  bool ecl_bst = (ECLtoGDL[2] & (1 << (77 - 32 * 2))) != 0;
 
   //---------------------------------------------------------------------
   //..Other input bits
@@ -613,7 +621,7 @@ void TRGGRLProjectsModule::event()
   bool klm_2 = (klmtracklist.getEntries() & (1 << 2)) != 0;
 
   bool cdcklm_0 = (trackKLMmatch.getEntries() == 1);
-  bool cdcklm_1 = (trackKLMmatch.getEntries() == 2);
+  bool cdcklm_1 = (trackKLMmatch.getEntries() > 1);
   bool cdcklm_2 = (trackKLMmatch.getEntries() == 3);
   bool cdcklm_3 = (trackKLMmatch.getEntries() > 3);
 
@@ -663,6 +671,8 @@ void TRGGRLProjectsModule::event()
   bool nclst2_3 = (N_clst2 > 3);
 
   int N_ST = trgInfo->getNshorttrk();
+  int N_ST_fwd = trgInfo->getNshorttrk_fwd();
+  int N_ST_bwd = trgInfo->getNshorttrk_bwd();
   int s2s3 = trgInfo->gets2s3();
   int s2s5 = trgInfo->gets2s5();
   int s2so = trgInfo->gets2so();
@@ -675,10 +685,16 @@ void TRGGRLProjectsModule::event()
   int fwdnb  = trgInfo->getfwdnb();
   int brlfb  = trgInfo->getbrlfb();
   int brlnb  = trgInfo->getbrlnb();
+  int N_IT   = trgInfo->getNinnertrk();
+  int i2fo   = trgInfo->geti2fo();
+  int n_secl = trgInfo->getNsecl();
+  int n_iecl = trgInfo->getNiecl();
+  int n_seklm = trgInfo->getNsklm();
+  int n_ieklm = trgInfo->getNiklm();
 
   //---------------------------------------------------------------------
   //..Filling InputBits
-  //..Naming is based on trg/gdl/src/TrgBitData.cc
+  //..Naming is based on trg/gdl/dbobjects/log/
 
 
   if (!m_InputBitsDB)B2INFO("no database of gdl input bits");
@@ -701,6 +717,8 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "ts_1") {bit = N_ST == 2;}
     else if (bitname == "ts_2") {bit = N_ST == 3;}
     else if (bitname == "ts_3") {bit = N_ST > 3;}
+    else if (bitname == "fwd_s") {bit = N_ST_fwd > 0;}
+    else if (bitname == "bwd_s") {bit = N_ST_bwd > 0;}
     else if (bitname == "cdc_open90") {bit = Trk_open90 == 1;}
     else if (bitname == "cdc_active") {bit = cdc_active;}
     else if (bitname == "cdc_b2b3") {bit = Trk_b2b_1to3;}
@@ -721,35 +739,42 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "brlfb2") {bit = brlfb == 2;}
     else if (bitname == "brlnb1") {bit = brlnb == 1;}
     else if (bitname == "brlnb2") {bit = brlnb == 2;}
+    else if (bitname == "seklm_0") {bit = n_seklm == 0;}
+    else if (bitname == "seklm_1") {bit = n_seklm > 0;}
+    else if (bitname == "ieklm") {bit = n_ieklm > 0;}
+    else if (bitname == "secl") {bit = n_secl > 0;}
+    else if (bitname == "iecl") {bit = n_iecl > 0;}
+    else if (bitname == "ti") {bit = N_IT > 0;}
+    else if (bitname == "i2fo") {bit = i2fo > 0;}
     else if (bitname == "ehigh") {bit = ehigh;}
     else if (bitname == "elow") {bit = elow;}
     else if (bitname == "elum") {bit = elum;}
     else if (bitname == "ecl_bha") {bit = ecl_bha;}
-    else if (bitname == "bha_0") {bit = bha_type0;}
-    else if (bitname == "bha_1") {bit = bha_type1;}
-    else if (bitname == "bha_2") {bit = bha_type2;}
-    else if (bitname == "bha_3") {bit = bha_type3;}
-    else if (bitname == "bha_4") {bit = bha_type4;}
-    else if (bitname == "bha_5") {bit = bha_type5;}
-    else if (bitname == "bha_6") {bit = bha_type6;}
-    else if (bitname == "bha_7") {bit = bha_type7;}
-    else if (bitname == "bha_8") {bit = bha_type8;}
-    else if (bitname == "bha_9") {bit = bha_type9;}
-    else if (bitname == "bha_10") {bit = bha_type10;}
-    else if (bitname == "bha_11") {bit = bha_type11;}
-    else if (bitname == "bha_12") {bit = bha_type12;}
-    else if (bitname == "bha_13") {bit = bha_type13;}
+    else if (bitname == "bha_type_0") {bit = bha_type0;}
+    else if (bitname == "bha_type_1") {bit = bha_type1;}
+    else if (bitname == "bha_type_2") {bit = bha_type2;}
+    else if (bitname == "bha_type_3") {bit = bha_type3;}
+    else if (bitname == "bha_type_4") {bit = bha_type4;}
+    else if (bitname == "bha_type_5") {bit = bha_type5;}
+    else if (bitname == "bha_type_6") {bit = bha_type6;}
+    else if (bitname == "bha_type_7") {bit = bha_type7;}
+    else if (bitname == "bha_type_8") {bit = bha_type8;}
+    else if (bitname == "bha_type_9") {bit = bha_type9;}
+    else if (bitname == "bha_type_10") {bit = bha_type10;}
+    else if (bitname == "bha_type_11") {bit = bha_type11;}
+    else if (bitname == "bha_type_12") {bit = bha_type12;}
+    else if (bitname == "bha_type_13") {bit = bha_type13;}
     else if (bitname == "clst_0") {bit = nclst_0;}
     else if (bitname == "clst_1") {bit = nclst_1;}
     else if (bitname == "clst_2") {bit = nclst_2;}
     else if (bitname == "clst_3") {bit = nclst_3;}
-    else if (bitname == "ebg_0") {bit = ecl_bg_0;}
-    else if (bitname == "ebg_1") {bit = ecl_bg_1;}
-    else if (bitname == "ebg_2") {bit = ecl_bg_2;}
+    else if (bitname == "ecl_bg_0") {bit = ecl_bg_0;}
+    else if (bitname == "ecl_bg_1") {bit = ecl_bg_1;}
+    else if (bitname == "ecl_bg_2") {bit = ecl_bg_2;}
     else if (bitname == "ecl_active") {bit = ecl_active;}
-    else if (bitname == "ecl_tim_fwd") {bit = ecl_timing_fwd;}
-    else if (bitname == "ecl_tim_brl") {bit = ecl_timing_brl;}
-    else if (bitname == "ecl_tim_bwd") {bit = ecl_timing_bwd;}
+    else if (bitname == "ecl_timing_fwd") {bit = ecl_timing_fwd;}
+    else if (bitname == "ecl_timing_brl") {bit = ecl_timing_brl;}
+    else if (bitname == "ecl_timing_bwd") {bit = ecl_timing_bwd;}
     else if (bitname == "ecl_phys") {bit = ecl_phys;}
     else if (bitname == "ecl_oflo") {bit = ecl_oflo;}
     else if (bitname == "ecl_3dbha") {bit = ecl_3dbha;}
@@ -765,6 +790,11 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "ecl_lml_8") {bit = ecl_lml_8;}
     else if (bitname == "ecl_lml_9") {bit = ecl_lml_9;}
     else if (bitname == "ecl_lml_10") {bit = ecl_lml_10;}
+    else if (bitname == "ecl_lml_11") {bit = ecl_lml_11;}
+    else if (bitname == "ecl_lml_12") {bit = ecl_lml_12;}
+    else if (bitname == "ecl_lml_13") {bit = ecl_lml_13;}
+    else if (bitname == "ecl_mumu") {bit = ecl_mumu;}
+    else if (bitname == "ecl_bst") {bit = ecl_bst;}
     else if (bitname == "top_0") {bit = false;}
     else if (bitname == "top_1") {bit = false;}
     else if (bitname == "top_2") {bit = false;}
@@ -819,6 +849,54 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "track") {bit = false;}
     else if (bitname == "trkfit") {bit = false;}
 
+    // Neuro track, TSIM not ready
+    else if (bitname == "ty_0") {bit = false;}
+    else if (bitname == "ty_1") {bit = false;}
+    else if (bitname == "ty_2") {bit = false;}
+    else if (bitname == "ty_3") {bit = false;}
+
+    //GRL related bits, not ready
+    else if (bitname == "ta_0") {bit = false;}
+    else if (bitname == "ta_1") {bit = false;}
+    else if (bitname == "ta_2") {bit = false;}
+    else if (bitname == "ta_3") {bit = false;}
+    else if (bitname == "trkflt") {bit = false;}
+    else if (bitname == "tsf0b2b") {bit = false;}
+    else if (bitname == "tsf1b2b") {bit = false;}
+    else if (bitname == "tsf2b2b") {bit = false;}
+    else if (bitname == "trkbha1") {bit = false;}
+    else if (bitname == "trkbha2") {bit = false;}
+    else if (bitname == "grlgg1") {bit = false;}
+    else if (bitname == "grlgg2") {bit = false;}
+
+    //KLM TOP ECL not ready
+    else if (bitname == "ecl_bhauni") {bit = false;}
+    else if (bitname == "ecl_bhapur") {bit = false;}
+    else if (bitname == "klmb2b") {bit = false;}
+    else if (bitname == "eklm_hit") {bit = false;}
+    else if (bitname == "eklm_0") {bit = false;}
+    else if (bitname == "eklm_1") {bit = false;}
+    else if (bitname == "eklm_2") {bit = false;}
+    else if (bitname == "eklmb2b") {bit = false;}
+    else if (bitname == "cdctop_0") {bit = false;}
+    else if (bitname == "cdctop_1") {bit = false;}
+    else if (bitname == "cdctop_2") {bit = false;}
+    else if (bitname == "cdctop_3") {bit = false;}
+
+    //random trigger
+    else if (bitname == "injv") {bit = false;}
+    else if (bitname == "nimin0") {bit = false;}
+    else if (bitname == "nimin1") {bit = false;}
+    else if (bitname == "inp159") {bit = false;}
+
+    //other trigger bits
+    else if (bitname == "itsfb2b") {bit = false;}
+    else if (bitname == "f2f30") {bit = false;}
+    else if (bitname == "s2f30") {bit = false;}
+    else if (bitname == "s2s30") {bit = false;}
+
+    //DITTO: please don't change the WARNING message below.
+    //If you change it, please update the test trg_tsim_check_warnings.py accordingly.
     else B2WARNING("Unknown bitname" << LogVar("bitname", bitname));
 
     trgInfo->setInputBits(i, bit);
@@ -829,7 +907,7 @@ void TRGGRLProjectsModule::event()
 void
 TRGGRLProjectsModule::endRun()
 {
-  B2DEBUG(200, "TRGGRLProjectsModule ... endRun called ");
+  B2DEBUG(20, "TRGGRLProjectsModule ... endRun called ");
 }
 
 

@@ -10,7 +10,6 @@
 //---------------------------------------------------------------
 // $Log$
 //---------------------------------------------------------------
-
 #define TRG_SHORT_NAMES
 #define TRGECLCLUSTER_SHORT_NAMES
 #include <framework/gearbox/Unit.h>
@@ -24,63 +23,92 @@ using namespace Belle2;
 //
 TrgEclTiming::TrgEclTiming() : NofTopTC(3), Source(0)
 {
-
   _TCMap = new TrgEclMapping();
   TCEnergy.clear();
   TCTiming.clear();
   TCId.clear();
-
+  m_EventTimingQualityFlag = -1;
+  m_EventTimingTCId = 0;
+  m_EventTimingTCThetaId = 0;
+  m_EventTimingTCEnergy = 0;
+  m_EventTimingQualityThresholds = {0.5, 2.0}; // GeV
 }
-
+//
+//
+//
 TrgEclTiming::~TrgEclTiming()
 {
-
   delete _TCMap;
 }
-void TrgEclTiming::Setup(std::vector<int> HitTCId, std::vector<double>HitTCEnergy, std::vector<double> HitTCTiming)
+//
+//
+//
+void
+TrgEclTiming::Setup(const std::vector<int>& HitTCId,
+                    const std::vector<double>& HitTCEnergy,
+                    const std::vector<double>& HitTCTiming)
 {
   TCId = HitTCId;
   TCEnergy = HitTCEnergy;
   TCTiming = HitTCTiming;
   return;
 }
-
+//========================================================
+// timing method selection
+//========================================================
 double TrgEclTiming::GetEventTiming(int method)
 {
   double EventTiming = 0;
 
-  if (method == 0) { // Fastest timing (belle)
+  if (method == 0) {
+    // Fastest timing (belle)
     EventTiming =  GetEventTiming00();
-  } else if (method == 1) { // Maximum energy
+  } else if (method == 1) {
+    // Maximum energy
     EventTiming =  GetEventTiming01();
-  } else { // Energy weighted timing
-
+  } else {
+    // Energy weighted timing
     EventTiming =  GetEventTiming02();
   }
 
   return EventTiming;
 }
+//========================================================
+// Fastest TC timing ( same as belle )
+//========================================================
 double TrgEclTiming::GetEventTiming00()
 {
   Source = 0;
-  double Fastest = 9999;
+  double FastestEnergy = 0;
+  double FastestTiming = 9999;
   int FastestTCId = 0;
   const int hit_size = TCTiming.size();
 
   for (int ihit = 0; ihit < hit_size; ihit++) {
-    if (TCTiming[ihit] < Fastest) {
-      Fastest = TCTiming[ihit];
+    if (TCTiming[ihit] < FastestTiming) {
+      FastestTiming = TCTiming[ihit];
       FastestTCId = TCId[ihit];
+      FastestEnergy = TCEnergy[ihit];
     }
   }
 
-  if (FastestTCId < 81) {Source = 1;}
-  else if (FastestTCId > 80 && FastestTCId < 513) {Source = 2;}
-  else {Source = 4;}
-  return Fastest ;
+  if (FastestTCId < 81) {
+    Source = 1;
+  } else if (FastestTCId > 80 && FastestTCId < 513) {
+    Source = 2;
+  } else {
+    Source = 4;
+  }
 
+  m_EventTimingTCId = FastestTCId;
+  m_EventTimingTCThetaId = _TCMap->getTCThetaIdFromTCId(FastestTCId);
+  m_EventTimingTCEnergy = FastestEnergy;
+
+  return FastestTiming;
 }
-
+//========================================================
+// Timing from most energetic TC timing
+//========================================================
 double TrgEclTiming::GetEventTiming01()
 {
   Source = 0;
@@ -94,19 +122,38 @@ double TrgEclTiming::GetEventTiming01()
     if (TCEnergy[ihit] > maxEnergy) {
       maxEnergy = TCEnergy[ihit] ;
       maxTiming = TCTiming[ihit] ;
-      maxTCId = TCId[ihit];
+      maxTCId   = TCId[ihit];
     }
   }
-  if (maxTCId < 81) {Source = 1;}
-  else if (maxTCId > 80 && maxTCId < 513) {Source = 2;}
-  else {Source = 4;}
+  if (maxTCId < 81) {
+    Source = 1;
+  } else if (maxTCId > 80 && maxTCId < 513) {
+    Source = 2;
+  } else {
+    Source = 4;
+  }
 
+  if (hit_size == 0) {
+    m_EventTimingQualityFlag = 0;
+  } else {
+    if (maxEnergy > m_EventTimingQualityThresholds[1]) {
+      m_EventTimingQualityFlag = 3;
+    } else if (maxEnergy > m_EventTimingQualityThresholds[0]) {
+      m_EventTimingQualityFlag = 2;
+    } else {
+      m_EventTimingQualityFlag = 1;
+    }
+  }
+
+  m_EventTimingTCId = maxTCId;
+  m_EventTimingTCThetaId = _TCMap->getTCThetaIdFromTCId(maxTCId);
+  m_EventTimingTCEnergy = maxEnergy;
 
   return maxTiming;
-
 }
-
-
+//========================================================
+// Energy weighted TC timing
+//========================================================
 double TrgEclTiming::GetEventTiming02()
 {
   Source = 0;
@@ -134,7 +181,8 @@ double TrgEclTiming::GetEventTiming02()
           maxTCId = TCId[ihit];
         }
       } else if (iNtopTC > 0) {
-        if (maxEnergy[iNtopTC - 1] > TCEnergy[ihit] && maxEnergy[iNtopTC] < TCEnergy[ihit]) {
+        if (maxEnergy[iNtopTC - 1] > TCEnergy[ihit] &&
+            maxEnergy[iNtopTC]     < TCEnergy[ihit]) {
           maxEnergy[iNtopTC] =  TCEnergy[ihit];
           maxTiming[iNtopTC] =  TCTiming[ihit];
         }
@@ -146,17 +194,16 @@ double TrgEclTiming::GetEventTiming02()
 
   EventTiming /= E_sum;
 
-  if (maxTCId < 81) {Source = 1;}
-  else if (maxTCId > 80 && maxTCId < 513) {Source = 2;}
-  else {Source = 4;}
-
-
+  if (maxTCId < 81) {
+    Source = 1;
+  } else if (maxTCId > 80 && maxTCId < 513) {
+    Source = 2;
+  } else {
+    Source = 4;
+  }
 
   return EventTiming;
-
 }
-
-
+//========================================================
 //
-//===<END>
-//
+//========================================================

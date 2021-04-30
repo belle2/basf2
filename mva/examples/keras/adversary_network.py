@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Dennis Weyland 2017
 # Justin Tan 2017
@@ -9,21 +8,16 @@
 # Relevant paper: https://arxiv.org/abs/1611.01046
 # use basf2_mva_evaluation.py with train.root and test.root at the end to see the impact on the spectator variables.
 
-import basf2
 import basf2_mva
 from basf2_mva_python_interface.contrib_keras import State
-import h5py
-import tensorflow as tf
 import tensorflow.contrib.keras as keras
-import keras
 
-from keras.layers import Input, Dense, Concatenate, Lambda
-from keras.models import Model, load_model
+from keras.layers import Dense, Input
+from keras.models import Model
 from keras.optimizers import adam
 from keras.losses import binary_crossentropy, sparse_categorical_crossentropy
 from keras.activations import sigmoid, tanh, softmax
-from keras import backend as K
-from keras.callbacks import Callback, EarlyStopping
+from keras.callbacks import EarlyStopping
 from keras.utils import plot_model
 
 import numpy as np
@@ -189,10 +183,10 @@ def partial_fit(state, X, S, y, w, epoch):
         Callback to print AUC after every epoch.
         """
 
-        def on_train_begin(self, logs={}):
+        def on_train_begin(self, logs=None):
             self.val_aucs = []
 
-        def on_epoch_end(self, epoch, logs={}):
+        def on_epoch_end(self, epoch, logs=None):
             val_y_pred = state.model.predict(state.Xtest).flatten()
             val_auc = roc_auc_score(state.ytest, val_y_pred)
             print('\nTest AUC: {}\n'.format(val_auc))
@@ -204,7 +198,7 @@ def partial_fit(state, X, S, y, w, epoch):
         Callback to train Adversary
         """
 
-        def on_batch_end(self, batch, logs={}):
+        def on_batch_end(self, batch, logs=None):
             v_X, v_y, v_S = state.batch_gen.next_batch(400 * state.K)
             target_adversary = build_adversary_target(v_y, v_S)
             state.adv_model.fit(v_X, target_adversary, verbose=0, batch_size=400)

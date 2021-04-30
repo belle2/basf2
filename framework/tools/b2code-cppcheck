@@ -37,10 +37,13 @@ EOT
     exit 1;
 fi
 
+# FIXME: to be removed when PHOKHARA is moved into externals.
+EXCLUDES="-i ${SOFTWARE_DIR}/generators/phokhara"
+
 cppcheck -q --enable=all --template=gcc --std=c++17 --suppress=unusedFunction --suppress=useStlAlgorithm --inline-suppr \
          --force --relative-paths=${SOFTWARE_DIR} \
          -D_PACKAGE_=PACKAGE -ULOG_NO_B2DEBUG -ULOG_NO_B2METHOD -ULOG_NO_B2INFO -ULOG_NO_B2WARNING -ULOG_NO_B2ASSERT -ULOG_NO_B2RESULT \
          -D__GNUC__=8 -UR__DICTIONARY_FILENAME -U__CINT__ -U__ROOTCLING__ -U__APPLE__ -U__ECC -U__ICC \
          -I ${SOFTWARE_DIR}/include/ -I ${SOFTWARE_DIR}/framework/data/cppcheck-includes/ \
          -i ${SOFTWARE_DIR}/build/ -i ${SOFTWARE_DIR}/include/ -i ${SOFTWARE_DIR}/framework/utilities/sha3hash \
-         "$@" 2>&1
+         "$@" ${EXCLUDES} 2>&1

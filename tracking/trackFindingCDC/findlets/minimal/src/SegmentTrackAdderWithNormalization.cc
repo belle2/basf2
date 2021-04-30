@@ -17,7 +17,6 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <vector>
-#include <deque>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -48,8 +47,23 @@ std::string SegmentTrackAdderWithNormalization::getDescription()
 void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCTrack, const CDCSegment2D>>& relations,
                                                std::vector<CDCTrack>& tracks, const std::vector<CDCSegment2D>& segments)
 {
-  // Storage space for the hits - deque for address persistence
-  std::deque<CDCRecoHit3D> recoHits3D;
+  // Storage space for the hits
+  // Important to reserve enough space as otherwise references to the elements used by the
+  // `WeightedRelations` in the vector `trackHitRelations` are not valid anymore
+  // !!! We cannot use a deque or list as these do not guarantee valid pointer comparisons as
+  // used by `std::sort` below !!!
+  std::vector<CDCRecoHit3D> recoHits3D;
+  int hit_size = 0;
+  for (const auto& relation : relations) {
+    hit_size += relation.getTo()->size();
+  }
+  for (const CDCSegment2D& segment : segments) {
+    hit_size += segment.size();
+  }
+  for (CDCTrack& track : tracks) {
+    hit_size += track.size();
+  }
+  recoHits3D.reserve(hit_size);
 
   // Relations for the matching tracks
   std::vector<WeightedRelation<CDCTrack, const CDCRecoHit3D>> trackHitRelations;

@@ -61,8 +61,8 @@ namespace Belle2 {
     std::string m_arrayNameV0ValidationVertex; ///< StoreArray name of the V0ValidationVertex.
 
     /// range for reconstructed Kshort mass used for pre-selection
-    /// default range set to nomminal KS mass +/- 0.005 GeV
-    std::tuple<double, double> m_MassRangeKshort = { 0.497614 - 0.005 , 0.497614 + 0.005 };
+    /// default range set to nomminal KS mass + 0.015 GeV and 0.45 GeV
+    std::tuple<double, double> m_MassRangeKshort = { 0.45, 0.497614 + 0.015 };
     /// range for reconstructed Lambda mass used for pre-selection
     /// Default range set to nominal Lambda mass +/- 0.03
     std::tuple<double, double> m_MassRangeLambda = { 1.115683 - 0.03, 1.115683 + 0.03 };

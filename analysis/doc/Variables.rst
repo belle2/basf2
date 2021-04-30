@@ -349,7 +349,11 @@ Rest of Event
 Continuum Suppression
 ~~~~~~~~~~~~~~~~~~~~~
 
-For a detailed description of the continuum suppression, see `ContinuumSuppression`
+For a detailed description of the continuum suppression, see `ContinuumSuppression`.
+All variables in this group require the :b2:mod:`ContinuumSuppressionBuilder` module to be added to the path,
+and a rest of event for the candidate particles. This can be done with both the
+`modularAnalysis.buildRestOfEvent`, and the `modularAnalysis.buildContinuumSuppression` 
+convenience functions.
 
 .. b2-variables::
     :group: Continuum Suppression

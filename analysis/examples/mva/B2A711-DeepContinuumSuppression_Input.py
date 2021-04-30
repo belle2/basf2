@@ -192,6 +192,9 @@ basf2.process(firstpath)
 print(basf2.statistics)
 
 # Shuffle Data. Use only if enough Ram is available
-df = read_root(outfile)
-df = df.sample(frac=1)
-df.to_root(outfile, key='tree')
+try:
+    df = read_root(outfile)
+    df = df.sample(frac=1)
+    df.to_root(outfile, key='tree')
+except OSError as e:
+    print(e)

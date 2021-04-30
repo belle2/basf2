@@ -53,7 +53,7 @@ V0FinderModule::V0FinderModule() : Module()
            1.);
 
   addParam("vertexChi2CutOutside", m_vertexChi2CutOutside,
-           "Maximum chi² for the vertex fit (NDF = 1)", 50.);
+           "Maximum chi² for the vertex fit (NDF = 1)", 10000.);
 
   addParam("v0FitterMode", m_v0FitterMode,
            "designate which fitAndStore function is called in V0Fitter.\n"

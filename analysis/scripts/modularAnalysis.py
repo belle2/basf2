@@ -3043,7 +3043,7 @@ def labelTauPairMC(printDecayInfo=False, path=None, TauolaBelle=False, mapping=N
     @param mapping: if None, the map is the default one, else the path for the map is given by the user.
     """
     from basf2 import find_file
-    if TauolaBelle:
+    if not TauolaBelle:
         TauDecayMode = register_module('TauDecayMode')
         if mapping is None:
             mp_file = find_file('data/analysis/modules/TauDecayMode/map_tau_vf.txt')

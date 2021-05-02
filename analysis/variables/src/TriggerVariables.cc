@@ -280,7 +280,7 @@ namespace Belle2 {
           B2FATAL("Invalid argument for L1PSNMBitPrescale function. The argument must be an integer representing the PSNM trigger bit.");
         }
         auto func = [testBit](const Particle*) -> double {
-          if (testBit < 0 or testBit >= TRGSummary::c_trgWordSize * TRGSummary::c_ntrgWords)
+          if (testBit < 0 or testBit >= (int)TRGSummary::c_trgWordSize * (int)TRGSummary::c_ntrgWords)
             return std::numeric_limits<double>::quiet_NaN();
           static DBObjPtr<TRGGDLDBPrescales> prescales;
           if (!prescales.isValid())

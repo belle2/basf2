@@ -297,9 +297,9 @@ void Variable::Manager::deprecateVariable(const std::string& name, bool make_fat
   auto mapIter = m_variables.find(name);
   if (mapIter != m_variables.end()) {
     if (make_fatal) {
-      mapIter->second.get()->extendDescriptionString("\n.. warning:: ");
+      mapIter->second.get()->extendDescriptionString("\n\n.. warning:: ");
     } else {
-      mapIter->second.get()->extendDescriptionString("\n.. note:: ");
+      mapIter->second.get()->extendDescriptionString("\n\n.. note:: ");
     }
     mapIter->second.get()->extendDescriptionString(".. deprecated:: " + version + "\n " + description);
   }

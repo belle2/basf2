@@ -2120,12 +2120,12 @@ def appendROEMask(list_name,
 
     - append a ROE mask with all tracks in ROE coming from the IP region
 
-       >>> appendROEMask('B+:sig', 'IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
+       >>> appendROEMask('B+:sig', 'IPtracks', '[dr < 2] and [abs(dz) < 5]', '')
 
     - append a ROE mask with only ECL-based particles that pass as good photon candidates
 
-       >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
-       >>> appendROEMask('B+:sig', 'goodROEGamma', '', good_photons)
+       >>> goodPhotons = 'inCDCAcceptance and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
+       >>> appendROEMask('B+:sig', 'goodROEGamma', '', goodPhotons)
 
 
     @param list_name             name of the input ParticleList
@@ -2154,10 +2154,10 @@ def appendROEMasks(list_name, mask_tuples, path=None):
 
     - Example for two tuples, one with and one without fractions
 
-       >>> ipTracks     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '', '')
-       >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
-       >>> goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', good_photons, '')
-       >>> goodROEKLM     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '', 'nKLMClusterTrackMatches == 0')
+       >>> ipTracks     = ('IPtracks', '[dr < 2] and [abs(dz) < 5]', '', '')
+       >>> goodPhotons = 'inCDCAcceptance and [clusterErrorTiming < 1e6] and [clusterE1E9 > 0.4 or E > 0.075]'
+       >>> goodROEGamma = ('ROESel', '[dr < 2] and [abs(dz) < 5]', goodPhotons, '')
+       >>> goodROEKLM     = ('IPtracks', '[dr < 2] and [abs(dz) < 5]', '', 'nKLMClusterTrackMatches == 0')
        >>> appendROEMasks('B+:sig', [ipTracks, goodROEGamma, goodROEKLM])
 
     @param list_name             name of the input ParticleList

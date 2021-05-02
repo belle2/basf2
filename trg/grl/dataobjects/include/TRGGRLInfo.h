@@ -27,7 +27,11 @@ namespace Belle2 {
       m_n_3dfitter_track(-1),
       m_n_3dfitter_track_Z10(-1),
       m_n_3dfitter_track_Z25(-1),
+      m_n_3dfitter_track_Z35(-1),
       m_n_NN_track(-1),
+      m_n_NN_track_Z20(-1),
+      m_n_NN_track_Z40(-1),
+      m_n_NN_track_STT(-1),
       m_n_2dmatch_track(-1),
       m_n_3dmatch_track(-1),
       m_n_cluster(-1),
@@ -110,8 +114,16 @@ namespace Belle2 {
     int getN3DfittertrkZ10() const  {return m_n_3dfitter_track_Z10;}
     /**get the number of 3D charged tracks*/
     int getN3DfittertrkZ25() const  {return m_n_3dfitter_track_Z25;}
+    /**get the number of 3D charged tracks*/
+    int getN3DfittertrkZ35() const  {return m_n_3dfitter_track_Z35;}
     /**get the number of NN charged tracks*/
     int getNNNtrk() const  {return m_n_NN_track;}
+    /**get the number of NN charged tracks Z0<20cm*/
+    int getNNNtrkZ20() const  {return m_n_NN_track_Z20;}
+    /**get the number of NN charged tracks Z0<40cm*/
+    int getNNNtrkZ40() const  {return m_n_NN_track_Z40;}
+    /**get the number of NN STT Z0<15cm, P>0.7GeV*/
+    int getNNNtrkSTT() const  {return m_n_NN_track_STT;}
     /**get the number of 2D matched tracks*/
     int getN2Dmatchtrk() const {return m_n_2dmatch_track;}
     /**get the number of 3D matched tracks*/
@@ -257,8 +269,16 @@ namespace Belle2 {
     void setN3DfittertrkZ10(int N3DfittertrkZ10)  {m_n_3dfitter_track_Z10 = N3DfittertrkZ10;}
     /**set the number of 3D charged tracks*/
     void setN3DfittertrkZ25(int N3DfittertrkZ25)  {m_n_3dfitter_track_Z25 = N3DfittertrkZ25;}
+    /**set the number of 3D charged tracks*/
+    void setN3DfittertrkZ35(int N3DfittertrkZ35)  {m_n_3dfitter_track_Z35 = N3DfittertrkZ35;}
     /**set the number of NN charged tracks*/
     void setNNNtrk(int NNNtrk)  {m_n_NN_track = NNNtrk;}
+    /**get the number of NN charged tracks Z0<20cm*/
+    void setNNNtrkZ20(int NNNtrkZ20)  {m_n_NN_track_Z20 = NNNtrkZ20;}
+    /**get the number of NN charged tracks Z0<40cm*/
+    void setNNNtrkZ40(int NNNtrkZ40)  {m_n_NN_track_Z40 = NNNtrkZ40;}
+    /**get the number of NN charged STT Z0<15sm, P>0.7GeV*/
+    void setNNNtrkSTT(int NNNtrkSTT)  {m_n_NN_track_STT = NNNtrkSTT;}
     /**set the number of 2D matched tracks*/
     void setN2Dmatchtrk(int N2Dmatchtrk)  {m_n_2dmatch_track = N2Dmatchtrk;}
     /**set the number of 3D matched tracks*/
@@ -404,8 +424,16 @@ namespace Belle2 {
     int m_n_3dfitter_track_Z10;
     /**#3D fitter tracks*/
     int m_n_3dfitter_track_Z25;
+    /**#3D fitter tracks*/
+    int m_n_3dfitter_track_Z35;
     /**#NN tracks*/
     int m_n_NN_track;
+    /**#NN tracks Z0<20cm*/
+    int m_n_NN_track_Z20;
+    /**#NN tracks Z0<40cm*/
+    int m_n_NN_track_Z40;
+    /**#NN tracks Z0<15cm,P>0.7GeV*/
+    int m_n_NN_track_STT;
     /**#2D matched finder tracks*/
     int m_n_2dmatch_track;
     /**#3D matched NN tracks*/
@@ -548,7 +576,7 @@ namespace Belle2 {
     std::vector<bool> m_InputBits = std::vector<bool>(320, false);
 
     /**! The Class title*/
-    ClassDef(TRGGRLInfo, 4); /*< the class title */
+    ClassDef(TRGGRLInfo, 5); /*< the class title */
   };
 } // end namespace Belle2
 

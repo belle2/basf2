@@ -56,11 +56,15 @@ def getAllSamples(mcCampaign):
         f"{mcCampaign}_taupairBGx0",
     ]
 
+    mcCampaignNumber = int(re.search(r"\d+", mcCampaign).group())
+    # TODO: Temporary workaround while only some MC14 samples are available on KEKCC
+    if mcCampaignNumber == 14:
+        mcSamples = [s for s in mcSamples if s.endswith("BGx1")]
+        mcSamples += ["MC14_eeeeBGx1", "MC14_mumuBGx1", "MC14_ggBGx1"]
     # For MC13 the low mult test samples exist (but they don't for MC12
     # and older) so here is a hack.
     # TODO: remove once when we regularly add the same low mult samples
-    mcCampaignNumber = int(re.search(r"\d+", mcCampaign).group())
-    if mcCampaignNumber > 12:
+    elif mcCampaignNumber > 12:
         mcSamples += [
             f"{mcCampaign}_ggBGx1",
             # f"{mcCampaign}_eeBGx1",
@@ -183,7 +187,7 @@ def getArgumentParser():
     parser.add_argument(
         "--mccampaign",
         default="MC13",
-        choices=["MC12", "MC13"],
+        choices=["MC12", "MC13", "MC14"],
         help="The MC campaign to test on.",
     )
     parser.add_argument(

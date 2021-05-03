@@ -1813,9 +1813,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("momentumOfSecondDaughter", momentumOfSecondDaughter,
                       "[Expert] Returns the momentum of second daughter if exists, 0. otherwise.");
     REGISTER_VARIABLE("momentumOfSecondDaughterCMS", momentumOfSecondDaughterCMS,
-                      "[Expert] Returns the Momentum of second daughter if exists in CMS, 0. otherwise.");
+                      "[Expert] Returns the momentum of the second daughter in the centre-of-mass system, 0. if this daughter doesn't exist.");
     REGISTER_VARIABLE("chargeTimesKaonLiklihood", chargeTimesKaonLiklihood,
-                      "[Expert] Returns the ``q*(highest PID_Likelihood for Kaons)``, 0. otherwise.");
+                      "[Expert] Returns ``q*(highest PID_Likelihood for Kaons)``, 0. otherwise.");
     REGISTER_VARIABLE("ptTracksRoe", transverseMomentumOfChargeTracksInRoe,
                       "[Expert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE.");
     REGISTER_VARIABLE("NumberOfKShortsInRoe", NumberOfKShortsInRoe,
@@ -1835,7 +1835,7 @@ namespace Belle2 {
 [Eventbased][Expert] Returns -1 (1) if current RestOfEvent is related to a ``anti-B0`` (``B0``). 
 The ``MCError`` bit of Breco has to be 0, 1, 2, 16 or 1024. 
 The output of the variable is 0 otherwise. 
-If one particle in the RestOfEvent is found to belong the reconstructed ``B0``, the output is -2(2) for a ``anti-B0`` (``B0``) on the recostructed side.");
+If one particle in the RestOfEvent is found to belong to the reconstructed ``B0``, the output is -2(2) for a ``anti-B0`` (``B0``) on the reconstructed side.");
 )DOC");
     REGISTER_VARIABLE("ancestorHasWhichFlavor", ancestorHasWhichFlavor,
                       "[Expert] Checks the decay chain of the given particle upwards up to the ``Upsilon(4S)`` resonance and outputs 0 (1) if an ancestor is found to be a ``anti-B0`` (``B0``), if not -2.");
@@ -1845,7 +1845,7 @@ If one particle in the RestOfEvent is found to belong the reconstructed ``B0``, 
     REGISTER_VARIABLE("isRestOfEventMajorityB0Flavor", isRestOfEventMajorityB0Flavor,
                       "[Expert] Returns 0 (1) if the majority of tracks and clusters of the current RestOfEvent are related to a ``anti-B0`` (``B0``).");
     REGISTER_VARIABLE("mcFlavorOfOtherB", mcFlavorOfOtherB,  R"DOC(
-[Expert] Returns the MC flavor (+1 or -1) of the accompaning tag-side B meson if the given particle is a correctly truth-matched B candidate, 0 otherwise.
+[Expert] Returns the MC flavor (+1 or -1) of the accompanying tag-side B meson if the given particle is a correctly truth-matched B candidate, 0 otherwise.
 In other words, this variable checks the generated flavor of the other generated ``Upsilon(4S)`` daughter.");
 )DOC");
 
@@ -1863,7 +1863,7 @@ The input values of ``requestedVariable`` can be the following:  cosKaonPion, Ha
 The input values of ``requestedVariable`` can be the following: pFastCMS, cosSlowFast, SlowFastHaveOpositeCharges, or cosTPTOFast.
 )DOC");
     REGISTER_VARIABLE("hasHighestProbInCat(particleListName, extraInfoName)", hasHighestProbInCat, R"DOC(
-[Expert] Returns 1.0 if the given Particle is classified as target track, i.e. if it has the highest target track probability in particlelistName. 
+[Expert] Returns 1.0 if the given Particle is classified as target track, i.e. if it has the highest target track probability in particleListName. 
 The probability is accessed via ``extraInfoName``, which can have the following input values:
 
 * isRightTrack(Electron),
@@ -1990,7 +1990,7 @@ The return values and the corresponding dilution ranges are the following:
 .. seealso:: :ref:`FlavorTagger` and :func:`flavorTagger.flavorTagger`.
 )DOC");
     REGISTER_VARIABLE("qrOutput(combinerMethod)", qrOutput, R"DOC(
-Returns the output of the flavorTagger, flavor tag :math:`q` times the dilution factor :math:`r`, for the given a combiner method. 
+Returns the output of the flavorTagger, flavor tag :math:`q` times the dilution factor :math:`r`, for the given combiner method. 
 The available combiner methods are 'FBDT' or 'FANN'.
 
 .. warning:: You have to run the Flavor Tagger for this variable to be meaningful.
@@ -2007,7 +2007,7 @@ The available combiner methods are 'FBDT' or 'FANN'.
 Returns -1 (1) if the RestOfEvent related to the given particle is related to a ``anti-B0`` (``B0``). 
 The ``MCError`` bit of Breco has to be 0, 1, 2, 16 or 1024. 
 The output of the variable is 0 otherwise. 
-If one particle in the RestOfEvent is found to belong the reconstructed ``B0``, the output is -2(2) for a ``anti-B0`` (``B0``) on the reconstructed side.
+If one particle in the RestOfEvent is found to belong to the reconstructed ``B0``, the output is -2(2) for a ``anti-B0`` (``B0``) on the reconstructed side.
 )DOC");
   }
 }

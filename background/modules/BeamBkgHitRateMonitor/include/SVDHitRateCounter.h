@@ -196,7 +196,7 @@ namespace Belle2 {
 
       // store object
       StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer; /**< trigger decision */
-      StoreObjPtr<SVDEventInfo> m_eventInfo;
+      StoreObjPtr<SVDEventInfo> m_eventInfo; /**< For number of APV samples taken (3 or 6). */
 
       // DB payloads
       SVDHotStripsCalibrations m_HotStripsCalib; /**< payload for hot strips */

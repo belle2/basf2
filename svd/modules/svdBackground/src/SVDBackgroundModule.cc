@@ -7,6 +7,7 @@
 
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/dataobjects/BackgroundMetaData.h>
+#include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDSimHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
@@ -258,27 +259,27 @@ void SVDBackgroundModule::event()
       int pdg = abs(simhit->getPDGcode());
       double kineticEnergy(0.0);
       double nielWeight(0.0);
-      if (pdg == 2112) {
-        double m0 = 0.940;
+      if (pdg == Const::neutron.getPDGCode()) {
+        double m0 = Const::neutronMass;
         kineticEnergy = sqrt(hitMomentum.Mag2() + m0 * m0) - m0;
         nielWeight = m_nielNeutrons->getNielFactor(kineticEnergy / Unit::MeV);
       }
-      if (pdg == 2212) {
-        double m0 = 0.938;
+      if (pdg == Const::proton.getPDGCode()) {
+        double m0 = Const::protonMass;
         kineticEnergy = sqrt(hitMomentum.Mag2() + m0 * m0) - m0;
         nielWeight = m_nielProtons->getNielFactor(kineticEnergy / Unit::MeV);
       }
-      if (pdg == 111 || pdg == 211) {
-        double m0 = 0.135;
+      if (pdg == Const::pi0.getPDGCode() || pdg == Const::pion.getPDGCode()) {
+        double m0 = Const::pi0Mass;
         kineticEnergy = sqrt(hitMomentum.Mag2() + m0 * m0) - m0;
         nielWeight = m_nielPions->getNielFactor(kineticEnergy / Unit::MeV);
       }
-      if (pdg == 11) {
-        double m0 = 0.511e-3;
+      if (pdg == Const::electron.getPDGCode()) {
+        double m0 = Const::electronMass;
         kineticEnergy = sqrt(hitMomentum.Mag2() + m0 * m0) - m0;
         nielWeight = m_nielElectrons->getNielFactor(kineticEnergy / Unit::MeV);
       }
-      if (pdg == 22) {
+      if (pdg == Const::photon.getPDGCode()) {
         double m0 = 0.0;
         kineticEnergy = sqrt(hitMomentum.Mag2() + m0 * m0) - m0;
       }

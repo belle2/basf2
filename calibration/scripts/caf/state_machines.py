@@ -27,9 +27,6 @@ from caf.utils import iov_from_runs
 from caf.utils import IoV_Result
 from caf.utils import get_iov_from_file
 from caf.backends import Job
-from caf.backends import LSF
-from caf.backends import PBS
-from caf.backends import Local
 from caf.runners import AlgorithmsRunner
 
 
@@ -309,11 +306,12 @@ class Machine():
         Runs the transition logic. Callbacks are evaluated in the order:
         conditions -> before -> <new state set here> -> after.
         """
-        source, dest, conditions, before_callbacks, after_callbacks = (transition_dict["source"],
-                                                                       transition_dict["dest"],
-                                                                       transition_dict["conditions"],
-                                                                       transition_dict["before"],
-                                                                       transition_dict["after"])
+        dest, conditions, before_callbacks, after_callbacks = (
+            transition_dict["dest"],
+            transition_dict["conditions"],
+            transition_dict["before"],
+            transition_dict["after"]
+        )
         # Returns True only if every condition returns True when called
         if all(map(lambda condition: self._callback(condition, **kwargs), conditions)):
             for before_func in before_callbacks:

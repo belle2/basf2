@@ -105,7 +105,7 @@ def generate_constraints(constraint_sets, timedep, global_tags, init_event):
 
     from alignment.constraints_generator import save_config
     ccfn = save_config(constraint_sets, timedep, global_tags, init_event)
-    os.system('basf2 {} {}'.format(find_file('alignment/scripts/alignment/constraints_generator.py'), ccfn))
+    os.system('basf2 {} {}'.format(b2.find_file('alignment/scripts/alignment/constraints_generator.py'), ccfn))
 
     return files
 
@@ -398,7 +398,7 @@ class CDCWireConstraints(Constraints):
         super(CDCWireConstraints, self).__init__(filename)
         #: List of layers for whose wires to generate the constraints. None = all layers
         if layers is None:
-            layers = [l for l in range(0, 56)]
+            layers = [lst for lst in range(0, 56)]
         self.layers = layers
         #: 6 x 56 (6/layer) constraints. Sum(dX_B/dY_B/drot_B/dX_FB/dY_FB/drot_FB)=0 for all wires in each layer
         #  -> removes the basic unconstrained DoF when aligning wires and layers simultaneously.

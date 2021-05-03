@@ -1,0 +1,5 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'calibration', 'analysis_dataobjects', 'mdst_dataobjects']
+
+Return('env')

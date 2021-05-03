@@ -185,7 +185,7 @@ void TRGGRLProjectsModule::initialize()
 void
 TRGGRLProjectsModule::beginRun()
 {
-  B2DEBUG(200, "TRGGDLModule ... beginRun called ");
+  B2DEBUG(20, "TRGGDLModule ... beginRun called ");
   //...GDL config. name...
 }
 //-----------------------------------------------------------------------------------------
@@ -201,6 +201,7 @@ void TRGGRLProjectsModule::event()
   //StoreArray<MCParticle> MCParticleArray;
   StoreArray<CDCTriggerTrack> cdc2DTrkArray("TRGCDC2DFinderTracks");
   StoreArray<CDCTriggerTrack> cdc3DTrkArray("TRGCDC3DFitterTracks");
+  StoreArray<CDCTriggerTrack> cdcNNTrkArray("TRGCDCNeuroTracks");
   StoreArray<TRGECLCluster> eclTrgClusterArray("TRGECLClusters");
   StoreArray<TRGGRLMATCH> trackphimatch("TRGPhiMatchTracks");
   StoreArray<TRGGRLMATCHKLM> trackKLMmatch("TRGKLMMatchTracks");
@@ -234,18 +235,48 @@ void TRGGRLProjectsModule::event()
   int nTrk3D = cdc3DTrkArray.getEntries();
   int nTrkZ10 = 0;
   int nTrkZ25 = 0;
-  int nTrkZ40 = 0;
+  int nTrkZ35 = 0;
   for (int itrk = 0; itrk < nTrk3D; itrk++) {
     double z0 = cdc3DTrkArray[itrk]->getZ0();
     if (abs(z0) < 10.) {nTrkZ10++;}
     if (abs(z0) < 25.) {nTrkZ25++;}
-    if (abs(z0) < 40.) {nTrkZ40++;}
+    if (abs(z0) < 35.) {nTrkZ35++;}
+  }
+  int nTrkNN = cdc3DTrkArray.getEntries();
+  int nTrkNNSTT = 0;
+  int nTrkNN20 = 0;
+  int nTrkNN40 = 0;
+  for (int itrk = 0; itrk < nTrkNN; itrk++) {
+    double z0 = cdcNNTrkArray[itrk]->getZ0();
+
+    double omega = 100 * cdcNNTrkArray[itrk]->getOmega();
+    int omega_bin = omega / 0.044;
+    omega = omega_bin * 0.044;
+
+    double cottheta = cdcNNTrkArray[itrk]->getCotTheta();
+    double theta = 0;
+    if (cottheta != 0)theta = atan(1. / cottheta);
+    int theta_bin = theta / 0.098125;
+    theta = theta_bin * 0.098125;
+    int p = abs(10 * 0.3 * 1.5 / omega / sin(theta)); //0.1GeV unit
+
+    double pt    = cdcNNTrkArray[itrk]->getPt();
+    double p_abs = cdcNNTrkArray[itrk]->getPt() / sin(theta);
+    B2DEBUG(20, "NN momentum " << omega << " " << theta * 180 / 3.14 << " " << p * 0.1 << " " << p_abs << " " << pt);
+
+    if (abs(z0) < 15. && p > 7) {nTrkNNSTT++;}
+    if (abs(z0) < 20.) {nTrkNN20++;}
+    if (abs(z0) < 40.) {nTrkNN40++;}
   }
 
   trgInfo->setN3Dfittertrk(nTrk3D);
   trgInfo->setN3DfittertrkZ10(nTrkZ10);
   trgInfo->setN3DfittertrkZ25(nTrkZ25);
-
+  trgInfo->setN3DfittertrkZ35(nTrkZ35);
+  trgInfo->setNNNtrk(nTrkNN);
+  trgInfo->setNNNtrkZ20(nTrkNN20);
+  trgInfo->setNNNtrkZ40(nTrkNN40);
+  trgInfo->setNNNtrkSTT(nTrkNNSTT);
   //---------------------------------------------------------------------
   //..Trigger objects using single ECL clusters
   // nClust n300MeV n2GeV n2GeV414 n2GeV231516 n2GeV117 n1GeV415 n1GeV2316 n1GeV117
@@ -705,10 +736,15 @@ void TRGGRLProjectsModule::event()
     std::string bitname(m_InputBitsDB->getinbitname(i));
 
     bool bit = false;
-    if (bitname == "t3_0") {bit = nTrkZ40 == 1;}
-    else if (bitname == "t3_1") {bit = nTrkZ40 == 2;}
-    else if (bitname == "t3_2") {bit = nTrkZ40 == 3;}
-    else if (bitname == "t3_3") {bit = nTrkZ40 > 3;}
+    if (bitname == "t3_0") {bit = nTrkZ35 == 1;}
+    else if (bitname == "t3_1") {bit = nTrkZ35 == 2;}
+    else if (bitname == "t3_2") {bit = nTrkZ35 == 3;}
+    else if (bitname == "t3_3") {bit = nTrkZ35 > 3;}
+    else if (bitname == "ty_0") {bit = nTrkNN20 == 1;}
+    else if (bitname == "ty_1") {bit = nTrkNN20 == 2;}
+    else if (bitname == "ty_2") {bit = nTrkNN20 == 3;}
+    else if (bitname == "ty_3") {bit = nTrkNN20 > 3;}
+    else if (bitname == "typ")  {bit = nTrkNNSTT > 0;}
     else if (bitname == "t2_0") {bit = nTrk2D == 1;}
     else if (bitname == "t2_1") {bit = nTrk2D == 2;}
     else if (bitname == "t2_2") {bit = nTrk2D == 3;}
@@ -849,11 +885,6 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "track") {bit = false;}
     else if (bitname == "trkfit") {bit = false;}
 
-    // Neuro track, TSIM not ready
-    else if (bitname == "ty_0") {bit = false;}
-    else if (bitname == "ty_1") {bit = false;}
-    else if (bitname == "ty_2") {bit = false;}
-    else if (bitname == "ty_3") {bit = false;}
 
     //GRL related bits, not ready
     else if (bitname == "ta_0") {bit = false;}
@@ -889,7 +920,14 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "nimin1") {bit = false;}
     else if (bitname == "inp159") {bit = false;}
 
+    //other trigger bits
+    else if (bitname == "itsfb2b") {bit = false;}
+    else if (bitname == "f2f30") {bit = false;}
+    else if (bitname == "s2f30") {bit = false;}
+    else if (bitname == "s2s30") {bit = false;}
 
+    //DITTO: please don't change the WARNING message below.
+    //If you change it, please update the test trg_tsim_check_warnings.py accordingly.
     else B2WARNING("Unknown bitname" << LogVar("bitname", bitname));
 
     trgInfo->setInputBits(i, bit);
@@ -900,7 +938,7 @@ void TRGGRLProjectsModule::event()
 void
 TRGGRLProjectsModule::endRun()
 {
-  B2DEBUG(200, "TRGGRLProjectsModule ... endRun called ");
+  B2DEBUG(20, "TRGGRLProjectsModule ... endRun called ");
 }
 
 

@@ -6,11 +6,11 @@ tools and the Python API.
 
 .. note:: Generated on |today| for release |release|, commit |version|.
 
-This Documentation is not yet complete. In case of questions regarding the
-Belle 2 Software or for additional information, please
+In case of questions regarding the Belle 2 Software or for additional
+information, please check `Belle 2 Questions <https://questions.belle2.org>`_.
 
-* look at the `Confluence Pages <https://confluence.desy.de/display/BI>`_
-* check `Belle 2 Questions <https://questions.belle2.org>`_
+.. tip:: If you are new to the Belle 2 Software, you might want to take a look
+    at the :ref:`onlinebook`, a series of lessons that get you started in no time!
 
 ----
 

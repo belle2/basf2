@@ -74,7 +74,7 @@ ntuple.param('treeName', methodPrefixEventLevel + "_tree")
 # Call variable aliases from flavor tagger
 ft.set_FlavorTagger_pid_aliases()
 # Alias for pidProbabilityExpert(11, ALL)
-vm.addAlias(f"eid_ALL", f"pidProbabilityExpert(11, ALL)")
+vm.addAlias("eid_ALL", "pidProbabilityExpert(11, ALL)")
 
 variablesToBeSaved = ['useCMSFrame(p)',
                       'useCMSFrame(pt)',

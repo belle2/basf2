@@ -25,7 +25,6 @@ from ROOT import Belle2
 import modularAnalysis as ma
 import numpy as np
 import math
-import random
 from variables import variables as mc_variables
 
 inputFiles = []
@@ -84,15 +83,15 @@ def plotWithAsymmetry(
 
     iBin = 0
 
-    xValModel = ROOT.Double(-1.E30)
-    yValModel = ROOT.Double(-1.E30)
+    # xValModel = ROOT.Double(-1.E30)
+    # yValModel = ROOT.Double(-1.E30)
     xValDot = ROOT.Double(-1.E30)
     yValDotA = ROOT.Double(-1.E30)
     yValDotB = ROOT.Double(-1.E30)
 
     iDotsA = ROOT.RooRealVar("iDotsA", "", 0.)
     idotsB = ROOT.RooRealVar("idotsB", "", 0.)
-    iDotError = ROOT.RooRealVar("iDotErrorA", "", 0.)
+    # iDotError = ROOT.RooRealVar("iDotErrorA", "", 0.)
     # yComb = ROOT.RooFormulaVar("yComb", "", "-1*@0", ROOT.RooArgList(y1RV))
     iAsymmetry = ROOT.RooFormulaVar("yComb", "", "(@0 - @1)/(@0 + @1)", ROOT.RooArgList(iDotsA, idotsB))
 
@@ -443,9 +442,6 @@ class fitDeltaT(b2.Module):
             # print(tSig, " ", tTag)
             B0Flags.append(isB0sig)
 
-        tagProb = random.uniform(0, 1)
-        signalProb = random.uniform(0, 1)
-
         rejectEventFlag = False
 
         DeltaT = 1000 * (tSig - tTag)
@@ -638,7 +634,7 @@ class fitDeltaT(b2.Module):
         # lFitRes.SetTextSize(0.054)
         # lFitRes.Draw()
 
-        textValA = ROOT.TText(
+        ROOT.TText(
             0.1,
             1,
             "#it{A}_{#it{CP}} = " +
@@ -647,7 +643,7 @@ class fitDeltaT(b2.Module):
             " #pm " +
             '{:1.2f}'.format(
                 self.A.getError()))
-        textValS = ROOT.TText(
+        ROOT.TText(
             0.1,
             0.5,
             "#it{A}_{#it{CP}} = " +

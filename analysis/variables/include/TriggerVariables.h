@@ -17,6 +17,7 @@
 
 
 namespace Belle2 {
+
   class Particle;
 
   namespace Variable {
@@ -27,29 +28,19 @@ namespace Belle2 {
     double L1Trigger(const Particle*);
 
     /**
-     * returns trigger FTDL bit (Final Trigger Decision Logic before prescale)
+     * returns L1 trigger time type
      */
-    double L1FTDLBit(const Particle*, const std::vector<double>& bit);
+    double L1TimeType(const Particle*);
 
     /**
-     * returns trigger PSNM bit (prescale and mask), i.e. after prescale
+     * returns L1 trigger time quality
      */
-    double L1PSNMBit(const Particle*, const std::vector<double>& bit);
+    double L1TimeQuality(const Particle*);
 
     /**
-     * returns trigger input bit i
+     * returns 1 if poisson random trigger is within injection veto window
      */
-    double L1InputBit(const Particle*, const std::vector<double>& bit);
-
-    /**
-     * returns trigger prescale for a given trigger bit
-     */
-    double L1PSNMBitPrescale(const Particle*, const std::vector<double>& bit);
-
-    /**
-     * returns true L1 time type
-     */
-    double getTimType(const Particle*);
+    double isPoissonInInjectionVeto(const Particle*);
 
     /**
      * returns 1 if the event passes a given software trigger identifier, NAN if

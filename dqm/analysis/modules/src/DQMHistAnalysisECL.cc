@@ -52,12 +52,12 @@ void DQMHistAnalysisECLModule::initialize()
   B2DEBUG(20, "DQMHistAnalysisECL: initialized.");
 
   //new canvases for existing histograms
-  c_quality_analysis = new TCanvas("ECL_c_quality_analysis");
-  c_quality_other_analysis = new TCanvas("ECL_c_quality_other_analysis");
+  c_quality_analysis = new TCanvas("ECL/c_quality_analysis");
+  c_quality_other_analysis = new TCanvas("ECL/c_quality_other_analysis");
   c_bad_quality_analysis = new TCanvas("ECL/c_bad_quality_analysis");
   c_trigtag1_analysis = new TCanvas("ECL/c_trigtag1_analysis");
   c_trigtag2_analysis = new TCanvas("ECL/c_trigtag2_analysis");
-  c_adc_hits_analysis = new TCanvas("ECL_c_adc_hits_analysis");
+  c_adc_hits_analysis = new TCanvas("ECL/c_adc_hits_analysis");
   c_ampfail_quality_analysis = new TCanvas("ECL/c_ampfail_quality_analysis");
   c_timefail_quality_analysis = new TCanvas("ECL/c_timefail_quality_analysis");
   c_quality_fit_data_analysis = new TCanvas("ECL/c_quality_fit_data_analysis");
@@ -126,7 +126,11 @@ void DQMHistAnalysisECLModule::normalize(TCanvas* c, const std::string&  h_name,
   if (h != NULL) {
     for (unsigned short i = 0; i < h->GetNbinsX(); i++) {
       Double_t entries = h->GetBinContent(i + 1);
-      if (weight) h->SetBinContent(i + 1, entries / weight);
+      Double_t error = h->GetBinError(i + 1);
+      if (weight) {
+        h->SetBinContent(i + 1, entries / weight);
+        h->SetBinError(i + 1, error / weight);
+      }
     }
     h->Draw("HIST");
   }
@@ -150,7 +154,7 @@ void DQMHistAnalysisECLModule::event()
   TH1* h_quality = findHist("ECL/quality");
   if (h_quality != NULL) {
     h_quality->SetMinimum(0.1);
-    h_quality->Draw();
+    h_quality->Draw("hist");
   }
   c_quality_analysis->Draw();
   c_quality_analysis->Modified();
@@ -163,7 +167,7 @@ void DQMHistAnalysisECLModule::event()
   TH1* h_quality_other = findHist("ECL/quality_other");
   if (h_quality_other != NULL) {
     h_quality_other->SetMinimum(0.1);
-    h_quality_other->Draw();
+    h_quality_other->Draw("hist");
   }
   c_quality_other_analysis->Draw();
   c_quality_other_analysis->Modified();
@@ -211,7 +215,7 @@ void DQMHistAnalysisECLModule::event()
   TH1* h_trigtag1 = findHist("ECL/trigtag1");
   if (h_trigtag1 != NULL) {
     h_trigtag1->SetMinimum(0.1);
-    h_trigtag1->Draw();
+    h_trigtag1->Draw("hist");
     if (h_trigtag1->GetBinContent(2)) c_trigtag1_analysis->Pad()->SetFillColor(kRed);
   }
   c_trigtag1_analysis->Draw();
@@ -225,7 +229,7 @@ void DQMHistAnalysisECLModule::event()
   TH1* h_adc_hits = findHist("ECL/adc_hits");
   if (h_adc_hits != NULL) {
     h_adc_hits->SetMinimum(0.1);
-    h_adc_hits->Draw();
+    h_adc_hits->Draw("hist");
   }
   c_adc_hits_analysis->Draw();
   c_adc_hits_analysis->Modified();
@@ -240,7 +244,7 @@ void DQMHistAnalysisECLModule::event()
   TH1* h_ampfail_quality = findHist("ECL/ampfail_quality");
   if (h_ampfail_quality != NULL) {
     h_ampfail_quality->SetMinimum(0.1);
-    h_ampfail_quality->Draw();
+    h_ampfail_quality->Draw("hist");
     for (unsigned short i = 1; i < 5; i++) {
       if (h_ampfail_quality->GetBinContent(i + 1)) {
         c_ampfail_quality_analysis->Pad()->SetFillColor(kRed);
@@ -261,7 +265,7 @@ void DQMHistAnalysisECLModule::event()
   TH1* h_timefail_quality = findHist("ECL/timefail_quality");
   if (h_timefail_quality != NULL) {
     h_timefail_quality->SetMinimum(0.1);
-    h_timefail_quality->Draw();
+    h_timefail_quality->Draw("hist");
     for (unsigned short i = 1; i < 5; i++) {
       if (h_timefail_quality->GetBinContent(i + 1)) {
         c_timefail_quality_analysis->Pad()->SetFillColor(kRed);
@@ -281,8 +285,8 @@ void DQMHistAnalysisECLModule::event()
   c_trigtag2_analysis->Pad()->SetFillColor(kWhite);
   TH1* h_trigtag2_trigid = findHist("ECL/trigtag2_trigid");
   if (h_trigtag2_trigid != NULL) {
-    h_trigtag2_trigid->Draw();
-    for (unsigned short i = 0; i  < 52; i++) {
+    h_trigtag2_trigid->Draw("colz");
+    for (unsigned short i = 0; i < 52; i++) {
       if (h_trigtag2_trigid->GetBinContent(h_trigtag2_trigid->GetBin(i + 1, 3))) {
         c_trigtag2_analysis->Pad()->SetFillColor(kRed);
         break;
@@ -303,7 +307,7 @@ void DQMHistAnalysisECLModule::event()
   c_quality_fit_data_analysis->Pad()->SetFillColor(kWhite);
   TH1* h_quality_fit_data = findHist("ECL/quality_fit_data");
   if (h_quality_fit_data != NULL) {
-    h_quality_fit_data->Draw();
+    h_quality_fit_data->Draw("hist");
     for (unsigned short i = 0; i < 4; i++) {
       for (unsigned short j = 0; j < 4; j++) {
         if (h_quality_fit_data->GetBinContent(h_quality_fit_data->GetBin(i + 1, j + 1)) > 0) {

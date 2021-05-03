@@ -55,12 +55,20 @@ void SVDZeroSuppressionEmulatorModule::initialize()
 {
   m_storeShaper.isRequired(m_storeShaperDigitsName);
 
-  m_selectorIN.registerSubset(m_storeShaper, m_SVDShaperDigitsIN);
-  //  m_selectorIN.inheritAllRelations();
+  if (m_storeShaperDigitsName == m_SVDShaperDigitsIN) {
+    m_selectorIN.registerSubset(m_storeShaper);
+  } else {
+    m_selectorIN.registerSubset(m_storeShaper, m_SVDShaperDigitsIN, DataStore::c_WriteOut);
+    m_selectorIN.inheritAllRelations();
+  }
 
   if (m_createOutside) {
-    m_selectorOUT.registerSubset(m_storeShaper, m_SVDShaperDigitsOUT);
-    //    m_selectorOUT.inheritAllRelations();
+    if (m_storeShaperDigitsName == m_SVDShaperDigitsOUT) {
+      m_selectorOUT.registerSubset(m_storeShaper);
+    } else {
+      m_selectorOUT.registerSubset(m_storeShaper, m_SVDShaperDigitsOUT);
+      m_selectorOUT.inheritAllRelations();
+    }
   }
 
 }

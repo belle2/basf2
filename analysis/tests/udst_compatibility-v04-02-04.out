@@ -12,11 +12,13 @@ Untested method Particle::removeDaughter
 Untested method Particle::removeExtraInfo
 Untested method Particle::set4Vector
 Untested method Particle::setExtraInfo
+Untested method Particle::setJacobiMatrix
 Untested method Particle::setMomentumScalingFactor
 Untested method Particle::setMomentumVertexErrorMatrix
 Untested method Particle::setPValue
 Untested method Particle::setProperty
 Untested method Particle::setVertex
+Untested method Particle::updateJacobiMatrix
 Untested method Particle::updateMomentum
 Untested method Particle::writeExtraInfo
 Untested method EventExtraInfo::removeExtraInfo

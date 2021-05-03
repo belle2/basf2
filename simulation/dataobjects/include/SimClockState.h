@@ -51,6 +51,15 @@ namespace Belle2 {
     void setBeamCycleNumber(unsigned beamCycle) {m_beamCycle = beamCycle;}
 
     /**
+     * Sets the relativeBucket number, i.e. the number
+     * of buckets between the collision bunch crossing and the
+     * L1 trigger signal.
+     * In other words: it sets the jitter measured in units of
+     * number of buckets.
+     */
+    void setRelativeBucketNo(int relativeBucket) {m_relativeBucketNo = relativeBucket;}
+
+    /**
      * Returns the number of system clock ticks since last revo9 marker.
      * System clock runs with a frequency of RF/4 ~ 127 MHz.
      * @return number of system clock ticks
@@ -77,14 +86,31 @@ namespace Belle2 {
      */
     unsigned getSVDTriggerBin(unsigned offset = 2) const {return (m_revo9Count + offset) % 4;}
 
+    /**
+    * Returns CDC trigger bin.
+    * Default value for offset put as 0 for now.
+    * @param offset offset
+    * @return CDC trigger bin
+    */
+    unsigned getCDCTriggerBin(unsigned offset = 0) const {return (m_revo9Count + offset) % 4;}
+
+    /**
+     * Returns the distance (in bucket number)
+     * between the collision  bunch crossing and the bucket
+     * corresponding to the L1 trigger signal
+    * @return relative bucket number
+    */
+    int getRelativeBucketNo() const {return m_relativeBucketNo;}
 
   private:
+
+    int m_relativeBucketNo = 0; /**<jitter measured in units of number-of-buckets*/
 
     unsigned m_revo9Count = 0; /**< number of system clock ticks since last revo9 marker */
     unsigned m_bucketNumber = 0; /**< RF bucket number of the collision */
     unsigned m_beamCycle = 0; /**< beam revolution count since last revo9 marker */
 
-    ClassDef(SimClockState, 1); /**< ClassDef */
+    ClassDef(SimClockState, 2); /**< ClassDef */
 
   };
 

@@ -10,4 +10,7 @@
 #pragma link C++ class Belle2::PXDGainCalibrationAlgorithm-;
 #pragma link C++ class Belle2::PXDChargeCalibrationAlgorithm-;
 #pragma link C++ class Belle2::PXDDataMCGainCalibrationAlgorithm-;
+#pragma link C++ class Belle2::PXDAnalyticGainCalibrationAlgorithm-;
+#pragma link C++ class Belle2::PXDValidationAlgorithm-;
+
 #endif

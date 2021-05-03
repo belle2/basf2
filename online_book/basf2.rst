@@ -3,7 +3,7 @@
 Working with Belle II software.
 ===============================
 
-This chapter contains lessons designed to get you up-and-running using the 
+This chapter contains lessons designed to get you up-and-running using the
 Belle II software to perform analysis tasks.
 
 .. toctree::
@@ -19,4 +19,4 @@ Belle II software to perform analysis tasks.
    basf2/cs
    basf2/b2bii
    basf2/skim
-
+   basf2/python_module

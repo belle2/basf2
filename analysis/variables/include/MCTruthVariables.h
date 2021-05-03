@@ -298,9 +298,14 @@ namespace Belle2 {
     double getLEREnergy(const Particle*);
 
     /**
-     * return crossing angle from generator level beam kinematics
+     * return crossing angle in the x-z plane from generator level beam kinematics
      */
-    double getCrossingAngle(const Particle*);
+    double getCrossingAngleX(const Particle*);
+
+    /**
+     * return crossing angle in the y-z plane from generator level beam kinematics
+     */
+    double getCrossingAngleY(const Particle*);
 
     /**
      * returns the weight of the ECLCluster -> MCParticle relation for the
@@ -323,6 +328,12 @@ namespace Belle2 {
      */
     double particleClusterBestMCPDGCode(const Particle*);
 
+    /**
+     * returns 1 for crossfeed in reconstruction of a B meson, 0 for no crossfeed and
+     * nan for no true B meson or failed truthmatching. Iterates over final state daughters
+     * of a given B meson and searches for common identical B meson ancestor at generator level.
+     */
+    double isBBCrossfeed(const Particle*);
   }
 }
 

@@ -11,6 +11,7 @@
 #include <simulation/kernel/UserInfo.h>
 #include <vxd/simulation/SensitiveDetectorBase.h>
 #include <vxd/dataobjects/VXDElectronDeposit.h>
+#include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
 
 #ifdef VXD_SENSITIVEDETECTOR_DEBUG
@@ -30,7 +31,8 @@ namespace Belle2 {
       const int pdgCode = track.GetDefinition()->GetPDGEncoding();
       // Get particle charge (only keep charged tracks, photons and magnetic monopoles)
       const bool isNeutral = track.GetDefinition()->GetPDGCharge() == 0;
-      const bool isAllowedNeutral = (pdgCode == 22) || (m_seeNeutrons && (abs(pdgCode) == 2112)) || (abs(pdgCode) == 99666);
+      const bool isAllowedNeutral = (pdgCode == Const::photon.getPDGCode()) || (m_seeNeutrons
+                                    && (abs(pdgCode) == Const::neutron.getPDGCode())) || (abs(pdgCode) == 99666);
       //Not interested in neutral particles except photons, magnetic monopoles and maybe neutrons
       if (isNeutral && !isAllowedNeutral) return false;
 

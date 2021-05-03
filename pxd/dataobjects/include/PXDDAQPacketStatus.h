@@ -26,7 +26,7 @@ namespace Belle2 {
    * It will record if the data of DHC/DHE/sensors (readout by this packet) is useable.
    *
    */
-  class PXDDAQPacketStatus {
+  class PXDDAQPacketStatus final {
   public:
 
     /** Default constructor for the ROOT IO. */
@@ -36,6 +36,9 @@ namespace Belle2 {
      * @param inx packet index
      */
     explicit PXDDAQPacketStatus(unsigned short inx) : m_errorMask(0), m_critErrorMask(0), m_usable(true), m_index(inx) {}
+
+    /** destructor */
+    virtual ~PXDDAQPacketStatus() {};
 
     /** Return Usability of data
      * @return conclusion if data is useable

@@ -74,7 +74,6 @@ namespace Belle2 {
     StoreArray<MCParticle> m_mcParticles; /**< StoreArray of MCParticle objects */
     StoreArray<PIDLikelihood> m_pidlikelihoods; /**< StoreArray of PIDLikelihood objects */
     double m_angleThres; /**< input max angle to be accepted (in radian) */
-    double m_minimumEnergy; /**< min energy of gamma to be accepted(in GeV) */
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
     bool m_isMultiPho; /**<multiple or one bremphoton addition option  */
   };

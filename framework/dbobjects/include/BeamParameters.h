@@ -79,10 +79,11 @@ namespace Belle2 {
      *     the matrix will not be checked but just the lower triangle will be used.
      *
      * @param energy beam energy
-     * @param angle angle between beam direction and z axis. Negative values are treated as M_PI - abs(angle)
+     * @param angleX angle between beam direction and z axis (in the x-z plane). Negative values are treated as M_PI - abs(angle)
+     * @param angleY angle between beam direction and z axis (in the y-z plane). Negative values are treated as M_PI - abs(angle)
      * @param cov entries of the covariance matrix.
      */
-    void setHER(double energy, double angle, const std::vector<double>& cov);
+    void setHER(double energy, double angleX, double angleY, const std::vector<double>& cov);
 
     /** Set the LER FourVector and error matrix from beam energy, angle and covariance entries.
      *
@@ -96,10 +97,11 @@ namespace Belle2 {
      *     the matrix will not be checked but just the lower triangle will be used.
      *
      * @param energy beam energy
-     * @param angle angle between beam direction and z axis. Negative values are treated as M_PI - abs(angle)
+     * @param angleX angle between beam direction and z axis (in the x-z plane). Negative values are treated as M_PI - abs(angle)
+     * @param angleY angle between beam direction and z axis (in the y-z plane). Negative values are treated as M_PI - abs(angle)
      * @param cov entries of the covariance matrix.
      */
-    void setLER(double energy, double angle, const std::vector<double>& cov);
+    void setLER(double energy, double angleX, double angleY, const std::vector<double>& cov);
 
     /** Set the vertex position and error matrix.
      *
@@ -139,9 +141,10 @@ namespace Belle2 {
     /** Calculate FourVector of a beam from energy and angle wrt the z-axis.
      * Negative angles will be treated as angle = M_PI - fabs(angle)
      * @param energy beam energy
-     * @param angle angle wrt z-axis
+     * @param angleX horizontal angle wrt z-axis
+     * @param angleY vertical angle wrt z-axis
      */
-    static TLorentzVector getFourVector(double energy, double angle);
+    static TLorentzVector getFourVector(double energy, double angleX, double angleY);
     /** Set covariance matrix from vector of entries.
      *
      * The vector for the covariance matrix can have either 0, 1, 3, 6 or 9 entries:

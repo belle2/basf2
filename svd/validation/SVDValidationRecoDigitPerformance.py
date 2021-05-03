@@ -24,7 +24,7 @@ treeRD = inputRD.Get("tree")
 
 histsRDP = R.TFile.Open("SVDRecoDigitPerformance.root", "recreate")
 
-pu.ploter(
+pu.plotter(
     name='TimeResolution',
     title='Resolution of the reconstructed time of a single strip',
     nbins=200,
@@ -41,7 +41,7 @@ pu.ploter(
     check='Distribution between -40 and 20 ns.',
     isShifter=True)
 
-pu.ploter(
+pu.plotter(
     name='StripCharge',
     title='Charge of the strip',
     nbins=50,
@@ -51,7 +51,7 @@ pu.ploter(
     y_label='counts',
     granules=pu.gD,
     tree=treeRD,
-    expr='strip_charge',
+    expr='recodigit_charge',
     cut='',
     descr='Strip charge for all RecoDigits related to one TrueHit.',
     check='Distribution peak around 15-30 ke.',

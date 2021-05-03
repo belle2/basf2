@@ -266,6 +266,14 @@ namespace Belle2 {
     }
 
     /**
+     * Get total number of channels.
+     */
+    static constexpr int getTotalChannelNumber()
+    {
+      return m_TotalChannelNumber;
+    }
+
+    /**
      * Get element numbers by layer global number (0-based).
      * @param[in]  layerGlobal  Layer global number.
      * @param[out] section      Section (0-based).
@@ -419,6 +427,9 @@ namespace Belle2 {
 
     /** Maximal plane number (0-based). */
     static constexpr int m_MaximalPlaneNumber = 1;
+
+    /** Total number of channels (1-based). */
+    static constexpr int m_TotalChannelNumber = 21978;
 
     /** Bit position for strip-1 [0..47]. */
     static constexpr int BKLM_STRIP_BIT = 0;

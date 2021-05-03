@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from ROOT import Belle2  # make Belle2 namespace available
+from ROOT import Belle2  # make Belle2 namespace available # noqa
 from ROOT.Belle2 import TrackFindingCDC as TFCDC
 
 import sys
@@ -127,9 +127,6 @@ class LegendreBinningValidationModule(harvesting.HarvestingModule):
 
     def peel(self, track):
         """Aggregate the track and MC information for track-segment analysis"""
-        mc_track_lookup = self.mc_track_lookup
-        mc_hit_lookup = self.mc_hit_lookup
-
         track_fitter = self.track_fitter
 
         rl_drift_circle = 1

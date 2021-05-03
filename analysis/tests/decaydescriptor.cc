@@ -13,6 +13,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/utilities/TestHelpers.h>
+#include <framework/gearbox/Const.h>
 
 #include <gtest/gtest.h>
 #include <string>
@@ -31,7 +32,7 @@ namespace {
     EXPECT_EQ(dd.getMother()->getName(), "K+");
     EXPECT_EQ(dd.getMother()->getLabel(), "");
     EXPECT_EQ(dd.getMother()->getFullName(), "K+");
-    EXPECT_EQ(dd.getMother()->getPDGCode(), 321);
+    EXPECT_EQ(dd.getMother()->getPDGCode(), Const::kaon.getPDGCode());
     EXPECT_EQ(dd.getNDaughters(), 0);
   }
 
@@ -56,13 +57,13 @@ namespace {
     EXPECT_EQ(dd.getDaughter(0)->getNDaughters(), 0);
     EXPECT_EQ(dd.getDaughter(0)->getMother()->getName(), "K+");
     EXPECT_EQ(dd.getDaughter(0)->getMother()->getLabel(), "loose");
-    EXPECT_EQ(dd.getDaughter(0)->getMother()->getPDGCode(), 321);
+    EXPECT_EQ(dd.getDaughter(0)->getMother()->getPDGCode(), Const::kaon.getPDGCode());
     EXPECT_EQ(dd.getDaughter(0)->getMother()->getFullName(), "K+:loose");
 
     EXPECT_EQ(dd.getDaughter(1)->getNDaughters(), 0);
     EXPECT_EQ(dd.getDaughter(1)->getMother()->getName(), "pi-");
     EXPECT_EQ(dd.getDaughter(1)->getMother()->getLabel(), "loose");
-    EXPECT_EQ(dd.getDaughter(1)->getMother()->getPDGCode(), -211);
+    EXPECT_EQ(dd.getDaughter(1)->getMother()->getPDGCode(), -Const::pion.getPDGCode());
     EXPECT_EQ(dd.getDaughter(1)->getMother()->getFullName(), "pi-:loose");
 
     ASSERT_EQ(dd.getDaughter(2), nullptr);
@@ -90,20 +91,20 @@ namespace {
 
     // pi0 -> gamma gamma; gamma -> ee
     EXPECT_EQ(dd.getDaughter(1)->getMother()->getName(), "pi0");
-    EXPECT_EQ(dd.getDaughter(1)->getMother()->getPDGCode(), 111);
+    EXPECT_EQ(dd.getDaughter(1)->getMother()->getPDGCode(), Const::pi0.getPDGCode());
     EXPECT_EQ(dd.getDaughter(1)->getNDaughters(), 2);
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(0)->getMother()->getName(), "gamma");
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(0)->getMother()->getLabel(), "grandau");
-    EXPECT_EQ(dd.getDaughter(1)->getDaughter(0)->getMother()->getPDGCode(), 22);
+    EXPECT_EQ(dd.getDaughter(1)->getDaughter(0)->getMother()->getPDGCode(), Const::photon.getPDGCode());
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(0)->getNDaughters(), 0);
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getMother()->getName(), "gamma");
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getMother()->getLabel(), "converted");
-    EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getMother()->getPDGCode(), 22);
+    EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getMother()->getPDGCode(), Const::photon.getPDGCode());
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getNDaughters(), 2);
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getDaughter(0)->getMother()->getName(), "e+");
-    EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getDaughter(0)->getMother()->getPDGCode(), -11);
+    EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getDaughter(0)->getMother()->getPDGCode(), -Const::electron.getPDGCode());
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getDaughter(1)->getMother()->getName(), "e-");
-    EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getDaughter(1)->getMother()->getPDGCode(), 11);
+    EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getDaughter(1)->getMother()->getPDGCode(), Const::electron.getPDGCode());
     ASSERT_EQ(dd.getDaughter(1)->getDaughter(1)->getDaughter(2), nullptr);
     ASSERT_EQ(dd.getDaughter(1)->getDaughter(2), nullptr);
 

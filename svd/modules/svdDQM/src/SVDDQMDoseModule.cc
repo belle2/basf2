@@ -64,12 +64,12 @@ void SVDDQMDoseModule::defineHisto()
   }
 
   // Round noInjectionTimeout to the nearest multiple of the revolution cycle
-  m_noInjectionTime = round(m_noInjectionTime / m_revolutionTime) * m_revolutionTime;
+  m_noInjectionTime = round(m_noInjectionTime / c_revolutionTime) * c_revolutionTime;
 
   h_nEvtsVsTime = new TH2F(
     "SVDEvtsVsTime",
     "SVD Events;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
-    500, 0, m_noInjectionTime, 100, 0, m_revolutionTime);
+    500, 0, m_noInjectionTime, 100, 0, c_revolutionTime);
 
   m_groupOccupanciesU.reserve(c_sensorGroups.size()); // Allocate memory only once
   TString name = "SVDInstOccu_";
@@ -90,11 +90,11 @@ void SVDDQMDoseModule::defineHisto()
     m_groupNHitsU.push_back(
       new TH2F(name + group.nameSuffix + "U",
                title + group.titleSuffix + " U-side" + axisTitle,
-               500, 0, m_noInjectionTime, 100, 0, m_revolutionTime));
+               500, 0, m_noInjectionTime, 100, 0, c_revolutionTime));
   }
 
   // Nbins for 1D histos such that bin width = beam_revolution_time / 2
-  int nb1 = TMath::Nint(m_noInjectionTime * 2.0 / m_revolutionTime);
+  int nb1 = TMath::Nint(m_noInjectionTime * 2.0 / c_revolutionTime);
   h_nEvtsVsTime1 = new TH1F(
     "SVDEvtsVsTime1", "SVD Events;Time since last injection [#mus];Events / bin",
     nb1, 0, m_noInjectionTime);
@@ -199,15 +199,12 @@ void SVDDQMDoseModule::event()
   if (m_rawTTD.getEntries() == 0)
     return;
   RawFTSW* theTTD = m_rawTTD[0];
-  // 127 MHz is the (inexactly rounded) clock of the ticks
-  // Can't use the exact value because m_revolutionTime is using the approximated value too
-  // See the docs of m_revolutionTime (in SVDDQMDoseModule.h) for the reason
-  const double timeSinceInj = theTTD->GetTimeSinceLastInjection(0) / 127.0;
+  const double timeSinceInj = theTTD->GetTimeSinceLastInjection(0) / c_globalClock;
   const bool isHER = theTTD->GetIsHER(0);
   const EEventType eventType = timeSinceInj > m_noInjectionTime ? c_NoInjection : (isHER ? c_HERInjection : c_LERInjection);
   if (((unsigned int)eventType & m_eventFilter) == 0U)
     return;
-  const double timeInCycle = timeSinceInj - (int)(timeSinceInj / m_revolutionTime) * m_revolutionTime;
+  const double timeInCycle = timeSinceInj - (int)(timeSinceInj / c_revolutionTime) * c_revolutionTime;
 
   // Reset counters
   for (int& count : groupHitsU) count = 0;
@@ -239,10 +236,10 @@ void SVDDQMDoseModule::event()
 }
 
 const std::vector<SVDDQMDoseModule::SensorGroup> SVDDQMDoseModule::c_sensorGroups = {
-  {"L3XX", "L3", defaultNBins, defaultOccuMin, defaultOccuMax, [](const VxdID & s) { return s.getLayerNumber() == 3; }},
-  {"L4XX", "L4", defaultNBins, defaultOccuMin, defaultOccuMax, [](const VxdID & s) { return s.getLayerNumber() == 4; }},
-  {"L5XX", "L5", defaultNBins, defaultOccuMin, defaultOccuMax, [](const VxdID & s) { return s.getLayerNumber() == 5; }},
-  {"L6XX", "L6", defaultNBins, defaultOccuMin, defaultOccuMax, [](const VxdID & s) { return s.getLayerNumber() == 6; }},
-  {"L31X", "L3.1", defaultNBins, defaultOccuMin, defaultOccuMax, [](const VxdID & s) { return s.getLayerNumber() == 3 && s.getLadderNumber() == 1; }},
-  {"L32X", "L3.2", defaultNBins, defaultOccuMin, defaultOccuMax, [](const VxdID & s) { return s.getLayerNumber() == 3 && s.getLadderNumber() == 2; }}
+  {"L3XX", "L3", c_defaultNBins, c_defaultOccuMin, c_defaultOccuMax, [](const VxdID & s) { return s.getLayerNumber() == 3; }},
+  {"L4XX", "L4", c_defaultNBins, c_defaultOccuMin, c_defaultOccuMax, [](const VxdID & s) { return s.getLayerNumber() == 4; }},
+  {"L5XX", "L5", c_defaultNBins, c_defaultOccuMin, c_defaultOccuMax, [](const VxdID & s) { return s.getLayerNumber() == 5; }},
+  {"L6XX", "L6", c_defaultNBins, c_defaultOccuMin, c_defaultOccuMax, [](const VxdID & s) { return s.getLayerNumber() == 6; }},
+  {"L31X", "L3.1", c_defaultNBins, c_defaultOccuMin, c_defaultOccuMax, [](const VxdID & s) { return s.getLayerNumber() == 3 && s.getLadderNumber() == 1; }},
+  {"L32X", "L3.2", c_defaultNBins, c_defaultOccuMin, c_defaultOccuMax, [](const VxdID & s) { return s.getLayerNumber() == 3 && s.getLadderNumber() == 2; }}
 };

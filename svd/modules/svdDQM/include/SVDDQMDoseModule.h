@@ -101,20 +101,33 @@ namespace Belle2 {
       /** Beam revolution time in microseconds (approximated).
        *
        * The exact time could be obtained as
-       * `5120 / m_clockSettings->getAcceleratorRF() * 1e3`
+       * `5120 / HardwareClockSettings::getAcceleratorRF() * 1e3`
        * but this would run after defineHisto() if used in initialize().
        * Since defineHisto() uses this value, using a run-independent
        * approximated constant value is the only way.
        */
-      static constexpr double m_revolutionTime = 5120.0 / 508.0;
+      static constexpr double c_revolutionTime = 5120.0 / 508.0;
+      /** Approximated global clock frequency in MHz.
+       *
+       * Used to convert TTD timing to us.
+       *
+       * The exact frequency could be obtained as
+       * `HardwareClockSettings::getGlobalClockFrequency() * 1e3`
+       * but this would produce inconsistent histograms since I am
+       * forced to use an approximated accelerator RF (508 MHz) for the
+       * beam revolution period.
+       *
+       * @sa c_revolutionTime
+       */
+      static constexpr double c_globalClock = 127.0;
 
       /** Default minimum of the instantaneous occupancy histograms. */
-      static constexpr double defaultOccuMin = 0.0;
+      static constexpr double c_defaultOccuMin = 0.0;
       /** Default number of bins of the instantaneous occupancy histograms.
        * Optimized to get a maximum around 5%.
-       * @sa defaultOccuMax
+       * @sa c_defaultOccuMax
        */
-      static const int defaultNBins = 90;
+      static const int c_defaultNBins = 90;
       /** Default maximum of the instantaneous occupancy histograms.
        * This value is optimized for a single ladder of layer 3, which has two sensors
        * with 768 strips each (on both sides). The occupancy resolution on one event
@@ -126,7 +139,7 @@ namespace Belle2 {
        * resolution would not resolve anything, as they would be too large to read
        * anything; hence, using the exact resolution as bin width is necessary.
        */
-      static constexpr double defaultOccuMax = 100.0 / 1536.0 * defaultNBins;
+      static constexpr double c_defaultOccuMax = 100.0 / 1536.0 * c_defaultNBins;
 
       /** List of interesting groups of sensors to average over. Defined in SVDDQMDoseModule.cc . */
       static const std::vector<SensorGroup> c_sensorGroups;

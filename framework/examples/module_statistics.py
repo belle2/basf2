@@ -30,7 +30,7 @@ print(statistics)
 
 # Print basic event statistics for specific modules
 print('Event Statistics for selected modules:')
-print(statistics([eventinfosetter]))
+print(statistics(modules=[eventinfosetter]))
 
 # Print statistics adding all counters
 print('Total processing times:')

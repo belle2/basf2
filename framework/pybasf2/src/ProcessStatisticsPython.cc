@@ -20,12 +20,6 @@ using namespace Belle2;
 using namespace std;
 using namespace boost::python;
 
-ProcessStatisticsPython& ProcessStatisticsPython::getInstance()
-{
-  static ProcessStatisticsPython instance;
-  return instance;
-}
-
 ProcessStatistics* ProcessStatisticsPython::getWrapped()
 {
   StoreObjPtr<ProcessStatistics> stats("", DataStore::c_Persistent);
@@ -38,19 +32,25 @@ ProcessStatistics* ProcessStatisticsPython::getWrapped()
   return &(*stats);
 }
 
-string ProcessStatisticsPython::getStatisticsString(ModuleStatistics::EStatisticCounters mode,
-                                                    const std::vector<ModuleStatistics>* modules)
+string ProcessStatisticsPython::getStatisticsString()
 {
   if (!getWrapped())
     return "";
-  return getWrapped()->getStatisticsString(mode, modules);
+  return getWrapped()->getStatisticsString(m_type, m_modules.empty() ? nullptr : &m_modules);
 }
 
-string ProcessStatisticsPython::getModuleStatistics(const boost::python::list& modulesPyList,
-                                                    ModuleStatistics::EStatisticCounters mode)
+string ProcessStatisticsPython::getStatisticsStringHTML()
 {
   if (!getWrapped())
     return "";
+  return getWrapped()->getStatisticsString(m_type, m_modules.empty() ? nullptr : &m_modules, true);
+}
+
+ProcessStatisticsPython ProcessStatisticsPython::getModuleStatistics(ModuleStatistics::EStatisticCounters type,
+    const boost::python::list& modulesPyList)
+{
+  if (!getWrapped())
+    return ProcessStatisticsPython();
 
   std::vector<ModuleStatistics> moduleStats;
   auto modules = PyObjConvUtils::convertPythonObject(modulesPyList, std::vector<ModulePtr>());
@@ -60,7 +60,7 @@ string ProcessStatisticsPython::getModuleStatistics(const boost::python::list& m
     if (stats.getName().empty()) stats.setName(ptr->getName());
     moduleStats.push_back(stats);
   }
-  return getStatisticsString(mode, &moduleStats);
+  return ProcessStatisticsPython(type, moduleStats);
 }
 
 boost::python::list ProcessStatisticsPython::getAll()
@@ -68,7 +68,7 @@ boost::python::list ProcessStatisticsPython::getAll()
   boost::python::list result;
   if (!getWrapped())
     return result;
-  for (auto& module : getWrapped()->getAll()) {
+  for (auto& module : (m_modules.empty()) ? getWrapped()->getAll() : m_modules) {
     result.append(module);
   }
   return result;
@@ -96,20 +96,6 @@ void ProcessStatisticsPython::clear()
 }
 
 
-#if !defined(__GNUG__) || defined(__ICC)
-#else
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#endif
-//used to make python aware of default arguments
-// cppcheck-suppress unknownMacro
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getStatistics_overloads, getStatisticsString, 0, 1)
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getModuleStatistics_overloads, getModuleStatistics, 1, 2)
-#if !defined(__GNUG__) || defined(__ICC)
-#else
-#pragma GCC diagnostic pop
-#endif
-
 void ProcessStatisticsPython::exposePythonAPI()
 {
   // to avoid confusion between std::arg and boost::python::arg we want a shorthand namespace as well
@@ -121,7 +107,7 @@ void ProcessStatisticsPython::exposePythonAPI()
   docstring_options options(true, true, false); //userdef, py sigs, c++ sigs
 
   //Wrap ProcessStatisticsPython as non-copy and non-instantiable in python
-  class_<ProcessStatisticsPython, boost::noncopyable> stats("ProcessStatistics", R"DOCSTRING(
+  class_<ProcessStatisticsPython> stats("ProcessStatistics", R"DOCSTRING(
 Interface for retrieving statistics about module execution at runtime or after
 :py:func:`basf2.process()` returns. Should be accessed through a global instance `basf2.statistics`.
 
@@ -185,39 +171,8 @@ between them.
   .def_readonly("modules", &ProcessStatisticsPython::getAll, "List of all `ModuleStatistics` objects.")
   ;
 
-
-  {
-    // the overloaded __str__ and __call__ give very confusing signatures so hand-craft doc string.
-  docstring_options custom_options(true, false, false); //userdef, py sigs, c++ sigs
-  stats
-  .def("__str__", &ProcessStatisticsPython::getStatisticsString,
-       getStatistics_overloads("Return the event statistics for all modules as string in a human readable form"))
-  .def("__call__", &ProcessStatisticsPython::getStatisticsString, getStatistics_overloads())
-  .def("__call__", &ProcessStatisticsPython::getModuleStatistics, getModuleStatistics_overloads(R"DOCSTRING(
-__call__(modules=None, counter=StatisticCounters.TOTAL)
-
-Calling the statistics object directly like a function will return a string
-with the execution statistics in human readable form.
-
-Parameters:
-    modules (list[Module]): A list of modules to include in the returned string.
-        If omitted the statistics for all modules will be included.
-    counter (StatisticCounters): Which counter to use
-
-* print the `beginRun() <Module.beginRun>` statistics for all modules:
-
-  >>> print(statistics(statistics.BEGIN_RUN))
-
-* print the total execution times and memory consumption but only for the
-  modules ``module1`` and ``module2``
-
-  >>> print(statistics([module1, module2], statistics.TOTAL))
-)DOCSTRING"))
-  ;
-  }
-
   //Set scope to current class
-  scope statistics = stats;
+  scope statistics{stats};
   //Define enum for all the counter types in scope of class
   enum_<ModuleStatistics::EStatisticCounters>("StatisticCounters", R"DOCSTRING(
 Available types of statistic counters (corresponds to Module functions)
@@ -256,6 +211,41 @@ Time spent or memory used in any module function. This is the sum of all of the 
   .export_values()
   ;
 
+  {
+    // the overloaded __str__ and __call__ give very confusing signatures so hand-craft doc string.
+  docstring_options custom_options(true, false, false); //userdef, py sigs, c++ sigs
+  stats
+  .def("__str__", &ProcessStatisticsPython::getStatisticsString,
+       "Return the event statistics as a string in a human readable form")
+  .def("_repr_html_", &ProcessStatisticsPython::getStatisticsStringHTML,
+       "Return an html represenation of the statistics (used by ipython/jupyter)")
+  .def("__call__", &ProcessStatisticsPython::getModuleStatistics, (bp::arg("counter") = ModuleStatistics::EStatisticCounters::c_Event, bp::arg("modules") = boost::python::list()),
+       R"DOCSTRING(__call__(counter=StatisticCounters.EVENT, modules=None)
+
+Calling the statistics object directly like a function will return a string
+with the execution statistics in human readable form.
+
+Parameters:
+    counter (StatisticCounters): Which counter to use
+    modules (list[Module]): A list of modules to include in the returned string.
+        If omitted the statistics for all modules will be included.
+
+* print the `beginRun() <Module.beginRun>` statistics for all modules:
+
+  >>> print(statistics(statistics.BEGIN_RUN))
+
+* print the total execution times and memory consumption but only for the
+  modules ``module1`` and ``module2``
+
+  >>> print(statistics(statistics.TOTAL, [module1, module2]))
+
+* print the event statistics (default) for only two modules
+
+  >>> print(statistics(modules=[module1, module2]))
+)DOCSTRING")
+  ;
+  }
+
   //Wrap statistics class. The default boost python docstring signature is way
   //to noisy for these simple getters so this time we do it ourselves ...
   docstring_options new_options(true, false, false); //userdef, py sigs, c++ sigs
@@ -284,6 +274,5 @@ Time spent or memory used in any module function. This is the sum of all of the 
   ;
 
   //Expose ProcessStatisticsPython instance as "statistics" object in pybasf2 module
-  ProcessStatisticsPython& instance = getInstance();
-  global.attr("statistics") = object(ptr(&instance));
+  global.attr("statistics") = object(ProcessStatisticsPython());
 }

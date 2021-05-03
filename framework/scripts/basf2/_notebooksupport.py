@@ -5,6 +5,7 @@ from . import core as b2core
 import multiprocessing
 
 import ROOT
+from ROOT import Belle2
 
 #: Show an informational message once before the first process() call
 _process_warning = False
@@ -52,7 +53,7 @@ def print_module_html(module):
     tname = module.type()
     tname = f" (type {tname})" if tname != name else ""
     module_html = E.div(f"basf2.Module ", E.b(name), tname, E.p(module.description),
-                        E.style("table * { text-align: left !important; }", scoped="scoped"))
+                        E.style("table.b2module * { text-align: left !important; }"))
     cols = ["parameter", "type", "default", "current", "changed", "is required"]
     if len(module.available_params()) > 0:
         params = E.tbody()
@@ -62,7 +63,7 @@ def print_module_html(module):
                                E.td(E.b("yes") if p.forceInSteering else "no")))
             params.append(E.tr(E.td(), E.td(p.description, colspan="5")))
 
-        module_html.append(E.table(E.thead(E.tr(*[E.th(e) for e in cols])), params))
+        module_html.append(E.table(E.thead(E.tr(*[E.th(e) for e in cols])), params, **{"class": "b2module"}))
 
     return etree.tostring(module_html).decode()
 
@@ -86,7 +87,20 @@ def enable_notebooksupport():
     html_formatter.for_type(b2core.Path, print_path_html)
     html_formatter.for_type(b2core.Module, print_module_html)
 
-# convenience wrap the process() function to use a calculation object
+
+def _child_process(pipe, path, max_events):
+    """Execute process() in a child process but send the persistent datastore objects back to the parent"""
+    # do the processing
+    b2core.process(path, max_events)
+    # no send back all the objects we want. Which currently is only the stats
+    return_objects = {}
+    for name in ["ProcessStatistics"]:
+        name = str(name)
+        storeobj = Belle2.PyStoreObj(name, Belle2.DataStore.c_Persistent)
+        if storeobj.isValid():
+            return_objects[name] = str(ROOT.TBufferJSON.ToJSON(storeobj.obj()))
+    pipe.send(return_objects)
+    pipe.close()
 
 
 def process(path, max_event=0):
@@ -118,9 +132,26 @@ def process(path, max_event=0):
     if(not _process_warning):
         _process_warning = True
         b2core.B2INFO("process() called in a Jupyter Notebook. See help(process) for caveats")
+
+    datastore = Belle2.DataStore.Instance()
     ctx = multiprocessing.get_context("fork")
-    process = ctx.Process(target=b2core.process, args=(path, max_event))
+    nanny, child = ctx.Pipe()
+    process = ctx.Process(target=_child_process, args=(child, path, max_event))
     process.start()
     process.join()
     if process.exitcode != 0:
         raise RuntimeError("Event processing was not successful")
+    return_objects = nanny.recv()
+    nanny.close()
+    datastore.setInitializeActive(True)
+    try:
+        for name, value in return_objects.items():
+            storeobj = Belle2.PyStoreObj(name, Belle2.DataStore.c_Persistent)
+            if value is not None:
+                storeobj.registerInDataStore()
+                storeobj.create()
+                obj = ROOT.TBufferJSON.ConvertFromJSON(value)
+                ROOT.SetOwnership(obj, False)
+                storeobj.assign(obj, True)
+    finally:
+        datastore.setInitializeActive(False)

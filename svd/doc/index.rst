@@ -1,8 +1,11 @@
 
-SVD (Silicon Vertex Detector)
-=============================
+SVD
+===
 
-In the following we describe the ``svd`` package (documentation still under development).
+In the following we describe the ``svd`` package .
+
+.. warning::
+   documentation under development
 
 .. toctree:: reconstruction
 
@@ -13,8 +16,8 @@ In the following we describe the ``svd`` package (documentation still under deve
 .. toctree:: dbstore
 
 
-SVD Documentation To Do List
-----------------------------
+Documentation To Do List
+------------------------
 
 organization
 

@@ -91,7 +91,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
                                                    ";cell id; ts(new|bhabha) - ts(previous iteration|merged)  [ns]", 8736,
                                                    1, 8736 + 1));
   unique_ptr<TH1F> tcrateNew_MINUS_tcrateOld__crateID(new TH1F("tcrateNew_MINUS_tcrateOld__crateID",
-                                                      ";crate id; ts(new | bhabha) - ts(previous iteration | merged)  [ns]",
+                                                      ";crate id; tcrate(new | bhabha) - tcrate(previous iteration | merged)  [ns]",
                                                       52, 1, 52 + 1));
   unique_ptr<TH1F> tsNew_MINUS_tsCustomPrev__cid(new TH1F("TsNew_MINUS_TsCustomPrev__cid",
                                                           ";cell id; ts(new|bhabha) - ts(old = 'before 1st iter'|merged)  [ns]",
@@ -117,11 +117,36 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
 
 
+  // Histograms just for crates and collecting for all the different runs rather than run by run.
+  unique_ptr<TH1F> tcrateNew_MINUS_tcrateOld_allRuns(new TH1F("tcrateNew_MINUS_tcrateOld_allRuns",
+                                                              "Crate time constant changes over all runs : tcrate(new) uncertainty < 0.1ns;tcrate(new) - tcrate(previous iteration)  [ns];Number of crates",
+                                                              201, -10.05, 10.05));
+
+  unique_ptr<TH1F> tcrateNew_MINUS_tcrateOld_allRuns_allCrates(new TH1F("tcrateNew_MINUS_tcrateOld_allRuns_allCrates",
+      "Crate time constant changes over all runs : all crates;tcrate(new) - tcrate(previous iteration)  [ns];Number of crates",
+      201, -10.05, 10.05));
+
+  unique_ptr<TH1I> num_tcrates_perRun(new TH1I("num_tcrates_perRun",
+                                               "Number of good tcrates in each run;Run number;Number of good tcrates",
+                                               6000, 0, 6000));
+
+  unique_ptr<TH2F> tcrateNew_MINUS_tcrateOld__vs__runNum(new TH2F("tcrateNew_MINUS_tcrateOld__vs__runNum",
+                                                         "Crate time constant changes vs run number : tcrate(new) uncertainty < 0.1ns;Run number;tcrate(new) - tcrate(previous iteration)  [ns]",
+                                                         6000, 0, 6000, 21, -10.5, 10.5));
+
+
+
+
+
   if (!TimevsCrysNoCalibrations) return c_Failure;
 
   /**-----------------------------------------------------------------------------------------------*/
 
   TFile* histfile = 0;
+  TFile* histExtraCrateInfofile = 0;   // Only created if needed for crates
+  TFile* histExtraCrateInfofile_dummy = 0;   // Only created if needed for crates
+
+
   unique_ptr<TTree> tree_crystal(new TTree("tree_crystal", "Debug data from bhabha time calibration algorithm for crystals"));
 
   unique_ptr<TTree>   tree_crate(new TTree("tree_crate",   "Debug data from bhabha time calibration algorithm for crates"));
@@ -135,6 +160,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
 
   int minNumEntries = 40;
+  int minNumEntriesCrateConvergence = 1000;
 
 
   double mean = 0;
@@ -181,6 +207,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   string runNumsString = string("_") + to_string(minExpNum) + "_" + to_string(minRunNum) + string("-") +
                          to_string(maxExpNum) + "_" + to_string(maxRunNum);
   string debugFilename = debugFilenameBase + runNumsString + string(".root");
+  string extraCratedebugFilename = debugFilenameBase + string("_cratesAllRuns.root");
 
 
   // Need to load information about the event/run/experiment to get the right database information
@@ -780,6 +807,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   vector<float> tcrate_mean_prev(52, 0.0);
   // vector<float> tcrate_sigma_prev(52, 0.0); // currently not used
   vector<bool> tcrate_new_was_set(52, false);
+  vector<bool> tcrate_new_goodQuality(52, false);
 
   B2DEBUG(22, "crate vectors set");
 
@@ -793,10 +821,56 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   }
 
 
-  B2INFO("Print out previous crate time calibration constants");
+  B2INFO("Print out previous crate time calibration constants to make sure they match from the two different sources.");
   for (int crate_id = 1; crate_id <= 52; crate_id++) {
     B2INFO("tcrate_mean_prev[crate " << crate_id << " (base 1)] = " << tcrate_mean_prev[crate_id - 1]);
+
+    int thisRefCellID = crystalIDReferenceForZeroTs[crate_id - 1];
+    B2INFO("tcrate from payload: ref cellID " << thisRefCellID << " " << currentValuesCrate[thisRefCellID - 1] << " +/- " <<
+           currentUncCrate[thisRefCellID - 1]);
   }
+
+
+  /* Read in the histogram about the crate calibration constant differences between iterations
+     if it exists.  This way the histograms can be updated after each run.*/
+  if (crateIDLo <= crateIDHi) {
+    B2INFO("Debug output rootfile used for crate iterations: " << extraCratedebugFilename);
+    histExtraCrateInfofile_dummy = new TFile(extraCratedebugFilename.c_str(), "UPDATE");
+
+
+    // If the histogram already exists then read it in and recreate the file so that we can save an updated version of the histogram.
+    TKey* key = histExtraCrateInfofile_dummy->FindKey("tcrateNew_MINUS_tcrateOld_allRuns");
+    if (key != 0) {
+      TH1F* h = (TH1F*)histExtraCrateInfofile_dummy->Get("tcrateNew_MINUS_tcrateOld_allRuns");
+      tcrateNew_MINUS_tcrateOld_allRuns->Add(h);
+    }
+
+    key = histExtraCrateInfofile_dummy->FindKey("tcrateNew_MINUS_tcrateOld_allRuns_allCrates");
+    if (key != 0) {
+      TH1F* h = (TH1F*)histExtraCrateInfofile_dummy->Get("tcrateNew_MINUS_tcrateOld_allRuns_allCrates");
+      tcrateNew_MINUS_tcrateOld_allRuns_allCrates->Add(h);
+    }
+
+    key = histExtraCrateInfofile_dummy->FindKey("num_tcrates_perRun");
+    if (key != 0) {
+      TH1F* h = (TH1F*)histExtraCrateInfofile_dummy->Get("num_tcrates_perRun");
+      num_tcrates_perRun->Add(h);
+    }
+
+    key = histExtraCrateInfofile_dummy->FindKey("tcrateNew_MINUS_tcrateOld__vs__runNum");
+    if (key != 0) {
+      TH1F* h = (TH1F*)histExtraCrateInfofile_dummy->Get("tcrateNew_MINUS_tcrateOld__vs__runNum");
+      tcrateNew_MINUS_tcrateOld__vs__runNum->Add(h);
+    }
+
+    histExtraCrateInfofile_dummy->Close();
+
+    /* After reading in all the histograms, recreate the root file from empty so that the
+       histograms can be made again with the updated values.*/
+    histExtraCrateInfofile = new TFile(extraCratedebugFilename.c_str(), "recreate");
+  }
+
+
 
   for (int crate_id = crateIDLo; crate_id <= crateIDHi; crate_id++) {
 
@@ -806,7 +880,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     TH1D* h_time_crate_mask = (TH1D*)h_time_crate->Clone();
     TH1D* h_time_crate_masked = (TH1D*)h_time_crate->Clone();
     TH1D* h_time_crate_rebin = (TH1D*)h_time_crate->Clone();
-
 
 
     // Do rebinning and cleaning of some bins but only if the user selection values call for it since it slows the code down
@@ -915,10 +988,12 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     double database_mean_crate = 0;
     double database_mean_crate_unc = 0;
     if ((numEntries >= minNumEntries)  &&  good_fit) {
-
       database_mean_crate = fit_mean_crate;
       database_mean_crate_unc = fit_mean_crate_unc;
 
+      if ((numEntries >= minNumEntriesCrateConvergence)  && (fit_mean_crate_unc < 0.1)) {
+        tcrate_new_goodQuality[crate_id - 1] = true;
+      }
     } else {
       database_mean_crate = default_mean_crate;
       database_mean_crate_unc = default_mean_crate_unc;
@@ -971,18 +1046,37 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   // Fill histograms with the difference in the tcrate values
   if (crateIDLo <= crateIDHi) {
     for (int crate_id = crateIDLo; crate_id <= crateIDHi; crate_id++) {
-      double tCrateDiff_ns = (tcrate_mean_new[crate_id - 1] - tcrate_mean_prev[crate_id - 1]) * TICKS_TO_NS;
-      B2INFO("Crate " << crate_id << ": tcrate new - old = " << tCrateDiff_ns << " ns");
+      // tcrate_mean_new already in ns, but tcrate_mean_prev in ticks.
+      double tCrateDiff_ns = tcrate_mean_new[crate_id - 1] - (tcrate_mean_prev[crate_id - 1] * TICKS_TO_NS);
+      B2INFO("Crate " << crate_id << ": tcrate new - previous iteration = "
+             << tcrate_mean_new[crate_id - 1]
+             << " - " << tcrate_mean_prev[crate_id - 1] * TICKS_TO_NS
+             << " = " << tCrateDiff_ns << " ns");
       tcrateNew_MINUS_tcrateOld__crateID->SetBinContent(crate_id, tCrateDiff_ns);
       tcrateNew_MINUS_tcrateOld__crateID->SetBinError(crate_id, 0);
       tcrateNew_MINUS_tcrateOld__crateID->ResetStats();
 
       tcrateNew_MINUS_tcrateOld->Fill(tCrateDiff_ns);
+
+      // Save the histograms monitoring the change between iterations
+      tcrateNew_MINUS_tcrateOld_allRuns_allCrates->Fill(tCrateDiff_ns);
+      if (tcrate_new_goodQuality[crate_id - 1]) {
+        tcrateNew_MINUS_tcrateOld_allRuns->Fill(tCrateDiff_ns);
+        num_tcrates_perRun->Fill(minRunNum);
+        tcrateNew_MINUS_tcrateOld__vs__runNum->Fill(minRunNum, tCrateDiff_ns);
+      }
     }
 
     // Save the histograms to the output root file
     histfile->WriteTObject(tcrateNew_MINUS_tcrateOld__crateID.get(), "tcrateNew_MINUS_tcrateOld__crateID");
     histfile->WriteTObject(tcrateNew_MINUS_tcrateOld.get(), "tcrateNew_MINUS_tcrateOld");
+
+    // Save the histograms ot the crate iterations file
+    histExtraCrateInfofile->WriteTObject(tcrateNew_MINUS_tcrateOld_allRuns.get(), "tcrateNew_MINUS_tcrateOld_allRuns");
+    histExtraCrateInfofile->WriteTObject(tcrateNew_MINUS_tcrateOld_allRuns_allCrates.get(),
+                                         "tcrateNew_MINUS_tcrateOld_allRuns_allCrates");
+    histExtraCrateInfofile->WriteTObject(num_tcrates_perRun.get(), "num_tcrates_perRun");
+    histExtraCrateInfofile->WriteTObject(tcrateNew_MINUS_tcrateOld__vs__runNum.get(), "tcrateNew_MINUS_tcrateOld__vs__runNum");
   }
 
 
@@ -995,6 +1089,8 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   if (crateIDLo <= crateIDHi) {
     saveCalibration(BhabhaTCrateCalib, "ECLCrateTimeOffset");
     B2DEBUG(22, "crate payload made");
+
+    histExtraCrateInfofile->Close();
   }
 
 

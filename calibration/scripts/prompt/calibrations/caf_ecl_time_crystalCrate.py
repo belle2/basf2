@@ -34,7 +34,7 @@ settings = CalibrationSettings(
     #                                          input_data_filters["Run Type"]["physics"],
     #                                          input_data_filters["Magnet"]["On"]]},
     depends_on=[],
-    expert_config={"numCrysCrateIterations": 1, "payload_boundaries": [], "t0_bhabhaToHadron_correction": -0.9})
+    expert_config={"numCrysCrateIterations": 1, "payload_boundaries": [], "t0_bhabhaToHadron_correction": 0})
 
 
 ##############################

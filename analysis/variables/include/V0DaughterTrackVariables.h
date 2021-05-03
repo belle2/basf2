@@ -205,58 +205,79 @@ namespace Belle2 {
         const int tauIndex);
 
     /** helper function to do some basic sanity checks before calculating converted photon variables */
-    int convertedPhoton_errorChecks(const Particle* gamma, const std::vector<double>& daughter_indexes);
+    int convertedPhotonErrorChecks(const Particle* gamma, const std::vector<double>& daughterIndices);
 
     /** helper function to load helix parameters for calculating converted photon variables */
-    void convertedPhoton_loadHelixParams(const Particle* gamma, int daughter_index1, int daughter_index2, double& Phi0_1, double& D0_1,
-                                         double& Omega_1, double& Z0_1, double& TanLambda_1, double& Phi0_2, double& D0_2, double& Omega_2, double& Z0_2,
-                                         double& TanLambda_2);
+    void convertedPhotonLoadHelixParams(const Particle* gamma, int daughterIndex1, int daughterIndex2, double& Phi01, double& D01,
+                                        double& Omega1, double& Z01, double& TanLambda1, double& Phi02, double& D02, double& Omega2, double& Z02,
+                                        double& TanLambda2);
 
     /**
      * returns the invariant-mass of the two-track system assuming it's a converted photon
      */
-    double convertedPhotonInvariantMass(const Particle* gamma, const std::vector<double>& daughter_indexes);
+    double convertedPhotonInvariantMass(const Particle* gamma, const std::vector<double>& daughterIndices);
 
     /**
      * returns the discriminating variable Delta-TanLambda of the two-track system assuming it's a converted photon
      */
-    double convertedPhotonDelTanLambda(const Particle* gamma, const std::vector<double>& daughter_indexes);
+    double convertedPhotonDelTanLambda(const Particle* gamma, const std::vector<double>& daughterIndices);
 
     /**
      * returns the discriminating variable Delta-R of the two-track system assuming it's a converted photon
      */
-    double convertedPhotonDelR(const Particle* gamma, const std::vector<double>& daughter_indexes);
+    double convertedPhotonDelR(const Particle* gamma, const std::vector<double>& daughterIndices);
 
     /** helper function that returns the estimated Z-coordinates of the two helices at the vertex */
-    TVector2 convertedPhotonZ1Z2(const Particle* gamma, const std::vector<double>& daughter_indexes);
+    std::pair<double, double> convertedPhotonZ1Z2(const Particle* gamma, const std::vector<double>& daughterIndices);
 
     /**
      * returns the discriminating variable Delta-Z of the two-track system assuming it's a converted photon
      */
-    double convertedPhotonDelZ(const Particle* gamma, const std::vector<double>& daughter_indexes);
+    double convertedPhotonDelZ(const Particle* gamma, const std::vector<double>& daughterIndices);
 
     /**
      * returns the estimated Z-coordinate of the two-track system assuming it's a converted photon
      */
-    double convertedPhotonZ(const Particle* gamma, const std::vector<double>& daughter_indexes);
+    double convertedPhotonZ(const Particle* gamma, const std::vector<double>& daughterIndices);
 
     /** helper function that returns the estimated vertex in the transverse plane */
-    TVector2 convertedPhotonXY(const Particle* gamma, const std::vector<double>& daughter_indexes);
+    TVector2 convertedPhotonXY(const Particle* gamma, const std::vector<double>& daughterIndices);
 
     /**
      * returns the estimated X-coordinate of the two-track system assuming it's a converted photon
      */
-    double convertedPhotonX(const Particle* gamma, const std::vector<double>& daughter_indexes);
+    double convertedPhotonX(const Particle* gamma, const std::vector<double>& daughterIndices);
 
     /**
      * returns the estimated Y-coordinate of the two-track system assuming it's a converted photon
      */
-    double convertedPhotonY(const Particle* gamma, const std::vector<double>& daughter_indexes);
+    double convertedPhotonY(const Particle* gamma, const std::vector<double>& daughterIndices);
 
     /**
      * returns the estimated Rho of the two-track system assuming it's a converted photon
      */
-    double convertedPhotonRho(const Particle* gamma, const std::vector<double>& daughter_indexes);
+    double convertedPhotonRho(const Particle* gamma, const std::vector<double>& daughterIndices);
+
+    /**
+     * helper function that returns the estimated 3-momentum of the two-track system assuming it's a converted photon
+     */
+    TVector3 convertedPhoton3Momentum(const Particle* gamma, const std::vector<double>& daughterIndices);
+
+    /**
+     * returns the estimated x-component of momentum of the two-track system assuming it's a converted photon
+     */
+    double convertedPhotonPx(const Particle* gamma, const std::vector<double>& daughterIndices);
+
+    /**
+     * returns the estimated y-component of momentum of the two-track system assuming it's a converted photon
+     */
+    double convertedPhotonPy(const Particle* gamma, const std::vector<double>& daughterIndices);
+
+    /**
+     * returns the estimated z-component of momentum of the two-track system assuming it's a converted photon
+     */
+    double convertedPhotonPz(const Particle* gamma, const std::vector<double>& daughterIndices);
+
 
   }
 } // Belle2 namespace

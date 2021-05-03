@@ -19,7 +19,6 @@
 
 // dataobjects from the MDST
 #include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
 // framework aux
@@ -336,29 +335,29 @@ namespace Belle2 {
       return cov[paramID];
     }
 
-    int convertedPhoton_errorChecks(const Particle* gamma, const std::vector<double>& daughter_indexes)
+    int convertedPhotonErrorChecks(const Particle* gamma, const std::vector<double>& daughterIndices)
     {
-      //Check that exactly two daugher are indices provided
-      if (daughter_indexes.size() != 2) {
+      //Check that exactly two daughter indices are provided
+      if (daughterIndices.size() != 2) {
         B2ERROR("Invalid number of daughter indices. Please specify exactly two valid daughter indices.");
         return -1;
       }
 
-      //Check that there are atleast (r+1) daughters where r is the bigger of the two indices provided
-      int daughter_index1 = int(daughter_indexes[0]);
-      int daughter_index2 = int(daughter_indexes[1]);
-      if (gamma->getNDaughters() <= std::max(daughter_index1, daughter_index2)) {
+      //Check that there are at least (r+1) daughters where r is the bigger of the two indices provided
+      int daughterIndex1 = int(daughterIndices[0]);
+      int daughterIndex2 = int(daughterIndices[1]);
+      if (gamma->getNDaughters() <= std::max(daughterIndex1, daughterIndex2)) {
         B2ERROR("Invalid daughter indices provided. Particle does not have that many daughters.");
         return -1;
       }
 
       //Check that there exists tracks associated with the daughter indices provided
-      if (!gamma->getDaughter(daughter_index1)->getTrack()) {
-        B2ERROR("There is no track associated with daughter index " << daughter_index1);
+      if (!gamma->getDaughter(daughterIndex1)->getTrack()) {
+        B2ERROR("There is no track associated with daughter index " << daughterIndex1);
         return -1;
       }
-      if (!gamma->getDaughter(daughter_index2)->getTrack()) {
-        B2ERROR("There is no track associated with daughter index " << daughter_index2);
+      if (!gamma->getDaughter(daughterIndex2)->getTrack()) {
+        B2ERROR("There is no track associated with daughter index " << daughterIndex2);
         return -1;
       }
 
@@ -366,203 +365,203 @@ namespace Belle2 {
     }
 
 
-    void convertedPhoton_loadHelixParams(const Particle* gamma, int daughter_index1, int daughter_index2, double& Phi0_1, double& D0_1,
-                                         double& Omega_1, double& Z0_1, double& TanLambda_1, double& Phi0_2, double& D0_2, double& Omega_2, double& Z0_2,
-                                         double& TanLambda_2)
+    void convertedPhotonLoadHelixParams(const Particle* gamma, int daughterIndex1, int daughterIndex2, double& Phi01, double& D01,
+                                        double& Omega1, double& Z01, double& TanLambda1, double& Phi02, double& D02, double& Omega2, double& Z02,
+                                        double& TanLambda2)
     {
       //Get helix parameters
       //Electron/track 1
-      Helix e1_helix = gamma->getDaughter(daughter_index1)->getTrack()->getTrackFitResultWithClosestMass(Const::electron)->getHelix();
+      Helix e1Helix = gamma->getDaughter(daughterIndex1)->getTrackFitResult()->getHelix();
 
-      Phi0_1 = e1_helix.getPhi0();
-      D0_1  = e1_helix.getD0() ;
-      Omega_1  = e1_helix.getOmega();
-      Z0_1   = e1_helix.getZ0();
-      TanLambda_1 = e1_helix.getTanLambda();
+      Phi01 = e1Helix.getPhi0();
+      D01  = e1Helix.getD0() ;
+      Omega1  = e1Helix.getOmega();
+      Z01   = e1Helix.getZ0();
+      TanLambda1 = e1Helix.getTanLambda();
 
       //Electron/track 2
-      Helix e2_helix = gamma->getDaughter(daughter_index2)->getTrack()->getTrackFitResultWithClosestMass(Const::electron)->getHelix();
+      Helix e2Helix = gamma->getDaughter(daughterIndex2)->getTrackFitResult()->getHelix();
 
-      Phi0_2 = e2_helix.getPhi0();
-      D0_2  = e2_helix.getD0() ;
-      Omega_2  = e2_helix.getOmega();
-      Z0_2   = e2_helix.getZ0();
-      TanLambda_2 = e2_helix.getTanLambda();
+      Phi02 = e2Helix.getPhi0();
+      D02  = e2Helix.getD0() ;
+      Omega2  = e2Helix.getOmega();
+      Z02   = e2Helix.getZ0();
+      TanLambda2 = e2Helix.getTanLambda();
     }
 
-    double convertedPhotonInvariantMass(const Particle* gamma, const std::vector<double>& daughter_indexes)
+    double convertedPhotonInvariantMass(const Particle* gamma, const std::vector<double>& daughterIndices)
     {
       //Do basic checks
-      int err_flag = convertedPhoton_errorChecks(gamma, daughter_indexes);
-      if (err_flag == -1) {return -999;}
+      int errFlag = convertedPhotonErrorChecks(gamma, daughterIndices);
+      if (errFlag == -1) {return std::numeric_limits<double>::quiet_NaN();}
 
       //Load helix parameters
-      double Phi0_1, D0_1, Omega_1, Z0_1, TanLambda_1, Phi0_2, D0_2, Omega_2, Z0_2, TanLambda_2;
-      int daughter_index1 = int(daughter_indexes[0]);
-      int daughter_index2 = int(daughter_indexes[1]);
-      convertedPhoton_loadHelixParams(gamma, daughter_index1, daughter_index2, Phi0_1, D0_1, Omega_1, Z0_1, TanLambda_1, Phi0_2, D0_2,
-                                      Omega_2, Z0_2, TanLambda_2);
+      double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
+      int daughterIndex1 = int(daughterIndices[0]);
+      int daughterIndex2 = int(daughterIndices[1]);
+      convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
+                                     Omega2, Z02, TanLambda2);
 
       //Calculating invariant mass
       //Sine and cosine Lambda
-      double sinlam1 = TanLambda_1 / sqrt(1 + (TanLambda_1 * TanLambda_1));
-      double coslam1 = 1 / sqrt(1 + (TanLambda_1 * TanLambda_1));
-      double sinlam2 = TanLambda_2 / sqrt(1 + (TanLambda_2 * TanLambda_2));
-      double coslam2 = 1 / sqrt(1 + (TanLambda_2 * TanLambda_2));
+      double sinlam1 = TanLambda1 / sqrt(1 + (TanLambda1 * TanLambda1));
+      double coslam1 = 1 / sqrt(1 + (TanLambda1 * TanLambda1));
+      double sinlam2 = TanLambda2 / sqrt(1 + (TanLambda2 * TanLambda2));
+      double coslam2 = 1 / sqrt(1 + (TanLambda2 * TanLambda2));
 
-      //Transverse and longitudinal momentum components; energy with electron mass hypothesis : 0.000511 GeV
+      //Transverse and longitudinal momentum components; energy with electron mass hypothesis
       //electron 1
-      double p1  = gamma->getDaughter(daughter_index1)->getMomentumMagnitude();
+      double p1  = gamma->getDaughter(daughterIndex1)->getMomentumMagnitude();
       double pt1 = p1 * coslam1, pz1 =  p1 * sinlam1;
-      double e1 = sqrt(pow(p1, 2.0) + pow(0.000511, 2.0));
+      double e1 = sqrt((p1 * p1) + (Const::electronMass * Const::electronMass));
       //electron 2
-      double p2  = gamma->getDaughter(daughter_index2)->getMomentumMagnitude();
+      double p2  = gamma->getDaughter(daughterIndex2)->getMomentumMagnitude();
       double pt2 = p2 * coslam2, pz2 =  p2 * sinlam2;
-      double e2 = sqrt(pow(p2, 2.0) + pow(0.000511, 2.0));
+      double e2 = sqrt((p2 * p2) + (Const::electronMass * Const::electronMass));
 
       //Invariant mass of the two track system
-      double vtx_mass = sqrt(pow(e1 + e2, 2.0) - pow(pt1 + pt2, 2.0)  - pow(pz1 + pz2, 2.0));
-      return vtx_mass;
+      double vtxMass = sqrt(pow(e1 + e2, 2.0) - pow(pt1 + pt2, 2.0)  - pow(pz1 + pz2, 2.0));
+      return vtxMass;
     }
 
-    double convertedPhotonDelTanLambda(const Particle* gamma, const std::vector<double>& daughter_indexes)
+    double convertedPhotonDelTanLambda(const Particle* gamma, const std::vector<double>& daughterIndices)
     {
       //Do basic checks
-      int err_flag = convertedPhoton_errorChecks(gamma, daughter_indexes);
-      if (err_flag == -1) {return -999;}
+      int errFlag = convertedPhotonErrorChecks(gamma, daughterIndices);
+      if (errFlag == -1) {return std::numeric_limits<double>::quiet_NaN();}
 
       //Load helix parameters
-      double Phi0_1, D0_1, Omega_1, Z0_1, TanLambda_1, Phi0_2, D0_2, Omega_2, Z0_2, TanLambda_2;
-      int daughter_index1 = int(daughter_indexes[0]);
-      int daughter_index2 = int(daughter_indexes[1]);
-      convertedPhoton_loadHelixParams(gamma, daughter_index1, daughter_index2, Phi0_1, D0_1, Omega_1, Z0_1, TanLambda_1, Phi0_2, D0_2,
-                                      Omega_2, Z0_2, TanLambda_2);
+      double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
+      int daughterIndex1 = int(daughterIndices[0]);
+      int daughterIndex2 = int(daughterIndices[1]);
+      convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
+                                     Omega2, Z02, TanLambda2);
 
       //Delta-TanLambda
-      return (TanLambda_2 - TanLambda_1);
+      return (TanLambda2 - TanLambda1);
     }
 
-    double convertedPhotonDelR(const Particle* gamma, const std::vector<double>& daughter_indexes)
+    double convertedPhotonDelR(const Particle* gamma, const std::vector<double>& daughterIndices)
     {
       //Do basic checks
-      int err_flag = convertedPhoton_errorChecks(gamma, daughter_indexes);
-      if (err_flag == -1) {return -999;}
+      int errFlag = convertedPhotonErrorChecks(gamma, daughterIndices);
+      if (errFlag == -1) {return std::numeric_limits<double>::quiet_NaN();}
 
       //Load helix parameters
-      double Phi0_1, D0_1, Omega_1, Z0_1, TanLambda_1, Phi0_2, D0_2, Omega_2, Z0_2, TanLambda_2;
-      int daughter_index1 = int(daughter_indexes[0]);
-      int daughter_index2 = int(daughter_indexes[1]);
-      convertedPhoton_loadHelixParams(gamma, daughter_index1, daughter_index2, Phi0_1, D0_1, Omega_1, Z0_1, TanLambda_1, Phi0_2, D0_2,
-                                      Omega_2, Z0_2, TanLambda_2);
+      double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
+      int daughterIndex1 = int(daughterIndices[0]);
+      int daughterIndex2 = int(daughterIndices[1]);
+      convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
+                                     Omega2, Z02, TanLambda2);
 
       //Delta-R
-      double radius_1 = 1 / Omega_1;
-      double radius_2 = 1 / Omega_2;
+      double radius1 = 1 / Omega1;
+      double radius2 = 1 / Omega2;
 
-      TVector2 center1((radius_1 + D0_1) * sin(Phi0_1) , -1 * (radius_1 + D0_1) * cos(Phi0_1));
-      TVector2 center2((radius_2 + D0_2) * sin(Phi0_2) , -1 * (radius_2 + D0_2) * cos(Phi0_2));
-      TVector2 cen_diff = center1 - center2;
+      TVector2 center1((radius1 + D01) * sin(Phi01) , -1 * (radius1 + D01) * cos(Phi01));
+      TVector2 center2((radius2 + D02) * sin(Phi02) , -1 * (radius2 + D02) * cos(Phi02));
+      TVector2 cenDiff = center1 - center2;
 
-      double del_R = fabs(radius_1) + fabs(radius_2) - cen_diff.Mod();
-      return del_R;
+      double delR = fabs(radius1) + fabs(radius2) - cenDiff.Mod();
+      return delR;
     }
 
-    TVector2 convertedPhotonZ1Z2(const Particle* gamma, const std::vector<double>& daughter_indexes)
+    std::pair<double, double> convertedPhotonZ1Z2(const Particle* gamma, const std::vector<double>& daughterIndices)
     {
       //Do basic checks
-      int err_flag = convertedPhoton_errorChecks(gamma, daughter_indexes);
-      if (err_flag == -1) {return TVector2(-9999.0, -9999.0);}
+      int errFlag = convertedPhotonErrorChecks(gamma, daughterIndices);
+      if (errFlag == -1) {return std::pair<double, double>(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());}
 
       //Load helix parameters
-      double Phi0_1, D0_1, Omega_1, Z0_1, TanLambda_1, Phi0_2, D0_2, Omega_2, Z0_2, TanLambda_2;
-      int daughter_index1 = int(daughter_indexes[0]);
-      int daughter_index2 = int(daughter_indexes[1]);
-      convertedPhoton_loadHelixParams(gamma, daughter_index1, daughter_index2, Phi0_1, D0_1, Omega_1, Z0_1, TanLambda_1, Phi0_2, D0_2,
-                                      Omega_2, Z0_2, TanLambda_2);
+      double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
+      int daughterIndex1 = int(daughterIndices[0]);
+      int daughterIndex2 = int(daughterIndices[1]);
+      convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
+                                     Omega2, Z02, TanLambda2);
 
       //Delta-Z
       //Radial unit vectors
-      double radius_1 = 1 / Omega_1;
-      double radius_2 = 1 / Omega_2;
+      double radius1 = 1 / Omega1;
+      double radius2 = 1 / Omega2;
 
-      TVector2 center1((radius_1 + D0_1) * sin(Phi0_1) , -1 * (radius_1 + D0_1) * cos(Phi0_1));
-      TVector2 center2((radius_2 + D0_2) * sin(Phi0_2) , -1 * (radius_2 + D0_2) * cos(Phi0_2));
+      TVector2 center1((radius1 + D01) * sin(Phi01) , -1 * (radius1 + D01) * cos(Phi01));
+      TVector2 center2((radius2 + D02) * sin(Phi02) , -1 * (radius2 + D02) * cos(Phi02));
 
       TVector2 n1 =  center1 - center2; n1 = n1.Unit();
       TVector2 n2 = -1 * n1;
-      n1 = copysign(1.0, Omega_1) * n1;
-      n2 = copysign(1.0, Omega_2) * n2;
+      n1 = copysign(1.0, Omega1) * n1;
+      n2 = copysign(1.0, Omega2) * n2;
 
-      //Getting running parameter phi at nominal vetex
-      double phi_n1 = atan2(n1.X(), -n1.Y());
-      double phi_n2 = atan2(n2.X(), -n2.Y());
-      double Phi0_1_intersect = phi_n1 - Phi0_1;
-      double Phi0_2_intersect = phi_n2 - Phi0_2;
+      //Getting running parameter phi at nominal vertex
+      double phiN1 = atan2(n1.X(), -n1.Y());
+      double phiN2 = atan2(n2.X(), -n2.Y());
+      double Phi01Intersect = phiN1 - Phi01;
+      double Phi02Intersect = phiN2 - Phi02;
 
-      double z1 = Z0_1 - (radius_1 * TanLambda_1 * Phi0_1_intersect);
-      double z2 = Z0_2 - (radius_2 * TanLambda_2 * Phi0_2_intersect);
-      TVector2 z1_z2(z1, z2);
-      return z1_z2;
+      double z1 = Z01 - (radius1 * TanLambda1 * Phi01Intersect);
+      double z2 = Z02 - (radius2 * TanLambda2 * Phi02Intersect);
+      std::pair<double, double>  z1z2(z1, z2);
+      return z1z2;
     }
 
-    double convertedPhotonDelZ(const Particle* gamma, const std::vector<double>& daughter_indexes)
+    double convertedPhotonDelZ(const Particle* gamma, const std::vector<double>& daughterIndices)
     {
-      TVector2 z1_z2 = convertedPhotonZ1Z2(gamma, daughter_indexes);
-      double z1 = z1_z2.X(); double z2 = z1_z2.Y();
+      std::pair<double, double> z1z2 = convertedPhotonZ1Z2(gamma, daughterIndices);
+      double z1 = z1z2.first; double z2 = z1z2.second;
       return (z1 - z2);
     }
 
-    double convertedPhotonZ(const Particle* gamma, const std::vector<double>& daughter_indexes)
+    double convertedPhotonZ(const Particle* gamma, const std::vector<double>& daughterIndices)
     {
-      TVector2 z1_z2 = convertedPhotonZ1Z2(gamma, daughter_indexes);
-      double z1 = z1_z2.X(); double z2 = z1_z2.Y();
+      std::pair<double, double> z1z2 = convertedPhotonZ1Z2(gamma, daughterIndices);
+      double z1 = z1z2.first; double z2 = z1z2.second;
       return (z1 + z2) * 0.5;
     }
 
-    TVector2 convertedPhotonXY(const Particle* gamma, const std::vector<double>& daughter_indexes)
+    TVector2 convertedPhotonXY(const Particle* gamma, const std::vector<double>& daughterIndices)
     {
       //Do basic checks
-      int err_flag = convertedPhoton_errorChecks(gamma, daughter_indexes);
-      if (err_flag == -1) {return TVector2(-9999.0, -9999.0);}
+      int errFlag = convertedPhotonErrorChecks(gamma, daughterIndices);
+      if (errFlag == -1) {return TVector2(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());}
 
       //Load helix parameters
-      double Phi0_1, D0_1, Omega_1, Z0_1, TanLambda_1, Phi0_2, D0_2, Omega_2, Z0_2, TanLambda_2;
-      int daughter_index1 = int(daughter_indexes[0]);
-      int daughter_index2 = int(daughter_indexes[1]);
-      convertedPhoton_loadHelixParams(gamma, daughter_index1, daughter_index2, Phi0_1, D0_1, Omega_1, Z0_1, TanLambda_1, Phi0_2, D0_2,
-                                      Omega_2, Z0_2, TanLambda_2);
+      double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
+      int daughterIndex1 = int(daughterIndices[0]);
+      int daughterIndex2 = int(daughterIndices[1]);
+      convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
+                                     Omega2, Z02, TanLambda2);
 
       //Radial unit vectors
-      double radius_1 = 1 / Omega_1;
-      double radius_2 = 1 / Omega_2;
+      double radius1 = 1 / Omega1;
+      double radius2 = 1 / Omega2;
 
-      TVector2 center1((radius_1 + D0_1) * sin(Phi0_1) , -1 * (radius_1 + D0_1) * cos(Phi0_1));
-      TVector2 center2((radius_2 + D0_2) * sin(Phi0_2) , -1 * (radius_2 + D0_2) * cos(Phi0_2));
-      TVector2 cen_diff = center2 - center1;
-      double del_R = fabs(radius_1) + fabs(radius_2) - cen_diff.Mod();
+      TVector2 center1((radius1 + D01) * sin(Phi01) , -1 * (radius1 + D01) * cos(Phi01));
+      TVector2 center2((radius2 + D02) * sin(Phi02) , -1 * (radius2 + D02) * cos(Phi02));
+      TVector2 cenDiff = center2 - center1;
+      double delR = fabs(radius1) + fabs(radius2) - cenDiff.Mod();
 
       //Calculate transverse vertex
-      TVector2 n1 = cen_diff.Unit();
-      TVector2 vtx_xy = center1 + ((fabs(radius_1) - (del_R / 2)) * n1);
-      return vtx_xy;
+      TVector2 n1 = cenDiff.Unit();
+      TVector2 vtxXY = center1 + ((fabs(radius1) - (delR / 2)) * n1);
+      return vtxXY;
     }
 
-    double convertedPhotonX(const Particle* gamma, const std::vector<double>& daughter_indexes)
+    double convertedPhotonX(const Particle* gamma, const std::vector<double>& daughterIndices)
     {
-      auto vtx_xy = convertedPhotonXY(gamma, daughter_indexes);
-      return vtx_xy.X();
+      auto vtxXY = convertedPhotonXY(gamma, daughterIndices);
+      return vtxXY.X();
     }
 
-    double convertedPhotonY(const Particle* gamma, const std::vector<double>& daughter_indexes)
+    double convertedPhotonY(const Particle* gamma, const std::vector<double>& daughterIndices)
     {
-      auto vtx_xy = convertedPhotonXY(gamma, daughter_indexes);
-      return vtx_xy.Y();
+      auto vtxXY = convertedPhotonXY(gamma, daughterIndices);
+      return vtxXY.Y();
     }
 
-    double convertedPhotonRho(const Particle* gamma, const std::vector<double>& daughter_indexes)
+    double convertedPhotonRho(const Particle* gamma, const std::vector<double>& daughterIndices)
     {
-      auto vtx_xy = convertedPhotonXY(gamma, daughter_indexes);
-      return vtx_xy.Mod();
+      auto vtxXY = convertedPhotonXY(gamma, daughterIndices);
+      return vtxXY.Mod();
     }
 
     VARIABLE_GROUP("V0Daughter");

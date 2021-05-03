@@ -90,7 +90,6 @@ void SVDUnpackerModule::initialize()
 
   StoreArray<SVDShaperDigit> storeShaperDigits(m_svdShaperDigitListName);
   storeShaperDigits.registerInDataStore();
-  storeShaperDigits.registerRelationTo(storeDAQDiagnostics);
   m_svdShaperDigitListName = storeShaperDigits.getName();
 
 }

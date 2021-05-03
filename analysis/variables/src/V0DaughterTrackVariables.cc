@@ -24,6 +24,10 @@
 // framework aux
 #include <framework/logging/Logger.h>
 
+#include <algorithm>
+#include <TVector2.h>
+#include <cmath>
+
 using namespace std;
 
 namespace Belle2 {
@@ -564,6 +568,68 @@ namespace Belle2 {
       return vtxXY.Mod();
     }
 
+    TVector3 convertedPhoton3Momentum(const Particle* gamma, const std::vector<double>& daughterIndices)
+    {
+      //Do basic checks
+      int errFlag = convertedPhotonErrorChecks(gamma, daughterIndices);
+      if (errFlag == -1) {return TVector3(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());}
+
+      //Load helix parameters
+      double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
+      int daughterIndex1 = int(daughterIndices[0]);
+      int daughterIndex2 = int(daughterIndices[1]);
+      convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02,
+                                     TanLambda2);
+      //Delta-Z
+      //Radial unit vectors
+      double radius1 = 1 / Omega1;
+      double radius2 = 1 / Omega2;
+
+      TVector2 center1((radius1 + D01) * sin(Phi01) , -1 * (radius1 + D01) * cos(Phi01));
+      TVector2 center2((radius2 + D02) * sin(Phi02) , -1 * (radius2 + D02) * cos(Phi02));
+      TVector2 n1 =  center1 - center2; n1 = n1.Unit();
+      TVector2 n2 = -1 * n1;
+      n1 = copysign(1.0, Omega1) * n1;
+      n2 = copysign(1.0, Omega2) * n2;
+
+      //Getting running parameter phi at nominal vertex
+      double phiN1 = atan2(n1.X(), -n1.Y());
+      double phiN2 = atan2(n2.X(), -n2.Y());
+
+      //Sine and cosine Lambda
+      double sinlam1 = TanLambda1 / sqrt(1 + (TanLambda1 * TanLambda1));
+      double coslam1 = 1 / sqrt(1 + (TanLambda1 * TanLambda1));
+      double sinlam2 = TanLambda2 / sqrt(1 + (TanLambda2 * TanLambda2));
+      double coslam2 = 1 / sqrt(1 + (TanLambda2 * TanLambda2));
+
+      //Photon 3-momentum
+      double p1  = gamma->getDaughter(daughterIndex1)->getMomentumMagnitude();
+      TVector3 e1Momentum(coslam1 * cos(phiN1), coslam1 * sin(phiN1), sinlam1);
+      double p2  = gamma->getDaughter(daughterIndex2)->getMomentumMagnitude();
+      TVector3 e2Momentum(coslam2 * cos(phiN2), coslam2 * sin(phiN2), sinlam2);
+      TVector3 gammaMomentum = (e1Momentum * p1) + (e2Momentum * p2);
+
+      return gammaMomentum;
+    }
+
+    double convertedPhotonPx(const Particle* gamma, const std::vector<double>& daughterIndices)
+    {
+      auto gammaMomentum = convertedPhoton3Momentum(gamma, daughterIndices);
+      return gammaMomentum.Px();
+    }
+
+    double convertedPhotonPy(const Particle* gamma, const std::vector<double>& daughterIndices)
+    {
+      auto gammaMomentum = convertedPhoton3Momentum(gamma, daughterIndices);
+      return gammaMomentum.Py();
+    }
+
+    double convertedPhotonPz(const Particle* gamma, const std::vector<double>& daughterIndices)
+    {
+      auto gammaMomentum = convertedPhoton3Momentum(gamma, daughterIndices);
+      return gammaMomentum.Pz();
+    }
+
     VARIABLE_GROUP("V0Daughter");
 
     REGISTER_VARIABLE("v0DaughterNCDCHits(i)", v0DaughterTrackNCDCHits, "Number of CDC hits associated to the i-th daughter track");
@@ -721,6 +787,11 @@ namespace Belle2 {
                       "Estimate of vertex Z coordinate  calculated for daughters (i,j), assuming it's a converted photon");
     REGISTER_VARIABLE("convertedPhotonRho(i,j)",       convertedPhotonRho,
                       "Estimate of vertex Rho  calculated for daughters (i,j), assuming it's a converted photon");
-
+    REGISTER_VARIABLE("convertedPhotonPx(i,j)", convertedPhotonPx,
+                      "Estimate of x-component of photon momentum calculated for daughters (i,j), assuming it's a converted photon");
+    REGISTER_VARIABLE("convertedPhotonPy(i,j)", convertedPhotonPy,
+                      "Estimate of y-component of photon momentum calculated for daughters (i,j), assuming it's a converted photon");
+    REGISTER_VARIABLE("convertedPhotonPz(i,j)", convertedPhotonPz,
+                      "Estimate of z-component of photon momentum calculated for daughters (i,j), assuming it's a converted photon");
   }
 }

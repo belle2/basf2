@@ -90,6 +90,8 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("CorrectForWireSag",   m_correctForWireSag,
            "A switch for sense wire sag effect; true: drift-time is calculated with the sag taken into account; false: not. Here, sag means the perturbative part which corresponds to alignment in case of wire-position. The main part (corresponding to design+displacement in wire-position) is taken into account in FullSim; you can control it via CDCJobCntlParModifier.",
            true);
+  //Switch for negative-t0 wires
+  addParam("TreatNegT0WiresAsGood", m_treatNegT0WiresAsGood, "Treat wires with negative t0 (calibrated) as good wire4s.", true);
 
   //Threshold
   addParam("TDCThreshold4Outer", m_tdcThreshold4Outer,
@@ -610,7 +612,7 @@ void CDCDigitizerModule::event()
     }
 
     //N.B. No bias (+ or -0.5 count) is introduced on average in digitization by the real TDC (info. from KEK electronics division). So round off (t0 - drifttime) below.
-    unsigned short tdcCount = static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime) *
+    unsigned short tdcCount = static_cast<unsigned short>((getPositiveT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime) *
                                                           m_tdcBinWidthInv + 0.5);
 
     //calculate tot; hard-coded currently
@@ -641,7 +643,7 @@ void CDCDigitizerModule::event()
 
     //Set 2nd-hit related things if it exists
     if (m_output2ndHit && iterSignalMap->second.m_simHitIndex2 >= 0) {
-      unsigned short tdcCount2 = static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime2) *
+      unsigned short tdcCount2 = static_cast<unsigned short>((getPositiveT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime2) *
                                                              m_tdcBinWidthInv + 0.5);
       if (tdcCount2 != tdcCount) {
         CDCHit* secondHit = m_cdcHits.appendNew(tdcCount2, adcCount, iterSignalMap->first, 0, tot);
@@ -671,7 +673,7 @@ void CDCDigitizerModule::event()
       } else { //Check the 3rd hit when tdcCount = tdcCount2
         //        std::cout << "tdcCount1=2" << std::endl;
         if (iterSignalMap->second.m_simHitIndex3 >= 0) {
-          unsigned short tdcCount3 = static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime3) *
+          unsigned short tdcCount3 = static_cast<unsigned short>((getPositiveT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime3) *
                                                                  m_tdcBinWidthInv + 0.5);
           //          std::cout << "tdcCount3= " << tdcCount3 << " " << tdcCount << std::endl;
           if (tdcCount3 != tdcCount) {
@@ -724,7 +726,7 @@ void CDCDigitizerModule::event()
     //    unsigned short adcCount = getADCCount(iterSignalMapTrg->second.m_charge);
     unsigned short adcCount = iterSignalMapTrg->second.m_charge;
     unsigned short tdcCount =
-      static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMapTrg->first.first) -
+      static_cast<unsigned short>((getPositiveT0(iterSignalMapTrg->first.first) -
                                    iterSignalMapTrg->second.m_driftTime) * m_tdcBinWidthInv + 0.5);
     const CDCHit* cdcHit = m_cdcHits4Trg.appendNew(tdcCount, adcCount, iterSignalMapTrg->first.first);
 
@@ -1033,7 +1035,7 @@ void CDCDigitizerModule::addXTalk()
       WireID widx = m_cdcgp->getWireID(board, xTalks[i].first);
       if (!m_cdcgp->isBadWire(widx)) { // for non-bad wire
         if (m_includeEarlyXTalks || (xTalks[i].second.TDC <= tdcCount)) {
-          const double t0 = m_cdcgp->getT0(widx);
+          const double t0 = getPositiveT0(widx);
           const double ULOfTDC = (t0 - m_lowEdgeOfTimeWindow[board]) * m_tdcBinWidthInv;
           const double LLOfTDC = (t0 - m_uprEdgeOfTimeWindow[board]) * m_tdcBinWidthInv;
           if (LLOfTDC <= tdcCount4XTalk && tdcCount4XTalk <= ULOfTDC) {
@@ -1153,4 +1155,13 @@ void CDCDigitizerModule::addXTalk()
     }
   } //end of x-talk loop
   B2DEBUG(m_debugLevel4XTalk, "original #hits, #hits= " << OriginalNoOfHits << " " << m_cdcHits.getEntries());
+}
+
+
+double CDCDigitizerModule::getPositiveT0(const WireID& wid)
+{
+  double t0 = m_cdcgp->getT0(wid);
+  if (t0 <= 0 && m_treatNegT0WiresAsGood) t0 = m_cdcgp->getMeanT0();
+  //  B2DEBUG(m_debugLevel, m_cdcgp->getT0(wid) <<" "<< m_cdcgp->getMeanT0() <<" "<< t0);
+  return t0;
 }

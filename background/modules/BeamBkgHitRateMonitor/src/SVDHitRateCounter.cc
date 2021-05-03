@@ -295,18 +295,18 @@ namespace Belle2 {
       m_rates_energyU = m_buffer_energyU[timeStamp];
       m_rates_energyV = m_buffer_energyV[timeStamp];
 
-      SVDHitRateCounter::normalize_rates(m_rates);
-      SVDHitRateCounter::normalize_rates(m_ratesU, true);
-      SVDHitRateCounter::normalize_rates(m_ratesV, false, true);
-      SVDHitRateCounter::normalize_rates(m_rates_highE);
-      SVDHitRateCounter::normalize_rates(m_rates_lowE);
-      SVDHitRateCounter::normalize_rates(m_clustersU, true);
-      SVDHitRateCounter::normalize_rates(m_clustersV, false, true);
-      SVDHitRateCounter::normalize_energy_rates(m_rates_energyU);
-      SVDHitRateCounter::normalize_energy_rates(m_rates_energyV);
+      SVDHitRateCounter::normalizeRates(m_rates);
+      SVDHitRateCounter::normalizeRates(m_ratesU, true);
+      SVDHitRateCounter::normalizeRates(m_ratesV, false, true);
+      SVDHitRateCounter::normalizeRates(m_rates_highE);
+      SVDHitRateCounter::normalizeRates(m_rates_lowE);
+      SVDHitRateCounter::normalizeRates(m_clustersU, true);
+      SVDHitRateCounter::normalizeRates(m_clustersV, false, true);
+      SVDHitRateCounter::normalizeEnergyRates(m_rates_energyU);
+      SVDHitRateCounter::normalizeEnergyRates(m_rates_energyV);
     }
 
-    void SVDHitRateCounter::normalize_rates(TreeStruct& rates, bool isU, bool isV)
+    void SVDHitRateCounter::normalizeRates(TreeStruct& rates, bool isU, bool isV)
     {
       if (not rates.valid) return;
 
@@ -342,7 +342,7 @@ namespace Belle2 {
       }
     }
 
-    void SVDHitRateCounter::normalize_energy_rates(TreeStruct& rates)
+    void SVDHitRateCounter::normalizeEnergyRates(TreeStruct& rates)
     {
       static const double ehEnergyJoules = Const::ehEnergy / Unit::J;
       // Convert charge/s to mrad/s by multiplying by energy/pair and dividing by the mass

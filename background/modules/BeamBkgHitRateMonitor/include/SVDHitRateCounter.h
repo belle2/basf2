@@ -80,9 +80,9 @@ namespace Belle2 {
        * @param ignoreHotStripsPayload Count also hot strips as active
        * @param ignoreMaskedStripsPayload Count also FADC-masked strips as active
        */
-      explicit SVDHitRateCounter(const std::string& svdShaperDigitsName, double thrCharge,
-                                 bool ignoreHotStripsPayload = false,
-                                 bool ignoreMaskedStripsPayload = false):
+      SVDHitRateCounter(const std::string& svdShaperDigitsName, double thrCharge,
+                        bool ignoreHotStripsPayload = false,
+                        bool ignoreMaskedStripsPayload = false):
         m_svdShaperDigitsName(svdShaperDigitsName), m_thrCharge(thrCharge),
         m_ignoreHotStripsPayload(ignoreHotStripsPayload),
         m_ignoreMaskedStripsPayload(ignoreMaskedStripsPayload)
@@ -117,7 +117,7 @@ namespace Belle2 {
        * @param isU Whether the TreeStruct only contains U-side hits
        * @param isV Whether the TreeStruct only contains V-side hits
        */
-      virtual void normalize_rates(TreeStruct& rates, bool isU = false, bool isV = false);
+      void normalizeRates(TreeStruct& rates, bool isU = false, bool isV = false);
 
       /**
        * Normalize a TreeStruct that stores charge/energy, not hits.
@@ -130,7 +130,7 @@ namespace Belle2 {
        *
        * Assumes the integration time is 155 ns (6 samples).
        */
-      virtual void normalize_energy_rates(TreeStruct& rates);
+      void normalizeEnergyRates(TreeStruct& rates);
 
       /**
        * Return number of strips on a sensor.

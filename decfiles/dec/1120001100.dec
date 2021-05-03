@@ -16,7 +16,7 @@ Alias anti-B0sig anti-B0
 ChargeConj B0sig anti-B0sig
 
 Decay Upsilon(4S)
-1.0 B0sig anti-B0sig VSS;
+1.0 B0sig anti-B0 VSS;
 Enddecay
 
 Alias f_2sig f_2

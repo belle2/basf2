@@ -144,7 +144,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
   TFile* histfile = 0;
   TFile* histExtraCrateInfofile = 0;   // Only created if needed for crates
-  TFile* histExtraCrateInfofile_dummy = 0;   // Only created if needed for crates
 
 
   unique_ptr<TTree> tree_crystal(new TTree("tree_crystal", "Debug data from bhabha time calibration algorithm for crystals"));
@@ -834,6 +833,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   /* Read in the histogram about the crate calibration constant differences between iterations
      if it exists.  This way the histograms can be updated after each run.*/
   if (crateIDLo <= crateIDHi) {
+    TFile* histExtraCrateInfofile_dummy = 0;   // Only created if needed for crates
     B2INFO("Debug output rootfile used for crate iterations: " << extraCratedebugFilename);
     histExtraCrateInfofile_dummy = new TFile(extraCratedebugFilename.c_str(), "UPDATE");
 

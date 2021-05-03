@@ -67,6 +67,7 @@ namespace Belle2 {
 #endif
 
     void initialize() override final;
+    void beginRun() override final;
     void event() override final;
     void endRun() override final;
 
@@ -108,6 +109,7 @@ namespace Belle2 {
     double m_epicsUpdateSeconds; /**< Minimum interval between successive PV updates */
     std::string m_pvSuffix; /**< Suffix for EPICS PVs */
     std::string m_deltaTPVSuffix; /**< Suffix of the update-time monitoring PV */
+    std::string m_statePVSuffix; /**< Suffix of the state PV */
 
     // Data members for outputs
     MonitoringObject* m_monObj = nullptr; /**< Monitoring object for MiraBelle */
@@ -135,9 +137,10 @@ namespace Belle2 {
 
 #ifdef _BELLE2_EPICS
     std::vector<MyPV> m_myPVs; /**< EPICS stuff for each sensor group / PV */
-    double m_lastPVUpdate; /**< Time of the last PV update (seconds) */
-    chid m_timeSinceLastPVUpdateChan;
-    double m_timeSinceLastPVUpdate = -1.0;
+    double m_lastPVUpdate = -1.0; /**< Time of the last PV update (seconds) */
+    chid m_timeSinceLastPVUpdateChan; /**< EPICS channel for monitoring time between updates. */
+    struct dbr_ctrl_enum m_stateCtrl; /**< Struct for the state PV. */
+    chid m_stateChan; /**< EPICS channel for the state PV. */
 #endif
 
     /** List of sensors groups. Must match Belle2::SVD::SVDDQMDoseModule::c_sensorGroups.

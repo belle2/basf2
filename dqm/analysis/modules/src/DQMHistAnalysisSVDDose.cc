@@ -28,10 +28,12 @@ DQMHistAnalysisSVDDoseModule::DQMHistAnalysisSVDDoseModule()
   addParam("pvPrefix", m_pvPrefix, "Prefix for EPICS PVs.", std::string("SVD:DQM:"));
   addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", true);
   addParam("epicsUpdateSeconds", m_epicsUpdateSeconds,
-           "Minimum interval between two successive PV updates (in seconds).", 300.0);
+           "Minimum interval between two successive PV updates (in seconds).", 1000.0);
   addParam("pvSuffix", m_pvSuffix, "Suffix for EPICS PVs.", std::string(":Occ:Pois:Avg"));
   addParam("deltaTPVSuffix", m_deltaTPVSuffix, "Suffix for the PV that monitors the update interval of the PVs.",
            std::string("Occ:Pois:UpdateInterval"));
+  addParam("statePVSuffix", m_statePVSuffix, "Suffix for the PV with the state of the monitoring.",
+           std::string("Occ:Pois:State"));
 }
 
 DQMHistAnalysisSVDDoseModule::~DQMHistAnalysisSVDDoseModule()
@@ -126,13 +128,38 @@ void DQMHistAnalysisSVDDoseModule::initialize()
   if (m_useEpics) {
     if (!ca_current_context())
       SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    // Channels for the occupancies
     m_myPVs.resize(c_sensorGroups.size());
     for (unsigned int g = 0; g < c_sensorGroups.size(); g++)
       SEVCHK(ca_create_channel((m_pvPrefix + c_sensorGroups[g].pvMiddle + m_pvSuffix).data(),
                                NULL, NULL, 10, &m_myPVs[g].mychid), "ca_create_channel");
+    // Channels for update interval and state
     SEVCHK(ca_create_channel((m_pvPrefix + m_deltaTPVSuffix).data(),
                              NULL, NULL, 10, &m_timeSinceLastPVUpdateChan), "ca_create_channel");
+    SEVCHK(ca_create_channel((m_pvPrefix + m_statePVSuffix).data(),
+                             NULL, NULL, 10, &m_stateChan), "ca_create_channel");
+    // Actually do create the channels, communicating with the IOC
     SEVCHK(ca_pend_io(5.0), "ca_pend_io");
+    // Get the state enum
+    SEVCHK(ca_get(DBR_CTRL_ENUM, m_stateChan, &m_stateCtrl), "ca_get");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io");
+    B2DEBUG(19, "State PV initialized (ca_get)" << LogVar("value", m_stateCtrl.value));
+    // First update should happen m_epicsUpdateSeconds from now
+    m_lastPVUpdate = getClockSeconds();
+  }
+#endif
+}
+
+void DQMHistAnalysisSVDDoseModule::beginRun()
+{
+  // Set status PV to running, reset last update time
+#ifdef _BELLE2_EPICS
+  if (m_useEpics) {
+    B2DEBUG(19, "beginRun: setting state PV to RUNNING");
+    m_stateCtrl.value = 1;
+    SEVCHK(ca_put(DBR_ENUM, m_stateChan, &m_stateCtrl.value), "ca_put");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io");
+    // First update should happen m_epicsUpdateSeconds from now
     m_lastPVUpdate = getClockSeconds();
   }
 #endif
@@ -142,8 +169,8 @@ void DQMHistAnalysisSVDDoseModule::event()
 {
   // Update PVs ("write" to EPICS)
 #ifdef _BELLE2_EPICS
-  m_timeSinceLastPVUpdate = getClockSeconds() - m_lastPVUpdate;
-  if (m_useEpics && m_timeSinceLastPVUpdate >= m_epicsUpdateSeconds) {
+  double timeSinceLastPVUpdate = getClockSeconds() - m_lastPVUpdate;
+  if (m_useEpics && timeSinceLastPVUpdate >= m_epicsUpdateSeconds) {
     for (unsigned int g = 0; g < c_sensorGroups.size(); g++) {
       const auto& group = c_sensorGroups[g];
       double nHits = 0.0, nEvts = 0.0;
@@ -174,7 +201,7 @@ void DQMHistAnalysisSVDDoseModule::event()
       pv.lastNHits = nHits;
     }
     if (m_timeSinceLastPVUpdateChan)
-      SEVCHK(ca_put(DBR_DOUBLE, m_timeSinceLastPVUpdateChan, (void*)&m_timeSinceLastPVUpdate), "ca_put");
+      SEVCHK(ca_put(DBR_DOUBLE, m_timeSinceLastPVUpdateChan, (void*)&timeSinceLastPVUpdate), "ca_put");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io");
     m_lastPVUpdate = getClockSeconds();
   }
@@ -187,9 +214,18 @@ void DQMHistAnalysisSVDDoseModule::endRun()
 {
   B2DEBUG(18, "DQMHistAnalysisSVDDose: endRun");
 
-  // EPICS: reset the counters used for the delta computation
-  for (auto& pv : m_myPVs)
-    pv.lastNEvts = pv.lastNHits = 0.0;
+  // EPICS: reset the counters used for the delta computation, set state to NOT RUNNING
+#ifdef _BELLE2_EPICS
+  if (m_useEpics) {
+    B2DEBUG(19, "endRun: setting state PV to NOT RUNNING");
+    m_stateCtrl.value = 0;
+    SEVCHK(ca_put(DBR_ENUM, m_stateChan, &m_stateCtrl.value), "ca_put");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io");
+    // Reset events and hits counters
+    for (auto& pv : m_myPVs)
+      pv.lastNEvts = pv.lastNHits = 0.0;
+  }
+#endif
 
   // Write to MiraBelle
   for (unsigned int g = 0; g < c_sensorGroups.size(); g++) {

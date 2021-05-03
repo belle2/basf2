@@ -242,7 +242,7 @@ void TRGGRLProjectsModule::event()
     if (abs(z0) < 25.) {nTrkZ25++;}
     if (abs(z0) < 35.) {nTrkZ35++;}
   }
-  int nTrkNN = cdc3DTrkArray.getEntries();
+  int nTrkNN = cdcNNTrkArray.getEntries();
   int nTrkNNSTT = 0;
   int nTrkNN20 = 0;
   int nTrkNN40 = 0;

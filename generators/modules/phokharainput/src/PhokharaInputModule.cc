@@ -14,6 +14,7 @@
 #include <framework/utilities/EnvironmentVariables.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 using namespace std;
 using namespace Belle2;
@@ -158,6 +159,8 @@ void PhokharaInputModule::event()
     }
   }
 
+  StoreObjPtr<EventMetaData> evtMetaData("EventMetaData", DataStore::c_Event);
+
   // initial particle from beam parameters
   const MCInitialParticles& initial = m_initial.generate();
 
@@ -174,9 +177,11 @@ void PhokharaInputModule::event()
     m_generator.setCMSEnergy(initial.getMass());
     m_generator.init(m_ParameterFile);
   }
-  m_generator.generateEvent(m_mcGraph, vertex, boost);
+  double weight = m_generator.generateEvent(m_mcGraph, vertex, boost);
   m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 
+  //store the weight (1.0 for unweighted events)
+  evtMetaData->setGeneratedWeight(weight);
 }
 
 

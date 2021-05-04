@@ -189,7 +189,7 @@ namespace Belle2 {
      * @param vertex generated vertex.
      * @param boost generated boost.
      */
-    void generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost);
+    double generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost);
 
     /**
      * Terminates the generator.

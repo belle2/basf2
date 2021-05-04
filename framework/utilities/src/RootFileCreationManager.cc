@@ -19,6 +19,7 @@ namespace {
   /** Custom delete funktion for the TFile */
   void TFile_Deleter(TFile* file)
   {
+    if (!file) return;
     B2DEBUG(30, "Closing ROOT file");
     if (file->IsOpen()) {
       file->Close();

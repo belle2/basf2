@@ -118,6 +118,8 @@ class SteeringFileTest(unittest.TestCase):
                 "067_generate_mc.py"
             ],
             skip_in_light=[
+                "065_generate_mc.py",
+                "067_generate_mc.py",
                 "085_module.py",
                 "087_module.py"
             ],

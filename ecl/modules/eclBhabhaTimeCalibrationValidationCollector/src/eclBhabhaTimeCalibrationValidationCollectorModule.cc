@@ -168,7 +168,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::prepare()
   registerObject<TH1F>("clusterTime", clusterTime) ;
 
   auto clusterTime_cid = new TH2F("clusterTime_cid",
-                                  ";crystal ID ;Electron ECL cluster time [ns]", 8736, 0, 8736, nbins, min_t, max_t) ;
+                                  ";crystal Cell ID ;Electron ECL cluster time [ns]", 8736, 1, 8736 + 1, nbins, min_t, max_t) ;
   registerObject<TH2F>("clusterTime_cid", clusterTime_cid) ;
 
   auto clusterTime_run = new TH2F("clusterTime_run",

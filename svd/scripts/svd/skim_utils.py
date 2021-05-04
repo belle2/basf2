@@ -27,6 +27,11 @@ class skimOutRNDTrgModule(b2.Module):
     returns True if the event is NOT a random triggered event
     """
 
+    def __init__(self):
+        """constructor"""
+
+        super().__init__()
+
     def event(self):
         """
         check RawFTSW to get the event type
@@ -185,7 +190,7 @@ class skimFineTRGEventsPyModule(b2.Module):
 
 class skimLowEventT0EventsPyModule(b2.Module):
     """
-    returns True if |EventT0| is smaller than a selected value
+    returns True if abs(EventT0) is smaller than a selected value
     that can be set with set_maxEventT0(evtT0)
     """
 

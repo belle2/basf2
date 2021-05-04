@@ -296,7 +296,13 @@ You have to adjust the following parameters:
 
 Here's a complete example:
 
-``python3 analysis/scripts/fei/distributed.py -s kekcc -f /home/belle2/tkeck/basf2/analysis/examples/FEI/B_generic.py -w /gpfs/fs02/belle2/users/tkeck/Belle2Generic_20160222 -n 1000 -d /ghi/fs01/belle2/bdata/MC/fab/merge/release-00-05-03/DBxxxxxxxx/MC5/prod00000013/s00/e0002/4S/r00001/mixed/sub00/\*.root -d /ghi/fs01/belle2/bdata/MC/fab/merge/release-00-05-03/DBxxxxxxxx/MC5/prod00000014/s00/e0002/4S/r00001/charged/sub00/\*.root``
+.. code-block:: bash
+
+    python3 analysis/scripts/fei/distributed.py -s kekcc \
+        -f /home/belle2/tkeck/basf2/analysis/examples/FEI/B_generic.py \
+        -w /gpfs/fs02/belle2/users/tkeck/Belle2Generic_20160222 \
+        -n 1000 -d /ghi/fs01/belle2/bdata/MC/fab/merge/release-00-05-03/DBxxxxxxxx/MC5/prod00000013/s00/e0002/4S/r00001/mixed/sub00/\*.root \
+        -d /ghi/fs01/belle2/bdata/MC/fab/merge/release-00-05-03/DBxxxxxxxx/MC5/prod00000014/s00/e0002/4S/r00001/charged/sub00/\*.root
 
 Known issues when training the FEI on the KEK system:
 
@@ -326,6 +332,23 @@ The user is responsible for writing the input and output part of the steering fi
 The FEI algorithm itself just assumes that the DataStore already contains a valid reconstructed event, and starts to reconstruct B mesons. During the training the steering file is executed multiple times. The first time it is called with the Monte Carlo files you provided, and the complete DataStore is written out at the end. The following calls must receive the previous output as input.
 
 You can find up to date examples for training the specific or generic FEI, for the cases of Belle II of Belle converted data / MC in ``analysis/examples/FEI``.
+
+
+FEI Training on Grid
+####################
+
+In this section, we will consider, how to run the FEI training workflow on grid using `gbasf2` and `b2luigi`.
+
+.. seealso::
+
+    * `gbasf2 documentation <https://confluence.desy.de/display/BI/Computing+GBasf2>`_
+    * `b2luigi documentation <https://b2luigi.readthedocs.io/en/latest/>`_
+
+The example adapted for this section is ``analysis/examples/FEI/B_generic_train.py``, but feel free to adapt
+the changes presented for that example to your own needs.
+
+Software and Environment Setup
+******************************
 
 
 Troubleshooting

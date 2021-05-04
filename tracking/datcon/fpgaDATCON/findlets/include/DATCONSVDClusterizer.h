@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <framework/datastore/StoreArray.h>
 #include <vxd/geometry/GeoCache.h>
-
 #include <svd/calibration/SVDNoiseCalibrations.h>
 
 #include <string>

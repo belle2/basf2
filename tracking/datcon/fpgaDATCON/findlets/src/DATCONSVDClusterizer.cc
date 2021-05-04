@@ -9,14 +9,11 @@
  **************************************************************************/
 #include <tracking/datcon/fpgaDATCON/findlets/DATCONSVDClusterizer.h>
 #include <tracking/datcon/fpgaDATCON/entities/DATCONSVDDigit.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/dataobjects/VxdID.h>
-
 #include <framework/core/ModuleParamList.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 

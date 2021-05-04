@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/datcon/optimizedDATCON/filters/trackletFilters/TrackletFilterFactory.h>
-
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
@@ -16,7 +15,6 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
 
 TrackletFilterFactory::TrackletFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)

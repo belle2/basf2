@@ -11,17 +11,14 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/ModuleParamList.h>
-
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-
-#include <tracking/datcon/optimizedDATCON/entities/HitData.h>
-#include <tracking/spacePointCreation/SpacePoint.h>
 #include <framework/geometry/B2Vector3.h>
-#include <vxd/geometry/GeoCache.h>
-
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/BeamSpot.h>
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/datcon/optimizedDATCON/entities/HitData.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
+#include <vxd/geometry/GeoCache.h>
 
 #include <string>
 #include <vector>

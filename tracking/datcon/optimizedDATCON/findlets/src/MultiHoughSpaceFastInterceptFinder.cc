@@ -8,20 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/datcon/optimizedDATCON/findlets/MultiHoughSpaceFastInterceptFinder.h>
-
 #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
-
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <vxd/dataobjects/VxdID.h>
-
 #include <framework/core/ModuleParamList.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
-#include <iostream>
-
-#include <fstream>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

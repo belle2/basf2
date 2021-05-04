@@ -9,14 +9,11 @@
  **************************************************************************/
 #include <tracking/datcon/optimizedDATCON/findlets/ROIFinder.h>
 #include <tracking/datcon/optimizedDATCON/findlets/RawTrackCandCleaner.icc.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-
 #include <framework/logging/Logger.h>
 #include <framework/core/ModuleParamList.h>
 #include <framework/geometry/BFieldManager.h>
 #include <framework/geometry/B2Vector3.h>
-
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 

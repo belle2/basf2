@@ -11,9 +11,7 @@
 
 #include <tracking/datcon/optimizedDATCON/filters/relations/LayerRelationFilter.dcl.h>
 #include <tracking/trackFindingCDC/filters/base/RelationFilter.icc.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <vxd/geometry/GeoCache.h>

@@ -8,13 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/datcon/fpgaDATCON/findlets/FastInterceptFinder2DFPGA.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <vxd/dataobjects/VxdID.h>
-
 #include <framework/core/ModuleParamList.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
-// #include <iostream>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

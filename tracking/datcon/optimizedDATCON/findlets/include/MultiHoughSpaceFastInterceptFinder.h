@@ -17,10 +17,9 @@
 #include <vector>
 
 namespace Belle2 {
+  class ModuleParamList;
   class VxdID;
   class HitData;
-
-  class ModuleParamList;
 
   /**
    * Findlet for finding intersections of sinosoidal curves in the 2D Hough space by iteratively calling

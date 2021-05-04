@@ -10,7 +10,6 @@
 #include <tracking/datcon/optimizedDATCON/filters/relations/RelationFilterFactory.h>
 #include <tracking/datcon/optimizedDATCON/filters/relations/AngleAndTimeRelationFilter.h>
 #include <tracking/datcon/optimizedDATCON/filters/relations/SimpleRelationFilter.h>
-
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
@@ -18,7 +17,6 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
 
 RelationFilterFactory::RelationFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)

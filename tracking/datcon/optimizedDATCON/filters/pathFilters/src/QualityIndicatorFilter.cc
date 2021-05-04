@@ -9,12 +9,10 @@
  **************************************************************************/
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/QualityIndicatorFilter.h>
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
-
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorMC.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/geometry/BFieldManager.h>

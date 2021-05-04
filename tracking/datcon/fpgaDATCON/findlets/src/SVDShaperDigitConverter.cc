@@ -9,12 +9,9 @@
  **************************************************************************/
 #include <tracking/datcon/fpgaDATCON/findlets/SVDShaperDigitConverter.h>
 #include <tracking/datcon/fpgaDATCON/entities/DATCONSVDDigit.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <vxd/dataobjects/VxdID.h>
-
 #include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;

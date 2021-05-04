@@ -11,12 +11,9 @@
 
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/BasePathFilter.h>
 #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
-
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/BeamSpot.h>
-
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
-#include <math.h>
 
 namespace Belle2 {
   /// Filter for three hits using QualityEstimators plus a virtual IP.

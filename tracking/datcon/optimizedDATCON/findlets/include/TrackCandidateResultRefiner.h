@@ -10,10 +10,8 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
 #include <tracking/datcon/optimizedDATCON/findlets/TrackCandidateOverlapResolver.h>
-
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <string>

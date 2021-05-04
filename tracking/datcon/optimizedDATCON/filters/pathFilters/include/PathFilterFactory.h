@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/BasePathFilter.h>
-
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {

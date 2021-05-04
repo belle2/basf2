@@ -12,8 +12,6 @@
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/BasePathFilter.h>
 #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
 
-#include <math.h>
-
 namespace Belle2 {
   /// TODO: Base filter for five hits.
   /// Basic working principle: use ThreeHitVariables and provide three B2Vector3D to each variable.

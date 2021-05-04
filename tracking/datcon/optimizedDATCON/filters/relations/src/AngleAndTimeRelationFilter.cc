@@ -9,7 +9,6 @@
  **************************************************************************/
 #include <tracking/datcon/optimizedDATCON/filters/relations/AngleAndTimeRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 

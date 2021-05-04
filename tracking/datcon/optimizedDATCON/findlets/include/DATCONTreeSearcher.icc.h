@@ -10,15 +10,12 @@
 #pragma once
 
 #include <tracking/datcon/optimizedDATCON/findlets/DATCONTreeSearcher.dcl.h>
-
+#include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/logging/Logger.h>
-
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/Range.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-
-#include <framework/core/ModuleParamList.templateDetails.h>
 
 namespace Belle2 {
   template <class AHit, class APathFilter, class AResult>

@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 

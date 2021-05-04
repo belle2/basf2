@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-
 #include <tracking/datcon/optimizedDATCON/findlets/SpacePointLoaderAndPreparer.h>
 #include <tracking/datcon/optimizedDATCON/findlets/MultiHoughSpaceFastInterceptFinder.h>
 #include <tracking/datcon/optimizedDATCON/findlets/SingleHoughSpaceFastInterceptFinder.h>

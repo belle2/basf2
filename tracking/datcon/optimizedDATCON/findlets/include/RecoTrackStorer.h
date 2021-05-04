@@ -12,18 +12,17 @@
 #include <framework/datastore/StoreArray.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
-
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
 
 #include <string>
 #include <vector>
 
 namespace Belle2 {
+  class ModuleParamList;
   class SpacePointTrackCand;
   class SpacePoint;
   class RecoTrack;
   class SVDCluster;
-  class ModuleParamList;
 
   /// Store RecoTracks into StoreArray
   class RecoTrackStorer : public TrackFindingCDC::Findlet<SpacePointTrackCand, const SpacePoint* const> {

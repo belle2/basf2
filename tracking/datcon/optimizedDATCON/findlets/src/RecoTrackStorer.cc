@@ -8,32 +8,25 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/datcon/optimizedDATCON/findlets/RecoTrackStorer.h>
-
 #include <framework/core/ModuleParamList.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/geometry/BFieldManager.h>
-
 #include <tracking/dataobjects/RecoTrack.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
-
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorMC.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
-
-#include <iostream>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 RecoTrackStorer::~RecoTrackStorer() = default;
-
 
 RecoTrackStorer::RecoTrackStorer() : Super()
 {

@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-
 #include <tracking/datcon/fpgaDATCON/findlets/SVDShaperDigitConverter.h>
 #include <tracking/datcon/fpgaDATCON/findlets/DATCONSVDClusterizer.h>
 #include <tracking/datcon/fpgaDATCON/findlets/DATCONSVDClusterLoaderAndPreparer.h>
@@ -18,7 +17,6 @@
 #include <tracking/datcon/fpgaDATCON/findlets/ToPXDExtrapolator.h>
 #include <tracking/datcon/fpgaDATCON/findlets/ROICalculator.h>
 #include <tracking/datcon/fpgaDATCON/entities/DATCONSVDDigit.h>
-
 #include <svd/dataobjects/SVDCluster.h>
 
 #include <string>

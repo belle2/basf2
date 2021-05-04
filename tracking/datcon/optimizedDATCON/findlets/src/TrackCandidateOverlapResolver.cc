@@ -8,21 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/datcon/optimizedDATCON/findlets/TrackCandidateOverlapResolver.h>
-
 #include <framework/core/ModuleParamList.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
-
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
-
 #include <tracking/trackFindingVXD/trackSetEvaluator/OverlapMatrixCreator.h>
 #include <tracking/trackFindingVXD/trackSetEvaluator/HopfieldNetwork.h>
 #include <tracking/trackFindingVXD/trackSetEvaluator/Scrooge.h>
 #include <tracking/trackFindingVXD/trackSetEvaluator/OverlapResolverNodeInfo.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-
-#include <iostream>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

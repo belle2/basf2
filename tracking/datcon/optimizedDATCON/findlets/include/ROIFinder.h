@@ -10,12 +10,10 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/geometry/B2Vector3.h>
-
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/BeamSpot.h>
 

@@ -10,17 +10,15 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-
 #include <framework/datastore/StoreArray.h>
-
 #include <svd/dataobjects/SVDCluster.h>
 
 #include <string>
 #include <vector>
 
 namespace Belle2 {
-  class SpacePointTrackCand;
   class ModuleParamList;
+  class SpacePointTrackCand;
 
   /// Findlet for rejecting wrong SpacePointTrackCands and for removing bad hits.
   class TrackCandidateOverlapResolver : public TrackFindingCDC::Findlet<SpacePointTrackCand> {

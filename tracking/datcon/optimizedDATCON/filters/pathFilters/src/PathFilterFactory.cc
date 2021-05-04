@@ -15,7 +15,6 @@
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/FiveHitFilter.h>
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/TwoHitVirtualIPQIFilter.h>
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/QualityIndicatorFilter.h>
-
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
@@ -23,7 +22,6 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
 
 PathFilterFactory::PathFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)

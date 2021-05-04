@@ -13,8 +13,6 @@
 #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
 
-#include <math.h>
-
 namespace Belle2 {
   /// Filter for three hits using QualityEstimators.
   class QualityIndicatorFilter : public BasePathFilter {

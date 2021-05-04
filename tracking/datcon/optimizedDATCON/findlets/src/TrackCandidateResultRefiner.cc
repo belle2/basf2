@@ -8,21 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/datcon/optimizedDATCON/findlets/TrackCandidateResultRefiner.h>
-
 #include <framework/core/ModuleParamList.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/geometry/BFieldManager.h>
-
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
-
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorMC.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-
-#include <iostream>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

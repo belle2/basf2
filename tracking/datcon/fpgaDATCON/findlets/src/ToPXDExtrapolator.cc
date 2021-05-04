@@ -8,15 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/datcon/fpgaDATCON/findlets/ToPXDExtrapolator.h>
-
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
 #include <framework/gearbox/Unit.h>
-
 #include <framework/core/ModuleParamList.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 

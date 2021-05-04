@@ -11,6 +11,7 @@
 
 #include <tracking/datcon/optimizedDATCON/findlets/OnHitApplier.dcl.h>
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
+
 #include <vector>
 
 namespace Belle2 {

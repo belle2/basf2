@@ -12,11 +12,8 @@
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/BasePathFilter.h>
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/ThreeHitVariables.h>
 #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
-
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/BeamSpot.h>
-
-#include <math.h>
 
 namespace Belle2 {
   /// Filter for two hits plus a virtual IP.

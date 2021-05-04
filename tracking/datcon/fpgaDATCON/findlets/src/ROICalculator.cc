@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/datcon/fpgaDATCON/findlets/ROICalculator.h>
-
 #include <framework/core/ModuleParamList.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>

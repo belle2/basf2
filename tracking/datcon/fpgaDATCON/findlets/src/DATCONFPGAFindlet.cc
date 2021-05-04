@@ -8,10 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/datcon/fpgaDATCON/findlets/DATCONFPGAFindlet.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/logging/Logger.h>
-
 #include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
@@ -24,12 +22,9 @@ DATCONFPGAFindlet::DATCONFPGAFindlet()
   addProcessingSignalListener(&m_digitConverter);
   addProcessingSignalListener(&m_uClusterizer);
   addProcessingSignalListener(&m_vClusterizer);
-
   addProcessingSignalListener(&m_clusterLoaderAndPreparer);
-
   addProcessingSignalListener(&m_uInterceptFinder);
   addProcessingSignalListener(&m_vInterceptFinder);
-
   addProcessingSignalListener(&m_toPXDExtrapolator);
   addProcessingSignalListener(&m_ROICalculator);
 }

@@ -11,7 +11,6 @@
 
 #include <tracking/datcon/optimizedDATCON/filters/relations/BaseRelationFilter.h>
 #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
-#include <math.h>
 
 namespace Belle2 {
   /// Base filter for CKF PXD states

@@ -13,8 +13,6 @@
 #include <tracking/datcon/optimizedDATCON/filters/pathFilters/FourHitVariables.h>
 #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
 
-#include <math.h>
-
 namespace Belle2 {
   /// Filter for four hits.
   /// Basic working principle: use FourHitVariables and ThreeHitVariables and provide four (three B2Vector3D) to each variable.

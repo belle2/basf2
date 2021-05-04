@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/datcon/optimizedDATCON/entities/HitData.h>
-
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <vxd/dataobjects/VxdID.h>
 
@@ -19,6 +18,7 @@
 
 namespace Belle2 {
   class SpacePoint;
+
   /**
    * Select hits to be analysed in the Hough Space intercept finder for a given layer 6 sensor based on the simple sensor friend map.
    */

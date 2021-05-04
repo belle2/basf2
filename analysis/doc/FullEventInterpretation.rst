@@ -350,6 +350,86 @@ the changes presented for that example to your own needs.
 Software and Environment Setup
 ******************************
 
+The following software packages need an installation: local `basf2`, `luigi`, `b2luigi`, and `gbasf2`.
+
+In case the required developments are not merged into a `basf2` release yet, the first step would be to setup a local `basf2` development directory, which is also documented in 
+:ref:`build/tools_doc/index-01-tools:Development Setup`. The easiest way to do that is by performing the following commands:
+
+
+.. code-block:: bash
+
+    source /cvmfs/belle.cern.ch/tools/b2setup
+    cd </path/to/your/work/directory>
+    b2code-create development
+    cd development; b2setup
+
+After this, you would need to merge in the changes required to run on grid from the branch
+``feature/BII-2765-make-fei-great-again-training-grid-compatible-v2``:
+
+.. code-block:: bash
+
+    git fetch origin
+    git merge origin/feature/BII-2765-make-fei-great-again-training-grid-compatible-v2
+
+You can monitor the changes and updates for this branch by looking at the JIRA issue `BII-2765 <https://agira.desy.de/browse/BII-2765>`_.
+There you would also see, whether it is already merged into a certain release or not.
+
+The last set of commands to setup `basf2` is compiling everything. It is best to do this using multiple CPU's,
+so please check beforehand, how many you can use in parallel on your machine.
+
+.. code-block:: bash
+
+    scons -j <number-of-available-cpus>
+
+The next step is to setup the software packages `luigi` and `b2luigi`. To profit from latest
+developments, feel free to checkout the packages directly from github, as will be documented
+further below. You can also use particular releases of these packages to be installed with `pip`.
+Commands to install the two packages in your work directory from git are:
+
+.. code-block:: bash
+
+    cd </path/to/your/work/directory>
+    mkdir -p sw; pushd sw
+    git clone https://github.com/spotify/luigi.git
+    git clone https://github.com/nils-braun/b2luigi.git
+    popd;
+
+After this, you would need to setup the environment for ``python`` properly for these two packages
+with the following commands (they work only for ``bash``):
+
+.. code-block:: bash
+
+    export PATH="$(readlink -f sw)/luigi/bin:$PATH"
+    export PYTHONPATH="$(readlink -f sw)/luigi:$(readlink -f sw)/b2luigi:$PYTHONPATH"
+
+The last step is to install `gbasf2`. For that purpose, please switch to a new terminal window with fresh environment
+on your machine, and follow the steps for `Gbasf2 installation <https://confluence.desy.de/display/BI/Computing+GBasf2#ComputingGBasf2-gBasf2installationprocedure>`_.
+
+In the following, adaptions for `gbasf2` package will be discussed, which are required, in case a corresponding JIRA issue
+is not resolved in the release used in your setup.
+
+* JIRA issue `BIIDCD-1260 <https://agira.desy.de/projects/BIIDCD/issues/BIIDCD-1260>`_. Please follow the procedure to adapt ``BelleDIRAC/gbasf2/lib/job/gbasf2helper.py`` as given in the corresponding pull request, such that additional non-basf2 inputs uploaded to SE's are recognized properly and downloaded to the batch node.
+* JIRA issue `BIIDCO-3332 <https://agira.desy.de/projects/BIIDCO/issues/BIIDCO-3332>`_. Please follow the procedure to adapt ``BelleDIRAC/gbasf2/lib/basf2helper.py`` as given in the corresponding pull request, such that a too long printout from FEI initialization is not leading to a stalled job, which is then marked as failed.
+* JIRA issue `BIIDCD-1256 <https://agira.desy.de/projects/BIIDCD/issues/BIIDCD-1256>`_. Please incorporate the changes documented further below to be able to upload non-basf2 data to remote SE's on grid.
+
+Within the file ``BelleDIRAC/gbasf2/lib/ds/manager.py`` in function ``putDatasetMetadata(...)``, the lines
+
+.. code-block:: python
+
+            experiment_min, experiment_max = min(experiment_range), max(experiment_range)
+            run_min, run_max = min(run_range), max(run_range)
+
+should be replaced with:
+
+.. code-block:: python
+
+            if len(experiment_range) > 0 and len(run_range) > 0:
+                experiment_min, experiment_max = min(experiment_range), max(experiment_range)
+                run_min, run_max = min(run_range), max(run_range)
+            else:
+                experiment_min, experiment_max, run_min, run_max = -1, -1, -1, -1
+
+
 
 Troubleshooting
 ###############

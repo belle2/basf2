@@ -962,13 +962,13 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Generated tau decay information");
     REGISTER_VARIABLE("tauPlusMCMode", tauPlusMcMode,
-                      "Decay ID for the positive tau lepton in a tau pair generated event.")
+                      "[Eventbased] Decay ID for the positive tau lepton in a tau pair generated event.")
     REGISTER_VARIABLE("tauMinusMCMode", tauMinusMcMode,
-                      "Decay ID for the negative tau lepton in a tau pair generated event.")
+                      "[Eventbased] Decay ID for the negative tau lepton in a tau pair generated event.")
     REGISTER_VARIABLE("tauPlusMCProng", tauPlusMcProng,
-                      "Prong for the positive tau lepton in a tau pair generated event.")
+                      "[Eventbased] Prong for the positive tau lepton in a tau pair generated event.")
     REGISTER_VARIABLE("tauMinusMCProng", tauMinusMcProng,
-                      "Prong for the negative tau lepton in a tau pair generated event.")
+                      "[Eventbased] Prong for the negative tau lepton in a tau pair generated event.")
 
     VARIABLE_GROUP("MC particle seen in subdetectors");
     REGISTER_VARIABLE("isReconstructible", isReconstructible,

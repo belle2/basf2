@@ -58,10 +58,12 @@ class SteeringFileTest(unittest.TestCase):
                 scripts (must end in .py)
             broken (list(str)): (optional) names of scripts that are known to
                 be broken and can be skipped
-            expensive_tests (list(str)): (optional) names of scripts that take
-                longer and should e.g. not run on bamboo
             additional_arguments (list(str)): (optional) additional arguments
                 for basf2 to be passed when testing the scripts
+            expensive_tests (list(str)): (optional) names of scripts that take
+                longer and should e.g. not run on bamboo
+            skip_in_light (list(str)): (optional) names of scripts that have to
+                be excluded in light builds
             change_working_directory: Change to path_to_glob for execution
         """
         if additional_arguments is None:

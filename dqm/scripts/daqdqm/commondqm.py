@@ -29,7 +29,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                      For dqm_mode == "l1_passthrough" only the DQM modules which should run on the
                             L1 passthrough events should be added
     @param create_hlt_unit_histograms: Parameter for SoftwareTiggerHLTDQMModule.
-                                       Should be True only when running on the HLT servers
+                                         Should be True only when running on the HLT servers
     """
     assert dqm_mode in ["dont_care", "all_events", "filtered", "before_filter", "l1_passthrough"]
     # Check components.
@@ -101,7 +101,97 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                         createHLTUnitHistograms=create_hlt_unit_histograms,
                         )
 
-    # SVD
+    if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
+        # HLT
+        hlt_trigger_lines_in_plot = []
+        hlt_skim_lines_in_plot = []
+
+        hlt_trigger_lines_per_unit_in_plot = [
+            "ge3_loose_tracks_inc_1_tight_not_ee2leg",
+            "Elab_gt_0.5_plus_2_others_with_Elab_gt_0.18_plus_no_clust_with_Ecms_gt_2.0",
+            "selectee",
+            "Estargt2_GeV_cluster",
+        ]
+        cutResultIdentifiers = {}
+
+        from softwaretrigger import filter_categories, skim_categories
+
+        filter_cat = [method for method in dir(filter_categories) if method.startswith('__') is False if method is not 'RESULTS']
+        skim_cat = [method for method in dir(skim_categories) if method.startswith('__') is False]
+
+        def read_lines(category):
+            return [i.split(" ", 1)[1].replace(" ", "_") for i in category]
+
+        for i in filter_cat:
+            cutResultIdentifiers[i] = {"filter": read_lines(getattr(filter_categories, i))}
+            hlt_trigger_lines_in_plot += read_lines(getattr(filter_categories, i))
+
+        for i in skim_cat:
+            cutResultIdentifiers[i] = {"skim": read_lines(getattr(skim_categories, i))}
+            hlt_skim_lines_in_plot += read_lines(getattr(skim_categories, i))
+
+        cutResultIdentifiers["skim"] = {"skim": hlt_skim_lines_in_plot}
+        cutResultIdentifiers["filter"] = {"filter": hlt_trigger_lines_in_plot}
+
+        additionalL1Identifiers = [
+            'ffy',
+            'fyo',
+            'c4',
+            'hie',
+            'mu_b2b',
+            'mu_eb2b',
+            'beklm',
+            'eklm2',
+            'cdcklm1',
+            'seklm1',
+            'ieklm1',
+            'ecleklm1',
+            'fso',
+            'fioiecl1',
+            'ff30',
+            'stt',
+            'ioiecl1',
+            'ioiecl2',
+            'lml1',
+            'lml2',
+            'lml3',
+            'lml4',
+            'lml5',
+            'lml6',
+            'lml7',
+            'lml8',
+            'lml9',
+            'lml10',
+            'lml12',
+            'lml13',
+            'bhapur']
+
+        # Default plot
+        path.add_module(
+            "SoftwareTriggerHLTDQM",
+            cutResultIdentifiers=cutResultIdentifiers,
+            l1Identifiers=["fff", "ffo", "lml0", "ffb", "fp"],
+            additionalL1Identifiers=additionalL1Identifiers,
+            createHLTUnitHistograms=create_hlt_unit_histograms,
+            cutResultIdentifiersPerUnit=hlt_trigger_lines_per_unit_in_plot,
+            pathLocation="after filter",
+        )
+        # Skim plots where bhabha contamination is removed
+        path.add_module(
+            "SoftwareTriggerHLTDQM",
+            cutResultIdentifiers={
+                "skim": {"skim": hlt_skim_lines_in_plot},
+            },
+            cutResultIdentifiersIgnored={
+                "skim": [
+                    "accept_bhabha_all",
+                ]
+            },
+            createTotalResultHistograms=False,
+            createExpRunEventHistograms=False,
+            histogramDirectoryName="softwaretrigger_skim_nobhabha",
+        ).set_name("SoftwareTriggerHLTDQM_skim_nobhabha")
+
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
         # SVD DATA FORMAT
         if components is None or 'SVD' in components:
@@ -135,7 +225,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     if (components is None or 'TOP' in components) and (dqm_mode in ["dont_care", "filtered"]):
         topdqm = b2.register_module('TOPDQM')
         path.add_module(topdqm)
-
     # KLM
     if (components is None or 'KLM' in components) and (dqm_mode in ["dont_care", "filtered"]):
         klmdqm = b2.register_module("KLMDQM")
@@ -182,7 +271,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             path.add_module('TRGCDCT3DDQM', T3DMOD=mod_t3d)
         # CDCTriggerNeuro
         path.add_module('CDCTriggerNeuroDQM')
-
     # TRG after skim
     if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care", "filtered"]):
         # TRGGDL
@@ -203,11 +291,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     if (components is None or 'ARICH' in components) and (dqm_mode in ["dont_care", "filtered"]):
         path.add_module('ARICHDQM')
 
-    # PhysicsObjectsDQM
     if dqm_mode in ["dont_care", "filtered"]:
+        # PhysicsObjectsDQM
         add_analysis_dqm(path)
-
-    # MiraBelle
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         add_mirabelle_dqm(path)
 

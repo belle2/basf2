@@ -21,7 +21,7 @@ def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode, create
                           dqm_mode=dqm_mode, create_hlt_unit_histograms=create_hlt_unit_histograms)
     elif run_type == constants.RunTypes.cosmic:
         add_cosmic_dqm(path, components=components, dqm_environment=dqm_environment,
-                       dqm_mode=dqm_mode, create_hlt_unit_histograms=create_hlt_unit_histograms)
+                       dqm_mode=dqm_mode)
     else:
         basf2.B2FATAL("Run type {} not supported.".format(run_type))
 

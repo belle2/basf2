@@ -54,7 +54,7 @@ void DQMHistAnalysisHLTModule::initialize()
 
   m_hEfficiency = {
     new TCanvas("HLT/Ratio"),
-    new TH1F("Ratio", "Ratio of Tags to HLT triggered events", 1, 0, 0)
+    new TH1F("Ratio", "Retention of selected HLT skims", 1, 0, 0)
   };
   m_hEfficiencyTotal = {
     new TCanvas("HLT/RatioTotal"),
@@ -91,6 +91,7 @@ void DQMHistAnalysisHLTModule::initialize()
     histogram->SetDirectory(0);
     histogram->SetOption("bar");
     histogram->SetFillStyle(0);
+    histogram->SetMinimum(0);
     histogram->SetStats(false);
     histogram->Draw("hist");
   }

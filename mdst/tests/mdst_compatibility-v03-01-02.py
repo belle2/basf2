@@ -20,7 +20,12 @@ CHANGES since release-03-01-02:
   + ndf
   + chi2
 - TRGSummary:
-  * getTimQuality added
+  + getTimQuality added
+  + isPoissonInInjectionVeto()
+  * added getters to map bit names to numbers (getInputBitNumber, getOutputBitNumber)
+    The mapping is from the database and doesn't affect mdst content and is thus not tested here.
+  + getInputBitNumber added
+  + getOutputBitNumber added
 - Particle masses:
   * The particle masses have been updated to PDG 2020. As a result, the
     energies corresponding to the measured momenta became slightly different.

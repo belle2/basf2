@@ -6,7 +6,7 @@ import collections
 
 import basf2
 from caf.utils import ExpRun, IoV
-from prompt import CalibrationSettings
+from prompt import CalibrationSettings, input_data_filters
 from prompt.utils import events_in_basf2_file
 
 ##############################
@@ -24,6 +24,15 @@ settings = CalibrationSettings(
     description=__doc__,
     input_data_formats=['raw'],
     input_data_names=['raw_beam', 'raw_cosmic', 'raw_physics'],
+    input_data_filters={
+        'raw_beam': [input_data_filters['Run Type']['beam'],
+                     input_data_filters['Data Quality Tag']['Good Or Recoverable']],
+        'raw_cosmic': [input_data_filters['Run Type']['cosmic'],
+                       input_data_filters['Data Quality Tag']['Good Or Recoverable']],
+        'raw_physics': [input_data_filters['Run Type']['physics'],
+                        f"NOT {input_data_filters['Data Tag']['random_calib']}",
+                        input_data_filters['Data Quality Tag']['Good Or Recoverable']]
+    },
     depends_on=[])
 
 ##############################

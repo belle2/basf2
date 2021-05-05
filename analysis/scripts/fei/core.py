@@ -74,7 +74,6 @@ import re
 import functools
 import subprocess
 import multiprocessing
-import pickle
 
 # Simple object containing the output of fei
 FeiState = collections.namedtuple('FeiState', 'path, stage, plists')
@@ -309,7 +308,13 @@ class PreReconstruction:
 
                 if len(channel.daughters) == 1:
                     ma.cutAndCopyList(channel.name, channel.daughters[0], channel.preCutConfig.userCut, writeOut=True, path=path)
-                    ma.variablesToExtraInfo(channel.name, {f'constant({channel.decayModeID})': 'decayModeID'}, path=path)
+                    v2EI = basf2.register_module('VariablesToExtraInfo')
+                    v2EI.set_name('VariablesToExtraInfo_' + channel.name)
+                    v2EI.param('particleList', channel.name)
+                    v2EI.param('variables', {f'constant({channel.decayModeID})': 'decayModeID'})
+                    # suppress warning that decay mode ID won't be overwritten if it already exists
+                    v2EI.set_log_level(basf2.logging.log_level.ERROR)
+                    path.add_module(v2EI)
                 else:
                     ma.reconstructDecay(channel.decayString, channel.preCutConfig.userCut, channel.decayModeID,
                                         writeOut=True, path=path)
@@ -446,6 +451,8 @@ class PostReconstruction:
                     expert.param('identifier', self.config.prefix + '_' + channel.label)
                 expert.param('extraInfoName', 'SignalProbability')
                 expert.param('listNames', [channel.name])
+                # suppress warning that signal probability won't be overwritten if it already exists
+                expert.set_log_level(basf2.logging.log_level.ERROR)
                 path.add_module(expert)
 
                 uniqueSignal = basf2.register_module('TagUniqueSignal')
@@ -453,6 +460,8 @@ class PostReconstruction:
                 uniqueSignal.param('target', channel.mvaConfig.target)
                 uniqueSignal.param('extraInfoName', 'uniqueSignal')
                 uniqueSignal.set_name('TagUniqueSignal_' + channel.name)
+                # suppress warning that unique signal extra info won't be overwritten if it already exists
+                uniqueSignal.set_log_level(basf2.logging.log_level.ERROR)
                 path.add_module(uniqueSignal)
 
                 if self.config.monitor:

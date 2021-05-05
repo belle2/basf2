@@ -20,6 +20,7 @@ from skimExpertFunctions import BaseSkim, _sphinxify_decay, fancy_skim_header
 from variables import variables as vm
 
 __liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 def _merge_boolean_dicts(*dicts):
@@ -307,6 +308,7 @@ class feiHadronicB0(BaseFEISkim):
         event-level cuts made before applying the FEI.
     """
     __description__ = "FEI-tagged neutral :math:`B`'s decaying hadronically."
+    validation_sample = _VALIDATION_SAMPLE
 
     FEIChannelArgs = {
         "neutralB": True,
@@ -329,50 +331,43 @@ class feiHadronicB0(BaseFEISkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
 
-        vm.addAlias("d0_massDiff", "daughter(0,massDifference(0))")
-        vm.addAlias("d0_M", "daughter(0,M)")
-        vm.addAlias("nDaug", "countDaughters(1>0)")  # Dummy cut so all daughters are selected.
+        vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
+        vm.addAlias('log10_sigProb', 'log10(extraInfo(SignalProbability))')
+        vm.addAlias('d0_massDiff', 'daughter(0,massDifference(0))')
+        vm.addAlias('d0_M', 'daughter(0,M)')
+        vm.addAlias('decayModeID', 'extraInfo(decayModeID)')
+        vm.addAlias('nDaug', 'countDaughters(1>0)')  # Dummy cut so all daughters are selected.
 
         histogramFilename = f"{self}_Validation.root"
-        email = "Phil Grace <philip.grace@adelaide.edu.au>"
-        SkimList = self.SkimLists[0]
-
-        variables_1d = [
-            ("sigProb", 100, 0.0, 1.0, "Signal probability", email,
-             "Signal probability of the reconstructed tag B candidates",
-             "Most around zero, with a tail at non-zero values.", "Signal probability", "Candidates", "logy"),
-            ("nDaug", 6, 0.0, 6, "Number of daughters of tag B", email,
-             "Number of daughters of tag B", "Some distribution of number of daughters", "n_{daughters}", "Candidates"),
-            ("d0_massDiff", 100, 0.0, 0.5, "Mass difference of D* and D", email,
-             "Mass difference of D^{*} and D", "Peak at 0.14 GeV", "m(D^{*})-m(D) [GeV]", "Candidates", "shifter"),
-            ("d0_M", 100, 0.0, 3.0, "Mass of zeroth daughter (D* or D)", email,
-             "Mass of zeroth daughter of tag B (either a $D^{*}$ or a D)", "Peaks at 1.86 GeV and 2.00 GeV",
-             "m(D^{(*)}) [GeV]", "Candidates", "shifter"),
-            ("deltaE", 100, -0.2, 0.2, "#Delta E", email,
-             "$\\Delta E$ of event", "Peak around zero", "#Delta E [GeV]", "Candidates"),
-            ("Mbc", 100, 5.2, 5.3, "Mbc", email,
-             "Beam-constrained mass of event", "Peaking around B mass (5.28 GeV)", "M_{bc} [GeV]", "Candidates")
-        ]
-
-        variables_2d = [
-            ("deltaE", 100, -0.2, 0.2, "Mbc", 100, 5.2, 5.3, "Mbc vs deltaE", email,
-             "Plot of the $\\Delta E$ of the event against the beam constrained mass",
-             "Peak of $\\Delta E$ around zero, and $M_{bc}$ around B mass (5.28 GeV)",
-             "#Delta E [GeV]", "M_{bc} [GeV]", "colz, shifter"),
-            ("decayModeID", 26, 0, 26, "log10_sigProb", 100, -3.0, 0.0,
-             "Signal probability for each decay mode ID", email,
-             "Signal probability for each decay mode ID",
-             "Some distribtuion of candidates in the first few decay mode IDs",
-             "Decay mode ID", "#log_10(signal probability)", "colz")
-        ]
 
         create_validation_histograms(
             rootfile=histogramFilename,
-            particlelist=SkimList,
-            variables_1d=variables_1d,
-            variables_2d=variables_2d,
-            path=path
-        )
+            particlelist='B0:generic',
+            variables_1d=[
+                ('sigProb', 100, 0.0, 1.0, 'Signal probability', __liaison__,
+                 'Signal probability of the reconstructed tag B candidates',
+                 'Most around zero, with a tail at non-zero values.', 'Signal probability', 'Candidates', 'logy'),
+                ('nDaug', 6, 0.0, 6, 'Number of daughters of tag B', __liaison__,
+                 'Number of daughters of tag B', 'Some distribution of number of daughters', 'n_{daughters}', 'Candidates'),
+                ('d0_massDiff', 100, 0.0, 0.5, 'Mass difference of D* and D', __liaison__,
+                 'Mass difference of D^{*} and D', 'Peak at 0.14 GeV', 'm(D^{*})-m(D) [GeV]', 'Candidates', 'shifter'),
+                ('d0_M', 100, 0.0, 3.0, 'Mass of zeroth daughter (D* or D)', __liaison__,
+                 'Mass of zeroth daughter of tag B (either a $D^{*}$ or a D)', 'Peaks at 1.86 GeV and 2.00 GeV',
+                 'm(D^{(*)}) [GeV]', 'Candidates', 'shifter'),
+                ('deltaE', 40, -0.2, 0.2, '#Delta E', __liaison__,
+                 '$\\Delta E$ of event', 'Peak around zero', '#Delta E [GeV]', 'Candidates', 'shifter'),
+                ('Mbc', 40, 5.2, 5.3, 'Mbc', __liaison__,
+                 'Beam-constrained mass of event', 'Peaking around B mass (5.28 GeV)', 'M_{bc} [GeV]', 'Candidates', 'shifter')],
+            variables_2d=[('deltaE', 100, -0.2, 0.2, 'Mbc', 100, 5.2, 5.3, 'Mbc vs deltaE', __liaison__,
+                           'Plot of the $\\Delta E$ of the event against the beam constrained mass',
+                           'Peak of $\\Delta E$ around zero, and $M_{bc}$ around B mass (5.28 GeV)',
+                           '#Delta E [GeV]', 'M_{bc} [GeV]', 'colz'),
+                          ('decayModeID', 26, 0, 26, 'log10_sigProb', 100, -3.0, 0.0,
+                           'Signal probability for each decay mode ID', __liaison__,
+                           'Signal probability for each decay mode ID',
+                           'Some distribtuion of candidates in the first few decay mode IDs',
+                           'Decay mode ID', '#log_10(signal probability)', 'colz')],
+            path=path)
 
 
 @_FEI_skim_header("B+")
@@ -393,6 +388,7 @@ class feiHadronicBplus(BaseFEISkim):
         event-level cuts made before applying the FEI.
     """
     __description__ = "FEI-tagged charged :math:`B`'s decaying hadronically."
+    validation_sample = _VALIDATION_SAMPLE
 
     FEIChannelArgs = {
         "neutralB": False,
@@ -415,50 +411,43 @@ class feiHadronicBplus(BaseFEISkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
 
-        vm.addAlias("d0_massDiff", "daughter(0,massDifference(0))")
-        vm.addAlias("d0_M", "daughter(0,M)")
-        vm.addAlias("nDaug", "countDaughters(1>0)")  # Dummy cut so all daughters are selected.
+        vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
+        vm.addAlias('log10_sigProb', 'log10(extraInfo(SignalProbability))')
+        vm.addAlias('d0_massDiff', 'daughter(0,massDifference(0))')
+        vm.addAlias('d0_M', 'daughter(0,M)')
+        vm.addAlias('decayModeID', 'extraInfo(decayModeID)')
+        vm.addAlias('nDaug', 'countDaughters(1>0)')  # Dummy cut so all daughters are selected.
 
         histogramFilename = f"{self}_Validation.root"
-        email = "Phil Grace <philip.grace@adelaide.edu.au>"
-        SkimList = self.SkimLists[0]
-
-        variables_1d = [
-            ("sigProb", 100, 0.0, 1.0, "Signal probability", email,
-             "Signal probability of the reconstructed tag B candidates",
-             "Most around zero, with a tail at non-zero values.", "Signal probability", "Candidates", "logy"),
-            ("nDaug", 6, 0.0, 6, "Number of daughters of tag B", email,
-             "Number of daughters of tag B", "Some distribution of number of daughters", "n_{daughters}", "Candidates"),
-            ("d0_massDiff", 100, 0.0, 0.5, "Mass difference of D* and D", email,
-             "Mass difference of D^{*} and D", "Peak at 0.14 GeV", "m(D^{*})-m(D) [GeV]", "Candidates", "shifter"),
-            ("d0_M", 100, 0.0, 3.0, "Mass of zeroth daughter (D* or D)", email,
-             "Mass of zeroth daughter of tag B (either a $D^{*}$ or a D)", "Peaks at 1.86 GeV and 2.00 GeV",
-             "m(D^{(*)}) [GeV]", "Candidates", "shifter"),
-            ("deltaE", 100, -0.2, 0.2, "#Delta E", email,
-             "$\\Delta E$ of event", "Peak around zero", "#Delta E [GeV]", "Candidates"),
-            ("Mbc", 100, 5.2, 5.3, "Mbc", email,
-             "Beam-constrained mass of event", "Peaking around B mass (5.28 GeV)", "M_{bc} [GeV]", "Candidates")
-        ]
-
-        variables_2d = [
-            ("deltaE", 100, -0.2, 0.2, "Mbc", 100, 5.2, 5.3, "Mbc vs deltaE", email,
-             "Plot of the $\\Delta E$ of the event against the beam constrained mass",
-             "Peak of $\\Delta E$ around zero, and $M_{bc}$ around B mass (5.28 GeV)",
-             "#Delta E [GeV]", "M_{bc} [GeV]", "colz, shifter"),
-            ("decayModeID", 29, 0, 29, "log10_sigProb", 100, -3.0, 0.0,
-             "Signal probability for each decay mode ID", email,
-             "Signal probability for each decay mode ID",
-             "Some distribtuion of candidates in the first few decay mode IDs",
-             "Decay mode ID", "#log_10(signal probability)", "colz")
-        ]
 
         create_validation_histograms(
             rootfile=histogramFilename,
-            particlelist=SkimList,
-            variables_1d=variables_1d,
-            variables_2d=variables_2d,
-            path=path
-        )
+            particlelist='B+:generic',
+            variables_1d=[
+                ('sigProb', 100, 0.0, 1.0, 'Signal probability', __liaison__,
+                 'Signal probability of the reconstructed tag B candidates', 'Most around zero, with a tail at non-zero values.',
+                 'Signal probability', 'Candidates', 'logy'),
+                ('nDaug', 6, 0.0, 6, 'Number of daughters of tag B', __liaison__,
+                 'Number of daughters of tag B', 'Some distribution of number of daughters', 'n_{daughters}', 'Candidates'),
+                ('d0_massDiff', 100, 0.0, 0.5, 'Mass difference of D* and D', __liaison__,
+                 'Mass difference of D^{*} and D', 'Peak at 0.14 GeV', 'm(D^{*})-m(D) [GeV]', 'Candidates', 'shifter'),
+                ('d0_M', 100, 0.0, 3.0, 'Mass of zeroth daughter (D* or D)', __liaison__,
+                 'Mass of zeroth daughter of tag B (either a $D^{*}$ or a D)', 'Peaks at 1.86 GeV and 2.00 GeV',
+                 'm(D^{(*)}) [GeV]', 'Candidates', 'shifter'),
+                ('deltaE', 40, -0.2, 0.2, '#Delta E', __liaison__,
+                 '$\\Delta E$ of event', 'Peak around zero', '#Delta E [GeV]', 'Candidates', 'shifter'),
+                ('Mbc', 40, 5.2, 5.3, 'Mbc', __liaison__,
+                 'Beam-constrained mass of event', 'Peak around B mass (5.28 GeV)', 'M_{bc} [GeV]', 'Candidates', 'shifter')],
+            variables_2d=[('deltaE', 100, -0.2, 0.2, 'Mbc', 100, 5.2, 5.3, 'Mbc vs deltaE', __liaison__,
+                           'Plot of the $\\Delta E$ of the event against the beam constrained mass',
+                           'Peak of $\\Delta E$ around zero, and $M_{bc}$ around B mass (5.28 GeV)',
+                           '#Delta E [GeV]', 'M_{bc} [GeV]', 'colz'),
+                          ('decayModeID', 29, 0, 29, 'log10_sigProb', 100, -3.0, 0.0,
+                           'Signal probability for each decay mode ID', __liaison__,
+                           'Signal probability for each decay mode ID',
+                           'Some distribtuion of candidates in the first few decay mode IDs',
+                           'Decay mode ID', '#log_10(signal probability)', 'colz')],
+            path=path)
 
 
 @_FEI_skim_header("B0")
@@ -480,6 +469,7 @@ class feiSLB0(BaseFEISkim):
         event-level cuts made before applying the FEI.
     """
     __description__ = "FEI-tagged neutral :math:`B`'s decaying semileptonically."
+    validation_sample = _VALIDATION_SAMPLE
 
     FEIChannelArgs = {
         "neutralB": True,
@@ -504,48 +494,38 @@ class feiSLB0(BaseFEISkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
 
-        vm.addAlias("d0_massDiff", "daughter(0,massDifference(0))")
-        vm.addAlias("d0_M", "daughter(0,M)")
-        vm.addAlias("nDaug", "countDaughters(1>0)")  # Dummy cut so all daughters are selected.
+        vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
+        vm.addAlias('log10_sigProb', 'log10(extraInfo(SignalProbability))')
+        vm.addAlias('d0_massDiff', 'daughter(0,massDifference(0))')
+        vm.addAlias('d0_M', 'daughter(0,M)')
+        vm.addAlias('decayModeID', 'extraInfo(decayModeID)')
+        vm.addAlias('nDaug', 'countDaughters(1>0)')  # Dummy cut so all daughters are selected.
 
         histogramFilename = f"{self}_Validation.root"
-        email = "Phil Grace <philip.grace@adelaide.edu.au>"
-        SkimList = self.SkimLists[0]
-
-        variables_1d = [
-            ("sigProb", 100, 0.0, 1.0, "Signal probability", email,
-             "Signal probability of the reconstructed tag B candidates",
-             "Most around zero, with a tail at non-zero values.",
-             "Signal probability", "Candidates", "logy"),
-            ("nDaug", 6, 0.0, 6, "Number of daughters of tag B", email,
-             "Number of daughters of tag B", "Some distribution of number of daughters",
-             "n_{daughters}", "Candidates"),
-            ("cosThetaBetweenParticleAndNominalB", 100, -6.0, 4.0, "#cos#theta_{BY}", email,
-             "Cosine of angle between the reconstructed B and the nominal B",
-             "Distribution peaking between -1 and 1", "#cos#theta_{BY}", "Candidates"),
-            ("d0_massDiff", 100, 0.0, 0.5, "Mass difference of D* and D", email,
-             "Mass difference of $D^{*}$ and D", "Peak at 0.14 GeV", "m(D^{*})-m(D) [GeV]",
-             "Candidates", "shifter"),
-            ("d0_M", 100, 0.0, 3.0, "Mass of zeroth daughter (D* or D)", email,
-             "Mass of zeroth daughter of tag B (either a $D^{*}$ or a D)", "Peaks at 1.86 GeV and 2.00 GeV",
-             "m(D^{(*)}) [GeV]", "Candidates", "shifter")
-        ]
-
-        variables_2d = [
-            ("decayModeID", 8, 0, 8, "log10_sigProb", 100, -3.0, 0.0,
-             "Signal probability for each decay mode ID", email,
-             "Signal probability for each decay mode ID",
-             "Some distribtuion of candidates in the first few decay mode IDs",
-             "Decay mode ID", "#log_10(signal probability)", "colz")
-        ]
 
         create_validation_histograms(
             rootfile=histogramFilename,
-            particlelist=SkimList,
-            variables_1d=variables_1d,
-            variables_2d=variables_2d,
-            path=path
-        )
+            particlelist='B0:semileptonic',
+            variables_1d=[
+                ('sigProb', 100, 0.0, 1.0, 'Signal probability', __liaison__,
+                 'Signal probability of the reconstructed tag B candidates', 'Most around zero, with a tail at non-zero values.',
+                 'Signal probability', 'Candidates', 'logy'),
+                ('nDaug', 6, 0.0, 6, 'Number of daughters of tag B', __liaison__,
+                 'Number of daughters of tag B', 'Some distribution of number of daughters', 'n_{daughters}', 'Candidates'),
+                ('cosThetaBetweenParticleAndNominalB', 100, -6.0, 4.0, '#cos#theta_{BY}', __liaison__,
+                 'Cosine of angle between the reconstructed B and the nominal B', 'Distribution peaking between -1 and 1',
+                 '#cos#theta_{BY}', 'Candidates'),
+                ('d0_massDiff', 100, 0.0, 0.5, 'Mass difference of D* and D', __liaison__,
+                 'Mass difference of $D^{*}$ and D', 'Peak at 0.14 GeV', 'm(D^{*})-m(D) [GeV]', 'Candidates', 'shifter'),
+                ('d0_M', 100, 0.0, 3.0, 'Mass of zeroth daughter (D* or D)', __liaison__,
+                 'Mass of zeroth daughter of tag B (either a $D^{*}$ or a D)', 'Peaks at 1.86 GeV and 2.00 GeV',
+                 'm(D^{(*)}) [GeV]', 'Candidates', 'shifter')],
+            variables_2d=[('decayModeID', 8, 0, 8, 'log10_sigProb', 100, -3.0, 0.0,
+                           'Signal probability for each decay mode ID', __liaison__,
+                           'Signal probability for each decay mode ID',
+                           'Some distribtuion of candidates in the first few decay mode IDs',
+                           'Decay mode ID', '#log_10(signal probability)', 'colz')],
+            path=path)
 
 
 @_FEI_skim_header("B+")
@@ -567,6 +547,7 @@ class feiSLBplus(BaseFEISkim):
         event-level cuts made before applying the FEI.
     """
     __description__ = "FEI-tagged charged :math:`B`'s decaying semileptonically."
+    validation_sample = _VALIDATION_SAMPLE
 
     FEIChannelArgs = {
         "neutralB": False,
@@ -591,48 +572,38 @@ class feiSLBplus(BaseFEISkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
 
-        vm.addAlias("d0_massDiff", "daughter(0,massDifference(0))")
-        vm.addAlias("d0_M", "daughter(0,M)")
-        vm.addAlias("nDaug", "countDaughters(1>0)")  # Dummy cut so all daughters are selected.
+        vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
+        vm.addAlias('log10_sigProb', 'log10(extraInfo(SignalProbability))')
+        vm.addAlias('d0_massDiff', 'daughter(0,massDifference(0))')
+        vm.addAlias('d0_M', 'daughter(0,M)')
+        vm.addAlias('decayModeID', 'extraInfo(decayModeID)')
+        vm.addAlias('nDaug', 'countDaughters(1>0)')  # Dummy cut so all daughters are selected.
 
         histogramFilename = f"{self}_Validation.root"
-        email = "Phil Grace <philip.grace@adelaide.edu.au>"
-        SkimList = self.SkimLists[0]
-
-        variables_1d = [
-            ("sigProb", 100, 0.0, 1.0, "Signal probability", email,
-             "Signal probability of the reconstructed tag B candidates",
-             "Most around zero, with a tail at non-zero values.",
-             "Signal probability", "Candidates", "logy"),
-            ("nDaug", 6, 0.0, 6, "Number of daughters of tag B", email,
-             "Number of daughters of tag B", "Some distribution of number of daughters",
-             "n_{daughters}", "Candidates"),
-            ("cosThetaBetweenParticleAndNominalB", 100, -6.0, 4.0, "#cos#theta_{BY}", email,
-             "Cosine of angle between the reconstructed B and the nominal B",
-             "Distribution peaking between -1 and 1", "#cos#theta_{BY}", "Candidates"),
-            ("d0_massDiff", 100, 0.0, 0.5, "Mass difference of D* and D", email,
-             "Mass difference of $D^{*}$ and D", "Peak at 0.14 GeV", "m(D^{*})-m(D) [GeV]",
-             "Candidates", "shifter"),
-            ("d0_M", 100, 0.0, 3.0, "Mass of zeroth daughter (D* or D)", email,
-             "Mass of zeroth daughter of tag B (either a $D^{*}$ or a D)", "Peaks at 1.86 GeV and 2.00 GeV",
-             "m(D^{(*)}) [GeV]", "Candidates", "shifter")
-        ]
-
-        variables_2d = [
-            ("decayModeID", 8, 0, 8, "log10_sigProb", 100, -3.0, 0.0,
-             "Signal probability for each decay mode ID", email,
-             "Signal probability for each decay mode ID",
-             "Some distribtuion of candidates in the first few decay mode IDs",
-             "Decay mode ID", "#log_10(signal probability)", "colz")
-        ]
 
         create_validation_histograms(
             rootfile=histogramFilename,
-            particlelist=SkimList,
-            variables_1d=variables_1d,
-            variables_2d=variables_2d,
-            path=path
-        )
+            particlelist='B+:semileptonic',
+            variables_1d=[
+                ('sigProb', 100, 0.0, 1.0, 'Signal probability', __liaison__,
+                 'Signal probability of the reconstructed tag B candidates',
+                 'Most around zero, with a tail at non-zero values.', 'Signal probability', 'Candidates', 'logy'),
+                ('nDaug', 6, 0.0, 6, 'Number of daughters of tag B', __liaison__,
+                 'Number of daughters of tag B', 'Some distribution of number of daughters', 'n_{daughters}', 'Candidates'),
+                ('cosThetaBetweenParticleAndNominalB', 100, -6.0, 4.0, '#cos#theta_{BY}', __liaison__,
+                 'Cosine of angle between the reconstructed B and the nominal B', 'Distribution peaking between -1 and 1',
+                 '#cos#theta_{BY}', 'Candidates'),
+                ('d0_massDiff', 100, 0.0, 0.5, 'Mass difference of D* and D', __liaison__,
+                 'Mass difference of $D^{*}$ and D', 'Peak at 0.14 GeV', 'm(D^{*})-m(D) [GeV]', 'Candidates', 'shifter'),
+                ('d0_M', 100, 0.0, 3.0, 'Mass of zeroth daughter (D* or D)', __liaison__,
+                 'Mass of zeroth daughter of tag B (either a $D^{*}$ or a D)', 'Peaks at 1.86 GeV and 2.00 GeV',
+                 'm(D^{(*)}) [GeV]', 'Candidates', 'shifter')],
+            variables_2d=[('decayModeID', 8, 0, 8, 'log10_sigProb', 100, -3.0, 0.0,
+                           'Signal probability for each decay mode ID', __liaison__,
+                           'Signal probability for each decay mode ID',
+                           'Some distribtuion of candidates in the first few decay mode IDs',
+                           'Decay mode ID', '#log_10(signal probability)', 'colz')],
+            path=path)
 
 
 @_FEI_skim_header(["B0", "B+"])

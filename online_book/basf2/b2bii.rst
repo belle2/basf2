@@ -423,7 +423,7 @@ The Klongs are stored in the default ``K_L0:mdst``.
    * Be careful with particle lists and variables in your analysis.
    * **Never use** `fillParticleList` **to create neutral final state particles!!**
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Author of this lesson
 

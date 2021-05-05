@@ -47,6 +47,8 @@ DQMHistAnalysisSVDGeneralModule::DQMHistAnalysisSVDGeneralModule()
            float(0));
   addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
   addParam("statThreshold", m_statThreshold, "Minimal number of events to compare histograms", int(10000));
+  addParam("timeThreshold", m_timeThreshold, "Acceptable difference between mean of cluster time for present and reference run",
+           float(4)); // 4 ns
   addParam("refMCTP", m_refMCTP, "Mean of Cluster Time from Physics reference run", float(-1.939)); // e14r826
   addParam("refRCTP", m_refRCTP, "RMS of Cluster Time from Physics reference run", float(15.79)); // e14r826
   addParam("refMCTC", m_refMCTC, "Mean of Cluster Time from Cosmic reference run", float(6.106)); // e14r1182
@@ -328,25 +330,25 @@ void DQMHistAnalysisSVDGeneralModule::event()
   if (m_h != NULL) {
     m_hClusterOnTrackTime_L456V.Clear();
     m_h->Copy(m_hClusterOnTrackTime_L456V);
-    m_hClusterOnTrackTime_L456V.SetName("ClusterOnTrackTimeL456V");
     m_hClusterOnTrackTime_L456V.SetTitle("ClusterOnTrack Time L456V " + runID);
     bool hasError = false;
     if (nEvents > m_statThreshold) {
       if (runtype == "physics") {
-        float threshold_physics = m_refRCTP / sqrt(m_statThreshold);
         float difference_physics = fabs(m_hClusterOnTrackTime_L456V.GetMean() - m_refMCTP);
-        if (difference_physics > threshold_physics) {
+        if (difference_physics > m_timeThreshold) {
           hasError = true;
         }
       } else if (runtype == "cosmic") {
-        float threshold_cosmic = m_refRCTC / sqrt(m_statThreshold);
         float difference_cosmic = fabs(m_hClusterOnTrackTime_L456V.GetMean() - m_refMCTC);
-        if (difference_cosmic > threshold_cosmic) {
+        if (difference_cosmic > m_timeThreshold) {
           hasError = true;
         }
       } else {
         B2WARNING("Run type:" << runtype);
       }
+    } else {
+      m_cClusterOnTrackTime_L456V->SetFillColor(kGray);
+      m_cClusterOnTrackTime_L456V->SetFrameFillColor(10);
     }
     if (! hasError) {
       m_cClusterOnTrackTime_L456V->SetFillColor(kGreen);
@@ -507,6 +509,10 @@ void DQMHistAnalysisSVDGeneralModule::event()
       Float_t onlineOccV = htmp->GetEntries() / nStrips / nEvents * 100;
       m_hOnlineOccupancyV->SetBinContent(bin, onlineOccV);
 
+      for (int b = 1; b < htmp->GetNbinsX() + 1; b++) {
+        htmp->SetBinContent(b, htmp->GetBinContent(b) / nEvents * 100);
+      }
+      htmp->GetYaxis()->SetTitle("ZS3 ccupancy (%)");
       //test ERRORS
       /*
         if(bin == m_hOnlineOccupancyV->FindBin(3, findBinY(3, 1))){
@@ -541,6 +547,10 @@ void DQMHistAnalysisSVDGeneralModule::event()
       Float_t onlineOccU = htmp->GetEntries() / nStrips / nEvents * 100;
       m_hOnlineOccupancyU->SetBinContent(bin, onlineOccU);
 
+      for (int b = 1; b < htmp->GetNbinsX() + 1; b++) {
+        htmp->SetBinContent(b, htmp->GetBinContent(b) / nEvents * 100);
+      }
+      htmp->GetYaxis()->SetTitle("ZS3 ccupancy (%)");
       //test ERRORS
       /*
         if(bin == m_hOnlineOccupancyU->FindBin(3, findBinY(3, 1))){
@@ -708,7 +718,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
 
 void DQMHistAnalysisSVDGeneralModule::endRun()
 {
-  B2INFO("DQMHistAnalysisSVDGeneral:  endRun called");
+  B2INFO("DQMHistAnalysisSVDGeneral: endRun called");
 }
 
 
@@ -754,10 +764,8 @@ void DQMHistAnalysisSVDGeneralModule::terminate()
   delete m_cClusterOnTrackTime_L456V;
 }
 
-
 Int_t DQMHistAnalysisSVDGeneralModule::findBinY(Int_t layer, Int_t sensor)
 {
-
   if (layer == 3)
     return sensor; //2
   if (layer == 4)
@@ -769,3 +777,4 @@ Int_t DQMHistAnalysisSVDGeneralModule::findBinY(Int_t layer, Int_t sensor)
   else
     return -1;
 }
+

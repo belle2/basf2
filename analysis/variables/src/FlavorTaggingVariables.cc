@@ -133,8 +133,8 @@ namespace Belle2 {
 
     double lambdaFlavor(const Particle* particle)
     {
-      if (particle->getPDGCode() == 3122) return 1.0; //Lambda0
-      else if (particle->getPDGCode() == -3122) return -1.0; //Anti-Lambda0
+      if (particle->getPDGCode() == Const::Lambda.getPDGCode()) return 1.0; //Lambda0
+      else if (particle->getPDGCode() == Const::antiLambda.getPDGCode()) return -1.0; //Anti-Lambda0
       else return 0.0;
     }
 
@@ -142,7 +142,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = particle->getMCParticle();
       if (!mcparticle) return 0.0;
-      return (abs(mcparticle->getPDG()) == 3122);
+      return (abs(mcparticle->getPDG()) == Const::Lambda.getPDGCode());
     }
 
     double lambdaZError(const Particle* particle)
@@ -924,56 +924,56 @@ namespace Belle2 {
 
         //direct electron
         if (index == 0
-            && mcPDG == 11
+            && mcPDG == Const::electron.getPDGCode()
             && mothersPDG[0] == 511)
         {
           return 1.0;
           //intermediate electron
         } else if (index == 1
-                   && mcPDG == 11 && mothersPDG.size() > 1
+                   && mcPDG == Const::electron.getPDGCode() && mothersPDG.size() > 1
                    && isQQbarMesonInChain == false)
         {
           return 1.0;
           //direct muon
         } else if (index == 2
-                   && mcPDG == 13 && mothersPDG[0] == 511)
+                   && mcPDG == Const::muon.getPDGCode() && mothersPDG[0] == 511)
         {
           return 1.0;
           //intermediate muon
         } else if (index == 3
-                   && mcPDG == 13 && mothersPDG.size() > 1
+                   && mcPDG == Const::muon.getPDGCode() && mothersPDG.size() > 1
                    && isQQbarMesonInChain == false)
         {
           return 1.0;
           //KinLepton
         } else if (index == 4
-                   && (mcPDG == 13 || mcPDG == 11) && mothersPDG[0] == 511)
+                   && (mcPDG == Const::muon.getPDGCode() || mcPDG == Const::electron.getPDGCode()) && mothersPDG[0] == 511)
         {
           return 1.0;
           //IntermediateKinLepton
         } else if (index == 5
-                   && (mcPDG == 13 || mcPDG == 11) && mothersPDG.size() > 1
+                   && (mcPDG == Const::muon.getPDGCode() || mcPDG == Const::electron.getPDGCode()) && mothersPDG.size() > 1
                    && isQQbarMesonInChain == false)
         {
           return 1.0;
           //kaon
         } else if (index == 6
-                   && mcPDG == 321 && isQQbarMesonInChain == false && (isCharmedMesonInChain == true || isCharmedBaryonInChain == true))
+                   && mcPDG == Const::kaon.getPDGCode() && isQQbarMesonInChain == false && (isCharmedMesonInChain == true || isCharmedBaryonInChain == true))
         {
           return 1.0;
           //slow pion
         } else if (index == 7
-                   && mcPDG == 211 && mothersPDG.size() > 1 && mothersPDG[0] == 413 && mothersPDG[1] == 511)
+                   && mcPDG == Const::pion.getPDGCode() && mothersPDG.size() > 1 && mothersPDG[0] == 413 && mothersPDG[1] == 511)
         {
           return 1.0;
           //high momentum hadrons
         } else if (index == 8
-                   && (mcPDG == 211 || mcPDG == 321) && isQQbarMesonInChain == false && (mothersPDG[0] == 511 || (mothersPDG.rbegin()[0] == 511
+                   && (mcPDG == Const::pion.getPDGCode() || mcPDG == Const::kaon.getPDGCode()) && isQQbarMesonInChain == false && (mothersPDG[0] == 511 || (mothersPDG.rbegin()[0] == 511
                        && (isB0DaughterConservingFlavor == true || isHadronSingleTauDaughter == true))))
         {
           return 1.0;
           //lambdas
-        } else if (index == 9 && mcPDG == 3122 && isCharmedBaryonInChain == true)
+        } else if (index == 9 && mcPDG == Const::Lambda.getPDGCode() && isCharmedBaryonInChain == true)
         {
           return 1.0;
         } else return 0.0;
@@ -1128,7 +1128,7 @@ namespace Belle2 {
               const MCParticle* mcSlowPion = targetSlowPion ->getMCParticle();
               //               SlowPion_q = targetSlowPion -> getCharge();
               if (mcSlowPion != nullptr && mcSlowPion->getMother() != nullptr
-                  && abs(mcSlowPion->getPDG()) == 211 && abs(mcSlowPion->getMother()->getPDG()) == 413) {
+                  && abs(mcSlowPion->getPDG()) == Const::pion.getPDGCode() && abs(mcSlowPion->getMother()->getPDG()) == 413) {
                 mcSlowPionMother = mcSlowPion->getMother();
               }
             }
@@ -1175,58 +1175,58 @@ namespace Belle2 {
 
         // ------------------------------  Outputs  -----------------------------------
         if (index == 0 // Electron
-            && qTarget == qMC && mcPDG == 11 && mothersPDG[0] == 511)
+            && qTarget == qMC && mcPDG == Const::electron.getPDGCode() && mothersPDG[0] == 511)
         {
           return 1.0;
         } else if (index == 1 // IntermediateElectron
-                   && qTarget != qMC && mcPDG == 11 && mothersPDG.size() > 1
+                   && qTarget != qMC && mcPDG == Const::electron.getPDGCode() && mothersPDG.size() > 1
                    && isQQbarMesonInChain == false)
         {
           return 1.0;
         } else if (index == 2 // Muon
-                   && qTarget == qMC && mcPDG == 13 && mothersPDG[0] == 511)
+                   && qTarget == qMC && mcPDG == Const::muon.getPDGCode() && mothersPDG[0] == 511)
         {
           return 1.0;
         } else if (index == 3 // IntermediateMuon
-                   && qTarget != qMC && mcPDG == 13 && mothersPDG.size() > 1
+                   && qTarget != qMC && mcPDG == Const::muon.getPDGCode() && mothersPDG.size() > 1
                    && isQQbarMesonInChain == false)
         {
           return 1.0;
         }  else if (index == 4 // KinLepton
-                    && qTarget == qMC && (mcPDG == 11 || mcPDG == 13) && mothersPDG[0] == 511)
+                    && qTarget == qMC && (mcPDG == Const::electron.getPDGCode() || mcPDG == Const::muon.getPDGCode()) && mothersPDG[0] == 511)
         {
           return 1.0;
         }  else if (index == 5 // IntermediateKinLepton
-                    && qTarget != qMC && (mcPDG == 11 || mcPDG == 13) && mothersPDG.size() > 1
+                    && qTarget != qMC && (mcPDG == Const::electron.getPDGCode() || mcPDG == Const::muon.getPDGCode()) && mothersPDG.size() > 1
                     && isQQbarMesonInChain == false)
         {
           return 1.0;
         } else if (index == 6 && qTarget == qMC // Kaon
-                   && mcPDG == 321 && isQQbarMesonInChain == false && (isCharmedMesonInChain == true || isCharmedBaryonInChain == true))
+                   && mcPDG == Const::kaon.getPDGCode() && isQQbarMesonInChain == false && (isCharmedMesonInChain == true || isCharmedBaryonInChain == true))
         {
           return 1.0;
         } else if (index == 7 && qTarget != qMC // SlowPion
-                   && mcPDG == 211 && mothersPDG.size() > 1 && mothersPDG[0] == 413 && mothersPDG[1] == 511)
+                   && mcPDG == Const::pion.getPDGCode() && mothersPDG.size() > 1 && mothersPDG[0] == 413 && mothersPDG[1] == 511)
         {
           return 1.0;
         } else if (index == 8 && qTarget == qMC // FastHadron
-                   && (mcPDG == 211 || mcPDG == 321) && isQQbarMesonInChain == false && (mothersPDG[0] == 511 || (mothersPDG.rbegin()[0] == 511
+                   && (mcPDG == Const::pion.getPDGCode() || mcPDG == Const::kaon.getPDGCode()) && isQQbarMesonInChain == false && (mothersPDG[0] == 511 || (mothersPDG.rbegin()[0] == 511
                        && (isB0DaughterConservingFlavor == true || isHadronSingleTauDaughter == true))))
         {
           return 1.0;
         } else if (index == 9  && qTarget == qMC // KaonPion
-                   && mcPDG == 321 && haveKaonPionSameMother == true)
+                   && mcPDG == Const::kaon.getPDGCode() && haveKaonPionSameMother == true)
         {
           return 1.0;
         } else if (index == 10 && qTarget == qMC)   // MaximumPstar
         {
           return 1.0;
         } else if (index == 11 && qTarget != qMC && mothersPDG.size() > 1 && qFSC == qMC // "FSC"
-                   && mcPDG == 211 && FastParticlePDGMother == 511 && isQQbarMesonInChain == false)
+                   && mcPDG == Const::pion.getPDGCode() && FastParticlePDGMother == 511 && isQQbarMesonInChain == false)
         {
           return 1.0;
         } else if (index == 12 && (particle->getPDGCode() / abs(particle->getPDGCode())) != qMC // Lambda
-                   && mcPDG == 3122 && isCharmedBaryonInChain == true)
+                   && mcPDG == Const::Lambda.getPDGCode() && isCharmedBaryonInChain == true)
         {
           return 1.0;
         } else {
@@ -1800,91 +1800,214 @@ namespace Belle2 {
       return func;
     }
 
-    VARIABLE_GROUP("Flavor Tagger Variables");
+    VARIABLE_GROUP("Flavor Tagger Expert Variables");
 
-    REGISTER_VARIABLE("pMissTag", momentumMissingTagSide,  "Calculates the missing Momentum for a given particle on the tag side.");
-    REGISTER_VARIABLE("cosTPTO"  , cosTPTO , "cosine of angle between thrust axis of given particle and thrust axis of ROE");
-    REGISTER_VARIABLE("lambdaFlavor", lambdaFlavor,  "1.0 if Lambda0, -1.0 if Anti-Lambda0, 0.0 else.");
-    REGISTER_VARIABLE("isLambda", isLambda,  "1.0 if MCLambda0, 0.0 else.");
-    REGISTER_VARIABLE("lambdaZError", lambdaZError,  "Returns the variance of the z-component of the decay vertex.");
+    REGISTER_VARIABLE("pMissTag", momentumMissingTagSide,
+                      "[Expert] Calculates the missing momentum for a given particle on the tag side.");
+    REGISTER_VARIABLE("cosTPTO"  , cosTPTO ,
+                      "[Expert] Returns cosine of angle between thrust axis of given particle and thrust axis of ROE.");
+    REGISTER_VARIABLE("lambdaFlavor", lambdaFlavor,
+                      "[Expert] Returns 1.0 if particle is ``Lambda0``, -1.0 in case of ``anti-Lambda0``, 0.0 otherwise.");
+    REGISTER_VARIABLE("isLambda", isLambda,  "[Expert] Returns 1.0 if particle is truth-matched to ``Lambda0``, 0.0 otherwise.");
+    REGISTER_VARIABLE("lambdaZError", lambdaZError,  "[Expert] Returns the variance of the z-component of the decay vertex.");
     REGISTER_VARIABLE("momentumOfSecondDaughter", momentumOfSecondDaughter,
-                      "Returns the Momentum of second daughter if existing, else 0.");
+                      "[Expert] Returns the momentum of second daughter if exists, 0. otherwise.");
     REGISTER_VARIABLE("momentumOfSecondDaughterCMS", momentumOfSecondDaughterCMS,
-                      "Returns the Momentum of second daughter if existing in CMS, else 0.");
+                      "[Expert] Returns the momentum of the second daughter in the centre-of-mass system, 0. if this daughter doesn't exist.");
     REGISTER_VARIABLE("chargeTimesKaonLiklihood", chargeTimesKaonLiklihood,
-                      "Returns the q*(highest PID_Likelihood for Kaons), else 0.");
+                      "[Expert] Returns ``q*(highest PID_Likelihood for Kaons)``, 0. otherwise.");
     REGISTER_VARIABLE("ptTracksRoe", transverseMomentumOfChargeTracksInRoe,
-                      "Returns the transverse momentum of all charged tracks if there exists a ROE for the given particle, else 0.");
+                      "[Expert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE.");
     REGISTER_VARIABLE("NumberOfKShortsInRoe", NumberOfKShortsInRoe,
-                      "Returns the number of K_S0 in the rest of event. The particleList K_S0:inRoe is required");
+                      "[Expert] Returns the number of ``K_S0`` in the rest of event. The particle list ``K_S0:inRoe`` has to be filled beforehand.");
 
     REGISTER_VARIABLE("isInElectronOrMuonCat", isInElectronOrMuonCat,
-                      "Returns 1.0 if the particle has been selected as target in the Muon or Electron Category, 0.0 else.");
+                      "[Expert] Returns 1.0 if the particle has been selected as target in the Muon or Electron Category, 0.0 otherwise.");
 
     REGISTER_VARIABLE("isMajorityInRestOfEventFromB0", isMajorityInRestOfEventFromB0,
-                      "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a B0.");
+                      "[Eventbased][Expert] Checks if the majority of the tracks in the current RestOfEvent are from a ``B0``.");
     REGISTER_VARIABLE("isMajorityInRestOfEventFromB0bar", isMajorityInRestOfEventFromB0bar,
-                      "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a B0bar.");
+                      "[Eventbased][Expert] Check if the majority of the tracks in the current RestOfEvent are from a ``anti-B0``.");
     REGISTER_VARIABLE("hasRestOfEventTracks", hasRestOfEventTracks,
-                      "Returns the amount of tracks in the RestOfEvent related to the given Particle. -2 If ROE is empty.");
-    REGISTER_VARIABLE("isRelatedRestOfEventB0Flavor", isRelatedRestOfEventB0Flavor,
-                      "-1 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0). The MCError bit of Breco has to be 0, 1, 2, 16 or 1024. The output of the variable is 0 otherwise. If one Particle in the Rest of Event is found to belong the reconstructed B0, the output is -2(2) for a B0bar (B0) on the reco side.");
-    REGISTER_VARIABLE("qrCombined", isRestOfEventB0Flavor,
-                      "[Eventbased] -1 (1) if current RestOfEvent is related to a B0bar (B0). The MCError bit of Breco has to be 0, 1, 2, 16 or 1024. The output of the variable is 0 otherwise. If one Particle in the Rest of Event is found to belong the reconstructed B0, the output is -2(2) for a B0bar (B0) on the reco side.");
+                      "[Expert] Returns the amount of tracks in the RestOfEvent related to the given Particle. -2 if the RestOfEvent is empty.");
+
+    REGISTER_VARIABLE("qrCombined", isRestOfEventB0Flavor, R"DOC(
+[Eventbased][Expert] Returns -1 (1) if current RestOfEvent is related to a ``anti-B0`` (``B0``). 
+The ``MCError`` bit of Breco has to be 0, 1, 2, 16 or 1024. 
+The output of the variable is 0 otherwise. 
+If one particle in the RestOfEvent is found to belong to the reconstructed ``B0``, the output is -2(2) for a ``anti-B0`` (``B0``) on the reconstructed side.");
+)DOC");
     REGISTER_VARIABLE("ancestorHasWhichFlavor", ancestorHasWhichFlavor,
-                      "checks the decay chain of the given particle upwards up to the Y(4S) resonance.Output is 0 (1) if an ancestor is found to be a B0bar (B0), if not -2.");
-    REGISTER_VARIABLE("B0mcErrors", B0mcErrors, "mcErrors MCMatching Flag on the reconstructed B0_cp.");
+                      "[Expert] Checks the decay chain of the given particle upwards up to the ``Upsilon(4S)`` resonance and outputs 0 (1) if an ancestor is found to be a ``anti-B0`` (``B0``), if not -2.");
+    REGISTER_VARIABLE("B0mcErrors", B0mcErrors, "[Expert] Returns MC-matching flag, see :b2:var:`mcErrors` for the particle, e.g. ``B0`` .");
     REGISTER_VARIABLE("isRelatedRestOfEventMajorityB0Flavor", isRelatedRestOfEventMajorityB0Flavor,
-                      " 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a B0bar (B0).");
+                      "[Expert] Returns 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a ``anti-B0`` (``B0``).");
     REGISTER_VARIABLE("isRestOfEventMajorityB0Flavor", isRestOfEventMajorityB0Flavor,
-                      "0 (1) if the majority of tracks and clusters of the current RestOfEvent are related to a B0bar (B0).");
-    REGISTER_VARIABLE("mcFlavorOfOtherB", mcFlavorOfOtherB,
-                      "Returns the MC flavor (+-1) of the accompaning tag-side B meson if the given particle is a correctly MC-matched B candidate. It returns 0 else. \n"
-                      "In other words, this variable checks the generated flavor of the other MC Upsilon(4S) daughter.");
+                      "[Expert] Returns 0 (1) if the majority of tracks and clusters of the current RestOfEvent are related to a ``anti-B0`` (``B0``).");
+    REGISTER_VARIABLE("mcFlavorOfOtherB", mcFlavorOfOtherB,  R"DOC(
+[Expert] Returns the MC flavor (+1 or -1) of the accompanying tag-side B meson if the given particle is a correctly truth-matched B candidate, 0 otherwise.
+In other words, this variable checks the generated flavor of the other generated ``Upsilon(4S)`` daughter.");
+)DOC");
 
-    VARIABLE_GROUP("Flavor Tagger MetaFunctions")
 
-    REGISTER_VARIABLE("BtagToWBosonVariables(requestedVariable)", BtagToWBosonVariables,
-                      "FlavorTagging:[Eventbased] Kinematical variables (recoilMass, pMissCMS, cosThetaMissCMS or EW90) assuming a semileptonic decay with the given particle as target.");
-    REGISTER_VARIABLE("KaonPionVariables(requestedVariable)"  , KaonPionVariables ,
-                      " Kinematical variables for KaonPion category (cosKaonPion or HaveOpositeCharges)");
-    REGISTER_VARIABLE("FSCVariables(requestedVariable)", FSCVariables,
-                      "FlavorTagging:[Eventbased] Kinematical variables for FastSlowCorrelated category (pFastCMS, cosSlowFast, SlowFastHaveOpositeCharges, or cosTPTOFast).");
-    REGISTER_VARIABLE("hasHighestProbInCat(particleListName, extraInfoName)", hasHighestProbInCat,
-                      "Returns 1.0 if the given Particle is classified as target track, i.e. if it has the highest target track probability in particlelistName. The probability is accessed via extraInfoName.");
+    REGISTER_VARIABLE("BtagToWBosonVariables(requestedVariable)", BtagToWBosonVariables, R"DOC(
+[Eventbased][Expert] Returns values of FlavorTagging-specific kinematical variables assuming a semileptonic decay with the given particle as target.
+The input values of ``requestedVariable`` can be the following:  recoilMass, pMissCMS, cosThetaMissCMS and EW90.
+)DOC");
+    REGISTER_VARIABLE("KaonPionVariables(requestedVariable)"  , KaonPionVariables , R"DOC(
+[Expert] Returns values of FlavorTagging-specific kinematical variables for ``KaonPion`` category.
+The input values of ``requestedVariable`` can be the following:  cosKaonPion, HaveOpositeCharges.
+)DOC");
+    REGISTER_VARIABLE("FSCVariables(requestedVariable)", FSCVariables, R"DOC(
+[Eventbased][Expert] Returns values of FlavorTagging-specific kinematical variables for ``FastSlowCorrelated`` category.
+The input values of ``requestedVariable`` can be the following: pFastCMS, cosSlowFast, SlowFastHaveOpositeCharges, or cosTPTOFast.
+)DOC");
+    REGISTER_VARIABLE("hasHighestProbInCat(particleListName, extraInfoName)", hasHighestProbInCat, R"DOC(
+[Expert] Returns 1.0 if the given Particle is classified as target track, i.e. if it has the highest target track probability in particleListName. 
+The probability is accessed via ``extraInfoName``, which can have the following input values:
+
+* isRightTrack(Electron),
+* isRightTrack(IntermediateElectron),
+* isRightTrack(Muon),
+* isRightTrack(IntermediateMuon),
+* isRightTrack(KinLepton),
+* isRightTrack(IntermediateKinLepton),
+* isRightTrack(Kaon),
+* isRightTrack(SlowPion),
+* isRightTrack(FastHadron),
+* isRightTrack(MaximumPstar),
+* isRightTrack(Lambda),
+* isRightCategory(Electron),
+* isRightCategory(IntermediateElectron),
+* isRightCategory(Muon),
+* isRightCategory(IntermediateMuon),
+* isRightCategory(KinLepton),
+* isRightCategory(IntermediateKinLepton),
+* isRightCategory(Kaon),
+* isRightCategory(SlowPion),
+* isRightCategory(FastHadron),
+* isRightCategory(MaximumPstar),
+* isRightCategory(Lambda),
+* isRightCategory(KaonPion),
+* isRightCategory(FSC).
+
+)DOC");
     REGISTER_VARIABLE("HighestProbInCat(particleListName, extraInfoName)", HighestProbInCat,
-                      "Returns the highest target track probability value for the given category");
+                      "[Expert] Returns the highest target track probability value for the given category, for allowed input values for ``extraInfoName`` see :b2:var:`hasHighestProbInCat`.");
 
-    REGISTER_VARIABLE("isRightTrack(particleName)", isRightTrack,
-                      "Checks if the given Particle was really from a B. 1.0 if true otherwise 0.0");
-    REGISTER_VARIABLE("isRightCategory(particleName)", isRightCategory,
-                      "FlavorTagging: returns 1 if the class track by particleName category has the same flavor as the MC target track 0 else also if there is no target track");
-    REGISTER_VARIABLE("QpOf(particleListName, outputExtraInfo, rankingExtraInfo)", QpOf,
-                      "FlavorTagging: [Eventbased] Returns the q*p value for a given list (argument[0]), where p is the probability of a category stored as extraInfo (argument[1]).\n"
-                      "The particle is selected after ranking according to a flavor tagging extraInfo (argument[2]).");
-    REGISTER_VARIABLE("weightedQpOf(particleListName, outputExtraInfo, rankingExtraInfo)", weightedQpOf,
-                      "FlavorTagging: [Eventbased] Returns the weighted q*p value for a given list (argument[0]), where p is the probability of a category stored as extraInfo (argument[1]).\n"
-                      "The particles in the list are ranked according to a flavor tagging extraInfo (argument[2]). \n"
-                      "The values for the three top particles is combined into an effective (weighted) output.");
-    REGISTER_VARIABLE("variableOfTarget(particleListName, inputVariable, rankingExtraInfo)", variableOfTarget,
-                      "FlavorTagging: [Eventbased] Returns the value of an input variable (argument[1]) for a particle selected from the given list (argument[0]).\n"
-                      "The particles are ranked according to a flavor tagging extraInfo (argument[2]).");
+    REGISTER_VARIABLE("isRightTrack(particleName)", isRightTrack, R"DOC(
+[Expert] Returns 1.0 if the given particle was really from a B-meson depending on category provided in ``particleName`` argument, 0.0 otherwise.
+Allowed input values for ``particleName`` argument in this variable are the following:
+
+* Electron,
+* IntermediateElectron,
+* Muon,
+* IntermediateMuon,
+* KinLepton,
+* IntermediateKinLepton,
+* Kaon,
+* SlowPion,
+* FastHadron,
+* Lambda,
+* mcAssociated.
+
+)DOC");
+    REGISTER_VARIABLE("isRightCategory(particleName)", isRightCategory,  R"DOC(
+[Expert] Returns 1.0 if the class track by ``particleName`` category has the same flavor as the MC target track, 0.0 otherwise.
+Allowed input values for ``particleName`` argument in this variable are the following:
+
+* Electron,
+* IntermediateElectron,
+* Muon,
+* IntermediateMuon,
+* KinLepton,
+* IntermediateKinLepton
+* Kaon,
+* SlowPion,
+* FastHadron, 
+* KaonPion,
+* MaximumPstar,
+* FSC, 
+* Lambda,
+* mcAssociated.
+
+)DOC");
+    REGISTER_VARIABLE("QpOf(particleListName, outputExtraInfo, rankingExtraInfo)", QpOf,  R"DOC(
+[Eventbased][Expert] Returns the :math:`q*p` value for a given particle list provided as the 1st argument, 
+where math:`p` is the probability of a category stored as extraInfo, provided as the 2nd argument, 
+allowed values are same as in :b2:var:`hasHighestProbInCat`.
+The particle is selected after ranking according to a flavor tagging extraInfo, provided as the 3rd argument, 
+allowed values are same as in :b2:var:`hasHighestProbInCat`.
+)DOC");
+    REGISTER_VARIABLE("weightedQpOf(particleListName, outputExtraInfo, rankingExtraInfo)", weightedQpOf, R"DOC(
+[Eventbased][Expert] Returns the weighted :math:`q*p` value for a given particle list, provided as the  1st argument, 
+where math:`p` is the probability of a category stored as extraInfo, provided in the 2nd argument, 
+allowed values are same as in :b2:var:`hasHighestProbInCat`.
+The particles in the list are ranked according to a flavor tagging extraInfo, provided as the 3rd argument, 
+allowed values are same as in :b2:var:`hasHighestProbInCat`.
+The values for the three top particles is combined into an effective (weighted) output.
+)DOC");
+    REGISTER_VARIABLE("variableOfTarget(particleListName, inputVariable, rankingExtraInfo)", variableOfTarget, R"DOC(
+[Eventbased][Expert] Returns the value of an input variable provided as the 2nd argument for a particle selected from the given list provided as the 1st argument.
+The particles are ranked according to a flavor tagging extraInfo, provided as the 2nd argument, 
+allowed values are same as in :b2:var:`hasHighestProbInCat`.
+)DOC");
 
     REGISTER_VARIABLE("hasTrueTarget(categoryName)", hasTrueTarget,
-                      "Returns 1 if the given category has a target. 0 Else.");
+                      "[Expert] Returns 1 if the given category has a target, 0 otherwise.");
     REGISTER_VARIABLE("isTrueCategory(categoryName)", isTrueCategory,
-                      "Returns 1 if the given category tags the B0 MC flavor correctly. 0 Else.");
-    REGISTER_VARIABLE("qrOutput(combinerMethod)", qrOutput,
-                      "Returns the output of the flavorTagger for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.");
-    REGISTER_VARIABLE("qOutput(combinerMethod)", qOutput,
-                      "Returns the flavor tag q output of the flavorTagger for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.");
-    REGISTER_VARIABLE("rBinBelle(combinerMethod)", rBinBelle,
-                      "Returns the corresponding r (dilution) bin according to the Belle binning for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.");
-    REGISTER_VARIABLE("qpCategory(categoryName)", qpCategory,
-                      "Returns the output q (charge of target track) times p (probability that this is the right category) of the category with the given name. The allowed categories are the official Flavor Tagger Category Names.");
-    REGISTER_VARIABLE("isTrueFTCategory(categoryName)", isTrueFTCategory,
-                      "Returns 1 if the target particle (checking the decay chain) of the category with the given name is found in the mc Particles, and if it provides the right Flavor. The allowed categories are the official Flavor Tagger Category Names.");
-    REGISTER_VARIABLE("hasTrueTargets(categoryName)", hasTrueTargets,
-                      "Returns 1 if target particles (checking only the decay chain) of the category with the given name is found in the mc Particles. The allowed categories are the official Flavor Tagger Category Names.");
+                      "[Expert] Returns 1 if the given category tags the B0 MC flavor correctly, 0 otherwise.");
+
+    REGISTER_VARIABLE("qpCategory(categoryName)", qpCategory, R"DOC(
+[Expert] Returns the output :math:`q` (charge of target track) times :math:`p` (probability that this is the right category) of the category with the given name. 
+The allowed categories are the official Flavor Tagger Category Names.
+)DOC");
+    REGISTER_VARIABLE("isTrueFTCategory(categoryName)", isTrueFTCategory, R"DOC(
+[Expert] Returns 1 if the target particle (checking the decay chain) of the category with the given name is found in the MC particles, 
+and if it provides the right flavor. The allowed categories are the official Flavor Tagger Category Names.
+)DOC");
+    REGISTER_VARIABLE("hasTrueTargets(categoryName)", hasTrueTargets, R"DOC(
+[Expert] Returns 1 if target particles (checking only the decay chain) of the category with the given name is found in the MC particles. 
+The allowed categories are the official Flavor Tagger Category Names.
+)DOC");
+
+    VARIABLE_GROUP("Flavor Tagger Analysis Variables")
+
+    REGISTER_VARIABLE("rBinBelle(combinerMethod)", rBinBelle, R"DOC(
+Returns the corresponding :math:`r` (dilution) bin according to the Belle binning for the given ``combinerMethod``. 
+The available combiner methods are 'FBDT' and 'FANN'.
+The return values and the corresponding dilution ranges are the following:
+
+* 0: :math:`0.000 < r < 0.100`;
+* 1: :math:`0.100 < r < 0.250`;
+* 2: :math:`0.250 < r < 0.500`;
+* 3: :math:`0.500 < r < 0.625`;
+* 4: :math:`0.625 < r < 0.750`;
+* 5: :math:`0.750 < r < 0.875`;
+* 6: :math:`0.875 < r < 1.000`.
+
+.. warning:: You have to run the Flavor Tagger for this variable to be meaningful.
+.. seealso:: :ref:`FlavorTagger` and :func:`flavorTagger.flavorTagger`.
+)DOC");
+    REGISTER_VARIABLE("qrOutput(combinerMethod)", qrOutput, R"DOC(
+Returns the output of the flavorTagger, flavor tag :math:`q` times the dilution factor :math:`r`, for the given combiner method. 
+The available combiner methods are 'FBDT' or 'FANN'.
+
+.. warning:: You have to run the Flavor Tagger for this variable to be meaningful.
+.. seealso:: :ref:`FlavorTagger` and :func:`flavorTagger.flavorTagger`.
+)DOC");
+    REGISTER_VARIABLE("qOutput(combinerMethod)", qOutput, R"DOC(
+Returns the flavor tag :math:`q` output of the flavorTagger for the given combinerMethod. 
+The available combiner methods are 'FBDT' or 'FANN'.
+
+.. warning:: You have to run the Flavor Tagger for this variable to be meaningful.
+.. seealso:: :ref:`FlavorTagger` and :func:`flavorTagger.flavorTagger`.
+)DOC");
+    REGISTER_VARIABLE("isRelatedRestOfEventB0Flavor", isRelatedRestOfEventB0Flavor,  R"DOC(
+Returns -1 (1) if the RestOfEvent related to the given particle is related to a ``anti-B0`` (``B0``). 
+The ``MCError`` bit of Breco has to be 0, 1, 2, 16 or 1024. 
+The output of the variable is 0 otherwise. 
+If one particle in the RestOfEvent is found to belong to the reconstructed ``B0``, the output is -2(2) for a ``anti-B0`` (``B0``) on the reconstructed side.
+)DOC");
   }
 }

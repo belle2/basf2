@@ -1,6 +1,8 @@
 Tools which will provide you help
 +++++++++++++++++++++++++++++++++
 
+.. _b2help-modules:
+
 ``b2help-modules``: List available basf2 modules and ask about their details
 ----------------------------------------------------------------------------
 
@@ -11,6 +13,8 @@ Tools which will provide you help
     :nodefault:
     :nogroupsections:
 
+
+.. _b2help-particles:
 
 ``b2help-particles``: List particles used in the event generator
 ----------------------------------------------------------------

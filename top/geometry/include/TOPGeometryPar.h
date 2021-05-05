@@ -136,6 +136,41 @@ namespace Belle2 {
        */
       const TOPNominalTTS& getTTS(int moduleID, int pmtID) const;
 
+      /**
+       * Returns phase refractive index of quartz at given photon energy
+       * @param energy photon energy [eV]
+       * @return phase refractive index
+       */
+      double getPhaseIndex(double energy) const;
+
+      /**
+       * Returns group refractive index of quartz at given photon energy
+       * @param energy photon energy [eV]
+       * @return group refractive index
+       */
+      double getGroupIndex(double energy) const;
+
+      /**
+       * Returns the derivative (dn/dE) of phase refractive index of quartz at given photon energy
+       * @param energy photon energy [eV]
+       * @return derivative of phase refractive index
+       */
+      double getPhaseIndexDerivative(double energy) const;
+
+      /**
+       * Returns the derivative (dn_g/dE) of group refractive index of quartz at given photon energy
+       * @param energy photon energy [eV]
+       * @return group refractive index
+       */
+      double getGroupIndexDerivative(double energy) const;
+
+      /**
+       * Returns bulk absorption lenght of quartz at given photon energy
+       * @param energy photon energy [eV]
+       * @return bulk absorption lenght
+       */
+      double getAbsorptionLength(double energy) const;
+
       static const double c_hc; /**< Planck constant times speed of light in [eV*nm] */
 
     private:
@@ -247,6 +282,14 @@ namespace Belle2 {
       double integralOfQE(const std::vector<float>& qe, double ce,
                           double lambdaFirst, double lambdaStep) const;
 
+
+      /**
+       * Quartz refractive index (SellMeier equation)
+       * @param lambda photon wavelength [nm]
+       * @return refractive index
+       */
+      double refractiveIndex(double lambda) const;
+
       // Geometry
 
       TOPGeometry* m_geo = 0;             /**< geometry parameters from Gearbox */
@@ -280,6 +323,24 @@ namespace Belle2 {
       static TOPGeometryPar* s_instance;  /**< Pointer to the class instance */
 
     };
+
+    inline double TOPGeometryPar::getPhaseIndexDerivative(double energy) const
+    {
+      double dE = 0.01; // [eV]
+      return (getPhaseIndex(energy + dE / 2) - getPhaseIndex(energy - dE / 2)) / dE;
+    }
+
+    inline double TOPGeometryPar::getGroupIndexDerivative(double energy) const
+    {
+      double dE = 0.01; // [eV]
+      return (getGroupIndex(energy + dE / 2) - getGroupIndex(energy - dE / 2)) / dE;
+    }
+
+    inline double TOPGeometryPar::getAbsorptionLength(double energy) const
+    {
+      double lambda = c_hc / energy;
+      return 15100 * pow(lambda / 405, 4); // Alan Schwartz, 2013 (private comunication)
+    }
 
   } // end of namespace TOP
 } // end of namespace Belle2

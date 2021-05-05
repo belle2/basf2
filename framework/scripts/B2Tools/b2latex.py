@@ -454,7 +454,6 @@ class TitlePage(LatexObject):
 
 if __name__ == '__main__':
     import random
-    import subprocess
 
     o = LatexFile()
     o += TitlePage(title='Automatic Latex Code Example',

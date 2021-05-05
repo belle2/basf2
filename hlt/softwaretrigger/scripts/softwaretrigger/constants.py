@@ -33,6 +33,8 @@ class DQMModes(Enum):
     before_filter = "before_filter"
     #: DQM modules which should only run on the filtered ones
     filtered = "filtered"
+    #: DQM modules which should run on the L1 passthrough events
+    l1_passthrough = "l1_passthrough"
     #: If not in HLT, just all all DQM modules
     dont_care = "dont_care"
 

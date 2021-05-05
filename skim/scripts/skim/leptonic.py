@@ -17,6 +17,7 @@ from stdCharged import stdE, stdMu
 from variables import variables as vm
 
 __liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header
@@ -40,6 +41,8 @@ class LeptonicUntagged(BaseSkim):
         ":math:`B_{\\text{sig}}^-\\to\\ell\\nu`, where :math:`\\ell=e,\\mu`"
     )
     __category__ = "physics, leptonic"
+
+    validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -87,8 +90,8 @@ class LeptonicUntagged(BaseSkim):
         vm.addAlias("d0_muonID", "daughter(0,muonID)")
         vm.addAlias("MissP", "weMissP(basic,0)")
 
-        histogramFilename = "LeptonicUntagged_Validation.root"
-        contact = "Phil Grace <philip.grace@adelaide.edu.au>"
+        histogramFilename = f"{self}_Validation.root"
+        contact = __liaison__
 
         create_validation_histograms(
             rootfile=histogramFilename,
@@ -161,14 +164,14 @@ class dilepton(BaseSkim):
             checkForDuplicates=False,
             path=path)
 
-        ma.applyEventCuts(cut='foxWolframR2 < 0.5 and nTracks > 3', path=path)
+        path = self.skim_event_cuts('foxWolframR2 < 0.5 and nTracks > 3', path=path)
 
-        ma.reconstructDecay('Upsilon(4S):ee   -> e+:pid e-:pid',   'M < 15', path=path)
-        ma.reconstructDecay('Upsilon(4S):emu  -> e+:pid mu-:pid',  'M < 15', path=path)
+        ma.reconstructDecay('Upsilon(4S):ee   -> e+:pid e-:pid', 'M < 15', path=path)
+        ma.reconstructDecay('Upsilon(4S):emu  -> e+:pid mu-:pid', 'M < 15', path=path)
         ma.reconstructDecay('Upsilon(4S):mumu -> mu+:pid mu-:pid', 'M < 15', path=path)
 
-        ma.reconstructDecay('Delta++:ee   -> e+:pid e+:pid',   'M < 15', path=path)
-        ma.reconstructDecay('Delta++:emu  -> e+:pid mu+:pid',  'M < 15', path=path)
+        ma.reconstructDecay('Delta++:ee   -> e+:pid e+:pid', 'M < 15', path=path)
+        ma.reconstructDecay('Delta++:emu  -> e+:pid mu+:pid', 'M < 15', path=path)
         ma.reconstructDecay('Delta++:mumu -> mu+:pid mu+:pid', 'M < 15', path=path)
 
         ma.copyLists(outputListName='Upsilon(4S):ll',

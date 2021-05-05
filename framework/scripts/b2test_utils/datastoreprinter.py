@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from ROOT import Belle2, kIsPublic, kIsStatic, TVector3, TLorentzVector
-from basf2 import Module
+from basf2 import Module, B2FATAL
 
 
 def get_public_members(classname):
@@ -294,5 +294,8 @@ class PrintObjectsModule(Module):
 
     def event(self):
         """print the contents of the mdst mdst_dataobjects"""
-        for printer in self.objects_to_print:
-            printer.print()
+        try:
+            for printer in self.objects_to_print:
+                printer.print()
+        except Exception as e:
+            B2FATAL("Error in datastore printer: ", e)

@@ -17,7 +17,7 @@ import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 import basf2
-from basf2 import B2ERROR, B2INFO, B2WARNING
+from basf2 import B2ERROR, B2INFO, B2WARNING, B2FATAL
 import json
 import importlib
 from pathlib import Path
@@ -71,14 +71,17 @@ def get_files(args):
         download_paths[file] = path_to_files
     
     current_directory = Path().absolute()
-    download_files_path = Path(current_directory, 'download_files')
+    download_files_path = Path(current_directory, 'validation_results', 'download_files')
     try:
         download_files_path.mkdir(parents=True)
     except FileExistsError as e:
         B2WARNING(f"Download file directory '{download_files_path.as_posix()}' exists.")
-        B2INFO(f"Removing '{download_files_path.as_posix()}'...")
-        shutil.rmtree(download_files_path)
-        download_files_path.mkdir(parents=True)
+        if args.overwrite_workdir:
+            B2INFO(f"Removing '{download_files_path.as_posix()}'...")
+            shutil.rmtree(download_files_path)
+            download_files_path.mkdir(parents=True)
+        else:
+            B2FATAL("Cannot overwrite download directory")
     B2INFO(f"Will now copy the requested files from the CAF output to '{download_files_path.as_posix()}'")
     print()
     for file_name, file_paths in download_paths.items():
@@ -123,6 +126,7 @@ is (lowest -> highest): [Backend.default_backend_args -> validation_config.json
     validation_module = get_validation_module(args)       
     current_directory = Path().absolute()
     script_name = validation_config["validation_script"]
+    script_path = basf2.find_file(f'{prompt_validation_script_dir}/{script_name}')
 
     # Now we set the backend that will be used globally.
     backend_args = validation_config.get("backend_args", None)
@@ -132,22 +136,55 @@ is (lowest -> highest): [Backend.default_backend_args -> validation_config.json
     B2INFO("Getting values for 'expert_config' from the prompt script.")
     expert_config = validation_module.settings.expert_config   # set to be the default from the script
     # If we have values in the validation_config we merge/overwrite with the default
-    if "expert_config" in validation_config:
-        # Overwrite/merge the default Validation Settings with JSON
+    if not expert_config:
+        # In case expert_config is None or False
+        B2INFO("'expert_config' from the prompt script is not set")
+        expert_config = {} 
+        
+    try:
         B2INFO("Overwriting values in 'expert_config' by using the values from the config JSON file.")
-        expert_config = {**expert_config, **validation_config["expert_config"]}
+        expert_config = {**expert_config, **validation_config.get("expert_config", {})}
+    except:
+        B2ERROR("Expert config must be a dictionary! E.g. {'my_var': 42}")
+        exit() 
+        
+    if "requested_iov" in validation_config:
+        # Overwrite/merge the default Validation Settings with JSON
+        if isinstance(validation_config["requested_iov"], list):
+            if len(validation_config["requested_iov"]) != 4:
+                B2ERROR('request_iov list must have 4 elements! E.g. [10,0,10,300]')
+                exit() 
+            else:
+                requested_iov = validation_config.get("requested_iov")
+        else:
+            B2ERROR("requested_iov must be a list! E.g. [10,0,10,300]") 
+            exit() 
+    else:
+        requested_iov = None
+        
+    job_path = validation_config.get('job_path', None)
+    input_data_path=validation_config.get('input_data_path', None)
+    
+    validation_result_path = Path(current_directory, 'validation_results', 'validations')
+    
+    try:
+        validation_result_path.mkdir(parents=True)
+    except FileExistsError as e:
+        B2WARNING(f"Validation result directory '{validation_result_path.as_posix()}' exists.")
+        if args.overwrite_workdir:
+            B2INFO(f"Removing '{validation_result_path.as_posix()}'...")
+            shutil.rmtree(validation_result_path)
+            validation_result_path.mkdir(parents=True)
+        else:
+            B2FATAL("Cannot overwrite validation result directory")
 
     job = Job(name=validation_module.settings.name)
     # Working directory that will be sent to the backend and used as the current working directory
-    job.working_dir = Path(current_directory, "validation_results")
+    job.working_dir = validation_result_path
     # Output directory, where the stdout and stderr will be sent.
-    job.output_dir = Path(current_directory, "validation_results")
+    job.output_dir = validation_result_path
     # The command we want to run
-    module_name = prompt_validation_script_package + Path(script_name).stem
-    job_path = validation_config.get('job_path', None)
-    input_data_path=validation_config.get('input_data_path', None)
-    requested_iov=validation_config.get('requested_iov', None)
-    job.cmd = ["basf2", f"{os.environ['BELLE2_LOCAL_DIR']}/{prompt_validation_script_dir}/{script_name}", f"{job_path} {input_data_path} {requested_iov} {expert_config}"]
+    job.cmd = ["basf2", f"{script_path}", f"{job_path} {input_data_path} '{requested_iov}' '{json.dumps(expert_config)}'"]
     job.append_current_basf2_setup_cmds()
     return [job]
 
@@ -165,13 +202,6 @@ def get_argparser():
         cli.add_monitor_options(subparser, default_heartbeat=default_collection_heartbeat)
         cli.add_job_options(subparser)
 
-        subparser.add_argument("--dry-run", dest="dry_run", action="store_true",
-                            help="Flags if the CAF process should be set up but not run. "
-                                 "Good for testing if your prompt script and config files are well formed without attempting "
-                                 "to submit any jobs."
-                           )
-        subparser.set_defaults(dry_run=False)
-
         subparser.add_argument("--overwrite-working-dir", dest="overwrite_workdir", action="store_true",
                             help="Flags if the tool should delete the validation working directory before "
                                  "beginning the processing. This will delete the previous results! Only use if you want a clean "
@@ -179,7 +209,6 @@ def get_argparser():
                            )
 
         subparser.set_defaults(overwrite_workdir=False)
-        subparser.set_defaults(expert_config={})
 
     return parser
 

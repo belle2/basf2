@@ -2,7 +2,7 @@
 
 """CDC tracking calibration. Performs the T0 determination using HLT skimmed raw data."""
 
-from prompt import CalibrationSettings
+from prompt import CalibrationSettings, input_data_filters
 from prompt.utils import events_in_basf2_file, ExpRun
 import basf2
 from random import choice
@@ -15,7 +15,16 @@ settings = CalibrationSettings(name="CDC Tracking",
                                expert_username="eberthol",
                                description=__doc__,
                                input_data_formats=["raw"],
-                               input_data_names=["hlt_mumu", "hlt_hadron", "Bcosmics"],
+                               input_data_names=["mumutight_calib", "hadron_calib", "cosmic_calib"],
+                               input_data_filters={"mumutight_calib": [input_data_filters["Data Tag"]["mumutight_calib"],
+                                                                       input_data_filters["Data Quality Tag"]["Good"],
+                                                                       input_data_filters["Magnet"]["On"]],
+                                                   "hadron_calib": [input_data_filters["Data Tag"]["hadron_calib"],
+                                                                    input_data_filters["Data Quality Tag"]["Good"],
+                                                                    input_data_filters["Magnet"]["On"]],
+                                                   "cosmic_calib": [input_data_filters["Data Tag"]["cosmic_calib"],
+                                                                    input_data_filters["Data Quality Tag"]["Good"],
+                                                                    input_data_filters["Magnet"]["On"]]},
                                depends_on=[],
                                expert_config={
                                    "max_files_per_run": 100000,
@@ -74,9 +83,9 @@ def get_calibrations(input_data, **kwargs):
     import basf2
     from prompt.utils import filter_by_max_files_per_run
     # Gets the input files and IoV objects associated with the files.
-    file_to_iov_mumu = input_data["hlt_mumu"]
-    file_to_iov_hadron = input_data["hlt_hadron"]
-    file_to_iov_Bcosmics = input_data["Bcosmics"]
+    file_to_iov_mumu = input_data["mumutight_calib"]
+    file_to_iov_hadron = input_data["hadron_calib"]
+    file_to_iov_Bcosmics = input_data["cosmic_calib"]
 
     # read expert_config values
     expert_config = kwargs.get("expert_config")
@@ -88,24 +97,24 @@ def get_calibrations(input_data, **kwargs):
     max_events_per_file_hadron = expert_config["max_events_per_file_hadron"]
     payload_boundaries = []
     payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
-    basf2.B2INFO(f"Expert set payload boundaries are: {payload_boundaries}")
+    basf2.B2INFO(f"Payload boundaries from expert_config: {payload_boundaries}")
 
     reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run, min_events_per_file)
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())
-    basf2.B2INFO(f"Total number of hlt_mumu files actually used as input = {len(input_files_mumu)}")
+    basf2.B2INFO(f"Total number of mumutight_calib files actually used as input = {len(input_files_mumu)}")
     chosen_files_mumu = select_files(input_files_mumu[:], max_events_per_calibration, max_events_per_file)
     chosen_files_mumu_for_xt_sr = select_files(input_files_mumu[:], max_events_per_calibration_for_xt_sr, max_events_per_file)
 
     reduced_file_to_iov_hadron = filter_by_max_files_per_run(file_to_iov_hadron, max_files_per_run, min_events_per_file)
     input_files_hadron = list(reduced_file_to_iov_hadron.keys())
-    basf2.B2INFO(f"Total number of hlt_hadron files actually used as input = {len(input_files_hadron)}")
+    basf2.B2INFO(f"Total number of hadron_calib files actually used as input = {len(input_files_hadron)}")
     chosen_files_hadron = select_files(input_files_hadron[:], max_events_per_calibration, max_events_per_file_hadron)
     chosen_files_hadron_for_xt_sr = select_files(input_files_hadron[:],
                                                  max_events_per_calibration_for_xt_sr, max_events_per_file_hadron)
 
     reduced_file_to_iov_Bcosmics = filter_by_max_files_per_run(file_to_iov_Bcosmics, max_files_per_run, min_events_per_file)
     input_files_Bcosmics = list(reduced_file_to_iov_Bcosmics.keys())
-    basf2.B2INFO(f"Total number of Bcosmics files actually used as input = {len(input_files_Bcosmics)}")
+    basf2.B2INFO(f"Total number of cosmic_calib files actually used as input = {len(input_files_Bcosmics)}")
     chosen_files_Bcosmics = select_files(input_files_Bcosmics[:], max_events_per_calibration, max_events_per_file)
     chosen_files_Bcosmics_for_xt_sr = select_files(
         input_files_Bcosmics[:],
@@ -113,15 +122,15 @@ def get_calibrations(input_data, **kwargs):
         max_events_per_file)
 
     input_file_dict = {
-        "hlt_mumu": chosen_files_mumu_for_xt_sr,
-        "hlt_hadron": chosen_files_hadron_for_xt_sr,
-        "Bcosmics": chosen_files_Bcosmics_for_xt_sr
+        "mumutight_calib": chosen_files_mumu_for_xt_sr,
+        "hadron_calib": chosen_files_hadron_for_xt_sr,
+        "cosmic_calib": chosen_files_Bcosmics_for_xt_sr
     }
 
     chosen_file_dict = {
-        "hlt_mumu": chosen_files_mumu,
-        "hlt_hadron": chosen_files_hadron,
-        "Bcosmics": chosen_files_Bcosmics
+        "mumutight_calib": chosen_files_mumu,
+        "hadron_calib": chosen_files_hadron,
+        "cosmic_calib": chosen_files_Bcosmics
     }
 
     # Get the overall IoV we want to cover, including the end values
@@ -193,7 +202,7 @@ def get_calibrations(input_data, **kwargs):
                           )
 
     if payload_boundaries:
-        basf2.B2INFO(f"Found payload_boundaries: calibration strategies set to SequentialBoundaries.")
+        basf2.B2INFO("Found payload_boundaries: calibration strategies set to SequentialBoundaries.")
         cal0.strategies = strategies.SequentialBoundaries
         for algorithm in cal0.algorithms:
             algorithm.params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
@@ -239,13 +248,19 @@ def pre_collector(max_events=None):
         path : path for pre collection
     """
     from basf2 import create_path, register_module
+    from softwaretrigger.constants import HLT_INPUT_OBJECTS
     reco_path = create_path()
     if max_events is None:
-        root_input = register_module('RootInput')
+        root_input = register_module(
+            'RootInput',
+            branchNames=HLT_INPUT_OBJECTS
+        )
     else:
-        root_input = register_module('RootInput',
-                                     entrySequences=['0:{}'.format(max_events)]
-                                     )
+        root_input = register_module(
+            'RootInput',
+            branchNames=HLT_INPUT_OBJECTS,
+            entrySequences=[
+                '0:{}'.format(max_events)])
     reco_path.add_module(root_input)
 
     gearbox = register_module('Gearbox')
@@ -276,13 +291,19 @@ def pre_collector_cr(max_events=None):
         path : path for pre collection
     """
     from basf2 import create_path, register_module
+    from softwaretrigger.constants import HLT_INPUT_OBJECTS
     reco_path = create_path()
     if max_events is None:
-        root_input = register_module('RootInput')
+        root_input = register_module(
+            'RootInput',
+            branchNames=HLT_INPUT_OBJECTS
+        )
     else:
-        root_input = register_module('RootInput',
-                                     entrySequences=['0:{}'.format(max_events)]
-                                     )
+        root_input = register_module(
+            'RootInput',
+            branchNames=HLT_INPUT_OBJECTS,
+            entrySequences=[
+                '0:{}'.format(max_events)])
     reco_path.add_module(root_input)
 
     gearbox = register_module('Gearbox')
@@ -409,7 +430,7 @@ class CDCCalibration(Calibration):
         from caf.framework import Collection
 
         for skim_type, file_list in input_file_dict.items():
-            if skim_type is "Bcosmics":
+            if skim_type == "Bcosmics":
                 collection = Collection(collector=collector(granularity=collector_granularity),
                                         input_files=file_list,
                                         pre_collector_path=pre_collector_cr(max_events=max_events),

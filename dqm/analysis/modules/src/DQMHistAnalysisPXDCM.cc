@@ -34,6 +34,10 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:CommonMode:"));
   addParam("useEpics", m_useEpics, "useEpics", true);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 10000);
+  addParam("warnMeanAdhoc", m_warnMeanAdhoc, "warn level for peak position", 1.0);
+  addParam("errorMeanAdhoc", m_errorMeanAdhoc, "error level for peak position", 2.0);
+  addParam("warnOutside", m_warnOutside, "warn level for outside fraction", 1e-5);
+  addParam("errorOutside", m_errorOutside, "error level for outside fraction", 1e-4);
   B2DEBUG(99, "DQMHistAnalysisPXDCM: Constructor done.");
 }
 
@@ -65,14 +69,16 @@ void DQMHistAnalysisPXDCMModule::initialize()
   m_cCommonMode = new TCanvas((m_histogramDirectoryName + "/c_CommonMode").data());
   m_cCommonModeDelta = new TCanvas((m_histogramDirectoryName + "/c_CommonModeDelta").data());
 
-  m_hCommonMode = new TH2D("CommonMode", "CommonMode; Module; CommonMode", m_PXDModules.size(), 0, m_PXDModules.size(), 63, 0, 63);
+  m_hCommonMode = new TH2D("hPXDCommonMode", "PXD CommonMode; Module; CommonMode", m_PXDModules.size(), 0, m_PXDModules.size(), 63, 0,
+                           63);
   m_hCommonMode->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonMode->SetStats(false);
-  m_hCommonModeDelta = new TH2D("CommonModeDelta", "CommonModeDelta; Module; CommonModeDelta", m_PXDModules.size(), 0,
+  m_hCommonModeDelta = new TH2D("hPXDCommonModeAdhoc", "PXD CommonMode Adhoc; Module; CommonMode", m_PXDModules.size(), 0,
                                 m_PXDModules.size(), 63, 0, 63);
   m_hCommonModeDelta->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonModeDelta->SetStats(false);
-  m_hCommonModeOld = new TH2D("CommonModeOld", "CommonModeOld; Module; CommonModeOld", m_PXDModules.size(), 0, m_PXDModules.size(),
+  m_hCommonModeOld = new TH2D("hPXDCommonModeOld", "PXD CommonMode Old; Module; CommonMode", m_PXDModules.size(), 0,
+                              m_PXDModules.size(),
                               63, 0, 63);
   m_hCommonModeOld->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonModeOld->SetStats(false);
@@ -108,10 +114,18 @@ void DQMHistAnalysisPXDCMModule::initialize()
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-    mychid.resize(3);
+    mychid.resize(4);
     SEVCHK(ca_create_channel((m_pvPrefix + "Outside").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
     SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
     SEVCHK(ca_create_channel((m_pvPrefix + "CM63").data(), NULL, NULL, 10, &mychid[2]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Status_Adhoc").data(), NULL, NULL, 10, &mychid[3]), "ca_create_channel failure");
+
+    for (VxdID& aPXDModule : m_PXDModules) {
+      TString buff = (std::string)aPXDModule;
+      buff.ReplaceAll(".", "_");
+      auto& my = mychid_mean[aPXDModule];
+      SEVCHK(ca_create_channel((m_pvPrefix + "Mean:" + buff).Data(), NULL, NULL, 10, &my), "ca_create_channel failure");
+    }
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif
@@ -139,6 +153,9 @@ void DQMHistAnalysisPXDCMModule::event()
   double all_cm = 0.0;
   bool error_flag = false;
   bool warn_flag = false;
+  bool error_adhoc_flag = false;
+  bool warn_adhoc_flag = false;
+  bool anyupdate = false;
   if (!m_cCommonMode) return;
   m_hCommonMode->Reset(); // dont sum up!!!
 
@@ -151,17 +168,18 @@ void DQMHistAnalysisPXDCMModule::event()
       hh1 = findHist(m_histogramDirectoryName, name);
     }
     if (hh1) {
-      double current = 0.0;
-      double outside = 0.0;
+      double current_full = 0.0;
+      double outside_full = 0.0;
 
       auto nevent = hh1->GetBinContent(0); // misuse underflow as event counter
       bool update = nevent - m_hCommonModeOld->GetBinContent(i + 1, 0) > m_minEntries ;
+      anyupdate |= update;
       if (update) m_hCommonModeOld->SetBinContent(i + 1, 0, nevent);
       for (int bin = 1; bin <= 63; bin++) { // we ignore CM63!!!
         double v;
         v = hh1->GetBinContent(bin);
         m_hCommonMode->SetBinContent(i + 1, bin, v); // attention, mixing bin nr and index
-        current += v;
+        current_full += v;
         if (nevent < m_minEntries) {
           m_hCommonModeDelta->SetBinContent(i + 1, bin, v); // attention, mixing bin nr and index
         } else if (update) {
@@ -171,22 +189,51 @@ void DQMHistAnalysisPXDCMModule::event()
         }
       }
 
-      m_monObj->setVariable(("cm_" + (std::string)m_PXDModules[i]).c_str(), hh1->GetMean());
-
-
       /// TODO: integration intervalls depend on CM default value, this seems to be agreed =10
-      outside += hh1->Integral(16, 63);
+      // Attention, Integral uses the bin nr, not the value!
+      outside_full += hh1->Integral(16 + 1, 63);
       // FIXME currently we have to much noise below the line ... thus excluding this to avoid false alarms
-      // outside += hh1->Integral(1 /*0*/, 5); /// FIXME we exclude bin 0 as we use it for debugging/timing pixels
-      all_outside += outside;
-      all += current;
+      // outside_full += hh1->Integral(1 /*0*/, 5); /// FIXME we exclude bin 0 as we use it for debugging/timing pixels
+      all_outside += outside_full;
+      all += current_full;
       double dhpc = hh1->GetBinContent(64);
       all_cm += dhpc;
-      if (current > 1) {
-        error_flag |= (outside / current > 1e-5); /// TODO level might need adjustment
-        warn_flag |= (outside / current > 1e-6); /// TODO level might need adjustment
-//         error_flag |= (dhpc / current > 1e-5); // DHP Fifo overflow ... might be critical/unrecoverable
-//         warn_flag |= (dhpc / current > 1e-6); // DHP Fifo overflow ... might be critical/unrecoverable
+      if (current_full > 1) {
+        error_flag |= (outside_full / current_full > m_errorOutside); /// TODO level might need adjustment
+        warn_flag |= (outside_full / current_full > m_warnOutside); /// TODO level might need adjustment
+//         error_flag |= (dhpc / current_full > 1e-5); // DHP Fifo overflow ... might be critical/unrecoverable
+//         warn_flag |= (dhpc / current_full > 1e-6); // DHP Fifo overflow ... might be critical/unrecoverable
+      }
+
+      if (update) {
+        Double_t mean_adhoc = 0.;
+        Double_t entries_adhoc = 0.;
+        Double_t outside_adhoc = 0.;
+        // Attention, Bins
+        for (int cm_y = 0; cm_y < 16; cm_y++) {
+          auto v = m_hCommonModeDelta->GetBinContent(m_hCommonModeDelta->GetBin(i + 1, cm_y + 1));
+          entries_adhoc += v;
+          mean_adhoc += v * (cm_y + 1);
+        }
+        // Attention, Bins
+        for (int cm_y = 16; cm_y < 64; cm_y++) {
+          auto v = m_hCommonModeDelta->GetBinContent(m_hCommonModeDelta->GetBin(i + 1, cm_y + 1));
+          entries_adhoc += v;
+          outside_adhoc += v;
+        }
+        if (entries_adhoc > 0) { // ignore 1.3.2
+          mean_adhoc /= entries_adhoc; // calculate mean
+          warn_adhoc_flag |= entries_adhoc > 1000 && fabs(10.0 - mean_adhoc) > m_warnMeanAdhoc;
+          error_adhoc_flag |= entries_adhoc > 1000 && fabs(10.0 - mean_adhoc) > m_errorMeanAdhoc;
+          m_monObj->setVariable(("cm_" + (std::string)m_PXDModules[i]).c_str(), mean_adhoc);
+#ifdef _BELLE2_EPICS
+          if (m_useEpics) {
+            auto my = mychid_mean[m_PXDModules[i]];
+            // B2ERROR("Mean "<< name << " " << mean_adhoc << " " << outside_adhoc << " " << entries_adhoc << " " <<warn_adhoc_flag <<error_adhoc_flag );
+            if (my) SEVCHK(ca_put(DBR_DOUBLE, my, (void*)&mean_adhoc), "ca_set failure");
+          }
+#endif
+        }
       }
     }
   }
@@ -232,29 +279,31 @@ void DQMHistAnalysisPXDCMModule::event()
   }
 
   {
+    int status_adhoc = 0;
     m_cCommonModeDelta->cd();
     // not enough Entries
-#if 0
-    int status = 0;
-    if (all < 100.) {
+
+    if (all < 100.) { // delta cannot be more than all
       m_cCommonModeDelta->Pad()->SetFillColor(kGray);// Magenta or Gray
-      status = 0; // default
+      status_adhoc = 0; // default
     } else {
       /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
-      if (all_outside / all > 1e-5 || /*all_cm / all > 1e-5 ||*/ error_flag) {
+      if (error_adhoc_flag) {
         m_cCommonModeDelta->Pad()->SetFillColor(kRed);// Red
-        status = 4;
-      } else if (all_outside / all > 1e-6 || /*all_cm / all > 1e-6 ||*/ warn_flag) {
+        status_adhoc = 4;
+      } else if (warn_adhoc_flag) {
         m_cCommonModeDelta->Pad()->SetFillColor(kYellow);// Yellow
-        status = 3;
-      } else if (all_outside == 0. /*&& all_cm == 0.*/) {
+        status_adhoc = 3;
+      } else {
         m_cCommonModeDelta->Pad()->SetFillColor(kGreen);// Green
-        status = 2;
-      } else { // between 0 and 50 ...
-        m_cCommonModeDelta->Pad()->SetFillColor(kWhite);// White
-        status = 1;
+        status_adhoc = 2;
+        /*      } else { // between 0 and 50 ...
+                m_cCommonModeDelta->Pad()->SetFillColor(kWhite);// White
+                status_adhoc = 1;*/
       }
     }
+#ifdef _BELLE2_EPICS
+    if (m_useEpics && anyupdate) SEVCHK(ca_put(DBR_INT, mychid[3], (void*)&status_adhoc), "ca_set failure");
 #endif
     if (m_hCommonModeDelta) {
       m_hCommonModeDelta->Draw("colz");
@@ -291,6 +340,7 @@ void DQMHistAnalysisPXDCMModule::terminate()
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
     for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
+    for (auto& m : mychid_mean) SEVCHK(ca_clear_channel(m.second), "ca_clear_channel failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif

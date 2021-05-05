@@ -10,6 +10,7 @@
 #include <ecl/simulation/SensitiveDetector.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 #include <simulation/background/BkgNeutronWeight.h>
 
 using namespace std;
@@ -353,7 +354,7 @@ bool BkgSensitiveDiode::step(G4Step* aStep, G4TouchableHistory*)
     int pdgCode = track.GetDefinition()->GetPDGEncoding();
     double endEnergy = track.GetKineticEnergy() * Unit::MeV;
     double neutWeight = 0;
-    if (pdgCode == 2112) {
+    if (pdgCode == Const::neutron.getPDGCode()) {
       BkgNeutronWeight& wt = BkgNeutronWeight::getInstance();
       neutWeight = wt.getWeight(m_startEnergy / Unit::MeV);
     }

@@ -737,6 +737,7 @@ def make_combined_steering_file(
         modules=modules,
         stats=False,
         hints=False,
+        mdstOutput=False,
     )
 
     with open(SteeringFile, "w") as f:

@@ -51,9 +51,8 @@ for width in integral_types:
         # do we need a prefix to the literal?
         prefix = "ull" if width > 32 else ""
         # append it to the test class
-        testclass.append(f"uint{width}_t {func_name}() const {{ return {value}ull; }}")
-        testclass.append("uint{0}_t& ref_{1}() {{ static uint{0}_t val = {2}{3}; return val; }}".format(
-            width, func_name, value, prefix))
+        testclass.append(f"uint{width}_t {func_name}() const {{ return {value}{prefix}; }}")
+        testclass.append(f"uint{width}_t& ref_{func_name}() {{ static uint{width}_t val = {value}{prefix}; return val; }}")
         # and remember name and result for checking
         results.append([func_name, value, dtype])
         results.append(['ref_' + func_name, value, dtype])

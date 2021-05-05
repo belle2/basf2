@@ -74,16 +74,16 @@ void PXDPerformanceModule::beginRun()
 void PXDPerformanceModule::event()
 {
   PXD2TrackEvent eventHolder;
-  B2DEBUG(1, "PXD2TrackEvent created");
+  B2DEBUG(20, "PXD2TrackEvent created");
   bool good = eventHolder.setValues(m_recoTracks,
                                     m_storeRecoTracksName,
                                     m_storeInterceptsName,
                                     m_storeClustersFromTracksName
                                    );
-  B2DEBUG(1, "PXD2TrackEvent update status: " << good);
+  B2DEBUG(20, "PXD2TrackEvent update status: " << good);
   if (good) {
     m_pxd2TrackEvents.appendNew(eventHolder);
-    B2DEBUG(1, "PXD2TrackEvent is appended.");
+    B2DEBUG(20, "PXD2TrackEvent is appended.");
   }
 
 }

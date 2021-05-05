@@ -22,6 +22,8 @@
 
 import basf2
 import modularAnalysis as ma
+from stdV0s import stdKshorts
+from stdPi0s import stdPi0s
 from vertex import TagV
 import variables as v
 import glob
@@ -31,22 +33,18 @@ import numpy as np
 basf2.set_log_level(basf2.LogLevel.ERROR)
 
 # --I/O----------------------------------------------------------------------------------------
-if (len(sys.argv) < 2 or sys.argv[1] not in ['signal', 'qqbar']):
-    sys.exit("usage:\n\tbasf2 B2A703-ContinuumSuppression_MVAExpert.py <signal,qqbar>")
+step = 'signal'
 
-step = str(sys.argv[1])
-
-path = '/group/belle2/tutorial/release_01-00-00/DCS_Bd_KsPi0'
-signal_inputfiles = glob.glob(path + '/*/*/*1.root.mdst')
-qqbar_inputfiles = glob.glob(path + '/*/*/*7.root.mdst')
-
-np.random.shuffle(signal_inputfiles)
-np.random.shuffle(qqbar_inputfiles)
+if len(sys.argv) >= 2:
+    if sys.argv[1] not in ['signal', 'qqbar']:
+        sys.exit("usage:\n\tbasf2 B2A713-DeepContinuumSuppression_MVAExpert.py <signal,qqbar>")
+    else:
+        step = str(sys.argv[1])
 
 if step == 'signal':
-    input = signal_inputfiles
+    input_file_list = [basf2.find_file('Bd2K0spi0_to_test.root', 'examples', False)]
 elif step == 'qqbar':
-    input = qqbar_inputfiles
+    input_file_list = [basf2.find_file('ccbar_sample_to_test.root', 'examples', False)]
 else:
     sys.exit('Step does not match any of the available samples: `signal` or `qqbar`')
 
@@ -56,18 +54,14 @@ outfile = 'MVAExpert_fullNTuple_' + step + '.root'
 main = basf2.create_path()
 
 # Perform analysis.
-ma.inputMdstList('default', input, path=main)
+ma.inputMdstList('default', input_file_list, path=main)
 
 main.add_module('ProgressBar')
 
 # Build B candidate like in B2A701-ContinuumSuppression_Input.py
-ma.fillParticleList('gamma', 'goodGamma == 1', path=main)
-
-ma.fillParticleList('pi+:good', 'chiProb > 0.001 and pionID > 0.5', path=main)
-
-ma.reconstructDecay('K_S0 -> pi+:good pi-:good', '0.480<=M<=0.516', path=main)
-ma.reconstructDecay('pi0  -> gamma gamma', '0.115<=M<=0.152', path=main)
-ma.reconstructDecay('B0   -> K_S0 pi0', '5.2 < Mbc < 5.3 and -0.3 < deltaE < 0.2', path=main)
+stdKshorts(path=main)
+stdPi0s('eff40_May2020', path=main)
+ma.reconstructDecay('B0 -> K_S0:merged pi0:eff40_May2020', '5.2 < Mbc < 5.3 and -0.3 < deltaE < 0.2', path=main)
 
 ma.matchMCTruth('B0', path=main)
 ma.buildRestOfEvent('B0', path=main)
@@ -91,8 +85,8 @@ deadEndPath = basf2.create_path()
 ma.signalSideParticleFilter('B0', '', roe_path, deadEndPath)
 
 # Build particle lists for low level variables
-ma.fillParticleList('gamma:roe', 'isInRestOfEvent == 1 and goodGamma == 1', path=roe_path)
-ma.fillParticleList('gamma:signal', 'isInRestOfEvent == 0 and goodGamma == 1', path=roe_path)
+ma.fillParticleList('gamma:roe', 'isInRestOfEvent == 1 and goodBelleGamma == 1', path=roe_path)
+ma.fillParticleList('gamma:signal', 'isInRestOfEvent == 0 and goodBelleGamma == 1', path=roe_path)
 ma.fillParticleList('pi+:chargedProe', 'isInRestOfEvent == 1', path=roe_path)
 ma.fillParticleList('pi+:chargedPsignal', 'isInRestOfEvent == 0', path=roe_path)
 ma.fillParticleList('pi-:chargedMroe', 'isInRestOfEvent == 1', path=roe_path)
@@ -130,15 +124,15 @@ contVars = [
     'KSFWVariables(hoo2)',
     'KSFWVariables(hoo3)',
     'KSFWVariables(hoo4)',
-    'CleoCone(1)',
-    'CleoCone(2)',
-    'CleoCone(3)',
-    'CleoCone(4)',
-    'CleoCone(5)',
-    'CleoCone(6)',
-    'CleoCone(7)',
-    'CleoCone(8)',
-    'CleoCone(9)'
+    'CleoConeCS(1)',
+    'CleoConeCS(2)',
+    'CleoConeCS(3)',
+    'CleoConeCS(4)',
+    'CleoConeCS(5)',
+    'CleoConeCS(6)',
+    'CleoConeCS(7)',
+    'CleoConeCS(8)',
+    'CleoConeCS(9)'
 ]
 
 # Define additional low level variables
@@ -180,10 +174,7 @@ for rank in range(5):
             variables.append(f'{variable}_{shortcut}{rank}')
 
 # MVAExpert
-# In this path there are already several trained weightfiles. Look at README for a short explanation
-path = '/gpfs/fs02/belle2/users/pablog/inputForDNNContinuumSuppression/'
-
-roe_path.add_module('MVAExpert', listNames=['B0'], extraInfoName='Deep_CS', identifier=path + 'Deep_Feed_Forward.xml')
+roe_path.add_module('MVAExpert', listNames=['B0'], extraInfoName='Deep_CS', identifier='Deep_Feed_Forward.xml')
 
 # Variables from MVAExpert.
 expertVars = ['extraInfo(Deep_CS)', 'transformedNetworkOutput(Deep_CS,0.1,1.0)']

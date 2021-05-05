@@ -368,7 +368,7 @@ class LogViewer(IPythonWidget):
                     level = message["level"].lower()
                     output.write(self.log_message.format(info=info, type_lower=level, var_output=variables, **message))
                     continue
-                except json.JSONDecodeError as e:
+                except json.JSONDecodeError:
                     # any error: treat as default output, not a log line
                     pass
 

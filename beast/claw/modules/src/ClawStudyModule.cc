@@ -14,6 +14,7 @@
 #include <generators/SAD/dataobjects/SADMetaHit.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/GearDir.h>
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <cmath>
 
@@ -161,8 +162,8 @@ void ClawStudyModule::event()
       double tof = aHit->getFlightTime(); //ns
 
       h_claws_Evtof1[detNB]->Fill(tof, Edep);
-      if (pdg == 22) h_claws_Evtof2[detNB]->Fill(tof, Edep);
-      else if (fabs(pdg) == 11) h_claws_Evtof3[detNB]->Fill(tof, Edep);
+      if (pdg == Const::photon.getPDGCode()) h_claws_Evtof2[detNB]->Fill(tof, Edep);
+      else if (fabs(pdg) == Const::electron.getPDGCode()) h_claws_Evtof3[detNB]->Fill(tof, Edep);
       else h_claws_Evtof4[detNB]->Fill(tof, Edep);
       if (Edep > m_Ethres) {
         h_claws_edep[detNB]->Fill(Edep);

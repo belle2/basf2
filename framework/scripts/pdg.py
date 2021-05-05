@@ -100,7 +100,7 @@ def conjugate(name):
 
     try:
         return to_name(-from_name(name))
-    except LookupError as e:
+    except LookupError:
         return name
 
 

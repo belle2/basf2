@@ -28,13 +28,13 @@ namespace Belle2 {
 
     /** Constructor */
     PXDDQMExpressRecoModule();
-    /* Destructor */
-    virtual ~PXDDQMExpressRecoModule();
 
   private:
-    /** Module functions */
+    /** Initialize */
     void initialize() override final;
+    /** Begin run */
     void beginRun() override final;
+    /** Event */
     void event() override final;
 
     /**
@@ -45,8 +45,14 @@ namespace Belle2 {
 
   private:
 
-    /** cut for accepting to hitmap histogram, using pixels only, default = 0 */
-    float m_CutPXDCharge = 0.0;
+    /** cut for accepting filtered pixel */
+    int m_CutMinCharge;
+    /** cut for accepting filtered cluster, using cluster charge */
+    int m_CutMinClusterCharge;
+    /** cut for accepting to filtered hitmap histogram, using cluster seed */
+    int m_CutMinSeedCharge;
+    /** cut for accepting to filtered hitmap histogram, maximum cluster size */
+    int m_CutMaxClusterSize;
 
     std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
 
@@ -62,16 +68,25 @@ namespace Belle2 {
 
     /** Hitmaps of Digits */
     TH1D* m_hitMapCounts = {};
+    /** Hitmaps of filtered Digits */
+    TH1D* m_hitMapFilterCounts = {};
     /** Hitmaps of Clusters*/
     TH1D* m_hitMapClCounts = {};
+    /** Hitmaps of filtered Clusters*/
+    TH1D* m_hitMapClFilterCounts = {};
+
     /** Hitmaps of digits on chips */
     TH1D* m_hitMapCountsChip = {};
     /** Hitmaps of clusters on chips */
     TH1D* m_hitMapClCountsChip = {};
     /** Fired pixels per event */
     std::vector <TH1D*> m_fired = {};
+    /** Filtered fired pixels per event */
+    std::vector<TH1D*> m_goodfired = {};
     /** Clusters per event */
     std::vector <TH1D*> m_clusters = {};
+    /** filtered Clusters per event */
+    std::vector<TH1D*> m_goodclusters = {};
     // FIXME: Startrow related histos are expert debugging, not for shifter (-> remove this)
     /** Start row distribution */
     //std::vector <TH1D*> m_startRow={};

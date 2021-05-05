@@ -78,9 +78,9 @@ uvarsv = uvars + ['chiProb']
 uvars4c = uvars + vu.create_aliases(['OrcaKinFitProb',
                                      'OrcaKinFitProb',
                                      'OrcaKinFitChi2',
-                                     'OrcaKinFitErrorCode'], 'extraInfo(variable)', "") + \
+                                     'OrcaKinFitErrorCode'], 'extraInfo({variable})', "") + \
     vu.create_aliases(['VertexFitChi2',
-                       'VertexFitProb'], 'daughter(1,extraInfo(variable))', "A")
+                       'VertexFitProb'], 'daughter(1, extraInfo({variable}))', "A")
 
 # Saving variables to ntuple
 output_file = 'B2A424-OrcaKinFit_vertexfit_4Cfit.root'

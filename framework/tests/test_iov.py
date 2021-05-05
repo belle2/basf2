@@ -7,7 +7,7 @@ import random
 import unittest
 import doctest
 from conditions_db.iov import IntervalOfValidity, IoVSet
-from conditions_db import iov
+import conditions_db.iov
 
 
 class TestIntervalOfValidity(unittest.TestCase):
@@ -164,7 +164,7 @@ class TestIoVSet(unittest.TestCase):
 
 def load_tests(loader, tests, ignore):
     """Add the doctests to the list of tests"""
-    tests.addTests(doctest.DocTestSuite(iov))
+    tests.addTests(doctest.DocTestSuite(conditions_db.iov))
     return tests
 
 

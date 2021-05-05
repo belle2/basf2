@@ -3,4 +3,4 @@
 Fitting
 =======
 
-.. include:: ../todo.rst
+.. include:: ../todo.rstinclude

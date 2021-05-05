@@ -107,8 +107,8 @@ namespace Belle2 {
     IntervalOfValidity iov(m_event->getExperiment(), m_event->getRun(), m_event->getExperiment(), m_event->getRun());
 
     BeamParameters beamParams;
-    beamParams.setLER(Eler, angleLer, covariance);
-    beamParams.setHER(Eher, angleHer, covariance);
+    beamParams.setLER(Eler, angleLer, 0, covariance);
+    beamParams.setHER(Eher, angleHer, 0, covariance);
 
     CollisionBoostVector collisionBoostVector;
     CollisionInvariantMass collisionInvM;

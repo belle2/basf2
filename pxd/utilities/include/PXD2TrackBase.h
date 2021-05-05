@@ -74,7 +74,13 @@ namespace Belle2 {
      */
     const T& getTrackM() const { return m_track_m; }
 
-    /** Set values from RecoTrack collection */
+    /** Set values from RecoTrack collection.
+     * @param recoTracks StoreArray of RecoTracks.
+     * @param recoTracksName name of the related array of RecoTracks.
+     * @param pxdInterceptsName name of the related array of PXDIntercepts.
+     * @param pxdTrackClustersName name of the related array of PXDClustersFromTracks.
+     * @return setting status true for success.
+     */
     //bool setValues(const RelationVector<RecoTrack>& recoTracks);
     virtual bool setValues(const StoreArray<RecoTrack>& recoTracks,
                            const std::string recoTracksName = "",
@@ -89,7 +95,7 @@ namespace Belle2 {
     T m_track_p; /**< Track with the positive charge. */
     T m_track_m; /**< Track with the negative charge. */
 
-    ClassDef(PXD2TrackBase, 1);
+    ClassDef(PXD2TrackBase, 1)
   };
 
   template <class T>

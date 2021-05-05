@@ -47,7 +47,7 @@ def get_lowest_exprun(number_of_experiments, experiment_index, run_list,
         lowest_exprun = run_list[0]
         # Start from the beginning of experiments except the first one.
         if (experiment_index > 1):
-            lowest_exprun.run = 0
+            lowest_exprun = ExpRun(lowest_exprun.exp, 0)
     return lowest_exprun
 
 
@@ -76,5 +76,5 @@ def get_highest_exprun(number_of_experiments, experiment_index, run_list,
         highest_exprun = run_list[-1]
         # Extend the IOV to the end of experiments except the last one.
         if (experiment_index < number_of_experiments):
-            highest_exprun.run = -1
+            highest_exprun = ExpRun(highest_exprun.exp, -1)
     return highest_exprun

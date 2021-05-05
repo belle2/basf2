@@ -23,9 +23,9 @@ def addSource(x, angle, slotID, path):
                     minAlpha=0.0,  # not used if angulardistribution == 'Gaussian'
                     maxAlpha=33.0,  # not used if angulardistribution == 'Gaussian'
                     na=0.50,       # used only if angulardistribution == 'Gaussian'
-                    startTime=0,
+                    startTime=-53.0,  # start time relative to the first cal pulse (according to run 8/414)
                     pulseWidth=10.0e-3,  # laser time jitter (1 Gaussian sigma), [ns]
-                    numPhotons=10,
+                    numPhotons=62.5,  # according to run 8/414
                     diameter=10.0e-3,  # source diameter in cm
                     slotID=slotID,  # if nonzero, local (slot) frame, otherwise Belle II
                     x=x,
@@ -36,13 +36,11 @@ def addSource(x, angle, slotID, path):
                     psi=0.0,
                     angularDistribution='uniform'
                     # angularDistribution='(40-x)*TMath::Sin(x)'
-
                     )
 
 
 # Create path
 main = b2.create_path()
-
 
 # Set number of events to generate
 main.add_module('EventInfoSetter',
@@ -55,11 +53,10 @@ main.add_module('Gearbox')
 # Geometry
 main.add_module('Geometry')
 
-
 # Pulse generator
 main.add_module('TOPCalPulseGenerator',
                 asicChannels=[0],
-                amplitude=700.)
+                amplitude=600.)
 
 # Optical sources
 for slotId in range(1, 17):

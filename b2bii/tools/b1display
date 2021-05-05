@@ -10,7 +10,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
 
     from basf2 import *
     from ROOT import Belle2
-    from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase, parse_process_url
+    from b2biiConversion import convertBelleMdstToBelleIIMdst, parse_process_url
 
     import sys
     try:
@@ -30,7 +30,6 @@ with tempfile.TemporaryDirectory() as tmpdir:
     subprocess.call(['scp', 'cw01.cc.kek.jp:' + on_kek_cc[0] + '*', '.'])
 
     path = create_path()
-    setupB2BIIDatabase(True)
     files = glob.glob("*.mdst")
     convertBelleMdstToBelleIIMdst(files, applySkim=True, path=path)
     path.add_module('RootOutput', outputFileName='b1display_temp.root')

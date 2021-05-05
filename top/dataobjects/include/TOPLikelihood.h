@@ -33,7 +33,7 @@ namespace Belle2 {
 
     /**
      * Sets reconstruction flag
-     * @param reconstruction flag: 1 = OK, 0 = out of acceptance, -1 = error in reconstruction
+     * @param flag reconstruction flag: 1 = OK, 0 = out of acceptance, -1 = error in reconstruction
      */
     void setFlag(int flag) {m_flag = flag;}
 

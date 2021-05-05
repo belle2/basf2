@@ -107,7 +107,7 @@ namespace Belle2 {
        * @param digitsName name of TOPDigits collection
        * @param chargedStable hypothesis used in mdst track extrapolation
        */
-      explicit TOPTrack(const Track& track, std::string digitsName = "",
+      explicit TOPTrack(const Track& track, const std::string& digitsName = "",
                         const Const::ChargedStable& chargedStable = Const::pion);
 
       /**
@@ -115,7 +115,7 @@ namespace Belle2 {
        * @param extHit extrapolated track hit
        * @param digitsName name of TOPDigits collection
        */
-      explicit TOPTrack(const ExtHit* extHit, std::string digitsName = "");
+      explicit TOPTrack(const ExtHit* extHit, const std::string& digitsName = "");
 
       /**
        * Overrides transformation from local to nominal frame, which is by default obtained from DB.
@@ -258,7 +258,7 @@ namespace Belle2 {
        * @param digitsName name of TOPDigits collection
        * @param chargedStable hypothesis used in mdst track extrapolation
        */
-      void set(const Track& track, std::string digitsName, const Const::ChargedStable& chargedStable);
+      void set(const Track& track, const std::string& digitsName, const Const::ChargedStable& chargedStable);
 
       /**
        * Sets helix (helix is given in nominal frame)

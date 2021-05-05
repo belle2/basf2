@@ -32,7 +32,7 @@ namespace Belle2 {
     {}
 
 
-    TOPTrack::TOPTrack(const Track& track, std::string digitsName, const Const::ChargedStable& chargedStable)
+    TOPTrack::TOPTrack(const Track& track, const std::string& digitsName, const Const::ChargedStable& chargedStable)
     {
       // find extrapolated track hit at TOP
 
@@ -60,7 +60,7 @@ namespace Belle2 {
     }
 
 
-    TOPTrack::TOPTrack(const ExtHit* extHit, std::string digitsName)
+    TOPTrack::TOPTrack(const ExtHit* extHit, const std::string& digitsName)
     {
       if (not extHit) return;
       m_extHit = extHit;
@@ -83,7 +83,7 @@ namespace Belle2 {
     }
 
 
-    void TOPTrack::set(const Track& track, std::string digitsName, const Const::ChargedStable& chargedStable)
+    void TOPTrack::set(const Track& track, const std::string& digitsName, const Const::ChargedStable& chargedStable)
     {
       // require fitResult
 

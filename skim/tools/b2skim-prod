@@ -148,6 +148,7 @@ import argparse
 from functools import lru_cache
 from itertools import product, zip_longest
 import json
+from numpy import inf
 from pathlib import Path
 import re
 import sys
@@ -746,6 +747,31 @@ def make_combined_steering_file(
     B2INFO(f"Steering file for {SkimName} combined skim written to {SteeringFile}")
 
 
+def clean_inf_in_list(obj):
+    """
+    Replace inf values in list with a sensible default value.
+
+    This function exists to account for the situation where the number of test events
+    passing a skim is zero, and hence any per-skimmed-event quantities are inf.
+    """
+    if not isinstance(obj, list):
+        return obj
+
+    non_inf_values = [e for e in obj if e != inf]
+    if not non_inf_values:
+        raise ValueError(
+            "Encountered a combined skim with zero retention rate!"
+        )
+
+    def replace_inf(x):
+        if x == inf:
+            # Replace inf value with max of other values
+            return max(non_inf_values)
+        return x
+
+    return list(map(replace_inf, obj))
+
+
 def make_request_dict(
     args, sampleRegistry, skimName, sampleLabel, LPNList, LPNBlockIdentifier=None,
 ):
@@ -800,8 +826,8 @@ def make_request_dict(
         "ExpectedEventCPUTime": (
             skimStatsDict[skimName]["HS06TimePerEvent"][statsSampleLabel]
         ),
-        "ExpectedEventSize": (
-            skimStatsDict[skimName]["udstSizePerInputEvent"][statsSampleLabel]
+        "ExpectedEventSize": clean_inf_in_list(
+            skimStatsDict[skimName]["udstSizePerSkimmedEvent"][statsSampleLabel]
         ),
         "InputSandboxFilePrefix": SkimScriptsDirectory,
         "InputData": LPNList,

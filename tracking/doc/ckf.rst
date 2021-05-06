@@ -1,4 +1,7 @@
 .. _tracking_ckf: 
 
-Combinatorial Kalman Filter
-===========================
+General information about the Combinatorial Kalman Filter (CKF) code
+====================================================================
+
+.. warning::
+  This documentation is under construction!

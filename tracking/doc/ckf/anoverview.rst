@@ -1,3 +1,6 @@
  
-Documentation of Combinatorial Kalman Filter Package
-====================================================
+Detailed documentation of Combinatorial Kalman Filter Package
+=============================================================
+
+.. warning::
+  This documentation is under construction!

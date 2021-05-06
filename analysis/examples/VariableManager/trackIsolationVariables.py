@@ -4,7 +4,7 @@
 # @cond
 
 """
-Test track isolation variables.
+Example script to calculate track isolation variables.
 
 For each particle's track in the input charged stable particle list,
 calculate the minimal distance to the other candidates' tracks at a given detector entry surface.
@@ -23,9 +23,16 @@ def argparser():
     """ Argument parser
     """
 
+    import stdCharged as stdc
+
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawTextHelpFormatter)
 
+    parser.add_argument("--std_charged",
+                        type=str,
+                        choices=stdc._chargednames,
+                        default="pi",
+                        help="The base name of the standard charged particle list to consider.")
     parser.add_argument("--detectors",
                         type=str,
                         nargs="+",
@@ -61,25 +68,34 @@ if __name__ == "__main__":
     # Add input data and ParticleLoader modules to the path.
     ma.inputMdstList("default", filelist=[b2.find_file("mdst14.root", "validation")], path=path)
 
-    # Fill a particle list of charged stable particles (eg. pions).
+    # Fill a particle list of charged stable particles.
     # Apply (optionally) some quality selection.
-    ma.fillParticleList("pi+:mypions", "", path=path)
-    ma.applyCuts("pi+:mypions", "abs(dr) < 2.0 and abs(dz) < 5.0 and p > 0.1", path=path)
+    plist_name = f"{args.std_charged}+:my_std_charged"
+    ma.fillParticleList(plist_name, "", path=path)
+    ma.applyCuts(plist_name, "abs(dr) < 2.0 and abs(dz) < 5.0 and p > 0.1", path=path)
 
     # 3D distance (default).
-    ma.calculateTrackIsolation("pi+:mypions",
+    ma.calculateTrackIsolation(plist_name,
                                path,
                                *args.detectors,
                                alias="dist3DToClosestTrkAtSurface")
     # 2D distance on rho-phi plane (chord length).
-    ma.calculateTrackIsolation("pi+:mypions",
+    ma.calculateTrackIsolation(plist_name,
                                path,
                                *args.detectors,
                                use2DRhoPhiDist=True,
                                alias="dist2DRhoPhiToClosestTrkAtSurface")
 
+    # Aliases for NTuple variables.
     ntup_vars = [f"dist3DToClosestTrkAtSurface{det}" for det in args.detectors]
     ntup_vars += [f"dist2DRhoPhiToClosestTrkAtSurface{det}" for det in args.detectors]
+
+    # Dump isolation variables in a ntuple.
+    ma.variablesToNtuple(plist_name,
+                         ntup_vars,
+                         treename=args.std_charged,
+                         filename="TrackIsolationVariables.root",
+                         path=path)
 
     # Optionally activate debug mode for the TrackIsoCalculator module(s).
     if args.debug:
@@ -87,9 +103,6 @@ if __name__ == "__main__":
             if "TrackIsoCalculator" in m.name():
                 m.set_log_level(b2.LogLevel.DEBUG)
                 m.set_debug_level(args.debug)
-
-    # Dump isolation variables in a ntuple.
-    ma.variablesToNtuple("pi+:mypions", ntup_vars, treename="pi", filename="TrackIsolationVariables.root", path=path)
 
     path.add_module("Progress")
 

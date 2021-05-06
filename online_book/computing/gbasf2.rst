@@ -616,7 +616,7 @@ You need to reschedule these jobs by yourself.
 
 You can use ``gb2_job_reschedule -p <project name>``:
 
-.. code-block:: bash
+.. code-block::
 
     gb2_job_reschedule --usage
 

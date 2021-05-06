@@ -36,10 +36,12 @@ namespace Belle2 {
   private:
     BeamParameters m_beamParams; /**< Copy of the beamparameters created from the parameters */
     double m_energyHER;  /**< Energy of the High Energy Ring */
-    double m_angleHER;  /**< theta angle of the High Energy Ring */
+    double m_angleXHER;  /**< theta angle of the High Energy Ring in the x-z plane */
+    double m_angleYHER;  /**< theta angle of the High Energy Ring in the y-z plane */
     std::vector<double> m_covHER; /**< Covariance matrix for the High Energy Ring */
     double m_energyLER;  /**< Energy of the Low Energy Ring */
-    double m_angleLER;  /**< theta angle of the Low Energy Ring */
+    double m_angleXLER;  /**< theta angle of the Low Energy Ring in the x-z plane */
+    double m_angleYLER;  /**< theta angle of the Low Energy Ring in the y-z plane */
     std::vector<double> m_covLER; /**< Covariance matrix for the Low Energy Ring */
     std::vector<double> m_vertex; /**< nominal vertex position */
     std::vector<double> m_covVertex; /**< covariance matrix for the vertex position */

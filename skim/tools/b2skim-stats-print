@@ -154,7 +154,7 @@ def getArgumentParser():
     parser.add_argument(
         "--mccampaign",
         default="MC13",
-        choices=["MC12", "MC13"],
+        choices=["MC12", "MC13", "MC14"],
         help="The MC campaign to test on.",
     )
 
@@ -625,11 +625,21 @@ def getAllSamples(mcCampaign):
         f"{mcCampaign}_taupairBGx0": f"{mcCampaign}: taupair BGx0",
     }
 
+    mcCampaignNumber = int(re.search(r"\d+", mcCampaign).group())
+    # TODO: Temporary workaround while only some MC14 samples are available on KEKCC
+    if mcCampaignNumber == 14:
+        mcSampleLabels = {k: v for (k, v) in mcSampleLabels.items() if k.endswith("BGx1")}
+        mcSampleLabels.update(
+            {
+                f"{mcCampaign}_ggBGx1": f"{mcCampaign}: gg BGx1",
+                f"{mcCampaign}_mumuBGx1": f"{mcCampaign}: mumu BGx1",
+                f"{mcCampaign}_eeeeBGx1": f"{mcCampaign}: eeee BGx1",
+            }
+        )
     # For MC13 the low mult test samples exist (but they don't for MC12
     # and older) so here is a hack.
     # TODO: remove once when we regularly add the same low mult samples
-    mcCampaignNumber = int(re.search(r"\d+", mcCampaign).group())
-    if mcCampaignNumber > 12:
+    elif mcCampaignNumber > 12:
         mcSampleLabels.update(
             {
                 f"{mcCampaign}_ggBGx1": f"{mcCampaign}: gg BGx1",

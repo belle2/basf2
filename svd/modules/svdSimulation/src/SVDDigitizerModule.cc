@@ -23,7 +23,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
-//#include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <fstream>
 #include <sstream>
@@ -87,8 +86,6 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
   // 3. Noise
   addParam("PoissonSmearing", m_applyPoisson,
            "Apply Poisson smearing on chargelets", m_applyPoisson);
-  addParam("ElectronicEffects", m_applyNoise, "Generate noise digits",
-           m_applyNoise);
   addParam("ZeroSuppressionCut", m_SNAdjacent,
            "Zero suppression cut in sigmas of strip noise", m_SNAdjacent);
   addParam("FADCmode", m_roundZS,
@@ -111,7 +108,8 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
   addParam("TimeFrameHigh", m_maxTimeFrame,
            "Right edge of event time randomization window, ns", m_maxTimeFrame);
 
-  // 5. Reporting
+
+  // 6. Reporting
   addParam("statisticsFilename", m_rootFilename,
            "ROOT Filename for statistics generation. If filename is empty, no statistics will be produced",
            m_rootFilename);
@@ -161,39 +159,38 @@ void SVDDigitizerModule::initialize()
   m_minTimeFrame *= Unit::ns;
   m_maxTimeFrame *= Unit::ns;
 
-  B2DEBUG(1,
+  B2DEBUG(29,
           "SVDDigitizer parameters (in default system units, *=cannot be set directly):");
-  B2DEBUG(1, " DATASTORE COLLECTIONS:");
-  B2DEBUG(1,
+  B2DEBUG(29, " DATASTORE COLLECTIONS:");
+  B2DEBUG(29,
           " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
-  B2DEBUG(1,
+  B2DEBUG(29,
           " -->  Digits:             " << DataStore::arrayName<SVDShaperDigit>(m_storeShaperDigitsName));
-  B2DEBUG(1,
+  B2DEBUG(29,
           " -->  SimHits:            " << DataStore::arrayName<SVDSimHit>(m_storeSimHitsName));
-  B2DEBUG(1,
+  B2DEBUG(29,
           " -->  TrueHits:           " << DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
-  B2DEBUG(1, " -->  MCSimHitRel:        " << m_relMCParticleSimHitName);
-  B2DEBUG(1, " -->  DigitMCRel:         " << m_relShaperDigitMCParticleName);
-  B2DEBUG(1, " -->  TrueSimRel:         " << m_relTrueHitSimHitName);
-  B2DEBUG(1, " -->  DigitTrueRel:       " << m_relShaperDigitTrueHitName);
-  B2DEBUG(1, " PHYSICS: ");
-  B2DEBUG(1, " -->  SegmentLength:      " << m_segmentLength);
-  B2DEBUG(1, " -->  Charge int. range:  " << m_widthOfDiffusCloud);
-  B2DEBUG(1, " NOISE: ");
-  B2DEBUG(1, " -->  Add Poisson noise   " << (m_applyPoisson ? "true" : "false"));
-  B2DEBUG(1, " -->  Add Gaussian noise: " << (m_applyNoise ? "true" : "false"));
-  B2DEBUG(1, " -->  Zero suppression cut" << m_SNAdjacent);
-  B2DEBUG(1, " -->  Round ZS cut:       " << (m_roundZS ? "true" : "false"));
-  B2DEBUG(1, " -->  Samples over ZS cut:" << m_nSamplesOverZS);
-  B2DEBUG(1, " -->  Noise fraction*:    " << 1.0 - m_noiseFraction);
-  B2DEBUG(1, " TIMING: ");
-  B2DEBUG(1, " -->  APV25 shaping time: " << m_shapingTime);
-  B2DEBUG(1, " -->  Sampling time:      " << m_samplingTime);
-  B2DEBUG(1, " -->  Start of int. wind.:" << m_startSampling);
-  B2DEBUG(1, " -->  Random event times. " << (m_randomizeEventTimes ? "true" : "false"));
-  B2DEBUG(1, " REPORTING: ");
-  B2DEBUG(1, " -->  statisticsFilename: " << m_rootFilename);
-  B2DEBUG(1,
+  B2DEBUG(29, " -->  MCSimHitRel:        " << m_relMCParticleSimHitName);
+  B2DEBUG(29, " -->  DigitMCRel:         " << m_relShaperDigitMCParticleName);
+  B2DEBUG(29, " -->  TrueSimRel:         " << m_relTrueHitSimHitName);
+  B2DEBUG(29, " -->  DigitTrueRel:       " << m_relShaperDigitTrueHitName);
+  B2DEBUG(29, " PHYSICS: ");
+  B2DEBUG(29, " -->  SegmentLength:      " << m_segmentLength);
+  B2DEBUG(29, " -->  Charge int. range:  " << m_widthOfDiffusCloud);
+  B2DEBUG(29, " NOISE: ");
+  B2DEBUG(29, " -->  Add Poisson noise   " << (m_applyPoisson ? "true" : "false"));
+  B2DEBUG(29, " -->  Zero suppression cut" << m_SNAdjacent);
+  B2DEBUG(29, " -->  Round ZS cut:       " << (m_roundZS ? "true" : "false"));
+  B2DEBUG(29, " -->  Samples over ZS cut:" << m_nSamplesOverZS);
+  B2DEBUG(29, " -->  Noise fraction*:    " << 1.0 - m_noiseFraction);
+  B2DEBUG(29, " TIMING: ");
+  B2DEBUG(29, " -->  APV25 shaping time: " << m_shapingTime);
+  B2DEBUG(29, " -->  Sampling time:      " << m_samplingTime);
+  B2DEBUG(29, " -->  Start of int. wind.:" << m_startSampling);
+  B2DEBUG(29, " -->  Random event times. " << (m_randomizeEventTimes ? "true" : "false"));
+  B2DEBUG(29, " REPORTING: ");
+  B2DEBUG(29, " -->  statisticsFilename: " << m_rootFilename);
+  B2DEBUG(29,
           " -->  storeWaveforms:     " << (m_storeWaveforms ? "true" : "false"));
 
   if (!m_rootFilename.empty()) {
@@ -297,10 +294,34 @@ void SVDDigitizerModule::beginRun()
   if (!m_map)
     B2WARNING("No valid channel mapping -> all APVs will be enabled");
 
+
 }
 
 void SVDDigitizerModule::event()
 {
+
+  //get number of samples and relativeShift
+  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo(m_svdEventInfoName);
+  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
+  m_relativeShift = storeSVDEvtInfo->getRelativeShift();
+  m_nAPV25Samples = storeSVDEvtInfo->getNSamples();
+
+  //Compute time of the first sample, update latency
+  const double systemClockPeriod = 1. / m_hwClock->getGlobalClockFrequency();
+  int triggerBin = modeByte.getTriggerBin();
+
+  m_initTime = m_startSampling - systemClockPeriod * triggerBin;
+
+  m_is3sampleEvent = false;
+  if (m_nAPV25Samples == 3) {
+    m_is3sampleEvent = true;
+    m_startingSample = getFirstSample(triggerBin, m_relativeShift);
+    B2DEBUG(25, "3-sample event, starting sample = " << m_startingSample);
+  } else m_startingSample = 0; //not used
+
+  // set APV mode for background overlay
+  SVDShaperDigit::setAPVMode(m_nAPV25Samples, m_startingSample);
+
   // Generate current event time
   if (m_randomizeEventTimes) {
     StoreObjPtr<EventMetaData> storeEvent;
@@ -329,8 +350,9 @@ void SVDDigitizerModule::event()
   RelationIndex<SVDTrueHit, SVDSimHit> relTrueHitSimHit(storeTrueHits, storeSimHits, m_relTrueHitSimHitName);
 
   unsigned int nSimHits = storeSimHits.getEntries();
-  if (nSimHits == 0)
+  if (nSimHits == 0) {
     return;
+  }
 
   //Check sensor info and set pointers to current sensor
   for (unsigned int i = 0; i < nSimHits; ++i) {
@@ -372,11 +394,8 @@ void SVDDigitizerModule::event()
       const SensorInfo& info = *m_currentSensorInfo;
       // Publish some useful data
       m_sensorThickness = info.getThickness();
-      m_depletionVoltage = info.getDepletionVoltage();
-      m_biasVoltage = info.getBiasVoltage();
-
       m_currentSensor = &m_sensors[sensorID];
-      B2DEBUG(20,
+      B2DEBUG(29,
               "Sensor Parameters for Sensor " << sensorID << ": " << endl
               << " --> Width:          " << m_currentSensorInfo->getWidth() << endl
               << " --> Length:         " << m_currentSensorInfo->getLength() << endl
@@ -389,7 +408,7 @@ void SVDDigitizerModule::event()
              );
 
     }
-    B2DEBUG(10,
+    B2DEBUG(28,
             "Processing hit " << i << " in Sensor " << sensorID << ", related to MCParticle " << m_currentParticle);
     processHit();
   }
@@ -401,17 +420,11 @@ void SVDDigitizerModule::event()
   if (m_signalsList != "")
     saveSignals();
 
-  //Compute time of the first sample and update latency
-  StoreObjPtr<SVDEventInfo> storeSVDEvtInfo(m_svdEventInfoName);
-  SVDModeByte modeByte = storeSVDEvtInfo->getModeByte();
-  B2DEBUG(25, "triggerBin = " << (int)modeByte.getTriggerBin());
-  const double systemClockPeriod = 1. / m_hwClock->getGlobalClockFrequency();
-  int triggerBin = modeByte.getTriggerBin();
-  m_initTime = m_startSampling - systemClockPeriod * triggerBin;
-  //determine number fo samples
-  m_nAPV25Samples = storeSVDEvtInfo->getNSamples();
 
   saveDigits();
+
+
+
 }
 
 void SVDDigitizerModule::processHit()
@@ -458,10 +471,10 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   bool have_electrons = (carrierType == SVD::SensorInfo::electron);
 
   string carrierName = (have_electrons) ? "electron" : "hole";
-  B2DEBUG(30,
+  B2DEBUG(29,
           "Drifting " << carriers << " " << carrierName << "s at position (" << position.x() << ", " << position.y() << ", " << position.z()
           << ").");
-  B2DEBUG(30, "@@@ driftCharge: drifting " << carriers << " " << carrierName << "s at position (" << position.x() << ", " <<
+  B2DEBUG(29, "@@@ driftCharge: drifting " << carriers << " " << carrierName << "s at position (" << position.x() << ", " <<
           position.y() << ", " << position.z()
           << ").");
 
@@ -501,10 +514,10 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   double sigma = std::max(1.0e-4, sqrt(2.0 * D * driftTime));
   double tanLorentz = (!have_electrons) ? v.X() / v.Z() : v.Y() / v.Z();
 
-  B2DEBUG(30, "velocity (" << v.X() / Unit::um << ", " << v.Y() / Unit::um << ", " << v.Z() / Unit::um << ") um/ns");
-  B2DEBUG(30, "D = " << D << ", driftTime = " << driftTime / Unit::ns << " ns");
-  B2DEBUG(30, "sigma = " << sigma / Unit::um << " um");
-  B2DEBUG(30, "tan Lorentz = " << tanLorentz);
+  B2DEBUG(29, "velocity (" << v.X() / Unit::um << ", " << v.Y() / Unit::um << ", " << v.Z() / Unit::um << ") um/ns");
+  B2DEBUG(29, "D = " << D << ", driftTime = " << driftTime / Unit::ns << " ns");
+  B2DEBUG(29, "sigma = " << sigma / Unit::um << " um");
+  B2DEBUG(29, "tan Lorentz = " << tanLorentz);
 
   sigma *= sqrt(1.0 + tanLorentz * tanLorentz);
   if (m_histLorentz_u && !have_electrons) m_histLorentz_u->Fill(tanLorentz);
@@ -528,8 +541,8 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   double cdf_high = NORMAL_CDF((current_pos + 0.5 * geomPitch) / sigma);
   double charge = carriers * (cdf_high - cdf_low);
 
-  B2DEBUG(30, "geomPitch = " << geomPitch / Unit::um << " um");
-  B2DEBUG(30, "charge = " << charge << " = " << carriers << "(carriers) * (" << cdf_high << "(cdf_high) - " << cdf_low <<
+  B2DEBUG(29, "geomPitch = " << geomPitch / Unit::um << " um");
+  B2DEBUG(29, "charge = " << charge << " = " << carriers << "(carriers) * (" << cdf_high << "(cdf_high) - " << cdf_low <<
           "(cdf_low));");
 
   stripCharges.push_back(charge);
@@ -568,11 +581,11 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
     stripCharges.push_back(0);
   }
   // Charge sharing
-  B2DEBUG(30, "  --> charge sharing simulation, # strips = " << strips.size());
+  B2DEBUG(29, "  --> charge sharing simulation, # strips = " << strips.size());
   std::deque<double> readoutCharges;
   std::deque<int> readoutStrips;
   for (std::size_t index = 3; index <  strips.size() - 3; index += 2) {
-    B2DEBUG(30, "  index = " << index << ", strip = " << strips[index] << ", stripCharge = " << stripCharges[index]);
+    B2DEBUG(29, "  index = " << index << ", strip = " << strips[index] << ", stripCharge = " << stripCharges[index]);
     int currentStrip = static_cast<int>(strips[index]);
     VxdID currentSensorID = m_currentHit->getSensorID();
 
@@ -581,14 +594,14 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
     double c2 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, "C2");
     double c3 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, "C3");
 
-    B2DEBUG(30, "  current strip = " << currentStrip);
-    B2DEBUG(30, "     index-3 = " << index - 3 << ", strip = " << strips[index - 3] << ", stripCharge = " << stripCharges[index - 3]);
-    B2DEBUG(30, "     index-2 = " << index - 2 << ", strip = " << strips[index - 2] << ", stripCharge = " << stripCharges[index - 2]);
-    B2DEBUG(30, "     index-1 = " << index - 1 << ", strip = " << strips[index - 1] << ", stripCharge = " << stripCharges[index - 1]);
-    B2DEBUG(30, "     index   = " << index << ", strip = " << strips[index] << ", stripCharge = " << stripCharges[index]);
-    B2DEBUG(30, "     index+1 = " << index + 1 << ", strip = " << strips[index + 1] << ", stripCharge = " << stripCharges[index + 1]);
-    B2DEBUG(30, "     index+2 = " << index + 2 << ", strip = " << strips[index + 2] << ", stripCharge = " << stripCharges[index + 2]);
-    B2DEBUG(30, "     index+3 = " << index + 3 << ", strip = " << strips[index + 3] << ", stripCharge = " << stripCharges[index + 3]);
+    B2DEBUG(29, "  current strip = " << currentStrip);
+    B2DEBUG(29, "     index-3 = " << index - 3 << ", strip = " << strips[index - 3] << ", stripCharge = " << stripCharges[index - 3]);
+    B2DEBUG(29, "     index-2 = " << index - 2 << ", strip = " << strips[index - 2] << ", stripCharge = " << stripCharges[index - 2]);
+    B2DEBUG(29, "     index-1 = " << index - 1 << ", strip = " << strips[index - 1] << ", stripCharge = " << stripCharges[index - 1]);
+    B2DEBUG(29, "     index   = " << index << ", strip = " << strips[index] << ", stripCharge = " << stripCharges[index]);
+    B2DEBUG(29, "     index+1 = " << index + 1 << ", strip = " << strips[index + 1] << ", stripCharge = " << stripCharges[index + 1]);
+    B2DEBUG(29, "     index+2 = " << index + 2 << ", strip = " << strips[index + 2] << ", stripCharge = " << stripCharges[index + 2]);
+    B2DEBUG(29, "     index+3 = " << index + 3 << ", strip = " << strips[index + 3] << ", stripCharge = " << stripCharges[index + 3]);
 
     readoutCharges.push_back(c3 * stripCharges[index - 3]
                              + c2 * stripCharges[index - 2]
@@ -599,7 +612,7 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
                              + c3 * stripCharges[index + 3]
                             );
     readoutStrips.push_back(currentStrip);
-    B2DEBUG(30, "    post simulation: " << index << ", strip = " << currentStrip << ", readoutCharge = " <<
+    B2DEBUG(29, "    post simulation: " << index << ", strip = " << currentStrip << ", readoutCharge = " <<
             readoutCharges[readoutCharges.size() - 1]);
   }
   // Trim at sensor edges
@@ -639,7 +652,7 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   }
 
   // Store
-  B2DEBUG(25, "currentTime = " << m_currentTime << " + 0.5 driftTime = " << 0.5 * driftTime << " = " << m_currentTime + 0.5 *
+  B2DEBUG(29, "currentTime = " << m_currentTime << " + 0.5 driftTime = " << 0.5 * driftTime << " = " << m_currentTime + 0.5 *
           driftTime);
 
   double recoveredCharge = 0;
@@ -649,9 +662,9 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
     digits[readoutStrips[index]].add(m_currentTime + 0.5 * driftTime, readoutCharges[index],
                                      m_shapingTime, m_currentParticle, m_currentTrueHit);
     recoveredCharge += readoutCharges[index];
-    B2DEBUG(30, "strip: " << readoutStrips[index] << " charge: " << readoutCharges[index]);
+    B2DEBUG(29, "strip: " << readoutStrips[index] << " charge: " << readoutCharges[index]);
   }
-  B2DEBUG(30, "Digitized " << recoveredCharge << " of " << carriers << " original carriers.");
+  B2DEBUG(29, "Digitized " << recoveredCharge << " of " << carriers << " original carriers.");
 }
 
 double SVDDigitizerModule::addNoise(double charge, double noise)
@@ -707,12 +720,10 @@ void SVDDigitizerModule::saveDigits()
 
       double t = m_initTime;
       B2DEBUG(25, "start sampling at " << m_initTime);
-      for (int iSample = 0; iSample < m_nAPV25Samples; iSample ++) {
+      for (int iSample = 0; iSample < (int) SVDShaperDigit::c_nAPVSamples; iSample ++) {
         samples.push_back(addNoise(electronWeight * s(t), elNoise));
         t += m_samplingTime;
       }
-      for (int iSample = m_nAPV25Samples; iSample < 6; iSample++)
-        samples.push_back(0);
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();
       SVDSignal::relations_map truehits = s.getTrueHitRelations();
@@ -739,6 +750,22 @@ void SVDDigitizerModule::saveDigits()
 
       // 2.c check if the APV is disabled
       if (!m_map->isAPVinMap(sensorID, true, iStrip)) continue;
+
+      // 2.d.1 check if it's a 3-sample event
+      if (m_is3sampleEvent) {
+        rawSamples[0] = rawSamples[m_startingSample];
+        rawSamples[1] = rawSamples[m_startingSample + 1];
+        rawSamples[2] = rawSamples[m_startingSample + 2];
+        rawSamples[3] = 0.;
+        rawSamples[4] = 0.;
+        rawSamples[5] = 0.;
+        //2.d.2 check if still over threshold
+        n_over = std::count_if(rawSamples.begin(), rawSamples.end(),
+                               std::bind2nd(std::greater<double>(), rawThreshold)
+                              );
+        if (n_over < m_nSamplesOverZS) continue;
+
+      }
 
       // 3. Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
@@ -772,12 +799,10 @@ void SVDDigitizerModule::saveDigits()
       double electronWeight = m_ChargeSimCal.getElectronWeight(sensorID, false);
 
       double t = m_initTime;
-      for (int iSample = 0; iSample < m_nAPV25Samples; iSample ++) {
+      for (int iSample = 0; iSample < (int)SVDShaperDigit::c_nAPVSamples; iSample ++) {
         samples.push_back(addNoise(electronWeight * s(t), elNoise));
         t += m_samplingTime;
       }
-      for (int iSample = m_nAPV25Samples; iSample < 6; iSample++)
-        samples.push_back(0);
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();
       SVDSignal::relations_map truehits = s.getTrueHitRelations();
@@ -803,6 +828,21 @@ void SVDDigitizerModule::saveDigits()
 
       // 2.c check if the APV is disabled
       if (!m_map->isAPVinMap(sensorID, false, iStrip)) continue;
+
+      // 2.d.1 check if it's a 3-sample event
+      if (m_is3sampleEvent) {
+        rawSamples[0] = rawSamples[m_startingSample];
+        rawSamples[1] = rawSamples[m_startingSample + 1];
+        rawSamples[2] = rawSamples[m_startingSample + 2];
+        rawSamples[3] = 0.;
+        rawSamples[4] = 0.;
+        rawSamples[5] = 0.;
+        //2.d.2 check if still over threshold
+        n_over = std::count_if(rawSamples.begin(), rawSamples.end(),
+                               std::bind2nd(std::greater<double>(), rawThreshold)
+                              );
+        if (n_over < m_nSamplesOverZS) continue;
+      }
 
       // 3. Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
@@ -916,4 +956,10 @@ void SVDDigitizerModule::terminate()
     m_rootFile->Write();
     m_rootFile->Close();
   }
+}
+
+int SVDDigitizerModule::getFirstSample(int triggerBin, int relativeShift)
+{
+  int nTriggerClocks = triggerBin + relativeShift;
+  return floor(nTriggerClocks / 4);
 }

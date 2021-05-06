@@ -185,8 +185,6 @@ class SLUntagged(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
 
-    ApplyHLTHadronCut = True
-    produce_on_tau_samples = False  # retention is very close to zero on taupair
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
@@ -309,6 +307,9 @@ class B0toDstarl_Kpi_Kpipi0_Kpipipi(BaseSkim):
     __description__ = ""
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
+
+    ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
 
     def load_standard_lists(self, path):
         stdE("all", path=path)

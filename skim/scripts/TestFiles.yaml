@@ -4,6 +4,22 @@
 #  | |  | | |___  \__ \ (_| | | | | | | |_) | |  __/\__ \
 #  |_|  |_|\____| |___/\__,_|_| |_| |_| .__/|_|\___||___/
 #                                     |_|
+# MC14 generic
+
+MC14_ccbarBGx1: /group/belle2/dataprod/MC/SkimTraining/MC14_ccbarBGx1.root
+MC14_chargedBGx1: /group/belle2/dataprod/MC/SkimTraining/MC14_chargedBGx1.root
+MC14_ddbarBGx1: /group/belle2/dataprod/MC/SkimTraining/MC14_ddbarBGx1.root
+MC14_mixedBGx1: /group/belle2/dataprod/MC/SkimTraining/MC14_mixedBGx1.root
+MC14_ssbarBGx1: /group/belle2/dataprod/MC/SkimTraining/MC14_ssbarBGx1.root
+MC14_taupairBGx1: /group/belle2/dataprod/MC/SkimTraining/MC14_taupairBGx1.root
+MC14_uubarBGx1: /group/belle2/dataprod/MC/SkimTraining/MC14_uubarBGx1.root
+
+
+#MC14 low mult
+
+MC14_eeeeBGx1: /group/belle2/dataprod/MC/SkimTraining/MC14_eeeeBGx1.root
+MC14_mumuBGx1: /group/belle2/dataprod/MC/SkimTraining/MC14_mumuBGx1.root
+MC14_ggBGx1: /group/belle2/dataprod/MC/SkimTraining/MC14_ggBGx1.root
 
 
 ## MC13 generic

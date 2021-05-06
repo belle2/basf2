@@ -111,16 +111,16 @@ void DQMHistAnalysisPXDEffModule::initialize()
       B2WARNING(m_pvPrefix + (std::string)aPXDModule);
     }
 #endif
-    TString histTitle = "Hit Efficiency on Module " + (std::string)aPXDModule + ";Pixel in U;Pixel in V";
+    TString histTitle = "PXD Hit Efficiency on Module " + (std::string)aPXDModule + ";Pixel in U;Pixel in V";
     if (m_singleHists) {
       m_cEffModules[aPXDModule] = new TCanvas((m_histogramDirectoryName + "/c_Eff_").data() + buff);
-      m_hEffModules[aPXDModule] = new TEfficiency("HitEff_" + buff, histTitle,
+      m_hEffModules[aPXDModule] = new TEfficiency("ePXDHitEff_" + buff, histTitle,
                                                   m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
     }
   }
 
-  m_hErrorLine = new TH1F("Errorlimit", "Error Limit", m_PXDModules.size(), 0, m_PXDModules.size());
-  m_hWarnLine = new TH1F("Warnlimit", "Warn Limit", m_PXDModules.size(), 0, m_PXDModules.size());
+  m_hErrorLine = new TH1F("hPXDErrorlimit", "Error Limit", m_PXDModules.size(), 0, m_PXDModules.size());
+  m_hWarnLine = new TH1F("hPXDWarnlimit", "Warn Limit", m_PXDModules.size(), 0, m_PXDModules.size());
   for (int i = 0; i < (int)m_PXDModules.size(); i++) {
     m_hErrorLine->SetBinContent(i + 1, m_errorlevel);
     m_hWarnLine->SetBinContent(i + 1, m_warnlevel);
@@ -134,7 +134,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
   //One bin for each module in the geometry, one histogram for each layer
   m_cEffAll = new TCanvas((m_histogramDirectoryName + "/c_EffAll").data());
-  m_hEffAll = new TEfficiency("HitEffAll", "Integrated Efficiency of each module;PXD Module;",
+  m_hEffAll = new TEfficiency("ePXDHitEffAll", "PXD Integrated Efficiency of each module;PXD Module;",
                               m_PXDModules.size(), 0, m_PXDModules.size());
   m_hEffAll->SetConfidenceLevel(m_confidence);
   m_hEffAll->Paint("AP");
@@ -157,7 +157,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
   }
 
   m_cEffAllUpdate = new TCanvas((m_histogramDirectoryName + "/c_EffAllUp").data());
-  m_hEffAllUpdate = new TEfficiency("HitEffAllUpdate", "Integral and last-updated Efficiency per module;PXD Module;",
+  m_hEffAllUpdate = new TEfficiency("ePXDHitEffAllUpdate", "PXD Integral and last-updated Efficiency per module;PXD Module;",
                                     m_PXDModules.size(), 0, m_PXDModules.size());
   m_hEffAllUpdate->SetConfidenceLevel(m_confidence);
 

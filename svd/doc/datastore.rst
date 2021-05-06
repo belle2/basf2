@@ -32,7 +32,7 @@ Here we briefly describe the SVD objects that populate the DataStore.
 
 .. cpp:class:: SVDRecoDigit
 
-	       StoreArray created by :b2:mod:`SVDRecoDigitCreator` (not in default recosntruction) and storing the calibrated strip informations:
+	       StoreArray created by :b2:mod:`SVDRecoDigitCreator` (not in default reconstruction) and storing the calibrated strip informations:
 
 	       #. layer, ladder, sensor (VxdID), side
 	       #. cellID

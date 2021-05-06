@@ -19,7 +19,7 @@ Wrappers have one of the following the following granularity:
 Simulation Calibrations
 -----------------------
 
-In simulation, sensors are grouped by type (L3, origami, backward, forward) and by side (u/P, v/N). Sensors in the same group share the same calibration constats.
+In simulation, sensors are grouped by type (L3, origami, backward, forward) and by side (u/P, v/N). Sensors in the same group share the same calibration constants.
 
 .. _svdchargesimulation:
 
@@ -81,7 +81,7 @@ Reconstruction Calibrations
 
 	       Stores the functions and their parameters for the selection of clusters based on the cluster time in the SpacePoint creation step, with sensor-side granularity_.
 
-The ``SVDClusterCalibrations`` wrapper contains both ``SVDClusterCuts`` and ``SVDhitTimeSelection``.
+The ``SVDClusterCalibrations`` wrapper contains both ``SVDClusterCuts`` and ``SVDHitTimeSelection``.
 
 .. cpp:class:: SVDOccupancyCalibrations
 	       

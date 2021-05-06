@@ -3,13 +3,15 @@
 Documentation To Do List
 ------------------------
 
-#. add documentation to functions in svd/scripts/svd/__init__ and the other _utils
+#. add documentation to functions in svd/scripts/svd/__init__ and the other utils
 
-#. add brief description of the simulation and reconstruction steps (including reconstruction algorihtms!)
+#. add brief description of the simulation
 
 #. check module and parameters description reading from sphinx
 
-#. calibration: do we want to add doc on calibration?
+#. calibration
+   * add example 2D plots with calibration function superimposed
+   * add the hot strip calibration algorithm
 
 #. performance: do we want to add doc on performance?
 

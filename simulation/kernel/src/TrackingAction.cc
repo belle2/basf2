@@ -68,7 +68,7 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
     //Check if the dynamic particle has a primary particle attached.
     //If the answer is yes, the UserInfo of the primary particle is recycled as the UserInfo of the track.
     const bool isPrimary = dynamicParticle->GetPrimaryParticle() != nullptr;
-    const bool neutral_llp = false;
+    bool neutral_llp = false;
     if (isPrimary) {
       const G4PrimaryParticle* primaryParticle = dynamicParticle->GetPrimaryParticle();
       if (primaryParticle->GetUserInformation() != nullptr) {

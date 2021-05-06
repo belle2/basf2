@@ -12,7 +12,7 @@ sys_tests = ['def', 'scale']
 test = 'scale'
 
 if test not in sys_tests:
-    print("Unknown systematic test {}".format(test))
+    print(f"Unknown systematic test {test}")
     exit(1)
 
 # create path

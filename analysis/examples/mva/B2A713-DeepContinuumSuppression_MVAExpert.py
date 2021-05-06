@@ -158,9 +158,7 @@ for rank in range(10):
     for shortcut, particlelist in [('Croe', 'gamma:roe'), ('Csig', 'gamma:signal')]:
         for variable in cluster_variables:
             v.variables.addAlias(
-                '{}_{}{}'.format(
-                    variable, shortcut, rank), 'getVariableByRank({}, cmsp, {}, {})'.format(
-                    particlelist, variable, rank + 1))
+                f'{variable}_{shortcut}{rank}', f'getVariableByRank({particlelist}, cmsp, {variable}, {rank + 1})')
             variables.append(f'{variable}_{shortcut}{rank}')
 
 for rank in range(5):
@@ -168,9 +166,7 @@ for rank in range(5):
                                    ('TMroe', 'pi+:chargedMroe'), ('TMsig', 'pi+:chargedMsignal')]:
         for variable in track_variables:
             v.variables.addAlias(
-                '{}_{}{}'.format(
-                    variable, shortcut, rank), 'getVariableByRank({}, cmsp, {}, {})'.format(
-                    particlelist, variable, rank + 1))
+                f'{variable}_{shortcut}{rank}', f'getVariableByRank({particlelist}, cmsp, {variable}, {rank + 1})')
             variables.append(f'{variable}_{shortcut}{rank}')
 
 # MVAExpert

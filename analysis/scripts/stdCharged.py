@@ -180,5 +180,5 @@ def stdMostLikely(pidPriors=None, suffix='', custom_cuts='', path=None):
     if custom_cuts != '':
         trackQuality = custom_cuts
     for name in _chargednames:
-        fillParticleList('{}+:{}'.format(name, _mostLikelyList+suffix),
+        fillParticleList(f'{name}+:{_mostLikelyList}{suffix}',
                          f'pidIsMostLikely({args}) > 0 and {trackQuality}', True, path=path)

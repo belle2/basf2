@@ -12,7 +12,7 @@ Details can be found in the VariableManager section at https://software.belle2.o
 from ROOT import gSystem
 gSystem.Load('libanalysis.so')
 
-# import everything into current namespace.
+#: import everything into current namespace.
 variables = Belle2.Variable.Manager.Instance()
 
 
@@ -27,7 +27,7 @@ def std_vector(*args):
 
 
 def getCommandLineOptions():
-    """ Parses the command line options of the fei and returns the corresponding arguments. """
+    """ Parses the command line options and returns the corresponding arguments. """
     parser = argparse.ArgumentParser()
     parser.add_argument('--no-pager', dest='pager', default=True, action='store_false',
                         help='Use a pager to show output or print to terminal.')

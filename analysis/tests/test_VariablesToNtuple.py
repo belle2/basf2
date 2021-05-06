@@ -80,15 +80,15 @@ with b2test_utils.clean_working_directory():
     nBckgrd = 0
     for event in t1:
         if event.isSignal == 1:
-            assert event.__weight__ == 1, "Expected weight 1 for a true electron candidate got {}".format(event.__weight__)
+            assert event.__weight__ == 1, f"Expected weight 1 for a true electron candidate got {event.__weight__}"
             nSignal += 1
         else:
-            assert event.__weight__ == 20, "Expected weight 20 for a wrong electron candidate got {}".format(event.__weight__)
+            assert event.__weight__ == 20, f"Expected weight 20 for a wrong electron candidate got {event.__weight__}"
             nBckgrd += 1
     assert nBckgrd < nSignal, "Expected less background than signal due to the large sampling rate"
 
     for event in t2:
-        assert event.__weight__ == 1, "Expected weight 1 for all photon candidates got {}".format(event.__weight__)
+        assert event.__weight__ == 1, f"Expected weight 1 for all photon candidates got {event.__weight__}"
 
     assert os.path.isfile('eventNtuple.root'), "eventNtuple.root wasn't created"
     f = ROOT.TFile('eventNtuple.root')
@@ -114,10 +114,10 @@ with b2test_utils.clean_working_directory():
     nTracks_11 = 0
     for event in t:
         if event.nTracks == 12:
-            assert event.__weight__ == 10, "Expected weight 10 in an event with 12 tracks got {}".format(event.__weight__)
+            assert event.__weight__ == 10, f"Expected weight 10 in an event with 12 tracks got {event.__weight__}"
             nTracks_12 += 1
         else:
-            assert event.__weight__ == 1, "Expected weight 1 in an event with unequal 12 tracks got {}".format(event.__weight__)
+            assert event.__weight__ == 1, f"Expected weight 1 in an event with unequal 12 tracks got {event.__weight__}"
             if event.nTracks == 11:
                 nTracks_11 += 1
     assert nTracks_12 * 5 < nTracks_11, "Expected much less events with 12 tracks than with 11, due to the large sampling rate"

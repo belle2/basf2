@@ -3,29 +3,49 @@
 SVD Reconstruction
 ==================
 
-The SVD reconstruction starts with ``SVDShaperDigits`` and ``SVDEventInfo``, ``SVDClusters`` are created on both sides of the sensors and then combined into ``SVDSpacePoints``.
+The SVD reconstruction starts with :ref:`SVDShaperDigits<svdshapers>` and :ref:`SVDEventInfo<svdeventinfo>`, :ref:`SVDClusteras<svdclusters>` are created on both sides of the sensors and then combined into :ref:`SVDSpacePoints<svdsps>`.
+
+Several algorithms are available for cluster charge, time and position reconstruction, and they are specified as parameters of the :b2:mod:`SVDClusterizer` module (``chargeAlgorithm{3/6}Samples``, ``timeAlgorithm{3/6}Samples``, ``positionAlgorithm{3/6}Samples``).
+
+Use the following python function if you want to add the SVD reconstruction to your steering file:
+
+.. autofunction:: svd.__init__.add_svd_reconstruction
+
 
 Clustering
 ----------
-The first step of reconstruction after unpacking (or simulation) is the the clustering, i.e. grouping adjacent strips into ``RawCluster``. A strip is considered for clustering its SNR > 3, which corresponds to the online zero-suppression cut: if a strip has a SNR <=3 it's not written out. Consequently all acquired strips are good for clustering.
-A RawCluster is promoted to ``SVDCluster`` if there is at least one strip in the cluster with SNR > 5.
+The first step of reconstruction after unpacking (or simulation) is the the clustering, i.e. grouping adjacent strips into ``RawCluster``. All acquired strips are good for clustering since the minimum value of SNR corresponds to the online zero-suppresion cut: SNR > 3.
+A ``RawCluster`` is promoted to ``SVDCluster`` if there is at least one strip in the cluster with SNR > 5.
+The parameters for clustering are stored in the :ref:`SVDClusterCuts<svdclustercuts>` DBObject.
 
 Cluster Charge Reconstruction
 -----------------------------
 The cluster charge is a measurement of the charge released in the sensor by the charged particle, and collected on one side of the sensor.
 
-The *default algorithm* used to compute cluster charge is the ``MaxSample``: the highest strip sample for each strip in the cluster represents the strip charge (in ADC). This value is calibrated using the ``SVDPulseShapeCalibrations`` DBObject and converted in :math:`e^{-}` and the cluster charge is evaluated as the sum of the strips charges in :math:`e^{-}`.
+The *default algorithm* used to compute cluster charge is the ``MaxSample``: the highest strip sample for each strip in the cluster represents the strip charge (in ADC). This value is calibrated using the :ref:`SVDPulseShapeCalibrations<svdpulsecal>` DBObject and converted in :math:`e^{-}` and the cluster charge is evaluated as the sum of the strips charges in :math:`e^{-}`.
 
 
 We have two alternative algorithms to compute the cluster charge:
 
 #. ``SumSamples``: the strip charge is evaluated as the sum of the 6 samples in ADC, converted in :math:`e^{-}` and then the cluster charge is the computed as the sum of the strip charges.
 
-#. ``ELS3``: first all strips in the cluster are summed sample by sample. Then the 3 best consecutive summed-samples are found and the maximum :math:`A` of :math:`a(t) = \frac{A(t-t_{\rm raw}}{\tau}\exp{\left(1 - \frac{t-t_{\rm raw}}{\tau}\right)}` (CR-RC waveform) is computed with a simple system of equations (with :math:`\tau = 55\ \rm ns`) and converted in :math:`e^{-}`.
+#. ``ELS3``: first all strips in the cluster are summed sample by sample. Then the 3 best consecutive summed-samples are found with the `MaxSum`_ algorithm and the maximum :math:`A` of the theoretical CR-RC waveform:
+
+   .. _svdcrrc:
+
+   .. math::
+
+      a(t) = A \frac{t-t_{\rm raw}}{\tau}\exp{\left(1 - \frac{t-t_{\rm raw}}{\tau}\right)} 
+
+   is computed with a simple system of equations (with :math:`\tau = 55\ \rm ns`) and converted in :math:`e^{-}`.
  
 .. note::
 
    All three algorithms are implemented in the ``svd/reconstruction/SVDClusterCharge`` class.
+
+.. _MaxSum: 
+
+**The MaxSum Algorithm**: the sum of two consecutive samples are evaluated for all consecutive samples and the three best samples are the two with the larges sum plus the previous one. If the samples with the largest sum are the first two, the first three samples are selected.
 
 Cluster Time Reconstruction
 ---------------------------
@@ -37,14 +57,14 @@ The *default algorithm* used to compute cluster time is the ``CoG6``: the cluste
 
    t_{strip}^{\rm raw} = \frac{\sum_{i=0}^{i<6}t_i A_i}{\sum_{i=0}^{i<6} A_i}.
 
-The raw strip time is calibrated with a third order polynomial stored in the ``SVDCoGTimeCalibration`` payload.
+The raw strip time is calibrated with a third order polynomial stored in the :ref:`SVDCoGTimeCalibration<svdcog6time>` DBObject.
 
 
-We have two alternative algorithms to compute the cluster time. For both, first all strips in the cluster are summed sample by sample, tthen the 3 best consecutive summed-samples are determined.
+We have two alternative algorithms to compute the cluster time. For both, first all strips in the cluster are summed sample by sample, tthen the 3 best consecutive summed-samples are determined using the `MaxSum`_ algorithm.
 
-#. ``CoG3``: the raw cluster time is the average of the 3 best samples time with the sample charge. The raw time is finally calibrated with a third order polynomial stored in ``SVDCoG3SamplesCalibrations``.
+#. ``CoG3``: the raw cluster time is the average of the 3 best samples time with the sample charge. The raw time is finally calibrated with a third order polynomial stored in the :ref:`SVDCoG3SampleTimeCalibration<svdcog3time>` DBObject.
 
-#. ``ELS3``: the raw cluster time is computed with a symple system of equations as :math:`t_{\rm raw}` of :math:`a(t) = \frac{A(t-t_{\rm raw}}{\tau}\exp{\left(1 - \frac{t-t_{\rm raw}}{\tau}\right)}` (CR-RC waveform). The raw time is finally calibrated with a third order polynomial stored in ``SVDELS3SamplesCalibrations``.
+#. ``ELS3``: the raw cluster time is computed with a symple system of equations as :math:`t_{\rm raw}` of the theoretical :ref:`CR-RC waveform<svdcrrc>`. The raw time is finally calibrated with a third order polynomial stored in the  :ref:`SVDELS3SampleTimeCalibration<svdels3time>` DBObject.
  
 .. note::
 
@@ -53,15 +73,58 @@ We have two alternative algorithms to compute the cluster time. For both, first 
 
 Cluster Position Reconstruction
 -------------------------------
+The algorithm to determine the cluster position depends on the cluster size, i.e. the number of strips forming the cluster.
 
-SpacePoint Creation
--------------------
+For one-strip clusters the position is the position of the strip, i.e. the position of the center of the readout implant.
+
+For more-than-one strip clusters we have two algorithms:
+
+* center-of-gravity ``CoG``: the cluster position is computed averaging the strip position weighted with the strip charge
+* analog-heat-tail ``AHT``:
+
+The available algorithms to determine the strip charge for the position computation are the same available for clusters, strips are considered as one-strip clusters). To choose the srtip charge reconstruction algorithm for cluster position computation use the :b2:mod:`SVDClusterizer` parameter ``stripChargeAlgorithm{3/6}Samples``. The default algorithm is the ``MaxSample``.
+
+
+In the current default reconstruction the ``CoG`` is used for cluster size = 2, and ``AHT`` is used for cluster size > 2.
+
+The ``SVDClusterizer`` supports the following position reconstruction algorithms (that can be passed as string, see the :b2:mod:`SVDClusterizer` parameter ``positionAlgorithm{3/6}Samples`` parameter)
+
+* ``OldDefault``: current default described above
+* ``CoGOnly``: the ``CoG`` is used for all cluster sizes :math:`>=2` (``AHT`` is not used)
+
+.. note::
+
+   All algorithms are implemented in the ``svd/reconstruction/SVDClusterPosition`` class.
+
+Creation of Clusters in disabled-APV regions
+--------------------------------------------
+
+In case one or more APV readout chips are disabled during data taking, a *fake* cluster is created in the middle of the region in order not to loose the information of the hit on the other side of the sensor. For more details see :b2:mod:`SVDMissingAPVsClusterCreator`.
+
+:ref:`SpacePoint<svdsps>` Creation
+----------------------------------
+
+All clusters on one side of each sensor are combined with all clusters on the other side. Certain combinations of clusters can be excluded based on the hit time, the two available cuts are:
+
+#. exclude ``SpacePoints`` in which at least one cluster has hit time below a certain threshold
+#. exclude ``SpacePoints`` in which thetime difference of the two clusters exceeds a crtain threshold
+
+The choice of the cut and of the threshold is stored in the :ref:`SVDHitTimeSelection<svdhittimeselection>`.
+
 
 Strip Reconstruction (Optional)
 -------------------------------
-Please use the following python function if you want to add the SVD reconstruction to your steering file:
 
-.. autofunction:: svd.__init__.add_svd_reconstruction
+The :b2:mod:`SVDRecoDigitCreator` reconstructs raw strips, creating one :ref:`SVDRecoDigit<svdrecos>` for each :ref:`SVDShaperDigit<svdshapers>`.
+
+Strip reconstruction is not called in the default SVD reconstruction. It is anyway necessary for DQM or other performance studies.
+Use the following python function if you want to add the SVD strip reconstruction to your steering file:
+
+.. autofunction:: svd.__init__.add_svd_create_recodigits
+
+The charge and time algorithm available for clusters are also available for strips (considered as one-strip clusters). To choose the algorithm use the :b2:mod:`SVDRecoDigitCreator` parameter ``chargeAlgorithm{3/6}Samples``, ``timeAlgorithm{3/6}Samples``.
+
+
 
 Reconstruction Modules
 ----------------------
@@ -70,6 +133,6 @@ This is a list of the ``svd`` modules used for reconstruction.
 
 .. b2-modules::
    :package: svd
-   :modules: SVDClusterizer, SVDMissingAPVsClusterCreator, SVDSpacePointCreator, SVDRecoDigitCreator
+   :modules: SVDUnpacker, SVDClusterizer, SVDMissingAPVsClusterCreator, SVDSpacePointCreator, SVDRecoDigitCreator
    :io-plots:
 

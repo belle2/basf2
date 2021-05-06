@@ -9,7 +9,7 @@ SVD Utility Functions
 .. autofunction:: svd.__init__.add_svd_SPcreation
 
 .. autofunction:: svd.__init__.add_svd_create_recodigits
-
+		  :noindex:
 .. autofunction:: svd.__init__.add_rel5_svd_reconstruction
 
 .. autofunction:: svd.__init__.add_svd_unpacker

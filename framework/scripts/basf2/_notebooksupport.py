@@ -129,9 +129,9 @@ def process(path, max_event=0):
         None
     """
     global _process_warning
-    if(not _process_warning):
+    if not _process_warning:
         _process_warning = True
-        b2core.B2INFO("process() called in a Jupyter Notebook. See help(process) for caveats")
+        b2core.B2INFO("process() called in a Jupyter Notebook. See help(basf2.process) for caveats")
 
     datastore = Belle2.DataStore.Instance()
     ctx = multiprocessing.get_context("fork")

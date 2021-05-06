@@ -60,23 +60,6 @@ namespace Belle2 {
     /** Get a new statistics object for a different counter/different list of modules */
     ProcessStatisticsPython getModuleStatistics(ModuleStatistics::EStatisticCounters type, const boost::python::list& modulesPyList);
 
-    /**
-     * Set name for module in statistics.
-     *
-     * Normally, all modules get assigned their default name which is
-     * used to register them. If multiple instances of the same module
-     * are present at the same time, this can be used to distuingish
-     * between them
-     *
-     * @param module Shared pointer to the Module for which a name is
-     *               to be defined
-     * @param name   Name to show in statistics
-     */
-    void setModuleName(Module* module, const std::string& name)
-    {
-      getWrapped()->getStatistics(module).setName(name);
-    }
-
     /** Get statistics for given module. */
     const ModuleStatistics* get(const std::shared_ptr<Module>& module);
 

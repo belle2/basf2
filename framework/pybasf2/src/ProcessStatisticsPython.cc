@@ -152,17 +152,6 @@ counters defined in `StatisticCounters`:
 )DOCSTRING", no_init);
 
   stats
-  .def("set_name", &ProcessStatisticsPython::setModuleName, bp::args("module", "name"),
-       R"DOCSTRING(Set name for module in statistics.
-
-Normally, all modules get assigned their default name which is
-used to register them. If multiple instances of the same module
-are present at the same time, this can be used to distinguish
-between them.
-
-.. deprecated:: release-01-00-00
-    Use `Module.set_name` instead
-)DOCSTRING")
   .def("get", &ProcessStatisticsPython::get, return_value_policy<reference_existing_object>(), bp::arg("module"),
        "Get `ModuleStatistics` for given Module.")
   .def("get_global", &ProcessStatisticsPython::getGlobal, return_value_policy<reference_existing_object>(),
@@ -253,8 +242,7 @@ Parameters:
                            "All member functions take exactly one argument to select which "
                            "counter to query which defaults to `StatisticCounters.TOTAL` if omitted.")
   .add_property("name", make_function(&ModuleStatistics::getName, return_value_policy<copy_const_reference>()),
-                &ModuleStatistics::setName, "property to set or get the name of the module to be displayed in the statistics"
-                "\n\n.. deprecated:: release-01-00-00\n    use `Module.set_name` instead")
+                "property to get the name of the module to be displayed in the statistics")
   .def("time_sum", &ModuleStatistics::getTimeSum, bp::arg("counter") = ModuleStatistics::c_Total,
        "time_sum(counter=StatisticCounters.TOTAL)\nReturn the sum of all execution times")
   .def("time_mean", &ModuleStatistics::getTimeMean, bp::arg("counter") = ModuleStatistics::c_Total,

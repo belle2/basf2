@@ -201,7 +201,7 @@ namespace Belle2 {
       // DB payloads
       SVDHotStripsCalibrations m_HotStripsCalib; /**< payload for hot strips */
       SVDFADCMaskedStrips m_FADCMaskedStrips; /**< payload for strips masked on FADC level */
-      DBObjPtr<HardwareClockSettings> m_clockSettings; /**< hardware clock settings */
+      OptionalDBObjPtr<HardwareClockSettings> m_clockSettings; /**< hardware clock settings */
 
       // other
       std::string m_svdShaperDigitsName; /**< name of the input SVDShaperDigits collection */
@@ -233,6 +233,14 @@ namespace Belle2 {
       double m_layerLadderMassKg[4][16] = {0}; /**< Active mass of each ladder of each layer, in Kg. */
       double m_layerSensorMassKg[4][5] = {0}; /**< Active mass of each ladder/sensor position, in Kg. */
       // No need for m_l3LadderSensorMassKg, massOfSensor() can be used.
+
+      /** SVD Sampling Clock frequency (approximated) in GHz (standard
+       * unit of frequency in basf2).
+       *
+       * This is used as a fallback value when HardwareClockSettings'
+       * payload is not available.
+       */
+      static constexpr double c_SVDSamplingClockFrequency = 0.03175;
     };
 
   } // Background namespace

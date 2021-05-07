@@ -30,6 +30,8 @@ namespace Belle2 {
       // register collection(s) as optional, your detector might be excluded in DAQ
       m_digits.isOptional(m_svdShaperDigitsName);
       m_clusters.isOptional();
+      m_resultStoreObjectPointer.isOptional();
+      m_eventInfo.isOptional();
 
       B2DEBUG(10, "SVDHitRateCounter: initialize()");
       // set branch address
@@ -237,9 +239,24 @@ namespace Belle2 {
             if (layer == 0)
               rates_lowE.l3LadderSensorAverageRates[ladder][sensor] ++;
           }
-          int nSamp = m_eventInfo.isValid() ? m_eventInfo->getNSamples() : 6; // Assume 6 samples if real value unknown
-          if (nSamp < 2) nSamp = 2; // Avoid division by zero if nSamp = 1. Not sure it's correct, but I don't expect nSamp = 1 to happen.
-          double integrationTimeSeconds = (nSamp - 1) / m_clockSettings->getClockFrequency(Const::SVD, "sampling") / Unit::s;
+
+          // Compute integration time for obtaining the dose rate
+          int nSamp = 6; // Fallback value
+          double svdSamplingClock = c_SVDSamplingClockFrequency; // Fallback value
+          // Replace number of samples with real value if available
+          if (m_eventInfo.isValid())
+            nSamp = m_eventInfo->getNSamples();
+          else
+            B2WARNING("SVDEventInfo not available: assuming 6 samples were taken.");
+          // Avoid division by zero if nSamp = 1. Valid values are only 6 and 3,
+          // so this line is only meant to prevent a crash in case of corrupted data.
+          if (nSamp < 2) nSamp = 2;
+          // Replace sampling frequency with real value if available
+          if (m_clockSettings.isValid())
+            svdSamplingClock = m_clockSettings->getClockFrequency(Const::SVD, "sampling");
+          else
+            B2WARNING("HardwareClockSettings not available: using approximated SVD sampling clock frequency.");
+          double integrationTimeSeconds = (nSamp - 1) / svdSamplingClock / Unit::s;
           double chargePerUnitTime = cluster.getCharge() / integrationTimeSeconds;
           if (cluster.isUCluster()) {
             rates_energyU.layerAverageRates[layer] += chargePerUnitTime;

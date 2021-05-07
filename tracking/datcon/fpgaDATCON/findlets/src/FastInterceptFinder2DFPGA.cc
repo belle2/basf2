@@ -49,7 +49,7 @@ void FastInterceptFinder2DFPGA::exposeParameters(ModuleParamList* moduleParamLis
                                 "Number of vertical sectors (= y-axis) dividing the Hough space.", m_param_nVerticalSectors);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "verticalHoughSpaceSize"), m_param_verticalHoughSpaceSize,
-                                "data type: long. Vertical size of the Hough space.", m_param_verticalHoughSpaceSize);
+                                "Vertical size of the Hough space. Data type: long", m_param_verticalHoughSpaceSize);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumX"), m_param_minimumX,
                                 "Minimum x value of the Hough space.", m_param_minimumX);
@@ -58,16 +58,16 @@ void FastInterceptFinder2DFPGA::exposeParameters(ModuleParamList* moduleParamLis
                                 "Maximum x value of the Hough space.", m_param_maximumX);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumHSClusterSize"), m_param_MinimumHSClusterSize,
-                                "Maximum x value of the Hough space.", m_param_MinimumHSClusterSize);
+                                "Minimum size of the Hough Space clusters.", m_param_MinimumHSClusterSize);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSize"), m_param_MaximumHSClusterSize,
-                                "Maximum x value of the Hough space.", m_param_MaximumHSClusterSize);
+                                "Maximum size of the Hough Space clusters.", m_param_MaximumHSClusterSize);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSizeX"), m_param_MaximumHSClusterSizeX,
-                                "Maximum x value of the Hough space.", m_param_MaximumHSClusterSizeX);
+                                "Maximum size of the Hough Space clusters in horizontal direction.", m_param_MaximumHSClusterSizeX);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSizeY"), m_param_MaximumHSClusterSizeY,
-                                "Maximum x value of the Hough space.", m_param_MaximumHSClusterSizeY);
+                                "Maximum size of the Hough Space clusters in vertical direction.", m_param_MaximumHSClusterSizeY);
 
 }
 

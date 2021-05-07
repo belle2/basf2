@@ -6,7 +6,6 @@ from svd import add_svd_reconstruction
 
 
 def add_datcon(path,
-               rootFileName='trackCandAnalysis.root',
                datcon_reco_tracks='DATCONRecoTracks',
                use_simple_roi_calculation=True,
                use_advanced_roi_calculation=False,
@@ -15,7 +14,6 @@ def add_datcon(path,
     """
     Convenience function to add the optimized DATCON to the path.
     : param path: The path to add the DATCON module to.
-    : param rootFileName: Name of the ROOT file for debugging. Will be removed when the full development is finished.
     : param datcon_reco_tracks: Name of the StoreArray containing the RecoTracks found by DATCON
     : param use_simple_roi_calculation: Use a simple ROI calculation with a circle extrapolation in r-phi
         and a straight line extrapolation in theta
@@ -49,18 +47,17 @@ def add_datcon(path,
                     simpleMinimumHSClusterSize=4,
                     simpleMaximumHSClusterSize=200,
 
-                    maxRelations=1000000,
                     relationFilter='angleAndTime',
                     relationFilterParameters={'AngleAndTimeThetaCutDeltaL0': 0.05,
-                                              'AngleAndTimeThetaCutDeltaL1': 0.10,
+                                              'AngleAndTimeThetaCutDeltaL1': 0.20,
                                               'AngleAndTimeThetaCutDeltaL2': 0.25,
                                               'AngleAndTimeDeltaUTime': 50.,
                                               'AngleAndTimeDeltaVTime': 50., },
-                    rootFileName=rootFileName,
-                    maxRelationsCleaner=10000,
-                    twoHitFilterLimit=50,
+                    # maxRelations=10000,
+                    maxRelations=2000,
+                    twoHitFilterLimit=40,
                     twoHitFilter='twoHitVirtualIPQI',
-                    twoHitUseNBestHits=50,
+                    twoHitUseNBestHits=40,
                     # twoHitFilter='all',
                     # twoHitUseNBestHits=0,
                     threeHitUseNBestHits=20,
@@ -71,11 +68,20 @@ def add_datcon(path,
                     minQualitiyIndicatorSize3=0.50,
                     minQualitiyIndicatorSize4=0.001,
                     minQualitiyIndicatorSize5=0.001,
-                    maxNumberOfHitsForEachPathLength=50,
+                    maxNumberOfEachPathLength=50,
 
                     RecoTracksStoreArrayName=datcon_reco_tracks,
 
                     calculateROI=use_simple_roi_calculation,
+                    # tolerancePhi=0,
+                    # toleranceZ=0,
+                    multiplierUL1=600,
+                    multiplierUL2=800,
+                    multiplierVL1=0.8,
+                    multiplierVL2=1.2,
+                    radiusCorrectionFactor=4.0,
+                    sinPhiCorrectionFactor=0.0,
+                    cosPhiCorrectionFactor=0.0,
                     )
 
     if use_advanced_roi_calculation:
@@ -98,3 +104,33 @@ def add_datcon(path,
                         numSigmaTotV=10,
                         maxWidthU=0.5,
                         maxWidthV=0.5,).set_name('DATCONPXDROIFinder')
+
+
+def add_fpga_datcon(path):
+    """
+    Convenience function to add the FPGA version of DATCON to the path.
+    : param path: The path to add the DATCONFPGA module to.
+    """
+
+    path.add_module('DATCONFPGA',
+                    uSideVerticalHoughSpaceSize=100000000,
+                    uSideNAngleSectors=128,
+                    uSideNVerticalSectors=128,
+                    uSideMinimumHSClusterSize=5,
+                    uSideMaximumHSClusterSize=50,
+                    vSideIsUClusterizer=False,    # required, as default is True for u side
+                    vSideIsUFinder=False,         # required, as default is True for u side
+                    vSideNAngleSectors=128,
+                    vSideNVerticalSectors=64,
+                    vSideMinimumHSClusterSize=5,
+                    vSideMaximumHSClusterSize=50,
+                    vSideMaximumX=65. / 180. * PI,  # corresponds to +155° for theta, required as default values are for u side
+                    vSideMinimumX=-75. / 180. * PI,  # corresponds to  +15° for theta, required as default values are for u side
+                    vSideVerticalHoughSpaceSize=20000000,
+                    createPXDIntercepts=False,
+                    extrapolationPhiCutL1=1.,
+                    extrapolationPhiCutL2=1.,
+                    uROIsizeL1=80,
+                    uROIsizeL2=60,
+                    vROIsizeL1=80,
+                    vROIsizeL2=60)

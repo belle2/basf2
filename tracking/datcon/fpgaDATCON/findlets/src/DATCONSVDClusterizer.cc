@@ -35,7 +35,7 @@ void DATCONSVDClusterizer::exposeParameters(ModuleParamList* moduleParamList, co
                                 "Write noise information to text file?", m_param_writeNoiseMapsToFile);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumClusterSize"), m_param_maxiClusterSize,
-                                "Maximum cluster size.", m_param_maxiClusterSize);
+                                "Maximum SVD cluster size for this side. Data type: unsigned short", m_param_maxiClusterSize);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "noiseCut"), m_param_noiseCut,
                                 "Cut for using default noise (noise < this value), or actual noise (noise > this value).",

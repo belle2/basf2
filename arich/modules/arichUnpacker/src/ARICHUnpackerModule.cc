@@ -163,8 +163,11 @@ namespace Belle2 {
           if (m_debug) febHead.print();
 
           if (/*febHead.type != head.type ||*/ febHead.version != head.version || febHead.mergerID != head.mergerID
-                                               || febHead.trigger != head.trigger) B2ERROR("ARICHUnpackerModule: data in header " << LogVar("FEB ID", (unsigned)febHead.FEBSlot) <<
-                                                     " not consistent with data in header " << LogVar("merger ID", (unsigned)head.mergerID));
+                                               || febHead.trigger != head.trigger) {
+            B2ERROR("ARICHUnpackerModule: data in FEB header not consistent with data in merger HEADER " << LogVar("FEB ID",
+                    (unsigned)febHead.FEBSlot) <<
+                    LogVar("merger ID", (unsigned)head.mergerID)); break;
+          }
 
           // feb header shift
           ibyte += ARICHFEB_HEADER_SIZE;
@@ -174,11 +177,11 @@ namespace Belle2 {
 
           unsigned mergID = m_mergerMap->getMergerIDfromSN((unsigned)head.mergerID);
 
-          if (mergID == 99) { B2ERROR("ARICHUnpackerModule: unknown merger number " << LogVar("merger ID", mergID) << LogVar("Serial Number", (unsigned)head.mergerID) << "Merger data will be skipped"); break;}
+          if (mergID == 99) { B2ERROR("ARICHUnpackerModule: unknown merger number. Merger data will be skipped.  " << LogVar("merger ID", mergID) << LogVar("Serial Number", (unsigned)head.mergerID)); break;}
 
           unsigned moduleID = m_mergerMap->getModuleID(mergID, (unsigned)febHead.FEBSlot);
 
-          if (!moduleID) { B2ERROR("ARICHUnpackerModule: no merger to FEB mapping" << LogVar("merger ID", mergID) << LogVar("Serial Number", (unsigned)head.mergerID) << LogVar("FEB slot", (unsigned)febHead.FEBSlot) << "Merger data will be skipped"); break;}
+          if (!moduleID) { B2ERROR("ARICHUnpackerModule: no merger to FEB mapping. Merger data will be skipped. " << LogVar("merger ID", mergID) << LogVar("Serial Number", (unsigned)head.mergerID) << LogVar("FEB slot", (unsigned)febHead.FEBSlot)); break;}
 
           // read data
           if (m_debug) std::cout << "Hit channels: " << std::endl;

@@ -5,7 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::Particle+; // checksum=0x5a78ef64, version=13
+#pragma link C++ class Belle2::Particle+; // checksum=0xd7cf258f, version=14
 #pragma link C++ class Belle2::EventExtraInfo+; // checksum=0x965ad50b, version=2
 #pragma link C++ class Belle2::ParticleList+; // checksum=0x98887650, version=3
 #pragma link C++ class Belle2::RestOfEvent+; // checksum=0xe86f1658, version=7

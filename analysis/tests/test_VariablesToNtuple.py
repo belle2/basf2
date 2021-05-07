@@ -6,7 +6,7 @@ import basf2
 import ROOT
 import b2test_utils
 
-inputFile = b2test_utils.require_file('mdst12.root', 'validation')
+inputFile = b2test_utils.require_file('mdst14.root', 'validation')
 path = basf2.create_path()
 path.add_module('RootInput', inputFileName=inputFile)
 path.add_module('ParticleLoader', decayStrings=['e+'])
@@ -106,7 +106,7 @@ with b2test_utils.clean_working_directory():
 
     t.GetEntry(0)
     assert t.__run__ == 0, "run number not as expected"
-    assert t.__experiment__ == 0, "experiment number not as expected"
+    assert t.__experiment__ == 1003, "experiment number not as expected"
     assert t.__event__ == 1, "event number not as expected"
     assert t.__production__ == 0, "production number not as expected"
 
@@ -132,12 +132,12 @@ with b2test_utils.clean_working_directory():
 
     t.GetEntry(0)
     assert t.__run__ == 0, "run number not as expected"
-    assert t.__experiment__ == 0, "experiment number not as expected"
+    assert t.__experiment__ == 1003, "experiment number not as expected"
     assert t.__event__ == 1, "event number not as expected"
     assert t.__production__ == 0, "production number not as expected"
 
     t.GetEntry(9)
     assert t.__run__ == 0, "run number not as expected"
-    assert t.__experiment__ == 0, "experiment number not as expected"
+    assert t.__experiment__ == 1003, "experiment number not as expected"
     assert t.__event__ == 10, "event number not as expected"
     assert t.__production__ == 0, "production number not as expected"

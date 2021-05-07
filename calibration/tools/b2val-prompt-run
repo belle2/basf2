@@ -136,9 +136,14 @@ is (lowest -> highest): [Backend.default_backend_args -> validation_config.json
     B2INFO("Getting values for 'expert_config' from the prompt script.")
     expert_config = validation_module.settings.expert_config   # set to be the default from the script
     # If we have values in the validation_config we merge/overwrite with the default
+    if not expert_config:
+        # In case expert_config is None or False
+        B2INFO("'expert_config' from the prompt script is not set")
+        expert_config = {} 
+        
     try:
         B2INFO("Overwriting values in 'expert_config' by using the values from the config JSON file.")
-        expert_config = {**expert_config, **validation_config["expert_config"]}
+        expert_config = {**expert_config, **validation_config.get("expert_config", {})}
     except:
         B2ERROR("Expert config must be a dictionary! E.g. {'my_var': 42}")
         exit() 
@@ -179,7 +184,7 @@ is (lowest -> highest): [Backend.default_backend_args -> validation_config.json
     # Output directory, where the stdout and stderr will be sent.
     job.output_dir = validation_result_path
     # The command we want to run
-    job.cmd = ["basf2", f"{script_path}", f'{job_path} {input_data_path} {requested_iov} "{expert_config}"']
+    job.cmd = ["basf2", f"{script_path}", f"{job_path} {input_data_path} '{requested_iov}' '{json.dumps(expert_config)}'"]
     job.append_current_basf2_setup_cmds()
     return [job]
 

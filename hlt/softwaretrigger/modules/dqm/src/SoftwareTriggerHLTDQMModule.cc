@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <stdexcept>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
@@ -351,7 +352,12 @@ void SoftwareTriggerHLTDQMModule::event()
                     << LogVar("L1 trigger line", l1Trigger));
           continue;
         }
-        const bool triggerResult = m_l1TriggerResult->testPsnm(triggerBit);
+        bool triggerResult;
+        try {
+          triggerResult = m_l1TriggerResult->testPsnm(triggerBit);
+        } catch (const std::exception&) {
+          triggerResult = false;
+        }
         if (m_param_create_total_result_histograms) {
           if (triggerResult) {
             m_l1Histograms["l1_total_result"]->Fill(l1Index - 0.5);
@@ -397,7 +403,12 @@ void SoftwareTriggerHLTDQMModule::event()
                       << LogVar("L1 trigger line", l1Trigger));
             continue;
           }
-          const bool triggerResult = m_l1TriggerResult->testPsnm(triggerBit);
+          bool triggerResult;
+          try {
+            triggerResult = m_l1TriggerResult->testPsnm(triggerBit);
+          } catch (const std::exception&) {
+            triggerResult = false;
+          }
           if (triggerResult) {
             m_l1Histograms["l1_total_result"]->Fill(l1Index - 0.5);
           }

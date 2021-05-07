@@ -96,11 +96,11 @@ namespace Belle2 {
     uint32_t getEndErrorInfo(void) const { return m_errorinfo;};
 
     /** set gating info from the DHC END */
-    void setGatedFlag(uint32_t e) { m_gated_mode = e;};
+    void setGatedFlag(bool gm) { m_gated_mode = gm;};
     /** get gating info from the DHC END */
     bool getGatedFlag(void) const { return m_gated_mode;};
     /** set HER/LER gating info from the DHC END */
-    void setGatedHER(uint32_t e) { m_gated_her = e;};
+    void setGatedHER(bool isher) { m_gated_her = isher;};
     /** get HER/LER gating info from the DHC END */
     bool getGatedHER(void) const { return m_gated_her;};
 

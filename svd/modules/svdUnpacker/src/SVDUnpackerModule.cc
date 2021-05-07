@@ -90,7 +90,6 @@ void SVDUnpackerModule::initialize()
 
   StoreArray<SVDShaperDigit> storeShaperDigits(m_svdShaperDigitListName);
   storeShaperDigits.registerInDataStore();
-  storeShaperDigits.registerRelationTo(storeDAQDiagnostics);
   m_svdShaperDigitListName = storeShaperDigits.getName();
 
 }
@@ -620,7 +619,7 @@ void SVDUnpackerModule::event()
         || p.second->getFTBFlags()     || p.second->getAPVError() || !(p.second->getAPVMatch()) || !(p.second->getFADCMatch())
         || p.second->getBadHeader()
         ||  p.second->getBadMapping() || p.second->getUpsetAPV() || p.second->getMissedHeader() || p.second->getMissedTrailer()) continue;
-    shaperDigits.appendNew(p.first)->addRelationTo(p.second);
+    shaperDigits.appendNew(p.first);
   }
 
   if (!m_svdEventInfoPtr->getMatchTriggerType()) {if (!(nEventInfoMatchErrors % m_errorRate) or nEventInfoMatchErrors < 200) B2WARNING("Inconsistent SVD Trigger Type value for: " << LogVar("Event number", eventNo));}

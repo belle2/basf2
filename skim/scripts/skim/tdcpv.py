@@ -275,7 +275,7 @@ class TDCPV_ccs(BaseSkim):
 
     def additional_setup(self, path):
         ma.cutAndCopyList('K_L0:alleclEcut', 'K_L0:allecl', 'E>0.15', path=path)
-        ma.copyLists('K_L0:all', ['K_L0:allklm', 'K_L0:allecl'], writeOut=True, path=path)
+        ma.copyLists('K_L0:all_klmecl', ['K_L0:allklm', 'K_L0:allecl'], writeOut=True, path=path)
 
     def build_lists(self, path):
         vm.addAlias('E_ECL_pi_TDCPV', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_eventshape)')
@@ -294,8 +294,8 @@ class TDCPV_ccs(BaseSkim):
         bPlustoJPsiK_Channel = ['J/psi:mumu K+:SkimHighEff',
                                 'J/psi:ee K+:SkimHighEff']
 
-        bd_ccs_KL_Channels = ['J/psi:mumu K_L0:all',
-                              'J/psi:ee K_L0:all']
+        bd_ccs_KL_Channels = ['J/psi:mumu K_L0:all_klmecl',
+                              'J/psi:ee K_L0:all_klmecl']
 
         bd_ccs_List = []
         for chID, channel in enumerate(bd_ccs_Channels):

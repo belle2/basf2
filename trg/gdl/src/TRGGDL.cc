@@ -33,6 +33,8 @@
 
 #include <TH1I.h>
 
+#include <stdexcept>
+
 #define N_TIMING_REGISTERS 4
 
 using namespace std;
@@ -69,7 +71,9 @@ namespace Belle2 {
                     const std::string& Phase,
                     bool algFromDB,
                     const std::string& algFilePath,
-                    int debugLevel)
+                    int debugLevel,
+                    double timquality_threshold_sfin,
+                    double timquality_threshold_fine)
   {
     if (_gdl) {
       //delete _gdl;
@@ -84,7 +88,9 @@ namespace Belle2 {
                         Phase,
                         algFromDB,
                         algFilePath,
-                        debugLevel);
+                        debugLevel,
+                        timquality_threshold_sfin,
+                        timquality_threshold_fine);
     } else {
       cout << "TRGGDL::getTRGGDL ... good-bye" << endl;
       //        delete _gdl;
@@ -109,7 +115,9 @@ namespace Belle2 {
                  const std::string& Phase,
                  bool algFromDB,
                  const std::string& algFilePath,
-                 int debugLevel)
+                 int debugLevel,
+                 double timquality_threshold_sfin,
+                 double timquality_threshold_fine)
     : _debugLevel(debugLevel),
       _configFilename(configFile),
       _simulationMode(simulationMode),
@@ -121,7 +129,9 @@ namespace Belle2 {
       _offset(15.3),
       _isb(0),
       _osb(0),
-      _algFromDB(algFromDB)
+      _algFromDB(algFromDB),
+      _timquality_threshold_sfin(timquality_threshold_sfin),
+      _timquality_threshold_fine(timquality_threshold_fine)
   {
 
     if (TRGDebug::level()) {
@@ -318,6 +328,33 @@ namespace Belle2 {
           GDLResult->setPsnmBits(i / 32, L1Summary_psnm);
         }
       }
+
+      //set timing qulaity flag based on MC truth jitter, which is NOT simulated by TSIM
+      TRGSummary::ETimingQuality timQuality = TRGSummary::TTYQ_NONE;
+      double jitter = 0;
+
+      //get true jitter if SimClockState is valid
+      if (m_simClockState.isValid() && m_hwClock.isValid()) {
+
+        jitter = m_simClockState->getRelativeBucketNo() / m_hwClock->getAcceleratorRF(); // in ns
+
+        //set timing quality flag with the jitter
+        if (abs(jitter) < _timquality_threshold_sfin)
+          timQuality = TRGSummary::TTYQ_SFIN;
+        else {
+          if (abs(jitter) < _timquality_threshold_fine)
+            timQuality = TRGSummary::TTYQ_FINE;
+          else
+            timQuality = TRGSummary::TTYQ_CORS;
+        }
+      }
+
+      B2DEBUG(20, "TRGGDL::set timing quality, jitter = " << jitter << ": timQuality =  " << timQuality << " sfin threshold = " <<
+              _timquality_threshold_sfin << " fine threshold = " <<
+              _timquality_threshold_fine);
+
+      //fill the flag to TRGSummary
+      GDLResult->setTimQuality(timQuality);
     }
   }
 
@@ -363,7 +400,10 @@ namespace Belle2 {
       _ftdBits.clear();
       _psnBits.clear();
       for (int i = 0; i < N_InputBits; i++) {
-        _inpBits.push_back(GDLResult->testInput(i));
+        bool inputBit;
+        try { inputBit = GDLResult->testInput(i); }
+        catch (const std::exception&) { inputBit = false; }
+        _inpBits.push_back(inputBit);
       }
 
       if (_algFromDB) {

@@ -16,7 +16,7 @@ import modularAnalysis as ma
 
 path = basf2.Path()
 ma.inputMdst(environmentType='default',
-             filename=basf2.find_file('mdst14.root', 'validation', False),
+             filename=basf2.find_file('mdst14.root', 'validation', True),
              path=path)
 ma.printMCParticles(path=path)
 basf2.process(path)

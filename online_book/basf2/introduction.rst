@@ -62,7 +62,7 @@ https://doi.org/10.1007/s41781-018-0017-9
 
 ... and a logo.
 
-.. figure:: ../../../../_static/b2logo.svg
+.. figure:: introduction/b2logo.svg
     :align: center
     :width: 300px
     :alt: The basf2 logo.

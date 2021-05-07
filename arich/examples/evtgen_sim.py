@@ -5,7 +5,6 @@ import basf2 as b2
 from optparse import OptionParser
 from tracking import add_tracking_reconstruction
 from modularAnalysis import inputMdst
-from tracking import add_tracking_reconstruction
 import os
 # --------------------------------------------------------------------
 # Performs Geant4 simulation of events generated with evtgen_gen.py

@@ -14,6 +14,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/RelationVector.h>
+#include <framework/gearbox/Const.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/TrackPoint.h>
@@ -316,7 +317,7 @@ std::vector<MCParticle*> StandardTrackingPerformanceModule::removeFinalStateRadi
 {
   std::vector<MCParticle*> daughtersWOFSR;
   for (unsigned int iDaughter = 0; iDaughter < in_daughters.size(); iDaughter++)
-    if (abs(in_daughters[iDaughter]->getPDG()) != 22)
+    if (abs(in_daughters[iDaughter]->getPDG()) != Const::photon.getPDGCode())
       daughtersWOFSR.push_back(in_daughters[iDaughter]);
 
   return daughtersWOFSR;

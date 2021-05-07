@@ -164,29 +164,99 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Acceptance");
 
-    REGISTER_VARIABLE("thetaInCDCAcceptance",   thetaInCDCAcceptance, "Particle is within CDC angular acceptance.");
-    REGISTER_VARIABLE("thetaInTOPAcceptance",   thetaInTOPAcceptance, "Particle is within TOP angular acceptance.");
-    REGISTER_VARIABLE("thetaInARICHAcceptance", thetaInARICHAcceptance, "Particle is within ARICH angular acceptance.");
-    REGISTER_VARIABLE("thetaInECLAcceptance",   thetaInECLAcceptance,
-                      "Particle is within ECL angular acceptance. 1: Forward; 2: Barrel; 3: Backwards.");
-    REGISTER_VARIABLE("thetaInBECLAcceptance",  thetaInBECLAcceptance, "Particle is within Barrel ECL angular acceptance.");
-    REGISTER_VARIABLE("thetaInEECLAcceptance",  thetaInEECLAcceptance, "Particle is within Endcap ECL angular acceptance.");
-    REGISTER_VARIABLE("thetaInKLMAcceptance",   thetaInKLMAcceptance,
-                      "Particle is within KLM angular acceptance. 1: Forward endcap; 2: Forward overalp; 3: Barrel; 4: Backward overlap; 5: Backward endcap.");
-    REGISTER_VARIABLE("thetaInBKLMAcceptance",  thetaInBKLMAcceptance, "Particle is within Barrel KLM angular acceptance.");
-    REGISTER_VARIABLE("thetaInEKLMAcceptance",  thetaInEKLMAcceptance, "Particle is within Endcap KLM angular acceptance.");
-    REGISTER_VARIABLE("thetaInKLMOverlapAcceptance",  thetaInKLMOverlapAcceptance,
-                      "Particle is within the angular region where KLM barrel and endcaps overlap.");
+    REGISTER_VARIABLE("thetaInCDCAcceptance",   thetaInCDCAcceptance, R"DOC(
+Returns 1.0 if particle is within CDC angular acceptance, 0.0 otherwise.
+This variable checks if the particle polar angle :math:`\theta` is within the range :math:`17^\circ < \theta < 150^\circ`.
+The polar angle is computed using only the initial particle momentum.
+)DOC");
+    REGISTER_VARIABLE("thetaInTOPAcceptance",   thetaInTOPAcceptance, R"DOC(
+Returns 1.0 if particle is within TOP angular acceptance, 0.0 otherwise.
+This variable checks if the particle polar angle :math:`\theta` is within the range :math:`31^\circ < \theta < 128^\circ`.
+The polar angle is computed using only the initial particle momentum.
+)DOC");
+    REGISTER_VARIABLE("thetaInARICHAcceptance", thetaInARICHAcceptance, R"DOC(
+Returns 1.0 if particle is within ARICH angular acceptance, 0.0 otherwise.
+This variable checks if the particle polar angle :math:`\theta` is within the range :math:`14^\circ < \theta < 30^\circ`.
+The polar angle is computed using only the initial particle momentum.
+)DOC");
+    REGISTER_VARIABLE("thetaInECLAcceptance",   thetaInECLAcceptance, R"DOC(
+Checks if particle is within ECL angular acceptance. 
+This variable checks if the particle polar angle :math:`\theta` is within certain ranges.
+Return values and the corresponding :math:`\theta` ranges are the following:
 
-    REGISTER_VARIABLE("ptInTOPAcceptance",   ptInTOPAcceptance,  "Particle is within TOP transverse momentum acceptance.");
-    REGISTER_VARIABLE("ptInBECLAcceptance",  ptInBECLAcceptance, "Particle is within Barrel ECL transverse momentum acceptance.");
-    REGISTER_VARIABLE("ptInBKLMAcceptance",  ptInBKLMAcceptance, "Particle is within Barrel KLM transverse momentum acceptance.");
+* 0: Outside of ECL acceptance, :math:`\theta < 12.4^\circ` or :math:`\theta < 155.1^\circ`.
+* 1: Forward ECL,  :math:`12.4^\circ < \theta < 31.4^\circ`; 
+* 2: Barrel ECL,   :math:`32.2^\circ < \theta < 128.7^\circ`; 
+* 3: Backward ECL, :math:`130.7^\circ < \theta < 155.1^\circ`.
 
-    REGISTER_VARIABLE("inCDCAcceptance",   inCDCAcceptance,   "Particle is within CDC geometrical acceptance.");
-    REGISTER_VARIABLE("inTOPAcceptance",   inTOPAcceptance,   "Particle is within TOP geometrical acceptance.");
-    REGISTER_VARIABLE("inARICHAcceptance", inARICHAcceptance, "Particle is within ARICH geometrical acceptance.");
-    REGISTER_VARIABLE("inECLAcceptance",   inECLAcceptance,   "Particle is within ECL geometrical acceptance.");
-    REGISTER_VARIABLE("inKLMAcceptance",   inKLMAcceptance,   "Particle is within KLM geometrical acceptance.");
+The polar angle is computed using only the initial particle momentum.
+)DOC");
+    REGISTER_VARIABLE("thetaInBECLAcceptance",  thetaInBECLAcceptance, R"DOC(
+Returns 1.0 if particle is within Barrel ECL angular acceptance, 0.0 otherwise.
+This variable checks if the particle polar angle :math:`\theta` is within the range :math:`32.2^\circ < \theta < 128.7^\circ`.
+The polar angle is computed using only the initial particle momentum.
+)DOC");
+    REGISTER_VARIABLE("thetaInEECLAcceptance",  thetaInEECLAcceptance, R"DOC(
+Returns 1.0 if particle is within Endcap ECL angular acceptance, 0.0 otherwise.
+This variable checks if the particle polar angle :math:`\theta` is within the range :math:`12.4^\circ < \theta < 31.4^\circ` 
+or :math:`130.7^\circ < \theta < 155.1^\circ`.
+The polar angle is computed using only the initial particle momentum.
+)DOC");
+    REGISTER_VARIABLE("thetaInKLMAcceptance",   thetaInKLMAcceptance,  R"DOC(
+Checks if particle is within KLM angular acceptance. 
+This variable checks if the particle polar angle :math:`\theta` is within certain ranges.
+Return values and the corresponding :math:`\theta` ranges are the following:
+
+* 0: Outside of KLM acceptance, :math:`\theta < 18^\circ` or :math:`\theta < 155^\circ`.
+* 1: Forward endcap,   :math:`18^\circ < \theta < 37^\circ`; 
+* 2: Forward overlap,  :math:`37^\circ < \theta < 47^\circ`; 
+* 3: Barrel,           :math:`47^\circ < \theta < 122^\circ`; 
+* 4: Backward overlap, :math:`122^\circ < \theta < 130^\circ`; 
+* 5: Backward endcap,  :math:`130^\circ < \theta < 155^\circ`.
+
+The polar angle is computed using only the initial particle momentum.
+)DOC");
+
+    REGISTER_VARIABLE("thetaInBKLMAcceptance",  thetaInBKLMAcceptance, R"DOC(
+Returns 1.0 if particle is within Barrel KLM angular acceptance, 0.0 otherwise.
+This variable checks if the particle polar angle :math:`\theta` is within the range :math:`37^\circ < \theta < 130^\circ`.
+The polar angle is computed using only the initial particle momentum.
+)DOC");
+    REGISTER_VARIABLE("thetaInEKLMAcceptance",  thetaInEKLMAcceptance, R"DOC(
+Returns 1.0 if particle is within Endcap KLM angular acceptance, 0.0 otherwise.
+This variable checks if the particle polar angle :math:`\theta` is within the range :math:`18^\circ < \theta < 47^\circ` or :math:`122^\circ < \theta < 155^\circ`.
+The polar angle is computed using only the initial particle momentum.
+)DOC");
+    REGISTER_VARIABLE("thetaInKLMOverlapAcceptance",  thetaInKLMOverlapAcceptance, R"DOC(
+Returns 1.0 if particle is within the angular region where KLM barrel and endcaps overlap, 0.0 otherwise.
+This variable checks if the particle polar angle :math:`\theta` is within the range :math:`37^\circ < \theta < 47^\circ` or :math:`122^\circ < \theta < 130^\circ`.
+The polar angle is computed using only the initial particle momentum.
+)DOC");
+
+    REGISTER_VARIABLE("ptInTOPAcceptance",   ptInTOPAcceptance,  "Returns 1.0 if particle transverse momentum :math:`p_t` is within TOP acceptance, :math:`p_t > 0.27` GeV, 0.0 otherwise.");
+    REGISTER_VARIABLE("ptInBECLAcceptance",  ptInBECLAcceptance, "Returns 1.0 if particle transverse momentum :math:`p_t` is within Barrel ECL acceptance, :math:`p_t > 0.28` GeV, 0.0 otherwise.");
+    REGISTER_VARIABLE("ptInBKLMAcceptance",  ptInBKLMAcceptance, "Returns 1.0 if particle transverse momentum :math:`p_t` is within Barrel KLM acceptance, :math:`p_t > 0.6` GeV, 0.0 otherwise.");
+
+    REGISTER_VARIABLE("inCDCAcceptance",   inCDCAcceptance, R"DOC(
+Returns 1.0 if particle is within CDC geometrical and kinematical acceptance, 0.0 otherwise. 
+This variable is an alias for :b2:var:`thetaInCDCAcceptance`.
+)DOC");
+    REGISTER_VARIABLE("inTOPAcceptance",   inTOPAcceptance, R"DOC(
+Returns 1.0 if particle is within TOP geometrical and kinematical acceptance, 0.0 otherwise. 
+This variable is a combination of :b2:var:`thetaInTOPAcceptance` and :b2:var:`ptInTOPAcceptance`.
+)DOC");
+    REGISTER_VARIABLE("inARICHAcceptance", inARICHAcceptance, R"DOC(
+Returns 1.0 if particle is within ARICH geometrical and kinematical acceptance, 0.0 otherwise.
+This variable is an alias for :b2:var:`thetaInARICHAcceptance`.
+)DOC");
+    REGISTER_VARIABLE("inECLAcceptance",   inECLAcceptance, R"DOC(
+Returns 1.0 if particle is within ECL geometrical and kinematical acceptance, 0.0 otherwise.");
+This variable is a combination of :b2:var:`thetaInEECLAcceptance`, :b2:var:`thetaInBECLAcceptance` and :b2:var:`ptInBECLAcceptance`.
+)DOC");
+    REGISTER_VARIABLE("inKLMAcceptance",   inKLMAcceptance, R"DOC(
+Returns 1.0 if particle is within KLM geometrical and kinematical acceptance, 0.0 otherwise.
+This variable is a combination of :b2:var:`thetaInEKLMAcceptance`, :b2:var:`thetaInBKLMAcceptance` and :b2:var:`ptInBKLMAcceptance`.
+)DOC");
 
   }
 }

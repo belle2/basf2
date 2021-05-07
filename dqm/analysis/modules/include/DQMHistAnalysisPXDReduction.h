@@ -18,6 +18,9 @@
 
 #include <TH2F.h>
 #include <TCanvas.h>
+#include <TLine.h>
+
+#include <vector>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Reduction */
@@ -55,6 +58,8 @@ namespace Belle2 {
     //! Final Canvas
     TCanvas* m_cReduction = nullptr;
 
+    //! Line in the Canvas to guide the eye
+    TLine* m_line1 = nullptr;
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
@@ -63,8 +68,8 @@ namespace Belle2 {
     bool m_useEpics;
 
 #ifdef _BELLE2_EPICS
-    //! one EPICS PV
-    chid  mychid;
+    //! EPICS PVs
+    std::vector <chid>  mychid;
 #endif
   };
 } // end namespace Belle2

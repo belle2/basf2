@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
-# from svd import add_svd_create_recodigits
+from svd import add_svd_create_recodigits
+from svd.dqm_utils import add_svd_dqm_dose
 from geometry import check_components
 from analysisDQM import add_analysis_dqm, add_mirabelle_dqm
 
@@ -26,10 +27,12 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             all reconstruction
                      For dqm_mode == "filtered"  only the DQM modules which should run on filtered
                             events should be added
+                     For dqm_mode == "l1_passthrough" only the DQM modules which should run on the
+                            L1 passthrough events should be added
     @param create_hlt_unit_histograms: Parameter for SoftwareTiggerHLTDQMModule.
                                          Should be True only when running on the HLT servers
     """
-    assert dqm_mode in ["dont_care", "all_events", "filtered", "before_filter"]
+    assert dqm_mode in ["dont_care", "all_events", "filtered", "before_filter", "l1_passthrough"]
     # Check components.
     check_components(components)
 
@@ -50,7 +53,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         # SVD
         if components is None or 'SVD' in components:
             # reconstruct SVDRecoDigits first of all
-            # add_svd_create_recodigits(path)
+            add_svd_create_recodigits(path)
 
             # SVD DATA FORMAT
             svdunpackerdqm = b2.register_module('SVDUnpackerDQM')
@@ -77,6 +80,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             path.add_module('SVDDQMEfficiency')
             # SVD CLUSTERS ON TRACK
             path.add_module('SVDDQMClustersOnTrack')
+            # SVD DOSE
+            add_svd_dqm_dose(path, 'SVDShaperDigitsZS5')
 
         # Event time measuring detectors
         if components is None or 'CDC' in components or 'ECL' in components or 'TOP' in components:
@@ -92,7 +97,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             createErrorFlagHistograms=True,
             cutResultIdentifiers={},
             histogramDirectoryName="softwaretrigger_before_filter",
-        )
+            pathLocation="before filter",
+        ).set_name("SoftwareTriggerHLTDQM_before_filter")
+
         path.add_module("StatisticsTimingHLTDQM",
                         createHLTUnitHistograms=create_hlt_unit_histograms,
                         )
@@ -112,7 +119,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
 
         from softwaretrigger import filter_categories, skim_categories
 
-        filter_cat = [method for method in dir(filter_categories) if method.startswith('__') is False]
+        filter_cat = [method for method in dir(filter_categories) if method.startswith('__') is False if method is not 'RESULTS']
         skim_cat = [method for method in dir(skim_categories) if method.startswith('__') is False]
 
         def read_lines(category):
@@ -129,29 +136,64 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         cutResultIdentifiers["skim"] = {"skim": hlt_skim_lines_in_plot}
         cutResultIdentifiers["filter"] = {"filter": hlt_trigger_lines_in_plot}
 
+        additionalL1Identifiers = [
+            'ffy',
+            'fyo',
+            'c4',
+            'hie',
+            'mu_b2b',
+            'mu_eb2b',
+            'beklm',
+            'eklm2',
+            'cdcklm1',
+            'seklm1',
+            'ieklm1',
+            'ecleklm1',
+            'fso',
+            'fioiecl1',
+            'ff30',
+            'stt',
+            'ioiecl1',
+            'ioiecl2',
+            'lml1',
+            'lml2',
+            'lml3',
+            'lml4',
+            'lml5',
+            'lml6',
+            'lml7',
+            'lml8',
+            'lml9',
+            'lml10',
+            'lml12',
+            'lml13',
+            'bhapur']
+
         # Default plot
         path.add_module(
             "SoftwareTriggerHLTDQM",
             cutResultIdentifiers=cutResultIdentifiers,
             l1Identifiers=["fff", "ffo", "lml0", "ffb", "fp"],
+            additionalL1Identifiers=additionalL1Identifiers,
             createHLTUnitHistograms=create_hlt_unit_histograms,
             cutResultIdentifiersPerUnit=hlt_trigger_lines_per_unit_in_plot,
+            pathLocation="after filter",
         )
         # Skim plots where bhabha contamination is removed
         path.add_module(
-           "SoftwareTriggerHLTDQM",
-           cutResultIdentifiers={
-               "skim": {"skim": hlt_skim_lines_in_plot},
-           },
-           cutResultIdentifiersIgnored={
-               "skim": [
-                   "accept_bhabha_all",
-                   ]
-           },
-           createTotalResultHistograms=False,
-           createExpRunEventHistograms=False,
-           histogramDirectoryName="softwaretrigger_skim_nobhabha",
-        )
+            "SoftwareTriggerHLTDQM",
+            cutResultIdentifiers={
+                "skim": {"skim": hlt_skim_lines_in_plot},
+            },
+            cutResultIdentifiersIgnored={
+                "skim": [
+                    "accept_bhabha_all",
+                ]
+            },
+            createTotalResultHistograms=False,
+            createExpRunEventHistograms=False,
+            histogramDirectoryName="softwaretrigger_skim_nobhabha",
+        ).set_name("SoftwareTriggerHLTDQM_skim_nobhabha")
 
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
         # SVD DATA FORMAT
@@ -181,6 +223,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         # we dont want to create large histograms on HLT, thus ERECO only
         if dqm_environment == "expressreco":
             path.add_module('ECLDQMInjection', histogramDirectoryName='ECLINJ')
+
     # TOP
     if (components is None or 'TOP' in components) and (dqm_mode in ["dont_care", "filtered"]):
         topdqm = b2.register_module('TOPDQM')

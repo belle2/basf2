@@ -7,5 +7,6 @@
 
 #pragma link C++ class Belle2::ARICHDatabaseImporter-;
 #pragma link C++ class Belle2::ARICHChannelMaskMaker-;
+#pragma link C++ class Belle2::ARICHCalibrationChecker-;
 
 #endif

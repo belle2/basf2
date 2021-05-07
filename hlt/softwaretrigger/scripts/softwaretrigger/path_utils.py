@@ -43,12 +43,12 @@ def add_hlt_dqm(path, run_type, components, dqm_mode, create_hlt_unit_histograms
     path.add_module('StatisticsSummary').set_name('Sum_HLT_DQM_' + dqm_mode.name)
 
 
-def add_expressreco_dqm(path, run_type, components):
+def add_expressreco_dqm(path, run_type, components, dqm_mode=constants.DQMModes.dont_care.name):
     """
     Add all the DQM modules for ExpressReco to the path
     """
     add_online_dqm(path, run_type=run_type, dqm_environment=constants.Location.expressreco.name, components=components,
-                   dqm_mode=constants.DQMModes.dont_care.name)
+                   dqm_mode=dqm_mode)
 
 
 def add_geometry_if_not_present(path):
@@ -187,13 +187,15 @@ def add_filter_reconstruction(path, run_type, components, **kwargs):
             components=components,
             event_abort=hlt_event_abort,
             **kwargs)
-
         add_filter_software_trigger(path, store_array_debug_prescale=1)
         path.add_module('StatisticsSummary').set_name('Sum_HLT_Filter_Calculation')
 
     elif run_type == constants.RunTypes.cosmic:
         reconstruction.add_cosmics_reconstruction(path, skipGeometryAdding=True, pruneTracks=False,
                                                   components=components, **kwargs)
+        add_filter_software_trigger(path, store_array_debug_prescale=1)
+        path.add_module('StatisticsSummary').set_name('Sum_HLT_Filter_Calculation')
+
     else:
         basf2.B2FATAL(f"Run Type {run_type} not supported.")
 
@@ -215,11 +217,13 @@ def add_post_filter_reconstruction(path, run_type, components):
     """
     check_components(components)
 
+    # Currently, the post filter reconstruction for physics and cosmics events is exactly the same.
     if run_type == constants.RunTypes.beam:
         add_skim_software_trigger(path, store_array_debug_prescale=1)
         path.add_module('StatisticsSummary').set_name('Sum_HLT_Skim_Calculation')
     elif run_type == constants.RunTypes.cosmic:
-        pass
+        add_skim_software_trigger(path, store_array_debug_prescale=1)
+        path.add_module('StatisticsSummary').set_name('Sum_HLT_Skim_Calculation')
     else:
         basf2.B2FATAL(f"Run Type {run_type} not supported.")
 

@@ -8,7 +8,7 @@ main = b2.Path()
 
 ma.inputMdst(
     "default",
-    "/home/belle2/mbauer/fei_tutorial/fei_skimmed_xulnu.udst.root",
+    b2.find_file("starterkit/2021/fei_skimmed_xulnu.udst.root", "examples"),
     path=main,
 )
 

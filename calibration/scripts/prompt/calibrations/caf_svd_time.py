@@ -22,7 +22,7 @@ from tracking import add_tracking_reconstruction
 from caf.framework import Calibration
 from caf import strategies
 from caf.utils import IoV
-from prompt import CalibrationSettings
+from prompt import CalibrationSettings, input_data_filters
 from prompt.utils import filter_by_max_events_per_run
 
 b2.set_log_level(b2.LogLevel.INFO)
@@ -35,7 +35,12 @@ settings = CalibrationSettings(name="caf_svd_time",
                                expert_username="gdujany",
                                description=__doc__,
                                input_data_formats=["raw"],
-                               input_data_names=["hlt_hadron"],
+                               input_data_names=["hadron_calib"],
+                               input_data_filters={"hadron_calib": [input_data_filters["Data Tag"]["hadron_calib"],
+                                                                    input_data_filters["Beam Energy"]["4S"],
+                                                                    input_data_filters["Beam Energy"]["Continuum"],
+                                                                    input_data_filters["Run Type"]["physics"],
+                                                                    input_data_filters["Magnet"]["On"]]},
                                depends_on=[],
                                expert_config={
                                    "max_events_per_run": 10000,
@@ -202,10 +207,11 @@ def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
     add_tracking_reconstruction(path)
     path = remove_module(path, "V0Finder")
     if not is_validation:
-        b2.set_module_parameters(path, 'SVDCoGTimeEstimator', CalibrationWithEventT0=False)
+        b2.set_module_parameters(path, 'SVDClusterizer', returnClusterRawTime=True)
 
     # repeat svd reconstruction using only SVDShaperDigitsFromTracks
     path.add_module("SVDShaperDigitsFromTracks")
+
     cog = b2.register_module("SVDCoGTimeEstimator")
     cog.set_name("CoGReconstruction")
     path.add_module(cog)
@@ -224,7 +230,7 @@ def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
 
 def get_calibrations(input_data, **kwargs):
 
-    file_to_iov_physics = input_data["hlt_hadron"]
+    file_to_iov_physics = input_data["hadron_calib"]
     expert_config = kwargs.get("expert_config")
     max_events_per_run = expert_config["max_events_per_run"]  # Maximum number of events selected per each run
     isMC = expert_config["isMC"]

@@ -78,10 +78,10 @@ granulesL3456 = ((cut_L3, 'L3456'),)  # characteristic of track saved in 3rd lay
 g_L3_V = ((cut_L3 + cut_V, 'L3_V'),)
 
 
-def ploter(name, title, nbins, xmin, xmax, x_label, y_label,
-           granules,
-           tree, expr, cut,
-           descr, check, contact_str=SVDContact, isShifter=False):
+def plotter(name, title, nbins, xmin, xmax, x_label, y_label,
+            granules,
+            tree, expr, cut,
+            descr, check, contact_str=SVDContact, isShifter=False):
     for g in granules:
         hName = f'{name}_{g[1]}'
         h = create1DHist(hName, title, nbins, xmin, xmax, x_label, y_label)

@@ -256,6 +256,15 @@ namespace Belle2 {
      */
     std::string getSectorDAQName(int subdetector, int section, int sector) const;
 
+    /**
+     * Get total number of channels.
+     */
+    static constexpr int getTotalChannelNumber()
+    {
+      return BKLMElementNumbers::getTotalChannelNumber() +
+             EKLMElementNumbers::getTotalChannelNumber();
+    }
+
   private:
 
     /**

@@ -37,8 +37,11 @@ namespace Belle2 {
      * @param dhcid DHC id
      * @param mask error mask
      */
-    PXDDAQDHCStatus(int dhcid, PXDErrorFlags mask) : m_errorMask(mask),
+    explicit PXDDAQDHCStatus(int dhcid, PXDErrorFlags mask) : m_errorMask(mask),
       m_critErrorMask(0), m_usable(true), m_dhcID(dhcid), m_rawCount(0), m_redCount(0), m_errorinfo(0) {}
+
+    /** destructor */
+    virtual ~PXDDAQDHCStatus() {};
 
     /** Return Usability of data
      * @return conclusion if data is useable
@@ -93,11 +96,11 @@ namespace Belle2 {
     uint32_t getEndErrorInfo(void) const { return m_errorinfo;};
 
     /** set gating info from the DHC END */
-    void setGatedFlag(uint32_t e) { m_gated_mode = e;};
+    void setGatedFlag(bool gm) { m_gated_mode = gm;};
     /** get gating info from the DHC END */
     bool getGatedFlag(void) const { return m_gated_mode;};
     /** set HER/LER gating info from the DHC END */
-    void setGatedHER(uint32_t e) { m_gated_her = e;};
+    void setGatedHER(bool isher) { m_gated_her = isher;};
     /** get HER/LER gating info from the DHC END */
     bool getGatedHER(void) const { return m_gated_her;};
 

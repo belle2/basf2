@@ -16,6 +16,7 @@
 #include <mdst/dataobjects/HitPatternCDC.h>
 
 #include <numeric>
+#include <stdexcept>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
@@ -154,13 +155,38 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   if (m_l1Trigger.isValid()) {
     calculationResult["l1_trigger_random"] = m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND;
     calculationResult["l1_trigger_delayed_bhabha"] = m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_DPHY;
-
-    calculationResult["bha3d"] = m_l1Trigger->testPsnm("bha3d");
-    calculationResult["bhapur"] = m_l1Trigger->testPsnm("bhapur");
-    calculationResult["bhapur_lml1"] = m_l1Trigger->testPsnm("lml1") and m_l1Trigger->testFtdl("bhapur");
+    calculationResult["l1_trigger_poisson"] = m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_POIS;
+    bool bha3d;
+    try {
+      bha3d = m_l1Trigger->testPsnm("bha3d");
+    } catch (const std::exception&) {
+      bha3d = false;
+    }
+    bool bhapurPsnm;
+    try {
+      bhapurPsnm = m_l1Trigger->testPsnm("bhapur");
+    } catch (const std::exception&) {
+      bhapurPsnm = false;
+    }
+    bool bhapurFtdl;
+    try {
+      bhapurFtdl = m_l1Trigger->testFtdl("bhapur");
+    } catch (const std::exception&) {
+      bhapurFtdl = false;
+    }
+    bool lml1;
+    try {
+      lml1 = m_l1Trigger->testPsnm("lml1");
+    } catch (const std::exception&) {
+      lml1 = false;
+    }
+    calculationResult["bha3d"] = bha3d;
+    calculationResult["bhapur"] = bhapurPsnm;
+    calculationResult["bhapur_lml1"] = lml1 and bhapurFtdl;
   } else {
     calculationResult["l1_trigger_random"] = 1; // save every event if no L1 trigger info
     calculationResult["l1_trigger_delayed_bhabha"] = 0;
+    calculationResult["l1_trigger_poisson"] = 0;
     calculationResult["bha3d"] = 0;
     calculationResult["bhapur"] = 0;
     calculationResult["bhapur_lml1"] = 0;

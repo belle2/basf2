@@ -10,8 +10,8 @@
 
 
 import basf2 as b2
-from ROOT import Belle2, TFile, TFitResultPtr, TH1F, TH2D, TTree
-from ROOT import TF1, TTree, gDirectory, gROOT
+from ROOT import (Belle2, TFile, TFitResultPtr, TH1F, TH2D, TTree, TF1,
+                  gDirectory, gROOT)
 # import numpy
 import math
 
@@ -313,7 +313,7 @@ class SVDCoGTimeCalibrationCheckModule(b2.Module):
         tree.Branch("ClsChargeMean", clsCharge, "ClsChargeMean/D")
         tree.Branch("ClsSNRMean", clsSNR, "ClsSNRMean/D")
 
-        par = [0, 1]
+        # par = [0, 1]
 
         # tfileHist.cd()
         geoCache = Belle2.VXD.GeoCache.getInstance()
@@ -368,7 +368,7 @@ class SVDCoGTimeCalibrationCheckModule(b2.Module):
                         charge.Write()
                         # ScatterPlot Histograms with Linear Fit
                         sp = self.spList[li][ldi][si][side]
-                        covscalebias = sp.GetCovariance()
+                        # covscalebias = sp.GetCovariance()
                         pfxsp = sp.ProfileX()
                         sp.GetXaxis().SetTitle("cluster time (ns)")
                         sp.GetYaxis().SetTitle("EventT0 (ns)")

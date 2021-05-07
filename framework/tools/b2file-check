@@ -5,23 +5,25 @@
 Check a given basf2 root file for problems. This program checks a given output root file for the following problems
 
 * File is readable (``file_readable``)
-* File contains event and persistent tree (``contains_tree``, ``contains_persistent``)
+* File contains event and persistent trees (``contains_tree``, ``contains_persistent``)
 * Event tree contains event meta data (``eventmetadata_readable``)
 * Persistent tree contains file metadata (``filemetadata_readable``)
-* All entries in persistent and event trees readable (``all_entries_readable``)
-* Number of entries in event tree == number of events in file metadata (``entries_eq_filemetedata``)
+* All entries in persistent and event trees are readable (``all_entries_readable``)
+* Number of entries in event tree == number of events in file metadata (``entries_eq_filemetadata``)
 * Number of entries in event tree == expected_no_of_events, if given (``entries_eq_expectation``)
 * Number of MC events generated == expected_no_of_mcevents, if given (``mcevents_eq_expectation``)
-* If the expected size is given: abs(total_file_size/(#events*expected_event_size) - 1) < relative_uncertainty (``eventsize_eq_expectation``)
+* If the expected size is given:
+    abs(total_file_size/(#events*expected_event_size) - 1) < relative_uncertainty (``eventsize_eq_expectation``)
 * If branches are given: Event tree contains the given branches (``branches_present``)
 
 It returns 0 if all checks succeeded, 1 otherwise. Details about check failures are printed on standard output.
 """
-#TODO: (check_basf2_log?)
-#- If log is give: Grep for suspicious messages like Fatal, segmentation
-#fault, etc. [although this should be caught by the basf2 return code.]
+# TODO: (check_basf2_log?)
+# - If log is give: Grep for suspicious messages like Fatal, segmentation
+# fault, etc. [although this should be caught by the basf2 return code.]
 
 
+import ROOT
 import sys
 import os
 import argparse
@@ -29,17 +31,22 @@ import json
 from contextlib import redirect_stdout
 from ROOT import PyConfig
 PyConfig.IgnoreCommandLineOptions = True
-import ROOT
 
 
 def get_argument_parser():
     """Return argument parser with all defined arguments"""
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("-n", "--events", type=int, dest='expected_no_of_events', default=None, help="Expected number of events")
-    parser.add_argument("--mcevents", type=int, dest='expected_no_of_mcevents', default=None, help="Expected number of generated events")
-    parser.add_argument("-s", "--size", type=float, dest='expected_event_size', metavar=('EXPECTED_EVENT_SIZE_KIB', 'RELATIVE_UNCERTAINTY'), default=None, nargs=2,
-                        help="Expected size per event (kiB), with maximal relative uncertainty. Check is passed when abs(total_file_size/(#events*expected_event_size) - 1) < relative_uncertainty")
-    parser.add_argument("--json", action='store_true', dest='json_output', default=False, help="Provide dictionary of passed checks and file statistics in JSON format on standard output. Checks are only included when actually run, and receive a boolean value indicating success.")
+    parser.add_argument("-n", "--events", type=int, dest='expected_no_of_events', default=None,
+                        help="Expected number of events")
+    parser.add_argument("--mcevents", type=int, dest='expected_no_of_mcevents', default=None,
+                        help="Expected number of generated events")
+    parser.add_argument("-s", "--size", type=float, dest='expected_event_size',
+                        metavar=('EXPECTED_EVENT_SIZE_KIB', 'RELATIVE_UNCERTAINTY'), default=None, nargs=2,
+                        help=("Expected size per event (KiB), with maximal relative uncertainty. Check is passed when "
+                              "abs(total_file_size/(#events*expected_event_size) - 1) < relative_uncertainty"))
+    parser.add_argument("--json", action='store_true', dest='json_output', default=False,
+                        help=("Provide dictionary of passed checks and file statistics in JSON format on standard output.  "
+                              "Checks are only included when actually run, and receive a boolean value indicating success."))
     parser.add_argument("FILE", type=str, help="The basf2 .root file to check. http:// and root:// URLs are also supported.")
     parser.add_argument("BRANCH", type=str, nargs='*', help="Branches that should exist in the event durability tree.")
     return parser
@@ -98,18 +105,21 @@ def checkFile(args):
             if args.expected_no_of_mcevents is not None:
                 checks_passed['mcevents_eq_expectation'] = mcevents == args.expected_no_of_mcevents
                 if not checks_passed['mcevents_eq_expectation']:
-                    print('expected %d MC events, but file contains %d!' % (args.expected_no_of_mcevents, mcevents))
+                    print('Expected %d MC events, but file contains %d!' % (args.expected_no_of_mcevents, mcevents))
 
         if args.expected_no_of_events is not None:
             checks_passed['entries_eq_expectation'] = nevents == args.expected_no_of_events
             if not checks_passed['entries_eq_expectation']:
-                print('expected %d events, but file contains %d!' % (args.expected_no_of_events, nevents))
+                print('Expected %d events, but file contains %d!' % (args.expected_no_of_events, nevents))
 
         if args.BRANCH:
             checks_passed['branches_present'] = all([tree.GetBranch(b) for b in args.BRANCH])
 
-        if nevents == 0 and args.expected_event_size is None:
-            print('file contains zero events')
+        if nevents == 0:
+            print('File contains zero events')
+            stats['events_without_errorflag'] = 0
+            if args.expected_event_size is not None:
+                checks_passed['eventsize_eq_expectation'] = False
             return checks_passed, stats
 
         checks_passed['eventmetadata_readable'] = False
@@ -126,10 +136,18 @@ def checkFile(args):
             dev = abs(size_kib_per_event / exp_size_kib - 1)
             checks_passed['eventsize_eq_expectation'] = dev < rel_uncertainty
             if not checks_passed['eventsize_eq_expectation']:
-                print('Size per event (%g kiB) differs from expectation (deviation: %g >= %g)' % (size_kib_per_event, dev, rel_uncertainty))
+                print(
+                    'Size per event (%g kiB) differs from expectation (deviation: %g >= %g)' %
+                    (size_kib_per_event, dev, rel_uncertainty))
 
         checks_passed['all_entries_readable'] = read_tree(tree) and read_tree(persistent)
-    except:
+
+        # Get number of events which do not have the errorFlag set.
+        stats['events_without_errorflag'] = tree.GetEntries("EventMetaData.m_errorFlag == 0")
+        if stats['events_without_errorflag'] != 0:
+            stats['size_per_event_without_errorflag_kib'] = size_kib / stats['events_without_errorflag']
+
+    except BaseException:
         # at least one of the checks should have failed
         assert not all(checks_passed.values())
 
@@ -153,4 +171,3 @@ if __name__ == "__main__":
 
     if checks_failed:
         sys.exit(1)
-

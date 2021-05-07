@@ -331,7 +331,7 @@ namespace {
                                                         Particle::c_ECLCluster,
                                                         3));
     MCParticle* MC1Pion = mcparticles. appendNew(MCParticle());
-    MC1Pion->setPDG(211);
+    MC1Pion->setPDG(Const::pion.getPDGCode());
     MC1Pion->set4Vector(TLorentzVector(0, 0, 0, 0));
     Particle* T1PionFromMC     = particles.appendNew(Particle(MC1Pion));
 

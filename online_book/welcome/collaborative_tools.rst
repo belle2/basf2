@@ -408,7 +408,7 @@ When writing your questions post, you can turn on "preview" (this is helpful).
 You can use simple markdown syntax.
 Code is indented by four spaces, and you can use latex!
 
-.. code:: markdown
+.. code-block::
 
         This is some normal text.
         This is normal text with inline code `[ x*x for x in range(10) ]`.

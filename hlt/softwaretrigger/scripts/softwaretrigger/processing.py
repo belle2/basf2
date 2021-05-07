@@ -43,7 +43,7 @@ def setup_basf2_and_db(zmq=False):
                             help="Don't write any output files",
                             action="store_true", default=False)
 
-    parser.add_argument('--number-processes', type=int, default=multiprocessing.cpu_count()-5,
+    parser.add_argument('--number-processes', type=int, default=multiprocessing.cpu_count() - 5,
                         help='Number of parallel processes to use')
     parser.add_argument('--local-db-path', type=str,
                         help="set path to the local payload locations to use for the ConditionDB",
@@ -121,7 +121,6 @@ def start_zmq_path(args, location):
     input_module.if_value("==0", reco_path, basf2.AfterConditionPath.CONTINUE)
     reco_path.add_module("HLTDQM2ZMQ", output=args.dqm, sendOutInterval=30)
 
-    path.add_module('StatisticsSummary').set_name('Sum_Start_ZMQ')
     return path, reco_path
 
 
@@ -137,6 +136,8 @@ def add_hlt_processing(path,
     """
     Add all modules for processing on HLT filter machines
     """
+    path.add_module('StatisticsSummary').set_name('Sum_Wait')
+
     if unpacker_components is None:
         unpacker_components = constants.DEFAULT_HLT_COMPONENTS
     if reco_components is None:
@@ -156,7 +157,7 @@ def add_hlt_processing(path,
     path.add_module('StatisticsSummary').set_name('Sum_Initialization')
 
     # Unpack the event content
-    add_unpackers(path, components=unpacker_components)
+    add_unpackers(path, components=unpacker_components, writeKLMDigitRaws=True)
     path.add_module('StatisticsSummary').set_name('Sum_Unpackers')
 
     # Build one path for all accepted events...
@@ -254,7 +255,7 @@ def add_expressreco_processing(path,
         path.add_module("PruneDataStore", matchEntries=constants.EXPRESSRECO_INPUT_OBJECTS)
 
     path_utils.add_geometry_if_not_present(path)
-    add_unpackers(path, components=unpacker_components)
+    add_unpackers(path, components=unpacker_components, writeKLMDigitRaws=True)
 
     if do_reconstruction:
         if run_type == constants.RunTypes.beam:
@@ -267,6 +268,23 @@ def add_expressreco_processing(path,
             basf2.B2FATAL("Run Type {} not supported.".format(run_type))
 
     path_utils.add_expressreco_dqm(path, run_type, components=reco_components)
+
+    # Will be removed later if not going to be used:
+    # Build one path for all events coming from L1 passthrough...
+    # l1_passthrough_path = basf2.Path()
+
+    # Find if the event is triggered in L1_trigger filter line, if yes, send through l1_passthrough_path
+    # l1_passthrough_module = path.add_module(
+    #     "TriggerSkim",
+    #     triggerLines=["software_trigger_cut&filter&L1_trigger"],
+    #     resultOnMissing=0)
+    # l1_passthrough_module.if_value("==1", l1_passthrough_path, basf2.AfterConditionPath.CONTINUE)
+
+    # path_utils.add_expressreco_dqm(
+    #     l1_passthrough_path,
+    #     run_type,
+    #     components=reco_components,
+    #     dqm_mode=constants.DQMModes.l1_passthrough.name)
 
     if prune_output:
         path.add_module("PruneDataStore", matchEntries=constants.ALWAYS_SAVE_OBJECTS + constants.RAWDATA_OBJECTS +
@@ -326,4 +344,3 @@ def finalize_zmq_path(path, args, location):
         path.add_module("HLTDs2ZMQ", output=args.output, raw=True)
     else:
         basf2.B2FATAL(f"Does not know location {location}")
-    path.add_module('StatisticsSummary').set_name('Sum_Finalize_ZMQ')

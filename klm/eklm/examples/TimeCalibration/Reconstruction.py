@@ -6,7 +6,6 @@
 import sys
 import basf2
 from reconstruction import add_reconstruction
-import sys
 
 # Set the global log level
 basf2.set_log_level(basf2.LogLevel.INFO)

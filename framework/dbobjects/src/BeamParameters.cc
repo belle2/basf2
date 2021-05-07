@@ -28,16 +28,16 @@ namespace {
   }
 }
 
-void BeamParameters::setLER(double energy, double angle, const std::vector<double>& cov)
+void BeamParameters::setLER(double energy, double angleX, double angleY, const std::vector<double>& cov)
 {
-  TLorentzVector vec = getFourVector(energy, angle);
+  TLorentzVector vec = getFourVector(energy, angleX, angleY);
   setLER(vec);
   setCovMatrix(m_covLER, cov, false);
 }
 
-void BeamParameters::setHER(double energy, double angle, const std::vector<double>& cov)
+void BeamParameters::setHER(double energy, double angleX, double angleY, const std::vector<double>& cov)
 {
-  TLorentzVector vec = getFourVector(energy, angle);
+  TLorentzVector vec = getFourVector(energy, angleX, angleY);
   setHER(vec);
   setCovMatrix(m_covHER, cov, false);
 }
@@ -48,13 +48,23 @@ void BeamParameters::setVertex(const TVector3& vertex, const std::vector<double>
   setCovMatrix(m_covVertex, cov, true);
 }
 
-TLorentzVector BeamParameters::getFourVector(double energy, double angle)
+TLorentzVector BeamParameters::getFourVector(double energy, double angleX, double angleY)
 {
-  double pz = sqrt(energy * energy - Const::electronMass * Const::electronMass);
-  TLorentzVector vec(0, 0, pz, energy);
-  if (angle < 0) angle = M_PI + angle;
-  vec.RotateY(angle);
-  return vec;
+  double p = sqrt(pow(energy, 2) - pow(Const::electronMass, 2));
+  if (angleX < 0) {
+    angleX = M_PI + angleX;
+    angleY = M_PI + angleY;
+  }
+
+  double Sign = cos(angleX) < 0 ?  -1 : 1;
+
+  double pzTerm = 1 - pow(sin(angleX), 2) - pow(sin(angleY), 2);
+  B2ASSERT("Angular term should be positive", pzTerm >= 0);
+
+  double pz = Sign * p * sqrt(pzTerm);
+
+  return TLorentzVector(p * sin(angleX), p * sin(angleY), pz, energy);
+
 }
 
 TMatrixDSym BeamParameters::getCovMatrix(const Double32_t* member)

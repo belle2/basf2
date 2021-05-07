@@ -18,7 +18,10 @@ CHANGES since release-02-01-00:
   + hasFailedTimeResolution
   - getCovarianceMatrixAsArray removed
 - TRGSummary:
-  * getTimQuality added
+  + getTimQuality added
+  + isPoissonInInjectionVeto
+  * added getters to map bit names to numbers (getInputBitNumber, getOutputBitNumber)
+    The mapping is from the database and doesn't affect mdst content and is thus not tested here.
 - SoftwareTriggerResult:
   * non-prescaled results added
 - TrackFitResult:

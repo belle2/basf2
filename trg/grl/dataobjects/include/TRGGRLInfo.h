@@ -27,7 +27,11 @@ namespace Belle2 {
       m_n_3dfitter_track(-1),
       m_n_3dfitter_track_Z10(-1),
       m_n_3dfitter_track_Z25(-1),
+      m_n_3dfitter_track_Z35(-1),
       m_n_NN_track(-1),
+      m_n_NN_track_Z20(-1),
+      m_n_NN_track_Z40(-1),
+      m_n_NN_track_STT(-1),
       m_n_2dmatch_track(-1),
       m_n_3dmatch_track(-1),
       m_n_cluster(-1),
@@ -58,6 +62,7 @@ namespace Belle2 {
       m_Trk_b2b_1to7(-1),
       m_Trk_b2b_1to9(-1),
       m_Trk_open90(-1),
+      m_Trk_open30(-1),
       m_cluster_b2b_1to3(-1),
       m_cluster_b2b_1to5(-1),
       m_cluster_b2b_1to7(-1),
@@ -77,9 +82,11 @@ namespace Belle2 {
       m_s2s3(-1),
       m_s2s5(-1),
       m_s2so(-1),
+      m_s2s30(-1),
       m_s2f3(-1),
       m_s2f5(-1),
       m_s2fo(-1),
+      m_s2f30(-1),
       m_bwdsb(-1),
       m_bwdnb(-1),
       m_fwdsb(-1),
@@ -110,8 +117,16 @@ namespace Belle2 {
     int getN3DfittertrkZ10() const  {return m_n_3dfitter_track_Z10;}
     /**get the number of 3D charged tracks*/
     int getN3DfittertrkZ25() const  {return m_n_3dfitter_track_Z25;}
+    /**get the number of 3D charged tracks*/
+    int getN3DfittertrkZ35() const  {return m_n_3dfitter_track_Z35;}
     /**get the number of NN charged tracks*/
     int getNNNtrk() const  {return m_n_NN_track;}
+    /**get the number of NN charged tracks Z0<20cm*/
+    int getNNNtrkZ20() const  {return m_n_NN_track_Z20;}
+    /**get the number of NN charged tracks Z0<40cm*/
+    int getNNNtrkZ40() const  {return m_n_NN_track_Z40;}
+    /**get the number of NN STT Z0<15cm, P>0.7GeV*/
+    int getNNNtrkSTT() const  {return m_n_NN_track_STT;}
     /**get the number of 2D matched tracks*/
     int getN2Dmatchtrk() const {return m_n_2dmatch_track;}
     /**get the number of 3D matched tracks*/
@@ -168,6 +183,8 @@ namespace Belle2 {
     int getTrk_b2b_1to9() const {return m_Trk_b2b_1to9;}
     /**get Trk_open90*/
     int getTrk_open90() const {return m_Trk_open90;}
+    /**get Trk_open30*/
+    int getTrk_open30() const {return m_Trk_open30;}
     /**get cluster_b2b_1to3*/
     int getcluster_b2b_1to3() const {return m_cluster_b2b_1to3;}
     /**get cluster_b2b_1to5*/
@@ -206,12 +223,16 @@ namespace Belle2 {
     int gets2s5() const  {return m_s2s5;}
     /**get s2so: short-to-short opening angle > 90 degrees*/
     int gets2so() const  {return m_s2so;}
+    /**get s2s30: short-to-short opening angle > 30 degrees*/
+    int gets2s30() const  {return m_s2s30;}
     /**get s2f3: short-to-full b2b, 10 to 30 degress*/
     int gets2f3() const  {return m_s2f3;}
     /**get s2f5: short-to-full b2b, 10 to 50 degress*/
     int gets2f5() const  {return m_s2f5;}
     /**get s2fo: short-to-full opening angle > 90 degrees*/
     int gets2fo() const  {return m_s2fo;}
+    /**get s2f30: short-to-full opening angle > 30 degrees*/
+    int gets2f30() const  {return m_s2f30;}
     /**get bwdsb: short track matched to bhabha cluster in bwd endcap*/
     int getbwdsb() const  {return m_bwdsb;}
     /**get bwdnb: neutral bhabha cluster in bwd endcap*/
@@ -257,8 +278,16 @@ namespace Belle2 {
     void setN3DfittertrkZ10(int N3DfittertrkZ10)  {m_n_3dfitter_track_Z10 = N3DfittertrkZ10;}
     /**set the number of 3D charged tracks*/
     void setN3DfittertrkZ25(int N3DfittertrkZ25)  {m_n_3dfitter_track_Z25 = N3DfittertrkZ25;}
+    /**set the number of 3D charged tracks*/
+    void setN3DfittertrkZ35(int N3DfittertrkZ35)  {m_n_3dfitter_track_Z35 = N3DfittertrkZ35;}
     /**set the number of NN charged tracks*/
     void setNNNtrk(int NNNtrk)  {m_n_NN_track = NNNtrk;}
+    /**get the number of NN charged tracks Z0<20cm*/
+    void setNNNtrkZ20(int NNNtrkZ20)  {m_n_NN_track_Z20 = NNNtrkZ20;}
+    /**get the number of NN charged tracks Z0<40cm*/
+    void setNNNtrkZ40(int NNNtrkZ40)  {m_n_NN_track_Z40 = NNNtrkZ40;}
+    /**get the number of NN charged STT Z0<15sm, P>0.7GeV*/
+    void setNNNtrkSTT(int NNNtrkSTT)  {m_n_NN_track_STT = NNNtrkSTT;}
     /**set the number of 2D matched tracks*/
     void setN2Dmatchtrk(int N2Dmatchtrk)  {m_n_2dmatch_track = N2Dmatchtrk;}
     /**set the number of 3D matched tracks*/
@@ -313,6 +342,8 @@ namespace Belle2 {
     void setTrk_b2b_1to9(int Trk_b2b_1to9) {m_Trk_b2b_1to9 = Trk_b2b_1to9;}
     /**set the value of Trk_open90*/
     void setTrk_open90(int Trk_open90) {m_Trk_open90 = Trk_open90;}
+    /**set the value of Trk_open30*/
+    void setTrk_open30(int Trk_open30) {m_Trk_open30 = Trk_open30;}
     /**set the value of cluster_b2b_1to3*/
     void setcluster_b2b_1to3(int cluster_b2b_1to3) {m_cluster_b2b_1to3 = cluster_b2b_1to3;}
     /**set the value of cluster_b2b_1to5*/
@@ -351,12 +382,16 @@ namespace Belle2 {
     void sets2s5(int s2s5) {m_s2s5 = s2s5;}
     /**set s2so: short-to-short opening angle > 90 degrees*/
     void sets2so(int s2so) {m_s2so = s2so;}
+    /**set s2s30: short-to-short opening angle > 30 degrees*/
+    void sets2s30(int s2s30) {m_s2s30 = s2s30;}
     /**set s2f3: short-to-full b2b, 10 to 30 degress*/
     void sets2f3(int s2f3) {m_s2f3 = s2f3;}
     /**set s2f5: short-to-full b2b, 10 to 50 degress*/
     void sets2f5(int s2f5) {m_s2f5 = s2f5;}
     /**set s2fo: short-to-full opening angle > 90 degrees*/
     void sets2fo(int s2fo) {m_s2fo = s2fo;}
+    /**set s2f30: short-to-full opening angle > 30 degrees*/
+    void sets2f30(int s2f30) {m_s2f30 = s2f30;}
     /**set bwdsb: short track matched to bhabha cluster in bwd endcap*/
     void setbwdsb(int bwdsb) {m_bwdsb = bwdsb;}
     /**set bwdnb: neutral bhabha cluster in bwd endcap*/
@@ -404,8 +439,16 @@ namespace Belle2 {
     int m_n_3dfitter_track_Z10;
     /**#3D fitter tracks*/
     int m_n_3dfitter_track_Z25;
+    /**#3D fitter tracks*/
+    int m_n_3dfitter_track_Z35;
     /**#NN tracks*/
     int m_n_NN_track;
+    /**#NN tracks Z0<20cm*/
+    int m_n_NN_track_Z20;
+    /**#NN tracks Z0<40cm*/
+    int m_n_NN_track_Z40;
+    /**#NN tracks Z0<15cm,P>0.7GeV*/
+    int m_n_NN_track_STT;
     /**#2D matched finder tracks*/
     int m_n_2dmatch_track;
     /**#3D matched NN tracks*/
@@ -468,6 +511,8 @@ namespace Belle2 {
     int m_Trk_b2b_1to9;
     /**Trk_open90*/
     int m_Trk_open90;
+    /**Trk_open30*/
+    int m_Trk_open30;
     /**cluster_b2b_1to3*/
     int m_cluster_b2b_1to3;
     /**cluster_b2b_1to5*/
@@ -506,12 +551,16 @@ namespace Belle2 {
     int m_s2s5;
     /**s2so: short-to-short opening angle > 90 degrees*/
     int m_s2so;
+    /**s2s30: short-to-short opening angle > 30 degrees*/
+    int m_s2s30;
     /**s2f3: short-to-full b2b, 10 to 30 degress*/
     int m_s2f3;
     /**s2f5: short-to-full b2b, 10 to 50 degress*/
     int m_s2f5;
     /**s2fo: short-to-full opening angle > 90 degrees*/
     int m_s2fo;
+    /**s2f30: short-to-full opening angle > 30 degrees*/
+    int m_s2f30;
     /**bwdsb: short track matched to bhabha cluster in bwd endcap*/
     int m_bwdsb;
     /**bwdnb: neutral bhabha cluster in bwd endcap*/
@@ -548,7 +597,7 @@ namespace Belle2 {
     std::vector<bool> m_InputBits = std::vector<bool>(320, false);
 
     /**! The Class title*/
-    ClassDef(TRGGRLInfo, 4); /*< the class title */
+    ClassDef(TRGGRLInfo, 6); /*< the class title */
   };
 } // end namespace Belle2
 

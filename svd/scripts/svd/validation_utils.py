@@ -177,7 +177,7 @@ def get_histos(in_file, algo='CoG3',
     iov = in_file.Get(f'{base_dir}/RunRange').getIntervalOfValidity()
     exp, run = iov.getExperimentLow(), iov.getRunLow()
 
-    histos['eventT0'] = in_file.Get(get_full_path(f'hEventT0', exp, run, base_dir))
+    histos['eventT0'] = in_file.Get(get_full_path('hEventT0', exp, run, base_dir))
 
     histos_all = {name_side: in_file.Get(get_full_path(f'clsTimeAll__{name_side}', exp, run, base_dir))
                   for name_side in names_sides}

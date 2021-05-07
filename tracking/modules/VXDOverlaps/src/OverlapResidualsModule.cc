@@ -15,6 +15,7 @@
 #include <framework/core/Environment.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
@@ -26,6 +27,7 @@
 #include <TDirectory.h>
 #include <math.h>
 #include <iostream>
+#include <algorithm>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
@@ -331,6 +333,7 @@ void OverlapResidualsModule::defineHisto()
     t_SVD_U->Branch("svdClSNR_int", &svdClSNR_U_int, "svdClSNR_int/F");
     t_SVD_U->Branch("svdClCharge_int", &svdClCharge_U_int, "svdClCharge_int/F");
     t_SVD_U->Branch("svdStripCharge_int", &svdStripCharge_U_int);
+    t_SVD_U->Branch("svdStrip6Samples_int", &svdStrip6Samples_U_int);
     t_SVD_U->Branch("svdClTime_int", &svdClTime_U_int, "svdClTime_int/F");
     t_SVD_U->Branch("svdStripTime_int", &svdStripTime_U_int);
     t_SVD_U->Branch("svdStripPosition_int", &svdStripPosition_U_int);
@@ -361,6 +364,7 @@ void OverlapResidualsModule::defineHisto()
     t_SVD_U->Branch("svdClSNR_ext", &svdClSNR_U_ext, "svdClSNR_ext/F");
     t_SVD_U->Branch("svdClCharge_ext", &svdClCharge_U_ext, "svdClCharge_ext/F");
     t_SVD_U->Branch("svdStripCharge_ext", &svdStripCharge_U_ext);
+    t_SVD_U->Branch("svdStrip6Samples_ext", &svdStrip6Samples_U_ext);
     t_SVD_U->Branch("svdClTime_ext", &svdClTime_U_ext, "svdClTime_ext/F");
     t_SVD_U->Branch("svdStripTime_ext", &svdStripTime_U_ext);
     t_SVD_U->Branch("svdStripPosition_ext", &svdStripPosition_U_ext);
@@ -401,6 +405,7 @@ void OverlapResidualsModule::defineHisto()
     t_SVD_V->Branch("svdClSNR_int", &svdClSNR_V_int, "svdClSNR_int/F");
     t_SVD_V->Branch("svdClCharge_int", &svdClCharge_V_int, "svdClCharge_int/F");
     t_SVD_V->Branch("svdStripCharge_int", &svdStripCharge_V_int);
+    t_SVD_V->Branch("svdStrip6Samples_int", &svdStrip6Samples_V_int);
     t_SVD_V->Branch("svdClTime_int", &svdClTime_V_int, "svdClTime_int/F");
     t_SVD_V->Branch("svdStripTime_int", &svdStripTime_V_int);
     t_SVD_V->Branch("svdStripPosition_int", &svdStripPosition_V_int);
@@ -431,6 +436,7 @@ void OverlapResidualsModule::defineHisto()
     t_SVD_V->Branch("svdClSNR_ext", &svdClSNR_V_ext, "svdClSNR_ext/F");
     t_SVD_V->Branch("svdClCharge_ext", &svdClCharge_V_ext, "svdClCharge_ext/F");
     t_SVD_V->Branch("svdStripCharge_ext", &svdStripCharge_V_ext);
+    t_SVD_V->Branch("svdStrip6Samples_ext", &svdStrip6Samples_V_ext);
     t_SVD_V->Branch("svdClTime_ext", &svdClTime_V_ext, "svdClTime_ext/F");
     t_SVD_V->Branch("svdStripTime_ext", &svdStripTime_V_ext);
     t_SVD_V->Branch("svdStripPosition_ext", &svdStripPosition_V_ext);
@@ -724,6 +730,7 @@ void OverlapResidualsModule::event()
               svdClIntStrPos_U_int = fmod(svdClPos_U_int + halfLength, pitch) / pitch;
 
               svdStripCharge_U_int.clear();
+              svdStrip6Samples_U_int.clear();
               svdStripTime_U_int.clear();
               svdStripPosition_U_int.clear();
               //retrieve relations and set strip charges and times
@@ -736,6 +743,9 @@ void OverlapResidualsModule::event()
               if (svdSize_U_int < 128)
                 for (unsigned int d = 0; d < svdSize_U_int; d++) {
                   svdStripCharge_U_int.push_back(theRecoDigits_1[d]->getCharge());
+                  SVDShaperDigit* ShaperDigit_1 = theRecoDigits_1[d]->getRelated<SVDShaperDigit>();
+                  array<float, 6> Samples_1 = ShaperDigit_1->getSamples();
+                  std::copy(std::begin(Samples_1), std::end(Samples_1), std::back_inserter(svdStrip6Samples_U_int));
                   svdStripTime_U_int.push_back(theRecoDigits_1[d]->getTime());
                   double misalignedStripPos = svdSensor_1.getUCellPosition(theRecoDigits_1[d]->getCellID());
                   //aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)
@@ -775,6 +785,7 @@ void OverlapResidualsModule::event()
               svdClIntStrPos_U_ext = fmod(svdClPos_U_ext + halfLength, pitch) / pitch;
 
               svdStripCharge_U_ext.clear();
+              svdStrip6Samples_U_ext.clear();
               svdStripTime_U_ext.clear();
               svdStripPosition_U_ext.clear();
               //retrieve relations and set strip charges and times
@@ -786,6 +797,9 @@ void OverlapResidualsModule::event()
               if (svdSize_U_ext < 128)
                 for (unsigned int d = 0; d < svdSize_U_ext; d++) {
                   svdStripCharge_U_ext.push_back(theRecoDigits_2[d]->getCharge());
+                  SVDShaperDigit* ShaperDigit_2 = theRecoDigits_2[d]->getRelated<SVDShaperDigit>();
+                  array<float, 6> Samples_2 = ShaperDigit_2->getSamples();
+                  std::copy(std::begin(Samples_2), std::end(Samples_2), std::back_inserter(svdStrip6Samples_U_ext));
                   svdStripTime_U_ext.push_back(theRecoDigits_2[d]->getTime());
                   double misalignedStripPos = svdSensor_2.getUCellPosition(theRecoDigits_2[d]->getCellID());
                   //aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)
@@ -898,6 +912,7 @@ void OverlapResidualsModule::event()
               svdClIntStrPos_V_int = fmod(svdClPos_V_int + halfLength, pitch) / pitch;
 
               svdStripCharge_V_int.clear();
+              svdStrip6Samples_V_int.clear();
               svdStripTime_V_int.clear();
               svdStripPosition_V_int.clear();
               //retrieve relations and set strip charges and times
@@ -909,6 +924,9 @@ void OverlapResidualsModule::event()
               if (svdSize_V_int < 128)
                 for (unsigned int d = 0; d < svdSize_V_int; d++) {
                   svdStripCharge_V_int.push_back(theRecoDigits_1[d]->getCharge());
+                  SVDShaperDigit* ShaperDigit_1 = theRecoDigits_1[d]->getRelated<SVDShaperDigit>();
+                  array<float, 6> Samples_1 = ShaperDigit_1->getSamples();
+                  std::copy(std::begin(Samples_1), std::end(Samples_1), std::back_inserter(svdStrip6Samples_V_int));
                   svdStripTime_V_int.push_back(theRecoDigits_1[d]->getTime());
                   double misalignedStripPos = svdSensor_1.getVCellPosition(theRecoDigits_1[d]->getCellID());
                   //aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)
@@ -948,6 +966,7 @@ void OverlapResidualsModule::event()
               svdClIntStrPos_V_ext = fmod(svdClPos_V_ext + halfLength, pitch) / pitch;
 
               svdStripCharge_V_ext.clear();
+              svdStrip6Samples_V_ext.clear();
               svdStripTime_V_ext.clear();
               svdStripPosition_V_ext.clear();
               //retrieve relations and set strip charges and times
@@ -959,6 +978,9 @@ void OverlapResidualsModule::event()
               if (svdSize_V_ext < 128)
                 for (unsigned int d = 0; d < svdSize_V_ext; d++) {
                   svdStripCharge_V_ext.push_back(theRecoDigits_2[d]->getCharge());
+                  SVDShaperDigit* ShaperDigit_2 = theRecoDigits_2[d]->getRelated<SVDShaperDigit>();
+                  array<float, 6> Samples_2 = ShaperDigit_2->getSamples();
+                  std::copy(std::begin(Samples_2), std::end(Samples_2), std::back_inserter(svdStrip6Samples_V_ext));
                   svdStripTime_V_ext.push_back(theRecoDigits_2[d]->getTime());
                   double misalignedStripPos = svdSensor_2.getVCellPosition(theRecoDigits_2[d]->getCellID());
                   //aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)

@@ -247,7 +247,7 @@ class MaxSubjobsSplitter(SubjobSplitter):
         subjob_i = 0
         while remaining_input_files:
             # How many files should we use for this subjob?
-            num_input_files = ceil(len(remaining_input_files)/available_subjobs)
+            num_input_files = ceil(len(remaining_input_files) / available_subjobs)
             # Pop them from the remaining files
             subjob_input_files = []
             for i in range(num_input_files):
@@ -1875,12 +1875,12 @@ class HTCondor(Batch):
     default_global_job_limit = 10000
     #: Default backend args for HTCondor
     default_backend_args = {
-                            "universe": "vanilla",
-                            "getenv": "false",
-                            "request_memory": "4 GB",  # We set the default requested memory to 4 GB to maintain parity with KEKCC
-                            "path_prefix": "",  # Path prefix for file path
+        "universe": "vanilla",
+        "getenv": "false",
+        "request_memory": "4 GB",  # We set the default requested memory to 4 GB to maintain parity with KEKCC
+        "path_prefix": "",  # Path prefix for file path
                             "extra_lines": []  # These should be other HTCondor submit script lines like 'request_cpus = 2'
-                           }
+    }
     #: Default ClassAd attributes to return from commands like condor_q
     default_class_ads = ["GlobalJobId", "JobStatus", "Owner"]
 
@@ -2039,7 +2039,7 @@ class HTCondor(Batch):
             backend_status = job_info["JobStatus"]
             # if job is held (backend_status = 5) then report why then kill the job
             if backend_status == 5:
-                hold_reason = job_info["HoldReason"]
+                hold_reason = job_info.get("HoldReason", None)
                 B2WARNING(f"{self.job} on hold because of {hold_reason}. Killing it")
                 subprocess.check_output(["condor_rm", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
                 backend_status = 6
@@ -2137,7 +2137,12 @@ class HTCondor(Batch):
         # We get a JSON serialisable summary from condor_q. But we will alter it slightly to be more similar to other backends
         cmd = " ".join(cmd_list)
         B2DEBUG(29, f"Calling subprocess with command = '{cmd}'")
-        records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        # condor_q occassionally fails
+        try:
+            records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        except BaseException:
+            records = None
+
         if records:
             records = decode_json_string(records)
         else:
@@ -2197,11 +2202,16 @@ class HTCondor(Batch):
         # We get a JSON serialisable summary from condor_q. But we will alter it slightly to be more similar to other backends
         cmd = " ".join(cmd_list)
         B2DEBUG(29, f"Calling subprocess with command = '{cmd}'")
-        records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        try:
+            records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        except BaseException:
+            records = None
+
         if records:
             records = decode_json_string(records)
         else:
             records = []
+
         jobs_info = {"JOBS": records}
         jobs_info["NJOBS"] = len(jobs_info["JOBS"])  # Just to avoid having to len() it in the future
         return jobs_info

@@ -136,7 +136,7 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
         end_segment = segment_pair_relation.getEndSegment()
 
         # Take the fit best at the middle of the segment pair
-        mc_particle = mc_segment_lookup.getMCParticle(end_segment)
+        # mc_particle = mc_segment_lookup.getMCParticle(end_segment)
         fit3d_truth = mc_segment_lookup.getTrajectory3D(end_segment)
 
         return dict(
@@ -169,7 +169,7 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
             chi2 = chi2
             ndf = ndf
             p_value = prob(chi2, ndf)
-            select = True
+            # select = True
 
         else:
             nan = float('nan')
@@ -207,7 +207,6 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
     def peel_fitless(self, segment_pair_relation):
         """Create a dictionary of track-segments-without-fit information"""
         # Try to make some judgements without executing the common fit.
-        mc_segment_lookup = self.mc_segment_lookup
 
         start_segment = segment_pair_relation.getStartSegment()
         end_segment = segment_pair_relation.getEndSegment()
@@ -326,8 +325,8 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
         """Print diagnostic information about the track-segment-pair selection"""
         info = get_logger().info
 
-        start_superlayer_ids = crops["start_superlayer_id"]
-        end_superlayer_ids = crops["end_superlayer_id"]
+        # start_superlayer_ids = crops["start_superlayer_id"]
+        # end_superlayer_ids = crops["end_superlayer_id"]
 
         superlayer_id_pair = crops["superlayer_id_pair"]
         info("Number of pairs in superlayers %s : %s", np.unique(superlayer_id_pair), len(superlayer_id_pair))

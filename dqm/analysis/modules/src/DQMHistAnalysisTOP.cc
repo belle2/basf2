@@ -48,6 +48,14 @@ void DQMHistAnalysisTOPModule::initialize()
   m_c_badHitsMean = new TCanvas("TOP/c_bad_hits_mean");
   m_c_badHitsRMS = new TCanvas("TOP/c_bad_hits_rms");
 
+  //using c2_Name to avoid an overlap on default c_Name
+  for (int i = 1; i <= 16; i++) {
+    m_c_good_hits_xy_[i] = new TCanvas(Form("TOP/c2_good_hits_xy_%d", i));
+    m_c_bad_hits_xy_[i] = new TCanvas(Form("TOP/c2_bad_hits_xy_%d", i));
+    m_c_good_hits_asics_[i] = new TCanvas(Form("TOP/c2_good_hits_asics_%d", i));
+    m_c_bad_hits_asics_[i] = new TCanvas(Form("TOP/c2_bad_hits_asics_%d", i));
+  }
+
   m_h_goodHitsMean = new TH1F("TOP/good_hits_mean", "Mean of good hits per event", 16, 0.5, 16.5);
   m_h_goodHitsRMS = new TH1F("TOP/good_hits_rms", "RMS of good hits per event", 16, 0.5, 16.5);
   m_h_badHitsMean = new TH1F("TOP/bad_hits_mean", "Mean of bad hits per event", 16, 0.5, 16.5);
@@ -227,6 +235,65 @@ void DQMHistAnalysisTOPModule::event()
     if (badRatio > 0.0001) c3->Pad()->SetFillColor(kRed);
     else c3->Pad()->SetFillColor(kWhite);
     m_text2->Draw();
+  }
+
+  //obtaining the total yield for 16 2D-plots
+  double Ntotal_good_hits_xy(0.0);
+  double Ntotal_bad_hits_xy(0.0);
+  double Ntotal_good_hits_asics(0.0);
+  double Ntotal_bad_hits_asics(0.0);
+  for (int module = 1; module <= 16; module++) {
+    TH2F* h2Dtmp = 0;
+
+    h2Dtmp = (TH2F*)findHist(Form("TOP/good_hits_xy_%d", module));
+    Ntotal_good_hits_xy += h2Dtmp->Integral();
+
+    h2Dtmp = (TH2F*)findHist(Form("TOP/bad_hits_xy_%d", module));
+    Ntotal_bad_hits_xy += h2Dtmp->Integral();
+
+    h2Dtmp = (TH2F*)findHist(Form("TOP/good_hits_asics_%d", module));
+    Ntotal_good_hits_asics += h2Dtmp->Integral();
+
+    h2Dtmp = (TH2F*)findHist(Form("TOP/bad_hits_asics_%d", module));
+    Ntotal_bad_hits_asics += h2Dtmp->Integral();
+  }
+
+  //reset the maximum z-axis of 16 2D plots: 3 times of average for good hits; 30 times of average for bad hits
+  for (int i = 1; i <= 16; i++) {
+    m_c_good_hits_xy_[i]->Clear();
+    m_c_good_hits_xy_[i]->cd();
+    TH2F* h2Dscale_xy = (TH2F*)findHist(Form("TOP/good_hits_xy_%d", i));
+    h2Dscale_xy->GetZaxis()->SetRangeUser(0, Ntotal_good_hits_xy / 2500.0);
+    h2Dscale_xy->Draw();
+    m_c_good_hits_xy_[i]->Modified();
+  }
+
+
+  for (int i = 1; i <= 16; i++) {
+    m_c_bad_hits_xy_[i]->Clear();
+    m_c_bad_hits_xy_[i]->cd();
+    TH2F* h2Dscale_xy = (TH2F*)findHist(Form("TOP/bad_hits_xy_%d", i));
+    h2Dscale_xy->GetZaxis()->SetRangeUser(0, Ntotal_bad_hits_xy / 250.0);
+    h2Dscale_xy->Draw();
+    m_c_bad_hits_xy_[i]->Modified();
+  }
+
+  for (int i = 1; i <= 16; i++) {
+    m_c_good_hits_asics_[i]->Clear();
+    m_c_good_hits_asics_[i]->cd();
+    TH2F* h2Dscale_asics = (TH2F*)findHist(Form("TOP/good_hits_asics_%d", i));
+    h2Dscale_asics->GetZaxis()->SetRangeUser(0, Ntotal_good_hits_asics / 2500.0);
+    h2Dscale_asics->Draw();
+    m_c_good_hits_asics_[i]->Modified();
+  }
+
+  for (int i = 1; i <= 16; i++) {
+    m_c_bad_hits_asics_[i]->Clear();
+    m_c_bad_hits_asics_[i]->cd();
+    TH2F* h2Dscale_asics = (TH2F*)findHist(Form("TOP/bad_hits_asics_%d", i));
+    h2Dscale_asics->GetZaxis()->SetRangeUser(0, Ntotal_bad_hits_asics / 250.0);
+    h2Dscale_asics->Draw();
+    m_c_bad_hits_asics_[i]->Modified();
   }
 
   m_c_goodHitsMean->Clear();

@@ -24,7 +24,12 @@ namespace {
 
   double getValue(const std::string& name, TH1* histogram)
   {
-    B2ASSERT("This histogram does not have this value!", hasValue(name, histogram));
+    if (not hasValue(name, histogram)) {
+      B2ERROR("This histogram does not have this value! (fallback value = -1)"
+              << LogVar("histogram", histogram->GetName())
+              << LogVar("value", name));
+      return -1;
+    }
     auto binNumber = histogram->GetXaxis()->FindFixBin(name.c_str());
     return histogram->GetBinContent(binNumber);
   }
@@ -49,11 +54,11 @@ void DQMHistAnalysisHLTModule::initialize()
 
   m_hEfficiency = {
     new TCanvas("HLT/Ratio"),
-    new TH1F("Ratio", "Ratio of Tags to HLT triggered events", 1, 0, 0)
+    new TH1F("Ratio", "Retention of selected HLT skims", 1, 0, 0)
   };
   m_hEfficiencyTotal = {
     new TCanvas("HLT/RatioTotal"),
-    new TH1F("Ratio", "Ratio of Tags to all events", 1, 0, 0)
+    new TH1F("RatioTotal", "Ratio of Tags to all events", 1, 0, 0)
   };
   m_hCrossSection = {
     new TCanvas("HLT/CrossSection"),
@@ -76,7 +81,7 @@ void DQMHistAnalysisHLTModule::initialize()
     m_hRetentionPerUnit.emplace(filterLine, std::make_pair(
                                   new TCanvas(("HLT/" + filterLine + "_RetentionPerUnit").c_str()),
                                   new TH1F((filterLine + "_RetentionPerUnit").c_str(), ("Retention rate per unit of: " + filterLine).c_str(),
-                                           SoftwareTrigger::HLTUnit::max_hlt_units, 1,
+                                           SoftwareTrigger::HLTUnit::max_hlt_units + 1, 0,
                                            SoftwareTrigger::HLTUnit::max_hlt_units + 1)
                                 ));
   }
@@ -86,6 +91,7 @@ void DQMHistAnalysisHLTModule::initialize()
     histogram->SetDirectory(0);
     histogram->SetOption("bar");
     histogram->SetFillStyle(0);
+    histogram->SetMinimum(0);
     histogram->SetStats(false);
     histogram->Draw("hist");
   }
@@ -102,11 +108,36 @@ void DQMHistAnalysisHLTModule::initialize()
   for (auto& nameAndcanvasAndHisto : m_hRetentionPerUnit) {
     auto* histogram = nameAndcanvasAndHisto.second.second;
     histogram->SetDirectory(0);
-    histogram->SetOption("bar");
-    histogram->SetFillStyle(0);
+    histogram->SetOption("histe");
+    histogram->SetMinimum(0);
     histogram->SetStats(false);
-    histogram->Draw("hist");
+    histogram->Draw();
   }
+
+  m_hMeanTime = {
+    new TCanvas("HLT/MeanTime"),
+    new TH1F("MeanTime", "Mean processing time", 1, 0, 0)
+  };
+
+  m_hErrorFlagFraction = {
+    new TCanvas("HLT/ErrorFlagFraction"),
+    new TH1D("ErrorFlagFraction", "Fraction of events with Error Flags", 1, 0, 0)
+  };
+
+  m_hFilteredFractionPerUnit = {
+    new TCanvas("HLT/FilteredFractionPerUnit"),
+    new TH1D("FilteredFractionPerUnit", "Fraction of events filtered per unit", 1, 0, 0)
+  };
+
+  m_hMeanBudgetTimePerUnit = {
+    new TCanvas("HLT/MeanBudgetTimePerUnit"),
+    new TH1F("MeanBudgetTimePerUnit", "Mean budget time per unit", 1, 0, 0)
+  };
+
+  m_hMeanProcessingTimePerUnit = {
+    new TCanvas("HLT/MeanProcessingTimePerUnit"),
+    new TH1F("MeanProcessingTimePerUnit", "Mean proecessing time per unit", 1, 0, 0)
+  };
 
 #ifdef _BELLE2_EPICS
   if (not m_pvPrefix.empty()) {
@@ -120,7 +151,12 @@ void DQMHistAnalysisHLTModule::initialize()
 
 void DQMHistAnalysisHLTModule::beginRun()
 {
-  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios}) {
+  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios, m_hMeanTime, m_hMeanBudgetTimePerUnit, m_hMeanProcessingTimePerUnit}) {
+    auto* canvas = canvasAndHisto.first;
+    canvas->Clear();
+  }
+
+  for (auto& canvasAndHisto : {m_hErrorFlagFraction, m_hFilteredFractionPerUnit}) {
     auto* canvas = canvasAndHisto.first;
     canvas->Clear();
   }
@@ -142,6 +178,12 @@ void DQMHistAnalysisHLTModule::event()
   auto* skimHistogram = findHist("softwaretrigger/skim");
   auto* totalResultHistogram = findHist("softwaretrigger/total_result");
   auto* hltUnitNumberHistogram = findHist("softwaretrigger_before_filter/hlt_unit_number");
+  auto* processesPerUnitHistogram = findHist("timing_statistics/processesPerUnitHistogram");
+  auto* meanTimeHistogram = findHist("timing_statistics/meanTimeHistogram");
+  auto* errorFlagHistogram = findHist("softwaretrigger_before_filter/error_flag");
+  auto* hltUnitNumberHistogram_filtered = findHist("softwaretrigger/hlt_unit_number_after_filter");
+  auto* fullTimeMeanPerUnitHistogram = findHist("timing_statistics/fullTimeMeanPerUnitHistogram");
+  auto* processingTimeMeanPerUnitHistogram = findHist("timing_statistics/processingTimeMeanPerUnitHistogram");
 
   if (not filterHistogram) {
     B2ERROR("Can not find the filter histogram!");
@@ -159,6 +201,30 @@ void DQMHistAnalysisHLTModule::event()
     B2ERROR("Can not find the HLT unit number histogram!");
     return;
   }
+  if (not processesPerUnitHistogram) {
+    B2ERROR("Can not find the processes per unit histogram!");
+    return;
+  }
+  if (not meanTimeHistogram) {
+    B2ERROR("Can not find the mean processing time histogram!");
+    return;
+  }
+  if (not errorFlagHistogram) {
+    B2ERROR("Can not find the error flag histogram!");
+    return;
+  }
+  if (not hltUnitNumberHistogram_filtered) {
+    B2ERROR("Can not find the HLT unit number after filter histogram!");
+    return;
+  }
+  if (not fullTimeMeanPerUnitHistogram) {
+    B2ERROR("Can not find the HLT budget time per unit histogram!");
+    return;
+  }
+  if (not processingTimeMeanPerUnitHistogram) {
+    B2ERROR("Can not find the HLT processing time per unit histogram!");
+    return;
+  }
 
   m_hEfficiencyTotal.second->Reset();
   m_hEfficiency.second->Reset();
@@ -169,6 +235,7 @@ void DQMHistAnalysisHLTModule::event()
   double numberOfAcceptedHLTEvents = getValue("total_result", totalResultHistogram);
   double numberOfBhabhaEvents = getValue(m_bhabhaName, skimHistogram);
   double numberOfAllEvents = hltUnitNumberHistogram->GetEntries();
+  double numberOfProcesses = processesPerUnitHistogram->GetEntries();
 
 #ifdef _BELLE2_EPICS
   if (not m_pvPrefix.empty()) {
@@ -270,24 +337,53 @@ void DQMHistAnalysisHLTModule::event()
       continue;
     }
 
-    for (unsigned int i = 1; i <= SoftwareTrigger::HLTUnit::max_hlt_units; i++) {
+    for (unsigned int i = 1; i <= SoftwareTrigger::HLTUnit::max_hlt_units + 1; i++) {
       double totalUnitValue = hltUnitNumberHistogram->GetBinContent(i);
       if (totalUnitValue == 0) {
         histogram->Fill(i, 0);
       } else {
         double filterLineUnitValue = filterLineHistogram->GetBinContent(i);
-        histogram->Fill(i, filterLineUnitValue / totalUnitValue);
+        histogram->SetBinContent(i, filterLineUnitValue / totalUnitValue);
       }
     }
   }
 
-  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios}) {
+  m_hMeanTime.second = (TH1F*) meanTimeHistogram->Clone("MeanTime");
+  m_hMeanTime.second->Scale(1 / numberOfProcesses);
+
+  m_hErrorFlagFraction.second = (TH1D*) errorFlagHistogram->Clone("ErrorFlagFraction");
+  m_hErrorFlagFraction.second->Scale(1 / numberOfAllEvents);
+  m_hErrorFlagFraction.second->SetTitle("Fraction of events with error flags");
+
+  m_hFilteredFractionPerUnit.second = (TH1D*) hltUnitNumberHistogram_filtered->Clone("FilteredFractionPerUnit");
+  m_hFilteredFractionPerUnit.second->Divide(hltUnitNumberHistogram_filtered, hltUnitNumberHistogram);
+  m_hFilteredFractionPerUnit.second->SetTitle("Fraction of events filtered per unit");
+
+  m_hMeanBudgetTimePerUnit.second = (TH1F*) fullTimeMeanPerUnitHistogram->Clone("MeanBudgetTimePerUnit");
+  m_hMeanBudgetTimePerUnit.second->Divide(fullTimeMeanPerUnitHistogram, processesPerUnitHistogram);
+
+  m_hMeanProcessingTimePerUnit.second = (TH1F*) processingTimeMeanPerUnitHistogram->Clone("MeanProcessingTimePerUnit");
+  m_hMeanProcessingTimePerUnit.second->Divide(processingTimeMeanPerUnitHistogram, processesPerUnitHistogram);
+
+  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios, m_hMeanTime, m_hMeanBudgetTimePerUnit, m_hMeanProcessingTimePerUnit}) {
     auto* canvas = canvasAndHisto.first;
     auto* histogram = canvasAndHisto.second;
 
     canvas->cd();
     histogram->LabelsDeflate("X");
     histogram->Draw("hist");
+    canvas->Modified();
+    canvas->Update();
+  }
+
+  for (auto& canvasAndHisto : {m_hErrorFlagFraction, m_hFilteredFractionPerUnit}) {
+    auto* canvas = canvasAndHisto.first;
+    auto* histogram = canvasAndHisto.second;
+
+    canvas->cd();
+    histogram->LabelsDeflate("X");
+    histogram->Draw("hist");
+    histogram->SetStats(false);
     canvas->Modified();
     canvas->Update();
   }

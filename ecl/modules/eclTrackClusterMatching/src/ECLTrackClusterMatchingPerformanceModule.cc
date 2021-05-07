@@ -13,6 +13,7 @@
 #include <framework/datastore/RelationVector.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
+#include <framework/gearbox/Const.h>
 
 #include <root/TFile.h>
 #include <root/TTree.h>
@@ -88,7 +89,8 @@ void ECLTrackClusterMatchingPerformanceModule::event()
       if (eclCluster.getEnergy(hypo) >= 0.5 * relatedMCParticle->getEnergy()) {
         if (isChargedStable(*relatedMCParticle) && weight >= 0.5 * relatedMCParticle->getEnergy()) {
           found_charged_stable = true;
-        } else if (relatedMCParticle->getPDG() == 22 && weight >= 0.5 * eclCluster.getEnergy(hypo) && !found_photon) {
+        } else if (relatedMCParticle->getPDG() == Const::photon.getPDGCode() && weight >= 0.5 * eclCluster.getEnergy(hypo)
+                   && !found_photon) {
           found_photon = true;
           m_photonEnergy = relatedMCParticle->getEnergy();
         }

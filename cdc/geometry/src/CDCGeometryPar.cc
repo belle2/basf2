@@ -326,12 +326,12 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   m_fieldWireDiameter = geom.getFieldDiameter();
 
   //Set various quantities (should be moved to CDC.xml later...)
-  m_clockFreq4TDC = 1.017774;  //in GHz
-  double tmp = geom.getClockFrequency();
-
-  if (tmp != m_clockFreq4TDC) {
-    B2WARNING("CDCGeometryPar: The default clock freq. for TDC (" << m_clockFreq4TDC << " GHz) is replaced with " << tmp << " (GHz).");
-    m_clockFreq4TDC = tmp;
+  m_clockFreq4TDC = geom.getClockFrequency();
+  const double officialClockFreq4TDC = 2 * m_clockSettings->getAcceleratorRF(); // in GHz
+  if (m_clockFreq4TDC != officialClockFreq4TDC) {
+    B2WARNING("ClockFreq4TDC changed from cdclocal " << scientific << setprecision(6) << m_clockFreq4TDC << " to official " <<
+              officialClockFreq4TDC << " (GHz)!");
+    m_clockFreq4TDC = officialClockFreq4TDC;
   }
   B2DEBUG(100, "CDCGeometryPar: Clock freq. for TDC= " << m_clockFreq4TDC << " (GHz).");
   m_tdcBinWidth = 1. / m_clockFreq4TDC;  //in ns
@@ -1265,16 +1265,6 @@ void CDCGeometryPar::readEDepToADC(const GearDir& gbxParams, const int mode)
     cLMin[sl] = cLMax[0] + 6 * sl - 5;
     cLMax[sl] = cLMax[0] + 6 * sl;
   }
-  int nCell[56] = {160, 160, 160, 160, 160, 160, 160, 160,
-                   160, 160, 160, 160, 160, 160,
-                   192, 192, 192, 192, 192, 192,
-                   224, 224, 224, 224, 224, 224,
-                   256, 256, 256, 256, 256, 256,
-                   288, 288, 288, 288, 288, 288,
-                   320, 320, 320, 320, 320, 320,
-                   352, 352, 352, 352, 352, 352,
-                   384, 384, 384, 384, 384, 384
-                  }; //no. of cells in clayer
 
   unsigned short id = 0;
   double coef = 0.;
@@ -1283,7 +1273,7 @@ void CDCGeometryPar::readEDepToADC(const GearDir& gbxParams, const int mode)
     for (unsigned short i = 0; i < nParams; ++i) {
       ifs  >> coef;
       for (unsigned short cL = cLMin[id]; cL <= cLMax[id]; ++cL) { //clayer loop
-        for (unsigned short cell = 0; cell < nCell[cL]; ++cell) { //cell loop
+        for (unsigned short cell = 0; cell < m_nWires[cL]; ++cell) { //cell loop
           m_eDepToADCParams[cL][cell][i] = coef;
           //    B2DEBUG(29, "cL,cell,i,coef= "<< cL <<" "<< cell <<" "<< i <<" "<< coef);
         }
@@ -1325,7 +1315,7 @@ void CDCGeometryPar::calcMeanT0()
   m_meanT0 = 0.;
   for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
     for (unsigned short iW = 0; iW < MAX_N_SCELLS; ++iW) {
-      if (m_t0[iCL][iW] == 0.) continue;
+      if (m_t0[iCL][iW] <= 0.) continue;
       const WireID wid = WireID(iCL, iW);
       if (isHotWire(wid)) continue;
       if (isBadWire(wid)) continue;
@@ -1537,30 +1527,20 @@ void CDCGeometryPar::setEDepToADCConversions()
     cLMin[sl] = cLMax[0] + 6 * sl - 5;
     cLMax[sl] = cLMax[0] + 6 * sl;
   }
-  int nCell[56] = {160, 160, 160, 160, 160, 160, 160, 160,
-                   160, 160, 160, 160, 160, 160,
-                   192, 192, 192, 192, 192, 192,
-                   224, 224, 224, 224, 224, 224,
-                   256, 256, 256, 256, 256, 256,
-                   288, 288, 288, 288, 288, 288,
-                   320, 320, 320, 320, 320, 320,
-                   352, 352, 352, 352, 352, 352,
-                   384, 384, 384, 384, 384, 384
-                  }; //no. of cells in clayer
 
   for (unsigned short id = 0; id < nEnt; ++id) {
     unsigned short np = ((*m_eDepToADCConversionsFromDB)->getParams(id)).size();
     if (np > 6) B2FATAL("CDCGeometryPar:: No. of edep-to-ADC conversion params. > 6");
     if (groupId == 0) { //per super-layer; id=super-layer
       for (unsigned short cL = cLMin[id]; cL <= cLMax[id]; ++cL) { //clayer loop
-        for (unsigned short cell = 0; cell < nCell[cL]; ++cell) { //cell loop
+        for (unsigned short cell = 0; cell < m_nWires[cL]; ++cell) { //cell loop
           for (unsigned short i = 0; i < np; ++i) {
             m_eDepToADCParams[cL][cell][i] = ((*m_eDepToADCConversionsFromDB)->getParams(id))[i];
           }
         }
       }
     } else if (groupId == 1) { //per clayer; id=clayer
-      for (unsigned short cell = 0; cell < nCell[id]; ++cell) { //cell loop
+      for (unsigned short cell = 0; cell < m_nWires[id]; ++cell) { //cell loop
         for (unsigned short i = 0; i < np; ++i) {
           m_eDepToADCParams[id][cell][i] = ((*m_eDepToADCConversionsFromDB)->getParams(id))[i];
         }

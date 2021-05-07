@@ -67,7 +67,7 @@ z0vars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + \
 z0uvars = z0vars + \
     vu.create_aliases(['OrcaKinFitProb',
                        'OrcaKinFitChi2',
-                       'OrcaKinFitErrorCode'], 'extraInfo(variable)', "")
+                       'OrcaKinFitErrorCode'], 'extraInfo({variable})', "")
 
 # Saving variables to ntuple
 output_file = 'B2A422-Orcakinfit_3CFit.root'

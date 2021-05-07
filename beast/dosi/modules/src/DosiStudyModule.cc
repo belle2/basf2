@@ -16,6 +16,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 //c++
 #include <cmath>
@@ -176,30 +177,30 @@ void DosiStudyModule::event()
       h_dosi_edep1[detNB]->Fill(Edep);
       if (0.005 <= Kinetic && Kinetic <= 10.0)
         h_dosi_edep2[detNB]->Fill(Edep);
-      if (0.005 <= Kinetic && Kinetic <= 10.0 && (fabs(pdg) == 11))
+      if (0.005 <= Kinetic && Kinetic <= 10.0 && (fabs(pdg) == Const::electron.getPDGCode()))
         h_dosi_edep3[detNB]->Fill(Edep);
-      if (0.1 <= Kinetic && Kinetic <= 10.0 && (fabs(pdg) == 11))
+      if (0.1 <= Kinetic && Kinetic <= 10.0 && (fabs(pdg) == Const::electron.getPDGCode()))
         h_dosi_edep4[detNB]->Fill(Edep);
       if (0.001 <= Kinetic && Kinetic <= 0.050)
         h_dosi_edep5[detNB]->Fill(Edep);
-      if (pdg == 2112)
+      if (pdg == Const::neutron.getPDGCode())
         h_dosi_edep6[detNB]->Fill(Edep);
-      if (pdg == 2112 && (0.001 <= Kinetic && Kinetic <= 10.0))
+      if (pdg == Const::neutron.getPDGCode() && (0.001 <= Kinetic && Kinetic <= 10.0))
         h_dosi_edep7[detNB]->Fill(Edep);
 
 
       h_dosi_rs_edep1[detNB]->Fill(Edep, ring_section);
       if (0.005 <= Kinetic && Kinetic <= 10.0)
         h_dosi_rs_edep2[detNB]->Fill(Edep, ring_section);
-      if (0.005 <= Kinetic && Kinetic <= 10.0 && (fabs(pdg) == 11))
+      if (0.005 <= Kinetic && Kinetic <= 10.0 && (fabs(pdg) == Const::electron.getPDGCode()))
         h_dosi_rs_edep3[detNB]->Fill(Edep, ring_section);
-      if (0.1 <= Kinetic && Kinetic <= 10.0 && (fabs(pdg) == 11))
+      if (0.1 <= Kinetic && Kinetic <= 10.0 && (fabs(pdg) == Const::electron.getPDGCode()))
         h_dosi_rs_edep4[detNB]->Fill(Edep, ring_section);
       if (0.001 <= Kinetic && Kinetic <= 0.050)
         h_dosi_rs_edep5[detNB]->Fill(Edep, ring_section);
-      if (pdg == 2112)
+      if (pdg == Const::neutron.getPDGCode())
         h_dosi_rs_edep6[detNB]->Fill(Edep, ring_section);
-      if (pdg == 2112 && (0.001 <= Kinetic && Kinetic <= 10.0))
+      if (pdg == Const::neutron.getPDGCode() && (0.001 <= Kinetic && Kinetic <= 10.0))
         h_dosi_rs_edep7[detNB]->Fill(Edep, ring_section);
     }
   }

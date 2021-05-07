@@ -63,7 +63,7 @@ def wf_display(waveform, run, event, suffix=""):
     carr = waveform.getCarrierNumber()
     bstk = (chan // 8 // 4 // 4) % 4
     pdfFile = pdfFile + '-' + str(chan)
-    nHits = 0
+    # nHits = 0
     wf = waveform.getWaveform()
     hist.Reset()
     numSamples = waveform.getSize()
@@ -210,13 +210,13 @@ class WaveformAnalyzer(b2.Module):
             fePeak1Ht = -1
             fePeak1TDC = -1
             fePeak1Wd = -1
-            fePeak1Integral = -1
+            # fePeak1Integral = -1
             if nTOPRawDigits > 1:
                 # if there is a second TOPRawDigit then get it for our ntuple
                 fePeak1Ht = rawDigits[1].getValuePeak()
                 fePeak1TDC = rawDigits[1].getSamplePeak()
                 fePeak1Wd = rawDigits[1].getSampleFall() - rawDigits[1].getSampleRise()
-                fePeak1Integral = rawDigits[1].getIntegral()
+                # fePeak1Integral = rawDigits[1].getIntegral()
 
             if nTOPRawDigits > 1 and fePeak1TDC < 64:
                 # counting the times that the second digit is found in the first window

@@ -3,7 +3,6 @@
 
 import fnmatch
 import math
-import root_numpy
 
 import numpy as np
 import matplotlib
@@ -91,7 +90,7 @@ def get_agreament2(histo_eventT0, histo_onTracks, min_entries=100):
 
 
 def make_roc(hist_sgn, hist_bkg, lower_is_better=False, two_sided=True):
-
+    import root_numpy
     dist_sgn = root_numpy.hist2array(hist_sgn)
     dist_bkg = root_numpy.hist2array(hist_bkg)
     dist_sgn = dist_sgn/dist_sgn.sum()
@@ -126,7 +125,7 @@ def np2plt_hist(np_hist):
 
 
 def make_combined_plot(pattern, histos, title=None):
-
+    import root_numpy
     h_onTracks = root_numpy.hist2array(get_combined(histos['onTracks'], pattern), return_edges=True)
     h_offTracks = root_numpy.hist2array(get_combined(histos['offTracks'], pattern), return_edges=True)
     h_eventT0 = root_numpy.hist2array(histos['eventT0'], return_edges=True)
@@ -178,7 +177,7 @@ def get_histos(in_file, algo='CoG3',
     iov = in_file.Get(f'{base_dir}/RunRange').getIntervalOfValidity()
     exp, run = iov.getExperimentLow(), iov.getRunLow()
 
-    histos['eventT0'] = in_file.Get(get_full_path(f'hEventT0', exp, run, base_dir))
+    histos['eventT0'] = in_file.Get(get_full_path('hEventT0', exp, run, base_dir))
 
     histos_all = {name_side: in_file.Get(get_full_path(f'clsTimeAll__{name_side}', exp, run, base_dir))
                   for name_side in names_sides}

@@ -26,5 +26,10 @@ This is not only an act of altruism:
 * Having your first commit in the software framework should really be considered
   to be a rite of passage.
 * You also get your questions answered and people will thank you for raising them!
+* If you've already read our bylaws, then you know that in order to become an
+  author of the Belle/Belle II papers, you need to complete quite a bit of
+  *service work* (basically work that you cannot publish in a journal but that
+  is required for the collaboration). Any work you do on training and documentation
+  counts towards that goal as well!
 
 Learn more about this: :doc:`/online_book/how_to_contribute`.

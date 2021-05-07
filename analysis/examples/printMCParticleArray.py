@@ -12,11 +12,13 @@ Execute script with:
 """
 
 import basf2
-from modularAnalysis import printMCParticles
+import modularAnalysis as ma
 
 path = basf2.Path()
-path.add_module('RootInput')
-printMCParticles(path=path)
+ma.inputMdst(environmentType='default',
+             filename=basf2.find_file('mdst14.root', 'validation', True),
+             path=path)
+ma.printMCParticles(path=path)
 basf2.process(path)
 
 # @endcond

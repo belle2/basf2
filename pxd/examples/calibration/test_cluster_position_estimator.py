@@ -118,10 +118,10 @@ class PXDPositionEstimation(b2.Module):
                     thetaU = math.atan(tu) * 180 / math.pi
                     thetaV = math.atan(tv) * 180 / math.pi
 
-                    # Only look at primary particles
-                    for mcp in truehit.getRelationsFrom("MCParticles"):
-                        if not mcp.hasStatus(1):
-                            reject = True
+                    # Only look at primary particles -> check if the following is needed
+                    # for mcp in truehit.getRelationsFrom("MCParticles"):
+                    #    if not mcp.hasStatus(1):
+                    #        reject = True
 
                     # Get instance of position estimator
                     PositionEstimator = Belle2.PXD.PXDClusterPositionEstimator.getInstance()

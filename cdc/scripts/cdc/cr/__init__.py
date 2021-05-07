@@ -116,7 +116,6 @@ def add_cdc_cr_simulation(path,
     Add CDC CR simulation.
 
     """
-    empty_path = b2.create_path()
 
     # background mixing or overlay input before process forking
     if bkgfiles:
@@ -319,13 +318,13 @@ def getDataPeriod(exp=0, run=0):
     """
     period = None
 
-    if exp is 1:  # GCR2017
+    if exp == 1:  # GCR2017
         return 'gcr2017'
 
-    if exp is 2:  # GCR2
+    if exp == 2:  # GCR2
         return 'phase2'
 
-    if exp is 3:  # Phase2
+    if exp == 3:  # Phase2
         return 'phase2'
 
     if exp > 3:  # Phase3?

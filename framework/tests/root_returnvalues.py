@@ -52,7 +52,7 @@ for width in integral_types:
         # do we need a prefix to the literal?
         prefix = "ull" if width > 32 else ""
         # append it to the test class
-        testclass.append("uint{0}_t {1}() const {{ return {2}ull; }}".format(width, func_name, value, prefix))
+        testclass.append("uint{0}_t {1}() const {{ return {2}{3}; }}".format(width, func_name, value, prefix))
         testclass.append("uint{0}_t& ref_{1}() {{ static uint{0}_t val = {2}{3}; return val; }}".format(
             width, func_name, value, prefix))
         # and remember name and result for checking

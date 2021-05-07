@@ -125,6 +125,7 @@ namespace Belle2 {
     /** Get the likelyhood that cluster shape is likely to be created from track state. */
     float getShapeLikelyhood(const genfit::StateOnPlane& state) const;
 
+    /** Construct the hessian matrix */
     virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const override { return new genfit::HMatrixUV(); };
 
   private:

@@ -72,12 +72,14 @@ job state statistics.
    dc_generic      100  Open:Active       -    -    -    -     0     0     0     0
 
 Different queues have different settings. For analysis you can use ``s``,
-``l``, or ``h``. For short jobs with running time under 3 hours, the queue
+``l``, or ``h``. For short jobs with a computing time (`CPU time`_) of under 3 hours, the queue
 ``s`` is preferable. For jobs with execution time more than 3 hours,
 you might want to use the queue ``l`` which gives jobs up to 24 hours of
-running time.
+computing time.
 More information about LSF queues can be found
-`here <https://kekcc.kek.jp/service/kekcc/html/Eng/BatchQueueList.html>`__.
+`here <https://kekcc.kek.jp/service/kekcc/support/en/12/>`__.
+
+.. _CPU time: https://www.ibm.com/support/pages/cputime-and-runtime-lsf-job
 
 This command also displays the current "Fairshare" values. Fairshare
 defines the priorities of jobs that are dispatched.
@@ -236,7 +238,7 @@ To resumes suspended jobs
    * Kill jobs with ``bkill <job id>``
    * **Always test your scripts before large scale submissions!**
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Author of this lesson
 

@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import os
 from basf2 import create_path
 from stdHyperons import stdXi, stdXi0, stdOmega, goodXi, goodXi0, goodOmega
-from itertools import product
 from b2bii import setB2BII, unsetB2BII
 
 

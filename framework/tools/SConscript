@@ -4,7 +4,8 @@ env['TOOLS_LIBS']['basf2'] = ['framework_pybasf2', 'framework',
                               'boost_filesystem', 'boost_program_options', 'boost_python', 'boost_system',
                               '$PYTHON_LIBS']
 
-env['TOOLS_LIBS']['b2file-metadata-show'] = ['$XML_LIBS', 'framework', 'boost_program_options', '$ROOT_LIBS']
+env['TOOLS_LIBS']['b2file-metadata-show'] = ['$XML_LIBS', 'framework', 'framework_io', 'boost_program_options',
+                                             '$ROOT_LIBS']
 
 env['TOOLS_LIBS']['b2file-metadata-add'] = ['$XML_LIBS', 'framework', 'boost_program_options', '$ROOT_LIBS']
 

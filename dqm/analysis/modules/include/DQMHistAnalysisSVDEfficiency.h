@@ -37,13 +37,10 @@ namespace Belle2 {
     virtual void terminate() override;
 
     //parameters
-    bool m_printCanvas; /**< if true print the pdf of the canvases */
     float m_effError; /**<error level of the efficiency */
     float m_effWarning; /**< warning level of the efficiency */
     float m_effEmpty; /**<empty level of the efficiency */
-    float m_errEffError = 1; /**<error level of the efficiency error*/
-    float m_errEffWarning = 0.5; /**< warning level of the efficiency error*/
-
+    float m_statThreshold; /**<minimal number of tracks per sensor to set green or red frame */
     //! Data members
   private:
 
@@ -68,15 +65,9 @@ namespace Belle2 {
 
     Int_t m_effUstatus; /**< number representing the status of the efficiency U side */
     Int_t m_effVstatus;/**< number representing the status of the efficiency V side */
-    Int_t m_effUErrstatus; /**< number representing the status of the efficiency error U side */
-    Int_t m_effVErrstatus; /**< number representing the status of the efficiency error V side */
 
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;
-
-    MonitoringObject* m_monObj = NULL; /**< MonitoringObject to be produced by this module*/
-    TCanvas* m_c_found_tracks_UV = NULL; /**<Canvas with found tracks for U and V side*/
-    TCanvas* m_c_matched_clusters_UV = NULL; /**<Canvas with matched clusters for U and V side*/
 
   };
 } // end namespace Belle2

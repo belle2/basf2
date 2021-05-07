@@ -12,7 +12,7 @@ The computing system
 
         * An internet browser
         * :ref:`onlinebook_basf2_introduction`
-        * :ref:`onlinebook_hep_analyses`
+        * :ref:`onlinebook_fundamentals`
 
     **Questions**:
 
@@ -176,9 +176,8 @@ The `Expert Shifter training course <https://confluence.desy.de/display/BI/DC+Op
 
 You will learn a lot about the computing system, and it is a very important service to the collaboration.
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Author of this lesson
 
     Michel Villanueva
-

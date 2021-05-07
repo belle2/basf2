@@ -24,6 +24,8 @@
 
 /* ROOT headers. */
 #include <TCanvas.h>
+#include <TH1.h>
+#include <TH2F.h>
 #include <TLatex.h>
 #include <TText.h>
 #include <TLine.h>
@@ -75,7 +77,7 @@ namespace Belle2 {
      */
     void terminate() override;
 
-  protected:
+  private:
 
     /**
      * Get number of processed events.
@@ -94,6 +96,15 @@ namespace Belle2 {
     void analyseChannelHitHistogram(
       int subdetector, int section, int sector,
       TH1* histogram, TCanvas* canvas, TLatex& latex);
+
+    /**
+     * Process spatial 2D hits histograms for endcap.
+     * @param[in] section   Section.
+     * @param[in] histogram Histogram.
+     * @param[in] canvas    Canvas.
+     */
+    void processSpatial2DHitEndcapHistogram(
+      uint16_t section, TH2F* histogram, TCanvas* canvas);
 
     /**
      * Process histogram containing the number of hits in plane.
@@ -141,6 +152,9 @@ namespace Belle2 {
 
     /** Vector of masked channels. */
     std::vector<uint16_t> m_MaskedChannels;
+
+    /** TLine for background region in 2d hits histograms. */
+    TLine m_2DHitsLine;
 
     /** TLine for boundary in plane histograms. */
     TLine m_PlaneLine;

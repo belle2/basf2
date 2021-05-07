@@ -655,6 +655,27 @@ def strip_campaign(label):
     return re.sub(MCCampaignRegex, "", label)
 
 
+def produce_on_tau_samples(skims):
+    """
+    Determine whether the combined skim should be produced on taupair samples, based on
+    the values of `BaseSkim.produce_on_tau_samples`. The values of
+    `BaseSkim.produce_on_tau_samples` must be either all True or all False.
+
+    Parameters:
+        skims (list(str)): List of skim names in combined skim.
+
+    Returns:
+        ProduceOnTau (bool): True if combined skim should be produced on taupair samples.
+    """
+    from skimExpertFunctions import CombinedSkim  # noqa
+
+    # Create the CombinedSkim object, and try to access produce_on_tau_samples.
+    # If the skims contain a mix of True and False, then the CombinedSkim method will
+    # raise a ValueError, and the user will be made aware of the problem.
+    SkimObject = CombinedSkim(*[Registry.get_skim_function(skim)() for skim in skims])
+    return SkimObject.produce_on_tau_samples
+
+
 def warn_local_script(args):
     """If a local script is given print a warning that a local script will be used.
 
@@ -716,6 +737,7 @@ def make_combined_steering_file(
         modules=modules,
         stats=False,
         hints=False,
+        mdstOutput=False,
     )
 
     with open(SteeringFile, "w") as f:
@@ -846,6 +868,12 @@ def write_json_files(sampleRegistry, args, outputDirectory):
         )
 
         for sampleLabel, sampleInfo in sampleRegistry.items():
+            # Skip taupair sample if the combined skim is not to be produced on taupair
+            if (
+                    "taupair" in sampleLabel and
+                    not produce_on_tau_samples(CombinedSkimDefinitions[skimName])
+            ):
+                continue
 
             SampleLPNList = get_lpn_list(sampleInfo, args.mc)
 

@@ -22,18 +22,18 @@ class TestStdPhotons(unittest.TestCase):
         # verify that we load only the list-creating modules
         # the beam background MVA information is added to the photon lists by default
         self.assertEqual(
-            len(testpath.modules()), len(expected_lists) + 1,
+            len(testpath.modules()), len(set(expected_lists)) + 2 if listtype == 'all' else len(set(expected_lists)) + 4,
             "List %s doesn't work with function %s" % (listtype, std_function.__name__))
         self.assertTrue(all((module.type() == "ParticleLoader") or (module.type() == "ParticleListManipulator")
-                            or (module.type() == "MVAExpert")
+                            or (module.type() == "ParticleSelector") or (module.type() == "MVAExpert")
                             for module in testpath.modules()))
 
         #
         built_list = []
         for module in testpath.modules():
             for param in module.available_params():
-                if param.name == 'decayStringsWithCuts':
-                    name = param.values[0][0].split(':')[1]
+                if param.name == 'decayStrings':
+                    name = param.values[0].split(':')[1]
                     built_list.append(name)
                 if param.name == 'outputListName':
                     name = str(param.values).split(':')[1]
@@ -66,7 +66,7 @@ class TestStdPhotons(unittest.TestCase):
     def test_default_list_works(self):
         """Check that the default list type (loose) works."""
         # basically a duplicate of test_loose_list
-        self._check_list(expected_lists=["cdc", "loose"])
+        self._check_list(expected_lists=["cdc", "cdc", "loose"])
 
     def test_all_list(self):
         """check that the builder function works with the all list"""
@@ -78,43 +78,43 @@ class TestStdPhotons(unittest.TestCase):
 
     def test_loose_list(self):
         """check that the builder function works with the loose list"""
-        self._check_list("loose", expected_lists=["cdc", "loose"])
+        self._check_list("loose", expected_lists=["cdc", "cdc", "loose"])
 
     def test_default_list(self):
         """check that the builder function works with the default (loose) list"""
-        self._check_list(expected_lists=["cdc", "loose"])
+        self._check_list(expected_lists=["cdc", "cdc", "loose"])
 
     def test_tight_list(self):
         """check that the builder function works with the tight list"""
-        self._check_list("tight", expected_lists=["cdc", "loose", "tight"])
+        self._check_list("tight", expected_lists=["cdc", "cdc", "loose", "tight"])
 
-    def test_pi0eff60_Jan2020_list(self):
-        """check that the builder function works with the pi0eff60_Jan2020 list"""
-        self._check_list("pi0eff60_Jan2020", expected_lists=["pi0eff60_Jan2020"])
+    def test_pi0eff60_May2020_list(self):
+        """check that the builder function works with the pi0eff60_May2020 list"""
+        self._check_list("pi0eff60_May2020", expected_lists=["pi0eff60_May2020"])
 
-    def test_pi0eff50_Jan2020_list(self):
-        """check that the builder function works with the pi0eff50_Jan2020 list"""
-        self._check_list("pi0eff50_Jan2020", expected_lists=["pi0eff50_Jan2020"])
+    def test_pi0eff50_May2020_list(self):
+        """check that the builder function works with the pi0eff50_May2020 list"""
+        self._check_list("pi0eff50_May2020", expected_lists=["pi0eff50_May2020"])
 
-    def test_pi0eff40_Jan2020_list(self):
-        """check that the builder function works with the pi0eff40_Jan2020 list"""
-        self._check_list("pi0eff40_Jan2020", expected_lists=["pi0eff40_Jan2020"])
+    def test_pi0eff40_May2020_list(self):
+        """check that the builder function works with the pi0eff40_May2020 list"""
+        self._check_list("pi0eff40_May2020", expected_lists=["pi0eff40_May2020"])
 
-    def test_pi0eff30_Jan2020_list(self):
-        """check that the builder function works with the pi0eff30_Jan2020 list"""
-        self._check_list("pi0eff30_Jan2020", expected_lists=["pi0eff30_Jan2020"])
+    def test_pi0eff30_May2020_list(self):
+        """check that the builder function works with the pi0eff30_May2020 list"""
+        self._check_list("pi0eff30_May2020", expected_lists=["pi0eff30_May2020"])
 
-    def test_pi0eff20_Jan2020_list(self):
-        """check that the builder function works with the pi0eff20_Jan2020 list"""
-        self._check_list("pi0eff20_Jan2020", expected_lists=["pi0eff20_Jan2020"])
+    def test_pi0eff20_May2020_list(self):
+        """check that the builder function works with the pi0eff20_May2020 list"""
+        self._check_list("pi0eff20_May2020", expected_lists=["pi0eff20_May2020"])
 
-    def test_pi0eff10_Jan2020_list(self):
-        """check that the builder function works with the pi0eff10_Jan2020 list"""
-        self._check_list("pi0eff10_Jan2020", expected_lists=["pi0eff10_Jan2020"])
+    def test_pi0eff10_May2020_list(self):
+        """check that the builder function works with the pi0eff10_May2020 list"""
+        self._check_list("pi0eff10_May2020", expected_lists=["pi0eff10_May2020"])
 
     def test_skim(self):
         """check that the builder function works with the skim list"""
-        self._check_list("skim", std_function=stdPhotons.loadStdSkimPhoton, expected_lists=["cdc", "loose", "skim"])
+        self._check_list("skim", std_function=stdPhotons.loadStdSkimPhoton, expected_lists=["cdc", "cdc", "loose", "skim"])
 
     def test_belle(self):
         """check that the builder function works with the belle list"""

@@ -310,12 +310,6 @@ namespace Belle2 {
     double fEEclD2[kPTrk][kEEcl + 1] = {0.0};     /**< Second derivatives of ECL energy pdf */
     double fEEclD3[kPTrk][kEEcl + 1] = {0.0};     /**< Third derivatives of ECL energy pdf */
 
-    // private member functions
-    /** Generate the spline interpolation coefficients to smooth out a
-     *  binned histogram.
-     */
-    void spline(int, double, double*, double*, double*, double*);
-
   };
 
 } // namespace Belle

@@ -2,29 +2,24 @@ import os
 
 Import('env')
 
-#env['LIBS'] = ['framework', 'daq', "RHTTP", "ca", "RooFit", "RooFitCore"]
-#env['LIBS'] = ['framework', 'daq', "RHTTP", "RooFit", "RooFitCore"]
-env['LIBS'] = ['framework', 'daq', 'RooFit', 'RooFitCore', 'vxd',
-               'boost_regex', 'arich',
-               'klm_dataobjects', 'klm_dbobjects',
-               'dqm_dataobjects', 'svd_dataobjects', 'vxd_dataobjects',
-	       'cdc_dataobjects','cdc']
+env['LIBS'] = ['framework', 'daq', 'boost_regex',
+               'arich', 'cdc', 'dqm_dataobjects',
+	       'klm_dataobjects', 'klm_dbobjects', 
+	       'svd_dataobjects',
+               'RooFit', 'RooFitCore', 'ca', 'Com']
 
-option = os.environ['BELLE2_OPTION']
-# disable EPICS if clang compiled
-if option != 'clang':
-    env['EPICS_BASE']=os.environ['EPICS_BASE']
-    env['EPICS_HOST_ARCH']=os.environ['EPICS_HOST_ARCH']
+# this check is not completely save if new options are added with clang
+if os.environ['BELLE2_OPTION'] == 'clang':
+    env.Append(CPPPATH=['$EPICS_BASE/include/compiler/clang'])
+else:
+    env.Append(CPPPATH=['$EPICS_BASE/include/compiler/gcc'])
 
-    env.Append( CPPDEFINES=['_BELLE2_EPICS'])
-    env.Append( CPPPATH=['$EPICS_BASE/include'] )
-    env.Append( CPPPATH=['$EPICS_BASE/include/os/Linux'] )
+env['EPICS_BASE'] = os.environ['EPICS_BASE']
+env['EPICS_HOST_ARCH'] = os.environ['EPICS_HOST_ARCH']
 
-    env.Append( CPPPATH=['$EPICS_BASE/include/compiler/gcc'] )
-    # here would like to switch to clang, but for now we dont have include files installed
-    # env.Append( CPPPATH=['$EPICS_BASE/include/compiler/clang'] )
-
-    env.Append( LIBPATH=['$EPICS_BASE/lib/$EPICS_HOST_ARCH'])
-    env.Append( LIBS=['ca', 'Com'])
+env.Append(CPPDEFINES=['_BELLE2_EPICS'])
+env.Append(CPPPATH=['$EPICS_BASE/include'])
+env.Append(CPPPATH=['$EPICS_BASE/include/os/Linux'])
+env.Append(LIBPATH=['$EPICS_BASE/lib/$EPICS_HOST_ARCH'])
 
 Return('env')

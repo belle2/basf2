@@ -35,16 +35,19 @@ namespace Belle2 {
 
       //! Constructor / Destructor
       PXDReadRawONSENModule();
+      //! Destructor
       ~PXDReadRawONSENModule();
 
 
     private:
 
-      //! Module functions to be called from main process
+      //! Initialize
       void initialize() override final;
 
-      //! Module functions to be called from event process
+      //! Event
       void event() override final;
+
+      //! Terminate
       void terminate() override final;
 
 

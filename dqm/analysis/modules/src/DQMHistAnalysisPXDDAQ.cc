@@ -62,8 +62,8 @@ void DQMHistAnalysisPXDDAQModule::initialize()
   m_monObj->addCanvas(m_cMissingDHP);
   m_monObj->addCanvas(m_cStatistic);
 
-  m_hMissingDHC = new TH2F("hPXDMissingDHC", "hPXDMissingDHC", 16, 0, 16, 2, 0, 2);
-  m_hMissingDHE = new TH2F("hPXDMissingDHE", "hPXDMissingDHE", 64, 0, 64, 2, 0, 2);
+  m_hMissingDHC = new TH2F("hPXDMissingDHC", "PXD Missing DHC", 16, 0, 16, 2, 0, 2);
+  m_hMissingDHE = new TH2F("hPXDMissingDHE", "PXD Missing DHE", 64, 0, 64, 2, 0, 2);
 
 #ifdef _BELLE2_EPICS
   mychid.resize(20);

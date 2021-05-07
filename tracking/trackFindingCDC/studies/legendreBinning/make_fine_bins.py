@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from ROOT import Belle2  # make Belle2 namespace available
+from ROOT import Belle2  # make Belle2 namespace available # noqa
 from ROOT.Belle2 import TrackFindingCDC as TFCDC
 
 

@@ -521,3 +521,52 @@ bool V0Fitter::removeInnerHits(RecoTrack* origRecoTrack, RecoTrack* recoTrack,
 
   return true;
 }
+
+int V0Fitter::checkSharedInnermostCluster(const RecoTrack* recoTrackPlus, const RecoTrack* recoTrackMinus)
+{
+  int flag = 0; // 1 for sharing 1D-hit, 2 for sharing 2D-hit
+
+  for (auto& recoHitInfoPlus : recoTrackPlus->getRecoHitInformations(true)) {
+    if (not recoHitInfoPlus->useInFit()) continue; // get the innermost hit for plus-daughter
+    for (auto& recoHitInfoMinus : recoTrackMinus->getRecoHitInformations(true)) {
+      if (not recoHitInfoMinus->useInFit()) continue; // get the innermost hit for minus-daughter
+      if (recoHitInfoPlus->getTrackingDetector() == recoHitInfoMinus->getTrackingDetector()) {
+        if (recoHitInfoPlus->getTrackingDetector() == RecoHitInformation::c_PXD) {
+          const PXDCluster* clusterPlus = recoHitInfoPlus->getRelatedTo<PXDCluster>();
+          const PXDCluster* clusterMinus = recoHitInfoMinus->getRelatedTo<PXDCluster>();
+          if (clusterPlus == clusterMinus) { // if they share a same PXDCluster, set the flag
+            flag = 2; // PXD cluster is a 2D-hit
+            break;
+          }
+        } else if (recoHitInfoPlus->getTrackingDetector() == RecoHitInformation::c_SVD) {
+          const SVDCluster* clusterPlus = recoHitInfoPlus->getRelatedTo<SVDCluster>();
+          const SVDCluster* clusterMinus = recoHitInfoMinus->getRelatedTo<SVDCluster>();
+          if (clusterPlus == clusterMinus) {
+            /// if the innermost hit is a SVD U-hit and shared, check the next hit (SVD V-hit as the pair) in addition
+            ///    note: for the SVD pair hits, U-hit should be first and the V-hit the next in the sorted RecoHitInformation array.
+            if (clusterPlus->isUCluster()) {
+              const auto& recoHitInfoNextPlus  = ++recoHitInfoPlus;
+              const auto& recoHitInfoNextMinus = ++recoHitInfoMinus;
+              if (recoHitInfoNextPlus->useInFit() && recoHitInfoNextMinus->useInFit()  // this should be satisfied by default
+                  && recoHitInfoNextPlus->getTrackingDetector() == recoHitInfoNextMinus->getTrackingDetector()
+                  && recoHitInfoNextPlus->getTrackingDetector() == RecoHitInformation::c_SVD) {
+                const SVDCluster* clusterPlusV = recoHitInfoNextPlus->getRelatedTo<SVDCluster>();
+                const SVDCluster* clusterMinusV = recoHitInfoNextMinus->getRelatedTo<SVDCluster>();
+                if (clusterPlus->getSensorID() == clusterPlusV->getSensorID()
+                    && clusterPlusV == clusterMinusV && !(clusterPlusV->isUCluster())) {
+                  flag = 2; // SVD U- and V-cluster gives 2D-hit information
+                  break;
+                }
+              }
+            }
+            flag = 1; // share SVD U/V-cluster only, 1D-hit
+            break;
+          }
+        } else break;
+      }
+    }
+    break;
+  }
+  return flag;
+
+}

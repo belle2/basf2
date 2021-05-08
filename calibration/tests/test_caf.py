@@ -36,10 +36,17 @@ with b2test_utils.clean_working_directory():
     try:
         subprocess.check_call(['b2caf-prompt-run', 'Local', 'config.json', 'input_files.json', '--heartbeat', '20'])
     except subprocess.CalledProcessError as e:
-        log_name = basf2.find_file('calibration_results/KLMChannelStatus/0/collector_output/raw/0/stdout', '', True)
-        if log_name:
-            with open(log_name) as log_file:
-                basf2.B2ERROR('Calibration failed, here is the log of the first collector job.')
-                print(log_file.read())
+        # In case of failure, prints the stdout...
+        out_name = basf2.find_file('calibration_results/KLMChannelStatus/0/collector_output/raw/0/stdout', '', True)
+        if out_name:
+            with open(out_name) as out_file:
+                basf2.B2ERROR('Calibration failed, here is the stdout of the first collector job.')
+                print(out_file.read())
+        # ... and the stderr.
+        err_name = basf2.find_file('calibration_results/KLMChannelStatus/0/collector_output/raw/0/stderr', '', True)
+        if err_name:
+            with open(err_name) as err_file:
+                basf2.B2ERROR('Calibration failed, here is the stderr of the first collector job.')
+                print(err_file.read())
         basf2.B2FATAL(
             f'The test failed because an exception was raised ({e}). Please re-run the build if this failure happened on bamboo.')

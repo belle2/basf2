@@ -822,6 +822,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
       double beamEnergy = T.getCMSEnergy() / 2.;
+      if (part->getNDaughters() != 2) return std::numeric_limits<double>::quiet_NaN();
       TLorentzVector tagVec = T.rotateLabToCms()
                               * part->getDaughter(0)->get4Vector();
       TLorentzVector sigVec = T.rotateLabToCms()

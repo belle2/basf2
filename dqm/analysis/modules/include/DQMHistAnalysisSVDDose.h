@@ -71,7 +71,7 @@ namespace Belle2 {
     void event() override final;
     void endRun() override final;
 
-    void updateCanvases();
+    void updateCanvases(); /**< updated canvas */
 
     /** Utility method */
     template<typename T>

@@ -262,6 +262,7 @@ namespace Belle2 {
 
       auto func = [detectorSet](const Particle * part) -> int {
         const PIDLikelihood* pid = part->getPIDLikelihood();
+        if (!pid) return std::numeric_limits<double>::quiet_NaN();
         if (not pid->isAvailable(detectorSet))
           return 1;
         else return 0;

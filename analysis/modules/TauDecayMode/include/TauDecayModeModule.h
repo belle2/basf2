@@ -110,12 +110,14 @@ namespace Belle2 {
       22//gamma
     };
 
-    // ** Flag for eta->pi0pi0pi0 decays
+    /** Flag for eta->pi0pi0pi0 decays from tau- */
     bool m_isEtaPizPizPizFromTauMinus;
+    /** Flag for eta->pi0pi0pi0 decays from tau+ */
     bool m_isEtaPizPizPizFromTauPlus;
 
-    // ** Flag for omega->pi-pi+ decays
+    /** Flag for omega->pi-pi+ decays from tau- */
     bool m_isOmegaPimPipFromTauMinus;
+    /** Flag for omega->pi-pi+ decays from tau+ */
     bool m_isOmegaPimPipFromTauPlus;
 
     //
@@ -171,7 +173,7 @@ namespace Belle2 {
     /** Analyze a generated tau pair event */
     void AnalyzeTauPairEvent();
     /** Classifies the decays of the event and assigns a decay mode */
-    int TauolaBelle2DecayMode(std::string s, int chg);
+    int TauolaBelle2DecayMode(const std::string& s, int chg);
     /** Identifies particles coming from tau decays */
     int getRecursiveMotherCharge(const MCParticle* mc);
     /** Identifies if the event is a generated tau pair */

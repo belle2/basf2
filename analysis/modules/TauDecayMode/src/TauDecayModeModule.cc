@@ -62,7 +62,9 @@ REG_MODULE(TauDecayMode)
 //-----------------------------------------------------------------
 
 TauDecayModeModule::TauDecayModeModule() : Module() , m_taum_no(0), m_taup_no(0), m_mmode(-2), m_pmode(-2),
-  m_mprong(0), m_pprong(0), tauPair(false), numOfTauMinus(0), numOfTauPlus(0), idOfTauMinus(-1), idOfTauPlus(-1)
+  m_mprong(0), m_pprong(0), tauPair(false), numOfTauMinus(0), numOfTauPlus(0), idOfTauMinus(-1), idOfTauPlus(-1),
+  m_isEtaPizPizPizFromTauMinus(false), m_isEtaPizPizPizFromTauPlus(false),
+  m_isOmegaPimPipFromTauMinus(false), m_isOmegaPimPipFromTauPlus(false)
 {
   // Set module properties
   setDescription("Module to identify generated tau pair decays, using MCParticle information."
@@ -710,7 +712,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
 }
 
 //
-int TauDecayModeModule::TauolaBelle2DecayMode(std::string state, int chg)
+int TauDecayModeModule::TauolaBelle2DecayMode(const std::string& state, int chg)
 {
   std::map<std::string, int> mode_decay = (chg < 0) ? mode_decay_minus : mode_decay_plus;
   map<std::string, int>::iterator itr ;

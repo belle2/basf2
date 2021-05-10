@@ -3041,7 +3041,7 @@ def labelTauPairMC(printDecayInfo=False, path=None, TauolaBelle=False, mapping_m
     @param path:        module is added to this path
     @param TauolaBelle: if False, TauDecayMarker is set. If True, TauDecayMode is set.
     @param mapping_minus: if None, the map is the default one, else the path for the map is given by the user for tau-
-    @param mapping_plus: if None, the map is the default one, else the path for the map is given by the user for tau-
+    @param mapping_plus: if None, the map is the default one, else the path for the map is given by the user for tau+
     """
     from basf2 import find_file
     if not TauolaBelle:
@@ -3064,9 +3064,6 @@ def labelTauPairMC(printDecayInfo=False, path=None, TauolaBelle=False, mapping_m
         else:
             mp_file_plus = mapping_plus
 
-        TauDecayMode.param('printmode', m_printmode)
-        TauDecayMode.param('file_minus', mp_file_minus)
-        TauDecayMode.param('file_plus', mp_file_plus)
         path.add_module('TauDecayMode', printmode=m_printmode, file_minus=mp_file_minus, file_plus=mp_file_plus)
 
     else:

@@ -279,13 +279,13 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
 
     int pdgid = p.getPDG();
 
-    if (pdgid == -130) pdgid = 130; // Strange feature in TauolaBelle2
+    if (pdgid == -Const::Klong.getPDGCode()) pdgid = Const::Klong.getPDGCode(); // Strange feature in TauolaBelle2
 
     if (!p.hasStatus(MCParticle::c_PrimaryParticle))
       continue; // only consider particles coming from generator, e.g. discard particles added by Geant4
     if (p.isInitial()) continue; // pick e-  e+, but not from the incoming beams
 
-    if (pdgid == 11 && elecFirst)  {
+    if (pdgid == Const::electron.getPDGCode() && elecFirst)  {
       elecFirst = false;
       const MCParticle* mother = p.getMother();
       const vector<MCParticle*> daughters = mother->getDaughters();
@@ -295,15 +295,15 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
       for (MCParticle* d : daughters) {
         if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
         elec_ss <<  d->getPDG() << " ";
-        if (d->getPDG() == 11) nElMinus++;
-        if (d->getPDG() == -11) nElPlus++;
+        if (d->getPDG() == Const::electron.getPDGCode()) nElMinus++;
+        if (d->getPDG() == -Const::electron.getPDGCode()) nElPlus++;
       }
       if (nElMinus == 1 && nElPlus == 1) { // use this information in getRecursiveMotherCharge
         B2DEBUG(1, "Mother of elec pair is = " << mother->getPDG() << " which has daughters : " << elec_ss.str());
       }
     }
 
-    if (pdgid == 13 && muonFirst)  {
+    if (pdgid == Const::muon.getPDGCode() && muonFirst)  {
       muonFirst = false;
       const MCParticle* mother = p.getMother();
       const vector<MCParticle*> daughters = mother->getDaughters();
@@ -313,8 +313,8 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
       for (MCParticle* d : daughters) {
         if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
         muon_ss <<  d->getPDG() << " ";
-        if (d->getPDG() == 13) nMuMinus++;
-        if (d->getPDG() == -13) nMuPlus++;
+        if (d->getPDG() == Const::muon.getPDGCode()) nMuMinus++;
+        if (d->getPDG() == -Const::muon.getPDGCode()) nMuPlus++;
       }
       if (nMuMinus == 1 && nMuPlus == 1) { // use this information in getRecursiveMotherCharge
         B2DEBUG(1, "Mother of muon pair is = " << mother->getPDG() << " which has daughters : " << muon_ss.str());
@@ -323,7 +323,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
 
     // Special treatment for photons
     bool accept_photon = false;
-    if (pdgid == 22)  {
+    if (pdgid == Const::photon.getPDGCode())  {
       const MCParticle* mother = p.getMother();
       int mothid = abs(mother->getPDG());
 

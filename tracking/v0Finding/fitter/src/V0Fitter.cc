@@ -164,10 +164,15 @@ double V0Fitter::getBzAtVertex(const TVector3& vertexPosition)
 
 TrackFitResult* V0Fitter::buildTrackFitResult(const genfit::Track& track, const RecoTrack* recoTrack,
                                               const genfit::MeasuredStateOnPlane& msop, const double Bz,
-                                              const Const::ParticleType& trackHypothesis)
+                                              const Const::ParticleType& trackHypothesis,
+                                              const int sharedInnermostCluster)
 {
   const uint64_t hitPatternCDCInitializer = TrackBuilder::getHitPatternCDCInitializer(*recoTrack);
-  const uint32_t hitPatternVXDInitializer = TrackBuilder::getHitPatternVXDInitializer(*recoTrack);
+  uint32_t hitPatternVXDInitializer = TrackBuilder::getHitPatternVXDInitializer(*recoTrack);
+
+  // If innermost hit is shared between daoughters, assign flag in the infoLayer.
+  if (sharedInnermostCluster == 1 || sharedInnermostCluster == 2)
+    hitPatternVXDInitializer += sharedInnermostCluster << 24;
 
   TrackFitResult* v0TrackFitResult
     = m_trackFitResults.appendNew(msop.getPos(), msop.getMom(),
@@ -413,8 +418,12 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
     const TVector3 origin(0, 0, 0);
     const double Bz = getBzAtVertex(origin);
 
-    TrackFitResult* tfrPlusVtx =  buildTrackFitResult(gfTrackPlus, recoTrackPlus, stPlus,  Bz, trackHypotheses.first);
-    TrackFitResult* tfrMinusVtx = buildTrackFitResult(gfTrackMinus, recoTrackMinus, stMinus, Bz, trackHypotheses.second);
+    int sharedInnermostCluster = checkSharedInnermostCluster(recoTrackPlus, recoTrackMinus);
+
+    TrackFitResult* tfrPlusVtx =  buildTrackFitResult(gfTrackPlus, recoTrackPlus, stPlus,  Bz, trackHypotheses.first,
+                                                      sharedInnermostCluster);
+    TrackFitResult* tfrMinusVtx = buildTrackFitResult(gfTrackMinus, recoTrackMinus, stMinus, Bz, trackHypotheses.second,
+                                                      sharedInnermostCluster);
 
     B2DEBUG(20, "Creating new V0.");
     auto v0 = m_v0s.appendNew(std::make_pair(trackPlus, tfrPlusVtx),
@@ -524,7 +533,7 @@ bool V0Fitter::removeInnerHits(RecoTrack* origRecoTrack, RecoTrack* recoTrack,
 
 int V0Fitter::checkSharedInnermostCluster(const RecoTrack* recoTrackPlus, const RecoTrack* recoTrackMinus)
 {
-  int flag = 0; // 1 for sharing 1D-hit, 2 for sharing 2D-hit
+  int flag = 0; // 1 for sharing 1D-hit, 2 for sharing 2D-hit. -1 for exception.
 
   // get the innermost hit for plus/minus-daughter
   const std::vector<RecoHitInformation*>& recoHitInformationsPlus  = recoTrackPlus->getRecoHitInformations(
@@ -538,7 +547,7 @@ int V0Fitter::checkSharedInnermostCluster(const RecoTrack* recoTrackPlus, const 
     if (recoHitInformationsMinus[iInnermostHitMinus]->useInFit()) break;
   if (iInnermostHitPlus == recoHitInformationsPlus.size() || iInnermostHitMinus == recoHitInformationsMinus.size()) {
     B2WARNING("checkSharedInnermostCluster function called for recoTrack including no hit used for fit! This should not happen!");
-    return 0;
+    return -1;
   }
   const auto& recoHitInfoPlus  = recoHitInformationsPlus[iInnermostHitPlus];
   const auto& recoHitInfoMinus = recoHitInformationsMinus[iInnermostHitMinus];
@@ -572,8 +581,17 @@ int V0Fitter::checkSharedInnermostCluster(const RecoTrack* recoTrackPlus, const 
             } else if (clusterPlus == clusterMinus || clusterNextPlus == clusterNextMinus) {
               flag = 1; // SVD U- or V-cluster gives 1D-hit information
             }
+          } else {
+            B2WARNING("SVD cluster to be paired is not on V-side, or not on the same sensor.");
+            return -1;
           }
+        } else {
+          B2WARNING("No SVD cluster to be paired.");
+          return -1;
         }
+      } else {
+        B2WARNING("No SVD U-cluster in the innermost cluster.");
+        return -1;
       }
     }
   }

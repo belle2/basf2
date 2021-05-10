@@ -3046,9 +3046,6 @@ def labelTauPairMC(printDecayInfo=False, path=None, TauolaBelle=False, mapping_m
     from basf2 import find_file
     if not TauolaBelle:
 
-        TauDecayMode = register_module('TauDecayMode')
-        TauDecayMode.set_name('TauDecayMode_')
-
         if printDecayInfo:
             m_printmode = 'all'
         else:

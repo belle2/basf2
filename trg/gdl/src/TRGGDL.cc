@@ -129,9 +129,9 @@ namespace Belle2 {
       _offset(15.3),
       _isb(0),
       _osb(0),
-      _algFromDB(algFromDB),
       _timquality_threshold_sfin(timquality_threshold_sfin),
-      _timquality_threshold_fine(timquality_threshold_fine)
+      _timquality_threshold_fine(timquality_threshold_fine),
+      _algFromDB(algFromDB)
   {
 
     if (TRGDebug::level()) {

@@ -10,7 +10,7 @@ Systematics skims
 Using ``SystematicsCombined`` skims
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The `SystematicsCombinedHadronic` and `SystematicsCombinedLowMulti` skims are a bit special, as they contain events passing a logical ``OR`` of individual skim classes, and no pre-defined `ParticleList`_ s.
+The `SystematicsCombinedHadronic` and `SystematicsCombinedLowMulti` skims are a bit special, as they contain events passing a logical ``OR`` of individual skim classes, and no pre-defined `particle lists <ParticleList>`.
 In order to select events of a given skim class in the combination, one has to filter events based on the desired flag first (eg. ``SystematicsKshort``) via :py:func:`modularAnalysis.applyEventCuts`, like in the following example:
 
 .. code-block:: python

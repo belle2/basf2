@@ -3032,7 +3032,7 @@ def buildEventShape(inputListNames=None,
     path.add_module(eventShapeModule)
 
 
-def labelTauPairMC(printDecayInfo=False, path=None, TauolaBelle=False, mapping=None):
+def labelTauPairMC(printDecayInfo=False, path=None, TauolaBelle=False, mapping_minus=None, mapping_plus=None):
     """
     Search tau leptons into the MC information of the event. If confirms it's a generated tau pair decay,
     labels the decay generated of the positive and negative leptons using the ID of KKMC tau decay table.
@@ -3040,17 +3040,34 @@ def labelTauPairMC(printDecayInfo=False, path=None, TauolaBelle=False, mapping=N
     @param printDecayInfo:  If true, prints ID and prong of each tau lepton in the event.
     @param path:        module is added to this path
     @param TauolaBelle: if False, TauDecayMarker is set. If True, TauDecayMode is set.
-    @param mapping: if None, the map is the default one, else the path for the map is given by the user.
+    @param mapping_minus: if None, the map is the default one, else the path for the map is given by the user for tau-
+    @param mapping_plus: if None, the map is the default one, else the path for the map is given by the user for tau-
     """
     from basf2 import find_file
     if not TauolaBelle:
+
         TauDecayMode = register_module('TauDecayMode')
-        if mapping is None:
-            mp_file = find_file('data/analysis/modules/TauDecayMode/map_tau_vf.txt')
-            TauDecayMode.param('file', mp_file)
-            path.add_module('TauDecayMode', file=mp_file)
+        TauDecayMode.set_name('TauDecayMode_')
+
+        if printDecayInfo:
+            m_printmode = 'all'
         else:
-            path.add_module('TauDecayMode', file=mapping)
+            m_printmode = 'default'
+
+        if mapping_minus is None:
+            mp_file_minus = find_file('data/analysis/modules/TauDecayMode/map_tauminus.txt')
+        else:
+            mp_file_minus = mapping_minus
+
+        if mapping_plus is None:
+            mp_file_plus = find_file('data/analysis/modules/TauDecayMode/map_tauplus.txt')
+        else:
+            mp_file_plus = mapping_plus
+
+        TauDecayMode.param('printmode', m_printmode)
+        TauDecayMode.param('file_minus', mp_file_minus)
+        TauDecayMode.param('file_plus', mp_file_plus)
+        path.add_module('TauDecayMode', printmode=m_printmode, file_minus=mp_file_minus, file_plus=mp_file_plus)
 
     else:
         tauDecayMarker = register_module('TauDecayMarker')

@@ -38,13 +38,13 @@ from basf2.utils import pretty_print_table
 from terminal_utils import Pager
 from dateutil.parser import parse as parse_date
 from getpass import getuser
-from . import ConditionsDB, enable_debugging, encode_name, PayloadInformation
-from .cli_utils import ItemFilter
+from conditions_db import ConditionsDB, enable_debugging, encode_name, PayloadInformation
+from conditions_db.cli_utils import ItemFilter
 # the command_* functions are imported but not used so disable warning about
 # this if pylama/pylint is used to check
-from .cli_upload import command_upload  # noqa
-from .cli_download import command_download, command_legacydownload  # noqa
-from .cli_management import command_tag_merge, command_tag_runningupdate  # noqa
+from conditions_db.cli_upload import command_upload  # noqa
+from conditions_db.cli_download import command_download, command_legacydownload  # noqa
+from conditions_db.cli_management import command_tag_merge, command_tag_runningupdate  # noqa
 
 
 def escape_ctrl_chars(name):

@@ -502,7 +502,7 @@ if __name__ == '__main__':
         graphics.add(image, width=0.49)
     o += graphics.finish()
 
-    from . import format
+    from B2Tools import format
     o += Section("Format section e.g. " + format.decayDescriptor("B+ ==> mu+ nu gamma"))
     o += r"Some important channels in B physics"
     items = Itemize()

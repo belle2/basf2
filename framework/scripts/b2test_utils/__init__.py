@@ -18,7 +18,7 @@ import multiprocessing
 import basf2
 import subprocess
 import re
-from . import logfilter
+from b2test_utils import logfilter
 
 
 def skip_test(reason, py_case=None):

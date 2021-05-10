@@ -209,8 +209,9 @@ def add_simulation(
         klm_digitizer = b2.register_module('KLMDigitizer')
         path.add_module(klm_digitizer)
 
-    # TO DO:
-    # add BG Overlay for: KLM, ECL, ARICH, TOP, CDC
+    # add BG Overlay for CDC, TOP, ARICH and KLM (for ECL it's already added in ECLDigitizer)
+    if bkgfiles is not None and bkgOverlay:
+        path.add_module('BGOverlayExecutor', components=['CDC', 'TOP', 'ARICH', 'KLM'])
 
     # TO DO: L1 TRIGGER simulation
     # !!! DO NOT UNCOMMENT !!!
@@ -240,11 +241,10 @@ def add_simulation(
             roi_condition_module_Sim.if_true(path_enableROI_Sim, b2.AfterConditionPath.CONTINUE)
             roi_condition_module_Sim.if_false(path_disableROI_Sim, b2.AfterConditionPath.CONTINUE)
 
-    # background overlay executor - after all digitizers
-    # TO DO: overlay ONLY for PXD and SVD
+    # add BG overlay for PXD and SVD
     if bkgfiles is not None and bkgOverlay:
         if forceSetPXDDataReduction:
-            path.add_module('BGOverlayExecutor', PXDDigitsName=pxd_digits_name)
+            path.add_module('BGOverlayExecutor', components=['PXD', 'SVD'], PXDDigitsName=pxd_digits_name)
 
             if components is None or 'PXD' in components:
                 path.add_module("PXDDigitSorter", digits=pxd_digits_name)
@@ -256,13 +256,13 @@ def add_simulation(
             path_disableROI_Bkg = b2.create_path()
             path_enableROI_Bkg = b2.create_path()
 
-            path_disableROI_Bkg.add_module('BGOverlayExecutor', PXDDigitsName='PXDDigits')
+            path_disableROI_Bkg.add_module('BGOverlayExecutor', components=['PXD', 'SVD'], PXDDigitsName='PXDDigits')
             if components is None or 'PXD' in components:
                 path_disableROI_Bkg.add_module("PXDDigitSorter", digits='PXDDigits')
             if components is None or 'SVD' in components:
                 path_disableROI_Bkg.add_module("SVDShaperDigitSorter")
 
-            path_enableROI_Bkg.add_module('BGOverlayExecutor', PXDDigitsName='pxd_unfiltered_digits')
+            path_enableROI_Bkg.add_module('BGOverlayExecutor', components=['PXD', 'SVD'], PXDDigitsName='pxd_unfiltered_digits')
             if components is None or 'PXD' in components:
                 path_enableROI_Bkg.add_module("PXDDigitSorter", digits='pxd_unfiltered_digits')
             if components is None or 'SVD' in components:

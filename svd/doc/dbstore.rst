@@ -79,6 +79,8 @@ Check `MaskedStrips@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDFADCMasked
 Detector Configuration
 ----------------------
 
+.. _svdglobalconfig:
+
 .. cpp:class:: SVDGlobalConfigParameters
 
 	       Stores the detector configuration for the Belle2 run, with detector granularity_
@@ -118,6 +120,8 @@ The ``SVDClusterCalibrations`` wrapper contains both ``SVDClusterCuts`` and ``SV
 	       
 	       wrapper with the strip occupancy averaged over a run, strip granularity_
 
+.. _svdhotstrips:
+
 .. cpp:class:: SVDHotStripsCalibrations
 
 	       wrapper with the hot strips as determined by ``SVDHotStripFinder``, strip granularity_
@@ -126,7 +130,7 @@ The ``SVDClusterCalibrations`` wrapper contains both ``SVDClusterCuts`` and ``SV
 Time Calibrations
 -----------------
 
-.. _svdcog6time:
+.. _svdcog6timecal:
 
 .. cpp:class:: SVDCoGTimeCalibrations
 
@@ -135,7 +139,7 @@ Time Calibrations
 Check `CoG6Time@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGTimeCalibrations&perpage=25&>`_ all revisions available in the Conditions Database. Revision **203** is used for experiment 0 and 1003, revision **7** correspond to no calibration.
 
 
-.. _svdcog3time:
+.. _svdcog3timecal:
 
 .. cpp:class:: SVD3SampleCoGTimeCalibrations
 
@@ -143,7 +147,7 @@ Check `CoG6Time@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGTimeCalibra
 
 Check `CoG3Time@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVD3SampleCoGTimeCalibrations&perpage=25&>`_ all revisions available in the Conditions Database. Revision **2** is used for experiment 0 and 1003, revision **1** correspond to no calibration.
 
-.. _svdels3time:
+.. _svdels3timecal:
 
 .. cpp:class:: SVD3SampleELSTimeCalibrations
 	       

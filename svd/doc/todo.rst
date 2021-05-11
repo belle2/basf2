@@ -3,10 +3,6 @@
 Documentation To Do List
 ------------------------
 
-#. add documentation to functions in svd/scripts/svd/__init__ and the other utils
-
-#. add brief description of the simulation
-
 #. check module and parameters description reading from sphinx
 
 #. calibration

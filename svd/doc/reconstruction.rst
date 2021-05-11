@@ -3,7 +3,7 @@
 SVD Reconstruction
 ==================
 
-The SVD reconstruction starts with :ref:`SVDShaperDigits<svdshapers>` and :ref:`SVDEventInfo<svdeventinfo>`, :ref:`SVDClusteras<svdclusters>` are created on both sides of the sensors and then combined into :ref:`SVDSpacePoints<svdsps>`.
+The SVD reconstruction starts with :ref:`SVDShaperDigits<svdshapers>` and :ref:`SVDEventInfo<svdeventinfo>`, :ref:`SVDClusters<svdclusters>` are created on both sides of the sensors and then combined into :ref:`SVDSpacePoints<svdsps>`.
 
 Several algorithms are available for cluster charge, time and position reconstruction, and they are specified as parameters of the :b2:mod:`SVDClusterizer` module (``chargeAlgorithm{3/6}Samples``, ``timeAlgorithm{3/6}Samples``, ``positionAlgorithm{3/6}Samples``).
 
@@ -22,7 +22,7 @@ Cluster Charge Reconstruction
 -----------------------------
 The cluster charge is a measurement of the charge released in the sensor by the charged particle, and collected on one side of the sensor.
 
-The **default** algorithm used to compute cluster charge is the ``MaxSample``: the highest strip sample for each strip in the cluster represents the strip charge (in ADC). This value is calibrated using the :ref:`SVDPulseShapeCalibrations<svdpulsecal>` DBObject and converted in :math:`e^{-}` and the cluster charge is evaluated as the sum of the strips charges in :math:`e^{-}`.
+The **default** algorithm used to compute cluster charge is the ``MaxSample``: the highest strip sample for each strip in the cluster represents the strip charge (in ADC). This value is converted in :math:`e^{-}` using the :ref:`SVDPulseShapeCalibrations<svdpulsecal>` DBObject. The cluster charge is computed as the sum of the strips charges in :math:`e^{-}`.
 
 
 We have two alternative algorithms to compute the cluster charge:
@@ -47,7 +47,7 @@ We have two alternative algorithms to compute the cluster charge:
 
    Finally the charge is converted in :math:`e^{-}` with the the :ref:`SVDPulseShapeCalibrations<svdpulsecal>` DBObject.
  
-.. note::
+.. seealso::
 
    All three algorithms are implemented in the ``svd/reconstruction/SVDClusterCharge`` class.
 
@@ -56,7 +56,10 @@ We have two alternative algorithms to compute the cluster charge:
 **The MaxSum Algorithm**:
 
 #. Find the two consecutive samples for which :math:`(a_{i} + a_{i+1})` represents the maximum, where :math:`a_{j}` is the amplitude of j-th sample.
-#. The three chosen samples are: :math:`a_{i-1}, a_{i},  a_{i+1}`, with :math:`i-i = FF`, the first frame.
+
+.. _svdff:
+
+#. The three chosen samples are: :math:`a_{i-1}, a_{i},  a_{i+1}`, with :math:`i-i = FF`, the ``FirstFrame``.
 #. There will be cases in which :math:`i = 0`, in this case the three chosen samples are :math:`a_0 , a_1 , a_2` with :math:`FF=0`.
 
 
@@ -68,24 +71,24 @@ The **default** algorithm used to compute cluster time is the ``CoG6``: the clus
 
 .. math::
 
-   t_{\rm strip}^{\rm raw} = \Delta t \cdot \frac{\sum_{i=0}^{i<6}i a_i}{\sum_{i=0}^{i<6} a_i}.
+   t_{\rm strip}^{\rm raw} = \Delta t \cdot \frac{\sum_{i=0}^{i<6}i\ a_i}{\sum_{i=0}^{i<6} a_i}.
 
 where the :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV readout chip and  :math:`a_{j}` is the amplitude of j-th sample.
 
-The raw strip time is calibrated with a third order polynomial stored in the :ref:`SVDCoGTimeCalibration<svdcog6time>` DBObject.
+The raw strip time is calibrated with a third order polynomial stored in the :ref:`SVDCoGTimeCalibration<svdcog6timecal>` DBObject.
 
 
-We have two alternative algorithms to compute the cluster time. For both, first all strips in the cluster are summed sample by sample, tthen the 3 best consecutive summed-samples are determined using the `MaxSum`_ algorithm.
+We have two alternative algorithms to compute the cluster time. For both, first all strips in the cluster are summed sample by sample, then the 3 best consecutive summed-samples are determined using the `MaxSum`_ algorithm.
 
-#. ``CoG3``: the raw cluster time is the average of the 3 best samples time with the sample charge:
+#. ``CoG3``: the raw cluster time is the average of the 3 best summed-samples time with the sample charge:
 
    .. math::
 
-      t_{\rm cluster}^{\rm raw} = \Delta t \cdot \frac{\sum_{i=0}^{i<3}i a_i}{\sum_{i=0}^{i<3} a_i}.
+      t_{\rm cluster}^{\rm raw} = \Delta t \cdot \frac{\sum_{i=0}^{i<3}i\ a_i}{\sum_{i=0}^{i<3} a_i}.
 
    where the :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV readout chip and  :math:`a_{j}` is the amplitude of j-th summed-sample.
 
-   The raw time is finally calibrated with a third order polynomial stored in the :ref:`SVDCoG3SampleTimeCalibration<svdcog3time>` DBObject.
+   The raw time is finally calibrated with a third order polynomial stored in the :ref:`SVDCoG3SampleTimeCalibration<svdcog3timecal>` DBObject.
 
 #. ``ELS3``: the raw cluster time is computed with a simple system of equations as :math:`t_{\rm raw}` of the theoretical :ref:`CR-RC waveform<svdcrrc>`:
    
@@ -97,12 +100,22 @@ We have two alternative algorithms to compute the cluster time. For both, first 
 
    where :math:`e_{\tau} = e^{- \frac{\Delta t}{\tau}}`, :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV readout chip,  :math:`w = \frac{a_{0}-2 e_{\tau}^{-2} a_{2}}{2a_{0} + e_{\tau}^{-1} a_{1}}` and  :math:`a_{j}` is the amplitude of j-th summed-sample.
 
-   The raw time is finally calibrated with a third order polynomial stored in the  :ref:`SVDELS3SampleTimeCalibration<svdels3time>` DBObject.
+   The raw time is finally calibrated with a third order polynomial stored in the  :ref:`SVDELS3SampleTimeCalibration<svdels3timecal>` DBObject.
  
-.. note::
+.. seealso::
 
    All three algorithms are implemented in the ``svd/reconstruction/SVDClusterTime`` class.
 
+.. note::
+
+   The hit time expressed in the trigger reference :math:`t_{\rm hit}` is:
+
+   .. math::
+
+      t_{\rm hit} = f(t_{\rm raw}) + r_{\rm shift} + \frac{\Delta t}{4} \cdot (3 - TB + 4\ FF)
+   
+   where :math:`f(t_{\rm raw})` is the calibrated time, :math:`r_{\rm shift}` is the relative shift among 3-sample and 6-sample event (= 0 in 6-sample events), :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV readout chip, :math:`TB` is the :ref:`TriggerBin<svdtb>` and :math:`FF` is the :ref:`FirstFrame<svdff>`.
+   
 
 Cluster Position Reconstruction
 -------------------------------
@@ -128,7 +141,7 @@ For more-than-one strip clusters we have two algorithms:
 
   where :math:`p` is the readout pitch,  :math:`x_{\rm head/tail}` (:math:`S_{\rm head/tail}`) are the position (charge) of the two strips at the edge of the cluster and :math:`S_{\rm center}` is the average strip charge after removing the strips at the edge, :math:`S_{\rm center} = \frac{S_{\rm tot} - S_{\rm head} - S_{\rm tail}}{\rm size - 2}` with :math:`S_{\rm tot}` is the total cluster charge.
 
-The available algorithms to determine the strip charge for the position computation are the same available for clusters, strips are considered as one-strip clusters). To choose the strip charge reconstruction algorithm for cluster position computation use the :b2:mod:`SVDClusterizer` parameter ``stripChargeAlgorithm{3/6}Samples``. The **default** algorithm is the ``MaxSample``.
+The available algorithms to determine the strip charge for the position computation are the same available for clusters, strips are considered as one-strip clusters. To choose the strip charge reconstruction algorithm for cluster position computation use the :b2:mod:`SVDClusterizer` parameter ``stripChargeAlgorithm{3/6}Samples``. The **default** algorithm is the ``MaxSample``.
 
 
 In the current **default** reconstruction the ``CoG`` is used for cluster size = 2, and ``AHT`` is used for cluster size > 2.
@@ -136,9 +149,9 @@ In the current **default** reconstruction the ``CoG`` is used for cluster size =
 The ``SVDClusterizer`` supports the following position reconstruction algorithms (that can be passed as string, see the :b2:mod:`SVDClusterizer` parameter ``positionAlgorithm{3/6}Samples`` parameter)
 
 * ``OldDefault``: current default described above
-* ``CoGOnly``: the ``CoG`` is used for all cluster sizes :math:`>=2` (``AHT`` is not used)
+* ``CoGOnly``: the ``CoG`` is used for all cluster sizes :math:`\ge2` (``AHT`` is not used)
 
-.. note::
+.. seealso::
 
    All algorithms are implemented in the ``svd/reconstruction/SVDClusterPosition`` class.
 

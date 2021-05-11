@@ -23,6 +23,21 @@ SVD Utility Functions
 event skim utils
 ----------------
 
+To use these skim modules, first import it:
+
+.. code::
+
+   svd.skim_utils import skimOutRNDTrgModule
+
+then use it:
+
+.. code::
+
+   skimRNDtrg = skimOutRNDTrgModule()
+   main.add_module(skimRNDtrg)
+   emptypath = create_path()  
+   skimRNDtrg.if_false(emptypath)
+
 .. autofunction:: svd.skim_utils.skimOutRNDTrgModule
 
 .. autofunction:: svd.skim_utils.skimSVDBurstEventsModule
@@ -42,6 +57,10 @@ pleas check ``svd/scripts/svd/validation_utils.py``
 
 background overlay utils
 ------------------------
+
+.. note::
+
+   These functions are not part of the official background overlay tools. Use them only if you know what you are doing!
 
 .. autofunction:: svd.overlay_utils.prepare_svd_overlay
 

@@ -56,7 +56,7 @@ class skimOutRNDTrgModule(b2.Module):
 class skimSVDBurstEventsModule(b2.Module):
     """
     returns True if the event is a Burst event (number of strips > max number of strips)
-    use set_nMaxStrips(nMaxStrips) to set the max number of strips iof a non-burst event, default is nMaxStrips=5000
+    use :code:`set_nMaxStrips(nMaxStrips)` to set the max number of strips iof a non-burst event, default is :code:`nMaxStrips=5000`
     """
 
     def __init__(self):
@@ -124,7 +124,7 @@ class skim6SampleEventsPyModule(b2.Module):
 class skimSVDTriggerBinEventsPyModule(b2.Module):
     """
     returns True if TriggerBin of the event is the selected one
-    use set_tb(tb) to set the value of the selected TriggerBin (0,1,2,3)
+    use :code:`set_tb(tb)` to set the value of the selected TriggerBin (0,1,2,3)
     """
 
     def __init__(self):
@@ -190,8 +190,8 @@ class skimFineTRGEventsPyModule(b2.Module):
 
 class skimLowEventT0EventsPyModule(b2.Module):
     """
-    returns True if abs(EventT0) is smaller than a selected value
-    that can be set with set_maxEventT0(evtT0)
+    returns True if :code:`abs(EventT0)` is smaller than a selected value
+    that can be set with :code:`set_maxEventT0(evtT0)`
     """
 
     def __init__(self):

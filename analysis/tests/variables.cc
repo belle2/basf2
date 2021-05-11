@@ -2046,9 +2046,9 @@ namespace {
     const Manager::Var* var_ClusterE_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,2,3,clusterE)");
 
     const Manager::Var* var_ClusterPhi = Manager::Instance().getVariable("grandDaughterDiffOfClusterPhi(0,1,0,0)");
-    const Manager::Var* var_Phi = Manager::Instance().getVariable("grandDaughterDiffOfPhi(0,1,0,0)");
+    const Manager::Var* var_Phi = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,0,0,phi)");
     const Manager::Var* var_ClusterPhi_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOfClusterPhi(0,1,2,3)");
-    const Manager::Var* var_Phi_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOfPhi(0,1,2,3)");
+    const Manager::Var* var_Phi_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,2,3,phi)");
 
     // when no relations are set between the particles and the eclClusters, nan is expected to be returned for the Cluster- vars
     // no problems are supposed to happen for non-Cluster- vars
@@ -3465,14 +3465,11 @@ namespace {
 
     EXPECT_B2FATAL(Manager::Instance().getVariable("mcDaughterDiffOf(0, NOTINT, PDG)"));
 
-
-    // Test mcDaughterDiffOfPhi
-    var = Manager::Instance().getVariable("mcDaughterDiffOfPhi(0, 1)");
+    // Test azimuthal angle as well
+    var = Manager::Instance().getVariable("mcDaughterDiffOf(0, 1, phi)");
     ASSERT_NE(var, nullptr);
     v_test = momentum_2.Vect().DeltaPhi(momentum_1.Vect());
     EXPECT_FLOAT_EQ(var->function(p), v_test);
-
-    EXPECT_B2FATAL(Manager::Instance().getVariable("mcDaughterDiffOfPhi(0, NOTINT)"));
 
   }
 

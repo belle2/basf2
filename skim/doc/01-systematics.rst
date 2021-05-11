@@ -21,7 +21,7 @@ In order to select events of a given skim class in the combination, one has to f
     import variables.collections as vc
     import stdCharged as stdc
 
-    path = b2.create_path()
+    path = b2.Path()
 
     input_file = "/PATH/TO/INPUT/SKIM/FILE.root"
     ma.inputMdst("default", filename=input_file, path=path)
@@ -48,18 +48,20 @@ In order to select events of a given skim class in the combination, one has to f
 
     b2.process(path)
 
-.. note::
+.. only:: not light
 
-    Occasionally, the `SystematicsCombinedHadronic` and `SystematicsCombinedLowMulti` skims are produced in cDST ("rawFormat") format to enable low-level performance studies.
-    In such an occurrence, one has to modify the above code snippet slightly to account for the different input data level and the post-tracking reconstruction:
+    .. note::
 
-    .. code-block:: python
+        Occasionally, the `SystematicsCombinedHadronic` and `SystematicsCombinedLowMulti` skims are produced in cDST ("rawFormat") format to enable low-level performance studies.
+        In such an occurrence, one has to modify the above code snippet slightly to account for the different input data level and the post-tracking reconstruction:
 
-        from reconstruction import prepare_cdst_analysis
+        .. code-block:: python
 
-	path.add_module("RootInput", inputFileName=input_file)
+            from reconstruction import prepare_cdst_analysis
 
-	ma.applyEventCuts("eventExtraInfo(passes_SystematicsKshort)", path=path)
+	    path.add_module("RootInput", inputFileName=input_file)
 
-	# Run the post-tracking reco.
-	prepare_cdst_analysis(path, mc=False) # mc=True if input is MC.
+	    ma.applyEventCuts("eventExtraInfo(passes_SystematicsKshort)", path=path)
+
+	    # Run the post-tracking reco.
+	    prepare_cdst_analysis(path, mc=False) # mc=True if input is MC.

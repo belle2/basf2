@@ -2,7 +2,7 @@ from unittest import TestCase, main
 try:
     from unittest.mock import patch, MagicMock
 except ImportError:
-    from mock import patch, MagicMock
+    from unittest.mock import patch, MagicMock
 
 import datetime
 

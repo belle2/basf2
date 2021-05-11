@@ -189,7 +189,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::prepare()
   registerObject<TH1F>("eventT0", eventT0) ;
 
   auto clusterTimeE0E1diff = new TH1F("clusterTimeE0E1diff",
-                                      ";ECL cluster time of max E photon - ECL cluster time of 2nd max E photon [ns]; number of photon ECL cluster time differences",
+                                      ";ECL cluster time of max E electron - ECL cluster time of 2nd max E electron [ns]; number of electron ECL cluster time differences",
                                       nbins, min_t, max_t) ;
   registerObject<TH1F>("clusterTimeE0E1diff", clusterTimeE0E1diff) ;
 

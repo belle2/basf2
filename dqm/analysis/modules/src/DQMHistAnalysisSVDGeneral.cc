@@ -47,12 +47,10 @@ DQMHistAnalysisSVDGeneralModule::DQMHistAnalysisSVDGeneralModule()
            float(0));
   addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
   addParam("statThreshold", m_statThreshold, "Minimal number of events to compare histograms", int(10000));
-  addParam("timeThreshold", m_timeThreshold, "Acceptable difference between mean of cluster time for present and reference run",
+  addParam("timeThreshold", m_timeThreshold, "Acceptable difference between mean of central peak for present and reference run",
            float(4)); // 4 ns
-  addParam("refMCTP", m_refMCTP, "Mean of Cluster Time from Physics reference run", float(-1.939)); // e14r826
-  addParam("refRCTP", m_refRCTP, "RMS of Cluster Time from Physics reference run", float(15.79)); // e14r826
-  addParam("refMCTC", m_refMCTC, "Mean of Cluster Time from Cosmic reference run", float(6.106)); // e14r1182
-  addParam("refRCTC", m_refRCTC, "RMS of Cluster Time from Cosmic reference run", float(15.77)); // e14r1182
+  addParam("refMCTP", m_refMCTP, "Mean of central peak from Physics reference run", float(-1.226)); // e14r826
+  addParam("refMCTC", m_refMCTC, "Mean of central peak from Cosmic reference run", float(4.938)); // e14r1182
 }
 
 
@@ -330,16 +328,19 @@ void DQMHistAnalysisSVDGeneralModule::event()
   if (m_h != NULL) {
     m_hClusterOnTrackTime_L456V.Clear();
     m_h->Copy(m_hClusterOnTrackTime_L456V);
+    m_hClusterOnTrackTime_L456V.GetXaxis()->SetRange(110, 190); // [-40 ns,40 ns]
+    Float_t mean_PeakInCenter = m_hClusterOnTrackTime_L456V.GetMean(); //
+    m_hClusterOnTrackTime_L456V.GetXaxis()->SetRange(); // back to [-150 ns,150 ns]
     m_hClusterOnTrackTime_L456V.SetTitle("ClusterOnTrack Time L456V " + runID);
     bool hasError = false;
     if (nEvents > m_statThreshold) {
       if (runtype == "physics") {
-        float difference_physics = fabs(m_hClusterOnTrackTime_L456V.GetMean() - m_refMCTP);
+        Float_t difference_physics = fabs(mean_PeakInCenter - m_refMCTP);
         if (difference_physics > m_timeThreshold) {
           hasError = true;
         }
       } else if (runtype == "cosmic") {
-        float difference_cosmic = fabs(m_hClusterOnTrackTime_L456V.GetMean() - m_refMCTC);
+        Float_t difference_cosmic = fabs(mean_PeakInCenter - m_refMCTC);
         if (difference_cosmic > m_timeThreshold) {
           hasError = true;
         }

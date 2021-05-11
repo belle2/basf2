@@ -184,7 +184,7 @@ def process(path, max_event=0):
 
     # If a pickle path is set via  --dump-path or --execute-path we do something special
     if pybasf2.get_pickle_path() != "":
-        from . pickle_path import check_pickle_path
+        from basf2.pickle_path import check_pickle_path
         path = check_pickle_path(path)
 
     # apparently nothing to do

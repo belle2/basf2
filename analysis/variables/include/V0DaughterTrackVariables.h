@@ -194,6 +194,12 @@ namespace Belle2 {
     double v0DaughterTrackParamCov5x5AtIPPerigee(const Particle* part, const std::vector<double>& params);
 
     /**
+     * returns the flag for V0 daughters sharing the innermost VXD hit.
+     * 1: one side of SVDCluster, 2: both sides of SVDClusters or PXDCluster
+     */
+    int v0DaughtersShareInnermostHit(const Particle* part);
+
+    /**
      * helper function to get the number of hits associated to a track for given tracking detector
      * If given particle is not created out of the Track, the return value is 0.
      * Not registered in variable manager

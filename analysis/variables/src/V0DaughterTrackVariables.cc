@@ -20,6 +20,7 @@
 // dataobjects from the MDST
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/HitPatternVXD.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
@@ -335,6 +336,24 @@ namespace Belle2 {
       return cov[paramID];
     }
 
+    int v0DaughtersShareInnermostHit(const Particle* part)
+    {
+      if (!part)
+        return std::numeric_limits<int>::quiet_NaN();
+      auto daughterPlus  = part->getDaughter(0);
+      auto daughterMinus = part->getDaughter(1);
+      if (!daughterPlus || !daughterMinus)
+        return std::numeric_limits<int>::quiet_NaN();
+      auto trackFitPlus  = daughterPlus->getTrackFitResult();
+      auto trackFitMinus = daughterMinus->getTrackFitResult();
+      if (!trackFitPlus || !trackFitMinus)
+        return std::numeric_limits<int>::quiet_NaN();
+      int flagPlus  = trackFitPlus->getHitPatternVXD().getInteger() >> 24;
+      int flagMinus = trackFitMinus->getHitPatternVXD().getInteger() >> 24;
+      if (flagPlus != flagMinus)
+        return std::numeric_limits<int>::quiet_NaN();
+      return flagPlus;
+    }
 
     VARIABLE_GROUP("V0Daughter");
 
@@ -476,5 +495,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("v0DaughterCov(i,j)",        v0DaughterTrackParamCov5x5AtIPPerigee,
                       "j-th element of the 15 covariance matrix elements (at IP perigee) of the i-th daughter track. "
                       "(0,0), (0,1) ... (1,1), (1,2) ... (2,2) ...");
+    /// check whether the innermost VXD hits are shared among daoughters
+    REGISTER_VARIABLE("v0DaughtersShareInnermostHit", v0DaughtersShareInnermostHit,
+                      "flag for V0 daughters sharing the innermost VXD hit. 1: one side of SVDCluster, 2: both sides of SVDClusters or PXDCluster");
   }
 }

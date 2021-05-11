@@ -16,6 +16,7 @@ def add_tsim(
         OpenFilter=False,
         Belle2Phase='Phase3',
         components=['CDC', 'ECL', 'KLM', 'GRL', 'GDL'],
+        simulateT0jitter=False,
         PrintInfo=False):
     '''
     Add the L1 trigger simulation (TSIM) modules to path.
@@ -29,6 +30,7 @@ def add_tsim(
         open filter before you set the value to True.
     @param Belle2Phase: The trigger menu at the given Phase is applied. Available options: Phase2, Phase3.
     @param components: List of sub-trigger components to be included in TSIM.
+    @param simulateT0jitter: if True L1 trigger jitter is simulated by EventT0Generator.
     '''
 
     add_subdetector_tsim(

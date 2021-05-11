@@ -218,10 +218,8 @@ def add_simulation(
         m = path.add_module('BGOverlayExecutor', components=['CDC', 'TOP', 'ARICH', 'KLM'])
         m.set_name('BGOverlayExecutor_CDC...KLM')
 
-    # TO DO: L1 TRIGGER simulation
-    # !!! DO NOT UNCOMMENT !!!
-    # if simulateL1trigger:
-    #    add_tsim(path)
+    if components is None or 'TRG' in components:
+        add_tsim(path, simulateT0jitter=simulateT0jitter)
 
     # SVD digitization, BG Overlay, sorting and zero suppression
     if components is None or 'SVD' in components:

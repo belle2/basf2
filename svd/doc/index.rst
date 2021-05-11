@@ -7,7 +7,7 @@ In particular, SVD reconstruction provides the position, charge and time of the 
 
 SVD raw data consists of:
 
-* list of strips above threshold SNR > 3: for each strip the amplitude (in ``ADC``) of each of the 6 (or 3) acquired samples from the digitization of the APV (readout chip) waveform
+* list of acquired strips (SNR > 3): for each strip the amplitude (in ADC) of each of the 6 (or 3) acquired samples from the digitization of the APV (readout chip) waveform
 
 .. _svdtb:
 
@@ -20,7 +20,7 @@ In addition, calibration constants from local runs (strip gain, noise, ...) and 
 In the following we describe the ``svd`` package .
 
 .. warning::
-   documentation under development
+   if you spot unclear or incorrect information, let us know at svd-software@belle2.it
 
 .. toctree:: reconstruction
 

@@ -15,6 +15,7 @@ Warning:
 """
 import basf2
 
+#: Definition of Phase 2 in a) real data and b) run-independent MC/development globaltags
 PHASE2_IOVS = [(1, 0, 4, -1), (1002, 0, 1002, -1)]
 
 

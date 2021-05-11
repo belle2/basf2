@@ -26,7 +26,7 @@ import re
 import basf2
 from ROOT.Belle2 import EvtGenDatabasePDG
 
-# the particle database (filled from evt.pdl by framework)
+#: the particle database (filled from evt.pdl by framework)
 _database = EvtGenDatabasePDG.Instance()
 
 

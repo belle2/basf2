@@ -104,6 +104,7 @@ def _PyDBArray__iter__(self):
         yield self[i]
 
 
+# @cond SUPPRESS_DOXYGEN
 # now replace the PyDBObj getter with one that returns non-modifiable objects.
 # This is how root does it in ROOT.py so let's keep that
 _dbobj_scope = _cppyy._backend.CreateScopeProxy("Belle2::PyDBObj")
@@ -121,3 +122,4 @@ _dbarray_scope.__iter__ = _PyDBArray__iter__
 _dbobj_scope.__iter__ = lambda self: iter(self.obj())
 _storeobj_scope = _cppyy._backend.CreateScopeProxy("Belle2::PyStoreObj")
 _storeobj_scope.__iter__ = lambda self: iter(self.obj())
+# @endcond

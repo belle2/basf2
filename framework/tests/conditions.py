@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# this is a test executable, not a module so we don't need doxygen warnings
+# @cond SUPPRESS_DOXYGEN
+
 """
 Script to make sure the conditions database interface is behaving as expected.
 
@@ -318,3 +321,5 @@ if "ssl" in sys.argv:
     # available
     for hostname in ("expired", "wrong.host", "self-signed", "untrusted-root"):
         dbprocess(f"https://{hostname}.badssl.com/", main)
+
+# @endcond

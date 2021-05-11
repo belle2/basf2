@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# this is a test executable, not a module so we don't need doxygen warnings
+# @cond SUPPRESS_DOXYGEN
+
 """
 Check reading and writing of evt.pdl files as well as errors when creating new particles.
 
@@ -50,7 +53,7 @@ with NamedTemporaryFile() as tempfile:
         retcode = 1
     else:
         # field types for comparison
-        types = [str]*4 + [int, float, float, float, int, int, float, int]
+        types = [str] * 4 + [int, float, float, float, int, int, float, int]
         # check all lines for equality but don't care about formatting
         for old, new in zip(old_lines, new_lines):
             # make sure the lines have the same number of fields
@@ -89,3 +92,5 @@ print("so reread default file...")
 db.ReadEvtGenTable()
 print("number of entries is now", db.ParticleList().GetEntries() and "positive" or "zero")
 sys.exit(retcode)
+
+# @endcond

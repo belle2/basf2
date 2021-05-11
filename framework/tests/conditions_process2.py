@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# this is a test executable, not a module so we don't need doxygen warnings
+# @cond SUPPRESS_DOXYGEN
+
 """
 Check that running process twice actually reinitializes the database correctly
 """
@@ -24,3 +27,5 @@ basf2.process(p)
 basf2.conditions.reset()
 basf2.conditions.override_globaltags([])
 b2test_utils.safe_process(p)
+
+# @endcond

@@ -1,14 +1,11 @@
 #!/usr/bin/env python
 
-"""
-Import bunch structure payload for master GT.
-Create payload taking information from the RunDB.
-Usage: basf2 DBBunchStructureImporter.py <username> <minexp> <minrun> <maxexp> <maxrun>
-
-if minexp is 0 the designed filling patter will be created. Meaning 10101010...
-if minexp is 1003 the early phase 3 pattern will be created. Meaning 1001001001..
-
-"""
+# Import bunch structure payload for master GT.
+# Create payload taking information from the RunDB.
+# Usage: basf2 DBBunchStructureImporter.py <username> <minexp> <minrun> <maxexp> <maxrun>
+#
+# if minexp is 0 the designed filling patter will be created. Meaning 10101010...
+# if minexp is 1003 the early phase 3 pattern will be created. Meaning 1001001001..
 
 from ROOT import Belle2
 from rundb import RunDB
@@ -17,6 +14,7 @@ import basf2
 
 
 def fill(fillPatternHex, firstExp, firstRun, lastExp, lastRun):
+    """Create a payload with the given hexadecmal fill pattern for the given run range"""
 
     if fillPatternHex is None:
         return

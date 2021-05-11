@@ -25,8 +25,10 @@ from pybasf2 import *  # noqa
 from basf2 import _constwrapper  # noqa
 
 
+#: name of the framework
 basf2label = 'BASF2 (Belle Analysis Software Framework 2)'
-basf2copyright = 'Copyright(C) 2010-2020  Belle II Collaboration'
+#: and copyright notice
+basf2copyright = 'Copyright(C) 2010-2021 Belle II Collaboration'
 
 # -----------------------------------------------
 #               Prepare basf2

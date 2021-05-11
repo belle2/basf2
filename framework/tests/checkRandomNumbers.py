@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# this is a test executable, not a module so we don't need doxygen warnings
+# @cond SUPPRESS_DOXYGEN
+
 """
 Check that random numbers don't change and are consistent.
 
@@ -71,12 +74,15 @@ main.add_module(RandomTestModule("test1"))
 main.add_module("RandomBarrier")
 main.add_module(RandomTestModule("test2"))
 
+#: framework logging configuration object
+logging_framework = basf2.logging.package("framework")
 # now the libraries are loaded so we can set the loglevel to debug, set the seed
 # and start processing
-logging_framework = basf2.logging.package("framework")
 logging_framework.set_log_level(basf2.LogLevel.DEBUG)
 logging_framework.set_debug_level(200)
 logging_framework.set_info(basf2.LogLevel.DEBUG, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
 basf2.set_random_seed("this is the seed")
 
 basf2.process(main)
+
+# @endcond

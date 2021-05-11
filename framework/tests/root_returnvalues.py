@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# this is a test executable, not a module so we don't need doxygen warnings
+# @cond SUPPRESS_DOXYGEN
+
 """
 Check that ROOT returns the correct values (ints, floats) when calling a C++
 function from python
@@ -30,7 +33,7 @@ floating_expressions = {
 for width in integral_types:
     # check signed types, we want min, max -1, 0 and 1
     dtype = np.dtype("int%d" % width)
-    for i, value in enumerate([-2**(width-1), -1, 0, 1, 2**(width-1) - 1]):
+    for i, value in enumerate([-2**(width - 1), -1, 0, 1, 2**(width - 1) - 1]):
         # create a unique member name
         func_name = f"int{width}test{i}"
         # do we need a prefix to the literal?
@@ -101,3 +104,5 @@ for func, value, dtype in results:
         failures += 1
 
 sys.exit(failures)
+
+# @endcond

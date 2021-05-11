@@ -31,7 +31,9 @@ class BASF2StateRecorder:
         return getattr(original_basf2, name)
 
 
+#: instance of the state recorder
 basf2_state_recorder = BASF2StateRecorder()
+#: basic unittest Mock object to attach fake functions to
 manager = mock.Mock()
 
 
@@ -53,6 +55,7 @@ def process(path, max_event=0):
 for name, x in original_basf2.__dict__.items():
     # We record function and fake Boost.Python.function objects
     if inspect.isfunction(x) or isinstance(x, type(original_basf2.find_file)):
+        #: mock object to simulate the original function but record calls and arguments
         mock_x = mock.Mock(x, side_effect=x)
         manager.attach_mock(mock_x, name)
         setattr(basf2_state_recorder, name, mock_x)
@@ -60,6 +63,8 @@ for name, x in original_basf2.__dict__.items():
     else:
         setattr(basf2_state_recorder, name, x)
 
+#: set the process function to serialize/deserialize the basf2 state correctly
 basf2_state_recorder.process = process
+# and replace the module
 sys.modules['basf2'] = basf2_state_recorder
 sys.modules['pickable_basf2'] = basf2_state_recorder

@@ -8,7 +8,7 @@ Here we briefly describe the so-called offline calibrations.
 Hit Time Calibration
 ---------------------
 
-The time calibration is implemented in the :ref:`calibration_caf` and is run on data with AirFlow, on data acquired in the 6-sample DAQ mode.
+The time calibration is implemented in the :ref:`calibration_caf` and is run on **6-sample data** with AirFlow.
 
 The hit time calibration exploits the correlation between the time of the event ``EventT0`` and the hit time. We select clusters associated to tracks and neglect the flight time of the particle.
 
@@ -18,10 +18,13 @@ For all three time estimators ``CoG6``, ``CoG3`` and ``ELS3`` we first compute t
 
    t_0^{\rm SVD} = t_0 - \frac{\Delta t}{4} \cdot (3 - TB + 4\ FF)
 
-where :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV readout chip, :math:`TB = 0,1,2,3` is the :ref:`TriggerBin<svdtb>` and provides the correct time shift to move into the SVD reference frame, and :math:`FF=0,1,2,3` (:ref:`FirstFrame<svdff>` is applied only for ``CoG3`` and ``ELS3`` due to the :ref:`MaxSum<MaxSum>` algorithm.
+where :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV readout chip, :math:`TB = 0,1,2,3` is the :ref:`TriggerBin<svdtb>` and provides the correct time shift to move into the SVD reference frame, and :math:`FF=0,1,2,3` (:ref:`FirstFrame<svdff>`) is applied only for ``CoG3`` and ``ELS3`` due to the :ref:`MaxSum<MaxSum>` algorithm.
 
-We build the 2D plot of the raw hit time :math:`t_{\rm raw}` vs :math:`t_0^{\rm SVD}`. Note that the :math:`t_{\rm raw}` is obviously different for the three estimator.
- We then take the ``ProfileX`` of the 2D plot and fit the correlation with a function that depends on the estimator. 
+We build the 2D plot of the raw hit time :math:`t_{\rm raw}` vs :math:`t_0^{\rm SVD}`. Note that the :math:`t_{\rm raw}` is different for the three estimator.
+We then take the ``ProfileX`` of the 2D plot and fit the correlation with a function that depends on the estimator. An example of correlation plot for CoG6, with calibration function superimposed is shown in the following figure:
+
+.. figure:: figures/time_calibration.png
+   :align: center
 
 **CoG6 Calibration Function**
 

@@ -297,6 +297,9 @@ Variables will also work on generator-level particles:
 .. b2-variables::
    :group: MC particle seen in subdetectors
 
+.. b2-variables::
+   :group: MCParticle tag variables
+   :noindex:
 
 Daughter info
 ~~~~~~~~~~~~~
@@ -333,10 +336,17 @@ To use most of the variables in this section on need to run `vertex.TagV` method
 Flavor Tagger
 ~~~~~~~~~~~~~
 
+Analysis variables
+""""""""""""""""""
+
 .. b2-variables::
-   :group: Flavor Tagger Variables
+   :group: Flavor Tagger Analysis Variables
+
+Training and expert variables
+"""""""""""""""""""""""""""""
+
 .. b2-variables::
-   :group: Flavor Tagger MetaFunctions
+   :group: Flavor Tagger Expert Variables
 
 .. _restOfEventVariables:
 

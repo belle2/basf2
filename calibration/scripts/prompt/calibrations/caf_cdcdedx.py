@@ -30,7 +30,7 @@ settings = CalibrationSettings(
     input_data_formats=["cdst"],
     input_data_names=["bhabha_all_calib"],
     expert_config={
-        "payload_boundaries": None,
+        "payload_boundaries": [],
         "calib_datamode": False,
         "maxevt_rg": 75000,
         "maxevt_cc": 18e6,
@@ -40,7 +40,7 @@ settings = CalibrationSettings(
         "bhabha_all_calib": [
             input_data_filters['Run Type']['physics'],
             input_data_filters['Data Tag']['bhabha_all_calib'],
-            input_data_filters['Data Quality Tag']['Good'],
+            input_data_filters['Data Quality Tag']['Good Or Recoverable'],
             input_data_filters['Magnet']['On'],
             input_data_filters['Beam Energy']['4S'],
             input_data_filters['Beam Energy']['Continuum'],

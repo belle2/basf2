@@ -45,12 +45,14 @@ main.add_module(evtgeninput)
 # Simulation
 add_simulation(main, bkgfiles=bg, bkgOverlay=True)
 
-# set debug level for overlay executor module
-for m in main.modules():
-    if m.type() == "BGOverlayExecutor":
-        m.logging.log_level = b2.LogLevel.DEBUG  # comment or remove to turn off
-        m.logging.debug_level = 100
-        break
+# Set debug level for overlay executor module (all instances)
+paths = [main]
+for p in paths:
+    for m in p.modules():
+        paths += m.get_all_condition_paths()
+        if m.type() == "BGOverlayExecutor":
+            m.logging.log_level = b2.LogLevel.DEBUG  # comment or remove to turn off
+            m.logging.debug_level = 20
 
 # Reconstruction
 add_reconstruction(main)

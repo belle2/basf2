@@ -1,5 +1,0 @@
-The model is a generic L_mu-L_tau model with a Z' boson. It is inherited from:
-
-Eqn 2.12 of Essig et al. JHEP02(2015)157, arXiv:1412.0018 [hep-ph].
-
-MG5 model kindly provided by B. Shuve: "Brian shuve" <bshuve@slac.stanford.edu>

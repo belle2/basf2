@@ -76,7 +76,7 @@ void PXDDQMEfficiencyNtupleModule::initialize()
   m_file = new TFile(m_ntupleName.data(), "recreate");
   if (m_file) m_file->cd();
   m_tuple = new TNtuple("effcontrol", "effcontrol",
-                        "vxdid:u:v:p:pt:distu:distv:sigu:sigv:dist:inroi:clborder:cldead:matched:z0:d0:svdhits:charge:phi:costheta");
+                        "trig:vxdid:u:v:p:pt:distu:distv:sigu:sigv:dist:inroi:clborder:cldead:matched:z0:d0:svdhits:charge:phi:costheta:bunch:frame:timetrg:timeinj:ring:ibunch:gated:gring:vstart:csize:cusize:cvsize");
 
   //register the required arrays
   //Register as optional so validation for cases where they are not available still succeeds, but module will not do any meaningful work without them
@@ -85,6 +85,8 @@ void PXDDQMEfficiencyNtupleModule::initialize()
   m_tracks.isOptional(m_tracksName);
   m_ROIs.isOptional(m_ROIsName);
   m_intercepts.isOptional(m_PXDInterceptListName);
+  m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
+  m_storeDAQEvtStats.isRequired();
 }
 
 
@@ -106,6 +108,52 @@ void PXDDQMEfficiencyNtupleModule::event()
     B2INFO("Intercept array is missing, no efficiencies");
     return;
   }
+
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
+  auto event_nr = eventMetaDataPtr->getEvent();
+
+  float bunch = -1;
+  float ibunch = -1;
+  float frame = -1;
+  float timesincetrig = -1;
+  float timesinceinj = -1;
+  float ring = -1;
+  float gated = -1;
+  float gring = -1;
+  for (auto& it : m_rawTTD) {
+    bunch = it.GetBunchNumber(0);
+    frame = it.GetFrameCount(0);
+    ring = it.GetIsHER(0);
+    timesincetrig = it.GetTimeSincePrevTrigger(0) / (508.877 / 4.);
+    auto difference = it.GetTimeSinceLastInjection(0);
+    // check time overflow, too long ago
+    if (difference != 0x7FFFFFFF) {
+      // Exact timing may lead to pattern due to binning
+      // more exact: (508.877 / 4.)
+      timesinceinj = difference / 127.; //  127MHz clock ticks to us, inexact rounding
+    }
+
+//      int bunch_trg = it.GetBunchNumber(0);
+//      int time_inj  = it.GetTimeSinceLastInjection(0);
+//      int bunch_inj = (bunch_trg - time_inj) % 1280;
+//      if (bunch_inj < 0) bunch_inj += 1280;
+    // unsigned issue if run without int?
+    int bunch_inj = ((int)it.GetBunchNumber(0) - (int)it.GetTimeSinceLastInjection(0)) % 1280;
+    if (bunch_inj < 0) bunch_inj += 1280;
+    ibunch = bunch_inj;
+    break;
+  }
+  for (auto& pkt : *m_storeDAQEvtStats) {
+    for (auto& dhc : pkt) {
+      gated = dhc.getGatedFlag();
+      if (gated) {
+        gring = dhc.getGatedHER();
+        break;
+      }
+    }
+    if (gated) break;
+  }
+
 
   for (auto& track : m_tracks) {
     RelationVector<RecoTrack> recoTrack = track.getRelationsTo<RecoTrack>(m_recoTracksName);
@@ -187,10 +235,15 @@ void PXDDQMEfficiencyNtupleModule::event()
       double dv_clus = 0;
       double d_clus = 0;
       float charge = 0;
+      float csize = 0;
+      float csizeu = 0;
+      float csizev = 0;
       bool matched = false;
+      float vstart = 1;
       if (bestcluster >= 0) {
         double u_clus = m_pxdclusters[bestcluster]->getU();
         double v_clus = m_pxdclusters[bestcluster]->getV();
+        vstart = m_pxdclusters[bestcluster]->getVStart();
 
         //is the closest cluster close enough to the track to count as measured?
         TVector3 dist_clus(u_fit - u_clus, v_fit - v_clus, 0);
@@ -198,13 +251,17 @@ void PXDDQMEfficiencyNtupleModule::event()
         dv_clus = v_fit - v_clus;
         d_clus = dist_clus.Mag();
         charge = m_pxdclusters[bestcluster]->getCharge();
+        csize = m_pxdclusters[bestcluster]->getSize();
+        csizeu = m_pxdclusters[bestcluster]->getUSize();
+        csizev = m_pxdclusters[bestcluster]->getVSize();
         matched = true;
       }
-      float fill[22] = {float((int)aVxdID), float(u_fit), float(v_fit), float(trackstate.getMom().Mag()), float(trackstate.getMom().Pt()),
+      float fill[34] = {float(event_nr), float((int)aVxdID), float(u_fit), float(v_fit), float(trackstate.getMom().Mag()), float(trackstate.getMom().Pt()),
                         float(du_clus), float(dv_clus), float(sigu), float(sigv), float(d_clus),
                         float(fitInsideROI), float(closeToBoarder), float(closeToDead), float(matched),
                         float(ptr2->getZ0()), float(ptr2->getD0()), float(a_track->getNumberOfSVDHits()),
-                        charge, float(trackstate.getMom().Phi()), float(trackstate.getMom().CosTheta())
+                        charge, float(trackstate.getMom().Phi()), float(trackstate.getMom().CosTheta()),
+                        bunch, frame, timesincetrig, timesinceinj, ring, ibunch, gated, gring, vstart, csize, csizeu, csizev
                        };
       m_tuple->Fill(fill);
     }

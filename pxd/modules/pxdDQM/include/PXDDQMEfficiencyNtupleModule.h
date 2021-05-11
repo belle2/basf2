@@ -13,7 +13,9 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-
+#include <framework/datastore/StoreObjPtr.h>
+#include <rawdata/dataobjects/RawFTSW.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
 #include <vxd/geometry/GeoCache.h>
@@ -92,6 +94,11 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_recoTracks; ///< store array of reco tracks
     StoreArray<ROIid> m_ROIs; ///< store array of ROIs
     StoreArray<PXDIntercept> m_intercepts; ///< store array of PXD Intercepts
+
+    /** Input array for TTD/FTSW */
+    StoreArray<RawFTSW> m_rawTTD;
+    /** Input array for DAQ Status. */
+    StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
 
     double m_pcut; ///< pValue-Cut for tracks
     double m_momCut; ///< Cut on fitted track momentum

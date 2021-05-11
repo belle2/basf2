@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Thomas Keck, Dennis Weyland 2017
 
@@ -10,7 +9,6 @@ except BaseException:
     pass
 import basf2_mva
 import basf2_mva_util
-import pandas
 import time
 import tempfile
 import os
@@ -30,7 +28,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     y = tf.placeholder(tf.float32, [None, 1])
 
     def layer(x, shape, name, unit=tf.sigmoid):
-        with tf.name_scope(name) as scope:
+        with tf.name_scope(name):
             weights = tf.Variable(tf.truncated_normal(shape, stddev=1.0 / np.sqrt(float(shape[0]))), name='weights')
             biases = tf.Variable(tf.constant(0.0, shape=[shape[1]]), name='biases')
             layer = unit(tf.matmul(x, weights) + biases)

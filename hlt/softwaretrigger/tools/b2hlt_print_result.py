@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = True
-PyConfig.StartGuiThread = False
+PyConfig.IgnoreCommandLineOptions = True  # noqa
+PyConfig.StartGuiThread = False  # noqa
 
 import basf2
 from argparse import ArgumentParser
@@ -34,15 +34,20 @@ if __name__ == "__main__":
     parser.add_argument("--override-globaltags", dest="override", action="store_true", default=False,
                         help="Use this option in case the data file does not provide globaltag information. "
                              "The only case where this should occur is when analyzing raw data.")
+    parser.add_argument('--local-db-path', type=str,
+                        help="set path to the local payload locations to use for the ConditionDB",
+                        default=None)
 
     args = parser.parse_args()
 
     if args.input:
         # For data, the prescales are only valid when using the online database!
-        basf2.reset_database()
+        if args.local_db_path is not None:
+            basf2.conditions.metadata_providers = ["file://" + basf2.find_file(args.local_db_path + "/metadata.sqlite")]
+            basf2.conditions.payload_locations = [basf2.find_file(args.local_db_path)]
+
         if args.override:
-            basf2.conditions.override_globaltags()
-            basf2.use_central_database("online")
+            basf2.conditions.override_globaltags(["online"])
 
         path = basf2.Path()
 

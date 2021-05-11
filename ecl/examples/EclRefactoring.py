@@ -30,6 +30,7 @@ def argparser():
                         'If you want to add beam background, pass this option.')
     return parser
 
+
 args = argparser().parse_args()
 
 # Set log level

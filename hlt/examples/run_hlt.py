@@ -7,7 +7,7 @@
 
 import basf2
 
-from rawdata import add_raw_seqoutput, add_unpackers
+from rawdata import add_raw_seqoutput
 from softwaretrigger import constants
 from softwaretrigger.processing import add_hlt_processing
 

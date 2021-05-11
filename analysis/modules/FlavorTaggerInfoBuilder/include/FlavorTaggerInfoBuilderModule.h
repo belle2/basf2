@@ -12,6 +12,12 @@
 
 #include <framework/core/Module.h>
 
+#include <analysis/dataobjects/FlavorTaggerInfo.h>
+#include <analysis/dataobjects/RestOfEvent.h>
+#include <analysis/dataobjects/FlavorTaggerInfoMap.h>
+
+#include <framework/datastore/StoreArray.h>
+
 namespace Belle2 {
 
   /**
@@ -31,6 +37,11 @@ namespace Belle2 {
     /** process event */
     virtual void event() override;
 
+  private:
+
+    StoreArray<RestOfEvent> m_roes; /**< StoreArray of ROEs */
+    StoreArray<FlavorTaggerInfo> m_flavorTaggerInfos; /**< StoreArray of FlavorTaggerInfos */
+    StoreArray<FlavorTaggerInfoMap> m_flavorTaggerInfoMaps; /**< StoreArray of FlavorTaggerInfoMaps */
   };
 }
 

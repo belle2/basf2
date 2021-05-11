@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Test the classes to handle iovs
 
@@ -8,7 +7,7 @@ import random
 import unittest
 import doctest
 from conditions_db.iov import IntervalOfValidity, IoVSet
-from conditions_db import iov
+import conditions_db.iov
 
 
 class TestIntervalOfValidity(unittest.TestCase):
@@ -152,7 +151,7 @@ class TestIoVSet(unittest.TestCase):
         """Test intersecting two sets"""
         iovs = []
         for i in range(6):
-            iovs.append((i, 0, i+5, -1))
+            iovs.append((i, 0, i + 5, -1))
         result = {IntervalOfValidity(5, 0, 5, -1)}
         for _ in range(10):
             a = IoVSet([IntervalOfValidity.always()])
@@ -165,8 +164,9 @@ class TestIoVSet(unittest.TestCase):
 
 def load_tests(loader, tests, ignore):
     """Add the doctests to the list of tests"""
-    tests.addTests(doctest.DocTestSuite(iov))
+    tests.addTests(doctest.DocTestSuite(conditions_db.iov))
     return tests
+
 
 if __name__ == "__main__":
     # test everything

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ######################################################
 # shows how to use the logging object exposed by the framework

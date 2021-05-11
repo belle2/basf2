@@ -1,10 +1,9 @@
-import basf2  # Import basf2 to make the Belle2 namespace available
+import basf2  # Import basf2 to make the Belle2 namespace available # noqa
 import ROOT
 from ROOT import Belle2
 
 import numpy as np
 import math
-import contextlib
 
 # Vectorised version of the error function for numpy arrays
 try:
@@ -156,6 +155,8 @@ def getSeedTrackFitResult(reco_track):
     b_field = Belle2.BFieldManager.getField(position).Z() / Belle2.Unit.T
     cdc_hit_pattern = 0
     svd_hit_pattern = 0
+    # the value 0xFFFF will cause the TrackFitResult::getNDF() to return -1
+    ndf = 0xFFFF
 
     track_fit_result = Belle2.TrackFitResult(
         position,
@@ -167,6 +168,7 @@ def getSeedTrackFitResult(reco_track):
         b_field,
         cdc_hit_pattern,
         svd_hit_pattern,
+        ndf
     )
 
     return track_fit_result

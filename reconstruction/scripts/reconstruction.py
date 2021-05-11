@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2
 
 from ROOT import Belle2
 
@@ -12,7 +12,9 @@ from pxd import add_pxd_reconstruction
 
 from rawdata import add_unpackers
 
-from tracking import (
+from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
+
+from tracking import (  # noqa
     add_mc_tracking_reconstruction,
     add_tracking_reconstruction,
     add_cr_tracking_reconstruction,
@@ -29,10 +31,44 @@ from softwaretrigger.path_utils import (
 import mdst
 
 
+CDST_TRACKING_OBJECTS = (
+    'RecoTracks',
+    'Tracks',
+    'V0s',
+    'TrackFitResults',
+    'EventT0',
+    'CDCDedxTracks',
+    'SVDShaperDigitsFromTracks',
+    'PXDClustersFromTracks',
+    'VXDDedxTracks',
+    'CDCDedxLikelihoods',
+    'VXDDedxLikelihoods'
+)
+
+
+DIGITS_OBJECTS = (
+    'ARICHDigits',
+    'CDCHits',
+    'ECLDigits',
+    'KLMDigits',
+    'PXDDigits',
+    'SVDEventInfoSim',
+    'SVDShaperDigits',
+    'TOPRawDigits'
+)
+
+
+def default_event_abort(module, condition, error_flag):
+    """Default event abort outside of HLT: Ignore the error flag and just stop
+    processing by giving an empty path"""
+    p = basf2.Path()
+    module.if_value(condition, p, basf2.AfterConditionPath.END)
+
+
 def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
-                       abort_path=None):
+                       event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -55,19 +91,20 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the
         full (old) format. This parameter is needed when reconstructing cdsts, otherwise the
         required PXD objects won't be added.
-    :param abort_path: the path to use when the reconstruction is aborted. If None an empty path will be used.
+    :param event_abort: A function to abort event processing at the given point. Should take three arguments: a module,
+        the condition and the error_flag to be set if these events are kept. If run on HLT this will not abort the event
+        but just remove all data except for the event information.
+    :param use_random_numbers_for_hlt_prescale: If True, the HLT filter prescales are applied using randomly
+        generated numbers, otherwise are applied using an internal counter.
     """
 
     # Check components.
     check_components(components)
 
     # Do not even attempt at reconstructing events w/ abnormally large occupancy.
-    if abort_path is None:
-        abort_path = create_path()
-    doom = path.add_module('EventsOfDoomBuster')
-    doom.if_true(abort_path, AfterConditionPath.END)
-    abort_path.add_module('EventErrorFlag',
-                          errorFlag=Belle2.EventMetaData.c_ReconstructionAbort)
+    doom = path.add_module("EventsOfDoomBuster")
+    event_abort(doom, ">=1", Belle2.EventMetaData.c_ReconstructionAbort)
+    path.add_module('StatisticsSummary').set_name('Sum_EventsofDoomBuster')
 
     # Add modules that have to be run BEFORE track reconstruction
     add_pretracking_reconstruction(path,
@@ -97,14 +134,15 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         if not components or ('SVD' in components):
             path.add_module("SVDShaperDigitsFromTracks")
 
-        # if you need to calculat the triggerResult, then you will need the full post-tracking recostruction
+        # if you need to calculate the triggerResult, then you will need the full post-tracking recostruction
         if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
             add_posttracking_reconstruction(path,
                                             components=components,
                                             pruneTracks=pruneTracks,
                                             add_muid_hits=add_muid_hits,
                                             addClusterExpertModules=addClusterExpertModules)
-            add_filter_software_trigger(path)
+            add_filter_software_trigger(path,
+                                        use_random_numbers_for_prescale=use_random_numbers_for_hlt_prescale)
             add_skim_software_trigger(path)
         # if you don't need the softwareTrigger result, then you can add only these two modules of the post-tracking reconstruction
         else:
@@ -130,7 +168,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                         addClusterExpertModules=addClusterExpertModules)
         # Add the modules calculating the software trigger cuts (but not performing them)
         if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
-            add_filter_software_trigger(path)
+            add_filter_software_trigger(path,
+                                        use_random_numbers_for_prescale=use_random_numbers_for_hlt_prescale)
             add_skim_software_trigger(path)
 
     #
@@ -145,7 +184,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                         addClusterExpertModules=addClusterExpertModules)
         # Add the modules calculating the software trigger cuts (but not performing them)
         if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
-            add_filter_software_trigger(path)
+            add_filter_software_trigger(path,
+                                        use_random_numbers_for_prescale=use_random_numbers_for_hlt_prescale)
             add_skim_software_trigger(path)
 
 
@@ -214,10 +254,15 @@ def add_cosmics_reconstruction(
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
-    # Add only the dE/dx calculation and prune the tracks
     if reconstruct_cdst:
-        add_dedx_modules(main_path)
-        add_prune_tracks(main_path, components=components)
+        # if PXD or SVD are included, you will need there two modules which are not part of the standard reconstruction
+        if not components or ('PXD' in components):
+            path.add_module("PXDClustersFromTracks")
+        if not components or ('SVD' in components):
+            path.add_module("SVDShaperDigitsFromTracks")
+        # And add only the dE/dx calculation and prune the tracks
+        add_dedx_modules(path)
+        add_prune_tracks(path, components=components)
 
     else:
         # Add further reconstruction modules
@@ -303,8 +348,6 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
 
     add_arich_modules(path, components)
 
-    path.add_module('StatisticsSummary').set_name('Sum_PID')
-
     # Not add EventT0Combiner module in prepare_cdst_analysis()
     if not for_cdst_analysis:
         path.add_module("EventT0Combiner")
@@ -339,7 +382,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
         if pruneTracks:
             add_prune_tracks(path, components)
 
-    path.add_module('StatisticsSummary').set_name('Sum_Clustering')
+    path.add_module('StatisticsSummary').set_name('Sum_Posttracking_Reconstruction')
 
 
 def add_mdst_output(
@@ -369,138 +412,51 @@ def add_cdst_output(
     filename='cdst.root',
     additionalBranches=[],
     dataDescription=None,
-    rawFormat=False
+    rawFormat=True,
+    ignoreInputModulesCheck=False
 ):
     """
-    This function add the rootOutput module with the settings needed to produce a cdst to a path,
+    This function adds the `RootOutput` module to a path with the settings needed to produce a cDST output.
 
-    @param path Path to add modules to
+    @param path Path to add modules to.
     @param mc Save Monte Carlo quantities? (MCParticles and corresponding relations)
     @param filename Output file name.
     @param additionalBranches Additional objects/arrays of event durability to save
     @param dataDescription Additional key->value pairs to be added as data description
            fields to the output FileMetaData
-    @param rawFormat saves the cdsts in the raw+tracking format.
+    @param rawFormat Saves the cDST file in the raw+tracking format if mc=False, otherwise saves the cDST file
+           in the digits+tracking format.
+    @param ignoreInputModulesCheck If True, do not enforce check on missing PXD modules in the input path.
+           Needed when a conditional path is passed as input.
     """
 
-    branches = [
-        'Tracks',
-        'V0s',
-        'TrackFitResults',
-        'EventLevelTrackingInfo',
-        'PIDLikelihoods',
-        'TracksToPIDLikelihoods',
-        'ECLClusters',
-        'ECLClustersToTracksNamedBremsstrahlung',
-        'EventLevelClusteringInfo',
-        'TracksToECLClusters',
-        'KLMClusters',
-        'KlIds',
-        'KLMClustersToKlIds',
-        'TRGSummary',
-        'SoftwareTriggerResult',
-        'RecoTracks',
-        'EventT0',
-        'PXDClustersFromTracks',
-        'SVDEventInfo',
-        'SVDShaperDigits',
-        'SVDRecoDigits',
-        'SVDClusters',
-        'CDCDedxTracks',
-        'TOPDigits',
-        'ExtHits',
-        'TOPLikelihoods',
-        'TOPRecBunch',
-        'TOPTimeZeros',
-        'TOPAsicMask',
-        'ECLDigits',
-        'ECLCalDigits',
-        'TRGECLClusters',
-        'TRGECLUnpackerStores',
-        'TRGECLUnpackerEvtStores',
-        'TRGGRLUnpackerStore',
-        'CDCTriggerSegmentHits',
-        'CDCTrigger2DFinderTracks',
-        'CDCTrigger2DFinderClones',
-        'CDCTriggerNNInputSegmentHits',
-        'CDCTriggerNNInput2DFinderTracks',
-        'CDCTriggerNeuroTracks',
-        'CDCTriggerNeuroTracksInput',
-        'CDCTriggerNNInputFinderTracks',
-        'CDCTriggerNNInputBits',
-        'CDCTriggerNNOutputBits',
-        'TRGGDLUnpackerStores',
-        'TRGTOPUnpackerStores',
-        'RecoHitInformations',
-        'RecoHitInformationsToBKLMHit2ds',
-        'TracksToARICHLikelihoods',
-        'TracksToExtHits',
-        'ARICHDigits',
-        'ARICHInfo',
-        'ARICHTracks',
-        'ARICHLikelihoods',
-        'ARICHTracksToExtHits',
-        'SoftwareTriggerVariables',
-        'KLMDigits',
-        'KLMMuidLikelihoods',
-        'TracksToKLMMuidLikelihoods',
-        'BKLMHit1ds',
-        'BKLMHit1dsToKLMDigits',
-        'BKLMHit2ds',
-        'BKLMHit2dsToBKLMHit1ds',
-        'EKLMAlignmentHits',
-        'EKLMHit2ds',
-        'EKLMHit2dsToKLMDigits',
-        'TracksToBKLMHit2ds',
-        'TracksToEKLMHit2ds',
-        'SVDShaperDigitsFromTracks',
-        'TRGGDLUnpackerStores',
-        'VXDDedxTracks',
-        'VXDDedxLikelihoods',
-    ]
+    branches = []
+    persistentBranches = ['FileMetaData']
 
     if rawFormat:
-        branches = [
-            'EventMetaData',
-            'RawPXDs',
-            'RawSVDs',
-            'RawCDCs',
-            'RawECLs',
-            'RawARICHs',
-            'RawKLMs',
-            'RawTOPs',
-            'RawTRGs',
-            'RecoTracks',
-            'Tracks',
-            'V0s',
-            'TrackFitResults',
-            'EventT0',
-            'TRGECLClusters',
-            'TRGECLUnpackerStores',
-            'TRGECLUnpackerEvtStores',
-            'TRGGRLUnpackerStore',
-            'TRGGDLUnpackerStores',
-            'TRGTOPUnpackerStores',
-            'CDCDedxTracks',
-            'SVDShaperDigitsFromTracks',
-            'PXDClustersFromTracks',
-            'VXDDedxTracks',
-            'CDCDedxLikelihoods',
-            'VXDDedxLikelihoods'
-            ]
-
-        if "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:
-            B2ERROR("PXDClusterFsromTracks is required in CDST output but its module is not found!")
+        branches += list(CDST_TRACKING_OBJECTS)
+        if not mc:
+            branches += ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS
+        else:
+            branches += list(DIGITS_OBJECTS) + [
+                'SoftwareTriggerResult',
+                'TRGSummary']
+        if not ignoreInputModulesCheck and "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:
+            basf2.B2ERROR("PXDClustersFromTracks is required in CDST output but its module is not found in the input path!")
+    else:
+        if not additionalBranches:
+            B2WARNING('You are calling add_cdst_output() using rawFormat=False and requiring no additional branches. '
+                      'This is equivalent to calling add_mdst_output().')
+        branches += list(mdst.MDST_OBJECTS)
 
     if dataDescription is None:
         dataDescription = {}
     dataDescription.setdefault("dataLevel", "cdst")
 
-    persistentBranches = ['FileMetaData']
     if mc:
-        branches += ['MCParticles', 'TracksToMCParticles',
-                     'ECLClustersToMCParticles', 'KLMClustersToMCParticles']
+        branches += ['MCParticles']
         persistentBranches += ['BackgroundInfo']
+
     branches += additionalBranches
 
     return path.add_module("RootOutput", outputFileName=filename, branchNames=branches,
@@ -515,12 +471,9 @@ def add_arich_modules(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
     if components is None or 'ARICH' in components:
-        arich_fillHits = register_module('ARICHFillHits')
-        path.add_module(arich_fillHits)
-        arich_rec = register_module('ARICHReconstructor')
-        # enabled for ARICH DQM plots
-        arich_rec.param('storePhotons', 1)
-        path.add_module(arich_rec)
+        path.add_module('ARICHFillHits')
+        path.add_module('ARICHReconstructor',
+                        storePhotons=1)  # enabled for ARICH DQM plots
 
 
 def add_top_modules(path, components=None, cosmics=False):
@@ -531,18 +484,13 @@ def add_top_modules(path, components=None, cosmics=False):
     :param components: The components to use or None to use all standard components.
     :param cosmics: if True, steer TOP for cosmic reconstruction
     """
-    # TOP reconstruction
     if components is None or 'TOP' in components:
-        top_cm = register_module('TOPChannelMasker')
-        path.add_module(top_cm)
+        path.add_module('TOPChannelMasker')
         if cosmics:
-            top_finder = register_module('TOPCosmicT0Finder')
-            path.add_module(top_finder)
+            path.add_module('TOPCosmicT0Finder')
         else:
-            top_finder = register_module('TOPBunchFinder')
-            path.add_module(top_finder)
-        top_rec = register_module('TOPReconstructor')
-        path.add_module(top_rec)
+            path.add_module('TOPBunchFinder')
+        path.add_module('TOPReconstructor')
 
 
 def add_cluster_expert_modules(path, components=None):
@@ -552,12 +500,9 @@ def add_cluster_expert_modules(path, components=None):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    # KLMExpert (needed for KlId) ClusterMatcher (needed for Cluster)
     if components is None or ('KLM' in components and 'ECL' in components):
-        klm_expert = register_module('KLMExpert')
-        path.add_module(klm_expert)
-        cluster_matcher = register_module('ClusterMatcher')
-        path.add_module(cluster_matcher)
+        path.add_module('KLMExpert')
+        path.add_module('ClusterMatcher')
 
 
 def add_pid_module(path, components=None):
@@ -567,10 +512,8 @@ def add_pid_module(path, components=None):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    # charged particle PID
     if components is None or 'SVD' in components or 'CDC' in components:
-        mdstPID = register_module('MdstPID')
-        path.add_module(mdstPID)
+        path.add_module('MdstPID')
 
 
 def add_klm_modules(path, components=None):
@@ -581,10 +524,8 @@ def add_klm_modules(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
     if components is None or 'KLM' in components:
-        klm_rec = register_module('KLMReconstructor')
-        path.add_module(klm_rec)
-        klm_clusters_rec = register_module('KLMClustersReconstructor')
-        path.add_module(klm_clusters_rec)
+        path.add_module('KLMReconstructor')
+        path.add_module('KLMClustersReconstructor')
 
 
 def add_klm_mc_matcher_module(path, components=None):
@@ -594,10 +535,8 @@ def add_klm_mc_matcher_module(path, components=None):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    # MC matching
     if components is None or 'KLM' in components:
-        klm_mc = register_module('MCMatcherKLMClusters')
-        path.add_module(klm_mc)
+        path.add_module('MCMatcherKLMClusters')
 
 
 def add_muid_module(path, add_hits_to_reco_track=False, components=None):
@@ -608,19 +547,19 @@ def add_muid_module(path, add_hits_to_reco_track=False, components=None):
     :param add_hits_to_reco_track: Add the found KLM hits also to the RecoTrack. Make sure to refit the track afterwards.
     :param components: The components to use or None to use all standard components.
     """
-    # Muid is needed for muonID computation and ECLCluster-Track matching.
+    # Muid is needed for muonID computation AND ECLCluster-Track matching.
     if components is None or ('CDC' in components and 'ECL' in components and 'KLM' in components):
-        muid = register_module('Muid', addHitsToRecoTrack=add_hits_to_reco_track)
-        path.add_module(muid)
+        path.add_module('Muid',
+                        addHitsToRecoTrack=add_hits_to_reco_track)
     if components is not None and 'CDC' in components:
         if ('ECL' not in components and 'KLM' in components):
-            B2WARNING('You added KLM to the components list but not ECL: the module Muid, that is necessary '
-                      'for correct muonID computation, will not be added to your reconstruction path. '
-                      'Make sure that this is fine for your purposes, otherwise please include also ECL.')
+            basf2.B2WARNING('You added KLM to the components list but not ECL: the module Muid, that is necessary '
+                            'for correct muonID computation, will not be added to your reconstruction path. '
+                            'Make sure that this is fine for your purposes, otherwise please include also ECL.')
         if ('ECL' in components and 'KLM' not in components):
-            B2WARNING('You added ECL to the components list but not KLM: the module Muid, that is necessary '
-                      'for correct ECLCluster-Track matching, will not be added to your reconstruction path. '
-                      ' Make sure that this is fine for your purposes, otherwise please include also KLM.')
+            basf2.B2WARNING('You added ECL to the components list but not KLM: the module Muid, that is necessary '
+                            'for correct ECLCluster-Track matching, will not be added to your reconstruction path. '
+                            ' Make sure that this is fine for your purposes, otherwise please include also KLM.')
 
 
 def add_ecl_modules(path, components=None):
@@ -630,57 +569,20 @@ def add_ecl_modules(path, components=None):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    # ECL calibration and reconstruction
     if components is None or 'ECL' in components:
-
-        # ECL offline waveform fitting
-        ecl_waveform_fit = register_module('ECLWaveformFit')
-        path.add_module(ecl_waveform_fit)
-
-        # ECL digit calibration
-        ecl_digit_calibration = register_module('ECLDigitCalibrator')
-        path.add_module(ecl_digit_calibration)
-
-        # ECL T0 extraction
+        path.add_module('ECLWaveformFit')
+        path.add_module('ECLDigitCalibrator')
         path.add_module('ECLEventT0')
-
-        # ECL connected region finder
-        ecl_crfinder = register_module('ECLCRFinder')
-        path.add_module(ecl_crfinder)
-
-        # ECL local maximum finder
-        ecl_lmfinder = register_module('ECLLocalMaximumFinder')
-        path.add_module(ecl_lmfinder)
-
-        # ECL splitter N1
-        ecl_splitterN1 = register_module('ECLSplitterN1')
-        path.add_module(ecl_splitterN1)
-
-        # ECL splitter N2
-        ecl_splitterN2 = register_module('ECLSplitterN2')
-        path.add_module(ecl_splitterN2)
-
-        # ECL Shower Correction
-        ecl_showercorrection = register_module('ECLShowerCorrector')
-        path.add_module(ecl_showercorrection)
-
-        # ECL Shower Calibration
-        ecl_showercalibration = register_module('ECLShowerCalibrator')
-        path.add_module(ecl_showercalibration)
-
-        # ECL Shower Shape
-        ecl_showershape = register_module('ECLShowerShape')
-        path.add_module(ecl_showershape)
-
-        # ECL Pulse Shape Discrimination
-        ecl_clusterPSD = register_module('ECLClusterPSD')
-        path.add_module(ecl_clusterPSD)
-
-        # ECL covariance matrix
-        ecl_covariance = register_module('ECLCovarianceMatrix')
-        path.add_module(ecl_covariance)
-
-        # ECL finalize -> must run after eventT0Combiner
+        path.add_module('ECLCRFinder')  # connected region finder
+        path.add_module('ECLLocalMaximumFinder')
+        path.add_module('ECLSplitterN1')
+        path.add_module('ECLSplitterN2')
+        path.add_module('ECLShowerCorrector')
+        path.add_module('ECLShowerCalibrator')
+        path.add_module('ECLShowerShape')
+        path.add_module('ECLClusterPSD')
+        path.add_module('ECLCovarianceMatrix')
+        # The module ECLFinalizer must run after EventT0Combiner
 
 
 def add_ecl_finalizer_module(path, components=None):
@@ -692,9 +594,7 @@ def add_ecl_finalizer_module(path, components=None):
         """
 
     if components is None or 'ECL' in components:
-        # ECL finalize
-        ecl_finalize = register_module('ECLFinalizer')
-        path.add_module(ecl_finalize)
+        path.add_module('ECLFinalizer')
 
 
 def add_ecl_track_cluster_modules(path, components=None):
@@ -727,8 +627,7 @@ def add_ecl_track_brem_finder(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
     if components is None or ('ECL' in components and ('PXD' in components or 'SVD' in components)):
-        brem_finder = register_module('ECLTrackBremFinder')
-        path.add_module(brem_finder)
+        path.add_module('ECLTrackBremFinder')
 
 
 def add_ecl_chargedpid_module(path, components=None):
@@ -739,9 +638,7 @@ def add_ecl_chargedpid_module(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
     if components is None or 'ECL' in components:
-        # charged PID
-        charged_id = register_module('ECLChargedPID')
-        path.add_module(charged_id)
+        path.add_module('ECLChargedPID')
 
 
 def add_ecl_mc_matcher_module(path, components=None):
@@ -752,9 +649,7 @@ def add_ecl_mc_matcher_module(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
     if components is None or 'ECL' in components:
-        # MC matching
-        ecl_mc = register_module('MCMatcherECLClusters')
-        path.add_module(ecl_mc)
+        path.add_module('MCMatcherECLClusters')
 
 
 def add_ext_module(path, components=None):
@@ -765,52 +660,60 @@ def add_ext_module(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
     if components is None or 'CDC' in components:
-        ext = register_module('Ext')
-        path.add_module(ext)
+        path.add_module('Ext')
 
 
 def add_dedx_modules(path, components=None):
     """
-    Add the dEdX reconstruction modules to the path
-    and prune the tracks afterwards if wanted.
+    Add the dE/dX reconstruction modules to the path.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
     # CDC dE/dx PID
     if components is None or 'CDC' in components:
-        CDCdEdxPID = register_module('CDCDedxPID')
-        path.add_module(CDCdEdxPID)
-
+        path.add_module('CDCDedxPID')
     # VXD dE/dx PID
     # only run this if the SVD is enabled - PXD is disabled by default
     if components is None or 'SVD' in components:
-        VXDdEdxPID = register_module('VXDDedxPID')
-        path.add_module(VXDdEdxPID)
+        path.add_module('VXDDedxPID')
 
 
-def prepare_cdst_analysis(path, components=None):
+def prepare_cdst_analysis(path, components=None, mc=False):
     """
-    Adds to a (analysis) path all the modules needed to
-    analyse a cdsts file in the raw+tracking format.
+    Adds to a (analysis) path all the modules needed to analyse a cDST file in the raw+tracking format
+    for collisions/cosmics data or in the digits+tracking format for MC data.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
+    :param mc: Are we running over MC data or not? If so, do not run the unpackers.
     """
-    # unpackers
-    add_unpackers(path, components=components)
+    # Add the unpackers only if not running on MC, otherwise check the components and simply add
+    # the Gearbox and the Geometry modules
+    if not mc:
+        add_unpackers(path,
+                      components=components)
+    else:
+        check_components(components)
+        path.add_module('Gearbox')
+        path.add_module('Geometry')
 
-    # this is currently just calls add_ecl_modules
-    add_pretracking_reconstruction(path, components=components)
+    # This currently just calls add_ecl_modules
+    add_pretracking_reconstruction(path,
+                                   components=components)
 
-    # needed to retrieve the PXD and SVD clusters out of the raws
+    # Needed to retrieve the PXD and SVD clusters out of the raw data
     if components is None or 'SVD' in components:
         add_svd_reconstruction(path)
     if components is None or 'PXD' in components:
         add_pxd_reconstruction(path)
 
     # check, this one may not be needed...
-    path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
+    path.add_module('SetupGenfitExtrapolation',
+                    energyLossBrems=False,
+                    noiseBrems=False)
 
-    # add the posttracking modules needed for cdst analysis
-    add_posttracking_reconstruction(path, components=components, for_cdst_analysis=True)
+    # Add the posttracking modules needed for the cDST analysis
+    add_posttracking_reconstruction(path,
+                                    components=components,
+                                    for_cdst_analysis=True)

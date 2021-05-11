@@ -176,7 +176,7 @@ namespace {
       TVector3 momentum(roeTFRProperties[i][3], roeTFRProperties[i][4], roeTFRProperties[i][5]);
 
       testsTFRs.appendNew(position, momentum, cov6, roeTRFCharges[i], Const::pion, roeTFRProperties[i][6], bField, roeTRFCDCValues[i],
-                          roeTRFVXDValues[i]);
+                          roeTRFVXDValues[i], 0);
 
       Track ROETrack;
       ROETrack.setTrackFitResultIndex(Const::pion, i);

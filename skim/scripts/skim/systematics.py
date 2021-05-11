@@ -10,23 +10,27 @@ __authors__ = [
     "Yuji Kato"
 ]
 
+import basf2 as b2
 import modularAnalysis as ma
 import vertex
-from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
+from skimExpertFunctions import BaseSkim, CombinedSkim, fancy_skim_header, get_test_file
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
-from stdV0s import stdKshorts
+from stdV0s import stdKshorts, stdLambdas
+from variables import variables as vm
 
 # TODO: Add liaison name and email address
 __liaison__ = ""
+__liaison_leptonID__ = "Marcel Hohmann"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header
-class Systematics(BaseSkim):
+class SystematicsDstar(BaseSkim):
     """
-    Lists in this skim are those defined in `JpsimumuTagProbe`, `JpsieeTagProbe`, and
-    `PiKFromDstarList`.
+    Primarily used for hadron and lepton ID studies.
+    Lists in this skim are those defined in `PiKFromDstarList`.
     """
     __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato", "Racha Cheaib"]
     __description__ = ""
@@ -41,37 +45,11 @@ class Systematics(BaseSkim):
 
     def build_lists(self, path):
         lists = [
-            # self.JpsimumuTagProbe(path),
-            # self.JpsieeTagProbe(path),
             self.PiKFromDstarList(path),
         ]
 
         # Flatten the list of lists
-        self.SkimLists = [s for l in lists for s in l]
-
-    def JpsimumuTagProbe(self, path):
-        """Build JpsimumuTagProbe lists for systematics skims."""
-        #   Cuts = "2.8 < M < 3.4"
-        Cuts = "2.7 < M < 3.4 and useCMSFrame(p) < 2.0"
-        Channel = "mu+:all mu-:loose"
-        jpsiList = []
-        chID = 0
-        ma.reconstructDecay("J/psi:mumutagprobe" + str(chID) + " -> " + Channel, Cuts, chID, path=path)
-        jpsiList.append("J/psi:mumutagprobe" + str(chID))
-        ma.matchMCTruth("J/psi:mumutagprobe0", path=path)
-        return jpsiList
-
-    def JpsieeTagProbe(self, path):
-        """Build JpsieeTagProbe lists for systematics skims."""
-        #   Cuts = "2.7 < M < 3.4"
-        Cuts = "2.7 < M < 3.4 and useCMSFrame(p) < 2.0"
-        Channel = "e+:all e-:loose"
-        jpsiList = []
-        chID = 0
-        ma.reconstructDecay("J/psi:eetagprobe" + str(chID) + " -> " + Channel, Cuts, chID, path=path)
-        jpsiList.append("J/psi:eetagprobe" + str(chID))
-        ma.matchMCTruth("J/psi:eetagprobe0", path=path)
-        return jpsiList
+        self.SkimLists = [s for lst in lists for s in lst]
 
     def PiKFromDstarList(self, path):
         """Build PiKFromDstarList lists for systematics skims."""
@@ -113,7 +91,7 @@ class SystematicsTracking(BaseSkim):
     def load_standard_lists(self, path):
         stdK("loose", path=path)
         stdPi("loose", path=path)
-        stdPi0s("eff40_Jan2020", path=path)
+        stdPi0s("eff40_May2020", path=path)
 
     def build_lists(self, path):
         lists = [
@@ -122,7 +100,7 @@ class SystematicsTracking(BaseSkim):
         ]
 
         # Flatten the list of lists
-        self.SkimLists = [s for l in lists for s in l]
+        self.SkimLists = [s for lst in lists for s in lst]
 
     def BtoDStarPiList(self, path):
         """Build BtoDStarPiList lists for systematics skims."""
@@ -131,14 +109,13 @@ class SystematicsTracking(BaseSkim):
         B0Cuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
 
         # D0
-        D0Channel = ["K+:loose pi-:loose", "K+:loose pi-:loose pi-:loose pi+:loose", "K+:loose pi-:loose pi0:eff40_Jan2020"]
+        D0Channel = ["K+:loose pi-:loose", "K+:loose pi-:loose pi-:loose pi+:loose", "K+:loose pi-:loose pi0:eff40_May2020"]
 
         D0List = []
         for chID, channel in enumerate(D0Channel):
             resonanceName = "anti-D0:loose" + str(chID)
             ma.reconstructDecay(resonanceName + " -> " + channel, D0Cuts, chID, path=path)
             # vertex.raveFit(resonanceName, 0.0, path=path)
-            ma.matchMCTruth(resonanceName, path=path)
         ma.copyLists("anti-D0:loose", ["anti-D0:loose0", "anti-D0:loose1", "anti-D0:loose2"], path=path)
         D0List.append("anti-D0:loose")
 
@@ -153,7 +130,6 @@ class SystematicsTracking(BaseSkim):
             ma.reconstructDecay(resonanceName + " -> " + channel, DstarCuts, chID, path=path)
             # vertex.raveFit(resonanceName, 0.0)
             DstarList.append(resonanceName)
-            ma.matchMCTruth(resonanceName, path=path)
 
         # B0
         B0Channel = []
@@ -166,7 +142,6 @@ class SystematicsTracking(BaseSkim):
             ma.reconstructDecay(resonanceName + " -> " + channel, B0Cuts, chID, path=path)
             B0List.append(resonanceName)
             # vertex.raveFit(resonanceName, 0.0)
-            ma.matchMCTruth(resonanceName, path=path)
 
         return B0List
 
@@ -192,7 +167,6 @@ class SystematicsTracking(BaseSkim):
             resonanceName = "D*0:loose" + str(chID)
             ma.reconstructDecay(resonanceName + " -> " + channel, DstarCuts, chID, path=path)
             DstarList.append(resonanceName)
-            ma.matchMCTruth(resonanceName, path=path)
 
         return DstarList
 
@@ -213,7 +187,7 @@ class Resonance(BaseSkim):
         stdMu("loose", path=path)
         stdPi("loose", path=path)
         stdPr("loose", path=path)
-        stdPi0s("eff40_Jan2020Fit", path=path)
+        stdPi0s("eff40_May2020Fit", path=path)
 
     def build_lists(self, path):
         lists = [
@@ -226,7 +200,7 @@ class Resonance(BaseSkim):
         ]
 
         # Flatten the list of lists
-        self.SkimLists = [s for l in lists for s in l]
+        self.SkimLists = [s for lst in lists for s in lst]
 
     def getDsList(self, path):
         """Build Ds list for systematics skims."""
@@ -240,7 +214,6 @@ class Resonance(BaseSkim):
         for chID, channel in enumerate(DsChannel):
             particlename = "D_s+:Resonance%d" % (chID)
             ma.reconstructDecay(particlename + " -> " + channel, DsCuts, chID, path=path)
-            ma.matchMCTruth(particlename, path)
             DsList.append(particlename)
 
         return DsList
@@ -260,13 +233,12 @@ class Resonance(BaseSkim):
 
         DstarChannel = []
         for channel in DplusList:
-            DstarChannel.append(channel + " pi0:eff40_Jan2020")
+            DstarChannel.append(channel + " pi0:eff40_May2020")
 
         DstarList = []
         for chID, channel in enumerate(DstarChannel):
             ma.reconstructDecay("D*+:resonance" + str(chID) + " -> " + channel, DstarCuts, chID, path=path)
             DstarList.append("D*+:resonance" + str(chID))
-            ma.matchMCTruth("D*+:resonance0", path=path)
 
         return DstarList
 
@@ -291,7 +263,6 @@ class Resonance(BaseSkim):
         for chID, channel in enumerate(SigmacPlusChannel):
             ma.reconstructDecay("Sigma_c++:resonance" + str(chID) + " -> " + channel, SigmacCuts, chID, path=path)
             SigmacList.append("Sigma_c++:resonance" + str(chID))
-            ma.matchMCTruth("Sigma_c++:resonance0", path=path)
 
         # Sigma_c0
         Sigmac0Channel = []
@@ -302,7 +273,6 @@ class Resonance(BaseSkim):
         for chID, channel in enumerate(Sigmac0Channel):
             ma.reconstructDecay("Sigma_c0:resonance" + str(chID) + " -> " + channel, SigmacCuts, chID, path=path)
             Sigmac0List.append("Sigma_c0:resonance" + str(chID))
-            ma.matchMCTruth("Sigma_c0:resonance0", path=path)
 
         return SigmacList
 
@@ -315,7 +285,6 @@ class Resonance(BaseSkim):
             resonanceName = "vpho:resonance" + str(chID)
             ma.reconstructDecay("vpho:resonance" + str(chID) + " -> " + channel, vphocuts, chID, path=path)
             ma.applyCuts(resonanceName, "nTracks == 2 and M < formula(Ecms*0.9877)", path=path)
-            ma.matchMCTruth(resonanceName, path=path)
             vertex.raveFit(resonanceName, 0.0, path=path)
             ma.applyCuts(resonanceName, "M < formula(Ecms*0.9877)", path=path)
             vphoList.append(resonanceName)
@@ -332,7 +301,6 @@ class Resonance(BaseSkim):
             resonanceName = "B0:resonance" + str(chID)
             ma.reconstructDecay(resonanceName + " -> " + channel, BZeroCuts, chID, path=path)
             BZeroList.append(resonanceName)
-            ma.matchMCTruth(resonanceName, path=path)
 
         return BZeroList
 
@@ -357,7 +325,6 @@ class Resonance(BaseSkim):
         for chID, channel in enumerate(BPlusChannel):
             ma.reconstructDecay("B+:resonance" + str(chID) + " -> " + channel, BPlusCuts, chID, path=path)
             BPlusList.append("B+:resonance" + str(chID))
-            ma.matchMCTruth("B+:resonance" + str(chID), path=path)
 
         return BPlusList
 
@@ -532,33 +499,23 @@ class SystematicsRadEE(BaseSkim):
 
 @fancy_skim_header
 class SystematicsLambda(BaseSkim):
-    __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato"]
+    __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato", "Jake Bennett"]
     __description__ = ""
     __contact__ = __liaison__
     __category__ = "systematics"
 
-    def build_lists(self, path):
-        LambdaCuts = "M < 1.2"
+    def load_standard_lists(self, path):
+        stdLambdas(path=path)
 
-        ma.fillParticleList("p+:SystematicsLambda", "", enforceFitHypothesis=True, path=path)
-        ma.fillParticleList("pi-:SystematicsLambda", "", enforceFitHypothesis=True, path=path)
-        LambdaChannel = ["p+:SystematicsLambda pi-:SystematicsLambda"]
+    def build_lists(self, path):
+        vm.addAlias("fsig", "formula(flightDistance/flightDistanceErr)")
+        vm.addAlias("pMom", "daughter(0,p)")
+        vm.addAlias("piMom", "daughter(1,p)")
+        vm.addAlias("daughtersPAsym", "formula((pMom-piMom)/(pMom+piMom))")
 
         LambdaList = []
-        for chID, channel in enumerate(LambdaChannel):
-            ma.reconstructDecay("Lambda0:syst" + str(chID) + " -> " + channel, LambdaCuts, chID, path=path)
-            vertex.kFit("Lambda0:syst" + str(chID), 0.002, path=path)
-            ma.applyCuts("Lambda0:syst" + str(chID), "1.10<M<1.13", path=path)
-            ma.applyCuts("Lambda0:syst" + str(chID), "formula(x*x+y*y)>0.0225", path=path)
-            ma.applyCuts("Lambda0:syst" + str(chID), "formula(x*px+y*py)>0", path=path)
-            ma.applyCuts(
-                "Lambda0:syst" +
-                str(chID),
-                "formula([x*px*x*px+2*x*px*y*py+y*py*y*py]/[[px*px+py*py]*[x*x+y*y]])>0.994009",
-                path=path)
-            ma.applyCuts("Lambda0:syst" + str(chID), "p>0.2", path=path)
-            ma.matchMCTruth("Lambda0:syst0", path=path)
-            LambdaList.append("Lambda0:syst" + str(chID))
+        ma.cutAndCopyList("Lambda0:syst0", "Lambda0:merged", "fsig>10 and daughtersPAsym>0.41", path=path)
+        LambdaList.append("Lambda0:syst0")
 
         self.SkimLists = LambdaList
 
@@ -582,15 +539,16 @@ class SystematicsPhiGamma(BaseSkim):
         ":math:`\\phi` decays into two charged tracks "
         "(:math:`K^+K^-` or :math:`K_S K_L` with :math:`K_S\\to \\pi^+\\pi^-`)"
     )
-    __contact__ = __liaison__
+    __contact__ = "Giuseppe Finocchiaro <giuseppe.finocchiaro@lnf.infn.it>"
     __category__ = "systematics"
+
+    TestFiles = [get_test_file("phigamma_neutral")]
+    validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         stdPhotons("loose", path=path)
         stdK("all", path=path)
-        stdKshorts("merged", path=path)
-
-    TestFiles = [get_test_file("phigamma_neutral")]
+        stdKshorts(path=path)
 
     def build_lists(self, path):
         EventCuts = [
@@ -605,3 +563,333 @@ class SystematicsPhiGamma(BaseSkim):
 
         path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
         self.SkimLists = ["gamma:PhiSystematics"]
+
+    def validation_histograms(self, path):
+        stdKshorts(path=path)
+        ma.fillParticleList('K+:all', "", writeOut=True, path=path)
+        ma.fillParticleList('K_L0:all', "", writeOut=True, path=path)
+        ma.fillParticleList('gamma:sig', 'nTracks > 1 and 3. < E < 8.', writeOut=True, path=path)
+
+        ma.reconstructDecay('phi:KK -> K+:all K-:all', '0.9 < M < 1.2', writeOut=True, path=path)
+
+        vm.addAlias("gamma_E_CMS", "useCMSFrame(E)")
+        vm.addAlias("gamma_E", "E")
+        vm.addAlias("K_S0_mass", "M")
+        vm.addAlias("phi_mass", "M")
+
+        histoRootFile = f'{self}_Validation.root'
+        variableshisto = [('gamma_E', 120, 2.5, 8.5),
+                          ('gamma_E_CMS', 100, 2.0, 7.0),
+                          ('nTracks', 15, 0, 15),
+                          ]
+        variableshistoKS = [('K_S0_mass', 200, 0.4, 0.6),
+                            ]
+        variableshistoPhi = [('phi_mass', 200, 0.8, 1.2),
+                             ]
+
+        ma.variablesToHistogram('gamma:sig', variableshisto, filename=histoRootFile, path=path)
+        ma.variablesToHistogram('K_S0:merged', variableshistoKS, filename=histoRootFile, path=path)
+        ma.variablesToHistogram('phi:KK', variableshistoPhi, filename=histoRootFile, path=path)
+
+
+@fancy_skim_header
+class Random(BaseSkim):
+    __authors__ = "Phil Grace"
+    __contact__ = "Phil Grace <philip.grace@adelaide.edu.au>"
+    __description__ = "Random skim to select a fixed fraction of events."
+    __category__ = "systematics, random"
+
+    def __init__(self, KeepPercentage=10, seed=None, **kwargs):
+        """
+        Parameters:
+            KeepPercentage (float): Percentage of events to be kept.
+            seed (int): Set random seed to given number. If this argument is not given,
+                this skim will not alter the random seed.
+            **kwargs: Passed to constructor of `BaseSkim`.
+        """
+        super().__init__(**kwargs)
+        self.KeepPercentage = KeepPercentage
+        self.seed = seed
+
+    def additional_setup(self, path):
+        if self.seed is not None:
+            b2.set_random_seed(int(self.seed))
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        stdPhotons("all", path=path)
+
+    def build_lists(self, path):
+        # Select one photon/track per event with no other cuts, so that all events are
+        # captured in the skim list if KeepPercentage=100.
+        label = "RandomSkim"
+        ma.copyList(f"pi+:{label}", "pi+:all", path=path)
+        ma.copyList(f"gamma:{label}", "gamma:all", path=path)
+        ma.applyRandomCandidateSelection(f"pi+:{label}", path=path)
+        ma.applyRandomCandidateSelection(f"gamma:{label}", path=path)
+
+        # Select fraction of events
+        path = self.skim_event_cuts(
+            f"eventRandom <= {self.KeepPercentage/100}", path=path
+        )
+
+        self.SkimLists = [f"pi+:{label}", f"gamma:{label}"]
+
+
+@fancy_skim_header
+class SystematicsFourLeptonFromHLTFlag(BaseSkim):
+    __authors__ = "Marcel Hohmann"
+    __contact__ = __liaison_leptonID__
+    __description__ = "Skim to select all events that pass the HLT Four Lepton skim for lepton ID studies"
+    __category__ = "systematics, leptonID"
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+
+    def build_lists(self, path):
+        label = "FourLeptonHLT"
+        ma.copyList(f"pi+:{label}", "pi+:all", path=path)
+        ma.rankByLowest(f"pi+:{label}", "random", 1, "systematicsFourLeptonHLT_randomRank", path=path)
+
+        path = self.skim_event_cuts(
+            "SoftwareTriggerResult(software_trigger_cut&skim&accept_fourlep) == 1", path=path
+        )
+
+        self.SkimLists = [f"pi+:{label}"]
+
+
+@fancy_skim_header
+class SystematicsRadMuMuFromHLTFlag(BaseSkim):
+    __authors__ = "Marcel Hohmann"
+    __contact__ = __liaison_leptonID__
+    __description__ = "Skim to select all events that pass the HLT RadMuMu skim for lepton ID studies"
+    __category__ = "systematics, leptonID"
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+
+    def build_lists(self, path):
+        label = "RadMuMuLeptonID"
+        ma.copyList(f"pi+:{label}", "pi+:all", path=path)
+        ma.rankByLowest(f"pi+:{label}", "random", 1, "systematicsRadMuMuLeptonID_randomRank", path=path)
+
+        path = self.skim_event_cuts(
+            "SoftwareTriggerResult(software_trigger_cut&skim&accept_radmumu) == 1", path=path
+        )
+        self.SkimLists = [f"pi+:{label}"]
+
+
+@fancy_skim_header
+class SystematicsJpsi(BaseSkim):
+    """
+    J/psi skim for lepton ID systematics studies. Lists in this skim are those defined in `JpsimumuTagProbe`, `JpsieeTagProbe`.
+    """
+    __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato", "Racha Cheaib", "Marcel Hohmann"]
+    __description__ = ""
+    __contact__ = __liaison_leptonID__
+    __category__ = "systematics, leptonID"
+
+    def load_standard_lists(self, path):
+        stdMu("all", path=path)
+        stdE("all", path=path)
+        stdPhotons("all", path=path)
+
+    TestFiles = [get_test_file("MC13_ccbarBGx1")]
+    ApplyHLTHadronCut = True
+
+    def build_lists(self, path):
+        self.SkimLists = [
+            self.JpsimumuTagProbe(path),
+            self.JpsieeTagProbe(path),
+        ]
+
+    def JpsimumuTagProbe(self, path):
+        """Build JpsimumuTagProbe lists for systematics skims."""
+        Cuts = "2.7 < M < 3.4"
+        ma.reconstructDecay(
+            "J/psi:systematics_mumu -> mu+:all mu-:all",
+            f'{Cuts} and [daughter(0,muonID)>0.1 or daughter(1,muonID)>0.1]',
+            path=path)
+        return "J/psi:systematics_mumu"
+
+    def JpsieeTagProbe(self, path):
+        """Build JpsieeTagProbe lists for systematics skims."""
+
+        Cuts = "2.7 < M < 3.4"
+        ma.cutAndCopyList('gamma:brems', 'gamma:all', 'E<1', path=path)
+        ma.correctBrems('e+:brems_corrected', 'e+:all', 'gamma:brems', path=path)
+        ma.reconstructDecay(
+            "J/psi:systematics_ee -> e+:brems_corrected e-:brems_corrected",
+            f'{Cuts} and [daughter(0,electronID)>0.1 or daughter(1,electronID)>0.1]',
+            path=path)
+        return "J/psi:systematics_ee"
+
+
+@fancy_skim_header
+class SystematicsKshort(BaseSkim):
+    """
+      K-short skim for hadron and lepton ID systematics studies.
+      As K-short candidates are abundant this skim has a high retention.
+      To meet the retention criteria a prescale is added. The prescale is given in standard trigger terms (reciprocal).
+      A prescale of 50 will keep 2% of events, etc.
+    """
+    __authors__ = ["Marcel Hohmann"]
+    __description__ = "Skim for K-short events for performance studies"
+    __contact__ = __liaison_leptonID__
+    __category__ = "performance, leptonID"
+
+    ApplyHLTHadronCut = True
+
+    def __init__(self, prescale=1, **kwargs):
+        """
+        Parameters:
+            prescale (int): the global prescale for this skim.
+            **kwargs: Passed to constructor of `BaseSkim`.
+        """
+        self.prescale = prescale
+        super().__init__(**kwargs)
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+
+    def build_lists(self, path):
+
+        ma.reconstructDecay(
+            'K_S0:reco -> pi+:all pi-:all',
+            '[0.30 < M < 0.70]',
+            path=path)
+
+        vertex.treeFit('K_S0:reco', 0.0, path=path)
+        ma.applyCuts('K_S0:reco', '0.4 < M < 0.6', path=path)
+
+        ma.fillParticleList('K_S0:v0 -> pi+ pi-',
+                            '[0.30 < M < 0.70]',
+                            True,
+                            path=path)
+        vertex.treeFit('K_S0:v0', 0.0, path=path)
+        ma.applyCuts('K_S0:v0', '0.4 < M < 0.6', path=path)
+
+        ma.mergeListsWithBestDuplicate('K_S0:merged', ['K_S0:v0', 'K_S0:reco'],
+                                       variable='particleSource', preferLowest=True, path=path)
+
+        KS_cut = '[[cosAngleBetweenMomentumAndVertexVector>0.998] or '\
+            ' [formula(flightDistance/flightDistanceErr)>11] or '\
+            ' [flightTime>0.007]]'  # and '\
+        # '[useAlternativeDaughterHypothesis(M, 0:p+) > 1.13068 and useAlternativeDaughterHypothesis(M, 0:pi-, 1:p+) > 1.13068]'
+
+        ma.cutAndCopyList("K_S0:skim", "K_S0:merged", KS_cut, path=path)
+        path = self.skim_event_cuts(f'eventRandom < {(1/self.prescale):.6f}', path=path)
+        self.SkimLists = ['K_S0:skim']
+
+
+@fancy_skim_header
+class SystematicsBhabha(BaseSkim):
+    """
+    Skim for selecting Bhabha events for leptonID studies.
+    In case the retention exceeds 10% a prescale can be added.
+    The prescale is given in standard trigger terms (reciprocal).
+    """
+    __authors__ = ["Justin Skorupa"]
+    __description__ = "Skim for Bhabha events for lepton ID study"
+    __contact__ = __liaison_leptonID__
+    __category__ = "performance, leptonID"
+
+    ApplyHLTHadronCut = False
+
+    def __init__(self, prescale=1, **kwargs):
+        """
+        Parameters:
+            prescale (int): the global prescale for this skim.
+            **kwargs: Passed to constructor of `BaseSkim`.
+        """
+        self.prescale = prescale
+        super().__init__(**kwargs)
+
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+
+    def build_lists(self, path):
+        goodtrack = "abs(dz) < 5 and abs(dr) < 2"
+        goodtrackwithPID = f"{goodtrack} and electronID > 0.95 and clusterTheta > 0.59"\
+            " and clusterTheta < 2.15 and useCMSFrame(clusterE) > 2"
+        ma.cutAndCopyList("e+:tight", "e+:all", goodtrackwithPID, path=path)
+        ma.cutAndCopyList("e+:loose", "e+:all", goodtrack, path=path)
+
+        recoil = "m2Recoil < 10"
+        ma.reconstructDecay(
+            "vpho:bhabha -> e+:tight e-:loose", recoil, path=path)
+
+        event_cuts = "[nCleanedTracks(abs(dz) < 5 and abs(dr) < 2) == 2]"\
+                     f" and eventRandom < {(1/self.prescale):.6f}"
+
+        ma.applyCuts("vpho:bhabha", event_cuts, path=path)
+
+        self.SkimLists = ["vpho:bhabha"]
+
+
+@fancy_skim_header
+class SystematicsCombinedHadronic(CombinedSkim):
+    """
+      Combined systematics skim for the four hadronic channels:
+            SystematicsKshort,
+            SystematicsJpsi,
+            SystematicsDstar,
+            SystemmaticsLambda.
+
+      This is required for  technical (data production) reasons, as it keeps the number of files low.
+      See the definitions of the individual skims for the details.
+    """
+    __authors__ = ["Marcel Hohmann"]
+    __description__ = "Combined Skim of the systematic hadronic skims: Kshort, Jpsi, Dstar, Lambda."
+    __contact__ = __liaison_leptonID__
+    __category__ = "performance, leptonID"
+    __name__ = "SystematicsCombinedHadronic"
+
+    def __init__(self, prescale_kshort=1, mdstOutput=True, **kwargs):
+        """ Initialiser.
+
+        Args:
+            prescale_kshort (Optional[int]): offline prescale factor for KS skim.
+            **kwargs: key-worded arguments. See CombinedSkim.__init__()
+        """
+
+        kwargs.update(mdstOutput=mdstOutput, CombinedSkimName=self.__name__)
+        kwargs.setdefault('udstOutput', False)
+
+        skims_list = [SystematicsKshort(prescale=prescale_kshort), SystematicsDstar(), SystematicsLambda(), SystematicsJpsi()]
+        super().__init__(*skims_list, **kwargs)
+
+
+@fancy_skim_header
+class SystematicsCombinedLowMulti(CombinedSkim):
+    """
+      Combined systematics skim for the four low multi channels:
+          SystematicsFourLeptonFromHLTFlag,
+          SystematicsRadmumuFromHLTFlag,
+          SystematicsBhabha,
+          ThauThrust.
+
+      This is required for  technical (data production) reasons, as it keeps the number of files low.
+      See the definitions of the individual skims for the details.
+    """
+    __authors__ = ["Marcel Hohmann"]
+    __description__ = "Combined Skim of the systematic low multi skims: FourLepton, Radmumu, Bhabha, TauThrust."
+    __contact__ = __liaison_leptonID__
+    __category__ = "performance, leptonID"
+    __name__ = "SystematicsCombinedLowMulti"
+
+    def __init__(self, prescale_kshort=1, mdstOutput=True, **kwargs):
+        """ Initialiser.
+
+        Args:
+            **kwargs: key-worded arguments. See CombinedSkim.__init__()
+        """
+
+        kwargs.update(mdstOutput=mdstOutput, CombinedSkimName=self.__name__)
+        kwargs.setdefault('udstOutput', False)
+
+        from skim.taupair import TauThrust
+        skims_list = [SystematicsFourLeptonFromHLTFlag(), SystematicsRadMuMuFromHLTFlag(), SystematicsBhabha(), TauThrust()]
+        super().__init__(*skims_list, **kwargs)

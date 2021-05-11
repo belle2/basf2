@@ -5,7 +5,6 @@ import configparser
 import urllib.request
 import re
 import sys
-import os
 
 
 def readConfigFile_mc():

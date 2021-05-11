@@ -10,16 +10,7 @@
 
 #include <analysis/modules/RestOfEventBuilder/RestOfEventBuilderModule.h>
 
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/MCParticle.h>
-
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
-
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/logging/Logger.h>
 
@@ -42,30 +33,32 @@ RestOfEventBuilderModule::RestOfEventBuilderModule() : Module()
 
   // Parameter definitions
   std::vector<std::string> emptyList;
-  addParam("particleList", m_particleList, "Name of the ParticleList");
+  addParam("particleList", m_particleListName, "Name of the ParticleList");
   addParam("particleListsInput", m_particleListsInput, "List of the particle lists, which serve as a source of particles", emptyList);
   addParam("createNestedROE", m_createNestedROE, "A switch to create nested ROE", false);
   addParam("nestedROEMask", m_nestedMask, "A switch to create nested ROE", std::string(""));
   addParam("fromMC", m_fromMC, "A switch to create MC ROE", false);
+  addParam("useKLMEnergy", m_useKLMEnergy, "A switch to create ROE with KLM energy included", false);
+  addParam("mostLikely", m_builtWithMostLikely, "whether input particle lists contain most-likely lists", true);
   m_nestedROEArrayName = "NestedRestOfEvents";
 }
 
 void RestOfEventBuilderModule::initialize()
 {
   // input
-  StoreObjPtr<ParticleList>().isRequired(m_particleList);
-  StoreArray<Particle> particles;
-  particles.isRequired();
+  m_particleList.isRequired(m_particleListName);
+  m_particles.isRequired();
 
   // output
-  StoreArray<RestOfEvent> roeArray;
-  roeArray.registerInDataStore();
-  particles.registerRelationTo(roeArray);
+  m_roeArray.registerInDataStore();
+  m_particles.registerRelationTo(m_roeArray);
   if (m_createNestedROE) {
-    StoreArray<RestOfEvent> nestedROEArray(m_nestedROEArrayName);
-    nestedROEArray.registerInDataStore();
-    particles.registerRelationTo(nestedROEArray);
-    roeArray.registerRelationTo(nestedROEArray);
+    m_nestedROEArray.registerInDataStore(m_nestedROEArrayName);
+    m_particles.registerRelationTo(m_nestedROEArray);
+    m_roeArray.registerRelationTo(m_nestedROEArray);
+  }
+  if (m_useKLMEnergy) {
+    B2WARNING("*** The ROE for " << m_particleListName << " list will have KLM energy included into its 4-momentum. ***");
   }
 }
 
@@ -82,24 +75,22 @@ void RestOfEventBuilderModule::event()
 void RestOfEventBuilderModule::createNestedROE()
 {
   // input target Particle
-  StoreObjPtr<ParticleList> plist(m_particleList);
-  StoreArray<RestOfEvent> nestedROEArray(m_nestedROEArrayName);
   StoreObjPtr<RestOfEvent> hostROE("RestOfEvent");
   if (!hostROE.isValid()) {
     B2WARNING("ROE list is not valid somehow, nested ROE is not created!");
     return;
   }
   auto outerROEParticles = hostROE->getParticles(m_nestedMask);
-  unsigned int nParticles = plist->getListSize();
+  unsigned int nParticles = m_particleList->getListSize();
   for (unsigned i = 0; i < nParticles; i++) {
-    const Particle* particle = plist->getParticle(i);
+    const Particle* particle = m_particleList->getParticle(i);
     // check if a Particle object is already related to a RestOfEvent object
     auto* check_roe = particle->getRelated<RestOfEvent>();
     if (check_roe != nullptr) {
       return;
     }
     // create nested RestOfEvent object:
-    RestOfEvent* nestedROE = nestedROEArray.appendNew(particle->getPDGCode(), true);
+    RestOfEvent* nestedROE = m_nestedROEArray.appendNew(particle->getPDGCode(), true);
     // create relation: Particle <-> RestOfEvent
     particle->addRelationTo(nestedROE);
     // create relation: host ROE <-> nested ROE
@@ -124,14 +115,9 @@ void RestOfEventBuilderModule::createNestedROE()
 
 void RestOfEventBuilderModule::createROE()
 {
-  // input target Particle
-  StoreObjPtr<ParticleList> plist(m_particleList);
-
-  // output
-  StoreArray<RestOfEvent> roeArray;
-  unsigned int nParts = plist->getListSize();
+  unsigned int nParts = m_particleList->getListSize();
   for (unsigned i = 0; i < nParts; i++) {
-    const Particle* particle = plist->getParticle(i);
+    const Particle* particle = m_particleList->getParticle(i);
 
     // check if a Particle object is already related to a RestOfEvent object
     auto* check_roe = particle->getRelated<RestOfEvent>();
@@ -139,7 +125,7 @@ void RestOfEventBuilderModule::createROE()
       return;
 
     // create RestOfEvent object
-    RestOfEvent* roe = roeArray.appendNew(particle->getPDGCode(), false, m_fromMC);
+    RestOfEvent* roe = m_roeArray.appendNew(particle->getPDGCode(), false, m_fromMC, m_useKLMEnergy, m_builtWithMostLikely);
 
     // create relation: Particle <-> RestOfEvent
     particle->addRelationTo(roe);
@@ -151,13 +137,12 @@ void RestOfEventBuilderModule::createROE()
 
 void RestOfEventBuilderModule::addRemainingParticles(const Particle* particle, RestOfEvent* roe)
 {
-  StoreArray<Particle> particlesArray;
   auto fsdaughters =  particle->getFinalStateDaughters();
   int nParticleLists = m_particleListsInput.size();
   B2DEBUG(10, "Particle has " + std::to_string(fsdaughters.size()) + " daughters");
   for (auto* daughter : fsdaughters) {
     B2DEBUG(10, "\t" << daughter->getArrayIndex() << ": pdg " << daughter->getPDGCode());
-    B2DEBUG(10, "\t\t Store array particle: " << particlesArray[daughter->getArrayIndex()]->getPDGCode());
+    B2DEBUG(10, "\t\t Store array particle: " << m_particles[daughter->getArrayIndex()]->getPDGCode());
   }
   unsigned int nExcludedParticles = 0;
   std::vector<const Particle* > particlesToAdd;
@@ -204,16 +189,13 @@ void RestOfEventBuilderModule::addRemainingParticles(const Particle* particle, R
   }
   roe->addParticles(particlesToAdd);
 }
+
 void RestOfEventBuilderModule::printEvent()
 {
-  StoreArray<ECLCluster> eclClusters;
-  StoreArray<KLMCluster> klmClusters;
-  StoreArray<Track>      tracks;
-
   B2INFO("[RestOfEventBuilderModule] *** Print Event ***");
-  B2INFO("[RestOfEventBuilderModule] Tracks: " << tracks.getEntries());
-  for (int i = 0; i < tracks.getEntries(); i++) {
-    const Track* track = tracks[i];
+  B2INFO("[RestOfEventBuilderModule] Tracks: " << m_tracks.getEntries());
+  for (int i = 0; i < m_tracks.getEntries(); i++) {
+    const Track* track = m_tracks[i];
     const ECLCluster* trackECLCluster = track->getRelated<ECLCluster>();
     const KLMCluster* trackKLMCluster = track->getRelated<KLMCluster>();
     if (trackECLCluster) {
@@ -228,16 +210,16 @@ void RestOfEventBuilderModule::printEvent()
     }
   }
 
-  B2INFO("[RestOfEventBuilderModule] ECLCluster: " << eclClusters.getEntries());
-  for (int i = 0; i < eclClusters.getEntries(); i++) {
-    const ECLCluster* eclCluster = eclClusters[i];
+  B2INFO("[RestOfEventBuilderModule] ECLCluster: " << m_eclClusters.getEntries());
+  for (int i = 0; i < m_eclClusters.getEntries(); i++) {
+    const ECLCluster* eclCluster = m_eclClusters[i];
 
     B2INFO("[RestOfEventBuilderModule]  -> cluster " << eclCluster->getArrayIndex());
   }
 
-  B2INFO("[RestOfEventBuilderModule] KLMCluster: " << klmClusters.getEntries());
-  for (int i = 0; i < klmClusters.getEntries(); i++) {
-    const KLMCluster* klmCluster = klmClusters[i];
+  B2INFO("[RestOfEventBuilderModule] KLMCluster: " << m_klmClusters.getEntries());
+  for (int i = 0; i < m_klmClusters.getEntries(); i++) {
+    const KLMCluster* klmCluster = m_klmClusters[i];
 
     B2INFO("[RestOfEventBuilderModule]  -> cluster " << klmCluster->getArrayIndex());
   }

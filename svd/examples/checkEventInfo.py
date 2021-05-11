@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
 ####################################################################################
@@ -9,8 +9,8 @@ from ROOT import Belle2
 
 
 # register modules
-eventinfosetter = register_module("EventInfoSetter")
-eventinfoprinter = register_module("EventInfoPrinter")
+eventinfosetter = b2.register_module("EventInfoSetter")
+eventinfoprinter = b2.register_module("EventInfoPrinter")
 
 # set parameters in modules
 param_eventinfosetter = {'expList': [1],
@@ -18,23 +18,23 @@ param_eventinfosetter = {'expList': [1],
                          'evtNumList': [1]}
 
 
-class Check_info(Module):
+class Check_info(b2.Module):
     ''' check the SVDEventInfo object'''
 
     def event(self):
         '''print the SVDEventInfo to string in each event'''
         eventInfo = Belle2.PyStoreObj('SVDEventInfo')
-        B2INFO(eventInfo.toString())
+        b2.B2INFO(eventInfo.toString())
 
 
 eventinfosetter.param(param_eventinfosetter)
 
 # create path and add modules
-main = create_path()
+main = b2.create_path()
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 
-setInfo = register_module('SVDEventInfoSetter')
+setInfo = b2.register_module('SVDEventInfoSetter')
 # exemplary settings that overwrite default ones
 # setInfo.param('runType', 1) #transparent
 # setInfo.param('eventType', 1) #local mode
@@ -45,8 +45,8 @@ setInfo = register_module('SVDEventInfoSetter')
 
 main.add_module(setInfo)
 
-checkInfo = register_module(Check_info())
+checkInfo = b2.register_module(Check_info())
 main.add_module(checkInfo)
 
 # process
-process(main)
+b2.process(main)

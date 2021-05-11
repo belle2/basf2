@@ -135,7 +135,8 @@ Module::Module(double                    stripWidth,
   m_DisplacedGeoInverse(HepGeom::Transform3D()),
   m_DisplacedGeoRotationInverse(CLHEP::HepRotation())
 {
-  if (isFlipped) m_Rotation.rotateZ(M_PI);
+  if (isFlipped)
+    m_Rotation.rotateZ(M_PI);
   m_RotationInverse = m_Rotation.inverse();
   m_PhiScintLengths.clear();
   m_PhiScintPositions.clear();
@@ -258,11 +259,49 @@ const CLHEP::Hep3Vector Module::getLocalPosition(double phiStripAve, double zStr
                            (zStripAve - m_ZPositionBase + 0.5) * m_ZStripWidth);
 }
 
-const CLHEP::Hep3Vector Module::getPropagationTimes(const CLHEP::Hep3Vector& local) const
+double Module::getPropagationDistance(const CLHEP::Hep3Vector& local,
+                                      int strip, bool phiReadout) const
+{
+  double distance;
+  if (phiReadout) {
+    distance = m_ZStripMax * m_ZStripWidth - local.z();
+  } else {
+    /**
+     * The value m_PhiSensorSide == -1 corresponds to SiPMs at positive
+     * local coordinate (and vice versa). Consequently, the sign is negative.
+     */
+    distance = fabs(m_ZScintOffsets[strip] -
+                    0.5 * m_PhiSensorSide * m_ZScintLengths[strip] - local.y());
+  }
+  return distance;
+}
+
+const CLHEP::Hep3Vector Module::getPropagationDistance(const CLHEP::Hep3Vector& local) const
 {
   double dy = m_PhiPositionBase * m_PhiStripWidth - m_PhiSensorSide * local.y();
   double dz = m_ZStripMax * m_ZStripWidth - local.z();
-  return CLHEP::Hep3Vector(0.0, dz / m_SignalSpeed, dy / m_SignalSpeed);
+  return CLHEP::Hep3Vector(0.0, dz, dy);
+}
+
+const CLHEP::Hep3Vector Module::getPropagationTimes(const CLHEP::Hep3Vector& local) const
+{
+  const CLHEP::Hep3Vector proDist = getPropagationDistance(local);
+  return CLHEP::Hep3Vector(0.0, proDist[1] / m_SignalSpeed, proDist[2] / m_SignalSpeed);
+}
+
+double Module::getPropagationTime(const CLHEP::Hep3Vector& local, int strip,
+                                  bool phiReadout) const
+{
+  double distance = getPropagationDistance(local, strip, phiReadout);
+  return distance / m_SignalSpeed;
+}
+
+const CLHEP::Hep3Vector Module::getPropagationTimes(
+  const CLHEP::Hep3Vector& local, int stripZ, int stripPhi) const
+{
+  double distanceZ = getPropagationDistance(local, stripZ, false);
+  double distancePhi = getPropagationDistance(local, stripPhi, true);
+  return CLHEP::Hep3Vector(0.0, distancePhi / m_SignalSpeed, distanceZ / m_SignalSpeed);
 }
 
 const CLHEP::Hep3Vector Module::localToGlobal(const CLHEP::Hep3Vector& v, bool m_reco) const

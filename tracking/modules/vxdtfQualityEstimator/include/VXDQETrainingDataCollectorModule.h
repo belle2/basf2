@@ -58,6 +58,9 @@ namespace Belle2 {
      */
     std::string m_EstimationMethod = "tripletFit";
 
+    /** whether to collect MC truth information **/
+    bool m_MCInfo = true;
+
     /** sets the name of the expected StoreArray containing SpacePointTrackCands */
     std::string m_SpacePointTrackCandsStoreArrayName = "SPTrackCands";
 

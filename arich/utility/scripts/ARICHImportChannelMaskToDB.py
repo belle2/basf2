@@ -3,7 +3,7 @@
 # Import channel mask from a histogram to conditions database
 # ARICHImportChannelMaskToDB.py  -f a.root --hname ARICH/chHit --firstexp=3 --firstrun=2300 --lastexp=4 --lastrun=10
 #
-from basf2 import *
+import basf2 as b2
 import ROOT
 from ROOT.Belle2 import ARICHDatabaseImporter
 
@@ -55,7 +55,7 @@ parser.add_option('-d', '--dryrun', dest='dryrun', default=0, type="int", help="
 (options, args) = parser.parse_args()
 
 # set local database folder
-use_local_database("localdb/database.txt", "localdb", 0, LogLevel.INFO)
+b2.use_local_database("localdb/database.txt", "localdb", 0, b2.LogLevel.INFO)
 
 print('<runinfo>')
 print('<run>{}</run>'.format(options.firstrun))

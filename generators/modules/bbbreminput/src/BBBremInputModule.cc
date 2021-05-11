@@ -76,7 +76,7 @@ void BBBremInputModule::event()
   StoreObjPtr<EventMetaData> evtMetaData("EventMetaData", DataStore::c_Event);
 
   // initial particle from beam parameters
-  MCInitialParticles& initial = m_initial.generate();
+  const MCInitialParticles& initial = m_initial.generate();
 
   // true boost
   TLorentzRotation boost = initial.getCMSToLab();

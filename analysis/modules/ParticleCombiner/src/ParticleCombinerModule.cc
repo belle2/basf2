@@ -14,9 +14,6 @@
 // framework aux
 #include <framework/logging/Logger.h>
 
-// dataobjects
-#include <analysis/dataobjects/Particle.h>
-
 // decay descriptor
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 
@@ -132,12 +129,10 @@ namespace Belle2 {
 
     m_generator = std::make_unique<ParticleGenerator>(m_decayString, m_cutParameter);
 
-    StoreObjPtr<ParticleList> particleList(m_listName);
     DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
-    particleList.registerInDataStore(flags);
+    m_outputList.registerInDataStore(m_listName, flags);
     if (!m_isSelfConjugatedParticle && m_chargeConjugation) {
-      StoreObjPtr<ParticleList> antiParticleList(m_antiListName);
-      antiParticleList.registerInDataStore(flags);
+      m_outputAntiList.registerInDataStore(m_antiListName, flags);
     }
 
     if (m_recoilParticleType != 0 && m_recoilParticleType != 1 && m_recoilParticleType != 2)
@@ -147,18 +142,14 @@ namespace Belle2 {
 
   void ParticleCombinerModule::event()
   {
-    StoreArray<Particle> particles;
-
-    StoreObjPtr<ParticleList> outputList(m_listName);
-    outputList.create();
-    outputList->initialize(m_pdgCode, m_listName);
+    m_outputList.create();
+    m_outputList->initialize(m_pdgCode, m_listName);
 
     if (!m_isSelfConjugatedParticle && m_chargeConjugation) {
-      StoreObjPtr<ParticleList> outputAntiList(m_antiListName);
-      outputAntiList.create();
-      outputAntiList->initialize(-1 * m_pdgCode, m_antiListName);
+      m_outputAntiList.create();
+      m_outputAntiList->initialize(-1 * m_pdgCode, m_antiListName);
 
-      outputList->bindAntiParticleList(*(outputAntiList));
+      m_outputList->bindAntiParticleList(*(m_outputAntiList));
     }
 
     m_generator->init();
@@ -201,16 +192,16 @@ namespace Belle2 {
       if (m_maximumNumberOfCandidates > 0 and numberOfCandidates > m_maximumNumberOfCandidates) {
         if (m_ignoreIfTooManyCandidates) {
           B2WARNING("Maximum number of " << m_maximumNumberOfCandidates << " candidates reached, skipping event");
-          outputList->clear();
+          m_outputList->clear();
         } else {
           B2WARNING("Maximum number of " << m_maximumNumberOfCandidates << " candidates reached. Ignoring others");
         }
         break;
       }
 
-      Particle* newParticle = particles.appendNew(particle);
+      Particle* newParticle = m_particles.appendNew(particle);
 
-      outputList->addParticle(newParticle);
+      m_outputList->addParticle(newParticle);
 
       // append to the created particle the user specified decay mode ID
       newParticle->addExtraInfo("decayModeID", m_decayModeID);

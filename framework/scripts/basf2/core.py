@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 The core module of the Belle II Analysis Software Framework.
@@ -18,7 +17,7 @@ if _sys.version_info[0] < 3:
 from basf2 import _override_print  # noqa
 
 # import the C++ library with the exported functions
-import pybasf2
+import pybasf2  # noqa
 # and also import all of them in current scope for ease of use
 from pybasf2 import *  # noqa
 
@@ -26,8 +25,10 @@ from pybasf2 import *  # noqa
 from basf2 import _constwrapper  # noqa
 
 
+#: name of the framework
 basf2label = 'BASF2 (Belle Analysis Software Framework 2)'
-basf2copyright = 'Copyright(C) 2010-2018  Belle II Collaboration'
+#: and copyright notice
+basf2copyright = 'Copyright(C) 2010-2021 Belle II Collaboration'
 
 # -----------------------------------------------
 #               Prepare basf2
@@ -185,7 +186,7 @@ def process(path, max_event=0):
 
     # If a pickle path is set via  --dump-path or --execute-path we do something special
     if pybasf2.get_pickle_path() != "":
-        from . pickle_path import check_pickle_path
+        from basf2.pickle_path import check_pickle_path
         path = check_pickle_path(path)
 
     # apparently nothing to do

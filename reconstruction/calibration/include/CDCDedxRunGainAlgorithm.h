@@ -16,21 +16,22 @@
 #include <TH1D.h>
 
 namespace Belle2 {
+
   /**
    * A calibration algorithm for CDC dE/dx run gains
-   *
    */
   class CDCDedxRunGainAlgorithm : public CalibrationAlgorithm {
 
   public:
 
     /**
-     * Constructor: Sets the description, the properties and the parameters of the algorithm.
-     */
+    * Constructor: Sets the description, the properties and the parameters of the algorithm.
+    */
     CDCDedxRunGainAlgorithm();
+
     /**
-     * Destructor
-     */
+    * Destructor
+    */
     virtual ~CDCDedxRunGainAlgorithm() {}
 
     /**
@@ -58,13 +59,27 @@ namespace Belle2 {
     */
     void setFitWidth(double value = 2.5) {fSigLim = value;}
 
+    /**
+    * function to set dedx hist bins
+    */
+    void setHistBins(int value = 600) {fdEdxBins = value;}
+
+    /**
+    * function to set dedx gain adjustment
+    */
+    void setAdjustment(double value = 1.0) {fAdjust = value;}
+
+    /**
+    * function to set dedx hist range
+    */
+    void setHistRange(double min = 0.0, double max = 3.0) {fdEdxMin = min; fdEdxMax = max;}
 
   protected:
-    /**
-     * Run algorithm
-     */
-    virtual EResult calibrate() override;
 
+    /**
+    * Run algorithm
+    */
+    virtual EResult calibrate() override;
 
   private:
 
@@ -72,8 +87,11 @@ namespace Belle2 {
     bool isMergePayload; /**< merge payload at the of calibration */
     DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
 
-    double fSigLim = 2.5; /**< fit range limit based on sigma */
-    double RunGainAbs = 1.0; /**< calculated Run gain */
+    TString fsrun; /**< flag to indentify low stats runs */
+    double fSigLim; /**< fit range limit based on sigma */
+    int fdEdxBins; /**< number of bins for dedx histogram */
+    double fdEdxMin; /**< min dedx range for gain cal */
+    double fdEdxMax; /**< max dedx range for gain cal */
+    double fAdjust; /**< factor to adjust dedx gain  */
   };
-
 } // namespace Belle2

@@ -164,4 +164,3 @@ Here is an example of use:
 	# isSignal(B+:norad)   == 0 Because the radiated photon is missed.
 	# isSignal(B+:exact)   == 0 Because the intermediate resonance (Jpsi) and the radiated photon are missed.
 
-.. warning:: There is a known issue in the MC matching: Some photons produced by PHOTOS are misinterpreted as other radiated photons (see :issue:`BII-5934`).

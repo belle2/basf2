@@ -46,7 +46,7 @@ bool ProcessController::load(int timeout)
 {
   m_info.clear();
   m_process.cancel();
-  m_process.kill(SIGQUIT);
+  m_process.kill(SIGABRT);
   if (pipe(m_iopipe) < 0) {
     perror("pipe");
     return false;
@@ -96,7 +96,7 @@ bool ProcessController::pause()
 {
   GenericLockGuard<RunInfoBuffer> lockGuard(m_info);
   if (m_info.isRunning()) {
-    m_info.setState(RunInfoBuffer::PAUSING);
+    m_info.setState(RunInfoBuffer::PAUSED);
   } else {
     LogFile::warning("Process is not running. Pause request was ignored.");
   }
@@ -107,22 +107,35 @@ bool ProcessController::resume()
 {
   GenericLockGuard<RunInfoBuffer> lockGuard(m_info);
   if (m_info.isPaused()) {
-    m_info.setState(RunInfoBuffer::RESUMING);
+    m_info.setState(RunInfoBuffer::RUNNING);
   } else {
     LogFile::warning("Process is not paused. Resume request was ignored.");
   }
   return true;
 }
 
-bool ProcessController::abort()
+bool ProcessController::abort(unsigned int timeout)
 {
   m_info.clear();
   m_process.kill(SIGINT);
-  if (getExecutable() == "basf2") {
-    usleep(100000);
-    m_process.kill(SIGQUIT);
-    m_process.kill(SIGKILL);
+
+  bool sigintWasSuccessful = false;
+  for (unsigned int timer = 0; timer < timeout; ++timer) {
+    if (not m_process.isAlive()) {
+      sigintWasSuccessful = true;
+      break;
+    } else {
+      usleep(1000000);
+    }
   }
+
+  if (sigintWasSuccessful) {
+    LogFile::debug("Process successfully killed with SIGINT.");
+  } else {
+    LogFile::warning("Process could not be killed with SIGINT, sending SIGABRT.");
+    m_process.kill(SIGABRT);
+  }
+
   if (m_callback != NULL)
     m_callback->set(m_parname + ".pid", -1);
   m_process.wait();

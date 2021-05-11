@@ -3,11 +3,12 @@
 """
 This module contains various utility functions for the prompt calibration CAF scripts to use.
 """
-from basf2 import B2INFO, B2WARNING, B2DEBUG
+from basf2 import B2INFO
 from collections import defaultdict, OrderedDict
 from itertools import groupby
 import ROOT
 from caf.utils import ExpRun, IoV
+from random import choice
 
 
 def filter_by_max_files_per_run(files_to_iov, max_files_per_run=1, min_events_per_file=0):
@@ -65,7 +66,7 @@ def group_files_by_iov(files_to_iov):
         files_to_iov (dict): {"/path/to/file1.root": IoV(1,1,1,1), "/path/to/file2.root": IoV(1,1,1,1)}
 
     Returns:
-        dict:   {IoV(1,1,1,1): ["/path/to/file1.root", "/path/to/file2.root"]}
+        dict: {IoV(1,1,1,1): ["/path/to/file1.root", "/path/to/file2.root"]}
     """
     iov_to_files = OrderedDict()
     for iov, g in groupby(files_to_iov.items(), lambda g: g[1]):
@@ -74,7 +75,7 @@ def group_files_by_iov(files_to_iov):
     return iov_to_files
 
 
-def filter_by_max_events_per_run(files_to_iov, max_events_per_run):
+def filter_by_max_events_per_run(files_to_iov, max_events_per_run, random_select=False):
     """
     This function creates a new files_to_iov dictionary by appending files
     in order until the maximum number of events are reached per run.
@@ -83,6 +84,7 @@ def filter_by_max_events_per_run(files_to_iov, max_events_per_run):
         files_to_iov (dict): {"/path/to/file.root": IoV(1,1,1,1)} type dictionary. Same style as used by the CAF
             for lookup values.
         max_events_per_run (int): The threshold we want to reach but stop adding files if we reach it.
+        random_select (bool): true will select random nfile and false will take first nfile.
 
     Returns:
         dict: The same style of dict as the input files_to_iov, but filtered down.
@@ -93,13 +95,17 @@ def filter_by_max_events_per_run(files_to_iov, max_events_per_run):
     # Ready a new dict to contain the reduced lists
     new_iov_to_files = OrderedDict()
 
-    for iov, files in iov_to_files.items():
+    for iov, files in sorted(iov_to_files.items()):
         run = ExpRun(iov.exp_low, iov.run_low)
         total = 0
         remaining_files = files[:]
         chosen_files = []
         while total < max_events_per_run and remaining_files:
-            file_path = remaining_files.pop(0)
+            if random_select:
+                file_path = choice(remaining_files)
+                remaining_files.remove(file_path)
+            else:
+                file_path = remaining_files.pop(0)
             events = events_in_basf2_file(file_path)
             # Empty files are skipped
             if not events:
@@ -123,6 +129,47 @@ def filter_by_max_events_per_run(files_to_iov, max_events_per_run):
     return new_files_to_iov
 
 
+def filter_by_select_max_events_from_files(input_file_list, select_max_events_from_files):
+    """
+    This function creates a new list by appending random files until
+    the maximum number of events are reached per data set.
+
+    Parameters:
+        input_file_list (list): ["/path/to/file2.root", "/path/to/file2.root"]
+        select_max_events_from_files (int): The threshold we want to reach but stop adding files if we reach it.
+
+    Returns:
+        list: The sorted list of random files or empty list of not enought found
+    """
+
+    total = 0
+    selected_file = []
+    while total < select_max_events_from_files:
+
+        if not input_file_list:
+            break
+
+        file_path = choice(input_file_list)
+        input_file_list.remove(file_path)
+
+        events = events_in_basf2_file(file_path)
+        # Empty files are skipped
+        if not events:
+            B2INFO(f"No events in {file_path}, skipping...")
+            continue
+
+        total += events
+        selected_file.append(file_path)
+        B2INFO(f"Choosing random input file: {file_path} and total events so far {total}")
+
+    # return empty list if request events found
+    if total < select_max_events_from_files:
+        B2INFO(f"total events {total} are less than requested {select_max_events_from_files}")
+        selected_file = []
+
+    return sorted(selected_file)
+
+
 def events_in_basf2_file(file_path):
     """Does a quick open and return of the number of entries in a basf2 file's tree object.
 
@@ -132,7 +179,7 @@ def events_in_basf2_file(file_path):
     Returns:
         int: Number of entries in tree.
     """
-    f = ROOT.TFile(file_path, "READ")
+    f = ROOT.TFile.Open(file_path, "READ")
     events = f.tree.GetEntries()
     f.Close()
     return events

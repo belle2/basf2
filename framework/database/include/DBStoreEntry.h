@@ -54,12 +54,14 @@ namespace Belle2 {
       c_Object
     };
     /** Construct a new DBStoreEntry
+     * @param type store entry type
      * @param name name of the payload, ususally the class name of the payload
      *        but can be any string identifying the payload in the database
      * @param objClass TClass* pointer of the payload, used to check that we
      *        actually obtained the correct payload from the database
      * @param isArray if true the object is required to be a TClonesArray
      *        containing objClass objects.
+     * @param isRequired if false don't emit errors if the payload cannot be found for any run
      */
     DBStoreEntry(EPayloadType type, const std::string& name, const TClass* objClass, bool isArray, bool isRequired):
       m_payloadType(type), m_name(name), m_objClass(objClass), m_isArray(isArray), m_isRequired(isRequired) {}
@@ -129,6 +131,8 @@ namespace Belle2 {
      * @param revision new revision of the payload
      * @param iov new interval of validity for the payload
      * @param filename filename for the payload
+     * @param checksum checksum of the payload
+     * @param event EventMetaData object
      */
     void updatePayload(unsigned int revision, const IntervalOfValidity& iov, const std::string& filename, const std::string& checksum,
                        const EventMetaData& event);

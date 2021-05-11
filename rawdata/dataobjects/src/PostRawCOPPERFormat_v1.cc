@@ -87,7 +87,7 @@ unsigned int PostRawCOPPERFormat_v1::CalcDriverChkSum(int n)
 int PostRawCOPPERFormat_v1::GetFINESSENwords(int n, int finesse_num)
 {
   int pos_nwords_0, pos_nwords_1;
-  int nwords;
+  int nwords = 0;
   switch (finesse_num) {
     case 0 :
       pos_nwords_0 = GetBufferPos(n) + tmp_header.POS_OFFSET_1ST_FINESSE;

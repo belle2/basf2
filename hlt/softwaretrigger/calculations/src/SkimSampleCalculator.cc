@@ -25,13 +25,16 @@
 #include <analysis/variables/ECLVariables.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <analysis/variables/AcceptanceVariables.h>
+#include <analysis/variables/FlightInfoVariables.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
 SkimSampleCalculator::SkimSampleCalculator() :
   m_pionParticles("pi+:skim"), m_gammaParticles("gamma:skim"), m_pionHadParticles("pi+:hadb"), m_pionTauParticles("pi+:tau"),
-  m_KsParticles("K_S0:merged")
+  m_KsParticles("K_S0:merged"), m_LambdaParticles("Lambda0:merged"), m_DstParticles("D*+:d0pi"), m_offIpParticles("pi+:offip"),
+  m_filterL1TrgNN("software_trigger_cut&filter&L1_trigger_nn_info")
 {
 
 }
@@ -43,6 +46,9 @@ void SkimSampleCalculator::requireStoreArrays()
   m_pionHadParticles.isRequired();
   m_pionTauParticles.isRequired();
   m_KsParticles.isOptional();
+  m_LambdaParticles.isOptional();
+  m_DstParticles.isOptional();
+  m_offIpParticles.isRequired();
 
 };
 
@@ -659,13 +665,15 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   // nKshort
   int nKshort = 0;
   double Kshort = 0.;
+  const double KsMassLow = 0.468;
+  const double KsMassHigh = 0.528;
 
   if (m_KsParticles.isValid()) {
     for (unsigned int i = 0; i < m_KsParticles->getListSize(); i++) {
       const Particle* mergeKsCand = m_KsParticles->getParticle(i);
       const double isKsCandGood = Variable::goodBelleKshort(mergeKsCand);
       const double KsCandMass = mergeKsCand->getMass();
-      if (KsCandMass > 0.468 && KsCandMass < 0.528 && isKsCandGood == 1.) nKshort++;
+      if (KsCandMass > KsMassLow && KsCandMass < KsMassHigh && isKsCandGood == 1.) nKshort++;
     }
   }
 
@@ -706,4 +714,85 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   if (nFourLep != 0 && visibleEnergyCMS < 6) fourLep = 1;
 
   calculationResult["FourLep"] = fourLep;
+
+  // nLambda
+  unsigned int nLambda = 0;
+
+  if (m_LambdaParticles.isValid()) {
+    for (unsigned int i = 0; i < m_LambdaParticles->getListSize(); i++) {
+      const Particle* mergeLambdaCand = m_LambdaParticles->getParticle(i);
+      const double flightDist = Variable::flightDistance(mergeLambdaCand);
+      const double flightDistErr = Variable::flightDistanceErr(mergeLambdaCand);
+      const double flightSign = flightDist / flightDistErr;
+      const Particle* protCand = mergeLambdaCand->getDaughter(0);
+      const Particle* pionCand = mergeLambdaCand->getDaughter(1);
+      const double protMom = protCand->getMomentum().Mag();
+      const double pionMom = pionCand->getMomentum().Mag();
+      const double asymPDaughters = (protMom - pionMom) / (protMom + pionMom);
+      if (flightSign > 10 && asymPDaughters > 0.41) nLambda++;
+    }
+  }
+
+  if (nLambda > 0) {
+    calculationResult["Lambda"] = 1;
+  } else {
+    calculationResult["Lambda"] = 0;
+  }
+
+  // nDstp
+  unsigned int nDstp1 = 0;
+  unsigned int nDstp2 = 0;
+  unsigned int nDstp3 = 0;
+  unsigned int nDstp4 = 0;
+
+  if (m_DstParticles.isValid() && (ntrk_bha >= 3 && Bhabha2Trk == 0)) {
+    for (unsigned int i = 0; i < m_DstParticles->getListSize(); i++) {
+      const Particle* allDstCand = m_DstParticles->getParticle(i);
+      const double dstDecID = allDstCand->getExtraInfo("decayModeID");
+      if (dstDecID == 1.) nDstp1++;
+      if (dstDecID == 2.) nDstp2++;
+      if (dstDecID == 3.) nDstp3++;
+      if (dstDecID == 4.) nDstp4++;
+    }
+  }
+
+
+  if (nDstp1 > 0) {
+    calculationResult["Dstp1"] = 1;
+  } else {
+    calculationResult["Dstp1"] = 0;
+  }
+
+  if (nDstp2 > 0) {
+    calculationResult["Dstp2"] = 1;
+  } else {
+    calculationResult["Dstp2"] = 0;
+  }
+
+  if (nDstp3 > 0) {
+    calculationResult["Dstp3"] = 1;
+  } else {
+    calculationResult["Dstp3"] = 0;
+  }
+
+  if (nDstp4 > 0) {
+    calculationResult["Dstp4"] = 1;
+  } else {
+    calculationResult["Dstp4"] = 0;
+  }
+
+  // nTracksOffIP
+  calculationResult["nTracksOffIP"] = m_offIpParticles->getListSize();
+
+  // Flag for events with Trigger B2Link information
+  calculationResult["NeuroTRG"] = 0;
+
+  StoreObjPtr<SoftwareTriggerResult> filter_result;
+  if (filter_result.isValid()) {
+    const std::map<std::string, int>& nonPrescaledResults = filter_result->getNonPrescaledResults();
+    if (nonPrescaledResults.find(m_filterL1TrgNN) != nonPrescaledResults.end()) {
+      const bool hasNN = (filter_result->getNonPrescaledResult(m_filterL1TrgNN) == SoftwareTriggerCutResult::c_accept);
+      if (hasNN) calculationResult["NeuroTRG"] = 1;
+    }
+  }
 }

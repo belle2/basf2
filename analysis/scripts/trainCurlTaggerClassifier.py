@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-# -*-  coding: utf-8 -*-
 # Author: Marcel Hohmann (marcel.hohmann@desy.de)
 
 import basf2.core
-from modularAnalysis import inputMdst, tagCurlTracks, process, statistics, register_module
+from basf2 import process, statistics
+from modularAnalysis import inputMdst, tagCurlTracks, register_module
 from stdCharged import stdPi
 import sys
 import os
@@ -41,8 +41,8 @@ data_base_file = here + "/localdb/database.txt"
 
 # upload to global database
 if upload:
-    os.system("conditionsdb upload {TAGNAME} {DATABASEFILE}".format(TAGNAME=tag_name, DATABASEFILE=data_base_file))
+    os.system(f"conditionsdb upload {tag_name} {data_base_file}")
 
 if remove_local_files:
     os.system('rm -r {}'.format(here + '/localdb/'))
-    os.system('rm {}/{}'.format(here, training_file_name))
+    os.system(f'rm {here}/{training_file_name}')

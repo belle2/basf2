@@ -64,19 +64,19 @@ namespace Belle2 {
     /** See https://confluence.desy.de/display/BI/Electronics+Thresholds */
     short int m_adcAlwThresh;
     /** See documentation for method 'getF31' */
-    std::vector<short int> m_fg31;
+    std::vector<short int> m_fg31 = {};
     /** See documentation for method 'getF32' */
-    std::vector<short int> m_fg32;
+    std::vector<short int> m_fg32 = {};
     /** See documentation for method 'getF33' */
-    std::vector<short int> m_fg33;
+    std::vector<short int> m_fg33 = {};
     /** See documentation for method 'getF41' */
-    std::vector<short int> m_fg41;
+    std::vector<short int> m_fg41 = {};
     /** See documentation for method 'getF43' */
-    std::vector<short int> m_fg43;
+    std::vector<short int> m_fg43 = {};
     /** See documentation for method 'getF' */
-    std::vector<short int> m_f;
+    std::vector<short int> m_f = {};
     /** See documentation for method 'getF1' */
-    std::vector<short int> m_f1;
+    std::vector<short int> m_f1 = {};
     /**
      * This vector contains all parameters that didn't exist in the initial
      * version of ECL DSP file format.
@@ -114,14 +114,7 @@ namespace Belle2 {
       m_hitThresh(0),
       m_lowAmpThresh(0),
       m_skipThresh(0),
-      m_adcAlwThresh(0),
-      m_fg31(49152),
-      m_fg32(49152),
-      m_fg33(49152),
-      m_fg41(6144),
-      m_fg43(6144),
-      m_f(49152),
-      m_f1(49152)
+      m_adcAlwThresh(0)
     {}
     /** */
     ~ECLDspData() {};
@@ -131,7 +124,7 @@ namespace Belle2 {
     /*************/
 
     /** Return version of packer algorithm used in [un]packCoefVector */
-    static short int getPackerVersion() { return c_packerVersion; }
+    static constexpr short int getPackerVersion() { return c_packerVersion; }
 
     /**
      * @return Vector with all parameters that haven't been
@@ -224,37 +217,37 @@ namespace Belle2 {
     /**
      * Array with tabulated signal waveform.
      */
-    void setF(std::vector<short int>& src) { packCoefVector(src, m_f); }
+    void setF(const std::vector<short int>& src) { packCoefVector(src, m_f); }
     /**
      * Array with tabulated derivative of signal waveform
      */
-    void setF1(std::vector<short int>& src) { packCoefVector(src, m_f1); }
+    void setF1(const std::vector<short int>& src) { packCoefVector(src, m_f1); }
     /**
      * Array FG31, used to estimate signal amplitude.
      * Calculated from F and covariance matrix.
      */
-    void setF31(std::vector<short int>& src) { packCoefVector(src, m_fg31); }
+    void setF31(const std::vector<short int>& src) { packCoefVector(src, m_fg31); }
     /**
      * Array FG32, used to estimate A * delta_t.
      * (A -- amplitude, delta_t -- time shift for linearization)
      *
      * Calculated from F and covariance matrix.
      */
-    void setF32(std::vector<short int>& src) { packCoefVector(src, m_fg32); }
+    void setF32(const std::vector<short int>& src) { packCoefVector(src, m_fg32); }
     /**
      * Array FG33, used to estimate pedestal height in signal.
      *
      * Calculated from F and covariance matrix.
      */
-    void setF33(std::vector<short int>& src) { packCoefVector(src, m_fg33); }
+    void setF33(const std::vector<short int>& src) { packCoefVector(src, m_fg33); }
     /**
      * Alternative for FG31 for signals with small amplitude.
      */
-    void setF41(std::vector<short int>& src) { packCoefVector(src, m_fg41); }
+    void setF41(const std::vector<short int>& src) { packCoefVector(src, m_fg41); }
     /**
      * Alternative for FG33 for signals with small amplitude.
      */
-    void setF43(std::vector<short int>& src) { packCoefVector(src, m_fg43); }
+    void setF43(const std::vector<short int>& src) { packCoefVector(src, m_fg43); }
 
     /** Sets major version of DSP coefficients */
     void setverMaj(unsigned char val) { m_verMaj = val; }

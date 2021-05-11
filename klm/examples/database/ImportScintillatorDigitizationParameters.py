@@ -6,7 +6,6 @@
 import sys
 import basf2
 import math
-import ROOT
 from ROOT.Belle2 import KLMDatabaseImporter, KLMScintillatorDigitizationParameters
 
 basf2.set_log_level(basf2.LogLevel.INFO)

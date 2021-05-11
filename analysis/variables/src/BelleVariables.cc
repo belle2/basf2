@@ -15,9 +15,8 @@
 #include <analysis/variables/VertexVariables.h>
 #include <analysis/variables/ECLVariables.h>
 #include <analysis/variables/TrackVariables.h>
+#include <analysis/variables/V0DaughterTrackVariables.h>
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <analysis/variables/ParameterVariables.h>
 #include <analysis/variables/VertexVariables.h>
 
 #include <framework/logging/Logger.h>
@@ -25,6 +24,11 @@
 
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/BeamSpot.h>
+
+#include <framework/datastore/StoreArray.h>
+#include <b2bii/dataobjects/BelleTrkExtra.h>
+
+#include <TVectorF.h>
 
 #include <limits>
 
@@ -135,6 +139,103 @@ namespace Belle2 {
       return (double) isGoodBelleGamma(region, energy);
     }
 
+    BelleTrkExtra* getBelleTrkExtraInfoFromParticle(Particle const* particle)
+    {
+      const Track* track = particle->getTrack();
+      if (!track) {
+        return nullptr;
+      }
+      auto belleTrkExtra = track->getRelatedTo<BelleTrkExtra>();
+      if (!belleTrkExtra) {
+        return nullptr;
+      }
+      return belleTrkExtra;
+    }
+
+    double BelleFirstCDCHitX(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getTrackFirstX();
+    }
+
+    double BelleFirstCDCHitY(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getTrackFirstY();
+    }
+
+    double BelleFirstCDCHitZ(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getTrackFirstZ();
+    }
+
+    double BelleLastCDCHitX(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getTrackLastX();
+    }
+
+    double BelleLastCDCHitY(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getTrackLastY();
+    }
+
+    double BelleLastCDCHitZ(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getTrackLastZ();
+    }
+
+    double BellePi0InvariantMassSignificance(const Particle* particle)
+    {
+      TMatrixFSym covarianceMatrix(Particle::c_DimMomentum);
+      for (auto daughter : particle->getDaughters()) {
+        covarianceMatrix += daughter->getMomentumErrorMatrix();
+      }
+
+      TVectorF jacobian(Particle::c_DimMomentum);
+      jacobian[0] = -1.0 * particle->getPx() / particle->getMass();
+      jacobian[1] = -1.0 * particle->getPy() / particle->getMass();
+      jacobian[2] = -1.0 * particle->getPz() / particle->getMass();
+      jacobian[3] = 1.0 * particle->getEnergy() / particle->getMass();
+
+      double massErrSquared = jacobian * (covarianceMatrix * jacobian);
+
+      if (massErrSquared < 0.0)
+        return std::numeric_limits<double>::quiet_NaN();
+
+      double invMass = particleInvariantMassFromDaughters(particle);
+      double nomMass = particle->getPDGMass();
+
+      return (invMass - nomMass) / sqrt(massErrSquared);
+    }
+
     VARIABLE_GROUP("Belle Variables");
 
     REGISTER_VARIABLE("goodBelleKshort", goodBelleKshort, R"DOC(
@@ -173,6 +274,36 @@ See Also:
 [Legacy] Returns 1.0 if photon candidate passes simple region dependent
 energy selection for Belle data and MC (50/100/150 MeV).
 )DOC");
+
+    REGISTER_VARIABLE("BelleFirstCDCHitX", BelleFirstCDCHitX, R"DOC(
+[Legacy] Returns x component of starting point of the track near the 1st SVD or CDC hit for SVD1 data (exp. 7 - 27) or the 1st CDC hit for SVD2 data (from exp. 31). (Belle only, originally stored in mdst_trk_fit.)
+)DOC");
+
+    REGISTER_VARIABLE("BelleFirstCDCHitY", BelleFirstCDCHitY, R"DOC(
+[Legacy] Returns y component of starting point of the track near the 1st SVD or CDC hit for SVD1 data (exp. 7 - 27) or the 1st CDC hit for SVD2 data (from exp. 31). (Belle only, originally stored in mdst_trk_fit.)
+)DOC");
+
+    REGISTER_VARIABLE("BelleFirstCDCHitZ", BelleFirstCDCHitZ, R"DOC(
+[Legacy] Returns z component of starting point of the track near the 1st SVD or CDC hit for SVD1 data (exp. 7 - 27) or the 1st CDC hit for SVD2 data (from exp. 31). (Belle only, originally stored in mdst_trk_fit.)
+)DOC");
+
+    REGISTER_VARIABLE("BelleLastCDCHitX", BelleLastCDCHitX, R"DOC(
+[Legacy] Returns x component of end point of the track near the last CDC hit. (Belle only, originally stored in mdst_trk_fit.)
+)DOC");
+
+    REGISTER_VARIABLE("BelleLastCDCHitY", BelleLastCDCHitY, R"DOC(
+[Legacy] Returns y component of end point of the track near the last CDC hit. (Belle only, originally stored in mdst_trk_fit.)
+)DOC");
+
+    REGISTER_VARIABLE("BelleLastCDCHitZ", BelleLastCDCHitZ, R"DOC(
+[Legacy] Returns z component of end point of the track near the last CDC hit. (Belle only, originally stored in mdst_trk_fit.)
+)DOC");
+
+    REGISTER_VARIABLE("BellePi0SigM", BellePi0InvariantMassSignificance, R"DOC(
+      [Legacy] Returns the significance of the pi0 mass used in the FEI for B2BII.
+      The significance is calculated as the difference between the reconstructed and the nominal mass divided by the mass uncertainty.
+      Since the pi0's covariance matrix for B2BII is empty, the latter is calculated using the photon daughters' covariance matrices.
+      )DOC");
 
     // this is defined in ECLVariables.{h,cc}
     REGISTER_VARIABLE("clusterBelleQuality", eclClusterDeltaL, R"DOC(

@@ -275,13 +275,13 @@ bool HLTEventProcessor::processEvent(PathIterator moduleIter, bool firstRound)
                 << module->getName());
       }
     } else {
-      // initialize random number state for the event
-      RandomNumbers::initializeEvent();
-
       if (not firstRound) {
         // Also call the event function for the master, but not the first time
         callEvent(module);
       }
+      // initialize random number state for the event handling after we have
+      // recieved the event information from the master module.
+      RandomNumbers::initializeEvent(true);
     }
 
     if (g_signalReceived != 0) {

@@ -164,13 +164,35 @@ namespace Belle2 {
       return m_svdGlobalConfig_aDBObjPtr->getHV();
     }
 
+    /** GLOBAL CONFIGURATION PARAMETERS:
+     * Return the relative time shift in units of APV clock /4 between the 3- and 6- sample acquired events
+     *
+     * Input:
+     * no input parameters are required since it is a detector based payload
+     *
+     * Output: int corresponding to the relative time shift in units of APV clock /4 between the 3- and 6- sample acquired events
+     */
+    float getRelativeTimeShift()
+    {
+      return m_svdGlobalConfig_aDBObjPtr->getRelativeTimeShift();
+    }
+
+    /** GLOBAL CONFIGURATION PARAMETER:
+     * Return the int corresponding to the sumber of samples (3 -> 3-sample DAQ, 6-> 6-sample DAQ, 9 ->3-mixed-6 DAQ)
+     */
+    int getNrFrames()
+    {
+      return m_svdGlobalConfig_aDBObjPtr->getNrFrames();
+    }
+
     /** returns the unique ID of the payload */
     //    TString getUniqueID() { return m_svdLocalConfig_aDBObjPtr->get_uniqueID(); }
 
     /** returns true if the m_aDBObtPtr is valid in the requested IoV */
     bool isValid()
     {
-      return m_svdLocalConfig_aDBObjPtr.isValid();
+      //      return m_svdLocalConfig_aDBObjPtr.isValid();
+      return m_svdGlobalConfig_aDBObjPtr.isValid();
     }
 
 

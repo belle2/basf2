@@ -10,12 +10,10 @@
 
 #include <ecl/modules/eclTrackClusterMatching/ECLTrackClusterMatchingPerformanceModule.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/RelationVector.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
+#include <framework/gearbox/Const.h>
 
 #include <root/TFile.h>
 #include <root/TTree.h>
@@ -63,10 +61,9 @@ void ECLTrackClusterMatchingPerformanceModule::initialize()
 
 void ECLTrackClusterMatchingPerformanceModule::event()
 {
-  StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
-  m_iEvent = eventMetaData->getEvent();
-  m_iRun = eventMetaData->getRun();
-  m_iExperiment = eventMetaData->getExperiment();
+  m_iEvent = m_EventMetaData->getEvent();
+  m_iRun = m_EventMetaData->getRun();
+  m_iExperiment = m_EventMetaData->getExperiment();
 
   for (const ECLCluster& eclCluster : m_eclClusters) {
     setClusterVariablesToDefaultValue();
@@ -92,7 +89,8 @@ void ECLTrackClusterMatchingPerformanceModule::event()
       if (eclCluster.getEnergy(hypo) >= 0.5 * relatedMCParticle->getEnergy()) {
         if (isChargedStable(*relatedMCParticle) && weight >= 0.5 * relatedMCParticle->getEnergy()) {
           found_charged_stable = true;
-        } else if (relatedMCParticle->getPDG() == 22 && weight >= 0.5 * eclCluster.getEnergy(hypo) && !found_photon) {
+        } else if (relatedMCParticle->getPDG() == Const::photon.getPDGCode() && weight >= 0.5 * eclCluster.getEnergy(hypo)
+                   && !found_photon) {
           found_photon = true;
           m_photonEnergy = relatedMCParticle->getEnergy();
         }

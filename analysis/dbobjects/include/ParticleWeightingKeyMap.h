@@ -62,7 +62,7 @@ namespace Belle2 {
 
     /**
      * Adding predefined ID to the table.
-     * @param bin contains bin ranges and names of te variables
+     * @param bin contains bin ranges and names of the variables
      * @param key_ID predefined bin ID
      * @return added key ID
      */
@@ -70,7 +70,7 @@ namespace Belle2 {
 
     /**
      * Adding predefined ID to the table.
-     * @param bin contains bin ranges and names of te variables
+     * @param bin contains bin ranges and names of the variables
      * @return added key ID
      */
     double addKey(NDBin bin);
@@ -78,7 +78,7 @@ namespace Belle2 {
 
     /**
      * Get global bin ID for given observable values
-     * @param values map of axis names and correspoinding values
+     * @param values map of axis names and corresponding values
      * @return global ID
      */
     double getKey(std::map<std::string, double> values) const;

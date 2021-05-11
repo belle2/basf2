@@ -450,6 +450,8 @@ void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
   unsigned int dhp_reserved     = 0;
   unsigned int dhp_dhe_id       = 0;
   unsigned int dhp_dhp_id       = 0;
+  unsigned int wrap = 0; // workaround to recalc a relative frame number
+  int last_gate = -1; // workaround to recalc a relative frame number
 
   // cppcheck-suppress unreadVariable
   unsigned int dhp_row = 0, dhp_col = 0, dhp_adc = 0, dhp_cm = 0;
@@ -573,6 +575,12 @@ void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
         pixelflag = false;
         dhp_row = (dhp_pix[i] & 0xFFC0) >> 5;
         dhp_cm  = dhp_pix[i] & 0x3F;
+        if (last_gate != -1 && (int)dhp_row / 4 < last_gate) {
+          // B2DEBUF(29,"Wrap " << LogVar("last", last_gate) << LogVar("curr", dhp_row / 4) << LogVar("DHE", dhe_ID) << LogVar("DHP", dhp_dhp_id));
+          wrap++; // relies on the order of data before mapping and the fact that OT firmware delivers only one frame
+        }
+        last_gate = dhp_row / 4;
+
         if (dhp_cm == 63) { // fifo overflow
           B2WARNING("DHP data loss (CM=63) in " << LogVar("DHE", dhe_ID) << LogVar("DHP", dhp_dhp_id));
           /// FIXME TODO set an error bit ... but define one first
@@ -630,16 +638,16 @@ void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
           B2DEBUG(29, "SetPix: Row $" << hex << dhp_row << " Col $" << hex << dhp_col << " ADC $" << hex << dhp_adc
                   << " CM $" << hex << dhp_cm);
 
-          /*if (m_verbose) {
-            B2DEBUG(29, "raw    |   " << hex << d[i]);
-            B2DEBUG(29, "row " << hex << ((d[i] >> 20) & 0xFFF) << "(" << ((d[i] >> 20) & 0xFFF) << ")" << " col " << "(" << hex << ((d[i] >> 8) & 0xFFF) << ((d[i] >> 8) & 0xFFF)
-                   << " adc " << "(" << hex << (d[i] & 0xFF) << (d[i] & 0xFF) << ")");
-            B2DEBUG(29, "dhe_ID " << dhe_ID);
-            B2DEBUG(29, "start-Frame-Nr " << dec << dhe_first_readout_frame_id_lo);
-          };*/
-
-          if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
-                                                        (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F);
+          if (dhp_adc == 0) {
+            // if !supress error flag
+            B2WARNING("DHE Event truncation in DHE " << dhe_ID << " DHP " << dhp_dhp_id);
+            // m_errorMask |= c_DHE_EVENT_TRUNC;
+            daqpktstat.dhc_back().dhe_back().dhp_back().setTruncated();
+          } else {
+            // in new firmware, (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) would always been 0
+            if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
+                                                          (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo + wrap) & 0x3F);
+          }
         }
       }
     }

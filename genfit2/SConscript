@@ -22,6 +22,7 @@ env.Append(CPPPATH=os.path.join(env['INCDIR'], 'genfit'))
 def create_dictionaries(dirs):
     """generate, build, and collect dictionary files"""
     dict_files = []
+    aux_dict_files = []
     for dir in dirs:
         linkdef_files = Glob(os.path.join(src_dir, dir, 'src', '*LinkDef.h'))
         for linkdef_file in linkdef_files:
@@ -51,13 +52,13 @@ def create_dictionaries(dirs):
             dict_files.append(env.SharedObject(dict_file, CPPPATH=['#'] + env['CPPPATH']))
 
             # install corresponding pcm file in lib (for cling)
-            env.Copy(os.path.join(env['LIBDIR'], rootpcm_file.name), rootpcm_file)
+            aux_dict_files.append(env.Copy(os.path.join(env['LIBDIR'], rootpcm_file.name), rootpcm_file))
 
             # install corresponding rootmap files to support auto-loading of libraries
             # once used via ROOT
-            env.Copy(os.path.join(env['LIBDIR'], rootmap_file.name), rootmap_file)
+            aux_dict_files.append(env.Copy(os.path.join(env['LIBDIR'], rootmap_file.name), rootmap_file))
 
-    return dict_files
+    return (dict_files, aux_dict_files)
 
 
 def build_library(name, dirs, extra_libs=[]):
@@ -76,9 +77,12 @@ def build_library(name, dirs, extra_libs=[]):
         print("No genfit sources found.  Please check if svn up fills the genfit2/$src_dir subdirectory.")
         Exit(1)
 
-    dict_files = create_dictionaries(dirs)
+    dict_files, aux_dict_files = create_dictionaries(dirs)
     lib = env.SharedLibrary(os.path.join(env['LIBDIR'], name), [source_files, dict_files], LIBS=extra_libs + env["LIBS"])
     env.Alias('genfit2', lib)
+
+    # make sure pcm and rootmap files are installed before the library
+    env.Depends(lib, aux_dict_files)
 
 
 build_library("libgenfit2.so", dirs)

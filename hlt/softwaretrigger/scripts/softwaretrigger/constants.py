@@ -33,14 +33,19 @@ class DQMModes(Enum):
     before_filter = "before_filter"
     #: DQM modules which should only run on the filtered ones
     filtered = "filtered"
+    #: DQM modules which should run on the L1 passthrough events
+    l1_passthrough = "l1_passthrough"
     #: If not in HLT, just all all DQM modules
     dont_care = "dont_care"
 
+
 #: Always store those objects
-ALWAYS_SAVE_OBJECTS = ["EventMetaData", "SoftwareTriggerResult", "TRGSummary", "ROIpayload", "SoftwareTriggerVariables"]
+ALWAYS_SAVE_OBJECTS = ["EventMetaData", "RawFTSWs", "ROIpayload", "SoftwareTriggerResult", "SoftwareTriggerVariables",
+                       "TRGSummary"]
+
 #: Objects to be left on output
-RAWDATA_OBJECTS = ["RawCDCs", "RawSVDs", "RawPXDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "RawFTSWs", "RawTRGs",
-                   "ROIs"]
+RAWDATA_OBJECTS = ["RawCDCs", "RawSVDs", "RawPXDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "RawTRGs", "ROIs"]
+
 #: Objects which will be kept after the ExpressReconstruction, for example for the Event Display
 PROCESSED_OBJECTS = ['Tracks', 'TrackFitResults',
                      'SVDClusters', 'PXDClusters',
@@ -49,15 +54,16 @@ PROCESSED_OBJECTS = ['Tracks', 'TrackFitResults',
                      'BKLMHit1ds', 'BKLMHit2ds',
                      'EKLMHit2ds', 'SoftwareTriggerResult']
 
-#: list of DataStore names that are present when data enters the HLT.
-HLT_INPUT_OBJECTS = RAWDATA_OBJECTS + ["EventMetaData"]
+#: List of DataStore names that are present when data enters the HLT.
+HLT_INPUT_OBJECTS = RAWDATA_OBJECTS + ["EventMetaData", "RawFTSWs"]
 HLT_INPUT_OBJECTS.remove("ROIs")
 
-#: list of DataStore names that are present when data enters the expressreco
+#: List of DataStore names that are present when data enters the expressreco
 EXPRESSRECO_INPUT_OBJECTS = RAWDATA_OBJECTS + ALWAYS_SAVE_OBJECTS
 
 # Detectors to be included in hlt
 DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "KLM", "TRG"]
+
 # Detectors to be included in expressreco
 DEFAULT_EXPRESSRECO_COMPONENTS = DEFAULT_HLT_COMPONENTS + ["PXD"]
 

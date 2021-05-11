@@ -8,10 +8,11 @@
 #        TOPDigits.root is the output file of unpackToTOPDigitsWithTBC.py
 # -------------------------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 import ROOT
 from ROOT import gStyle, gROOT, AddressOf, TH2F
+import sys
 
 
 gStyle.SetOptStat(0)
@@ -30,13 +31,12 @@ gROOT.ProcessLine('struct TreeStruct {\
    int pmtpixel;\
 };')
 
-from ROOT import TreeStruct
+from ROOT import TreeStruct  # noqa
 
-from sys import argv
 args = sys.argv
 
 
-class Ntuple(Module):
+class Ntuple(b2.Module):
     ''' t0const ntpule infomation '''
 
     global t0const
@@ -111,7 +111,7 @@ class Ntuple(Module):
 
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # input
 main.add_module('RootInput')
@@ -123,7 +123,7 @@ main.add_module(Ntuple())
 main.add_module('Progress')
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print statistics
-print(statistics)
+print(b2.statistics)

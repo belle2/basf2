@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import os
 import sys
@@ -8,7 +7,7 @@ import subprocess
 import itertools
 from shutil import copyfile
 import ROOT
-from ROOT.Belle2 import FileMetaData, EventMetaData
+from ROOT.Belle2 import FileMetaData
 # we don't really need basf2 but it fixes the print buffering problem
 import basf2
 from b2test_utils import clean_working_directory, skip_test_if_light
@@ -22,7 +21,7 @@ def create_testfile(name, release=None, exp=0, run=0, events=100, branchNames=No
     env = dict(os.environ)
     env.update(argk)
 
-    steering_file = "steering-{0}.py".format(name)
+    steering_file = f"steering-{name}.py"
     with open(steering_file, "w") as f:
         f.write(testfile_steering)
 
@@ -78,8 +77,8 @@ def merge_files(*args, output="output.root", filter_modified=False):
     # do we want to filter the modified release warning?
     if filter_modified:
         # if so replace them using regular expression
-        process.stdout = re.sub(b"^\[WARNING\] File \"(.*?)\" created with modified software ([a-zA-Z0-9\-+]*?): "
-                                b"cannot verify that files are compatible\\n", b"", process.stdout, flags=re.MULTILINE)
+        process.stdout = re.sub(rb"^\[WARNING\] File \"(.*?)\" created with modified software ([a-zA-Z0-9\-+]*?): "
+                                rb"cannot verify that files are compatible\n", b"", process.stdout, flags=re.MULTILINE)
 
     # in any case print output
     sys.stdout.buffer.write(process.stdout)
@@ -95,8 +94,7 @@ import sys
 import basf2
 basf2.set_log_level(basf2.LogLevel.ERROR)
 if "BELLE2_GLOBALTAG" in os.environ:
-    basf2.reset_database()
-    basf2.use_central_database(os.environ["BELLE2_GLOBALTAG"])
+    basf2.conditions.override_globaltags([os.environ["BELLE2_GLOBALTAG"]])
 if "BELLE2_SEED" in os.environ:
     basf2.set_random_seed(os.environ["BELLE2_SEED"])
 main = basf2.create_path()
@@ -347,8 +345,8 @@ def check_21_eventmetadata():
         return False
     # we expect to see the events from run 0 twice and the ones from run 1 once.
     # So create a dictionary which contains the expected counts
-    eventcount = {(0, 0, i+1): 2 for i in range(100)}
-    eventcount.update({(0, 1, i+1): 1 for i in range(100)})
+    eventcount = {(0, 0, i + 1): 2 for i in range(100)}
+    eventcount.update({(0, 1, i + 1): 1 for i in range(100)})
     for i in range(entries):
         events.GetEntry(i)
         e = events.EventMetaData
@@ -405,12 +403,12 @@ if __name__ == "__main__":
     failures = 0
     existing = [e for e in sorted(globals().items()) if e[0].startswith("check_")]
     for name, fcn in existing:
-        print("running {0}: {1}".format(name, fcn.__doc__))
+        print(f"running {name}: {fcn.__doc__}")
         with clean_working_directory():
             if not fcn():
-                print("{0} failed".format(name))
+                print(f"{name} failed")
                 failures += 1
             else:
-                print("{0} passed".format(name))
+                print(f"{name} passed")
 
     sys.exit(failures)

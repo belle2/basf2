@@ -1,0 +1,24 @@
+# EventType: 1110022004
+# Descriptor: [B0 -> (rho+ -> pi+ pi0) pi- ]cc
+# NickName: Bb_rho+pi-
+# Documentation:    Decay mode for phi2/alpha and rediscoveries
+# Reponsible: R. Manfredi
+# Email: riccardo.manfredi@ts.infn.it
+# Tested: Yes
+# PhysicsWG: BToCharmless
+# Cuts: None
+# Date: 06/11/2020
+#
+#
+#
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0                     VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+0.5  rho+ pi-          PHOTOS SVS;
+0.5  rho- pi+	       PHOTOS SVS;
+Enddecay
+CDecay anti-B0sig
+
+End

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # Thomas Keck
 
-import sys
 import re
 import struct
 import pdg
@@ -9,9 +8,7 @@ import basf2
 
 import pybasf2
 # inspect is also used by LogPythonInterface. Do not remove
-import inspect
 import numpy as np
-import collections
 import ROOT
 from ROOT import Belle2
 
@@ -49,10 +46,11 @@ def _decayHashFloatToInt(decayHash, decayHashExtended):
     return decayHashFullInt
 
 
-class DecayHashMap(object):
+class DecayHashMap:
     """
     DecayHashMap using the C++ implementation of DecayTree and DecayNode
     """
+
     def __init__(self, rootfile, removeRadiativeGammaFlag=False):
         """Constructor"""
         import root_numpy
@@ -134,7 +132,7 @@ def _pdg_to_name(x):
         pass
 
     if selected:
-        if LogPythonInterface.terminal_supports_colors():
+        if pybasf2.LogPythonInterface.terminal_supports_colors():
             return '\x1b[31m' + pdg_string + '\x1b[0m'
         else:
             return '^' + pdg_string

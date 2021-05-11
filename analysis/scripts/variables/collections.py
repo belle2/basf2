@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from variables import utils
 
 #: Replacement for DeltaEMbc
@@ -94,7 +93,7 @@ dalitz_3body = [
 ]
 
 #: Tracking variables, replacement for Track tool
-track = ['dr', 'dx', 'dy', 'dz', 'd0', 'z0', 'pValue']
+track = ['dr', 'dx', 'dy', 'dz', 'd0', 'z0', 'pValue', 'ndf']
 
 #: Replacement for TrackHits tool
 track_hits = ['nCDCHits', 'nPXDHits', 'nSVDHits', 'nVXDHits']
@@ -335,6 +334,16 @@ mc_event_kinematics = [
     'genMissingMomentumOfEventCMS',
     'genTotalPhotonsEnergyOfEvent',
     'genVisibleEnergyOfEventCMS'
+]
+
+#: Belle Track CDC hit variables
+belle_track_hit = [
+    "BelleFirstCDCHitX",
+    "BelleFirstCDCHitY",
+    "BelleFirstCDCHitZ",
+    "BelleLastCDCHitX",
+    "BelleLastCDCHitY",
+    "BelleLastCDCHitZ"
 ]
 
 # now register all the variables declared in this file as collections

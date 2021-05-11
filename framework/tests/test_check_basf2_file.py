@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import os
 
@@ -8,7 +7,7 @@ from contextlib import redirect_stdout
 with redirect_stdout(open(os.devnull, 'w')):
     print('abc')
 
-import basf2
+import basf2  # noqa
 
 
 rootfile = basf2.find_file('/framework/tests/root_input.root')

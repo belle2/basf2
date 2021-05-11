@@ -41,13 +41,11 @@ Untested method PIDLikelihood::printArray
 Untested method PIDLikelihood::setLogLikelihood
 Untested method ECLCluster::addHypothesis
 Untested method ECLCluster::addStatus
-Untested method ECLCluster::getHypothesisId
 Untested method ECLCluster::hasStatus
 Untested method ECLCluster::removeHypothesis
 Untested method ECLCluster::removeStatus
 Untested method ECLCluster::setAbsZernike40
 Untested method ECLCluster::setAbsZernike51
-Untested method ECLCluster::setClusterHadronIntensity
 Untested method ECLCluster::setClusterId
 Untested method ECLCluster::setConnectedRegionId
 Untested method ECLCluster::setCovarianceMatrix
@@ -92,11 +90,15 @@ Untested method KLMCluster::setLayers
 Untested method KLMCluster::setMomentumMag
 Untested method KLMCluster::setTime
 Untested method TRGSummary::getInfoHTML
+Untested method TRGSummary::getInputBitNumber
+Untested method TRGSummary::getOutputBitNumber
 Untested method TRGSummary::setFtdlBits
 Untested method TRGSummary::setInputBits
+Untested method TRGSummary::setPoissonInInjectionVeto
 Untested method TRGSummary::setPreScale
 Untested method TRGSummary::setPsnmBits
 Untested method TRGSummary::setTRGSummary
+Untested method TRGSummary::setTimQuality
 Untested method TRGSummary::setTimType
 Untested method TRGSummary::test
 Untested method TRGSummary::testFtdl
@@ -288,6 +290,7 @@ TrackFitResult#0:
 [INFO] Conditions data: configured globaltags (highest priority first) are GT_gen_prod_004.10_release-01-00-00, Legacy_IP_Information
   get4Momentum(): (-0.159463,0.323374,0.355817,0.525438)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.986861
   getCov(): size(15)
     2.01428e-05
@@ -323,6 +326,7 @@ TrackFitResult#0:
   getHitPatternCDC(): 0100011111111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.159463,0.323374,0.355817)
+  getNDF(): -1
   getOmega(): -0.0123421
   getPValue(): 0.49966
   getParticleType(): <type: pi+>
@@ -341,6 +345,7 @@ TrackFitResult#0:
 TrackFitResult#1:
   get4Momentum(): (-0.16061,0.325522,0.35786,0.709606)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.985875
   getCov(): size(15)
     3.21657e-05
@@ -376,6 +381,7 @@ TrackFitResult#1:
   getHitPatternCDC(): 0100011111111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.16061,0.325522,0.35786)
+  getNDF(): -1
   getOmega(): -0.0122594
   getPValue(): 0.350686
   getParticleType(): <type: K+>
@@ -394,6 +400,7 @@ TrackFitResult#1:
 TrackFitResult#2:
   get4Momentum(): (-0.164918,0.333685,0.366626,1.07392)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.984987
   getCov(): size(15)
     5.99112e-05
@@ -429,6 +436,7 @@ TrackFitResult#2:
   getHitPatternCDC(): 0100011111111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.164918,0.333685,0.366626)
+  getNDF(): -1
   getOmega(): -0.0119555
   getPValue(): 0.0530578
   getParticleType(): <type: p+>
@@ -447,6 +455,7 @@ TrackFitResult#2:
 TrackFitResult#3:
   get4Momentum(): (0.587618,-0.614402,-0.722687,1.12452)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.850053
   getCov(): size(15)
     3.52233e-06
@@ -482,6 +491,7 @@ TrackFitResult#3:
   getHitPatternCDC(): 0010010100000000000000000000111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.587618,-0.614402,-0.722687)
+  getNDF(): -1
   getOmega(): 0.00523427
   getPValue(): 0.000327144
   getParticleType(): <type: pi+>
@@ -500,6 +510,7 @@ TrackFitResult#3:
 TrackFitResult#4:
   get4Momentum(): (0.587731,-0.614492,-0.722675,1.22025)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.849896
   getCov(): size(15)
     3.99477e-06
@@ -535,6 +546,7 @@ TrackFitResult#4:
   getHitPatternCDC(): 0010010100000000000000000000111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.587731,-0.614492,-0.722675)
+  getNDF(): -1
   getOmega(): 0.00523339
   getPValue(): 0.000689633
   getParticleType(): <type: K+>
@@ -553,6 +565,7 @@ TrackFitResult#4:
 TrackFitResult#5:
   get4Momentum(): (0.588765,-0.61555,-0.723674,1.45932)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.849592
   getCov(): size(15)
     5.27417e-06
@@ -588,6 +601,7 @@ TrackFitResult#5:
   getHitPatternCDC(): 0010010100000000000000000000111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.588765,-0.61555,-0.723674)
+  getNDF(): -1
   getOmega(): 0.00522429
   getPValue(): 0.00215956
   getParticleType(): <type: p+>
@@ -606,6 +620,7 @@ TrackFitResult#5:
 TrackFitResult#6:
   get4Momentum(): (-0.507064,-0.304919,1.21146,1.35543)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 2.04747
   getCov(): size(15)
     1.66414e-05
@@ -641,6 +656,7 @@ TrackFitResult#6:
   getHitPatternCDC(): 0010000000000000000000000000000011111111111111111101111111111111
   getHitPatternVXD(): 00000000010101010101010100010010
   getMomentum(): (-0.507064,-0.304919,1.21146)
+  getNDF(): -1
   getOmega(): 0.00752094
   getPValue(): 0.0228862
   getParticleType(): <type: pi+>
@@ -659,6 +675,7 @@ TrackFitResult#6:
 TrackFitResult#7:
   get4Momentum(): (-0.506994,-0.304833,1.2113,1.43559)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 2.04757
   getCov(): size(15)
     1.85526e-05
@@ -694,6 +711,7 @@ TrackFitResult#7:
   getHitPatternCDC(): 0010000000000000000000000000000011111111111111111101111111111111
   getHitPatternVXD(): 00000000010101010101010100010010
   getMomentum(): (-0.506994,-0.304833,1.2113)
+  getNDF(): -1
   getOmega(): 0.00752227
   getPValue(): 0.0238767
   getParticleType(): <type: K+>
@@ -712,6 +730,7 @@ TrackFitResult#7:
 TrackFitResult#8:
   get4Momentum(): (-0.507586,-0.305048,1.2127,1.64368)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 2.0478
   getCov(): size(15)
     2.38391e-05
@@ -747,6 +766,7 @@ TrackFitResult#8:
   getHitPatternCDC(): 0010000000000000000000000000000011111111111111111101111111111111
   getHitPatternVXD(): 00000000010101010101010100010010
   getMomentum(): (-0.507586,-0.305048,1.2127)
+  getNDF(): -1
   getOmega(): 0.00751441
   getPValue(): 0.0244285
   getParticleType(): <type: p+>
@@ -765,6 +785,7 @@ TrackFitResult#8:
 TrackFitResult#9:
   get4Momentum(): (0.0738267,0.0031515,0.0145708,0.158595)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.197185
   getCov(): size(15)
     0.000955232
@@ -800,6 +821,7 @@ TrackFitResult#9:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101011010010100010001
   getMomentum(): (0.0738267,0.0031515,0.0145708)
+  getNDF(): -1
   getOmega(): -0.0602217
   getPValue(): 0.867952
   getParticleType(): <type: pi+>
@@ -818,6 +840,7 @@ TrackFitResult#9:
 TrackFitResult#10:
   get4Momentum(): (-0.259623,-0.00235443,-0.450079,0.538015)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -1.73351
   getCov(): size(15)
     0.00130553
@@ -853,6 +876,7 @@ TrackFitResult#10:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100000000
   getMomentum(): (-0.259623,-0.00235443,-0.450079)
+  getNDF(): -1
   getOmega(): -0.0171397
   getPValue(): 0.64931
   getParticleType(): <type: pi+>
@@ -871,6 +895,7 @@ TrackFitResult#10:
 TrackFitResult#11:
   get4Momentum(): (-0.261777,-0.00248038,-0.453905,0.719917)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -1.73386
   getCov(): size(15)
     0.00231566
@@ -906,6 +931,7 @@ TrackFitResult#11:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100000000
   getMomentum(): (-0.261777,-0.00248038,-0.453905)
+  getNDF(): -1
   getOmega(): -0.0169987
   getPValue(): 0.79109
   getParticleType(): <type: K+>
@@ -924,6 +950,7 @@ TrackFitResult#11:
 TrackFitResult#12:
   get4Momentum(): (-0.27052,-0.00300837,-0.469145,1.08335)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -1.73413
   getCov(): size(15)
     0.00500735
@@ -959,6 +986,7 @@ TrackFitResult#12:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100000000
   getMomentum(): (-0.27052,-0.00300837,-0.469145)
+  getNDF(): -1
   getOmega(): -0.016449
   getPValue(): 0.916488
   getParticleType(): <type: p+>
@@ -977,6 +1005,7 @@ TrackFitResult#12:
 TrackFitResult#13:
   get4Momentum(): (0.435752,-0.0092323,0.00716212,0.457707)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.0164325
   getCov(): size(15)
     8.93076e-06
@@ -1012,6 +1041,7 @@ TrackFitResult#13:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.435752,-0.0092323,0.00716212)
+  getNDF(): -1
   getOmega(): 0.01021
   getPValue(): 0.033321
   getParticleType(): <type: pi+>
@@ -1030,6 +1060,7 @@ TrackFitResult#13:
 TrackFitResult#14:
   get4Momentum(): (0.435069,-0.00903417,0.0069923,0.658128)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.0160682
   getCov(): size(15)
     1.669e-05
@@ -1065,6 +1096,7 @@ TrackFitResult#14:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.435069,-0.00903417,0.0069923)
+  getNDF(): -1
   getOmega(): 0.0102261
   getPValue(): 0.241854
   getParticleType(): <type: K+>
@@ -1083,6 +1115,7 @@ TrackFitResult#14:
 TrackFitResult#15:
   get4Momentum(): (0.43829,-0.00895727,0.0067232,1.03565)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.0153364
   getCov(): size(15)
     3.64459e-05
@@ -1118,6 +1151,7 @@ TrackFitResult#15:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.43829,-0.00895727,0.0067232)
+  getNDF(): -1
   getOmega(): 0.010151
   getPValue(): 0.690083
   getParticleType(): <type: p+>
@@ -1256,7 +1290,6 @@ PIDLikelihood#5:
 ECLCluster#0:
   getAbsZernike40(): 0.881543
   getAbsZernike51(): 0.738281
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (47.3882,48.5937,211.467)
   getConnectedRegionId(): 1
@@ -1296,7 +1329,6 @@ ECLCluster#0:
   getUncertaintyEnergy(): 0.00205078
   getUncertaintyPhi(): 0.0152344
   getUncertaintyTheta(): 0.00605469
-  getUniqueId(): 105001
   getZernikeMVA(): 0.569336
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1310,7 +1342,6 @@ ECLCluster#0:
 ECLCluster#1:
   getAbsZernike40(): 0.464844
   getAbsZernike51(): 0.372656
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-99.0707,-19.5978,211.009)
   getConnectedRegionId(): 2
@@ -1347,7 +1378,6 @@ ECLCluster#1:
   getUncertaintyEnergy(): 0.0263672
   getUncertaintyPhi(): 0.00625
   getUncertaintyTheta(): 0.00234375
-  getUniqueId(): 205001
   getZernikeMVA(): 0.533203
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1361,7 +1391,6 @@ ECLCluster#1:
 ECLCluster#2:
   getAbsZernike40(): 0.587695
   getAbsZernike51(): 0.876562
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-135.933,11.8634,198.639)
   getConnectedRegionId(): 3
@@ -1397,7 +1426,6 @@ ECLCluster#2:
   getUncertaintyEnergy(): 0.00146484
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.00917969
-  getUniqueId(): 305001
   getZernikeMVA(): 0.494141
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1411,7 +1439,6 @@ ECLCluster#2:
 ECLCluster#3:
   getAbsZernike40(): 0.202539
   getAbsZernike51(): 0.309375
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-136.801,13.1692,164.643)
   getConnectedRegionId(): 4
@@ -1447,7 +1474,6 @@ ECLCluster#3:
   getUncertaintyEnergy(): 0.00703125
   getUncertaintyPhi(): 0.00722656
   getUncertaintyTheta(): 0.00585938
-  getUniqueId(): 405001
   getZernikeMVA(): 0.105469
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1461,7 +1487,6 @@ ECLCluster#3:
 ECLCluster#4:
   getAbsZernike40(): 0.972852
   getAbsZernike51(): 0.616406
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-5.20805,139.222,106.614)
   getConnectedRegionId(): 5
@@ -1497,7 +1522,6 @@ ECLCluster#4:
   getUncertaintyEnergy(): 0.00410156
   getUncertaintyPhi(): 0.00878906
   getUncertaintyTheta(): 0.00722656
-  getUniqueId(): 505001
   getZernikeMVA(): 0.797852
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1511,7 +1535,6 @@ ECLCluster#4:
 ECLCluster#5:
   getAbsZernike40(): 0.303809
   getAbsZernike51(): 0.302344
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-129.533,54.8222,51.2424)
   getConnectedRegionId(): 6
@@ -1547,7 +1570,6 @@ ECLCluster#5:
   getUncertaintyEnergy(): 0.00908203
   getUncertaintyPhi(): 0.00664062
   getUncertaintyTheta(): 0.00527344
-  getUniqueId(): 605001
   getZernikeMVA(): 0.333008
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1561,7 +1583,6 @@ ECLCluster#5:
 ECLCluster#6:
   getAbsZernike40(): 0.918066
   getAbsZernike51(): 0.650391
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (2.71374,140.805,24.8401)
   getConnectedRegionId(): 8
@@ -1597,7 +1618,6 @@ ECLCluster#6:
   getUncertaintyEnergy(): 0.00292969
   getUncertaintyPhi(): 0.00976562
   getUncertaintyTheta(): 0.00800781
-  getUniqueId(): 805001
   getZernikeMVA(): 0.439453
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1611,7 +1631,6 @@ ECLCluster#6:
 ECLCluster#7:
   getAbsZernike40(): 0.348633
   getAbsZernike51(): 0.375
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (115.322,80.6579,16.8508)
   getConnectedRegionId(): 7
@@ -1647,7 +1666,6 @@ ECLCluster#7:
   getUncertaintyEnergy(): 0.00673828
   getUncertaintyPhi(): 0.00742187
   getUncertaintyTheta(): 0.00585938
-  getUniqueId(): 705001
   getZernikeMVA(): 0.80957
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1661,7 +1679,6 @@ ECLCluster#7:
 ECLCluster#8:
   getAbsZernike40(): 0.95625
   getAbsZernike51(): 0.671484
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (104.847,-93.645,-1.96114)
   getConnectedRegionId(): 10
@@ -1698,7 +1715,6 @@ ECLCluster#8:
   getUncertaintyEnergy(): 0.00205078
   getUncertaintyPhi(): 0.0105469
   getUncertaintyTheta(): 0.00898437
-  getUniqueId(): 1005001
   getZernikeMVA(): 0.805664
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1712,7 +1728,6 @@ ECLCluster#8:
 ECLCluster#9:
   getAbsZernike40(): 1.07578
   getAbsZernike51(): 0.386719
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-39.8493,-134.848,-8.32757)
   getConnectedRegionId(): 11
@@ -1748,7 +1763,6 @@ ECLCluster#9:
   getUncertaintyEnergy(): 0.00439453
   getUncertaintyPhi(): 0.00878906
   getUncertaintyTheta(): 0.00703125
-  getUniqueId(): 1105001
   getZernikeMVA(): 0.833984
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1762,7 +1776,6 @@ ECLCluster#9:
 ECLCluster#10:
   getAbsZernike40(): 1.17539
   getAbsZernike51(): 0.678516
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-35.3413,136.312,-27.0504)
   getConnectedRegionId(): 12
@@ -1798,7 +1811,6 @@ ECLCluster#10:
   getUncertaintyEnergy(): 0.00175781
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.00917969
-  getUniqueId(): 1205001
   getZernikeMVA(): 0.78418
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1812,7 +1824,6 @@ ECLCluster#10:
 ECLCluster#11:
   getAbsZernike40(): 1.38955
   getAbsZernike51(): 0.106641
-  getClusterHadronIntensity(): 0
   getClusterId(): 2
   getClusterPosition(): (140.705,3.58911,-46.1838)
   getConnectedRegionId(): 13
@@ -1849,7 +1860,6 @@ ECLCluster#11:
   getUncertaintyEnergy(): 0.0108398
   getUncertaintyPhi(): 0.00605469
   getUncertaintyTheta(): 0.00488281
-  getUniqueId(): 1305002
   getZernikeMVA(): 0.0732422
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1863,7 +1873,6 @@ ECLCluster#11:
 ECLCluster#12:
   getAbsZernike40(): 1.24346
   getAbsZernike51(): 0.530859
-  getClusterHadronIntensity(): 0
   getClusterId(): 3
   getClusterPosition(): (140.306,-8.48485,-60.3816)
   getConnectedRegionId(): 13
@@ -1901,7 +1910,6 @@ ECLCluster#12:
   getUncertaintyEnergy(): 0.00644531
   getUncertaintyPhi(): 0.00761719
   getUncertaintyTheta(): 0.00605469
-  getUniqueId(): 1305003
   getZernikeMVA(): 0.151367
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1915,7 +1923,6 @@ ECLCluster#12:
 ECLCluster#13:
   getAbsZernike40(): 0.697266
   getAbsZernike51(): 0.0808594
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (123.088,-67.1176,-77.2865)
   getConnectedRegionId(): 14
@@ -1952,7 +1959,6 @@ ECLCluster#13:
   getUncertaintyEnergy(): 0.00410156
   getUncertaintyPhi(): 0.00878906
   getUncertaintyTheta(): 0.00722656
-  getUniqueId(): 1405001
   getZernikeMVA(): 0.294922
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1966,7 +1972,6 @@ ECLCluster#13:
 ECLCluster#14:
   getAbsZernike40(): 0.939648
   getAbsZernike51(): 0.589453
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (127.869,56.6363,-90.2211)
   getConnectedRegionId(): 15
@@ -2002,7 +2007,6 @@ ECLCluster#14:
   getUncertaintyEnergy(): 0.00878906
   getUncertaintyPhi(): 0.00664062
   getUncertaintyTheta(): 0.00546875
-  getUniqueId(): 1505001
   getZernikeMVA(): 0.850586
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2016,7 +2020,6 @@ ECLCluster#14:
 ECLCluster#15:
   getAbsZernike40(): 0.991113
   getAbsZernike51(): 0.501563
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (54.1965,-117.313,-113.805)
   getConnectedRegionId(): 16
@@ -2052,7 +2055,6 @@ ECLCluster#15:
   getUncertaintyEnergy(): 0.00498047
   getUncertaintyPhi(): 0.0113281
   getUncertaintyTheta(): 0.00761719
-  getUniqueId(): 1605001
   getZernikeMVA(): 0.40625
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2066,7 +2068,6 @@ ECLCluster#15:
 ECLCluster#16:
   getAbsZernike40(): 0.10957
   getAbsZernike51(): 0.258984
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-65.8506,-71.5169,-115.167)
   getConnectedRegionId(): 17
@@ -2102,7 +2103,6 @@ ECLCluster#16:
   getUncertaintyEnergy(): 0.00205078
   getUncertaintyPhi(): 0.0140625
   getUncertaintyTheta(): 0.00996094
-  getUniqueId(): 1705001
   getZernikeMVA(): 0.363281
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2116,7 +2116,6 @@ ECLCluster#16:
 ECLCluster#17:
   getAbsZernike40(): 0.415039
   getAbsZernike51(): 0.472266
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (40.6597,-64.4135,-116.195)
   getConnectedRegionId(): 18
@@ -2153,7 +2152,6 @@ ECLCluster#17:
   getUncertaintyEnergy(): 0.00380859
   getUncertaintyPhi(): 0.0123047
   getUncertaintyTheta(): 0.00839844
-  getUniqueId(): 1805001
   getZernikeMVA(): 0.326172
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2167,7 +2165,6 @@ ECLCluster#17:
 ECLCluster#18:
   getAbsZernike40(): 0.655762
   getAbsZernike51(): 0.933984
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-24.9582,-58.2077,-116.598)
   getConnectedRegionId(): 19
@@ -2203,7 +2200,6 @@ ECLCluster#18:
   getUncertaintyEnergy(): 0.00146484
   getUncertaintyPhi(): 0.0148437
   getUncertaintyTheta(): 0.0103516
-  getUniqueId(): 1905001
   getZernikeMVA(): 0.40332
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2217,7 +2213,6 @@ ECLCluster#18:
 ECLCluster#19:
   getAbsZernike40(): 1.35801
   getAbsZernike51(): 0.373828
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (47.3882,48.5937,211.467)
   getConnectedRegionId(): 1
@@ -2258,7 +2253,6 @@ ECLCluster#19:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 106001
   getZernikeMVA(): 0.430664
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2272,7 +2266,6 @@ ECLCluster#19:
 ECLCluster#20:
   getAbsZernike40(): 1.12227
   getAbsZernike51(): 0.203906
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-99.0707,-19.5978,211.009)
   getConnectedRegionId(): 2
@@ -2309,7 +2302,6 @@ ECLCluster#20:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 206001
   getZernikeMVA(): 0.466797
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2323,7 +2315,6 @@ ECLCluster#20:
 ECLCluster#21:
   getAbsZernike40(): 1.27998
   getAbsZernike51(): 0.452344
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-135.933,11.8634,198.639)
   getConnectedRegionId(): 3
@@ -2359,7 +2350,6 @@ ECLCluster#21:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 306001
   getZernikeMVA(): 0.505859
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2373,7 +2363,6 @@ ECLCluster#21:
 ECLCluster#22:
   getAbsZernike40(): 0.911426
   getAbsZernike51(): 0.183984
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-136.801,13.1692,164.643)
   getConnectedRegionId(): 4
@@ -2409,7 +2398,6 @@ ECLCluster#22:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 406001
   getZernikeMVA(): 0.894531
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2423,7 +2411,6 @@ ECLCluster#22:
 ECLCluster#23:
   getAbsZernike40(): 1.37295
   getAbsZernike51(): 0.323437
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-5.20805,139.222,106.614)
   getConnectedRegionId(): 5
@@ -2459,7 +2446,6 @@ ECLCluster#23:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 506001
   getZernikeMVA(): 0.202148
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2473,7 +2459,6 @@ ECLCluster#23:
 ECLCluster#24:
   getAbsZernike40(): 1.05586
   getAbsZernike51(): 0.315234
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-129.532,54.8218,51.265)
   getConnectedRegionId(): 6
@@ -2509,7 +2494,6 @@ ECLCluster#24:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 606001
   getZernikeMVA(): 0.666992
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2523,7 +2507,6 @@ ECLCluster#24:
 ECLCluster#25:
   getAbsZernike40(): 1.40615
   getAbsZernike51(): 0.338672
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (2.71374,140.805,24.8401)
   getConnectedRegionId(): 8
@@ -2559,7 +2542,6 @@ ECLCluster#25:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 806001
   getZernikeMVA(): 0.560547
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2573,7 +2555,6 @@ ECLCluster#25:
 ECLCluster#26:
   getAbsZernike40(): 1.16709
   getAbsZernike51(): 0.267187
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (115.32,80.6564,16.8436)
   getConnectedRegionId(): 7
@@ -2609,7 +2590,6 @@ ECLCluster#26:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 706001
   getZernikeMVA(): 0.19043
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2623,7 +2603,6 @@ ECLCluster#26:
 ECLCluster#27:
   getAbsZernike40(): 1.38789
   getAbsZernike51(): 0.319922
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (104.847,-93.645,-1.96114)
   getConnectedRegionId(): 10
@@ -2660,7 +2639,6 @@ ECLCluster#27:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1006001
   getZernikeMVA(): 0.194336
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2674,7 +2652,6 @@ ECLCluster#27:
 ECLCluster#28:
   getAbsZernike40(): 1.39785
   getAbsZernike51(): 0.172266
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-39.8493,-134.848,-8.32757)
   getConnectedRegionId(): 11
@@ -2710,7 +2687,6 @@ ECLCluster#28:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1106001
   getZernikeMVA(): 0.166016
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2724,7 +2700,6 @@ ECLCluster#28:
 ECLCluster#29:
   getAbsZernike40(): 1.4377
   getAbsZernike51(): 0.315234
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-35.3413,136.312,-27.0504)
   getConnectedRegionId(): 12
@@ -2760,7 +2735,6 @@ ECLCluster#29:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1206001
   getZernikeMVA(): 0.21582
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2774,7 +2748,6 @@ ECLCluster#29:
 ECLCluster#30:
   getAbsZernike40(): 0.283887
   getAbsZernike51(): 0.546094
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (140.519,-1.3742,-51.4618)
   getConnectedRegionId(): 13
@@ -2812,7 +2785,6 @@ ECLCluster#30:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1306001
   getZernikeMVA(): 0.998047
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2826,7 +2798,6 @@ ECLCluster#30:
 ECLCluster#31:
   getAbsZernike40(): 1.30488
   getAbsZernike51(): 0.105469
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (123.088,-67.1176,-77.2865)
   getConnectedRegionId(): 14
@@ -2863,7 +2834,6 @@ ECLCluster#31:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1406001
   getZernikeMVA(): 0.705078
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2877,7 +2847,6 @@ ECLCluster#31:
 ECLCluster#32:
   getAbsZernike40(): 1.37627
   getAbsZernike51(): 0.291797
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (127.869,56.6363,-90.2211)
   getConnectedRegionId(): 15
@@ -2913,7 +2882,6 @@ ECLCluster#32:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1506001
   getZernikeMVA(): 0.149414
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2927,7 +2895,6 @@ ECLCluster#32:
 ECLCluster#33:
   getAbsZernike40(): 1.43271
   getAbsZernike51(): 0.258984
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (54.1965,-117.313,-113.805)
   getConnectedRegionId(): 16
@@ -2963,7 +2930,6 @@ ECLCluster#33:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1606001
   getZernikeMVA(): 0.59375
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2977,7 +2943,6 @@ ECLCluster#33:
 ECLCluster#34:
   getAbsZernike40(): 0.863281
   getAbsZernike51(): 0.526172
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-65.8506,-71.5169,-115.167)
   getConnectedRegionId(): 17
@@ -3013,7 +2978,6 @@ ECLCluster#34:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1706001
   getZernikeMVA(): 0.636719
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -3027,7 +2991,6 @@ ECLCluster#34:
 ECLCluster#35:
   getAbsZernike40(): 1.25342
   getAbsZernike51(): 0.394922
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (40.6597,-64.4135,-116.195)
   getConnectedRegionId(): 18
@@ -3064,7 +3027,6 @@ ECLCluster#35:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1806001
   getZernikeMVA(): 0.673828
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -3078,7 +3040,6 @@ ECLCluster#35:
 ECLCluster#36:
   getAbsZernike40(): 1.32148
   getAbsZernike51(): 0.510937
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-24.9582,-58.2077,-116.598)
   getConnectedRegionId(): 19
@@ -3114,7 +3075,6 @@ ECLCluster#36:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1906001
   getZernikeMVA(): 0.59668
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -3518,7 +3478,9 @@ TRGSummary:
   getTRGSummary(7): 0
   getTRGSummary(8): 0
   getTRGSummary(9): 0
+  getTimQuality(): 0
   getTimType(): 15
+  isPoissonInInjectionVeto(): False
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(35)
     pair
@@ -5544,6 +5506,7 @@ Track#7:
 TrackFitResult#0:
   get4Momentum(): (-0.413809,-0.0745542,0.156042,0.469708)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.371111
   getCov(): size(15)
     1.08082e-05
@@ -5579,6 +5542,7 @@ TrackFitResult#0:
   getHitPatternCDC(): 0011100011111100000011111111111111111111111111111111111101111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.413809,-0.0745542,0.156042)
+  getNDF(): -1
   getOmega(): 0.0105834
   getPValue(): 1.25869e-12
   getParticleType(): <type: pi+>
@@ -5597,6 +5561,7 @@ TrackFitResult#0:
 TrackFitResult#1:
   get4Momentum(): (-0.417298,-0.0749718,0.157268,0.669484)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.370934
   getCov(): size(15)
     1.85102e-05
@@ -5632,6 +5597,7 @@ TrackFitResult#1:
   getHitPatternCDC(): 0011100011111100000011111111111111111111111111111111111101111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.417298,-0.0749718,0.157268)
+  getNDF(): -1
   getOmega(): 0.0104958
   getPValue(): 3.58474e-10
   getParticleType(): <type: K+>
@@ -5650,6 +5616,7 @@ TrackFitResult#1:
 TrackFitResult#2:
   get4Momentum(): (-0.432009,-0.0770028,0.162667,1.04851)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.370693
   getCov(): size(15)
     3.60726e-05
@@ -5685,6 +5652,7 @@ TrackFitResult#2:
   getHitPatternCDC(): 0011100011111100000011111111111111111111111111111111111101111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.432009,-0.0770028,0.162667)
+  getNDF(): -1
   getOmega(): 0.0101409
   getPValue(): 1.08935e-05
   getParticleType(): <type: p+>
@@ -5703,6 +5671,7 @@ TrackFitResult#2:
 TrackFitResult#3:
   get4Momentum(): (-0.527194,-0.0185765,0.414668,0.685353)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.786069
   getCov(): size(15)
     6.81588e-06
@@ -5738,6 +5707,7 @@ TrackFitResult#3:
   getHitPatternCDC(): 0011000100000111100011111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.527194,-0.0185765,0.414668)
+  getNDF(): -1
   getOmega(): 0.00843569
   getPValue(): 3.48763e-06
   getParticleType(): <type: pi+>
@@ -5756,6 +5726,7 @@ TrackFitResult#3:
 TrackFitResult#4:
   get4Momentum(): (-0.528327,-0.018616,0.415492,0.834162)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.785942
   getCov(): size(15)
     9.42511e-06
@@ -5791,6 +5762,7 @@ TrackFitResult#4:
   getHitPatternCDC(): 0011000100000111100011111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.528327,-0.018616,0.415492)
+  getNDF(): -1
   getOmega(): 0.0084176
   getPValue(): 6.89767e-06
   getParticleType(): <type: K+>
@@ -5809,6 +5781,7 @@ TrackFitResult#4:
 TrackFitResult#5:
   get4Momentum(): (-0.532961,-0.018742,0.419013,1.15772)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.785712
   getCov(): size(15)
     1.63829e-05
@@ -5844,6 +5817,7 @@ TrackFitResult#5:
   getHitPatternCDC(): 0011000100000111100011111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.532961,-0.018742,0.419013)
+  getNDF(): -1
   getOmega(): 0.00834443
   getPValue(): 1.41885e-06
   getParticleType(): <type: p+>
@@ -5862,6 +5836,7 @@ TrackFitResult#5:
 TrackFitResult#6:
   get4Momentum(): (-0.199983,0.0145911,-0.078633,0.25665)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.392155
   getCov(): size(15)
     2.83297
@@ -5897,6 +5872,7 @@ TrackFitResult#6:
   getHitPatternCDC(): 0011011100000000000000000000000000000000000000000000000111111111
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.199983,0.0145911,-0.078633)
+  getNDF(): -1
   getOmega(): 0.0211289
   getPValue(): 9.83509e-05
   getParticleType(): <type: pi+>
@@ -5915,6 +5891,7 @@ TrackFitResult#6:
 TrackFitResult#7:
   get4Momentum(): (-0.169711,0.0880405,-0.0525587,0.532008)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.274906
   getCov(): size(15)
     0.997624
@@ -5950,6 +5927,7 @@ TrackFitResult#7:
   getHitPatternCDC(): 0011011100000000000000000000000000000000000000000000000111111111
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.169711,0.0880405,-0.0525587)
+  getNDF(): -1
   getOmega(): 0.0225359
   getPValue(): 5.73585e-16
   getParticleType(): <type: K+>
@@ -5968,6 +5946,7 @@ TrackFitResult#7:
 TrackFitResult#8:
   get4Momentum(): (-0.151732,0.130868,0.0310067,0.95993)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.154746
   getCov(): size(15)
     3.61491
@@ -6003,6 +5982,7 @@ TrackFitResult#8:
   getHitPatternCDC(): 0011011100000000000000000000000000000000000000000000000111111111
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.151732,0.130868,0.0310067)
+  getNDF(): -1
   getOmega(): -0.0218398
   getPValue(): 0.0756598
   getParticleType(): <type: p+>
@@ -6021,6 +6001,7 @@ TrackFitResult#8:
 TrackFitResult#9:
   get4Momentum(): (0.205523,-0.051604,0.140182,0.289886)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.66154
   getCov(): size(15)
     0.01785
@@ -6056,6 +6037,7 @@ TrackFitResult#9:
   getHitPatternCDC(): 0001100011111111111111101010111100000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.205523,-0.051604,0.140182)
+  getNDF(): -1
   getOmega(): 0.0219397
   getPValue(): 0.106222
   getParticleType(): <type: pi+>
@@ -6074,6 +6056,7 @@ TrackFitResult#9:
 TrackFitResult#10:
   get4Momentum(): (0.206192,-0.0520076,0.14008,0.555481)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.658739
   getCov(): size(15)
     0.0281362
@@ -6109,6 +6092,7 @@ TrackFitResult#10:
   getHitPatternCDC(): 0001100011111111111111101010111100000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.206192,-0.0520076,0.14008)
+  getNDF(): -1
   getOmega(): 0.0218641
   getPValue(): 0.0250739
   getParticleType(): <type: K+>
@@ -6127,6 +6111,7 @@ TrackFitResult#10:
 TrackFitResult#11:
   get4Momentum(): (0.209164,-0.0537671,0.142607,0.97331)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.660324
   getCov(): size(15)
     0.0539579
@@ -6162,6 +6147,7 @@ TrackFitResult#11:
   getHitPatternCDC(): 0001100011111111111111101010111100000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.209164,-0.0537671,0.142607)
+  getNDF(): -1
   getOmega(): 0.0215307
   getPValue(): 0.3399
   getParticleType(): <type: p+>
@@ -6180,6 +6166,7 @@ TrackFitResult#11:
 TrackFitResult#12:
   get4Momentum(): (-0.205488,0.0517,-0.138353,0.288997)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.652942
   getCov(): size(15)
     7.88215e-05
@@ -6215,6 +6202,7 @@ TrackFitResult#12:
   getHitPatternCDC(): 0011010011111111111111111111111111111111111111000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.205488,0.0517,-0.138353)
+  getNDF(): -1
   getOmega(): -0.0219357
   getPValue(): 3.86518e-06
   getParticleType(): <type: pi+>
@@ -6233,6 +6221,7 @@ TrackFitResult#12:
 TrackFitResult#13:
   get4Momentum(): (-0.2058,0.0517903,-0.139786,0.555241)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.658696
   getCov(): size(15)
     0.000112915
@@ -6268,6 +6257,7 @@ TrackFitResult#13:
   getHitPatternCDC(): 0011010011111111111111111111111111111111111111000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.2058,0.0517903,-0.139786)
+  getNDF(): -1
   getOmega(): -0.0219033
   getPValue(): 0.00232588
   getParticleType(): <type: K+>
@@ -6286,6 +6276,7 @@ TrackFitResult#13:
 TrackFitResult#14:
   get4Momentum(): (-0.207375,0.0521739,-0.142297,0.972795)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.665441
   getCov(): size(15)
     0.000153101
@@ -6321,6 +6312,7 @@ TrackFitResult#14:
   getHitPatternCDC(): 0011010011111111111111111111111111111111111111000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.207375,0.0521739,-0.142297)
+  getNDF(): -1
   getOmega(): -0.0217389
   getPValue(): 0.418394
   getParticleType(): <type: p+>
@@ -6339,6 +6331,7 @@ TrackFitResult#14:
 TrackFitResult#15:
   get4Momentum(): (-0.398906,-0.318506,-0.676951,0.859253)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -1.32615
   getCov(): size(15)
     10.9631
@@ -6374,6 +6367,7 @@ TrackFitResult#15:
   getHitPatternCDC(): 0001001000000011111100000000000000000000000011111100000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.398906,-0.318506,-0.676951)
+  getNDF(): -1
   getOmega(): -0.00299561
   getPValue(): 0.483979
   getParticleType(): <type: pi+>
@@ -6392,6 +6386,7 @@ TrackFitResult#15:
 TrackFitResult#16:
   get4Momentum(): (-0.452352,-0.365648,-0.785544,1.09504)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -1.35054
   getCov(): size(15)
     12.9575
@@ -6427,6 +6422,7 @@ TrackFitResult#16:
   getHitPatternCDC(): 0001001000000011111100000000000000000000000011111100000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.452352,-0.365648,-0.785544)
+  getNDF(): -1
   getOmega(): -0.00243118
   getPValue(): 0.153499
   getParticleType(): <type: K+>
@@ -6445,6 +6441,7 @@ TrackFitResult#16:
 TrackFitResult#17:
   get4Momentum(): (-0.563109,-0.487884,-1.08218,1.61449)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -1.45246
   getCov(): size(15)
     15.1509
@@ -6480,6 +6477,7 @@ TrackFitResult#17:
   getHitPatternCDC(): 0001001000000011111100000000000000000000000011111100000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.563109,-0.487884,-1.08218)
+  getNDF(): -1
   getOmega(): -0.00436386
   getPValue(): 0.0426493
   getParticleType(): <type: p+>
@@ -6498,6 +6496,7 @@ TrackFitResult#17:
 TrackFitResult#18:
   get4Momentum(): (0.0710962,0.0340655,0.0425449,0.165847)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.539663
   getCov(): size(15)
     0.00132329
@@ -6533,6 +6532,7 @@ TrackFitResult#18:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010000
   getMomentum(): (0.0710962,0.0340655,0.0425449)
+  getNDF(): -1
   getOmega(): -0.0564464
   getPValue(): 1
   getParticleType(): <type: pi+>
@@ -6551,6 +6551,7 @@ TrackFitResult#18:
 TrackFitResult#19:
   get4Momentum(): (-0.234345,-0.103624,0.684447,0.744045)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 2.67119
   getCov(): size(15)
     6.43431e-05
@@ -6586,6 +6587,7 @@ TrackFitResult#19:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.234345,-0.103624,0.684447)
+  getNDF(): -1
   getOmega(): -0.017367
   getPValue(): 0.596972
   getParticleType(): <type: pi+>
@@ -6604,6 +6606,7 @@ TrackFitResult#19:
 TrackFitResult#20:
   get4Momentum(): (-0.234737,-0.103815,0.685566,0.882948)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 2.67101
   getCov(): size(15)
     8.75122e-05
@@ -6639,6 +6642,7 @@ TrackFitResult#20:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.234737,-0.103815,0.685566)
+  getNDF(): -1
   getOmega(): -0.0173375
   getPValue(): 0.785026
   getParticleType(): <type: K+>
@@ -6657,6 +6661,7 @@ TrackFitResult#20:
 TrackFitResult#21:
   get4Momentum(): (-0.236733,-0.10477,0.691415,1.19391)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 2.67078
   getCov(): size(15)
     0.000150645
@@ -6692,6 +6697,7 @@ TrackFitResult#21:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.236733,-0.10477,0.691415)
+  getNDF(): -1
   getOmega(): -0.0171894
   getPValue(): 0.949226
   getParticleType(): <type: p+>
@@ -6870,7 +6876,6 @@ PIDLikelihood#7:
 ECLCluster#0:
   getAbsZernike40(): 0.283887
   getAbsZernike51(): 0.737109
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-19.9561,-68.5697,211.502)
   getConnectedRegionId(): 1
@@ -6910,7 +6915,6 @@ ECLCluster#0:
   getUncertaintyEnergy(): 0.00820313
   getUncertaintyPhi(): 0.00996094
   getUncertaintyTheta(): 0.00371094
-  getUniqueId(): 105001
   getZernikeMVA(): 0.280273
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -6924,7 +6928,6 @@ ECLCluster#0:
 ECLCluster#1:
   getAbsZernike40(): 0.735449
   getAbsZernike51(): 0.648047
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (40.0134,-130.331,203.405)
   getConnectedRegionId(): 2
@@ -6961,7 +6964,6 @@ ECLCluster#1:
   getUncertaintyEnergy(): 0.0120117
   getUncertaintyPhi(): 0.00585938
   getUncertaintyTheta(): 0.0046875
-  getUniqueId(): 205001
   getZernikeMVA(): 0.119141
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -6975,7 +6977,6 @@ ECLCluster#1:
 ECLCluster#2:
   getAbsZernike40(): 0.74873
   getAbsZernike51(): 0.755859
-  getClusterHadronIntensity(): 0
   getClusterId(): 2
   getClusterPosition(): (50.7777,-126.516,204.258)
   getConnectedRegionId(): 2
@@ -7012,7 +7013,6 @@ ECLCluster#2:
   getUncertaintyEnergy(): 0.0120117
   getUncertaintyPhi(): 0.00585938
   getUncertaintyTheta(): 0.0046875
-  getUniqueId(): 205002
   getZernikeMVA(): 0.124023
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7026,7 +7026,6 @@ ECLCluster#2:
 ECLCluster#3:
   getAbsZernike40(): 0.843359
   getAbsZernike51(): 0.878906
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-131.702,-40.0064,159.846)
   getConnectedRegionId(): 4
@@ -7063,7 +7062,6 @@ ECLCluster#3:
   getUncertaintyEnergy(): 0.00703125
   getUncertaintyPhi(): 0.00722656
   getUncertaintyTheta(): 0.00585938
-  getUniqueId(): 405001
   getZernikeMVA(): 0.681641
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7077,7 +7075,6 @@ ECLCluster#3:
 ECLCluster#4:
   getAbsZernike40(): 1.41777
   getAbsZernike51(): 0.404297
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (25.8941,135.677,146.252)
   getConnectedRegionId(): 5
@@ -7113,7 +7110,6 @@ ECLCluster#4:
   getUncertaintyEnergy(): 0.00322266
   getUncertaintyPhi(): 0.00957031
   getUncertaintyTheta(): 0.0078125
-  getUniqueId(): 505001
   getZernikeMVA(): 0.647461
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7127,7 +7123,6 @@ ECLCluster#4:
 ECLCluster#5:
   getAbsZernike40(): 0.95127
   getAbsZernike51(): 0.137109
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-95.8542,100.024,129.776)
   getConnectedRegionId(): 6
@@ -7163,7 +7158,6 @@ ECLCluster#5:
   getUncertaintyEnergy(): 0.00117187
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.009375
-  getUniqueId(): 605001
   getZernikeMVA(): 0.292969
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7177,7 +7171,6 @@ ECLCluster#5:
 ECLCluster#6:
   getAbsZernike40(): 0.00498047
   getAbsZernike51(): 0.199219
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-128.51,-52.051,126.018)
   getConnectedRegionId(): 7
@@ -7214,7 +7207,6 @@ ECLCluster#6:
   getUncertaintyEnergy(): 0.00234375
   getUncertaintyPhi(): 0.0103516
   getUncertaintyTheta(): 0.00859375
-  getUniqueId(): 705001
   getZernikeMVA(): 0.0185547
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7228,7 +7220,6 @@ ECLCluster#6:
 ECLCluster#7:
   getAbsZernike40(): 0.481445
   getAbsZernike51(): 0.289453
-  getClusterHadronIntensity(): 0
   getClusterId(): 2
   getClusterPosition(): (-120.189,-69.0792,127.607)
   getConnectedRegionId(): 7
@@ -7267,7 +7258,6 @@ ECLCluster#7:
   getUncertaintyEnergy(): 0.00380859
   getUncertaintyPhi(): 0.00917969
   getUncertaintyTheta(): 0.00742187
-  getUniqueId(): 705002
   getZernikeMVA(): 0.0322266
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7281,7 +7271,6 @@ ECLCluster#7:
 ECLCluster#8:
   getAbsZernike40(): 0.0713867
   getAbsZernike51(): 0.191016
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-114.785,78.267,117.617)
   getConnectedRegionId(): 8
@@ -7320,7 +7309,6 @@ ECLCluster#8:
   getUncertaintyEnergy(): 0.0111328
   getUncertaintyPhi(): 0.00605469
   getUncertaintyTheta(): 0.00488281
-  getUniqueId(): 805001
   getZernikeMVA(): 0.105469
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7334,7 +7322,6 @@ ECLCluster#8:
 ECLCluster#9:
   getAbsZernike40(): 1.5207
   getAbsZernike51(): 0.0363281
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-21.0042,-137.952,99.9571)
   getConnectedRegionId(): 9
@@ -7370,7 +7357,6 @@ ECLCluster#9:
   getUncertaintyEnergy(): 0.00380859
   getUncertaintyPhi(): 0.00917969
   getUncertaintyTheta(): 0.00742187
-  getUniqueId(): 905001
   getZernikeMVA(): 0.345703
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7384,7 +7370,6 @@ ECLCluster#9:
 ECLCluster#10:
   getAbsZernike40(): 1.46094
   getAbsZernike51(): 0.295312
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-130.405,50.2596,93.5169)
   getConnectedRegionId(): 10
@@ -7420,7 +7405,6 @@ ECLCluster#10:
   getUncertaintyEnergy(): 0.00292969
   getUncertaintyPhi(): 0.00976562
   getUncertaintyTheta(): 0.00800781
-  getUniqueId(): 1005001
   getZernikeMVA(): 0.560547
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7434,7 +7418,6 @@ ECLCluster#10:
 ECLCluster#11:
   getAbsZernike40(): 1.104
   getAbsZernike51(): 0.316406
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (122.582,68.1436,72.9882)
   getConnectedRegionId(): 11
@@ -7472,7 +7455,6 @@ ECLCluster#11:
   getUncertaintyEnergy(): 0.00644531
   getUncertaintyPhi(): 0.00761719
   getUncertaintyTheta(): 0.00605469
-  getUniqueId(): 1105001
   getZernikeMVA(): 0.769531
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7486,7 +7468,6 @@ ECLCluster#11:
 ECLCluster#12:
   getAbsZernike40(): 1.51904
   getAbsZernike51(): 0.0609375
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-117.047,77.9326,59.0372)
   getConnectedRegionId(): 13
@@ -7522,7 +7503,6 @@ ECLCluster#12:
   getUncertaintyEnergy(): 0.00498047
   getUncertaintyPhi(): 0.00820313
   getUncertaintyTheta(): 0.00664062
-  getUniqueId(): 1305001
   getZernikeMVA(): 0.34668
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7536,7 +7516,6 @@ ECLCluster#12:
 ECLCluster#13:
   getAbsZernike40(): 0.489746
   getAbsZernike51(): 0.672656
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-62.8263,-125.774,9.77459)
   getConnectedRegionId(): 15
@@ -7573,7 +7552,6 @@ ECLCluster#13:
   getUncertaintyEnergy(): 0.00351562
   getUncertaintyPhi(): 0.009375
   getUncertaintyTheta(): 0.00761719
-  getUniqueId(): 1505001
   getZernikeMVA(): 0.109375
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7587,7 +7565,6 @@ ECLCluster#13:
 ECLCluster#14:
   getAbsZernike40(): 1.30156
   getAbsZernike51(): 0.588281
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-140.574,2.88455,-1.61095)
   getConnectedRegionId(): 16
@@ -7623,7 +7600,6 @@ ECLCluster#14:
   getUncertaintyEnergy(): 0.00292969
   getUncertaintyPhi(): 0.00996094
   getUncertaintyTheta(): 0.00820313
-  getUniqueId(): 1605001
   getZernikeMVA(): 0.707031
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7637,7 +7613,6 @@ ECLCluster#14:
 ECLCluster#15:
   getAbsZernike40(): 0.63252
   getAbsZernike51(): 0.304688
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (114.523,-80.3611,-87.0421)
   getConnectedRegionId(): 18
@@ -7674,7 +7649,6 @@ ECLCluster#15:
   getUncertaintyEnergy(): 0.00146484
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.009375
-  getUniqueId(): 1805001
   getZernikeMVA(): 0.0400391
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7688,7 +7662,6 @@ ECLCluster#15:
 ECLCluster#16:
   getAbsZernike40(): 0.763672
   getAbsZernike51(): 0.217969
-  getClusterHadronIntensity(): 0
   getClusterId(): 2
   getClusterPosition(): (124.359,-64.159,-85.9381)
   getConnectedRegionId(): 18
@@ -7725,7 +7698,6 @@ ECLCluster#16:
   getUncertaintyEnergy(): 0.00205078
   getUncertaintyPhi(): 0.0105469
   getUncertaintyTheta(): 0.00898437
-  getUniqueId(): 1805002
   getZernikeMVA(): 0.0341797
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7739,7 +7711,6 @@ ECLCluster#16:
 ECLCluster#17:
   getAbsZernike40(): 0.581055
   getAbsZernike51(): 0.434766
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (126.273,59.7522,-93.4004)
   getConnectedRegionId(): 19
@@ -7775,7 +7746,6 @@ ECLCluster#17:
   getUncertaintyEnergy(): 0.00498047
   getUncertaintyPhi(): 0.00820313
   getUncertaintyTheta(): 0.00664062
-  getUniqueId(): 1905001
   getZernikeMVA(): 0.551758
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7789,7 +7759,6 @@ ECLCluster#17:
 ECLCluster#18:
   getAbsZernike40(): 0.405078
   getAbsZernike51(): 0.423047
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (138.74,17.5307,-88.7801)
   getConnectedRegionId(): 17
@@ -7828,7 +7797,6 @@ ECLCluster#18:
   getUncertaintyEnergy(): 0.0111328
   getUncertaintyPhi(): 0.00605469
   getUncertaintyTheta(): 0.00488281
-  getUniqueId(): 1705001
   getZernikeMVA(): 0.744141
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7842,7 +7810,6 @@ ECLCluster#18:
 ECLCluster#19:
   getAbsZernike40(): 1.07578
   getAbsZernike51(): 0.748828
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (46.5125,108.938,-114.301)
   getConnectedRegionId(): 21
@@ -7879,7 +7846,6 @@ ECLCluster#19:
   getUncertaintyEnergy(): 0.00117187
   getUncertaintyPhi(): 0.0150391
   getUncertaintyTheta(): 0.0103516
-  getUniqueId(): 2105001
   getZernikeMVA(): 0.763672
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7893,7 +7859,6 @@ ECLCluster#19:
 ECLCluster#20:
   getAbsZernike40(): 0.604297
   getAbsZernike51(): 0.644531
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (112.769,-17.0372,-114.487)
   getConnectedRegionId(): 20
@@ -7931,7 +7896,6 @@ ECLCluster#20:
   getUncertaintyEnergy(): 0.0199219
   getUncertaintyPhi(): 0.00722656
   getUncertaintyTheta(): 0.00449219
-  getUniqueId(): 2005001
   getZernikeMVA(): 0.796875
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7945,7 +7909,6 @@ ECLCluster#20:
 ECLCluster#21:
   getAbsZernike40(): 1.20527
   getAbsZernike51(): 0.420703
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-19.9561,-68.5697,211.502)
   getConnectedRegionId(): 1
@@ -7986,7 +7949,6 @@ ECLCluster#21:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 106001
   getZernikeMVA(): 0.719727
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8000,7 +7962,6 @@ ECLCluster#21:
 ECLCluster#22:
   getAbsZernike40(): 0.700586
   getAbsZernike51(): 0.171094
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (44.3465,-128.825,203.081)
   getConnectedRegionId(): 2
@@ -8037,7 +7998,6 @@ ECLCluster#22:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 206001
   getZernikeMVA(): 0.985352
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8051,7 +8011,6 @@ ECLCluster#22:
 ECLCluster#23:
   getAbsZernike40(): 1.35801
   getAbsZernike51(): 0.471094
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-131.702,-40.0064,159.846)
   getConnectedRegionId(): 4
@@ -8088,7 +8047,6 @@ ECLCluster#23:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 406001
   getZernikeMVA(): 0.318359
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8102,7 +8060,6 @@ ECLCluster#23:
 ECLCluster#24:
   getAbsZernike40(): 1.53232
   getAbsZernike51(): 0.165234
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (25.8941,135.677,146.252)
   getConnectedRegionId(): 5
@@ -8138,7 +8095,6 @@ ECLCluster#24:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 506001
   getZernikeMVA(): 0.352539
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8152,7 +8108,6 @@ ECLCluster#24:
 ECLCluster#25:
   getAbsZernike40(): 1.13057
   getAbsZernike51(): 0.0246094
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-95.8542,100.024,129.776)
   getConnectedRegionId(): 6
@@ -8188,7 +8143,6 @@ ECLCluster#25:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 606001
   getZernikeMVA(): 0.707031
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8202,7 +8156,6 @@ ECLCluster#25:
 ECLCluster#26:
   getAbsZernike40(): 0.366895
   getAbsZernike51(): 0.264844
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-123.063,-63.3409,127.465)
   getConnectedRegionId(): 7
@@ -8241,7 +8194,6 @@ ECLCluster#26:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 706001
   getZernikeMVA(): 0.999023
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8255,7 +8207,6 @@ ECLCluster#26:
 ECLCluster#27:
   getAbsZernike40(): 0.986133
   getAbsZernike51(): 0.183984
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-114.785,78.267,117.617)
   getConnectedRegionId(): 8
@@ -8294,7 +8245,6 @@ ECLCluster#27:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 806001
   getZernikeMVA(): 0.894531
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8308,7 +8258,6 @@ ECLCluster#27:
 ECLCluster#28:
   getAbsZernike40(): 1.56221
   getAbsZernike51(): 0.00703125
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-21.0042,-137.952,99.9571)
   getConnectedRegionId(): 9
@@ -8344,7 +8293,6 @@ ECLCluster#28:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 906001
   getZernikeMVA(): 0.654297
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8358,7 +8306,6 @@ ECLCluster#28:
 ECLCluster#29:
   getAbsZernike40(): 1.54893
   getAbsZernike51(): 0.132422
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-130.405,50.2596,93.5169)
   getConnectedRegionId(): 10
@@ -8394,7 +8341,6 @@ ECLCluster#29:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1006001
   getZernikeMVA(): 0.439453
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8408,7 +8354,6 @@ ECLCluster#29:
 ECLCluster#30:
   getAbsZernike40(): 1.2916
   getAbsZernike51(): 0.146484
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (122.582,68.1436,72.9882)
   getConnectedRegionId(): 11
@@ -8446,7 +8391,6 @@ ECLCluster#30:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1106001
   getZernikeMVA(): 0.230469
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8460,7 +8404,6 @@ ECLCluster#30:
 ECLCluster#31:
   getAbsZernike40(): 1.55557
   getAbsZernike51(): 0.0140625
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-117.047,77.9326,59.0372)
   getConnectedRegionId(): 13
@@ -8496,7 +8439,6 @@ ECLCluster#31:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1306001
   getZernikeMVA(): 0.65332
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8510,7 +8452,6 @@ ECLCluster#31:
 ECLCluster#32:
   getAbsZernike40(): 1.05088
   getAbsZernike51(): 0.0445313
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-62.8263,-125.774,9.77459)
   getConnectedRegionId(): 15
@@ -8547,7 +8488,6 @@ ECLCluster#32:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1506001
   getZernikeMVA(): 0.890625
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8561,7 +8501,6 @@ ECLCluster#32:
 ECLCluster#33:
   getAbsZernike40(): 1.50244
   getAbsZernike51(): 0.261328
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-140.574,2.88455,-1.61095)
   getConnectedRegionId(): 16
@@ -8597,7 +8536,6 @@ ECLCluster#33:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1606001
   getZernikeMVA(): 0.292969
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8611,7 +8549,6 @@ ECLCluster#33:
 ECLCluster#34:
   getAbsZernike40(): 0.00166016
   getAbsZernike51(): 0.120703
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (119.789,-71.7205,-86.1501)
   getConnectedRegionId(): 18
@@ -8648,7 +8585,6 @@ ECLCluster#34:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1806001
   getZernikeMVA(): 0.999023
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8662,7 +8598,6 @@ ECLCluster#34:
 ECLCluster#35:
   getAbsZernike40(): 1.22686
   getAbsZernike51(): 0.336328
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (126.273,59.7522,-93.4004)
   getConnectedRegionId(): 19
@@ -8698,7 +8633,6 @@ ECLCluster#35:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1906001
   getZernikeMVA(): 0.448242
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8712,7 +8646,6 @@ ECLCluster#35:
 ECLCluster#36:
   getAbsZernike40(): 1.12725
   getAbsZernike51(): 0.331641
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (138.74,17.5307,-88.7801)
   getConnectedRegionId(): 17
@@ -8751,7 +8684,6 @@ ECLCluster#36:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1706001
   getZernikeMVA(): 0.255859
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8765,7 +8697,6 @@ ECLCluster#36:
 ECLCluster#37:
   getAbsZernike40(): 1.43437
   getAbsZernike51(): 0.342187
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (46.5125,108.938,-114.301)
   getConnectedRegionId(): 21
@@ -8802,7 +8733,6 @@ ECLCluster#37:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 2106001
   getZernikeMVA(): 0.236328
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8816,7 +8746,6 @@ ECLCluster#37:
 ECLCluster#38:
   getAbsZernike40(): 1.19531
   getAbsZernike51(): 0.301172
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (112.769,-17.0372,-114.487)
   getConnectedRegionId(): 20
@@ -8854,7 +8783,6 @@ ECLCluster#38:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 2006001
   getZernikeMVA(): 0.203125
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9259,7 +9187,9 @@ TRGSummary:
   getTRGSummary(7): 0
   getTRGSummary(8): 0
   getTRGSummary(9): 0
+  getTimQuality(): 0
   getTimType(): 15
+  isPoissonInInjectionVeto(): False
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(35)
     pair
@@ -11255,6 +11185,7 @@ Track#4:
 TrackFitResult#0:
   get4Momentum(): (-0.613985,0.619082,0.0134006,0.883119)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.0153691
   getCov(): size(15)
     1.63657e-06
@@ -11290,6 +11221,7 @@ TrackFitResult#0:
   getHitPatternCDC(): 0011110011111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.613985,0.619082,0.0134006)
+  getNDF(): -1
   getOmega(): -0.00510371
   getPValue(): 0.127976
   getParticleType(): <type: pi+>
@@ -11308,6 +11240,7 @@ TrackFitResult#0:
 TrackFitResult#1:
   get4Momentum(): (-0.614292,0.619398,0.0134403,1.00245)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.0154068
   getCov(): size(15)
     2.05919e-06
@@ -11343,6 +11276,7 @@ TrackFitResult#1:
   getHitPatternCDC(): 0011110011111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.614292,0.619398,0.0134403)
+  getNDF(): -1
   getOmega(): -0.00510112
   getPValue(): 0.191441
   getParticleType(): <type: K+>
@@ -11361,6 +11295,7 @@ TrackFitResult#1:
 TrackFitResult#2:
   get4Momentum(): (-0.616297,0.621384,0.0135403,1.28315)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.0154715
   getCov(): size(15)
     3.22773e-06
@@ -11396,6 +11331,7 @@ TrackFitResult#2:
   getHitPatternCDC(): 0011110011111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.616297,0.621384,0.0135403)
+  getNDF(): -1
   getOmega(): -0.00508468
   getPValue(): 0.25902
   getParticleType(): <type: p+>
@@ -11414,6 +11350,7 @@ TrackFitResult#2:
 TrackFitResult#3:
   get4Momentum(): (0.0778226,0.634583,0.165731,0.675054)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.259223
   getCov(): size(15)
     1.06398e-05
@@ -11449,6 +11386,7 @@ TrackFitResult#3:
   getHitPatternCDC(): 0011111111111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.0778226,0.634583,0.165731)
+  getNDF(): -1
   getOmega(): -0.00696036
   getPValue(): 0.50959
   getParticleType(): <type: pi+>
@@ -11467,6 +11405,7 @@ TrackFitResult#3:
 TrackFitResult#4:
   get4Momentum(): (0.0779252,0.635924,0.166076,0.825694)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.259218
   getCov(): size(15)
     1.36217e-05
@@ -11502,6 +11441,7 @@ TrackFitResult#4:
   getHitPatternCDC(): 0011111111111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.0779252,0.635924,0.166076)
+  getNDF(): -1
   getOmega(): -0.00694576
   getPValue(): 0.507866
   getParticleType(): <type: K+>
@@ -11520,6 +11460,7 @@ TrackFitResult#4:
 TrackFitResult#5:
   get4Momentum(): (0.0785028,0.641589,0.167534,1.15162)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.259191
   getCov(): size(15)
     2.02631e-05
@@ -11555,6 +11496,7 @@ TrackFitResult#5:
   getHitPatternCDC(): 0011111111111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.0785028,0.641589,0.167534)
+  getNDF(): -1
   getOmega(): -0.00688459
   getPValue(): 0.306876
   getParticleType(): <type: p+>
@@ -11573,6 +11515,7 @@ TrackFitResult#5:
 TrackFitResult#6:
   get4Momentum(): (0.849706,0.094952,0.163686,0.88164)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.191447
   getCov(): size(15)
     2.97449e-06
@@ -11608,6 +11551,7 @@ TrackFitResult#6:
   getHitPatternCDC(): 0011011011111111111111011111111111110111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.849706,0.094952,0.163686)
+  getNDF(): -1
   getOmega(): 0.00520472
   getPValue(): 0.779805
   getParticleType(): <type: pi+>
@@ -11626,6 +11570,7 @@ TrackFitResult#6:
 TrackFitResult#7:
   get4Momentum(): (0.850244,0.0950661,0.163851,1.00126)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.191517
   getCov(): size(15)
     3.61315e-06
@@ -11661,6 +11606,7 @@ TrackFitResult#7:
   getHitPatternCDC(): 0011011011111111111111011111111111110111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.850244,0.0950661,0.163851)
+  getNDF(): -1
   getOmega(): 0.00520139
   getPValue(): 0.801153
   getParticleType(): <type: K+>
@@ -11679,6 +11625,7 @@ TrackFitResult#7:
 TrackFitResult#8:
   get4Momentum(): (0.853147,0.0954537,0.164535,1.28234)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.191661
   getCov(): size(15)
     5.25427e-06
@@ -11714,6 +11661,7 @@ TrackFitResult#8:
   getHitPatternCDC(): 0011011011111111111111011111111111110111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.853147,0.0954537,0.164535)
+  getNDF(): -1
   getOmega(): 0.00518365
   getPValue(): 0.787381
   getParticleType(): <type: p+>
@@ -11732,6 +11680,7 @@ TrackFitResult#8:
 TrackFitResult#9:
   get4Momentum(): (-0.71024,-0.0701305,1.34953,1.533)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.89092
   getCov(): size(15)
     5.72717e-06
@@ -11767,6 +11716,7 @@ TrackFitResult#9:
   getHitPatternCDC(): 0010011100000000000000000001111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.71024,-0.0701305,1.34953)
+  getNDF(): -1
   getOmega(): 0.00623518
   getPValue(): 0.82765
   getParticleType(): <type: pi+>
@@ -11785,6 +11735,7 @@ TrackFitResult#9:
 TrackFitResult#10:
   get4Momentum(): (-0.710043,-0.0701108,1.34918,1.60408)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.89095
   getCov(): size(15)
     6.21485e-06
@@ -11820,6 +11771,7 @@ TrackFitResult#10:
   getHitPatternCDC(): 0010011100000000000000000001111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.710043,-0.0701108,1.34918)
+  getNDF(): -1
   getOmega(): 0.00623692
   getPValue(): 0.848792
   getParticleType(): <type: K+>
@@ -11838,6 +11790,7 @@ TrackFitResult#10:
 TrackFitResult#11:
   get4Momentum(): (-0.710577,-0.0701491,1.35025,1.79259)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.89102
   getCov(): size(15)
     7.57811e-06
@@ -11873,6 +11826,7 @@ TrackFitResult#11:
   getHitPatternCDC(): 0010011100000000000000000001111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.710577,-0.0701491,1.35025)
+  getNDF(): -1
   getOmega(): 0.00623223
   getPValue(): 0.881068
   getParticleType(): <type: p+>
@@ -11891,6 +11845,7 @@ TrackFitResult#11:
 TrackFitResult#12:
   get4Momentum(): (0.0189463,0.08907,-0.165019,0.234528)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -1.81214
   getCov(): size(15)
     0.0191997
@@ -11926,6 +11881,7 @@ TrackFitResult#12:
   getHitPatternCDC(): 0010010100000000111111111111111111111100000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.0189463,0.08907,-0.165019)
+  getNDF(): -1
   getOmega(): -0.0512805
   getPValue(): 0.448363
   getParticleType(): <type: pi+>
@@ -11944,6 +11900,7 @@ TrackFitResult#12:
 TrackFitResult#13:
   get4Momentum(): (0.0189155,0.0907124,-0.15436,0.525481)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -1.66581
   getCov(): size(15)
     0.00474512
@@ -11979,6 +11936,7 @@ TrackFitResult#13:
   getHitPatternCDC(): 0010010100000000111111111111111111111100000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.0189155,0.0907124,-0.15436)
+  getNDF(): -1
   getOmega(): -0.0503151
   getPValue(): 0.00909003
   getParticleType(): <type: K+>
@@ -11997,6 +11955,7 @@ TrackFitResult#13:
 TrackFitResult#14:
   get4Momentum(): (0.0293873,0.155743,-0.292117,0.995393)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -1.84311
   getCov(): size(15)
     0.118713
@@ -12032,6 +11991,7 @@ TrackFitResult#14:
   getHitPatternCDC(): 0010010100000000111111111111111111111100000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.0293873,0.155743,-0.292117)
+  getNDF(): -1
   getOmega(): -0.0295286
   getPValue(): 0.805172
   getParticleType(): <type: p+>
@@ -12150,7 +12110,6 @@ PIDLikelihood#4:
 ECLCluster#0:
   getAbsZernike40(): 0.512988
   getAbsZernike51(): 0.807422
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (29.6661,72.2071,211.439)
   getConnectedRegionId(): 1
@@ -12190,7 +12149,6 @@ ECLCluster#0:
   getUncertaintyEnergy(): 0.00439453
   getUncertaintyPhi(): 0.0123047
   getUncertaintyTheta(): 0.0046875
-  getUniqueId(): 105001
   getZernikeMVA(): 0.712891
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12204,7 +12162,6 @@ ECLCluster#0:
 ECLCluster#1:
   getAbsZernike40(): 0.569434
   getAbsZernike51(): 0.375
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-98.1965,29.983,210.979)
   getConnectedRegionId(): 2
@@ -12244,7 +12201,6 @@ ECLCluster#1:
   getUncertaintyEnergy(): 0.0143555
   getUncertaintyPhi(): 0.00800781
   getUncertaintyTheta(): 0.003125
-  getUniqueId(): 205001
   getZernikeMVA(): 0.15332
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12258,7 +12214,6 @@ ECLCluster#1:
 ECLCluster#2:
   getAbsZernike40(): 0.360254
   getAbsZernike51(): 0.528516
-  getClusterHadronIntensity(): 0
   getClusterId(): 2
   getClusterPosition(): (-111.6,32.1547,210.797)
   getConnectedRegionId(): 2
@@ -12297,7 +12252,6 @@ ECLCluster#2:
   getUncertaintyEnergy(): 0.00380859
   getUncertaintyPhi(): 0.0130859
   getUncertaintyTheta(): 0.00507813
-  getUniqueId(): 205002
   getZernikeMVA(): 0.119141
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12311,7 +12265,6 @@ ECLCluster#2:
 ECLCluster#3:
   getAbsZernike40(): 0.722168
   getAbsZernike51(): 0.672656
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-56.0705,-124.554,194.422)
   getConnectedRegionId(): 3
@@ -12348,7 +12301,6 @@ ECLCluster#3:
   getUncertaintyEnergy(): 0.00878906
   getUncertaintyPhi(): 0.00664062
   getUncertaintyTheta(): 0.00527344
-  getUniqueId(): 305001
   getZernikeMVA(): 0.869141
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12362,7 +12314,6 @@ ECLCluster#3:
 ECLCluster#4:
   getAbsZernike40(): 1.20029
   getAbsZernike51(): 0.667969
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-119.281,-74.385,58.7255)
   getConnectedRegionId(): 4
@@ -12398,7 +12349,6 @@ ECLCluster#4:
   getUncertaintyEnergy(): 0.00322266
   getUncertaintyPhi(): 0.00957031
   getUncertaintyTheta(): 0.0078125
-  getUniqueId(): 405001
   getZernikeMVA(): 0.823242
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12412,7 +12362,6 @@ ECLCluster#4:
 ECLCluster#5:
   getAbsZernike40(): 0.602637
   getAbsZernike51(): 0.556641
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-55.8246,129.201,41.5627)
   getConnectedRegionId(): 5
@@ -12448,7 +12397,6 @@ ECLCluster#5:
   getUncertaintyEnergy(): 0.0123047
   getUncertaintyPhi(): 0.00566406
   getUncertaintyTheta(): 0.0046875
-  getUniqueId(): 505001
   getZernikeMVA(): 0.739258
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12462,7 +12410,6 @@ ECLCluster#5:
 ECLCluster#6:
   getAbsZernike40(): 0.800195
   getAbsZernike51(): 0.652734
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (136.244,-35.5608,26.7756)
   getConnectedRegionId(): 6
@@ -12498,7 +12445,6 @@ ECLCluster#6:
   getUncertaintyEnergy(): 0.0178711
   getUncertaintyPhi(): 0.00488281
   getUncertaintyTheta(): 0.00410156
-  getUniqueId(): 605001
   getZernikeMVA(): 0.899414
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12512,7 +12458,6 @@ ECLCluster#6:
 ECLCluster#7:
   getAbsZernike40(): 0.504687
   getAbsZernike51(): 0.525
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-103.467,95.141,4.3002)
   getConnectedRegionId(): 7
@@ -12549,7 +12494,6 @@ ECLCluster#7:
   getUncertaintyEnergy(): 0.000878906
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.009375
-  getUniqueId(): 705001
   getZernikeMVA(): 0.661133
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12563,7 +12507,6 @@ ECLCluster#7:
 ECLCluster#8:
   getAbsZernike40(): 0.569434
   getAbsZernike51(): 0.283594
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-127.677,58.8066,1.85992)
   getConnectedRegionId(): 8
@@ -12600,7 +12543,6 @@ ECLCluster#8:
   getUncertaintyEnergy(): 0.0178711
   getUncertaintyPhi(): 0.00488281
   getUncertaintyTheta(): 0.00410156
-  getUniqueId(): 805001
   getZernikeMVA(): 0.732422
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12614,7 +12556,6 @@ ECLCluster#8:
 ECLCluster#9:
   getAbsZernike40(): 0.864941
   getAbsZernike51(): 0.741797
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (131.491,-50.1864,-19.0327)
   getConnectedRegionId(): 9
@@ -12651,7 +12592,6 @@ ECLCluster#9:
   getUncertaintyEnergy(): 0.00117187
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.009375
-  getUniqueId(): 905001
   getZernikeMVA(): 0.779297
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12665,7 +12605,6 @@ ECLCluster#9:
 ECLCluster#10:
   getAbsZernike40(): 0.982812
   getAbsZernike51(): 0.508594
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-117.451,77.2785,-57.5265)
   getConnectedRegionId(): 10
@@ -12708,7 +12647,6 @@ ECLCluster#10:
   getUncertaintyEnergy(): 0.00878906
   getUncertaintyPhi(): 0.00664062
   getUncertaintyTheta(): 0.00527344
-  getUniqueId(): 1005001
   getZernikeMVA(): 0.806641
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12722,7 +12660,6 @@ ECLCluster#10:
 ECLCluster#11:
   getAbsZernike40(): 1.0542
   getAbsZernike51(): 0.952734
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (51.8253,-120.516,-112.517)
   getConnectedRegionId(): 11
@@ -12758,7 +12695,6 @@ ECLCluster#11:
   getUncertaintyEnergy(): 0.000878906
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.009375
-  getUniqueId(): 1105001
   getZernikeMVA(): 0.345703
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12772,7 +12708,6 @@ ECLCluster#11:
 ECLCluster#12:
   getAbsZernike40(): 1.19199
   getAbsZernike51(): 0.455859
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (29.6704,72.2176,211.438)
   getConnectedRegionId(): 1
@@ -12813,7 +12748,6 @@ ECLCluster#12:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 106001
   getZernikeMVA(): 0.287109
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12827,7 +12761,6 @@ ECLCluster#12:
 ECLCluster#13:
   getAbsZernike40(): 0.871582
   getAbsZernike51(): 0.219141
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-101.675,30.2793,210.936)
   getConnectedRegionId(): 2
@@ -12867,7 +12800,6 @@ ECLCluster#13:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 206001
   getZernikeMVA(): 0.981445
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12881,7 +12813,6 @@ ECLCluster#13:
 ECLCluster#14:
   getAbsZernike40(): 1.32979
   getAbsZernike51(): 0.380859
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-56.0705,-124.554,194.422)
   getConnectedRegionId(): 3
@@ -12918,7 +12849,6 @@ ECLCluster#14:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 306001
   getZernikeMVA(): 0.130859
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12932,7 +12862,6 @@ ECLCluster#14:
 ECLCluster#15:
   getAbsZernike40(): 1.4626
   getAbsZernike51(): 0.303516
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-119.281,-74.385,58.7255)
   getConnectedRegionId(): 4
@@ -12968,7 +12897,6 @@ ECLCluster#15:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 406001
   getZernikeMVA(): 0.176758
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12982,7 +12910,6 @@ ECLCluster#15:
 ECLCluster#16:
   getAbsZernike40(): 1.19697
   getAbsZernike51(): 0.267187
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-55.8246,129.201,41.5627)
   getConnectedRegionId(): 5
@@ -13018,7 +12945,6 @@ ECLCluster#16:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 506001
   getZernikeMVA(): 0.260742
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -13032,7 +12958,6 @@ ECLCluster#16:
 ECLCluster#17:
   getAbsZernike40(): 1.30986
   getAbsZernike51(): 0.352734
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (136.244,-35.5608,26.7756)
   getConnectedRegionId(): 6
@@ -13068,7 +12993,6 @@ ECLCluster#17:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 606001
   getZernikeMVA(): 0.100586
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -13082,7 +13006,6 @@ ECLCluster#17:
 ECLCluster#18:
   getAbsZernike40(): 1.23848
   getAbsZernike51(): 0.248437
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-103.467,95.141,4.3002)
   getConnectedRegionId(): 7
@@ -13119,7 +13042,6 @@ ECLCluster#18:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 706001
   getZernikeMVA(): 0.338867
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -13133,7 +13055,6 @@ ECLCluster#18:
 ECLCluster#19:
   getAbsZernike40(): 1.21689
   getAbsZernike51(): 0.208594
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-127.683,58.7944,1.85992)
   getConnectedRegionId(): 8
@@ -13170,7 +13091,6 @@ ECLCluster#19:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 806001
   getZernikeMVA(): 0.267578
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -13184,7 +13104,6 @@ ECLCluster#19:
 ECLCluster#20:
   getAbsZernike40(): 1.33809
   getAbsZernike51(): 0.355078
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (131.491,-50.1864,-19.0327)
   getConnectedRegionId(): 9
@@ -13221,7 +13140,6 @@ ECLCluster#20:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 906001
   getZernikeMVA(): 0.220703
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -13235,7 +13153,6 @@ ECLCluster#20:
 ECLCluster#21:
   getAbsZernike40(): 1.31484
   getAbsZernike51(): 0.226172
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-117.451,77.2785,-57.5265)
   getConnectedRegionId(): 10
@@ -13278,7 +13195,6 @@ ECLCluster#21:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1006001
   getZernikeMVA(): 0.193359
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -13292,7 +13208,6 @@ ECLCluster#21:
 ECLCluster#22:
   getAbsZernike40(): 1.36299
   getAbsZernike51(): 0.617578
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (51.8253,-120.516,-112.517)
   getConnectedRegionId(): 11
@@ -13328,7 +13243,6 @@ ECLCluster#22:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1106001
   getZernikeMVA(): 0.654297
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -13798,7 +13712,9 @@ TRGSummary:
   getTRGSummary(7): 0
   getTRGSummary(8): 0
   getTRGSummary(9): 0
+  getTimQuality(): 0
   getTimType(): 15
+  isPoissonInInjectionVeto(): False
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(35)
     pair
@@ -15816,6 +15732,7 @@ V0#3:
 TrackFitResult#0:
   get4Momentum(): (-0.00230703,0.236596,-0.0379177,0.277309)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.160256
   getCov(): size(15)
     0.212705
@@ -15851,6 +15768,7 @@ TrackFitResult#0:
   getHitPatternCDC(): 0111000000000000000000000000000001111111111111111111111111111111
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.00230703,0.236596,-0.0379177)
+  getNDF(): -1
   getOmega(): 0.0184128
   getPValue(): 1.97651e-05
   getParticleType(): <type: pi+>
@@ -15869,6 +15787,7 @@ TrackFitResult#0:
 TrackFitResult#1:
   get4Momentum(): (0.024602,0.423407,-0.0706403,0.654665)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.166557
   getCov(): size(15)
     0.335995
@@ -15904,6 +15823,7 @@ TrackFitResult#1:
   getHitPatternCDC(): 0111000000000000000000000000000001111111111111111111111111111111
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.024602,0.423407,-0.0706403)
+  getNDF(): -1
   getOmega(): 0.0102693
   getPValue(): 0.00434517
   getParticleType(): <type: K+>
@@ -15922,6 +15842,7 @@ TrackFitResult#1:
 TrackFitResult#2:
   get4Momentum(): (0.126191,0.66939,-0.132781,1.16704)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.194928
   getCov(): size(15)
     0.512776
@@ -15957,6 +15878,7 @@ TrackFitResult#2:
   getHitPatternCDC(): 0111000000000000000000000000000001111111111111111111111111111111
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.126191,0.66939,-0.132781)
+  getNDF(): -1
   getOmega(): 0.00638007
   getPValue(): 6.56103e-17
   getParticleType(): <type: p+>
@@ -15975,6 +15897,7 @@ TrackFitResult#2:
 TrackFitResult#3:
   get4Momentum(): (0.15648,0.279902,-0.00969889,0.349864)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.0302455
   getCov(): size(15)
     1.71895e-05
@@ -16010,6 +15933,7 @@ TrackFitResult#3:
   getHitPatternCDC(): 0100010111111111111111111111111111111111111111111101111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.15648,0.279902,-0.00969889)
+  getNDF(): -1
   getOmega(): -0.0138771
   getPValue(): 0.302379
   getParticleType(): <type: pi+>
@@ -16028,6 +15952,7 @@ TrackFitResult#3:
 TrackFitResult#4:
   get4Momentum(): (0.159912,0.286407,-0.0100001,0.592805)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.0304856
   getCov(): size(15)
     3.93932e-05
@@ -16063,6 +15988,7 @@ TrackFitResult#4:
   getHitPatternCDC(): 0100010111111111111111111111111111111111111111111101111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.159912,0.286407,-0.0100001)
+  getNDF(): -1
   getOmega(): -0.013566
   getPValue(): 0.116643
   getParticleType(): <type: K+>
@@ -16081,6 +16007,7 @@ TrackFitResult#4:
 TrackFitResult#5:
   get4Momentum(): (0.172601,0.310562,-0.0110075,1.00335)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.0309807
   getCov(): size(15)
     7.85686e-05
@@ -16116,6 +16043,7 @@ TrackFitResult#5:
   getHitPatternCDC(): 0100010111111111111111111111111111111111111111111101111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.172601,0.310562,-0.0110075)
+  getNDF(): -1
   getOmega(): -0.0125246
   getPValue(): 1.10925e-05
   getParticleType(): <type: p+>
@@ -16134,6 +16062,7 @@ TrackFitResult#5:
 TrackFitResult#6:
   get4Momentum(): (-0.280686,-0.193817,0.0147476,0.368846)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.0432352
   getCov(): size(15)
     8.01582e-05
@@ -16169,6 +16098,7 @@ TrackFitResult#6:
   getHitPatternCDC(): 0100010111111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.280686,-0.193817,0.0147476)
+  getNDF(): -1
   getOmega(): 0.013046
   getPValue(): 0.007953
   getParticleType(): <type: pi+>
@@ -16187,6 +16117,7 @@ TrackFitResult#6:
 TrackFitResult#7:
   get4Momentum(): (-0.286851,-0.197887,0.0161363,0.6045)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.0463039
   getCov(): size(15)
     0.000127895
@@ -16222,6 +16153,7 @@ TrackFitResult#7:
   getHitPatternCDC(): 0100010111111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.286851,-0.197887,0.0161363)
+  getNDF(): -1
   getOmega(): 0.0127695
   getPValue(): 0.000806975
   getParticleType(): <type: K+>
@@ -16240,6 +16172,7 @@ TrackFitResult#7:
 TrackFitResult#8:
   get4Momentum(): (-0.309496,-0.213241,0.0182691,1.01091)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.0486081
   getCov(): size(15)
     0.000191407
@@ -16275,6 +16208,7 @@ TrackFitResult#8:
   getHitPatternCDC(): 0100010111111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.309496,-0.213241,0.0182691)
+  getNDF(): -1
   getOmega(): 0.01184
   getPValue(): 5.90273e-10
   getParticleType(): <type: p+>
@@ -16293,6 +16227,7 @@ TrackFitResult#8:
 TrackFitResult#9:
   get4Momentum(): (0.233031,0.850579,0.747998,1.1648)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.848144
   getCov(): size(15)
     4.24274e-05
@@ -16328,6 +16263,7 @@ TrackFitResult#9:
   getHitPatternCDC(): 0011100011111111111111111111111111111111111111111111111111110100
   getHitPatternVXD(): 00000000010101010101010100000000
   getMomentum(): (0.233031,0.850579,0.747998)
+  getNDF(): -1
   getOmega(): -0.00504578
   getPValue(): 0.269208
   getParticleType(): <type: pi+>
@@ -16346,6 +16282,7 @@ TrackFitResult#9:
 TrackFitResult#10:
   get4Momentum(): (0.233107,0.850794,0.74813,1.25762)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.848076
   getCov(): size(15)
     4.92709e-05
@@ -16381,6 +16318,7 @@ TrackFitResult#10:
   getHitPatternCDC(): 0011100011111111111111111111111111111111111111111111111111110100
   getHitPatternVXD(): 00000000010101010101010100000000
   getMomentum(): (0.233107,0.850794,0.74813)
+  getNDF(): -1
   getOmega(): -0.00504448
   getPValue(): 0.255895
   getParticleType(): <type: K+>
@@ -16399,6 +16337,7 @@ TrackFitResult#10:
 TrackFitResult#11:
   get4Momentum(): (0.233638,0.852721,0.749696,1.49135)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.847929
   getCov(): size(15)
     6.84475e-05
@@ -16434,6 +16373,7 @@ TrackFitResult#11:
   getHitPatternCDC(): 0011100011111111111111111111111111111111111111111111111111110100
   getHitPatternVXD(): 00000000010101010101010100000000
   getMomentum(): (0.233638,0.852721,0.749696)
+  getNDF(): -1
   getOmega(): -0.00503308
   getPValue(): 0.170924
   getParticleType(): <type: p+>
@@ -16452,6 +16392,7 @@ TrackFitResult#11:
 TrackFitResult#12:
   get4Momentum(): (-0.236144,-0.454141,-0.129353,0.546095)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.252708
   getCov(): size(15)
     7.42121e-06
@@ -16487,6 +16428,7 @@ TrackFitResult#12:
   getHitPatternCDC(): 0011110011111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.236144,-0.454141,-0.129353)
+  getNDF(): -1
   getOmega(): -0.00869367
   getPValue(): 0.248486
   getParticleType(): <type: pi+>
@@ -16505,6 +16447,7 @@ TrackFitResult#12:
 TrackFitResult#13:
   get4Momentum(): (-0.23729,-0.456318,-0.129959,0.724665)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.252677
   getCov(): size(15)
     1.12281e-05
@@ -16540,6 +16483,7 @@ TrackFitResult#13:
   getHitPatternCDC(): 0011110011111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.23729,-0.456318,-0.129959)
+  getNDF(): -1
   getOmega(): -0.00865208
   getPValue(): 0.115209
   getParticleType(): <type: K+>
@@ -16558,6 +16502,7 @@ TrackFitResult#13:
 TrackFitResult#14:
   get4Momentum(): (-0.241705,-0.465029,-0.132373,1.08284)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.252575
   getCov(): size(15)
     2.06869e-05
@@ -16593,6 +16538,7 @@ TrackFitResult#14:
   getHitPatternCDC(): 0011110011111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.241705,-0.465029,-0.132373)
+  getNDF(): -1
   getOmega(): -0.00849087
   getPValue(): 0.00508186
   getParticleType(): <type: p+>
@@ -16611,6 +16557,7 @@ TrackFitResult#14:
 TrackFitResult#15:
   get4Momentum(): (0.348053,0.262303,-0.0265404,0.458398)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.0608968
   getCov(): size(15)
     1.42294e-05
@@ -16646,6 +16593,7 @@ TrackFitResult#15:
   getHitPatternCDC(): 0011100011111111111111111111111110011111111111111100000011111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.348053,0.262303,-0.0265404)
+  getNDF(): -1
   getOmega(): 0.0102105
   getPValue(): 0.281162
   getParticleType(): <type: pi+>
@@ -16664,6 +16612,7 @@ TrackFitResult#15:
 TrackFitResult#16:
   get4Momentum(): (0.350929,0.264272,-0.0265867,0.661373)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.0605195
   getCov(): size(15)
     2.53232e-05
@@ -16699,6 +16648,7 @@ TrackFitResult#16:
   getHitPatternCDC(): 0011100011111111111111111111111110011111111111111100000011111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.350929,0.264272,-0.0265867)
+  getNDF(): -1
   getOmega(): 0.0101296
   getPValue(): 0.183831
   getParticleType(): <type: K+>
@@ -16717,6 +16667,7 @@ TrackFitResult#16:
 TrackFitResult#17:
   get4Momentum(): (0.362228,0.27235,-0.0270092,1.04234)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.0595977
   getCov(): size(15)
     4.86832e-05
@@ -16752,6 +16703,7 @@ TrackFitResult#17:
   getHitPatternCDC(): 0011100011111111111111111111111110011111111111111100000011111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.362228,0.27235,-0.0270092)
+  getNDF(): -1
   getOmega(): 0.00981919
   getPValue(): 0.00446503
   getParticleType(): <type: p+>
@@ -16770,6 +16722,7 @@ TrackFitResult#17:
 TrackFitResult#18:
   get4Momentum(): (0.581832,-0.338248,0.343719,0.768481)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.510721
   getCov(): size(15)
     4.12871e-06
@@ -16805,6 +16758,7 @@ TrackFitResult#18:
   getHitPatternCDC(): 0011011011111111111111111111111111111111110111100111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.581832,-0.338248,0.343719)
+  getNDF(): -1
   getOmega(): 0.0066121
   getPValue(): 0.656035
   getParticleType(): <type: pi+>
@@ -16823,6 +16777,7 @@ TrackFitResult#18:
 TrackFitResult#19:
   get4Momentum(): (0.582592,-0.338702,0.344147,0.903486)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.510684
   getCov(): size(15)
     5.28192e-06
@@ -16858,6 +16813,7 @@ TrackFitResult#19:
   getHitPatternCDC(): 0011011011111111111111111111111111111111110111100111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.582592,-0.338702,0.344147)
+  getNDF(): -1
   getOmega(): 0.00660341
   getPValue(): 0.532404
   getParticleType(): <type: K+>
@@ -16876,6 +16832,7 @@ TrackFitResult#19:
 TrackFitResult#20:
   get4Momentum(): (0.585932,-0.340678,0.346062,1.20809)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.510586
   getCov(): size(15)
     8.38583e-06
@@ -16911,6 +16868,7 @@ TrackFitResult#20:
   getHitPatternCDC(): 0011011011111111111111111111111111111111110111100111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.585932,-0.340678,0.346062)
+  getNDF(): -1
   getOmega(): 0.0065656
   getPValue(): 0.201007
   getParticleType(): <type: p+>
@@ -16929,6 +16887,7 @@ TrackFitResult#20:
 TrackFitResult#21:
   get4Momentum(): (0.114718,0.0188428,0.169737,0.248607)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.46004
   getCov(): size(15)
     0.00021177
@@ -16964,6 +16923,7 @@ TrackFitResult#21:
   getHitPatternCDC(): 0011010000000000000000000000000000000000011111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.114718,0.0188428,0.169737)
+  getNDF(): -1
   getOmega(): 0.0382776
   getPValue(): 0.0732721
   getParticleType(): <type: pi+>
@@ -16982,6 +16942,7 @@ TrackFitResult#21:
 TrackFitResult#22:
   get4Momentum(): (0.131367,0.0204798,0.194134,0.546884)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.46016
   getCov(): size(15)
     0.000625052
@@ -17017,6 +16978,7 @@ TrackFitResult#22:
   getHitPatternCDC(): 0011010000000000000000000000000000000000011111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.131367,0.0204798,0.194134)
+  getNDF(): -1
   getOmega(): 0.03347
   getPValue(): 0.00492105
   getParticleType(): <type: K+>
@@ -17035,6 +16997,7 @@ TrackFitResult#22:
 TrackFitResult#23:
   get4Momentum(): (0.143032,0.0219636,0.211302,0.972596)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.4602
   getCov(): size(15)
     0.00186813
@@ -17070,6 +17033,7 @@ TrackFitResult#23:
   getHitPatternCDC(): 0011010000000000000000000000000000000000011111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.143032,0.0219636,0.211302)
+  getNDF(): -1
   getOmega(): 0.0307513
   getPValue(): 0.997747
   getParticleType(): <type: p+>
@@ -17088,6 +17052,7 @@ TrackFitResult#23:
 TrackFitResult#24:
   get4Momentum(): (0.705851,0.101127,-0.111046,0.735026)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.155731
   getCov(): size(15)
     0.00124067
@@ -17123,6 +17088,7 @@ TrackFitResult#24:
   getHitPatternCDC(): 0011001011111111111111111111111110000010111111111111111111111111
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.705851,0.101127,-0.111046)
+  getNDF(): -1
   getOmega(): 0.0062419
   getPValue(): 0.00330391
   getParticleType(): <type: pi+>
@@ -17141,6 +17107,7 @@ TrackFitResult#24:
 TrackFitResult#25:
   get4Momentum(): (0.706798,0.101255,-0.111251,0.875162)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.15581
   getCov(): size(15)
     0.00166889
@@ -17176,6 +17143,7 @@ TrackFitResult#25:
   getHitPatternCDC(): 0011001011111111111111111111111110000010111111111111111111111111
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.706798,0.101255,-0.111251)
+  getNDF(): -1
   getOmega(): 0.00623354
   getPValue(): 0.00392922
   getParticleType(): <type: K+>
@@ -17194,6 +17162,7 @@ TrackFitResult#25:
 TrackFitResult#26:
   get4Momentum(): (0.712025,0.101547,-0.112064,1.18752)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.155812
   getCov(): size(15)
     0.00290067
@@ -17229,6 +17198,7 @@ TrackFitResult#26:
   getHitPatternCDC(): 0011001011111111111111111111111110000010111111111111111111111111
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.712025,0.101547,-0.112064)
+  getNDF(): -1
   getOmega(): 0.00618833
   getPValue(): 0.00375496
   getParticleType(): <type: p+>
@@ -17247,6 +17217,7 @@ TrackFitResult#26:
 TrackFitResult#27:
   get4Momentum(): (-0.0103587,0.49852,0.836401,0.983706)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 1.67741
   getCov(): size(15)
     1.1304e-05
@@ -17282,6 +17253,7 @@ TrackFitResult#27:
   getHitPatternCDC(): 0010110100000000000001111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.0103587,0.49852,0.836401)
+  getNDF(): -1
   getOmega(): -0.00892452
   getPValue(): 0.0986511
   getParticleType(): <type: pi+>
@@ -17300,6 +17272,7 @@ TrackFitResult#27:
 TrackFitResult#28:
   get4Momentum(): (-0.0103786,0.498677,0.836707,1.09205)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 1.67749
   getCov(): size(15)
     1.3583e-05
@@ -17335,6 +17308,7 @@ TrackFitResult#28:
   getHitPatternCDC(): 0010110100000000000001111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.0103786,0.498677,0.836707)
+  getNDF(): -1
   getOmega(): -0.00892172
   getPValue(): 0.0631306
   getParticleType(): <type: K+>
@@ -17353,6 +17327,7 @@ TrackFitResult#28:
 TrackFitResult#29:
   get4Momentum(): (-0.0104728,0.500322,0.839536,1.35485)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 1.67762
   getCov(): size(15)
     1.98143e-05
@@ -17388,6 +17363,7 @@ TrackFitResult#29:
   getHitPatternCDC(): 0010110100000000000001111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.0104728,0.500322,0.839536)
+  getNDF(): -1
   getOmega(): -0.00889235
   getPValue(): 0.0121181
   getParticleType(): <type: p+>
@@ -17406,6 +17382,7 @@ TrackFitResult#29:
 TrackFitResult#30:
   get4Momentum(): (-0.259873,0.0784384,0.486872,0.57464)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.79358
   getCov(): size(15)
     3.93288e-05
@@ -17441,6 +17418,7 @@ TrackFitResult#30:
   getHitPatternCDC(): 0010101100000000000000000000111111111111111111111111111111110111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.259873,0.0784384,0.486872)
+  getNDF(): -1
   getOmega(): 0.0163933
   getPValue(): 0.00645912
   getParticleType(): <type: pi+>
@@ -17459,6 +17437,7 @@ TrackFitResult#30:
 TrackFitResult#31:
   get4Momentum(): (-0.261142,0.0787466,0.489104,0.746549)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.79319
   getCov(): size(15)
     6.3166e-05
@@ -17494,6 +17473,7 @@ TrackFitResult#31:
   getHitPatternCDC(): 0010101100000000000000000000111111111111111111111111111111110111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.261142,0.0787466,0.489104)
+  getNDF(): -1
   getOmega(): 0.0163149
   getPValue(): 0.00708825
   getParticleType(): <type: K+>
@@ -17512,6 +17492,7 @@ TrackFitResult#31:
 TrackFitResult#32:
   get4Momentum(): (-0.266553,0.0804029,0.49917,1.09865)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.7929
   getCov(): size(15)
     0.000122963
@@ -17547,6 +17528,7 @@ TrackFitResult#32:
   getHitPatternCDC(): 0010101100000000000000000000111111111111111111111111111111110111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.266553,0.0804029,0.49917)
+  getNDF(): -1
   getOmega(): 0.0159833
   getPValue(): 0.00307779
   getParticleType(): <type: p+>
@@ -17565,6 +17547,7 @@ TrackFitResult#32:
 TrackFitResult#33:
   get4Momentum(): (-0.395044,-0.325558,-0.297943,0.608521)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.582026
   getCov(): size(15)
     6.88943e-06
@@ -17600,6 +17583,7 @@ TrackFitResult#33:
   getHitPatternCDC(): 0011101111111111111111111111111111111111111111111011111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.395044,-0.325558,-0.297943)
+  getNDF(): -1
   getOmega(): -0.00869298
   getPValue(): 0.00258795
   getParticleType(): <type: pi+>
@@ -17618,6 +17602,7 @@ TrackFitResult#33:
 TrackFitResult#34:
   get4Momentum(): (-0.396087,-0.326594,-0.298732,0.772338)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.581905
   getCov(): size(15)
     1.01716e-05
@@ -17653,6 +17638,7 @@ TrackFitResult#34:
   getHitPatternCDC(): 0011101111111111111111111111111111111111111111111011111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.396087,-0.326594,-0.298732)
+  getNDF(): -1
   getOmega(): -0.0086682
   getPValue(): 0.0113588
   getParticleType(): <type: K+>
@@ -17671,6 +17657,7 @@ TrackFitResult#34:
 TrackFitResult#35:
   get4Momentum(): (-0.400809,-0.330899,-0.302392,1.11442)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.5818
   getCov(): size(15)
     1.86749e-05
@@ -17706,6 +17693,7 @@ TrackFitResult#35:
   getHitPatternCDC(): 0011101111111111111111111111111111111111111111111011111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.400809,-0.330899,-0.302392)
+  getNDF(): -1
   getOmega(): -0.00856176
   getPValue(): 0.00279986
   getParticleType(): <type: p+>
@@ -17724,6 +17712,7 @@ TrackFitResult#35:
 TrackFitResult#36:
   get4Momentum(): (-0.133593,-0.195855,0.478645,0.552075)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 2.01893
   getCov(): size(15)
     5.32629e-05
@@ -17759,6 +17748,7 @@ TrackFitResult#36:
   getHitPatternCDC(): 0001010000000000000000000000000001111111111111111100000000000000
   getHitPatternVXD(): 00000000010110100101010100010001
   getMomentum(): (-0.133593,-0.195855,0.478645)
+  getNDF(): -1
   getOmega(): -0.0187701
   getPValue(): 0.00504008
   getParticleType(): <type: pi+>
@@ -17777,6 +17767,7 @@ TrackFitResult#36:
 TrackFitResult#37:
   get4Momentum(): (-0.13452,-0.197311,0.482146,0.730211)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 2.01901
   getCov(): size(15)
     8.7436e-05
@@ -17812,6 +17803,7 @@ TrackFitResult#37:
   getHitPatternCDC(): 0001010000000000000000000000000001111111111111111100000000000000
   getHitPatternVXD(): 00000000010110100101010100010001
   getMomentum(): (-0.13452,-0.197311,0.482146)
+  getNDF(): -1
   getOmega(): -0.0186346
   getPValue(): 0.00801129
   getParticleType(): <type: K+>
@@ -17830,6 +17822,7 @@ TrackFitResult#37:
 TrackFitResult#38:
   get4Momentum(): (-0.138175,-0.203041,0.49588,1.0893)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 2.01908
   getCov(): size(15)
     0.000170911
@@ -17865,6 +17858,7 @@ TrackFitResult#38:
   getHitPatternCDC(): 0001010000000000000000000000000001111111111111111100000000000000
   getHitPatternVXD(): 00000000010110100101010100010001
   getMomentum(): (-0.138175,-0.203041,0.49588)
+  getNDF(): -1
   getOmega(): -0.0181191
   getPValue(): 0.00828389
   getParticleType(): <type: p+>
@@ -17883,6 +17877,7 @@ TrackFitResult#38:
 TrackFitResult#39:
   get4Momentum(): (-0.170574,-0.0485184,-0.0287478,0.227499)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.162106
   getCov(): size(15)
     6.6629e-05
@@ -17918,6 +17913,7 @@ TrackFitResult#39:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.170574,-0.0485184,-0.0287478)
+  getNDF(): -1
   getOmega(): 0.0250931
   getPValue(): 0.454064
   getParticleType(): <type: pi+>
@@ -17936,6 +17932,7 @@ TrackFitResult#39:
 TrackFitResult#40:
   get4Momentum(): (-0.178346,-0.0506389,-0.0301144,0.5282)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.162433
   getCov(): size(15)
     0.000287998
@@ -17971,6 +17968,7 @@ TrackFitResult#40:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.178346,-0.0506389,-0.0301144)
+  getNDF(): -1
   getOmega(): 0.0240027
   getPValue(): 0.976346
   getParticleType(): <type: K+>
@@ -17989,6 +17987,7 @@ TrackFitResult#40:
 TrackFitResult#41:
   get4Momentum(): (-0.201175,-0.0565546,-0.0339663,0.961862)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.162539
   getCov(): size(15)
     0.000754805
@@ -18024,6 +18023,7 @@ TrackFitResult#41:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.201175,-0.0565546,-0.0339663)
+  getNDF(): -1
   getOmega(): 0.0212946
   getPValue(): 0.955176
   getParticleType(): <type: p+>
@@ -18042,6 +18042,7 @@ TrackFitResult#41:
 TrackFitResult#42:
   get4Momentum(): (0.0112083,-0.147512,0.0248558,0.204898)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.168016
   getCov(): size(15)
     9.87338e-05
@@ -18077,6 +18078,7 @@ TrackFitResult#42:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.0112083,-0.147512,0.0248558)
+  getNDF(): -1
   getOmega(): -0.0300803
   getPValue(): 0.625262
   getParticleType(): <type: pi+>
@@ -18095,6 +18097,7 @@ TrackFitResult#42:
 TrackFitResult#43:
   get4Momentum(): (0.0130096,-0.163138,0.0272974,0.520812)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.166797
   getCov(): size(15)
     0.000456904
@@ -18130,6 +18133,7 @@ TrackFitResult#43:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.0130096,-0.163138,0.0272974)
+  getNDF(): -1
   getOmega(): -0.0271911
   getPValue(): 0.971963
   getParticleType(): <type: K+>
@@ -18148,6 +18152,7 @@ TrackFitResult#43:
 TrackFitResult#44:
   get4Momentum(): (0.0157102,-0.190034,0.0317403,0.957978)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.166456
   getCov(): size(15)
     0.00133646
@@ -18183,6 +18188,7 @@ TrackFitResult#44:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.0157102,-0.190034,0.0317403)
+  getNDF(): -1
   getOmega(): -0.0233372
   getPValue(): 0.670729
   getParticleType(): <type: p+>
@@ -18201,6 +18207,7 @@ TrackFitResult#44:
 TrackFitResult#45:
   get4Momentum(): (0.835034,0.0769315,-0.110018,0.857195)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.131197
   getCov(): size(15)
     3.13648e-06
@@ -18236,6 +18243,7 @@ TrackFitResult#45:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.835034,0.0769315,-0.110018)
+  getNDF(): -1
   getOmega(): 0.00530666
   getPValue(): 0.659755
   getParticleType(): <type: pi+>
@@ -18254,6 +18262,7 @@ TrackFitResult#45:
 TrackFitResult#46:
   get4Momentum(): (0.834428,0.0769013,-0.109962,0.978771)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.131225
   getCov(): size(15)
     3.80433e-06
@@ -18289,6 +18298,7 @@ TrackFitResult#46:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.834428,0.0769013,-0.109962)
+  getNDF(): -1
   getOmega(): 0.00531049
   getPValue(): 0.717316
   getParticleType(): <type: K+>
@@ -18307,6 +18317,7 @@ TrackFitResult#46:
 TrackFitResult#47:
   get4Momentum(): (0.833495,0.0768802,-0.109873,1.26216)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.131264
   getCov(): size(15)
     5.62264e-06
@@ -18342,6 +18353,7 @@ TrackFitResult#47:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.833495,0.0768802,-0.109873)
+  getNDF(): -1
   getOmega(): 0.0053164
   getPValue(): 0.8189
   getParticleType(): <type: p+>
@@ -18360,6 +18372,7 @@ TrackFitResult#47:
 TrackFitResult#48:
   get4Momentum(): (0.707005,0.101297,-0.111227,0.736186)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.155731
   getCov(): size(15)
     0.00124209
@@ -18395,6 +18408,7 @@ TrackFitResult#48:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.707005,0.101297,-0.111227)
+  getNDF(): -1
   getOmega(): 0.0062317
   getPValue(): 0.00330391
   getParticleType(): <type: pi+>
@@ -18413,6 +18427,7 @@ TrackFitResult#48:
 TrackFitResult#49:
   get4Momentum(): (-0.133305,-0.195416,0.477584,0.55093)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 2.01893
   getCov(): size(15)
     1.21921e-05
@@ -18448,6 +18463,7 @@ TrackFitResult#49:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.133305,-0.195416,0.477584)
+  getNDF(): -1
   getOmega(): -0.0188118
   getPValue(): 0.00504008
   getParticleType(): <type: pi+>
@@ -18466,6 +18482,7 @@ TrackFitResult#49:
 TrackFitResult#50:
   get4Momentum(): (0.707005,0.101297,-0.111227,0.722834)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.155731
   getCov(): size(15)
     0.00124209
@@ -18501,6 +18518,7 @@ TrackFitResult#50:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.707005,0.101297,-0.111227)
+  getNDF(): -1
   getOmega(): 0.0062317
   getPValue(): 0.00330391
   getParticleType(): <type: e->
@@ -18519,6 +18537,7 @@ TrackFitResult#50:
 TrackFitResult#51:
   get4Momentum(): (-0.133305,-0.195416,0.477584,0.532958)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 2.01893
   getCov(): size(15)
     1.21921e-05
@@ -18554,6 +18573,7 @@ TrackFitResult#51:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.133305,-0.195416,0.477584)
+  getNDF(): -1
   getOmega(): -0.0188118
   getPValue(): 0.00504008
   getParticleType(): <type: e->
@@ -18572,6 +18592,7 @@ TrackFitResult#51:
 TrackFitResult#52:
   get4Momentum(): (0.715143,0.102003,-0.112555,1.18948)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.155812
   getCov(): size(15)
     0.00290427
@@ -18607,6 +18628,7 @@ TrackFitResult#52:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.715143,0.102003,-0.112555)
+  getNDF(): -1
   getOmega(): 0.00616134
   getPValue(): 0.00375496
   getParticleType(): <type: p+>
@@ -18625,6 +18647,7 @@ TrackFitResult#52:
 TrackFitResult#53:
   get4Momentum(): (-0.133305,-0.195416,0.477584,0.55093)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 2.01893
   getCov(): size(15)
     1.21928e-05
@@ -18660,6 +18683,7 @@ TrackFitResult#53:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.133305,-0.195416,0.477584)
+  getNDF(): -1
   getOmega(): -0.0188118
   getPValue(): 0.00504008
   getParticleType(): <type: pi+>
@@ -18678,6 +18702,7 @@ TrackFitResult#53:
 TrackFitResult#54:
   get4Momentum(): (0.707005,0.101297,-0.111227,0.736186)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.155731
   getCov(): size(15)
     0.00124209
@@ -18713,6 +18738,7 @@ TrackFitResult#54:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.707005,0.101297,-0.111227)
+  getNDF(): -1
   getOmega(): 0.0062317
   getPValue(): 0.00330391
   getParticleType(): <type: pi+>
@@ -18731,6 +18757,7 @@ TrackFitResult#54:
 TrackFitResult#55:
   get4Momentum(): (-0.136709,-0.200793,0.490463,1.08624)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 2.01908
   getCov(): size(15)
     3.04373e-05
@@ -18766,6 +18793,7 @@ TrackFitResult#55:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.136709,-0.200793,0.490463)
+  getNDF(): -1
   getOmega(): -0.0183192
   getPValue(): 0.00828389
   getParticleType(): <type: p+>
@@ -19104,7 +19132,6 @@ PIDLikelihood#15:
 ECLCluster#0:
   getAbsZernike40(): 0.456543
   getAbsZernike51(): 0.283594
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-4.10938,-66.2655,211.545)
   getConnectedRegionId(): 1
@@ -19145,7 +19172,6 @@ ECLCluster#0:
   getUncertaintyEnergy(): 0.00146484
   getUncertaintyPhi(): 0.0154297
   getUncertaintyTheta(): 0.00625
-  getUniqueId(): 105001
   getZernikeMVA(): 0.175781
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19159,7 +19185,6 @@ ECLCluster#0:
 ECLCluster#1:
   getAbsZernike40(): 0.928027
   getAbsZernike51(): 0.536719
-  getClusterHadronIntensity(): 0
   getClusterId(): 2
   getClusterPosition(): (10.1275,-70.9914,211.507)
   getConnectedRegionId(): 1
@@ -19196,7 +19221,6 @@ ECLCluster#1:
   getUncertaintyEnergy(): 0.00263672
   getUncertaintyPhi(): 0.0144531
   getUncertaintyTheta(): 0.00566406
-  getUniqueId(): 105002
   getZernikeMVA(): 0.40332
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19210,7 +19234,6 @@ ECLCluster#1:
 ECLCluster#2:
   getAbsZernike40(): 0.602637
   getAbsZernike51(): 0.349219
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (31.9703,-79.8773,211.256)
   getConnectedRegionId(): 2
@@ -19247,7 +19270,6 @@ ECLCluster#2:
   getUncertaintyEnergy(): 0.0046875
   getUncertaintyPhi(): 0.0121094
   getUncertaintyTheta(): 0.0046875
-  getUniqueId(): 205001
   getZernikeMVA(): 0.342773
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19261,7 +19283,6 @@ ECLCluster#2:
 ECLCluster#3:
   getAbsZernike40(): 0.343652
   getAbsZernike51(): 0.154688
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-36.5772,93.4066,211.02)
   getConnectedRegionId(): 3
@@ -19297,7 +19318,6 @@ ECLCluster#3:
   getUncertaintyEnergy(): 0.0046875
   getUncertaintyPhi(): 0.0121094
   getUncertaintyTheta(): 0.0046875
-  getUniqueId(): 305001
   getZernikeMVA(): 0.396484
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19311,7 +19331,6 @@ ECLCluster#3:
 ECLCluster#4:
   getAbsZernike40(): 0.84834
   getAbsZernike51(): 0.0785156
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-65.1753,99.5125,210.764)
   getConnectedRegionId(): 4
@@ -19347,7 +19366,6 @@ ECLCluster#4:
   getUncertaintyEnergy(): 0.00556641
   getUncertaintyPhi(): 0.0113281
   getUncertaintyTheta(): 0.00429688
-  getUniqueId(): 405001
   getZernikeMVA(): 0.404297
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19361,7 +19379,6 @@ ECLCluster#4:
 ECLCluster#5:
   getAbsZernike40(): 1.11895
   getAbsZernike51(): 0.440625
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-32.7788,134.408,136.922)
   getConnectedRegionId(): 5
@@ -19398,7 +19415,6 @@ ECLCluster#5:
   getUncertaintyEnergy(): 0.00175781
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.00917969
-  getUniqueId(): 505001
   getZernikeMVA(): 0.694336
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19412,7 +19428,6 @@ ECLCluster#5:
 ECLCluster#6:
   getAbsZernike40(): 0.886523
   getAbsZernike51(): 0.482812
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-12.8785,138.226,122.21)
   getConnectedRegionId(): 6
@@ -19450,7 +19465,6 @@ ECLCluster#6:
   getUncertaintyEnergy(): 0.00556641
   getUncertaintyPhi(): 0.00800781
   getUncertaintyTheta(): 0.00644531
-  getUniqueId(): 605001
   getZernikeMVA(): 0.292969
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19464,7 +19478,6 @@ ECLCluster#6:
 ECLCluster#7:
   getAbsZernike40(): 0.771973
   getAbsZernike51(): 0.162891
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (130.784,-50.1035,82.8077)
   getConnectedRegionId(): 7
@@ -19500,7 +19513,6 @@ ECLCluster#7:
   getUncertaintyEnergy(): 0.00234375
   getUncertaintyPhi(): 0.0103516
   getUncertaintyTheta(): 0.00859375
-  getUniqueId(): 705001
   getZernikeMVA(): 0.46875
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19514,7 +19526,6 @@ ECLCluster#7:
 ECLCluster#8:
   getAbsZernike40(): 0.793555
   getAbsZernike51(): 0.196875
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (74.8127,-118.645,72.2533)
   getConnectedRegionId(): 8
@@ -19550,7 +19561,6 @@ ECLCluster#8:
   getUncertaintyEnergy(): 0.00615234
   getUncertaintyPhi(): 0.0078125
   getUncertaintyTheta(): 0.00625
-  getUniqueId(): 805001
   getZernikeMVA(): 0.204102
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19564,7 +19574,6 @@ ECLCluster#8:
 ECLCluster#9:
   getAbsZernike40(): 0.702246
   getAbsZernike51(): 0.213281
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (133.196,45.7223,23.8517)
   getConnectedRegionId(): 9
@@ -19600,7 +19609,6 @@ ECLCluster#9:
   getUncertaintyEnergy(): 0.00527344
   getUncertaintyPhi(): 0.00820313
   getUncertaintyTheta(): 0.00664062
-  getUniqueId(): 905001
   getZernikeMVA(): 0.56543
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19614,7 +19622,6 @@ ECLCluster#9:
 ECLCluster#10:
   getAbsZernike40(): 0.879883
   getAbsZernike51(): 0.585938
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-140.502,-5.70114,8.30755)
   getConnectedRegionId(): 12
@@ -19650,7 +19657,6 @@ ECLCluster#10:
   getUncertaintyEnergy(): 0.00380859
   getUncertaintyPhi(): 0.00917969
   getUncertaintyTheta(): 0.00742187
-  getUniqueId(): 1205001
   getZernikeMVA(): 0.633789
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19664,7 +19670,6 @@ ECLCluster#10:
 ECLCluster#11:
   getAbsZernike40(): 0.290527
   getAbsZernike51(): 0.268359
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-125.567,-63.5372,24.3836)
   getConnectedRegionId(): 10
@@ -19703,7 +19708,6 @@ ECLCluster#11:
   getUncertaintyEnergy(): 0.00556641
   getUncertaintyPhi(): 0.00800781
   getUncertaintyTheta(): 0.00644531
-  getUniqueId(): 1005001
   getZernikeMVA(): 0.0322266
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19717,7 +19721,6 @@ ECLCluster#11:
 ECLCluster#12:
   getAbsZernike40(): 0.302148
   getAbsZernike51(): 0.307031
-  getClusterHadronIntensity(): 0
   getClusterId(): 2
   getClusterPosition(): (-132.716,-46.6271,15.5521)
   getConnectedRegionId(): 10
@@ -19757,7 +19760,6 @@ ECLCluster#12:
   getUncertaintyEnergy(): 0.00556641
   getUncertaintyPhi(): 0.00800781
   getUncertaintyTheta(): 0.00644531
-  getUniqueId(): 1005002
   getZernikeMVA(): 0.0429688
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19771,7 +19773,6 @@ ECLCluster#12:
 ECLCluster#13:
   getAbsZernike40(): 1.00605
   getAbsZernike51(): 0.924609
-  getClusterHadronIntensity(): 0
   getClusterId(): 3
   getClusterPosition(): (-122.855,-68.3573,6.58935)
   getConnectedRegionId(): 10
@@ -19811,7 +19812,6 @@ ECLCluster#13:
   getUncertaintyEnergy(): 0.00205078
   getUncertaintyPhi(): 0.0105469
   getUncertaintyTheta(): 0.00878906
-  getUniqueId(): 1005003
   getZernikeMVA(): 0.0908203
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19825,7 +19825,6 @@ ECLCluster#13:
 ECLCluster#14:
   getAbsZernike40(): 0.127832
   getAbsZernike51(): 0.227344
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-88.7354,108.931,-3.10538)
   getConnectedRegionId(): 13
@@ -19861,7 +19860,6 @@ ECLCluster#14:
   getUncertaintyEnergy(): 0.00410156
   getUncertaintyPhi(): 0.00898437
   getUncertaintyTheta(): 0.00722656
-  getUniqueId(): 1305001
   getZernikeMVA(): 0.0244141
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19875,7 +19873,6 @@ ECLCluster#14:
 ECLCluster#15:
   getAbsZernike40(): 0.483105
   getAbsZernike51(): 0.342187
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-128.209,57.6569,7.23716)
   getConnectedRegionId(): 11
@@ -19912,7 +19909,6 @@ ECLCluster#15:
   getUncertaintyEnergy(): 0.00292969
   getUncertaintyPhi(): 0.00996094
   getUncertaintyTheta(): 0.00820313
-  getUniqueId(): 1105001
   getZernikeMVA(): 0.0292969
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19926,7 +19922,6 @@ ECLCluster#15:
 ECLCluster#16:
   getAbsZernike40(): 0.112891
   getAbsZernike51(): 0.271875
-  getClusterHadronIntensity(): 0
   getClusterId(): 2
   getClusterPosition(): (-119.667,73.6418,1.56947)
   getConnectedRegionId(): 11
@@ -19964,7 +19959,6 @@ ECLCluster#16:
   getUncertaintyEnergy(): 0.00410156
   getUncertaintyPhi(): 0.00898437
   getUncertaintyTheta(): 0.00722656
-  getUniqueId(): 1105002
   getZernikeMVA(): 0.0136719
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19978,7 +19972,6 @@ ECLCluster#16:
 ECLCluster#17:
   getAbsZernike40(): 0.936328
   getAbsZernike51(): 0.628125
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (140.058,-12.6701,-8.6195)
   getConnectedRegionId(): 14
@@ -20014,7 +20007,6 @@ ECLCluster#17:
   getUncertaintyEnergy(): 0.00527344
   getUncertaintyPhi(): 0.00820313
   getUncertaintyTheta(): 0.00664062
-  getUniqueId(): 1405001
   getZernikeMVA(): 0.614258
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20028,7 +20020,6 @@ ECLCluster#17:
 ECLCluster#18:
   getAbsZernike40(): 0.170996
   getAbsZernike51(): 0.291797
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (133.517,-44.4063,-17.3478)
   getConnectedRegionId(): 15
@@ -20065,7 +20056,6 @@ ECLCluster#18:
   getUncertaintyEnergy(): 0.00556641
   getUncertaintyPhi(): 0.00800781
   getUncertaintyTheta(): 0.00644531
-  getUniqueId(): 1505001
   getZernikeMVA(): 0.21582
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20079,7 +20069,6 @@ ECLCluster#18:
 ECLCluster#19:
   getAbsZernike40(): 0.408398
   getAbsZernike51(): 0.392578
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (131.846,49.4407,-28.8521)
   getConnectedRegionId(): 16
@@ -20115,7 +20104,6 @@ ECLCluster#19:
   getUncertaintyEnergy(): 0.00732422
   getUncertaintyPhi(): 0.00703125
   getUncertaintyTheta(): 0.00566406
-  getUniqueId(): 1605001
   getZernikeMVA(): 0.566406
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20129,7 +20117,6 @@ ECLCluster#19:
 ECLCluster#20:
   getAbsZernike40(): 0.752051
   getAbsZernike51(): 0.485156
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (18.8924,-139.504,-39.8972)
   getConnectedRegionId(): 17
@@ -20165,7 +20152,6 @@ ECLCluster#20:
   getUncertaintyEnergy(): 0.00292969
   getUncertaintyPhi(): 0.00976562
   getUncertaintyTheta(): 0.00800781
-  getUniqueId(): 1705001
   getZernikeMVA(): 0.0859375
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20179,7 +20165,6 @@ ECLCluster#20:
 ECLCluster#21:
   getAbsZernike40(): 0.564453
   getAbsZernike51(): 0.289453
-  getClusterHadronIntensity(): 0
   getClusterId(): 2
   getClusterPosition(): (31.3809,-137.22,-38.918)
   getConnectedRegionId(): 17
@@ -20215,7 +20200,6 @@ ECLCluster#21:
   getUncertaintyEnergy(): 0.0046875
   getUncertaintyPhi(): 0.00859375
   getUncertaintyTheta(): 0.00683594
-  getUniqueId(): 1705002
   getZernikeMVA(): 0.0996094
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20229,7 +20213,6 @@ ECLCluster#21:
 ECLCluster#22:
   getAbsZernike40(): 1.34307
   getAbsZernike51(): 0.405469
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-139.652,-14.9045,-66.129)
   getConnectedRegionId(): 18
@@ -20265,7 +20248,6 @@ ECLCluster#22:
   getUncertaintyEnergy(): 0.0046875
   getUncertaintyPhi(): 0.00839844
   getUncertaintyTheta(): 0.00683594
-  getUniqueId(): 1805001
   getZernikeMVA(): 0.768555
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20279,7 +20261,6 @@ ECLCluster#22:
 ECLCluster#23:
   getAbsZernike40(): 0
   getAbsZernike51(): 0.260156
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-31.4303,-136.174,-89.3925)
   getConnectedRegionId(): 19
@@ -20315,7 +20296,6 @@ ECLCluster#23:
   getUncertaintyEnergy(): 0.00585938
   getUncertaintyPhi(): 0.0078125
   getUncertaintyTheta(): 0.00625
-  getUniqueId(): 1905001
   getZernikeMVA(): 0.0498047
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20329,7 +20309,6 @@ ECLCluster#23:
 ECLCluster#24:
   getAbsZernike40(): 0.903125
   getAbsZernike51(): 0.645703
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-89.1801,-82.3992,-114.167)
   getConnectedRegionId(): 20
@@ -20365,7 +20344,6 @@ ECLCluster#24:
   getUncertaintyEnergy(): 0.00849609
   getUncertaintyPhi(): 0.00957031
   getUncertaintyTheta(): 0.00605469
-  getUniqueId(): 2005001
   getZernikeMVA(): 0.786133
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20379,7 +20357,6 @@ ECLCluster#24:
 ECLCluster#25:
   getAbsZernike40(): 0.263965
   getAbsZernike51(): 0.390234
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (3.9689,-68.3483,211.523)
   getConnectedRegionId(): 1
@@ -20421,7 +20398,6 @@ ECLCluster#25:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 106001
   getZernikeMVA(): 0.928711
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20435,7 +20411,6 @@ ECLCluster#25:
 ECLCluster#26:
   getAbsZernike40(): 1.19033
   getAbsZernike51(): 0.217969
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (31.9703,-79.8773,211.256)
   getConnectedRegionId(): 2
@@ -20472,7 +20447,6 @@ ECLCluster#26:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 206001
   getZernikeMVA(): 0.657227
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20486,7 +20460,6 @@ ECLCluster#26:
 ECLCluster#27:
   getAbsZernike40(): 0.972852
   getAbsZernike51(): 0.467578
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-36.443,93.8046,211.019)
   getConnectedRegionId(): 3
@@ -20522,7 +20495,6 @@ ECLCluster#27:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 306001
   getZernikeMVA(): 0.603516
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20536,7 +20508,6 @@ ECLCluster#27:
 ECLCluster#28:
   getAbsZernike40(): 1.32646
   getAbsZernike51(): 0.101953
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-65.1753,99.5125,210.764)
   getConnectedRegionId(): 4
@@ -20572,7 +20543,6 @@ ECLCluster#28:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 406001
   getZernikeMVA(): 0.595703
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20586,7 +20556,6 @@ ECLCluster#28:
 ECLCluster#29:
   getAbsZernike40(): 1.40615
   getAbsZernike51(): 0.182812
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-32.7788,134.408,136.922)
   getConnectedRegionId(): 5
@@ -20623,7 +20592,6 @@ ECLCluster#29:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 506001
   getZernikeMVA(): 0.305664
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20637,7 +20605,6 @@ ECLCluster#29:
 ECLCluster#30:
   getAbsZernike40(): 1.37627
   getAbsZernike51(): 0.275391
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-12.8785,138.226,122.21)
   getConnectedRegionId(): 6
@@ -20675,7 +20642,6 @@ ECLCluster#30:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 606001
   getZernikeMVA(): 0.707031
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20689,7 +20655,6 @@ ECLCluster#30:
 ECLCluster#31:
   getAbsZernike40(): 1.36465
   getAbsZernike51(): 0.0679687
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (130.784,-50.1035,82.8077)
   getConnectedRegionId(): 7
@@ -20725,7 +20690,6 @@ ECLCluster#31:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 706001
   getZernikeMVA(): 0.53125
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20739,7 +20703,6 @@ ECLCluster#31:
 ECLCluster#32:
   getAbsZernike40(): 1.34473
   getAbsZernike51(): 0.0152344
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (74.8127,-118.645,72.2533)
   getConnectedRegionId(): 8
@@ -20775,7 +20738,6 @@ ECLCluster#32:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 806001
   getZernikeMVA(): 0.795898
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20789,7 +20751,6 @@ ECLCluster#32:
 ECLCluster#33:
   getAbsZernike40(): 1.32314
   getAbsZernike51(): 0.0949219
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (133.196,45.7223,23.8517)
   getConnectedRegionId(): 9
@@ -20825,7 +20786,6 @@ ECLCluster#33:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 906001
   getZernikeMVA(): 0.43457
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20839,7 +20799,6 @@ ECLCluster#33:
 ECLCluster#34:
   getAbsZernike40(): 1.39121
   getAbsZernike51(): 0.283594
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-140.502,-5.70114,8.30755)
   getConnectedRegionId(): 12
@@ -20875,7 +20834,6 @@ ECLCluster#34:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1206001
   getZernikeMVA(): 0.366211
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20889,7 +20847,6 @@ ECLCluster#34:
 ECLCluster#35:
   getAbsZernike40(): 0.391797
   getAbsZernike51(): 0.457031
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-129.249,-54.8335,18.7465)
   getConnectedRegionId(): 10
@@ -20932,7 +20889,6 @@ ECLCluster#35:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1006001
   getZernikeMVA(): 1
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20946,7 +20902,6 @@ ECLCluster#35:
 ECLCluster#36:
   getAbsZernike40(): 0.725488
   getAbsZernike51(): 0.157031
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-86.6533,110.511,-2.98942)
   getConnectedRegionId(): 13
@@ -20982,7 +20937,6 @@ ECLCluster#36:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1306001
   getZernikeMVA(): 0.975586
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20996,7 +20950,6 @@ ECLCluster#36:
 ECLCluster#37:
   getAbsZernike40(): 0.262305
   getAbsZernike51(): 0.128906
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-122.623,68.1973,4.00984)
   getConnectedRegionId(): 11
@@ -21035,7 +20988,6 @@ ECLCluster#37:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1106001
   getZernikeMVA(): 1
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -21049,7 +21001,6 @@ ECLCluster#37:
 ECLCluster#38:
   getAbsZernike40(): 1.39619
   getAbsZernike51(): 0.326953
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (140.058,-12.6701,-8.6195)
   getConnectedRegionId(): 14
@@ -21085,7 +21036,6 @@ ECLCluster#38:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1406001
   getZernikeMVA(): 0.385742
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -21099,7 +21049,6 @@ ECLCluster#38:
 ECLCluster#39:
   getAbsZernike40(): 0.994434
   getAbsZernike51(): 0.254297
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (133.517,-44.4063,-17.3478)
   getConnectedRegionId(): 15
@@ -21136,7 +21085,6 @@ ECLCluster#39:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1506001
   getZernikeMVA(): 0.78418
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -21150,7 +21098,6 @@ ECLCluster#39:
 ECLCluster#40:
   getAbsZernike40(): 1.13555
   getAbsZernike51(): 0.175781
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (131.846,49.4407,-28.8521)
   getConnectedRegionId(): 16
@@ -21186,7 +21133,6 @@ ECLCluster#40:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1606001
   getZernikeMVA(): 0.433594
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -21200,7 +21146,6 @@ ECLCluster#40:
 ECLCluster#41:
   getAbsZernike40(): 0.766992
   getAbsZernike51(): 0.135937
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (26.6078,-138.121,-39.362)
   getConnectedRegionId(): 17
@@ -21236,7 +21181,6 @@ ECLCluster#41:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1706001
   getZernikeMVA(): 0.991211
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -21250,7 +21194,6 @@ ECLCluster#41:
 ECLCluster#42:
   getAbsZernike40(): 1.49414
   getAbsZernike51(): 0.162891
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-139.652,-14.9045,-66.129)
   getConnectedRegionId(): 18
@@ -21286,7 +21229,6 @@ ECLCluster#42:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1806001
   getZernikeMVA(): 0.231445
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -21300,7 +21242,6 @@ ECLCluster#42:
 ECLCluster#43:
   getAbsZernike40(): 0.815137
   getAbsZernike51(): 0.0480469
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-31.4303,-136.174,-89.3925)
   getConnectedRegionId(): 19
@@ -21336,7 +21277,6 @@ ECLCluster#43:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1906001
   getZernikeMVA(): 0.950195
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -21350,7 +21290,6 @@ ECLCluster#43:
 ECLCluster#44:
   getAbsZernike40(): 1.33975
   getAbsZernike51(): 0.325781
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-89.1801,-82.3992,-114.167)
   getConnectedRegionId(): 20
@@ -21386,7 +21325,6 @@ ECLCluster#44:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 2006001
   getZernikeMVA(): 0.213867
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -21889,7 +21827,9 @@ TRGSummary:
   getTRGSummary(7): 0
   getTRGSummary(8): 0
   getTRGSummary(9): 0
+  getTimQuality(): 0
   getTimType(): 15
+  isPoissonInInjectionVeto(): False
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(35)
     pair
@@ -24363,6 +24303,7 @@ V0#3:
 TrackFitResult#0:
   get4Momentum(): (0.101682,0.240894,-0.0369706,0.29869)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.141393
   getCov(): size(15)
     2.37056e-05
@@ -24398,6 +24339,7 @@ TrackFitResult#0:
   getHitPatternCDC(): 0101100111111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.101682,0.240894,-0.0369706)
+  getNDF(): -1
   getOmega(): -0.0170189
   getPValue(): 0.461865
   getParticleType(): <type: pi+>
@@ -24416,6 +24358,7 @@ TrackFitResult#0:
 TrackFitResult#1:
   get4Momentum(): (0.105843,0.251821,-0.0387947,0.565543)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.142022
   getCov(): size(15)
     6.76818e-05
@@ -24451,6 +24394,7 @@ TrackFitResult#1:
   getHitPatternCDC(): 0101100111111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.105843,0.251821,-0.0387947)
+  getNDF(): -1
   getOmega(): -0.0162908
   getPValue(): 0.0736962
   getParticleType(): <type: K+>
@@ -24469,6 +24413,7 @@ TrackFitResult#1:
 TrackFitResult#2:
   get4Momentum(): (0.119481,0.287435,-0.0443722,0.989554)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.142548
   getCov(): size(15)
     0.000123107
@@ -24504,6 +24449,7 @@ TrackFitResult#2:
   getHitPatternCDC(): 0101100111111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.119481,0.287435,-0.0443722)
+  getNDF(): -1
   getOmega(): -0.0142959
   getPValue(): 2.9653e-12
   getParticleType(): <type: p+>
@@ -24522,6 +24468,7 @@ TrackFitResult#2:
 TrackFitResult#3:
   get4Momentum(): (-0.219201,-0.0266518,-0.0600109,0.268031)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.271769
   getCov(): size(15)
     3.31013e-05
@@ -24557,6 +24504,7 @@ TrackFitResult#3:
   getHitPatternCDC(): 0111001100000000111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.219201,-0.0266518,-0.0600109)
+  getNDF(): -1
   getOmega(): -0.0201526
   getPValue(): 0.229785
   getParticleType(): <type: pi+>
@@ -24575,6 +24523,7 @@ TrackFitResult#3:
 TrackFitResult#4:
   get4Momentum(): (-0.238709,-0.030115,-0.0651827,0.553041)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.270916
   getCov(): size(15)
     9.77738e-05
@@ -24610,6 +24559,7 @@ TrackFitResult#4:
   getHitPatternCDC(): 0111001100000000111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.238709,-0.030115,-0.0651827)
+  getNDF(): -1
   getOmega(): -0.0184954
   getPValue(): 0.000127635
   getParticleType(): <type: K+>
@@ -24628,6 +24578,7 @@ TrackFitResult#4:
 TrackFitResult#5:
   get4Momentum(): (-0.174937,-0.305485,-0.0332433,0.380143)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.0944337
   getCov(): size(15)
     1.29801e-05
@@ -24663,6 +24614,7 @@ TrackFitResult#5:
   getHitPatternCDC(): 0011110011111111111111111111111111111110110111111111111111111010
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.174937,-0.305485,-0.0332433)
+  getNDF(): -1
   getOmega(): 0.0126411
   getPValue(): 0.466383
   getParticleType(): <type: pi+>
@@ -24681,6 +24633,7 @@ TrackFitResult#5:
 TrackFitResult#6:
   get4Momentum(): (-0.177795,-0.310195,-0.033653,0.610476)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.0941248
   getCov(): size(15)
     2.8644e-05
@@ -24716,6 +24669,7 @@ TrackFitResult#6:
   getHitPatternCDC(): 0011110011111111111111111111111111111110110111111111111111111010
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.177795,-0.310195,-0.033653)
+  getNDF(): -1
   getOmega(): 0.0124463
   getPValue(): 0.575472
   getParticleType(): <type: K+>
@@ -24734,6 +24688,7 @@ TrackFitResult#6:
 TrackFitResult#7:
   get4Momentum(): (-0.188745,-0.328261,-0.0355349,1.01242)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.093845
   getCov(): size(15)
     5.99431e-05
@@ -24769,6 +24724,7 @@ TrackFitResult#7:
   getHitPatternCDC(): 0011110011111111111111111111111111111110110111111111111111111010
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.188745,-0.328261,-0.0355349)
+  getNDF(): -1
   getOmega(): 0.0117521
   getPValue(): 0.0177136
   getParticleType(): <type: p+>
@@ -24787,6 +24743,7 @@ TrackFitResult#7:
 TrackFitResult#8:
   get4Momentum(): (0.273557,-0.0484831,0.191924,0.365375)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.690821
   getCov(): size(15)
     3.90307e-05
@@ -24822,6 +24779,7 @@ TrackFitResult#8:
   getHitPatternCDC(): 0100110111111111111111111111111111111111111111111111111111111110
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.273557,-0.0484831,0.191924)
+  getNDF(): -1
   getOmega(): 0.0160176
   getPValue(): 0.206043
   getParticleType(): <type: pi+>
@@ -24840,6 +24798,7 @@ TrackFitResult#8:
 TrackFitResult#9:
   get4Momentum(): (0.280385,-0.0498776,0.196617,0.602892)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.690401
   getCov(): size(15)
     8.7648e-05
@@ -24875,6 +24834,7 @@ TrackFitResult#9:
   getHitPatternCDC(): 0100110111111111111111111111111111111111111111111111111111111110
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.280385,-0.0498776,0.196617)
+  getNDF(): -1
   getOmega(): 0.0156258
   getPValue(): 0.047787
   getParticleType(): <type: K+>
@@ -24893,6 +24853,7 @@ TrackFitResult#9:
 TrackFitResult#10:
   get4Momentum(): (0.305387,-0.0548997,0.214187,1.01119)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.690296
   getCov(): size(15)
     0.000174227
@@ -24928,6 +24889,7 @@ TrackFitResult#10:
   getHitPatternCDC(): 0100110111111111111111111111111111111111111111111111111111111110
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.305387,-0.0548997,0.214187)
+  getNDF(): -1
   getOmega(): 0.0143418
   getPValue(): 3.57157e-08
   getParticleType(): <type: p+>
@@ -24946,6 +24908,7 @@ TrackFitResult#10:
 TrackFitResult#11:
   get4Momentum(): (-0.332222,-0.155519,-0.100381,0.40511)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.273652
   getCov(): size(15)
     1.49971e-05
@@ -24981,6 +24944,7 @@ TrackFitResult#11:
   getHitPatternCDC(): 0011111011111111111111111111111110111111111111111100000011111111
   getHitPatternVXD(): 00000000010100000101010100010001
   getMomentum(): (-0.332222,-0.155519,-0.100381)
+  getNDF(): -1
   getOmega(): -0.0121313
   getPValue(): 0.233034
   getParticleType(): <type: pi+>
@@ -24999,6 +24963,7 @@ TrackFitResult#11:
 TrackFitResult#12:
   get4Momentum(): (-0.337085,-0.158057,-0.101863,0.626659)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.273604
   getCov(): size(15)
     2.88721e-05
@@ -25034,6 +24999,7 @@ TrackFitResult#12:
   getHitPatternCDC(): 0011111011111111111111111111111110111111111111111100000011111111
   getHitPatternVXD(): 00000000010100000101010100010001
   getMomentum(): (-0.337085,-0.158057,-0.101863)
+  getNDF(): -1
   getOmega(): -0.0119527
   getPValue(): 0.214166
   getParticleType(): <type: K+>
@@ -25052,6 +25018,7 @@ TrackFitResult#12:
 TrackFitResult#13:
   get4Momentum(): (-0.355697,-0.167383,-0.107534,1.02296)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.273544
   getCov(): size(15)
     5.57033e-05
@@ -25087,6 +25054,7 @@ TrackFitResult#13:
   getHitPatternCDC(): 0011111011111111111111111111111110111111111111111100000011111111
   getHitPatternVXD(): 00000000010100000101010100010001
   getMomentum(): (-0.355697,-0.167383,-0.107534)
+  getNDF(): -1
   getOmega(): -0.0113199
   getPValue(): 0.00312703
   getParticleType(): <type: p+>
@@ -25105,6 +25073,7 @@ TrackFitResult#13:
 TrackFitResult#14:
   get4Momentum(): (-0.247785,-0.26606,0.168368,0.42428)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.463093
   getCov(): size(15)
     1.50681e-05
@@ -25140,6 +25109,7 @@ TrackFitResult#14:
   getHitPatternCDC(): 0011110011111111101111111111111111111111111111111111111111100111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.247785,-0.26606,0.168368)
+  getNDF(): -1
   getOmega(): -0.0122399
   getPValue(): 0.708437
   getParticleType(): <type: pi+>
@@ -25158,6 +25128,7 @@ TrackFitResult#14:
 TrackFitResult#15:
   get4Momentum(): (-0.250479,-0.269393,0.170415,0.638804)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.463275
   getCov(): size(15)
     2.90413e-05
@@ -25193,6 +25164,7 @@ TrackFitResult#15:
   getHitPatternCDC(): 0011110011111111101111111111111111111111111111111111111111100111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.250479,-0.269393,0.170415)
+  getNDF(): -1
   getOmega(): -0.0120976
   getPValue(): 0.667538
   getParticleType(): <type: K+>
@@ -25211,6 +25183,7 @@ TrackFitResult#15:
 TrackFitResult#16:
   get4Momentum(): (-0.261202,-0.28174,0.17804,1.0294)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.463413
   getCov(): size(15)
     5.81599e-05
@@ -25246,6 +25219,7 @@ TrackFitResult#16:
   getHitPatternCDC(): 0011110011111111101111111111111111111111111111111111111111100111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.261202,-0.28174,0.17804)
+  getNDF(): -1
   getOmega(): -0.011583
   getPValue(): 0.216298
   getParticleType(): <type: p+>
@@ -25264,6 +25238,7 @@ TrackFitResult#16:
 TrackFitResult#17:
   get4Momentum(): (0.469448,0.553652,0.280625,0.790659)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.386596
   getCov(): size(15)
     3.96757e-06
@@ -25299,6 +25274,7 @@ TrackFitResult#17:
   getHitPatternCDC(): 0011110011111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.469448,0.553652,0.280625)
+  getNDF(): -1
   getOmega(): -0.00613043
   getPValue(): 0.970862
   getParticleType(): <type: pi+>
@@ -25317,6 +25293,7 @@ TrackFitResult#17:
 TrackFitResult#18:
   get4Momentum(): (0.470023,0.554347,0.280835,0.922392)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.386404
   getCov(): size(15)
     4.94695e-06
@@ -25352,6 +25329,7 @@ TrackFitResult#18:
   getHitPatternCDC(): 0011110011111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.470023,0.554347,0.280835)
+  getNDF(): -1
   getOmega(): -0.00612282
   getPValue(): 0.968043
   getParticleType(): <type: K+>
@@ -25370,6 +25348,7 @@ TrackFitResult#18:
 TrackFitResult#19:
   get4Momentum(): (0.472627,0.557493,0.282188,1.22236)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.386098
   getCov(): size(15)
     7.44093e-06
@@ -25405,6 +25384,7 @@ TrackFitResult#19:
   getHitPatternCDC(): 0011110011111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.472627,0.557493,0.282188)
+  getNDF(): -1
   getOmega(): -0.00608861
   getPValue(): 0.908953
   getParticleType(): <type: p+>
@@ -25423,6 +25403,7 @@ TrackFitResult#19:
 TrackFitResult#20:
   get4Momentum(): (0.351269,0.239815,0.563464,0.719634)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.32479
   getCov(): size(15)
     0.000126221
@@ -25458,6 +25439,7 @@ TrackFitResult#20:
   getHitPatternCDC(): 0100010111111111111111111111111111111111101111111111111111111111
   getHitPatternVXD(): 00000000010110100101010100010000
   getMomentum(): (0.351269,0.239815,0.563464)
+  getNDF(): -1
   getOmega(): 0.0104626
   getPValue(): 0.502156
   getParticleType(): <type: pi+>
@@ -25476,6 +25458,7 @@ TrackFitResult#20:
 TrackFitResult#21:
   get4Momentum(): (0.352168,0.240387,0.564969,0.862969)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.32501
   getCov(): size(15)
     0.0001794
@@ -25511,6 +25494,7 @@ TrackFitResult#21:
   getHitPatternCDC(): 0100010111111111111111111111111111111111101111111111111111111111
   getHitPatternVXD(): 00000000010110100101010100010000
   getMomentum(): (0.352168,0.240387,0.564969)
+  getNDF(): -1
   getOmega(): 0.0104365
   getPValue(): 0.456909
   getParticleType(): <type: K+>
@@ -25529,6 +25513,7 @@ TrackFitResult#21:
 TrackFitResult#22:
   get4Momentum(): (0.356066,0.2429,0.571166,1.17999)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.32513
   getCov(): size(15)
     0.000323365
@@ -25564,6 +25549,7 @@ TrackFitResult#22:
   getHitPatternCDC(): 0100010111111111111111111111111111111111101111111111111111111111
   getHitPatternVXD(): 00000000010110100101010100010000
   getMomentum(): (0.356066,0.2429,0.571166)
+  getNDF(): -1
   getOmega(): 0.0103242
   getPValue(): 0.419825
   getParticleType(): <type: p+>
@@ -25582,6 +25568,7 @@ TrackFitResult#22:
 TrackFitResult#23:
   get4Momentum(): (0.204969,-0.048444,-0.134346,0.286161)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.637872
   getCov(): size(15)
     0.00120941
@@ -25617,6 +25604,7 @@ TrackFitResult#23:
   getHitPatternCDC(): 0011101000000000000001111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101000000000000
   getMomentum(): (0.204969,-0.048444,-0.134346)
+  getNDF(): -1
   getOmega(): 0.0211332
   getPValue(): 0.186241
   getParticleType(): <type: pi+>
@@ -25635,6 +25623,7 @@ TrackFitResult#23:
 TrackFitResult#24:
   get4Momentum(): (0.21296,-0.0517846,-0.139845,0.557949)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.638081
   getCov(): size(15)
     0.00203478
@@ -25670,6 +25659,7 @@ TrackFitResult#24:
   getHitPatternCDC(): 0011101000000000000001111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101000000000000
   getMomentum(): (0.21296,-0.0517846,-0.139845)
+  getNDF(): -1
   getOmega(): 0.0203088
   getPValue(): 0.00849016
   getParticleType(): <type: K+>
@@ -25688,6 +25678,7 @@ TrackFitResult#24:
 TrackFitResult#25:
   get4Momentum(): (0.235002,-0.0609685,-0.15491,0.981476)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.638063
   getCov(): size(15)
     0.00310015
@@ -25723,6 +25714,7 @@ TrackFitResult#25:
   getHitPatternCDC(): 0011101000000000000001111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101000000000000
   getMomentum(): (0.235002,-0.0609685,-0.15491)
+  getNDF(): -1
   getOmega(): 0.0183332
   getPValue(): 0.000210493
   getParticleType(): <type: p+>
@@ -25741,6 +25733,7 @@ TrackFitResult#25:
 TrackFitResult#26:
   get4Momentum(): (0.159037,0.0724216,0.33259,0.400792)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.90323
   getCov(): size(15)
     0.000561255
@@ -25776,6 +25769,7 @@ TrackFitResult#26:
   getHitPatternCDC(): 0010001100000000000000000000000000111111111111111100000011111111
   getHitPatternVXD(): 00000000010101011010010100010001
   getMomentum(): (0.159037,0.0724216,0.33259)
+  getNDF(): -1
   getOmega(): 0.0254692
   getPValue(): 3.84937e-10
   getParticleType(): <type: pi+>
@@ -25794,6 +25788,7 @@ TrackFitResult#26:
 TrackFitResult#27:
   get4Momentum(): (0.164386,0.0745966,0.343783,0.628085)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.90441
   getCov(): size(15)
     0.00124354
@@ -25829,6 +25824,7 @@ TrackFitResult#27:
   getHitPatternCDC(): 0010001100000000000000000000000000111111111111111100000011111111
   getHitPatternVXD(): 00000000010101011010010100010001
   getMomentum(): (0.164386,0.0745966,0.343783)
+  getNDF(): -1
   getOmega(): 0.0246552
   getPValue(): 8.29403e-07
   getParticleType(): <type: K+>
@@ -25847,6 +25843,7 @@ TrackFitResult#27:
 TrackFitResult#28:
   get4Momentum(): (0.181067,0.0813914,0.378187,1.03092)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.90504
   getCov(): size(15)
     0.00244592
@@ -25882,6 +25879,7 @@ TrackFitResult#28:
   getHitPatternCDC(): 0010001100000000000000000000000000111111111111111100000011111111
   getHitPatternVXD(): 00000000010101011010010100010001
   getMomentum(): (0.181067,0.0813914,0.378187)
+  getNDF(): -1
   getOmega(): 0.0224197
   getPValue(): 1.24442e-05
   getParticleType(): <type: p+>
@@ -25900,6 +25898,7 @@ TrackFitResult#28:
 TrackFitResult#29:
   get4Momentum(): (0.0627233,0.214358,-0.0260612,0.264655)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.116686
   getCov(): size(15)
     0.137538
@@ -25935,6 +25934,7 @@ TrackFitResult#29:
   getHitPatternCDC(): 0110010101111111111111111111111111111100000011111111111000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.0627233,0.214358,-0.0260612)
+  getNDF(): -1
   getOmega(): -0.018889
   getPValue(): 1.72123e-09
   getParticleType(): <type: pi+>
@@ -25953,6 +25953,7 @@ TrackFitResult#29:
 TrackFitResult#30:
   get4Momentum(): (0.0675985,0.241334,-0.0508913,0.555984)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.203059
   getCov(): size(15)
     0.0854503
@@ -25988,6 +25989,7 @@ TrackFitResult#30:
   getHitPatternCDC(): 0110010101111111111111111111111111111100000011111111111000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.0675985,0.241334,-0.0508913)
+  getNDF(): -1
   getOmega(): -0.0172237
   getPValue(): 5.93268e-08
   getParticleType(): <type: K+>
@@ -26006,6 +26008,7 @@ TrackFitResult#30:
 TrackFitResult#31:
   get4Momentum(): (0.0687147,0.436992,-0.0821189,1.04057)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.185638
   getCov(): size(15)
     0.783987
@@ -26041,6 +26044,7 @@ TrackFitResult#31:
   getHitPatternCDC(): 0110010101111111111111111111111111111100000011111111111000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.0687147,0.436992,-0.0821189)
+  getNDF(): -1
   getOmega(): -0.0096943
   getPValue(): 0.00633675
   getParticleType(): <type: p+>
@@ -26059,6 +26063,7 @@ TrackFitResult#31:
 TrackFitResult#32:
   get4Momentum(): (0.0542434,0.231183,0.717131,0.768209)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 3.01998
   getCov(): size(15)
     0.000241166
@@ -26094,6 +26099,7 @@ TrackFitResult#32:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.0542434,0.231183,0.717131)
+  getNDF(): -1
   getOmega(): 0.0187398
   getPValue(): 0.874193
   getParticleType(): <type: pi+>
@@ -26112,6 +26118,7 @@ TrackFitResult#32:
 TrackFitResult#33:
   get4Momentum(): (0.0543898,0.231684,0.718733,0.903842)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 3.0201
   getCov(): size(15)
     0.000329231
@@ -26147,6 +26154,7 @@ TrackFitResult#33:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.0543898,0.231684,0.718733)
+  getNDF(): -1
   getOmega(): 0.0186988
   getPValue(): 0.931102
   getParticleType(): <type: K+>
@@ -26165,6 +26173,7 @@ TrackFitResult#33:
 TrackFitResult#34:
   get4Momentum(): (0.0549458,0.233714,0.725132,1.20988)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 3.0203
   getCov(): size(15)
     0.000573314
@@ -26200,6 +26209,7 @@ TrackFitResult#34:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.0549458,0.233714,0.725132)
+  getNDF(): -1
   getOmega(): 0.018535
   getPValue(): 0.981205
   getParticleType(): <type: p+>
@@ -26218,6 +26228,7 @@ TrackFitResult#34:
 TrackFitResult#35:
   get4Momentum(): (0.1592,0.0725005,0.332935,0.401157)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.90323
   getCov(): size(15)
     0.000599381
@@ -26253,6 +26264,7 @@ TrackFitResult#35:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.1592,0.0725005,0.332935)
+  getNDF(): -1
   getOmega(): 0.0254428
   getPValue(): 3.84937e-10
   getParticleType(): <type: pi+>
@@ -26271,6 +26283,7 @@ TrackFitResult#35:
 TrackFitResult#36:
   get4Momentum(): (-0.247694,-0.26596,0.168305,0.424139)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.463092
   getCov(): size(15)
     1.09908e-05
@@ -26306,6 +26319,7 @@ TrackFitResult#36:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.247694,-0.26596,0.168305)
+  getNDF(): -1
   getOmega(): -0.0122444
   getPValue(): 0.708437
   getParticleType(): <type: pi+>
@@ -26324,6 +26338,7 @@ TrackFitResult#36:
 TrackFitResult#37:
   get4Momentum(): (0.1592,0.0725005,0.332935,0.376094)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.90323
   getCov(): size(15)
     0.000599381
@@ -26359,6 +26374,7 @@ TrackFitResult#37:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.1592,0.0725005,0.332935)
+  getNDF(): -1
   getOmega(): 0.0254428
   getPValue(): 3.84937e-10
   getParticleType(): <type: e->
@@ -26377,6 +26393,7 @@ TrackFitResult#37:
 TrackFitResult#38:
   get4Momentum(): (-0.247694,-0.26596,0.168305,0.400517)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.463092
   getCov(): size(15)
     1.09908e-05
@@ -26412,6 +26429,7 @@ TrackFitResult#38:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.247694,-0.26596,0.168305)
+  getNDF(): -1
   getOmega(): -0.0122444
   getPValue(): 0.708437
   getParticleType(): <type: e->
@@ -26430,6 +26448,7 @@ TrackFitResult#38:
 TrackFitResult#39:
   get4Momentum(): (0.182126,0.0818955,0.380421,1.03196)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.90504
   getCov(): size(15)
     0.00259144
@@ -26465,6 +26484,7 @@ TrackFitResult#39:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.182126,0.0818955,0.380421)
+  getNDF(): -1
   getOmega(): 0.0222881
   getPValue(): 1.24442e-05
   getParticleType(): <type: p+>
@@ -26483,6 +26503,7 @@ TrackFitResult#39:
 TrackFitResult#40:
   get4Momentum(): (-0.247703,-0.265969,0.168311,0.424152)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.463092
   getCov(): size(15)
     1.10967e-05
@@ -26518,6 +26539,7 @@ TrackFitResult#40:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.247703,-0.265969,0.168311)
+  getNDF(): -1
   getOmega(): -0.012244
   getPValue(): 0.708437
   getParticleType(): <type: pi+>
@@ -26536,6 +26558,7 @@ TrackFitResult#40:
 TrackFitResult#41:
   get4Momentum(): (0.159201,0.0725008,0.332936,0.401158)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.90323
   getCov(): size(15)
     0.000599435
@@ -26571,6 +26594,7 @@ TrackFitResult#41:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.159201,0.0725008,0.332936)
+  getNDF(): -1
   getOmega(): 0.0254427
   getPValue(): 3.84937e-10
   getParticleType(): <type: pi+>
@@ -26589,6 +26613,7 @@ TrackFitResult#41:
 TrackFitResult#42:
   get4Momentum(): (-0.260371,-0.280822,0.177466,1.02884)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.463413
   getCov(): size(15)
     3.88422e-05
@@ -26624,6 +26649,7 @@ TrackFitResult#42:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.260371,-0.280822,0.177466)
+  getNDF(): -1
   getOmega(): -0.0116204
   getPValue(): 0.216298
   getParticleType(): <type: p+>
@@ -26882,7 +26908,6 @@ PIDLikelihood#11:
 ECLCluster#0:
   getAbsZernike40(): 0.287207
   getAbsZernike51(): 0.557812
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (49.1079,41.838,211.541)
   getConnectedRegionId(): 1
@@ -26922,7 +26947,6 @@ ECLCluster#0:
   getUncertaintyEnergy(): 0.00439453
   getUncertaintyPhi(): 0.0125
   getUncertaintyTheta(): 0.00488281
-  getUniqueId(): 105001
   getZernikeMVA(): 0.303711
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -26936,7 +26960,6 @@ ECLCluster#0:
 ECLCluster#1:
   getAbsZernike40(): 1.20693
   getAbsZernike51(): 0.419531
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (115.457,29.3444,210.714)
   getConnectedRegionId(): 3
@@ -26972,7 +26995,6 @@ ECLCluster#1:
   getUncertaintyEnergy(): 0.00585938
   getUncertaintyPhi(): 0.0111328
   getUncertaintyTheta(): 0.00429688
-  getUniqueId(): 305001
   getZernikeMVA(): 0.858398
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -26986,7 +27008,6 @@ ECLCluster#1:
 ECLCluster#2:
   getAbsZernike40(): 0.595996
   getAbsZernike51(): 0.268359
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (134.142,-24.5498,200.473)
   getConnectedRegionId(): 4
@@ -27022,7 +27043,6 @@ ECLCluster#2:
   getUncertaintyEnergy(): 0.0146484
   getUncertaintyPhi(): 0.00527344
   getUncertaintyTheta(): 0.00429688
-  getUniqueId(): 405001
   getZernikeMVA(): 0.429688
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27036,7 +27056,6 @@ ECLCluster#2:
 ECLCluster#3:
   getAbsZernike40(): 0.664062
   getAbsZernike51(): 0.1875
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (127.217,52.9094,155.203)
   getConnectedRegionId(): 5
@@ -27072,7 +27091,6 @@ ECLCluster#3:
   getUncertaintyEnergy(): 0.0213867
   getUncertaintyPhi(): 0.00449219
   getUncertaintyTheta(): 0.00371094
-  getUniqueId(): 505001
   getZernikeMVA(): 0.723633
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27086,7 +27104,6 @@ ECLCluster#3:
 ECLCluster#4:
   getAbsZernike40(): 0.516309
   getAbsZernike51(): 0.638672
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-101.754,93.6019,140.772)
   getConnectedRegionId(): 6
@@ -27123,7 +27140,6 @@ ECLCluster#4:
   getUncertaintyEnergy(): 0.0149414
   getUncertaintyPhi(): 0.00527344
   getUncertaintyTheta(): 0.00429688
-  getUniqueId(): 605001
   getZernikeMVA(): 0.905273
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27137,7 +27153,6 @@ ECLCluster#4:
 ECLCluster#5:
   getAbsZernike40(): 0.901465
   getAbsZernike51(): 0.440625
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (15.421,-137.849,126.618)
   getConnectedRegionId(): 7
@@ -27175,7 +27190,6 @@ ECLCluster#5:
   getUncertaintyEnergy(): 0.00205078
   getUncertaintyPhi(): 0.0105469
   getUncertaintyTheta(): 0.00898437
-  getUniqueId(): 705001
   getZernikeMVA(): 0.375
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27189,7 +27203,6 @@ ECLCluster#5:
 ECLCluster#6:
   getAbsZernike40(): 0.566113
   getAbsZernike51(): 0.0855469
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (48.4514,-131.349,79.3978)
   getConnectedRegionId(): 8
@@ -27228,7 +27241,6 @@ ECLCluster#6:
   getUncertaintyEnergy(): 0.00615234
   getUncertaintyPhi(): 0.0078125
   getUncertaintyTheta(): 0.00625
-  getUniqueId(): 805001
   getZernikeMVA(): 0.0185547
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27242,7 +27254,6 @@ ECLCluster#6:
 ECLCluster#7:
   getAbsZernike40(): 1.39121
   getAbsZernike51(): 0.496875
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (100.646,98.2054,58.9982)
   getConnectedRegionId(): 10
@@ -27278,7 +27289,6 @@ ECLCluster#7:
   getUncertaintyEnergy(): 0.00117187
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.009375
-  getUniqueId(): 1005001
   getZernikeMVA(): 0.585938
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27292,7 +27302,6 @@ ECLCluster#7:
 ECLCluster#8:
   getAbsZernike40(): 0.451562
   getAbsZernike51(): 0.0433594
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (33.8361,136.412,59.0228)
   getConnectedRegionId(): 11
@@ -27329,7 +27338,6 @@ ECLCluster#8:
   getUncertaintyEnergy(): 0.00498047
   getUncertaintyPhi(): 0.00820313
   getUncertaintyTheta(): 0.00664062
-  getUniqueId(): 1105001
   getZernikeMVA(): 0.177734
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27343,7 +27351,6 @@ ECLCluster#8:
 ECLCluster#9:
   getAbsZernike40(): 0.595996
   getAbsZernike51(): 0.491016
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-134.301,41.1197,64.6755)
   getConnectedRegionId(): 9
@@ -27379,7 +27386,6 @@ ECLCluster#9:
   getUncertaintyEnergy(): 0.00322266
   getUncertaintyPhi(): 0.00957031
   getUncertaintyTheta(): 0.0078125
-  getUniqueId(): 905001
   getZernikeMVA(): 0.803711
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27393,7 +27399,6 @@ ECLCluster#9:
 ECLCluster#10:
   getAbsZernike40(): 0.655762
   getAbsZernike51(): 0.757031
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-118.279,-75.9684,2.78345)
   getConnectedRegionId(): 13
@@ -27429,7 +27434,6 @@ ECLCluster#10:
   getUncertaintyEnergy(): 0.0046875
   getUncertaintyPhi(): 0.00839844
   getUncertaintyTheta(): 0.00683594
-  getUniqueId(): 1305001
   getZernikeMVA(): 0.875
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27443,7 +27447,6 @@ ECLCluster#10:
 ECLCluster#11:
   getAbsZernike40(): 0.0647461
   getAbsZernike51(): 0.171094
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (32.0199,-136.93,11.241)
   getConnectedRegionId(): 12
@@ -27489,7 +27492,6 @@ ECLCluster#11:
   getUncertaintyEnergy(): 0.019043
   getUncertaintyPhi(): 0.0046875
   getUncertaintyTheta(): 0.00390625
-  getUniqueId(): 1205001
   getZernikeMVA(): 0.015625
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27503,7 +27505,6 @@ ECLCluster#11:
 ECLCluster#12:
   getAbsZernike40(): 0.275586
   getAbsZernike51(): 0.195703
-  getClusterHadronIntensity(): 0
   getClusterId(): 2
   getClusterPosition(): (17.937,-139.481,12.3209)
   getConnectedRegionId(): 12
@@ -27549,7 +27550,6 @@ ECLCluster#12:
   getUncertaintyEnergy(): 0.0146484
   getUncertaintyPhi(): 0.00527344
   getUncertaintyTheta(): 0.00429688
-  getUniqueId(): 1205002
   getZernikeMVA(): 0.0136719
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27563,7 +27563,6 @@ ECLCluster#12:
 ECLCluster#13:
   getAbsZernike40(): 0.63584
   getAbsZernike51(): 0.196875
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-140.423,-6.83105,-14.6229)
   getConnectedRegionId(): 14
@@ -27600,7 +27599,6 @@ ECLCluster#13:
   getUncertaintyEnergy(): 0.00527344
   getUncertaintyPhi(): 0.00820313
   getUncertaintyTheta(): 0.00664062
-  getUniqueId(): 1405001
   getZernikeMVA(): 0.0332031
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27614,7 +27612,6 @@ ECLCluster#13:
 ECLCluster#14:
   getAbsZernike40(): 0.327051
   getAbsZernike51(): 0.269531
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-25.8304,-138.293,-46.0126)
   getConnectedRegionId(): 15
@@ -27652,7 +27649,6 @@ ECLCluster#14:
   getUncertaintyEnergy(): 0.00761719
   getUncertaintyPhi(): 0.00703125
   getUncertaintyTheta(): 0.00566406
-  getUniqueId(): 1505001
   getZernikeMVA(): 0.255859
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27666,7 +27662,6 @@ ECLCluster#14:
 ECLCluster#15:
   getAbsZernike40(): 0.692285
   getAbsZernike51(): 0.121875
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-67.9964,-82.8376,-114.759)
   getConnectedRegionId(): 16
@@ -27702,7 +27697,6 @@ ECLCluster#15:
   getUncertaintyEnergy(): 0.0161133
   getUncertaintyPhi(): 0.0078125
   getUncertaintyTheta(): 0.00488281
-  getUniqueId(): 1605001
   getZernikeMVA(): 0.457031
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27716,7 +27710,6 @@ ECLCluster#15:
 ECLCluster#16:
   getAbsZernike40(): 1.04756
   getAbsZernike51(): 0.583594
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-78.606,-42.1904,-115.533)
   getConnectedRegionId(): 18
@@ -27754,7 +27747,6 @@ ECLCluster#16:
   getUncertaintyEnergy(): 0.009375
   getUncertaintyPhi(): 0.009375
   getUncertaintyTheta(): 0.00585938
-  getUniqueId(): 1805001
   getZernikeMVA(): 0.811523
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27768,7 +27760,6 @@ ECLCluster#16:
 ECLCluster#17:
   getAbsZernike40(): 0.31875
   getAbsZernike51(): 0.233203
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-43.8474,-78.3622,-115.507)
   getConnectedRegionId(): 17
@@ -27807,7 +27798,6 @@ ECLCluster#17:
   getUncertaintyEnergy(): 0.00351562
   getUncertaintyPhi(): 0.0125
   getUncertaintyTheta(): 0.00839844
-  getUniqueId(): 1705001
   getZernikeMVA(): 0.429688
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27821,7 +27811,6 @@ ECLCluster#17:
 ECLCluster#18:
   getAbsZernike40(): 1.21191
   getAbsZernike51(): 0.369141
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (49.1079,41.838,211.541)
   getConnectedRegionId(): 1
@@ -27862,7 +27851,6 @@ ECLCluster#18:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 106001
   getZernikeMVA(): 0.696289
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27876,7 +27864,6 @@ ECLCluster#18:
 ECLCluster#19:
   getAbsZernike40(): 1.46094
   getAbsZernike51(): 0.195703
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (115.457,29.3444,210.714)
   getConnectedRegionId(): 3
@@ -27912,7 +27899,6 @@ ECLCluster#19:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 306001
   getZernikeMVA(): 0.141602
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27926,7 +27912,6 @@ ECLCluster#19:
 ECLCluster#20:
   getAbsZernike40(): 1.16709
   getAbsZernike51(): 0.282422
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (134.149,-24.5244,200.455)
   getConnectedRegionId(): 4
@@ -27962,7 +27947,6 @@ ECLCluster#20:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 406001
   getZernikeMVA(): 0.570312
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27976,7 +27960,6 @@ ECLCluster#20:
 ECLCluster#21:
   getAbsZernike40(): 1.26504
   getAbsZernike51(): 0.135937
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (127.217,52.9094,155.203)
   getConnectedRegionId(): 5
@@ -28012,7 +27995,6 @@ ECLCluster#21:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 506001
   getZernikeMVA(): 0.276367
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28026,7 +28008,6 @@ ECLCluster#21:
 ECLCluster#22:
   getAbsZernike40(): 1.23018
   getAbsZernike51(): 0.407812
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-101.754,93.6019,140.772)
   getConnectedRegionId(): 6
@@ -28063,7 +28044,6 @@ ECLCluster#22:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 606001
   getZernikeMVA(): 0.0947266
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28077,7 +28057,6 @@ ECLCluster#22:
 ECLCluster#23:
   getAbsZernike40(): 1.40449
   getAbsZernike51(): 0.228516
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (15.421,-137.849,126.618)
   getConnectedRegionId(): 7
@@ -28115,7 +28094,6 @@ ECLCluster#23:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 706001
   getZernikeMVA(): 0.625
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28129,7 +28107,6 @@ ECLCluster#23:
 ECLCluster#24:
   getAbsZernike40(): 0.330371
   getAbsZernike51(): 0.065625
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (41.2937,-133.451,78.5088)
   getConnectedRegionId(): 8
@@ -28168,7 +28145,6 @@ ECLCluster#24:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 806001
   getZernikeMVA(): 0.981445
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28182,7 +28158,6 @@ ECLCluster#24:
 ECLCluster#25:
   getAbsZernike40(): 1.53232
   getAbsZernike51(): 0.226172
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (100.646,98.2054,58.9982)
   getConnectedRegionId(): 10
@@ -28218,7 +28193,6 @@ ECLCluster#25:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1006001
   getZernikeMVA(): 0.414062
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28232,7 +28206,6 @@ ECLCluster#25:
 ECLCluster#26:
   getAbsZernike40(): 1.18369
   getAbsZernike51(): 0.192187
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (33.8361,136.412,59.0228)
   getConnectedRegionId(): 11
@@ -28269,7 +28242,6 @@ ECLCluster#26:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1106001
   getZernikeMVA(): 0.822266
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28283,7 +28255,6 @@ ECLCluster#26:
 ECLCluster#27:
   getAbsZernike40(): 1.27002
   getAbsZernike51(): 0.222656
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-134.301,41.1197,64.6755)
   getConnectedRegionId(): 9
@@ -28319,7 +28290,6 @@ ECLCluster#27:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 906001
   getZernikeMVA(): 0.196289
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28333,7 +28303,6 @@ ECLCluster#27:
 ECLCluster#28:
   getAbsZernike40(): 1.2999
   getAbsZernike51(): 0.471094
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-118.279,-75.9684,2.78345)
   getConnectedRegionId(): 13
@@ -28369,7 +28338,6 @@ ECLCluster#28:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1306001
   getZernikeMVA(): 0.125
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28383,7 +28351,6 @@ ECLCluster#28:
 ECLCluster#29:
   getAbsZernike40(): 0.454883
   getAbsZernike51(): 0.0398437
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (26.7217,-137.93,12.0986)
   getConnectedRegionId(): 12
@@ -28429,7 +28396,6 @@ ECLCluster#29:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1206001
   getZernikeMVA(): 1
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28443,7 +28409,6 @@ ECLCluster#29:
 ECLCluster#30:
   getAbsZernike40(): 0.659082
   getAbsZernike51(): 0.114844
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-140.392,-7.12643,-14.5056)
   getConnectedRegionId(): 14
@@ -28480,7 +28445,6 @@ ECLCluster#30:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1406001
   getZernikeMVA(): 0.966797
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28494,7 +28458,6 @@ ECLCluster#30:
 ECLCluster#31:
   getAbsZernike40(): 1.03262
   getAbsZernike51(): 0.332813
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-25.8304,-138.293,-46.0126)
   getConnectedRegionId(): 15
@@ -28532,7 +28495,6 @@ ECLCluster#31:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1506001
   getZernikeMVA(): 0.744141
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28546,7 +28508,6 @@ ECLCluster#31:
 ECLCluster#32:
   getAbsZernike40(): 1.31152
   getAbsZernike51(): 0.0667969
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-67.9964,-82.8376,-114.759)
   getConnectedRegionId(): 16
@@ -28582,7 +28543,6 @@ ECLCluster#32:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1606001
   getZernikeMVA(): 0.542969
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28596,7 +28556,6 @@ ECLCluster#32:
 ECLCluster#33:
   getAbsZernike40(): 1.36963
   getAbsZernike51(): 0.283594
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-78.606,-42.1904,-115.533)
   getConnectedRegionId(): 18
@@ -28634,7 +28593,6 @@ ECLCluster#33:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1806001
   getZernikeMVA(): 0.188477
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28648,7 +28606,6 @@ ECLCluster#33:
 ECLCluster#34:
   getAbsZernike40(): 1.15049
   getAbsZernike51(): 0.291797
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-43.8474,-78.3622,-115.507)
   getConnectedRegionId(): 17
@@ -28687,7 +28644,6 @@ ECLCluster#34:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1706001
   getZernikeMVA(): 0.570312
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -29123,7 +29079,9 @@ TRGSummary:
   getTRGSummary(7): 0
   getTRGSummary(8): 0
   getTRGSummary(9): 0
+  getTimQuality(): 0
   getTimType(): 15
+  isPoissonInInjectionVeto(): False
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(35)
     pair

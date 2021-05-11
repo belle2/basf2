@@ -12,11 +12,11 @@
 # Bto J/Psi Ks(Pi+Pi-) is fitted and the resolution of the vertex
 # positions/E/P/pVal is plotted.
 
+import glob
+
 import ROOT
 import sysconfig
 ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))  # noqa
-
-import glob
 
 workingFiles = glob.glob(str("../TreeFitted_B0ToJPsiKs.root"))
 
@@ -33,9 +33,9 @@ nBins = 50
 B0_E_pull_s = ROOT.TH1F("B0_E_pull_s", 'Pull of the B^{0} energy sig', nBins, -RangePull, RangePull)
 B0_p_pull_s = ROOT.TH1F("B0_p_pull_s", 'Pull of the B^{0} momentum sig', nBins, -RangePull, RangePull)
 
-B0_vertex_pullx_s = ROOT.TH1F("B0_vertex_pullx_s", 'Pull of The B^{0} x vertex postion sig', nBins, -RangePull, RangePull)
-B0_vertex_pully_s = ROOT.TH1F("B0_vertex_pully_s", 'Pull of The B^{0} y vertex postion sig', nBins, -RangePull, RangePull)
-B0_vertex_pullz_s = ROOT.TH1F("B0_vertex_pullz_s", 'Pull of The B^{0} z vertex postion sig', nBins, -RangePull, RangePull)
+B0_vertex_pullx_s = ROOT.TH1F("B0_vertex_pullx_s", 'Pull of The B^{0} x vertex position sig', nBins, -RangePull, RangePull)
+B0_vertex_pully_s = ROOT.TH1F("B0_vertex_pully_s", 'Pull of The B^{0} y vertex position sig', nBins, -RangePull, RangePull)
+B0_vertex_pullz_s = ROOT.TH1F("B0_vertex_pullz_s", 'Pull of The B^{0} z vertex position sig', nBins, -RangePull, RangePull)
 
 B0_vertex_resolutionx_s = ROOT.TH1F("B0_vertex_resolutionx_s",
                                     'meas - mc of the B^{0} x vertex sig', nBins, -RangeMicrons, RangeMicrons)
@@ -52,14 +52,14 @@ histsAndLabels = {
     B0_vertex_pullx_s: "pull of B^{0} vertex X ",
     B0_vertex_pully_s: "pull of B^{0} vertex Y ",
     B0_vertex_pullz_s: "pull of B^{0} vertex Z ",
-    B0_vertex_resolutionx_s: r"meas-mc of B^{0} vertex X [\mum]",
-    B0_vertex_resolutiony_s: r"meas-mc of B^{0} vertex Y [\mum]",
-    B0_vertex_resolutionz_s: r"meas-mc of B^{0} vertex Z [\mum]",
+    B0_vertex_resolutionx_s: "meas-mc of B^{0} vertex X [#mum]",
+    B0_vertex_resolutiony_s: "meas-mc of B^{0} vertex Y [#mum]",
+    B0_vertex_resolutionz_s: "meas-mc of B^{0} vertex Z [#mum]",
     pVal_b: "pValue",
     pVal_s: "pValue",
 }
 
-checkForGausian = "This should be a Gausian on flat bkg and not changing."
+checkForGausian = "This should be a Gaussian on flat bkg and not changing."
 metaOptions = "pvalue-warn=0.1"
 for hist, xlabel in histsAndLabels.items():
     hist.GetXaxis().SetTitle(xlabel)

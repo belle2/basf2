@@ -17,6 +17,8 @@
 
 #include <csignal>
 
+#include <csignal>
+
 //#define DEBUG
 using namespace std;
 using namespace Belle2;

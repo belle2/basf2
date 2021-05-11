@@ -33,6 +33,14 @@ namespace Belle2 {
     ~KLMTimeConversion();
 
     /**
+     * Get TDC period.
+     */
+    double getTDCPeriod() const
+    {
+      return m_TDCPeriod;
+    }
+
+    /**
      * Set TDC frequency.
      */
     void setTDCFrequency(double frequency)

@@ -35,11 +35,17 @@ namespace Belle2 {
 
     /** Useful Constructor.
      * @param sensorID Sensor compact ID.
-     * @param isU True if v strip, false if v.
-     * @param cellID Strip ID.
-     * @param cellPosition Strip mid-line coordinate.
-     * @param charge The charge collected on the strip.
-     * @param time Index of the sample, e.g., 0 to 5.
+     * @param isU True if u strip, false if v.
+     * @param fadcID
+     * @param apvID
+     * @param nSample
+     * @param adc
+     * @param cmc1
+     * @param cmc2
+     * @param corradc
+     * @param fine_cmc1
+     * @param fine_cmc2
+     * @param fine_corradc
      */
     SVDTransparentDigit(const VxdID sensorID, const bool isU,
                         const unsigned short fadcID,

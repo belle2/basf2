@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 pdg - access particle definitions
@@ -25,10 +24,9 @@ particles to generate. See `from_name`, `from_names`, `to_name` and `to_names`
 
 import re
 import basf2
-import ROOT
 from ROOT.Belle2 import EvtGenDatabasePDG
 
-# the particle database (filled from evt.pdl by framework)
+#: the particle database (filled from evt.pdl by framework)
 _database = EvtGenDatabasePDG.Instance()
 
 
@@ -102,7 +100,7 @@ def conjugate(name):
 
     try:
         return to_name(-from_name(name))
-    except LookupError as e:
+    except LookupError:
         return name
 
 
@@ -153,7 +151,7 @@ def add_particle(name, pdgCode, mass, width, charge, spin, max_width=None, lifet
 
 
 def search(name=None, min_mass=None, max_mass=None, name_regex=False, include_width=False):
-    """
+    r"""
     Search for a particles by name or mass or both.
 
     This function allows to search for particle by name or mass and will return
@@ -203,7 +201,7 @@ def search(name=None, min_mass=None, max_mass=None, name_regex=False, include_wi
 
         Search for all partiles which contain a set of parenthesis containing a number
 
-        >>> search(".*\(\d*\).*", name_regex=True)
+        >>> search(r".*\(\d*\).*", name_regex=True)
 
         Search all particles whose mass ± width covers 1 to 1.2 GeV
 
@@ -255,9 +253,9 @@ def search(name=None, min_mass=None, max_mass=None, name_regex=False, include_wi
             continue
         m = p.Mass()
         w = p.Width() * include_width
-        if min_mass is not None and min_mass > (m+w):
+        if min_mass is not None and min_mass > (m + w):
             continue
-        if max_mass is not None and max_mass < (m-w):
+        if max_mass is not None and max_mass < (m - w):
             continue
         result.append(p)
 

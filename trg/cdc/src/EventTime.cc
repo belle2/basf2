@@ -73,6 +73,7 @@ namespace Belle2 {
     //m_ver = 0;
     //m_foundT0 = 0;
   }
+
   TRGCDCEventTime::~TRGCDCEventTime()
   {
     delete m_evtOutputTs;

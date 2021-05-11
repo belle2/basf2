@@ -21,7 +21,7 @@ namespace Belle2 {
   class SVDCoGTimeCalibrationAlgorithm : public CalibrationAlgorithm {
   public:
 
-    /** Constructor set the prefix to SVDCoGTimeCalibrationCollector*/
+    /** Constructor set the prefix to SVDTimeCalibrationCollector*/
     explicit SVDCoGTimeCalibrationAlgorithm(const std::string& str);
 
     /** Destructor*/
@@ -51,14 +51,14 @@ namespace Belle2 {
     /** setup of the boundary finding*/
     virtual void boundaryFindingSetup(std::vector<Calibration::ExpRun> /*runs*/, int /*iteration = 0*/) override
     {
-      m_previousRawCoGTimeMeanL3V.reset();
+      m_previousRawTimeMeanL3V.reset();
     }
 
 
   private:
 
     std::string m_id = ""; /**< Parameter given to set the UniqueID of the payload*/
-    std::optional<float> m_previousRawCoGTimeMeanL3V; /**< CoG time mean of the previous run for V side of layer 3*/
+    std::optional<float> m_previousRawTimeMeanL3V; /**< CoG time mean of the previous run for V side of layer 3*/
 
     float m_allowedTimeShift = 2.; /**< Allowed EventT0 shift*/
     float m_minEntries = 10000; /**< Set the minimun number of entries required in the histograms of layer 3*/

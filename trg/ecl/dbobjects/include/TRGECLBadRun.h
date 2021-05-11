@@ -28,11 +28,9 @@ namespace Belle2 {
 
     }
     //! Construction
-    TRGECLBadRun(int BadRunNumber):
+    explicit TRGECLBadRun(int BadRunNumber):
       m_BadRunNumber(BadRunNumber)
-
-    {
-    }
+    {}
 
     //! Set BadRunNumber
     void setBadRunNumber(int BadRunNumber) { m_BadRunNumber = BadRunNumber; }

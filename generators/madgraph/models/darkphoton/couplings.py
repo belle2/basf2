@@ -104,21 +104,24 @@ GC_33 = Coupling(name='GC_33', value='complex(0,1)*gw**2*sw**2',
                  order={'QED': 2})
 
 GC_34 = Coupling(name='GC_34',
-                 value='(cw*ee*complex(0,1))/(2.*sw) + (ee*complex(0,1)*sw)/(2.*cw)'
-                 , order={'QED': 1})
+                 value='(cw*ee*complex(0,1))/(2.*sw) + (ee*complex(0,1)*sw)/(2.*cw)', order={'QED': 1})
 
-GC_35 = Coupling(name='GC_35',
-                 value='ee**2*complex(0,1) + (cw**2*ee**2*complex(0,1))/(2.*sw**2) + (ee**2*complex(0,1)*sw**2)/(2.*cw**2)'
-                 , order={'QED': 2})
+GC_35 = Coupling(
+    name='GC_35',
+    value='ee**2*complex(0,1) + (cw**2*ee**2*complex(0,1))/(2.*sw**2) + (ee**2*complex(0,1)*sw**2)/(2.*cw**2)',
+    order={
+        'QED': 2})
 
 GC_36 = Coupling(name='GC_36', value='-6*complex(0,1)*lam*v', order={'QED': 1})
 
 GC_37 = Coupling(name='GC_37', value='(ee**2*complex(0,1)*v)/(2.*sw**2)',
                  order={'QED': 1})
 
-GC_38 = Coupling(name='GC_38',
-                 value='ee**2*complex(0,1)*v + (cw**2*ee**2*complex(0,1)*v)/(2.*sw**2) + (ee**2*complex(0,1)*sw**2*v)/(2.*cw**2)'
-                 , order={'QED': 1})
+GC_38 = Coupling(
+    name='GC_38',
+    value='ee**2*complex(0,1)*v + (cw**2*ee**2*complex(0,1)*v)/(2.*sw**2) + (ee**2*complex(0,1)*sw**2*v)/(2.*cw**2)',
+    order={
+        'QED': 1})
 
 GC_39 = Coupling(name='GC_39', value='-((complex(0,1)*yb)/cmath.sqrt(2))',
                  order={'QED': 1})
@@ -148,38 +151,28 @@ GC_47 = Coupling(name='GC_47', value='-((complex(0,1)*yup)/cmath.sqrt(2))',
                  order={'QED': 1})
 
 GC_48 = Coupling(name='GC_48',
-                 value='(ee*complex(0,1)*complexconjugate(CKM1x1))/(sw*cmath.sqrt(2))'
-                 , order={'QED': 1})
+                 value='(ee*complex(0,1)*complexconjugate(CKM1x1))/(sw*cmath.sqrt(2))', order={'QED': 1})
 
 GC_49 = Coupling(name='GC_49',
-                 value='(ee*complex(0,1)*complexconjugate(CKM1x2))/(sw*cmath.sqrt(2))'
-                 , order={'QED': 1})
+                 value='(ee*complex(0,1)*complexconjugate(CKM1x2))/(sw*cmath.sqrt(2))', order={'QED': 1})
 
 GC_50 = Coupling(name='GC_50',
-                 value='(ee*complex(0,1)*complexconjugate(CKM1x3))/(sw*cmath.sqrt(2))'
-                 , order={'QED': 1})
+                 value='(ee*complex(0,1)*complexconjugate(CKM1x3))/(sw*cmath.sqrt(2))', order={'QED': 1})
 
 GC_51 = Coupling(name='GC_51',
-                 value='(ee*complex(0,1)*complexconjugate(CKM2x1))/(sw*cmath.sqrt(2))'
-                 , order={'QED': 1})
+                 value='(ee*complex(0,1)*complexconjugate(CKM2x1))/(sw*cmath.sqrt(2))', order={'QED': 1})
 
 GC_52 = Coupling(name='GC_52',
-                 value='(ee*complex(0,1)*complexconjugate(CKM2x2))/(sw*cmath.sqrt(2))'
-                 , order={'QED': 1})
+                 value='(ee*complex(0,1)*complexconjugate(CKM2x2))/(sw*cmath.sqrt(2))', order={'QED': 1})
 
 GC_53 = Coupling(name='GC_53',
-                 value='(ee*complex(0,1)*complexconjugate(CKM2x3))/(sw*cmath.sqrt(2))'
-                 , order={'QED': 1})
+                 value='(ee*complex(0,1)*complexconjugate(CKM2x3))/(sw*cmath.sqrt(2))', order={'QED': 1})
 
 GC_54 = Coupling(name='GC_54',
-                 value='(ee*complex(0,1)*complexconjugate(CKM3x1))/(sw*cmath.sqrt(2))'
-                 , order={'QED': 1})
+                 value='(ee*complex(0,1)*complexconjugate(CKM3x1))/(sw*cmath.sqrt(2))', order={'QED': 1})
 
 GC_55 = Coupling(name='GC_55',
-                 value='(ee*complex(0,1)*complexconjugate(CKM3x2))/(sw*cmath.sqrt(2))'
-                 , order={'QED': 1})
+                 value='(ee*complex(0,1)*complexconjugate(CKM3x2))/(sw*cmath.sqrt(2))', order={'QED': 1})
 
 GC_56 = Coupling(name='GC_56',
-                 value='(ee*complex(0,1)*complexconjugate(CKM3x3))/(sw*cmath.sqrt(2))'
-                 , order={'QED': 1})
-
+                 value='(ee*complex(0,1)*complexconjugate(CKM3x3))/(sw*cmath.sqrt(2))', order={'QED': 1})

@@ -29,20 +29,23 @@ GeometryPar* GeometryPar::m_Instance = nullptr;
 
 GeometryPar* GeometryPar::instance(void)
 {
-  if (m_Instance) return m_Instance;
+  if (m_Instance)
+    return m_Instance;
   B2FATAL("instance() called without initialization");
   return nullptr;  // never reached
 }
 
 GeometryPar* GeometryPar::instance(const GearDir& content)
 {
-  if (!m_Instance) m_Instance = new GeometryPar(content);
+  if (!m_Instance)
+    m_Instance = new GeometryPar(content);
   return m_Instance;
 }
 
 GeometryPar* GeometryPar::instance(const BKLMGeometryPar& element)
 {
-  if (!m_Instance) m_Instance = new GeometryPar(element);
+  if (!m_Instance)
+    m_Instance = new GeometryPar(element);
   return m_Instance;
 }
 
@@ -421,7 +424,8 @@ void GeometryPar::calculate(void)
       int nZStrips = (hasChimney ? m_NZStripsChimney : m_NZStrips);
       int nZScints = (hasChimney ? m_NZScintsChimney : m_NZScints);
       CLHEP::HepRotation rotation;
-      if (!isForward) rotation.rotateX(M_PI);
+      if (!isForward)
+        rotation.rotateX(M_PI);
       rotation.rotateZ(m_SectorRotation[section][sector - 1]);
       for (int layer = 1; layer <= m_NLayer; ++layer) {
         bool isFlipped = m_IsFlipped[section][sector - 1][layer - 1];
@@ -579,7 +583,8 @@ const CLHEP::Hep3Vector GeometryPar::getScintEnvelopeHalfSize(int layer, bool ha
 
 int GeometryPar::getNPhiScints(int layer) const
 {
-  if ((layer <= 0) || (layer > m_NLayer)) return 0;
+  if ((layer <= 0) || (layer > m_NLayer))
+    return 0;
   return m_NPhiScints[layer - 1];
 }
 
@@ -667,7 +672,8 @@ const CLHEP::Hep3Vector GeometryPar::getSupportPlateHalfSize(bool hasChimney) co
 double GeometryPar::getBracketZPosition(int bracket, bool hasChimney) const
 {
   double z = m_BracketInset - 0.5 * m_GapLength;
-  if (bracket == 0) return z;
+  if (bracket == 0)
+    return z;
   if (hasChimney) {
     return m_SupportPlateLengthChimney - m_GapLength - z;
   } else {
@@ -709,7 +715,8 @@ const CLHEP::Hep3Vector GeometryPar::getReadoutConnectorsHalfSize(void) const
 
 bool GeometryPar::hasRPCs(int layer) const
 {
-  if ((layer <= 0) || (layer > m_NLayer)) return false;
+  if ((layer <= 0) || (layer > m_NLayer))
+    return false;
   return m_HasRPCs[layer - 1];
 }
 

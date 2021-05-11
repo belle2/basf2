@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import os
 from basf2 import create_path, process, B2FATAL, set_random_seed
-from ROOT import TFile, TTree
+from ROOT import TFile
 
 set_random_seed("something important")
 

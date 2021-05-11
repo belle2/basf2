@@ -12,6 +12,9 @@
 #include <framework/core/Module.h>
 #include <string>
 
+#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/datastore/StoreObjPtr.h>
+
 namespace Belle2 {
 
   /** This module deletes the extrainfo of each particle in the given ParticleLists.
@@ -25,6 +28,9 @@ namespace Belle2 {
 
     /** Removes or not EventExtraInfo **/
     bool m_removeEventExtraInfo;
+
+    /** event extra info object pointer */
+    StoreObjPtr<EventExtraInfo> m_eventExtraInfo;
 
   public:
     /** Constructor. */

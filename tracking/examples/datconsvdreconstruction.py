@@ -5,16 +5,15 @@
 # Simple steering file to demonstrate how to run the reconstruction on Phase2 geometry
 #############################################################
 
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from L1trigger import add_tsim
-import glob
 
 # background (collision) files
 bg = None
 
-set_random_seed(3)
+b2.set_random_seed(3)
 
 num_events = 100
 
@@ -23,7 +22,7 @@ output_filename = "datconsvdreconstruction.root"
 output_branches = ["DATCONSVDDigits", "DATCONSimpleSVDCluster", "DATCONSVDSpacePoints"]
 
 # create path
-main = create_path()
+main = b2.create_path()
 
 # specify number of events to be generated
 # the experiment number for phase2 MC has to be 1002, otherwise the wrong payloads (for VXDTF2 the SectorMap) are loaded
@@ -56,5 +55,5 @@ main.add_module('Progress')
 main.add_module("RootOutput", outputFileName=output_filename, branchNames=output_branches)
 
 # process events and print call statistics
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

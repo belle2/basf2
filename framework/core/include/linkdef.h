@@ -10,7 +10,7 @@
 #pragma link C++ class Belle2::ModuleStatistics+; // checksum=0x90989198, version=-1
 #pragma link C++ class vector<Belle2::ModuleStatistics>+; // checksum=0x88bd6342, version=6
 #pragma link C++ class Belle2::ProcessStatistics+; // checksum=0x70dfd8a3, version=2
-#pragma link C++ class Belle2::Environment+; // checksum=0xe1a055bf, version=-1
+#pragma link C++ class Belle2::Environment+; // checksum=0x32a0c385, version=-1
 #pragma link C++ class Belle2::RandomGenerator+; // checksum=0x1f2a940c, version=2
 #pragma link C++ class Belle2::MetadataService-;
 

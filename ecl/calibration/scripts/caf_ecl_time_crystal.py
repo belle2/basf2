@@ -3,7 +3,7 @@
 """ECL timing calibration that performs the crystal calibrations, one for  the whole set of runs."""
 
 from prompt import CalibrationSettings
-from reconstruction import *
+from reconstruction import prepare_cdst_analysis
 
 
 ##############################
@@ -80,9 +80,7 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     import basf2
     from basf2 import register_module, create_path
-    import ROOT
     from ROOT import Belle2
-    from ROOT.Belle2 import TestCalibrationAlgorithm
     from caf.framework import Collection
 
     ###################################################

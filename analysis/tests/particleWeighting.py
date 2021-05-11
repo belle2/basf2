@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 from basf2 import B2FATAL, B2RESULT, Path, process, conditions, register_module
 import b2test_utils
 import modularAnalysis as ma
@@ -137,8 +136,8 @@ with b2test_utils.clean_working_directory():
     addtable = register_module('ParticleWeightingLookUpCreator')
     addtable.param('tableIDNotSpec', tableIDNotSpec)
     addtable.param('outOfRangeWeight', outOfRangeWeightInfo)
-    addtable.param('experimentHigh', 1000)
-    addtable.param('experimentLow', 0)
+    addtable.param('experimentHigh', 1003)
+    addtable.param('experimentLow', 1003)
     addtable.param('runHigh', 1000)
     addtable.param('runLow', 0)
     addtable.param('tableName', "ParticleReweighting:TestMomentum")
@@ -146,8 +145,8 @@ with b2test_utils.clean_working_directory():
     addtable2 = register_module('ParticleWeightingLookUpCreator')
     addtable2.param('tableIDSpec', tableIDSpec)
     addtable2.param('outOfRangeWeight', outOfRangeWeightInfo)
-    addtable2.param('experimentHigh', 1000)
-    addtable2.param('experimentLow', 0)
+    addtable2.param('experimentHigh', 1003)
+    addtable2.param('experimentLow', 1003)
     addtable2.param('runHigh', 1000)
     addtable2.param('runLow', 0)
     addtable2.param('tableName', "ParticleReweighting:TestMomentum2")
@@ -155,7 +154,7 @@ with b2test_utils.clean_working_directory():
     testpath = Path()
     testpath.add_module(addtable)
     testpath.add_module(addtable2)
-    testpath.add_module('EventInfoSetter', evtNumList=[100], runList=[1], expList=[1])
+    testpath.add_module('EventInfoSetter', evtNumList=[100], runList=[0], expList=[1003])
 
     # Process the events to create database payloads
     process(testpath)

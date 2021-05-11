@@ -1,10 +1,12 @@
 import functools
-from concurrent.futures import ProcessPoolExecutor
+import time
+from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict
-from conditions_db.iov import IoVSet, IntervalOfValidity
-from basf2 import B2INFO, B2ERROR, B2FATAL, LogPythonInterface
+from basf2 import B2INFO, B2ERROR, B2WARNING, LogPythonInterface  # noqa
 from basf2.utils import pretty_print_table
 from terminal_utils import Pager
+from conditions_db.iov import IoVSet, IntervalOfValidity
+from conditions_db.runningupdate import RunningTagUpdater, RunningTagUpdaterError, RunningTagUpdateMode
 
 
 def get_all_iovsets(existing_payloads, run_range=None):
@@ -53,7 +55,8 @@ def create_iov_wrapper(db, globaltag_id, payload):
     Wrapper function for adding payloads into a given globaltag.
     """
     for iov in payload.iov:
-        db.create_iov(globaltag_id, payload.payload_id, *iov.tuple)
+        if db.create_iov(globaltag_id, payload.payload_id, *iov.tuple) is None:
+            raise RuntimeError(f"Cannot create iov for {payload.name} r{payload.revision}")
 
 
 def command_tag_merge(args, db=None):
@@ -132,8 +135,8 @@ def command_tag_merge(args, db=None):
                           help="Can be for numbers to limit the run range to put"
                           "in the output globaltag: All iovs will be limited to "
                           "be in this range.")
-        args.add_argument("-j", type=int, default=1, dest="nprocess",
-                          help="Number of concurrent processes to use for "
+        args.add_argument("-j", type=int, default=10, dest="nprocess",
+                          help="Number of concurrent threads to use for "
                           "creating payloads into the output globaltag.")
         return
 
@@ -200,9 +203,241 @@ def command_tag_merge(args, db=None):
 
     # Ok, we're still alive, create all the payloads using multiple processes.
     if not args.dry_run:
-        B2INFO(f'Now copying the payloads into {args.output}...')
+        B2INFO(f'Now copying the {len(final)} payloads into {args.output} to create {len(table)-1} iovs ...')
         create_iov = functools.partial(create_iov_wrapper, db, output_id)
-        with ProcessPoolExecutor(max_workers=args.nprocess) as pool:
-            pool.map(create_iov, final)
+        try:
+            with ThreadPoolExecutor(max_workers=args.nprocess) as pool:
+                start = time.monotonic()
+                for payload, _ in enumerate(pool.map(create_iov, final), 1):
+                    eta = (time.monotonic() - start) / payload * (len(final) - payload)
+                    B2INFO(f"{payload}/{len(final)} payloads copied, ETA: {eta:.1f} seconds")
+        except RuntimeError:
+            B2ERROR("Not all iovs could be created. This could be a server/network problem "
+                    "or the destination globaltag was not empty or not writeable. Please make "
+                    "sure the target tag is empty and try again")
+            return 1
 
     return 0
+
+
+def command_tag_runningupdate(args, db=None):
+    """
+    Update a running globaltag with payloads from a staging tag
+
+    This command will calculate and apply the necessary updates to a running
+    globaltag with a given staging globaltag
+
+    Running tags are defined as "immutable for existing data but conditions for
+    newer runs may be added" and the only modification allowed is to add new
+    payloads for new runs or close existing payloads to no longer be valid for
+    new runs.
+
+    This command takes previously prepared and validated payloads in a staging
+    globaltag and will then calculate which payloads to close and what to add to
+    the running globaltag.
+
+    For this to work we require
+
+    1. A running globaltag in the state "RUNNING"
+
+    2. A (experiment, run) number from which run on the update should be valid.
+       This run number needs to be
+
+        a) bigger than the start of validity for all iovs in the running tag
+        b) bigger than the end of validity for all closed iovs (i.e. not valid
+           to infinity) in the running tag
+
+    3. A staging globaltag with the new payloads in state "VALIDATED"
+
+        a) payloads in the staging tag starting at (0,0) will be interpreted as
+           starting at the first valid run for the update
+        b) all other payloads need to start at or after the first valid run for
+           the update.
+        c) The globaltag needs to be gap and overlap free
+        d) All payloads in the staging tag should have as last iov an open iov
+           (i.e. valid to infinity) but this can be disabled.
+
+    The script will check all the above requirements and will then calculate the
+    necessary operations to
+
+    1. Add all payloads from the staging tag where a start validity of (0, 0) is
+       replaced by the starting run for which this update should be valid.
+    2. close all iovs for payloads in the running tags just before the
+       corresponding iov of the same payload in the staging tag, so either at the
+       first run for the update to be valid or later
+    3. Optionally, make sure all payloads in the staging tag end in an open iov.
+
+    Example:
+
+        running tag contains ::
+
+            payload1, rev 1, valid from 0,1 to 1,0
+            payload1, rev 2, valid from 1,1 to -1,-1
+            payload2, rev 1, valid from 0,1 to -1,-1
+            payload3, rev 1, valid from 0,1 to 1,0
+            payload4, rev 1, valid from 0,1 to -1,-1
+            payload5, rev 1, valid from 0,1 to -1,-1
+
+        staging tag contains ::
+
+            payload1, rev 3, valid from 0,0 to 1,8
+            payload1, rev 4, valid from 1,9 to 1,20
+            payload2, rev 2, valid from 1,5 to 1,20
+            payload3, rev 2, valid from 0,0 to -1,-1
+            payload4, rev 1, valid from 0,0 to 1,20
+
+        Then running ``b2conditionsdb tag runningupdate running staging --run 1 2 --allow-closed``,
+        the running globaltag after the update will contain ::
+
+            payload1, rev 1, valid from 0,1 to 1,0
+            payload1, rev 2, valid from 1,1 to 1,1
+            payload1, rev 3, valid from 1,2 to 1,8
+            payload1, rev 4, valid from 1,9 to 1,20
+            payload2, rev 1, valid from 0,1 to 1,4
+            payload2, rev 2, valid from 1,5 to 1,20
+            payload3, rev 1, valid from 0,1 to 1,0
+            payload3, rev 2, valid from 1,2 to -1,-1
+            payload4, rev 1, valid from 0,1 to 1,20
+            payload5, rev 1, valid from 0,1 to -1,-1
+
+        Note that
+
+        - the start of payload1 and payload3 in staging has been adjusted
+        - payload2 in the running tag as been closed at 1,4, just before the
+          validity from the staging tag
+        - payload3 was already closed in the running tag so no change is
+          performed. This might result in gaps but is intentional
+        - payload4 was not closed at rim 1,2 because the staging tag had the same
+          revision of the payload so the these were merged to one long validity.
+        - payload5 was not closed as there was no update to it in the staging tag.
+          If we would have run with ``--full-replacement`` it would have been closed.
+        - if we would have chosen ``--run 1 1`` the update would have failed because
+          payload1, rev2 in running starts at 1,1 so we would have a conflict
+        - if we would have chosen ``--run 1 6`` the update would have failed because
+          payload2 in the staging tag starts before this run
+        - if we would have chosen to open the final iovs in staging by using
+          ``--fix-closed``, payload1, rev 4; payload2, rev 2 and payload4 rev 1
+          would be valid until -1,-1 after the running tag. In fact, payload 4
+          would not be changed at all.
+    """
+    if db is None:
+        args.add_argument("running", help="name of the running globaltag")
+        args.add_argument("staging", help="name of the staging globaltag")
+        group = args.add_argument_group("required named arguments")
+        group.add_argument("-r", "--run", required=True, nargs=2, type=int, metavar=("EXP", "RUN"),
+                           help="First experiment + run number for which the update should be "
+                           "valid. Two numbers separated by space")
+        choice = args.add_mutually_exclusive_group()
+        choice.add_argument("--allow-closed", dest="mode", action="store_const",
+                            const=RunningTagUpdateMode.ALLOW_CLOSED,
+                            default=RunningTagUpdateMode.STRICT,
+                            help="if given allow payloads in the staging tag to not "
+                            "be open, i.e. they don't have to be open ended in the "
+                            "update. Useful to retire a payload by adding one last update")
+        choice.add_argument("--fix-closed", dest="mode", action="store_const",
+                            const=RunningTagUpdateMode.FIX_CLOSED,
+                            help="if given automatically open the last iov for each "
+                            "payload in staging if it is closed.")
+        choice.add_argument("--simple-mode", dest="mode", action="store_const",
+                            const=RunningTagUpdateMode.SIMPLE,
+                            help="if given require the staging tag to solely consist "
+                            "of fully infinite validities: Only one iov per payload "
+                            "with a validity of (0,0,-1,-1)")
+        choice.add_argument("--full-replacement", dest="mode", action="store_const",
+                            const=RunningTagUpdateMode.FULL_REPLACEMENT,
+                            help="if given perform a full replacement and close all "
+                            "open iovs in the running tag not present in the staging tag. "
+                            "After such an update exactly the payloads in the staging tag "
+                            "will be valid after the given run. This allows for closed iovs "
+                            "in the staging tag as with ``--allow-closed``")
+        args.add_argument("--dry-run", default=False, action="store_true",
+                          help="Only show the changes, don't try to apply them")
+        return
+
+    try:
+        updater = RunningTagUpdater(db, args.running, args.staging, args.run, args.mode)
+        operations = updater.calculate_update()
+    except RunningTagUpdaterError as e:
+        B2ERROR(e, **e.extra_vars)
+        return 1
+
+    # make sure we exit if we have nothing to do
+    if not operations:
+        B2INFO("Nothing to do, please check the globaltags given are correct")
+        return 1
+
+    # show operations in a table and some summary
+    table = []
+    last_valid = tuple(args.run)
+    summary = {
+        "first valid run": last_valid,
+        "payloads closed": 0,
+        "payloads updated": 0,
+        "payload iovs added": 0,
+        "next possible update": last_valid,
+    }
+
+    updated_payloads = set()
+    for op, payload in operations:
+        # calculate how many payloads/iovs will be closed/added
+        if op == "CLOSE":
+            summary['payloads closed'] += 1
+        else:
+            updated_payloads.add(payload.name)
+            summary['payload iovs added'] += 1
+        # remember the highest run number of any iov, so first run
+        last_valid = max(payload.iov[:2], last_valid)
+        # and final run if not open
+        if payload.iov[2:] != (-1, -1):
+            last_valid = max(payload.iov[2:], last_valid)
+        # and add to the table of operations to be shown
+        table.append([op, payload.name, payload.revision] + list(payload.iov))
+
+    # calculate the next fee run
+    summary['next possible update'] = (last_valid[0] + (1 if last_valid[1] < 0 else 0), last_valid[1] + 1)
+    # and the number of distinct payloads
+    summary['payloads updated'] = len(updated_payloads)
+
+    # prepare some colors for easy distinction of closed payloads
+    support_color = LogPythonInterface.terminal_supports_colors()
+
+    def color_row(row, _, line):
+        """Color the lines depending on which globaltag the payload comes from"""
+        if not support_color:
+            return line
+        begin = "" if row[0] != "CLOSE" else "\x1b[31m"
+        end = '\x1b[0m'
+        return begin + line + end
+
+    # and then show the table
+    table.sort(key=lambda x: (x[1], x[3:], x[2], x[0]))
+    table.insert(0, ["Action", "Payload", "Rev", "First Exp", "First Run", "Final Exp", "Final Run"])
+    columns = [6, '*', -6, 6, 6, 6, 6]
+
+    with Pager(f"Changes to running tag {args.running}:", True):
+        B2INFO(f"Changes to be applied to the running tag {args.running}")
+        pretty_print_table(table, columns, transform=color_row)
+
+    if args.dry_run:
+        B2INFO("Running in dry mode, not applying any changes.", **summary)
+        return 0
+
+    B2WARNING("Applying these changes cannot be undone and further updates to "
+              "this run range will **NOT** be possible", **summary)
+    # ask if the user really knows what they're doing
+    answer = input("Are you sure you want to continue? [yes/No]: ")
+    while answer.lower().strip() not in ['yes', 'no', 'n', '']:
+        answer = input("Please enter 'yes' or 'no': ")
+
+    if answer.lower().strip() != 'yes':
+        B2INFO("Aborted by user ...")
+        return 1
+
+    # Ok, all set ... apply the update
+    try:
+        updater.apply_update()
+        B2INFO("done")
+        return 0
+    except RunningTagUpdaterError as e:
+        B2ERROR(e, **e.extra_vars)
+        return 1

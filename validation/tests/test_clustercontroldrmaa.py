@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import unittest
 import sys
@@ -40,7 +39,6 @@ class TestClusterControlDrmaa(unittest.TestCase):
 
         def __exit__(self, exc, value, tb):
             """ to support python with syntax"""
-            pass
 
         def createJobTemplate(self):
             """fake creating job template"""

@@ -51,9 +51,9 @@ namespace Belle2 {
   /** unpacker for the merger reader (TSF which reads the merger output) */
   struct Merger : SubTrigger {
     /** Constructor */
-    Merger(StoreArray<MergerBits>* inArrayPtr, std::string inName,
+    Merger(StoreArray<MergerBits>* inArrayPtr, const std::string& inName,
            unsigned inEventWidth, unsigned inOffset,
-           int inHeaderSize, std::vector<int> inNodeID,
+           int inHeaderSize, const std::vector<int>& inNodeID,
            unsigned inNInnerMergers, int& inDelay,
            int& inCnttrg,
            int inDebugLevel) :
@@ -90,7 +90,7 @@ namespace Belle2 {
     /** Unpack function */
     void unpack(int subDetectorId,
                 std::array<int*, 4> data32tab,
-                std::array<int, 4> nWords)
+                std::array<int, 4> nWords) override
     {
       if (subDetectorId != iNode) {
         return;
@@ -133,8 +133,8 @@ namespace Belle2 {
     /** constructor */
     Tracker2D(StoreArray<TSFOutputBitStream>* inArrayPtr,
               StoreArray<T2DOutputBitStream>* outArrayPtr,
-              std::string inName, unsigned inEventWidth, unsigned inOffset,
-              unsigned inHeaderSize, std::vector<int> inNodeID,
+              const std::string& inName, unsigned inEventWidth, unsigned inOffset,
+              unsigned inHeaderSize, const std::vector<int>& inNodeID,
               unsigned inNumTS, int& inDelay,
               int& inCnttrg,
               int inDebugLevel) :
@@ -198,7 +198,7 @@ namespace Belle2 {
      */
     void unpack(int subDetectorId,
                 std::array<int*, 4> data32tab,
-                std::array<int, 4> nWords)
+                std::array<int, 4> nWords) override
     {
       if (subDetectorId != iNode) {
         return;
@@ -398,8 +398,8 @@ namespace Belle2 {
   struct Neuro : SubTrigger {
     /** Constructor */
     Neuro(StoreArray<NNBitStream>* arrPtr,
-          std::string inName, unsigned inEventWidth, unsigned inOffset,
-          unsigned inHeaderSize, std::vector<int> inNodeID, int& inDelay,
+          const std::string& inName, unsigned inEventWidth, unsigned inOffset,
+          unsigned inHeaderSize, const std::vector<int>& inNodeID, int& inDelay,
           int& inCnttrg,
           int inDebugLevel) :
       SubTrigger(inName, inEventWidth, inOffset / wordWidth, inHeaderSize, inNodeID,
@@ -559,6 +559,7 @@ void CDCTriggerUnpackerModule::initialize()
     m_NeuroInputs.registerInDataStore("CDCTriggerNeuroTracksInput");
     m_NeuroTracks.registerRelationTo(m_NNInputTSHits);
     m_NNInput2DFinderTracks.registerRelationTo(m_NNInputTSHits);
+    m_NNInput2DFinderTracks.registerRelationTo(m_NNInputTSHitsAll);
     m_NNInput2DFinderTracks.registerRelationTo(m_NeuroTracks);
     m_NeuroTracks.registerRelationTo(m_NNInput2DFinderTracks);
     m_NeuroTracks.registerRelationTo(m_NeuroInputs);
@@ -609,14 +610,6 @@ void CDCTriggerUnpackerModule::initialize()
       m_subTrigger.push_back(dynamic_cast<SubTrigger*>(m_neuro));
     }
   }
-  if (m_useDB == true) {
-    B2DEBUG(2, "Load Neurotrigger configuration for network " << m_cdctriggerneuroconfig->getNNName() << " from database ");
-    B2DEBUG(10, padright("Name", 50) << padright("start", 10) << padright("end", 10) << padright("offset", 10));
-    for (auto x : m_cdctriggerneuroconfig->getB2Format()) {
-      B2DEBUG(10, padright(x.name, 48) << ": " << padright(std::to_string(x.start), 10) <<  padright(std::to_string(x.end),
-              10) << padright(std::to_string(x.offset), 10));
-    }
-  }
 }
 
 void CDCTriggerUnpackerModule::terminate()
@@ -633,6 +626,16 @@ void CDCTriggerUnpackerModule::beginRun()
   m_exp = bevt->getExperiment();
   m_run = bevt->getRun();
 
+  if (not m_cdctriggerneuroconfig.isValid())
+    B2FATAL("CDCTriggerNeuroConfig is not valid.");
+  if (m_useDB == true) {
+    B2DEBUG(2, "Load Neurotrigger configuration for network " << m_cdctriggerneuroconfig->getNNName() << " from database ");
+    B2DEBUG(10, padright("Name", 50) << padright("start", 10) << padright("end", 10) << padright("offset", 10));
+    for (auto x : m_cdctriggerneuroconfig->getB2Format()) {
+      B2DEBUG(10, padright(x.name, 48) << ": " << padright(std::to_string(x.start), 10) <<  padright(std::to_string(x.end),
+              10) << padright(std::to_string(x.offset), 10));
+    }
+  }
 }
 
 

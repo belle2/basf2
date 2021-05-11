@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
-logging.log_level = LogLevel.WARNING
+b2.logging.log_level = b2.LogLevel.WARNING
 
 
-class CheckTrueHits(Module):
+class CheckTrueHits(b2.Module):
 
     """
     Lists TrueHits with MCParticles and SimHits that generated them.
@@ -76,6 +76,9 @@ class CheckTrueHits(Module):
             base_info = '\n' + 'TrueHit type: ' + truehit_type_text
             # Get the generating MCParticle and check sign of relation weight
             mcparticle_relations = truehit.getRelationsFrom('MCParticles')
+            if mcparticle_relations.size() == 0:
+                b2.B2INFO('Found PXDTrueHit w/o relation to MCParticles')
+                continue
             weight = mcparticle_relations.weight(0)
             particle = mcparticle_relations[0]
             particle_type_text = 'secondary'
@@ -92,10 +95,10 @@ class CheckTrueHits(Module):
                 mcparticle_message += 'remapped ' + str(weight)
             else:
                 continue
-            B2INFO(base_info + '\n' + mcparticle_message)
+            b2.B2INFO(base_info + '\n' + mcparticle_message)
             # Now get and print out the SimHits
             simhits = truehit.getRelationsTo('PXDSimHits')
-            B2INFO('SimHits:')
+            b2.B2INFO('SimHits:')
             for simhit in simhits:
                 particle_type_text = 'secondary'
                 simhit_weight = 0.0
@@ -123,7 +126,7 @@ class CheckTrueHits(Module):
                         w_in=simhit.getPosIn().Z())
                 simhit_text += \
                     '{time:8.5f}'.format(time=simhit.getGlobalTime())
-                B2INFO(simhit_text)
+                b2.B2INFO(simhit_text)
             # Print the truhit position
             midpoint_text = 'TrueHit position:\n'
             midpoint_text += \
@@ -161,7 +164,7 @@ class CheckTrueHits(Module):
             # Print the truhit time
             midpoint_text += 'Time: {t:8.5f}\n'.format(
                 t=truehit.getGlobalTime())
-            B2INFO(midpoint_text)
+            b2.B2INFO(midpoint_text)
 
         for truehit in svd_truehits:
             # Get the VXD and sensor thickness
@@ -191,6 +194,9 @@ class CheckTrueHits(Module):
             base_info += '\n' + 'TrueHit type: ' + truehit_type_text
             # Get the generating MCParticle and check sign of relation weight
             mcparticle_relations = truehit.getRelationsFrom('MCParticles')
+            if mcparticle_relations.size() == 0:
+                b2.B2INFO('Found SVDTrueHit w/o relation to MCParticles')
+                continue
             weight = mcparticle_relations.weight(0)
             particle = mcparticle_relations[0]
             particle_type_text = 'secondary'
@@ -207,10 +213,10 @@ class CheckTrueHits(Module):
                 mcparticle_message += 'remapped ' + str(weight)
             else:
                 continue
-            B2INFO(base_info + '\n' + mcparticle_message)
+            b2.B2INFO(base_info + '\n' + mcparticle_message)
             # Now get and print out the SimHits
             simhits = truehit.getRelationsTo('SVDSimHits')
-            B2INFO('SimHits:')
+            b2.B2INFO('SimHits:')
             for simhit in simhits:
                 particle_type_text = 'secondary'
                 simhit_weight = 0.0
@@ -238,7 +244,7 @@ class CheckTrueHits(Module):
                         w_in=simhit.getPosIn().Z())
                 simhit_text += \
                     '{time:8.5f} '.format(time=simhit.getGlobalTime())
-                B2INFO(simhit_text)
+                b2.B2INFO(simhit_text)
             # Print the truhit position
             midpoint_text = 'TrueHit position:\n'
             midpoint_text += \
@@ -276,33 +282,34 @@ class CheckTrueHits(Module):
             # Print the truhit time
             midpoint_text += 'Time: {t:8.5f}\n'.format(
                 t=truehit.getGlobalTime())
-            B2INFO(midpoint_text)
+            b2.B2INFO(midpoint_text)
 
     def terminate(self):
         """ Write results """
-        B2INFO(
+        b2.B2INFO(
             '\nStatistics for PXD: {pxd};\nStatistics for SVD: {svd}\n'.format(
                 pxd=str(self.truehit_stats_pxd),
                 svd=str(self.truehit_stats_svd)
             )
         )
 
+
 # Particle gun module
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 # Create Event information
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 # Load parameters
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 # Create geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 # Run simulation
-simulation = register_module('FullSim')
+simulation = b2.register_module('FullSim')
 # simulation.param('StoreAllSecondaries', True)
 # PXD digitization module
 printParticles = CheckTrueHits()
-printParticles.set_log_level(LogLevel.INFO)
+printParticles.set_log_level(b2.LogLevel.INFO)
 
 # Specify number of events to generate
 eventinfosetter.param({'evtNumList': [200], 'runList': [1]})
@@ -325,11 +332,9 @@ particlegun.param({
     'independentVertices': False,
 })
 
-# Select subdetectors to be built
-geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
 
 # create processing path
-main = create_path()
+main = b2.create_path()
 main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(particlegun)
@@ -339,7 +344,7 @@ main.add_module(simulation)
 main.add_module(printParticles)
 
 # generate events
-process(main)
+b2.process(main)
 
 # show call statistics
-print(statistics)
+print(b2.statistics)

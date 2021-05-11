@@ -343,6 +343,11 @@ namespace Belle2 {
        */
       StoreArray<CDCHit> m_CDCHits;
 
+      /**
+       * True if data length error has been already reported.
+       */
+      bool m_dataLengthError;
+
     };//end class declaration
 
 

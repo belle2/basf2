@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # BASF2 (Belle Analysis Framework 2)                                     #
@@ -20,7 +19,6 @@ import tensorflow as tf
 import pandas
 
 # was still important for some shared libraries at some point
-import basf2_mva
 
 from basf2_mva_python_interface.tensorflow import State
 
@@ -271,7 +269,7 @@ def end_fit(state):
     :return:
     """
     filename = state.training.save_name
-    with open(filename + str('.data-00000-of-00001'), 'rb') as file1, open(filename + str('.index'), 'rb') as file2:
+    with open(filename + '.data-00000-of-00001', 'rb') as file1, open(filename + '.index', 'rb') as file2:
         data1 = file1.read()
         data2 = file2.read()
     binning_parameters = state.binning_parameters
@@ -282,7 +280,7 @@ def end_fit(state):
 
     # sample pdfs of trained model on test_dataset, return test df
     state.get_from_collection()
-    y_hat = apply(state, state.Xtest)
+    y_hat = state(*state.Xtest)
     test_df = pandas.DataFrame.from_dict({'y': state.ytest.reshape(-1), 'y_hat': y_hat.reshape(-1)})
     (sig_pdf, back_pdf) = binning.get_signal_background_pdf(test_df)
     seed = state.seed

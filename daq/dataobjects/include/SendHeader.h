@@ -59,8 +59,6 @@ namespace Belle2 {
     int GetExpNum(); //!
     int GetRunNumSubRunNum(); //!
 
-    RawHeader_latest tmp_header; //!
-
     /* Data Format : Node info */
     enum {
       SENDHDR_NWORDS = 6
@@ -78,7 +76,14 @@ namespace Belle2 {
       POS_NODE_ID = 5
     };
 
-
+    /* Data Format in EXP_RUN_NUM word: Same as in RawHeader_v2.h */
+    enum {
+      EXP_MASK = 0xFFC00000,
+      EXP_SHIFT = 22,
+      RUNNO_MASK = 0x003FFF00,
+      RUNNO_SHIFT = 8,
+      SUBRUNNO_MASK = 0x000000FF
+    };
 
     int m_buffer[ SENDHDR_NWORDS ];
 

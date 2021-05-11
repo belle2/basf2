@@ -31,7 +31,7 @@ namespace Belle2 {
    * DecayString: 'B -> K* ^gamma'
    *
    * As noted above the module has to be executed in ROE path, that is a path that is executed for each ROE object
-   * foudnin the DataStore. The module first starts at the ROE object and obtains the related Particle. In our example
+   * found in the DataStore. The module first starts at the ROE object and obtains the related Particle. In our example
    * this is a B meson candidate. Next, the module fetches the selected B meson daughter (a photon in our case) and
    * adds it to the 'gamma:sig' ParticleList. This ParticleList contains only one particle, the photon used to reconstruct
    * the B -> K* gamma candidate.

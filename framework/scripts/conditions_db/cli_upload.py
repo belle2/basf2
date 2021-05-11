@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Script to upload local database to ConditionsDB.
@@ -9,8 +8,7 @@ this file to the ConditionsDB and create iovs for each payload. It assumes that
 all tags already exist.
 """
 
-import os
-from basf2 import B2FATAL, B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging
+from basf2 import LogInfo, LogLevel, logging
 
 
 def command_upload(args, db=None):

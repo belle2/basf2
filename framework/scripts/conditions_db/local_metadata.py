@@ -6,8 +6,7 @@ information.
 """
 
 import sqlite3
-from pathlib import Path
-from . import PayloadInformation
+from conditions_db import PayloadInformation
 
 
 class LocalMetadataProvider:
@@ -153,7 +152,7 @@ class LocalMetadataProvider:
                 raise RuntimeError("Not a b2conditionsdb database file")
             schema_version = self._database.execute("PRAGMA user_version").fetchone()[0]
             if schema_version != self.SCHEMA_VERSION:
-                raise RuntimeError("Cannot append to sqlite: different schema version, please recreate")
+                raise RuntimeError("Cannot use sqlite file: different schema version, please recreate")
 
     def get_payload_count(self):
         """Get the number of distinct payloads known to this file"""
@@ -245,13 +244,17 @@ class LocalMetadataProvider:
           a sorted list of `PayloadInformation` objects
         """
         params = {"globalTag": globalTag}
-        query = ""
+        query = """\
+            SELECT
+              payloadId, payloadName, revision, checksum, payloadUrl, baseUrl,
+              firstExp, firstRun, finalExp, finalRun
+            FROM iov_payloads
+            WHERE globalTagName=:globalTag"""
         if exp is not None:
             params.update({"exp": exp, "run": run})
-            query = " AND firstExp<=:exp AND firstRun<=:run AND "\
-                    "(finalExp<0 OR (finalRun<0 AND finalExp>=:exp) OR (finalExp>=:exp AND finalRun>=:run))"
+            query += """ AND\
+                ((firstExp==:exp AND firstRun<=:run) OR firstExp<:exp) AND
+                (finalExp<0 OR (finalRun<0 AND finalExp>=:exp) OR (finalExp>:exp) OR (finalExp==:exp AND finalRun>=:run))"""
         iovs = sorted([PayloadInformation(*row[:6], iov_id=None, iov=row[6:]) for row in
-                       self._database.execute("SELECT payloadId, payloadName, revision, checksum, payloadUrl, baseUrl, "
-                                              "firstExp, firstRun, finalExp, finalRun from iov_payloads "
-                                              "WHERE globalTagName=:globalTag" + query, params)])
+                       self._database.execute(query, params)])
         return iovs

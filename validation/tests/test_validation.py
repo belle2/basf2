@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import unittest
 import metaoptions
@@ -170,9 +169,9 @@ class ValidationTest(unittest.TestCase):
 
             script = validationscript.Script(tf.name, "package", None)
             script.load_header()
-            self.assertTrue(script.is_cacheable())
-            self.assertTrue('EvtGenSim.root' in script.get_output_files())
-            self.assertTrue('SomeIn.root' in script.get_input_files())
+            self.assertTrue(script.is_cacheable)
+            self.assertTrue('EvtGenSim.root' in script.output_files)
+            self.assertTrue('SomeIn.root' in script.input_files)
 
     def test_meta_option_parser(self):
         """

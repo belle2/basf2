@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Modify the PyDBObj and PyDBArray classes to return read only objects to prevent
@@ -27,7 +26,6 @@ _ROOT_kIsConstMethod = 0x10000000
 
 class _TObjectConstWrapper:
     """Empty class to check whether an instance is already const wrapped"""
-    pass
 
 
 def _make_tobject_nonconst(obj):
@@ -73,7 +71,7 @@ def _make_tobject_const(obj):
 
         def proxy(self, *args):
             """raise attribute error when called"""
-            raise AttributeError("%s is readonly and method '%s' is not const" % (obj, name))
+            raise AttributeError(f"{obj} is readonly and method '{name}' is not const")
         return proxy
 
     def __setattr(self, name, value):
@@ -106,6 +104,7 @@ def _PyDBArray__iter__(self):
         yield self[i]
 
 
+# @cond SUPPRESS_DOXYGEN
 # now replace the PyDBObj getter with one that returns non-modifiable objects.
 # This is how root does it in ROOT.py so let's keep that
 _dbobj_scope = _cppyy._backend.CreateScopeProxy("Belle2::PyDBObj")
@@ -123,3 +122,4 @@ _dbarray_scope.__iter__ = _PyDBArray__iter__
 _dbobj_scope.__iter__ = lambda self: iter(self.obj())
 _storeobj_scope = _cppyy._backend.CreateScopeProxy("Belle2::PyStoreObj")
 _storeobj_scope.__iter__ = lambda self: iter(self.obj())
+# @endcond

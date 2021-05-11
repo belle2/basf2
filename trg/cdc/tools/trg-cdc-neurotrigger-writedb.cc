@@ -15,7 +15,7 @@
 
 class InputParser {
 public:
-  InputParser(int& argc, char** argv)
+  InputParser(const int& argc, char** argv)
   {
     for (int i = 1; i < argc; ++i)
       this->tokens.push_back(std::string(argv[i]));
@@ -48,7 +48,6 @@ int main(int argc, char** argv)
   int nniov_exp_end;
   int nniov_run_start;
   int nniov_run_end;
-  std::vector<CDCTriggerNeuroConfig::B2FormatLine> b2lines;
   std::string configfilename = "";
   std::string nnname;
   std::string nnpath;
@@ -90,7 +89,6 @@ int main(int argc, char** argv)
     std::string line = line_all.substr(0, hashtag);
     std::string par;
     std::string key;
-    std::string skip;
     if (line.length() < 3) {
       continue;
       // check, if line wasnt a pure comment line

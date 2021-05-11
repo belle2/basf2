@@ -1,38 +1,35 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 import sys
 
-mypath = Path()
+mypath = b2.Path()
 inputFile = sys.argv[1]
 outputFile = sys.argv[2]
 
-# reset_database()
-use_database_chain()
-use_central_database('data_reprocessing_prompt')
+b2.conditions.prepend_globaltag('data_reprocessing_prompt')
 
-inroot = register_module('DQMHistAnalysisInputRootFile')
+inroot = b2.register_module('DQMHistAnalysisInputRootFile')
 inroot.param('InputRootFile', inputFile)
 mypath.add_module(inroot)
 
 mypath.add_module('Gearbox')
 mypath.add_module('Geometry')
 
-dqm = register_module('DQMHistAnalysisSVDEfficiency')
-dqm.set_log_level(LogLevel.INFO)
-dqm.param("printCanvas", True)
+dqm = b2.register_module('DQMHistAnalysisSVDEfficiency')
+dqm.set_log_level(b2.LogLevel.INFO)
 mypath.add_module(dqm)
 
-outroot = register_module('DQMHistAnalysisOutputFile')
+outroot = b2.register_module('DQMHistAnalysisOutputFile')
 outroot.param('SaveHistos', False)
 outroot.param('SaveCanvases', True)
 outroot.param('HistoFile', outputFile)
 mypath.add_module(outroot)
 
 # Process the events
-print_path(mypath)
-process(mypath)
+b2.print_path(mypath)
+b2.process(mypath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

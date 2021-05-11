@@ -12,8 +12,10 @@
 
 #include <framework/core/Module.h>
 
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
@@ -55,6 +57,7 @@ namespace Belle2 {
     std::string m_cutParameter; /**< Selection for candidates to be ranked. */
     std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */
 
+    StoreArray<Particle> m_particles; /**< StoreArray of Particle objects */
     StoreObjPtr<ParticleList> m_inputList; /**< input particle list */
     const Variable::Manager::Var* m_variable; /**< Variable which defines the candidate ranking. */
 

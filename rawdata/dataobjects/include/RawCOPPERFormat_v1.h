@@ -166,6 +166,10 @@ namespace Belle2 {
     /* cppcheck-suppress missingOverride */
     void GetTTTimeVal(int n, struct timeval* tv) OVERRIDE_CPP17;
 
+    //! Get the max number of channels in a readout board
+    /* cppcheck-suppress missingOverride */
+    int GetMaxNumOfCh(int n) OVERRIDE_CPP17;
+
     /// Format version number
     enum {
       DATA_FORMAT_VERSION = 1
@@ -334,6 +338,11 @@ namespace Belle2 {
     tmp_header.SetBuffer(GetBuffer(n));
     tmp_header.GetTTTimeVal(tv);
     return ;
+  }
+
+  inline int RawCOPPERFormat_v1::GetMaxNumOfCh(int/* n */)
+  {
+    return MAX_COPPER_CH;
   }
 }
 #endif

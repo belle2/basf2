@@ -2,23 +2,19 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABC, abstractmethod
-from threading import Thread
 import time
-import ROOT
-from .utils import decode_json_string
-from .utils import IoV_Result
-from .utils import AlgResult
-from basf2 import B2ERROR, B2FATAL, B2INFO, B2DEBUG
+from basf2 import B2DEBUG, B2ERROR, B2INFO
 import multiprocessing
 
 
 class Runner(ABC):
-    """Abstract Base Class for Runner type object"""
+    """
+    Abstract Base Class for Runner type object.
+    """
     @abstractmethod
     def run(self):
         """
         """
-        pass
 
 
 class AlgorithmsRunner(Runner):
@@ -98,8 +94,8 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
     def run(self, iov, iteration):
         """
         """
-        from .strategies import AlgorithmStrategy
-        B2INFO("SequentialAlgorithmsRunner begun for Calibration {}".format(self.name))
+        from caf.strategies import AlgorithmStrategy
+        B2INFO(f"SequentialAlgorithmsRunner begun for Calibration {self.name}.")
         # First we do the setup of algorithm strategies
         strategies = []
         for algorithm in self.algorithms:
@@ -124,13 +120,13 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
                                 args=(strategy, iov, iteration, queue))
 
             self.results[strategy.algorithm.name] = []
-            B2INFO("Starting subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
+            B2INFO(f"Starting subprocess of AlgorithmStrategy for {strategy.algorithm.name}.")
             B2INFO("Logging will be diverted into algorithm output.")
             child.start()
             final_state = None
             final_loop = False
 
-            B2INFO("Collecting results for {}.".format(strategy.algorithm.name))
+            B2INFO(f"Collecting results for {strategy.algorithm.name}.")
             while True:
                 # Do we have results?
                 while not queue.empty():
@@ -183,11 +179,10 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
         """Runs the AlgorithmStrategy sends back the results"""
         strategy.run(iov, iteration, queue)
         # Get the return codes of the algorithm for the IoVs found by the Process
-        B2INFO("Finished Strategy for {}".format(strategy.algorithm.name))
+        B2INFO(f"Finished Strategy for {strategy.algorithm.name}.")
 
 
 class RunnerError(Exception):
     """
     Base exception class for Runners
     """
-    pass

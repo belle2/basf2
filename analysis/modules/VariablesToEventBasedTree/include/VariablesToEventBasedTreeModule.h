@@ -1,7 +1,6 @@
-#pragma once
 /**************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2013-2018 - Belle II Collaboration                        *
+* Copyright(C) 2013-2020 - Belle II Collaboration                        *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
 * Contributors: Thomas Keck                                              *
@@ -10,6 +9,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
+#pragma once
 #include <framework/core/Module.h>
 #include <analysis/VariableManager/Manager.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -71,6 +71,7 @@ namespace Belle2 {
     int m_event{ -1};                /**< event number */
     int m_run{ -1};                  /**< run number */
     int m_experiment{ -1};           /**< experiment number */
+    int m_production{ -1};           /**< production ID (to distinguish MC samples) */
     unsigned int m_ncandidates{ 0};  /**< number of candidates in this event */
     float m_weight{0.0};             /**< weight of this event */
     /** Values corresponding to given variables. */

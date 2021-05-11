@@ -10,7 +10,7 @@
       * with multiple entries and some text in *italic* and even **bold**.
         The bullet list items can span multiple lines which are indented
 
-      .. warning:: bullet (as well as enumerated) list have to start and end
+      .. warning:: bullet (as well as enumerated) lists have to start and end
          with an empty line
 
       1. Single backquotes are for **references** to other documented items.

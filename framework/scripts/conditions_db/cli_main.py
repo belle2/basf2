@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 This script provides a command line interface to all the tasks related to the
@@ -29,7 +28,6 @@ import argparse
 import textwrap
 import json
 import difflib
-from urllib.parse import urljoin
 import shutil
 import pprint
 import requests
@@ -39,13 +37,13 @@ from basf2.utils import pretty_print_table
 from terminal_utils import Pager
 from dateutil.parser import parse as parse_date
 from getpass import getuser
-from . import ConditionsDB, enable_debugging, encode_name, PayloadInformation
-from .cli_utils import ItemFilter
+from conditions_db import ConditionsDB, enable_debugging, encode_name, PayloadInformation
+from conditions_db.cli_utils import ItemFilter
 # the command_* functions are imported but not used so disable warning about
 # this if pylama/pylint is used to check
-from .cli_upload import command_upload  # noqa
-from .cli_download import command_download, command_legacydownload  # noqa
-from .cli_management import command_tag_merge  # noqa
+from conditions_db.cli_upload import command_upload  # noqa
+from conditions_db.cli_download import command_download, command_legacydownload  # noqa
+from conditions_db.cli_management import command_tag_merge, command_tag_runningupdate  # noqa
 
 
 def escape_ctrl_chars(name):
@@ -110,7 +108,7 @@ def command_tag_list(args, db=None):
     if not tagfilter.check_arguments():
         return 1
 
-    req = db.request("GET", "/globalTags", "Getting list of globaltags{}".format(tagfilter))
+    req = db.request("GET", "/globalTags", f"Getting list of globaltags{tagfilter}")
 
     # now let's filter the tags
     taglist = []
@@ -159,7 +157,7 @@ def print_globaltag(db, *tags):
         if isinstance(info, str):
             try:
                 req = db.request("GET", "/globalTag/{}".format(encode_name(info)),
-                                 "Getting info for globaltag {}".format(info))
+                                 f"Getting info for globaltag {info}")
             except ConditionsDB.RequestError as e:
                 # ok, there's an error for this one, let's continue with the other
                 # ones
@@ -281,7 +279,7 @@ def command_tag_modify(args, db=None):
 
     # first we need to get the old tag information
     req = db.request("GET", "/globalTag/{}".format(encode_name(args.tag)),
-                     "Getting info for globaltag {}".format(args.tag))
+                     f"Getting info for globaltag {args.tag}")
 
     # now we update the tag information
     info = req.json()
@@ -331,7 +329,7 @@ def command_tag_clone(args, db=None):
 
     # first we need to get the old tag information
     req = db.request("GET", "/globalTag/{}".format(encode_name(args.tag)),
-                     "Getting info for globaltag {}".format(args.tag))
+                     f"Getting info for globaltag {args.tag}")
     info = req.json()
 
     # now we clone the tag. id came from the database so no need for escape
@@ -452,7 +450,7 @@ def remove_repeated_values(table, columns, keep=None):
 
     If we want to remove duplicates in all columns in order it would look like this:
 
-        >>> remove_repated_values(table, [0,1])
+        >>> remove_repeated_values(table, [0,1])
         [
             ["A", "a"],
             ["B", "a"],
@@ -474,7 +472,7 @@ def remove_repeated_values(table, columns, keep=None):
     were identical but keep the values of the previous column. For this one can
     supply ``keep``:
 
-        >>> remove_repated_values(table, [0,1,2], keep=[0])
+        >>> remove_repeated_values(table, [0,1,2], keep=[0])
         [
             ["A", "a"],
             ["B", "a"],
@@ -657,7 +655,7 @@ def command_iov(args, db):
         req = db.request("GET", "/iovPayloads", msg, params={'gtName': args.tag, 'expNumber': args.run[0],
                                                              'runNumber': args.run[1]})
     else:
-        msg = "Obtaining list of iovs for globaltag {tag}{filter}".format(tag=args.tag, filter=iovfilter)
+        msg = f"Obtaining list of iovs for globaltag {args.tag}{iovfilter}"
         req = db.request("GET", "/globalTag/{}/globalTagPayloads".format(encode_name(args.tag)), msg)
 
     with Pager("List of IoVs{}{}".format(iovfilter, " (detailed)" if args.detail else ""), True):
@@ -917,15 +915,15 @@ class FullHelpAction(argparse._HelpAction):
             # get all subparsers and print help
             for choice, subparser in subparsers_action.choices.items():
                 print()
-                print("Command '{}{}'".format(prefix, choice))
+                print(f"Command '{prefix}{choice}'")
                 print(subparser.format_help())
 
-                self.print_subparsers(subparser, prefix="{}{} ".format(prefix, choice))
+                self.print_subparsers(subparser, prefix=f"{prefix}{choice} ")
 
     def __call__(self, parser, namespace, values, option_string=None):
         """Show full help message"""
         # run in pager because amount of options will be looong
-        with Pager("{} {}".format(parser.prog, option_string)):
+        with Pager(f"{parser.prog} {option_string}"):
             parser.print_help()
             self.print_subparsers(parser)
             parser.exit()

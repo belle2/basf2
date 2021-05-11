@@ -11,11 +11,6 @@
 #include <analysis/modules/FlavorTaggerInfoBuilder/FlavorTaggerInfoBuilderModule.h>
 
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/FlavorTaggerInfo.h>
-#include <analysis/dataobjects/RestOfEvent.h>
-#include <analysis/dataobjects/FlavorTaggerInfoMap.h>
-
-#include <framework/datastore/StoreArray.h>
 
 using namespace Belle2;
 
@@ -37,35 +32,25 @@ FlavorTaggerInfoBuilderModule::FlavorTaggerInfoBuilderModule() : Module()
 
 void FlavorTaggerInfoBuilderModule::initialize()
 {
-  // input: Particles and RestOfEvent
-  StoreArray<RestOfEvent> roeArray;
-  StoreArray<Particle> particles;
-  roeArray.isRequired();
+  // input
+  m_roes.isRequired();
 
   // output: FlavorTaggerInfo
-  StoreArray<FlavorTaggerInfo> flavTagArray;
-  flavTagArray.registerInDataStore();
-  StoreArray<FlavorTaggerInfoMap> flavTagMap;
-  flavTagMap.registerInDataStore();
-  particles.registerRelationTo(flavTagArray);
-  roeArray.registerRelationTo(flavTagArray);
+  m_flavorTaggerInfos.registerInDataStore();
+  m_flavorTaggerInfoMaps.registerInDataStore();
+  StoreArray<Particle>().registerRelationTo(m_flavorTaggerInfos);
+  m_roes.registerRelationTo(m_flavorTaggerInfos);
 }
 
 void FlavorTaggerInfoBuilderModule::event()
 {
-  // input
-  StoreArray<RestOfEvent> roeArray;
-
-  // output
-  StoreArray<FlavorTaggerInfo> flavTagArray;
-
-
-  for (int i = 0; i < roeArray.getEntries(); i++) {
-    const RestOfEvent* roe = roeArray[i];
+  for (int i = 0; i < m_roes.getEntries(); i++) {
+    const RestOfEvent* roe = m_roes[i];
+    if (!roe->isBuiltWithMostLikely()) continue;
     const Particle* particle = roe->getRelated<Particle>();
 
     // create FlavorTaggerInfo object
-    FlavorTaggerInfo* flavTag = flavTagArray.appendNew();
+    FlavorTaggerInfo* flavTag = m_flavorTaggerInfos.appendNew();
 
     // create relations: Particle <-> FlavorTaggerInfo , RestOfEvent <-> FlavorTaggerInfo
     particle->addRelationTo(flavTag);

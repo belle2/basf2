@@ -10,9 +10,6 @@
 
 #include <analysis/modules/ExtraInfoRemover/ExtraInfoRemoverModule.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
-
-#include <framework/datastore/StoreObjPtr.h>
 
 using namespace std;
 using namespace Belle2;
@@ -53,8 +50,7 @@ void ExtraInfoRemoverModule::event()
   }
 
   if (m_removeEventExtraInfo)  {
-    StoreObjPtr<EventExtraInfo> eventExtraInfo;
-    eventExtraInfo->removeExtraInfo();
+    m_eventExtraInfo->removeExtraInfo();
   }
 
 }

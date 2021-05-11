@@ -50,11 +50,11 @@ void getLogicGND(string&);
 void tofunc(string&);
 string breakup(const string& logic);
 string decodeLogic(const string& logic);
-void kumacOutput(ofstream&, string logic, string ftd);
+void kumacOutput(ofstream&, string logic, const string& ftd);
 
 class Term {
 public:
-  Term(const string&);
+  explicit Term(const string&);
   virtual ~Term();
 
 public:
@@ -896,7 +896,7 @@ getLogicGND(string& s)
 }
 
 void
-kumacOutput(ofstream& f, string logic, string ftd)
+kumacOutput(ofstream& f, string logic, const string& ftd)
 {
   const string tab = "    ";
   bool first = true;

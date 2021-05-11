@@ -2,13 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import os
-import sys
 import basf2
 import ROOT
 import b2test_utils
-from ROOT import Belle2
 
-inputFile = b2test_utils.require_file('mdst12.root', 'validation')
+inputFile = b2test_utils.require_file('mdst14.root', 'validation')
 path = basf2.create_path()
 path.add_module('RootInput', inputFileName=inputFile)
 

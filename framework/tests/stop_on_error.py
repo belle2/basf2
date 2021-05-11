@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import os
 import basf2
-from ROOT import Belle2
 
 basf2.set_random_seed("")
 

@@ -11,6 +11,7 @@
 #include <beast/csi/modules/CsiStudy_v2Module.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
+#include <framework/gearbox/Const.h>
 #include <cmath>
 
 #include <fstream>
@@ -205,8 +206,8 @@ void CsiStudy_v2Module::event()
 
     h_csi_edep[detNB]->Fill(Edep);
     h_csi_Evtof[detNB]->Fill(tof, Edep);
-    if (pdg == 22) h_csi_Evtof1[detNB]->Fill(tof, Edep);
-    else if (fabs(pdg) == 11) h_csi_Evtof2[detNB]->Fill(tof, Edep);
+    if (pdg == Const::photon.getPDGCode()) h_csi_Evtof1[detNB]->Fill(tof, Edep);
+    else if (fabs(pdg) == Const::electron.getPDGCode()) h_csi_Evtof2[detNB]->Fill(tof, Edep);
     h_csi_energy1[detNB]->Fill(log10(Edep));
     h_csi_energy1W[detNB]->Fill(log10(Edep), rate);
     h_csi_energyVrs1[detNB]->Fill(log10(Edep), ring_section);

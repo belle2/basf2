@@ -185,6 +185,7 @@ class Parameter(UFOBaseClass):
         self.lhablock = lhablock
         self.lhacode = lhacode
 
+
 all_CTparameters = []
 
 
@@ -217,6 +218,7 @@ class CTParameter(UFOBaseClass):
         except KeyError:
             return 'ZERO'
 
+
 all_vertices = []
 
 
@@ -235,6 +237,7 @@ class Vertex(UFOBaseClass):
         global all_vertices
         all_vertices.append(self)
 
+
 all_CTvertices = []
 
 
@@ -252,6 +255,7 @@ class CTVertex(UFOBaseClass):
 
         global all_CTvertices
         all_CTvertices.append(self)
+
 
 all_couplings = []
 
@@ -308,6 +312,7 @@ class Coupling(UFOBaseClass):
                 pattern = re.compile(r"(?P<first>\A|\*|\+|\-|\()(?P<name>" + CTparam.name + r")(?P<second>\Z|\*|\+|\-|\))")
                 return pattern.sub(substitution, self.value)
 
+
 all_lorentz = []
 
 
@@ -344,6 +349,7 @@ class Function(object):
 
         return eval(self.expr)
 
+
 all_orders = []
 
 
@@ -358,6 +364,7 @@ class CouplingOrder(object):
         self.expansion_order = expansion_order
         self.hierarchy = hierarchy
         self.perturbative_expansion = perturbative_expansion
+
 
 all_decays = []
 
@@ -374,6 +381,7 @@ class Decay(UFOBaseClass):
 
         # Add the information directly to the particle
         particle.partial_widths = partial_widths
+
 
 all_form_factors = []
 

@@ -23,9 +23,8 @@
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] ================================================================================
 [WARNING] in total, 1 warnings occurred during processing
-[INFO] event	run	exp
+ ... message repeated 1 times
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
 [INFO] 2	0	0
@@ -46,9 +45,8 @@
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] ================================================================================
 [WARNING] in total, 1 warnings occurred during processing
-[INFO] event	run	exp
+ ... message repeated 2 times
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
 [INFO] 1	1	1
@@ -66,9 +64,8 @@
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] ================================================================================
 [WARNING] in total, 1 warnings occurred during processing
-[INFO] event	run	exp
+ ... message repeated 3 times
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
 [INFO] 2	1	1
@@ -85,9 +82,8 @@
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] ================================================================================
 [WARNING] in total, 1 warnings occurred during processing
-[INFO] event	run	exp
+ ... message repeated 4 times
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
 [INFO] 1	3	3
@@ -101,9 +97,8 @@
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] ================================================================================
 [WARNING] in total, 1 warnings occurred during processing
-[INFO] event	run	exp
+ ... message repeated 5 times
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
 [INFO] 2	3	3
@@ -116,9 +111,8 @@
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] ================================================================================
 [WARNING] in total, 1 warnings occurred during processing
-[INFO] event	run	exp
+ ... message repeated 6 times
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
 [INFO] 3	3	3
@@ -130,9 +124,8 @@
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] ================================================================================
 [WARNING] in total, 1 warnings occurred during processing
-[INFO] event	run	exp
+ ... message repeated 7 times
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
 [INFO] 4	3	3
@@ -143,23 +136,23 @@
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] ================================================================================
 [WARNING] in total, 1 warnings occurred during processing
-[INFO] event	run	exp
+ ... message repeated 8 times
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
 [INFO] 5	3	3
 [INFO] EvtMetaDataTest::endRun()
 [INFO] EvtMetaDataTest::terminate()
-[INFO] event	run	exp
+ ... message repeated 9 times
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
-[INFO] EvtMetaDataTest::initialize()
-[INFO] EvtMetaDataTest::terminate()
+[FATAL] Total processed number of events is 0, please check your inputs, -n and --skip-events arguments!  { module: EventInfoSetter function: virtual void Belle2::EventInfoSetterModule::initialize() }
+[INFO] ===Error Summary================================================================
+[FATAL] Total processed number of events is 0, please check your inputs, -n and --skip-events arguments!  { module: EventInfoSetter }
+[INFO] ================================================================================
+ ... message repeated 9 times
 [INFO] skipping to exp=0, run=0, evt=1
 [INFO] event	run	exp
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
 [INFO] 1	0	0
@@ -185,7 +178,6 @@
 [INFO] skipping to exp=0, run=0, evt=3
 [INFO] event	run	exp
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
 [INFO] 3	0	0
@@ -209,7 +201,6 @@
 [INFO] skipping to exp=0, run=1, evt=1
 [INFO] event	run	exp
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
 [INFO] 1	1	0
@@ -230,7 +221,6 @@
 [INFO] skipping to exp=0, run=1, evt=6
 [INFO] event	run	exp
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
 [INFO] 1	2	0
@@ -246,7 +236,6 @@
 [INFO] skipping to exp=0, run=2, evt=3
 [INFO] event	run	exp
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
 [INFO] 3	2	0
@@ -260,7 +249,6 @@
 [INFO] skipping to exp=1, run=0, evt=1
 [INFO] event	run	exp
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
 [INFO] 1	0	1
@@ -271,6 +259,7 @@
 [INFO] skipping to exp=2, run=0, evt=1
 [INFO] event	run	exp
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
-[INFO] EvtMetaDataTest::initialize()
-[INFO] EvtMetaDataTest::terminate()
+[FATAL] Total processed number of events is 0, please check your inputs, -n and --skip-events arguments!  { module: EventInfoSetter function: virtual void Belle2::EventInfoSetterModule::initialize() }
+[INFO] ===Error Summary================================================================
+[FATAL] Total processed number of events is 0, please check your inputs, -n and --skip-events arguments!  { module: EventInfoSetter }
+[INFO] ================================================================================

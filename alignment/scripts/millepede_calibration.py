@@ -3,17 +3,16 @@
 
 import basf2
 
-from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
-from caf import backends
+from caf.framework import Calibration, CentralDatabase, Collection, LocalDatabase
 from caf import strategies
 
 import os
 
-import alignment.parameters as parameters
-import alignment.constraints as constraints
+import alignment.parameters as parameters  # noqa
+import alignment.constraints  # noqa
 
-import alignment.collections as collections
-from alignment.collections import make_collection
+import alignment.collections  # noqa
+from alignment.collections import make_collection  # noqa
 
 
 def limit_file_events(calibration, collection_limits):
@@ -388,7 +387,6 @@ def create(name,
                               pre_collector_path=None,
                               database_chain=dbchain,
                               output_patterns=None,
-                              max_files_per_collector_job=1,
                               backend_args=None
                               )
 
@@ -433,7 +431,6 @@ def create(name,
         collection = Collection(collector=collector,
                                 input_files=filelist,
                                 pre_collector_path=path,
-                                max_files_per_collector_job=1,
                                 database_chain=dbchain)
 
         calibration.add_collection(colname, collection)

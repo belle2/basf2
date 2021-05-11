@@ -15,6 +15,8 @@
 #
 ########################################################
 
+import glob
+import os
 import basf2
 
 # Add a Global Tag
@@ -46,8 +48,6 @@ print(basf2.statistics)
 # by the BKLMDigitAnalyzer module
 # The command to be executed is:
 # root -b 'drawHitmap.cxx("./bklmHitmap_runXXX.root")'
-import glob
-import os
 allFiles = glob.glob('./bklmHitmap*root')  # list all the hitmap .root files
 latestFile = max(allFiles, key=os.path.getctime)  # pick the latest hitmap file
 bashCommand = "root -b 'drawHitmap.cxx" + '("' + latestFile + '")' + "'"

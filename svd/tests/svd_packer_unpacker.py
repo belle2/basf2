@@ -1,19 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 from svd import add_svd_simulation
 from ROOT import Belle2
-import os
 import numpy
 
-import simulation
 
 svd_digits_pack_unpack_collection = "SVDShaperDigits_test"
-set_random_seed(42)
+b2.set_random_seed(42)
 
 
-class SvdPackerUnpackerTestModule(Module):
+class SvdPackerUnpackerTestModule(b2.Module):
 
     """
     module which ckecks if two collection of SVDShaperDigits are equal
@@ -48,7 +46,7 @@ class SvdPackerUnpackerTestModule(Module):
         svdDigitsPackedUnpacked_sorted = self.sortDigits(svdDigitsPackedUnpacked)
 
         if not len(svdDigits_sorted) == len(svdDigitsPackedUnpacked_sorted):
-            B2FATAL("SVDShaperDigits count not equal after packing and unpacking")
+            b2.B2FATAL("SVDShaperDigits count not equal after packing and unpacking")
 
         # check all quantities between the direct and the packed/unpacked svd digits
         for i in range(len(svdDigits_sorted)):
@@ -75,17 +73,17 @@ class SvdPackerUnpackerTestModule(Module):
 
 
 # to run the framework the used modules need to be registered
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 particlegun.param('pdgCodes', [13, -13])
 particlegun.param('nTracks', 10)
 
 # Create Event information
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 
-main = create_path()
+main = b2.create_path()
 # init path
 main.add_module(eventinfosetter)
 main.add_module(particlegun)
@@ -95,13 +93,13 @@ add_svd_simulation(main)
 main.add_module(progress)
 
 nodeid = 0
-Packer = register_module('SVDPacker')
+Packer = b2.register_module('SVDPacker')
 Packer.param('NodeID', nodeid)
 Packer.param('svdShaperDigitListName', 'SVDShaperDigits')
 Packer.param('rawSVDListName', 'SVDRaw')
 main.add_module(Packer)
 
-unPacker = register_module('SVDUnpacker')
+unPacker = b2.register_module('SVDUnpacker')
 unPacker.param('rawSVDListName', 'SVDRaw')
 unPacker.param('svdShaperDigitListName', svd_digits_pack_unpack_collection)
 main.add_module(unPacker)
@@ -111,4 +109,4 @@ main.add_module(unPacker)
 main.add_module(SvdPackerUnpackerTestModule())
 
 # Process events
-process(main)
+b2.process(main)

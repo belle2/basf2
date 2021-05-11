@@ -67,8 +67,16 @@
 #ifdef LOG_NO_B2DEBUG
 #define B2DEBUG(level, streamText) _B2_DO_NOTHING
 #else
-#define B2DEBUG(level, streamText) B2LOG(Belle2::LogConfig::c_Debug, level, streamText)
+#define B2DEBUG(level, streamText) do { if (Belle2::LogSystem::debugEnabled()) B2LOG(Belle2::LogConfig::c_Debug, level, streamText); } while(false)
 #endif
+
+/**
+ * \def B2DEBUG_MODIFIABLE(level, streamText)
+ * Send a debug message for which the level may be adjusted with LogModRealm.
+ * For performance reasons normal B2DEBUG messages are ignored if the log level is not c_Debug, even if a LogModRealm is used. This optimization is not done for B2DEBUG_MODIFIABLE. So only use B2DEBUG_MODIFIABLE in conjuction with LogModRealm.
+ */
+#define B2DEBUG_MODIFIABLE(level, streamText) B2DEBUG(Belle2::LogConfig::c_Debug, level, streamText)
+
 
 /**
  * \def B2INFO(streamText)

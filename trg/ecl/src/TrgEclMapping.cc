@@ -76,7 +76,7 @@ TrgEclMapping::getTCIdFromXtalId(int XtalId)
     } else if (XtalId0 < 1008) {
       e_o = ((XtalId0 - 864) % 9 < 5) ? (XtalId0 - 864) / 9 * 2 : (XtalId0 - 864) / 9 * 2 + 1;
       _tcid = (e_o % 2 == 0) ? e_o * 5 / 2 + 3 : e_o * 5 / 2 + 2;
-    } else if (XtalId0 < 1152) {
+    } else {
       e_o = ((XtalId0 - 864) % 9 < 5) ? (XtalId0 - 1008) / 9 * 2 : (XtalId0 - 1008) / 9 * 2 + 1;
       _tcid = (e_o % 2 == 0) ? e_o * 5 / 2 + 3 : e_o * 5 / 2 + 2;
     }
@@ -160,7 +160,7 @@ TrgEclMapping::getTCSubIdFromXtalId(int XtalId)
       int aaa = (XtalId - 864) % 9;
       _tcsubid = (aaa == 0 || aaa == 1 || aaa == 4 || aaa == 7) ? 1 : 0;
     } else if (XtalId <= 1008) {_tcsubid = 1;}
-    else if (XtalId <= 1152) {
+    else {
       int aaa = (XtalId - 1009) % 9;
       _tcsubid = (aaa == 0) ? 1 : 0;
     }
@@ -247,14 +247,12 @@ TrgEclMapping::getTCPhiIdFromTCId(int TCId)
 //
 //
 //
-
 TVector3 TrgEclMapping::getTCPosition(int TCId)
 {
   if (TCId < 1 || TCId > 576) {
     B2ERROR("TrgEclMapping> input TCId is wrong!!!");
 
   }
-
 
   double TCPosition[576][3] =  {
     { 52.5341, 16.6502, 197.05},
@@ -1512,9 +1510,6 @@ TrgEclMapping::getTCIdFromFAMChannel(int NFAM, int NChannel)
 
 }
 //
-//
-
-
 //
 //
 std::vector<int>

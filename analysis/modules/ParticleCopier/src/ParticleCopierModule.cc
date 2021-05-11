@@ -13,7 +13,6 @@
 
 
 // framework - DataStore
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
@@ -64,8 +63,6 @@ namespace Belle2 {
 
   void ParticleCopierModule::event()
   {
-    const StoreArray<Particle> particles;
-
     // copy all particles from input lists that pass selection criteria into plist
     for (const auto& inputListName : m_inputListNames) {
       const StoreObjPtr<ParticleList> plist(inputListName);

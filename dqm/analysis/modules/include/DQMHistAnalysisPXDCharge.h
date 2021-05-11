@@ -65,6 +65,12 @@ namespace Belle2 {
     //! Final Canvas
     TCanvas* m_cCharge = nullptr;
 
+    /** Monitoring Object */
+    MonitoringObject* m_monObj {};
+
+    /** flag if to export to EPICS */
+    bool m_useEpics;
+
 #ifdef _BELLE2_EPICS
     //! Place for EPICS PVs, Mean and maximum deviation
     std::vector <chid> mychid;

@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
 from rawdata import add_packers, add_raw_output, add_raw_seqoutput
-from glob import glob
-import ROOT
 
 # create path
-main = create_path()
+main = b2.create_path()
 
 # specify number of events to be generated
 main.add_module('EventInfoSetter', evtNumList=[10])
@@ -32,5 +30,5 @@ add_raw_seqoutput(main, 'raw.sroot')
 add_raw_seqoutput(main, "raw.f%05d.sroot", fileNameIsPattern=True)
 
 # process events and print call statistics
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

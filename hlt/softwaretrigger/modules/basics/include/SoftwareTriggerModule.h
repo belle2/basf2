@@ -16,7 +16,9 @@
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>
 
+#include <stdint.h>
 #include <string>
+#include <vector>
 
 namespace Belle2 {
   namespace SoftwareTrigger {
@@ -86,6 +88,8 @@ namespace Belle2 {
       std::string m_param_debugOutputFileName = "software_trigger_debug.root";
       /// Output store object name for the debug output. Is only used if debug is turned on.
       std::string m_param_debugOutputStoreObjName = "";
+      /// Flag to use random numbers or a counter for applying a prescale.
+      bool m_param_useRandomNumbersForPreScale = true;
 
       // Object pools
       /// Store Object for storing the trigger decision.
@@ -101,6 +105,9 @@ namespace Belle2 {
       /// TTree living in the datastore for debug reasons
       StoreObjPtr<SoftwareTriggerVariables> m_debugOutputStoreObject;
 
+      /// Vector of the internal counters used to apply a prescale.
+      std::vector<uint32_t> m_counters;
+
       /// Helper function to initialize the calculation by creating a new calculation object and
       /// requiring all store arrays.
       void initializeCalculation();
@@ -108,6 +115,9 @@ namespace Belle2 {
       /// Helper function to initliaze debug output creation by creating a TTree
       /// and an object in the data store if needed.
       void initializeDebugOutput();
+
+      /// Helper function to initialize the internal counters used for each cut identifier.
+      void initializeCounters();
 
       /// Helper function to perform the actual cut on the prefilled object and set the return value of the module.
       void makeCut(const SoftwareTriggerObject& prefilledObject);

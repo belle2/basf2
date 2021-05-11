@@ -16,16 +16,10 @@
 #
 # Author: Luka Santelj
 
-from basf2 import *
+import basf2 as b2
 import os
 from optparse import OptionParser
 home = os.environ['BELLE2_LOCAL_DIR']
-
-
-# reset_database()
-# use_central_database("development")
-use_database_chain()
-use_central_database("data_reprocessing_prod5", LogLevel.WARNING)
 
 # parameters
 parser = OptionParser()
@@ -37,42 +31,42 @@ parser.add_option('-o', '--output', dest='output', default='arich_recon_ntuple.r
 (options, args) = parser.parse_args()
 
 # create paths
-main = create_path()
-displ = create_path()
+main = b2.create_path()
+displ = b2.create_path()
 
 # root input module
-input_module = register_module('RootInput')
+input_module = b2.register_module('RootInput')
 input_module.param('inputFileName', options.filename)
 main.add_module(input_module)
 
 # Histogram manager module
-histo = register_module('HistoManager')
+histo = b2.register_module('HistoManager')
 histo.param('histoFileName', "histograms.root")  # File to save histograms
 main.add_module(histo)
 
 # build geometry if display option
 if int(options.display):
-    gearbox = register_module('Gearbox')
+    gearbox = b2.register_module('Gearbox')
     main.add_module(gearbox)
-    geometry = register_module('Geometry')
+    geometry = b2.register_module('Geometry')
     geometry.param('components', ['ARICH', 'MagneticField'])
     main.add_module(geometry)
 
 if int(options.recon):
-    arichHits = register_module('ARICHFillHits')
+    arichHits = b2.register_module('ARICHFillHits')
     arichHits.param('MagFieldCorrection', 1)
     main.add_module(arichHits)
-    arichreco = register_module('ARICHReconstructor')
+    arichreco = b2.register_module('ARICHReconstructor')
     arichreco.param('storePhotons', 1)
     arichreco.param('useAlignment', 1)
     main.add_module(arichreco)
-    arichNtuple = register_module('ARICHNtuple')
+    arichNtuple = b2.register_module('ARICHNtuple')
     arichNtuple.param('outputFile', options.output)
     main.add_module(arichNtuple)
 
 
 # create simple DQM histograms
-arichHists = register_module('ARICHDQM')
+arichHists = b2.register_module('ARICHDQM')
 arichHists.param('ArichEvents', bool(options.arichtrk))
 # set hit range - include only events with hits in this range (also for event display!)
 arichHists.param('MaxHits', 100)
@@ -81,7 +75,7 @@ main.add_module(arichHists)
 
 # add display module if display option
 if int(options.display):
-    display = register_module('Display')
+    display = b2.register_module('Display')
     # show arich hits
     display.param('showARICHHits', True)
     # show reconstruced tracks
@@ -92,16 +86,16 @@ if int(options.display):
 
 
 # show progress
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 arichHists.if_value('==1', displ)
 
 # process
-process(main)
+b2.process(main)
 
 # print stats
-print(statistics)
+print(b2.statistics)
 
 # plot DQM histograms
 if not int(options.display):

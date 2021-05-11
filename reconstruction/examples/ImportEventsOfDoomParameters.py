@@ -3,7 +3,6 @@
 
 # Import EventsOfDoomParameters payloads
 
-import ROOT
 from ROOT.Belle2 import EventsOfDoomParameters, Database, IntervalOfValidity
 
 parameters = EventsOfDoomParameters()

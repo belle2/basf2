@@ -6,12 +6,11 @@ import collections
 import numbers
 import copy
 
-from . import scores
-from . import statistics
+from tracking.validation import scores, statistics
 
-from .plot import ValidationPlot, compose_axis_label
-from .fom import ValidationFiguresOfMerit
-from .tolerate_missing_key_formatter import TolerateMissingKeyFormatter
+from tracking.validation.plot import ValidationPlot, compose_axis_label
+from tracking.validation.fom import ValidationFiguresOfMerit
+from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
 
 formatter = TolerateMissingKeyFormatter()
 
@@ -577,14 +576,14 @@ class CutAtBackgroundRejectionClassifier(CutClassifier):
         sorting_indices = np.argsort(estimates)
         if self.cut_direction_ < 0:  # reject low
             # Keep a reference to keep the content alive
-            orginal_sorting_indices = sorting_indices
+            original_sorting_indices = sorting_indices  # noqa
             sorting_indices = sorting_indices[::-1]
 
         sorted_truths = truths[sorting_indices]
         sorted_estimates = estimates[sorting_indices]
 
         sorted_n_accepted_signals = np.cumsum(sorted_truths, dtype=float)
-        sorted_efficiencies = sorted_n_accepted_signals / n_signals
+        # sorted_efficiencies = sorted_n_accepted_signals / n_signals
 
         sorted_n_rejected_signals = n_signals - sorted_n_accepted_signals
         sorted_n_rejects = np.arange(len(estimates) + 1, 1, -1)

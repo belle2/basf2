@@ -20,7 +20,7 @@
 //#define NO_DATA_CHECK
 //#define WO_FIRST_EVENUM_CHECK
 //#define YAMADA_DUMMY
-
+#define USE_PCIE40
 
 
 using namespace std;
@@ -180,7 +180,13 @@ void DeSerializerCOPPERModule::initializeCOPPER()
 
 int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* delete_flag, int* m_size_word)
 {
-
+#ifdef USE_PCIE40
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  exit(1);
+#else
   // prepare buffer
   *m_size_word = 0;
   int* temp_buf = m_bufary[ entry ];
@@ -300,6 +306,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
   m_bufary[entry][2] = checksum;
 #endif
   return temp_buf;
+#endif
 }
 
 

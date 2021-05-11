@@ -13,20 +13,13 @@
 //to help printing out stuff
 #include<sstream>
 
-// framework - DataStore
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // dataobjects
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/RestOfEvent.h>
-#include <analysis/dataobjects/TagVertex.h>
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
 
 // utilities
@@ -42,7 +35,6 @@
 #include <analysis/VertexFitting/KFit/VertexFitKFit.h>
 
 // mdst dataobject
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 
 // Magnetic field
@@ -133,15 +125,13 @@ namespace Belle2 {
     // roll back status will be set to 2 only if the MC info cannot be recovered
     if (m_useRollBack) m_rollbackStatus = 1;
 
-    //TODO: this won't work with nonstandard name for Particle array (e.g. will fail when adding relations)
     //input
-    StoreArray<Particle> particles;
-    particles.isRequired();
+    StoreArray<Particle>().isRequired();
+    m_plist.isRequired(m_listName);
     // output
-    StoreArray<TagVertex> verArray;
-    verArray.registerInDataStore();
-    particles.registerRelationTo(verArray);
-    //check if the fitting algorithm name  is set correctly
+    m_verArray.registerInDataStore();
+    StoreArray<Particle>().registerRelationTo(m_verArray);
+    //check if the fitting algorithm name is set correctly
     if (m_fitAlgo != "Rave" && m_fitAlgo != "KFit")
       B2FATAL("TagVertexModule: invalid fitting algorithm (must be set to either Rave or KFit).");
     if (m_useRollBack && m_useTruthInFit)
@@ -159,22 +149,20 @@ namespace Belle2 {
 
   void TagVertexModule::event()
   {
-    StoreObjPtr<ParticleList> plist(m_listName);
-    if (!plist) {
+    if (!m_plist) {
       B2ERROR("TagVertexModule: ParticleList " << m_listName << " not found");
       return;
     }
 
     // output
-    StoreArray<TagVertex> verArray;
     analysis::RaveSetup::initialize(1, m_Bfield);
 
     std::vector<unsigned int> toRemove;
 
-    for (unsigned i = 0; i < plist->getListSize(); ++i) {
+    for (unsigned i = 0; i < m_plist->getListSize(); ++i) {
       resetReturnParams();
 
-      Particle* particle =  plist->getParticle(i);
+      Particle* particle =  m_plist->getParticle(i);
       if (m_useMCassociation == "breco" || m_useMCassociation == "internal") BtagMCVertex(particle);
       bool ok = doVertexFit(particle);
       if (ok) deltaT(particle);
@@ -184,7 +172,7 @@ namespace Belle2 {
         toRemove.push_back(particle->getArrayIndex());
       } else {
         // save information in the Vertex StoreArray
-        TagVertex* ver = verArray.appendNew();
+        TagVertex* ver = m_verArray.appendNew();
         // create relation: Particle <-> Vertex
         particle->addRelationTo(ver);
         // fill Vertex with content
@@ -248,7 +236,7 @@ namespace Belle2 {
         }
       }
     }
-    plist->removeParticles(toRemove);
+    m_plist->removeParticles(toRemove);
 
     //free memory allocated by rave. initialize() would be enough, except that we must clean things up before program end...
     //
@@ -541,9 +529,8 @@ namespace Belle2 {
   void TagVertexModule::BtagMCVertex(const Particle* Breco)
   {
     //fill vector with mcB (intended order: Reco, Tag)
-    StoreArray<Belle2::MCParticle> mcParticles("");
     vector<const MCParticle*> mcBs;
-    for (const MCParticle& mc : mcParticles) {
+    for (const MCParticle& mc : m_mcParticles) {
       if (abs(mc.getPDG()) == abs(Breco->getPDGCode()))
         mcBs.push_back(&mc);
     }
@@ -619,7 +606,8 @@ namespace Belle2 {
     std::vector<const Particle*> fitParticles;
     const RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
     if (!roe) return fitParticles;
-    std::vector<const Particle*> ROEParticles = roe->getChargedParticles(m_roeMaskName, Const::pion.getPDGCode(), false);
+    //load all particles from the ROE
+    std::vector<const Particle*> ROEParticles = roe->getChargedParticles(m_roeMaskName, 0 , false);
     if (ROEParticles.size() == 0) return fitParticles;
 
     for (auto& ROEParticle : ROEParticles) {
@@ -952,7 +940,7 @@ namespace Belle2 {
                           tfr->getChargeSign(),
                           tfr->getParticleType(),
                           tfr->getPValue(),
-                          m_Bfield, 0, 0);
+                          m_Bfield, 0, 0, tfr->getNDF());
   }
 
   // static
@@ -978,7 +966,7 @@ namespace Belle2 {
                           tfr->getChargeSign(),
                           tfr->getParticleType(),
                           tfr->getPValue(),
-                          m_Bfield, 0, 0);
+                          m_Bfield, 0, 0, tfr->getNDF());
   }
 
   TVector3 TagVertexModule::getRollBackPoca(ParticleAndWeight const& paw)

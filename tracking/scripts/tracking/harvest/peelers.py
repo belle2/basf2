@@ -9,13 +9,13 @@ import numpy as np
 
 import ROOT
 
-ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
-Belle2.RecoTrack.getRightLeftInformation("Belle2::CDCHit")
 
 import basf2
 from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
 
+Belle2.RecoTrack.getRightLeftInformation["Belle2::CDCHit"]
+ROOT.gSystem.Load("libtracking")
 #: string formatter that handles missing keys gracefully
 formatter = TolerateMissingKeyFormatter()
 
@@ -646,6 +646,8 @@ def get_seed_track_fit_result(reco_track):
     b_field = Belle2.BFieldManager.getField(position).Z() / Belle2.Unit.T
     cdc_hit_pattern = 0
     svd_hit_pattern = 0
+    # the value 0xFFFF will cause the TrackFitResult::getNDF() to return -1
+    ndf = 0xFFFF
 
     track_fit_result = Belle2.TrackFitResult(
         position,
@@ -657,6 +659,7 @@ def get_seed_track_fit_result(reco_track):
         b_field,
         cdc_hit_pattern,
         svd_hit_pattern,
+        ndf,
     )
 
     return track_fit_result
@@ -665,7 +668,7 @@ def get_seed_track_fit_result(reco_track):
 
 
 def is_correct_rl_information(cdc_hit, reco_track, hit_lookup):
-    rl_info = reco_track.getRightLeftInformation("const Belle2::CDCHit")(cdc_hit)
+    rl_info = reco_track.getRightLeftInformation["const Belle2::CDCHit"](cdc_hit)
     truth_rl_info = hit_lookup.getRLInfo(cdc_hit)
 
     if rl_info == Belle2.RecoHitInformation.c_right and truth_rl_info == 1:

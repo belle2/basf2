@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Dennis Weyland 2017
 
@@ -16,7 +15,7 @@ CONTINUE_ENQUEUE = True
 
 def signal_handler(signal, frame):
     """
-    Used to safely stopp training. This can only be used in main thread,
+    Used to safely stop training. This can only be used in main thread,
     so depending on the training style, it can take a while before execution.
     """
     print('Stopping Training safely')
@@ -64,7 +63,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     y = tf.placeholder("float", [None, 1])
 
     def layer(x, shape, name, unit=tf.sigmoid):
-        with tf.name_scope(name) as scope:
+        with tf.name_scope(name):
             weights = tf.Variable(tf.truncated_normal(shape, stddev=1.0 / np.sqrt(float(shape[0]))), name='weights')
             biases = tf.Variable(tf.constant(0.0, shape=[shape[1]]), name='biases')
             layer = unit(tf.matmul(x, weights) + biases)

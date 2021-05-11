@@ -9,8 +9,12 @@
  **************************************************************************/
 #pragma once
 
+#include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/dataobjects/ECLShower.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
@@ -29,13 +33,30 @@ namespace Belle2 {
     void event() override;
 
     /// Merge cosmic tracks.
-    void MergingTracks(RecoTrack*, RecoTrack*, StoreArray<RecoTrack>);
+    void MergingTracks(RecoTrack*, RecoTrack*, StoreArray<RecoTrack>&);
 
   private:
     /// StoreArray name from which to read the reco tracks.
     std::string m_param_recoTracksStoreArrayName = "";
     /// StoreArray name where the merged reco track is written.
     std::string m_param_mergedRecoTracksStoreArrayName = "CosmicRecoTracks";
+
+    /// Tracks.
+    StoreArray<Track> m_Tracks;
+
+    /// RecoTracks.
+    StoreArray<RecoTrack> m_RecoTracks;
+
+    /// Merged RecoTracks.
+    StoreArray<RecoTrack> m_MergedRecoTracks;
+
+    /// ECL connected regions.
+    StoreArray<ECLConnectedRegion> m_ECLConnectedRegions;
+
+    /// KLM clusters.
+    StoreArray<KLMCluster> m_KLMClusters;
+
+
     /// Flag to using magnetic field during reconstruction.
     bool m_usingMagneticField = true;
     /// Number of CDC hit per track required for cosmic track

@@ -2,7 +2,7 @@ from unittest import TestCase, main
 try:
     from unittest.mock import patch, MagicMock
 except ImportError:
-    from mock import patch, MagicMock
+    from unittest.mock import patch, MagicMock
 
 import datetime
 
@@ -66,6 +66,7 @@ class TestEnvironmentInformation(TestCase):
 
     def test_get_current_revision(self):
         pass
+
 
 if __name__ == "__main__":
     main()

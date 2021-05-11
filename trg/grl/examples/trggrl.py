@@ -9,7 +9,8 @@
 #       commend > basf2 TrgEcl_pgun.py [Name of output root file]
 # ------------------------------------------------------------------------------------------------------
 import os
-from basf2 import *
+import basf2 as b2
+import random
 
 ################
 import sys  # get argv
@@ -30,45 +31,45 @@ print('f_out_root = %s\n' % f_out_root)
 
 # suppress messages and warnings during processing:
 # level: LogLevel.DEBUG/INFO/WARNING/ERROR/FATALls
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 # set_log_level(LogLevel.DEBUG)
 
-set_random_seed(0)
+b2.set_random_seed(0)
 basf2datadir = os.path.join(os.environ.get('BELLE2_LOCAL_DIR', None), 'data')
 
 # one event
 # eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 
 # Register necessary modules
-eventinfosetter = register_module('EventInfoSetter')
-eventinfoprinter = register_module('EventInfoPrinter')
+eventinfosetter = b2.register_module('EventInfoSetter')
+eventinfoprinter = b2.register_module('EventInfoPrinter')
 
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 
 # input
 # rootinput1 = register_module('RootInput')
 # rootinput1.param('inputFileName', f_in_root)
 
 # Geometry builder
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 
 # Simulation
-g4sim = register_module('FullSim')
+g4sim = b2.register_module('FullSim')
 
 # register module for TRGCDC
 # evtmetagen        = register_module('EventInfoSetter')
-evtmetainfo = register_module('Progress')
+evtmetainfo = b2.register_module('Progress')
 # paramloader       = register_module('Gearbox')
 # geobuilder        = register_module('Geometry')
 # particlegun       = register_module('ParticleGun')
 # evtgeninput       = register_module('EvtGenInput')
 # kkgeninput        = register_module('KKGenInput')
-mcparticleprinter = register_module('PrintMCParticles')
+mcparticleprinter = b2.register_module('PrintMCParticles')
 # g4sim             = register_module('FullSim')
 # bkgmixer          = register_module('BeamBkgMixer')
-cdcdigitizer = register_module('CDCDigitizer')
-cdctrg = register_module("TRGCDC")
+cdcdigitizer = b2.register_module('CDCDigitizer')
+cdctrg = b2.register_module("TRGCDC")
 # rootOut           = register_module('RootOutput')
 # rootIn            = register_module('RootInput')
 
@@ -76,10 +77,9 @@ cdctrg = register_module("TRGCDC")
 # one event
 eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 
-import random
 intseed = random.randint(1, 10000000)
 
-pGun = register_module('ParticleGun')
+pGun = b2.register_module('ParticleGun')
 param_pGun = {
     'pdgCodes': [11],
     'nTracks': 1,
@@ -146,20 +146,20 @@ cdctrg.param('Fitter3DLRLUT', 0)
 
 
 # TRGECL
-trgeclfam = register_module("TRGECLFAM")
-trgecl = register_module("TRGECL")
-trgeclMC = register_module("TRGECLMCMatching")
+trgeclfam = b2.register_module("TRGECLFAM")
+trgecl = b2.register_module("TRGECL")
+trgeclMC = b2.register_module("TRGECLMCMatching")
 # addParam("FAMFitMethod", _famMethod, "TRGECLFAM fit method", _famMethod);
 trgeclfam.param('FAMFitMethod', 1)
 
-grltrg = register_module('TRGGRL')
+grltrg = b2.register_module('TRGGRL')
 grltrg.param('DebugLevel', 0)
 grltrg.param('ConfigFile',
              os.path.join(os.environ['BELLE2_LOCAL_DIR'],
                           "trg/gdl/data/ftd/0.01/ftd_0.01"))
 
 # output
-rootoutput = register_module('RootOutput')
+rootoutput = b2.register_module('RootOutput')
 rootoutput.param('outputFileName', f_out_root)
 
 # import random
@@ -169,7 +169,7 @@ rootoutput.param('outputFileName', f_out_root)
 # Set parameters
 
 # Create paths
-main = create_path()
+main = b2.create_path()
 
 # main.add_module(rootinput1)
 # main.add_module(rootinput2)
@@ -194,9 +194,9 @@ main.add_module(rootoutput)
 
 
 # main
-process(main)
+b2.process(main)
 ###
 ###
 ###
-print(statistics)
+print(b2.statistics)
 # ===<END>

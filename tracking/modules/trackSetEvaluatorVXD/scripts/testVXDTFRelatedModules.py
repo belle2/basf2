@@ -1,20 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-from basf2 import *
-from subprocess import call
-from sys import argv
+import basf2 as b2
 import time
 
 from VXDTF.setup_modules import (setup_gfTCtoSPTCConverters,
                                  setup_spCreatorPXD,
                                  setup_spCreatorSVD,
                                  setup_sp2thConnector,
-                                 setup_qualityEstimators,
-                                 setup_trackSetEvaluators)
+                                 setup_qualityEstimators)
 
-from VXDTF.setup_modules_ml import *
+from VXDTF.setup_modules_ml import add_fbdtclassifier_training, add_ml_threehitfilters
 
 # ################
 # rootInputFileName = "seed4nEv100000pGun1_1T.root"
@@ -75,19 +71,19 @@ else:
 # initialValue = int(stringInitialValue[1])
 initialValue = 0
 
-set_log_level(LogLevel.ERROR)
-set_random_seed(initialValue)
+b2.set_log_level(b2.LogLevel.ERROR)
+b2.set_random_seed(initialValue)
 
-trainerVXDTFLogLevel = LogLevel.INFO
+trainerVXDTFLogLevel = b2.LogLevel.INFO
 trainerVXDTFDebugLevel = 10
 
-TFlogLevel = LogLevel.INFO
+TFlogLevel = b2.LogLevel.INFO
 TFDebugLevel = 1
 
-CAlogLevel = LogLevel.DEBUG
+CAlogLevel = b2.LogLevel.DEBUG
 CADebugLevel = 1
 
-AnalizerlogLevel = LogLevel.INFO
+AnalizerlogLevel = b2.LogLevel.INFO
 AnalizerDebugLevel = 1
 
 # acceptedRawSecMapFiles = ['lowTestRedesign_202608818.root']
@@ -146,23 +142,23 @@ print('')
 time.sleep(5)  # sleep for 5 seconds
 print('')
 
-rootInputM = register_module('RootInput')
+rootInputM = b2.register_module('RootInput')
 rootInputM.param('inputFileName', rootInputFileName)
 
 # rootInputM.param('skipNEvents', int(10000))
 
-eventinfoprinter = register_module('EventInfoPrinter')
+eventinfoprinter = b2.register_module('EventInfoPrinter')
 
 
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 
-secMapBootStrap = register_module('SectorMapBootstrap')
+secMapBootStrap = b2.register_module('SectorMapBootstrap')
 secMapBootStrap.param('ReadSectorMap', False)
 secMapBootStrap.param('WriteSectorMap', True)
 
 evtStepSize = 1
 if newTrain:
-    newSecMapTrainerBase = register_module('SecMapTrainerBase')
+    newSecMapTrainerBase = b2.register_module('SecMapTrainerBase')
     newSecMapTrainerBase.logging.log_level = trainerVXDTFLogLevel
     newSecMapTrainerBase.logging.debug_level = trainerVXDTFDebugLevel
     newSecMapTrainerBase.param('spTCarrayName', 'checkedSPTCs')
@@ -170,7 +166,7 @@ if newTrain:
 
     evtStepSize = 100
 else:
-    merger = register_module('RawSecMapMerger')
+    merger = b2.register_module('RawSecMapMerger')
     merger.logging.log_level = trainerVXDTFLogLevel
     merger.logging.debug_level = trainerVXDTFDebugLevel
     merger.param('rootFileNames', acceptedRawSecMapFiles)
@@ -179,13 +175,13 @@ else:
 if useOldTFinstead:
     evtStepSize = 100
 
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD',
                               'PXD', 'SVD'])
 
 
-eventCounter = register_module('EventCounter')
-eventCounter.logging.log_level = LogLevel.INFO
+eventCounter = b2.register_module('EventCounter')
+eventCounter.logging.log_level = b2.LogLevel.INFO
 eventCounter.param('stepSize', evtStepSize)
 
 if useOldTFinstead:
@@ -201,8 +197,8 @@ if useOldTFinstead:
              'shiftedL3IssueTestVXDStd-25to100MeV_PXDSVD'
              ]
         tuneValue = 0.22
-    vxdtf = register_module('VXDTF')  # VXDTF TFRedesign
-    vxdtf.logging.log_level = LogLevel.DEBUG
+    vxdtf = b2.register_module('VXDTF')  # VXDTF TFRedesign
+    vxdtf.logging.log_level = b2.LogLevel.DEBUG
     vxdtf.logging.debug_level = 1
     vxdtf.param('sectorSetup', secSetup)
     vxdtf.param('GFTrackCandidatesColName', 'caTracks')
@@ -212,16 +208,16 @@ if useOldTFinstead:
         vxdtf.param('filterOverlappingTCs', 'none')  # shall provide overlapping TCs
         # vxdtf.param('useTimeSeedAsQI', True)  # hack for storing QIs in TimeSeed-Variable for genfit::TrackCand
 
-    oldAnalyzer = register_module('TFAnalizer')
-    oldAnalyzer.logging.log_level = LogLevel.INFO
+    oldAnalyzer = b2.register_module('TFAnalizer')
+    oldAnalyzer.logging.log_level = b2.LogLevel.INFO
     oldAnalyzer.param('printExtentialAnalysisData', False)
     oldAnalyzer.param('caTCname', 'caTracks')
     oldAnalyzer.param('acceptedTCname', 'VXDTFoldAcceptedTCS')
     oldAnalyzer.param('lostTCname', 'VXDTFoldLostTCS')
 
     # TCConverter, genfit -> SPTC
-    trackCandConverter = register_module('GFTC2SPTCConverter')
-    trackCandConverter.logging.log_level = LogLevel.WARNING
+    trackCandConverter = b2.register_module('GFTC2SPTCConverter')
+    trackCandConverter.logging.log_level = b2.LogLevel.WARNING
     trackCandConverter.param('genfitTCName', 'caTracks')
     trackCandConverter.param('SpacePointTCName', 'caSPTCs')
     trackCandConverter.param('NoSingleClusterSVDSP', 'nosingleSP')
@@ -231,7 +227,7 @@ if useOldTFinstead:
     trackCandConverter.param('useSingleClusterSP', False)
     trackCandConverter.param('skipCluster', True)
 else:
-    segNetProducer = register_module('SegmentNetworkProducer')
+    segNetProducer = b2.register_module('SegmentNetworkProducer')
     segNetProducer.param('CreateNeworks', cNetworks)
     segNetProducer.param('NetworkOutputName', 'test2Hits')
     segNetProducer.param('printNetworks', printNetworks)
@@ -242,16 +238,16 @@ else:
     segNetProducer.logging.debug_level = TFDebugLevel
 
     if activateSegNetAnalizer:
-        segNetAnalyzer = register_module('SegmentNetworkAnalyzer')
+        segNetAnalyzer = b2.register_module('SegmentNetworkAnalyzer')
         segNetAnalyzer.param('networkInputName', 'test2Hits')
         segNetAnalyzer.param('rootFileName', segNetAnaRFN)
-        segNetAnalyzer.logging.log_level = LogLevel.INFO
+        segNetAnalyzer.logging.log_level = b2.LogLevel.INFO
         segNetAnalyzer.logging.debug_level = 100
 
     if bypassCA:
-        cellOmat = register_module('TrackFinderVXDBasicPathFinder')
+        cellOmat = b2.register_module('TrackFinderVXDBasicPathFinder')
     else:
-        cellOmat = register_module('TrackFinderVXDCellOMat')
+        cellOmat = b2.register_module('TrackFinderVXDCellOMat')
     cellOmat.param('printNetworks', printNetworks)
     cellOmat.param('SpacePointTrackCandArrayName', 'caSPTCs')
     cellOmat.param('NetworkName', 'test2Hits')
@@ -263,7 +259,7 @@ else:
 
 print("spot 10")
 
-vxdAnal = register_module('TrackFinderVXDAnalizer')
+vxdAnal = b2.register_module('TrackFinderVXDAnalizer')
 vxdAnal.param('referenceTCname', 'SPTracks')
 vxdAnal.param('testTCname', 'caSPTCs')
 vxdAnal.param('purityThreshold', 0.7)
@@ -274,11 +270,11 @@ vxdAnal.logging.debug_level = AnalizerDebugLevel
 
 print("spot 11")
 if newTrain:
-    log_to_file('testRedesign' + str(initialValue) + '.log', append=False)
+    b2.log_to_file('testRedesign' + str(initialValue) + '.log', append=False)
 else:
-    log_to_file('testsegNetExecute' + str(initialValue) + '.log', append=False)
+    b2.log_to_file('testsegNetExecute' + str(initialValue) + '.log', append=False)
 # Create paths
-main = create_path()
+main = b2.create_path()
 
 
 main.add_module(rootInputM)
@@ -288,8 +284,9 @@ main.add_module(geometry)
 main.add_module(eventCounter)
 main.add_module(secMapBootStrap)
 
-setup_spCreatorSVD(path=main, nameOutput='nosingleSP', createSingleClusterSPs=False, logLevel=LogLevel.INFO)
-setup_spCreatorPXD(path=main, nameOutput='pxdOnly', logLevel=LogLevel.INFO)  # needed since 2gftc-converter does not work without it
+setup_spCreatorSVD(path=main, nameOutput='nosingleSP', createSingleClusterSPs=False, logLevel=b2.LogLevel.INFO)
+# needed since 2gftc-converter does not work without it
+setup_spCreatorPXD(path=main, nameOutput='pxdOnly', logLevel=b2.LogLevel.INFO)
 setup_gfTCtoSPTCConverters(
     path=main,
     pxdSPs='pxdOnly',
@@ -297,21 +294,21 @@ setup_gfTCtoSPTCConverters(
     gfTCinput='mcTracks',
     sptcOutput='checkedSPTCs',
     usePXD=usePXD,
-    logLevel=LogLevel.WARNING)
+    logLevel=b2.LogLevel.WARNING)
 
-vIPRemover = register_module('SPTCvirtualIPRemover')
+vIPRemover = b2.register_module('SPTCvirtualIPRemover')
 vIPRemover.param('maxTCLengthForVIPKeeping', 0)  # want to remove virtualIP for any track length
 vIPRemover.param('tcArrayName', 'caSPTCs')
 
 # connect all SpacePoints to all possible TrueHits and store them in a new
 # StoreArray (to not interfere with the SpacePoints of the reference
 # TrackCands)
-setup_sp2thConnector(main, 'pxdOnly', 'nosingleSP', '_relTH', True, LogLevel.ERROR, 1)
+setup_sp2thConnector(main, 'pxdOnly', 'nosingleSP', '_relTH', True, b2.LogLevel.ERROR, 1)
 if newTrain:
     main.add_module(newSecMapTrainerBase)
 else:
     if useOldTFinstead:
-        main.add_module(register_module('SetupGenfitExtrapolation'))
+        main.add_module(b2.register_module('SetupGenfitExtrapolation'))
         main.add_module(vxdtf)
         main.add_module(oldAnalyzer)
         main.add_module(trackCandConverter)
@@ -320,7 +317,7 @@ else:
         main.add_module(segNetProducer)
         if trainFBDT:  # collect in this step
             add_fbdtclassifier_training(main, 'test2Hits', 'FBDTClassifier.dat', False, True,
-                                        False, fbdtSamplesFN, 100, 3, 0.15, 0.5, LogLevel.DEBUG, 10)
+                                        False, fbdtSamplesFN, 100, 3, 0.15, 0.5, b2.LogLevel.DEBUG, 10)
         if useFBDT:  # apply the filters
             add_ml_threehitfilters(main, 'test2Hits', fbdtFN, 0.989351, True)
         if activateSegNetAnalizer:
@@ -330,7 +327,7 @@ else:
     if doVirtualIPRemovalb4Fit:
         main.add_module(vIPRemover)
 
-    setup_qualityEstimators(main, fitType, 'caSPTCs', LogLevel.INFO, 1)
+    setup_qualityEstimators(main, fitType, 'caSPTCs', b2.LogLevel.INFO, 1)
     # setup_qualityEstimators(main, fitType, 'SPTracks', LogLevel.DEBUG, 1)
 
     if doVirtualIPRemovalb4Fit is False:
@@ -338,32 +335,32 @@ else:
 
     if doNewSubsetSelection:
 
-        tcNetworkProducer = register_module('SPTCNetworkProducer')
+        tcNetworkProducer = b2.register_module('SPTCNetworkProducer')
         tcNetworkProducer.param('tcArrayName', 'caSPTCs')
         tcNetworkProducer.param('tcNetworkName', 'tcNetwork')
         main.add_module(tcNetworkProducer)
 
-        tsEvaluator = register_module('TrackSetEvaluatorHopfieldNN')
-        tsEvaluator.logging.log_level = LogLevel.DEBUG
+        tsEvaluator = b2.register_module('TrackSetEvaluatorHopfieldNN')
+        tsEvaluator.logging.log_level = b2.LogLevel.DEBUG
         tsEvaluator.logging.debug_level = 3
         tsEvaluator.param('tcArrayName', 'caSPTCs')
         tsEvaluator.param('tcNetworkName', 'tcNetwork')
         main.add_module(tsEvaluator)
 
-        svdOverlapResolver = register_module('SVDOverlapResolver')
+        svdOverlapResolver = b2.register_module('SVDOverlapResolver')
         svdOverlapResolver.param('NameSpacePointTrackCands', 'caSPTCs')
         svdOverlapResolver.param('resolveMethod', 'greedy')
         # svdOverlapResolver.param('resolveMethod', 'hopfield')
-        svdOverlapResolver.logging.log_level = LogLevel.DEBUG
+        svdOverlapResolver.logging.log_level = b2.LogLevel.DEBUG
 
     main.add_module(vxdAnal)
 
 if useDisplay:
-    display = register_module('Display')
+    display = b2.register_module('Display')
     display.param('showAllPrimaries', True)
     main.add_module(display)
 
 # Process events
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

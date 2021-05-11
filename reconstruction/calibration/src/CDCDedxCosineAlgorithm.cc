@@ -13,19 +13,26 @@
 #include <TF1.h>
 #include <TLine.h>
 #include <TCanvas.h>
+#include <TH1I.h>
 
 using namespace Belle2;
-
-
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
-
 CDCDedxCosineAlgorithm::CDCDedxCosineAlgorithm() :
   CalibrationAlgorithm("CDCDedxElectronCollector"),
   isMethodSep(true),
   isMakePlots(true),
-  isMergePayload(true)
+  isMergePayload(true),
+  fSigLim(2.5),
+  fCosbins(100),
+  fCosMin(-1.0),
+  fCosMax(1.0),
+  fHistbins(600),
+  fdEdxMin(0.0),
+  fdEdxMax(3.0),
+  fStartRun(0)
+
 {
   // Set module properties
   setDescription("A calibration algorithm for CDC dE/dx electron cos(theta) dependence");
@@ -35,10 +42,8 @@ CDCDedxCosineAlgorithm::CDCDedxCosineAlgorithm() :
 //-----------------------------------------------------------------
 //                 Run the calibration
 //-----------------------------------------------------------------
-
 CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
 {
-
   B2INFO("Preparing dE/dx calibration for CDC dE/dx electron saturation");
 
   // Get data objects
@@ -50,293 +55,369 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
   ttree->SetBranchAddress("costh", &costh);
   ttree->SetBranchAddress("charge", &charge);
 
+  const auto expRun = getRunList()[0];
+  updateDBObjPtrs(1, expRun.second, expRun.first);
+  fStartRun = expRun.second;
+
   // make histograms to store dE/dx values in bins of cos(theta)
   // bin size can be arbitrary, but for now just make uniform bins
-  const int nbins = 100;
-  TH1D* hdEdx_elCosbin[nbins], *hdEdx_poCosbin[nbins], *hdEdx_epCosbin[nbins];
-  for (unsigned int i = 0; i < nbins; ++i) {
-    hdEdx_elCosbin[i] = new TH1D(Form("hdEdx_elCosbin%d", i), "dE/dx (e-) in bins of cosine", 400, 0, 2);
+  TH1D* hdEdx_elCosbin[fCosbins], *hdEdx_poCosbin[fCosbins], *hdEdx_epCosbin[fCosbins];
+  const double binW = (fCosMax - fCosMin) / fCosbins;
+
+  for (unsigned int i = 0; i < fCosbins; ++i) {
+
+    double coslow = i * binW + fCosMin,  coshigh = coslow + binW;
+
+    hdEdx_elCosbin[i] = new TH1D(Form("hdEdx_elCosbin%d_fRun%d", i, fStartRun), "", fHistbins, fdEdxMin, fdEdxMax);
+    hdEdx_elCosbin[i]->SetTitle(Form("dE/dx dist (e-) in costh (%0.02f, %0.02f), run start: %d", coslow, coshigh, fStartRun));
     hdEdx_elCosbin[i]->GetXaxis()->SetTitle("dE/dx (no had sat, for e-)");
     hdEdx_elCosbin[i]->GetYaxis()->SetTitle("Entries");
 
-    hdEdx_poCosbin[i] = new TH1D(Form("hdEdx_poCosbin%d", i), "dE/dx (e+) in bins of cosine", 400, 0, 2);
+    hdEdx_poCosbin[i] = new TH1D(Form("hdEdx_poCosbin%d_fRun%d", i, fStartRun), "", fHistbins, fdEdxMin, fdEdxMax);
+    hdEdx_poCosbin[i]->SetTitle(Form("dE/dx dist (e+) in costh (%0.02f, %0.02f), run start: %d", coslow, coshigh, fStartRun));
     hdEdx_poCosbin[i]->GetXaxis()->SetTitle("dE/dx (no had sat, for e+)");
     hdEdx_poCosbin[i]->GetYaxis()->SetTitle("Entries");
 
-    hdEdx_epCosbin[i] = new TH1D(Form("hdEdx_epCosbin%d", i), "dE/dx (e- and e+) in bins of cosine", 400, 0, 2);
+    hdEdx_epCosbin[i] = new TH1D(Form("hdEdx_epCosbin%d_fRun%d", i, fStartRun), "", fHistbins, fdEdxMin, fdEdxMax);
+    hdEdx_epCosbin[i]->SetTitle(Form("dE/dx dist (e-,e+) in costh (%0.02f, %0.02f), run start: %d", coslow, coshigh, fStartRun));
     hdEdx_epCosbin[i]->GetXaxis()->SetTitle("dE/dx (no had sat, for e-,e+)");
     hdEdx_epCosbin[i]->GetYaxis()->SetTitle("Entries");
   }
 
   // fill histograms, bin size may be arbitrary
-  TH1D* hCosthElec = new TH1D("hCosthElec", "Cos(#theta) dist; Cos(#theta): e-; Entries", 100, -1.0, 1.0);
-  TH1D* hCosthPosi = new TH1D("hCosthPosi", "Cos(#theta) dist; Cos(#theta): e+; Entries", 100, -1.0, 1.0);
-  TH1D* hCosthElPo = new TH1D("hCosthElPo", "Cos(#theta) dist; Cos(#theta): avg e+, e-; Entries", 100, -1.0, 1.0);
+  TH1D* hCosth_el = new TH1D(Form("hCosth_el_fRun%d", fStartRun),
+                             Form("cos(#theta) dist (e- and e+), start run: %d; cos(#theta); Entries", fStartRun), fCosbins, fCosMin, fCosMax);
+  TH1D* hCosth_po = new TH1D(Form("hCosth_po_fRun%d", fStartRun), Form("cos(#theta) dist (e+), start run: %d; cos(#theta); Entries",
+                             fStartRun), fCosbins, fCosMin, fCosMax);
+  TH1D* hCosth_ep = new TH1D(Form("hCosth_ep_fRun%d", fStartRun),
+                             Form("cos(#theta) dist (e- and e+), start run: %d; cos(#theta); Entries", fStartRun), fCosbins, fCosMin, fCosMax);
 
-  const double costhmin = -1.0, costhmax = 1.0;
   for (int i = 0; i < ttree->GetEntries(); ++i) {
 
     ttree->GetEvent(i);
-    if (dedx == 0 || charge == 0 || costh < costhmin || costh > costhmax) continue;
 
-    int bin = int((costh - costhmin) * nbins / (costhmax - costhmin));
-    if (bin < 0 || bin >= nbins) continue;
+    //if track is a junk
+    if (dedx <= 0 || charge == 0) continue;
+
+    //if track is in CDC accpetance (though it is inbuilt in collector module)
+    if (costh < TMath::Cos(150 * TMath::DegToRad()) || costh > TMath::Cos(17 * TMath::DegToRad())) continue;
+
+    int bin = int((costh - fCosMin) / binW);
+    if (bin < 0 || bin >= int(fCosbins)) continue;
 
     if (isMethodSep) {
       if (charge < 0) {
-        hCosthElec->Fill(costh);
+        hCosth_el->Fill(costh);
         hdEdx_elCosbin[bin]->Fill(dedx);
       } else if (charge > 0) {
-        hCosthPosi->Fill(costh);
+        hCosth_po->Fill(costh);
         hdEdx_poCosbin[bin]->Fill(dedx);
       }
     } else {
-      hCosthElPo->Fill(costh);
+      hCosth_ep->Fill(costh);
       hdEdx_epCosbin[bin]->Fill(dedx);
     }
   }
 
-  // Print the histograms for quality control
-  TCanvas* ctmpElPo = new TCanvas("ctmpElPo", "ctmpElPo", 800, 400);
-  if (isMethodSep)ctmpElPo->Divide(2, 1);
-  else ctmpElPo->SetCanvasSize(400, 800);
-  std::stringstream psnameElPo;
-
-  TLine* tl = new TLine();
-  tl->SetLineColor(kBlack);
-
-  if (isMakePlots) {
-    psnameElPo << "dedxFits_cosinebins_ElPo.pdf[";
-    ctmpElPo->Print(psnameElPo.str().c_str());
-    psnameElPo.str("");
-    psnameElPo << "dedxFits_cosinebins_ElPo.pdf";
-  }
-
   //Plot constants
-  TH1D* hCosConstMeanPosi = new TH1D("hCosConstMeanPosi", "dEdx Mean vs Costh Bin; Cos(#theta); dEdx (e+) means", 100, -1.0, 1.0);
-  TH1D* hCosConstMeanElec = new TH1D("hCosConstMeanElec", "dEdx Mean vs Costh Bin; Cos(#theta); dEdx (e-) means", 100, -1.0, 1.0);
-  TH1D* hCosConstMeanElPo = new TH1D("hCosConstMeanElPo", "dEdx Mean vs Costh Bin; Cos(#theta); dEdx (e-,e+) means", 100, -1.0, 1.0);
+  TH1D* hdEdxMeanvsCos_po = new TH1D(Form("hdEdxMeanvsCos_po_fRun%d", fStartRun),
+                                     Form("dE/dx(e+) rel means, start run: %d; cos(#theta); dE/dx (#mu_{fit})", fStartRun), fCosbins, fCosMin, fCosMax);
+  TH1D* hdEdxSigmavsCos_po = new TH1D(Form("hdEdxSigmavsCos_po_fRun%d", fStartRun),
+                                      Form("dE/dx(e+) rel means, start run: %d; cos(#theta); dE/dx (#mu_{fit})", fStartRun), fCosbins, fCosMin, fCosMax);
 
-  TH1D* hCosConstSigmaPosi = new TH1D("hCosConstSigmaPosi", "dEdx Sigma vs Costh Bin; Cos(#theta); dEdx (e+) sigmas", 100, -1.0, 1.0);
-  TH1D* hCosConstSigmaElec = new TH1D("hCosConstSigmaElec", "dEdx Sigma vs Costh Bin; Cos(#theta); dEdx (e-) sigmas", 100, -1.0, 1.0);
-  TH1D* hCosConstSigmaElPo = new TH1D("hCosConstSigmaElPo", "dEdx Sigma vs Costh Bin; Cos(#theta); dEdx (e-,e+) sigmas", 100, -1.0,
-                                      1.0);
+  TH1D* hdEdxMeanvsCos_el = new TH1D(Form("hdEdxMeanvsCos_el_fRun%d", fStartRun),
+                                     Form("dE/dx(e-) rel means, start run: %d; cos(#theta); dE/dx (#mu_{fit})", fStartRun), fCosbins, fCosMin, fCosMax);
+  TH1D* hdEdxSigmavsCos_el = new TH1D(Form("hdEdxSigmavsCos_el_fRun%d", fStartRun),
+                                      Form("dE/dx(e-) rel means, start run: %d; cos(#theta); dE/dx (#mu_{fit})", fStartRun), fCosbins, fCosMin, fCosMax);
+
+  TH1D* hdEdxMeanvsCos_ep = new TH1D(Form("hdEdxMeanvsCos_ep_fRun%d", fStartRun),
+                                     Form("dE/dx(e+, e-) rel means, start run: %d; cos(#theta); dE/dx (#mu_{fit})", fStartRun), fCosbins, fCosMin, fCosMax);
+  TH1D* hdEdxSigmavsCos_ep = new TH1D(Form("hdEdxSigmavsCos_ep_fRun%d", fStartRun),
+                                      Form("dE/dx(e+, e-) rel means, start run: %d; cos(#theta); dE/dx (#mu_{fit})", fStartRun), fCosbins, fCosMin, fCosMax);
+
+  // more validation plots
+  TCanvas* ctmp_ep = new TCanvas("ctmp_ep", "ctmp_ep", 800, 400);
+  if (isMethodSep)ctmp_ep->Divide(2, 1);
+  else {
+    ctmp_ep->Divide(2, 2);
+    ctmp_ep->SetCanvasSize(800, 800);
+  }
+  std::stringstream psname_ep;
+
+  //validation plots: individual bin dedx dist and fits
+  if (isMakePlots) {
+    psname_ep << Form("cdcdedx_coscal_fits_frun%d.pdf[", fStartRun);
+    ctmp_ep->Print(psname_ep.str().c_str());
+    psname_ep.str("");
+    psname_ep << Form("cdcdedx_coscal_fits_frun%d.pdf", fStartRun);
+  }
 
   // fit histograms to get gains in bins of cos(theta)
   std::vector<double> cosine;
+  for (unsigned int i = 0; i < fCosbins; ++i) {
 
-  for (unsigned int i = 0; i < nbins; ++i) {
 
-    double BW = (costhmax - costhmin) / nbins;
-    double LowE = i * BW + costhmin;
-    double UpE  = LowE + BW;
+    TLine* tl = new TLine();
+    tl->SetLineColor(kBlack);
 
-    TString status = "";
-    double mean = 1.0;
+    double fdEdxMean = 1.0; //This is what we need for calibration
+    double fdEdxMeanErr = 0.0;
 
     if (!isMethodSep) {
 
-      double meanErr = 0.0;
-      double sigma = 0.0, sigmaErr = 0.0;
+      TString status = "";
+
+      double fdEdxSigma = 0.0, fdEdxSigmaErr = 0.0;
       FitGaussianWRange(hdEdx_epCosbin[i], status);
-      if (status != "FitOK")mean = 1.0;
-      else {
-        mean = hdEdx_epCosbin[i]->GetFunction("gaus")->GetParameter(1);
-        meanErr = hdEdx_epCosbin[i]->GetFunction("gaus")->GetParError(1);
-        sigma = hdEdx_epCosbin[i]->GetFunction("gaus")->GetParameter(2);
-        sigmaErr = hdEdx_epCosbin[i]->GetFunction("gaus")->GetParError(2);
+
+      if (status != "FitOK") {
+        fdEdxMean = 1.0;
+        hdEdx_epCosbin[i]->SetTitle(Form("%s, Fit(%s)", hdEdx_epCosbin[i]->GetTitle(), status.Data()));
+      } else {
+        fdEdxMean = hdEdx_epCosbin[i]->GetFunction("gaus")->GetParameter(1);
+        fdEdxMeanErr = hdEdx_epCosbin[i]->GetFunction("gaus")->GetParError(1);
+        fdEdxSigma = hdEdx_epCosbin[i]->GetFunction("gaus")->GetParameter(2);
+        fdEdxSigmaErr = hdEdx_epCosbin[i]->GetFunction("gaus")->GetParError(2);
+        hdEdx_epCosbin[i]->SetTitle(Form("%s, Fit (%s), #mu_{fit}: %0.04f#pm%0.04f,, #sigma_{fit}: %0.04f", hdEdx_epCosbin[i]->GetTitle(),
+                                         status.Data(), fdEdxMean, fdEdxMeanErr, fdEdxSigma));
       }
-      hdEdx_epCosbin[i]->SetTitle(Form("dE/dx (avg) in cos(#theta) %0.03f,%0.03f, Fit: %s", LowE, UpE, status.Data()));
+
+      hdEdxMeanvsCos_ep->SetBinContent(i + 1, fdEdxMean);
+      hdEdxMeanvsCos_ep->SetBinError(i + 1, fdEdxMeanErr);
+      hdEdxSigmavsCos_ep->SetBinContent(i + 1, fdEdxSigma);
+      hdEdxSigmavsCos_ep->SetBinError(i + 1, fdEdxSigmaErr);
 
       if (isMakePlots) {
-
-        hCosConstMeanElPo->SetBinContent(i + 1, mean);
-        hCosConstMeanElPo->SetBinError(i + 1, meanErr);
-        hCosConstSigmaElPo->SetBinContent(i + 1, sigma);
-        hCosConstSigmaElPo->SetBinError(i + 1, sigmaErr);
-
-        ctmpElPo->cd(i % 4 + 1); // each canvas is 2x2
-        hdEdx_epCosbin[i]->SetFillColor(kYellow);
+        ctmp_ep->cd(i % 4 + 1); // each canvas is 2x2
+        hdEdx_epCosbin[i]->SetFillColorAlpha(kYellow, 0.25);
         hdEdx_epCosbin[i]->DrawCopy("hist");
 
-        tl->SetX1(mean); tl->SetX2(mean);
+        tl->SetX1(fdEdxMean); tl->SetX2(fdEdxMean);
         tl->SetY1(0); tl->SetY2(hdEdx_epCosbin[i]->GetMaximum());
         tl->DrawClone("same");
-        if ((i + 1) % 4 == 0)ctmpElPo->Print(psnameElPo.str().c_str());
+        if ((i + 1) % 4 == 0 || (i + 1 == fCosbins))ctmp_ep->Print(psname_ep.str().c_str());
       }
     } else {
 
-      double meanelec = 1.0, meanelecErr = 0.0;
-      double sigmaelec = 0.0, sigmaelecErr = 0.0;
-      double meanposi = 1.0, meanposiErr = 0.0;
-      double sigmaposi = 0.0, sigmaposiErr = 0.0;
-      //Fit Electrons in cos bins
-      FitGaussianWRange(hdEdx_elCosbin[i], status);
-      if (status != "FitOK")meanelec = 1.0;
-      else {
-        meanelec = hdEdx_elCosbin[i]->GetFunction("gaus")->GetParameter(1);
-        meanelecErr = hdEdx_elCosbin[i]->GetFunction("gaus")->GetParError(1);
-        sigmaelec = hdEdx_elCosbin[i]->GetFunction("gaus")->GetParameter(2);
-        sigmaelecErr = hdEdx_elCosbin[i]->GetFunction("gaus")->GetParError(2);
-        hdEdx_elCosbin[i]->SetTitle(Form("dE/dx (e-) in cos(#theta) %0.03f,%0.03f, Fit: %s, Mean = %0.03f", LowE, UpE, status.Data(),
-                                         meanelec));
+      double fdEdxMean_el = 1.0, fdEdxMean_elErr = 0.0;
+      double fdEdxSigma_el = 0.0, fdEdxSigma_elErr = 0.0;
+      double fdEdxMean_po = 1.0, fdEdxMean_poErr = 0.0;
+      double fdEdxSigma_po = 0.0, fdEdxSigma_poErr = 0.0;
+      TString status_el = "", status_po = "";
+
+      //Fit _eltrons in cos bins
+      FitGaussianWRange(hdEdx_elCosbin[i], status_el);
+      if (status_el != "FitOK") {
+        fdEdxMean_el = 1.0;
+        hdEdx_elCosbin[i]->SetTitle(Form("%s, Fit(%s)", hdEdx_elCosbin[i]->GetTitle(), status_el.Data()));
+      } else {
+        fdEdxMean_el = hdEdx_elCosbin[i]->GetFunction("gaus")->GetParameter(1);
+        fdEdxMean_elErr = hdEdx_elCosbin[i]->GetFunction("gaus")->GetParError(1);
+        fdEdxSigma_el = hdEdx_elCosbin[i]->GetFunction("gaus")->GetParameter(2);
+        fdEdxSigma_elErr = hdEdx_elCosbin[i]->GetFunction("gaus")->GetParError(2);
+        hdEdx_elCosbin[i]->SetTitle(Form("%s, Fit (%s), #mu_{fit}: %0.04f#pm%0.04f,, #sigma_{fit}: %0.04f", hdEdx_elCosbin[i]->GetTitle(),
+                                         status_el.Data(), fdEdxMean_el, fdEdxMean_elErr, fdEdxSigma_el));
       }
 
+      hdEdxMeanvsCos_el->SetBinContent(i + 1, fdEdxMean_el);
+      hdEdxMeanvsCos_el->SetBinError(i + 1, fdEdxMean_elErr);
+      hdEdxSigmavsCos_el->SetBinContent(i + 1, fdEdxSigma_el);
+      hdEdxSigmavsCos_el->SetBinError(i + 1, fdEdxSigma_elErr);
 
-      //Fit Positron in cos bins
-      FitGaussianWRange(hdEdx_poCosbin[i], status);
-      if (status != "FitOK")meanposi = 1.0;
-      else {
-        meanposi = hdEdx_poCosbin[i]->GetFunction("gaus")->GetParameter(1);
-        meanposiErr = hdEdx_poCosbin[i]->GetFunction("gaus")->GetParError(1);
-        sigmaposi = hdEdx_poCosbin[i]->GetFunction("gaus")->GetParameter(2);
-        sigmaposiErr = hdEdx_poCosbin[i]->GetFunction("gaus")->GetParError(2);
-        hdEdx_poCosbin[i]->SetTitle(Form("dE/dx (e+) in cos(#theta) %0.03f,%0.03f, Fit: %s, Mean = %0.03f", LowE, UpE, status.Data(),
-                                         meanposi));
+      //Fit _potron in cos bins
+      FitGaussianWRange(hdEdx_poCosbin[i], status_po);
+      if (status_po != "FitOK") {
+        fdEdxMean_po = 1.0;
+        hdEdx_poCosbin[i]->SetTitle(Form("%s, Fit(%s)", hdEdx_poCosbin[i]->GetTitle(), status_po.Data()));
+      } else {
+        fdEdxMean_po = hdEdx_poCosbin[i]->GetFunction("gaus")->GetParameter(1);
+        fdEdxMean_poErr = hdEdx_poCosbin[i]->GetFunction("gaus")->GetParError(1);
+        fdEdxSigma_po = hdEdx_poCosbin[i]->GetFunction("gaus")->GetParameter(2);
+        fdEdxSigma_poErr = hdEdx_poCosbin[i]->GetFunction("gaus")->GetParError(2);
+        hdEdx_poCosbin[i]->SetTitle(Form("%s, Fit (%s), #mu_{fit}: %0.04f#pm%0.04f,, #sigma_{fit}: %0.04f", hdEdx_poCosbin[i]->GetTitle(),
+                                         status_po.Data(), fdEdxMean_po, fdEdxMean_poErr, fdEdxSigma_po));
       }
 
+      if (status_po != "FitOK" && status_el == "FitOK") {
+        fdEdxMean_po = fdEdxMean_el;
+        hdEdx_poCosbin[i]->SetTitle(Form("%s, mean (manual) = elec left", hdEdx_poCosbin[i]->GetTitle()));
+      } else if (status_el != "FitOK" && status_po == "FitOK") {
+        fdEdxMean_el = fdEdxMean_po;
+        hdEdx_elCosbin[i]->SetTitle(Form("%s, mean (manual) = posi right", hdEdx_elCosbin[i]->GetTitle()));
+      } else if (status_el != "FitOK" && status_po != "FitOK") {
+        fdEdxMean_po = 1.0; fdEdxMean_el = 1.0;
+      }
+
+      hdEdxMeanvsCos_po->SetBinContent(i + 1, fdEdxMean_po);
+      hdEdxMeanvsCos_po->SetBinError(i + 1, fdEdxMean_poErr);
+      hdEdxSigmavsCos_po->SetBinContent(i + 1, fdEdxSigma_po);
+      hdEdxSigmavsCos_po->SetBinError(i + 1, fdEdxSigma_poErr);
+
+      //for validation purpose
       if (isMakePlots) {
 
-        hCosConstMeanElec->SetBinContent(i + 1, meanelec);
-        hCosConstMeanElec->SetBinError(i + 1, meanelecErr);
-        hCosConstSigmaElec->SetBinContent(i + 1, sigmaelec);
-        hCosConstSigmaElec->SetBinError(i + 1, sigmaelecErr);
-
-        hCosConstMeanPosi->SetBinContent(i + 1, meanposi);
-        hCosConstMeanPosi->SetBinError(i + 1, meanposiErr);
-        hCosConstSigmaPosi->SetBinContent(i + 1, sigmaposi);
-        hCosConstSigmaPosi->SetBinError(i + 1, sigmaposiErr);
-
-        ctmpElPo->cd(1); // each canvas is 2x2
-        hdEdx_elCosbin[i]->SetFillColorAlpha(kYellow, 0.10);
+        ctmp_ep->cd(1); // each canvas is 2x2
+        hdEdx_elCosbin[i]->SetFillColorAlpha(kYellow, 0.25);
         hdEdx_elCosbin[i]->DrawCopy("");
-        tl->SetX1(meanelec); tl->SetX2(meanelec);
+        tl->SetX1(fdEdxMean_el); tl->SetX2(fdEdxMean_el);
         tl->SetY1(0); tl->SetY2(hdEdx_elCosbin[i]->GetMaximum());
         tl->DrawClone("same");
 
-        ctmpElPo->cd(2); // each canvas is 2x2
-        hdEdx_poCosbin[i]->SetFillColorAlpha(kBlue, 0.10);
+        ctmp_ep->cd(2); // each canvas is 2x2
+        hdEdx_poCosbin[i]->SetFillColorAlpha(kBlue, 0.25);
         hdEdx_poCosbin[i]->DrawCopy("");
-        tl->SetX1(meanposi); tl->SetX2(meanposi);
+        tl->SetX1(fdEdxMean_po); tl->SetX2(fdEdxMean_po);
         tl->SetY1(0); tl->SetY2(hdEdx_poCosbin[i]->GetMaximum());
         tl->DrawClone("same");
-        ctmpElPo->Print(psnameElPo.str().c_str());
+        ctmp_ep->Print(psname_ep.str().c_str());
       }
 
-      //avg of both e+ and e- mean
-      mean = 0.5 * (meanposi + meanelec);
-      if (mean <= 0)mean = 1.0; //protection only
-      hCosConstMeanElPo->SetBinContent(i + 1, mean);
-      hCosConstMeanElPo->SetBinError(i + 1, 0.0);
+      //avg of both e+ and e- fdEdxMean
+      fdEdxMean = 0.5 * (fdEdxMean_po + fdEdxMean_el);
+      if (fdEdxMean <= 0)fdEdxMean = 1.0; //protection only
+      fdEdxMeanErr = 0.5 * TMath::Sqrt(fdEdxMean_elErr * fdEdxMean_elErr +  fdEdxMean_poErr * fdEdxMean_poErr);
+      hdEdxMeanvsCos_ep->SetBinContent(i + 1, fdEdxMean);
+      hdEdxMeanvsCos_ep->SetBinError(i + 1, fdEdxMeanErr);
     }
 
-    cosine.push_back(mean);
+    cosine.push_back(fdEdxMean);
+    delete tl;
   }
 
-
+  //more validation plots for debugging
   if (isMakePlots) {
 
-    TCanvas* ctmpElPoCCComp = new TCanvas("ctmpElPoCCComp", "ctmpElPoCCComp", 800, 400);
-    ctmpElPoCCComp->Divide(2, 1);
+    psname_ep.str("");
+    psname_ep << Form("cdcdedx_coscal_fits_frun%d.pdf]", fStartRun);
+    ctmp_ep->Print(psname_ep.str().c_str());
+    delete ctmp_ep;
 
-    TCanvas* ctmpElPoCosth = new TCanvas("ctmpElPoCosth", "ctmpElPoCosth", 500, 500);
+    TCanvas* cstats = new TCanvas("cstats", "cstats", 1000, 500);
+    cstats->SetBatch(kTRUE);
+    cstats->Divide(2, 1);
+    cstats->cd(1);
+    auto hestats = getObjectPtr<TH1I>("hestats");
+    if (hestats) {
+      hestats->SetName(Form("hestats_fRun%d", fStartRun));
+      hestats->SetStats(0);
+      hestats->DrawCopy("");
+    }
+    cstats->cd(2);
+    auto htstats = getObjectPtr<TH1I>("htstats");
+    if (htstats) {
+      hestats->SetName(Form("htstats_fRun%d", fStartRun));
+      htstats->DrawCopy("");
+      hestats->SetStats(0);
+    }
+    cstats->Print(Form("cdcdedx_coscal_stats_frun%d.pdf", fStartRun));
+    delete cstats;
+
+    TCanvas* ctmp_epConst = new TCanvas("ctmp_epConst", "ctmp_epConst", 800, 400);
+    ctmp_epConst->Divide(2, 1);
+
+    TCanvas* ctmp_epCosth = new TCanvas("ctmp_epCosth", "ctmp_epCosth", 600, 500);
 
     if (isMethodSep) {
 
-      ctmpElPoCCComp->cd(1);
-      hCosConstMeanElec->SetMarkerStyle(20);
-      hCosConstMeanElec->SetMarkerSize(0.80);
-      hCosConstMeanElec->SetMarkerColor(kRed);
-      hCosConstMeanElec->SetStats(0);
-      hCosConstMeanElec->SetTitle("rel-dedx-mean comparison (e-=red, e+=blue, avg=black)");
-      hCosConstMeanElec->GetYaxis()->SetRangeUser(0.95, 1.05);
-      hCosConstMeanElec->DrawCopy("");
+      ctmp_epConst->cd(1);
+      gPad->SetGridy(1);
+      hdEdxMeanvsCos_el->SetMarkerStyle(20);
+      hdEdxMeanvsCos_el->SetMarkerSize(0.60);
+      hdEdxMeanvsCos_el->SetMarkerColor(kRed);
+      hdEdxMeanvsCos_el->SetStats(0);
+      hdEdxMeanvsCos_el->SetTitle("comparison of dedx #mu_{fit}^{rel}: (e-=red, e+=blue, avg=black)");
+      hdEdxMeanvsCos_el->GetYaxis()->SetRangeUser(0.96, 1.04);
+      hdEdxMeanvsCos_el->DrawCopy("");
 
-      hCosConstMeanPosi->SetMarkerStyle(20);
-      hCosConstMeanPosi->SetMarkerSize(0.80);
-      hCosConstMeanPosi->SetMarkerColor(kBlue);
-      hCosConstMeanPosi->SetStats(0);
-      hCosConstMeanPosi->DrawCopy("same");
+      hdEdxMeanvsCos_po->SetMarkerStyle(20);
+      hdEdxMeanvsCos_po->SetMarkerSize(0.60);
+      hdEdxMeanvsCos_po->SetMarkerColor(kBlue);
+      hdEdxMeanvsCos_po->SetStats(0);
+      hdEdxMeanvsCos_po->DrawCopy("same");
 
-      hCosConstMeanElPo->SetMarkerStyle(20);
-      hCosConstMeanElPo->SetMarkerSize(0.80);
-      hCosConstMeanElPo->SetMarkerColor(kBlack);
-      hCosConstMeanElPo->SetStats(0);
-      hCosConstMeanElPo->DrawCopy("same");
+      hdEdxMeanvsCos_ep->SetMarkerStyle(20);
+      hdEdxMeanvsCos_ep->SetMarkerSize(0.60);
+      hdEdxMeanvsCos_ep->SetMarkerColor(kBlack);
+      hdEdxMeanvsCos_ep->SetStats(0);
+      hdEdxMeanvsCos_ep->DrawCopy("same");
 
-      ctmpElPoCCComp->cd(2);
-      hCosConstSigmaElec->SetMarkerStyle(20);
-      hCosConstSigmaElec->SetMarkerColor(kRed);
-      hCosConstSigmaElec->SetMarkerSize(1.1);
-      hCosConstSigmaElec->SetTitle("rel-dedx-mean comparison (e-=red, e+=blue)");
-      hCosConstSigmaElec->GetYaxis()->SetRangeUser(0.2, 0.12);
-      hCosConstSigmaElec->SetStats(0);
-      hCosConstSigmaElec->DrawCopy("");
+      ctmp_epConst->cd(2);
+      gPad->SetGridy(1);
+      hdEdxSigmavsCos_el->SetMarkerStyle(4);
+      hdEdxSigmavsCos_el->SetMarkerColor(kRed);
+      hdEdxSigmavsCos_el->SetMarkerSize(0.90);
+      hdEdxSigmavsCos_el->SetTitle("comparison of dedx #mu_{fit}^{rel}: (e-=open, e+=closed)");
+      hdEdxSigmavsCos_el->GetYaxis()->SetRangeUser(0.4, 0.12);
+      hdEdxSigmavsCos_el->SetStats(0);
+      hdEdxSigmavsCos_el->DrawCopy("");
 
-      hCosConstSigmaPosi->SetMarkerStyle(20);
-      hCosConstSigmaPosi->SetMarkerSize(0.80);
-      hCosConstSigmaPosi->SetMarkerColor(kBlue);
-      hCosConstSigmaPosi->SetStats(0);
-      hCosConstSigmaPosi->DrawCopy("same");
+      hdEdxSigmavsCos_po->SetMarkerStyle(8);
+      hdEdxSigmavsCos_po->SetMarkerSize(0.80);
+      hdEdxSigmavsCos_po->SetMarkerColor(kBlue);
+      hdEdxSigmavsCos_po->SetStats(0);
+      hdEdxSigmavsCos_po->DrawCopy("same");
 
-      ctmpElPoCCComp->Print("hMeanSigma_CosthBin.pdf");
-      ctmpElPoCCComp->Print("hMeanSigma_CosthBin.root");
-      delete ctmpElPoCCComp;
-
-      psnameElPo.str("");
-      psnameElPo << "dedxFits_cosinebins_ElPo.pdf]";
-      ctmpElPo->Print(psnameElPo.str().c_str());
-      delete ctmpElPo;
-
-      ctmpElPoCosth->cd();
-      hCosthElec->SetStats(0);
-      hCosthElec->SetLineColor(kRed);
-      hCosthElec->DrawCopy("");
-      hCosthPosi->SetStats(0);
-      hCosthPosi->SetLineColor(kBlue);
-      hCosthPosi->DrawCopy("same");
-      ctmpElPoCosth->Print("hCosth_Dist_Comparison.pdf");
-      delete ctmpElPoCosth;
+      ctmp_epCosth->cd();
+      hCosth_el->SetStats(0);
+      hCosth_el->SetLineColor(kRed);
+      hCosth_el->SetFillColorAlpha(kYellow, 0.55);
+      hCosth_el->DrawCopy("");
+      hCosth_po->SetStats(0);
+      hCosth_po->SetLineColor(kBlue);
+      hCosth_po->SetFillColorAlpha(kGray, 0.35);
+      hCosth_po->DrawCopy("same");
 
     } else {
 
-      ctmpElPoCCComp->cd(1);
-      hCosConstMeanElPo->SetLineColor(kBlack);
-      hCosConstMeanElPo->DrawCopy("");
+      ctmp_epConst->cd(1);
+      gPad->SetGridy(1);
+      hdEdxMeanvsCos_ep->SetMarkerStyle(20);
+      hdEdxMeanvsCos_ep->SetMarkerSize(0.60);
+      hdEdxMeanvsCos_ep->SetMarkerColor(kBlack);
+      hdEdxMeanvsCos_ep->SetStats(0);
+      hdEdxMeanvsCos_ep->SetTitle("dedx rel(#mu_{fit}) for e- and e+ combined");
+      hdEdxMeanvsCos_ep->GetYaxis()->SetRangeUser(0.97, 1.04);
+      hdEdxMeanvsCos_ep->DrawCopy("");
 
-      ctmpElPoCCComp->cd(2);
-      hCosConstSigmaElPo->SetLineColor(kBlack);
-      hCosConstSigmaElPo->DrawCopy("same");
+      ctmp_epConst->cd(2);
+      gPad->SetGridy(1);
+      hdEdxSigmavsCos_ep->SetMarkerStyle(20);
+      hdEdxSigmavsCos_ep->SetMarkerColor(kRed);
+      hdEdxSigmavsCos_ep->SetMarkerSize(1.1);
+      hdEdxSigmavsCos_ep->SetTitle("dedx rel(#sigma_{fit}) for e- and e+ combined");
+      hdEdxSigmavsCos_ep->GetYaxis()->SetRangeUser(0.4, 0.12);
+      hdEdxSigmavsCos_ep->SetStats(0);
+      hdEdxSigmavsCos_ep->DrawCopy("");
 
-      ctmpElPoCCComp->Print("hMeanSigma_CosthBin.pdf");
-      ctmpElPoCCComp->Print("hMeanSigma_CosthBin.root");
-
-      psnameElPo.str("");
-      psnameElPo << "dedxFits_cosinebins_ElPo.pdf]";
-      ctmpElPo->Print(psnameElPo.str().c_str());
-      delete ctmpElPo;
-
-      ctmpElPoCosth->cd();
-      hCosthElPo->SetStats(0);
-      hCosthElPo->SetLineColor(kBlack);
-      hCosthElPo->DrawCopy("same");
-      ctmpElPoCosth->Print("hCosth_Dist.pdf");
-      delete ctmpElPoCosth;
+      ctmp_epCosth->cd();
+      hCosth_ep->SetStats(0);
+      hCosth_ep->SetLineColor(kGray);
+      hCosth_ep->SetFillColorAlpha(kGray, 0.25);
+      hCosth_ep->DrawCopy("same");
     }
+
+    ctmp_epCosth->SaveAs(Form("cdcdedx_coscal_costhdist_frun%d.pdf", fStartRun));
+    delete ctmp_epCosth;
+
+    ctmp_epConst->SaveAs(Form("cdcdedx_coscal_relmeans_frun%d.pdf", fStartRun));
+    ctmp_epConst->SaveAs(Form("cdcdedx_coscal_relmeans_frun%d.root", fStartRun));
+    delete ctmp_epConst;
   }
 
-  delete tl;
   generateNewPayloads(cosine);
   return c_OK;
 }
 
-
-
 void CDCDedxCosineAlgorithm::generateNewPayloads(std::vector<double> cosine)
 {
 
-  TH1D* hCompareCorrOld = new TH1D("hCompareCorrOld", "Const Comp (Red->old);Cos(#theta);dEdx mean", 100, -1.0, 1.0);
-  TH1D* hCompareCorrNew = new TH1D("hCompareCorrNew", "Const Comp;Cos(#theta);dEdx mean", 100, -1.0, 1.0);
+  TH1D* hCosCorrOld = new TH1D(Form("hCosCorrOld_fRun%d", fStartRun),
+                               Form("cos corr const comparison (red=old, blue=new), start run: %d;cos(#theta);dE/dx #mu_{fit}", fStartRun), fCosbins, fCosMin,
+                               fCosMax);
+  TH1D* hCosCorrNew = new TH1D(Form("hCosCorrNew_fRun%d", fStartRun), Form("coss corr, start run: %d;cos(#theta);dE/dx #mu_{fit}",
+                               fStartRun), fCosbins, fCosMin, fCosMax);
+  TH1D* hCosCorrRel = new TH1D(Form("hCosCorrRel_fRun%d", fStartRun),
+                               Form("new relative cos corr, start run: %d;cos(#theta);dE/dx #mu_{fit}", fStartRun), fCosbins, fCosMin, fCosMax);
 
   if (isMergePayload) {
     const auto expRun = getRunList()[0];
@@ -344,62 +425,74 @@ void CDCDedxCosineAlgorithm::generateNewPayloads(std::vector<double> cosine)
     // bool refchange = m_DBCosineCor.hasChanged(); //Add this feature for major processing
     B2INFO("Saving new rung for (Exp, Run) : (" << expRun.first << "," << expRun.second << ")");
     for (unsigned int ibin = 0; ibin < m_DBCosineCor->getSize(); ibin++) {
-      hCompareCorrOld->SetBinContent(ibin + 1, (double)m_DBCosineCor->getMean(ibin));
+      hCosCorrOld->SetBinContent(ibin + 1, (double)m_DBCosineCor->getMean(ibin));
+      hCosCorrRel->SetBinContent(ibin + 1, cosine.at(ibin));
       B2INFO("Cosine Corr for Bin # " << ibin << ", Previous = " << m_DBCosineCor->getMean(ibin) << ", Relative = " << cosine.at(
                ibin) << ", Merged = " << m_DBCosineCor->getMean(ibin)*cosine.at(ibin));
       cosine.at(ibin) *= (double)m_DBCosineCor->getMean(ibin);
-      hCompareCorrNew->SetBinContent(ibin + 1, cosine.at(ibin));
+      hCosCorrNew->SetBinContent(ibin + 1, cosine.at(ibin));
     }
   }
 
   if (isMakePlots) {
-    TCanvas* coldCCComp = new TCanvas("coldCCComp", "coldCCComp", 500, 500);
-    hCompareCorrOld->SetStats(0);
-    hCompareCorrOld->SetLineColor(kRed);
-    hCompareCorrOld->DrawCopy("");
-    hCompareCorrNew->SetStats(0);
-    hCompareCorrNew->SetLineColor(kBlue);
-    hCompareCorrNew->DrawCopy("same");
-    coldCCComp->Print("hCosineCorr_CompareConstNewvsOld.pdf");
-    coldCCComp->Print("hCosineCorr_CompareConstNewvsOld.root");
-    delete coldCCComp;
+    TCanvas* ctmp_const = new TCanvas("ctmp_const", "ctmp_const", 900, 450);
+    ctmp_const->Divide(2, 1);
+
+    ctmp_const->cd(1);
+    gPad->SetGridy(1);
+    gPad->SetGridx(1);
+    hCosCorrOld->SetStats(0);
+    hCosCorrOld->SetLineColor(kRed);
+    hCosCorrOld->GetYaxis()->SetRangeUser(0.64, 1.20);
+    hCosCorrOld->DrawCopy("");
+    hCosCorrNew->SetStats(0);
+    hCosCorrNew->SetLineColor(kBlue);
+    hCosCorrNew->DrawCopy("same");
+
+    ctmp_const->cd(2);
+    gPad->SetGridy(1);
+    hCosCorrRel->SetStats(0);
+    hCosCorrRel->GetYaxis()->SetRangeUser(0.97, 1.03);
+    hCosCorrRel->SetLineColor(kBlack);
+    hCosCorrRel->DrawCopy("");
+
+    ctmp_const->SaveAs(Form("cdcdedx_coscal_constants_frun%d.pdf", fStartRun));
+    ctmp_const->SaveAs(Form("cdcdedx_coscal_constants_frun%d.root", fStartRun));
+    delete ctmp_const;
   }
 
-  B2INFO("dE/dx calibration done for CDC dE/dx electron saturation");
+  B2INFO("dE/dx calibration done for CDC dE/dx _eltron saturation");
   CDCDedxCosineCor* gain = new CDCDedxCosineCor(cosine);
   saveCalibration(gain, "CDCDedxCosineCor");
 }
 
-
 void CDCDedxCosineAlgorithm::FitGaussianWRange(TH1D*& temphist, TString& status)
 {
-
-  if (temphist->Integral() < 250) {
-    std::cout << "\t\t" << Form("%s no-FIT as this bin is LowStats < 250", temphist->GetName()) << std::endl;
+  if (temphist->Integral() < 2000) { //atleast 1k bhabha events
+    B2INFO(Form("\tThis hist (%s) have insufficient entries to perform fit (%0.03f)", temphist->GetName(), temphist->Integral()));
     status = "LowStats";
     return;
-  }
-
-  temphist->GetXaxis()->SetRange(temphist->FindFirstBinAbove(0, 1), temphist->FindLastBinAbove(0, 1));
-  int fs = temphist->Fit("gaus", "QR");
-  if (fs != 0) {
-    std::cout << "\t\t" << Form("%s FIT (round 1) STATUS Failed ", temphist->GetName()) << fs << std::endl;
-    status = "FitFailed";
-    return;
-  }
-
-  double mean = temphist->GetFunction("gaus")->GetParameter(1);
-  double width = temphist->GetFunction("gaus")->GetParameter(2);
-  temphist->GetXaxis()->SetRangeUser(mean - 4.5 * width, mean + 4.5 * width);
-  fs = temphist->Fit("gaus", "QR", "", mean - fSigLim * width, mean + fSigLim * width);
-  if (fs != 0) {
-    std::cout << "\t\t" << Form("%s FIT (round 2) STATUS Failed ", temphist->GetName()) << fs << std::endl;
-    status = "FitFailed";
-    return;
   } else {
-    status = "FitOK";
-    std::cout << "\t\t" << Form("%s FIT STATUS OK ", temphist->GetName()) << fs << std::endl;
-    temphist->GetXaxis()->SetRangeUser(mean - 4.5 * width, mean + 4.5 * width);
+    temphist->GetXaxis()->SetRange(temphist->FindFirstBinAbove(0, 1), temphist->FindLastBinAbove(0, 1));
+    int fs = temphist->Fit("gaus", "QR");
+    if (fs != 0) {
+      B2INFO(Form("\tFit (round 1) for hist (%s) failed (status = %d)", temphist->GetName(), fs));
+      status = "FitFailed";
+      return;
+    } else {
+      double fdEdxMean = temphist->GetFunction("gaus")->GetParameter(1);
+      double width = temphist->GetFunction("gaus")->GetParameter(2);
+      temphist->GetXaxis()->SetRangeUser(fdEdxMean - 5.0 * width, fdEdxMean + 5.0 * width);
+      fs = temphist->Fit("gaus", "QR", "", fdEdxMean - fSigLim * width, fdEdxMean + fSigLim * width);
+      if (fs != 0) {
+        B2INFO(Form("\tFit (round 2) for hist (%s) failed (status = %d)", temphist->GetName(), fs));
+        status = "FitFailed";
+        return;
+      } else {
+        temphist->GetXaxis()->SetRangeUser(fdEdxMean - 5.0 * width, fdEdxMean + 5.0 * width);
+        B2INFO(Form("\tFit for hist (%s) sucessfull (status = %d)", temphist->GetName(), fs));
+        status = "FitOK";
+      }
+    }
   }
 }
-

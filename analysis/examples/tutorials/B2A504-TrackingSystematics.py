@@ -27,7 +27,7 @@ sys_tests = ['def', 'scale', 'scaleUp', 'scaleDown', 'Efficiency']
 test = 'scaleDown'
 
 if test not in sys_tests:
-    print("Unknown systematic test {}".format(test))
+    print(f"Unknown systematic test {test}")
     exit(1)
 
 # create path
@@ -47,13 +47,13 @@ ma.fillParticleList(decayString='e+:sel',
 if test == 'def':
     pass
 elif test == 'scale':
-    ma.trackingMomentum(inputListNames=['e+:sel'], scale=1.00056, path=my_path)
+    ma.scaleTrackMomenta(inputListNames=['e+:sel'], scale=1.00056, path=my_path)
 elif test == 'scaleUp':
-    ma.trackingMomentum(inputListNames=['e+:sel'], scale=1.001, path=my_path)
+    ma.scaleTrackMomenta(inputListNames=['e+:sel'], scale=1.001, path=my_path)
 elif test == 'scaleDown':
-    ma.trackingMomentum(inputListNames=['e+:sel'], scale=0.999, path=my_path)
+    ma.scaleTrackMomenta(inputListNames=['e+:sel'], scale=0.999, path=my_path)
 elif test == 'Efficiency':
-    ma.trackingEfficiency(inputListNames=['e+:sel'], fraction=0.01, path=my_path)
+    ma.removeTracksForTrackingEfficiencyCalculation(inputListNames=['e+:sel'], fraction=0.01, path=my_path)
 
 # J/psi
 ma.reconstructDecay(decayString='J/psi:out -> e+:sel e-:sel',
@@ -67,7 +67,7 @@ var1 = ['M',
 
 ma.variablesToNtuple(decayString='J/psi:out',
                      variables=var1,
-                     filename='Jpsi_out_{}.root'.format(test),
+                     filename=f'Jpsi_out_{test}.root',
                      path=my_path)
 
 # process the events

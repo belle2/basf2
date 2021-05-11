@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import basf2 as b2
-import os
 
 # ---------------------------------------------------------------
 # example of using OpticalGun to simulate the TOP laser calibration
@@ -40,6 +39,7 @@ def addSource(x, angle, slotID, path):
                     angularDistribution='uniform'
                     # angularDistribution='(40-x)*TMath::Sin(x)' # You can have whatever distribution you like
                     )
+
 
 # Create path
 main = b2.create_path()

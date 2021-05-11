@@ -132,6 +132,10 @@ namespace Belle2 {
     std::vector<double> _TotalEnergy;
     //! Low Multiplicity Threshold
     std::vector<double> _LowMultiThreshold;
+    // Theta region (low, high) of 3D Bhabha Veto InTrack
+    std::vector<int> m_3DBhabhaVetoInTrackThetaRegion;
+    // Energy threshold(low, high) of event timing quality flag (GeV)
+    std::vector<double> m_EventTimingQualityThresholds;
 
     /** output for TRGECLHit */
     StoreArray<TRGECLHit> m_TRGECLHit;

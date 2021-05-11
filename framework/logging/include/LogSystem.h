@@ -188,6 +188,16 @@ namespace Belle2 {
      */
     void updateModule(const LogConfig* moduleLogConfig = nullptr, const std::string& moduleName = "") { m_moduleLogConfig = moduleLogConfig; m_moduleName = moduleName; }
 
+    /**
+     * Enable debug output.
+     */
+    static void enableDebug() {s_debugEnabled = true;}
+
+    /**
+     * Is debug output enabled?
+     */
+    inline static bool debugEnabled() {return s_debugEnabled;}
+
   private:
     /** Stores the pointers to the log connection objects. (owned by us) */
     std::vector<LogConnectionBase*> m_logConnections;
@@ -209,6 +219,8 @@ namespace Belle2 {
     unsigned int m_suppressedMessages{0};
     /** Counts the number of messages sent per message level. */
     int m_messageCounter[LogConfig::c_Default];
+    /** Global flag for fast checking if debug output is enabled */
+    static bool s_debugEnabled;
 
     /** The constructor is hidden to avoid that someone creates an instance of this class. */
     LogSystem();

@@ -10,14 +10,14 @@
 </header>
 """
 import basf2
-from ROOT import TFile, TNamed, Belle2
-
-VALIDATION_OUTPUT_FILE = "fullTrackingTableValidation.root"
+from ROOT import TFile, TNamed
 import os
 
+VALIDATION_OUTPUT_FILE = "fullTrackingTableValidation.root"
+
 try:
-    from root_pandas import read_root
-    import pandas as pd
+    from root_pandas import read_root  # noqa
+    import pandas as pd  # noqa
 except ImportError:
     basf2.B2FATAL("You need to have pandas installed for this validation script to run.")
 
@@ -60,8 +60,8 @@ def reducelist(list_of_cuts, df, current_name=None, current_cut=None, x=0, y=0):
                               x + 2 ** (len(list_of_cuts) - 1), y + 1)
 
 
-def make_chunks(l, n):
-    return [l[i:i + n] for i in range(0, len(l), n)]
+def make_chunks(k, n):
+    return [k[i:i + n] for i in range(0, len(k), n)]
 
 
 def write_value_cell(key, value):
@@ -93,7 +93,6 @@ def write_value_cell(key, value):
 def make_html_row(x):
     keys = [key for key, _ in x.iteritems()]
     titles = [key[2] for key, _ in x.iteritems()]
-    values = [value for _, value in x.iteritems()]
 
     chunked_titles = make_chunks(titles, 2)
     common_prefixes = list(map(os.path.commonprefix, chunked_titles))

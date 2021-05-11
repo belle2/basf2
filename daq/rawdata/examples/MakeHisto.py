@@ -17,33 +17,33 @@
 # Example steering file - 2011 Belle II Collaboration
 ######################################################
 
-from basf2 import *
+import basf2 as b2
 
 # Set the log level to show only error and fatal messages
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 
 # input
 # input = register_module('SeqRootInput')
 # input.param('iutputFileName', 'RootOutput1.root')
-input = register_module('RootInput')
+input = b2.register_module('RootInput')
 
 # output
-output = register_module('PrintData')
+output = b2.register_module('PrintData')
 
 # Histo Module
 # histo = register_module('DqmHistoManager')
-histo = register_module('HistoManager')
+histo = b2.register_module('HistoManager')
 # histo.param('HostName', 'ropc01')
 # histo.param('Port', 9991)
 # histo.param('DumpInterval', 10)
 # histo.param('HistoFileName', 'ropc_histofile.root')
 
 # Monitor module
-monitor = register_module('MonitorDataCOPPER')
+monitor = b2.register_module('MonitorDataCOPPER')
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Add modules to main path
 main.add_module(input)
@@ -52,4 +52,4 @@ main.add_module(monitor)
 # main.add_module(output)
 
 # Process all events
-process(main)
+b2.process(main)

@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Thomas Keck 2017
 
 import numpy as np
 import tensorflow as tf
 import basf2_mva
-import pandas
 
 from basf2_mva_python_interface.tensorflow import State
 
@@ -73,7 +71,7 @@ class Prior(object):
         """
         signal_weight = self.get_signal_cdf(X) / self.get_bckgrd_pdf(X)
         signal_weight = np.where(np.isfinite(signal_weight), signal_weight, 0)
-        # NOT self.get_bckgrd_cdf() here, signal and background are handlet asymmetrical!
+        # NOT self.get_bckgrd_cdf() here, signal and background are handled asymmetrical!
         bckgrd_weight = (1.0 - self.get_signal_cdf(X)) / self.get_bckgrd_pdf(X)
         bckgrd_weight = np.where(np.isfinite(bckgrd_weight), bckgrd_weight, 0)
         return np.r_[signal_weight, bckgrd_weight]
@@ -108,7 +106,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     w = tf.placeholder(tf.float32, [None, 1], name='w')
 
     def layer(x, shape, name, unit=tf.sigmoid):
-        with tf.name_scope(name) as scope:
+        with tf.name_scope(name):
             weights = tf.Variable(tf.truncated_normal(shape, stddev=1.0 / np.sqrt(float(shape[0]))), name='weights')
             biases = tf.Variable(tf.constant(0.0, shape=[shape[1]]), name='biases')
             layer = unit(tf.matmul(x, weights) + biases)

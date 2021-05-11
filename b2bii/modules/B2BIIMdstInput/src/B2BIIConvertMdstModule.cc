@@ -163,6 +163,9 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
   //Set module properties
   setDescription("Converts Belle mDST objects (Panther tables and records) to Belle II mDST objects.");
 
+  addParam("convertBeamParameters", m_convertBeamParameters,
+           "Convert beam parameters or use information stored in "
+           "Belle II database.", true);
   addParam("use6x6CovarianceMatrix4Tracks", m_use6x6CovarianceMatrix4Tracks,
            "Use 6x6 (position, momentum) covariance matrix for charged tracks instead of 5x5 (helix parameters) covariance matrix", false);
   addParam("mcMatchingMode", m_mcMatchingModeString,
@@ -175,6 +178,7 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
   addParam("convertEvtcls", m_convertEvtcls, "Flag to switch on conversion of Mdst_evtcls", true);
   addParam("nisKsInfo", m_nisEnable, "Flag to switch on conversion of nisKsFinder info", true);
   addParam("RecTrg", m_convertRecTrg, "Flag to switch on conversion of rectrg_summary3", false);
+  addParam("TrkExtra", m_convertTrkExtra, " Flag to switch on conversion of first_x,y,z and last_x,y,z from Mdst_trk_fit", true);
 
   m_realData = false;
 
@@ -218,6 +222,8 @@ void B2BIIConvertMdstModule::initializeDataStore()
 
   if (m_convertEvtcls || m_convertRecTrg) m_evtInfo.registerInDataStore();
 
+  if (m_convertTrkExtra) m_belleTrkExtra.registerInDataStore();
+
   StoreObjPtr<ParticleList> gammaParticleList("gamma:mdst");
   gammaParticleList.registerInDataStore();
   StoreObjPtr<ParticleList> pi0ParticleList("pi0:mdst");
@@ -241,6 +247,7 @@ void B2BIIConvertMdstModule::initializeDataStore()
   //list here all Relations between Belle2 objects
   m_tracks.registerRelationTo(m_mcParticles);
   m_tracks.registerRelationTo(m_pidLikelihoods);
+  if (m_convertTrkExtra) m_tracks.registerRelationTo(m_belleTrkExtra);
   m_eclClusters.registerRelationTo(m_mcParticles);
   m_tracks.registerRelationTo(m_eclClusters);
   m_klmClusters.registerRelationTo(m_tracks);
@@ -256,17 +263,19 @@ void B2BIIConvertMdstModule::beginRun()
 {
   B2DEBUG(99, "B2BIIConvertMdst: beginRun called.");
 
-  //BeamEnergy class updated by fixmdst module in beginRun()
-  Belle::BeamEnergy::begin_run();
-  convertBeamEnergy();
-  Belle::BeamEnergy::dump();
+  if (m_convertBeamParameters) {
+    //BeamEnergy class updated by fixmdst module in beginRun()
+    Belle::BeamEnergy::begin_run();
+    convertBeamEnergy();
+    Belle::BeamEnergy::dump();
 
-  // load IP data from DB server
-  Belle::IpProfile::begin_run();
-  convertIPProfile(true);
-  Belle::IpProfile::dump();
-  bool usableIP = Belle::IpProfile::usable();
-  B2DEBUG(99, "B2BIIConvertMdst: IpProfile is usable = " << usableIP);
+    // load IP data from DB server
+    Belle::IpProfile::begin_run();
+    convertIPProfile(true);
+    Belle::IpProfile::dump();
+    bool usableIP = Belle::IpProfile::usable();
+    B2DEBUG(99, "B2BIIConvertMdst: IpProfile is usable = " << usableIP);
+  }
 
   //init eID
 #ifdef HAVE_EID
@@ -278,44 +287,46 @@ void B2BIIConvertMdstModule::beginRun()
 
 void B2BIIConvertMdstModule::event()
 {
-  // Are we running on MC or DATA?
-  Belle::Belle_event_Manager& evman = Belle::Belle_event_Manager::get_manager();
-  Belle::Belle_event& evt = evman[0];
+  if (m_convertBeamParameters) {
+    // Are we running on MC or DATA?
+    Belle::Belle_event_Manager& evman = Belle::Belle_event_Manager::get_manager();
+    Belle::Belle_event& evt = evman[0];
 
-  if (evt.ExpMC() == 2)
-    m_realData = false; // <- this is MC sample
-  else
-    m_realData = true;  // <- this is real data sample
+    if (evt.ExpMC() == 2)
+      m_realData = false; // <- this is MC sample
+    else
+      m_realData = true;  // <- this is real data sample
 
-  // 0. Convert IPProfile to BeamSpot
-  convertIPProfile();
+    // 0. Convert IPProfile to BeamSpot
+    convertIPProfile();
 
-  // Make sure beam parameters are correct: if they are not found in the
-  // database or different from the ones in the database we need to override them
-  if (!m_beamSpotDB || !(m_beamSpot == *m_beamSpotDB) ||
-      !m_collisionBoostVectorDB || !m_collisionInvMDB) {
-    if ((!m_beamSpotDB || !m_collisionBoostVectorDB || !m_collisionInvMDB) && !m_realData) {
-      B2INFO("No database entry for this run yet, create one");
-      StoreObjPtr<EventMetaData> event;
-      IntervalOfValidity iov(event->getExperiment(), event->getRun(), event->getExperiment(), event->getRun());
-      Database::Instance().storeData("CollisionBoostVector", &m_collisionBoostVector, iov);
-      Database::Instance().storeData("CollisionInvariantMass", &m_collisionInvM, iov);
-      Database::Instance().storeData("BeamSpot", &m_beamSpot, iov);
+    // Make sure beam parameters are correct: if they are not found in the
+    // database or different from the ones in the database we need to override them
+    if (!m_beamSpotDB || !(m_beamSpot == *m_beamSpotDB) ||
+        !m_collisionBoostVectorDB || !m_collisionInvMDB) {
+      if ((!m_beamSpotDB || !m_collisionBoostVectorDB || !m_collisionInvMDB) && !m_realData) {
+        B2INFO("No database entry for this run yet, create one");
+        StoreObjPtr<EventMetaData> event;
+        IntervalOfValidity iov(event->getExperiment(), event->getRun(), event->getExperiment(), event->getRun());
+        Database::Instance().storeData("CollisionBoostVector", &m_collisionBoostVector, iov);
+        Database::Instance().storeData("CollisionInvariantMass", &m_collisionInvM, iov);
+        Database::Instance().storeData("BeamSpot", &m_beamSpot, iov);
+      }
+      if (m_realData) {
+        B2ERROR("BeamParameters from condition database are different from converted "
+                "ones, overriding database. Did you make sure the globaltag B2BII is used?");
+      } else {
+        B2INFO("BeamSpot, BoostVector, and InvariantMass from condition database are different from converted "
+               "ones, overriding database");
+      }
+      if (ProcHandler::parallelProcessingUsed()) {
+        B2FATAL("Cannot reliably override the Database content in parallel processing "
+                "mode, please run the conversion in single processing mode");
+      }
+      DBStore::Instance().addConstantOverride("CollisionBoostVector", new CollisionBoostVector(m_collisionBoostVector), true);
+      DBStore::Instance().addConstantOverride("CollisionInvariantMass", new CollisionInvariantMass(m_collisionInvM), true);
+      DBStore::Instance().addConstantOverride("BeamSpot", new BeamSpot(m_beamSpot), true);
     }
-    if (m_realData) {
-      B2ERROR("BeamParameters from condition database are different from converted "
-              "ones, overriding database. Did you make sure the globaltag B2BII is used?");
-    } else {
-      B2INFO("BeamSpot, BoostVector, and InvariantMass from condition database are different from converted "
-             "ones, overriding database");
-    }
-    if (ProcHandler::parallelProcessingUsed()) {
-      B2FATAL("Cannot reliably override the Database content in parallel processing "
-              "mode, please run the conversion in single processing mode");
-    }
-    DBStore::Instance().addConstantOverride("CollisionBoostVector", new CollisionBoostVector(m_collisionBoostVector), true);
-    DBStore::Instance().addConstantOverride("CollisionInvariantMass", new CollisionInvariantMass(m_collisionInvM), true);
-    DBStore::Instance().addConstantOverride("BeamSpot", new BeamSpot(m_beamSpot), true);
   }
 
   // 1. Convert MC information
@@ -584,11 +595,11 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
         std::vector<float> helixError(15);
         belleVeeDaughterHelix(belleV0, 1, helixParam, helixError);
 
-        auto trackFitP = m_trackFitResults.appendNew(helixParam, helixError, pTypeP, 0.5, -1, -1);
+        auto trackFitP = m_trackFitResults.appendNew(helixParam, helixError, pTypeP, 0.5, -1, -1, 0);
         trackFitPIndex = trackFitP->getArrayIndex();
 
         belleVeeDaughterToCartesian(belleV0, 1, pTypeP, momentumP, positionP, error7x7P);
-        TrackFitResult* tmpTFR = new TrackFitResult(createTrackFitResult(momentumP, positionP, error7x7P, 1, pTypeP, 0.5, -1, -1));
+        TrackFitResult* tmpTFR = new TrackFitResult(createTrackFitResult(momentumP, positionP, error7x7P, 1, pTypeP, 0.5, -1, -1, 0));
         // TrackFitResult internaly stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
         // Overwrite it.
 
@@ -615,7 +626,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
           continue;
         }
 
-        auto trackFitP = m_trackFitResults.appendNew(helixParam, helixError, pTypeP, pValue, -1, -1);
+        auto trackFitP = m_trackFitResults.appendNew(helixParam, helixError, pTypeP, pValue, -1, -1, 0);
 
         trackFitPIndex = trackFitP->getArrayIndex();
 
@@ -640,11 +651,11 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
         std::vector<float> helixError(15);
         belleVeeDaughterHelix(belleV0, -1, helixParam, helixError);
 
-        auto trackFitM = m_trackFitResults.appendNew(helixParam, helixError, pTypeM, 0.5, -1, -1);
+        auto trackFitM = m_trackFitResults.appendNew(helixParam, helixError, pTypeM, 0.5, -1, -1, 0);
         trackFitMIndex = trackFitM->getArrayIndex();
 
         belleVeeDaughterToCartesian(belleV0, -1, pTypeM, momentumM, positionM, error7x7M);
-        TrackFitResult* tmpTFR = new TrackFitResult(createTrackFitResult(momentumM, positionM, error7x7M, -1, pTypeM, 0.5, -1, -1));
+        TrackFitResult* tmpTFR = new TrackFitResult(createTrackFitResult(momentumM, positionM, error7x7M, -1, pTypeM, 0.5, -1, -1, 0));
         // TrackFitResult internaly stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
         // Overwrite it.
         for (unsigned i = 0; i < 7; i++)
@@ -670,7 +681,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
           continue;
         }
 
-        auto trackFitM = m_trackFitResults.appendNew(helixParam, helixError, pTypeM, pValue, -1, -1);
+        auto trackFitM = m_trackFitResults.appendNew(helixParam, helixError, pTypeM, pValue, -1, -1, 0);
 
         trackFitMIndex = trackFitM->getArrayIndex();
 
@@ -718,12 +729,27 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
     TLorentzVector v0Momentum(belleV0.px(), belleV0.py(), belleV0.pz(), belleV0.energy());
     TVector3 v0Vertex(belleV0.vx(), belleV0.vy(), belleV0.vz());
 
+    /*
+     * Documentation of Mdst_vee2 vertex fit:
+     *      /sw/belle/belle/b20090127_0910/share/tables/mdst.tdf (L96-L125)
+     */
+    auto appendVertexFitInfo = [](Belle::Mdst_vee2 & _belle_V0, Particle & _belle2_V0) {
+      // Add chisq of vertex fit. chiSquared=10^10 means the fit fails.
+      _belle2_V0.addExtraInfo("chiSquared", _belle_V0.chisq());
+      // Ndf of the vertex kinematic fit is 1
+      _belle2_V0.addExtraInfo("ndf", 1);
+      // Add p-value to extra Info
+      double prob = TMath::Prob(_belle_V0.chisq(), 1);
+      _belle2_V0.setPValue(prob);
+    };
+
     Particle* newV0 = nullptr;
     if (belleV0.kind() == 1) { // K0s -> pi+ pi-
       Particle KS(v0Momentum, 310);
       KS.appendDaughter(newDaugP);
       KS.appendDaughter(newDaugM);
       KS.setVertex(v0Vertex);
+      appendVertexFitInfo(belleV0, KS);
       newV0 = m_particles.appendNew(KS);
       ksPList->addParticle(newV0);
 
@@ -771,6 +797,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       Lambda0.appendDaughter(newDaugP);
       Lambda0.appendDaughter(newDaugM);
       Lambda0.setVertex(v0Vertex);
+      appendVertexFitInfo(belleV0, Lambda0);
       newV0 = m_particles.appendNew(Lambda0);
       lambda0PList->addParticle(newV0);
 
@@ -783,6 +810,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       antiLambda0.appendDaughter(newDaugM);
       antiLambda0.appendDaughter(newDaugP);
       antiLambda0.setVertex(v0Vertex);
+      appendVertexFitInfo(belleV0, antiLambda0);
       newV0 = m_particles.appendNew(antiLambda0);
       antiLambda0PList->addParticle(newV0);
 
@@ -795,6 +823,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       gamma.appendDaughter(newDaugP);
       gamma.appendDaughter(newDaugM);
       gamma.setVertex(v0Vertex);
+      appendVertexFitInfo(belleV0, gamma);
       newV0 = m_particles.appendNew(gamma);
       convGammaPList->addParticle(newV0);
     }
@@ -826,55 +855,42 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
 
   // check if the Gen_hepevt table has any entries
   Belle::Gen_hepevt_Manager& genMgr = Belle::Gen_hepevt_Manager::get_manager();
-  if (genMgr.count() == 0) {
+  if (genMgr.count() == 0)
     return;
-  }
-
-  m_particleGraph.clear();
-
-  int position = m_particleGraph.size();
-
-  // Start with the root (mother-of-all) particle (1st particle in gen_hepevt table)
-  m_particleGraph.addParticle();
-  Belle::Gen_hepevt rootParticle = genMgr(Belle::Panther_ID(1));
-  genHepevtToMCParticle[1] = position;
-
-  MCParticleGraph::GraphParticle* p = &m_particleGraph[position];
-  convertGenHepevtObject(rootParticle, p);
-
-  // at this stage (before all other particles) all "motherless" particles (i.e. beam background)
-  // have to be added to Particle graph
-  /*
-  // if this is uncommented then beam background hits will be added to the MCParticle array
-  for (Belle::Gen_hepevt_Manager::iterator genIterator = genMgr.begin(); genIterator != genMgr.end(); ++genIterator) {
-    Belle::Gen_hepevt hep = *genIterator;
-    if (hep.moFirst() == 0 && hep.moLast() == 0 && hep.get_ID() > 1) {
-      // Particle has no mother
-      // put the particle in the graph:
-      position = m_particleGraph.size();
-      m_particleGraph.addParticle();
-      genHepevtToMCParticle[hep.get_ID()] = position;
-
-      MCParticleGraph::GraphParticle* graphParticle = &m_particleGraph[position];
-      convertGenHepevtObject(hep, graphParticle);
-    }
-  }
-  */
 
   typedef std::pair<MCParticleGraph::GraphParticle*, Belle::Gen_hepevt> halfFamily;
   halfFamily currFamily;
   halfFamily family;
   std::queue < halfFamily > heritancesQueue;
 
-  for (int idaughter = rootParticle.daFirst(); idaughter <= rootParticle.daLast(); ++idaughter) {
-    if (idaughter == 0) {
-      B2DEBUG(95, "Trying to access generated daughter with Panther ID == 0");
+  // Add motherless particles. The root particle is often the first one,
+  // but this is not correct in general case; thus, all particles are added,
+  // including the beam-background ones.
+  m_particleGraph.clear();
+  for (Belle::Gen_hepevt_Manager::iterator genIterator = genMgr.begin();
+       genIterator != genMgr.end(); ++genIterator) {
+    Belle::Gen_hepevt hep = *genIterator;
+    // Select particles without mother.
+    if (!(hep.moFirst() == 0 && hep.moLast() == 0))
       continue;
+    // Ignore particles with code 911, they are used for CDC data.
+    if (hep.idhep() == 911)
+      continue;
+    int position = m_particleGraph.size();
+    m_particleGraph.addParticle();
+    genHepevtToMCParticle[hep.get_ID()] = position;
+    MCParticleGraph::GraphParticle* graphParticle = &m_particleGraph[position];
+    convertGenHepevtObject(hep, graphParticle);
+    for (int iDaughter = hep.daFirst(); iDaughter <= hep.daLast();
+         ++iDaughter) {
+      if (iDaughter == 0) {
+        B2DEBUG(95, "Trying to access generated daughter with Panther ID == 0");
+        continue;
+      }
+      currFamily.first = graphParticle;
+      currFamily.second = genMgr(Belle::Panther_ID(iDaughter));
+      heritancesQueue.push(currFamily);
     }
-
-    currFamily.first = p;
-    currFamily.second = genMgr(Belle::Panther_ID(idaughter));
-    heritancesQueue.push(currFamily);
   }
 
   //now we can go through the queue:
@@ -885,12 +901,12 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
     MCParticleGraph::GraphParticle* currMother = currFamily.first;
     Belle::Gen_hepevt& currDaughter = currFamily.second;
 
-    // skip particle with idhep = 0
-    if (currDaughter.idhep() == 0)
+    // Skip particles with idhep = 0 or 911 (CDC data).
+    if (currDaughter.idhep() == 0 || currDaughter.idhep() == 911)
       continue;
 
     //putting the daughter in the graph:
-    position = m_particleGraph.size();
+    int position = m_particleGraph.size();
     m_particleGraph.addParticle();
     genHepevtToMCParticle[currDaughter.get_ID()] = position;
 
@@ -966,17 +982,15 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
         hep = &gen_level(hep0);
         break;
     }
-    if (hep->idhep() != 911) {
-      // Step 2: Gen_hepevt -> MCParticle
-      if (genHepevtToMCParticle.count(hep->get_ID()) > 0) {
-        int matchedMCParticleID = genHepevtToMCParticle[hep->get_ID()];
-        // Step 3: set the relation
-        eclClustersToMCParticles.add(B2EclCluster->getArrayIndex(), matchedMCParticleID);
-        testMCRelation(*hep, m_mcParticles[matchedMCParticleID], "ECLCluster");
-      } else {
-        B2DEBUG(79, "Cannot find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep->get_ID() << ")");
-        B2DEBUG(79, "Gen_hepevt: Panther ID = " << hep->get_ID() << "; idhep = " << hep->idhep() << "; isthep = " << hep->isthep());
-      }
+    // Step 2: Gen_hepevt -> MCParticle
+    if (genHepevtToMCParticle.count(hep->get_ID()) > 0) {
+      int matchedMCParticleID = genHepevtToMCParticle[hep->get_ID()];
+      // Step 3: set the relation
+      eclClustersToMCParticles.add(B2EclCluster->getArrayIndex(), matchedMCParticleID);
+      testMCRelation(*hep, m_mcParticles[matchedMCParticleID], "ECLCluster");
+    } else {
+      B2DEBUG(79, "Cannot find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep->get_ID() << ")");
+      B2DEBUG(79, "Gen_hepevt: Panther ID = " << hep->get_ID() << "; idhep = " << hep->idhep() << "; isthep = " << hep->isthep());
     }
   }
 }
@@ -1239,19 +1253,35 @@ void B2BIIConvertMdstModule::convertRecTrgTable()
   if (not m_evtInfo.isValid()) {
     m_evtInfo.create();
   }
+  // Load event info
+  StoreObjPtr<EventMetaData> event;
 
-  // Pull rectrg_summary3 from manager
-  Belle::Rectrg_summary3_Manager& RecTrgSummary3Mgr = Belle::Rectrg_summary3_Manager::get_manager();
+  if (event->getExperiment() <= 27) {  // Check if it's SVD 1
+    // Pull rectrg_summary from namager
+    Belle::Rectrg_summary_Manager& RecTrgSummaryMgr = Belle::Rectrg_summary_Manager::get_manager();
+    std::vector<Belle::Rectrg_summary>::iterator eflagIterator = RecTrgSummaryMgr.begin();
+    std::string name_summary = "rectrg_summary_m_final";
 
-  std::string name = "rectrg_summary3_m_final";
-  // Only one entry in each event
-  std::vector<Belle::Rectrg_summary3>::iterator eflagIterator = RecTrgSummary3Mgr.begin();
+    // Converting m_final(2) from rectrg_summary
+    for (int index = 0; index < 2; ++index) {
+      std::string iVar = name_summary + std::to_string(index);
+      m_evtInfo->addExtraInfo(iVar, (*eflagIterator).final(index));
+      B2DEBUG(99, "m_final(" << index << ") = " << m_evtInfo->getExtraInfo(iVar));
+    }
+  } else { // For SVD2
+    // Pull rectrg_summary3 from manager
+    Belle::Rectrg_summary3_Manager& RecTrgSummary3Mgr = Belle::Rectrg_summary3_Manager::get_manager();
 
-  // Converting m_final(3)
-  for (int index = 0; index < 3; ++index) {
-    std::string iVar = name + std::to_string(index);
-    m_evtInfo->addExtraInfo(iVar, (*eflagIterator).final(index));
-    B2DEBUG(99, "m_final(" << index << ") = " << m_evtInfo->getExtraInfo(iVar));
+    std::string name_summary3 = "rectrg_summary3_m_final";
+    // Only one entry in each event
+    std::vector<Belle::Rectrg_summary3>::iterator eflagIterator3 = RecTrgSummary3Mgr.begin();
+
+    // Converting m_final(3)
+    for (int index = 0; index < 3; ++index) {
+      std::string iVar = name_summary3 + std::to_string(index);
+      m_evtInfo->addExtraInfo(iVar, (*eflagIterator3).final(index));
+      B2DEBUG(99, "m_final(" << index << ") = " << m_evtInfo->getExtraInfo(iVar));
+    }
   }
 
 }
@@ -1644,6 +1674,12 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
     HitPatternCDC patternCdc;
     patternCdc.setNHits(cdcNHits);
 
+    // conversion of track position in CDC layers
+    if (m_convertTrkExtra) {
+      auto cdcExtraInfo = m_belleTrkExtra.appendNew(trk_fit.first_x(), trk_fit.first_y(), trk_fit.first_z(),
+                                                    trk_fit.last_x(), trk_fit.last_y(), trk_fit.last_z());
+      track->addRelationTo(cdcExtraInfo);
+    }
     // conversion of the SVD hit pattern
     int svdHitPattern = trk_fit.hit_svd();
     // use hits from 3: SVD-rphi, 4: SVD-z
@@ -1680,7 +1716,7 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
       svdVMask <<= 2;
     }
 
-    TrackFitResult helixFromHelix(helixParam, helixError, pType, pValue, -1, patternVxd.getInteger());
+    TrackFitResult helixFromHelix(helixParam, helixError, pType, pValue, -1, patternVxd.getInteger(), 0);
 
     if (m_use6x6CovarianceMatrix4Tracks) {
       TMatrixDSym cartesianCovariance(6);
@@ -1706,7 +1742,7 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
     }
 
     auto trackFit = m_trackFitResults.appendNew(helixParam, helixError, pType, pValue, patternCdc.getInteger(),
-                                                patternVxd.getInteger());
+                                                patternVxd.getInteger(), trk_fit.ndf());
     track->setTrackFitResultIndex(pType, trackFit->getArrayIndex());
     /*
       B2INFO("--- B1 Track: ");
@@ -1734,11 +1770,10 @@ void B2BIIConvertMdstModule::convertGenHepevtObject(const Belle::Gen_hepevt& gen
 
   // updating the GraphParticle information from the Gen_hepevt information
   const int idHep = recoverMoreThan24bitIDHEP(genHepevt.idhep());
-
-  // TODO: do not change 911 to 22
-  if (idHep == 0 || idHep == 911) {
-    B2WARNING("[B2BIIConvertMdstModule] Trying to convert Gen_hepevt with idhep = " << idHep << ". This should enver happen.");
-    mcParticle->setPDG(22);
+  if (idHep == 0) {
+    B2WARNING("Trying to convert Gen_hepevt with idhep = " << idHep <<
+              ". This should never happen.");
+    mcParticle->setPDG(Const::photon.getPDGCode());
   } else {
     mcParticle->setPDG(idHep);
   }
@@ -1956,7 +1991,7 @@ void B2BIIConvertMdstModule::testMCRelation(const Belle::Gen_hepevt& belleMC, co
   if (bellePDGCode == 0)
     B2WARNING("[B2BIIConvertMdstModule] " << objectName << " matched to Gen_hepevt with idhep = 0.");
 
-  if (bellePDGCode != belleIIPDGCode && bellePDGCode != 911)
+  if (bellePDGCode != belleIIPDGCode)
     B2WARNING("[B2BIIConvertMdstModule] " << objectName << " matched to different MCParticle! " << bellePDGCode << " vs. " <<
               belleIIPDGCode);
 
@@ -2203,7 +2238,8 @@ TrackFitResult B2BIIConvertMdstModule::createTrackFitResult(const CLHEP::HepLore
                                                             const Const::ParticleType& pType,
                                                             const float pValue,
                                                             const uint64_t hitPatternCDCInitializer,
-                                                            const uint32_t hitPatternVXDInitializer)
+                                                            const uint32_t hitPatternVXDInitializer,
+                                                            const uint16_t ndf)
 {
   TVector3 pos(position.x(),  position.y(),  position.z());
   TVector3 mom(momentum.px(), momentum.py(), momentum.pz());
@@ -2223,7 +2259,7 @@ TrackFitResult B2BIIConvertMdstModule::createTrackFitResult(const CLHEP::HepLore
     }
   }
 
-  return TrackFitResult(pos, mom, errMatrix, charge, pType, pValue, BFIELD, hitPatternCDCInitializer, hitPatternVXDInitializer);
+  return TrackFitResult(pos, mom, errMatrix, charge, pType, pValue, BFIELD, hitPatternCDCInitializer, hitPatternVXDInitializer, ndf);
 }
 
 double B2BIIConvertMdstModule::atcPID(const PIDLikelihood* pid, int sigHyp, int bkgHyp)

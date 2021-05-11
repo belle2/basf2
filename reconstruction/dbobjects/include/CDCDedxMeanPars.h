@@ -61,8 +61,8 @@ namespace Belle2 {
     void setVersion(short version) {m_version = version; };
 
     /** Set a parameter
-     * @param parameter key
-     * @param parameter value
+     * @param par parameter key
+     * @param value parameter value
      */
     void setMeanPar(int par, double value) {m_meanpars[par] = value; };
 

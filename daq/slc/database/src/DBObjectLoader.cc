@@ -46,6 +46,7 @@ DBObject DBObjectLoader::load(ConfigFile& config)
       if (type_s == "bool") type = DBField::BOOL;
       else if (type_s == "int") type = DBField::INT;
       else if (type_s == "float") type = DBField::FLOAT;
+      else if (type_s == "double") type = DBField::DOUBLE;
       else if (type_s == "object") type = DBField::OBJECT;
       if (type != DBField::TEXT) {
         value = StringUtil::replace(value.substr(pos + 1), ")", "");
@@ -62,7 +63,7 @@ DBObject DBObjectLoader::load(ConfigFile& config)
       } else if (StringUtil::split(value, '.').size() < 3 &&
                  StringUtil::isdigit(StringUtil::replace(value, ".", "")) &&
                  sscanf(value.c_str(), "%f", &vf) == 1) {
-        type = DBField::FLOAT;
+        type = DBField::DOUBLE;
       } else {
         type = DBField::TEXT;
       }
@@ -111,7 +112,7 @@ DBObject DBObjectLoader::load(DBInterface& db,
     } else if (record.hasField("value_i")) {
       ss << record.get("name") <<  " : int(" << record.get("value_i") << ")" << std::endl;
     } else if (record.hasField("value_f")) {
-      ss << record.get("name") <<  " : float(" << record.get("value_f") << ")" << std::endl;
+      ss << record.get("name") <<  " : double(" << record.get("value_f") << ")" << std::endl;
     } else if (record.hasField("value_t")) {
       ss << record.get("name") <<  " : \"" << record.get("value_t") << "\"" << std::endl;
     }
@@ -206,6 +207,7 @@ bool DBObjectLoader::setObject(DBObject& obj, StringList& str,
       case DBField::BOOL:   obj.addBool(name, false); break;
       case DBField::INT:    obj.addInt(name, 0); break;
       case DBField::FLOAT:  obj.addFloat(name, 0); break;
+      case DBField::DOUBLE: obj.addDouble(name, 0); break;
       case DBField::TEXT:   obj.addText(name, value); break;
       case DBField::OBJECT: {
         DBObject cobj(value);

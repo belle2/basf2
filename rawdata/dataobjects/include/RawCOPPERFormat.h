@@ -11,7 +11,7 @@
 // Includes
 #include <stdio.h>
 #include <string>
-
+#include <vector>
 #include <rawdata/RawCOPPERPackerInfo.h>
 #include <rawdata/dataobjects/RawDataBlockFormat.h>
 
@@ -238,9 +238,6 @@ namespace Belle2 {
     //! get data size of  FINESSE slot D buffer
     virtual int Get4thFINESSENwords(int n) = 0;
 
-    //! For copying FTSW word1 (FEE header)
-    virtual unsigned int GetB2LHeaderWord(int n, int finesse_buffer_pos);
-
     //
     // Get information from "B2link(attached by FEE and HLSB) header"
     //
@@ -324,6 +321,26 @@ namespace Belle2 {
                                  int* detector_buf_3rd, int nwords_3rd,
                                  int* detector_buf_4th, int nwords_4th,
                                  RawCOPPERPackerInfo rawcprpacker_info) = 0;
+
+    //! Pack data for PCIe40 data-format
+    virtual int* PackDetectorBuf(int* packed_buf_nwords,
+                                 int* const(&detector_buf_ch)[MAX_PCIE40_CH],
+                                 int const(&nwords_ch)[MAX_PCIE40_CH],
+                                 RawCOPPERPackerInfo rawcpr_info);
+
+    //! Get the max number of channels in a readout board
+    virtual int GetMaxNumOfCh(int n) = 0;
+
+    //! Compare value from different channels and make a statistics table
+    virtual void CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH] ,
+                                    std::vector<std::vector< unsigned int> >& result);
+
+    //! Get hostname of a node from the RawCOPPER header
+    virtual void GetNodeName(int n, char* node_name, int bufsize);
+
+    //! Get hostname of a node from an argument
+    virtual void GetNodeName(char* node_name, unsigned int node_id, int bufsize);
+
 
   protected :
 

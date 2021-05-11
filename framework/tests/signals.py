@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Tests basf2 behaviour under various POSIX signals
 # different possibilities for termination
@@ -158,7 +157,7 @@ for nproc in [0, 3]:
         except Exception as e:
             # Note: Without specifying exception type, we might get those from forked processes, too
             basf2.B2WARNING("Exception occured for nproc=%d, test_in_process=%d" % (nproc, in_proc))
-            raise
+            raise e
 
 print("\n")
 print("=========================================================================")

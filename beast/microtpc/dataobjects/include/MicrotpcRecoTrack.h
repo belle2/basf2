@@ -27,7 +27,22 @@ namespace Belle2 {
       m_parFit(), m_parFit_err(), m_cov(), m_impact_x() , m_impact_y(), m_side(), m_partID() {}
 
     /** Standard constructor
-     * @param energyDep Deposited energy in electrons
+     * @param detNb detector number
+     * @param pixnb pixel number
+     * @param chi2 the chi^2
+     * @param theta the polar angle in degrees
+     * @param phi the azimuthal angle in degrees
+     * @param esum total ionization energy
+     * @param totsum tot sum
+     * @param trl track length
+     * @param time_range trigger/time length
+     * @param parFit the fit parameters
+     * @param parFit_err the fit parameter errors
+     * @param cov covariant
+     * @param impact_x impact parameter x
+     * @param impact_y impact parameter y
+     * @param side which side was/were hit
+     * @param partID raw part ID
      */
     MicrotpcRecoTrack(int detNb, int pixnb, float chi2, float theta, float phi, float esum, int totsum, float trl, int time_range,
                       const float parFit[5], const float parFit_err[5], const float cov[25], const float impact_x[4], const float impact_y[4],

@@ -45,10 +45,10 @@ namespace TreeFitter {
 
     /** init the kalman machienery */
     ErrCode calculateGainMatrix(
-      const Eigen::Matrix < double, -1, 1, 0, 5, 1 > & residuals,
-      const Eigen::Matrix < double, -1, -1, 0, 5, MAX_MATRIX_SIZE > & G,
+      const Eigen::Matrix < double, -1, 1, 0, 7, 1 > & residuals,
+      const Eigen::Matrix < double, -1, -1, 0, 7, MAX_MATRIX_SIZE > & G,
       const FitParams& fitparams,
-      const Eigen::Matrix < double, -1, -1, 0, 5, 5 > * V = 0,
+      const Eigen::Matrix < double, -1, -1, 0, 7, 7 > * V = 0,
       double weight = 1);
 
     /**  get chi2 */
@@ -76,22 +76,22 @@ namespace TreeFitter {
      * */
 
     /** vector holding the residuals */
-    Eigen::Matrix < double, -1, 1, 0, 5, 1 > m_res;
+    Eigen::Matrix < double, -1, 1, 0, 7, 1 > m_res;
 
     /** G former H, transforms covraince of {residuals}<->{x,p,E} */
-    Eigen::Matrix < double, -1, -1, 0, 5, MAX_MATRIX_SIZE > m_G;
+    Eigen::Matrix < double, -1, -1, 0, 7, MAX_MATRIX_SIZE > m_G;
 
     /** R residual covariance */
-    Eigen::Matrix < double, -1, -1, 0, 5, 5 > m_R;
+    Eigen::Matrix < double, -1, -1, 0, 7, 7 > m_R;
 
     /** R inverse */
-    Eigen::Matrix < double, -1, -1, 0, 5, 5 > m_Rinverse;
+    Eigen::Matrix < double, -1, -1, 0, 7, 7 > m_Rinverse;
 
     /** K kalman gain matrix */
-    Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, 5 > m_K;
+    Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, 7 > m_K;
 
     /** C times G^t  */
-    Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, 5 > m_CGt;
+    Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, 7 > m_CGt;
 
   };
 }

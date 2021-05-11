@@ -8,38 +8,31 @@
 #
 ##############################################################################
 
-from basf2 import *
+import basf2 as b2
 from svd.dump_digits import dump_digits
 from svd.dump_clusters import dump_clusters
 
 # show warnings during processing
-set_log_level(LogLevel.WARNING)
-
-# Set database
-"""
-For phase 3 related studies, use this tag
-"""
-# use_local_database('localDB_NN_toImport/database_NN_toImport.txt','localDB_NN_toImport')
-use_central_database("development")
+b2.set_log_level(b2.LogLevel.WARNING)
 
 # Register modules
 
 # Particle gun module
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 # Create Event information
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 # Load parameters
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 # Create geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 # Run simulation
-simulation = register_module('FullSim')
+simulation = b2.register_module('FullSim')
 # Add the PXD digitizer, too, to avoid problems with empty events.
-PXDDIGI = register_module('PXDDigitizer')
+PXDDIGI = b2.register_module('PXDDigitizer')
 # SVD digitization module
-SVDDIGI = register_module('SVDDigitizer')
+SVDDIGI = b2.register_module('SVDDigitizer')
 SVDDIGI.param('StartSampling', -31.44)
 SVDDIGI.param('GenerateShaperDigits', True)
 # SVDDIGI.param('signalsList', 'SVDSignalsList.csv')
@@ -47,19 +40,19 @@ SVDDIGI.param('GenerateShaperDigits', True)
 # SVDDIGI.param('TimeFrameLow', -180)
 # SVDDIGI.param('TimeFrameHigh', 150)
 # SVD signal reconstructor
-SVDSIGR = register_module('SVDNNShapeReconstructor')
+SVDSIGR = b2.register_module('SVDNNShapeReconstructor')
 # Write RecoDigits so that we can check them
 SVDSIGR.param('WriteRecoDigits', True)
 # RecoDigit clusterizer
-SVDCLUST1 = register_module('SVDNNClusterizer')
+SVDCLUST1 = b2.register_module('SVDNNClusterizer')
 # ShaperDigit clusterizer
-SVDCLUST2 = register_module("SVDClusterizerDirect")
+SVDCLUST2 = b2.register_module("SVDClusterizerDirect")
 # Save output of simulation
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 
 # ============================================================================
 # Set a fixed random seed for particle generation:
-set_random_seed(1028307)
+b2.set_random_seed(1028307)
 
 # ============================================================================
 # Setting the list of particle codes (PDG codes) for the generated particles
@@ -82,7 +75,7 @@ geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
 # ============================================================================
 # Do the simulation
 
-main = create_path()
+main = b2.create_path()
 main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(gearbox)
@@ -98,7 +91,7 @@ main.add_module(dump_clusters())
 main.add_module(output)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

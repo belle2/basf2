@@ -8,7 +8,7 @@
 #
 ######################################################
 
-from basf2 import *
+import basf2 as b2
 import sys
 argvs = sys.argv
 if len(argvs) != 5:
@@ -16,10 +16,10 @@ if len(argvs) != 5:
     sys.exit()
 
 # Set the log level to show only error and fatal messages
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 # Modules
-processor = register_module('DesSerPrePCMain')
+processor = b2.register_module('DesSerPrePCMain')
 
 # Processor
 processor.param('HostNameFrom', argvs[1])
@@ -31,10 +31,10 @@ use_shm_flag = int(argvs[2])
 processor.param('UseShmFlag', use_shm_flag)
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Add modules to main path
 main.add_module(processor)
 
 # Process all events
-process(main)
+b2.process(main)

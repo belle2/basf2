@@ -11,6 +11,7 @@
 ******************************************************************************/
 
 #include <svd/modules/svdUnpacker/SVDUnpackerModule.h>
+#include <svd/calibration/SVDDetectorConfiguration.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -83,19 +84,19 @@ void SVDUnpackerModule::initialize()
   // Register default SVDEventInfo for unpacking Raw Data
   m_svdEventInfoPtr.registerInDataStore(m_svdEventInfoName, DataStore::c_ErrorIfAlreadyRegistered);
 
-  StoreArray<SVDDAQDiagnostic> storeDAQDiagnostics(m_svdDAQDiagnosticsListName);
-  storeDAQDiagnostics.registerInDataStore();
-  m_svdDAQDiagnosticsListName = storeDAQDiagnostics.getName();
+  m_storeDAQDiagnostics.registerInDataStore(m_svdDAQDiagnosticsListName);
+  m_svdDAQDiagnosticsListName = m_storeDAQDiagnostics.getName();
 
-  StoreArray<SVDShaperDigit> storeShaperDigits(m_svdShaperDigitListName);
-  storeShaperDigits.registerInDataStore();
-  storeShaperDigits.registerRelationTo(storeDAQDiagnostics);
-  m_svdShaperDigitListName = storeShaperDigits.getName();
+  m_storeShaperDigits.registerInDataStore(m_svdShaperDigitListName);
+  m_svdShaperDigitListName = m_storeShaperDigits.getName();
 
 }
 
 void SVDUnpackerModule::beginRun()
 {
+  if (!m_mapping.isValid())
+    B2FATAL("no valid SVD Channel Mapping. We stop here.");
+
   m_wrongFTBcrc = 0;
   if (m_mapping.hasChanged()) { m_map = std::make_unique<SVDOnlineToOfflineMap>(m_mapping->getFileName()); }
 
@@ -125,6 +126,15 @@ void SVDUnpackerModule::beginRun()
   nEventInfoMatchErrors = -1;
 
   seenHeadersAndTrailers = 0;
+
+  //get the relative time shift
+  SVDDetectorConfiguration detectorConfig;
+  if (detectorConfig.isValid())
+    m_relativeTimeShift = detectorConfig.getRelativeTimeShift();
+  else {
+    B2ERROR("SVDDetectorConfiguration not valid!! Setting relativeTimeShift to 0 for this reconstruction.");
+    m_relativeTimeShift = 0;
+  }
 }
 
 #ifndef __clang__
@@ -133,14 +143,10 @@ void SVDUnpackerModule::beginRun()
 #endif
 void SVDUnpackerModule::event()
 {
-  StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
-  if (!rawSVDList || !rawSVDList.getEntries())
+  if (!m_rawSVD || !m_rawSVD.getEntries())
     return;
 
-  StoreArray<SVDShaperDigit> shaperDigits(m_svdShaperDigitListName);
-  StoreArray<SVDDAQDiagnostic> DAQDiagnostics(m_svdDAQDiagnosticsListName);
-
-  if (!m_silentAppend && shaperDigits && shaperDigits.getEntries())
+  if (!m_silentAppend && m_storeShaperDigits && m_storeShaperDigits.getEntries())
     B2WARNING("Unpacking SVDShaperDigits to a non-empty pre-existing \n"
               << "StoreArray. This can lead to undesired behaviour. At least\n"
               << "remember to use SVDShaperDigitSorter in your path and \n"
@@ -169,10 +175,13 @@ void SVDUnpackerModule::event()
   // flag to set SVDEventInfo once per event
   bool isSetEventInfo = false;
 
+  //flag to set nAPVsamples in SVDEventInfo once per event
+  bool isSetNAPVsamples = false;
+
   unsigned short nAPVheaders = 999;
   set<short> seenAPVHeaders = {};
 
-  unsigned short nEntries_rawSVD = rawSVDList.getEntries();
+  unsigned short nEntries_rawSVD = m_rawSVD.getEntries();
   auto eventNo = m_eventMetaDataPtr->getEvent();
 
   short fadc = 255, apv = 63;
@@ -188,26 +197,28 @@ void SVDUnpackerModule::event()
 
   for (unsigned int i = 0; i < nEntries_rawSVD; i++) {
 
-    unsigned int numEntries_rawSVD = rawSVDList[ i ]->GetNumEntries();
+    unsigned int numEntries_rawSVD = m_rawSVD[ i ]->GetNumEntries();
     for (unsigned int j = 0; j < numEntries_rawSVD; j++) {
 
       unsigned short nWords[4];
-      nWords[0] = rawSVDList[i]->Get1stDetectorNwords(j);
-      nWords[1] = rawSVDList[i]->Get2ndDetectorNwords(j);
-      nWords[2] = rawSVDList[i]->Get3rdDetectorNwords(j);
-      nWords[3] = rawSVDList[i]->Get4thDetectorNwords(j);
+      nWords[0] = m_rawSVD[i]->Get1stDetectorNwords(j);
+      nWords[1] = m_rawSVD[i]->Get2ndDetectorNwords(j);
+      nWords[2] = m_rawSVD[i]->Get3rdDetectorNwords(j);
+      nWords[3] = m_rawSVD[i]->Get4thDetectorNwords(j);
 
       uint32_t* data32tab[4]; //vector of pointers
 
-      data32tab[0] = (uint32_t*)rawSVDList[i]->Get1stDetectorBuffer(j); // points at the begining of the 1st buffer
-      data32tab[1] = (uint32_t*)rawSVDList[i]->Get2ndDetectorBuffer(j);
-      data32tab[2] = (uint32_t*)rawSVDList[i]->Get3rdDetectorBuffer(j);
-      data32tab[3] = (uint32_t*)rawSVDList[i]->Get4thDetectorBuffer(j);
+      data32tab[0] = (uint32_t*)m_rawSVD[i]->Get1stDetectorBuffer(j); // points at the begining of the 1st buffer
+      data32tab[1] = (uint32_t*)m_rawSVD[i]->Get2ndDetectorBuffer(j);
+      data32tab[2] = (uint32_t*)m_rawSVD[i]->Get3rdDetectorBuffer(j);
+      data32tab[3] = (uint32_t*)m_rawSVD[i]->Get4thDetectorBuffer(j);
 
 
       unsigned short ftbError = 0;
       unsigned short trgType = 0;
       unsigned short trgNumber = 0;
+      unsigned short daqMode = -1;
+      unsigned short daqType = 0;
       unsigned short cmc1;
       unsigned short cmc2;
       unsigned short apvErrors;
@@ -216,6 +227,7 @@ void SVDUnpackerModule::event()
       unsigned short apvErrorsOR = 0;
 
       bool is3sampleData = false;
+      bool is6sampleData = false;
 
       for (unsigned int buf = 0; buf < 4; buf++) { // loop over 4 buffers
 
@@ -291,6 +303,11 @@ void SVDUnpackerModule::event()
             fadc = m_MainHeader.FADCnum;
             trgType = m_MainHeader.trgType;
             trgNumber = m_MainHeader.trgNumber;
+            daqMode = m_MainHeader.DAQMode;
+            daqType = m_MainHeader.DAQType;
+
+            //Let's add run-dependent info: daqMode="11" in case of 3-mixed-6 sample acquisition mode.
+            if (daqType) daqMode = 3;
 
             nAPVheaders = 0; // start counting APV headers for this FADC
             nAPVmatch = true; //assume correct # of APV headers
@@ -299,7 +316,12 @@ void SVDUnpackerModule::event()
             badTrailer = false;
 
             is3sampleData = false;
-            if (m_MainHeader.DAQMode == 1) is3sampleData = true;
+            is6sampleData = false;
+
+            if (daqMode == 0) B2ERROR("SVDDataFormatCheck: the event " << eventNo <<
+                                        " is apparently taken with 1-sample mode, this is not expected.");
+            if (daqMode == 1) is3sampleData = true;
+            if (daqMode == 2) is6sampleData = true;
 
             if (
               m_MainHeader.trgNumber !=
@@ -314,7 +336,7 @@ void SVDUnpackerModule::event()
             }
 
             // create SVDModeByte object from MainHeader vars
-            m_SVDModeByte = SVDModeByte(m_MainHeader.runType, m_MainHeader.evtType, m_MainHeader.DAQMode, m_MainHeader.trgTiming);
+            m_SVDModeByte = SVDModeByte(m_MainHeader.runType, 0, daqMode, m_MainHeader.trgTiming);
 
             // create SVDEventInfo and fill it with SVDModeByte & SVDTriggerType objects
             if (!isSetEventInfo) {
@@ -323,6 +345,8 @@ void SVDUnpackerModule::event()
               m_svdEventInfoPtr->setModeByte(m_SVDModeByte);
               m_svdEventInfoPtr->setTriggerType(m_SVDTriggerType);
 
+              //set relative time shift
+              m_svdEventInfoPtr->setRelativeShift(m_relativeTimeShift);
               // set X-talk info online from Raw Data
               m_svdEventInfoPtr->setCrossTalk(m_MainHeader.xTalk);
 
@@ -351,9 +375,10 @@ void SVDUnpackerModule::event()
                                                  apvErrors));
             }
             // temporary SVDDAQDiagnostic object (no info from trailers and APVmatch code)
-            currentDAQDiagnostic = DAQDiagnostics.appendNew(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError, nFADCmatch, nAPVmatch,
-                                                            badHeader, missedHeader, missedTrailer,
-                                                            fadc, apv);
+            currentDAQDiagnostic = m_storeDAQDiagnostics.appendNew(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError, nFADCmatch,
+                                                                   nAPVmatch,
+                                                                   badHeader, missedHeader, missedTrailer,
+                                                                   fadc, apv);
             vDiagnostic_ptr.push_back(currentDAQDiagnostic);
 
             apvsByPipeline[pipAddr].insert(make_pair(fadc, apv));
@@ -366,20 +391,42 @@ void SVDUnpackerModule::event()
             sample[1] = m_data_A.sample2;
             sample[2] = m_data_A.sample3;
 
-
             sample[3] = 0;
             sample[4] = 0;
             sample[5] = 0;
 
-            if (not is3sampleData) {
+            // Let's check the next rawdata word to determine if we acquired 3 or 6 sample
+            data32_it++;
+            m_data32 = *data32_it;
 
-              data32_it++;
-              m_data32 = *data32_it; // 2nd frame with data
+            if (m_data_B.check == 0 && strip == m_data_B.stripNum) { // 2nd data frame with the same strip number -> six samples
+
+              if (!isSetNAPVsamples) {
+                m_svdEventInfoPtr->setNSamples(6);
+                isSetNAPVsamples = true;
+              } else {
+                if (is3sampleData)
+                  B2ERROR("DAQMode value (indicating 3-sample acquisition mode) doesn't correspond to the actual number of samples (6) in the data! The data might be corrupted!");
+              }
+
               crc16vec.push_back(m_data32);
 
               sample[3] = m_data_B.sample4;
               sample[4] = m_data_B.sample5;
               sample[5] = m_data_B.sample6;
+            }
+
+            else { // three samples
+              data32_it--;
+              m_data32 = *data32_it;
+
+              if (!isSetNAPVsamples) {
+                m_svdEventInfoPtr->setNSamples(3);
+                isSetNAPVsamples = true;
+              } else {
+                if (is6sampleData)
+                  B2ERROR("DAQMode value (indicating 6-sample acquisition mode) doesn't correspond to the actual number of samples (3) in the data! The data might be corrupted!");
+              }
             }
 
             // Generating SVDShaperDigit object
@@ -407,7 +454,7 @@ void SVDUnpackerModule::event()
             unsigned short nAPVs = APVmap->count(fadc);
 
             if (nAPVheaders == 0) {
-              currentDAQDiagnostic = DAQDiagnostics.appendNew(0, 0, 0, 0, 0, 0, ftbError, nFADCmatch, nAPVmatch, badHeader, 0, 0, fadc, 0);
+              currentDAQDiagnostic = m_storeDAQDiagnostics.appendNew(0, 0, 0, 0, 0, 0, ftbError, nFADCmatch, nAPVmatch, badHeader, 0, 0, fadc, 0);
               vDiagnostic_ptr.push_back(currentDAQDiagnostic);
             }
 
@@ -526,7 +573,7 @@ void SVDUnpackerModule::event()
                               );
   // We set emuPipelineAddress fields in diagnostics to this.
   if (m_emulatePipelineAddress)
-    for (auto& p : DAQDiagnostics)
+    for (auto& p : m_storeDAQDiagnostics)
       p.setEmuPipelineAddress(major_apv->first);
   // And report any upset apvs or update records
   if (apvsByPipeline.size() > 1)
@@ -548,7 +595,7 @@ void SVDUnpackerModule::event()
                                make_pair(fadcApv.first, fadcApv.second),
                                make_pair(eventNo, eventNo)
                              ));
-          for (auto& pp : DAQDiagnostics) {
+          for (auto& pp : m_storeDAQDiagnostics) {
 
             if (pp.getFADCNumber() == fadcApv.first and pp.getAPVNumber() == fadcApv.second)
               pp.setUpsetAPV(true);
@@ -567,7 +614,7 @@ void SVDUnpackerModule::event()
         || p.second->getFTBFlags()     || p.second->getAPVError() || !(p.second->getAPVMatch()) || !(p.second->getFADCMatch())
         || p.second->getBadHeader()
         ||  p.second->getBadMapping() || p.second->getUpsetAPV() || p.second->getMissedHeader() || p.second->getMissedTrailer()) continue;
-    shaperDigits.appendNew(p.first)->addRelationTo(p.second);
+    m_storeShaperDigits.appendNew(p.first);
   }
 
   if (!m_svdEventInfoPtr->getMatchTriggerType()) {if (!(nEventInfoMatchErrors % m_errorRate) or nEventInfoMatchErrors < 200) B2WARNING("Inconsistent SVD Trigger Type value for: " << LogVar("Event number", eventNo));}

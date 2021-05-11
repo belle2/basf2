@@ -3,15 +3,15 @@
 
 # avoid race conditions beetween pyroot and GUI thread
 from ROOT import PyConfig
-PyConfig.StartGuiThread = False
+PyConfig.StartGuiThread = False  # noqa
 
-from basf2 import *
+import basf2 as b2
 import os
 import glob
 import sys
 
 from ROOT import Belle2
-from ROOT import TH1F, TH2F, TCanvas
+from ROOT import TCanvas, TH1F
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 
@@ -22,7 +22,7 @@ from reconstruction import add_reconstruction
 # Red histograms are marking the modules with at least one track impact.
 # ------------------------------------------------------------------------------
 
-class TOPDisplay(Module):
+class TOPDisplay(b2.Module):
 
     '''
     Simple event display for TOP.
@@ -61,8 +61,8 @@ class TOPDisplay(Module):
                     moduleID = exthit.getCopyID()
                     self.hist[moduleID - 1].SetFillColor(2)
                     self.hist[moduleID - 1].SetLineColor(2)
-                except:
-                    B2ERROR('No relation to ExtHit')
+                except BaseException:
+                    b2.B2ERROR('No relation to ExtHit')
 
         digits = Belle2.PyStoreArray('TOPDigits')
         for digit in digits:
@@ -77,14 +77,10 @@ class TOPDisplay(Module):
         self.c1.Update()
 
         # wait for user respond
-        try:
-            q = 0
-            Q = 0
-            abc = eval(input('Type <CR> to continue or Q to quit '))
+        user_input = input("Press Enter to continue or Q to quit ").lower().strip()
+        if user_input == "q":
             evtMetaData = Belle2.PyStoreObj('EventMetaData')
             evtMetaData.obj().setEndOfData()
-        except:
-            abc = ''  # dummy line to terminate try-except
 
 
 # Check if the display is set (needed for canvas)
@@ -95,18 +91,18 @@ if 'DISPLAY' not in os.environ:
     sys.exit()
 
 # Suppress messages other than errors
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Set number of events to generate
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])
 main.add_module(eventinfosetter)
 
 # generate BBbar events
-evtgeninput = register_module('EvtGenInput')
+evtgeninput = b2.register_module('EvtGenInput')
 main.add_module(evtgeninput)
 
 # Detector simulation
@@ -122,11 +118,11 @@ add_reconstruction(main)
 main.add_module(TOPDisplay())
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

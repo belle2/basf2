@@ -67,7 +67,8 @@ if __name__ == "__main__":
         basf2.B2FATAL('Input file name and output file name must differ.')
     command = f'cp {input_file} {output_file}'
     basf2.B2INFO(f'The following command will be executed: {command}')
-    os.system(command)
+    if (os.system(command) != 0):
+        basf2.B2FATAL(f'The command "{command}" aborted during its execution.')
 
     # Set the Global Tags
     basf2.conditions.override_globaltags(globaltags)
@@ -124,4 +125,5 @@ if __name__ == "__main__":
         command = f'b2klm-execute-masking {output_file} '
         command += ' '.join(channels)
         basf2.B2INFO(f'The following command will be executed: {command}')
-        os.system(command)
+        if (os.system(command) != 0):
+            basf2.B2FATAL(f'The command "{command}" aborted during its execution.')

@@ -17,8 +17,6 @@
 # Example steering file - 2011 Belle II Collaboration
 #############################################################
 
-import sys
-import math
 import basf2 as b2
 
 # Some ROOT tools
@@ -119,7 +117,7 @@ class TreeWriterModule(b2.Module):
             except BaseException:
 
                 # some tracks don't have an mcparticle (fixed now)
-                B2WARNING('problems with track <-> mcparticle relations')
+                b2.B2WARNING('problems with track <-> mcparticle relations')
                 event = Belle2.PyStoreObj('EventMetaData').obj().getEvent()
                 print('event: %d, track: %d' % (event, track.getArrayIndex()))
 

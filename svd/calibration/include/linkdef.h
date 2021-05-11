@@ -19,6 +19,7 @@
 #pragma link C++ class Belle2::SVDFADCMaskedStrips-; // checksum=0x5c3369a8, version=-1
 #pragma link C++ class Belle2::SVDHotStripsCalibrations-; // checksum=0x94dfda0f, version=-1
 #pragma link C++ class Belle2::SVDDetectorConfiguration-; // checksum=0x8ad578cb, version=-1
+#pragma link C++ class Belle2::SVDChargeSimulationCalibrations-;
 
 //calibration importers
 #pragma link C++ class Belle2::SVDDatabaseImporter-;
@@ -32,5 +33,6 @@
 #pragma link C++ class Belle2::SVDOccupancyCalibrationsAlgorithm-; // checksum=0xd1c55b35, version=-1
 #pragma link C++ class Belle2::SVDHotStripsCalibrationsAlgorithm-; // checksum=0x3e0c24c4, version=-1
 #pragma link C++ class Belle2::SVDCrossTalkCalibrationsAlgorithm-; // checksum=0x71ffb51b, version=-1
+#pragma link C++ class Belle2::SVDTimeValidationAlgorithm-;
 
 #endif

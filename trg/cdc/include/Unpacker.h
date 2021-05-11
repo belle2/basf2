@@ -34,7 +34,7 @@ namespace Belle2 {
     static constexpr int T2DOutputWidth = T2D_TO_3D_WIDTH; // 747
     static constexpr unsigned lenTS = 21;   // ID (8 bit) + t (9 bit) + LR (2 bit) + priority (2 bit)
 
-    static constexpr int nMax2DTracksPerClock = 6;
+    static constexpr int nMax2DTracksPerClock = 4;
 
     // bit width of the clock counter
     static constexpr int clockCounterWidth = 9;
@@ -234,11 +234,13 @@ namespace Belle2 {
       return globalID;
     }
 
+    static const double realNaN = std::numeric_limits<double>::quiet_NaN();
+
     using tsOut = std::array<unsigned, 4>;
     using tsOutArray = std::array<tsOut, 5>;
     /// TRG 2DFinder Track
     struct TRG2DFinderTrack {
-      TRG2DFinderTrack() {}
+      TRG2DFinderTrack() : omega(realNaN), phi0(realNaN) {}
       /// omega of a 2D track
       double omega;
       /// phi0 of a 2D track
@@ -268,9 +270,10 @@ namespace Belle2 {
         StoreArray<CDCTriggerUnpacker::NNBitStream>* bitsNN,
         unsigned foundtime,
         unsigned iTracker,
-        const CDCTriggerNeuroConfig::B2FormatLine b2line)
+        const CDCTriggerNeuroConfig::B2FormatLine& b2line)
       {
-        if (int(b2line.offset + foundtime) <= bitsNN->getEntries()) {
+        if (int(b2line.offset + foundtime) >= 0 &&
+            int(b2line.offset + foundtime) <= bitsNN->getEntries()) {
 
           NNBitStream* bitsn = (*bitsNN)[foundtime + b2line.offset];
 
@@ -321,7 +324,7 @@ namespace Belle2 {
       }
       return res;
     }
-    bool decodevalstereobit(std::string p_valstereobit)
+    bool decodevalstereobit(const std::string& p_valstereobit)
     {
       bool res;
       if (p_valstereobit == "1") {
@@ -462,16 +465,16 @@ namespace Belle2 {
      *
      *  @return         TRG2DFinderTrack containing omega, phi0 and related TS hit
      */
-    TRG2DFinderTrack decode2DTrack(std::string p_charge __attribute__((unused)),
+    TRG2DFinderTrack decode2DTrack(const std::string& p_charge __attribute__((unused)),
                                    std::string p_omega,
                                    std::string p_phi,
-                                   std::string p_ts0,
-                                   std::string p_ts2,
-                                   std::string p_ts4,
-                                   std::string p_ts6,
-                                   std::string p_ts8,
+                                   const std::string& p_ts0,
+                                   const std::string& p_ts2,
+                                   const std::string& p_ts4,
+                                   const std::string& p_ts6,
+                                   const std::string& p_ts8,
                                    unsigned iTracker,
-                                   std::string p_2dcc,
+                                   const std::string& p_2dcc,
                                    bool sim13dt)
     {
 //constexpr unsigned lenomega = p_omega.size();
@@ -564,7 +567,7 @@ namespace Belle2 {
                                 std::string p_mlpin_id,
                                 std::string p_netsel,
                                 const DBObjPtr<CDCTriggerNeuroConfig> neurodb,
-                                std::string p_2dcc,
+                                const std::string& p_2dcc,
                                 bool sim13dt,
                                 B2LDataField p_extendedpts)
     {
@@ -1225,8 +1228,8 @@ namespace Belle2 {
           }
           B2DEBUG(21, padright("      2DCC: " + std::to_string(std::stoi(p_2dcc.data, 0, 2)) + ", (" + p_2dcc.data + ")", 100));
           if (p_nnenable.data == "1") {
-            std::vector<bool> foundoldtrack;
-            std::vector<bool> driftthreshold;
+            std::vector<bool> foundoldtrack{false};
+            std::vector<bool> driftthreshold{false};
             bool valstereobit;
             if (p_foundoldtrack.name != "None") {
               foundoldtrack = decodefoundoldtrack(p_foundoldtrack.data);
@@ -1264,7 +1267,7 @@ namespace Belle2 {
               const auto& ts = trk2D.ts[iAx];
               if (ts[3] > 0) {
                 CDCTriggerSegmentHit* hit =
-                  addTSHit(ts, 2 * iAx, iTracker, tsHits, iclock);
+                  addTSHit(ts, 2 * iAx, iTracker, tsHitsAll, iclock);
                 unsigned iTS = TSIDInSL(ts[0], iAx * 2, iTracker);
                 tsstr += "(SL" + std::to_string(iAx * 2) + ", " + std::to_string(iTS) + ", " + std::to_string(ts[1]) + ", " + std::to_string(
                            ts[2]) + ", " + std::to_string(ts[3]) + "),";
@@ -1296,23 +1299,38 @@ namespace Belle2 {
 
               std::vector<bool> tsvector(9, false);
               tsstr = "";
+              // turns false, as soon as there is a ts, which is not contained in the 2dfindertrack
+              bool isin2d = true;
               for (unsigned iSL = 0; iSL < 9; ++iSL) {
                 if (trkNN.ts[iSL][3] > 0) {
                   tsvector[iSL] = true;
                   unsigned iTS = TSIDInSL(trkNN.ts[iSL][0], iSL, iTracker);
                   tsstr += "(SL" + std::to_string(iSL) + ", " + std::to_string(iTS) + ", " + std::to_string(trkNN.ts[iSL][1]) + ", " + std::to_string(
                              trkNN.ts[iSL][2]) + ", " + std::to_string(trkNN.ts[iSL][3]) + "),\n";
-
+                  // check, wether axials are a subset of 2dfinderTS:
+                  if (iSL % 2 == 0) {
+                    if (!(trk2D.ts[iSL / 2][0] == trkNN.ts[iSL][0] &&
+                          //trk2D.ts[iSL / 2][1] == trkNN.ts[iSL][1] &&
+                          trk2D.ts[iSL / 2][2] == trkNN.ts[iSL][2] &&
+                          trk2D.ts[iSL / 2][3] == trkNN.ts[iSL][3])) {
+                      isin2d = false;
+                    }
+                  }
 
                 } else {
                   tsstr += "( - ),\n";
                 }
               }
+
               B2DEBUG(15, padright("      NNTrack TS: " + tsstr, 100));
 
               CDCTriggerTrack* trackNN = storeNNTracks->appendNew(phi0, omega, 0.,
                                                                   trkNN.z, cos(trkNN.theta) / sin(trkNN.theta), 0., track2D->getFoundOldTrack(), track2D->getDriftThreshold(),
                                                                   track2D->getValidStereoBit(), trkNN.sector, tsvector, iclock, iTracker);
+
+              if (isin2d == false) {
+                trackNN->setQualityVector(1);
+              }
               std::vector<float> inputVector(27, 0.);
               for (unsigned iSL = 0; iSL < 9; ++iSL) {
                 inputVector[3 * iSL] = trkNN.inputID[iSL];
@@ -1353,13 +1371,17 @@ namespace Belle2 {
                   //   }
 
                   // }
+
+                  // cppcheck-suppress knownConditionTrueFalse
                   if (!hit) {
                     hit = addTSHit(trkNN.ts[iSL] , iSL, iTracker, tsHits, iclock);
-                    // if (sim13dt) {
                     //   B2DEBUG(1, "Hit with short drift time added, should not happen!");
                     // }
                   }
                   trackNN->addRelationTo(hit);
+                  if (iSL % 2 == 0) {
+                    track2D->addRelationTo(hit);
+                  }
                 }
               }
             }

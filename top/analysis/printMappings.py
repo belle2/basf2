@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-import os
+import basf2 as b2
 import sys
 
 # ---------------------------------------------------------------------------
@@ -17,21 +16,21 @@ import sys
 # ---------------------------------------------------------------------------
 
 # Suppress messages and warnings for all other packages
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # set DEBUG level for top only to print mappings
-logging.set_package('top', LogConfig(LogLevel.DEBUG, 100))
+b2.logging.set_package('top', b2.LogConfig(b2.LogLevel.DEBUG, 100))
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Set number of events to generate
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1])
 main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 argvs = sys.argv
 if len(argvs) > 1:
     fileName = argvs[1]
@@ -39,10 +38,10 @@ if len(argvs) > 1:
 main.add_module(gearbox)
 
 # Geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 
 # Process events
-process(main)
+b2.process(main)

@@ -188,7 +188,7 @@ void TRGCDCTSFUnpackerModule::fillTreeCDCTSF(int* buf, int evt)
 
 
     for (int _wd = 0; _wd < m_nBits / 32; _wd++) { // 0..19
-      int wd = buf[clk * (m_nBits / 32) + _wd + nword_header];
+      unsigned wd = buf[clk * (m_nBits / 32) + _wd + nword_header];
       bitset<32> bwd(wd);
       for (int bb = 0; bb < 32; bb++) { // bit by bit
         if ((wd >> (31 - bb)) & 1) { /* MSB to LSB */
@@ -237,7 +237,7 @@ void TRGCDCTSFUnpackerModule::fillTreeCDCTSF_4k15ts(int* buf, int evt)
 
 
     for (int _wd = 0; _wd < m_nBits / 32; _wd++) { // 0..19
-      int wd = buf[clk * (m_nBits / 32) + _wd + nword_header];
+      unsigned wd = buf[clk * (m_nBits / 32) + _wd + nword_header];
       bitset<32> bwd(wd);
       for (int bb = 0; bb < 32; bb++) { // bit by bit
         if ((wd >> (31 - bb)) & 1) { /* MSB to LSB */

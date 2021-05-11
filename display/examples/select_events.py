@@ -9,15 +9,14 @@
 # if the box is checked when advancing to the next event, the event
 # will be saved in saved_from_display.root.
 
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
-from reconstruction import add_reconstruction
 
 # register necessary modules
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [5000])
 
-main = Path()
+main = b2.Path()
 
 # add modules to paths
 main.add_module(eventinfosetter)
@@ -41,9 +40,9 @@ add_simulation(main, components)
 # add_reconstruction(main, components)
 
 display = main.add_module('Display')
-conditionpath = Path()
+conditionpath = b2.Path()
 conditionpath.add_module('RootOutput', outputFileName='saved_from_display.root')
 display.if_true(conditionpath)
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

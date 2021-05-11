@@ -19,7 +19,7 @@ path = b2.create_path()
 
 # Load input ROOT file
 ma.inputMdst(environmentType='default',
-             filename=b2.find_file('mdst12.root', 'validation', False),
+             filename=b2.find_file('mdst14.root', 'validation', False),
              path=path)
 
 # Max 12 tracks per event - this avoids much computing time.
@@ -78,7 +78,7 @@ fei_tag = 'FEIv4_2020_MC13_release_04_01_01'
 # b2.conditions.globaltags = ['name of database containing the specific training']
 
 # Here we use a generic FEI training to demonstrate applying the FEI in an ROE of the signal
-b2.conditions.globaltags = ['analysis_tools_release-04-02']
+b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
 belle_particles = fei.get_default_channels(KLong=False,
                                            chargedB=True,

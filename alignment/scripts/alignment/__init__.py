@@ -1,14 +1,13 @@
-from basf2 import *
+import basf2 as b2
+from basf2.pickle_path import deserialize_path, deserialize_module, serialize_path, serialize_module
 
-import sys
 import ROOT
-import basf2
 from ROOT import Belle2
 from caf.framework import Calibration
 
 from collections import OrderedDict
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 UVWABC = [1, 2, 3, 4, 5, 6]
 
 
@@ -19,7 +18,7 @@ def collect(calibration, basf2_args=None):
     if basf2_args is None:
         basf2_args = []
 
-    main = create_path()
+    main = b2.create_path()
     main.add_module('RootInput', inputFileNames=calibration.input_files)
     main.add_module('HistoManager', histoFileName='RootOutput.root')
     main.add_path(calibration.pre_collector_path)
@@ -74,7 +73,7 @@ class MillepedeCalibration():
             primary_vertices = []
 
         if path is None:
-            path = create_path()
+            path = b2.create_path()
             path.add_module('Gearbox')
             path.add_module('Geometry')
             path.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
@@ -84,7 +83,7 @@ class MillepedeCalibration():
         #: pre-collector path
         self.path = path
         #: the collector module
-        self.collector = register_module('MillepedeCollector')
+        self.collector = b2.register_module('MillepedeCollector')
         #: Parameter config at algo level (fixing)
         self.parameters = OrderedDict()
         #: Commands for pede steering
@@ -190,7 +189,7 @@ class MillepedeCalibration():
                 if mod.name() == module:
                     module = mod
                     break
-        if isinstance(module, basf2.Module):
+        if isinstance(module, b2.Module):
             return module
         return None
 

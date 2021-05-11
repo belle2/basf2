@@ -11,10 +11,15 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <string>
+
+// framework - DataStore
+#include <framework/datastore/StoreObjPtr.h>
 
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
+
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <string>
 
 namespace Belle2 {
 
@@ -42,6 +47,8 @@ namespace Belle2 {
     virtual void event() override;
 
   private:
+
+    StoreObjPtr<ParticleList> m_plist; /**< particle list */
 
     std::string m_listName;   /**< particle list name */
     bool m_fullPrint;         /**< steering variable */

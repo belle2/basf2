@@ -9,9 +9,11 @@
  **************************************************************************/
 #pragma once
 
+#include <stdint.h>
+
 namespace Belle2 {
   namespace SoftwareTrigger {
-    /// Helper function to do a prescaling using a random integer number and the prescaling factor from the object.
-    bool makePreScale(const unsigned int& preScaleFactor);
+    /// Helper function to do a prescaling using a random integer number or a counter and the prescaling factor from the object.
+    bool makePreScale(const unsigned int& preScaleFactor, uint32_t* counter = nullptr);
   }
 }

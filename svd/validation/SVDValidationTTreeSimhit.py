@@ -11,17 +11,13 @@
   </description>
 </header>
 """
-import sys
-import math
 
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
 from ROOT import Belle2  # make Belle2 namespace available
 from ROOT import gROOT, AddressOf
-from ROOT import PyConfig
-from ROOT import TVector3
 
 # Define a ROOT struct to hold output data in the TTree
 gROOT.ProcessLine('struct EventDataSimhit {\
@@ -35,22 +31,22 @@ gROOT.ProcessLine('struct EventDataSimhit {\
     float simhit_dEdx;\
     };')
 
-from ROOT import EventDataSimhit
+from ROOT import EventDataSimhit  # noqa
 
 
-class SVDValidationTTreeSimhit(Module):
+class SVDValidationTTreeSimhit(b2.Module):
     '''class to create sim hit ttree'''
 
     def __init__(self):
         """Initialize the module"""
 
         super(SVDValidationTTreeSimhit, self).__init__()
+        #: output file
         self.file = ROOT.TFile('../SVDValidationTTreeSimhit.root', 'recreate')
-        '''Output ROOT file'''
+        #: output ttree
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-        '''TTrees for output data'''
+        #: instance of eventDataSimhit
         self.data = EventDataSimhit()
-        '''Instance of the EventDataSimhit class'''
 
         # Declare tree branches
         for key in EventDataSimhit.__dict__:

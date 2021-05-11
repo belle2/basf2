@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Thomas Keck 2017
 
@@ -14,7 +13,7 @@ import basf2_mva_util
 
 
 class MyFancyClassifier(object):
-    """ Let's assume we have writte our own classifier (or installed something from github) """
+    """ Let's assume we have written our own classifier (or installed something from github) """
 
     def __init__(self, *my_fancy_parameters):
         """ Just print the passed parameters """
@@ -77,7 +76,7 @@ def partial_fit(state, X, S, y, w, epoch):
     If m_nIterations > 1 and m_mini_batch_size == 0
         partial_fit is called multiple times, each time with the complete training data
     If m_nIterations > 1 and m_mini_batch_size != 0
-        partial_fit is called multiple times with only a subset of the trianing data of the desired size,
+        partial_fit is called multiple times with only a subset of the training data of the desired size,
         until the complete dataset was streamed m_nIterations times
     If m_nIterations == 0
         partial_fit is called multiple times until partial_fit returns False
@@ -107,7 +106,7 @@ def end_fit(state):
 
     We can fit our method here. And since our state object is pickable,
     we can just return it. You might want to use better mechanism in a real world example,
-    you can look at the implementations of the other methods (like tensorflow) howto save models
+    you can look at the implementations of the other methods (like tensorflow) how to save models
     to files, read them and return them as a pickable object.
     """
     state.fit(state.X, state.y)

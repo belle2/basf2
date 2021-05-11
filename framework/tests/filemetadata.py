@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
+from ROOT import Belle2
 import os
 import tempfile
 import subprocess
@@ -19,7 +19,6 @@ main.add_module('RootOutput', outputFileName=testFile.name, updateFileCatalog=Fa
 basf2.process(main)
 
 # Check the file meta data (via DataStore)
-from ROOT import Belle2
 metadata = Belle2.PyStoreObj('FileMetaData', 1)
 
 # print (metadata.getLfn()) #?

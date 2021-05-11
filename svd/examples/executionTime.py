@@ -14,8 +14,7 @@
 #############################################################
 
 import sys
-import os
-from basf2 import *
+import basf2 as b2
 from svd.executionTime_utils import SVDExtraEventStatisticsModule
 import simulation as simu
 import tracking as trk
@@ -27,12 +26,12 @@ if len(sys.argv) == 2:
     tag = sys.argv[1]
 
 # EXAMPLE OF EXECUTION TIME MEASUREMENT
-main = create_path()
+main = b2.create_path()
 
-set_random_seed(1)
+b2.set_random_seed(1)
 
 # set the exp/run event informations
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('evtNumList', [10])
@@ -45,7 +44,7 @@ main.add_module('EvtGenInput')
 bkgDir = '/group/belle2/BGFile/OfficialBKG/early_phase3/prerelease-04-00-00a/overlay/phase31/BGx1/set0/*.root'
 bg = glob.glob(bkgDir)
 if len(bg) == 0:
-    B2ERROR('No files found in ', bkgDir)
+    b2.B2ERROR('No files found in ', bkgDir)
     sys.exit()
 simu.add_simulation(main, bkgfiles=bg, usePXDDataReduction=False, forceSetPXDDataReduction=True)
 
@@ -64,6 +63,6 @@ main.add_module(SVDExtraEventStatisticsModule("SVDExecutionTime_"+str(tag)+".roo
 
 main.add_module('Progress')
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

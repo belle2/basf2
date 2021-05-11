@@ -19,7 +19,7 @@ class ParamCardWriter(object):
         filename,
         list_of_parameters=None,
         generic=False,
-        ):
+    ):
         """write a valid param_card.dat"""
 
         if not list_of_parameters:
@@ -38,7 +38,7 @@ class ParamCardWriter(object):
         self.fsock.close()
 
     def define_not_dep_param(self, list_of_parameters):
-        """define self.dep_mass and self.dep_width in case that they are 
+        """define self.dep_mass and self.dep_width in case that they are
         requested in the param_card.dat"""
 
         from particles import all_particles
@@ -78,8 +78,7 @@ class ParamCardWriter(object):
         all_lhablock = set([param.lhablock for param in all_ext_param])
 
         # ordonate lhablock alphabeticaly
-        all_lhablock = list(all_lhablock)
-        all_lhablock.sort()
+        all_lhablock = sorted(all_lhablock)
         # put at the beginning SMINPUT + MASS + DECAY
         for name in ['DECAY', 'MASS', 'SMINPUTS']:
             if name in all_lhablock:
@@ -116,7 +115,7 @@ class ParamCardWriter(object):
         lhacode = """ """.join(['%3s' % key for key in param.lhacode])
         if lhablock != 'DECAY':
             text = """  %s %e # %s \n""" % (lhacode,
-                    complex(param.value).real, param.name)
+                                            complex(param.value).real, param.name)
         else:
             text = '''DECAY %s %e \n''' % (lhacode, complex(param.value).real)
         self.fsock.write(text)
@@ -147,7 +146,7 @@ class ParamCardWriter(object):
                 value = param.value
 
             text += """%s %s %f # %s : %s \n""" % (prefix, part.pdg_code,
-                    value, part.name, param.value)
+                                                   value, part.name, param.value)
         # If more than a particles has the same mass/width we need to write it here
         # as well
         if lhablock == 'MASS':
@@ -167,7 +166,7 @@ class ParamCardWriter(object):
                 value = float(particle.get(arg).value)
                 name = particle.get(arg).name
                 text += """%s %s %f # %s : %s \n""" % (prefix,
-                        particle.pdg_code, value, particle.name, name)
+                                                       particle.pdg_code, value, particle.name, name)
 
         self.fsock.write(text)
 
@@ -190,9 +189,9 @@ class ParamCardWriter(object):
         23,
         24,
         25,
-        ]
+    ]
     data = \
-        """Block QNUMBERS %(pdg)d  # %(name)s 
+        """Block QNUMBERS %(pdg)d  # %(name)s
         1 %(charge)d  # 3 times electric charge
         2 %(spin)d  # number of spin states (2S+1)
         3 %(color)d  # colour rep (1: singlet, 3: triplet, 8: octet)
@@ -223,7 +222,7 @@ class ParamCardWriter(object):
                 'spin': part.spin,
                 'color': part.color,
                 'antipart': part.name != part.antiname and 1 or 0,
-                }
+            }
 
         self.fsock.write(text)
 
@@ -231,4 +230,3 @@ class ParamCardWriter(object):
 if '__main__' == __name__:
     ParamCardWriter('./param_card.dat', generic=True)
     print 'write ./param_card.dat'
-

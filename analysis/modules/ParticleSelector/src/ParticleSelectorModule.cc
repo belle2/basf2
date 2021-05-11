@@ -11,15 +11,11 @@
 // Own include
 #include <analysis/modules/ParticleSelector/ParticleSelectorModule.h>
 
-// framework - DataStore
-#include <framework/datastore/StoreObjPtr.h>
-
 // framework aux
 #include <framework/logging/Logger.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 
 using namespace std;
 
@@ -64,10 +60,24 @@ namespace Belle2 {
     // Mother particle
     const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
 
+    const int pdgCode = mother->getPDGCode();
+    string listLabel = mother->getLabel();
     m_listName = mother->getFullName();
+    // Some labels are reserved for the particle loader which loads all particles of the corresponding type.
+    // If people applied cuts on these particle lists, very dangerous bugs could be introduced.
+    // An exception is made for the gamma:all list. This can be limited to photons from the ECL only.
+    if (Const::finalStateParticlesSet.contains(Const::ParticleType(abs(pdgCode))) and listLabel == "all"
+        and not(abs(pdgCode) == Const::photon.getPDGCode() and m_cutParameter == "isFromECL")) {
+      B2FATAL("You are trying to apply a cut on the list " << m_listName <<
+              " but the label 'all' is protected for lists of final-state particles." <<
+              " It could introduce *very* dangerous bugs.");
+    } else if (listLabel == "MC" or listLabel == "ROE" or listLabel == "V0") {
+      // the labels MC, ROE, and V0 are also protected
+      B2FATAL("You are trying to apply a cut on the list " << m_listName <<
+              " but the label " << listLabel << " is protected and can not be reduced.");
+    }
 
-    StoreObjPtr<ParticleList> particleList(m_listName);
-    particleList.isRequired(m_listName);
+    m_particleList.isRequired(m_listName);
 
     m_cut = Variable::Cut::compile(m_cutParameter);
 
@@ -77,23 +87,15 @@ namespace Belle2 {
 
   void ParticleSelectorModule::event()
   {
-    StoreObjPtr<ParticleList> plist(m_listName);
-    bool existingList = plist.isValid();
-
-    if (!existingList) {
-      B2WARNING("Input list " << m_listName << " was not created?");
-      return;
-    }
-
     // loop over list only if cuts should be applied
     if (!m_cutParameter.empty()) {
       std::vector<unsigned int> toRemove;
-      unsigned int n = plist->getListSize();
+      unsigned int n = m_particleList->getListSize();
       for (unsigned i = 0; i < n; i++) {
-        const Particle* part = plist->getParticle(i);
+        const Particle* part = m_particleList->getParticle(i);
         if (!m_cut->check(part)) toRemove.push_back(part->getArrayIndex());
       }
-      plist->removeParticles(toRemove);
+      m_particleList->removeParticles(toRemove);
     }
   }
 } // end Belle2 namespace

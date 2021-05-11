@@ -290,19 +290,15 @@ void DBObject::print(bool isfull) const
   printf("\n");
   StringList s = StringUtil::split(getName(), '@');
   if (s.size() > 1) {
-    printf(StringUtil::form("%%-%ds : %%s\n", length).c_str(),
-           "nodename", s[0].c_str());
-    printf(StringUtil::form("%%-%ds : %%s\n", length).c_str(),
-           "config", s[1].c_str());
+    printf("%*s : %s\n", int(-length), "nodename", s[0].c_str());
+    printf("%*s : %s\n", int(-length), "config", s[1].c_str());
   } else {
-    printf(StringUtil::form("%%-%ds : %%s\n", length).c_str(),
-           "config", getName().c_str());
+    printf("%*s : %s\n", int(-length), "config", getName().c_str());
   }
   printf("\n");
   for (NameValueList::iterator it = map.begin();
        it != map.end(); it++) {
-    printf(StringUtil::form("%%-%ds : %%s\n", length).c_str(),
-           it->name.c_str(), it->value.c_str());
+    printf("%*s : %s\n", int(-length), it->name.c_str(), it->value.c_str());
   }
   printf("\n");
   printf("#\n");
@@ -327,19 +323,19 @@ const std::string DBObject::sprint(bool isfull) const
   ss << "" << std::endl;
   StringList s = StringUtil::split(getName(), '@');
   if (s.size() > 1) {
-    ss << StringUtil::form(StringUtil::form("%%-%ds : %%s\n", length),
-                           "nodename", s[0].c_str()) << std:: endl;
-    ss << StringUtil::form(StringUtil::form("%%-%ds : %%s\n", length),
-                           "config", s[1].c_str()) << std:: endl;
+    ss << StringUtil::form("%*s : %s\n", -length, "nodename", s[0].c_str())
+       << std:: endl;
+    ss << StringUtil::form("%*s : %s\n", -length, "config", s[1].c_str())
+       << std:: endl;
   } else {
-    ss << StringUtil::form(StringUtil::form("%%-%ds : %%s\n", length),
-                           "config", getName().c_str()) << std:: endl;
+    ss << StringUtil::form("%*s : %s\n", -length, "config", getName().c_str())
+       << std:: endl;
   }
   ss << "" << std::endl;
   for (NameValueList::iterator it = map.begin();
        it != map.end(); it++) {
-    ss << StringUtil::form(StringUtil::form("%%-%ds : %%s\n", length),
-                           it->name.c_str(), it->value.c_str()) << std:: endl;
+    ss << StringUtil::form("%*s : %s\n", -length, it->name.c_str(), it->value.c_str())
+       << std::endl;
   }
   ss << "" << std::endl;
   ss << "#" << std::endl;
@@ -414,6 +410,7 @@ const
       case DBField::BOOL: ptype = "bool"; break;
       case DBField::INT:  ptype = "int"; break;
       case DBField::FLOAT:  ptype = "float"; break;
+      case DBField::DOUBLE:  ptype = "double"; break;
       default : break;
     }
     if (pro.getType() == DBField::OBJECT) {
@@ -471,6 +468,7 @@ const
 const std::string DBObject::printSQL(const std::string& table, int id) const
 {
   std::stringstream ss;
+
   const std::string& name_in = "";
   NameValueList map;
   bool isfull = false;
@@ -495,6 +493,7 @@ const std::string DBObject::printSQL(const std::string& table, int id) const
         value = StringUtil::replace(value.substr(pos + 1), ")", "");
       }
     }
+
     switch (nv.type) {
       case DBField::BOOL:
         ss << "insert into " << table << " (pid,name,value_b) values "
@@ -505,6 +504,7 @@ const std::string DBObject::printSQL(const std::string& table, int id) const
            << "(" << id << ",'" << nv.name << "'," << value << ");" << std::endl;
         break;
       case DBField::FLOAT:
+      case DBField::DOUBLE:
         ss << "insert into " << table << " (pid,name,value_f) values "
            << "(" << id << ",'" << nv.name << "'," << value << ");" << std::endl;
         break;

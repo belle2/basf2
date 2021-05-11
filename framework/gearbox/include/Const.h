@@ -533,6 +533,8 @@ namespace Belle2 {
 
     static const ParticleSet clusterSet; /**< set of cluster particles */
 
+    static const ParticleSet finalStateParticlesSet; /**< set of final set particles that can be created by the ParticleLoader */
+
     static const ChargedStable electron;  /**< electron particle */
     static const ChargedStable muon;      /**< muon particle */
     static const ChargedStable pion;      /**< charged pion particle */

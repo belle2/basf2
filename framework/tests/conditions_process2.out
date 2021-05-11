@@ -8,10 +8,10 @@
    HER=(0.290583, 0, 6.99797, 7.004), 
    LER=(0.166035, 0, -3.99855, 4.002), 
    CMS=(0.456618, 0, 2.99942, 11.006), 
-   VTX=(0, 0, 0), 
+   VTX=(-0.05, 0.017, -0.01), 
    CovHER=diag(2.63169e-05, 0, 0)
    CovLER=diag(5.64063e-06, 0, 0)
-   CovVTX=[(4.10916e-07, 0, -2.64802e-06), (0, 1.7405e-11, 0), (-2.64802e-06, 0, 0.000237962)]
+   CovVTX=[(1.79873e-06, 0, -1.08724e-05), (0, 4e-08, 0), (-1.08724e-05, 0, 0.00108889)]
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] Conditions Database: found working server
@@ -21,10 +21,10 @@
    HER=(0.290583, 0, 6.99797, 7.004), 
    LER=(0.166035, 0, -3.99855, 4.002), 
    CMS=(0.456618, 0, 2.99942, 11.006), 
-   VTX=(0, 0, 0), 
+   VTX=(-0.05, 0.017, -0.01), 
    CovHER=diag(2.63169e-05, 0, 0)
    CovLER=diag(5.64063e-06, 0, 0)
-   CovVTX=[(4.10916e-07, 0, -2.64802e-06), (0, 1.7405e-11, 0), (-2.64802e-06, 0, 0.000237962)]
+   CovVTX=[(1.79873e-06, 0, -1.08724e-05), (0, 4e-08, 0), (-1.08724e-05, 0, 0.00108889)]
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored

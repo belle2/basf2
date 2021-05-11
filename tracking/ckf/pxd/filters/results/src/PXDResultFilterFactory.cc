@@ -52,7 +52,7 @@ std::string PXDResultFilterFactory::getIdentifier() const
 
 std::string PXDResultFilterFactory::getFilterPurpose() const
 {
-  return "Reject pxd results";
+  return "Reject PXD CKF results. ";
 }
 
 std::map<std::string, std::string> PXDResultFilterFactory::getValidFilterNamesAndDescriptions() const

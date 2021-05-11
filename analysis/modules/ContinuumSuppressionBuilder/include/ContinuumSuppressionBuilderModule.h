@@ -12,6 +12,11 @@
 
 #include <framework/core/Module.h>
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/ContinuumSuppression.h>
+
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 #include <string>
 
@@ -32,7 +37,10 @@ namespace Belle2 {
 
   private:
 
-    std::string m_particleList;  /**< Name of the ParticleList */
+    StoreArray<ContinuumSuppression> m_csarray; /**< StoreArray of ContinuumSuppression */
+    StoreObjPtr<ParticleList> m_plist; /**< input particle list */
+
+    std::string m_particleListName;  /**< Name of the ParticleList */
     std::string m_ROEMask;  /**< ROE mask */
 
     /** print an event for debugging purposes */

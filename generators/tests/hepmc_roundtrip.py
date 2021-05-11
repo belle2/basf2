@@ -9,13 +9,12 @@ again and checking if they match.
 
 import os
 import math
-from ROOT import Belle2
 import basf2 as b2
 import modularAnalysis as ma
 from tempfile import TemporaryDirectory
 
 # analogous to lhereader.py
-input_filename = Belle2.FileSystem.findFile("generators/tests/event.hepmc")
+input_filename = b2.find_file("generators/tests/event.hepmc")
 if len(input_filename) == 0:
     sys.stderr.write("TEST SKIPPED: input file " + filepath + " not found.")
     sys.exit(-1)

@@ -4,6 +4,7 @@
 """Test skims by running them all as a single combined steering file."""
 
 from importlib import import_module
+from glob import glob
 
 from b2test_utils import clean_working_directory, require_file
 import basf2 as b2
@@ -45,9 +46,12 @@ def get_skim_object(SkimName):
 
 def main():
     path = b2.Path()
-    ma.inputMdstList("default", require_file("mdst12.root", "validation"), path=path)
+    mdst_files = glob(f'{b2.find_file("mdst/tests")}/mdst-v*.root')
+    mdst_files.sort(reverse=True)
+    ma.inputMdstList("default", require_file(mdst_files[0]), path=path)
 
-    skim = CombinedSkim(*[get_skim_object(skim) for skim in Registry.names])
+    SkimObjects = [get_skim_object(skim) for skim in Registry.names]
+    skim = CombinedSkim(*[skim for skim in SkimObjects if not isinstance(skim, CombinedSkim)])
     skim(path)
 
     b2.process(path, max_event=10)

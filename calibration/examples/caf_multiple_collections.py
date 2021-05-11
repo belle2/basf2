@@ -2,17 +2,17 @@
 # multiple different Collector configurations. Using different database chains,
 # different Collector module configs, different input files etc.
 
-from basf2 import *
-set_log_level(LogLevel.INFO)
+import basf2 as b2
 
 import os
 import sys
 
-import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm
 
 from caf.framework import Calibration, CAF, Collection
 from caf import backends
+
+b2.set_log_level(b2.LogLevel.INFO)
 
 
 def main(argv):
@@ -43,12 +43,12 @@ def main(argv):
     # We'll make two instances of the same CollectorModule, but configured differently
     # They MUST have the same granularity!
 
-    col_test_1 = register_module('CaTest')
+    col_test_1 = b2.register_module('CaTest')
     col_test_1.set_name('Test')   # Sets the prefix of collected data
     col_test_1.param('granularity', 'all')
     col_test_1.param('spread', 1)
 
-    col_test_2 = register_module('CaTest')
+    col_test_2 = b2.register_module('CaTest')
     col_test_2.set_name('Test')   # Sets the prefix of collected data
     col_test_2.param('granularity', 'all')
     col_test_2.param('spread', 20)
@@ -57,13 +57,13 @@ def main(argv):
     # Reconstruction path setup
     # create the basf2 paths to run before each Collector module
     # Exclude the ARICH instead of CDC
-    rec_path_1 = create_path()
+    rec_path_1 = b2.create_path()
     rec_path_1.add_module('Gearbox')
     rec_path_1.add_module('Geometry', excludedComponents=['SVD', 'PXD', 'ARICH', 'BeamPipe', 'EKLM'])
     # could now add reconstruction modules dependent on the type on input data
 
     # Excluded CDC instead of ARICH
-    rec_path_2 = create_path()
+    rec_path_2 = b2.create_path()
     rec_path_2.add_module('Gearbox')
     rec_path_2.add_module('Geometry', excludedComponents=['SVD', 'PXD', 'CDC', 'BeamPipe', 'EKLM'])
     # could now add reconstruction modules dependent on the type on input data

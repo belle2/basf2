@@ -45,6 +45,10 @@
 //                   |      1 |         77    | E_tot > 20 GeV
 //                   |      1 |         78    | N Cluster  >= 3, at least one Cluster >500 MeV (LAB) with Theta Id 2~16, not 3D ECL Bhabha
 //                   |      1 |         79    | Only one Cluster >500 MeV (CM) with Theta Id 6~11 and no other CL >= 300 MeV(LAB) anywhere
+//                   |      1 |  83 downto 80 | clock counter(set to be "0000" in tsim)
+//                   |      1 |  85 downto 84 | event timing quality flag
+//                   |      1 |         86    | 3D Bhabha Veto Intrk
+//                   |      1 |  88 downto 87 | 3D Bhabha selection theta flag
 // ---------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------
@@ -64,7 +68,6 @@
 #include "trg/ecl/dataobjects/TRGECLTrg.h"
 #include "trg/ecl/dataobjects/TRGECLHit.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
-
 //
 #include <math.h>
 #include <TRandom3.h>
@@ -76,8 +79,10 @@ using namespace Belle2;
 //
 //
 TrgEclMaster::TrgEclMaster():
-  TimeWindow(250.0), OverlapWindow(0.0), _Clustering(1), _Bhabha(0), _EventTiming(1), _NofTopTC(3), _ClusterLimit(6), _Lowmultibit(0),
-  _PrescaleFactor(0), _PrescaleCounter(0), _mumuThreshold(20), _n300MeVCluster(1), _ECLBurstThreshold(200)
+  TimeWindow(250.0), OverlapWindow(0.0), _Clustering(1), _Bhabha(0),
+  _EventTiming(1), _NofTopTC(3), _ClusterLimit(6), _Lowmultibit(0),
+  _PrescaleFactor(0), _PrescaleCounter(0), _mumuThreshold(20),
+  _n300MeVCluster(1), _ECLBurstThreshold(200)
 {
 
   TCEnergy.clear();
@@ -111,7 +116,7 @@ TrgEclMaster::TrgEclMaster():
   _LowMultiThreshold.clear();
 
   _TotalEnergy = {5, 10, 30}; // /100 MeV
-  _2DBhabhaThresholdFWD = {40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 30, 35}; // /100 MeV
+  _2DBhabhaThresholdFWD  = {40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 30, 35}; // /100 MeV
   _2DBhabhaThresholdBWD  = {25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 30, 30}; // /100 MeV
   _3DBhabhaVetoThreshold = {30, 45}; //  /100 MeV
   _3DBhabhaSelectionThreshold = {20, 40}; //  /100 MeV
@@ -119,6 +124,9 @@ TrgEclMaster::TrgEclMaster():
   _3DBhabhaSelectionAngle = {140, 220, 160, 200}; //  /100 MeV
   _mumuAngle = {160, 200, 165, 190}; //  degree
   _LowMultiThreshold = {10, 20, 25, 30}; // degree
+
+  m_3DBhabhaVetoInTrackThetaRegion = {3, 15};
+  m_EventTimingQualityThresholds = {5, 6}; // GeV
 
   //ThetaRingSum.resize(3,std::vector<double>(36,0));
   //PhiRingSum.resize(17,0);
@@ -130,9 +138,10 @@ TrgEclMaster::TrgEclMaster():
   obj_timing = new TrgEclTiming();
   obj_map = new TrgEclMapping();
   obj_database = new TrgEclDataBase();
-
-
 }
+//
+//
+//
 TrgEclMaster::~TrgEclMaster()
 {
   delete obj_cluster;
@@ -140,6 +149,7 @@ TrgEclMaster::~TrgEclMaster()
   delete obj_bhabha;
   delete obj_timing;
   delete obj_map;
+  delete obj_database;
 }
 //
 //
@@ -161,7 +171,6 @@ TrgEclMaster::version(void) const
 //
 //
 void
-//iwasaki TrgEclMaster::initialize(int m_nEvent)
 TrgEclMaster::initialize(int)
 {
 }
@@ -176,16 +185,14 @@ TrgEclMaster*
 TrgEclMaster::getTrgEclMaster(void)
 {
 
-  //  if (! _ecl){
-  //    std::cout << "TrgEclMaster::getTrgEcl !!! TrgEcl is not created yet" << std::endl;
-  //  }
-
   if (_ecl) { delete _ecl; }
   _ecl = new TrgEclMaster();
 
   return _ecl;
-
 }
+//========================================================
+//
+//========================================================
 void
 TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns )
 {
@@ -217,14 +224,13 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
 
     TRGECLHit* aTRGECLHit = trgeclHitArray[ii];
     int iTCID = (aTRGECLHit->getTCId() - 1);
-    double HitTiming    = aTRGECLHit ->getTimeAve();
-    double HitEnergy =  aTRGECLHit -> getEnergyDep();
-    double HitBeamBkg =  aTRGECLHit -> getBeamBkgTag();
+    double HitTiming  = aTRGECLHit->getTimeAve();
+    double HitEnergy  = aTRGECLHit->getEnergyDep();
+    double HitBeamBkg = aTRGECLHit->getBeamBkgTag();
 
     TCTiming[iTCID].push_back(HitTiming);
     TCEnergy[iTCID].push_back(HitEnergy);
     TCBeamBkgTag[iTCID].push_back(HitBeamBkg);
-
   }
   //
   //
@@ -233,12 +239,11 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
   double WindowStart;
   /* cppcheck-suppress variableScope */
   double WindowEnd;
-  double fluctuation = ((gRandom ->Uniform(-1, 0))) * 125;
+  double fluctuation = ((gRandom->Uniform(-1, 0))) * 125;
   /* cppcheck-suppress variableScope */
   double check_window_start;
   /* cppcheck-suppress variableScope */
   double check_window_end;
-
 
   for (int iBin = 0 ; iBin < nBin; iBin ++) {
 
@@ -251,12 +256,12 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     TCHitEnergy.clear();
     TCHitBeamBkgTag.clear();
 
-
     // prepare TC Hit in time window --
     for (int iTCId = 0; iTCId < 576; iTCId++) {
       const int hitsize =  TCTiming[iTCId].size();
       for (int ihit = 0; ihit < hitsize; ihit++) {
-        if (TCTiming[iTCId][ihit] > check_window_start && TCTiming[iTCId][ihit] < check_window_end) {
+        if (TCTiming[iTCId][ihit] > check_window_start &&
+            TCTiming[iTCId][ihit] < check_window_end) {
           HitTCId.push_back(iTCId + 1);
 
         }
@@ -268,7 +273,8 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
       for (int iTCId = 0; iTCId < 576; iTCId++) {
         const int hitsize =  TCTiming[iTCId].size();
         for (int ihit = 0; ihit < hitsize; ihit++) {
-          if (TCTiming[iTCId][ihit] > WindowStart && TCTiming[iTCId][ihit] < WindowEnd) {
+          if (TCTiming[iTCId][ihit] > WindowStart &&
+              TCTiming[iTCId][ihit] < WindowEnd) {
             HitTCId.push_back(iTCId + 1);
             TCHitTiming.push_back(TCTiming[iTCId][ihit]);
             TCHitEnergy.push_back(TCEnergy[iTCId][ihit]);
@@ -280,20 +286,20 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     int noftchit = HitTCId.size();
     if (noftchit == 0) {continue;}
 
-
     double eventtiming = 0;
     // Get EventTiming
-    obj_timing -> Setup(HitTCId, TCHitEnergy, TCHitTiming);
-    obj_timing -> SetNofTopTC(_NofTopTC);
-    eventtiming = obj_timing -> GetEventTiming(_EventTiming);
-    int timingsource = obj_timing -> GetTimingSource();
+    obj_timing->Setup(HitTCId, TCHitEnergy, TCHitTiming);
+    obj_timing->SetNofTopTC(_NofTopTC);
+    //    obj_timing->setEventTimingQualityThresholds(m_EventTimingQualityThresholds);
+
+    eventtiming = obj_timing->GetEventTiming(_EventTiming);
+    int timingsource = obj_timing->GetTimingSource();
+    int EventTimingQualityFlag = obj_timing->getEventTimingQualityFlag();
     //--------------------------------------------------
     // Ring sum and Total Energy Sum
     //-------------------------------------------------
-
     std::vector<std::vector<double>>  thetaringsum;
     std::vector<double>  phiringsum;
-
 
     thetaringsum.clear();
     phiringsum.clear();
@@ -301,17 +307,11 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     phiringsum.resize(17, 0);
     setRS(HitTCId, TCHitEnergy, phiringsum, thetaringsum);
 
-    double E_br = 0;
-    double E_fwd = 0;
-    double E_bwd = 0;
     double E_phys = 0;
     double E_total = 0;
     int E_burst = 0;
     for (int iii = 0; iii <= 16; iii++) {
       if (iii > 0 && iii < 15) {E_phys += phiringsum[iii];}
-      if (iii < 3) {E_fwd += phiringsum[iii];}
-      if (iii > 2 && iii < 15) {E_br += phiringsum[iii];}
-      if (iii > 14) {E_bwd += phiringsum[iii];}
       E_total += phiringsum[iii];
     }
     if (E_total == 0) {continue;}
@@ -329,10 +329,6 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     if (E_phys > _TotalEnergy[2] / 10) { // GeV
       ELum = 0x01;
     }
-
-
-
-
     //--------------
     // Clustering
     //--------------
@@ -348,13 +344,10 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     int icnfwd  = obj_cluster->getICNSub(0);
     int icnbr   = obj_cluster->getICNSub(1);
     int icnbwd = obj_cluster->getICNSub(2);
-
     //    int NofCluster =  obj_cluster->getNofCluster();
     //--------------
     // Low Multiplicity bit
     //--------------
-    //
-    //
     std::vector<double> ClusterTiming;
     std::vector<double> ClusterEnergy;
     std::vector<int> MaxTCId;
@@ -364,10 +357,12 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     StoreArray<TRGECLCluster> trgeclClusterArray;
     for (int ii = 0; ii < trgeclClusterArray.getEntries(); ii++) {
       TRGECLCluster* aTRGECLCluster = trgeclClusterArray[ii];
-      int maxTCId    = aTRGECLCluster ->getMaxTCId();
-      double clusterenergy  = aTRGECLCluster ->getEnergyDep();
-      double clustertiming  =  aTRGECLCluster -> getTimeAve();
-      TVector3 clusterposition(aTRGECLCluster ->getPositionX(), aTRGECLCluster ->getPositionY(), aTRGECLCluster ->getPositionZ());
+      int maxTCId    = aTRGECLCluster->getMaxTCId();
+      double clusterenergy  = aTRGECLCluster->getEnergyDep();
+      double clustertiming  =  aTRGECLCluster->getTimeAve();
+      TVector3 clusterposition(aTRGECLCluster->getPositionX(),
+                               aTRGECLCluster->getPositionY(),
+                               aTRGECLCluster->getPositionZ());
       ClusterTiming.push_back(clustertiming);
       ClusterEnergy.push_back(clusterenergy);
       MaxTCId.push_back(maxTCId);
@@ -375,18 +370,16 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     //    const int ncluster = ClusterEnergy.size();
 
     makeLowMultiTriggerBit(MaxTCId, ClusterEnergy);
-
     //--------------
     // Bhabha veto
     //--------------
-
-    obj_bhabha-> set2DBhabhaThreshold(_2DBhabhaThresholdFWD, _2DBhabhaThresholdBWD);
-    obj_bhabha -> set3DBhabhaSelectionThreshold(_3DBhabhaSelectionThreshold);
-    obj_bhabha -> set3DBhabhaVetoThreshold(_3DBhabhaVetoThreshold);
-    obj_bhabha -> set3DBhabhaSelectionAngle(_3DBhabhaSelectionAngle);
-    obj_bhabha -> set3DBhabhaVetoAngle(_3DBhabhaVetoAngle);
-    obj_bhabha -> setmumuThreshold(_mumuThreshold);
-    obj_bhabha -> setmumuAngle(_mumuAngle);
+    obj_bhabha->set2DBhabhaThreshold(_2DBhabhaThresholdFWD, _2DBhabhaThresholdBWD);
+    obj_bhabha->set3DBhabhaSelectionThreshold(_3DBhabhaSelectionThreshold);
+    obj_bhabha->set3DBhabhaVetoThreshold(_3DBhabhaVetoThreshold);
+    obj_bhabha->set3DBhabhaSelectionAngle(_3DBhabhaSelectionAngle);
+    obj_bhabha->set3DBhabhaVetoAngle(_3DBhabhaVetoAngle);
+    obj_bhabha->setmumuThreshold(_mumuThreshold);
+    obj_bhabha->setmumuAngle(_mumuAngle);
 
     std::vector<double> vct_bhabha;
     vct_bhabha.clear();
@@ -394,23 +387,26 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     int bhabha3D_veto = 0 ;
     int bhabha3D_sel = 0;
     int mumu = 0;
+    int bhabha3DVetoInTrackFlag = 0;
+    int bhabha3DSelectionThetaFlag = 0;
 
-    bool b_2Dbhabha = obj_bhabha -> GetBhabha00(phiringsum);
-    vct_bhabha = obj_bhabha -> GetBhabhaComb();
+    bool b_2Dbhabha = obj_bhabha->GetBhabha00(phiringsum);
+    vct_bhabha = obj_bhabha->GetBhabhaComb();
     if (b_2Dbhabha && (icn < 4)) {bhabha2D = 1;}
-    bool b_3Dbhabha =  obj_bhabha -> GetBhabha01();
+    bool b_3Dbhabha =  obj_bhabha->GetBhabha01();
     if (b_3Dbhabha) {bhabha3D_veto = 1;}
-    bool b_3Dbhabha_sel =  obj_bhabha -> GetBhabha02();
+    bool b_3Dbhabha_sel =  obj_bhabha->GetBhabha02();
     if (b_3Dbhabha_sel) {bhabha3D_sel = 1;}
-    bool b_mumu =  obj_bhabha -> Getmumu();
+    bool b_mumu =  obj_bhabha->Getmumu();
     if (b_mumu) {mumu = 1;}
+    bhabha3DVetoInTrackFlag = obj_bhabha->get3DBhabhaVetoInTrackFlag();
+    bhabha3DSelectionThetaFlag = obj_bhabha->get3DBhabhaSelectionThetaFlag();
     //------------------------
     // Beam Background veto (Old cosmic veto)
     //------------------------
-    bool boolBeamBkgTag = false;
     int beambkgtag = 0;
-    boolBeamBkgTag =   obj_beambkg -> GetBeamBkg(thetaringsum);
-    if (boolBeamBkgTag) {beambkgtag = 1;}
+    beambkgtag = obj_beambkg->GetBeamBkg(thetaringsum);
+
     int bhabhaprescale = 0;
     if (_PrescaleFactor == _PrescaleCounter) {
       bhabhaprescale = 1;
@@ -418,9 +414,6 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     } else if (_PrescaleFactor > _PrescaleCounter) {
       _PrescaleCounter ++;
     }
-
-
-
     //-------------
     // Make ECL  Trigger Bit
     //-------------
@@ -443,21 +436,21 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
       flagoverflow = 1;
     }
 
-    makeTriggerBit(hit, Timing, 0, timingsource, E_phys, bhabha2D, physics, bhabhabit, icn, beambkgtag, flagoverflow,
-                   bhabha3D_veto, _Lowmultibit, bhabha3D_sel, mumu, bhabhaprescale, E_burst);
-
+    makeTriggerBit(hit, Timing, 0, timingsource, E_phys,
+                   bhabha2D, physics, bhabhabit, icn, beambkgtag,
+                   flagoverflow, bhabha3D_veto, _Lowmultibit,
+                   bhabha3D_sel, mumu, bhabhaprescale, E_burst,
+                   EventTimingQualityFlag,
+                   bhabha3DVetoInTrackFlag,
+                   bhabha3DSelectionThetaFlag);
 
     int m_hitEneNum = 0;
     StoreArray<TRGECLTrg> trgEcltrgArray;
     trgEcltrgArray.appendNew();
     m_hitEneNum = trgEcltrgArray.getEntries() - 1;
-
-    //----------------------
-    //
     //-------------
     // Store
     //-------------
-
     trgEcltrgArray[m_hitEneNum]->setEventId(m_nEvent);
     trgEcltrgArray[m_hitEneNum]->setPRS01(phiringsum[0]);
     trgEcltrgArray[m_hitEneNum]->setPRS02(phiringsum[1]);
@@ -523,19 +516,18 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     trgEcltrgArray[m_hitEneNum]->setmumuBit(mumu);
     trgEcltrgArray[m_hitEneNum]->setBhabhaPrescaleBit(bhabhaprescale);
 
-
     trgEcltrgArray[m_hitEneNum]->setELow(ELow)  ;
     trgEcltrgArray[m_hitEneNum]->setEHihg(EHigh);
     trgEcltrgArray[m_hitEneNum]->setELum(ELum)  ;
     trgEcltrgArray[m_hitEneNum]->setClusterOverflow(ClusterOverflow) ;
     trgEcltrgArray[m_hitEneNum]->setLowMultiBit(_Lowmultibit);
-
-
   }
 
   return;
 }
-
+//========================================================
+//
+//========================================================
 void
 TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger logic
 {
@@ -567,26 +559,24 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
 
     TRGECLHit* aTRGECLHit = trgeclHitArray[ii];
     int iTCID = (aTRGECLHit->getTCId() - 1);
-    double HitTiming    = aTRGECLHit ->getTimeAve();
-    double HitEnergy =  aTRGECLHit -> getEnergyDep();
-    double HitBeamBkg =  aTRGECLHit -> getBeamBkgTag();
+    double HitTiming  = aTRGECLHit->getTimeAve();
+    double HitEnergy  = aTRGECLHit->getEnergyDep();
+    double HitBeamBkg = aTRGECLHit->getBeamBkgTag();
 
     TCTiming[iTCID].push_back(HitTiming);
     TCEnergy[iTCID].push_back(HitEnergy);
     TCBeamBkgTag[iTCID].push_back(HitBeamBkg);
-
   }
   //
   //
   int nBin = 2 * 8000 / TimeWindow ;
   double WindowStart = 0;
   double WindowEnd = 0;
-  double fluctuation = ((gRandom ->Uniform(-1, 0))) * 125;
+  double fluctuation = ((gRandom->Uniform(-1, 0))) * 125;
 
   int startBin = nBin / 2 - 1; //start previous bin near 0s
 
   int endBin = nBin / 2 + 1; //start next bin near 0s
-
 
   if (_EventTiming == 0) {
     TimeWindow = 500;
@@ -595,7 +585,6 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
 
   double maxE = 0;
   int max_bin = 0;
-
 
   for (int iBin = startBin ; iBin <= endBin; iBin ++) {
     WindowStart = iBin * (TimeWindow - OverlapWindow) + fluctuation - 4000;
@@ -607,7 +596,8 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
     for (int iTCId = 0; iTCId < 576; iTCId++) {
       const int hitsize =  TCTiming[iTCId].size();
       for (int ihit = 0; ihit < hitsize; ihit++) {
-        if (TCTiming[iTCId][ihit] > WindowStart && TCTiming[iTCId][ihit] < WindowEnd) {
+        if (TCTiming[iTCId][ihit] > WindowStart &&
+            TCTiming[iTCId][ihit] < WindowEnd) {
           totalE += TCEnergy[iTCId][ihit] ;
         }
       }
@@ -619,12 +609,9 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
     }
   }
 
-
-
   WindowStart = max_bin * (TimeWindow - OverlapWindow) + fluctuation - 4000;
   if (max_bin == 0) {WindowStart = - 4000 + fluctuation;}
   WindowEnd = WindowStart + TimeWindow;
-
 
   HitTCId.clear();
   TCHitTiming.clear();
@@ -634,7 +621,8 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   for (int iTCId = 0; iTCId < 576; iTCId++) {
     const int hitsize =  TCTiming[iTCId].size();
     for (int ihit = 0; ihit < hitsize; ihit++) {
-      if (TCTiming[iTCId][ihit] > WindowStart && TCTiming[iTCId][ihit] < WindowEnd) {
+      if (TCTiming[iTCId][ihit] > WindowStart &&
+          TCTiming[iTCId][ihit] < WindowEnd) {
         HitTCId.push_back(iTCId + 1);
         TCHitTiming.push_back(TCTiming[iTCId][ihit]);
         TCHitEnergy.push_back(TCEnergy[iTCId][ihit]);
@@ -643,28 +631,24 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
     }
   }
 
-
   int noftchit = HitTCId.size();
   if (noftchit == 0) { return;}
 
-
-
   double eventtiming = 0;
   // Get EventTiming
-  obj_timing -> Setup(HitTCId, TCHitEnergy, TCHitTiming);
-  obj_timing -> SetNofTopTC(_NofTopTC);
-  eventtiming = obj_timing -> GetEventTiming(_EventTiming);
-  int timingsource = obj_timing -> GetTimingSource();
+  obj_timing->Setup(HitTCId, TCHitEnergy, TCHitTiming);
+  obj_timing->SetNofTopTC(_NofTopTC);
+  obj_timing->setEventTimingQualityThresholds(m_EventTimingQualityThresholds);
 
+  eventtiming = obj_timing->GetEventTiming(_EventTiming);
+  int timingsource = obj_timing->GetTimingSource();
 
-
+  int EventTimingQualityFlag = obj_timing->getEventTimingQualityFlag();
   //--------------------------------------------------
   // Ring sum and Total Energy Sum
   //-------------------------------------------------
-
   std::vector<std::vector<double>>  thetaringsum;
   std::vector<double>  phiringsum;
-
 
   thetaringsum.clear();
   phiringsum.clear();
@@ -672,18 +656,18 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   phiringsum.resize(17, 0);
   setRS(HitTCId, TCHitEnergy, phiringsum, thetaringsum);
 
-  double E_br;
-  double E_fwd;
-  double E_bwd;
+  //double E_br;  //variable not used
+  //double E_fwd; //variable not used
+  //double E_bwd; //variable not used
   double E_phys = 0;
   double E_total = 0;
   int E_burst = 0;
 
   for (int iii = 0; iii <= 16; iii++) {
     if (iii > 0 && iii < 15) {E_phys += phiringsum[iii];}
-    if (iii < 3) {E_fwd += phiringsum[iii];}
-    if (iii > 2 && iii < 15) {E_br += phiringsum[iii];}
-    if (iii > 14) {E_bwd += phiringsum[iii];}
+    //if (iii < 3) {E_fwd += phiringsum[iii];} //TODO variable not used, should be?
+    //if (iii > 2 && iii < 15) {E_br += phiringsum[iii];} //TODO not used, should be?
+    //if (iii > 14) {E_bwd += phiringsum[iii];} //TODO not used, should be?
     E_total += phiringsum[iii];
   }
   if (E_total == 0) {return;}
@@ -701,9 +685,6 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   if (E_phys > _TotalEnergy[2] / 10) { // GeV
     ELum = 0x01;
   }
-
-
-
   //--------------
   // Clustering
   //--------------
@@ -715,18 +696,14 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   obj_cluster->setICN(HitTCId, TCHitEnergy, TCHitTiming);// Clustering
   obj_cluster->setICN(HitTCId); // Belle Cluster Counting
 
-
-  int icn = obj_cluster->getICNFwBr();
-  int icnfwd  = obj_cluster->getICNSub(0);
-  int icnbr   = obj_cluster->getICNSub(1);
+  int icn    = obj_cluster->getICNFwBr();
+  int icnfwd = obj_cluster->getICNSub(0);
+  int icnbr  = obj_cluster->getICNSub(1);
   int icnbwd = obj_cluster->getICNSub(2);
-
   //    int NofCluster =  obj_cluster->getNofCluster();
   //--------------
   // Low Multiplicity bit
   //--------------
-  //
-  //
   std::vector<double> ClusterTiming;
   std::vector<double> ClusterEnergy;
   std::vector<int> MaxTCId;
@@ -736,29 +713,30 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   StoreArray<TRGECLCluster> trgeclClusterArray;
   for (int ii = 0; ii < trgeclClusterArray.getEntries(); ii++) {
     TRGECLCluster* aTRGECLCluster = trgeclClusterArray[ii];
-    int maxTCId    = aTRGECLCluster ->getMaxTCId();
-    double clusterenergy  = aTRGECLCluster ->getEnergyDep();
-    double clustertiming  =  aTRGECLCluster -> getTimeAve();
-    TVector3 clusterposition(aTRGECLCluster ->getPositionX(), aTRGECLCluster ->getPositionY(), aTRGECLCluster ->getPositionZ());
+    int maxTCId    = aTRGECLCluster->getMaxTCId();
+    double clusterenergy  = aTRGECLCluster->getEnergyDep();
+    double clustertiming  =  aTRGECLCluster->getTimeAve();
+    TVector3 clusterposition(aTRGECLCluster->getPositionX(),
+                             aTRGECLCluster->getPositionY(),
+                             aTRGECLCluster->getPositionZ());
     ClusterTiming.push_back(clustertiming);
     ClusterEnergy.push_back(clusterenergy);
     MaxTCId.push_back(maxTCId);
   }
   //    int NofCluster =  obj_cluster->getNofCluster();
   makeLowMultiTriggerBit(MaxTCId, ClusterEnergy);
-
   //--------------
   // Bhabha veto
   //--------------
-  //
-  obj_bhabha-> set2DBhabhaThreshold(_2DBhabhaThresholdFWD, _2DBhabhaThresholdBWD);
-  obj_bhabha -> set3DBhabhaSelectionThreshold(_3DBhabhaSelectionThreshold);
-  obj_bhabha -> set3DBhabhaVetoThreshold(_3DBhabhaVetoThreshold);
-  obj_bhabha -> set3DBhabhaSelectionAngle(_3DBhabhaSelectionAngle);
-  obj_bhabha -> set3DBhabhaVetoAngle(_3DBhabhaVetoAngle);
-  obj_bhabha -> setmumuThreshold(_mumuThreshold);
-  obj_bhabha -> setmumuAngle(_mumuAngle);
-
+  obj_bhabha->set2DBhabhaThreshold(_2DBhabhaThresholdFWD,
+                                   _2DBhabhaThresholdBWD);
+  obj_bhabha->set3DBhabhaSelectionThreshold(_3DBhabhaSelectionThreshold);
+  obj_bhabha->set3DBhabhaVetoThreshold(_3DBhabhaVetoThreshold);
+  obj_bhabha->set3DBhabhaSelectionAngle(_3DBhabhaSelectionAngle);
+  obj_bhabha->set3DBhabhaVetoAngle(_3DBhabhaVetoAngle);
+  obj_bhabha->setmumuThreshold(_mumuThreshold);
+  obj_bhabha->setmumuAngle(_mumuAngle);
+  obj_bhabha->set3DBhabhaVetoInTrackThetaRegion(m_3DBhabhaVetoInTrackThetaRegion);
 
   std::vector<double> vct_bhabha;
   vct_bhabha.clear();
@@ -766,15 +744,17 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   int bhabha3D_veto = 0 ;
   int bhabha3D_sel = 0;
   int mumu = 0;
+  int bhabha3DVetoInTrackFlag = -1;
+  int bhabha3DSelectionThetaFlag = -1;
 
-  bool b_2Dbhabha = obj_bhabha -> GetBhabha00(phiringsum);
-  vct_bhabha = obj_bhabha -> GetBhabhaComb();
+  bool b_2Dbhabha = obj_bhabha->GetBhabha00(phiringsum);
+  vct_bhabha = obj_bhabha->GetBhabhaComb();
   if (b_2Dbhabha && (icn < 4)) {bhabha2D = 1;}
-  bool b_3Dbhabha =  obj_bhabha -> GetBhabha01();
+  bool b_3Dbhabha =  obj_bhabha->GetBhabha01();
   if (b_3Dbhabha) {bhabha3D_veto = 1;}
-  bool b_3Dbhabha_sel =  obj_bhabha -> GetBhabha02();
+  bool b_3Dbhabha_sel =  obj_bhabha->GetBhabha02();
   if (b_3Dbhabha_sel) {bhabha3D_sel = 1;}
-  bool b_mumu =  obj_bhabha -> Getmumu();
+  bool b_mumu =  obj_bhabha->Getmumu();
   if (b_mumu) {mumu = 1;}
   int bhabhaprescale = 0;
   if (_PrescaleFactor == _PrescaleCounter) {
@@ -783,14 +763,14 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   } else if (_PrescaleFactor > _PrescaleCounter) {
     _PrescaleCounter ++;
   }
-
+  bhabha3DVetoInTrackFlag    = obj_bhabha->get3DBhabhaVetoInTrackFlag();
+  bhabha3DSelectionThetaFlag = obj_bhabha->get3DBhabhaSelectionThetaFlag();
   //------------------------
-  // Beam Background veto (Old cosmic veto)
+  // Beam Background veto
   //------------------------
-  bool boolBeamBkgTag = false;
   int beambkgtag = 0;
-  boolBeamBkgTag =   obj_beambkg -> GetBeamBkg(thetaringsum);
-  if (boolBeamBkgTag) {beambkgtag = 1;}
+  beambkgtag = obj_beambkg->GetBeamBkg(thetaringsum);
+
   //-------------
   // Make ECL  Trigger Bit
   //-------------
@@ -814,14 +794,16 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
     flagoverflow = 1;
   }
 
-  makeTriggerBit(hit, Timing, 0, timingsource, E_phys, bhabha2D, physics, bhabhabit, icn, beambkgtag, flagoverflow,
-                 bhabha3D_veto, _Lowmultibit, bhabha3D_sel, mumu, bhabhaprescale, E_burst);
-
-  //
-  //
-  //--------------
+  makeTriggerBit(hit, Timing, 0, timingsource, E_phys, bhabha2D,
+                 physics, bhabhabit, icn, beambkgtag, flagoverflow,
+                 bhabha3D_veto, _Lowmultibit, bhabha3D_sel, mumu,
+                 bhabhaprescale, E_burst,
+                 EventTimingQualityFlag,
+                 bhabha3DVetoInTrackFlag,
+                 bhabha3DSelectionThetaFlag);
+  //----------------------------------------------------
   // ECL trigger
-  //--------------
+  //----------------------------------------------------
   // Integer GDL "Output word to GDL:"
   //  "bit0-2 = Etot1,2,3"
   //  "bit3 = Bhabha,"
@@ -899,18 +881,13 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   //   }
 
 
-
   int m_hitEneNum = 0;
   StoreArray<TRGECLTrg> trgEcltrgArray;
   trgEcltrgArray.appendNew();
   m_hitEneNum = trgEcltrgArray.getEntries() - 1;
-
-  //----------------------
-  //
-  //-------------
+  //----------------------------------------------------
   // Store
-  //-------------
-
+  //----------------------------------------------------
   trgEcltrgArray[m_hitEneNum]->setEventId(m_nEvent);
   trgEcltrgArray[m_hitEneNum]->setPRS01(phiringsum[0]);
   trgEcltrgArray[m_hitEneNum]->setPRS02(phiringsum[1]);
@@ -982,18 +959,43 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   trgEcltrgArray[m_hitEneNum]->setClusterOverflow(ClusterOverflow) ;
   trgEcltrgArray[m_hitEneNum]->setLowMultiBit(_Lowmultibit);
 
+  trgEcltrgArray[m_hitEneNum]->set3DBhabhaVetoInTrackFlag(obj_bhabha->get3DBhabhaVetoInTrackFlag());
+  trgEcltrgArray[m_hitEneNum]->set3DBhabhaVetoClusterTCId(obj_bhabha->get3DBhabhaVetoClusterTCId(0), 0);
+  trgEcltrgArray[m_hitEneNum]->set3DBhabhaVetoClusterTCId(obj_bhabha->get3DBhabhaVetoClusterTCId(1), 1);
+  trgEcltrgArray[m_hitEneNum]->set3DBhabhaVetoClusterEnergy(obj_bhabha->get3DBhabhaVetoClusterEnergy(0), 0);
+  trgEcltrgArray[m_hitEneNum]->set3DBhabhaVetoClusterEnergy(obj_bhabha->get3DBhabhaVetoClusterEnergy(1), 1);
+  trgEcltrgArray[m_hitEneNum]->set3DBhabhaVetoClusterTiming(obj_bhabha->get3DBhabhaVetoClusterTiming(0), 0);
+  trgEcltrgArray[m_hitEneNum]->set3DBhabhaVetoClusterTiming(obj_bhabha->get3DBhabhaVetoClusterTiming(1), 1);
+  trgEcltrgArray[m_hitEneNum]->set3DBhabhaVetoClusterThetaId(obj_bhabha->get3DBhabhaVetoClusterThetaId(0), 0);
+  trgEcltrgArray[m_hitEneNum]->set3DBhabhaVetoClusterThetaId(obj_bhabha->get3DBhabhaVetoClusterThetaId(1), 1);
 
+  trgEcltrgArray[m_hitEneNum]->set3DBhabhaSelectionThetaFlag(obj_bhabha->get3DBhabhaSelectionThetaFlag());
+  trgEcltrgArray[m_hitEneNum]->set3DBhabhaSelectionClusterTCId(obj_bhabha->get3DBhabhaSelectionClusterTCId(0), 0);
+  trgEcltrgArray[m_hitEneNum]->set3DBhabhaSelectionClusterTCId(obj_bhabha->get3DBhabhaSelectionClusterTCId(1), 1);
+  trgEcltrgArray[m_hitEneNum]->set3DBhabhaSelectionClusterEnergy(obj_bhabha->get3DBhabhaSelectionClusterEnergy(0), 0);
+  trgEcltrgArray[m_hitEneNum]->set3DBhabhaSelectionClusterEnergy(obj_bhabha->get3DBhabhaSelectionClusterEnergy(1), 1);
+  trgEcltrgArray[m_hitEneNum]->set3DBhabhaSelectionClusterTiming(obj_bhabha->get3DBhabhaSelectionClusterTiming(0), 0);
+  trgEcltrgArray[m_hitEneNum]->set3DBhabhaSelectionClusterTiming(obj_bhabha->get3DBhabhaSelectionClusterTiming(1), 1);
+  trgEcltrgArray[m_hitEneNum]->set3DBhabhaSelectionClusterThetaId(obj_bhabha->get3DBhabhaSelectionClusterThetaId(0), 0);
+  trgEcltrgArray[m_hitEneNum]->set3DBhabhaSelectionClusterThetaId(obj_bhabha->get3DBhabhaSelectionClusterThetaId(1), 1);
 
+  trgEcltrgArray[m_hitEneNum]->setEventTimingQualityFlag(obj_timing->getEventTimingQualityFlag());
+  trgEcltrgArray[m_hitEneNum]->setEventTimingTCId(obj_timing->getEventTimingTCId());
+  trgEcltrgArray[m_hitEneNum]->setEventTimingTCThetaId(obj_timing->getEventTimingTCThetaId());
+  trgEcltrgArray[m_hitEneNum]->setEventTimingTCEnergy(obj_timing->getEventTimingTCEnergy());
+
+  trgEcltrgArray[m_hitEneNum]->setDataClockWindowStartTime(WindowStart);
 
   return;
 }
-
+//========================================================
 //
-//
-//
+//========================================================
 void
-TrgEclMaster::setRS(std::vector<int> TCId, std::vector<double> TCHit, std::vector<double>& phiringsum,
-                    std::vector<std::vector<double>>&  thetaringsum)
+TrgEclMaster::setRS(std::vector<int> TCId,
+                    std::vector<double> TCHit,
+                    std::vector<double>& phiringsum,
+                    std::vector<std::vector<double>>& thetaringsum)
 {
   //
   //
@@ -1015,15 +1017,20 @@ TrgEclMaster::setRS(std::vector<int> TCId, std::vector<double> TCHit, std::vecto
   for (int iHit = 0; iHit < size_hit; iHit++) {
     int iTCId = TCId[iHit] - 1;
     if (TCHit[iHit] > 0) {
-      int iTCThetaId = obj_map ->getTCThetaIdFromTCId(iTCId + 1) - 1 ;
-      int iTCPhiId = obj_map ->getTCPhiIdFromTCId(iTCId + 1) - 1 ;
+      int iTCThetaId = obj_map->getTCThetaIdFromTCId(iTCId + 1) - 1 ;
+      int iTCPhiId   = obj_map->getTCPhiIdFromTCId(iTCId + 1) - 1 ;
       phiringsum[iTCThetaId] += TCHit[iHit];
-      if (iTCThetaId - 1 < 3) { //fwd
-        thetaringsum[0][iTCPhiId] += TCHit[iHit];
-      } else if (iTCThetaId > 14) { //bwd
-        thetaringsum[2][iTCPhiId] += TCHit[iHit];
-      } else { //barrel
+      if (iTCThetaId < 3) {
+        //fwd
+        if (iTCThetaId != 0) {
+          thetaringsum[0][iTCPhiId] += TCHit[iHit];
+        }
+      } else if (iTCThetaId < 15) {
+        //barrel
         thetaringsum[1][iTCPhiId] += TCHit[iHit];
+      } else {
+        //bwd
+        thetaringsum[2][iTCPhiId] += TCHit[iHit];
       }
 
     }
@@ -1031,60 +1038,24 @@ TrgEclMaster::setRS(std::vector<int> TCId, std::vector<double> TCHit, std::vecto
   }
 
 }
-
-
-void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSource, double etot, int bhabha2D, int physics,
-                                  std::vector<int> bhabhatype, int ICN, int BGVeto, int ClusterOverflow, int bhabha3D, int lowmultibit, int bhabha3D_sel, int mumubit,
-                                  int prescale, int burst)
+//========================================================
+//
+//========================================================
+void
+TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSource,
+                             double etot, int bhabha2D, int physics,
+                             std::vector<int> bhabhatype, int ICN, int BGVeto,
+                             int ClusterOverflow, int bhabha3D, int lowmultibit,
+                             int bhabha3D_sel, int mumubit, int prescale, int burst,
+                             int EventTimingQualityFlag, int bhabha3DVetoInTrackFlag,
+                             int bhabha3DSelectionThetaFlag)
 {
-
 
   _Triggerbit[0] = 0;
   _Triggerbit[1] = 0;
   _Triggerbit[2] = 0;
   _Triggerbit[3] = 0;
 
-  //---------------------------------------------------------------------------------
-  // ECL trigger
-  //---------------------------------------------------------------------------------
-  //Variable(in Tsim) | N(bit) |   Address     | Parameter
-  //-------------------------------------- ------------------------------------------
-  //                  |      1 |         0     | TRG(Hit or not)
-  //                  |      7 |   7 downto 1  | Timing (LSB = 1 ns )
-  //   _Triggerbit[0] |      7 |  14 downto 8  | Revoclk from FAM (LSB  = 125 ns)
-  //   (upto 12th     |      3 |  17 downto 15 | ECL-TRG Timing Source
-  //   bhabha bit)    |      1 |            18 | Physics TRG
-  //     (32bit)      |      1 |            19 | Belle type Bhabha
-  //------------------|     14 |  33 downto 20 | Bhabha Type
-  //                  |     13 |  46 downto 34 | Total Energy
-  //                  |      1 |            47 | E low (Etot >0.5 GeV)
-  //                  |      1 |            48 | E High (Etot > 1.0 GeV)
-  //   _Triggerbit[1] |      1 |            49 | E lom (Etot > 3.0 GeV)
-  //                  |      7 |  56 dwonto 50 | ICN
-  //                  |      3 |  59 downto 57 | BG veto
-  //                  |      1 |            60 | Cluster Overflow
-  //                  |      1 |            61 | 3D Bhabha Trigger
-  //                  |      1 |         62    | N Cluster  >= 3, at least one Cluster >300 MeV (LAB), not 3D ECL Bhabha
-  //_________________ |      1 |         63    | one Cluster >= 2GeV(CM) with Theta Id = 4~14
-  //                  |      1 |         64    | one Cluster >= 2GeV(CM) with Theta Id = 2,3,15 or 16 and not a 3D ECL Bhabha
-  //                  |      1 |         65    | one Cluster >= 2GeV(CM) with Theta Id = 2, 3, 15 or 16 and not a 3D ECL Bhabha
-  //                  |      1 |         66    | one Cluster >= 2GeV(CM) with Theta Id = 1 or 17 and not a 3D ECL Bhabha
-  //                  |      1 |         67    | one Cluster >= 2GeV(CM) with Theta Id = 1 or 17 and a 3D ECL Bhabha
-  //   _Triggerbit[2] |      1 |         68    | exactly one Cluster >= 1GeV(CM) and one Cluster > 300  MeV (LAB ), in Theta Id 4~15(Barrel)
-  //                  |      1 |         69    | exactly one Cluster >= 1GeV(CM) and one Cluster > 300 MeV (LAB), in Theta Id 2, 3 or 16
-  //                  |      1 |         70    | 170 < delta phi(CM) < 190 degree, both Clusters > 250 MeV (LAB), and no 2GeV (CM) Cluster
-  //                  |      1 |         71    | 170 < delta phi(CM) < 190 degree, one Cluster < 250 MeV (LAB), the other Cluster > 250 MeV(LAB), and no 2GeV (CM) Cluster
-  //                  |      1 |         72    | 160 < delta phi(CM) < 200 degree, 160 < Sum Theta (CM)< 200 degree, no 2 GeV(CM) cluster
-  //                  |      1 |         73    | No 2GeV (CM) Cluster
-  //                  |      1 |         74    | 3D Bhabha Trigger for selection
-  //                  |      1 |         75    | mumu bit
-  //                  |      1 |         76    | Bhabha prescale bit
-  //                  |      1 |         77    | E_tot > 20 GeV
-  //---------------------------------------------------------------------------------
-  //
-  //
-  //
-  //
   //  int physics = 0;
   int elow = 0;
   int ehigh = 0;
@@ -1113,7 +1084,6 @@ void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSo
     }
   }
 
-
   int bit_hit = hit & 0x01;
   int bit_Timing = (Timing & 0x7F) ;
   int bit_RevoFAM = (RevoFAM & 0x7F) ;
@@ -1136,6 +1106,25 @@ void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSo
   int bit_mumu = mumubit & 0x01;
   int bit_prescale = prescale & 0x01;
   int bit_burst = burst & 0x01;
+  int bit_clkcc = 0;  // 4 bits for revo counter (set to be 0 in tsim)
+  int bit_eventtimingqualityflag = EventTimingQualityFlag & 0x03;
+  int bit_bhabha3dvetointrackflag = 0;
+  if (bhabha3D == 1) {
+    bit_bhabha3dvetointrackflag = bhabha3DVetoInTrackFlag & 0x01;
+  }
+  int bit_bhabha3dselectionthetaflag = 0;
+  if (bhabha3D_sel == 1) {
+    bit_bhabha3dselectionthetaflag = bhabha3DSelectionThetaFlag & 0x03;
+  }
+
+  _Triggerbit[2] |= bit_bhabha3dselectionthetaflag;
+  _Triggerbit[2] <<= 1;
+  _Triggerbit[2] |= bit_bhabha3dvetointrackflag;
+  _Triggerbit[2] <<= 2;
+  _Triggerbit[2] |= bit_eventtimingqualityflag;
+  _Triggerbit[2] <<= 4;
+  _Triggerbit[2] |= bit_clkcc;
+  _Triggerbit[2] <<= 2;
   _Triggerbit[2] |= bit_lowmulti2;
   _Triggerbit[2] <<= 1;
   _Triggerbit[2] |= bit_burst;
@@ -1147,7 +1136,6 @@ void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSo
   _Triggerbit[2] |= bit_3DBhabha_sel;
   _Triggerbit[2] <<= 10;
   _Triggerbit[2] |= ((bit_lowmulti1) >> 2) & 0x3FF;
-
 
   _Triggerbit[1] |= (bit_lowmulti1 & 0x03);
   _Triggerbit[1] <<= 1;
@@ -1169,7 +1157,6 @@ void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSo
   _Triggerbit[1] <<= 2;
   _Triggerbit[1] |= ((bit_bhabhatype >> 12) & 0x03);
 
-
   _Triggerbit[0] |= (bit_bhabhatype & 0x0FFF);
   _Triggerbit[0] <<= 1;
   _Triggerbit[0] |= bit_2Dbhabha;
@@ -1184,16 +1171,15 @@ void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSo
   _Triggerbit[0] <<= 1;
   _Triggerbit[0] |= bit_hit;
 
-
-
-
-
-
-
+  // int tmp = (_Triggerbit[2] >> 24) & 0x03;
+  // printf("%5i %5i %i\n", bit_bhabha3dselectionthetaflag, tmp, _Triggerbit[2]);
 }
-
-
-void TrgEclMaster::makeLowMultiTriggerBit(std::vector<int> CenterTCId, std::vector<double> clusterenergy)
+//
+//
+//
+void
+TrgEclMaster::makeLowMultiTriggerBit(std::vector<int> CenterTCId,
+                                     std::vector<double> clusterenergy)
 {
 
   //---------------------------------------------------------------------------------
@@ -1287,15 +1273,20 @@ void TrgEclMaster::makeLowMultiTriggerBit(std::vector<int> CenterTCId, std::vect
       if (dphi > 170. && clusterenergy[i0] > _LowMultiThreshold[2] / 100
           && clusterenergy[i1] >  _LowMultiThreshold[2] / 100) {_nPhiPairHigh++;}
       if (dphi > 170. &&
-          ((clusterenergy[i0] <  _LowMultiThreshold[2] / 100 && clusterenergy[i1] >  _LowMultiThreshold[2] / 100) ||
-           (clusterenergy[i0] >  _LowMultiThreshold[2] / 100 && clusterenergy[i1] <  _LowMultiThreshold[2] / 100))) {_nPhiPairLow++;}
+          ((clusterenergy[i0] <  _LowMultiThreshold[2] / 100 &&
+            clusterenergy[i1] >  _LowMultiThreshold[2] / 100) ||
+           (clusterenergy[i0] >  _LowMultiThreshold[2] / 100 &&
+            clusterenergy[i1] <  _LowMultiThreshold[2] / 100))) {_nPhiPairLow++;}
       //..3D
       if (dphi > 160. && thetaSum > 160. && thetaSum < 200) {_n3DPair++;}
       //..ecl Bhabha
-      if (dphi > 160 && thetaSum > 165 && thetaSum < 190 && clusterenergy[i0] * 100 > _3DBhabhaVetoThreshold[0] * energy1
-          && clusterenergy[i1] * 100 > _3DBhabhaVetoThreshold[0]  * energy2
-          && (clusterenergy[i0] * 100 > _3DBhabhaVetoThreshold[1]  * energy1
-              ||  clusterenergy[i1] * 100 > _3DBhabhaVetoThreshold[1]  * energy2)) {
+      if (dphi > 160 &&
+          thetaSum > 165 &&
+          thetaSum < 190 &&
+          clusterenergy[i0] * 100 > _3DBhabhaVetoThreshold[0] * energy1 &&
+          clusterenergy[i1] * 100 > _3DBhabhaVetoThreshold[0]  * energy2 &&
+          (clusterenergy[i0] * 100 > _3DBhabhaVetoThreshold[1]  * energy1 ||
+           clusterenergy[i1] * 100 > _3DBhabhaVetoThreshold[1]  * energy2)) {
         _nECLBhabha++;
 
       }
@@ -1353,7 +1344,6 @@ void TrgEclMaster::makeLowMultiTriggerBit(std::vector<int> CenterTCId, std::vect
   if (_n2GeV == 0) {
     bit12 = 0x01; //4
   }
-
   if (_nClust216 >= 3 && _n500MeV216 >  0 && _nECLBhabha == 0) {
     bit13 = 0x01; //6
   }
@@ -1361,9 +1351,7 @@ void TrgEclMaster::makeLowMultiTriggerBit(std::vector<int> CenterTCId, std::vect
     bit14 = 0x01; //6
   }
 
-
   int  total_bit = 0;
-
   total_bit |= bit14;
   total_bit <<= 1;
   total_bit |= bit13;
@@ -1393,7 +1381,6 @@ void TrgEclMaster::makeLowMultiTriggerBit(std::vector<int> CenterTCId, std::vect
   total_bit |= bit1;
 
   _Lowmultibit =  total_bit ;
-
 }
 //
 //
@@ -1407,17 +1394,6 @@ double TrgEclMaster::setTotalEnergy(std::vector<double> phisum)
   }
   return E_phys;
 }
-
-//
-
-
-
-
-
-
-
-
-
 //
 //
 //

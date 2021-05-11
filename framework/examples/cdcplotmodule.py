@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ###############################################################################
 # A more complex python module using matlotlib to create
@@ -8,20 +7,13 @@
 # colours depending on associated MCParticle.
 ###############################################################################
 
-from basf2 import Module, Path, process, B2INFO
-from simulation import add_simulation
-
-import matplotlib
-# to avoid loading gtk backend in the following imports
-# (fails if no X11 display is available)
-matplotlib.use('agg')
-
-import matplotlib.pyplot as plt
-from matplotlib.patches import Circle
-import matplotlib.cm as colormap
-
-from ROOT import Belle2
 import os
+from ROOT import Belle2
+import matplotlib.cm as colormap
+from matplotlib.patches import Circle
+import matplotlib.pyplot as plt
+from basf2 import Module, Path, process, B2INFO, B2WARNING
+from simulation import add_simulation
 
 
 def plot(x, y, col, show=0):

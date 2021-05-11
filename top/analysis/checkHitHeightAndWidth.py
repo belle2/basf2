@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 import sys
 import glob
 from ROOT import Belle2
@@ -17,7 +17,7 @@ from ROOT import TH2F, TFile
 # ------------------------------------------------------------------------
 
 
-class Histogrammer(Module):
+class Histogrammer(b2.Module):
 
     ''' A module to histogram width and amplitude of calibration pulses'''
 
@@ -48,7 +48,7 @@ class Histogrammer(Module):
 
         digits = Belle2.PyStoreArray('TOPDigits')
         for digit in digits:
-            quality = digit.getHitQuality()
+            # quality = digit.getHitQuality()
             slotID = digit.getModuleID()
             hwchan = digit.getChannel()
             self.hist[slotID - 1].Fill(digit.getPulseHeight(), digit.getPulseWidth())
@@ -82,16 +82,16 @@ outfile = argvs[2]     # output name
 files = glob.glob('/ghi/fs01/belle2/bdata/Data/sRaw/e0001/r0' + str(runnumber) + '/sub00/*.sroot')
 
 # Suppress messages and warnings during processing
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # Define a global tag (note: the one given bellow will become out-dated!)
-use_central_database('data_reprocessing_proc8')
+b2.use_central_database('data_reprocessing_proc8')
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # input
-roinput = register_module('SeqRootInput')
+roinput = b2.register_module('SeqRootInput')
 roinput.param('inputFileNames', files)
 main.add_module(roinput)
 
@@ -108,15 +108,15 @@ main.add_module(roinput)
 main.add_module('TOPGeometryParInitializer')
 
 # Unpacking (format auto detection works now)
-unpack = register_module('TOPUnpacker')
+unpack = b2.register_module('TOPUnpacker')
 main.add_module(unpack)
 
 # Add multiple hits by running feature extraction offline
-featureExtractor = register_module('TOPWaveformFeatureExtractor')
+featureExtractor = b2.register_module('TOPWaveformFeatureExtractor')
 main.add_module(featureExtractor)
 
 # Convert to TOPDigits
-converter = register_module('TOPRawDigitConverter')
+converter = b2.register_module('TOPRawDigitConverter')
 converter.param('useSampleTimeCalibration', False)
 converter.param('useChannelT0Calibration', False)
 converter.param('useModuleT0Calibration', False)
@@ -135,12 +135,12 @@ histogramModule.setOutputName(outfile)
 main.add_module(histogramModule)
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
-print(statistics(statistics.TERM))
+print(b2.statistics)
+print(b2.statistics(b2.statistics.TERM))

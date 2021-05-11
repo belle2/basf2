@@ -13,6 +13,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/utilities/TestHelpers.h>
+#include <framework/gearbox/Const.h>
 
 #include <gtest/gtest.h>
 #include <string>
@@ -31,7 +32,7 @@ namespace {
     EXPECT_EQ(dd.getMother()->getName(), "K+");
     EXPECT_EQ(dd.getMother()->getLabel(), "");
     EXPECT_EQ(dd.getMother()->getFullName(), "K+");
-    EXPECT_EQ(dd.getMother()->getPDGCode(), 321);
+    EXPECT_EQ(dd.getMother()->getPDGCode(), Const::kaon.getPDGCode());
     EXPECT_EQ(dd.getNDaughters(), 0);
   }
 
@@ -56,13 +57,13 @@ namespace {
     EXPECT_EQ(dd.getDaughter(0)->getNDaughters(), 0);
     EXPECT_EQ(dd.getDaughter(0)->getMother()->getName(), "K+");
     EXPECT_EQ(dd.getDaughter(0)->getMother()->getLabel(), "loose");
-    EXPECT_EQ(dd.getDaughter(0)->getMother()->getPDGCode(), 321);
+    EXPECT_EQ(dd.getDaughter(0)->getMother()->getPDGCode(), Const::kaon.getPDGCode());
     EXPECT_EQ(dd.getDaughter(0)->getMother()->getFullName(), "K+:loose");
 
     EXPECT_EQ(dd.getDaughter(1)->getNDaughters(), 0);
     EXPECT_EQ(dd.getDaughter(1)->getMother()->getName(), "pi-");
     EXPECT_EQ(dd.getDaughter(1)->getMother()->getLabel(), "loose");
-    EXPECT_EQ(dd.getDaughter(1)->getMother()->getPDGCode(), -211);
+    EXPECT_EQ(dd.getDaughter(1)->getMother()->getPDGCode(), -Const::pion.getPDGCode());
     EXPECT_EQ(dd.getDaughter(1)->getMother()->getFullName(), "pi-:loose");
 
     ASSERT_EQ(dd.getDaughter(2), nullptr);
@@ -90,20 +91,20 @@ namespace {
 
     // pi0 -> gamma gamma; gamma -> ee
     EXPECT_EQ(dd.getDaughter(1)->getMother()->getName(), "pi0");
-    EXPECT_EQ(dd.getDaughter(1)->getMother()->getPDGCode(), 111);
+    EXPECT_EQ(dd.getDaughter(1)->getMother()->getPDGCode(), Const::pi0.getPDGCode());
     EXPECT_EQ(dd.getDaughter(1)->getNDaughters(), 2);
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(0)->getMother()->getName(), "gamma");
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(0)->getMother()->getLabel(), "grandau");
-    EXPECT_EQ(dd.getDaughter(1)->getDaughter(0)->getMother()->getPDGCode(), 22);
+    EXPECT_EQ(dd.getDaughter(1)->getDaughter(0)->getMother()->getPDGCode(), Const::photon.getPDGCode());
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(0)->getNDaughters(), 0);
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getMother()->getName(), "gamma");
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getMother()->getLabel(), "converted");
-    EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getMother()->getPDGCode(), 22);
+    EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getMother()->getPDGCode(), Const::photon.getPDGCode());
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getNDaughters(), 2);
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getDaughter(0)->getMother()->getName(), "e+");
-    EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getDaughter(0)->getMother()->getPDGCode(), -11);
+    EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getDaughter(0)->getMother()->getPDGCode(), -Const::electron.getPDGCode());
     EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getDaughter(1)->getMother()->getName(), "e-");
-    EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getDaughter(1)->getMother()->getPDGCode(), 11);
+    EXPECT_EQ(dd.getDaughter(1)->getDaughter(1)->getDaughter(1)->getMother()->getPDGCode(), Const::electron.getPDGCode());
     ASSERT_EQ(dd.getDaughter(1)->getDaughter(1)->getDaughter(2), nullptr);
     ASSERT_EQ(dd.getDaughter(1)->getDaughter(2), nullptr);
 
@@ -272,6 +273,32 @@ namespace {
     EXPECT_EQ(dd6.getDaughter(0)->getMother()->isSelected(), true);
 
   }
+
+  TEST(DecayDescriptorTest, GrammarWithNestedDecay)
+  {
+    // ... means accept missing massive
+    DecayDescriptor dd1;
+    bool initok = dd1.init("B0:candidates =direct=> [D-:pi =norad=> pi-:loose ... ?gamma] e+:loose ?nu ?addbrems");
+    EXPECT_EQ(initok, true);
+
+    EXPECT_EQ(dd1.isIgnoreRadiatedPhotons(), true);
+    EXPECT_EQ(dd1.isIgnoreIntermediate(), false);
+    EXPECT_EQ(dd1.isIgnoreMassive(), false);
+    EXPECT_EQ(dd1.isIgnoreNeutrino(), true);
+    EXPECT_EQ(dd1.isIgnoreGamma(), false);
+    EXPECT_EQ(dd1.isIgnoreBrems(), true);
+
+    const DecayDescriptor* dd1_D = dd1.getDaughter(0);
+    EXPECT_EQ(dd1_D->getMother()->getName(), "D-");
+    EXPECT_EQ(dd1_D->isIgnoreRadiatedPhotons(), false);
+    EXPECT_EQ(dd1_D->isIgnoreIntermediate(), true);
+    EXPECT_EQ(dd1_D->isIgnoreMassive(), true);
+    EXPECT_EQ(dd1_D->isIgnoreNeutrino(), false);
+    EXPECT_EQ(dd1_D->isIgnoreGamma(), true);
+    EXPECT_EQ(dd1_D->isIgnoreBrems(), false);
+
+  }
+
 
   TEST(DecayDescriptorTest, SelectionParticles)
   {

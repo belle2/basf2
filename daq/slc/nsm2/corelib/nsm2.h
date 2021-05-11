@@ -10,8 +10,9 @@ extern "C" {
 
 /* -- version info */
 
-#define NSM_PROTOCOL_VERSION 1944 /* protocol version */
-#define NSM_PACKAGE_VERSION  1995 /* package  version */
+#define NSM_REQUIRED_VERSION  1999 /* required version */
+#define NSM_LIBRARY_VERSION   2003 /* library version */
+#define NSM_PACKAGE_VERSION   2006 /* package version */
 
 /*
   20120723 1900 file created
@@ -56,7 +57,7 @@ extern "C" {
   20140922 1941 nsmget is added
   20140922 1942 nodtim fix
   20150520 1943 destroyconn fix [for anonymous and for sys.ready]
-  20150521 1944 new protocol version, master recoonect fix
+  20150521 1944 new protocol version, master reconnect fix
   20150808 1945 updates for PNNL summer school tutorial
   20160420 1946 suppress debug output of nsmd2 and b2lib
   20170613 1947 nsmd2 update for USRCPYMEM protection
@@ -100,6 +101,22 @@ extern "C" {
   20190524 1995 add: nsmstat2, fix: nsmd2 ocnt/osiz/otim
   20190529 1994 fix: nsmlib2.c null sysp handling
   20190529 1995 merge: fix in 1994
+  20190530 1996 fix: nsmd2 int function must always return (for g++ 8.2.0 -O)
+  20190724 1997 mod: version definition, nsminfo2 format, log filename
+  20190903 1998 fix: nsmd2 momentary deputy, select timeout in tcprecv
+  20190913 1999 mod: b2nsm_logging and b2nsm_context return previous value
+  20191002 1999 mod: nsmsys2.h should not be needed by user
+  20191123 1999 fix: nsm2sh send_vset
+  20200121 1999 fix: call destroyconn upon new re-accept
+  20200122 1999 fix: reuse tm in reopenlog
+  20200122 1999 fix: bad tcphead
+  20200127 2000 dbg: nsmstat2 crash
+  20200314 2001 dbg: nsmstat2 crash (32-bit host), add: localhost support
+  20200416 2002 add: killnsm2, mod: nsmd2.cc code cleanup
+  20200520 2003 fix: bad tcphead by newclient, avoid already exist error
+  20200520 2004 fix: close fd 0,1,2 before running in background
+  20200522 2005 fix: allow udp socket == 0, eliminate log at startup with -b
+  20200603 2006 fix: corelib nnod fix
  */
 
 /* -- DATA TYPES ----------------------------------------------------- */
@@ -189,6 +206,12 @@ typedef struct NSMcontext_struct NSMcontext;
 #define NSMESHMNOSYS  (-37) /* ESHMGETSYS and ENOENT */
 #define NSMESHMACCES  (-38) /* ESHMGETMEM and EACCES */
 #define NSMEEMPTYDEST (-39) /* empty string for destination node */
+#define NSMENGMASTER  (-40) /* master nsmd2 temporarily unreachable */
+#define NSMETIMEOUTW  (-41) /* timeout in sending to nsmd2 */
+#define NSMETIMEOUTR  (-42) /* timeout in receiving from nsmd2 */
+#define NSMENOSUCHREQ (-43) /* no such registered request */
+#define NSMEBADHASH   (-44) /* broken internal hash table */
+#define NSMENODEHERE  (-45) /* node already exist on the same host */
 
 /* NSMmsg (in host byte order) */
 typedef struct {

@@ -56,6 +56,7 @@ class TestStatistics(TestCase):
         self.assertEqual(statistics.columns, test_columns)
         self.assertEqual(statistics.modules, test_modules)
 
+
 if __name__ == "__main__":
     main()
 # @endcond

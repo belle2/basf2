@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
-logging.log_level = LogLevel.WARNING
+b2.logging.log_level = b2.LogLevel.WARNING
 
 
-class CheckMCParticles(Module):
+class CheckMCParticles(b2.Module):
 
     """
     Counts MCParticles that generate TrueHits.
@@ -57,31 +57,31 @@ class CheckMCParticles(Module):
 
     def terminate(self):
         """ Write results """
-        B2INFO('Found {nu} secondary MC Particles out of total {n}.'
-               .format(nu=self.nSecondaries, n=self.nMCParticles))
-        B2INFO('Of these, found {n1} secondaries in PXD and {n2} in SVD.'
-               .format(n1=self.nSecondariesPXD, n2=self.nSecondariesSVD))
-        B2INFO('Secondary processes for PXD: {list1}; for SVD: {list2}'
-               .format(list1=str(self.processesPXD),
-                       list2=str(self.processesSVD)))
+        b2.B2INFO('Found {nu} secondary MC Particles out of total {n}.'
+                  .format(nu=self.nSecondaries, n=self.nMCParticles))
+        b2.B2INFO('Of these, found {n1} secondaries in PXD and {n2} in SVD.'
+                  .format(n1=self.nSecondariesPXD, n2=self.nSecondariesSVD))
+        b2.B2INFO('Secondary processes for PXD: {list1}; for SVD: {list2}'
+                  .format(list1=str(self.processesPXD),
+                          list2=str(self.processesSVD)))
 
 
 # Particle gun module
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 # Create Event information
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 # Load parameters
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 # Create geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 # Run simulation
-simulation = register_module('FullSim')
+simulation = b2.register_module('FullSim')
 # simulation.param('StoreAllSecondaries', True)
 # PXD digitization module
 printParticles = CheckMCParticles()
-printParticles.set_log_level(LogLevel.INFO)
+printParticles.set_log_level(b2.LogLevel.INFO)
 
 # Specify number of events to generate
 eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
@@ -108,7 +108,7 @@ particlegun.param({
 geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
 
 # create processing path
-main = create_path()
+main = b2.create_path()
 main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(particlegun)
@@ -118,7 +118,7 @@ main.add_module(simulation)
 main.add_module(printParticles)
 
 # generate events
-process(main)
+b2.process(main)
 
 # show call statistics
-print(statistics)
+print(b2.statistics)

@@ -9,12 +9,9 @@
  **************************************************************************/
 
 #include <analysis/modules/TauDecayMarker/TauDecayMarkerModule.h>
-#include <analysis/dataobjects/TauPairDecay.h>
-
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 #include <iostream>
 
@@ -44,25 +41,21 @@ TauDecayMarkerModule::TauDecayMarkerModule() : Module(), tauPair(false), numOfTa
 
 void TauDecayMarkerModule::initialize()
 {
-  StoreObjPtr<TauPairDecay> tauDecay;
-  tauDecay.registerInDataStore();
+  m_tauDecay.registerInDataStore();
 
 }
 
 void TauDecayMarkerModule::event()
 {
-  StoreObjPtr<TauPairDecay> tauDecay;
-  StoreArray<MCParticle> MCParticles;
-
-  if (!tauDecay) tauDecay.create();
+  if (!m_tauDecay) m_tauDecay.create();
 
   IdentifyTauPair();
   if (tauPair) {
     m_pmode = getDecayChannelOfTau(+1) % 100;
     m_mmode = getDecayChannelOfTau(-1) % 100;
 
-    m_pprong = getProngOfDecay(*MCParticles[idOfTauPlus - 1]);
-    m_mprong = getProngOfDecay(*MCParticles[idOfTauMinus - 1]);
+    m_pprong = getProngOfDecay(*m_MCParticles[idOfTauPlus - 1]);
+    m_mprong = getProngOfDecay(*m_MCParticles[idOfTauMinus - 1]);
 
     if (m_printDecayInfo) {
       B2INFO("Decay ID: " << m_pmode << " (tau+), " << m_mmode << " (tau-)." <<
@@ -74,23 +67,22 @@ void TauDecayMarkerModule::event()
     m_mmode = -1;
   }
 
-  tauDecay->addTauPlusIdMode(m_pmode);
-  tauDecay->addTauMinusIdMode(m_mmode);
+  m_tauDecay->addTauPlusIdMode(m_pmode);
+  m_tauDecay->addTauMinusIdMode(m_mmode);
 
-  tauDecay->addTauPlusMcProng(m_pprong);
-  tauDecay->addTauMinusMcProng(m_mprong);
+  m_tauDecay->addTauPlusMcProng(m_pprong);
+  m_tauDecay->addTauMinusMcProng(m_mprong);
 
 }
 
 void TauDecayMarkerModule::IdentifyTauPair()
 {
-  StoreArray<MCParticle> MCParticles;
   numOfTauPlus = 0;
   numOfTauMinus = 0;
   idOfTauPlus = 0;
   idOfTauMinus = 0;
-  for (int i = 0; i < MCParticles.getEntries(); i++) {
-    MCParticle& p = *MCParticles[i];
+  for (int i = 0; i < m_MCParticles.getEntries(); i++) {
+    MCParticle& p = *m_MCParticles[i];
 
     if (p.getStatus() == 1 && p.getPDG() == 15) {
       numOfTauMinus++;
@@ -112,24 +104,23 @@ int TauDecayMarkerModule::getNumDaughterOfTau(int s, int id, int sign)
   int tauid = idOfTauMinus;
   if (s > 0) tauid = idOfTauPlus;
   int ret = 0;
-  StoreArray<MCParticle> MCParticles;
-  const MCParticle& p = *MCParticles[tauid - 1];
+  const MCParticle& p = *m_MCParticles[tauid - 1];
 
   if (id == 0) {
     for (int i = p.getFirstDaughter(); i <= p.getLastDaughter(); ++i) {
-      MCParticle& d = *MCParticles[i - 1];
+      MCParticle& d = *m_MCParticles[i - 1];
       if (abs(d.getPDG()) == 24)
         ret += d.getLastDaughter() - d.getFirstDaughter() + 1;
       else ret++;
     }
   } else {
     for (int i = p.getFirstDaughter(); i <= p.getLastDaughter(); ++i) {
-      MCParticle& d = *MCParticles[i - 1];
+      MCParticle& d = *m_MCParticles[i - 1];
       int pdg = d.getPDG();
       if (pdg == id || (sign == 0 && abs(pdg) == abs(id))) ret++;
       if (abs(pdg) == 24) {
         for (int j = d.getFirstDaughter(); j <= d.getLastDaughter(); ++j) {
-          MCParticle& e = *MCParticles[j - 1];
+          MCParticle& e = *m_MCParticles[j - 1];
           int pdg2 = e.getPDG();
           if (pdg2 == id ||
               (sign == 0)) ret++;
@@ -146,26 +137,25 @@ int TauDecayMarkerModule::getNumDaughterOfTauExceptGamma(int s, int id, int sign
   int tauid = idOfTauMinus;
   if (s > 0) tauid = idOfTauPlus;
   int ret = 0;
-  StoreArray<MCParticle> MCParticles;
-  const MCParticle& p = *MCParticles[tauid - 1];
+  const MCParticle& p = *m_MCParticles[tauid - 1];
 
   if (id == 0) {
     for (int i = p.getFirstDaughter(); i <= p.getLastDaughter(); ++i) {
-      MCParticle& d = *MCParticles[i - 1];
+      MCParticle& d = *m_MCParticles[i - 1];
       if (abs(d.getPDG()) == 24) {
         for (int j = d.getFirstDaughter(); j <= d.getLastDaughter(); ++j) {
-          MCParticle& e = *MCParticles[j - 1];
-          if (e.getPDG() != 22) ret++;
+          MCParticle& e = *m_MCParticles[j - 1];
+          if (e.getPDG() != Const::photon.getPDGCode()) ret++;
         }
-      } else if (d.getPDG() != 22) ret++;
+      } else if (d.getPDG() != Const::photon.getPDGCode()) ret++;
     }
   } else {
     for (int i = p.getFirstDaughter(); i <= p.getLastDaughter(); ++i) {
-      MCParticle& d = *MCParticles[i - 1];
+      MCParticle& d = *m_MCParticles[i - 1];
       int pdg = d.getPDG();
       if (abs(pdg) == 24) {
         for (int j = d.getFirstDaughter(); j <= d.getLastDaughter(); ++j) {
-          MCParticle& e = *MCParticles[j - 1];
+          MCParticle& e = *m_MCParticles[j - 1];
           int pdg2 = e.getPDG();
           if (pdg2 == id ||
               (sign == 0 && abs(pdg2) == abs(id))) ret++;

@@ -1,0 +1,117 @@
+# EventType: 1111540111
+# Descriptor: [B0 -> X (J/psisig(1S) -> e+ e-)]
+# NickName: Bd_JpsiX_ee
+# Tested: Yes
+# Physics WG: EWP
+# Responsible: Sviatoslav Bilokin
+# Email: sviatoslav.bilokin@desy.de
+# Cuts: None
+# Date: 20200908
+#
+#
+Decay Upsilon(4S)
+1.0  B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+0.04605 J/psisig K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #CPV included, Oberhof 03/09/2018
+0.04605 J/psisig K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  #CPV included, Oberhof 03/09/2018
+0.02215 J/psisig K*S SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;        #CPV included, Oberhof 09/11/2017
+0.02215 J/psisig K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;       #CPV included, Oberhof 09/11/2017
+0.09073 J/psisig K*0T SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #CPV included, Oberhof 09/11/2017
+0.00186 J/psisig pi0   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;               #CPV included, Oberhof 03/09/2018
+0.00269 J/psisig rho0  SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #CPV included, Oberhof 03/09/2018
+0.00190 J/psisig omega SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #CPV included, Oberhof 03/09/2018
+0.01055 J/psisig  K0  pi0         PHSP;
+0.04642 J/psisig  K0  pi-  pi+    PHSP;  #Added by Yubo Li 03/09/2018
+0.13715 J/psisig  K_10            SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
+0.01055 J/psisig  K'_10           SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
+0.05275 J/psisig  K_2*0           PHSP;
+0.00517 J/psisig  K0 phi          PHSP;  #Added by Yubo Li 03/09/2018
+0.00000 J/psisig  K+ pi-          PHSP;
+0.01139 J/psisig eta K0            PHSP; #Added by Yubo Li 03/09/2018
+0.02426 J/psisig omega K0          PHSP; #Added by Yubo Li 03/09/2018
+0.00114 J/psisig eta               PHSP; #Added by Yubo Li 03/09/2018
+0.00121 J/psisig pi+ pi-           PHSP; #Added by Yubo Li 03/09/2018 Br = Br(all) -Br(J/psisig rho0) -Br(J/psisig f2)
+0.00035 J/psisig f_2               PHSP; #Added by Yubo Li 03/09/2018
+0.00027 J/psisig K+ K-             PHSP; #Added by Yubo Li 03/09/2018
+0.00080 J/psisig eta'              PHSP; #Added by Yubo Li 03/09/2018
+0.00264 J/psisig K0 K+ K-          PHSP; #Added by Yubo Li 03/09/2018
+0.05697 J/psisig K0 rho0           PHSP; #Added by Yubo Li 03/09/2018
+0.08440 J/psisig K*+ pi-           PHSP; #Added by Yubo Li 03/09/2018
+0.00066 J/psisig pi+ pi- pi+ pi-   PHSP; #Added by Yubo Li 03/09/2018 Br = Br(all) -Br(J/psisig f_1)
+0.00091 J/psisig f_1               PHSP; #Added by Yubo Li 03/09/2018
+0.06963 J/psisig K*0 pi+ pi-       PHSP; #Added by Yubo Li 03/09/2018
+0.01825 psi(2S)sig K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
+0.01825 psi(2S)sig K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+0.00617 psi(2S)sig K*S      SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;       #CPV included, Oberhof 09/11/2017
+0.00617 psi(2S)sig K*L      SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      #CPV included, Oberhof 09/11/2017
+0.02467 psi(2S)sig K*0T     SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #CPV included, Oberhof 09/11/2017
+0.02518 psi(2S)sig  K+  pi-          PHSP;
+0.01259 psi(2S)sig  K0  pi0          PHSP;
+0.01259 psi(2S)sig  K0  pi-  pi+     PHSP;
+0.00629 psi(2S)sig  K0  pi0  pi0     PHSP;
+0.00629 psi(2S)sig  K+  pi-  pi0     PHSP;
+0.02518 psi(2S)sig  K_10             PHSP;
+0.00145 psi(2S)sig  pi+  pi-         PHSP; #Added by Yubo Li 03/09/2018
+0.00074 psi(2S)sig  pi0              PHSP; #Added by Yubo Li 03/09/2018
+0.00010 chi_c0sig K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  #CPV included, Oberhof 09/11/2017
+0.00010 chi_c0sig K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #CPV included, Oberhof 09/11/2017
+0.00004 K*S chi_c0sig  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  #CPV included, Oberhof 09/11/2017
+0.00004 K*L chi_c0sig  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #CPV included, Oberhof 09/11/2017
+0.00015 K*0T chi_c0sig SVS;                                             #CPV included, Oberhof 09/11/2017
+0.00027 chi_c0sig  K+  pi-          PHSP;
+0.00013 chi_c0sig  K0  pi0          PHSP;
+0.00027 chi_c0sig  K0  pi-  pi+     PHSP;
+0.00013 chi_c0sig  K0  pi0  pi0     PHSP;
+0.00013 chi_c0sig  K+  pi-  pi0     PHSP;
+0.00703 chi_c1sig K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  #CPV included, Oberhof 09/11/2017
+0.00703 chi_c1sig K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   #CPV included, Oberhof 09/11/2017
+0.00566 chi_c1sig  K*0T      SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #CPV included, Oberhof 09/11
+0.01211 chi_c1sig  K+  pi-   PHSP;
+0.00142 K*S chi_c1sig        SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;       #CPV included, Oberhof 09/11/2017
+0.00142 K*L chi_c1sig        SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      #CPV included, Oberhof 09/11/2017
+0.00606 chi_c1sig  K0  pi0   PHSP;
+0.01144 chi_c1sig  K0  pi-  pi+    PHSP;
+0.00715 chi_c1sig  K0  pi0  pi0    PHSP;
+0.01252 chi_c1sig  K+  pi-  pi0    PHSP;
+0.00040 chi_c1sig  pi0             PHSP;
+0.00015 chi_c2sig K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  #CPV included, Oberhof 09/11/2017
+0.00015 chi_c2sig K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   #CPV included, Oberhof 09/11/2017
+0.00101 chi_c2sig  K*0              PHSP;
+0.00146 chi_c2sig  K+  pi-          PHSP;
+0.00203 chi_c2sig  K0  pi0          PHSP;
+0.00344 chi_c2sig  K0  pi-  pi+     PHSP;
+0.00150 chi_c2sig  K+  pi-  pi0     PHSP;
+0.00203 chi_c2sig  K0  pi0  pi0     PHSP;
+Enddecay
+CDecay anti-B0sig
+#
+Decay psi(2S)sig
+0.40826 J/psisig   pi+     pi-                             VVPIPI;
+0.21543 J/psisig   pi0     pi0                             VVPIPI;
+0.03985 J/psisig   eta                                     PARTWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
+0.00158 J/psisig   pi0                                     PARTWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
+0.11689 gamma   chi_c0sig                                  PHSP;
+0.11179 gamma   chi_c1sig                                  PHSP;
+0.10620 gamma   chi_c2sig                                  PHSP;
+Enddecay
+#
+Decay chi_c0sig
+1.00000 gamma   J/psisig                                   PHSP;
+Enddecay
+#
+Decay chi_c1sig
+1.00000 J/psisig   gamma                  VVP 1.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0;
+Enddecay
+#
+Decay chi_c2sig
+1.00000 gamma   J/psisig                   PHSP;
+Enddecay
+#
+Decay J/psisig
+1.00000  e+       e-            PHOTOS VLL;
+Enddecay
+#
+End
+

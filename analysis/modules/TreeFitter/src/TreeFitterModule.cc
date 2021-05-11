@@ -1,24 +1,21 @@
-/* BASF2 (Belle Analysis Framework 2)                                    *
-*                                                                        *
-* Copyright(C) 2013 - Belle II Collaboration                             *
-*                                                                        *
-* Author: The Belle II Collaboration                                     *
-* Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
-*                                                                        *
-* This software is provided "as is" without any warranty.                *
-**************************************************************************/
+/*************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                          *
+ *                                                                       *
+ * Copyright(C) 2013-2021 - Belle II Collaboration                       *
+ *                                                                       *
+ * Author: The Belle II Collaboration                                    *
+ * Contributors: Francesco Tenchini, Jo-Frederik Krohn                   *
+ *                                                                       *
+ * This software is provided "as is" without any warranty.               *
+ *************************************************************************/
 
-//Implementation of Decay Tree Fitter based on arXiv:physics/0503191
-//Main module implementation
+// Implementation of Decay Tree Fitter based on arXiv:physics/0503191
+// Main module implementation
 
 #include <analysis/modules/TreeFitter/TreeFitterModule.h>
 #include <analysis/VertexFitting/TreeFitter/FitManager.h>
 
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/Particle.h>
-
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
 
 #include <analysis/utility/ParticleCopy.h>
@@ -95,9 +92,8 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
 
 void TreeFitterModule::initialize()
 {
-  StoreObjPtr<ParticleList>().isRequired(m_particleList);
-  StoreArray<Belle2::Particle> particles;
-  particles.isRequired();
+  m_plist.isRequired(m_particleList);
+  StoreArray<Particle>().isRequired();
   m_nCandidatesBeforeFit = 0;
   m_nCandidatesAfter = 0;
 
@@ -115,19 +111,17 @@ void TreeFitterModule::beginRun()
 
 void TreeFitterModule::event()
 {
-  StoreObjPtr<ParticleList> plist(m_particleList);
-
-  if (!plist) {
+  if (!m_plist) {
     B2ERROR("ParticleList " << m_particleList << " not found");
     return;
   }
 
   std::vector<unsigned int> toRemove;
-  const unsigned int n = plist->getListSize();
+  const unsigned int n = m_plist->getListSize();
   m_nCandidatesBeforeFit += n;
 
   for (unsigned i = 0; i < n; i++) {
-    Belle2::Particle* particle = plist->getParticle(i);
+    Belle2::Particle* particle = m_plist->getParticle(i);
 
     if (m_updateDaughters == true) {
       ParticleCopy::copyDaughters(particle);
@@ -145,8 +139,8 @@ void TreeFitterModule::event()
     }
 
   }
-  plist->removeParticles(toRemove);
-  m_nCandidatesAfter += plist->getListSize();
+  m_plist->removeParticles(toRemove);
+  m_nCandidatesAfter += m_plist->getListSize();
 }
 
 

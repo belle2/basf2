@@ -19,6 +19,7 @@ class VariablesToHDF5(basf2.Module):
     instead of a root file. It is slower as it is implemented in pure python and
     should currently be considered a proof of concept.
     """
+
     def __init__(self, listname, variables, filename):
         """Constructor to initialize the internal state
 
@@ -38,10 +39,10 @@ class VariablesToHDF5(basf2.Module):
     def initialize(self):
         """Create the hdf5 file and list of variable objects to be used during
         event processing."""
-        # get variables from manager
-        varnames = variable_manager.resolveCollections(std_vector(*self._variables))
+        #: variable names
+        self._varnames = variable_manager.resolveCollections(std_vector(*self._variables))
         #: variable objects for each variable
-        self._var_objects = [variable_manager.getVariable(n) for n in varnames]
+        self._var_objects = [variable_manager.getVariable(n) for n in self._varnames]
 
         #: Event metadata
         self._evtmeta = Belle2.PyStoreObj("EventMetaData")
@@ -56,10 +57,11 @@ class VariablesToHDF5(basf2.Module):
             basf2.B2ERROR("Cannot create output file")
             return
 
-        dtype = [("exp", np.int32), ("run", np.int32), ("evt", np.uint32), ("icand", np.uint32), ("ncand", np.uint32)]
-        for v in self._var_objects:
+        dtype = [("exp", np.int32), ("run", np.int32), ("evt", np.uint32),
+                 ("prod", np.uint32), ("icand", np.uint32), ("ncand", np.uint32)]
+        for name in self._varnames:
             # only float variables for now
-            dtype.append((v.name, np.float64))
+            dtype.append((name, np.float64))
 
         #: The data type
         self._dtype = dtype
@@ -78,15 +80,16 @@ class VariablesToHDF5(basf2.Module):
         buf["exp"] = self._evtmeta.getExperiment()
         buf["run"] = self._evtmeta.getRun()
         buf["evt"] = self._evtmeta.getEvent()
+        buf["prod"] = self._evtmeta.getProduction()
         buf["ncand"] = len(buf)
         buf["icand"] = np.arange(len(buf))
 
         for row, p in zip(buf, self._plist):
-            for v in self._var_objects:
+            for name, v in zip(self._varnames, self._var_objects):
                 # pyroot proxy not working with callables, we should fix this.
                 # For now we need to go back by name and call it.
                 # should be `row[v.name] = v.func(p)`
-                row[v.name] = variable_manager.evaluate(v.name, p)
+                row[name] = variable_manager.evaluate(v.name, p)
 
         self._table.append(buf)
 

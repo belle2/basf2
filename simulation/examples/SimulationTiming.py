@@ -20,19 +20,19 @@ validation script but due to this problem it was moved to examples
 """
 
 import os
-from basf2 import *
+import basf2 as b2
 import ROOT
 
 if os.environ.get("BELLE2_EXTERNALS_OPTION", "opt") != "debug":
-    B2FATAL("This script needs to be run with debug externals, otherwise it "
-            "cannot determine the time spent in each volume.")
+    b2.B2FATAL("This script needs to be run with debug externals, otherwise it "
+               "cannot determine the time spent in each volume.")
 
 # limit output
-logging.log_level = LogLevel.WARNING
+b2.logging.log_level = b2.LogLevel.WARNING
 # disable multi processing
-set_nprocesses(0)
+b2.set_nprocesses(0)
 
-main = create_path()
+main = b2.create_path()
 # create 100 events
 main.add_module("EventInfoSetter", evtNumList=[100])
 # using standard evtgen
@@ -44,14 +44,16 @@ main.add_module("Geometry", assignRegions=True)
 # as well as the simulation
 main.add_module("FullSim")
 # including the timing module
-main.add_module("FullSimTiming", rootFile="EvtGenTiming.root", logLevel=LogLevel.INFO)
+main.add_module("FullSimTiming", rootFile="EvtGenTiming.root", logLevel=b2.LogLevel.INFO)
+
 # and run it
-process(main)
+b2.process(main)
 
 
 def add_info(obj, title, text):
     """Add a description item to a TH object"""
     obj.GetListOfFunctions().Add(ROOT.TNamed(title, text))
+
 
 # now open the created root file and update some things
 root_file = ROOT.TFile("EvtGenTiming.root", "UPDATE")

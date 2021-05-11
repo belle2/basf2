@@ -58,7 +58,7 @@ pleas check ``svd/scripts/svd/validation_utils.py``
 background overlay utils
 ------------------------
 
-.. note::
+.. warning::
 
    These functions are not part of the official background overlay tools. Use them only if you know what you are doing!
 

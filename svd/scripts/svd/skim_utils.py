@@ -123,7 +123,7 @@ class skim6SampleEventsPyModule(b2.Module):
 
 class skimSVDTriggerBinEventsPyModule(b2.Module):
     """
-    returns True if TriggerBin of the event is the selected one
+    returns True if TriggerBin of the event is the selected one,
     use :code:`set_tb(tb)` to set the value of the selected TriggerBin (0,1,2,3)
     """
 

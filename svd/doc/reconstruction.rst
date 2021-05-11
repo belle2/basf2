@@ -25,7 +25,7 @@ The cluster charge is a measurement of the charge released in the sensor by the 
 The **default** algorithm used to compute cluster charge is the ``MaxSample``: the highest strip sample for each strip in the cluster represents the strip charge (in ADC). This value is converted in :math:`e^{-}` using the :ref:`SVDPulseShapeCalibrations<svdpulsecal>` DBObject. The cluster charge is computed as the sum of the strips charges in :math:`e^{-}`.
 
 
-We have two alternative algorithms to compute the cluster charge:
+We have two alternative algorithms to compute the cluster charge that can be selected by setting the :b2:mod:`SVDClusterizer` parameter ``chargeAlgorithm{3/6}Samples``:
 
 #. ``SumSamples``: the strip charge is evaluated as the sum of the 6 samples in ADC, converted in :math:`e^{-}` with the help of the :ref:`SVDPulseShapeCalibrations<svdpulsecal>` DBObject and then the cluster charge is the computed as the sum of the strip charges.
 
@@ -78,7 +78,7 @@ where the :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV rea
 The raw strip time is calibrated with a third order polynomial stored in the :ref:`SVDCoGTimeCalibration<svdcog6timecal>` DBObject.
 
 
-We have two alternative algorithms to compute the cluster time. For both, first all strips in the cluster are summed sample by sample, then the 3 best consecutive summed-samples are determined using the `MaxSum`_ algorithm.
+We have two alternative algorithms to compute the cluster charge that can be selected by setting the :b2:mod:`SVDClusterizer` parameter ``timeAlgorithm{3/6}Samples``. For both, first all strips in the cluster are summed sample by sample, then the 3 best consecutive summed-samples are determined using the `MaxSum`_ algorithm.
 
 #. ``CoG3``: the raw cluster time is the average of the 3 best summed-samples time with the sample charge:
 

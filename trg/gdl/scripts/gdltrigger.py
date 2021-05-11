@@ -5,7 +5,7 @@ import basf2 as b2
 emptypath = b2.create_path()
 
 
-def add_gdl_trigger(path, SimulationMode=1, OpenFilter=False, Belle2Phase="Phase2"):
+def add_gdl_trigger(path, SimulationMode=1, OpenFilter=False, simulateT0jitter=False, Belle2Phase="Phase2"):
     """
     add the gdl module to path
     @param path            module is added to this path
@@ -20,6 +20,7 @@ def add_gdl_trigger(path, SimulationMode=1, OpenFilter=False, Belle2Phase="Phase
     trggdl = b2.register_module('TRGGDL')
     trggdl.param('SimulationMode', SimulationMode)
     trggdl.param('Belle2Phase', Belle2Phase)
+    trggdl.param('simulateT0jitter', simulateT0jitter)
     if OpenFilter:
         trggdl.if_value('<1', emptypath)
     path.add_module(trggdl)

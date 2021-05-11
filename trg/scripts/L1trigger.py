@@ -43,6 +43,7 @@ def add_tsim(
         SimulationMode=SimulationMode,
         OpenFilter=OpenFilter,
         Belle2Phase=Belle2Phase,
+        simulateT0jitter=simulateT0jitter,
         components=components)
     path.add_module('StatisticsSummary').set_name('Sum_TriggerSimulation')
     if PrintInfo:
@@ -83,6 +84,7 @@ def add_grl_gdl_tsim(
         SimulationMode=1,
         OpenFilter=False,
         Belle2Phase='Phase3',
+        simulateT0jitter=False,
         components=['GRL', 'GDL']):
     '''
     Add GRL and GDL modules to the TSIM with no subdetectors. The function have to applied based on the dataobjects
@@ -93,10 +95,16 @@ def add_grl_gdl_tsim(
     @param OpenFilter: If true, the events failed to pass L1 trigger will be discarded. Make sure you do need
         open filter before you set the value to True.
     @param Belle2Phase: The trigger menu at the given Phase is applied. Available options: Phase2, Phase3.
+    @param simulateT0jitter: if True L1 trigger jitter is simulated by EventT0Generator.
     @param components: List of logic components to be included in TSIM.
     '''
 
     if ('GRL' in components):
         add_grl_trigger(path=path, SimulationMode=SimulationMode)
     if ('GDL' in components):
-        add_gdl_trigger(path=path, SimulationMode=SimulationMode, OpenFilter=OpenFilter, Belle2Phase=Belle2Phase)
+        add_gdl_trigger(
+            path=path,
+            SimulationMode=SimulationMode,
+            OpenFilter=OpenFilter,
+            Belle2Phase=Belle2Phase,
+            simulateT0jitter=simulateT0jitter)

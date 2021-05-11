@@ -36,7 +36,7 @@ DQMHistAnalysisSVDGeneralModule::DQMHistAnalysisSVDGeneralModule()
   //Parameter definition
   B2INFO("DQMHistAnalysisSVDGeneral: Constructor done.");
 
-  setDescription("DQM Analysis Module that produces colored canvas tfor a straightforward interpretation of the SVD Data Quality.");
+  setDescription("DQM Analysis Module that produces colored canvas for a straightforward interpretation of the SVD Data Quality.");
 
   addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("SVDrefHisto.root"));
   addParam("unpackerErrorLevel", m_unpackError, "Maximum bin_content/ # events allowed before throwing ERROR", double(0.00001));

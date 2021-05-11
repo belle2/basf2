@@ -145,6 +145,7 @@ The available algorithms to determine the strip charge for the position computat
 
 
 In the current **default** reconstruction the ``CoG`` is used for cluster size = 2, and ``AHT`` is used for cluster size > 2.
+Position errors are scaled depending on the cluster size, scale factors are stored in :ref:`SVDClusterCut<svdclustercuts>`.
 
 The ``SVDClusterizer`` supports the following position reconstruction algorithms (that can be passed as string, see the :b2:mod:`SVDClusterizer` parameter ``positionAlgorithm{3/6}Samples`` parameter)
 

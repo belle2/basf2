@@ -12,7 +12,7 @@ Here we briefly describe the SVD objects that populate the DataStore.
 
 .. cpp:class:: SVDEventInfo
 
-	       StoreObjPtr created by :b2:mod:`SVDUnpacker` / :b2:mod:`SVDDigitizer` and storing the following event-wise informations:
+	       StoreObjPtr created by :b2:mod:`SVDUnpacker` / :b2:mod:`SVDEventInfoSetter` and storing the following event-wise informations:
 
 	       #. the DAQ mode (3-sample, 6-sample, 3-mixed-6 sample) of the run
 	       #. the number of APV samples (3 or 6) in the acquired event
@@ -26,7 +26,7 @@ Here we briefly describe the SVD objects that populate the DataStore.
 
 	       #. layer, ladder, sensor (VxdID), side
 	       #. cellID
-	       #. amplitudes of the 6 samples. In case of 3-sample events, the last 3 values are set tot zero
+	       #. amplitudes of the 6 samples. In case of 3-sample events, the last 3 values are set to zero
 
 .. _svdrecos:
 

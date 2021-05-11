@@ -10,7 +10,7 @@ Each chargelet (small group of ionized :math:`e^{-}` or :math:`h^{+}`) is drifte
 
 .. math::
 
-   w(t) = Q \cdot \frac{149.012 \cdot (t-\delta)^2}{(1 + t - \delta)^{-10}}
+   w(t) = Q \cdot \frac{149.012 \cdot (t-\delta)^2}{(1 + t - \delta)^{10}}
 
 ..   w(t|\delta,\tau) = Q \cdot \frac{t-\delta}{\tau} * \exp{(1 - \frac{t-\delta}{\tau})} \quad {\rm for }\quad t \ge \delta
 .. and :math:`\tau = 250` ns.

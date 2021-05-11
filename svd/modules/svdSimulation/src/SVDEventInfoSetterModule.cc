@@ -28,7 +28,7 @@ SVDEventInfoSetterModule::SVDEventInfoSetterModule() : Module()
 {
   //Set module properties
   setDescription(
-    "Sets the SVD event information Use this "
+    "Sets the SVD event information. Use this "
     "module to fill SVDEventInfo object which tells the digitizer "
     "the conditions for creating ShaperDigits."
   );

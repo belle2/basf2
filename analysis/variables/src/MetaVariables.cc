@@ -40,6 +40,7 @@
 #include <stdexcept>
 #include <memory>
 #include <string>
+#include <regex>
 
 #include <TDatabasePDG.h>
 
@@ -748,7 +749,7 @@ namespace Belle2 {
           else {
             const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
             double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
-            if (variablename == "phi" or variablename == "useCMSFrame(phi)")
+            if (variablename == "phi" or variablename == "clusterPhi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)")) or std::regex_match(variablename, std::regex("use.*Frame\\(clusterPhi\\)")))
             {
               if (fabs(diff) > M_PI) {
                 if (diff > M_PI) {
@@ -793,7 +794,7 @@ namespace Belle2 {
             Particle jTmpPart(jMcDaughter);
             const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
             double diff = var->function(&jTmpPart) - var->function(&iTmpPart);
-            if (variablename == "phi" or variablename == "useCMSFrame(phi)")
+            if (variablename == "phi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)")))
             {
               if (fabs(diff) > M_PI) {
                 if (diff > M_PI) {
@@ -836,7 +837,7 @@ namespace Belle2 {
           else {
             const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
             double diff = var->function((particle->getDaughter(jDaughterNumber))->getDaughter(bgrandDaughterNumber)) - var->function((particle->getDaughter(iDaughterNumber))->getDaughter(agrandDaughterNumber));
-            if (variablename == "phi")
+            if (variablename == "phi" or variablename == "clusterPhi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)")) or std::regex_match(variablename, std::regex("use.*Frame\\(clusterPhi\\)")))
             {
               if (fabs(diff) > M_PI) {
                 if (diff > M_PI) {

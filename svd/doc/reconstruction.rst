@@ -41,7 +41,7 @@ We have two alternative algorithms to compute the cluster charge that can be sel
 
    .. math::
 
-      A = - \frac{(e_{\tau}^{-1} - e_{\tau}^{3}) a_{1} + (2+e_{\tau}^{2})a_{2} - (1+2e_{\tau}^{2})a_{3}}{\Delta t/\tau \exp{(1+t_{\rm raw}/\tau)}(1+4e_{\tau}^{2}+e_{\tau}^{4})}
+      A = \frac{(e_{\tau}^{-1} - e_{\tau}^{3}) a_{1} + (2+e_{\tau}^{2})a_{2} - (1+2e_{\tau}^{2})a_{0}}{\Delta t/\tau \exp{(1+t_{\rm raw}/\tau)}(1+4e_{\tau}^{2}+e_{\tau}^{4})}
 
    where :math:`e_{\tau} = e^{- \frac{\Delta t}{\tau}}`, :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV readout chip,  :math:`t_{\rm raw}` is the :ref:`raw ELS3 time<svdels3time>`,  and  :math:`a_{j}` is the amplitude of j-th summed-sample.
 
@@ -59,7 +59,7 @@ We have two alternative algorithms to compute the cluster charge that can be sel
 
 .. _svdff:
 
-#. The three chosen samples are: :math:`a_{i-1}, a_{i},  a_{i+1}`, with :math:`i-i = FF`, the ``FirstFrame``.
+#. The three chosen samples are: :math:`a_{i-1}, a_{i},  a_{i+1}`, with :math:`i-1 = FF`, the ``FirstFrame``.
 #. There will be cases in which :math:`i = 0`, in this case the three chosen samples are :math:`a_0 , a_1 , a_2` with :math:`FF=0`.
 
 
@@ -96,7 +96,7 @@ We have two alternative algorithms to compute the cluster charge that can be sel
 
    .. math::
 
-      t_{\rm cluster}^{\rm raw} = - \frac{2e_{\tau}^{4} + w e_{\tau}^{2}}{1 - 2e_{\tau}^{4}-w(2+e_{\tau}^{2})}
+      t_{\rm cluster}^{\rm raw} = - \Delta t \cdot \frac{2e_{\tau}^{4} + w e_{\tau}^{2}}{1 - e_{\tau}^{4}-w(2+e_{\tau}^{2})}
 
    where :math:`e_{\tau} = e^{- \frac{\Delta t}{\tau}}`, :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV readout chip,  :math:`w = \frac{a_{0}-2 e_{\tau}^{-2} a_{2}}{2a_{0} + e_{\tau}^{-1} a_{1}}` and  :math:`a_{j}` is the amplitude of j-th summed-sample.
 

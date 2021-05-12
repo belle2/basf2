@@ -80,8 +80,6 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
   // 2. Physics
   addParam("SegmentLength", m_segmentLength,
            "Maximum segment length (in millimeters)", m_segmentLength);
-  addParam("WidthOfDiffusCloud", m_widthOfDiffusCloud,
-           "Integration range of charge cloud in sigmas", m_widthOfDiffusCloud);
 
   // 3. Noise
   addParam("PoissonSmearing", m_applyPoisson,
@@ -95,7 +93,7 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
            m_nSamplesOverZS);
 
   // 4. Timing
-  addParam("APVShapingTime", m_shapingTime, "APV25 shaping time in ns (unused with the current default waveform)",
+  addParam("APVShapingTime", m_shapingTime, "APV25 shaping time in ns",
            m_shapingTime);
   addParam("ADCSamplingTime", m_samplingTime,
            "Interval between ADC samples in ns, if = -1 taken from HardwareClockSettings payload (default).", m_samplingTime);
@@ -176,7 +174,6 @@ void SVDDigitizerModule::initialize()
   B2DEBUG(29, " -->  DigitTrueRel:       " << m_relShaperDigitTrueHitName);
   B2DEBUG(29, " PHYSICS: ");
   B2DEBUG(29, " -->  SegmentLength:      " << m_segmentLength);
-  B2DEBUG(29, " -->  Charge int. range:  " << m_widthOfDiffusCloud);
   B2DEBUG(29, " NOISE: ");
   B2DEBUG(29, " -->  Add Poisson noise   " << (m_applyPoisson ? "true" : "false"));
   B2DEBUG(29, " -->  Zero suppression cut" << m_SNAdjacent);

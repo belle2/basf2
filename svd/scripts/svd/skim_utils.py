@@ -56,7 +56,7 @@ class skimOutRNDTrgModule(b2.Module):
 class skimSVDBurstEventsModule(b2.Module):
     """
     returns True if the event is a Burst event (number of strips > max number of strips)
-    use :code:`set_nMaxStrips(nMaxStrips)` to set the max number of strips iof a non-burst event, default is :code:`nMaxStrips=5000`
+    use :code:`set_nMaxStrips(nMaxStrips)` to set the max number of strips of a non-burst event, default is :code:`nMaxStrips=5000`
     """
 
     def __init__(self):

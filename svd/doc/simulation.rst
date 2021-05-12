@@ -6,16 +6,16 @@ SVD Simulation
 The SVD simulation starts with ``SVDSimHits`` and ends with :ref:`SVDShaperDigits<svdshapers>` and :ref:`SVDEventInfo<svdeventinfo>`.
 
 First of all the SVD configuration is written in the :ref:`SVDEventInfo<svdeventinfo>` (DAQ mode, number of APV samples in the event, ...).
-Each chargelet (small group of ionized :math:`e^{-}` or :math:`h^{+}`) is drifted towards the sensor sides (:math:`e^{-}` are collected on the v/N side, :math:`h^{+}` are collected on the u/P side) in a simplified electromagnetic field (including diffusion) and then each charge is assigned to the nearest readout or floating implant. Charge sharing among implants is simulated using coupling constants measured on data and stored in :ref:`SVDChargeSimulationCalibrations<svdchargesimulation>`. Each charge :math:`Q` on a readout strip is assigned an approximate time :math:`\delta` equals to the time it reaches half-way to the sensor side. The APV25 waveform is the simulated in :math:`e^{-}` for each chargelet getting to the sensor side with the following function:
+Each chargelet (small group of ionized :math:`e^{-}` or :math:`h^{+}`) is drifted towards the sensor sides (:math:`e^{-}` are collected on the v/N side, :math:`h^{+}` are collected on the u/P side) in a simplified electromagnetic field (including diffusion) and then each charge is assigned to the nearest readout or floating implant. Charge sharing among implants is simulated using coupling constants measured on data and stored in :ref:`SVDChargeSimulationCalibrations<svdchargesimulation>`. Each charge :math:`Q` on a readout strip is assigned an approximate time :math:`\delta` equals to the time it reaches half-way to the sensor side. The APV25 waveform is simulated in :math:`e^{-}` for each chargelet getting to the sensor side with the following function:
 
 .. math::
 
-   w(t) = Q \cdot \frac{149.012 \cdot (t-\delta)^2}{(1 + t - \delta)^{10}}
+   w(t) = Q \cdot \frac{149.012 \cdot \left(\frac{t-\delta}{\tau}\right)^2}{\left[1 + \left(\frac{t-\delta}{\tau}\right)\right]^{10}}
 
 ..   w(t|\delta,\tau) = Q \cdot \frac{t-\delta}{\tau} * \exp{(1 - \frac{t-\delta}{\tau})} \quad {\rm for }\quad t \ge \delta
-.. and :math:`\tau = 250` ns.
 
-where :math:`Q` is the charge, :math:`\delta` is the start time of the waveform. 
+
+where :math:`Q` is the charge, :math:`\delta` is the start time of the waveform and :math:`\tau = 250` ns.
 
 The total analog APV waveform is the sum of contributions from each charge.
 

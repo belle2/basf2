@@ -21,7 +21,7 @@ where :code:`YZT` is the payload name and :code:`X` is the revision number. The 
 
 .. _granularity:
 
-Wrappers have one of the following the following granularity:
+Wrappers have one of the following granularity:
 
 #. strip granularity: one value/payload per strip
 #. sensor-side granularity: one value/payload per sensor side

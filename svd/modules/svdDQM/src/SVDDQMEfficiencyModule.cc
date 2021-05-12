@@ -25,7 +25,7 @@ REG_MODULE(SVDDQMEfficiency)
 SVDDQMEfficiencyModule::SVDDQMEfficiencyModule() : HistoModule(), m_geoCache(VXD::GeoCache::getInstance())
 {
   // Set module properties
-  setDescription("Create basic histograms to the compute average sensor efficiency.");
+  setDescription("Create basic histograms to compute the average sensor efficiency.");
 
   // What exactly is needed for this to be true?
   setPropertyFlags(c_ParallelProcessingCertified);

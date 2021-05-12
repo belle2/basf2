@@ -1823,7 +1823,7 @@ namespace {
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
+      Particle d(TLorentzVector(-1, 1.0 - 2 * (i % 2), 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -1853,6 +1853,14 @@ namespace {
     var = Manager::Instance().getVariable("daughterDiffOf(0, 2, PDG)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(p), 0);
+
+    var = Manager::Instance().getVariable("daughterDiffOf(1, 0, phi)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -1.5707964);
+
+    var = Manager::Instance().getVariable("daughterDiffOf(1, 0, useCMSFrame(phi))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -1.513103);
 
     EXPECT_B2FATAL(Manager::Instance().getVariable("daughterDiffOf(0, NOTINT, PDG)"));
   }
@@ -2045,9 +2053,9 @@ namespace {
     const Manager::Var* var_E_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,2,3,E)");
     const Manager::Var* var_ClusterE_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,2,3,clusterE)");
 
-    const Manager::Var* var_ClusterPhi = Manager::Instance().getVariable("grandDaughterDiffOfClusterPhi(0,1,0,0)");
+    const Manager::Var* var_ClusterPhi = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,0,0,clusterPhi)");
     const Manager::Var* var_Phi = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,0,0,phi)");
-    const Manager::Var* var_ClusterPhi_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOfClusterPhi(0,1,2,3)");
+    const Manager::Var* var_ClusterPhi_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,2,3,clusterPhi)");
     const Manager::Var* var_Phi_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,2,3,phi)");
 
     // when no relations are set between the particles and the eclClusters, nan is expected to be returned for the Cluster- vars

@@ -3404,7 +3404,7 @@ def getNbarIDMVA(particleList, path=None, ):
     variables.addAlias('nbarIDValid',
                        'passesCut(V1 == 1 and V2 >= 0 and V3 >= 0 and V4 >= 0 and V5 >= 0 and V6 >= 0 and V7 >= 0 and V8 >= 0)')
     variables.addAlias('nbarIDmod', 'conditionalVariableSelector(nbarIDValid == 1, extraInfo(nbarIDFromMVA), constant(-1.0))')
-    basf2.conditions.prepend_globaltag('staging_analysis_yutan_20210226-130316')
+    basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
     path.add_module('MVAExpert', listNames=particleList, extraInfoName='nbarIDFromMVA', identifier='db_nbarIDECL')
     variablesToExtraInfo(particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
 

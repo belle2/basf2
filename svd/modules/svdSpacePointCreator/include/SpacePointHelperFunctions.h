@@ -242,7 +242,7 @@ namespace Belle2 {
    */
   template <class SpacePointType> void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters,
       StoreArray<SpacePointType>& spacePoints, SVDClusterCalibrations& clusterCal, bool useQualityEstimator, TFile* pdfFile,
-      bool useLegacyNaming)
+      bool useLegacyNaming, unsigned int numMaxSpacePoints)
   {
     std::unordered_map<VxdID::baseType, ClustersOnSensor>
     activatedSensors; // collects one entry per sensor, each entry will contain all Clusters on it TODO: better to use a sorted vector/list?
@@ -263,16 +263,18 @@ namespace Belle2 {
     for (auto& aSensor : activatedSensors)
       findPossibleCombinations(aSensor.second, foundCombinations, clusterCal);
 
-
-    for (auto& clusterCombi : foundCombinations) {
-      SpacePointType* newSP = spacePoints.appendNew(clusterCombi);
-      if (useQualityEstimator == true) {
-        calculatePairingProb(pdfFile, clusterCombi, probability, error, useLegacyNaming);
-        newSP->setQualityEstimation(probability);
-        newSP->setQualityEstimationError(error);
-      }
-      for (auto* cluster : clusterCombi) {
-        newSP->addRelationTo(cluster, cluster->isUCluster() ? 1. : -1.);
+    // Do not make space-points if their number would be too large to be considered by tracking
+    if (foundCombinations.size() < numMaxSpacePoints) {
+      for (auto& clusterCombi : foundCombinations) {
+        SpacePointType* newSP = spacePoints.appendNew(clusterCombi);
+        if (useQualityEstimator == true) {
+          calculatePairingProb(pdfFile, clusterCombi, probability, error, useLegacyNaming);
+          newSP->setQualityEstimation(probability);
+          newSP->setQualityEstimationError(error);
+        }
+        for (auto* cluster : clusterCombi) {
+          newSP->addRelationTo(cluster, cluster->isUCluster() ? 1. : -1.);
+        }
       }
     }
   }

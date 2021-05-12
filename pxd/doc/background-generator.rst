@@ -61,7 +61,7 @@ Use the drop-in replacement function incorporating the module instance instead o
 The module implements different generator models.
 A module instance uses one of the implemented generator models.
 
-.. _PyTorch: https://www.pytorch.org
+.. _PyTorch: https://pytorch.org
 
 
 Models

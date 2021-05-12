@@ -2720,44 +2720,48 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.");
     MAKE_DEPRECATED("daughterDiffOfPhi(i, j)", false, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle phi of two daughters can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
+                     The difference of the azimuthal angle :math:`\\phi` of two daughters can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
     REGISTER_VARIABLE("mcDaughterDiffOfPhi(i, j)", mcDaughterDiffOfPhi,
                       "MC matched version of the `daughterDiffOfPhi` function."); 
     MAKE_DEPRECATED("mcDaughterDiffOfPhi(i, j)", false, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle phi of the MC partners of two daughters can be calculated with the generic variable :b2:var:`mcDaughterDiffOf`.)DOC");
+                     The difference of the azimuthal angle :math:`\\phi` of the MC partners of two daughters can be calculated with the generic variable :b2:var:`mcDaughterDiffOf`.)DOC");
     REGISTER_VARIABLE("grandDaughterDiffOfPhi(i, j)", grandDaughterDiffOfPhi,
                       "Returns the difference in :math:`\\phi` between the first daughters of the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.\n");
     MAKE_DEPRECATED("grandDaughterDiffOfPhi(i, j)", false, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle phi of two granddaughters can be calculated with the generic variable :b2:var:`grandDaughterDiffOf`.)DOC");
+                     The difference of the azimuthal angle :math:`\\phi` of two granddaughters can be calculated with the generic variable :b2:var:`grandDaughterDiffOf`.)DOC");
     REGISTER_VARIABLE("daughterDiffOfClusterPhi(i, j)", daughterDiffOfClusterPhi,
                       "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.\n"
-                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n"
-                      "For a generic variable difference, see :b2:var:`daughterDiffOf`.");
+                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.");
+    MAKE_DEPRECATED("daughterDiffOfClusterPhi(i, j)", false, "release-06-00-00", R"DOC(
+                     The difference of the azimuthal angle :math:`\\phi` of the related ECL clusters of two daughters can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
     REGISTER_VARIABLE("grandDaughterDiffOfClusterPhi(i, j)", grandDaughterDiffOfClusterPhi,
                       "Returns the difference in :math:`\\phi` between the ECLClusters of the daughters of the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.\n"
                       "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n");
+    MAKE_DEPRECATED("grandDaughterDiffOfClusterPhi(i, j)", false, "release-06-00-00", R"DOC(
+                     The difference of the azimuthal angle :math:`\\phi` of the related ECL clusters of two granddaughters can be calculated with the generic variable :b2:var:`grandDaughterDiffOf`.)DOC");
     REGISTER_VARIABLE("daughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
                       "Returns the difference in :math:`\\phi` between the two given daughters in the CMS frame.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.");
     MAKE_DEPRECATED("daughterDiffOfPhiCMS(i, j)", false, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle phi of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
+                     The difference of the azimuthal angle :math:`\\phi` of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
     REGISTER_VARIABLE("mcDaughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
                       "MC matched version of the `daughterDiffOfPhiCMS` function.");      
     MAKE_DEPRECATED("mcDaughterDiffOfPhiCMS(i, j)", false, "release-06-00-00", R"DOC(
-                     The difference of the azimuthal angle phi of the MC partners of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`mcDaughterDiffOf`.)DOC");
+                     The difference of the azimuthal angle :math:`\\phi` of the MC partners of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`mcDaughterDiffOf`.)DOC");
     REGISTER_VARIABLE("daughterDiffOfClusterPhiCMS(i, j)", daughterDiffOfClusterPhiCMS,
                       "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters in the CMS frame.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i``.\n"
-                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n"
-                      "For a generic variable difference, see :b2:var:`daughterDiffOf`.");
+                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.");
+    MAKE_DEPRECATED("daughterDiffOfClusterPhiCMS(i, j)", false, "release-06-00-00", R"DOC(
+                     The difference of the azimuthal angle :math:`\\phi` of the related ECL clusters of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
     REGISTER_VARIABLE("daughterNormDiffOf(i, j, variable)", daughterNormDiffOf,
                       "Returns the normalized difference of a variable between the two given daughters.\n"
                       "E.g. ``daughterNormDiffOf(0, 1, p)`` returns the normalized momentum difference between first and second daughter in the lab frame.");

@@ -47,7 +47,6 @@ class SteeringFileTest(unittest.TestCase):
         additional_arguments: Optional[List[str]] = None,
         expensive_tests: Optional[List[str]] = None,
         skip_in_light: Optional[List[str]] = None,
-        change_working_directory=True,
     ):
         """
         Internal function to test a directory full of example scripts with an
@@ -64,7 +63,6 @@ class SteeringFileTest(unittest.TestCase):
                 longer and should e.g. not run on bamboo
             skip_in_light (list(str)): (optional) names of scripts that have to
                 be excluded in light builds
-            change_working_directory: Change to path_to_glob for execution
         """
         if additional_arguments is None:
             additional_arguments = []
@@ -89,7 +87,6 @@ class SteeringFileTest(unittest.TestCase):
                     ["basf2", "-n1", eg, *additional_arguments],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
-                    cwd=working_dir,
                 )
                 if result.returncode != 0:
                     # failure running example so let's print the output
@@ -125,7 +122,6 @@ class SteeringFileTest(unittest.TestCase):
                 "085_module.py",
                 "087_module.py"
             ],
-            change_working_directory=True,
         )
 
 

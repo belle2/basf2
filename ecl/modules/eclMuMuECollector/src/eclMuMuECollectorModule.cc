@@ -73,6 +73,9 @@ void eclMuMuECollectorModule::prepare()
 
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
+  auto TrkPerCrysID = new TH1F("TrkPerCrysID", "track extrapolations per crystalID;crystal ID", 8736, 0, 8736);
+  registerObject<TH1F>("TrkPerCrysID", TrkPerCrysID);
+
   auto EnVsCrysID = new TH2F("EnVsCrysID", "Normalized energy for each crystal;crystal ID;E/Expected", 8736, 0, 8736, 120, 0.1, 2.5);
   registerObject<TH2F>("EnVsCrysID", EnVsCrysID);
 
@@ -99,6 +102,12 @@ void eclMuMuECollectorModule::prepare()
   auto RawDigitTimevsCrys = new TH2F("RawDigitTimevsCrys", "Digit Time vs crystal ID;crystal ID;Time", 8736, 0, 8736, 200, -2000,
                                      2000);
   registerObject<TH2F>("RawDigitTimevsCrys", RawDigitTimevsCrys);
+
+  //..Diagnose possible cable swaps
+  auto hitCrysVsExtrapolatedCrys = new TH2F("hitCrysVsExtrapolatedCrys",
+                                            "Crystals with high energy vs extrapolated crystals with no energy;extrapolated crystalID;High crystalID", 8736, 0, 8736, 8736, 0,
+                                            8736);
+  registerObject<TH2F>("hitCrysVsExtrapolatedCrys", hitCrysVsExtrapolatedCrys);
 
 
   //------------------------------------------------------------------------
@@ -270,13 +279,13 @@ void eclMuMuECollectorModule::collect()
       int temp0 = extHit.getCopyID();  // ID within that subsystem; for ecl it is crystal ID
 
       /** This extrapolation is the entrance point to an ECL crystal, assuming muon hypothesis */
-      if (detectorID == eclID && TMath::Abs(pdgCode) == Const::muon.getPDGCode() && extHit.getStatus() == EXT_ENTER) {
+      if (detectorID == eclID && TMath::Abs(pdgCode) == 13 && extHit.getStatus() == EXT_ENTER) {
         IDEnter = temp0;
         temppos[0] = extHit.getPosition();
       }
 
       /** Now we have the exit point of the same ECL crystal */
-      if (detectorID == eclID && TMath::Abs(pdgCode) == Const::muon.getPDGCode() && extHit.getStatus() == EXT_EXIT && temp0 == IDEnter) {
+      if (detectorID == eclID && TMath::Abs(pdgCode) == 13 && extHit.getStatus() == EXT_EXIT && temp0 == IDEnter) {
         temppos[1] = extHit.getPosition();
 
         /** Keep track of this crystal if the track length is long enough. Note that if minTrackLength is less than half the crystal length, we will keep only the first extrapolation due to break */
@@ -293,12 +302,18 @@ void eclMuMuECollectorModule::collect()
   //------------------------------------------------------------------------
   /** Record ECL digit amplitude as a function of CrysID */
   memset(&EperCrys[0], 0, EperCrys.size()*sizeof EperCrys[0]);
+
+  //..Record crystals with high energies to diagnose cable swaps
+  const double highEnergyThresh = 0.18; // GeV
+  std::vector<int> highECrys; // crystalIDs of crystals with high energy
+
   for (auto& eclDigit : m_eclDigitArray) {
     int crysID = eclDigit.getCellId() - 1;
     getObjectPtr<TH2F>("RawDigitAmpvsCrys")->Fill(crysID + 0.001, eclDigit.getAmp());
 
     /** MuMuECalib is negative if the previous iteration of the algorithm was unable to calculate a value. In this case, the input value has been stored with a minus sign */
     EperCrys[crysID] = eclDigit.getAmp() * abs(MuMuECalib[crysID]) * ElectronicsCalib[crysID];
+    if (EperCrys[crysID] > highEnergyThresh) {highECrys.push_back(crysID);}
     if (EperCrys[crysID] > 0.01) {
       getObjectPtr<TH2F>("RawDigitTimevsCrys")->Fill(crysID + 0.001, eclDigit.getTimeFit());
     }
@@ -314,19 +329,23 @@ void eclMuMuECollectorModule::collect()
   }
 
   //------------------------------------------------------------------------
-  /** Require that the energy in immediately adjacent crystals is below threshold */
+  /** Require that the energy in immediately adjacent crystals is below threshold.
+      Also check if neighbour has high energy due to cable swaps */
   for (int imu = 0; imu < 2; imu++) {
     int crysID = extCrysID[imu];
     int cellID = crysID + 1;
     if (crysID > -1) {
 
+      getObjectPtr<TH1F>("TrkPerCrysID")->Fill(crysID + 0.001);
+
       bool noNeighbourSignal = true;
+      bool highNeighourSignal = false;
       if (cellID >= firstcellIDN4 && crysID <= lastcellIDN4) {
         for (const auto& tempCellID : myNeighbours4->getNeighbours(cellID)) {
           int tempCrysID = tempCellID - 1;
           if (tempCellID != cellID && EperCrys[tempCrysID] > m_MaxNeighbourE) {
             noNeighbourSignal = false;
-            break;
+            if (EperCrys[tempCrysID] > highEnergyThresh) {highNeighourSignal = true;}
           }
         }
       } else {
@@ -334,7 +353,7 @@ void eclMuMuECollectorModule::collect()
           int tempCrysID = tempCellID - 1;
           if (tempCellID != cellID && EperCrys[tempCrysID] > m_MaxNeighbourE) {
             noNeighbourSignal = false;
-            break;
+            if (EperCrys[tempCrysID] > highEnergyThresh) {highNeighourSignal = true;}
           }
         }
       }
@@ -348,6 +367,13 @@ void eclMuMuECollectorModule::collect()
         getObjectPtr<TH1F>("ElecCalibvsCrys")->Fill(crysID + 0.001, ElectronicsCalib[crysID]);
         getObjectPtr<TH1F>("InitialCalibvsCrys")->Fill(crysID + 0.001, MuMuECalib[crysID]);
         getObjectPtr<TH1F>("CalibEntriesvsCrys")->Fill(crysID + 0.001);
+      }
+
+      //..Possible cable swap
+      if (highNeighourSignal or (noNeighbourSignal and EperCrys[crysID] < m_MaxNeighbourE)) {
+        for (auto& id : highECrys) {
+          getObjectPtr<TH2F>("hitCrysVsExtrapolatedCrys")->Fill(crysID + 0.0001, id + 0.0001);
+        }
       }
     }
   }

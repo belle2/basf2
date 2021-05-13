@@ -9,6 +9,7 @@ env['LIBS'] = ['framework',
 	       'trg_grl_dataobjects',
 	       'mdst_dataobjects',
 	       'mdst_dbobjects',
+	       'simulation_dataobjects',
 	       'trg_trg',
 	       'trg_cdc']
 #env.Append(CPPDEFINES = {'TRG_DEBUG':None})

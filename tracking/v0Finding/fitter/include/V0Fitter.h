@@ -101,7 +101,7 @@ namespace Belle2 {
     bool removeInnerHits(RecoTrack* origRecoTrack, RecoTrack* recoTrack,
                          const int trackPDG, unsigned int& nRemoveHits);
 
-    /** Compare innremost hits of daughter pairs to check if they are the same (shared) or not.
+    /** Compare innermost hits of daughter pairs to check if they are the same (shared) or not.
      * For SVD hits, compare U- and V- hit pair.
      * @param recoTrackPlus, recoTrackMinus input RecoTrack pair
      * @return 0 for not the same (not shared), 1 for 1D-hit share (1-side SVD hit), 2 for 2D-hit (PXD hit or SVD hit pair) share, -1 for exception

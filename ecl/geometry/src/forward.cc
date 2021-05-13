@@ -84,7 +84,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     G4VSolid* part1solid = new BelleLathe("fwd_part1solid", phi0, dphi, contour1);
     G4LogicalVolume* part1logical = new G4LogicalVolume(part1solid, Materials::get("SUS304"), "part1logical", 0, 0, 0);
     part1logical->SetVisAttributes(att("iron"));
-    new G4PVPlacement(gTrans, part1logical, "part1physical", top, false, 0, overlap);
+    new G4PVPlacement(gTrans, part1logical, "ECL_part1physical", top, false, 0, overlap);
   }
 
   // cppcheck-suppress knownConditionTrueFalse

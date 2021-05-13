@@ -565,28 +565,34 @@ int V0Fitter::checkSharedInnermostCluster(const RecoTrack* recoTrackPlus, const 
       const SVDCluster* clusterPlus = recoHitInfoPlus->getRelatedTo<SVDCluster>();
       const SVDCluster* clusterMinus = recoHitInfoMinus->getRelatedTo<SVDCluster>();
       if (clusterPlus->isUCluster() && clusterMinus->isUCluster()) {
-        const auto& recoHitInfoNextPlus  = recoHitInformationsPlus[iInnermostHitPlus + 1];
-        const auto& recoHitInfoNextMinus = recoHitInformationsMinus[iInnermostHitMinus + 1];
-        // sanity check to access next hits
-        if (recoHitInfoNextPlus->useInFit() && recoHitInfoNextMinus->useInFit()  // this should be satisfied by default
-            && recoHitInfoNextPlus->getTrackingDetector()  == RecoHitInformation::c_SVD
-            && recoHitInfoNextMinus->getTrackingDetector() == RecoHitInformation::c_SVD) {
-          const SVDCluster* clusterNextPlus = recoHitInfoNextPlus->getRelatedTo<SVDCluster>();
-          const SVDCluster* clusterNextMinus = recoHitInfoNextMinus->getRelatedTo<SVDCluster>();
-          if (!(clusterNextPlus->isUCluster()) && !(clusterNextMinus->isUCluster())
-              && clusterPlus->getSensorID() == clusterNextPlus->getSensorID()
-              && clusterMinus->getSensorID() == clusterNextMinus->getSensorID()) {
-            if (clusterPlus == clusterMinus && clusterNextPlus == clusterNextMinus) {
-              flag = 2; // SVD U- and V-cluster gives 2D-hit information
-            } else if (clusterPlus == clusterMinus || clusterNextPlus == clusterNextMinus) {
-              flag = 1; // SVD U- or V-cluster gives 1D-hit information
+        if (recoHitInformationsPlus.size() > iInnermostHitPlus + 1
+            && recoHitInformationsMinus.size() > iInnermostHitMinus + 1) { // not to access an array out of boundary
+          const auto& recoHitInfoNextPlus  = recoHitInformationsPlus[iInnermostHitPlus + 1];
+          const auto& recoHitInfoNextMinus = recoHitInformationsMinus[iInnermostHitMinus + 1];
+          // sanity check to access next hits
+          if (recoHitInfoNextPlus->useInFit() && recoHitInfoNextMinus->useInFit()  // this should be satisfied by default
+              && recoHitInfoNextPlus->getTrackingDetector()  == RecoHitInformation::c_SVD
+              && recoHitInfoNextMinus->getTrackingDetector() == RecoHitInformation::c_SVD) {
+            const SVDCluster* clusterNextPlus = recoHitInfoNextPlus->getRelatedTo<SVDCluster>();
+            const SVDCluster* clusterNextMinus = recoHitInfoNextMinus->getRelatedTo<SVDCluster>();
+            if (!(clusterNextPlus->isUCluster()) && !(clusterNextMinus->isUCluster())
+                && clusterPlus->getSensorID() == clusterNextPlus->getSensorID()
+                && clusterMinus->getSensorID() == clusterNextMinus->getSensorID()) {
+              if (clusterPlus == clusterMinus && clusterNextPlus == clusterNextMinus) {
+                flag = 2; // SVD U- and V-cluster gives 2D-hit information
+              } else if (clusterPlus == clusterMinus || clusterNextPlus == clusterNextMinus) {
+                flag = 1; // SVD U- or V-cluster gives 1D-hit information
+              }
+            } else {
+              B2WARNING("SVD cluster to be paired is not on V-side, or not on the same sensor.");
+              return -1;
             }
           } else {
-            B2WARNING("SVD cluster to be paired is not on V-side, or not on the same sensor.");
+            B2WARNING("No SVD cluster to be paired.");
             return -1;
           }
         } else {
-          B2WARNING("No SVD cluster to be paired.");
+          B2WARNING("Innermost SVD U-cluster is the only hit in a daughter track. This should not happen.");
           return -1;
         }
       } else {

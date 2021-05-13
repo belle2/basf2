@@ -72,10 +72,10 @@ namespace Belle2 {
 
     /// range for reconstructed Kshort mass used for pre-selection
     /// default range set to nomminal KS mass + 0.015 GeV and 0.45 GeV
-    std::tuple<double, double> m_MassRangeKshort = { 0.45, 0.497614 + 0.015 };
+    std::tuple<double, double> m_preFilterMassRangeKshort = { 0.45, 0.497614 + 0.015 };
     /// range for reconstructed Lambda mass used for pre-selection
     /// Default range set to nominal Lambda mass +/- 0.03
-    std::tuple<double, double> m_MassRangeLambda = { 1.115683 - 0.03, 1.115683 + 0.03 };
+    std::tuple<double, double> m_preFilterMassRangeLambda = { 1.115683 - 0.03, 1.115683 + 0.03 };
 
     /** helper function that gets the approximate mass range for the two given tracks and rejects candidates which
       do not fall into a user given mass range for lambda and Kshort.

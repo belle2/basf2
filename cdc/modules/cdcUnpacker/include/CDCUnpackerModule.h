@@ -348,6 +348,11 @@ namespace Belle2 {
        */
       bool m_dataLengthError;
 
+      /**
+       * True if data size error between CDCFE and COPPER has been already reported.
+       */
+      bool m_dataSizeError;
+
     };//end class declaration
 
 

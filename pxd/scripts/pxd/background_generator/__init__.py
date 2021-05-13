@@ -21,9 +21,12 @@ from .models import MODELS
 from .models import _get_model_cls, _get_generate_func
 
 ##
-# Sequence of forty arguments represented as
-# tuples with elements `(layer, ladder, sensor)` used to
-# instantiate `VxdID` objects that collectively specify all distinct PXD modules.
+# Sequence of forty tuples `(layer, ladder, sensor)` used to
+# instantiate `VxdID` specifier objects for distinct PXD modules.
+#
+# It is assumed that the indices of tuples in the sequence match
+# indices along the first axis of tensors with shape `(40, 250, 768)`
+# that are produced by the generator.
 VXDID_ARGS = tuple(
     tuple(product([1], [ladder + 1 for ladder in range(8)], [1, 2]))
     + tuple(product([2], [ladder + 1 for ladder in range(12)], [1, 2]))

@@ -3,7 +3,7 @@
 
 import basf2 as b2
 from geometry import check_components
-from L1trigger import add_tsim
+from L1trigger import add_trigger_simulation
 from pxd import add_pxd_simulation
 from svd import add_svd_simulation
 from svd import add_svd_reconstruction
@@ -219,7 +219,7 @@ def add_simulation(
         m.set_name('BGOverlayExecutor_CDC...KLM')
 
     if components is None or 'TRG' in components:
-        add_tsim(path, simulateT0jitter=simulateT0jitter)
+        add_trigger_simulation(path, simulateT0jitter=simulateT0jitter)
 
     # SVD digitization, BG Overlay, sorting and zero suppression
     if components is None or 'SVD' in components:

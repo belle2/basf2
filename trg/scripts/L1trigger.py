@@ -9,7 +9,7 @@ from grltrigger import add_grl_trigger
 from gdltrigger import add_gdl_trigger
 
 
-def add_tsim(
+def add_trigger_simulation(
         path,
         SimulationMode=1,
         shortTracks=False,
@@ -108,3 +108,28 @@ def add_grl_gdl_tsim(
             OpenFilter=OpenFilter,
             Belle2Phase=Belle2Phase,
             simulateT0jitter=simulateT0jitter)
+
+
+def add_tsim(
+        path,
+        SimulationMode=1,
+        shortTracks=False,
+        OpenFilter=False,
+        Belle2Phase='Phase3',
+        components=['CDC', 'ECL', 'KLM', 'GRL', 'GDL'],
+        PrintInfo=False):
+    '''
+    This convenience function is DEPRECATED!
+
+    The L1 trigger simulation (TSIM) is now included in ``add_simulation``.
+
+    If you already have a ``add_simulation`` in your path, you already get L1 trigger simulation.
+
+    If you do not have ``add_simulation``, and you need the L1 trigger simulation,\
+    please use ``add_trigger_simulation()``.
+
+    '''
+
+    basf2.B2FATAL("add_tsim() is deprecated. The L1 trigger simulation is now included\
+    in add_simulation(). If you do not have add_simulation in your path, and you\
+    need the L1 trigger simulation, please use add_trigger_simulation().")

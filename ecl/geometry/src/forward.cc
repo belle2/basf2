@@ -84,7 +84,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     G4VSolid* part1solid = new BelleLathe("fwd_part1solid", phi0, dphi, contour1);
     G4LogicalVolume* part1logical = new G4LogicalVolume(part1solid, Materials::get("SUS304"), "part1logical", 0, 0, 0);
     part1logical->SetVisAttributes(att("iron"));
-    new G4PVPlacement(gTrans, part1logical, "ECL_part1physical", top, false, 0, overlap);
+    new G4PVPlacement(gTrans, part1logical, "ECL_ForwardSupport_part1physical", top, false, 0, overlap);
   }
 
   // cppcheck-suppress knownConditionTrueFalse
@@ -99,7 +99,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     G4VSolid* part23solid = new BelleLathe("fwd_part23solid", phi0, dphi, contour23);
     G4LogicalVolume* part23logical = new G4LogicalVolume(part23solid, Materials::get("A5052"), "part23logical", 0, 0, 0);
     part23logical->SetVisAttributes(att("alum"));
-    new G4PVPlacement(gTrans, part23logical, "part23physical", top, false, 0, overlap);
+    new G4PVPlacement(gTrans, part23logical, "ECL_ForwardSupport_part23physical", top, false, 0, overlap);
   }
 
   // cppcheck-suppress knownConditionTrueFalse
@@ -109,7 +109,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     G4VSolid* part4solid = new BelleLathe("fwd_part4solid", phi0, dphi, contour4);
     G4LogicalVolume* part4logical = new G4LogicalVolume(part4solid, Materials::get("SUS304"), "part4logical", 0, 0, 0);
     part4logical->SetVisAttributes(att("iron"));
-    new G4PVPlacement(gTrans, part4logical, "part4physical", top, false, 0, overlap);
+    new G4PVPlacement(gTrans, part4logical, "ECL_ForwardSupport_part4physical", top, false, 0, overlap);
   }
 
   zr_t cont_array_in[] = {{3., RI}, {ZT, RIp}, {ZT, RT - 20}, {3 + (RT - 20 - RC) / tand(th1), RT - 20}, {3, RC}};

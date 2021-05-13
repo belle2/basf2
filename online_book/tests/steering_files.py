@@ -37,7 +37,7 @@ def light_release() -> bool:
     return False
 
 
-def cetral_release() -> bool:
+def central_release() -> bool:
     """ Returns true if we're in a central release """
     return "BELLE2_RELEASE_DIR" in os.environ
 

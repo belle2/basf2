@@ -13,7 +13,7 @@ from typing import Optional, List
 
 # basf2
 from basf2 import find_file
-from b2test_utils import clean_working_directory, skip_test
+from b2test_utils import clean_working_directory
 
 
 def skip_expensive_tests() -> bool:
@@ -35,11 +35,6 @@ def light_release() -> bool:
     except ModuleNotFoundError:
         return True
     return False
-
-
-def cetral_release() -> bool:
-    """ Returns true if we're in a central release """
-    return "BELLE2_RELEASE_DIR" in os.environ
 
 
 class SteeringFileTest(unittest.TestCase):
@@ -135,7 +130,5 @@ class SteeringFileTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    if central_release():
-        skip_test("Central release is setup")
     with clean_working_directory():
         unittest.main()

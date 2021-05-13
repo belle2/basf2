@@ -279,13 +279,13 @@ void eclMuMuECollectorModule::collect()
       int temp0 = extHit.getCopyID();  // ID within that subsystem; for ecl it is crystal ID
 
       /** This extrapolation is the entrance point to an ECL crystal, assuming muon hypothesis */
-      if (detectorID == eclID && TMath::Abs(pdgCode) == 13 && extHit.getStatus() == EXT_ENTER) {
+      if (detectorID == eclID && TMath::Abs(pdgCode) == Const::muon.getPDGCode() && extHit.getStatus() == EXT_ENTER) {
         IDEnter = temp0;
         temppos[0] = extHit.getPosition();
       }
 
       /** Now we have the exit point of the same ECL crystal */
-      if (detectorID == eclID && TMath::Abs(pdgCode) == 13 && extHit.getStatus() == EXT_EXIT && temp0 == IDEnter) {
+      if (detectorID == eclID && TMath::Abs(pdgCode) == Const::muon.getPDGCode() && extHit.getStatus() == EXT_EXIT && temp0 == IDEnter) {
         temppos[1] = extHit.getPosition();
 
         /** Keep track of this crystal if the track length is long enough. Note that if minTrackLength is less than half the crystal length, we will keep only the first extrapolation due to break */

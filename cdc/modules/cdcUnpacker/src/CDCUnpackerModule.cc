@@ -68,6 +68,7 @@ CDCUnpackerModule::~CDCUnpackerModule()
 void CDCUnpackerModule::initialize()
 {
   m_dataLengthError = false;
+  m_dataSizeError = false;
   m_channelMapFromDB = new DBArray<CDCChannelMap>;
   if ((*m_channelMapFromDB).isValid()) {
     //    B2INFO("Channel map is  valid");
@@ -199,10 +200,12 @@ void CDCUnpackerModule::event()
 
 
         if (dataLength != (nWord - c_headearWords)) {
-          B2ERROR("Inconsistent data size between COPPER and CDC FEE."
-                  << LogVar("data length", dataLength) << LogVar("nWord", nWord)
-                  << LogVar("Node ID", iNode) << LogVar("Finness ID", iFiness));
-
+          if (m_dataSizeError = false) {
+            B2ERROR("Inconsistent data size between COPPER and CDC FEE."
+                    << LogVar("data length", dataLength) << LogVar("nWord", nWord)
+                    << LogVar("Node ID", iNode) << LogVar("Finness ID", iFiness));
+            m_dataSizeError = true;
+          }
           continue;
         }
         if (m_enablePrintOut == true) {

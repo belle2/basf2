@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from basf2 import B2INFO
+from basf2 import B2INFO, B2FATAL
 from cdctrigger import add_cdc_trigger
 from ecltrigger import add_ecl_trigger
 from klmtrigger import add_klm_trigger
@@ -130,6 +130,6 @@ def add_tsim(
 
     '''
 
-    basf2.B2FATAL("add_tsim() is deprecated. The L1 trigger simulation is now included\
-    in add_simulation(). If you do not have add_simulation in your path, and you\
-    need the L1 trigger simulation, please use add_trigger_simulation().")
+    B2FATAL("add_tsim() is deprecated. The L1 trigger simulation is now included\
+ in add_simulation(). If you do not have add_simulation in your path, and you\
+ need the L1 trigger simulation, please use add_trigger_simulation().")

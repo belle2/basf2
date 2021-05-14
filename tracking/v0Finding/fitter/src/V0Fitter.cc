@@ -168,11 +168,14 @@ TrackFitResult* V0Fitter::buildTrackFitResult(const genfit::Track& track, const 
                                               const int sharedInnermostCluster)
 {
   const uint64_t hitPatternCDCInitializer = TrackBuilder::getHitPatternCDCInitializer(*recoTrack);
-  uint32_t hitPatternVXDInitializer = TrackBuilder::getHitPatternVXDInitializer(*recoTrack);
+  uint64_t hitPatternVXDInitializer = TrackBuilder::getHitPatternVXDInitializer(*recoTrack);
 
   // If the innermost hit is shared among V0 daughters, assign flag in the infoLayer.
-  if (sharedInnermostCluster == 1 || sharedInnermostCluster == 2)
-    hitPatternVXDInitializer += sharedInnermostCluster << 24;
+  if (sharedInnermostCluster == 1 || sharedInnermostCluster == 2) {
+    HitPatternVXD hitPatternVXD_forflag = HitPatternVXD(hitPatternVXDInitializer);
+    hitPatternVXD_forflag.setInformation(sharedInnermostCluster);
+    hitPatternVXDInitializer = hitPatternVXD_forflag.getInteger();
+  }
 
   TrackFitResult* v0TrackFitResult
     = m_trackFitResults.appendNew(msop.getPos(), msop.getMom(),

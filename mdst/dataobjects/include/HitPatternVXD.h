@@ -181,6 +181,27 @@ namespace Belle2 {
      */
     short getLastPXDLayer(const PXDMode& mode = PXDMode::normal) const;
 
+    // ----------------------------------------------------------------
+    // ---------------- INFORMATION FUNCTIONS -------------------------
+    // ----------------------------------------------------------------
+
+    /**
+     * Set the information flag.
+     * @param information Information flag.
+     */
+    void setInformation(const unsigned short information);
+
+    /**
+     * Get the information flag.
+     * @return Information flag.
+     */
+    unsigned short getInformation() const;
+
+    /**
+     * Reset the information flag.
+     */
+    void resetInformation();
+
     /** String for printing in python.*/
     std::string __repr__() const;
 

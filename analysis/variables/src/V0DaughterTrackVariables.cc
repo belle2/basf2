@@ -348,8 +348,8 @@ namespace Belle2 {
       auto trackFitMinus = daughterMinus->getTrackFitResult();
       if (!trackFitPlus || !trackFitMinus)
         return std::numeric_limits<int>::quiet_NaN();
-      int flagPlus  = trackFitPlus->getHitPatternVXD().getInteger() >> 24;
-      int flagMinus = trackFitMinus->getHitPatternVXD().getInteger() >> 24;
+      int flagPlus  = trackFitPlus->getHitPatternVXD().getInformation();
+      int flagMinus = trackFitMinus->getHitPatternVXD().getInformation();
       if (flagPlus != flagMinus)
         return std::numeric_limits<int>::quiet_NaN();
       return flagPlus;

@@ -180,6 +180,26 @@ short HitPatternVXD::getLastPXDLayer(const PXDMode& mode) const
   return -1;
 }
 
+void HitPatternVXD::setInformation(const unsigned short information)
+{
+  B2ASSERT("Information is out of range.", information > (s_infoLayerMask >> (4 * 6)).to_ulong());
+  resetInformation();
+  std::bitset<32> hits(information);
+  hits <<= 4 * 6;
+  m_pattern |= hits;
+}
+
+unsigned short HitPatternVXD::getInformation() const
+{
+  std::bitset<32> hits(m_pattern & s_infoLayerMask);
+  return (hits >> (4 * 6)).to_ulong();
+}
+
+void HitPatternVXD::resetInformation()
+{
+  m_pattern &= ~(s_infoLayerMask);
+}
+
 std::string HitPatternVXD::__repr__() const
 {
   return m_pattern.to_string();

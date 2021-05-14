@@ -143,8 +143,10 @@ void DQMHistAnalysisSVDDoseModule::initialize()
     // Get the state enum
     if (m_stateChan) {
       SEVCHK(ca_get(DBR_CTRL_ENUM, m_stateChan, &m_stateCtrl), "ca_get");
-      SEVCHK(ca_pend_io(2.0), "ca_pend_io");
       B2DEBUG(19, "State PV initialized (ca_get)" << LogVar("value", m_stateCtrl.value));
+      SEVCHK(ca_pend_io(2.0), "ca_pend_io");
+    } else {
+      B2DEBUG(18, "State PV failed to initialize, will retry in beginRun(), event() and endRun().");
     }
     // First update should happen m_epicsUpdateSeconds from now
     m_lastPVUpdate = getClockSeconds();
@@ -161,8 +163,11 @@ void DQMHistAnalysisSVDDoseModule::beginRun()
     m_stateCtrl.value = 1;
     if (m_stateChan) {
       SEVCHK(ca_put(DBR_ENUM, m_stateChan, &m_stateCtrl.value), "ca_put");
-      SEVCHK(ca_pend_io(2.0), "ca_pend_io");
+    } else {
+      SEVCHK(ca_create_channel((m_pvPrefix + m_statePVSuffix).data(),
+                               NULL, NULL, 10, &m_stateChan), "ca_create_channel (reconnection)");
     }
+    SEVCHK(ca_pend_io(2.0), "ca_pend_io");
     // First update should happen m_epicsUpdateSeconds from now
     m_lastPVUpdate = getClockSeconds();
   }
@@ -178,16 +183,26 @@ void DQMHistAnalysisSVDDoseModule::event()
     // Dummy ca_get to ensure reconnection to the IOC in case of past errors
     if (m_stateChan) {
       SEVCHK(ca_get(DBR_CTRL_ENUM, m_stateChan, &m_stateCtrl), "ca_get");
-      SEVCHK(ca_pend_io(2.0), "ca_pend_io");
+    } else {
+      SEVCHK(ca_create_channel((m_pvPrefix + m_statePVSuffix).data(),
+                               NULL, NULL, 10, &m_stateChan), "ca_create_channel (reconnection)");
     }
+    SEVCHK(ca_pend_io(2.0), "ca_pend_io");
 
     // Write updateInterval PV and state PV first
-    if (m_timeSinceLastPVUpdateChan)
+    if (m_timeSinceLastPVUpdateChan) {
       SEVCHK(ca_put(DBR_DOUBLE, m_timeSinceLastPVUpdateChan, (void*)&timeSinceLastPVUpdate), "ca_put");
+    } else {
+      SEVCHK(ca_create_channel((m_pvPrefix + m_deltaTPVSuffix).data(), NULL, NULL, 10, &m_timeSinceLastPVUpdateChan),
+             "ca_create_channel (reconnection)");
+    }
     m_stateCtrl.value = 1; // If IOC is restarted this PV must be re-updated
-    if (m_stateChan)
+    if (m_stateChan) {
       SEVCHK(ca_put(DBR_ENUM, m_stateChan, &m_stateCtrl.value), "ca_put");
-
+    } else {
+      SEVCHK(ca_create_channel((m_pvPrefix + m_statePVSuffix).data(),
+                               NULL, NULL, 10, &m_stateChan), "ca_create_channel (reconnection)");
+    }
     // Update occupancy PVs
     for (unsigned int g = 0; g < c_sensorGroups.size(); g++) {
       const auto& group = c_sensorGroups[g];
@@ -212,9 +227,12 @@ void DQMHistAnalysisSVDDoseModule::event()
       double delta_nHits = nHits - pv.lastNHits;
       double delta_nEvts = nEvts - pv.lastNEvts;
       double occ = delta_nEvts > 0.0 ? (delta_nHits / delta_nEvts * 100.0 / group.nStrips) : -1.0;
-      if (pv.mychid)
+      if (pv.mychid) {
         SEVCHK(ca_put(DBR_DOUBLE, pv.mychid, (void*)&occ), "ca_put");
-
+      } else {
+        SEVCHK(ca_create_channel((m_pvPrefix + c_sensorGroups[g].pvMiddle + m_pvSuffix).data(),
+                                 NULL, NULL, 10, &m_myPVs[g].mychid), "ca_create_channel (reconnection)");
+      }
       pv.lastNEvts = nEvts;
       pv.lastNHits = nHits;
     }
@@ -239,8 +257,11 @@ void DQMHistAnalysisSVDDoseModule::endRun()
     m_stateCtrl.value = 0;
     if (m_stateChan) {
       SEVCHK(ca_put(DBR_ENUM, m_stateChan, &m_stateCtrl.value), "ca_put");
-      SEVCHK(ca_pend_io(2.0), "ca_pend_io");
+    } else {
+      SEVCHK(ca_create_channel((m_pvPrefix + m_statePVSuffix).data(),
+                               NULL, NULL, 10, &m_stateChan), "ca_create_channel (reconnection)");
     }
+    SEVCHK(ca_pend_io(2.0), "ca_pend_io");
     // Reset events and hits counters
     for (auto& pv : m_myPVs)
       pv.lastNEvts = pv.lastNHits = 0.0;

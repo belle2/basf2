@@ -157,12 +157,14 @@ void TRGGDLDQMModule::defineHisto()
     // output overlap
     h_psn_overlap[iskim] = new TH1I(Form("hGDL_psn_overlap_%s", skim_smap[iskim].c_str()), "psn overlap", n_output_overlap, 0,
                                     n_output_overlap);
+    h_psn_overlap[iskim]->LabelsOption("v");
     for (int i = 0; i < n_output_overlap; i++) {
       h_psn_overlap[iskim]->GetXaxis()->SetBinLabel(i + 1, output_overlap[i]);
     }
     // output no overlap
     h_psn_nooverlap[iskim] = new TH1I(Form("hGDL_psn_nooverlap_%s", skim_smap[iskim].c_str()), "psn nooverlap", n_output_overlap, 0,
                                       n_output_overlap);
+    h_psn_nooverlap[iskim]->LabelsOption("v");
     for (int i = 0; i < n_output_overlap; i++) {
       h_psn_nooverlap[iskim]->GetXaxis()->SetBinLabel(i + 1, output_overlap[i]);
     }
@@ -1048,71 +1050,199 @@ void
 TRGGDLDQMModule::fillOutputOverlap(void)
 {
   for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
-    bool cdc_fired = isFired_quick("fff", true) || isFired_quick("ffo", true) || isFired_quick("ffb", true)
-                     ||  isFired_quick("ffy", true) ||  isFired_quick("fyo", true) ||  isFired_quick("fyb", true);
+    bool ffy_fired = isFired_quick("ffy", true);
+    bool fyo_fired = isFired_quick("fyo", true) ||  isFired_quick("fyb", true);
     bool c4_fired = isFired_quick("c4", true);
     bool hie_fired = isFired_quick("hie", true);
-    bool lml_fired = (isFired_quick("lml0", true) || isFired_quick("lml1", true) || isFired_quick("lml2", true)
-                      || isFired_quick("lml3", true) || isFired_quick("lml4", true) || isFired_quick("lml5", true)
-                      || isFired_quick("lml6", true) || isFired_quick("lml7", true) || isFired_quick("lml8", true) || isFired_quick("lml9", true)
-                      || isFired_quick("lml10", true)  || isFired_quick("lml11", true)
-                      || isFired_quick("lml12", true) || isFired_quick("lml13", true) || isFired_quick("eclmumu", true));
-    bool klm_fired = isFired_quick("mu_b2b", true) || isFired_quick("mu_eb2b", true) || isFired_quick("beklm", true)
-                     || isFired_quick("cdcklm1", true) || isFired_quick("cdcklm2", true);
-    bool short_fired = isFired_quick("fso", true) || isFired_quick("fsb", true) || isFired_quick("yso", true)
-                       ||  isFired_quick("ysb", true);
-    bool ff30_fired = isFired_quick("ff30", true) || isFired_quick("fy30", true);
-    bool bha3d_fired = isFired_quick("bha3d", true);
+    bool klm_fired = isFired_quick("mu_b2b", true) || isFired_quick("mu_eb2b", true) || isFired_quick("eklm2", true)
+                     || isFired_quick("beklm", true);
+    bool klm_match_fired = isFired_quick("cdcklm1", true) || isFired_quick("cdcklm2", true)
+                           || isFired_quick("seklm1", true) || isFired_quick("seklm2", true)
+                           || isFired_quick("fwd_seklm", true) || isFired_quick("bwd_seklm", true)
+                           || isFired_quick("ieklm1", true) || isFired_quick("ecleklm1", true);
+    bool stt_fired = isFired_quick("stt", true) || isFired_quick("sttecl", true);
+    bool short_fired = isFired_quick("syo", true) ||  isFired_quick("syb", true) || isFired_quick("yioiecl1", true) ;
+    bool ff30_fired = isFired_quick("fy30", true);
+    bool inner_fired = isFired_quick("ioiecl2", true);
+    bool lml_fired = isFired_quick("lml0", true) || isFired_quick("lml2", true) || isFired_quick("lml6", true)
+                     || isFired_quick("lml7", true) || isFired_quick("lml8", true) || isFired_quick("lml9", true)
+                     || isFired_quick("lml10", true)
+                     || isFired_quick("lml12", true) || isFired_quick("lml13", true);
+    bool gg_fired = isFired_quick("ggsel", true);
+    bool bhabha_fired = isFired_quick("bhapur", true);
+    bool pid_fired =     isFired_quick("ssb", true) || isFired_quick("eed", true) || isFired_quick("fed", true)
+                         ||  isFired_quick("fp", true)  || isFired_quick("shem", true) || isFired_quick("ohem", true);
+    bool bhamon_fired =  isFired_quick("bffo", true) || isFired_quick("bhie", true);
+    bool eclmumu_fired = isFired_quick("eclmumu", true);
+    bool lml1_fired = isFired_quick("lml1", true);
+    bool lml4_fired = isFired_quick("lml4", true);
+    bool veto_fired =  isFired_quick("hiev", true) || isFired_quick("fffv", true);
+    bool random_fired =  isFired_quick("bg", true) || isFired_quick("poissonv", true);
+    bool ffz_fired = isFired_quick("ffz", true);
+    bool fzo_fired = isFired_quick("fzo", true) ||  isFired_quick("fzb", true);
+    bool monitor_fired =    isFired_quick("fff", true) || isFired_quick("ffo", true) || isFired_quick("ffb", true)
+                            || isFired_quick("fffo", true) || isFired_quick("ffs", true) || isFired_quick("fss", true) || isFired_quick("sss", true)
+                            || isFired_quick("ff", true) || isFired_quick("ss", true) || isFired_quick("fso", true)
+                            || isFired_quick("sso", true) || isFired_quick("fsb", true) || isFired_quick("ff30", true)
+                            || isFired_quick("lume", true) || isFired_quick("c2", true) || isFired_quick("c3", true)
+                            || isFired_quick("bha3d", true) || isFired_quick("bhabha", true)
+                            || isFired_quick("lml3", true) || isFired_quick("lml5", true)
+                            || isFired_quick("g_high", true) || isFired_quick("g_c1", true) || isFired_quick("gg", true)
+                            || isFired_quick("eklmhit", true) || isFired_quick("fioiecl1", true) || isFired_quick("ioiecl1", true)
+                            || isFired_quick("cdcecl1", true) || isFired_quick("cdcecl2", true) || isFired_quick("cdcecl3", true)
+                            || isFired_quick("cdcecl4", true) || isFired_quick("c2gev1", true) || isFired_quick("c2gev2", true)
+                            || isFired_quick("c2hie", true) || isFired_quick("f", true) || isFired_quick("s", true)
+                            || isFired_quick("revolution", true) || isFired_quick("random", true);
 
+    bool B_CDC_fired = ffy_fired || fyo_fired;
+    bool B_ECL_fired = c4_fired  || hie_fired;
+    bool LOW_KLM_fired = klm_fired || klm_match_fired;
+    bool LOW_CDC_fired = stt_fired || short_fired || ff30_fired || inner_fired;
+    bool LOW_ECL_fired = lml_fired;
+    bool CALIB_fired = gg_fired || bhabha_fired || pid_fired || bhamon_fired || eclmumu_fired || lml1_fired || lml4_fired || veto_fired
+                       || random_fired;
+    bool MONITOR_fired = monitor_fired || ffz_fired || fzo_fired;
+
+    //all event
     if (1) {
       h_psn_overlap[skim[ifill]]->Fill(0.5);
     }
-    if (cdc_fired) {
+    //main category
+    if (B_CDC_fired) {
       h_psn_overlap[skim[ifill]]->Fill(1.5);
-    } else if (c4_fired) {
+    } else if (B_ECL_fired) {
       h_psn_overlap[skim[ifill]]->Fill(2.5);
-    } else if (hie_fired) {
+    } else if (LOW_KLM_fired) {
       h_psn_overlap[skim[ifill]]->Fill(3.5);
-    } else if (klm_fired) {
+    } else if (LOW_CDC_fired) {
       h_psn_overlap[skim[ifill]]->Fill(4.5);
-    } else if (short_fired) {
+    } else if (LOW_ECL_fired) {
       h_psn_overlap[skim[ifill]]->Fill(5.5);
-    } else if (ff30_fired) {
+    } else if (CALIB_fired) {
       h_psn_overlap[skim[ifill]]->Fill(6.5);
-    } else if (lml_fired) {
+    } else if (MONITOR_fired) {
       h_psn_overlap[skim[ifill]]->Fill(7.5);
-    } else if (bha3d_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(8.5);
     } else {
+      h_psn_overlap[skim[ifill]]->Fill(8.5);
+    }
+    //detail category
+    if (ffy_fired) {
       h_psn_overlap[skim[ifill]]->Fill(9.5);
+    } else if (fyo_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(10.5);
+    } else if (c4_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(11.5);
+    } else if (hie_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(12.5);
+    } else if (klm_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(13.5);
+    } else if (klm_match_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(14.5);
+    } else if (stt_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(15.5);
+    } else if (short_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(16.5);
+    } else if (ff30_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(17.5);
+    } else if (inner_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(18.5);
+    } else if (lml_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(19.5);
+    } else if (gg_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(20.5);
+    } else if (bhabha_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(21.5);
+    } else if (pid_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(22.5);
+    } else if (bhamon_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(23.5);
+    } else if (eclmumu_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(24.5);
+    } else if (lml1_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(25.5);
+    } else if (lml4_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(26.5);
+    } else if (veto_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(27.5);
+    } else if (random_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(28.5);
+    } else if (ffz_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(29.5);
+    } else if (fzo_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(30.5);
+    } else if (monitor_fired) {
+      h_psn_overlap[skim[ifill]]->Fill(31.5);
+    } else {
+      h_psn_overlap[skim[ifill]]->Fill(32.5);
     }
 
+    //all event
     if (1) {
       h_psn_nooverlap[skim[ifill]]->Fill(0.5);
     }
-    if (cdc_fired) {
+    //main category
+    if (B_CDC_fired) {
       h_psn_nooverlap[skim[ifill]]->Fill(1.5);
-    }
-    if (c4_fired) {
+    }  if (B_ECL_fired) {
       h_psn_nooverlap[skim[ifill]]->Fill(2.5);
-    }
-    if (hie_fired) {
+    }  if (LOW_KLM_fired) {
       h_psn_nooverlap[skim[ifill]]->Fill(3.5);
-    }
-    if (klm_fired) {
+    }  if (LOW_CDC_fired) {
       h_psn_nooverlap[skim[ifill]]->Fill(4.5);
-    }
-    if (short_fired) {
+    }  if (LOW_ECL_fired) {
       h_psn_nooverlap[skim[ifill]]->Fill(5.5);
-    }
-    if (ff30_fired) {
+    }  if (CALIB_fired) {
       h_psn_nooverlap[skim[ifill]]->Fill(6.5);
-    }
-    if (lml_fired) {
+    }  if (MONITOR_fired) {
       h_psn_nooverlap[skim[ifill]]->Fill(7.5);
     }
-    if (bha3d_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(8.5);
+    //detail category
+    if (ffy_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(9.5);
+    }  if (fyo_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(10.5);
+    }  if (c4_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(11.5);
+    }  if (hie_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(12.5);
+    }  if (klm_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(13.5);
+    }  if (klm_match_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(14.5);
+    }  if (stt_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(15.5);
+    }  if (short_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(16.5);
+    }  if (ff30_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(17.5);
+    }  if (inner_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(18.5);
+    }  if (lml_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(19.5);
+    }  if (gg_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(20.5);
+    }  if (bhabha_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(21.5);
+    }  if (pid_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(22.5);
+    }  if (bhamon_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(23.5);
+    }  if (eclmumu_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(24.5);
+    }  if (lml1_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(25.5);
+    }  if (lml4_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(26.5);
+    }  if (veto_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(27.5);
+    }  if (random_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(28.5);
+    }  if (ffz_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(29.5);
+    }  if (fzo_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(30.5);
+    }  if (monitor_fired) {
+      h_psn_nooverlap[skim[ifill]]->Fill(31.5);
     }
   }
 }
@@ -1482,8 +1612,12 @@ const char* TRGGDLDQMModule::output_extra[n_output_extra] = {
 };
 
 const char* TRGGDLDQMModule::output_overlap[n_output_overlap] = {
-  "all", "cdc", "c4", "hie", "klm", "short", "ff30", "lml", "bha3D", "other"
+  "all",       "B_CDC",        "B_ECL",      "L_KLM",            "L_CDC",         "L_ECL",      "CALIB",      "MONITOR",      "other",        "B_ffy",
+  "B_fyo",     "B_c4",         "B_hie",      "L_klm",            "L_klm_match",   "L_stt",      "L_short",    "L_fy30",       "L_inner",      "L_lml",
+  "CALIB_gg",  "CALIB_bhapur", "CALIB_pid",  "CALIB_wo_bhaveto", "CALIB_eclmumu", "CALIB_lml1", "CALIB_lml4", "CALIB_noveto", "CALIB_random", "MON_ffz",
+  "MON_fzo",   "monitor",      "other"
 };
+
 
 
 void

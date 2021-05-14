@@ -50,9 +50,9 @@ namespace Belle2 {
       struct Wave {
         /** Constructor.*/
         Wave(double initTime, double charge, double tau,
-             RelationElement::index_type particle, RelationElement::index_type truehit):
+             RelationElement::index_type particle, RelationElement::index_type truehit, waveFunction wfun):
           m_initTime(initTime), m_charge(charge), m_tau(tau), m_particle(particle),
-          m_truehit(truehit)
+          m_truehit(truehit), m_wfun(wfun)
         {}
         /** Create a string containing data of this Wave object */
         std::string toString() const
@@ -71,6 +71,8 @@ namespace Belle2 {
         RelationElement::index_type m_particle;
         /** DataStore index of the associated SVDTrueHit. */
         RelationElement::index_type m_truehit;
+        /** Waveform function. */
+        waveFunction m_wfun;
       };
 
       /** List of elementary waveforms. */
@@ -108,11 +110,11 @@ namespace Belle2 {
        * @param truehit Index of the truehit corresponding to the particle that contributed
        * the charge.
        */
-      void add(double initTime, double charge, double tau, int particle = -1, int truehit = -1)
+      void add(double initTime, double charge, double tau, int particle = -1, int truehit = -1, waveFunction wfun = w_betaprime)
       {
         if (charge > 0) {
           m_charge += charge;
-          m_functions.push_back(Wave(initTime, charge, tau, particle, truehit));
+          m_functions.push_back(Wave(initTime, charge, tau, particle, truehit, wfun));
           if (particle > -1) m_particles[particle] += static_cast<float>(charge);
           if (truehit > -1) m_truehits[truehit] += static_cast<float>(charge);
         } else if (m_charge == 0)
@@ -141,7 +143,7 @@ namespace Belle2 {
        * @return Value of the waveform at t.
        */
       double waveform(double t, double initTime, double charge, double tau,
-                      waveFunction wfun = w_betaprime) const
+                      waveFunction wfun) const
       {
         double z = (t - initTime) / tau;
         return charge * wfun(z);
@@ -153,7 +155,7 @@ namespace Belle2 {
        * @return THe value of the waveform at time time.
        */
       double waveform(double t, const Wave& wave) const
-      { return waveform(t, wave.m_initTime, wave.m_charge, wave.m_tau); }
+      { return waveform(t, wave.m_initTime, wave.m_charge, wave.m_tau, wave.m_wfun); }
 
       /** Make SVDSignal a functor.
        * @param t The time at which output is to be calculated.

@@ -139,11 +139,13 @@ void DQMHistAnalysisSVDDoseModule::initialize()
     SEVCHK(ca_create_channel((m_pvPrefix + m_statePVSuffix).data(),
                              NULL, NULL, 10, &m_stateChan), "ca_create_channel");
     // Actually do create the channels, communicating with the IOC
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io");
+    SEVCHK(ca_pend_io(2.0), "ca_pend_io");
     // Get the state enum
-    SEVCHK(ca_get(DBR_CTRL_ENUM, m_stateChan, &m_stateCtrl), "ca_get");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io");
-    B2DEBUG(19, "State PV initialized (ca_get)" << LogVar("value", m_stateCtrl.value));
+    if (m_stateChan) {
+      SEVCHK(ca_get(DBR_CTRL_ENUM, m_stateChan, &m_stateCtrl), "ca_get");
+      SEVCHK(ca_pend_io(2.0), "ca_pend_io");
+      B2DEBUG(19, "State PV initialized (ca_get)" << LogVar("value", m_stateCtrl.value));
+    }
     // First update should happen m_epicsUpdateSeconds from now
     m_lastPVUpdate = getClockSeconds();
   }
@@ -157,8 +159,10 @@ void DQMHistAnalysisSVDDoseModule::beginRun()
   if (m_useEpics) {
     B2DEBUG(19, "beginRun: setting state PV to RUNNING");
     m_stateCtrl.value = 1;
-    SEVCHK(ca_put(DBR_ENUM, m_stateChan, &m_stateCtrl.value), "ca_put");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io");
+    if (m_stateChan) {
+      SEVCHK(ca_put(DBR_ENUM, m_stateChan, &m_stateCtrl.value), "ca_put");
+      SEVCHK(ca_pend_io(2.0), "ca_pend_io");
+    }
     // First update should happen m_epicsUpdateSeconds from now
     m_lastPVUpdate = getClockSeconds();
   }
@@ -171,6 +175,20 @@ void DQMHistAnalysisSVDDoseModule::event()
 #ifdef _BELLE2_EPICS
   double timeSinceLastPVUpdate = getClockSeconds() - m_lastPVUpdate;
   if (m_useEpics && timeSinceLastPVUpdate >= m_epicsUpdateSeconds) {
+    // Dummy ca_get to ensure reconnection to the IOC in case of past errors
+    if (m_stateChan) {
+      SEVCHK(ca_get(DBR_CTRL_ENUM, m_stateChan, &m_stateCtrl), "ca_get");
+      SEVCHK(ca_pend_io(2.0), "ca_pend_io");
+    }
+
+    // Write updateInterval PV and state PV first
+    if (m_timeSinceLastPVUpdateChan)
+      SEVCHK(ca_put(DBR_DOUBLE, m_timeSinceLastPVUpdateChan, (void*)&timeSinceLastPVUpdate), "ca_put");
+    m_stateCtrl.value = 1; // If IOC is restarted this PV must be re-updated
+    if (m_stateChan)
+      SEVCHK(ca_put(DBR_ENUM, m_stateChan, &m_stateCtrl.value), "ca_put");
+
+    // Update occupancy PVs
     for (unsigned int g = 0; g < c_sensorGroups.size(); g++) {
       const auto& group = c_sensorGroups[g];
       double nHits = 0.0, nEvts = 0.0;
@@ -200,9 +218,9 @@ void DQMHistAnalysisSVDDoseModule::event()
       pv.lastNEvts = nEvts;
       pv.lastNHits = nHits;
     }
-    if (m_timeSinceLastPVUpdateChan)
-      SEVCHK(ca_put(DBR_DOUBLE, m_timeSinceLastPVUpdateChan, (void*)&timeSinceLastPVUpdate), "ca_put");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io");
+
+    // Actually write all the PVs
+    SEVCHK(ca_pend_io(2.0), "ca_pend_io");
     m_lastPVUpdate = getClockSeconds();
   }
 #endif
@@ -219,8 +237,10 @@ void DQMHistAnalysisSVDDoseModule::endRun()
   if (m_useEpics) {
     B2DEBUG(19, "endRun: setting state PV to NOT RUNNING");
     m_stateCtrl.value = 0;
-    SEVCHK(ca_put(DBR_ENUM, m_stateChan, &m_stateCtrl.value), "ca_put");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io");
+    if (m_stateChan) {
+      SEVCHK(ca_put(DBR_ENUM, m_stateChan, &m_stateCtrl.value), "ca_put");
+      SEVCHK(ca_pend_io(2.0), "ca_pend_io");
+    }
     // Reset events and hits counters
     for (auto& pv : m_myPVs)
       pv.lastNEvts = pv.lastNHits = 0.0;

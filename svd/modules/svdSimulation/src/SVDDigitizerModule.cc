@@ -657,7 +657,7 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
     // NB> To first approximation, we assign to the signal 1/2*driftTime.
     // This doesn't change the charge collection, only charge collection timing.
     digits[readoutStrips[index]].add(m_currentTime + 0.5 * driftTime, readoutCharges[index],
-                                     m_shapingTime, m_currentParticle, m_currentTrueHit);
+                                     m_shapingTime, m_currentParticle, m_currentTrueHit, w_betaprime);
     recoveredCharge += readoutCharges[index];
     B2DEBUG(29, "strip: " << readoutStrips[index] << " charge: " << readoutCharges[index]);
   }

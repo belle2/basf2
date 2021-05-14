@@ -79,8 +79,7 @@ namespace Belle2 {
     /** Beta-prime wave function, x^alpha/(1+x)^beta.
      * This is the function for general use.
      * @param t Properly scaled time, (t - t0)/tau.
-     * @param tau Waveform width
-     * @return 6x2 Eigen matrix, times in 1st column, signals in the 2nd.
+     * @return Waveform value t^alpha/(1+t)^beta for t>0, else 0.
      */
     inline double w_betaprime(double t)
     {
@@ -88,6 +87,16 @@ namespace Belle2 {
         return 0.0;
       else
         return 149.012 * pow(t, 2) * pow(1.0 + t, -10);
+    }
+
+    /** Adjacent-channel waveform.
+     * The exact parametrisation is to be determined.
+     * @param t Properly scaled time, (t - t0)/tau.
+     * @return Waveform value (TBD).
+     */
+    inline double w_adjacent(double t)
+    {
+      return 0;
     }
 
     /** Waveform generator

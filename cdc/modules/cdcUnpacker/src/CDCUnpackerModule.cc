@@ -200,11 +200,15 @@ void CDCUnpackerModule::event()
 
 
         if (dataLength != (nWord - c_headearWords)) {
-          if (m_dataSizeError = false) {
+          if (m_dataSizeError == false) {
             B2ERROR("Inconsistent data size between COPPER and CDC FEE."
                     << LogVar("data length", dataLength) << LogVar("nWord", nWord)
                     << LogVar("Node ID", iNode) << LogVar("Finness ID", iFiness));
             m_dataSizeError = true;
+          } else {
+            B2WARNING("Inconsistent data size between COPPER and CDC FEE."
+                      << LogVar("data length", dataLength) << LogVar("nWord", nWord)
+                      << LogVar("Node ID", iNode) << LogVar("Finness ID", iFiness));
           }
           continue;
         }

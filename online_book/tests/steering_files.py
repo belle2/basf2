@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""" Extended version of analysis/test/examples.py. """
+"""
+Test all the steering files used in the online_book lessons.
+Proudly based on analysis/test/examples.py.
+"""
 
 # std
 import os

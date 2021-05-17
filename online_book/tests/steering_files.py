@@ -78,9 +78,9 @@ class SteeringFileTest(unittest.TestCase):
             filename = os.path.basename(eg)
             if filename in broken:
                 continue
-            if skip_expensive_tests and filename in expensive_tests:
+            if skip_expensive_tests() and filename in expensive_tests:
                 continue
-            if filename in skip_in_light and light_release:
+            if light_release() and filename in skip_in_light:
                 continue
             with self.subTest(msg=filename):
                 result = subprocess.run(

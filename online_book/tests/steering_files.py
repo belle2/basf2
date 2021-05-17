@@ -78,7 +78,7 @@ class SteeringFileTest(unittest.TestCase):
             skip_in_light = []
         # we have to copy all the steering files (plus other stuffs, like decfiles) we want to test
         # into a new directory and then cd it as working directory when subprocess.run is executed,
-        # otherwise the test will fail horribly if find_file is calles by one of the steerings.
+        # otherwise the test will fail horribly if find_file is called by one of the tested steerings.
         original_dir = find_file(path_to_glob)
         working_dir = find_file(shutil.copytree(original_dir, 'working_dir'))
         all_egs = sorted(glob.glob(working_dir + "/*.py"))

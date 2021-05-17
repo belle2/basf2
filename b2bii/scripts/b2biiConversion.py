@@ -25,6 +25,7 @@ def setupBelleDatabaseServer():
     except IOError:
         pass
 
+    os.environ['PGUSER'] = 'g0db'
     os.environ['BELLE_POSTGRES_SERVER'] = belleDBServer
 
 

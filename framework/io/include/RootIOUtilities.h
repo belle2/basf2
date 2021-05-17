@@ -16,6 +16,7 @@
 
 class TTree;
 class TClass;
+class TBranch;
 
 namespace Belle2 {
   class FileMetaData;
@@ -35,6 +36,20 @@ namespace Belle2 {
      */
     std::set<std::string> filterBranches(const std::set<std::string>& branchesToFilter, const std::vector<std::string>& branches,
                                          const std::vector<std::string>& excludeBranches, int durability, bool quiet = false);
+
+    /** Set Branch to be read or not
+     *
+     * TTree::SetBranchAddress doesn't do what we want it to do because our branch
+     * names seem to not be conform to their expectations. But we don't need to
+     * use name matching, we know our structure and it's simple enough so we just
+     * recursively go through the branch and all children and set processing on or
+     * off.
+     *
+     * @param branch The branch to change the status for
+     * @param process Whether or not to read/process this branch
+     * @returns the number of branches enabled/disabled
+     */
+    size_t setBranchStatus(TBranch* branch, bool process);
 
     /** Performs wildcard expansion using wordexp(), returns matches. */
     std::vector<std::string> expandWordExpansions(const std::vector<std::string>& filenames);

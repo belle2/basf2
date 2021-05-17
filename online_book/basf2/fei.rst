@@ -99,48 +99,44 @@ In addition to the usual python packages (``basf2`` and `modularAnalysis`) we al
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: -21
+        :lines: -20
 
 Now we need the Global Tag in which the weight files for the FEI can be found. This can change once a new central
-training of the FEI is released so it is best to use the `b2conditionsdb-recommend<b2conditionsdb-recommend>` tool
+training of the FEI is released, so please check the recommended versions.
+One way to do so is to use the `b2conditionsdb-recommend<b2conditionsdb-recommend>` tool
 with the mdst file as argument.
+But there is also a handy method in the `modularAnalysis` package. Can you find it?
 
-The correct Global Tag must then be used in your steering file by assigning it
+The correct Global Tag must then be used in your steering file by prepending it
 to the `conditions.globaltags <ConditionsConfiguration.globaltags>` list in the ``basf2`` namespace.
+There is also a convenience function for that!
 
 .. admonition:: Exercise
     :class: exercise stacked
 
-    Look up the correct Global Tag for our mdst file using `b2conditionsdb-recommend<b2conditionsdb-recommend>`.
-    The command will return multiple Global Tags, choose the one starting with ``analysis_tools``
-    as this one contains the weight files of the FEI.
-
-    Include the Global Tag in your steering file.
+    Include the recommended Global Tag in your steering file. For this you need to
+    get the recommended tag using a method found in `modularAnalysis` and then
+    prepend it to the list using a function documented at :ref:`conditionsdb_overview`.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    Execute
+    You can get the recommended tag using `modularAnalysis.getAnalysisGlobaltag`
 
-    .. code-block:: bash
+.. admonition:: Hint
+    :class: toggle xhint stacked
 
-        b2conditionsdb-recommend /group/belle2/users/tenchini/prerelease-05-00-00a/charged/charged_eph3_BGx0_0.root
-
-    The results are presented in one line separated by spaces. Pick the tag starting with ``analysis_tools`` and assign
-    it to ``b2.conditions.globaltags``.
-
-    **NOTE**: This variable always takes a **list** of tags.
+    The function to prepend to the list of global tags is `conditions.prepend_globaltag <ConditionsConfiguration.prepend_globaltag>`.
+    Now combine this with the last hint!
 
 .. admonition:: Solution
     :class: toggle solution
-
-    The correct global tag is ``analysis_tools_release-04-02``
 
     Include it in the steering file like this:
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 25
+        :lines: 24
 
 
 Configuring the FEI
@@ -169,7 +165,7 @@ efficiency.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 29-35
+        :lines: 28-34
 
 
 The `fei.FeiConfiguration` class controls the other configuration options of the FEI.
@@ -189,7 +185,7 @@ in a single Global Tag and is ``prefix=FEIv4_2020_MC13_release_04_01_01`` for th
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 37-40
+        :lines: 35-38
 
 The configuration created above must now be turned into a ``basf2`` path which can be appended to the main path.
 This is done with the `fei.get_path` function which takes the channel configuration
@@ -213,7 +209,7 @@ to the main path with the `basf2.Path.add_path` method.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 42-46
+        :lines: 41-45
 
 
 You have now successfully added the FEI to the main path. The FEI will add a particle list
@@ -255,7 +251,7 @@ You should already be familiar with these topics from the previous exercises.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 50-51, 61-72, 74-78
+        :lines: 49-50, 60-71, 73-77
 
 The FEI returns not only one B meson candidate for each event but up to 20. Using the `modularAnalysis.rankByHighest`
 function, it is possible to rank the candidates by the B meson classifier output in the
@@ -285,7 +281,7 @@ candidate.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 52-78
+        :lines: 51-77
 
 You can now execute your steering file which should look somewhat like this:
 
@@ -334,7 +330,7 @@ indicator for the quality of the B mesons we have reconstructed.
         n, bins, patches = ax.hist(df['Mbc'], bins=30, range=(5.15, 5.3))
         ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ in GeV/c^2')
         ax.set_ylabel('Number of candidates')
-        ax.savefig('m_bc.pdf')
+        fig.savefig('m_bc.pdf')
 
 
 .. admonition:: Question
@@ -391,11 +387,11 @@ indicator for the quality of the B mesons we have reconstructed.
         ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ in GeV/c^2')
         ax.set_ylabel('Total number of candidates')
         ax.set_title('SigProb > 0.01')
-        ax.savefig('m_bc_cut_0_01.pdf')
+        fig.savefig('m_bc_cut_0_01.pdf')
 
 Congratulations, you have now discovered the B meson in Monte Carlo data!
 This concludes the first part of this lesson. The second part of this lesson will show you now how to use
-the reconstructed B\ :sub:`tag` in you own analysis.
+the reconstructed B\ :sub:`tag` in your own analysis.
 
 
 Reconstructing the full ϒ(4S) event
@@ -436,7 +432,7 @@ Lets get started with the usual steps. Nothing here should be new to you.
     Then, fill two particle lists with muons and charged pions. For the muons, you can require a `muonID`
     above 0.9, for the pions a `pionID` above 0.5.
     For both you should apply some requirements on the track, you can use
-    ``dr < 0.5 and abs(dz) < 2 nCDCHits > 20 and thetaInCDCAcceptance``
+    ``dr < 0.5 and abs(dz) < 2 and nCDCHits > 20 and thetaInCDCAcceptance``
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -512,7 +508,7 @@ B\ :sub:`sig` we have just created.
     :class: toggle solution
 
     To account for B\ :sup:`0` meson mixing, you should also combine same-sign B\ :sup:`0` mesons as the
-    anti-B\ :sup:`0` can oscillate to a anti-B\ :sup:`0`.
+    anti-B\ :sup:`0` can oscillate to a B\ :sup:`0`.
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
@@ -524,9 +520,9 @@ You have already done this in :ref:`onlinebook_roe` for a B meson, here however 
 will create a Rest of Event for the ϒ(4S). This allows us to count the tracks left over after reconstructing the ϒ(4S),
 for two correctly reconstructed B mesons there should be no tracks left over.
 
-For this to work we have to use a slightly different ROE mask than in the ROE chapter. In addition to the track cuts
-given there, two cuts on the two distance variables `dr` and `dz` are needed to match the cuts used by the FEI to
-reconstruct B\ :sub:`tag` candidates.
+For this to work we have to use a slightly different ROE mask than in the ROE chapter. To match the cuts used by the
+FEI to reconstruct B\ :sub:`tag` candidates, we have to tighten the cut on `dr` to below 2 and the cut on the absolute
+value of `dz` (``abs(dz)``) to below 4. The two other cuts (on `pt` and `thetaInCDCAcceptance`) can be left as-is.
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -687,7 +683,7 @@ and explanations on the code structure.
     * FEI Purity and efficiency are controlled by a cut on ``extraInfo(SignalProbability)``
     * The B\ :sub:`tag` from the FEI can be used to construct a complete ϒ(4S) event.
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Author of this lesson
 

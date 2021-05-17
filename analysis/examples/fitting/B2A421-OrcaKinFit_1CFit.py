@@ -60,7 +60,7 @@ z0uvars = z0vars + \
                        'OrcaKinFitErrorCode',
                        'OrcaKinFitUnmeasuredTheta',
                        'OrcaKinFitUnmeasuredPhi',
-                       'OrcaKinFitUnmeasuredE'], 'extraInfo(variable)', "")
+                       'OrcaKinFitUnmeasuredE'], 'extraInfo({variable})', "")
 
 # Saving variables to ntuple
 output_file = 'B2A421-Orcakinfit_1CFit.root'

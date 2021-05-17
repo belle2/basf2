@@ -104,7 +104,7 @@ string FpgaUtility::doubleToArb(double in, int outRadix, int numberOfDigits)
   return result;
 }
 // Change number system between strings.
-string FpgaUtility::arbToArb(std::string& in, int inRadix, int outRadix, int numberOfDigits)
+string FpgaUtility::arbToArb(const std::string& in, int inRadix, int outRadix, int numberOfDigits)
 {
   return doubleToArb(arbToDouble(in, inRadix), outRadix, numberOfDigits);
 }
@@ -211,7 +211,7 @@ void FpgaUtility::writeSignals(std::string outFilePath, std::map<std::string, st
 
 // COE file functions. [TODO] Should  limit number of entries for write functions.
 void FpgaUtility::multipleWriteCoe(int lutInBitsize, std::map<std::string, std::vector<signed long long> >& data,
-                                   std::string fileDirectory)
+                                   const std::string& fileDirectory)
 {
   // Loop over all data.
   for (auto it = data.begin(); it != data.end(); it++) {
@@ -272,7 +272,7 @@ void FpgaUtility::readCoe(std::string inFilePath, std::vector<signed long long>&
       else reformatCoeFile << t_line.substr(0, t_line.size() - 1) << endl;
     }
     // Process reformatted file.
-    vector<string> keywords = {"memory_initialization_radix", "memory_initialization_vector"};
+    //vector<string> keywords = {"memory_initialization_radix", "memory_initialization_vector"};
     int t_radix = 0;
     vector<string> t_rawData;
     while (getline(reformatCoeFile, t_line)) {

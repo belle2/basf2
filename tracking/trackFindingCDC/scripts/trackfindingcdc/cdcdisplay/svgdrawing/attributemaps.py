@@ -4,8 +4,6 @@
 from ROOT import gSystem
 
 from ROOT import Belle2  # make Belle2 namespace available
-from ROOT import std
-from ROOT import genfit
 
 import bisect
 import colorsys

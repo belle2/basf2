@@ -11,7 +11,7 @@ using namespace Belle2::ECL;
 using namespace std;
 
 double Belle2::ECL::func(int i, int ifine,
-                         EclConfigurationPure::signalsamplepure_t& signal)
+                         const EclConfigurationPure::signalsamplepure_t& signal)
 {
   if (i == 0) return 0;
   if (ifine < 0) {
@@ -23,7 +23,7 @@ double Belle2::ECL::func(int i, int ifine,
 }
 
 double Belle2::ECL::func1(int i, int ifine,
-                          EclConfigurationPure::signalsamplepure_t& signal)
+                          const EclConfigurationPure::signalsamplepure_t& signal)
 {
   if (i == 0) return 0;
   if (ifine < 0) {
@@ -35,7 +35,7 @@ double Belle2::ECL::func1(int i, int ifine,
 }
 
 void Belle2::ECL::initParams(EclConfigurationPure::fitparamspure_t& params,
-                             EclConfigurationPure::signalsamplepure_t& signal)
+                             const EclConfigurationPure::signalsamplepure_t& signal)
 {
 
   for (int i = 0; i < 16; i++) {

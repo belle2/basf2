@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Nils Braun, Christian Wessel                             *
+ * Contributors:  Nils Braun, Christian Wessel, Simon Kurz                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -25,6 +25,7 @@ CKFToPXDState::CKFToPXDState(const RecoTrack* seed, bool reversed) : CKFState(se
     setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
   }
   m_stateCache.isHitState = false;
+  m_stateCache.ptSeed = this->getMeasuredStateOnPlane().getMom().Pt();
   m_stateCache.phi = this->getMeasuredStateOnPlane().getPos().Phi();
   m_stateCache.theta = this->getMeasuredStateOnPlane().getPos().Theta();
   m_stateCache.geoLayer = this->getGeometricalLayer();

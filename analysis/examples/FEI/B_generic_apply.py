@@ -11,13 +11,13 @@ path = b2.create_path()
 
 # Load input ROOT file
 ma.inputMdst(environmentType='default',
-             filename=b2.find_file('mdst12.root', 'validation', False),
+             filename=b2.find_file('mdst14.root', 'validation', False),
              path=path)
 
 # Add the necessary database
 # You can use the command b2conditionsdb-recommend
 # b2.conditions.globaltags = ['name of analysis global tag']
-b2.conditions.globaltags = ['analysis_tools_release-04-02']
+b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
 # Get FEI default channels.
 # Utilise the arguments to toggle on and off certain channels

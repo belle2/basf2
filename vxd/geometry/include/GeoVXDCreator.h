@@ -83,7 +83,9 @@ namespace Belle2 {
       /**
        * Return the position where a daughter component is to be placed
        * @param mother Mother component
-       * @param daugther Daughter component
+       * @param daughter Daughter component
+       * @param placement VXDGeoPlacement
+       * @param originCenter bool
        * @return Transformation matrix to place the daughter relative to the origin to the mother
        */
       G4Transform3D getPosition(const VXDGeoComponent& mother, const VXDGeoComponent& daughter, const VXDGeoPlacement& placement,
@@ -113,6 +115,8 @@ namespace Belle2 {
        * @param createContainer if true, subcomponents are allowed to be placed
        *        on top or below the component and the whole component will be
        *        wrapped in an Air volume fitting all components
+       * @param originCenter bool
+       * @param allowOutside bool
        * @return offset in w which was applied to the component when extending it
        */
       GeoVXDAssembly createSubComponents(const std::string& name, VXDGeoComponent&
@@ -169,7 +173,8 @@ namespace Belle2 {
        * Read parameters for all components in placement container from Gearbox
        * into payload.
        * @param placements container holding names of all components to be cached
-       * @param componentDir Path to Gearbox where parameters are to be found
+       * @param componentsDir Path to Gearbox where parameters are to be found
+       * @param vxdGeometryPar
        */
       void readSubComponents(const std::vector<VXDGeoPlacementPar>& placements, const GearDir& componentsDir,
                              VXDGeometryPar& vxdGeometryPar);

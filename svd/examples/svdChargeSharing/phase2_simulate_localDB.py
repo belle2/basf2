@@ -5,9 +5,10 @@
 # Simulating BBbar events, geometry created from DB chain
 # usage: basf2_phase2_simulate_localDB.py fileOUT localDB_dir
 ##################################################################################
-import os
-from basf2 import *
-from generators import *
+import sys
+
+import basf2 as b2
+from generators import add_evtgen_generator
 
 print('***')
 print('*** Used steering script:')
@@ -23,7 +24,7 @@ dec_file = None
 final_state = 'mixed'
 
 # main path
-main = create_path()
+main = b2.create_path()
 
 # event info setter
 main.add_module("EventInfoSetter", expList=1002, runList=0, evtNumList=100)
@@ -44,7 +45,7 @@ main.add_module("Progress")
 main.add_module('RootOutput', outputFileName=fileOUT)
 
 # generate events
-process(main)
+b2.process(main)
 
 # show call statistics
-print(statistics)
+print(b2.statistics)

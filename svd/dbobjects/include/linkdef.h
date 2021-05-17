@@ -29,6 +29,10 @@
 #pragma link C++ class Belle2::SVDCalibrationsVector<Belle2::SVDStripCalAmp> +; // checksum=0xfff37002, version=-1
 #pragma link C++ struct Belle2::SVDStripCalAmp +;
 
+#pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsScalar<Belle2::SVDChargeSimCal>>+; // checksum=0x98e032e5, version=2
+#pragma link C++ class Belle2::SVDCalibrationsScalar<Belle2::SVDChargeSimCal> +; // checksum=0x8b93e80, version=-1
+#pragma link C++ struct Belle2::SVDChargeSimCal +;
+
 #pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsBitmap> +; // checksum=0x34de8474, version=2
 #pragma link C++ class Belle2::SVDCalibrationsBitmap +; // checksum=0xf2ee9bed, version=-1
 
@@ -46,12 +50,10 @@
 #pragma link C++ class Belle2::SVDCalibrationsScalar< Belle2::SVDHitTimeSelectionFunction> +; // checksum=0xfe6bb093, version=-1
 #pragma link C++ class Belle2::SVDHitTimeSelectionFunction +; // checksum=0x996882b0, version=3
 
-
-
 #pragma link C++ class Belle2::SVDLocalConfigParameters +; // checksum=0x56a63232, version=1
-
-
 #pragma link C++ class Belle2::SVDGlobalConfigParameters +; // , checksum=0x1694a3c, version=3
+
+#pragma link C++ class Belle2::SVDRecoConfiguration +; // checksum=0x5da73de6, version=1
 
 #endif
 

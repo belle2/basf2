@@ -10,7 +10,6 @@
 
 # *****************************************************************************
 
-import sys
 import math
 import basf2 as b2
 
@@ -189,9 +188,9 @@ class CosmicAnalysis(b2.Module):
                 if track.hasPXDHits():
 
                     # Print number of PXD hits
-                    EventMetaData = Belle2.PyStoreObj('EventMetaData')
-                    event = EventMetaData.getEvent()
-                    nPxdHits = track.getNumberOfPXDHits()
+                    # EventMetaData = Belle2.PyStoreObj('EventMetaData')
+                    # event = EventMetaData.getEvent()
+                    # nPxdHits = track.getNumberOfPXDHits()
                     # print('Event', event, 'has PXD', nPxdHits, 'hit(s):')
 
                     # First loop over PXD Hits
@@ -200,7 +199,6 @@ class CosmicAnalysis(b2.Module):
                         sensorID = Belle2.VxdID(pxdHit.getSensorID())
                         info = geoCache.get(sensorID)
                         layer = sensorID.getLayerNumber()
-                        ladder = sensorID.getLadderNumber()
                         sensor = sensorID.getSensorNumber()
                         # print('Hit information: #hit:', n, 'sensor information:', layer, ladder, sensor)
                         self.HitsVsLayer.Fill(totalNumberOfHits, layer)
@@ -212,26 +210,23 @@ class CosmicAnalysis(b2.Module):
                 if track.hasSVDHits():
 
                     # Print number of SVD hits
-                    EventMetaData = Belle2.PyStoreObj('EventMetaData')
-                    event = EventMetaData.getEvent()
-                    nSvdHits = track.getNumberOfSVDHits()
+                    # EventMetaData = Belle2.PyStoreObj('EventMetaData')
+                    # event = EventMetaData.getEvent()
+                    # nSvdHits = track.getNumberOfSVDHits()
                     # print('Event', event, 'has SVD', nSvdHits, 'hit(s):')
 
                     # First loop over SVD Hits
-                    measured = ROOT.TVector3(0, 0, 0)
-                    expected = ROOT.TVector3(0, 0, 0)
                     for n in range(0, len(track.getSVDHitList())):
                         svdHit = track.getSVDHitList()[n]
                         sensorID = Belle2.VxdID(svdHit.getSensorID())
                         info = geoCache.get(sensorID)
                         layer = sensorID.getLayerNumber()
-                        ladder = sensorID.getLadderNumber()
                         sensor = sensorID.getSensorNumber()
 
                         if svdHit.isUCluster():
                             # print('Hit information: #hit:', n, 'sensor information:', layer, ladder, sensor, 'isU')
-                            for l in range(0, len(track.getSVDHitList())):
-                                svdHitA = track.getSVDHitList()[l]
+                            for lst in range(0, len(track.getSVDHitList())):
+                                svdHitA = track.getSVDHitList()[lst]
                                 sensorIDA = Belle2.VxdID(svdHitA.getSensorID())
                                 if info == geoCache.get(sensorIDA):
                                     if svdHitA.isUCluster() == 0:

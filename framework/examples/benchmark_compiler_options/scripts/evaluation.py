@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-import numpy as np
 
 
 def fFileExist(filename):
     '''Test if file exists'''
 
     try:
-        oFile = open(filename, 'r')
-    except IOError:
+        oFile = open(filename)
+    except OSError:
         return 0
     else:
         oFile.close()
@@ -24,7 +21,7 @@ def read(optlevel):
         print('missing ' + filename)
     else:
         CDCLegendreTracking = []
-        fobj = open(filename, 'r')
+        fobj = open(filename)
         # read output file
         for line in fobj:
             if line.startswith('CDCLegendreTracking'):

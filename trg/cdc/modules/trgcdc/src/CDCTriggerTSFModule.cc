@@ -86,7 +86,7 @@ CDCTriggerTSFModule::initialize()
   // Prepare track segment shapes.
   // First a structure of wires is created for all layers and super layers.
   // Each track segment consists of pointers to wires in this structure.
-  CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
+  const CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
   const unsigned nLayers = cdc.nWireLayers();
   TRGClock* clockTDC = new TRGClock("CDCTrigger TDC clock", 0, 500. / cdc.getTdcBinWidth());
   TRGClock* clockData = new TRGClock("CDCTrigger data clock", *clockTDC, 1, 16);
@@ -283,7 +283,7 @@ CDCTriggerTSFModule::initialize()
 void
 CDCTriggerTSFModule::event()
 {
-  CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
+  const CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
 
   // fill CDCHits into track segment shapes
 

@@ -171,7 +171,7 @@ void KLMTriggerModule::fillTracks()
 
     int sectorID = section * c_TotalSectors + sector;
 
-    if (trackMap.find(sectorID) == trackMap.end())
+    if (!trackMap.count(sectorID))
       trackMap[sectorID] = klmTriggerTracks.appendNew(section, sector);
 
     trackMap[sectorID]->addRelationTo(klmTriggerHits[i]);

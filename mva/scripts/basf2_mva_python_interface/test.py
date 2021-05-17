@@ -10,9 +10,9 @@ class State(object):
     """
     Test state
     """
+
     def __init__(self):
         """ Constructor of the state object """
-        pass
 
     def __repr__(self):
         """ Returns representation of this state"""

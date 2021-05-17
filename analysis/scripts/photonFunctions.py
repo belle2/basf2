@@ -1,5 +1,4 @@
 # !/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Functions that work on photon lists.
@@ -12,7 +11,6 @@ Contributor(s): Torben Ferber
 from basf2 import create_path
 import string
 import random
-from variables import variables
 import modularAnalysis as ma
 
 

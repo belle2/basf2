@@ -19,8 +19,10 @@ import pdg
 from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
 from stdCharged import stdE, stdMu
 from stdPhotons import stdPhotons
+import vertex as vertex
 
 __liaison__ = "Sascha Dreyer <sascha.dreyer@desy.de>"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header
@@ -388,7 +390,7 @@ class GammaGammaControlKLMDark(BaseSkim):
         # unpack prescales and convert from trigger convention to a number we can
         # compare with a float
         prescale_high, prescale_low = self.prescale_high, self.prescale_low
-        if (prescale_high, prescale_low) is not (1, 1):
+        if (prescale_high, prescale_low) != (1, 1):
             b2.B2INFO(
                 "GammaGammaControlKLMDarkList is prescaled. "
                 f"prescale_high={prescale_high}, prescale_low={prescale_low}"
@@ -485,6 +487,53 @@ class DielectronPlusMissingEnergy(BaseSkim):
 
 
 @fancy_skim_header
+class RadBhabhaV0Control(BaseSkim):
+
+    """
+    Control sample: :math:`e^{+}e^{-} \\to e^{+}e^{-}V^{0};`"
+    """
+
+    __authors__ = "Savino Longo"
+    __description__ = (
+        "iDM control sample skim. :math:`e^{+}e^{-} \\to e^{+}e^{-}V^{0};`"
+    )
+    __contact__ = __liaison__
+    __category__ = "physics, dark sector"
+
+    def load_standard_lists(self, path):
+        stdPhotons("all", path=path)
+        stdE("all", path=path)
+
+    def build_lists(self, path):
+
+        # require Bhabha tracks are high p and E/p is consitent with e+/e-
+        BhabhaTrackCuts = 'abs(dr)<0.5 and abs(dz)<2 and pt>0.2 and 0.8<clusterEoP<1.2 and p>1.0 and clusterReg==2 and nCDCHits>4'
+        BhabhaSystemCuts = '4<M<10 and 0.5<pRecoilTheta<2.25'
+        V0TrackCuts = 'nCDCHits>4 and p<3.0'
+        V0Cuts = 'dr>0.5'
+        PhotonVetoCuts = 'p>1.0'  # event should have no high E photons
+
+        ma.cutAndCopyList("gamma:HighEGammaVeto", "gamma:all", PhotonVetoCuts, path=path)
+        ma.cutAndCopyList("e+:BhabhaTrack", "e+:all", BhabhaTrackCuts, path=path)
+        ma.cutAndCopyList("e+:V0Track", "e+:all", V0TrackCuts, path=path)
+
+        ma.reconstructDecay("vpho:BhabhaSysyem -> e+:BhabhaTrack e-:BhabhaTrack", BhabhaSystemCuts, path=path)
+
+        ma.reconstructDecay("vpho:V0System -> e+:V0Track e-:V0Track", '', path=path)
+        vertex.treeFit('vpho:V0System', conf_level=0.0, path=path)
+        ma.applyCuts('vpho:V0System', V0Cuts, path=path)
+
+        ma.reconstructDecay('vpho:Total -> vpho:BhabhaSysyem vpho:V0System', '', path=path)
+
+        eventCuts = ('nParticlesInList(gamma:HighEGammaVeto)<1 and '
+                     'nParticlesInList(vpho:Total)>0')
+
+        path = self.skim_event_cuts(eventCuts, path=path)
+
+        self.SkimLists = ["vpho:Total"]
+
+
+@fancy_skim_header
 class InelasticDarkMatter(BaseSkim):
     """
     Skim list contains events with no tracks from IP, no high E tracks and only one high E photon.
@@ -527,4 +576,4 @@ class InelasticDarkMatter(BaseSkim):
 
         path = self.skim_event_cuts(idmEventCuts, path=path)
 
-        self.SkimLists = ["gamma:all", 'e-:all']
+        self.SkimLists = ['gamma:ISR']

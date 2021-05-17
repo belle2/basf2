@@ -50,10 +50,7 @@ namespace Belle2 {
     Bitstream() {};
 
     /** constructor from Signal Bus */
-    explicit Bitstream(SignalBus bus) : m_signal(bus)
-    {
-      m_signal = bus;
-    };
+    explicit Bitstream(SignalBus bus) : m_signal(bus) {}
 
     /** destructor, empty because we don't allocate memory explicitly. */
     ~Bitstream() { };

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ########################################################
 #
@@ -19,12 +18,12 @@ def stdPhotons(listtype='loose', path=None):
     - 'gamma:cdc' all clusters inside the CDC tracking acceptance
     - 'gamma:loose' (default) with some loose quality selections
     - 'gamma:tight' like loose but with higher energy cuts depending on detector regions
-    - 'gamma:pi0eff60_Jan2020' gamma list for 60% pi0 efficiency list, optimized in January 2020
-    - 'gamma:pi0eff50_Jan2020' gamma list for 50% pi0 efficiency list, optimized in January 2020
-    - 'gamma:pi0eff40_Jan2020' gamma list for 40% pi0 efficiency list, optimized in January 2020
-    - 'gamma:pi0eff30_Jan2020' gamma list for 30% pi0 efficiency list, optimized in January 2020
-    - 'gamma:pi0eff20_Jan2020' gamma list for 20% pi0 efficiency list, optimized in January 2020
-    - 'gamma:pi0eff10_Jan2020' gamma list for 10% pi0 efficiency list, optimized in January 2020
+    - 'gamma:pi0eff60_May2020' gamma list for 60% pi0 efficiency list, optimized in May 2020
+    - 'gamma:pi0eff50_May2020' gamma list for 50% pi0 efficiency list, optimized in May 2020
+    - 'gamma:pi0eff40_May2020' gamma list for 40% pi0 efficiency list, optimized in May 2020
+    - 'gamma:pi0eff30_May2020' gamma list for 30% pi0 efficiency list, optimized in May 2020
+    - 'gamma:pi0eff20_May2020' gamma list for 20% pi0 efficiency list, optimized in May 2020
+    - 'gamma:pi0eff10_May2020' gamma list for 10% pi0 efficiency list, optimized in May 2020
     - 'gamma:pi0' gamma list for pi0 list
     - 'gamma:pi0highE' gamma list for pi0 list, high energy selection
 
@@ -42,10 +41,10 @@ def stdPhotons(listtype='loose', path=None):
     elif listtype == 'cdc':
         fillParticleList(
             'gamma:cdc',
-            'theta > 0.296706 and theta < 2.61799',
+            'inCDCAcceptance',
             True,
             path)
-    # clusterErrorTiming < 1e6 removes failed waveform fits, this is not an actual timing cut. A 99% efficienct cut
+    # clusterErrorTiming < 1e6 removes failed waveform fits, this is not an actual timing cut. A 99% efficiency cut
     # is already applied on mdst level for photons with E < 50 MeV.
     elif listtype == 'loose':
         stdPhotons('cdc', path)
@@ -64,36 +63,43 @@ def stdPhotons(listtype='loose', path=None):
             '[clusterReg == 1 and E > 0.05] or [clusterReg == 2 and E > 0.05] or [clusterReg == 3 and E > 0.075]',
             True,
             path)
-    elif listtype == 'pi0eff10_Jan2020':
+    elif listtype == 'pi0eff10_May2020':
         fillParticleList(
-            'gamma:pi0eff10_Jan2020',
-            '[clusterReg==1 and E>0.200] or [clusterReg==2 and E>0.100] or [clusterReg==3 and E>0.180 and clusterE1E9>0.5]',
+            'gamma:pi0eff10_May2020',
+            '[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and \
+             [[clusterReg==1 and E>0.200] or [clusterReg==2 and E>0.100] or [clusterReg==3 and E>0.180]] and [clusterE1E9>0.5]',
             True,
             path)
-    elif listtype == 'pi0eff20_Jan2020':
+    elif listtype == 'pi0eff20_May2020':
         fillParticleList(
-            'gamma:pi0eff20_Jan2020',
-            '[clusterReg==1 and E>0.120] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.080 and clusterE1E9>0.4]',
+            'gamma:pi0eff20_May2020',
+            '[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and \
+             [[clusterReg==1 and E>0.120] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.080]] and [clusterE1E9>0.4]',
             True,
             path)
-    elif listtype == 'pi0eff30_Jan2020' or listtype == 'pi0eff40_Jan2020':
+    elif listtype == 'pi0eff30_May2020' or listtype == 'pi0eff40_May2020':
         fillParticleList(
-                f'gamma:{listtype}',
-                '[clusterReg==1 and E>0.080] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.060 ]',
-                True,
-                path)
-    elif listtype == 'pi0eff50_Jan2020':
-        fillParticleList(
-            'gamma:pi0eff50_Jan2020',
-            '[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.025] or [clusterReg==3 and E>0.040]',
+            f'gamma:{listtype}',
+            '[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and \
+             [[clusterReg==1 and E>0.080] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.060 ]]',
             True,
             path)
-    elif listtype == 'pi0eff60_Jan2020':
+    elif listtype == 'pi0eff50_May2020':
         fillParticleList(
-            'gamma:pi0eff60_Jan2020',
-            '[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.020] or [clusterReg==3 and E>0.020]',
+            'gamma:pi0eff50_May2020',
+            '[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and \
+            [[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.025] or [clusterReg==3 and E>0.040]]',
             True,
             path)
+    elif listtype == 'pi0eff60_May2020':
+        fillParticleList(
+            'gamma:pi0eff60_May2020',
+            '[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and \
+             [[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.020] or [clusterReg==3 and E>0.020]]',
+            True,
+            path)
+    else:
+        raise ValueError(f"\"{listtype}\" is none of the allowed standardized types of photon lists!")
 
 # Used in skimming code
 

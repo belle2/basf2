@@ -6,7 +6,7 @@
 # Laura Zani (September 2019)
 ############################################################
 
-from basf2 import *
+import basf2 as b2
 
 import os
 import sys
@@ -14,21 +14,18 @@ import multiprocessing
 import datetime
 import glob
 
-import ROOT
 from ROOT import Belle2, TFile
 from ROOT.Belle2 import SVDOccupancyCalibrationsAlgorithm
 from ROOT.Belle2 import SVDHotStripsCalibrationsAlgorithm
 
-from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
+from caf.framework import CAF, Calibration, CentralDatabase
 from caf import backends
 from caf import strategies
 
 import rawdata as raw
-import reconstruction as reco
-import modularAnalysis as ana
 # import vertex as vx
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 now = datetime.datetime.now()
 uniqueID_occup = ''
@@ -38,13 +35,13 @@ input_branches = [
     'RawSVDs'
 ]
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 
 def SVDOccupancyAndHotStripsCalibrations(files, tags):
 
     # Set-up re-processing path
-    path = create_path()
+    path = b2.create_path()
 
     # logging.log_level = LogLevel.WARNING
 
@@ -62,7 +59,7 @@ def SVDOccupancyAndHotStripsCalibrations(files, tags):
         ShaperDigitsIN='SVDShaperDigitsZS5',
         FADCmode=True)
 
-    collector = register_module('SVDOccupancyCalibrationsCollector')
+    collector = b2.register_module('SVDOccupancyCalibrationsCollector')
     collector.param("SVDShaperDigitsName", "SVDShaperDigitsZS5")
     algorithm1 = SVDOccupancyCalibrationsAlgorithm(uniqueID_occup)
     algorithm2 = SVDHotStripsCalibrationsAlgorithm(uniqueID_hotStrips)

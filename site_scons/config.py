@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from SCons.Script import *
+from SCons.Script import Configure, Environment
 import os
-import subprocess
+import sys
 
 
 def CheckEnvVar(conf, var, text=None):
@@ -111,6 +111,11 @@ def configure_system(conf):
     if conf.CheckHeader('omp.h', language="C++"):
         conf.env['HAS_OPENMP'] = True
         conf.env.Append(CPPDEFINES='-DHAS_OPENMP')
+
+    # graphviz
+    conf.env['HAS_DOT'] = False
+    if conf.CheckProg('dot'):
+        conf.env['HAS_DOT'] = True
 
     return True
 

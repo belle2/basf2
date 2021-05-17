@@ -25,15 +25,15 @@ namespace TreeFitter {
     m_K(sizeState, sizeRes),
     m_CGt(sizeState, sizeRes)
   {
-    m_R = Eigen::Matrix < double, -1, -1, 0, 5, 5 >::Zero(m_constrDim, m_constrDim);
+    m_R = Eigen::Matrix < double, -1, -1, 0, 7, 7 >::Zero(m_constrDim, m_constrDim);
   }
 
 
   ErrCode KalmanCalculator::calculateGainMatrix(
-    const Eigen::Matrix < double, -1, 1, 0, 5, 1 > & residuals,
-    const Eigen::Matrix < double, -1, -1, 0, 5, MAX_MATRIX_SIZE > & G,
+    const Eigen::Matrix < double, -1, 1, 0, 7, 1 > & residuals,
+    const Eigen::Matrix < double, -1, -1, 0, 7, MAX_MATRIX_SIZE > & G,
     const FitParams& fitparams,
-    const Eigen::Matrix < double, -1, -1, 0, 5, 5 > * V,
+    const Eigen::Matrix < double, -1, -1, 0, 7, 7 > * V,
     double weight)
   {
     m_res = residuals;
@@ -42,10 +42,10 @@ namespace TreeFitter {
     Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > C = fitparams.getCovariance().triangularView<Eigen::Lower>();
 
     m_CGt = C.selfadjointView<Eigen::Lower>() * G.transpose();
-    Eigen::Matrix < double, -1, -1, 0, 5, 5 > Rtemp = G * m_CGt;
+    Eigen::Matrix < double, -1, -1, 0, 7, 7 > Rtemp = G * m_CGt;
     if (V && (weight) && ((*V).diagonal().array() != 0).all()) {
 
-      const Eigen::Matrix < double, -1, -1, 0, 5, 5 > weightedV  =
+      const Eigen::Matrix < double, -1, -1, 0, 7, 7 > weightedV  =
         weight * (*V).selfadjointView<Eigen::Lower>();
 
       m_R = Rtemp + weightedV;
@@ -54,7 +54,7 @@ namespace TreeFitter {
       m_R = Rtemp.triangularView<Eigen::Lower>();
     }
 
-    Eigen::Matrix < double, -1, -1, 0, 5, 5 > RInvtemp;
+    Eigen::Matrix < double, -1, -1, 0, 7, 7 > RInvtemp;
     RInvtemp = m_R.selfadjointView<Eigen::Lower>();
     m_Rinverse = RInvtemp.inverse();
     if (!m_Rinverse.allFinite()) { return ErrCode(ErrCode::Status::inversionerror); }
@@ -71,7 +71,7 @@ namespace TreeFitter {
 
   void KalmanCalculator::updateState(FitParams& fitparams, FitParams& oldState)
   {
-    Eigen::Matrix < double, -1, 1, 0, 5, 1 > res_prime =
+    Eigen::Matrix < double, -1, 1, 0, 7, 1 > res_prime =
       m_res + m_G * (oldState.getStateVector() - fitparams.getStateVector());
     fitparams.getStateVector() = oldState.getStateVector() -  m_K * res_prime;
     m_chisq = res_prime.transpose() * m_Rinverse.selfadjointView<Eigen::Lower>() * res_prime;

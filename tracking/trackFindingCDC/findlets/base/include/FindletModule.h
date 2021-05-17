@@ -247,12 +247,13 @@ namespace Belle2 {
       }
 
       /** Compose a parameter name for the name of the vector on the DataStore.
-       *  @param classMnemomic Short name of the value type that is stored in the vector
+       *  @param classMnemonic Short name of the value type that is stored in the vector
        *  @param order In case of mulitple occurances of the same type which occurance is it. 1 and 2  are supported.
        *  @param input Should the parameter name state that this is an input.
+       *  @return rname of the StoreVector
        */
       std::string
-      getStoreVectorParameterName(std::string classMnenomic, int order, bool input) const
+      getStoreVectorParameterName(std::string classMnemonic, int order, bool input) const
       {
         std::string orderPrefix;
         if (order == 1) {
@@ -265,21 +266,22 @@ namespace Belle2 {
         std::string inputPrefix = input ? "input" : "";
 
         if (input or order > 1) {
-          classMnenomic[0] = ::toupper(classMnenomic.at(0));
+          classMnemonic[0] = ::toupper(classMnemonic.at(0));
         }
         if (input and order > 1) {
           inputPrefix[0] = ::toupper(inputPrefix.at(0));
         }
 
-        return orderPrefix + inputPrefix + classMnenomic + "s";
+        return orderPrefix + inputPrefix + classMnemonic + "s";
       }
 
       /** Compose a parameter description for the name of the vector on the DataStore.
-       *  @param classMnemomic Short name of the value type that is stored in the vector
+       *  @param classMnemonic Short name of the value type that is stored in the vector
        *  @param order In case of mulitple occurances of the same type which occurance is it. 1 and 2 are supported.
        *  @param input Should the parameter name state that this is an input.
+       *  @return description for the StoreVector
        */
-      std::string getStoreVectorParameterDescription(const std::string& classMnenomic, int order, bool input) const
+      std::string getStoreVectorParameterDescription(const std::string& classMnemonic, int order, bool input) const
       {
         std::string orderPrefix;
         if (order == 1) {
@@ -290,7 +292,7 @@ namespace Belle2 {
           B2ERROR("More than two inputs of the same type are not supported");
         }
         std::string inputPrefix = input ? "input " : "";
-        return "Name of the " + orderPrefix + inputPrefix + classMnenomic + " vector.";
+        return "Name of the " + orderPrefix + inputPrefix + classMnemonic + " vector.";
       }
 
     private:

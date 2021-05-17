@@ -49,7 +49,7 @@ namespace Belle2 {
      * Lowest bin border
      * @return Lowest bin border
      */
-    double first()
+    double first() const
     {
       return m_lowerLimit;
     }
@@ -58,7 +58,7 @@ namespace Belle2 {
      * Highest bin border
      * @return Highest bin border
      */
-    double second()
+    double second() const
     {
       return m_upperLimit;
     }

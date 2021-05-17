@@ -12,14 +12,13 @@
 #
 # ---------------------------------------------------------------------------------------
 
-from basf2 import *
-from ROOT import Belle2, TTree, TFile, TH1F
+from ROOT import TFile, TTree
 import sys
 import math
 from array import array
 
-if len(sys.argv) is not 4:
-    print('usage: basf2', argvs[0], ' <reference slot (1-16)> <reference channel (0-511)> <input_file.root> <output_file.root>')
+if len(sys.argv) != 4:
+    print('usage: basf2', sys.argv[0], ' <reference slot (1-16)> <reference channel (0-511)> <input_file.root> <output_file.root>')
     sys.exit()
 
 refSlot = int(sys.argv[1]) - 1  # 1-based to 0-based

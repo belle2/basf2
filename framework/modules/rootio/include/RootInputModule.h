@@ -14,6 +14,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/core/Environment.h>
 #include <framework/dataobjects/FileMetaData.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <string>
 #include <vector>
@@ -218,6 +219,8 @@ namespace Belle2 {
 
     /** Discard events that have an error flag != 0 */
     bool m_discardErrorEvents{true};
+    /** Don't issue a warning when discarding events if the error flag consists exclusively of flags in this mask */
+    unsigned int m_discardErrorMask{EventMetaData::c_HLTDiscard};
 
     /** Set to true if we process the input files completely: No skip events or sequences or -n parameters */
     bool m_processingAllEvents{true};

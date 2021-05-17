@@ -73,7 +73,7 @@ muvars = vc.mc_truth + vc.pid + vc.kinematics
 gvars = vc.kinematics + vc.mc_truth
 etaanduvars = vc.inv_mass + vc.kinematics + vc.mc_truth
 u4svars = vc.inv_mass + vc.kinematics + vc.mc_truth + \
-    vu.create_aliases(['FourCFitProb', 'FourCFitChi2'], 'extraInfo(variable)', "") + \
+    vu.create_aliases(['FourCFitProb', 'FourCFitChi2'], 'extraInfo({variable})', "") + \
     vu.create_aliases_for_selected(etaanduvars, 'Upsilon(4S) -> ^eta ^Upsilon') + \
     vu.create_aliases_for_selected(muvars, 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]') + \
     vu.create_aliases_for_selected(gvars, 'Upsilon(4S) -> [eta -> ^gamma ^gamma] Upsilon')

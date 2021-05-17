@@ -4,7 +4,7 @@
 # Dennis Weyland 2017
 
 from keras.layers.core import Reshape
-from keras.layers import activations
+from keras import activations
 from keras.activations import sigmoid, tanh
 from keras.engine.topology import Layer
 from keras import backend as K

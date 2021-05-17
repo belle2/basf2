@@ -5,6 +5,7 @@
 
 import basf2_mva
 
+import numpy as np
 import os
 import tempfile
 import sys

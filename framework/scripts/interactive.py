@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 interactive
@@ -16,7 +15,6 @@ be used. Use Ctrl+D to exit the shell.
 See framework/examples/interactive.py for an example.
 """
 
-from IPython import embed
 from traitlets.config.loader import Config
 from IPython.terminal.prompts import Prompts, Token
 

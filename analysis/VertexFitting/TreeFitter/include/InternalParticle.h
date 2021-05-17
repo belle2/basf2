@@ -90,7 +90,7 @@ namespace TreeFitter {
     /** compare transverse track momentum*/
     bool static compTrkTransverseMomentum(const RecoTrack* lhs, const RecoTrack* rhs);
 
-    /** has mass cosntraint */
+    /** has mass constraint */
     bool m_massconstraint ;
 
     /** shares vertex with mother, that means decay vertex = productionvertex */

@@ -45,6 +45,8 @@ KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
            "Minimal momentum in case there are no hits in outer layers.", 0.0);
   addParam("RemoveUnusedMuons", m_RemoveUnusedMuons,
            "Whether to remove unused muons.", false);
+  addParam("IgnoreBackwardPropagation", m_IgnoreBackwardPropagation,
+           "Whether to ignore ExtHits with backward propagation.", false);
   addParam("Debug", m_Debug, "Debug mode.", false);
   addParam("DebugFileName", m_MatchingFileName, "Debug file name.", std::string("matching.root"));
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -96,6 +98,8 @@ void KLMStripEfficiencyCollectorModule::finish()
 
 void KLMStripEfficiencyCollectorModule::startRun()
 {
+  if (!m_ChannelStatus.isValid())
+    B2FATAL("KLM channel status data are not available.");
   int minimalActivePlanes = -1;
   KLMChannelIndex klmSectors(KLMChannelIndex::c_IndexLevelSector);
   for (KLMChannelIndex& klmSector : klmSectors) {
@@ -239,6 +243,16 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(
      */
     if (hit.getStatus() != EXT_EXIT)
       continue;
+    /*
+     * Ignore ExtHits with backward propagation. This affects cosmic events
+     * only. The removal of hits with backward propagation is normally
+     * not needed, however, it is added because of backward error propagation
+     * bug in Geant4 10.6.
+     */
+    if (m_IgnoreBackwardPropagation) {
+      if (hit.isBackwardPropagated())
+        continue;
+    }
     uint16_t planeGlobal = 0;
     hitData.hit = &hit;
     hitData.digit = nullptr;

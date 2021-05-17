@@ -5,49 +5,21 @@
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 2 - Aug - 2013
 //-
+
+/* Own header. */
 #include <dqm/modules/DAQMonitor.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <rawdata/dataobjects/RawPXD.h>
-#include <rawdata/dataobjects/RawSVD.h>
-#include <rawdata/dataobjects/RawCDC.h>
-#include <rawdata/dataobjects/RawTOP.h>
-#include <rawdata/dataobjects/RawARICH.h>
-#include <rawdata/dataobjects/RawECL.h>
-#include <rawdata/dataobjects/RawKLM.h>
-#include <rawdata/dataobjects/RawTRG.h>
-
+/* ROOT headers. */
 #include <TDirectory.h>
 
-using namespace std;
 using namespace Belle2;
 
-
-//#define DEBUG
-
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
 REG_MODULE(DAQMonitor)
-
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
 
 DAQMonitorModule::DAQMonitorModule() : HistoModule()
 {
-  //Set module properties
-
-  setDescription("Monitor Raw Data");
+  setDescription("This module produces general DAQ DQM histograms.");
   setPropertyFlags(c_ParallelProcessingCertified);
-  m_nevt = -1;
-
-}
-
-
-
-DAQMonitorModule::~DAQMonitorModule()
-{
 }
 
 void DAQMonitorModule::defineHisto()
@@ -55,158 +27,107 @@ void DAQMonitorModule::defineHisto()
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir("DAQ");
   oldDir->cd("DAQ");
-
-  h_nevt = new TH1F("Nevent", "Number of Events", 10, 0.0, 10.0);
-
-  h_size = new TH1F("TotalDataSize", "Total Data Size", 100, 0.0, 300000.0);
-  h_hltsize = new TH1F("HLTDataSize", "HLT Data Size", 100, 0.0, 300000.0);
-
-  h_pxdsize = new TH1F("PXDDataSize", "PXD Data Size", 100, 0.0, 100000.0);
-  h_svdsize = new TH1F("SVDDataSize", "SVD Data Size", 100, 0.0, 100000.0);
-  h_cdcsize = new TH1F("CDCDataSize", "CDC Data Size", 100, 0.0, 100000.0);
-  h_topsize = new TH1F("TOPDataSize", "TOP Data Size", 100, 0.0, 100000.0);
-  h_arichsize = new TH1F("ARICHDataSize", "ARICH Data Size", 100, 0.0, 100000.0);
-  h_eclsize = new TH1F("ECLDataSize", "ECL Data Size", 100, 0.0, 100000.0);
-  h_klmsize = new TH1F("KLMDataSize", "KLM Data Size", 100, 0.0, 100000.0);
-  h_trgsize = new TH1F("TRGDataSize", "TRG Data Size", 100, 0.0, 200000.0);
-
+  h_nEvt = new TH1F("Nevent", "Total Number of Events", 3, 0.0, 2.0);
+  h_pxdSize = new TH1F("PXDDataSize", "PXD Data Size;Size [kB];", 100, 0.0, 100.0);
+  h_svdSize = new TH1F("SVDDataSize", "SVD Data Size;Size [kB];", 100, 0.0, 100.0);
+  h_cdcSize = new TH1F("CDCDataSize", "CDC Data Size;Size [kB];", 100, 0.0, 100.0);
+  h_topSize = new TH1F("TOPDataSize", "TOP Data Size;Size [kB];", 100, 0.0, 100.0);
+  h_arichSize = new TH1F("ARICHDataSize", "ARICH Data Size;Size [kB];", 100, 0.0, 40.0);
+  h_eclSize = new TH1F("ECLDataSize", "ECL Data Size;Size [kB];", 100, 0.0, 100.0);
+  h_klmSize = new TH1F("KLMDataSize", "KLM Data Size;Size [kB];", 100, 0.0, 40.0);
+  h_trgSize = new TH1F("TRGDataSize", "TRG Data Size;Size [kB];", 100, 0.0, 40.0);
+  h_hltSize = new TH1F("HLTDataSize", "HLT (Total - PXD) Data Size;Size [kB];", 100, 0.0, 300.0);
+  h_totalSize = new TH1F("TotalDataSize", "Total (HLT + PXD) Data Size;Size [kB];", 100, 0.0, 300.0);
   oldDir->cd();
 }
 
-
 void DAQMonitorModule::initialize()
 {
-  REG_HISTOGRAM
+  REG_HISTOGRAM;
+  m_pxdRaw.isOptional();
+  m_svdRaw.isOptional();
+  m_cdcRaw.isOptional();
+  m_topRaw.isOptional();
+  m_arichRaw.isOptional();
+  m_eclRaw.isOptional();
+  m_klmRaw.isOptional();
+  m_trgRaw.isOptional();
 }
-
 
 void DAQMonitorModule::beginRun()
 {
-  B2INFO("beginRun called.");
+  h_nEvt->Reset();
+  h_pxdSize->Reset();
+  h_svdSize->Reset();
+  h_cdcSize->Reset();
+  h_topSize->Reset();
+  h_arichSize->Reset();
+  h_eclSize->Reset();
+  h_klmSize->Reset();
+  h_trgSize->Reset();
+  h_hltSize->Reset();
+  h_totalSize->Reset();
 }
-
-
-
-
-void DAQMonitorModule::endRun()
-{
-  //fill Run data
-
-  B2INFO("endRun done.");
-}
-
-
-void DAQMonitorModule::terminate()
-{
-  B2INFO("terminate called");
-}
-
-
-
-//
-// User defined functions
-//
-
 
 void DAQMonitorModule::event()
 {
-  h_nevt->Fill((float)m_nevt);
+  // Total number of events: just fill the histogram with 1
+  h_nEvt->Fill(1.0);
+
+  // Since sizeof returns the size in bytes (B),
+  // if we divide it by 1000 we obtain kilobytes (kB).
 
   // PXD
-  StoreArray<RawPXD> rawpxd;
-  int npxd = rawpxd.getEntries();
-  int pxdsize = 0;
-  for (int i = 0; i < npxd; i++) {
-    pxdsize += (rawpxd[i]->size()) * sizeof(unsigned int);
-    //    printf ( "PXD size [%d] = %d bytes\n", i, size );
-  }
-  h_pxdsize->Fill((float)pxdsize);
+  int pxdSize{0};
+  for (RawPXD& pxdRaw : m_pxdRaw)
+    pxdSize += (pxdRaw.size()) * sizeof(unsigned int);
+  h_pxdSize->Fill(static_cast<float>(pxdSize) / 1000.);
 
   // SVD
-  StoreArray<RawSVD> rawsvd;
-  int nsvd = rawsvd.getEntries();
-  int svdsize = 0;
-  for (int i = 0; i < nsvd; i++) { // Loop over COPPERs
-    int nbytes = rawsvd[i]->GetBlockNwords(0) * sizeof(unsigned int);
-    svdsize += nbytes;
-  }
-  //  printf ( "SVD size = %d\n", svdsize );
-  h_svdsize->Fill((float)svdsize);
+  int svdSize{0};
+  for (RawSVD& svdRaw : m_svdRaw) // Loop over COPPERs
+    svdSize += svdRaw.GetBlockNwords(0) * sizeof(unsigned int);
+  h_svdSize->Fill(static_cast<float>(svdSize) / 1000.);
 
   // CDC
-  StoreArray<RawCDC> rawcdc;
-  int ncdc = rawcdc.getEntries();
-  int cdcsize = 0;
-  for (int i = 0; i < ncdc; i++) { // Loop over COPPERs
-    int nbytes = rawcdc[i]->GetBlockNwords(0) * sizeof(unsigned int);
-    cdcsize += nbytes;
-  }
-  //  printf ( "CDC size = %d\n", cdcsize );
-  h_cdcsize->Fill((float)cdcsize);
+  int cdcSize{0};
+  for (RawCDC& cdcRaw : m_cdcRaw) // Loop over COPPERs
+    cdcSize += cdcRaw.GetBlockNwords(0) * sizeof(unsigned int);
+  h_cdcSize->Fill(static_cast<float>(cdcSize) / 1000.);
 
   // TOP
-  StoreArray<RawTOP> rawtop;
-  int ntop = rawtop.getEntries();
-  int topsize = 0;
-  for (int i = 0; i < ntop; i++) { // Loop over COPPERs
-    int nbytes = rawtop[i]->GetBlockNwords(0) * sizeof(unsigned int);
-    topsize += nbytes;
-  }
-  //  printf ( "TOP size = %d\n", topsize );
-  h_topsize->Fill((float)topsize);
+  int topSize{0};
+  for (RawTOP& topRaw : m_topRaw) // Loop over COPPERs
+    topSize += topRaw.GetBlockNwords(0) * sizeof(unsigned int);
+  h_topSize->Fill(static_cast<float>(topSize) / 1000.);
 
   // ARICH
-  StoreArray<RawARICH> rawarich;
-  int narich = rawarich.getEntries();
-  int arichsize = 0;
-  for (int i = 0; i < narich; i++) { // Loop over COPPERs
-    int nbytes = rawarich[i]->GetBlockNwords(0) * sizeof(unsigned int);
-    arichsize += nbytes;
-  }
-  //  printf ( "ARICH size = %d\n", arichsize );
-  h_arichsize->Fill((float)arichsize);
+  int arichSize{0};
+  for (RawARICH& arichRaw : m_arichRaw) // Loop over COPPERs
+    arichSize += arichRaw.GetBlockNwords(0) * sizeof(unsigned int);
+  h_arichSize->Fill(static_cast<float>(arichSize) / 1000.);
 
   // ECL
-  StoreArray<RawECL> rawecl;
-  int necl = rawecl.getEntries();
-  int eclsize = 0;
-  for (int i = 0; i < necl; i++) { // Loop over COPPERs
-    int nbytes = rawecl[i]->GetBlockNwords(0) * sizeof(unsigned int);
-    eclsize += nbytes;
-  }
-  //  printf ( "ECL size = %d\n", eclsize );
-  h_eclsize->Fill((float)eclsize);
+  int eclSize{0};
+  for (RawECL& eclRaw : m_eclRaw) // Loop over COPPERs
+    eclSize += eclRaw.GetBlockNwords(0) * sizeof(unsigned int);
+  h_eclSize->Fill(static_cast<float>(eclSize) / 1000.);
 
   // KLM
-  StoreArray<RawKLM> rawklm;
-  int nklm = rawklm.getEntries();
-  int klmsize = 0;
-  for (int i = 0; i < nklm; i++) { // Loop over COPPERs
-    int nbytes = rawklm[i]->GetBlockNwords(0) * sizeof(unsigned int);
-    klmsize += nbytes;
-  }
-  //  printf ( "KLM size = %d\n", klmsize );
-  h_klmsize->Fill((float)klmsize);
+  int klmSize{0};
+  for (RawKLM& klmRaw : m_klmRaw) // Loop over COPPERs
+    klmSize += klmRaw.GetBlockNwords(0) * sizeof(unsigned int);
+  h_klmSize->Fill(static_cast<float>(klmSize) / 1000.);
 
   // TRG
-  StoreArray<RawTRG> rawtrg;
-  int ntrg = rawtrg.getEntries();
-  int trgsize = 0;
-  for (int i = 0; i < ntrg; i++) { // Loop over COPPERs
-    int nbytes = rawtrg[i]->GetBlockNwords(0) * sizeof(unsigned int);
-    trgsize += nbytes;
-  }
-  //  printf ( "TRG size = %d\n", svdsize );
-  h_trgsize->Fill((float)trgsize);
+  int trgSize{0};
+  for (RawTRG& trgRaw : m_trgRaw) // Loop over COPPERs
+    trgSize += trgRaw.GetBlockNwords(0) * sizeof(unsigned int);
+  h_trgSize->Fill(static_cast<float>(trgSize) / 1000.);
 
-  // Total size
-  int hltsize = svdsize + cdcsize + topsize + arichsize + eclsize + klmsize + trgsize;
-  int totalsize = pxdsize + hltsize;
-  //  printf ( "sizes = %d %d %d %d %d %d %d;  %d %d\n", svdsize, cdcsize, topsize, arichsize, eclsize, klmsize, trgsize, hltsize, totalsize );
-  h_hltsize->Fill((float)hltsize);
-  h_size->Fill((float)totalsize);
-
-
-  m_nevt++;
-
+  // HLT size and total (HLT + PXD) size
+  int hltSize = svdSize + cdcSize + topSize + arichSize + eclSize + klmSize + trgSize;
+  h_hltSize->Fill(static_cast<float>(hltSize) / 1000.);
+  int totalSize = pxdSize + hltSize;
+  h_totalSize->Fill(static_cast<float>(totalSize) / 1000.);
 }

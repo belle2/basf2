@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <framework/logging/LogConfig.h>
+
 #include <sstream>
 #include <vector>
 #include <string>
@@ -71,6 +73,46 @@ private:
 };
 
 /**
+ * Class to modify the log level dependent on the execution realm.
+ */
+class LogModRealm {
+public:
+  /**
+   * Constructor of a realm dependent modification of the log level.
+   * @param realm execution realm
+   * @param logLevel realm dependent log level.
+   */
+  LogModRealm(Belle2::LogConfig::ELogRealm realm, Belle2::LogConfig::ELogLevel logLevel) :
+    m_realm(realm),
+    m_logLevel(logLevel)
+  {
+  }
+
+  /**
+   * Returns the realm.
+   */
+  Belle2::LogConfig::ELogRealm getRealm() const
+  {
+    return m_realm;
+  }
+
+  /**
+   * Returns the log level.
+   */
+  Belle2::LogConfig::ELogLevel getLogLevel() const
+  {
+    return m_logLevel;
+  }
+
+private:
+  /** Realm for the conditional log level. */
+  Belle2::LogConfig::ELogRealm m_realm;
+
+  /** Realm dependent log level. */
+  Belle2::LogConfig::ELogLevel m_logLevel;
+};
+
+/**
  * Specialized implementation of an ostream-like class where the << operator can be used to insert values.
  * In addition to the regular ostream usage, this class also accepts the LogVar class, which contains
  * the name of a variable and its value. If string part and variable part of a log message are separated in
@@ -101,7 +143,7 @@ public:
   /**
    * Implement custom copy-constructor, because stringstream's one is deleted.
    */
-  LogVariableStream(const LogVariableStream& other) :  m_variables(other.m_variables)
+  LogVariableStream(const LogVariableStream& other) :  m_variables(other.m_variables), m_logLevelOverride(other.m_logLevelOverride)
   {
     // copy manually because stringstream has no copy-constructor
     m_stringStream << other.m_stringStream.str();
@@ -140,6 +182,11 @@ public:
     m_variables.push_back(var);
     return *this;
   }
+
+  /**
+   * Operator override which sets a realm dependent log level
+   */
+  LogVariableStream& operator<<(LogModRealm const& var);
 
   /**
    * Templated operator which will be used for all non-fundamental types. This types can be accepted via
@@ -216,6 +263,14 @@ public:
     return m_variables;
   }
 
+  /** Adjust the log level in case of a realm dependent modification */
+  void adjustLogLevel(Belle2::LogConfig::ELogLevel& logLevel) const
+  {
+    if (m_logLevelOverride != Belle2::LogConfig::c_Default) {
+      logLevel = m_logLevelOverride;
+    }
+  }
+
 private:
 
   /** All non-LogVar items are directly forwarded to this stringstream */
@@ -223,4 +278,7 @@ private:
 
   /** List of LogVars which were accepted so far */
   std::vector<LogVar> m_variables;
+
+  /** Adjusted log level */
+  Belle2::LogConfig::ELogLevel m_logLevelOverride = Belle2::LogConfig::c_Default;
 };

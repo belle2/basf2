@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-import os
-import random
 import basf2  # also test non-polluting import
 from ROOT import Belle2
 
@@ -46,7 +43,7 @@ class PrintName(basf2.Module):
     def __init__(self, name):
         """constructor."""
 
-        super(PrintName, self).__init__()
+        super().__init__()
         self.set_name(name)
 
     def event(self):

@@ -106,14 +106,14 @@ namespace Belle2 {
     unsigned n = list.size();
     for (unsigned i = 0; i < n; i++) {
       unsigned id = list[i]->cell()->layerId();
-      if (id < 32) l0 |= (1 << id);
+      if (id < 32) l0 |= (1u << id);
       else         l1 |= (1 << (id - 32));
     }
 
     unsigned l = 0;
     for (unsigned i = 0; i < 32; i++) {
-      if (l0 & (1 << i)) ++l;
-      if (l1 & (1 << i)) ++l;
+      if (l0 & (1u << i)) ++l;
+      if (l1 & (1u << i)) ++l;
     }
     return l;
   }
@@ -308,6 +308,7 @@ namespace Belle2 {
         cout << " total " << nMC << " mc fit valid contribution(s)";
       }
 
+      // cppcheck-suppress knownConditionTrueFalse
       if (MCCOverFlow)
         cout << "(counter overflow)";
     }
@@ -339,6 +340,7 @@ namespace Belle2 {
           }
         }
       }
+      // cppcheck-suppress knownConditionTrueFalse
       if (MCCOverFlow)
         cout << "(counter overflow)";
       cout << endl;
@@ -852,7 +854,7 @@ namespace Belle2 {
   TRGCDCLink::operator new(size_t size)
   {
     void* p = malloc(size);
-    _all.push_back((TRGCDCLink*) p);
+    _all.push_back(static_cast<TRGCDCLink*>(p));
 
 //     cout << ">---------------------" << endl;
 //     for (unsigned i = 0; i < _all.size(); i++)
@@ -867,7 +869,7 @@ namespace Belle2 {
     for (vector<TRGCDCLink*>::iterator it = _all.begin();
          it != _all.end();
          ++it) {
-      if ((* it) == (TRGCDCLink*) t) {
+      if ((* it) == static_cast<TRGCDCLink*>(t)) {
         _all.erase(it);
         break;
       }

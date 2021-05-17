@@ -37,6 +37,8 @@ namespace Belle2 {
 
         /** Specified track-id out of range */
         kOutOfRange              = 11,
+        /** Unprepared */
+        kUnimplemented           = 12,
 
         /** Track count too small to perform fit */
         kBadTrackSize            = 21,

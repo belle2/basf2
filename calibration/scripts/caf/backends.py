@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL, B2DEBUG
+from basf2 import B2DEBUG, B2ERROR, B2INFO, B2WARNING
 import re
 import os
 from abc import ABC, abstractmethod
@@ -9,8 +9,7 @@ import json
 import xml.etree.ElementTree as ET
 from math import ceil
 from pathlib import Path
-import glob
-from collections import defaultdict, deque
+from collections import deque
 from itertools import count, takewhile
 import shutil
 import time
@@ -18,11 +17,11 @@ from datetime import datetime, timedelta
 import subprocess
 import multiprocessing as mp
 
-from .utils import method_dispatch
-from .utils import decode_json_string
-from .utils import grouper
+from caf.utils import method_dispatch
+from caf.utils import decode_json_string
+from caf.utils import grouper
+from caf.utils import parse_file_uri
 
-import ROOT
 
 __all__ = ["Job", "SubJob", "Backend", "Local", "Batch", "LSF", "PBS", "HTCondor", "get_input_data"]
 
@@ -46,19 +45,27 @@ def get_input_data():
 
 def monitor_jobs(args, jobs):
     unfinished_jobs = jobs[:]
+    failed_jobs = 0
     while unfinished_jobs:
-        B2INFO(f"Updating statuses of unfinished jobs...")
+        B2INFO("Updating statuses of unfinished jobs...")
         for j in unfinished_jobs:
             j.update_status()
-        B2INFO(f"Checking if jobs are ready...")
+        B2INFO("Checking if jobs are ready...")
         for j in unfinished_jobs[:]:
             if j.ready():
-                B2INFO(f"{j} is finished")
+                if j.status == "failed":
+                    B2ERROR(f"{j} is failed")
+                    failed_jobs += 1
+                else:
+                    B2INFO(f"{j} is finished")
                 unfinished_jobs.remove(j)
         if unfinished_jobs:
             B2INFO(f"Not all jobs done yet, waiting {args.heartbeat} seconds before re-checking...")
             time.sleep(args.heartbeat)
-    B2INFO(f"All jobs finished")
+    if failed_jobs > 0:
+        B2ERROR(f"{failed_jobs} jobs failed")
+    else:
+        B2INFO('All jobs finished successfully')
 
 
 class ArgumentsGenerator():
@@ -150,7 +157,6 @@ class SubjobSplitter(ABC):
         """
         Implement this method in derived classes to generate the `SubJob` objects.
         """
-        pass
 
     def assign_arguments(self, job):
         """
@@ -204,7 +210,7 @@ class MaxFilesSplitter(SubjobSplitter):
             return
 
         for i, subjob_input_files in enumerate(grouper(self.max_files_per_subjob, job.input_files)):
-            subjob = job.create_subjob(i, input_files=subjob_input_files)
+            job.create_subjob(i, input_files=subjob_input_files)
 
         self.assign_arguments(job)
 
@@ -241,13 +247,13 @@ class MaxSubjobsSplitter(SubjobSplitter):
         subjob_i = 0
         while remaining_input_files:
             # How many files should we use for this subjob?
-            num_input_files = ceil(len(remaining_input_files)/available_subjobs)
+            num_input_files = ceil(len(remaining_input_files) / available_subjobs)
             # Pop them from the remaining files
             subjob_input_files = []
             for i in range(num_input_files):
                 subjob_input_files.append(remaining_input_files.popleft())
             # Create the actual subjob
-            subjob = job.create_subjob(subjob_i, input_files=subjob_input_files)
+            job.create_subjob(subjob_i, input_files=subjob_input_files)
             subjob_i += 1
             available_subjobs -= 1
 
@@ -344,7 +350,7 @@ class Job:
             self.cmd = []
             #: The arguments that will be applied to the `cmd` (These are ignored by SubJobs as they have their own arguments)
             self.args = []
-            #: Input files to job (`pathlib.Path`), a list of these is copied to the working directory.
+            #: Input files to job (`str`), a list of these is copied to the working directory.
             self.input_files = []
             #: Bash commands to run before the main self.cmd (mainly used for batch system setup)
             self.setup_cmds = []
@@ -360,7 +366,7 @@ class Job:
             self.output_patterns = job_dict["output_patterns"]
             self.cmd = job_dict["cmd"]
             self.args = job_dict["args"]
-            self.input_files = [Path(p) for p in job_dict["input_files"]]
+            self.input_files = job_dict["input_files"]
             self.setup_cmds = job_dict["setup_cmds"]
             self.backend_args = job_dict["backend_args"]
             self.subjobs = {}
@@ -442,7 +448,11 @@ class Job:
         """
         Sets the status of this Job.
         """
-        B2INFO(f"Setting {self.name} status to {status}")
+        # Print an error only if the job failed.
+        if status == 'failed':
+            B2ERROR(f"Setting {self.name} status to failed")
+        else:
+            B2INFO(f"Setting {self.name} status to {status}")
         self._status = status
 
     @property
@@ -475,7 +485,7 @@ class Job:
 
     @input_files.setter
     def input_files(self, value):
-        self._input_files = [Path(p).absolute() for p in value]
+        self._input_files = value
 
     @property
     def max_subjobs(self):
@@ -526,7 +536,7 @@ class Job:
         job_dict["output_patterns"] = self.output_patterns
         job_dict["cmd"] = self.cmd
         job_dict["args"] = self.args
-        job_dict["input_files"] = [i.as_posix() for i in self.input_files]
+        job_dict["input_files"] = self.input_files
         job_dict["setup_cmds"] = self.setup_cmds
         job_dict["backend_args"] = self.backend_args
         job_dict["subjobs"] = [sj.job_dict for sj in self.subjobs.values()]
@@ -535,10 +545,10 @@ class Job:
     def dump_input_data(self):
         """
         Dumps the `Job.input_files` attribute to a JSON file. input_files should be a list of
-        Path objects.
+        string URI objects.
         """
         with open(Path(self.working_dir, _input_data_file_path), mode="w") as input_data_file:
-            json.dump([file_path.as_posix() for file_path in self.input_files], input_data_file, indent=2)
+            json.dump(self.input_files, input_data_file, indent=2)
 
     def copy_input_sandbox_files_to_working_dir(self):
         """
@@ -553,21 +563,29 @@ class Job:
 
     def check_input_data_files(self):
         """
-        Check the input files and make sure that there aren't any duplicates and that the files actually exist.
+        Check the input files and make sure that there aren't any duplicates.
+        Also check if the files actually exist if possible.
         """
         existing_input_files = []  # We use a list instead of set to avoid losing any ordering of files
         for file_path in self.input_files:
-            file_path = Path(file_path).absolute()
-            if file_path.is_file():
+            file_uri = parse_file_uri(file_path)
+            if file_uri.scheme == "file":
+                p = Path(file_uri.path)
+                if p.is_file():
+                    if file_uri.geturl() not in existing_input_files:
+                        existing_input_files.append(file_uri.geturl())
+                    else:
+                        B2WARNING(f"Requested input file path {file_path} was already added, skipping it.")
+                else:
+                    B2WARNING(f"Requested input file path {file_path} does not exist, skipping it.")
+            else:
+                B2DEBUG(29, f"{file_path} is not a local file URI. Skipping checking if file exists")
                 if file_path not in existing_input_files:
                     existing_input_files.append(file_path)
                 else:
                     B2WARNING(f"Requested input file path {file_path} was already added, skipping it.")
-            else:
-                B2WARNING(f"Requested input file path {file_path} does not exist, skipping it.")
-
         if self.input_files and not existing_input_files:
-            B2WARNING(f"No valid input file paths found for {job}, but some were requested.")
+            B2WARNING(f"No valid input file paths found for {self.name}, but some were requested.")
 
         # Replace the Job's input files with the ones that exist + duplicates removed
         self.input_files = existing_input_files
@@ -589,7 +607,8 @@ class Job:
         """
         This adds simple setup commands like ``source /path/to/tools/b2setup`` to your `Job`.
         It should detect if you are using a local release or CVMFS and append the correct commands
-        so that the job will have the same basf2 release environment.
+        so that the job will have the same basf2 release environment. It should also detect
+        if a local release is not compiled with the ``opt`` option.
 
         Note that this *doesn't mean that every environment variable is inherited* from the submitting
         process environment.
@@ -602,9 +621,12 @@ class Job:
             self.setup_cmds.append("export BELLE2_NO_TOOLS_CHECK=\"TRUE\"")
             self.setup_cmds.append(f"BACKEND_B2SETUP={os.environ['BELLE2_TOOLS']}/b2setup")
             self.setup_cmds.append(f"BACKEND_BELLE2_RELEASE_LOC={os.environ['BELLE2_LOCAL_DIR']}")
-            self.setup_cmds.append(f"pushd $BACKEND_BELLE2_RELEASE_LOC > /dev/null")
-            self.setup_cmds.append(f"source $BACKEND_B2SETUP")
-            self.setup_cmds.append(f"popd > /dev/null")
+            self.setup_cmds.append(f"BACKEND_BELLE2_OPTION={os.environ['BELLE2_OPTION']}")
+            self.setup_cmds.append("pushd $BACKEND_BELLE2_RELEASE_LOC > /dev/null")
+            self.setup_cmds.append("source $BACKEND_B2SETUP")
+            # b2code-option has to be executed only after the source of the tools.
+            self.setup_cmds.append("b2code-option $BACKEND_BELLE2_OPTION")
+            self.setup_cmds.append("popd > /dev/null")
 
 
 class SubJob(Job):
@@ -624,7 +646,7 @@ class SubJob(Job):
         #: Input files specific to this subjob
         if not input_files:
             input_files = []
-        self.input_files = [Path(p) for p in input_files]
+        self.input_files = input_files
         #: The result object of this SubJob. Only filled once it is is submitted to a backend
         #: since the backend creates a special result class depending on its type.
         self.result = None
@@ -659,8 +681,13 @@ class SubJob(Job):
     @status.setter
     def status(self, status):
         """
+        Sets the status of this Job.
         """
-        B2INFO(f"Setting {self.name} status to {status}")
+        # Print an error only if the job failed.
+        if status == "failed":
+            B2ERROR(f"Setting {self.name} status to failed")
+        else:
+            B2INFO(f"Setting {self.name} status to {status}")
         self._status = status
 
     @property
@@ -680,7 +707,7 @@ class SubJob(Job):
         """
         job_dict = {}
         job_dict["id"] = self.id
-        job_dict["input_files"] = [i.as_posix() for i in self.input_files]
+        job_dict["input_files"] = self.input_files
         job_dict["args"] = self.args
         return job_dict
 
@@ -729,7 +756,6 @@ class Backend(ABC):
         Base method for submitting collection jobs to the backend type. This MUST be
         implemented for a correctly written backend class deriving from Backend().
         """
-        pass
 
     @staticmethod
     def _add_setup(job, batch_file):
@@ -933,7 +959,7 @@ class Local(Backend):
         #: Internal attribute of max_processes
         self._max_processes = value
         if self.pool:
-            B2INFO(f"New max_processes requested. But a pool already exists.")
+            B2INFO("New max_processes requested. But a pool already exists.")
             self.join()
         B2INFO(f"Starting up new Pool with {self.max_processes} processes")
         self.pool = mp.Pool(processes=self.max_processes)
@@ -1035,7 +1061,7 @@ class Local(Backend):
         shell command in a subprocess and captures the stdout and stderr of the subprocess to files.
         """
         B2INFO(f"Starting Sub-process: {name}")
-        from subprocess import PIPE, STDOUT, Popen
+        from subprocess import Popen
         stdout_file_path = Path(working_dir, _STDOUT_FILE)
         stderr_file_path = Path(working_dir, _STDERR_FILE)
         # Create unix command to redirect stdour and stderr
@@ -1108,7 +1134,6 @@ class Batch(Backend):
         directives pasted directly into the submission script. It should be overwritten
         if needed.
         """
-        pass
 
     @classmethod
     @abstractmethod
@@ -1116,7 +1141,6 @@ class Batch(Backend):
         """
         Do the actual batch submission command and collect the output to find out the job id for later monitoring.
         """
-        pass
 
     def can_submit(self, *args, **kwargs):
         """
@@ -1144,8 +1168,8 @@ class Batch(Backend):
 
         Should set a Result object as an attribute of the job.
         """
-        # Make sure the output directory of the job is created
-        job.output_dir.mkdir(parents=True, exist_ok=True)
+        # Make sure the output directory of the job is created, commented out due to permission issues
+        # job.output_dir.mkdir(parents=True, exist_ok=True)
         # Make sure the working directory of the job is created
         job.working_dir.mkdir(parents=True, exist_ok=True)
         job.copy_input_sandbox_files_to_working_dir()
@@ -1179,15 +1203,15 @@ class Batch(Backend):
 
         Should set a Result object as an attribute of the job.
         """
-        # Make sure the output directory of the job is created
-        job.output_dir.mkdir(parents=True, exist_ok=True)
+        # Make sure the output directory of the job is created, commented out due to permissions issue
+        # job.output_dir.mkdir(parents=True, exist_ok=True)
         # Make sure the working directory of the job is created
         job.working_dir.mkdir(parents=True, exist_ok=True)
         # Check if we have any valid input files
         job.check_input_data_files()
         # Add any required backend args that are missing (I'm a bit hesitant to actually merge with job.backend_args)
         # just in case you want to resubmit the same job with different backend settings later.
-        job_backend_args = {**self.backend_args, **job.backend_args}
+        # job_backend_args = {**self.backend_args, **job.backend_args}
 
         # If there's no splitter then we just submit the Job with no SubJobs
         if not job.splitter:
@@ -1246,7 +1270,7 @@ class Batch(Backend):
         for jobs_to_submit in grouper(jobs_per_check, jobs):
             # Wait until we are allowed to submit
             while not self.can_submit(njobs=len(jobs_to_submit)):
-                B2INFO(f"Too many jobs are currently int the batch system globally. Waiting until submission can continue...")
+                B2INFO("Too many jobs are currently in the batch system globally. Waiting until submission can continue...")
                 time.sleep(self.sleep_between_submission_checks)
             else:
                 # We loop here since we have already checked if the number of jobs is low enough, we don't want to hit this
@@ -1270,13 +1294,11 @@ class Batch(Backend):
     def _create_job_result(cls, job, batch_output):
         """
         """
-        pass
 
     @abstractmethod
     def _create_cmd(self, job):
         """
         """
-        pass
 
 
 class PBS(Batch):
@@ -1419,7 +1441,7 @@ class PBS(Batch):
             try:
                 new_job_status = self.backend_code_to_status[backend_status]
             except KeyError as err:
-                raise BackendError(f"Unidentified backend status found for {self.job}: {backend_status}")
+                raise BackendError(f"Unidentified backend status found for {self.job}: {backend_status}") from err
 
             if new_job_status != self.job.status:
                 self.job.status = new_job_status
@@ -1671,7 +1693,7 @@ class LSF(Batch):
             try:
                 new_job_status = self.backend_code_to_status[backend_status]
             except KeyError as err:
-                raise BackendError(f"Unidentified backend status found for {self.job}: {backend_status}")
+                raise BackendError(f"Unidentified backend status found for {self.job}: {backend_status}") from err
 
             if new_job_status != self.job.status:
                 self.job.status = new_job_status
@@ -1853,11 +1875,12 @@ class HTCondor(Batch):
     default_global_job_limit = 10000
     #: Default backend args for HTCondor
     default_backend_args = {
-                            "universe": "vanilla",
-                            "getenv": "false",
-                            "request_memory": "4 GB",  # We set the default requested memory to 4 GB to maintain parity with KEKCC
+        "universe": "vanilla",
+        "getenv": "false",
+        "request_memory": "4 GB",  # We set the default requested memory to 4 GB to maintain parity with KEKCC
+        "path_prefix": "",  # Path prefix for file path
                             "extra_lines": []  # These should be other HTCondor submit script lines like 'request_cpus = 2'
-                           }
+    }
     #: Default ClassAd attributes to return from commands like condor_q
     default_class_ads = ["GlobalJobId", "JobStatus", "Owner"]
 
@@ -1876,7 +1899,7 @@ class HTCondor(Batch):
             print(f'log = {Path(job.output_dir, "htcondor.log").as_posix()}', file=submit_file)
             print(f'output = {Path(job.working_dir, _STDOUT_FILE).as_posix()}', file=submit_file)
             print(f'error = {Path(job.working_dir, _STDERR_FILE).as_posix()}', file=submit_file)
-            print(f'transfer_input_files = ', ','.join(files_to_transfer), file=submit_file)
+            print('transfer_input_files = ', ','.join(files_to_transfer), file=submit_file)
             print(f'universe = {job_backend_args["universe"]}', file=submit_file)
             print(f'getenv = {job_backend_args["getenv"]}', file=submit_file)
             print(f'request_memory = {job_backend_args["request_memory"]}', file=submit_file)
@@ -1913,11 +1936,21 @@ class HTCondor(Batch):
         """
         job_dir = Path(cmd[-1]).parent.as_posix()
         sub_out = ""
-        try:
-            sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, cwd=job_dir)
-        except subprocess.CalledProcessError as e:
-            B2ERROR(f"Error during condor_submit: {str(e)}")
-            raise e
+        attempt = 0
+        sleep_time = 30
+
+        while attempt < 3:
+            try:
+                sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, cwd=job_dir)
+                break
+            except subprocess.CalledProcessError as e:
+                attempt += 1
+                if attempt == 3:
+                    B2ERROR(f"Error during condor_submit: {str(e)} occurred more than 3 times.")
+                    raise e
+                else:
+                    B2ERROR(f"Error during condor_submit: {str(e)}, sleeping for {sleep_time} seconds.")
+                    time.sleep(30)
         return sub_out.split()[0]
 
     class HTCondorResult(Result):
@@ -1979,16 +2012,7 @@ class HTCondor(Batch):
                     B2DEBUG(29, f"Found {self.job_id} in condor_q_output.")
                     jobs_info.append(job_record)
 
-            # If this job wasn't in the passed in condor_q output, let's try our own with the specific job_id
-            if not jobs_info:
-                jobs_info = HTCondor.condor_q(job_id=self.job_id, class_ads=["JobStatus", "HoldReason"])["JOBS"]
-
-            # If no job information is returned then the job already left the queue
-            # check in the history to see if it suceeded or failed
-            if not jobs_info:
-                jobs_info = HTCondor.condor_history(job_id=self.job_id, class_ads=["JobStatus", "HoldReason"])["JOBS"]
-
-            # Getting ridiculous, let's look for the exit code file where we expect it
+            # Let's look for the exit code file where we expect it
             if not jobs_info:
                 try:
                     exit_code = self.get_exit_code_from_file()
@@ -2005,22 +2029,33 @@ class HTCondor(Batch):
                 else:
                     jobs_info = [{"JobStatus": 4, "HoldReason": None}]  # Set to completed
 
+            # If this job wasn't in the passed in condor_q output, let's try our own with the specific job_id
+            if not jobs_info:
+                jobs_info = HTCondor.condor_q(job_id=self.job_id, class_ads=["JobStatus", "HoldReason"])["JOBS"]
+
+            # If no job information is returned then the job already left the queue
+            # check in the history to see if it suceeded or failed
+            if not jobs_info:
+                try:
+                    jobs_info = HTCondor.condor_history(job_id=self.job_id, class_ads=["JobStatus", "HoldReason"])["JOBS"]
+                except KeyError:
+                    hold_reason = "No Reason Known"
+
             # Still no record of it after waiting for the exit code file?
             if not jobs_info:
                 jobs_info = [{"JobStatus": 6, "HoldReason": None}]  # Set to failed
 
             job_info = jobs_info[0]
             backend_status = job_info["JobStatus"]
-            # if job is held (backend_status = 5) then report why then kill the job
+            # if job is held (backend_status = 5) then report why then keep waiting
             if backend_status == 5:
-                hold_reason = job_info["HoldReason"]
-                B2WARNING(f"{self.job} on hold because of {hold_reason}. Killing it")
-                subprocess.check_output(["condor_rm", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
-                backend_status = 6
+                hold_reason = job_info.get("HoldReason", None)
+                B2WARNING(f"{self.job} on hold because of {hold_reason}. Keep waiting.")
+                backend_status = 2
             try:
                 new_job_status = self.backend_code_to_status[backend_status]
             except KeyError as err:
-                raise BackendError(f"Unidentified backend status found for {self.job}: {backend_status}")
+                raise BackendError(f"Unidentified backend status found for {self.job}: {backend_status}") from err
             if new_job_status != self.job.status:
                 self.job.status = new_job_status
 
@@ -2111,7 +2146,12 @@ class HTCondor(Batch):
         # We get a JSON serialisable summary from condor_q. But we will alter it slightly to be more similar to other backends
         cmd = " ".join(cmd_list)
         B2DEBUG(29, f"Calling subprocess with command = '{cmd}'")
-        records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        # condor_q occassionally fails
+        try:
+            records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        except BaseException:
+            records = None
+
         if records:
             records = decode_json_string(records)
         else:
@@ -2171,11 +2211,16 @@ class HTCondor(Batch):
         # We get a JSON serialisable summary from condor_q. But we will alter it slightly to be more similar to other backends
         cmd = " ".join(cmd_list)
         B2DEBUG(29, f"Calling subprocess with command = '{cmd}'")
-        records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        try:
+            records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        except BaseException:
+            records = None
+
         if records:
             records = decode_json_string(records)
         else:
             records = []
+
         jobs_info = {"JOBS": records}
         jobs_info["NJOBS"] = len(jobs_info["JOBS"])  # Just to avoid having to len() it in the future
         return jobs_info
@@ -2185,25 +2230,21 @@ class DIRAC(Backend):
     """
     Backend for submitting calibration processes to the grid.
     """
-    pass
 
 
 class BackendError(Exception):
     """
     Base exception class for Backend classes.
     """
-    pass
 
 
 class JobError(Exception):
     """
     Base exception class for Job objects.
     """
-    pass
 
 
 class SplitterError(Exception):
     """
     Base exception class for SubjobSplitter objects.
     """
-    pass

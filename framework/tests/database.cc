@@ -209,6 +209,14 @@ namespace {
     EXPECT_EQ(iov2, IntervalOfValidity(0, 0, 11, -1));
   }
 
+  /** Test direct database access */
+  TEST_F(DataBaseTest, getData)
+  {
+    EXPECT_TRUE(strcmp(Database::Instance().getData("TNamed", 1, 1)->GetName(), "Experiment 1") == 0);
+    EXPECT_TRUE(strcmp(Database::Instance().getData("TNamed", 4, 1)->GetName(), "Experiment 4") == 0);
+    EXPECT_TRUE(Database::Instance().getData("TNamed", 6, 1) == 0);
+  }
+
   /** Test database access via DBObjPtr */
   TEST_F(DataBaseTest, DBObjPtr)
   {
@@ -932,5 +940,4 @@ namespace {
     ptr = 3;
     EXPECT_FALSE(ptr.isValid());
   }
-
 }  // namespace

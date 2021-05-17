@@ -2,11 +2,8 @@
 # -*- coding: utf-8 -*-
 
 
-import ROOT
-from ROOT import TFile, TH1D, TH2D, TCanvas, TFile, TChain
-from ROOT import TH1F
+from ROOT import TCanvas, TFile
 import argparse
-import glob
 
 
 class QAM():

@@ -9,17 +9,17 @@
 </header>
 """
 
-from basf2 import *
+import basf2 as b2
 import os
 import glob
 import math
 from ROOT import Belle2
 from ROOT import TH1F, TFile, TNamed
 
-set_random_seed(123452)
+b2.set_random_seed(123452)
 
 
-class BGHistogrammer(Module):
+class BGHistogrammer(b2.Module):
 
     '''
     Make validation histograms for BG mixer.
@@ -97,19 +97,19 @@ class BGHistogrammer(Module):
 
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Set number of events to generate
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # Geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 main.add_module(geometry)
 
 # mix beam background
@@ -117,24 +117,24 @@ bg = None
 if 'BELLE2_BACKGROUND_MIXING_DIR' in os.environ:
     bg = glob.glob(os.environ['BELLE2_BACKGROUND_MIXING_DIR'] + '/*.root')
     if bg is None:
-        B2FATAL('No beam background samples found in folder ' +
-                os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
-    B2INFO('Using background samples from ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
-    bkgmixer = register_module('BeamBkgMixer')
+        b2.B2FATAL('No beam background samples found in folder ' +
+                   os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
+    b2.B2INFO('Using background samples from ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
+    bkgmixer = b2.register_module('BeamBkgMixer')
     bkgmixer.param('backgroundFiles', bg)
     main.add_module(bkgmixer)
 else:
-    B2FATAL('variable BELLE2_BACKGROUND_MIXING_DIR is not set')
+    b2.B2FATAL('variable BELLE2_BACKGROUND_MIXING_DIR is not set')
 
 # fill validation histograms
 main.add_module(BGHistogrammer())
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

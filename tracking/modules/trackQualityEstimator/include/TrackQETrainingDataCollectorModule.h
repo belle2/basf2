@@ -86,7 +86,12 @@ namespace Belle2 {
     std::vector<Named<float*>> m_variableSet;
 
     /** truth information collected with m_estimatorMC
-     * type is float to be consistend with m_variableSet (and TTree + MVA implementation) */
-    float m_truth = NAN;
+     * type is float to be consistend with m_variableSet (and TTree + MVA implementation).
+     * */
+    float m_matched = NAN; ///< 1 if track is matched, 0 else
+    float m_background = NAN; ///< 1 if track is background track, 0 else
+    float m_ghost = NAN;///< 1 if track is ghost track, 0 else
+    float m_fake = NAN;///< 1 if track is fake track, 0 else
+    float m_clone = NAN;///< 1 if track is clone track, 0 else
   };
 }

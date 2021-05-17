@@ -10,15 +10,15 @@
 # author: benjamin.schwenker@phys.uni-goettingen.de
 
 import math
-from basf2 import *
+import basf2 as b2
 import ROOT
 from ROOT import Belle2
 
 # set some random seed
-set_random_seed(10346)
+b2.set_random_seed(10346)
 
 
-class PXDPositionEstimation(Module):
+class PXDPositionEstimation(b2.Module):
     """
     Histogram the difference position residuals and pulls between clusters and truehits.
     """
@@ -118,10 +118,10 @@ class PXDPositionEstimation(Module):
                     thetaU = math.atan(tu) * 180 / math.pi
                     thetaV = math.atan(tv) * 180 / math.pi
 
-                    # Only look at primary particles
-                    for mcp in truehit.getRelationsFrom("MCParticles"):
-                        if not mcp.hasStatus(1):
-                            reject = True
+                    # Only look at primary particles -> check if the following is needed
+                    # for mcp in truehit.getRelationsFrom("MCParticles"):
+                    #    if not mcp.hasStatus(1):
+                    #        reject = True
 
                     # Get instance of position estimator
                     PositionEstimator = Belle2.PXD.PXDClusterPositionEstimator.getInstance()
@@ -315,7 +315,7 @@ if __name__ == "__main__":
         sys.exit()
 
     # Now let's create a path to simulate our events.
-    main = create_path()
+    main = b2.create_path()
     main.add_module("EventInfoSetter", evtNumList=[10000])
     main.add_module("Gearbox")
     # We only need the pxd for this
@@ -327,7 +327,7 @@ if __name__ == "__main__":
     # Background overlay input
     if bkgfiles:
         if args.bkgOverlay:
-            bkginput = register_module('BGOverlayInput')
+            bkginput = b2.register_module('BGOverlayInput')
             bkginput.param('inputFileNames', bkgfiles)
             main.add_module(bkginput)
 
@@ -347,5 +347,5 @@ if __name__ == "__main__":
     main.add_module(positionestimation)
     main.add_module("Progress")
 
-    process(main)
-    print(statistics)
+    b2.process(main)
+    print(b2.statistics)

@@ -65,7 +65,7 @@ namespace Belle2 {
     /**
      * Set the injected charge
      * Input:
-     * @param std::string [e]
+     * @param injectedCharge
      *
      */
     void setInjectedCharge(float injectedCharge)
@@ -77,7 +77,7 @@ namespace Belle2 {
     /**
      * Set the time units
      * Input:
-     * @param std::string coeff+ [RFC]
+     * @param calibrationTimeUnits
      *
      */
     void setCalibrationTimeInRFCUnits(const std::string& calibrationTimeUnits)
@@ -86,9 +86,9 @@ namespace Belle2 {
     }
 
     /**
-     * Set the date_hour (yyyymmdd_hhmm) of the current calibration
+     * Set the date (yyyy-mm-dd) of the current NOISE calibration
      * Input:
-     * @param std::string
+     * @param date
      *
      */
     void setCalibDate(const std::string& date)

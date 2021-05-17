@@ -417,7 +417,7 @@ void Fitter3DUtility::calPhi(std::map<std::string, double> const& mConstD,
   //}
 
   // Calculate minInvValue, maxInvValue for LUTs
-  if (mSignalStorage.find("invDriftPhiMin") == mSignalStorage.end()) {
+  if (!mSignalStorage.count("invDriftPhiMin")) { //nothing found
     mSignalStorage["invDriftPhiMin"] = Belle2::TRGCDCJSignal(0, mSignalStorage["driftTime_0"].getToReal(), commonData);
     mSignalStorage["invDriftPhiMax"] = Belle2::TRGCDCJSignal(pow(2, mConstD.at("tdcBitSize")) - 1,
                                                              mSignalStorage["driftTime_0"].getToReal(), commonData);
@@ -428,7 +428,7 @@ void Fitter3DUtility::calPhi(std::map<std::string, double> const& mConstD,
   for (unsigned iSt = 0; iSt < 4; iSt++) {
     string t_valueName = "driftPhi_" + to_string(iSt);
     string t_inName = "driftTime_" + to_string(iSt);
-    if (mLutStorage.find(t_valueName) == mLutStorage.end()) {
+    if (!mLutStorage.count(t_valueName)) { //if nothing found
       mLutStorage[t_valueName] = new Belle2::TRGCDCJLUT(t_valueName);
       // Lambda can not copy maps.
       double t_parameter = mConstV.at("rr3D")[iSt];
@@ -956,7 +956,7 @@ void Fitter3DUtility::calZ(std::map<std::string, double> const& mConstD, std::ma
     string t_maxName = "phiAxMax_" + to_string(iSt);
     string t_invMinName = "invPhiAxMin_" + to_string(iSt);
     string t_invMaxName = "invPhiAxMax_" + to_string(iSt);
-    if (mLutStorage.find(t_valueName) == mLutStorage.end()) {
+    if (!mLutStorage.count(t_valueName)) { //if nothing found
       mLutStorage[t_valueName] = new Belle2::TRGCDCJLUT(t_valueName);
       // Lambda can not copy maps.
       double t_parameter = mConstV.at("rr3D")[iSt];
@@ -1174,7 +1174,7 @@ void Fitter3DUtility::calZ(std::map<std::string, double> const& mConstD, std::ma
     string t_invMinName = "invZMin_" + to_string(iSt);
     string t_invMaxName = "invZMax_" + to_string(iSt);
 
-    if (mLutStorage.find(t_outputName) == mLutStorage.end()) {
+    if (!mLutStorage.count(t_outputName)) { //if nothing found
       mLutStorage[t_outputName] = new Belle2::TRGCDCJLUT(t_outputName);
       // Lambda can not copy maps.
       double t_zToStraw = mConstV.at("zToStraw")[iSt];
@@ -1254,7 +1254,7 @@ void Fitter3DUtility::calS(std::map<std::string, double> const& mConstD, std::ma
     string t_valueName = "arcS_" + to_string(iSt);
     string t_invMinName = "invArcSMin_" + to_string(iSt);
     string t_invMaxName = "invArcSMax_" + to_string(iSt);
-    if (mLutStorage.find(t_valueName) == mLutStorage.end()) {
+    if (!mLutStorage.count(t_valueName)) { //if nothing found
       mLutStorage[t_valueName] = new Belle2::TRGCDCJLUT(t_valueName);
       // Lambda can not copy maps.
       double t_parameter = mConstV.at("rr3D")[iSt];
@@ -1572,7 +1572,7 @@ void Fitter3DUtility::rSFit(std::map<std::string, double> const& mConstD,
   //cout<<"<<<invIDenMin>>>"<<endl; mSignalStorage["invIDenMin"].dump();
   //cout<<"<<<invIDenMax>>>"<<endl; mSignalStorage["invIDenMax"].dump();
   // Generate LUT(iDen = 1/den)
-  if (mLutStorage.find("iDen") == mLutStorage.end()) {
+  if (!mLutStorage.count("iDen")) {
     mLutStorage["iDen"] = new Belle2::TRGCDCJLUT("iDen");
     mLutStorage["iDen"]->setFloatFunction(
       [ = ](double aValue) -> double{return 1 / aValue;},
@@ -1600,8 +1600,10 @@ void Fitter3DUtility::rSFit(std::map<std::string, double> const& mConstD,
   mSignalStorage["cot"] <= mSignalStorage["cot_p2"] * mSignalStorage["iDen"];
   // z0 = z0_p2 * iDen
   mSignalStorage["z0"] <= mSignalStorage["z0_p2"] * mSignalStorage["iDen"];
-  if (mConstD.at("JB") == 1) {cout << "<<<cot>>>" << endl; mSignalStorage["cot"].dump();}
-  if (mConstD.at("JB") == 1) {cout << "<<<z0>>>" << endl; mSignalStorage["z0"].dump();}
+  if (mConstD.at("JB") == 1) {
+    cout << "<<<cot>>>" << endl; mSignalStorage["cot"].dump();
+    cout << "<<<z0>>>" << endl; mSignalStorage["z0"].dump();
+  }
 
   // Constrain z0 to [-30,30]
   /* cppcheck-suppress variableScope */
@@ -1609,7 +1611,7 @@ void Fitter3DUtility::rSFit(std::map<std::string, double> const& mConstD,
   /* cppcheck-suppress variableScope */
   double z0Max = 30;
   // Calculate z0Max and z0Min
-  if (mSignalStorage.find("z0Min") == mSignalStorage.end()) {
+  if (!mSignalStorage.count("z0Min")) {
     mSignalStorage["z0Min"] = Belle2::TRGCDCJSignal(z0Min, mSignalStorage["z0"].getToReal(), commonData);
     mSignalStorage["z0Max"] = Belle2::TRGCDCJSignal(z0Max, mSignalStorage["z0"].getToReal(), commonData);
   }
@@ -1648,7 +1650,7 @@ void Fitter3DUtility::rSFit(std::map<std::string, double> const& mConstD,
   // Constraint cot to [-0.753, 1.428]
   double cotMin = cos(127 * mConstD.at("Trg_PI") / 180) / sin(127 * mConstD.at("Trg_PI") / 180);
   double cotMax = cos(35 * mConstD.at("Trg_PI") / 180) / sin(35 * mConstD.at("Trg_PI") / 180);
-  if (mSignalStorage.find("cotMin") == mSignalStorage.end()) {
+  if (!mSignalStorage.count("cotMin")) {
     mSignalStorage["cotMin"] = Belle2::TRGCDCJSignal(cotMin, mSignalStorage["cot"].getToReal(), commonData);
     mSignalStorage["cotMax"] = Belle2::TRGCDCJSignal(cotMax, mSignalStorage["cot"].getToReal(), commonData);
   }
@@ -1797,7 +1799,7 @@ void Fitter3DUtility::rSFit(std::map<std::string, double> const& mConstD,
   /* cppcheck-suppress variableScope */
   int zChi2Bits = 4;
   // Calculate zChi2Max and zChi2Min
-  if (mSignalStorage.find("zChi2Min") == mSignalStorage.end()) {
+  if (!mSignalStorage.count("zChi2Min")) {
     mSignalStorage["zChi2Min"] = Belle2::TRGCDCJSignal(zChi2Min, mSignalStorage["zChi2"].getToReal(), commonData);
     mSignalStorage["zChi2Max"] = Belle2::TRGCDCJSignal(zChi2Max, mSignalStorage["zChi2"].getToReal(), commonData);
   }
@@ -1876,7 +1878,8 @@ void Fitter3DUtility::fitter3D(std::map<std::string, std::vector<double> >& stGe
   Fitter3DUtility::rSFit(&invZError2[0], &arcS[0], &zz[0], z0, cot, chi2);
 }
 
-void Fitter3DUtility::fitter3DFirm(std::map<std::string, double>& mConstD, std::map<std::string, std::vector<double> >& mConstV,
+void Fitter3DUtility::fitter3DFirm(std::map<std::string, double>& mConstD,
+                                   const std::map<std::string, std::vector<double> >& mConstV,
                                    int eventTimeValid, int eventTime,
                                    std::vector<std::vector<int> > const& rawStTSs,
                                    int charge, double radius, double phi_c,
@@ -1893,10 +1896,10 @@ void Fitter3DUtility::fitter3DFirm(std::map<std::string, double>& mConstD, std::
     make_tuple("lr_1", rawStTSs[1][1], 2, 0, 3.5, 0),
     make_tuple("lr_2", rawStTSs[2][1], 2, 0, 3.5, 0),
     make_tuple("lr_3", rawStTSs[3][1], 2, 0, 3.5, 0),
-    make_tuple("tsId_0", rawStTSs[0][0], ceil(log(mConstV["nTSs"][1]) / log(2)), 0, pow(2, ceil(log(mConstV["nTSs"][1]) / log(2))) - 0.5, 0),
-    make_tuple("tsId_1", rawStTSs[1][0], ceil(log(mConstV["nTSs"][3]) / log(2)), 0, pow(2, ceil(log(mConstV["nTSs"][3]) / log(2))) - 0.5, 0),
-    make_tuple("tsId_2", rawStTSs[2][0], ceil(log(mConstV["nTSs"][5]) / log(2)), 0, pow(2, ceil(log(mConstV["nTSs"][5]) / log(2))) - 0.5, 0),
-    make_tuple("tsId_3", rawStTSs[3][0], ceil(log(mConstV["nTSs"][7]) / log(2)), 0, pow(2, ceil(log(mConstV["nTSs"][7]) / log(2))) - 0.5, 0),
+    make_tuple("tsId_0", rawStTSs[0][0], ceil(log(mConstV.at("nTSs")[1]) / log(2)), 0, pow(2, ceil(log(mConstV.at("nTSs")[1]) / log(2))) - 0.5, 0),
+    make_tuple("tsId_1", rawStTSs[1][0], ceil(log(mConstV.at("nTSs")[3]) / log(2)), 0, pow(2, ceil(log(mConstV.at("nTSs")[3]) / log(2))) - 0.5, 0),
+    make_tuple("tsId_2", rawStTSs[2][0], ceil(log(mConstV.at("nTSs")[5]) / log(2)), 0, pow(2, ceil(log(mConstV.at("nTSs")[5]) / log(2))) - 0.5, 0),
+    make_tuple("tsId_3", rawStTSs[3][0], ceil(log(mConstV.at("nTSs")[7]) / log(2)), 0, pow(2, ceil(log(mConstV.at("nTSs")[7]) / log(2))) - 0.5, 0),
     make_tuple("tdc_0", rawStTSs[0][2], mConstD["tdcBitSize"], 0, pow(2, mConstD["tdcBitSize"]) - 0.5, 0),
     make_tuple("tdc_1", rawStTSs[1][2], mConstD["tdcBitSize"], 0, pow(2, mConstD["tdcBitSize"]) - 0.5, 0),
     make_tuple("tdc_2", rawStTSs[2][2], mConstD["tdcBitSize"], 0, pow(2, mConstD["tdcBitSize"]) - 0.5, 0),
@@ -1965,7 +1968,8 @@ void Fitter3DUtility::calHelixParameters(TVector3 position, TVector3 momentum, i
   helixParameters[4] = momentum.Z() / t_pT * charge;
   helixParameters[3] = position.Z() + helixParameters[4] * t_R * t_phi;
 }
-void Fitter3DUtility::calVectorsAtR(TVectorD& helixParameters, int charge, double cdcRadius, TVector3& position, TVector3& momentum)
+void Fitter3DUtility::calVectorsAtR(const TVectorD& helixParameters, int charge, double cdcRadius, TVector3& position,
+                                    TVector3& momentum)
 {
   // HelixParameters: dR, phi0, keppa, dz, tanLambda
   double t_alpha = 1 / 0.3 / 1.5 * 100;

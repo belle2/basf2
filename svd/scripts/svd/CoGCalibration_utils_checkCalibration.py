@@ -9,23 +9,13 @@
 #
 
 
-from basf2 import *
-from svd import *
-import ROOT
-from ROOT import Belle2, TFile, TTree, TH1F, TH2F, TH2D, TGraph, TFitResultPtr
-from ROOT import TROOT, gROOT, TF1, TMath, gStyle, gDirectory, TTree
-import os
+import basf2 as b2
+from ROOT import (Belle2, TFile, TFitResultPtr, TH1F, TH2D, TTree, TF1,
+                  gDirectory, gROOT)
 # import numpy
 import math
-import random
-from array import array
-import basf2
-import sys
 
-import matplotlib.pyplot as plt
 import numpy as np
-from numpy.linalg import inv, pinv
-from numpy.linalg import det, norm, cond
 
 cdc_Time0 = "EventT0"
 svd_Clusters = "SVDClustersFromTracks"
@@ -37,7 +27,7 @@ gROOT.SetBatch(True)
 # mode = True
 
 
-class SVDCoGTimeCalibrationCheckModule(basf2.Module):
+class SVDCoGTimeCalibrationCheckModule(b2.Module):
     """
     Python class used for checking SVD CoG Calibration stored in a localDB
     """
@@ -269,6 +259,7 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
         svdCluster_list = Belle2.PyStoreArray(svd_Clusters)
         svd_evtInfo = Belle2.PyStoreObj(svd_EventInfo)
         clsTB = svd_evtInfo.getModeByte().getTriggerBin()
+        #: trigger bin
         self.TB = ord(clsTB)
 
         for svdCluster in svdCluster_list:
@@ -322,7 +313,7 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
         tree.Branch("ClsChargeMean", clsCharge, "ClsChargeMean/D")
         tree.Branch("ClsSNRMean", clsSNR, "ClsSNRMean/D")
 
-        par = [0, 1]
+        # par = [0, 1]
 
         # tfileHist.cd()
         geoCache = Belle2.VXD.GeoCache.getInstance()
@@ -377,7 +368,7 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
                         charge.Write()
                         # ScatterPlot Histograms with Linear Fit
                         sp = self.spList[li][ldi][si][side]
-                        covscalebias = sp.GetCovariance()
+                        # covscalebias = sp.GetCovariance()
                         pfxsp = sp.ProfileX()
                         sp.GetXaxis().SetTitle("cluster time (ns)")
                         sp.GetYaxis().SetTitle("EventT0 (ns)")

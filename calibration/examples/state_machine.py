@@ -1,4 +1,4 @@
-from basf2 import *
+import basf2 as b2
 from caf.state_machines import Machine, State
 
 # We set up a bunch of function callbacks to show the ordering of evaluation
@@ -12,7 +12,7 @@ def print_msg_before(**kwargs):
     specify when calling a transition. But remember that all kwargs are passed
     to ALL transition callbacks. Including both the before and after callbacks
     """
-    B2INFO(kwargs["msg_before"])
+    b2.B2INFO(kwargs["msg_before"])
 
 
 def print_msg_after(**kwargs):
@@ -20,7 +20,7 @@ def print_msg_after(**kwargs):
     Have to have a different kwarg name, otherwise the same argument from the
     'before' callback will be used
     """
-    B2INFO(kwargs["msg_after"])
+    b2.B2INFO(kwargs["msg_after"])
 
 
 def enter_new_state(**kwargs):
@@ -28,15 +28,15 @@ def enter_new_state(**kwargs):
     Enter and exit callbacks have access to the prior and new state objects but NOT
     the transition arguments.
     """
-    B2INFO("Entering state {0} from state {1}".format(kwargs["new_state"].name, kwargs["prior_state"].name))
+    b2.B2INFO("Entering state {0} from state {1}".format(kwargs["new_state"].name, kwargs["prior_state"].name))
 
 
 def exit_old_state(**kwargs):
-    B2INFO("Exiting state {0} to state {1}".format(kwargs["prior_state"].name, kwargs["new_state"].name))
+    b2.B2INFO("Exiting state {0} to state {1}".format(kwargs["prior_state"].name, kwargs["new_state"].name))
 
 
 def condition_true(**kwargs):
-    B2INFO("Evaluating conditions")
+    b2.B2INFO("Evaluating conditions")
     return True
 
 
@@ -59,7 +59,7 @@ m1.initial_state = "start"
 m1.save_graph(filename="machine_graph.dot", graphname="Machine")
 
 # Run through the states passing in arguments to callbacks
-B2INFO("Currently in " + m1.state.name + " state.")
+b2.B2INFO("Currently in " + m1.state.name + " state.")
 m1.begin(msg_before="About to run", msg_after="Now Running")
 m1.finish(msg_before="Finishing", msg_after="Finished")
-B2INFO("Currently in " + m1.state.name + " state.")
+b2.B2INFO("Currently in " + m1.state.name + " state.")

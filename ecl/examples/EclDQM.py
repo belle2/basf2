@@ -45,7 +45,7 @@ mainPath.add_module(histoManager)
 triggerSkim = b2.register_module('TriggerSkim')
 triggerSkim.param('triggerLines',
                   ['software_trigger_cut&all&total_result'])
-triggerSkim.if_value('==0', Path(), AfterConditionPath.END)
+triggerSkim.if_value('==0', b2.Path(), b2.AfterConditionPath.END)
 mainPath.add_module(triggerSkim)
 
 # Register and add 'ECLDQM' module and settings

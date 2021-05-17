@@ -15,7 +15,8 @@
 </header>
 """
 
-from plotUtils import *
+import ROOT as R
+import plotUtils as pu
 
 inputRT = R.TFile.Open("../SVDValidationTTreeRecoTrack.root")
 inputSP = R.TFile.Open("../SVDValidationTTreeSpacePoint.root")
@@ -26,7 +27,7 @@ treeSP = inputSP.Get("tree")
 histsTP = R.TFile.Open("SVDTrackingPerformance.root", "recreate")
 
 
-ploter(
+pu.plotter(
     name='SpacePointTime_U',
     title='SpacePoint time on U side',
     nbins=200,
@@ -34,7 +35,7 @@ ploter(
     xmax=100,
     x_label='SP time (ns)',
     y_label='counts',
-    granules=gD2,
+    granules=pu.gD2,
     tree=treeSP,
     expr='time_u',
     cut='',
@@ -43,7 +44,7 @@ ploter(
     isShifter=True)
 
 
-ploter(
+pu.plotter(
     name='SpacePointTime_V',
     title='SpacePoint time on V side',
     nbins=200,
@@ -51,7 +52,7 @@ ploter(
     xmax=100,
     x_label='SP time (ns)',
     y_label='counts',
-    granules=gD2,
+    granules=pu.gD2,
     tree=treeSP,
     expr='time_v',
     cut='',
@@ -60,7 +61,7 @@ ploter(
     isShifter=True)
 
 
-ploter(
+pu.plotter(
     name='cluster_UVTimeDiff',
     title='U-V time difference',
     nbins=80,
@@ -68,17 +69,17 @@ ploter(
     xmax=20,
     x_label='Cluster time difference (ns)',
     y_label='counts',
-    granules=gD2,
+    granules=pu.gD2,
     tree=treeRT,
     expr='cluster_UVTimeDiff',
-    cut=cut_oneTH,
+    cut=pu.cut_oneTH,
     descr='Time difference between opposite sides of clusters belonging to the same layer.\
     Distribution for signal clusters.',
     check='Distribution peak around 0 for signal.',
     isShifter=True)
 
 
-ploter(
+pu.plotter(
     name='cluster_UUTimeDiff',
     title='U-U time difference',
     nbins=80,
@@ -86,17 +87,17 @@ ploter(
     xmax=20,
     x_label='Cluster time difference (ns)',
     y_label='counts',
-    granules=granulesTD,
+    granules=pu.granulesTD,
     tree=treeRT,
     expr='cluster_UUTimeDiff',
-    cut=cut_U+cut_oneTH,
+    cut=pu.cut_U+pu.cut_oneTH,
     descr='Time difference between clusters belonging to the neighbour layers.\
     Distribution for signal clusters.',
     check='Distributions peak around 0.',
     isShifter=True)
 
 
-ploter(
+pu.plotter(
     name='cluster_VVTimeDiff',
     title='V-V time difference',
     nbins=80,
@@ -104,49 +105,49 @@ ploter(
     xmax=20,
     x_label='Cluster time difference (ns)',
     y_label='counts',
-    granules=granulesTD,
+    granules=pu.granulesTD,
     tree=treeRT,
     expr='cluster_VVTimeDiff',
-    cut=cut_V+cut_oneTH,
+    cut=pu.cut_V+pu.cut_oneTH,
     descr='Time difference between clusters belonging to the neighbour layers.\
     Distribution for signal clusters.',
     check='Distributions peak around 0.',
     isShifter=True)
 
 
-plotRegions(
+pu.plotRegions(
     name='ClusterizationPurity_U',
     title='Purity of clusters from tracks for U side',
     x_label='SVD regions',
     y_label='Purity',
-    granules=granulesLayersTypes,
+    granules=pu.granulesLayersTypes,
     tree=treeRT,
     expr='strip_dir',
-    cutALL=cut_noV,
-    cut=cut_oneTH,
+    cutALL=pu.cut_noV,
+    cut=pu.cut_oneTH,
     descr='Definition: (number of clusters related to one TrueHit) / (number of clusters).\
     Evaluates the fraction of signal cluster over the total number of signal and background clusters.',
     check='Should be close to 1 in all bins',
     isShifter=True)
 
 
-plotRegions(
+pu.plotRegions(
     name='ClusterizationPurity_V',
     title='Purity of clusters from tracks for V side',
     x_label='SVD regions',
     y_label='Purity',
-    granules=granulesLayersTypes,
+    granules=pu.granulesLayersTypes,
     tree=treeRT,
     expr='strip_dir',
-    cutALL=cut_noU,
-    cut=cut_oneTH,
+    cutALL=pu.cut_noU,
+    cut=pu.cut_oneTH,
     descr='Definition: (number of clusters related to one TrueHit) / (number of clusters).\
     Evaluates the fraction of signal cluster over the total number of signal and background clusters.',
     check='Should be close to 1 in all bins.',
     isShifter=True)
 
 
-ploter(
+pu.plotter(
     name='clusters_number',
     title='Number of clusters in one track',
     nbins=12,
@@ -154,10 +155,10 @@ ploter(
     xmax=13,
     x_label='Number of clusters in one track',
     y_label='counts',
-    granules=granulesL3456,
+    granules=pu.granulesL3456,
     tree=treeRT,
     expr='clusters_number',
-    cut=cut_U,
+    cut=pu.cut_U,
     descr='Number of all clusters (signal + background) in one track.',
     check='Maximum is expected for 8, i.e. each cluster for one of 4 layers,\
     separately for U and V side.',

@@ -5,7 +5,7 @@
 
 import os
 import sys
-from tools import *
+from tools import getMaxRunNo_mc, getBelleUrl_mc, readConfigFile_mc, countEventsInUrl, addLine
 
 # print debug messages ?
 debug = False
@@ -20,11 +20,12 @@ thresholdEventsNo, expNoList, eventTypeList, dataTypeList, belleLevelList =\
 
 # create output directory for tables if it doesn't exist
 if not os.path.exists('tables'):
-        os.makedirs('tables')
+    os.makedirs('tables')
 
 # open table and write in it
 # table name contains threshold for events number of each job
-tableName = 'tables/lookUpTable_mc_' + str(int(thresholdEventsNo / 1000)) + 'k.txt'
+tableName = 'tables/lookUpTable_mc_' + \
+    str(int(thresholdEventsNo / 1000)) + 'k.txt'
 f = open(tableName, 'w')
 
 # write one line for each job we submit
@@ -52,7 +53,8 @@ for expNo in expNoList:
 
                     maxRunNo = minRunNo + 1
 
-                    # create the smallest set of runs that has more than Nthreshold events
+                    # create the smallest set of runs that has more than
+                    # Nthreshold events
                     for add in range(1, 1000):
 
                         maxRunNo = minRunNo + add

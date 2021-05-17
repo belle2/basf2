@@ -8,6 +8,7 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/gearbox/Const.h>
 
 #include <gtest/gtest.h>
 
@@ -304,9 +305,9 @@ namespace {
     //actually push things into StoreArray
     d.finalize();
     EXPECT_EQ(mcparticles.getEntries(), 3);
-    EXPECT_EQ(mcparticles[0]->getPDG(), 111);
-    EXPECT_EQ(mcparticles[1]->getPDG(), 22);
-    EXPECT_EQ(mcparticles[2]->getPDG(), 22);
+    EXPECT_EQ(mcparticles[0]->getPDG(), Const::pi0.getPDGCode());
+    EXPECT_EQ(mcparticles[1]->getPDG(), Const::photon.getPDGCode());
+    EXPECT_EQ(mcparticles[2]->getPDG(), Const::photon.getPDGCode());
     EXPECT_EQ(mcparticles[0]->getMother(), nullptr);
     EXPECT_EQ(mcparticles[1]->getMother(), mcparticles[0]);
     EXPECT_EQ(mcparticles[2]->getMother(), mcparticles[0]);
@@ -314,10 +315,10 @@ namespace {
     Decay e(111, {22, 22});
     e.finalize();
     EXPECT_EQ(mcparticles.getEntries(), 6);
-    EXPECT_EQ(mcparticles[3]->getPDG(), 111);
+    EXPECT_EQ(mcparticles[3]->getPDG(), Const::pi0.getPDGCode());
     EXPECT_EQ(mcparticles[3]->getNDaughters(), 2);
-    EXPECT_EQ(mcparticles[4]->getPDG(), 22);
-    EXPECT_EQ(mcparticles[5]->getPDG(), 22);
+    EXPECT_EQ(mcparticles[4]->getPDG(), Const::photon.getPDGCode());
+    EXPECT_EQ(mcparticles[5]->getPDG(), Const::photon.getPDGCode());
     EXPECT_EQ(mcparticles[4]->getNDaughters(), 0);
     EXPECT_EQ(mcparticles[5]->getNDaughters(), 0);
     EXPECT_EQ(mcparticles[3]->getMother(), nullptr);
@@ -327,7 +328,7 @@ namespace {
     Decay f(211);
     f.finalize();
     EXPECT_EQ(mcparticles.getEntries(), 7);
-    EXPECT_EQ(mcparticles[6]->getPDG(), 211);
+    EXPECT_EQ(mcparticles[6]->getPDG(), Const::pion.getPDGCode());
 
     Decay g(421, {321, -211, {111, {22, 22}}});
     g.finalize();
@@ -346,7 +347,7 @@ namespace {
     //reconstruct() calls finalize(), so MCParticles are filled now
     EXPECT_EQ(mcparticles.getEntries(), 6);
     EXPECT_EQ(mcparticles[0]->getPDG(), 421);
-    EXPECT_EQ(mcparticles[5]->getPDG(), 22);
+    EXPECT_EQ(mcparticles[5]->getPDG(), Const::photon.getPDGCode());
     EXPECT_EQ(particles.getEntries(), 6);
 
     ASSERT_NE(d.m_particle, nullptr);
@@ -1105,7 +1106,7 @@ namespace {
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::c_MissGamma | MCMatching::c_MissingResonance, MCMatching::getMCErrors(d.m_particle)) << d.getString();
       ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
-      vector<int> daughterPDG{111};
+      vector<int> daughterPDG{Const::pi0.getPDGCode()};
       EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG), 1);
     }
     {
@@ -1115,7 +1116,7 @@ namespace {
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::getMCErrors(d.m_particle), MCMatching::c_MissMassiveParticle) << d.getString();
       ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
-      vector<int> daughterPDG{211};
+      vector<int> daughterPDG{Const::pion.getPDGCode()};
       EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG), 1);
     }
     {
@@ -1125,7 +1126,7 @@ namespace {
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::getMCErrors(d.m_particle), MCMatching::c_MissMassiveParticle) << d.getString();
       ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
-      vector<int> daughterPDG{321};
+      vector<int> daughterPDG{Const::kaon.getPDGCode()};
       EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG), 1);
     }
     {
@@ -1135,7 +1136,7 @@ namespace {
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(MCMatching::getMCErrors(d.m_particle), MCMatching::c_MissMassiveParticle) << d.getString();
       ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
-      vector<int> daughterPDG{321};
+      vector<int> daughterPDG{Const::kaon.getPDGCode()};
       EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG), 2);
     }
     {
@@ -1155,7 +1156,7 @@ namespace {
       EXPECT_EQ(MCMatching::c_MissMassiveParticle | MCMatching::c_MissingResonance,
                 MCMatching::getMCErrors(d.m_particle)) << d.getString();
       ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
-      vector<int> daughterPDG{310};
+      vector<int> daughterPDG{Const::Kshort.getPDGCode()};
       EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG), 1);
     }
     {
@@ -1171,7 +1172,7 @@ namespace {
       EXPECT_EQ(MCMatching::c_MissKlong | MCMatching::c_MissMassiveParticle | MCMatching::c_MissingResonance,
                 MCMatching::getMCErrors(d.m_particle)) << d.getString();
       ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
-      vector<int> daughterPDG{130};
+      vector<int> daughterPDG{Const::Klong.getPDGCode()};
       EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG), 1);
     }
     {
@@ -1182,7 +1183,7 @@ namespace {
       EXPECT_EQ(MCMatching::c_MissNeutrino | MCMatching::c_MissMassiveParticle,
                 MCMatching::getMCErrors(d.m_particle)) << d.getString();
       ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
-      vector<int> daughterPDG_E{11};
+      vector<int> daughterPDG_E{Const::electron.getPDGCode()};
       EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG_E), 1);
       vector<int> daughterPDG_NuE{12};
       EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG_NuE), 1);
@@ -1197,7 +1198,7 @@ namespace {
       EXPECT_EQ(MCMatching::c_MissNeutrino | MCMatching::c_MissMassiveParticle,
                 MCMatching::getMCErrors(d.m_particle)) << d.getString();
       ASSERT_NE(nullptr, d.m_particle->getRelated<MCParticle>()) << d.getString();
-      vector<int> daughterPDG_Mu{13};
+      vector<int> daughterPDG_Mu{Const::muon.getPDGCode()};
       EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG_Mu), 1);
       vector<int> daughterPDG_NuMu{14};
       EXPECT_EQ(MCMatching::countMissingParticle(d.m_particle, d.m_particle->getRelated<MCParticle>(), daughterPDG_NuMu), 1);

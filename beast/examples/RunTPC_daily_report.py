@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
 import sys
 import datetime
-from basf2 import *
-from subprocess import call
+import basf2 as b2
 
 d = datetime.datetime.today()
 print((d.strftime('job start: %Y-%m-%d %H:%M:%S\n')))
@@ -41,34 +39,34 @@ print(date)
 print(TPCnb)
 
 # Register necessary modules
-main = create_path()
+main = b2.create_path()
 
 # Register RootInput
-simpleinput = register_module('RootInput')
+simpleinput = b2.register_module('RootInput')
 simpleinput.param('inputFileNames', inputs)
 main.add_module(simpleinput)
 
 # Register HistoManager
-histo = register_module("HistoManager")  # Histogram Manager
+histo = b2.register_module("HistoManager")  # Histogram Manager
 histo.param('histoFileName', outfile)
 main.add_module(histo)
 
 # Register Gearbox
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 gearbox.param('fileName', '/geometry/Beast2_phase1.xml')
 main.add_module(gearbox)
 
 # Register MicrotpcDailyReport
-daily = register_module('MicrotpcDailyReport')
+daily = b2.register_module('MicrotpcDailyReport')
 daily.param('inputTPCNumber', int(TPCnb))
 daily.param('inputReportDate', int(date))
 main.add_module(daily)
 
 
-process(main)
+b2.process(main)
 
 print('Event Statistics:')
-print(statistics)
+print(b2.statistics)
 
 d = datetime.datetime.today()
 print(d.strftime('job finish: %Y-%m-%d %H:%M:%S\n'))

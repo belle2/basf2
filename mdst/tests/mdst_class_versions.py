@@ -28,7 +28,7 @@ EXPECTED_CHECKSUMS = {
     'Belle2::RelationElement': (1, 1883389510),
     'Belle2::RelationsInterface<TObject>': (0, 3862127315),
     'Belle2::SoftwareTriggerResult': (5, 241059817),
-    'Belle2::TRGSummary': (6, 3829574990),
+    'Belle2::TRGSummary': (7, 1658421299),
     'Belle2::Track': (4, 839781593),
     'Belle2::TrackFitResult': (8, 1247854432),
     'Belle2::V0': (3, 4006259140),

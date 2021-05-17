@@ -38,7 +38,7 @@ namespace TreeFitter {
     /**  destructor   */
     ~DecayChain();
 
-    /** initalize the chain */
+    /** initialize the chain */
     ErrCode initialize(FitParams& par);
 
     /** filter down the chain */

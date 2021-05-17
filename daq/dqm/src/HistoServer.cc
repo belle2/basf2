@@ -8,6 +8,7 @@
 #include <daq/dqm/HistoServer.h>
 
 #include <framework/pcore/MsgHandler.h>
+#include <ctime>
 
 using namespace Belle2;
 using namespace std;
@@ -47,11 +48,14 @@ int HistoServer::server()
 {
   SocketIO sio;
   MsgHandler msghdl(0);
+  char mbstr[100];
+  time_t now;
   char* buffer = new char[MAXBUFSIZE];
   //  vector<int> recvsock;
   int loop_counter = 0;
   bool updated = false;
   while (m_force_exit == 0) {
+    fflush(stdout);
     int exam_stat = m_man->examine();
     if (exam_stat == 0) {
     } else if (exam_stat == 1) { //
@@ -63,7 +67,9 @@ int HistoServer::server()
         if (m_man->connected(fd)) {
           int is = sio.get(fd, buffer, MAXBUFSIZE);
           if (is <= 0) {
-            printf("HistoServer: fd %d disconnected\n", fd);
+            now = time(0);
+            strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+            printf("[%s] HistoServer: fd %d disconnected\n", mbstr, fd);
             m_man->remove(fd);
             break;
           }
@@ -78,11 +84,30 @@ int HistoServer::server()
           int narys = (hmsg->header())->reserved[2];
           //    string subdir = "ROOT";
           string subdir = "";
-          printf("HistoServer : received nobjs = %d\n", nobjs);
+          now = time(0);
+          strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+          printf("[%s] HistoServer : received nobjs = %d\n", mbstr, nobjs);
           for (int i = 0; i < nobjs; i++) {
             //      printf ( "Object : %s received, class = %s\n", (strlist.at(i)).c_str(),
             //                     (objlist.at(i))->ClassName() );
             string objname = strlist.at(i);
+            if (objname == string("DQMRC:CLEAR")) {
+              m_hman->clear();
+              m_hman->merge();
+              now = time(0);
+              strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+              printf("[%s] HistoServer: CLEAR\n", mbstr);
+              updated = false;
+              continue;
+            }
+            if (objname == string("DQMRC:MERGE")) {
+              m_hman->merge();
+              now = time(0);
+              strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+              printf("[%s] HistoServer: MERGE\n", mbstr);
+              updated = false;
+              continue;
+            }
             int lpos = objname.find("SUBDIR:");
             if (lpos != string::npos) {
               subdir = objname.substr(7);
@@ -98,7 +123,9 @@ int HistoServer::server()
     usleep(1000);
     loop_counter++;
     if (loop_counter % MERGE_INTERVAL == 0 && updated) {
-      printf("HistoServer: merging histograms\n");
+      now = time(0);
+      strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+      printf("[%s] HistoServer: merging histograms\n", mbstr);
       //      m_mapfile->AcquireSemaphore();
       m_hman->merge();
       //      m_mapfile->ReleaseSemaphore();

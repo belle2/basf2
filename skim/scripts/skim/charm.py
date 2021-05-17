@@ -15,15 +15,14 @@ Skim list building functions for charm analyses.
 from functools import lru_cache
 
 import modularAnalysis as ma
-import vertex
 from skimExpertFunctions import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
-from stdPhotons import loadStdSkimPhoton, stdPhotons
+from stdPhotons import loadStdSkimPhoton
 from stdPi0s import loadStdSkimPi0
 from stdV0s import stdKshorts
-from variables import variables as vm
 
 __liaison__ = "Guanda Gong <gonggd@mail.ustc.edu.cn>"
+_VALIDATION_SAMPLE = "mdst14.root"
 
 
 @fancy_skim_header
@@ -88,28 +87,6 @@ class XToD0_D0ToHpJm(BaseSkim):
         """Builds :math:`D^0` skim lists defined in `XToD0_D0ToHpJm.D0ToHpJm`."""
         self.SkimLists = self.D0ToHpJm(path)
 
-    def validation_histograms(self, path):
-        # NOTE: the validation package is not part of the light releases, so this import
-        # must be made here rather than at the top of the file.
-        from validation_tools.metadata import create_validation_histograms
-
-        ma.reconstructDecay('D0:HpJm0_test -> pi+:loose K-:loose', '1.80 < M < 1.93 and useCMSFrame(p) > 2.0', path=path)
-
-        vm.addAlias('M_D0', 'InvM')
-
-        histogramFilename = 'D0ToHpJm_Validation.root'
-        myEmail = 'Guanda Gong <gonggd@mail.ustc.edu.cn>'
-
-        create_validation_histograms(
-            rootfile=histogramFilename,
-            particlelist='D0:HpJm0_test',
-            variables_1d=[
-                ('M_D0', 100, 1.80, 1., 'Mass distribution of $D^{0}$', myEmail,
-                 'mass of D0 (mean=1.86483)', 'Please check agreement of: mean, sigma and ratio of signal and background',
-                 'M(D^{0}) [GeV/c^{2}]', 'shifter'),
-            ],
-            path=path)
-
 
 @fancy_skim_header
 class XToD0_D0ToNeutrals(BaseSkim):
@@ -167,27 +144,6 @@ class XToD0_D0ToNeutrals(BaseSkim):
         """Builds :math:`D^0` skim lists defined in `XToD0_D0ToNeutrals.D0ToNeutrals`."""
         self.SkimLists = self.D0ToNeutrals(path)
 
-    def validation_histograms(self, path):
-        # NOTE: the validation package is not part of the light releases, so this import
-        # must be made here rather than at the top of the file.
-        from validation_tools.metadata import create_validation_histograms
-
-        ma.reconstructDecay('D0:2Nbdy_test0 -> pi0:skim pi0:skim', '1.78 < M < 1.94 and useCMSFrame(p) > 2.0', path=path)
-        ma.reconstructDecay('D0:2Nbdy_test1 -> K_S0:merged K_S0:merged', '1.78 < M < 1.94 and useCMSFrame(p) > 2.0', path=path)
-        vm.addAlias('M_D0', 'InvM')
-
-        histogramFilename = 'D0ToNeutrals_Validation.root'
-        myEmail = 'Guanda Gong <gonggd@mail.ustc.edu.cn>'
-        M_D0_Hist = ('M_D0', 100, 1.80, 1., 'Mass distribution of $D^{0}$', myEmail,
-                     'mass of D0 (mean=1.86483)', 'Please check agreement of: mean, sigma and ratio of signal and background',
-                     'M(D^{0}) [GeV/c^{2}]', 'shifter')
-
-        create_validation_histograms(rootfile=histogramFilename, particlelist='D0:2Nbdy_test0', variables_1d=[M_D0_Hist, ],
-                                     path=path)
-
-        create_validation_histograms(rootfile=histogramFilename, particlelist='D0:2Nbdy_test1', variables_1d=[M_D0_Hist, ],
-                                     path=path)
-
 
 @fancy_skim_header
 class DstToD0Pi_D0ToRare(BaseSkim):
@@ -239,28 +195,6 @@ class DstToD0Pi_D0ToRare(BaseSkim):
 
         self.SkimLists = DstList
 
-    def validation_histograms(self, path):
-        # NOTE: the validation package is not part of the light releases, so this import
-        # must be made here rather than at the top of the file.
-        from validation_tools.metadata import create_validation_histograms
-        self.build_lists(path)
-        vm.addAlias('M_D0', 'daughter(1, InvM)')
-
-        histogramFilename = 'D0ToNeutrals_Validation.root'
-        myEmail = 'Guanda Gong <gonggd@mail.ustc.edu.cn>'
-        M_D0_Hist = ('M_D0', 100, 1.80, 1., 'Mass distribution of $D^{0}$', myEmail,
-                     'mass of D0 (mean=1.86483)', 'Please check agreement of: mean, sigma and ratio of signal and background',
-                     'M(D^{0}) [GeV/c^{2}]', 'shifter')
-
-        create_validation_histograms(rootfile=histogramFilename, particlelist='D0:Rare0', variables_1d=[M_D0_Hist, ],
-                                     path=path)
-
-        create_validation_histograms(rootfile=histogramFilename, particlelist='D0:Rare1', variables_1d=[M_D0_Hist, ],
-                                     path=path)
-
-        create_validation_histograms(rootfile=histogramFilename, particlelist='D0:Rare4', variables_1d=[M_D0_Hist, ],
-                                     path=path)
-
 
 @fancy_skim_header
 class XToDp_DpToKsHp(BaseSkim):
@@ -308,33 +242,6 @@ class XToDp_DpToKsHp(BaseSkim):
 
         self.SkimLists = DpList
 
-    def validation_histograms(self, path):
-        # NOTE: the validation package is not part of the light releases, so this import
-        # must be made here rather than at the top of the file.
-        from validation_tools.metadata import create_validation_histograms
-        self.build_lists(path)
-        vm.addAlias('M_Dp', 'InvM')
-
-        histogramFilename = 'DpToKsHp_Validation.root'
-        myEmail = 'Guanda Gong <gonggd@mail.ustc.edu.cn>'
-        M_Dp_Hist = (
-            'M_Dp',
-            100,
-            1.72,
-            2.2,
-            'Mass distribution of $D_{(S)}^{+}$',
-            myEmail,
-            'mass of D+ (mean=1.86958) and D_s+(mean=1.96827)',
-            'Please check agreement of: mean, sigma and ratio of signal and background',
-            'M(D_{(S)}^{+}) [GeV/c^{2}]',
-            'shifter')
-
-        create_validation_histograms(rootfile=histogramFilename, particlelist='D+:kshp0', variables_1d=[M_Dp_Hist, ],
-                                     path=path)
-
-        create_validation_histograms(rootfile=histogramFilename, particlelist='D+:kshp1', variables_1d=[M_Dp_Hist, ],
-                                     path=path)
-
 
 @fancy_skim_header
 class XToDp_DpToHpHmJp(BaseSkim):
@@ -380,33 +287,6 @@ class XToDp_DpToHpHmJp(BaseSkim):
 
         self.SkimLists = DpList
 
-    def validation_histograms(self, path):
-        # NOTE: the validation package is not part of the light releases, so this import
-        # must be made here rather than at the top of the file.
-        from validation_tools.metadata import create_validation_histograms
-        self.build_lists(path)
-        vm.addAlias('M_Dp', 'InvM')
-
-        histogramFilename = 'DpToHpHmJp_Validation.root'
-        myEmail = 'Guanda Gong <gonggd@mail.ustc.edu.cn>'
-        M_Dp_Hist = (
-            'M_Dp',
-            100,
-            1.72,
-            2.2,
-            'Mass distribution of $D_{(S)}^{+}$',
-            myEmail,
-            'mass of D+ (mean=1.86958) and D_s+(mean=1.96827)',
-            'Please check agreement of: mean, sigma and ratio of signal and background',
-            'M(D_{(S)}^{+}) [GeV/c^{2}]',
-            'shifter')
-
-        create_validation_histograms(rootfile=histogramFilename, particlelist='D+:HpHmJp0', variables_1d=[M_Dp_Hist, ],
-                                     path=path)
-
-        create_validation_histograms(rootfile=histogramFilename, particlelist='D+:HpHmJp3', variables_1d=[M_Dp_Hist, ],
-                                     path=path)
-
 
 @fancy_skim_header
 class LambdacTopHpJm(BaseSkim):
@@ -451,33 +331,6 @@ class LambdacTopHpJm(BaseSkim):
             LambdacList.append("Lambda_c+:pHpJm" + str(chID))
 
         self.SkimLists = LambdacList
-
-    def validation_histograms(self, path):
-        # NOTE: the validation package is not part of the light releases, so this import
-        # must be made here rather than at the top of the file.
-        from validation_tools.metadata import create_validation_histograms
-        self.build_lists(path)
-        vm.addAlias('M_Lambdac', 'InvM')
-
-        histogramFilename = 'DpToHpHmJp_Validation.root'
-        myEmail = 'Guanda Gong <gonggd@mail.ustc.edu.cn>'
-        M_Dp_Hist = (
-            'M_Lambdac',
-            100,
-            2.2,
-            2.4,
-            'Mass distribution of $\Lambda_{C}^{+}$',
-            myEmail,
-            'mass of Lambda_c+ (mean=2.28646) ',
-            'Please check agreement of: mean, sigma and ratio of signal and background',
-            '#Lambda_{C}^{+} [GeV/c^{2}]',
-            'shifter')
-
-        create_validation_histograms(rootfile=histogramFilename, particlelist='D+:HpHmJp0', variables_1d=[M_Dp_Hist, ],
-                                     path=path)
-
-        create_validation_histograms(rootfile=histogramFilename, particlelist='D+:HpHmJp3', variables_1d=[M_Dp_Hist, ],
-                                     path=path)
 
 
 @fancy_skim_header
@@ -558,61 +411,6 @@ class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
             DstList.append('D*+:HpJm' + str(chID))
 
         self.SkimLists = DstList
-
-    def validation_histograms(self, path):
-        # NOTE: the validation package is not part of the light releases, so this import
-        # must be made here rather than at the top of the file.
-        from validation_tools.metadata import create_validation_histograms
-
-        ma.reconstructDecay('D0:HpJm0_test -> pi+:loose K-:loose', '1.80 < M < 1.93 and useCMSFrame(p) > 2.0', path=path)
-        ma.reconstructDecay('D*+:HpJm0_test -> D0:HpJm0_test pi+:loose', '0 < Q < 0.018', path=path)
-
-        vm.addAlias('M_D0', 'daughter(0,InvM)')
-        vm.addAlias('Pcms_D0', 'daughter(0,useCMSFrame(p))')
-        vm.addAlias('d0_spi', 'daughter(1,d0)')
-        vm.addAlias('z0_spi', 'daughter(1,z0)')
-        vm.addAlias('dr_spi', 'daughter(1,dr)')
-        vm.addAlias('dz_spi', 'daughter(1,dz)')
-        vm.addAlias('Pcms_spi', 'daughter(1,useCMSFrame(p))')
-        vm.addAlias('Pcms_Dst', 'useCMSFrame(p)')
-
-        histogramFilename = 'DstToD0Pi_D0ToHpJm_Validation.root'
-        myEmail = 'Guanda Gong <gonggd@mail.ustc.edu.cn>'
-
-        create_validation_histograms(
-            rootfile=histogramFilename,
-            particlelist='D*+:HpJm0_test',
-            variables_1d=[
-                ('M_D0', 100, 1.80, 1., 'Mass distribution of $D^{0}$', myEmail,
-                 'mass of D0 (mean=1.86483)', 'Please check agreement of: mean, sigma and ratio of signal and background',
-                 'M(D^{0}) [GeV/c^{2}]', 'shifter'),
-                ('Pcms_D0', 100, 2, 6, 'momentum of $D_{0}$ in CMS Frame', myEmail,
-                 'CMS momentum of D0', 'Please check agreement of lineshape',
-                 '$P_{cms}(D^{0}) [GeV/c^{2}]', 'shifter'),
-                ('d0_spi', 100, -1.2, 1.2, 'd0 of slow pi', myEmail,
-                 'd0 of slow pion', 'provided for the SVD and PXD group',
-                 'd0_spi [cm]', 'shifter'),
-                ('z0_spi', 100, -3.3, 3.3, 'z0 of slow pi', myEmail,
-                 'z0 of slow pion', 'provided for the SVD and PXD group',
-                 'z0_spi [cm]', 'shifter'),
-                ('dr_spi', 100, -1.2, 1.2, 'dr of slow pi', myEmail,
-                 'dr of slow pion', 'provided for the SVD and PXD group',
-                 'dr_spi [cm]', 'shifter'),
-                ('dz_spi', 100, -3.3, 3.3, 'dz of slow pi', myEmail,
-                 'dz of slow pion', 'provided for the SVD and PXD group',
-                 'dz_spi [cm]', 'shifter'),
-                ('Pcms_spi', 100, 0, 0.8, 'momentum of slow pi in CMS Frame', myEmail,
-                 'CMS momentum of slow pion', 'Please check agreement of lineshape',
-                 'P_{cms}(#pi_{s}) [GeV/c]', 'shifter'),
-                ('Pcms_Dst', 100, 2, 6, 'momentum of $D_{*}$ in CMS Frame', myEmail,
-                 'CMS momentum of slow pion', 'Please check agreement of lineshape',
-                 'P_{cms}(D*) {GeV/c}', 'shifter'),
-                ('Q', 100, 0, 0.018, 'Released energy in $D^{*}$ decay', myEmail,
-                 'Q = M(D0 pi) - M(D0) - M(pi), and it peaks around 0.006 GeV',
-                 'Please check agreement of: mean, sigma and ratio of signal and background',
-                 'Q [GeV]', 'shifter'),
-            ],
-            path=path)
 
 
 @fancy_skim_header

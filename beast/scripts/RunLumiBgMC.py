@@ -1,10 +1,6 @@
-import basf2
-from basf2 import *
+import basf2 as b2
 from beamparameters import add_beamparameters
-import os
 import sys
-import math
-import string
 import datetime
 from background import add_output
 
@@ -38,16 +34,16 @@ outputfilename = output_dir + '/output_phase_' + argvs[4] + '_' + generator + '_
 
 # set random seed
 seed = str(1234567 + int(num))
-set_random_seed(seed)
+b2.set_random_seed(seed)
 
-kill = basf2.create_path()
-main = basf2.create_path()
+kill = b2.create_path()
+main = b2.create_path()
 # main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=1000000)
 # main.add_module("EventInfoPrinter")
 
-# basf2.set_log_level(basf2.LogLevel.DEBUG)
-# basf2.set_debug_level(250)
-# basf2.logging.package("framework").log_level = basf2.LogLevel.WARNING
+# b2.set_log_level(b2.LogLevel.DEBUG)
+# b2.set_debug_level(250)
+# b2.logging.package("framework").log_level = b2.LogLevel.WARNING
 
 
 def add_cut(name, minParticles, maxParticles, minTheta, maxTheta=None):
@@ -102,7 +98,7 @@ elif generator == "koralw":
     evtnum = 1720
     realTime = 1.0e3  # in ns = 1 us
     main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=evtnum)
-    koralw = register_module('KoralWInput')
+    koralw = b2.register_module('KoralWInput')
     koralw.param('RandomSeed', int(seed))
     koralw.param('DataPath', './data/')
     koralw.param('UserDataFile', 'KoralW_ee_mod.data')
@@ -113,7 +109,7 @@ elif generator == "aafh":
     evtnum = 5640
     realTime = 1.0e3  # in ns = 1 us
     main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=evtnum)
-    aafh = register_module('AafhInput')
+    aafh = b2.register_module('AafhInput')
     aafh.param({
         # decay mode to generate.
         # 1: e+e- -> mu+mu-L+L- where L is a user defined particle (default: tau)
@@ -179,7 +175,7 @@ print('generator ', generator)
 print('bgtype', bgType)
 print('reaTime', realTime)
 
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 if sampleType == 'study' and phase == 3:
     gearbox.param('override', [
         ('/Global/length', '40.0', 'm'),
@@ -201,7 +197,7 @@ if phase == 2:
     gearbox.param('fileName', '/geometry/Beast2_phase2.xml')
 main.add_module(gearbox)
 
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param({
     "excludedComponents": ["MagneticField"],
     "additionalComponents": ["MagneticField3dQuadBeamline"],
@@ -214,7 +210,7 @@ main.add_module(geometry)
 # mcparticleprinter.logging.log_level = LogLevel.INFO
 # main.add_module(mcparticleprinter)
 
-fullsim = register_module('FullSim')
+fullsim = b2.register_module('FullSim')
 fullsim.param('PhysicsList', 'FTFP_BERT_HP')
 fullsim.param('UICommandsAtIdle', ['/process/inactivate nKiller'])
 fullsim.param('StoreAllSecondaries', True)
@@ -224,7 +220,7 @@ main.add_module(fullsim)
 main.add_module("Progress")
 
 if phase == 2 and digitization == 'true':
-    rootoutput = register_module('RootOutput')
+    rootoutput = b2.register_module('RootOutput')
     rootoutput.param('outputFileName', outputfilename)
     rootoutput.param('updateFileCatalog', False)
     rootoutput.param('branchNames', ["SVDSimHits", "SVDTrueHits", "SVDTrueHitsToSVDSimHits",
@@ -239,43 +235,43 @@ if phase == 2 and digitization == 'true':
                                      "MicrotpcSimHits", "MicrotpcHits",
                                      "SADMetaHits"])
     MIP_to_PE = [12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12]
-    he3digi = register_module('He3Digitizer')
+    he3digi = b2.register_module('He3Digitizer')
     he3digi.param('conversionFactor', 0.303132019)
     he3digi.param('useMCParticles', False)
     main.add_module(he3digi)
-    diadigi = register_module('BeamDigitizer')
+    diadigi = b2.register_module('BeamDigitizer')
     diadigi.param('WorkFunction', 13.25)
     diadigi.param('FanoFactor', 0.382)
     main.add_module(diadigi)
-    pindigi = register_module('PinDigitizer')
+    pindigi = b2.register_module('PinDigitizer')
     pindigi.param('WorkFunction', 3.64)
     pindigi.param('FanoFactor', 0.13)
     main.add_module(pindigi)
-    clawsdigi = register_module('ClawsDigitizer')
+    clawsdigi = b2.register_module('ClawsDigitizer')
     clawsdigi.param('ScintCell', 16)
     clawsdigi.param('C_keV_to_MIP', 457.114)
     clawsdigi.param('C_MIP_to_PE', MIP_to_PE)
     clawsdigi.param('PEthres', 1.0)
     main.add_module(clawsdigi)
-    qcssdigi = register_module('QcsmonitorDigitizer')
+    qcssdigi = b2.register_module('QcsmonitorDigitizer')
     qcssdigi.param('ScintCell', 40)
     qcssdigi.param('C_keV_to_MIP', 1629.827)
     qcssdigi.param('C_MIP_to_PE', 15.0)
     qcssdigi.param('MIPthres', 0.5)
     main.add_module(qcssdigi)
-    fangsdigi = register_module('FANGSDigitizer')
+    fangsdigi = b2.register_module('FANGSDigitizer')
     main.add_module(fangsdigi)
-    tpcdigi = register_module('TpcDigitizer')
+    tpcdigi = b2.register_module('TpcDigitizer')
     main.add_module(tpcdigi)
     main.add_module(rootoutput)
 else:
     add_output(main, bgType, realTime, sampleType, phase, outputfilename)
 
 # main.add_module("RootOutput", outputFileName="%s.root" % generator)
-basf2.process(main)
+b2.process(main)
 
 print('Event Statistics:')
-print(basf2.statistics)
+print(b2.statistics)
 
 d = datetime.datetime.today()
 print(d.strftime('job finish: %Y-%m-%d %H:%M:%S\n'))

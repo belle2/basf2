@@ -138,6 +138,7 @@ namespace Belle2 {
        * @param dhe_DHPport raw DHP port from DHC frame
        * @param dhe_reformat flag if DHE did reformatting
        * @param vxd_id vertex Detector ID
+       * @param daqpktstat Daq Packet Status Object
        */
       void unpack_dhp(void* data, unsigned int len, unsigned int dhe_first_readout_frame_lo, unsigned int dhe_ID, unsigned dhe_DHPport,
                       unsigned dhe_reformat, VxdID vxd_id, PXDDAQPacketStatus& daqpktstat);
@@ -154,7 +155,7 @@ namespace Belle2 {
       /** Unpack DHP/FCE data within one DHE frame
        * Not fully implemented as cluster format not 100% fixed
        * @param data pointer to dhp data
-       * @param len length of dhp data
+       * @param length length of dhp data
        * @param vxd_id vertex Detector ID
        */
       void unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id);

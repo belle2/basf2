@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import unittest
-import os
 import tempfile
 from basf2 import create_path, register_module
 import b2test_utils
 from modularAnalysis import fillParticleListFromMC, reconstructMCDecay, inputMdst
-from ROOT import Belle2
 from ROOT import TFile
-from ROOT import TNtuple
 
 
 class TestNewMCDecayFinder(unittest.TestCase):
@@ -25,12 +22,12 @@ class TestNewMCDecayFinder(unittest.TestCase):
             'analysis/1000_B_DstD0Kpi_skimmed.root', 'validation', py_case=self)
         inputMdst('default', inputfile, path=main)
 
-        fillParticleListFromMC('gamma:MC', 'mcPrimary', path=main)
-        fillParticleListFromMC('K+:MC', 'mcPrimary', path=main)
-        fillParticleListFromMC('pi+:MC', 'mcPrimary', path=main)
+        fillParticleListFromMC('gamma:primaryMC', 'mcPrimary', path=main)
+        fillParticleListFromMC('K+:primaryMC', 'mcPrimary', path=main)
+        fillParticleListFromMC('pi+:primaryMC', 'mcPrimary', path=main)
 
         reconstructMCDecay(
-            'B0:DstD0Kpi =direct=> [D*+:MC =direct=> [D0:MC =direct=> K-:MC pi+:MC ] pi+:MC] pi-:MC',
+            'B0:DstD0Kpi =direct=> [D*+:MC =direct=> [D0:MC =direct=> K-:primaryMC pi+:primaryMC ] pi+:primaryMC] pi-:primaryMC',
             '',
             path=main)
 
@@ -50,8 +47,8 @@ class TestNewMCDecayFinder(unittest.TestCase):
         allBkg = ntuple.GetEntries("isSignal == 0")
         allSig = ntuple.GetEntries("isSignal > 0")
 
-        print("True candidates {0}".format(allSig))
-        print("False candidates {0}".format(allBkg))
+        print(f"True candidates {allSig}")
+        print(f"False candidates {allBkg}")
 
         sig_expected = 406
 

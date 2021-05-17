@@ -19,7 +19,7 @@
 #    outdir         output directory path
 # -------------------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 import sys
 import os
 from background import add_output
@@ -91,7 +91,7 @@ outputFile = outdir + '/' + fname + '.root'
 # check for the existance of a SAD file
 
 if not os.path.exists(sadFile):
-    B2ERROR('SAD file ' + sadFile + ' not found')
+    b2.B2ERROR('SAD file ' + sadFile + ' not found')
     sys.exit()
 
 # make output directory if it doesn't exist
@@ -100,23 +100,23 @@ if not os.path.exists(outdir):
     os.makedirs(outdir)
 
 # log message
-B2RESULT('Output file: ' + outputFile)
-B2RESULT('Corresponds to ' + equivTime + ' us of running phase ' + str(phase))
+b2.B2RESULT('Output file: ' + outputFile)
+b2.B2RESULT('Corresponds to ' + equivTime + ' us of running phase ' + str(phase))
 
 # Suppress messages and warnings during processing:
-set_log_level(LogLevel.RESULT)
+b2.set_log_level(b2.LogLevel.RESULT)
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Event info setter
 # Set some large number of events - processing will be stopped by BG generator
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [10000000])
 main.add_module(eventinfosetter)
 
 # Gearbox
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 if phase == 2:
     gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
 elif phase == 31:
@@ -135,21 +135,21 @@ if sampleType == 'study':
 main.add_module(gearbox)
 
 # BG generator
-generator = register_module('BeamBkgGenerator')
+generator = b2.register_module('BeamBkgGenerator')
 generator.param('fileName', sadFile)
 generator.param('ringName', accRing)
 generator.param('realTime', realTime)
 main.add_module(generator)
 
 # Geant geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('useDB', False)
 if phase == 31:
     geometry.param('additionalComponents', ['BEAMABORT', 'MICROTPC', 'CLAWS', 'HE3TUBE'])
 main.add_module(geometry)
 
 # Geant simulation
-fullsim = register_module('FullSim')
+fullsim = b2.register_module('FullSim')
 if sampleType == 'study':
     fullsim.param('PhysicsList', 'FTFP_BERT_HP')
     fullsim.param('UICommandsAtIdle', ['/process/inactivate nKiller'])
@@ -158,7 +158,7 @@ if sampleType == 'study':
 main.add_module(fullsim)
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Output
@@ -171,7 +171,7 @@ add_output(main, bgType, realTime, sampleType, phase, fileName=outputFile, exclu
 
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

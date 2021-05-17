@@ -132,7 +132,7 @@ namespace Belle2 {
       }
 
       /** Convert a uniform distribution to time-shift-like pdf.
-       * @parram left Left edge of the interval
+       * @param left Left edge of the interval
        * @param right Right edge of the interval
        * @return pointer to binned pdf representing the uniform distribution
        * between left and right.

@@ -85,7 +85,7 @@ void MCMatcherECLClustersModule::event()
     Index[t.getCellId() - 1] = i;
   }
 
-  RelationArray& p2sh = m_mcParticleToECLSimHitRelationArray;
+  const RelationArray& p2sh = m_mcParticleToECLSimHitRelationArray;
   //RelationArray& cd2p = m_eclCalDigitToMCParticleRelationArray;
   ECLSimHit** simhits = (ECLSimHit**)(m_eclSimHits.getPtr()->GetObjectRef());
   MCParticle** mcs = (MCParticle**)(m_mcParticles.getPtr()->GetObjectRef());
@@ -151,7 +151,7 @@ void MCMatcherECLClustersModule::event()
     Index[t.getCellId() - 1] = i;
   }
 
-  RelationArray& p2eh = m_mcParticleToECLHitRelationArray;
+  const RelationArray& p2eh = m_mcParticleToECLHitRelationArray;
   //RelationArray& ed2p = m_eclDigitToMCParticleRelationArray;
   ECLHit** eclhits = (ECLHit**)(m_eclHits.getPtr()->GetObjectRef());
   for (int i = 0, imax = p2eh.getEntries(); i < imax; i++) {

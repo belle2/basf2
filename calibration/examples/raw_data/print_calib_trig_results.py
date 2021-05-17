@@ -5,7 +5,7 @@
 # Prints Calibration trigger results from a raw sroot file
 # --------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
 from collections import defaultdict
@@ -13,7 +13,7 @@ from collections import defaultdict
 results = defaultdict(int)
 
 
-class PrintCalibTriggerResults(Module):
+class PrintCalibTriggerResults(b2.Module):
 
     '''
     Prints Calibration trigger results in a well formatted way.
@@ -41,19 +41,19 @@ class PrintCalibTriggerResults(Module):
         print('')
 
 
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Root input
-roinput = register_module('SeqRootInput')
+roinput = b2.register_module('SeqRootInput')
 main.add_module(roinput)
 
 # print array of log likelihoods
 main.add_module(PrintCalibTriggerResults())
 
 # Process events
-process(main)
+b2.process(main)
 
 print(results)

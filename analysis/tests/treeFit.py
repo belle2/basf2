@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import unittest
-import os
 import tempfile
 import basf2
 import modularAnalysis as ma
 from vertex import treeFit
 import b2test_utils
-from ROOT import Belle2
 from ROOT import TFile
-from ROOT import TNtuple
 
 
 class TestTreeFits(unittest.TestCase):
@@ -57,8 +54,8 @@ class TestTreeFits(unittest.TestCase):
         truePositives = ntuple.GetEntries("(chiProb > 0) && (isSignal > 0)")
         falsePositives = ntuple.GetEntries("(chiProb > 0) && (isSignal == 0)")
 
-        print("True fit survivors: {0} out of {1} true candidates".format(truePositives, allSig))
-        print("False fit survivors: {0} out of {1} false candidates".format(falsePositives, allBkg))
+        print(f"True fit survivors: {truePositives} out of {allSig} true candidates")
+        print(f"False fit survivors: {falsePositives} out of {allBkg} false candidates")
 
         self.assertTrue(truePositives > 32, f"Signal rejection too high. True positives: {truePositives}")
 

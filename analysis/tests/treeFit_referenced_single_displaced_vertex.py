@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import unittest
-import os
 import tempfile
 import basf2
 import modularAnalysis as ma
 import b2test_utils
-from ROOT import Belle2
 from ROOT import TFile
-from ROOT import TNtuple
 
 
 class TestTreeFits(unittest.TestCase):
@@ -25,7 +22,7 @@ class TestTreeFits(unittest.TestCase):
             'analysis/1000_B_Jpsi_ks_pipi.root', 'validation', py_case=self)
         ma.inputMdst('default', inputfile, path=main)
 
-        ma.fillParticleList('pi+:a', 'pionID > 0.5', path=main)
+        ma.fillParticleList('pi+:a', 'pidProbabilityExpert(211, ALL) > 0.5', path=main)
 
         ma.reconstructDecay('K_S0:all -> pi+:a pi-:a', '', 0, path=main)
         ma.matchMCTruth('K_S0:all', path=main)
@@ -59,17 +56,17 @@ class TestTreeFits(unittest.TestCase):
         truePositives = ntuple.GetEntries("(chiProb > 0) && (isSignal > 0)")
         falsePositives = ntuple.GetEntries("(chiProb > 0) && (isSignal == 0)")
 
-        mustBeZero = ntuple.GetEntries("(chiProb < {})".format(conf))
+        mustBeZero = ntuple.GetEntries(f"(chiProb < {conf})")
 
-        print("True fit survivors: {0} out of {1} true candidates".format(truePositives, allSig))
-        print("False fit survivors: {0} out of {1} false candidates".format(falsePositives, allBkg))
+        print(f"True fit survivors: {truePositives} out of {allSig} true candidates")
+        print(f"False fit survivors: {falsePositives} out of {allBkg} false candidates")
 
         self.assertFalse(truePositives == 0, "No signal survived the fit.")
 
         self.assertTrue(falsePositives < 2586, f"Too many false positives: {falsePositives} out of {allBkg} total bkg events.")
 
         self.assertTrue(truePositives > 540, "Signal rejection too high")
-        self.assertFalse(mustBeZero, "We should have dropped all candidates with confidence level less than {}.".format(conf))
+        self.assertFalse(mustBeZero, f"We should have dropped all candidates with confidence level less than {conf}.")
 
         print("Test passed, cleaning up.")
 

@@ -20,7 +20,7 @@
 # The original example has been modified to apply the
 # event based selection, and the ntuples are filled
 # also with the R2EventLevel variable.
-# While signal/charged samples have R2 distributins below
+# While signal/charged samples have R2 distributions below
 # 0.3, ccbar sample has a larger distribution and the
 # initial selection reduces the processing time.
 #
@@ -87,8 +87,8 @@ stdc.stdK(listtype='loose', path=my_path)
 stdc.stdMu(listtype='loose', path=my_path)
 
 
-# creates "pi0:eff40_Jan2020Fit" ParticleList
-stdPi0s(listtype='eff40_Jan2020Fit', path=my_path)
+# creates "pi0:eff40_May2020Fit" ParticleList
+stdPi0s(listtype='eff40_May2020Fit', path=my_path)
 
 
 # 1. reconstruct D0 in multiple decay modes
@@ -97,7 +97,7 @@ ma.reconstructDecay(decayString='D0:ch1 -> K-:loose pi+:loose',
                     dmID=1,
                     path=my_path)
 
-ma.reconstructDecay(decayString='D0:ch2 -> K-:loose pi+:loose pi0:eff40_Jan2020Fit',
+ma.reconstructDecay(decayString='D0:ch2 -> K-:loose pi+:loose pi0:eff40_May2020Fit',
                     cut='1.8 < M < 1.9',
                     dmID=2,
                     path=my_path)

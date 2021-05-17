@@ -53,14 +53,15 @@ C switches of tau+ tau- decay modes !!
       Jak2            = xpar(ITAUXPAR+2)   ! Decay Mask for second tau
       IF( (Jak1.EQ.-1) .AND. (Jak2.EQ.-1) ) m_IsInitialized = 0
       TAUOLA_BBB = xpar(ITAUXPAR+900)
-      PRINT*, 'Taupair_Initialize: Jak1, Jak2, IsInitialized, BBB = ', 
-     c                             Jak1, Jak2, m_IsInitialized, TAUOLA_BBB
-        m_KeyClone      = 1       ! dip-switch for cloning procedure, =1,2
-        m_KeyClone      = 2       ! dip-switch for cloning procedure, =1,2
-        WRITE(m_out,bxope)
-        WRITE(m_out,bxtxt) ' KK interface of Tauola                  '
-        WRITE(m_out,bxl1i) m_KeyClone,'Cloning procedure   ','KeyClone','t01'
-        WRITE(m_out,bxclo)
+      WRITE(m_out,*) 'Taupair_Init: Jak1, Jak2, IsInitialized, BBB = ', 
+     c                              Jak1, Jak2, m_IsInitialized, TAUOLA_BBB
+      m_KeyClone      = 1       ! dip-switch for cloning procedure, =1,2
+      m_KeyClone      = 2       ! dip-switch for cloning procedure, =1,2
+      WRITE(m_out,bxope)
+      WRITE(m_out,bxtxt) ' KK interface of Tauola                  '
+      WRITE(m_out,bxl1i) m_KeyClone,
+     c                  'Cloning procedure   ','KeyClone','t01'
+      WRITE(m_out,bxclo)
 
 * Initialisation of tau decay package TAUOLA; ITAUXPAR is for indirect adressing.
       CALL INIETC(ITAUXPAR,xpar)

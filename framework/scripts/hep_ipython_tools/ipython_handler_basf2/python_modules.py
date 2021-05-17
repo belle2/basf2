@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import basf2.core as _basf2
 from ROOT import Belle2

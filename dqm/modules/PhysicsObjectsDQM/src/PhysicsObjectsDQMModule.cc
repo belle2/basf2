@@ -10,6 +10,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/variables/EventShapeVariables.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <TDirectory.h>
 #include <map>
@@ -43,10 +44,10 @@ void PhysicsObjectsDQMModule::defineHisto()
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir("PhysicsObjects")->cd();
 
-  m_h_mKS0 = new TH1F("mKS0", "KS0 Invariant Mass", 500, 0.0, 1.0);
+  m_h_mKS0 = new TH1F("mKS0", "KS0 Invariant Mass", 20, 0.48, 0.52);
   m_h_mKS0->SetXTitle("M(K_{S}^{0}) [GeV]");
 
-  m_h_mPI0 = new TH1F("mPI0", "PI0 Invariant Mass", 125, 0.0, 0.25);
+  m_h_mPI0 = new TH1F("mPI0", "pi0 Invariant Mass", 25, 0.10, 0.15);
   m_h_mPI0->SetXTitle("M(#pi^{0}) [GeV]");
 
   m_h_R2 = new TH1F("R2", "Event Level R2", 36, 0, 1.2);
@@ -107,13 +108,13 @@ void PhysicsObjectsDQMModule::event()
   double R2 = Belle2::Variable::foxWolframR2(nullptr);
   m_h_R2->Fill(R2);
 
-  if (pi0Particles.isValid() && abs(pi0Particles->getPDGCode()) == 111) {
+  if (pi0Particles.isValid() && abs(pi0Particles->getPDGCode()) == Const::pi0.getPDGCode()) {
     for (unsigned int i = 0; i < pi0Particles->getListSize(); i++) {
       Particle* pi0 = pi0Particles->getParticle(i);
       m_h_mPI0->Fill(pi0->getMass());
     }
   }
-  if (ks0Particles.isValid() && abs(ks0Particles->getPDGCode()) == 310) {
+  if (ks0Particles.isValid() && abs(ks0Particles->getPDGCode()) == Const::Kshort.getPDGCode()) {
     for (unsigned int i = 0; i < ks0Particles->getListSize(); i++) {
       Particle* ks0 = ks0Particles->getParticle(i);
       m_h_mKS0->Fill(ks0->getMass());

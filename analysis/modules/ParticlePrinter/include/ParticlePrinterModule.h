@@ -48,7 +48,7 @@ namespace Belle2 {
 
   private:
 
-    StoreObjPtr<ParticleList> m_plist;
+    StoreObjPtr<ParticleList> m_plist; /**< particle list */
 
     std::string m_listName;   /**< particle list name */
     bool m_fullPrint;         /**< steering variable */

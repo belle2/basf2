@@ -69,33 +69,33 @@ namespace Belle2 {
       /**
        * Create support structure for a SVD Layer
        * @param layer Layer ID to create the support
-       * @param support Reference to the database containing the parameters
+       * @param parameters
        */
       virtual VXD::GeoVXDAssembly createLayerSupport(int, const SVDGeometryPar& parameters);
 
       /**
        * Create support structure for a SVD Ladder
        * @param layer Layer ID to create the support
-       * @param support Reference to the database containing the parameters
+       * @param parameters
        */
       virtual VXD::GeoVXDAssembly createLadderSupport(int, const SVDGeometryPar& parameters);
 
       /**
        * Create support structure for SVD Half Shell, that means everything
-       * thagt does not depend on layer or sensor alignment
-       * @param support Reference to the database containing the parameters
+       * that does not depend on layer or sensor alignment
+       * @param parameters
        */
       virtual VXD::GeoVXDAssembly createHalfShellSupport(const SVDGeometryPar& parameters);
 
       /**
        * Read the sensor definitions from the database
-       * @param sensors Reference to the database containing the parameters
+       * @param sensor Reference to the database containing the parameters
        */
       virtual VXD::SensorInfoBase* createSensorInfo(const VXDGeoSensorPar& sensor) override;
 
       /**
        * Read the sensor definitions from gearbox
-       * @param sensors Reference to the database containing the parameters
+       * @param sensor Reference to the database containing the parameters
        */
       SVDSensorInfoPar* readSensorInfo(const GearDir& sensor);
 
@@ -110,8 +110,9 @@ namespace Belle2 {
 
       /**
        * Create support structure for SVD Half Shell, that means everything
-       * thagt does not depend on layer or sensor alignment
+       * that does not depend on layer or sensor alignment
        * @param support Reference to the database containing the parameters
+       * @param svdGeometryPar
        */
       void readHalfShellSupport(const GearDir& support, SVDGeometryPar& svdGeometryPar);
 
@@ -119,6 +120,7 @@ namespace Belle2 {
        * Create support structure for a SVD Layer
        * @param layer Layer ID to create the support for
        * @param support Reference to the database containing the parameters
+       * @param svdGeometryPar
        */
       void readLayerSupport(int layer, const GearDir& support, SVDGeometryPar& svdGeometryPar);
 
@@ -126,6 +128,7 @@ namespace Belle2 {
        * Create support structure for a SVD Ladder
        * @param layer Layer ID to create the support for
        * @param support Reference to the database containing the parameters
+       * @param svdGeometryPar
        */
       void readLadderSupport(int layer, const GearDir& support, SVDGeometryPar& svdGeometryPar);
 

@@ -1,13 +1,13 @@
 /*
   This macro produces ARICH background plots.
 
-  Run it as: root -l 'BeamBack_arich.cc(simulated time in us,"path to files")'
+  Run it as: root -l 'BeamBack_arich.cc("path to files")'
 
   Path to files should be directory containing files produced by "ARICHBkg.py".
   It is assumed file names contain source of background ...RBB,BHWide...,...
 
   !! IMPORTANT
-  set the correct scalings in case of using samples of different time lenghts (in line 36)
+  set the correct time size of each background sample!  (in line 37)
 
   Author: Luka Santelj
   Contributor: Manca Mrvar, Leonid Burmistrov
@@ -33,9 +33,9 @@
 
 using namespace std;
 
-// scalings for "RBB", "BHWide", "Touschek_HER", "Touschek_LER", "Coulomb_HER", "Coulomb_LER","2-photon", "BHWideLargeAngle"
-double scaling[8] = {100., 1, 10., 10., 10., 10., 10., 0.001};
-int sourceType[8] = {0, 1, 2, 3, 4, 5, 6, 1};
+// time of simulated sample (total) for all background sources (in ms): "RBB", "BHWide", "Touschek_HER", "Touschek_LER", "Coulomb_HER", "Coulomb_LER","twoPhotons", "brems", "BHWideLargeAngle"
+double sourceTime[9] = {0.1, 50., 8., 8., 80., 80., 5., 800., 250.};
+int sourceType[9] = {0, 1, 2, 3, 4, 5, 6, 7, 1};
 
 // returns "ring number" of HAPD module with id modID
 int mod2row(int modID)
@@ -50,7 +50,7 @@ int mod2row(int modID)
   return -1; // -1 if invalid input
 }
 
-TCanvas* make_plot(double data[][7], TString title, int type)
+TCanvas* make_plot(double data[][8], TString title, int type)
 {
 
   TH1F* h1 = new TH1F(title + "h1", "RBB", 7, 0.5, 7.5);
@@ -60,12 +60,13 @@ TCanvas* make_plot(double data[][7], TString title, int type)
   TH1F* h5 = new TH1F(title + "h5", "Coulomb HER", 7, 0.5, 7.5);
   TH1F* h6 = new TH1F(title + "h6", "Coulomb LER", 7, 0.5, 7.5);
   TH1F* h7 = new TH1F(title + "h7", "2-photon", 7, 0.5, 7.5);
+  TH1F* h8 = new TH1F(title + "h8", "brems", 7, 0.5, 7.5);
   h1->SetStats(0); h2->SetStats(0); h3->SetStats(0);
-  h4->SetStats(0); h5->SetStats(0); h6->SetStats(0); h7->SetStats(0);
-  h1->SetBit(TH1::kNoTitle); h2->SetBit(TH1::kNoTitle); h3->SetBit(TH1::kNoTitle);
+  h4->SetStats(0); h5->SetStats(0); h6->SetStats(0); h7->SetStats(0); h8->SetStats(0);
+  h1->SetBit(TH1::kNoTitle); h2->SetBit(TH1::kNoTitle); h3->SetBit(TH1::kNoTitle); h8->SetBit(TH1::kNoTitle);
   h4->SetBit(TH1::kNoTitle); h5->SetBit(TH1::kNoTitle); h6->SetBit(TH1::kNoTitle); h7->SetBit(TH1::kNoTitle);
 
-  for (int i = 0; i < 7; i++) {
+  for (int i = 0; i < 8; i++) {
     h1->SetBinContent(i + 1, data[i][0]);
     h2->SetBinContent(i + 1, data[i][0] + data[i][1]);
     h3->SetBinContent(i + 1, data[i][0] + data[i][1] + data[i][2]);
@@ -73,18 +74,24 @@ TCanvas* make_plot(double data[][7], TString title, int type)
     h5->SetBinContent(i + 1, data[i][0] + data[i][1] + data[i][2] + data[i][3] + data[i][4]);
     h6->SetBinContent(i + 1, data[i][0] + data[i][1] + data[i][2] + data[i][3] + data[i][4] + data[i][5]);
     h7->SetBinContent(i + 1, data[i][0] + data[i][1] + data[i][2] + data[i][3] + data[i][4] + data[i][5] + data[i][6]);
+    h8->SetBinContent(i + 1, data[i][0] + data[i][1] + data[i][2] + data[i][3] + data[i][4] + data[i][5] + data[i][6] + data[i][7]);
   }
+
   TCanvas* c1 = new TCanvas(title);
-  h7->SetLineColor(7);
-  h7->GetXaxis()->SetTitle("HAPD ring #");
+  h8->SetLineColor(8);
+  h8->GetXaxis()->SetTitle("HAPD ring #");
   TPaveText* pt1 = new TPaveText(0.20, 0.92, 0.8, 0.99, "NDC");
-  if (type == 1) { h7->GetYaxis()->SetTitle("radiation dose [gray/year]"); pt1->AddText("Radiation dose");}
-  if (type == 2) { h7->GetYaxis()->SetTitle("1MeV equiv. neutrons / cm^2 / year"); pt1->AddText("1Mev equiv. neutron flux");}
-  if (type == 3) { h7->GetYaxis()->SetTitle("photons / cm^2 / s"); pt1->AddText("photon flux on HAPDs");}
+  if (type == 1) { h8->GetYaxis()->SetTitle("radiation dose [gray/year]"); pt1->AddText("Radiation dose");}
+  if (type == 2) { h8->GetYaxis()->SetTitle("1MeV equiv. neutrons / cm^2 / year"); pt1->AddText("1Mev equiv. neutron flux");}
+  if (type == 3) { h8->GetYaxis()->SetTitle("photons / cm^2 / s"); pt1->AddText("photon flux on HAPDs");}
+
+  h8->SetFillColor(8);
+  h8->Draw();
+  pt1->Draw();
 
   h7->SetFillColor(7);
-  h7->Draw();
-  pt1->Draw();
+  h7->SetLineColor(7);
+  h7->Draw("same");
 
   h6->SetFillColor(1);
   h6->SetLineColor(1);
@@ -111,30 +118,31 @@ TCanvas* make_plot(double data[][7], TString title, int type)
 }
 
 
-//int BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mmanca/basf2/background/16th_campaign/arich_")
-void BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mmanca/basf2/background/16th_campaign/arich_")
+void BeamBack_arich(std::string path = "/gpfs/home/belle/mmanca/basf2/background/16th_campaign/arich_")
 {
 
+  double time = 1000.; // 1 ms
   gROOT->SetBatch(kTRUE);
-  TGraph2D* dteb = new TGraph2D(420);
-  TGraph2D* dtnb = new TGraph2D(420);
-  Belle2::ARICHChannelHist* chHits = new Belle2::ARICHChannelHist("neutronFlux", "1MeV eq. neutron flux /cm2 / year on HAPD board",
-      1);
 
-  TGraph2D* dteh = new TGraph2D(420);
-  TGraph2D* dtnh = new TGraph2D(420);
-  TGraph2D* dtp = new TGraph2D(420);
-  dteb->SetName("dteb"); dteb->SetTitle("Deposited energy [gray/year] in HAPD board");
-  dteh->SetName("dteh"); dteh->SetTitle("Deposited energy [gray/year] in HAPD bottom");
-  dtnb->SetName("dtnb"); dtnb->SetTitle("1MeV equiv. neutron flux / cm2 / year on HAPD board [x10^{11}]");
-  dtnh->SetName("dtnh"); dtnh->SetTitle("1MeV equiv. neutron flux / cm2 / year on HAPD bottom [x10^{11}]");
-  dtp->SetName("dtp");   dtp->SetTitle("Optical photon flux on hapd [photons / s]");
+  Belle2::ARICHChannelHist* mapsPhotons[9];
+  Belle2::ARICHChannelHist* mapsNeutrons[9];
+  Belle2::ARICHChannelHist* mapsDose[9];
 
-  double edep_board[420][7]; // background contribution from each source
-  double edep_hapd[420][7];
-  double nflux_board[420][7]; // This holds neutron flux on each HAPD module
-  double nflux_hapd[420][7];
-  double flux_phot[420][7];
+  TString tits[9] = {"RBB", "BHWide", "Touschek_HER", "Touschek_LER", "Coulomb_HER", "Coulomb_LER", "twoPhoton", "brems", "total"};
+
+  for (int i = 0; i < 9; i++) {
+    mapsPhotons[i] = new Belle2::ARICHChannelHist("photonFlux_" + tits[i], "photons / cm^2 / s - " + tits[i], 1);
+    mapsNeutrons[i] = new Belle2::ARICHChannelHist("neutronFlux_" + tits[i],
+                                                   "1MeV eq. neutron flux /cm2 / year (x 10^{11}) - " + tits[i], 1);
+    mapsDose[i] = new Belle2::ARICHChannelHist("radDose_" + tits[i], "radiation dose [gray/year] - " + tits[i], 1);
+  }
+
+
+  double edep_board[420][8]; // background contribution from each source
+  double edep_hapd[420][8];
+  double nflux_board[420][8]; // This holds neutron flux on each HAPD module
+  double nflux_hapd[420][8];
+  double flux_phot[420][8];
   double edep_board_all[420]; // sum of background from all sources
   double nflux_board_all[420];
   double edep_hapd_all[420];
@@ -145,7 +153,7 @@ void BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mma
   double origins[420][2];
 
   // intialize
-  for (int j = 0; j < 7; j++) {
+  for (int j = 0; j < 8; j++) {
     for (int i = 0; i < 420; i++) {
       edep_board[i][j] = 0;
       edep_hapd[i][j] = 0;
@@ -163,8 +171,6 @@ void BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mma
 
   // sources
   //TString tip[7] = {"RBB", "BHWide", "Touschek_HER", "Touschek_LER", "Coulomb_HER", "Coulomb_LER", "2-photon"};
-
-
   // input file names
   /*  for (int j = 0; j < 7; j++) {
       for (int i = 0; i < 1; i++) {
@@ -203,14 +209,15 @@ void BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mma
   tree->SetBranchAddress("source", &source);
 
   int nevents = tree->GetEntries();
-  //double nmax = 0;
+
   // loop over all hits
   for (int e = 0; e < nevents; e++) {
 
+    if (e % 1000000 == 0)  std::cout << "Processed: " << double(e) / double(nevents) << std::endl;
     edep = 0;
     type = -1;
     pdg = -1;
-    //modID = 1;
+
     mom->SetXYZ(0., 0., 0.);
 
     tree->GetEvent(e);
@@ -224,17 +231,19 @@ void BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mma
       origins[modID - 1][1] = modOrig->Y();
     } else continue;
 
+    if (sourceTime[source] == 0) continue;
+
     // this is for photon flux
     if (type == 2) {
-      flux_phot[modID - 1][sourceType[source]] += scaling[source];
+      flux_phot[modID - 1][sourceType[source]] += 1. / sourceTime[source];
     }
 
     if (type != 2) {
 
       //  energy deposit from a hit (two volumes are sensitive el. board and hapd bottom, commonly I show results for board.
       //  Anyhow the rates are approximately equal.)
-      if (pdg != 2112) {
-        edep *= scaling[source];
+      if (pdg != Const::neutron.getPDGCode()) {
+        edep /= sourceTime[source];
         if (type == 0) edep_board[modID - 1][sourceType[source]] += edep;
         if (type == 1) edep_hapd[modID - 1][sourceType[source]]  += edep;
       }
@@ -249,14 +258,13 @@ void BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mma
 
         // contibution to neutron flux
         if (type == 0) {
-          if (modID == 10) continue;
-          phnw *= scaling[source];
+          phnw /= sourceTime[source];
           nflux_board[modID - 1][sourceType[source]] += phnw * trlen / 0.2; // trlen/0.2, this is kind of cos(theta) correction to the flux.
           // trlen = track length in volume, and 0.2cm is thickness of board.
           nenergy->Fill(lee);
         }
         if (type == 1) {
-          phnw *= scaling[source];
+          phnw *= sourceTime[source];
           nflux_hapd[modID - 1][sourceType[source]] += phnw * trlen / 0.05;
         }
       }
@@ -266,14 +274,14 @@ void BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mma
 
 
   // values averaged over HAPD rings;
-  double avgeb[7][7];
-  double avgeh[7][7];
-  double avgnb[7][7];
-  double avgnh[7][7];
-  double avgf[7][7];
+  double avgeb[7][8];
+  double avgeh[7][8];
+  double avgnb[7][8];
+  double avgnh[7][8];
+  double avgf[7][8];
 
   for (int i = 0; i < 7; i++) {
-    for (int j = 0; j < 7; j++) {
+    for (int j = 0; j < 8; j++) {
       avgeb[i][j] = 0;  avgeh[i][j] = 0;
       avgnb[i][j] = 0;  avgnh[i][j] = 0;
       avgf[i][j] = 0;
@@ -290,7 +298,7 @@ void BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mma
 
   for (int i = 0; i < 420; i++) {
     int nrow = mod2row(i + 1);
-    for (int j = 0; j < 7; j++) {
+    for (int j = 0; j < 8; j++) {
 
       edep_board[i][j] = edep_board[i][j] * 1.6E+6 / 47.25 / time; // 47.25 mass of FEB in grams
       edep_hapd[i][j] = edep_hapd[i][j] * 1.6E+6 / 5.49 / time; // 5.49 mass of APD chip (volume 62.7x62.7x0.06)
@@ -311,27 +319,23 @@ void BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mma
       avgnb[nrow][j] += nflux_board[i][j] / nhapd[nrow];
       avgnh[nrow][j] += nflux_hapd[i][j] / nhapd[nrow];
       avgf[nrow][j] += flux_phot[i][j] / nhapd[nrow];
+
+      mapsPhotons[j]->setBinContent(i + 1, flux_phot[i][j]);
+      mapsNeutrons[j]->setBinContent(i + 1, nflux_board[i][j] / 1E+11);
+      mapsDose[j]->setBinContent(i + 1, edep_board[i][j]);
+
     }
 
     double nn = nflux_board_all[i] / 1E+11;
     ndist->Fill(nn);
     edist->Fill(edep_board_all[i]);
+
     // fill 2D graphs
-    dteb->SetPoint(i, origins[i][0], origins[i][1], edep_board_all[i]);
-    dtnb->SetPoint(i, origins[i][0], origins[i][1], nn);
-    dteh->SetPoint(i, origins[i][0], origins[i][1], edep_hapd_all[i]);
-    dtnh->SetPoint(i, origins[i][0], origins[i][1], nflux_hapd_all[i]);
-    dtp->SetPoint(i, origins[i][0], origins[i][1], phot_all[i]);
-    chHits->setBinContent(i + 1, nn);
+    mapsPhotons[8]->setBinContent(i + 1, phot_all[i]);
+    mapsNeutrons[8]->setBinContent(i + 1, nn);
+    mapsDose[8]->setBinContent(i + 1, edep_board_all[i]);
 
   } // end of HAPD loop
-
-  dteb->SetMarkerStyle(21);
-  dteh->SetMarkerStyle(21);
-  dtnb->SetMarkerStyle(21);
-  dteh->SetMarkerStyle(21);
-  dtp->SetMarkerStyle(21);
-  //chHits->SetMarkerStyle(21);
 
 
   TGaxis::SetMaxDigits(1);
@@ -349,13 +353,19 @@ void BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mma
   TFile* f = new TFile("arich_background_phase3.root", "RECREATE");
 
   c1->Write(); c2->Write(); c3->Write(); c4->Write(); c5->Write();
-  dteb->Write(); dteh->Write();
-  dtnb->Write(); dtnh->Write();
-  dtp->Write();
-  chHits->Write();
   ndist->Write();
   edist->Write();
   nenergy->Write();
+
+  for (int i = 0; i < 8; i++) {
+    mapsPhotons[i]->SetMinimum(0.0);
+    mapsNeutrons[i]->SetMinimum(0.0);
+    mapsDose[i]->SetMinimum(0.0);
+    mapsPhotons[i]->Write();
+    mapsNeutrons[i]->Write();
+    mapsDose[i]->Write();
+  }
+
   f->Close();
 
   delete c1;
@@ -364,5 +374,4 @@ void BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mma
   delete c4;
   delete c5;
 
-  //return 0;
 }

@@ -7,9 +7,9 @@
 # Output ntuple to cosmicT0FinderNtuple.root
 # ---------------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
-from ROOT import TH1F, TFile
+from ROOT import TH1F
 from ROOT import gROOT, AddressOf
 import math
 import ROOT
@@ -17,7 +17,7 @@ import ROOT
 timeShift = 100  # ns (can be arbitrary chosen)
 
 
-class ShiftDigits(Module):
+class ShiftDigits(b2.Module):
     ''' shift digits in time by timeShift'''
 
     def event(self):
@@ -55,7 +55,7 @@ gROOT.ProcessLine('struct TreeStruct {\
 from ROOT import TreeStruct  # noqa
 
 
-class Ntuple(Module):
+class Ntuple(b2.Module):
     ''' makes ntuple for MC studies of TOPCosmicT0Finder performance '''
 
     def initialize(self):
@@ -89,23 +89,23 @@ class Ntuple(Module):
         for timeZero in timeZeros:
             extHit = timeZero.getRelated('ExtHits')
             if not extHit:
-                B2WARNING('no related extHits')
+                b2.B2WARNING('no related extHits')
                 continue
             barHit = None
             for barhit in mcParticles[0].getRelationsWith('TOPBarHits'):
                 if barhit.getModuleID() == extHit.getCopyID():
                     barHit = barhit
             if not barHit:
-                B2WARNING('no corresponding TOPBarHit')
+                b2.B2WARNING('no corresponding TOPBarHit')
                 continue
 
             moduleID = timeZero.getModuleID()
             if extHit.getCopyID() != moduleID:
-                B2ERROR('moduleID in extHit differs: ' + str(extHit.getCopyID()) +
-                        ' ' + str(moduleID))
+                b2.B2ERROR('moduleID in extHit differs: ' + str(extHit.getCopyID()) +
+                           ' ' + str(moduleID))
             if barHit.getModuleID() != moduleID:
-                B2ERROR('moduleID in barHit differs: ' + str(barHit.getModuleID()) +
-                        ' ' + str(moduleID))
+                b2.B2ERROR('moduleID in barHit differs: ' + str(barHit.getModuleID()) +
+                           ' ' + str(moduleID))
 
             self.data.slot = moduleID
             self.data.nfot = timeZero.getNumPhotons()
@@ -154,16 +154,16 @@ class Ntuple(Module):
 
 
 # Suppress messages and warnings during processing:
-set_log_level(LogLevel.WARNING)
+b2.set_log_level(b2.LogLevel.WARNING)
 
 # Define a global tag (note: the one given bellow will become out-dated!)
-use_central_database('data_reprocessing_proc8')
+b2.use_central_database('data_reprocessing_proc8')
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # input
-roinput = register_module('RootInput')
+roinput = b2.register_module('RootInput')
 main.add_module(roinput)
 
 # Initialize TOP geometry parameters (creation of Geant geometry is not needed)
@@ -173,7 +173,7 @@ main.add_module('TOPGeometryParInitializer')
 main.add_module(ShiftDigits())
 
 # t0 finder
-finder = register_module('TOPCosmicT0Finder')
+finder = b2.register_module('TOPCosmicT0Finder')
 finder.param('useIncomingTrack', False)  # or True
 # finder.param('saveHistograms', True)
 main.add_module(finder)
@@ -185,7 +185,7 @@ main.add_module(Ntuple())
 main.add_module('Progress')
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print statistics
-print(statistics)
+print(b2.statistics)

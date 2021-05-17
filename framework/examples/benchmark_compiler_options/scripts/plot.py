@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import numpy as np
 import matplotlib.pyplot as plt
 
 
 def fFileExist(filename):
-    '''Test if file exists'''
+    """Test if file exists"""
 
     try:
-        oFile = open(filename, 'r')
-    except IOError:
+        oFile = open(filename)
+    except OSError:
         return 0
     else:
         oFile.close()
@@ -18,11 +17,11 @@ def fFileExist(filename):
 
 
 def read(optlevel, b, name):
-    '''read time from out/*.out and save plots to plots/. The cut deletes obviously wrong times.'''
+    """read time from out/*.out and save plots to plots/. The cut deletes obviously wrong times."""
 
     z = 0
     for i in range(0, len(optlevel)):
-        if fFileExist('out/' + optlevel[i - z] + '.out') == 0:
+        if fFileExist("out/" + optlevel[i - z] + ".out") == 0:
             del optlevel[i - z]
             z = z + 1
     cut = True
@@ -33,7 +32,7 @@ def read(optlevel, b, name):
     n = [0] * len(optlevel)
     t = list(range(0, len(optlevel)))
     for i in t:
-        fobj = open('out/' + optlevel[i] + '.out', 'r')
+        fobj = open("out/" + optlevel[i] + ".out")
         readvalue = []
         # read file
         for line in fobj:
@@ -47,8 +46,7 @@ def read(optlevel, b, name):
         z = 0
         if cut:
             for j in u:
-                if readvalue[j - z] > 1.5 * value[i] or readvalue[j - z] < 0.5 \
-                        * value[i]:
+                if readvalue[j - z] > 1.5 * value[i] or readvalue[j - z] < 0.5 * value[i]:
                     del readvalue[j - z]
                     z = z + 1
             sigma[i] = np.std(readvalue)
@@ -63,27 +61,38 @@ def read(optlevel, b, name):
         valuenormed,
         xerr=0,
         yerr=sigmanormed,
-        color='black',
-        fmt='_',
-        ecolor='black',
-        label='normed time',
+        color="black",
+        fmt="_",
+        ecolor="black",
+        label="normed time",
     )
     (locs, labels) = plt.xticks(t, optlevel)
     plt.setp(labels, rotation=90)
     plt.xlim([-0.5, len(optlevel) - 0.5])
-    plt.ylabel('performance')
+    plt.ylabel("performance")
     fig = plt.gcf()
     fig.subplots_adjust(bottom=0.65)
-    plt.savefig('plots/' + name + '.png')
+    plt.savefig("plots/" + name + ".png")
     plt.close()
-    fobj = open('plots/' + name + '.out', 'w')
+    fobj = open("plots/" + name + ".out", "w")
     for i in t:
-        fobj.write(optlevel[i] + '&' + str(n[i]) + '&' + str('%.3f' % value[i]) +
-                   ' & ' + str('%.3f' % sigma[i]) + '&' + str('%.4f' % valuenormed[i]) +
-                   '&' + str('%.4f' % sigmanormed[i]) + '\\\\\n')
-        fobj.write("\hline\n")
+        fobj.write(
+            optlevel[i]
+            + "&"
+            + str(n[i])
+            + "&"
+            + str("%.3f" % value[i])
+            + " & "
+            + str("%.3f" % sigma[i])
+            + "&"
+            + str("%.4f" % valuenormed[i])
+            + "&"
+            + str("%.4f" % sigmanormed[i])
+            + "\\\\\n"
+        )
+        fobj.write(r"\hline\n")
 
 
-name = 'CDCLegendreTracking'
-optlevel = ['gcc-O0', 'gcc-O3', 'gcc-O3-native']
+name = "CDCLegendreTracking"
+optlevel = ["gcc-O0", "gcc-O3", "gcc-O3-native"]
 read(optlevel, 0, name)

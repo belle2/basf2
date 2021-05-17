@@ -1,0 +1,34 @@
+# EventType: 1166740000
+# Descriptor:  [anti-B0 -> D*+ l- nu, D* -> D0 pi]cc 
+# NickName: Bd_Dstlnu_D0pi
+# Documentation: b->c l nu process, D* mode (BGL model)
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Chaoyi Lyu
+# Email: chaoyi_lyu@uni-bonn.de
+# Cuts: None
+# Date: 20201207
+#
+
+Decay Upsilon(4S)
+1.0 B0 anti-B0 B0sig anti-B0sig VSS_BMIX dm;
+Enddecay
+
+Decay anti-B0sig
+0.5   D*+sig  mu-   anti-nu_mu PHOTOS BGL 0.02596 -0.06049 0.01311 0.01713 0.00753 -0.09346; #[para. values from arXiv:2008.09341]
+0.5   D*+sig  e-    anti-nu_e  PHOTOS BGL 0.02596 -0.06049 0.01311 0.01713 0.00753 -0.09346; #[para. values from arXiv:2008.09341]
+Enddecay
+CDecay B0sig
+
+Decay D*+sig
+1  D0sig pi+  PHOTOS VSS;
+Enddecay
+CDecay D*-sig
+
+Decay D0sig
+1  K- pi+  PHOTOS PHSP;
+Enddecay
+CDecay anti-D0sig
+
+End
+

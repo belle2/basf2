@@ -1,22 +1,19 @@
 import basf2 as b2
 
 import os
-import sys
 import multiprocessing
 
 import ROOT
 from ROOT import Belle2
 from ROOT.Belle2 import MillepedeAlgorithm
 
-from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
+from caf.framework import CAF, Calibration, CentralDatabase
 from caf import backends
 from caf import strategies
 
-import rawdata as raw
 import reconstruction as reco
-import modularAnalysis as ana
-import vertex as vx
 
+from generators import add_kkmc_generator
 from simulation import add_simulation
 from L1trigger import add_tsim
 
@@ -151,7 +148,6 @@ def PXDHalfShellsAlignment(files, tags):
                         54,
                         55,
                         20])
-                pass
 
     algorithm.setTimedepConfig(timedep)
 
@@ -172,12 +168,6 @@ def PXDHalfShellsAlignment(files, tags):
 
 
 def generate_test_data(filename):
-    kkgeninput = b2.register_module('KKGenInput')
-    kkgeninput.param('tauinputFile', Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat'))
-    kkgeninput.param('KKdefaultFile', Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat'))
-    kkgeninput.param('taudecaytableFile', '')
-    kkgeninput.param('kkmcoutputfilename', 'kkmc_mumu.txt')
-
     main = b2.create_path()
 
     main.add_module("EventInfoSetter", evtNumList=evtNumList, runList=runList, expList=expList)
@@ -185,7 +175,7 @@ def generate_test_data(filename):
     main.add_module('Gearbox')
     main.add_module('Geometry')
 
-    main.add_module(kkgeninput)
+    add_kkmc_generator(main, 'mu-mu+')
 
     add_simulation(main)
     add_tsim(main)

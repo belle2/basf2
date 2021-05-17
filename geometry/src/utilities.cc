@@ -255,6 +255,16 @@ namespace Belle2 {
       return new G4Polycone(name, minPhi, dPhi, nPlanes, &z.front(), &rMin.front(), &rMax.front());
     }
 
+    /**
+     * Create rotation solid.
+     * @param name         Name of the volume.
+     * @param innerPoints  Inner points of the volume.
+     * @param outerPointes Outer points of the volume.
+     * @param minPhi       Minimum phi angle.
+     * @param maxPhi       Maximum phi angle.
+     * @param minZ         Minimum z coordinate.
+     * @param maxZ         Maximum z coordinate.
+     */
     G4Polycone* createRotationSolid(const std::string& name,
                                     std::list< std::pair<double, double> > innerPoints,
                                     std::list< std::pair<double, double> > outerPoints,

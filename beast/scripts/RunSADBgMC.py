@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-import os
+import basf2 as b2
 import sys
-import math
-import string
 import datetime
 from background import add_output
 
@@ -140,16 +137,16 @@ print('sampleType: ', sampleType)
 print('realTime: ', realTime, 'ns')
 print('seed: ', seed)
 
-set_log_level(LogLevel.WARNING)
-set_random_seed(int(seed))
+b2.set_log_level(b2.LogLevel.WARNING)
+b2.set_random_seed(int(seed))
 
-main = create_path()
+main = b2.create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [nevent], 'runList': [1], 'expList': [1]})
 main.add_module(eventinfosetter)
 
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 if sampleType == 'study' and phase == 3:
     gearbox.param('override', [
         ('/Global/length', '40.0', 'm'),
@@ -173,7 +170,7 @@ elif phase == 1:
     gearbox.param('fileName', '/geometry/Beast2_phase1.xml')
 main.add_module(gearbox)
 
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 if phase == 2 or phase == 3:
     geometry.param({
         "excludedComponents": ["MagneticField"],
@@ -181,7 +178,7 @@ if phase == 2 or phase == 3:
     })
 main.add_module(geometry)
 
-sadinput = register_module('SADInput')
+sadinput = b2.register_module('SADInput')
 sadinput.param('Filename', inputfilename)
 sadinput.param('ReadMode', readmode)
 sadinput.param('AccRing', accring)
@@ -189,17 +186,17 @@ sadinput.param('ReadoutTime', readouttime)  # needed only for ReadMode = 1
 sadinput.param('Range', range)
 main.add_module(sadinput)
 
-fullsim = register_module('FullSim')
+fullsim = b2.register_module('FullSim')
 fullsim.param('PhysicsList', 'FTFP_BERT_HP')
 fullsim.param('UICommandsAtIdle', ['/process/inactivate nKiller'])
 fullsim.param('StoreAllSecondaries', True)
 fullsim.param('SecondariesEnergyCut', 0.0)  # [MeV] need for CDC EB neutron flux
 main.add_module(fullsim)
 
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 if phase == 1 and digitization == 'true':
-    rootoutput = register_module('RootOutput')
+    rootoutput = b2.register_module('RootOutput')
     rootoutput.param('outputFileName', outputfilename)
     rootoutput.param('updateFileCatalog', False)
     rootoutput.param('branchNames', ["ClawSimHits", "ClawsHits",
@@ -211,35 +208,35 @@ if phase == 1 and digitization == 'true':
                                      "He3tubeSimHits", "He3tubeHits",
                                      "MicrotpcSimHits", "MicrotpcHits",
                                      "SADMetaHits"])
-    bgodigi = register_module('BgoDigitizer')
+    bgodigi = b2.register_module('BgoDigitizer')
     main.add_module(bgodigi)
     # dosidigi = register_module('DosiDigitizer')
     # main.add_module(dosidigi)
-    csidigi = register_module('CsiDigitizer_v2')
+    csidigi = b2.register_module('CsiDigitizer_v2')
     main.add_module(csidigi)
-    he3digi = register_module('He3Digitizer')
+    he3digi = b2.register_module('He3Digitizer')
     he3digi.param('conversionFactor', 0.303132019)
     he3digi.param('useMCParticles', False)
     main.add_module(he3digi)
-    diadigi = register_module('BeamDigitizer')
+    diadigi = b2.register_module('BeamDigitizer')
     diadigi.param('WorkFunction', 13.25)
     diadigi.param('FanoFactor', 0.382)
     main.add_module(diadigi)
-    pindigi = register_module('PinDigitizer')
+    pindigi = b2.register_module('PinDigitizer')
     pindigi.param('WorkFunction', 3.64)
     pindigi.param('FanoFactor', 0.13)
     main.add_module(pindigi)
-    tpcdigi = register_module('TpcDigitizer')
+    tpcdigi = b2.register_module('TpcDigitizer')
     main.add_module(tpcdigi)
     MIP_to_PE1 = [12.97, 12.46, 14.86, 15.71, 13.63, 14.56, 14.53, 15.31]
     MIP_to_PE2 = [15.21, 12.46, 14.86, 15.71, 16.02, 15.83, 14.53, 15.31]
-    clawsdigi = register_module('ClawDigitizer')
+    clawsdigi = b2.register_module('ClawDigitizer')
     clawsdigi.param('ScintCell', 8)
     clawsdigi.param('C_keV_to_MIP', 457.114)
     clawsdigi.param('C_MIP_to_PE', MIP_to_PE2)
     clawsdigi.param('PEthres', 1.0)
     main.add_module(clawsdigi)
-    qcssdigi = register_module('QcsmonitorDigitizer')
+    qcssdigi = b2.register_module('QcsmonitorDigitizer')
     qcssdigi.param('ScintCell', 2)
     qcssdigi.param('C_keV_to_MIP', 1629.827)
     qcssdigi.param('C_MIP_to_PE', 15.0)
@@ -247,7 +244,7 @@ if phase == 1 and digitization == 'true':
     main.add_module(qcssdigi)
     main.add_module(rootoutput)
 elif phase == 2 and digitization == 'true':
-    rootoutput = register_module('RootOutput')
+    rootoutput = b2.register_module('RootOutput')
     rootoutput.param('outputFileName', outputfilename)
     rootoutput.param('updateFileCatalog', False)
     rootoutput.param('branchNames', ["SVDSimHits", "SVDTrueHits", "SVDTrueHitsToSVDSimHits",
@@ -262,42 +259,42 @@ elif phase == 2 and digitization == 'true':
                                      "MicrotpcSimHits", "MicrotpcHits",
                                      "SADMetaHits"])
     MIP_to_PE = [12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12]
-    he3digi = register_module('He3Digitizer')
+    he3digi = b2.register_module('He3Digitizer')
     he3digi.param('conversionFactor', 0.303132019)
     he3digi.param('useMCParticles', False)
     main.add_module(he3digi)
-    diadigi = register_module('BeamDigitizer')
+    diadigi = b2.register_module('BeamDigitizer')
     diadigi.param('WorkFunction', 13.25)
     diadigi.param('FanoFactor', 0.382)
     main.add_module(diadigi)
-    pindigi = register_module('PinDigitizer')
+    pindigi = b2.register_module('PinDigitizer')
     pindigi.param('WorkFunction', 3.64)
     pindigi.param('FanoFactor', 0.13)
     main.add_module(pindigi)
-    clawsdigi = register_module('ClawsDigitizer')
+    clawsdigi = b2.register_module('ClawsDigitizer')
     clawsdigi.param('ScintCell', 16)
     clawsdigi.param('C_keV_to_MIP', 457.114)
     clawsdigi.param('C_MIP_to_PE', MIP_to_PE)
     clawsdigi.param('PEthres', 1.0)
     main.add_module(clawsdigi)
-    qcssdigi = register_module('QcsmonitorDigitizer')
+    qcssdigi = b2.register_module('QcsmonitorDigitizer')
     qcssdigi.param('ScintCell', 40)
     qcssdigi.param('C_keV_to_MIP', 1629.827)
     qcssdigi.param('C_MIP_to_PE', 15.0)
     qcssdigi.param('MIPthres', 0.5)
     main.add_module(qcssdigi)
-    fangsdigi = register_module('FANGSDigitizer')
+    fangsdigi = b2.register_module('FANGSDigitizer')
     main.add_module(fangsdigi)
-    tpcdigi = register_module('TpcDigitizer')
+    tpcdigi = b2.register_module('TpcDigitizer')
     main.add_module(tpcdigi)
     main.add_module(rootoutput)
 else:
     add_output(main, bgType, realTime, sampleType, phase, outputfilename)
 
-process(main)
+b2.process(main)
 
 print('Event Statistics:')
-print(statistics)
+print(b2.statistics)
 
 d = datetime.datetime.today()
 print(d.strftime('job finish: %Y-%m-%d %H:%M:%S\n'))

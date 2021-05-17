@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+# this is a test executable, not a module so we don't need doxygen warnings
+# @cond SUPPRESS_DOXYGEN
 
 """
 Script to make sure the conditions database interface is behaving as expected.
@@ -99,7 +101,6 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
 
     def log_error(self, *args):
         """Disable error logs"""
-        pass
 
     def do_GET(self):
         """Parse a get request"""
@@ -112,7 +113,9 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
             # gt info
             gtname = url.path.split("/")[-1]
             if gtname in self.globaltags:
-                return self.reply('{ "name": "%s", "globalTagStatus": { "name": "%s" } }' % (gtname, self.globaltags[gtname]))
+                return self.reply(
+                    '{{ "name": "{}", "globalTagStatus": {{ "name": "{}" }} }}'.format(
+                        gtname, self.globaltags[gtname]))
             else:
                 return self.send_error(404)
 
@@ -185,7 +188,6 @@ def run_redirect(pipe, redir_port):
 
         def log_error(self, *args):
             """Disable error logs"""
-            pass
 
     try:
         httpd = HTTPServer(("127.0.0.1", 12702), SimpleRedirectServer)
@@ -202,9 +204,7 @@ def run_redirect(pipe, redir_port):
 def dbprocess(host, path, lastChangeCallback=lambda: None, *, globaltag="localtest"):
     """Process a given path in a child process so that FATAL will not abort this
     script but just the child and configure to use a central database at the given host"""
-    # reset the database so that there is no chain
-    basf2.reset_database()
-    # now run the path in a child process inside of a clean working directory
+    # Run the path in a child process inside of a clean working directory
     with clean_working_directory():
         # make logging more reproducible by replacing some strings
         configure_logging_for_tests()
@@ -321,3 +321,5 @@ if "ssl" in sys.argv:
     # available
     for hostname in ("expired", "wrong.host", "self-signed", "untrusted-root"):
         dbprocess(f"https://{hostname}.badssl.com/", main)
+
+# @endcond

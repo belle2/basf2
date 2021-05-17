@@ -11,10 +11,8 @@ runs the fullsim w/ mixed in background, and dumps full output (*Digits containe
 </header>
 """
 
-from ROOT import Belle2
-from background import get_background_files
-from simulation import add_simulation
-import basf2
+# NB. Argument parsing is done *before* any import from the ROOT module, otherwise PyROOT will hijack the command-line options
+# in case of clashing option names. Most notably, this would happen with the '-h', '--help' option.
 import argparse
 
 parser = argparse.ArgumentParser(description=__doc__,
@@ -27,6 +25,10 @@ parser.add_argument("--bkg_dir",
                     "which is defined on the validation server.")
 args = parser.parse_args()
 
+from ROOT import Belle2  # noqa
+from background import get_background_files  # noqa
+from simulation import add_simulation  # noqa
+import basf2  # noqa
 
 # Pdg code of the charged stable particles & antiparticles.
 chargedStableList = []

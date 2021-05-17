@@ -2,18 +2,16 @@
 
 """Custom calibration strategy for KLM channel status."""
 
-import collections
 import numpy
-import os
 
 import basf2
 import ROOT
 from ROOT import Belle2
 
-from caf.utils import ExpRun, IoV, AlgResult
+from caf.utils import AlgResult, IoV
 from caf.utils import runs_overlapping_iov, runs_from_vector
 from caf.utils import split_runs_by_exp
-from caf.strategies import AlgorithmStrategy
+from caf.strategies import AlgorithmStrategy, StrategyError
 from caf.state_machines import AlgorithmMachine
 from ROOT.Belle2 import KLMChannelStatusAlgorithm, KLMChannelIndex
 from klm_strategies_common import get_lowest_exprun, get_highest_exprun, \

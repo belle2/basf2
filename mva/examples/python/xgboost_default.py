@@ -2,7 +2,6 @@
 
 # Thomas Keck 2017
 
-import numpy as np
 import basf2_mva
 import basf2_mva_util
 import time

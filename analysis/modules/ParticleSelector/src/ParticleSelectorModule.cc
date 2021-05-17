@@ -60,7 +60,22 @@ namespace Belle2 {
     // Mother particle
     const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
 
+    const int pdgCode = mother->getPDGCode();
+    string listLabel = mother->getLabel();
     m_listName = mother->getFullName();
+    // Some labels are reserved for the particle loader which loads all particles of the corresponding type.
+    // If people applied cuts on these particle lists, very dangerous bugs could be introduced.
+    // An exception is made for the gamma:all list. This can be limited to photons from the ECL only.
+    if (Const::finalStateParticlesSet.contains(Const::ParticleType(abs(pdgCode))) and listLabel == "all"
+        and not(abs(pdgCode) == Const::photon.getPDGCode() and m_cutParameter == "isFromECL")) {
+      B2FATAL("You are trying to apply a cut on the list " << m_listName <<
+              " but the label 'all' is protected for lists of final-state particles." <<
+              " It could introduce *very* dangerous bugs.");
+    } else if (listLabel == "MC" or listLabel == "ROE" or listLabel == "V0") {
+      // the labels MC, ROE, and V0 are also protected
+      B2FATAL("You are trying to apply a cut on the list " << m_listName <<
+              " but the label " << listLabel << " is protected and can not be reduced.");
+    }
 
     m_particleList.isRequired(m_listName);
 

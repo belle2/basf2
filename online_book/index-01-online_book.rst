@@ -23,9 +23,16 @@ the software by following through a series of hands-on lessons.
    page, just below the logo. You can also change your version by clicking on
    `other versions <https://software.belle2.org/>`_.
 
-   **For the StarterKit workshop in October 2020, we use the online textbook
-   section of the software version called development**
-   (`take me there <https://software.belle2.org/development/sphinx/online_book/index-01-online_book.html>`_).
+   If you are a new to all of this, we recommend you to select the
+   *recommended release version* (``release-xx-xx-xx (recommended)`` in the
+   above list).
+
+   You can also take a sneak peek at the most recent version of the documentation by selecting
+   the `development version <https://software.belle2.org/development/sphinx/online_book/index-01-online_book.html>`_.
+   However not all of the code examples might work for you yet.
+
+   The earliest release version which contains this online book is
+   ``release-05-01-12``.
 
 .. warning::
 
@@ -40,13 +47,16 @@ the software by following through a series of hands-on lessons.
 
 .. tip::
 
-   If you get stuck or have any questions during a StarterKit workshop, the
+   If you get stuck or have any questions to the online book material, the
    `#starterkit-workshop channel <https://chat.belle2.org/channel/starterkit-workshop>`_
-   in our chat is full of nice people who will provide instant help.
+   in our chat is full of nice people who will provide fast help.
+   However this is not the place for specific or very detailed questions about
+   your own analysis.
 
    The first lesson of this book (:ref:`onlinebook_collaborative_tools`) will show
    several other places where you can get help later on.
-   It also includes a quick tips section about the chat: :ref:`onlinebook_collaborative_tools_b2chat_howto`.
+   It also includes a quick tips section about the chat:
+   :ref:`onlinebook_collaborative_tools_b2chat_howto`.
 
 .. toctree::
    :maxdepth: 2
@@ -58,4 +68,4 @@ the software by following through a series of hands-on lessons.
    basf2
    analysis
    computing
-
+   join_us

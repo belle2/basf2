@@ -20,6 +20,10 @@ namespace TreeFitter {
     /** constructor */
     RecoComposite(Belle2::Particle* bc, const ParticleBase* mother) ;
 
+    /** constructor */
+    RecoComposite(Belle2::Particle* bc, const ParticleBase* mother, const ConstraintConfiguration& config,
+                  bool massconstraint = false);
+
     /** destructor */
     virtual ~RecoComposite() {};
 
@@ -29,7 +33,7 @@ namespace TreeFitter {
     /** init particle in case it has no mother */
     virtual ErrCode initMotherlessParticle(FitParams& fitparams) override;
 
-    /** update chaed params */
+    /** update changed params */
     void updateParams();
 
     /** project this particle constraint  */
@@ -38,7 +42,7 @@ namespace TreeFitter {
     /** dimension of the measurement vector */
     int dimMeas() const        { return m_hasEnergy ? 7 : 6 ; }
 
-    /** get dimension of cosntraint */
+    /** get dimension of constraint */
     virtual int dim() const override { return m_hasEnergy ? 8 : 7 ; }// (x,y,z,t,px,py,pz,(E))
 
     /** get dimension  of measurement*/
@@ -70,6 +74,9 @@ namespace TreeFitter {
     {
       alist.push_back(Constraint(this, Constraint::composite, depth, dimM())) ;
       alist.push_back(Constraint(this, Constraint::geometric, depth, 3)) ;
+      if (m_massconstraint) {
+        alist.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
+      }
     }
 
   protected:
@@ -82,5 +89,8 @@ namespace TreeFitter {
 
     /** flag */
     bool m_hasEnergy;
+
+    /** flag */
+    bool m_massconstraint;
   };
 }

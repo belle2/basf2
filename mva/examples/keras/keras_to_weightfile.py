@@ -6,8 +6,6 @@
 
 from basf2_mva_python_interface.contrib_keras import State
 
-import tensorflow as tf
-import tensorflow.contrib.keras as keras
 
 from keras.models import load_model
 
@@ -34,7 +32,6 @@ if __name__ == "__main__":
     import json
     import numpy as np
 
-    import basf2
     import basf2_mva
     import basf2_mva_util
 

@@ -1,4 +1,3 @@
-import os
 import subprocess
 
 # this scripts prepares SAD files for G4 simulation

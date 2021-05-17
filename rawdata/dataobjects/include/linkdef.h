@@ -5,19 +5,13 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::RawCOPPERFormat+;
-#pragma link C++ class Belle2::RawCOPPERFormat_v0+;
-#pragma link C++ class Belle2::RawCOPPERFormat_v1+;
-#pragma link C++ class Belle2::RawCOPPERFormat_latest+;
-#pragma link C++ class Belle2::PreRawCOPPERFormat_v1+;
-#pragma link C++ class Belle2::PreRawCOPPERFormat_latest+;
-#pragma link C++ class Belle2::PostRawCOPPERFormat_v1+;
-#pragma link C++ class Belle2::PostRawCOPPERFormat_latest+;
 #pragma link C++ class Belle2::RawHeader_v0+; // checksum=0xba530450, version=-1
 #pragma link C++ class Belle2::RawHeader_v1+; // checksum=0xba530451, version=-1
+#pragma link C++ class Belle2::RawHeader_v2+; // checksum=0xba530452, version=-1
 #pragma link C++ class Belle2::RawHeader_latest+; // checksum=0xf44474e9, version=-1
 #pragma link C++ class Belle2::RawTrailer_v0+; // checksum=0x2efe07ba, version=-1
 #pragma link C++ class Belle2::RawTrailer_v1+; // checksum=0x2efe07bb, version=-1
+#pragma link C++ class Belle2::RawTrailer_v2+; // checksum=0x2efe07bc, version=-1
 #pragma link C++ class Belle2::RawTrailer_latest+; // checksum=0xde608973, version=-1
 
 #pragma link C++ class Belle2::RawDataBlock+; // checksum=0x8d55bf47, version=3

@@ -23,10 +23,10 @@ namespace Belle2 {
    * Module to compute event shape variables starting from three lists of particle objects (tracks, gammas, Klongs).
    * The output is stored in the EventShapeContainer dataobject.
    * This module does not contain the implementation of the core eventshape algorithm, that is rather done in separate
-   * basf2 classes. This scheme has been shosen partially beacuse it was already ised by the ContinuumSuppression, and partially
+   * basf2 classes. This scheme has been chosen partially because it was already used by the ContinuumSuppression, and partially
    * because different modules may need to access the very same core utilities.
    *
-   * The steering parameters of the module mostly consiste in flags that enable the user to swith on or off the calculation
+   * The steering parameters of the module mostly consist of flags that enable the user to switch on or off the calculation
    * of different quantities.
    */
   class EventShapeCalculatorModule : public Module {
@@ -49,7 +49,7 @@ namespace Belle2 {
 
     /**
      * Main method, called for each events.
-     * It calles the event shape core functions and stores the output in an EventShapeContainer object.
+     * It calls the event shape core functions and stores the output in an EventShapeContainer object.
      */
     virtual void event() override;
 

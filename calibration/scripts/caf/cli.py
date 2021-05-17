@@ -2,9 +2,8 @@ import basf2
 from basf2 import B2INFO
 
 import argparse
-import time
 
-from caf.backends import Local, Batch, LSF, PBS, HTCondor, monitor_jobs
+from caf.backends import Batch, HTCondor, LSF, Local, PBS
 
 
 def command_local(args, backend_args=None):
@@ -16,7 +15,7 @@ def command_local(args, backend_args=None):
         backend_args (dict): Backend arguments that will be applied. Specific backend args set by the args positional argument
             will take priority over these values.
     """
-    B2INFO(f"Requested use of Local backend")
+    B2INFO("Requested use of Local backend")
     backend = Local(max_processes=args.max_processes, backend_args=backend_args)
     return backend
 
@@ -30,7 +29,7 @@ def command_lsf(args, backend_args=None):
         backend_args (dict): Backend arguments that will be applied. Specific backend args set by the args positional argument
             will take priority over these values.
     """
-    B2INFO(f"Requested use of LSF backend")
+    B2INFO("Requested use of LSF backend")
     command_line_backend_args = {"queue": args.queue}
     # If any backend_args are None then they shouldn't overwrite
     command_line_backend_args = {key: value for key, value in command_line_backend_args.items() if value is not None}
@@ -52,7 +51,7 @@ def command_pbs(args, backend_args=None):
         backend_args (dict): Backend arguments that will be applied. Specific backend args set by the args positional argument
             will take priority over these values.
     """
-    B2INFO(f"Requested use of PBS backend")
+    B2INFO("Requested use of PBS backend")
     command_line_backend_args = {"queue": args.queue}
     command_line_backend_args = {key: value for key, value in command_line_backend_args.items() if value is not None}
     if backend_args is None:
@@ -73,10 +72,11 @@ def command_condor(args, backend_args=None):
         backend_args (dict): Backend arguments that will be applied. Specific backend args set by the args positional argument
             will take priority over these values.
     """
-    B2INFO(f"Requested use of HTCondor backend")
+    B2INFO("Requested use of HTCondor backend")
     command_line_backend_args = {
                                  "universe": args.universe,
-                                 "getenv": args.getenv
+                                 "getenv": args.getenv,
+                                 "path_prefix": args.path_prefix
                                 }
     command_line_backend_args = {key: value for key, value in command_line_backend_args.items() if value is not None}
     if backend_args is None:
@@ -156,13 +156,13 @@ def add_backends_subparsers(parser, default_max_processes=4,
                             help=("The batch queue to use."
                                   " (e.g. s)"))
 
-    lsf_parser.add_argument("--global-job-limit", dest="global_job_limit", metavar="", default=default_global_job_limit,
+    lsf_parser.add_argument("--global-job-limit", dest="global_job_limit", metavar="", default=default_global_job_limit, type=int,
                             help=("The number of batch jobs that can be active for the user before the backend class will stop "
                                   "submitting. This is not a completely hard limit, the actual max reached depends on other "
                                   "submitting processes and the number submitted before re-checking."
                                   f" (default: {default_global_job_limit})"))
 
-    lsf_parser.add_argument("--submission-check-heartbeat", dest="submission_check_heartbeat", metavar="",
+    lsf_parser.add_argument("--submission-check-heartbeat", dest="submission_check_heartbeat", metavar="", type=int,
                             default=default_submission_check_heartbeat,
                             help=("The time (seconds) between checking if there are fewer batch jobs than the global limit. "
                                   "Generally not needed to change, but it certainly shouldn't be set lower than 30 seconds."
@@ -179,13 +179,13 @@ def add_backends_subparsers(parser, default_max_processes=4,
                             help=("The batch queue to use."
                                   " e.g. short"))
 
-    pbs_parser.add_argument("--global-job-limit", dest="global_job_limit", metavar="", default=default_global_job_limit,
+    pbs_parser.add_argument("--global-job-limit", dest="global_job_limit", metavar="", default=default_global_job_limit, type=int,
                             help=("The number of batch jobs that can be active for the user before the backend class will stop "
                                   "submitting. This is not a completely hard limit, the actual max reached depends on other "
                                   "submitting processes and the number submitted before re-checking."
                                   f" (default: {default_global_job_limit})"))
 
-    pbs_parser.add_argument("--submission-check-heartbeat", dest="submission_check_heartbeat", metavar="",
+    pbs_parser.add_argument("--submission-check-heartbeat", dest="submission_check_heartbeat", metavar="", type=int,
                             default=default_submission_check_heartbeat,
                             help=("The time (seconds) between checking if there are fewer batch jobs than the global limit. "
                                   "Generally not needed to change, but it certainly shouldn't be set lower than 30 seconds."
@@ -200,19 +200,29 @@ def add_backends_subparsers(parser, default_max_processes=4,
 
     condor_parser.add_argument("--getenv", dest="getenv", metavar="",
                                help=("Should jobs inherit the submitting environment (doesn't always work as expected)."
-                                     f" e.g. false"))
+                                     " e.g. false"))
 
     condor_parser.add_argument("--universe", dest="universe", metavar="",
                                help=("Jobs should be submitted using this univese."
                                      " e.g. vanilla"))
 
-    condor_parser.add_argument("--global-job-limit", dest="global_job_limit", metavar="", default=default_global_job_limit,
-                               help=("The number of batch jobs that can be active for the user before the backend class will stop "
-                                     "submitting. This is not a completely hard limit, the actual max reached depends on other "
-                                     "submitting processes and the number submitted before re-checking."
-                                     f" (default: {default_global_job_limit})"))
+    condor_parser.add_argument("--path-prefix", dest="path_prefix", metavar="", default="",
+                               help=("The string that should be pre-appended to file path given to backend"
+                                     " e.g. root://dcbldoor.sdcc.bnl.gov:1096"))
 
-    condor_parser.add_argument("--submission-check-heartbeat", dest="submission_check_heartbeat", metavar="",
+    condor_parser.add_argument(
+        "--global-job-limit",
+        dest="global_job_limit",
+        metavar="",
+        default=default_global_job_limit,
+        type=int,
+        help=(
+            "The number of batch jobs that can be active for the user before the backend class will stop "
+            "submitting. This is not a completely hard limit, the actual max reached depends on other "
+            "submitting processes and the number submitted before re-checking."
+            f" (default: {default_global_job_limit})"))
+
+    condor_parser.add_argument("--submission-check-heartbeat", dest="submission_check_heartbeat", metavar="", type=int,
                                default=default_submission_check_heartbeat,
                                help=("The time (seconds) between checking if there are fewer batch jobs than the global limit. "
                                      "Generally not needed to change, but it certainly shouldn't be set lower than 30 seconds."

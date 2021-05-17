@@ -35,7 +35,7 @@ namespace Belle2 {
     {
       BitStream q;
       EXPECT_EQ(q.getPos(), 0);
-      EXPECT_EQ(q.getStore().size(), 0);
+      EXPECT_EQ(q.getStore().size(), 1);
 
       int N = 128;
       BitStream q2(N);

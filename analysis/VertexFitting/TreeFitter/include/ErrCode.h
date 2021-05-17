@@ -11,7 +11,7 @@
 
 namespace TreeFitter {
 
-  /** abstract errorocode be aware that the default is succes */
+  /** abstract errorocode be aware that the default is success */
   class ErrCode {
   public:
     /** some enums to store errors */

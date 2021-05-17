@@ -16,15 +16,14 @@ import os
 import glob
 from caf import backends
 from caf.framework import Calibration, CAF
-from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
-from ROOT import Belle2
+from caf.strategies import SingleIOV
 from ROOT.Belle2 import TOP
 from basf2 import B2ERROR
 from top_calibration import BS13d_calibration_local
 
 # ----- those parameters need to be adjusted before running -----------------------
 #
-globalTags = ['Reco_master_patch', 'data_reprocessing_proc10']  # highest priority first
+globalTags = ['data_reprocessing_proc11']  # highest priority first
 localDBs = []  # highest priority first, local DB's have higher priority than global tags
 data_dir = '/ghi/fs01/belle2/bdata/group/detector/TOP/2019-*/data_sroot_global/'
 main_output_dir = 'top_calibration'

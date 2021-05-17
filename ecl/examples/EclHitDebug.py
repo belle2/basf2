@@ -14,7 +14,6 @@ Usage:
     $ basf2 EclHitDebug.py
 """
 
-import os
 import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_tracking_reconstruction

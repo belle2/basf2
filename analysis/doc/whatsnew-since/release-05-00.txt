@@ -1,25 +1,16 @@
 Changes in the analysis package since release-05-00
 ---------------------------------------------------
 
-Vertex Fitting
-++++++++++++++
+Bremsstrahlung correction
++++++++++++++++++++++++++
 
- * KFit has been extended to be able to handle vertex fits (with and without mass constraint) that involve an eta particle
-   reconstructed in ``eta -> gamma gamma``.
+ * Fixed that the copies of particles to which Bremsstrahlung was applied (whether this resulted in a added photon or
+   not) are considered as sources of tracks. This allows to update the daughters in vertex fits that involve
+   brems-corrected particles.
 
 Variables
 +++++++++
 
- * Variables :b2:var:`SoftwareTriggerResult`, :b2:var:`SoftwareTriggerResultNonPrescaled` and :b2:var:`SoftwareTriggerPrescaling` now silently return NAN if the trigger is not found.
-
-   .. warning:: this no longer dumps all possible trigger names instead please see ``b2hlt_triggers`` for a list of all possible names.
-
-   .. seealso:: ``b2hlt_triggers print --database online --format list``
-
- * Variables :b2:var:`recQ2Bh`, :b2:var:`recMissM2`, :b2:var:`recQ2BhSimple` have been moved to a new variable group ``Specific kinematic variables``,
-   and :b2:var:`recQ2Bh` is now using a `diamond frame method <https://www.osti.gov/biblio/1442697>`_
- * Added the new variable :b2:var:`photonHasOverlap`, which determines whether a particle's cluster is sharing its connected
-   region with another cluster. A cut string can be provided to ignore cluster that do not satisfy the specified criteria.
  * Variable ``TagVmcLBoost`` renamed to :b2:var:`mcTagVLBoost` and variable ``TagVmcOBoost`` renamed to :b2:var:`mcTagVOBoost`
  * Variable ``mcDeltaL`` renamed to :b2:var:`mcDeltaBoost` as it represents mc-truth version of :b2:var:`DeltaBoost` variable
  * Added variables to get track information of V0 daughters from TrackFitResult in V0 objects:
@@ -32,59 +23,33 @@ Variables
    :b2:var:`v0DaughterD0PullWithOriginAsPivot`, :b2:var:`v0DaughterPhi0PullWithOriginAsPivot`, :b2:var:`v0DaughterOmegaPullWithOriginAsPivot`, :b2:var:`v0DaughterZ0PullWithOriginAsPivot`, :b2:var:`v0DaughterTanLambdaPullWithOriginAsPivot`,
    :b2:var:`v0DaughterTau`, :b2:var:`v0DaughterCov` in a new variable group ``V0Daughter``.
    These variables can also be used for the V0s from reconstructDecay, but the information are taken from the TrackFitResult of daughters.
- * Variables `clusterThetaID` and `clusterPhiID` have both been added as a new variable
- * Event-based variables from ``cluster`` collection have been moved into a new ``event_level_cluster`` collection, 
-   collections of ROE and recoil variables have been expanded
- * Added the variable :b2:var:`binaryPID`, which takes two PID codes as arguments and calculates the binary PID between them. A few
-   binary PID variables have been added to the PID variable collection.
-
-   .. hint:: The hadron PID group recommends to try out the binary PID in analyses and compare the performance with the global PID.
-
- * Added new generated event kinematics variables :b2:var:`genMissingMass2OfEvent`,  :b2:var:`genMissingEnergyOfEventCMS`, 
-   :b2:var:`genMissingMomentumOfEventCMS`, :b2:var:`genTotalPhotonsEnergyOfEvent`, :b2:var:`genVisibleEnergyOfEventCMS` 
+ * Added new generated event kinematics variables :b2:var:`genMissingMass2OfEvent`,  :b2:var:`genMissingEnergyOfEventCMS`,
+   :b2:var:`genMissingMomentumOfEventCMS`, :b2:var:`genTotalPhotonsEnergyOfEvent`, :b2:var:`genVisibleEnergyOfEventCMS`
    and a corresponding collection ``mc_event_kinematics``.
  * Fixed the variable :b2:var:`isDescendantOfList`, which did not work if the ParticleLoader was used to fill a ParticleList with
    descendants of an existing list or exclude them.
  * Added new B2BII variables for the first and last hit position in the tracking system :b2:var:`BelleFirstCDCHitX`,
    :b2:var:`BelleLastCDCHitX`, etc. and a new variable collection ``belle_track_hit``.
- * Added a new variable :b2:var:`nROE_Composites` to count V0 particles in ROE.
- * Added meta variables corresponding to existing variables that access the MC matched particles of given daughters :b2:var:`mcDaughterDiffOf` , :b2:var:`mcDaughterDiffOfPhi`, :b2:var:`mcDaughterDiffOfPhiCMS`, :b2:var:`mcDaughterAngle`.
- * Added the new variable :b2:var:`mcCosThetaBetweenParticleAndNominalB`. This is an MC version of
-   :b2:var:`cosThetaBetweenParticleAndNominalB` in which all descendant neutrino momenta are subtracted from the B momentum
-   during the calculation.
  * Added new variables :b2:var:`ndf` and :b2:var:`chi2` to return track NDF and Chi2
- * Added the inverse trigonometric functions: :b2:var:`acos`, :b2:var:`asin`.
+ * Added new variable :b2:var:`YAngle` containing value of the vertical beam crossing angle (in the y-z plane) in the MC
+ * Added the variable `particleSource`, which returns the mdst source, i.e. whether the particle was created from a track, an ECL
+   cluster, or a KLM cluster, is a V0 object, an MC particle, or a composite particle.
+ * Exclude SVD from definition of standard global and binary PID variables (like ``electronID``, ``pionID`` etc.). This change is
+   introduced because physical SVD PDFs are available only for some particle hypotheses, but not for others yet.
+ * Added the variable :b2:var:`binaryPID`, which takes two PID codes as arguments and calculates the binary PID between them.
+
+   .. hint:: The hadron PID group recommends to try out the binary PID in analyses and compare the performance with the global PID.
+
 
 Modules
 +++++++
 
- * The :b2:mod:`InclusiveDstarReconstruction` creates antiparticle lists correctly now. The module's input changed to a
-   :ref:`DecayString` of the form ``D* -> pi`` and MC Matching is applicable (one can use :b2:var:`isSignal`).
- * In `BtubeCreator` module, functionality to apply a cut on the confidence level of the fit of fully reconstructed B to the
-   beamspot is added.
  * Added the new wrapper function `applyRandomCandidateSelection`, which uses the :b2:mod:`BestCandidateSelection` module to
    reduce the number of candidates in the input particle list to one candidate per event based on a random value.
- * The ``EventKinematics`` module can now compute event kinematics using generated particles as an input.
- * Arguments of `writePi0EtaVeto` have been updated. ``downloadFlag`` and ``workingDirectory`` have been removed since the
-   download processes can be skipped. New arguments have been added for several reasons. ``suffix`` allows to calculate this
-   veto for multiple photons. ``hardParticle`` allows to call this function for a given particle other than a photon. 
-   Four new arguments have been added to override the payload names and soft photon selections, ``pi0PayloadNameOverride``,
-   ``etaPayloadNameOverride``, ``pi0SoftPhotonCutOverride``, and ``etaSoftPhotonCutOverride``.
- * A new helper method `updateROEUsingV0Lists` has been added to facilitate application of V0Finder results in Rest Of Event.
- * In :b2:mod:`TagVertex`, all charged particles from the ROE are loaded to be included in the tag vertex fit (and not only those with a pion hypothesis)
- * Added a possibility to add a ROE mask for KLM-based particles and an experimental option of including KLM-based particles into ROE 4-vector computation.
-
-   .. warning:: The option ``useKLMEnergy`` of `RestOfEventBuilder` module is only meant for performance studies and NOT for a physics analysis.
-
- * The :b2:mod:`ParticleCombinerFromMC` and the `reconstructMCDecay` function can set decayModeID extraInfo with an argument ``dmID``.
-   One can decide whether charge conjugated mode should be reconstructed with new boolean argument ``chargeConjugation`` (true by default).
- * The :b2:mod:`PrintMCParticles` module and thus also the `printMCParticles` function
-   has a completely new layout that should be much easier to parse, especially for complicated events. By default it shows
-   much less information but in an easier to parse tree representation. See the documentation of `printMCParticles` for details.
+ * In :b2:mod:`TagVertex`, all charged particles from the ROE are loaded to be included in the tag vertex fit (and not only those
+   with a pion hypothesis)
+ * The :b2:mod:`ParticleCombinerFromMC` and the `reconstructMCDecay` function can set decayModeID extraInfo with an argument
+   ``dmID``. One can decide whether charge conjugated mode should be reconstructed with new boolean argument ``chargeConjugation``
+   (true by default).
  * The special treatment of MCMatching for the tau-decay is fixed. The treatment was working fine in release-04, but it was broken
    in the release-05.
-
-Full Event Interpretation
-+++++++++++++++++++++++++
-
- * Added option to reconstruct strange B mesons (at Y(5S)) in 51 decay channels. Can be switched on with the ``strangeB`` flag in `fei.get_default_channels()`.

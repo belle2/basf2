@@ -12,12 +12,11 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
-import ROOT
 
 
-class PlotClusterPositionEstimatorPayload(Module):
+class PlotClusterPositionEstimatorPayload(b2.Module):
     """Plot the PXDClusterPositionEstimator playload """
 
     def __init__(self, resultdir):
@@ -35,7 +34,7 @@ class PlotClusterPositionEstimatorPayload(Module):
 
         # We plot the payload whenever it changes
         if self.position_estimator.hasChanged():
-            B2INFO("PXDClusterPositionEstimator payload has changed. Plot the new payload.")
+            b2.B2INFO("PXDClusterPositionEstimator payload has changed. Plot the new payload.")
             self.plot()
             self.counter += 1
 
@@ -238,7 +237,6 @@ class PlotClusterPositionEstimatorPayload(Module):
         # Read corrections data
         offsetMap = shape_classifier.getOffsetMap()
         likelyhoodMap = shape_classifier.getLikelyhoodMap()
-        shapeLikelyhoodMap = shape_classifier.getShapeLikelyhoodMap()
 
         # Some counters
         nCorrections = 0
@@ -248,7 +246,6 @@ class PlotClusterPositionEstimatorPayload(Module):
         for item in offsetMap:
             shape_index = item.first
             offsets_array = item.second
-            shape_likelyhood = shapeLikelyhoodMap[shape_index]
 
             nShapes += 1
 
@@ -297,10 +294,10 @@ if __name__ == "__main__":
     os.mkdir(os.getcwd() + '/' + args.resultdir)
 
     # Now let's create a path to simulate our events.
-    main = create_path()
+    main = b2.create_path()
     main.add_module("EventInfoSetter", evtNumList=[1])
     main.add_module(PlotClusterPositionEstimatorPayload(args.resultdir))
     main.add_module("Progress")
 
-    process(main)
-    print(statistics)
+    b2.process(main)
+    print(b2.statistics)

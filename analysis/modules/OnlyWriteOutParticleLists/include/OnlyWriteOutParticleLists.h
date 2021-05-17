@@ -14,7 +14,7 @@
 namespace Belle2 {
   /**
    * Marks all objects in DataStore except those of type ParticleList as WrtieOut=False.
-   * Intedend to run before outputting an index file to remove unecessary arrays.
+   * Intended to run before outputting an index file to remove unnecessary arrays.
    */
   class OnlyWriteOutParticleListsModule : public Module {
 

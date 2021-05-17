@@ -9,6 +9,7 @@ import sys
 import subprocess
 import unittest
 import glob
+import shutil
 from typing import Optional, List
 
 # basf2
@@ -72,7 +73,11 @@ class SteeringFileTest(unittest.TestCase):
             expensive_tests = []
         if skip_in_light is None:
             skip_in_light = []
-        working_dir = find_file(path_to_glob)
+        # we have to copy all the steering files (plus other stuffs, like decfiles) we want to test
+        # into a new directory and then cd it as working directory when subprocess.run is executed,
+        # otherwise the test will fail horribly if find_file is calles by one of the steerings.
+        original_dir = find_file(path_to_glob)
+        working_dir = find_file(shutil.copytree(original_dir, 'working_dir'))
         all_egs = sorted(glob.glob(working_dir + "/*.py"))
         for eg in all_egs:
             filename = os.path.basename(eg)
@@ -87,6 +92,7 @@ class SteeringFileTest(unittest.TestCase):
                     ["basf2", "-n1", eg, *additional_arguments],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
+                    cwd=working_dir,
                 )
                 if result.returncode != 0:
                     # failure running example so let's print the output

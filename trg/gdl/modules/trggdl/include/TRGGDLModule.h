@@ -99,6 +99,12 @@ namespace Belle2 {
     // Path to algorithm file
     std::string _algFilePath;
 
+    /// Threshold to determine timing quality flag with MC truth: super fine
+    double _timquality_threshold_sfin;
+
+    /// Threshold to determine timing quality flag with MC truth: fine
+    double _timquality_threshold_fine;
+
   private:
 
     /// A pointer to a TRGGDL;

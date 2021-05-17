@@ -1,3 +1,4 @@
+import os
 import argparse
 import multiprocessing
 
@@ -102,7 +103,9 @@ def start_path(args, location):
     if not args.histo_output_file:
         path.add_module('DqmHistoManager', Port=args.histo_port, DumpInterval=1000, workDirName="/tmp/")
     else:
-        path.add_module('HistoManager', histoFileName=args.histo_output_file)
+        workdir = os.path.dirname(args.histo_output_file)
+        filename = os.path.basename(args.histo_output_file)
+        path.add_module('HistoManager', histoFileName=filename, workDirName=workdir)
 
     return path
 
@@ -255,7 +258,7 @@ def add_expressreco_processing(path,
         path.add_module("PruneDataStore", matchEntries=constants.EXPRESSRECO_INPUT_OBJECTS)
 
     path_utils.add_geometry_if_not_present(path)
-    add_unpackers(path, components=unpacker_components)
+    add_unpackers(path, components=unpacker_components, writeKLMDigitRaws=True)
 
     if do_reconstruction:
         if run_type == constants.RunTypes.beam:

@@ -8,6 +8,7 @@ Changes in the framework package since release-05-01
 Conditions Database
 +++++++++++++++++++
 
+* The format in which local database payloads are created has changed slightly, see :ref:`cdb_payload_creation`
 * ``b2conditionsdb-tag-merge`` has been added to merge a number of globaltags into a single globaltag
   in the order they are given. The result is equivalent to having multiple globaltags setup in the 
   conditions access for basf2.

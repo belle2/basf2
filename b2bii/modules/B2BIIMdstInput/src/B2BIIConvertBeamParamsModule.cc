@@ -123,8 +123,8 @@ namespace Belle2 {
     IntervalOfValidity iov(m_event->getExperiment(), m_event->getRun(), m_event->getExperiment(), m_event->getRun());
 
     BeamParameters beamParams;
-    beamParams.setLER(Eler, angleLer, covarianceHer);
-    beamParams.setHER(Eher, angleHer, covarianceLer);
+    beamParams.setLER(Eler, angleLer, 0, covarianceLer);
+    beamParams.setHER(Eher, angleHer, 0, covarianceHer);
 
     // set the flags according to the module settings.
     int flags = 0;

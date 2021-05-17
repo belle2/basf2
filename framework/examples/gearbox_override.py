@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ############################################################
 # This steering file shows how to use overrides for xml files

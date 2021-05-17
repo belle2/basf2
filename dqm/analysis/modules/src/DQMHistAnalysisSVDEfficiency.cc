@@ -32,6 +32,8 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   //Parameter definition
   B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: Constructor done.");
 
+  setDescription("DQM Analysis Module that computes the average SVD sensor efficiency.");
+
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("SVDrefHisto.root"));
   addParam("effLevel_Error", m_effError, "Efficiency error (%) level (red)", float(0.9));
   addParam("effLevel_Warning", m_effWarning, "Efficiency WARNING (%) level (orange)", float(0.94));

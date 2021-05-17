@@ -31,7 +31,7 @@ namespace Belle2 {
     virtual void collect() override;
 
   private:
-    bool storeGeo = true;; /**< force geometry to be saved first event */
+    bool storeGeo = true; /**< force geometry to be saved first event */
 
     /** Offset between crystal center and lower edge, from database */
     DBObjPtr<ECLCrystalCalib> m_ECLCrystalOffsetTheta; /**< offset in theta */

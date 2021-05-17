@@ -20,6 +20,7 @@ import os
 from glob import glob
 from math import sqrt, frexp, asin
 
+from datetime import datetime, timedelta
 
 #: Tells the automated system some details of this script
 settings = ValidationSettings(name='Beam Spot values',
@@ -169,14 +170,13 @@ def printToFile(arr):
 
 
 # Create a plot with the specified variable
-def plotVar(arr, vName, getterV, getterE=None):
+def plotVar(arr, limits, vName, getterV, getterE=None):
 
     tVals = []
     bsVals = []
     bsErrs = []
     for i, el in enumerate(arr):
         s, e = el[1], el[2]
-        from datetime import datetime, timedelta
         s = datetime.utcfromtimestamp((s + 9) * 3600)
         e = datetime.utcfromtimestamp((e + 9) * 3600)
         tVals.append(s)
@@ -197,7 +197,6 @@ def plotVar(arr, vName, getterV, getterE=None):
                 if getterE is not None:
                     bsErrs.append(np.nan)
 
-    plt.figure(figsize=(12, 6))
     plt.plot(tVals, bsVals)
 
     bsVals = np.array(bsVals)
@@ -207,12 +206,21 @@ def plotVar(arr, vName, getterV, getterE=None):
         plt.fill_between(tVals, bsVals - bsErrs, bsVals + bsErrs, alpha=0.2)
 
     plt.xlabel('time')
-    if 'angle' in vName:
+    if 'Angle' in vName:
         plt.ylabel(vName + ' [urad]')
     else:
         plt.ylabel(vName + ' [um]')
 
-    plt.savefig(vName + '.png')
+    loc = 'plots/allData'
+    if limits is not None:
+        plt.xlim(datetime.strptime(limits[0], '%Y-%m-%d'), datetime.strptime(limits[1], '%Y-%m-%d'))
+        loc = 'plots/' + limits[0] + 'to' + limits[1]
+
+    # if not os.path.isdir(loc):
+    os.makedirs(loc, exist_ok=True)
+
+    plt.savefig(loc + '/' + vName + '.png')
+    plt.clf()
 
 
 def run_validation(job_path, input_data_path, requested_iov, expert_config):
@@ -220,8 +228,13 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     Run the validation.
     '''
 
-    # Expert config is currently dummy
-    expert_config = json.loads(expert_config)
+    # Expert config can contain the time ranges of the plots
+    if expert_config != '':
+        expert_config = json.loads(expert_config)
+
+    allLimits = [None]
+    if expert_config is not None and 'plotsRanges' in expert_config:
+        allLimits += expert_config['plotsRanges']
 
     # Path to the database.txt file and to the payloads.
     inputDir = f'{job_path}/BeamSpot/outputdb'
@@ -230,22 +243,25 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     # print the results to the CSV file
     printToFile(arr)
 
+    plt.figure(figsize=(12, 6))
+
     # plot the results
-    plotVar(arr, 'xIP', lambda e: e[3][0], lambda e: e[4][0])
-    plotVar(arr, 'yIP', lambda e: e[3][1], lambda e: e[4][1])
-    plotVar(arr, 'zIP', lambda e: e[3][2], lambda e: e[4][2])
+    for limits in allLimits:
+        plotVar(arr, limits, 'xIP', lambda e: e[3][0], lambda e: e[4][0])
+        plotVar(arr, limits, 'yIP', lambda e: e[3][1], lambda e: e[4][1])
+        plotVar(arr, limits, 'zIP', lambda e: e[3][2], lambda e: e[4][2])
 
-    plotVar(arr, 'xSize', lambda e: sqrt(e[5][0]))
-    plotVar(arr, 'ySize', lambda e: sqrt(e[5][1]))
-    plotVar(arr, 'zSize', lambda e: sqrt(e[5][2]))
+        plotVar(arr, limits, 'xSize', lambda e: sqrt(e[5][0]))
+        plotVar(arr, limits, 'ySize', lambda e: sqrt(e[5][1]))
+        plotVar(arr, limits, 'zSize', lambda e: sqrt(e[5][2]))
 
-    plotVar(arr, 'xSizeEig', lambda e: e[6][0])
-    plotVar(arr, 'ySizeEig', lambda e: e[6][1])
-    plotVar(arr, 'zSizeEig', lambda e: e[6][2])
+        plotVar(arr, limits, 'xSizeEig', lambda e: e[6][0])
+        plotVar(arr, limits, 'ySizeEig', lambda e: e[6][1])
+        plotVar(arr, limits, 'zSizeEig', lambda e: e[6][2])
 
-    plotVar(arr, 'xzAngle', lambda e: e[6][3])
-    plotVar(arr, 'yzAngle', lambda e: e[6][4])
-    plotVar(arr, 'xyAngle', lambda e: e[6][5])
+        plotVar(arr, limits, 'xzAngle', lambda e: e[6][3])
+        plotVar(arr, limits, 'yzAngle', lambda e: e[6][4])
+        plotVar(arr, limits, 'xyAngle', lambda e: e[6][5])
 
 
 if __name__ == "__main__":

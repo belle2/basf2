@@ -28,7 +28,10 @@ namespace Belle2 {
    *
    * @sa HitPatternCDC
    *
-   * GENERAL COMMENT: 32 Bits are reserved, but only 16 are used so far. Think about a application for them.
+   * 32 Bits are reserved. 4 Bits for each layer: 2 Bits for each PXD normal/gated-mode, 2 Bits for each SVD U/V-side. In total 24 Bits are used to represent hit patterns. Remaining upper 8 Bits are resevered for information.
+   * 8 Bits information is currently only used in V0Finder.
+   *  - 1: V0 daughters share either side of SVDCluster in the innermost hits.
+   *  - 2: V0 daughters share PXDCluster or both sides of SVDClusters in the innermost hits.
    */
   class HitPatternVXD {
     friend class HitPatternVXDTest_General_Test;

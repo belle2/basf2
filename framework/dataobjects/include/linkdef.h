@@ -19,6 +19,7 @@
 #pragma link C++ class Belle2::EventT0::EventT0Component+; // checksum=0x2ca9debe, version=3
 #pragma link C++ class Belle2::BinnedEventT0+; // checksum=0x17a28b5d, version=1
 #pragma link C++ class Belle2::TestChunkData+; // checksum=0x25c3db4e, version=1
+#pragma link C++ class Belle2::TTDEventInfo+;
 
 #pragma link C++ class Belle2::BackgroundMetaData+; // checksum=0x60d78a20, version=4
 #pragma link C++ class Belle2::BackgroundInfo+; // checksum=0x6eb1ad8, version=4

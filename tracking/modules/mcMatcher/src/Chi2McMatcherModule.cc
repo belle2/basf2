@@ -77,6 +77,7 @@ void Chi2McMatcherModule::event()
 {
   StoreArray<MCParticle> MCParticles;
   StoreArray<Track> Tracks;
+
   // get StoreArray length
   int nTracks = Tracks.getEntries();
   int nMCParticles = MCParticles.getEntries();
@@ -88,14 +89,20 @@ void Chi2McMatcherModule::event()
   }
   int count = 0;
   int match_count = 0;
-  B2DEBUG(1, "nMCParticles = " << nMCParticles);
-  B2DEBUG(1, "nTracks = " << nTracks);
 
   double chi2_min;
   int it_min;
   int ip_min;
-  Eigen::MatrixXd Chi2s(nTracks * nMCParticles, 1);
-  Eigen::MatrixXd CompareNumber(nTracks * nMCParticles, 2);
+//  for (auto track:Tracks)
+//  {
+//    for (auto particle:MCParticles)
+//    {
+
+  //B2DEBUG(1,"partilce = "<<particle->getPDG());
+  //B2DEBUG(1,"track = "<<track);
+//      continue;
+//    }
+//  }
   for (int it = 0; it < nTracks; it++) {
     for (int ip = 0; ip < nMCParticles; ip++) {
       auto mcparticle = MCParticles[ip];
@@ -107,12 +114,6 @@ void Chi2McMatcherModule::event()
 
       auto trackfit_wcm = track->getTrackFitResultWithClosestMass(mc_particleType);
       auto Covariance5 = trackfit_wcm->getCovariance5();
-      // Eigen::VectorXd m_HelixParameterErrors(5);
-      // m_HelixParameterErrors[0] =    sqrt((trackfit_wcm->getCovariance5())[0][0]);//D0Err
-      // m_HelixParameterErrors[1] =    sqrt((trackfit_wcm->getCovariance5())[1][1]);//Phi0Err
-      // m_HelixParameterErrors[2] =    sqrt((trackfit_wcm->getCovariance5())[2][2]);//OmegaErr
-      // m_HelixParameterErrors[3] =    sqrt((trackfit_wcm->getCovariance5())[3][3]);//Z0Err
-      // m_HelixParameterErrors[4] =    sqrt((trackfit_wcm->getCovariance5())[4][4]);//TanLamdaErr
 
       Eigen::VectorXd m_TrackHelixParameters(5);
       m_TrackHelixParameters[0] = trackfit_wcm->getD0();    // D0 Helix Parameter
@@ -134,24 +135,28 @@ void Chi2McMatcherModule::event()
       m_McHelixParameters[3] = m_McHelix.getZ0();
       m_McHelixParameters[4] = m_McHelix.getTanLambda();
 
-      auto Covariance5_inv = Covariance5.InvertFast();
+      // Check if Matrix is invertable
+      // alternative: add a very small number to every matrix entry to make it invertable
+      double det = Covariance5.Determinant();
+      double det0 = 0.0;
+      if (det == det0) {
+        continue;
+      }
 
-
-      //Eigen::MatrixXd Covariance5_eigen(5,5);
+      // Invert the matrix
+      auto covariance5_inv = Covariance5.InvertFast();
+      //B2DEBUG(1,"cov_inv = "<<covariance5_inv);
       Eigen::MatrixXd Covariance5_eigen_inv(5, 5);
       for (int i = 0; i == 4; i++) {
         for (int j = 0; j == 4; j++) {
-          Covariance5_eigen_inv(i, j) = Covariance5_inv[i][j];
+          Covariance5_eigen_inv(i, j) = covariance5_inv[i][j];
         }
       }
-      if (Covariance5.Determinant() == (0)) {
-        continue;
-      }
-      //Covariance5_eigen_inv = Covariance5_eigen.inverse();
-      Eigen::VectorXd m_Delta(5);
-      m_Delta = m_TrackHelixParameters - m_McHelixParameters;
 
-      auto Chi2_cur = m_Delta.transpose() * Covariance5_eigen_inv * m_Delta;
+      Eigen::VectorXd delta(5);
+      delta = m_TrackHelixParameters - m_McHelixParameters;
+
+      double Chi2_cur = delta.transpose() * Covariance5_eigen_inv * delta;
 
       if (count == 0) {
         chi2_min = Chi2_cur;
@@ -165,25 +170,12 @@ void Chi2McMatcherModule::event()
         it_min = it;
         ip_min = ip;
       }
-      //CompareNumber(count,0)=it;
-      //CompareNumber(count,1)=ip;
       ++count;
     }
   }
   //int index_min;
   B2DEBUG(1, "chi2_min = " << chi2_min);
-  //if (count>0){
-  //for (int i=0;i<nTracks*nMCParticles;i++){
-  //  if (i==0){
-  //  chi2_min = Chi2s(i);
-  //    index_min = i;
-  //    continue;
-  //  }
-  //  if (chi2_min>Chi2s(i)){
-  //    index_min = i;
-  //    chi2_min = Chi2s(i);
-  //  }
-  //}
+
   // initialize Cut Off
   double CutOff = 0;
   if (m_param_CutOffType == std::string("general")) {
@@ -191,19 +183,24 @@ void Chi2McMatcherModule::event()
   } else if (m_param_CutOffType == std::string("individual")) {
     //int pdg = std::abs(MCParticles[CompareNumber(index_min,1)]->getPDG());
     int pdg = std::abs(MCParticles[ip_min]->getPDG());
-    if (pdg == 11) {CutOff = m_param_IndividualCutOffs[0];}
-    else if (pdg == 13) {CutOff = m_param_IndividualCutOffs[1];}
-    else if (pdg == 211) {CutOff = m_param_IndividualCutOffs[2];}
-    else if (pdg == 2212) {CutOff = m_param_IndividualCutOffs[3];}
-    else if (pdg == 321) {CutOff = m_param_IndividualCutOffs[4];}
-    else if (pdg == 1000010020) {CutOff = m_param_IndividualCutOffs[5];}
+    if (pdg == 11) {
+      CutOff = m_param_IndividualCutOffs[0];
+    } else if (pdg == 13) {
+      CutOff = m_param_IndividualCutOffs[1];
+    } else if (pdg == 211) {
+      CutOff = m_param_IndividualCutOffs[2];
+    } else if (pdg == 2212) {
+      CutOff = m_param_IndividualCutOffs[3];
+    } else if (pdg == 321) {
+      CutOff = m_param_IndividualCutOffs[4];
+    } else if (pdg == 1000010020) {
+      CutOff = m_param_IndividualCutOffs[5];
+    }
   }
   if (chi2_min < CutOff) {
-    //Tracks[CompareNumber(index_min,0)]->addRelationTo(MCParticles[CompareNumber(index_min,1)]);
     Tracks[it_min]->addRelationTo(MCParticles[ip_min]);
     ++match_count;
   }
-  //}
   //B2DEBUG(1,"it_min= "<<it_min<<", ip_min= "<<ip_min);
   //B2DEBUG(1,"count = "<<count);
   //B2DEBUG(1,"match_count = "<<match_count);

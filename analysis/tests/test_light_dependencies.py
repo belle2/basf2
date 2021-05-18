@@ -56,11 +56,11 @@ def get_dependencies(sconscript_filename):
     dependencies = [
         lb.replace("'", "").replace('"', "").strip()
         for lb in re.split(",|\n", dependencies)
-        if not lb.count("#") and not lb == ""
+        if not lb.count("#") and not lb == ''
     ]
     # now just trim only the packagename's from the library names
     # and make a python set of them
-    package_dependencies = set([lb.split("_")[0] for lb in dependencies if lb.split("_")[0] != ''])
+    package_dependencies = set([lb.split("_")[0] for lb in dependencies])
 
     return package_dependencies
 

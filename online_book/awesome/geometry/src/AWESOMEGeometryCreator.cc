@@ -11,7 +11,7 @@
  **************************************************************************/
 
 /* Own header. */
-#include <awesome/geometry/AWESOMEGeometryCreator.h>
+#include <online_book/awesome/geometry/AWESOMEGeometryCreator.h>
 
 /* Belle2 haders. */
 #include <framework/gearbox/Unit.h>

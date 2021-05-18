@@ -12,7 +12,7 @@
  **************************************************************************/
 
 /* Own header. */
-#include <awesome/modules/AWESOMEBasic/AWESOMEBasicModule.h>
+#include <online_book/awesome/modules/AWESOMEBasic/AWESOMEBasicModule.h>
 
 /* Belle2 headers. */
 #include <framework/logging/Logger.h>

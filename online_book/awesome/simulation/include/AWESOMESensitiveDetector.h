@@ -13,7 +13,7 @@
 #pragma once
 
 /* AWESOME headers. */
-#include <awesome/dataobjects/AWESOMESimHit.h>
+#include <online_book/awesome/dataobjects/AWESOMESimHit.h>
 
 /* Belle2 headers. */
 #include <framework/datastore/StoreArray.h>

@@ -1,7 +1,22 @@
 Import('env')
 
-#These are the libraries the awesome package has to be linked against
-env['LIBS'] = ['framework', 'geometry', 'simulation', '$ROOT_LIBS',
-               'simulation_dataobjects',   'awesome_dataobjects', 'mdst_dataobjects']
+# The awesome package depends on the simulation one:
+# this means that it must be ignored by scons when we build a light release.
+if 'simulation' not in env['AVAILABLE_PACKAGES']:
+   env['CONTINUE'] = False
+
+# Mark this package as a sub-library. In case we have to link against awesome,
+# we have to use 'online_book_awesome' as library name.
+env.Dictionary()['SUBLIB'] = True
+
+# These are the libraries the awesome package has to be linked against.
+env['LIBS'] = ['online_book_awesome_dataobjects',
+               'framework',
+               'geometry',
+               'mdst_dataobjects',
+               'simulation',
+               'simulation_dataobjects',
+               '$ROOT_LIBS',
+              ]
 
 Return('env')

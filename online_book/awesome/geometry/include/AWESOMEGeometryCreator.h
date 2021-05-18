@@ -13,7 +13,7 @@
 #pragma once
 
 /* AWESOME headers. */
-#include <awesome/simulation/AWESOMESensitiveDetector.h>
+#include <online_book/awesome/simulation/AWESOMESensitiveDetector.h>
 
 /* Belle2 headers. */
 #include <framework/gearbox/GearDir.h>

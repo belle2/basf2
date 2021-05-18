@@ -62,12 +62,14 @@ def get_dependencies(sconscript_filename):
     return package_dependencies
 
 
-def check_dependencies(forbidden, sconscript_files, error=""):
+def check_dependencies(forbidden, sconscript_files, exceptions, error=""):
     """Check that there are no dependencies that are forbidden.
 
     Parameters:
         forbidden set(str): a set of packages we don't want to depend on
         sconscript_files list(str): a list of paths to sconscript files
+        exceptions list(str): if a sconscript file contains one of the
+          strings listed here, don't check it
         error str: optionally specify the error message
 
     Returns:
@@ -75,7 +77,8 @@ def check_dependencies(forbidden, sconscript_files, error=""):
     """
     n_forbidden = 0
     for sconscript_filename in sconscript_files:
-
+        if any(exception in sconscript_filename for exception in exceptions):
+            continue
         # get the dependencies from this SConscript file
         this_dependencies = get_dependencies(sconscript_filename)
 
@@ -108,6 +111,9 @@ all_packages = all_packages.decode("utf-8").strip().split(" ")
 # the forbidden packages
 non_light_packages = set(all_packages).difference(set(light_packages))
 
+# if a sconscript contains one of this strings, don't check it
+test_exceptions = ['online_book/awesome']
+
 # sum up the return codes
 return_code_sum = 0
 
@@ -116,7 +122,10 @@ start = time()
 for package in light_packages:
     sconscript_files = get_sconscripts(package)
     return_code_sum += check_dependencies(
-        non_light_packages, sconscript_files, "This breaks light releases! Sorry."
+        non_light_packages,
+        sconscript_files,
+        test_exceptions,
+        "This breaks light releases! Sorry."
     )
 
 # test finished, now report

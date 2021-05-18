@@ -44,7 +44,7 @@ AWESOMEGeometryCreator::~AWESOMEGeometryCreator()
     delete m_sensitiveDetector;
 }
 
-void AWESOMEGeometryCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
+void AWESOMEGeometryCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes)
 {
   /* Let's get the stepsize parameter with a default value of 5 µm. */
   double stepSize = content.getLength("stepSize", 5 * Unit::um);

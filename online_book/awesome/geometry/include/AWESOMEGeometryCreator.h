@@ -55,9 +55,8 @@ namespace Belle2::AWESOME {
      * Create the AWESOME detector geometry in the world volume.
      * @param content Gearbox path to the detector geometry.
      * @param topVolume Geant4 world volume.
-     * @param type Geometry type.
      */
-    void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
+    void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes);
 
   private:
 

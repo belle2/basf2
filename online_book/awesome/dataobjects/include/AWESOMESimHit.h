@@ -66,7 +66,7 @@ namespace Belle2 {
 
     /**
      * Set the deposited energy.
-     * @param energy Deposited energy in MeV.
+     * @param energyDep Deposited energy in MeV.
      */
     void setEnergyDep(float energyDep)
     {

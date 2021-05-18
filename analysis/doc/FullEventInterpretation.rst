@@ -429,7 +429,13 @@ should be replaced with:
             else:
                 experiment_min, experiment_max, run_min, run_max = -1, -1, -1, -1
 
+After installing all prerequisites, you would need to get the example `FEIOnGridWorkflow <https://github.com/ArturAkh/FEIOnGridWorkflow.git>`_:
 
+.. code-block:: bash
+
+    cd </path/to/your/work/directory>
+    git clone https://github.com/ArturAkh/FEIOnGridWorkflow.git
+    cd FEIOnGridWorkflow
 
 Troubleshooting
 ###############

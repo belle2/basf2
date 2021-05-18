@@ -89,6 +89,8 @@ void Chi2McMatcherModule::event()
   }
   int count = 0;
   int match_count = 0;
+  int det0_count = 0;
+
 
   double chi2_min;
   int it_min;
@@ -140,12 +142,12 @@ void Chi2McMatcherModule::event()
       double det = Covariance5.Determinant();
       double det0 = 0.0;
       if (det == det0) {
+        ++det0_count;
         continue;
       }
 
       // Invert the matrix
       auto covariance5_inv = Covariance5.InvertFast();
-      //B2DEBUG(1,"cov_inv = "<<covariance5_inv);
       Eigen::MatrixXd Covariance5_eigen_inv(5, 5);
       for (int i = 0; i == 4; i++) {
         for (int j = 0; j == 4; j++) {
@@ -175,29 +177,29 @@ void Chi2McMatcherModule::event()
   }
   //int index_min;
   B2DEBUG(1, "chi2_min = " << chi2_min);
-
+  B2DEBUG(1, "det0_count = " << det0_count);
   // initialize Cut Off
-  double CutOff = 0;
+  double cutOff = 0;
   if (m_param_CutOffType == std::string("general")) {
-    CutOff = m_param_GeneralCutOff;
+    cutOff = m_param_GeneralCutOff;
   } else if (m_param_CutOffType == std::string("individual")) {
     //int pdg = std::abs(MCParticles[CompareNumber(index_min,1)]->getPDG());
     int pdg = std::abs(MCParticles[ip_min]->getPDG());
     if (pdg == 11) {
-      CutOff = m_param_IndividualCutOffs[0];
+      cutOff = m_param_IndividualCutOffs[0];
     } else if (pdg == 13) {
-      CutOff = m_param_IndividualCutOffs[1];
+      cutOff = m_param_IndividualCutOffs[1];
     } else if (pdg == 211) {
-      CutOff = m_param_IndividualCutOffs[2];
+      cutOff = m_param_IndividualCutOffs[2];
     } else if (pdg == 2212) {
-      CutOff = m_param_IndividualCutOffs[3];
+      cutOff = m_param_IndividualCutOffs[3];
     } else if (pdg == 321) {
-      CutOff = m_param_IndividualCutOffs[4];
+      cutOff = m_param_IndividualCutOffs[4];
     } else if (pdg == 1000010020) {
-      CutOff = m_param_IndividualCutOffs[5];
+      cutOff = m_param_IndividualCutOffs[5];
     }
   }
-  if (chi2_min < CutOff) {
+  if (chi2_min < cutOff) {
     Tracks[it_min]->addRelationTo(MCParticles[ip_min]);
     ++match_count;
   }

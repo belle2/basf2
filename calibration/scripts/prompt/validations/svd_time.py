@@ -68,31 +68,40 @@ def run_validation(job_path, input_data_path=None, **kwargs):
 
             histos, exp, run = vu.get_histos(in_file, algo)
 
-            entries_eventT0_ = histos['eventT0'].GetEntries()
-            if run not in entries_eventT0[algo] or entries_eventT0_ > entries_eventT0[algo][run]:
-                agreements[algo][run] = {key: vu.get_agreament(histos['eventT0'], h_diff)
-                                         for key, h_diff in histos['diff'].items()}
-                precisions[algo][run] = {key: vu.get_precision(h_diff)
-                                         for key, h_diff in histos['diff'].items()}
-                discriminations[algo][run] = {key: vu.get_roc_auc(histos['onTracks'][key], histos['offTracks'][key])
-                                              for key in histos['onTracks']}
-                entries_onTracks[algo][run] = {key: val.GetEntries() for key, val in histos['onTracks'].items()}
-                entries_eventT0[algo][run] = entries_eventT0_
+            if histos is None:
+                print(f'Skipping file {in_file_name} for {algo}')
+                continue
 
-                vu.make_combined_plot('*U', histos,
-                                      title=f'exp {exp} run {run} U {algo}')
-                plt.savefig(plots_per_run / f'{exp}_{run}_U_{algo}.pdf')
-                plt.close()
+            # if some histogram is empty (too little stat) do not crash but skip that file for that calibration
+            try:
+                entries_eventT0_ = histos['eventT0'].GetEntries()
+                if run not in entries_eventT0[algo] or entries_eventT0_ > entries_eventT0[algo][run]:
+                    agreements[algo][run] = {key: vu.get_agreament(histos['eventT0'], h_diff)
+                                             for key, h_diff in histos['diff'].items()}
+                    precisions[algo][run] = {key: vu.get_precision(h_diff)
+                                             for key, h_diff in histos['diff'].items()}
+                    discriminations[algo][run] = {key: vu.get_roc_auc(histos['onTracks'][key], histos['offTracks'][key])
+                                                  for key in histos['onTracks']}
+                    entries_onTracks[algo][run] = {key: val.GetEntries() for key, val in histos['onTracks'].items()}
+                    entries_eventT0[algo][run] = entries_eventT0_
 
-                vu.make_combined_plot('*V', histos,
-                                      title=f'exp {exp} run {run} V {algo}')
-                plt.savefig(plots_per_run / f'{exp}_{run}_V_{algo}.pdf')
-                plt.close()
+                    vu.make_combined_plot('*U', histos,
+                                          title=f'exp {exp} run {run} U {algo}')
+                    plt.savefig(plots_per_run / f'{exp}_{run}_U_{algo}.pdf')
+                    plt.close()
 
-                roc_U[algo][run] = vu.make_roc(vu.get_combined(histos['onTracks'], '*U'),
-                                               vu.get_combined(histos['offTracks'], '*U'))
-                roc_V[algo][run] = vu.make_roc(vu.get_combined(histos['onTracks'], '*V'),
-                                               vu.get_combined(histos['offTracks'], '*V'))
+                    vu.make_combined_plot('*V', histos,
+                                          title=f'exp {exp} run {run} V {algo}')
+                    plt.savefig(plots_per_run / f'{exp}_{run}_V_{algo}.pdf')
+                    plt.close()
+
+                    roc_U[algo][run] = vu.make_roc(vu.get_combined(histos['onTracks'], '*U'),
+                                                   vu.get_combined(histos['offTracks'], '*U'))
+                    roc_V[algo][run] = vu.make_roc(vu.get_combined(histos['onTracks'], '*V'),
+                                                   vu.get_combined(histos['offTracks'], '*V'))
+            except AttributeError:
+                print(f'Skipping file {in_file_name} for {algo}')
+                continue
 
         in_file.Close()
 

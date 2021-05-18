@@ -437,6 +437,16 @@ After installing all prerequisites, you would need to get the example `FEIOnGrid
     git clone https://github.com/ArturAkh/FEIOnGridWorkflow.git
     cd FEIOnGridWorkflow
 
+General Workflow Concept
+************************
+
+The `b2luigi` workflow of running FEI on grid is constructed from 4 building blocks
+
+* ``FEIAnalysisTask`` and ``FEIAnalysisSummaryTask``: these tasks are performed to produce FEI training inputs based on `mdst` samples. They are used to run a `basf2` steering file for FEI on grid using `gbasf2` batch system. In one instance of ``FEIAnalysisSummaryTask``, several instances of ``FEIAnalysisTask`` are created, based on the provided dataset list. This allows to run this step on an unlimited number of input files.
+* ``MergeOutputsTask``: After all outputs produced by ``FEIAnalysisSummaryTask`` are downloaded, they need to be merged into a single file to be able to run the MVA training on it.
+* ``FEITrainingTask``: Peforms the MVA training on merged outputs produced by ``MergeOutputsTask``.
+* ``PrepareInputsTask``: After a certain stage of MVA training is performed, all ingredients to produce FEI training inputs for the next stage require an upload to grid storage elements. This is accomplished by this task, such that the ``FEIAnalysisSummaryTask`` can be run for the next stage based on these uploaded ingredients.
+
 Troubleshooting
 ###############
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 import glob
 import re
 import sys
@@ -25,7 +26,8 @@ def get_sconscripts(package):
     Returns:
         list(str): a list of all SConscript files
     """
-    return glob.glob(package + "/**/SConscript", recursive=True)
+    path_to_package = basf2.find_file(package)
+    return glob.glob(f"{path_to_package}/**/SConscript", recursive=True)
 
 
 def get_dependencies(sconscript_filename):
@@ -58,7 +60,8 @@ def get_dependencies(sconscript_filename):
     ]
     # now just trim only the packagename's from the library names
     # and make a python set of them
-    package_dependencies = set([lb.split("_")[0] for lb in dependencies])
+    package_dependencies = set([lb.split("_")[0] for lb in dependencies if lb.split("_")[0] != ''])
+
     return package_dependencies
 
 
@@ -96,13 +99,16 @@ def check_dependencies(forbidden, sconscript_files, error=""):
 
 # grab all of the light release packages
 # (defined by the .light file for the sparse checkout)
-with open(basf2.find_file(".light")) as fi:
+light_file = basf2.find_file(".light")
+with open(light_file) as fi:
     light_packages = [li.strip().replace("/", "") for li in fi if li.strip().endswith("/")]
 
-# we also need all packages (to compare), for this use b2code-package-list
-all_packages = subprocess.Popen(
-    ["b2code-package-list"], stdout=subprocess.PIPE
-).communicate()[0]
+# we also need all packages (to compare), for this use b2code-package-list.
+# note that b2code-package-list has to be executed from the top basf2 directory,
+# since it requires the presence of the .release file: we use cwd for this.
+all_packages = subprocess.check_output(
+    ["b2code-package-list"], cwd=os.path.dirname(light_file),
+)
 all_packages = all_packages.decode("utf-8").strip().split(" ")
 
 # the forbidden packages

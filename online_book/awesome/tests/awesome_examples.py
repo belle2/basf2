@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Test all the steering files used in the online_book lessons.
+Test all the examples of the awesome package.
 Proudly based on analysis/test/examples.py.
 """
 
@@ -62,7 +62,7 @@ class AwesomeExamplesTest(unittest.TestCase):
                 self.assertEqual(result.returncode, 0)
 
     def test_examples(self):
-        """Test examples of the awesome package. """
+        """Run the examples of the awesome package. """
 
         self._test_examples_dir(
             path_to_glob='online_book/awesome/examples',

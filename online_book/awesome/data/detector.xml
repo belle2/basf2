@@ -14,8 +14,10 @@
     <height unit="mm">35.0</height>
   </Global>
 
-  <!-- include basic materials, directories always relative to current directory -->
-  <xi:include href="../geometry/BasicMaterials.xml"/>
+  <!-- include basic materials, directories always relative to current directory.
+       Typically, we have just to use ../geometry as path, but since we are in the
+       online_book directory, we are forced to use ../../ here -->
+  <xi:include href="../../geometry/BasicMaterials.xml"/>
 
   <!-- include the awesome Materials and detector component -->
   <xi:include href="AWESOME-Materials.xml"/>

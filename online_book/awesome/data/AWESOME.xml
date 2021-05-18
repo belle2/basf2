@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <DetectorComponent name="AWESOME">
   <!-- The geometry of this detector component should be created by the
-       Creator called AWESOMECreator. Since it is defined in the awesome
-       package we have to make sure the libawesome.so is loaded --> 
-  <Creator library="awesome">AWESOMECreator</Creator>
+       Creator called AWESOMECreator. Since it is defined in the 
+       online_book_awesome sub-library, we have to make sure that
+       everything is correctly loaded --> 
+  <Creator library="online_book_awesome">AWESOMECreator</Creator>
   <Content>
     <!-- normally, parameters should be defined with a unit attribute. This
          enables automatic conversion to the default framework unit --> 

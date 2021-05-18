@@ -23,7 +23,7 @@ main = b2.create_path()
 main.add_module('EventInfoSetter')
 
 # Main XML parameter file to load, relative to global data directory
-main.add_module('Gearbox', fileName='awesome/detector.xml')
+main.add_module('Gearbox', fileName='online_book/awesome/detector.xml')
 main.add_module('Geometry', useDB=False)
 
 # Shoot some particles into the detector

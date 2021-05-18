@@ -14,9 +14,10 @@ env['LIBS'] = ['online_book_awesome_dataobjects',
                'framework',
                'geometry',
                'mdst_dataobjects',
-               'simulation',
-               'simulation_dataobjects',
                '$ROOT_LIBS',
               ]
+
+if 'simulation' in env['AVAILABLE_PACKAGES']:
+	env['LIBS'] += ['simulation', 'simulation_dataobjects']
 
 Return('env')

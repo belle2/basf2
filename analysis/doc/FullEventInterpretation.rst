@@ -447,6 +447,18 @@ The `b2luigi` workflow of running FEI on grid is constructed from 4 building blo
 * ``FEITrainingTask``: Peforms the MVA training on merged outputs produced by ``MergeOutputsTask``.
 * ``PrepareInputsTask``: After a certain stage of MVA training is performed, all ingredients to produce FEI training inputs for the next stage require an upload to grid storage elements. This is accomplished by this task, such that the ``FEIAnalysisSummaryTask`` can be run for the next stage based on these uploaded ingredients.
 
+In the figure below, the concept of the workflow is visualized.
+
+.. _FEI_Grid_Workflow:
+
+.. figure:: figs/FEI_Grid_Workflow.svg
+  :width: 900
+  :align: left
+
+  Visualization of the workflow concept of FEI training running on grid.
+
+Starting with stage -1, at first the ``FEIAnalysisSummaryTask`` spawns several instances of ``FEIAnalysisTask``, which are created for each line in the dataset filelist, assuming that one line is one dataset. By this task, a cycle of four steps is started, containing ``FEIAnalysisSummaryTask`` at the beginning, followed by ``MergeOutputsTask``, ``FEITrainingTask`` and ``PrepareInputsTask``. As soon as ``FEIAnalysisSummaryTask`` is reached again, the stage number is increased by 1. This cycle is repeated until stage 5 is reached. Then, for stage 6, the workflow ends with ``FEITrainingTask``.
+
 Troubleshooting
 ###############
 

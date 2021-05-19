@@ -155,18 +155,18 @@ void TRGGDLDQMModule::defineHisto()
       h_psn_extra[iskim]->GetXaxis()->SetBinLabel(i + 1, output_extra[i]);
     }
     // output overlap
-    h_psn_overlap[iskim] = new TH1I(Form("hGDL_psn_overlap_%s", skim_smap[iskim].c_str()), "psn overlap", n_output_overlap, 0,
-                                    n_output_overlap);
-    h_psn_overlap[iskim]->LabelsOption("v");
+    h_psn_effect_to_l1[iskim] = new TH1I(Form("hGDL_psn_overlap_%s", skim_smap[iskim].c_str()), "psn overlap", n_output_overlap, 0,
+                                         n_output_overlap);
+    h_psn_effect_to_l1[iskim]->LabelsOption("v");
     for (int i = 0; i < n_output_overlap; i++) {
-      h_psn_overlap[iskim]->GetXaxis()->SetBinLabel(i + 1, output_overlap[i]);
+      h_psn_effect_to_l1[iskim]->GetXaxis()->SetBinLabel(i + 1, output_overlap[i]);
     }
     // output no overlap
-    h_psn_nooverlap[iskim] = new TH1I(Form("hGDL_psn_nooverlap_%s", skim_smap[iskim].c_str()), "psn nooverlap", n_output_overlap, 0,
-                                      n_output_overlap);
-    h_psn_nooverlap[iskim]->LabelsOption("v");
+    h_psn_raw_rate[iskim] = new TH1I(Form("hGDL_psn_nooverlap_%s", skim_smap[iskim].c_str()), "psn nooverlap", n_output_overlap, 0,
+                                     n_output_overlap);
+    h_psn_raw_rate[iskim]->LabelsOption("v");
     for (int i = 0; i < n_output_overlap; i++) {
-      h_psn_nooverlap[iskim]->GetXaxis()->SetBinLabel(i + 1, output_overlap[i]);
+      h_psn_raw_rate[iskim]->GetXaxis()->SetBinLabel(i + 1, output_overlap[i]);
     }
     // output pure extra
     h_psn_pure_extra[iskim] = new TH1I(Form("hGDL_psn_pure_extra_%s", skim_smap[iskim].c_str()), "psn pure extra", n_output_pure_extra,
@@ -1105,144 +1105,144 @@ TRGGDLDQMModule::fillOutputOverlap(void)
 
     //all event
     if (1) {
-      h_psn_overlap[skim[ifill]]->Fill(0.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(0.5);
     }
     //main category
     if (B_CDC_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(1.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(1.5);
     } else if (B_ECL_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(2.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(2.5);
     } else if (LOW_KLM_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(3.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(3.5);
     } else if (LOW_CDC_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(4.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(4.5);
     } else if (LOW_ECL_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(5.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(5.5);
     } else if (CALIB_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(6.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(6.5);
     } else if (MONITOR_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(7.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(7.5);
     } else {
-      h_psn_overlap[skim[ifill]]->Fill(8.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(8.5);
     }
     //detail category
     if (ffy_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(9.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(9.5);
     } else if (fyo_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(10.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(10.5);
     } else if (c4_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(11.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(11.5);
     } else if (hie_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(12.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(12.5);
     } else if (klm_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(13.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(13.5);
     } else if (klm_match_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(14.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(14.5);
     } else if (stt_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(15.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(15.5);
     } else if (short_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(16.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(16.5);
     } else if (ff30_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(17.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(17.5);
     } else if (inner_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(18.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(18.5);
     } else if (lml_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(19.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(19.5);
     } else if (gg_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(20.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(20.5);
     } else if (bhabha_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(21.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(21.5);
     } else if (pid_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(22.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(22.5);
     } else if (bhamon_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(23.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(23.5);
     } else if (eclmumu_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(24.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(24.5);
     } else if (lml1_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(25.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(25.5);
     } else if (lml4_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(26.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(26.5);
     } else if (veto_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(27.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(27.5);
     } else if (random_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(28.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(28.5);
     } else if (ffz_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(29.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(29.5);
     } else if (fzo_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(30.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(30.5);
     } else if (monitor_fired) {
-      h_psn_overlap[skim[ifill]]->Fill(31.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(31.5);
     } else {
-      h_psn_overlap[skim[ifill]]->Fill(32.5);
+      h_psn_effect_to_l1[skim[ifill]]->Fill(32.5);
     }
 
     //all event
     if (1) {
-      h_psn_nooverlap[skim[ifill]]->Fill(0.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(0.5);
     }
     //main category
     if (B_CDC_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(1.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(1.5);
     }  if (B_ECL_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(2.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(2.5);
     }  if (LOW_KLM_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(3.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(3.5);
     }  if (LOW_CDC_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(4.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(4.5);
     }  if (LOW_ECL_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(5.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(5.5);
     }  if (CALIB_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(6.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(6.5);
     }  if (MONITOR_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(7.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(7.5);
     }
     //detail category
     if (ffy_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(9.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(9.5);
     }  if (fyo_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(10.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(10.5);
     }  if (c4_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(11.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(11.5);
     }  if (hie_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(12.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(12.5);
     }  if (klm_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(13.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(13.5);
     }  if (klm_match_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(14.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(14.5);
     }  if (stt_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(15.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(15.5);
     }  if (short_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(16.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(16.5);
     }  if (ff30_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(17.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(17.5);
     }  if (inner_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(18.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(18.5);
     }  if (lml_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(19.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(19.5);
     }  if (gg_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(20.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(20.5);
     }  if (bhabha_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(21.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(21.5);
     }  if (pid_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(22.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(22.5);
     }  if (bhamon_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(23.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(23.5);
     }  if (eclmumu_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(24.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(24.5);
     }  if (lml1_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(25.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(25.5);
     }  if (lml4_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(26.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(26.5);
     }  if (veto_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(27.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(27.5);
     }  if (random_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(28.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(28.5);
     }  if (ffz_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(29.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(29.5);
     }  if (fzo_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(30.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(30.5);
     }  if (monitor_fired) {
-      h_psn_nooverlap[skim[ifill]]->Fill(31.5);
+      h_psn_raw_rate[skim[ifill]]->Fill(31.5);
     }
   }
 }

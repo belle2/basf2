@@ -155,14 +155,15 @@ void TRGGDLDQMModule::defineHisto()
       h_psn_extra[iskim]->GetXaxis()->SetBinLabel(i + 1, output_extra[i]);
     }
     // output overlap
-    h_psn_effect_to_l1[iskim] = new TH1I(Form("hGDL_psn_overlap_%s", skim_smap[iskim].c_str()), "psn overlap", n_output_overlap, 0,
+    h_psn_effect_to_l1[iskim] = new TH1I(Form("hGDL_psn_effect_to_l1_%s", skim_smap[iskim].c_str()), "psn effect to l1",
+                                         n_output_overlap, 0,
                                          n_output_overlap);
     h_psn_effect_to_l1[iskim]->LabelsOption("v");
     for (int i = 0; i < n_output_overlap; i++) {
       h_psn_effect_to_l1[iskim]->GetXaxis()->SetBinLabel(i + 1, output_overlap[i]);
     }
     // output no overlap
-    h_psn_raw_rate[iskim] = new TH1I(Form("hGDL_psn_nooverlap_%s", skim_smap[iskim].c_str()), "psn nooverlap", n_output_overlap, 0,
+    h_psn_raw_rate[iskim] = new TH1I(Form("hGDL_psn_raw_rate_%s", skim_smap[iskim].c_str()), "psn raw rate", n_output_overlap, 0,
                                      n_output_overlap);
     h_psn_raw_rate[iskim]->LabelsOption("v");
     for (int i = 0; i < n_output_overlap; i++) {

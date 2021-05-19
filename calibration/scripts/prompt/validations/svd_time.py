@@ -185,7 +185,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
         plt.close()
 
         plt.figure(figsize=(6.4*max(2, num_files/30), 4.8*2))
-        ax = sns.violinplot(x='run', y=f'entries_onTracks_{algo}', hue='side', data=df, split=True)
+        ax = sns.violinplot(x='run', y=f'entries_onTracks_{algo}', hue='side', data=df, split=True, cut=0)
         ax.xaxis.set_minor_locator(ticker.NullLocator())
         plt.setp(ax.get_xticklabels(), rotation=90)
         plt.tight_layout()

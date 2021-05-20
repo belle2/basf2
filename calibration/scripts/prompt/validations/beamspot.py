@@ -81,26 +81,27 @@ def getEigenPars(SizeM):
 # Load the values of the Beam Spot parameters into the list
 def getBSvalues(path):
     runDict = {}
-    fDB = open(path + '/database.txt')
-    for ll in fDB:
-        ll = ll.strip()
-        ll = ll.split(' ')
-        # print(ll)
-        i = int(ll[1])
-        r = ll[2].split(',')
-        assert(r[0] == r[2])
-        assert(r[1] == r[3])
-        # print(r[0], r[1])
-        runDict[int(i)] = (int(r[0]), int(r[1]))
+    with open(path + '/database.txt') as fDB:
+        for ll in fDB:
+            ll = ll.strip()
+            ll = ll.split(' ')
+
+            # deriving file name
+            fN = ll[0].replace('/', '_') + '_rev_' + ll[1] + '.root'
+
+            r = ll[2].split(',')
+            assert(r[0] == r[2])
+            assert(r[1] == r[3])
+            runDict[fN] = (int(r[0]), int(r[1]))
 
     arr = []
 
     fList = glob(path + '/*.root')
     for fName in fList:
-        r = re.findall("[0-9]+", os.path.basename(fName))
-        Id = int(r[0])
-        f = ROOT.TFile.Open(fName)
+        bName = os.path.basename(fName)
+        runExp = runDict[bName]
 
+        f = ROOT.TFile.Open(fName)
         bsAll = f.Get("BeamSpot")
 
         evNums = bsAll.getEventNumbers()
@@ -121,7 +122,7 @@ def getBSvalues(path):
             tEnd = int(frexp(ipeV(0, 2))[0] * 2**53) % 2**32 / 3600.
 
             eigM = getEigenPars(sizeM)
-            arr.append((runDict[Id], tStart, tEnd, ip, ipe, sizeM, eigM))
+            arr.append((runExp, tStart, tEnd, ip, ipe, sizeM, eigM))
         f.Close()
 
     arr = sorted(arr, key=lambda x: x[1])

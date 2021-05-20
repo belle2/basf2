@@ -16,7 +16,6 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <top/dataobjects/TOPBarHit.h>
 #include <top/dataobjects/TOPDigit.h>
@@ -33,24 +32,9 @@ namespace Belle2 {
     {}
 
 
-    TOPTrack::TOPTrack(const Track& track, std::string digitsName, const Const::ChargedStable& chargedStable)
+    TOPTrack::TOPTrack(const Track& track, const std::string& digitsName, const Const::ChargedStable& chargedStable)
     {
-      // require fitResult
-
-      const auto* fitResult = track.getTrackFitResultWithClosestMass(chargedStable);
-      if (not fitResult) {
-        B2ERROR("No TrackFitResult available for: "
-                << LogVar("PDG code", chargedStable.getPDGCode()));
-        return;
-      }
-
-      // require hits in CDC
-
-      if (fitResult->getHitPatternCDC().getNHits() == 0) return;
-
-      // find extHit and set pointers
-
-      m_track = &track;
+      // find extrapolated track hit at TOP
 
       Const::EDetector myDetID = Const::EDetector::TOP;
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
@@ -70,6 +54,53 @@ namespace Belle2 {
       }
       if (not m_extHit) return;
 
+      // set the object
+
+      set(track, digitsName, chargedStable);
+    }
+
+
+    TOPTrack::TOPTrack(const ExtHit* extHit, const std::string& digitsName)
+    {
+      if (not extHit) return;
+      m_extHit = extHit;
+
+      const auto* track = extHit->getRelated<Track>();
+      if (not track) {
+        B2ERROR("No related Track found for valid extHit");
+        return;
+      }
+
+      auto chargedStable = Const::chargedStableSet.find(abs(extHit->getPdgCode()));
+      if (chargedStable == Const::invalidParticle) {
+        B2ERROR("Extrapolation hypothesis of extHit is not chargedStable particle");
+        return;
+      }
+
+      // set the object
+
+      set(*track, digitsName, chargedStable);
+    }
+
+
+    void TOPTrack::set(const Track& track, const std::string& digitsName, const Const::ChargedStable& chargedStable)
+    {
+      // require fitResult
+
+      const auto* fitResult = track.getTrackFitResultWithClosestMass(chargedStable);
+      if (not fitResult) {
+        B2ERROR("No TrackFitResult available for: "
+                << LogVar("PDG code", chargedStable.getPDGCode()));
+        return;
+      }
+
+      // require hits in CDC
+
+      if (fitResult->getHitPatternCDC().getNHits() == 0) return;
+
+      // set pointers
+
+      m_track = &track;
       m_mcParticle = track.getRelated<MCParticle>();
       if (m_mcParticle) {
         const auto barHits = m_mcParticle->getRelationsWith<TOPBarHit>();
@@ -89,30 +120,29 @@ namespace Belle2 {
 
       // selection of photon hits belonging to this track
 
-      double minTime = TOPRecoManager::getMinTime();
-      double maxTime = TOPRecoManager::getMaxTime();
       unsigned numHitsOtherSlots = 0;
-
       StoreArray<TOPDigit> digits(digitsName);
       for (const auto& digit : digits) {
         if (digit.getHitQuality() != TOPDigit::c_Good) continue;
         if (digit.getModuleID() == m_moduleID) {
           m_selectedHits.push_back(SelectedHit(digit.getPixelID(), digit.getTime(), digit.getTimeError()));
         } else {
-          double time = digit.getTime();
-          if (time < minTime or time > maxTime) continue;
           numHitsOtherSlots++;
         }
       }
 
       // background rate estimation (TODO to be improved ...)
 
+      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+      const auto& tdc = geo->getNominalTDC();
+      double timeWindow = m_feSetting->getReadoutWindows() * tdc.getSyncTimeBase() / TOPNominalTDC::c_syncWindows;
+
       const auto& backgroundPDFs = TOPRecoManager::getBackgroundPDFs();
       unsigned k = m_moduleID - 1;
       double effi = (k < backgroundPDFs.size()) ? backgroundPDFs[k].getEfficiency() : 0;
       double effiSum = 0;
       for (const auto& bkg : backgroundPDFs) effiSum += bkg.getEfficiency();
-      m_bkgRate = (effiSum > effi) ? numHitsOtherSlots * effi / (effiSum - effi) / (maxTime - minTime) : 0;
+      m_bkgRate = (effiSum > effi) ? numHitsOtherSlots * effi / (effiSum - effi) / timeWindow : 0;
 
       // selected photon hits mapped to pixel columns
 
@@ -128,7 +158,7 @@ namespace Belle2 {
         m_columnHits.emplace(col, &hit);
       }
 
-      m_valid = effi > 0; // no sense to provide PID for this track since the module is fully inefficient
+      m_valid = effi > 0; // no sense to provide PID for the track if the module is fully inefficient
     }
 
 

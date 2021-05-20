@@ -115,6 +115,15 @@ namespace Belle2 {
       }
 
       /**
+       * Sets default time window (functions getMinTime(), getMaxTime() will then return default values from DB)
+       */
+      static void setDefaultTimeWindow()
+      {
+        getInstance().m_minTime = 0;
+        getInstance().m_maxTime = 0;
+      }
+
+      /**
        * Sets channel masks
        * @param mask channel mask
        * @param asicMask masked asics

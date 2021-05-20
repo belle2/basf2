@@ -1936,11 +1936,21 @@ class HTCondor(Batch):
         """
         job_dir = Path(cmd[-1]).parent.as_posix()
         sub_out = ""
-        try:
-            sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, cwd=job_dir)
-        except subprocess.CalledProcessError as e:
-            B2ERROR(f"Error during condor_submit: {str(e)}")
-            raise e
+        attempt = 0
+        sleep_time = 30
+
+        while attempt < 3:
+            try:
+                sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, cwd=job_dir)
+                break
+            except subprocess.CalledProcessError as e:
+                attempt += 1
+                if attempt == 3:
+                    B2ERROR(f"Error during condor_submit: {str(e)} occurred more than 3 times.")
+                    raise e
+                else:
+                    B2ERROR(f"Error during condor_submit: {str(e)}, sleeping for {sleep_time} seconds.")
+                    time.sleep(30)
         return sub_out.split()[0]
 
     class HTCondorResult(Result):
@@ -2037,12 +2047,11 @@ class HTCondor(Batch):
 
             job_info = jobs_info[0]
             backend_status = job_info["JobStatus"]
-            # if job is held (backend_status = 5) then report why then kill the job
+            # if job is held (backend_status = 5) then report why then keep waiting
             if backend_status == 5:
                 hold_reason = job_info.get("HoldReason", None)
-                B2WARNING(f"{self.job} on hold because of {hold_reason}. Killing it")
-                subprocess.check_output(["condor_rm", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
-                backend_status = 6
+                B2WARNING(f"{self.job} on hold because of {hold_reason}. Keep waiting.")
+                backend_status = 2
             try:
                 new_job_status = self.backend_code_to_status[backend_status]
             except KeyError as err:

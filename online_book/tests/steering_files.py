@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""" Extended version of analysis/test/examples.py. """
+"""
+Test all the steering files used in the online_book lessons.
+Proudly based on analysis/test/examples.py.
+"""
 
 # std
 import os
@@ -9,6 +12,7 @@ import sys
 import subprocess
 import unittest
 import glob
+import shutil
 from typing import Optional, List
 
 # basf2
@@ -47,7 +51,6 @@ class SteeringFileTest(unittest.TestCase):
         additional_arguments: Optional[List[str]] = None,
         expensive_tests: Optional[List[str]] = None,
         skip_in_light: Optional[List[str]] = None,
-        change_working_directory=True,
     ):
         """
         Internal function to test a directory full of example scripts with an
@@ -64,7 +67,6 @@ class SteeringFileTest(unittest.TestCase):
                 longer and should e.g. not run on bamboo
             skip_in_light (list(str)): (optional) names of scripts that have to
                 be excluded in light builds
-            change_working_directory: Change to path_to_glob for execution
         """
         if additional_arguments is None:
             additional_arguments = []
@@ -74,15 +76,19 @@ class SteeringFileTest(unittest.TestCase):
             expensive_tests = []
         if skip_in_light is None:
             skip_in_light = []
-        working_dir = find_file(path_to_glob)
+        # we have to copy all the steering files (plus other stuffs, like decfiles) we want to test
+        # into a new directory and then cd it as working directory when subprocess.run is executed,
+        # otherwise the test will fail horribly if find_file is called by one of the tested steerings.
+        original_dir = find_file(path_to_glob)
+        working_dir = find_file(shutil.copytree(original_dir, 'working_dir'))
         all_egs = sorted(glob.glob(working_dir + "/*.py"))
         for eg in all_egs:
             filename = os.path.basename(eg)
             if filename in broken:
                 continue
-            if skip_expensive_tests and filename in expensive_tests:
+            if skip_expensive_tests() and filename in expensive_tests:
                 continue
-            if filename in skip_in_light and light_release:
+            if light_release() and filename in skip_in_light:
                 continue
             with self.subTest(msg=filename):
                 result = subprocess.run(
@@ -125,7 +131,6 @@ class SteeringFileTest(unittest.TestCase):
                 "085_module.py",
                 "087_module.py"
             ],
-            change_working_directory=True,
         )
 
 

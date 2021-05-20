@@ -352,9 +352,9 @@ void TRGGDLDQMModule::initialize()
 
   for (unsigned i = 0; i < n_clocks; i++) {
     for (int j = 0; j < n_leafs + n_leafsExtra; j++)h_0_vec.push_back(0);
-    for (int j = 0; j < n_outbit; j++)              h_p_vec.push_back(0);
-    for (int j = 0; j < n_outbit; j++)              h_f_vec.push_back(0);
-    for (int j = 0; j < n_inbit; j++)               h_i_vec.push_back(0);
+    for (unsigned int j = 0; j < n_outbit; j++)              h_p_vec.push_back(0);
+    for (unsigned int j = 0; j < n_outbit; j++)              h_f_vec.push_back(0);
+    for (unsigned int j = 0; j < n_inbit; j++)               h_i_vec.push_back(0);
   }
 
 }
@@ -560,7 +560,7 @@ void TRGGDLDQMModule::event()
       ftd_tmp[0] = h_0_vec[(clk - 1) * (n_leafs + n_leafsExtra) + ee_ftd[0]];
       psn[0] |= psn_tmp[0];
       ftd[0] |= ftd_tmp[0];
-      for (int i = 0; i < 32; i++) {
+      for (unsigned int i = 0; i < 32; i++) {
         if (i >= n_outbit)continue;
         if (psn_tmp[0] & (1 << i)) h_p_vec[(clk - 1)*n_outbit + i] = 1;
         if (ftd_tmp[0] & (1 << i)) h_f_vec[(clk - 1)*n_outbit + i] = 1;
@@ -569,7 +569,7 @@ void TRGGDLDQMModule::event()
       ftd_tmp[1] = h_0_vec[(clk - 1) * n_outbit + ee_ftd[2]] * (1 << 16) + h_0_vec[(clk - 1) * n_outbit + ee_ftd[1]];
       psn[1] |= psn_tmp[1];
       ftd[1] |= ftd_tmp[1];
-      for (int i = 0; i < 32; i++) {
+      for (unsigned int i = 0; i < 32; i++) {
         if (i + 32 >= n_outbit)continue;
         if (psn_tmp[1] & (1 << i)) h_p_vec[(clk - 1)*n_outbit + i + 32] = 1;
         if (ftd_tmp[1] & (1 << i)) h_f_vec[(clk - 1)*n_outbit + i + 32] = 1;

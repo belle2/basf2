@@ -136,7 +136,12 @@ void DQMHistAnalysisHLTModule::initialize()
 
   m_hMeanProcessingTimePerUnit = {
     new TCanvas("HLT/MeanProcessingTimePerUnit"),
-    new TH1F("MeanProcessingTimePerUnit", "Mean proecessing time per unit", 1, 0, 0)
+    new TH1F("MeanProcessingTimePerUnit", "Mean processing time per unit", 1, 0, 0)
+  };
+
+  m_hMeanMemory = {
+    new TCanvas("HLT/MeanMemoryChange"),
+    new TH1F("MeanMemoryChange", "Mean memory change [MB]", 1, 0, 0)
   };
 
 #ifdef _BELLE2_EPICS
@@ -151,7 +156,7 @@ void DQMHistAnalysisHLTModule::initialize()
 
 void DQMHistAnalysisHLTModule::beginRun()
 {
-  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios, m_hMeanTime, m_hMeanBudgetTimePerUnit, m_hMeanProcessingTimePerUnit}) {
+  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios, m_hMeanTime, m_hMeanBudgetTimePerUnit, m_hMeanProcessingTimePerUnit, m_hMeanMemory}) {
     auto* canvas = canvasAndHisto.first;
     canvas->Clear();
   }
@@ -184,6 +189,7 @@ void DQMHistAnalysisHLTModule::event()
   auto* hltUnitNumberHistogram_filtered = findHist("softwaretrigger/hlt_unit_number_after_filter");
   auto* fullTimeMeanPerUnitHistogram = findHist("timing_statistics/fullTimeMeanPerUnitHistogram");
   auto* processingTimeMeanPerUnitHistogram = findHist("timing_statistics/processingTimeMeanPerUnitHistogram");
+  auto* meanMemoryHistogram = findHist("timing_statistics/meanMemoryHistogram");
 
   if (not filterHistogram) {
     B2ERROR("Can not find the filter histogram!");
@@ -223,6 +229,10 @@ void DQMHistAnalysisHLTModule::event()
   }
   if (not processingTimeMeanPerUnitHistogram) {
     B2ERROR("Can not find the HLT processing time per unit histogram!");
+    return;
+  }
+  if (not meanMemoryHistogram) {
+    B2ERROR("Can not find the mean memory change histogram!");
     return;
   }
 
@@ -351,6 +361,9 @@ void DQMHistAnalysisHLTModule::event()
   m_hMeanTime.second = (TH1F*) meanTimeHistogram->Clone("MeanTime");
   m_hMeanTime.second->Scale(1 / numberOfProcesses);
 
+  m_hMeanMemory.second = (TH1F*) meanMemoryHistogram->Clone("MeanMemoryChange");
+  m_hMeanMemory.second->Scale(1 / numberOfProcesses);
+
   m_hErrorFlagFraction.second = (TH1D*) errorFlagHistogram->Clone("ErrorFlagFraction");
   m_hErrorFlagFraction.second->Scale(1 / numberOfAllEvents);
   m_hErrorFlagFraction.second->SetTitle("Fraction of events with error flags");
@@ -365,7 +378,7 @@ void DQMHistAnalysisHLTModule::event()
   m_hMeanProcessingTimePerUnit.second = (TH1F*) processingTimeMeanPerUnitHistogram->Clone("MeanProcessingTimePerUnit");
   m_hMeanProcessingTimePerUnit.second->Divide(processingTimeMeanPerUnitHistogram, processesPerUnitHistogram);
 
-  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios, m_hMeanTime, m_hMeanBudgetTimePerUnit, m_hMeanProcessingTimePerUnit}) {
+  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios, m_hMeanTime, m_hMeanBudgetTimePerUnit, m_hMeanProcessingTimePerUnit, m_hMeanMemory}) {
     auto* canvas = canvasAndHisto.first;
     auto* histogram = canvasAndHisto.second;
 

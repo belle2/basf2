@@ -442,7 +442,7 @@ General Workflow Concept
 
 The `b2luigi` workflow of running FEI on grid is constructed from 4 building blocks
 
-* ``FEIAnalysisTask`` and ``FEIAnalysisSummaryTask``: these tasks are performed to produce FEI training inputs based on `mdst` samples. They are used to run a `basf2` steering file for FEI on grid using `gbasf2` batch system. In one instance of ``FEIAnalysisSummaryTask``, several instances of ``FEIAnalysisTask`` are created, based on the provided dataset list. This allows to run this step on an unlimited number of input files.
+* ``FEIAnalysisTask`` and ``FEIAnalysisSummaryTask``: these tasks are performed to produce FEI training inputs based on `mdst` samples. They are used to run a `basf2` steering file for FEI on grid using `gbasf2` as grid submission tool. In one instance of ``FEIAnalysisSummaryTask``, several instances of ``FEIAnalysisTask`` are created, based on the provided dataset list. This allows to run this step on an unlimited number of input files.
 * ``MergeOutputsTask``: After all outputs produced by ``FEIAnalysisSummaryTask`` are downloaded, they need to be merged into a single file to be able to run the MVA training on it.
 * ``FEITrainingTask``: Peforms the MVA training on merged outputs produced by ``MergeOutputsTask``.
 * ``PrepareInputsTask``: After a certain stage of MVA training is performed, all ingredients to produce FEI training inputs for the next stage require an upload to grid storage elements. This is accomplished by this task, such that the ``FEIAnalysisSummaryTask`` can be run for the next stage based on these uploaded ingredients.
@@ -458,6 +458,40 @@ In the figure below, the concept of the workflow is visualized.
   Visualization of the workflow concept of FEI training running on grid.
 
 Starting with stage -1, at first the ``FEIAnalysisSummaryTask`` spawns several instances of ``FEIAnalysisTask``, which are created for each line in the dataset filelist, assuming that one line is one dataset. By this task, a cycle of four steps is started, containing ``FEIAnalysisSummaryTask`` at the beginning, followed by ``MergeOutputsTask``, ``FEITrainingTask`` and ``PrepareInputsTask``. As soon as ``FEIAnalysisSummaryTask`` is reached again, the stage number is increased by 1. This cycle is repeated until stage 5 is reached. Then, for stage 6, the workflow ends with ``FEITrainingTask``.
+
+
+Technical details
+*****************
+
+In the following, more technical details will be discussed to be able to run FEI on grid.
+
+settings.json
+-------------
+
+The `b2luigi` configuration of the FEI grid workflow is handled by the file `settings.json <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/settings.json>`_. Further below some explanations for the required settings:
+
+* ``gbasf2_install_directory``: Absolute path to the directory where you have installed the `gbasf2` tool. Please correct it to a meaningful path according to the installation you have performed previously.
+* ``gbasf2_input_dslist``: Absolute path to the dataset list of all datasets you would like to process. It is assumed by the ``FEIAnalysisSummaryTask``, that each line corresponds to a dataset sample, such for each line in this dataset list an instance of ``FEIAnalysisTask`` is spawned. An example of a possible dataset list is given below:
+
+.. code-block:: bash
+
+    /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014078/s00/e0000/4S/r00000/mixed/mdst
+    /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014079/s00/e0000/4S/r00000/mixed/mdst
+    /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014088/s00/e0000/4S/r00000/charged/mdst
+    /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014089/s00/e0000/4S/r00000/charged/mdst
+
+* ``gbasf2_project_name_prefix``: Prefix for the `gbasf2` tasks which will be created by `b2luigi` in the FEI grid workflow. Please try to keep it short and it is suggested to you to attach a date to it. Within the workflow, an additional string ``_part{index}`` will be added for each enumerated instance of ``FEIAnalysisTask``, and `b2luigi` adds an additional hash number to the project name to keep it unique.
+* ``gbasf2_release``: The release to be used on grid. Please make a choice here depending on what is supported by the `gbasf2` release you have checked out. You don't have to worry about the case, that the developments in `basf2` specific to running FEI training on grid might not be contained in the official release. The FEI training steering file is adapted such, that it can run both with a development and an official release.
+* ``gbasf2_print_status_updates``: Convenient option to monitor the progress of running `gbasf2` tasks submitted by the FEI grid workflow, so it is good to set it to ``true``. As an alternative, the progress can also be monitored with the `Job Monitor` application of `Belle II DIRAC <https://dirac.cc.kek.jp:8443/DIRAC/>`_.
+* ``gbasf2_noscout``: Option to disable scouting, which would slow down the progress. Feel free to activate it for testing purposes.
+* ``gbasf2_basf2opt``: To reduce the amount of print output of the `gbasf2` jobs, this option should be set to ``"-l ERROR"``, which is then passed to the `basf2` steering file. Having too many print outputs may cause problems on grid worker nodes.
+* ``gbasf2_max_retries``: An option that handles how often a job is allowed to be resubmitted, before its `gbasf2` task is marked as failed in the `b2luigi` workflow. Since it is well possible that individual jobs fail due to connection issues or temporarily bad sites, it is good to set that option to a relatively high number, e.g. 5 or even 10. Of course, you are advised to have a look at log files of failed jobs in any case, e.g. by using `Belle II DIRAC <https://dirac.cc.kek.jp:8443/DIRAC/>`_ for that.
+* ``gbasf2_download_logs``: To reduce the overall time of the FEI grid workflow, this option should be disabled by setting it to ``false``. You can have a look at specific job logs by using `Belle II DIRAC <https://dirac.cc.kek.jp:8443/DIRAC/>`_.
+* ``remote_tmp_directory``: This option is used by the ``PrepareInputsTask`` to upload tarballs of input files required by ``FEIAnalysisTask`` running on grid. The directory specified in this option serves as a main directory, where several subdirectories will be created by the uploads performed by ``PrepareInputsTask``. To be able to access your temporary user folders on remote storage elements, the directory name should contain ``/belle/user/<your-grid-username>``.
+* ``remote_initial_se``: Initial storage element used by the ``PrepareInputsTask`` to upload the tarballs for the first time. After that first upload, the tarballs are replicated to storage elements corresponding to the ones, where the datasets specified in ``gbasf2_input_dslist`` are located. Possible initial storage element would be e.g. ``"KIT-TMP-SE"``.
+* ``local_cpus``: Number of CPU's used in parallel by the ``MergeOutputsTask`` on the local machine you are using. Please specifiy a sensible number, which does not lead to an overloaded machine.
+* ``working_dir``, ``log_dir`` and ``result_dir``: directories used by `b2luigi` for processing the specified workflow. In case of the FEI grid worklow, please choose a local storage element with enough space of at least several 100 GB.
+* ``executable``: List of executables to be used for the `b2luigi` tasks, to be specified in this case to ``["python3"]``.
 
 Troubleshooting
 ###############

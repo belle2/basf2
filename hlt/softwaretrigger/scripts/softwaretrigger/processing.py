@@ -183,7 +183,6 @@ def add_hlt_processing(path,
         path_utils.hlt_event_abort(hlt_filter_module, "==0", ROOT.Belle2.EventMetaData.c_HLTDiscard)
         # (2) the event is accepted -> go on with the hlt reconstruction
         hlt_filter_module.if_value("==1", accept_path, basf2.AfterConditionPath.CONTINUE)
-        accept_path.add_module('StatisticsSummary').set_name('Sum_HLT_Discard')
     elif softwaretrigger_mode == constants.SoftwareTriggerModes.monitor:
         # Otherwise just always go with the accept path
         path.add_path(accept_path)

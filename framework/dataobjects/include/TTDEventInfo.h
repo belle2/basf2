@@ -9,7 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <bitset>
+#include <limits>
+
 #include <TObject.h>
 
 namespace Belle2 {
@@ -19,51 +20,57 @@ namespace Belle2 {
   class TTDEventInfo : public TObject {
 
   public:
-    /// Default constructor
-    TTDEventInfo() {}
+    /// Constructor
+    explicit TTDEventInfo(bool isValid = false, bool isHER = false, bool revo2 = false,
+                          unsigned int timeSinceLastInjection = std::numeric_limits<unsigned int>::max(),
+                          unsigned int bunchNumber = std::numeric_limits<unsigned int>::max()) :
+      m_isValid(isValid), m_isHER(isHER), m_revo2(revo2), m_timeSinceLastInjection(timeSinceLastInjection),
+      m_bunchNumber(bunchNumber) {}
     /// Destructor
     ~TTDEventInfo() {}
 
     // Getters
-    /// get if an injection happened recently (and the stored data is actually valid)
-    bool getHasInjection() {return m_TTDflags[c_hasInjection];}
+    /// get if stored information is valid
+    bool isValid() {return m_isValid;}
     /// get if injection in HER/LER
-    bool getIsHER() {return m_TTDflags[c_isHER];}
+    bool isHER() {return m_isHER;}
     /// get lowest bit of revolution counter
-    bool getRevo2() {return m_TTDflags[c_revo2];}
+    bool revo2() {return m_revo2;}
     /// get time since the last injection in clock ticks (FTSW clock)
     unsigned int getTimeSinceLastInjection() {return m_timeSinceLastInjection;}
     /// get number of injected bunch
     unsigned int getBunchNumber() {return m_bunchNumber;}
+    /// get if an injection happened recently (and the corresponding stored data is actually valid)
+    bool hasInjection() {return m_timeSinceLastInjection == std::numeric_limits<unsigned int>::max();}
 
     // Setters
-    /// set that injection happened recently
-    void setHasInjection(bool isInjection) {m_TTDflags[c_hasInjection] = isInjection;}
+    /// set that stored information is valid
+    void setValid() {m_isValid = true;}
+    /// set that stored information is valid
+    void setInvalid() {m_isValid = false;}
     /// set if injection in HER/LER
-    void setIsHER(bool isHER) {m_TTDflags[c_isHER] = isHER;}
+    void setIsHER(bool isHER) {m_isHER = isHER;}
     /// set lowest bit of revolution counter
-    void setRevo2(bool revo2) {m_TTDflags[c_revo2] = revo2;}
+    void setRevo2(bool revo2) {m_revo2 = revo2;}
     /// set time since the last injection in clock ticks (FTSW clock)
     void setTimeSinceLastInjection(unsigned int timeSinceLastInjection) {m_timeSinceLastInjection = timeSinceLastInjection;}
     /// set number of injected bunch
     void setBunchNumber(unsigned int bunchNumber) {m_bunchNumber = bunchNumber;}
+    /// set that no injection happened recently (and the corresponding stored data is actually invalid)
+    void setNoInjection() {m_timeSinceLastInjection = std::numeric_limits<unsigned int>::max();}
 
 
   private:
-    /// Use a bitset to save some space in file (compared to individual bools)
-    std::bitset<4> m_TTDflags{"0000"};
-    /// Enum to specify meaning of bits in m_flags bitset
-    /// DOES THIS HAVE TO GO TO A .cc FILE SO IT IS NOT WRITTEN TO A FILE?
-    enum E_TTDflags {
-      c_hasInjection = 0, ///< the data stored in the TTDEventInfo is actually valid and an injection took place recently
-      c_isHER        = 1, ///< injection in HER/LER
-      c_revo2        = 2, ///< lowest bit of revolution counter (PXD needs ~2 revolutions to readout one frame)
-      c_UNUSED       = 3, ///< UNUSED: maybe we could set a flag if it was a 2-bunch injection?
-    };
+    /// Data stored in the TTD info is actually valid
+    bool m_isValid;
+    /// Injection in HER/LER
+    bool m_isHER;
+    /// Lowest bit of revolution counter (PXD needs ~2 revolutions to readout one frame)
+    bool m_revo2;
     /// Time since the last injection in clock ticks (FTSW clock)
-    unsigned int m_timeSinceLastInjection = 0;
+    unsigned int m_timeSinceLastInjection;
     /// Number of injected bunch
-    unsigned int m_bunchNumber = 0;
+    unsigned int m_bunchNumber;
 
     ClassDef(TTDEventInfo, 1) ///< Storage element for TTD information
   };

@@ -108,12 +108,12 @@ def getBSvalues(path):
         for i in range(len(evNums) + 1):
             bs = bsAll.getObjectByIndex(i)
             ipV = bs.getIPPosition()
-            ip = [1e4 * ipV(i) for i in range(3)]
+            ip = [1e4 * ipV(i) for i in range(3)]  # from cm to um
             ipeV = bs.getIPPositionCovMatrix()
-            ipe = [1e4 * sqrt(ipeV(i, i)) for i in range(3)]
+            ipe = [1e4 * sqrt(ipeV(i, i)) for i in range(3)]  # from cm to um
             covM = bs.getSizeCovMatrix()
             sizeM = (covM(0, 0), covM(1, 1), covM(2, 2), covM(0, 1), covM(0, 2), covM(1, 2))
-            sizeM = [1e8 * x for x in sizeM]
+            sizeM = [1e8 * x for x in sizeM]  # from cm2 to um2
 
             tStart = ipeV(0, 1) * 1e20
             tEnd = ipeV(0, 2) * 1e20
@@ -122,6 +122,7 @@ def getBSvalues(path):
 
             eigM = getEigenPars(sizeM)
             arr.append((runDict[Id], tStart, tEnd, ip, ipe, sizeM, eigM))
+        f.Close()
 
     arr = sorted(arr, key=lambda x: x[1])
 
@@ -132,41 +133,41 @@ def getBSvalues(path):
 
 def printToFile(arr):
 
-    outFile = open('bsData.csv', 'w')
-    outFile.write('exp  run  tStart  tEnd  xIP  yIP  zIP  xeIP  yeIP  zeIP  sXX  sYY  sZZ  sXY  sXZ  '
-                  + 'sYZ  xSizeEig  ySizeEig  zSizeEig  xzAngle  yzAngle  xyAngle\n')
+    with open('bsData.csv', 'w') as outFile:
+        outFile.write('exp  run  tStart  tEnd  xIP  yIP  zIP  xeIP  yeIP  zeIP  sXX  sYY  sZZ  sXY  sXZ  '
+                      + 'sYZ  xSizeEig  ySizeEig  zSizeEig  xzAngle  yzAngle  xyAngle\n')
 
-    for e in arr:
-        outFile.write(
-            # exp  run
-            str(e[0][0]) + ' ' +
-            str(e[0][1]) + ' ' +
-            # tStart  tEnd
-            str(e[1]) + ' ' +
-            str(e[2]) + ' ' +
-            # xIP  yIP  zIP
-            str(e[3][0]) + ' ' +
-            str(e[3][1]) + ' ' +
-            str(e[3][2]) + ' ' +
-            # xeIP  yeIP  zeIP
-            str(e[4][0]) + ' ' +
-            str(e[4][1]) + ' ' +
-            str(e[4][2]) + ' ' +
-            # sXX  sYY  sZZ  sXY  sXZ  sYZ
-            str(e[5][0]) + ' ' +
-            str(e[5][1]) + ' ' +
-            str(e[5][2]) + ' ' +
-            str(e[5][3]) + ' ' +
-            str(e[5][4]) + ' ' +
-            str(e[5][5]) + ' ' +
-            # xSizeEig  ySizeEig  zSizeEig  xzAngle  yzAngle  xyAngle
-            str(e[6][0]) + ' ' +
-            str(e[6][1]) + ' ' +
-            str(e[6][2]) + ' ' +
-            str(e[6][3]) + ' ' +
-            str(e[6][4]) + ' ' +
-            str(e[6][5]) + '\n')
-    return arr
+        for e in arr:
+            outFile.write(
+                # exp  run
+                str(e[0][0]) + ' ' +
+                str(e[0][1]) + ' ' +
+                # tStart  tEnd
+                str(e[1]) + ' ' +
+                str(e[2]) + ' ' +
+                # xIP  yIP  zIP
+                str(e[3][0]) + ' ' +
+                str(e[3][1]) + ' ' +
+                str(e[3][2]) + ' ' +
+                # xeIP  yeIP  zeIP
+                str(e[4][0]) + ' ' +
+                str(e[4][1]) + ' ' +
+                str(e[4][2]) + ' ' +
+                # sXX  sYY  sZZ  sXY  sXZ  sYZ
+                str(e[5][0]) + ' ' +
+                str(e[5][1]) + ' ' +
+                str(e[5][2]) + ' ' +
+                str(e[5][3]) + ' ' +
+                str(e[5][4]) + ' ' +
+                str(e[5][5]) + ' ' +
+                # xSizeEig  ySizeEig  zSizeEig  xzAngle  yzAngle  xyAngle
+                str(e[6][0]) + ' ' +
+                str(e[6][1]) + ' ' +
+                str(e[6][2]) + ' ' +
+                str(e[6][3]) + ' ' +
+                str(e[6][4]) + ' ' +
+                str(e[6][5]) + '\n')
+        return arr
 
 
 # Create a plot with the specified variable
@@ -177,7 +178,7 @@ def plotVar(arr, limits, vName, getterV, getterE=None):
     bsErrs = []
     for i, el in enumerate(arr):
         s, e = el[1], el[2]
-        s = datetime.utcfromtimestamp((s + 9) * 3600)
+        s = datetime.utcfromtimestamp((s + 9) * 3600)  # Convert to the JST (+9 hours)
         e = datetime.utcfromtimestamp((e + 9) * 3600)
         tVals.append(s)
         tVals.append(e)

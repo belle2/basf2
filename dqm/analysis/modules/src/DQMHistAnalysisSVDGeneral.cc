@@ -49,10 +49,9 @@ DQMHistAnalysisSVDGeneralModule::DQMHistAnalysisSVDGeneralModule()
   addParam("statThreshold", m_statThreshold, "Minimal number of events to compare histograms", int(10000));
   addParam("timeThreshold", m_timeThreshold, "Acceptable difference between mean of central peak for present and reference run",
            float(4)); // 4 ns
-  addParam("refMCTP", m_refMCTP, "Mean of central peak from Physics reference run", float(-1.226)); // e14r826
-  addParam("refMCTC", m_refMCTC, "Mean of central peak from Cosmic reference run", float(4.938)); // e14r1182
+  addParam("refMCTP", m_refMeanP, "Mean of the signal time peak from Physics reference run", float(-1.226)); // e14r826
+  addParam("refMCTC", m_refMeanC, "Mean of the signal time peak from Cosmic reference run", float(4.938)); // e14r1182
 }
-
 
 DQMHistAnalysisSVDGeneralModule::~DQMHistAnalysisSVDGeneralModule() { }
 
@@ -335,12 +334,12 @@ void DQMHistAnalysisSVDGeneralModule::event()
     bool hasError = false;
     if (nEvents > m_statThreshold) {
       if (runtype == "physics") {
-        Float_t difference_physics = fabs(mean_PeakInCenter - m_refMCTP);
+        Float_t difference_physics = fabs(mean_PeakInCenter - m_refMeanP);
         if (difference_physics > m_timeThreshold) {
           hasError = true;
         }
       } else if (runtype == "cosmic") {
-        Float_t difference_cosmic = fabs(mean_PeakInCenter - m_refMCTC);
+        Float_t difference_cosmic = fabs(mean_PeakInCenter - m_refMeanC);
         if (difference_cosmic > m_timeThreshold) {
           hasError = true;
         }

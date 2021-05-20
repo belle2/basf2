@@ -50,8 +50,8 @@ namespace Belle2 {
 
     int m_statThreshold; /**< minimal number of events to compare histograms */
     float m_timeThreshold; /**< difference between mean of cluster time for present and reference run */
-    float m_refMCTP; /**< mean of central peak from Physics reference run */
-    float m_refMCTC; /**< mean of central peak from Cosmic reference run */
+    float m_refMeanP; /**< mean of the signal time peak from Physics reference run */
+    float m_refMeanC; /**< Mean of the signal time peak from Cosmic reference run */
 
     //! Parameters accesible from basf2 scripts
     //  protected:

@@ -61,6 +61,10 @@ namespace Belle2 {
     std::pair<TCanvas*, TH1D*> m_hErrorFlagFraction = {nullptr, nullptr};
     /// Histogram with fraction of events filtered per unit
     std::pair<TCanvas*, TH1D*> m_hFilteredFractionPerUnit = {nullptr, nullptr};
+    /// Histogram with mean budget time per unit per process
+    std::pair<TCanvas*, TH1F*> m_hMeanBudgetTimePerUnit = {nullptr, nullptr};
+    /// Histogram with mean processing time per unit per process
+    std::pair<TCanvas*, TH1F*> m_hMeanProcessingTimePerUnit = {nullptr, nullptr};
 
 #ifdef _BELLE2_EPICS
     //! one EPICS PV

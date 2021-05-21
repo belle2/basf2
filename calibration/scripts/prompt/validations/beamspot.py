@@ -23,7 +23,7 @@ from math import sqrt, frexp, asin
 from datetime import datetime, timedelta
 
 #: Tells the automated system some details of this script
-settings = ValidationSettings(name='Beam Spot values',
+settings = ValidationSettings(name='BeamSpot Calibrations',
                               description=__doc__,
                               download_files=['stdout'],
                               expert_config={})

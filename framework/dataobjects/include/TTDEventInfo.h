@@ -13,6 +13,9 @@
 
 #include <TObject.h>
 
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
+
 namespace Belle2 {
   /**
    * Storage element for information from the Trigger Timing Distribution (TTD).
@@ -29,13 +32,13 @@ namespace Belle2 {
     /// Destructor
     ~TTDEventInfo() {}
 
-    // Getters
+    // Simple Getters
     /// get if stored information is valid
     bool isValid() {return m_isValid;}
     /// get if injection in HER/LER
     bool isHER() {return m_isHER;}
     /// get lowest bit of revolution counter
-    bool revo2() {return m_revo2;}
+    bool isRevo2() {return m_revo2;}
     /// get time since the last injection in clock ticks (FTSW clock)
     unsigned int getTimeSinceLastInjection() {return m_timeSinceLastInjection;}
     /// get number of injected bunch
@@ -43,7 +46,7 @@ namespace Belle2 {
     /// get if an injection happened recently (and the corresponding stored data is actually valid)
     bool hasInjection() {return m_timeSinceLastInjection == std::numeric_limits<unsigned int>::max();}
 
-    // Setters
+    // Simple Setters
     /// set that stored information is valid
     void setValid() {m_isValid = true;}
     /// set that stored information is valid
@@ -59,6 +62,10 @@ namespace Belle2 {
     /// set that no injection happened recently (and the corresponding stored data is actually invalid)
     void setNoInjection() {m_timeSinceLastInjection = std::numeric_limits<unsigned int>::max();}
 
+    // Additional Functions (not inline)
+    /// get time since the last injection in microseconds
+    Double_t getTimeSinceLastInjectionInMicroSeconds();
+
 
   private:
     /// Data stored in the TTD info is actually valid
@@ -69,8 +76,10 @@ namespace Belle2 {
     bool m_revo2;
     /// Time since the last injection in clock ticks (FTSW clock)
     unsigned int m_timeSinceLastInjection;
-    /// Number of injected bunch
+    /// Number of triggered bunch
     unsigned int m_bunchNumber;
+    /// The clock, to translate clock ticks to microseconds
+    DBObjPtr<HardwareClockSettings> m_clockSettings; //! tells ROOT not to write it to file (transient)
 
     ClassDef(TTDEventInfo, 1) ///< Storage element for TTD information
   };

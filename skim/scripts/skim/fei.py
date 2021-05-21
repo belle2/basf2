@@ -184,7 +184,7 @@ class BaseFEISkim(BaseSkim):
             path (`basf2.Path`): The skim path to be processed.
         """
         # Run FEI
-        b2.conditions.prepend_globaltag("analysis_tools_light-2104-poseidon")  # ma.getAnalysisGlobaltag())
+        b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
         particles = fei.get_default_channels(**FEIChannelArgs)
         configuration = fei.config.FeiConfiguration(
             prefix=FEIPrefix,

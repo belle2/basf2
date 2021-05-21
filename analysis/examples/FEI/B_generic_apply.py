@@ -15,8 +15,6 @@ ma.inputMdst(environmentType='default',
              path=path)
 
 # Add the necessary database
-# You can use the command b2conditionsdb-recommend
-# b2.conditions.globaltags = ['name of analysis global tag']
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
 # Get FEI default channels.

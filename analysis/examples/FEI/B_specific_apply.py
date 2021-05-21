@@ -75,7 +75,7 @@ path.add_module(skimfilter)
 fei_tag = 'FEIv4_2020_MC13_release_04_01_01'
 
 # Add the necessary database
-# b2.conditions.globaltags = ['name of database containing the specific training']
+# b2.conditions.prepend_globaltag('name of database containing the specific training')
 
 # Here we use a generic FEI training to demonstrate applying the FEI in an ROE of the signal
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())

@@ -1,5 +1,4 @@
 """
-
 This module implements the ResNet generator model.
 """
 
@@ -8,11 +7,14 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+##
+# Class for the residual block layer.
 class ResidualBlock(nn.Module):
-    """"""
+    """Residual block layer."""
 
+    ##
+    # Constructor to create a new residual block layer.
     def __init__(self, ninput, noutput, upsample=True):
-        """"""
         super().__init__()
         self.upsample = upsample
         # shortcut branch
@@ -25,8 +27,10 @@ class ResidualBlock(nn.Module):
         self.norm2 = nn.BatchNorm2d(noutput)
         self.conv2 = nn.Conv2d(noutput, noutput, 3, 1, 1)
 
+    ##
+    # Function to perform a forward pass.
     def forward(self, x):
-        """"""
+        """Compute the layer output for a given input."""
         # residual branch
         h = x
         h = self.norm1(h)
@@ -47,34 +51,37 @@ class ResidualBlock(nn.Module):
 
     ##
     # @var upsample
-    # Whether to double the height and width of inputs
+    # Whether to double the height and width of input
 
     ##
     # @var conv
-    # Convolutional layer in 2D - shortcut branch
+    # Convolutional layer in the shortcut branch
 
     ##
     # @var norm1
-    # Batch normalization layer in 2D - residual branch
+    # First batch normalization layer in the residual branch
 
     ##
     # @var conv1
-    # Convolutional layer in 2D - residual branch
+    # First convolutional layer in the residual branch
 
     ##
     # @var norm2
-    # Batch normalization layer in 2D - residual branch
+    # Second batch normalization layer in the residual branch
 
     ##
     # @var conv2
-    # Convolutional layer in 2D - residual branch
+    # Second convolutional layer in the residual branch
 
 
+##
+# Class for the ResNet generator model.
 class Model(nn.Module):
-    """"""
+    """ResNet generator model."""
 
+    ##
+    # Constructor to create a new model instance.
     def __init__(self):
-        """"""
         super().__init__()
         # fully-connected inputs
         self.fc = nn.Linear(96, 49152)
@@ -98,8 +105,10 @@ class Model(nn.Module):
         self.norm = nn.BatchNorm2d(16)
         self.conv = nn.Conv2d(16, 1, 3, 1, 1)
 
+    ##
+    # Function to perform a forward pass.
     def forward(self, z):
-        """"""
+        """Compute the model output for a given input."""
         z = self.fc(z)
         z = z.view(-1, 256, 8, 24)
         for block in self.blocks:
@@ -115,19 +124,24 @@ class Model(nn.Module):
 
     ##
     # @var blocks
-    # Sequence of residual blocks
+    # Sequence of residual block layers
 
     ##
     # @var norm
-    # Batch normalization in 2D
+    # Batch normalization layer
 
     ##
     # @var conv
-    # Convolutional layer in 2D
+    # Convolutional layer
 
 
+##
+# Function to produce one pseudo-random image for each PXD module
+# using the ResNet generator model.
 def generate(model):
-    """"""
+    """Produce one pseudo-random image for each PXD module
+    using the ResNet generator model.
+    """
     # infer the device that is in use
     device = next(model.parameters()).device
     # without computing gradients

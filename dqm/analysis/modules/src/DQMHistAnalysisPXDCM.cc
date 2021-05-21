@@ -34,10 +34,18 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:CommonMode:"));
   addParam("useEpics", m_useEpics, "useEpics", true);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 10000);
-  addParam("warnMeanAdhoc", m_warnMeanAdhoc, "warn level for peak position", 1.0);
-  addParam("errorMeanAdhoc", m_errorMeanAdhoc, "error level for peak position", 2.0);
-  addParam("warnOutside", m_warnOutside, "warn level for outside fraction", 1e-5);
-  addParam("errorOutside", m_errorOutside, "error level for outside fraction", 1e-4);
+
+  addParam("warnMeanAdhoc", m_warnMeanAdhoc, "warn level for peak position", 2.0);
+  addParam("errorMeanAdhoc", m_errorMeanAdhoc, "error level for peak position", 3.0);
+  addParam("warnOutsideAdhoc", m_warnOutsideAdhoc, "warn level for outside fraction", 1e-5);
+  addParam("errorOutsideAdhoc", m_errorOutsideAdhoc, "error level for outside fraction", 1e-4);
+  addParam("upperLineAdhoc", m_upperLineAdhoc, "upper threshold and line for outside fraction", 17);
+
+  addParam("warnMeanFull", m_warnMeanFull, "warn level for peak position", 2.0);
+  addParam("errorMeanFull", m_errorMeanFull, "error level for peak position", 3.0);
+  addParam("warnOutsideFull", m_warnOutsideFull, "warn level for outside fraction", 1e-5);
+  addParam("errorOutsideFull", m_errorOutsideFull, "error level for outside fraction", 1e-4);
+  addParam("upperLineFull", m_upperLineFull, "upper threshold and line for outside fraction", 17);
   B2DEBUG(99, "DQMHistAnalysisPXDCM: Constructor done.");
 }
 
@@ -98,17 +106,17 @@ void DQMHistAnalysisPXDCMModule::initialize()
 
   /// FIXME were to put the lines depends ...
   m_line1 = new TLine(0, 10, m_PXDModules.size(), 10);
-  m_line2 = new TLine(0, 16, m_PXDModules.size(), 16);
-//   m_line3 = new TLine(0, 3, m_PXDModules.size(), 3);
+  m_lineA = new TLine(0, m_upperLineAdhoc, m_PXDModules.size(), m_upperLineAdhoc);
+  m_lineF = new TLine(0, m_upperLineFull, m_PXDModules.size(), m_upperLineFull);
   m_line1->SetHorizontal(true);
   m_line1->SetLineColor(3);// Green
   m_line1->SetLineWidth(3);
-  m_line2->SetHorizontal(true);
-  m_line2->SetLineColor(1);// Black
-  m_line2->SetLineWidth(3);
-//   m_line3->SetHorizontal(true);
-//   m_line3->SetLineColor(1);
-//   m_line3->SetLineWidth(3);
+  m_lineA->SetHorizontal(true);
+  m_lineA->SetLineColor(1);// Black
+  m_lineA->SetLineWidth(3);
+  m_lineF->SetHorizontal(true);
+  m_lineF->SetLineColor(1);// Black
+  m_lineF->SetLineWidth(3);
 
 
 #ifdef _BELLE2_EPICS
@@ -151,8 +159,8 @@ void DQMHistAnalysisPXDCMModule::event()
 {
   double all_outside = 0.0, all = 0.0;
   double all_cm = 0.0;
-  bool error_flag = false;
-  bool warn_flag = false;
+  bool error_full_flag = false;
+  bool warn_full_flag = false;
   bool error_adhoc_flag = false;
   bool warn_adhoc_flag = false;
   bool anyupdate = false;
@@ -172,26 +180,29 @@ void DQMHistAnalysisPXDCMModule::event()
       double outside_full = 0.0;
 
       auto nevent = hh1->GetBinContent(0); // misuse underflow as event counter
-      bool update = nevent - m_hCommonModeOld->GetBinContent(i + 1, 0) > m_minEntries ;
+      double scale = nevent - m_hCommonModeOld->GetBinContent(i + 1, 0); // number of new events for delta
+      bool update = scale > m_minEntries ;
       anyupdate |= update;
       if (update) m_hCommonModeOld->SetBinContent(i + 1, 0, nevent);
+      if (scale > 0) scale = 1.0 / scale;
+      else scale = 1.; // worst case, no events at run start
       for (int bin = 1; bin <= 63; bin++) { // we ignore CM63!!!
         double v;
         v = hh1->GetBinContent(bin);
         m_hCommonMode->SetBinContent(i + 1, bin, v); // attention, mixing bin nr and index
         current_full += v;
         if (nevent < m_minEntries) {
-          m_hCommonModeDelta->SetBinContent(i + 1, bin, v); // attention, mixing bin nr and index
+          m_hCommonModeDelta->SetBinContent(i + 1, bin, v * scale); // attention, mixing bin nr and index
         } else if (update) {
           auto old = m_hCommonModeOld->GetBinContent(i + 1, bin); // attention, mixing bin nr and index
-          m_hCommonModeDelta->SetBinContent(i + 1, bin, v - old); // attention, mixing bin nr and index
+          m_hCommonModeDelta->SetBinContent(i + 1, bin, (v - old)*scale); // attention, mixing bin nr and index
           m_hCommonModeOld->SetBinContent(i + 1, bin, v); // attention, mixing bin nr and index
         }
       }
 
       /// TODO: integration intervalls depend on CM default value, this seems to be agreed =10
       // Attention, Integral uses the bin nr, not the value!
-      outside_full += hh1->Integral(16 + 1, 63);
+      outside_full += hh1->Integral(m_upperLineFull + 1, 63);
       // FIXME currently we have to much noise below the line ... thus excluding this to avoid false alarms
       // outside_full += hh1->Integral(1 /*0*/, 5); /// FIXME we exclude bin 0 as we use it for debugging/timing pixels
       all_outside += outside_full;
@@ -199,10 +210,8 @@ void DQMHistAnalysisPXDCMModule::event()
       double dhpc = hh1->GetBinContent(64);
       all_cm += dhpc;
       if (current_full > 1) {
-        error_flag |= (outside_full / current_full > m_errorOutside); /// TODO level might need adjustment
-        warn_flag |= (outside_full / current_full > m_warnOutside); /// TODO level might need adjustment
-//         error_flag |= (dhpc / current_full > 1e-5); // DHP Fifo overflow ... might be critical/unrecoverable
-//         warn_flag |= (dhpc / current_full > 1e-6); // DHP Fifo overflow ... might be critical/unrecoverable
+        error_full_flag |= (outside_full / current_full > m_errorOutsideFull);
+        warn_full_flag |= (outside_full / current_full > m_warnOutsideFull);
       }
 
       if (update) {
@@ -210,21 +219,23 @@ void DQMHistAnalysisPXDCMModule::event()
         Double_t entries_adhoc = 0.;
         Double_t outside_adhoc = 0.;
         // Attention, Bins
-        for (int cm_y = 0; cm_y < 16; cm_y++) {
+        // we do not need to re-scale it as the scale is the same for all bins
+        for (int cm_y = 0; cm_y < m_upperLineAdhoc; cm_y++) {
           auto v = m_hCommonModeDelta->GetBinContent(m_hCommonModeDelta->GetBin(i + 1, cm_y + 1));
           entries_adhoc += v;
           mean_adhoc += v * (cm_y + 1);
         }
         // Attention, Bins
-        for (int cm_y = 16; cm_y < 64; cm_y++) {
+        for (int cm_y = m_upperLineAdhoc; cm_y < 64; cm_y++) {
           auto v = m_hCommonModeDelta->GetBinContent(m_hCommonModeDelta->GetBin(i + 1, cm_y + 1));
           entries_adhoc += v;
           outside_adhoc += v;
         }
         if (entries_adhoc > 0) { // ignore 1.3.2
           mean_adhoc /= entries_adhoc; // calculate mean
-          warn_adhoc_flag |= entries_adhoc > 1000 && fabs(10.0 - mean_adhoc) > m_warnMeanAdhoc;
-          error_adhoc_flag |= entries_adhoc > 1000 && fabs(10.0 - mean_adhoc) > m_errorMeanAdhoc;
+          // scale <1e-3 == >1000 entries
+          warn_adhoc_flag |= scale < 1e-3 && (fabs(10.0 - mean_adhoc) > m_warnMeanAdhoc || outside_adhoc > m_warnOutsideAdhoc);
+          error_adhoc_flag |= scale < 1e-3 && (fabs(10.0 - mean_adhoc) > m_errorMeanAdhoc || outside_adhoc > m_errorOutsideAdhoc);
           m_monObj->setVariable(("cm_" + (std::string)m_PXDModules[i]).c_str(), mean_adhoc);
 #ifdef _BELLE2_EPICS
           if (m_useEpics) {
@@ -246,11 +257,11 @@ void DQMHistAnalysisPXDCMModule::event()
       m_cCommonMode->Pad()->SetFillColor(kGray);// Magenta or Gray
       status = 0; // default
     } else {
-      /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
-      if (all_outside / all > 1e-5 || /*all_cm / all > 1e-5 ||*/ error_flag) {
+      /// use flags set above
+      if (all_outside / all > m_errorOutsideFull || error_full_flag) {
         m_cCommonMode->Pad()->SetFillColor(kRed);// Red
         status = 4;
-      } else if (all_outside / all > 1e-6 || /*all_cm / all > 1e-6 ||*/ warn_flag) {
+      } else if (all_outside / all > m_warnOutsideFull || warn_full_flag) {
         m_cCommonMode->Pad()->SetFillColor(kYellow);// Yellow
         status = 3;
       } else if (all_outside == 0. /*&& all_cm == 0.*/) {
@@ -265,8 +276,7 @@ void DQMHistAnalysisPXDCMModule::event()
     if (m_hCommonMode) {
       m_hCommonMode->Draw("colz");
       m_line1->Draw();
-      m_line2->Draw();
-//     m_line3->Draw();
+      m_lineA->Draw();
     }
 
     auto tt = new TLatex(5.5, 3, "1.3.2 Module is excluded, please ignore");
@@ -287,7 +297,7 @@ void DQMHistAnalysisPXDCMModule::event()
       m_cCommonModeDelta->Pad()->SetFillColor(kGray);// Magenta or Gray
       status_adhoc = 0; // default
     } else {
-      /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
+      /// use flags set above
       if (error_adhoc_flag) {
         m_cCommonModeDelta->Pad()->SetFillColor(kRed);// Red
         status_adhoc = 4;
@@ -308,8 +318,7 @@ void DQMHistAnalysisPXDCMModule::event()
     if (m_hCommonModeDelta) {
       m_hCommonModeDelta->Draw("colz");
       m_line1->Draw();
-      m_line2->Draw();
-//     m_line3->Draw();
+      m_lineA->Draw();
     }
 
     auto tt = new TLatex(5.5, 3, "1.3.2 Module is excluded, please ignore");

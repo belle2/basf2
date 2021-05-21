@@ -260,6 +260,11 @@ def add_expressreco_processing(path,
     path_utils.add_geometry_if_not_present(path)
     add_unpackers(path, components=unpacker_components, writeKLMDigitRaws=True)
 
+    # dont filter prune pxd for partly broken events, as we loose diagnostics in DQM
+    for m in path.modules():
+        if m.name() == "PXDPostErrorChecker":
+            m.param('CriticalErrorMask', 0)
+
     if do_reconstruction:
         if run_type == constants.RunTypes.beam:
             add_reconstruction(path, components=reco_components, pruneTracks=False,

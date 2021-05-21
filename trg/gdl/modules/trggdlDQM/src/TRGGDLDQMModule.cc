@@ -249,6 +249,8 @@ void TRGGDLDQMModule::beginRun()
     h_psn_extra[iskim]->Reset();
     h_psn_pure_extra[iskim]->Reset();
     h_timtype[iskim]->Reset();
+    h_psn_raw_rate[iskim]->Reset();
+    h_psn_effect_to_l1[iskim]->Reset();
   }
 
   oldDir->cd();

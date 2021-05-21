@@ -30,7 +30,12 @@ settings = CalibrationSettings(
         'raw_cosmic': [input_data_filters['Run Type']['cosmic'],
                        input_data_filters['Data Quality Tag']['Good Or Recoverable']],
         'raw_physics': [input_data_filters['Run Type']['physics'],
-                        f"NOT {input_data_filters['Data Tag']['random_calib']}",
+                        input_data_filters['Data Tag']['NOT random_calib'],
+                        input_data_filters['Data Tag']['bhabha_all_calib'],
+                        input_data_filters['Data Tag']['gamma_gamma_calib'],
+                        input_data_filters['Data Tag']['hadron_calib'],
+                        input_data_filters['Data Tag']['mumutight_calib'],
+                        input_data_filters['Data Tag']['radmumu_calib'],
                         input_data_filters['Data Quality Tag']['Good Or Recoverable']]
     },
     depends_on=[])

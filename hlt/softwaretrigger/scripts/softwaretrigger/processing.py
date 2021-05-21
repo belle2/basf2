@@ -261,7 +261,7 @@ def add_expressreco_processing(path,
     add_unpackers(path, components=unpacker_components, writeKLMDigitRaws=True)
 
     # dont filter/prune pxd for partly broken events, as we loose diagnostics in DQM
-    set_module_parameters(path, "PXDPostErrorChecker", CriticalErrorMask=0)
+    basf2.set_module_parameters(path, "PXDPostErrorChecker", CriticalErrorMask=0)
 
     if do_reconstruction:
         if run_type == constants.RunTypes.beam:

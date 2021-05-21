@@ -206,6 +206,7 @@ elif option == 'intel':
     global_env.PrependENVPath('LD_LIBRARY_PATH', os.path.join(base_dir, 'lib', arch))
     global_env['CC'] = 'icc'
     global_env['CXX'] = 'icpc'
+    global_env['FC'] = 'ifort'
     global_env['AR'] = 'xiar'
     global_env['LD'] = 'xild'
     global_env['LINK'] = 'icpc'

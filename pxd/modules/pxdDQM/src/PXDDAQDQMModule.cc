@@ -267,11 +267,12 @@ void PXDDAQDQMModule::event()
         for (auto cm = dhe.cm_begin(); cm < dhe.cm_end(); ++cm) {
           // uint8_t, uint16_t, uint8_t ; tuple of Chip ID (2 bit), Row (10 bit), Common Mode (6 bit)
           if (hDAQCM[dhe.getSensorID()]) hDAQCM[dhe.getSensorID()]->Fill(std::get<0>(*cm) * 192 + std::get<1>(*cm) / 4, std::get<2>(*cm));
+          if (hDAQCM2[dhe.getSensorID()]) hDAQCM2[dhe.getSensorID()]->Fill(std::get<2>(*cm));
           //if (hDAQCM2[dhe.getSensorID()] && std::get<1>(*cm) < 768 - 2) {
           // Deactivated again as the clean-up effect was insignificant for beam data
           // ignore the always-on rows (second to last: 766 and last 767)
           // row in CM array is already in readout-direction and not V-ID
-          hDAQCM2[dhe.getSensorID()]->Fill(std::get<2>(*cm));
+          // hDAQCM2[dhe.getSensorID()]->Fill(std::get<2>(*cm));
           //}
           cm63Flag |= 63 == std::get<2>(*cm);
         }

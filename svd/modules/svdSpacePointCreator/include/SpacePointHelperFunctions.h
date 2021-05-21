@@ -261,19 +261,19 @@ namespace Belle2 {
       findPossibleCombinations(aSensor.second, foundCombinations, clusterCal);
 
     // Do not make space-points if their number would be too large to be considered by tracking
-    if (foundCombinations.size() < numMaxSpacePoints) {
-      for (auto& clusterCombi : foundCombinations) {
-        SpacePointType* newSP = spacePoints.appendNew(clusterCombi);
-        if (useQualityEstimator == true) {
-          double probability;
-          double error;
-          calculatePairingProb(pdfFile, clusterCombi, probability, error, useLegacyNaming);
-          newSP->setQualityEstimation(probability);
-          newSP->setQualityEstimationError(error);
-        }
-        for (auto* cluster : clusterCombi) {
-          newSP->addRelationTo(cluster, cluster->isUCluster() ? 1. : -1.);
-        }
+    if (foundCombinations.size() > numMaxSpacePoints) return;
+
+    for (auto& clusterCombi : foundCombinations) {
+      SpacePointType* newSP = spacePoints.appendNew(clusterCombi);
+      if (useQualityEstimator == true) {
+        double probability;
+        double error;
+        calculatePairingProb(pdfFile, clusterCombi, probability, error, useLegacyNaming);
+        newSP->setQualityEstimation(probability);
+        newSP->setQualityEstimationError(error);
+      }
+      for (auto* cluster : clusterCombi) {
+        newSP->addRelationTo(cluster, cluster->isUCluster() ? 1. : -1.);
       }
     }
   }

@@ -179,7 +179,7 @@ protected:
   bool checkOsc(EvtParticle* egPro);
 
   /** Number of times to try a decay sampling (constant). */
-  static const int NTRYDECAY = 1000;
+  static constexpr int NTRYDECAY = 1000;
 
   /** The pointer to the associated Pythia object. */
   Pythia8::Pythia* pythiaPtr;

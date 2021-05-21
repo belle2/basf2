@@ -9,10 +9,11 @@ import basf2
 from pxd.calibration import gain_calibration
 from prompt.utils import filter_by_max_files_per_run, filter_by_max_events_per_run
 from prompt import CalibrationSettings
-from caf.utils import vector_from_runs, ExpRun, IoV
+from caf.utils import ExpRun, IoV
 from itertools import groupby
 from itertools import chain
 from math import ceil, inf
+from prompt.calibrations.caf_beamspot import settings as beamspot_calibration
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="PXD gain calibration",
@@ -36,7 +37,7 @@ settings = CalibrationSettings(name="PXD gain calibration",
                                    "max_files_per_run": 20,  # only valid when max_events/run = 0
                                    "payload_boundaries": []
                                },
-                               depends_on=[])
+                               depends_on=[beamspot_calibration])
 
 
 def get_calibrations(input_data, **kwargs):
@@ -69,6 +70,7 @@ def get_calibrations(input_data, **kwargs):
     max_files_per_run = expert_config["max_files_per_run"]
     min_files_per_chunk = expert_config["min_files_per_chunk"]
     min_events_per_file = expert_config["min_events_per_file"]
+    cal_kwargs = expert_config.get("kwargs", {})
 
     # print all config
     basf2.B2INFO(f"Requested iov: {requested_iov} ")
@@ -134,7 +136,8 @@ but {min_files_per_chunk} required!")
                 cal_name=cal_name,
                 gain_method=gain_method,
                 # boundaries=vector_from_runs(payload_boundaries),
-                input_files=input_files)
+                input_files=input_files,
+                **cal_kwargs)
             for alg in cal.algorithms:
                 alg.params["iov_coverage"] = specific_iov
             cal_list.append(cal)

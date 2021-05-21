@@ -11,8 +11,8 @@ namespace {
   {
     BeamParameters beamparams;
     //some values from Belle
-    beamparams.setLER(3.49841, M_PI, std::vector<double>());
-    beamparams.setHER(7.99638, 0.022, std::vector<double>());
+    beamparams.setLER(3.49841, M_PI,  0, std::vector<double>());
+    beamparams.setHER(7.99638, 0.022, 0, std::vector<double>());
 
     const TLorentzVector upsVec = beamparams.getHER() + beamparams.getLER();
     TLorentzVector upsVecCMS = upsVec;
@@ -31,8 +31,8 @@ namespace {
   {
     BeamParameters beamparams;
     //some values from Belle
-    beamparams.setLER(3.49841, M_PI, std::vector<double>());
-    beamparams.setHER(7.99638, 0.022, std::vector<double>());
+    beamparams.setLER(3.49841, M_PI,  0, std::vector<double>());
+    beamparams.setHER(7.99638, 0.022, 0, std::vector<double>());
 
     auto backAndForth = beamparams.getCMSToLab().MatrixMultiplication(beamparams.getLabToCMS());
     TLorentzVector vec(1, 1, 1, 1);
@@ -65,7 +65,7 @@ namespace {
     BeamParameters beamparams;
     std::vector<double> cov;
     TMatrixDSym matrix(3);
-    beamparams.setHER(0, 0, cov);
+    beamparams.setHER(0, 0, 0, cov);
     beamparams.setVertex(TVector3(0, 0, 0), cov);
     EXPECT_EQ(matrix, beamparams.getCovHER());
     EXPECT_EQ(matrix, beamparams.getCovVertex());
@@ -83,7 +83,7 @@ namespace {
       vertex(0, 0) = i;
       vertex(1, 1) = i;
       vertex(2, 2) = i;
-      beamparams.setHER(0, 0, cov);
+      beamparams.setHER(0, 0, 0, cov);
       beamparams.setVertex(TVector3(0, 0, 0), cov);
       EXPECT_EQ(beam, beamparams.getCovHER());
       EXPECT_EQ(vertex, beamparams.getCovVertex());
@@ -100,7 +100,7 @@ namespace {
     matrix(0, 0) = 1;
     matrix(1, 1) = 2;
     matrix(2, 2) = 3;
-    beamparams.setHER(0, 0, cov);
+    beamparams.setHER(0, 0, 0, cov);
     beamparams.setVertex(TVector3(0, 0, 0), cov);
     EXPECT_EQ(matrix, beamparams.getCovHER());
     EXPECT_EQ(matrix, beamparams.getCovVertex());
@@ -118,7 +118,7 @@ namespace {
     matrix(1, 1) = 4;
     matrix(1, 2) = matrix(2, 1) = 5;
     matrix(2, 2) = 6;
-    beamparams.setHER(0, 0, cov);
+    beamparams.setHER(0, 0, 0, cov);
     beamparams.setVertex(TVector3(0, 0, 0), cov);
     EXPECT_EQ(matrix, beamparams.getCovHER());
     EXPECT_EQ(matrix, beamparams.getCovVertex());
@@ -136,7 +136,7 @@ namespace {
     matrix(1, 1) = 5;
     matrix(1, 2) = matrix(2, 1) = 6;
     matrix(2, 2) = 9;
-    beamparams.setHER(0, 0, cov);
+    beamparams.setHER(0, 0, 0, cov);
     beamparams.setVertex(TVector3(0, 0, 0), cov);
     EXPECT_EQ(matrix, beamparams.getCovHER());
     EXPECT_EQ(matrix, beamparams.getCovVertex());

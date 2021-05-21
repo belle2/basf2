@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 from basf2 import B2ERROR
 import modularAnalysis as ma
@@ -24,17 +23,18 @@ def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None):
         path (basf2.Path): the path to load the modules
     """
     # Fill one list from V0
-    ma.fillParticleList('K_S0:V0 -> pi+ pi-', '0.3 < M < 0.7', True, path=path)
+    ma.fillParticleList('K_S0:V0 -> pi+ pi-', '', True, path=path)
+    ma.cutAndCopyList('K_S0:V0_MassWindow', 'K_S0:V0', '0.3 < M < 0.7', path=path)
     # Perform vertex fit and apply tighter mass window
     if fitter == 'TreeFit':
-        vertex.treeFit('K_S0:V0', conf_level=0.0, path=path)
+        vertex.treeFit('K_S0:V0_MassWindow', conf_level=0.0, path=path)
     elif fitter == 'KFit':
-        vertex.kFit('K_S0:V0', conf_level=0.0, path=path)
+        vertex.kFit('K_S0:V0_MassWindow', conf_level=0.0, path=path)
     elif fitter == 'Rave':
-        vertex.raveFit('K_S0:V0', conf_level=0.0, path=path, silence_warning=True)
+        vertex.raveFit('K_S0:V0_MassWindow', conf_level=0.0, path=path, silence_warning=True)
     else:
         B2ERROR("Valid fitter options for Kshorts are 'TreeFit', 'KFit', and 'Rave'. However, the latter is not recommended.")
-    ma.applyCuts('K_S0:V0', '0.450 < M < 0.550', path=path)
+    ma.applyCuts('K_S0:V0_MassWindow', '0.450 < M < 0.550', path=path)
     # Reconstruct a second list
     stdPi('all', path=path)  # no quality cuts
     ma.reconstructDecay('K_S0:RD -> pi+:all pi-:all', '0.3 < M < 0.7', 1, True, path=path)
@@ -47,7 +47,7 @@ def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None):
         vertex.raveFit('K_S0:RD', conf_level=0.0, path=path, silence_warning=True)
     ma.applyCuts('K_S0:RD', '0.450 < M < 0.550', path=path)
     # Create merged list based on provided priority
-    ma.mergeListsWithBestDuplicate('K_S0:merged', ['K_S0:V0', 'K_S0:RD'],
+    ma.mergeListsWithBestDuplicate('K_S0:merged', ['K_S0:V0_MassWindow', 'K_S0:RD'],
                                    variable='particleSource', preferLowest=prioritiseV0, path=path)
 
 
@@ -83,20 +83,21 @@ def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None):
         path (basf2.Path): the path to load the modules
     """
     # Fill one list from V0
-    ma.fillParticleList('Lambda0:V0 -> p+ pi-', '0.9 < M < 1.3', True, path=path)
+    ma.fillParticleList('Lambda0:V0 -> p+ pi-', '', True, path=path)
+    ma.cutAndCopyList('Lambda0:V0_MassWindow', 'Lambda0:V0', '0.9 < M < 1.3', path=path)
     # Perform vertex fit and apply tighter mass window
     if fitter == 'TreeFit':
-        vertex.treeFit('Lambda0:V0', conf_level=0.0, path=path)
+        vertex.treeFit('Lambda0:V0_MassWindow', conf_level=0.0, path=path)
     elif fitter == 'KFit':
-        vertex.kFit('Lambda0:V0', conf_level=0.0, path=path)
+        vertex.kFit('Lambda0:V0_MassWindow', conf_level=0.0, path=path)
     elif fitter == 'Rave':
-        vertex.raveFit('Lambda0:V0', conf_level=0.0, path=path, silence_warning=True)
+        vertex.raveFit('Lambda0:V0_MassWindow', conf_level=0.0, path=path, silence_warning=True)
     else:
         B2ERROR("Valid fitter options for Lambdas are 'TreeFit', 'KFit', and 'Rave'. However, the latter is not recommended.")
-    ma.applyCuts('Lambda0:V0', '1.10 < M < 1.13', path=path)
+    ma.applyCuts('Lambda0:V0_MassWindow', '1.10 < M < 1.13', path=path)
     # Find V0 duplicate with better vertex fit quality
-    ma.markDuplicate('Lambda0:V0', False, path=path)
-    ma.applyCuts('Lambda0:V0', 'extraInfo(highQualityVertex)', path=path)
+    ma.markDuplicate('Lambda0:V0_MassWindow', False, path=path)
+    ma.applyCuts('Lambda0:V0_MassWindow', 'extraInfo(highQualityVertex)', path=path)
     # Reconstruct a second list
     stdPi('all', path=path)  # no quality cuts
     stdPr('all', path=path)  # no quality cuts
@@ -112,5 +113,5 @@ def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None):
     # Find RD duplicate with better vertex fit quality
     ma.markDuplicate('Lambda0:RD', False, path=path)
     ma.applyCuts('Lambda0:RD', 'extraInfo(highQualityVertex)', path=path)
-    ma.mergeListsWithBestDuplicate('Lambda0:merged', ['Lambda0:V0', 'Lambda0:RD'],
+    ma.mergeListsWithBestDuplicate('Lambda0:merged', ['Lambda0:V0_MassWindow', 'Lambda0:RD'],
                                    variable='particleSource', preferLowest=prioritiseV0, path=path)

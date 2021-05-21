@@ -93,6 +93,9 @@ namespace {
 PXDValidationAlgorithm::PXDValidationAlgorithm():
   CalibrationAlgorithm("PXDCDSTCollector")
   , minTrackPoints(1000), save2DHists(false)
+  , m_exp(-1), m_run(-1), m_hD0(nullptr), m_hZ0(nullptr)
+  , m_hTrackPointsLayer1(nullptr), m_hTrackClustersLayer1(nullptr)
+  , m_hTrackPointsLayer2(nullptr), m_hTrackClustersLayer2(nullptr)
   //,m_file(nullptr), m_tree(nullptr)
   //,minTrackPoints(1000), safetyFactor(2.0), forceContinue(false), strategy(0)
 {

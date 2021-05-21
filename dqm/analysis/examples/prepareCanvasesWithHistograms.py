@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 import sys
 argv = sys.argv
 
@@ -19,13 +19,13 @@ if len(argv) < 3:
     print()
     exit(1)
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Modules
-inroot = register_module('DQMHistAnalysisInputRootFile')
+inroot = b2.register_module('DQMHistAnalysisInputRootFile')
 inroot.param('InputRootFile', argv[1])
 
 # you can select which branches/folders to process, leave blank to process all branches/folders
@@ -36,7 +36,7 @@ inroot.param('InputRootFile', argv[1])
 
 main.add_module(inroot)
 
-outroot = register_module('DQMHistAnalysisOutputFile')
+outroot = b2.register_module('DQMHistAnalysisOutputFile')
 
 outroot.param('SaveHistos', False)  # don't save histograms
 outroot.param('SaveCanvases', True)  # save canvases
@@ -44,7 +44,7 @@ outroot.param('SaveCanvases', True)  # save canvases
 outroot.param('HistoFile', argv[2])
 main.add_module(outroot)
 
-print_path(main)
+b2.print_path(main)
 
 # Process all events
-process(main)
+b2.process(main)

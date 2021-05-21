@@ -45,19 +45,27 @@ def get_input_data():
 
 def monitor_jobs(args, jobs):
     unfinished_jobs = jobs[:]
+    failed_jobs = 0
     while unfinished_jobs:
-        B2INFO(f"Updating statuses of unfinished jobs...")
+        B2INFO("Updating statuses of unfinished jobs...")
         for j in unfinished_jobs:
             j.update_status()
-        B2INFO(f"Checking if jobs are ready...")
+        B2INFO("Checking if jobs are ready...")
         for j in unfinished_jobs[:]:
             if j.ready():
-                B2INFO(f"{j} is finished")
+                if j.status == "failed":
+                    B2ERROR(f"{j} is failed")
+                    failed_jobs += 1
+                else:
+                    B2INFO(f"{j} is finished")
                 unfinished_jobs.remove(j)
         if unfinished_jobs:
             B2INFO(f"Not all jobs done yet, waiting {args.heartbeat} seconds before re-checking...")
             time.sleep(args.heartbeat)
-    B2INFO(f"All jobs finished")
+    if failed_jobs > 0:
+        B2ERROR(f"{failed_jobs} jobs failed")
+    else:
+        B2INFO('All jobs finished successfully')
 
 
 class ArgumentsGenerator():
@@ -202,7 +210,7 @@ class MaxFilesSplitter(SubjobSplitter):
             return
 
         for i, subjob_input_files in enumerate(grouper(self.max_files_per_subjob, job.input_files)):
-            subjob = job.create_subjob(i, input_files=subjob_input_files)
+            job.create_subjob(i, input_files=subjob_input_files)
 
         self.assign_arguments(job)
 
@@ -239,13 +247,13 @@ class MaxSubjobsSplitter(SubjobSplitter):
         subjob_i = 0
         while remaining_input_files:
             # How many files should we use for this subjob?
-            num_input_files = ceil(len(remaining_input_files)/available_subjobs)
+            num_input_files = ceil(len(remaining_input_files) / available_subjobs)
             # Pop them from the remaining files
             subjob_input_files = []
             for i in range(num_input_files):
                 subjob_input_files.append(remaining_input_files.popleft())
             # Create the actual subjob
-            subjob = job.create_subjob(subjob_i, input_files=subjob_input_files)
+            job.create_subjob(subjob_i, input_files=subjob_input_files)
             subjob_i += 1
             available_subjobs -= 1
 
@@ -440,7 +448,11 @@ class Job:
         """
         Sets the status of this Job.
         """
-        B2INFO(f"Setting {self.name} status to {status}")
+        # Print an error only if the job failed.
+        if status == 'failed':
+            B2ERROR(f"Setting {self.name} status to failed")
+        else:
+            B2INFO(f"Setting {self.name} status to {status}")
         self._status = status
 
     @property
@@ -573,7 +585,7 @@ class Job:
                 else:
                     B2WARNING(f"Requested input file path {file_path} was already added, skipping it.")
         if self.input_files and not existing_input_files:
-            B2WARNING(f"No valid input file paths found for {job}, but some were requested.")
+            B2WARNING(f"No valid input file paths found for {self.name}, but some were requested.")
 
         # Replace the Job's input files with the ones that exist + duplicates removed
         self.input_files = existing_input_files
@@ -610,11 +622,11 @@ class Job:
             self.setup_cmds.append(f"BACKEND_B2SETUP={os.environ['BELLE2_TOOLS']}/b2setup")
             self.setup_cmds.append(f"BACKEND_BELLE2_RELEASE_LOC={os.environ['BELLE2_LOCAL_DIR']}")
             self.setup_cmds.append(f"BACKEND_BELLE2_OPTION={os.environ['BELLE2_OPTION']}")
-            self.setup_cmds.append(f"pushd $BACKEND_BELLE2_RELEASE_LOC > /dev/null")
-            self.setup_cmds.append(f"source $BACKEND_B2SETUP")
+            self.setup_cmds.append("pushd $BACKEND_BELLE2_RELEASE_LOC > /dev/null")
+            self.setup_cmds.append("source $BACKEND_B2SETUP")
             # b2code-option has to be executed only after the source of the tools.
-            self.setup_cmds.append(f"b2code-option $BACKEND_BELLE2_OPTION")
-            self.setup_cmds.append(f"popd > /dev/null")
+            self.setup_cmds.append("b2code-option $BACKEND_BELLE2_OPTION")
+            self.setup_cmds.append("popd > /dev/null")
 
 
 class SubJob(Job):
@@ -669,8 +681,13 @@ class SubJob(Job):
     @status.setter
     def status(self, status):
         """
+        Sets the status of this Job.
         """
-        B2INFO(f"Setting {self.name} status to {status}")
+        # Print an error only if the job failed.
+        if status == "failed":
+            B2ERROR(f"Setting {self.name} status to failed")
+        else:
+            B2INFO(f"Setting {self.name} status to {status}")
         self._status = status
 
     @property
@@ -942,7 +959,7 @@ class Local(Backend):
         #: Internal attribute of max_processes
         self._max_processes = value
         if self.pool:
-            B2INFO(f"New max_processes requested. But a pool already exists.")
+            B2INFO("New max_processes requested. But a pool already exists.")
             self.join()
         B2INFO(f"Starting up new Pool with {self.max_processes} processes")
         self.pool = mp.Pool(processes=self.max_processes)
@@ -1194,7 +1211,7 @@ class Batch(Backend):
         job.check_input_data_files()
         # Add any required backend args that are missing (I'm a bit hesitant to actually merge with job.backend_args)
         # just in case you want to resubmit the same job with different backend settings later.
-        job_backend_args = {**self.backend_args, **job.backend_args}
+        # job_backend_args = {**self.backend_args, **job.backend_args}
 
         # If there's no splitter then we just submit the Job with no SubJobs
         if not job.splitter:
@@ -1253,7 +1270,7 @@ class Batch(Backend):
         for jobs_to_submit in grouper(jobs_per_check, jobs):
             # Wait until we are allowed to submit
             while not self.can_submit(njobs=len(jobs_to_submit)):
-                B2INFO(f"Too many jobs are currently in the batch system globally. Waiting until submission can continue...")
+                B2INFO("Too many jobs are currently in the batch system globally. Waiting until submission can continue...")
                 time.sleep(self.sleep_between_submission_checks)
             else:
                 # We loop here since we have already checked if the number of jobs is low enough, we don't want to hit this
@@ -1424,7 +1441,7 @@ class PBS(Batch):
             try:
                 new_job_status = self.backend_code_to_status[backend_status]
             except KeyError as err:
-                raise BackendError(f"Unidentified backend status found for {self.job}: {backend_status}")
+                raise BackendError(f"Unidentified backend status found for {self.job}: {backend_status}") from err
 
             if new_job_status != self.job.status:
                 self.job.status = new_job_status
@@ -1676,7 +1693,7 @@ class LSF(Batch):
             try:
                 new_job_status = self.backend_code_to_status[backend_status]
             except KeyError as err:
-                raise BackendError(f"Unidentified backend status found for {self.job}: {backend_status}")
+                raise BackendError(f"Unidentified backend status found for {self.job}: {backend_status}") from err
 
             if new_job_status != self.job.status:
                 self.job.status = new_job_status
@@ -1858,12 +1875,12 @@ class HTCondor(Batch):
     default_global_job_limit = 10000
     #: Default backend args for HTCondor
     default_backend_args = {
-                            "universe": "vanilla",
-                            "getenv": "false",
-                            "request_memory": "4 GB",  # We set the default requested memory to 4 GB to maintain parity with KEKCC
-                            "path_prefix": "",  # Path prefix for file path
+        "universe": "vanilla",
+        "getenv": "false",
+        "request_memory": "4 GB",  # We set the default requested memory to 4 GB to maintain parity with KEKCC
+        "path_prefix": "",  # Path prefix for file path
                             "extra_lines": []  # These should be other HTCondor submit script lines like 'request_cpus = 2'
-                           }
+    }
     #: Default ClassAd attributes to return from commands like condor_q
     default_class_ads = ["GlobalJobId", "JobStatus", "Owner"]
 
@@ -1882,7 +1899,7 @@ class HTCondor(Batch):
             print(f'log = {Path(job.output_dir, "htcondor.log").as_posix()}', file=submit_file)
             print(f'output = {Path(job.working_dir, _STDOUT_FILE).as_posix()}', file=submit_file)
             print(f'error = {Path(job.working_dir, _STDERR_FILE).as_posix()}', file=submit_file)
-            print(f'transfer_input_files = ', ','.join(files_to_transfer), file=submit_file)
+            print('transfer_input_files = ', ','.join(files_to_transfer), file=submit_file)
             print(f'universe = {job_backend_args["universe"]}', file=submit_file)
             print(f'getenv = {job_backend_args["getenv"]}', file=submit_file)
             print(f'request_memory = {job_backend_args["request_memory"]}', file=submit_file)
@@ -1919,11 +1936,21 @@ class HTCondor(Batch):
         """
         job_dir = Path(cmd[-1]).parent.as_posix()
         sub_out = ""
-        try:
-            sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, cwd=job_dir)
-        except subprocess.CalledProcessError as e:
-            B2ERROR(f"Error during condor_submit: {str(e)}")
-            raise e
+        attempt = 0
+        sleep_time = 30
+
+        while attempt < 3:
+            try:
+                sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, cwd=job_dir)
+                break
+            except subprocess.CalledProcessError as e:
+                attempt += 1
+                if attempt == 3:
+                    B2ERROR(f"Error during condor_submit: {str(e)} occurred more than 3 times.")
+                    raise e
+                else:
+                    B2ERROR(f"Error during condor_submit: {str(e)}, sleeping for {sleep_time} seconds.")
+                    time.sleep(30)
         return sub_out.split()[0]
 
     class HTCondorResult(Result):
@@ -2020,16 +2047,15 @@ class HTCondor(Batch):
 
             job_info = jobs_info[0]
             backend_status = job_info["JobStatus"]
-            # if job is held (backend_status = 5) then report why then kill the job
+            # if job is held (backend_status = 5) then report why then keep waiting
             if backend_status == 5:
-                hold_reason = job_info["HoldReason"]
-                B2WARNING(f"{self.job} on hold because of {hold_reason}. Killing it")
-                subprocess.check_output(["condor_rm", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
-                backend_status = 6
+                hold_reason = job_info.get("HoldReason", None)
+                B2WARNING(f"{self.job} on hold because of {hold_reason}. Keep waiting.")
+                backend_status = 2
             try:
                 new_job_status = self.backend_code_to_status[backend_status]
             except KeyError as err:
-                raise BackendError(f"Unidentified backend status found for {self.job}: {backend_status}")
+                raise BackendError(f"Unidentified backend status found for {self.job}: {backend_status}") from err
             if new_job_status != self.job.status:
                 self.job.status = new_job_status
 
@@ -2120,7 +2146,12 @@ class HTCondor(Batch):
         # We get a JSON serialisable summary from condor_q. But we will alter it slightly to be more similar to other backends
         cmd = " ".join(cmd_list)
         B2DEBUG(29, f"Calling subprocess with command = '{cmd}'")
-        records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        # condor_q occassionally fails
+        try:
+            records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        except BaseException:
+            records = None
+
         if records:
             records = decode_json_string(records)
         else:
@@ -2180,11 +2211,16 @@ class HTCondor(Batch):
         # We get a JSON serialisable summary from condor_q. But we will alter it slightly to be more similar to other backends
         cmd = " ".join(cmd_list)
         B2DEBUG(29, f"Calling subprocess with command = '{cmd}'")
-        records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        try:
+            records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        except BaseException:
+            records = None
+
         if records:
             records = decode_json_string(records)
         else:
             records = []
+
         jobs_info = {"JOBS": records}
         jobs_info["NJOBS"] = len(jobs_info["JOBS"])  # Just to avoid having to len() it in the future
         return jobs_info

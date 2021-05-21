@@ -94,7 +94,7 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
     def run(self, iov, iteration):
         """
         """
-        from .strategies import AlgorithmStrategy
+        from caf.strategies import AlgorithmStrategy
         B2INFO(f"SequentialAlgorithmsRunner begun for Calibration {self.name}.")
         # First we do the setup of algorithm strategies
         strategies = []

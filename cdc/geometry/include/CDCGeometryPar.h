@@ -13,6 +13,7 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCTimeZeros.h>
@@ -1166,6 +1167,8 @@ namespace Belle2 {
       DBObjPtr<CDCAlignment>* m_alignmentFromDB; /*!< alignment params. retrieved from DB. */
       DBObjPtr<CDCMisalignment>* m_misalignmentFromDB; /*!< misalignment params. retrieved from DB. */
       DBObjPtr<CDCEDepToADCConversions>* m_eDepToADCConversionsFromDB; /*!< Pointer to edep-to-ADC conv. params. from DB. */
+
+      DBObjPtr<HardwareClockSettings> m_clockSettings; /*!< hardware clock settings */
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
 

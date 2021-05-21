@@ -1,9 +1,9 @@
 import ROOT
 from tracking import metamodules
 
-from .mc_side_module import MCSideTrackingValidationModule
-from .pr_side_module import PRSideTrackingValidationModule
-from .eventwise_module import EventwiseTrackingValidationModule
+from tracking.harvesting_validation.mc_side_module import MCSideTrackingValidationModule
+from tracking.harvesting_validation.pr_side_module import PRSideTrackingValidationModule
+from tracking.harvesting_validation.eventwise_module import EventwiseTrackingValidationModule
 
 
 class CombinedTrackingValidationModule(metamodules.PathModule):

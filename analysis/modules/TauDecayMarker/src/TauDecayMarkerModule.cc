@@ -11,6 +11,7 @@
 #include <analysis/modules/TauDecayMarker/TauDecayMarkerModule.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 #include <iostream>
 
@@ -32,7 +33,7 @@ TauDecayMarkerModule::TauDecayMarkerModule() : Module(), tauPair(false), numOfTa
   // Set module properties
   setDescription("Module to identify generated tau pair decays, using MCParticle information. Each tau lepton decay channel "
                  "is numbered following the order in the default KKMC decay table. Using this module, "
-                 "the channel number will be stored in the variables ``tauPlusMcMode``, and ``tauMinusMcMode``. "
+                 "the channel number will be stored in the variables `tauPlusMCMode`, and `tauMinusMCMode`. "
                  "Further details and usage can be found at `TauDecayMCModes`. ");
   //Parameter definition
   addParam("printDecayInfo", m_printDecayInfo, "Print information of the tau pair decay from MC.", false);
@@ -144,9 +145,9 @@ int TauDecayMarkerModule::getNumDaughterOfTauExceptGamma(int s, int id, int sign
       if (abs(d.getPDG()) == 24) {
         for (int j = d.getFirstDaughter(); j <= d.getLastDaughter(); ++j) {
           MCParticle& e = *m_MCParticles[j - 1];
-          if (e.getPDG() != 22) ret++;
+          if (e.getPDG() != Const::photon.getPDGCode()) ret++;
         }
-      } else if (d.getPDG() != 22) ret++;
+      } else if (d.getPDG() != Const::photon.getPDGCode()) ret++;
     }
   } else {
     for (int i = p.getFirstDaughter(); i <= p.getLastDaughter(); ++i) {

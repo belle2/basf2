@@ -15,9 +15,8 @@
 #include <analysis/variables/VertexVariables.h>
 #include <analysis/variables/ECLVariables.h>
 #include <analysis/variables/TrackVariables.h>
+#include <analysis/variables/V0DaughterTrackVariables.h>
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <analysis/variables/ParameterVariables.h>
 #include <analysis/variables/VertexVariables.h>
 
 #include <framework/logging/Logger.h>

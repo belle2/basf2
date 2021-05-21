@@ -96,7 +96,7 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
   if (!m_NoiseCal.isValid())
     B2WARNING("No valid SVDNoiseCalibration for the requested IoV");
   if (!m_DetectorConf.isValid())
-    B2WARNING("No valid SVDDetectorConfiguration for the requested IoV");
+    B2FATAL("No valid SVDDetectorConfiguration for the requested IoV");
   if (!m_PedestalCal.isValid())
     B2WARNING("No valid SVDPedestalCalibration for the requested IoV");
   if (! m_PulseShapeCal.isValid())

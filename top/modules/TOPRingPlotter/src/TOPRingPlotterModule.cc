@@ -48,9 +48,9 @@
 #include <analysis/VariableManager/Manager.h>
 
 #include <top/geometry/TOPGeometryPar.h>
-#include <top/reconstruction/TOPreco.h>
-#include <top/reconstruction/TOPtrack.h>
-#include <top/reconstruction/TOPconfigure.h>
+#include <top/reconstruction_cpp/TOPTrack.h>
+#include <top/reconstruction_cpp/PDFConstructor.h>
+#include <top/reconstruction_cpp/TOPRecoManager.h>
 
 using namespace Belle2;
 using namespace TOP;
@@ -138,22 +138,16 @@ void TOPRingPlotterModule::resetTree()
 void TOPRingPlotterModule::fillPDF(Belle2::Const::ChargedStable ch, const Track* track, TH2F* histo, short* pixelArray,
                                    float* timeArray, int& arrayGuard, int& toyCounter)
 {
-  double mass = ch.getMass();
-  int pdgCode = ch.getPDGCode();
 
-  TOPtrack trkPDF(track, ch);
+  if (not track) return;
+
+  TOPTrack trkPDF(*track);
 
   if (!trkPDF.isValid())
     return;
 
-  TOPreco reco(1, &mass, &pdgCode);
-  reco.setPDFoption(TOPreco::c_Fine);
-  reco.setTimeWindow(0, 100);
-  reco.setMass(mass, pdgCode);
-  reco.reconstruct(trkPDF, pdgCode);
-
-  if (reco.getFlag() != 1)
-    return ; // track is not in the acceptance of TOP
+  PDFConstructor pdfConstructor(trkPDF, ch, PDFConstructor::c_Fine);
+  if (not pdfConstructor.isValid()) return;
 
   arrayGuard = 0; // this keeps track of the total number of PDF samples we have saved so far
   m_pdfAsHisto->Reset(); // clan the histogram that will contain the PDf to be sampled
@@ -163,14 +157,14 @@ void TOPRingPlotterModule::fillPDF(Belle2::Const::ChargedStable ch, const Track*
     for (int iBinY = 1; iBinY < 500 + 1; iBinY++) {
       // MARKO'S Trick HERE
       auto time = m_pdfAsHisto->GetYaxis()->GetBinCenter(iBinY);
-      auto pdfVal = reco.getPDF(pixelID, time, mass, pdgCode); // jitter = 0 understood
+      auto pdfVal = pdfConstructor.getPDFValue(pixelID, time, 0.070); // average electronic time reso = 70 ps
       m_pdfAsHisto->Fill(pixelID - 0.5, time, pdfVal * 0.2); // bins are 1 px  X  0.2 ns wide
       short pixelCol = (pixelID - 1) % 64 + 1;
       histo->Fill(pixelCol, time, pdfVal * 1.6); // bins in the map are 8 px  X  0.2 ns wide
     }
   }
 
-  auto nExpPhot = reco.getExpectedPhotons();
+  auto nExpPhot = pdfConstructor.getExpectedPhotons();
 
   m_pdfAsHisto->Scale(nExpPhot);
   histo->Scale(nExpPhot);
@@ -194,7 +188,6 @@ void TOPRingPlotterModule::fillPDF(Belle2::Const::ChargedStable ch, const Track*
       tmpPixel.push_back(short(pxID));
     }
 
-
     // before transferring the results of the PDF sampling into pixelArray and timeArray, check if there's
     // enough room.
     if (arrayGuard + tmpTime.size() < m_MaxPDFPhotons) {
@@ -213,15 +206,13 @@ void TOPRingPlotterModule::fillPDF(Belle2::Const::ChargedStable ch, const Track*
 }
 
 
-
-
-
 void TOPRingPlotterModule::initialize()
 {
 
   // Check the list of pdg hypotheses
   for (auto pdg : m_pdgHyp) {
-    if ((pdg != 11) & (pdg != 211) & (pdg != 321) & (pdg != 13) & (pdg != 2212))
+    if ((pdg != Const::electron.getPDGCode()) & (pdg != Const::pion.getPDGCode()) & (pdg != Const::kaon.getPDGCode()) &
+        (pdg != Const::muon.getPDGCode()) & (pdg != Const::proton.getPDGCode()))
       B2FATAL("Invalid PDG hypothesis for the PDF evaluation: " << pdg);
     short duplicateCount = 0;
     for (auto pdg2 : m_pdgHyp) {
@@ -246,15 +237,15 @@ void TOPRingPlotterModule::initialize()
 
   if (m_saveHistograms) {
     for (auto pdg : m_pdgHyp) {
-      if (pdg == 11)
+      if (pdg == Const::electron.getPDGCode())
         m_tree->Branch("hitMapMCE", "TH2F", &m_hitMapMCE, 32000, 0);
-      else if (pdg == 13)
+      else if (pdg == Const::muon.getPDGCode())
         m_tree->Branch("hitMapMCMU", "TH2F", &m_hitMapMCMU, 32000, 0);
-      else if (pdg == 211)
+      else if (pdg == Const::pion.getPDGCode())
         m_tree->Branch("hitMapMCPI", "TH2F", &m_hitMapMCPI, 32000, 0);
-      else if (pdg == 321)
+      else if (pdg == Const::kaon.getPDGCode())
         m_tree->Branch("hitMapMCK", "TH2F", &m_hitMapMCK, 32000, 0);
-      else if (pdg == 2212)
+      else if (pdg == Const::proton.getPDGCode())
         m_tree->Branch("hitMapMCP", "TH2F", &m_hitMapMCP, 32000, 0);
     }
   }
@@ -337,14 +328,12 @@ void TOPRingPlotterModule::initialize()
   StoreArray<TOPBarHit> barHits;
   barHits.isOptional();
 
-  TOPconfigure config;
 }
-
-
 
 
 void TOPRingPlotterModule::event()
 {
+  TOPRecoManager::setTimeWindow(0, 100);
 
   StoreObjPtr<EventMetaData> evtMetaData;
   StoreArray<Track> tracks;
@@ -400,7 +389,7 @@ void TOPRingPlotterModule::event()
       }
     } else {
       // Check if one can make a TOP track
-      TOPtrack trk(track, Const::pion);
+      TOPTrack trk(*track);
       if (!trk.isValid())
         continue;
       moduleID = trk.getModuleID();
@@ -412,6 +401,7 @@ void TOPRingPlotterModule::event()
     // Save the digit info for all the topDigits in the module where the track was extrapolated
     for (const auto& digi : digits) {
       // if we have a cluster, save the digits from the two modules closer to the cluster
+      if (m_nDigits >= m_MaxPhotons) break;
       if ((digi.getModuleID() == moduleID) || (!isFromTrack && digi.getModuleID() == moduleID + deltaModule)) {
         m_digitTime[m_nDigits] = digi.getTime();
         m_digitChannel[m_nDigits] = digi.getChannel();
@@ -428,7 +418,6 @@ void TOPRingPlotterModule::event()
         m_digitAsic[m_nDigits] = digi.getASICNumber();
         m_digitQuality[m_nDigits] = digi.getHitQuality();
         m_nDigits++;
-        if (m_nDigits > m_MaxPhotons) break;
       }
     }
 
@@ -440,15 +429,15 @@ void TOPRingPlotterModule::event()
     // Save the PDF samplings
     if (isFromTrack) {
       for (auto pdg : m_pdgHyp) {
-        if (pdg == 11)
+        if (pdg == Const::electron.getPDGCode())
           fillPDF(Belle2::Const::electron, track, m_hitMapMCE, m_pdfPixelE, m_pdfTimeE, m_pdfSamplesE, m_pdfToysE);
-        else if (pdg == 13)
+        else if (pdg == Const::muon.getPDGCode())
           fillPDF(Belle2::Const::muon, track, m_hitMapMCMU, m_pdfPixelMU, m_pdfTimeMU, m_pdfSamplesMU, m_pdfToysMU);
-        else if (pdg == 211)
+        else if (pdg == Const::pion.getPDGCode())
           fillPDF(Belle2::Const::pion, track, m_hitMapMCPI, m_pdfPixelPI, m_pdfTimePI, m_pdfSamplesPI, m_pdfToysPI);
-        else if (pdg == 321)
+        else if (pdg == Const::kaon.getPDGCode())
           fillPDF(Belle2::Const::kaon, track, m_hitMapMCK, m_pdfPixelK, m_pdfTimeK, m_pdfSamplesK, m_pdfToysK);
-        else if (pdg == 2212)
+        else if (pdg == Const::proton.getPDGCode())
           fillPDF(Belle2::Const::proton, track, m_hitMapMCP, m_pdfPixelP, m_pdfTimeP, m_pdfSamplesP, m_pdfToysP);
       }
     }

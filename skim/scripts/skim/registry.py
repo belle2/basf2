@@ -14,7 +14,7 @@ from tabulate import tabulate
 _RegisteredSkims = [
     # --- WG0: Systematics ---
     ("10000000", "systematics", "Random"),
-    ("10600100", "systematics", "Systematics"),
+    # ("10600100", "systematics", "Systematics"), renamed to SystematicsDstar.
     ("10600300", "systematics", "SystematicsTracking"),
     ("10600400", "systematics", "Resonance"),
     ("10600500", "systematics", "SystematicsRadMuMu"),
@@ -22,12 +22,21 @@ _RegisteredSkims = [
     ("10600700", "systematics", "SystematicsRadEE"),
     ("10620200", "systematics", "SystematicsLambda"),
     ("11640100", "systematics", "SystematicsPhiGamma"),
+    ("10600800", "systematics", "SystematicsFourLeptonFromHLTFlag"),
+    ("10600900", "systematics", "SystematicsRadMuMuFromHLTFlag"),
+    ("10611000", "systematics", "SystematicsJpsi"),
+    ("10611100", "systematics", "SystematicsKshort"),
+    ("10601200", "systematics", "SystematicsBhabha"),
+    ("10601300", "systematics", "SystematicsCombinedHadronic"),
+    ("10601400", "systematics", "SystematicsCombinedLowMulti"),
+    ("10601500", "systematics", "SystematicsDstar"),
 
     # --- WG1: SL + missing energy ---
     ("11110100", "semileptonic", "PRsemileptonicUntagged"),
     ("11130300", "leptonic", "LeptonicUntagged"),
     ("11130301", "leptonic", "dilepton"),
     ("11160200", "semileptonic", "SLUntagged"),
+    ("11160201", "semileptonic", "B0toDstarl_Kpi_Kpipi0_Kpipipi"),
     ("11180100", "fei", "feiHadronicB0"),
     ("11180200", "fei", "feiHadronicBplus"),
     ("11180300", "fei", "feiSLB0"),

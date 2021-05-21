@@ -115,8 +115,7 @@ class Cluster(ClusterBase):
         # installations which have no drmaa at all
         import drmaa
 
-        ss = drmaa.Session()
-        print(str(drmaa.Session))
+        print(str(drmaa.Session()))
 
         with drmaa.Session() as session:
             print("got session ")
@@ -157,7 +156,7 @@ class Cluster(ClusterBase):
 
         @param job: The job of which we want to know if it finished
         @return: (True if the job has finished, exit code). If we can't find the
-            exit code in the '.done'-file, the returncode will be -666.
+            exit code in the '.done'-file, the returncode will be -654.
             If the job is not finished, the exit code is returned as 0.
         """
 

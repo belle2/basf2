@@ -242,7 +242,7 @@ void BeamBack_arich(std::string path = "/gpfs/home/belle/mmanca/basf2/background
 
       //  energy deposit from a hit (two volumes are sensitive el. board and hapd bottom, commonly I show results for board.
       //  Anyhow the rates are approximately equal.)
-      if (pdg != 2112) {
+      if (pdg != Const::neutron.getPDGCode()) {
         edep /= sourceTime[source];
         if (type == 0) edep_board[modID - 1][sourceType[source]] += edep;
         if (type == 1) edep_hapd[modID - 1][sourceType[source]]  += edep;

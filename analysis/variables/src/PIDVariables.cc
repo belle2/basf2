@@ -18,8 +18,7 @@
 // framework aux
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Conversion.h>
-
-#include <framework/utilities/Conversion.h>
+#include <framework/gearbox/Const.h>
 
 #include <boost/algorithm/string.hpp>
 
@@ -261,8 +260,9 @@ namespace Belle2 {
       std::vector<std::string> detectors(arguments.begin(), arguments.end());
       Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
 
-      auto func = [detectorSet](const Particle * part) -> int {
+      auto func = [detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
+        if (!pid) return std::numeric_limits<double>::quiet_NaN();
         if (not pid->isAvailable(detectorSet))
           return 1;
         else return 0;
@@ -334,10 +334,10 @@ namespace Belle2 {
         B2ERROR("The variable binaryPID_SVD needs exactly two arguments: the PDG codes of two hypotheses.");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      size_t pdgCodeHyp = std::abs(int(std::lround(arguments[0])));
-      size_t pdgCodeTest = std::abs(int(std::lround(arguments[1])));
-      std::vector<size_t> pdgIds {pdgCodeHyp, pdgCodeTest};
-      if (std::any_of(pdgIds.begin(), pdgIds.end(), [](size_t p) {return (p == 11 || p == 13 || p == 1000010020);})) {
+      int pdgCodeHyp = std::abs(int(std::lround(arguments[0])));
+      int pdgCodeTest = std::abs(int(std::lround(arguments[1])));
+      std::vector<int> pdgIds {pdgCodeHyp, pdgCodeTest};
+      if (std::any_of(pdgIds.begin(), pdgIds.end(), [](int p) {return (p == Const::electron.getPDGCode() || p == Const::muon.getPDGCode() || p == Const::deuteron.getPDGCode());})) {
         B2ERROR("The variable binaryPID_SVD is not defined for particle hypotheses {11, 13, 1000010020}.");
         return std::numeric_limits<float>::quiet_NaN();
       }

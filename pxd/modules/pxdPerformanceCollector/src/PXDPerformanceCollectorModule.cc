@@ -38,7 +38,11 @@ REG_MODULE(PXDPerformanceCollector)
 //-----------------------------------------------------------------
 
 PXDPerformanceCollectorModule::PXDPerformanceCollectorModule() : CalibrationCollectorModule()
-  , m_pxd2TrackEvent(), m_signal(0), m_estimated(0.0), m_run(0), m_exp(0)
+  , m_selectedEff(true), m_selectedRes(true)
+  , m_pxd2TrackEvent()
+  , m_deltaD0oSqrt2(0.0), m_deltaZ0oSqrt2(0.0)
+  , m_signal(0), m_estimated(0.0)
+  , m_run(0), m_exp(0)
 {
   // Set module properties
   setDescription("Calibration collector module for CDST data.");

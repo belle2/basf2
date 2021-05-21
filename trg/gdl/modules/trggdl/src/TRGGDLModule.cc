@@ -80,6 +80,16 @@ namespace Belle2 {
              ".alg file path",
              _algFilePath);
 
+    addParam("timquality_threshold_sfin",
+             _timquality_threshold_sfin,
+             "Threshold to determine timing quality flag with MC truth: superfine",
+             -1.0);
+
+    addParam("timquality_threshold_fine",
+             _timquality_threshold_fine,
+             "Threshold to determine timing quality flag with MC truth: fine",
+             10.0);
+
     B2DEBUG(100, "TRGGDLModule ... created");
   }
 
@@ -141,7 +151,9 @@ namespace Belle2 {
                                _Phase,
                                _algFromDB,
                                _algFilePath,
-                               _debugLevel);
+                               _debugLevel,
+                               _timquality_threshold_sfin,
+                               _timquality_threshold_fine);
     } else if (cfn != _gdl->configFile()) {
       _gdl = TRGGDL::getTRGGDL(cfn,
                                _simulationMode,
@@ -150,7 +162,9 @@ namespace Belle2 {
                                _Phase,
                                _algFromDB,
                                _algFilePath,
-                               _debugLevel);
+                               _debugLevel,
+                               _timquality_threshold_sfin,
+                               _timquality_threshold_fine);
     }
     if (_debugLevel > 9) printf("TRGGDLModule::beginRun() ends.\n");
 

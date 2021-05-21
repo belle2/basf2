@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 conditions_db
@@ -284,7 +283,7 @@ class ConditionsDB:
                 )
 
             if message is not None:
-                raise ConditionsDB.RequestError("{} failed: {}".format(message, error))
+                raise ConditionsDB.RequestError(f"{message} failed: {error}")
             else:
                 raise ConditionsDB.RequestError(error)
 
@@ -292,7 +291,7 @@ class ConditionsDB:
             try:
                 req.json()
             except json.JSONDecodeError as e:
-                B2INFO("Invalid response: {}".format(req.content))
+                B2INFO(f"Invalid response: {req.content}")
                 raise ConditionsDB.RequestError("{method} {url} returned invalid JSON response {}"
                                                 .format(e, method=method, url=url))
         return req
@@ -304,7 +303,7 @@ class ConditionsDB:
         try:
             req = self.request("GET", "/globalTags")
         except ConditionsDB.RequestError as e:
-            B2ERROR("Could not get the list of globaltags: {}".format(e))
+            B2ERROR(f"Could not get the list of globaltags: {e}")
             return None
 
         result = {}
@@ -330,7 +329,7 @@ class ConditionsDB:
         try:
             req = self.request("GET", "/globalTag/{globalTagName}".format(globalTagName=encode_name(name)))
         except ConditionsDB.RequestError as e:
-            B2ERROR("Cannot find globaltag '{}': {}".format(name, e))
+            B2ERROR(f"Cannot find globaltag '{name}': {e}")
             return None
 
         return req.json()
@@ -343,7 +342,7 @@ class ConditionsDB:
         try:
             req = self.request("GET", "/globalTagType")
         except ConditionsDB.RequestError as e:
-            B2ERROR("Could not get list of valid globaltag types: {}".format(e))
+            B2ERROR(f"Could not get list of valid globaltag types: {e}")
             return None
 
         types = {e["name"]: e for e in req.json()}
@@ -360,7 +359,7 @@ class ConditionsDB:
         """
         info = {"name": name, "description": description, "modifiedBy": user, "isDefault": False}
         try:
-            req = self.request("POST", f"/globalTag/DEV", f"Creating globaltag {name}", json=info)
+            req = self.request("POST", "/globalTag/DEV", f"Creating globaltag {name}", json=info)
         except ConditionsDB.RequestError as e:
             B2ERROR(f"Could not create globaltag {name}: {e}")
             return None
@@ -422,7 +421,7 @@ class ConditionsDB:
             else:
                 req = self.request("GET", "/payloads")
         except ConditionsDB.RequestError as e:
-            B2ERROR("Cannot get list of payloads: {}".format(e))
+            B2ERROR(f"Cannot get list of payloads: {e}")
             return {}
 
         result = {}
@@ -454,7 +453,7 @@ class ConditionsDB:
         try:
             req = self.request("POST", "/checkPayloads", json=search_query)
         except ConditionsDB.RequestError as e:
-            B2ERROR("Cannot check for existing payloads: {}".format(e))
+            B2ERROR(f"Cannot check for existing payloads: {e}")
             return {}
 
         result = {}
@@ -524,7 +523,7 @@ class ConditionsDB:
                                .format(moduleName=encode_name(module)),
                                data=post_body, headers=headers)
         except ConditionsDB.RequestError as e:
-            B2ERROR("Could not create Payload: {}".format(e))
+            B2ERROR(f"Could not create Payload: {e}")
             return None
 
         return req.json()["payloadId"]
@@ -559,7 +558,7 @@ class ConditionsDB:
             req = self.request("POST", "/globalTagPayload/{globalTagId},{payloadId}"
                                "/payloadIov/{firstExp},{firstRun},{finalExp},{finalRun}".format(**variables))
         except ConditionsDB.RequestError as e:
-            B2ERROR("Could not create IOV: {}".format(e))
+            B2ERROR(f"Could not create IOV: {e}")
             return None
 
         return req.json()["payloadIovId"]
@@ -571,7 +570,7 @@ class ConditionsDB:
         try:
             req = self.request("GET", "/globalTag/{globalTagName}/globalTagPayloads"
                                .format(globalTagName=encode_name(globalTagName)))
-        except ConditionsDB.RequestError as e:
+        except ConditionsDB.RequestError:
             # there could be just no iovs so no error
             return {}
 
@@ -811,7 +810,7 @@ class ConditionsDB:
                 description += f"|*Forward compatibility* | \\#{data['forward-compatibility']} |\n"
             description += '|*Details* |' + ''.join(data['details']) + ' |\n'
             if data['task'] == 'online':
-                description += f'|*Impact on data taking*|' + ''.join(data['data_taking']) + ' |\n'
+                description += '|*Impact on data taking*|' + ''.join(data['data_taking']) + ' |\n'
 
         # add information about uploaded payloads/IoVs
         description += '\nPayloads\n||Name||Revision||IoV||\n'

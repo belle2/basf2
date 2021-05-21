@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 pdg - access particle definitions
@@ -27,7 +26,7 @@ import re
 import basf2
 from ROOT.Belle2 import EvtGenDatabasePDG
 
-# the particle database (filled from evt.pdl by framework)
+#: the particle database (filled from evt.pdl by framework)
 _database = EvtGenDatabasePDG.Instance()
 
 
@@ -101,7 +100,7 @@ def conjugate(name):
 
     try:
         return to_name(-from_name(name))
-    except LookupError as e:
+    except LookupError:
         return name
 
 

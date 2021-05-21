@@ -10,13 +10,19 @@ from basf2 import register_module, create_path
 from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm, PXDAnalyticGainCalibrationAlgorithm
 from ROOT.Belle2 import PXDValidationAlgorithm
 from caf.framework import Calibration
-from caf.strategies import SequentialRunByRun, SimpleRunByRun, SequentialBoundaries
+from caf.strategies import SequentialRunByRun, SimpleRunByRun
 
 run_types = ['beam', 'physics', 'cosmic', 'all']
 gain_methods = ['analytic', 'generic_mc', 'cluster_sim', '']
 
 
-def hot_pixel_mask_calibration(input_files, cal_name="PXDHotPixelMaskCalibration", run_type=None, global_tags=None, local_dbs=None):
+def hot_pixel_mask_calibration(
+        input_files,
+        cal_name="PXDHotPixelMaskCalibration",
+        run_type=None,
+        global_tags=None,
+        local_dbs=None,
+        **kwargs):
     """
     Parameters:
       input_files (list): A list of input files to be assigned to calibration.input_files
@@ -27,6 +33,12 @@ def hot_pixel_mask_calibration(input_files, cal_name="PXDHotPixelMaskCalibration
       global_tags (list): A list of global tags
 
       local_dbs   (list): A list of local databases
+
+      **kwargs: Additional configuration to support extentions without changing scripts in calibration folder.
+        Supported options are listed below:
+
+        "activate_masking" is a boolean to activate existing masking in the payload.
+          PXDHotPixelMaskCollector will be used then instead of PXDRawHotPixelMaskCollector
 
     Return:
       A caf.framework.Calibration obj.
@@ -40,6 +52,9 @@ def hot_pixel_mask_calibration(input_files, cal_name="PXDHotPixelMaskCalibration
         run_type = 'all'
     if not isinstance(run_type, str) or run_type.lower() not in run_types:
         raise ValueError("run_type not found in run_types : {}".format(run_type))
+    activate_masking = kwargs.get("activate_masking", False)
+    if not isinstance(activate_masking, bool):
+        raise ValueError("activate_masking is not a boolean!")
 
     # Create BASF2 path
 
@@ -56,11 +71,15 @@ def hot_pixel_mask_calibration(input_files, cal_name="PXDHotPixelMaskCalibration
     main.add_module(geometry)
     main.add_module(pxdunpacker)
     main.add_module(checker)
+    if activate_masking:
+        main.add_module("ActivatePXDPixelMasker")
     main.add_module("PXDRawHitSorter")
 
     # Collector setup
-
-    collector = register_module("PXDRawHotPixelMaskCollector")
+    collector_name = "PXDRawHotPixelMaskCollector"
+    if activate_masking:
+        collector_name = "PXDHotPixelMaskCollector"
+    collector = register_module(collector_name)
     collector.param("granularity", "run")
 
     # Algorithm setup
@@ -74,7 +93,7 @@ def hot_pixel_mask_calibration(input_files, cal_name="PXDHotPixelMaskCalibration
     algorithm.drainMultiplier = 7           # Occupancy threshold is median occupancy x multiplier
     algorithm.maskRows = True               # Set True to allow masking of hot rows
     algorithm.rowMultiplier = 7             # Occupancy threshold is median occupancy x multiplier
-    algorithm.setPrefix("PXDRawHotPixelMaskCollector")
+    algorithm.setPrefix(collector_name)
     if run_type.lower() == 'cosmic':
         algorithm.forceContinueMasking = True
 
@@ -102,7 +121,7 @@ def hot_pixel_mask_calibration(input_files, cal_name="PXDHotPixelMaskCalibration
 
 def gain_calibration(input_files, cal_name="PXDGainCalibration",
                      boundaries=None, global_tags=None, local_dbs=None,
-                     gain_method="Analytic", validation=True):
+                     gain_method="Analytic", validation=True, **kwargs):
     """
     Parameters:
       input_files (list): A list of input files to be assigned to calibration.input_files
@@ -119,6 +138,8 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
         Caveat: Only the analytic method is now implemented.
 
       validation (bool): Adding validation algorithm if True (default)
+
+      **kwargs: Additional configuration to support extentions without changing scripts in calibration folder.
 
     Return:
       A caf.framework.Calibration obj.

@@ -18,6 +18,7 @@
 #include <framework/core/Environment.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <vxd/dataobjects/VxdID.h>
@@ -29,6 +30,7 @@
 #include <TVector3.h>
 #include <math.h>
 #include <iostream>
+#include <algorithm>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
@@ -68,6 +70,7 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_U->Branch("svdClSNR", &m_svdClSNR, "svdClSNR/F");
   m_t_U->Branch("svdClCharge", &m_svdClCharge, "svdClCharge/F");
   m_t_U->Branch("svdStripCharge", &m_svdStripCharge);
+  m_t_U->Branch("svdStrip6Samples", &m_svdStrip6Samples);
   m_t_U->Branch("svdClTime", &m_svdClTime, "svdClTime/F");
   m_t_U->Branch("svdStripTime", &m_svdStripTime);
   m_t_U->Branch("svdStripPosition", &m_svdStripPosition);
@@ -110,6 +113,7 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_V->Branch("svdClSNR", &m_svdClSNR, "svdClSNR/F");
   m_t_V->Branch("svdClCharge", &m_svdClCharge, "svdClCharge/F");
   m_t_V->Branch("svdStripCharge", &m_svdStripCharge);
+  m_t_V->Branch("svdStrip6Samples", &m_svdStrip6Samples);
   m_t_V->Branch("svdClTime", &m_svdClTime, "svdClTime/F");
   m_t_V->Branch("svdStripTime", &m_svdStripTime);
   m_t_V->Branch("svdStripPosition", &m_svdStripPosition);
@@ -278,7 +282,7 @@ void SVDPerformanceTTreeModule::event()
           m_svdStripCharge.clear();
           m_svdStripTime.clear();
           m_svdStripPosition.clear();
-
+          m_svdStrip6Samples.clear();
           //retrieve relations and set strip charges and times
           RelationVector<SVDRecoDigit> theRecoDigits = DataStore::getRelationsWithObj<SVDRecoDigit>(svd_1);
           if ((theRecoDigits.size() != m_svdSize) && (m_svdSize != 128)) //virtual cluster
@@ -287,7 +291,12 @@ void SVDPerformanceTTreeModule::event()
           //skip clusters created beacuse of missing APV
           if (m_svdSize < 128)
             for (unsigned int d = 0; d < m_svdSize; d++) {
+
+              SVDShaperDigit* ShaperDigit = theRecoDigits[d]->getRelated<SVDShaperDigit>();
+              array<float, 6> Samples = ShaperDigit->getSamples();
+
               m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
+              std::copy(std::begin(Samples), std::end(Samples), std::back_inserter(m_svdStrip6Samples));
               m_svdStripTime.push_back(theRecoDigits[d]->getTime());
               double misalignedStripPos = svdSensor_1.getUCellPosition(theRecoDigits[d]->getCellID());
               //aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)
@@ -345,7 +354,7 @@ void SVDPerformanceTTreeModule::event()
           m_svdStripCharge.clear();
           m_svdStripTime.clear();
           m_svdStripPosition.clear();
-
+          m_svdStrip6Samples.clear();
           //retrieve relations and set strip charges and times
           RelationVector<SVDRecoDigit> theRecoDigits = DataStore::getRelationsWithObj<SVDRecoDigit>(svd_1);
           if ((theRecoDigits.size() != m_svdSize) && (m_svdSize != 128)) //virtual cluster
@@ -354,7 +363,10 @@ void SVDPerformanceTTreeModule::event()
           //skip clusters created beacuse of missing APV
           if (m_svdSize < 128)
             for (unsigned int d = 0; d < m_svdSize; d++) {
+              SVDShaperDigit* ShaperDigit = theRecoDigits[d]->getRelated<SVDShaperDigit>();
+              array<float, 6> Samples = ShaperDigit->getSamples();
               m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
+              std::copy(std::begin(Samples), std::end(Samples), std::back_inserter(m_svdStrip6Samples));
               m_svdStripTime.push_back(theRecoDigits[d]->getTime());
               double misalignedStripPos = svdSensor_1.getVCellPosition(theRecoDigits[d]->getCellID());
               //Aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)

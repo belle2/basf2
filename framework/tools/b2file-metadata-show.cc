@@ -8,22 +8,23 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/logging/Logger.h>
+// Belle 2 headers
 #include <framework/core/FileCatalog.h>
 #include <framework/dataobjects/FileMetaData.h>
+#include <framework/io/RootFileInfo.h>
+#include <framework/logging/Logger.h>
 
-#include <TFile.h>
-#include <TTree.h>
+// ROOT headers
 #include <TError.h>
 
+// C++ headers
 #include <csignal>
+#include <iostream>
+#include <string>
 
+// Boost headers
 #include <boost/program_options.hpp>
 
-#include <string>
-#include <iostream>
-
-using namespace std;
 using namespace Belle2;
 namespace prog = boost::program_options;
 
@@ -32,16 +33,15 @@ int main(int argc, char* argv[])
   //remove SIGPIPE handler set by ROOT which sometimes caused infinite loops
   //See https://savannah.cern.ch/bugs/?97991
   //default action is to abort
-  if (signal(SIGPIPE, SIG_DFL) == SIG_ERR) {
+  if (std::signal(SIGPIPE, SIG_DFL) == SIG_ERR)
     B2FATAL("Cannot remove SIGPIPE signal handler");
-  }
 
   // Define command line options
   prog::options_description options("Options");
   options.add_options()
   ("help,h", "print all available options")
-  ("file,f", prog::value<string>(), "local file name")
-  ("lfn,l", prog::value<string>(), "logical file name")
+  ("file,f", prog::value<std::string>(), "local file name")
+  ("lfn,l", prog::value<std::string>(), "logical file name")
   ("all,a", "print all information")
   ("json", "print machine-readable information in JSON format. Implies --all and --steering.")
   ("steering,s", "print steering file contents")
@@ -56,63 +56,52 @@ int main(int argc, char* argv[])
                 options(options).positional(posOptDesc).run(), varMap);
     prog::notify(varMap);
   } catch (std::exception& e) {
-    cout << "Problem parsing command line: " << e.what() << endl;
-    cout << "Usage: " << argv[0] << " [OPTIONS] [FILE]\n";
-    cout << options << endl;
+    std::cout << "Problem parsing command line: " << e.what() << std::endl;
+    std::cout << "Usage: " << argv[0] << " [OPTIONS] [FILE]\n";
+    std::cout << options << std::endl;
     return 1;
   }
 
   //Check for help option
   if (varMap.count("help") or argc == 1) {
-    cout << "Usage: " << argv[0] << " [OPTIONS] [FILE]\n";
-    cout << options << endl;
+    std::cout << "Usage: " << argv[0] << " [OPTIONS] [FILE]\n";
+    std::cout << options << std::endl;
     return 0;
   }
 
-  FileMetaData metaData;
-  FileMetaData* metaDataPtr = &metaData;
+  FileMetaData metaData{};
 
-  //Check for file option
+  //Check for file and lfn options
   if (varMap.count("file")) {
     gErrorIgnoreLevel = kError;
-    string fileName = varMap["file"].as<string>();
-    TFile* file = TFile::Open(fileName.c_str(), "READ");
-    if (!file || !file->IsOpen()) {
-      B2ERROR("Couldn't open file " << fileName);
-      return 1;
+    std::string fileName = varMap["file"].as<std::string>();
+    try {
+      RootIOUtilities::RootFileInfo fileInfo{fileName};
+      metaData = fileInfo.getFileMetaData();
+    } catch (const std::invalid_argument&) {
+      B2FATAL("The input file can not be opened"
+              << LogVar("File name", fileName));
+    } catch (const std::runtime_error& e) {
+      B2FATAL("Something went wrong with the input file"
+              << LogVar("File name", fileName)
+              << LogVar("Issue", e.what()));
     }
-    auto* tree = (TTree*) file->Get("persistent");
-    if (!tree) {
-      B2ERROR("No tree persistent found in " << fileName);
-      return 1;
-    }
-    TBranch* branch = tree->GetBranch("FileMetaData");
-    if (!branch) {
-      B2ERROR("No meta data found in " << fileName);
-      return 1;
-    }
-    metaDataPtr = nullptr;
-    branch->SetAddress(&metaDataPtr);
-    tree->GetEntry(0);
-
   } else if (varMap.count("lfn")) {
-    std::string lfn = varMap["lfn"].as<string>();
-    if (!FileCatalog::Instance().getMetaData(lfn, metaData)) {
-      B2ERROR("No meta data found in file catalog for LFN " << varMap["lfn"].as<int>());
-      return 1;
-    }
-
-  } else {
-    B2ERROR("Please specify either a file name, a unique ID, or a LFN.");
-    return 1;
-  }
+    std::string lfn = varMap["lfn"].as<std::string>();
+    if (!FileCatalog::Instance().getMetaData(lfn, metaData))
+      B2FATAL("No FileMetaData found in FileCatalog"
+              << LogVar("LFN", varMap["lfn"].as<int>()));
+  } else
+    B2FATAL("Please specify either a file name or a LFN.");
 
   const char* option = "";
-  if (varMap.count("json")) option = "json";
-  else if (varMap.count("all")) option = "all";
-  metaDataPtr->Print(option);
-  if (string(option) != "json" and varMap.count("steering")) metaDataPtr->Print("steering");
+  if (varMap.count("json"))
+    option = "json";
+  else if (varMap.count("all"))
+    option = "all";
+  metaData.Print(option);
+  if (std::string(option) != "json" and varMap.count("steering"))
+    metaData.Print("steering");
 
   return 0;
 }
-

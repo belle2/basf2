@@ -7,9 +7,9 @@ necessary updates for a running globaltag
 
 from enum import Enum
 from collections import defaultdict
-from basf2 import B2ERROR, B2WARNING, B2INFO, B2WARNING  # noqa
-from . import ConditionsDB
-from .iov import IntervalOfValidity, IoVSet
+from basf2 import B2ERROR, B2WARNING, B2INFO  # noqa
+from conditions_db import ConditionsDB
+from conditions_db.iov import IntervalOfValidity, IoVSet
 
 
 class RunningTagUpdateMode(Enum):

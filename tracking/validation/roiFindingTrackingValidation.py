@@ -127,7 +127,6 @@ class ROIFindingTrackingValidationPlots(basf2.Module):
     def terminate(self):
         """Receive signal at the end of event processing"""
 
-        name = self.validation_name
         contact = self.contact
         basf2.B2RESULT("total nROIs = {}".format(self.nROIs))
 

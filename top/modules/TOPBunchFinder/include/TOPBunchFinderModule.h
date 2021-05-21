@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2018, 2021 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -23,6 +23,8 @@
 #include <framework/dataobjects/EventT0.h>
 #include <framework/database/DBObjPtr.h>
 #include <top/dbobjects/TOPCalCommonT0.h>
+#include <top/dbobjects/TOPFrontEndSetting.h>
+
 
 namespace Belle2 {
 
@@ -72,8 +74,10 @@ namespace Belle2 {
     Const::ChargedStable getMostProbable(const Track& track);
 
     // steering parameters
-    int m_numBins;      /**< number of bins to which search region is divided */
-    double m_timeRange; /**< time range in which to do fine search [ns] */
+    int m_numBins;      /**< number of bins to which the fine search region is divided */
+    double m_timeRangeFine; /**< time range in which to do fine search [ns] */
+    double m_timeRangeCoarse; /**< time range in which to do coarse search if autoRange turned off [ns] */
+    bool m_autoRange; /**< determine coarse range automatically */
     double m_sigmaSmear;  /**< additional smearing of PDF in [ns] */
     double m_minSignal;   /**< minimal number of signal photons */
     double m_minSBRatio;  /**< minimal signal-to-background ratio */
@@ -114,6 +118,7 @@ namespace Belle2 {
 
     // database
     DBObjPtr<TOPCalCommonT0> m_commonT0;   /**< common T0 calibration constants */
+    DBObjPtr<TOPFrontEndSetting> m_feSetting;  /**< front-end settings */
 
   };
 

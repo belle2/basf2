@@ -27,7 +27,7 @@ treeSP = inputSP.Get("tree")
 histsTP = R.TFile.Open("SVDTrackingPerformance.root", "recreate")
 
 
-pu.ploter(
+pu.plotter(
     name='SpacePointTime_U',
     title='SpacePoint time on U side',
     nbins=200,
@@ -44,7 +44,7 @@ pu.ploter(
     isShifter=True)
 
 
-pu.ploter(
+pu.plotter(
     name='SpacePointTime_V',
     title='SpacePoint time on V side',
     nbins=200,
@@ -61,7 +61,7 @@ pu.ploter(
     isShifter=True)
 
 
-pu.ploter(
+pu.plotter(
     name='cluster_UVTimeDiff',
     title='U-V time difference',
     nbins=80,
@@ -79,7 +79,7 @@ pu.ploter(
     isShifter=True)
 
 
-pu.ploter(
+pu.plotter(
     name='cluster_UUTimeDiff',
     title='U-U time difference',
     nbins=80,
@@ -97,7 +97,7 @@ pu.ploter(
     isShifter=True)
 
 
-pu.ploter(
+pu.plotter(
     name='cluster_VVTimeDiff',
     title='V-V time difference',
     nbins=80,
@@ -147,7 +147,7 @@ pu.plotRegions(
     isShifter=True)
 
 
-pu.ploter(
+pu.plotter(
     name='clusters_number',
     title='Number of clusters in one track',
     nbins=12,

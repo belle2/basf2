@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ############################################################
 # Demonstrates using (I)python inside a basf2 session,
@@ -24,8 +23,8 @@ class MinModule(Module):
         """
         reimplement Module::event()
         """
-        evtmetadata = Belle2.PyStoreObj("EventMetaData")
-        particles = Belle2.PyStoreArray("MCParticles")
+        evtmetadata = Belle2.PyStoreObj("EventMetaData")  # noqa
+        particles = Belle2.PyStoreArray("MCParticles")  # noqa
         B2INFO(80 * '=')
         B2INFO("Dropping into interactive python shell. Try:"
                "\n  print evtmetadata.obj().getEvent()"

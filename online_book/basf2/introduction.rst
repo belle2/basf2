@@ -62,7 +62,7 @@ https://doi.org/10.1007/s41781-018-0017-9
 
 ... and a logo.
 
-.. figure:: ../../../../_static/b2logo.svg
+.. figure:: introduction/b2logo.svg
     :align: center
     :width: 300px
     :alt: The basf2 logo.
@@ -965,7 +965,7 @@ Good luck.
     `in the main software repository <https://stash.desy.de/projects/B2/repos/software/browse/analysis/examples>`_.
     You might want to take a look there after the starterkit.
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Author of this lesson
 

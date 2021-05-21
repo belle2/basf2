@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Removes broken or empty root files in the current directory
 # Thomas Keck 2014
@@ -14,6 +13,6 @@ if __name__ == '__main__':
         z = rootfile.IsZombie()
         rootfile.Close()
         if n == 0 or z:
-            print('Remove broken or empty ROOT file {f} (y/n)?'.format(f=filename))
+            print(f'Remove broken or empty ROOT file {filename} (y/n)?')
             if input() == 'y':
                 os.remove(filename)

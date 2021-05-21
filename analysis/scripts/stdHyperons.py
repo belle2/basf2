@@ -96,8 +96,8 @@ def stdXi0(gammatype='eff40', path=None):
             [ chiProb > 0.0 ]',
             True, path=path)
         # ~7*sigma Range around nominal mass
-        stdPhotons(f'pi0{gammatype}_Jan2020', path=path)
-        reconstructDecay(f'pi0:reco -> gamma:pi0{gammatype}_Jan2020 gamma:pi0{gammatype}_Jan2020',
+        stdPhotons(f'pi0{gammatype}_May2020', path=path)
+        reconstructDecay(f'pi0:reco -> gamma:pi0{gammatype}_May2020 gamma:pi0{gammatype}_May2020',
                          'abs( dM ) < 0.0406',
                          True, path=path)
 

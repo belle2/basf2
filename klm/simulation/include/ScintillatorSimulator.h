@@ -13,8 +13,8 @@
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMSimHit.h>
 #include <klm/dataobjects/eklm/EKLMSimHit.h>
-#include <klm/dbobjects/eklm/EKLMChannelData.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
+#include <klm/dbobjects/KLMScintillatorFEEData.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 
 namespace Belle2 {
@@ -107,9 +107,9 @@ namespace Belle2 {
       double getEnergy();
 
       /**
-       * Set channel data.
+       * Set FEE data.
        */
-      void setChannelData(const EKLMChannelData* channelData);
+      void setFEEData(const KLMScintillatorFEEData* FEEData);
 
       /**
        * Generate photoelectrons.

@@ -51,6 +51,8 @@ namespace Belle2 {
       StoreObjPtr<ParticleList> m_DstParticles;
       /// Internal storage of the tracks for alignment calibration.
       StoreObjPtr<ParticleList> m_offIpParticles;
+      /// HLT filter line for the TRG skim.
+      std::string m_filterL1TrgNN = "";
     };
   }
 }

@@ -14,5 +14,6 @@
 #pragma link C++ class Belle2::TOP::TOPCommonT0LLAlgorithm-;
 #pragma link C++ class Belle2::TOP::TOPPulseHeightAlgorithm-;
 #pragma link C++ class Belle2::TOP::TOPAlignmentAlgorithm-;
+#pragma link C++ class Belle2::TOP::TOPChannelMaskAlgorithm-;
 
 #endif

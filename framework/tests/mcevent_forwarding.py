@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import sys
 import basf2
@@ -94,7 +93,7 @@ with clean_working_directory():
 
     # and if some files are processed multiple times we don't want to forward
     # the number either
-    run_rootio(f"duplicate.root", all_files*2, 0)
+    run_rootio("duplicate.root", all_files*2, 0)
 
 if failures > 0:
     basf2.B2ERROR(f"{failures} tests failed ...")

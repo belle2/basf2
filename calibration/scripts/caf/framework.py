@@ -36,7 +36,6 @@ from caf.utils import parse_file_uri
 
 import caf.strategies as strategies
 import caf.runners as runners
-from caf import backends
 from caf.backends import MaxSubjobsSplitter, MaxFilesSplitter
 from caf.state_machines import CalibrationMachine, ConditionError, MachineError
 from caf.database import CAFDB
@@ -1456,5 +1455,5 @@ class CAF():
         if self._db_path.exists():
             B2INFO(f"Previous CAF database found {self._db_path}")
         # Will create a new database + tables, or do nothing but checks we can connect to existing one
-        with CAFDB(self._db_path) as db:
+        with CAFDB(self._db_path):
             pass

@@ -20,6 +20,7 @@
 #include <framework/utilities/TestHelpers.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/Const.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
@@ -434,11 +435,11 @@ namespace {
 
       // create the true underlying mcparticles
       auto* true_photon = mcparticles.appendNew(MCParticle());
-      true_photon->setPDG(22);
+      true_photon->setPDG(Const::photon.getPDGCode());
       auto* true_electron = mcparticles.appendNew(MCParticle());
-      true_electron->setPDG(11);
+      true_electron->setPDG(Const::electron.getPDGCode());
       auto* true_pion = mcparticles.appendNew(MCParticle());
-      true_pion->setPDG(-211);
+      true_pion->setPDG(-Const::pion.getPDGCode());
 
       // create the reco clusters
       auto* cl0 = clusters.appendNew(ECLCluster());
@@ -526,9 +527,9 @@ namespace {
 
     graphParticleMother.setPDG(-521);
     graphParticleDaughter1.setPDG(421);
-    graphParticleDaughter2.setPDG(-211);
-    graphParticleGranddaughter1.setPDG(-321);
-    graphParticleGranddaughter2.setPDG(-11);
+    graphParticleDaughter2.setPDG(-Const::pion.getPDGCode());
+    graphParticleGranddaughter1.setPDG(-Const::kaon.getPDGCode());
+    graphParticleGranddaughter2.setPDG(-Const::electron.getPDGCode());
     graphParticleGranddaughter3.setPDG(12);
 
     // Create the two 4-vectors that will factor into calculation, and set a mass that corresponds
@@ -601,10 +602,10 @@ namespace {
 
 
     const auto* pdgcode = Manager::Instance().getVariable("clusterBestMCPDG");
-    EXPECT_EQ(pdgcode->function(photon),       22);
-    EXPECT_EQ(pdgcode->function(electron),     11);
-    EXPECT_EQ(pdgcode->function(pion),     11);
-    EXPECT_EQ(pdgcode->function(misid_photon), 11);
+    EXPECT_EQ(pdgcode->function(photon),       Const::photon.getPDGCode());
+    EXPECT_EQ(pdgcode->function(electron),     Const::electron.getPDGCode());
+    EXPECT_EQ(pdgcode->function(pion),     Const::electron.getPDGCode());
+    EXPECT_EQ(pdgcode->function(misid_photon), Const::electron.getPDGCode());
 
     const auto* weight = Manager::Instance().getVariable("clusterBestMCMatchWeight");
     EXPECT_FLOAT_EQ(weight->function(photon),       12.3);
@@ -691,13 +692,13 @@ namespace {
     DataStore::Instance().setInitializeActive(false);
 
     auto* mcParticle = mcParticles.appendNew();
-    mcParticle->setPDG(11);
+    mcParticle->setPDG(Const::electron.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
     auto* p1 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p1->addRelationTo(mcParticle);
 
     mcParticle = mcParticles.appendNew();
-    mcParticle->setPDG(-11);
+    mcParticle->setPDG(-Const::electron.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
     auto* p2 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p2->addRelationTo(mcParticle);
@@ -721,7 +722,7 @@ namespace {
     DataStore::Instance().setInitializeActive(false);
 
     auto* mcParticle = mcParticles2.appendNew();
-    mcParticle->setPDG(22);
+    mcParticle->setPDG(Const::photon.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
     auto* p3 = particles2.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p3->addRelationTo(mcParticle);
@@ -751,7 +752,7 @@ namespace {
     DataStore::Instance().setInitializeActive(false);
 
     auto* mcParticle = mcParticles3.appendNew();
-    mcParticle->setPDG(22);
+    mcParticle->setPDG(Const::photon.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
     auto* p5 = particles3.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p5->addRelationTo(mcParticle);
@@ -1170,9 +1171,9 @@ namespace {
     MCParticleGraph::GraphParticle& graphParticleDaughter2 = mcGraph.addParticle();
 
     graphParticleGrandMother.setPDG(-521);
-    graphParticleMother.setPDG(13);
+    graphParticleMother.setPDG(Const::muon.getPDGCode());
     graphParticleAunt.setPDG(-14);
-    graphParticleDaughter1.setPDG(11);
+    graphParticleDaughter1.setPDG(Const::electron.getPDGCode());
     graphParticleDaughter2.setPDG(14);
 
     graphParticleMother.comesFrom(graphParticleGrandMother);
@@ -1292,16 +1293,16 @@ namespace {
 
     StoreArray<MCParticle> mcParticles;
     auto* mcParticle = mcParticles.appendNew();
-    mcParticle->setPDG(11);
+    mcParticle->setPDG(Const::electron.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
     mcParticle = mcParticles.appendNew();
-    mcParticle->setPDG(22);
+    mcParticle->setPDG(Const::photon.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
     mcParticle = mcParticles.appendNew();
-    mcParticle->setPDG(-11);
+    mcParticle->setPDG(-Const::electron.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
     mcParticle = mcParticles.appendNew();
-    mcParticle->setPDG(11);
+    mcParticle->setPDG(Const::electron.getPDGCode());
 
 
     const Manager::Var* var = Manager::Instance().getVariable("NumberOfMCParticlesInEvent(11)");
@@ -1390,9 +1391,9 @@ namespace {
     MCParticleGraph::GraphParticle& graphParticleDaughter2 = mcGraph.addParticle();
 
     graphParticleGrandMother.setPDG(-521);
-    graphParticleMother.setPDG(13);
+    graphParticleMother.setPDG(Const::muon.getPDGCode());
     graphParticleAunt.setPDG(-14);
-    graphParticleDaughter1.setPDG(11);
+    graphParticleDaughter1.setPDG(Const::electron.getPDGCode());
     graphParticleDaughter2.setPDG(14);
 
     graphParticleMother.comesFrom(graphParticleGrandMother);
@@ -1477,9 +1478,9 @@ namespace {
     MCParticleGraph::GraphParticle& graphParticleDaughter2 = mcGraph.addParticle();
 
     graphParticleGrandMother.setPDG(-521);
-    graphParticleMother.setPDG(13);
+    graphParticleMother.setPDG(Const::muon.getPDGCode());
     graphParticleAunt.setPDG(-14);
-    graphParticleDaughter1.setPDG(11);
+    graphParticleDaughter1.setPDG(Const::electron.getPDGCode());
     graphParticleDaughter2.setPDG(14);
 
     graphParticleMother.comesFrom(graphParticleGrandMother);
@@ -1558,7 +1559,7 @@ namespace {
     graphParticleGrandMother.setPDG(300553);
     graphParticleMother.setPDG(-521);
     graphParticleAunt.setPDG(521);
-    graphParticleDaughter1.setPDG(11);
+    graphParticleDaughter1.setPDG(Const::electron.getPDGCode());
     graphParticleDaughter2.setPDG(-12);
 
     graphParticleGrandMother.setMomentum(0.0, 0.0, 0.4);
@@ -1653,7 +1654,7 @@ namespace {
     graphParticleGrandMother.setPDG(300553);
     graphParticleMother.setPDG(-521);
     graphParticleAunt.setPDG(521);
-    graphParticleDaughter1.setPDG(11);
+    graphParticleDaughter1.setPDG(Const::electron.getPDGCode());
     graphParticleDaughter2.setPDG(-12);
 
     graphParticleGrandMother.setMomentum(0.0, 0.0, 0.4);
@@ -1716,8 +1717,8 @@ namespace {
     MCParticleGraph::GraphParticle& graphParticle1 = mcGraph2.addParticle();
     MCParticleGraph::GraphParticle& graphParticle2 = mcGraph2.addParticle();
 
-    graphParticle1.setPDG(11);
-    graphParticle2.setPDG(-11);
+    graphParticle1.setPDG(Const::electron.getPDGCode());
+    graphParticle2.setPDG(-Const::electron.getPDGCode());
 
     graphParticle1.setMomentum(1.1, 1.3, 1.4);
     graphParticle1.setMomentum(-1.1, -1.3, 1.4);
@@ -1822,7 +1823,7 @@ namespace {
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
+      Particle d(TLorentzVector(-1, 1.0 - 2 * (i % 2), 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -1853,6 +1854,14 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(p), 0);
 
+    var = Manager::Instance().getVariable("daughterDiffOf(1, 0, phi)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -1.5707964);
+
+    var = Manager::Instance().getVariable("daughterDiffOf(1, 0, useCMSFrame(phi))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -1.513103);
+
     EXPECT_B2FATAL(Manager::Instance().getVariable("daughterDiffOf(0, NOTINT, PDG)"));
   }
 
@@ -1874,7 +1883,7 @@ namespace {
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
       auto* mcParticle = mcParticles.appendNew();
-      mcParticle->setPDG((i % 2) ? -11 : 211);
+      mcParticle->setPDG((i % 2) ? -Const::electron.getPDGCode() : Const::pion.getPDGCode());
       mcParticle->setStatus(MCParticle::c_PrimaryParticle);
       newDaughters->addRelationTo(mcParticle);
     }
@@ -2044,10 +2053,10 @@ namespace {
     const Manager::Var* var_E_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,2,3,E)");
     const Manager::Var* var_ClusterE_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,2,3,clusterE)");
 
-    const Manager::Var* var_ClusterPhi = Manager::Instance().getVariable("grandDaughterDiffOfClusterPhi(0,1,0,0)");
-    const Manager::Var* var_Phi = Manager::Instance().getVariable("grandDaughterDiffOfPhi(0,1,0,0)");
-    const Manager::Var* var_ClusterPhi_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOfClusterPhi(0,1,2,3)");
-    const Manager::Var* var_Phi_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOfPhi(0,1,2,3)");
+    const Manager::Var* var_ClusterPhi = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,0,0,clusterPhi)");
+    const Manager::Var* var_Phi = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,0,0,phi)");
+    const Manager::Var* var_ClusterPhi_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,2,3,clusterPhi)");
+    const Manager::Var* var_Phi_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,2,3,phi)");
 
     // when no relations are set between the particles and the eclClusters, nan is expected to be returned for the Cluster- vars
     // no problems are supposed to happen for non-Cluster- vars
@@ -2263,19 +2272,19 @@ namespace {
     DataStore::Instance().setInitializeActive(false);
 
     auto* mcParticle = mcParticles.appendNew();
-    mcParticle->setPDG(11);
+    mcParticle->setPDG(Const::electron.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
     auto* p1 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p1->addRelationTo(mcParticle);
 
     mcParticle = mcParticles.appendNew();
-    mcParticle->setPDG(-11);
+    mcParticle->setPDG(-Const::electron.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
     auto* p2 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p2->addRelationTo(mcParticle);
 
     mcParticle = mcParticles.appendNew();
-    mcParticle->setPDG(22);
+    mcParticle->setPDG(Const::photon.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
     auto* p3 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p3->addRelationTo(mcParticle);
@@ -2460,19 +2469,19 @@ namespace {
 
     // MCParticles
     auto* mcphoton = mcparticles.appendNew();
-    mcphoton->setPDG(22);
+    mcphoton->setPDG(Const::photon.getPDGCode());
     mcphoton->setStatus(MCParticle::c_PrimaryParticle);
 
     auto* mcelectron = mcparticles.appendNew();
-    mcelectron->setPDG(11);
+    mcelectron->setPDG(Const::electron.getPDGCode());
     mcelectron->setStatus(MCParticle::c_PrimaryParticle);
 
     auto* mcanotherelectron = mcparticles.appendNew();
-    mcanotherelectron->setPDG(22);
+    mcanotherelectron->setPDG(Const::photon.getPDGCode());
     mcanotherelectron->setStatus(MCParticle::c_PrimaryParticle);
 
     auto* mcyetanotherelectron = mcparticles.appendNew();
-    mcyetanotherelectron->setPDG(22);
+    mcyetanotherelectron->setPDG(Const::photon.getPDGCode());
     mcyetanotherelectron->setStatus(MCParticle::c_PrimaryParticle);
 
     // particles
@@ -3394,7 +3403,7 @@ namespace {
       momentum_1 = momentum_1 + mom;
 
       auto* mcParticle = mcParticles.appendNew();
-      mcParticle->setPDG((i % 2) ? -11 : 211);
+      mcParticle->setPDG((i % 2) ? -Const::electron.getPDGCode() : Const::pion.getPDGCode());
       mcParticle->setStatus(MCParticle::c_PrimaryParticle);
       mcParticle->set4Vector(mom);
       newDaughters->addRelationTo(mcParticle);
@@ -3422,7 +3431,7 @@ namespace {
       momentum_2 = momentum_2 + mom;
 
       auto* mcParticle = mcParticles.appendNew();
-      mcParticle->setPDG((i % 2) ? -11 : 211);
+      mcParticle->setPDG((i % 2) ? -Const::electron.getPDGCode() : Const::pion.getPDGCode());
       mcParticle->setStatus(MCParticle::c_PrimaryParticle);
       mcParticle->set4Vector(mom);
       newDaughters->addRelationTo(mcParticle);
@@ -3464,14 +3473,11 @@ namespace {
 
     EXPECT_B2FATAL(Manager::Instance().getVariable("mcDaughterDiffOf(0, NOTINT, PDG)"));
 
-
-    // Test mcDaughterDiffOfPhi
-    var = Manager::Instance().getVariable("mcDaughterDiffOfPhi(0, 1)");
+    // Test azimuthal angle as well
+    var = Manager::Instance().getVariable("mcDaughterDiffOf(0, 1, phi)");
     ASSERT_NE(var, nullptr);
     v_test = momentum_2.Vect().DeltaPhi(momentum_1.Vect());
     EXPECT_FLOAT_EQ(var->function(p), v_test);
-
-    EXPECT_B2FATAL(Manager::Instance().getVariable("mcDaughterDiffOfPhi(0, NOTINT)"));
 
   }
 
@@ -3510,19 +3516,19 @@ namespace {
 
     mcg_m.setPDG(421);
     mcg_m.set4Vector(TLorentzVector(7, 7, 7, 7));
-    mcg_d_0.setPDG(-310);
+    mcg_d_0.setPDG(-Const::Kshort.getPDGCode());
     mcg_d_0.set4Vector(TLorentzVector(6, 6, 6, 6));
-    mcg_d_1.setPDG(310);
+    mcg_d_1.setPDG(Const::Kshort.getPDGCode());
     mcg_d_1.set4Vector(TLorentzVector(5, 5, 5, 5));
-    mcg_gd_0_0.setPDG(211);
+    mcg_gd_0_0.setPDG(Const::pion.getPDGCode());
     mcg_gd_0_0.set4Vector(TLorentzVector(4, 4, 4, 4));
-    mcg_gd_0_1.setPDG(-211);
+    mcg_gd_0_1.setPDG(-Const::pion.getPDGCode());
     mcg_gd_0_1.set4Vector(TLorentzVector(3, 3, 3, 3));
-    mcg_gd_1_0.setPDG(211);
+    mcg_gd_1_0.setPDG(Const::pion.getPDGCode());
     mcg_gd_1_0.set4Vector(TLorentzVector(2, 1, 2, 2));
-    mcg_gd_1_1.setPDG(-211);
+    mcg_gd_1_1.setPDG(-Const::pion.getPDGCode());
     mcg_gd_1_1.set4Vector(TLorentzVector(1, 1, 1, 1));
-    mcg_not_child.setPDG(211);
+    mcg_not_child.setPDG(Const::pion.getPDGCode());
     mcg_not_child.set4Vector(TLorentzVector(10, 10, 10, 10));
 
     mcg_d_0.comesFrom(mcg_m);
@@ -3903,12 +3909,12 @@ namespace {
 
     mcg_m.setPDG(521);
     mcg_d_0.setPDG(-411);
-    mcg_d_1.setPDG(211);
-    mcg_gd_0_0.setPDG(310);
-    mcg_gd_0_1.setPDG(-211);
-    mcg_ggd_0_0_0.setPDG(211);
-    mcg_ggd_0_0_1.setPDG(-211);
-    mcg_not_child.setPDG(211);
+    mcg_d_1.setPDG(Const::pion.getPDGCode());
+    mcg_gd_0_0.setPDG(Const::Kshort.getPDGCode());
+    mcg_gd_0_1.setPDG(-Const::pion.getPDGCode());
+    mcg_ggd_0_0_0.setPDG(Const::pion.getPDGCode());
+    mcg_ggd_0_0_1.setPDG(-Const::pion.getPDGCode());
+    mcg_not_child.setPDG(Const::pion.getPDGCode());
 
     mcg_d_0.comesFrom(mcg_m);
     mcg_d_1.comesFrom(mcg_m);
@@ -4350,12 +4356,18 @@ namespace {
                               particledEdx)));
     //Mostlikely PDG tests:
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG()")->function(particledEdx), 1.00001e+09);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.5, 0.1, 0.1, 0.1, 0.1, 0.1)")->function(particledEdx), 11);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.5, 0.1, 0.1, 0.1, 0.1)")->function(particledEdx), 13);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.5, 0.1, 0.1, 0.1)")->function(particledEdx), 211);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.5, 0.1, 0.1)")->function(particledEdx), 321);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.1, 0.5, 0.1)")->function(particledEdx), 2212);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0, 1., 0, 0, 0, 0)")->function(particledEdx), 13);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.5, 0.1, 0.1, 0.1, 0.1, 0.1)")->function(particledEdx),
+                    Const::electron.getPDGCode());
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.5, 0.1, 0.1, 0.1, 0.1)")->function(particledEdx),
+                    Const::muon.getPDGCode());
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.5, 0.1, 0.1, 0.1)")->function(particledEdx),
+                    Const::pion.getPDGCode());
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.5, 0.1, 0.1)")->function(particledEdx),
+                    Const::kaon.getPDGCode());
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.1, 0.5, 0.1)")->function(particledEdx),
+                    Const::proton.getPDGCode());
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0, 1., 0, 0, 0, 0)")->function(particledEdx),
+                    Const::muon.getPDGCode());
   }
 
   TEST_F(PIDVariableTest, MissingLikelihood)
@@ -4459,7 +4471,7 @@ namespace {
 
       // Insert MC particle logic here
       MCParticle mcKs;
-      mcKs.setPDG(310);
+      mcKs.setPDG(Const::Kshort.getPDGCode());
       mcKs.setProductionVertex(1.0, 1.0, 0.0);
       mcKs.setDecayVertex(4.0, 5.0, 0.0);
       mcKs.setProductionTime(0);
@@ -4762,7 +4774,7 @@ namespace {
 
       // Insert MC particle logic here
       MCParticle mcKs;
-      mcKs.setPDG(310);
+      mcKs.setPDG(Const::Kshort.getPDGCode());
       mcKs.setDecayVertex(4.0, 5.0, 0.0);
       mcKs.setProductionVertex(TVector3(1.0, 2.0, 3.0));
       mcKs.setMassFromPDG();

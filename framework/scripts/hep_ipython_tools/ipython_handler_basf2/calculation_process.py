@@ -22,8 +22,8 @@ class Basf2CalculationProcess(CalculationProcess):
         #: The maximum number of events to process. Leave 0 to process al events
         self.max_event = max_event
 
-        super(Basf2CalculationProcess, self).__init__(result_queue=result_queue, log_file_name=log_file_name,
-                                                      parameters=parameters)
+        super().__init__(result_queue=result_queue, log_file_name=log_file_name,
+                         parameters=parameters)
 
     def prepare(self):
         """

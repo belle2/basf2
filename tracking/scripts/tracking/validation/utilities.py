@@ -1,4 +1,4 @@
-import basf2  # Import basf2 to make the Belle2 namespace available
+import basf2  # Import basf2 to make the Belle2 namespace available # noqa
 import ROOT
 from ROOT import Belle2
 

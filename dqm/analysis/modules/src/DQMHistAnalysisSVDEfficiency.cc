@@ -123,6 +123,10 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   m_hEfficiency = new SVDSummaryPlots("SVDEfficiency@view", "Summary of SVD efficiencies (%), @view/@side Side");
   m_hEfficiencyErr = new SVDSummaryPlots("SVDEfficiencyErr@view", "Summary of SVD efficiencies errors (%), @view/@side Side");
 
+  // status of module efficiency for U and V sides
+  m_effUstatus = lowStat; // default state is lowStat
+  m_effVstatus = lowStat;
+
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::beginRun()
@@ -141,10 +145,6 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   //SETUP gSTYLE - all plots
   //  gStyle->SetOptStat(0);
   //  gStyle->SetTitleY(.97);
-
-  //check MODULE EFFICIENCY
-  m_effUstatus = lowStat; // default state is lowStat
-  m_effVstatus = lowStat;
 
   //set dedicate gStyle
   //  const Int_t colNum = 4;

@@ -27,7 +27,9 @@ REG_MODULE(DQMHistAnalysisSVDEfficiency)
 //-----------------------------------------------------------------
 
 DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
-  : DQMHistAnalysisModule()
+  : DQMHistAnalysisModule(),
+    m_effUstatus(lowStat),
+    m_effVstatus(lowStat)
 {
   //Parameter definition
   B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: Constructor done.");
@@ -122,11 +124,6 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
 
   m_hEfficiency = new SVDSummaryPlots("SVDEfficiency@view", "Summary of SVD efficiencies (%), @view/@side Side");
   m_hEfficiencyErr = new SVDSummaryPlots("SVDEfficiencyErr@view", "Summary of SVD efficiencies errors (%), @view/@side Side");
-
-  // status of module efficiency for U and V sides
-  m_effUstatus = lowStat; // default state is lowStat
-  m_effVstatus = lowStat;
-
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::beginRun()

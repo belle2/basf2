@@ -1,7 +1,7 @@
 .. _tracking_calibration: 
 
-Tracking Calibration
-====================
+Tracking Calibrations
+=====================
 
 .. warning::
   This documentation is under construction!

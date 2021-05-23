@@ -1,7 +1,7 @@
 .. _tracking_trackFitting: 
 
-Documentation of the track fitting
-==================================
+Track Fitting
+=============
 
 .. warning::
   This documentation is under construction!

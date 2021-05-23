@@ -33,34 +33,57 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                 add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False):
     """
-    This function adds the standard reconstruction modules for tracking
-    to a path.
+    This function adds the **standard tracking reconstruction** modules
+    to a path:
 
-    :param path: The path to add the tracking reconstruction modules to
+    #. first we find tracks using the CDC hits only, see :ref:`CDC Track Finding<tracking_trackFindingCDC>`
+    #. CDC tracks are extrapolated to SVD and SVD hits are attached, see :ref:`CDC to SVD CKF<tracking_cdc2svd_ckf>`
+    #. remaining  SVD hits are used to find SVD tracks, see :ref:`SVD Track Finding<tracking_trackFindingSVD>`
+    #. SVD tracks are extrapolated to CDC to attach CDC hits, see :ref:`SVD to CDC CKF<tracking_svd2cdc_ckf>`
+    #. SVD and CDC tracks are merged and fitted, see :ref:`Track Fitting<tracking_trackFitting>`
+    #. merged SVD+CDC tracks are extrapolated to PXD to attach PXD hits, see :ref:`SVD to PXD CKF<tracking_svd2pxd_ckf>`
+
+    .. note::
+
+       PXD hits are not available on HLT. At the end of the tracking chain on HLT we have the\
+       :ref:`PXD Region Of Interest Finding<pxdDataReduction>`, that consists of extrapolating\
+       the tracks on the PXD sensors and defining regions in which we expect to find the hit.\
+       Only fired pixels inside these regions reach Event Builder 2.
+
+    #. after all the tracks from the IP are found, we look for special classes of tracks,\
+    in particular we search for displaced vertices to reconstruct K-short, Lambda and\
+    photon-conversions, see :ref:`V0 Finding<tracking_v0Finding>`
+
+    .. note::
+
+       this last step is not run on HLT
+
+
+    :param path: the path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
-    :param pruneTracks: Delete all hits except the first and the last in the found tracks.
-    :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
+    :param pruneTracks: if true, delete all hits except the first and the last in the found tracks.
+    :param skipGeometryAdding: (advanced flag) the tracking modules need the geometry module and will add it,
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
         determine, if the geometry is already loaded. This flag can be used o just turn off the geometry adding at
         all (but you will have to add it on your own then).
-    :param skipHitPreparerAdding: Advanced flag: do not add the hit preparation (esp. VXD cluster creation
+    :param skipHitPreparerAdding: (advanced flag) if true, do not add the hit preparation (esp. VXD cluster creation
         modules. This is useful if they have been added before already.
-    :param mcTrackFinding: Use the MC track finders instead of the realistic ones.
-    :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
-    :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
+    :param mcTrackFinding: if true, use the MC track finders instead of the realistic ones.
+    :param reco_tracks: name of the StoreArray where the reco tracks should be stored
+    :param prune_temporary_tracks: if false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
-    :param fit_tracks: If false, the final track find and the TrackCreator module will no be executed
-    :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
-    :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    :param fit_tracks: if false, the final track find and the TrackCreator module will no be executed
+    :param use_second_cdc_hits: if true, the second hit information will be used in the CDC track finding.
+    :param trackFitHypotheses: which pdg hypothesis to fit. Defaults to [211, 321, 2212].
     :param use_svd_to_cdc_ckf: if true, add SVD to CDC CKF module.
     :param use_ecl_to_cdc_ckf: if true, add ECL to CDC CKF module.
-    :param add_cdcTrack_QI: If true, add the MVA track quality estimation
+    :param add_cdcTrack_QI: if true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found CDC standalone tracks
-    :param add_vxdTrack_QI: If true, add the MVA track quality estimation
+    :param add_vxdTrack_QI: if true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found VXDTF2 tracks
         (ATTENTION: Standard triplet QI of VXDTF2 is replaced in this case
         -> setting this option to 'True' will have some influence on the final track collection)
-    :param add_recoTrack_QI: If true, add the MVA track quality estimation
+    :param add_recoTrack_QI: if true, add the MVA track quality estimation
         to the path that sets the quality indicator property of all found reco tracks
         (Both other QIs needed as input.)
     """
@@ -153,6 +176,7 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
     :param top_in_counter: time of propagation from the hit point to the PMT in the trigger counter is subtracted
            (assuming PMT is put at -z of the counter).
     """
+
     # make sure CDC is used
     if not is_cdc_used(components):
         return

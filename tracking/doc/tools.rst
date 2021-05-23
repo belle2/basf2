@@ -1,7 +1,7 @@
 .. _tracking_tools: 
 
-Tools for the tracking package
-==============================
+Tools
+=====
 
 .. warning::
   This documentation is under construction!

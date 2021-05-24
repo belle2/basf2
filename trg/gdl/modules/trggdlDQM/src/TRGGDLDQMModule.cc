@@ -158,14 +158,12 @@ void TRGGDLDQMModule::defineHisto()
     h_psn_effect_to_l1[iskim] = new TH1I(Form("hGDL_psn_effect_to_l1_%s", skim_smap[iskim].c_str()), "psn effect to l1",
                                          n_output_overlap, 0,
                                          n_output_overlap);
-    h_psn_effect_to_l1[iskim]->LabelsOption("v");
     for (int i = 0; i < n_output_overlap; i++) {
       h_psn_effect_to_l1[iskim]->GetXaxis()->SetBinLabel(i + 1, output_overlap[i]);
     }
     // output no overlap
     h_psn_raw_rate[iskim] = new TH1I(Form("hGDL_psn_raw_rate_%s", skim_smap[iskim].c_str()), "psn raw rate", n_output_overlap, 0,
                                      n_output_overlap);
-    h_psn_raw_rate[iskim]->LabelsOption("v");
     for (int i = 0; i < n_output_overlap; i++) {
       h_psn_raw_rate[iskim]->GetXaxis()->SetBinLabel(i + 1, output_overlap[i]);
     }
@@ -1615,10 +1613,10 @@ const char* TRGGDLDQMModule::output_extra[n_output_extra] = {
 };
 
 const char* TRGGDLDQMModule::output_overlap[n_output_overlap] = {
-  "all",       "B_CDC",        "B_ECL",      "L_KLM",            "L_CDC",         "L_ECL",      "CALIB",      "MONITOR",      "other",        "B_ffy",
+  "all",       "B_CDC",        "B_ECL",      "L_KLM",            "L_CDC",         "L_ECL",      "CALIB",      "MONITOR",      "OTHER",        "B_ffy",
   "B_fyo",     "B_c4",         "B_hie",      "L_klm",            "L_klm_match",   "L_stt",      "L_short",    "L_fy30",       "L_inner",      "L_lml",
   "CALIB_gg",  "CALIB_bhapur", "CALIB_pid",  "CALIB_wo_bhaveto", "CALIB_eclmumu", "CALIB_lml1", "CALIB_lml4", "CALIB_noveto", "CALIB_random", "MON_ffz",
-  "MON_fzo",   "monitor",      "other"
+  "MON_fzo",   "MONITOR_all",      "OTHER_all"
 };
 
 

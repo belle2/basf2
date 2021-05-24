@@ -144,13 +144,16 @@ For more-than-one strip clusters we have two algorithms:
 The available algorithms to determine the strip charge for the position computation are the same available for clusters, strips are considered as one-strip clusters. To choose the strip charge reconstruction algorithm for cluster position computation use the :b2:mod:`SVDClusterizer` parameter ``stripChargeAlgorithm{3/6}Samples``. The **default** algorithm is the ``MaxSample``.
 
 
-In the current **default** reconstruction the ``CoG`` is used for cluster size = 2, and ``AHT`` is used for cluster size > 2.
-Position errors are scaled depending on the cluster size, scale factors are stored in :ref:`SVDClusterCut<svdclustercuts>`.
+In the current **default** reconstruction the ``CoG`` is used for cluster size > 1 (``AHT`` is not used).
+
+.. note::
+
+   Position errors are NOT scaled. Scaling factors should be re-determined and stored in :ref:`SVDClusterCut<svdclustercuts>`.
 
 The ``SVDClusterizer`` supports the following position reconstruction algorithms (that can be passed as string, see the :b2:mod:`SVDClusterizer` parameter ``positionAlgorithm{3/6}Samples`` parameter)
 
-* ``OldDefault``: current default described above
-* ``CoGOnly``: the ``CoG`` is used for all cluster sizes :math:`\ge2` (``AHT`` is not used)
+* ``OldDefault``: ``CoG`` for cluster size = 2 and ``AHT`` for cluster sizes > 2.
+* ``CoGOnly`` (**current default**): the ``CoG`` is used for all cluster sizes :math:`\ge2` (``AHT`` is not used).
 
 .. seealso::
 

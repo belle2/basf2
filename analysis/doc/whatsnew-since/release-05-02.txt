@@ -58,6 +58,9 @@ Variables
  * New variables have been added to classify the true decay mode of an event (e.g. :b2:var:`BplusMode` and :b2:var:`B0Mode`). They
    serve as an alternative to the `TopologyAnalysis`. Further information about the meaning of the variable values can be found in
    :b2:ref:`GeneratedDecayModes`.
+ * Added new variables :b2:var:`useParticleRestFrame` and :b2:var:`useRecoilParticleRestFrame` for computing variables in the
+   rest frame of a given Particle (or in the rest frame of the recoiling system of a given Particle). If the ParticleList passed
+   to these variables contains more than one Particle, only the first one in the list will be considered.
 
 Modules
 +++++++

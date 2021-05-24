@@ -98,6 +98,14 @@ The ``SVDDectectorConfiguration`` wrapper contains both ``SVDGlobalConfigParamet
 Reconstruction Calibrations
 ---------------------------
 
+.. _svdcogonlycal:
+
+.. cpp:class:: SVDCoGOnlyErrorScaleFactors
+
+	       Stores the scaling factors for the ``CoGOnly`` algorithm, with the same granularity_ as simulation objects
+
+Check `CoGOnlySF@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyErrorScaleFactors&perpage=25&>`_ all revisions available in the Conditions Database. Revision **1** is used for experiment 0 and 1003.
+
 .. _svdclustercuts:
 
 .. cpp:class:: SVDClusterCuts

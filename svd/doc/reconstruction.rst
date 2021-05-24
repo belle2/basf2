@@ -148,7 +148,7 @@ In the current **default** reconstruction the ``CoG`` is used for cluster size >
 
 .. note::
 
-   Position errors are NOT scaled. Scaling factors should be re-determined and stored in :ref:`SVDClusterCut<svdclustercuts>`.
+   Position errors are scaled, scaling factors are stored in :ref:`SVDCoGOnlyErrorScaleFactors<svdcogonlycal>`.
 
 The ``SVDClusterizer`` supports the following position reconstruction algorithms (that can be passed as string, see the :b2:mod:`SVDClusterizer` parameter ``positionAlgorithm{3/6}Samples`` parameter)
 

@@ -13,6 +13,7 @@
 #pragma link C++ class Belle2::SVD3SampleCoGTimeCalibrations-; // checksum=0x8950f4e1, version=-1
 #pragma link C++ class Belle2::SVD3SampleELSTimeCalibrations-; // checksum=0x371ee746, version=-1
 #pragma link C++ class Belle2::SVDClusterCalibrations-; // checksum=0x2908aba1, version=-1
+#pragma link C++ class Belle2::SVDCoGOnlyErrorScaleFactors-;
 #pragma link C++ class Belle2::SVDNoiseCalibrations-; // checksum=0xe1bbb6f3, version=-1
 #pragma link C++ class Belle2::SVDPulseShapeCalibrations-; // checksum=0x6bdaa4b, version=-1
 #pragma link C++ class Belle2::SVDPedestalCalibrations-; // checksum=0xbb219a89, version=-1

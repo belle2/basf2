@@ -440,7 +440,7 @@ After installing all prerequisites, you would need to get the example `FEIOnGrid
 General Workflow Concept
 ************************
 
-The `b2luigi` workflow of running FEI on grid is constructed from 4 building blocks
+The `b2luigi` workflow of running FEI on grid is constructed from 4 building blocks contained in `fei_grid_workflow.py <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/fei_grid_workflow.py>`_:
 
 * ``FEIAnalysisTask`` and ``FEIAnalysisSummaryTask``: these tasks are performed to produce FEI training inputs based on `mdst` samples. They are used to run a `basf2` steering file for FEI on grid using `gbasf2` as grid submission tool. In one instance of ``FEIAnalysisSummaryTask``, several instances of ``FEIAnalysisTask`` are created, based on the provided dataset list. This allows to run this step on an unlimited number of input files.
 * ``MergeOutputsTask``: After all outputs produced by ``FEIAnalysisSummaryTask`` are downloaded, they need to be merged into a single file to be able to run the MVA training on it.
@@ -519,6 +519,26 @@ Both modules have the following common settings:
 * ``gbasf2_project_name_prefix``: taken from the `settings.json <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/settings.json>`_ for ``FEIAnalysisSummaryTask`` and is extended with ``_Part{index}`` for instances of ``FEIAnalysisTask``. These prefixes is then used for the names of `gbasf2` tasks created by the corresponding `b2luigi` batch process.
 * ``gbasf2_input_dslist``: taken from `settings.json <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/settings.json>`_ for ``FEIAnalysisSummaryTask`` and is extended with ``_part{index}`` for instances of ``FEIAnalysisTask``. Corresponding individual dataset lists are created by ``FEIAnalysisSummaryTask``.
 
+The following outputs are produced by ``FEIAnalysisTask`` for different stages:
+
+* stage -1: ``mcParticlesCount.root`` summarizing the absolute number of produced particles on generator level
+* stages 0 to 5: ``training_input.root`` containing a flat n-tuple with variables required for the BDT training of a certain stage.
+* stage 6: ``Monitor*.root`` several output files with histograms, flat n-tuples or processing information to validate and evaluate the BDT trainings and the computational performance
+
+To spawn several instances of ``FEIAnalysisTask`` at a certain stage, the following inputs are required to be already produced for stages greater -1:
+
+* Merged ``mcParticlesCount.root`` from stage -1.
+* All training files ``*.xml`` from previous stages.
+* Time stamp of inputs listed above, which were successfully uploaded to TMP-SE as a tarball by ``PrepareInputsTask`` of the previous stage.
+
+During the sequential execution of all required instances of ``FEIAnalysisTask``, symlinks are created for all input files (``mcParticlesCount.root`` and ``*.xml``, where applicable)
+to the current directory to correctly configure the `basf2` path. The path is then pickled by `b2luigi` and send out to grid with `gbasf2` with an appropriate configuration of the grid
+path to the inputs tarball. The jobs are then monitored with corresponding `gbasf2` tools and are resubmitted, if necessary. As soon as all jobs of an instance of ``FEIAnalysisTask``
+are successfully completed, the job outputs required for further processing are downloaded.
+
+In the current state of `b2luigi`, the workflow is interrupted, in case not all output files could be downloaded.
+In that case, you can resume the workflow (after checking the cause for the failed download) by simply restarting the workflow again and only the files for which the download failed will be downloaded.
+
 MergeOutputsTask
 ----------------
 
@@ -528,7 +548,7 @@ FEITrainingTask
 PrepareInputsTask
 -----------------
 
-General Comments on fei_grid_workflow.py
+Further Comments on fei_grid_workflow.py
 ----------------------------------------
 
 Tips and Tricks

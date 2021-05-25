@@ -13,8 +13,8 @@ now = datetime.datetime.now()
 # cluster reconstruction algorithms:
 algorithmFor_timeRecoWith6Samples = "CoG6"
 algorithmFor_timeRecoWith3Samples = "CoG6"
-algorithmFor_positionRecoWith6Samples = "oldDefault"
-algorithmFor_positionRecoWith3Samples = "oldDefault"
+algorithmFor_positionRecoWith6Samples = "CoGOnly"
+algorithmFor_positionRecoWith3Samples = "CoGOnly"
 algorithmFor_chargeRecoWith6Samples = "MaxSample"
 algorithmFor_chargeRecoWith3Samples = "MaxSample"
 # strip reconstruction algorithms:

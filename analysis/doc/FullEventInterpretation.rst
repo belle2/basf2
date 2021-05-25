@@ -501,6 +501,8 @@ In contrast to the original steering file from ``analysis/examples/FEI/B_generic
 * The path creation is summarized in a corresponding function ``def create_fei_path(filelist=[], cache=0, monitor=False, verbose=False):``, which returns a `basf2` path. This function is then used within the `b2luigi` setup to create a corresponding fixed and pickled `basf2` path.
 * The adaptions of histogram and n-tuple outputs needed for FEI training are reduced to a small set of files to avoid long lasting downloads of a large set of small files. In case these adaptions are not in an official release yet, which is supported by `gbasf2`, these need to be done by hand. This is accomplished within the ``for``-loops ``for m in path.modules():``.
 
+.. _fei-ana:
+
 FEIAnalysisSummaryTask and FEIAnalysisTask
 ------------------------------------------
 
@@ -541,6 +543,14 @@ In that case, you can resume the workflow (after checking the cause for the fail
 
 MergeOutputsTask
 ----------------
+
+After all outputs from instances of ``FEIAnalysisTask`` are downloaded and listed by the ``FEIAnalysisSummaryTask`` in ``list_of_output_directories.json``, the outputs from the various jobs need to be
+merged into a single file. This is accomplished by ``MergeOutputsTask`` using the information from ``list_of_output_directories.json`` and the (adapted) script ``analysis-fei-mergefiles`` from `basf2`.
+
+This task depends on the ``FEIAnalysisSummaryTask`` running directly before it to be finished successfully, and has the following settings:
+
+* ``ncpus``: number of CPUs of the local machine to be used for parallel merging, in case multiple outputs are produced by the `gbasf2` tasks. The value is extracted from the `settings.json <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/settings.json>`_ (``local_cpus``).
+* ``monitor`` and ``stage``: see description in :ref:`fei-ana`.
 
 FEITrainingTask
 ---------------

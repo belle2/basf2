@@ -41,7 +41,7 @@ namespace Belle2 {
     bool isRevo2() {return m_revo2;}
     /// get time since the last injection in clock ticks (FTSW clock)
     unsigned int getTimeSinceLastInjection() {return m_timeSinceLastInjection;}
-    /// get time since the last injection in clock ticks (FTSW clock)
+    /// get time since the previous trigger in clock ticks (FTSW clock)
     unsigned int getTimeSincePrevTrigger() {return m_timeSincePrevTrigger;}
     /// get number of triggered bunch
     unsigned int getBunchNumber() {return m_bunchNumber;}

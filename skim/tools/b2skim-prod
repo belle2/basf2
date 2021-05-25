@@ -500,7 +500,13 @@ def get_lpn_list(sampleInfo, mc):
                     sampleInfo["experimentNumber"],
                     sampleInfo["beamEnergy"],
                     run,
-                    sampleInfo["inputDataLevel"],
+                    # For backward compatibility, allow 'generalSkimName' to be missing
+                    # from block in input YAML file
+                    *(
+                        (sampleInfo["generalSkimName"], sampleInfo["inputDataLevel"])
+                        if "generalSkimName" in sampleInfo
+                        else (sampleInfo["inputDataLevel"],)
+                    )
                 )
             )
             for run in sampleInfo["runNumbers"]

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 from basf2.core import basf2label, basf2copyright, list_module_search_paths, LogPythonInterface
 from basf2.version import version, release

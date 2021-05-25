@@ -60,7 +60,7 @@ namespace Belle2 {
 #ifdef _BELLE2_EPICS
     /** A struct to keep EPICS PV-related data. */
     typedef struct MyPV {
-      chid mychid; /**< Channel id */
+      chid mychid = nullptr; /**< Channel id */
       double lastNHits = 0.0; /**< Hit count at last report. Needed for the delta. */
       double lastNEvts = 0.0; /**< Events count at last report. Needed for the delta. */
     } MyPV;
@@ -138,9 +138,9 @@ namespace Belle2 {
 #ifdef _BELLE2_EPICS
     std::vector<MyPV> m_myPVs; /**< EPICS stuff for each sensor group / PV */
     double m_lastPVUpdate = -1.0; /**< Time of the last PV update (seconds) */
-    chid m_timeSinceLastPVUpdateChan; /**< EPICS channel for monitoring time between updates. */
+    chid m_timeSinceLastPVUpdateChan = nullptr; /**< EPICS channel for monitoring time between updates. */
     struct dbr_ctrl_enum m_stateCtrl; /**< Struct for the state PV. */
-    chid m_stateChan; /**< EPICS channel for the state PV. */
+    chid m_stateChan = nullptr; /**< EPICS channel for the state PV. */
 #endif
 
     /** List of sensors groups. Must match Belle2::SVD::SVDDQMDoseModule::c_sensorGroups.

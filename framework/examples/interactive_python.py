@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ############################################################
 # Demonstrates using (I)python inside a basf2 session,

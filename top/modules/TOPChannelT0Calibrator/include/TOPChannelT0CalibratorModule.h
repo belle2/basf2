@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2018, 2021 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -19,7 +19,7 @@
 #include <top/dataobjects/TOPRecBunch.h>
 #include <top/utilities/TrackSelector.h>
 #include <top/utilities/Chi2MinimumFinder1D.h>
-#include <top/reconstruction/TOPreco.h>
+#include <top/reconstruction_cpp/PDFConstructor.h>
 
 #include <string>
 #include <vector>
@@ -48,7 +48,8 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~TOPChannelT0CalibratorModule();
+    virtual ~TOPChannelT0CalibratorModule()
+    {}
 
     /**
      * Initialize the Module.
@@ -57,21 +58,9 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun() override;
-
-    /**
      * Event processor.
      */
     virtual void event() override;
-
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
 
     /**
      * Termination action.
@@ -91,8 +80,6 @@ namespace Belle2 {
     // module parameters
     int m_numBins;      /**< number of bins to which search region is divided */
     double m_timeRange; /**< time range in which to search for the minimum [ns] */
-    double m_minBkgPerBar; /**< minimal assumed background photons per module */
-    double m_scaleN0; /**< scale factor for figure-of-merit N0 */
     double m_sigmaSmear;  /**< additional smearing of PDF in [ns] */
     std::string m_sample; /**< sample type */
     double m_minMomentum; /**< minimal track momentum if sample is "cosmics" */
@@ -107,7 +94,7 @@ namespace Belle2 {
     // procedure
     TOP::TrackSelector m_selector; /**< track selection utility */
     TOP::Chi2MinimumFinder1D m_finders[2][c_numModules][c_numChannels]; /**< finders */
-    TOP::TOPreco::PDFoption m_PDFOption = TOP::TOPreco::c_Rough; /**< PDF option */
+    TOP::PDFConstructor::EPDFOption m_PDFOption = TOP::PDFConstructor::c_Rough; /**< PDF option */
 
     // datastore objects
     StoreArray<TOPDigit> m_digits; /**< collection of digits */

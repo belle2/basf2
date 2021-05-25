@@ -21,15 +21,15 @@ REG_MODULE(SVDDQMHitTime)
 SVDDQMHitTimeModule::SVDDQMHitTimeModule(): HistoModule()
 {
   setPropertyFlags(c_ParallelProcessingCertified); // parallel processing
-  setDescription("Make data quality monitoring plots for SVD Hit Time for bhabha, mu mu, and hadron samples seeded by different trigger times.(ECL, CDC)");
-  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+  setDescription("Make data quality monitoring plots for SVD Hit Time for bhabha, mu mu, and hadron samples seeded by different trigger times (ECL, CDC).");
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed.",
            std::string("SVDHitTime"));
-  addParam("Clusters", m_storeSVDClustersName, "SVDCluster StoreArray name",
+  addParam("Clusters", m_storeSVDClustersName, "SVDCluster StoreArray name.",
            std::string(""));
-  addParam("EventInfo", m_storeSVDEventInfoName, "SVDEventInfo StoreObjPtr name",
+  addParam("EventInfo", m_storeSVDEventInfoName, "SVDEventInfo StoreObjPtr name.",
            std::string(""));
   addParam("desynchronizeSVDTime", m_desynchSVDTime,
-           "if TRUE (default is FALSE): svdTime back in SVD time reference", bool(false));
+           "if True, svd time back in SVD time reference", bool(false));
 
 }
 

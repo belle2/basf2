@@ -98,7 +98,7 @@ class BaseFEISkim(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, Full Event Interpretation"
 
-    FEIPrefix = "FEIv4_2020_MC13_release_04_01_01"
+    FEIPrefix = "FEIv4_2021_MC14_release_05_01_12"
     """Prefix label for the FEI training used in the FEI skims."""
 
     FEIChannelArgs = {}
@@ -185,7 +185,6 @@ class BaseFEISkim(BaseSkim):
         """
         # Run FEI
         b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
-
         particles = fei.get_default_channels(**FEIChannelArgs)
         configuration = fei.config.FeiConfiguration(
             prefix=FEIPrefix,

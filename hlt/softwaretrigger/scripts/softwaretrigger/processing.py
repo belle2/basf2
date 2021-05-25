@@ -183,7 +183,6 @@ def add_hlt_processing(path,
         path_utils.hlt_event_abort(hlt_filter_module, "==0", ROOT.Belle2.EventMetaData.c_HLTDiscard)
         # (2) the event is accepted -> go on with the hlt reconstruction
         hlt_filter_module.if_value("==1", accept_path, basf2.AfterConditionPath.CONTINUE)
-        accept_path.add_module('StatisticsSummary').set_name('Sum_HLT_Discard')
     elif softwaretrigger_mode == constants.SoftwareTriggerModes.monitor:
         # Otherwise just always go with the accept path
         path.add_path(accept_path)
@@ -259,6 +258,9 @@ def add_expressreco_processing(path,
 
     path_utils.add_geometry_if_not_present(path)
     add_unpackers(path, components=unpacker_components, writeKLMDigitRaws=True)
+
+    # dont filter/prune pxd for partly broken events, as we loose diagnostics in DQM
+    basf2.set_module_parameters(path, "PXDPostErrorChecker", CriticalErrorMask=0)
 
     if do_reconstruction:
         if run_type == constants.RunTypes.beam:

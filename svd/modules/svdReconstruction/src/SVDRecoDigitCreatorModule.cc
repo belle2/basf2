@@ -38,23 +38,23 @@ SVDRecoDigitCreatorModule::SVDRecoDigitCreatorModule() : Module(),
   m_useDB(true)
 {
   //Set module properties
-  setDescription("Reconstruct SVDShaperDigit in SVDRecoDigit");
+  setDescription("This module reconstructs SVDShaperDigit in SVDRecoDigit, i.e. calibrated strip with reconstructed charge and time.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // 1. Collections.
   addParam("ShaperDigits", m_storeShaperDigitsName,
-           "SVDShaperDigits collection name", string(""));
+           "SVDShaperDigits collection name.", string(""));
   addParam("RecoDigits", m_storeRecoDigitsName,
-           "SVDRecoDigits collection name", string(""));
+           "SVDRecoDigits collection name.", string(""));
   addParam("Clusters", m_storeClustersName,
-           "SVDCluster collection name", string(""));
+           "SVDCluster collection name.", string(""));
 
   // 2. Reconstruction
   addParam("timeAlgorithm6Samples", m_timeRecoWith6SamplesAlgorithm,
-           " choose time algorithm for the 6-sample DAQ mode:  CoG6 = 6-sample CoG (default), CoG3 = 3-sample CoG,  ELS3 = 3-sample ELS",
+           "strip-time reconstruction algorithm for the 6-sample DAQ mode:  CoG6 = 6-sample CoG (default), CoG3 = 3-sample CoG,  ELS3 = 3-sample ELS",
            std::string("inRecoDBObject"));
   addParam("timeAlgorithm3Samples", m_timeRecoWith3SamplesAlgorithm,
-           " choose time algorithm for the 3-sample DAQ mode:  CoG6 = 6-sample CoG, CoG3 = 3-sample CoG (default),  ELS3 = 3-sample ELS",
+           "strip-time reconstruction algorithm for the 3-sample DAQ mode:  CoG6 = 6-sample CoG, CoG3 = 3-sample CoG (default),  ELS3 = 3-sample ELS",
            std::string("inRecoDBObject"));
   addParam("chargeAlgorithm6Samples", m_chargeRecoWith6SamplesAlgorithm,
            " choose charge algorithm for 6-sample DAQ mode:  MaxSample (default), SumSamples,  ELS3 = 3-sample ELS",

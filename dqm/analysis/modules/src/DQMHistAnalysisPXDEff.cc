@@ -507,7 +507,7 @@ void DQMHistAnalysisPXDEffModule::event()
     } else scale_min = 0.0;
     if (gr) gr->Draw("AP");
     if (gr3) gr3->Draw("P");
-    auto tt = new TLatex(5.5, scale_min, "1.3.2 Module is excluded, please ignore");
+    auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
     tt->SetTextSize(0.035);
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered

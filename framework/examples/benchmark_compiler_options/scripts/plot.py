@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,8 +8,8 @@ def fFileExist(filename):
     """Test if file exists"""
 
     try:
-        oFile = open(filename, "r")
-    except IOError:
+        oFile = open(filename)
+    except OSError:
         return 0
     else:
         oFile.close()
@@ -33,7 +32,7 @@ def read(optlevel, b, name):
     n = [0] * len(optlevel)
     t = list(range(0, len(optlevel)))
     for i in t:
-        fobj = open("out/" + optlevel[i] + ".out", "r")
+        fobj = open("out/" + optlevel[i] + ".out")
         readvalue = []
         # read file
         for line in fobj:

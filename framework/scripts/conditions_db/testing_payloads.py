@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Script to upload local database to ConditionsDB.
@@ -25,11 +24,9 @@ class TestingPayloadEntry:
         except ValueError:
             raise ValueError("line must be of the form 'dbstore/<payloadname> <revision> "
                              "<firstExp>,<firstRun>,<finalExp>,<finalRun>'")
-        try:
-            #: revision stored in the file
-            self.revision = int(revision)
-        except ValueError:
-            raise ValueError("revision must be an integer")
+
+        #: revision stored in the file
+        self.revision = revision
 
         try:
             #: module name

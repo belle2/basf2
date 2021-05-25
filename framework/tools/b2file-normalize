@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """Tool to reset the non-reproducible root file metadata: UUID and datimes.
 It can also reset the initial file name stored in the file itself, but

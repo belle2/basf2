@@ -46,7 +46,7 @@ def _decayHashFloatToInt(decayHash, decayHashExtended):
     return decayHashFullInt
 
 
-class DecayHashMap(object):
+class DecayHashMap:
     """
     DecayHashMap using the C++ implementation of DecayTree and DecayNode
     """

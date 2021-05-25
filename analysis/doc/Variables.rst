@@ -301,6 +301,10 @@ Variables will also work on generator-level particles:
    :group: MCParticle tag variables
    :noindex:
 
+.. b2-variables::
+   :group: Generated tau decay information
+   :noindex:
+
 Daughter info
 ~~~~~~~~~~~~~
 

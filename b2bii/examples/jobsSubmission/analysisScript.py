@@ -11,9 +11,8 @@ from tools import getBelleUrl_data, getBelleUrl_mc
 import basf2 as b2
 from modularAnalysis import variablesToNtuple
 from modularAnalysis import fillParticleList
-from modularAnalysis import loadGearbox
 
-import b2biiConversion
+from b2biiConversion import convertBelleMdstToBelleIIMdst
 
 
 # ------- Arguments sorting
@@ -46,8 +45,7 @@ else:
 
 # ------- B2BII
 
-b2biiConversion.setupB2BIIDatabase(isMC)
-
+os.environ['PGUSER'] = 'g0db'
 os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
 
 if isMC:
@@ -58,8 +56,7 @@ else:
                            skimType, dataType, belleLevel)
 
 mypath = b2.create_path()
-b2biiConversion.convertBelleMdstToBelleIIMdst(url, applySkim=True, path=mypath)
-loadGearbox(mypath)
+convertBelleMdstToBelleIIMdst(url, applySkim=True, path=mypath)
 
 
 # ------- Output file
@@ -74,7 +71,7 @@ outputFileName = outDir + '/output_' + filenameEnd
 
 # this sample code is taken from b2bii/examples
 
-fillParticleList('pi+:all', '', mypath)
+fillParticleList('pi+:all', '', path=mypath)
 
 kinematic_variables = ['px', 'py', 'pz', 'E']
 

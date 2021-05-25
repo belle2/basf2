@@ -1,5 +1,4 @@
 """
-
 This module implements the ConvNet generator model.
 """
 
@@ -7,11 +6,14 @@ import torch
 import torch.nn as nn
 
 
+##
+# Class for the ConvNet generator model.
 class Model(nn.Module):
-    """"""
+    """ConvNet generator model."""
 
+    ##
+    # Constructor to create a new model instance.
     def __init__(self):
-        """"""
         super().__init__()
         self.fc = nn.Linear(96, 98304)
         self.features = nn.Sequential(
@@ -46,8 +48,10 @@ class Model(nn.Module):
             # (1, 256, 768)
         )
 
+    ##
+    # Function to perform a forward pass.
     def forward(self, z):
-        """"""
+        """Compute the model output for a given input."""
         return self.features(self.fc(z).view(-1, 512, 8, 24)).tanh_()
 
     ##
@@ -56,11 +60,16 @@ class Model(nn.Module):
 
     ##
     # @var features
-    # Sequential layer (composite)
+    # Sequential composite layer
 
 
+##
+# Function to produce one pseudo-random image for each PXD module
+# using the ConvNet generator model.
 def generate(model):
-    """"""
+    """Produce one pseudo-random image for each PXD module
+    using the ConvNet generator model.
+    """
     # infer the device that is in use
     device = next(model.parameters()).device
     # without computing gradients

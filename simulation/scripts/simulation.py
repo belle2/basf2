@@ -121,6 +121,7 @@ def add_simulation(
         cleanupPXDDataReduction=True,
         generate_2nd_cdc_hits=False,
         simulateT0jitter=False,
+        FilterEvents=False,
         usePXDGatedMode=False,
         skipExperimentCheckForBG=False):
     """
@@ -129,6 +130,8 @@ def add_simulation(
     @param usePXDDataReduction: if 'forceSetPXDDataReduction==True', override settings from the DB
     @param cleanupPXDDataReduction: if True the datastore objects used by PXDDataReduction are emptied
     @param simulateT0jitter: if True simulate L1 trigger jitter
+    @param FilterEvents: if True only the events that pass the L1 trigger will survive simulation, the other are discarded.
+        Make sure you do need to filter events before you set the value to True.
     @param skipExperimentCheckForBG: If True, skip the check on the experiment number consistency between the basf2
       process and the beam background files. Note that this check should be skipped only by experts.
     """
@@ -219,7 +222,7 @@ def add_simulation(
         m.set_name('BGOverlayExecutor_CDC...KLM')
 
     if components is None or 'TRG' in components:
-        add_trigger_simulation(path, simulateT0jitter=simulateT0jitter)
+        add_trigger_simulation(path, simulateT0jitter=simulateT0jitter, FilterEvents=FilterEvents)
 
     # SVD digitization, BG Overlay, sorting and zero suppression
     if components is None or 'SVD' in components:

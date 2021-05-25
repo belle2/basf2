@@ -13,7 +13,7 @@ def add_trigger_simulation(
         path,
         SimulationMode=1,
         shortTracks=False,
-        OpenFilter=False,
+        FilterEvents=False,
         Belle2Phase='Phase3',
         components=['CDC', 'ECL', 'KLM', 'GRL', 'GDL'],
         simulateT0jitter=False,
@@ -26,8 +26,8 @@ def add_trigger_simulation(
         no firmware simulation; 2) full simulation, both trigger algorithm and firmware are simulated.
     @param shortTracks: The standard CDC track finding requires hits in 4 axial super layers. With the shortTracks
         option, tracks with hits in the 3 innermost super layers are also found.
-    @param OpenFilter: If true, the events failed to pass L1 trigger will be discarded. Make sure you do need
-        open filter before you set the value to True.
+    @param FilterEvents: if True only the events that pass the L1 trigger will survive simulation, the other are discarded.
+        Make sure you do need to filter events before you set the value to True.
     @param Belle2Phase: The trigger menu at the given Phase is applied. Available options: Phase2, Phase3.
     @param components: List of sub-trigger components to be included in TSIM.
     @param simulateT0jitter: if True L1 trigger jitter is simulated by EventT0Generator.
@@ -41,7 +41,7 @@ def add_trigger_simulation(
     add_grl_gdl_tsim(
         path=path,
         SimulationMode=SimulationMode,
-        OpenFilter=OpenFilter,
+        FilterEvents=FilterEvents,
         Belle2Phase=Belle2Phase,
         simulateT0jitter=simulateT0jitter,
         components=components)
@@ -50,7 +50,7 @@ def add_trigger_simulation(
         B2INFO('The L1 trigger simulation (TSIM) is set up with the following configuration:',
                SimulationMode=SimulationMode,
                ShortTracks=shortTracks,
-               OpenFilter=OpenFilter,
+               FilterEvents=FilterEvents,
                Belle2Phase=Belle2Phase,
                Components=', '.join(components))
 
@@ -82,7 +82,7 @@ def add_subdetector_tsim(
 def add_grl_gdl_tsim(
         path,
         SimulationMode=1,
-        OpenFilter=False,
+        FilterEvents=False,
         Belle2Phase='Phase3',
         simulateT0jitter=False,
         components=['GRL', 'GDL']):
@@ -92,8 +92,8 @@ def add_grl_gdl_tsim(
 
     @param SimulationMode: The simulation mode in TSIM: 1) fast simulation, trigger algoritm simulation only,
         no firmware simulation; 2) full simulation, both trigger algorithm and firmware are simulated.
-    @param OpenFilter: If true, the events failed to pass L1 trigger will be discarded. Make sure you do need
-        open filter before you set the value to True.
+    @param FilterEvents: if True only the events that pass the L1 trigger will survive simulation, the other are discarded.
+        Make sure you do need to filter events before you set the value to True.
     @param Belle2Phase: The trigger menu at the given Phase is applied. Available options: Phase2, Phase3.
     @param simulateT0jitter: if True L1 trigger jitter is simulated by EventT0Generator.
     @param components: List of logic components to be included in TSIM.
@@ -105,7 +105,7 @@ def add_grl_gdl_tsim(
         add_gdl_trigger(
             path=path,
             SimulationMode=SimulationMode,
-            OpenFilter=OpenFilter,
+            FilterEvents=FilterEvents,
             Belle2Phase=Belle2Phase,
             simulateT0jitter=simulateT0jitter)
 
@@ -114,7 +114,7 @@ def add_tsim(
         path,
         SimulationMode=1,
         shortTracks=False,
-        OpenFilter=False,
+        FilterEvents=False,
         Belle2Phase='Phase3',
         components=['CDC', 'ECL', 'KLM', 'GRL', 'GDL'],
         PrintInfo=False):

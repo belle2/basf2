@@ -4,9 +4,9 @@
 """
 <header>
   <contact>Fernando Abudinen; abudinen@mpp.mpg.de</contact>
-  <description>This file skims events that are usefull to test the time dependent CPV analysis tools,
+  <description>This file skims events that are useful to test the time dependent CPV analysis tools,
   i.e. those events where the signal B0 meson is correctly MC matched and where no tracks on the tag side
-  belongs to the signal side. The variable used for skimming is isRelatedRestOfEventB0Flavor.
+  belong to the signal side. The variable used for skimming is isRelatedRestOfEventB0Flavor.
   As input one needs a MC mdst file for the signal channel B0sig->J/PsiKs.
   The script reconstructs B0sig->J/PsiKs on the signal side
   and applies the flavor tagger on the ROE.
@@ -36,12 +36,6 @@ cp_val_path = b2.Path()
 environmentType = "default"
 
 if belleOrBelle2Flag == "Belle":
-    from b2biiConversion import setupB2BIIDatabase
-
-    isBelleMC = True
-    # if belleData == "BelleDataConv":
-    #    isBelleMC=False
-    setupB2BIIDatabase(isBelleMC)  # False for Belle Data True for Belle MC
     os.environ['BELLE_POSTGRES_SERVER'] = 'can51'
     os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
 

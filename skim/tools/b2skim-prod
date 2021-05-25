@@ -283,7 +283,7 @@ def verify_stats_dict(args, sampleRegistry, skimStatsDict):
         skimStatsDict (dict): A dict containing the tested skim statistics.
     """
     skims = args.skims
-    statistics = ["cpuTimePerEvent", "udstSizePerSkimmedEvent"]
+    statistics = ["cpuTimePerEvent", "udstSizePerInputEvent"]
     sampleLabels = [sampleInfo["sampleLabel"] for sampleInfo in sampleRegistry.values()]
 
     # Verify that all the requested skims have statistics listed
@@ -737,6 +737,7 @@ def make_combined_steering_file(
         modules=modules,
         stats=False,
         hints=False,
+        mdstOutput=False,
     )
 
     with open(SteeringFile, "w") as f:

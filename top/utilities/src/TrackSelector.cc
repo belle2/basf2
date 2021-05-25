@@ -10,11 +10,10 @@
 
 #include <top/utilities/TrackSelector.h>
 #include <framework/logging/Logger.h>
-#include <top/reconstruction/TOPtrack.h>
 #include <top/geometry/TOPGeometryPar.h>
 #include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/ExtHit.h>
 #include <analysis/utility/PCmsLabTransform.h>
-
 
 namespace Belle2 {
   namespace TOP {
@@ -38,7 +37,8 @@ namespace Belle2 {
       }
     }
 
-    bool TrackSelector::isSelected(const TOPtrack& trk) const
+
+    bool TrackSelector::isSelected(const TOPtrack& trk) const // old version (TODO: to be removed)
     {
 
       if (m_sampleType == c_undefined) {
@@ -78,6 +78,51 @@ namespace Belle2 {
       const auto& module = geo->getModule(trk.getModuleID());
       m_localPosition = module.pointToLocal(trk.getPosition());
       m_localMomentum = module.momentumToLocal(trk.getMomentum());
+      if (m_localPosition.Z() < m_minZ or m_localPosition.Z() > m_maxZ) return false;
+
+      return true;
+    }
+
+    bool TrackSelector::isSelected(const TOPTrack& trk) const
+    {
+
+      if (m_sampleType == c_undefined) {
+        B2ERROR("TOP::TrackSelector:isSelected sample type is undefined, returning false");
+        return false;
+      }
+
+      if (not trk.isValid()) return false;
+
+      const auto* fit = trk.getTrack()->getTrackFitResultWithClosestMass(m_chargedStable);
+      if (not fit) return false;
+
+      // cut on POCA
+      m_pocaPosition = fit->getPosition();
+      if (m_pocaPosition.Perp() > m_dr) return false;
+      if (fabs(m_pocaPosition.Z()) > m_dz) return false;
+
+      // momentum/energy cut
+      m_pocaMomentum = fit->getMomentum();
+      if (m_sampleType == c_cosmics) {
+        if (m_pocaMomentum.Mag() < m_minMomentum) return false;
+      } else if (m_sampleType == c_dimuon or m_sampleType == c_bhabha) {
+        TLorentzVector lorentzLab;
+        lorentzLab.SetXYZM(m_pocaMomentum.X(), m_pocaMomentum.Y(), m_pocaMomentum.Z(),
+                           m_chargedStable.getMass());
+        PCmsLabTransform T;
+        auto lorentzCms = T.labToCms(lorentzLab);
+        m_cmsEnergy = lorentzCms.Energy();
+        double dE = m_cmsEnergy - T.getCMSEnergy() / 2;
+        if (fabs(dE) > m_deltaEcms) return false;
+      } else {
+        return false;
+      }
+
+      // cut on local z
+      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+      const auto& module = geo->getModule(trk.getModuleID());
+      m_localPosition = module.pointToLocal(trk.getExtHit()->getPosition());
+      m_localMomentum = module.momentumToLocal(trk.getExtHit()->getMomentum());
       if (m_localPosition.Z() < m_minZ or m_localPosition.Z() > m_maxZ) return false;
 
       return true;

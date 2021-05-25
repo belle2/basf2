@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ###############################################################################
 # A more complex python module using matlotlib to create

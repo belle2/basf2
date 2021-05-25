@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ######################################################
 # This steering file shows how to use the statistics
@@ -30,14 +29,11 @@ print(statistics)
 
 # Print basic event statistics for specific modules
 print('Event Statistics for selected modules:')
-print(statistics([eventinfosetter]))
+print(statistics(modules=[eventinfosetter]))
 
 # Print statistics adding all counters
 print('Total processing times:')
 print(statistics(statistics.TOTAL))
-
-# Change name of modules
-statistics.set_name(eventinfosetter, 'Foo')
 
 # Make a list of all available statistic counters
 statistic_counters = [
@@ -79,8 +75,6 @@ for stats in statistics.modules:
 stats = statistics.get(eventinfosetter)
 eventinfo_total = stats.time_sum(statistics.TOTAL)
 print('EventInfoSetter needed %.3f ms in total' % (eventinfo_total / 1e6))
-# Now we can also set the name since we have the correct object
-stats.name = "FooBar"
 
 # Print total processing time
 framework_total = statistics.get_global().time_sum(statistics.TOTAL)
@@ -89,7 +83,7 @@ print('Total processing time: %.3f ms' % (framework_total / 1e6))
 # Calculate estimate for framework overhead
 modules_total = sum(e.time_sum(statistics.TOTAL) for e in statistics.modules)
 overhead = framework_total - modules_total
-print('Framework overhead: %.3f ms (%.2f %%)' % (
+print('Framework overhead: {:.3f} ms ({:.2f} %)'.format(
     overhead / 1e6,
     100 * overhead / framework_total,
 ))

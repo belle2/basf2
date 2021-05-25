@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Utility functions for the ConditionsDB command line interface
@@ -62,7 +61,7 @@ class ItemFilter:
         for attribute in ["filter", "exclude"]:
             term = getattr(self._args, attribute, None)
             if term is not None:
-                text.append("{}={}".format(attribute, term))
+                text.append(f"{attribute}={term}")
         if not text:
             return ""
         if getattr(self._args, "regex", False):
@@ -84,7 +83,7 @@ class ItemFilter:
                         term = re.escape(term)
                     setattr(self, "_"+attribute, re.compile(term, re.IGNORECASE))
                 except Exception as e:
-                    B2ERROR("--{}: '{}' is not a valid regular expression: {}'".format(attribute, term, e))
+                    B2ERROR(f"--{attribute}: '{term}' is not a valid regular expression: {e}'")
                     return False
         return True
 

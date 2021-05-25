@@ -11,7 +11,7 @@ The base class is Transform.
 __author__ = 'swehle'
 
 
-from .settings import ProTool
+from alignment.fancystuff.settings import ProTool
 
 import numpy as np
 import pandas as pd

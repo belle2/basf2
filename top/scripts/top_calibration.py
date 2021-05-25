@@ -118,7 +118,7 @@ def BS13d_calibration_cdst(inputFiles, time_offset=0, globalTags=None, localDBs=
         main.add_module('TOPUnpacker')
         main.add_module('TOPRawDigitConverter')
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', subtractRunningOffset=False)
+        main.add_module('TOPBunchFinder', autoRange=True, subtractRunningOffset=False)
         main.add_module('TOPTimeRecalibrator',
                         useAsicShiftCalibration=False, useChannelT0Calibration=True)
     else:
@@ -170,12 +170,12 @@ def moduleT0_calibration_DeltaT(inputFiles, globalTags=None, localDBs=None,
         main.add_module('TOPUnpacker')
         main.add_module('TOPRawDigitConverter')
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', subtractRunningOffset=False)
+        main.add_module('TOPBunchFinder', autoRange=True, subtractRunningOffset=False)
     else:
         main.add_module('TOPGeometryParInitializer')
         main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', usePIDLikelihoods=True,
+        main.add_module('TOPBunchFinder', usePIDLikelihoods=True, autoRange=True,
                         subtractRunningOffset=False)
 
     #   collector module
@@ -223,12 +223,12 @@ def moduleT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
         main.add_module('TOPUnpacker')
         main.add_module('TOPRawDigitConverter')
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', subtractRunningOffset=False)
+        main.add_module('TOPBunchFinder', autoRange=True, subtractRunningOffset=False)
     else:
         main.add_module('TOPGeometryParInitializer')
         main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', usePIDLikelihoods=True,
+        main.add_module('TOPBunchFinder', usePIDLikelihoods=True, autoRange=True,
                         subtractRunningOffset=False)
 
     #   collector module
@@ -276,12 +276,12 @@ def commonT0_calibration_BF(inputFiles, globalTags=None, localDBs=None,
         main.add_module('TOPUnpacker')
         main.add_module('TOPRawDigitConverter')
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', subtractRunningOffset=False)
+        main.add_module('TOPBunchFinder', autoRange=True, subtractRunningOffset=False)
     else:
         main.add_module('TOPGeometryParInitializer')
         main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', usePIDLikelihoods=True,
+        main.add_module('TOPBunchFinder', usePIDLikelihoods=True, autoRange=True,
                         subtractRunningOffset=False)
 
     #   collector module
@@ -328,12 +328,12 @@ def commonT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
         main.add_module('TOPUnpacker')
         main.add_module('TOPRawDigitConverter')
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', subtractRunningOffset=False)
+        main.add_module('TOPBunchFinder', autoRange=True, subtractRunningOffset=False)
     else:
         main.add_module('TOPGeometryParInitializer')
         main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', usePIDLikelihoods=True,
+        main.add_module('TOPBunchFinder', usePIDLikelihoods=True, autoRange=True,
                         subtractRunningOffset=False)
 
     #   collector module
@@ -487,12 +487,12 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
             main.add_module('TOPUnpacker')
             main.add_module('TOPRawDigitConverter')
             main.add_module('TOPChannelMasker')
-            main.add_module('TOPBunchFinder', subtractRunningOffset=False)
+            main.add_module('TOPBunchFinder', autoRange=True, subtractRunningOffset=False)
         else:
             main.add_module('TOPGeometryParInitializer')
             main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
             main.add_module('TOPChannelMasker')
-            main.add_module('TOPBunchFinder',
+            main.add_module('TOPBunchFinder', autoRange=True,
                             usePIDLikelihoods=True, subtractRunningOffset=False)
 
         #   collector module
@@ -520,5 +520,45 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
     #   algorithm
     algorithm = TOP.TOPAlignmentAlgorithm()
     cal.algorithms = algorithm
+
+    return cal
+
+
+def channel_mask_calibration(inputFiles, globalTags=None, localDBs=None, unpack=True):
+    '''
+    Returns calibration object for channel masking
+    :param inputFiles: A list of input files in raw data or cdst format
+    :param globalTags: a list of global tags, highest priority first
+    :param localDBs: a list of local databases, highest priority first
+    :param unpack: True if data unpacking is required (i.e. for raw data or for new cdst format)
+    '''
+
+    #   create path
+    main = basf2.create_path()
+
+    #   add basic modules
+    main.add_module('RootInput')
+    main.add_module('TOPGeometryParInitializer')
+    if unpack:
+        main.add_module('TOPUnpacker')
+        main.add_module('TOPRawDigitConverter')
+
+    #   collector module
+    collector = basf2.register_module('TOPChannelMaskCollector')
+
+    #   algorithm
+    algorithm = TOP.TOPChannelMaskAlgorithm()
+
+    #   define calibration
+    cal = Calibration(name='TOP_ChannelMaskCalibration', collector=collector,
+                      algorithms=algorithm, input_files=inputFiles)
+    if globalTags:
+        for globalTag in reversed(globalTags):
+            cal.use_central_database(globalTag)
+    if localDBs:
+        for localDB in reversed(localDBs):
+            cal.use_local_database(localDB)
+    cal.pre_collector_path = main
+    cal.strategies = SequentialRunByRun
 
     return cal

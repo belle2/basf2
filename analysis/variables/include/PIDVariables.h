@@ -60,7 +60,7 @@ namespace Belle2 {
     * probability of pi hypothesis, using TOP and CDC only =  particleProbability(211, TOP, CDC);
     * probability of K hypothesis, using ARICH, TOP, CDC only =  particleProbability(321, ARICH, TOP, CDC);
     */
-    Manager::FunctionPtr pidParticleProbabilityExpert(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr pidProbabilityExpert(const std::vector<std::string>& arguments);
 
     /**
     * @return  returns 1 if the PID probabiliy is missing for the provided detector list, otherwise 0.

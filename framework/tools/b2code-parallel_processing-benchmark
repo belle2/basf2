@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """\
 Measure multi-core execution time of given steering file with different number
@@ -9,7 +8,6 @@ cores (aka. -p argument to basf2). 0 cores equals true single-core mode.
 
 # we want to print some stuff to sys.stderr and the print function makes this
 # much easier
-from __future__ import print_function
 import sys
 import numpy as np
 import argparse

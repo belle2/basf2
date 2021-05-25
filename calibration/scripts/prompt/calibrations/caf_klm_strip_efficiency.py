@@ -6,7 +6,7 @@ database object.
 """
 
 import basf2
-from prompt import CalibrationSettings
+from prompt import CalibrationSettings, input_data_filters
 
 ##############################
 # REQUIRED VARIABLE #
@@ -17,12 +17,18 @@ from prompt import CalibrationSettings
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
 #: Tells the automated system some details of this script
-settings = CalibrationSettings(name='KLM strip efficiency',
-                               expert_username='depietro',
-                               description=__doc__,
-                               input_data_formats=['cdst'],
-                               input_data_names=['hlt_mumu'],
-                               depends_on=[])
+settings = CalibrationSettings(
+    name='KLM strip efficiency',
+    expert_username='depietro',
+    description=__doc__,
+    input_data_formats=['cdst'],
+    input_data_names=['hlt_mumu'],
+    input_data_filters={
+        'hlt_mumu': [input_data_filters['Run Type']['physics'],
+                     input_data_filters['Data Tag']['mumutight_calib'],
+                     input_data_filters['Data Quality Tag']['Good Or Recoverable']]
+    },
+    depends_on=[])
 
 ##############################
 

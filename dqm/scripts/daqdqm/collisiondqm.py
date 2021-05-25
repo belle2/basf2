@@ -26,11 +26,13 @@ def add_collision_dqm(path, components=None, dqm_environment="expressreco", dqm_
                             the hlt filter
                      For dqm_mode == "filtered"  only the DQM modules which should run on filtered
                             events should be added
+                     For dqm_mode == "l1_passthrough" only the DQM modules which should run on the
+                            L1 passthrough events should be added
     @param create_hlt_unit_histograms: Parameter for SoftwareTiggerHLTDQMModule.
                                          Should be True only when running on the HLT servers
     """
 
-    assert dqm_mode in ["dont_care", "all_events", "filtered", "before_filter"]
+    assert dqm_mode in ["dont_care", "all_events", "filtered", "before_filter", "l1_passthrough"]
 
     add_common_dqm(path, components=components, dqm_environment=dqm_environment,
                    dqm_mode=dqm_mode, create_hlt_unit_histograms=create_hlt_unit_histograms)
@@ -42,7 +44,7 @@ def add_collision_dqm(path, components=None, dqm_environment="expressreco", dqm_
             path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF')
 
     # the following makes only sense in collisions
-    if dqm_environment == "expressreco":
+    if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         if components is None or ('CDC' in components and 'SVD' in components):
             add_IP_dqm(path)
 

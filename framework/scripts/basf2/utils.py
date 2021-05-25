@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 basf2.utils - Helper functions for printing basf2 objects
@@ -252,10 +251,10 @@ def print_all_modules(moduleList, package=''):
             if package == '' or current_module.package() == package:
                 modules.append((current_module.package(), moduleName, current_module.description()))
         except pybasf2.ModuleNotCreatedError:
-            pybasf2.B2ERROR('The module {} could not be loaded.'.format(moduleName))
+            pybasf2.B2ERROR(f'The module {moduleName} could not be loaded.')
             fail = True
         except Exception as e:
-            pybasf2.B2ERROR('An exception occurred when trying to load the module {}: {}'.format(moduleName, e))
+            pybasf2.B2ERROR(f'An exception occurred when trying to load the module {moduleName}: {e}')
             fail = True
 
     table = []
@@ -375,7 +374,7 @@ def print_path(path, defaults=False, description=False, indentation=0, title=Tru
         for param in module.available_params():
             if not defaults and param.values == param.default:
                 continue
-            out = indentation_string + '      %s=%s' % (param.name, param.values)
+            out = indentation_string + f'      {param.name}={param.values}'
             if description:
                 out += '  #%s' % param.description
             print(out)

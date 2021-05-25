@@ -8,6 +8,7 @@
 
 
 #include <dqm/analysis/modules/DQMHistInjection.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
 #include <TROOT.h>
 
 using namespace std;
@@ -79,7 +80,8 @@ void DQMHistInjectionModule::initialize()
                                 20000);
   m_hInjectionLERARICH = new TH1F("HitInjectionLERARICH", "ARICH Occ after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 ,
                                   20000);
-  m_hInjectionLERKLM = new TH1F("HitInjectionLERKLM", "KLM Occ after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 ,
+  m_hInjectionLERKLM = new TH1F("HitInjectionLERKLM",
+                                "KLM occupancy after LER Injection;Time [#mus];Digits occupancy in % / (5 #mus)", 4000, 0 ,
                                 20000);
 
   m_hInjectionHERPXD = new TH1F("HitInjectionHERPXD", "PXD Hits after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
@@ -95,7 +97,8 @@ void DQMHistInjectionModule::initialize()
                                 20000);
   m_hInjectionHERARICH = new TH1F("HitInjectionHERARICH", "ARICH Occ after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 ,
                                   20000);
-  m_hInjectionHERKLM = new TH1F("HitInjectionHERKLM", "KLM Occ after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 ,
+  m_hInjectionHERKLM = new TH1F("HitInjectionHERKLM",
+                                "KLM occupancy after HER Injection;Time [#mus];Digits occupancy in % / (5 #mus)", 4000, 0 ,
                                 20000);
 
 #ifdef _BELLE2_EPICS
@@ -456,14 +459,14 @@ void DQMHistInjectionModule::event()
     locationHits = m_histogramDirectoryName + "/" + locationHits;
   }
   Hits = (TH1*)findHist(locationHits.Data());
-  locationTriggers = "KLMEOccInjLER";
+  locationTriggers = "KLMTrigInjLER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
   Triggers = (TH1*)findHist(locationTriggers.Data());
 
   if (Hits && Triggers) {
-    m_hInjectionLERKLM->Divide(Hits, Triggers);
+    m_hInjectionLERKLM->Divide(Hits, Triggers, 100, KLMElementNumbers::getTotalChannelNumber());
   }
 
   m_cInjectionLERKLM->Clear();
@@ -475,14 +478,14 @@ void DQMHistInjectionModule::event()
     locationHits = m_histogramDirectoryName + "/" + locationHits;
   }
   Hits = (TH1*)findHist(locationHits.Data());
-  locationTriggers = "KLMEOccInjHER";
+  locationTriggers = "KLMTrigInjHER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
   Triggers = (TH1*)findHist(locationTriggers.Data());
 
   if (Hits && Triggers) {
-    m_hInjectionHERKLM->Divide(Hits, Triggers);
+    m_hInjectionHERKLM->Divide(Hits, Triggers, 100, KLMElementNumbers::getTotalChannelNumber());
   }
 
   m_cInjectionHERKLM->Clear();

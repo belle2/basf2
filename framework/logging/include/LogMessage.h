@@ -113,6 +113,11 @@ namespace Belle2 {
     void setLogInfo(unsigned int logInfo) {m_logInfo = logInfo; }
 
     /**
+     * Set the number of occurrences
+     */
+    void setCount(int count) {m_count = count; }
+
+    /**
      * Generate output stream.
      *
      * @param out The output stream.
@@ -158,6 +163,7 @@ namespace Belle2 {
     int m_debugLevel;         /**< The debug level for messages with level=c_Debug */
 
     unsigned int m_logInfo;   /**< kind of information to show (ORed combination of LogConfig::ELogInfo flags). */
+    int m_count;              /**< Number of occurrences of the same message */
   };
 } // end namespace Belle2
 

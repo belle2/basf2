@@ -65,7 +65,7 @@ void DQMHistAnalysisPXDReductionModule::initialize()
   gROOT->cd(); // this seems to be important, or strange things happen
 
   m_cReduction = new TCanvas((m_histogramDirectoryName + "/c_Reduction").data());
-  m_hReduction = new TH1F("Reduction", "Reduction; Module; Reduction", m_PXDModules.size(), 0, m_PXDModules.size());
+  m_hReduction = new TH1F("hPXDReduction", "PXD Reduction; Module; Reduction", m_PXDModules.size(), 0, m_PXDModules.size());
   m_hReduction->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hReduction->SetStats(false);
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
@@ -164,6 +164,7 @@ void DQMHistAnalysisPXDReductionModule::event()
     m_hReduction->Draw("");
     if (status != 0) {
       m_line1->SetY1(value);
+      m_line1->SetY2(value); // aka SetHorizontal
       m_line1->Draw();
     }
 //     m_line2->Draw();

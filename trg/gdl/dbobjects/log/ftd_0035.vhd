@@ -821,9 +821,9 @@ begin
       sig_ftdout(oname004'pos(b_aaao)) <= aaao;
       sig_ftdout(oname004'pos(b_aao)) <= aao;
       sig_ftdout(oname004'pos(b_aab)) <= aab;
-      sig_ftdout(oname004'pos(b_aa)) <= aa;
+      sig_ftdout(oname004'pos(b_aa)) <= aa; --40
 
-      sig_ftdout(oname004'pos(b_hie)) <= hie;
+      sig_ftdout(oname004'pos(b_hie)) <= hie; --41
       sig_ftdout(oname004'pos(b_lowe)) <= lowe;
       sig_ftdout(oname004'pos(b_lume)) <= lume;
       sig_ftdout(oname004'pos(b_hade)) <= hade;
@@ -845,7 +845,7 @@ begin
       sig_ftdout(oname004'pos(b_ggsel))   <= ggsel;
       sig_ftdout(oname004'pos(b_g_high)) <= g_high;
       sig_ftdout(oname004'pos(b_g_c1)) <= g_c1;
-      sig_ftdout(oname004'pos(b_gg)) <= gg;
+      sig_ftdout(oname004'pos(b_gg)) <= gg; --63
 
       sig_ftdout(oname004'pos(b_mu_pair)) <= mu_pair;
       sig_ftdout(oname004'pos(b_mu_b2b)) <= mu_b2b;
@@ -855,11 +855,11 @@ begin
       sig_ftdout(oname004'pos(b_eklmhit)) <= eklmhit;
       sig_ftdout(oname004'pos(b_klm2))    <= klm2;
       sig_ftdout(oname004'pos(b_eklm2))   <= eklm2;
-      sig_ftdout(oname004'pos(b_beklm))   <= beklm;
+      sig_ftdout(oname004'pos(b_beklm))   <= beklm; --72
 
       sig_ftdout(oname004'pos(b_toptiming)) <= toptiming;
       sig_ftdout(oname004'pos(b_ecltiming)) <= ecltiming;
-      sig_ftdout(oname004'pos(b_cdctiming)) <= cdctiming;
+      sig_ftdout(oname004'pos(b_cdctiming)) <= cdctiming; --75
 
       sig_ftdout(oname004'pos(b_revolution)) <= revolution;
       sig_ftdout(oname004'pos(b_random)) <= random;
@@ -867,7 +867,7 @@ begin
       sig_ftdout(oname004'pos(b_pls)) <= pls;
       sig_ftdout(oname004'pos(b_poisson)) <= poisson;
       sig_ftdout(oname004'pos(b_poissonv)) <= poissonv;
-      sig_ftdout(oname004'pos(b_vetout)) <= vetout;
+      sig_ftdout(oname004'pos(b_vetout)) <= vetout; --82
 
       sig_ftdout(oname004'pos(b_lml0)) <= lml0;
       sig_ftdout(oname004'pos(b_lml1)) <= lml1;
@@ -881,7 +881,7 @@ begin
       sig_ftdout(oname004'pos(b_lml9)) <= lml9;
       sig_ftdout(oname004'pos(b_lml10)) <= lml10;
       sig_ftdout(oname004'pos(b_lml12)) <= lml12;
-      sig_ftdout(oname004'pos(b_lml13)) <= lml13;
+      sig_ftdout(oname004'pos(b_lml13)) <= lml13; --95
 
       sig_ftdout(oname004'pos(b_stt))      <= stt;
       sig_ftdout(oname004'pos(b_sttecl))   <= sttecl;
@@ -891,7 +891,7 @@ begin
       sig_ftdout(oname004'pos(b_fioiecl1)) <= fioiecl1;
       sig_ftdout(oname004'pos(b_itsf_b2b)) <= itsf_b2b;
       sig_ftdout(oname004'pos(b_ioiecl1))  <= ioiecl1;
-      sig_ftdout(oname004'pos(b_ioiecl2))  <= ioiecl2;
+      sig_ftdout(oname004'pos(b_ioiecl2))  <= ioiecl2; --104
 
       sig_ftdout(oname004'pos(b_eed)) <= eed;
       sig_ftdout(oname004'pos(b_fed)) <= fed;
@@ -901,29 +901,29 @@ begin
       sig_ftdout(oname004'pos(b_yp)) <= yp;
       sig_ftdout(oname004'pos(b_d_5)) <= d_5;
       sig_ftdout(oname004'pos(b_shem)) <= shem;
-      sig_ftdout(oname004'pos(b_ohem)) <= ohem;
+      sig_ftdout(oname004'pos(b_ohem)) <= ohem; --113
 
-      sig_ftdout(oname004'pos(b_cdcecl1)) <= cdcecl1;
+      sig_ftdout(oname004'pos(b_cdcecl1)) <= cdcecl1; 
       sig_ftdout(oname004'pos(b_cdcecl2)) <= cdcecl2;
       sig_ftdout(oname004'pos(b_cdcecl3)) <= cdcecl3;
       sig_ftdout(oname004'pos(b_cdcecl4)) <= cdcecl4;
       sig_ftdout(oname004'pos(b_c2gev1))  <= c2gev1;
       sig_ftdout(oname004'pos(b_c2gev2))  <= c2gev2;
-      sig_ftdout(oname004'pos(b_c2gev3))  <= c2gev3;
+      sig_ftdout(oname004'pos(b_c2gev3))  <= c2gev3; --120
       sig_ftdout(oname004'pos(b_c2gev4))  <= c2gev4;
-      sig_ftdout(oname004'pos(b_cdctop1)) <= cdctop1;
-      sig_ftdout(oname004'pos(b_cdctop2)) <= cdctop2;
-      sig_ftdout(oname004'pos(b_cdctop3)) <= cdctop3;
-      sig_ftdout(oname004'pos(b_cdctop4)) <= cdctop4;
       sig_ftdout(oname004'pos(b_c1hie))   <= c1hie;
       sig_ftdout(oname004'pos(b_c1lume))  <= c1lume;
       sig_ftdout(oname004'pos(b_n1hie))   <= n1hie;
       sig_ftdout(oname004'pos(b_n1lume))  <= n1lume;
-      sig_ftdout(oname004'pos(b_c3hie))   <= c3hie;
+      sig_ftdout(oname004'pos(b_c3hie))   <= c3hie; --130
       sig_ftdout(oname004'pos(b_c3lume))  <= c3lume;
       sig_ftdout(oname004'pos(b_n3hie))   <= n3hie;
       sig_ftdout(oname004'pos(b_n3lume))  <= n3lume;
       sig_ftdout(oname004'pos(b_c2hie))   <= c2hie;
+      sig_ftdout(oname004'pos(b_cdctop1)) <= cdctop1;
+      sig_ftdout(oname004'pos(b_cdctop2)) <= cdctop2;
+      sig_ftdout(oname004'pos(b_cdctop3)) <= cdctop3;
+      sig_ftdout(oname004'pos(b_cdctop4)) <= cdctop4;
       sig_ftdout(oname004'pos(b_cdcklm1)) <= cdcklm1;
       sig_ftdout(oname004'pos(b_cdcklm2)) <= cdcklm2;
       sig_ftdout(oname004'pos(b_seklm1))  <= seklm1;

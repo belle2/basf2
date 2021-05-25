@@ -323,7 +323,9 @@ namespace Belle2 {
         if (window >= storageDepth) {
           B2WARNING("TOPRawDigitConverter: window number greater than storage depth."
                     << LogVar("window number", window)
-                    << LogVar("storage depth", storageDepth));
+                    << LogVar("storage depth", storageDepth)
+                    << LogVar("refWindow", refWindow)
+                    << LogVar("phase", phase));
           continue;
         }
 

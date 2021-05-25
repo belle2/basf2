@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # install optional python packages which are required to
 # use ipython notebooks productively
@@ -19,10 +18,10 @@ def can_install_sitepackages():
     """
     first_site = site.getsitepackages()[0]
     if os.access(first_site, os.W_OK):
-        print("Site package folder {} writeable. User can install additional packages.".format(first_site))
+        print(f"Site package folder {first_site} writeable. User can install additional packages.")
         return True
     else:
-        print("Site package folder {} read-only. User cannot install additional packages.".format(first_site))
+        print(f"Site package folder {first_site} read-only. User cannot install additional packages.")
         return False
 
 
@@ -50,7 +49,7 @@ def get_argument_parser(target_required=False):
 
     parser.add_argument('package',
                         nargs="*",
-                        help='Packages to additionally install in addition to {}'.format(optional_packages_list))
+                        help=f'Packages to additionally install in addition to {optional_packages_list}')
 
     return parser
 
@@ -66,7 +65,7 @@ if __name__ == "__main__":
     target_pythonpath_env = os.environ.copy()
     target_path_abs = None
     if args.target:
-        print("Installing packages into target {} -- This will take some time.".format(args.target) )
+        print(f"Installing packages into target {args.target} -- This will take some time." )
         target_path_abs = os.path.abspath(args.target)
         target_option = ["--target", target_path_abs]
     

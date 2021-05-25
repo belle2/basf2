@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2017, 2021 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -11,6 +11,8 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
+#include <top/dbobjects/TOPFrontEndSetting.h>
 
 namespace Belle2 {
 
@@ -29,7 +31,8 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~TOPCosmicT0FinderModule();
+    virtual ~TOPCosmicT0FinderModule()
+    {}
 
     /**
      * Initialize the Module.
@@ -38,21 +41,9 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun() override;
-
-    /**
      * Event processor.
      */
     virtual void event() override;
-
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
 
     /**
      * Termination action.
@@ -62,6 +53,7 @@ namespace Belle2 {
 
   private:
 
+    // steering parameters
     bool m_useIncomingTrack; /**< if true use incoming track, otherwise use outcoming */
     unsigned m_minHits; /**< minimal number of hits on TOP module */
     double m_minSignal; /**< minimal number of expected signal photons */
@@ -71,6 +63,10 @@ namespace Belle2 {
     double m_sigma;     /**< additional time spread added to PDF [ns] */
     bool m_saveHistograms; /**< flag to save histograms */
 
+    // database
+    DBObjPtr<TOPFrontEndSetting> m_feSetting;  /**< front-end settings */
+
+    // other
     int m_num = 0; /**< histogram number */
     int m_acceptedCount = 0;  /**< counter for accepted events */
     int m_successCount = 0; /**< counter for successfully determined T0 */

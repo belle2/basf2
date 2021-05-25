@@ -11,6 +11,8 @@
 #pragma link C++ class Belle2::KLMElectronicsMap+; // checksum=0x80823ee7, version=1
 #pragma link C++ class Belle2::KLMLikelihoodParameters+; // checksum=0xb0134418, version=1
 #pragma link C++ class Belle2::KLMScintillatorDigitizationParameters+; // checksum=0x569c2529, version=1
+#pragma link C++ class Belle2::KLMScintillatorFEEData+; // checksum=0xa1527940, version=1
+#pragma link C++ class Belle2::KLMScintillatorFEEParameters+; // checksum=0xae2d1dcf, version=1
 #pragma link C++ class Belle2::KLMStripEfficiency+; // checksum=0xbe1e8e53, version=1
 #pragma link C++ class Belle2::KLMTimeCableDelay+; // checksum=0xdaabeabe, version=1
 #pragma link C++ class Belle2::KLMTimeConstants+; // checksum=0x771043a0, version=1

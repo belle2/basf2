@@ -35,7 +35,8 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~TOPCalPulseGeneratorModule();
+    virtual ~TOPCalPulseGeneratorModule()
+    {}
 
     /**
      * Initialize the Module.
@@ -44,27 +45,9 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun() override;
-
-    /**
      * Event processor.
      */
     virtual void event() override;
-
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
-
-    /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate() override;
 
   private:
 
@@ -73,10 +56,11 @@ namespace Belle2 {
     std::vector<int> m_moduleIDs; /**< slot ID's to generate for */
     std::vector<unsigned> m_asicChannels; /**< ASIC calibration channels */
     double m_amplitude; /**< cal pulse amplitude [ADC counts] */
+    double m_delay; /**< cal pulse delay [ns] */
+    double m_windowSize; /**< window size in which to generate cal pulses [ns] */
 
     // dataobjects
     StoreArray<TOPSimCalPulse> m_calPulses; /**< collection of simulated cal pulses */
-
 
   };
 

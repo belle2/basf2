@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """Tool to create a source code template for a module.
 
@@ -66,7 +65,7 @@ if __name__ == "__main__":
 
     # check whether the files already exist
     if os.path.isfile(header) or os.path.isfile(src):
-        sys.stderr.write('ERROR: The file %s or %s already exists.\n' % (header,
+        sys.stderr.write('ERROR: The file {} or {} already exists.\n'.format(header,
                         src))
         sys.exit(1)
 
@@ -156,9 +155,9 @@ if __name__ == "__main__":
         header_includes.append('Store%s' % io_type)
         header_includes.append(io_class)
         if io_branch != '':
-            ctor_src = ctor_src + ', m_%s("%s")' % (io_name, io_branch)
+            ctor_src = ctor_src + f', m_{io_name}("{io_branch}")'
         io_required = io_required[0].upper() + io_required[1:]
-        init_src = init_src + '  m_%s.is%s();\n' % (io_name, io_required)
+        init_src = init_src + f'  m_{io_name}.is{io_required}();\n'
 
     print('Please enter the output data types:', flush=True)
     while True:
@@ -182,8 +181,8 @@ if __name__ == "__main__":
         header_includes.append('Store%s' % io_type)
         header_includes.append(io_class)
         if io_branch != '':
-            ctor_src = ctor_src + ', m_%s("%s")' % (io_name, io_branch)
-        init_src = init_src + '  m_%s.registerInDataStore(%s);\n' % (io_name, io_storeFlag)
+            ctor_src = ctor_src + f', m_{io_name}("{io_branch}")'
+        init_src = init_src + f'  m_{io_name}.registerInDataStore({io_storeFlag});\n'
 
     # get module methods
     methods_header = ''

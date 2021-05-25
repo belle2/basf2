@@ -47,6 +47,8 @@ namespace Belle2 {
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
 
+    //! Histogram covering all error types
+    TH1* m_hDAQError = nullptr;
     //! Histogram covering all DHC modules
     TH2F* m_hMissingDHC = nullptr;
     //! Histogram covering all DHE modules
@@ -55,6 +57,8 @@ namespace Belle2 {
     TH1F* m_hMissingDHP = nullptr;
     //! Histogram covering stat
     TH1F* m_hStatistic = nullptr;
+    //! Final Canvas
+    TCanvas* m_cDAQError = nullptr;
     //! Final Canvas
     TCanvas* m_cMissingDHC = nullptr;
     //! Final Canvas

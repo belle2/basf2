@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """\
 Run basf2 framework tests of the given packages.  If no argument is given all
@@ -84,7 +83,7 @@ def compare_log(release, name, log, logtype, ignore_lines=0, diff_lines=10):
             open(template_file, "rb").read().splitlines()[ignore_lines:],
             log.splitlines()[ignore_lines:],
             fromfile=template.encode(),
-            tofile=("std%s of 'basf2 %s'" % (logtype, name)).encode(),
+            tofile=(f"std{logtype} of 'basf2 {name}'").encode(),
             lineterm=b'',
             n=0,
             ))
@@ -118,7 +117,7 @@ def format_output(name, out, err):
 def report_test_result(result, extra, name, message):
     """ print out the result of one test"""
     result_message = {True: "passed", None: "skipped", False: "FAILED"}[result]
-    print("%sfinished test %s\n     -> %s: %s" % (extra, name, result_message, message), flush=True)
+    print(f"{extra}finished test {name}\n     -> {result_message}: {message}", flush=True)
 
 
 def run_test(argument):
@@ -131,7 +130,7 @@ def run_test(argument):
     elif ext == ".py":
         return run_test_py(argument)
     else:
-        print("Testfile {} with extension {} not supported".format(name, ext))
+        print(f"Testfile {name} with extension {ext} not supported")
 
 
 def run_test_ipynb(argument):
@@ -161,20 +160,23 @@ def run_test_ipynb(argument):
     # execution errors within the notebook will throw this exception
     except CellExecutionError as ce:
         result = False
-        message = f"A CellExecutionError happened: {ce}. Please re-run the build if this failure happened on bamboo."
+        message = f"A CellExecutionError happened. Please re-run the build if this failure happened on bamboo."
+        extra = str(ce)
     except TimeoutError as te:
         result = False
-        message = f"A TimeoutError happened: {te}. Please re-run the build if this failure happened on bamboo."
+        message = f"A TimeoutError happened. Please re-run the build if this failure happened on bamboo."
+        extra = str(te)
     except RuntimeError as re:
         result = False
-        message = f"A RuntimeError happened: {re}. Please re-run the build if this failure happened on bamboo."
+        message = f"A RuntimeError happened. Please re-run the build if this failure happened on bamboo."
+        extra = str(re)
 
     time = timeit.default_timer() - time_start
 
     with print_lock:
         report_test_result(result, extra, name, message)
 
-    return (result, message, time, None)
+    return (result, message, time, extra)
 
 
 def run_test_py(argument):
@@ -201,7 +203,7 @@ def run_test_py(argument):
         # apparently test case took to long so format result message. Without
         # timeout result would be None so we can distinguish later.
         result = False
-        message = "timeout of %d seconds reached" % options.timeout
+        message = f"timeout of {options.timeout} seconds reached"
         extra = format_output(name, e.stderr, e.stdout)
 
     time = timeit.default_timer() - time_start
@@ -212,7 +214,7 @@ def run_test_py(argument):
             pass
         elif process.returncode != 0:
             # check for skipped test
-            skipped = re.search(b"^TEST SKIPPED:\s*(.+)$", process.stderr, re.MULTILINE)
+            skipped = re.search(br"^TEST SKIPPED:\s*(.+)$", process.stderr, re.MULTILINE)
             if skipped:
                 result = None
                 message = skipped.group(1).decode()
@@ -329,6 +331,8 @@ def get_argument_parser():
                         help="if given don't print output of failed tests")
     parser.add_argument("--filter", type=str, default=None, help="Only run tests where the name "
                         "of the steering file matches the given regular expression")
+    parser.add_argument("--exclude", type=str, default=None, help="Exclude all tests where the name "
+                        "of the steering file matches the given regular expression")
     parser.add_argument("directories", nargs="*", help="run all tests included in this directory."
                         "If none are specified run all tests", metavar="DIRECTORY")
     parser.add_argument("-t", "--timeout", type=int, default=None, metavar="SECONDS",
@@ -346,8 +350,7 @@ if __name__ == "__main__":
         sys.exit(-1)
 
     # first let's collect all tests
-    print("running steering file tests in %d %s" %
-          (options.nprocess, "process" if options.nprocess == 1 else "processes"), flush=True)
+    print(f"running steering file tests in {options.nprocess} processes", flush=True)
     all_tests = []
     processed_dirs = []
     if "BELLE2_LOCAL_DIR" in os.environ:
@@ -355,16 +358,18 @@ if __name__ == "__main__":
     if "BELLE2_RELEASE_DIR" in os.environ:
         all_tests += process_top_dir(os.environ['BELLE2_RELEASE_DIR'], options.directories, processed_dirs)
 
-    if options.filter is not None:
-        try:
-            re_filter = re.compile(options.filter)
-        except Exception as e:
-            print("The --filter argument %r is not a valid regular expression: %s" % (options.filter, e))
-            sys.exit(1)
-        all_tests = [e for e in all_tests if re_filter.search(e[0]) is not None]
+    for name, invert in [("filter", False), ("exclude", True)]:
+        arg = getattr(options, name)
+        if arg is not None:
+            try:
+                re_filter = re.compile(arg)
+            except Exception as e:
+                print(f"The --{name} argument {arg:r} is not a valid regular expression: {e}")
+                sys.exit(1)
+            all_tests = [e for e in all_tests if (re_filter.search(e[0]) is not None) != invert]
 
     all_tests.sort()
-    print("Collected %d tests..." % len(all_tests), flush=True)
+    print(f"Collected {len(all_tests)} tests...", flush=True)
 
     # now let's run them, either in multiprocessing or in a single process
     if options.nprocess > 1:
@@ -380,9 +385,12 @@ if __name__ == "__main__":
     test_results = TestSuite()
     test_suites = defaultdict(TestSuite)
     tests_failed = []
+    tests_skipped = []
     for (test, release_dir), result in zip(all_tests, results):
         if not test_results.add(test, *result):
-            tests_failed.append(test)
+            tests_failed.append((test, result[1]))
+        if result[0] is None:
+            tests_skipped.append((test, result[1]))
         suite = os.path.dirname(test)
         if suite.endswith("/tests"):
             suite = os.path.dirname(suite)
@@ -410,8 +418,10 @@ if __name__ == "__main__":
 
     # print a list of failed tests to find them more easily
     print(flush=True)
+    if test_results.skipped > 0:
+        print("\n    ".join(["Skipped tests: "] + ["%s (%s)" % e for e in tests_skipped]), flush=True)
     if test_results.failed > 0:
-        print("FAILED TESTS:", "\n    ".join([""] + tests_failed), flush=True)
+        print("\n    ".join(["FAILED tests: "] + ["%s (%s)" % e for e in tests_failed]), flush=True)
     # print summary and exit
-    print('%d out of %d tests failed, %d were skipped' % (test_results.failed, len(test_results), test_results.skipped), flush=True)
+    print(f'{test_results.failed} out of {len(test_results)} tests failed, {test_results.skipped} were skipped', flush=True)
     sys.exit(len(tests_failed))

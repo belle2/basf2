@@ -86,11 +86,12 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
 
     const int status = (*read_particle)->status();
     const bool isFinalstate =  !decay_vertex && status == 1;
-    const bool isVirtual  = (status == 4) || (status == 21) || (status == 22) || (status == 23); //TODO refine
+    const bool isVirtual  = (status == 4) || (status == 21) || (status == 22) || (status == 23) || (status == 51) || (status == 52)
+                            || (status == 71) ; //hepmc internal status flags. 4 are beam particles, rest could be refined if needed
     const int pdg_code = (*read_particle)->pdg_id() ;
     const double mass = (*read_particle)->generated_mass() * mom_conv;
     auto const mom_tmp = (*read_particle)->momentum();
-    //whatever genius wrote this vector class did not implement an operator for multiplication with a scalar or even access via []
+
     const HepMC::FourVector momentum(
       mom_tmp.x()*mom_conv * Unit::GeV,
       mom_tmp.y()*mom_conv * Unit::GeV,
@@ -100,7 +101,7 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
 
     B2DEBUG(20, "Read particle: status " << status << " isFinal " << isFinalstate << " isVirtual " << isVirtual << " pdg " << pdg_code
             << " mass " << mass << " px " << momentum.x() << " py " << momentum.y() << " px " << momentum.z() << " E " << momentum.t());
-    p.addStatus(MCParticle::c_PrimaryParticle);  // bit needs to be set in order for the GeneratedVertexDisplacer to work
+    p.addStatus(MCParticle::c_PrimaryParticle);  // all particles part of the hepmc file should be set as primary
     p.setPDG(pdg_code);
     p.setMomentum(TVector3(momentum.x(), momentum.y(), momentum.z()));
     p.setEnergy(momentum.t());
@@ -112,15 +113,20 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
       p.setValidVertex(true);
     }
 
-    if (decay_vertex) {
-      int daughter_idx = 0;
-      for (auto daughter = decay_vertex->particles_begin(HepMC::children);
-           daughter != decay_vertex->particles_end(HepMC::children); ++daughter) {
-        const int daughter_index_in_graph = hash_index_map[(*daughter)->barcode()];
-        p.decaysInto(graph[event_offset + daughter_index_in_graph]);
-        daughter_idx++;
+    if (status == 21) {       //removes massless beam particles carried over from MadGraph
+      p.setIgnore(true);    //they are just used for internal bookkeeping and serve no other purpose
+    }
+
+    //assign the parent particle:
+    //for two incoming particles only one of them is assigned as parent
+    if (production_vertex) {
+      if (production_vertex->particles_in_const_begin() != production_vertex->particles_in_const_end()) {
+        auto parent = production_vertex->particles_begin(HepMC::parents);
+        const int parent_index_in_graph = hash_index_map[(*parent)->barcode()];
+        p.comesFrom(graph[event_offset + parent_index_in_graph]);
       }
     }
+
     //boost particles to lab frame:
     TLorentzVector p4 = p.get4Vector();
     if (m_wrongSignPz) { // this means we have to mirror Pz

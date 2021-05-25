@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import subprocess
 
 
-class LatexObject(object):
+class LatexObject:
     """
     Common base class of all Latex Wrapper objects
     """
@@ -164,7 +163,7 @@ class String(LatexObject):
         Calls super-class initialize and adds initial text to output
             @param text intial text, usually you want to give a raw string r"some text"
         """
-        super(String, self).__init__()
+        super().__init__()
         #: output string
         self.output += str(text)
 
@@ -196,7 +195,7 @@ class Listing(LatexObject):
         Calls super-class initialize and adds initial text to output
             @param text intial text, usually you want to give a raw string r"some text"
         """
-        super(Listing, self).__init__()
+        super().__init__()
         #: output string
         self.output += r'\lstset{language=' + language + '}\n'
         self.output += r'\begin{lstlisting}[breaklines=true]' + '\n'
@@ -233,7 +232,7 @@ class DefineColourList(LatexObject):
         """
         Calls super-class init, adds definition of colourlist to latex code.
         """
-        super(DefineColourList, self).__init__()
+        super().__init__()
         self.output += r"\def\colourlist{{" + ', '.join('"%s"' % (c) for c in self.colours) + r"}}" + '\n'
         self.output += r"""
             \tikzset{nodeStyle/.style={text height=\heightof{A},text depth=\depthof{g}, inner sep = 0pt, node distance = -0.15mm}}
@@ -271,7 +270,7 @@ class Section(LatexObject):
         """
         Calls super-class init and adds necessary latex commands to output.
         """
-        super(Section, self).__init__()
+        super().__init__()
         self.output += r"\raggedbottom" + '\n'
         self.output += r"\pagebreak[0]" + '\n'
         self.output += r"\FloatBarrier" + '\n'
@@ -287,7 +286,7 @@ class SubSection(LatexObject):
         """
         Calls super-class init and adds necessary latex commands to output.
         """
-        super(SubSection, self).__init__()
+        super().__init__()
         self.output += r"\subsection{" + str(name) + r"}" + '\n'
 
 
@@ -300,7 +299,7 @@ class SubSubSection(LatexObject):
         """
         Calls super-class init and adds necessary latex commands to output.
         """
-        super(SubSubSection, self).__init__()
+        super().__init__()
         self.output += r"\subsubsection{" + str(name) + r"}" + '\n'
 
 
@@ -313,7 +312,7 @@ class Graphics(LatexObject):
         """
         Calls super-class init and begins centered environment.
         """
-        super(Graphics, self).__init__()
+        super().__init__()
         self.output += r"\begin{center}" + '\n'
 
     def add(self, filename, width=0.7):
@@ -343,7 +342,7 @@ class Itemize(LatexObject):
         """
         Calls super-class init and begins itemize
         """
-        super(Itemize, self).__init__()
+        super().__init__()
         #: number of items
         self.amount = 0
         self.output += r"\begin{itemize}"
@@ -383,7 +382,7 @@ class LongTable(LatexObject):
             @param format_string  python-style format-string used to generate a new row out of a given dictionary.
             @param head of the table
         """
-        super(LongTable, self).__init__()
+        super().__init__()
         self.output += r"\begin{center}" + '\n'
         self.output += r"\begin{longtable}{" + str(columnspecs) + r"}" + '\n'
         self.output += r"\caption{" + str(caption) + r"}\\" + '\n'
@@ -431,7 +430,7 @@ class TitlePage(LatexObject):
             @param abstract optional abstract placed on the title-page.
             @param add_table_of_contents bool indicating of table-of-contents should be included.
         """
-        super(TitlePage, self).__init__()
+        super().__init__()
         self.output += r"\author{"
         for author in authors:
             self.output += author + r"\\"
@@ -478,7 +477,7 @@ if __name__ == '__main__':
 
     table = LongTable(columnspecs=r"lcrrr",
                       caption="A coloured table for " +
-                              ', '.join(('\\textcolor{%s}{%s}' % (c, m) for c, m in zip(colour_list.colours[:3], "RGB"))),
+                              ', '.join((f'\\textcolor{{{c}}}{{{m}}}' for c, m in zip(colour_list.colours[:3], "RGB"))),
                       format_string="{name} & {bargraph} & {r:.2f} & {g:.2f} & {b:.2f}",
                       head=r"Name & Relative fractions & R - Value & G - Value & B - Value")
     sr = sg = sb = 0
@@ -490,9 +489,10 @@ if __name__ == '__main__':
         sr += r
         sg += g
         sb += b
-        table.add(name='test' + str(i), bargraph=r'\plotbar{ %g/, %g/, %g/,}' % (r / n, g / n, b / n), r=r, g=g, b=b)
+        table.add(name='test' + str(i), bargraph=r'\plotbar{{ {:g}/, {:g}/, {:g}/,}}'.format(r / n, g / n, b / n), r=r, g=g, b=b)
     n = (sr + sg + sb) / 100.0
-    o += table.finish(tail=r"Total & \plotbar{ %g/, %g/, %g/,} & %g & %g & %g" % (sr / n, sg / n, sb / n, sr, sg, sb))
+    o += table.finish(tail=r"Total & \plotbar{{ {:g}/, {:g}/, {:g}/,}} & {:g} & {:g} & {:g}".format(sr /
+                                                                                                    n, sg / n, sb / n, sr, sg, sb))
 
     o += Section("Graphic section")
     graphics = Graphics()
@@ -502,7 +502,7 @@ if __name__ == '__main__':
         graphics.add(image, width=0.49)
     o += graphics.finish()
 
-    from . import format
+    from B2Tools import format
     o += Section("Format section e.g. " + format.decayDescriptor("B+ ==> mu+ nu gamma"))
     o += r"Some important channels in B physics"
     items = Itemize()

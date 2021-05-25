@@ -62,51 +62,36 @@ void DQMHistAnalysisSVDDoseModule::initialize()
   m_c_occuLER1All.reserve(c_sensorGroups.size());
   m_c_occuHER1All.reserve(c_sensorGroups.size());
   for (const auto& group : c_sensorGroups) {
-    TCanvas* c = new TCanvas("svd_instOccupancy_" + group.nameSuffix + "_pois",
-                             "Instantaneous occupancy (Pois. trig.) " + group.titleSuffix,
-                             0, 0, 800, 600);
+    TCanvas* c = new TCanvas("SVDDOSE/c_svd_instOccupancy_" + group.nameSuffix + "_pois",
+                             "Instantaneous occupancy (Pois. trig.) " + group.titleSuffix);
     m_c_instOccu.push_back(c);
-    m_monObj->addCanvas(c);
-    c = new TCanvas("svd_occuLER_" + group.nameSuffix + "_pois",
-                    "Occupancy vs time since LER inj. (Pois. trig.) " + group.titleSuffix,
-                    0, 0, 800, 600);
+    c = new TCanvas("SVDDOSE/c_svd_occuLER_" + group.nameSuffix + "_pois",
+                    "Occupancy vs time since LER inj. (Pois. trig.) " + group.titleSuffix);
     m_c_occuLER.push_back(c);
-    // m_monObj->addCanvas(c);
-    c = new TCanvas("svd_occuHER_" + group.nameSuffix + "_pois",
-                    "Occupancy vs time since HER inj. (Pois. trig.) " + group.titleSuffix,
-                    0, 0, 800, 600);
+    c = new TCanvas("SVDDOSE/c_svd_occuHER_" + group.nameSuffix + "_pois",
+                    "Occupancy vs time since HER inj. (Pois. trig.) " + group.titleSuffix);
     m_c_occuHER.push_back(c);
-    // m_monObj->addCanvas(c);
-    c = new TCanvas("svd_1DoccuLER_" + group.nameSuffix + "_pois",
-                    "Occupancy vs time since LER inj. (Pois. trig.) " + group.titleSuffix,
-                    0, 0, 800, 600);
+    c = new TCanvas("SVDDOSE/c_svd_1DoccuLER_" + group.nameSuffix + "_pois",
+                    "Occupancy vs time since LER inj. (Pois. trig.) " + group.titleSuffix);
     m_c_occuLER1.push_back(c);
-    m_monObj->addCanvas(c);
-    c = new TCanvas("svd_1DoccuHER_" + group.nameSuffix + "_pois",
-                    "Occupancy vs time since HER inj. (Pois. trig.) " + group.titleSuffix,
-                    0, 0, 800, 600);
+    c = new TCanvas("SVDDOSE/c_svd_1DoccuHER_" + group.nameSuffix + "_pois",
+                    "Occupancy vs time since HER inj. (Pois. trig.) " + group.titleSuffix);
     m_c_occuHER1.push_back(c);
-    m_monObj->addCanvas(c);
 
-    c = new TCanvas("svd_instOccupancy_" + group.nameSuffix + "_all",
-                    "Instantaneous occupancy (all events) " + group.titleSuffix,
-                    0, 0, 800, 600);
+    c = new TCanvas("SVDDOSE/c_svd_instOccupancy_" + group.nameSuffix + "_all",
+                    "Instantaneous occupancy (all events) " + group.titleSuffix);
     m_c_instOccuAll.push_back(c);
-    c = new TCanvas("svd_occuLER_" + group.nameSuffix + "_all",
-                    "Occupancy vs time since LER inj. (all events) " + group.titleSuffix,
-                    0, 0, 800, 600);
+    c = new TCanvas("SVDDOSE/c_svd_occuLER_" + group.nameSuffix + "_all",
+                    "Occupancy vs time since LER inj. (all events) " + group.titleSuffix);
     m_c_occuLERAll.push_back(c);
-    c = new TCanvas("svd_occuHER_" + group.nameSuffix + "_all",
-                    "Occupancy vs time since HER inj. (all events) " + group.titleSuffix,
-                    0, 0, 800, 600);
+    c = new TCanvas("SVDDOSE/c_svd_occuHER_" + group.nameSuffix + "_all",
+                    "Occupancy vs time since HER inj. (all events) " + group.titleSuffix);
     m_c_occuHERAll.push_back(c);
-    c = new TCanvas("svd_1DoccuLER_" + group.nameSuffix + "_all",
-                    "Occupancy vs time since LER inj. (all events) " + group.titleSuffix,
-                    0, 0, 800, 600);
+    c = new TCanvas("SVDDOSE/c_svd_1DoccuLER_" + group.nameSuffix + "_all",
+                    "Occupancy vs time since LER inj. (all events) " + group.titleSuffix);
     m_c_occuLER1All.push_back(c);
-    c = new TCanvas("svd_1DoccuHER_" + group.nameSuffix + "_all",
-                    "Occupancy vs time since HER inj. (all events) " + group.titleSuffix,
-                    0, 0, 800, 600);
+    c = new TCanvas("SVDDOSE/c_svd_1DoccuHER_" + group.nameSuffix + "_all",
+                    "Occupancy vs time since HER inj. (all events) " + group.titleSuffix);
     m_c_occuHER1All.push_back(c);
   }
   m_h_occuLER.resize(c_sensorGroups.size(), nullptr);
@@ -139,11 +124,15 @@ void DQMHistAnalysisSVDDoseModule::initialize()
     SEVCHK(ca_create_channel((m_pvPrefix + m_statePVSuffix).data(),
                              NULL, NULL, 10, &m_stateChan), "ca_create_channel");
     // Actually do create the channels, communicating with the IOC
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io");
+    SEVCHK(ca_pend_io(2.0), "ca_pend_io");
     // Get the state enum
-    SEVCHK(ca_get(DBR_CTRL_ENUM, m_stateChan, &m_stateCtrl), "ca_get");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io");
-    B2DEBUG(19, "State PV initialized (ca_get)" << LogVar("value", m_stateCtrl.value));
+    if (m_stateChan) {
+      SEVCHK(ca_get(DBR_CTRL_ENUM, m_stateChan, &m_stateCtrl), "ca_get");
+      B2DEBUG(19, "State PV initialized (ca_get)" << LogVar("value", m_stateCtrl.value));
+      SEVCHK(ca_pend_io(2.0), "ca_pend_io");
+    } else {
+      B2DEBUG(18, "State PV failed to initialize, will retry in beginRun(), event() and endRun().");
+    }
     // First update should happen m_epicsUpdateSeconds from now
     m_lastPVUpdate = getClockSeconds();
   }
@@ -157,8 +146,13 @@ void DQMHistAnalysisSVDDoseModule::beginRun()
   if (m_useEpics) {
     B2DEBUG(19, "beginRun: setting state PV to RUNNING");
     m_stateCtrl.value = 1;
-    SEVCHK(ca_put(DBR_ENUM, m_stateChan, &m_stateCtrl.value), "ca_put");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io");
+    if (m_stateChan) {
+      SEVCHK(ca_put(DBR_ENUM, m_stateChan, &m_stateCtrl.value), "ca_put");
+    } else {
+      SEVCHK(ca_create_channel((m_pvPrefix + m_statePVSuffix).data(),
+                               NULL, NULL, 10, &m_stateChan), "ca_create_channel (reconnection)");
+    }
+    SEVCHK(ca_pend_io(2.0), "ca_pend_io");
     // First update should happen m_epicsUpdateSeconds from now
     m_lastPVUpdate = getClockSeconds();
   }
@@ -171,6 +165,30 @@ void DQMHistAnalysisSVDDoseModule::event()
 #ifdef _BELLE2_EPICS
   double timeSinceLastPVUpdate = getClockSeconds() - m_lastPVUpdate;
   if (m_useEpics && timeSinceLastPVUpdate >= m_epicsUpdateSeconds) {
+    // Dummy ca_get to ensure reconnection to the IOC in case of past errors
+    if (m_stateChan) {
+      SEVCHK(ca_get(DBR_CTRL_ENUM, m_stateChan, &m_stateCtrl), "ca_get");
+    } else {
+      SEVCHK(ca_create_channel((m_pvPrefix + m_statePVSuffix).data(),
+                               NULL, NULL, 10, &m_stateChan), "ca_create_channel (reconnection)");
+    }
+    SEVCHK(ca_pend_io(2.0), "ca_pend_io");
+
+    // Write updateInterval PV and state PV first
+    if (m_timeSinceLastPVUpdateChan) {
+      SEVCHK(ca_put(DBR_DOUBLE, m_timeSinceLastPVUpdateChan, (void*)&timeSinceLastPVUpdate), "ca_put");
+    } else {
+      SEVCHK(ca_create_channel((m_pvPrefix + m_deltaTPVSuffix).data(), NULL, NULL, 10, &m_timeSinceLastPVUpdateChan),
+             "ca_create_channel (reconnection)");
+    }
+    m_stateCtrl.value = 1; // If IOC is restarted this PV must be re-updated
+    if (m_stateChan) {
+      SEVCHK(ca_put(DBR_ENUM, m_stateChan, &m_stateCtrl.value), "ca_put");
+    } else {
+      SEVCHK(ca_create_channel((m_pvPrefix + m_statePVSuffix).data(),
+                               NULL, NULL, 10, &m_stateChan), "ca_create_channel (reconnection)");
+    }
+    // Update occupancy PVs
     for (unsigned int g = 0; g < c_sensorGroups.size(); g++) {
       const auto& group = c_sensorGroups[g];
       double nHits = 0.0, nEvts = 0.0;
@@ -194,15 +212,18 @@ void DQMHistAnalysisSVDDoseModule::event()
       double delta_nHits = nHits - pv.lastNHits;
       double delta_nEvts = nEvts - pv.lastNEvts;
       double occ = delta_nEvts > 0.0 ? (delta_nHits / delta_nEvts * 100.0 / group.nStrips) : -1.0;
-      if (pv.mychid)
+      if (pv.mychid) {
         SEVCHK(ca_put(DBR_DOUBLE, pv.mychid, (void*)&occ), "ca_put");
-
+      } else {
+        SEVCHK(ca_create_channel((m_pvPrefix + c_sensorGroups[g].pvMiddle + m_pvSuffix).data(),
+                                 NULL, NULL, 10, &m_myPVs[g].mychid), "ca_create_channel (reconnection)");
+      }
       pv.lastNEvts = nEvts;
       pv.lastNHits = nHits;
     }
-    if (m_timeSinceLastPVUpdateChan)
-      SEVCHK(ca_put(DBR_DOUBLE, m_timeSinceLastPVUpdateChan, (void*)&timeSinceLastPVUpdate), "ca_put");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io");
+
+    // Actually write all the PVs
+    SEVCHK(ca_pend_io(2.0), "ca_pend_io");
     m_lastPVUpdate = getClockSeconds();
   }
 #endif
@@ -219,8 +240,13 @@ void DQMHistAnalysisSVDDoseModule::endRun()
   if (m_useEpics) {
     B2DEBUG(19, "endRun: setting state PV to NOT RUNNING");
     m_stateCtrl.value = 0;
-    SEVCHK(ca_put(DBR_ENUM, m_stateChan, &m_stateCtrl.value), "ca_put");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io");
+    if (m_stateChan) {
+      SEVCHK(ca_put(DBR_ENUM, m_stateChan, &m_stateCtrl.value), "ca_put");
+    } else {
+      SEVCHK(ca_create_channel((m_pvPrefix + m_statePVSuffix).data(),
+                               NULL, NULL, 10, &m_stateChan), "ca_create_channel (reconnection)");
+    }
+    SEVCHK(ca_pend_io(2.0), "ca_pend_io");
     // Reset events and hits counters
     for (auto& pv : m_myPVs)
       pv.lastNEvts = pv.lastNHits = 0.0;

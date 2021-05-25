@@ -9,8 +9,8 @@ cat "$f"
 chmod +x ./"$f"
 
 #wait 1-20s to not run into issues with the batch system (low system limits)
-sleep `echo $RANDOM | sed -e 's/\(.\)\(.*\)/\1.\2/g'`
-sleep `echo $RANDOM | sed -e 's/\(.\)\(.*\)/\1.\2/g'`
+sleep `echo $RANDOM | sed -e 's/\\(.\\)\\(.*\\)/\1.\2/g'`
+sleep `echo $RANDOM | sed -e 's/\\(.\\)\\(.*\\)/\1.\2/g'`
 echo ""
 echo bsub -K -q sx -e "$f".elog -o "$f".log "$f"
 bsub -K -q sx -e "$f".elog -o "$f".log ./"$f"

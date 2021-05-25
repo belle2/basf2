@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 This tool allows to print and create bar graphs of the disk space requirements
@@ -277,7 +276,7 @@ def plot_sizes(pdf, files, skip, branch=None):
 
     # add sum of sizes as last column
     values[-1, :] = values[:-1, :].sum(0)
-    labels.append("$\sum$")
+    labels.append(r"$\sum$")
 
     # use branch name or generic title
     title = branch or "DataStore entries"
@@ -331,9 +330,9 @@ def print_tree(tree, filename):
     totzip = tree.GetZipBytes()
     nentries = tree.GetEntries()
     print("'%s' contains %d entries." % (filename, nentries))
-    print("\t%30s\t%7s\t%7s" % ("Total", convert_bytes(tot), convert_bytes(totzip)))
-    print("\t%30s\t%7s\t%7s" % ("Per entry", convert_bytes(tot / nentries), convert_bytes(totzip / nentries)))
-    print("%s:\t%30s\t%7s\t%7s" % ("#", "Branch Name", "Size", "Compressed Size"))
+    print("\t{:>30}\t{:>7}\t{:>7}".format("Total", convert_bytes(tot), convert_bytes(totzip)))
+    print("\t{:>30}\t{:>7}\t{:>7}".format("Per entry", convert_bytes(tot / nentries), convert_bytes(totzip / nentries)))
+    print("{}:\t{:>30}\t{:>7}\t{:>7}".format("#", "Branch Name", "Size", "Compressed Size"))
     print("--------------------------------------------------------------------")
     for index, branch in enumerate(branchesList):
         size = convert_bytes(branch.GetTotBytes('*'))
@@ -371,7 +370,7 @@ if __name__ == "__main__":
             filename = filename[:-1]
 
         if not os.path.exists(filename):
-            print("file '{}' could not be found, exiting".format(filename))
+            print(f"file '{filename}' could not be found, exiting")
             sys.exit(1)
 
         if label is None:
@@ -380,7 +379,7 @@ if __name__ == "__main__":
         rfile = root.TFile(filename)
         rtree = rfile.Get("tree")
         if not rtree:
-            print("could not find basf2 tree in '{}', exiting".format(filename))
+            print(f"could not find basf2 tree in '{filename}', exiting")
             sys.exit(1)
 
         # add TFile to list to prevent destruction
@@ -396,7 +395,7 @@ if __name__ == "__main__":
     if args.output is not None:
         try:
             pdf = PdfPages(args.output)
-        except IOError as e:
+        except OSError as e:
             print("Could not open output file:", e)
             sys.exit(1)
 

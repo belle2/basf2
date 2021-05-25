@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2018, 2021 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -11,32 +11,26 @@
 // Own include
 #include <top/modules/TOPBunchFinder/TOPBunchFinderModule.h>
 #include <top/geometry/TOPGeometryPar.h>
-#include <top/reconstruction/TOPreco.h>
-#include <top/reconstruction/TOPtrack.h>
-#include <top/reconstruction/TOPconfigure.h>
-#include <top/reconstruction/TOP1Dpdf.h>
+#include <top/reconstruction_cpp/TOPTrack.h>
+#include <top/reconstruction_cpp/PDFConstructor.h>
+#include <top/reconstruction_cpp/TOPRecoManager.h>
+#include <top/reconstruction_cpp/PDF1Dim.h>
 #include <top/utilities/Chi2MinimumFinder1D.h>
 
 // Dataobject classes
-#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <tracking/dataobjects/ExtHit.h>
-#include <top/dataobjects/TOPDigit.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPBarHit.h>
 #include <reconstruction/dataobjects/CDCDedxLikelihood.h>
 #include <reconstruction/dataobjects/VXDDedxLikelihood.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
-#include <top/dataobjects/TOPRecBunch.h>
-
-// framework - DataStore
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <set>
 
 using namespace std;
 
@@ -53,18 +47,21 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  TOPBunchFinderModule::TOPBunchFinderModule() : Module(),
-    m_bunchTimeSep(0)
-
+  TOPBunchFinderModule::TOPBunchFinderModule() : Module()
   {
     // set module description (e.g. insert text)
-    setDescription("A precise event T0 determination w.r.t local time reference of TOP counter. Results available in TOPRecBunch.");
+    setDescription("A precise event T0 determination w.r.t local time reference of TOP counter. "
+                   "Results available in TOPRecBunch.");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
     addParam("numBins", m_numBins, "number of bins of fine search region", 200);
-    addParam("timeRange", m_timeRange,
+    addParam("timeRangeFine", m_timeRangeFine,
              "time range in which to do fine search [ns]", 10.0);
+    addParam("timeRangeCoarse", m_timeRangeCoarse,
+             "time range in which to do coarse search, if autoRange turned off [ns]", 100.0);
+    addParam("autoRange", m_autoRange,
+             "turn on/off automatic determination of the coarse search region (false means off)", false);
     addParam("sigmaSmear", m_sigmaSmear,
              "sigma in [ns] for additional smearing of PDF", 0.0);
     addParam("minSignal", m_minSignal,
@@ -72,7 +69,7 @@ namespace Belle2 {
     addParam("minSBRatio", m_minSBRatio,
              "minimal signal-to-background ratio to accept track", 0.0);
     addParam("minDERatio", m_minDERatio,
-             "minimal ratio of detected-to-expected photons to accept track", 0.4);
+             "minimal ratio of detected-to-expected photons to accept track", 0.2);
     addParam("maxDERatio", m_maxDERatio,
              "maximal ratio of detected-to-expected photons to accept track", 2.5);
     addParam("minPt", m_minPt, "minimal p_T of the track", 0.3);
@@ -138,10 +135,6 @@ namespace Belle2 {
     m_timeZeros.registerRelationTo(extHits);
     m_eventT0.registerInDataStore(); // usually it is already registered in tracking
 
-    // Configure TOP detector for reconstruction
-
-    TOPconfigure config;
-
     // bunch separation in time
 
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
@@ -166,11 +159,14 @@ namespace Belle2 {
       return;
     }
 
-    // auto detection of HLT/express reco mode via status of common T0 payload:
-    //   c_Default           -> HLT/express reco mode
-    //   c_Calibrated        -> data processing mode
-    //   c_Unusable          -> HLT/express reco mode
-    //   c_roughlyCalibrated -> HLT/express reco mode
+    /*************************************************************************
+     * auto detection of HLT/express reco mode via status of common T0 payload:
+     *   c_Default           -> HLT/express reco mode
+     *   c_Calibrated        -> data processing mode
+     *   c_Unusable          -> HLT/express reco mode
+     *   c_roughlyCalibrated -> HLT/express reco mode
+     *************************************************************************/
+
     if (m_commonT0->isCalibrated()) {
       m_HLTmode = false;
       m_runningOffset = 0; // since digits are already commonT0 calibrated
@@ -211,17 +207,18 @@ namespace Belle2 {
   {
 
     m_processed++;
+    TOPRecoManager::setDefaultTimeWindow();
 
     // define output for the reconstructed bunch
 
-    if (!m_recBunch.isValid()) {
+    if (not m_recBunch.isValid()) {
       m_recBunch.create();
     } else {
       m_recBunch->clearReconstructed();
     }
     m_timeZeros.clear();
 
-    if (!m_eventT0.isValid()) m_eventT0.create();
+    if (not m_eventT0.isValid()) m_eventT0.create();
 
     // set MC truth if available
 
@@ -238,38 +235,26 @@ namespace Belle2 {
       m_recBunch->setRevo9Counter(rawDigit->getRevo9Counter());
     }
 
-    // create reconstruction object and set various options
+    // full time window in which data are taken (smaller time window is used in reconstruction)
 
-    int Nhyp = 1;
-    double pionMass = Const::pion.getMass();
-    int pionPDG = Const::pion.getPDGCode();
-    TOPreco reco(Nhyp, &pionMass, &pionPDG);
-    reco.setPDFoption(TOPreco::c_Rough);
-
-    // add photon hits to reconstruction object
-
-    for (const auto& digit : m_topDigits) {
-      if (digit.getHitQuality() == TOPDigit::c_Good)
-        reco.addData(digit.getModuleID(), digit.getPixelID(), digit.getTime(),
-                     digit.getTimeError());
-    }
+    const auto& tdc = TOPGeometryPar::Instance()->getGeometry()->getNominalTDC();
+    double timeWindow = m_feSetting->getReadoutWindows() * tdc.getSyncTimeBase() / TOPNominalTDC::c_syncWindows;
 
     // counters and temporary containers
 
     int numTrk = 0;
     m_nodEdxCount = 0;
-    std::vector<TOPtrack> topTracks;
-    std::vector<double> masses;
-    std::vector<int> pdgCodes;
-    std::vector<TOP1Dpdf> top1Dpdfs;
+    std::vector<TOPTrack> topTracks;
+    std::vector<PDFConstructor> pdfConstructors;
+    std::vector<PDF1Dim> top1Dpdfs;
     std::vector<int> numPhotons;
     std::vector<Chi2MinimumFinder1D> finders;
 
     // loop over reconstructed tracks, make a selection and push to containers
 
     for (const auto& track : m_tracks) {
-      TOPtrack trk(&track);
-      if (!trk.isValid()) continue;
+      TOPTrack trk(track);
+      if (not trk.isValid()) continue;
 
       // track selection
       const auto* fitResult = track.getTrackFitResultWithClosestMass(Const::pion);
@@ -284,30 +269,27 @@ namespace Belle2 {
       if (pt < m_minPt or pt > m_maxPt) continue;
 
       // determine most probable particle mass
-      double mass = 0;
-      int pdg = 0;
+      auto chargedStable = Const::pion;
       if (m_useMCTruth) {
-        if (!trk.getMCParticle()) continue;
-        if (!trk.getBarHit()) continue;
-        mass = trk.getMCParticle()->getMass();
-        pdg = trk.getMCParticle()->getPDG();
+        if (not trk.getMCParticle()) continue;
+        if (not trk.getBarHit()) continue;
+        chargedStable = Const::chargedStableSet.find(abs(trk.getMCParticle()->getPDG()));
+        if (chargedStable == Const::invalidParticle) continue;
       } else {
-        auto chargedStable = getMostProbable(track);
-        mass = chargedStable.getMass();
-        pdg = chargedStable.getPDGCode();
+        chargedStable = getMostProbable(track);
       }
 
-      // reconstruct (e.g. set PDF internally)
-      reco.setMass(mass, pdg);
-      reco.reconstruct(trk);
-      if (reco.getFlag() != 1) continue; // track is not in the acceptance of TOP
+      // construct PDF
+      PDFConstructor pdfConstructor(trk, chargedStable, PDFConstructor::c_Rough);
+      if (not pdfConstructor.isValid()) continue;
       numTrk++;
 
-      // one dimensional PDF with bin size of ~0.5 ns
-      TOP1Dpdf pdf1d(reco, m_topDigits, trk.getModuleID(), 0.5);
+      // make PDF projection to time axis with bin size of ~0.5 ns
+      PDF1Dim pdf1d(pdfConstructor, 0.5, timeWindow);
+      pdfConstructor.switchOffDeltaRayPDF(); // to speed-up fine search
 
       // do further track selection
-      double expSignal = pdf1d.getExpectedSignal();
+      double expSignal = pdf1d.getExpectedSignal() + pdf1d.getExpectedDeltaPhotons();
       double expBG = pdf1d.getExpectedBG();
       double expPhot = expSignal + expBG;
       double numPhot = pdf1d.getNumOfPhotons();
@@ -317,27 +299,30 @@ namespace Belle2 {
       if (numPhot > m_maxDERatio * expPhot) continue;
 
       topTracks.push_back(trk);
-      masses.push_back(mass);
-      pdgCodes.push_back(pdg);
+      pdfConstructors.push_back(pdfConstructor);
       top1Dpdfs.push_back(pdf1d);
-      numPhotons.push_back(reco.getNumOfPhotons());
+      numPhotons.push_back(numPhot);
     }
     m_recBunch->setNumTracks(numTrk, topTracks.size(), m_nodEdxCount);
     if (topTracks.empty()) return;
 
-    // determine search region
+    // set time region for coarse search
 
-    double minT0 = top1Dpdfs[0].getMinT0();
-    double maxT0 = top1Dpdfs[0].getMaxT0();
-    double binSize = top1Dpdfs[0].getBinSize();
-    for (const auto& pdf : top1Dpdfs) {
-      minT0 = std::min(minT0, pdf.getMinT0());
-      maxT0 = std::max(maxT0, pdf.getMaxT0());
+    double minT0 = -m_timeRangeCoarse / 2;
+    double maxT0 = m_timeRangeCoarse / 2;
+    if (m_autoRange) {
+      minT0 = top1Dpdfs[0].getMinT0();
+      maxT0 = top1Dpdfs[0].getMaxT0();
+      for (const auto& pdf : top1Dpdfs) {
+        minT0 = std::min(minT0, pdf.getMinT0());
+        maxT0 = std::max(maxT0, pdf.getMaxT0());
+      }
     }
+    double binSize = top1Dpdfs[0].getBinSize();
     int numBins = (maxT0 - minT0) / binSize;
     maxT0 = minT0 + binSize * numBins;
 
-    // find rough T0
+    // find coarse T0
 
     for (const auto& pdf : top1Dpdfs) {
       finders.push_back(Chi2MinimumFinder1D(numBins, minT0, maxT0));
@@ -348,22 +333,22 @@ namespace Belle2 {
         finder.add(i, -2 * pdf.getLogL(t0));
       }
     }
-    auto roughFinder = finders[0];
+    auto coarseFinder = finders[0];
     for (size_t i = 1; i < finders.size(); i++) {
-      roughFinder.add(finders[i]);
+      coarseFinder.add(finders[i]);
     }
 
-    const auto& t0Rough = roughFinder.getMinimum();
+    const auto& t0Coarse = coarseFinder.getMinimum();
     if (m_saveHistograms) {
-      m_recBunch->addHistogram(roughFinder.getHistogram("chi2_rough_",
-                                                        "rough T0; t_{0} [ns]; -2 log L"));
+      m_recBunch->addHistogram(coarseFinder.getHistogram("chi2_coarse_",
+                                                         "coarse T0; t_{0} [ns]; -2 log L"));
     }
-    if (t0Rough.position < minT0 or t0Rough.position > maxT0 or !t0Rough.valid) {
-      B2DEBUG(100, "Rough T0 finder: returning invalid or out of range T0");
+    if (t0Coarse.position < minT0 or t0Coarse.position > maxT0 or not t0Coarse.valid) {
+      B2DEBUG(100, "Coarse T0 finder: returning invalid or out of range T0");
       return;
     }
 
-    auto T0 = t0Rough;
+    auto T0 = t0Coarse;
 
     // find precise T0
 
@@ -371,30 +356,25 @@ namespace Belle2 {
       finders.clear();
       numPhotons.clear();
 
-      const auto& tdc = TOPGeometryPar::Instance()->getGeometry()->getNominalTDC();
-      double timeMin = tdc.getTimeMin() + t0Rough.position;
-      double timeMax = tdc.getTimeMax() + t0Rough.position;
-      double t0min = t0Rough.position - m_timeRange / 2;
-      double t0max = t0Rough.position + m_timeRange / 2;
+      double timeMin = TOPRecoManager::getMinTime() + t0Coarse.position;
+      double timeMax = TOPRecoManager::getMaxTime() + t0Coarse.position;
+      double t0min = t0Coarse.position - m_timeRangeFine / 2;
+      double t0max = t0Coarse.position + m_timeRangeFine / 2;
 
-      for (size_t itrk = 0; itrk < topTracks.size(); itrk++) {
+      for (const auto& reco : pdfConstructors) {
         finders.push_back(Chi2MinimumFinder1D(m_numBins, t0min, t0max));
-        auto& trk = topTracks[itrk];
-        auto mass = masses[itrk];
-        auto pdg = pdgCodes[itrk];
-        reco.setMass(mass, pdg);
-        reco.reconstruct(trk);
-        numPhotons.push_back(reco.getNumOfPhotons());
-        if (reco.getFlag() != 1) {
-          B2ERROR("TOPBunchFinder: track is not in the acceptance -> must be a bug");
-          continue;
-        }
+        numPhotons.push_back(0);
         auto& finder = finders.back();
+        std::set<int> nfotSet; // for control only
         const auto& binCenters = finder.getBinCenters();
         for (unsigned i = 0; i < binCenters.size(); i++) {
           double t0 = binCenters[i];
-          finder.add(i, -2 * reco.getLogL(t0, timeMin, timeMax, m_sigmaSmear));
+          auto LL = reco.getLogL(t0, timeMin, timeMax, m_sigmaSmear);
+          finder.add(i, -2 * LL.logL);
+          if (i == 0) numPhotons.back() = LL.numPhotons;
+          nfotSet.insert(LL.numPhotons);
         }
+        if (nfotSet.size() != 1) B2ERROR("Different number of photons used for log likelihood of different time shifts");
       }
 
       if (finders.size() == 0) return; // just in case
@@ -408,7 +388,7 @@ namespace Belle2 {
         m_recBunch->addHistogram(finder.getHistogram("chi2_fine_",
                                                      "precise T0; t_{0} [ns]; -2 log L"));
       }
-      if (t0Fine.position < t0min or t0Fine.position > t0max or !t0Fine.valid) {
+      if (t0Fine.position < t0min or t0Fine.position > t0max or not t0Fine.valid) {
         B2DEBUG(100, "Fine T0 finder: returning invalid or out of range T0");
         return;
       }
@@ -456,12 +436,13 @@ namespace Belle2 {
     if (finders.size() == topTracks.size()) {
       for (size_t itrk = 0; itrk < topTracks.size(); itrk++) {
         const auto& trk = topTracks[itrk];
+        const auto& reco = pdfConstructors[itrk];
         auto& finder = finders[itrk];
         const auto& t0trk = finder.getMinimum();
         auto* timeZero = m_timeZeros.appendNew(trk.getModuleID(),
                                                t0trk.position - bunchTime,
                                                t0trk.error, numPhotons[itrk]);
-        timeZero->setAssumedMass(masses[itrk]);
+        timeZero->setAssumedMass(reco.getHypothesis().getMass());
         if (not t0trk.valid) timeZero->setInvalid();
         timeZero->addRelationTo(trk.getExtHit());
 
@@ -474,10 +455,8 @@ namespace Belle2 {
           TH1F hits(("hits_" + num).c_str(),
                     "time distribution of hits (t0-subtracted); time [ns]",
                     pdf.GetNbinsX(), pdf.GetXaxis()->GetXmin(), pdf.GetXaxis()->GetXmax());
-          for (const auto& digit : m_topDigits) {
-            if (digit.getModuleID() != trk.getModuleID()) continue;
-            if (digit.getHitQuality() != TOPDigit::c_Good) continue;
-            hits.Fill(digit.getTime() - t0trk.position);
+          for (const auto& hit : trk.getSelectedHits()) {
+            hits.Fill(hit.time - t0trk.position);
           }
           timeZero->setHistograms(chi2, pdf, hits);
         }
@@ -517,7 +496,7 @@ namespace Belle2 {
 
     if (m_usePIDLikelihoods) {
       const auto* pid = track.getRelated<PIDLikelihood>();
-      if (!pid) {
+      if (not pid) {
         m_nodEdxCount++;
         return Const::pion;
       }
@@ -530,7 +509,7 @@ namespace Belle2 {
     } else {
       const auto* cdcdedx = track.getRelated<CDCDedxLikelihood>();
       const auto* vxddedx = track.getRelated<VXDDedxLikelihood>();
-      if (!cdcdedx and !vxddedx) {
+      if (not cdcdedx and not vxddedx) {
         m_nodEdxCount++;
         return Const::pion;
       }

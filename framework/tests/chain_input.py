@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import basf2
 from b2test_utils import configure_logging_for_tests, skip_test_if_light

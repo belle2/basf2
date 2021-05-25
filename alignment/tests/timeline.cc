@@ -15,6 +15,7 @@
 #include <framework/database/Configuration.h>
 #include <framework/database/Database.h>
 #include <framework/database/EventDependency.h>
+#include <framework/database/TestingPayloadStorage.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <vxd/dataobjects/VxdID.h>
 
@@ -447,35 +448,56 @@ namespace {
     for (auto iov_obj : objects)
       Database::Instance().storeData(DataStore::objectName(iov_obj.second->IsA(), ""), iov_obj.second, iov_obj.first);
 
-    TFile file("testPayloads/dbstore_EventDependency_rev_1.root");
-    auto evdep = (EventDependency*) file.Get("EventDependency");
+    // Ok let's open these payload files manually to see what's in them but at least we use the framework functions to
+    // find the correct payload for any given iov
+    Conditions::TestingPayloadStorage payloads("testPayloads/TestDatabase.txt");
+    {
+      EventMetaData eventMetaData(0, 2);
+      Conditions::PayloadMetadata payloadInfo{"EventDependency"};
+      ASSERT_TRUE(payloads.get(eventMetaData, payloadInfo));
+      ASSERT_FALSE(payloadInfo.filename.empty());
+      TFile file(payloadInfo.filename.c_str());
+      ASSERT_TRUE(file.IsOpen());
+      auto evdep = (EventDependency*) file.Get("EventDependency");
+      ASSERT_TRUE(evdep);
 
-    auto beam = dynamic_cast<BeamSpot*>(evdep->getObject(EventMetaData(530532, 2, 0)));
-    EXPECT_EQ(beam->getIPPosition()[2], 42.);
+      auto beam = dynamic_cast<BeamSpot*>(evdep->getObject(EventMetaData(530532, 2, 0)));
+      EXPECT_EQ(beam->getIPPosition()[2], 42.);
 
-    beam = dynamic_cast<BeamSpot*>(evdep->getObject(EventMetaData(530532, 2, 0)));
-    EXPECT_EQ(beam->getIPPosition()[0], 43.);
+      beam = dynamic_cast<BeamSpot*>(evdep->getObject(EventMetaData(530532, 2, 0)));
+      EXPECT_EQ(beam->getIPPosition()[0], 43.);
 
-    beam = dynamic_cast<BeamSpot*>(evdep->getObject(EventMetaData(530532 - 1, 2, 0)));
-    EXPECT_EQ(beam->getIPPosition()[2], 0.);
+      beam = dynamic_cast<BeamSpot*>(evdep->getObject(EventMetaData(530532 - 1, 2, 0)));
+      EXPECT_EQ(beam->getIPPosition()[2], 0.);
 
-    beam = dynamic_cast<BeamSpot*>(evdep->getObject(EventMetaData(530532 - 1, 2, 0)));
-    EXPECT_EQ(beam->getIPPosition()[0], 0.);
+      beam = dynamic_cast<BeamSpot*>(evdep->getObject(EventMetaData(530532 - 1, 2, 0)));
+      EXPECT_EQ(beam->getIPPosition()[0], 0.);
+    }
+    {
+      EventMetaData eventMetaData(0, 3);
+      Conditions::PayloadMetadata payloadInfo{"BeamSpot"};
+      ASSERT_TRUE(payloads.get(eventMetaData, payloadInfo));
+      ASSERT_FALSE(payloadInfo.filename.empty());
+      TFile file(payloadInfo.filename.c_str());
+      ASSERT_TRUE(file.IsOpen());
 
-    file.Close();
+      auto beam2 = (BeamSpot*) file.Get("BeamSpot");
+      ASSERT_TRUE(beam2);
+      beam2->getIPPosition().Print();
+      EXPECT_EQ(beam2->getIPPosition()[0], 3.);
+    }
+    {
+      EventMetaData eventMetaData(0, 4);
+      Conditions::PayloadMetadata payloadInfo{"VXDAlignment"};
+      ASSERT_TRUE(payloads.get(eventMetaData, payloadInfo));
+      ASSERT_FALSE(payloadInfo.filename.empty());
+      TFile file(payloadInfo.filename.c_str());
+      ASSERT_TRUE(file.IsOpen());
 
-    TFile file2("testPayloads/dbstore_BeamSpot_rev_3.root");
-    auto beam2 = (BeamSpot*) file2.Get("BeamSpot");
-    beam2->getIPPosition().Print();
-    EXPECT_EQ(beam2->getIPPosition()[0], 3.);
-
-    file2.Close();
-
-    TFile file3("testPayloads/dbstore_VXDAlignment_rev_2.root");
-    auto vxd = (VXDAlignment*) file3.Get("VXDAlignment");
-    EXPECT_EQ(vxd->getGlobalParam(VxdID(1, 0, 0, 1).getID(), 3), 44.);
-
-    file3.Close();
+      auto vxd = (VXDAlignment*) file.Get("VXDAlignment");
+      ASSERT_TRUE(vxd);
+      EXPECT_EQ(vxd->getGlobalParam(VxdID(1, 0, 0, 1).getID(), 3), 44.);
+    }
     // --------------------------------------------------------------------
   }
 }  // namespace

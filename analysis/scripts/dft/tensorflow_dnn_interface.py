@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # BASF2 (Belle Analysis Framework 2)                                     #
@@ -270,7 +269,7 @@ def end_fit(state):
     :return:
     """
     filename = state.training.save_name
-    with open(filename + str('.data-00000-of-00001'), 'rb') as file1, open(filename + str('.index'), 'rb') as file2:
+    with open(filename + '.data-00000-of-00001', 'rb') as file1, open(filename + '.index', 'rb') as file2:
         data1 = file1.read()
         data2 = file2.read()
     binning_parameters = state.binning_parameters

@@ -1,5 +1,4 @@
 # !/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 This module defines wrapper functions around the analysis modules.
@@ -3032,18 +3031,42 @@ def buildEventShape(inputListNames=None,
     path.add_module(eventShapeModule)
 
 
-def labelTauPairMC(printDecayInfo=False, path=None):
+def labelTauPairMC(printDecayInfo=False, path=None, TauolaBelle=False, mapping_minus=None, mapping_plus=None):
     """
     Search tau leptons into the MC information of the event. If confirms it's a generated tau pair decay,
     labels the decay generated of the positive and negative leptons using the ID of KKMC tau decay table.
 
     @param printDecayInfo:  If true, prints ID and prong of each tau lepton in the event.
     @param path:        module is added to this path
+    @param TauolaBelle: if False, TauDecayMarker is set. If True, TauDecayMode is set.
+    @param mapping_minus: if None, the map is the default one, else the path for the map is given by the user for tau-
+    @param mapping_plus: if None, the map is the default one, else the path for the map is given by the user for tau+
     """
-    tauDecayMarker = register_module('TauDecayMarker')
-    tauDecayMarker.set_name('TauDecayMarker_')
+    from basf2 import find_file
+    if not TauolaBelle:
 
-    path.add_module(tauDecayMarker, printDecayInfo=printDecayInfo)
+        if printDecayInfo:
+            m_printmode = 'all'
+        else:
+            m_printmode = 'default'
+
+        if mapping_minus is None:
+            mp_file_minus = find_file('data/analysis/modules/TauDecayMode/map_tauminus.txt')
+        else:
+            mp_file_minus = mapping_minus
+
+        if mapping_plus is None:
+            mp_file_plus = find_file('data/analysis/modules/TauDecayMode/map_tauplus.txt')
+        else:
+            mp_file_plus = mapping_plus
+
+        path.add_module('TauDecayMode', printmode=m_printmode, file_minus=mp_file_minus, file_plus=mp_file_plus)
+
+    else:
+        tauDecayMarker = register_module('TauDecayMarker')
+        tauDecayMarker.set_name('TauDecayMarker_')
+
+        path.add_module(tauDecayMarker, printDecayInfo=printDecayInfo)
 
 
 def tagCurlTracks(particleLists,
@@ -3374,12 +3397,27 @@ def getAnalysisGlobaltag():
     """
     Returns a string containing the name of the latest and recommended analysis globaltag.
     """
-    tags = subprocess.check_output(['b2conditionsdb-recommend', '--oneline']).decode('UTF-8').rstrip().split(' ')
-    analysis_tag = ''
-    for tag in tags:
-        if tag.startswith('analysis_tools'):
-            analysis_tag = tag
-    return analysis_tag
+    # b2conditionsdb-recommend relies on a different repository, so it's better to protect
+    # this function against potential failures of check_output.
+    try:
+        tags = subprocess.check_output(['b2conditionsdb-recommend', '--oneline'],
+                                       timeout=60).decode('UTF-8').rstrip().split(' ')
+        analysis_tag = ''
+        for tag in tags:
+            if tag.startswith('analysis_tools'):
+                analysis_tag = tag
+        return analysis_tag
+    # In case of issues with git, b2conditionsdb-recommend may take too much time.
+    except TimeoutExpired as te:
+        B2FATAL(f'A {te} exception was raised during the call of getAnalysisGlobalTag(). '
+                'The function took too much time to retrieve the requested information '
+                'from the versioning repository.\n'
+                'Plase try to re-run your job. In case of persistent failures, there may '
+                'be issues with the DESY collaborative services, so please contact the experts.')
+    except CalledProcessError as ce:
+        B2FATAL(f'A {ce} exception was raised during the call of getAnalysisGlobalTag(). '
+                'Please try to re-run your job. In case of persistent failures, please contact '
+                'the experts.')
 
 
 if __name__ == '__main__':

@@ -104,7 +104,7 @@ Reconstruction Calibrations
 
 	       Stores the scaling factors for the ``CoGOnly`` algorithm, with the same granularity_ as simulation objects
 
-Check `CoGOnlySF@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyErrorScaleFactors&perpage=25&>`_ all revisions available in the Conditions Database. Revision **1** is used for experiment 0 and 1003.
+Check `CoGOnlySF@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyErrorScaleFactors&perpage=25&>`_ all revisions available in the Conditions Database. Revision **1** is used for experiment 0 and 1003. Revision **2** (scale factors = 1) should be used for data reconstruction.
 
 .. _svdclustercuts:
 
@@ -112,7 +112,7 @@ Check `CoGOnlySF@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyErrorS
 
 	       Stores the parameters for the clusterization with sensor-side granularity_
 
-Check `ClusterCut@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDClusterCut&perpage=25&>`_ all revisions available in the Conditions Database. Revision **8** is used for experiment 0 and 1003.
+Check `ClusterCut@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDClusterCut&perpage=25&>`_ all revisions available in the Conditions Database. Revision **8** is used for experiment 0 and 1003. Revision **9** (scale factors = 1) should be used for data reconstruction.
 
 .. _svdhittimeselection:
 
@@ -120,7 +120,7 @@ Check `ClusterCut@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDClusterCut&p
 
 	       Stores the functions and their parameters for the selection of clusters based on the cluster time in the SpacePoint creation step, with sensor-side granularity_.
 
-Check `HitTimeSelection@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDHitTimeSelectionFunction&perpage=25&>`_ all revisions available in the Conditions Database. Revision **26** (no cuts) is used for experiment 1003, and revision **25** (u/v cluster time difference < 10 ns) is used for experiment 0.
+Check `HitTimeSelection@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDHitTimeSelectionFunction&perpage=25&>`_ all revisions available in the Conditions Database. Revision **26** (no cuts) is used for experiment 1003 (and data), and revision **25** (u/v cluster time difference < 10 ns) is used for experiment 0.
 
 The ``SVDClusterCalibrations`` wrapper contains both ``SVDClusterCuts`` and ``SVDHitTimeSelection``.
 

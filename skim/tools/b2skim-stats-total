@@ -421,7 +421,9 @@ def main():
         ("RetentionRate", "Event-based retention rate (%)", ".1f"),
         ("FilesizeRetentionRate", "Filesize-based retention rate (%)", ".1f"),
         ("udstSizePerSkimmedEvent", "Size of one event in uDST format (kB)", ".1f"),
-    )
+    
+        ("udstSizePerInputEvent", "Size of one event per input event(kB)", ".1f"),
+   )
     for variable, description, fmt_string in VariablesToPrint:
         table_function(
             variable,

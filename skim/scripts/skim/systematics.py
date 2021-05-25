@@ -891,5 +891,5 @@ class SystematicsCombinedLowMulti(CombinedSkim):
         kwargs.setdefault('udstOutput', False)
 
         from skim.taupair import TauThrust
-        skims_list = [SystematicsFourLeptonFromHLTFlag(), SystematicsRadMuMuFromHLTFlag(), SystematicsBhabha(), TauThrust()]
+        skims_list = [SystematicsFourLeptonFromHLTFlag(), SystematicsRadMuMuFromHLTFlag(), SystematicsBhabha()]  # , TauThrust()]
         super().__init__(*skims_list, **kwargs)

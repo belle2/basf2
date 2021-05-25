@@ -14,6 +14,15 @@ be adapted when changing to the new release.
 
 .. important changes should go here. Especially things that break backwards compatibility
 
+Changes since release-06
+========================
+
+.. only:: not light
+
+   .. rubric:: The L1 trigger simulation is included in :py:func:`simulation.add_simulation`
+
+   The L1 trigger simulation (``tsim``) is now executed in the standard simulation: before :ref:`<svd>` and PXD simulation but after the simulation of the rest of the subdetectors.
+
 Changes since release-05
 ========================
 

@@ -46,7 +46,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     .. note::
 
        PXD hits are not available on HLT. At the end of the tracking chain on HLT we have the\
-       :ref:`PXD Region Of Interest Finding<pxdDataReduction>`, that consists of extrapolating\
+       :ref:`PXD Region Of Interest Finding<tracking_pxdDataReduction>`, that consists of extrapolating\
        the tracks on the PXD sensors and defining regions in which we expect to find the hit.\
        Only fired pixels inside these regions reach Event Builder 2.
 

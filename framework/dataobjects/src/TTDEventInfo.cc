@@ -17,3 +17,10 @@ Double_t TTDEventInfo::getTimeSinceLastInjectionInMicroSeconds()
   // GlobalClockFrequency is in GHz, so we need an additional factor to convert to microseconds
   return ((Double_t)m_timeSinceLastInjection) / (m_clockSettings->getGlobalClockFrequency() * 1e3);
 }
+
+// get time since the previous trigger in microseconds
+Double_t TTDEventInfo::getTimeSincePrevTriggerInMicroSeconds()
+{
+  // GlobalClockFrequency is in GHz, so we need an additional factor to convert to microseconds
+  return ((Double_t)m_timeSincePrevTrigger) / (m_clockSettings->getGlobalClockFrequency() * 1e3);
+}

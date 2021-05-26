@@ -226,7 +226,7 @@ def main():
                 }
 
                 if "generalSkimName" in df.columns:
-                    DataBlocks[label]["generalSkimName"] = group["generalSkimName"][0]
+                    DataBlocks[label]["generalSkimName"] = list(group["generalSkimName"])[0]
     else:
         # Extract integers from columns
         df.loc[:, "prodNumber"] = (

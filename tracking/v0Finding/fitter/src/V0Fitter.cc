@@ -168,7 +168,7 @@ TrackFitResult* V0Fitter::buildTrackFitResult(const genfit::Track& track, const 
                                               const int sharedInnermostCluster)
 {
   const uint64_t hitPatternCDCInitializer = TrackBuilder::getHitPatternCDCInitializer(*recoTrack);
-  uint64_t hitPatternVXDInitializer = TrackBuilder::getHitPatternVXDInitializer(*recoTrack);
+  uint32_t hitPatternVXDInitializer = TrackBuilder::getHitPatternVXDInitializer(*recoTrack);
 
   // If the innermost hit is shared among V0 daughters, assign flag in the infoLayer.
   if (sharedInnermostCluster == 1 || sharedInnermostCluster == 2) {
@@ -244,11 +244,8 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   const int pdg_trackMinus  = trackMinus->getTrackFitResultWithClosestMass(
                                 trackHypotheses.second)->getParticleType().getPDGCode();/// positive number
 
-  RecoTrack* recoTrackPlus_forRefit  = copyRecoTrack(recoTrackPlus, pdg_trackPlus);
-  RecoTrack* recoTrackMinus_forRefit = copyRecoTrack(recoTrackMinus, pdg_trackMinus);
-
-  if ((recoTrackPlus_forRefit == nullptr) or (recoTrackMinus_forRefit == nullptr))
-    return false;
+  RecoTrack* recoTrackPlus_forRefit = nullptr;
+  RecoTrack* recoTrackMinus_forRefit = nullptr;
 
   while (hasInnerHitStatus != 0) {
     /// If the track has a hit inside the V0 vertex position, use refitted RecoTrack with removing inner hits
@@ -256,6 +253,10 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
 
     /// for plus-charged track
     if (hasInnerHitStatus & 0x1) {
+      // create a copy of the original RecoTrack w/o track fit
+      recoTrackPlus_forRefit  = copyRecoTrack(recoTrackPlus);
+      if (recoTrackPlus_forRefit == nullptr)
+        return false;
       ++nRemoveHitsPlus;
       /// if the track refit fails, break out of this loop and
       /// revert back to the original vertex fit with the original tracks.
@@ -263,10 +264,19 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
         failflag = true;
         break;
       }
+    } else if (recoTrackPlus_forRefit == nullptr) {
+      // create a copy of the original RecoTrack w/ track fit (only once)
+      recoTrackPlus_forRefit  = copyRecoTrackAndFit(recoTrackPlus, pdg_trackPlus);
+      if (recoTrackPlus_forRefit == nullptr)
+        return false;
     }
 
     /// for minus-charged track
     if (hasInnerHitStatus & 0x2) {
+      // create a copy of the original RecoTrack w/o track fit
+      recoTrackMinus_forRefit = copyRecoTrack(recoTrackMinus);
+      if (recoTrackMinus_forRefit == nullptr)
+        return false;
       ++nRemoveHitsMinus;
       /// if the track refit fails, break out of this loop and
       /// revert back to the original vertex fit with the original tracks.
@@ -274,6 +284,11 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
         failflag = true;
         break;
       }
+    } else if (recoTrackMinus_forRefit == nullptr) {
+      // create a copy of the original RecoTrack w/ track fit (only once)
+      recoTrackMinus_forRefit = copyRecoTrackAndFit(recoTrackMinus, pdg_trackMinus);
+      if (recoTrackMinus_forRefit == nullptr)
+        return false;
     }
 
     /// V0 vertex fit
@@ -361,12 +376,6 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
     return false;
   }
 
-  /// Update the tracks (genfit::MeasuredStateOnPlane) after vertex
-  ///    fitGFRaveVertex() looks not to give any changes to the input genfit::Track's (I'm not sure..)
-  /// make a clone, not use the reference so that the genfit::MeasuredStateOnPlane and its TrackReps will not be altered.
-  stPlus  = gfTrackPlus.getFittedState();
-  stMinus = gfTrackMinus.getFittedState();
-
   const TVector3& posVert(vert.getPos());
   vertexPos = posVert;
 
@@ -449,16 +458,22 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
   return true;
 }
 
-RecoTrack* V0Fitter::copyRecoTrack(RecoTrack* origRecoTrack, const int trackPDG)
+RecoTrack* V0Fitter::copyRecoTrack(RecoTrack* origRecoTrack)
+{
+  RecoTrack* newRecoTrack = origRecoTrack->copyToStoreArray(m_copiedRecoTracks);
+  newRecoTrack->addHitsFromRecoTrack(origRecoTrack);
+  newRecoTrack->addRelationTo(origRecoTrack);
+  return newRecoTrack;
+}
+
+RecoTrack* V0Fitter::copyRecoTrackAndFit(RecoTrack* origRecoTrack, const int trackPDG)
 {
   /// original track information
   Const::ChargedStable particleUsedForFitting(std::abs(trackPDG));
   const genfit::AbsTrackRep* origTrackRep = origRecoTrack->getTrackRepresentationForPDG(std::abs(
                                               trackPDG));/// only a positive PDG number is allowed for the input
 
-  RecoTrack* newRecoTrack = origRecoTrack->copyToStoreArray(m_copiedRecoTracks);
-  newRecoTrack->addHitsFromRecoTrack(origRecoTrack);
-  newRecoTrack->addRelationTo(origRecoTrack);
+  RecoTrack* newRecoTrack = copyRecoTrack(origRecoTrack);
 
   /// fit newRecoTrack
   TrackFitter fitter;

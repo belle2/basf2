@@ -80,12 +80,18 @@ namespace Belle2 {
                                  unsigned int& hasInnerHitStatus, TVector3& vertexPos,
                                  const bool forceStore);
 
-    /** Create a copy of RecoTrack.
+    /** Create a copy of RecoTrack. Track fit should be executed in removeInnerHits function.
+     * @param origRecoTrack original RecoTrack
+     * @return copied RecoTrack stored in the m_copiedRecoTracks, nullptr if track fit fails (this should not happen)
+     */
+    RecoTrack* copyRecoTrack(RecoTrack* origRecoTrack);
+
+    /** Create a copy of RecoTrack and fit the Track.
      * @param origRecoTrack original RecoTrack
      * @param trackPDG signed PDG used for the track fit hypothesis
      * @return copied RecoTrack stored in the m_copiedRecoTracks, nullptr if track fit fails (this should not happen)
      */
-    RecoTrack* copyRecoTrack(RecoTrack* origRecoTrack, const int trackPDG);
+    RecoTrack* copyRecoTrackAndFit(RecoTrack* origRecoTrack, const int trackPDG);
 
     /** Remove inner hits from RecoTrack.
      * Hits are removed from the minus-end of the momentum direction.

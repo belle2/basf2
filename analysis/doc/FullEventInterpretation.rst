@@ -473,12 +473,12 @@ The `b2luigi` configuration of the FEI grid workflow is handled by the file `set
 * ``gbasf2_install_directory``: Absolute path to the directory where you have installed the `gbasf2` tool. Please correct it to a meaningful path according to the installation you have performed previously.
 * ``gbasf2_input_dslist``: Absolute path to the dataset list of all datasets you would like to process. It is assumed by the ``FEIAnalysisSummaryTask``, that each line corresponds to a dataset sample, such for each line in this dataset list an instance of ``FEIAnalysisTask`` is spawned. An example of a possible dataset list is given below:
 
-.. code-block:: bash
+    .. code-block:: bash
 
-    /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014078/s00/e0000/4S/r00000/mixed/mdst
-    /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014079/s00/e0000/4S/r00000/mixed/mdst
-    /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014088/s00/e0000/4S/r00000/charged/mdst
-    /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014089/s00/e0000/4S/r00000/charged/mdst
+        /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014078/s00/e0000/4S/r00000/mixed/mdst
+        /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014079/s00/e0000/4S/r00000/mixed/mdst
+        /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014088/s00/e0000/4S/r00000/charged/mdst
+        /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014089/s00/e0000/4S/r00000/charged/mdst
 
 * ``gbasf2_project_name_prefix``: Prefix for the `gbasf2` tasks which will be created by `b2luigi` in the FEI grid workflow. Please try to keep it short and it is suggested to you to attach a date to it. Within the workflow, an additional string ``_part{index}`` will be added for each enumerated instance of ``FEIAnalysisTask``, and `b2luigi` adds an additional hash number to the project name to keep it unique.
 * ``gbasf2_release``: The release to be used on grid. Please make a choice here depending on what is supported by the `gbasf2` release you have checked out. You don't have to worry about the case, that the developments in `basf2` specific to running FEI training on grid might not be contained in the official release. The FEI training steering file is adapted such, that it can run both with a development and an official release.
@@ -612,8 +612,43 @@ The following paramaters are used in this module:
 Further Comments on fei_grid_workflow.py
 ----------------------------------------
 
+To run the workflow chain perpared in `fei_grid_workflow.py <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/fei_grid_workflow.py>`_,
+you would need to start it from the last task in this workflow that you would like to consider. From that point on,
+all other tasks will be constructed from the requirements, down to the ``FEIAnalysisSummaryTask`` of stage -1. This can be done with the wrapper task called ``ProduceStatisticsTask``.
+
+To run the full workflow, the wrapper contains the following piece of code:
+
+.. code-block:: python3
+
+        yield MergeOutputsTask(
+            mode="Merging",
+            stage=6,
+            ncpus=luigi.get_setting("local_cpus"),
+        )
+
+For testing purposes, feel free to change it to a different step in the workflow. Examples are given as comments within the ``ProduceStatisticsTask`` module. Please also note, that the
+names of the ``mode`` and ``stage`` settings should be chosen as expected by the modules to setup the considered workflow correctly.
+
 Tips and Tricks
 ***************
+
+In this last section of running FEI training on grid, a few tips and tricks are given, such that you get a better feeling what to expect from the workflow and which pitfalls you may encounter,
+especially when running on grid.
+
+* In general, you should always test the setup locally before submitting it to the grid. Therefore, please adapt your steering file equivalent to `B_generic_train.py <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/B_generic_train.py>`_ in such a way, that you would be able to run it both locally (potentially with a development version of `basf2`) and on the grid (using an official `basf2` release).
+* To test the workflow on the grid in a fast way, you can construct the dataset list provided to the ``gbasf2_input_dslist`` setting using individual file paths as content instead of dataset paths, and setting the maximum number of events to a small value, e.g. 10. There are several possibilitis to do that. You can either set it directly for the ``FEIAnalysisTask`` using the ``max_event`` task parameter (see `b2luigi documentation <https://b2luigi.readthedocs.io/en/latest/>`_), or extend the setting ``gbasf2_basf2opt`` from ``"-l ERROR"`` to ``"-l ERROR --events 10"``. The training itself will then have no meaning, since too few events for training, but you would be able to test the technical setup with that approach.
+* To run instances of ``FEIAnalysisTask`` efficiently on grid, you should prepare yourself well for that.
+
+    * You should make sure, that the datasets you would like to process are available on as many sites as possible. In that way you would also increase the number of potential computing nodes on the grid that you can use.
+    * In case you would like to perform a central FEI training, which will then be provided centrally and used by several analysis groups, it would be good, that your jobs will get an increased priority on grid to allow you to get the resources you need faster.
+    * If you do not trust some computing sites, or you trust only a few, you can make use of ``gbasf2_additional_params`` setting of `b2luigi` to bann some sites (``"--banned_site <SITE-1,SITE-2>"``) or specify sites you would like to run on (``"--site <SITE-1,SITE-2>"``). The value of the parameter ``gbasf2_additional_params`` will then be passed to `gbasf2`.
+
+* Although the workflow is (more or less) automatic, you are strongly advised to have a look at its progress regularly and check, whether everything is done correctly and do not run it as a black box.
+* Please expect, that problems may arise during the process, because of (possible temporarily) bad state of sites, failing downloads due to connection problems etc. Individual jobs may need to be resubmittedseveral times until they are finished successfully.
+* In case you encounter problems specific to `gbasf2`, do not hesitate to ask experts on `comp-users-forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_ mailing list.
+
+Possible Improvements
+*********************
 
 Troubleshooting
 ###############

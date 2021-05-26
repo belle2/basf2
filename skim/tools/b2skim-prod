@@ -204,13 +204,8 @@ def get_skim_stats_dict(SkimStatsJson):
     with open(SkimStatsJson) as skimStatsFile:
         JSONContents = json.load(skimStatsFile)
 
-    try:
-        skimStats = JSONContents["stats"]
-        CombinedSkimDefinitions = JSONContents["CombinedSkims"]
-    except KeyError:
-        raise ValueError(
-            "Cannot find definitions of combined skims in skim stats JSON file."
-        )
+    skimStats = JSONContents["stats"]
+    CombinedSkimDefinitions = JSONContents.get("CombinedSkims", {})
 
     return skimStats, CombinedSkimDefinitions
 
@@ -714,8 +709,12 @@ def make_combined_steering_file(
     SteeringFileDirectory.mkdir(parents=True, exist_ok=True)
     SteeringFile = SteeringFileDirectory / f"{SkimName}_Skim.py"
 
-    # Retrieve the list of individual skims going into this combined skim
-    SingleSkims = CombinedSkimDefinitions[SkimName]
+    # If SkimName exists as a skim name in the registry, assume that that is what we want
+    if SkimName in Registry.names:
+        SingleSkims = [SkimName]
+    # Otherwise, retrieve the list of individual skims going into this combined skim
+    else:
+        SingleSkims = CombinedSkimDefinitions[SkimName]
 
     try:
         skims, modules = resolve_skim_modules(SingleSkims, LocalModule=LocalModule)
@@ -777,7 +776,12 @@ def make_request_dict(
     skimStatsDict, CombinedSkimDefinitions = get_skim_stats_dict(args.SkimStatsJson)
     verify_stats_dict(args, sampleRegistry, skimStatsDict)
 
-    individualSkims = CombinedSkimDefinitions[skimName]
+    # If SkimName exists as a skim name in the registry, assume that that is what we want
+    if skimName in Registry.names:
+        individualSkims = [skimName]
+    # Otherwise, retrieve the list of individual skims going into this combined skim
+    else:
+        individualSkims = CombinedSkimDefinitions[skimName]
 
     if args.mc:
         fabricationType = "MCSkim"

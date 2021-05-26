@@ -12,8 +12,9 @@ import sys
 import subprocess
 import json
 
-import matplotlib.pyplot as plt
 import numpy as np
+import scipy.linalg as la
+import matplotlib.pyplot as plt
 
 import re
 import os
@@ -21,6 +22,7 @@ from glob import glob
 from math import sqrt, frexp, asin
 
 from datetime import datetime, timedelta
+from ROOT.Belle2.Unit import cm, um, mrad, rad
 
 #: Tells the automated system some details of this script
 settings = ValidationSettings(name='BeamSpot Calibrations',
@@ -37,7 +39,6 @@ def getEigenPars(SizeM):
                     [sxy, syy, syz],
                     [sxz, syz, szz]])
 
-    import scipy.linalg as la
     result = la.eig(mat)
     eigVals = result[0].real
     eigVecs = result[1]
@@ -70,10 +71,10 @@ def getEigenPars(SizeM):
         eigVecs[1][2] *= -1
         eigVecs[2][2] *= -1
 
-    # calculate the angles
-    angleXZ = 1e3 * asin(eigVecs[0][0] / sqrt(1 - eigVecs[1][0]**2))
-    angleYZ = 1e3 * asin(eigVecs[1][0])
-    angleXY = 1e3 * asin(eigVecs[1][1] / sqrt(1 - eigVecs[1][0]**2))
+    # calculate the angles in mrad
+    angleXZ = rad / mrad * asin(eigVecs[0][0] / sqrt(1 - eigVecs[1][0]**2))
+    angleYZ = rad / mrad * asin(eigVecs[1][0])
+    angleXY = rad / mrad * asin(eigVecs[1][1] / sqrt(1 - eigVecs[1][0]**2))
 
     return [sxEig, syEig, szEig, angleXZ, angleYZ, angleXY]
 
@@ -109,12 +110,12 @@ def getBSvalues(path):
         for i in range(len(evNums) + 1):
             bs = bsAll.getObjectByIndex(i)
             ipV = bs.getIPPosition()
-            ip = [1e4 * ipV(i) for i in range(3)]  # from cm to um
+            ip = [ipV(i) * cm / um for i in range(3)]  # from cm to um
             ipeV = bs.getIPPositionCovMatrix()
-            ipe = [1e4 * sqrt(ipeV(i, i)) for i in range(3)]  # from cm to um
+            ipe = [sqrt(ipeV(i, i)) * cm / um for i in range(3)]  # from cm to um
             covM = bs.getSizeCovMatrix()
             sizeM = (covM(0, 0), covM(1, 1), covM(2, 2), covM(0, 1), covM(0, 2), covM(1, 2))
-            sizeM = [1e8 * x for x in sizeM]  # from cm2 to um2
+            sizeM = [x * (cm / um)**2 * for x in sizeM]  # from cm2 to um2
 
             tStart = ipeV(0, 1) * 1e20
             tEnd = ipeV(0, 2) * 1e20

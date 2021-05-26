@@ -650,6 +650,11 @@ def strip_campaign(label):
     return re.sub(MCCampaignRegex, "", label)
 
 
+def get_skim_output_datalevel(skim):
+    func = Registry.get_skim_function(skim)
+    return "mdst" if func.produces_mdst_by_default else "udst"
+
+
 def produce_on_tau_samples(skims):
     """
     Determine whether the combined skim should be produced on taupair samples, based on
@@ -817,7 +822,7 @@ def make_request_dict(
             {
                 "": individualSkim,
                 "SkimDecayMode": Registry.encode_skim_name(individualSkim),
-                "DataLevel": "udst",
+                "DataLevel": get_skim_output_datalevel(individualSkim),
             }
             for individualSkim in individualSkims
         ],

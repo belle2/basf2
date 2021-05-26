@@ -394,6 +394,12 @@ class BaseSkim(ABC):
       production system may struggle to handle the jobs.
     """
 
+    produces_mdst_by_default = False
+    """Special property for combined systematics skims, which produce MDST output instead of
+    uDST. This property is used by ``b2skim-prod`` to set the ``DataLevel`` parameter in
+    the ``DataDescription`` block for this skim to ``mdst`` instead of ``udst``.
+    """
+
     validation_sample = None
     """
     MDST sample to use for validation histograms. Must be a valid location of a

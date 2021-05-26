@@ -584,8 +584,30 @@ After that, the ``do_trainings(particles, configuration)`` function of the ``fei
 
 For stage 6, the scripts ``analysis/scripts/fei/printReporting.py`` and ``analysis/scripts/fei/latexReporting.py`` are executed on top of the inputs provided via symlinks.
 
+Also for this module, the usual parameters are used to define the folder structure of outputs:
+
+* ``monitor`` and ``stage``: see description in :ref:`fei-ana`.
+
 PrepareInputsTask
 -----------------
+
+After ``FEITrainingTask`` is finished successfully, the last step before increasing the stage and starting again from ``FEIAnalysisSummaryTask`` is an upload of all inputs required for instances of
+``FEIAnalysisTask`` to the storage elements where the datasets are located.
+
+To be able to upload necessary files to SE, the following inputs are required:
+
+* ``dataset_sites.txt`` from ``FEITrainingTask`` of stage -1 which containes all sites required for tarball replicas.
+* Merged ``mcParticlesCount.root`` from stage -1. This indicates also the dependence, that ``FEITrainingTask`` of stage -1 should start after ``MergeOutputsTask`` of stage -1 is successfully completed.
+* All training files ``*.xml`` from previous stages and current stage, in case BDT trainings were already performed.
+
+The files ``mcParticlesCount.root`` and ``*.xml`` are then put into a tarball, copied over to the initial TMP-SE storage element configured by `gbasf2` tools, and then the tarball is replicated
+to the storage elements from ``dataset_sites.txt``. In case of a successfull upload and replication, the timestamp used in the remote path of the tarball is written to ``successfull_input_upload.txt``, which is checked by the ``FEIAnalysisSummaryTask`` directly following this ``PrepareInputsTask``.
+
+The following paramaters are used in this module:
+
+* ``remote_tmp_directory``: TMP-SE directory, where to put the tarballs. Extracted from `settings.json <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/settings.json>`_.
+* ``remote_initial_se``: TMP-SE server, where the tarballs should be put at first to be used for replication. Extracted from `settings.json <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/settings.json>`_.
+* ``monitor`` and ``stage``: see description in :ref:`fei-ana`.
 
 Further Comments on fei_grid_workflow.py
 ----------------------------------------

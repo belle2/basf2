@@ -244,7 +244,6 @@ void DQMHistAnalysisTOPModule::event()
   double Ntotal_bad_hits_asics(0.0);
   for (int module = 1; module <= 16; module++) {
     string hnameTmp1 = str(format("TOP/good_hits_xy_%1%") % (module));;
-    // h2Dtmp = (TH2F*)findHist(Form("TOP/good_hits_xy_%d", module));
     TH1* h2DTmp1 = findHist(hnameTmp1);
     if (h2DTmp1 != NULL)   Ntotal_good_hits_xy += h2DTmp1->Integral();
 
@@ -261,7 +260,7 @@ void DQMHistAnalysisTOPModule::event()
     if (h2DTmp4 != NULL) Ntotal_bad_hits_asics += h2DTmp4->Integral();
   }
 
-  //reset the maximum z-axis of 16 2D plots: 3 times of average for good hits; 30 times of average for bad hits
+  // reset the maximum z-axis of 16 2D plots: 3 times of average for good hits; 30 times of average for bad hits
   for (int i = 1; i <= 16; i++) {
     m_c_good_hits_xy_[i]->Clear();
     m_c_good_hits_xy_[i]->cd();

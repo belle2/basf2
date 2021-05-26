@@ -555,6 +555,35 @@ This task depends on the ``FEIAnalysisSummaryTask`` running directly before it t
 FEITrainingTask
 ---------------
 
+The BDT trainings of the various stages of FEI are performed by ``FEITrainingTask``, after merged input for training was created by the corresponding ``MergeOutputsTask``. This description
+fits the technical procedure exactly in case of stages 0 to 5.
+
+For stage -1, the task is (ab)used to determine storage elements, where the input datasets given in
+``gbasf2_input_dslist`` are located, and construc a list of sites (TMP-SE), where to put the tarballs created by instances of ``PrepareInputsTask``.
+
+In case of stage 6, all BDT's are already trained. Therefore, the merged ``Monitor*.root`` files are evaluated together with ``mcParticlesCount.root`` and  ``*.xml`` files with the scripts
+``analysis/scripts/fei/printReporting.py`` and ``analysis/scripts/fei/latexReporting.py`` within this task.
+
+In consequence, the output produced by this module depend on the particular stage considered:
+
+* stage -1: ``dataset_sites.txt`` listing the TMP-SE sites to upload the tarball from ``PrepareInputsTask``.
+* stages 0 to 5: ``*.xml`` BDT training files.
+* stage 6: ``summary.tex`` and ``summary.txt`` files, containing information on performance of FEI. The file ``summary.tex`` can then be compiled with `pdflatex` into a pdf document.
+
+Following inputs are required for ``FEITrainingTask`` depending on the current stage:
+
+* Merged ``mcParticlesCount.root`` from stage -1. This indicates also the dependence, that ``FEITrainingTask`` of stage -1 should start after ``MergeOutputsTask`` of stage -1 is successfully completed.
+* All training files ``*.xml`` from previous stages, in case BDT trainings were already performed.
+* Merged ``training_input.root`` from current stage, in case such a file was produced. This is true for stages 0 to 5.
+* Merged ``Monitor*.root`` from current stage, in case such a file was produced. This is true for stage 6.
+
+For all required inputs, symlinks are created to the current directory for stages 0 to 6.
+
+To correctly configure the training for stages 0 to 5, the `basf2` path needs to be created again to have the `Summary.pickle` file created, containing a local pickled version of the path.
+After that, the ``do_trainings(particles, configuration)`` function of the ``fei`` package is called to start BDT trainings needed for the current stage.
+
+For stage 6, the scripts ``analysis/scripts/fei/printReporting.py`` and ``analysis/scripts/fei/latexReporting.py`` are executed on top of the inputs provided via symlinks.
+
 PrepareInputsTask
 -----------------
 

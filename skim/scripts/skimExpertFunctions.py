@@ -937,10 +937,10 @@ class CombinedSkim(BaseSkim):
         passes_flag = path.add_module("VariableToReturnValue", variable=variable)
         passes_flag.if_value(">0", passes_flag_path, b2.AfterConditionPath.CONTINUE)
 
-        filename = kwargs.get("filename", kwargs.get("OutputFileName", self.name))
+        filename = kwargs.get("filename", kwargs.get("OutputFileName", self.code))
 
         if filename is None:
-            filename = self.name
+            filename = self.code
 
         if not filename.endswith(".mdst.root"):
             filename += ".mdst.root"

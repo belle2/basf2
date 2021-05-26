@@ -115,7 +115,7 @@ def getBSvalues(path):
             ipe = [sqrt(ipeV(i, i)) * cm / um for i in range(3)]  # from cm to um
             covM = bs.getSizeCovMatrix()
             sizeM = (covM(0, 0), covM(1, 1), covM(2, 2), covM(0, 1), covM(0, 2), covM(1, 2))
-            sizeM = [x * (cm / um)**2 * for x in sizeM]  # from cm2 to um2
+            sizeM = [x * (cm / um)**2 for x in sizeM]  # from cm2 to um2
 
             tStart = ipeV(0, 1) * 1e20
             tEnd = ipeV(0, 2) * 1e20

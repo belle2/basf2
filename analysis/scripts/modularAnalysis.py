@@ -3393,15 +3393,20 @@ def correctEnergyBias(inputListNames, tableName, path=None):
     path.add_module(correctenergybias)
 
 
-def getAnalysisGlobaltag():
+def getAnalysisGlobaltag(timeout=180) -> str:
     """
     Returns a string containing the name of the latest and recommended analysis globaltag.
+
+    Parameters:
+        timeout: Seconds to wait for b2conditionsdb-recommend
     """
     # b2conditionsdb-recommend relies on a different repository, so it's better to protect
     # this function against potential failures of check_output.
     try:
-        tags = subprocess.check_output(['b2conditionsdb-recommend', '--oneline'],
-                                       timeout=60).decode('UTF-8').rstrip().split(' ')
+        tags = subprocess.check_output(
+            ['b2conditionsdb-recommend', '--oneline'],
+            timeout=timeout
+        ).decode('UTF-8').rstrip().split(' ')
         analysis_tag = ''
         for tag in tags:
             if tag.startswith('analysis_tools'):

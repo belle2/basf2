@@ -93,7 +93,7 @@ namespace Belle2 {
      */
     RecoTrack* copyRecoTrackAndFit(RecoTrack* origRecoTrack, const int trackPDG);
 
-    /** Remove inner hits from RecoTrack.
+    /** Remove inner hits from RecoTrack at once.
      * Hits are removed from the minus-end of the momentum direction.
      * For SVD hits, remove U- and V- hit pair at once.
      * Input RecoTrack is fitted in the funcion.
@@ -101,11 +101,11 @@ namespace Belle2 {
      * @param origRecoTrack original RecoTrack
      * @param recoTrack input RecoTrack, updated in this function
      * @param trackPDG signed PDG used for the track fit hypothesis
-     * @param nRemoveHits the number of removed hits. This can be incremented in the function if the outermost removed hit is an SVD U-hit.
+     * @param vertexPosition V0 vertex position
      * @return
      */
     bool removeInnerHits(RecoTrack* origRecoTrack, RecoTrack* recoTrack,
-                         const int trackPDG, unsigned int& nRemoveHits);
+                         const int trackPDG, const TVector3& vertexPosition);
 
     /** Compare innermost hits of daughter pairs to check if they are the same (shared) or not.
      * For SVD hits, compare U- and V- hit pair.

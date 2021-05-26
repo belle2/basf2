@@ -602,8 +602,8 @@ def get_DBGlobalTag(releaseNumber):
     else:
         # If none available, throw an error
         B2ERROR(
-            f"Could not find any conditions database global tags for releases between\n"
-            "release-{majorNumber}-{minorNumber}-00 and {initialReleaseNumber}."
+            "Could not find any conditions database global tags for releases between\n"
+            f"release-{majorNumber}-{minorNumber}-00 and {initialReleaseNumber}."
         )
         sys.exit(1)
 

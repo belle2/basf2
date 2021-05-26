@@ -115,6 +115,8 @@ Full Event Interpretation
 
  * Added option to reconstruct strange B mesons (at Y(5S)) in 51 decay channels. Can be switched on with the ``strangeB`` flag in
    `fei.get_default_channels()`.
+ * The FEI has been retrained with MC14 and release-05. The prefix ``FEIv4_2021_MC14_release_05_01_12`` has to be set in the FEI
+   configuration.
 
 Standard Particle Lists
 +++++++++++++++++++++++

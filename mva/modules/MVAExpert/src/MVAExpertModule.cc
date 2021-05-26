@@ -132,8 +132,10 @@ namespace Belle2 {
         Particle* particle = list->getParticle(i);
         float targetValue = analyse(particle);
         if (particle->hasExtraInfo(m_extraInfoName)) {
-          B2WARNING("Extra Info with given name is already set! Overwriting old value!");
-          particle->setExtraInfo(m_extraInfoName, targetValue);
+          if (particle->getExtraInfo(m_extraInfoName) != targetValue) {
+            B2WARNING("Extra Info with given name is already set! Overwriting old value!");
+            particle->setExtraInfo(m_extraInfoName, targetValue);
+          }
         } else {
           particle->addExtraInfo(m_extraInfoName, targetValue);
         }

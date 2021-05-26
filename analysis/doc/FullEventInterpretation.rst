@@ -632,7 +632,7 @@ names of the ``mode`` and ``stage`` settings should be chosen as expected by the
 Tips and Tricks
 ***************
 
-In this last section of running FEI training on grid, a few tips and tricks are given, such that you get a better feeling what to expect from the workflow and which pitfalls you may encounter,
+In this concluding section of running FEI training on grid, a few tips and tricks are given, such that you get a better feeling what to expect from the workflow and which pitfalls you may encounter,
 especially when running on grid.
 
 * In general, you should always test the setup locally before submitting it to the grid. Therefore, please adapt your steering file equivalent to `B_generic_train.py <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/B_generic_train.py>`_ in such a way, that you would be able to run it both locally (potentially with a development version of `basf2`) and on the grid (using an official `basf2` release).
@@ -649,6 +649,53 @@ especially when running on grid.
 
 Possible Improvements
 *********************
+
+Some ideas of improvements of the workflow constructed to run FEI training on grid will be given below.
+
+The Problem of Too Long Runtimes
+--------------------------------
+
+One major drawback of the workflow presented here is that in particular the later stages, beginning from stage 3 to stage 6, have large runtimes due to the fact,
+that most FEI stages have to be recomputed from scratch with the corresponding trainings applied, since cache output files ``RootOutput.root`` are not produced by the
+`gbasf2` tasks since they occupy too much space.
+
+This is large problem because of the fact, that individual jobs may fail for several reasons, causing potentially a large number of resubmission attempts. In consequence,
+a task submitted with `gbasf2` to the grid may be delayed significantly by the potentially only a few restarted jobs, which have to be run again for a long time.
+
+A possible way out of this problem would be to split the processing within a jobs by the number of events to be processed, and not by the number of files. This not (yet) supported
+by `gbasf2`, but may be accomplished by passing ``--events`` and ``--skip-events`` options to `basf2` via ``gbasf2_basf2opt`` of `b2luigi`. In that case, a `gbasf2` task would need to be
+started for a single file only.
+
+To realize this within the workflow constructed in `fei_grid_workflow.py <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/fei_grid_workflow.py>`_, the modules ``FEIAnalysisTask``
+and ``FEIAnalysisSummaryTask`` would require several major extensions. Some ideas on technical implementations are given below:
+
+* For ``FEIAnalysisSummaryTask``, a stage dependent decision should be taken to decide, whether the jobs should be run on multiple files, or only on a subset of events from one single file.
+* File-based processing (stages -1 to 2): Due to limitations of scratch space on grid worker nodes, a realistic number for files per job would be 1 or 2. In that case, it is most presumably sufficient to keep the setup as it is currently for stages suitable for file-based processing.
+* Event-based processing (stages 3 to 6):
+
+    #. The first extension required for the workflow would be to determine the individual files from the datasets given in the setting ``gbasf2_input_dslist``, and the number of events per file. This can be done technically within the ``FEITrainingTask`` at stage -1.
+    #. As currently done for the expected runtimes in `fei_grid_workflow.py <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/fei_grid_workflow.py>`_, the required number of events to be processed within a job should be determined to optimize the runtime of a job to be at most of about 12 hours.
+    #. Using the information from previous two points, `FEIAnalysisSummaryTask`` should be extended such, that it can determine, how many `gbasf2` tasks should be created for a single file and which events from that file should be processed within a job.
+    #. Then, `FEIAnalysisSummaryTask`` should pass the file as a dataset list to an instance of correspondingly adapted ``FEIAnalysisTask`` and extend the setting ``gbasf2_basf2opt`` with ``--events`` and ``--skip-events`` accordingly.
+
+With this approach, the problem of too long runtimes per job is shifted to the requirement of having a large number of worker nodes in place to perform the computations. Since this is a grid workflow, this should be given in the ideal case. But be aware, that there are days, on which you get only a few free slots on the grid. Therefore, in case of central production of FEI training, a privileged access to grid worker nodes would be very benificial.
+
+A potential and perhaps a bit more important problem of the improved approach described above is a grid related issue of the current way of processing files placed on grid.
+Currently, the files are not streamed, but copied completely to a worker node on grid. In contrast to the file-based processing, where a single file is needed to be copied only once for an instance
+of ``FEIAnalysisTask``, an event-based splitting may lead to multiple copy transfers of a single file within an instance of ``FEIAnalysisTask``. In consequence, if you specify too few events per job,
+a significant amount of jobs may fail at the beginning due to too many copy transfer requests for the same file. So please keep this in mind, when optimizing on a suitable number of events per job.
+This problem might become less relevant, when input files are streamed and not copied, for example via `XRootD <https://xrootd.slac.stanford.edu/>`_ transfers.
+
+In the current state of `b2luigi`, the parallel instances of `gbasf2` tasks (like ``FEIAnalysisTask`` in this workflow) are handled sequentially, and not in parallel. This means, that you should avoid creating too many tasks with the event-based splitting discussed above. So try to optimize in that case between the runtimes of single jobs and the total number of the tasks. However, in the view of the fact, that this is done for stages 3 to 6, which anyhow run very long, this issue should not be a major problem.
+
+Potential Improvements Following gbasf2 Development
+---------------------------------------------------
+
+In the current state of the workflow and `b2luigi`, some print outputs from `gbasf2` have to be parsed to obtain desired information. Depending on the future improvements of `gbasf2`,
+such parsing may be changed to more convenient way, for example parsing a json file output created by `gbasf2` tools on request.
+
+In general, it is good to have a look at the process of `gbasf2` developments and extend the workflow and/or `b2luigi` to make use of the new features and improvements of future `gbasf2` releases.
+One example would be the possibility to resubmit jobs with changed settings, e.g. sites to blacklist, and/or the estimated runtime of the job.
 
 Troubleshooting
 ###############

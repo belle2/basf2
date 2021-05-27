@@ -26,7 +26,7 @@ Starting the display
 ====================
 
 The Belle II event display is envoked with ``b2display``.
-You can use it to explore any `mdst` files.
+You can use it to explore any :ref:`mdst` files.
 
 You must use a :ref:`full release <choosing_a_release>`, and it is usually 
 recommended to use the same release that was used to create the file you want 

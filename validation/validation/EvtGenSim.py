@@ -13,7 +13,6 @@
 
 from basf2 import set_random_seed, create_path, process, statistics
 from simulation import add_simulation
-from L1trigger import add_tsim
 from validation import statistics_plots, event_timing_plot
 from background import get_background_files
 
@@ -27,11 +26,8 @@ main.add_module('EventInfoSetter', evtNumList=[1000], runList=[1], expList=[0])
 # generate BBbar events
 main.add_module('EvtGenInput')
 
-# detector simulation
+# detector and L1 trigger simulation
 add_simulation(main, bkgfiles=get_background_files())
-
-# trigger simulation
-add_tsim(main)
 
 # memory profile
 main.add_module('Profile')

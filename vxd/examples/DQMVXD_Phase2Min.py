@@ -13,7 +13,6 @@
 import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
-from L1trigger import add_tsim
 
 
 # background (collision) files
@@ -45,11 +44,8 @@ main.add_module('EvtGenInput')
 # generate cosmics events
 # main.add_module('Cosmics')
 
-# detector simulation
+# detector and L1 trigger simulation
 add_simulation(main, bkgfiles=bg)
-
-# trigger simulation
-add_tsim(main)
 
 # reconstruction - set pruneTracks=False to store RecoHits for TrackDQM
 add_reconstruction(main, pruneTracks=False)

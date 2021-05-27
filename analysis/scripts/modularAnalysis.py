@@ -3401,28 +3401,33 @@ def correctEnergyBias(inputListNames, tableName, path=None):
     path.add_module(correctenergybias)
 
 
-def getAnalysisGlobaltag():
+def getAnalysisGlobaltag(timeout=180) -> str:
     """
     Returns a string containing the name of the latest and recommended analysis globaltag.
+
+    Parameters:
+        timeout: Seconds to wait for b2conditionsdb-recommend
     """
     # b2conditionsdb-recommend relies on a different repository, so it's better to protect
     # this function against potential failures of check_output.
     try:
-        tags = subprocess.check_output(['b2conditionsdb-recommend', '--oneline'],
-                                       timeout=60).decode('UTF-8').rstrip().split(' ')
+        tags = subprocess.check_output(
+            ['b2conditionsdb-recommend', '--oneline'],
+            timeout=timeout
+        ).decode('UTF-8').rstrip().split(' ')
         analysis_tag = ''
         for tag in tags:
             if tag.startswith('analysis_tools'):
                 analysis_tag = tag
         return analysis_tag
     # In case of issues with git, b2conditionsdb-recommend may take too much time.
-    except TimeoutExpired as te:
+    except subprocess.TimeoutExpired as te:
         B2FATAL(f'A {te} exception was raised during the call of getAnalysisGlobalTag(). '
                 'The function took too much time to retrieve the requested information '
                 'from the versioning repository.\n'
                 'Plase try to re-run your job. In case of persistent failures, there may '
                 'be issues with the DESY collaborative services, so please contact the experts.')
-    except CalledProcessError as ce:
+    except subprocess.CalledProcessError as ce:
         B2FATAL(f'A {ce} exception was raised during the call of getAnalysisGlobalTag(). '
                 'Please try to re-run your job. In case of persistent failures, please contact '
                 'the experts.')

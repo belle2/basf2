@@ -181,8 +181,8 @@ def create_report(args):
     ret = subprocess.call('basf2 fei/latexReporting.py ../summary.tex', shell=True)
     for i in glob.glob("*.xml"):
         if not fei.core.Teacher.check_if_weightfile_is_fake(i):
-            subprocess.call(f"basf2_mva_evaluate.py -id '{i[:-4]}.xml' -data '{i[:-4]}.root' "
-                            f"--treename variables -o '../{i[:-4]}.zip'", shell=True)
+            subprocess.call(f"basf2_mva_evaluate.py -id '{i[:-4]}.xml' -data 'training_input.root' "
+                            f"--treename '{i[:-4]} variables' -o '../{i[:-4]}.zip'", shell=True)
     os.chdir(args.directory)
     return ret == 0
 

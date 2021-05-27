@@ -808,7 +808,7 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('isPrimarySignal', 'extraInfo(postCut_rank)'),
                                                                        ('mcErrors', 'extraInfo(postCut_rank)'),
                                                                        ('mcParticleStatus', 'extraInfo(postCut_rank)')]),
-                        fileName='Monitor_PostReconstruction_AfterRanking.root', 'K+:generic')
+                        fileName='Monitor_PostReconstruction_AfterRanking.root', directory='K+:generic')
         path.add_module('VariablesToNtuple', fileName='Monitor_Final.root', treeName='K+:generic variables',
                         variables=['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', 'isPrimarySignal',
                                    'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],

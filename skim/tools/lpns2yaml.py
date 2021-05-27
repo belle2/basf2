@@ -86,6 +86,8 @@ def verify_dataframe(df, mc):
     # Check assumptions about columns
     if not all(df["dataLevel"].str.match("mdst")):
         raise ValueError("Input LPNs must all be mdst.")
+    if "generalSkimName" in df.columns and len(set(df["generalSkimName"])) > 1:
+        raise ValueError("More than one GeneralSkimName in input data LPNs.")
     if mc and len(set(df["runNumber"])) > 1:
         raise ValueError("More than one run number listed for MC LPNs.")
     if len(set(df["beamEnergy"])) > 1:
@@ -128,20 +130,40 @@ def main():
     # ...and put it all into a lovely dataframe, split by LPN part!
     df = pd.DataFrame([Path(LPN).parts for LPN in LPNs])
     if args.data:
-        columns = dict(
-            enumerate(
-                [
-                    "release",
-                    "DBGT",
-                    "campaign",
-                    "prodNumber",
-                    "expNumber",
-                    "beamEnergy",
-                    "runNumber",
-                    "dataLevel",
-                ]
+        if len(df.columns) == 8:
+            # If eight components to LPN, then we're dealing with the old data LPN schema
+            columns = dict(
+                enumerate(
+                    [
+                        "release",
+                        "DBGT",
+                        "campaign",
+                        "prodNumber",
+                        "expNumber",
+                        "beamEnergy",
+                        "runNumber",
+                        "dataLevel",
+                    ]
+                )
             )
-        )
+        elif len(df.columns) == 9:
+            # If nine components to LPN, then we're dealing with the old data LPN schema,
+            # which includes an additional GeneralSkimName component
+            columns = dict(
+                enumerate(
+                    [
+                        "release",
+                        "DBGT",
+                        "campaign",
+                        "prodNumber",
+                        "expNumber",
+                        "beamEnergy",
+                        "runNumber",
+                        "generalSkimName",
+                        "dataLevel",
+                    ]
+                )
+            )
     else:
         columns = dict(
             enumerate(
@@ -202,6 +224,9 @@ def main():
                     "inputDataLevel": "mdst",
                     "runNumbers": list(group["runNumber"]),
                 }
+
+                if "generalSkimName" in df.columns:
+                    DataBlocks[label]["generalSkimName"] = list(group["generalSkimName"])[0]
     else:
         # Extract integers from columns
         df.loc[:, "prodNumber"] = (

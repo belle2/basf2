@@ -694,7 +694,7 @@ def make_data_description_block(skims, sampleInfo):
         }
 
         if GeneralSkim is not None:
-            DescriptionDict["generalSkimName"] = GeneralSkim
+            DescriptionDict["GeneralSkimName"] = GeneralSkim
         DataDescription.append(DescriptionDict)
 
     return DataDescription

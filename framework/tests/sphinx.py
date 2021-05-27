@@ -30,9 +30,9 @@ if __name__ == "__main__":
     ignoreduplicatedescriptionofrole = 'duplicate description of role'
     #: ignore warning about not finding Geometry module ?!
     ignoregeometry = 'b2:mod reference target not found: Geometry'
+    #: ignore further warnings in light builds
     #: ignore online_book
     ignoreonlinebook = 'online_book'
-    #: ignore further warnings in light builds
     #: ignore add_trigger_simulation
     ignoreaddtriggersimulation = 'add_trigger_simulation'
     #: ignore add_simulation of simulation package

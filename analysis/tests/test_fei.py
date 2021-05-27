@@ -531,7 +531,7 @@ class TestPreReconstruction(unittest.TestCase):
                         variables_2d=fei.config.variables2binnings_2d([('chiProb', 'isSignal'),
                                                                        ('chiProb', 'mcErrors'),
                                                                        ('chiProb', 'mcParticleStatus')]),
-                        fileName='Monitor_PreReconstruction_AfterVetex.root', directory='D0:generic ==> pi-:generic pi+:generic')
+                        fileName='Monitor_PreReconstruction_AfterVertex.root', directory='D0:generic ==> pi-:generic pi+:generic')
 
         print_path(path, x.reconstruct())
         self.assertEqual(x.reconstruct(), path)

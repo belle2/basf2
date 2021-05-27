@@ -627,16 +627,14 @@ class Teacher(object):
         else:
             for particle in self.particles:
                 for channel in particle.channels:
-                    # filename = f'{channel.label}.root'
-                    # weightfile = self.config.prefix + '_' + channel.label
                     weightfile = channel.label + '.xml'
                     if not basf2_mva.available(weightfile):
                         keys = [m for m in f.GetListOfKeys() if f"{channel.label}" in m.GetName()]
-                        if len(keys) == 0:
-                            # B2WARNING("Training of MVC failed. ROOT file does not contain required tree. "
-                            #          f"Ignoring channel {channel.label}. No weight file will be provided.")
-                            # self.create_fake_weightfile(channel.label)
-                            # self.upload(channel.label)
+                        if not keys:
+                            B2WARNING("Training of MVC failed. ROOT file does not contain required tree. "
+                                      f"Ignoring channel {channel.label}.")
+                            self.create_fake_weightfile(channel.label)
+                            self.upload(channel.label)
                             continue
                         tree = keys[0].ReadObj()
                         nSig = tree.GetEntries(channel.mvaConfig.target + ' == 1.0')

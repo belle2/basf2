@@ -45,26 +45,26 @@ if __name__ == "__main__":
     ignorevalidationtools = 'validation_tools'
     #: ignore missing include directives
     ignoreincludeproblem = 'Problems with "include" directive path'
-    if light_build:
-        check_error_free("b2code-sphinx-warnings", "sphinx", None,
-                         lambda x:
-                         re.findall(ignoreunsupportedthemeoption, x) or
-                         re.findall(ignoreenvironmentvariables, x) or
-                         re.findall(ignorepythonclass, x) or
-                         re.findall(ignoreduplicatewhatsnewlabel, x) or
-                         re.findall(ignoreduplicatecalibrationlabel, x) or
-                         re.findall(ignoreduplicatedescriptionofrole, x) or
-                         re.findall(ignoreaddsimulation, x) or
-                         re.findall(ignoreaddtriggersimulation, x) or
-                         re.findall(ignoreaddreconstruction, x) or
-                         re.findall(ignoreaddcdstoutput, x) or
-                         re.findall(ignorevalidationtools, x) or
-                         re.findall(ignoreincludeproblem, x) or
-                         re.findall(ignoreonlinebook, x) or
-                         re.findall(ignoregeometry, x),
-                         ['--light']
-                         )
-    else:
+
+    check_error_free("b2code-sphinx-warnings", "sphinx", None,
+                     lambda x:
+                     re.findall(ignoreunsupportedthemeoption, x) or
+                     re.findall(ignoreenvironmentvariables, x) or
+                     re.findall(ignorepythonclass, x) or
+                     re.findall(ignoreduplicatewhatsnewlabel, x) or
+                     re.findall(ignoreduplicatecalibrationlabel, x) or
+                     re.findall(ignoreduplicatedescriptionofrole, x) or
+                     re.findall(ignoreaddsimulation, x) or
+                     re.findall(ignoreaddtriggersimulation, x) or
+                     re.findall(ignoreaddreconstruction, x) or
+                     re.findall(ignoreaddcdstoutput, x) or
+                     re.findall(ignorevalidationtools, x) or
+                     re.findall(ignoreincludeproblem, x) or
+                     re.findall(ignoreonlinebook, x) or
+                     re.findall(ignoregeometry, x),
+                     ['--light']
+                     )
+    if not light_build:
         check_error_free("b2code-sphinx-warnings", "sphinx", None,
                          lambda x:
                          re.findall(ignoreunsupportedthemeoption, x) or

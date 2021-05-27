@@ -119,24 +119,31 @@ namespace Belle2 {
       int getModuleID() const {return m_moduleID;}
 
       /**
-       * Returns alignment parameters.
-       * Order is: translations in x, y, z, rotation angles around x, y, z, module T0
-       * @return parameters
-       */
-      const std::vector<double>& getParameters() const {return m_par;}
-
-      /**
        * Returns alignment parameter names
        * @return parameter names
        */
       const std::vector<std::string>& getParameterNames() const {return m_parNames;}
 
       /**
+       * Returns alignment parameters.
+       * Order is: translations in x, y, z, rotation angles around x, y, z, module T0
+       * @return parameters in double precision
+       */
+      const std::vector<double>& getParams() const {return m_par;}
+
+      /**
+       * Returns alignment parameters.
+       * Order is: translations in x, y, z, rotation angles around x, y, z, module T0
+       * @return parameters in single precision
+       */
+      std::vector<float> getParameters() const;
+
+      /**
        * Returns errors on alignment parameters.
        * Order is: translations in x, y, z, rotation angles around x, y, z, module T0
-       * @return errors
+       * @return errors in single precision
        */
-      std::vector<double> getErrors() const;
+      std::vector<float> getErrors() const;
 
       /**
        * Returns error matrix of alignment parameters

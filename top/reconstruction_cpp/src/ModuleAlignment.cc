@@ -93,9 +93,16 @@ namespace Belle2 {
       m_numPhotons = 0;
     }
 
-    std::vector<double> ModuleAlignment::getErrors() const
+    std::vector<float> ModuleAlignment::getParameters() const
     {
-      std::vector<double> errors;
+      std::vector<float> pars;
+      for (auto par : m_par) pars.push_back(par);
+      return pars;
+    }
+
+    std::vector<float> ModuleAlignment::getErrors() const
+    {
+      std::vector<float> errors;
       int numPar = m_par.size();
       for (int i = 0; i < numPar; i++) {
         errors.push_back(sqrt(m_COV[i][i]));

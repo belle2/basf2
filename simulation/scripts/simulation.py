@@ -120,7 +120,7 @@ def add_simulation(
         usePXDDataReduction=True,
         cleanupPXDDataReduction=True,
         generate_2nd_cdc_hits=False,
-        simulateT0jitter=False,
+        simulateT0jitter=True,
         FilterEvents=False,
         usePXDGatedMode=False,
         skipExperimentCheckForBG=False):

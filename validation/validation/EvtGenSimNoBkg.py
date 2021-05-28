@@ -14,7 +14,6 @@
 from basf2 import set_random_seed, create_path, process, statistics, \
     register_module
 from simulation import add_simulation
-from L1trigger import add_tsim
 from beamparameters import add_beamparameters
 from validation import statistics_plots, event_timing_plot
 
@@ -37,11 +36,8 @@ beamparameters = add_beamparameters(main, "Y4S")
 evtgeninput = register_module('EvtGenInput')
 main.add_module(evtgeninput)
 
-# detector simulation, no background files
+# detector and L1 trigger simulation, no background files
 add_simulation(main)
-
-# trigger simulation
-add_tsim(main)
 
 # memory profile
 main.add_module(register_module('Profile'))

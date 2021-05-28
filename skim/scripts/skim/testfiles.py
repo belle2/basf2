@@ -129,20 +129,30 @@ class DataSample(Sample):
 
 
 class MCSample(Sample):
-    def __init__(self, *, location, process, campaign, background="BGx1", **kwargs):
+    def __init__(
+        self,
+        *,
+        location,
+        process,
+        campaign,
+        beam_energy="4S",
+        beam_background="BGx1",
+        **kwargs,
+    ):
         # Pass unrecognised kwargs to base class
         super().__init__(**kwargs)
 
         self.location = self.resolve_path(location)
         self.process = process
+        self.beam_energy = beam_energy
 
         if isinstance(campaign, int) or not campaign.startswith("MC"):
             campaign = f"MC{campaign}"
         self.campaign = campaign
 
-        if isinstance(background, int) or not background.startswith("BGx"):
-            background = f"BGx{background}"
-        self.background = background
+        if isinstance(beam_background, int) or not beam_background.startswith("BGx"):
+            beam_background = f"BGx{beam_background}"
+        self.beam_background = beam_background
 
     def __repr__(self):
         return (
@@ -150,7 +160,8 @@ class MCSample(Sample):
             f"location={repr(self.location)}, "
             f"process={repr(self.process)}, "
             f"campaign={repr(self.campaign)}, "
-            f"background={repr(self.background)})"
+            f"beam_energy={repr(self.beam_energy)}, "
+            f"beam_background={repr(self.beam_background)})"
         )
 
     @property
@@ -159,16 +170,21 @@ class MCSample(Sample):
             "location": str(self.location),
             "process": self.process,
             "campaign": self.campaign,
-            "background": self.background,
+            "beam_energy": self.beam_energy,
+            "beam_background": self.beam_background,
         }
 
     @property
     def encodeable_name(self):
-        return "-".join(("MC", self.campaign, self.process, self.background))
+        return "-".join(
+            ("MC", self.campaign, self.beam_energy, self.process, self.beam_background)
+        )
 
     @property
     def printable_name(self):
-        return " ".join((self.campaign, self.process, self.background))
+        return " ".join(
+            (self.campaign, self.beam_energy, self.process, self.beam_background)
+        )
 
 
 class CustomSample(Sample):

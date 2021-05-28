@@ -7,4 +7,5 @@
 
 #pragma link C++ class Belle2::ECL::ECLNeighbours+; // checksum=0xdd34ad20, version=-1
 #pragma link C++ class Belle2::ECL::ECLGeometryPar-;
+#pragma link C++ class Belle2::ECL::ECLLeakagePosition+;
 #endif

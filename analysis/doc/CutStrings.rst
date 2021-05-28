@@ -17,6 +17,13 @@ Use the logical operators ``and`` and ``or`` to combine your cuts.
 
 .. warning:: You should use square brackets ``[``, ``]`` to separate conditional statements.
 
+.. hint::
+
+   For a more in-depth documentation of cut strings for developers, you can refer to the `doxygen documentation`_
+   for the ``GeneralCut`` class.
+
+.. _doxygen documentation: https://b2-master.belle2.org/software/development/classBelle2_1_1GeneralCut.html
+
 This logic can become quite powerful, particularly in combination with the :b2:var:`formula` MetaVariable.
 Here are some examples:
 

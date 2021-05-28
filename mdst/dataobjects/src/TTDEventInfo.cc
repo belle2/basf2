@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <framework/dataobjects/TTDEventInfo.h>
+#include <mdst/dataobjects/TTDEventInfo.h>
 
 using namespace Belle2;
 

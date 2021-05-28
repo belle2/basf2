@@ -11,7 +11,7 @@
 ******************************************************************************/
 
 #include <svd/modules/svdUnpacker/SVDUnpackerModule.h>
-#include <svd/calibration/SVDDetectorConfiguration.h>
+
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -128,11 +128,10 @@ void SVDUnpackerModule::beginRun()
   seenHeadersAndTrailers = 0;
 
   //get the relative time shift
-  SVDDetectorConfiguration detectorConfig;
-  if (detectorConfig.isValid())
-    m_relativeTimeShift = detectorConfig.getRelativeTimeShift();
+  if (m_svdGlobalConfig.isValid())
+    m_relativeTimeShift = m_svdGlobalConfig->getRelativeTimeShift();
   else {
-    B2ERROR("SVDDetectorConfiguration not valid!! Setting relativeTimeShift to 0 for this reconstruction.");
+    B2ERROR("SVDGlobalConfigParamters not valid!! Setting relativeTimeShift to 0 for this reconstruction.");
     m_relativeTimeShift = 0;
   }
 }

@@ -1111,6 +1111,12 @@ def printToScreen(allSkimStats, samples):
         table = table.replace(" nan ", " -   ")
         print(table)
 
+    print(
+        "\nNote: If you are producing these stats for a skim pull request,\n"
+        "please consider using the `--markdown` option to produce a Markdown\n"
+        "table which BitBucket will display nicely."
+    )
+
 
 def printToConfluence(allSkimStats, samples, *, OutputFilename=None):
     """Format the skim performance statistics in Confluence wiki markdown, and

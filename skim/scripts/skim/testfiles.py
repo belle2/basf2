@@ -96,7 +96,7 @@ class DataSample(Sample):
     @property
     def as_dict(self):
         return {
-            "location": self.location,
+            "location": str(self.location),
             "processing": self.processing,
             "experiment": self.experiment,
             "beam_energy": self.beam_energy,
@@ -151,7 +151,7 @@ class MCSample(Sample):
     @property
     def as_dict(self):
         return {
-            "location": self.location,
+            "location": str(self.location),
             "process": self.process,
             "campaign": self.campaign,
             "background": self.background,
@@ -188,7 +188,7 @@ class CustomSample(Sample):
 
     @property
     def as_dict(self):
-        return {"location": self.location, "label": self.label}
+        return {"location": str(self.location), "label": self.label}
 
     @property
     def encodeable_name(self):

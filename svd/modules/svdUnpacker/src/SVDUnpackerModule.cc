@@ -129,7 +129,7 @@ void SVDUnpackerModule::beginRun()
 
   //get the relative time shift
   if (!m_svdGlobalConfig.isValid())
-    B2FATAL("SVDGlobalConfigParamters not valid!! Setting relativeTimeShift to 0 for this reconstruction.");
+    B2FATAL("SVDGlobalConfigParameters not valid!!");
 
   m_relativeTimeShift = m_svdGlobalConfig->getRelativeTimeShift();
 

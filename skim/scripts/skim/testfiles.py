@@ -79,7 +79,9 @@ class DataSample(Sample):
 
         self.location = self.resolve_path(location)
         self.processing = processing
-        self.experiment = str(experiment)
+        if isinstance(experiment, int) or not experiment.startswith("exp"):
+            experiment = f"exp{experiment}"
+        self.experiment = experiment
         self.beam_energy = beam_energy
         self.general_skim = general_skim
 
@@ -117,10 +119,13 @@ class DataSample(Sample):
 
     @property
     def printable_name(self):
-        return (
-            f"{self.processing} exp{self.experiment} (beam={self.beam_energy}, "
-            f"GeneralSkim={self.general_skim})"
-        )
+        name = f"{self.processing} {self.experiment}"
+        # Only print additional info in non-default situations
+        if self.beam_energy != "4S":
+            name += f", {self.beam_energy}"
+        if self.general_skim != "all":
+            name += f", ({self.general_skim})"
+        return name
 
 
 class MCSample(Sample):

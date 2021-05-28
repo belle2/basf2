@@ -264,9 +264,7 @@ def submit_jobs(skims, samples, nEventsPerSample, DryRun, *, CombinedSkimDefinit
             sampleFile = sample.location
 
             if not Path(sampleFile).exists():
-                raise FileNotFoundError(
-                    f"Could not find test file {sampleFile}.\n`b2skim-stats-submit` is meant to be run on KEKCC."
-                )
+                raise FileNotFoundError(f"Could not find test file {sampleFile}.")
 
             OutputDirectory = Path(logDirectory, skim, str(sample))
             OutputDirectory.mkdir(exist_ok=True, parents=True)
@@ -312,8 +310,9 @@ def submit_jobs(skims, samples, nEventsPerSample, DryRun, *, CombinedSkimDefinit
                 f"An error occurred while submitting jobs for {skim} skim.", "red"
             )
         elif jobIDs:
+            SamplesString = ', '.join(f"'{s.printable_name}'" for s in samples)
             print(
-                f"Running {skim} skim on {nEventsPerSample} events from test samples of {', '.join(samples)}. Job IDs:\n  "
+                f"Running {skim} skim on {nEventsPerSample} events from test samples of {SamplesString}. Job IDs:\n  "
                 + "\n  ".join(jobIDs)
             )
 

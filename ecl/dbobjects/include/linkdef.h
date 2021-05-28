@@ -32,5 +32,5 @@
 #pragma link C++ class Belle2::ECLWFAlgoParams+; // checksum=0x731094cf, implicit, version=1
 #pragma link C++ class Belle2::ECLNoiseData+; // checksum=0xf538d169, implicit, version=1
 #pragma link C++ class Belle2::ECLLookupTable+; // checksum=0xe3749e00, implicit, version=1
-#pragma link C++ class Belle2::ECLLeakageCorrections; // checksum=0x2a48c2d5, version=1
+#pragma link C++ class Belle2::ECLLeakageCorrections; // checksum=0x262d45e4, version=2
 #endif

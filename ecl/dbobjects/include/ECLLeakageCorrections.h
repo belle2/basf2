@@ -29,7 +29,6 @@ namespace Belle2 {
       m_logEnergiesFwd(),
       m_logEnergiesBrl(),
       m_logEnergiesBwd(),
-      m_thetaBoundaries(),
       m_thetaCorrections(),
       m_phiCorrections(),
       m_nCrystalCorrections()
@@ -46,9 +45,6 @@ namespace Belle2 {
 
     /** Get vector of log(energies) used in the backward endcap. Same number of test energies as forward, but different values*/
     const std::vector<float>& getlogEnergiesBwd() const {return m_logEnergiesBwd;}
-
-    /** Get vector containing theta (deg) separating theta rings */
-    const std::vector<float>& getThetaBoundaries() const {return m_thetaBoundaries;}
 
     /** Get 2D histogram of theta-dependent constants  (one column per thetaID & energy) */
     const TH2F getThetaCorrections() const {return m_thetaCorrections;}
@@ -72,13 +68,6 @@ namespace Belle2 {
     /** Set the vector of energies used to evaluate the leakage corrections in the backward endcap*/
     void setlogEnergiesBwd(const std::vector<float>& logEnergiesBwd) {m_logEnergiesBwd = logEnergiesBwd;}
 
-    /** Set the 70-element vector of theta lab values bounding the 69 theta rings */
-    void setThetaBoundaries(const std::vector<float>& thetaBoundaries)
-    {
-      if (thetaBoundaries.size() != 70) {B2FATAL("ECLLeakageCorrections: wrong size vector uploaded for thetaBoundaries, " << thetaBoundaries.size() << " instead of 70");}        m_thetaBoundaries
-        = thetaBoundaries;
-    }
-
     /** Set the 2D histogram containing the theta corrections for each thetaID and energy*/
     void setThetaCorrections(const TH2F& thetaCorrections) {m_thetaCorrections = thetaCorrections;}
 
@@ -94,11 +83,10 @@ namespace Belle2 {
     std::vector<float> m_logEnergiesFwd; /**< log(energies) used to find constants in the forward endcap (GeV) */
     std::vector<float> m_logEnergiesBrl; /**< log(energies) used to find constants in the barrel (GeV) */
     std::vector<float> m_logEnergiesBwd; /**< log(energies) used to find constants in the backward endcap (GeV) */
-    std::vector<float> m_thetaBoundaries; /**< 70 values of theta that bound the 69 theta rings (rad) */
     TH2F m_thetaCorrections; /**< 2D histogram containing theta-dependent correction for each thetaID & energy */
     TH2F m_phiCorrections; /**< 2D histogram containing phi-dependent correction for each thetaID & energy */
     TH2F m_nCrystalCorrections; /**< 2D histogram containing nCrys-dependent correction for each thetaID & energy */
 
-    ClassDef(ECLLeakageCorrections, 1); /**< ClassDef */
+    ClassDef(ECLLeakageCorrections, 2); /**< ClassDef */
   };
 }

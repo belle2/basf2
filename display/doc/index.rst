@@ -80,9 +80,9 @@ Viewer navigation and the user interface
 .. this ^^ enables a custom gui-like highlighting
 
 The right side shows a 3D view (top) and ρ-z and r-ϕ projections (bottom
-left/right); each of these three views can be navigated by by holding the left,
-middle or right mouse button and moving the cursor, the scroll wheel will also
-work. 
+left/right). The views can be navigated by clicking in one (to choose) then by
+holding the left, middle or right mouse button and moving the cursor, the
+scroll wheel will also work. 
 
 Here are all of the mouse and keyboard bindings:
 
@@ -147,7 +147,7 @@ vector graphics is fairly limited, most likely you should save them as .png
 files. The :gui-highlight-style:`Save As (High-Res)…` button creates a high
 resolution image.  (Specifying very high resolutions may crash your X server,
 4000px should be fine). If you want to print them later, you should probably
-also change background colour using the :gui-highlight-style:`Dark/light
+also change the background colour using the :gui-highlight-style:`Dark/light
 colors` button.
 
 .. important:: 
@@ -191,7 +191,7 @@ Geometry
         :gui-highlight-style:`Eve` tab → 'Geometry scene' → 'Top' (then you
         should see it in the bottom panel).  The default value of
         :gui-highlight-style:`VisLevel` will e.g. hide most of the KLM
-        structure, which might interesting to you.
+        structure, which might be interesting to you.
 
 MC info (MCParticles, SimHits)
         MCParticles are coloured depending on their PDG value (pions in gray,
@@ -254,7 +254,7 @@ ones are found at the very top:
 Troubleshooting
 ===============
 
-Unfortunately the event display is a bit susceptible to xforwarding problems
+Unfortunately, the event display is a bit susceptible to xforwarding problems
 and graphics driver issues (on both the local and remote machines).  Please
 report bugs and ask `questions <https://questions.belle2.org>`_ if you
 encounter problems (tag them with "b2display").

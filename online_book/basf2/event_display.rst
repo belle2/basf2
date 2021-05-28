@@ -46,14 +46,13 @@ event display for the mdst file that you were looking at in these last lessons
 (you might need a bit of patience if you're using xforwarding).
 
 .. admonition:: Exercise
+        :class: exercise
 
         Can you identify a :math:`B\to J/\psi K_S` event?
-
 
 .. seealso:: 
         `evdisp.belle2.org <https://evdisp.belle2.org>`_ for a live event
         display of the data-taking in real time.
-
 
 .. seealso::
         `Here is a gallery of nice event display images

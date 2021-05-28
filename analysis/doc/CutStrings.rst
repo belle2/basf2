@@ -11,7 +11,7 @@ Events selections are applied with `modularAnalysis.applyEventCuts`.
 
 .. _ParticleList: https://b2-master.belle2.org/software/development/classBelle2_1_1ParticleList.html
 
-You can use logical operators ``&&``, ``||`` or words ``and``, ``or`` in your cuts.
+You can use logical operators ``and`` and ``or`` in your cuts.
 
 .. warning:: You should use square braces ``[``, ``]`` to separate conditional statements.
 

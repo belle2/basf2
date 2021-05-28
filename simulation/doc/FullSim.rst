@@ -11,7 +11,6 @@ a geometry building module (e.g ``Geometry`` ) should have been executed before 
 
 .. b2-modules::
    :modules: FullSim
-   :noindex:
 
 FullSimTiming
 ==============

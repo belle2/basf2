@@ -136,10 +136,10 @@ automatically advance to the next event after the specified delay (in seconds).
 
         The :gui-highlight-style:`Event Control` tab on the left-hand panel.
 
-The :gui-highlight-style:`Options` box allows changing some of the options also available as module
-parameters at runtime. Most importantly, you can select which parts of an event
-should be shown: MC info, track candidates, and/or reconstructed tracks (and
-related objects).
+The :gui-highlight-style:`Options` box allows changing some of the options also
+available as module parameters at runtime. Most importantly, you can select
+which parts of an event should be shown: MC info, track candidates, and/or
+reconstructed tracks (and related objects).
 
 You can also save images of the currently active viewer (selected by clicking
 anywhere in it) using :gui-highlight-style:`Save As…`. Support for exporting
@@ -246,7 +246,7 @@ ones are found at the very top:
   currently selected view, which is selected by anywhere in it. 
 * :gui-highlight-style:`UndockWindow` moves this view into its own window, so
   it can be freely moved around, or shown in fullscreen.  
-* :gui-highlight-style:1DestroyWindow` removes this view entirely until the
+* :gui-highlight-style:`DestroyWindow` removes this view entirely until the
   display is restarted.
 
 .. _display_troubleshooting:

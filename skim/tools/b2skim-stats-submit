@@ -23,7 +23,7 @@ import yaml
 
 from basf2 import find_file
 from skim.registry import Registry
-from skim.testfiles import MCSample, DataSample, TestSampleList
+from skim.testfiles import TestSampleList
 from skimExpertFunctions import get_eventN
 
 
@@ -330,9 +330,9 @@ if __name__ == "__main__":
 
     samples = TestSampleList(SampleYAML=args.sample_yaml)
     if args.mconly:
-        samples = [s for s in samples if isinstance(s, MCSample)]
+        samples = TestSampleList(SampleList=samples.mc_samples)
     if args.dataonly:
-        samples = [s for s in samples if isinstance(s, DataSample)]
+        samples = TestSampleList(SampleList=samples.data_samples)
 
     if args.single:
         skims = args.single

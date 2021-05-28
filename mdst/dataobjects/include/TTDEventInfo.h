@@ -24,7 +24,7 @@ namespace Belle2 {
   public:
     /// Constructor
     explicit TTDEventInfo(bool isValid = false, bool isHER = false, bool revo2 = false,
-                          unsigned int timeSinceLastInjection = 0x7FFFFFF,
+                          unsigned int timeSinceLastInjection = 0x7FFFFFFF,
                           unsigned int timeSincePrevTrigger = 0,
                           unsigned int bunchNumber = 0) :
       m_isValid(isValid), m_isHER(isHER), m_revo2(revo2), m_timeSinceLastInjection(timeSinceLastInjection),
@@ -46,7 +46,7 @@ namespace Belle2 {
     /// get number of triggered bunch
     unsigned int getBunchNumber() {return m_bunchNumber;}
     /// get if an injection happened recently (and the corresponding stored data is actually valid)
-    bool hasInjection() {return m_timeSinceLastInjection == 0x7FFFFFF;}
+    bool hasInjection() {return m_timeSinceLastInjection == 0x7FFFFFFF;}
 
     // Simple Setters
     /// set that stored information is valid
@@ -64,7 +64,7 @@ namespace Belle2 {
     /// set number of triggered bunch
     void setBunchNumber(unsigned int bunchNumber) {m_bunchNumber = bunchNumber;}
     /// set that no injection happened recently (and the corresponding stored data is actually invalid)
-    void setNoInjection() {m_timeSinceLastInjection = 0x7FFFFFF;}
+    void setNoInjection() {m_timeSinceLastInjection = 0x7FFFFFFF;}
 
     // Additional Functions (not inline)
     /// get time since the last injection in microseconds
@@ -87,13 +87,13 @@ namespace Belle2 {
     **/
     bool m_revo2;
     /**
-    * Time since the last injection in clock ticks (FTSW clock)
-    * Note: A value of '0x7FFFFFF' means no injection took place recently,
+    * Time since the last injection in clock ticks (127MHz=RF/4 clock)
+    * Note: A value of '0x7FFFFFFF' means no injection took place recently,
     *       which is defined by the RawFTSW
     **/
     unsigned int m_timeSinceLastInjection;
     /**
-    * Time since the previous trigger in clock ticks (FTSW clock)
+    * Time since the previous trigger in clock ticks (127MHz=RF/4 clock)
     **/
     unsigned int m_timeSincePrevTrigger;
     /**

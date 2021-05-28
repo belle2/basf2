@@ -31,11 +31,10 @@ You can use it to explore any :ref:`mdst` files.
 You must use a :ref:`full release <choosing_a_release>`, and it is usually 
 recommended to use the same release that was used to create the file you want 
 to explore. If you are working remotely, you will need to connect with 
-xforwarding:
+xforwarding or start a ``vncserver`` (if permitted by your institute).
 
 .. code:: bash
 
-        $ ssh -X your_user@remote.machine
         $ b2setup <any release>
         $ b2file-metadata-show /path/to/your/mdst.root
         $ # read the metadata and find the release number

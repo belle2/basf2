@@ -4,7 +4,7 @@ Cut strings and selections
 --------------------------
 
 Cut strings in ``basf2`` analysis scripts work quite intuitively.
-If you are familiar with `ROOT <https://root.cern.ch>`_ cutstrings and/or python logic, you will probably not notice much difference.
+If you are familiar with `ROOT <https://root.cern.ch>`_ cut strings and/or python logic, you will probably not notice much difference.
 
 Cut strings are used to manipulate candidates (i.e. `ParticleList`_ s) with `modularAnalysis.applyCuts`, and `modularAnalysis.cutAndCopyList`.
 Events selections are applied with `modularAnalysis.applyEventCuts`.
@@ -15,7 +15,7 @@ Allowed comparisons are ``<``, ``<=``, ``>``, ``>=``, ``==`` and ``!=``.
 Two-sided inequalities like ``1.2 < M < 1.5`` also work as expected.
 Use the logical operators ``and`` and ``or`` to combine your cuts.
 
-.. warning:: You should use square braces ``[``, ``]`` to separate conditional statements.
+.. warning:: You should use square brackets ``[``, ``]`` to separate conditional statements.
 
 This logic can become quite powerful, particularly in combination with the :b2:var:`formula` MetaVariable.
 Here are some examples:

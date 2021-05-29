@@ -7,7 +7,7 @@
   <input>EvtGenSim.root</input>
   <output>DATCONTrackingValidationBkg.root</output>
   <description>
-  This module validates that the svd only track finding is capable of reconstructing tracks in Y(4S) runs with bkg included.
+  This module validates that the DATCON SVD only track finding is capable of reconstructing tracks in Y(4S) runs.
   </description>
 </header>
 """
@@ -27,53 +27,9 @@ basf2.set_random_seed(1337)
 rootFileName = 'trackCandAnalysisBkg.root'
 
 
-def setupFinderModule(path):
-    tracking.add_hit_preparation_modules(path, components=["SVD"])
-    add_datcon(path, rootFileName=rootFileName, datcon_reco_tracks='RecoTracks')
-    # path.add_module('DATCON',
-    # minimumUClusterTime=-10,
-    # minimumVClusterTime=-10,
-    # maximumUClusterTime=60,
-    # maximumVClusterTime=60,
-
-    # useSubHoughSpaces=False,
-
-    # simpleVerticalHoughSpaceSize=0.25,
-    # simpleNAngleSectors=256,
-    # simpleNVerticalSectors=256,
-    # simpleMinimumHSClusterSize=4,
-    # simpleMaximumHSClusterSize=200,
-
-    # maxRelations=1000000,
-    # relationFilter='angleAndTime',
-    # relationFilterParameters={'AngleAndTimeThetaCutDeltaL0': 0.05,
-    # 'AngleAndTimeThetaCutDeltaL1': 0.10,
-    # 'AngleAndTimeThetaCutDeltaL2': 0.25,
-    # 'AngleAndTimeDeltaUTime': 50.,
-    # 'AngleAndTimeDeltaVTime': 50., },
-    # rootFileName=rootFileName,
-    # maxRelationsCleaner=1000,
-    # #  twoHitFilter='twoHitVirtualIPQI',
-    # #  twoHitUseNBestHits=100,
-    # twoHitFilter='all',
-    # twoHitUseNBestHits=0,
-    # threeHitUseNBestHits=50,
-    # fourHitUseNBestHits=30,
-    # fiveHitUseNBestHits=10,
-
-    # #  trackQualityEstimationMethod='helixFit',
-    # minQualitiyIndicatorSize3=0.50,
-    # minQualitiyIndicatorSize4=0.001,
-    # minQualitiyIndicatorSize5=0.001,
-    # maxNumberOfHitsForEachPathLength=50,
-
-    # RecoTracksStoreArrayName='RecoTracks',
-    # )
-
-
 class DATCONTrackingValidationBkg(TrackingValidationRun):
     """
-    Validation class for the four 4-SVD Layer tracking
+    Validation class for the DATCON tracking
     """
     #: the number of events to process
     n_events = N_EVENTS
@@ -84,8 +40,10 @@ class DATCONTrackingValidationBkg(TrackingValidationRun):
     #: use full detector for validation
     components = None
 
-    #: lambda method which is used by the validation to add the svd finder modules
-    finder_module = staticmethod(setupFinderModule)
+    @staticmethod
+    def finder_module(path):
+        tracking.add_hit_preparation_modules(path, components=["SVD"])
+        add_datcon(path, datcon_reco_tracks='RecoTracks', use_simple_roi_calculation=False)
 
     #: use only the svd hits when computing efficiencies
     tracking_coverage = {
@@ -101,10 +59,6 @@ class DATCONTrackingValidationBkg(TrackingValidationRun):
     pulls = True
     #: output file of plots
     output_file_name = VALIDATION_OUTPUT_FILE
-
-    #: Store additional information in output file (like the full trees)
-    extended = True
-    saveFullTrees = True
 
 
 def main():

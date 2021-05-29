@@ -7,7 +7,7 @@
 
 import basf2 as b2
 from simulation import add_simulation
-from reconstruction import add_reconstruction
+from tracking import add_hit_preparation_modules
 from datcon.datcon_functions import add_datcon
 
 b2.set_random_seed(1337)
@@ -27,12 +27,10 @@ main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=num_events)
 main.add_module('EvtGenInput')
 
 # detector simulation, don't perform data reduction per default, but use DATCON instead
-add_simulation(main, bkgOverlay=True, forceSetPXDDataReduction=True, usePXDDataReduction=False, cleanupPXDDataReduction=False)
-
-# reconstruction
-add_reconstruction(main)
+add_simulation(main, bkgOverlay=False, forceSetPXDDataReduction=True, usePXDDataReduction=False, cleanupPXDDataReduction=False)
 
 # add DATCON simulation using the optimized DATCON
+add_hit_preparation_modules(main, components=["SVD"])
 add_datcon(main)
 
 main.add_module('Progress')

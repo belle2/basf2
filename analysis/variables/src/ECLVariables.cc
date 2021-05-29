@@ -35,6 +35,16 @@
 
 namespace Belle2 {
   namespace Variable {
+    double nbarID(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("nbarID")) {
+        return particle->getExtraInfo("nbarID");
+      } else {
+        B2WARNING("The extraInfo nbarID is not registerted! \n"
+                  "Please use function getNbarIDMVA in modularAnalysis.");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
     double beamBackgroundProbabilityMVA(const Particle* particle)
     {
       if (particle->hasExtraInfo("beamBackgroundProbabilityMVA")) {

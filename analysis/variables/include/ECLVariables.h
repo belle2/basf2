@@ -35,6 +35,14 @@ namespace Belle2 {
      * returns the weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component
      * Variable is used to separate hadronic showers from electromagnetic showers
      */
+    double nbarID(const Particle* particle);
+
+    /**
+    * returns the MVA score for only anti-neutron (not for neutron)
+    * -1 means invalid
+    *  0 background-like
+    *  1 signal-like
+    */
     double eclClusterNumberOfHadronDigits(const Particle* particle);
 
     /**

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Test SeqRootInputModule. Input data is the same as used by chain_input.py
 # (both files)

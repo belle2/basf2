@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # BASF2 (Belle Analysis Framework 2)                                     #
@@ -11,7 +10,6 @@
 # This software is provided "as is" without any warranty.                #
 ##########################################################################
 
-from __future__ import division, print_function, generators
 
 import numpy as np
 
@@ -53,7 +51,7 @@ class TfDataBasf2():
         self.batches = self.train_x.shape[0] // self.batch_size
 
         #: idices required for shuffling
-        self.train_idx = np.zeros((self.train_x.shape[0]))
+        self.train_idx = np.zeros(self.train_x.shape[0])
 
         #: np ndarray for training batch features
         self.batch_train_x = np.zeros((self.feature_number, self.batch_size))

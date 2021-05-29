@@ -566,8 +566,8 @@ namespace Belle2 {
     {
       // get associated ECLCluster
       const ECLCluster* cluster = part->getECLCluster();
-      const ECLCluster::EHypothesisBit clusterHypothesis = part->getECLClusterEHypothesisBit();
       if (!cluster) return std::numeric_limits<float>::quiet_NaN();
+      const ECLCluster::EHypothesisBit clusterHypothesis = part->getECLClusterEHypothesisBit();
 
       // get 4 momentum from cluster
       ClusterUtils clutls;
@@ -585,8 +585,8 @@ namespace Belle2 {
     {
       // get associated ECLCluster
       const ECLCluster* cluster = part->getECLCluster();
-      const ECLCluster::EHypothesisBit clusterHypothesis = part->getECLClusterEHypothesisBit();
       if (!cluster) return std::numeric_limits<float>::quiet_NaN();
+      const ECLCluster::EHypothesisBit clusterHypothesis = part->getECLClusterEHypothesisBit();
 
       // get 4 momentum from cluster
       ClusterUtils clutls;
@@ -822,6 +822,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
       double beamEnergy = T.getCMSEnergy() / 2.;
+      if (part->getNDaughters() != 2) return std::numeric_limits<double>::quiet_NaN();
       TLorentzVector tagVec = T.rotateLabToCms()
                               * part->getDaughter(0)->get4Vector();
       TLorentzVector sigVec = T.rotateLabToCms()
@@ -1069,7 +1070,7 @@ Note that this is context-dependent variable and can take different values depen
     REGISTER_VARIABLE("pRecoilTheta", recoilMomentumTheta,
                       "Polar angle of a particle's missing momentum");
     REGISTER_VARIABLE("pRecoilPhi", recoilMomentumPhi,
-                      "Azimutal angle of a particle's missing momentum");
+                      "Azimuthal angle of a particle's missing momentum");
     REGISTER_VARIABLE("eRecoil", recoilEnergy,
                       "energy recoiling against given Particle");
     REGISTER_VARIABLE("mRecoil", recoilMass,

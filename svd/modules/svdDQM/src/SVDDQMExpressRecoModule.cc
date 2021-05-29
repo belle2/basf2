@@ -43,27 +43,24 @@ REG_MODULE(SVDDQMExpressReco)
 SVDDQMExpressRecoModule::SVDDQMExpressRecoModule() : HistoModule()
 {
   //Set module properties
-  setDescription("SVD DQM module for Express Reco"
-                 "Recommended Number of events for monitor is 40 kEvents or more to fill all histograms "
-                 "Container for histograms for off-line analysis with any granulation base on request "
-                 "Call all histograms set ShowAllHistos=1 ."
-                );
+  setDescription("Original SVD DQM module for ExpressReco.");
 
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
-  addParam("offlineZSShaperDigits", m_storeSVDShaperDigitsName, "ShaperDigits StoreArray name", std::string("SVDShaperDigitsZS5"));
-  addParam("ShaperDigits", m_storeNoZSSVDShaperDigitsName, "not zero-suppressed ShaperDigits StoreArray name",
+  addParam("offlineZSShaperDigits", m_storeSVDShaperDigitsName, "ShaperDigits StoreArray name - usually ZS5 strips.",
+           std::string("SVDShaperDigitsZS5"));
+  addParam("ShaperDigits", m_storeNoZSSVDShaperDigitsName, "not zero-suppressed ShaperDigits StoreArray name.",
            std::string("SVDShaperDigits"));
-  addParam("Clusters", m_storeSVDClustersName, "Cluster StoreArray name",
+  addParam("Clusters", m_storeSVDClustersName, "Cluster StoreArray name.",
            std::string("SVDClusters"));
-  addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If TRUE skip events rejected by HLT", bool(true));
-  addParam("ShowAllHistos", m_ShowAllHistos, "Flag to show all histos in DQM, default = 0 ", int(0));
+  addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If True, skip events rejected by HLT.", bool(true));
+  addParam("ShowAllHistos", m_ShowAllHistos, "Flag to show all histos in DQM, default = 0.", int(0));
   addParam("desynchronizeSVDTime", m_desynchSVDTime,
-           "if TRUE (default is FALSE): svdTime back in SVD time reference", bool(false));
+           "if True, svd time back in SVD time reference.", bool(false));
   addParam("CutSVDCharge", m_CutSVDCharge,
-           "cut for accepting to hitmap histogram, using strips only", float(0));
+           "minimum charge (ADC) to fill the strip-hitmap histogram.", float(0));
   addParam("CutSVDClusterCharge", m_CutSVDClusterCharge,
-           "cut for accepting clusters to hitmap histogram", float(0));
-  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+           "minimum charge (in e-) to fill the cluster-hitmap histogram.", float(0));
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed.",
            std::string("SVDExpReco"));
 
   m_histoList = new TList();

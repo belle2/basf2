@@ -1,5 +1,4 @@
 #!/bin/env python3
-# -*- mode: Python; coding: utf-8 -*-
 
 """
 Script to get the integrated luminosity of a set of runs

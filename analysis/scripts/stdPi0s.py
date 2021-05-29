@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ########################################################
 #
@@ -47,7 +46,7 @@ def stdPi0s(listtype="eff60_May2020", path=None):
     elif 'eff10_May2020' == listtype:
         stdPhotons('pi0eff10_May2020', path)
         ma.reconstructDecay('pi0:eff10_May2020 -> gamma:pi0eff10_May2020 gamma:pi0eff10_May2020',
-                            '0.127<InvM<0.139 and -0.9<daughterDiffOfPhi(0,1)<0.9 and daughterAngle(0,1)<0.8',
+                            '0.127<InvM<0.139 and -0.9<daughterDiffOf(0,1,phi)<0.9 and daughterAngle(0,1)<0.8',
                             1,
                             True,
                             path)
@@ -55,7 +54,7 @@ def stdPi0s(listtype="eff60_May2020", path=None):
     elif 'eff20_May2020' == listtype:
         stdPhotons('pi0eff20_May2020', path)
         ma.reconstructDecay('pi0:eff20_May2020 -> gamma:pi0eff20_May2020 gamma:pi0eff20_May2020',
-                            '0.121<InvM<0.142 and -1.0<daughterDiffOfPhi(0,1)<1.0 and daughterAngle(0,1)<0.9',
+                            '0.121<InvM<0.142 and -1.0<daughterDiffOf(0,1,phi)<1.0 and daughterAngle(0,1)<0.9',
                             1,
                             True,
                             path)
@@ -63,7 +62,7 @@ def stdPi0s(listtype="eff60_May2020", path=None):
     elif 'eff30_May2020' == listtype:
         stdPhotons('pi0eff30_May2020', path)
         ma.reconstructDecay('pi0:eff30_May2020 -> gamma:pi0eff30_May2020 gamma:pi0eff30_May2020',
-                            '0.120<InvM<0.145 and -1.5<daughterDiffOfPhi(0,1)<1.5 and daughterAngle(0,1)<1.4',
+                            '0.120<InvM<0.145 and -1.5<daughterDiffOf(0,1,phi)<1.5 and daughterAngle(0,1)<1.4',
                             1,
                             True,
                             path)

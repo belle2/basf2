@@ -9,7 +9,6 @@ import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from datcon.datcon_functions import add_datcon
-from L1trigger import add_tsim
 
 b2.set_random_seed(1337)
 
@@ -29,9 +28,6 @@ main.add_module('EvtGenInput')
 
 # detector simulation, don't perform data reduction per default, but use DATCON instead
 add_simulation(main, bkgOverlay=True, forceSetPXDDataReduction=True, usePXDDataReduction=False, cleanupPXDDataReduction=False)
-
-# trigger simulation
-add_tsim(main)
 
 # reconstruction
 add_reconstruction(main)

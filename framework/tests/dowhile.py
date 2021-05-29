@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 from basf2 import create_path, LogLevel, LogInfo, logging, set_random_seed, B2INFO, Module
 import b2test_utils

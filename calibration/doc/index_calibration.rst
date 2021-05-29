@@ -1,6 +1,9 @@
+
 ===========
 Calibration
 ===========
+
+.. _calibration_caf:
 
 Calibration Framework (CAF)
 ===========================

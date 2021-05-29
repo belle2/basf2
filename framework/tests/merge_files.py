@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import os
 import sys
@@ -22,7 +21,7 @@ def create_testfile(name, release=None, exp=0, run=0, events=100, branchNames=No
     env = dict(os.environ)
     env.update(argk)
 
-    steering_file = "steering-{0}.py".format(name)
+    steering_file = f"steering-{name}.py"
     with open(steering_file, "w") as f:
         f.write(testfile_steering)
 
@@ -404,12 +403,12 @@ if __name__ == "__main__":
     failures = 0
     existing = [e for e in sorted(globals().items()) if e[0].startswith("check_")]
     for name, fcn in existing:
-        print("running {0}: {1}".format(name, fcn.__doc__))
+        print(f"running {name}: {fcn.__doc__}")
         with clean_working_directory():
             if not fcn():
-                print("{0} failed".format(name))
+                print(f"{name} failed")
                 failures += 1
             else:
-                print("{0} passed".format(name))
+                print(f"{name} passed")
 
     sys.exit(failures)

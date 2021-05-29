@@ -3,6 +3,7 @@
 
 import basf2 as b2
 from svd import add_svd_create_recodigits
+from svd.dqm_utils import add_svd_dqm_dose
 from geometry import check_components
 from analysisDQM import add_analysis_dqm, add_mirabelle_dqm
 
@@ -79,6 +80,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             path.add_module('SVDDQMEfficiency')
             # SVD CLUSTERS ON TRACK
             path.add_module('SVDDQMClustersOnTrack')
+            # SVD DOSE
+            add_svd_dqm_dose(path, 'SVDShaperDigitsZS5')
 
         # Event time measuring detectors
         if components is None or 'CDC' in components or 'ECL' in components or 'TOP' in components:

@@ -50,7 +50,7 @@ ECLLeakagePosition::ECLLeakagePosition() :
 
   //..Record the thetaID and phiID of each cellID
   for (int thID = 0; thID < 69; thID++) {
-    for (int phID = 0; phID < crystalsPerRing[thID]; phID++) {
+    for (int phID = 0; phID < neighbours->getCrystalsPerRing(thID); phID++) {
       thetaIDofCrysID.push_back(thID);
       phiIDofCrysID.push_back(phID);
     }

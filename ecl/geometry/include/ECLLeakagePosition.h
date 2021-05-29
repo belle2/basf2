@@ -57,9 +57,6 @@ namespace Belle2 {
 
       ECL::ECLNeighbours* neighbours{nullptr}; /**< 8 nearest neighbours to crystal */
 
-      const int crystalsPerRing[69] = {
-        48, 48, 64, 64, 64, 96, 96, 96, 96, 96, 96, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 96, 96, 96, 96, 96, 64, 64, 64
-      }; /**< crystals per thetaID */
       std::vector<int> thetaIDofCrysID; /**< thetaID of each crystal ID */
       std::vector<int> phiIDofCrysID; /**< phiID of each crystal ID */
       const int crysBetweenMech[3] = {16, 2, 16}; /**< crystals between phi mechanical structure in each region*/

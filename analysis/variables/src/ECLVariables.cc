@@ -40,8 +40,10 @@ namespace Belle2 {
       if (particle->hasExtraInfo("nbarID")) {
         return particle->getExtraInfo("nbarID");
       } else {
-        B2WARNING("The extraInfo nbarID is not registerted! \n"
-                  "Please use function getNbarIDMVA in modularAnalysis.");
+        if (particle->getPDGCode() == -2112) {
+          B2WARNING("The extraInfo nbarID is not registerted! \n"
+                    "Please use function getNbarIDMVA in modularAnalysis.");
+        }
         return std::numeric_limits<float>::quiet_NaN();
       }
     }
@@ -50,9 +52,11 @@ namespace Belle2 {
       if (particle->hasExtraInfo("beamBackgroundProbabilityMVA")) {
         return particle->getExtraInfo("beamBackgroundProbabilityMVA");
       } else {
+        return std::numeric_limits<float>::quiet_NaN();
+
         B2WARNING("The extraInfo beamBackgroundProbabilityMVA is not registerted! \n"
                   "This variable is only available for photons, and you either have to run the function getBeamBackgroundProbabilityMVA or turn the argument loadPhotonBeamBackgroundMVA to True when using fillParticleList.");
-        return std::numeric_limits<float>::quiet_NaN();
+
       }
     }
     double eclPulseShapeDiscriminationMVA(const Particle* particle)

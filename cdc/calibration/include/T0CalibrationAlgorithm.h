@@ -54,6 +54,8 @@ namespace Belle2 {
       void createHisto();
       /// write outut or store db
       void write();
+      /// calculate mean of the T0 distribution
+      double getMeanT0(TH1F* h1);
     private:
       TH1F* m_hTotal;       /**< 1D histogram of delta T whole channel */
       TH1F* m_h1[56][385];    /**<1D histogram for each channel*/

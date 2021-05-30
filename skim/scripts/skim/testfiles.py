@@ -1,7 +1,16 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
 import re
+import sys
 from pathlib import Path
 
+import json
+import jsonschema
 import yaml
+
+from basf2 import find_file
 
 
 class Sample:
@@ -13,7 +22,9 @@ class Sample:
         """
         if kwargs:
             keys = ", ".join(kwargs.keys())
-            raise ValueError(f"Unrecognised arguments in test sample YAML file: {keys}")
+            raise ValueError(
+                f"Unrecognised arguments in test sample initialisation: {keys}"
+            )
 
     location = NotImplemented
     """Path of the test file."""
@@ -87,11 +98,11 @@ class DataSample(Sample):
 
     def __repr__(self):
         return (
-            f"{self.__class__.__module__}.{self.__class__.__name__}("
-            f"location={repr(self.location)},"
-            f"processing={repr(self.processing)},"
-            f"experiment={repr(self.experiment)},"
-            f"beam_energy={repr(self.beam_energy)},"
+            f"{self.__class__.__name__}("
+            f"location={repr(self.location)}, "
+            f"processing={repr(self.processing)}, "
+            f"experiment={repr(self.experiment)}, "
+            f"beam_energy={repr(self.beam_energy)}, "
             f"general_skim={repr(self.general_skim)})"
         )
 
@@ -156,7 +167,7 @@ class MCSample(Sample):
 
     def __repr__(self):
         return (
-            f"{self.__class__.__module__}.{self.__class__.__name__}("
+            f"{self.__class__.__name__}("
             f"location={repr(self.location)}, "
             f"process={repr(self.process)}, "
             f"campaign={repr(self.campaign)}, "
@@ -202,7 +213,7 @@ class CustomSample(Sample):
 
     def __repr__(self):
         return (
-            f"{self.__class__.__module__}.{self.__class__.__name__}("
+            f"{self.__class__.__name__}("
             f"location={repr(self.location)}, "
             f"label={repr(self.label)})"
         )
@@ -259,6 +270,8 @@ class TestSampleList:
             with open(SampleYAML) as f:
                 SampleDict = yaml.safe_load(f)
 
+        self.validate_schema(SampleDict, SampleYAML)
+
         self._parse_all_samples(SampleDict)
 
     @property
@@ -275,10 +288,7 @@ class TestSampleList:
         return len(self._all_samples)
 
     def __repr__(self):
-        return (
-            f"{self.__class__.__module__}.{self.__class__.__name__}("
-            f"SampleList={repr(list(self))})"
-        )
+        return f"{self.__class__.__name__}(" f"SampleList={repr(list(self))})"
 
     @property
     def SampleDict(self):
@@ -287,6 +297,28 @@ class TestSampleList:
             "Data": [s.as_dict for s in self.data_samples],
             "Custom": [s.as_dict for s in self.custom_samples],
         }
+
+    def validate_schema(self, SampleDict, InputYAML=None):
+        """
+        Validate YAML input against JSON schema defined in
+        ``skim/tools/resources/test_samples_schema.json``.
+        """
+        schema_file = find_file("skim/tools/resources/test_samples_schema.json")
+        with open(schema_file) as f:
+            schema = json.load(f)
+        with open(schema_file, "w") as f:
+            schema = json.dump(schema, f, indent=2)
+        with open(schema_file) as f:
+            schema = json.load(f)
+
+        try:
+            jsonschema.validate(SampleDict, schema)
+        except jsonschema.exceptions.ValidationError as e:
+            if InputYAML:
+                raise ValueError(
+                    f"Error in sample list configuration file {InputYAML}"
+                ) from e
+            raise e
 
     @staticmethod
     def _parse_samples(SampleDict, BlockName, SampleClass):
@@ -337,3 +369,11 @@ class TestSampleList:
             raise ValueError(
                 MissingParams.format(block="Custom", params=required)
             ) from e
+
+
+if __name__ == "__main__":
+    try:
+        samples = TestSampleList(SampleYAML=sys.argv[1])
+    except IndexError:
+        samples = TestSampleList()
+    print(samples)

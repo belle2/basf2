@@ -9,7 +9,6 @@
 import basf2 as b2
 from generators import add_kkmc_generator
 from simulation import add_simulation
-from L1trigger import add_tsim
 from reconstruction import add_reconstruction
 from argparse import ArgumentParser
 import os
@@ -38,11 +37,8 @@ elif args.multiplicity == 'low':
     # generate mu pair events if low multiplicity is selected
     add_kkmc_generator(main, 'mu+mu-')
 
-# detector simulation
+# detector and L1 trigger simulation
 add_simulation(main, bkgfiles=glob.glob(os.environ.get('BELLE2_BACKGROUND_DIR', '/sw/belle2/bkg') + '/*.root'))
-
-# trigger simulation
-add_tsim(main)
 
 # reconstruction
 add_reconstruction(main)

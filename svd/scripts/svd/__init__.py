@@ -6,6 +6,19 @@ import sys
 
 
 def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, applyMasking=False):
+    """
+    Adds the SVD reconstruction to the path.
+
+    Reconstruction starts with :ref:`SVDShaperDigits<svdshapers>`
+    and :ref:`SVDEventInfo<svdeventinfo>` and provides
+    :ref:`SVDClusters<svdclusters>` and :ref:`SVDSpacePoints<svdsps>`.
+
+    @param path: add the modules to this basf2 path.
+    @param isROIsimulation: SVD reconstruction can be run during simulation\
+    in order to simulate the PXD Data Reduction with ROI finding.
+    @param createRecoDigits: if True, :ref:`SVDRecoDigits<svdrecos>` are created.
+    @param applyMasking: if True, hot strips found in :ref:`SVDHotStripsCalibration<svdhotstrips>` are masked.
+    """
 
     if(isROIsimulation):
         clusterizerName = '__ROISVDClusterizer'
@@ -50,7 +63,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         clusterizer.param('ShaperDigits', shaperDigitsName)
         clusterizer.param('Clusters', clustersName)
         clusterizer.param('timeAlgorithm6Samples', "CoG6")
-        clusterizer.param('timeAlgorithm3Samples', "CoG6")
+        clusterizer.param('timeAlgorithm3Samples', "CoG3")
         clusterizer.param('chargeAlgorithm6Samples', "MaxSample")
         clusterizer.param('chargeAlgorithm3Samples', "MaxSample")
         clusterizer.param('positionAlgorithm6Samples', "oldDefault")
@@ -77,6 +90,15 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
 
 
 def add_svd_create_recodigits(path, recocreatorName="SVDRecoDigitCreator", shaperDigitsName=""):
+    """
+    Adds the strip reconstruction to the path.
+
+    Produce :ref:`SVDRecoDigits<svdrecos>` from :ref:`SVDShaperDigits<svdshapers>`.
+
+    @param path: add the modules to this basf2 path.
+    @param recocreatorName: name of the module.
+    @param shaperDigitsName: name of the SVDShaperDigits StoreArray.
+ """
 
     if recocreatorName not in [e.name() for e in path.modules()]:
         recoDigitCreator = b2.register_module('SVDRecoDigitCreator')
@@ -89,56 +111,19 @@ def add_svd_create_recodigits(path, recocreatorName="SVDRecoDigitCreator", shape
         path.add_module(recoDigitCreator)
 
 
-def add_rel5_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, applyMasking=False):
+def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False):
+    """
+    Adds the old (up to release-05) SVD recontruction to the path.
 
-    if(useNN and useCoG):
-        print("WARNING! you can't select both NN and CoG for SVD reconstruction. Using the default algorithm (TB-equivalent)")
-        add_svd_reconstruction_CoG(path, isROIsimulation)
-    elif(useNN):
-        add_svd_reconstruction_nn(path, isROIsimulation)
+    Reconstruction starts with :ref:`SVDShaperDigits<svdshapers>` and
+    :ref:`SVDEventInfo<svdeventinfo>` and provides :ref:`SVDClusters<svdclusters>`
+    and :ref:`SVDSpacePoints<svdsps>`.
 
-    elif(useCoG):
-        add_svd_reconstruction_CoG(path, isROIsimulation, applyMasking)
-
-
-def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
-
-    if direct:
-        if(isROIsimulation):
-            clusterizerName = '__ROISVDClusterizerDirect'
-            clusterName = '__ROIsvdClusters'
-        else:
-            clusterizerName = 'SVDClusterizerDirect'
-            clusterName = ""
-
-        if clusterizerName not in [e.name() for e in path.modules()]:
-            clusterizer = b2.register_module('SVDClusterizerDirect')
-            clusterizer.set_name(clusterizerName)
-            clusterizer.param('Clusters', clusterName)
-            path.add_module(clusterizer)
-    else:
-        if(isROIsimulation):
-            fitterName = '__ROISVDNNShapeReconstructor'
-            clusterizerName = '__ROISVDNNClusterizer'
-            clusterName = '__ROIsvdClusters'
-        else:
-            fitterName = 'SVDNNShapeReconstructor'
-            clusterizerName = 'SVDNNClusterizer'
-            clusterName = ''
-
-        if fitterName not in [e.name() for e in path.modules()]:
-            fitter = b2.register_module('SVDNNShapeReconstructor')
-            fitter.set_name(fitterName)
-            path.add_module(fitter)
-
-        if clusterizerName not in [e.name() for e in path.modules()]:
-            clusterizer = b2.register_module('SVDNNClusterizer')
-            clusterizer.set_name(clusterizerName)
-            clusterizer.param('Clusters', clusterName)
-            path.add_module(clusterizer)
-
-
-def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
+    @param path: add the modules to this basf2 path.
+    @param isROIsimulation: SVD reconstruction can be run during simulation\
+    in order to simulate the PXD Data Reduction with ROI finding.
+    @param applyMasking: if True, hot strips found in :ref:`SVDHotStripsCalibration<svdhotstrips>` are masked.
+    """
 
     if(isROIsimulation):
         fitterName = '__ROISVDCoGTimeEstimator'
@@ -199,81 +184,60 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
     add_svd_SPcreation(path, isROIsimulation)
 
 
-def add_svd_simulation(path, daqMode=2, latencyShift=-1, relativeShift=-1):
+def add_svd_simulation(path, useConfigFromDB=False, daqMode=2, relativeShift=9):
+    """
+    Adds the SVD simulation to the path.
 
-    if daqMode != 2 and daqMode != 1:
-        print("OOPS the acquisition mode that you want to simulate is not available.")
-        print("Please choose among daqMode = 2 (6-sample) and daqMode = 1 (3-sample). Exiting now.")
-        sys.exit()
+    Simulation ends with :ref:`SVDShaperDigits<svdshapers>` and :ref:`SVDEventInfo<svdeventinfo>`.
 
-    # 6-sample acquisition mode
-    if daqMode == 2:
-        svdevtinfoset = b2.register_module("SVDEventInfoSetter")
+    @param path: add the modules to this basf2 path.
+    @param useConfigFromDB: if True, read the SVD configuration from :ref:`SVDGlobalConfigParameters<svdglobalconfig>`.
+    @param daqMode: = 2 for the default 6-sample mode, = 1 for the 3-sample mode, = 3 for the 3-mixed-6 sample mode.
+    @param relativeShift: relative time shift between the 3-sample and the 6-sample mode in units of 1/4 of APV clock.\
+    If ``useConfigFromDB`` is True, the value of this parameter is overwritten.
+    """
+
+    svdevtinfoset = b2.register_module("SVDEventInfoSetter")
+    svdevtinfoset.param("useDB", useConfigFromDB)
+    path.add_module(svdevtinfoset)
+
+    digitizer = b2.register_module('SVDDigitizer')
+    path.add_module(digitizer)
+
+    if not useConfigFromDB:
+        if daqMode != 2 and daqMode != 1 and daqMode != 3:
+            print("OOPS the acquisition mode that you want to simulate is not available.")
+            print("Please choose among daqMode = 2 (6-sample) and daqMode = 1 (3-sample). Exiting now.")
+            sys.exit()
+
+        # TODO add check of relative shift value
         svdevtinfoset.param("daqMode", daqMode)
-        path.add_module(svdevtinfoset)
-
-        digitizer = b2.register_module('SVDDigitizer')
-        path.add_module(digitizer)
-
-    # 3-sample acquisition mode
-    # we previously simulated this mode with StartSampling = 58 (default StartSampling = -2)
-    if daqMode == 1:
-        if relativeShift == -1 and latencyShift == -1:
-            print("OOPS please choose if you want to use the relativeShift or the latencyShift. Exiting now.")
-            sys.exit(1)
-        if relativeShift != -1 and latencyShift != -1:
-            print("OOPS please choose only one between relativeShift and latencyShift. Exiting now.")
-            sys.exit(1)
-
-        svdevtinfoset = b2.register_module("SVDEventInfoSetter")
-        svdevtinfoset.param("daqMode", 2)
-        svdevtinfoset.param("SVDEventInfo", "SVDEventInfoOriginal")
-        path.add_module(svdevtinfoset)
-
-        digitizer = b2.register_module('SVDDigitizer')
-        digitizer.param("ShaperDigits", "SVDShaperDigitsOriginal")
-        path.add_module(digitizer)
-
-        # emulate the 3-sample acquisition
-        emulator = b2.register_module("SVD3SamplesEmulator")
-        emulator.param("SVDEventInfo", "SVDEventInfoOriginal")
-        emulator.param("SVDShaperDigits", "SVDShaperDigitsOriginal")
-        if latencyShift == -1:
-            emulator.param("chooseStartingSample", False)
-        else:
-            emulator.param("chooseStartingSample", True)
-            emulator.param("StartingSample", latencyShift)
-
-        if relativeShift == -1:
-            emulator.param("chooseRelativeShift", False)
-        else:
-            emulator.param("chooseRelativeShift", True)
-            emulator.param("relativeShift", relativeShift)
-
-        emulator.param("outputSVDEventInfo", "SVDEventInfo")
-        emulator.param("outputSVDShaperDigits", "SVDShaperDigits3SampleAll")
-        path.add_module(emulator)
-
-        # emulate online zero-suppression
-        zsonline = b2.register_module("SVDZeroSuppressionEmulator")
-        zsonline.param("ShaperDigits", "SVDShaperDigits3SampleAll")
-        zsonline.param("ShaperDigitsIN", "SVDShaperDigits")
-        path.add_module(zsonline)
-
-        # 3-mixed-6 sample mode not available
+        svdevtinfoset.param("relativeShift", relativeShift)
 
 
 def add_svd_unpacker(path):
+    """
+    Adds the SVD Unpacker to the path.
+
+    The unpacker produces :ref:`SVDShaperDigits<svdshapers>` and :ref:`SVDEventInfo<svdeventinfo>`.
+
+    @param path: add the modules to this basf2 path.
+    """
 
     unpacker = b2.register_module('SVDUnpacker')
     path.add_module(unpacker)
 
 
 def add_svd_unpacker_simulate3sampleDAQ(path, latencyShift=-1, relativeShift=-1):
+    """
+    Adds the SVD Unpacker to the path, emulating the 3-sample mode from the 6-sample mode.
 
-    if relativeShift == -1 and latencyShift == -1:
-        print("OOPS please choose if you want to use the relativeShift or the latencyShift. Exiting now.")
-        sys.exit(1)
+    @param path: add the modules to this basf2 path.
+    @param latencyShift: relative time shift between the 3-sample and the 6-sample mode, in APV clocks.
+    @param relativeShift: relative time shift between the 3-sample and the 6-sample mode, in units of 1/4 of APV clock.
+
+    .. warning:: at least one between ``relativeShift`` and ``latencyShift`` should be set (different from -1).
+    """
 
     if relativeShift != -1 and latencyShift != -1:
         print("OOPS please choose only one between relativeShift and latencyShift. Exiting now.")
@@ -312,12 +276,24 @@ def add_svd_unpacker_simulate3sampleDAQ(path, latencyShift=-1, relativeShift=-1)
 
 
 def add_svd_packer(path):
+    """
+    Adds the SVD Packer to the path.
+
+    @param path: add the modules to this basf2 path.
+    """
 
     packer = b2.register_module('SVDPacker')
     path.add_module(packer)
 
 
 def add_svd_SPcreation(path, isROIsimulation=False):
+    """
+    Adds the SVD SpacePoint Creator to the path.
+
+    @param path: add the modules to this basf2 path.
+    @param isROIsimulation: SVD reconstruction can be run during simulation\
+    in order to simulate the PXD Data Reduction with ROI finding.
+    """
 
     if(isROIsimulation):
         svdSPCreatorName = '__ROISVDSpacePointCreator'

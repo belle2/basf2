@@ -8,7 +8,7 @@
 #        commend > basf2 TrgEcl.py [Name of Gsim root file] [Name of output root file]
 # -------------------------------------------------------------------------------------------------------
 import basf2 as b2
-from L1trigger import add_tsim
+from L1trigger import add_trigger_simulation
 ################
 import sys  # get argv
 argvs = sys.argv  # get arg
@@ -52,7 +52,7 @@ main.add_module(rootinput1)
 main.add_module(progress)
 main.add_module(gearbox)
 
-add_tsim(main, component=["ECL"])
+add_trigger_simulation(main, component=["ECL"])
 
 
 main.add_module(rootoutput, branchNames=["TRGECLTrgs", "TRGECLHits", "TRGECLClusters"])

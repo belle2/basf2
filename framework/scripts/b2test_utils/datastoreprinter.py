@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 from ROOT import Belle2, kIsPublic, kIsStatic, TVector3, TLorentzVector
 from basf2 import Module, B2FATAL
@@ -28,7 +27,7 @@ def get_public_members(classname):
     return list(sorted(members))
 
 
-class DataStorePrinter(object):
+class DataStorePrinter:
     """
     Class to print contents of a StoreObjPtr or StoreArray.
 
@@ -138,7 +137,7 @@ class DataStorePrinter(object):
     def print_untested(self):
         """Print all the public member functions we will not test"""
         members = get_public_members(self.name)
-        tested = set(e[0] for e in self.object_members)
+        tested = {e[0] for e in self.object_members}
         for member in members:
             if member in tested:
                 continue
@@ -156,7 +155,7 @@ class DataStorePrinter(object):
         else:
             index = ""
 
-        print("%s%s:" % (self.name, index))
+        print(f"{self.name}{index}:")
 
         # loop over all defined member/argument combinations
         # and print "member(arguments): result" for each
@@ -186,7 +185,7 @@ class DataStorePrinter(object):
                     print("  " + display + ": ", end="")
                 else:
                     # otherwise just print name and arguments
-                    print("  %s(%s): " % (name, ",".join(map(str, args))), end="")
+                    print("  {}({}): ".format(name, ",".join(map(str, args))), end="")
                 # if a callback is set the callback is used to print the result
                 if callback is not None:
                     print("", end="", flush=True)
@@ -257,7 +256,7 @@ class DataStorePrinter(object):
                 self._printResult(e, depth + 1, weight=weight)
         # print floats with 6 valid digits
         elif isinstance(result, float):
-            print("%.6g%s" % (result, weight))
+            print(f"{result:.6g}{weight}")
         # print char as int
         elif isinstance(result, str) and len(result) == 1:
             print(ord(result), weight, sep="")

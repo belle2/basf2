@@ -46,8 +46,8 @@ class TestMbcEff(unittest.TestCase):
         allBkg = ntuple.GetEntries("isSignal == 0")
         allSig = ntuple.GetEntries("isSignal > 0")
 
-        print("True candidates {0}".format(allSig))
-        print("False candidates {0}".format(allBkg))
+        print(f"True candidates {allSig}")
+        print(f"False candidates {allBkg}")
 
         sig_expected = 136
         bkg_expected = 1630

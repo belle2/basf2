@@ -344,9 +344,14 @@ namespace Belle2 {
       StoreArray<CDCHit> m_CDCHits;
 
       /**
-       * Event number.
+       * True if data length error has been already reported.
        */
-      int m_eventNum;
+      bool m_dataLengthError;
+
+      /**
+       * True if data size error between CDCFE and COPPER has been already reported.
+       */
+      bool m_dataSizeError;
 
     };//end class declaration
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+# this is a test executable, not a module so we don't need doxygen warnings
+# @cond SUPPRESS_DOXYGEN
 
 """
 test parsing of local database files
@@ -19,7 +21,7 @@ dbstore/good 1 0,0,-1,-1
 dbstore/good_tabs\t1\t0,0,-1,-1
 dbstore/good_many_spaces              1\t\t\t\t\t\t\t0,1,2,3
 dbstore/good_with_comment 1 0,1,2,3 # comment
-dbstore/bad_revision revision 0,0,0,0
+dbstory/good_with_md5 0123456789ABCDEF 0,1,2,3
 dbstore/no_revision 0,1,2,3
 no_package 1 0,0,-1,-1
 dbstore/no_iov 1
@@ -66,3 +68,5 @@ with clean_working_directory():
         # and parse in C++
         storage = ROOT.Belle2.Conditions.TestingPayloadStorage(filename)
         run_in_subprocess(evt, payload, target=storage.get)
+
+# @endcond

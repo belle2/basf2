@@ -153,7 +153,7 @@ namespace Belle2 {
      */
     inline bool isStdChargedList()
     {
-      return (Const::chargedStableSet.find(m_pList->getPDGCode()) != Const::invalidParticle);
+      return (Const::chargedStableSet.find(abs(m_pList->getPDGCode())) != Const::invalidParticle);
     };
 
     /**

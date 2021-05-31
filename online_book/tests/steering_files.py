@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""" Extended version of analysis/test/examples.py. """
+"""
+Test all the steering files used in the online_book lessons.
+Proudly based on analysis/test/examples.py.
+"""
 
 # std
 import os
@@ -9,6 +12,7 @@ import sys
 import subprocess
 import unittest
 import glob
+import shutil
 from typing import Optional, List
 
 # basf2
@@ -28,6 +32,15 @@ def skip_expensive_tests() -> bool:
     ]
 
 
+def light_release() -> bool:
+    """ Returns true if we're in a light release """
+    try:
+        import generators  # noqa
+    except ModuleNotFoundError:
+        return True
+    return False
+
+
 class SteeringFileTest(unittest.TestCase):
     """ Test steering files """
 
@@ -37,7 +50,7 @@ class SteeringFileTest(unittest.TestCase):
         broken: Optional[List[str]] = None,
         additional_arguments: Optional[List[str]] = None,
         expensive_tests: Optional[List[str]] = None,
-        change_working_directory=True,
+        skip_in_light: Optional[List[str]] = None,
     ):
         """
         Internal function to test a directory full of example scripts with an
@@ -48,11 +61,12 @@ class SteeringFileTest(unittest.TestCase):
                 scripts (must end in .py)
             broken (list(str)): (optional) names of scripts that are known to
                 be broken and can be skipped
-            expensive_tests (list(str)): (optional) names of scripts that take
-                longer and should e.g. not run on bamboo
             additional_arguments (list(str)): (optional) additional arguments
                 for basf2 to be passed when testing the scripts
-            change_working_directory: Change to path_to_glob for execution
+            expensive_tests (list(str)): (optional) names of scripts that take
+                longer and should e.g. not run on bamboo
+            skip_in_light (list(str)): (optional) names of scripts that have to
+                be excluded in light builds
         """
         if additional_arguments is None:
             additional_arguments = []
@@ -60,13 +74,21 @@ class SteeringFileTest(unittest.TestCase):
             broken = []
         if expensive_tests is None:
             expensive_tests = []
-        working_dir = find_file(path_to_glob)
+        if skip_in_light is None:
+            skip_in_light = []
+        # we have to copy all the steering files (plus other stuffs, like decfiles) we want to test
+        # into a new directory and then cd it as working directory when subprocess.run is executed,
+        # otherwise the test will fail horribly if find_file is called by one of the tested steerings.
+        original_dir = find_file(path_to_glob)
+        working_dir = find_file(shutil.copytree(original_dir, 'working_dir'))
         all_egs = sorted(glob.glob(working_dir + "/*.py"))
         for eg in all_egs:
             filename = os.path.basename(eg)
             if filename in broken:
                 continue
-            if skip_expensive_tests and filename in expensive_tests:
+            if skip_expensive_tests() and filename in expensive_tests:
+                continue
+            if light_release() and filename in skip_in_light:
                 continue
             with self.subTest(msg=filename):
                 result = subprocess.run(
@@ -103,7 +125,12 @@ class SteeringFileTest(unittest.TestCase):
                 "065_generate_mc.py",
                 "067_generate_mc.py"
             ],
-            change_working_directory=True,
+            skip_in_light=[
+                "065_generate_mc.py",
+                "067_generate_mc.py",
+                "085_module.py",
+                "087_module.py"
+            ],
         )
 
 

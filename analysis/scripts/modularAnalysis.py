@@ -1,5 +1,4 @@
 # !/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 This module defines wrapper functions around the analysis modules.
@@ -2120,12 +2119,12 @@ def appendROEMask(list_name,
 
     - append a ROE mask with all tracks in ROE coming from the IP region
 
-       >>> appendROEMask('B+:sig', 'IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
+       >>> appendROEMask('B+:sig', 'IPtracks', '[dr < 2] and [abs(dz) < 5]', '')
 
     - append a ROE mask with only ECL-based particles that pass as good photon candidates
 
-       >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
-       >>> appendROEMask('B+:sig', 'goodROEGamma', '', good_photons)
+       >>> goodPhotons = 'inCDCAcceptance and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
+       >>> appendROEMask('B+:sig', 'goodROEGamma', '', goodPhotons)
 
 
     @param list_name             name of the input ParticleList
@@ -2154,10 +2153,10 @@ def appendROEMasks(list_name, mask_tuples, path=None):
 
     - Example for two tuples, one with and one without fractions
 
-       >>> ipTracks     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '', '')
-       >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
-       >>> goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', good_photons, '')
-       >>> goodROEKLM     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '', 'nKLMClusterTrackMatches == 0')
+       >>> ipTracks     = ('IPtracks', '[dr < 2] and [abs(dz) < 5]', '', '')
+       >>> goodPhotons = 'inCDCAcceptance and [clusterErrorTiming < 1e6] and [clusterE1E9 > 0.4 or E > 0.075]'
+       >>> goodROEGamma = ('ROESel', '[dr < 2] and [abs(dz) < 5]', goodPhotons, '')
+       >>> goodROEKLM     = ('IPtracks', '[dr < 2] and [abs(dz) < 5]', '', 'nKLMClusterTrackMatches == 0')
        >>> appendROEMasks('B+:sig', [ipTracks, goodROEGamma, goodROEKLM])
 
     @param list_name             name of the input ParticleList
@@ -2693,7 +2692,6 @@ def writePi0EtaVeto(
                 if renameSuffix:
                     break
                 for submodule in subpath.modules():
-                    print(submodule.name())
                     if f'{hardParticle}:HardPhoton{suffix}' in submodule.name():
                         suffix += '_0'
                         B2WARNING("Same extension already used in writePi0EtaVeto, append '_0'")
@@ -2715,15 +2713,15 @@ def writePi0EtaVeto(
                         'cluster': '[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
                         'both': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]'}
 
-    dictEtaEnergyCut = {'standard': '[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]',
-                        'tight': '[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]',
-                        'cluster': '[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]',
-                        'both': '[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]'}
+    dictEtaEnergyCut = {'standard': '[[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]]',
+                        'tight': '[[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]]',
+                        'cluster': '[[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]]',
+                        'both': '[[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]]'}
 
-    dictTimingAndNHitsCut = {'standard': 'abs(clusterTiming)<clusterErrorTiming',
-                             'tight': 'abs(clusterTiming)<clusterErrorTiming',
-                             'cluster': 'abs(clusterTiming)<clusterErrorTiming and clusterNHits >= 2',
-                             'both': 'abs(clusterTiming)<clusterErrorTiming and clusterNHits >= 2'}
+    dictNHitsCut = {'standard': 'clusterNHits >= 0',
+                    'tight': 'clusterNHits >= 0',
+                    'cluster': 'clusterNHits >= 2',
+                    'both': 'clusterNHits >= 2'}
 
     dictPi0PayloadName = {'standard': 'Pi0VetoIdentifierStandard',
                           'tight': 'Pi0VetoIdentifierWithHigherEnergyThreshold',
@@ -2748,7 +2746,8 @@ def writePi0EtaVeto(
     ListName = dictListName[mode]
     Pi0EnergyCut = dictPi0EnergyCut[mode]
     EtaEnergyCut = dictEtaEnergyCut[mode]
-    TimingAndNHitsCut = dictTimingAndNHitsCut[mode]
+    TimingCut = 'abs(clusterTiming)<clusterErrorTiming'
+    NHitsCut = dictNHitsCut[mode]
     Pi0PayloadName = dictPi0PayloadName[mode]
     EtaPayloadName = dictEtaPayloadName[mode]
     Pi0ExtraInfoName = dictPi0ExtraInfoName[mode]
@@ -2760,7 +2759,11 @@ def writePi0EtaVeto(
     if pi0PayloadNameOverride is not None:
         Pi0PayloadName = pi0PayloadNameOverride
     if pi0SoftPhotonCutOverride is None:
-        Pi0SoftPhotonCut = Pi0EnergyCut + ' and ' + TimingAndNHitsCut
+        Pi0SoftPhotonCut = Pi0EnergyCut + ' and ' + NHitsCut
+        import b2bii
+        if not b2bii.isB2BII():
+            # timing cut is only valid for Belle II but not for B2BII
+            Pi0SoftPhotonCut += ' and ' + TimingCut
     else:
         Pi0SoftPhotonCut = pi0SoftPhotonCutOverride
 
@@ -2786,7 +2789,11 @@ def writePi0EtaVeto(
     if etaPayloadNameOverride is not None:
         EtaPayloadName = etaPayloadNameOverride
     if etaSoftPhotonCutOverride is None:
-        EtaSoftPhotonCut = EtaEnergyCut + ' and ' + TimingAndNHitsCut
+        EtaSoftPhotonCut = EtaEnergyCut + ' and ' + NHitsCut
+        import b2bii
+        if not b2bii.isB2BII():
+            # timing cut is only valid for Belle II but not for B2BII
+            EtaSoftPhotonCut += ' and ' + TimingCut
     else:
         EtaSoftPhotonCut = etaSoftPhotonCutOverride
 
@@ -3032,18 +3039,42 @@ def buildEventShape(inputListNames=None,
     path.add_module(eventShapeModule)
 
 
-def labelTauPairMC(printDecayInfo=False, path=None):
+def labelTauPairMC(printDecayInfo=False, path=None, TauolaBelle=False, mapping_minus=None, mapping_plus=None):
     """
     Search tau leptons into the MC information of the event. If confirms it's a generated tau pair decay,
     labels the decay generated of the positive and negative leptons using the ID of KKMC tau decay table.
 
     @param printDecayInfo:  If true, prints ID and prong of each tau lepton in the event.
     @param path:        module is added to this path
+    @param TauolaBelle: if False, TauDecayMarker is set. If True, TauDecayMode is set.
+    @param mapping_minus: if None, the map is the default one, else the path for the map is given by the user for tau-
+    @param mapping_plus: if None, the map is the default one, else the path for the map is given by the user for tau+
     """
-    tauDecayMarker = register_module('TauDecayMarker')
-    tauDecayMarker.set_name('TauDecayMarker_')
+    from basf2 import find_file
+    if not TauolaBelle:
 
-    path.add_module(tauDecayMarker, printDecayInfo=printDecayInfo)
+        if printDecayInfo:
+            m_printmode = 'all'
+        else:
+            m_printmode = 'default'
+
+        if mapping_minus is None:
+            mp_file_minus = find_file('data/analysis/modules/TauDecayMode/map_tauminus.txt')
+        else:
+            mp_file_minus = mapping_minus
+
+        if mapping_plus is None:
+            mp_file_plus = find_file('data/analysis/modules/TauDecayMode/map_tauplus.txt')
+        else:
+            mp_file_plus = mapping_plus
+
+        path.add_module('TauDecayMode', printmode=m_printmode, file_minus=mp_file_minus, file_plus=mp_file_plus)
+
+    else:
+        tauDecayMarker = register_module('TauDecayMarker')
+        tauDecayMarker.set_name('TauDecayMarker_')
+
+        path.add_module(tauDecayMarker, printDecayInfo=printDecayInfo)
 
 
 def tagCurlTracks(particleLists,
@@ -3352,16 +3383,54 @@ def scaleError(outputListName, inputListName,
     path.add_module(scale_error)
 
 
-def getAnalysisGlobaltag():
+def correctEnergyBias(inputListNames, tableName, path=None):
+    """
+    Scale energy of the particles according to the scaling factor.
+    If the particle list contains composite particles, the energy of the daughters are scaled.
+    Subsequently, the energy of the mother particle is updated as well.
+
+    Parameters:
+        inputListNames (list(str)): input particle list names
+        tableName : stored in localdb and created using ParticleWeightingLookUpCreator
+        path (basf2.Path): module is added to this path
+    """
+
+    correctenergybias = register_module('EnergyBiasCorrection')
+    correctenergybias.param('particleLists', inputListNames)
+    correctenergybias.param('tableName', tableName)
+    path.add_module(correctenergybias)
+
+
+def getAnalysisGlobaltag(timeout=180) -> str:
     """
     Returns a string containing the name of the latest and recommended analysis globaltag.
+
+    Parameters:
+        timeout: Seconds to wait for b2conditionsdb-recommend
     """
-    tags = subprocess.check_output(['b2conditionsdb-recommend', '--oneline']).decode('UTF-8').rstrip().split(' ')
-    analysis_tag = ''
-    for tag in tags:
-        if tag.startswith('analysis_tools'):
-            analysis_tag = tag
-    return analysis_tag
+    # b2conditionsdb-recommend relies on a different repository, so it's better to protect
+    # this function against potential failures of check_output.
+    try:
+        tags = subprocess.check_output(
+            ['b2conditionsdb-recommend', '--oneline'],
+            timeout=timeout
+        ).decode('UTF-8').rstrip().split(' ')
+        analysis_tag = ''
+        for tag in tags:
+            if tag.startswith('analysis_tools'):
+                analysis_tag = tag
+        return analysis_tag
+    # In case of issues with git, b2conditionsdb-recommend may take too much time.
+    except subprocess.TimeoutExpired as te:
+        B2FATAL(f'A {te} exception was raised during the call of getAnalysisGlobalTag(). '
+                'The function took too much time to retrieve the requested information '
+                'from the versioning repository.\n'
+                'Plase try to re-run your job. In case of persistent failures, there may '
+                'be issues with the DESY collaborative services, so please contact the experts.')
+    except subprocess.CalledProcessError as ce:
+        B2FATAL(f'A {ce} exception was raised during the call of getAnalysisGlobalTag(). '
+                'Please try to re-run your job. In case of persistent failures, please contact '
+                'the experts.')
 
 
 if __name__ == '__main__':

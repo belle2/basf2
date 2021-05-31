@@ -15,20 +15,19 @@ import math
 
 
 #: Tells the automated system some details of this script
-settings = ValidationSettings(name='ARICH channel mask',
+settings = ValidationSettings(name='ARICH channel masks',
                               description=__doc__,
                               download_files=['stdout'],
                               expert_config={"chunk_size": 100})
 
 
-def run_validation(job_path, input_data_path, requested_iov, expert_config, **kwargs):
+def run_validation(job_path, input_data_path, requested_iov, expert_config):
     '''
     Run the validation.
-
     '''
 
-    # TODO: replace it with an expert dictionary when it will be possible.
-    chunk_size = 100
+    expert_config = json.loads(expert_config)
+    chunk_size = expert_config["chunk_size"]
 
     # Ignore the ROOT command line options.
     ROOT.PyConfig.IgnoreCommandLineOptions = True  # noqa

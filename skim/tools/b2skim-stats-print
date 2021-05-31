@@ -30,13 +30,14 @@ import argparse
 from functools import lru_cache
 from itertools import product
 import json
+import numpy as np
 import os
 import pandas as pd
 from pathlib import Path
 import re
-import subprocess
 import sys
 from textwrap import wrap
+import warnings
 
 from basf2 import B2WARNING, B2ERROR
 from basf2.utils import pretty_print_table
@@ -154,7 +155,7 @@ def getArgumentParser():
     parser.add_argument(
         "--mccampaign",
         default="MC13",
-        choices=["MC12", "MC13"],
+        choices=["MC12", "MC13", "MC14"],
         help="The MC campaign to test on.",
     )
 
@@ -334,7 +335,9 @@ def nSkimmedEvents(skim, sample, TestingCombined):
         outputFileInfo["stats"]["events"] for outputFileInfo in outputFileInfoList
     ]
 
-    return max(eventNumberList)
+    if len(eventNumberList) == 1:
+        return eventNumberList[0]
+    return np.array(eventNumberList)
 
 
 def udstSize(skim, sample, TestingCombined):
@@ -357,7 +360,9 @@ def udstSize(skim, sample, TestingCombined):
         outputFileInfo["stats"]["filesize_kib"] for outputFileInfo in outputFileInfoList
     ]
 
-    return max(udstSizeList)
+    if len(udstSizeList) == 1:
+        return udstSizeList[0]
+    return np.array(udstSizeList)
 
 
 def inputFileSize(skim, sample, TestingCombined):
@@ -625,11 +630,21 @@ def getAllSamples(mcCampaign):
         f"{mcCampaign}_taupairBGx0": f"{mcCampaign}: taupair BGx0",
     }
 
+    mcCampaignNumber = int(re.search(r"\d+", mcCampaign).group())
+    # TODO: Temporary workaround while only some MC14 samples are available on KEKCC
+    if mcCampaignNumber == 14:
+        mcSampleLabels = {k: v for (k, v) in mcSampleLabels.items() if k.endswith("BGx1")}
+        mcSampleLabels.update(
+            {
+                f"{mcCampaign}_ggBGx1": f"{mcCampaign}: gg BGx1",
+                f"{mcCampaign}_mumuBGx1": f"{mcCampaign}: mumu BGx1",
+                f"{mcCampaign}_eeeeBGx1": f"{mcCampaign}: eeee BGx1",
+            }
+        )
     # For MC13 the low mult test samples exist (but they don't for MC12
     # and older) so here is a hack.
     # TODO: remove once when we regularly add the same low mult samples
-    mcCampaignNumber = int(re.search(r"\d+", mcCampaign).group())
-    if mcCampaignNumber > 12:
+    elif mcCampaignNumber > 12:
         mcSampleLabels.update(
             {
                 f"{mcCampaign}_ggBGx1": f"{mcCampaign}: gg BGx1",
@@ -1149,8 +1164,17 @@ def printToJson(
     }
 
     OutputFilename = Path(OutputFilename).with_suffix(".json")
+
+    class NumpyEncoder(json.JSONEncoder):
+        """JSON encoder for numpy arrays."""
+        def default(self, obj):
+            if isinstance(obj, np.ndarray):
+                return obj.tolist()
+            return json.JSONEncoder.default(self, obj)
+
+    dumped = json.dumps(OutputDict, cls=NumpyEncoder, indent=2)
     with open(OutputFilename, "w") as outputJson:
-        json.dump(OutputDict, outputJson, indent=2)
+        outputJson.write(dumped)
     print(f"Wrote stats to JSON file {OutputFilename}")
 
 
@@ -1430,6 +1454,8 @@ def printToMarkdown(
 
 
 if __name__ == "__main__":
+    warnings.filterwarnings("ignore", "divide by zero encountered in true_divide")
+
     parser = getArgumentParser()
     args = parser.parse_args()
 
@@ -1452,7 +1478,8 @@ if __name__ == "__main__":
     )
 
     beamBackgrounds = ["BGx1", "BGx0"]
-    if not args.dataonly:
+    # NOTE: can't calculate weighted MC averages for combined skims, since certain stats are lists
+    if not args.dataonly and not args.combined:
         allSkimStats = addWeightedMC(
             allSkimStats, statSpecifier, args.mccampaign, beamBackgrounds, args.VERBOSE
         )

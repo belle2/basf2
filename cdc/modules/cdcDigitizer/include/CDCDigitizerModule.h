@@ -110,6 +110,9 @@ namespace Belle2 {
     //    unsigned short getADCCount(unsigned short layer, unsigned short cell, double edep, double dx, double costh);
     unsigned short getADCCount(const WireID& wid, double edep, double dx, double costh);
 
+    /** Modify t0 for negative-t0 case */
+    double getPositiveT0(const WireID&);
+
     /** Set FEE parameters (from DB) */
     void setFEElectronics();
 
@@ -193,6 +196,7 @@ namespace Belle2 {
     bool m_output2ndHit;         /**< A switch to output 2nd hit */
     bool m_align;             /**< A switch to control alignment */
     bool m_correctForWireSag;    /**< A switch to control wire sag */
+    bool m_treatNegT0WiresAsGood;    /**< A switch for negative-t0 wires */
 //    float m_eventTime;         /**< It is a timing of event, which includes a time jitter due to the trigger system */
 
     bool m_useDB4FEE;             /**< Fetch FEE params from DB */

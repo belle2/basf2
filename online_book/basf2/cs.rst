@@ -94,8 +94,8 @@ while taking into account which particles belong to our signal reconstruction.
 
 .. warning::
 
-    In addition to the :ref:`Continuum Suppression Module <ContinuumSuppression>`
-    we will be using in this exercise, there is also the :ref:`Event Shape Framework <EventShape>` in
+    In addition to the :ref:`analysis_continuumsuppression` tools that
+    we will be using in this exercise, there is also the :ref:`analysis_eventshape` framework in
     basf2 which calculates similar properties to the Continuum Suppression module.
     However, this does not use candidate-based analysis and is not designed for Continuum Suppression.
 

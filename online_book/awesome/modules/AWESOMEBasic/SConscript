@@ -1,0 +1,10 @@
+Import('env')
+
+#These are the libraries the module has to be linked against
+env['LIBS'] = ['online_book_awesome_dataobjects',
+               'framework',
+               'mdst_dataobjects',
+               '$ROOT_LIBS',
+              ]
+
+Return('env')

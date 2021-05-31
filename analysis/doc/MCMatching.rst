@@ -264,6 +264,51 @@ The mapping of hashes to full MC decay strings is stored in a ROOT file determin
 
 Then the variables ``extraInfo(decayHash)`` and ``extraInfo(decayHashExtended)`` are available in the `VariableManager`.
 
+.. _GeneratedDecayModes:
+
+---------------------
+Generated decay modes
+---------------------
+
+A tool has been developed which analyzes the array of MC particles and determines the generated decay mode of the event.
+
+A total of 825 :math:`B^+` decay modes have been defined:
+
+  * The first 80 numbers are semi-leptonic decays (:math:`B^+ \to h l^+ \nu_l`), e.g.
+  
+     * 1001: :math:`B^+ \to \bar{D^{*0}} e^+ \nu_e`
+     * 1002: :math:`B^+ \to \bar{D^0} e^+ \nu_e`
+     * 1003: :math:`B^+ \to \bar{D_1^0} e^+ \nu_e`
+  * The numbers 1085 to 1092 are radiative decays.
+  * There are 17 :math:`B^+ \to X l^+ l^-` decay modes.
+  * The numbers 1113 to 1608 are hadronic charmless decays.
+  * Then there are 70 charmonium decays with :math:`J/\psi`, :math:`\Psi(2S)`, :math:`\eta_c`, etc.
+  * This is followed by decays involving two or one charm meson.
+  * The last 17 decay modes involve baryons.
+
+The same number of :math:`B^-` decay modes have been implemented. They have negative tags.
+
+.. b2-variables::
+   :variables: BplusMode,BminusMode
+
+The same general structure is used for the 1000 :math:`B^0` and :math:`\bar{B^0}` modes accessible via the variables
+
+.. b2-variables::
+   :variables: B0Mode,Bbar0Mode
+
+For :math:`B_s^0` and :math:`\bar{B_s^0}` a total of 264 decay have been defined.
+
+.. b2-variables::
+   :variables: Bs0Mode,Bsbar0Mode
+
+Besides the B meson decays three :math:`D^{*\pm}`, 84 :math:`D_s^\pm`, 84 :math:`D^\pm`, and 136 :math:`D^0` charm meson decays are implemented.
+For each category the tag number starts again at 1001.
+
+.. b2-variables::
+   :variables: DstplusMode,DstminusMode,DsplusMode,DsminusMode,DplusMode,DminusMode,D0Mode,Dbar0Mode
+
+The full list of all decay modes can be found in the technical Belle note `BELLE2-NOTE-TE-2021-002 <https://docs.belle2.org/record/2215/files/BELLE2-NOTE-TE-2021-002.pdf>`_.
+
 .. _TauDecayMCModes:
 
 ------------------
@@ -278,13 +323,13 @@ A special case is the decay of generated tau lepton pairs. For their study, it i
         labelTauPairMC()
 
 .. b2-variables::
-        :variables: tauPlusMcMode,tauMinusMcMode,tauPlusMCProng,tauMinusMCProng
+        :variables: tauPlusMCMode,tauMinusMCMode,tauPlusMCProng,tauMinusMCProng
 
-Using MC information, ``labelTauPairMC`` identifies if the generated event is a tau pair decay.
+Using MC information, `labelTauPairMC` identifies if the generated event is a tau pair decay.
 
-The variables ``tauPlusMCProng`` and ``tauMinusMCProng`` stores the prong (number of final state charged particles) coming from each one of the generated tau leptons. If the event is not a tau pair decay, the value in each one of these variables will be 0.
+The variables `tauPlusMCProng` and `tauMinusMCProng` store the prong (number of final state charged particles) coming from each one of the generated tau leptons. If the event is not a tau pair decay, the value in each one of these variables will be 0.
 
-The channel number will be stored in the variables ``tauPlusMcMode``, and ``tauMinusMcMode`` (one for the positive and the other for the negative) according to the following table:
+The channel number will be stored in the variables `tauPlusMCMode`, and `tauMinusMCMode` (one for the positive and the other for the negative) according to the following table:
 
 ============  ===============================================  ============  ==================================================
 MC mode       Decay channel                                    MC mode       Decay channel

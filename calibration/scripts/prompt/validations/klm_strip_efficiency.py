@@ -13,7 +13,7 @@ import sys
 import subprocess
 import math
 import os
-
+import json
 
 #: Tells the automated system some details of this script
 settings = ValidationSettings(name='KLM strip efficiency',
@@ -51,7 +51,7 @@ def save_graph_to_pdf(canvas, root_file, graph_name, exp, chunk):
     canvas.SaveAs(f'efficiency_exp{exp}_chunk{chunk}_{graph_name}.pdf')
 
 
-def run_validation(job_path, input_data_path, requested_iov, expert_config, **kwargs):
+def run_validation(job_path, input_data_path, requested_iov, expert_config):
     '''
     Run the validation.
     Nota bene:
@@ -60,7 +60,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     '''
 
     # Grab the expert configurations.
-    expert_config = kwargs.get('expert_config')
+    expert_config = json.loads(expert_config)
     chunk_size = expert_config['chunk_size']
 
     # Ignore the ROOT command line options.

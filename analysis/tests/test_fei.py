@@ -231,7 +231,7 @@ class TestFSPLoader(unittest.TestCase):
         path.add_module('ParticleLoader', decayStrings=['K_S0:V0 -> pi+ pi-'], writeOut=True)
         path.add_module('ParticleLoader', decayStrings=['Lambda0:V0 -> p+ pi-'], writeOut=True)
         path.add_module('ParticleLoader', decayStrings=['gamma:V0 -> e+ e-'], addDaughters=True, writeOut=True)
-        hist_variables = [('NumberOfMCParticlesInEvent({i})'.format(i=pdgcode), 100, -0.5, 99.5)
+        hist_variables = [(f'NumberOfMCParticlesInEvent({pdgcode})', 100, -0.5, 99.5)
                           for pdgcode in set([11, 321, 211, 13, 22, 310, 2212, 130, 3122, 111])]
         path.add_module('VariablesToHistogram', particleList='',
                         variables=hist_variables,
@@ -291,7 +291,7 @@ class TestFSPLoader(unittest.TestCase):
         path.add_module('ParticleCopier', inputListNames=['pi0:FSP'])
         path.add_module('ParticleListManipulator', outputListName='gamma:V0', inputListNames=['gamma:v0mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['gamma:V0'])
-        hist_variables = [('NumberOfMCParticlesInEvent({i})'.format(i=pdgcode), 100, -0.5, 99.5)
+        hist_variables = [(f'NumberOfMCParticlesInEvent({pdgcode})', 100, -0.5, 99.5)
                           for pdgcode in set([11, 321, 211, 13, 22, 310, 2212, 130, 3122, 111])]
         path.add_module('VariablesToHistogram', particleList='',
                         variables=hist_variables,
@@ -1020,11 +1020,11 @@ class TestGetPath(unittest.TestCase):
         f.cd()
 
         for pdgnumber in set([abs(pdg.from_name(particle.name)) for particle in particles]):
-            hist = ROOT.TH1F("NumberOfMCParticlesInEvent__bo{}__bc".format(pdgnumber),
-                             "NumberOfMCParticlesInEvent__bo{}__bc".format(pdgnumber), 11, -0.5, 10.5)
+            hist = ROOT.TH1F(f"NumberOfMCParticlesInEvent__bo{pdgnumber}__bc",
+                             f"NumberOfMCParticlesInEvent__bo{pdgnumber}__bc", 11, -0.5, 10.5)
             for i in range(10):
                 hist.Fill(5)
-            f.Write("NumberOfMCParticlesInEvent__bo{}__bc".format(pdgnumber))
+            f.Write(f"NumberOfMCParticlesInEvent__bo{pdgnumber}__bc")
 
     def tearDown(self):
         if os.path.isfile('mcParticlesCount.root'):

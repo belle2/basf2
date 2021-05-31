@@ -28,11 +28,12 @@ REG_MODULE(SVDDQMInjection)
 SVDDQMInjectionModule::SVDDQMInjectionModule() : HistoModule() , m_vxdGeometry(VXD::GeoCache::getInstance())
 {
   //Set module properties
-  setDescription("Monitor SVD Occupancy after Injection");
+  setDescription("Monitor SVD Occupancy after Injection.");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed.",
            std::string("SVDInjection"));
-  addParam("ShaperDigits", m_SVDShaperDigitsName, "Name of SVD ShaperDigits to count occupancy", std::string(""));
+  addParam("ShaperDigits", m_SVDShaperDigitsName, "Name of SVD ShaperDigits to count occupancy - usually ZS5 strips.",
+           std::string(""));
 }
 
 void SVDDQMInjectionModule::defineHisto()

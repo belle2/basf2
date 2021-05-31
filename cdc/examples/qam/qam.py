@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from ROOT import TCanvas, TFile, TFile
+from ROOT import TCanvas, TFile
 import argparse
 
 

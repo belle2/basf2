@@ -5,7 +5,7 @@ import basf2 as b2
 import os
 from simulation import add_simulation
 from optparse import OptionParser
-from L1trigger import add_tsim
+from L1trigger import add_trigger_simulation
 from reconstruction import add_cdst_output, add_reconstruction
 import glob
 
@@ -85,18 +85,22 @@ generatorpreselection.if_value('!=11', empty)
 
 # components = ['PXD', 'SVD', 'CDC']
 
+
 # detector simulation (still use background mixing)
 # add_simulation(main, components=components, bkgfiles=background_files, bkgOverlay=True)
 # add_simulation(main, components=components)
-add_simulation(main, None, bkgfiles=background_files, bkgOverlay=True)
+
+# add simulation but remove L1 trigger simulation
+allowed_components = ['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM']
+add_simulation(main, components=allowed_components, bkgfiles=background_files, bkgOverlay=True)
 
 # ARICH digitization
 arich_digitizer = b2.register_module('ARICHDigitizer')
 arich_digitizer.param('MagneticFieldDistorsion', 1)
 main.add_module(arich_digitizer)
 
-# add_tsim(main)
-add_tsim(main, shortTracks=True, Belle2Phase="Phase2")
+# L1 trigger simulation
+add_trigger_simulation(main, shortTracks=True, Belle2Phase="Phase2")
 
 # tracking
 # add_tracking_reconstruction(main)

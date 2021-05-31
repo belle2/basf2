@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 from string import Formatter
 from pathlib import Path
@@ -95,7 +94,7 @@ def decayDescriptor(decay_string):
     tex_string = decay_string
     for (key, value) in substitutes:
         tex_string = tex_string.replace(key, value)
-    return '\\texorpdfstring{%s}{%s}' % (tex_string, string(decay_string))
+    return '\\texorpdfstring{{{}}}{{{}}}'.format(tex_string, string(decay_string))
 
 
 def duration(seconds):

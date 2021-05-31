@@ -43,7 +43,7 @@ REG_MODULE(DQMHistAnalysisSVDOnMiraBelle)
 DQMHistAnalysisSVDOnMiraBelleModule::DQMHistAnalysisSVDOnMiraBelleModule()
   : DQMHistAnalysisModule()
 {
-  setDescription("Extract monitoring variables from SVD DQM histograms");
+  setDescription("DQM Analysis Module that extracts monitoring variables from SVD DQM histograms and provides input to MiraBelle.");
   setPropertyFlags(c_ParallelProcessingCertified);
   B2DEBUG(20, "DQMHistAnalysisSVDOnMiraBelle: Constructor done.");
 }

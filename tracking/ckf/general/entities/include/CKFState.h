@@ -123,6 +123,8 @@ namespace Belle2 {
     struct stateCache {
       /// Is this state based on a hit (=SpacePoint) or a seed (=RecoTrack)
       bool isHitState = false;
+      /// getPtOfSeed (if seed state)
+      double ptSeed = 0.;
       /// VxdID of this state, only set if based on SpacePoint
       VxdID sensorID = VxdID(0);
       /// Geometrical Layer this state is based on. Will be set to the SVD layer number if it's a state based on a SpacePoint, to an artificial layer else by using getGeometricalLayer()

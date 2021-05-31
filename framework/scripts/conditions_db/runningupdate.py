@@ -8,8 +8,8 @@ necessary updates for a running globaltag
 from enum import Enum
 from collections import defaultdict
 from basf2 import B2ERROR, B2WARNING, B2INFO  # noqa
-from . import ConditionsDB
-from .iov import IntervalOfValidity, IoVSet
+from conditions_db import ConditionsDB
+from conditions_db.iov import IntervalOfValidity, IoVSet
 
 
 class RunningTagUpdateMode(Enum):
@@ -63,8 +63,18 @@ class RunningTagUpdater:
     6. Close all payloads to be updated in the running tag that are open just
        before the validity in the staging tag.
     """
-    #: Initialize the class.
-    def __init__(self, db, running, staging, valid_from, mode):
+    def __init__(self, db, running, staging, valid_from, mode, dry_run=False):
+        """Initialize the class
+
+        Arguments:
+            db (ConditionsDB): reference to the database object
+            running (str): name of the running tag
+            stagin (str): name of the staging tag
+            valid_from (tuple(int,int)): first valid exp,run
+            mode (RunningTagUpdateMode): the mode of the update
+            dry_run (bool): If true only check, don't do anything.
+                But be more lenient with globaltag state of staging.
+        """
         #: Reference to the database object to use for queries
         self._db = db
 
@@ -76,6 +86,9 @@ class RunningTagUpdater:
         except Exception as e:
             raise RunningTagUpdaterError("No first valid run for the update specified", error=str(e)) from e
 
+        #: If we're in dry run mode be less critical about globaltag states
+        #  (just show warnings) but refuse to do any actual update
+        self._dry_run = dry_run
         #: First valid run for the update
         self._valid_from = valid_from
 
@@ -127,6 +140,9 @@ class RunningTagUpdater:
             raise RunningTagUpdaterError(f"Globaltag '{tagname}' cannot be found")
         state = taginfo['globalTagStatus']['name'].upper()
         if state != required.upper():
+            if self._dry_run:
+                B2WARNING(f"Globaltag '{tagname}' not in {required.upper()} state, continuing to display changes")
+                return
             raise RunningTagUpdaterError(f"Globaltag '{tagname}' not in {required.upper()} state", state=state)
 
     def _check_all(self):
@@ -150,6 +166,7 @@ class RunningTagUpdater:
             "payloads start after first valid run": 0,
             "payloads end after first valid run": 0
         }
+        earliest_valid_from = (0, 0)
         for p in payloads:
             iov = IntervalOfValidity(p.iov)
             # starting of a validity is simple ... it needs to be below the first valid run
@@ -162,6 +179,14 @@ class RunningTagUpdater:
                 B2ERROR(f"Payload in running tag '{tagname}' ends after first valid run",
                         payload=p.name, iov=p.iov, **{"first valid run": self._valid_from})
                 errors["payloads end after first valid run"] += 1
+
+            earliest_valid_from = max(earliest_valid_from, iov.first)
+            if iov.final != IntervalOfValidity.always().final:
+                earliest_valid_from = max(earliest_valid_from, iov.final)
+
+        if self._dry_run:
+            B2INFO("Earliest possible update of the running tag would be exp "
+                   f"{earliest_valid_from[0]}, run {earliest_valid_from[1] + 1}")
 
         # show errors if we have any ...
         if any(errors.values()):
@@ -350,6 +375,9 @@ class RunningTagUpdater:
             This action cannot be undone, only call it after checking the
             operations returned by the calculation of the update
         """
+        if self._dry_run:
+            raise RunningTagUpdaterError("Called in dry-run mode, refusing to cooperate")
+
         if self._operations is None:
             raise RunningTagUpdaterError("Update needs to be calculated first")
 

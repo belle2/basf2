@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """\
 Utility to measure the memory consumption of a process hierarchy on Linux.
@@ -55,7 +54,6 @@ processes into account. Swap is the amount of memory swapped out.
 
 # we want to print some stuff to sys.stderr and the print function makes this
 # much easier
-from __future__ import print_function
 import os
 import sys
 import re
@@ -118,7 +116,7 @@ def get_argument_parser():
     return parser
 
 
-class IntervalTimer(object):
+class IntervalTimer:
     """
     Class to run code in fixed intervals.
     This class allows to wait until a certain time is passed since the last
@@ -220,7 +218,7 @@ def get_memory_usage(pid):
                         break
 
         return sizes
-    except IOError:
+    except OSError:
         # IOError can happen if the process ends while reading, return 0 then
         return np.zeros(ntypes)
 
@@ -230,7 +228,7 @@ def get_cmdline(pid):
     try:
         args = open("/proc/%s/cmdline" % pid).read().strip("\0").split("\0")
         return " ".join(args)
-    except IOError:
+    except OSError:
         return ""
 
 
@@ -329,7 +327,7 @@ if __name__ == "__main__":
         try:
             f = open(options.profile, "wb")
             f.close()
-        except IOError:
+        except OSError:
             print("specified profile file could not be opened for writing",
                 file=sys.stderr)
             sys.exit(1)
@@ -386,7 +384,7 @@ if __name__ == "__main__":
         try:
             child = subprocess.Popen(args, stdout=subprocess.PIPE)
         except OSError as e:
-            print("Problem running '%s': %s" % (" ".join(args), e),
+            print("Problem running '{}': {}".format(" ".join(args), e),
                   file=sys.stderr)
             sys.exit(1)
         # we want to check the output for process spawn messages but we don't want
@@ -569,7 +567,7 @@ if __name__ == "__main__":
     digits = [max(map(len, v)) for v in values]
 
     # now print execution time
-    print("{0:20}: {1:.2f} sec".format("execution time", total_memory[:, 0].max()),
+    print("{:20}: {:.2f} sec".format("execution time", total_memory[:, 0].max()),
           file=sys.stderr)
     # then memory consumption
     for i, (name, field) in enumerate(memory_types):

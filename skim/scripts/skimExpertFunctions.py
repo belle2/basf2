@@ -630,7 +630,7 @@ class BaseSkim(ABC):
         If no sample can be found, an empty list is returned.
         """
         try:
-            return [get_test_file(process=self.TestSampleProcess)]
+            return [str(get_test_file(process=self.TestSampleProcess))]
         except FileNotFoundError:
             # Could not find TestFiles.yaml
             # (Don't issue a warning, since this will just show up as noise during grid processing)

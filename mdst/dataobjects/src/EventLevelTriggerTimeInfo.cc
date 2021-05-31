@@ -7,20 +7,20 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <mdst/dataobjects/TTDEventInfo.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 using namespace Belle2;
 
 // get time since the last injection in microseconds
-Double_t TTDEventInfo::getTimeSinceLastInjectionInMicroSeconds()
+double EventLevelTriggerTimeInfo::getTimeSinceLastInjectionInMicroSeconds()
 {
   // GlobalClockFrequency is in GHz, so we need an additional factor to convert to microseconds
-  return ((Double_t)m_timeSinceLastInjection) / (m_clockSettings->getGlobalClockFrequency() * 1e3);
+  return ((double)m_timeSinceLastInjection) / (m_clockSettings->getGlobalClockFrequency() * 1e3);
 }
 
 // get time since the previous trigger in microseconds
-Double_t TTDEventInfo::getTimeSincePrevTriggerInMicroSeconds()
+double EventLevelTriggerTimeInfo::getTimeSincePrevTriggerInMicroSeconds()
 {
   // GlobalClockFrequency is in GHz, so we need an additional factor to convert to microseconds
-  return ((Double_t)m_timeSincePrevTrigger) / (m_clockSettings->getGlobalClockFrequency() * 1e3);
+  return ((double)m_timeSincePrevTrigger) / (m_clockSettings->getGlobalClockFrequency() * 1e3);
 }

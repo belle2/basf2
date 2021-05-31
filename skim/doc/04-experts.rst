@@ -339,7 +339,7 @@ This will read the output files of the test jobs, and produce tables of statisti
    :nogroupsections:
 
 
-.. _b2skim-stats-custom-samples
+.. _b2skim-stats-custom-samples:
 
 Running ``b2skim-stats`` tools on custom samples
 ................................................

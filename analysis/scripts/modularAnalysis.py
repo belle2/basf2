@@ -163,7 +163,7 @@ def outputMdst(filename, path):
 
     .. warning::
 
-        This functon is kept for backward-compatibility.
+        This function is kept for backward-compatibility.
         Better to use `mdst.add_mdst_output` directly.
 
     """
@@ -873,7 +873,7 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
     Note:
         For "K_S0" and "Lambda0" you must specify the daughter ordering.
 
-    For example, to load V0s as :math:`\\Lambda^0\\to p^+\\pi^-` decays from V0ss:
+    For example, to load V0s as :math:`\\Lambda^0\\to p^+\\pi^-` decays from V0s:
 
     .. code-block:: python
 
@@ -3305,16 +3305,16 @@ def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):
       >>>calculateDistance('list_name', 'decay_string', "mode", path=user_path)
 
     @param list_name              name of the input ParticleList
-    @param decay_string           select particles between the distance of closest approch will be calculated
+    @param decay_string           select particles between the distance of closest approach will be calculated
     @param mode                   Specifies how the distance is calculated
-                                  vertextrack: calculate the distance of closest appreach between a track and a\
+                                  vertextrack: calculate the distance of closest approach between a track and a\
                                    vertex, taking the first candidate as vertex, default
-                                  trackvertex: calculate the distance of closest appreach between a track and a\
+                                  trackvertex: calculate the distance of closest approach between a track and a\
                                    vertex, taking the first candidate as track
-                                  2tracks: calculates the distance of closest appreach between two tracks
+                                  2tracks: calculates the distance of closest approach between two tracks
                                   2vertices: calculates the distance between two vertices
-                                  vertexbtube: calculates the distance of closest appreach between a vertex and btube
-                                  trackbtube: calculates the distance of closest appreach between a track and btube
+                                  vertexbtube: calculates the distance of closest approach between a vertex and btube
+                                  trackbtube: calculates the distance of closest approach between a track and btube
     @param path                   modules are added to this path
 
     """

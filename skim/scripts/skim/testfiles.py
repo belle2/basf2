@@ -310,10 +310,6 @@ class TestSampleList:
         schema_file = find_file("skim/tools/resources/test_samples_schema.json")
         with open(schema_file) as f:
             schema = json.load(f)
-        with open(schema_file, "w") as f:
-            schema = json.dump(schema, f, indent=2)
-        with open(schema_file) as f:
-            schema = json.load(f)
 
         try:
             jsonschema.validate(SampleDict, schema)

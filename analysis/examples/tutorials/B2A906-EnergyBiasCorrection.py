@@ -42,7 +42,11 @@ ma.fillParticleList(decayString='gamma:sel',
 
 if test == 'def':
     pass
-elif test == 'scale':  # weight_table_id+"_Weight" is used to scale photon energy
+elif test == 'scale':
+    # The scaling must only be applied to collision data, but not to MC.
+    # In principle, it can be run for MC as well because internally MC events are skipped anyway.
+    # However, it's better (faster, no error message) to skip the energy scaling in the steering file when running over MC.
+    # weight_table_id+"_Weight" is used to scale photon energy
     ma.correctEnergyBias(inputListNames=['gamma:sel'], tableName=weight_table_id, path=my_path)
 
 var1 = ['M',

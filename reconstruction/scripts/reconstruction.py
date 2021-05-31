@@ -101,8 +101,11 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                     use_random_numbers_for_prescale=use_random_numbers_for_hlt_prescale)
 
     add_postfilter_reconstruction(path,
-                                  components=components,
-                                  add_trigger_calculation=add_trigger_calculation)
+                                  components=components)
+
+    # Add the modules calculating the software trigger skims
+    if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
+        add_skim_software_trigger(path)
 
 
 def add_prefilter_reconstruction(path, components=None, add_trigger_calculation=True, skipGeometryAdding=False,
@@ -214,23 +217,18 @@ def add_prefilter_reconstruction(path, components=None, add_trigger_calculation=
                                         addClusterExpertModules=addClusterExpertModules)
 
 
-def add_postfilter_reconstruction(path, components=None, add_trigger_calculation=True):
+def add_postfilter_reconstruction(path, components=None):
     """
     This function adds the reconstruction modules not required to calculate HLT filter decision to a path.
 
     :param path: Add the modules to this path.
     :param components: list of geometry components to include reconstruction for, or None for all components.
-    :param add_trigger_calculation: add the software trigger modules for monitoring (do not make any cut)
     """
 
     # Add postfilter tracking reconstruction modules
     add_postfilter_tracking_reconstruction(path, components=components, pruneTracks=False)
 
     path.add_module('StatisticsSummary').set_name('Sum_Postfilter_Reconstruction')
-
-    # Add the modules calculating the software trigger skims
-    if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
-        add_skim_software_trigger(path)
 
 
 def add_cosmics_reconstruction(

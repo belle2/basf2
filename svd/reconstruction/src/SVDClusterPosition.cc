@@ -58,9 +58,6 @@ namespace Belle2 {
       double pitch = rawCluster.isUSide() ? info.getUPitch() : info.getVPitch();
       double sumStripCharge = getSumOfStripCharges(rawCluster);
       float noiseFirstStrip =  m_NoiseCal.getNoiseInElectrons(rawCluster.getSensorID(), rawCluster.isUSide(), strips.at(0).cellID);
-      //      float noiseLastStrip = m_NoiseCal.getNoiseInElectrons(rawCluster.getSensorID(), rawCluster.isUSide(), aStrip.at(strips.size() - 1).cellID);
-      //      float noiseAverage = (noiseFirstStrip + noiseLastStrip) /2;
-      float noiseAverage = noiseFirstStrip;
 
       double cutAdjacent = m_ClusterCal.getMinAdjSNR(rawCluster.getSensorID(), rawCluster.isUSide());
 
@@ -73,7 +70,7 @@ namespace Belle2 {
       } else {
         // if cluster size > 1
         double a = cutAdjacent;
-        double sn = sumStripCharge / noiseAverage;
+        double sn = sumStripCharge / getClusterNoise(rawCluster);
         positionError = a * pitch / sn;
       }
 

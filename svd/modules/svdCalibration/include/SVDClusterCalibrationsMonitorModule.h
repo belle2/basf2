@@ -13,7 +13,9 @@
 
 #include <framework/core/Module.h>
 
-#include <svd/calibration/SVDClusterCalibrations.h>
+#include <svd/calibration/SVDClustering.h>
+#include <svd/calibration/SVDHitTimeSelection.h>
+#include <svd/calibration/SVDCoGOnlyErrorScaleFactors.h>
 
 #include <svd/dataobjects/SVDHistograms.h>
 
@@ -85,7 +87,9 @@ namespace Belle2 {
 
   private:
 
-    SVDClusterCalibrations m_ClusterCal; /**< cluster calibrations payload */
+    SVDClustering m_ClusterCal; /**< cluster calibrations payload */
+    SVDHitTimeSelection m_HitTimeCut; /**< hit time cuts payload */
+    SVDCoGOnlyErrorScaleFactors m_CoGOnlySF;/**< scale factors for the CoGOnly algorithm*/
 
     //CLUSTERS SNR CUTS
     SVDHistograms<TH1F>* m_hClsSNR = nullptr; /**< cluster SNR histo */

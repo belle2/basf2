@@ -13,8 +13,9 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/reconstruction/RawCluster.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
-#include <svd/calibration/SVDClusterCalibrations.h>
+#include <svd/calibration/SVDClustering.h>
 #include <svd/calibration/SVDCoGOnlyErrorScaleFactors.h>
+#include <svd/calibration/SVDOldDefaultErrorScaleFactors.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 
 #include <vector>
@@ -66,7 +67,8 @@ namespace Belle2::SVD {
     double getClusterNoise(const Belle2::SVD::RawCluster& rawCluster);
 
     SVDCoGOnlyErrorScaleFactors m_CoGOnlyCal; /**< Scaling Factors for the CoGOnly algorithm*/
-    SVDClusterCalibrations m_ClusterCal; /**< SVDCluster calibrations for the position error scale factors for oldDefault algorithm*/
+    SVDOldDefaultErrorScaleFactors m_OldDefaultCal; /**< Scaling Factors for the OldDefault algorithm*/
+    SVDClustering m_ClusterCal; /**< SVD clustering parameters*/
     SVDNoiseCalibrations m_NoiseCal; /**< Noise calibrations for the position error*/
 
   private:

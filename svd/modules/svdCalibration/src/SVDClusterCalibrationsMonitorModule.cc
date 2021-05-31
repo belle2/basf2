@@ -55,7 +55,7 @@ void SVDClusterCalibrationsMonitorModule::beginRun()
 
 
   if (! m_ClusterCal.isValid())
-    B2WARNING("No valid SVDClusterCalibrations for the requested IoV");
+    B2WARNING("No valid SVDClustering for the requested IoV");
 
 
   ///CLUSTER SNR CUTS
@@ -161,18 +161,18 @@ void SVDClusterCalibrationsMonitorModule::event()
           m_clsAdjSNR = m_ClusterCal.getMinAdjSNR(theVxdID, m_side);
           m_hClsAdjSNR->fill(theVxdID, m_side, m_clsAdjSNR);
 
-          m_clsScaleErr1 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, m_side, 1, 1);
+          m_clsScaleErr1 = m_CoGOnlySF.getCorrectedClusterPositionError(theVxdID, m_side, 1, 1);
           m_hClsScaleErr1->fill(theVxdID, m_side, m_clsScaleErr1);
 
-          m_clsScaleErr2 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, m_side, 2, 1);
+          m_clsScaleErr2 = m_CoGOnlySF.getCorrectedClusterPositionError(theVxdID, m_side, 2, 1);
           m_hClsScaleErr2->fill(theVxdID, m_side, m_clsScaleErr2);
-          m_clsScaleErr3 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, m_side, 3, 1);
+          m_clsScaleErr3 = m_CoGOnlySF.getCorrectedClusterPositionError(theVxdID, m_side, 3, 1);
           m_hClsScaleErr3->fill(theVxdID, m_side, m_clsScaleErr3);
 
-          m_clsTimeMin = m_ClusterCal.getMinClusterTime(theVxdID, m_side);
+          m_clsTimeMin = m_HitTimeCut.getMinClusterTime(theVxdID, m_side);
           m_hClsTimeMin->fill(theVxdID, m_side, m_clsTimeMin);
 
-          m_clsTimeFunc = m_ClusterCal.getTimeSelectionFunction(theVxdID, m_side);
+          m_clsTimeFunc = m_HitTimeCut.getTimeSelectionFunction(theVxdID, m_side);
           m_hClsTimeMin->fill(theVxdID, m_side, m_clsTimeFunc);
 
           m_tree->Fill();

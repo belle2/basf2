@@ -21,21 +21,21 @@
 namespace Belle2 {
 
   /** This class defines the dbobject and the methods to access the
-   * scaling factors for the CoGOnly position algorithm
+   * scaling factors for the OldDefault position algorithm
    *
    */
-  class SVDCoGOnlyErrorScaleFactors {
+  class SVDOldDefaultErrorScaleFactors {
   public:
     static std::string name; /**< name of SVDPosErrScaleFactors  payload*/
     typedef SVDCalibrationsBase< SVDCalibrationsScalar<SVDPosErrScaleFactors> >
     t_payload;  /**< typedef for the of SVDPosErrScaleFactors  payload of all SVD sensors*/
 
     /** Constructor, no input argument is required */
-    SVDCoGOnlyErrorScaleFactors()
+    SVDOldDefaultErrorScaleFactors()
       : m_aDBObjPtr(name)
     {
       m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
-        B2INFO("SVDCoGOnlyErrorScaleFactors: from now on we are using " <<
+        B2INFO("SVDOldDefaultErrorScaleFactors: from now on we are using " <<
         this->m_aDBObjPtr -> get_uniqueID()); });
     }
     /** Return the corrected cluster position error

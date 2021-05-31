@@ -1,0 +1,14 @@
+Changes in the svd package since release-05-00
+---------------------------------------------------
+
+Reconstruction
+++++++++++++++
+
+ * the cluster position reconstruction is computed with the CoG algorithm for all cluster sizes > 1 (AHT was previously used for cluster size > 2)
+
+*
+
+Simulation
+++++++++++
+
+ * a different charge sharing model is implemented: now couplings are extracted directly from data

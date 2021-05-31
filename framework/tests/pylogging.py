@@ -218,7 +218,8 @@ class PythonLogJSON(unittest.TestCase):
         basf2.logging.add_json(True)
         logobject = self.getLogMessage("message")
         self.assertSetEqual(set(logobject.keys()), {"level", "message", "variables", "module", "package",
-                                                    "function", "file", "line", "timestamp", "proc"})
+                                                    "function", "file", "line", "timestamp", "proc",
+                                                    "initialize", "count"})
 
 
 if __name__ == "__main__":

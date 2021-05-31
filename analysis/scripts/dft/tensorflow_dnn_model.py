@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # BASF2 (Belle Analysis Framework 2)                                     #
@@ -11,7 +10,6 @@
 # This software is provided "as is" without any warranty.                #
 ##########################################################################
 
-from __future__ import division, print_function, generators
 
 import os
 import sys
@@ -22,7 +20,7 @@ import pickle
 import tensorflow as tf
 
 
-class Layer(object):
+class Layer:
     """
     definition of a layer obj
     """
@@ -142,7 +140,7 @@ class Layer(object):
                 self._add_var_to_summary(self.b)
 
 
-class MultilayerPerceptron(object):
+class MultilayerPerceptron:
     """
     class combine layer obj
     """
@@ -219,7 +217,7 @@ class MultilayerPerceptron(object):
         self.output = self.layers[-1].output
 
 
-class DefaultModel(object):
+class DefaultModel:
     """
     define the default model
     """
@@ -499,7 +497,7 @@ class DefaultModel(object):
         self.termination_criterion = self._default_termination_criterion
 
 
-class Trainer(object):
+class Trainer:
     """
     handling the training of the network model
     """
@@ -717,9 +715,9 @@ class Trainer(object):
         print('Current Epoch: %d' % self.current_epoch)
         for label, param in zip(self.model.monitoring_labels, self.epoch_parameters):
             self.train_log_dict['valid_' + label].append(param)
-            print("valid: %s: %1.5f" % (label, param))
+            print(f"valid: {label}: {param:1.5f}")
         for label, param in zip(self.model.monitoring_labels, epoch_parameters_train):
-            print("train: %s: %1.5f" % (label, param))
+            print(f"train: {label}: {param:1.5f}")
             self.train_log_dict['train_' + label].append(param)
 
         for val in model_mon_params:

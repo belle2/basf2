@@ -30,16 +30,41 @@ if __name__ == "__main__":
     ignoreduplicatedescriptionofrole = 'duplicate description of role'
     #: ignore warning about not finding Geometry module ?!
     ignoregeometry = 'b2:mod reference target not found: Geometry'
+    #: ignore further warnings in light builds
     #: ignore online_book
     ignoreonlinebook = 'online_book'
-    #: ignore further warnings in light builds
+    #: ignore add_trigger_simulation
+    ignoreaddtriggersimulation = 'add_trigger_simulation'
     #: ignore add_simulation of simulation package
     ignoreaddsimulation = 'add_simulation'
     #: ignore add_reconstruction of reconstruction package
     ignoreaddreconstruction = 'add_reconstruction'
+    #: ignore add_cdst_output of reconstruction package
+    ignoreaddcdstoutput = 'add_cdst_output'
+    #: ignore validation_tools of validation package
+    ignorevalidationtools = 'validation_tools'
     #: ignore missing include directives
     ignoreincludeproblem = 'Problems with "include" directive path'
-    if light_build:
+
+    check_error_free("b2code-sphinx-warnings", "sphinx", None,
+                     lambda x:
+                     re.findall(ignoreunsupportedthemeoption, x) or
+                     re.findall(ignoreenvironmentvariables, x) or
+                     re.findall(ignorepythonclass, x) or
+                     re.findall(ignoreduplicatewhatsnewlabel, x) or
+                     re.findall(ignoreduplicatecalibrationlabel, x) or
+                     re.findall(ignoreduplicatedescriptionofrole, x) or
+                     re.findall(ignoreaddsimulation, x) or
+                     re.findall(ignoreaddtriggersimulation, x) or
+                     re.findall(ignoreaddreconstruction, x) or
+                     re.findall(ignoreaddcdstoutput, x) or
+                     re.findall(ignorevalidationtools, x) or
+                     re.findall(ignoreincludeproblem, x) or
+                     re.findall(ignoreonlinebook, x) or
+                     re.findall(ignoregeometry, x),
+                     ['--light']
+                     )
+    if not light_build:
         check_error_free("b2code-sphinx-warnings", "sphinx", None,
                          lambda x:
                          re.findall(ignoreunsupportedthemeoption, x) or
@@ -48,22 +73,5 @@ if __name__ == "__main__":
                          re.findall(ignoreduplicatewhatsnewlabel, x) or
                          re.findall(ignoreduplicatecalibrationlabel, x) or
                          re.findall(ignoreduplicatedescriptionofrole, x) or
-                         re.findall(ignoreaddsimulation, x) or
-                         re.findall(ignoreaddreconstruction, x) or
-                         re.findall(ignoreincludeproblem, x) or
-                         re.findall(ignoreonlinebook, x) or
-                         re.findall(ignoregeometry, x),
-                         ['--light']
-                         )
-    else:
-        check_error_free("b2code-sphinx-warnings", "sphinx", None,
-                         lambda x:
-                         re.findall(ignoreunsupportedthemeoption, x) or
-                         re.findall(ignoreenvironmentvariables, x) or
-                         re.findall(ignorepythonclass, x) or
-                         re.findall(ignoreduplicatewhatsnewlabel, x) or
-                         re.findall(ignoreduplicatecalibrationlabel, x) or
-                         re.findall(ignoreduplicatedescriptionofrole, x) or
-                         re.findall(ignoreonlinebook, x) or
                          re.findall(ignoregeometry, x)
                          )

@@ -246,7 +246,7 @@ def partial_fit(state, X, S, y, w, epoch):
         def on_epoch_end(self, epoch, logs=None):
             val_y_pred = state.model.predict(state.Xtest).flatten()
             val_auc = roc_auc_score(state.ytest, val_y_pred)
-            print('\nTest AUC: {}\n'.format(val_auc))
+            print(f'\nTest AUC: {val_auc}\n')
             self.val_aucs.append(val_auc)
             return
 

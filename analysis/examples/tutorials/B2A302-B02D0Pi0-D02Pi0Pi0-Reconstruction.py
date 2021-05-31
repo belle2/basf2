@@ -37,20 +37,20 @@ ma.inputMdst(environmentType='default',
 
 # use standard final state particle lists
 #
-# creates "pi0:eff40_Jan2020Fit" ParticleList
+# creates "pi0:eff40_May2020Fit" ParticleList
 # see Standard Particles section at https://software.belle2.org/
-stdPi0s(listtype='eff40_Jan2020Fit', path=my_path)
+stdPi0s(listtype='eff40_May2020Fit', path=my_path)
 
 # reconstruct D0 -> pi0 pi0 decay
 # keep only candidates with 1.7 < M(pi0pi0) < 2.0 GeV
-ma.reconstructDecay(decayString='D0:pi0pi0 -> pi0:eff40_Jan2020Fit pi0:eff40_Jan2020Fit',
+ma.reconstructDecay(decayString='D0:pi0pi0 -> pi0:eff40_May2020Fit pi0:eff40_May2020Fit',
                     cut='1.7 < M < 2.0',
                     path=my_path)
 
 # reconstruct B0 -> D0 pi0 decay
 # keep only candidates with Mbc > 5.24 GeV
 # and -1 < Delta E < 1 GeV
-ma.reconstructDecay(decayString='B0:all -> D0:pi0pi0 pi0:eff40_Jan2020Fit',
+ma.reconstructDecay(decayString='B0:all -> D0:pi0pi0 pi0:eff40_May2020Fit',
                     cut='5.24 < Mbc < 5.29 and abs(deltaE) < 1.0',
                     path=my_path)
 
@@ -82,7 +82,7 @@ ma.variablesToNtuple('B0:all', B0_vars,
                      filename=output_file,
                      treename='b0',
                      path=my_path)
-ma.variablesToNtuple('pi0:eff40_Jan2020Fit', pi0_vars,
+ma.variablesToNtuple('pi0:eff40_May2020Fit', pi0_vars,
                      filename=output_file,
                      treename='pi0',
                      path=my_path)

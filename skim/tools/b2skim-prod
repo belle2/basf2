@@ -283,7 +283,7 @@ def verify_stats_dict(args, sampleRegistry, skimStatsDict):
         skimStatsDict (dict): A dict containing the tested skim statistics.
     """
     skims = args.skims
-    statistics = ["cpuTimePerEvent", "udstSizePerSkimmedEvent"]
+    statistics = ["cpuTimePerEvent", "udstSizePerInputEvent"]
     sampleLabels = [sampleInfo["sampleLabel"] for sampleInfo in sampleRegistry.values()]
 
     # Verify that all the requested skims have statistics listed
@@ -500,7 +500,13 @@ def get_lpn_list(sampleInfo, mc):
                     sampleInfo["experimentNumber"],
                     sampleInfo["beamEnergy"],
                     run,
-                    sampleInfo["inputDataLevel"],
+                    # For backward compatibility, allow 'generalSkimName' to be missing
+                    # from block in input YAML file
+                    *(
+                        (sampleInfo["generalSkimName"], sampleInfo["inputDataLevel"])
+                        if "generalSkimName" in sampleInfo
+                        else (sampleInfo["inputDataLevel"],)
+                    )
                 )
             )
             for run in sampleInfo["runNumbers"]
@@ -676,6 +682,24 @@ def produce_on_tau_samples(skims):
     return SkimObject.produce_on_tau_samples
 
 
+def make_data_description_block(skims, sampleInfo):
+    DataDescription = []
+    GeneralSkim = sampleInfo.get("generalSkimName", None)
+
+    for skim in skims:
+        DescriptionDict = {
+            "": skim,
+            "SkimDecayMode": Registry.encode_skim_name(skim),
+            "DataLevel": "udst",
+        }
+
+        if GeneralSkim is not None:
+            DescriptionDict["generalSkimName"] = GeneralSkim
+        DataDescription.append(DescriptionDict)
+
+    return DataDescription
+
+
 def warn_local_script(args):
     """If a local script is given print a warning that a local script will be used.
 
@@ -737,6 +761,7 @@ def make_combined_steering_file(
         modules=modules,
         stats=False,
         hints=False,
+        mdstOutput=False,
     )
 
     with open(SteeringFile, "w") as f:
@@ -808,14 +833,7 @@ def make_request_dict(
         "SteeringFile": f"{skimName}_Skim.py",
         "SteeringFilePrefix": SkimScriptsDirectory,
         "LPNPrefix": LPNPrefix,
-        "DataDescription": [
-            {
-                "": individualSkim,
-                "SkimDecayMode": Registry.encode_skim_name(individualSkim),
-                "DataLevel": "udst",
-            }
-            for individualSkim in individualSkims
-        ],
+        "DataDescription": make_data_description_block(individualSkims, sampleInfo)
     }
 
     # We only want the MCEventType to include the beam background level if the sample is BGx0

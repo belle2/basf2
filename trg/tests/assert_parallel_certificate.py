@@ -1,13 +1,13 @@
 # Test for the parallel certified flag in all modules in the standard L1 trigger simulation.
 
 import basf2 as b2
-from L1trigger import add_tsim
+from L1trigger import add_trigger_simulation
 
 # Create an empty path
 path = b2.create_path()
 
-# Add only tsim
-add_tsim(path)
+# Add only L1 trigger simulation
+add_trigger_simulation(path)
 
 # Assert that all modules have a parallel processing certified flag.
 modules = path.modules()

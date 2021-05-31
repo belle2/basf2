@@ -143,12 +143,12 @@ KLM::ScintillatorSimulator::~ScintillatorSimulator()
   free(m_PhotoelectronIndex2);
 }
 
-void KLM::ScintillatorSimulator::setChannelData(
-  const EKLMChannelData* channelData)
+void KLM::ScintillatorSimulator::setFEEData(
+  const KLMScintillatorFEEData* FEEData)
 {
-  m_Pedestal = channelData->getPedestal();
-  m_PhotoelectronAmplitude = channelData->getPhotoelectronAmplitude();
-  m_Threshold = channelData->getThreshold();
+  m_Pedestal = FEEData->getPedestal();
+  m_PhotoelectronAmplitude = FEEData->getPhotoelectronAmplitude();
+  m_Threshold = FEEData->getThreshold();
 }
 
 void KLM::ScintillatorSimulator::prepareSimulation()

@@ -15,6 +15,7 @@
 #include <framework/dataobjects/DigitBase.h>
 #include <string>
 #include <map>
+#include <vector>
 
 namespace Belle2 {
 
@@ -33,7 +34,8 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~BGOverlayExecutorModule();
+    virtual ~BGOverlayExecutorModule()
+    {}
 
     /**
      * Initialize the Module.
@@ -42,27 +44,9 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun() override;
-
-    /**
      * Event processor.
      */
     virtual void event() override;
-
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
-
-    /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate() override;
 
   private:
 
@@ -76,6 +60,15 @@ namespace Belle2 {
     std::string m_extensionName; /**< name added to default branch names */
     std::string m_BackgroundInfoInstanceName = ""; /**< name BackgroundInfo name */
 
+    std::vector<std::string> m_components; /**< detector components included in overlay */
+
+    bool m_addPXD = false; /**< if true add BG digits of PXD */
+    bool m_addSVD = false; /**< if true add BG digits of SVD */
+    bool m_addCDC = false; /**< if true add BG digits of CDC */
+    bool m_addTOP = false; /**< if true add BG digits of TOP */
+    bool m_addARICH = false; /**< if true add BG digits of ARICH */
+    bool m_addKLM = false; /**< if true add BG digits of KLM */
+
     /**
      * Register simulated and BG digits (both as optional input)
      */
@@ -88,7 +81,7 @@ namespace Belle2 {
       std::string nameBG = tmp.getName() + m_extensionName;
       StoreArray<Digit> bgDigits(nameBG);
       bgDigits.isOptional();
-      B2DEBUG(100, "optional input: " << digits.getName() << " " << bgDigits.getName());
+      B2DEBUG(20, "optional input: " << digits.getName() << " " << bgDigits.getName());
     }
 
     /**
@@ -101,7 +94,7 @@ namespace Belle2 {
       // simulated digits
       StoreArray<Digit> digits(name);
       if (!digits.isValid()) {
-        B2DEBUG(100, digits.getName() << " are not valid");
+        B2DEBUG(20, digits.getName() << " are not valid");
         return;
       }
 
@@ -110,7 +103,7 @@ namespace Belle2 {
       std::string nameBG = tmp.getName() + m_extensionName;
       StoreArray<Digit> bgDigits(nameBG);
       if (!bgDigits.isValid()) {
-        B2DEBUG(100, bgDigits.getName() << " are not valid");
+        B2DEBUG(20, bgDigits.getName() << " are not valid");
         return;
       }
 
@@ -135,12 +128,12 @@ namespace Belle2 {
           pileup = digit->addBGDigit(&bgDigit) == DigitBase::c_DontAppend;
           if (pileup) break; // BG digit merged with simulated one
         }
-        if (!pileup) digits.appendNew(bgDigit); // BG digit not merged, therefore append
+        if (!pileup) digits.appendNew(bgDigit)->adjustAppendedBGDigit(); // BG digit not merged, therefore append and possibly modify
       }
 
       // debug printout
       int diff = size + bgDigits.getEntries() - digits.getEntries();
-      B2DEBUG(100, digits.getName() << ": before " << size
+      B2DEBUG(20, digits.getName() << ": before " << size
               << " + " << bgDigits.getEntries() << "(BG)"
               << ", after " << digits.getEntries()
               << ", merged " << diff);

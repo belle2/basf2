@@ -124,7 +124,7 @@ namespace Belle2 {
     m_simClockState->setRevo9Count(revo9count);
     m_simClockState->setBucketNumber(bucket);
     m_simClockState->setBeamCycleNumber(beamRevo9Cycle);
-
+    m_simClockState->setRelativeBucketNo(relBucketNo);
   }
 
 

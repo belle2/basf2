@@ -1,0 +1,125 @@
+Changes in the analysis package since release-05-02
+---------------------------------------------------
+
+Vertex Fitting
+++++++++++++++
+
+ * KFit has been extended to be able to handle vertex fits (with and without mass constraint) that involve an eta particle
+   reconstructed in ``eta -> gamma gamma``.
+ * Added a method `scaleError` in order to scale up helix errors and avoid underestimation of vertex error.
+ * Added a new fit-type option ``massfourC`` to function :func:`vertex.kFit`. The kinematic fit is performed with the 4 momentum
+   constraint of a mother particle and mass constraints of intermediate particles specified by the option ``massConstraint``,
+   simultaneously.
+ * Changed the treatment of Bremsstrahlungs-corrected tracks in `vertex.treeFit`. The previous implementation exhibited bad
+   performance when a Bremsstrahlungs-photon is applied. The new implementation fits the corrected Track as a single particle,
+   analogous to, what KFit does.
+
+Variables
++++++++++
+
+ * Variables :b2:var:`SoftwareTriggerResult`, :b2:var:`SoftwareTriggerResultNonPrescaled` and :b2:var:`SoftwareTriggerPrescaling`
+   now silently return NAN if the trigger is not found.
+
+   .. warning:: this no longer dumps all possible trigger names instead please see ``b2hlt_triggers`` for a list of all possible names.
+
+   .. seealso:: ``b2hlt_triggers print --database online --format list``
+
+ * Variables :b2:var:`recQ2Bh`, :b2:var:`recMissM2`, :b2:var:`recQ2BhSimple` have been moved to a new variable group ``Specific kinematic variables``,
+   and :b2:var:`recQ2Bh` is now using a `diamond frame method <https://www.osti.gov/biblio/1442697>`_
+ * Added the new variable :b2:var:`photonHasOverlap`, which determines whether a particle's cluster is sharing its connected
+   region with another cluster. A cut string can be provided to ignore cluster that do not satisfy the specified criteria.
+ * Variables `clusterThetaID` and `clusterPhiID` have both been added as a new variable
+ * Event-based variables from ``cluster`` collection have been moved into a new ``event_level_cluster`` collection,
+   collections of ROE and recoil variables have been expanded
+ * A few binary PID variables have been added to the PID variable collection.
+ * Added a new variable :b2:var:`nROE_Composites` to count V0 particles in ROE.
+ * Added meta variables corresponding to existing variables that access the MC matched particles of given daughters
+   :b2:var:`mcDaughterDiffOf` , :b2:var:`mcDaughterDiffOfPhi`, :b2:var:`mcDaughterDiffOfPhiCMS`, :b2:var:`mcDaughterAngle`.
+ * Added the new variable :b2:var:`mcCosThetaBetweenParticleAndNominalB`. This is an MC version of
+   :b2:var:`cosThetaBetweenParticleAndNominalB` in which all descendant neutrino momenta are subtracted from the B momentum
+   during the calculation.
+ * Added the inverse trigonometric functions: :b2:var:`acos`, :b2:var:`asin`.
+ * Added new variables :b2:var:`exp` and :b2:var:`log`.
+ * Added special hadron ID variables :b2:var:`pionID_SVD`, :b2:var:`kaonID_SVD`, :b2:var:`protonID_SVD`, :b2:var:`binaryPID_SVD`
+   which include SVD PDFs for pions, kaons and protons only. For hadron ID, users should **no longer** rely on the standard
+   variables :b2:var:`pionID`, :b2:var:`kaonID`, :b2:var:`protonID`, :b2:var:`binaryPID` for the time being. For lepton
+   identification instead, the :b2:var:`electronID`, :b2:var:`muonID`, :b2:var:`binaryPID` variables, which do not contain SVD PDF
+   info yet, are still recommended.
+ * Added a new variable to clusters, `beamBackgroundProbabilityMVA`, which uses shower shape variables to separate between true
+   photons and beam backgrounds.
+ * Added ``b2help-variables`` which behaves identical to ``basf2 variables.py`` but more in-keeping with the ``b2help-<something>``
+   theme.
+ * The variables :b2:var:`EventType` and :b2:var:`trackMatchType` have been declared deprecated. Instead the variables
+   :b2:var:`isMC` and :b2:var:`clusterTrackMatch` should be used.   
+ * New MCTruthVariable `isBBCrossfeed` checks for crossfeed in the reconstruction of the given B meson.
+ * Modified the ``L1 Trigger`` variables (:b2:var:`L1PSNM`, :b2:var:`L1PSNMBit`, etc.) to return ``NAN`` instead of ``0`` in case the requested
+   trigger bit or number does not exist. These variables now return ``0`` only when the requested bit is not fired.
+ * Added new variables :b2:var:`L1TimeQuality` and :b2:var:`isPoissonTriggerInInjectionVeto` for returning the L1 trigger time quality and the injection veto flag. Renamed the variable ``L1TimType`` into :b2:var:`L1TimeType`.
+ * New variables have been added to classify the true decay mode of an event (e.g. :b2:var:`BplusMode` and :b2:var:`B0Mode`). They
+   serve as an alternative to the `TopologyAnalysis`. Further information about the meaning of the variable values can be found in
+   :b2:ref:`GeneratedDecayModes`.
+ * Added new variables :b2:var:`useParticleRestFrame` and :b2:var:`useRecoilParticleRestFrame` for computing variables in the
+   rest frame of a given Particle (or in the rest frame of the recoiling system of a given Particle). If the ParticleList passed
+   to these variables contains more than one Particle, only the first one in the list will be considered.
+
+Modules
++++++++
+
+ * Added a module :b2:mod:`TrackIsoCalculator`, which takes as input a standard charged particle list, and calculates for every particle's track in the list the
+   3D distance to the closest track in the event. The distance is calculated as the 3D separation between the points where two extrapolated track helices cross a given
+   detector's inner surface, where the detector is an input parameter to the module. This variable can be used to parametrise charged particle
+   identification efficiencies and mis-identification probabilities, as they can depend on the activity around each charged particle candidate.
+ * The :b2:mod:`InclusiveDstarReconstruction` creates antiparticle lists correctly now. The module's input changed to a
+   :ref:`DecayString` of the form ``D* -> pi`` and MC Matching is applicable (one can use :b2:var:`isSignal`).
+ * In `BtubeCreator` module, functionality to apply a cut on the confidence level of the fit of fully reconstructed B to the
+   beamspot is added.
+ * The ``EventKinematics`` module can now compute event kinematics using generated particles as an input.
+ * Arguments of `writePi0EtaVeto` have been updated. ``downloadFlag`` and ``workingDirectory`` have been removed since the
+   download processes can be skipped. New arguments have been added for several reasons. ``suffix`` allows to calculate this
+   veto for multiple photons. ``hardParticle`` allows to call this function for a given particle other than a photon.
+   Four new arguments have been added to override the payload names and soft photon selections, ``pi0PayloadNameOverride``,
+   ``etaPayloadNameOverride``, ``pi0SoftPhotonCutOverride``, and ``etaSoftPhotonCutOverride``.
+ * A new helper method `updateROEUsingV0Lists` has been added to facilitate application of V0Finder results in Rest Of Event.
+ * Added a possibility to add a ROE mask for KLM-based particles and an experimental option of including KLM-based particles into
+   ROE 4-vector computation.
+
+   .. warning:: The option ``useKLMEnergy`` of `RestOfEventBuilder` module is only meant for performance studies and NOT for a physics analysis.
+
+ * The :b2:mod:`PrintMCParticles` module and thus also the `printMCParticles` function
+   has a completely new layout that should be much easier to parse, especially for complicated events. By default it shows
+   much less information but in an easier to parse tree representation. See the documentation of `printMCParticles` for details.
+ * The :b2:mod:`ParticleLoader` now creates photon candidates from KLMCluster if the parameter ``loadPhotonsFromKLM`` is set to
+   true. It is off by default.
+
+   .. warning:: Photons from KLMCluster should only be used in specific use-cases and after a thorough study of their effect.
+
+ * In :b2:mod:`BtubeCreator`, new extrainfo ``TubeB_p_estimated`` was added. This returns the magnitude of the estimated momentum
+   of the B which should fly in the direction of the Btube.
+ * Added a module :b2:mod:`HelixErrorScaler`, which multiplies constant scaling factors to helix errors of input charged particles
+   and stores them in a new list.
+ * In :b2:mod:`ParticleStats` add functionality to produce a json containing the information printed on stdout. Added also a tool :ref:`b2plot-particleStats` to analyze the json and produce some plots.
+ * The :b2:mod:`TrackingMomentum` module has been extended. A ParticleList of composite particles can now be processed as well. In
+   that case the momenta of all track-based daughter particles are scaled by the provided factor.
+ * The wrapper functions for the tracking systematics modules have been renamed from ``trackingMomentum`` to `scaleTrackMomenta`
+   and from ``trackingEfficiency`` to `removeTracksForTrackingEfficiencyCalculation`.
+ * Added the :b2:mod:`TauDecayMode` module, which is an actualization of the :b2:mod:`TauDecayMarker` module for the new
+   TauolaBelle decays. Using a txt file, which defines the mapping between decay strings and decay numbers from TauolaBelle, the
+   module assigns a decay number for each tau in the event. This decay number is stored in the variables :b2:var:`tauMinusMCMode`
+   and :b2:var:`tauPlusMCMode`. It's possible to provide the path of a different txt file for the mapping as a parameter to the
+   module.
+ * Added a `EnergyBiasCorrection` module, sub-percent correction only applied to E of photons not on clusterE and should only
+   be applied on data. `correctEnergyBias` is a corresponding wrapper function.
+
+Full Event Interpretation
++++++++++++++++++++++++++
+
+ * Added option to reconstruct strange B mesons (at Y(5S)) in 51 decay channels. Can be switched on with the ``strangeB`` flag in
+   `fei.get_default_channels()`.
+ * The FEI has been retrained with MC14 and release-05. The prefix ``FEIv4_2021_MC14_release_05_01_12`` has to be set in the FEI
+   configuration.
+
+Standard Particle Lists
++++++++++++++++++++++++
+
+ * The selection criteria of the pi0 standard particle lists have been updated from the January 2020 to the May 2020
+   recommendations.

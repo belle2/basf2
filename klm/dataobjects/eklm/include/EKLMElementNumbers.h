@@ -391,6 +391,14 @@ namespace Belle2 {
       return m_NStripsSegment;
     }
 
+    /**
+     * Get total number of channels.
+     */
+    static constexpr int getTotalChannelNumber()
+    {
+      return m_TotalChannelNumber;
+    }
+
   private:
 
     /**
@@ -428,6 +436,9 @@ namespace Belle2 {
 
     /** Number of strips in a segment. */
     static constexpr int m_NStripsSegment = 15;
+
+    /** Total number of channels. */
+    static constexpr int m_TotalChannelNumber = 15600;
 
   private:
 

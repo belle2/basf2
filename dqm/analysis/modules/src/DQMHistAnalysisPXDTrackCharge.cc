@@ -96,7 +96,8 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
           m_cChargeModASIC[aVxdID][s][d] = new TCanvas((m_histogramDirectoryName + "/c_Fit_" + name + Form("_s%d_d%d", s + 1, d + 1)).data());
         }
       }
-      m_hChargeModASIC2d[aVxdID] = new TH2F(("PXD_TCChargeMPV_" + name).data(), ("PXD TCCharge MPV " + name + ";Switcher;DCD;MPV").data(),
+      m_hChargeModASIC2d[aVxdID] = new TH2F(("hPXD_TCChargeMPV_" + name).data(),
+                                            ("PXD TCCharge MPV " + name + ";Switcher;DCD;MPV").data(),
                                             6, 0.5, 6.5, 4, 0.5, 4.5);
       m_cChargeModASIC2d[aVxdID] = new TCanvas((m_histogramDirectoryName + "/c_TCCharge_MPV_" + name).data());
     }
@@ -106,7 +107,7 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
   gROOT->cd(); // this seems to be important, or strange things happen
 
   m_cTrackedClusters = new TCanvas((m_histogramDirectoryName + "/c_TrackedClusters").data());
-  m_hTrackedClusters = new TH1F("Tracked_Clusters", "Tracked Clusters/Event;Module", 40, 0, 40);
+  m_hTrackedClusters = new TH1F("hPXDTrackedClusters", "PXD Tracked Clusters/Event;Module", 40, 0, 40);
   m_hTrackedClusters->Draw();
   auto ax = m_hTrackedClusters->GetXaxis();
   if (ax) {
@@ -228,7 +229,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         href2->Draw("same,hist");
       }
 
-      auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is excluded, please ignore");
+      auto tt = new TLatex(5.5, 0, " 1.3.2 Module is excluded, please ignore");
       tt->SetTextAngle(90);// Rotated
       tt->SetTextAlign(12);// Centered
       tt->Draw();
@@ -392,7 +393,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   m_gCharge->SetMarkerStyle(8);
   m_gCharge->Draw("AP");
   {
-    auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is excluded, please ignore");
+    auto tt = new TLatex(5.5, 0, " 1.3.2 Module is excluded, please ignore");
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered
     tt->Draw();

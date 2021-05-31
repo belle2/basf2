@@ -87,35 +87,34 @@ bool LogSystem::sendMessage(LogMessage&& message)
 
   // add message to list of message or increase repetition value
   bool lastTime(false);
-  if (m_printErrorSummary || m_maxErrorRepetition > 0) {
-    unsigned int repetition{0};
-    if (m_messageLog.size() >= c_errorSummaryMaxLines) {
-      // we already have maximum size of the error log so don't add more messages.
-      // but we might want to increase the counter if it already exists
-      /* cppcheck-suppress stlIfFind */
-      if (auto it = m_messageLog.find(message); it != m_messageLog.end()) {
-        repetition = ++(it->second);
-      }
-    } else if (logLevel >= LogConfig::c_Warning or m_maxErrorRepetition > 0) {
-      // otherwise we only keep warnings or higher unless we suppress repetitions,
-      // then we keep everything
-      repetition = ++m_messageLog[message];
+  unsigned int repetition{0};
+  if (m_messageLog.size() >= c_errorSummaryMaxLines) {
+    // we already have maximum size of the error log so don't add more messages.
+    // but we might want to increase the counter if it already exists
+    /* cppcheck-suppress stlIfFind */
+    if (auto it = m_messageLog.find(message); it != m_messageLog.end()) {
+      repetition = ++(it->second);
     }
-    lastTime = m_maxErrorRepetition > 0 and repetition == m_maxErrorRepetition;
-    if (m_maxErrorRepetition > 0 and repetition > m_maxErrorRepetition) {
-      // We've seen this message more than once before so it cannot be an abort
-      // level message. So we can just not do anything here except counting ...
-      ++m_suppressedMessages;
-      // However we should warn from time to time that messages are being
-      // suppressed ... but not too often otherwise we don't gain anything so
-      // let's warn first each 100, then each 1000 suppressed messages.
-      if ((m_suppressedMessages < 1000 and m_suppressedMessages % 100 == 0) or
-          (m_suppressedMessages < 10000 and m_suppressedMessages % 1000 == 0) or
-          (m_suppressedMessages % 10000 == 0)) {
-        showText(LogConfig::c_Warning, "... " + std::to_string(m_suppressedMessages) + " log messages suppressed due to repetition ...");
-      }
-      return true;
+  } else if (logLevel >= LogConfig::c_Warning or m_maxErrorRepetition > 0) {
+    // otherwise we only keep warnings or higher unless we suppress repetitions,
+    // then we keep everything
+    repetition = ++m_messageLog[message];
+    message.setCount(repetition);
+  }
+  lastTime = m_maxErrorRepetition > 0 and repetition == m_maxErrorRepetition;
+  if (m_maxErrorRepetition > 0 and repetition > m_maxErrorRepetition) {
+    // We've seen this message more than once before so it cannot be an abort
+    // level message. So we can just not do anything here except counting ...
+    ++m_suppressedMessages;
+    // However we should warn from time to time that messages are being
+    // suppressed ... but not too often otherwise we don't gain anything so
+    // let's warn first each 100, then each 1000 suppressed messages.
+    if ((m_suppressedMessages < 1000 and m_suppressedMessages % 100 == 0) or
+        (m_suppressedMessages < 10000 and m_suppressedMessages % 1000 == 0) or
+        (m_suppressedMessages % 10000 == 0)) {
+      showText(LogConfig::c_Warning, "... " + std::to_string(m_suppressedMessages) + " log messages suppressed due to repetition ...");
     }
+    return true;
   }
 
   // Ok we want to see the message

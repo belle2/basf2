@@ -50,6 +50,9 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
   addParam("useLegacyNaming", m_useLegacyNaming,
            "Use old PDF name convention?", bool(true));
 
+  addParam("numMaxSpacePoints", m_numMaxSpacePoints,
+           "Maximum number of SpacePoints allowed in an event, above this threshold no SpacePoint will be created", unsigned(2e6));
+
 }
 
 
@@ -101,7 +104,7 @@ void SVDSpacePointCreatorModule::event()
                              m_spacePoints); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
   } else {
     provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_ClusterCal, m_useQualityEstimator, m_calibrationFile,
-                                  m_useLegacyNaming);
+                                  m_useLegacyNaming, m_numMaxSpacePoints);
   }
 
 

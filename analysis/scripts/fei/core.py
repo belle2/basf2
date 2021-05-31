@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # @cond SUPPRESS_DOXYGEN
 
@@ -80,7 +79,7 @@ import multiprocessing
 FeiState = collections.namedtuple('FeiState', 'path, stage, plists')
 
 
-class TrainingDataInformation(object):
+class TrainingDataInformation:
     """
     Contains the relevant information about the used training data.
     Basically we write out the number of MC particles in the whole dataset.
@@ -113,7 +112,7 @@ class TrainingDataInformation(object):
         @param particles list of config.Particle objects
         """
         # Unique absolute pdg-codes of all particles
-        pdgs = set([abs(pdg.from_name(particle.name)) for particle in self.particles])
+        pdgs = {abs(pdg.from_name(particle.name)) for particle in self.particles}
 
         path = basf2.create_path()
         module = basf2.register_module('VariablesToHistogram')
@@ -150,7 +149,7 @@ class TrainingDataInformation(object):
         return mc_counts
 
 
-class FSPLoader(object):
+class FSPLoader:
     """
     Steers the loading of FSP particles.
     This does NOT include RootInput, Geometry or anything required before loading FSPs,
@@ -193,13 +192,13 @@ class FSPLoader(object):
         if self.config.monitor:
             names = ['e+', 'K+', 'pi+', 'mu+', 'gamma', 'K_S0', 'p+', 'K_L0', 'Lambda0', 'pi0']
             filename = 'Monitor_FSPLoader.root'
-            pdgs = set([abs(pdg.from_name(name)) for name in names])
+            pdgs = {abs(pdg.from_name(name)) for name in names}
             variables = [(f'NumberOfMCParticlesInEvent({pdg})', 100, -0.5, 99.5) for pdg in pdgs]
             ma.variablesToHistogram('', variables=variables, filename=filename, path=path)
         return path
 
 
-class TrainingData(object):
+class TrainingData:
     """
     Steers the creation of the training data.
     The training data is used to train a multivariate classifier for each channel.
@@ -275,7 +274,7 @@ class TrainingData(object):
         return path
 
 
-class PreReconstruction(object):
+class PreReconstruction:
     """
     Steers the reconstruction phase before the mva method was applied
     It Includes:
@@ -309,7 +308,13 @@ class PreReconstruction(object):
 
                 if len(channel.daughters) == 1:
                     ma.cutAndCopyList(channel.name, channel.daughters[0], channel.preCutConfig.userCut, writeOut=True, path=path)
-                    ma.variablesToExtraInfo(channel.name, {f'constant({channel.decayModeID})': 'decayModeID'}, path=path)
+                    v2EI = basf2.register_module('VariablesToExtraInfo')
+                    v2EI.set_name('VariablesToExtraInfo_' + channel.name)
+                    v2EI.param('particleList', channel.name)
+                    v2EI.param('variables', {f'constant({channel.decayModeID})': 'decayModeID'})
+                    # suppress warning that decay mode ID won't be overwritten if it already exists
+                    v2EI.set_log_level(basf2.logging.log_level.ERROR)
+                    path.add_module(v2EI)
                 else:
                     ma.reconstructDecay(channel.decayString, channel.preCutConfig.userCut, channel.decayModeID,
                                         writeOut=True, path=path)
@@ -391,7 +396,7 @@ class PreReconstruction(object):
         return path
 
 
-class PostReconstruction(object):
+class PostReconstruction:
     """
     Steers the reconstruction phase after the mva method was applied
     It Includes:
@@ -446,6 +451,8 @@ class PostReconstruction(object):
                     expert.param('identifier', self.config.prefix + '_' + channel.label)
                 expert.param('extraInfoName', 'SignalProbability')
                 expert.param('listNames', [channel.name])
+                # suppress warning that signal probability won't be overwritten if it already exists
+                expert.set_log_level(basf2.logging.log_level.ERROR)
                 path.add_module(expert)
 
                 uniqueSignal = basf2.register_module('TagUniqueSignal')
@@ -453,6 +460,8 @@ class PostReconstruction(object):
                 uniqueSignal.param('target', channel.mvaConfig.target)
                 uniqueSignal.param('extraInfoName', 'uniqueSignal')
                 uniqueSignal.set_name('TagUniqueSignal_' + channel.name)
+                # suppress warning that unique signal extra info won't be overwritten if it already exists
+                uniqueSignal.set_log_level(basf2.logging.log_level.ERROR)
                 path.add_module(uniqueSignal)
 
                 if self.config.monitor:
@@ -527,7 +536,7 @@ class PostReconstruction(object):
         return path
 
 
-class Teacher(object):
+class Teacher:
     """
     Performs all necessary trainings for all training data files which are
     available but where there is no weight file available yet.
@@ -589,7 +598,7 @@ class Teacher(object):
         @param filename the filename of the weight file
         """
         try:
-            return '<method>Trivial</method>' in open(filename, 'r').readlines()[2]
+            return '<method>Trivial</method>' in open(filename).readlines()[2]
         except BaseException:
             return True
         return True

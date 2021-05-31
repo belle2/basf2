@@ -39,9 +39,12 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("singleHists", m_singleHists, "Also plot one efficiency histogram per module", bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Eff:"));
   addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("useEpicsRO", m_useEpicsRO, "useEpics ReadOnly", false);
   addParam("ConfidenceLevel", m_confidence, "Confidence Level for error bars and alarms", 0.9544);
   addParam("WarnLevel", m_warnlevel, "Efficiency Warn Level for alarms", 0.92);
   addParam("ErrorLevel", m_errorlevel, "Efficiency  Level for alarms", 0.90);
+  addParam("perModuleAlarm", m_perModuleAlarm, "Alarm level per module", true);
+  addParam("alarmAdhoc", m_alarmAdhoc, "Generate Alarm from adhoc values", true);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
@@ -93,6 +96,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
   }
 
 #ifdef _BELLE2_EPICS
+  m_useEpics |= m_useEpicsRO; // implicit
   if (m_useEpics) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
   }
@@ -109,17 +113,30 @@ void DQMHistAnalysisPXDEffModule::initialize()
       B2WARNING(m_pvPrefix + (std::string)aPXDModule);
     }
 #endif
-    TString histTitle = "Hit Efficiency on Module " + (std::string)aPXDModule + ";Pixel in U;Pixel in V";
+    TString histTitle = "PXD Hit Efficiency on Module " + (std::string)aPXDModule + ";Pixel in U;Pixel in V";
     if (m_singleHists) {
       m_cEffModules[aPXDModule] = new TCanvas((m_histogramDirectoryName + "/c_Eff_").data() + buff);
-      m_hEffModules[aPXDModule] = new TEfficiency("HitEff_" + buff, histTitle,
+      m_hEffModules[aPXDModule] = new TEfficiency("ePXDHitEff_" + buff, histTitle,
                                                   m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
     }
   }
 
+  m_hErrorLine = new TH1F("hPXDErrorlimit", "Error Limit", m_PXDModules.size(), 0, m_PXDModules.size());
+  m_hWarnLine = new TH1F("hPXDWarnlimit", "Warn Limit", m_PXDModules.size(), 0, m_PXDModules.size());
+  for (int i = 0; i < (int)m_PXDModules.size(); i++) {
+    m_hErrorLine->SetBinContent(i + 1, m_errorlevel);
+    m_hWarnLine->SetBinContent(i + 1, m_warnlevel);
+  }
+  m_hWarnLine->SetLineColor(kOrange - 3);
+  m_hWarnLine->SetLineWidth(3);
+  m_hWarnLine->SetLineStyle(4);
+  m_hErrorLine->SetLineColor(kRed + 3);
+  m_hErrorLine->SetLineWidth(3);
+  m_hErrorLine->SetLineStyle(7);
+
   //One bin for each module in the geometry, one histogram for each layer
   m_cEffAll = new TCanvas((m_histogramDirectoryName + "/c_EffAll").data());
-  m_hEffAll = new TEfficiency("HitEffAll", "Integrated Efficiency of each module;PXD Module;",
+  m_hEffAll = new TEfficiency("ePXDHitEffAll", "PXD Integrated Efficiency of each module;PXD Module;",
                               m_PXDModules.size(), 0, m_PXDModules.size());
   m_hEffAll->SetConfidenceLevel(m_confidence);
   m_hEffAll->Paint("AP");
@@ -142,7 +159,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
   }
 
   m_cEffAllUpdate = new TCanvas((m_histogramDirectoryName + "/c_EffAllUp").data());
-  m_hEffAllUpdate = new TEfficiency("HitEffAllUpdate", "Integral and last-updated Efficiency per module;PXD Module;",
+  m_hEffAllUpdate = new TEfficiency("ePXDHitEffAllUpdate", "PXD Integral and last-updated Efficiency per module;PXD Module;",
                                     m_PXDModules.size(), 0, m_PXDModules.size());
   m_hEffAllUpdate->SetConfidenceLevel(m_confidence);
 
@@ -160,18 +177,6 @@ void DQMHistAnalysisPXDEffModule::initialize()
       }
     }
   }
-
-  //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
-  m_line_warn = new TLine(0, m_warnlevel, m_PXDModules.size(), m_warnlevel);
-  m_line_error = new TLine(0, m_errorlevel, m_PXDModules.size(), m_errorlevel);
-  m_line_warn->SetHorizontal(true);
-  m_line_warn->SetLineColor(kOrange - 3);
-  m_line_warn->SetLineWidth(3);
-  m_line_warn->SetLineStyle(4);
-  m_line_error->SetHorizontal(true);
-  m_line_error->SetLineColor(kRed + 3);
-  m_line_error->SetLineWidth(3);
-  m_line_error->SetLineStyle(7);
 
   m_monObj->addCanvas(m_cEffAll);
   m_monObj->addCanvas(m_cEffAllUpdate);
@@ -204,6 +209,34 @@ void DQMHistAnalysisPXDEffModule::beginRun()
     m_hEffAll->SetTotalEvents(j, 0);
     m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
     m_hEffAllUpdate->SetTotalEvents(j, 0);
+
+    m_warnlevelmod[m_PXDModules[i]] = m_warnlevel;
+    m_errorlevelmod[m_PXDModules[i]] = m_errorlevel;
+
+#ifdef _BELLE2_EPICS
+    if (m_useEpics) {
+      // get warn and error limit
+      // as the same array as above, we assume chid exists
+      struct dbr_ctrl_double tPvData;
+      auto r = ca_get(DBR_CTRL_DOUBLE, mychid_eff[m_PXDModules[i]], &tPvData);
+      if (r == ECA_NORMAL) r = ca_pend_io(5.0);
+      if (r == ECA_NORMAL) {
+        if (!std::isnan(tPvData.lower_alarm_limit)
+            && tPvData.lower_alarm_limit > 0.0) {
+          m_hErrorLine->SetBinContent(i + 1, tPvData.lower_alarm_limit);
+          if (m_perModuleAlarm) m_errorlevelmod[m_PXDModules[i]] = tPvData.lower_alarm_limit;
+        }
+        if (!std::isnan(tPvData.lower_warning_limit)
+            && tPvData.lower_warning_limit > 0.0) {
+          m_hWarnLine->SetBinContent(i + 1, tPvData.lower_warning_limit);
+          if (m_perModuleAlarm) m_warnlevelmod[m_PXDModules[i]] = tPvData.lower_warning_limit;
+        }
+      } else {
+        SEVCHK(r, "ca_get or ca_pend_io failure");
+      }
+    }
+#endif
+
   }
   // Thus histo will contain old content until first update
   m_hEffAllLastTotal->Reset();
@@ -296,7 +329,7 @@ void DQMHistAnalysisPXDEffModule::event()
       }
 
       /// TODO: one value per module, and please change to the "delta" instead of integral
-      all += ihit;
+      all += nhit;
       m_hEffAll->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
       m_hEffAll->SetTotalEvents(j, nhit);
       m_hEffAll->SetPassedEvents(j, nmatch);
@@ -323,10 +356,18 @@ void DQMHistAnalysisPXDEffModule::event()
       // get the errors and check for limits for each bin seperately ...
       /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
 
-      error_flag |= (ihit > 10)
-                    && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < m_errorlevel); // error if upper error value is below limit
-      warn_flag |= (ihit > 10)
-                   && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < m_warnlevel); // (and not only the actual eff value)
+      if (nhit > 20) {
+        error_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
+                       m_errorlevelmod[aModule]); // error if upper error value is below limit
+        warn_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
+                      m_warnlevelmod[aModule]); // (and not only the actual eff value)
+        if (m_alarmAdhoc) {
+          error_flag |= (m_hEffAllUpdate->GetEfficiency(j) + m_hEffAllUpdate->GetEfficiencyErrorUp(j) <
+                         m_errorlevelmod[aModule]); // error if upper error value is below limit
+          warn_flag |= (m_hEffAllUpdate->GetEfficiency(j) + m_hEffAllUpdate->GetEfficiencyErrorUp(j) <
+                        m_warnlevelmod[aModule]); // (and not only the actual eff value)
+        }
+      }
     }
   }
 
@@ -396,8 +437,8 @@ void DQMHistAnalysisPXDEffModule::event()
       m_cEffAll->Pad()->SetFrameFillStyle(1001);// White
       m_cEffAll->Pad()->Modified();
       m_cEffAll->Pad()->Update();
-      m_line_warn->Draw();
-      m_line_error->Draw();
+      m_hWarnLine->Draw("same,hist");
+      m_hErrorLine->Draw("same,hist");
     }
 
     m_cEffAll->Modified();
@@ -450,7 +491,7 @@ void DQMHistAnalysisPXDEffModule::event()
         }
       }
 #ifdef _BELLE2_EPICS
-      if (m_useEpics) {
+      if (m_useEpics && !m_useEpicsRO) {
         for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
           if (updated[m_PXDModules[i]]) {
             Double_t x, y;// we assume that double and Double_t are same!
@@ -468,7 +509,7 @@ void DQMHistAnalysisPXDEffModule::event()
     } else scale_min = 0.0;
     if (gr) gr->Draw("AP");
     if (gr3) gr3->Draw("P");
-    auto tt = new TLatex(5.5, scale_min, "1.3.2 Module is excluded, please ignore");
+    auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
     tt->SetTextSize(0.035);
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered
@@ -495,8 +536,8 @@ void DQMHistAnalysisPXDEffModule::event()
     m_cEffAllUpdate->Pad()->SetFrameFillStyle(1001);// White
     m_cEffAllUpdate->Pad()->Modified();
     m_cEffAllUpdate->Pad()->Update();
-    m_line_warn->Draw();
-    m_line_error->Draw();
+    m_hWarnLine->Draw("same,hist");
+    m_hErrorLine->Draw("same,hist");
   }
   m_cEffAllUpdate->Modified();
   m_cEffAllUpdate->Update();
@@ -507,7 +548,7 @@ void DQMHistAnalysisPXDEffModule::event()
   m_monObj->setVariable("nmodules", ieff);
 
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (m_useEpics && !m_useEpicsRO) {
     SEVCHK(ca_put(DBR_DOUBLE, mychid_status[0], (void*)&stat_data), "ca_set failure");
     // only update if statistics is reasonable, we dont want "0" drops between runs!
     if (stat_data != 0) SEVCHK(ca_put(DBR_DOUBLE, mychid_status[1], (void*)&var_efficiency), "ca_set failure");

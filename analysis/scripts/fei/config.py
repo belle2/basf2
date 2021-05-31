@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # @cond SUPPRESS_DOXYGEN
 
@@ -139,7 +138,7 @@ def removeJPsiSlash(string: str) -> str:
     return string.replace('/', '')
 
 
-class Particle(object):
+class Particle:
 
     """
     The Particle class is the only class the end-user gets into contact with.

@@ -44,11 +44,9 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    std::vector<std::tuple<std::string, std::string>> emptyDecayStringsAndCuts;
-
-    addParam("decayStringsWithCuts", m_decayStringsWithCuts,
-             "List of (decayString, Variable::Cut) tuples that specify all output ParticleLists to be created by the module. Only Particles that pass specified selection criteria are added to the ParticleList (see :ref:`DecayString` and `cut_strings_selections`).",
-             emptyDecayStringsAndCuts);
+    addParam("decayStrings", m_decayStrings,
+             "List of decay strings (see :ref:`DecayString` for syntax) that specify all output ParticleLists to be created by the module.",
+             {});
 
     addParam("useMCParticles", m_useMCParticles,
              "Use MCParticles instead of reconstructed MDST dataobjects (tracks, ECL, KLM, clusters, V0s, ...)", false);
@@ -83,10 +81,6 @@ namespace Belle2 {
     addParam("enforceFitHypothesis", m_enforceFitHypothesis,
              "If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available.",
              m_enforceFitHypothesis);
-
-    addParam("loadPhotonsFromKLM", m_loadPhotonsFromKLM,
-             "If true, create photon candidates from KLM cluster.",
-             false);
   }
 
   void ParticleLoaderModule::initialize()
@@ -111,14 +105,10 @@ namespace Belle2 {
       m_mcparticles.isRequired();
     }
 
-    if (m_decayStringsWithCuts.empty()) {
-      B2WARNING("Obsolete usage of the ParticleLoader module (load all MDST objects as all possible Particle object types). Specify the particle type via decayStringsWithCuts module parameter instead.");
+    if (m_decayStrings.empty()) {
+      B2WARNING("Obsolete usage of the ParticleLoader module (load all MDST objects as all possible Particle object types). Specify the particle type via decayStrings module parameter instead.");
     } else {
-      for (auto decayStringCutTuple : m_decayStringsWithCuts) {
-
-        // parsing of the input tuple (DecayString, Cut)
-        string decayString = get<0>(decayStringCutTuple);
-        std::string cutParameter = get<1>(decayStringCutTuple);
+      for (auto decayString : m_decayStrings) {
 
         // obtain the output particle lists from the decay string
         bool valid = m_decaydescriptor.init(decayString);
@@ -127,16 +117,31 @@ namespace Belle2 {
 
         // Mother particle
         const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
+        int nProducts = m_decaydescriptor.getNDaughters();
 
         int pdgCode  = mother->getPDGCode();
-        string listName = mother->getFullName();
+        // The default list name is "all"
+        string listName = mother->getName() + ":all";
+        // ROE particles get the label "ROE"
+        if (m_useROEs) listName = mother->getName() + ":ROE";
+        // MC particles get the label "MC"
+        else if (m_useMCParticles) listName = mother->getName() + ":MC";
+        // V0s get the label "V0"
+        else if (nProducts > 0) listName = mother->getName() + ":V0";
 
-        // special case. if the list is called "all" it may not have a
-        // corresponding cut string this can introduce very dangerous bugs
-        string listLabel = mother->getLabel();
-        if (listLabel == "all")
-          if (cutParameter != "")
-            B2FATAL("You have tried to create a list " << listName << " with cuts! This is *very* error prone, so it is now forbidden.");
+        string antiListName = ParticleListName::antiParticleListName(listName);
+        bool isSelfConjugatedParticle = (listName == antiListName);
+
+        StoreObjPtr<ParticleList> particleList(listName);
+        // if the particle list doesn't exist, we have to register it
+        if (!particleList.isOptional()) {
+          DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
+          particleList.registerInDataStore(flags);
+          if (!isSelfConjugatedParticle) {
+            StoreObjPtr<ParticleList> antiParticleList(antiListName);
+            antiParticleList.registerInDataStore(flags);
+          }
+        }
 
         if (not isValidPDGCode(pdgCode) and (m_useMCParticles == false and m_useROEs == false))
           B2ERROR("Invalid particle type requested to be loaded. Set a valid decayString module parameter.");
@@ -148,7 +153,6 @@ namespace Belle2 {
              || (abs(pdgCode) == abs(Const::photon.getPDGCode()) && m_addDaughters == true)))
           mdstSourceIsV0 = true;
 
-        int nProducts = m_decaydescriptor.getNDaughters();
         if (mdstSourceIsV0 == false) {
           if (nProducts > 0) {
             if (!m_useROEs) {
@@ -171,74 +175,46 @@ namespace Belle2 {
           }
         }
 
-        string antiListName = ParticleListName::antiParticleListName(listName);
-        bool isSelfConjugatedParticle = (listName == antiListName);
-
-        StoreObjPtr<ParticleList> particleList(listName);
-        if (!particleList.isOptional()) {
-          //if it doesn't exist:
-
-          DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
-          particleList.registerInDataStore(flags);
-          if (!isSelfConjugatedParticle) {
-            StoreObjPtr<ParticleList> antiParticleList(antiListName);
-            antiParticleList.registerInDataStore(flags);
-          }
-        } else {
-          // TODO: test that this actually works
-          B2WARNING("The ParticleList with name " << listName << " already exists in the DataStore. Nothing to do.");
-          continue;
-        }
-
-        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutParameter));
-
         // add PList to corresponding collection of Lists
         B2INFO(" o) creating (anti-)ParticleList with name: " << listName << " (" << antiListName << ")");
         if (m_useROEs) {
           B2INFO("   -> MDST source: RestOfEvents");
-          m_ROE2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+          m_ROE2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
         } else if (m_useMCParticles) {
           B2INFO("   -> MDST source: MCParticles");
-          m_MCParticles2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+          m_MCParticles2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
         } else {
           bool chargedFSP = Const::chargedStableSet.contains(Const::ParticleType(abs(pdgCode)));
           if (chargedFSP) {
             B2INFO("   -> MDST source: Tracks");
-            m_Tracks2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+            m_Tracks2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
           }
 
           if (abs(pdgCode) == abs(Const::photon.getPDGCode())) {
             if (m_addDaughters == false) {
-              m_ECLClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
-              if (m_loadPhotonsFromKLM) {
-                m_KLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
-                B2INFO("   -> MDST source: ECLClusters and KLMClusters");
-              } else {
-                B2INFO("   -> MDST source: ECLClusters");
-              }
+              m_ECLKLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
+              B2INFO("   -> MDST source: ECLClusters and KLMClusters");
             } else {
               B2INFO("   -> MDST source: V0");
-              m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+              m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
             }
           }
 
           if (abs(pdgCode) == abs(Const::Kshort.getPDGCode())) {
             B2INFO("   -> MDST source: V0");
-            m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+            m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
           }
 
           if (abs(pdgCode) == abs(Const::Klong.getPDGCode()) || abs(pdgCode) == abs(Const::neutron.getPDGCode())) {
             B2INFO("   -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)");
-            m_KLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
-            m_ECLClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+            m_ECLKLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
           }
 
           if (abs(pdgCode) == abs(Const::Lambda.getPDGCode())) {
             B2INFO("   -> MDST source: V0");
-            m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+            m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle);
           }
         }
-        B2INFO("   -> With cuts  : " << cutParameter);
       }
     }
 
@@ -259,8 +235,7 @@ namespace Belle2 {
       mcParticlesToParticles();
     else {
       tracksToParticles();
-      eclClustersToParticles();
-      klmClustersToParticles();
+      eclAndKLMClustersToParticles();
       v0sToParticles();
     }
   }
@@ -297,6 +272,10 @@ namespace Belle2 {
     bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(roe2Plist);
 
     StoreObjPtr<ParticleList> plist(listName);
+    // since a particle list in the ParticleLoader always contains all possible objects
+    // we check whether it already exists in this path and can skip any further steps if it does
+    if (plist.isValid())
+      return;
     plist.create();
     plist->initialize(pdgCode, listName);
 
@@ -352,12 +331,9 @@ namespace Belle2 {
     }
     for (auto roe2Plist : m_ROE2Plists) {
       string listName = get<c_PListName>(roe2Plist);
-      auto& cut = get<c_CutPointer>(roe2Plist);
       StoreObjPtr<ParticleList> plist(listName);
-      if (cut->check(newPart))
-        plist->addParticle(newPart);
+      plist->addParticle(newPart);
     }
-
   }
 
 
@@ -366,14 +342,25 @@ namespace Belle2 {
     if (m_V02Plists.empty()) // nothing to do
       return;
 
-    // create all lists
-    for (auto v02Plist : m_V02Plists) {
+    // check if the order of the daughters in the decay string (decided by the user) is the same as the v0 daughters' order (fixed)
+    bool matchingDaughtersOrder = true;
+    if (m_decaydescriptor.getDaughter(0)->getMother()->getPDGCode() < 0
+        && m_decaydescriptor.getDaughter(1)->getMother()->getPDGCode() > 0)
+      matchingDaughtersOrder = false;
+
+    // loop over all ParticleLists
+    for (size_t ilist = 0; ilist < m_V02Plists.size(); ilist++) {
+      auto v02Plist = m_V02Plists[ilist];
       string listName = get<c_PListName>(v02Plist);
       string antiListName = get<c_AntiPListName>(v02Plist);
       int pdgCode = get<c_PListPDGCode>(v02Plist);
       bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(v02Plist);
 
       StoreObjPtr<ParticleList> plist(listName);
+      // since a particle list in the ParticleLoader always contains all possible objects
+      // we check whether it already exists in this path and can skip any further steps if it does
+      if (plist.isValid())
+        continue;
       plist.create();
       plist->initialize(pdgCode, listName);
 
@@ -384,25 +371,13 @@ namespace Belle2 {
 
         antiPlist->bindAntiParticleList(*(plist));
       }
-    }
 
-    // check if the order of the daughters in the decay string (decided by the user) is the same of the v0 daughers order (fixed)
-    bool matchingDaughtersOrder = true;
-    if (m_decaydescriptor.getDaughter(0)->getMother()->getPDGCode() < 0
-        && m_decaydescriptor.getDaughter(1)->getMother()->getPDGCode() > 0)
-      matchingDaughtersOrder = false;
+      // load reconstructed V0s as Kshorts (pi-pi+ combination), Lambdas (p+pi- combinations), and converted photons (e-e+ combinations)
+      for (int i = 0; i < m_v0s.getEntries(); i++) {
+        const V0* v0 = m_v0s[i];
+        Const::ParticleType v0Type = v0->getV0Hypothesis();
 
-    // load reconstructed V0s as Kshorts (pi-pi+ combination), Lambdas (p+pi- combinations), and converted photons (e-e+ combinations)
-    for (int i = 0; i < m_v0s.getEntries(); i++) {
-      const V0* v0 = m_v0s[i];
-      Const::ParticleType v0Type = v0->getV0Hypothesis();
-
-      // inner loop over the ParticleLists
-      for (size_t ilist = 0; ilist < m_V02Plists.size(); ilist++) {
-        auto v02Plist = m_V02Plists[ilist];
-        int listPDGCode = get<c_PListPDGCode>(v02Plist);
-
-        if (abs(listPDGCode) != abs(v0Type.getPDGCode()))
+        if (abs(pdgCode) != abs(v0Type.getPDGCode()))
           continue;
 
         // check if the charge of the 2 V0's daughters is opposite
@@ -494,15 +469,9 @@ namespace Belle2 {
           v0P.appendDaughter(newDaugP, false);
         }
 
-        // append the particle to the Particle StoreArray and check that we pass
-        // any cuts before adding the new particle to the ParticleList
+        // append the particle to the Particle StoreArray and add the new particle to the ParticleList
         Particle* newPart = m_particles.appendNew(v0P);
-        string listName = get<c_PListName>(v02Plist);
-        auto& cut = get<c_CutPointer>(v02Plist);
-        StoreObjPtr<ParticleList> plist(listName);
-
-        if (cut->check(newPart))
-          plist->addParticle(newPart);
+        plist->addParticle(newPart);
       }
     }
   }
@@ -512,14 +481,19 @@ namespace Belle2 {
     if (m_Tracks2Plists.empty()) // nothing to do
       return;
 
-    // create and initialize the particle lists
-    for (auto track2Plist : m_Tracks2Plists) {
+    // loop over all requested particle lists
+    for (size_t ilist = 0; ilist < m_Tracks2Plists.size(); ilist++) {
+      auto track2Plist = m_Tracks2Plists[ilist];
       string listName = get<c_PListName>(track2Plist);
       string antiListName = get<c_AntiPListName>(track2Plist);
       int pdgCode = get<c_PListPDGCode>(track2Plist);
       bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(track2Plist);
 
       StoreObjPtr<ParticleList> plist(listName);
+      // since a particle list in the ParticleLoader always contains all possible objects
+      // we check whether it already exists in this path and can skip any further steps if it does
+      if (plist.isValid())
+        continue;
       plist.create();
       plist->initialize(pdgCode, listName);
 
@@ -531,27 +505,16 @@ namespace Belle2 {
 
         antiPlist->bindAntiParticleList(*(plist));
       }
-    }
 
-    // the outer loop over all tracks from which Particles
-    // are created, and get sorted in the particle lists
-    for (int i = 0; i < m_tracks.getEntries(); i++) {
-      const Track* track = m_tracks[i];
-      const PIDLikelihood* pid = track->getRelated<PIDLikelihood>();
-      const auto& mcParticleWithWeight = track->getRelatedToWithWeight<MCParticle>();
+      // the inner loop over all tracks from which Particles
+      // are created, and get sorted in the particle lists
+      for (int i = 0; i < m_tracks.getEntries(); i++) {
+        const Track* track = m_tracks[i];
+        const PIDLikelihood* pid = track->getRelated<PIDLikelihood>();
+        const auto& mcParticleWithWeight = track->getRelatedToWithWeight<MCParticle>();
 
-      // inner loop over the ParticleLists
-      for (size_t ilist = 0; ilist < m_Tracks2Plists.size(); ilist++) {
-        auto track2Plist = m_Tracks2Plists[ilist];
-        string listName = get<c_PListName>(track2Plist);
-        auto& cut = get<c_CutPointer>(track2Plist);
-        StoreObjPtr<ParticleList> plist(listName);
-
-        // if no track hypothesis is requested, use the particle's own
-        int pdgCode;
-        if (m_trackHypothesis == 0)
-          pdgCode = get<c_PListPDGCode>(track2Plist);
-        else pdgCode = m_trackHypothesis;
+        // if a special track hypothesis is requested, use it
+        if (m_trackHypothesis != 0) pdgCode = m_trackHypothesis;
         Const::ChargedStable type(abs(pdgCode));
 
         // load the TrackFitResult for the requested particle or if not available use
@@ -589,94 +552,89 @@ namespace Belle2 {
             newPart->addRelationTo(mcParticleWithWeight.first, mcParticleWithWeight.second);
           newPart->addRelationTo(trackFit);
 
-          if (cut->check(newPart))
-            plist->addParticle(newPart);
+          plist->addParticle(newPart);
 
         } // sanity check correct particle type
-      } // particle lists
-    } // loop over tracks
+      } // loop over tracks
+    } // particle lists
   }
 
-  void ParticleLoaderModule::eclClustersToParticles()
+  void ParticleLoaderModule::eclAndKLMClustersToParticles()
   {
-    if (m_ECLClusters2Plists.empty()) // nothing to do
+    if (m_ECLKLMClusters2Plists.empty()) // nothing to do
       return;
 
-    // create and register all ParticleLists
-    for (auto eclCluster2Plist : m_ECLClusters2Plists) {
-      string listName = get<c_PListName>(eclCluster2Plist);
-      string antiListName = get<c_AntiPListName>(eclCluster2Plist);
-      int pdgCode = get<c_PListPDGCode>(eclCluster2Plist);
-      bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(eclCluster2Plist);
+    // loop over all ParticleLists
+    for (auto eclKLMCluster2Plist : m_ECLKLMClusters2Plists) {
+      string listName = get<c_PListName>(eclKLMCluster2Plist);
+      string antiListName = get<c_AntiPListName>(eclKLMCluster2Plist);
+      int pdgCode = get<c_PListPDGCode>(eclKLMCluster2Plist);
+      bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(eclKLMCluster2Plist);
 
       StoreObjPtr<ParticleList> plist(listName);
-      if (!plist) { // create the list only if the klmClustersToParticles function has not already created it
-        plist.create();
-        plist->initialize(pdgCode, listName);
-
-        // create anti-particle list if necessary
-        if (!isSelfConjugatedParticle) {
-          StoreObjPtr<ParticleList> antiPlist(antiListName);
-          antiPlist.create();
-          antiPlist->initialize(-1 * pdgCode, antiListName);
-
-          antiPlist->bindAntiParticleList(*(plist));
-        }
-      }
-    }
-
-    // outer loop over all ECLClusters
-    for (int i = 0; i < m_eclclusters.getEntries(); i++) {
-      const ECLCluster* cluster      = m_eclclusters[i];
-
-      // ECLClusters can be reconstructed under different hypotheses, for
-      // example photons or neutral hadrons, we only load particles from these
-      // for now
-      if (!cluster->isNeutral()) continue;
-      if (not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)
-          and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
+      // since a particle list in the ParticleLoader always contains all possible objects
+      // we check whether it already exists in this path and can skip any further steps if it does
+      if (plist.isValid())
         continue;
+      plist.create();
+      plist->initialize(pdgCode, listName);
 
-      // ECLCluster can be matched to multiple MCParticles
-      // order the relations by weights and set Particle -> multiple MCParticle relation
-      // preserve the weight
-      RelationVector<MCParticle> mcRelations = cluster->getRelationsTo<MCParticle>();
-      // order relations by weights
-      std::vector<std::pair<int, double>> weightsAndIndices;
-      for (unsigned int iMCParticle = 0; iMCParticle < mcRelations.size(); iMCParticle++) {
-        const MCParticle* relMCParticle = mcRelations[iMCParticle];
-        double weight = mcRelations.weight(iMCParticle);
-        if (relMCParticle)
-          weightsAndIndices.emplace_back(relMCParticle->getArrayIndex(), weight);
+      // create anti-particle list if necessary
+      if (!isSelfConjugatedParticle) {
+        StoreObjPtr<ParticleList> antiPlist(antiListName);
+        antiPlist.create();
+        antiPlist->initialize(-1 * pdgCode, antiListName);
+
+        antiPlist->bindAntiParticleList(*(plist));
       }
-      // sort descending by weight
-      std::sort(weightsAndIndices.begin(), weightsAndIndices.end(),
-      [](const std::pair<int, double>& left, const std::pair<int, double>& right) {
-        return left.second > right.second;
-      });
 
-      // inner loop over ParticleLists: fill each relevant list with Particles
-      // created from ECLClusters
-      for (auto eclCluster2Plist : m_ECLClusters2Plists) {
-        string listName = get<c_PListName>(eclCluster2Plist);
-        int listPdgCode = get<c_PListPDGCode>(eclCluster2Plist);
-        Const::ParticleType thisType(listPdgCode);
+      // load reconstructed neutral ECL clusters as photons or Klongs or neutrons
+      for (int i = 0; i < m_eclclusters.getEntries(); i++) {
+        const ECLCluster* cluster      = m_eclclusters[i];
+
+        // ECLClusters can be reconstructed under different hypotheses, for
+        // example photons or neutral hadrons, we only load particles from these
+        // for now
+        if (!cluster->isNeutral()) continue;
+        if (not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)
+            and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
+          continue;
+
+        // ECLCluster can be matched to multiple MCParticles
+        // order the relations by weights and set Particle -> multiple MCParticle relation
+        // preserve the weight
+        RelationVector<MCParticle> mcRelations = cluster->getRelationsTo<MCParticle>();
+        // order relations by weights
+        std::vector<std::pair<int, double>> weightsAndIndices;
+        for (unsigned int iMCParticle = 0; iMCParticle < mcRelations.size(); iMCParticle++) {
+          const MCParticle* relMCParticle = mcRelations[iMCParticle];
+          double weight = mcRelations.weight(iMCParticle);
+          if (relMCParticle)
+            weightsAndIndices.emplace_back(relMCParticle->getArrayIndex(), weight);
+        }
+        // sort descending by weight
+        std::sort(weightsAndIndices.begin(), weightsAndIndices.end(),
+        [](const std::pair<int, double>& left, const std::pair<int, double>& right) {
+          return left.second > right.second;
+        });
+
+        Const::ParticleType thisType(pdgCode);
 
         // don't fill photon list with clusters that don't have
         // the nPhotons hypothesis (ECL people call this N1)
-        if (listPdgCode == Const::photon.getPDGCode()
+        if (pdgCode == Const::photon.getPDGCode()
             and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
           continue;
 
         // don't fill a KLong list with clusters that don't have the neutral
         // hadron hypothesis set (ECL people call this N2)
-        if (listPdgCode == Const::Klong.getPDGCode()
+        if (pdgCode == Const::Klong.getPDGCode()
             and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
           continue;
 
         // don't fill a neutron list with clusters that don't have the neutral
         // hadron hypothesis set (ECL people call this N2)
-        if (abs(listPdgCode) == Const::neutron.getPDGCode()
+        if (abs(pdgCode) == Const::neutron.getPDGCode()
             and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
           continue;
 
@@ -702,58 +660,21 @@ namespace Belle2 {
               newPart->addRelationTo(relMCParticle, weight);
         }
 
+        // add particle to list
+        plist->addParticle(newPart);
+      }
 
-        // add particle to list if it passes the selection criteria
-        auto& cut = get<c_CutPointer>(eclCluster2Plist);
-        StoreObjPtr<ParticleList> plist(listName);
-        if (cut->check(newPart))
-          plist->addParticle(newPart);
+      // load reconstructed KLM clusters as Klongs or neutrons or photons
+      for (int i = 0; i < m_klmclusters.getEntries(); i++) {
+        const KLMCluster* cluster      = m_klmclusters[i];
 
-      } // loop over particle lists to be filled by ECLClusters
-    } // loop over cluster
-  }
-
-  void ParticleLoaderModule::klmClustersToParticles()
-  {
-    if (m_KLMClusters2Plists.empty()) // nothing to do
-      return;
-
-    // create all lists
-    for (auto klmCluster2Plist : m_KLMClusters2Plists) {
-      string listName = get<c_PListName>(klmCluster2Plist);
-      string antiListName = get<c_AntiPListName>(klmCluster2Plist);
-      int pdgCode = get<c_PListPDGCode>(klmCluster2Plist);
-      bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(klmCluster2Plist);
-
-      StoreObjPtr<ParticleList> plist(listName);
-      if (!plist) { // create the list only if the eclClustersToParticle has not already created it
-        plist.create();
-        plist->initialize(pdgCode, listName);
-
-        if (!isSelfConjugatedParticle) {
-          StoreObjPtr<ParticleList> antiPlist(antiListName);
-          antiPlist.create();
-          antiPlist->initialize(-1 * pdgCode, antiListName);
-
-          antiPlist->bindAntiParticleList(*(plist));
+        if (std::isnan(cluster->getMomentumMag())) {
+          B2DEBUG(19, "Skipping KLMCluster because its momentum is NaN. "
+                  "This can happen if the timing calibration is missing or wrong, so that the velocity is calculated to be negative.");
+          continue;
         }
-      }
-    }
 
-    // load reconstructed neutral KLM clusters as Klongs or neutrons or photons
-    for (int i = 0; i < m_klmclusters.getEntries(); i++) {
-      const KLMCluster* cluster      = m_klmclusters[i];
-
-      if (std::isnan(cluster->getMomentumMag())) {
-        B2WARNING("Skipping KLMCluster because of nan momentum.");
-        continue;
-      }
-
-      const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
-
-      for (auto klmCluster2Plist : m_KLMClusters2Plists) {
-        string listName = get<c_PListName>(klmCluster2Plist);
-        int pdgCode = get<c_PListPDGCode>(klmCluster2Plist);
+        const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
 
         // create particle and check its type before adding it to list
         Particle particle(cluster, pdgCode);
@@ -765,14 +686,10 @@ namespace Belle2 {
         if (mcParticle)
           newPart->addRelationTo(mcParticle);
 
-        // add particle to list if it passes the selection criteria
-        auto&  cut = get<c_CutPointer>(klmCluster2Plist);
-        StoreObjPtr<ParticleList> plist(listName);
-
-        if (cut->check(newPart))
-          plist->addParticle(newPart);
+        // add particle to list
+        plist->addParticle(newPart);
       }
-    }
+    } // loop over particle lists
   }
 
   void ParticleLoaderModule::mcParticlesToParticles()
@@ -788,6 +705,10 @@ namespace Belle2 {
       bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(mcParticle2Plist);
 
       StoreObjPtr<ParticleList> plist(listName);
+      // since a particle list in the ParticleLoader always contains all possible objects
+      // we check whether it already exists in this path and can skip any further steps if it does
+      if (plist.isValid())
+        continue;
       plist.create();
       plist->initialize(pdgCode, listName);
 
@@ -798,13 +719,9 @@ namespace Belle2 {
 
         antiPlist->bindAntiParticleList(*(plist));
       }
-    }
 
-    for (int i = 0; i < m_mcparticles.getEntries(); i++) {
-      const MCParticle* mcParticle = m_mcparticles[i];
-
-      for (auto mcParticle2Plist : m_MCParticles2Plists) {
-        int pdgCode = get<c_PListPDGCode>(mcParticle2Plist);
+      for (int i = 0; i < m_mcparticles.getEntries(); i++) {
+        const MCParticle* mcParticle = m_mcparticles[i];
 
         if (abs(pdgCode) != abs(mcParticle->getPDG()))
           continue;
@@ -816,12 +733,7 @@ namespace Belle2 {
         //append the whole bottom part of the decay tree to this particle
         if (m_addDaughters) appendDaughtersRecursive(newPart);
 
-        string listName = get<c_PListName>(mcParticle2Plist);
-        auto&  cut = get<c_CutPointer>(mcParticle2Plist);
-        StoreObjPtr<ParticleList> plist(listName);
-
-        if (cut->check(newPart))
-          plist->addParticle(newPart);
+        plist->addParticle(newPart);
       }
     }
   }

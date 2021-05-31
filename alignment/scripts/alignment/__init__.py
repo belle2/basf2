@@ -1,7 +1,6 @@
 import basf2 as b2
 from basf2.pickle_path import deserialize_path, deserialize_module, serialize_path, serialize_module
 
-import sys
 import ROOT
 from ROOT import Belle2
 from caf.framework import Calibration

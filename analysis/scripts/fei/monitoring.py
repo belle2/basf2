@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 # @cond SUPPRESS_DOXYGEN
 
@@ -47,7 +46,7 @@ def load_config():
     return pickle.load(open('Summary.pickle', 'rb'))
 
 
-class Statistic(object):
+class Statistic:
     """
     This class provides the efficiency, purity and other quantities for a
     given number of true signal candidates, signal candidates and background candidates
@@ -138,7 +137,7 @@ class Statistic(object):
         return Statistic(self.nTrueSig, self.nSig, self.nBg)
 
 
-class MonitoringHist(object):
+class MonitoringHist:
     """
     Reads all TH1F and TH2F from a ROOT file
     and puts them into a more accessible format.
@@ -235,7 +234,7 @@ class MonitoringHist(object):
         return self.centers[name][nonzero[-1]]
 
 
-class MonitoringNTuple(object):
+class MonitoringNTuple:
     """
     Reads the ntuple named variables from a ROOT file
     """
@@ -257,7 +256,7 @@ class MonitoringNTuple(object):
         self.filename = filename
 
 
-class MonitoringModuleStatistics(object):
+class MonitoringModuleStatistics:
     """
     Reads the module statistics for a single particle from the outputted root file
     and puts them into a more accessible format
@@ -407,7 +406,7 @@ def MonitoringMCCount(particle):
     return mc_counts
 
 
-class MonitoringBranchingFractions(object):
+class MonitoringBranchingFractions:
     """ Class extracts the branching fractions of a decay channel from the DECAY.DEC file. """
     #: is the monitoring shared
     _shared = None
@@ -474,7 +473,7 @@ class MonitoringBranchingFractions(object):
         branching_fractions = {'UNKOWN': {}}
 
         mother = 'UNKOWN'
-        with open(filename, 'r') as f:
+        with open(filename) as f:
             for line in f:
                 fields = line.split(' ')
                 fields = [x for x in fields if x != '']
@@ -518,7 +517,7 @@ class MonitoringBranchingFractions(object):
         @param branching_fractions
         """
         particles = set(exclusive_branching_fractions.keys())
-        particles.update(set(pdg.conjugate(p) for p in particles if p != pdg.conjugate(p)))
+        particles.update({pdg.conjugate(p) for p in particles if p != pdg.conjugate(p)})
         particles = sorted(particles, key=lambda x: pdg.get(x).Mass())
         inclusive_branching_fractions = copy.deepcopy(exclusive_branching_fractions)
 
@@ -534,7 +533,7 @@ class MonitoringBranchingFractions(object):
         return inclusive_branching_fractions
 
 
-class MonitoringParticle(object):
+class MonitoringParticle:
     """
     Monitoring object containing all the monitoring information
     about a single particle

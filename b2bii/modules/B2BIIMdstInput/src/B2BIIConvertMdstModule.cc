@@ -1253,19 +1253,35 @@ void B2BIIConvertMdstModule::convertRecTrgTable()
   if (not m_evtInfo.isValid()) {
     m_evtInfo.create();
   }
+  // Load event info
+  StoreObjPtr<EventMetaData> event;
 
-  // Pull rectrg_summary3 from manager
-  Belle::Rectrg_summary3_Manager& RecTrgSummary3Mgr = Belle::Rectrg_summary3_Manager::get_manager();
+  if (event->getExperiment() <= 27) {  // Check if it's SVD 1
+    // Pull rectrg_summary from namager
+    Belle::Rectrg_summary_Manager& RecTrgSummaryMgr = Belle::Rectrg_summary_Manager::get_manager();
+    std::vector<Belle::Rectrg_summary>::iterator eflagIterator = RecTrgSummaryMgr.begin();
+    std::string name_summary = "rectrg_summary_m_final";
 
-  std::string name = "rectrg_summary3_m_final";
-  // Only one entry in each event
-  std::vector<Belle::Rectrg_summary3>::iterator eflagIterator = RecTrgSummary3Mgr.begin();
+    // Converting m_final(2) from rectrg_summary
+    for (int index = 0; index < 2; ++index) {
+      std::string iVar = name_summary + std::to_string(index);
+      m_evtInfo->addExtraInfo(iVar, (*eflagIterator).final(index));
+      B2DEBUG(99, "m_final(" << index << ") = " << m_evtInfo->getExtraInfo(iVar));
+    }
+  } else { // For SVD2
+    // Pull rectrg_summary3 from manager
+    Belle::Rectrg_summary3_Manager& RecTrgSummary3Mgr = Belle::Rectrg_summary3_Manager::get_manager();
 
-  // Converting m_final(3)
-  for (int index = 0; index < 3; ++index) {
-    std::string iVar = name + std::to_string(index);
-    m_evtInfo->addExtraInfo(iVar, (*eflagIterator).final(index));
-    B2DEBUG(99, "m_final(" << index << ") = " << m_evtInfo->getExtraInfo(iVar));
+    std::string name_summary3 = "rectrg_summary3_m_final";
+    // Only one entry in each event
+    std::vector<Belle::Rectrg_summary3>::iterator eflagIterator3 = RecTrgSummary3Mgr.begin();
+
+    // Converting m_final(3)
+    for (int index = 0; index < 3; ++index) {
+      std::string iVar = name_summary3 + std::to_string(index);
+      m_evtInfo->addExtraInfo(iVar, (*eflagIterator3).final(index));
+      B2DEBUG(99, "m_final(" << index << ") = " << m_evtInfo->getExtraInfo(iVar));
+    }
   }
 
 }

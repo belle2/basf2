@@ -12,10 +12,9 @@
 # Author: Luka Santelj
 #
 
-import os
 import sys
-from basf2 import *
-logging.log_level = LogLevel.WARNING
+import basf2 as b2
+b2.logging.log_level = b2.LogLevel.WARNING
 
 print('')
 print('Use the script as: basf2 ARICHBkg.py arguments')
@@ -35,10 +34,10 @@ typs = ["RBB", "BHWide", "Touschek_HER", "Touschek_LER", "Coulomb_HER", "Coulomb
 # here we register modules
 # -------------------------
 
-input = register_module('RootInput')
-paramloader = register_module('Gearbox')
-geobuilder = register_module('Geometry')
-back = register_module('ARICHBackground')
+input = b2.register_module('RootInput')
+paramloader = b2.register_module('Gearbox')
+geobuilder = b2.register_module('Geometry')
+back = b2.register_module('ARICHBackground')
 
 # --------------------------------------
 # here we set the parameters of modules
@@ -68,7 +67,7 @@ geobuilder.param('components', ['ARICH'])
 back.param('FileName', out)
 back.param('BkgTag', typs.index(typee))
 # create path
-main = create_path()
+main = b2.create_path()
 
 # add modules to path
 main.add_module(input)
@@ -76,4 +75,4 @@ main.add_module(paramloader)
 main.add_module(geobuilder)
 main.add_module(back)
 
-process(main)
+b2.process(main)

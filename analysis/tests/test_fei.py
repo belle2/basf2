@@ -41,7 +41,7 @@ def print_path(a, b):
             if n.name != m.name:
                 print(n.name, m.name)
             if n.values != m.values:
-                print(n.values, m.values)
+                print(n.name, n.values, m.values)
 
 
 def get_small_unittest_channels():
@@ -202,15 +202,16 @@ class TestFSPLoader(unittest.TestCase):
         x = fei.core.FSPLoader(particles, config)
 
         path = basf2.create_path()
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                                                ('mu+:FSP', ''), ('gamma:FSP', ''),
-                                                                ('p+:FSP', ''), ('K_L0:FSP', '')],
-                        writeOut=True)
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('K_S0:V0 -> pi+ pi-', '')],
-                        writeOut=True)
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('Lambda0:V0 -> p+ pi-', '')],
-                        writeOut=True)
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma:V0 -> e+ e-', '')], addDaughters=True, writeOut=True)
+        fsps = ['K+:FSP', 'pi+:FSP', 'e+:FSP', 'mu+:FSP', 'gamma:FSP', 'p+:FSP', 'K_L0:FSP']
+        path.add_module('ParticleLoader', decayStrings=fsps, writeOut=True)
+        for fsp in fsps:
+            path.add_module('ParticleListManipulator', outputListName=fsp,
+                            inputListNames=[fsp.split(':')[0] + ':all'], writeOut=True)
+            if 'gamma' in fsp:
+                path.add_module('ParticleSelector', decayString='gamma:FSP', cut='isFromECL')
+        path.add_module('ParticleLoader', decayStrings=['K_S0:V0 -> pi+ pi-'], writeOut=True)
+        path.add_module('ParticleLoader', decayStrings=['Lambda0:V0 -> p+ pi-'], writeOut=True)
+        path.add_module('ParticleLoader', decayStrings=['gamma:V0 -> e+ e-'], addDaughters=True, writeOut=True)
         print_path(path, x.reconstruct())
         self.assertEqual(x.reconstruct(), path)
 
@@ -220,16 +221,17 @@ class TestFSPLoader(unittest.TestCase):
         x = fei.core.FSPLoader(particles, config)
 
         path = basf2.create_path()
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                                                ('mu+:FSP', ''), ('gamma:FSP', ''),
-                                                                ('p+:FSP', ''), ('K_L0:FSP', '')],
-                        writeOut=True)
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('K_S0:V0 -> pi+ pi-', '')],
-                        writeOut=True)
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('Lambda0:V0 -> p+ pi-', '')],
-                        writeOut=True)
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma:V0 -> e+ e-', '')], addDaughters=True, writeOut=True)
-        hist_variables = [('NumberOfMCParticlesInEvent({i})'.format(i=pdgcode), 100, -0.5, 99.5)
+        fsps = ['K+:FSP', 'pi+:FSP', 'e+:FSP', 'mu+:FSP', 'gamma:FSP', 'p+:FSP', 'K_L0:FSP']
+        path.add_module('ParticleLoader', decayStrings=fsps, writeOut=True)
+        for fsp in fsps:
+            path.add_module('ParticleListManipulator', outputListName=fsp,
+                            inputListNames=[fsp.split(':')[0] + ':all'], writeOut=True)
+            if 'gamma' in fsp:
+                path.add_module('ParticleSelector', decayString='gamma:FSP', cut='isFromECL')
+        path.add_module('ParticleLoader', decayStrings=['K_S0:V0 -> pi+ pi-'], writeOut=True)
+        path.add_module('ParticleLoader', decayStrings=['Lambda0:V0 -> p+ pi-'], writeOut=True)
+        path.add_module('ParticleLoader', decayStrings=['gamma:V0 -> e+ e-'], addDaughters=True, writeOut=True)
+        hist_variables = [(f'NumberOfMCParticlesInEvent({pdgcode})', 100, -0.5, 99.5)
                           for pdgcode in set([11, 321, 211, 13, 22, 310, 2212, 130, 3122, 111])]
         path.add_module('VariablesToHistogram', particleList='',
                         variables=hist_variables,
@@ -244,9 +246,11 @@ class TestFSPLoader(unittest.TestCase):
         x = fei.core.FSPLoader(particles, config)
 
         path = basf2.create_path()
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                                                ('mu+:FSP', ''), ('p+:FSP', '')],
-                        writeOut=True)
+        fsps = ['K+:FSP', 'pi+:FSP', 'e+:FSP', 'mu+:FSP', 'p+:FSP']
+        path.add_module('ParticleLoader', decayStrings=fsps, writeOut=True)
+        for fsp in fsps:
+            path.add_module('ParticleListManipulator', outputListName=fsp,
+                            inputListNames=[fsp.split(':')[0] + ':all'], writeOut=True)
         path.add_module('ParticleListManipulator', outputListName='gamma:FSP', inputListNames=['gamma:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['gamma:FSP'])
         path.add_module('ParticleListManipulator', outputListName='K_S0:V0', inputListNames=['K_S0:mdst'], writeOut=True)
@@ -270,9 +274,11 @@ class TestFSPLoader(unittest.TestCase):
         x = fei.core.FSPLoader(particles, config)
 
         path = basf2.create_path()
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                                                ('mu+:FSP', ''), ('p+:FSP', '')],
-                        writeOut=True)
+        fsps = ['K+:FSP', 'pi+:FSP', 'e+:FSP', 'mu+:FSP', 'p+:FSP']
+        path.add_module('ParticleLoader', decayStrings=fsps, writeOut=True)
+        for fsp in fsps:
+            path.add_module('ParticleListManipulator', outputListName=fsp,
+                            inputListNames=[fsp.split(':')[0] + ':all'], writeOut=True)
         path.add_module('ParticleListManipulator', outputListName='gamma:FSP', inputListNames=['gamma:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['gamma:FSP'])
         path.add_module('ParticleListManipulator', outputListName='K_S0:V0', inputListNames=['K_S0:mdst'], writeOut=True)
@@ -285,7 +291,7 @@ class TestFSPLoader(unittest.TestCase):
         path.add_module('ParticleCopier', inputListNames=['pi0:FSP'])
         path.add_module('ParticleListManipulator', outputListName='gamma:V0', inputListNames=['gamma:v0mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['gamma:V0'])
-        hist_variables = [('NumberOfMCParticlesInEvent({i})'.format(i=pdgcode), 100, -0.5, 99.5)
+        hist_variables = [(f'NumberOfMCParticlesInEvent({pdgcode})', 100, -0.5, 99.5)
                           for pdgcode in set([11, 321, 211, 13, 22, 310, 2212, 130, 3122, 111])]
         path.add_module('VariablesToHistogram', particleList='',
                         variables=hist_variables,
@@ -1014,11 +1020,11 @@ class TestGetPath(unittest.TestCase):
         f.cd()
 
         for pdgnumber in set([abs(pdg.from_name(particle.name)) for particle in particles]):
-            hist = ROOT.TH1F("NumberOfMCParticlesInEvent__bo{}__bc".format(pdgnumber),
-                             "NumberOfMCParticlesInEvent__bo{}__bc".format(pdgnumber), 11, -0.5, 10.5)
+            hist = ROOT.TH1F(f"NumberOfMCParticlesInEvent__bo{pdgnumber}__bc",
+                             f"NumberOfMCParticlesInEvent__bo{pdgnumber}__bc", 11, -0.5, 10.5)
             for i in range(10):
                 hist.Fill(5)
-            f.Write("NumberOfMCParticlesInEvent__bo{}__bc".format(pdgnumber))
+            f.Write(f"NumberOfMCParticlesInEvent__bo{pdgnumber}__bc")
 
     def tearDown(self):
         if os.path.isfile('mcParticlesCount.root'):

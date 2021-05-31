@@ -370,6 +370,7 @@ void PreRawCOPPERFormat_v2::CheckUtimeCtimeTRGType(int n)
   unsigned int temp_ctime_trgtype_footer, temp_eve_footer;
   unsigned int utime[4], ctime_trgtype[4], eve[4], exprun[4];
   char err_buf[2500];
+  int first_ch = 0;
 
   memset(utime, 0, sizeof(utime));
   memset(ctime_trgtype, 0, sizeof(ctime_trgtype));
@@ -396,6 +397,7 @@ void PreRawCOPPERFormat_v2::CheckUtimeCtimeTRGType(int n)
         temp_eve = eve[ i ];
         temp_exprun = exprun[ i ];
         flag = 1;
+        first_ch = i;
       } else {
         if (temp_ctime_trgtype != ctime_trgtype[ i ] || temp_utime != utime[ i ] ||
             temp_eve != eve[ i ] || temp_exprun != exprun[ i ]) {
@@ -408,13 +410,21 @@ void PreRawCOPPERFormat_v2::CheckUtimeCtimeTRGType(int n)
                      j, GetFINESSENwords(n, j), ctime_trgtype[ j ], utime[ j ], eve[ j ], exprun[ j ]);
             }
           }
-          sprintf(err_buf,
-                  "[FATAL] %s ch=%d : ERROR_EVENT : mismatch header value over FINESSEs. Exiting... FINESSE #=0 buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x FINESSE #=1 buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x FINESSE #=2 buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x FINESSE #=3 buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x\n %s %s %d\n",
-                  hostname, -1,
-                  GetFINESSENwords(n, 0), ctime_trgtype[ 0 ], utime[ 0 ], eve[ 0 ], exprun[ 0 ],
-                  GetFINESSENwords(n, 1), ctime_trgtype[ 1 ], utime[ 1 ], eve[ 1 ], exprun[ 1 ],
-                  GetFINESSENwords(n, 2), ctime_trgtype[ 2 ], utime[ 2 ], eve[ 2 ], exprun[ 2 ],
-                  GetFINESSENwords(n, 3), ctime_trgtype[ 3 ], utime[ 3 ], eve[ 3 ], exprun[ 3 ],
+
+          char err_buf_1[2500], err_buf_2[2500], err_buf_3[2500];
+          sprintf(err_buf_1,
+                  "[FATAL] %s ch=%d : ERROR_EVENT : mismatch header value over FINESSEs. Exiting...",
+                  hostname, -1);
+          sprintf(err_buf_2,
+                  "%s FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x",
+                  err_buf_1,
+                  first_ch, GetFINESSENwords(n, first_ch), ctime_trgtype[ first_ch ], utime[ first_ch ], eve[ first_ch ], exprun[ first_ch ]);
+          sprintf(err_buf_3,
+                  "%s FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x",
+                  err_buf_2,
+                  i, GetFINESSENwords(n, i), ctime_trgtype[ i ], utime[ i ], eve[ i ], exprun[ i ]);
+          sprintf(err_buf, "%s\n %s %s %d\n",
+                  err_buf_3,
                   __FILE__, __PRETTY_FUNCTION__, __LINE__);
           printf("%s", err_buf); fflush(stdout);
 

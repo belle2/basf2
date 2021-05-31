@@ -71,6 +71,9 @@ void PXDHotPixelMaskCalibrationAlgorithm::createDebugHistogram()
     // Get hitmap from collector
     string name = str(format("PXD_%1%_PixelHitmap") % id.getID());
     auto collector_pxdhitmap =  getObjectPtr<TH1I>(name.c_str());
+    if (collector_pxdhitmap == nullptr) {
+      continue;
+    }
     TH1I* debugHisto = new TH1I(*collector_pxdhitmap);
     // Set overflow to total number of events
     debugHisto->SetBinContent(debugHisto->GetNbinsX() + 1, nevents);

@@ -377,8 +377,15 @@ class TestSampleList:
         campaign=None,
         beam_energy=None,
         beam_background=None,
+        exact_match=False,
     ):
-        """Find all MC samples matching query."""
+        """
+        Find all MC samples matching query.
+
+        If ``exact_match`` is passed, an error is raised if there is not exactly one
+        matching sample. If there is exactly one matching sample, then the single sample
+        is returned, rather than a list.
+        """
         samples = [
             s
             for s in self.mc_samples
@@ -387,7 +394,15 @@ class TestSampleList:
             and (beam_energy is None or s.beam_energy == beam_energy)
             and (beam_background is None or s.beam_background == beam_background)
         ]
-        return samples
+        if exact_match:
+            if len(samples) == 1:
+                return samples[0]
+            else:
+                raise ValueError(
+                    "`exact_match=True` was specified, but did not find exactly one match."
+                )
+        else:
+            return samples
 
     def query_data_samples(
         self,
@@ -396,8 +411,15 @@ class TestSampleList:
         experiment=None,
         beam_energy=None,
         general_skim=None,
+        exact_match=False,
     ):
-        """Find all data samples matching query."""
+        """
+        Find all data samples matching query.
+
+        If ``exact_match`` is passed, an error is raised if there is not exactly one
+        matching sample. If there is exactly one matching sample, then the single sample
+        is returned, rather than a list.
+        """
         samples = [
             s
             for s in self.data_samples
@@ -406,7 +428,15 @@ class TestSampleList:
             and (beam_energy is None or s.beam_energy == beam_energy)
             and (general_skim is None or s.general_skim == general_skim)
         ]
-        return samples
+        if exact_match:
+            if len(samples) == 1:
+                return samples[0]
+            else:
+                raise ValueError(
+                    "`exact_match=True` was specified, but did not find exactly one match."
+                )
+        else:
+            return samples
 
 
 if __name__ == "__main__":

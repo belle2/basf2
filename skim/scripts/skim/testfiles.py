@@ -440,8 +440,12 @@ class TestSampleList:
 
 
 if __name__ == "__main__":
+    # Print the parsed contents of the YAML file
     try:
         samples = TestSampleList(SampleYAML=sys.argv[1])
     except IndexError:
         samples = TestSampleList()
-    print(samples)
+
+    print("Samples defined in YAML file:")
+    for sample in samples:
+        print(f"  * {repr(sample)}")

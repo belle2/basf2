@@ -293,6 +293,11 @@ def add_neuro_simulation(path, nntweightfile=None, **kwargs):
     else:
         tsf.param("OuterTSLUTFile", Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_v2.2.coe"))
     tsf.param("TSHitCollectionName", simsegmenthits)
+    tsf.param("CDCHitCollectionName", "CDCHits")
+    if "makeRecoLRTable" in kwargs:
+        tsf.param("makeRecoLRTable", kwargs["makeRecoLRTable"])
+    if "makeTrueLRTable" in kwargs:
+        tsf.param("makeTrueLRTable", kwargs["makeTrueLRTable"])
     path.add_module(tsf)
     path.add_module('CDCTrigger2DFinder',
                     minHits=4, minHitsShort=4, minPt=0.3,

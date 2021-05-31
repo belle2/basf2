@@ -16,6 +16,7 @@
 #include <trg/cdc/Wire.h>
 #include <trg/cdc/WireHit.h>
 #include <trg/cdc/Segment.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <fstream>
 
@@ -60,6 +61,11 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
            "Switch to create a table of hit pattern <-> "
            "number of true left / true right, which is needed to create the LUT",
            false);
+  addParam("makeRecoLRTable",
+           m_makeRecoLRTable,
+           "Switch to create a table of hit pattern <-> "
+           "number of reconstructed left / true right, which is needed to create the LUT",
+           false);
   addParam("innerTrueLRTableFilename",
            m_innerTrueLRTableFilename,
            "Filename for the true left/right table for the innermost super layer.",
@@ -76,6 +82,14 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
            m_crosstalk_tdcfilter,
            "TDC based crosstalk filtering logic on CDCFE. True:enable False:disable",
            true);
+  addParam("innerRecoLRTableFilename",
+           m_innerRecoLRTableFilename,
+           "Filename for the reconnstructed left/right table for the innermost super layer.",
+           string("innerRecoLRTable.dat"));
+  addParam("outerRecoLRTableFilename",
+           m_outerRecoLRTableFilename,
+           "Filename for the reconstructed left/right table for the outer super layers.",
+           string("outerRecoLRTable.dat"));
 }
 
 void
@@ -90,11 +104,19 @@ CDCTriggerTSFModule::initialize()
     innerTrueLRTable.assign(pow(2, 16), vector<unsigned>(3, 0));
     outerTrueLRTable.assign(pow(2, 12), vector<unsigned>(3, 0));
   }
+  if (m_makeRecoLRTable) {
+    m_recoTracks.isRequired("RecoTracks");
+    m_cdcHits.isRequired();
+    innerRecoLRTable.assign(pow(2, 16), vector<unsigned>(3, 0));
+    outerRecoLRTable.assign(pow(2, 12), vector<unsigned>(3, 0));
+  }
   // register relations
   StoreArray<MCParticle> mcparticles;
   m_segmentHits.registerRelationTo(m_cdcHits);
   mcparticles.registerRelationTo(m_segmentHits);
-
+  m_recoTracks.registerRelationTo(m_segmentHits);
+  m_recoTracks.registerRelationTo(m_cdcHits);
+  m_segmentHits.registerRelationTo(m_recoTracks);
   // Prepare track segment shapes.
   // First a structure of wires is created for all layers and super layers.
   // Each track segment consists of pointers to wires in this structure.
@@ -466,15 +488,84 @@ CDCTriggerTSFModule::event()
         if (m_makeTrueLRTable) {
           const CDCSimHit* simHit = priorityHit->getRelatedFrom<CDCSimHit>();
           if (simHit && !simHit->getBackgroundTag()) {
-            if (isl == 0)
+            if (isl == 0) {
+              std::cout << its << " creating entry in TrueLUT for pattern: " << s.lutPattern() << " :  " << simHit->getLeftRightPassage() <<
+                        std::endl;
               innerTrueLRTable[s.lutPattern()][simHit->getLeftRightPassage()] += 1;
-            else
+            } else {
               outerTrueLRTable[s.lutPattern()][simHit->getLeftRightPassage()] += 1;
+              std::cout << its << " creating entry in TrueLUT for pattern: " << s.lutPattern() << " :  " << simHit->getLeftRightPassage() <<
+                        std::endl;
+            }
           } else {
-            if (isl == 0)
+            if (isl == 0) {
+              std::cout << its  << " creating bghit in TrueLUT for pattern: " << s.lutPattern() << std::endl;
               innerTrueLRTable[s.lutPattern()][2] += 1;
-            else
+            }  else {
+              std::cout << its  << " creating bghit in TrueLUT for pattern: " << s.lutPattern() << std::endl;
               outerTrueLRTable[s.lutPattern()][2] += 1;
+            }
+          }
+        }
+
+        if (m_makeRecoLRTable) {
+          // for the recotable, we have no simhits and w can have more than one recotrack per event
+          // so wee need to loop over them:
+          unsigned lrflag = 2; // see explanation below
+          for (int ireco = 0; ireco < m_recoTracks.getEntries(); ++ireco) {
+            //        std::cout << "recotrack " << ireco << " of " << m_recoTracks.getEntries() << std::endl;
+            RecoTrack* recoTrack = m_recoTracks[ireco];
+            // since there is no relation between recotracks and the tshits yet, we need to create them first.
+            // within the recotrack class, there is a function which returns the hitids of the cdchits used
+            // in the recotrack. now we can loop over them and compare them with the id from the priorityhit:
+            // /
+            // Before looping over the recotracks, we set the rl information to 'bkg hit'. Then, we loop over all
+            // recotracks and determine if there is a relation and wether it passed left or right. If this is set for
+            // one recotrack, we set the rl information to the corresponding value. if it is set for another recotrack,
+            // we will also use this information for the recolrtable and set the corresponding value again.
+            // Just in the case, where after the loop over all recotracks it wasn't related to any of them, we will set
+            // the background flag in the recolrtable.
+            vector<CDCHit*> cdcHits = recoTrack->getCDCHitList();
+            bool related = false;
+            for (unsigned iHit = 0; iHit < cdcHits.size(); ++iHit) {
+//std::cout << "now looping over cdchits... " << iHit << "/" << cdcHits.size() << std::endl;
+              if (tsHit->getID() == cdcHits[iHit]->getID()) {
+                // check, wether recotrack is already related to ts, skip in this case.
+                // this is necessary because sometimes two wires are related to the same ts
+                if (related == false) related = true;
+                else continue;
+
+                //              std::cout << tsHit->getID() << " " << cdcHits[iHit]->getID() << " " << iHit << " matching id of priohit and current cdchit, creating relation... " << std::endl;
+                recoTrack->addRelationTo(tsHit);
+                if (isl == 0) {
+                  // this getrightleftinformation function returns 2 for a right pass, and 3 for a left pass
+                  if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  3) lrflag = 0;
+                  if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  2) lrflag = 1;
+                  innerRecoLRTable[s.lutPattern()][lrflag] += 1;
+                  std::cout << its << " creating entry in recoLUT for pattern: " << s.lutPattern() << " :  " << lrflag << " (recotrack " << ireco <<
+                            "), hit: " << iHit << std::endl;
+                } else {
+                  if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  3) lrflag = 0;
+                  if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  2) lrflag = 1;
+                  outerRecoLRTable[s.lutPattern()][lrflag] += 1;
+                  std::cout << its << " creating entry in recoLUT for pattern: " << s.lutPattern() << " :  " << lrflag << " (recotrack " << ireco <<
+                            "), hit: " << iHit << std::endl;
+                }
+                //break;
+              }
+            }
+            if (lrflag == 2) {
+
+              if (isl == 0) {
+                std::cout << its << " creating bghit in recoLUT for pattern: " << s.lutPattern() << " (recotrack " << ireco << ")" << std::endl;
+                innerRecoLRTable[s.lutPattern()][2] += 1;
+              } else {
+                std::cout << its << " creating bghit in recoLUT for pattern: " << s.lutPattern() << " (recotrack " << ireco << ")" << std::endl;
+                outerRecoLRTable[s.lutPattern()][2] += 1;
+
+              }
+            }
+
           }
         }
       }
@@ -533,6 +624,23 @@ CDCTriggerTSFModule::terminate()
     }
   }
 
+  // save reco left/right table
+  if (m_makeRecoLRTable) {
+    ofstream innerFile(m_innerRecoLRTableFilename);
+    ostream_iterator<unsigned> innerIterator(innerFile, " ");
+    for (unsigned pattern = 0; pattern < innerRecoLRTable.size(); ++pattern) {
+      copy(innerRecoLRTable[pattern].begin(), innerRecoLRTable[pattern].end(),
+           innerIterator);
+      innerFile << "\n";
+    }
+    ofstream outerFile(m_outerRecoLRTableFilename);
+    ostream_iterator<unsigned> outerIterator(outerFile, " ");
+    for (unsigned pattern = 0; pattern < outerRecoLRTable.size(); ++pattern) {
+      copy(outerRecoLRTable[pattern].begin(), outerRecoLRTable[pattern].end(),
+           outerIterator);
+      outerFile << "\n";
+    }
+  }
 }
 
 void

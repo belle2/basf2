@@ -3,8 +3,8 @@
 Cut strings and selections
 --------------------------
 
-Cut strings in ``basf2`` analysis scripts work quite intuitively.
-If you are familiar with `ROOT <https://root.cern.ch>`_ cut strings and/or python logic, you will probably not notice much difference.
+Cut strings in ``basf2`` analysis scripts work quite intuitively, particularly if you're comfortable with python logic.
+There are some minor differences with respect to  `ROOT <https://root.cern.ch>`_ cut strings.
 
 Cut strings are used to manipulate candidates (i.e. `ParticleList`_ s) with `modularAnalysis.applyCuts`, and `modularAnalysis.cutAndCopyList`.
 Events selections are applied with `modularAnalysis.applyEventCuts`.

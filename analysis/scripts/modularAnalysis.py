@@ -750,7 +750,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
 
         kaons = ('K+:mykaons', 'kaonID>0.1')
         pions = ('pi+:mypions','pionID>0.1')
-        fillParticleLists([kaons, pions])
+        fillParticleLists([kaons, pions], path=mypath)
 
     If you are unsure what selection you want, you might like to see the
     :doc:`StandardParticles` functions.
@@ -1004,7 +1004,7 @@ def fillConvertedPhotonsList(decayString, cut, writeOut=False, path=None):
 
     .. code-block:: python
 
-        fillConvertedPhotonsList('gamma:converted -> e+ e-', '')
+        fillConvertedPhotonsList('gamma:converted -> e+ e-', '', path=mypath)
 
     Parameters:
         decayString (str): Must be gamma to an e+e- pair. You must specify the daughter ordering.
@@ -1140,9 +1140,12 @@ def fillParticleListsFromMC(decayStringsWithCuts,
 
     The types of the particles to be loaded are specified via the (decayString, cut) tuples given in a list.
     For example:
-    kaons = ('K+:gen', '')
-    pions = ('pi+:gen', 'pionID>0.1')
-    fillParticleListsFromMC([kaons, pions])
+
+    .. code-block:: python
+
+        kaons = ('K+:gen', '')
+        pions = ('pi+:gen', 'pionID>0.1')
+        fillParticleListsFromMC([kaons, pions], path=mypath)
 
     @param decayString             specifies type of Particles and determines the name of the ParticleList
     @param cut                     Particles need to pass these selection criteria to be added to the ParticleList
@@ -1212,7 +1215,9 @@ def applyEventCuts(cut, path):
     Example:
         continuum events (in mc only) with more than 5 tracks
 
-        >>> applyEventCuts("[nTracks > 5] and [isContinuumEvent], path=mypath)
+        .. code-block:: python
+
+            applyEventCuts("[nTracks > 5] and [isContinuumEvent], path=mypath)
 
     Warning:
         You must use square braces ``[`` and ``]`` for conditional statements.
@@ -1802,12 +1807,14 @@ def signalRegion(particleList, cut, path=None, name="isSignalRegion", blind_data
     provided.
 
     Example:
-        >>> ma.reconstructDecay("B+:sig -> D+ pi0", "Mbc>5.2", path=path)
-        >>> ma.signalRegion("B+:sig",
-        >>>                  "Mbc>5.27 and abs(deltaE)<0.2",
-        >>>                  blind_data=True,
-        >>>                  path=path)
-        >>> ma.variablesToNtuples("B+:sig", ["isSignalRegion"], path=path)
+        .. code-block:: python
+
+            ma.reconstructDecay("B+:sig -> D+ pi0", "Mbc>5.2", path=path)
+            ma.signalRegion("B+:sig",
+                             "Mbc>5.27 and abs(deltaE)<0.2",
+                             blind_data=True,
+                             path=path)
+            ma.variablesToNtuples("B+:sig", ["isSignalRegion"], path=path)
 
     Parameters:
         particleList (str):     The input ParticleList
@@ -2124,12 +2131,16 @@ def appendROEMask(list_name,
 
     - append a ROE mask with all tracks in ROE coming from the IP region
 
-       >>> appendROEMask('B+:sig', 'IPtracks', '[dr < 2] and [abs(dz) < 5]', '')
+        .. code-block:: python
+
+            appendROEMask('B+:sig', 'IPtracks', '[dr < 2] and [abs(dz) < 5]', path=mypath)
 
     - append a ROE mask with only ECL-based particles that pass as good photon candidates
 
-       >>> goodPhotons = 'inCDCAcceptance and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
-       >>> appendROEMask('B+:sig', 'goodROEGamma', '', goodPhotons)
+        .. code-block:: python
+
+            goodPhotons = 'inCDCAcceptance and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
+            appendROEMask('B+:sig', 'goodROEGamma', '', goodPhotons, path=mypath)
 
 
     @param list_name             name of the input ParticleList
@@ -2158,11 +2169,13 @@ def appendROEMasks(list_name, mask_tuples, path=None):
 
     - Example for two tuples, one with and one without fractions
 
-       >>> ipTracks     = ('IPtracks', '[dr < 2] and [abs(dz) < 5]', '', '')
-       >>> goodPhotons = 'inCDCAcceptance and [clusterErrorTiming < 1e6] and [clusterE1E9 > 0.4 or E > 0.075]'
-       >>> goodROEGamma = ('ROESel', '[dr < 2] and [abs(dz) < 5]', goodPhotons, '')
-       >>> goodROEKLM     = ('IPtracks', '[dr < 2] and [abs(dz) < 5]', '', 'nKLMClusterTrackMatches == 0')
-       >>> appendROEMasks('B+:sig', [ipTracks, goodROEGamma, goodROEKLM])
+        .. code-block:: python
+
+            ipTracks     = ('IPtracks', '[dr < 2] and [abs(dz) < 5]', '', '')
+            goodPhotons = 'inCDCAcceptance and [clusterErrorTiming < 1e6] and [clusterE1E9 > 0.4 or E > 0.075]'
+            goodROEGamma = ('ROESel', '[dr < 2] and [abs(dz) < 5]', goodPhotons, '')
+            goodROEKLM     = ('IPtracks', '[dr < 2] and [abs(dz) < 5]', '', 'nKLMClusterTrackMatches == 0')
+            appendROEMasks('B+:sig', [ipTracks, goodROEGamma, goodROEKLM], path=mypath)
 
     @param list_name             name of the input ParticleList
     @param mask_tuples           array of ROEMask list tuples to be appended
@@ -2255,11 +2268,15 @@ def keepInROEMasks(list_name, mask_names, cut_string, path=None):
 
     - keep only those tracks that were used in provided particle list
 
-       >>> keepInROEMasks('pi+:goodTracks', 'mask', '')
+        .. code-block:: python
+
+            keepInROEMasks('pi+:goodTracks', 'mask', '', path=mypath)
 
     - keep only those clusters that were used in provided particle list and pass a cut, apply to several masks
 
-       >>> keepInROEMasks('gamma:goodClusters', ['mask1', 'mask2'], 'E > 0.1')
+        .. code-block:: python
+
+            keepInROEMasks('gamma:goodClusters', ['mask1', 'mask2'], 'E > 0.1', path=mypath)
 
 
     @param list_name    name of the input ParticleList
@@ -2292,11 +2309,15 @@ def discardFromROEMasks(list_name, mask_names, cut_string, path=None):
 
     - discard tracks that were used in provided particle list
 
-       >>> discardFromROEMasks('pi+:badTracks', 'mask', '')
+        .. code-block:: python
+
+            discardFromROEMasks('pi+:badTracks', 'mask', '', path=mypath)
 
     - discard clusters that were used in provided particle list and pass a cut, apply to several masks
 
-       >>> discardFromROEMasks('gamma:badClusters', ['mask1', 'mask2'], 'E < 0.1')
+        .. code-block:: python
+
+            discardFromROEMasks('gamma:badClusters', ['mask1', 'mask2'], 'E < 0.1', path=mypath)
 
 
     @param list_name    name of the input ParticleList
@@ -2328,7 +2349,9 @@ def optimizeROEWithV0(list_name, mask_names, cut_string, path=None):
 
     - treat tracks from K_S0 inside mass window separately, replace track momenta with K_S0 momentum
 
-       >>> optimizeROEWithV0('K_S0:opt', 'mask', '0.450 < M < 0.550')
+        .. code-block:: python
+
+            optimizeROEWithV0('K_S0:opt', 'mask', '0.450 < M < 0.550', path=mypath)
 
     @param list_name    name of the input ParticleList
     @param mask_names   array of ROEMasks to be updated
@@ -3307,8 +3330,10 @@ def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):
     to get it. A full example steering file is at analysis/tests/test_DistanceCalculator.py
 
     Example:
-      >>> from modularAnalysis import calculateDistance
-      >>>calculateDistance('list_name', 'decay_string', "mode", path=user_path)
+        .. code-block:: python
+
+            from modularAnalysis import calculateDistance
+            calculateDistance('list_name', 'decay_string', "mode", path=user_path)
 
     @param list_name              name of the input ParticleList
     @param decay_string           select particles between the distance of closest approach will be calculated

@@ -661,6 +661,22 @@ def get_skim_output_datalevel(skim):
     return "mdst" if func.produces_mdst_by_default else "udst"
 
 
+def get_individual_skims(SkimName, CombinedSkimDefinitions):
+    """
+    Resolve ``SkimName`` into a list of individual skims.
+
+    If ``SkimName`` exists as a skim name in the registry, assume that that is what we
+    want. Otherwise, retrieve the list of individual skims from
+    ``CombinedSkimDefinitions``.
+    """
+    if SkimName in Registry.names:
+        SingleSkims = [SkimName]
+    else:
+        SingleSkims = CombinedSkimDefinitions[SkimName]
+
+    return SingleSkims
+
+
 def produce_on_tau_samples(skims):
     """
     Determine whether the combined skim should be produced on taupair samples, based on
@@ -738,12 +754,7 @@ def make_combined_steering_file(
     SteeringFileDirectory.mkdir(parents=True, exist_ok=True)
     SteeringFile = SteeringFileDirectory / f"{SkimName}_Skim.py"
 
-    # If SkimName exists as a skim name in the registry, assume that that is what we want
-    if SkimName in Registry.names:
-        SingleSkims = [SkimName]
-    # Otherwise, retrieve the list of individual skims going into this combined skim
-    else:
-        SingleSkims = CombinedSkimDefinitions[SkimName]
+    SingleSkims = get_individual_skims(SkimName, CombinedSkimDefinitions)
 
     try:
         skims, modules = resolve_skim_modules(SingleSkims, LocalModule=LocalModule)
@@ -805,12 +816,7 @@ def make_request_dict(
     skimStatsDict, CombinedSkimDefinitions = get_skim_stats_dict(args.SkimStatsJson)
     verify_stats_dict(args, sampleRegistry, skimStatsDict)
 
-    # If SkimName exists as a skim name in the registry, assume that that is what we want
-    if skimName in Registry.names:
-        individualSkims = [skimName]
-    # Otherwise, retrieve the list of individual skims going into this combined skim
-    else:
-        individualSkims = CombinedSkimDefinitions[skimName]
+    individualSkims = get_individual_skims(skimName, CombinedSkimDefinitions)
 
     if args.mc:
         fabricationType = "MCSkim"
@@ -897,7 +903,9 @@ def write_json_files(sampleRegistry, args, outputDirectory):
             # Skip taupair sample if the combined skim is not to be produced on taupair
             if (
                     "taupair" in sampleLabel and
-                    not produce_on_tau_samples(CombinedSkimDefinitions[skimName])
+                    not produce_on_tau_samples(
+                        get_individual_skims(skimName, CombinedSkimDefinitions)
+                    )
             ):
                 continue
 

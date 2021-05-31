@@ -166,7 +166,7 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)
 
 
-def add_filter_reconstruction(path, run_type, components, **kwargs):
+def add_pre_filter_reconstruction(path, run_type, components, **kwargs):
     """
     Add everything needed to calculation a filter decision and if possible,
     also do the HLT filtering. This is only possible for beam runs (in the moment).

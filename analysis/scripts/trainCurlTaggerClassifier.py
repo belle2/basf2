@@ -2,8 +2,8 @@
 # Author: Marcel Hohmann (marcel.hohmann@desy.de)
 
 import basf2.core
-from basf2 import process, statistics
-from modularAnalysis import inputMdst, tagCurlTracks, register_module
+from basf2 import process, statistics, register_module
+from modularAnalysis import inputMdst, tagCurlTracks
 from stdCharged import stdPi
 import sys
 import os

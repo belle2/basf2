@@ -37,19 +37,19 @@ SVDMissingAPVsClusterCreatorModule::SVDMissingAPVsClusterCreatorModule()
   , m_mapping(m_xmlFileName)
 {
   //Set module properties
-  setDescription("This module produces clusters in the middle of a region read by a disabled APV. It can be run only after the SVDSimpleClusterizer because it does not register the SVDClusters StoreArray in the DataStore, but only add clusters.");
+  setDescription("This module produces clusters in the middle of a region read by a disabled APV. It can be run only after the SVDClusterizer because it does not register the SVDClusters StoreArray in the DataStore, but only add clusters.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("Clusters", m_storeClustersName,
            "SVDCluster collection name", string(""));
 
-  addParam("time", m_time, "cluster time", float(0));
-  addParam("timeError", m_timeError, "cluster time error", float(10));
-  addParam("seedCharge", m_seedCharge, "cluster seed charge (in e-)", float(10000));
-  addParam("charge", m_charge, "cluster charge (in e-)", float(20000));
-  addParam("SNR", m_SNR, "cluster SNR", float(15));
-  addParam("size", m_size, "cluster size", int(128));
-  addParam("firstFrame", m_firstFrame, "first frame, needed to build the cluster", int(0));
+  addParam("time", m_time, "fake-cluster time", float(0));
+  addParam("timeError", m_timeError, "fake-cluster time error", float(10));
+  addParam("seedCharge", m_seedCharge, "fake-cluster seed charge (in e-)", float(10000));
+  addParam("charge", m_charge, "fake-cluster charge (in e-)", float(20000));
+  addParam("SNR", m_SNR, "fake-cluster SNR", float(15));
+  addParam("size", m_size, "fake-cluster size", int(128));
+  addParam("firstFrame", m_firstFrame, "first frame, needed to build the fake-cluster", int(0));
   addParam("nFakeClusters", m_nFakeClusters, "number of fake clusters equally distributed in the dead area", int(4));
 }
 

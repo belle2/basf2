@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 b2test_utils - Helper functions useful for test scripts
@@ -18,7 +17,7 @@ import multiprocessing
 import basf2
 import subprocess
 import re
-from . import logfilter
+from b2test_utils import logfilter
 
 
 def skip_test(reason, py_case=None):
@@ -145,7 +144,9 @@ def configure_logging_for_tests(user_replacements=None):
         if not replacement:
             replacement = env_name
         if env_name in os.environ:
-            replacements[os.environ[env_name]] = f"${{{replacement}}}"
+            # replace path from the environment with the name of the variable. But remove a trailing slash or whitespace so that
+            # the output doesn't depend on whether there is a tailing slash in the environment variable
+            replacements[os.environ[env_name].rstrip('/ ')] = f"${{{replacement}}}"
     if user_replacements is not None:
         replacements.update(user_replacements)
     # add cwd only if it doesn't overwrite anything ...

@@ -27,7 +27,7 @@ sys_tests = ['def', 'scale', 'scaleUp', 'scaleDown', 'Efficiency']
 test = 'scaleDown'
 
 if test not in sys_tests:
-    print("Unknown systematic test {}".format(test))
+    print(f"Unknown systematic test {test}")
     exit(1)
 
 # create path
@@ -67,7 +67,7 @@ var1 = ['M',
 
 ma.variablesToNtuple(decayString='J/psi:out',
                      variables=var1,
-                     filename='Jpsi_out_{}.root'.format(test),
+                     filename=f'Jpsi_out_{test}.root',
                      path=my_path)
 
 # process the events

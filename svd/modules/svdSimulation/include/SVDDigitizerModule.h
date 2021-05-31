@@ -122,8 +122,6 @@ namespace Belle2 {
       // 2. Physics
       /** Max. Segment length to use for charge drifting */
       double m_segmentLength = 0.020;
-      /** Width of diffusion cloud for simple drift model (in sigmas) */
-      double m_widthOfDiffusCloud = 3.0;
 
       // 3. Noise
       /** Whether or not to apply poisson fluctuation of charge (Fano factor)*/
@@ -133,7 +131,7 @@ namespace Belle2 {
       /** Round ZS cut to nearest ADU */
       bool m_roundZS = true;
       /** Keek digit if at least m_nSamplesOverZS are over threshold */
-      unsigned short m_nSamplesOverZS = 1;
+      int m_nSamplesOverZS = 1;
       /** (derived from SNAdjacent) Fraction of noisy strips per sensor. */
       double m_noiseFraction = 0.01;
 

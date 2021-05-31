@@ -16,7 +16,6 @@
 #include <TFile.h>
 #include <analysis/VariableManager/Manager.h>
 #include <mdst/dataobjects/Track.h>
-#include <top/reconstruction/TOPreco.h>
 
 namespace Belle2 {
   /**

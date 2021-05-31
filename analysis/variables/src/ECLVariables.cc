@@ -40,11 +40,9 @@ namespace Belle2 {
       if (particle->hasExtraInfo("beamBackgroundProbabilityMVA")) {
         return particle->getExtraInfo("beamBackgroundProbabilityMVA");
       } else {
-        return std::numeric_limits<float>::quiet_NaN();
-
-        B2WARNING("The extraInfo beamBackgroundProbabilityMVA is not registerted! \n"
+        B2WARNING("The extraInfo beamBackgroundProbabilityMVA is not registered! \n"
                   "This variable is only available for photons, and you either have to run the function getBeamBackgroundProbabilityMVA or turn the argument loadPhotonBeamBackgroundMVA to True when using fillParticleList.");
-
+        return std::numeric_limits<float>::quiet_NaN();
       }
     }
     double eclPulseShapeDiscriminationMVA(const Particle* particle)
@@ -170,7 +168,7 @@ namespace Belle2 {
       return std::numeric_limits<float>::quiet_NaN();
     }
 
-    // An arry with each number representing the last number of the cellID per thetaID. There are 69 thetaIDs in total.
+    // An array with each number representing the last number of the cellID per thetaID. There are 69 thetaIDs in total.
     const std::array<int, 69> lastCellIDperThetaID{48,   96,  160,  224,  288,  384,  480,  576,  672,  768,  864,
             1008, 1152, 1296, 1440, 1584, 1728, 1872, 2016, 2160, 2304, 2448,
             2592, 2736, 2880, 3024, 3168, 3312, 3456, 3600, 3744, 3888, 4032,

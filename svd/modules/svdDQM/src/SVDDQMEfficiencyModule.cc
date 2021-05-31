@@ -25,38 +25,38 @@ REG_MODULE(SVDDQMEfficiency)
 SVDDQMEfficiencyModule::SVDDQMEfficiencyModule() : HistoModule(), m_geoCache(VXD::GeoCache::getInstance())
 {
   // Set module properties
-  setDescription("Create basic histograms for SVD efficiency");
+  setDescription("Create basic histograms to compute the average sensor efficiency.");
 
   // What exactly is needed for this to be true?
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
-  addParam("Clusters", m_svdClustersName, "name of StoreArray with SVD cluster", std::string(""));
-  addParam("Intercepts", m_interceptsName, "name of StoreArray with SVDIntercepts", std::string(""));
+  addParam("Clusters", m_svdClustersName, "name of StoreArray with SVD cluster.", std::string(""));
+  addParam("Intercepts", m_interceptsName, "name of StoreArray with SVDIntercepts.", std::string(""));
 
-  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed.",
            std::string("SVDEfficiency"));
 
-  addParam("binsU", m_u_bins, "histogram bins in u direction", int(4));
-  addParam("binsV", m_v_bins, "histogram bins in v direction", int(6));
+  addParam("binsU", m_u_bins, "histogram bins in u direction.", int(4));
+  addParam("binsV", m_v_bins, "histogram bins in v direction.", int(6));
 
 
-  addParam("saveExpertHistos", m_saveExpertHistos, "if true save additional histograms", bool(false));
+  addParam("saveExpertHistos", m_saveExpertHistos, "if True, save additional histograms.", bool(false));
 
-  addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", 1u);
-  addParam("minCDCHits", m_minCDCHits, "Number of CDC hits required in a track to be considered", 20u);
+  addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered.", 1u);
+  addParam("minCDCHits", m_minCDCHits, "Number of CDC hits required in a track to be considered.", 20u);
 
-  addParam("pValCut", m_pcut, "Set a cut on the p-value ", double(0));
+  addParam("pValCut", m_pcut, "Set a cut on the track  p-value.", double(0));
   //  addParam("d0Cut", m_d0cut, "|d0| smaller than the cut", double(0.5));
   //  addParam("z0Cut", m_z0cut, "|z0| smaller than the cut", double(2));
 
-  addParam("momCut", m_momCut, "Set a cut on the track momentum", double(0));
-  addParam("ptCut", m_ptCut, "Set a cut on the track transverse momentum", double(1));
+  addParam("momCut", m_momCut, "Set a cut on the track momentum.", double(0));
+  addParam("ptCut", m_ptCut, "Set a cut on the track transverse momentum.", double(1));
 
-  addParam("fiducialU", m_fiducialU, "Fiducial Area, U direction", float(0.5));
-  addParam("fiducialV", m_fiducialV, "Fiducial Area, V direction", float(0.5));
-  addParam("maxHalfResidU", m_maxResidU, "half window for cluster search around intercept, U direction", float(0.05));
-  addParam("maxHalfResidV", m_maxResidV, "half window for cluster search around intercept, V direction", float(0.05));
+  addParam("fiducialU", m_fiducialU, "Fiducial Area, U direction.", float(0.5));
+  addParam("fiducialV", m_fiducialV, "Fiducial Area, V direction.", float(0.5));
+  addParam("maxHalfResidU", m_maxResidU, "half window for cluster search around intercept, U direction.", float(0.05));
+  addParam("maxHalfResidV", m_maxResidV, "half window for cluster search around intercept, V direction.", float(0.05));
 
 }
 

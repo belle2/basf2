@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019 - Belle II Collaboration                             *
+ * Copyright(C) 2019, 2021 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -19,7 +19,7 @@
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPRecBunch.h>
 #include <top/utilities/TrackSelector.h>
-#include <top/reconstruction/TOPreco.h>
+#include <top/reconstruction_cpp/PDFConstructor.h>
 
 #include <framework/database/DBObjPtr.h>
 #include <top/dbobjects/TOPCalCommonT0.h>
@@ -61,8 +61,6 @@ namespace Belle2 {
     int m_bunchesPerSSTclk; /**< number of bunches per SST clock */
     int m_numBins;      /**< number of bins to which search region is divided */
     double m_timeRange; /**< time range in which to search for the minimum [ns] */
-    double m_minBkgPerBar; /**< minimal assumed background photons per module */
-    double m_scaleN0; /**< scale factor for figure-of-merit N0 */
     double m_sigmaSmear;  /**< additional smearing of PDF in [ns] */
     std::string m_sample; /**< sample type */
     double m_deltaEcms; /**< c.m.s energy window */
@@ -74,7 +72,7 @@ namespace Belle2 {
 
     // procedure
     TOP::TrackSelector m_selector; /**< track selection utility */
-    TOP::TOPreco::PDFoption m_PDFOption = TOP::TOPreco::c_Rough; /**< PDF option */
+    TOP::PDFConstructor::EPDFOption m_PDFOption = TOP::PDFConstructor::c_Rough; /**< PDF option */
     std::vector<std::string> m_names; /**< histogram names of chi2 scans */
 
     // collections

@@ -83,6 +83,7 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
 
   /**-----------------------------------------------------------------------------------------------*/
   /** Histograms containing the data collected by eclMuMuECollectorModule */
+  auto TrkPerCrysID = getObjectPtr<TH1F>("TrkPerCrysID");
   auto EnVsCrysID = getObjectPtr<TH2F>("EnVsCrysID");
   auto ExpEvsCrys = getObjectPtr<TH1F>("ExpEvsCrys");
   auto ElecCalibvsCrys = getObjectPtr<TH1F>("ElecCalibvsCrys");
@@ -90,6 +91,7 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
   auto CalibEntriesvsCrys = getObjectPtr<TH1F>("CalibEntriesvsCrys");
   auto RawDigitAmpvsCrys = getObjectPtr<TH2F>("RawDigitAmpvsCrys");
   auto RawDigitTimevsCrys = getObjectPtr<TH2F>("RawDigitTimevsCrys");
+  auto hitCrysVsExtrapolatedCrys = getObjectPtr<TH2F>("hitCrysVsExtrapolatedCrys");
 
   /**-----------------------------------------------------------------------------------------------*/
   /** Record the number of entries per crystal in the normalized energy histogram and calculate the average expected energy per crystal and calibration constants from Collector */
@@ -125,6 +127,7 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
   /**-----------------------------------------------------------------------------------------------*/
   /** Write out the basic histograms in all cases */
   TFile* histfile = new TFile("eclMuMuEAlgorithm.root", "recreate");
+  TrkPerCrysID->Write();
   EnVsCrysID->Write();
   IntegralVsCrysID->Write();
   AverageExpECrys->Write();
@@ -132,6 +135,7 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
   AverageInitCalib->Write();
   RawDigitAmpvsCrys->Write();
   RawDigitTimevsCrys->Write();
+  hitCrysVsExtrapolatedCrys->Write();
 
   /**-----------------------------------------------------------------------------------------------*/
   /** If we have not been asked to do fits, we can quit now */

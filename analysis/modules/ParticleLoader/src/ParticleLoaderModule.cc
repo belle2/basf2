@@ -664,12 +664,13 @@ namespace Belle2 {
         plist->addParticle(newPart);
       }
 
-      // load reconstructed neutral KLM clusters as Klongs or neutrons or photons
+      // load reconstructed KLM clusters as Klongs or neutrons or photons
       for (int i = 0; i < m_klmclusters.getEntries(); i++) {
         const KLMCluster* cluster      = m_klmclusters[i];
 
         if (std::isnan(cluster->getMomentumMag())) {
-          B2WARNING("Skipping KLMCluster because of nan momentum.");
+          B2DEBUG(19, "Skipping KLMCluster because its momentum is NaN. "
+                  "This can happen if the timing calibration is missing or wrong, so that the velocity is calculated to be negative.");
           continue;
         }
 

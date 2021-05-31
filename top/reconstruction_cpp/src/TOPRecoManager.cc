@@ -147,12 +147,29 @@ namespace Belle2 {
 
     void TOPRecoManager::setChannelEffi()
     {
+      const double minEffi = 0.1;
+      const double maxEffi = 2.0;
       for (auto& yScanner : getInstance().yScanners()) {
         auto& pixelEfficiencies = yScanner.pixelEfficiencies();
         int moduleID = pixelEfficiencies.getModuleID();
         int numPixels = pixelEfficiencies.getNumPixels();
         for (int pixelID = 1; pixelID <= numPixels; pixelID++) {
           double effi = TOPGeometryPar::Instance()->getRelativePixelEfficiency(moduleID, pixelID);
+          if (effi < minEffi) {
+            B2WARNING("TOPRecoManager::setChannelEffi: relative pixel efficiency found rather small"
+                      << LogVar("slot", moduleID)
+                      << LogVar("pixel", pixelID)
+                      << LogVar("efficiency", effi)
+                      << " -> will set it to " << minEffi);
+            effi = minEffi;
+          } else if (effi > maxEffi) {
+            B2WARNING("TOPRecoManager::setChannelEffi: relative pixel efficiency found rather large"
+                      << LogVar("slot", moduleID)
+                      << LogVar("pixel", pixelID)
+                      << LogVar("efficiency", effi)
+                      << " -> will set it to " << maxEffi);
+            effi = maxEffi;
+          }
           pixelEfficiencies.set(pixelID, effi);
         }
       }

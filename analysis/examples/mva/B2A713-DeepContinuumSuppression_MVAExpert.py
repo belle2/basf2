@@ -158,20 +158,16 @@ for rank in range(10):
     for shortcut, particlelist in [('Croe', 'gamma:roe'), ('Csig', 'gamma:signal')]:
         for variable in cluster_variables:
             v.variables.addAlias(
-                '{}_{}{}'.format(
-                    variable, shortcut, rank), 'getVariableByRank({}, cmsp, {}, {})'.format(
-                    particlelist, variable, rank + 1))
-            variables.append('{}_{}{}'.format(variable, shortcut, rank))
+                f'{variable}_{shortcut}{rank}', f'getVariableByRank({particlelist}, cmsp, {variable}, {rank + 1})')
+            variables.append(f'{variable}_{shortcut}{rank}')
 
 for rank in range(5):
     for shortcut, particlelist in [('TProe', 'pi+:chargedProe'), ('TPsig', 'pi+:chargedPsignal'),
                                    ('TMroe', 'pi+:chargedMroe'), ('TMsig', 'pi+:chargedMsignal')]:
         for variable in track_variables:
             v.variables.addAlias(
-                '{}_{}{}'.format(
-                    variable, shortcut, rank), 'getVariableByRank({}, cmsp, {}, {})'.format(
-                    particlelist, variable, rank + 1))
-            variables.append('{}_{}{}'.format(variable, shortcut, rank))
+                f'{variable}_{shortcut}{rank}', f'getVariableByRank({particlelist}, cmsp, {variable}, {rank + 1})')
+            variables.append(f'{variable}_{shortcut}{rank}')
 
 # MVAExpert
 roe_path.add_module('MVAExpert', listNames=['B0'], extraInfoName='Deep_CS', identifier='Deep_Feed_Forward.xml')

@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2017, 2021 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -11,6 +11,8 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/Track.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <set>
@@ -35,7 +37,8 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~TOPPDFCheckerModule();
+    virtual ~TOPPDFCheckerModule()
+    {}
 
     /**
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
@@ -50,21 +53,9 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun() override;
-
-    /**
      * Event processor.
      */
     virtual void event() override;
-
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
 
     /**
      * Termination action.
@@ -76,6 +67,8 @@ namespace Belle2 {
 
     /**
      * Checks if digit comes from given MC particle
+     * @param digit TOP digit
+     * @param particle MC particle
      */
     bool isFromThisParticle(const TOPDigit& digit, const MCParticle* particle);
 
@@ -87,6 +80,9 @@ namespace Belle2 {
     TH2F* m_pdf = 0;  /**< histogram of PDF */
     TH2F* m_hitsCol = 0; /**< histogram of photon hits projected to pixel columns */
     TH2F* m_pdfCol = 0;  /**< histogram of PDF projected to pixel columns */
+
+    StoreArray<Track> m_tracks; /**< collection of tracks */
+    StoreArray<TOPDigit> m_digits; /**< collection of digits */
 
     TVector3 m_avrgMomentum; /**< average particle momentum at bar entrance (bar frame) */
     TVector3 m_avrgPosition; /**< average particle position at bar entrance (bar frame) */

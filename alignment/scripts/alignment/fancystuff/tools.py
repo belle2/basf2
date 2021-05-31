@@ -8,8 +8,8 @@ In the tools collection all plotting tools are gathered.
 """
 __author__ = 'swehle'
 
-from . import transform
-from .settings import create_figure
+from alignment.fancystuff import transform
+from alignment.fancystuff.settings import create_figure
 
 import matplotlib.pyplot as plt
 import pandas as pd

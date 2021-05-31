@@ -1,8 +1,8 @@
-import os
 import json
 import subprocess
 import validation_gt as vgt
 import b2test_utils
+import basf2
 
 calibration_path = b2test_utils.require_file('calibration', 'validation')
 
@@ -33,4 +33,20 @@ with b2test_utils.clean_working_directory():
         json.dump(input_files, input_files_json)
 
     # Now simply run the calibration locally (on our CI/CD servers we can not test different backends).
-    subprocess.check_call(['b2caf-prompt-run', 'Local', 'config.json', 'input_files.json', '--heartbeat', '10'])
+    try:
+        subprocess.check_call(['b2caf-prompt-run', 'Local', 'config.json', 'input_files.json', '--heartbeat', '20'])
+    except subprocess.CalledProcessError as e:
+        # In case of failure, prints the stdout...
+        out_name = basf2.find_file('calibration_results/KLMChannelStatus/0/collector_output/raw/0/stdout', '', True)
+        if out_name:
+            with open(out_name) as out_file:
+                basf2.B2ERROR('Calibration failed, here is the stdout of the first collector job.')
+                print(out_file.read())
+        # ... and the stderr.
+        err_name = basf2.find_file('calibration_results/KLMChannelStatus/0/collector_output/raw/0/stderr', '', True)
+        if err_name:
+            with open(err_name) as err_file:
+                basf2.B2ERROR('Calibration failed, here is the stderr of the first collector job.')
+                print(err_file.read())
+        basf2.B2FATAL(
+            f'The test failed because an exception was raised ({e}). Please re-run the build if this failure happened on bamboo.')

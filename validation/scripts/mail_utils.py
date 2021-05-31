@@ -58,7 +58,6 @@ def send_mail(name, recipient, subject, text, link=None, link_title=None, mood="
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
     msg['From'] = "B2Bot <b2soft@mail.desy.de>"
-    msg['Reply-To'] = "Martin Ritter <martin.ritter@belle2.org>"
     if "bamboo_email_override" in os.environ and os.environ["bamboo_email_override"].find("@") > 0:
         msg["To"] = os.environ["bamboo_email_override"]
     else:

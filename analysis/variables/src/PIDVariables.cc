@@ -260,8 +260,9 @@ namespace Belle2 {
       std::vector<std::string> detectors(arguments.begin(), arguments.end());
       Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
 
-      auto func = [detectorSet](const Particle * part) -> int {
+      auto func = [detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
+        if (!pid) return std::numeric_limits<double>::quiet_NaN();
         if (not pid->isAvailable(detectorSet))
           return 1;
         else return 0;

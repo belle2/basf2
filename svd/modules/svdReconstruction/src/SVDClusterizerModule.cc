@@ -44,63 +44,63 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
   m_cutSeed(5.0), m_cutAdjacent(3.0), m_useDB(true)
 {
   //Set module properties
-  setDescription("Clusterize SVDShaperDigits");
+  setDescription("This module produces SVDClusters from SVDShaperDigits, providing 1-D hit position, charge and time on SVD sensors.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // 1. Collections.
   addParam("ShaperDigits", m_storeShaperDigitsName,
-           "SVDShaperDigits collection name", string(""));
+           "SVDShaperDigits collection name.", string(""));
   addParam("Clusters", m_storeClustersName,
-           "SVDCluster collection name", string(""));
+           "SVDCluster collection name.", string(""));
   addParam("SVDTrueHits", m_storeTrueHitsName,
-           "TrueHit collection name", string(""));
+           "TrueHit collection name.", string(""));
   addParam("MCParticles", m_storeMCParticlesName,
-           "MCParticles collection name", string(""));
+           "MCParticles collection name.", string(""));
 
   // 2. Clustering
   addParam("AdjacentSN", m_cutAdjacent,
-           "SN for digits to be considered for clustering", m_cutAdjacent);
+           "minimum SNR for strips to be considered for clustering.", m_cutAdjacent);
   addParam("returnClusterRawTime", m_returnRawClusterTime,
-           "if true returns the raw cluster time, to be used for time calibration",
+           "if True, returns the raw cluster time (to be used for time calibration).",
            m_returnRawClusterTime);
   addParam("SeedSN", m_cutSeed,
-           "SN for digits to be considered as seed", m_cutSeed);
+           "minimum SNR for strips to be considered as cluster seed", m_cutSeed);
   addParam("ClusterSN", m_cutCluster,
            "minimum value of the SNR of the cluster", m_cutCluster);
   addParam("timeAlgorithm6Samples", m_timeRecoWith6SamplesAlgorithm,
-           " choose time algorithm for the 6-sample DAQ mode:  CoG6 = 6-sample CoG (default), CoG3 = 3-sample CoG,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
+           "cluster-time reconstruction algorithm for the 6-sample DAQ mode:  CoG6 = 6-sample CoG (default), CoG3 = 3-sample CoG,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
            m_timeRecoWith6SamplesAlgorithm);
   addParam("timeAlgorithm3Samples", m_timeRecoWith3SamplesAlgorithm,
-           " choose time algorithm for the 3-sample DAQ mode:  CoG6 = 6-sample CoG, CoG3 = 3-sample CoG (default),  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
+           "cluster-time reconstruction algorithm for the 3-sample DAQ mode:  CoG6 = 6-sample CoG, CoG3 = 3-sample CoG (default),  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
            m_timeRecoWith3SamplesAlgorithm);
   addParam("chargeAlgorithm6Samples", m_chargeRecoWith6SamplesAlgorithm,
-           " choose charge algorithm for 6-sample DAQ mode:  MaxSample (default), SumSamples,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
+           "cluster-charge reconstruction algorithm for 6-sample DAQ mode:  MaxSample (default), SumSamples,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
            m_chargeRecoWith6SamplesAlgorithm);
   addParam("chargeAlgorithm3Samples", m_chargeRecoWith3SamplesAlgorithm,
-           " choose charge algorithm for 3-sample DAQ mode:  MaxSample (default), SumSamples,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
+           "cluster-charge reconstruction algorithm for 3-sample DAQ mode:  MaxSample (default), SumSamples,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
            m_chargeRecoWith3SamplesAlgorithm);
   addParam("positionAlgorithm6Samples", m_positionRecoWith6SamplesAlgorithm,
-           " choose position algorithm for 6-sample DAQ mode:  old (default), CoGOnly. Overwritten by the dbobject if useDB = True (default).",
+           "cluster-position reconstruction algorithm for 6-sample DAQ mode:  old (default), CoGOnly. Overwritten by the dbobject if useDB = True (default).",
            m_positionRecoWith6SamplesAlgorithm);
   addParam("positionAlgorithm3Samples", m_positionRecoWith3SamplesAlgorithm,
-           " choose position algorithm for 3-sample DAQ mode:  old (default), CoGOnly. Overwritten by the dbobject if useDB = True (default).",
+           "cluster-position reconstruction algorithm for 3-sample DAQ mode:  old (default), CoGOnly. Overwritten by the dbobject if useDB = True (default).",
            m_positionRecoWith3SamplesAlgorithm);
 
   addParam("stripTimeAlgorithm6Samples", m_stripTimeRecoWith6SamplesAlgorithm,
-           " choose strip time algorithm used for cluster position reconstruction for the 6-sample DAQ mode: dontdo = not done (default), CoG6 = 6-sample CoG, CoG3 = 3-sample CoG,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
+           "strip-time reconstruction algorithm used for cluster position reconstruction for the 6-sample DAQ mode: dontdo = not done (default), CoG6 = 6-sample CoG, CoG3 = 3-sample CoG,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
            m_stripTimeRecoWith6SamplesAlgorithm);
   addParam("stripTimeAlgorithm3Samples", m_stripTimeRecoWith3SamplesAlgorithm,
-           " choose strip time algorithm used for cluster position reconstruction for the 3-sample DAQ mode: dontdo = not done (default), CoG6 = 6-sample CoG, CoG3 = 3-sample CoG,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
+           "strip-time reconstruction algorithm used for cluster position reconstruction for the 3-sample DAQ mode: dontdo = not done (default), CoG6 = 6-sample CoG, CoG3 = 3-sample CoG,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
            m_stripTimeRecoWith3SamplesAlgorithm);
   addParam("stripChargeAlgorithm6Samples", m_stripChargeRecoWith6SamplesAlgorithm,
-           " choose strip charge algorithm used for cluster position reconstruction for the 6-sample DAQ mode: dontdo = not done, MaxSample, SumSamples,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
+           "strip-charge reconstruction algorithm used for cluster position reconstruction for the 6-sample DAQ mode: dontdo = not done, MaxSample, SumSamples,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
            m_stripChargeRecoWith6SamplesAlgorithm);
   addParam("stripChargeAlgorithm3Samples", m_stripChargeRecoWith3SamplesAlgorithm,
-           " choose strip charge algorithm used for cluster position reconstruction for the 3-sample DAQ mode: dontdo = not done, MaxSample, SumSamples,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
+           "strip-charge reconstruction algorithm used for cluster position reconstruction for the 3-sample DAQ mode: dontdo = not done, MaxSample, SumSamples,  ELS3 = 3-sample ELS. Overwritten by the dbobject if useDB = True (default).",
            m_stripChargeRecoWith3SamplesAlgorithm);
 
   addParam("useDB", m_useDB,
-           "if false use clustering and reconstruction configuration module parameters", m_useDB);
+           "if False, use clustering and reconstruction configuration module parameters", m_useDB);
 
 }
 

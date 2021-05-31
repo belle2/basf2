@@ -109,7 +109,8 @@ def getArgumentParser():
         metavar="Filename",
         help=(
             "YAML file containing a list of samples to test on. "
-            "File must conform to appropriate schema (see examples in "
+            "File must conform to the schema defined in "
+            "``skim/tools/resources/test_samples_schema.json`` (see examples in "
             "``/group/belle2/dataprod/MC/SkimTraining/SampleLists``). "
             "If argument not passed, defaults to "
             "``/group/belle2/dataprod/MC/SkimTraining/SampleLists/TestFiles.yaml``."

@@ -339,6 +339,34 @@ This will read the output files of the test jobs, and produce tables of statisti
    :nogroupsections:
 
 
+.. _b2skim-stats-custom-samples
+
+Running ``b2skim-stats`` tools on custom samples
+................................................
+
+By default, these tools will run over a standard list of samples defined in ``/group/belle2/dataprod/MC/SkimTraining/SampleLists/TestFiles.yaml``. If you would like to run these tools over a set of custom samples (*e.g.* a signal MC sample), first create a YAML file containing the following:
+
+.. code-block:: yaml
+
+    Custom:
+      - location: /path/to/sample/a.root
+        label: "A nice human-readable label"
+      - location: /path/to/sample/b.root
+        label: "Another nice human-readable label"
+      - location: /path/to/sample/c.root
+        label: "Yet another nice human-readable label"
+
+Then pass this YAML file to ``b2skim-stats-submit``:
+
+.. code-block:: sh
+
+    b2skim-stats-submit -s SkimA SkimB SkimC --sample-yaml MyCustomSamples.yaml
+    # wait for jobs to finish...
+    b2skim-stats-print -s SkimA SkimB SkimC
+
+The JSON schema for input files is defined in ``skim/tools/resources/test_samples_schema.json``.
+
+
 .. _skim-expert-functions:
 
 Utility functions for skim experts
@@ -388,3 +416,14 @@ The module ``skimExpertFunctions`` contains helper functions to perform common t
    :prog: lpns2yaml.py
    :nodefaultconst:
    :nogroupsections:
+
+.. _skim-testfiles:
+
+Handling skim samples
+~~~~~~~~~~~~~~~~~~~~~
+
+.. tip::
+    This section is probably only of interest to you if you are developing the ``b2skim`` tools. The classes defined here are used internally by these tools to parse YAML files and handle sample metadata internally.
+
+.. automodule:: skim.testfiles
+    :members:

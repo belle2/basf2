@@ -38,6 +38,9 @@ namespace Belle2 {
       /// Maximum mean of dt of all channels distribution, condition to stop iterating
       void setMaxMeanDt(double maxMeanDt) {m_maxMeanDt = maxMeanDt;}
 
+      /// set common T0
+      void setCommonT0(double commonT0) {m_commonT0 = commonT0;}
+
       /// Enable text output of calibration result
       void enableTextOutput(bool output = true) {m_textOutput = output;}
 
@@ -70,6 +73,7 @@ namespace Belle2 {
       double err_dt[56][385] = {{0.}}; /**< error of dt of each channel*/
       double dtb[300] = {0.};        /**< dt of each board*/
       double err_dtb[300] =  {0.};    /**< error of dt of board*/
+      double m_commonT0 = 4825.;
 
       bool m_debug = false;   /**< debug. */
       bool m_storeHisto = false; /**< store histo or not*/

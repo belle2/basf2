@@ -69,6 +69,7 @@ void T0CalibrationAlgorithm::createHisto()
   }
 
   m_hTotal = new TH1F("hTotal", "hTotal", 30, -15, 15);
+
   //for each channel
   for (int il = 0; il < 56; il++) {
     const int nW = cdcgeo.nWiresInLayer(il);
@@ -175,7 +176,9 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   }
   B2INFO("Gaus fitting for each cell");
   for (int ilay = 0; ilay < 56; ++ilay) {
-    for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
+    const unsigned int nW = cdcgeo.nWiresInLayer(ilay);
+    for (unsigned int iwire = 0; iwire < nW; ++iwire) {
+
       const int n = m_h1[ilay][iwire]->Integral(1, m_h1[ilay][iwire]->GetNbinsX()) ;
       B2DEBUG(21, "layer " << ilay << " wire " << iwire << " entries " << n);
       // Set Delta_T0=0 again to make sure there is no strange case
@@ -226,7 +229,8 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
     for (int ilay = 0; ilay < 56; ++ilay) {
       subDir[ilay] = top ->mkdir(Form("lay_%d", ilay));
       subDir[ilay]->cd();
-      for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
+      const unsigned int nW = cdcgeo.nWiresInLayer(ilay);
+      for (unsigned int iwire = 0; iwire < nW; ++iwire) {
         m_h1[ilay][iwire]->Write();
       }
     }
@@ -287,7 +291,8 @@ void T0CalibrationAlgorithm::write()
   double T0;
   // get old T0 to calculate T0 mean of each board
   for (int ilay = 0; ilay < 56; ++ilay) {
-    for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
+    const unsigned int nW = cdcgeo.nWiresInLayer(ilay);
+    for (unsigned int iwire = 0; iwire < nW; ++iwire) {
       WireID wireid(ilay, iwire);
       T0 = cdcgeo.getT0(wireid);
       hT0_all->Fill(T0);
@@ -297,8 +302,12 @@ void T0CalibrationAlgorithm::write()
 
   //get Nominal T0
   double  T0_average = getMeanT0(hT0_all);
+  if (fabs(T0_average - m_commonT0) > 50) {B2WARNING("Large difference between common T0 (" << m_commonT0 << ") and aveage value" << T0_average);}
   //  get average T0 for each board and also apply T0 correction for T0 of that board
-  double T0B[300] = {4825.};
+  double T0B[300];
+  for (int i = 0; i < 300; ++i) {T0B[i] = m_commonT0;}
+
+
   for (int ib = 1; ib < 300; ++ib) {
     T0B[ib] = getMeanT0(hT0B[ib]);
     if (fabs(T0B[ib] - T0_average) > 25) {
@@ -316,7 +325,8 @@ void T0CalibrationAlgorithm::write()
   //correct T0 and write
   double dT;
   for (int ilay = 0; ilay < 56; ++ilay) {
-    for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
+    const unsigned int nW = cdcgeo.nWiresInLayer(ilay);
+    for (unsigned int iwire = 0; iwire < nW; ++iwire) {
       WireID wireid(ilay, iwire);
       int bID = cdcgeo.getBoardID(wireid);
 

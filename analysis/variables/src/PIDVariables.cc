@@ -344,6 +344,19 @@ namespace Belle2 {
                                                pdgCodeTest) + ", ALL)")->function(part);
     }
 
+    double antineutronID(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("nbarID")) {
+        return particle->getExtraInfo("nbarID");
+      } else {
+        if (particle->getPDGCode() == -Const::neutron.getPDGCode()) {
+          B2WARNING("The extraInfo nbarID is not registered! \n"
+                    "Please use function getNbarIDMVA in modularAnalysis.");
+        }
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
     Manager::FunctionPtr pidChargedBDTScore(const std::vector<std::string>& arguments)
     {
       if (arguments.size() != 2) {
@@ -562,6 +575,16 @@ namespace Belle2 {
                       "proton identification probability defined as :math:`\\mathcal{L}_p/(\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p)`, using info from all available detectors, *including the SVD*");
     REGISTER_VARIABLE("binaryPID_SVD(pdgCode1, pdgCode2)", binaryPID_SVD,
                       "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, *including the SVD*. Accepted mass hypotheses are: 211 (:math:`\\pi`), 321 (:math:`K`), 2212 (:math:`p`)");
+    REGISTER_VARIABLE("nbarID", antineutronID, R"DOC(
+Returns MVA classifier for antineutron PID.
+
+    - 1  signal(antineutron) like 
+    - 0  background like
+    - -1 invalid using this PID due to some ECL variables used unavailable
+
+This PID is only for antineutron. Neutron is also considered as background.
+The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `clusterLAT`, `clusterE1E9`, `clusterE9E21`,
+`clusterAbsZernikeMoment40`, `clusterAbsZernikeMoment51`, `clusterZernikeMVA`.)DOC");
 
     // Metafunctions for experts to access the basic PID quantities
     VARIABLE_GROUP("PID_expert");

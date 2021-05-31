@@ -35,18 +35,6 @@
 
 namespace Belle2 {
   namespace Variable {
-    double antineutronID(const Particle* particle)
-    {
-      if (particle->hasExtraInfo("nbarID")) {
-        return particle->getExtraInfo("nbarID");
-      } else {
-        if (particle->getPDGCode() == -2112) {
-          B2WARNING("The extraInfo nbarID is not registerted! \n"
-                    "Please use function getNbarIDMVA in modularAnalysis.");
-        }
-        return std::numeric_limits<float>::quiet_NaN();
-      }
-    }
     double beamBackgroundProbabilityMVA(const Particle* particle)
     {
       if (particle->hasExtraInfo("beamBackgroundProbabilityMVA")) {
@@ -1232,16 +1220,6 @@ Returns MVA classifier that uses shower shape variables to distinguish true clus
 
 The variables used in the training (in decreasing order of significance): clusterTiming, clusterE, clusterTheta, 
 clusterZernikeMVA,  clusterE1E9, clusterLat, clusterSecondMoment and clusterPhi. )DOC");
-    REGISTER_VARIABLE("nbarID", antineutronID, R"DOC(
-Returns MVA classifier for antineutron PID.
-
-    - 1  signal(antineutron) like 
-    - 0  background like
-    - -1 invalid using this PID due to some ECL varialbes used unavailable
-
-This PID is only for antineutron. Neutron is also considered as background.
-The variables used are clusterPulseShapeDiscriminationMVA, clusterE, clusterLAT, clusterE1E9,clusterE9E21,
-clusterAbsZernikeMoment40, clusterAbsZernikeMoment51, clusterZernikeMVA. )DOC");
     REGISTER_VARIABLE("clusterPulseShapeDiscriminationMVA", eclPulseShapeDiscriminationMVA, R"DOC(
 Returns MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers.
 

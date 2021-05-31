@@ -104,7 +104,16 @@ def getArgumentParser():
         ),
     )
 
-    parser.add_argument(
+    CustomSamples = parser.add_mutually_exclusive_group()
+    CustomSamples.add_argument(
+        "--custom-samples",
+        nargs="+",
+        metavar="Filename",
+        help=(
+            "Filenames of custom samples to test in addition to standard data and MC files."
+        )
+    )
+    CustomSamples.add_argument(
         "--sample-yaml",
         metavar="Filename",
         help=(
@@ -138,10 +147,13 @@ def getArgumentParser():
 
     sampleGroup = parser.add_mutually_exclusive_group()
     sampleGroup.add_argument(
-        "--mconly", action="store_true", help="Test on only MC samples."
+        "--mc-only", action="store_true", help="Test on only MC samples."
     )
     sampleGroup.add_argument(
-        "--dataonly", action="store_true", help="Test on only data samples."
+        "--data-only", action="store_true", help="Test on only data samples."
+    )
+    sampleGroup.add_argument(
+        "--custom-only", action="store_true", help="Test on only custom samples."
     )
 
     return parser
@@ -329,10 +341,19 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     samples = TestSampleList(SampleYAML=args.sample_yaml)
-    if args.mconly:
+    # Update samples with custom samples, if given explicitly
+    if args.custom_samples:
+        extra_samples = TestSampleList(
+            SampleDict={"Custom": [{"location": f} for f in args.custom_samples]}
+        )
+        samples = TestSampleList(SampleList=[*samples, *extra_samples])
+
+    if args.mc_only:
         samples = TestSampleList(SampleList=samples.mc_samples)
-    if args.dataonly:
+    if args.data_only:
         samples = TestSampleList(SampleList=samples.data_samples)
+    if args.custom_only:
+        samples = TestSampleList(SampleList=samples.custom_samples)
 
     if args.single:
         skims = args.single

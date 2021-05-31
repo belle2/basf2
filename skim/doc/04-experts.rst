@@ -364,7 +364,16 @@ Then pass this YAML file to ``b2skim-stats-submit``:
     # wait for jobs to finish...
     b2skim-stats-print -s SkimA SkimB SkimC
 
-The JSON schema for input files is defined in ``skim/tools/resources/test_samples_schema.json``.
+Alternatively, the filenames can be passed directly to ``b2skim-stats-submit``:
+
+.. code-block:: sh
+
+    b2skim-stats-submit -s SkimA SkimB SkimC --custom-samples /path/to/sample/*.root
+    # wait for jobs to finish...
+    b2skim-stats-print -s SkimA SkimB SkimC
+
+
+The JSON schema for the input YAML file is defined in ``skim/tools/resources/test_samples_schema.json``.
 
 
 .. _skim-expert-functions:

@@ -215,7 +215,6 @@ def add_post_filter_reconstruction(path, run_type, components):
     """
     check_components(components)
 
-    # Currently, the post filter reconstruction for physics and cosmics events is exactly the same.
     if run_type == constants.RunTypes.beam:
         reconstruction.add_postfilter_reconstruction(path, components=components, add_trigger_calculation=False)
 

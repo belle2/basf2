@@ -209,6 +209,7 @@ if __name__ == "__main__":
     if args.tag:
         # basf2.reset_database()
         basf2.conditions.reset()
+        basf2.conditions.expert_settings(usable_globaltag_states={"TESTING", "VALIDATED",  "PUBLISHED", "RUNNING", "OPEN"})
         tags = args.tag.split(':')
         # basf2.use_database_chain(False, basf2.LogLevel.DEBUG)
 

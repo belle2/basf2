@@ -134,6 +134,8 @@ CalibrationAlgorithm::EResult PXDValidationAlgorithm::calibrate()
   // Get counter histograms and set pointers
   auto cluster_counter = getObjectPtr<TH1I>("PXDTrackClusterCounter");
   auto point_counter = getObjectPtr<TH1I>("PXDTrackPointCounter");
+  if (!cluster_counter) return c_NotEnoughData;
+  if (!point_counter) return c_NotEnoughData;
 
   // Extract number of sensors from counter histograms
   auto nSensors = getNumberOfSensors(cluster_counter);
@@ -159,8 +161,6 @@ CalibrationAlgorithm::EResult PXDValidationAlgorithm::calibrate()
   auto hTotalHitsLayer1 = getObjectPtr<TH2F>("hTotalHitsLayer1");
   auto hPassedHitsLayer2 = getObjectPtr<TH2F>("hPassedHitsLayer2");
   auto hTotalHitsLayer2 = getObjectPtr<TH2F>("hTotalHitsLayer2");
-  if (!cluster_counter) return c_NotEnoughData;
-  if (!point_counter) return c_NotEnoughData;
   if (!hPassedHitsLayer1) return c_NotEnoughData;
   if (!hTotalHitsLayer1) return c_NotEnoughData;
   if (!hPassedHitsLayer2) return c_NotEnoughData;

@@ -597,7 +597,9 @@ def cutAndCopyLists(outputListName, inputListNames, cut, writeOut=False, path=No
     Example:
         Require energetic pions safely inside the cdc
 
-        >>> cutAndCopyLists("pi+:energeticPions", ["pi+:good", "pi+:loose"], "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+        .. code-block:: python
+
+            cutAndCopyLists("pi+:energeticPions", ["pi+:good", "pi+:loose"], "[E > 2] and thetaInCDCAcceptance", path=mypath)
 
     Warning:
         You must use square braces ``[`` and ``]`` for conditional statements.
@@ -630,7 +632,9 @@ def cutAndCopyList(outputListName, inputListName, cut, writeOut=False, path=None
     Example:
         require energetic pions safely inside the cdc
 
-        >>> cutAndCopyLists("pi+:energeticPions", "pi+:loose", "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+        .. code-block:: python
+
+            cutAndCopyList("pi+:energeticPions", "pi+:loose", "[E > 2] and thetaInCDCAcceptance", path=mypath)
 
     Warning:
         You must use square braces ``[`` and ``]`` for conditional statements.
@@ -1181,7 +1185,9 @@ def applyCuts(list_name, cut, path):
     Example:
         require energetic pions safely inside the cdc
 
-        >>> applyCuts("pi+:mypions", "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+        .. code-block:: python
+
+            applyCuts("pi+:mypions", "[E > 2] and thetaInCDCAcceptance", path=mypath)
 
     Warning:
         You must use square braces ``[`` and ``]`` for conditional statements.

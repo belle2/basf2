@@ -32,7 +32,7 @@ Here are some examples:
      from modularAnalysis import applyEventCuts, fillParticleList
 
      total_ecl_clusters = "formula(nParticlesInList(gamma:all) + nParticlesInList(e+:clusters))"
-     applyEventCuts("[nTracks > 10] and [ %s > 4]" % total_ecl_clusters, path=mypath)
+     applyEventCuts(f"[nTracks > 10] and [{total_ecl_clusters} > 4]", path=mypath)
      fillParticleList("pi+:highEForward", "[E > 1] and [theta < 1.0]" path=mypath)
 
      # WILL NOT WORK!!!

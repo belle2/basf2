@@ -193,9 +193,13 @@ class MCSample(Sample):
 
     @property
     def printable_name(self):
-        return " ".join(
-            (self.campaign, self.beam_energy, self.process, self.beam_background)
-        )
+        name = f"{self.campaign} {self.process}"
+        # Only print additional info in non-default situations
+        if self.beam_background != "BGx1":
+            name += f" {self.beam_background}"
+        if self.beam_energy != "4S":
+            name += f", {self.beam_energy}"
+        return name
 
 
 class CustomSample(Sample):

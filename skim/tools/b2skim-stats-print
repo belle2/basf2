@@ -40,7 +40,7 @@ from textwrap import wrap
 import warnings
 
 from skim.registry import Registry
-from skim.testfiles import TestSampleList
+from skim.testfiles import MCSample, TestSampleList
 from skimExpertFunctions import get_eventN
 
 from tabulate import tabulate
@@ -592,6 +592,23 @@ def getSkimsToPrint(SingleSkims, CombinedSkims):
     return skims, TestingCombined
 
 
+def getGenericMCProcesses(labels_only=False):
+    # The cross section (nb) of each process in e+e- collisions
+    processCrossSections = {
+        "mixed": 0.555,
+        "charged": 0.555,
+        "ccbar": 1.3,
+        "uubar": 1.61,
+        "ddbar": 0.40,
+        "ssbar": 0.38,
+        "taupair": 0.91,
+    }
+    if labels_only:
+        return list(processCrossSections)
+    else:
+        return processCrossSections
+
+
 def getStatSpecifier():
     """Returns a nested dict containing the specifications for how each
     statistic should be calculated and printed. The keys of the dict are used
@@ -856,7 +873,7 @@ def fillSkimStatsDict(
 
     Args:
         skims (list): List of skims to run.
-        samples (list(skim.testfiles.Sample)): List of samples to test on.
+        samples (skim.testfiles.TestSampleList): List of samples to test on.
         statSpecifier (dict): A nested dict specifying how each statistic should
             be calculated and printed, as returned by ``getStatSpecifier``.
         TestingCombined (bool): True if this tool is being run on combined skims.
@@ -916,12 +933,19 @@ def mcMax(statsPerSample, mcCampaign, beamBackground):
         mcMax (float): The maximum value for a statistic across selected MC samples.
     """
 
-    processes = ["mixed", "charged", "ccbar", "uubar", "ddbar", "ssbar", "taupair"]
-    mcMax = max(
-        statsPerSample[f"{mcCampaign}_{process}{beamBackground}"]
-        for process in processes
-    )
-    return mcMax
+    processes = getGenericMCProcesses(labels_only=True)
+    values = []
+    for process in processes:
+        label = MCSample(
+            location="", process=process, campaign=mcCampaign, beam_background=beamBackground
+        ).encodeable_name
+
+        try:
+            values.append(statsPerSample[label])
+        except (KeyError, TypeError):
+            pass
+
+    return max(values)
 
 
 def mcSum(statsPerSample, mcCampaign, beamBackground):
@@ -938,11 +962,18 @@ def mcSum(statsPerSample, mcCampaign, beamBackground):
         mcSum (float): The sum of a statistic across selected MC samples.
     """
 
-    processes = ["mixed", "charged", "ccbar", "uubar", "ddbar", "ssbar", "taupair"]
-    mcSum = sum(
-        statsPerSample[f"{mcCampaign}_{process}{beamBackground}"]
-        for process in processes
-    )
+    processes = getGenericMCProcesses(labels_only=True)
+    mcSum = 0
+    for process in processes:
+        label = MCSample(
+            location="", process=process, campaign=mcCampaign, beam_background=beamBackground
+        ).encodeable_name
+
+        try:
+            mcSum += statsPerSample[label]
+        except (KeyError, TypeError):
+            pass
+
     return mcSum
 
 
@@ -960,31 +991,25 @@ def mcWeightedAverage(statsPerSample, mcCampaign, beamBackground):
         mcWeightedAverage (float): A weighted average for the statistic.
     """
 
-    # The cross section (nb) of each process in e+e- collisions
-    processCrossSections = {
-        "mixed": 0.555,
-        "charged": 0.555,
-        "ccbar": 1.3,
-        "uubar": 1.61,
-        "ddbar": 0.40,
-        "ssbar": 0.38,
-        "taupair": 0.91,
-    }
+    processCrossSections = getGenericMCProcesses()
 
     totalCrossSection = sum(processCrossSections.values())
 
     weightedAverage = 0
     for process, crossSection in processCrossSections.items():
-        sample = f"{mcCampaign}_{process}{beamBackground}"
-        if statsPerSample[sample]:
-            weightedAverage += statsPerSample[sample] * crossSection / totalCrossSection
+        label = MCSample(
+            location="", process=process, campaign=mcCampaign, beam_background=beamBackground
+        ).encodeable_name
+
+        try:
+            weightedAverage += statsPerSample[label] * crossSection / totalCrossSection
+        except (KeyError, TypeError):
+            pass
 
     return weightedAverage
 
 
-def addWeightedMC(
-    allSkimStats, statSpecifier, mcCampaign, beamBackgrounds, verbose=False
-):
+def addWeightedMC(allSkimStats, statSpecifier, samples, verbose=False):
     """Add an entry to ``allSkimStats`` for statistic estimates of a combined MC
     sample. The combining functions are taken from ``statSpecifier``, and may be
     ``max``, ``sum``, or ``mcWeightedAverage``, as is appropriate for each
@@ -995,8 +1020,7 @@ def addWeightedMC(
             ``getSkimStatsDict``.
         statSpecifier (dict): A nested dict specifying how each statistic should
             be calculated and printed, as returned by ``getStatSpecifier``.
-        mcCampaign (str): A label like ``MC12`` for the MC campaign to test on.
-        beamBackgrounds (list): A list of beam background labels, such as "BGx1".
+        samples (skim.testfiles.TestSampleList): List of samples to test on.
         verbose (bool): Print extra messages when a statistic can't be calculated, but
             the script moves on anyway.
 
@@ -1005,8 +1029,11 @@ def addWeightedMC(
             dict, with an extra entry for combined MC samples.
     """
 
-    for (skim, skimStats), (stat, statSpec), beamBackground in product(
-        allSkimStats.items(), statSpecifier.items(), beamBackgrounds
+    beamBackgrounds = list(set(s.beam_background for s in samples.mc_samples))
+    mcCampaigns = list(set(s.campaign for s in samples.mc_samples))
+
+    for (skim, skimStats), (stat, statSpec), beamBackground, mcCampaign in product(
+        allSkimStats.items(), statSpecifier.items(), beamBackgrounds, mcCampaigns
     ):
         try:
             combiningFunction = statSpec["CombineMC"]
@@ -1023,6 +1050,7 @@ def addWeightedMC(
                     "yellow",
                 )
         except TypeError:
+            raise TypeError
             skimStats[stat][f"Combined MC {beamBackground}"] = None
             if verbose:
                 cprint(
@@ -1076,7 +1104,7 @@ def printToScreen(allSkimStats, samples):
     Args:
         allSkimStats (dict): A nested dict of statistics, as returned by
             ``getSkimStatsDict``.
-        samples (list(skim.testfiles.Sample)): List of samples to print.
+        samples (skim.testfiles.TestSampleList): List of samples to print.
     """
     statSpecifier = getStatSpecifier()
 
@@ -1097,7 +1125,6 @@ def printToScreen(allSkimStats, samples):
 
         renamingPairs = {s.encodeable_name: s.printable_name for s in samples}
 
-        df = df.reindex(renamingPairs.keys())
         df.rename(index=renamingPairs, inplace=True)
 
         table = tabulate(
@@ -1112,9 +1139,9 @@ def printToScreen(allSkimStats, samples):
         print(table)
 
     print(
-        "\nNote: If you are producing these stats for a skim pull request,\n"
-        "please consider using the `--markdown` option to produce a Markdown\n"
-        "table which BitBucket will display nicely."
+        "\nNote: If you are producing these stats for a skim pull request, please\n"
+        "    consider using the `--markdown` option to produce a Markdown table\n"
+        "    which BitBucket will display nicely."
     )
 
 
@@ -1127,7 +1154,7 @@ def printToConfluence(allSkimStats, samples, *, OutputFilename=None):
     Args:
         allSkimStats (dict): A nested dict of statistics, as returned by
             ``getSkimStatsDict``.
-        samples (list(skim.testfiles.Sample)): List of samples to print.
+        samples (skim.testfiles.TestSampleList): List of samples to print.
         OutputFilename (str): File location to write the formatted stats to.
     """
 
@@ -1165,7 +1192,6 @@ def printToConfluence(allSkimStats, samples, *, OutputFilename=None):
 
         renamingPairs = {s.encodeable_name: s.printable_name for s in samples}
 
-        df = df.reindex(renamingPairs.keys())
         df.rename(index=renamingPairs, inplace=True)
 
         table = tabulate(df, headers=headers, tablefmt="jira", floatfmt=floatFormat)
@@ -1196,7 +1222,7 @@ def printToMarkdown(allSkimStats, samples, *, OutputFilename=None):
     Args:
         allSkimStats (dict): A nested dict of statistics, as returned by
             ``getSkimStatsDict``.
-        samples (list(skim.testfiles.Sample)): List of samples to print.
+        samples (skim.testfiles.TestSampleList): List of samples to print.
         OutputFilename (str): File location to write the formatted stats to.
     """
     statSpecifier = getStatSpecifier()
@@ -1214,7 +1240,6 @@ def printToMarkdown(allSkimStats, samples, *, OutputFilename=None):
 
         renamingPairs = {s.encodeable_name: s.printable_name for s in samples}
 
-        df = df.reindex(renamingPairs.keys())
         df.rename(index=renamingPairs, inplace=True)
         # Make entries in first column bold
         df.rename(index={label: f"**{label}**" for label in df.index}, inplace=True)
@@ -1265,12 +1290,9 @@ if __name__ == "__main__":
         verbose=args.VERBOSE,
     )
 
-    # TODO: Re-implement cross-section weighted averages
     # NOTE: can't calculate weighted MC averages for combined skims, since certain stats are lists
-    # if not args.dataonly and not args.combined:
-    #     allSkimStats = addWeightedMC(
-    #         allSkimStats, statSpecifier, args.mccampaign, beamBackgrounds, args.VERBOSE
-    #     )
+    if not args.dataonly and not args.combined:
+        allSkimStats = addWeightedMC(allSkimStats, statSpecifier, samples, args.VERBOSE)
 
     if args.confluence:
         printToConfluence(allSkimStats, samples, OutputFilename=args.confluence)

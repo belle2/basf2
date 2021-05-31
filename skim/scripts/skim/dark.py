@@ -16,7 +16,7 @@ __authors__ = [
 import basf2 as b2
 import modularAnalysis as ma
 import pdg
-from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
+from skimExpertFunctions import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdMu
 from stdPhotons import stdPhotons
 import vertex as vertex
@@ -372,7 +372,7 @@ class GammaGammaControlKLMDark(BaseSkim):
     def load_standard_lists(self, path):
         stdPhotons("all", path=path)
 
-    TestFiles = [get_test_file("MC13_ggBGx1")]
+    TestSampleProcess = "gg"
 
     def __init__(self, prescale_high=1, prescale_low=1, **kwargs):
         """
@@ -459,7 +459,7 @@ class DielectronPlusMissingEnergy(BaseSkim):
     def load_standard_lists(self, path):
         stdE("all", path=path)
 
-    TestFiles = [get_test_file("MC13_mumuBGx1")]
+    TestSampleProcess = "mumu"
 
     def build_lists(self, path):
         dielectron_list = []

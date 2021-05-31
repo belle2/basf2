@@ -7,33 +7,34 @@ import json
 from pathlib import Path
 import re
 
-import yaml
-
 import basf2 as b2
 from modularAnalysis import applyCuts, summaryOfLists
 from skim.registry import Registry
+from skim.testfiles import TestSampleList
 
 
-def get_test_file(sampleName):
+def get_test_file(process, *, SampleYAML=None):
     """
-    Return the KEKCC location of files used specifically for skim testing
+    Attempt to find a test sample of the given MC process.
 
-    Args:
-        sampleName (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
+    Parameters:
+        process (str): Physics process, e.g. mixed, charged, ccbar, eemumu.
+        SampleYAML (str, pathlib.Path): Path to a YAML file containing sample
+                specifications.
 
     Returns:
-        The path to the test file on KEKCC.
+        str: Path to test sample file.
+
+    Raises:
+        FileNotFoundError: Raised if no sample can be found.
     """
-
-    with open(b2.find_file("skim/scripts/TestFiles.yaml")) as f:
-        skimTestFilesInfo = yaml.safe_load(f)
-
+    samples = TestSampleList(SampleYAML=SampleYAML)
+    matches = samples.query_mc_samples(process=process)
     try:
-        return skimTestFilesInfo[sampleName]
-    except KeyError:
-        msg = f"Sample {sampleName} not listed in skim/scripts/TestFiles.yaml."
-        b2.B2ERROR(msg)
-        raise KeyError(msg)
+        # Return the first match found
+        return matches[0].location
+    except IndexError as e:
+        raise ValueError(f"No test samples found for MC process '{process}'.") from e
 
 
 def get_file_metadata(filename):
@@ -283,7 +284,8 @@ def _sphinxify_decay(decay_string):
         ("B-", "B^-"),
         ("B0", "B^0"),
         ("B_s0", "B^0_s"),
-        ("K*0", "K^{0*}")]
+        ("K*0", "K^{0*}"),
+    ]
     tex_string = decay_string
     for (key, value) in substitutes:
         tex_string = tex_string.replace(key, value)
@@ -312,7 +314,9 @@ def fancy_skim_header(SkimClass):
 
     if isinstance(authors, str):
         # If we were given a string, split it up at: commas, "and", "&", and newlines
-        authors = re.split(r",\s+and\s+|\s+and\s+|,\s+&\s+|\s+&\s+|,\s+|\s*\n\s*", authors)
+        authors = re.split(
+            r",\s+and\s+|\s+and\s+|,\s+&\s+|\s+&\s+|,\s+|\s*\n\s*", authors
+        )
         # Strip any remaining whitespace either side of an author's name
         authors = [re.sub(r"^\s+|\s+$", "", author) for author in authors]
 
@@ -348,7 +352,9 @@ def fancy_skim_header(SkimClass):
     # If documentation of template functions not redefined, make sure BaseSkim docstring is not repeated
     SkimClass.load_standard_lists.__doc__ = SkimClass.load_standard_lists.__doc__ or ""
     SkimClass.build_lists.__doc__ = SkimClass.build_lists.__doc__ or ""
-    SkimClass.validation_histograms.__doc__ = SkimClass.validation_histograms.__doc__ or ""
+    SkimClass.validation_histograms.__doc__ = (
+        SkimClass.validation_histograms.__doc__ or ""
+    )
     SkimClass.additional_setup.__doc__ = SkimClass.additional_setup.__doc__ or ""
 
     return SkimClass
@@ -365,10 +371,10 @@ class BaseSkim(ABC):
     """A list of modules which to be silenced for this skim. This may be necessary to
     set in order to keep log file sizes small."""
 
-    TestFiles = [get_test_file("MC13_mixedBGx1")]
-    """Location of an MDST file to test the skim on. Defaults to an MC13 mixed BGx1
-    sample. If you want to use a different test file for your skim, set it using
-    `get_test_file`.
+    TestSampleProcess = "mixed"
+    """MC process of test file. `BaseSkim.TestFiles` passes this property to
+    `skimExpertFunctions.get_test_file` to retrieve an appropriate file location.
+    Defaults to a :math:`B^{0}\\overline{B^{0}}` sample.
     """
 
     MergeDataStructures = {}
@@ -425,7 +431,14 @@ class BaseSkim(ABC):
         """Eight-digit code assigned to this skim in the registry."""
         return Registry.encode_skim_name(self.name)
 
-    def __init__(self, *, OutputFileName=None, additionalDataDescription=None, udstOutput=True, validation=False):
+    def __init__(
+        self,
+        *,
+        OutputFileName=None,
+        additionalDataDescription=None,
+        udstOutput=True,
+        validation=False,
+    ):
         """Initialise the BaseSkim class.
 
         Parameters:
@@ -605,6 +618,29 @@ class BaseSkim(ABC):
         eselect.if_value('=1', ConditionalPath, b2.AfterConditionPath.CONTINUE)
 
         return ConditionalPath
+
+    @property
+    def TestFiles(self):
+        """
+        Location of test MDST sample. To modify this, set the property
+        `BaseSkim.TestSampleProcess`, and this function will find an appropriate test
+        sample from the list in
+        ``/group/belle2/dataprod/MC/SkimTraining/SampleLists/TestFiles.yaml``
+
+        If no sample can be found, an empty list is returned.
+        """
+        try:
+            return [get_test_file(process=self.TestSampleProcess)]
+        except FileNotFoundError:
+            # Could not find TestFiles.yaml
+            # (Don't issue a warning, since this will just show up as noise during grid processing)
+            return []
+        except ValueError:
+            b2.B2WARNING(
+                f"Could not find '{self.TestSampleProcess}' sample in TestFiles.yaml"
+            )
+            # Could not find sample in YAML file
+            return []
 
     @property
     def flag(self):
@@ -802,7 +838,6 @@ class CombinedSkim(BaseSkim):
         self.Skims = skims
         self.name = CombinedSkimName
         self.NoisyModules = list({mod for skim in skims for mod in skim.NoisyModules}) + NoisyModules
-        self.TestFiles = list({f for skim in skims for f in skim.TestFiles})
 
         # empty but needed for functions inherited from baseSkim to work
         self.SkimLists = []
@@ -976,6 +1011,10 @@ class CombinedSkim(BaseSkim):
         """
         for skim in self:
             skim.apply_hlt_hadron_cut_if_required(skim._ConditionalPath or path)
+
+    @property
+    def TestFiles(self):
+        return list({f for skim in self for f in skim.TestFiles})
 
     @property
     def flags(self):

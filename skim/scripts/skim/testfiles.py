@@ -370,6 +370,44 @@ class TestSampleList:
                 MissingParams.format(block="Custom", params=required)
             ) from e
 
+    def query_mc_samples(
+        self,
+        *,
+        process=None,
+        campaign=None,
+        beam_energy=None,
+        beam_background=None,
+    ):
+        """Find all MC samples matching query."""
+        samples = [
+            s
+            for s in self.mc_samples
+            if (process is None or s.process == process)
+            and (campaign is None or s.campaign == campaign)
+            and (beam_energy is None or s.beam_energy == beam_energy)
+            and (beam_background is None or s.beam_background == beam_background)
+        ]
+        return samples
+
+    def query_data_samples(
+        self,
+        *,
+        processing=None,
+        experiment=None,
+        beam_energy=None,
+        general_skim=None,
+    ):
+        """Find all data samples matching query."""
+        samples = [
+            s
+            for s in self.data_samples
+            if (processing is None or s.processing == processing)
+            and (experiment is None or s.experiment == experiment)
+            and (beam_energy is None or s.beam_energy == beam_energy)
+            and (general_skim is None or s.general_skim == general_skim)
+        ]
+        return samples
+
 
 if __name__ == "__main__":
     try:

@@ -918,7 +918,7 @@ def get_argument_parser():
     options.add_argument("--http-user", default="commonDBUser", help=argparse.SUPPRESS)
     options.add_argument("--http-password", default="Eil9ohphoo2quot", help=argparse.SUPPRESS)
     options.add_argument("--auth-token", type=argparse.FileType('r'), default=None,
-                         help="File to to a CDB authentication token necessary for write access to the database")
+                         help="File containing a CDB authentication token necessary for write access to the database")
 
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter, parents=[options])
     parser.set_defaults(func=lambda x, y: parser.print_help())

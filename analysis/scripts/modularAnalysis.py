@@ -110,8 +110,7 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
     roinput.param('parentLevel', parentLevel)
 
     path.add_module(roinput)
-    progress = register_module('ProgressBar')
-    path.add_module(progress)
+    path.add_module('ProgressBar')
 
     # None means don't create custom magnetic field, use whatever comes from the
     # DB

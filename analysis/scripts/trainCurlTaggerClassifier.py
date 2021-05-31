@@ -29,8 +29,7 @@ inputMdst('default', input_file_name, path=training_path)
 stdPi('all', path=training_path)
 tagCurlTracks('pi+:all', train=True, selectorType='mva', path=training_path)
 
-progress = register_module('ProgressBar')
-training_path.add_module(progress)
+training_path.add_module('ProgressBar')
 
 process(training_path, int(2e5))
 print(statistics)

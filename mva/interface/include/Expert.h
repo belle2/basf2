@@ -75,8 +75,6 @@ namespace Belle2 {
         return std::vector<float>();
       };
 
-
-
       /**
        * Virtual destructor
        */

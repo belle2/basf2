@@ -171,6 +171,7 @@ All clusters on one side of each sensor are combined with all clusters on the ot
 
 The choice of the cut and of the threshold is stored in the :ref:`SVDHitTimeSelection<svdhittimeselection>`.
 
+SpacePoints are not created if they exceed a certain threshold defined in the ``numMaxSpacePoints`` parameter of the :b2:mod:`SVDSpacePointCreator`
 
 Strip Reconstruction (Optional)
 -------------------------------

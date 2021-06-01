@@ -25,8 +25,6 @@ namespace Belle2 {
       T0CalibrationAlgorithm();
       /// Destructor
       ~T0CalibrationAlgorithm() {}
-      /// turn on/off debug.
-      void setDebug(bool debug = false) {m_debug = debug; }
       /// store Hisotgram or not.
       void storeHisto(bool storeHist = false) {m_storeHisto = storeHist;}
       /// minimum ndf require for track.
@@ -75,7 +73,6 @@ namespace Belle2 {
       double err_dtb[300] =  {0.};    /**< error of dt of board*/
       double m_commonT0 = 4825.;  /**< A common T0 of all channels*/
 
-      bool m_debug = false;   /**< debug. */
       bool m_storeHisto = false; /**< store histo or not*/
       bool  m_textOutput = false; /**< output text file if true */
       std::string m_outputT0FileName = "t0_new.dat"; /**<output t0 file name for text file*/

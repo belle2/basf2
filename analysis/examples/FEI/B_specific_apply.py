@@ -24,7 +24,7 @@ ma.inputMdst(environmentType='default',
 
 # Max 12 tracks per event - this avoids much computing time.
 empty_path = b2.create_path()
-skimfilter = ma.register_module('VariableToReturnValue')
+skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
 skimfilter.if_value('>12', empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
@@ -60,7 +60,7 @@ clean_roe_mask = (
 ma.appendROEMasks('B+:sig', [clean_roe_mask], path=path)
 ma.applyCuts('B+:sig', 'roeDeltae(CleanROE) < 2.0 and roeMbc(CleanROE) > 4.8', path=path)
 
-skimfilter = ma.register_module('SkimFilter')
+skimfilter = b2.register_module('SkimFilter')
 skimfilter.param('particleLists', ['B+:sig'])
 empty_path = b2.create_path()
 skimfilter.if_value('=0', empty_path, b2.AfterConditionPath.END)

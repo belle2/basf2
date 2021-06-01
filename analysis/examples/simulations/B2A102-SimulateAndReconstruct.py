@@ -48,8 +48,7 @@ mdst.add_mdst_output(path=my_path,
                      filename='B2pi0D_D2hh_D2hhh_B2munu.root')
 
 # Show progress of processing
-progress = b2.register_module('ProgressBar')
-my_path.add_module(progress)
+my_path.add_module('ProgressBar')
 
 # Process the events
 b2.process(my_path)

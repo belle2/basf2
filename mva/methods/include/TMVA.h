@@ -353,8 +353,6 @@ namespace Belle2 {
         return std::vector<float>();
       };
 
-
-
       /**
        * Apply this expert onto a dataset.
        * Multi-class mode signature.

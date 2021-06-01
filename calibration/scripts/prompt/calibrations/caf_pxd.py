@@ -31,7 +31,7 @@ settings = CalibrationSettings(name="PXD hot/dead pixel calibration",
                                        input_data_filters["Beam Energy"]["Continuum"],
                                        input_data_filters["Beam Energy"]["Scan"],
                                        input_data_filters["Run Type"]["physics"],
-                                       input_data_filters["Data Quality Tag"]["Good"]],
+                                       input_data_filters["Data Quality Tag"]["Good Or Recoverable"]],
                                    "cosmic": [input_data_filters["Run Type"]["cosmic"]]},
                                expert_config={
                                    "max_events_per_run": 400000,

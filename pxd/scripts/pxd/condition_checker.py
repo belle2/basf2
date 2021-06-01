@@ -88,10 +88,16 @@ class ConditionCheckerBase(ABC):
 
     @property
     def run(self):
+        """
+        Run number
+        """
         return self.eventMetaData.getRun()
 
     @property
     def exp(self):
+        """
+        Experiment number
+        """
         return self.eventMetaData.getExperiment()
 
     def beginRun(self):
@@ -229,6 +235,9 @@ class ConditionCheckerBase(ABC):
         self.save_canvas(canvas, cname)
 
     def save_canvas(self, canvas, cname, with_logy=False):
+        """
+        Save TCanvas to png/pdf format and write it to the default ROOT file
+        """
         if cname:
             canvas.SetName(cname)
         exp_run = f"e{self.expstart:05}_r{self.runstart:04}-{self.runend:04}"
@@ -259,6 +268,9 @@ class PXDOccupancyInfoChecker(ConditionCheckerBase):
         super().__init__(name, Belle2.PXDOccupancyInfoPar, tfile, "")
 
     def define_graphs(self):
+        """
+        Method to define TGraph
+        """
         super().define_graphs(ytitle="Occupancy (With Mask) [%]")
 
     def get_db_content(self):
@@ -275,6 +287,9 @@ class PXDOccupancyInfoChecker(ConditionCheckerBase):
         return sensor_db_content * 100
 
     def draw_plots(self, canvas=None):
+        """
+        Method to draw plots on a TCanvas
+        """
         # We don't use raw occupanncy. They will be corrected after takig out dead pixels
         pass
         # super().draw_plots(canvas=canvas, cname="OccupancyWithMask", ymin=0., ymax=plot_type_dict["occ_masked"]["max"])
@@ -291,9 +306,15 @@ class PXDMaskedPixelsChecker(ConditionCheckerBase):
         super().__init__(name, Belle2.PXDMaskedPixelPar, tfile, rundir)
 
     def define_graphs(self):
+        """
+        Method to define TGraph
+        """
         super().define_graphs(ytitle="Hot pixels [%]")
 
     def define_hists(self):
+        """
+        Method to define TH2
+        """
         super().define_hists(name="MaskedPixels", title="Masked Pixels", ztitle="isMasked")
 
     def get_db_content(self):
@@ -301,6 +322,7 @@ class PXDMaskedPixelsChecker(ConditionCheckerBase):
 
     def get_graph_value(self, sensor_db_content):
         hotcount = len(sensor_db_content)
+        #: Hist title suffix
         self.hist_title_suffix = f" ({hotcount} pixels)"
         return hotcount * 100. / nPixels
 
@@ -312,6 +334,9 @@ class PXDMaskedPixelsChecker(ConditionCheckerBase):
             h2.SetBinContent(int(uCell + 1), int(vCell + 1), 1)
 
     def draw_plots(self, canvas=None, cname="PXDHotPixel", ymin=0., ymax=plot_type_dict["hot"]["max"]):
+        """
+        Method to draw plots on a TCanvas
+        """
         super().draw_plots(canvas=canvas, cname=cname, ymin=ymin, ymax=ymax)
 
 
@@ -326,9 +351,15 @@ class PXDDeadPixelsChecker(ConditionCheckerBase):
         super().__init__(name, Belle2.PXDDeadPixelPar, tfile, rundir)
 
     def define_graphs(self):
+        """
+        Method to define TGraph
+        """
         super().define_graphs(ytitle="Dead pixels [%]")
 
     def define_hists(self):
+        """
+        Method to define TH2
+        """
         super().define_hists(name="DeadPixels", title="Dead Pixels", ztitle="isDead")
 
     def get_db_content(self):
@@ -371,6 +402,7 @@ class PXDDeadPixelsChecker(ConditionCheckerBase):
                 h2 = list(get_sensor_maps(sensorID_list=sensorID_list[0:1]).values())[0]
                 self.set_hist_content(h2, sensor_db_content)
                 deadcount = h2.Integral()
+        #: Hist title suffix
         self.hist_title_suffix = f" ({deadcount} pixels)"
         return min(deadcount, nPixels) * 100. / nPixels
 
@@ -399,6 +431,9 @@ class PXDDeadPixelsChecker(ConditionCheckerBase):
                 h2.SetBinContent(int(uCell + 1), int(vCell + 1), 1)
 
     def draw_plots(self, canvas=None, cname="PXDDeadPixel", ymin=0., ymax=plot_type_dict["dead"]["max"]):
+        """
+        Method to draw plots on a TCanvas
+        """
         super().draw_plots(canvas=canvas, cname=cname, ymin=ymin, ymax=ymax)
 
 
@@ -413,9 +448,15 @@ class PXDGainMapChecker(ConditionCheckerBase):
         super().__init__(name, Belle2.PXDGainMapPar, tfile, rundir)
 
     def define_graphs(self):
+        """
+        Method to define TGraph
+        """
         super().define_graphs(ytitle="Gain / MC default")
 
     def define_hists(self):
+        """
+        Method to define TH2
+        """
         nU = self.dbObj.getBinsU()
         nV = self.dbObj.getBinsV()
         super().define_hists(name="GainMap", title="Gain / MC default", ztitle="Relative gain", nUCells=nU, nVCells=nV)
@@ -438,4 +479,7 @@ class PXDGainMapChecker(ConditionCheckerBase):
         array2hist(sensor_db_content.reshape(h2.GetNbinsX(), h2.GetNbinsY()), h2)
 
     def draw_plots(self, canvas=None, cname="PXDGain", ymin=0.5, ymax=2.5):
+        """
+        Method to draw plots on a TCanvas
+        """
         super().draw_plots(canvas=canvas, cname=cname, ymin=ymin, ymax=ymax)

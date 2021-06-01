@@ -36,6 +36,7 @@ class CalibrationCheckerBase(ABC):
           objType_list (list): a list of db objects used as keys to their checker.
             e.g., [Belle2.PXDMaskedPixelPar, Belle2.PXDDeadPixelPar]
         """
+        #: condition checkers which are assoicated to this calibration.
         self.condition_checkers = {}
         for objType in objType_list:
             self.condition_checkers[objType] = None
@@ -107,6 +108,9 @@ class PXDHotPixelMaskCalibrationChecker(CalibrationCheckerBase):
     """
 
     def __init__(self):
+        """
+        Initial with related condition db object types
+        """
         super().__init__(objType_list=[
             Belle2.PXDMaskedPixelPar,
             Belle2.PXDDeadPixelPar,
@@ -117,10 +121,13 @@ class PXDHotPixelMaskCalibrationChecker(CalibrationCheckerBase):
         """
         Define TGraphs for filling
         """
+        #: Dictionary to save TGraphs of hot/dead pixel fractions with sensor id as key
         self.hotdead_graphs = get_sensor_graphs("Hot/Dead pixels [%]")
+        #: Dictionary to save TGraph of module occupancy (with mask)
         self.occupancy_masked_graphs = get_sensor_graphs("Occupancy (With Mask) [%]")
+        #: Dictionary to save TGraph of module occupancy (without mask)
         self.occupancy_no_mask_graphs = get_sensor_graphs("Occupancy (No Mask) [%]")
-        # define summary TGraphs and their TLegend
+        #: Dictionary of summary TGraphs and their TLegend
         self.sum_graphs = {}
         # TLegend
         legsum = ROOT.TLegend(0.75, 0.65, 0.90, 0.85)

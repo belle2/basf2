@@ -395,6 +395,12 @@ class BaseSkim(ABC):
       production system may struggle to handle the jobs.
     """
 
+    produces_mdst_by_default = False
+    """Special property for combined systematics skims, which produce MDST output instead of
+    uDST. This property is used by ``b2skim-prod`` to set the ``DataLevel`` parameter in
+    the ``DataDescription`` block for this skim to ``mdst`` instead of ``udst``.
+    """
+
     validation_sample = None
     """
     MDST sample to use for validation histograms. Must be a valid location of a
@@ -938,10 +944,10 @@ class CombinedSkim(BaseSkim):
         passes_flag = path.add_module("VariableToReturnValue", variable=variable)
         passes_flag.if_value(">0", passes_flag_path, b2.AfterConditionPath.CONTINUE)
 
-        filename = kwargs.get("filename", kwargs.get("OutputFileName", self.name))
+        filename = kwargs.get("filename", kwargs.get("OutputFileName", self.code))
 
         if filename is None:
-            filename = self.name
+            filename = self.code
 
         if not filename.endswith(".mdst.root"):
             filename += ".mdst.root"

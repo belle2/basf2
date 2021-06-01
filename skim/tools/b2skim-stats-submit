@@ -292,7 +292,7 @@ def getSamplesToRun(mcSamples, dataSamples, mcOnly=False, dataOnly=False):
         return mcSamples + dataSamples
 
 
-def verify_combined_skims(CombinedSkimDefinitions, SkimsToRun):
+def verify_combined_skims(CombinedSkimDefinitions, SkimsToRun, filename):
     """Perform basic checks on combined skim definitions to catch issues early."""
     # Check all the requested combined skims are defined in the YAML file
     unrecognised = set(SkimsToRun).difference(CombinedSkimDefinitions)
@@ -300,6 +300,12 @@ def verify_combined_skims(CombinedSkimDefinitions, SkimsToRun):
         raise ValueError(
             f"Unrecognised combined skim name{'s'*(len(unrecognised)>1)}: {', '.join(unrecognised)}."
         )
+
+    for CombinedSkimName in CombinedSkimDefinitions.keys():
+        if CombinedSkimName in Registry.names:
+            raise ValueError(
+                f"Combined skim name '{CombinedSkimName}' in {filename} conflicts with a registered skim."
+            )
 
     for CombinedSkim, skims in CombinedSkimDefinitions.items():
         # Check input YAML file only contains skims listed in registry
@@ -440,5 +446,5 @@ if __name__ == "__main__":
         elif "all" in skims:
             raise ValueError("Cannot pass both 'all' and a list of skim names.")
 
-        verify_combined_skims(CombinedSkimDefinitions, skims)
+        verify_combined_skims(CombinedSkimDefinitions, skims, filename=args.combined[0])
         submit_jobs(skims, samples, args.nEventsPerSample, args.dry_run, CombinedSkimDefinitions=CombinedSkimDefinitions)

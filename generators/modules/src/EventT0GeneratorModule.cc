@@ -85,7 +85,11 @@ namespace Belle2 {
     int bucket = 0;
     int beamRevo9Cycle = 0;
     int relBucketNo = 0;
-    int revo9count = 0;
+    //if m_isCosmics we need to randomize revo9count,
+    //at least for the SVD trigger bin
+    //if !m_isCosmics the revo9Count value is overwritten
+    const int maxRevo9Count = 11519;
+    int revo9count = gRandom->Integer(maxRevo9Count);
 
     if (!m_isCosmics) {
       // generate bucket number w.r.t revo9 marker
@@ -105,11 +109,6 @@ namespace Belle2 {
         double sigma = m_coreGaussWidth;
         if (gRandom->Rndm() < m_tailGaussFraction) sigma = m_tailGaussWidth;
         timeJitter = gRandom->Gaus(0., sigma);
-
-        //if m_isCosmics we need to randomize revo9count,
-        //at least for SVD trigger bin
-        const int maxRevo9Count = 11519;
-        revo9count = gRandom->Integer(maxRevo9Count);
       }
 
       // calculate revo9count (system clock ticks since revo9 marker as determined by L1 trigger)

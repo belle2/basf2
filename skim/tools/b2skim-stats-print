@@ -154,7 +154,7 @@ def getArgumentParser():
 
     parser.add_argument(
         "--mccampaign",
-        default="MC13",
+        default="MC14",
         choices=["MC12", "MC13", "MC14"],
         help="The MC campaign to test on.",
     )
@@ -633,7 +633,7 @@ def getAllSamples(mcCampaign):
     mcCampaignNumber = int(re.search(r"\d+", mcCampaign).group())
     # TODO: Temporary workaround while only some MC14 samples are available on KEKCC
     if mcCampaignNumber == 14:
-        mcSampleLabels = {k: v for (k, v) in mcSampleLabels.items() if k.endswith("BGx1")}
+        mcSampleLabels = {k: v for (k, v) in mcSampleLabels.items()}# if k.endswith("BGx1")}
         mcSampleLabels.update(
             {
                 f"{mcCampaign}_ggBGx1": f"{mcCampaign}: gg BGx1",
@@ -672,7 +672,15 @@ def getAllSamples(mcCampaign):
         "bucket10_exp12": "Data: bucket10 exp. 12",
         "bucket11_exp12": "Data: bucket11 exp. 12",
         "bucket12_exp12_4S_offres": "Data: bucket12 exp. 12 off-res",
+
+        "bucket16_exp14": "Data: bucket16 exp. 14",
+        "bucket16_hadron": "Data: bucket16 hadron",
+        "bucket17_exp16": "Data: bucket17 exp. 16",
+        "bucket17_hadron": "Data: bucket17 hadron",
     }
+
+
+
 
     return mcSampleLabels, dataSampleLabels
 

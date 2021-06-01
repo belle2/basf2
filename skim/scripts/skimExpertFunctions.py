@@ -6,6 +6,7 @@ import subprocess
 import json
 from pathlib import Path
 import re
+import warnings
 
 import yaml
 
@@ -1011,9 +1012,8 @@ class CombinedSkim(BaseSkim):
         """
         Corresponding value of this attribute for each individual skim.
 
-        Raises:
-            RuntimeError: Raised if the individual skims in combined skim contain a mix
-                of True and False for this property.
+        A warning is issued if the individual skims in combined skim contain a mix of
+        True and False for this property.
         """
         produce_on_tau = [skim.produce_on_tau_samples for skim in self]
         if all(produce_on_tau):
@@ -1021,14 +1021,17 @@ class CombinedSkim(BaseSkim):
         elif all(not TauBool for TauBool in produce_on_tau):
             return False
         else:
-            raise RuntimeError(
-                "The individual skims in the combined skim contain a mix of True and "
-                "False for the attribute `produce_on_tau_samples`.\n"
-                "    It is unclear what should be done in this situation."
-                "Please reorganise the combined skims to address this.\n"
-                "    Skims included in the problematic combined skim: "
-                f"{', '.join(skim.name for skim in self)}"
+            warnings.warn(
+                (
+                    "The individual skims in the combined skim contain a mix of True and "
+                    "False for the attribute `produce_on_tau_samples`.\n    The default in "
+                    "this case is to allow the combined skim to be produced on tau samples.\n"
+                    "    Skims included in the problematic combined skim: "
+                    f"{', '.join(skim.name for skim in self)}"
+                ),
+                RuntimeWarning,
             )
+            return True
 
     def merge_data_structures(self):
         """Read the values of `BaseSkim.MergeDataStructures` and merge data structures

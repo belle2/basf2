@@ -353,6 +353,8 @@ namespace Belle2 {
         return std::vector<float>();
       };
 
+
+
       /**
        * Apply this expert onto a dataset.
        * Multi-class mode signature.
@@ -360,6 +362,13 @@ namespace Belle2 {
        * @param classID class identifier.
        */
       virtual std::vector<float> apply(Dataset& test_data, const unsigned int classID) const override;
+
+      /**
+        * Apply this m_expert onto a dataset of length 1
+        * returns score for all classes.
+        * @param test_data dataset
+        */
+      virtual std::vector<float> applySingle(Dataset& test_data) const override;
 
     protected:
       TMVAOptionsMulticlass specific_options; /**< Method specific options */

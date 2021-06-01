@@ -61,6 +61,21 @@ namespace Belle2 {
         return std::vector<float>();
       };
 
+      /**
+        * Apply this expert onto a dataset of length 1 and return the score for all classes.
+        * Multi-class mode signature.
+        * Not pure virtual, since not all derived classes to re-implement this.
+        * @param test_data dataset
+        */
+      virtual std::vector<float> applySingle(Dataset& test_data) const
+      {
+
+        (void) test_data;
+
+        return std::vector<float>();
+      };
+
+
 
       /**
        * Virtual destructor

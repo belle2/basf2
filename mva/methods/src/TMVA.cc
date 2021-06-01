@@ -589,6 +589,20 @@ namespace Belle2 {
       return probabilities;
     }
 
+    std::vector<float> TMVAExpertMulticlass::applySingle(Dataset& test_data) const
+    {
+
+      if (test_data.getNumberOfEvents() != 1) {
+        B2FATAL('applySingle called with a dataset of size other than 1. Only datasets of size 1 are supported to keep the output 1D.')
+      }
+      test_data.loadEvent(0);
+      for (unsigned int i = 0; i < m_input_cache.size(); ++i)
+        m_input_cache[i] = test_data.m_input[i];
+      for (unsigned int i = 0; i < m_spectators_cache.size(); ++i)
+        m_spectators_cache[i] = test_data.m_spectators[i];
+      return m_expert->EvaluateMulticlass(specific_options.m_method);
+    }
+
     std::vector<float> TMVAExpertRegression::apply(Dataset& test_data) const
     {
 

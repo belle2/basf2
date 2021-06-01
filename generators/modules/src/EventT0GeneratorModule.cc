@@ -88,8 +88,8 @@ namespace Belle2 {
     //if m_isCosmics we need to randomize revo9count,
     //at least for the SVD trigger bin
     //if !m_isCosmics the revo9Count value is overwritten
-    const int maxRevo9Count = 11519;
-    int revo9count = gRandom->Integer(maxRevo9Count);
+    unsigned revo9range = (m_bunchStructure->getRFBucketsPerRevolution() / 4) * 9;
+    int revo9count = gRandom->Integer(revo9range);
 
     if (!m_isCosmics) {
       // generate bucket number w.r.t revo9 marker
@@ -142,8 +142,6 @@ namespace Belle2 {
     m_initialParticles->setTime(eventTime);
 
     // store revo9count (modulo range) in order to be distibuted to sub-detectors
-
-    unsigned revo9range = (m_bunchStructure->getRFBucketsPerRevolution() / 4) * 9;
     revo9count %= revo9range;
     if (revo9count < 0) revo9count += revo9range;
 

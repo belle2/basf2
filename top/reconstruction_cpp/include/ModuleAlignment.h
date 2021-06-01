@@ -73,7 +73,7 @@ namespace Belle2 {
             return;
           }
         }
-        B2ERROR("TOPalign::fixParameter: invalid parameter name '" << name << "'");
+        B2ERROR("TOP::ModuleAlignment::fixParameter: invalid parameter name '" << name << "'");
       }
 
       /**
@@ -88,7 +88,7 @@ namespace Belle2 {
             return;
           }
         }
-        B2ERROR("TOPalign::unfixParameter: invalid parameter name '" << name << "'");
+        B2ERROR("TOP::ModuleAlignment::unfixParameter: invalid parameter name '" << name << "'");
       }
 
       /**

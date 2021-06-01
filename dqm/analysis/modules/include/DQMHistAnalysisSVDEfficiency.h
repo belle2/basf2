@@ -39,7 +39,6 @@ namespace Belle2 {
     //parameters
     float m_effError; /**<error level of the efficiency */
     float m_effWarning; /**< warning level of the efficiency */
-    float m_effEmpty; /**<empty level of the efficiency */
     float m_statThreshold; /**<minimal number of tracks per sensor to set green or red frame */
     //! Data members
   private:

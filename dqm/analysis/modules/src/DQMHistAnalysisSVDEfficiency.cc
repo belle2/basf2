@@ -39,7 +39,6 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("SVDrefHisto.root"));
   addParam("effLevel_Error", m_effError, "Efficiency error (%) level (red)", float(0.9));
   addParam("effLevel_Warning", m_effWarning, "Efficiency WARNING (%) level (orange)", float(0.94));
-  addParam("effLevel_Empty", m_effEmpty, "Threshold to consider the sensor efficiency as too low", float(0));
   addParam("statThreshold", m_statThreshold, "minimal number of tracks per sensor to set green/red alert", float(100));
 }
 
@@ -66,7 +65,6 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
     if (!ref_eff)
       B2WARNING("SVD DQMHistAnalysis: Efficiency Level Reference not found! using module parameters");
     else {
-      m_effEmpty = ref_eff->GetBinContent(1);
       m_effWarning = ref_eff->GetBinContent(2);
       m_effError = ref_eff->GetBinContent(3);
     }
@@ -75,7 +73,7 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
     B2WARNING("SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") not found, or closed, using module parameters");
 
   B2INFO(" SVD efficiency thresholds:");
-  B2INFO(" EFFICIENCY: empty < " << m_effEmpty << " < normal < " << m_effWarning << " < warning < " << m_effError << " < error");
+  B2INFO(" EFFICIENCY: normal < " << m_effWarning << " < warning < " << m_effError << " < error");
 
 
   //build the legend

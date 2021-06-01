@@ -142,6 +142,7 @@ bool V0Fitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit:
     double extralengthMinus = stMinus.extrapolateToPoint(vertexPosition);
     if (extralengthPlus  > 0) hasInnerHitStatus |= 0x1; ///  plus track has hits inside the V0 vertex.
     if (extralengthMinus > 0) hasInnerHitStatus |= 0x2; /// minus track has hits inside the V0 vertex.
+    B2DEBUG(22, "extralengthPlus=" << extralengthPlus << ", extralengthMinus=" << extralengthMinus);
   } catch (...) {
     /// This shouldn't ever happen, but I can see the extrapolation
     /// code trying several windings before giving up, so this happens occasionally.
@@ -244,7 +245,9 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   RecoTrack* recoTrackPlus_forRefit = nullptr;
   RecoTrack* recoTrackMinus_forRefit = nullptr;
 
+  unsigned int count_removeInnerHits = 0;
   while (hasInnerHitStatus != 0) {
+    ++count_removeInnerHits;
     /// If the track has a hit inside the V0 vertex position, use refitted RecoTrack with removing inner hits
     /// in the next V0 vertex fit. Else, use the original RecoTrack.
 
@@ -292,7 +295,12 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
     /// revert back to the original vertex fit with the original tracks.
     if (not vertexFitWithRecoTracks(trackPlus, trackMinus, recoTrackPlus_forRefit, recoTrackMinus_forRefit,
                                     v0Hypothesis, hasInnerHitStatus, vertexPos, false)) {
-      //B2WARNING("vertex refit failed.");
+      B2DEBUG(22, "Vertex refit failed, or rejected by invariant mass cut.");
+      failflag = true;
+      break;
+    }
+    if (count_removeInnerHits >= 5) {
+      B2WARNING("Inner hits remained after " << count_removeInnerHits << " times of removing inner hits!");
       failflag = true;
       break;
     }
@@ -486,6 +494,7 @@ RecoTrack* V0Fitter::copyRecoTrackAndFit(RecoTrack* origRecoTrack, const int tra
 bool V0Fitter::removeInnerHits(RecoTrack* origRecoTrack, RecoTrack* recoTrack,
                                const int trackPDG, const TVector3& vertexPosition)
 {
+  if (!origRecoTrack || !recoTrack) B2FATAL("Input recotrack is nullptr!");
   /// original track information
   Const::ChargedStable particleUsedForFitting(std::abs(trackPDG));
   const genfit::AbsTrackRep* origTrackRep = origRecoTrack->getTrackRepresentationForPDG(std::abs(
@@ -500,33 +509,59 @@ bool V0Fitter::removeInnerHits(RecoTrack* origRecoTrack, RecoTrack* recoTrack,
     B2WARNING("Copied RecoTrack has different number of hits from its original RecoTrack!");
     return false;
   }
+  /// check recohits one by one whether the vertex is outside/inside them
   for (nRemoveHits = 0; nRemoveHits < recoHitInformations.size(); ++nRemoveHits) {
-    genfit::MeasuredStateOnPlane stOrigRecoHit = origRecoTrack->getMeasuredStateOnPlaneFromRecoHit(
-                                                   origRecoHitInformations[nRemoveHits]);
-    if (stOrigRecoHit.extrapolateToPoint(vertexPosition) > 0) {
+    if (!origRecoHitInformations[nRemoveHits]->useInFit()) {
       recoHitInformations[nRemoveHits]->setUseInFit(false);
-      /// if the last removed hit is a SVD U-hit, remove the next hit (SVD V-hit as the pair) in addition
-      ///    note: for the SVD pair hits, U-hit should be first and the V-hit the next in the sorted RecoHitInformation array.
-      if (recoHitInformations[nRemoveHits]->getTrackingDetector() == RecoHitInformation::RecoHitDetector::c_SVD) {
-        if (recoHitInformations.size() > nRemoveHits + 1) {
-          if (recoHitInformations[nRemoveHits + 1]->getTrackingDetector() == RecoHitInformation::RecoHitDetector::c_SVD) {
-            const SVDCluster* lastRemovedSVDHit = recoHitInformations[nRemoveHits]    ->getRelatedTo<SVDCluster>();
-            const SVDCluster* nextSVDHit        = recoHitInformations[nRemoveHits + 1]->getRelatedTo<SVDCluster>();
-            if (lastRemovedSVDHit->getSensorID() == nextSVDHit->getSensorID() &&
-                lastRemovedSVDHit->isUCluster() && !(nextSVDHit->isUCluster())) {
-              recoHitInformations[nRemoveHits + 1]->setUseInFit(false);
-              ++nRemoveHits;
-            }
-          }
-        }
-      }
-    } else
-      break;
+      continue;
+    }
+    try {
+      /// make a clone, not use the reference so that the genfit::MeasuredStateOnPlane will not be altered.
+      genfit::MeasuredStateOnPlane stOrigRecoHit = origRecoTrack->getMeasuredStateOnPlaneFromRecoHit(
+                                                     origRecoHitInformations[nRemoveHits]);
+      /// extrapolate the hit to the V0 vertex position
+      /// the value will be positive (negative) if the direction of the extrapolation is (counter)momentum-wise
+      double extralength = stOrigRecoHit.extrapolateToPoint(vertexPosition);
+      if (extralength > 0) {
+        recoHitInformations[nRemoveHits]->setUseInFit(false);
+      } else
+        break;
+    } catch (NoTrackFitResult()) {
+      B2WARNING("Exception: no FitterInfo assigned for TrackPoint created from this RecoHit.");
+      recoHitInformations[nRemoveHits]->setUseInFit(false);
+      continue;
+    } catch (...) {
+      /// This shouldn't ever happen, but I can see the extrapolation
+      /// code trying several windings before giving up, so this happens occasionally.
+      /// Something more stable would perhaps be desirable.
+      B2DEBUG(22, "Could not extrapolate track to vertex when removing inner hits, aborting.");
+      return false;
+    }
   }
 
-  if (recoHitInformations.size() == nRemoveHits) {/// N removed hits should not exceed N hits in the track
+  if (nRemoveHits == 0) {
+    B2WARNING("No hits removed in removeInnerHits, aborted. Use the original RecoTrack.");
+    return false;
+  }
+
+  if (recoHitInformations.size() <= nRemoveHits) {/// N removed hits should not reach N hits in the track
     B2WARNING("Removed all the RecoHits in the RecoTrack, aborted. Use the original RecoTrack.");
     return false;
+  }
+
+  /// if the last removed hit is a SVD U-hit, remove the next hit (SVD V-hit as the pair) in addition
+  ///    note: for the SVD pair hits, U-hit should be first and the V-hit the next in the sorted RecoHitInformation array.
+  if (recoHitInformations[nRemoveHits - 1]->getTrackingDetector() == RecoHitInformation::RecoHitDetector::c_SVD) {
+    if (recoHitInformations[nRemoveHits]->getTrackingDetector() == RecoHitInformation::RecoHitDetector::c_SVD) {
+      const SVDCluster* lastRemovedSVDHit = recoHitInformations[nRemoveHits - 1]->getRelatedTo<SVDCluster>();
+      const SVDCluster* nextSVDHit        = recoHitInformations[nRemoveHits]  ->getRelatedTo<SVDCluster>();
+      if (!lastRemovedSVDHit || !nextSVDHit) B2FATAL("Last/Next SVD hit is null!");
+      if (lastRemovedSVDHit->getSensorID() == nextSVDHit->getSensorID() &&
+          lastRemovedSVDHit->isUCluster() && !(nextSVDHit->isUCluster())) {
+        recoHitInformations[nRemoveHits]->setUseInFit(false);
+        ++nRemoveHits;
+      }
+    }
   }
 
   /// if N of remaining SVD hit-pair is only one, don't use the SVD hits
@@ -547,7 +582,7 @@ bool V0Fitter::removeInnerHits(RecoTrack* origRecoTrack, RecoTrack* recoTrack,
   /// fit recoTrack
   TrackFitter fitter;
   if (not fitter.fit(*recoTrack, particleUsedForFitting)) {
-    B2WARNING("track fit failed.");
+    B2WARNING("track fit failed after removing inner hits.");
     /// check fit status of original track
     if (not origRecoTrack->wasFitSuccessful(origTrackRep))
       B2WARNING("\t original track fit was also failed.");

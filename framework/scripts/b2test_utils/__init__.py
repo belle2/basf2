@@ -366,4 +366,4 @@ def print_belle2_environment():
     basf2.B2INFO('The BELLE2 environment variables are:')
     for key, value in sorted(dict(os.environ).items()):
         if 'BELLE2' in key.upper():
-            print(f'  {key.upper()}={value}')
+            print(f'  {key}={value}')

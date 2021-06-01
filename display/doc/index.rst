@@ -222,14 +222,14 @@ Track candidates & reconstructed hits
         ``useClusters`` parameter is set to False, PXDTrueHits and SVDTrueHits
         will be shown instead of clusters.
 
-Tracks, vertices, gammas
+Tracks, vertices, clusters
         Fitted tracks are shown as lines between green points generated using
         genfit's track extrapolation, the reco hits are shown as well in
         yellow, for the CDC as tiny drift cylinders. GFRaveVertex objects are
         shown as yellow error ellipsoids, plus a dot in the center (for
-        increased visibility). ECLGammas are visible as thick green lines
-        originating from the detector center – if MC info is shown, they should
-        overlap with the MC photons (thin green lines).
+        increased visibility). ECLClusters are red blocks representing energy –
+        if MC info is shown, they should overlap with the MC photons (thin
+        green lines).
 
 .. _display_window_tips:
 

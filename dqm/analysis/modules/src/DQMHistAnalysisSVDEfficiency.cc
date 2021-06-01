@@ -27,7 +27,9 @@ REG_MODULE(DQMHistAnalysisSVDEfficiency)
 //-----------------------------------------------------------------
 
 DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
-  : DQMHistAnalysisModule()
+  : DQMHistAnalysisModule(),
+    m_effUstatus(lowStat),
+    m_effVstatus(lowStat)
 {
   //Parameter definition
   B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: Constructor done.");
@@ -37,7 +39,6 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("SVDrefHisto.root"));
   addParam("effLevel_Error", m_effError, "Efficiency error (%) level (red)", float(0.9));
   addParam("effLevel_Warning", m_effWarning, "Efficiency WARNING (%) level (orange)", float(0.94));
-  addParam("effLevel_Empty", m_effEmpty, "Threshold to consider the sensor efficiency as too low", float(0));
   addParam("statThreshold", m_statThreshold, "minimal number of tracks per sensor to set green/red alert", float(100));
 }
 
@@ -64,7 +65,6 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
     if (!ref_eff)
       B2WARNING("SVD DQMHistAnalysis: Efficiency Level Reference not found! using module parameters");
     else {
-      m_effEmpty = ref_eff->GetBinContent(1);
       m_effWarning = ref_eff->GetBinContent(2);
       m_effError = ref_eff->GetBinContent(3);
     }
@@ -73,7 +73,7 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
     B2WARNING("SVD DQMHistAnalysis: reference root file (" << m_refFileName << ") not found, or closed, using module parameters");
 
   B2INFO(" SVD efficiency thresholds:");
-  B2INFO(" EFFICIENCY: empty < " << m_effEmpty << " < normal < " << m_effWarning << " < warning < " << m_effError << " < error");
+  B2INFO(" EFFICIENCY: normal < " << m_effWarning << " < warning < " << m_effError << " < error");
 
 
   //build the legend
@@ -122,7 +122,6 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
 
   m_hEfficiency = new SVDSummaryPlots("SVDEfficiency@view", "Summary of SVD efficiencies (%), @view/@side Side");
   m_hEfficiencyErr = new SVDSummaryPlots("SVDEfficiencyErr@view", "Summary of SVD efficiencies errors (%), @view/@side Side");
-
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::beginRun()
@@ -142,10 +141,6 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   //  gStyle->SetOptStat(0);
   //  gStyle->SetTitleY(.97);
 
-  //check MODULE EFFICIENCY
-  m_effUstatus = 0; // 0: good; 1: low stat; 2: warning; 3: error;
-  m_effVstatus = 0;
-
   //set dedicate gStyle
   //  const Int_t colNum = 4;
   //  Int_t palette[colNum] {kBlack,  kGreen, kOrange, kRed};
@@ -158,12 +153,12 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_hEfficiencyErr->getHistogram(0)->Reset();
   m_hEfficiencyErr->getHistogram(1)->Reset();
 
-  Float_t effU;
-  Float_t effV;
-  Float_t erreffU;
-  Float_t erreffV;
+  Float_t effU = -1;
+  Float_t effV = -1;
+  Float_t erreffU = -1;
+  Float_t erreffV = -1;
 
-  //Efficiency for the U side
+  // Efficiency for the U side
   TH2F* found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");
   TH2F* matched_clusU = (TH2F*)findHist("SVDEfficiency/MatchedHitsU");
 
@@ -190,13 +185,16 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         erreffU = std::sqrt(effU * (1 - effU) / denU);
       m_hEfficiencyErr->fill(m_SVDModules[i], 1, erreffU * 100);
 
-      if (effU <= m_effEmpty || denU < m_statThreshold) {
-        if (m_effUstatus < 1) m_effUstatus = 1; // low statistics
-      } else if (effU + erreffU < m_effWarning) {
-        if (effU > m_effError || effU + erreffU > m_effError) {
-          if (m_effUstatus < 2) m_effUstatus = 2; // warning
-        } else {
-          if (m_effUstatus < 3) m_effUstatus = 3; // error
+      if (denU < m_statThreshold) {
+        m_effUstatus = lowStat;
+        break; // break loop if one of sensor collected less then m_statThreshold
+      } else {
+        if ((effU - erreffU <= m_effWarning) && (effU - erreffU > m_effError)) {
+          m_effUstatus = warning;
+        } else if ((effU - erreffU <= m_effError)) {
+          m_effUstatus = error;
+        } else if (effU - erreffU > m_effWarning) {
+          m_effUstatus = good;
         }
       }
     }
@@ -231,72 +229,93 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
       m_hEfficiencyErr->fill(m_SVDModules[i], 0, erreffV * 100);
 
-      if (effV <= m_effEmpty || denV < m_statThreshold) {
-        if (m_effVstatus < 1) m_effVstatus = 1;
-      } else if (effV + erreffV < m_effWarning) {
-        if (effV > m_effError || effV + erreffV > m_effError) {
-          if (m_effVstatus < 2) m_effVstatus = 2;
-        } else {
-          if (m_effVstatus < 3) m_effVstatus = 3;
+      if (denV < m_statThreshold) {
+        m_effVstatus = lowStat;
+        break; // break loop if one of sensor collected less then m_statThreshold
+      } else {
+        if ((effV - erreffV <= m_effWarning) && (effV - erreffV > m_effError)) {
+          m_effVstatus = warning;
+        } else if ((effV - erreffV <= m_effError)) {
+          m_effVstatus = error;
+        } else if (effV - erreffV > m_effWarning) {
+          m_effVstatus = good;
         }
       }
     }
   }
 
-  //update summary
+  // update summary for U side
   m_cEfficiencyU->cd();
   m_hEfficiency->getHistogram(1)->Draw("text");
 
-  if (m_effUstatus == 0) {
-    m_cEfficiencyU->SetFillColor(kGreen);
-    m_cEfficiencyU->SetFrameFillColor(10);
-    m_legNormal->Draw("same");
-  } else {
-    if (m_effUstatus == 3) {
+  switch (m_effUstatus) {
+    case good: {
+      m_cEfficiencyU->SetFillColor(kGreen);
+      m_cEfficiencyU->SetFrameFillColor(10);
+      m_legNormal->Draw("same");
+      break;
+    }
+    case error: {
       m_cEfficiencyU->SetFillColor(kRed);
       m_cEfficiencyU->SetFrameFillColor(10);
       m_legProblem->Draw("same");
+      break;
     }
-    if (m_effUstatus == 2) {
+    case warning: {
       m_cEfficiencyU->SetFillColor(kOrange);
       m_cEfficiencyU->SetFrameFillColor(10);
       m_legWarning->Draw("same");
+      break;
     }
-    if (m_effUstatus == 1) {
+    case lowStat: {
       m_cEfficiencyU->SetFillColor(kGray);
       m_cEfficiencyU->SetFrameFillColor(10);
       m_legEmpty->Draw("same");
+      break;
+    }
+    default: {
+      B2INFO("effUstatus not set properly: " << m_effUstatus);
+      break;
     }
   }
+
   m_cEfficiencyU->Draw("text");
   m_cEfficiencyU->Update();
   m_cEfficiencyU->Modified();
   m_cEfficiencyU->Update();
 
-
-  //update summary
+  // update summary for V side
   m_cEfficiencyV->cd();
   m_hEfficiency->getHistogram(0)->Draw("text");
 
-  if (m_effVstatus == 0) {
-    m_cEfficiencyV->SetFillColor(kGreen);
-    m_cEfficiencyV->SetFrameFillColor(10);
-    m_legNormal->Draw("same");
-  } else {
-    if (m_effVstatus == 3) {
+  switch (m_effVstatus) {
+    case good: {
+      m_cEfficiencyV->SetFillColor(kGreen);
+      m_cEfficiencyV->SetFrameFillColor(10);
+      m_legNormal->Draw("same");
+      break;
+    }
+    case error: {
       m_cEfficiencyV->SetFillColor(kRed);
       m_cEfficiencyV->SetFrameFillColor(10);
       m_legProblem->Draw("same");
+      break;
     }
-    if (m_effVstatus == 2) {
+    case warning: {
       m_cEfficiencyV->SetFillColor(kOrange);
       m_cEfficiencyV->SetFrameFillColor(10);
       m_legWarning->Draw("same");
+      break;
     }
-    if (m_effVstatus == 1) {
+    case lowStat: {
       m_cEfficiencyV->SetFillColor(kGray);
       m_cEfficiencyV->SetFrameFillColor(10);
       m_legEmpty->Draw("same");
+      break;
+    }
+    default: {
+      B2INFO("effVstatus not set properly: " << m_effVstatus);
+      break;
     }
   }
 

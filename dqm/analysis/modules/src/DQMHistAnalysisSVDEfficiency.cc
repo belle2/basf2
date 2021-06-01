@@ -191,19 +191,14 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         m_effUstatus = lowStat;
         break; // break loop if one of sensor collected less then m_statThreshold
       } else {
-        if (effU <= m_effEmpty) {
-          m_effUstatus = lowStat;
-        } else if ((effU - erreffU < m_effWarning) && (effU - erreffU > m_effError)) {
+        if ((effU - erreffU <= m_effWarning) && (effU - erreffU > m_effError)) {
           m_effUstatus = warning;
-        } else if ((effU - erreffU < m_effError)) {
+        } else if ((effU - erreffU <= m_effError)) {
           m_effUstatus = error;
         } else if (effU - erreffU > m_effWarning) {
           m_effUstatus = good;
-        } else {
-          m_effUstatus = lowStat;
         }
       }
-
     }
   }
 
@@ -240,16 +235,12 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         m_effVstatus = lowStat;
         break; // break loop if one of sensor collected less then m_statThreshold
       } else {
-        if (effV <= m_effEmpty) {
-          m_effVstatus = lowStat;
-        } else if ((effV - erreffV < m_effWarning) && (effV - erreffV > m_effError)) {
+        if ((effV - erreffV <= m_effWarning) && (effV - erreffV > m_effError)) {
           m_effVstatus = warning;
-        } else if ((effV - erreffV < m_effError)) {
+        } else if ((effV - erreffV <= m_effError)) {
           m_effVstatus = error;
         } else if (effV - erreffV > m_effWarning) {
           m_effVstatus = good;
-        } else {
-          m_effVstatus = lowStat;
         }
       }
     }

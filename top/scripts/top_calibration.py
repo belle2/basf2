@@ -443,7 +443,7 @@ def pulseHeight_calibration_rawdata(inputFiles, globalTags=None, localDBs=None):
     return cal
 
 
-def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
+def module_alignment(inputFiles, sample='dimuon', fixedParameters=None,
                      globalTags=None, localDBs=None, new_cdst_format=True,
                      backend_args=None):
     '''
@@ -498,7 +498,8 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
         #   collector module
         collector = basf2.register_module('TOPAlignmentCollector')
         collector.param('sample', sample)
-        collector.param('parFixed', fixedParameters)
+        if fixedParameters:
+            collector.param('parFixed', fixedParameters)
         collector.param('targetModule', slot)
         collector.param('granularity', 'all')
 

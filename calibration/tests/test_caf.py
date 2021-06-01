@@ -1,8 +1,11 @@
 import json
 import subprocess
-import validation_gt as vgt
-import b2test_utils
+
 import basf2
+import b2test_utils
+import validation_gt as vgt
+import validationtools
+
 
 calibration_path = b2test_utils.require_file('calibration', 'validation')
 
@@ -34,9 +37,16 @@ with b2test_utils.clean_working_directory():
 
     # Now simply run the calibration locally (on our CI/CD servers we can not test different backends).
     try:
+        # validationtools.update_env()
         subprocess.check_call(['b2caf-prompt-run', 'Local', 'config.json', 'input_files.json', '--heartbeat', '20'])
     except subprocess.CalledProcessError as e:
-        # In case of failure, prints the stdout...
+        # In case of failure, prints the submit.sh...
+        sub_name = basf2.find_file('calibration_results/KLMChannelStatus/0/collector_output/raw/0/submit.sh', '', True)
+        if sub_name:
+            with open(sub_name) as sub_file:
+                basf2.B2ERROR('Calibration failed, here is the submit.sh of the first collector job.')
+                print(sub_file.read())
+        # ... and the stdout...
         out_name = basf2.find_file('calibration_results/KLMChannelStatus/0/collector_output/raw/0/stdout', '', True)
         if out_name:
             with open(out_name) as out_file:

@@ -46,10 +46,10 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("coreGaussWidth", m_coreGaussWidth, "sigma of core gaussian [ns]", double(6));
-    addParam("tailGaussWidth", m_tailGaussWidth, "sigma of tail gaussian [ns]", double(15));
+    addParam("coreGaussWidth", m_coreGaussWidth, "sigma of core gaussian [ns]", double(5.6));
+    addParam("tailGaussWidth", m_tailGaussWidth, "sigma of tail gaussian [ns]", double(14.5));
     addParam("tailGaussFraction", m_tailGaussFraction,
-             "fraction (by area) of tail gaussian", double(0.1));
+             "fraction (by area) of tail gaussian", double(0.08));
     addParam("fixedT0",  m_fixedT0,
              "If set, a fixed event t0 is used instead of simulating the bunch timing.", m_fixedT0);
     addParam("maximumT0",  m_maximumT0,
@@ -57,10 +57,10 @@ namespace Belle2 {
              m_maximumT0);
     addParam("isCosmics", m_isCosmics,
              "if True simulate L1 jitter for cosmics", bool(false));
-    addParam("coreGaussWidthCosmics", m_coreGaussWidthCosmics, "sigma of core gaussian for cosmics [ns]", double(5.6));
-    addParam("tailGaussWidthCosmics", m_tailGaussWidthCosmics, "sigma of tail gaussian for cosmics [ns]", double(14.5));
+    addParam("coreGaussWidthCosmics", m_coreGaussWidthCosmics, "sigma of core gaussian for cosmics [ns]", double(6));
+    addParam("tailGaussWidthCosmics", m_tailGaussWidthCosmics, "sigma of tail gaussian for cosmics [ns]", double(15));
     addParam("tailGaussFractionCosmics", m_tailGaussFractionCosmics,
-             "fraction (by area) of tail gaussian for cosmics", double(0.08));
+             "fraction (by area) of tail gaussian for cosmics", double(0.1));
 
   }
 

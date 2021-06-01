@@ -29,14 +29,11 @@ Here are some examples:
 
 .. code-block:: python
 
-     from modularAnalysis import applyEventCuts, fillParticleList
+     from modularAnalysis import applyEventCuts, fillParticleLists
+     fillParticleLists([("gamma:allecl", "isFromECL"), ("e+:clusters", "clusterE > 0")], path=mypath)
 
-     total_ecl_clusters = "formula(nParticlesInList(gamma:all) + nParticlesInList(e+:clusters))"
+     total_ecl_clusters = "formula(nParticlesInList(gamma:allecl) + nParticlesInList(e+:clusters))"
      applyEventCuts(f"[nTracks > 10] and [{total_ecl_clusters} > 4]", path=mypath)
-     fillParticleList("pi+:highEForward", "[E > 1] and [theta < 1.0]" path=mypath)
-
-     # WILL NOT WORK!!!
-     applyEventCuts("(nTracks > 10) and (nParticlesInList(gamma:all) > 4)", path=mypath)
 
 The above example can be made even more readable with the use of variable aliases (`VariableManager.addAlias`).
 

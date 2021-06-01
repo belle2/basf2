@@ -2860,6 +2860,7 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
 
     gammaCuts = 'E > 0.05'
     gammaCuts += ' and thetaInCDCAcceptance'
+    gammaCuts += ' and abs(clusterTiming) < 200'
     if (custom_cuts is not None):
         trackCuts, gammaCuts = custom_cuts
 
@@ -3003,6 +3004,7 @@ def buildEventShape(inputListNames=None,
 
     gammaCuts = 'E > 0.05'
     gammaCuts += ' and thetaInCDCAcceptance'
+    gammaCuts += ' and abs(clusterTiming) < 200'
     if (custom_cuts is not None):
         trackCuts, gammaCuts = custom_cuts
 

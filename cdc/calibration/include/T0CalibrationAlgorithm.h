@@ -73,7 +73,7 @@ namespace Belle2 {
       double err_dt[56][385] = {{0.}}; /**< error of dt of each channel*/
       double dtb[300] = {0.};        /**< dt of each board*/
       double err_dtb[300] =  {0.};    /**< error of dt of board*/
-      double m_commonT0 = 4825.;
+      double m_commonT0 = 4825.;  /**< A common T0 of all channels*/
 
       bool m_debug = false;   /**< debug. */
       bool m_storeHisto = false; /**< store histo or not*/

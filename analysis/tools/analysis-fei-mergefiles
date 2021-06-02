@@ -92,7 +92,7 @@ if len(sys.argv) < 3:
 
 outFile = sys.argv[1]
 
-if os.path.isfile(outFile) and not is_training_ntuple_file(tFile):
+if os.path.isfile(outFile) and not is_training_ntuple_file(outFile):
     os.remove(outFile)
 
 inFiles = sys.argv[2:]

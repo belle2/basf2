@@ -67,8 +67,8 @@ void SVD3SamplesEmulatorModule::initialize()
     B2DEBUG(28, "The starting sample from which to start to select the three samples:  " << m_startingSample);
     B2DEBUG(28, "The three samples selected are: " << m_startingSample << " " << m_startingSample + 1 << " " << m_startingSample + 2);
   } else if (m_chooseRelativeShift) {
-    if (m_relativeShift < 0 || m_relativeShift > 15) {
-      B2FATAL("The relative shift must be between 0 and 15, you set = " << m_relativeShift);
+    if (m_relativeShift < 0 || m_relativeShift > 12) {
+      B2FATAL("The relative shift must be between 0 and 12, you set = " << m_relativeShift);
       return;
     }
     B2DEBUG(28, "The chosen relative shift is: " << m_relativeShift);

@@ -631,10 +631,6 @@ class Teacher(object):
                     if not basf2_mva.available(weightfile):
                         keys = [m for m in f.GetListOfKeys() if f"{channel.label}" in m.GetName()]
                         if not keys:
-                            B2WARNING("Training of MVC failed. ROOT file does not contain required tree. "
-                                      f"Ignoring channel {channel.label}.")
-                            self.create_fake_weightfile(channel.label)
-                            self.upload(channel.label)
                             continue
                         tree = keys[0].ReadObj()
                         nSig = tree.GetEntries(channel.mvaConfig.target + ' == 1.0')
@@ -662,7 +658,7 @@ class Teacher(object):
                                    f" {channel.mvaConfig.config} > '{channel.label}'.log 2>&1")
                         B2INFO(f"Used following command to invoke teacher: \n {command}")
                         job_list.append((channel.label, command))
-        f.Close()
+            f.Close()
         p = multiprocessing.Pool(None, maxtasksperchild=1)
         func = functools.partial(subprocess.call, shell=True)
         p.map(func, [c for _, c in job_list])

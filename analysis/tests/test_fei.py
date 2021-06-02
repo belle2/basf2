@@ -987,7 +987,7 @@ class TestTeacher(unittest.TestCase):
         x.do_all_trainings()
 
         self.assertEqual(basf2_mva.available('UNITTEST_pi+:generic ==> pi+:FSP'), True)
-        self.assertEqual(basf2_mva.available('UNITTEST_K+:generic ==> K+:FSP'), True)
+        self.assertEqual(basf2_mva.available('UNITTEST_K+:generic ==> K+:FSP'), False)
         self.assertEqual(basf2_mva.available('UNITTEST_D0:generic ==> K-:generic pi+:generic'), True)
         self.assertEqual(basf2_mva.available('UNITTEST_D0:generic ==> pi-:generic pi+:generic'), True)
 

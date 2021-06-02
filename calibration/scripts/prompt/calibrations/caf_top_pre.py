@@ -45,7 +45,7 @@ def get_calibrations(input_data, **kwargs):
     max_files_per_run = expert_config["max_files_per_run"]
     min_events_per_file = 1
     # Applying the min event per file to remove empty root files
-    reduced_file_to_iov = filter_by_max_files_per_run(file_to_iov, max_files_per_run, min_events_per_file)
+    reduced_file_to_iov = filter_by_max_files_per_run(file_to_iov, max_files_per_run, min_events_per_file, random_select=True)
     inputFiles = list(reduced_file_to_iov.keys())
     basf2.B2INFO(f"Total number of files actually used as input = {len(inputFiles)}")
     requested_iov = kwargs.get("requested_iov", None)

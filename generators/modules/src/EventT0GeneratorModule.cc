@@ -57,10 +57,11 @@ namespace Belle2 {
              m_maximumT0);
     addParam("isCosmics", m_isCosmics,
              "if True simulate L1 jitter for cosmics", bool(false));
-    addParam("coreGaussWidthCosmics", m_coreGaussWidthCosmics, "sigma of core gaussian for cosmics [ns]", double(6));
+    addParam("coreGaussWidthCosmics", m_coreGaussWidthCosmics, "sigma of core gaussian for cosmics [ns]", double(13));
+    addParam("tailGaussMeanCosmics", m_tailGaussMeanCosmics, "mean of tail gaussian for cosmics [ns]", double(28));
     addParam("tailGaussWidthCosmics", m_tailGaussWidthCosmics, "sigma of tail gaussian for cosmics [ns]", double(15));
     addParam("tailGaussFractionCosmics", m_tailGaussFractionCosmics,
-             "fraction (by area) of tail gaussian for cosmics", double(0.1));
+             "fraction (by area) of tail gaussian for cosmics", double(0.09));
 
   }
 

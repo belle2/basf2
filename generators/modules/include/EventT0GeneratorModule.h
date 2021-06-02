@@ -61,6 +61,7 @@ namespace Belle2 {
     double m_maximumT0 = NAN; /**< if set, randomize between -maximum and maximum */
     bool m_isCosmics = false; /**< if true L1 jitter for cosmics is simulated*/
     double m_coreGaussWidthCosmics; /**< sigma of core gaussian [ns] for cosmics*/
+    double m_tailGaussMeanCosmics; /**< mean of tail gaussian [ns] for cosmics*/
     double m_tailGaussWidthCosmics; /**< sigma of tail gaussian [ns] for cosmics*/
     double m_tailGaussFractionCosmics; /**< area fraction of core gaussian for cosmics*/
 

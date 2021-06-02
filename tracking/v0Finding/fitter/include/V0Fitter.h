@@ -104,7 +104,7 @@ namespace Belle2 {
      * @param vertexPosition V0 vertex position
      * @return
      */
-    bool removeInnerHits(RecoTrack* origRecoTrack, RecoTrack* recoTrack,
+    bool removeInnerHits(RecoTrack* prevRecoTrack, RecoTrack* recoTrack,
                          const int trackPDG, const TVector3& vertexPosition);
 
     /** Compare innermost hits of daughter pairs to check if they are the same (shared) or not.

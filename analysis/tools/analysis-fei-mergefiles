@@ -92,7 +92,7 @@ if len(sys.argv) < 3:
 
 outFile = sys.argv[1]
 
-if os.path.isfile(outFile) and not is_training_ntuple_file(outFile):
+if os.path.isfile(outFile) and not is_training_ntuple_file(ROOT.TFile.Open(outFile, 'read')):
     os.remove(outFile)
 
 inFiles = sys.argv[2:]
@@ -101,7 +101,7 @@ ROOT.gSystem.Load('libdataobjects')
 
 # pick first input file to check what we want to do
 filename = inFiles[0]
-tfile = ROOT.TFile.Open(filename)
+tfile = ROOT.TFile.Open(filename, 'read')
 print(f'Preparing merging for {outFile}')
 if is_statistics_file(tfile):
     print('Is a statistics file')

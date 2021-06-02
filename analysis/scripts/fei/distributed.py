@@ -268,7 +268,7 @@ def merge_root_files(args):
         if f.startswith('input_'):
             continue
         # in case of training_input.root, append to already existing file
-        if os.path.isfile(args.directory + '/collection/' + f) and not f == 'training_input.root,':
+        if os.path.isfile(args.directory + '/collection/' + f) and not f == 'training_input.root':
             continue
         rootfiles.append(f)
     if len(rootfiles) == 0:

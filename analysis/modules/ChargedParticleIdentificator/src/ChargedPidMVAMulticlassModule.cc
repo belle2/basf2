@@ -165,11 +165,12 @@ void ChargedPidMVAMulticlassModule::event()
       B2DEBUG(11, "\tMVA response:");
 
       std::string score_varname("");
+      std::vector<float> scores = m_experts.at(index)->applySingle(*m_datasets.at(index));
+
       for (unsigned int classID(0); classID < m_classes.size(); ++classID) {
 
         const std::string className(m_classes.at(classID));
 
-        float score = m_experts.at(index)->apply(*m_datasets.at(index), classID)[0];
         score_varname = "pidChargedBDTScore_" + className;
 
         if (m_ecl_only) {
@@ -180,11 +181,11 @@ void ChargedPidMVAMulticlassModule::event()
           }
         }
 
-        B2DEBUG(11, "\t\tclass[" << classID << "] = " << className << " - score = " << score);
+        B2DEBUG(11, "\t\tclass[" << classID << "] = " << className << " - score = " << scores[classID]);
         B2DEBUG(12, "\t\tExtraInfo: " << score_varname);
 
         // Store the MVA score as a new particle object property.
-        particle->writeExtraInfo(score_varname, score);
+        particle->writeExtraInfo(score_varname, scores[classID]);
 
       }
 

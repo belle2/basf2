@@ -1,7 +1,6 @@
 import basf2 as b2
 import generators as ge
 import simulation as si
-import L1trigger as l1
 import b2test_utils as b2u
 
 
@@ -13,7 +12,6 @@ def steering_path():
     main.add_module('EventInfoSetter')
     ge.add_kkmc_generator(main, 'mu-mu+')
     si.add_simulation(main)
-    l1.add_tsim(main)
     return main
 
 

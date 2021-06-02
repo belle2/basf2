@@ -90,6 +90,11 @@ namespace Belle2 {
              "Threshold to determine timing quality flag with MC truth: fine",
              10.0);
 
+    addParam("simulateT0jitter",
+             m_simulateT0Jitter,
+             "if True, L1 jitter is simulated by EventT0Generator.",
+             false);
+
     B2DEBUG(100, "TRGGDLModule ... created");
   }
 
@@ -132,6 +137,10 @@ namespace Belle2 {
     if (_simulationMode != 3) {
       m_TRGGRLInfo.isRequired("TRGGRLObjects");
     }
+
+    if (m_simulateT0Jitter)
+      m_simClockState.isRequired();
+
     m_TRGSummary.registerInDataStore();
   }
 

@@ -237,3 +237,4 @@ def hlt_event_abort(module, condition, error_flag):
     p.add_module("EventErrorFlag", errorFlag=error_flag)
     add_store_only_metadata_path(p)
     module.if_value(condition, p, basf2.AfterConditionPath.CONTINUE)
+    p.add_module('StatisticsSummary').set_name('Sum_HLT_Discard')

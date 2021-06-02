@@ -204,13 +204,8 @@ def get_skim_stats_dict(SkimStatsJson):
     with open(SkimStatsJson) as skimStatsFile:
         JSONContents = json.load(skimStatsFile)
 
-    try:
-        skimStats = JSONContents["stats"]
-        CombinedSkimDefinitions = JSONContents["CombinedSkims"]
-    except KeyError:
-        raise ValueError(
-            "Cannot find definitions of combined skims in skim stats JSON file."
-        )
+    skimStats = JSONContents["stats"]
+    CombinedSkimDefinitions = JSONContents.get("CombinedSkims", {})
 
     return skimStats, CombinedSkimDefinitions
 
@@ -500,7 +495,13 @@ def get_lpn_list(sampleInfo, mc):
                     sampleInfo["experimentNumber"],
                     sampleInfo["beamEnergy"],
                     run,
-                    sampleInfo["inputDataLevel"],
+                    # For backward compatibility, allow 'generalSkimName' to be missing
+                    # from block in input YAML file
+                    *(
+                        (sampleInfo["generalSkimName"], sampleInfo["inputDataLevel"])
+                        if "generalSkimName" in sampleInfo
+                        else (sampleInfo["inputDataLevel"],)
+                    )
                 )
             )
             for run in sampleInfo["runNumbers"]
@@ -607,8 +608,8 @@ def get_DBGlobalTag(releaseNumber):
     else:
         # If none available, throw an error
         B2ERROR(
-            f"Could not find any conditions database global tags for releases between\n"
-            "release-{majorNumber}-{minorNumber}-00 and {initialReleaseNumber}."
+            "Could not find any conditions database global tags for releases between\n"
+            f"release-{majorNumber}-{minorNumber}-00 and {initialReleaseNumber}."
         )
         sys.exit(1)
 
@@ -655,6 +656,27 @@ def strip_campaign(label):
     return re.sub(MCCampaignRegex, "", label)
 
 
+def get_skim_output_datalevel(skim):
+    func = Registry.get_skim_function(skim)
+    return "mdst" if func.produces_mdst_by_default else "udst"
+
+
+def get_individual_skims(SkimName, CombinedSkimDefinitions):
+    """
+    Resolve ``SkimName`` into a list of individual skims.
+
+    If ``SkimName`` exists as a skim name in the registry, assume that that is what we
+    want. Otherwise, retrieve the list of individual skims from
+    ``CombinedSkimDefinitions``.
+    """
+    if SkimName in Registry.names:
+        SingleSkims = [SkimName]
+    else:
+        SingleSkims = CombinedSkimDefinitions[SkimName]
+
+    return SingleSkims
+
+
 def produce_on_tau_samples(skims):
     """
     Determine whether the combined skim should be produced on taupair samples, based on
@@ -674,6 +696,24 @@ def produce_on_tau_samples(skims):
     # raise a ValueError, and the user will be made aware of the problem.
     SkimObject = CombinedSkim(*[Registry.get_skim_function(skim)() for skim in skims])
     return SkimObject.produce_on_tau_samples
+
+
+def make_data_description_block(skims, sampleInfo):
+    DataDescription = []
+    GeneralSkim = sampleInfo.get("generalSkimName", None)
+
+    for skim in skims:
+        DescriptionDict = {
+            "": skim,
+            "SkimDecayMode": Registry.encode_skim_name(skim),
+            "DataLevel": get_skim_output_datalevel(skim),
+        }
+
+        if GeneralSkim is not None:
+            DescriptionDict["GeneralSkimName"] = GeneralSkim
+        DataDescription.append(DescriptionDict)
+
+    return DataDescription
 
 
 def warn_local_script(args):
@@ -714,8 +754,7 @@ def make_combined_steering_file(
     SteeringFileDirectory.mkdir(parents=True, exist_ok=True)
     SteeringFile = SteeringFileDirectory / f"{SkimName}_Skim.py"
 
-    # Retrieve the list of individual skims going into this combined skim
-    SingleSkims = CombinedSkimDefinitions[SkimName]
+    SingleSkims = get_individual_skims(SkimName, CombinedSkimDefinitions)
 
     try:
         skims, modules = resolve_skim_modules(SingleSkims, LocalModule=LocalModule)
@@ -777,7 +816,7 @@ def make_request_dict(
     skimStatsDict, CombinedSkimDefinitions = get_skim_stats_dict(args.SkimStatsJson)
     verify_stats_dict(args, sampleRegistry, skimStatsDict)
 
-    individualSkims = CombinedSkimDefinitions[skimName]
+    individualSkims = get_individual_skims(skimName, CombinedSkimDefinitions)
 
     if args.mc:
         fabricationType = "MCSkim"
@@ -809,14 +848,7 @@ def make_request_dict(
         "SteeringFile": f"{skimName}_Skim.py",
         "SteeringFilePrefix": SkimScriptsDirectory,
         "LPNPrefix": LPNPrefix,
-        "DataDescription": [
-            {
-                "": individualSkim,
-                "SkimDecayMode": Registry.encode_skim_name(individualSkim),
-                "DataLevel": "udst",
-            }
-            for individualSkim in individualSkims
-        ],
+        "DataDescription": make_data_description_block(individualSkims, sampleInfo)
     }
 
     # We only want the MCEventType to include the beam background level if the sample is BGx0
@@ -871,7 +903,9 @@ def write_json_files(sampleRegistry, args, outputDirectory):
             # Skip taupair sample if the combined skim is not to be produced on taupair
             if (
                     "taupair" in sampleLabel and
-                    not produce_on_tau_samples(CombinedSkimDefinitions[skimName])
+                    not produce_on_tau_samples(
+                        get_individual_skims(skimName, CombinedSkimDefinitions)
+                    )
             ):
                 continue
 

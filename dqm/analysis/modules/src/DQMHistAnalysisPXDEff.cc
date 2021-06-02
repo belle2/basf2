@@ -39,6 +39,7 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("singleHists", m_singleHists, "Also plot one efficiency histogram per module", bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Eff:"));
   addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("useEpicsRO", m_useEpicsRO, "useEpics ReadOnly", false);
   addParam("ConfidenceLevel", m_confidence, "Confidence Level for error bars and alarms", 0.9544);
   addParam("WarnLevel", m_warnlevel, "Efficiency Warn Level for alarms", 0.92);
   addParam("ErrorLevel", m_errorlevel, "Efficiency  Level for alarms", 0.90);
@@ -95,6 +96,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
   }
 
 #ifdef _BELLE2_EPICS
+  m_useEpics |= m_useEpicsRO; // implicit
   if (m_useEpics) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
   }
@@ -489,7 +491,7 @@ void DQMHistAnalysisPXDEffModule::event()
         }
       }
 #ifdef _BELLE2_EPICS
-      if (m_useEpics) {
+      if (m_useEpics && !m_useEpicsRO) {
         for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
           if (updated[m_PXDModules[i]]) {
             Double_t x, y;// we assume that double and Double_t are same!
@@ -507,7 +509,7 @@ void DQMHistAnalysisPXDEffModule::event()
     } else scale_min = 0.0;
     if (gr) gr->Draw("AP");
     if (gr3) gr3->Draw("P");
-    auto tt = new TLatex(5.5, scale_min, "1.3.2 Module is excluded, please ignore");
+    auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
     tt->SetTextSize(0.035);
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered
@@ -546,7 +548,7 @@ void DQMHistAnalysisPXDEffModule::event()
   m_monObj->setVariable("nmodules", ieff);
 
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (m_useEpics && !m_useEpicsRO) {
     SEVCHK(ca_put(DBR_DOUBLE, mychid_status[0], (void*)&stat_data), "ca_set failure");
     // only update if statistics is reasonable, we dont want "0" drops between runs!
     if (stat_data != 0) SEVCHK(ca_put(DBR_DOUBLE, mychid_status[1], (void*)&var_efficiency), "ca_set failure");

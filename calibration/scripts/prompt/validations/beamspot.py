@@ -22,7 +22,7 @@ from glob import glob
 from math import sqrt, frexp, asin
 
 from datetime import datetime, timedelta
-from ROOT.Belle2.Unit import cm, um, mrad, rad
+from ROOT.Belle2 import Unit
 
 #: Tells the automated system some details of this script
 settings = ValidationSettings(name='BeamSpot Calibrations',
@@ -32,8 +32,8 @@ settings = ValidationSettings(name='BeamSpot Calibrations',
 
 
 # Get the eigen parameters of the matrix
-def getEigenPars(SizeM):
-    sxx, syy, szz, sxy, sxz, syz = SizeM
+def getEigenPars(covM):
+    sxx, syy, szz, sxy, sxz, syz = covM
 
     mat = np.array([[sxx, sxy, sxz],
                     [sxy, syy, syz],
@@ -48,8 +48,9 @@ def getEigenPars(SizeM):
     eigVals = eigVals[idx]
     eigVecs = eigVecs[:, idx]
 
-    eigVals[1] = max(0.0001, eigVals[1])
-    eigVals[2] = max(0.0001, eigVals[2])
+    assert(eigVals[0] > 1e-4)
+    assert(eigVals[1] > 1e-4)
+    assert(eigVals[2] > 1e-4)
 
     sxEig = sqrt((eigVals[1]))
     syEig = sqrt((eigVals[2]))
@@ -57,24 +58,18 @@ def getEigenPars(SizeM):
 
     # get the signs right
     if eigVecs[2][0] < 0:
-        eigVecs[0][0] *= -1
-        eigVecs[1][0] *= -1
-        eigVecs[2][0] *= -1
+        eigVecs[:, 0] *= -1
 
     if eigVecs[0][1] < 0:
-        eigVecs[0][1] *= -1
-        eigVecs[1][1] *= -1
-        eigVecs[2][1] *= -1
+        eigVecs[:, 1] *= -1
 
     if eigVecs[1][2] < 0:
-        eigVecs[0][2] *= -1
-        eigVecs[1][2] *= -1
-        eigVecs[2][2] *= -1
+        eigVecs[:, 2] *= -1
 
     # calculate the angles in mrad
-    angleXZ = rad / mrad * asin(eigVecs[0][0] / sqrt(1 - eigVecs[1][0]**2))
-    angleYZ = rad / mrad * asin(eigVecs[1][0])
-    angleXY = rad / mrad * asin(eigVecs[1][1] / sqrt(1 - eigVecs[1][0]**2))
+    angleXZ = Unit.rad / Unit.mrad * asin(eigVecs[0][0] / sqrt(1 - eigVecs[1][0]**2))
+    angleYZ = Unit.rad / Unit.mrad * asin(eigVecs[1][0])
+    angleXY = Unit.rad / Unit.mrad * asin(eigVecs[1][1] / sqrt(1 - eigVecs[1][0]**2))
 
     return [sxEig, syEig, szEig, angleXZ, angleYZ, angleXY]
 
@@ -109,21 +104,21 @@ def getBSvalues(path):
 
         for i in range(len(evNums) + 1):
             bs = bsAll.getObjectByIndex(i)
-            ipV = bs.getIPPosition()
-            ip = [ipV(i) * cm / um for i in range(3)]  # from cm to um
-            ipeV = bs.getIPPositionCovMatrix()
-            ipe = [sqrt(ipeV(i, i)) * cm / um for i in range(3)]  # from cm to um
-            covM = bs.getSizeCovMatrix()
-            sizeM = (covM(0, 0), covM(1, 1), covM(2, 2), covM(0, 1), covM(0, 2), covM(1, 2))
-            sizeM = [x * (cm / um)**2 for x in sizeM]  # from cm2 to um2
+            ipR = bs.getIPPosition()
+            ip = [ipR(i) * Unit.cm / Unit.um for i in range(3)]  # from cm to um
+            ipeR = bs.getIPPositionCovMatrix()
+            ipe = [sqrt(ipeR(i, i)) * Unit.cm / Unit.um for i in range(3)]  # from cm to um
+            covR = bs.getSizeCovMatrix()
+            covM = (covR(0, 0), covR(1, 1), covR(2, 2), covR(0, 1), covR(0, 2), covR(1, 2))
+            covM = [x * (Unit.cm / Unit.um)**2 for x in covM]  # from cm2 to um2
 
-            tStart = ipeV(0, 1) * 1e20
-            tEnd = ipeV(0, 2) * 1e20
-            tStart = int(frexp(ipeV(0, 1))[0] * 2**53) % 2**32 / 3600.
-            tEnd = int(frexp(ipeV(0, 2))[0] * 2**53) % 2**32 / 3600.
+            tStart = ipeR(0, 1) * 1e20
+            tEnd = ipeR(0, 2) * 1e20
+            tStart = int(frexp(ipeR(0, 1))[0] * 2**53) % 2**32 / 3600.
+            tEnd = int(frexp(ipeR(0, 2))[0] * 2**53) % 2**32 / 3600.
 
-            eigM = getEigenPars(sizeM)
-            arr.append((runExp, tStart, tEnd, ip, ipe, sizeM, eigM))
+            eigM = getEigenPars(covM)
+            arr.append((runExp, tStart, tEnd, ip, ipe, covM, eigM))
         f.Close()
 
     arr = sorted(arr, key=lambda x: x[1])

@@ -113,7 +113,7 @@ elif is_training_ntuple_file(tfile):
     print('Is a training ntuple file')
     import subprocess
     if os.path.exists(outFile):
-        print('\t{outFile} exists already! Appending...')
+        print(f'\t{outFile} exists already! Appending...')
         ret = subprocess.call(['hadd', '-a', outFile] + inFiles)
     else:
         ret = subprocess.call(['hadd', outFile] + inFiles)

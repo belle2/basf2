@@ -324,7 +324,7 @@ void KLMTimeCollectorModule::collectScintEnd(RelationVector<EKLMHit2d>& eklmHit2
 
       m_Event.dist = 0.5 * l - hitLocal_extHit.x() / CLHEP::mm * Unit::mm;
       m_Event.recTime = digitHit.getTime();
-      m_Event.eDep = digitHit.getCharge();
+      m_Event.eDep = digitHit.getEnergyDeposit();
       m_Event.nPE = digitHit.getNPhotoelectrons();
 
       getObjectPtr<TH2D>("m_HfTimeE")->Fill(m_Event.flyTime, digitHit.getLayer());

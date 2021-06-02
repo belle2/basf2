@@ -169,6 +169,11 @@ def add_simulation(
         if components is not None:
             b2.B2WARNING("Custom detector components specified: Will still build full geometry")
 
+    # create EventLevelTriggerTimeInfo if it doesn't exist in BG Overlay
+    if 'SimulateEventLevelTriggerTimeInfo' not in path:
+        eventleveltriggertimeinfo = b2.register_module('SimulateEventLevelTriggerTimeInfo')
+        path.add_module(eventleveltriggertimeinfo)
+
     # event T0 jitter simulation
     if simulateT0jitter and 'EventT0Generator' not in path:
         eventt0 = b2.register_module('EventT0Generator')

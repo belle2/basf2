@@ -118,7 +118,7 @@ elif is_training_ntuple_file(tfile):
     else:
         ret = subprocess.call(['hadd', outFile] + inFiles)
 else:
-    print('Is a histogram or a training ntuple file')
+    print('Is a histogram file')
     import subprocess
     ret = subprocess.call(['hadd', outFile] + inFiles)
     sys.exit(ret)

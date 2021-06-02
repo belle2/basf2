@@ -5,7 +5,7 @@ import modularAnalysis as ma
 import variables as va
 import os
 
-# defile scale tests
+# define scale tests
 sys_tests = ['def', 'scale']
 
 # Select the variation from the list
@@ -23,16 +23,12 @@ ma.inputMdst(environmentType='default',
              filename=b2.find_file('B02D0pi0_D02pi0pi0.root', 'examples', False),
              path=my_path)
 
-# ID of weight table is taken from B2A907
-weight_table_id = "Feb2021:TestEnergy"
+# ID of weight table
+weight_table_id = "PhotonEnergyBiasCorrection_Feb2021"
 
-if not os.getenv('BELLE2_EXAMPLES_DATA_DIR'):
-    b2.B2FATAL("You need the example data installed. Run `b2install-data example` in terminal for it.")
+b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
-db_location = os.getenv('BELLE2_EXAMPLES_DATA_DIR') + '/database/'
-b2.conditions.prepend_testing_payloads('localdb/database.txt')
-
-# We know what weight info will be added (see B2A907),
+# We know what weight info will be added,
 # so we add aliases and add it to the tools
 va.variables.addAlias('Weight', 'extraInfo(' + weight_table_id + '_Weight)')
 va.variables.addAlias('StatErr', 'extraInfo(' + weight_table_id + '_StatErr)')
@@ -46,7 +42,11 @@ ma.fillParticleList(decayString='gamma:sel',
 
 if test == 'def':
     pass
-elif test == 'scale':  # weight_table_id+"_Weight" is used to scale photon energy
+elif test == 'scale':
+    # The scaling must only be applied to collision data, but not to MC.
+    # In principle, it can be run for MC as well because internally MC events are skipped anyway.
+    # However, it's better (faster, no error message) to skip the energy scaling in the steering file when running over MC.
+    # weight_table_id+"_Weight" is used to scale photon energy
     ma.correctEnergyBias(inputListNames=['gamma:sel'], tableName=weight_table_id, path=my_path)
 
 var1 = ['M',

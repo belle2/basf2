@@ -233,8 +233,10 @@ def add_svd_unpacker_simulate3sampleDAQ(path, latencyShift=-1, relativeShift=-1)
     Adds the SVD Unpacker to the path, emulating the 3-sample mode from the 6-sample mode.
 
     @param path: add the modules to this basf2 path.
-    @param latencyShift: relative time shift between the 3-sample and the 6-sample mode, in APV clocks.
-    @param relativeShift: relative time shift between the 3-sample and the 6-sample mode, in units of 1/4 of APV clock.
+    @param latencyShift: relative time shift between the 3-sample and the 6-sample mode, in APV clocks.\
+                         0 <= latencyShift <=3
+    @param relativeShift: relative time shift between the 3-sample and the 6-sample mode, in units of 1/4 of APV clock.\
+                         0 <= relativeShift <=12
 
     .. warning:: at least one between ``relativeShift`` and ``latencyShift`` should be set (different from -1).
     """
@@ -256,13 +258,19 @@ def add_svd_unpacker_simulate3sampleDAQ(path, latencyShift=-1, relativeShift=-1)
         emulator.param("chooseStartingSample", False)
     else:
         emulator.param("chooseStartingSample", True)
-        emulator.param("StartingSample", latencyShift)
+        if latencyShift < 0 or latencyShift > 3:
+            B2FATAL("the latencyShift must be an integer >=0 and <= 3")
+        else:
+            emulator.param("StartingSample", latencyShift)
 
     if relativeShift == -1:
         emulator.param("chooseRelativeShift", False)
     else:
         emulator.param("chooseRelativeShift", True)
-        emulator.param("relativeShift", relativeShift)
+        if relativeShift < 0 or relativeShift > 12:
+            B2FATAL("the relativeShift must be an integer >=0 and <= 12")
+        else:
+            emulator.param("relativeShift", relativeShift)
 
     emulator.param("outputSVDEventInfo", "SVDEventInfo")
     emulator.param("outputSVDShaperDigits", "SVDShaperDigits3SampleAll")

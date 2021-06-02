@@ -847,6 +847,8 @@ class SystematicsCombinedHadronic(CombinedSkim):
     __category__ = "performance, leptonID"
     __name__ = "SystematicsCombinedHadronic"
 
+    produces_mdst_by_default = True
+
     def __init__(self, prescale_kshort=1, mdstOutput=True, **kwargs):
         """ Initialiser.
 
@@ -879,6 +881,8 @@ class SystematicsCombinedLowMulti(CombinedSkim):
     __contact__ = __liaison_leptonID__
     __category__ = "performance, leptonID"
     __name__ = "SystematicsCombinedLowMulti"
+
+    produces_mdst_by_default = True
 
     def __init__(self, prescale_kshort=1, mdstOutput=True, **kwargs):
         """ Initialiser.

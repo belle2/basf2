@@ -355,7 +355,7 @@ def command_tag_runningupdate(args, db=None):
         return
 
     try:
-        updater = RunningTagUpdater(db, args.running, args.staging, args.run, args.mode)
+        updater = RunningTagUpdater(db, args.running, args.staging, args.run, args.mode, args.dry_run)
         operations = updater.calculate_update()
     except RunningTagUpdaterError as e:
         B2ERROR(e, **e.extra_vars)

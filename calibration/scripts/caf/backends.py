@@ -615,6 +615,8 @@ class Job:
         """
         if "BELLE2_TOOLS" not in os.environ:
             raise BackendError("No BELLE2_TOOLS found in environment")
+        if "BELLE2_CONFIG_DIR" in os.environ:
+            self.setup_cmds.append(f"export BELLE2_CONFIG_DIR={os.environ['BELLE2_CONFIG_DIR']}")
         if "BELLE2_RELEASE" in os.environ:
             self.setup_cmds.append(f"source {os.environ['BELLE2_TOOLS']}/b2setup {os.environ['BELLE2_RELEASE']}")
         elif 'BELLE2_LOCAL_DIR' in os.environ:

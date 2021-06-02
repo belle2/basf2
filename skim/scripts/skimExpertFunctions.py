@@ -6,6 +6,7 @@ import subprocess
 import json
 from pathlib import Path
 import re
+import warnings
 
 import basf2 as b2
 from modularAnalysis import applyCuts, summaryOfLists
@@ -398,6 +399,12 @@ class BaseSkim(ABC):
 
     * The retention rate of the skim on taupair samples is too high (>20%), so the
       production system may struggle to handle the jobs.
+    """
+
+    produces_mdst_by_default = False
+    """Special property for combined systematics skims, which produce MDST output instead of
+    uDST. This property is used by ``b2skim-prod`` to set the ``DataLevel`` parameter in
+    the ``DataDescription`` block for this skim to ``mdst`` instead of ``udst``.
     """
 
     validation_sample = None
@@ -972,10 +979,10 @@ class CombinedSkim(BaseSkim):
         passes_flag = path.add_module("VariableToReturnValue", variable=variable)
         passes_flag.if_value(">0", passes_flag_path, b2.AfterConditionPath.CONTINUE)
 
-        filename = kwargs.get("filename", kwargs.get("OutputFileName", self.name))
+        filename = kwargs.get("filename", kwargs.get("OutputFileName", self.code))
 
         if filename is None:
-            filename = self.name
+            filename = self.code
 
         if not filename.endswith(".mdst.root"):
             filename += ".mdst.root"
@@ -1050,9 +1057,8 @@ class CombinedSkim(BaseSkim):
         """
         Corresponding value of this attribute for each individual skim.
 
-        Raises:
-            RuntimeError: Raised if the individual skims in combined skim contain a mix
-                of True and False for this property.
+        A warning is issued if the individual skims in combined skim contain a mix of
+        True and False for this property.
         """
         produce_on_tau = [skim.produce_on_tau_samples for skim in self]
         if all(produce_on_tau):
@@ -1060,14 +1066,17 @@ class CombinedSkim(BaseSkim):
         elif all(not TauBool for TauBool in produce_on_tau):
             return False
         else:
-            raise RuntimeError(
-                "The individual skims in the combined skim contain a mix of True and "
-                "False for the attribute `produce_on_tau_samples`.\n"
-                "    It is unclear what should be done in this situation."
-                "Please reorganise the combined skims to address this.\n"
-                "    Skims included in the problematic combined skim: "
-                f"{', '.join(skim.name for skim in self)}"
+            warnings.warn(
+                (
+                    "The individual skims in the combined skim contain a mix of True and "
+                    "False for the attribute `produce_on_tau_samples`.\n    The default in "
+                    "this case is to allow the combined skim to be produced on tau samples.\n"
+                    "    Skims included in the problematic combined skim: "
+                    f"{', '.join(skim.name for skim in self)}"
+                ),
+                RuntimeWarning,
             )
+            return True
 
     def merge_data_structures(self):
         """Read the values of `BaseSkim.MergeDataStructures` and merge data structures

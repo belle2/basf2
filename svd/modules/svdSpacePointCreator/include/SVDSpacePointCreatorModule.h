@@ -89,7 +89,7 @@ namespace Belle2 {
 
     unsigned int m_TESTERSpacePointCtr = 0; /**< counts total number of SpacePoints occured */
 
-    unsigned int m_numMaxSpacePoints = 2e6;
+    unsigned int m_numMaxSpacePoints = 2e6; /**< do not crete SPs if their number exceeds m_numMaxSpacePoints*/
 
     SVDClusterCalibrations m_ClusterCal; /**< SVDCluster calibration db object*/
   };

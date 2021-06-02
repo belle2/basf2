@@ -111,6 +111,7 @@ elif is_monitor_ntuple_file(tfile):
     doMergeNtuple(outFile, inFiles)
 elif is_training_ntuple_file(tfile):
     print('Is a training ntuple file.')
+    import subprocess
     if(os.path.isfile(outFile)):
         print('\t{outFile} exists already! Appending...')
         ret = subprocess.call(['hadd', '-a', outFile] + inFiles)

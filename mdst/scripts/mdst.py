@@ -160,7 +160,8 @@ def add_mdst_dump(path, print_untested=False):
         ]),
         DataStorePrinter("EventLevelTriggerTimeInfo", [
             "isValid", "hasInjection", "isHER", "isRevo2",
-            "getTimeSinceLastInjection", "getTimeSincePrevTrigger", "getBunchNumber"
+            "getTimeSinceLastInjection", "getTimeSincePrevTrigger", "getBunchNumber",
+            "getTimeSinceLastInjectionInMicroSeconds", "getTimeSincePrevTriggerInMicroSeconds"
             ], array=False),
     ]
     path.add_module(PrintObjectsModule(mdst_dataobjects, print_untested))

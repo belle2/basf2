@@ -23,7 +23,7 @@
 #include <svd/dataobjects/SVDDAQDiagnostic.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <svd/dataobjects/SVDTriggerType.h>
-
+#include <svd/dbobjects/SVDGlobalConfigParameters.h>
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <svd/online/SVDStripNoiseMap.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -230,6 +230,8 @@ namespace Belle2::SVD {
     std::map<std::pair<unsigned short, unsigned short>, std::pair<std::size_t, std::size_t> > m_upsetAPVs;
 
     int m_relativeTimeShift; /**< latency difference between the 3- and 6-sample acquired events in usint of APV clock / 4, read from SVDGlobalConfigParameters and filled into SVDEventInfo */
+
+    DBObjPtr<SVDGlobalConfigParameters> m_svdGlobalConfig;  /**< SVDGlobal Configuration payload*/
 
   };//end class declaration
 

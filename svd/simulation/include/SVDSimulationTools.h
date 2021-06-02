@@ -79,8 +79,7 @@ namespace Belle2 {
     /** Beta-prime wave function, x^alpha/(1+x)^beta.
      * This is the function for general use.
      * @param t Properly scaled time, (t - t0)/tau.
-     * @param tau Waveform width
-     * @return 6x2 Eigen matrix, times in 1st column, signals in the 2nd.
+     * @return Waveform value t^alpha/(1+t)^beta for t>0, else 0.
      */
     inline double w_betaprime(double t)
     {
@@ -88,6 +87,46 @@ namespace Belle2 {
         return 0.0;
       else
         return 149.012 * pow(t, 2) * pow(1.0 + t, -10);
+    }
+
+    /** Adjacent-channel waveform.
+     * The exact parametrisation is to be determined.
+     * @param t Properly scaled time, (t - t0)/tau.
+     * @return Waveform value (TBD).
+     */
+    inline double w_adjacent(double t)
+    {
+      // Convert from ns to 1/8 clock units
+      t /= 3.93;
+
+      double f1_p[8];
+      double f2_p[5];
+      double y = 0;
+
+      // First polynomial coefficients
+      f1_p[0] = -0.0175348;
+      f1_p[1] = -0.00818826;
+      f1_p[2] =  0.100159;
+      f1_p[3] = -0.0202636;
+      f1_p[4] =  0.00177548;
+      f1_p[5] = -8.30634e-05;
+      f1_p[6] =  2.03843e-06;
+      f1_p[7] = -2.06582e-08;
+
+      // Second polynomial coefficients
+      f2_p[0] =  4.85747;
+      f2_p[1] = -0.472951;
+      f2_p[2] =  0.0159236;
+      f2_p[3] = -0.000237671;
+      f2_p[4] =  1.33053e-06;
+
+      if (t > 0 && t <= 23.00) {
+        for (int i = 0; i <= 7; i++) y += f1_p[i] * pow(t, i);
+      } else if (t > 23.00) {
+        for (int i = 0; i <= 4; i++) y += f2_p[i] * pow(t, i);
+        if (y > 0) y = 0;
+      }
+      return y;
     }
 
     /** Waveform generator

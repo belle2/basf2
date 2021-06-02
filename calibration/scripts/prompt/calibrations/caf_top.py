@@ -29,9 +29,9 @@ settings = CalibrationSettings(
             input_data_filters["Data Quality Tag"]["Good Or Recoverable"]]},
     depends_on=[top_pretracking],
     expert_config={
-        "max_files_per_run": 10,
+        "max_files_per_run": 20,
         "payload_boundaries": None,
-        "request_memory": "4 GB"
+        "request_memory": "8 GB"
     })
 
 

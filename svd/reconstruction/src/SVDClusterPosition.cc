@@ -72,7 +72,11 @@ namespace Belle2 {
         double noiseAverage = getAverageStripNoise(rawCluster);
         double sn = sumStripCharge / noiseAverage;
 
-        //  if(strips.size() == 3)
+        // to be improved looking at:
+        // NIM A, 335 (1993) 44-58 (Turchetta)
+        // NIM 178 (1980) 543-554 (Radeka)
+        // e.g.:
+        // if(strips.size() == 3)
         //  a = 2.12; //Turchetta
 
         positionError = a * pitch / sn;
@@ -150,7 +154,7 @@ namespace Belle2 {
       //take the strips in the rawCluster
       std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
 
-      // compute the sum of strip charges
+      // compute the cluster noise as sum in quadrature of strip noise
       for (auto aStrip : strips) {
 
         float averageNoiseInElectrons =  m_NoiseCal.getNoiseInElectrons(rawCluster.getSensorID(), rawCluster.isUSide(), aStrip.cellID);
@@ -167,7 +171,7 @@ namespace Belle2 {
       //take the strips in the rawCluster
       std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
 
-      // compute the sum of strip charges
+      // compute the average strip noise
       for (auto aStrip : strips) {
 
         float averageNoiseInElectrons =  m_NoiseCal.getNoiseInElectrons(rawCluster.getSensorID(), rawCluster.isUSide(), aStrip.cellID);

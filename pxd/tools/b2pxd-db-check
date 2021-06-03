@@ -21,8 +21,8 @@ import ROOT
 from ROOT import Belle2
 from array import array
 from pxd.utils import style
-import pxd.condition_checker as checker
-import pxd.calibration_checker as calChecker
+import pxd.calibration.condition_checker as checker
+import pxd.calibration.calibration_checker as calChecker
 import argparse
 from ROOT import PyConfig
 PyConfig.IgnoreCommandLineOptions = True

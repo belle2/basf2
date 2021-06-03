@@ -14,7 +14,7 @@ from copy import deepcopy
 
 from pxd.utils import get_sensor_graphs, sensorID_list
 # from pxd.utils import nPixels, nVCells, nUCells
-from pxd.condition_checker import plot_type_dict
+from pxd.calibration.condition_checker import plot_type_dict
 
 # import basf2
 

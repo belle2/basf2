@@ -257,6 +257,7 @@ unsigned int ECLUnpackerModule::readNBits(int bitsToRead)
 
 void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 {
+  RelationArray relDigitToDsp(m_eclDigits, m_eclDsps);
   int iCrate, iShaper, iChannel, cellID;
 
   int shapersMask;
@@ -388,6 +389,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         B2DEBUG_eclunpacker(22, "ADCMASK = 0x" << std::hex << adcMask << " adcHighMask = 0x" << adcHighMask);
 
         ECLDigit* newEclDigits[ECL_CHANNELS_IN_SHAPER] = {};
+        int newEclDigitsIdx[ECL_CHANNELS_IN_SHAPER] = {};
 
         nRead = 0;
         // read DSP data (quality, fitted time, amplitude)
@@ -411,7 +413,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
           // construct eclDigit object and save it in DataStore
           ECLDigit* newEclDigit = m_eclDigits.appendNew();
-          newEclDigits[ind] = newEclDigit;
+          newEclDigitsIdx[ind]  = m_eclDigits.getEntries() - 1;
+          newEclDigits[ind]     = newEclDigit;
           newEclDigit->setCellId(cellID);
           newEclDigit->setAmp(dspAmplitude);
           newEclDigit->setQuality(dspQualityFlag);
@@ -496,7 +499,9 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
               }
               // Add relation from ECLDigit to ECLDsp
               if (newEclDigits[ind]) {
-                newEclDigits[ind]->addRelationTo(newEclDsp);
+                int eclDspIdx = m_eclDsps.getEntries() - 1;
+                relDigitToDsp.add(newEclDigitsIdx[ind], eclDspIdx);
+                // newEclDigits[ind]->addRelationTo(newEclDsp);
               }
             }
 

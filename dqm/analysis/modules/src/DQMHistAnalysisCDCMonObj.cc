@@ -217,7 +217,6 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   for (int i = 0; i < 300; ++i) {
     fitFunc[i] = new TF1(Form("f%d", i), "[0]+[6]*x+[1]*(exp([2]*(x-[3]))/(1+exp(-([4]-x)/[5])))",
                          4921 - 100, 4921 + 100);
-    // fitFunc[i]->SetParLimits(0, 0, 100);
     fitFunc[i]->SetParLimits(6, 0, 0.1);
     fitFunc[i]->SetParLimits(4, 4850., 5000.0);
     fitFunc[i]->SetParLimits(5, 0, 50.0);
@@ -277,7 +276,6 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     } else {
       double init_p0 = m_hTDCs[i]->GetBinContent(700 + 60);
       fitFunc[i]->SetParameters(init_p0, 100, 0.01, 4700, 4900, 2, 0.01);
-      //fitFunc[i]->SetParameter(0, 10);
       fitFunc[i]->SetParameter(6, 0.02);
       fitFunc[i]->SetParLimits(0, init_p0 - 200, init_p0 + 200);
       int xxx = -1;

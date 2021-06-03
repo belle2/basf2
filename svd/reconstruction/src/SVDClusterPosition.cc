@@ -57,20 +57,24 @@ namespace Belle2 {
       positionError = 0;
       double pitch = rawCluster.isUSide() ? info.getUPitch() : info.getVPitch();
       double sumStripCharge = getSumOfStripCharges(rawCluster);
-      float noiseFirstStrip =  m_NoiseCal.getNoiseInElectrons(rawCluster.getSensorID(), rawCluster.isUSide(), strips.at(0).cellID);
-
       double cutAdjacent = m_ClusterCal.getMinAdjSNR(rawCluster.getSensorID(), rawCluster.isUSide());
 
       // if cluster size == 1
       // add a strip charge equal to the zero-suppression threshold to compute the error
       if (strips.size() == 1) {
+        float noiseFirstStrip =  m_NoiseCal.getNoiseInElectrons(rawCluster.getSensorID(), rawCluster.isUSide(), strips.at(0).cellID);
         double phantomCharge = cutAdjacent * noiseFirstStrip;
         positionError = pitch * phantomCharge / (sumStripCharge + phantomCharge);
 
       } else {
         // if cluster size > 1
-        double a = cutAdjacent;
-        double sn = sumStripCharge / getClusterNoise(rawCluster);
+        double a = cutAdjacent; //Peter's implementation
+        double noiseAverage = getAverageStripNoise(rawCluster);
+        double sn = sumStripCharge / noiseAverage;
+
+        //  if(strips.size() == 3)
+        //  a = 2.12; //Turchetta
+
         positionError = a * pitch / sn;
       }
 
@@ -153,6 +157,23 @@ namespace Belle2 {
         clusterNoise += averageNoiseInElectrons * averageNoiseInElectrons;
       }
       return sqrt(clusterNoise);
+    }
+
+    double SVDClusterPosition::getAverageStripNoise(const Belle2::SVD::RawCluster& rawCluster)
+    {
+
+      double averageNoise = 0;
+
+      //take the strips in the rawCluster
+      std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
+
+      // compute the sum of strip charges
+      for (auto aStrip : strips) {
+
+        float averageNoiseInElectrons =  m_NoiseCal.getNoiseInElectrons(rawCluster.getSensorID(), rawCluster.isUSide(), aStrip.cellID);
+        averageNoise += averageNoiseInElectrons;
+      }
+      return averageNoise / strips.size();
     }
 
     void SVDClusterPosition::reconstructStrips(Belle2::SVD::RawCluster& rawCluster)

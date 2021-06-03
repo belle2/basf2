@@ -66,6 +66,9 @@ namespace Belle2::SVD {
     /** helper, returns the sum in quadrature of the strip noise*/
     double getClusterNoise(const Belle2::SVD::RawCluster& rawCluster);
 
+    /** helper, returns the average strip noise*/
+    double getAverageStripNoise(const Belle2::SVD::RawCluster& rawCluster);
+
     SVDCoGOnlyErrorScaleFactors m_CoGOnlyCal; /**< Scaling Factors for the CoGOnly algorithm*/
     SVDOldDefaultErrorScaleFactors m_OldDefaultCal; /**< Scaling Factors for the OldDefault algorithm*/
     SVDClustering m_ClusterCal; /**< SVD clustering parameters*/

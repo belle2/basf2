@@ -37,7 +37,7 @@ def run_copylists():
 
     # analysis input
     pa = b2.Path()
-    ma.inputMdst("default", b2.find_file("analysis/tests/mdst.root"), path=pa)
+    ma.inputMdst(b2.find_file("analysis/tests/mdst.root"), path=pa)
     ma.fillParticleList("pi+", "", path=pa)
     ma.fillParticleList("K+", "", path=pa)
     stdPi0s('all', path=pa)

@@ -67,7 +67,7 @@ namespace Belle2 {
       good = 1,    /**< green frame */
       warning = 2, /**< orange frame */
       error = 3    /**< red frame */
-    };
+    }; /**< efficiency status flags */
     effStatus m_effUstatus; /**< number representing the status of the efficiency U side */
     effStatus m_effVstatus;/**< number representing the status of the efficiency V side */
 

@@ -161,6 +161,8 @@ void ECLUnpackerModule::event()
   // relations arrays
   RelationArray relDigitToTrig(m_eclDigits, m_eclTrigs);
   if (relDigitToTrig) relDigitToTrig.clear();
+  RelationArray relDigitToDsp(m_eclDigits, m_eclDsps);
+  if (relDigitToDsp) relDigitToDsp.clear();
 
   if (m_eventMetaData.isValid()) {
     m_globalEvtNum = m_eventMetaData->getEvent();

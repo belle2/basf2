@@ -417,8 +417,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
           // do something (throw an exception etc.) TODO
         }
 
-
         //read ADC data
+        eclWaveformSamples.resize(nADCSamplesPerChannel);
         nRead = 0;
         for (ind = 0; ind < ECL_CHANNELS_IN_SHAPER; ind++) {
           //check if there is ADC data for this channel
@@ -426,7 +426,6 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
           iChannel = ind + 1;
           adcDataBase = 0;
           adcDataDiffWidth = 0;
-          eclWaveformSamples.clear();
           for (indSample = 0; indSample < nADCSamplesPerChannel; indSample++) {
             if (compressMode == 0) value = readNextCollectorWord();
             else {
@@ -443,17 +442,11 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
               value += adcDataBase;
             }
             // fill waveform data for single channel
-            eclWaveformSamples.push_back(value);
+            eclWaveformSamples[indSample] = value;
           }
 
           // save ADC data to the eclDsp DataStore object if any
-          if (eclWaveformSamples.size() > 0) {
-
-            if (eclWaveformSamples.size() != nADCSamplesPerChannel)
-              B2ERROR("Wrong number of ADC samples. Actual number of read samples "
-                      " != number of samples in header "
-                      << LogVar("Actual number of read samples", eclWaveformSamples.size())
-                      << LogVar("Number of samples in header", nADCSamplesPerChannel));
+          if (nADCSamplesPerChannel > 0) {
 
             cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 

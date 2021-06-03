@@ -56,7 +56,7 @@ def setAnalysisConfigParams(configParametersAndValues, path):
     path.add_module(conf)
 
 
-def inputMdst(environmentType, filename, path, skipNEvents=0, entrySequence=None, *, parentLevel=0):
+def inputMdst(filename, path, environmentType='default', skipNEvents=0, entrySequence=None, *, parentLevel=0):
     """
     Loads the specified :ref:`mDST <mdst>` (or :ref:`uDST <analysis_udstoutput>`) file with the RootInput module.
 
@@ -66,20 +66,43 @@ def inputMdst(environmentType, filename, path, skipNEvents=0, entrySequence=None
     data and MC.
 
     Parameters:
-        environmentType (str): type of the environment to be loaded (either 'default' or 'Belle')
         filename (str): the name of the file to be loaded
         path (basf2.Path): modules are added to this path
+        environmentType (str): type of the environment to be loaded (either 'default' or 'Belle')
         skipNEvents (int): N events of the input file are skipped
         entrySequence (str): The number sequences (e.g. 23:42,101) defining the entries which are processed.
         parentLevel (int): Number of generations of parent files (files used as input when creating a file) to be read
     """
+
+    # FIXME remove this check of "filename" at release-07
+    if filename == 'default':
+        B2FATAL("""
+We have simplified the arguments to inputMdst! If you are running on Belle II
+data or MC, you don't have to use "default" any more.
+Please replace:
+   inputMdst("default", "/your/input/file.root", path=mypath)
+With:
+   inputMdst("/your/input/file.root", path=mypath)
+                """)
+    elif filename == "Belle":
+        B2FATAL("""
+We have reordered the arguments to inputMdst! If you are running on Belle 1
+data or MC, you need to specify the 'environmentType'.
+Please replace:
+   inputMdst("Belle", "/your/input/file.root", path=mypath)
+With:
+   inputMdst("/your/input/file.root", path=mypath, environmentType='Belle')
+                """)
+    elif filename in [f"MC{i}" for i in range(5, 10)]:
+        B2FATAL(f"We no longer support the MC version {filename}. Sorry.")
+
     if entrySequence is not None:
         entrySequence = [entrySequence]
 
     inputMdstList(environmentType, [filename], path, skipNEvents, entrySequence, parentLevel=parentLevel)
 
 
-def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences=None, *, parentLevel=0):
+def inputMdstList(filelist, path, environmentType='default', skipNEvents=0, entrySequences=None, *, parentLevel=0):
     """
     Loads the specified list of :ref:`mDST <mdst>` (or :ref:`uDST <analysis_udstoutput>`) files with the RootInput module.
 
@@ -89,14 +112,36 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
     data and MC.
 
     Parameters:
-        environmentType (str): type of the environment to be loaded (either 'default' or 'Belle')
         filelist (list(str)): the filename list of files to be loaded
         path (basf2.Path): modules are added to this path
+        environmentType (str): type of the environment to be loaded (either 'default' or 'Belle')
         skipNEvents (int): N events of the input files are skipped
         entrySequences (list(str)): The number sequences (e.g. 23:42,101) defining
             the entries which are processed for each inputFileName.
         parentLevel (int): Number of generations of parent files (files used as input when creating a file) to be read
     """
+
+    # FIXME remove this check of "filename" at release-07
+    if filelist == 'default':
+        B2FATAL("""
+We have simplified the arguments to inputMdstList! If you are running on
+Belle II data or MC, you don't have to use "default" any more.
+Please replace:
+   inputMdstList("default", list_of_your_files, path=mypath)
+With:
+   inputMdstList(list_of_your_files, path=mypath)
+                """)
+    elif filelist == "Belle":
+        B2FATAL("""
+We have reordered the arguments to inputMdstList! If you are running on
+Belle 1 data or MC, you need to specify the 'environmentType'.
+Please replace:
+   inputMdstList("Belle", list_of_your_files, path=mypath)
+With:
+   inputMdstList(list_of_your_files, path=mypath, environmentType='Belle')
+                """)
+    elif filelist in [f"MC{i}" for i in range(5, 10)]:
+        B2FATAL(f"We no longer support the MC version {filelist}. Sorry.")
 
     roinput = register_module('RootInput')
     roinput.param('inputFileNames', filelist)

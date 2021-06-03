@@ -22,6 +22,36 @@ Changes since release-06
 Changes since release-05
 ========================
 
+.. rubric:: Simplified arguments to :py:func:`modularAnalysis.inputMdst` and :py:func:`modularAnalysis.inputMdstList`.
+
+   The arguments of :py:func:`modularAnalysis.inputMdst` and :py:func:`modularAnalysis.inputMdstList` have been changed a little.
+   You no longer need to specify "default", it's done automatically.
+
+   The following code lines need to be changed from:
+   .. code-block:: python
+
+        # old
+        import modularAnalysis as ma
+        ma.inputMdst("default", "/path/to/your/file.root", path=mypath)
+
+        # or
+        ma.inputMdst("Belle", "/path/to/your/file.root", path=mypath)
+
+   To:
+   .. code-block:: python
+
+        # new in release-06
+        import modularAnalysis as ma
+        ma.inputMdst("/path/to/your/file.root", path=mypath)
+
+        # or
+        ma.inputMdst("/path/to/your/file.root", path=mypath, environmentType="Belle")
+
+    And similarly for :py:func:`modularAnalysis.inputMdstList`.
+
+    .. warning:: We no longer support MC5-10 files.
+
+
 .. only:: not light
 
    .. rubric:: The jitter of the L1 trigger is included in the standard simulation
@@ -64,6 +94,7 @@ This was present in ``release-05-00-01`` and earlier, including MC13 files.
 
 .. rubric:: Unification of B2BII settings
 
+.. TODO: understand this for inputMdst(List) -- SC
 A single switch between Belle and Belle II settings has been implemented, which is automatically set when reading in a Belle type mdst.
 No individual options have to be set in modular analysis functions. 
 

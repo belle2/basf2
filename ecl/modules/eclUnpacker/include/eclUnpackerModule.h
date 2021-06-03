@@ -18,13 +18,13 @@
 
 // ECL
 #include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/dataobjects/ECLTrig.h>
 
 namespace Belle2 {
 
   class EventMetaData;
   class RawECL;
   class ECLDigit;
-  class ECLTrig;
   class ECLDsp;
 
   /** the ECL unpacker module */
@@ -169,6 +169,9 @@ namespace Belle2 {
     StoreArray<ECLTrig>  m_eclTrigs;
     /** store array for waveforms**/
     StoreArray<ECLDsp>   m_eclDsps;
+
+    /** ECLTrigs objects before they are added to m_eclTrigs array */
+    ECLTrig m_eclTrigsBuffer[ECL::ECL_CRATES];
 
     /** Cached debug level from LogSystem */
     int m_debugLevel;

@@ -16,13 +16,13 @@
 
 //Framework
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/RelationArray.h>
 
 //Rawdata
 #include <rawdata/dataobjects/RawECL.h>
 
 //ECL
 #include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/utility/ECLChannelMapper.h>
 #include <ecl/utility/ECLDspUtilities.h>
@@ -158,12 +158,21 @@ void ECLUnpackerModule::event()
   m_eclDigits.clear();
   m_eclDsps.clear();
   m_eclTrigs.clear();
+  // relations arrays
+  RelationArray relDigitToTrig(m_eclDigits, m_eclTrigs);
+  if (relDigitToTrig) relDigitToTrig.clear();
 
   if (m_eventMetaData.isValid()) {
     m_globalEvtNum = m_eventMetaData->getEvent();
   } else {
     m_globalEvtNum = -1;
   }
+
+  for (int i = 0; i < ECL_CRATES; i++) {
+    m_eclTrigsBuffer[i].setTrigId(0);
+  }
+
+  //=== Read raw event data
 
   int nRawEclEntries = m_rawEcl.getEntries();
 
@@ -172,6 +181,23 @@ void ECLUnpackerModule::event()
   for (int i = 0; i < nRawEclEntries; i++) {
     for (int n = 0; n < m_rawEcl[i]->GetNumEntries(); n++) {
       readRawECLData(m_rawEcl[ i ], n); // read data from RawECL and put into the m_eclDigits container
+    }
+  }
+
+  //=== Add created ECLTrig objects to the StoreArray
+
+  ECLTrig* new_ecl_trigs[ECL_CRATES] = {};
+  for (int i = 0; i < ECL_CRATES; i++) {
+    if (m_eclTrigsBuffer[i].getTrigId() > 0) {
+      new_ecl_trigs[i] = m_eclTrigs.appendNew(m_eclTrigsBuffer[i]);
+    }
+  }
+
+  for (int i = 0; i < m_eclDigits.getEntries(); i++) {
+    int cid = m_eclDigits[i]->getCellId();
+    int crate0 = m_eclMapper.getCrateID(cid) - 1;
+    if (new_ecl_trigs[crate0]) {
+      relDigitToTrig.add(i, crate0);
     }
   }
 
@@ -289,8 +315,6 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
     }
 
     try {
-
-      ECLTrig* eclTrig = 0;
       burstSuppressionMask = 0;
 
       // trigger phase of the Collector connected to this FINESSE
@@ -304,9 +328,6 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
       compressMode = (value & 0xF000) >> 12; // compression mode for ADC data, 0 -- disabled, 1 -- enabled
 
       B2DEBUG_eclunpacker(22, "ShapersMask = " << std::hex << shapersMask << " compressMode =  "  <<  compressMode);
-
-      // make new eclTrig oject to store trigger time for crate if there are triggered shapers in the crate
-      if (m_storeTrigTime && shapersMask != 0) eclTrig = m_eclTrigs.appendNew();
 
       // loop over all shapers in crate
       for (iShaper = 1; iShaper <= nShapers; iShaper++) {
@@ -408,7 +429,6 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
             newEclDigit->setTimeFit(dspTime);
             newEclDigit->setChi(0);
           }
-          if (m_storeTrigTime) newEclDigit->addRelationTo(eclTrig);
 
         }
 
@@ -471,7 +491,6 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
                     newEclDigit->setTimeFit(result.time);
                     newEclDigit->setQuality(result.quality);
                     newEclDigit->setChi(result.chi2);
-                    if (m_storeTrigTime) newEclDigit->addRelationTo(eclTrig);
                   }
                 }
               }
@@ -503,9 +522,11 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
       } // loop over shapers
 
-      // fill trigid, trgtime for eclTrig object
-      if (eclTrig) {
+      // make new eclTrig oject to store trigger time for crate if there are triggered shapers in the crate
+      if (m_storeTrigTime && shapersMask != 0) {
         int trigId = iCrate & 0x3F;
+        ECLTrig* eclTrig = &m_eclTrigsBuffer[trigId - 1];
+        // fill trigid, trgtime for eclTrig object
         trigId |= (burstSuppressionMask & 0xFFF) << 6;
         eclTrig->setTrigId(trigId);
         eclTrig->setTimeTrig(triggerPhase0);

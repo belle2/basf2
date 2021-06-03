@@ -479,7 +479,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
             cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 
             if (cellID > 0 || m_storeUnmapped) {
-              ECLDsp* newEclDsp = m_eclDsps.appendNew(cellID, eclWaveformSamples);
+              m_eclDsps.appendNew(cellID, eclWaveformSamples);
 
               if (m_useUnpackingParameters) {
                 // Check run-dependent unpacking parameters
@@ -503,7 +503,6 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
               if (newEclDigits[ind]) {
                 int eclDspIdx = m_eclDsps.getEntries() - 1;
                 relDigitToDsp.add(newEclDigitsIdx[ind], eclDspIdx);
-                // newEclDigits[ind]->addRelationTo(newEclDsp);
               }
             }
 

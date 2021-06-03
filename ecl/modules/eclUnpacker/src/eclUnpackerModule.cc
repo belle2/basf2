@@ -366,6 +366,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         adcHighMask = (value >> 16) & 0xFFFF;
         B2DEBUG_eclunpacker(22, "ADCMASK = 0x" << std::hex << adcMask << " adcHighMask = 0x" << adcHighMask);
 
+        ECLDigit* newEclDigits[ECL_CHANNELS_IN_SHAPER] = {};
+
         nRead = 0;
         // read DSP data (quality, fitted time, amplitude)
         for (ind = 0; ind < ECL_CHANNELS_IN_SHAPER; ind++) {
@@ -388,6 +390,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
           // construct eclDigit object and save it in DataStore
           ECLDigit* newEclDigit = m_eclDigits.appendNew();
+          newEclDigits[ind] = newEclDigit;
           newEclDigit->setCellId(cellID);
           newEclDigit->setAmp(dspAmplitude);
           newEclDigit->setQuality(dspQualityFlag);
@@ -460,19 +463,9 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
                   auto result = ECLDspUtilities::shapeFitter(cellID, eclWaveformSamples, triggerPhase0);
                   if (result.quality == 2) result.time = 0;
 
-                  bool found = false;
-                  for (auto& newEclDigit : m_eclDigits) {
-                    if (newEclDsp->getCellId() == newEclDigit.getCellId()) {
-                      newEclDigit.setAmp(result.amp);
-                      newEclDigit.setTimeFit(result.time);
-                      newEclDigit.setQuality(result.quality);
-                      newEclDigit.setChi(result.chi2);
-                      found = true;
-                      break;
-                    }
-                  }
-                  if (!found) {
+                  if (!newEclDigits[ind]) {
                     ECLDigit* newEclDigit = m_eclDigits.appendNew();
+                    newEclDigits[ind] = newEclDigit;
                     newEclDigit->setCellId(cellID);
                     newEclDigit->setAmp(result.amp);
                     newEclDigit->setTimeFit(result.time);
@@ -483,11 +476,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
                 }
               }
               // Add relation from ECLDigit to ECLDsp
-              for (auto& newEclDigit : m_eclDigits) {
-                if (newEclDsp->getCellId() == newEclDigit.getCellId()) {
-                  newEclDigit.addRelationTo(newEclDsp);
-                  break;
-                }
+              if (newEclDigits[ind]) {
+                newEclDigits[ind]->addRelationTo(newEclDsp);
               }
             }
 

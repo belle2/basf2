@@ -94,8 +94,8 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   m_legNormal->SetBorderSize(0.);
   m_legNormal->SetLineColor(kBlack);
   m_legEmpty = new TPaveText(11, findBinY(4, 3) - 2, 16, findBinY(4, 3));
-  m_legEmpty->AddText("NO DATA RECEIVED");
-  m_legEmpty->AddText("from at least one sensor");
+  m_legEmpty->AddText("Not enough statistics,");
+  m_legEmpty->AddText("check again in a few minutes");
   m_legEmpty->SetFillColor(kBlack);
   m_legEmpty->SetTextColor(kWhite);
   m_legEmpty->SetBorderSize(0.);

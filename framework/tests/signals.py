@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Tests basf2 behaviour under various POSIX signals
 # different possibilities for termination

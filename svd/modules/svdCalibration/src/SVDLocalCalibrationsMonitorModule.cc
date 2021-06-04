@@ -95,8 +95,10 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
     B2WARNING("No valid SVDFADCMaskedStrip for the requested IoV");
   if (!m_NoiseCal.isValid())
     B2WARNING("No valid SVDNoiseCalibration for the requested IoV");
-  if (!m_DetectorConf.isValid())
-    B2WARNING("No valid SVDDetectorConfiguration for the requested IoV");
+  if (!m_svdLocalConfig.isValid())
+    B2FATAL("No valid SVDLocalConfigParameters for the requested IoV");
+  if (!m_svdGlobalConfig.isValid())
+    B2FATAL("No valid SVDGlobalConfigParameters for the requested IoV");
   if (!m_PedestalCal.isValid())
     B2WARNING("No valid SVDPedestalCalibration for the requested IoV");
   if (! m_PulseShapeCal.isValid())
@@ -341,8 +343,8 @@ void SVDLocalCalibrationsMonitorModule::event()
   m_exp = meta->getExperiment();
   m_run = meta->getRun();
 
-  m_hv = m_DetectorConf.getHV();
-  m_DetectorConf.getCalibDate().copy(m_date, 10);
+  m_hv = m_svdGlobalConfig->getHV();
+  m_svdLocalConfig->getCalibDate().copy(m_date, 10);
   m_date[10] = '\0';
 
   //call for a geometry instance

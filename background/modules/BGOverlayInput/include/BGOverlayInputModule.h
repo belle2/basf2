@@ -10,10 +10,15 @@
 
 #pragma once
 
+/* Belle 2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/DataStore.h>
+
+/* ROOT headers. */
+#include <TChain.h>
+
+/* C++ headers. */
 #include <string>
-#include "TChain.h"
 
 namespace Belle2 {
 
@@ -33,36 +38,36 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~BGOverlayInputModule();
+    ~BGOverlayInputModule();
 
     /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize() override;
+    void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event() override;
+    void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun() override;
+    void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate() override;
+    void terminate() override;
 
   private:
 
@@ -76,10 +81,10 @@ namespace Belle2 {
      */
     bool connectBranches();
 
-
     std::vector<std::string> m_inputFileNames; /**< list of file names */
     std::string m_extensionName; /**< name added to default branch names */
     std::string m_BackgroundInfoInstanceName = ""; /**< name BackgroundInfo name */
+    bool m_skipExperimentCheck = false; /**< flag for skipping the check on the experiment number */
 
     TChain* m_tree = 0;            /**< tree pointer */
     unsigned m_numEvents = 0;      /**< number of events (tree entries) in the sample */

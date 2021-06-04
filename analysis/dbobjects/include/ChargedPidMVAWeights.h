@@ -43,8 +43,8 @@ namespace Belle2 {
      * Default constructor, necessary for ROOT to stream the object.
      */
     ChargedPidMVAWeights() :
-      m_energy_unit("energyUnit", Unit::rad),
-      m_ang_unit("angularUnit", Unit::GeV)
+      m_energy_unit("energyUnit", Unit::GeV),
+      m_ang_unit("angularUnit", Unit::rad)
     {};
 
 

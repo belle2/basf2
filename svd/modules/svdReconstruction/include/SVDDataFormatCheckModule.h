@@ -20,7 +20,6 @@
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDDAQDiagnostic.h>
-//#include <svd/calibration/SVDDetectorConfiguration.h>
 
 #include <string>
 
@@ -105,10 +104,6 @@ namespace Belle2 {
     /** Name of the SVDEventInfo object */
     std::string m_svdEventInfoName;
 
-    //counters
-    //    int m_
-    //calibration objects
-    //    SVDDetectorConfiguration m_SVDConfig;
 
   };
 }

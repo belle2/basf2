@@ -17,7 +17,7 @@ import matplotlib.colors
 import matplotlib.patches
 import matplotlib.ticker
 
-from . import histogram
+from basf2_mva_evaluation import histogram
 
 import basf2 as b2
 

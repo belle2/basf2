@@ -1315,7 +1315,7 @@ void CDCGeometryPar::calcMeanT0()
   m_meanT0 = 0.;
   for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
     for (unsigned short iW = 0; iW < MAX_N_SCELLS; ++iW) {
-      if (m_t0[iCL][iW] == 0.) continue;
+      if (m_t0[iCL][iW] <= 0.) continue;
       const WireID wid = WireID(iCL, iW);
       if (isHotWire(wid)) continue;
       if (isBadWire(wid)) continue;

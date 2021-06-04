@@ -25,6 +25,7 @@ def setupBelleDatabaseServer():
     except IOError:
         pass
 
+    os.environ['PGUSER'] = 'g0db'
     os.environ['BELLE_POSTGRES_SERVER'] = belleDBServer
 
 
@@ -35,36 +36,6 @@ def setupBelleMagneticField(path):
     b2.B2WARNING(
         'setupBelleMagneticField function is obsolete. Please remove it from your scripts. '
         'The Belle magnetic field is now being set via the settings in inputMdst(List) fucntion.')
-
-
-def setupB2BIIDatabase(isMC=False):
-    """
-    Setup the database for B2BII.
-
-    This automatically chooses the correct global tag and sets up a database suitable for B2BII conversion.
-
-    Warning:
-        This function is not up to date and should not be called
-
-    Args:
-        isMC (bool): should be True for MC data and False for real data
-    """
-    # we only want the central database with the B2BII content
-    tagname = "B2BII%s" % ("_MC" if isMC else "")
-    # and we want to cache them in a meaningful but separate directory
-    payloaddir = tagname + "_database"
-    # fallback to previously downloaded payloads if offline
-    if not isMC:
-        b2.conditions.prepend_testing_payloads(
-            "%s/dbcache.txt" %
-            payloaddir)
-        # get payloads from central database
-        b2.conditions.prepend_globaltag(tagname)
-    # unless they are already found locally
-    if isMC:
-        b2.conditions.prepend_testing_payloads(
-            "%s/dbcache.txt" %
-            payloaddir)
 
 
 def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,

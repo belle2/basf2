@@ -18,17 +18,18 @@ settings = CalibrationSettings(
     input_data_filters={
         "bhabha_all_calib": [
             input_data_filters["Data Tag"]["bhabha_all_calib"],
-            input_data_filters["Data Quality Tag"]["Good"],
+            input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
             input_data_filters["Magnet"]["On"]],
         "gamma_gamma_calib": [
             input_data_filters["Data Tag"]["gamma_gamma_calib"],
-            input_data_filters["Data Quality Tag"]["Good"],
+            input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
             input_data_filters["Magnet"]["On"]],
         "mumutight_calib": [
             input_data_filters["Data Tag"]["mumutight_calib"],
             input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
             input_data_filters["Magnet"]["On"]]},
-    depends_on=[])
+    depends_on=[],
+    expert_config={"ee5x5_min_entries": 100})
 
 # --------------------------------------------------------------
 # ..The calibration functions
@@ -50,7 +51,8 @@ def get_calibrations(input_data, **kwargs):
 
     # ..Algorithm
     algo_ee5x5 = Belle2.ECL.eclee5x5Algorithm()
-    algo_ee5x5.setMinEntries(150)
+    ee5x5minEntries = expert_config["ee5x5_min_entries"]
+    algo_ee5x5.setMinEntries(ee5x5minEntries)
     algo_ee5x5.setPayloadName("ECLCrystalEnergy5x5")
     algo_ee5x5.setStoreConst(True)
 

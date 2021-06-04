@@ -66,6 +66,9 @@ void eclEdgeCollectorModule::prepare()
   auto eclCrystalEdgePhi = new TH1F("eclCrystalEdgePhi", "lower edge of each crystal in phi;cellID;phi (rad)", 8736, 1, 8737);
   registerObject<TH1F>("eclCrystalEdgePhi", eclCrystalEdgePhi);
 
+  auto eclEdgeCounter = new TH1F("eclEdgeCounter", "dummy histogram to count collector calls;cellID;calls", 8736, 1, 8737);
+  registerObject<TH1F>("eclEdgeCounter", eclEdgeCounter);
+
 }
 
 void eclEdgeCollectorModule::collect()
@@ -93,6 +96,7 @@ void eclEdgeCollectorModule::collect()
       getObjectPtr<TH1F>("eclCrystalPhi")->SetBinContent(cellID, crystalPos.Phi());
       getObjectPtr<TH1F>("eclCrystalDirTheta")->SetBinContent(cellID, crystalDirection.Theta());
       getObjectPtr<TH1F>("eclCrystalDirPhi")->SetBinContent(cellID, crystalDirection.Phi());
+      getObjectPtr<TH1F>("eclEdgeCounter")->SetBinContent(cellID, 1);
 
       //..Subtract the offset between crystal center and edge to get edge locations
       float thetaEdge = crystalPos.Theta() - offsetTheta[cellID - 1];

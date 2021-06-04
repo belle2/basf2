@@ -95,27 +95,6 @@ namespace Belle2 {
     {__VA_ARGS__;}\
   }
 
-  /** \def branch_likely(x)
-   * \brief A macro to tell the compiler that the argument x will be very
-   * likely be true.
-   *
-   * This could result in optimized code as the compiler can reorder the code
-   * to reduce conditional jumps during execution. Due to the high efficiency
-   * of todays branch prediction systems the effect is probably small.
-   * \warning Use of this macro should be accompanied by a comment
-   *          documenting the (significant) performance gains that justify
-   *          its use. (Please make sure you compile in 'opt' mode.)
-   * \see \def branch_unlikely(x)
-   *
-   * Usage:
-   *
-   *     if (branch_likely(my_number > 10)) {
-   *       // executed very often
-   *     } else {
-   *       // executed only rarely
-   *     }
-   */
-
   /** \def branch_unlikely(x)
    * \brief A macro to tell the compiler that the argument x will be very
    * likely be false.

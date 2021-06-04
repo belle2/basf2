@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # @cond dont_want_no_doxygen_warnings_this_is_sphinxed
 
@@ -160,7 +159,7 @@ class ANSIColors(enum.Enum):
         return '\x1b[0m' if cls.supported() else ''
 
 
-class Pager(object):
+class Pager:
     """
     Context manager providing page-wise output using ``less``, similar to how
     git handles long output of for example ``git diff``.  Paging will only be

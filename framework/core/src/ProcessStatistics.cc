@@ -53,7 +53,7 @@ void ProcessStatistics::initModule(const Module* module)
 }
 
 string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounters mode,
-                                              const std::vector<ModuleStatistics>* modules) const
+                                              const std::vector<ModuleStatistics>* modules, bool html) const
 {
   const ModuleStatistics& global = getGlobal();
   if (!modules) modules = &(getAll());
@@ -68,11 +68,21 @@ string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounte
   const std::string numWidth = (boost::format("%d") % (moduleNameLength + 1 + lengthOfRest)).str();
   boost::format outputheader("%s %|" + numTabsModule + "t|| %10s | %10s | %10s | %17s\n");
   boost::format output("%s %|" + numTabsModule + "t|| %10.0f | %10.0f | %10.2f | %7.2f +-%7.2f\n");
+  if (html) {
+    outputheader = boost::format("<thead><tr><th>%s</th><th>%s</th><th>%s</th><th>%s</th><th>%s</th></tr></thead>");
+    output = boost::format("<tr><td>%s</td><td>%.0f</td><td>%.0f</td><td>%.2f</td><td>%.2f &plusmn; %.2f</td></tr>");
+  }
 
   stringstream out;
-  out << boost::format("%|" + numWidth + "T=|\n");
-  out << outputheader % "Name" % "Calls" % "Memory(MB)" % "Time(s)" % "Time(ms)/Call";
-  out << boost::format("%|" + numWidth + "T=|\n");
+  if (!html) {
+    out << boost::format("%|" + numWidth + "T=|\n");
+    out << outputheader % "Name" % "Calls" % "Memory(MB)" % "Time(s)" % "Time(ms)/Call";
+    out << boost::format("%|" + numWidth + "T=|\n");
+  } else {
+    out << "<table border=0>";
+    out << outputheader % "Name" % "Calls" % "Memory(MB)" % "Time(s)" % "Time(ms)/Call";
+    out << "<tbody>";
+  }
 
   std::vector<ModuleStatistics> modulesSortedByIndex(*modules);
   sort(modulesSortedByIndex.begin(), modulesSortedByIndex.end(), [](const ModuleStatistics & a, const ModuleStatistics & b) { return a.getIndex() < b.getIndex(); });
@@ -87,7 +97,11 @@ string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounte
         % (stats.getTimeStddev(mode) / Unit::ms);
   }
 
-  out << boost::format("%|" + numWidth + "T=|\n");
+  if (!html) {
+    out << boost::format("%|" + numWidth + "T=|\n");
+  } else {
+    out << "</tbody><tfoot>";
+  }
   out << output
       % (ProcHandler::isOutputProcess() ? "Total (output proc.)" : "Total")
       % global.getCalls(mode)
@@ -95,7 +109,11 @@ string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounte
       % (global.getTimeSum(mode) / Unit::s)
       % (global.getTimeMean(mode) / Unit::ms)
       % (global.getTimeStddev(mode) / Unit::ms);
-  out << boost::format("%|" + numWidth + "T=|\n");
+  if (!html) {
+    out << boost::format("%|" + numWidth + "T=|\n");
+  } else {
+    out << "</tfoot></table>";
+  }
   return out.str();
 }
 
@@ -200,11 +218,6 @@ TObject* ProcessStatistics::Clone(const char*) const
 std::string ProcessStatistics::getInfoHTML() const
 {
   std::string s = getStatisticsString();
-  const static std::regex tagRegex("^==*$");
-  s = std::regex_replace(s, tagRegex, "");
-
-  boost::algorithm::replace_all(s, "|", "</td><td>");
-  boost::algorithm::replace_all(s, "\n", "</td></tr><tr><td>");
-  return "Event Statistics:<br /><table border=0><tr><td>" + s + "</td></tr></table>";
+  return "Event Statistics:<br />" + s;
 }
 

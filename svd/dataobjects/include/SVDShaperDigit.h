@@ -275,7 +275,7 @@ namespace Belle2 {
     /**
      * set APV mode for the event
      * @param mode = 3, 6 depending on the number of acquired samples
-     * @param first sample = first sample (of the 6) to be stored if mode = 3
+     * @param firstSample = first sample (of the 6) to be stored if mode = 3
      */
     static void setAPVMode(size_t mode, size_t firstSample)
     {

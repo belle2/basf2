@@ -5,7 +5,8 @@
 
 __authors__ = [
     "Xing-Yu Zhou",
-    "Hisaki Hayashii"
+    "Hisaki Hayashii",
+    "Guanda Gong"
 ]
 
 
@@ -103,6 +104,9 @@ class LowMassTwoTrack(BaseSkim):
     """
     **Physics channel**: :math:`e^{+}e^{-} \\to \\gamma h_{1}^{+}h_{2}^{-} X`
 
+    .. Warning::
+        This skim includes the golden mode :math:`e^{+}e^{-} \\to \\gamma \\pi^{+}\\pi^{-}`
+
     .. Note::
         The :math:`h_{1}^{+}` and :math:`h_{2}^{+}` here mean a positive particle
         and a negative particle that could be either conjugate or non-conjugate. The
@@ -117,7 +121,7 @@ class LowMassTwoTrack(BaseSkim):
         5. :math:`e^{+}e^{-} \\to \\gamma p \\pi^{-} X`,
         6. :math:`e^{+}e^{-} \\to \\gamma p K^{-} X`,
     """
-    __authors__ = "Xing-Yu Zhou"
+    __authors__ = ["Xing-Yu Zhou", "Guanda Gong"]
     __description__ = "Skim list for low mass events with at least two tracks and one hard photon" \
                       " in final state."
     __contact__ = "Xing-Yu Zhou <xing-yu.zhou@desy.de>"

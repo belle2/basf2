@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019 - Belle II Collaboration                             *
+ * Copyright(C) 2019, 2021 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -10,9 +10,9 @@
 
 #include <top/modules/collectors/TOPCommonT0LLCollectorModule.h>
 #include <top/geometry/TOPGeometryPar.h>
-#include <top/reconstruction/TOPreco.h>
-#include <top/reconstruction/TOPtrack.h>
-#include <top/reconstruction/TOPconfigure.h>
+#include <top/reconstruction_cpp/TOPTrack.h>
+#include <top/reconstruction_cpp/PDFConstructor.h>
+#include <top/reconstruction_cpp/TOPRecoManager.h>
 
 // framework aux
 #include <framework/gearbox/Const.h>
@@ -53,10 +53,6 @@ namespace Belle2 {
     addParam("numBins", m_numBins, "number of bins of the search region", 200);
     addParam("timeRange", m_timeRange,
              "time range in which to search for the minimum [ns]", 10.0);
-    addParam("minBkgPerBar", m_minBkgPerBar,
-             "minimal number of background photons per module", 0.0);
-    addParam("scaleN0", m_scaleN0,
-             "Scale factor for figure-of-merit N0", 1.0);
     addParam("sigmaSmear", m_sigmaSmear,
              "sigma in [ns] for additional smearing of PDF", 0.0);
     addParam("sample", m_sample,
@@ -88,18 +84,14 @@ namespace Belle2 {
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     m_bunchTimeSep = geo->getNominalTDC().getSyncTimeBase() / m_bunchesPerSSTclk;
 
-    // Configure TOP detector for reconstruction
-
-    TOPconfigure config;
-
     // Parse PDF option
 
     if (m_pdfOption == "rough") {
-      m_PDFOption = TOPreco::c_Rough;
+      m_PDFOption = PDFConstructor::c_Rough;
     } else if (m_pdfOption == "fine") {
-      m_PDFOption = TOPreco::c_Fine;
+      m_PDFOption = PDFConstructor::c_Fine;
     } else if (m_pdfOption == "optimal") {
-      m_PDFOption = TOPreco::c_Optimal;
+      m_PDFOption = PDFConstructor::c_Optimal;
     } else {
       B2ERROR("Unknown PDF option '" << m_pdfOption << "'");
     }
@@ -158,30 +150,17 @@ namespace Belle2 {
     if (not m_recBunch.isValid()) return;
     if (not m_recBunch->isReconstructed()) return;
 
-    // create reconstruction object and set various options
+    TOPRecoManager::setDefaultTimeWindow();
+    double timeMin = TOPRecoManager::getMinTime();
+    double timeMax = TOPRecoManager::getMaxTime();
 
-    int Nhyp = 1;
-    double mass = m_selector.getChargedStable().getMass();
-    int pdg = m_selector.getChargedStable().getPDGCode();
-    TOPreco reco(Nhyp, &mass, &pdg, m_minBkgPerBar, m_scaleN0);
-    reco.setPDFoption(m_PDFOption);
-    const auto& tdc = TOPGeometryPar::Instance()->getGeometry()->getNominalTDC();
-    double timeMin = tdc.getTimeMin();
-    double timeMax = tdc.getTimeMax();
-
-    // add photon hits to reconstruction object with time corrected-back for common T0
+    // correct-back digits for common T0
 
     double T0 = 0;
     if (m_commonT0->isCalibrated()) T0 = m_commonT0->getT0();
-    for (const auto& digit : m_digits) {
-      if (digit.getHitQuality() == TOPDigit::c_Good) {
-        double t = digit.getTime();
-        if (digit.isCommonT0Calibrated()) t += T0;
-        if (digit.hasStatus(TOPDigit::c_BunchOffsetSubtracted)) {
-          t += m_recBunch->getAverageOffset();
-        }
-        reco.addData(digit.getModuleID(), digit.getPixelID(), t, digit.getTimeError());
-      }
+    for (auto& digit : m_digits) {
+      if (digit.isCommonT0Calibrated()) digit.subtractT0(-T0);
+      if (digit.hasStatus(TOPDigit::c_BunchOffsetSubtracted)) digit.subtractT0(-m_recBunch->getAverageOffset());
     }
 
     // loop over reconstructed tracks, make a selection and accumulate log likelihoods
@@ -190,14 +169,14 @@ namespace Belle2 {
     for (const auto& track : m_tracks) {
 
       // track selection
-      TOPtrack trk(&track);
+      TOPTrack trk(track);
       if (not trk.isValid()) continue;
 
       if (not m_selector.isSelected(trk)) continue;
 
-      // run reconstruction
-      reco.reconstruct(trk);
-      if (reco.getFlag() != 1) continue; // track is not in the acceptance of TOP
+      // construct PDF
+      PDFConstructor pdfConstructor(trk, m_selector.getChargedStable(), m_PDFOption);
+      if (not pdfConstructor.isValid()) continue;
 
       // minimization procedure: accumulate
       int sub = gRandom->Integer(c_numSets); // generate sub-sample number
@@ -205,7 +184,7 @@ namespace Belle2 {
       for (int ibin = 0; ibin < h->GetNbinsX(); ibin++) {
         double t0 = h->GetBinCenter(ibin + 1);
         double chi = h->GetBinContent(ibin + 1);
-        chi += -2 * reco.getLogL(t0, timeMin, timeMax, m_sigmaSmear);
+        chi += -2 * pdfConstructor.getLogL(t0, m_sigmaSmear).logL;
         h->SetBinContent(ibin + 1, chi);
       }
       auto h1 = getObjectPtr<TH1F>("tracks_per_set");

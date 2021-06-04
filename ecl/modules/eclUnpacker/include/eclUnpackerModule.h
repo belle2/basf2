@@ -15,6 +15,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/core/Module.h>
+#include <framework/datastore/RelationArray.h>
 
 // ECL
 #include <ecl/utility/ECLChannelMapper.h>
@@ -169,6 +170,11 @@ namespace Belle2 {
     StoreArray<ECLTrig>  m_eclTrigs;
     /** store array for waveforms**/
     StoreArray<ECLDsp>   m_eclDsps;
+
+    /** ECLDigit->ECLTrig relation array */
+    RelationArray m_relDigitToTrig{m_eclDigits, m_eclTrigs};
+    /** ECLDigit->ECLTrig relation array */
+    RelationArray m_relDigitToDsp{m_eclDigits, m_eclDsps};
 
     /** ECLTrigs objects before they are added to m_eclTrigs array */
     ECLTrig m_eclTrigsBuffer[ECL::ECL_CRATES];

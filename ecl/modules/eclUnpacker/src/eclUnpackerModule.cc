@@ -16,7 +16,6 @@
 
 //Framework
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/RelationArray.h>
 
 //Rawdata
 #include <rawdata/dataobjects/RawECL.h>
@@ -128,10 +127,10 @@ void ECLUnpackerModule::initialize()
   m_eclDigits.registerInDataStore(m_eclDigitsName);
   if (m_storeTrigTime) {
     m_eclTrigs.registerInDataStore(m_eclTrigsName);
-    m_eclDigits.registerRelationTo(m_eclTrigs);
+    m_relDigitToTrig.registerInDataStore();
   }
   m_eclDsps.registerInDataStore(m_eclDspsName);
-  m_eclDigits.registerRelationTo(m_eclDsps);
+  m_relDigitToDsp.registerInDataStore();
   m_eclDsps.registerRelationTo(m_eclDigits);
 
 }
@@ -158,11 +157,9 @@ void ECLUnpackerModule::event()
   m_eclDigits.clear();
   m_eclDsps.clear();
   m_eclTrigs.clear();
-  // relations arrays
-  RelationArray relDigitToTrig(m_eclDigits, m_eclTrigs);
-  if (relDigitToTrig) relDigitToTrig.clear();
-  RelationArray relDigitToDsp(m_eclDigits, m_eclDsps);
-  if (relDigitToDsp) relDigitToDsp.clear();
+  // clear relations arrays
+  if (m_relDigitToTrig) m_relDigitToTrig.clear();
+  if (m_relDigitToDsp) m_relDigitToDsp.clear();
 
   if (m_eventMetaData.isValid()) {
     m_globalEvtNum = m_eventMetaData->getEvent();
@@ -199,7 +196,7 @@ void ECLUnpackerModule::event()
     int cid = m_eclDigits[i]->getCellId();
     int crate0 = m_eclMapper.getCrateID(cid) - 1;
     if (new_ecl_trigs[crate0]) {
-      relDigitToTrig.add(i, crate0);
+      m_relDigitToTrig.add(i, crate0);
     }
   }
 
@@ -259,7 +256,6 @@ unsigned int ECLUnpackerModule::readNBits(int bitsToRead)
 
 void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 {
-  RelationArray relDigitToDsp(m_eclDigits, m_eclDsps);
   int iCrate, iShaper, iChannel, cellID;
 
   int shapersMask;
@@ -502,7 +498,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
               // Add relation from ECLDigit to ECLDsp
               if (newEclDigits[ind]) {
                 int eclDspIdx = m_eclDsps.getEntries() - 1;
-                relDigitToDsp.add(newEclDigitsIdx[ind], eclDspIdx);
+                m_relDigitToDsp.add(newEclDigitsIdx[ind], eclDspIdx);
               }
             }
 

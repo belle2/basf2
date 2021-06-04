@@ -32,8 +32,7 @@ namespace Belle2 {
   private: // Parameters
 
 
-    StoreArray<KLMDigit> m_Digits;
-    //! Total number of found tracks
+
     int m_nLayerTrigger = 0;
 
     /**name of StoreArray summery*/

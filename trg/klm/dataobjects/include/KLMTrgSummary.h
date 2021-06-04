@@ -155,7 +155,7 @@ namespace Belle2 {
 
     //! Needed to make the ROOT object storable
     //! version 4 adds ctime etc
-    ClassDef(KLMTrgSummary, 3);
+    ClassDef(KLMTrgSummary, 4);
   };
 } // end of namespace Belle2
 

@@ -127,12 +127,14 @@ KLMTriggerModule::KLMTriggerModule() : Module()
 
 void KLMTriggerModule::initialize()
 {
-  m_Digits.isRequired();
+
   B2INFO("KLMTrigger: m_dummy_used_layers " << m_dummy_used_layers);
   m_layerUsed = layer_string_list_to_integer(m_dummy_used_layers);
 
-
   StoreArray<KLMDigit> klmDigits;
+  klmDigits.isRequired();
+  if (!klmDigits.isValid())
+    return;
 
 // unused
   StoreArray<KLMTriggerHit> klmTriggerHits(m_klmhitCollectionName);
@@ -198,7 +200,7 @@ int to_i_sector(int KLM_type_, int section_)
   } else if (KLM_type_ == KLMElementNumbers::c_EKLM  && section_ == EKLMElementNumbers::c_ForwardSection) {
     return i_forward_eklm;
   }
-  B2FATAL("unecpected KLM type")
+  B2FATAL("unecpected KLM type");
   return 0;
 }
 
@@ -257,6 +259,7 @@ void KLMTriggerModule::event()
     return;
 
   auto summery = klmTriggerSummery.appendNew();
+  StoreArray<KLMDigit> klmDigits;
 
 
   auto hits = fill_vector(klmDigits,

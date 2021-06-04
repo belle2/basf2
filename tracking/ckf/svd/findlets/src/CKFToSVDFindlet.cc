@@ -83,10 +83,29 @@ void CKFToSVDFindlet::beginEvent()
   Super::beginEvent();
 
   m_cdcRecoTrackVector.clear();
+  if (m_spacePointVector.capacity() > 2000) {
+    // space point vector too big, start with a fresh one
+    decltype(m_spacePointVector) tmp;
+    std::swap(m_spacePointVector, tmp);
+    tmp.clear();
+  }
   m_spacePointVector.clear();
 
   m_seedStates.clear();
+  if (m_states.capacity() > 2000) {
+    // states vector too big, start with a fresh one
+    decltype(m_states) tmp;
+    std::swap(m_states, tmp);
+    tmp.clear();
+  }
   m_states.clear();
+
+  if (m_relations.capacity() > 20000) {
+    // relations vector too big, start with a fresh one
+    decltype(m_relations) tmp;
+    std::swap(m_relations, tmp);
+    tmp.clear();
+  }
   m_relations.clear();
 
   m_results.clear();

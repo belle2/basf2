@@ -62,12 +62,13 @@ namespace Belle2 {
     TPaveText* m_legNormal = nullptr; /**< efficiency plot legend, normal */
     TPaveText* m_legEmpty = nullptr; /**< efficiency plot legend, empty */
 
+    /** efficiency status flags */
     enum effStatus {
       lowStat = 0, /**< gray frame */
       good = 1,    /**< green frame */
       warning = 2, /**< orange frame */
       error = 3    /**< red frame */
-    }; /**< efficiency status flags */
+    };
     effStatus m_effUstatus; /**< number representing the status of the efficiency U side */
     effStatus m_effVstatus;/**< number representing the status of the efficiency V side */
 

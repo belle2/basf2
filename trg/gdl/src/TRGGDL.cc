@@ -1012,13 +1012,14 @@ namespace Belle2 {
     }
   }
 
-  void TRGGDL::checkDatabase()
+  void TRGGDL::checkDatabase() const
   {
     // The number of algorithm logics must be equal to the number of output bits.
-    if (m_AlgsDB->getnalgs() != m_FTDLBitsDB->getnoutbit())
+    if (m_AlgsDB->getnalgs() != m_FTDLBitsDB->getnoutbit()) {
       B2FATAL("The number of logics in TRGGDLDBAlgs differs from the number of outpit bits in TRGGDLDBFTDLBits. Please check the content of the IoVs of both payloads."
-              << LogVar("Logics", m_AlgsDB->getnalgs()),
+              << LogVar("Logics", m_AlgsDB->getnalgs())
               << LogVar("Output bits", m_FTDLBitsDB->getnoutbit()));
+    }
   }
 
 } // namespace Belle2

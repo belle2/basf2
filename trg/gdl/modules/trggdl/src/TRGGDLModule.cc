@@ -177,6 +177,8 @@ namespace Belle2 {
     }
     if (_debugLevel > 9) printf("TRGGDLModule::beginRun() ends.\n");
 
+    _gdl->checkDatabase();
+
     B2DEBUG(100, "TRGGDLModule ... beginRun called  configFile = " << cfn);
   }
 

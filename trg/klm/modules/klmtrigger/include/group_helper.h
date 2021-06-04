@@ -107,7 +107,7 @@ namespace group_helper {
   template <typename... T>
   struct group {
     template <typename VEC_T, typename T1, typename... T_rest>
-    static auto   __isEequal(const VEC_T& vecA, const VEC_T& vecB) -> decltype(std::enable_if_t<sizeof...(T_rest), bool> {})
+    static auto   __isEequal(const VEC_T& vecA, const VEC_T& vecB) -> decltype(std::enable_if_t< (bool)sizeof...(T_rest), bool> {})
     {
       if (std::get<T1>(vecA) != std::get<T1>(vecB)) {
         return false;

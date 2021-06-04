@@ -179,7 +179,7 @@ protected:
   bool checkOsc(EvtParticle* egPro);
 
   /** Number of times to try a decay sampling (constant). */
-  static const int NTRYDECAY = 1000;
+  static constexpr int NTRYDECAY = 1000;
 
   /** The pointer to the associated Pythia object. */
   Pythia8::Pythia* pythiaPtr;
@@ -276,8 +276,7 @@ EvtGenDecays::EvtGenDecays(Pythia8::Pythia* pythiaPtrIn, std::string decayFile,
 
   // Initialize EvtGen.
   if (!extPtr && fsrPtr) {
-    if (pythiaPtr) pythiaPtr->info.errorMsg("Error in EvtGenDecays::"
-                                              "EvtGenDecays: extPtr is null but fsrPtr is provided");
+    B2ERROR("Error in EvtGenDecays::EvtGenDecays: extPtr is null but fsrPtr is provided");
     return;
   }
   if (extPtr) extOwner = false;
@@ -400,8 +399,8 @@ double EvtGenDecays::decay()
     if (pythiaPtr->rndm.flat() <= 1.0 / n) break;
     if (iTry == NTRYDECAY) {
       wgt = 2.;
-      pythiaPtr->info.errorMsg("Warning in EvtGenDecays::decay: maximum "
-                               "number of signal decay attempts exceeded");
+      B2WARNING("Warning in EvtGenDecays::decay: maximum number of signal decay attempts exceeded"
+                << LogVar("maxTries", NTRYDECAY));
     }
   }
 

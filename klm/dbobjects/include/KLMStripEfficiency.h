@@ -19,6 +19,7 @@
 /* C++ headers. */
 #include <cstdint>
 #include <map>
+#include <limits>
 
 namespace Belle2 {
 

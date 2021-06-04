@@ -441,7 +441,7 @@ namespace {
           return otherSet->second.storedArray();
         else
           cout << " ???????????? " << i << endl;
-        return otherSet->second.storedArray();
+        throw std::runtime_error("invalid set access");
       }
 
       pair< const string, NamedSet>&

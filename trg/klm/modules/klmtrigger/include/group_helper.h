@@ -18,7 +18,7 @@ namespace group_helper {
 
     using my_type = T;
     axis_name_t() = default;
-    axis_name_t(T val) : m_value(val) {}
+    explicit axis_name_t(T val) : m_value(val) {}
 
     operator T() const
     {
@@ -226,19 +226,20 @@ namespace group_helper {
 
   template<typename T1 = int>
   struct greater {
-    greater(T1&& data) : m_data(data) {}
-    greater(const T1& data) : m_data(data) {}
+    explicit greater(T1&& data) : m_data(data) {}
+    explicit greater(const T1& data) : m_data(data) {}
     T1 m_data;
-    template<typename U>
-    constexpr auto operator()(U&& u) const
+
+
+    constexpr auto operator()(const T1& u) const
     {
-      return m_data < (U&&) u;
+      return m_data < u;
     }
   };
 
   template<typename T1>
   struct greater_equal {
-    greater_equal(T1 data) : m_data(data) {}
+    explicit greater_equal(T1 data) : m_data(data) {}
 
     T1 m_data;
     template<typename U>

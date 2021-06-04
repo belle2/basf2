@@ -73,7 +73,7 @@ REG_MODULE(KLMTrigger)
 //-----------------------------------------------------------------
 struct compare {
   int key;
-  compare(int const& i): key(i) { }
+  explicit compare(int const& i): key(i) { }
 
   bool operator()(int const& i)
   {
@@ -172,21 +172,21 @@ void KLMTriggerModule::endRun()
 
 
 
+// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(KLM_type, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(section_t, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(sector_t, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(layer_t, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(layer_count, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(layer_mask, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(n_triggered, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(sector_mask, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(sector_mask_or, int);// cppcheck-suppress  noExplicitConstructor
 
-AXIS_NAME(KLM_type, int);
-AXIS_NAME(section_t, int);
-AXIS_NAME(sector_t, int);
-AXIS_NAME(layer_t, int);
-AXIS_NAME(layer_count, int);
-AXIS_NAME(layer_mask, int);
-AXIS_NAME(n_triggered, int);
-AXIS_NAME(sector_mask, int);
-AXIS_NAME(sector_mask_or, int);
-
-AXIS_NAME(n_sections_trig, int);
-AXIS_NAME(back2back_t, int);
-AXIS_NAME(isectors_t, int);
-AXIS_NAME(TriggerCut, int);
+AXIS_NAME(n_sections_trig, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(back2back_t, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(isectors_t, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(TriggerCut, int);// cppcheck-suppress  noExplicitConstructor
 AXIS_NAME(vetoCut, int);
 
 int to_i_sector(int KLM_type_, int section_)

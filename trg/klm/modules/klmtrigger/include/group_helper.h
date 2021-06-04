@@ -133,7 +133,7 @@ namespace group_helper {
       auto tail = std::begin(vec);
 
       for (auto head = std::begin(vec); head != std::end(vec); ++head) {
-        if (!__isEequal<VEC_T, T...>(*head, *tail)) {
+        if (!group<T...>::__isEequal<VEC_T, T...>(*head, *tail)) {
 
           ret.emplace_back(std::get<T>(*tail)..., fun(__range__(tail, head))...);
           tail = head;

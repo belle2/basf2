@@ -100,7 +100,7 @@ ma.applyCuts('B-:sigT', 'abs(mcPDG)==521', path=my_path)
 
 ma.reconstructDecay('Upsilon(4S):sig -> B+:tag B-:sigT', '', path=my_path)
 
-mytestmodule2 = ma.register_module('BtubeCreator')
+mytestmodule2 = b2.register_module('BtubeCreator')
 my_path.add_module(mytestmodule2,
                    listName='Upsilon(4S):sig')
 vx.raveFit('B-:sigT', 0.0, constraint='btube', path=my_path)

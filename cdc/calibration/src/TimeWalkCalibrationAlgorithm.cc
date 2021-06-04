@@ -305,12 +305,15 @@ void TimeWalkCalibrationAlgorithm::updateT0()
   CDCTimeZeros* tz = new CDCTimeZeros();
   double T0;
   for (int ilay = 0; ilay < 56; ++ilay) {
-    for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
+    const unsigned int nW = cdcgeo.nWiresInLayer(ilay);
+    for (unsigned int iwire = 0; iwire < nW; ++iwire) {
       WireID wireid(ilay, iwire);
       int bID = cdcgeo.getBoardID(wireid);
+      T0 = cdcgeo.getT0(wireid);
       if (m_flag[bID] == 1) {
-        T0 = cdcgeo.getT0(wireid);
         tz->setT0(wireid, T0 - m_constTerm[bID]);
+      } else {
+        tz->setT0(wireid, T0);
       }
     }
   }

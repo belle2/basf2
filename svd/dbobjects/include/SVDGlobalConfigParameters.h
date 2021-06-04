@@ -12,7 +12,9 @@
  **************************************************************************/
 
 #pragma once
+#include <framework/database/DBObjPtr.h>
 #include "TObject.h"
+#include "TString.h"
 
 namespace Belle2 {
   /**

@@ -87,7 +87,7 @@ data_base_file = here + "/localdb/database.txt"
 
 # upload to global database
 if upload:
-    os.system(f"conditionsdb upload {tag_name} {data_base_file}")
+    os.system(f"b2conditionsdb-upload {tag_name} {data_base_file}")
 
 if remove_local_files:
     os.system('rm -r {}'.format(here + '/localdb/'))

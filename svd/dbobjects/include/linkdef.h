@@ -101,3 +101,18 @@
   targetClass="Belle2::SVDGlobalConfigParameters"\
   target="m_nrFrames"          \
   code="{ m_nrFrames = 6;}" \
+
+// SVDPosErrScaleFactors
+// As of version 2, new data members are added
+// classDef = 1 -> classDef = 2
+// x ->  int scaleError_clSize4,5
+// when classDef = 1 m_scaleError_clSize45 = m_scaleError_clSize3
+#pragma read \
+  sourceClass="Belle2::SVDPosErrScaleFactors"\
+  source=""\
+  version="[1]" \
+  targetClass="Belle2::SVDPosErrScaleFactors"\
+  target="m_scaleError_clSize4"          \
+  code="{ m_scaleError_clSize4 = m_scaleError_clSize3;}" \
+  target="m_scaleError_clSize5"          \
+  code="{ m_scaleError_clSize5 = m_scaleError_clSize3;}" \

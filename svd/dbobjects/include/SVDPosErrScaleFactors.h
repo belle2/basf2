@@ -17,15 +17,23 @@ namespace Belle2 {
 
     /** position error scale factor for cluster size = 1
      */
-    float scaleError_clSize1;
+    float scaleError_clSize1 = 1;
 
     /** position error scale factor for cluster size = 2
      */
-    float scaleError_clSize2;
+    float scaleError_clSize2 = 1;
 
-    /** position error scale factor for cluster size > 2
+    /** position error scale factor for cluster size = 3
      */
-    float scaleError_clSize3;
+    float scaleError_clSize3 = 1;
+
+    /** position error scale factor for cluster size = 4
+     */
+    float scaleError_clSize4 = 1;
+
+    /** position error scale factor for cluster size > 4
+     */
+    float scaleError_clSize5 = 1;
 
     /** returns the corrected cluster position error */
     float getCorrectedValue(float raw_error, int size) const
@@ -37,11 +45,17 @@ namespace Belle2 {
       if (size == 2)
         return raw_error * scaleError_clSize2;
 
-      return raw_error * scaleError_clSize3;
+      if (size == 3)
+        return raw_error * scaleError_clSize3;
+
+      if (size == 4)
+        return raw_error * scaleError_clSize4;
+
+      return raw_error * scaleError_clSize5;
     }
 
 
-    ClassDef(SVDPosErrScaleFactors, 1); /**< needed by root*/
+    ClassDef(SVDPosErrScaleFactors, 2); /**< needed by root*/
 
   };
 

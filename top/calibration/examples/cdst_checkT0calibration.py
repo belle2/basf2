@@ -9,8 +9,7 @@
 
 import basf2 as b2
 
-# Global tag
-b2.use_central_database('data_reprocessing_proc7')
+# Global tag: use global tag replay
 
 # Create path
 main = b2.create_path()

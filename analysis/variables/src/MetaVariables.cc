@@ -126,7 +126,60 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr useParticleRestFrame(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        std::string listName = arguments[1];
+        auto func = [var, listName](const Particle * particle) -> double {
+          StoreObjPtr<ParticleList> list(listName);
+          unsigned listSize = list->getListSize();
+          if (listSize == 0)
+            return std::numeric_limits<float>::quiet_NaN();
+          if (listSize > 1)
+            B2WARNING("The selected ParticleList contains more than 1 Particles in this event. The variable useParticleRestFrame will use only the first candidate, and the result may not be the expected one."
+            << LogVar("ParticleList", listName)
+            << LogVar("Number of candidates in the list", listSize));
+          const Particle* p = list->getParticle(0);
+          UseReferenceFrame<RestFrame> frame(p);
+          double result = var->function(particle);
+          return result;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function useParticleRestFrame.");
+      }
+    }
 
+    Manager::FunctionPtr useRecoilParticleRestFrame(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        std::string listName = arguments[1];
+        auto func = [var, listName](const Particle * particle) -> double {
+          StoreObjPtr<ParticleList> list(listName);
+          unsigned listSize = list->getListSize();
+          if (listSize == 0)
+            return std::numeric_limits<float>::quiet_NaN();
+          if (listSize > 1)
+            B2WARNING("The selected ParticleList contains more than 1 Particles in this event. The variable useParticleRestFrame will use only the first candidate, and the result may not be the expected one."
+            << LogVar("ParticleList", listName)
+            << LogVar("Number of candidates in the list", listSize));
+          const Particle* p = list->getParticle(0);
+          PCmsLabTransform T;
+          TLorentzVector recoil = T.getBeamFourMomentum() - p->get4Vector();
+          /* Let's use 0 as PDG code to avoid wrong assumptions. */
+          Particle pRecoil(recoil, 0);
+          pRecoil.setVertex(particle->getVertex());
+          UseReferenceFrame<RestFrame> frame(&pRecoil);
+          double result = var->function(particle);
+          return result;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function useParticleRestFrame.");
+      }
+    }
 
     Manager::FunctionPtr extraInfo(const std::vector<std::string>& arguments)
     {
@@ -2580,6 +2633,16 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       "Returns the value of the variable in the rest frame of the recoiling particle to the tag side B meson.\n"
                       "The variable should only be applied to an Upsilon(4S) list.\n"
                       "E.g. ``useTagSideRecoilRestFrame(daughter(1, daughter(1, p)), 0)`` applied on a Upsilon(4S) list (``Upsilon(4S)->B+:tag B-:sig``) returns the momentum of the second daughter of the signal B meson in the signal B meson rest frame.");
+    REGISTER_VARIABLE("useParticleRestFrame(variable, particleList)", useParticleRestFrame,
+                      "Returns the value of the variable in the rest frame of the first Particle contained in the given ParticleList.\n"
+		      "It is strongly recommended to pass a ParticleList that contains at most only one Particle in each event. "
+		      "When more than one Particle is present in the ParticleList, only the first Particle in the list is used for "
+		      "computing the rest frame and a warning is thrown. If the given ParticleList is empty in an event, it returns NaN.");
+    REGISTER_VARIABLE("useRecoilParticleRestFrame(variable, particleList)", useRecoilParticleRestFrame,
+                      "Returns the value of the variable in the rest frame of recoil system againt the first Particle contained in the given ParticleList.\n"
+		      "It is strongly recommended to pass a ParticleList that contains at most only one Particle in each event. "
+		      "When more than one Particle is present in the ParticleList, only the first Particle in the list is used for "
+		      "computing the rest frame and a warning is thrown. If the given ParticleList is empty in an event, it returns NaN.");
     REGISTER_VARIABLE("passesCut(cut)", passesCut,
                       "Returns 1 if particle passes the cut otherwise 0.\n"
                       "Useful if you want to write out if a particle would have passed a cut or not.\n"

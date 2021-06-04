@@ -38,7 +38,7 @@ ma.inputMdst(environmentType='default',
 
 maxTracks = 12
 empty_path = b2.create_path()
-skimfilter = ma.register_module('VariableToReturnValue')
+skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
 skimfilter.if_value('>{}'.format(maxTracks), empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
@@ -61,7 +61,7 @@ ma.inputMdstList('default', ['./RootOutput.root'], path)
 
 maxTracks = 12
 empty_path = b2.create_path()
-skimfilter = ma.register_module('VariableToReturnValue')
+skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
 skimfilter.if_value('>{}'.format(maxTracks), empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
@@ -92,7 +92,7 @@ ma.inputMdstList('default', ['./RootOutput.root'], path)
 
 maxTracks = 12
 empty_path = b2.create_path()
-skimfilter = ma.register_module('VariableToReturnValue')
+skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
 skimfilter.if_value('>{}'.format(maxTracks), empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
@@ -115,7 +115,7 @@ ma.inputMdstList('default', ['./RootOutput.root'], path)
 
 maxTracks = 12
 empty_path = b2.create_path()
-skimfilter = ma.register_module('VariableToReturnValue')
+skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
 skimfilter.if_value('>{}'.format(maxTracks), empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
@@ -141,7 +141,7 @@ ma.inputMdstList('default', ['./RootOutput.root'], path)
 
 maxTracks = 12
 empty_path = b2.create_path()
-skimfilter = ma.register_module('VariableToReturnValue')
+skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
 skimfilter.if_value('>{}'.format(maxTracks), empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
@@ -160,7 +160,7 @@ ma.inputMdst(environmentType='default',
 
 maxTracks = 12
 empty_path = b2.create_path()
-skimfilter = ma.register_module('VariableToReturnValue')
+skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
 skimfilter.if_value('>{}'.format(maxTracks), empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)

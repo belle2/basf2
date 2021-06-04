@@ -57,18 +57,18 @@ SVDEventInfoSetterModule::~SVDEventInfoSetterModule() = default;
 void SVDEventInfoSetterModule::beginRun()
 {
   if (m_useDB) {
-    if (!m_svdConfig.isValid()) {
-      B2WARNING("No valid SVDDetectorConfiguration for the requested IoV, simulating a 6-sample event");
+    if (!m_svdGlobalConfig.isValid()) {
+      B2WARNING("No valid SVDGlobalConfigParameters for the requested IoV, simulating a 6-sample event");
       m_daqMode = 2; //6-sample event
       m_relativeShift = 0; // not needed later in reconstruction
     } else {
-      m_relativeShift = m_svdConfig.getRelativeTimeShift();
-      int nFrames = m_svdConfig.getNrFrames();
+      m_relativeShift = m_svdGlobalConfig->getRelativeTimeShift();
+      int nFrames = m_svdGlobalConfig->getNrFrames();
       if (nFrames == 3) m_daqMode = 1;
       else if (nFrames == 6) m_daqMode = 2;
       else if (nFrames == 9) m_daqMode = 3;
       else
-        B2ERROR("Invalid number of frames (" << nFrames << ") in SVDDetectorConfiguration");
+        B2ERROR("Invalid number of frames (" << nFrames << ") in SVDGlobalConfigParamters");
     }
   }
 }

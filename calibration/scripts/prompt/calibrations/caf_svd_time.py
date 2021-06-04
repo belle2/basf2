@@ -357,7 +357,7 @@ def get_calibrations(input_data, **kwargs):
     # calibration setup
     calibration = Calibration("SVDTime",
                               collector=coll_els3,   # The other collectors are in the pre_collector_path itself
-                              algorithms=[algo_cog6, algo_cog3, algo_els3],
+                              algorithms=[algo_cog3, algo_cog6, algo_els3],
                               input_files=good_input_files,
                               pre_collector_path=pre_collector_path)
 
@@ -449,7 +449,7 @@ def get_calibrations(input_data, **kwargs):
 
     val_calibration = Calibration("SVDTimeValidation",
                                   collector=val_coll_els3,
-                                  algorithms=[val_algo_cog6, val_algo_cog3,
+                                  algorithms=[val_algo_cog3, val_algo_cog6,
                                               val_algo_els3],
                                   input_files=good_input_files,
                                   pre_collector_path=val_pre_collector_path)

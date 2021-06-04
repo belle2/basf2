@@ -14,7 +14,6 @@
 import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
-from L1trigger import add_tsim
 
 import PXDROIUnpackerModule
 
@@ -65,11 +64,9 @@ if (args.ExperimentType == 3):
 # generate BBbar events
 main.add_module('EvtGenInput')
 
-# detector simulation
+# detector and L1 trigger simulation
 add_simulation(main, bkgfiles=bg)
 
-# trigger simulation
-add_tsim(main)
 
 # PXD digitization module
 # main.add_module('PXDDigitizer')

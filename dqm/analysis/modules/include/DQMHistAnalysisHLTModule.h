@@ -65,6 +65,8 @@ namespace Belle2 {
     std::pair<TCanvas*, TH1F*> m_hMeanBudgetTimePerUnit = {nullptr, nullptr};
     /// Histogram with mean processing time per unit per process
     std::pair<TCanvas*, TH1F*> m_hMeanProcessingTimePerUnit = {nullptr, nullptr};
+    /// Histogram with mean memory change per process
+    std::pair<TCanvas*, TH1F*> m_hMeanMemory = {nullptr, nullptr};
 
 #ifdef _BELLE2_EPICS
     //! one EPICS PV

@@ -16,6 +16,8 @@
 #include <top/reconstruction_cpp/RaytracerBase.h>
 #include <framework/database/DBObjPtr.h>
 #include <top/dbobjects/TOPCalModuleAlignment.h>
+#include <top/dbobjects/TOPFrontEndSetting.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <vector>
 #include <map>
@@ -26,7 +28,6 @@ namespace Belle2 {
 
   class Track;
   class ExtHit;
-  class MCParticle;
   class TOPBarHit;
 
   namespace TOP {
@@ -106,8 +107,15 @@ namespace Belle2 {
        * @param digitsName name of TOPDigits collection
        * @param chargedStable hypothesis used in mdst track extrapolation
        */
-      explicit TOPTrack(const Track& track, std::string digitsName = "",
+      explicit TOPTrack(const Track& track, const std::string& digitsName = "",
                         const Const::ChargedStable& chargedStable = Const::pion);
+
+      /**
+       * Constructor from extrapolated track hit - isValid() must be checked before using the object
+       * @param extHit extrapolated track hit
+       * @param digitsName name of TOPDigits collection
+       */
+      explicit TOPTrack(const ExtHit* extHit, const std::string& digitsName = "");
 
       /**
        * Overrides transformation from local to nominal frame, which is by default obtained from DB.
@@ -206,6 +214,16 @@ namespace Belle2 {
       const MCParticle* getMCParticle() const {return m_mcParticle;}
 
       /**
+       * Returns PDG code of associated MCParticle (returns 0 if none)
+       * @return PDG code or 0
+       */
+      int getPDGCode() const
+      {
+        if (m_mcParticle) return m_mcParticle->getPDG();
+        return 0;
+      }
+
+      /**
        * Returns bar hit of MC particle assigned to this track (if any)
        * @return bar hit or NULL pointer
        */
@@ -235,6 +253,14 @@ namespace Belle2 {
     private:
 
       /**
+       * Sets the object (called by constructors)
+       * @param track mdst track
+       * @param digitsName name of TOPDigits collection
+       * @param chargedStable hypothesis used in mdst track extrapolation
+       */
+      void set(const Track& track, const std::string& digitsName, const Const::ChargedStable& chargedStable);
+
+      /**
        * Sets helix (helix is given in nominal frame)
        * @param rotation rotation matrix from local to nominal frame (rotation first ...)
        * @param translation translation vector from local to nominal frame (... then translation)
@@ -262,6 +288,7 @@ namespace Belle2 {
       double m_length = 0; /**< trajectory length within quartz */
       TOP::HelixSwimmer m_helix; /**< trajectory helix in nominal slot frame */
       DBObjPtr<TOPCalModuleAlignment> m_alignment;   /**< module alignment constants */
+      DBObjPtr<TOPFrontEndSetting> m_feSetting;  /**< front-end settings */
 
       const Track* m_track = 0;  /**< mdst track */
       const ExtHit* m_extHit = 0;  /**< extrapolated hit */

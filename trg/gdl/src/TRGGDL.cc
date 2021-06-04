@@ -167,8 +167,8 @@ namespace Belle2 {
       for (int i = 0; i < m_FTDLBitsDB->getnoutbit(); i++) {
         B2DEBUG(20, "TRGGDL::initialize, outputBits: " << i << ", " << m_FTDLBitsDB->getoutbitname(i));
       }
-      for (int i = 0; i < db_algs->getnalgs(); i++) {
-        B2DEBUG(20, "TRGGDL::initialize, algs: " << i << ", " << db_algs->getalg(i));
+      for (int i = 0; i < m_AlgsDB->getnalgs(); i++) {
+        B2DEBUG(20, "TRGGDL::initialize, algs: " << i << ", " << m_AlgsDB->getalg(i));
       }
     }
     //if it is firmware simulation, do the cofigurnation
@@ -254,9 +254,10 @@ namespace Belle2 {
     if (!m_FTDLBitsDB)  B2INFO("no database of gdl ftdl bits");
     int N_OutputBits = m_FTDLBitsDB->getnoutbit();
     if (!m_PrescalesDB)  B2INFO("no database of gdl prescale");
-    int N_AlgsBits = db_algs->getnalgs();
-    if (!db_algs)  B2INFO("no global database of gdl ftd logics");
+    int N_AlgsBits = m_AlgsDB->getnalgs();
+    if (!m_AlgsDB)  B2INFO("no global database of gdl ftd logics");
     if (N_OutputBits > N_AlgsBits) {
+      // Why this? This creates a problem in for loops later.
       B2DEBUG(20, "#Algs and #Ftdl is different");
       N_OutputBits = N_AlgsBits;
     }
@@ -314,8 +315,8 @@ namespace Belle2 {
           L1Summary = 0;
           L1Summary_psnm = 0;
         }
-        std::string alg = _algFromDB ? db_algs->getalg(i) : algs[i];
-        if (_debugLevel > 89) printf("TRGGDL:i(%d), alg(%s)\n", i, db_algs->getalg(i).c_str());
+        std::string alg = _algFromDB ? m_AlgsDB->getalg(i) : algs[i];
+        if (_debugLevel > 89) printf("TRGGDL:i(%d), alg(%s)\n", i, m_AlgsDB->getalg(i).c_str());
         if (isFiredFTDL(_inpBits, alg)) {
           L1Summary |= (1 << (i % 32));
           if (doprescale(m_PrescalesDB->getprescales(i))) {
@@ -379,8 +380,8 @@ namespace Belle2 {
     if (!m_FTDLBitsDB)  B2INFO("no database of gdl ftdl bits");
     int N_OutputBits = m_FTDLBitsDB->getnoutbit();
     if (!m_PrescalesDB) B2INFO("no database of gdl prescale");
-    int N_AlgsBits = db_algs->getnalgs();
-    if (!db_algs) B2INFO("no database of gdl ftdl bit logic");
+    int N_AlgsBits = m_AlgsDB->getnalgs();
+    if (!m_AlgsDB) B2INFO("no database of gdl ftdl bit logic");
     if (N_OutputBits > N_AlgsBits) {
       B2DEBUG(20, "#Algs and #FTDL is different");
       N_OutputBits = N_AlgsBits;
@@ -408,7 +409,7 @@ namespace Belle2 {
 
       if (_algFromDB) {
         for (int i = 0; i < N_OutputBits; i++) {
-          bool ftdl_fired = isFiredFTDL(_inpBits, db_algs->getalg(i));
+          bool ftdl_fired = isFiredFTDL(_inpBits, m_AlgsDB->getalg(i));
           bool psnm_fired = false;
           _ftdBits.push_back(ftdl_fired);
           if (ftdl_fired) {
@@ -1009,6 +1010,15 @@ namespace Belle2 {
     for (std::size_t i = 0; i < _psnBits.size(); i++) {
       if (_psnBits[i]) h->Fill(i);
     }
+  }
+
+  void TRGGDL::checkDatabase()
+  {
+    // The number of algorithm logics must be equal to the number of output bits.
+    if (m_AlgsDB->getnalgs() != m_FTDLBitsDB->getnoutbit())
+      B2FATAL("The number of logics in TRGGDLDBAlgs differs from the number of outpit bits in TRGGDLDBFTDLBits. Please check the content of the IoVs of both payloads."
+              << LogVar("Logics", m_AlgsDB->getnalgs()),
+              << LogVar("Output bits", m_FTDLBitsDB->getnoutbit()));
   }
 
 } // namespace Belle2

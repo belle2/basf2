@@ -30,7 +30,7 @@ settings = CalibrationSettings(name="PXD hot/dead pixel calibration",
                                                                      input_data_filters["Beam Energy"]["Scan"],
                                                                      input_data_filters["Run Type"]["physics"],
                                                                      input_data_filters["Data Quality Tag"]["Good"]],
-                                                   "cosmic": [input_data_filters["Data Tag"]["cosmic_calib"]]},
+                                                   "cosmic": [input_data_filters["Run Type"]["cosmic"]]},
                                expert_config={
                                    "max_events_per_run": 400000,
                                    "max_files_per_run": 20,  # only valid when max_events/run <= 0

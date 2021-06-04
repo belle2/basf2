@@ -165,7 +165,8 @@ void ChargedPidMVAMulticlassModule::event()
       B2DEBUG(11, "\tMVA response:");
 
       std::string score_varname("");
-      std::vector<float> scores = m_experts.at(index)->applySingle(*m_datasets.at(index));
+      // We deal w/ a SingleDataset, so 0 is the only existing component by construction.
+      std::vector<float> scores = m_experts.at(index)->applyMulticlass(*m_datasets.at(index))[0];
 
       for (unsigned int classID(0); classID < m_classes.size(); ++classID) {
 

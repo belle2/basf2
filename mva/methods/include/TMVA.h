@@ -354,19 +354,11 @@ namespace Belle2 {
       };
 
       /**
-       * Apply this expert onto a dataset.
-       * Multi-class mode signature.
-       * @param test_data dataset
-       * @param classID class identifier.
-       */
-      virtual std::vector<float> apply(Dataset& test_data, const unsigned int classID) const override;
-
-      /**
-        * Apply this m_expert onto a dataset of length 1
-        * returns score for all classes.
-        * @param test_data dataset
+        * Apply this m_expert onto a dataset.
+        * @param test_data dataset.
+      * @return vector of size N=test_data.getNumberOfEvents() with N=m_classes.size() scores for each event in the dataset.
         */
-      virtual std::vector<float> applySingle(Dataset& test_data) const override;
+      virtual std::vector<std::vector<float>> applyMulticlass(Dataset& test_data) const override;
 
     protected:
       TMVAOptionsMulticlass specific_options; /**< Method specific options */

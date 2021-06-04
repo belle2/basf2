@@ -45,7 +45,7 @@ that is, consult this page again: :ref:`conditionsdb_overview`).
     Add a line to your previous steering file that adds the
     ``analysis_tools_release-04-02`` global tag. For this you need to call the
     `prepend_globaltag` method of the `basf2.conditions` object (which is an
-    instance of the `ConditionsConfiguration <basf2.ConditionsConfiguration>` class).
+    instance of the `ConditionsConfiguration` class).
 
 .. admonition:: Solution
     :class: solution toggle

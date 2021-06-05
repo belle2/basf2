@@ -581,10 +581,10 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   B2DEBUG(29, "  --> charge sharing simulation, # strips = " << strips.size());
   std::deque<double> readoutCharges;
   std::deque<int> readoutStrips;
+  VxdID currentSensorID = m_currentHit->getSensorID();
   for (std::size_t index = 3; index <  strips.size() - 3; index += 2) {
     B2DEBUG(29, "  index = " << index << ", strip = " << strips[index] << ", stripCharge = " << stripCharges[index]);
     int currentStrip = static_cast<int>(strips[index]);
-    VxdID currentSensorID = m_currentHit->getSensorID();
 
     double c0 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, "C0");
     double c1 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, "C1");

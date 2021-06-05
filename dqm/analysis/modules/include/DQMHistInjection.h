@@ -24,6 +24,7 @@ namespace Belle2 {
   class DQMHistInjectionModule : public DQMHistAnalysisModule {
 
 #ifdef _BELLE2_EPICS
+    // struct definition
     typedef struct {
       chid    mychid;
       TH1*  histo = {};

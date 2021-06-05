@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
-import os
 import basf2
 from ROOT import TFile
 
-from b2test_utils import skip_test_if_light
+from b2test_utils import skip_test_if_light, clean_working_directory
 skip_test_if_light()  # light builds don't contain simulation, reconstruction etc; skip before trying to import  # noqa
 
 from simulation import add_simulation
@@ -24,24 +23,23 @@ basf2.set_module_parameters(main, type="Geometry", useDB=False, components=compo
 # output path
 main.add_module('RootOutput', outputFileName='streamer_test.root')
 
-basf2.process(main)
+with clean_working_directory():
+    basf2.process(main)
 
-# load file and see if it can be read properly
-tfile = TFile('streamer_test.root')
-tree = tfile.Get('tree')
+    # load file and see if it can be read properly
+    tfile = TFile('streamer_test.root')
+    tree = tfile.Get('tree')
 
-# seems to be ok, most of the time
-tree.Project("", "MCParticles.m_pdg")
+    # seems to be ok, most of the time
+    tree.Project("", "MCParticles.m_pdg")
 
-# Used to create problems when genfit::AbsTrackRep didn't have schema
-# evolution. With no '+' in linkdef, this crashes
-tree.Project("", "abs(MCParticles.m_pdg)")
+    # Used to create problems when genfit::AbsTrackRep didn't have schema
+    # evolution. With no '+' in linkdef, this crashes
+    tree.Project("", "abs(MCParticles.m_pdg)")
 
-# wether TTreeFormula chokes on something depends on alphabetical order...
-# so this should get it to iterate over the entire contents
-tree.Project("", "ZZZ.Doesnt.Exist")
+    # wether TTreeFormula chokes on something depends on alphabetical order...
+    # so this should get it to iterate over the entire contents
+    tree.Project("", "ZZZ.Doesnt.Exist")
 
-# also test using some class members
-tree.Project("", "GF2Tracks.getNumPoints()")
-
-os.remove('streamer_test.root')
+    # also test using some class members
+    tree.Project("", "GF2Tracks.getNumPoints()")

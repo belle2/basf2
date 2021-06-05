@@ -17,6 +17,8 @@
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
+#include <TString.h>
+
 #include <cmath>
 
 using namespace std;

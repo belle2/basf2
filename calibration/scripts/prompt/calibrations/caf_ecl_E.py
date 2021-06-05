@@ -51,6 +51,7 @@ def get_calibrations(input_data, **kwargs):
 
     # ..Algorithm
     algo_ee5x5 = Belle2.ECL.eclee5x5Algorithm()
+    expert_config = kwargs.get("expert_config")
     ee5x5minEntries = expert_config["ee5x5_min_entries"]
     algo_ee5x5.setMinEntries(ee5x5minEntries)
     algo_ee5x5.setPayloadName("ECLCrystalEnergy5x5")

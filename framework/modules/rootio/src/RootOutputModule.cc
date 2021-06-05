@@ -273,7 +273,6 @@ void RootOutputModule::openFile()
         }
       }
       m_tree[durability]->Branch(branchName.c_str(), &iter.second.object, m_basketsize, splitLevel);
-      m_tree[durability]->SetBranchAddress(branchName.c_str(), &iter.second.object);
       m_entries[durability].push_back(&iter.second);
       B2DEBUG(39, "The branch " << branchName << " was created.");
 
@@ -483,21 +482,23 @@ void RootOutputModule::fillTree(DataStore::EDurability durability)
 {
   if (!m_tree[durability]) return;
 
-  //Check for entries whose object was not created.
-  for (unsigned int i = 0; i < m_entries[durability].size(); i++) {
-    if (!m_entries[durability][i]->ptr) {
-      //create object owned and deleted by branch
-      m_tree[durability]->SetBranchAddress(m_entries[durability][i]->name.c_str(), nullptr);
-    } else {
-      m_tree[durability]->SetBranchAddress(m_entries[durability][i]->name.c_str(), &m_entries[durability][i]->object);
+  TTree& tree = *m_tree[durability];
+  for(auto* entry: m_entries[durability]) {
+    // Check for entries whose object was not created and mark them as invalid. 
+    // We still have to write them in the file due to the structure we have. This could be done better 
+    if (!entry->ptr) {
+      entry->object->SetBit(kInvalidObject);
     }
+    //FIXME: Do we need this? in theory no but it crashes in parallel processing otherwise ¯\_(ツ)_/¯
+    tree.SetBranchAddress(entry->name.c_str(), &entry->object);
   }
-  m_tree[durability]->Fill();
+  tree.Fill();
 
   const bool writeError = m_file->TestBit(TFile::kWriteError);
   if (writeError) {
     //m_file deleted first so we have a chance of closing it (though that will probably fail)
+    const std::string filename = m_file->GetName();
     delete m_file;
-    B2FATAL("A write error occured while saving '" << m_file->GetName()  << "', please check if enough disk space is available.");
+    B2FATAL("A write error occured while saving '" << filename << "', please check if enough disk space is available.");
   }
 }

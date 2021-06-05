@@ -12,7 +12,7 @@
 
 #include <pxd/dataobjects/PXDErrorFlags.h>
 
-#include <boost/spirit/home/support/detail/endian.hpp>
+#include <boost/endian/arithmetic.hpp>
 
 
 ///*********************************************************************************
@@ -23,8 +23,8 @@ namespace Belle2 {
 
   namespace PXD {
 
-    using boost::spirit::endian::ubig16_t;
-    using boost::spirit::endian::ubig32_t;
+    using ubig16_t = boost::endian::big_uint16_t;
+    using ubig32_t = boost::endian::big_uint32_t;
     using Belle2::PXD::PXDError::PXDErrorFlags;
 
     /** DHC frame header word data struct.

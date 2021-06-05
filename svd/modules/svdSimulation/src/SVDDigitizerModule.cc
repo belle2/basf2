@@ -679,13 +679,7 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
 
 double SVDDigitizerModule::addNoise(double charge, double noise)
 {
-  if (charge < 0) {
-    //Noise digit, add noise to exceed Noise Threshold;
-    double p = gRandom->Uniform(m_noiseFraction, 1.0);
-    charge = TMath::NormQuantile(p) * noise;
-  } else {
-    charge += gRandom->Gaus(0., noise);
-  }
+  charge += gRandom->Gaus(0., noise);
   return charge;
 }
 

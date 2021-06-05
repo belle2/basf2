@@ -11,7 +11,7 @@ __authors__ = [
 
 
 import modularAnalysis as ma
-from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
+from skimExpertFunctions import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdPi
 from stdPhotons import stdPhotons
 from variables import variables as vm
@@ -29,7 +29,7 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
     __contact__ = "Xing-Yu Zhou <xing-yu.zhou@desy.de>"
     __category__ = "physics, low multiplicity"
 
-    TestFiles = [get_test_file("MC13_mumuBGx1")]
+    TestSampleProcess = "mumu"
 
     def __init__(self, prescale=1, **kwargs):
         """
@@ -127,7 +127,7 @@ class LowMassTwoTrack(BaseSkim):
     __contact__ = "Xing-Yu Zhou <xing-yu.zhou@desy.de>"
     __category__ = "physics, low multiplicity"
 
-    TestFiles = [get_test_file("MC13_mumuBGx1"), get_test_file("MC13_uubarBGx1")]
+    TestSampleProcess = "mumu"
     validation_sample = _VALIDATION_SAMPLE
 
     def build_lists(self, path):

@@ -1,4 +1,4 @@
-Error in <TFile::TFile>: file test1.root does not exist
+Error in <TFile::TFile>: file /test1.root does not exist
 Error in <TFile::ReadBuffer>: error reading all requested bytes from file test1.root, got 23 of 300
 Error in <TFile::Init>: test1.root failed to read the file type data.
-SysError in <TFile::TFile>: file nosuchdir/foo can not be opened (No such file or directory)
+SysError in <TFile::TFile>: file /nosuchdir/foo can not be opened No such file or directory

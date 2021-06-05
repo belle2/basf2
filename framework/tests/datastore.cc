@@ -186,7 +186,7 @@ namespace {
     EXPECT_FALSE(evtData == evtDataDifferentDurability);
 
     //different type
-    StoreArray<ProfileInfo> profileInfo;
+    StoreArray<ProfileInfo> profileInfo{};
     EXPECT_FALSE(profileInfo == evtData);
     EXPECT_TRUE(profileInfo != evtData);
     //note: EXPECT_NE/EQ do things I don't understand. this doesn't work:
@@ -245,7 +245,7 @@ namespace {
   }
   TEST_F(DataStoreTest, RawAccess)
   {
-    StoreArray<EventMetaData> evtData;
+    StoreArray<EventMetaData> evtData{};
     EXPECT_TRUE(evtData.getPtr() != nullptr);
   }
 
@@ -708,7 +708,7 @@ namespace {
     EXPECT_EQ(entry->name, relObjs2.getName());
 
     //test finding storeobjptr (not implemented, so nothing found)
-    StoreObjPtr<EventMetaData> evtPtr;
+    StoreObjPtr<EventMetaData> evtPtr{};
     entry = nullptr; index = -1;
     EXPECT_FALSE(DataStore::Instance().findStoreEntry(&(*evtPtr), entry, index));
     EXPECT_EQ(index, -1);

@@ -1,5 +1,5 @@
 log/
-*.json
+SkimStats.json
 *.txt
 *.yaml
 *.md

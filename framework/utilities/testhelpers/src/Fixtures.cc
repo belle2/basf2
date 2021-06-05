@@ -63,7 +63,6 @@ namespace Belle2::TestHelpers {
     ASSERT_FALSE(m_messages.empty()) << "No message available to check";
     const auto& msg = m_messages.back();
     for (const auto& var : msg.getLogVariables()) {
-      // cppcheck-suppress stlIfFind ; cppcheck apparently cannot cope with if with initializer yet
       if (auto it = variables.find(var.getName()); it != variables.end()) {
         EXPECT_EQ(it->second, var.getValue());
         variables.erase(it);

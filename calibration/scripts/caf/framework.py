@@ -1111,7 +1111,8 @@ class Algorithm():
         #: CalibrationAlgorithm instance (assumed to be true since the Calibration class checks)
         self.algorithm = algorithm
         #: The name of the algorithm, default is the Algorithm class name
-        self.name = algorithm.__cppname__[algorithm.__cppname__.rfind('::') + 2:]
+        cppname = type(algorithm).__cpp_name__
+        self.name = cppname[cppname.rfind('::') + 2:]
         #: Function called before the pre_algorithm method to setup the input data that the CalibrationAlgorithm uses.
         #: The list of files matching the `Calibration.output_patterns` from the collector output
         #: directories will be passed to it

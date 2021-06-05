@@ -36,35 +36,35 @@ bool TRGSummary::test() const
 
 bool TRGSummary::testInput(unsigned int bit) const
 {
-  if (bit > c_trgWordSize * c_ntrgWords) {
+  if (bit >= c_trgWordSize * c_ntrgWords) {
     B2ERROR("Requested input trigger bit number is out of range" << LogVar("bit", bit));
     throw std::out_of_range("The requested input trigger bit is out of range: " + std::to_string(bit));
   }
   int iWord = bit / c_trgWordSize;
   int iBit = bit % c_trgWordSize;
-  return (m_inputBits[iWord] & (1 << iBit)) != 0;
+  return (m_inputBits[iWord] & (1u << iBit)) != 0;
 }
 
 bool TRGSummary::testFtdl(unsigned int bit) const
 {
-  if (bit > c_trgWordSize * c_ntrgWords) {
+  if (bit >= c_trgWordSize * c_ntrgWords) {
     B2ERROR("Requested ftdl trigger bit number is out of range" << LogVar("bit", bit));
     throw std::out_of_range("The requested FTDL trigger bit is out of range: " + std::to_string(bit));
   }
   int iWord = bit / c_trgWordSize;
   int iBit = bit % c_trgWordSize;
-  return (m_ftdlBits[iWord] & (1 << iBit)) != 0;
+  return (m_ftdlBits[iWord] & (1u << iBit)) != 0;
 }
 
 bool TRGSummary::testPsnm(unsigned int bit) const
 {
-  if (bit > c_trgWordSize * c_ntrgWords) {
+  if (bit >= c_trgWordSize * c_ntrgWords) {
     B2ERROR("Requested psnm trigger bit number is out of range" << LogVar("bit", bit));
     throw std::out_of_range("The requested PSNM trigger bit is out of range: " + std::to_string(bit));
   }
   int iWord = bit / c_trgWordSize;
   int iBit = bit % c_trgWordSize;
-  return (m_psnmBits[iWord] & (1 << iBit)) != 0;
+  return (m_psnmBits[iWord] & (1u << iBit)) != 0;
 }
 
 unsigned int TRGSummary::getInputBitNumber(const std::string& name) const

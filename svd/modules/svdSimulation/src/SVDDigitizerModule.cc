@@ -581,10 +581,10 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   B2DEBUG(29, "  --> charge sharing simulation, # strips = " << strips.size());
   std::deque<double> readoutCharges;
   std::deque<int> readoutStrips;
+  VxdID currentSensorID = m_currentHit->getSensorID();
   for (std::size_t index = 3; index <  strips.size() - 3; index += 2) {
     B2DEBUG(29, "  index = " << index << ", strip = " << strips[index] << ", stripCharge = " << stripCharges[index]);
     int currentStrip = static_cast<int>(strips[index]);
-    VxdID currentSensorID = m_currentHit->getSensorID();
 
     double c0 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, "C0");
     double c1 = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, "C1");
@@ -652,12 +652,25 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   B2DEBUG(29, "currentTime = " << m_currentTime << " + 0.5 driftTime = " << 0.5 * driftTime << " = " << m_currentTime + 0.5 *
           driftTime);
 
+  double apvCoupling = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, "APVCoupling");
+
   double recoveredCharge = 0;
   for (std::size_t index = 0; index <  readoutStrips.size(); index ++) {
     // NB> To first approximation, we assign to the signal 1/2*driftTime.
     // This doesn't change the charge collection, only charge collection timing.
     digits[readoutStrips[index]].add(m_currentTime + 0.5 * driftTime, readoutCharges[index],
                                      m_shapingTime, m_currentParticle, m_currentTrueHit, w_betaprime);
+
+    // coupled signal left neighbour
+    if (index > 0)
+      digits[readoutStrips[index]].add(m_currentTime + 0.5 * driftTime, apvCoupling * readoutCharges[index - 1],
+                                       1, m_currentParticle, m_currentTrueHit, w_adjacent);
+
+    // coupled signal right neighbour
+    if (index < readoutStrips.size() - 1)
+      digits[readoutStrips[index]].add(m_currentTime + 0.5 * driftTime, apvCoupling * readoutCharges[index + 1],
+                                       1, m_currentParticle, m_currentTrueHit, w_adjacent);
+
     recoveredCharge += readoutCharges[index];
     B2DEBUG(29, "strip: " << readoutStrips[index] << " charge: " << readoutCharges[index]);
   }
@@ -666,13 +679,7 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
 
 double SVDDigitizerModule::addNoise(double charge, double noise)
 {
-  if (charge < 0) {
-    //Noise digit, add noise to exceed Noise Threshold;
-    double p = gRandom->Uniform(m_noiseFraction, 1.0);
-    charge = TMath::NormQuantile(p) * noise;
-  } else {
-    charge += gRandom->Gaus(0., noise);
-  }
+  charge += gRandom->Gaus(0., noise);
   return charge;
 }
 

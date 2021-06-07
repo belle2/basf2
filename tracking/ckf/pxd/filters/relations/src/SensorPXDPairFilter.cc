@@ -32,7 +32,7 @@ SensorPXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFT
   if (not fromStateCache.isHitState) {
     // We are coming from a SVD-CDC track, so we can use its position to only look for matching ladders
     // This is done with the sensorCenterPhi, using the state's phi (and/or theta) wouldn't be a SensorFilter anymore.
-    double phiDiff = fromStateCache.phi - toStateCache.sensorCenterPhi;
+    float phiDiff = fromStateCache.phi - toStateCache.sensorCenterPhi;
     while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
     while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
 
@@ -54,7 +54,7 @@ SensorPXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFT
   // Next layer and sensor is not an overlap one, so we can just return all hits of the next layer
   // that are close enough in phi. No cut in theta here since this is the SensorPXDPairFilter,
   // a cut in theta is used in the DistancePXDPairFilter
-  double phiDiff = fromStateCache.sensorCenterPhi - toStateCache.sensorCenterPhi;
+  float phiDiff = fromStateCache.sensorCenterPhi - toStateCache.sensorCenterPhi;
   while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
   while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
 

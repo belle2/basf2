@@ -2,9 +2,9 @@ Import('env')
 
 env['SUBLIB'] = True
 env['LIBS'] = ['framework',
-               '$ROOT_LIBS', 'EvtGen', 'pythia8', 'PhotosCxxInterface.a', 'HepMC',
+               '$ROOT_LIBS', 'EvtGen', 'pythia8', 'Photospp', 'HepMC',
                'TauolaCxxInterface', 'TauolaFortran',
-               'PhotosFortran', 'EvtGenExternal', 'Geom', 'CLHEP',
+               'EvtGenExternal', 'Geom', 'CLHEP',
                'mdst_dataobjects']
 
 Return('env')

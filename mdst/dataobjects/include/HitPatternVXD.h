@@ -182,7 +182,7 @@ namespace Belle2 {
     short getLastPXDLayer(const PXDMode& mode = PXDMode::normal) const;
 
     /** String for printing in python.*/
-    std::string __repr__() const;
+    std::string __str__() const;
 
   private:
     /** Storing of actual hit pattern.

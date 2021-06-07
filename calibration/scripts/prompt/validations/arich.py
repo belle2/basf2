@@ -12,7 +12,7 @@ from ROOT.Belle2 import ARICHCalibrationChecker
 import sys
 import subprocess
 import math
-
+import json
 
 #: Tells the automated system some details of this script
 settings = ValidationSettings(name='ARICH channel masks',

@@ -53,17 +53,6 @@ class ANSIColors(enum.Enum):
     If the output is not to a terminal color output will be disabled and nothing
     will be added to the output, for example when redirecting the output to a
     logfile.
-
-    .. sphinx bug, classes inheriting from enum don't show class methods:
-       https://github.com/sphinx-doc/sphinx/issues/6857. So until that is fixed
-       we need to add them manually here
-
-    .. automethod:: color
-    .. automethod:: convert_color
-    .. automethod:: fg
-    .. automethod:: bg
-    .. automethod:: reset
-    .. automethod:: supported
     """
     BLACK = 0
     RED = 1

@@ -123,9 +123,9 @@ The ``--json`` parameter can be used to get detailed output for all tests in a m
 ``b2file-merge``: Merge multiple basf2 output files
 ---------------------------------------------------
 
-This program merges files created by separate ``basf2`` jobs. It's similar to
-ROOT ``hadd`` but does correctly update the metadata in the file and merges the
-objects in the persistent tree correctly.
+This program merges files created by separate ``basf2`` jobs with the `RootOutput`
+module. It's similar to ROOT ``hadd`` but does correctly update the metadata
+in the file and merges the objects in the persistent tree correctly.
 
 This tool is intended to only merge output files from identical jobs which were
 just split into smaller ones for convenience. As such the following
@@ -136,6 +136,13 @@ restrictions apply:
   inheriting from Mergeable and the same list of objects needs to be present in
   all files.
 * The event tree needs to contain the same DataStore entries in all files.
+
+.. hint:: If you want to merge the output of `VariablesToNtuple`, please use
+    ``hadd``.
+
+.. seealso:: For a comparision between ``hadd``, ``b2file-merge`` and friends,
+    take a look at
+    `this questions.belle2 thread <https://questions.belle2.org/question/3945/>`_.
 
 ::
 

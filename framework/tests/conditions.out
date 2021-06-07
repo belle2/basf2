@@ -126,7 +126,7 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=2
 [ERROR] Conditions Database: Problem parsing payload information.
 	globaltag = localtest
 	server url = http://localhost:12701/
-	error = The requested URL returned error: 404 Not Found
+	error = The requested URL returned error: 404
 [ERROR] Conditions data: Problem with payload metadata, trying to fall back to next provider ...
 [FATAL] Conditions data: No more metadata providers available
 [INFO] Starting event processing, random seed is set to 'something important'
@@ -162,7 +162,7 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=2
 [ERROR] Conditions Database: Problem parsing payload information.
 	globaltag = localtest
 	server url = http://localhost:12702/
-	error = The requested URL returned error: 404 Not Found
+	error = The requested URL returned error: 404
 [ERROR] Conditions data: Problem with payload metadata, trying to fall back to next provider ...
 [FATAL] Conditions data: No more metadata providers available
 [INFO] >>> check exp 4: [{
@@ -241,11 +241,11 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=5&runNumber=0
 MockConditionsDB: "GET /dbstore_BeamParameters_rev_2.root HTTP/1.1" 404 -
 [ERROR] Conditions Database: failure downloading url
 	url = http://127.0.0.1:12701/dbstore_BeamParameters_rev_2.root
-	error = The requested URL returned error: 404 Not Found
+	error = The requested URL returned error: 404
 MockConditionsDB: "GET /dbstore_BeamParameters_rev_2.root HTTP/1.1" 404 -
 [ERROR] Conditions Database: failure downloading url
 	url = http://127.0.0.1:12701/dbstore_BeamParameters_rev_2.root
-	error = The requested URL returned error: 404 Not Found
+	error = The requested URL returned error: 404
 [ERROR] Conditions data: Could not find file for payload
 	name = BeamParameters
 	revision = 2
@@ -272,11 +272,11 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=5&runNumber=0
 MockConditionsDB: "GET /dbstore_BeamParameters_rev_2.root HTTP/1.1" 404 -
 [ERROR] Conditions Database: failure downloading url
 	url = http://127.0.0.1:12701/dbstore_BeamParameters_rev_2.root
-	error = The requested URL returned error: 404 Not Found
+	error = The requested URL returned error: 404
 MockConditionsDB: "GET /dbstore_BeamParameters_rev_2.root HTTP/1.1" 404 -
 [ERROR] Conditions Database: failure downloading url
 	url = http://127.0.0.1:12701/dbstore_BeamParameters_rev_2.root
-	error = The requested URL returned error: 404 Not Found
+	error = The requested URL returned error: 404
 [ERROR] Conditions data: Could not find file for payload
 	name = BeamParameters
 	revision = 2
@@ -319,7 +319,7 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=2
 [ERROR] Conditions Database: Problem parsing payload information.
 	globaltag = localtest
 	server url = http://localhost:12701/
-	error = The requested URL returned error: 404 Not Found
+	error = The requested URL returned error: 404
 [ERROR] Conditions data: Problem with payload metadata, trying to fall back to next provider ...
 [FATAL] Conditions data: No more metadata providers available
 [INFO] Starting event processing, random seed is set to 'something important'
@@ -355,7 +355,7 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=2
 [ERROR] Conditions Database: Problem parsing payload information.
 	globaltag = localtest
 	server url = http://localhost:12702/
-	error = The requested URL returned error: 404 Not Found
+	error = The requested URL returned error: 404
 [ERROR] Conditions data: Problem with payload metadata, trying to fall back to next provider ...
 [FATAL] Conditions data: No more metadata providers available
 [INFO] >>> check exp 7
@@ -370,7 +370,7 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=0
 [ERROR] Conditions Database: Problem parsing payload information.
 	globaltag = localtest
 	server url = http://localhost:12701/
-	error = The requested URL returned error: 404 Not Found
+	error = The requested URL returned error: 404
 [ERROR] Conditions data: Problem with payload metadata, trying to fall back to next provider ...
 [FATAL] Conditions data: No more metadata providers available
 [INFO] Starting event processing, random seed is set to 'something important'
@@ -387,7 +387,7 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=0
 [ERROR] Conditions Database: Problem parsing payload information.
 	globaltag = localtest
 	server url = http://localhost:12702/
-	error = The requested URL returned error: 404 Not Found
+	error = The requested URL returned error: 404
 [ERROR] Conditions data: Problem with payload metadata, trying to fall back to next provider ...
 [FATAL] Conditions data: No more metadata providers available
 [INFO] >>> check that a invalid global tag or a misspelled global tag actually throw errors
@@ -444,26 +444,26 @@ MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.1" 200 -
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0 HTTP/1.1" 503 -
 [WARNING] Could not download url, retrying ...
 	url = http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0
-	error = The requested URL returned error: 503 Service Unavailable
+	error = The requested URL returned error: 503
 	try = 1
 	waiting time = 1
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0 HTTP/1.1" 503 -
 [WARNING] Could not download url, retrying ...
 	url = http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0
-	error = The requested URL returned error: 503 Service Unavailable
+	error = The requested URL returned error: 503
 	try = 2
 	waiting time = 1.9732459927339243
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0 HTTP/1.1" 503 -
 [WARNING] Could not download url, retrying ...
 	url = http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0
-	error = The requested URL returned error: 503 Service Unavailable
+	error = The requested URL returned error: 503
 	try = 3
 	waiting time = 4.4257193624731359
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0 HTTP/1.1" 503 -
 [ERROR] Conditions Database: Problem parsing payload information.
 	globaltag = localtest
 	server url = http://localhost:12701/
-	error = The requested URL returned error: 503 Service Unavailable
+	error = The requested URL returned error: 503
 [ERROR] Conditions data: Problem with payload metadata, trying to fall back to next provider ...
 [FATAL] Conditions data: No more metadata providers available
 [INFO] >>> check again without retries
@@ -478,7 +478,7 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber
 [ERROR] Conditions Database: Problem parsing payload information.
 	globaltag = localtest
 	server url = http://localhost:12701/
-	error = The requested URL returned error: 503 Service Unavailable
+	error = The requested URL returned error: 503
 [ERROR] Conditions data: Problem with payload metadata, trying to fall back to next provider ...
 [FATAL] Conditions data: No more metadata providers available
 [INFO] >>> try to open localhost on port 0, this should always be refused

@@ -129,7 +129,7 @@ namespace Belle2 {
     /**
      * Return HTML Info of PID Likelihoods
      */
-    std::string getInfoHTML() const;
+    std::string getInfoHTML() const override;
 
   private:
 
@@ -147,7 +147,7 @@ namespace Belle2 {
                      Const::PIDDetectorSet detSet) const;
 
 
-    ClassDef(PIDLikelihood, 3); /**< Collect log likelihoods from TOP, ARICH, dEdx, ECL and KLM. */
+    ClassDefOverride(PIDLikelihood, 3); /**< Collect log likelihoods from TOP, ARICH, dEdx, ECL and KLM. */
 
   };
 

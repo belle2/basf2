@@ -185,7 +185,6 @@ namespace Belle2::Conditions {
 
   bool PayloadProvider::getTemporaryFile(const std::string& url, PayloadMetadata& metadata, bool silentOnMissing)
   {
-    // cppcheck-suppress stlIfFind ; cppcheck apparently cannot cope with if with initializer yet
     if (auto && it = m_temporaryFiles.find(metadata.checksum); it != m_temporaryFiles.end()) {
       metadata.filename = it->second->getName();
       return true;

@@ -35,7 +35,7 @@ namespace Belle2 {
       : m_aDBObjPtr(name)
     {
       m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
-        B2INFO("SVDOldDefaultErrorScaleFactors: from now on we are using " <<
+        B2DEBUG(20, "SVDOldDefaultErrorScaleFactors: from now on we are using " <<
         this->m_aDBObjPtr -> get_uniqueID()); });
     }
     /** Return the corrected cluster position error

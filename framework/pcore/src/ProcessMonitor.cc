@@ -34,17 +34,17 @@ void ProcessMonitor::subscribe(const std::string& pubSocketAddress, const std::s
     zmq::socket_t pubSocket(context, ZMQ_XPUB);
     // ATTENTION: this is switched on intention!
     pubSocket.bind(subSocketAddress);
-    pubSocket.setsockopt(ZMQ_LINGER, 0);
+    pubSocket.set(zmq::sockopt::linger, 0);
 
     zmq::socket_t subSocket(context, ZMQ_XSUB);
     // ATTENTION: this is switched on intention!
     subSocket.bind(pubSocketAddress);
-    subSocket.setsockopt(ZMQ_LINGER, 0);
+    subSocket.set(zmq::sockopt::linger, 0);
 
     zmq::socket_t controlSocket(context, ZMQ_SUB);
     controlSocket.bind(controlSocketAddress);
-    controlSocket.setsockopt(ZMQ_LINGER, 0);
-    controlSocket.setsockopt(ZMQ_SUBSCRIBE, "", 0);
+    controlSocket.set(zmq::sockopt::linger, 0);
+    controlSocket.set(zmq::sockopt::subscribe, "");
 
     B2DEBUG(10, "Will now start the proxy..");
     bool running = true;

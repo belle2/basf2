@@ -45,7 +45,7 @@ namespace Belle2 {
      * @param isU: sensor side, true for p side, false for n side
      * @param strip: NOT USED
      * @param size: cluster size
-     * @param raw_error : error provided by the algorithm in the SVDSimpleClusterizer
+     * @param raw_error : error provided by the algorithm in the SVDClusterizer
      *
      * Output: double corresponding to the corrected cluster position error [cm]
      */

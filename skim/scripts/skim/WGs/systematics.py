@@ -44,12 +44,7 @@ class SystematicsDstar(BaseSkim):
     TestSampleProcess = "ccbar"
 
     def build_lists(self, path):
-        lists = [
-            self.PiKFromDstarList(path),
-        ]
-
-        # Flatten the list of lists
-        self.SkimLists = [s for lst in lists for s in lst]
+        return self.PiKFromDstarList(path)
 
     def PiKFromDstarList(self, path):
         """Build PiKFromDstarList lists for systematics skims."""
@@ -94,13 +89,7 @@ class SystematicsTracking(BaseSkim):
         stdPi0s("eff40_May2020", path=path)
 
     def build_lists(self, path):
-        lists = [
-            self.BtoDStarPiList(path),
-            self.DstarToD0PiPartList(path)
-        ]
-
-        # Flatten the list of lists
-        self.SkimLists = [s for lst in lists for s in lst]
+        return self.BtoDStarPiList(path) + self.DstarToD0PiPartList(path)
 
     def BtoDStarPiList(self, path):
         """Build BtoDStarPiList lists for systematics skims."""
@@ -190,17 +179,14 @@ class Resonance(BaseSkim):
         stdPi0s("eff40_May2020Fit", path=path)
 
     def build_lists(self, path):
-        lists = [
-            self.getDsList(path),
-            self.getDstarList(path),
-            self.getSigmacList(path),
-            self.getmumugList(path),
-            self.getBZeroList(path),
-            self.getBPlusList(path),
-        ]
-
-        # Flatten the list of lists
-        self.SkimLists = [s for lst in lists for s in lst]
+        return (
+            self.getDsList(path)
+            + self.getDstarList(path)
+            + self.getSigmacList(path)
+            + self.getmumugList(path)
+            + self.getBZeroList(path)
+            + self.getBPlusList(path)
+        )
 
     def getDsList(self, path):
         """Build Ds list for systematics skims."""
@@ -376,7 +362,7 @@ class SystematicsRadMuMu(BaseSkim):
         # selection Id1:
         # todo: include pair conversions?
 
-        self.SkimLists = radmumulist
+        return radmumulist
 
 
 @fancy_skim_header
@@ -405,7 +391,7 @@ class SystematicsEELL(BaseSkim):
                             EELLSelection + " and " + eventCuts, path=path)
         eelllist.append("gamma:eell")
 
-        self.SkimLists = eelllist
+        return eelllist
 
 
 @fancy_skim_header
@@ -494,7 +480,7 @@ class SystematicsRadEE(BaseSkim):
         prescale_logic = "[%s]" % prescale_logic
         ma.applyCuts("vpho:radee", event_cuts + " and " + prescale_logic, path=path)
 
-        self.SkimLists = ["vpho:radee"]
+        return ["vpho:radee"]
 
 
 @fancy_skim_header
@@ -517,7 +503,7 @@ class SystematicsLambda(BaseSkim):
         ma.cutAndCopyList("Lambda0:syst0", "Lambda0:merged", "fsig>10 and daughtersPAsym>0.41", path=path)
         LambdaList.append("Lambda0:syst0")
 
-        self.SkimLists = LambdaList
+        return LambdaList
 
 
 @fancy_skim_header
@@ -562,7 +548,7 @@ class SystematicsPhiGamma(BaseSkim):
         ma.copyList('K_S0:PhiSystematics', 'K_S0:merged', writeOut=True, path=path)
 
         path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
-        self.SkimLists = ["gamma:PhiSystematics"]
+        return ["gamma:PhiSystematics"]
 
     def validation_histograms(self, path):
         stdKshorts(path=path)
@@ -633,7 +619,7 @@ class Random(BaseSkim):
             f"eventRandom <= {self.KeepPercentage/100}", path=path
         )
 
-        self.SkimLists = [f"pi+:{label}", f"gamma:{label}"]
+        return [f"pi+:{label}", f"gamma:{label}"]
 
 
 @fancy_skim_header
@@ -656,7 +642,7 @@ class SystematicsFourLeptonFromHLTFlag(BaseSkim):
             "SoftwareTriggerResult(software_trigger_cut&skim&accept_fourlep) == 1", path=path
         )
 
-        self.SkimLists = [f"pi+:{label}"]
+        return [f"pi+:{label}"]
 
 
 @fancy_skim_header
@@ -678,7 +664,7 @@ class SystematicsRadMuMuFromHLTFlag(BaseSkim):
         path = self.skim_event_cuts(
             "SoftwareTriggerResult(software_trigger_cut&skim&accept_radmumu) == 1", path=path
         )
-        self.SkimLists = [f"pi+:{label}"]
+        return [f"pi+:{label}"]
 
 
 @fancy_skim_header
@@ -700,7 +686,7 @@ class SystematicsJpsi(BaseSkim):
     ApplyHLTHadronCut = True
 
     def build_lists(self, path):
-        self.SkimLists = [
+        return [
             self.JpsimumuTagProbe(path),
             self.JpsieeTagProbe(path),
         ]
@@ -781,7 +767,7 @@ class SystematicsKshort(BaseSkim):
 
         ma.cutAndCopyList("K_S0:skim", "K_S0:merged", KS_cut, path=path)
         path = self.skim_event_cuts(f'eventRandom < {(1/self.prescale):.6f}', path=path)
-        self.SkimLists = ['K_S0:skim']
+        return ['K_S0:skim']
 
 
 @fancy_skim_header
@@ -826,7 +812,7 @@ class SystematicsBhabha(BaseSkim):
 
         ma.applyCuts("vpho:bhabha", event_cuts, path=path)
 
-        self.SkimLists = ["vpho:bhabha"]
+        return ["vpho:bhabha"]
 
 
 @fancy_skim_header

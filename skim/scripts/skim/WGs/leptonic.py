@@ -67,8 +67,7 @@ class LeptonicUntagged(BaseSkim):
         ma.reconstructDecay("B-:LeptonicUntagged_1 -> mu-:LeptonicUntagged", "", 2, path=path)
         ma.applyCuts("B-:LeptonicUntagged_0", "nTracks>=3", path=path)
         ma.applyCuts("B-:LeptonicUntagged_1", "nTracks>=3", path=path)
-        lepList = ["B-:LeptonicUntagged_0", "B-:LeptonicUntagged_1"]
-        self.SkimLists = lepList
+        return ["B-:LeptonicUntagged_0", "B-:LeptonicUntagged_1"]
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import
@@ -182,5 +181,4 @@ class dilepton(BaseSkim):
                      inputListNames=['Delta++:ee', 'Delta++:emu', 'Delta++:mumu'],
                      path=path)
 
-        dileptonList = ["Upsilon(4S):ll", "Delta++:ll"]
-        self.SkimLists = dileptonList
+        return ["Upsilon(4S):ll", "Delta++:ll"]

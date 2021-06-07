@@ -56,7 +56,11 @@ To write a new skim, please follow these steps:
 
 4. If any further setup is required, then override the ``additional_setup`` method.
 
-5. *[Mandatory]* Define all cuts by overriding ``build_lists``. Before the end of the ``build_lists`` method, the attribute ``SkimLists`` must be set to a list of skim list names.
+5. *[Mandatory]* Define all cuts by overriding ``build_lists``. This function is expected to return the list of particle lists reconstructed by the skim.
+
+   .. versionchanged:: release-06-00-00
+   
+      Previously, this function was expected to set the attribute `BaseSkim.SkimLists`. This is now handled internally by `BaseSkim`, and `BaseSkim.build_lists` is expected to return the list of particle list names.
 
 6. Skims can crash on the grid if the log files are too large. If any modules is producing too much output, then override the attribute ``NoisyModules`` as a list of such modules, and their output will be set to print only error-level messages.
 

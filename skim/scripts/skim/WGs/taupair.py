@@ -189,8 +189,7 @@ class TauLFV(BaseSkim):
             ma.reconstructDecay("tau+:LFV_bnv" + str(chID) + " -> " + channel, tauLFVCuts3, chID, path=path)
             tau_bnv_list.append("tau+:LFV_bnv" + str(chID))
 
-        tau_lfv_lists = tau_lgamma_list + tau_lll_list + tau_lP0_list + tau_lS0_list + tau_lV0_list + tau_lhh_list + tau_bnv_list
-        self.SkimLists = tau_lfv_lists
+        return tau_lgamma_list + tau_lll_list + tau_lP0_list + tau_lS0_list + tau_lV0_list + tau_lhh_list + tau_bnv_list
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import
@@ -328,9 +327,7 @@ class TauGeneric(BaseSkim):
                      '[[ nTracksS2 == 1 or nTracksS2 == 3 ] and invMS2 < 1.8 and invMS1 < 2.3 ]', path=path)
 
         # For skimming, the important thing is if the final particleList is empty or not.
-        eventParticle = ['tau+:g2', 'tau+:g34', 'tau+:g56']
-
-        self.SkimLists = eventParticle
+        return ['tau+:g2', 'tau+:g34', 'tau+:g56']
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import
@@ -441,7 +438,7 @@ class TauThrust(BaseSkim):
         # cut6 thrust upper cut for 1x1 topology
         ma.applyCuts("tau+:thrust", "thrust < 0.99 or nGoodTracksThrust!=2", path=path)
 
-        self.SkimLists = eventParticle
+        return eventParticle
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import

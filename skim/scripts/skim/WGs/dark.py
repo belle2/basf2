@@ -84,7 +84,7 @@ class SinglePhotonDark(BaseSkim):
         # to the list (which is anyway a maximum one candidate per event) since
         # we can only call skim_event_cuts once
         ma.applyCuts("gamma:singlePhoton", veto_additional_in_time_cluster, path=path)
-        self.SkimLists = ["gamma:singlePhoton"]
+        return ["gamma:singlePhoton"]
 
 
 @fancy_skim_header
@@ -157,7 +157,7 @@ class ALP3Gamma(BaseSkim):
             print(mode)
             ma.reconstructDecay(mode, beamcuts, chID, path=path)
             beamList.append("beam:" + str(chID))
-        self.SkimLists = beamList
+        return beamList
 
 
 @fancy_skim_header
@@ -195,7 +195,7 @@ class DimuonPlusMissingEnergy(BaseSkim):
 
         # And return the dimuon list
         dimuon_list.append(dimuon_name)
-        self.SkimLists = dimuon_list
+        return dimuon_list
 
 
 @fancy_skim_header
@@ -239,7 +239,7 @@ class ElectronMuonPlusMissingEnergy(BaseSkim):
 
         # And return the dimuon list
         emu_list.append(emu_name)
-        self.SkimLists = emu_list
+        return emu_list
 
 
 @fancy_skim_header
@@ -287,7 +287,7 @@ class LFVZpVisible(BaseSkim):
 
         lfvzp_list.append("vpho:2tr_vislfvzp")
 
-        self.SkimLists = lfvzp_list
+        return lfvzp_list
 
 
 @fancy_skim_header
@@ -338,7 +338,7 @@ class EGammaControlDark(BaseSkim):
         ma.reconstructDecay(
             f'vpho:{skim_output_label} -> e+:{internal_skim_label} gamma:{internal_skim_label}',
             '', 1, allowChargeViolation=True, path=path)
-        self.SkimLists = [f"vpho:{skim_output_label}"]
+        return [f"vpho:{skim_output_label}"]
 
 
 @fancy_skim_header
@@ -436,7 +436,7 @@ class GammaGammaControlKLMDark(BaseSkim):
         ma.reconstructDecay(
             "vpho:singlePhotonControlKLM -> gamma:controlKLM gamma:controlKLM",
             cuts, path=path)
-        self.SkimLists = ["vpho:singlePhotonControlKLM"]
+        return ["vpho:singlePhotonControlKLM"]
 
 
 @fancy_skim_header
@@ -483,7 +483,7 @@ class DielectronPlusMissingEnergy(BaseSkim):
 
         # And return the dielectron list
         dielectron_list.append(dielectron_name)
-        self.SkimLists = dielectron_list
+        return dielectron_list
 
 
 @fancy_skim_header
@@ -530,7 +530,7 @@ class RadBhabhaV0Control(BaseSkim):
 
         path = self.skim_event_cuts(eventCuts, path=path)
 
-        self.SkimLists = ["vpho:Total"]
+        return ["vpho:Total"]
 
 
 @fancy_skim_header
@@ -576,4 +576,4 @@ class InelasticDarkMatter(BaseSkim):
 
         path = self.skim_event_cuts(idmEventCuts, path=path)
 
-        self.SkimLists = ['gamma:ISR']
+        return ['gamma:ISR']

@@ -324,7 +324,7 @@ class feiHadronicB0(BaseFEISkim):
         ma.applyCuts("B0:generic", "abs(deltaE)<0.200", path=path)
         ma.applyCuts("B0:generic", "sigProb>0.001 or extraInfo(dmID)==23", path=path)
 
-        self.SkimLists = ["B0:generic"]
+        return ["B0:generic"]
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import
@@ -404,7 +404,7 @@ class feiHadronicBplus(BaseFEISkim):
         ma.applyCuts("B+:generic", "abs(deltaE)<0.200", path=path)
         ma.applyCuts("B+:generic", "sigProb>0.001 or extraInfo(dmID)==25", path=path)
 
-        self.SkimLists = ["B+:generic"]
+        return ["B+:generic"]
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import
@@ -487,7 +487,7 @@ class feiSLB0(BaseFEISkim):
         ma.applyCuts("B0:semileptonic", "-4.0<cosThetaBY<3.0", path=path)
         ma.applyCuts("B0:semileptonic", "p_lepton_CMSframe>1.0", path=path)
 
-        self.SkimLists = ["B0:semileptonic"]
+        return ["B0:semileptonic"]
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import
@@ -565,7 +565,7 @@ class feiSLBplus(BaseFEISkim):
         ma.applyCuts("B+:semileptonic", "-4.0<cosThetaBY<3.0", path=path)
         ma.applyCuts("B+:semileptonic", "p_lepton_CMSframe>1.0", path=path)
 
-        self.SkimLists = ["B+:semileptonic"]
+        return ["B+:semileptonic"]
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import
@@ -651,7 +651,7 @@ class feiHadronic(BaseFEISkim):
         ma.applyCuts("B+:feiHadronic", "sigProb>0.001 or extraInfo(dmID)==25", path=path)
         ma.applyCuts("B0:feiHadronic", "sigProb>0.001 or extraInfo(dmID)==23", path=path)
 
-        self.SkimLists = HadronicBLists
+        return HadronicBLists
 
 
 @_FEI_skim_header(["B0", "B+"])
@@ -695,4 +695,4 @@ class feiSL(BaseFEISkim):
             for cut in Bcuts:
                 ma.applyCuts(BList, cut, path=path)
 
-        self.SkimLists = SLBLists
+        return SLBLists

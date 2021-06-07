@@ -83,7 +83,7 @@ class BtoD0h_Kspi0(BaseSkim):
             ma.reconstructDecay("B+:BtoD0h_Kspi0" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
             BsigList.append("B+:BtoD0h_Kspi0" + str(chID))
 
-        self.SkimLists = BsigList
+        return BsigList
 
     def validation_histograms(self, path):
         loadStdSkimPi0(path=path)
@@ -152,7 +152,7 @@ class BtoD0h_Kspipipi0(BaseSkim):
             ma.reconstructDecay("B+:BtoD0h_Kspipipi0" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
             BsigList.append("B+:BtoD0h_Kspipipi0" + str(chID))
 
-        self.SkimLists = BsigList
+        return BsigList
 
     def validation_histograms(self, path):
         stdPi('all', path=path)
@@ -209,7 +209,7 @@ class B0toDpi_Kpipi(BaseSkim):
         Bcuts = "5.2 < Mbc and abs(deltaE) < 0.3"
         ma.reconstructDecay("B0:Dpi_Kpipi -> D-:Kpipi pi+:GoodTrack", Bcuts, 0, path=path)
 
-        self.SkimLists = ["B0:Dpi_Kpipi"]
+        return ["B0:Dpi_Kpipi"]
 
 
 @fancy_skim_header
@@ -248,7 +248,7 @@ class B0toDpi_Kspi(BaseSkim):
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
         ma.reconstructDecay("B0:B0toDpi_Kspi -> D-:Kspi pi+:GoodTrack", Bcuts, 1, path=path)
 
-        self.SkimLists = ["B0:B0toDpi_Kspi"]
+        return ["B0:B0toDpi_Kspi"]
 
 
 @fancy_skim_header
@@ -286,7 +286,7 @@ class B0toDstarPi_D0pi_Kpi(BaseSkim):
         Bcuts = "5.2 < Mbc and abs(deltaE) < 0.3"
         ma.reconstructDecay("B0:Dstarpi_Kpi -> D*-:D0_Kpi pi+:GoodTrack", Bcuts, 0, path=path)
 
-        self.SkimLists = ["B0:Dstarpi_Kpi"]
+        return ["B0:Dstarpi_Kpi"]
 
 
 @fancy_skim_header
@@ -332,7 +332,7 @@ class B0toDstarPi_D0pi_Kpipipi_Kpipi0(BaseSkim):
             ma.reconstructDecay("B0:Dstarpi_Kpipipi_Kpipi0" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
             BsigList.append("B0:Dstarpi_Kpipipi_Kpipi0" + str(chID))
 
-        self.SkimLists = BsigList
+        return BsigList
 
 
 @fancy_skim_header
@@ -373,7 +373,7 @@ class B0toDrho_Kpipi(BaseSkim):
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
         ma.reconstructDecay("B0:B0toDrho_Kpipi -> D-:Kpipi rho+:all", Bcuts, 1, path=path)
 
-        self.SkimLists = ["B0:B0toDrho_Kpipi"]
+        return ["B0:B0toDrho_Kpipi"]
 
 
 @fancy_skim_header
@@ -417,7 +417,7 @@ class B0toDrho_Kspi(BaseSkim):
 
         ma.reconstructDecay("B0:B0toDrho_Kspi -> D-:Kspi rho+:all", Bcuts, 1, path=path)
 
-        self.SkimLists = ["B0:B0toDrho_Kspi"]
+        return ["B0:B0toDrho_Kspi"]
 
 
 @fancy_skim_header
@@ -462,7 +462,7 @@ class B0toDstarRho_D0pi_Kpi(BaseSkim):
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
         ma.reconstructDecay("B0:BtoDstarRho_D0pi_Kpi -> D*-:D0_Kpi rho+:all", Bcuts, 1, path=path)
 
-        self.SkimLists = ["B0:BtoDstarRho_D0pi_Kpi"]
+        return ["B0:BtoDstarRho_D0pi_Kpi"]
 
 
 @fancy_skim_header
@@ -520,7 +520,7 @@ class B0toDstarRho_D0pi_Kpipipi_Kpipi0(BaseSkim):
             ma.reconstructDecay("B+:B0toDstarRho" + str(chID) + " -> " + channel, Bcuts, chID, path=path, allowChargeViolation=True)
             BsigList.append("B+:B0toDstarRho" + str(chID))
 
-        self.SkimLists = BsigList
+        return BsigList
 
 
 @fancy_skim_header
@@ -575,7 +575,7 @@ class BtoD0h_hh(BaseSkim):
             ma.reconstructDecay("B+:BtoD0h_hh" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
             BsigList.append("B+:BtoD0h_hh" + str(chID))
 
-        self.SkimLists = BsigList
+        return BsigList
 
     def validation_histograms(self, path):
         stdPi('all', path=path)
@@ -640,7 +640,7 @@ class BtoD0h_Kpi(BaseSkim):
             ma.reconstructDecay("B+:BtoD0h_Kpi" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
             BsigList.append("B+:BtoD0h_Kpi" + str(chID))
 
-        self.SkimLists = BsigList
+        return BsigList
 
 
 @fancy_skim_header
@@ -706,7 +706,7 @@ class BtoD0h_Kpipipi_Kpipi0(BaseSkim):
         ma.rankByHighest(particleList="B+:BtoD0h_merged", variable="cos(mdstIndex)", numBest=3,
                          outputVariable="cosMdstIndex_rank", path=path)
 
-        self.SkimLists = ["B+:BtoD0h_merged"]
+        return ["B+:BtoD0h_merged"]
 
 
 @fancy_skim_header
@@ -759,7 +759,7 @@ class BtoD0h_Kshh(BaseSkim):
             ma.reconstructDecay("B+:BtoD0h_Kshh" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
             BsigList.append("B+:BtoD0h_Kshh" + str(chID))
 
-        self.SkimLists = BsigList
+        return BsigList
 
     def validation_histograms(self, path):
         stdPi('all', path=path)
@@ -829,7 +829,7 @@ class BtoD0rho_Kpi(BaseSkim):
             ma.reconstructDecay("B+:BtoD0rho_Kpi" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
             BsigList.append("B+:BtoD0rho_Kpi" + str(chID))
 
-        self.SkimLists = BsigList
+        return BsigList
 
 
 @fancy_skim_header
@@ -900,7 +900,7 @@ class BtoD0rho_Kpipipi_Kpipi0(BaseSkim):
         ma.rankByHighest(particleList="B+:BtoD0rho_merged", variable="cos(mdstIndex)", numBest=3,
                          outputVariable="cosMdstIndex_rank", path=path)
 
-        self.SkimLists = ["B+:BtoD0rho_merged"]
+        return ["B+:BtoD0rho_merged"]
 
 
 @fancy_skim_header
@@ -953,7 +953,7 @@ class B0toDD_Kpipi_Kspi(BaseSkim):
             ma.reconstructDecay("B0:B0toDD" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
             BsigList.append("B0:B0toDD" + str(chID))
 
-        self.SkimLists = BsigList
+        return BsigList
 
 
 @fancy_skim_header
@@ -1008,4 +1008,4 @@ class B0toDstarD(BaseSkim):
             ma.reconstructDecay("B0:B0toDstarD" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
             BsigList.append("B0:B0toDstarD" + str(chID))
 
-        self.SkimLists = BsigList
+        return BsigList

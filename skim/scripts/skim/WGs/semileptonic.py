@@ -120,7 +120,7 @@ class PRsemileptonicUntagged(BaseSkim):
         ma.reconstructDecay("B0:PRSemileptonic_4 ->  pi-:PRSemileptonic_2 mu+:PRSemileptonic_2",
                             "useCMSFrame(cos(daughterAngle(0,1)))<1.00", 4, path=path)
 
-        self.SkimLists = ["B0:PRSemileptonic_1", "B0:PRSemileptonic_2"]
+        return ["B0:PRSemileptonic_1", "B0:PRSemileptonic_2"]
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import
@@ -233,7 +233,7 @@ class SLUntagged(BaseSkim):
             ma.applyCuts(f"B0:SLUntagged_{chID}", "nTracks>4", path=path)
             b0List.append(f"B0:SLUntagged_{chID}")
 
-        self.SkimLists = b0List + bplusList
+        return b0List + bplusList
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import
@@ -353,4 +353,4 @@ class B0toDstarl_Kpi_Kpipi0_Kpipipi(BaseSkim):
             ma.reconstructDecay("B0:Dstl_kpi_kpipi0_kpipipi" + str(chID) + " -> " + channel, "", chID, path=path)
             B0_list.append("B0:Dstl_kpi_kpipi0_kpipipi" + str(chID))
 
-        self.SkimLists = B0_list
+        return B0_list

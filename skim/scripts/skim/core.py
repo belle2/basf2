@@ -153,11 +153,17 @@ class BaseSkim(ABC):
     @abstractmethod
     def build_lists(self, path):
         """Create the skim lists to be saved in the output uDST. This function is where
-        the main skim cuts should be applied. At the end of this method, the attribute
-        ``SkimLists`` must be set so it can be used by `BaseSkim.output_udst`.
+        the main skim cuts should be applied. This function should return a list of
+        particle list names.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
+
+        .. versionchanged:: release-06-00-00
+
+           Previously, this function was expected to set the attribute
+           `BaseSkim.SkimLists`. Now this is handled by `BaseSkim`, and this function is
+           expected to return the list of particle list names.
         """
 
     def validation_histograms(self, path):
@@ -183,7 +189,7 @@ class BaseSkim(ABC):
         # At this point, BaseSkim.skim_event_cuts may have been run, so pass
         # self._ConditionalPath for the path if it is not None (otherwise just pass the
         # regular path)
-        self.build_lists(self._ConditionalPath or path)
+        self.SkimLists = self.build_lists(self._ConditionalPath or path)
         self.apply_hlt_hadron_cut_if_required(self._ConditionalPath or path)
 
         self.update_skim_flag(self._ConditionalPath or path)
@@ -321,20 +327,6 @@ class BaseSkim(ABC):
             to exist for all events on the main path.
         """
         path.add_module(UpdateSkimFlag(self))
-
-    def get_skim_list_names(self):
-        """
-        Get the list of skim particle list names, without creating the particle lists on
-        the current path.
-        """
-        DummyPath = b2.Path()
-
-        OriginalSkimListsValue = self.SkimLists
-        self.build_lists(DummyPath)
-        SkimLists = self.SkimLists
-        self.SkimLists = OriginalSkimListsValue
-
-        return SkimLists
 
     def _method_unchanged(self, method):
         """Check if the method of the class is the same as in its parent class, or if it has
@@ -586,7 +578,7 @@ class CombinedSkim(BaseSkim):
             path (basf2.Path): Skim path to be processed.
         """
         for skim in self:
-            skim.build_lists(skim._ConditionalPath or path)
+            skim.SkimLists = skim.build_lists(skim._ConditionalPath or path)
 
     def output_udst(self, path):
         """Run the `BaseSkim.output_udst` function of each skim.

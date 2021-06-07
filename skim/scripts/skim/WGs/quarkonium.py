@@ -76,7 +76,7 @@ class BottomoniumEtabExclusive(BaseSkim):
             ma.reconstructDecay("eta_b:all" + str(chID) + " -> " + channel, Etabcuts, chID, path=path)
             EtabList.append("eta_b:all" + str(chID))
 
-        self.SkimLists = EtabList
+        return EtabList
 
 
 @fancy_skim_header
@@ -145,7 +145,7 @@ class BottomoniumUpsilon(BaseSkim):
             UpsilonList.append("junction:all" + str(chID))
 
         # reture the list
-        self.SkimLists = UpsilonList
+        return UpsilonList
 
     #       *two* sets of validation scripts defined.
 
@@ -214,10 +214,10 @@ class CharmoniumPsi(BaseSkim):
                             psi2s_mass_cut, path=path)
 
         # Return the lists.
-        self.SkimLists = ['J/psi:ee', 'psi(2S):ee',
-                          'J/psi:eebrems', 'psi(2S):eebrems',
-                          'J/psi:eebrems2', 'psi(2S):eebrems2',
-                          'J/psi:mumu', 'psi(2S):mumu']
+        return ['J/psi:ee', 'psi(2S):ee',
+                'J/psi:eebrems', 'psi(2S):eebrems',
+                'J/psi:eebrems2', 'psi(2S):eebrems2',
+                'J/psi:mumu', 'psi(2S):mumu']
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import
@@ -284,4 +284,4 @@ class InclusiveLambda(BaseSkim):
         ma.applyCuts("Lambda0:merged", "protonID_proton > 0.1", path=path)
 
         # Return the lists.
-        self.SkimLists = ["Lambda0:merged"]
+        return ["Lambda0:merged"]

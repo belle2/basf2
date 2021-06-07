@@ -41,19 +41,19 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
   // cppcheck-suppress knownConditionTrueFalse
   const double phi0 = 0, dphi = sec ? M_PI / 16 : 2 * M_PI;
 
-  const bool b_inner_support_ring = 1;
-  const bool b_outer_support_ring = 1;
-  const bool b_support_wall = 1;
-  const bool b_ribs = 1;
-  const bool b_septum_wall = 1;
-  const bool b_crystals = 1;
-  const bool b_preamplifier = 1;
-  const bool b_support_leg = 1;
-  const bool b_support_structure_13 = 1;
-  const bool b_support_structure_15 = 1;
-  bool b_connectors = 1;
-  bool b_boards = 1;
-  const bool b_cover = 1;
+  const bool b_inner_support_ring = true;
+  const bool b_outer_support_ring = true;
+  const bool b_support_wall = true;
+  const bool b_ribs = true;
+  const bool b_septum_wall = true;
+  const bool b_crystals = true;
+  const bool b_preamplifier = true;
+  const bool b_support_leg = true;
+  const bool b_support_structure_13 = true;
+  const bool b_support_structure_15 = true;
+  bool b_connectors = true;
+  bool b_boards = true;
+  const bool b_cover = true;
 
   b_connectors &= b_support_structure_15;
   b_boards &= b_support_structure_15;
@@ -356,7 +356,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     support_leg->AddPlacedVolume(l6, t6);
 
     for (int i = 0; i < 8; i++) {
-      G4Transform3D tp =  G4Translate3D(0, 0, 1960) * G4RotateZ3D(-M_PI / 2 + M_PI / 8 + i * M_PI / 4) *
+      G4Transform3D tp =  gTrans * G4RotateZ3D(-M_PI / 2 + M_PI / 8 + i * M_PI / 4) *
                           G4Translate3D(0, 1415 - 165 + 420. / 2, ZT + (97. + 160.) / 2) * G4Translate3D(0, -420. / 2, -(97. + 160.) / 2);
       support_leg->MakeImprint(top, tp, 0, overlap);
     }
@@ -1042,8 +1042,9 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     lsolid8->SetVisAttributes(att("alum"));
     for (int i = 0; i < 8; i++) {
       G4Transform3D tc = gTrans * G4Translate3D(0, 0, 3 + 434 + 0.5) * G4RotateZ3D(M_PI / 8 + i * M_PI / 4);
-      new G4PVPlacement(tc * G4RotateZ3D(M_PI / 16), lsolid8, suf("cover", 0 + 2 * i), top, false, 0 + 2 * i, overlap);
-      G4ReflectionFactory::Instance()->Place(tc * G4RotateZ3D(-M_PI / 16)*G4ReflectY3D(), suf("cover", 0 + 2 * i), lsolid8, top, false,
+      new G4PVPlacement(tc * G4RotateZ3D(M_PI / 16), lsolid8, suf("ECL_Forward_cover", 0 + 2 * i), top, false, 0 + 2 * i, overlap);
+      G4ReflectionFactory::Instance()->Place(tc * G4RotateZ3D(-M_PI / 16)*G4ReflectY3D(), suf("ECL_Forward_cover", 0 + 2 * i), lsolid8,
+                                             top, false,
                                              1 + 2 * i, overlap);
     }
   }

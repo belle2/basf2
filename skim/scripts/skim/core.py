@@ -168,28 +168,12 @@ class BaseSkim(ABC):
         """
 
     # Everything beyond this point can remain as-is when defining a skim
-    def __call__(self, path, *, udstOutput=None, validation=None):
+    def __call__(self, path):
         """Produce the skim particle lists and write uDST file.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
-            udstOutput (bool): [DEPRECATED ARGUMENT] If True, add uDST output to the path.
-            validation (bool): [DEPRECATED ARGUMENT] If True, build lists and write
-                validation histograms instead of writing uDSTs.
         """
-        # Deprecation warning. All configuration should be done during initialisation.
-        warning = (
-            "Passing the `{arg}` argument to `BaseSkim.__call__` is deprecated. "
-            "Please pass all configuration parameters to the initialisation of "
-            "the skim object."
-        )
-        if udstOutput is not None:
-            b2.B2WARNING(warning.format(arg="udstOutput"))
-            self._udstOutput = udstOutput
-        if validation is not None:
-            b2.B2WARNING(warning.format(arg="validation"))
-            self._validation = validation
-
         self._MainPath = path
 
         self.set_skim_logging(path)

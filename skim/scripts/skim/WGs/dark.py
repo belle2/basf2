@@ -16,7 +16,7 @@ __authors__ = [
 import basf2 as b2
 import modularAnalysis as ma
 import pdg
-from skimExpertFunctions import BaseSkim, fancy_skim_header
+from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdMu
 from stdPhotons import stdPhotons
 import vertex as vertex
@@ -355,7 +355,7 @@ class GammaGammaControlKLMDark(BaseSkim):
     .. Tip::
         To prescale the higher-energy probe photons by 10%:
 
-        >>> from skim.dark import GammaGammaControlKLMDark
+        >>> from skim.WGs.dark import GammaGammaControlKLMDark
         >>> Skim = GammaGammaControlKLMDark(prescale_high=10)
         >>> Skim(path)  # Add list-building function and uDST output module to path
         >>> b2.process(path)

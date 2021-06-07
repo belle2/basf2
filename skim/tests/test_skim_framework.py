@@ -14,7 +14,7 @@ import unittest
 
 from basf2 import find_file
 from skim.registry import Registry
-from skimExpertFunctions import BaseSkim
+from skim import BaseSkim
 
 __authors__ = ["Sam Cunliffe", "Phil Grace"]
 
@@ -103,14 +103,14 @@ class TestSkimRegistry(unittest.TestCase):
         in the modules.
         """
         for ModuleName in Registry.modules:
-            SkimModule = import_module(f"skim.{ModuleName}")
+            SkimModule = import_module(f"skim.WGs.{ModuleName}")
             for SkimName in Registry.get_skims_in_module(ModuleName):
                 # Check the skim is defined in the module
                 self.assertIn(
                     SkimName,
                     SkimModule.__dict__.keys(),
                     (
-                        f"Registry lists {SkimName} as existing in skim.{ModuleName}, "
+                        f"Registry lists {SkimName} as existing in skim.WGs.{ModuleName}, "
                         "but no such skim found!"
                     ),
                 )
@@ -130,7 +130,7 @@ class TestSkimRegistry(unittest.TestCase):
         incorrect skim information in the registry.
         """
         for ModuleName in self.ExistentModules:
-            SkimModule = import_module(f"skim.{ModuleName}")
+            SkimModule = import_module(f"skim.WGs.{ModuleName}")
 
             # Inspect the module, and find all BaseSkim subclasses
             SkimNames = [

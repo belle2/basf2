@@ -38,7 +38,7 @@ To write a new skim, please follow these steps:
 
    This header will appear as a "Note" block at the top of your skim class on Sphinx, and will also appear at the top of the help function in an interactive Python session:
 
-       >>> from skim.foo import MySkim
+       >>> from skim.WGs.foo import MySkim
        >>> help(MySkim)
 
    .. tip::
@@ -119,7 +119,7 @@ Calling an instance of a skim class will run the particle list loaders, setup fu
 
     import basf2 as b2
     import modularAnalysis as ma
-    from skim.foo import MySkim
+    from skim.WGs.foo import MySkim
 
     path = b2.Path()
     ma.inputMdstList("default", [], path=path)

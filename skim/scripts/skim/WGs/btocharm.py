@@ -31,7 +31,7 @@ from skim.standardlists.charm import (loadD0_hh_loose, loadD0_Kshh_loose,
                                       loadStdDstarPlus_Dpi0_Kpipi)
 from skim.standardlists.lightmesons import (loadStdAllRhoPlus,
                                             loadStdPi0ForBToHadrons)
-from skimExpertFunctions import BaseSkim, fancy_skim_header
+from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdK, stdPi
 from stdPi0s import loadStdSkimPi0, stdPi0s
 from stdV0s import stdKshorts

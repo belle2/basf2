@@ -13,7 +13,7 @@ import argparse
 import jinja2
 
 from basf2 import find_file
-from skimExpertFunctions import resolve_skim_modules
+from skim.utils.misc import resolve_skim_modules
 from skim.registry import Registry
 
 

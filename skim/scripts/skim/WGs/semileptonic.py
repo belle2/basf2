@@ -19,7 +19,7 @@ from skim.standardlists.charm import (loadKForBtoHadrons, loadPiForBtoHadrons,
                                       loadSkimHighEffD0_Kpipipi, loadSkimHighEffDstarPlus_D0pi_Kpipipi,
                                       loadStdD0_eff20_Kpipi0, loadStdDstarPlus_D0pi_Kpipi0_eff20)
 from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons
-from skimExpertFunctions import BaseSkim, fancy_skim_header
+from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s

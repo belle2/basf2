@@ -15,7 +15,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.semileptonic import SLUntagged
+from skim.WGs.semileptonic import SLUntagged
 
 path = b2.Path()
 skim = SLUntagged(validation=True, udstOutput=False)

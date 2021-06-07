@@ -13,7 +13,7 @@ __authors__ = [
 import basf2 as b2
 import modularAnalysis as ma
 import vertex
-from skimExpertFunctions import BaseSkim, CombinedSkim, fancy_skim_header
+from skim import BaseSkim, CombinedSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
@@ -894,6 +894,6 @@ class SystematicsCombinedLowMulti(CombinedSkim):
         kwargs.update(mdstOutput=mdstOutput, CombinedSkimName=self.__name__)
         kwargs.setdefault('udstOutput', False)
 
-        from skim.taupair import TauThrust
+        from skim.WGs.taupair import TauThrust
         skims_list = [SystematicsFourLeptonFromHLTFlag(), SystematicsRadMuMuFromHLTFlag(), SystematicsBhabha(), TauThrust()]
         super().__init__(*skims_list, **kwargs)

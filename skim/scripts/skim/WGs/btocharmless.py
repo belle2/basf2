@@ -10,7 +10,7 @@ __authors__ = [
 ]
 
 import modularAnalysis as ma
-from skimExpertFunctions import BaseSkim, fancy_skim_header
+from skim import BaseSkim, fancy_skim_header
 from stdV0s import stdKshorts
 from skim.standardlists.charmless import (
     loadStdVeryLooseTracks,

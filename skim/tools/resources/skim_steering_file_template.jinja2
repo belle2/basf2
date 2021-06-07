@@ -9,10 +9,10 @@
 import basf2 as b2
 import modularAnalysis as ma
 {% if skims|length > 1 -%}
-from skimExpertFunctions import CombinedSkim
+from skim import CombinedSkim
 {% endif -%}
 {% for module, ModuleSkims in modules.items() -%}
-    from {{ module }} import {{ ", ".join(ModuleSkims) }}
+    from skim.WGs.{{ module }} import {{ ", ".join(ModuleSkims) }}
 {% endfor %}
 path = b2.Path()
 {% if skims|length == 1 and not mdstOutput -%}

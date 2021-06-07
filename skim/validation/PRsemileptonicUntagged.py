@@ -15,7 +15,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.semileptonic import PRsemileptonicUntagged
+from skim.WGs.semileptonic import PRsemileptonicUntagged
 
 path = b2.Path()
 skim = PRsemileptonicUntagged(validation=True, udstOutput=False)

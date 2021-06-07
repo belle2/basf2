@@ -16,7 +16,8 @@ from functools import lru_cache, wraps
 import basf2 as b2
 import fei
 import modularAnalysis as ma
-from skimExpertFunctions import BaseSkim, _sphinxify_decay, fancy_skim_header
+from skim import BaseSkim, fancy_skim_header
+from skim.utils.misc import _sphinxify_decay
 from variables import variables as vm
 
 __liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"

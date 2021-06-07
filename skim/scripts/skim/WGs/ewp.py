@@ -14,7 +14,7 @@ __authors__ = [
 
 import basf2 as b2
 import modularAnalysis as ma
-from skimExpertFunctions import BaseSkim, fancy_skim_header
+from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons
 from variables import variables as vm

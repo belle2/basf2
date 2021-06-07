@@ -10,7 +10,7 @@ __authors__ = [
 import modularAnalysis as ma
 from skim.standardlists.lightmesons import (loadStdAllF_0, loadStdAllKstar0,
                                             loadStdAllPhi, loadStdAllRho0)
-from skimExpertFunctions import BaseSkim, fancy_skim_header
+from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
 from variables import variables as vm

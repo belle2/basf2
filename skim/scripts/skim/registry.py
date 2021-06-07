@@ -265,7 +265,7 @@ class SkimRegistryClass:
             The class constructor for the given skim.
         """
         ModuleName = self.get_skim_module(SkimName)
-        SkimModule = import_module(f"skim.{ModuleName}")
+        SkimModule = import_module(f"skim.WGs.{ModuleName}")
         return getattr(SkimModule, SkimName)
 
     def encode_skim_name(self, SkimName):

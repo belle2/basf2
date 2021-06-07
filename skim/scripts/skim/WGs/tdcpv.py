@@ -12,7 +12,7 @@ from skim.standardlists.lightmesons import (loadStdSkimHighEffTracks,
                                             loadStdSkimHighEffRho0, loadStdSkimHighEffOmega,
                                             loadStdSkimHighEffF_0)
 
-from skimExpertFunctions import BaseSkim, fancy_skim_header
+from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons
 from stdPi0s import loadStdSkimPi0, stdPi0s

@@ -15,7 +15,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.taupair import TauLFV
+from skim.WGs.taupair import TauLFV
 
 path = b2.Path()
 skim = TauLFV(validation=True, udstOutput=False)

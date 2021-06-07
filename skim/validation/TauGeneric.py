@@ -15,7 +15,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.taupair import TauGeneric
+from skim.WGs.taupair import TauGeneric
 
 path = b2.Path()
 skim = TauGeneric(validation=True, udstOutput=False)

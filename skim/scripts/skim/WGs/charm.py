@@ -15,7 +15,7 @@ Skim list building functions for charm analyses.
 from functools import lru_cache
 
 import modularAnalysis as ma
-from skimExpertFunctions import BaseSkim, fancy_skim_header
+from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import loadStdSkimPhoton
 from stdPi0s import loadStdSkimPi0

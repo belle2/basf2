@@ -15,7 +15,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.quarkonium import CharmoniumPsi
+from skim.WGs.quarkonium import CharmoniumPsi
 
 path = b2.Path()
 skim = CharmoniumPsi(validation=True, udstOutput=False)

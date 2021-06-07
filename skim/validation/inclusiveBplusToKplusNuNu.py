@@ -15,7 +15,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.ewp import inclusiveBplusToKplusNuNu
+from skim.WGs.ewp import inclusiveBplusToKplusNuNu
 
 path = b2.Path()
 skim = inclusiveBplusToKplusNuNu(validation=True, udstOutput=False)

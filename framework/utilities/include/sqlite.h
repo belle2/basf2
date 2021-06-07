@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 #include <tuple>
+#include <stdexcept>
 
 /** C++ wrapper around the sqlite C Api for convenient use of SQLite statements in C++
  *

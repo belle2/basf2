@@ -40,27 +40,24 @@ namespace Belle2 {
       virtual void load(Weightfile& weightfile) = 0;
 
       /**
-       * Apply this expert onto a dataset
+       * Apply this expert onto a dataset.
        * @param test_data dataset
        */
       virtual std::vector<float> apply(Dataset& test_data) const = 0;
 
       /**
-       * Apply this expert onto a dataset.
-       * Multi-class mode signature.
-       * Not pure virtual, since not all derived classes need to re-implement this.
-       * @param test_data dataset
-       * @param classID class identifier.
-       */
-      virtual std::vector<float> apply(Dataset& test_data, const unsigned int classID) const
+        * Apply this m_expert onto a dataset. Multiclass mode.
+        * Not pure virtual, since not all derived classes to re-implement this.
+        * @param test_data dataset.
+      * @return vector of size N=test_data.getNumberOfEvents() with N=m_classes.size() scores for each event in the dataset.
+        */
+      virtual std::vector<std::vector<float>> applyMulticlass(Dataset& test_data) const
       {
 
         (void) test_data;
-        (void) classID;
 
-        return std::vector<float>();
+        return std::vector<std::vector<float>>();
       };
-
 
       /**
        * Virtual destructor

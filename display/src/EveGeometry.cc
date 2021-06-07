@@ -9,6 +9,7 @@
 #include <TPRegexp.h>
 #include <TEveManager.h>
 #include <TEveGeoNode.h>
+#include <TEveGeoShape.h>
 #include <TEveGeoShapeExtract.h>
 #include <TFile.h>
 

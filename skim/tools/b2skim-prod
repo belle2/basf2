@@ -204,13 +204,8 @@ def get_skim_stats_dict(SkimStatsJson):
     with open(SkimStatsJson) as skimStatsFile:
         JSONContents = json.load(skimStatsFile)
 
-    try:
-        skimStats = JSONContents["stats"]
-        CombinedSkimDefinitions = JSONContents["CombinedSkims"]
-    except KeyError:
-        raise ValueError(
-            "Cannot find definitions of combined skims in skim stats JSON file."
-        )
+    skimStats = JSONContents["stats"]
+    CombinedSkimDefinitions = JSONContents.get("CombinedSkims", {})
 
     return skimStats, CombinedSkimDefinitions
 
@@ -404,7 +399,7 @@ def get_output_directory(args, sampleRegistry):
         outputDirectory (pathlib.Path): The directory to write the JSON files into.
     """
     baseDirectory = get_base_directory(args)
-    DBGlobalTag = get_DBGlobalTag(args.release)
+    DBGlobalTag = get_DBGlobalTag_argparse_wrapper(args.release, args.DBGlobalTagRelease)
     beamEnergy = get_beam_energy_from_registry(sampleRegistry)
 
     return Path(baseDirectory, "skim", args.campaign, args.release, DBGlobalTag, beamEnergy)
@@ -516,7 +511,7 @@ def get_lpn_list(sampleInfo, mc):
 
 
 @lru_cache()
-def get_DBGlobalTag(releaseNumber):
+def get_DBGlobalTag(releaseNumber, try_earlier=True):
     """Query the conditions database for the global tag to be used with a release.
     This function will look for global tags associated with all releases between
     the given release and the latest major release prior to it.
@@ -530,10 +525,24 @@ def get_DBGlobalTag(releaseNumber):
 
     Args:
         releaseNumber (str): The label of the release being used for the skims.
+        try_earlier (bool): Count back releases to last major release. If False, only
+            try the release passed, and return a ``RuntimeError`` if no associated
+            global tag is found.
 
     Returns:
         DBGlobalTag (str): the database global tag, in the format DBxxxxxxxx.
     """
+    db = ConditionsDB()
+
+    if not try_earlier:
+        try:
+            # Only try the exact release passed
+            req = db.request("GET", f"/globalTag/{encode_name(releaseNumber)}")
+            globalTagID = req.json()["globalTagId"]
+            return "DB" + str(globalTagID).zfill(8)
+        except ConditionsDB.RequestError as e:
+            raise RuntimeError(f"Could not find global tag for {releaseNumber}.") from e
+
     r = re.compile("^release(-[0-9]{2}){3}$")
     if not r.match(releaseNumber):
         B2ERROR("Release number must be of the form 'release-XX-XX-XX'.")
@@ -544,8 +553,6 @@ def get_DBGlobalTag(releaseNumber):
     _, majorNumber, minorNumber, patchNumber = releaseNumber.split("-")
     patchNumber = int(patchNumber)
     minorNumber = int(minorNumber)
-
-    db = ConditionsDB()
 
     globalTags = []
 
@@ -613,10 +620,19 @@ def get_DBGlobalTag(releaseNumber):
     else:
         # If none available, throw an error
         B2ERROR(
-            f"Could not find any conditions database global tags for releases between\n"
-            "release-{majorNumber}-{minorNumber}-00 and {initialReleaseNumber}."
+            "Could not find any conditions database global tags for releases between\n"
+            f"release-{majorNumber}-{minorNumber}-00 and {initialReleaseNumber}."
         )
         sys.exit(1)
+
+
+def get_DBGlobalTag_argparse_wrapper(releaseNumber, DBGlobalTagRelease):
+    """Wrapper around get_DBGlobalTag to parse release and DBGlobalTagRelease arguments."""
+
+    if DBGlobalTagRelease:
+        return get_DBGlobalTag(DBGlobalTagRelease, try_earlier=False)
+
+    return get_DBGlobalTag(releaseNumber)
 
 
 def get_beam_energy_from_registry(sampleRegistry):
@@ -661,6 +677,27 @@ def strip_campaign(label):
     return re.sub(MCCampaignRegex, "", label)
 
 
+def get_skim_output_datalevel(skim):
+    func = Registry.get_skim_function(skim)
+    return "mdst" if func.produces_mdst_by_default else "udst"
+
+
+def get_individual_skims(SkimName, CombinedSkimDefinitions):
+    """
+    Resolve ``SkimName`` into a list of individual skims.
+
+    If ``SkimName`` exists as a skim name in the registry, assume that that is what we
+    want. Otherwise, retrieve the list of individual skims from
+    ``CombinedSkimDefinitions``.
+    """
+    if SkimName in Registry.names:
+        SingleSkims = [SkimName]
+    else:
+        SingleSkims = CombinedSkimDefinitions[SkimName]
+
+    return SingleSkims
+
+
 def produce_on_tau_samples(skims):
     """
     Determine whether the combined skim should be produced on taupair samples, based on
@@ -690,11 +727,11 @@ def make_data_description_block(skims, sampleInfo):
         DescriptionDict = {
             "": skim,
             "SkimDecayMode": Registry.encode_skim_name(skim),
-            "DataLevel": "udst",
+            "DataLevel": get_skim_output_datalevel(skim),
         }
 
         if GeneralSkim is not None:
-            DescriptionDict["generalSkimName"] = GeneralSkim
+            DescriptionDict["GeneralSkimName"] = GeneralSkim
         DataDescription.append(DescriptionDict)
 
     return DataDescription
@@ -738,8 +775,7 @@ def make_combined_steering_file(
     SteeringFileDirectory.mkdir(parents=True, exist_ok=True)
     SteeringFile = SteeringFileDirectory / f"{SkimName}_Skim.py"
 
-    # Retrieve the list of individual skims going into this combined skim
-    SingleSkims = CombinedSkimDefinitions[SkimName]
+    SingleSkims = get_individual_skims(SkimName, CombinedSkimDefinitions)
 
     try:
         skims, modules = resolve_skim_modules(SingleSkims, LocalModule=LocalModule)
@@ -802,7 +838,7 @@ def make_request_dict(
     skimStatsDict, CombinedSkimDefinitions = get_skim_stats_dict(args.SkimStatsJson)
     verify_stats_dict(args, sampleRegistry, skimStatsDict)
 
-    individualSkims = CombinedSkimDefinitions[skimName]
+    individualSkims = get_individual_skims(skimName, CombinedSkimDefinitions)
 
     if args.mc:
         fabricationType = "MCSkim"
@@ -818,7 +854,7 @@ def make_request_dict(
         "ProductionGroup": "skim",
         "Description": f"{args.campaign} {skimName} skim on {sampleLabel}.",
         "Release": args.release,
-        "DBGlobalTag": get_DBGlobalTag(args.release),
+        "DBGlobalTag": get_DBGlobalTag_argparse_wrapper(args.release, args.DBGlobalTagRelease),
         "Campaign": args.campaign,
         "BeamEnergy": get_beam_energy_from_registry(sampleRegistry),
         "TargetFileSize": 1024,
@@ -890,7 +926,9 @@ def write_json_files(sampleRegistry, args, outputDirectory):
             # Skip taupair sample if the combined skim is not to be produced on taupair
             if (
                     "taupair" in sampleLabel and
-                    not produce_on_tau_samples(CombinedSkimDefinitions[skimName])
+                    not produce_on_tau_samples(
+                        get_individual_skims(skimName, CombinedSkimDefinitions)
+                    )
             ):
                 continue
 
@@ -990,6 +1028,15 @@ def get_argument_parser():
         "--release",
         required=True,
         help="The basf2 to release to be used, *e.g.* release-04-00-03.",
+    )
+    parser.add_argument(
+        "--DBGlobalTagRelease",
+        help=(
+            "Release number to use associated DB global tag for. If provided, the "
+            "script will try to find the global tag and raise an error if none is "
+            "found. Otherwise, a range of global tags will be searched for, and the "
+            "user will be presented with a prompt to select the one they want."
+        ),
     )
     parser.add_argument(
         "-l",

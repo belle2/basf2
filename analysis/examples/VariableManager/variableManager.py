@@ -29,7 +29,7 @@ vm.addCollection('Kinematics', variables.std_vector('px', 'py', 'pz'))
 var = vm.getCollection('Kinematics')
 print("Collection named Kinematics: ", list(var))
 
-result = vm.evaluate('constant(123)', None)
+result = vm.evaluate('constant(123)', ROOT.nullptr)
 print("Result of evaluating the variable 'constant(123)' ", result)
 
 # the variable names can contain special characters like (,:

@@ -69,7 +69,6 @@ static TLorentzVector getMomentum(double energy, double thetaX, double thetaY,
   return result;
 }
 
-/* cppcheck-suppress constParameter */
 static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
 {
   (void)npar;

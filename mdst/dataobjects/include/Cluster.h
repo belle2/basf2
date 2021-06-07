@@ -129,7 +129,7 @@ namespace Belle2 {
     /**
      * Return HTML Info of cluster Likelihoods
      */
-    std::string getInfoHTML() const;
+    std::string getInfoHTML() const override;
 
   private:
 
@@ -147,7 +147,7 @@ namespace Belle2 {
                      Const::ClusterDetectorSet detSet) const;
 
 
-    ClassDef(Cluster, 1); /**< Initial version. */
+    ClassDefOverride(Cluster, 1); /**< Initial version. */
 
   };
 

@@ -12,7 +12,7 @@ The main command line tool for the Belle2 Software is ``basf2``::
 -v, --version          print the version of the Belle2 Software
 --info                 print information about basf2 and the environment
 -m ARG, --modules ARG  Without argument this will print a list of all available
-                       `Module`. With an extra argument the list can be limited
+                       `Modules <basf2.Module>`. With an extra argument the list can be limited
                        to one package or one specific module.
 
 .. rubric:: Configuration

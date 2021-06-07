@@ -12,13 +12,16 @@
 
 #include <framework/datastore/StoreArray.h>
 
-#include <boost/spirit/home/support/detail/endian.hpp>
+#include <boost/endian/arithmetic.hpp>
 
 using namespace std;
 using namespace Belle2;
 using namespace PXD;
 
-using namespace boost::spirit::endian;
+using ulittle16_t = boost::endian::little_uint16_t;
+using ulittle32_t = boost::endian::little_uint32_t;
+using ubig16_t = boost::endian::big_uint16_t;
+using ubig32_t = boost::endian::big_uint32_t;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -263,4 +266,3 @@ bool PXDReadRawONSENModule::unpack_dhc_frame(void* data)
   }
   return false;
 }
-

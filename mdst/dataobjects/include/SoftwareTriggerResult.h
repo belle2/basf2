@@ -34,8 +34,8 @@ namespace Belle2 {
   class SoftwareTriggerResult : public RelationsObject {
   public:
     /// Add a new cut result to the storage or override the result with the same name.
-    void addResult(const std::string& triggerIdentifier, const SoftwareTriggerCutResult& result,
-                   const SoftwareTriggerCutResult& nonPrescaledResult = SoftwareTriggerCutResult::c_noResult);
+    void addResult(const std::string& triggerIdentifier, SoftwareTriggerCutResult result,
+                   SoftwareTriggerCutResult nonPrescaledResult = SoftwareTriggerCutResult::c_noResult);
 
     /// Return the cut result and the non-prescaled cut result with the given name or throw an error if no result is there.
     std::pair<SoftwareTriggerCutResult, SoftwareTriggerCutResult> getResultPair(const std::string& triggerIdentifier) const;

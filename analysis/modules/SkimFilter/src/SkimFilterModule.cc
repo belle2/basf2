@@ -15,6 +15,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <TString.h>
 
 using namespace std;
 using namespace Belle2;
@@ -80,4 +81,3 @@ void SkimFilterModule::terminate()
   stream <<  "\n=======================================================\n";
   B2INFO(stream.str());
 }
-

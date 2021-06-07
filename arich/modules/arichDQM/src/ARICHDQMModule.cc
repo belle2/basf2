@@ -35,6 +35,7 @@
 
 #include <TF1.h>
 #include <TVector3.h>
+#include <TDirectory.h>
 
 #include <fstream>
 #include <math.h>

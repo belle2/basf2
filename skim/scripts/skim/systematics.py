@@ -13,7 +13,7 @@ __authors__ = [
 import basf2 as b2
 import modularAnalysis as ma
 import vertex
-from skimExpertFunctions import BaseSkim, CombinedSkim, fancy_skim_header, get_test_file
+from skimExpertFunctions import BaseSkim, CombinedSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
@@ -41,7 +41,7 @@ class SystematicsDstar(BaseSkim):
         stdK("all", path=path)
         stdPi("all", path=path)
 
-    TestFiles = [get_test_file("MC13_ccbarBGx1")]
+    TestSampleProcess = "ccbar"
 
     def build_lists(self, path):
         lists = [
@@ -542,7 +542,7 @@ class SystematicsPhiGamma(BaseSkim):
     __contact__ = "Giuseppe Finocchiaro <giuseppe.finocchiaro@lnf.infn.it>"
     __category__ = "systematics"
 
-    TestFiles = [get_test_file("phigamma_neutral")]
+    TestSampleProcess = "ccbar"
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
@@ -696,7 +696,7 @@ class SystematicsJpsi(BaseSkim):
         stdE("all", path=path)
         stdPhotons("all", path=path)
 
-    TestFiles = [get_test_file("MC13_ccbarBGx1")]
+    TestSampleProcess = "ccbar"
     ApplyHLTHadronCut = True
 
     def build_lists(self, path):
@@ -847,6 +847,8 @@ class SystematicsCombinedHadronic(CombinedSkim):
     __category__ = "performance, leptonID"
     __name__ = "SystematicsCombinedHadronic"
 
+    produces_mdst_by_default = True
+
     def __init__(self, prescale_kshort=1, mdstOutput=True, **kwargs):
         """ Initialiser.
 
@@ -879,6 +881,8 @@ class SystematicsCombinedLowMulti(CombinedSkim):
     __contact__ = __liaison_leptonID__
     __category__ = "performance, leptonID"
     __name__ = "SystematicsCombinedLowMulti"
+
+    produces_mdst_by_default = True
 
     def __init__(self, prescale_kshort=1, mdstOutput=True, **kwargs):
         """ Initialiser.

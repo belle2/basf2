@@ -15,6 +15,8 @@
 #include <tracking/dataobjects/hitXP.h>
 #include <TFile.h>
 
+#include <set>
+
 namespace Belle2 {
 
   /**  This module from a data root file builds a tree of hitXP

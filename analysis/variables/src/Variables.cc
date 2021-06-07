@@ -67,8 +67,8 @@ namespace Belle2 {
     double particleClusterEUncertainty(const Particle* part)
     {
       const ECLCluster* cluster = part->getECLCluster();
-      const auto EPhiThetaCov = cluster->getCovarianceMatrix3x3();
       if (cluster) {
+        const auto EPhiThetaCov = cluster->getCovarianceMatrix3x3();
         return std::sqrt(EPhiThetaCov[0][0]);
       }
       return std::numeric_limits<double>::quiet_NaN();

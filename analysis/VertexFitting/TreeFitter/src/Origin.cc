@@ -54,7 +54,6 @@ namespace TreeFitter {
 
   ErrCode Origin::initOrigin()
   {
-    ErrCode status;
     if (m_beamSpot && m_isBeamSpot && m_constraintDimension == 3) {
       m_covariance = Eigen::Matrix<double, 3, 3>::Zero(3, 3);
       const TVector3& vertexVector = m_beamSpot->getIPPosition();

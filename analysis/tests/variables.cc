@@ -1921,7 +1921,7 @@ namespace {
   TEST_F(MetaVariableTest, daughterClusterAngleInBetween)
   {
     // declare all the array we need
-    StoreArray<Particle> particles, particles_noclst;
+    StoreArray<Particle> particles;
     std::vector<int> daughterIndices, daughterIndices_noclst;
 
     //proxy initialize where to declare the needed array
@@ -1994,7 +1994,7 @@ namespace {
   TEST_F(MetaVariableTest, grandDaughterDiffOfs)
   {
     // declare all the array we need
-    StoreArray<Particle> particles, particles_noclst;
+    StoreArray<Particle> particles;
     std::vector<int> daughterIndices0_noclst, daughterIndices1_noclst, daughterIndices2_noclst;
     std::vector<int> daughterIndices0, daughterIndices1, daughterIndices2;
 

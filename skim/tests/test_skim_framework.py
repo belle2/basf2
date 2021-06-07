@@ -22,7 +22,7 @@ __authors__ = ["Sam Cunliffe", "Phil Grace"]
 class TestSkimRegistry(unittest.TestCase):
     """Test case for skim registry."""
 
-    ExistentModulePaths = Path(find_file("skim/scripts/skim")).glob("*.py")
+    ExistentModulePaths = Path(find_file("skim/scripts/skim/WGs")).glob("*.py")
     ExistentModules = [
         module.stem
         for module in ExistentModulePaths

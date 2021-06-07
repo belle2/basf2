@@ -74,7 +74,7 @@ namespace {
       gParticleGraph.generateList();
       gParticleGraph.clear(); //don't add them again in the next call..
 
-      StoreArray<MCParticle> mcparticles;
+      StoreArray<MCParticle> mcparticles{};
       m_mcparticle = mcparticles[m_graphParticle->getIndex() - 1];
 
       for (Decay& d : m_daughterDecays)

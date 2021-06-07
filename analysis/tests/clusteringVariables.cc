@@ -328,7 +328,7 @@ namespace {
   TEST_F(ECLVariableTest, ECLThetaAndPhiId)
   {
     StoreArray<Particle> particles;
-    StoreArray<ECLCluster> clusters;
+    StoreArray<ECLCluster> clusters{};
     StoreArray<ECLCluster> eclclusters;
     // make a particle from cluster #1
     const Particle* p = particles.appendNew(Particle(eclclusters[0]));

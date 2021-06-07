@@ -1,0 +1,246 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""\
+This tool is an extention of b2conditionsdb-extract for PXD calibration validation.
+It reads the given conditions objects from the database and writes them
+to a TTree or histograms. Intra run dependencies are not supported.
+
+For example the command ::
+
+  b2pxd-db-check --exp 12 --runs 1-3,12 --tag pxd_calibration PXDMaskedPixelPar PXDDeadPixelPar PXDOccupancyInfoPar
+
+will create a root file with validation histograms or a Tree containing the masked
+pixels of the runs 1, 2, 3, and 12 of experiment 5. The branch PXDMaskedPixelPar_valid
+contains 1 if the calibration costants are available for the given run and 0 if not.
+
+"""
+
+import basf2
+import ROOT
+from ROOT import Belle2
+from array import array
+from pxd.utils import style
+import pxd.calibration.condition_checker as checker
+import pxd.calibration.calibration_checker as calChecker
+import argparse
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
+PyConfig.StartGuiThread = False
+
+
+class Condition:
+    """This class contains the data related to a conditions object."""
+
+    def __init__(self, condition, tree):
+        """Split condition name if its of the form 'name/Class', otherwise
+        assume classname is same as conditions name"""
+
+        if '/' in condition:
+            #: name of the conditions object
+            self.name, className = condition.split('/')
+        else:
+            self.name = className = condition
+
+        # We need to find the correct object type so let's look in the Belle2
+        # and the ROOT namespace
+        for namespace in (Belle2, ROOT):
+            try:
+                #: Type of the object for this condition
+                self.objType = getattr(namespace, className)
+                break
+            except NameError:
+                # not found, try next namespace
+                pass
+        else:
+            # nothing found, cannot continue
+            basf2.B2FATAL(f"Cannot determine find object type '{className}'")
+
+        #: flag indicating whether or not the condition is present for this run
+        self.valid = array('i', [0])
+        #: pointer to an object of the correct type
+        self.obj = self.objType()
+        #: DBObjPtr for the condition
+        self.dbObj = Belle2.PyDBObj(self.name, self.objType.Class())
+        # now let's add the branches to the tree
+        tree.Branch(self.name + '_valid', self.valid, self.name + '_valid/I')
+        tree.Branch(self.name, self.obj)
+
+    def update(self):
+        """Update the object to have the correct values"""
+        if self.dbObj.isValid():
+            self.valid[0] = True
+            # TODO: we might be able to adjust the branch address instead of copying the object ...
+            self.obj.__assign__(self.dbObj.obj())
+        else:
+            self.valid[0] = False
+
+
+class ConditionsTreeModule(basf2.Module):
+    """This module writes conditions to a TTree."""
+
+    def __init__(self, exp, filename, conditions, selected_runs=[], only_hist=True, maps=False):
+        """Initialize and set some members"""
+        super().__init__()
+        #: experiment number
+        self.exp = array('i', [exp])
+        #: run number
+        self.run = array('i', [0])
+        #: output filename
+        self.filename = filename
+        #: names of all the conditions we want to put in the tree
+        self.condition_names = conditions
+        #: pointer to the event metadata
+        self.eventMetaData = Belle2.PyStoreObj("EventMetaData")
+        #: selected runs for study
+        self.selected_runs = set(selected_runs)
+        #: flag to only save histograms
+        self.only_hist = only_hist
+        #: flag to save 2D maps of pixel matrix
+        self.maps = maps
+
+    def initialize(self):
+        """Create ROOT Tree for all conditions"""
+        self.eventMetaData.isRequired()
+        #: ROOT File to contain the output
+        self.tfile = ROOT.TFile.Open(self.filename, "RECREATE")
+        if not self.tfile.IsOpen():
+            basf2.B2FATAL(f"Cannot create output root file '{self.filename}'")
+        #: Tree with the conditions data
+        self.tree = ROOT.TTree('conditions', f'Conditions data for experiment {self.exp[0]}')
+        #: Add the experiment and run numbers
+        self.tree.Branch('exp', self.exp, 'exp/I')
+        self.tree.Branch('run', self.run, 'run/I')
+
+        # Create the list of condition objects
+        self.conditions = []
+        self.conditionCheckers = {}
+        self.calibrationCheckers = []
+        for condition in self.condition_names:
+            aCondition = Condition(condition, self.tree)
+            self.conditions.append(aCondition)
+            # get calibration checker based on objType
+            self.conditionCheckers[aCondition] = getattr(
+                checker, checker.__checker_dict__[aCondition.objType]
+            )(aCondition.name, self.tfile)
+            if not self.maps:
+                self.conditionCheckers[aCondition].rundir = ""
+        # Get Calibration Checkers
+        dbObjTypeSet = set(aCondition.objType for aCondition in self.conditionCheckers.keys())
+        for aCalChecker_name, aObjType_set in calChecker.__cal_checker_dict__.items():
+            # basf2.B2INFO(f"dbObjTypeSet:  {dbObjTypeSet}")
+            # basf2.B2INFO(f"aObjType_set:  {aObjType_set}")
+            if aObjType_set <= dbObjTypeSet:
+                aCalChecker = getattr(calChecker, aCalChecker_name)()
+                aCalChecker.initialize(self.conditionCheckers.values())
+                self.calibrationCheckers.append(aCalChecker)
+
+
+    def beginRun(self):
+        """Fill all conditions in the tree"""
+        # Update run/exp number
+        self.exp[0] = self.eventMetaData.getExperiment()
+        self.run[0] = self.eventMetaData.getRun()
+
+        # Skip the run if not selected
+        if (self.selected_runs and
+                ((self.exp[0], self.run[0]) not in self.selected_runs)):
+            return
+
+        basf2.B2INFO(f"Processing exp {self.exp[0]}, run {self.run[0]}")
+
+        # update all condition objects
+        for condition in self.conditions:
+            condition.update()
+            self.conditionCheckers[condition].beginRun()
+            # self.conditionCheckers[condition].define_hists()
+            # self.conditionCheckers[condition].fill_plots()
+        for aCalChecker in self.calibrationCheckers:
+            aCalChecker.beginRun()
+
+        # fill tree
+        if not self.only_hist:
+            self.tree.Fill()
+
+    def terminate(self):
+        """Save the tree and close the file"""
+        self.tfile.cd()
+        c_lg = ROOT.TCanvas('c_lg', 'c_lg', 1000, 400)
+        for condition in self.conditions:
+            self.conditionCheckers[condition].draw_plots(c_lg)
+        for aCalChecker in self.calibrationCheckers:
+            aCalChecker.terminate()
+        if not self.only_hist:
+            self.tree.Write()
+        self.tfile.Close()
+
+
+def get_argument_parser():
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--output", "-o", default="conditions.root", type=str,
+                        help="output file containing the TTree of conditions")
+    parser.add_argument("--tag", "-t", type=str,
+                        help="global tag")
+    parser.add_argument("--exp", "-e", type=int, required=True,
+                        help="experiment number")
+    parser.add_argument("--runs", type=str, required=True,
+                        help="run numbers, ranges are given as X-Y, multiple runs or ranges are separated by comma")
+    parser.add_argument('--maps', dest='maps', action="store_true", help='Create maps from payloads. This can be slow.')
+    parser.add_argument("--only-hist", dest="only_hist", action="store_true",
+                        help="Only save histograms. The conditions TTree will not be saved.")
+    parser.add_argument("condition", type=str, nargs='+',
+                        help="payload identifier, if the type is not equal to the name it has to be appended after a /")
+    return parser
+
+
+if __name__ == "__main__":
+    from conditions_db.testing_payloads import parse_testing_payloads_file
+    # ROOT settings
+    ROOT.gROOT.SetBatch(True)
+    style()  # set plotting style for PXD
+    # selected runs indicated with a tuple (exp, run), e.g., [(7, 111), (8,1022)]
+    selected_runs = []
+    # Arguments
+    args = get_argument_parser().parse_args()
+    # no need for log summary
+    basf2.logging.enable_summary(False)
+
+    # setup database if a tag is given
+    if args.tag:
+        # basf2.reset_database()
+        basf2.conditions.reset()
+        basf2.conditions.expert_settings(usable_globaltag_states={"TESTING", "VALIDATED",  "PUBLISHED", "RUNNING", "OPEN"})
+        tags = args.tag.split(':')
+        # basf2.use_database_chain(False, basf2.LogLevel.DEBUG)
+
+        for tag in tags:
+            if tag.endswith('.txt'):
+                # basf2.use_local_database(tag, readonly=True, loglevel=basf2.LogLevel.DEBUG)
+                basf2.conditions.prepend_testing_payloads(tag)
+                # collect selected runs based on the first run of each iov
+                iov_entries = parse_testing_payloads_file(tag)
+                selected_runs += [(item.firstRun['exp'], item.firstRun['run']) for item in iov_entries]
+
+            else:
+                # basf2.use_central_database(tag, basf2.LogLevel.DEBUG)
+                basf2.conditions.prepend_globaltag(tag)
+
+    # parse runs argument
+    runs = []
+    for runentry in args.runs.split(','):
+        if '-' in runentry:
+            firstrun, lastrun = runentry.split('-')
+            runs += list(range(int(firstrun), int(lastrun) + 1))
+        else:
+            runs.append(int(runentry))
+    if selected_runs:
+        runs = list(sorted(set(runs) & set(i for _, i in selected_runs)))
+    else:
+        runs = list(sorted(set(runs)))
+
+    # run over the given run ranges and write the conditions to the TTree
+    main = basf2.create_path()
+    main.add_module('EventInfoSetter', expList=[args.exp] * len(runs), runList=runs, evtNumList=[1] * len(runs))
+    main.add_module(ConditionsTreeModule(
+        args.exp, args.output, args.condition, selected_runs, args.only_hist, args.maps))
+    basf2.process(main)

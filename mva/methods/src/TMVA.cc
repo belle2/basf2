@@ -574,17 +574,18 @@ namespace Belle2 {
 
     }
 
-    std::vector<float> TMVAExpertMulticlass::apply(Dataset& test_data, const unsigned int classID) const
+    std::vector<std::vector<float>> TMVAExpertMulticlass::applyMulticlass(Dataset& test_data) const
     {
 
-      std::vector<float> probabilities(test_data.getNumberOfEvents());
+      std::vector<std::vector<float>> probabilities(test_data.getNumberOfEvents());
+
       for (unsigned int iEvent = 0; iEvent < test_data.getNumberOfEvents(); ++iEvent) {
         test_data.loadEvent(iEvent);
         for (unsigned int i = 0; i < m_input_cache.size(); ++i)
           m_input_cache[i] = test_data.m_input[i];
         for (unsigned int i = 0; i < m_spectators_cache.size(); ++i)
           m_spectators_cache[i] = test_data.m_spectators[i];
-        probabilities[iEvent] = m_expert->EvaluateMulticlass(classID, specific_options.m_method);
+        probabilities[iEvent] = m_expert->EvaluateMulticlass(specific_options.m_method);
       }
       return probabilities;
     }

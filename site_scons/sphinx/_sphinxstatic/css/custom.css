@@ -138,3 +138,16 @@
 .rst-content .stacked .admonition {
     margin-bottom: 0px;
 }
+
+/* Textbox that looks like the ROOT TEve GUI */
+/* ----------------------------------------- */
+
+.gui-highlight-style {
+    color: black;
+    background-color: #e7e7e7; /* Grey */
+    border: none;
+    padding: 1px 2px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}

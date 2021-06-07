@@ -510,7 +510,7 @@ class Job:
         Dumps the Job object configuration to a JSON file so that it can be read in again later.
 
         Parameters:
-          file_path(`Path`): The filepath we'll dump to
+          file_path(`basf2.Path`): The filepath we'll dump to
         """
         with open(file_path, mode="w") as job_file:
             json.dump(self.job_dict, job_file, indent=2)
@@ -525,8 +525,8 @@ class Job:
     def job_dict(self):
         """
         Returns:
-            dict: A JSON serialisable representation of the `Job` and its `SubJob` objects. `Path` objects are converted to
-            string via ``Path.as_posix()``.
+            dict: A JSON serialisable representation of the `Job` and its `SubJob` objects.
+            `Path <basf2.Path>` objects are converted to string via ``Path.as_posix()``.
         """
         job_dict = {}
         job_dict["name"] = self.name
@@ -615,6 +615,8 @@ class Job:
         """
         if "BELLE2_TOOLS" not in os.environ:
             raise BackendError("No BELLE2_TOOLS found in environment")
+        if "BELLE2_CONFIG_DIR" in os.environ:
+            self.setup_cmds.append(f"export BELLE2_CONFIG_DIR={os.environ['BELLE2_CONFIG_DIR']}")
         if "BELLE2_RELEASE" in os.environ:
             self.setup_cmds.append(f"source {os.environ['BELLE2_TOOLS']}/b2setup {os.environ['BELLE2_RELEASE']}")
         elif 'BELLE2_LOCAL_DIR' in os.environ:
@@ -701,7 +703,7 @@ class SubJob(Job):
     def job_dict(self):
         """
         Returns:
-            dict: A JSON serialisable representation of the `SubJob`. `Path` objects are converted to
+            dict: A JSON serialisable representation of the `SubJob`. `Path <basf2.Path>` objects are converted to
             `string` via ``Path.as_posix()``. Since Subjobs inherit most of the parent job's config
             we only output the input files and arguments that are specific to this subjob and no other details.
         """

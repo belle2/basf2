@@ -108,7 +108,7 @@ basf2.process(main)
 def check_01_existing():
     """Check that merging a non exsiting file fails"""
     create_testfile_direct("test2.root")
-    return merge_files("test1.root") != 0 and merge_files("test2.root") == 0
+    return merge_files("/test1.root") != 0 and merge_files("test2.root") == 0
 
 
 def check_02_nonroot():
@@ -129,7 +129,7 @@ def check_03_overwrite():
 def check_04_access():
     """Check that it fails if we cannot create output file"""
     create_testfile_direct("test1.root")
-    return merge_files("test1.root", output="nosuchdir/foo") != 0
+    return merge_files("test1.root", output="/nosuchdir/foo") != 0
 
 
 def check_05_release():

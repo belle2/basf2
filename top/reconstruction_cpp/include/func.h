@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #pragma once
+#include <cmath>
 
 namespace Belle2 {
   namespace TOP {
@@ -104,4 +105,3 @@ namespace Belle2 {
     } // func
   } // TOP
 } // Belle2
-

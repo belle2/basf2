@@ -40,7 +40,7 @@ class VariablesToHDF5(basf2.Module):
         """Create the hdf5 file and list of variable objects to be used during
         event processing."""
         #: variable names
-        self._varnames = variable_manager.resolveCollections(std_vector(*self._variables))
+        self._varnames = [str(varname) for varname in variable_manager.resolveCollections(std_vector(*self._variables))]
         #: variable objects for each variable
         self._var_objects = [variable_manager.getVariable(n) for n in self._varnames]
 

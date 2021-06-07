@@ -68,7 +68,7 @@ def require_file(filename, data_type="", py_case=None):
 @contextmanager
 def set_loglevel(loglevel):
     """
-    temporarily set the log level to the specified `LogLevel`. This returns a
+    temporarily set the log level to the specified `LogLevel <basf2.LogLevel>`. This returns a
     context manager so it should be used in a ``with`` statement:
 
     >>> with set_log_level(LogLevel.ERROR):
@@ -357,3 +357,13 @@ def skip_test_if_light(py_case=None):
         import generators  # noqa
     except ModuleNotFoundError:
         skip_test(reason="We're in a light build.", py_case=py_case)
+
+
+def print_belle2_environment():
+    """
+    Prints all the BELLE2 environment variables on the screen.
+    """
+    basf2.B2INFO('The BELLE2 environment variables are:')
+    for key, value in sorted(dict(os.environ).items()):
+        if 'BELLE2' in key.upper():
+            print(f'  {key}={value}')

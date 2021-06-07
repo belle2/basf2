@@ -93,11 +93,11 @@ namespace Belle2 {
           //               ----|----                    ----|----                    ----|----
           //  This is fine:         X        This not:                X   This not:          X
           //                      ----|----                    ----|----                    ----|----
-          if (currentStateCache.localNormalizedu > 0.2) {
+          if (currentStateCache.localNormalizedu > 0.2f) {
             continue;
           }
 
-          if (nextStateCache.localNormalizedu <= 0.8) {
+          if (nextStateCache.localNormalizedu <= 0.8f) {
             continue;
           }
         }

@@ -25,7 +25,7 @@ class InitialiseSkimFlag(b2.Module):
         Initialise module.
 
         Parameters:
-            skims (skimExpertFunctions.BaseSkim): Skim to initialise event flag for.
+            skims (skim.core.BaseSkim): Skim to initialise event flag for.
         """
 
         from variables import variables as vm
@@ -73,7 +73,7 @@ class UpdateSkimFlag(b2.Module):
         Initialise module.
 
         Parameters:
-            skim (skimExpertFunctions.BaseSkim): Skim to update event flag for.
+            skim (skim.core.BaseSkim): Skim to update event flag for.
         """
 
         from ROOT import Belle2

@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-Core classes of the skim package: ``BaseSkim`` and ``CombinedSkim``.
+The core classes of the skim package are defined in ``skim.core``: ``BaseSkim`` and
+``CombinedSkim``.
 
 * ``BaseSkim`` is an abstract base class from which all skims inherit. It defines
   template functions for a skim, and includes attributes describing the skim metadata.
@@ -18,7 +19,7 @@ import basf2 as b2
 from modularAnalysis import applyCuts, summaryOfLists
 from skim.registry import Registry
 from skim.utils.flags import InitialiseSkimFlag, UpdateSkimFlag
-from skim.utils.misc import get_test_file
+from skim.utils.testfiles import get_test_file
 
 
 class BaseSkim(ABC):
@@ -34,7 +35,7 @@ class BaseSkim(ABC):
 
     TestSampleProcess = "mixed"
     """MC process of test file. `BaseSkim.TestFiles` passes this property to
-    `skimExpertFunctions.get_test_file` to retrieve an appropriate file location.
+    `skim.utils.testfiles.get_test_file` to retrieve an appropriate file location.
     Defaults to a :math:`B^{0}\\overline{B^{0}}` sample.
     """
 
@@ -121,7 +122,6 @@ class BaseSkim(ABC):
         self.additionalDataDescription = additionalDataDescription
         self._udstOutput = udstOutput
         self._validation = validation
-        self.SkimLists = []
 
     def load_standard_lists(self, path):
         """
@@ -219,6 +219,12 @@ class BaseSkim(ABC):
             raise ValueError("Skim has not been added to the path yet!")
         return self._ConditionalPath or self._MainPath
 
+    SkimLists = []
+    """
+    List of particle lists reconstructed by the skim. This attribute should only be
+    accessed after running the ``__call__`` method.
+    """
+
     _MainPath = None
     """Main analysis path."""
 
@@ -310,15 +316,15 @@ class BaseSkim(ABC):
 
     def initialise_skim_flag(self, path):
         """
-        Add the module `skimExpertFunctions.InitialiseSkimFlag` to the path, which
+        Add the module `skim.utils.flags.InitialiseSkimFlag` to the path, which
         initialises flag for this skim to zero.
         """
         path.add_module(InitialiseSkimFlag(self))
 
     def update_skim_flag(self, path):
         """
-        Add the module `skimExpertFunctions.InitialiseSkimFlag` to the path, which
-        initialises flag for this skim to zero.
+        Add the module `skim.utils.flags.UpdateSkimFlag` to the path, which
+        updates flag for this skim.
 
         .. Warning::
 
@@ -675,14 +681,14 @@ class CombinedSkim(BaseSkim):
 
     def initialise_skim_flag(self, path):
         """
-        Add the module `skimExpertFunctions.InitialiseSkimFlag` to the path, to
+        Add the module `skim.utils.flags.InitialiseSkimFlag` to the path, to
         initialise flags for each skim.
         """
         path.add_module(InitialiseSkimFlag(*self))
 
     def update_skim_flag(self, path):
         """
-        Add the module `skimExpertFunctions.InitialiseSkimFlag` to the conditional path
+        Add the module `skim.utils.flags.UpdateSkimFlag` to the conditional path
         of each skims.
         """
         for skim in self:

@@ -11,31 +11,6 @@ import re
 from pathlib import Path
 
 from skim.registry import Registry
-from skim.utils.testfiles import TestSampleList
-
-
-def get_test_file(process, *, SampleYAML=None):
-    """
-    Attempt to find a test sample of the given MC process.
-
-    Parameters:
-        process (str): Physics process, e.g. mixed, charged, ccbar, eemumu.
-        SampleYAML (str, pathlib.Path): Path to a YAML file containing sample
-                specifications.
-
-    Returns:
-        str: Path to test sample file.
-
-    Raises:
-        FileNotFoundError: Raised if no sample can be found.
-    """
-    samples = TestSampleList(SampleYAML=SampleYAML)
-    matches = samples.query_mc_samples(process=process)
-    try:
-        # Return the first match found
-        return matches[0].location
-    except IndexError as e:
-        raise ValueError(f"No test samples found for MC process '{process}'.") from e
 
 
 def get_file_metadata(filename):
@@ -46,7 +21,7 @@ def get_file_metadata(filename):
        metadata (str): File to get number of events from.
 
     Returns:
-        metadata: Metadata of file in dict format.
+        dict: Metadata of file in dict format.
     """
     if not Path(filename).exists():
         raise FileNotFoundError(f"Could not find file {filename}")
@@ -68,7 +43,7 @@ def get_eventN(filename):
        filename (str): File to get number of events from.
 
     Returns:
-        nEvents: Number of events in the file.
+        int: Number of events in the file.
     """
     return int(get_file_metadata(filename)["nEvents"])
 

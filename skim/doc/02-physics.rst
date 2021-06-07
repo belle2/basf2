@@ -8,7 +8,7 @@ Physics skims
 B → charm skims
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. automodule:: skim.btocharm
+.. automodule:: skim.WGs.btocharm
     :members:
     :undoc-members:
 
@@ -17,7 +17,7 @@ B → charm skims
 B → charmless skims
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. automodule:: skim.btocharmless
+.. automodule:: skim.WGs.btocharmless
     :members:
     :undoc-members:
 
@@ -26,7 +26,7 @@ B → charmless skims
 Charm physics skims
 ~~~~~~~~~~~~~~~~~~~
 
-.. automodule:: skim.charm
+.. automodule:: skim.WGs.charm
     :members:
     :undoc-members:
 
@@ -35,7 +35,7 @@ Charm physics skims
 Dark sector skims
 ~~~~~~~~~~~~~~~~~
 
-.. automodule:: skim.dark
+.. automodule:: skim.WGs.dark
     :members:
     :undoc-members:
 
@@ -44,7 +44,7 @@ Dark sector skims
 Full event interpretation skims
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. automodule:: skim.fei
+.. automodule:: skim.WGs.fei
     :members:
     :undoc-members:
 
@@ -53,7 +53,7 @@ Full event interpretation skims
 Leptonic skims
 ~~~~~~~~~~~~~~
 
-.. automodule:: skim.leptonic
+.. automodule:: skim.WGs.leptonic
     :members:
     :undoc-members:
     
@@ -62,7 +62,7 @@ Leptonic skims
 Low multiplicity skims
 ~~~~~~~~~~~~~~~~~~~~~~
 
-.. automodule:: skim.lowMulti
+.. automodule:: skim.WGs.lowMulti
     :members:
     :undoc-members:
 
@@ -72,7 +72,7 @@ Low multiplicity skims
 Quarkonium skims
 ~~~~~~~~~~~~~~~~
 
-.. automodule:: skim.quarkonium
+.. automodule:: skim.WGs.quarkonium
     :members:
     :undoc-members:
 
@@ -81,7 +81,7 @@ Quarkonium skims
 Radiative and electroweak penguins skims
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. automodule:: skim.ewp
+.. automodule:: skim.WGs.ewp
     :members:
     :undoc-members:
 
@@ -90,7 +90,7 @@ Radiative and electroweak penguins skims
 Semileptonic skims
 ~~~~~~~~~~~~~~~~~~
 
-.. automodule:: skim.semileptonic
+.. automodule:: skim.WGs.semileptonic
     :members:
     :undoc-members:
 
@@ -99,7 +99,7 @@ Semileptonic skims
 Time-dependent CP-violation (TDCPV) analysis skims
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. automodule:: skim.tdcpv
+.. automodule:: skim.WGs.tdcpv
     :members:
     :undoc-members:
 
@@ -108,6 +108,6 @@ Time-dependent CP-violation (TDCPV) analysis skims
 Tau-pair skims
 ~~~~~~~~~~~~~~~~~
 
-.. automodule:: skim.taupair
+.. automodule:: skim.WGs.taupair
     :members:
     :undoc-members:

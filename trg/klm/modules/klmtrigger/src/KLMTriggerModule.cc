@@ -115,7 +115,7 @@ KLMTriggerModule::KLMTriggerModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
 
-  addParam("nLayerTrigger", m_nLayerTrigger, "", 7);
+  addParam("nLayerTrigger", m_nLayerTrigger, "", 5);
 
   addParam("LayerUsed", m_dummy_used_layers, "List of layers used for the simulation", string("2:16"));
 

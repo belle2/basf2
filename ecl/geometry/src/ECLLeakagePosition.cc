@@ -55,6 +55,19 @@ ECLLeakagePosition::ECLLeakagePosition() :
       phiIDofCrysID.push_back(phID);
     }
   }
+
+  //..Crystals between mechanical structure for each thetaID
+  for (int thID = 0; thID < firstBarrelThetaID; thID++) {
+    int nCrys = neighbours->getCrystalsPerRing(thID) / 16;
+    crysBetweenMech.push_back(nCrys);
+  }
+  for (int thID = firstBarrelThetaID; thID <= lastBarrelThetaID; thID++) {
+    crysBetweenMech.push_back(2);
+  }
+  for (int thID = lastBarrelThetaID + 1; thID < 69; thID++) {
+    int nCrys = neighbours->getCrystalsPerRing(thID) / 16;
+    crysBetweenMech.push_back(nCrys);
+  }
 }
 
 ECLLeakagePosition::~ECLLeakagePosition()
@@ -130,19 +143,25 @@ std::vector<int> ECLLeakagePosition::getLeakagePosition(const int cellIDFromEner
   if (thetaID >= firstBarrelThetaID and thetaID <= lastBarrelThetaID) {iRegion = 1;}
   if (thetaID > lastBarrelThetaID) {iRegion = 2;}
 
-  //..Mechanical structure is on lower edge of phiID 0, and every 2 (barrel) or 16 (endcap)
+  //..Mechanical structure is on lower edge of phiID 0, and every 2 (barrel) or n (endcap)
   //  crystals thereafter
-  int iPhiMech = phiIDofCrysID[crysID] % crysBetweenMech[iRegion];
-  bool reversePhi = false;
+  int iPhiMech = phiIDofCrysID[crysID] % crysBetweenMech[thetaID];
+  bool reversePhi;
 
-  //..Mechanical structure on upper edge
-  if (iPhiMech == crysBetweenMech[iRegion] - 1) {
+  //..Mechanical structure on lower edge
+  if ((iPhiMech == 0 and iRegion != 1) or (iPhiMech == crysBetweenMech[thetaID] - 1 and iRegion == 1)) {
+    iPhiMech = 0;
+    reversePhi = false;
+
+    //..Mechanical structure on upper edge
+  } else if ((iPhiMech == crysBetweenMech[thetaID] - 1 and iRegion != 1) or (iPhiMech == 0 and iRegion == 1)) {
     iPhiMech = 0;
     reversePhi = true;
 
     //..No mechanical structure adjacent
-  } else if (iPhiMech > 0) {
+  } else {
     iPhiMech = 1;
+    reversePhi = false;
   }
 
   //..Divide crystal into nPositions in width, starting from lower edge

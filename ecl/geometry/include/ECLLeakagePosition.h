@@ -59,7 +59,7 @@ namespace Belle2 {
 
       std::vector<int> thetaIDofCrysID; /**< thetaID of each crystal ID */
       std::vector<int> phiIDofCrysID; /**< phiID of each crystal ID */
-      const int crysBetweenMech[3] = {16, 2, 16}; /**< crystals between phi mechanical structure in each region*/
+      std::vector<int> crysBetweenMech; /**< crystals between phi mechanical structure per thetaID*/
       const int firstBarrelThetaID = 13; /**< first barrel thetaID */
       const int lastBarrelThetaID = 58; /**< last barrel thetaID */
 

@@ -1,0 +1,124 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+'''Tool used to generate cluster position error scale factors payload.'''
+
+__author__ = 'Giulia Casarosa'
+__copyright__ = '2021 - Belle II Collaboration'
+
+
+import basf2 as b2
+from ROOT import Belle2
+from svd import add_svd_reconstruction, add_svd_simulation
+from ROOT.Belle2 import SVDPosErrScaleFactors
+from basf2 import conditions as b2c
+import datetime
+
+import argparse
+import os
+import ROOT
+
+
+def arg_parser():
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('-n', '--events',
+                        default=10000,
+                        type=int,
+                        help='number of events',
+                        metavar='EVENTS')
+    parser.add_argument('--prepend_gt',
+                        default='',
+                        type=str,
+                        nargs='*',
+                        help='Global Tags to be prepended',
+                        metavar='GT')
+    parser.add_argument('--no_outliers',
+                        default=False,
+                        action='store_true',
+                        help='flag to remove outliers from the computation of the scale factors')
+    parser.add_argument('--max_pulls',
+                        default=10,
+                        type=int,
+                        help='max (min = -max) of the pulls distribution',
+                        metavar='MAX (MIN=-MAX)')
+
+    parser.add_argument('--nBins_pulls',
+                        default=100,
+                        type=int,
+                        help='number of bins of the pulls distribution',
+                        metavar='NBINS')
+    return parser
+
+
+now = datetime.datetime.now()
+
+
+if __name__ == "__main__":
+
+    #####################################################
+    # Part 0: setup
+
+    # Argument parsing
+    args = arg_parser().parse_args()
+    args.events
+
+    # Prepend and/or append the input GTs
+    if not (args.prepend_gt == ''):
+        for gt in reversed(args.prepend_gt):
+            b2c.prepend_globaltag(gt)
+
+    b2c.prepend_globaltag("svd_onlySVDinGeoConfiguration")
+    b2c.prepend_globaltag("svd_NOPosErrScaleFactors")
+
+    #####################################################
+    # Part 1: run the SVD simulation and reconstruction
+
+    # Set the global log level
+    b2.set_log_level(b2.LogLevel.INFO)
+
+    # Create path
+    main = b2.Path()
+
+    b2.set_random_seed(1)
+
+    eventinfosetter = b2.register_module('EventInfoSetter')
+    eventinfosetter.param('expList', [0])
+    eventinfosetter.param('runList', [0])
+    eventinfosetter.param('evtNumList', [args.events])
+    main.add_module(eventinfosetter)
+    main.add_module('EvtGenInput')
+
+    main.add_module('Gearbox')
+    main.add_module('Geometry')
+    main.add_module('FullSim')
+
+    add_svd_simulation(main)
+
+    add_svd_reconstruction(main)
+
+    #####################################################
+    # Part 2: compute scale factors and create localdb
+
+    importer = b2.register_module("SVDCoGOnlyErrorScaleFactorImporter")
+    importer.param("minPulls", - args.max_pulls)
+    importer.param("maxPulls", args.max_pulls)
+    importer.param("nBinsPulls", args.nBins_pulls)
+    importer.param("noOutliers", args.no_outliers)
+    uniqueid = "CoGOnlyErrorScaleFactors_default_" + str(now.isoformat()) + "_INFO:_scaleFactors=fromSimulation_noOutliers="
+
+    if args.no_outliers:
+        uniqueid += "True"
+    else:
+        uniqueid += "False"
+
+    importer.param("uniqueID", uniqueid)
+    main.add_module(importer)
+
+    main.add_module('Progress')
+
+    b2.print_path(main)
+
+    b2.process(main)
+
+    print(b2.statistics)

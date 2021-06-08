@@ -56,7 +56,6 @@ namespace Belle2 {
     {
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getMomentum(part).P();
-
     }
 
     double particleE(const Particle* part)
@@ -68,8 +67,8 @@ namespace Belle2 {
     double particleClusterEUncertainty(const Particle* part)
     {
       const ECLCluster* cluster = part->getECLCluster();
-      const auto EPhiThetaCov = cluster->getCovarianceMatrix3x3();
       if (cluster) {
+        const auto EPhiThetaCov = cluster->getCovarianceMatrix3x3();
         return std::sqrt(EPhiThetaCov[0][0]);
       }
       return std::numeric_limits<double>::quiet_NaN();
@@ -214,7 +213,6 @@ namespace Belle2 {
         return sqrt(errorSquared);
       else
         return std::numeric_limits<double>::quiet_NaN();
-
     }
 
     double momentumDeviationChi2(const Particle* part)
@@ -313,7 +311,6 @@ namespace Belle2 {
       else
         return std::numeric_limits<double>::quiet_NaN();
     }
-
 
     double particleXp(const Particle* part)
     {
@@ -745,7 +742,6 @@ namespace Belle2 {
       return frame.getMomentum(pIN - particle->get4Vector()).Pz();
     }
 
-
     double recoilMomentum(const Particle* particle)
     {
       PCmsLabTransform T;
@@ -941,7 +937,6 @@ namespace Belle2 {
       }
       return result;
     }
-
 
     double False(const Particle*)
     {

@@ -277,20 +277,16 @@ def add_cosmics_reconstruction(
         eventTimingExtraction=True,
         addClusterExpertModules=True,
         merge_tracks=True,
-        top_in_counter=False,
-        data_taking_period='early_phase3',
         use_second_cdc_hits=False,
         add_muid_hits=False,
-        reconstruct_cdst=False):
+        reconstruct_cdst=False,
+        posttracking=False):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
     Consists of tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`,
     plus the modules to calculate the software trigger cuts.
 
     :param path: Add the modules to this path.
-    :param data_taking_period: The cosmics generation will be added using the
-           parameters, that where used in this period of data taking. The periods can be found in cdc/cr/__init__.py.
-
     :param components: list of geometry components to include reconstruction for, or None for all components.
     :param pruneTracks: Delete all hits except the first and last of the tracks after the dEdX modules.
     :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
@@ -305,12 +301,10 @@ def add_cosmics_reconstruction(
     :param merge_tracks: The upper and lower half of the tracks should be merged together in one track
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
 
-    :param top_in_counter: time of propagation from the hit point to the PMT in the trigger counter is subtracted
-           (assuming PMT is put at -z of the counter).
-
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
 
     :param reconstruct_cdst: run only the minimal reconstruction needed to produce the cdsts (raw+tracking+dE/dx)
+    :param posttracking: run reconstruction for outer detectors.
     """
 
     # Check components.
@@ -327,31 +321,29 @@ def add_cosmics_reconstruction(
                                    skip_geometry_adding=skipGeometryAdding,
                                    event_time_extraction=eventTimingExtraction,
                                    merge_tracks=merge_tracks,
-                                   data_taking_period=data_taking_period,
-                                   top_in_counter=top_in_counter,
                                    use_second_cdc_hits=use_second_cdc_hits)
 
     # Statistics summary
-    path.add_module('StatisticsSummary').set_name('Sum_CR_Tracking')
+    path.add_module('StatisticsSummary').set_name('Sum_Tracking')
+    if posttracking:
+        if reconstruct_cdst:
+            # if PXD or SVD are included, you will need there two modules which are not part of the standard reconstruction
+            if not components or ('PXD' in components):
+                path.add_module("PXDClustersFromTracks")
+            if not components or ('SVD' in components):
+                path.add_module("SVDShaperDigitsFromTracks")
+            # And add only the dE/dx calculation and prune the tracks
+            add_dedx_modules(path)
+            add_prune_tracks(path, components=components)
 
-    if reconstruct_cdst:
-        # if PXD or SVD are included, you will need there two modules which are not part of the standard reconstruction
-        if not components or ('PXD' in components):
-            path.add_module("PXDClustersFromTracks")
-        if not components or ('SVD' in components):
-            path.add_module("SVDShaperDigitsFromTracks")
-        # And add only the dE/dx calculation and prune the tracks
-        add_dedx_modules(path)
-        add_prune_tracks(path, components=components)
-
-    else:
-        # Add further reconstruction modules
-        add_prefilter_posttracking_reconstruction(path,
-                                                  components=components,
-                                                  pruneTracks=pruneTracks,
-                                                  addClusterExpertModules=addClusterExpertModules,
-                                                  add_muid_hits=add_muid_hits,
-                                                  cosmics=True)
+        else:
+            # Add further reconstruction modules
+            add_prefilter_posttracking_reconstruction(path,
+                                                      components=components,
+                                                      pruneTracks=pruneTracks,
+                                                      addClusterExpertModules=addClusterExpertModules,
+                                                      add_muid_hits=add_muid_hits,
+                                                      cosmics=True)
 
 
 def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,

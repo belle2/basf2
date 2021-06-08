@@ -230,11 +230,11 @@ void SVDCoGOnlyErrorScaleFactorImporterModule::endRun()
           }
           //  origami
           else {
-            m_hBWPulls[0][m_side]->Add(m_hClsPullSize1->getHistogram(theVxdID, m_side));
-            m_hBWPulls[1][m_side]->Add(m_hClsPullSize2->getHistogram(theVxdID, m_side));
-            m_hBWPulls[2][m_side]->Add(m_hClsPullSize3->getHistogram(theVxdID, m_side));
-            m_hBWPulls[3][m_side]->Add(m_hClsPullSize4->getHistogram(theVxdID, m_side));
-            m_hBWPulls[4][m_side]->Add(m_hClsPullSize5->getHistogram(theVxdID, m_side));
+            m_hORPulls[0][m_side]->Add(m_hClsPullSize1->getHistogram(theVxdID, m_side));
+            m_hORPulls[1][m_side]->Add(m_hClsPullSize2->getHistogram(theVxdID, m_side));
+            m_hORPulls[2][m_side]->Add(m_hClsPullSize3->getHistogram(theVxdID, m_side));
+            m_hORPulls[3][m_side]->Add(m_hClsPullSize4->getHistogram(theVxdID, m_side));
+            m_hORPulls[4][m_side]->Add(m_hClsPullSize5->getHistogram(theVxdID, m_side));
           }
         }
         ++itSvdSensors;
@@ -308,7 +308,7 @@ void SVDCoGOnlyErrorScaleFactorImporterModule::endRun()
     //write the tree
     m_tree->Write();
 
-    m_rootFilePtr->mkdir("LLS_pulls");
+    m_rootFilePtr->mkdir("sensor_pulls");
     m_rootFilePtr->mkdir("pulls");
 
     for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD))

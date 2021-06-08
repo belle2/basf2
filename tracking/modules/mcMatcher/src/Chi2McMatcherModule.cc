@@ -15,18 +15,18 @@ If you have more complex parameter types in your class then simple int,
 double or std::vector of those you might need to uncomment the following
 include directive to avoid an undefined reference on compilation.
 * ---------------------------------------------------------------------- */
-// #include <framework/core/ModuleParam.templateDetails.h>
 
 // datastore types
-
 #include <framework/datastore/StoreArray.h>
-
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <iostream>
-#include <typeinfo>
-#include <Eigen/Dense>
+#include <framework/gearbox/Const.h>
 
+#include <iostream>
+
+// ROOT
+#include <TVectorD.h>
+#include <TMatrixD.h>
 
 using namespace Belle2;
 
@@ -36,6 +36,8 @@ Chi2McMatcherModule::Chi2McMatcherModule() : Module()
 {
   // Set module properties
   setDescription(R"DOC(Monte Carlo matcher using the helix parameters for matching by chi2-method)DOC");
+
+  // set module parameters
   addParam("CutOffType",
            m_param_CutOffType,
            "Defines the Cut Off behavior",
@@ -75,6 +77,7 @@ void Chi2McMatcherModule::initialize()
 
 void Chi2McMatcherModule::event()
 {
+  //B2DEBUG(100,"=======================EVENT BEGIN==================");
   StoreArray<MCParticle> MCParticles;
   StoreArray<Track> Tracks;
 
@@ -87,126 +90,125 @@ void Chi2McMatcherModule::event()
     // Cannot perfom matching
     return;
   }
-  int count = 0;
-  int match_count = 0;
+
+  // debug variables
+  int det_not_valid = 0;
   int det0_count = 0;
+  int match_count = 0;
+  int minus_count = 0;
+  int count = 0;
 
+  // compare all tracks with all mcParticles in event
+  //
+  for (int it = 0 ; it < nTracks; ++it) {
+    auto track = Tracks[it];
+    // test for existing relations
+    if (track->getRelated<MCParticle>()) {
+      B2DEBUG(100, "relations = " << track->getRelated<MCParticle>());
+      continue;
+    }
+    // initialize minimal chi2 variables
+    int ip_min = -1;
+    double chi2Min = std::numeric_limits<double>::infinity();
 
-  double chi2_min;
-  int it_min;
-  int ip_min;
-//  for (auto track:Tracks)
-//  {
-//    for (auto particle:MCParticles)
-//    {
-
-  //B2DEBUG(1,"partilce = "<<particle->getPDG());
-  //B2DEBUG(1,"track = "<<track);
-//      continue;
-//    }
-//  }
-  for (int it = 0; it < nTracks; it++) {
-    for (int ip = 0; ip < nMCParticles; ip++) {
-      auto mcparticle = MCParticles[ip];
-      auto track = Tracks[it];
-      const Const::ParticleType mc_particleType(std::abs(mcparticle->getPDG()));
-      if (not Const::chargedStableSet.contains(mc_particleType)) {
+    for (int ip = 0; ip < nMCParticles; ++ip) {
+      auto mcParticle = MCParticles[ip];
+      // Check if current particle is a charged stable particle
+      const Const::ParticleType mcParticleType(std::abs(mcParticle->getPDG()));
+      if (not Const::chargedStableSet.contains(mcParticleType)) {
         continue;
       }
 
-      auto trackfit_wcm = track->getTrackFitResultWithClosestMass(mc_particleType);
-      auto Covariance5 = trackfit_wcm->getCovariance5();
+      // get trackfitresult of current track with clossest mass to current mcparticle Type
+      auto trackFitResult = track->getTrackFitResultWithClosestMass(mcParticleType);
+      TMatrixD Covariance5 = trackFitResult->getCovariance5();
 
-      Eigen::VectorXd m_TrackHelixParameters(5);
-      m_TrackHelixParameters[0] = trackfit_wcm->getD0();    // D0 Helix Parameter
-      m_TrackHelixParameters[1] = trackfit_wcm->getPhi0();  // Phi0 Helix Parameter
-      m_TrackHelixParameters[2] = trackfit_wcm->getOmega(); // Omega Helix Parameter
-      m_TrackHelixParameters[3] = trackfit_wcm->getZ0();    // Z0 Helix Parameter
-      m_TrackHelixParameters[4] = trackfit_wcm->getTanLambda();// TanLambda Helix Parameter
-
-      double charge_sign = 1;
-      if (mcparticle->getCharge() < 0) { charge_sign = -1;}
-
-      auto b_field = BFieldManager::getField(mcparticle->getVertex()).Z() / Belle2::Unit::T;
-      auto m_McHelix = Helix(mcparticle->getVertex(), mcparticle->getMomentum(), charge_sign, b_field);
-
-      Eigen::VectorXd m_McHelixParameters(5);
-      m_McHelixParameters[0] = m_McHelix.getD0();
-      m_McHelixParameters[1] = m_McHelix.getPhi0();
-      m_McHelixParameters[2] = m_McHelix.getOmega();
-      m_McHelixParameters[3] = m_McHelix.getZ0();
-      m_McHelixParameters[4] = m_McHelix.getTanLambda();
-
-      // Check if Matrix is invertable
-      // alternative: add a very small number to every matrix entry to make it invertable
+      // check if matrix is invertable
       double det = Covariance5.Determinant();
-      double det0 = 0.0;
-      if (det == det0) {
-        ++det0_count;
+      if (det == 0.0) {
+        det0_count += 1;
+        //Covariance5.Print();
         continue;
       }
 
-      // Invert the matrix
-      auto covariance5_inv = Covariance5.InvertFast();
-      Eigen::MatrixXd Covariance5_eigen_inv(5, 5);
-      for (int i = 0; i == 4; i++) {
-        for (int j = 0; j == 4; j++) {
-          Covariance5_eigen_inv(i, j) = covariance5_inv[i][j];
-        }
-      }
+      // generate helix for current mc particle
+      double charge_sign = 1;
+      if (mcParticle->getCharge() < 0) { charge_sign = -1;}
+      auto b_field = BFieldManager::getField(mcParticle->getVertex()).Z() / Belle2::Unit::T;
+      auto mcParticleHelix = Helix(mcParticle->getVertex(), mcParticle->getMomentum(), charge_sign, b_field);
 
-      Eigen::VectorXd delta(5);
-      delta = m_TrackHelixParameters - m_McHelixParameters;
+      TMatrixD delta(5, 1);
+      delta[0][0] = trackFitResult->getD0()        - mcParticleHelix.getD0();
+      delta[1][0] = trackFitResult->getPhi0()      - mcParticleHelix.getPhi0();
+      delta[2][0] = trackFitResult->getOmega()     - mcParticleHelix.getOmega();
+      delta[3][0] = trackFitResult->getZ0()        - mcParticleHelix.getZ0();
+      delta[4][0] = trackFitResult->getTanLambda() - mcParticleHelix.getTanLambda();
 
-      double Chi2_cur = delta.transpose() * Covariance5_eigen_inv * delta;
+      TMatrixD covariance5_inv(TMatrixD::kInverted, Covariance5);
 
-      if (count == 0) {
-        chi2_min = Chi2_cur;
-        ++count;
-        it_min = it;
-        ip_min = ip;
-        continue;
-      }
-      if (Chi2_cur < chi2_min) {
-        chi2_min = Chi2_cur;
-        it_min = it;
+      TMatrixD deltaT = delta;
+      deltaT.T();
+
+      double chi2Cur = ((deltaT) * (covariance5_inv * delta))[0][0];
+      B2DEBUG(110, "chi2_cur = " << chi2Cur);
+
+      if (chi2Min > chi2Cur) {
+        chi2Min = chi2Cur;
         ip_min = ip;
       }
       ++count;
     }
-  }
-  //int index_min;
-  B2DEBUG(1, "chi2_min = " << chi2_min);
-  B2DEBUG(1, "det0_count = " << det0_count);
-  // initialize Cut Off
-  double cutOff = 0;
-  if (m_param_CutOffType == std::string("general")) {
-    cutOff = m_param_GeneralCutOff;
-  } else if (m_param_CutOffType == std::string("individual")) {
-    //int pdg = std::abs(MCParticles[CompareNumber(index_min,1)]->getPDG());
-    int pdg = std::abs(MCParticles[ip_min]->getPDG());
-    if (pdg == 11) {
-      cutOff = m_param_IndividualCutOffs[0];
-    } else if (pdg == 13) {
-      cutOff = m_param_IndividualCutOffs[1];
-    } else if (pdg == 211) {
-      cutOff = m_param_IndividualCutOffs[2];
-    } else if (pdg == 2212) {
-      cutOff = m_param_IndividualCutOffs[3];
-    } else if (pdg == 321) {
-      cutOff = m_param_IndividualCutOffs[4];
-    } else if (pdg == 1000010020) {
-      cutOff = m_param_IndividualCutOffs[5];
+
+
+    B2DEBUG(100, "chi2_min = " << chi2Min);
+    if (det0_count > 0) {
+      B2DEBUG(100, "det0_count = " << det0_count);
     }
+    if (det_not_valid > 0) {
+      B2DEBUG(100, "det_not_valid = " << det_not_valid);
+    }
+
+    if (ip_min == -1) {
+      ++minus_count;
+      continue;
+    }
+    // initialize Cut Off
+    double cutOff = 0;
+
+    // fill cut off with value
+    if (m_param_CutOffType == std::string("general")) {
+      cutOff = m_param_GeneralCutOff;
+    } else if (m_param_CutOffType == std::string("individual")) {
+      int mcMinPDG = abs(MCParticles[ip_min]->getPDG());
+
+      if (mcMinPDG == Belle2::Const::electron.getPDGCode()) {
+        cutOff = m_param_IndividualCutOffs[0];
+      } else if (mcMinPDG == Const::muon.getPDGCode()) {
+
+        cutOff = m_param_IndividualCutOffs[1];
+      } else if (mcMinPDG == Const::pion.getPDGCode()) {
+        cutOff = m_param_IndividualCutOffs[2];
+      } else if (mcMinPDG == Const::proton.getPDGCode()) {
+        cutOff = m_param_IndividualCutOffs[3];
+      } else if (mcMinPDG == Const::kaon.getPDGCode()) {
+        cutOff = m_param_IndividualCutOffs[4];
+      } else if (mcMinPDG == Const::deuteron.getPDGCode()) {
+        cutOff = m_param_IndividualCutOffs[5];
+      } else {
+        B2DEBUG(1, "pdg_nochargedstalbe = " << mcMinPDG);
+        continue;
+        cutOff = 128024;
+      }
+    }
+    B2DEBUG(100, "cutoff = " << cutOff);
+    if (chi2Min < cutOff) {
+      Tracks[it]->addRelationTo(MCParticles[ip_min]);
+      ++match_count;
+    }
+
   }
-  if (chi2_min < cutOff) {
-    Tracks[it_min]->addRelationTo(MCParticles[ip_min]);
-    ++match_count;
-  }
-  //B2DEBUG(1,"it_min= "<<it_min<<", ip_min= "<<ip_min);
-  //B2DEBUG(1,"count = "<<count);
-  //B2DEBUG(1,"match_count = "<<match_count);
-  B2DEBUG(1, "Relation ratio: from " << count << " pairs in total " << match_count << " where matched");
+  B2DEBUG(100, "matchcount = " << match_count);
+  B2DEBUG(100, "Relation ratio: from " << count << " pairs in total " << match_count << " where matched");
 }
 
 

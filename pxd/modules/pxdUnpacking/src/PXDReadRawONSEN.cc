@@ -122,7 +122,8 @@ int PXDReadRawONSENModule::readOneEvent()
     exit(0);
   }
   int bcount = read_data(data + headerlen + tablelen, datalen);
-  if (br <= 0) return br;
+  // the following condition does not do anything since `br` wasn't modified since the last check if (br <= 0)
+  //if (br <= 0) return br;
   return (headerlen + tablelen + bcount);
 }
 

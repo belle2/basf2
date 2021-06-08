@@ -280,7 +280,7 @@ def add_cosmics_reconstruction(
         use_second_cdc_hits=False,
         add_muid_hits=False,
         reconstruct_cdst=False,
-        posttracking=False):
+        posttracking=True):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
     Consists of tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`,

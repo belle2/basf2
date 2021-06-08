@@ -6,7 +6,7 @@ Airflow script for TOP post-tracking calibration:
 
 Author: Marko Staric, Umberto Tamponi, Shahab Kohani
 """
-
+import basf2
 from prompt import CalibrationSettings, input_data_filters
 from caf.utils import IoV
 from caf.strategies import SequentialBoundaries
@@ -29,9 +29,9 @@ settings = CalibrationSettings(
             input_data_filters["Data Quality Tag"]["Good Or Recoverable"]]},
     depends_on=[top_pretracking],
     expert_config={
-        "max_files_per_run": 10,
+        "max_files_per_run": 20,
         "payload_boundaries": None,
-        "request_memory": "4 GB"
+        "request_memory": "8 GB"
     })
 
 
@@ -45,9 +45,15 @@ def get_calibrations(input_data, **kwargs):
 
     file_to_iov = input_data["bhabha_all_calib"]
     sample = 'bhabha'
-    inputFiles = list(file_to_iov.keys())
     requested_iov = kwargs.get("requested_iov", None)
     expert_config = kwargs.get("expert_config")
+    max_files_per_run = expert_config["max_files_per_run"]
+    min_events_per_file = 1
+    # Applying the min event per file to remove empty root files
+    reduced_file_to_iov = filter_by_max_files_per_run(file_to_iov, max_files_per_run, min_events_per_file, random_select=True)
+    inputFiles = list(reduced_file_to_iov.keys())
+    basf2.B2INFO(f"Total number of files actually used as input = {len(inputFiles)}")
+    requested_iov = kwargs.get("requested_iov", None)
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
     cal = [BS13d_calibration_cdst(inputFiles),  # this is run-dep

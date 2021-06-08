@@ -29,7 +29,7 @@ namespace TreeFitter {
     charge = helix.getChargeSign();
   }
 
-  void HelixUtils::helixFromVertex(Eigen::Matrix<double, 1, 6>& positionAndMomentum,
+  void HelixUtils::helixFromVertex(const Eigen::Matrix<double, 1, 6>& positionAndMomentum,
                                    int charge, double Bz,
                                    Belle2::Helix& helix,
                                    double& L,

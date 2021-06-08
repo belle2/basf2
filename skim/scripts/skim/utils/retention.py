@@ -73,6 +73,7 @@ class RetentionCheck(b2.Module):
         super().__init__()
 
     def event(self):
+        """"""
 
         for particle_list in self.particle_lists:
 
@@ -87,6 +88,7 @@ class RetentionCheck(b2.Module):
                     self.event_with_candidate_count[particle_list] += 1
 
     def terminate(self):
+        """"""
 
         N = Belle2.Environment.Instance().getNumberOfEvents()
 

@@ -64,7 +64,7 @@ To write a new skim, please follow these steps:
 
 6. Skims can crash on the grid if the log files are too large. If any modules is producing too much output, then override the attribute ``NoisyModules`` as a list of such modules, and their output will be set to print only error-level messages.
 
-7. By default, the skim test file is a neutral :math:`B` pair sample with beam background. If your skim has a retention rate of close to zero for this sample type, you may wish to override the attribute ``TestSampleProcess``. This should be a label of a generic MC type, *e.g.* ``"ccbar"``, ``"charged"``, or ``"eemumu"``. This attribute is passed to `skim.utils.misc.get_test_file`, which retrieves a suitable test file, available in the property ``TestFiles``.
+7. By default, the skim test file is a neutral :math:`B` pair sample with beam background. If your skim has a retention rate of close to zero for this sample type, you may wish to override the attribute ``TestSampleProcess``. This should be a label of a generic MC type, *e.g.* ``"ccbar"``, ``"charged"``, or ``"eemumu"``. This attribute is passed to `skim.utils.testfiles.get_test_file`, which retrieves a suitable test file, available in the property ``TestFiles``.
 
 8. *[Mandatory]* Add your skim to the registry, with an appropriate skim code (see :ref:`Skim Registry<skim-registry>`).
 

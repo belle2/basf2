@@ -20,7 +20,7 @@ In addition, calibration constants from local runs (strip gain, noise, ...) and 
 In the following we describe the ``svd`` package .
 
 .. warning::
-   if you spot unclear or incorrect information, let us know at svd-software@belle2.it
+   if you spot unclear or incorrect information, let us know at svd-software@belle2.org
 
 .. toctree:: reconstruction
 

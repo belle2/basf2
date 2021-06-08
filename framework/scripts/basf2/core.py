@@ -50,7 +50,7 @@ def register_module(name_or_module, shared_lib_path=None, logLevel=None, debugLe
     Parameters can be passed directly to the module as keyword parameters or can
     be set later using `Module.param`
 
-    >>> module = basf.register_module('EventInfoSetter', evtNumList=100, logLevel=LogLevel.ERROR)
+    >>> module = basf2.register_module('EventInfoSetter', evtNumList=100, logLevel=LogLevel.ERROR)
     >>> module.param("evtNumList", 100)
 
     Parameters:
@@ -131,6 +131,30 @@ def set_module_parameters(path, name=None, type=None, recursive=False, **kwargs)
 
     if not found:
         raise KeyError("No module with given name found anywhere in the path")
+
+
+def remove_module(old_path, name=None):
+    """Remove a module of the given ``name`` from the path (see `Module.set_name`)
+
+    Usage is very simple, in this example we remove Geometry the path:
+
+    >>> main = remove_module(main, "Geometry")
+
+    Parameters:
+      old_path (basf2.Path): The path to search for the module
+      name (str): Then name of the module you want to remove
+    """
+
+    if name is None:
+        raise ValueError("You should provide the module name")
+
+    new_path = create_path()
+
+    for module in old_path.modules():
+        if name != module.name():
+            new_path.add_module(module)
+
+    return new_path
 
 
 def create_path():

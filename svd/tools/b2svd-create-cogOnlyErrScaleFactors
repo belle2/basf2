@@ -10,20 +10,18 @@ __copyright__ = '2021 - Belle II Collaboration'
 import basf2 as b2
 from ROOT import Belle2
 from svd import add_svd_reconstruction, add_svd_simulation
-from ROOT.Belle2 import SVDPosErrScaleFactors
 from basf2 import conditions as b2c
-import datetime
 
+import datetime
 import argparse
 import os
-import ROOT
 
 
 def arg_parser():
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-n', '--events',
-                        default=10000,
+                        default=20000,
                         type=int,
                         help='number of events',
                         metavar='EVENTS')
@@ -32,7 +30,7 @@ def arg_parser():
                         type=str,
                         nargs='*',
                         help='Global Tags to be prepended',
-                        metavar='GT')
+                        metavar='GTs')
     parser.add_argument('--no_outliers',
                         default=False,
                         action='store_true',
@@ -96,6 +94,13 @@ if __name__ == "__main__":
     add_svd_simulation(main)
 
     add_svd_reconstruction(main)
+
+    # set CoGOnly as position algorithm
+    b2.set_module_parameters(main, "SVDClusterizer",positionAlgorithm3Samples="CoGOnly")
+    b2.set_module_parameters(main, "SVDClusterizer",positionAlgorithm6Samples="CoGOnly")
+    # remove uselss modules for this purpose
+    main = b2.remove_module(main,"SVDMissingAPVsClusterCreator")
+    main = b2.remove_module(main,"SVDSpacePointCreator")
 
     #####################################################
     # Part 2: compute scale factors and create localdb

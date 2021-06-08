@@ -34,19 +34,16 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace group_helper;
+using namespace Belle2::group_helper;
 
-//! Total number of sectors (eight, a constant)
-const int c_TotalSectors = 8;
 
-//! Total number of sections
-const int c_TotalSections = 6;
+
+
 
 //! Total number of sections
 const int c_TotalSections_per_EKLM_BKLM = 2;
 
-//! Total number of layers (fifteen, a constant)
-const int c_TotalLayers = 15;
+
 
 
 
@@ -56,6 +53,8 @@ const int i_backward_eklm = 3;
 const int i_forward_bklm = 0;
 const int i_backward_bklm = 1;
 
+
+const std::string m_klmTriggerSummery =  "TRGKLMSummery"; //"Name of the StoreArray holding the Trigger Summery"
 
 // part of unused old Trigger collection
 const std::string m_klmtrackCollectionName = "TRGKLMTracks";
@@ -121,13 +120,14 @@ KLMTriggerModule::KLMTriggerModule() : Module()
 
 
 
-  addParam("TRGKLMSummery", m_klmTriggerSummery,  "Name of the StoreArray holding the Trigger Summery", string("TRGKLMSummery"));
+
 
 }
 
 void KLMTriggerModule::initialize()
 {
 
+  m_KLMTrgSummary.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
   B2INFO("KLMTrigger: m_dummy_used_layers " << m_dummy_used_layers);
   m_layerUsed = layer_string_list_to_integer(m_dummy_used_layers);
 
@@ -147,9 +147,6 @@ void KLMTriggerModule::initialize()
 // end unused
 
 
-  StoreArray<KLMTrgSummary> KLMTrgSummaries(m_klmTriggerSummery);
-  KLMTrgSummaries.registerInDataStore();
-  KLMTrgSummaries.registerRelationTo(klmDigits);
 
 
 }
@@ -254,13 +251,9 @@ void KLMTriggerModule::event()
 
 
 
-  StoreArray<KLMTrgSummary> klmTriggerSummery(m_klmTriggerSummery);
-  if (!klmTriggerSummery.isValid())
-    return;
+  m_KLMTrgSummary.create();
 
-  auto summery = klmTriggerSummery.appendNew();
   StoreArray<KLMDigit> klmDigits;
-
 
   auto hits = fill_vector(klmDigits,
                           [](auto klmdig) -> KLM_type  { return klmdig->getSubdetector(); },
@@ -302,20 +295,24 @@ void KLMTriggerModule::event()
   }
                                         );
 
-  summery->setBKLM_n_trg_sectors(first_or_default(summery2, KLM_type(KLMElementNumbers::c_BKLM), 0 , n_sections_trig{}));
-  summery->setEKLM_n_trg_sectors(first_or_default(summery2, KLM_type(KLMElementNumbers::c_EKLM), 0 , n_sections_trig{}));
+  m_KLMTrgSummary->setBKLM_n_trg_sectors(first_or_default(summery2, KLM_type(KLMElementNumbers::c_BKLM), 0 , n_sections_trig{}));
+  m_KLMTrgSummary->setEKLM_n_trg_sectors(first_or_default(summery2, KLM_type(KLMElementNumbers::c_EKLM), 0 , n_sections_trig{}));
 
-  summery->setSector_mask_Backward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(i_backward_bklm), 0 , sector_mask{}));
-  summery->setSector_mask_Forward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(i_forward_bklm) , 0 , sector_mask{}));
-  summery->setSector_mask_Backward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(i_backward_eklm), 0 , sector_mask{}));
-  summery->setSector_mask_Forward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(i_forward_eklm) , 0 , sector_mask{}));
+  m_KLMTrgSummary->setSector_mask_Backward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(i_backward_bklm), 0 , sector_mask{}));
+  m_KLMTrgSummary->setSector_mask_Forward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(i_forward_bklm) , 0 , sector_mask{}));
+  m_KLMTrgSummary->setSector_mask_Backward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(i_backward_eklm), 0 , sector_mask{}));
+  m_KLMTrgSummary->setSector_mask_Forward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(i_forward_eklm) , 0 , sector_mask{}));
 
-  summery->Sector_mask_OR_Backward_Barrel = first_or_default(n_triggered_sectors2, isectors_t(i_backward_bklm), 0 , sector_mask_or{});
-  summery->Sector_mask_OR_Forward_Barrel = first_or_default(n_triggered_sectors2, isectors_t(i_forward_bklm) , 0 , sector_mask_or{});
-  summery->Sector_mask_OR_Backward_Endcap = first_or_default(n_triggered_sectors2, isectors_t(i_backward_eklm), 0 , sector_mask_or{});
-  summery->Sector_mask_OR_Forward_Endcap = first_or_default(n_triggered_sectors2, isectors_t(i_forward_eklm) , 0 , sector_mask_or{});
+  m_KLMTrgSummary->Sector_mask_OR_Backward_Barrel = first_or_default(n_triggered_sectors2, isectors_t(i_backward_bklm), 0 ,
+                                                    sector_mask_or{});
+  m_KLMTrgSummary->Sector_mask_OR_Forward_Barrel = first_or_default(n_triggered_sectors2, isectors_t(i_forward_bklm) , 0 ,
+                                                   sector_mask_or{});
+  m_KLMTrgSummary->Sector_mask_OR_Backward_Endcap = first_or_default(n_triggered_sectors2, isectors_t(i_backward_eklm), 0 ,
+                                                    sector_mask_or{});
+  m_KLMTrgSummary->Sector_mask_OR_Forward_Endcap = first_or_default(n_triggered_sectors2, isectors_t(i_forward_eklm) , 0 ,
+                                                   sector_mask_or{});
 
-  summery->setBKLM_back_to_back_flag(first_or_default(summery1, KLM_type(KLMElementNumbers::c_BKLM), 0 , back2back_t{}));
-  summery->setEKLM_back_to_back_flag(first_or_default(summery1, KLM_type(KLMElementNumbers::c_EKLM), 0 , back2back_t{}));
+  m_KLMTrgSummary->setBKLM_back_to_back_flag(first_or_default(summery1, KLM_type(KLMElementNumbers::c_BKLM), 0 , back2back_t{}));
+  m_KLMTrgSummary->setEKLM_back_to_back_flag(first_or_default(summery1, KLM_type(KLMElementNumbers::c_EKLM), 0 , back2back_t{}));
 
 }

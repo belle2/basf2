@@ -12,8 +12,10 @@
 #define KLMTRIGGERMODULE_H
 
 #include <framework/core/Module.h>
-
+#include <framework/datastore/StoreObjPtr.h>
+#include <trg/klm/dataobjects/KLMTrgSummary.h>
 namespace Belle2 {
+
   class KLMTriggerModule : public Module {
   public:
 
@@ -35,8 +37,7 @@ namespace Belle2 {
 
     int m_nLayerTrigger = 0;
 
-    /**name of StoreArray summery*/
-    std::string m_klmTriggerSummery;
+    StoreObjPtr<KLMTrgSummary> m_KLMTrgSummary;
 
     std::vector<int> m_layerUsed;
     std::string m_dummy_used_layers;

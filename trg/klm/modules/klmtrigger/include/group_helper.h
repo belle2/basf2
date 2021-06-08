@@ -6,7 +6,7 @@
 #include <vector>
 #include <tuple>
 
-namespace group_helper {
+namespace Belle2::group_helper {
 
   template <class _Ty>
   using _Remove_cvref_t = std::remove_cv_t<std::remove_reference_t<_Ty>>;

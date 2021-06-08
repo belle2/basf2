@@ -134,7 +134,8 @@ def set_module_parameters(path, name=None, type=None, recursive=False, **kwargs)
 
 
 def remove_module(old_path, name=None):
-    """Remove a module of the given ``name`` from the path (see `Module.set_name`)
+    """Provides a new path with all modules that were in the ``old_path`` \
+    except the one with the given ``name`` (see `Module.set_name`)
 
     Usage is very simple, in this example we remove Geometry the path:
 

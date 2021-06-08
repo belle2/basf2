@@ -139,8 +139,7 @@ void SVDCoGOnlyErrorScaleFactorImporterModule::event()
     m_side = cluster.isUCluster();
     m_clsCharge = cluster.getCharge();
     m_clsTime = cluster.getClsTime();
-    m_clsPos = m_side ? cluster.getPosition(trueHit[0]->getU()) :  cluster.getPosition(trueHit[0]->getV());
-    m_clsPos = m_side ? cluster.getPosition(trueHit[0]->getU()) :  cluster.getPosition(trueHit[0]->getV());
+    m_clsPos = m_side ? cluster.getPosition(trueHit[0]->getV()) :  cluster.getPosition();
     m_clsErr = cluster.getPositionSigma();
     m_clsResid = m_side ? m_clsPos - trueHit[0]->getU() : m_clsPos - trueHit[0]->getV();
     m_clsPull = m_clsResid / m_clsErr;

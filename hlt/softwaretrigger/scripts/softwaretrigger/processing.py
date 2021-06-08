@@ -73,6 +73,9 @@ def setup_basf2_and_db(zmq=False):
     # otherwise the LogFilter in daq_slc throws away the other lines
     basf2.logging.enable_escape_newlines = True
 
+    # Online realm
+    basf2.set_realm("online")
+
     return args
 
 

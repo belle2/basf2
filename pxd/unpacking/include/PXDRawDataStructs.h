@@ -23,11 +23,15 @@ namespace Belle2 {
 
   namespace PXD {
 
+    /// define alias ulittle16_t
+    using ulittle16_t = boost::endian::little_uint16_t;
+    /// define alias ulittle32_t
+    using ulittle32_t = boost::endian::little_uint32_t;
     /// define alias ubig16_t
     using ubig16_t = boost::endian::big_uint16_t;
     /// define alias ubig32_t
     using ubig32_t = boost::endian::big_uint32_t;
-    // introduce from namespace
+
     using Belle2::PXD::PXDError::PXDErrorFlags;
 
     /** DHC frame header word data struct.

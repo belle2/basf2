@@ -121,10 +121,9 @@ int PXDReadRawONSENModule::readOneEvent()
     B2FATAL(Form("buffer too small : %d %d %d(%d) \n", headerlen, tablelen, datalen, len));
     exit(0);
   }
-  int bcount = read_data(data + headerlen + tablelen, datalen);
-  // the following condition does not do anything since `br` wasn't modified since the last check if (br <= 0)
-  //if (br <= 0) return br;
-  return (headerlen + tablelen + bcount);
+  br = read_data(data + headerlen + tablelen, datalen);
+  if (br <= 0) return br;
+  return (headerlen + tablelen + br);
 }
 
 void PXDReadRawONSENModule::event()

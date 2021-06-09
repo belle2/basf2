@@ -24,8 +24,7 @@ namespace Belle2 {
   class DQMHistInjectionModule : public DQMHistAnalysisModule {
 
 #ifdef _BELLE2_EPICS
-    // anonymous struct definition
-    typedef struct {
+    typedef struct MYNODE_struct {
       chid    mychid; /**< channel ID */
       TH1*  histo = {}; /**< initial histogram */
       std::vector <double> data; /**< vector of data */

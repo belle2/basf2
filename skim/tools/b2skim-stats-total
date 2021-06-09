@@ -26,12 +26,11 @@ import warnings
 
 from tabulate import tabulate
 
-from skimExpertFunctions import get_test_file
+from skim.testfiles import TestSampleList
 from skim.registry import Registry
 
 
 def get_working_groups():
-    # Write out numbering explicitly, but return a list of keys
     WGs = {
         0: "Systematics",
         1: "SL + Missing Energy",
@@ -210,12 +209,18 @@ def get_nEvents_per_invab():
     return CrossSection_ab * invab
 
 
-def load_df(JSONPath, *, RequestedSkims):
-    InputFile = Path(JSONPath).expanduser()
+def get_samples_of_interest(StatsDict):
+    """
+    Retrieve list of samples, and filter down to only the ones we're interested in
+    printing: only BGx1 samples for MC, and only 4S and GeneralSkimName=all for data.
+    """
+    samples = TestSampleList(SampleDict=StatsDict)
+    samples.query_mc_samples(beam_background="BGx1", inplace=True)
+    samples.query_data_samples(beam_energy="4S", general_skim="all", inplace=True)
+    return samples
 
-    with open(InputFile) as f:
-        StatsDict = json.load(f)["stats"]
 
+def load_df(StatsDict, *, RequestedSkims, samples):
     # Read in the nested stats dict and concatenate into a single dataframe
     dfs = {
         skim: pd.DataFrame(stats).reset_index(level=0)
@@ -238,19 +243,17 @@ def load_df(JSONPath, *, RequestedSkims):
     df["Requested"] = df.apply(lambda row: row["Skim"] in RequestedSkims, axis=1)
 
     # Filter into data and MC dataframes using sample labels
-    df["Sample"] = df["Sample"].str.replace(r"^MC\d+_", "")
-    df["Sample"] = df["Sample"].str.replace("BGx", " BGx")
-    MCMask = df["Sample"].str.contains(
-        r"(mixed|charged|ccbar|uubar|ddbar|ssbar|taupair|ee|eeee|eemumu|mumu|gg) BGx\d"
-    )
-    DataMask = df["Sample"].str.contains("proc|bucket") & ~df["Sample"].str.contains(
-        "offres"
-    )
+    MCMask = df["Sample"].isin([s.encodeable_name for s in samples.mc_samples])
+    DataMask = df["Sample"].isin([s.encodeable_name for s in samples.data_samples])
+
+    # Use human-readable labels from now on
+    labels = {s.encodeable_name: s.printable_name for s in samples}
+    df = df.replace({"Sample": labels})
 
     return df.loc[DataMask], df.loc[MCMask]
 
 
-def add_data_fields(df, add_lumi=False):
+def add_data_fields(df, *, samples, add_lumi=False):
     """
     Add stats to dataframe for data samples.
 
@@ -261,14 +264,16 @@ def add_data_fields(df, add_lumi=False):
     df = df.fillna(0)
 
     # Add columns with info about input file
-    df["SampleFile"] = df["Sample"].apply(lambda sample: get_test_file(sample))
-    df["FractionOfEventsUsed"] = df.apply(
-        lambda row: get_fraction_of_events_used(row["SampleFile"], row["nInputEvents"]),
-        axis=1,
-    )
+    locations = {s.printable_name: s.location for s in samples.data_samples}
+    df["SampleFile"] = df["Sample"].apply(lambda sample: locations[sample])
 
     # NOTE: very slow to query the DB multiple times, so don't do this if we don't need to
     if add_lumi:
+        df["FractionOfEventsUsed"] = df.apply(
+            lambda row: get_fraction_of_events_used(row["SampleFile"], row["nInputEvents"]),
+            axis=1,
+        )
+
         # Get luminosity associated with each
         df["SampleIntLumi"] = df["SampleFile"].apply(
             lambda SampleFile: get_luminosity(SampleFile)
@@ -395,9 +400,18 @@ def main():
                 + ", ".join(InvalidSkims)
             )
 
-    df_Data, df_MC = load_df(args.StatsJSON, RequestedSkims=RequestedSkims)
+    with open(args.StatsJSON) as f:
+        JSONContent = json.load(f)
 
-    df_Data = add_data_fields(df_Data)
+    samples = get_samples_of_interest(JSONContent["Samples"])
+
+    df_Data, df_MC = load_df(
+        JSONContent["stats"], RequestedSkims=RequestedSkims, samples=samples
+    )
+    print(df_Data)
+    print(df_MC)
+
+    df_Data = add_data_fields(df_Data, samples=samples)
     df_MC = add_mc_fields(df_MC)
 
     # Select the table printing format based on flag
@@ -421,9 +435,8 @@ def main():
         ("RetentionRate", "Event-based retention rate (%)", ".1f"),
         ("FilesizeRetentionRate", "Filesize-based retention rate (%)", ".1f"),
         ("udstSizePerSkimmedEvent", "Size of one event in uDST format (kB)", ".1f"),
-    
         ("udstSizePerInputEvent", "Size of one event per input event(kB)", ".1f"),
-   )
+    )
     for variable, description, fmt_string in VariablesToPrint:
         table_function(
             variable,

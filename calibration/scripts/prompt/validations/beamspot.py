@@ -86,8 +86,6 @@ def getBSvalues(path):
             fN = ll[0].replace('/', '_') + '_rev_' + ll[1] + '.root'
 
             r = ll[2].split(',')
-            assert(r[0] == r[2])
-            assert(r[1] == r[3])
             runDict[fN] = (int(r[0]), int(r[1]))
 
     arr = []
@@ -99,6 +97,7 @@ def getBSvalues(path):
 
         f = ROOT.TFile.Open(fName)
         bsAll = f.Get("BeamSpot")
+        assert(bsAll.ClassName() == "Belle2::EventDependency")
 
         evNums = bsAll.getEventNumbers()
 
@@ -173,6 +172,10 @@ def plotVar(arr, limits, vName, getterV, getterE=None):
     tVals = []
     bsVals = []
     bsErrs = []
+
+    tGapVals = []
+    bsGapVals = []
+
     for i, el in enumerate(arr):
         s, e = el[1], el[2]
         s = datetime.utcfromtimestamp((s + 9) * 3600)  # Convert to the JST (+9 hours)
@@ -186,16 +189,38 @@ def plotVar(arr, limits, vName, getterV, getterE=None):
             bsErrs.append(getterE(el))
             bsErrs.append(getterE(el))
 
-        # Add breaks if gap more than 180s
-        if i < len(arr) - 1:
-            dt = (arr[i + 1][1] - arr[i][2]) * 3600
-            if dt > 180:
-                tVals.append(e + timedelta(seconds=90))
-                bsVals.append(np.nan)
-                if getterE is not None:
-                    bsErrs.append(np.nan)
+        # Add breaks for longer gap if not the last interval
+        if i >= len(arr) - 1:
+            continue
 
-    plt.plot(tVals, bsVals)
+        dt = (arr[i + 1][1] - arr[i][2]) * 3600
+
+        # only consider gaps longer than 10 mins
+        if dt < 10 * 60:
+            continue
+
+        # start-time of gap, end-time of gap
+        gS = datetime.utcfromtimestamp((arr[i][2] + 9) * 3600)  # Convert to the JST (+9 hours)
+        gE = datetime.utcfromtimestamp((arr[i + 1][1] + 9) * 3600)
+
+        tVals.append(gS + (gE - gS) / 2)
+        bsVals.append(np.nan)
+        if getterE is not None:
+            bsErrs.append(np.nan)
+
+        # store curve connecting gaps
+        tGapVals.append(gS - timedelta(seconds=1))
+        tGapVals.append(gS)
+        tGapVals.append(gE)
+        tGapVals.append(gE + timedelta(seconds=1))
+
+        bsGapVals.append(np.nan)
+        bsGapVals.append(getterV(arr[i]))
+        bsGapVals.append(getterV(arr[i + 1]))
+        bsGapVals.append(np.nan)
+
+    plt.plot(tVals, bsVals, linewidth=2, color='C0')
+    plt.plot(tGapVals, bsGapVals, linewidth=2, color='C0', alpha=0.35)
 
     bsVals = np.array(bsVals)
     bsErrs = np.array(bsErrs)
@@ -235,13 +260,17 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
         allLimits += expert_config['plotsRanges']
 
     # Path to the database.txt file and to the payloads.
-    inputDir = f'{job_path}/BeamSpot/outputdb'
+    dbFile = glob(f'{job_path}/**/database.txt', recursive=True)
+    assert(len(dbFile) == 1)
+    dbFile = dbFile[0]
+    inputDir = dbFile[:dbFile.rfind('/')]
+
     arr = getBSvalues(inputDir)
 
     # print the results to the CSV file
     printToFile(arr)
 
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(18, 9))
 
     # plot the results
     for limits in allLimits:

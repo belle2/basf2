@@ -9,6 +9,10 @@
 # Contributors: Ewan Hill
 #
 # This software is provided "as is" without any warranty.
+#
+# This script executes the bhabha validation algoirthm.  It
+# has to run on the results of the bahbha validation collector.
+# This script is run directly with basf2.
 # -----------------------------------------------------------
 
 # Usage: basf2 run_eclBhabhaTimeCalibrationValidation_algorithm.py [input_file]

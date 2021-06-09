@@ -10,6 +10,12 @@
 #               Mikhail Remnev
 #
 # This software is provided "as is" without any warranty.
+#
+# This script executes the bhabha timing calibration collector,
+# which reads in the bhabha events to perform the crystal
+# time calibration and the crate time calibration, where
+# the final calibration step is performed by the algorithm.
+# This script is run directly with basf2.
 # -----------------------------------------------------------
 
 # --------------------------------------------------------------------------

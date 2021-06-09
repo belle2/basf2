@@ -682,7 +682,7 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
     for (int runCounter = 0; runCounter < numRunsWithCrateTimes; runCounter++) {
       int idx = (int) round(counterVec[runCounter]);
       B2INFO("Vector index, Run number, run number sorting order index, tcrystal+tcrate+shifts = " << runCounter << ", " <<
-             allCrates_run_nums[i][runCounter] << ", " << idx << ", " << single_crate_crystalCrate_times[idx] << " ns");
+             allCrates_run_nums[i][runCounter] << ", " << idx << ", " << single_crate_crystalCrate_times[idx - 1] << " ns");
     }
 
 

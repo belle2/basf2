@@ -9,6 +9,12 @@
 # Contributors: Ewan Hill
 #
 # This software is provided "as is" without any warranty.
+#
+# This script executes the bhabha timing calibration algorithm,
+# which is used for both the crystal time calibration and the
+# crate time calibration.  It has to run on the results of
+# the collector code.
+# This script is run directly with basf2.
 # -----------------------------------------------------------
 
 # Usage: basf2 run_eclBhabhaT_algorithm.py [input_file]

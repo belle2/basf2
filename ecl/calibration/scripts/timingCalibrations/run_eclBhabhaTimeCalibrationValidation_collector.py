@@ -9,6 +9,12 @@
 # Contributors: Ewan Hill
 #
 # This software is provided "as is" without any warranty.
+#
+# This script executes the bhabha timing calibration collector,
+# which reads in the bhabha events to perform the bhabha
+# validation, where the final validation fits is performed
+# by the algorithm.
+# This script is run directly with basf2.
 # -----------------------------------------------------------
 
 # --------------------------------------------------------------------------

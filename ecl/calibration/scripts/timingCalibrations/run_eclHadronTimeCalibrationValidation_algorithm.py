@@ -9,6 +9,10 @@
 # Contributors: Ewan Hill
 #
 # This software is provided "as is" without any warranty.
+#
+# This script executes the hadron validation algoirthm.  It
+# has to run on the results of the hadron validation collector.
+# This script is run directly with basf2.
 # -----------------------------------------------------------
 
 # Usage: basf2 run_eclHadronTimeCalibrationValidation_algorithm.py [input_file]

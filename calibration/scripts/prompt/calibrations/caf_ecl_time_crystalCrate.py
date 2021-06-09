@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """ECL timing calibration that performs the crystal and crate calibrations,
-   merges the relevant crystal payloads, and makes validation plots."""
+   merges the relevant crystal payloads, and makes validation plots.  It is the
+   main script for executing the ECL timing calibrations."""
 
 from prompt import CalibrationSettings, input_data_filters
 from reconstruction import prepare_cdst_analysis, prepare_user_cdst_analysis

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""ECL timing self-consistency check (not orthogonal events so not a great validation)."""
+"""ECL timing validations.  Does both the bhabha self-consistency check and the hadronic event selection validation."""
 
 from prompt import CalibrationSettings
 from reconstruction import *

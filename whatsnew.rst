@@ -22,7 +22,7 @@ Changes since release-05
    .. rubric:: The jitter of the L1 trigger is included in the standard simulation
 
    The L1 trigger jitter is randomly extracted from a double gaussian whose parameters have been tuned with 2020 data.
-   The machine filling pattern is takein into account in the simulation of the jitter.
+   The machine filling pattern is taken into account in the simulation of the jitter.
 
 
 .. only:: not light

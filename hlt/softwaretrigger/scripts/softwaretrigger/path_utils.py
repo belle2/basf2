@@ -187,13 +187,15 @@ def add_filter_reconstruction(path, run_type, components, **kwargs):
             components=components,
             event_abort=hlt_event_abort,
             **kwargs)
-
         add_filter_software_trigger(path, store_array_debug_prescale=1)
         path.add_module('StatisticsSummary').set_name('Sum_HLT_Filter_Calculation')
 
     elif run_type == constants.RunTypes.cosmic:
         reconstruction.add_cosmics_reconstruction(path, skipGeometryAdding=True, pruneTracks=False,
                                                   components=components, **kwargs)
+        add_filter_software_trigger(path, store_array_debug_prescale=1)
+        path.add_module('StatisticsSummary').set_name('Sum_HLT_Filter_Calculation')
+
     else:
         basf2.B2FATAL(f"Run Type {run_type} not supported.")
 
@@ -215,11 +217,13 @@ def add_post_filter_reconstruction(path, run_type, components):
     """
     check_components(components)
 
+    # Currently, the post filter reconstruction for physics and cosmics events is exactly the same.
     if run_type == constants.RunTypes.beam:
         add_skim_software_trigger(path, store_array_debug_prescale=1)
         path.add_module('StatisticsSummary').set_name('Sum_HLT_Skim_Calculation')
     elif run_type == constants.RunTypes.cosmic:
-        pass
+        add_skim_software_trigger(path, store_array_debug_prescale=1)
+        path.add_module('StatisticsSummary').set_name('Sum_HLT_Skim_Calculation')
     else:
         basf2.B2FATAL(f"Run Type {run_type} not supported.")
 
@@ -233,3 +237,4 @@ def hlt_event_abort(module, condition, error_flag):
     p.add_module("EventErrorFlag", errorFlag=error_flag)
     add_store_only_metadata_path(p)
     module.if_value(condition, p, basf2.AfterConditionPath.CONTINUE)
+    p.add_module('StatisticsSummary').set_name('Sum_HLT_Discard')

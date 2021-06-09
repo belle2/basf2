@@ -16,6 +16,7 @@
 #include <TObject.h>
 
 #include <vector>
+#include <limits>
 
 
 namespace Belle2 {
@@ -109,4 +110,3 @@ namespace Belle2 {
 } //end namespace Belle2
 
 #endif
-

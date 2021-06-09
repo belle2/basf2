@@ -1,0 +1,130 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""\
+Tool to aggregate log messages sent by UDP in json format from multiple clients.
+
+The configuration file has json format and can contain the following attributes:
+ * host(str): Name of the host where to listen for incoming messages, default is 'localhost'.
+ * port(int): Port on which to listen for incoming messages, default is 9742.
+ * forward_host(str): Name of host to which messages should be forwarded,
+     default is null which disables forwarding and instead prints the messages.
+ * forward_port(int): Port to which messages should be forwarded, default is 9742.
+ * throttle(int): For a value N > 0 forward only the first N occurrences of the same message and afterwards only each N-th message
+     until the N^2-th occurrence, then forward only each N^2-th message and so on. Default is 0 meaning no throttling.
+ * filter(dict): A dictionary of message texts to log level strings for changing the level of a message.
+     A value of null will drop the message. By default no filtering is applied.
+ * single_process(bool): If true ignore a message if the same one was already sent from a different process
+     (in multi-processing mode). Default is false.
+
+"""
+
+import argparse
+import socketserver
+import socket
+import json
+
+
+def get_argument_parser():
+    """Return argument parser with all defined arguments"""
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('config', default=None,
+                        help='Name of the configuration file in json format.')
+    return parser
+
+
+class LogAggregator():
+    """
+    Class for processing received log messages
+    """
+
+    def __init__(self, config_file):
+        """
+        Initialize member variables and read config file
+        """
+
+        self.host = 'localhost'
+        self.port = 9742
+        self.forward_host = None
+        self.forward_port = 9742
+        self.throttle = 0
+        self.filter = {}
+        self.single_process = False
+
+        config = json.loads(open(config_file).read())
+        for attribute in ['host', 'port', 'forward_host', 'forward_port', 'throttle', 'filter', 'single_process']:
+            if attribute in config.keys():
+                self.__setattr__(attribute, config[attribute])
+
+        self.messages = {}
+        self.forward_socket = None
+        if self.forward_host:
+            self.forward_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    def handle(self, data):
+        """
+        Process a log message
+        """
+
+        message = data['message']
+
+        # count messages
+        if message not in self.messages:
+            self.messages[message] = [data, 0]
+        self.messages[message][1] += 1
+        count = self.messages[message][1]
+        data['count'] = count
+
+        # throttle messages
+        if self.throttle > 0:
+            step = 1
+            while count > step * self.throttle:
+                step *= self.throttle
+            if count % step != 0:
+                return
+
+        # filter messages or modify their level
+        if message in self.filter.keys():
+            data['level'] = self.filter[message]
+            if data['level'] is None:
+                return
+
+        # ignore the message if it was already issued by another process
+        if self.single_process and self.messages[message][0]['proc'] != data['proc']:
+            return
+
+        # forward or print the message
+        if self.forward_socket:
+            try:
+                self.forward_socket.sendto(bytes(json.dumps(data), "utf-8"), (self.forward_host, self.forward_port))
+            except Exception as e:
+                print(f'[ERROR] Failed to forward log message to {self.forward_host} port {self.forward_port}: {e}')
+        else:
+            print(f'[{data["level"]}] {message}')
+
+
+global aggregator
+
+
+class LogHandler(socketserver.BaseRequestHandler):
+    """
+    Class for processing received UDP messages
+    """
+
+    def handle(self):
+        """
+        This method is called for each received UDP message.
+        It interprets the json and forwards it to the log aggregator
+        """
+        try:
+            data = json.loads(self.request[0].strip())
+        except:
+            data = {'level': 'ERROR', 'message': 'Invalid data received', 'variables': {'data': self.request[0].strip()}, 'module': 'LogAggregator', 'package': 'framework'}
+        aggregator.handle(data)
+
+
+if __name__ == "__main__":
+    args = get_argument_parser().parse_args()
+    aggregator = LogAggregator(args.config)
+    with socketserver.UDPServer((aggregator.host, aggregator.port), LogHandler) as server:
+        server.serve_forever()

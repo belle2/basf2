@@ -93,6 +93,11 @@ int main(int argc, char* argv[])
     tree->GetEntry(0);
   }
 
+  if (!fileMetaData) {
+    B2ERROR("Failed to load FileMetaData from file " << fileName);
+    return 1;
+  }
+
   // remember old lfn in case this file was registered in file catalog
   const std::string oldLFN = fileMetaData->getLfn();
 
@@ -130,4 +135,3 @@ int main(int argc, char* argv[])
   }
   return 0;
 }
-

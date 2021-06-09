@@ -165,9 +165,7 @@ Now we have to add to the steering path the relevant functions for:
 
 * generating MC events (for example, some :math:`B^0 \bar{B}^0` events): :py:func:`generators.add_evtgen_generator`
 
-* simulating the detector response: :py:func:`simulation.add_simulation`
-
-* simulating the L1 trigger: :py:func:`L1trigger.add_tsim`
+* simulating the detector response, including the L1 trigger: :py:func:`simulation.add_simulation`
 
 * reconstructing the relevant objects, like tracks, electromagnetic clusters, etc.: :py:func:`reconstruction.add_reconstruction`
 
@@ -183,7 +181,7 @@ Now we have to add to the steering path the relevant functions for:
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     Do not forget to import all the relevant python modules (for example, ``import L1trigger`` for ``add_tsim()``).
+     Do not forget to import all the relevant python modules (for example, ``import simulation`` for ``add_simulation()``).
 
 .. admonition:: Solution
      :class: toggle solution

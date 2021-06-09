@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+# this is a test executable, not a module so we don't need doxygen warnings
+# @cond SUPPRESS_DOXYGEN
 
 """
 Check that ROOT returns the correct values (ints, floats) when calling a C++
@@ -31,13 +33,13 @@ floating_expressions = {
 for width in integral_types:
     # check signed types, we want min, max -1, 0 and 1
     dtype = np.dtype("int%d" % width)
-    for i, value in enumerate([-2**(width-1), -1, 0, 1, 2**(width-1) - 1]):
+    for i, value in enumerate([-2**(width - 1), -1, 0, 1, 2**(width - 1) - 1]):
         # create a unique member name
-        func_name = "int{0}test{1}".format(width, i)
+        func_name = f"int{width}test{i}"
         # do we need a prefix to the literal?
         prefix = "ull" if width > 32 else ""
         # append it to the test class
-        testclass.append("int{0}_t {1}() const {{ return {2}{3}; }}".format(width, func_name, value, prefix))
+        testclass.append(f"int{width}_t {func_name}() const {{ return {value}{prefix}; }}")
         testclass.append("int{0}_t& ref_{1}() {{ static int{0}_t val = {2}{3}; return val; }}".format(
             width, func_name, value, prefix))
         # and remember name and result for checking
@@ -48,13 +50,12 @@ for width in integral_types:
     dtype = np.dtype("uint%d" % width)
     for i, value in enumerate([0, 1, 2**(width) - 1]):
         # create a unique member name
-        func_name = "uint{0}test{1}".format(width, i)
+        func_name = f"uint{width}test{i}"
         # do we need a prefix to the literal?
         prefix = "ull" if width > 32 else ""
         # append it to the test class
-        testclass.append("uint{0}_t {1}() const {{ return {2}{3}; }}".format(width, func_name, value, prefix))
-        testclass.append("uint{0}_t& ref_{1}() {{ static uint{0}_t val = {2}{3}; return val; }}".format(
-            width, func_name, value, prefix))
+        testclass.append(f"uint{width}_t {func_name}() const {{ return {value}{prefix}; }}")
+        testclass.append(f"uint{width}_t& ref_{func_name}() {{ static uint{width}_t val = {value}{prefix}; return val; }}")
         # and remember name and result for checking
         results.append([func_name, value, dtype])
         results.append(['ref_' + func_name, value, dtype])
@@ -66,10 +67,10 @@ for t in floating_types:
 
     # check some values
     for i, value in enumerate([-np.inf, info.min, -1, 0, info.tiny, info.eps, 1, info.max, np.inf, np.nan]):
-        func_name = "{0}test{1}".format(t, i)
+        func_name = f"{t}test{i}"
         # see if we can just have the literal or if we need a mapping
         expression = repr(value) if value not in floating_expressions else floating_expressions[value].format(t)
-        testclass.append("{0} {1}() const {{ return {2}; }}".format(t, func_name, expression))
+        testclass.append(f"{t} {func_name}() const {{ return {expression}; }}")
         testclass.append("{0}& ref_{1}() {{ static {0} val = {2}; return val; }}".format(t, func_name, expression))
         results.append([func_name, value, info.dtype])
         results.append(['ref_' + func_name, value, info.dtype])
@@ -91,7 +92,7 @@ for func, value, dtype in results:
         ret = np.fromstring(ret.encode("latin1"), dtype)[0]
 
     # print the test
-    print("check %s(): %r == %r: " % (func, value, ret), end="")
+    print(f"check {func}(): {value!r} == {ret!r}: ", end="")
     # nan needs special care because it cannot be compared to itself
     if np.isnan(value):
         passed = np.isnan(ret)
@@ -103,3 +104,5 @@ for func, value, dtype in results:
         failures += 1
 
 sys.exit(failures)
+
+# @endcond

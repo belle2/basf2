@@ -35,11 +35,11 @@ class defaultSVDConfigParametersImporter(b2.Module):
 
         iov = Belle2.IntervalOfValidity.always()
 
-        local_payload = Belle2.SVDDetectorConfiguration.t_svdLocalConfig_payload(
+        local_payload = Belle2.SVDLocalConfigParameters(
             "LocalConfiguration_default_" + str(now.isoformat()) +
             "_INFO:_injCharge=" + str(injCharge) + "_calTimeUnits=" + str(calibrationTimeUnits))
 
-        global_payload = Belle2.SVDDetectorConfiguration.t_svdGlobalConfig_payload(
+        global_payload = Belle2.SVDGlobalConfigParameters(
             "GlobalConfiguration_default_" + str(now.isoformat()) +
             "_INFO:_latency=" + str(latency) +
             "_maskFilter=" + str(maskFilter) + "_ZS=" + str(zeroSuppress) +
@@ -56,8 +56,8 @@ class defaultSVDConfigParametersImporter(b2.Module):
         global_payload.setRelativeTimeShift(relativeShift)
         global_payload.setNrFrames(nrFrames)
 
-        Belle2.Database.Instance().storeData(Belle2.SVDDetectorConfiguration.svdLocalConfig_name, local_payload, iov)
-        Belle2.Database.Instance().storeData(Belle2.SVDDetectorConfiguration.svdGlobalConfig_name, global_payload, iov)
+        Belle2.Database.Instance().storeData("SVDLocalConfigParameters", local_payload, iov)
+        Belle2.Database.Instance().storeData("SVDGlobalConfigParameters", global_payload, iov)
 
 
 b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")

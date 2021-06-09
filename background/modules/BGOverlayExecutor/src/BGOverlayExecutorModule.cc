@@ -12,8 +12,6 @@
 #include <background/modules/BGOverlayExecutor/BGOverlayExecutorModule.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
@@ -63,12 +61,10 @@ namespace Belle2 {
              "name of ARICH collection to overlay with BG", string(""));
     addParam("KLMDigitsName", m_KLMDigitsName,
              "name of KLM collection to overlay with BG", string(""));
-
+    addParam("components", m_components,
+             "Detector components to be included in overlay (empty list means all)", m_components);
   }
 
-  BGOverlayExecutorModule::~BGOverlayExecutorModule()
-  {
-  }
 
   void BGOverlayExecutorModule::initialize()
   {
@@ -92,35 +88,42 @@ namespace Belle2 {
     registerDigits<ARICHDigit>(m_ARICHDigitsName);
     registerDigits<KLMDigit>(m_KLMDigitsName);
 
+    // toggle ON the components from the list
+    if (m_components.empty()) {
+      m_addPXD = true;
+      m_addSVD = true;
+      m_addCDC = true;
+      m_addTOP = true;
+      m_addARICH = true;
+      m_addKLM = true;
+    } else {
+      for (const auto& component : m_components) {
+        if (component == "PXD") m_addPXD = true;
+        else if (component == "SVD") m_addSVD = true;
+        else if (component == "CDC") m_addCDC = true;
+        else if (component == "TOP") m_addTOP = true;
+        else if (component == "ARICH") m_addARICH = true;
+        else if (component == "ECL") continue; // not relevant - overlay implemented in ECLDigitizer
+        else if (component == "KLM") m_addKLM = true;
+        else B2ERROR("Unknown detector component '" << component << "'");
+      }
+    }
+
   }
 
-  void BGOverlayExecutorModule::beginRun()
-  {
-  }
 
   void BGOverlayExecutorModule::event()
   {
     /* note: dataobject must inherit from DigitBase */
 
-    addBGDigits<PXDDigit>(m_PXDDigitsName);
-    addBGDigits<SVDShaperDigit>(m_SVDShaperDigitsName);
-    addBGDigits<CDCHit>(m_CDCHitsName);
-    addBGDigits<TOPDigit>(m_TOPDigitsName);
-    addBGDigits<ARICHDigit>(m_ARICHDigitsName);
+    if (m_addPXD) addBGDigits<PXDDigit>(m_PXDDigitsName);
+    if (m_addSVD) addBGDigits<SVDShaperDigit>(m_SVDShaperDigitsName);
+    if (m_addCDC) addBGDigits<CDCHit>(m_CDCHitsName);
+    if (m_addTOP) addBGDigits<TOPDigit>(m_TOPDigitsName);
+    if (m_addARICH) addBGDigits<ARICHDigit>(m_ARICHDigitsName);
     //Compressed waveforms are loaded to the datastore by BGOverlayInputModule and unpacked and overlayed in ECLDigitizerModule
-    addBGDigits<KLMDigit>(m_KLMDigitsName);
-
+    if (m_addKLM) addBGDigits<KLMDigit>(m_KLMDigitsName);
   }
-
-
-  void BGOverlayExecutorModule::endRun()
-  {
-  }
-
-  void BGOverlayExecutorModule::terminate()
-  {
-  }
-
 
 } // end Belle2 namespace
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # BASF2 (Belle Analysis Framework 2)                                     #
@@ -11,7 +10,6 @@
 # This software is provided "as is" without any warranty.                #
 ##########################################################################
 
-from __future__ import division, print_function
 import numpy as np
 
 # Purity transformations

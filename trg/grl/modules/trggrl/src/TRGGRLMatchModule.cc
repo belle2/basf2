@@ -1076,9 +1076,11 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
   bool s2s3 = false;
   bool s2s5 = false;
   bool s2so = false;
+  bool s2s30 = false;
   bool s2f3 = false;
   bool s2f5 = false;
   bool s2fo = false;
+  bool s2f30 = false;
   int secl = 0;
   int secl_fwd = 0;
   int secl_bwd = 0;
@@ -1133,6 +1135,22 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
                             or ST0_36b[N36(i + 11)] or ST0_36b[N36(i + 25)]
                             or ST0_36b[N36(i + 10)] or ST0_36b[N36(i + 26)]
                             or ST0_36b[N36(i + 9)] or ST0_36b[N36(i + 27)])) or s2so ;
+    s2s30 = (ST0_36b[i] and (ST0_36b[N36(i + 18)] or ST0_36b[N36(i + 17)] or ST0_36b[N36(i + 19)]
+                             or ST0_36b[N36(i + 16)] or ST0_36b[N36(i + 20)]
+                             or ST0_36b[N36(i + 15)] or ST0_36b[N36(i + 21)]
+                             or ST0_36b[N36(i + 14)] or ST0_36b[N36(i + 22)]
+                             or ST0_36b[N36(i + 13)] or ST0_36b[N36(i + 23)]
+                             or ST0_36b[N36(i + 12)] or ST0_36b[N36(i + 24)]
+                             or ST0_36b[N36(i + 11)] or ST0_36b[N36(i + 25)]
+                             or ST0_36b[N36(i + 10)] or ST0_36b[N36(i + 26)]
+                             or ST0_36b[N36(i + 9)] or ST0_36b[N36(i + 27)]
+                             or ST0_36b[N36(i + 8)] or ST0_36b[N36(i + 28)]
+                             or ST0_36b[N36(i + 7)] or ST0_36b[N36(i + 29)]
+                             or ST0_36b[N36(i + 6)] or ST0_36b[N36(i + 30)]
+                             or ST0_36b[N36(i + 5)] or ST0_36b[N36(i + 31)]
+                             or ST0_36b[N36(i + 4)] or ST0_36b[N36(i + 32)]
+                             or ST0_36b[N36(i + 3)] or ST0_36b[N36(i + 33)])) or s2s30 ;
+
 
     s2f3 = (phimap_i[i] and (ST0_36b[N36(i + 18)] or ST0_36b[N36(i + 17)] or ST0_36b[N36(i + 19)])) or s2f3;
     s2f5 = (phimap_i[i] and (ST0_36b[N36(i + 18)] or ST0_36b[N36(i + 17)] or ST0_36b[N36(i + 19)]
@@ -1146,6 +1164,22 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
                              or ST0_36b[N36(i + 11)] or ST0_36b[N36(i + 25)]
                              or ST0_36b[N36(i + 10)] or ST0_36b[N36(i + 26)]
                              or ST0_36b[N36(i + 9)] or ST0_36b[N36(i + 27)])) or s2fo ;
+    s2f30 = (phimap_i[i] and (ST0_36b[N36(i + 18)] or ST0_36b[N36(i + 17)] or ST0_36b[N36(i + 19)]
+                              or ST0_36b[N36(i + 16)] or ST0_36b[N36(i + 20)]
+                              or ST0_36b[N36(i + 15)] or ST0_36b[N36(i + 21)]
+                              or ST0_36b[N36(i + 14)] or ST0_36b[N36(i + 22)]
+                              or ST0_36b[N36(i + 13)] or ST0_36b[N36(i + 23)]
+                              or ST0_36b[N36(i + 12)] or ST0_36b[N36(i + 24)]
+                              or ST0_36b[N36(i + 11)] or ST0_36b[N36(i + 25)]
+                              or ST0_36b[N36(i + 10)] or ST0_36b[N36(i + 26)]
+                              or ST0_36b[N36(i + 9)] or ST0_36b[N36(i + 27)]
+                              or ST0_36b[N36(i + 8)] or ST0_36b[N36(i + 28)]
+                              or ST0_36b[N36(i + 7)] or ST0_36b[N36(i + 29)]
+                              or ST0_36b[N36(i + 6)] or ST0_36b[N36(i + 30)]
+                              or ST0_36b[N36(i + 5)] or ST0_36b[N36(i + 31)]
+                              or ST0_36b[N36(i + 4)] or ST0_36b[N36(i + 32)]
+                              or ST0_36b[N36(i + 3)] or ST0_36b[N36(i + 33)])) or s2f30 ;
+
   }
 
 //short-ecl matching at endcap
@@ -1173,9 +1207,11 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
   trgInfo->sets2s3(s2s3);
   trgInfo->sets2s5(s2s5);
   trgInfo->sets2so(s2so);
+  trgInfo->sets2s30(s2s30);
   trgInfo->sets2f3(s2f3);
   trgInfo->sets2f5(s2f5);
   trgInfo->sets2fo(s2fo);
+  trgInfo->sets2f30(s2f30);
   trgInfo->setbwdsb(0);
   trgInfo->setbwdnb(0);
   trgInfo->setfwdsb(0);

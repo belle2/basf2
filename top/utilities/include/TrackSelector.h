@@ -10,14 +10,14 @@
 
 #pragma once
 
+#include <top/reconstruction/TOPtrack.h> // old version (TODO: to be removed)
+#include <top/reconstruction_cpp/TOPTrack.h>
 #include <framework/gearbox/Const.h>
 #include <string>
 #include <TVector3.h>
 
 namespace Belle2 {
   namespace TOP {
-
-    class TOPtrack;
 
     /**
      * Utility for the track selection - used in various calibration modules
@@ -160,11 +160,18 @@ namespace Belle2 {
       const TVector3& getLocalMomentum() const {return m_localMomentum;}
 
       /**
-       * Returns selection status
+       * Returns selection status - old version (TODO: to be removed)
        * @param track track extrapolated to TOP
        * @return true if track passes selection criteria
        */
       bool isSelected(const TOPtrack& track) const;
+
+      /**
+       * Returns selection status
+       * @param track track extrapolated to TOP
+       * @return true if track passes selection criteria
+       */
+      bool isSelected(const TOPTrack& track) const;
 
     private:
 

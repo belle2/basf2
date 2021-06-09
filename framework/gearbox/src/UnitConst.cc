@@ -212,7 +212,6 @@ unsigned short Const::DetectorSet::getBit(Const::EDetector det)
   if (det > TEST) {
     B2ERROR("Const::DetectorSet::getBit(): Invalid detector ID");
   }
-  // cppcheck-suppress shiftTooManyBits
   return (1 << (det - 1));
 }
 

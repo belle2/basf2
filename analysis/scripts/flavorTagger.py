@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # *************  Flavor Tagging   ************
 # * Authors: Fernando Abudinen, Moritz Gelb  *

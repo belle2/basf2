@@ -201,7 +201,7 @@ void HitPatternVXD::resetInformation()
   m_pattern &= ~(s_infoLayerMask);
 }
 
-std::string HitPatternVXD::__repr__() const
+std::string HitPatternVXD::__str__() const
 {
   return m_pattern.to_string();
 }

@@ -154,8 +154,10 @@ bool ProcHandler::startProc(std::set<int>* processList, const std::string& procT
 
   fflush(stdout);
   fflush(stderr);
+  PyOS_BeforeFork();
   pid_t pid = fork();
   if (pid > 0) {   // Mother process
+    PyOS_AfterFork_Parent();
     if (m_markChildrenAsLocal)
       pid = -pid;
     processList->insert(pid);
@@ -170,7 +172,7 @@ bool ProcHandler::startProc(std::set<int>* processList, const std::string& procT
 
     s_processID = id;
     //Reset some python state: signals, threads, gil in the child
-    PyOS_AfterFork();
+    PyOS_AfterFork_Child();
     //InputController becomes useless in child process
     InputController::resetForChildProcess();
     //die when parent dies

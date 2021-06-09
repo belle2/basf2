@@ -19,7 +19,7 @@ namespace Belle2 {
   {
     if (m_weights.empty()) return 0;
 
-    float sum = m_BGWeight;
+    float sum = m_BGWeight + m_deltaRayWeight;
     for (const auto& w : m_weights) sum += w;
     float prob = sum * gRandom->Rndm();
     float cum = 0;

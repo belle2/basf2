@@ -301,6 +301,12 @@ namespace Belle2 {
     }
 
     /**
+     * Sets 4x6 jacobi matrix
+     * @param jacobiMatrix 4x6 momentum and vertex error matrix (order: px,py,pz,E,x,y,z)
+     */
+    void setJacobiMatrix(const TMatrixF& jacobiMatrix);
+
+    /**
      * Sets 7x7 error matrix
      * @param errMatrix 7x7 momentum and vertex error matrix (order: px,py,pz,E,x,y,z)
      */
@@ -459,7 +465,8 @@ namespace Belle2 {
      */
     float getEnergy() const
     {
-      return sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz + m_mass * m_mass);
+      return sqrt(m_momentumScale * m_momentumScale * m_px * m_px + m_momentumScale * m_momentumScale * m_py * m_py + m_momentumScale *
+                  m_momentumScale * m_pz * m_pz + m_mass * m_mass);
     }
 
     /**
@@ -795,10 +802,10 @@ namespace Belle2 {
     const MCParticle* getMCParticle() const;
 
     /** Return name of this particle. */
-    virtual std::string getName() const;
+    std::string getName() const override;
 
     /** Return a short summary of this object's contents in HTML format. */
-    virtual std::string getInfoHTML() const;
+    std::string getInfoHTML() const override;
 
     /**
      * Prints the contents of a Particle object to standard output.
@@ -918,6 +925,10 @@ namespace Belle2 {
     */
     const Particle* getParticleFromGeneralizedIndexString(const std::string& generalizedIndex) const;
 
+    /**
+     * Propagate the photon energy scaling to jacobian elements that were calculated using energy
+     */
+    void updateJacobiMatrix();
 
   private:
 
@@ -933,6 +944,7 @@ namespace Belle2 {
     float m_y;      /**< position component y */
     float m_z;      /**< position component z */
     float m_errMatrix[c_SizeMatrix] = {}; /**< error matrix (1D representation) */
+    float m_jacobiMatrix[c_SizeMatrix] = {}; /**< error matrix (1D representation) */
     float m_pValue;   /**< chi^2 probability of the fit. Default is nan */
     std::vector<int> m_daughterIndices;  /**< daughter particle indices */
     EFlavorType m_flavorType;  /**< flavor type. */
@@ -979,11 +991,22 @@ namespace Belle2 {
     void resetErrorMatrix();
 
     /**
+     * Resets 4x6 error matrix
+     * All elements are set to 0.0
+     */
+    void resetJacobiMatrix();
+
+    /**
      * Stores 7x7 error matrix into private member m_errMatrix
      * @param errMatrix 7x7 error matrix
      */
     void storeErrorMatrix(const TMatrixFSym& errMatrix);
 
+    /**
+     * Stores 4x6 Jacobi matrix into private member m_jacobiMatrix
+     * @param jacobiMatrix 4x6 error matrix
+     */
+    void storeJacobiMatrix(const TMatrixF& jacobiMatrix);
     /**
      * Fill final state particle daughters into a vector
      *
@@ -1019,13 +1042,14 @@ namespace Belle2 {
      */
     int generatePDGCodeFromCharge(const int chargedSign, const Const::ChargedStable& chargedStable);
 
-    ClassDef(Particle, 13); /**< Class to store reconstructed particles. */
+    ClassDefOverride(Particle, 14); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit
     // v10: added m_properties
     // v11: added m_daughterProperties
     // v12: renamed EParticleType m_particleType to EParticleSourceObject m_particleSource
     // v13: added m_momentumScale
+    // v14: added m_jacobiMatrix
 
     friend class ParticleSubset;
   };

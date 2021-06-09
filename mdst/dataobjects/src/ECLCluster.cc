@@ -18,7 +18,7 @@
 
 using namespace Belle2;
 
-double ECLCluster::getEnergy(const ECLCluster::EHypothesisBit& hypothesis) const
+double ECLCluster::getEnergy(ECLCluster::EHypothesisBit hypothesis) const
 {
   // check if cluster has the requested hypothesis
   if (!hasHypothesis(hypothesis)) {

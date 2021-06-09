@@ -5,9 +5,9 @@ env['LIBS'] = [
     'analysis_dataobjects',
     'analysis',
     'framework',
+    'top',
     'tracking_dataobjects',
     'top_dataobjects', 
-    'top_reconstruction',
     '$ROOT_LIBS',
 ]
 

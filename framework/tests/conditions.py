@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+# this is a test executable, not a module so we don't need doxygen warnings
+# @cond SUPPRESS_DOXYGEN
 
 """
 Script to make sure the conditions database interface is behaving as expected.
@@ -111,7 +113,9 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
             # gt info
             gtname = url.path.split("/")[-1]
             if gtname in self.globaltags:
-                return self.reply('{ "name": "%s", "globalTagStatus": { "name": "%s" } }' % (gtname, self.globaltags[gtname]))
+                return self.reply(
+                    '{{ "name": "{}", "globalTagStatus": {{ "name": "{}" }} }}'.format(
+                        gtname, self.globaltags[gtname]))
             else:
                 return self.send_error(404)
 
@@ -317,3 +321,5 @@ if "ssl" in sys.argv:
     # available
     for hostname in ("expired", "wrong.host", "self-signed", "untrusted-root"):
         dbprocess(f"https://{hostname}.badssl.com/", main)
+
+# @endcond

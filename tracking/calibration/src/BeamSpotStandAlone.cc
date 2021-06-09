@@ -34,6 +34,8 @@
 #include <TRandom.h>
 #include <TRotation.h>
 #include <TChain.h>
+#include <TString.h>
+#include <TObjString.h>
 
 
 #include <functional>

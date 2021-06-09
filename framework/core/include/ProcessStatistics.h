@@ -94,9 +94,10 @@ namespace Belle2 {
      * @param type    counter type to use for statistics
      * @param modules map of modules to use. If NULL, default map will be
      *                used
+     * @param html    if true return the output as html table instead of an ascii table
      */
     std::string getStatisticsString(ModuleStatistics::EStatisticCounters type = ModuleStatistics::c_Event,
-                                    const std::vector<Belle2::ModuleStatistics>* modules = nullptr) const;
+                                    const std::vector<Belle2::ModuleStatistics>* modules = nullptr, bool html = false) const;
 
     /** Get global statistics. */
     const ModuleStatistics& getGlobal() const { return m_global; }

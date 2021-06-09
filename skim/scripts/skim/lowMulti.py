@@ -5,12 +5,13 @@
 
 __authors__ = [
     "Xing-Yu Zhou",
-    "Hisaki Hayashii"
+    "Hisaki Hayashii",
+    "Guanda Gong"
 ]
 
 
 import modularAnalysis as ma
-from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
+from skimExpertFunctions import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdPi
 from stdPhotons import stdPhotons
 from variables import variables as vm
@@ -28,7 +29,7 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
     __contact__ = "Xing-Yu Zhou <xing-yu.zhou@desy.de>"
     __category__ = "physics, low multiplicity"
 
-    TestFiles = [get_test_file("MC13_mumuBGx1")]
+    TestSampleProcess = "mumu"
 
     def __init__(self, prescale=1, **kwargs):
         """
@@ -103,6 +104,9 @@ class LowMassTwoTrack(BaseSkim):
     """
     **Physics channel**: :math:`e^{+}e^{-} \\to \\gamma h_{1}^{+}h_{2}^{-} X`
 
+    .. Warning::
+        This skim includes the golden mode :math:`e^{+}e^{-} \\to \\gamma \\pi^{+}\\pi^{-}`
+
     .. Note::
         The :math:`h_{1}^{+}` and :math:`h_{2}^{+}` here mean a positive particle
         and a negative particle that could be either conjugate or non-conjugate. The
@@ -117,13 +121,13 @@ class LowMassTwoTrack(BaseSkim):
         5. :math:`e^{+}e^{-} \\to \\gamma p \\pi^{-} X`,
         6. :math:`e^{+}e^{-} \\to \\gamma p K^{-} X`,
     """
-    __authors__ = "Xing-Yu Zhou"
+    __authors__ = ["Xing-Yu Zhou", "Guanda Gong"]
     __description__ = "Skim list for low mass events with at least two tracks and one hard photon" \
                       " in final state."
     __contact__ = "Xing-Yu Zhou <xing-yu.zhou@desy.de>"
     __category__ = "physics, low multiplicity"
 
-    TestFiles = [get_test_file("MC13_mumuBGx1"), get_test_file("MC13_uubarBGx1")]
+    TestSampleProcess = "mumu"
     validation_sample = _VALIDATION_SAMPLE
 
     def build_lists(self, path):

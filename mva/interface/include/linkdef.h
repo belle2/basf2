@@ -7,7 +7,6 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::MVA::AbstractInterface-;
-#pragma link C++ class Belle2::MVA::Interface-;
 #pragma link C++ class Belle2::MVA::Weightfile-;
 #pragma link C++ class Belle2::MVA::Dataset-;
 #pragma link C++ class Belle2::MVA::ROOTDataset-;

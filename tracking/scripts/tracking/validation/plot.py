@@ -6,6 +6,7 @@ import math
 import collections
 import array
 import numpy as np
+import ctypes
 
 import ROOT
 
@@ -2160,13 +2161,13 @@ class ValidationPlot(object):
         # Combine both TF1 functions
         # Get the lower and upper bound of the fit
         # Use the pass-by reference containers from pyROOT to be able to call the function
-        lower_bound = ROOT.Double()
-        upper_bound = ROOT.Double()
+        lower_bound = ctypes.c_double()
+        upper_bound = ctypes.c_double()
         fit_tf1.GetRange(lower_bound, upper_bound)
         title = fit_tf1.GetTitle()
 
         combined_formula = additional_stats_tf1.GetExpFormula().Data() + '+' + fit_tf1.GetExpFormula().Data()
-        combined_tf1 = ROOT.TF1("Combined", combined_formula, lower_bound, upper_bound)
+        combined_tf1 = ROOT.TF1("Combined", combined_formula, lower_bound.value, upper_bound.value)
         combined_tf1.SetTitle(title)
 
         # Transfer the fitted parameters
@@ -2199,8 +2200,8 @@ class ValidationPlot(object):
         n_parameters = tf1_source.GetNpar()
 
         # Helper variables for pyROOT's mechanism to call functions by reference
-        lower_bound = ROOT.Double()
-        upper_bound = ROOT.Double()
+        lower_bound = ctypes.c_double()
+        upper_bound = ctypes.c_double()
 
         for i_source in range(n_parameters):
             parameter_name = tf1_source.GetParName(i_source)
@@ -2221,7 +2222,7 @@ class ValidationPlot(object):
                                    tf1_source.GetParError(i_source))
 
             tf1_source.GetParLimits(i_source, lower_bound, upper_bound)
-            tf1_target.SetParLimits(i_target, lower_bound, upper_bound)
+            tf1_target.SetParLimits(i_target, lower_bound.value, upper_bound.value)
 
     def attach_attributes(self):
         """Reassign the special attributes of the plot forwarding them to the ROOT plot."""

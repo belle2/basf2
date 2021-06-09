@@ -1,0 +1,119 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+  This script generates BeamParameters for run-dependent MC generation
+  based on the information from the calibrated payloads
+  BeamSpot, CollisionBoostVector, and CollisionInvariantMass.
+"""
+
+
+import argparse
+import basf2
+from beamparameters import beamparameter_presets, calculate_beamspot
+from conditions_db import ConditionsDB
+from ROOT.Belle2 import IntervalOfValidity, BeamParametersFitter, \
+                        MCInitialParticles
+
+# Arguments.
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--input-tag', required=True, default=None,
+                    help='Input global tag.')
+parser.add_argument(
+    '--iov', default='0,0,-1,-1',
+    help='Interval of validity (4 comma-separated integers: ' \
+         'first experiment, first run, last experiment, last run).')
+arguments = parser.parse_args()
+
+# Get interval of validity.
+iov_values = arguments.iov.split(',')
+import_iov = IntervalOfValidity(int(iov_values[0]), int(iov_values[1]),
+                                int(iov_values[2]), int(iov_values[3]))
+
+# Setup database.
+basf2.conditions.override_globaltags()
+basf2.conditions.prepend_globaltag(arguments.input_tag)
+db = ConditionsDB()
+
+def get_iov_list(payload_name):
+    iovs = db.get_iovs(arguments.input_tag, payload_name)
+    iovs2 = []
+    for (payloadId, firstExp, firstRun, finalExp, finalRun) in iovs:
+        iov = IntervalOfValidity(firstExp, firstRun, finalExp, finalRun)
+        iovs2.append(iov)
+    for i in range(len(iovs2)):
+        j = i + 1
+        while j < len(iovs2):
+            if (iovs2[i].overlaps(iovs2[j])):
+                basf2.B2FATAL('Overlapping IOVs found.')
+            j = j + 1
+    return iovs2
+
+# Get intervals of validity for calibrated beam payloads.
+invariant_mass_iovs = get_iov_list('CollisionInvariantMass')
+boost_vector_iovs = get_iov_list('CollisionBoostVector')
+beam_spot_iovs = get_iov_list('BeamSpot')
+
+# Get list of intervals of validity for combination of
+# CollisionBoostVector and CollisionInvariantMass.
+collision_iovs = []
+for iov1 in invariant_mass_iovs:
+    iov1 = iov1.overlap(import_iov)
+    if iov1.empty():
+        continue
+    for iov2 in boost_vector_iovs:
+        overlap = iov1.overlap(iov2)
+        if overlap.empty():
+            continue
+        collision_iovs.append(overlap)
+collision_iovs.sort(key = lambda x: (x.getExperimentLow(), x.getRunLow()))
+
+# Get beam parameters for each interval.
+beam_parameters = []
+fitter = BeamParametersFitter()
+fitter.setAngleHER(0.0415);
+fitter.setAngleLER(-0.0415);
+fitter.setAngleError(0.0001);
+fitter.setVerbose(False)
+for iov in collision_iovs:
+    fitter.setIntervalOfValidity(iov)
+    fitter.fit()
+    beam_parameters.append(fitter.getBeamParameters())
+
+# Get list of validity intervals.
+full_iovs = []
+for i in range(len(collision_iovs)):
+    iov1 = collision_iovs[i]
+    for iov2 in beam_spot_iovs:
+        overlap = iov1.overlap(iov2)
+        if overlap.empty():
+            continue
+        full_iovs.append([overlap, i])
+full_iovs.sort(key = lambda x: (x[0].getExperimentLow(), x[0].getRunLow()))
+
+# Fill beam spot information.
+values = beamparameter_presets["SuperKEKB"][1]
+beampos_spot, cov_spot = calculate_beamspot(
+    [0, 0, 0], [0, 0, 0],
+    values["bunchHER"], values["bunchLER"],
+    values["angleHER"], values["angleLER"],
+)
+for iov in full_iovs:
+    fitter.setIntervalOfValidity(iov[0])
+    beam_parameters[iov[1]].setGenerationFlags(MCInitialParticles.c_smearALL)
+    fitter.setBeamParameters(beam_parameters[iov[1]])
+    # FIXME: Remove this when a better estimate becomes available.
+    # The default size is too small, the calibrated size from BeamSpot
+    # is too large. For now, use beam size from mc_production_MC13b_proc11.
+    if iov[0].getExperimentLow() < 10 or \
+        (iov[0].getExperimentLow() == 10 and iov[0].getRunLow() < 5606):
+        cov_spot[0, 0] = 2.19039998228254e-06
+        cov_spot[1, 1] = 2.25000000853015e-08
+    else:
+        cov_spot[0, 0] = 1.4400000054593e-06
+        cov_spot[1, 1] = 9.00000018955183e-10
+    fitter.fillVertexData(cov_spot.item(0, 0), cov_spot.item(1, 1))
+    fitter.importBeamParameters()
+    basf2.B2INFO(f'Imported IOV: {iov[0].getExperimentLow()} ' \
+                 f'{iov[0].getRunLow()} {iov[0].getExperimentHigh()} ' \
+                 f'{iov[0].getRunHigh()}')

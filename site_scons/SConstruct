@@ -165,9 +165,6 @@ SetOption("max_drift", 600)
 # cache implicit dependencies (#includes)
 SetOption('implicit_cache', 1)
 
-# disable source code checks
-global_env.SourceCode(".", None)
-
 # include extra library paths and compiler flags
 if GetOption('extralibpath'):
     global_env.Append(LIBPATH=GetOption('extralibpath').split(':'))

@@ -16,79 +16,15 @@ import re
 from shlex import quote
 from socket import gethostname
 import subprocess
-import sys
+from termcolor import cprint
 
 from git import Repo
 import yaml
 
-from b2test_utils import working_directory
-from basf2 import find_file, B2ERROR, B2INFO
+from basf2 import find_file
 from skim.registry import Registry
-from skimExpertFunctions import get_test_file, get_eventN
-
-
-def getAllSamples(mcCampaign):
-    """Get lists of all MC and data samples to potentially test on.
-
-    Args:
-        mcCampaign (str): A label like ``MC12`` for the MC campaign to test on.
-
-    Returns:
-        mcSampleLabels (list): A list of internal MC sample labels (as used by
-            `skimExpertFunctions.get_test_file`).
-        dataSampleLabels (list): A list of internal data sample labels (as used by
-            `skimExpertFunctions.get_test_file`).
-    """
-    mcSamples = [
-        f"{mcCampaign}_mixedBGx1",
-        f"{mcCampaign}_chargedBGx1",
-        f"{mcCampaign}_ccbarBGx1",
-        f"{mcCampaign}_uubarBGx1",
-        f"{mcCampaign}_ddbarBGx1",
-        f"{mcCampaign}_ssbarBGx1",
-        f"{mcCampaign}_taupairBGx1",
-        f"{mcCampaign}_mixedBGx0",
-        f"{mcCampaign}_chargedBGx0",
-        f"{mcCampaign}_ccbarBGx0",
-        f"{mcCampaign}_uubarBGx0",
-        f"{mcCampaign}_ddbarBGx0",
-        f"{mcCampaign}_ssbarBGx0",
-        f"{mcCampaign}_taupairBGx0",
-    ]
-
-    # For MC13 the low mult test samples exist (but they don't for MC12
-    # and older) so here is a hack.
-    # TODO: remove once when we regularly add the same low mult samples
-    mcCampaignNumber = int(re.search(r"\d+", mcCampaign).group())
-    if mcCampaignNumber > 12:
-        mcSamples += [
-            f"{mcCampaign}_ggBGx1",
-            # f"{mcCampaign}_eeBGx1",
-            f"{mcCampaign}_mumuBGx1",
-            f"{mcCampaign}_eeeeBGx1",
-            f"{mcCampaign}_eemumuBGx1",
-            # f"{mcCampaign}_eeBGx0",
-            f"{mcCampaign}_mumuBGx0",
-            f"{mcCampaign}_eeeeBGx0",
-            f"{mcCampaign}_eemumuBGx0",
-        ]
-
-    dataSamples = [
-        "proc9_exp3",
-        "proc9_exp7",
-        "proc9_exp8",
-        "proc10_exp7",
-        "proc10_exp8",
-        "proc11_exp7",
-        "proc11_exp8",
-        "proc11_exp10",
-        "bucket9_exp12",
-        "bucket10_exp12",
-        "bucket11_exp12",
-        "bucket12_exp12_4S_offres",
-    ]
-
-    return mcSamples, dataSamples
+from skim.testfiles import TestSampleList
+from skimExpertFunctions import get_eventN
 
 
 class CustomHelpFormatter(argparse.HelpFormatter):
@@ -168,6 +104,28 @@ def getArgumentParser():
         ),
     )
 
+    CustomSamples = parser.add_mutually_exclusive_group()
+    CustomSamples.add_argument(
+        "--custom-samples",
+        nargs="+",
+        metavar="Filename",
+        help=(
+            "Filenames of custom samples to test in addition to standard data and MC files."
+        )
+    )
+    CustomSamples.add_argument(
+        "--sample-yaml",
+        metavar="Filename",
+        help=(
+            "YAML file containing a list of samples to test on. "
+            "File must conform to the schema defined in "
+            "``skim/tools/resources/test_samples_schema.json`` (see examples in "
+            "``/group/belle2/dataprod/MC/SkimTraining/SampleLists``). "
+            "If argument not passed, defaults to "
+            "``/group/belle2/dataprod/MC/SkimTraining/SampleLists/TestFiles.yaml``."
+        )
+    )
+
     parser.add_argument(
         "-n",
         type=int,
@@ -181,12 +139,6 @@ def getArgumentParser():
         ),
     )
     parser.add_argument(
-        "--mccampaign",
-        default="MC13",
-        choices=["MC12", "MC13"],
-        help="The MC campaign to test on.",
-    )
-    parser.add_argument(
         "--dry-run",
         "--dry",
         action="store_true",
@@ -195,10 +147,13 @@ def getArgumentParser():
 
     sampleGroup = parser.add_mutually_exclusive_group()
     sampleGroup.add_argument(
-        "--mconly", action="store_true", help="Test on only MC samples."
+        "--mc-only", action="store_true", help="Test on only MC samples."
     )
     sampleGroup.add_argument(
-        "--dataonly", action="store_true", help="Test on only data samples."
+        "--data-only", action="store_true", help="Test on only data samples."
+    )
+    sampleGroup.add_argument(
+        "--custom-only", action="store_true", help="Test on only custom samples."
     )
 
     return parser
@@ -218,7 +173,7 @@ def get_tag(repo):
     return tag
 
 
-def write_stats_metadata(logDirectory, CombinedSkimDefinitions={}):
+def write_stats_metadata(logDirectory, samples, CombinedSkimDefinitions={}):
     """Write a short file containing details about when and how this test was run."""
     UserInfo = {
         "user": getuser(),
@@ -252,36 +207,12 @@ def write_stats_metadata(logDirectory, CombinedSkimDefinitions={}):
 
     # Put it all together and write to file
     metadata = {"WhoAndWhen": UserInfo, "GitInfo": GitInfo}
+    metadata["Samples"] = samples.SampleDict
     if CombinedSkimDefinitions:
         metadata["CombinedSkims"] = CombinedSkimDefinitions
 
     with open(logDirectory / "metadata.json", "w") as f:
         json.dump(metadata, f, indent=2)
-
-
-def getSamplesToRun(mcSamples, dataSamples, mcOnly=False, dataOnly=False):
-    """Get a list of samples to be tested, filtered by whether the ``mcOnly``
-    or ``dataOnly`` flags are provided.
-
-    Args:
-        mcSamples (list): A list of internal labels (as used by
-            `skimExpertFunctions.get_test_file`) for MC samples to potentially
-            test on.
-        dataSamples (list): A list of internal labels (as used by
-            `skimExpertFunctions.get_test_file`) for data samples to potentially
-            test on.
-        mcOnly (bool): Test only on MC samples.
-        dataOnly (bool): Test only on data samples.
-
-    Returns:
-        samples (list): A list of internal labels for samples to be tested on.
-    """
-    if mcOnly:
-        return mcSamples
-    elif dataOnly:
-        return dataSamples
-    else:
-        return mcSamples + dataSamples
 
 
 def verify_combined_skims(CombinedSkimDefinitions, SkimsToRun):
@@ -292,6 +223,12 @@ def verify_combined_skims(CombinedSkimDefinitions, SkimsToRun):
         raise ValueError(
             f"Unrecognised combined skim name{'s'*(len(unrecognised)>1)}: {', '.join(unrecognised)}."
         )
+
+    for CombinedSkimName in CombinedSkimDefinitions.keys():
+        if CombinedSkimName in Registry.names:
+            raise ValueError(
+                f"Combined skim name '{CombinedSkimName}' in {filename} conflicts with a registered skim."
+            )
 
     for CombinedSkim, skims in CombinedSkimDefinitions.items():
         # Check input YAML file only contains skims listed in registry
@@ -317,8 +254,7 @@ def submit_jobs(skims, samples, nEventsPerSample, DryRun, *, CombinedSkimDefinit
 
     Args:
         skims (list): A list of skim names to be run.
-        samples (list): A list of internal labels for samples to be tested.
-            These are read by `skimExpertFunctions.get_test_file`.
+        samples (list(skim.testfiles.Sample)): A list of samples to be tested.
         nEventsPerSample (int): The number of events per file to run on.
         DryRun (bool): Print the submission commands, but don't run anything.
         CombinedSkimDefinitions (dict(list)): A data structure specifyign which
@@ -332,7 +268,7 @@ def submit_jobs(skims, samples, nEventsPerSample, DryRun, *, CombinedSkimDefinit
 
     logDirectory.mkdir(parents=True, exist_ok=True)
 
-    write_stats_metadata(logDirectory, CombinedSkimDefinitions)
+    write_stats_metadata(logDirectory, samples, CombinedSkimDefinitions)
 
     # Set up a cache for the metadata query, to reduce number of calls
     get_cached_eventN = lru_cache()(get_eventN)
@@ -344,20 +280,17 @@ def submit_jobs(skims, samples, nEventsPerSample, DryRun, *, CombinedSkimDefinit
         returnCodes = []
 
         for sample in samples:
-            sampleFile = get_test_file(sample)
+            sampleFile = sample.location
 
             if not Path(sampleFile).exists():
-                B2ERROR(
-                    f"Could not find test file {sampleFile}. `b2skim-stats-submit` is meant to be run on KEKCC."
-                )
-                sys.exit(1)
+                raise FileNotFoundError(f"Could not find test file {sampleFile}.")
 
-            logFile = Path(logDirectory, f"{skim}_{sample}.out")
-            errFile = Path(logDirectory, f"{skim}_{sample}.err")
-            jsonFile = Path(logDirectory, f"{skim}_{sample}.json")
+            OutputDirectory = Path(logDirectory, skim, str(sample))
+            OutputDirectory.mkdir(exist_ok=True, parents=True)
 
-            workingDirectory = Path(logDirectory, f"{skim}_{sample}")
-            workingDirectory.mkdir(exist_ok=True)
+            logFile = OutputDirectory / "job.out"
+            errFile = OutputDirectory / "job.err"
+            jsonFile = OutputDirectory / "job.json"
 
             # Check that the number of events asked for doesn't exceed the number of events in the test file.
             # Removing this may confuse the stats printer.
@@ -367,41 +300,42 @@ def submit_jobs(skims, samples, nEventsPerSample, DryRun, *, CombinedSkimDefinit
                 arguments = [
                     "bsub", "-q", "l", "-oo", logFile, "-e", errFile, "-J",
                     f"{skim} {sample}", "basf2", runner, "--job-information", jsonFile, "-n",
-                    str(nTestEvents), "-i", sampleFile, "--", "combined",
+                    str(nTestEvents), "-i", str(sampleFile), "--", "combined",
                     *CombinedSkimDefinitions[skim]
                 ]
             else:
                 arguments = [
                     "bsub", "-q", "l", "-oo", logFile, "-e", errFile, "-J",
                     f"{skim} {sample}", "basf2", runner, "--job-information", jsonFile, "-n",
-                    str(nTestEvents), "-i", sampleFile, "--", "single", skim
+                    str(nTestEvents), "-i", str(sampleFile), "--", "single", skim
                 ]
 
             if DryRun:
                 print(" ".join([quote(str(arg)) for arg in arguments]) + "\n")
                 continue
 
-            with working_directory(workingDirectory):
-                process = subprocess.run(
-                    arguments,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                )
+            process = subprocess.run(
+                arguments,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                cwd=OutputDirectory,
+            )
 
-                jobIDs.append(re.findall("\d+", str(process.stdout))[0])
-                returnCodes.append(process.returncode)
+            jobIDs.append(re.findall(r"\d+", str(process.stdout))[0])
+            returnCodes.append(process.returncode)
 
         if any(returnCodes):
-            B2ERROR(
-                f"An error occurred while submitting jobs for {skim} skim."
+            cprint(
+                f"An error occurred while submitting jobs for {skim} skim.", "red"
             )
         elif jobIDs:
-            B2INFO(
-                f"Running {skim} skim on {nEventsPerSample} events from test samples of {', '.join(samples)}. Job IDs:\n  "
+            SamplesString = ', '.join(f"'{s.printable_name}'" for s in samples)
+            print(
+                f"Running {skim} skim on {nEventsPerSample} events from test samples of {SamplesString}. Job IDs:\n  "
                 + "\n  ".join(jobIDs)
             )
 
-    B2INFO(
+    print(
         f"Log files will be written to {str(logDirectory)}. "
         "Once these jobs have finished, please run `b2skim-stats-print` "
         f"from the directory {str(Path.cwd().resolve())}."
@@ -412,8 +346,20 @@ if __name__ == "__main__":
     parser = getArgumentParser()
     args = parser.parse_args()
 
-    mcSamples, dataSamples = getAllSamples(args.mccampaign)
-    samples = getSamplesToRun(mcSamples, dataSamples, args.mconly, args.dataonly)
+    samples = TestSampleList(SampleYAML=args.sample_yaml)
+    # Update samples with custom samples, if given explicitly
+    if args.custom_samples:
+        extra_samples = TestSampleList(
+            SampleDict={"Custom": [{"location": f} for f in args.custom_samples]}
+        )
+        samples = TestSampleList(SampleList=[*samples, *extra_samples])
+
+    if args.mc_only:
+        samples = TestSampleList(SampleList=samples.mc_samples)
+    if args.data_only:
+        samples = TestSampleList(SampleList=samples.data_samples)
+    if args.custom_only:
+        samples = TestSampleList(SampleList=samples.custom_samples)
 
     if args.single:
         skims = args.single
@@ -432,5 +378,5 @@ if __name__ == "__main__":
         elif "all" in skims:
             raise ValueError("Cannot pass both 'all' and a list of skim names.")
 
-        verify_combined_skims(CombinedSkimDefinitions, skims)
+        verify_combined_skims(CombinedSkimDefinitions, skims, filename=args.combined[0])
         submit_jobs(skims, samples, args.nEventsPerSample, args.dry_run, CombinedSkimDefinitions=CombinedSkimDefinitions)

@@ -252,7 +252,6 @@ namespace Belle2 {
         for (unsigned int iFeature = 0; iFeature < numberOfFeatures + numberOfSpectators; ++iFeature) {
           bins[iFeature] = featureBinnings[iFeature].ValueToBin(training_data.m_input[iFeature]);
         }
-        // cppcheck-suppress unsignedLessThanZero
         for (unsigned int iSpectator = 0; iSpectator < numberOfSpectators; ++iSpectator) {
           bins[iSpectator + numberOfFeatures] = featureBinnings[iSpectator + numberOfFeatures].ValueToBin(
                                                   training_data.m_spectators[iSpectator]);

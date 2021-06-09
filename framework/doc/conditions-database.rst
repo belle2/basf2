@@ -91,7 +91,7 @@ The globaltag replay can be disabled by calling `conditions.override_globaltags(
 If multiple files are processed all need to have the same globaltags specified,
 otherwise processing cannot continue unless globaltag replay is disabled.
 
-There are more advanced settings available via the `conditions <ConditionsConfiguration>`
+There are more advanced settings available via the `conditions <basf2.ConditionsConfiguration>`
 object which should not be needed by most users, like setting the URL to the central
 database or where to look for previously downloaded payloads.
 
@@ -101,7 +101,7 @@ database or where to look for previously downloaded payloads.
 
 .. attribute:: basf2.conditions
 
-   Global instance of a `ConditionsConfiguration` object containing all he
+   Global instance of a `basf2.ConditionsConfiguration` object containing all he
    settings relevant for the conditions database
 
 .. autoclass:: basf2.ConditionsConfiguration
@@ -284,3 +284,21 @@ These payloads can then be tested by adding the filename of the text file to
 `conditions.testing_payloads <basf2.ConditionsConfiguration.testing_payloads>`
 and once satisfied can be uploaded with :ref:`b2conditionsdb-upload <b2conditionsdb>`
 or :ref:`b2conditionsdb-request <b2conditionsdb-request>`
+
+.. versionchanged:: release-06-00-00
+
+When new payloads are created via ``Belle2::Database::storeData`` the new
+payloads will be assigned a revision number consisting of the first few
+characters of the checksum of the payload file. This is done for efficient
+creation of payload files but also to distuingish locally created payload files
+from payloads downloaded from the database.
+
+* If a payload has an alphanumeric string similar to a git commit hash as
+  revision number then it was created locally
+
+* If a payload has a numeric
+  revision number it was either downloaded from the database or created with
+  older release versions.
+
+In any case the local revision number is not related with the revision number
+obtained when uploading a payload to the server.

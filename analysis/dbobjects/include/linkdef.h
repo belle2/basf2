@@ -11,7 +11,7 @@
 #pragma link C++ class Belle2::ParticleWeightingLookUpTable+; // checksum=0xa8074d49, version=1
 #pragma link C++ class Belle2::PIDPriorsTable+; // checksum=0x9f605cba, version=-1
 #pragma link C++ class Belle2::PIDPriors+; // checksum=0xbe032267, version=1
-#pragma link C++ class Belle2::ChargedPidMVAWeights+; // checksum=0xc7de4a70, version=5
+#pragma link C++ class Belle2::ChargedPidMVAWeights+; // checksum=0xb2e8cc13, version=6
 #pragma link C++ enum Belle2::ChargedPidMVAWeights::ChargedPidMVATrainingMode+; //implicit
 
 #endif

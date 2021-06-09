@@ -36,6 +36,10 @@ ChargedPidMVAModule::ChargedPidMVAModule() : Module()
            m_payload_name,
            "The name of the database payload object with the MVA weights.",
            std::string("ChargedPidMVAWeights"));
+  addParam("chargeIndependent",
+           m_charge_independent,
+           "Specify whether to use a charge-independent training of the MVA.",
+           bool(false));
   addParam("useECLOnlyTraining",
            m_ecl_only,
            "Specify whether to use an ECL-only training of the MVA.",
@@ -125,21 +129,25 @@ void ChargedPidMVAModule::event()
       }
 
       // Retrieve the index for the correct MVA expert and dataset,
-      // given reconstructed (clusterTheta, p)
-      auto theta   = eclCluster->getTheta();
-      auto p       = particle->getP();
-      int jth, ip;
-      auto index   = (*m_weightfiles_representation.get())->getMVAWeightIdx(theta, p, jth, ip);
+      // given reconstructed (clusterTheta, p, charge)
+      auto clusterTheta = eclCluster->getTheta();
+      auto p = particle->getP();
+      auto charge = (m_charge_independent) ? particle->getCharge() :
+                    0.0; // Set a dummy charge of zero to pick charge-independent payloads, if requested.
+      int jth, ip, kch;
+      auto index = (*m_weightfiles_representation.get())->getMVAWeightIdx(clusterTheta, p, charge, jth, ip, kch);
 
       // Get the cut defining the MVA category under exam (this reflects the one used in the training).
       const auto cuts   = (*m_weightfiles_representation.get())->getCuts(m_sig_pdg);
       const auto cutstr = (!cuts->empty()) ? cuts->at(index) : "";
 
-      B2DEBUG(11, "\t\tcharge          = " << particle->getCharge());
-      B2DEBUG(11, "\t\tclusterTheta    = " << theta << " [rad]");
+      B2DEBUG(11, "\t\tclusterTheta    = " << clusterTheta << " [rad]");
       B2DEBUG(11, "\t\tp               = " << p << " [GeV/c]");
+      if (!m_charge_independent) {
+        B2DEBUG(11, "\t\tcharge          = " << charge);
+      }
       B2DEBUG(11, "\t\tBrems corrected = " << particle->hasExtraInfo("bremsCorrectedPhotonEnergy"));
-      B2DEBUG(11, "\t\tWeightfile idx  = " << index << " - (clusterTheta, p) = (" << jth << ", " << ip << ")");
+      B2DEBUG(11, "\t\tWeightfile idx  = " << index << " - (clusterTheta, p, charge) = (" << jth << ", " << ip <<  ", " << kch << ")");
       if (!cutstr.empty()) {
         B2DEBUG(11, "\tCategory cut: " << cutstr);
       }

@@ -3162,7 +3162,7 @@ def tagCurlTracks(particleLists,
     path.add_module(curlTagger)
 
 
-def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0, 0)):
+def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=False, binaryHypoPDGCodes=(0, 0)):
     """
     Use an MVA to perform particle identification for charged stable particles, using the `ChargedPidMVA` module.
 
@@ -3170,7 +3170,7 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
     containing the appropriate MVA score, which can be used to select candidates by placing a cut on it.
 
     Note:
-        The MVA algorithm used is a gradient boosted decision tree (**TMVA 4.2.1**, **ROOT 6.14/06**).
+        The MVA algorithm used is a gradient boosted decision tree (**TMVA 4.3.0**, **ROOT 6.20/04**).
 
     The module can perform either 'binary' PID between input S, B particle mass hypotheses according to the following scheme:
 
@@ -3183,9 +3183,6 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
 
     , or 'global' PID, namely "one-vs-others" separation. The latter makes use of an MVA algorithm trained in multi-class mode,
     and it's the default behaviour.
-
-    Note:
-        Currently the MVA is charge-agnostic, i.e. the training is not done independently for +/- charged particles.
 
     Parameters:
         particleLists (list(str)): list of names of ParticleList objects for charged stable particles.
@@ -3203,6 +3200,7 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
           * c_ECL_PSD_Classification=6
           * c_ECL_PSD_Multiclass=7
 
+        chargeIndependent (bool, ``optional``): use a BDT trained on a sample of inclusively charged particles.
         binaryHypoPDGCodes (tuple(int, int), ``optional``): the pdgIds of the signal, background mass hypothesis.
           Required only for binary PID mode.
     """
@@ -3271,8 +3269,8 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
         chargedpid.param("bkgHypoPDGCode", binaryHypoPDGCodes[1])
 
     chargedpid.param("particleLists", list(plSet))
-
     chargedpid.param("payloadName", payloadName)
+    chargedpid.param("chargeIndependent", chargeIndependent)
 
     # Ensure the module knows whether we are using ECL-only training mode.
     if detector == "ECL":

@@ -116,6 +116,8 @@ void SVDClusterizerModule::beginRun()
     m_timeRecoWith3SamplesAlgorithm = m_recoConfig->getTimeRecoWith3Samples();
     m_chargeRecoWith6SamplesAlgorithm = m_recoConfig->getChargeRecoWith6Samples();
     m_chargeRecoWith3SamplesAlgorithm = m_recoConfig->getChargeRecoWith3Samples();
+    m_positionRecoWith6SamplesAlgorithm = m_recoConfig->getPositionRecoWith6Samples();
+    m_positionRecoWith3SamplesAlgorithm = m_recoConfig->getPositionRecoWith3Samples();
 
     //strip algorithms
     m_stripTimeRecoWith6SamplesAlgorithm = m_recoConfig->getStripTimeRecoWith6Samples();
@@ -128,8 +130,8 @@ void SVDClusterizerModule::beginRun()
   SVDReconstructionBase recoBase;
 
   if (!recoBase.isTimeAlgorithmAvailable(m_timeRecoWith6SamplesAlgorithm)) {
-    B2WARNING("cluster time algorithm " << m_timeRecoWith6SamplesAlgorithm << " is NOT available, using CoG6");
-    m_timeRecoWith6SamplesAlgorithm = "CoG6";
+    B2WARNING("cluster time algorithm " << m_timeRecoWith6SamplesAlgorithm << " is NOT available, using CoG3");
+    m_timeRecoWith6SamplesAlgorithm = "CoG3";
   };
 
   if (!recoBase.isTimeAlgorithmAvailable(m_timeRecoWith3SamplesAlgorithm)) {

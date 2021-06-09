@@ -230,7 +230,7 @@ def plotVar(arr, limits, vName, getterV, getterE=None):
 
     plt.xlabel('time')
     if 'Angle' in vName:
-        plt.ylabel(vName + ' [urad]')
+        plt.ylabel(vName + ' [mrad]')
     else:
         plt.ylabel(vName + ' [um]')
 
@@ -242,6 +242,30 @@ def plotVar(arr, limits, vName, getterV, getterE=None):
     # if not os.path.isdir(loc):
     os.makedirs(loc, exist_ok=True)
 
+    plt.savefig(loc + '/' + vName + '.png')
+    plt.clf()
+
+
+def plotPullSpectrum(arr, vName, getterV, getterE):
+
+    from itertools import groupby
+    vals = np.array([k for k, g in groupby([getterV(v) for v in arr])])
+    errs = np.array([k for k, g in groupby([getterE(v) for v in arr])])
+    assert(len(vals) == len(errs))
+
+    diffs = (vals[1:] - vals[:-1]) / np.hypot(errs[1:], errs[:-1])
+
+    # Get 1sigma quantiles of the normal distribution
+    n1, n2 = scipy.stats.norm.cdf([-1, 1])
+
+    q1 = np.quantile(diffs, n1)
+    q2 = np.quantile(diffs, n2)
+
+    plt.hist(diffs, bins=np.linspace(-20, 20, 80), label=f'q1={round(q1,1)}, q2={round(q2,1)}')
+    plt.xlabel(vName)
+    plt.legend()
+
+    loc = 'plots/allData'
     plt.savefig(loc + '/' + vName + '.png')
     plt.clf()
 
@@ -278,17 +302,21 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
         plotVar(arr, limits, 'yIP', lambda e: e[3][1], lambda e: e[4][1])
         plotVar(arr, limits, 'zIP', lambda e: e[3][2], lambda e: e[4][2])
 
-        plotVar(arr, limits, 'xSize', lambda e: sqrt(e[5][0]))
-        plotVar(arr, limits, 'ySize', lambda e: sqrt(e[5][1]))
-        plotVar(arr, limits, 'zSize', lambda e: sqrt(e[5][2]))
+        plotVar(arr, limits, 'xSpotSize', lambda e: sqrt(e[5][0]))
+        plotVar(arr, limits, 'ySpotSize', lambda e: sqrt(e[5][1]))
+        plotVar(arr, limits, 'zSpotSize', lambda e: sqrt(e[5][2]))
 
-        plotVar(arr, limits, 'xSizeEig', lambda e: e[6][0])
-        plotVar(arr, limits, 'ySizeEig', lambda e: e[6][1])
-        plotVar(arr, limits, 'zSizeEig', lambda e: e[6][2])
+        plotVar(arr, limits, 'xSpotSizeEig', lambda e: e[6][0])
+        plotVar(arr, limits, 'ySpotSizeEig', lambda e: e[6][1])
+        plotVar(arr, limits, 'zSpotSizeEig', lambda e: e[6][2])
 
-        plotVar(arr, limits, 'xzAngle', lambda e: e[6][3])
-        plotVar(arr, limits, 'yzAngle', lambda e: e[6][4])
-        plotVar(arr, limits, 'xyAngle', lambda e: e[6][5])
+        plotVar(arr, limits, 'xzSpotAngle', lambda e: e[6][3])
+        plotVar(arr, limits, 'yzSpotAngle', lambda e: e[6][4])
+        plotVar(arr, limits, 'xySpotAngle', lambda e: e[6][5])
+
+    plotPullSpectrum(arr, 'xIPpulls', lambda e: e[3][0], lambda e: e[4][0])
+    plotPullSpectrum(arr, 'yIPpulls', lambda e: e[3][1], lambda e: e[4][1])
+    plotPullSpectrum(arr, 'zIPpulls', lambda e: e[3][2], lambda e: e[4][2])
 
 
 if __name__ == "__main__":

@@ -84,7 +84,9 @@ void CKFToSVDFindlet::beginEvent()
 
   m_cdcRecoTrackVector.clear();
   if (m_spacePointVector.capacity() > 2000) {
-    // space point vector too big, start with a fresh one
+    // Capacity of m_spacePointVector is too large, start with a fresh one.
+    // Since m_spacePointVector.shrink() or m_spacePointVector.shrink_to_fit() not necessarily reduce the capacity in the desired way,
+    // create a temporary vector of the same type and swap them to use the vector at the new location afterwards.
     decltype(m_spacePointVector) tmp;
     std::swap(m_spacePointVector, tmp);
     tmp.clear();
@@ -93,7 +95,9 @@ void CKFToSVDFindlet::beginEvent()
 
   m_seedStates.clear();
   if (m_states.capacity() > 2000) {
-    // states vector too big, start with a fresh one
+    // Capacity of m_states is too large, start with a fresh one.
+    // Since m_states.shrink() or m_states.shrink_to_fit() not necessarily reduce the capacity in the desired way,
+    // create a temporary vector of the same type and swap them to use the vector at the new location afterwards.
     decltype(m_states) tmp;
     std::swap(m_states, tmp);
     tmp.clear();
@@ -101,7 +105,9 @@ void CKFToSVDFindlet::beginEvent()
   m_states.clear();
 
   if (m_relations.capacity() > 20000) {
-    // relations vector too big, start with a fresh one
+    // Capacity of m_relations is too large, start with a fresh one.
+    // Since m_relations.shrink() or m_relations.shrink_to_fit() not necessarily reduce the capacity in the desired way,
+    // create a temporary vector of the same type and swap them to use the vector at the new location afterwards.
     decltype(m_relations) tmp;
     std::swap(m_relations, tmp);
     tmp.clear();

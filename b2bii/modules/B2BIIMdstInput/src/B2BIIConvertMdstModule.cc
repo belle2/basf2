@@ -945,10 +945,12 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
 
   // Loop over all Belle Mdst_ecl
   Belle::Mdst_ecl_Manager& ecl_manager = Belle::Mdst_ecl_Manager::get_manager();
-  Belle::Mdst_ecl_aux_Manager& ecl_aux_manager = Belle::Mdst_ecl_aux_Manager::get_manager();
 
   for (Belle::Mdst_ecl_Manager::iterator eclIterator = ecl_manager.begin(); eclIterator != ecl_manager.end(); ++eclIterator) {
 
+    /* Don't know why, but move this line inside the for-loop somehow suppress the constVariable warning.
+     * Added const in front of Belle::Mdst_ecl_aux_Manager& will cause the package failed to compile */
+    Belle::Mdst_ecl_aux_Manager& ecl_aux_manager = Belle::Mdst_ecl_aux_Manager::get_manager();
     // Pull Mdst_ecl from manager
     Belle::Mdst_ecl mdstEcl = *eclIterator;
     Belle::Mdst_ecl_aux mdstEclAux(ecl_aux_manager(mdstEcl.get_ID()));
@@ -2108,127 +2110,6 @@ void B2BIIConvertMdstModule::belleVeeDaughterHelix(const Belle::Mdst_vee2& vee, 
   for (unsigned int i = 0; i < size; i++)
     for (unsigned int j = i; j < size; j++)
       helixError[counter++] = error5x5[i][j];
-}
-
-void B2BIIConvertMdstModule::belleHelixToHelix(const Belle::Mdst_trk_fit& trk_fit,
-                                               std::vector<float>& helixParam, std::vector<float>& helixError)
-{
-  const HepPoint3D pivot(trk_fit.pivot_x(),
-                         trk_fit.pivot_y(),
-                         trk_fit.pivot_z());
-
-  CLHEP::HepVector  a(5);
-  a[0] = trk_fit.helix(0);
-  a[1] = trk_fit.helix(1);
-  a[2] = trk_fit.helix(2);
-  a[3] = trk_fit.helix(3);
-  a[4] = trk_fit.helix(4);
-  CLHEP::HepSymMatrix Ea(5, 0);
-  Ea[0][0] = trk_fit.error(0);
-  Ea[1][0] = trk_fit.error(1);
-  Ea[1][1] = trk_fit.error(2);
-  Ea[2][0] = trk_fit.error(3);
-  Ea[2][1] = trk_fit.error(4);
-  Ea[2][2] = trk_fit.error(5);
-  Ea[3][0] = trk_fit.error(6);
-  Ea[3][1] = trk_fit.error(7);
-  Ea[3][2] = trk_fit.error(8);
-  Ea[3][3] = trk_fit.error(9);
-  Ea[4][0] = trk_fit.error(10);
-  Ea[4][1] = trk_fit.error(11);
-  Ea[4][2] = trk_fit.error(12);
-  Ea[4][3] = trk_fit.error(13);
-  Ea[4][4] = trk_fit.error(14);
-  Belle::Helix helix(pivot, a, Ea);
-
-  helix.pivot(HepPoint3D(0., 0., 0.));
-
-  // convert to Belle II helix parameters
-  // param 0: d_0 = d_rho
-  helixParam[0] = helix.a()[0];
-
-  // param 1: phi = phi_0 + pi/2
-  helixParam[1] = helix.a()[1] +  TMath::Pi() / 2.0;
-
-  // param 2: omega = Kappa * alpha = Kappa * B[Tesla] * speed_of_light[m/s] * 1e-11
-  helixParam[2] = helix.a()[2] * KAPPA2OMEGA;
-
-  // param 3: d_z = z0
-  helixParam[3] = helix.a()[3];
-
-  // param 4: tan(Lambda) = cotTheta
-  helixParam[4] = helix.a()[4];
-
-  Ea = helix.Ea();
-
-  helixError[0]  = Ea[0][0];
-  helixError[1]  = Ea[1][0];
-  helixError[2]  = Ea[2][0] * KAPPA2OMEGA;
-  helixError[3]  = Ea[3][0];
-  helixError[4]  = Ea[4][0];
-  helixError[5]  = Ea[1][1];
-  helixError[6]  = Ea[2][1] * KAPPA2OMEGA;
-  helixError[7]  = Ea[3][1];
-  helixError[8]  = Ea[4][1];
-  helixError[9]  = Ea[2][2] * KAPPA2OMEGA * KAPPA2OMEGA;
-  helixError[10] = Ea[3][2] * KAPPA2OMEGA;
-  helixError[11] = Ea[4][2] * KAPPA2OMEGA;
-  helixError[12] = Ea[3][3];
-  helixError[13] = Ea[4][3];
-  helixError[14] = Ea[4][4];
-}
-
-int B2BIIConvertMdstModule::belleHelixToCartesian(const Belle::Mdst_trk_fit& trk_fit, const double mass,
-                                                  const HepPoint3D& newPivot,
-                                                  CLHEP::HepLorentzVector& momentum, HepPoint3D& position, CLHEP::HepSymMatrix& error, double dPhi)
-{
-  const HepPoint3D pivot(trk_fit.pivot_x(),
-                         trk_fit.pivot_y(),
-                         trk_fit.pivot_z());
-
-  CLHEP::HepVector  a(5);
-  a[0] = trk_fit.helix(0);
-  a[1] = trk_fit.helix(1);
-  a[2] = trk_fit.helix(2);
-  a[3] = trk_fit.helix(3);
-  a[4] = trk_fit.helix(4);
-  CLHEP::HepSymMatrix Ea(5, 0);
-  Ea[0][0] = trk_fit.error(0);
-  Ea[1][0] = trk_fit.error(1);
-  Ea[1][1] = trk_fit.error(2);
-  Ea[2][0] = trk_fit.error(3);
-  Ea[2][1] = trk_fit.error(4);
-  Ea[2][2] = trk_fit.error(5);
-  Ea[3][0] = trk_fit.error(6);
-  Ea[3][1] = trk_fit.error(7);
-  Ea[3][2] = trk_fit.error(8);
-  Ea[3][3] = trk_fit.error(9);
-  Ea[4][0] = trk_fit.error(10);
-  Ea[4][1] = trk_fit.error(11);
-  Ea[4][2] = trk_fit.error(12);
-  Ea[4][3] = trk_fit.error(13);
-  Ea[4][4] = trk_fit.error(14);
-
-  Belle::Helix helix(pivot, a, Ea);
-
-  int charge = 0;
-  if (helix.kappa() > 0)
-    charge = 1;
-  else
-    charge = -1;
-
-  if (newPivot.x() != 0. || newPivot.y() != 0. || newPivot.z() != 0.) {
-    helix.pivot(newPivot);
-    momentum = helix.momentum(dPhi, mass, position, error);
-  } else {
-    if (pivot.x() != 0. || pivot.y() != 0. || pivot.z() != 0.) {
-      helix.pivot(HepPoint3D(0., 0., 0.));
-      momentum = helix.momentum(dPhi, mass, position, error);
-    } else {
-      momentum = helix.momentum(dPhi, mass, position, error);
-    }
-  }
-  return charge;
 }
 
 TrackFitResult B2BIIConvertMdstModule::createTrackFitResult(const CLHEP::HepLorentzVector& momentum,

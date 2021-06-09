@@ -41,7 +41,7 @@ const int ftd_run[N_FTD_VERS][4] = { //itnitial exp, initial run, end exp, end r
   0,  0,     6,   -1, //  0
   7,  0,     7, 2102, //  1 11
   7,  2103,  7, 2367, //  2 12 +{tsf0b2b,sl0b2b}
-  7,  2368,  8, 4023, //  3 13 +{eklm_hit,eklm(4),eklmb2b(3),mu_epair,mu_eb2b,eklmhit}
+  7,  2368,  7, 4023, //  3 13 +{eklm_hit,eklm(4),eklmb2b(3),mu_epair,mu_eb2b,eklmhit}
   7,  4024,  8, 1185, //  4 14 +{fffc,fffc2,ffoc2}
   8,  1186,  8, 1285, //  5 15 +{fffo,fffov}
   8,  1286,  8, 1505, //  6 14 gdl0070p2

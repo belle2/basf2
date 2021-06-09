@@ -272,7 +272,7 @@ void PreRawCOPPERFormat_v2::CheckData(int n,
         char hostname[128];
         GetNodeName(n, hostname, sizeof(hostname));
         sprintf(err_buf,
-                "[FATAL] %s ch=%d : ERROR_EVENT : Invalid Event # at the beginning of the run (It should be zero.): preveve 0x%x cureve 0x%x : prev(exp %u run %d sub %u ) cur(exp %u run %d sub %u ) ( A:0x%.8x B:0x%.8x C:0x%.8x D:0x%.8x ) Exiting... : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+                "[FATAL] %s ch=%d : ERROR_EVENT : Invalid Event # at the beginning of the run (It should be zero.): preveve 0x%x cureve 0x%x : prev(exp %u run %u sub %u ) cur(exp %u run %u sub %u ) ( A:0x%.8x B:0x%.8x C:0x%.8x D:0x%.8x ) Exiting... : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
                 hostname, -1,
                 prev_evenum, *cur_evenum_rawcprhdr,
                 prev_exprunsubrun_no >> 22 , (prev_exprunsubrun_no >> 8) & 0x3FFF, prev_exprunsubrun_no & 0xFF,

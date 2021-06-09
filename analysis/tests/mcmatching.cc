@@ -74,7 +74,7 @@ namespace {
       gParticleGraph.generateList();
       gParticleGraph.clear(); //don't add them again in the next call..
 
-      StoreArray<MCParticle> mcparticles;
+      StoreArray<MCParticle> mcparticles{};
       m_mcparticle = mcparticles[m_graphParticle->getIndex() - 1];
 
       for (Decay& d : m_daughterDecays)
@@ -552,8 +552,6 @@ namespace {
   {
     // Correct tau
     {
-      StoreArray<Particle> particles;
-      StoreArray<MCParticle> mcparticles;
       Decay d(15, {16, { -213, { -211, {111, {22, 22}}}}});
       d.reconstruct({15, {0, { -213, { -211, {111, {22, 22}}}}}});
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
@@ -561,8 +559,6 @@ namespace {
     }
     // Miss Resoanace
     {
-      StoreArray<Particle> particles;
-      StoreArray<MCParticle> mcparticles;
       Decay d(15, {16, { -213, { -211, {111, {22, 22}}}}});
       d.reconstruct({15, {{ -211, {}, Decay::c_ReconstructFrom, &d[1][0]}, {111, {22, 22}, Decay::c_ReconstructFrom, &d[1][1]}}});
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
@@ -570,8 +566,6 @@ namespace {
     }
     // Miss Gamma
     {
-      StoreArray<Particle> particles;
-      StoreArray<MCParticle> mcparticles;
       Decay d(15, {16, { -213, { -211, {111, {22, 22}}}}});
       d.reconstruct({15, {{ -211, {}, Decay::c_ReconstructFrom, &d[1][0]}, {111, {0, {22, {}, Decay::c_ReconstructFrom, &d[1][1][1]}},  Decay::c_ReconstructFrom, &d[1][1]}}});
       ASSERT_TRUE(MCMatching::setMCTruth(d.m_particle)) << d.getString();
@@ -579,8 +573,6 @@ namespace {
     }
     // Added Wrong Pion
     {
-      StoreArray<Particle> particles;
-      StoreArray<MCParticle> mcparticles;
       Decay g(-512, {211, -211, -16, {15, {16, { -213, { -211, {111, {22, 22}}}}}}});
       Decay& d = g[3];
       d.reconstruct({15, {{ -211, {}, Decay::c_ReconstructFrom, &g[1]}, {111, {22, 22}, Decay::c_ReconstructFrom, &d[1][1]}}});

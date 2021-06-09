@@ -58,7 +58,9 @@ EvtGen* EvtGenInterface::createEvtGen(const std::string& DECFileName, const bool
   std::list<EvtDecayBase*> extraModels = EvtGenModelRegister::getModels();
 
   //fill model list with pythia, photos etc.
-  EvtExternalGenList genList;
+  // TODO: but keep converting pythia codes until we modified all decay files.
+  // Once that is done we should change this to false.
+  EvtExternalGenList genList(true);
   EvtAbsRadCorr* radCorrEngine = genList.getPhotosModel();
   list<EvtDecayBase*> modelList = genList.getListOfModels();
   extraModels.insert(extraModels.end(), modelList.begin(), modelList.end());

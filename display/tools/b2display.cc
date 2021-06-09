@@ -9,6 +9,8 @@
  */
 int main(int argc, char* argv[])
 {
+  // if you modify the text below, please update the CLI documentation in
+  // display/doc/index.rst
   if (argc != 2 or std::string(argv[1]) == "--help") {
     std::cerr << "Usage: " << argv[0] << " input_file.root\n\n"
               "  Show data in given input file using the event display.\n\n"

@@ -60,7 +60,7 @@ namespace Belle2 {
    * Valid cuts can contain:
    * 1. Logic conditions: and, or
    * 2. Numeric conditions: <, <=, >, >=, ==, !=
-   * 3. Parenthesis []
+   * 3. Square brackets []
    * 4. Floats
    * 5. Variables registered in the general "Variable Manager" which are used as a template argument to this class.
    *

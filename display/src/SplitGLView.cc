@@ -15,6 +15,7 @@
 #include "TGLPhysicalShape.h"
 #include "TGLLogicalShape.h"
 #include "TGLWidget.h"
+#include "TVirtualX.h"
 
 #include "TString.h"
 

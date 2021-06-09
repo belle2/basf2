@@ -58,6 +58,10 @@ FileMetaData updateFileMetaData(const std::string& fileName, const std::string& 
     newTree = tree->CloneTree(0);
     tree->GetEntry(0);
   }
+  if (!fileMetaData) {
+    B2ERROR("Failed to load FileMetaData from file " << fileName);
+    return FileMetaData();
+  }
 
   // update the IDs and write the updated FileMetaData to the file
   const std::string oldLFN = fileMetaData->getLfn();

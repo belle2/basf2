@@ -150,7 +150,7 @@ namespace Belle2 {
     bool hasStereoLayer() const;
 
     /** String for printing in python.*/
-    std::string __repr__() const;
+    std::string __str__() const;
 
   private:
     std::bitset<64> m_pattern;                     /**<  Saves the actual pattern.*/

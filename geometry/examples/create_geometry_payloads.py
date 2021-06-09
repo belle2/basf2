@@ -57,13 +57,12 @@ phase2 = ["GeoConfiguration", "PXDGeometryPar", "SVDGeometryPar", "BeamPipeGeo",
 # want to put that here as well
 early3 = ["PXDGeometryPar"]
 database_content = []
-line_match = re.compile(r"^dbstore/(.*?) (\d+) ([0-9\-,]*)$")
+line_match = re.compile(r"^dbstore/(.*?) ([0-9a-f]+) ([0-9\-,]*)$")
 keep = set()
 with open("localdb/database.txt") as dbfile:
     for line in dbfile:
         match = line_match.search(line)
         name, revision, iov = match.groups()
-        revision = int(revision)
         # do we want to keep that payload at all?
         if interested and name not in interested:
             continue

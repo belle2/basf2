@@ -168,7 +168,7 @@ bool HitPatternCDC::hasStereoLayer() const
           & m_pattern).any();
 }
 
-std::string HitPatternCDC::__repr__() const
+std::string HitPatternCDC::__str__() const
 {
   return m_pattern.to_string();
 }

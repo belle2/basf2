@@ -69,17 +69,20 @@ void T0CalibrationAlgorithm::createHisto()
   }
 
   m_hTotal = new TH1F("hTotal", "hTotal", 30, -15, 15);
+
   //for each channel
   for (int il = 0; il < 56; il++) {
     const int nW = cdcgeo.nWiresInLayer(il);
     for (int ic = 0; ic < nW; ++ic) {
-      m_h1[il][ic] = new TH1F(Form("h1%d@%d", il, ic), Form("L%d_cell%d", il, ic), 30, -15, 15);
+      m_h1[il][ic] = new TH1F(Form("hdT_L%d_W%d", il, ic), Form("L%d_cell%d", il, ic), 30, -15, 15);
     }
   }
+
   //for each board
   for (int ib = 0; ib < 300; ++ib) {
-    m_hT0b[ib] = new TH1F(Form("hT0b%d", ib), Form("boardID_%d", ib), 100, -20, 20);
+    m_hT0b[ib] = new TH1F(Form("hdT_b%d", ib), Form("boardID_%d", ib), 100, -20, 20);
   }
+
   //read data
   const Long64_t nEntries = tree->GetEntries();
   B2INFO("Number of entries: " << nEntries);
@@ -96,6 +99,7 @@ void T0CalibrationAlgorithm::createHisto()
     int boardID = cdcgeo.getBoardID(WireID(lay, IWire));
     m_hT0b[boardID]->Fill(t_mea - t_fit);
   }
+
   B2INFO("Finish making histogram for all channels");
 }
 
@@ -134,6 +138,7 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
 
   TF1* g1 = new TF1("g1", "gaus", -100, 100);
+  g1->SetParLimits(1, -20, 20);
   vector<double> b, db, Sb, dSb;
   vector<double> c[56];
   vector<double> dc[56];
@@ -149,7 +154,15 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
 
   B2INFO("Gaus fitting for each board");
   for (int ib = 1; ib < 300; ++ib) {
-    if (m_hT0b[ib]->GetEntries() < 10) continue;
+    // Set Delta_T0=0 again to make sure there is no strange case
+    // in which T0 might be initialed with a strange value
+    dtb[ib] = 0;
+    err_dtb[ib] = 0;
+
+    if (m_hT0b[ib]->Integral(1, m_hT0b[ib]->GetNbinsX()) < 50) {
+      //set error to large number as a flag of bad value
+      err_dtb[ib] = 50; continue;
+    }
     mean = m_hT0b[ib]->GetMean();
     m_hT0b[ib]->SetDirectory(0);
     m_hT0b[ib]->Fit("g1", "Q", "", mean - 15, mean + 15);
@@ -158,15 +171,26 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
     db.push_back(0.0);
     Sb.push_back(par[1]);
     dSb.push_back(g1->GetParError(1));
-    dtb[ib] = par[1];
+    dtb[ib] = par[1] + dEventT0;// add dEvtT0 here
     err_dtb[ib] = g1->GetParError(1);
   }
   B2INFO("Gaus fitting for each cell");
   for (int ilay = 0; ilay < 56; ++ilay) {
-    for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
-      const int n = m_h1[ilay][iwire]->GetEntries();
+    const unsigned int nW = cdcgeo.nWiresInLayer(ilay);
+    for (unsigned int iwire = 0; iwire < nW; ++iwire) {
+
+      const int n = m_h1[ilay][iwire]->Integral(1, m_h1[ilay][iwire]->GetNbinsX()) ;
       B2DEBUG(21, "layer " << ilay << " wire " << iwire << " entries " << n);
-      if (n < 10) continue;
+      // Set Delta_T0=0 again to make sure there is no strange case
+      // in which T0 might be initialed with a strange value
+      dt[ilay][iwire] = 0;
+      err_dt[ilay][iwire] = 0;
+
+      if (n < 30) {
+        //set error to large number as a flag of bad value
+        err_dt[ilay][iwire] = 50; continue;
+      }
+
       mean = m_h1[ilay][iwire]->GetMean();
       m_h1[ilay][iwire]->SetDirectory(0);
       m_h1[ilay][iwire]->Fit("g1", "Q", "", mean - 15, mean + 15);
@@ -176,22 +200,12 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
       s[ilay].push_back(par[1]);
       ds[ilay].push_back(g1->GetParError(1));
 
-      dt[ilay][iwire] = par[1];
+      dt[ilay][iwire] = par[1] + dEventT0; // add dEvtT0 here;
       err_dt[ilay][iwire] = g1->GetParError(1);
       hm_All->Fill(par[1]);// mean of gauss fitting.
       hs_All->Fill(par[2]); // sigma of gauss fitting.
     }
   }
-
-  // mean shift
-  //  const double dt0Mean = hm_All->GetMean();
-  for (int ilay = 0; ilay < 56; ++ilay) {
-    for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
-      dt[ilay][iwire] += dEventT0;
-    }
-  }
-
-
 
   if (m_storeHisto) {
     B2INFO("Storing histograms");
@@ -215,10 +229,12 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
     for (int ilay = 0; ilay < 56; ++ilay) {
       subDir[ilay] = top ->mkdir(Form("lay_%d", ilay));
       subDir[ilay]->cd();
-      for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
+      const unsigned int nW = cdcgeo.nWiresInLayer(ilay);
+      for (unsigned int iwire = 0; iwire < nW; ++iwire) {
         m_h1[ilay][iwire]->Write();
       }
     }
+
     top->cd();
     TDirectory* corrT0 = top->mkdir("DeltaT0");
     corrT0->cd();
@@ -265,32 +281,72 @@ void T0CalibrationAlgorithm::write()
 {
   CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   CDCTimeZeros* tz = new CDCTimeZeros();
-  double T0;
-  TH1F* T0B[300];
+
+  TH1F* hT0B[300];
   for (int ib = 0; ib < 300; ++ib) {
-    T0B[ib] = new TH1F(Form("T0B%d", ib), Form("boardID_%d", ib), 9000, 0, 9000);
+    hT0B[ib] = new TH1F(Form("hT0B%d", ib), Form("boardID_%d", ib), 9000, 0, 9000);
   }
-  //for calculate T0 mean of each board
+
+  TH1F* hT0_all = new TH1F("hT0_all", "T0 distribution", 9000, 0, 9000);
+  double T0;
+  // get old T0 to calculate T0 mean of each board
   for (int ilay = 0; ilay < 56; ++ilay) {
-    for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
+    const unsigned int nW = cdcgeo.nWiresInLayer(ilay);
+    for (unsigned int iwire = 0; iwire < nW; ++iwire) {
       WireID wireid(ilay, iwire);
       T0 = cdcgeo.getT0(wireid);
-      T0B[cdcgeo.getBoardID(wireid)]->Fill(T0);
+      hT0_all->Fill(T0);
+      hT0B[cdcgeo.getBoardID(wireid)]->Fill(T0);
+    }
+  }
+
+  //get Nominal T0
+  double  T0_average = getMeanT0(hT0_all);
+  if (fabs(T0_average - m_commonT0) > 50) {B2WARNING("Large difference between common T0 (" << m_commonT0 << ") and aveage value" << T0_average);}
+  //  get average T0 for each board and also apply T0 correction for T0 of that board
+  double T0B[300];
+  for (int i = 0; i < 300; ++i) {T0B[i] = m_commonT0;}
+
+
+  for (int ib = 1; ib < 300; ++ib) {
+    T0B[ib] = getMeanT0(hT0B[ib]);
+    if (fabs(T0B[ib] - T0_average) > 25) {
+      B2WARNING("T0 of Board " << ib << " (= " << T0B[ib] << ") is too different with common T0: " << T0_average <<
+                "\n It will be replaced by common T0");
+      T0B[ib] = T0_average;
+      continue;
+    }
+    //correct T0 board
+    if (abs(err_dtb[ib]) < 2 && abs(dtb[ib]) < 20) {
+      T0B[ib] -= dtb[ib];
     }
   }
 
   //correct T0 and write
+  double dT;
   for (int ilay = 0; ilay < 56; ++ilay) {
-    for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
+    const unsigned int nW = cdcgeo.nWiresInLayer(ilay);
+    for (unsigned int iwire = 0; iwire < nW; ++iwire) {
       WireID wireid(ilay, iwire);
       int bID = cdcgeo.getBoardID(wireid);
-      if (abs(err_dt[ilay][iwire]) > 2 || abs(dt[ilay][iwire]) > 1.e3) {
-        T0 = T0B[bID]->GetMean();
-        dt[ilay][iwire] = dtb[bID];
-      } else {
-        T0 = cdcgeo.getT0(wireid);
+
+      //get old T0, replace with common T0 of board or average over all channel.
+      T0 = cdcgeo.getT0(wireid);
+      if (fabs(T0 - T0B[bID]) > 25 || fabs(T0 - T0_average) > 25) {
+        B2WARNING("T0 of wireID L-W: " << ilay << "--" << iwire << " (= " << T0
+                  << ") is too different with common T0 of board: " << bID << " = " << T0B[bID] <<
+                  "\n It will be replaced by common T0 of the Board");
+        T0 = T0B[bID];
       }
-      tz->setT0(wireid, T0 - dt[ilay][iwire]);
+
+      //select DeltaT
+      dT = 0;
+      if (abs(err_dt[ilay][iwire]) < 2 && abs(dt[ilay][iwire]) < 20) {
+        dT = dt[ilay][iwire];
+      }
+
+      //export
+      tz->setT0(wireid, T0 - dT);
     }
   }
 
@@ -298,4 +354,17 @@ void T0CalibrationAlgorithm::write()
     tz->outputToFile(m_outputT0FileName);
   }
   saveCalibration(tz, "CDCTimeZeros");
+}
+double T0CalibrationAlgorithm::getMeanT0(TH1F* h1)
+{
+  double mean1 = h1->GetMean();
+  h1->GetXaxis()->SetRangeUser(mean1 - 50, 8000);
+  double mean2 = h1->GetMean();
+  while (fabs(mean1 - mean2) > 0.5) {
+    mean1 = mean2;
+    h1->GetXaxis()->SetRangeUser(mean1 - 50, 8000);
+    mean2 = h1->GetMean();
+  }
+  return mean2;
+
 }

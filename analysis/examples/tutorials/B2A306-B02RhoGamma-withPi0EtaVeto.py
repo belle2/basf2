@@ -222,7 +222,7 @@ b_vars = vc.kinematics + \
                                    decay_string='B0 -> rho0 ^gamma') + \
     vu.create_aliases_for_selected(list_of_variables=rho_vars,
                                    decay_string='B0 -> ^rho0 gamma') + \
-    vu.create_aliases_for_selected(list_of_variables=rho_vars,
+    vu.create_aliases_for_selected(list_of_variables=pi_vars,
                                    decay_string='B0 -> [rho0 -> ^pi+ ^pi-] gamma') + \
     ['pi0Prob(standard)', 'etaProb(standard)', 'extraInfo(pi0veto)']
 

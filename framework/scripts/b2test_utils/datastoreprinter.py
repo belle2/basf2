@@ -241,8 +241,8 @@ class DataStorePrinter:
             print("pair%s" % weight)
             self._printResult(result.first, depth + 1)
             self._printResult(result.second, depth + 1)
-        # or, could it be a std::vector like container?
-        elif hasattr(result, "size") and hasattr(result, "begin") and hasattr(result, "end"):
+        # or, could it be a std::vector like container? But ROOT might wrap a std::string so if it has npos assume it's a string
+        elif (hasattr(result, "size") and hasattr(result, "begin") and hasattr(result, "end")) and not hasattr(result, "npos"):
             print("size(%d)%s" % (result.size(), weight))
             # if it is a RelationVector we also want to print the weights. So
             # check whether we have weights and pass them to the _printResult

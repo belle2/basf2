@@ -14,12 +14,14 @@ import json
 
 import numpy as np
 import scipy.linalg as la
+import scipy.stats
 import matplotlib.pyplot as plt
 
 import re
 import os
 from glob import glob
 from math import sqrt, frexp, asin
+from itertools import groupby
 
 from datetime import datetime, timedelta
 from ROOT.Belle2 import Unit
@@ -248,10 +250,13 @@ def plotVar(arr, limits, vName, getterV, getterE=None):
 
 def plotPullSpectrum(arr, vName, getterV, getterE):
 
-    from itertools import groupby
-    vals = np.array([k for k, g in groupby([getterV(v) for v in arr])])
-    errs = np.array([k for k, g in groupby([getterE(v) for v in arr])])
-    assert(len(vals) == len(errs))
+    valsOrg = np.array([getterV(v) for v in arr])
+    errsOrg = np.array([getterE(v) for v in arr])
+
+    # remove repeating values
+    indx = np.array([list(g)[0][0] for k, g in groupby(zip(np.arange(len(valsOrg)), valsOrg), lambda x: x[1])])
+    vals = valsOrg[indx]
+    errs = errsOrg[indx]
 
     diffs = (vals[1:] - vals[:-1]) / np.hypot(errs[1:], errs[:-1])
 

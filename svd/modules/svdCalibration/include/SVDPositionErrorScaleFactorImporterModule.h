@@ -28,16 +28,17 @@
 
 namespace Belle2 {
   /**
-   * Module that produces a localdb with CoGOnly position error scale factors
+   * Module that produces a localdb with position error scale factors
+   * for different position algoritms
    */
-  class SVDCoGOnlyErrorScaleFactorImporterModule : public Module {
+  class SVDPositionErrorScaleFactorImporterModule : public Module {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    SVDCoGOnlyErrorScaleFactorImporterModule();
+    SVDPositionErrorScaleFactorImporterModule();
 
     /** check presence of data objects*/
     virtual void initialize() override;
@@ -60,12 +61,14 @@ namespace Belle2 {
     /* user-defined parameters */
     std::string m_rootFileName;   /**< root file name */
 
+    std::string m_posAlgorithm = "CoGOnly"; /**< position algorithm */
+
     bool m_noOutliers = false; /**< if True removes outliers from scale factor computation*/
 
     float m_min = -10; /**< min of the pulls histograms*/
     float m_max = 10; /**< max of the pulls histograms*/
     float m_nBins = 100; /**< number of bins of the pulls histograms*/
-    std::string m_uniqueID = "CoGOnlyErrorScaleFactors_TEST"; /**< payload uniqueID*/
+    std::string m_uniqueID = "PositionErrorScaleFactors_TEST"; /**< payload uniqueID*/
 
     StoreArray<SVDCluster> m_clusters; /**< SVDClusters StoreArray */
     StoreArray<SVDTrueHit> m_truehits; /**< SVDTrueHits StoreArray */

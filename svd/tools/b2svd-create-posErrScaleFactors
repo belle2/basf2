@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-'''Tool used to generate cluster position error scale factors payload.'''
+'''Tool used to generate cluster position error scale factors payload,
+for the desired algorithm (supported: CoGOnly, OldDefault)'''
 
 __author__ = 'Giulia Casarosa'
 __copyright__ = '2021 - Belle II Collaboration'
@@ -14,12 +15,17 @@ from basf2 import conditions as b2c
 
 import datetime
 import argparse
-import os
+import os, glob
 
 
 def arg_parser():
 
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--posAlgorithm',
+                        required=True,
+                        type=str,
+                        help='position algorithm',
+                        metavar='POSITION_ALGORITHM')
     parser.add_argument('-n', '--events',
                         default=20000,
                         type=int,
@@ -35,6 +41,15 @@ def arg_parser():
                         default=False,
                         action='store_true',
                         help='flag to remove outliers from the computation of the scale factors')
+    parser.add_argument('--no_bkg',
+                        default=False,
+                        action='store_true',
+                        help='flag to remove beam background from simulation')
+    parser.add_argument('--exp',
+                        default=0,
+                        type=int,
+                        help='experiment number you want to simulate',
+                        metavar='EXP')
     parser.add_argument('--max_pulls',
                         default=10,
                         type=int,
@@ -61,6 +76,10 @@ if __name__ == "__main__":
     args = arg_parser().parse_args()
     args.events
 
+    if args.posAlgorithm!='CoGOnly' and args.posAlgorithm!='OldDefault' :
+        b2.B2FATAL("the algorithm you ask for is not supported!\
+        supported algorithms are: CoGOnly and OldDefault")
+
     # Prepend and/or append the input GTs
     if not (args.prepend_gt == ''):
         for gt in reversed(args.prepend_gt):
@@ -69,9 +88,14 @@ if __name__ == "__main__":
     b2c.prepend_globaltag("svd_onlySVDinGeoConfiguration")
     b2c.prepend_globaltag("svd_NOPosErrScaleFactors")
 
+    bkgFiles = glob.glob('/sw/belle2/bkg/*.root')
+    if args.no_bkg:
+        bkgFiles = None
+
     #####################################################
     # Part 1: run the SVD simulation and reconstruction
-
+    #         including beam background
+ 
     # Set the global log level
     b2.set_log_level(b2.LogLevel.INFO)
 
@@ -81,7 +105,7 @@ if __name__ == "__main__":
     b2.set_random_seed(1)
 
     eventinfosetter = b2.register_module('EventInfoSetter')
-    eventinfosetter.param('expList', [0])
+    eventinfosetter.param('expList', [args.exp])
     eventinfosetter.param('runList', [0])
     eventinfosetter.param('evtNumList', [args.events])
     main.add_module(eventinfosetter)
@@ -93,11 +117,19 @@ if __name__ == "__main__":
 
     add_svd_simulation(main)
 
+    if bkgFiles is not None:
+        bkginput = b2.register_module('BGOverlayInput')
+        bkginput.param('inputFileNames', bkgFiles)
+        main.add_module(bkginput)
+        main.add_module('BGOverlayExecutor', components=['SVD'])
+        main.add_module('SVDShaperDigitSorter')
+        main.add_module('SVDZeroSuppressionEmulator')
+
     add_svd_reconstruction(main)
 
-    # set CoGOnly as position algorithm
-    b2.set_module_parameters(main, "SVDClusterizer",positionAlgorithm3Samples="CoGOnly")
-    b2.set_module_parameters(main, "SVDClusterizer",positionAlgorithm6Samples="CoGOnly")
+    # set the position algorithm
+    b2.set_module_parameters(main, "SVDClusterizer",positionAlgorithm3Samples=args.posAlgorithm)
+    b2.set_module_parameters(main, "SVDClusterizer",positionAlgorithm6Samples=args.posAlgorithm)
     # remove uselss modules for this purpose
     main = b2.remove_module(main,"SVDMissingAPVsClusterCreator")
     main = b2.remove_module(main,"SVDSpacePointCreator")
@@ -105,14 +137,21 @@ if __name__ == "__main__":
     #####################################################
     # Part 2: compute scale factors and create localdb
 
-    importer = b2.register_module("SVDCoGOnlyErrorScaleFactorImporter")
+    importer = b2.register_module("SVDPositionErrorScaleFactorImporter")
+    importer.param("posAlgorithm", args.posAlgorithm)
     importer.param("minPulls", - args.max_pulls)
     importer.param("maxPulls", args.max_pulls)
     importer.param("nBinsPulls", args.nBins_pulls)
     importer.param("noOutliers", args.no_outliers)
-    uniqueid = "CoGOnlyErrorScaleFactors_default_" + str(now.isoformat()) + "_INFO:_scaleFactors=fromSimulation_noOutliers="
+    uniqueid = str(args.posAlgorithm)+"ErrorScaleFactors_default_" + str(now.isoformat()) + "_INFO:_scaleFactors=fromSimulation_exp"+str(args.exp)+"_nEvents="+str(args.events)+"_noOutliers="
 
     if args.no_outliers:
+        uniqueid += "True"
+    else:
+        uniqueid += "False"
+
+    uniqueid +="_noBkg="
+    if args.no_bkg:
         uniqueid += "True"
     else:
         uniqueid += "False"

@@ -8,8 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <svd/modules/svdCalibration/SVDCoGOnlyErrorScaleFactorImporterModule.h>
+#include <svd/modules/svdCalibration/SVDPositionErrorScaleFactorImporterModule.h>
 #include <svd/calibration/SVDCoGOnlyErrorScaleFactors.h>
+#include <svd/calibration/SVDOldDefaultErrorScaleFactors.h>
 #include <vxd/geometry/GeoCache.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -22,19 +23,20 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDCoGOnlyErrorScaleFactorImporter)
+REG_MODULE(SVDPositionErrorScaleFactorImporter)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-SVDCoGOnlyErrorScaleFactorImporterModule::SVDCoGOnlyErrorScaleFactorImporterModule() : Module()
+SVDPositionErrorScaleFactorImporterModule::SVDPositionErrorScaleFactorImporterModule() : Module()
 {
   // Set module properties
   setDescription("Module to produce a list of histograms showing the uploaded calibration constants");
 
   // Parameter definitions
-  addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDCoGOnlyErrorScaleFactors.root"));
+  addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDPositionErrorScaleFactors.root"));
+  addParam("posAlgorithm", m_posAlgorithm, "Position Algorithm.", std::string(m_posAlgorithm));
   addParam("uniqueID", m_uniqueID, "Payload uniqueID.", std::string(m_uniqueID));
   addParam("minPulls", m_min, "min of the pulls histograms.", float(m_min));
   addParam("maxPulls", m_max, "max of the pulls histograms.", float(m_max));
@@ -43,13 +45,13 @@ SVDCoGOnlyErrorScaleFactorImporterModule::SVDCoGOnlyErrorScaleFactorImporterModu
            bool(false));
 }
 
-void SVDCoGOnlyErrorScaleFactorImporterModule::initialize()
+void SVDPositionErrorScaleFactorImporterModule::initialize()
 {
   m_clusters.isRequired();
   m_truehits.isRequired();
 }
 
-void SVDCoGOnlyErrorScaleFactorImporterModule::beginRun()
+void SVDPositionErrorScaleFactorImporterModule::beginRun()
 {
   //to avoid publicAllocationError:
   delete  m_rootFilePtr;
@@ -73,31 +75,31 @@ void SVDCoGOnlyErrorScaleFactorImporterModule::beginRun()
 
   //CLUSTER POSITION PULLS
   TH1F hClsPullSize1("clusterPulls1_L@layerL@ladderS@sensor@view",
-                     "Cluster CoGOnly Pulls for Size 1 in @layer.@ladder.@sensor @view/@side",
+                     Form("Cluster %s Pulls for Size 1 in @layer.@ladder.@sensor @view/@side", m_posAlgorithm.c_str()),
                      m_nBins, m_min, m_max);
   hClsPullSize1.GetXaxis()->SetTitle("cluster pull");
   m_hClsPullSize1 = new SVDHistograms<TH1F>(hClsPullSize1);
 
   TH1F hClsPullSize2("clusterPulls2_L@layerL@ladderS@sensor@view",
-                     "Cluster CoGOnly Pulls for Size 2 in @layer.@ladder.@sensor @view/@side",
+                     Form("Cluster %s Pulls for Size 2 in @layer.@ladder.@sensor @view/@side", m_posAlgorithm.c_str()),
                      m_nBins, m_min, m_max);
   hClsPullSize2.GetXaxis()->SetTitle("cluster pull");
   m_hClsPullSize2 = new SVDHistograms<TH1F>(hClsPullSize2);
 
   TH1F hClsPullSize3("clusterPulls3_L@layerL@ladderS@sensor@view",
-                     "Cluster CoGOnly Pulls for Size 3 in @layer.@ladder.@sensor @view/@side",
+                     Form("Cluster %s Pulls for Size 3 in @layer.@ladder.@sensor @view/@side", m_posAlgorithm.c_str()),
                      m_nBins, m_min, m_max);
   hClsPullSize3.GetXaxis()->SetTitle("cluster pull");
   m_hClsPullSize3 = new SVDHistograms<TH1F>(hClsPullSize3);
 
   TH1F hClsPullSize4("clusterPulls4_L@layerL@ladderS@sensor@view",
-                     "Cluster CoGOnly Pulls for Size 4 in @layer.@ladder.@sensor @view/@side",
+                     Form("Cluster %s Pulls for Size 4 in @layer.@ladder.@sensor @view/@side", m_posAlgorithm.c_str()),
                      m_nBins, m_min, m_max);
   hClsPullSize4.GetXaxis()->SetTitle("cluster pull");
   m_hClsPullSize4 = new SVDHistograms<TH1F>(hClsPullSize4);
 
   TH1F hClsPullSize5("clusterPulls5_L@layerL@ladderS@sensor@view",
-                     "Cluster CoGOnly Pulls for Size > 4 in @layer.@ladder.@sensor @view/@side",
+                     Form("Cluster %s Pulls for Size > 4 in @layer.@ladder.@sensor @view/@side", m_posAlgorithm.c_str()),
                      m_nBins, m_min, m_max);
   hClsPullSize5.GetXaxis()->SetTitle("cluster pull");
   m_hClsPullSize5 = new SVDHistograms<TH1F>(hClsPullSize5);
@@ -106,24 +108,24 @@ void SVDCoGOnlyErrorScaleFactorImporterModule::beginRun()
     for (int s = 0; s < maxSize; s++) {
       TString sside = "u";
       if (i == 0) sside = "v";
-      m_hL3Pulls[s][i] = new TH1F(Form("l3_%s_size%d", sside.Data(), s + 1), Form("Size %d Cluster CoGOnly Pulls for L3 %s sensors",
-                                  s + 1, sside.Data()), m_nBins, m_min, m_max);
+      m_hL3Pulls[s][i] = new TH1F(Form("l3_%s_size%d", sside.Data(), s + 1), Form("Size %d Cluster %s Pulls for L3 %s sensors",
+                                  s + 1, m_posAlgorithm.c_str(), sside.Data()), m_nBins, m_min, m_max);
       m_hL3Pulls[s][i]->GetXaxis()->SetTitle("cluster pull");
-      m_hBWPulls[s][i] = new TH1F(Form("bw_%s_size%d", sside.Data(), s + 1), Form("Size %d Cluster CoGOnly Pulls for BW %s sensors",
-                                  s + 1, sside.Data()), m_nBins, m_min, m_max);
+      m_hBWPulls[s][i] = new TH1F(Form("bw_%s_size%d", sside.Data(), s + 1), Form("Size %d Cluster %s Pulls for BW %s sensors",
+                                  s + 1, m_posAlgorithm.c_str(), sside.Data()), m_nBins, m_min, m_max);
       m_hBWPulls[s][i]->GetXaxis()->SetTitle("cluster pull");
-      m_hFWPulls[s][i] = new TH1F(Form("fw_%s_size%d", sside.Data(), s + 1), Form("Size %d Cluster CoGOnly Pulls for FW %s sensors",
-                                  s + 1, sside.Data()), m_nBins, m_min, m_max);
+      m_hFWPulls[s][i] = new TH1F(Form("fw_%s_size%d", sside.Data(), s + 1), Form("Size %d Cluster %s Pulls for FW %s sensors",
+                                  s + 1, m_posAlgorithm.c_str(), sside.Data()), m_nBins, m_min, m_max);
       m_hFWPulls[s][i]->GetXaxis()->SetTitle("cluster pull");
-      m_hORPulls[s][i] = new TH1F(Form("or_%s_size%d", sside.Data(), s + 1), Form("Size %d Cluster CoGOnly Pulls for ORIGAMI %s sensors",
-                                  s + 1, sside.Data()), m_nBins, m_min, m_max);
+      m_hORPulls[s][i] = new TH1F(Form("or_%s_size%d", sside.Data(), s + 1), Form("Size %d Cluster %s Pulls for ORIGAMI %s sensors",
+                                  s + 1, m_posAlgorithm.c_str(), sside.Data()), m_nBins, m_min, m_max);
       m_hORPulls[s][i]->GetXaxis()->SetTitle("cluster pull");
     }
 
 
 }
 
-void SVDCoGOnlyErrorScaleFactorImporterModule::event()
+void SVDPositionErrorScaleFactorImporterModule::event()
 {
   StoreObjPtr<EventMetaData> meta;
   m_run = meta->getRun();
@@ -159,7 +161,7 @@ void SVDCoGOnlyErrorScaleFactorImporterModule::event()
   }
 }
 
-void SVDCoGOnlyErrorScaleFactorImporterModule::endRun()
+void SVDPositionErrorScaleFactorImporterModule::endRun()
 {
 
   // 1. compute scale factors for each sensor (not used in the payload!)
@@ -247,7 +249,12 @@ void SVDCoGOnlyErrorScaleFactorImporterModule::endRun()
   IntervalOfValidity iov(0, 0, -1, -1);
 
   auto scfs = new Belle2::SVDPosErrScaleFactors;
-  auto payload = new Belle2::SVDCoGOnlyErrorScaleFactors::t_payload(*scfs, m_uniqueID);
+
+  //CoGOnly payload
+  auto payload_cogOnly = new Belle2::SVDCoGOnlyErrorScaleFactors::t_payload(*scfs, m_uniqueID);
+
+  //OldDefault payload
+  auto payload_oldDefault = new Belle2::SVDOldDefaultErrorScaleFactors::t_payload(*scfs, m_uniqueID);
 
   // 2. compute scale factors using cumulative histograms
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
@@ -291,12 +298,22 @@ void SVDCoGOnlyErrorScaleFactorImporterModule::endRun()
             scfs->scaleError_clSize5 = oneSigma(m_hORPulls[4][m_side]);
           }
 
-          payload->set(theVxdID.getLayerNumber(), theVxdID.getLadderNumber(), theVxdID.getSensorNumber(), m_side, 1, *scfs);
+          if (TString(m_posAlgorithm).Contains("CoGOnly"))
+            payload_cogOnly->set(theVxdID.getLayerNumber(), theVxdID.getLadderNumber(), theVxdID.getSensorNumber(), m_side, 1, *scfs);
+          if (TString(m_posAlgorithm).Contains("OldDefault"))
+            payload_oldDefault->set(theVxdID.getLayerNumber(), theVxdID.getLadderNumber(), theVxdID.getSensorNumber(), m_side, 1, *scfs);
         }
 
-  Database::Instance().storeData(SVDCoGOnlyErrorScaleFactors::name, payload, iov);
+  if (TString(m_posAlgorithm).Contains("CoGOnly")) {
+    Database::Instance().storeData(SVDCoGOnlyErrorScaleFactors::name, payload_cogOnly, iov);
 
-  B2RESULT("SVDCoGOnlyErrorScaleFactors imported to database.");
+    B2RESULT("SVDCoGOnlyErrorScaleFactors imported to database.");
+  }
+  if (TString(m_posAlgorithm).Contains("OldDefault")) {
+    Database::Instance().storeData(SVDOldDefaultErrorScaleFactors::name, payload_oldDefault, iov);
+
+    B2RESULT("SVDOldDefaultErrorScaleFactors imported to database.");
+  }
 
 
   //now write the rootfile
@@ -343,7 +360,7 @@ void SVDCoGOnlyErrorScaleFactorImporterModule::endRun()
   }
 }
 
-double SVDCoGOnlyErrorScaleFactorImporterModule::oneSigma(TH1F* h1)
+double SVDPositionErrorScaleFactorImporterModule::oneSigma(TH1F* h1)
 {
   TH1F* h1_res = (TH1F*)h1->Clone("h1_res");
 

@@ -170,11 +170,11 @@ def printToFile(arr):
 def plotVar(arr, limits, vName, getterV, getterE=None):
 
     tVals = []
-    bsVals = []
-    bsErrs = []
+    Vals = []
+    Errs = []
 
     tGapVals = []
-    bsGapVals = []
+    GapVals = []
 
     for i, el in enumerate(arr):
         s, e = el[1], el[2]
@@ -182,12 +182,12 @@ def plotVar(arr, limits, vName, getterV, getterE=None):
         e = datetime.utcfromtimestamp((e + 9) * 3600)
         tVals.append(s)
         tVals.append(e)
-        bsVals.append(getterV(el))
-        bsVals.append(getterV(el))
+        Vals.append(getterV(el))
+        Vals.append(getterV(el))
 
         if getterE is not None:
-            bsErrs.append(getterE(el))
-            bsErrs.append(getterE(el))
+            Errs.append(getterE(el))
+            Errs.append(getterE(el))
 
         # Add breaks for longer gap if not the last interval
         if i >= len(arr) - 1:
@@ -204,9 +204,9 @@ def plotVar(arr, limits, vName, getterV, getterE=None):
         gE = datetime.utcfromtimestamp((arr[i + 1][1] + 9) * 3600)
 
         tVals.append(gS + (gE - gS) / 2)
-        bsVals.append(np.nan)
+        Vals.append(np.nan)
         if getterE is not None:
-            bsErrs.append(np.nan)
+            Errs.append(np.nan)
 
         # store curve connecting gaps
         tGapVals.append(gS - timedelta(seconds=1))
@@ -214,19 +214,19 @@ def plotVar(arr, limits, vName, getterV, getterE=None):
         tGapVals.append(gE)
         tGapVals.append(gE + timedelta(seconds=1))
 
-        bsGapVals.append(np.nan)
-        bsGapVals.append(getterV(arr[i]))
-        bsGapVals.append(getterV(arr[i + 1]))
-        bsGapVals.append(np.nan)
+        GapVals.append(np.nan)
+        GapVals.append(getterV(arr[i]))
+        GapVals.append(getterV(arr[i + 1]))
+        GapVals.append(np.nan)
 
-    plt.plot(tVals, bsVals, linewidth=2, color='C0')
-    plt.plot(tGapVals, bsGapVals, linewidth=2, color='C0', alpha=0.35)
+    plt.plot(tVals, Vals, linewidth=2, color='C0')
+    plt.plot(tGapVals, GapVals, linewidth=2, color='C0', alpha=0.35)
 
-    bsVals = np.array(bsVals)
-    bsErrs = np.array(bsErrs)
+    Vals = np.array(Vals)
+    Errs = np.array(Errs)
 
     if getterE is not None:
-        plt.fill_between(tVals, bsVals - bsErrs, bsVals + bsErrs, alpha=0.2)
+        plt.fill_between(tVals, Vals - Errs, Vals + Errs, alpha=0.2)
 
     plt.xlabel('time')
     if 'Angle' in vName:

@@ -3,8 +3,8 @@
 """ECL timing calibration that performs the crystal and crate calibrations,
    merges the relevant crystal payloads, and makes validation plots."""
 
-from prompt import CalibrationSettings
-from reconstruction import prepare_cdst_analysis, add_reconstruction
+from prompt import CalibrationSettings, input_data_filters
+from reconstruction import prepare_cdst_analysis, prepare_user_cdst_analysis
 from caf.utils import IoV, ExpRun
 import copy
 
@@ -26,20 +26,20 @@ settings = CalibrationSettings(
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["bhabha_all_calib", "hadron_calib"],
-    # input_data_filters={"bhabha_all_calib": [input_data_filters["Data Tag"]["bhabha_all_calib"],
-    #                                          input_data_filters["Beam Energy"]["4S"],
-    #                                          input_data_filters["Beam Energy"]["Continuum"],
-    #                                          input_data_filters["Beam Energy"]["Scan"],
-    #                                          input_data_filters["Data Quality Tag"]["Good"],
-    #                                          input_data_filters["Run Type"]["physics"],
-    #                                          input_data_filters["Magnet"]["On"]],
-    #                     "hadron_calib": [input_data_filters["Data Tag"]["hadron_calib"],
-    #                                      input_data_filters["Beam Energy"]["4S"],
-    #                                      input_data_filters["Beam Energy"]["Continuum"],
-    #                                      input_data_filters["Beam Energy"]["Scan"],
-    #                                      input_data_filters["Data Quality Tag"]["Good"],
-    #                                      input_data_filters["Run Type"]["physics"],
-    #                                      input_data_filters["Magnet"]["On"]]},
+    input_data_filters={"bhabha_all_calib": [input_data_filters["Data Tag"]["bhabha_all_calib"],
+                                             input_data_filters["Beam Energy"]["4S"],
+                                             input_data_filters["Beam Energy"]["Continuum"],
+                                             input_data_filters["Beam Energy"]["Scan"],
+                                             input_data_filters["Data Quality Tag"]["Good"],
+                                             input_data_filters["Run Type"]["physics"],
+                                             input_data_filters["Magnet"]["On"]],
+                        "hadron_calib": [input_data_filters["Data Tag"]["hadron_calib"],
+                                         input_data_filters["Beam Energy"]["4S"],
+                                         input_data_filters["Beam Energy"]["Continuum"],
+                                         input_data_filters["Beam Energy"]["Scan"],
+                                         input_data_filters["Data Quality Tag"]["Good"],
+                                         input_data_filters["Run Type"]["physics"],
+                                         input_data_filters["Magnet"]["On"]]},
     depends_on=[],
     expert_config={"numCrysCrateIterations": 2, "payload_boundaries": [], "t0_bhabhaToHadron_correction": 0})
 
@@ -345,7 +345,6 @@ def get_calibrations(input_data, **kwargs):
 
             cal_ecl_merge_i.save_payloads = False
             ecl_merge_pre_path_i = basf2.create_path()
-            # prepare_cdst_analysis(ecl_merge_pre_path_i, components=['ECL'])
             prepare_cdst_analysis(ecl_merge_pre_path_i)
             ecl_merge_pre_path_i.pre_collector_path = ecl_merge_pre_path_i
 
@@ -426,8 +425,7 @@ def get_calibrations(input_data, **kwargs):
         if 'Geometry' not in rec_path_bhabha_val:
             rec_path_bhabha_val.add_module('Geometry', useDB=True)
 
-        prepare_cdst_analysis(rec_path_bhabha_val)    # for new 2020 cdst format
-        # add_reconstruction(rec_path_bhabha_val)
+        prepare_user_cdst_analysis(rec_path_bhabha_val)    # for new 2020 cdst format
 
         col_bhabha_val = register_module('eclBhabhaTimeCalibrationValidationCollector')
         col_bhabha_val.param('timeAbsMax', 70)
@@ -506,8 +504,7 @@ def get_calibrations(input_data, **kwargs):
         if 'Geometry' not in rec_path_hadron_val:
             rec_path_hadron_val.add_module('Geometry', useDB=True)
 
-        prepare_cdst_analysis(rec_path_hadron_val)    # for new 2020 cdst format
-        # add_reconstruction(rec_path_hadron_val)
+        prepare_user_cdst_analysis(rec_path_hadron_val)    # for new 2020 cdst format
 
         col_hadron_val = register_module('eclHadronTimeCalibrationValidationCollector')
         col_hadron_val.param('timeAbsMax', 70)
@@ -754,7 +751,6 @@ def get_calibrations(input_data, **kwargs):
 
         # ..Uses cdst data so it requires prepare_cdst_analysis
         ecl_merge_pre_path = basf2.create_path()
-        # prepare_cdst_analysis(ecl_merge_pre_path, components=['ECL'])
         prepare_cdst_analysis(ecl_merge_pre_path)
         ecl_merge_pre_path.pre_collector_path = ecl_merge_pre_path
 
@@ -795,8 +791,7 @@ def get_calibrations(input_data, **kwargs):
         if 'Geometry' not in rec_path_bhabha_val:
             rec_path_bhabha_val.add_module('Geometry', useDB=True)
 
-        prepare_cdst_analysis(rec_path_bhabha_val)    # for new 2020 cdst format
-        # add_reconstruction(rec_path_bhabha_val)
+        prepare_user_cdst_analysis(rec_path_bhabha_val)    # for new 2020 cdst format
 
         col_bhabha_val = register_module('eclBhabhaTimeCalibrationValidationCollector')
         col_bhabha_val.param('timeAbsMax', 70)
@@ -869,8 +864,7 @@ def get_calibrations(input_data, **kwargs):
         if 'Geometry' not in rec_path_hadron_val:
             rec_path_hadron_val.add_module('Geometry', useDB=True)
 
-        prepare_cdst_analysis(rec_path_hadron_val)    # for new 2020 cdst format
-        # add_reconstruction(rec_path_hadron_val)
+        prepare_user_cdst_analysis(rec_path_hadron_val)    # for new 2020 cdst format
 
         col_hadron_val = register_module('eclHadronTimeCalibrationValidationCollector')
         col_hadron_val.param('timeAbsMax', 70)

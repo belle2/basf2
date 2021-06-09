@@ -102,7 +102,7 @@ def get_calibrations(input_data, **kwargs):
     if 'Geometry' not in rec_path_hadron:
         rec_path_hadron.add_module('Geometry', useDB=True)
 
-    prepare_cdst_analysis(rec_path_hadron)    # for new 2020 cdst format
+    prepare_user_cdst_analysis(rec_path_hadron)    # for new 2020 cdst format
 
     col_hadron = register_module('eclHadronTimeCalibrationValidationCollector')
     col_hadron.param('timeAbsMax', 70)

@@ -408,8 +408,6 @@ def main():
     df_Data, df_MC = load_df(
         JSONContent["stats"], RequestedSkims=RequestedSkims, samples=samples
     )
-    print(df_Data)
-    print(df_MC)
 
     df_Data = add_data_fields(df_Data, samples=samples)
     df_MC = add_mc_fields(df_MC)

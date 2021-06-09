@@ -78,10 +78,10 @@ class SVDClustersQuickCheck(b2.Module):
                 sensorN = 0
                 for sensor in geoCache.getSensors(ladder):
                     sensorN = sensorN + 1
-            self.test.append(TH2F("cl_layer"+str(layerNumber), "Layer "+str(layerNumber) +
-                                  " Ladder VS Sensor.Side", ladderN, 0.5, ladderN+0.5, 2*sensorN, +0.75, sensorN+0.75))
-            self.testNew.append(TH2F("clNew_layer"+str(layerNumber), "Layer "+str(layerNumber) +
-                                     " Ladder VS Sensor.Side", ladderN, 0.5, ladderN+0.5, 2*sensorN, +0.75, sensorN+0.75))
+            self.test.append(TH2F("cl_layer" + str(layerNumber), "Layer " + str(layerNumber) +
+                                  " Ladder VS Sensor.Side", ladderN, 0.5, ladderN + 0.5, 2 * sensorN, +0.75, sensorN + 0.75))
+            self.testNew.append(TH2F("clNew_layer" + str(layerNumber), "Layer " + str(layerNumber) +
+                                     " Ladder VS Sensor.Side", ladderN, 0.5, ladderN + 0.5, 2 * sensorN, +0.75, sensorN + 0.75))
 
         print(self.test)
 
@@ -90,7 +90,7 @@ class SVDClustersQuickCheck(b2.Module):
 
         clusterList = Belle2.PyStoreArray("SVDClusters")
         clusterListNew = Belle2.PyStoreArray("SVDNewClusters")
-        print("number of clusters = "+str(clusterList.getEntries())+" (old) VS "+str(clusterListNew.getEntries())+" (new)")
+        print("number of clusters = " + str(clusterList.getEntries()) + " (old) VS " + str(clusterListNew.getEntries()) + " (new)")
 
         for d in clusterList:
             trueList = d.getRelationsTo('SVDTrueHits')  # SVDClustersToSVDTrueHits
@@ -104,26 +104,26 @@ class SVDClustersQuickCheck(b2.Module):
             self.size.Fill(d.getSize())
             self.time.Fill(d.getClsTime())
             self.ff.Fill(d.getFirstFrame())
-            self.charge.Fill(d.getCharge()/1000)
+            self.charge.Fill(d.getCharge() / 1000)
             self.SNR.Fill(d.getSNR())
             self.position.Fill(d.getPosition())
             self.positionSigma.Fill(d.getPositionSigma() * 1e4)
             if d.getSize() == 1:
                 self.positionS1.Fill(d.getPosition())
                 self.positionS1Sigma.Fill(d.getPositionSigma() * 1e4)
-                self.positionPull1.Fill((d.getPosition() - truePos)/d.getPositionSigma())
+                self.positionPull1.Fill((d.getPosition() - truePos) / d.getPositionSigma())
             if d.getSize() == 2:
                 self.positionS2.Fill(d.getPosition())
                 self.positionS2Sigma.Fill(d.getPositionSigma() * 1e4)
-                self.positionPull2.Fill((d.getPosition() - truePos)/d.getPositionSigma())
+                self.positionPull2.Fill((d.getPosition() - truePos) / d.getPositionSigma())
             if d.getSize() > 2:
                 self.positionS3.Fill(d.getPosition())
                 self.positionS3Sigma.Fill(d.getPositionSigma() * 1e4)
-                self.positionPull3.Fill((d.getPosition() - truePos)/d.getPositionSigma())
+                self.positionPull3.Fill((d.getPosition() - truePos) / d.getPositionSigma())
 
-            self.test[d.getSensorID().getLayerNumber()-3].Fill(d.getSensorID().getLadderNumber(),
-                                                               d.getSensorID().getSensorNumber()+isU)
-            self.positionPull.Fill((d.getPosition() - truePos)/d.getPositionSigma())
+            self.test[d.getSensorID().getLayerNumber() - 3].Fill(d.getSensorID().getLadderNumber(),
+                                                                 d.getSensorID().getSensorNumber() + isU)
+            self.positionPull.Fill((d.getPosition() - truePos) / d.getPositionSigma())
 
         for d in clusterListNew:
 
@@ -138,26 +138,26 @@ class SVDClustersQuickCheck(b2.Module):
             self.sizeNew.Fill(d.getSize())
             self.timeNew.Fill(d.getClsTime())
             self.ffNew.Fill(d.getFirstFrame())
-            self.chargeNew.Fill(d.getCharge()/1000)
+            self.chargeNew.Fill(d.getCharge() / 1000)
             self.SNRNew.Fill(d.getSNR())
             self.positionNew.Fill(d.getPosition())
             self.positionSigmaNew.Fill(d.getPositionSigma() * 1e4)
             if d.getSize() == 1:
                 self.positionS1New.Fill(d.getPosition())
                 self.positionS1SigmaNew.Fill(d.getPositionSigma() * 1e4)
-                self.positionPull1New.Fill((d.getPosition() - truePos)/d.getPositionSigma())
+                self.positionPull1New.Fill((d.getPosition() - truePos) / d.getPositionSigma())
             if d.getSize() == 2:
                 self.positionS2New.Fill(d.getPosition())
                 self.positionS2SigmaNew.Fill(d.getPositionSigma() * 1e4)
-                self.positionPull2New.Fill((d.getPosition() - truePos)/d.getPositionSigma())
+                self.positionPull2New.Fill((d.getPosition() - truePos) / d.getPositionSigma())
             if d.getSize() > 2:
                 self.positionS3New.Fill(d.getPosition())
                 self.positionS3SigmaNew.Fill(d.getPositionSigma() * 1e4)
-                self.positionPull3New.Fill((d.getPosition() - truePos)/d.getPositionSigma())
+                self.positionPull3New.Fill((d.getPosition() - truePos) / d.getPositionSigma())
 
-            self.testNew[d.getSensorID().getLayerNumber()-3].Fill(d.getSensorID().getLadderNumber(),
-                                                                  d.getSensorID().getSensorNumber()+isU)
-            self.positionPullNew.Fill((d.getPosition() - truePos)/d.getPositionSigma())
+            self.testNew[d.getSensorID().getLayerNumber() - 3].Fill(d.getSensorID().getLadderNumber(),
+                                                                    d.getSensorID().getSensorNumber() + isU)
+            self.positionPullNew.Fill((d.getPosition() - truePos) / d.getPositionSigma())
 
     def terminate(self):
         '''write'''
@@ -285,10 +285,10 @@ class SVDRecoDigitsQuickCheck(b2.Module):
                 sensorN = 0
                 for sensor in geoCache.getSensors(ladder):
                     sensorN = sensorN + 1
-            self.test.append(TH2F("rd_layer"+str(layerNumber), "Layer "+str(layerNumber) +
-                                  " Ladder VS Sensor.Side", ladderN, 0.5, ladderN+0.5, 2*sensorN, +0.75, sensorN+0.75))
-            self.testNew.append(TH2F("rdNew_layer"+str(layerNumber), "Layer "+str(layerNumber) +
-                                     " Ladder VS Sensor.Side", ladderN, 0.5, ladderN+0.5, 2*sensorN, +0.75, sensorN+0.75))
+            self.test.append(TH2F("rd_layer" + str(layerNumber), "Layer " + str(layerNumber) +
+                                  " Ladder VS Sensor.Side", ladderN, 0.5, ladderN + 0.5, 2 * sensorN, +0.75, sensorN + 0.75))
+            self.testNew.append(TH2F("rdNew_layer" + str(layerNumber), "Layer " + str(layerNumber) +
+                                     " Ladder VS Sensor.Side", ladderN, 0.5, ladderN + 0.5, 2 * sensorN, +0.75, sensorN + 0.75))
 
         print(self.test)
 
@@ -298,7 +298,8 @@ class SVDRecoDigitsQuickCheck(b2.Module):
         recodigitList = Belle2.PyStoreArray("SVDRecoDigits")
         recodigitListNew = Belle2.PyStoreArray("SVDNewRecoDigits")
 
-        print("number of recodigits = "+str(recodigitList.getEntries())+" (old) VS "+str(recodigitListNew.getEntries())+" (new)")
+        print("number of recodigits = " + str(recodigitList.getEntries()) +
+              " (old) VS " + str(recodigitListNew.getEntries()) + " (new)")
 
         for d in recodigitList:
             self.time.Fill(d.getTime())
@@ -306,8 +307,8 @@ class SVDRecoDigitsQuickCheck(b2.Module):
             isU = 0
             if(d.isUStrip()):
                 isU = 0.5
-            self.test[d.getSensorID().getLayerNumber()-3].Fill(d.getSensorID().getLadderNumber(),
-                                                               d.getSensorID().getSensorNumber()+isU)
+            self.test[d.getSensorID().getLayerNumber() - 3].Fill(d.getSensorID().getLadderNumber(),
+                                                                 d.getSensorID().getSensorNumber() + isU)
 
         for d in recodigitListNew:
             self.timeNew.Fill(d.getTime())
@@ -315,8 +316,8 @@ class SVDRecoDigitsQuickCheck(b2.Module):
             isU = 0
             if(d.isUStrip()):
                 isU = 0.5
-            self.testNew[d.getSensorID().getLayerNumber()-3].Fill(d.getSensorID().getLadderNumber(),
-                                                                  d.getSensorID().getSensorNumber()+isU)
+            self.testNew[d.getSensorID().getLayerNumber() - 3].Fill(d.getSensorID().getLadderNumber(),
+                                                                    d.getSensorID().getSensorNumber() + isU)
 
     def terminate(self):
         '''write'''
@@ -373,8 +374,8 @@ clusterizer.param('timeAlgorithm6Samples', "CoG6")
 clusterizer.param('timeAlgorithm3Samples', "CoG6")
 clusterizer.param('chargeAlgorithm6Samples', "MaxSample")
 clusterizer.param('chargeAlgorithm3Samples', "MaxSample")
-clusterizer.param('positionAlgorithm6Samples', "oldDefault")
-clusterizer.param('positionAlgorithm3Samples', "oldDefault")
+clusterizer.param('positionAlgorithm6Samples', "OldDefault")
+clusterizer.param('positionAlgorithm3Samples', "OldDefault")
 clusterizer.param('stripTimeAlgorithm6Samples', "dontdo")
 clusterizer.param('stripTimeAlgorithm3Samples', "dontdo")
 clusterizer.param('stripChargeAlgorithm6Samples', "MaxSample")

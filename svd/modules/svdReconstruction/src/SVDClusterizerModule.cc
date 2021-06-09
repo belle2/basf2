@@ -147,12 +147,12 @@ void SVDClusterizerModule::beginRun()
     m_chargeRecoWith3SamplesAlgorithm = "MaxSample";
   };
   if (!recoBase.isPositionAlgorithmAvailable(m_positionRecoWith6SamplesAlgorithm)) {
-    B2WARNING("cluster position algorithm " << m_positionRecoWith6SamplesAlgorithm << " is NOT available, using oldDefault");
-    m_positionRecoWith6SamplesAlgorithm = "oldDefault";
+    B2WARNING("cluster position algorithm " << m_positionRecoWith6SamplesAlgorithm << " is NOT available, using OldDefault");
+    m_positionRecoWith6SamplesAlgorithm = "OldDefault";
   };
   if (!recoBase.isPositionAlgorithmAvailable(m_positionRecoWith3SamplesAlgorithm)) {
-    B2WARNING("cluster position algorithm " << m_positionRecoWith3SamplesAlgorithm << " is NOT available, using oldDefault");
-    m_positionRecoWith3SamplesAlgorithm = "oldDefault";
+    B2WARNING("cluster position algorithm " << m_positionRecoWith3SamplesAlgorithm << " is NOT available, using OldDefault");
+    m_positionRecoWith3SamplesAlgorithm = "OldDefault";
   };
 
 

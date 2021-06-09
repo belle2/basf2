@@ -64,7 +64,7 @@ namespace Belle2::SVD {
     /** helper, returns the sum in quadrature of the strip noise*/
     double getClusterNoise(const Belle2::SVD::RawCluster& rawCluster);
 
-    SVDClusterCalibrations m_ClusterCal; /**< SVDCluster calibrations for the position error scale factors for oldDefault algorithm*/
+    SVDClusterCalibrations m_ClusterCal; /**< SVDCluster calibrations for the position error scale factors for OldDefault algorithm*/
     SVDNoiseCalibrations m_NoiseCal; /**< Noise calibrations for the position error*/
 
   private:

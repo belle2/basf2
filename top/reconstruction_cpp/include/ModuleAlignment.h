@@ -77,10 +77,10 @@ namespace Belle2 {
       }
 
       /**
-       * Unfixes parameter with its name given as argument
+       * Release fixed parameter
        * @param name parameter name
        */
-      void unfixParameter(const std::string& name)
+      void releaseParameter(const std::string& name)
       {
         for (unsigned i = 0; i < m_parNames.size(); i++) {
           if (name == m_parNames[i]) {
@@ -88,19 +88,19 @@ namespace Belle2 {
             return;
           }
         }
-        B2ERROR("TOP::ModuleAlignment::unfixParameter: invalid parameter name '" << name << "'");
+        B2ERROR("TOP::ModuleAlignment::releaseParameter: invalid parameter name '" << name << "'");
       }
 
       /**
-       * Unfixes all parameters
+       * Release all fixed parameters
        */
-      void unfixAll()
+      void releaseAllParameters()
       {
         for (unsigned i = 0; i < m_fixed.size(); i++) m_fixed[i] = false;
       }
 
       /**
-       * Run a single iteration
+       * Run a single alignment iteration, on success update alignment parameters
        * @param track track parameters
        * @param hypothesis particle hypothesis
        * @return error status (0 = OK, < 0 no track hit, > 0 matrix not positive definite)
@@ -180,6 +180,7 @@ namespace Belle2 {
 
       /**
        * Returns log likelihood for given parameters
+       * Note: it changes helix parameters of TOPTrack object (m_track)
        * @param par parameters
        * @param ok status [out]
        * @return log likelihood

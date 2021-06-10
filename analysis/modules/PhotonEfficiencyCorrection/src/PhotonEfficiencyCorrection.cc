@@ -34,11 +34,11 @@ REG_MODULE(PhotonEfficiencyCorrection);
 PhotonEfficiencyCorrectionModule::PhotonEfficiencyCorrectionModule() : Module()
 {
   setDescription(
-    R"DOC(Module to modify energy from the lists. Include in your code as
+    R"DOC(Module to include data/MC weights for photon detection efficiency. Include in your code as
 
     .. code:: python
 
-        mypath.add_module("PhotonEfficiencyCorrection", particleLists=['gamma:cut'], scale=tableName_Weight)
+        mypath.add_module("PhotonEfficiencyCorrection", particleLists=['gamma:cut'], tableName=tableName_Weight)
 
 The module modifies the input particleLists by scaling energy as given by the scale in the LookUpTable
 		     
@@ -69,7 +69,7 @@ void PhotonEfficiencyCorrectionModule::beginRun()
 {
   //check if this module is used only for MC
   if (!Environment::Instance().isMC()) {
-    B2ERROR("Attempting to run PhotonEfficiencyCorrection Data but this should be only used on MC");
+    B2ERROR("Attempting to run PhotonEfficiencyCorrection for Data but this should be only used on MC to normalise to real detection efficiency.");
   }
 
   m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_tableName);
@@ -95,28 +95,27 @@ void PhotonEfficiencyCorrectionModule::event()
     size_t nPart = particleList->getListSize();
     for (size_t iPart = 0; iPart < nPart; iPart++) {
       auto particle = particleList->getParticle(iPart);
-      setEnergyScalingFactor(particle);
+      addPhotonDetectionEfficiencyWeights(particle);
     }
   }
 
 }
 
-void EnergyBiasCorrectionModule::addPhotonDetectionEfficiencyWeights(Particle* particle)
+void PhotonEfficiencyCorrectionModule::addPhotonDetectionEfficiencyWeights(Particle* particle)
 {
   // Should this necessarily be a photon??? TODO
   if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite) {
-    B2ERROR("This should be photon??????");
+    B2ERROR("This should be called on photons only, not composite particles.");
   }
 
-} else if (particle->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster
-           && particle->getPDGCode() == Const::photon.getPDGCode())
-{
-  //particle is photon reconstructed from ECL cluster
-  WeightInfo info = getInfo(particle);
-  for (const auto& entry : info) {
-    particle->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
+  else if (particle->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster
+           && particle->getPDGCode() == Const::photon.getPDGCode()) {
+    //particle is photon reconstructed from ECL cluster
+    WeightInfo info = getInfo(particle);
+    for (const auto& entry : info) {
+      particle->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
+    }
   }
-}
 // Not sure at the moment if debug messages are needed
 //B2DEBUG(10, "Called setMomentumScalingFactor for an unspecified, track-based or KLM cluster-based particle");
 }

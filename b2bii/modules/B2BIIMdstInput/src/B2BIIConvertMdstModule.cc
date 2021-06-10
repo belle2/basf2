@@ -945,12 +945,11 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
 
   // Loop over all Belle Mdst_ecl
   Belle::Mdst_ecl_Manager& ecl_manager = Belle::Mdst_ecl_Manager::get_manager();
+  // cppcheck-suppress constVariable; cppcheck doesn't understand the manager initialisation
+  Belle::Mdst_ecl_aux_Manager& ecl_aux_manager = Belle::Mdst_ecl_aux_Manager::get_manager();
 
   for (Belle::Mdst_ecl_Manager::iterator eclIterator = ecl_manager.begin(); eclIterator != ecl_manager.end(); ++eclIterator) {
 
-    /* Don't know why, but move this line inside the for-loop somehow suppress the constVariable warning.
-     * Added const in front of Belle::Mdst_ecl_aux_Manager& will cause the package failed to compile */
-    Belle::Mdst_ecl_aux_Manager& ecl_aux_manager = Belle::Mdst_ecl_aux_Manager::get_manager();
     // Pull Mdst_ecl from manager
     Belle::Mdst_ecl mdstEcl = *eclIterator;
     Belle::Mdst_ecl_aux mdstEclAux(ecl_aux_manager(mdstEcl.get_ID()));

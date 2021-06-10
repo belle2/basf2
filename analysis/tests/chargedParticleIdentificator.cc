@@ -87,7 +87,7 @@ namespace Belle2 {
 
       m_dbrep.setWeightCategories(m_grid.get());
 
-      std::vector<std::tuple<float, float, float>> gridBinCentres;
+      std::vector<std::tuple<double, double, double>> gridBinCentres;
 
       for (unsigned int kch(0); kch < m_chbins.size() - 1; kch++) {
         auto ch_bin_centre = (m_chbins.at(kch) + m_chbins.at(kch + 1)) / 2.0;

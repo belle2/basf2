@@ -103,11 +103,11 @@ namespace Belle2 {
      *
      * @param pdg the particle mass hypothesis' pdgId.
      * @param filepaths a list of xml (root) file paths for several (clusterTheta, p, charge) categories.
-     * @param categoryBinCentres a list of <float, float, float> representing the (clusterTheta, p, charge) bin centres.
+     * @param categoryBinCentres a list of <double, double, double> representing the (clusterTheta, p, charge) bin centres.
      *        Used to check consistency of the xml vector indexing w/ the linearised TH3 category map.
      */
     void storeMVAWeights(const int pdg, const std::vector<std::string>& filepaths,
-                         const std::vector<std::tuple<float, float, float>>& categoryBinCentres)
+                         const std::vector<std::tuple<double, double, double>>& categoryBinCentres)
     {
 
       if (!isValidPdg(pdg)) {
@@ -161,11 +161,11 @@ namespace Belle2 {
      * Uses the special value of pdg=0 reserved for multi-class mode.
      *
      * @param filepaths a list of xml (root) file paths for several (clusterTheta, p, charge) categories.
-     * @param categoryBinCentres a list of <float, float, float> representing the (clusterTheta, p, charge) bin centres.
+     * @param categoryBinCentres a list of <double, double, double> representing the (clusterTheta, p, charge) bin centres.
      *        Used to check consistency of the xml vector indexing w/ the linearised TH3 category map.
      */
     void storeMVAWeightsMultiClass(const std::vector<std::string>& filepaths,
-                                   const std::vector<std::tuple<float, float, float>>& categoryBinCentres)
+                                   const std::vector<std::tuple<double, double, double>>& categoryBinCentres)
     {
       storeMVAWeights(0, filepaths, categoryBinCentres);
     }
@@ -178,11 +178,11 @@ namespace Belle2 {
      * @param pdg the particle mass hypothesis' pdgId.
      * @param cutfiles a list of text files w/ cut strings, for each (clusterTheta, p, charge) category.
      *        The format of the cut must comply with the `GeneralCut` syntax.
-     * @param categoryBinCentres a list of <float, float, float> representing the (clusterTheta, p, charge) bin centres.
+     * @param categoryBinCentres a list of <double, double, double> representing the (clusterTheta, p, charge) bin centres.
      *        Used to check consistency of the xml vector indexing w/ the linearised TH3 category map.
      */
     void storeCuts(const int pdg, const std::vector<std::string>& cutfiles,
-                   const std::vector<std::tuple<float, float, float>>& categoryBinCentres)
+                   const std::vector<std::tuple<double, double, double>>& categoryBinCentres)
     {
 
       if (!isValidPdg(pdg)) {
@@ -231,11 +231,11 @@ namespace Belle2 {
      *
      * @param cutfiles a list of text files w/ cut strings, for each (clusterTheta, p, charge) category.
      *        The format of the cut must comply with the `GeneralCut` syntax.
-     * @param categoryBinCentres a list of <float, float, float> representing the (clusterTheta, p, charge) bin centres.
+     * @param categoryBinCentres a list of <double, double, double> representing the (clusterTheta, p, charge) bin centres.
      *        Used to check consistency of the xml vector indexing w/ the linearised TH3 category map.
      */
     void storeCutsMultiClass(const std::vector<std::string>& cutfiles,
-                             const std::vector<std::tuple<float, float, float>>& categoryBinCentres)
+                             const std::vector<std::tuple<double, double, double>>& categoryBinCentres)
     {
       storeCuts(0, cutfiles, categoryBinCentres);
     }

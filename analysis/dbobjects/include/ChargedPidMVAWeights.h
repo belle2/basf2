@@ -120,15 +120,16 @@ namespace Belle2 {
         // Index consistency check.
         auto bin_centres_tuple = categoryBinCentres.at(idx);
 
-        auto th_centre = std::get<0>(bin_centres_tuple);
-        auto p_centre = std::get<1>(bin_centres_tuple);
-        auto ch_centre = std::get<2>(bin_centres_tuple);
+        auto theta_bin_centre = std::get<0>(bin_centres_tuple);
+        auto p_bin_centre = std::get<1>(bin_centres_tuple);
+        auto charge_bin_centre = std::get<2>(bin_centres_tuple);
 
-        auto h_idx = getMVAWeightIdx(th_centre, p_centre, ch_centre);
+        auto h_idx = getMVAWeightIdx(theta_bin_centre, p_bin_centre, charge_bin_centre);
         if (idx != h_idx) {
           B2FATAL("xml file:\n" << path << "\nindex in input vector:\n" << idx << "\ndoes not correspond to:\n" << h_idx <<
-                  "\n, i.e. the linearised index of the 3D bin centered in (clusterTheta, p, charge) = (" << th_centre << ", " << p_centre << ", " <<
-                  ch_centre <<
+                  "\n, i.e. the linearised index of the 3D bin centered in (clusterTheta, p, charge) = (" << theta_bin_centre << ", " << p_bin_centre
+                  << ", " <<
+                  charge_bin_centre <<
                   ")\nPlease check how the input xml file list is being filled.");
         }
 
@@ -157,6 +158,7 @@ namespace Belle2 {
     /**
      * For the multi-class mode,
      * store the list of MVA weight files (one for each category) into the payload.
+     * Uses the special value of pdg=0 reserved for multi-class mode.
      *
      * @param filepaths a list of xml (root) file paths for several (clusterTheta, p, charge) categories.
      * @param categoryBinCentres a list of <float, float, float> representing the (clusterTheta, p, charge) bin centres.
@@ -192,15 +194,16 @@ namespace Belle2 {
 
         auto bin_centres_tuple = categoryBinCentres.at(idx);
 
-        auto th_centre = std::get<0>(bin_centres_tuple);
-        auto p_centre = std::get<1>(bin_centres_tuple);
-        auto ch_centre = std::get<2>(bin_centres_tuple);
+        auto theta_bin_centre = std::get<0>(bin_centres_tuple);
+        auto p_bin_centre = std::get<1>(bin_centres_tuple);
+        auto charge_bin_centre = std::get<2>(bin_centres_tuple);
 
-        auto h_idx = getMVAWeightIdx(th_centre, p_centre, ch_centre);
+        auto h_idx = getMVAWeightIdx(theta_bin_centre, p_bin_centre, charge_bin_centre);
         if (idx != h_idx) {
           B2FATAL("Cut file:\n" << cutfile << "\nindex in input vector:\n" << idx << "\ndoes not correspond to:\n" << h_idx <<
-                  "\n, i.e. the linearised index of the 3D bin centered in (clusterTheta, p, charge) = (" << th_centre << ", " << p_centre << ", " <<
-                  ch_centre <<
+                  "\n, i.e. the linearised index of the 3D bin centered in (clusterTheta, p, charge) = (" << theta_bin_centre << ", " << p_bin_centre
+                  << ", " <<
+                  charge_bin_centre <<
                   ")\nPlease check how the input cut file list is being filled.");
         }
 
@@ -224,6 +227,7 @@ namespace Belle2 {
     /**
      * For the multi-class mode,
      * store the list of selection cuts (one for each category) into the payload.
+     * Uses the special value of pdg=0 reserved for multi-class mode.
      *
      * @param cutfiles a list of text files w/ cut strings, for each (clusterTheta, p, charge) category.
      *        The format of the cut must comply with the `GeneralCut` syntax.
@@ -251,6 +255,7 @@ namespace Belle2 {
     /**
      * For the multi-class mode,
      * get the list of (serialized) MVA weightfiles stored in the payload, one for each (clusterTheta, p, charge) category.
+     * Uses the special value of pdg=0 reserved for multi-class mode.
      */
     const std::vector<std::string>* getMVAWeightsMulticlass() const
     {
@@ -273,6 +278,7 @@ namespace Belle2 {
     /**
      * For the multi-class mode,
      * get the list of selection cuts stored in the payload, one for each (clusterTheta, p, charge) category.
+     * Uses the special value of pdg=0 reserved for multi-class mode.
      */
     const std::vector<std::string>* getCutsMulticlass() const
     {
@@ -289,12 +295,13 @@ namespace Belle2 {
      * @param clusterTheta the particle polar angle (from the ECL cluster) in [rad].
      * @param p the particle momentum (from the track) in [GeV/c].
      * @param charge the particle charge (from the track).
-     * @param[out] jth the index of the (clusterTheta, p, charge) bin along the theta (X) axis.
-     * @param[out] ip the index of the (clusterTheta, p, charge) bin along the p (Y) axis.
-     * @param[out] kch the index of the (clusterTheta, p, charge) bin along the charge (Z) axis.
+     * @param[out] idx_theta the index of the (clusterTheta, p, charge) bin along the theta (X) axis.
+     * @param[out] idx_p the index of the (clusterTheta, p, charge) bin along the p (Y) axis.
+     * @param[out] idx_charge the index of the (clusterTheta, p, charge) bin along the charge (Z) axis.
      * @return the index of the weightfile of interest from the array of weightfiles.
      */
-    unsigned int getMVAWeightIdx(const double& clusterTheta, const double& p, const double& charge, int& jth, int& ip, int& kch) const
+    unsigned int getMVAWeightIdx(const double& clusterTheta, const double& p, const double& charge, int& idx_theta, int& idx_p,
+                                 int& idx_charge) const
     {
 
       if (!m_categories) {
@@ -305,11 +312,11 @@ namespace Belle2 {
       int nbins_p = m_categories->GetYaxis()->GetNbins(); // nr. of p (visible) bins, along Y.
 
       int glob_bin_idx = findBin(m_categories, clusterTheta / m_ang_unit.GetVal(), p / m_energy_unit.GetVal(), charge);
-      m_categories->GetBinXYZ(glob_bin_idx, jth, ip, kch);
+      m_categories->GetBinXYZ(glob_bin_idx, idx_theta, idx_p, idx_charge);
 
       // The index of the linearised 3D (clusterTheta, p, charge) m_categories.
       // The unit offset is b/c ROOT sets global bin idx also for overflows and underflows.
-      return (jth - 1) + nbins_th * ((ip - 1) + nbins_p * (kch - 1));
+      return (idx_theta - 1) + nbins_th * ((idx_p - 1) + nbins_p * (idx_charge - 1));
     }
 
 
@@ -318,8 +325,8 @@ namespace Belle2 {
      */
     unsigned int getMVAWeightIdx(const double& theta, const double& p, const double& charge) const
     {
-      int jth, ip, kch;
-      return getMVAWeightIdx(theta, p, charge, jth, ip, kch);
+      int idx_theta, idx_p, idx_charge;
+      return getMVAWeightIdx(theta, p, charge, idx_theta, idx_p, idx_charge);
     }
 
 
@@ -377,6 +384,7 @@ namespace Belle2 {
 
     /**
      * Special version for multi-class mode.
+     * Uses the special value of pdg=0 reserved for multi-class mode.
      */
     void dumpPayloadMulticlass(const double& theta, const double& p, const double& charge) const
     {
@@ -386,7 +394,7 @@ namespace Belle2 {
 
     /**
      * Check if the input pdgId is that of a valid charged particle.
-     * An input value of  pdg=0 is considered valid, since it's reserved for multi-class mode.
+     * An input value of pdg=0 is considered valid, since it's reserved for multi-class mode.
      */
     bool isValidPdg(const int pdg) const
     {
@@ -404,7 +412,7 @@ namespace Belle2 {
      * @param h 3D histogram.
      * @param x value along the x axis.
      * @param y value along the y axis.
-     * @param y value along the z axis.
+     * @param z value along the z axis.
      * @return the global linearised bin index.
     */
     int findBin(const TH3F* h, const double& x, const double& y, const double& z) const

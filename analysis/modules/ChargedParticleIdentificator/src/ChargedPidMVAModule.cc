@@ -132,10 +132,10 @@ void ChargedPidMVAModule::event()
       // given reconstructed (clusterTheta, p, charge)
       auto clusterTheta = eclCluster->getTheta();
       auto p = particle->getP();
-      auto charge = (m_charge_independent) ? particle->getCharge() :
+      auto charge = (!m_charge_independent) ? particle->getCharge() :
                     0.0; // Set a dummy charge of zero to pick charge-independent payloads, if requested.
-      int jth, ip, kch;
-      auto index = (*m_weightfiles_representation.get())->getMVAWeightIdx(clusterTheta, p, charge, jth, ip, kch);
+      int idx_theta, idx_p, idx_charge;
+      auto index = (*m_weightfiles_representation.get())->getMVAWeightIdx(clusterTheta, p, charge, idx_theta, idx_p, idx_charge);
 
       // Get the cut defining the MVA category under exam (this reflects the one used in the training).
       const auto cuts   = (*m_weightfiles_representation.get())->getCuts(m_sig_pdg);
@@ -147,7 +147,8 @@ void ChargedPidMVAModule::event()
         B2DEBUG(11, "\t\tcharge          = " << charge);
       }
       B2DEBUG(11, "\t\tBrems corrected = " << particle->hasExtraInfo("bremsCorrectedPhotonEnergy"));
-      B2DEBUG(11, "\t\tWeightfile idx  = " << index << " - (clusterTheta, p, charge) = (" << jth << ", " << ip <<  ", " << kch << ")");
+      B2DEBUG(11, "\t\tWeightfile idx  = " << index << " - (clusterTheta, p, charge) = (" << idx_theta << ", " << idx_p <<  ", " <<
+              idx_charge << ")");
       if (!cutstr.empty()) {
         B2DEBUG(11, "\tCategory cut: " << cutstr);
       }

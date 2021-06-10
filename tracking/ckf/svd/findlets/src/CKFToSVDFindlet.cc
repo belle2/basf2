@@ -82,32 +82,29 @@ void CKFToSVDFindlet::beginEvent()
 {
   Super::beginEvent();
 
+  // If the capacity of a std::vector is very large without being used, it just allocates RAM for no reason,
+  // increasing the RAM usage unnecessarily. In this case, start with a fresh one.
+  // Since std::vector.shrink() or std::vector.shrink_to_fit() not necessarily reduce the capacity in the desired way,
+  // create a temporary vector of the same type and swap them to use the vector at the new location afterwards.
   m_cdcRecoTrackVector.clear();
-  if (m_spacePointVector.capacity() > 2000) {
-    // Capacity of m_spacePointVector is too large, start with a fresh one.
-    // Since m_spacePointVector.shrink() or m_spacePointVector.shrink_to_fit() not necessarily reduce the capacity in the desired way,
-    // create a temporary vector of the same type and swap them to use the vector at the new location afterwards.
+  if (m_spacePointVector.capacity() > 40000) {
     decltype(m_spacePointVector) tmp;
     std::swap(m_spacePointVector, tmp);
     tmp.clear();
   }
   m_spacePointVector.clear();
+  m_spacePointVector.reserve(10000);
 
   m_seedStates.clear();
-  if (m_states.capacity() > 2000) {
-    // Capacity of m_states is too large, start with a fresh one.
-    // Since m_states.shrink() or m_states.shrink_to_fit() not necessarily reduce the capacity in the desired way,
-    // create a temporary vector of the same type and swap them to use the vector at the new location afterwards.
+  if (m_states.capacity() > 40000) {
     decltype(m_states) tmp;
     std::swap(m_states, tmp);
     tmp.clear();
   }
   m_states.clear();
+  m_states.reserve(10000);
 
-  if (m_relations.capacity() > 20000) {
-    // Capacity of m_relations is too large, start with a fresh one.
-    // Since m_relations.shrink() or m_relations.shrink_to_fit() not necessarily reduce the capacity in the desired way,
-    // create a temporary vector of the same type and swap them to use the vector at the new location afterwards.
+  if (m_relations.capacity() > 100000) {
     decltype(m_relations) tmp;
     std::swap(m_relations, tmp);
     tmp.clear();

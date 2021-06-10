@@ -160,11 +160,7 @@ void HitXPModule::beginRun() {}
 
 void HitXPModule::event()
 {
-  StoreArray<SVDCluster> SVDClusters;
-  StoreArray<SVDTrueHit> SVDTrueHits;
   StoreArray<MCParticle> MCParticles;
-
-  StoreArray<RecoTrack> recoTracks;
 
   m_eventNumber = m_eventIterator;
   m_EeventNumber = m_eventIterator; //------------External Tree---------//

@@ -37,6 +37,9 @@ namespace Belle2 {
     struct HitGapAxialSegmentPairVarNames : public VarNames<CDCAxialSegmentPair > {
 
       /// Number of variables to be generated
+      // we shouldn't use public member variables but we do want want to rewrite all related code using setters/getters
+      // at least tell cppcheck that everything is fine
+      // cppcheck-suppress duplInheritedMember
       static const size_t nVars = size(hitGapAxialSegmentPairVarNames);
 
       /// Getter for the name at the given index

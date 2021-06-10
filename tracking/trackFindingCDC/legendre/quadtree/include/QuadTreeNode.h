@@ -52,6 +52,7 @@ namespace Belle2 {
        *  however this would come at performance penalty.
        *  If somebody knows the suppression category please apply it here.
        */
+      // cppcheck-suppress passedByValue
       QuadTreeNode(XSpan xSpan, YSpan ySpan, int level, This* parent)
         : m_xBinBounds(
       {

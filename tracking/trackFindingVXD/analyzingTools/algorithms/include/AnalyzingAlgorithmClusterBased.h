@@ -44,6 +44,7 @@ namespace Belle2 {
           if (aCluster.isUCluster() == wantUCluster) { clusters.push_back(&aCluster); }
         }
       }
+      // cppcheck-suppress returnDanglingLifetime
       return clusters;
     }
 
@@ -127,7 +128,7 @@ namespace Belle2 {
       (AlgoritmType::AnalyzingAlgorithmLostUEDep) {}
 
     /** returns the energy deposit of u-type-clusters the testTC lost compared to the refTC */
-    virtual DataType calcData(const TCInfoType& aTC) /// TODO !!!
+    virtual DataType calcData(const TCInfoType& aTC) override /// TODO !!!
     {
       DataType lostEdep;
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
@@ -154,7 +155,7 @@ namespace Belle2 {
       (AlgoritmType::AnalyzingAlgorithmLostVEDep) {}
 
     /** returns the energy deposit of v-type-clusters the testTC lost compared to the refTC */
-    virtual DataType calcData(const TCInfoType& aTC) /// TODO
+    virtual DataType calcData(const TCInfoType& aTC) override /// TODO
     {
       DataType lostEdep;
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
@@ -225,7 +226,7 @@ namespace Belle2 {
       (AlgoritmType::AnalyzingAlgorithmTotalUEDep) {}
 
     /** returns the energy deposit of u-type-clusters the given TC had */
-    virtual DataType calcData(const TCInfoType& aTC) /// TODO
+    virtual DataType calcData(const TCInfoType& aTC) override /// TODO
     {
       DataType totalEDep;
       const TCInfoType& thisTC = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC);
@@ -249,7 +250,7 @@ namespace Belle2 {
       (AlgoritmType::AnalyzingAlgorithmTotalVEDep) {}
 
     /** returns the energy deposit of v-type-clusters the given TC had */
-    virtual DataType calcData(const TCInfoType& aTC) /// TODO
+    virtual DataType calcData(const TCInfoType& aTC) override /// TODO
     {
       DataType totalEDep;
       const TCInfoType& thisTC = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC);

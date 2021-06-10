@@ -24,7 +24,7 @@ b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 particles = fei.get_default_channels()
 
 # Set up FEI configuration specifying the FEI prefix
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2020_MC13_release_04_01_01', training=False, monitor=False, cache=0)
+configuration = fei.config.FeiConfiguration(prefix='FEIv4_2021_MC14_release_05_01_12', training=False, monitor=False, cache=0)
 
 # Get FEI path
 feistate = fei.get_path(particles, configuration)

@@ -506,6 +506,16 @@ namespace Belle2 {
     Manager::FunctionPtr useTagSideRecoilRestFrame(const std::vector<std::string>& arguments);
 
     /**
+     * Returns the value of the variable in the rest frame of the first Particle in the given ParticleList.
+     */
+    Manager::FunctionPtr useParticleRestFrame(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns the value of the variable in the rest frame of the recoil system against the first Particle in the given ParticleList.
+     */
+    Manager::FunctionPtr useRecoilParticleRestFrame(const std::vector<std::string>& arguments);
+
+    /**
     * Returns a  function that returns the value of a variable calculated using new mass assumptions for the daughters' masses.
     */
     Manager::FunctionPtr  useAlternativeDaughterHypothesis(const std::vector<std::string>& arguments);

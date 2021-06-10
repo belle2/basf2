@@ -114,8 +114,8 @@ namespace Belle2 {
 
       G4RotationMatrix rotMaster;
       double rot_x = m_config.getMasterVolume().getRotationX();
-      double rot_y = m_config.getMasterVolume().getRotationX();
-      double rot_z = m_config.getMasterVolume().getRotationX();
+      double rot_y = m_config.getMasterVolume().getRotationY();
+      double rot_z = m_config.getMasterVolume().getRotationZ();
       double tr_x = m_config.getMasterVolume().getPosition().X();
       double tr_y = m_config.getMasterVolume().getPosition().Y();
       double tr_z = m_config.getMasterVolume().getPosition().Z();
@@ -130,8 +130,8 @@ namespace Belle2 {
         B2WARNING("ARICH global displacement parameters from DB will be taken into account.");
       }
       rotMaster.rotateX(rot_x);
-      rotMaster.rotateX(rot_y);
-      rotMaster.rotateX(rot_z);
+      rotMaster.rotateY(rot_y);
+      rotMaster.rotateZ(rot_z);
 
       G4ThreeVector transMaster(tr_x, tr_y, tr_z);
 

@@ -322,7 +322,8 @@ def add_pretracking_reconstruction(path, components=None):
 
 
 def add_posttracking_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
-                                    add_muid_hits=False, cosmics=False, for_cdst_analysis=False):
+                                    add_muid_hits=False, cosmics=False, for_cdst_analysis=False,
+                                    add_eventt0_combiner_for_cdst=False):
     """
     This function adds the standard reconstruction modules after tracking
     to a path.
@@ -336,6 +337,10 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     :param cosmics: if True, steer TOP for cosmic reconstruction.
     :param for_cdst_analysis: if True, dEdx, EventT0 and PruneTracks modules are not added to the path.
            This is only needed by prepare_cdst_analysis().
+    :param add_eventt0_combiner_for_cdst: if True, the EventT0Combiner module is added to the path even if
+           for_cdst_analysis is False. This is useful for validation purposes for avoiding to run the full
+           add_reconstruction(). Note that, with the default settings (for_cdst_analysis=False and
+           add_eventt0_combiner_for_cdst=False), the EventT0Combiner module is added to the path.
     """
 
     # Not add dEdx modules in prepare_cdst_analysis()
@@ -348,8 +353,10 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
 
     add_arich_modules(path, components)
 
-    # Not add EventT0Combiner module in prepare_cdst_analysis()
-    if not for_cdst_analysis:
+    # Not add EventT0Combiner module in prepare_cdst_analysis() by default,
+    # but be lenient and add it if requested.
+    # By default, since for_cdst_analysis is False, the module is added by this function.
+    if not for_cdst_analysis or add_eventt0_combiner_for_cdst:
         path.add_module("EventT0Combiner")
 
     add_ecl_finalizer_module(path, components)
@@ -445,8 +452,8 @@ def add_cdst_output(
             basf2.B2ERROR("PXDClustersFromTracks is required in CDST output but its module is not found in the input path!")
     else:
         if not additionalBranches:
-            B2WARNING('You are calling add_cdst_output() using rawFormat=False and requiring no additional branches. '
-                      'This is equivalent to calling add_mdst_output().')
+            basf2.B2WARNING('You are calling add_cdst_output() using rawFormat=False and requiring no additional branches. '
+                            'This is equivalent to calling add_mdst_output().')
         branches += list(mdst.MDST_OBJECTS)
 
     if dataDescription is None:
@@ -679,7 +686,7 @@ def add_dedx_modules(path, components=None):
         path.add_module('VXDDedxPID')
 
 
-def prepare_cdst_analysis(path, components=None, mc=False):
+def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=False):
     """
     Adds to a (analysis) path all the modules needed to analyse a cDST file in the raw+tracking format
     for collisions/cosmics data or in the digits+tracking format for MC data.
@@ -687,6 +694,9 @@ def prepare_cdst_analysis(path, components=None, mc=False):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     :param mc: Are we running over MC data or not? If so, do not run the unpackers.
+    :param add_eventt0_combiner: If True, it adds the EventT0Combiner module when the post-tracking
+      reconstruction is run. This must NOT be used during the calibration, but it may be necessary
+      for validation purposes or for the user analyses.
     """
     # Add the unpackers only if not running on MC, otherwise check the components and simply add
     # the Gearbox and the Geometry modules
@@ -716,4 +726,21 @@ def prepare_cdst_analysis(path, components=None, mc=False):
     # Add the posttracking modules needed for the cDST analysis
     add_posttracking_reconstruction(path,
                                     components=components,
-                                    for_cdst_analysis=True)
+                                    for_cdst_analysis=True,
+                                    add_eventt0_combiner_for_cdst=add_eventt0_combiner)
+
+
+def prepare_user_cdst_analysis(path, components=None, mc=False):
+    """
+    Adds to a (analysis) path all the modules needed to analyse a cDST file in the raw+tracking format
+    for collisions/cosmics data or in the digits+tracking format for MC data.
+    Differently from prepare_cdst_analysis(), this function add the EventT0Combiner module to the path,
+    which makes this function suitable for all the users and not only for the calibration expertes.
+    Note that the EventT0Combiner module is necessary for applying the proper EventT0 correction to
+    our data.
+
+    :param path: The path to add the modules to.
+    :param components: The components to use or None to use all standard components.
+    :param mc: Are we running over MC data or not? If so, do not run the unpackers.
+    """
+    prepare_cdst_analysis(path=path, components=components, mc=mc, add_eventt0_combiner=True)

@@ -305,7 +305,7 @@ namespace Belle2 {
     {
 
       if (!m_categories) {
-        B2FATAL("No (clusterTheta, p, charge) TH3 grid was found in the DB payload. This should not happen! Abort...");
+        B2FATAL("No (clusterTheta, p, charge) TH3 grid was found in the DB payload. Most likely, you are using a GT w/ an old payload which is no longer compatible with the DB object class implementation. This should not happen! Abort...");
       }
 
       int nbins_th = m_categories->GetXaxis()->GetNbins(); // nr. of clusterTheta (visible) bins, along X.

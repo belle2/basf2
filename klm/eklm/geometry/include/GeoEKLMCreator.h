@@ -372,7 +372,7 @@ namespace Belle2 {
        */
       G4SubtractionSolid* cutSolidCorner(
         const char* name, G4VSolid* solid, G4Box* subtractionBox,
-        HepGeom::Transform3D& transf, bool largerAngles,
+        const HepGeom::Transform3D& transf, bool largerAngles,
         double x1, double y1, double x2, double y2);
 
       /**
@@ -388,7 +388,7 @@ namespace Belle2 {
        */
       G4SubtractionSolid* cutSolidCorner(
         const char* name, G4VSolid* solid, G4Box* subtractionBox,
-        HepGeom::Transform3D& transf, bool largerAngles,
+        const HepGeom::Transform3D& transf, bool largerAngles,
         double x, double y, double ang);
 
       /**

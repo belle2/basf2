@@ -99,11 +99,12 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   m_c_avgOffOccupancy->cd(1);
   if (h_zs5countsU) h_zs5countsU->Draw("colz");
   m_c_avgOffOccupancy->cd(2);
-  if (h_zs5countsV) h_zs5countsU->Draw("colz");
+  if (h_zs5countsV) h_zs5countsV->Draw("colz");
   m_c_avgOffOccupancy->cd(3);
   if (h_events) h_events->Draw("colz");
 
-  int nE = h_events->GetEntries(); // number of events for all "clusters on track" histograms
+  int nE = 0;
+  if (h_events) nE = h_events->GetEntries();  // number of events for all "clusters on track" histograms
 
   // average occupancy for each layer
   std::vector<float> avgOffOccL3UV = avgOccupancyUV(3, h_zs5countsU, h_zs5countsV, 0, 14, 1, 1, nE);
@@ -447,10 +448,14 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   if (h_clusterCharge_L456U) h_clusterCharge_L456U->Draw();
 
   // find abscissa of max Y in histograms
-  float MPVClusterChargeL3U = xForMaxY(h_clusterCharge_L3U);
-  float MPVClusterChargeL3V = xForMaxY(h_clusterCharge_L3V);
-  float MPVClusterChargeL456U = xForMaxY(h_clusterCharge_L456U);
-  float MPVClusterChargeL456V = xForMaxY(h_clusterCharge_L456V);
+  float MPVClusterChargeL3U = -1;
+  if (h_clusterCharge_L3U) MPVClusterChargeL3U = xForMaxY(h_clusterCharge_L3U);
+  float MPVClusterChargeL3V = -1;
+  if (h_clusterCharge_L3V) MPVClusterChargeL3V = xForMaxY(h_clusterCharge_L3V);
+  float MPVClusterChargeL456U = -1;
+  if (h_clusterCharge_L456U) MPVClusterChargeL456U = xForMaxY(h_clusterCharge_L456U);
+  float MPVClusterChargeL456V = -1;
+  if (h_clusterCharge_L456V) MPVClusterChargeL456V = xForMaxY(h_clusterCharge_L456V);
 
   if (h_clusterCharge_L3U == NULL || h_clusterCharge_L456U == NULL) {
     B2INFO("Histograms needed for MPV cluster charge on U side are not found");
@@ -529,14 +534,22 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   m_c_MPVTimeClusterOnTrack->cd(4);
   if (h_clusterTime_L456V) h_clusterTime_L456V->Draw();
 
-  float MPVClusterTimeL3U = xForMaxY(h_clusterTime_L3U);
-  float MPVClusterTimeL3V = xForMaxY(h_clusterTime_L3V);
-  float MPVClusterTimeL456U = xForMaxY(h_clusterTime_L456U);
-  float MPVClusterTimeL456V = xForMaxY(h_clusterTime_L456V);
-  float FWHMClusterTimeL3U = histFWHM(h_clusterTime_L3U);
-  float FWHMClusterTimeL3V = histFWHM(h_clusterTime_L3V);
-  float FWHMClusterTimeL456U = histFWHM(h_clusterTime_L456U);
-  float FWHMClusterTimeL456V = histFWHM(h_clusterTime_L456V);
+  float MPVClusterTimeL3U = -1;
+  if (h_clusterTime_L3U) MPVClusterTimeL3U = xForMaxY(h_clusterTime_L3U);
+  float MPVClusterTimeL3V = -1;
+  if (h_clusterTime_L3V) MPVClusterTimeL3V = xForMaxY(h_clusterTime_L3V);
+  float MPVClusterTimeL456U = -1;
+  if (h_clusterTime_L456U) MPVClusterTimeL456U = xForMaxY(h_clusterTime_L456U);
+  float MPVClusterTimeL456V = -1;
+  if (h_clusterTime_L456V) MPVClusterTimeL456V = xForMaxY(h_clusterTime_L456V);
+  float FWHMClusterTimeL3U = -1;
+  if (h_clusterTime_L3U) FWHMClusterTimeL3U = histFWHM(h_clusterTime_L3U);
+  float FWHMClusterTimeL3V = -1;
+  if (h_clusterTime_L3V) FWHMClusterTimeL3V = histFWHM(h_clusterTime_L3V);
+  float FWHMClusterTimeL456U = -1;
+  if (h_clusterTime_L456U) FWHMClusterTimeL456U = histFWHM(h_clusterTime_L456U);
+  float FWHMClusterTimeL456V = -1;
+  if (h_clusterTime_L456V) FWHMClusterTimeL456V = histFWHM(h_clusterTime_L456V);
 
   if (h_clusterTime_L3U == NULL || h_clusterTime_L456U == NULL) {
     B2INFO("Histograms needed for MPV cluster time on U side are not found");

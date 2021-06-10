@@ -21,7 +21,6 @@
 #pragma link C++ class Belle2::SVDPedestalCalibrations-; // checksum=0xbb219a89, version=-1
 #pragma link C++ class Belle2::SVDFADCMaskedStrips-; // checksum=0x5c3369a8, version=-1
 #pragma link C++ class Belle2::SVDHotStripsCalibrations-; // checksum=0x94dfda0f, version=-1
-#pragma link C++ class Belle2::SVDDetectorConfiguration-; // checksum=0x8ad578cb, version=-1
 #pragma link C++ class Belle2::SVDChargeSimulationCalibrations-;
 
 //calibration importers

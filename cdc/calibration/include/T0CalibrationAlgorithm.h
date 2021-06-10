@@ -25,8 +25,6 @@ namespace Belle2 {
       T0CalibrationAlgorithm();
       /// Destructor
       ~T0CalibrationAlgorithm() {}
-      /// turn on/off debug.
-      void setDebug(bool debug = false) {m_debug = debug; }
       /// store Hisotgram or not.
       void storeHisto(bool storeHist = false) {m_storeHisto = storeHist;}
       /// minimum ndf require for track.
@@ -37,6 +35,9 @@ namespace Belle2 {
       void setMaxRMSDt(double maxRMSDt) {m_maxRMSDt = maxRMSDt;}
       /// Maximum mean of dt of all channels distribution, condition to stop iterating
       void setMaxMeanDt(double maxMeanDt) {m_maxMeanDt = maxMeanDt;}
+
+      /// set common T0
+      void setCommonT0(double commonT0) {m_commonT0 = commonT0;}
 
       /// Enable text output of calibration result
       void enableTextOutput(bool output = true) {m_textOutput = output;}
@@ -54,6 +55,8 @@ namespace Belle2 {
       void createHisto();
       /// write outut or store db
       void write();
+      /// calculate mean of the T0 distribution
+      double getMeanT0(TH1F* h1);
     private:
       TH1F* m_hTotal;       /**< 1D histogram of delta T whole channel */
       TH1F* m_h1[56][385];    /**<1D histogram for each channel*/
@@ -68,8 +71,8 @@ namespace Belle2 {
       double err_dt[56][385] = {{0.}}; /**< error of dt of each channel*/
       double dtb[300] = {0.};        /**< dt of each board*/
       double err_dtb[300] =  {0.};    /**< error of dt of board*/
+      double m_commonT0 = 4825.;  /**< A common T0 of all channels*/
 
-      bool m_debug = false;   /**< debug. */
       bool m_storeHisto = false; /**< store histo or not*/
       bool  m_textOutput = false; /**< output text file if true */
       std::string m_outputT0FileName = "t0_new.dat"; /**<output t0 file name for text file*/

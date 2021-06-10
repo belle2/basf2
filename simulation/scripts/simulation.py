@@ -120,7 +120,8 @@ def add_simulation(
         usePXDDataReduction=True,
         cleanupPXDDataReduction=True,
         generate_2nd_cdc_hits=False,
-        simulateT0jitter=False,
+        simulateT0jitter=True,
+        isCosmics=False,
         FilterEvents=False,
         usePXDGatedMode=False,
         skipExperimentCheckForBG=False):
@@ -130,6 +131,7 @@ def add_simulation(
     @param usePXDDataReduction: if 'forceSetPXDDataReduction==True', override settings from the DB
     @param cleanupPXDDataReduction: if True the datastore objects used by PXDDataReduction are emptied
     @param simulateT0jitter: if True simulate L1 trigger jitter
+    @param isCosmics: if True the filling pattern is removed from L1 jitter simulation
     @param FilterEvents: if True only the events that pass the L1 trigger will survive simulation, the other are discarded.
         Make sure you do need to filter events before you set the value to True.
     @param skipExperimentCheckForBG: If True, skip the check on the experiment number consistency between the basf2
@@ -175,6 +177,7 @@ def add_simulation(
     # event T0 jitter simulation
     if simulateT0jitter and 'EventT0Generator' not in path:
         eventt0 = b2.register_module('EventT0Generator')
+        eventt0.param("isCosmics", isCosmics)
         path.add_module(eventt0)
 
     # detector simulation

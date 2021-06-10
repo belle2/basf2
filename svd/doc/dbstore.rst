@@ -93,7 +93,6 @@ Check `GlobalConfig@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDGlobalConf
 
 Check `LocalConfig@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDLocalConfigParameters&perpage=25&>`_ all revisions available in the Conditions Database. Revision **63** is used for experiment 0 and 1003.
 
-The ``SVDDectectorConfiguration`` wrapper contains both ``SVDGlobalConfigParameters`` and ``SVDLocalConfigParameters``.
 
 Reconstruction Calibrations
 ---------------------------

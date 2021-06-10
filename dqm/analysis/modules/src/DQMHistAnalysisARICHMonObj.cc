@@ -346,24 +346,33 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
     m_c_mask->cd(4); line->Draw();
   }
 
-  bits->SetLineWidth(2);
-  bits->SetLineColor(2);
-  bits->SetOption("hist");
-  bits->SetFillStyle(3010);
-  bits->SetFillColor(3);
+  if (bits) {
+    bits->SetLineWidth(2);
+    bits->SetLineColor(2);
+    bits->SetOption("hist");
+    bits->SetFillStyle(3010);
+    bits->SetFillColor(3);
+  }
 
-  hitsPerTrack->SetLineWidth(2);
-  hitsPerTrack->SetLineColor(2);
-  hitsPerTrack->SetOption("hist");
-  hitsPerEvent->SetLineWidth(2);
-  hitsPerEvent->SetLineColor(2);
-  hitsPerEvent->SetOption("hist");
-
+  if (hitsPerTrack) {
+    hitsPerTrack->SetLineWidth(2);
+    hitsPerTrack->SetLineColor(2);
+    hitsPerTrack->SetOption("hist");
+  }
+  if (hitsPerEvent) {
+    hitsPerEvent->SetLineWidth(2);
+    hitsPerEvent->SetLineColor(2);
+    hitsPerEvent->SetOption("hist");
+  }
   //Tcanvas main
-  m_c_main->cd(2); bits->Draw(); bits->GetYaxis()->SetTitleOffset(0.5);
-  m_c_main->cd(3); theta->Draw();
-  m_c_main->cd(4); hitsPerTrack->Draw();
-  m_c_main->cd(5); hitsPerEvent->Draw();
+  m_c_main->cd(2);
+  if (bits) { bits->Draw(); bits->GetYaxis()->SetTitleOffset(0.5); }
+  m_c_main->cd(3);
+  if (theta) theta->Draw();
+  m_c_main->cd(4);
+  if (hitsPerTrack) hitsPerTrack->Draw();
+  m_c_main->cd(5);
+  if (hitsPerEvent) hitsPerEvent->Draw();
   m_c_main->cd(6);
   if (thetaPhi != NULL) thetaPhi->Draw("colz");
 

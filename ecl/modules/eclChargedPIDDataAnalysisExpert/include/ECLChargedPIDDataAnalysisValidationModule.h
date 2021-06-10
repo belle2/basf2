@@ -24,6 +24,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 
+#include <set>
+
 namespace Belle2 {
 
   /**

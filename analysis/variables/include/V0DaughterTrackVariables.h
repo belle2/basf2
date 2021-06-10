@@ -195,9 +195,19 @@ namespace Belle2 {
 
     /**
      * returns the flag for V0 daughters sharing the innermost VXD hit.
-     * 1: one side of SVDCluster, 2: both sides of SVDClusters or PXDCluster
+     * 0x1(0x2) bit represents V/z(U/r-phi)-hit share.
      */
     int v0DaughtersShareInnermostHit(const Particle* part);
+
+    /**
+     * returns the flag for V0 daughters sharing the innermost VXD U-side hit.
+     */
+    bool v0DaughtersShareInnermostUHit(const Particle* part);
+
+    /**
+     * returns the flag for V0 daughters sharing the innermost VXD V-side hit.
+     */
+    bool v0DaughtersShareInnermostVHit(const Particle* part);
 
     /**
      * helper function to get the number of hits associated to a track for given tracking detector

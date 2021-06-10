@@ -110,7 +110,7 @@ namespace Belle2 {
     /** Compare innermost hits of daughter pairs to check if they are the same (shared) or not.
      * For SVD hits, compare U- and V- hit pair.
      * @param recoTrackPlus, recoTrackMinus input RecoTrack pair
-     * @return 0 for not the same (not shared), 1 for 1D-hit share (1-side SVD hit), 2 for 2D-hit (PXD hit or SVD hit pair) share, -1 for exception
+     * @return If 1D- or 2D-hits are shared as the innermost hits among V0 daughters. 0x1(0x2) bit represents V/z(U/r-phi)-hit share. -1 for exception.
      */
     int checkSharedInnermostCluster(const RecoTrack* recoTrackPlus, const RecoTrack* recoTrackMinus);
 

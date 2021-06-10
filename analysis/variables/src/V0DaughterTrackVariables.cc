@@ -348,11 +348,21 @@ namespace Belle2 {
       auto trackFitMinus = daughterMinus->getTrackFitResult();
       if (!trackFitPlus || !trackFitMinus)
         return std::numeric_limits<int>::quiet_NaN();
-      int flagPlus  = trackFitPlus->getHitPatternVXD().getInformation();
-      int flagMinus = trackFitMinus->getHitPatternVXD().getInformation();
+      int flagPlus  = trackFitPlus->getHitPatternVXD().getInnermostHitShareStatus();
+      int flagMinus = trackFitMinus->getHitPatternVXD().getInnermostHitShareStatus();
       if (flagPlus != flagMinus)
         return std::numeric_limits<int>::quiet_NaN();
       return flagPlus;
+    }
+
+    bool v0DaughtersShareInnermostUHit(const Particle* part)
+    {
+      return ((v0DaughtersShareInnermostHit(part) / 2) == 1);
+    }
+
+    bool v0DaughtersShareInnermostVHit(const Particle* part)
+    {
+      return ((v0DaughtersShareInnermostHit(part) % 2) == 1);
     }
 
     VARIABLE_GROUP("V0Daughter");
@@ -496,7 +506,11 @@ namespace Belle2 {
                       "j-th element of the 15 covariance matrix elements (at IP perigee) of the i-th daughter track. "
                       "(0,0), (0,1) ... (1,1), (1,2) ... (2,2) ...");
     /// check whether the innermost VXD hits are shared among daoughters
-    REGISTER_VARIABLE("v0DaughtersShareInnermostHit", v0DaughtersShareInnermostHit,
-                      "flag for V0 daughters sharing the innermost VXD hit. 1: one side of SVDCluster, 2: both sides of SVDClusters or PXDCluster");
+    REGISTER_VARIABLE("v0DaughtersShare1stHit", v0DaughtersShareInnermostHit,
+                      "flag for V0 daughters sharing the first(innermost) VXD hit. 0x1(0x2) bit represents V/z(U/r-phi)-hit share.");
+    REGISTER_VARIABLE("v0DaughtersShare1stUHit", v0DaughtersShareInnermostHit,
+                      "flag for V0 daughters sharing the first(innermost) VXD U-side hit.");
+    REGISTER_VARIABLE("v0DaughtersShare1stVHit", v0DaughtersShareInnermostHit,
+                      "flag for V0 daughters sharing the first(innermost) VXD V-side hit.");
   }
 }

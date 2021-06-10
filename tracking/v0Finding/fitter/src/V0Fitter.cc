@@ -172,9 +172,9 @@ TrackFitResult* V0Fitter::buildTrackFitResult(const genfit::Track& track, const 
   uint32_t hitPatternVXDInitializer = TrackBuilder::getHitPatternVXDInitializer(*recoTrack);
 
   // If the innermost hit is shared among V0 daughters, assign flag in the infoLayer.
-  if (sharedInnermostCluster == 1 || sharedInnermostCluster == 2) {
+  if (sharedInnermostCluster > 0 || sharedInnermostCluster < 4) {
     HitPatternVXD hitPatternVXD_forflag = HitPatternVXD(hitPatternVXDInitializer);
-    hitPatternVXD_forflag.setInformation(sharedInnermostCluster);
+    hitPatternVXD_forflag.setInnermostHitShareStatus(sharedInnermostCluster);
     hitPatternVXDInitializer = hitPatternVXD_forflag.getInteger();
   }
 
@@ -617,7 +617,9 @@ bool V0Fitter::removeInnerHits(RecoTrack* prevRecoTrack, RecoTrack* recoTrack,
 
 int V0Fitter::checkSharedInnermostCluster(const RecoTrack* recoTrackPlus, const RecoTrack* recoTrackMinus)
 {
-  int flag = 0; // 1 for sharing 1D-hit, 2 for sharing 2D-hit. -1 for exception.
+  /// If 1D- or 2D-hits are shared as the innermost hits among V0 daughters.
+  /// 0x1(0x2) bit in flag represents V/z(U/r-phi)-hit share.
+  int flag = 0; // -1 for exception
 
   // get the innermost hit for plus/minus-daughter
   const std::vector<RecoHitInformation*>& recoHitInformationsPlus  = recoTrackPlus->getRecoHitInformations(
@@ -641,7 +643,7 @@ int V0Fitter::checkSharedInnermostCluster(const RecoTrack* recoTrackPlus, const 
       const PXDCluster* clusterPlus = recoHitInfoPlus->getRelatedTo<PXDCluster>();
       const PXDCluster* clusterMinus = recoHitInfoMinus->getRelatedTo<PXDCluster>();
       if (clusterPlus == clusterMinus) { // if they share a same PXDCluster, set the flag
-        flag = 2; // PXD cluster is a 2D-hit
+        flag = 3; // PXD cluster is a 2D-hit
       }
     } else if (recoHitInfoPlus->getTrackingDetector() == RecoHitInformation::c_SVD) {
       /// if the innermost hit is a SVD U-hit, check the next hit in addition
@@ -662,11 +664,10 @@ int V0Fitter::checkSharedInnermostCluster(const RecoTrack* recoTrackPlus, const 
             if (!(clusterNextPlus->isUCluster()) && !(clusterNextMinus->isUCluster())
                 && clusterPlus->getSensorID() == clusterNextPlus->getSensorID()
                 && clusterMinus->getSensorID() == clusterNextMinus->getSensorID()) {
-              if (clusterPlus == clusterMinus && clusterNextPlus == clusterNextMinus) {
-                flag = 2; // SVD U- and V-cluster gives 2D-hit information
-              } else if (clusterPlus == clusterMinus || clusterNextPlus == clusterNextMinus) {
-                flag = 1; // SVD U- or V-cluster gives 1D-hit information
-              }
+              if (clusterPlus == clusterMinus)
+                flag += 2; // SVD U-cluster is shared
+              if (clusterNextPlus == clusterNextMinus)
+                flag += 1; // SVD V-cluster is shared
             } else {
               B2WARNING("SVD cluster to be paired is not on V-side, or not on the same sensor.");
               return -1;

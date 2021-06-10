@@ -36,7 +36,9 @@ const std::bitset<32> HitPatternVXD::s_SVDuvMasks[2] = {
   std::bitset<32>(static_cast<std::string>("00000000110011001100110000000000"))   // v layer
 };
 
-const std::bitset<32> HitPatternVXD::s_infoLayerMask(static_cast<std::string>("11111111000000000000000000000000"));
+const std::bitset<32> HitPatternVXD::s_V0DaughterMask(static_cast<std::string>("00000011000000000000000000000000"));
+
+const std::bitset<32> HitPatternVXD::s_infoLayerMask(static_cast<std::string>("11111100000000000000000000000000"));
 
 unsigned short HitPatternVXD::getNdf() const
 {
@@ -180,25 +182,26 @@ short HitPatternVXD::getLastPXDLayer(const PXDMode& mode) const
   return -1;
 }
 
-void HitPatternVXD::setInformation(const unsigned short information)
+void HitPatternVXD::setInnermostHitShareStatus(const unsigned short innermostHitShareStatus)
 {
-  B2ASSERT("Information is out of range. Information: " << information << ", range: " << (s_infoLayerMask >> (4 * 6)).to_ulong(),
-           information <= (s_infoLayerMask >> (4 * 6)).to_ulong());
-  resetInformation();
-  std::bitset<32> hits(information);
+  B2ASSERT("Information is out of range. Information: " << innermostHitShareStatus << ", range: " << (s_V0DaughterMask >>
+           (4 * 6)).to_ulong(),
+           innermostHitShareStatus <= (s_V0DaughterMask >> (4 * 6)).to_ulong());
+  resetInnermostHitShareStatus();
+  std::bitset<32> hits(innermostHitShareStatus);
   hits <<= 4 * 6;
   m_pattern |= hits;
 }
 
-unsigned short HitPatternVXD::getInformation() const
+unsigned short HitPatternVXD::getInnermostHitShareStatus() const
 {
-  std::bitset<32> hits(m_pattern & s_infoLayerMask);
+  std::bitset<32> hits(m_pattern & s_V0DaughterMask);
   return (hits >> (4 * 6)).to_ulong();
 }
 
-void HitPatternVXD::resetInformation()
+void HitPatternVXD::resetInnermostHitShareStatus()
 {
-  m_pattern &= ~(s_infoLayerMask);
+  m_pattern &= ~(s_V0DaughterMask);
 }
 
 std::string HitPatternVXD::__str__() const

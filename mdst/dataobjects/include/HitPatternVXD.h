@@ -28,10 +28,9 @@ namespace Belle2 {
    *
    * @sa HitPatternCDC
    *
-   * 32 Bits are reserved. 4 Bits for each layer: 2 Bits for each PXD normal/gated-mode, 2 Bits for each SVD U/V-side. In total 24 Bits are used to represent hit patterns. Remaining upper 8 Bits are resevered for information.
-   * 8 Bits information is currently only used in V0Finder.
-   *  - 1: V0 daughters share either side of SVDCluster in the innermost hits.
-   *  - 2: V0 daughters share PXDCluster or both sides of SVDClusters in the innermost hits.
+   * 32 Bits are reserved. 4 Bits for each layer: 2 Bits for each PXD normal/gated-mode, 2 Bits for each SVD U/V-side. In total 24 Bits are used to represent hit patterns.
+   * Remaining upper 8 Bits are resevered for information.
+   * Lowest 2 Bits for V0 daghters (innermost hit share status), assigned in V0Finder. 0x1(0x2) bit represents V/z(U/r-phi)-hit share.
    */
   class HitPatternVXD {
     friend class HitPatternVXDTest_General_Test;
@@ -185,25 +184,25 @@ namespace Belle2 {
     short getLastPXDLayer(const PXDMode& mode = PXDMode::normal) const;
 
     // ----------------------------------------------------------------
-    // ---------------- INFORMATION FUNCTIONS -------------------------
+    // ---------------- V0DAUGHTER FUNCTIONS --------------------------
     // ----------------------------------------------------------------
 
     /**
-     * Set the information flag.
-     * @param information Information flag.
+     * Set the innermost hit share flags for V0 daughters.
+     * @param innermostHitShareStatus Innermost hit share status flags.
      */
-    void setInformation(const unsigned short information);
+    void setInnermostHitShareStatus(const unsigned short innermostHitShareStatus);
 
     /**
-     * Get the information flag.
-     * @return Information flag.
+     * Get the innermost hit share flags for V0 daughters.
+     * @return Innermost hit share status flags.
      */
-    unsigned short getInformation() const;
+    unsigned short getInnermostHitShareStatus() const;
 
     /**
-     * Reset the information flag.
+     * Reset the innermost hit share flags for V0 daughters.
      */
-    void resetInformation();
+    void resetInnermostHitShareStatus();
 
     /** String for printing in python.*/
     std::string __str__() const;
@@ -219,6 +218,7 @@ namespace Belle2 {
     static const std::bitset<32> s_LayerMasks[6]; /**<  Masks to zero out all bits from other layers. */
     static const std::bitset<32> s_PXDModeMasks[2]; /**<  Mask to zero out all bits from other layers. */
     static const std::bitset<32> s_SVDuvMasks[2]; /**<  Mask to zero out all bits from other layers. */
+    static const std::bitset<32> s_V0DaughterMask;  /**<  Mask to zero out all bits from other layers. */
     static const std::bitset<32> s_infoLayerMask;  /**<  Mask to zero out all bits from other layers. */
 
     static const std::list<unsigned short> s_PXDLayerNumbers;  /**< For iterating through layers. */

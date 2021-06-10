@@ -18,7 +18,7 @@ import basf2 as b2
 # Some ROOT tools
 import ROOT
 from ROOT import Belle2
-from ROOT import gROOT, AddressOf
+from ROOT import gROOT, addressof
 
 # Define a ROOT struct to hold output data in the TTree
 gROOT.ProcessLine('struct EventDataRecoTrack {\
@@ -57,7 +57,7 @@ class SVDValidationTTreeRecoTrack(b2.Module):
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
-                self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
+                self.tree.Branch(key, addressof(self.data, key), key + formstring)
 
     def event(self):
         """Take clusters from SVDRecoTracks with a truehit and save needed information"""
@@ -67,7 +67,7 @@ class SVDValidationTTreeRecoTrack(b2.Module):
             dict_cluster = OrderedDict({'L3': [], 'L4': [], 'L5': [], 'L6': []})  # keys: layers, values: list of dicts
             # clusters are ordered acording layers and sides, so we can read two at once
             for i in range(0, len(clusters), 2):
-                c_U, c_V = clusters[i], clusters[i+1]  # read at once two clusters
+                c_U, c_V = clusters[i], clusters[i + 1]  # read at once two clusters
                 cluster_U_truehits = c_U.getRelationsTo('SVDTrueHits')  # SVDClustersToSVDTrueHits
                 U_id = c_U.getSensorID()
                 sensorNum_U = U_id.getSensorNumber()

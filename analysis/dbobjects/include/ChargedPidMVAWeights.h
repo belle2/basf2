@@ -498,7 +498,8 @@ namespace Belle2 {
     };
 
 
-    ClassDef(ChargedPidMVAWeights, 6);
+    ClassDef(ChargedPidMVAWeights, 7);
+    /**< 7. Use double instead of float in tuple. */
     /**< 6. Introduce charge bin in the parametrisation. */
     /**< 5. remove 2D grid dependence on pdgId, add multi-class support, define enum for valid training modes */
     /**< 4. add cuts map. */

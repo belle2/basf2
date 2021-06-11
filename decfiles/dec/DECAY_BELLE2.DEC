@@ -8431,20 +8431,24 @@ Decay D0
 ###############################################################
 # Semi-leptonic modes
 ###############################################################
+# PDG2021: BF(X e+ nu_e) = (6.49 \pm 0.11)%
+# sum of next 9 lines: 6.476%
 0.021500000   K*-  e+  nu_e                                SLPOLE_DtoKstarlnu; # [PDG2019]
 0.001600000   anti-K0  pi-  e+  nu_e                       PHSP;
 0.000800000   K-  pi0  e+  nu_e                            PHSP;
-0.035420 K-      e+      nu_e                            SLBKPOLE_DtoKlnu; # [PDG2019]
+0.035420000   K-      e+      nu_e                         SLBKPOLE_DtoKlnu; # [PDG2019]
 0.000760000   K_1-  e+  nu_e                               ISGW2; # [PDG2019]
 0.000000000   K-  pi+  pi-  e+  nu_e                       PHSP; # Moved up from bottom of decay table 02/2020
 0.000000000   K_2*-  e+  nu_e                              ISGW2; # Removed 02/2020
 0.002910000   pi-  e+  nu_e                                SLBKPOLE_Dtopilnu; # [PDG2019]
 0.001770000   rho-  e+  nu_e                               SLPOLE_Dtorholnu; # [PDG2019]
 
+# PDG2021: BF(X mu+ nu_mu) = (6.8 \pm 0.6)%
+# sum of next 9 lines: 6.270%
 0.018900000   K*-  mu+  nu_mu                              SLPOLE_DtoKstarlnu; # [PDG2019]
 0.003000000   anti-K0  pi-  mu+  nu_mu                     PHSP;
 0.001500000   K-  pi0  mu+  nu_mu                          PHSP;
-0.034100 K-      mu+     nu_mu                           SLBKPOLE_DtoKlnu; # [PDG2019]
+0.034100000   K-      mu+     nu_mu                        SLBKPOLE_DtoKlnu; # [PDG2019]
 0.000760000   K_1-  mu+  nu_mu                             ISGW2; # copied K_1- e+ nu_e, best estimate
 0.000000000   K-  pi+  pi-  mu+  nu_mu                     PHSP; # Added with BF=0 02/2020
 0.000000000   K_2*-  mu+  nu_mu                            ISGW2; # Removed 02/2020
@@ -8500,8 +8504,8 @@ Decay D0
 0.008300000   K_L0  pi0  pi0                               PHSP; 
 0.000000000   anti-K0  pi0  pi0                            PHSP;
 
-0.005600000   K_S0  eta  pi0                               PHSP;
-0.005600000   K_L0  eta  pi0                               PHSP;
+0.010100000   K_S0  eta  pi0                               PHSP; # [PDG2021]
+0.010100000   K_L0  eta  pi0                               PHSP;
 0.000000000   anti-K0  eta  pi0                            PHSP;
 
 0.024000000   anti-K*0  pi+  pi-                           PHSP;
@@ -8514,19 +8518,26 @@ Decay D0
 0.007500000   K-  eta'  pi+                                PHSP;
 0.008800000   K-  pi+  pi+  pi-                            PHSP;
 
-0.035300000   K_S0  pi+  pi-  pi0                          PHSP; # [PDG2019] - subtract K_S0 eta, omega K_S0, anti-K*0 pi+ pi-, and K*- pi+ pi0 BFs from PDG value of 0.052
-0.035300000   K_L0  pi+  pi-  pi0                          PHSP;
+0.006000000   K_S0  pi+  pi-  pi0                          PHSP; # [PDG2019] - subtract contributions from 11 resonances (K_S0 (eta, eta', omega, phiR), anti-K*0 (rho0, omega, pi+ pi-), K*- (rho+, pi+ pi0), K_1- pi+, anti-K_10 pi0) from PDG value of 0.052
+0.006000000   K_L0  pi+  pi-  pi0                          PHSP;
 0.000000000   anti-K0  pi+  pi-  pi0                       PHSP;
 
 # Confirm that these should be commented out [PG 05/02/2018]
-# K+ pi- pi0 pi0 is not in PDG but was well-measured at BESIII
+# K- pi+ pi0 pi0 is not in PDG but was well-measured at BESIII
 #  to be (8.98 +/- 0.13(stat.) +/- 0.40(syst.))%
-0.025100000   K-  pi+  pi0  pi0                            PHSP; # [New mode added] - subtract contributions from resonances and adjust decimal places to have everything add to 1
+0.025100000   K-  pi+  pi0  pi0                            PHSP; # [New mode added 03/2020] - subtract contributions from resonances and adjust decimal places to have everything add to 1
 
-# Keep these modes commented out for now to have everything add to 1 [ERO 03/09/2020]
-#0.014300 anti-K0 pi0     pi0     pi0                     PHSP;
-#0.063800 anti-K0 pi+     pi-     pi0     pi0             PHSP;
-#0.019200 anti-K0 pi+     pi-     pi0     pi0     pi0     PHSP;
+0.008560000 K_S0  pi0  pi0  pi0                            PHSP; # [New mode added 06/2021 to compensate for changes in other modes]
+0.008560000 K_L0  pi0  pi0  pi0                            PHSP;
+0.000000000 anti-K0  pi0  pi0  pi0                         PHSP;
+
+0.008560000 K_S0  pi+  pi-  pi0  pi0                       PHSP; # [New mode added 06/2021 to compensate for changes in other modes]
+0.008560000 K_L0  pi+  pi-  pi0  pi0                       PHSP;
+0.000000000 anti-K0  pi+  pi-  pi0  pi0                    PHSP;
+
+0.008798500 K_S0  pi+  pi-  pi0  pi0  pi0                  PHSP; # [New mode added 06/2021 to compensate for changes in other modes]
+0.008798500 K_L0  pi+  pi-  pi0  pi0  pi0                  PHSP;
+0.000000000 anti-K0  pi+  pi-  pi0  pi0  pi0               PHSP;
 
 0.000000000   K-  pi+  pi+  pi-  pi0                       PHSP;
 0.003497000   K-  pi+  pi0  pi0  pi0                       PHSP;
@@ -8626,9 +8637,9 @@ Decay D0
 0.001518000   K_L0  K+  pi-                                PHSP;
 0.000000000   anti-K0  K+  pi-                             PHSP;
 
-0.002068000   K+  K-  pi0                                  PHSP; # [PDG2019] - subtract phi pi0, K*+ K-, and K*- K+ BFs from PDG value of 0.00342
+0.000768000   K+  K-  pi0                                  PHSP; # [PDG2019] - subtract resonance BFs from PDG value of 0.00342
 
-0.002430000   K+  K-  pi+  pi-                             PHSP;
+0.001730000   K+  K-  pi+  pi-                             PHSP; # [PDG2019] - subtract resonance BFs from PDG value of 0.00247
 0.002761000   K+  K-  pi0  pi0                             PHSP;
 
 0.001280000   K_S0  K_S0  pi+  pi-                         PHSP; # [PDG2019]
@@ -8653,7 +8664,7 @@ Decay D0
 # Doubly Cabibbo suppressed modes
 ###############################################################
 0.000150000   K+  pi-                                      PHSP; # [PDG2019]
-0.000237000   K*+  pi-                                     SVS; # [PDG2019] - calculated to give correct K_S0 pi+ pi- contribution
+0.000000000   K*+  pi-                                     SVS; # [Zero out to avoid double counting K_S0 pi+ pi-; contribution would be almost negligible anyway, not worth including]
 0.000019000   K+  pi-  pi0                                 PHSP; # [PDG2019] - subtract K*+ pi- BF from PDG value of 0.000306
 0.000249000   K+  pi+  pi-  pi-                            PHSP; # [PDG2019]
 0.000300000   K+  pi-  pi0  pi0                            PHSP; # [New moded added]
@@ -8669,20 +8680,24 @@ Decay anti-D0
 ###############################################################
 # Semi-leptonic modes
 ###############################################################
+# PDG2021: BF(X e- anti-nu_e) = (6.49 \pm 0.11)%
+# sum of next 9 lines: 6.476%
 0.021500000   K*+  e-  anti-nu_e                           SLPOLE_DtoKstarlnu; # [PDG2019]
 0.001600000   K0  pi+  e-  anti-nu_e                       PHSP;
 0.000800000   K+  pi0  e-  anti-nu_e                       PHSP;
-0.035420 K+      e-      anti-nu_e                       SLBKPOLE_DtoKlnu; # [PDG2019]
+0.035420000   K+      e-      anti-nu_e                    SLBKPOLE_DtoKlnu; # [PDG2019]
 0.000760000   K_1+  e-  anti-nu_e                          ISGW2; # [PDG2019]
 0.000000000   K+  pi-  pi+  e-  anti-nu_e                  PHSP; # Moved up from bottom of decay table 02/2020
 0.000000000   K_2*+  e-  anti-nu_e                         ISGW2; # Removed 02/2020
 0.002910000   pi+  e-  anti-nu_e                           SLBKPOLE_Dtopilnu; # [PDG2019]
 0.001770000   rho+  e-  anti-nu_e                          SLPOLE_Dtorholnu; # [PDG2019]
 
+# PDG2021: BF(X mu- anti-nu_mu) = (6.8 \pm 0.6)%
+# sum of next 9 lines: 6.270%
 0.018900000   K*+  mu-  anti-nu_mu                         SLPOLE_DtoKstarlnu; # [PDG2019]
 0.003000000   K0  pi+  mu-  anti-nu_mu                     PHSP;
 0.001500000   K+  pi0  mu-  anti-nu_mu                     PHSP;
-0.034100 K+      mu-     anti-nu_mu                      SLBKPOLE_DtoKlnu; # [PDG2019]
+0.034100000   K+      mu-     anti-nu_mu                   SLBKPOLE_DtoKlnu; # [PDG2019]
 0.000760000   K_1+  mu-  anti-nu_mu                        ISGW2; # copied K_1+ e- anti-nu_e, best estimate
 0.000000000   K+  pi-  pi+  mu-  anti-nu_mu                PHSP; # Added with BF=0 02/2020
 0.000000000   K_2*+  mu-  anti-nu_mu                       ISGW2; # Removed 02/2020
@@ -8738,8 +8753,8 @@ Decay anti-D0
 0.008300000   K_L0  pi0  pi0                               PHSP; 
 0.000000000   K0  pi0  pi0                                 PHSP;
 
-0.005600000   K_S0  eta  pi0                               PHSP;
-0.005600000   K_L0  eta  pi0                               PHSP; 
+0.010100000   K_S0  eta  pi0                               PHSP; # [PDG2021]
+0.010100000   K_L0  eta  pi0                               PHSP; 
 0.000000000   K0  eta  pi0                                 PHSP;
 
 0.024000000   K*0  pi+  pi-                                PHSP;
@@ -8752,19 +8767,26 @@ Decay anti-D0
 0.007500000   K+  eta'  pi-                                PHSP;
 0.008800000   K+  pi-  pi+  pi-                            PHSP;
 
-0.035300000   K_S0  pi+  pi-  pi0                          PHSP; # [PDG2019] - subtract K_S0 eta, omega K_S0, K*0 pi+ pi-, and K*+ pi- pi0 BFs from PDG value of 0.052
-0.035300000   K_L0  pi+  pi-  pi0                          PHSP;
+0.006000000   K_S0  pi+  pi-  pi0                          PHSP; # [PDG2019] - subtract contributions from 11 resonances (K_S0 (eta, eta', omega, phiR), K*0 (rho0, omega, pi+ pi-), K*+ (rho-, pi- pi0), K_1+ pi-, K_10 pi0) from PDG value of 0.052
+0.006000000   K_L0  pi+  pi-  pi0                          PHSP;
 0.000000000   K0  pi+  pi-  pi0                            PHSP;
 
 # Confirm that these should be commented out [PG 05/02/2018]
 # K+ pi- pi0 pi0 is not in PDG but was well-measured at BESIII
 #  to be (8.98 +/- 0.13(stat.) +/- 0.40(syst.))%
-0.025100000   K+  pi-  pi0  pi0                            PHSP; # [New mode added] - subtract contributions from resonances and adjust decimal places to have everything add to 1
+0.025100000   K+  pi-  pi0  pi0                            PHSP; # [New mode added 03/2020] - subtract contributions from resonances and adjust decimal places to have everything add to 1
 
-# Keep these modes commented out for now to have everything add to 1 [ERO 03/09/2020]
-#0.014300 K0      pi0     pi0     pi0                     PHSP;
-#0.063800 K0      pi-     pi+     pi0     pi0             PHSP;
-#0.019200 K0      pi-     pi+     pi0     pi0     pi0     PHSP;
+0.008560000 K_S0  pi0  pi0  pi0                            PHSP; # [New mode added 06/2021 to compensate for changes in other modes]
+0.008560000 K_L0  pi0  pi0  pi0                            PHSP;
+0.000000000 K0  pi0  pi0  pi0                              PHSP;
+
+0.008560000 K_S0  pi+  pi-  pi0  pi0                       PHSP; # [New mode added 06/2021 to compensate for changes in other modes]
+0.008560000 K_L0  pi+  pi-  pi0  pi0                       PHSP;
+0.000000000 K0  pi+  pi-  pi0  pi0                         PHSP;
+
+0.008798500 K_S0  pi+  pi-  pi0  pi0  pi0                  PHSP; # [New mode added 06/2021 to compensate for changes in other modes]
+0.008798500 K_L0  pi+  pi-  pi0  pi0  pi0                  PHSP;
+0.000000000 K0  pi+  pi-  pi0  pi0  pi0                    PHSP;
 
 0.000000000   K+  pi-  pi+  pi-  pi0                       PHSP;
 0.003497000   K+  pi-  pi0  pi0  pi0                       PHSP;
@@ -8773,7 +8795,7 @@ Decay anti-D0
 0.002800000   K_L0  pi+  pi+  pi-  pi-                     PHSP;
 0.000000000   K0  pi+  pi+  pi-  pi-                       PHSP;
 
-0.002115000   phiR  K_S0                                   SVS;
+0.002115000   phiR  K_S0                                   SVS; # phiR is "fake" resonance to prevent double counting of K_S0 K+ K- Dalitz mode
 0.002115000   phiR  K_L0                                   SVS;
 0.000000000   phiR  K0                                     SVS;
 
@@ -8864,9 +8886,9 @@ Decay anti-D0
 0.001518000   K_L0  K-  pi+                                PHSP;
 0.000000000   K0  K-  pi+                                  PHSP;
 
-0.002068000   K+  K-  pi0                                  PHSP; # [PDG2019] - subtract phi pi0, K*- K+, and K*+ K- BFs from PDG value of 0.00342
+0.000768000   K+  K-  pi0                                  PHSP; # [PDG2019] - subtract resonance BFs from PDG value of 0.00342
 
-0.002430000   K+  K-  pi+  pi-                             PHSP;
+0.001730000   K+  K-  pi+  pi-                             PHSP; # [PDG2019] - subtract resonance BFs from PDG value of 0.00247
 0.002761000   K+  K-  pi0  pi0                             PHSP;
 
 0.001280000   K_S0  K_S0  pi+  pi-                         PHSP; # [PDG2019]
@@ -8891,7 +8913,7 @@ Decay anti-D0
 # Doubly Cabibbo suppressed modes
 ###############################################################
 0.000150000   K-  pi+                                      PHSP; # [PDG2019]
-0.000237000   K*-  pi+                                     SVS; # [PDG2019] - calculated to give correct K_S0 pi+ pi- contribution
+0.000000000   K*-  pi+                                     SVS; # [Zero out to avoid double counting K_S0 pi+ pi-; contribution would be almost negligible anyway, not worth including]
 0.000019000   K-  pi+  pi0                                 PHSP; # [PDG2019] - subtract K*+ pi- BF from PDG value of 0.000306
 0.000249000   K-  pi+  pi+  pi-                            PHSP; # [PDG2019]
 0.000300000   K-  pi+  pi0  pi0                            PHSP; # [New mode added]

@@ -698,6 +698,7 @@ def add_cdc_cr_track_finding(path, output_reco_tracks="RecoTracks", trigger_poin
     path.add_module("TFCDC_WireHitPreparer",
                     useSecondHits=use_second_cdc_hits,
                     flightTimeEstimation="downwards",
+                    filter="cuts_from_DB",
                     triggerPoint=trigger_point)
 
     # Constructs clusters and reduce background hits

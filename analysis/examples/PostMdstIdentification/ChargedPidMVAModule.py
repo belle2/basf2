@@ -30,7 +30,7 @@ from modularAnalysis import getAnalysisGlobaltag
 def argparser():
 
     parser = argparse.ArgumentParser(description=__doc__,
-                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+                                     formatter_class=argparse.RawTextHelpFormatter)
 
     def sb_pair(arg):
         try:
@@ -47,9 +47,9 @@ def argparser():
                         type=sb_pair,
                         nargs='+',
                         default=(0, 0),
-                        help="Option required in binary mode."
-                        "A list of pdgId pairs of the (S, B) charged stable particle mass hypotheses to test."
-                        "Pass a space-separated list of (>= 1) S,B pdgIds, e.g.:"
+                        help="Option required in binary mode.\n"
+                        "A list of pdgId pairs of the (S, B) charged stable particle mass hypotheses to test.\n"
+                        "Pass a space-separated list of (>= 1) S,B pdgIds, e.g.:\n"
                         "'--testHyposPDGCodePair 11,211 13,211'")
     parser.add_argument("--addECLOnly",
                         dest="add_ecl_only",
@@ -57,12 +57,16 @@ def argparser():
                         default=False,
                         help="Apply the BDT also for the ECL-only training."
                         "This will result in a separate score branch in the ntuple.")
+    parser.add_argument("--chargeIndependent",
+                        action="store_true",
+                        default=False,
+                        help="Use a BDT trained on a sample of inclusively charged particles.")
     parser.add_argument("--global_tag_append",
                         type=str,
                         nargs="+",
                         default=[getAnalysisGlobaltag()],
-                        help="List of names of conditions DB global tag(s) to append on top of GT replay."
-                        "NB: these GTs will have lowest priority."
+                        help="List of names of conditions DB global tag(s) to append on top of GT replay.\n"
+                        "NB: these GTs will have lowest priority.\n"
                         "Pass a space-separated list of names.")
     parser.add_argument("-d", "--debug",
                         dest="debug",
@@ -141,10 +145,10 @@ if __name__ == '__main__':
     # ----------------------------------------------------------------------------
 
     variables.addAlias("__event__", "evtNum")
-    for det in ["SVD", "CDC", "TOP", "ARICH", "ECL", "KLM"]:
+    for det in ["CDC", "TOP", "ARICH", "ECL", "KLM"]:
         if global_pid:
             for pdgId, d in std_charged.items():
-                variables.addAlias(f"{d.get('FULLNAME')}LogL_{det}", f"pidLogLikelihoodValueExpert({pdgId}, {det})")
+                variables.addAlias(f"{d.get('FULLNAME')}ID_{det}", f"pidProbabilityExpert({pdgId}, {det})")
         elif binary_pid:
             for s, b in args.testHyposPDGCodePair:
                 s_name = std_charged.get(s).get("NAME")
@@ -158,7 +162,8 @@ if __name__ == '__main__':
     if global_pid:
         applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
                            path=path,
-                           trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Multiclass)
+                           trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Multiclass,
+                           chargeIndependent=args.chargeIndependent)
         if args.add_ecl_only:
             applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
                                path=path,
@@ -168,7 +173,8 @@ if __name__ == '__main__':
             applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
                                path=path,
                                trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Classification,
-                               binaryHypoPDGCodes=(s, b))
+                               binaryHypoPDGCodes=(s, b),
+                               chargeIndependent=args.chargeIndependent)
             if args.add_ecl_only:
                 applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
                                    path=path,

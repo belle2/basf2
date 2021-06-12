@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     from keras.layers import Input, Dense
     from keras.models import Model
-    from keras.optimizers import adam
+    from keras.optimizers import Adam
     from keras.losses import binary_crossentropy
     from keras.activations import sigmoid, tanh
     from basf2 import conditions
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     output = Dense(units=1, activation=sigmoid)(net)
 
     model = Model(input, output)
-    model.compile(optimizer=adam(lr=0.01), loss=binary_crossentropy, metrics=['accuracy'])
+    model.compile(optimizer=Adam(lr=0.01), loss=binary_crossentropy, metrics=['accuracy'])
 
     model.fit(data[:, :-1], data[:, -1], batch_size=10, epochs=10)
 

@@ -14,7 +14,7 @@ import tensorflow.contrib.keras as keras
 
 from keras.layers import Dense, Input
 from keras.models import Model
-from keras.optimizers import adam
+from keras.optimizers import Adam
 from keras.losses import binary_crossentropy, sparse_categorical_crossentropy
 from keras.activations import sigmoid, tanh, softmax
 from keras.callbacks import EarlyStopping
@@ -101,7 +101,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
     # Model for applying Data. Loss function will not be used for training, if adversary is used.
     apply_model = Model(input, output)
-    apply_model.compile(optimizer=adam(lr=parameters['learning_rate']), loss=binary_crossentropy, metrics=['accuracy'])
+    apply_model.compile(optimizer=Adam(lr=parameters['learning_rate']), loss=binary_crossentropy, metrics=['accuracy'])
 
     state = State(apply_model, use_adv=parameters['lambda'] > 0 and number_of_spectators > 0)
     state.number_bins = parameters['number_bins']
@@ -119,7 +119,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
         # Model which trains first part of the net
         model1 = Model(input, [output] + adversaries)
-        model1.compile(optimizer=adam(lr=parameters['learning_rate']),
+        model1.compile(optimizer=Adam(lr=parameters['learning_rate']),
                        loss=[binary_crossentropy] + adversary_losses_model, metrics=['accuracy'],
                        loss_weights=[1] + [-parameters['lambda']] * len(adversary_losses_model))
         model1.summary()
@@ -130,7 +130,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
         for layer in model2.layers:
             layer.trainable = not layer.trainable
 
-        model2.compile(optimizer=adam(lr=parameters['learning_rate']), loss=adversary_losses_model,
+        model2.compile(optimizer=Adam(lr=parameters['learning_rate']), loss=adversary_losses_model,
                        metrics=['accuracy'])
         model2.summary()
 

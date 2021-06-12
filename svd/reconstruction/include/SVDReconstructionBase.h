@@ -85,7 +85,7 @@ namespace Belle2::SVD {
       m_chargeAlgorithms.insert("ELS3");
 
       m_positionAlgorithms.insert("CoGOnly");
-      m_positionAlgorithms.insert("oldDefault");
+      m_positionAlgorithms.insert("OldDefault");
     }
 
   };

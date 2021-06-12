@@ -85,7 +85,7 @@ void XTCalibrationAlgorithm::createHisto()
   for (Long64_t i = 0; i < nEntries; ++i) {
     tree->GetEntry(i);
     /* protect in case |alpha|>90 */
-    if (fabs(alpha > 90)) {
+    if (fabs(alpha) > 90) {
       if (alpha < 0) alpha += 180;
       if (alpha > 0) alpha -= 180;
     }

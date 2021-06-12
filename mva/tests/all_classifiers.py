@@ -49,7 +49,7 @@ if __name__ == "__main__":
         basf2_mva.expert(basf2_mva.vector(*[i for i, _ in methods]),
                          basf2_mva.vector('train.root'), 'tree', 'expert.root')
 
-        subprocess.call('basf2_mva_evaluate.py -o latex.pdf -train train.root -data test.root -i ' +
+        subprocess.call('basf2_mva_evaluate.py -c -o latex.pdf -train train.root -data test.root -i ' +
                         ' '.join([i for i, _ in methods]), shell=True)
 
         os.chdir(olddir)

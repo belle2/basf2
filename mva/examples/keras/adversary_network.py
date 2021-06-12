@@ -10,7 +10,7 @@
 
 import basf2_mva
 from basf2_mva_python_interface.contrib_keras import State
-import tensorflow.contrib.keras as keras
+import tensorflow.keras as keras
 
 from keras.layers import Dense, Input
 from keras.models import Model

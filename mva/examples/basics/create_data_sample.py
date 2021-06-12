@@ -20,7 +20,7 @@ variables = ['p', 'pt', 'pz', 'phi',
              'daughter(2, daughter(0, E))', 'daughter(2, daughter(1, E))',
              'daughter(2, daughter(0, clusterTiming))', 'daughter(2, daughter(1, clusterTiming))',
              'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
-             'daughter(2, daughter(0, minC2HDist))', 'daughter(2, daughter(1, minC2HDist))',
+             'daughter(2, daughter(0, minC2TDist))', 'daughter(2, daughter(1, minC2TDist))',
              'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
 spectators = ['isSignal', 'M']
 
@@ -31,7 +31,7 @@ def reconstruction_path(inputfiles):
     ma.fillParticleLists([('K-', 'kaonID > 0.5'), ('pi+', 'pionID > 0.5'),
                           ('gamma', '[[clusterReg == 1 and E > 0.10] or [clusterReg == 2 and E > 0.09] or '
                            '[clusterReg == 3 and E > 0.16]] and abs(clusterTiming) < 20 and clusterE9E25 > 0.7'
-                           ' and minC2HDist > 35')],
+                           ' and minC2TDist > 35')],
                          path=path)
     ma.reconstructDecay('pi0 -> gamma gamma', '0.1 < M < 1.6', path=path)
     vx.kFit('pi0', 0.1, fit_type='massvertex', path=path)

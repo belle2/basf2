@@ -75,7 +75,7 @@ if __name__ == "__main__":
         dic.update({'isSignal': data[:, -1]})
 
         df = pandas.DataFrame(dic, dtype=np.float32)
-        to_root(df, os.path.join(path, 'data.root'), tree_key='tree')
+        to_root(df, os.path.join(path, 'data.root'), key='tree')
 
         # Saving keras training model
         model.save(os.path.join(path, 'weights.h5'))

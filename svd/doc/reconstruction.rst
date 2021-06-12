@@ -67,30 +67,30 @@ Cluster Time Reconstruction
 ---------------------------
 The cluster time is a measurement of the time of the hit (with respect to the trigger signal).
 
-The **default** algorithm used to compute cluster time is the ``CoG6``: the cluster time is the average of the strips time weighted with the strip charge. The raw strip time is computed as the average of the sample time weighted with the sample amplitude:
+The **default** algorithm used to compute cluster time is the ``CoG3``: first all strips in the cluster are summed sample by sample, and the 3 best consecutive summed-samples are determined using the `MaxSum`_ algorithm. Then, the raw cluster time is the average of the 3 best summed-samples time with the sample charge:
 
 .. math::
 
-   t_{\rm strip}^{\rm raw} = \Delta t \cdot \frac{\sum_{i=0}^{i<6}i\ a_i}{\sum_{i=0}^{i<6} a_i} - t_{\rm peak}.
+   t_{\rm cluster}^{\rm raw} = \Delta t \cdot \frac{\sum_{i=0}^{i<3}i\ a_i}{\sum_{i=0}^{i<3} a_i}.
 
-where the :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV readout chip, :math:`a_{j}` is the amplitude of j-th sample and :math:`t_{\rm peak}` is the peaking time measured in calibration.
-
-The raw strip time is calibrated with a third order polynomial stored in the :ref:`SVDCoGTimeCalibration<svdcog6timecal>` DBObject.
+where the :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV readout chip and  :math:`a_{j}` is the amplitude of j-th summed-sample.
 
 
-We have two alternative algorithms to compute the cluster charge that can be selected by setting the :b2:mod:`SVDClusterizer` parameter ``timeAlgorithm{3/6}Samples``. For both, first all strips in the cluster are summed sample by sample, then the 3 best consecutive summed-samples are determined using the `MaxSum`_ algorithm.
+The raw time is finally calibrated with a third order polynomial stored in the :ref:`SVDCoG3SampleTimeCalibration<svdcog3timecal>` DBObject.
 
-#. ``CoG3``: the raw cluster time is the average of the 3 best summed-samples time with the sample charge:
+We have two alternative algorithms to compute the cluster time that can be selected by setting the :b2:mod:`SVDClusterizer` parameter ``timeAlgorithm{3/6}Samples``. 
+
+#. ``CoG6``: the cluster time is the average of the strips time weighted with the strip charge. The raw strip time is computed as the average of the sample time weighted with the sample amplitude:
 
    .. math::
 
-      t_{\rm cluster}^{\rm raw} = \Delta t \cdot \frac{\sum_{i=0}^{i<3}i\ a_i}{\sum_{i=0}^{i<3} a_i}.
+      t_{\rm strip}^{\rm raw} = \Delta t \cdot \frac{\sum_{i=0}^{i<6}i\ a_i}{\sum_{i=0}^{i<6} a_i}.
 
-   where the :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV readout chip and  :math:`a_{j}` is the amplitude of j-th summed-sample.
+   where the :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV readout chip and  :math:`a_{j}` is the amplitude of j-th sample.
+   The raw strip time is calibrated with a third order polynomial stored in the :ref:`SVDCoGTimeCalibration<svdcog6timecal>` DBObject.
 
-   The raw time is finally calibrated with a third order polynomial stored in the :ref:`SVDCoG3SampleTimeCalibration<svdcog3timecal>` DBObject.
 
-#. ``ELS3``: the raw cluster time is computed with a simple system of equations as :math:`t_{\rm raw}` of the theoretical :ref:`CR-RC waveform<svdcrrc>`:
+#. ``ELS3``: as for ``CoG3``, all strips in the cluster are summed sample by sample and the `MaxSum`_ algorithm is applied, and then the raw cluster time is computed with a simple system of equations as :math:`t_{\rm raw}` of the theoretical :ref:`CR-RC waveform<svdcrrc>`:
    
    .. _svdels3time:
 

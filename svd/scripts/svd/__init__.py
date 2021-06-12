@@ -62,7 +62,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         clusterizer.set_name(clusterizerName)
         clusterizer.param('ShaperDigits', shaperDigitsName)
         clusterizer.param('Clusters', clustersName)
-        clusterizer.param('timeAlgorithm6Samples', "CoG6")
+        clusterizer.param('timeAlgorithm6Samples', "CoG3")
         clusterizer.param('timeAlgorithm3Samples', "CoG3")
         clusterizer.param('chargeAlgorithm6Samples', "MaxSample")
         clusterizer.param('chargeAlgorithm3Samples', "MaxSample")

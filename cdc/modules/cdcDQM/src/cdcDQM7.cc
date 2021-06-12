@@ -72,7 +72,7 @@ void cdcDQM7Module::defineHisto()
   dirDAQ->cd();
 
   int bmin = 0;
-  int bmax = 0;
+  int bmax;
   int ndiv[9] = {160, 160, 192, 224, 256, 288, 320, 352, 384};
 
   for (int b = 0; b < 56; b++) {

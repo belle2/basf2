@@ -10,6 +10,7 @@ import tempfile
 import subprocess
 import sys
 import shutil
+from b2test_utils import skip_test
 
 variables = ['p', 'pz', 'daughter(0, p)', 'daughter(0, pz)', 'daughter(1, p)', 'daughter(1, pz)',
              'chiProb', 'dr', 'dz', 'daughter(0, dr)', 'daughter(1, dr)', 'daughter(0, chiProb)', 'daughter(1, chiProb)',
@@ -19,7 +20,7 @@ if __name__ == "__main__":
 
     # Skip test if files are not available
     if not (os.path.isfile('train.root') and os.path.isfile('test.root')):
-        sys.exit(0)
+        skip_test('Necessary files "train.root" and "test.root" not available.')
 
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")

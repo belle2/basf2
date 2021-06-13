@@ -54,4 +54,4 @@ if __name__ == "__main__":
     auc = basf2_mva_util.calculate_roc_auc(p, t)
     print("HepML", training_time, inference_time, auc)
 
-    subprocess.call('basf2_mva_evaluate.py -o latex.pdf -train train.root -data test.root -i HepMLUBoost', shell=True)
+    subprocess.call('basf2_mva_evaluate.py -c -o latex.pdf -train train.root -data test.root -i HepMLUBoost', shell=True)

@@ -45,9 +45,6 @@ namespace Belle2 {
     /// Create the store arrays
     void initialize() override;
 
-    /// End run and write Root file
-//     void endRun() override;
-
     /// Reject bad SpacePointTrackCands and bad hits inside the remaining
     void apply(std::vector<std::vector<AHit*>>& rawTrackCandidates, std::vector<SpacePointTrackCand>& trackCandidates) override;
 

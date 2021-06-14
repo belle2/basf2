@@ -65,36 +65,36 @@ namespace Belle2 {
 
     /// Cache containing the most important information of this state which will often be needed
     struct DataCache {
-      /// SensorID of this hit
-      VxdID sensorID = VxdID(0);
+      /// x coordinate of this hit
+      float x = std::numeric_limits<float>::quiet_NaN();
+      /// y coordinate of this hit
+      float y = std::numeric_limits<float>::quiet_NaN();
+      /// z coordinate of this hit
+      float z = std::numeric_limits<float>::quiet_NaN();
+      /// conformal transformed x coordinate of this hit
+      float xConformal = std::numeric_limits<float>::quiet_NaN();
+      /// conformal transformed y coordinate of this hit
+      float yConformal = std::numeric_limits<float>::quiet_NaN();
+      /// Local normalized uCoordinate of this state, only set if based on SpacePoint
+      float localNormalizedu = std::numeric_limits<float>::quiet_NaN();
+      /// Local normalized vCoordinate of this state, only set if based on SpacePoint
+      float localNormalizedv = std::numeric_limits<float>::quiet_NaN();
+      /// Phi value of SpacePoint
+      float sensorCenterPhi = std::numeric_limits<float>::quiet_NaN();
+      /// Phi value of SpacePoint
+      float phi = std::numeric_limits<float>::quiet_NaN();
+      /// Theta value of SpacePoint
+      float theta = std::numeric_limits<float>::quiet_NaN();
+      /// Time of the u-side cluster
+      float uTime = std::numeric_limits<float>::quiet_NaN();
+      /// Time of the v-side cluster
+      float vTime = std::numeric_limits<float>::quiet_NaN();
       /// Geometrical Layer this state is based on
       unsigned short layer = std::numeric_limits<unsigned short>::quiet_NaN();
       /// Ladder this state is based on (only use for SpacePoint based states)
       unsigned short ladder = std::numeric_limits<unsigned short>::quiet_NaN();
-      /// x coordinate of this hit
-      double x = std::numeric_limits<double>::quiet_NaN();
-      /// y coordinate of this hit
-      double y = std::numeric_limits<double>::quiet_NaN();
-      /// z coordinate of this hit
-      double z = std::numeric_limits<double>::quiet_NaN();
-      /// conformal transformed x coordinate of this hit
-      double xConformal = std::numeric_limits<double>::quiet_NaN();
-      /// conformal transformed y coordinate of this hit
-      double yConformal = std::numeric_limits<double>::quiet_NaN();
-      /// Local normalized uCoordinate of this state, only set if based on SpacePoint
-      double localNormalizedu = std::numeric_limits<double>::quiet_NaN();
-      /// Local normalized vCoordinate of this state, only set if based on SpacePoint
-      double localNormalizedv = std::numeric_limits<double>::quiet_NaN();
-      /// Phi value of SpacePoint
-      double sensorCenterPhi = std::numeric_limits<double>::quiet_NaN();
-      /// Phi value of SpacePoint
-      double phi = std::numeric_limits<double>::quiet_NaN();
-      /// Theta value of SpacePoint
-      double theta = std::numeric_limits<double>::quiet_NaN();
-      /// Time of the u-side cluster
-      double uTime = std::numeric_limits<double>::quiet_NaN();
-      /// Time of the v-side cluster
-      double vTime = std::numeric_limits<double>::quiet_NaN();
+      /// SensorID of this hit
+      VxdID sensorID = VxdID(0);
     };
     /// Get the cached data of this state
     const DataCache getDataCache() const { return m_dataCache; }

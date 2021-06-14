@@ -56,15 +56,43 @@ template<class AHit>
 void RawTrackCandCleaner<AHit>::apply(std::vector<std::vector<AHit*>>& rawTrackCandidates,
                                       std::vector<SpacePointTrackCand>& trackCandidates)
 {
-  m_relations.reserve(8192);
-  m_results.reserve(64);
-
   uint family = 0; // family of the SpacePointTrackCands
   for (auto& rawTrackCand : rawTrackCandidates) {
+
+    // If the capacity of a std::vector is too large, start with a fresh one.
+    // Since std::vector.shrink() or std::vector.shrink_to_fit() not necessarily reduce the capacity in the desired way,
+    // create a temporary vector of the same type and swap them to use the vector at the new location afterwards.
+    if (m_relations.capacity() > 8192) {
+      decltype(m_relations) tmp;
+      std::swap(m_relations, tmp);
+      tmp.clear();
+    }
     m_relations.clear();
+    m_relations.reserve(8192);
+
+    if (m_results.capacity() > 8192) {
+      decltype(m_results) tmp;
+      std::swap(m_results, tmp);
+      tmp.clear();
+    }
     m_results.clear();
+    m_results.reserve(8192);
+
+    if (m_unfilteredResults.capacity() > 8192) {
+      decltype(m_unfilteredResults) tmp;
+      std::swap(m_unfilteredResults, tmp);
+      tmp.clear();
+    }
     m_unfilteredResults.clear();
+    m_unfilteredResults.reserve(8192);
+
+    if (m_filteredResults.capacity() > 64) {
+      decltype(m_filteredResults) tmp;
+      std::swap(m_filteredResults, tmp);
+      tmp.clear();
+    }
     m_filteredResults.clear();
+    m_filteredResults.reserve(64);
 
     m_relationCreator.apply(rawTrackCand, m_relations);
 

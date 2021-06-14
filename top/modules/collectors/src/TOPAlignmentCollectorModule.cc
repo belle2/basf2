@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019 - Belle II Collaboration                             *
+ * Copyright(C) 2019, 2021 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -10,8 +10,7 @@
 
 #include <top/modules/collectors/TOPAlignmentCollectorModule.h>
 #include <top/geometry/TOPGeometryPar.h>
-#include <top/reconstruction/TOPconfigure.h>
-#include <top/reconstruction/TOPtrack.h>
+#include <top/reconstruction_cpp/TOPTrack.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
@@ -45,10 +44,6 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // module parameters
-    addParam("minBkgPerBar", m_minBkgPerBar,
-             "Minimal number of background photons per module", 0.0);
-    addParam("scaleN0", m_scaleN0,
-             "Scale factor for figure-of-merit N0", 1.0);
     addParam("targetModule", m_targetMid,
              "Module to be aligned. Must be 1 <= Mid <= 16.");
     addParam("maxFails", m_maxFails,
@@ -64,14 +59,8 @@ namespace Belle2 {
     addParam("stepPosition", m_stepPosition, "step size for translations", 1.0);
     addParam("stepAngle", m_stepAngle, "step size for rotations", 0.01);
     addParam("stepTime", m_stepTime, "step size for t0", 0.05);
-    addParam("stepRefind", m_stepRefind,
-             "step size for scaling of refractive index (dn/n)", 0.005);
-    addParam("gridSize", m_gridSize,
-             "size of a 2D grid for time-of-propagation averaging in analytic PDF: "
-             "[number of emission points along track, number of Cerenkov angles]. "
-             "No grid used if list is empty.", m_gridSize);
     std::string names;
-    auto align = TOPalign();
+    auto align = ModuleAlignment();
     for (const auto& parName : align.getParameterNames()) names += parName + ", ";
     names.pop_back();
     names.pop_back();
@@ -115,13 +104,9 @@ namespace Belle2 {
     // set alignment objects
 
     for (int set = 0; set < c_numSets; set++) {
-      auto align = TOPalign();
+      auto align = ModuleAlignment();
       align.setModuleID(m_targetMid);
-      align.setSteps(m_stepPosition, m_stepAngle, m_stepTime, m_stepRefind);
-      if (m_gridSize.size() == 2) {
-        align.setGrid(m_gridSize[0], m_gridSize[1]);
-        B2INFO("TOPAligner: grid for time-of-propagation averaging is set");
-      }
+      align.setSteps(m_stepPosition, m_stepAngle, m_stepTime);
       align.setParameters(m_parInit);
       for (const auto& parName : m_parFixed) {
         align.fixParameter(parName);
@@ -129,10 +114,6 @@ namespace Belle2 {
       m_align.push_back(align);
       m_countFails.push_back(0);
     }
-
-    // configure detector in reconstruction code
-
-    TOPconfigure config;
 
     // create and register output histograms and ntuples
 
@@ -237,24 +218,12 @@ namespace Belle2 {
     if (not m_recBunch.isValid()) return;
     if (not m_recBunch->isReconstructed()) return;
 
-    // add photons
-
-    TOPalign::clearData();
-
-    for (const auto& digit : m_digits) {
-      if (digit.getHitQuality() == TOPDigit::c_Good)
-        TOPalign::addData(digit.getModuleID(), digit.getPixelID(), digit.getTime(),
-                          digit.getTimeError());
-    }
-
-    TOPalign::setPhotonYields(m_minBkgPerBar, m_scaleN0);
-
     // track-by-track iterations
 
     for (const auto& track : m_tracks) {
 
-      // construct TOPtrack from mdst track
-      TOPtrack trk(&track);
+      // construct TOPTrack from mdst track
+      TOPTrack trk(track);
       if (not trk.isValid()) continue;
 
       // skip if track not hitting target module
@@ -311,7 +280,7 @@ namespace Belle2 {
       m_pocaY = pocaPosition.Y();
       m_cmsE = m_selector.getCMSEnergy();
       m_charge = trk.getCharge();
-      m_PDG = trk.getPDGcode();
+      m_PDG = trk.getPDGCode();
 
       // fill output tree
       auto alignTree = getObjectPtr<TTree>(name);

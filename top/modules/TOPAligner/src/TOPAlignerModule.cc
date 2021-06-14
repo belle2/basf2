@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
+ * Copyright(C) 2016, 2021 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -11,20 +11,8 @@
 // Own include
 #include <top/modules/TOPAligner/TOPAlignerModule.h>
 #include <top/geometry/TOPGeometryPar.h>
-#include <top/reconstruction/TOPalign.h>
-#include <top/reconstruction/TOPtrack.h>
-#include <top/reconstruction/TOPconfigure.h>
-
-// framework - DataStore
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
-// framework aux
-#include <framework/gearbox/Const.h>
+#include <top/reconstruction_cpp/TOPTrack.h>
 #include <framework/logging/Logger.h>
-
-// analysis
-#include <analysis/utility/PCmsLabTransform.h>
 
 // root
 #include <TH1F.h>
@@ -55,10 +43,6 @@ namespace Belle2 {
     //    setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("minBkgPerBar", m_minBkgPerBar,
-             "Minimal number of background photons per module", 0.0);
-    addParam("scaleN0", m_scaleN0,
-             "Scale factor for figure-of-merit N0", 1.0);
     addParam("targetModule", m_targetMid,
              "Module to be aligned. Must be 1 <= Mid <= 16.", 1);
     addParam("maxFails", m_maxFails,
@@ -81,12 +65,6 @@ namespace Belle2 {
     addParam("stepPosition", m_stepPosition, "step size for translations", 1.0);
     addParam("stepAngle", m_stepAngle, "step size for rotations", 0.01);
     addParam("stepTime", m_stepTime, "step size for t0", 0.05);
-    addParam("stepRefind", m_stepRefind,
-             "step size for scaling of refractive index (dn/n)", 0.005);
-    addParam("gridSize", m_gridSize,
-             "size of a 2D grid for time-of-propagation averaging in analytic PDF: "
-             "[number of emission points along track, number of Cerenkov angles]. "
-             "No grid used if list is empty.", m_gridSize);
     std::string names;
     for (const auto& parName : m_align.getParameterNames()) names += parName + ", ";
     names.pop_back();
@@ -100,42 +78,38 @@ namespace Belle2 {
 
   }
 
-  TOPAlignerModule::~TOPAlignerModule()
-  {
-  }
-
   void TOPAlignerModule::initialize()
   {
-
     // check if target module ID is valid
 
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-    if (!geo->isModuleIDValid(m_targetMid))
-      B2FATAL("Target module ID = " << m_targetMid << " is invalid. Exiting...");
+    if (not geo->isModuleIDValid(m_targetMid)) {
+      B2ERROR("Target module ID = " << m_targetMid << " is invalid.");
+    }
 
     // check if sample type is valid
 
-    if (!(m_sample == "dimuon" or m_sample == "bhabha" or m_sample == "cosmics")) {
-      B2FATAL("Invalid sample type " << m_sample << ". Exiting...");
+    if (not(m_sample == "dimuon" or m_sample == "bhabha" or m_sample == "cosmics")) {
+      B2ERROR("Invalid sample type '" << m_sample << "'");
     }
     if (m_sample == "bhabha") m_chargedStable = Const::electron;
+
+    // set track selector
+
+    m_selector = TrackSelector(m_sample);
+    m_selector.setMinMomentum(m_minMomentum);
+    m_selector.setDeltaEcms(m_deltaEcms);
+    m_selector.setCutOnPOCA(m_dr, m_dz);
+    m_selector.setCutOnLocalZ(m_minZ, m_maxZ);
 
     // set alignment object
 
     m_align.setModuleID(m_targetMid);
-    m_align.setSteps(m_stepPosition, m_stepAngle, m_stepTime, m_stepRefind);
-    if (m_gridSize.size() == 2) {
-      m_align.setGrid(m_gridSize[0], m_gridSize[1]);
-      B2INFO("TOPAligner: grid for time-of-propagation averaging is set");
-    }
+    m_align.setSteps(m_stepPosition, m_stepAngle, m_stepTime);
     m_align.setParameters(m_parInit);
     for (const auto& parName : m_parFixed) {
       m_align.fixParameter(parName);
     }
-
-    // configure detector in reconstruction code
-
-    TOPconfigure config;
 
     // input
 
@@ -144,13 +118,9 @@ namespace Belle2 {
     m_extHits.isRequired();
     m_recBunch.isOptional();
 
-    // set counter for failed iterations:
-
-    m_countFails = 0;
-
     // open output file
 
-    m_file = new TFile(m_outFileName.c_str(), "RECREATE");
+    m_file = TFile::Open(m_outFileName.c_str(), "RECREATE");
     if (m_file->IsZombie()) {
       B2FATAL("Couldn't open file '" << m_outFileName << "' for writing!");
       return;
@@ -166,6 +136,7 @@ namespace Belle2 {
     m_alignTree->Branch("iterPars", &m_vAlignPars);
     m_alignTree->Branch("iterParsErr", &m_vAlignParsErr);
     m_alignTree->Branch("valid", &m_valid);
+    m_alignTree->Branch("numPhot", &m_numPhot);
     m_alignTree->Branch("x", &m_x);
     m_alignTree->Branch("y", &m_y);
     m_alignTree->Branch("z", &m_z);
@@ -182,10 +153,6 @@ namespace Belle2 {
 
   }
 
-  void TOPAlignerModule::beginRun()
-  {
-  }
-
   void TOPAlignerModule::event()
   {
 
@@ -194,34 +161,22 @@ namespace Belle2 {
     // - if object doesn't exist (cosmic data and other cases w/o bunch finder)
 
     if (m_recBunch.isValid()) {
-      if (!m_recBunch->isReconstructed()) return;
+      if (not m_recBunch->isReconstructed()) return;
     }
-
-    // add photons
-
-    TOPalign::clearData();
-
-    for (const auto& digit : m_digits) {
-      if (digit.getHitQuality() == TOPDigit::EHitQuality::c_Good)
-        TOPalign::addData(digit.getModuleID(), digit.getPixelID(), digit.getTime(),
-                          digit.getTimeError());
-    }
-
-    TOPalign::setPhotonYields(m_minBkgPerBar, m_scaleN0);
 
     // track-by-track iterations
 
     for (const auto& track : m_tracks) {
 
       // construct TOPtrack from mdst track
-      TOPtrack trk(&track);
-      if (!trk.isValid()) continue;
+      TOPTrack trk(track);
+      if (not trk.isValid()) continue;
 
       // skip if track not hitting target module
       if (trk.getModuleID() != m_targetMid) continue;
 
       // track selection
-      if (!selectTrack(trk)) continue;
+      if (not m_selector.isSelected(trk)) continue;
 
       // do an iteration
       int err = m_align.iterate(trk, m_chargedStable);
@@ -245,6 +200,25 @@ namespace Belle2 {
       m_ntrk = m_align.getNumUsedTracks();
       m_errorCode = err;
       m_valid = m_align.isValid();
+      m_numPhot = m_align.getNumOfPhotons();
+
+      // set other ntuple variables
+      const auto& localPosition = m_selector.getLocalPosition();
+      m_x = localPosition.X();
+      m_y = localPosition.Y();
+      m_z = localPosition.Z();
+      const auto& localMomentum = m_selector.getLocalMomentum();
+      m_p = localMomentum.Mag();
+      m_theta = localMomentum.Theta();
+      m_phi = localMomentum.Phi();
+      const auto& pocaPosition = m_selector.getPOCAPosition();
+      m_pocaR = pocaPosition.Perp();
+      m_pocaZ = pocaPosition.Z();
+      m_pocaX = pocaPosition.X();
+      m_pocaY = pocaPosition.Y();
+      m_cmsE = m_selector.getCMSEnergy();
+      m_charge = trk.getCharge();
+      m_PDG = trk.getPDGCode();
 
       // fill output tree
       m_alignTree->Fill();
@@ -269,10 +243,6 @@ namespace Belle2 {
   }
 
 
-  void TOPAlignerModule::endRun()
-  {
-  }
-
   void TOPAlignerModule::terminate()
   {
 
@@ -292,9 +262,9 @@ namespace Belle2 {
     std::string name, title;
     name = "results_slot" + to_string(m_targetMid);
     title = "alignment parameters, slot " + to_string(m_targetMid);
-    int npar = m_align.getParameters().size();
+    int npar = m_align.getParams().size();
     TH1F h0(name.c_str(), title.c_str(), npar, 0, npar);
-    const auto& par = m_align.getParameters();
+    const auto& par = m_align.getParams();
     const auto& err = m_align.getErrors();
     for (int i = 0; i < npar; i++) {
       h0.SetBinContent(i + 1, par[i]);
@@ -308,7 +278,7 @@ namespace Belle2 {
     const auto& errMatrix = m_align.getErrorMatrix();
     for (int i = 0; i < npar; i++) {
       for (int k = 0; k < npar; k++) {
-        h1.SetBinContent(i + 1, k + 1, errMatrix[i + npar * k]);
+        h1.SetBinContent(i + 1, k + 1, errMatrix[i][k]);
       }
     }
     h1.Write();
@@ -318,13 +288,13 @@ namespace Belle2 {
     TH2F h2(name.c_str(), title.c_str(), npar, 0, npar, npar, 0, npar);
     std::vector<double> diag;
     for (int i = 0; i < npar; i++) {
-      double d = errMatrix[i * (1 + npar)];
+      double d = errMatrix[i][i];
       if (d != 0) d = 1.0 / sqrt(d);
       diag.push_back(d);
     }
     for (int i = 0; i < npar; i++) {
       for (int k = 0; k < npar; k++) {
-        h2.SetBinContent(i + 1, k + 1, diag[i] * diag[k] * errMatrix[i + npar * k]);
+        h2.SetBinContent(i + 1, k + 1, diag[i] * diag[k] * errMatrix[i][k]);
       }
     }
     h2.Write();
@@ -341,50 +311,6 @@ namespace Belle2 {
     }
   }
 
-  bool TOPAlignerModule::selectTrack(const TOP::TOPtrack& trk)
-  {
-
-    const auto* fit = trk.getTrack()->getTrackFitResultWithClosestMass(m_chargedStable);
-    auto pocaPosition = fit->getPosition();
-    m_pocaR = pocaPosition.Perp();
-    m_pocaZ = pocaPosition.Z();
-    m_pocaX = pocaPosition.X();
-    m_pocaY = pocaPosition.Y();
-    if (m_pocaR > m_dr) return false;
-    if (fabs(m_pocaZ) > m_dz) return false;
-
-    auto pocaMomentum = fit->getMomentum();
-
-    if (m_sample == "cosmics") {
-      if (pocaMomentum.Mag() < m_minMomentum) return false;
-    } else {
-      TLorentzVector lorentzLab;
-      lorentzLab.SetXYZM(pocaMomentum.X(), pocaMomentum.Y(), pocaMomentum.Z(),
-                         m_chargedStable.getMass());
-      PCmsLabTransform T;
-      auto lorentzCms = T.labToCms(lorentzLab);
-      m_cmsE = lorentzCms.Energy();
-      double dE = m_cmsE - T.getCMSEnergy() / 2;
-      if (fabs(dE) > m_deltaEcms) return false;
-    }
-
-    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-    const auto& module = geo->getModule(m_targetMid);
-    auto position = module.pointToLocal(trk.getPosition());
-    auto momentum = module.momentumToLocal(trk.getMomentum());
-    m_x = position.X();
-    m_y = position.Y();
-    m_z = position.Z();
-    m_p = momentum.Mag();
-    m_theta = momentum.Theta();
-    m_phi = momentum.Phi();
-    m_charge = trk.getCharge();
-    m_PDG = trk.getPDGcode();
-
-    if (m_z < m_minZ or m_z > m_maxZ) return false;
-
-    return true;
-  }
 
 } // end Belle2 namespace
 

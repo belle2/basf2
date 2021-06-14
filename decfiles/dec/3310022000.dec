@@ -1,0 +1,25 @@
+# EventType: 3310022000
+# Descriptor: e+ e- -> [phi [-> K+ K-] pi0 [-> gamma gamma]]
+# NickName: ee_phipi0ISR
+# Documentation: to be used with add_phokhara_evtgen_combination()
+# Tested: Yes
+# PhysicsWG: Dark Sector and Low Multiplicity
+# Responsible: Giacomo De Pietro
+# Email: depietro@infn.it
+# Cuts: None
+# Date: 20210608
+#
+
+Decay vpho 
+1.000 pi0 phi PARTWAVE 0.0 0.0 1.0 0.0 0.0 0.0;  
+Enddecay
+
+Decay phi
+1.000 K+ K- VSS;
+Enddecay
+
+Decay pi0
+1.000 gamma gamma PHSP;
+Enddecay
+
+End

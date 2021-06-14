@@ -19,6 +19,14 @@ Changes since release-05
 
 .. only:: not light
 
+   .. rubric:: The jitter of the L1 trigger is included in the standard simulation
+
+   The L1 trigger jitter is randomly extracted from a double gaussian whose parameters have been tuned with 2020 data.
+   The machine filling pattern is takein into account in the simulation of the jitter.
+
+
+.. only:: not light
+
    .. rubric:: The L1 trigger simulation is included in :py:func:`simulation.add_simulation`
 
    The L1 trigger simulation (``tsim``) is now executed in the standard simulation: before SVD and PXD simulation but after the simulation of the rest of the subdetectors. For this reason, the python function ``add_tsim()`` is deprecated. If you already have a ``add_simulation`` in your path, you already get L1 trigger simulation.

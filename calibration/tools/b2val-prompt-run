@@ -192,7 +192,7 @@ is (lowest -> highest): [Backend.default_backend_args -> validation_config.json
 def get_argparser():
     """Setup the argparser for this command line tool"""
     import argparse
-    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, epilog="Type b2val-prompt-run <backend> --help to see the full options for each backend")
     subparsers = cli.add_backends_subparsers(parser)
 
     for subparser in subparsers:

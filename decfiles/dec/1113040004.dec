@@ -1,0 +1,28 @@
+# EventType:1113040004 
+# Descriptor: [B0 -> (D- -> K+ pi- pi-) K+]
+# NickName: Bd_DK_kpipi
+# Documentation: One of the neutral B decays needed for phase3 data validation
+# Author: Yi Zhang
+# Tested: Yes
+# Physics WG: BtoCharm(less)
+# Data: 20210610
+
+
+Decay Upsilon(4S)
+0.500 B0sig anti-B0 VSS_BMIX dm;
+0.500 B0 anti-B0sig VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.000 D-sig K+ PHOTOS PHSP;
+Enddecay
+CDecay anti-B0sig
+
+Decay D-sig
+1.000 K+ pi- pi- PHOTOS D_DALITZ;
+Enddecay
+CDecay D+sig
+
+End
+
+

@@ -95,7 +95,6 @@ namespace {
       {221, "Decay_MuAtom "},
       {231, "Decay_External"},
     };
-    // cppcheck-suppress stlIfFind; cppcheck doesn't like this C++ featue ...
     if (auto it = translation.find(process); it != translation.end()) {
       return it->second;
     }

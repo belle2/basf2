@@ -50,7 +50,6 @@ namespace Belle2 {
        *
        *  Cppcheck may warn to pass the spans by reference here,
        *  however this would come at performance penalty.
-       *  If somebody knows the suppression category please apply it here.
        */
       // cppcheck-suppress passedByValue
       QuadTreeNode(XSpan xSpan, YSpan ySpan, int level, This* parent)

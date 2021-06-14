@@ -38,7 +38,7 @@ namespace Belle2 {
     struct FitSegmentPairRelationVarNames : public VarNames<Relation<const CDCSegmentPair>> {
 
       /// Number of variables to be generated
-      // we shouldn't use public member variables but we do want want to rewrite all related code using setters/getters
+      // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
       // at least tell cppcheck that everything is fine
       // cppcheck-suppress duplInheritedMember
       static const size_t nVars = size(fitSegmentRelationVarNames);

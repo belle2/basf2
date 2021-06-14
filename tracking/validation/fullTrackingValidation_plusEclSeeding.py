@@ -56,14 +56,14 @@ class fullTrackingValidation_plusECL(TrackingValidationRun):
     fit_tracks = False
     #: But we need to tell the validation module to use the fit information
     use_fit_information = True
+    #: do not create expert-level output histograms
+    use_expert_folder = False
     #: Include pulls in the validation output
     pulls = True
     #: Include resolution information in the validation output
     resolution = True
     #: name of the output ROOT file
     output_file_name = VALIDATION_OUTPUT_FILE
-    #: Store additional information in output file (like the full trees)
-    extended = True
 
 
 def main():

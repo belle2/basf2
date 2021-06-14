@@ -5,7 +5,7 @@
 <header>
   <contact>simon.kurz@desy.de</contact>
   <input>EvtGenSimNoBkg.root</input>
-  <output>toCDCfromEclCKFTrackingValidation.root</output>
+  <output>fullTrackingValidation_plusECL.root</output>
   <description>This module validates the full track reconstruction including the ECL seeding.</description>
 </header>
 """

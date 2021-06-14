@@ -44,6 +44,7 @@ namespace Belle2 {
           if (aCluster.isUCluster() == wantUCluster) { clusters.push_back(&aCluster); }
         }
       }
+      // cppcheck-suppress returnDanglingLifetime
       return clusters;
     }
 
@@ -85,7 +86,7 @@ namespace Belle2 {
       (AlgoritmType::AnalyzingAlgorithmLostUClusters) {}
 
     /** returns how many u-type-clusters the testTC lost compared to the refTC */
-    DataType calcData(const TCInfoType& aTC) override /// TODO
+    DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
       std::vector<const SVDCluster*> uClustersRef = AnalyzingAlgorithmHelper::getSVDClusters(tcs.refTC->tC, true);
@@ -106,7 +107,7 @@ namespace Belle2 {
       (AlgoritmType::AnalyzingAlgorithmLostVClusters) {}
 
     /** returns how many v-type-clusters the testTC lost compared to the refTC */
-    DataType calcData(const TCInfoType& aTC) override /// TODO
+    DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
       std::vector<const SVDCluster*> vClustersRef = AnalyzingAlgorithmHelper::getSVDClusters(tcs.refTC->tC, false);
@@ -127,7 +128,7 @@ namespace Belle2 {
       (AlgoritmType::AnalyzingAlgorithmLostUEDep) {}
 
     /** returns the energy deposit of u-type-clusters the testTC lost compared to the refTC */
-    virtual DataType calcData(const TCInfoType& aTC) /// TODO !!!
+    virtual DataType calcData(const TCInfoType& aTC) override
     {
       DataType lostEdep;
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
@@ -154,7 +155,7 @@ namespace Belle2 {
       (AlgoritmType::AnalyzingAlgorithmLostVEDep) {}
 
     /** returns the energy deposit of v-type-clusters the testTC lost compared to the refTC */
-    virtual DataType calcData(const TCInfoType& aTC) /// TODO
+    virtual DataType calcData(const TCInfoType& aTC) override
     {
       DataType lostEdep;
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
@@ -185,7 +186,7 @@ namespace Belle2 {
       (AlgoritmType::AnalyzingAlgorithmTotalUClusters) {}
 
     /** returns how many u-type-clusters the given TC had */
-    DataType calcData(const TCInfoType& aTC) override /// TODO
+    DataType calcData(const TCInfoType& aTC) override
     {
       const TCInfoType& thisTC = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC);
       std::vector<const SVDCluster*> uClusters = AnalyzingAlgorithmHelper::getSVDClusters(thisTC.tC, true);
@@ -205,7 +206,7 @@ namespace Belle2 {
       (AlgoritmType::AnalyzingAlgorithmTotalVClusters) {}
 
     /** returns how many v-type-clusters the given TC had */
-    DataType calcData(const TCInfoType& aTC) override /// TODO
+    DataType calcData(const TCInfoType& aTC) override
     {
       const TCInfoType& thisTC = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC);
       std::vector<const SVDCluster*> vClusters = AnalyzingAlgorithmHelper::getSVDClusters(thisTC.tC, false);
@@ -225,7 +226,7 @@ namespace Belle2 {
       (AlgoritmType::AnalyzingAlgorithmTotalUEDep) {}
 
     /** returns the energy deposit of u-type-clusters the given TC had */
-    virtual DataType calcData(const TCInfoType& aTC) /// TODO
+    virtual DataType calcData(const TCInfoType& aTC) override
     {
       DataType totalEDep;
       const TCInfoType& thisTC = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC);
@@ -249,7 +250,7 @@ namespace Belle2 {
       (AlgoritmType::AnalyzingAlgorithmTotalVEDep) {}
 
     /** returns the energy deposit of v-type-clusters the given TC had */
-    virtual DataType calcData(const TCInfoType& aTC) /// TODO
+    virtual DataType calcData(const TCInfoType& aTC) override
     {
       DataType totalEDep;
       const TCInfoType& thisTC = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC);

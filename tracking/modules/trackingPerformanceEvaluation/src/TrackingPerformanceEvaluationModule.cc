@@ -844,7 +844,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
   double z0_err = -999;
   double pt = -999;
 
-
+  // cppcheck-suppress nullPointerRedundantCheck
   if ((fitResult != nullptr)
       || (fitResult->getParticleType() != Const::ChargedStable(m_ParticleHypothesis))) { // valid TrackFitResult found
     d0_err = sqrt((fitResult->getCovariance5())[0][0]);

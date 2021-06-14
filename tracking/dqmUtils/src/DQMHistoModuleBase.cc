@@ -585,29 +585,26 @@ void DQMHistoModuleBase::ComputeMean(TH1F* output, TH2F* input, bool onX)
 
 void DQMHistoModuleBase::ProcessHistogramParameterChange(const string& name, const string& parameter, const string& value)
 {
-  TH1* histogram;
-  bool found = false;
+  TH1* histogram = nullptr;
 
   for (auto adept : m_histograms)
     if (adept->GetName() == name) {
-      found = true;
       histogram = adept;
       break;
     }
 
-  if (!found) {
+  if (!histogram) {
     B2WARNING("Histogram " + name + " not found, parameter change is skipped in " + getName() + ".");
-    return;
-  }
-
-  try {
-    EditHistogramParameter(histogram, parameter, value);
-  } catch (const invalid_argument& e) {
-    B2WARNING("Value " + value + " of parameter " + parameter + " for histogram " + histogram->GetName() +
-              " could not be parsed, parameter change is skipped in " + getName() + ".");
-  } catch (const out_of_range& e) {
-    B2WARNING("Value " + value + " of parameter " + parameter + " for histogram " + histogram->GetName() +
-              " is out of range, parameter change is skipped in " + getName() + ".");
+  } else {
+    try {
+      EditHistogramParameter(histogram, parameter, value);
+    } catch (const invalid_argument& e) {
+      B2WARNING("Value " + value + " of parameter " + parameter + " for histogram " + histogram->GetName() +
+                " could not be parsed, parameter change is skipped in " + getName() + ".");
+    } catch (const out_of_range& e) {
+      B2WARNING("Value " + value + " of parameter " + parameter + " for histogram " + histogram->GetName() +
+                " is out of range, parameter change is skipped in " + getName() + ".");
+    }
   }
 }
 

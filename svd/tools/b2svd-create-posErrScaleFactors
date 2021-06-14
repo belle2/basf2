@@ -130,6 +130,7 @@ if __name__ == "__main__":
     # set the position algorithm
     b2.set_module_parameters(main, "SVDClusterizer",positionAlgorithm3Samples=args.posAlgorithm)
     b2.set_module_parameters(main, "SVDClusterizer",positionAlgorithm6Samples=args.posAlgorithm)
+    b2.set_module_parameters(main, "SVDClusterizer",useDB=False)
     # remove uselss modules for this purpose
     main = b2.remove_module(main,"SVDMissingAPVsClusterCreator")
     main = b2.remove_module(main,"SVDSpacePointCreator")

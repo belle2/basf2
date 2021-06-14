@@ -69,6 +69,7 @@ def create_collector(name="SVDTimeCalibrationCollector",
                      clusters="SVDClustersFromTracks",
                      event_info="SVDEventInfo",
                      event_t0="EventT0",
+                     rawBinWidth=2,
                      granularity="run"):
     """
     Simply creates a SVDTimeCalibrationCollector module with some options.
@@ -82,7 +83,8 @@ def create_collector(name="SVDTimeCalibrationCollector",
     collector.param("SVDClustersFromTracksName", clusters)
     collector.param("SVDEventInfoName", event_info)
     collector.param("EventT0Name", event_t0)
-    collector.param("granularity", granularity)
+    collector.param("granularity", granularity)  # outdated?
+    collector.param("RawCoGBinWidth", rawBinWidth)
 
     return collector
 
@@ -150,7 +152,8 @@ def create_svd_clusterizer(name="ClusterReconstruction",
                            clusters="SVDClustersFromTracks",
                            reco_digits=None,
                            shaper_digits=None,
-                           time_algorithm=0,
+                           # time_algorithm=0,
+                           time_algorithm="CoG6",
                            get_3sample_raw_time=False):
     """
     Simply creates a SVDSimpleClusterizer module with some options.
@@ -159,16 +162,20 @@ def create_svd_clusterizer(name="ClusterReconstruction",
         pybasf2.Module
     """
 
-    cluster = b2.register_module("SVDSimpleClusterizer")
+    # cluster = b2.register_module("SVDSimpleClusterizer")
+    cluster = b2.register_module("SVDClusterizer")
     cluster.set_name(name)
     cluster.param("Clusters", clusters)
-    if reco_digits is not None:
-        cluster.param("RecoDigits", reco_digits)
+    # if reco_digits is not None:
+    #     cluster.param("RecoDigits", reco_digits)
     if shaper_digits is not None:
         cluster.param("ShaperDigits", shaper_digits)
-    cluster.param("timeAlgorithm", time_algorithm)
+    # cluster.param("timeAlgorithm", time_algorithm)
+    cluster.param("timeAlgorithm6Samples", time_algorithm)
+    cluster.param("useDB", False)
     if get_3sample_raw_time:
-        cluster.param("Calibrate3SampleWithEventT0", False)
+        # cluster.param("Calibrate3SampleWithEventT0", False)
+        cluster.param("returnClusterRawTime", True)
     return cluster
 
 
@@ -188,7 +195,10 @@ def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
     path = b2.create_path()
 
     # Read from file only what is needed
-    path.add_module("RootInput", branchNames=HLT_INPUT_OBJECTS)
+    # path.add_module("RootInput", branchNames=HLT_INPUT_OBJECTS)
+    # path.add_module("RootInput",
+    # branchNames=HLT_INPUT_OBJECTS+['SVDShaperDigits','SVDShaperDigitsFromTracks','EventT0','Tracks','RecoTracks'])
+    path.add_module("RootInput")
 
     # unpack raw data to do the tracking
     if not isMC:
@@ -196,6 +206,7 @@ def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
     else:
         path.add_module("Gearbox")
         path.add_module("Geometry")
+        # path.add_module("SVDEventInfoSetter") #YU
 
     # proceed only if we acquired 6-sample strips
     skim6SampleEvents = b2.register_module("SVD6SampleEventSkim")
@@ -203,6 +214,7 @@ def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
     emptypath = b2.create_path()
     skim6SampleEvents.if_false(emptypath)
 
+    """
     # run tracking reconstruction
     add_tracking_reconstruction(path)
     path = remove_module(path, "V0Finder")
@@ -211,6 +223,7 @@ def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
 
     # repeat svd reconstruction using only SVDShaperDigitsFromTracks
     path.add_module("SVDShaperDigitsFromTracks")
+    """
 
     cog = b2.register_module("SVDCoGTimeEstimator")
     cog.set_name("CoGReconstruction")
@@ -283,7 +296,8 @@ def get_calibrations(input_data, **kwargs):
         clusters=f"SVDClustersFromTracks{cog6_suffix}",
         reco_digits=NEW_RECO_DIGITS_NAME,
         shaper_digits=NEW_SHAPER_DIGITS_NAME,
-        time_algorithm=0,
+        # time_algorithm=0,
+        time_algorithm="CoG6",
         get_3sample_raw_time=True)
 
     cog3 = create_svd_clusterizer(
@@ -291,7 +305,8 @@ def get_calibrations(input_data, **kwargs):
         clusters=f"SVDClustersFromTracks{cog3_suffix}",
         reco_digits=NEW_RECO_DIGITS_NAME,
         shaper_digits=NEW_SHAPER_DIGITS_NAME,
-        time_algorithm=1,
+        # time_algorithm=1,
+        time_algorithm="CoG3",
         get_3sample_raw_time=True)
 
     els3 = create_svd_clusterizer(
@@ -299,7 +314,8 @@ def get_calibrations(input_data, **kwargs):
         clusters=f"SVDClustersFromTracks{els3_suffix}",
         reco_digits=NEW_RECO_DIGITS_NAME,
         shaper_digits=NEW_SHAPER_DIGITS_NAME,
-        time_algorithm=2,
+        # time_algorithm=2,
+        time_algorithm="ELS3",
         get_3sample_raw_time=True)
 
     ####
@@ -324,6 +340,7 @@ def get_calibrations(input_data, **kwargs):
         name=f"SVDTimeCalibrationCollector{cog3_suffix}",
         clusters=f"SVDClustersFromTracks{cog3_suffix}",
         event_info=eventInfo,
+        rawBinWidth=1,
         event_t0="EventT0")
 
     algo_cog3 = create_algorithm(
@@ -373,38 +390,44 @@ def get_calibrations(input_data, **kwargs):
     val_cog6 = create_svd_clusterizer(
         name=f"ClusterReconstruction{cog6_suffix}",
         clusters=f"SVDClusters{cog6_suffix}",
-        time_algorithm=0)
+        # time_algorithm=0)
+        time_algorithm="CoG6")
 
     val_cog6_onTracks = create_svd_clusterizer(
         name=f"ClusterReconstruction{cog6_suffix}_onTracks",
         clusters=f"SVDClusters{cog6_suffix}_onTracks",
         reco_digits=NEW_RECO_DIGITS_NAME,
         shaper_digits=NEW_SHAPER_DIGITS_NAME,
-        time_algorithm=0)
+        # time_algorithm=0)
+        time_algorithm="CoG6")
 
     val_cog3 = create_svd_clusterizer(
         name=f"ClusterReconstruction{cog3_suffix}",
         clusters=f"SVDClusters{cog3_suffix}",
-        time_algorithm=1)
+        # time_algorithm=1)
+        time_algorithm="CoG3")
 
     val_cog3_onTracks = create_svd_clusterizer(
         name=f"ClusterReconstruction{cog3_suffix}_onTracks",
         clusters=f"SVDClusters{cog3_suffix}_onTracks",
         reco_digits=NEW_RECO_DIGITS_NAME,
         shaper_digits=NEW_SHAPER_DIGITS_NAME,
-        time_algorithm=1)
+        # time_algorithm=1)
+        time_algorithm="CoG3")
 
     val_els3 = create_svd_clusterizer(
         name=f"ClusterReconstruction{els3_suffix}",
         clusters=f"SVDClusters{els3_suffix}",
-        time_algorithm=2)
+        # time_algorithm=2)
+        time_algorithm="ELS3")
 
     val_els3_onTracks = create_svd_clusterizer(
         name=f"ClusterReconstruction{els3_suffix}_onTracks",
         clusters=f"SVDClusters{els3_suffix}_onTracks",
         reco_digits=NEW_RECO_DIGITS_NAME,
         shaper_digits=NEW_SHAPER_DIGITS_NAME,
-        time_algorithm=2)
+        # time_algorithm=2)
+        time_algorithm="ELS3")
 
     val_coll_cog6 = create_validation_collector(
         name=f"SVDTimeValidationCollector{cog6_suffix}",

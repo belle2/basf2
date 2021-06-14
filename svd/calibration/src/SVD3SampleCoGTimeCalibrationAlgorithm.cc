@@ -45,7 +45,9 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
                                     80)); // In the local study, Y. Uematsu tuned the range to (31.5,48), because the correlation is not exactly like pol3. (The deviation appears at around 48, very naive.) However, original value (-10,80) also seems working.
   // apply parameter limits to be monotonic. upper limits are loose.
   pol3->SetParLimits(1, 0, 100);
+  // pol3->SetParLimits(1, 0.5, 100);
   pol3->SetParLimits(2, 0, 0.1);
+  pol3->SetParLimits(3, 30, 60); // This may affects calibration in data badly.
 
   FileStat_t info;
   int cal_rev = 1;
@@ -107,8 +109,11 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
           std::string name = "pfx_" + std::string(hEventT0vsCoG->GetName());
           pfx->SetName(name.c_str());
           // set initial value for d, which is quadratic in the formula.
+          pol3->SetParameter(1, 1.75);
+          pol3->SetParameter(2, 0.005);
           pol3->SetParameter(3, 40);
-          TFitResultPtr tfr = pfx->Fit("pol3", "QMRS");
+          // TFitResultPtr tfr = pfx->Fit("pol3", "QMRS");
+          pfx->Fit("pol3", "QMRS");
           double par[4];
           pol3->GetParameters(par);
           // double meanT0 = hEventT0->GetMean();
@@ -124,10 +129,16 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
           pfx->Write();
 
           a = par[0]; b = par[1]; c = par[2]; d = par[3];
-          a_err = tfr->ParError(0); b_err = tfr->ParError(1); c_err = tfr->ParError(2); d_err = tfr->ParError(3);
-          chi2 = tfr->Chi2();
-          ndf = tfr->Ndf();
-          p = tfr->Prob();
+          // a = par[0]; b = par[1] + par[2]*par[3]*par[3]; c = -par[2]*par[3]; d = par[2] / 3;
+          // a_err = tfr->ParError(0); b_err = tfr->ParError(1); c_err = tfr->ParError(2); d_err = tfr->ParError(3);
+          auto parerr = pol3->GetParErrors();
+          a_err = parerr[0]; b_err = parerr[1]; c_err = parerr[2]; d_err = parerr[3];
+          // chi2 = tfr->Chi2();
+          // ndf  = tfr->Ndf();
+          // p    = tfr->Prob();
+          chi2 = pol3->GetChisquare();
+          ndf  = pol3->GetNDF();
+          p    = pol3->GetProb();
           m_tree->Fill();
 
         }

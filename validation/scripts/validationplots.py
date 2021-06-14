@@ -24,6 +24,7 @@ from ROOT import RooFit  # noqa
 import pprint
 import json_objects
 
+from basf2 import B2ERROR
 import validationpath
 from validationplotuple import Plotuple
 from validationfunctions import index_from_revision, get_style, \
@@ -704,18 +705,28 @@ def rootobjects_from_file(
     :return: package, {key: [list of root objects]}. Note: The list will
         contain only one root object right now, because package + root file
         basename key uniquely determine it, but later we will merge this list
-        with files from other revisions.
+        with files from other revisions. In case of errors, it returns an
+        empty dictionary.
     """
 
     # Return value: {key: root object}
     key2object = collections.defaultdict(list)
 
+    # Open the file with ROOT
+    # In case of errors, simply return an empty key2object dictionary
+    tfile = None
+    try:
+        tfile = ROOT.TFile(root_file)
+        if not tfile or not tfile.IsOpen():
+            B2ERROR(f'The file {root_file} can not be opened. Skipping it.')
+            return key2object
+    except OSError as e:
+        B2ERROR(f'{e}. Skipping it.')
+        return key2object
+
     # Get the 'last modified' timestamp of the revision that contains our
     # current root_file
     dir_date = date_from_revision(revision, work_folder)
-
-    # Open the file with ROOT
-    tfile = ROOT.TFile(root_file)
 
     # Loop over all Keys in that ROOT-File
     for key in tfile.GetListOfKeys():

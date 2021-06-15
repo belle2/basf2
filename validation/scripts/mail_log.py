@@ -87,7 +87,7 @@ class Mails:
                 file=sys.stderr
             )
 
-        #: Current mail data. Will be filled on instantiation. . Check
+        #: Current mail data. Will be filled on instantiation. Check
         #: docstring of _create_mail_log for exact format
         self._mail_data_new = self._create_mail_log(
             comparison_json, include_expert_plots=include_expert_plots

@@ -15,6 +15,7 @@ from validationfunctions import available_revisions
 # martin's mail utils
 import mail_utils
 from validationscript import Script
+from validation import Validation
 
 
 def parse_mail_address(obj: Union[str, List[str]]) -> List[str]:
@@ -40,11 +41,6 @@ class Mails:
     plots.
     The mail data is built upon instantiation, the `send_mails` method
     sends the actual mails.
-
-
-    @var _validator: Instance of validation.Validation
-    @var _mail_data_old: Yesterday's mail data (generated from comparison_json)
-    @var _mail_data_new: Current mail data. Will be filled on instantiation.
     """
 
     def __init__(self, validation, include_expert_plots=False):
@@ -61,7 +57,8 @@ class Mails:
         @param include_expert_plots: Should expert plots be included?
         """
 
-        self._validator = validation
+        #: Instance of validation.Validation
+        self._validator: Validation = validation
 
         # read contents from comparison.json
         work_folder = self._validator.work_folder
@@ -78,6 +75,9 @@ class Mails:
         old_mail_data_path = os.path.join(
             self._validator.get_log_folder(), "mail_data.json"
         )
+        #: Yesterday's mail data (generated from comparison_json). Check
+        #: docstring of _create_mail_log for exact format
+        self._mail_data_old: Optional[dict] = None
         try:
             with open(old_mail_data_path) as f:
                 self._mail_data_old = json.load(f)
@@ -86,9 +86,9 @@ class Mails:
                 f"Could not find old mail_data.json at {old_mail_data_path}.",
                 file=sys.stderr
             )
-            self._mail_data_old = None
 
-        # current mail data
+        #: Current mail data. Will be filled on instantiation. . Check
+        #: docstring of _create_mail_log for exact format
         self._mail_data_new = self._create_mail_log(
             comparison_json, include_expert_plots=include_expert_plots
         )

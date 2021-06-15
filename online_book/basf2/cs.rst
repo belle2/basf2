@@ -320,13 +320,15 @@ Fortunately, there is a solution to this: Boosted Decision Trees!
 Continuum suppression using Boosted Decision Trees
 __________________________________________________
 
-Boosted Decision Trees (DT) are a specific type of a machine learning model used for classification tasks. Its goal is to predict the value of a target variable based on the values of the input variables.
+Boosted Decision Trees (BDT) are a specific type of a machine learning model used for classification tasks. Its goal is to predict the value of a target variable based on the values of the input variables.
 
-"Decision tree" refers to the general structure: the classification is done with a series of "decisions". "Decisions" are logical operations (like ">", "<", "=", etc.) on the features of each data point, where the data points are separated into groups judging by the outcome. Each outcome has a separate line of "decisions" following it. Maximum number of such "decisions" is called the "tree depth".
+The name "decision tree" refers to the general structure: the classification is done with a series of "decisions". Decisions are logical operations (like ">", "<", "=", etc.) on the input variables of each data point, by the outcome of which the data points are separated into groups. Each outcome has a separate line of decisions following it. Maximum number of such decisions is called the "tree depth".
 
-"Boosted" refers to the specific way the tree is formed: gradient boosting. Gradient boosting means, that a final tree is made by combining a series of smaller trees of a fixed depth. 
+The word "boosted" refers to the specific way the tree is formed: gradient boosting. Gradient boosting means, that a final tree is made by combining a series of smaller trees of a fixed depth.
 
-In our case BDT is used directly to distinguish between continuum and non-continuum events. The target variable is the "Continuum probability" - the probability of an event being a continuum event. The input variables can be in principle any varible that distinguishes between continuum and non-continuum events. The recommended variables and the most used are the ones introduced in the previous lesson as well as others from the "Continuum Suppression" section of the Variables. As BDT is a supervised machine learning method, there are three steps needed to put it to use:
+The reader is welcome to consult the Wikipedia pages on `Decision Tree Learning <https://en.wikipedia.org/wiki/Decision_tree_learning>`_ and `Gradient Tree Boosting <https://en.wikipedia.org/wiki/Gradient_boosting#Gradient_tree_boosting>`_ for a more detailed overview. 
+
+In our case BDT is used directly to distinguish between continuum and non-continuum events. The target variable is the "continuum probability" - the probability of an event being a continuum event. The input variables can be in principle any varible that distinguishes between continuum and non-continuum events. The recommended variables and the most used are the ones introduced in the previous lesson as well as others from the :ref:`analysis/doc/analysis_continuumsuppression:Continuum Suppression` variable group in the :ref:`analysis/doc/index-01-analysis:Variables`. As BDT is a supervised machine learning method, there are three steps needed to put it to use:
 
 1. Create learning dataset.
 2. Make the algorithm "learn" and output a decision tree, that we can use.

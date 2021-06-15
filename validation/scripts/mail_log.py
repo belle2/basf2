@@ -15,7 +15,6 @@ from validationfunctions import available_revisions
 # martin's mail utils
 import mail_utils
 from validationscript import Script
-from validation import Validation
 
 
 def parse_mail_address(obj: Union[str, List[str]]) -> List[str]:
@@ -57,8 +56,10 @@ class Mails:
         @param include_expert_plots: Should expert plots be included?
         """
 
+        # Cannot import Validation to type hint because this would give us a
+        # circular import.
         #: Instance of validation.Validation
-        self._validator: Validation = validation
+        self._validator = validation
 
         # read contents from comparison.json
         work_folder = self._validator.work_folder

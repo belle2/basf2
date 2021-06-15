@@ -19,16 +19,6 @@ from ROOT import TH1F, TFile, TNamed
 b2.set_random_seed(123452)
 
 
-class RegisterMCParticles(b2.Module):
-    '''
-    Simple module for registering the MCParticle StoreArray in the datastore.
-    '''
-    def initialize(self):
-        '''Initialize the module.'''
-        mc_particles = Belle2.PyStoreArray('MCParticles')
-        mc_particles.registerInDataStore()
-
-
 class Histogrammer(b2.Module):
 
     '''
@@ -104,11 +94,9 @@ eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 main.add_module(eventinfosetter)
 
-# Register the MCParticles
-main.add_module(RegisterMCParticles())
-
 # Simulation
-add_simulation(main, bkgfiles=bg, bkgOverlay=True, usePXDDataReduction=False, forceSetPXDDataReduction=True)
+add_simulation(main, bkgfiles=bg, bkgOverlay=True, usePXDDataReduction=False, forceSetPXDDataReduction=True,
+               simulateT0jitter=False)
 
 # Make histograms
 main.add_module(Histogrammer())

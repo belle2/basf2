@@ -41,17 +41,17 @@ namespace Belle2 {
     {{ -dt_APV, 0.0, dt_APV, 2 * dt_APV, 3 * dt_APV, 4 * dt_APV}};
 
 // ==============================================================================
-// APV25 waveforms
+// APV25 waveform shapes
 // ------------------------------------------------------------------------------
 
-    /** Wavefrom function type.
-     * This is the type for a naked wave function, giving a single value for a
+    /** WaveformShape type.
+     * This is the type for a naked waveform function, giving a single value for a
      * properly scaled arguemnt.
      * The functions are scaled to 1.0 at mode, location (shift) 0.0, and scale 1.0.
      */
-    typedef std::function<double(double)> waveFunction;
+    typedef std::function<double(double)> WaveformShape;
 
-    /** Gamma waveform, x.exp(-x)
+    /** Gamma waveform shape, x.exp(-x)
      * This is only historically useful. Use beta-prime instead.
      * @param t properly scaled time, (t-t0)/tau
      * @return Waveform value t * exp(1 - t) for t > 0, else 0
@@ -62,7 +62,7 @@ namespace Belle2 {
       else return t * exp(1.0 - t);
     }
 
-    /** Polynomial waveform, x.(1-x)^2
+    /** Polynomial waveform shape, x.(1-x)^2
      * This is used in signal calibration in SVD hardware tests.
      * Do not use for signal simulation.
      * @param t properly scaled time, (t-t0)/tau
@@ -76,10 +76,10 @@ namespace Belle2 {
         return 6.75 * t * (1.0 - t) * (1.0 - t);
     }
 
-    /** Beta-prime wave function, x^alpha/(1+x)^beta.
+    /** Beta-prime waveform shape, x^alpha/(1+x)^beta.
      * This is the function for general use.
      * @param t Properly scaled time, (t - t0)/tau.
-     * @return Waveform value t^alpha/(1+t)^beta for t>0, else 0.
+     * @return Waveform value 149.012 * t^2 / (1+t)^10 for t > 0, else 0
      */
     inline double w_betaprime(double t)
     {
@@ -130,31 +130,31 @@ namespace Belle2 {
     }
 
     /** Waveform generator
-     * This is a functor to calculate signal values.
+     * This is a functor to calculate APV samples from waveform.
      * Constructs from a waveform function.
      */
 
     class WaveGenerator {
     public:
       /** Constructor takes waveform function. */
-      WaveGenerator(waveFunction wave = w_betaprime):
-        m_samples( {{0, 0, 0, 0, 0, 0}}), m_wave(wave)
+      WaveGenerator(WaveformShape waveform = w_betaprime):
+        m_samples( {{0, 0, 0, 0, 0, 0}}), m_waveform(waveform)
       {}
-      /** Set wave function */
-      void setWaveFunction(waveFunction wave) { m_wave  = wave; }
+      /** Set waveform */
+      void setWaveform(WaveformShape waveform) { m_waveform = waveform; }
       /** Operator () returns 6 APV samples.*/
       const apvSamples& operator()(double t0, double tau)
       {
         std::transform(
           apvTimeBase.begin(), apvTimeBase.end(),
           m_samples.begin(),
-          [this, t0, tau](double t)->double { return m_wave((t - t0) / tau); }
+          [this, t0, tau](double t)->double { return m_waveform((t - t0) / tau); }
         );
         return m_samples;
       }
     private:
       apvSamples m_samples; /**< for storage of computed data */
-      waveFunction m_wave; /**< the wave function */
+      WaveformShape m_waveform; /**< the wave function */
     };
 
 

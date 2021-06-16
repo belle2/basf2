@@ -58,7 +58,7 @@ REG_MODULE(SVDDigitizer)
 
 std::string Belle2::SVD::SVDDigitizerModule::m_xmlFileName = std::string("SVDChannelMapping.xml");
 SVDDigitizerModule::SVDDigitizerModule() : Module(),
-  m_currentSensor(nullptr),
+  m_currentSensorWaveforms(nullptr),
   m_mapping(m_xmlFileName)
 {
   //Set module properties
@@ -276,12 +276,12 @@ void SVDDigitizerModule::beginRun()
   //Fill map with all possible sensors This is too slow to be done every event so
   //we fill it once and only clear the content of the sensors per event, not
   //the whole map
-  m_sensors.clear();
+  m_waveforms.clear();
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   for (VxdID layer : geo.getLayers(SensorInfo::SVD)) {
     for (VxdID ladder : geo.getLadders(layer)) {
       for (VxdID sensor : geo.getSensors(ladder)) {
-        m_sensors[sensor] = Sensor();
+        m_waveforms[sensor] = SensorWaveforms();
       }
     }
   }
@@ -328,13 +328,13 @@ void SVDDigitizerModule::event()
   } else
     m_currentEventTime = 0.0;
 
-  //Clear sensors and process SimHits
-  for (Sensors::value_type& sensor : m_sensors) {
-    sensor.second.first.clear();  // u strips
-    sensor.second.second.clear(); // v strips
+  // Clear sensors' waveforms and process SimHits
+  for (Waveforms::value_type& sensorWaveforms : m_waveforms) {
+    sensorWaveforms.second.first.clear();  // u-side channels
+    sensorWaveforms.second.second.clear(); // v-side channels
   }
-  //  m_currentSensor = 0;
-  //m_currentSensorInfo = 0;
+  // m_currentSensorWaveforms = 0;
+  // m_currentSensorInfo = 0;
 
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<SVDSimHit> storeSimHits(m_storeSimHitsName);
@@ -391,7 +391,7 @@ void SVDDigitizerModule::event()
       const SensorInfo& info = *m_currentSensorInfo;
       // Publish some useful data
       m_sensorThickness = info.getThickness();
-      m_currentSensor = &m_sensors[sensorID];
+      m_currentSensorWaveforms = &m_waveforms[sensorID];
       B2DEBUG(29,
               "Sensor Parameters for Sensor " << sensorID << ": " << endl
               << " --> Width:          " << m_currentSensorInfo->getWidth() << endl
@@ -475,9 +475,9 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
           position.y() << ", " << position.z()
           << ").");
 
-  //Get references to current sensor/info for ease of use
+  // Get references to current sensor/info for ease of use
   const SensorInfo& info = *m_currentSensorInfo;
-  StripSignals& digits = (!have_electrons) ? m_currentSensor->first : m_currentSensor->second;
+  StripWaveforms& waveforms = (!have_electrons) ? m_currentSensorWaveforms->first : m_currentSensorWaveforms->second;
 
   double distanceToPlane = (have_electrons) ?
                            0.5 * m_sensorThickness - position.Z() :
@@ -658,19 +658,16 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   for (std::size_t index = 0; index <  readoutStrips.size(); index ++) {
     // NB> To first approximation, we assign to the signal 1/2*driftTime.
     // This doesn't change the charge collection, only charge collection timing.
-    digits[readoutStrips[index]].add(m_currentTime + 0.5 * driftTime, readoutCharges[index],
-                                     m_shapingTime, m_currentParticle, m_currentTrueHit, w_betaprime);
-
+    waveforms[readoutStrips[index]].add(m_currentTime + 0.5 * driftTime, readoutCharges[index],
+                                        m_shapingTime, m_currentParticle, m_currentTrueHit, w_betaprime);
     // coupled signal left neighbour
     if (index > 0)
-      digits[readoutStrips[index]].add(m_currentTime + 0.5 * driftTime, apvCoupling * readoutCharges[index - 1],
-                                       1, m_currentParticle, m_currentTrueHit, w_adjacent);
-
+      waveforms[readoutStrips[index]].add(m_currentTime + 0.5 * driftTime, apvCoupling * readoutCharges[index - 1],
+                                          1, m_currentParticle, m_currentTrueHit, w_adjacent);
     // coupled signal right neighbour
     if (index < readoutStrips.size() - 1)
-      digits[readoutStrips[index]].add(m_currentTime + 0.5 * driftTime, apvCoupling * readoutCharges[index + 1],
-                                       1, m_currentParticle, m_currentTrueHit, w_adjacent);
-
+      waveforms[readoutStrips[index]].add(m_currentTime + 0.5 * driftTime, apvCoupling * readoutCharges[index + 1],
+                                          1, m_currentParticle, m_currentTrueHit, w_adjacent);
     recoveredCharge += readoutCharges[index];
     B2DEBUG(29, "strip: " << readoutStrips[index] << " charge: " << readoutCharges[index]);
   }
@@ -703,15 +700,14 @@ void SVDDigitizerModule::saveDigits()
   vector<pair<unsigned int, float> > digit_weights;
 
   // Take samples at the desired times, add noise, zero-suppress and save digits.
-
-  for (Sensors::value_type& sensor : m_sensors) {
-    int sensorID = sensor.first;
+  for (Waveforms::value_type& sensorWaveforms : m_waveforms) {
+    int sensorID = sensorWaveforms.first;
     // u-side digits:
 
     // Cycle through signals and generate samples
-    for (StripSignals::value_type& stripSignal : sensor.second.first) {
-      short int iStrip = stripSignal.first;
-      SVDSignal& s = stripSignal.second;
+    for (StripWaveforms::value_type& stripWaveform : sensorWaveforms.second.first) {
+      short int iStrip = stripWaveform.first;
+      SVDWaveform& s = stripWaveform.second;
       // Now generate samples in time and save as digits.
       vector<double> samples;
       // ... to store digit-digit relations
@@ -729,8 +725,8 @@ void SVDDigitizerModule::saveDigits()
         t += m_samplingTime;
       }
 
-      SVDSignal::relations_map particles = s.getMCParticleRelations();
-      SVDSignal::relations_map truehits = s.getTrueHitRelations();
+      SVDWaveform::relations_map particles = s.getMCParticleRelations();
+      SVDWaveform::relations_map truehits = s.getTrueHitRelations();
 
       // Save SVDShaperDigits
 
@@ -789,9 +785,9 @@ void SVDDigitizerModule::saveDigits()
     // v-side digits:
 
     // Cycle through signals and generate samples
-    for (StripSignals::value_type& stripSignal : sensor.second.second) {
-      short int iStrip = stripSignal.first;
-      SVDSignal& s = stripSignal.second;
+    for (StripWaveforms::value_type& stripWaveform : sensorWaveforms.second.second) {
+      short int iStrip = stripWaveform.first;
+      SVDWaveform& s = stripWaveform.second;
       // Now generate samples in time and save as digits.
       vector<double> samples;
       // ... to store digit-digit relations
@@ -808,8 +804,8 @@ void SVDDigitizerModule::saveDigits()
         t += m_samplingTime;
       }
 
-      SVDSignal::relations_map particles = s.getMCParticleRelations();
-      SVDSignal::relations_map truehits = s.getTrueHitRelations();
+      SVDWaveform::relations_map particles = s.getMCParticleRelations();
+      SVDWaveform::relations_map truehits = s.getTrueHitRelations();
 
       // Save SVDShaperDigits
       // 1. Convert to ADU
@@ -866,16 +862,16 @@ void SVDDigitizerModule::saveDigits()
 
 void SVDDigitizerModule::saveWaveforms()
 {
-  for (Sensors::value_type& sensor : m_sensors) {
-    tree_vxdID = sensor.first;
+  for (Waveforms::value_type& sensorWaveforms : m_waveforms) {
+    tree_vxdID = sensorWaveforms.first;
     const SensorInfo& info =
-      dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensor.first));
+      dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorWaveforms.first));
     // u-side digits:
     tree_uv = 1;
     double thresholdU = 3.0 * info.getElectronicNoiseU();
-    for (StripSignals::value_type& stripSignal : sensor.second.first) {
-      tree_strip = stripSignal.first;
-      SVDSignal& s = stripSignal.second;
+    for (StripWaveforms::value_type& stripWaveform : sensorWaveforms.second.first) {
+      tree_strip = stripWaveform.first;
+      SVDWaveform& s = stripWaveform.second;
       // Read the value only if the signal is large enough.
       if (s.getCharge() < thresholdU)
         continue;
@@ -887,9 +883,9 @@ void SVDDigitizerModule::saveWaveforms()
     // v-side digits:
     tree_uv = 0;
     double thresholdV = 3.0 * info.getElectronicNoiseV();
-    for (StripSignals::value_type& stripSignal : sensor.second.second) {
-      tree_strip = stripSignal.first;
-      SVDSignal& s = stripSignal.second;
+    for (StripWaveforms::value_type& stripWaveform : sensorWaveforms.second.second) {
+      tree_strip = stripWaveform.first;
+      SVDWaveform& s = stripWaveform.second;
       // Read the values only if the signal is large enough
       if (s.getCharge() < thresholdV)
         continue;
@@ -909,16 +905,16 @@ void SVDDigitizerModule::saveSignals()
   regex startLine("^|\n"); // for inserting event/sensor/etc info
   ofstream outfile(m_signalsList, ios::out | ios::app);
   if (recordNo == 0) outfile << header << endl;
-  for (Sensors::value_type& sensor : m_sensors) {
-    VxdID sensorID(sensor.first);
+  for (Waveforms::value_type& sensorWaveforms : m_waveforms) {
+    VxdID sensorID(sensorWaveforms.first);
     const SensorInfo& info =
-      dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensor.first));
+      dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorWaveforms.first));
     // u-side digits:
     size_t isU = 1;
     double thresholdU = 3.0 * info.getElectronicNoiseU();
-    for (StripSignals::value_type& stripSignal : sensor.second.first) {
-      size_t strip = stripSignal.first;
-      SVDSignal& s = stripSignal.second;
+    for (StripWaveforms::value_type& stripWaveform : sensorWaveforms.second.first) {
+      size_t strip = stripWaveform.first;
+      SVDWaveform& s = stripWaveform.second;
       // Read the value only if the signal is large enough.
       if (s.getCharge() < thresholdU)
         continue;
@@ -934,9 +930,9 @@ void SVDDigitizerModule::saveSignals()
     // x-side digits:
     isU = 0;
     double thresholdV = 3.0 * info.getElectronicNoiseV();
-    for (StripSignals::value_type& stripSignal : sensor.second.second) {
-      size_t strip = stripSignal.first;
-      SVDSignal& s = stripSignal.second;
+    for (StripWaveforms::value_type& stripWaveform : sensorWaveforms.second.second) {
+      size_t strip = stripWaveform.first;
+      SVDWaveform& s = stripWaveform.second;
       // Read the value only if the signal is large enough.
       if (s.getCharge() < thresholdV)
         continue;

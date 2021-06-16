@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-'''Tool to create the MC sample to used to calibrate the hit time in MC. The tool creates the rootfile to be used as input file for the `caf_svd_time.py` time calibration script.'''
+'''Tool to create the MC sample to used to calibrate the hit time in MC. The tool creates the rootfile to be used as input file for the ``caf_svd_time.py`` time calibration script.'''
 
 __author__ = 'Giulia Casarosa'
 __copyright__ = '2021 - Belle II Collaboration'

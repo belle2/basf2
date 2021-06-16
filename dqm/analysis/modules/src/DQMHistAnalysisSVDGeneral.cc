@@ -51,7 +51,6 @@ DQMHistAnalysisSVDGeneralModule::DQMHistAnalysisSVDGeneralModule()
   addParam("onlineOccLevel_Warning", m_onlineOccWarning, "OnlineOccupancy (%) at WARNING level (orange)", float(5));
   addParam("onlineOccLevel_Empty", m_onlineOccEmpty, "Maximum OnlineOccupancy (%) for which the sensor is considered empty",
            float(0));
-  addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
   addParam("statThreshold", m_statThreshold, "Minimal number of events to compare histograms", int(10000));
   addParam("timeThreshold", m_timeThreshold, "Acceptable difference between mean of central peak for present and reference run",
            float(4)); // 4 ns
@@ -306,9 +305,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
   m_cUnpacker->Modified();
   m_cUnpacker->Update();
 
-  if (m_printCanvas)
-    m_cUnpacker->Print("c_SVDDataFormat.pdf");
-
   //occupancy chart
   TH1F* hChart = (TH1F*)findHist("SVDExpReco/SVDDQM_StripCountsChip");
 
@@ -324,9 +320,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
   }
   m_cOccupancyChartChip->Modified();
   m_cOccupancyChartChip->Update();
-
-  if (m_printCanvas)
-    m_cOccupancyChartChip->Print("c_OccupancyChartChip.pdf");
 
   // cluster time for clusters of track
   TH1* m_h = findHist("SVDClsTrk/SVDTRK_ClusterTimeV456");
@@ -374,9 +367,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
 
   m_cClusterOnTrackTime_L456V->Modified();
   m_cClusterOnTrackTime_L456V->Update();
-
-  if (m_printCanvas)
-    m_cClusterOnTrackTime_L456V->Print("c_SVDClusterOnTrackTime_L456V.pdf");
 
   //check MODULE OCCUPANCY online & offline
 
@@ -712,13 +702,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
   m_cOnlineOccupancyV->Update();
   m_cOnlineOccupancyV->Modified();
   m_cOnlineOccupancyV->Update();
-
-  if (m_printCanvas) {
-    m_cOccupancyU->Print("c_SVDOccupancyU.pdf");
-    m_cOccupancyV->Print("c_SVDOccupancyV.pdf");
-    m_cOnlineOccupancyU->Print("c_SVDOnlineOccupancyU.pdf");
-    m_cOnlineOccupancyV->Print("c_SVDOnlineOccupancyV.pdf");
-  }
 
 }
 

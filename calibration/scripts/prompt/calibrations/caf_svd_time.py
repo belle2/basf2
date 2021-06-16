@@ -189,10 +189,10 @@ def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
     path = b2.create_path()
 
     # Read from file only what is needed
-    # path.add_module("RootInput", branchNames=HLT_INPUT_OBJECTS)
-    # path.add_module("RootInput",
-    # branchNames=HLT_INPUT_OBJECTS+['SVDShaperDigits','SVDShaperDigitsFromTracks','EventT0','Tracks','RecoTracks'])
-    path.add_module("RootInput")
+    if not isMC:
+        path.add_module("RootInput", branchNames=HLT_INPUT_OBJECTS)
+    else:
+        path.add_module("RootInput")
 
     # unpack raw data to do the tracking
     if not isMC:
@@ -200,7 +200,6 @@ def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
     else:
         path.add_module("Gearbox")
         path.add_module("Geometry")
-        # path.add_module("SVDEventInfoSetter") #YU
 
     # proceed only if we acquired 6-sample strips
     skim6SampleEvents = b2.register_module("SVD6SampleEventSkim")
@@ -208,16 +207,15 @@ def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
     emptypath = b2.create_path()
     skim6SampleEvents.if_false(emptypath)
 
-    """
-    # run tracking reconstruction
-    add_tracking_reconstruction(path)
-    path = remove_module(path, "V0Finder")
-    if not is_validation:
-        b2.set_module_parameters(path, 'SVDClusterizer', returnClusterRawTime=True)
+    if not isMC:
+        # run tracking reconstruction
+        add_tracking_reconstruction(path)
+        path = remove_module(path, "V0Finder")
+        if not is_validation:
+            b2.set_module_parameters(path, 'SVDClusterizer', returnClusterRawTime=True)
 
-    # repeat svd reconstruction using only SVDShaperDigitsFromTracks
-    path.add_module("SVDShaperDigitsFromTracks")
-    """
+        # repeat svd reconstruction using only SVDShaperDigitsFromTracks
+        path.add_module("SVDShaperDigitsFromTracks")
 
     for cluster in clusterizers:
         path.add_module(cluster)

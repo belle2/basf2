@@ -41,13 +41,17 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
   auto timeCal = new Belle2::SVDCoGCalibrationFunction();
   auto payload = new Belle2::SVD3SampleCoGTimeCalibrations::t_payload(*timeCal, m_id);
 
+  // In the local study, Y. Uematsu tuned the range to (31.5,48), because the correlation is not exactly like pol3. (The deviation appears at around 48, very naive.)
+  // However, original value (-10,80) also seems working.
   std::unique_ptr<TF1> pol3(new TF1("pol3", "[0] + [1]*x + [2]*[3]*[3]*x - [2]*[3]*x*x + [2]*x*x*x/3", -10,
-                                    80)); // In the local study, Y. Uematsu tuned the range to (31.5,48), because the correlation is not exactly like pol3. (The deviation appears at around 48, very naive.) However, original value (-10,80) also seems working.
-  // apply parameter limits to be monotonic. upper limits are loose.
-  pol3->SetParLimits(1, 0, 100);
-  // pol3->SetParLimits(1, 0.5, 100);
+                                    80));
+  // apply parameter limits to be monotonic: [1] > 0 and [2] > 0. upper limits are loose on [2].
+  // lower limit on [1] is the minimum tilt (= tilt at the pole)
+  pol3->SetParLimits(1, 0, 3);
   pol3->SetParLimits(2, 0, 0.1);
-  pol3->SetParLimits(3, 30, 60); // This may affects calibration in data badly.
+  // the pole position [3] is different in the data (~40) and the current MC (~45)
+  // apply parameter limits on [3] to help non-linear minimization
+  pol3->SetParLimits(3, 30, 60);
 
   FileStat_t info;
   int cal_rev = 1;
@@ -109,17 +113,16 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
           std::string name = "pfx_" + std::string(hEventT0vsCoG->GetName());
           pfx->SetName(name.c_str());
           // set initial value for d, which is quadratic in the formula.
+          // also for b and c, with the nominal value in data.
           pol3->SetParameter(1, 1.75);
           pol3->SetParameter(2, 0.005);
           pol3->SetParameter(3, 40);
-          // TFitResultPtr tfr = pfx->Fit("pol3", "QMRS");
-          pfx->Fit("pol3", "QMRS");
+          TFitResultPtr tfr = pfx->Fit("pol3", "QMRS");
           double par[4];
           pol3->GetParameters(par);
           // double meanT0 = hEventT0->GetMean();
           // double meanT0NoSync = hEventT0nosync->GetMean();
           timeCal->set_current(1);
-          // timeCal->set_current(2);
           timeCal->set_pol3parameters(par[0], par[1] + par[2]*par[3]*par[3], -par[2]*par[3], par[2] / 3);
           payload->set(layer_num, ladder_num, sensor_num, bool(view), 1, *timeCal);
           f->cd();
@@ -128,18 +131,22 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
           hEventT0nosync->Write();
           pfx->Write();
 
-          a = par[0]; b = par[1]; c = par[2]; d = par[3];
-          // a = par[0]; b = par[1] + par[2]*par[3]*par[3]; c = -par[2]*par[3]; d = par[2] / 3;
-          // a_err = tfr->ParError(0); b_err = tfr->ParError(1); c_err = tfr->ParError(2); d_err = tfr->ParError(3);
-          auto parerr = pol3->GetParErrors();
-          a_err = parerr[0]; b_err = parerr[1]; c_err = parerr[2]; d_err = parerr[3];
-          // chi2 = tfr->Chi2();
-          // ndf  = tfr->Ndf();
-          // p    = tfr->Prob();
-          chi2 = pol3->GetChisquare();
-          ndf  = pol3->GetNDF();
-          p    = pol3->GetProb();
-          m_tree->Fill();
+          if (!tfr) {
+            B2ERROR("Fit to the histogram failed in SVD3SampleCoGTimeCalibrationAlgorithm. "
+                    << "TTree is filled with 0. "
+                    << "Check the histogram to specify the reason.")
+            a = 0; b = 0; c = 0; d = 0;
+            a_err = 0; b_err = 0; c_err = 0; d_err = 0;
+            chi2 = 0; ndf = 0; p = 0;
+            m_tree->Fill();
+          } else {
+            a = par[0]; b = par[1]; c = par[2]; d = par[3];
+            a_err = tfr->ParError(0); b_err = tfr->ParError(1); c_err = tfr->ParError(2); d_err = tfr->ParError(3);
+            chi2 = tfr->Chi2();
+            ndf  = tfr->Ndf();
+            p    = tfr->Prob();
+            m_tree->Fill();
+          }
 
         }
       }

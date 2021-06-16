@@ -40,6 +40,8 @@ def hot_pixel_mask_calibration(
         "activate_masking" is a boolean to activate existing masking in the payload.
           PXDHotPixelMaskCollector will be used then instead of PXDRawHotPixelMaskCollector
 
+        "debug_hist" is the flag to save a ROOT file for debug histograms.
+
     Return:
       A caf.framework.Calibration obj.
     """
@@ -55,6 +57,9 @@ def hot_pixel_mask_calibration(
     activate_masking = kwargs.get("activate_masking", False)
     if not isinstance(activate_masking, bool):
         raise ValueError("activate_masking is not a boolean!")
+    debug_hist = kwargs.get("debug_hist", True)
+    if not isinstance(debug_hist, bool):
+        raise ValueError("debug_hist is not a boolean!")
 
     # Create BASF2 path
 
@@ -93,6 +98,7 @@ def hot_pixel_mask_calibration(
     algorithm.drainMultiplier = 7           # Occupancy threshold is median occupancy x multiplier
     algorithm.maskRows = True               # Set True to allow masking of hot rows
     algorithm.rowMultiplier = 7             # Occupancy threshold is median occupancy x multiplier
+    algorithm.setDebugHisto(debug_hist)
     algorithm.setPrefix(collector_name)
     if run_type.lower() == 'cosmic':
         algorithm.forceContinueMasking = True

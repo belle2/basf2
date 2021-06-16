@@ -18,7 +18,7 @@
 #include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDTriggerType.h>
 #include <simulation/dataobjects/SimClockState.h>
-#include <svd/calibration/SVDDetectorConfiguration.h>
+#include <svd/dbobjects/SVDGlobalConfigParameters.h>
 #include <mdst/dataobjects/TRGSummary.h>
 
 
@@ -61,7 +61,7 @@ namespace Belle2 {
     /** Name of the StoreObjectPrt TRGSummary */
     std::string m_objTrgSummaryName = "TRGSummary";
 
-    bool m_useDB; /**<if true reads the configuration from SVDDetectorConfiguration payload**/
+    bool m_useDB; /**<if true reads the configuration from SVDGlobalConfigParameters payload**/
 
   private:
     StoreObjPtr<SVDEventInfo> m_svdEventInfoPtr; /**< Output object. */
@@ -85,7 +85,8 @@ namespace Belle2 {
 
     int m_relativeShift; /**< latency difference between the 3- and 6-sample acquired events*/
 
-    SVDDetectorConfiguration m_svdConfig; /**< svd configuration parameters */
+    DBObjPtr<SVDGlobalConfigParameters> m_svdGlobalConfig;  /**< SVD Global Configuration payload*/
+
   };
 }
 

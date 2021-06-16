@@ -47,6 +47,7 @@
 #include <TObject.h>
 #include <TROOT.h>
 #include <TSystem.h>
+#include <TVirtualX.h>
 
 #include <sys/prctl.h>
 #include <signal.h>

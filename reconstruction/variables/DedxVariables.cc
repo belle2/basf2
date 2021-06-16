@@ -23,6 +23,8 @@
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
 #include <reconstruction/dataobjects/VXDDedxTrack.h>
 
+#include <TString.h>
+
 #include <cmath>
 
 namespace Belle2 {

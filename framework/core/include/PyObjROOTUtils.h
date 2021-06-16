@@ -25,7 +25,7 @@ namespace Belle2 {
   {
     const char* classname = instance.IsA()->GetName();
     void* addr = new T(instance);
-    PyObject* obj = TPython::ObjectProxy_FromVoidPtr(addr, classname, true);
+    PyObject* obj = TPython::CPPInstance_FromVoidPtr(addr, classname, true);
     return boost::python::object(boost::python::handle<>(obj));
   }
 }

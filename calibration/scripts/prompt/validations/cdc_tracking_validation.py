@@ -7,6 +7,7 @@ import basf2
 from prompt import ValidationSettings
 import sys
 import os
+import json
 
 #: Tells the automated system some details of this script
 settings = ValidationSettings(name='CDC Tracking',

@@ -68,7 +68,7 @@ def require_file(filename, data_type="", py_case=None):
 @contextmanager
 def set_loglevel(loglevel):
     """
-    temporarily set the log level to the specified `LogLevel`. This returns a
+    temporarily set the log level to the specified `LogLevel <basf2.LogLevel>`. This returns a
     context manager so it should be used in a ``with`` statement:
 
     >>> with set_log_level(LogLevel.ERROR):

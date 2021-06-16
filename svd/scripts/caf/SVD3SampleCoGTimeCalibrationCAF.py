@@ -48,29 +48,22 @@ def pre_collector():
     pre_path.add_module("Geometry", useDB=True)
 
     # run SVD unpacker
-    # for proc11 we don't have RawSVDs in cdst, so I comment out.
     svd.add_svd_unpacker(pre_path)
 
     # run SVD reconstruction, changing names of StoreArray
     reco.add_svd_reconstruction(pre_path)
 
-    # for moda in pre_path.modules():
-    #     if moda.name() == 'SVDCoGTimeEstimator':
-    #         moda.param("ShaperDigits", 'SVDShaperDigitsFromTracks')
-    #         moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
-    #     if moda.name() == 'SVDSimpleClusterizer':
-    #         moda.param("Clusters", 'SVDClustersFromTracks')
-    #         moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
-    #         moda.param("ShaperDigits", 'SVDShaperDigitsFromTracks')
-    #         moda.param("timeAlgorithm", 1)
-    #     if moda.name() == 'SVDSpacePointCreator':
-    #         moda.param("SVDClusters", 'SVDClustersFromTracks')
-    b2.set_module_parameters(pre_path, 'SVDClusterizer',
-                             ShaperDigits='SVDShaperDigitsFromTracks',
-                             Clusters='SVDClustersFromTracks',
-                             timeAlgorithm6Samples='CoG3')
-    b2.set_module_parameters(pre_path, 'SVDSpacePointCreator',
-                             SVDClusters='SVDClustersFromTracks')
+    for moda in pre_path.modules():
+        if moda.name() == 'SVDCoGTimeEstimator':
+            moda.param("ShaperDigits", 'SVDShaperDigitsFromTracks')
+            moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
+        if moda.name() == 'SVDSimpleClusterizer':
+            moda.param("Clusters", 'SVDClustersFromTracks')
+            moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
+            moda.param("ShaperDigits", 'SVDShaperDigitsFromTracks')
+            moda.param("timeAlgorithm", 1)  # changed
+        if moda.name() == 'SVDSpacePointCreator':
+            moda.param("SVDClusters", 'SVDClustersFromTracks')
 
     pre_path = remove_module(pre_path, 'SVDMissingAPVsClusterCreator')
 
@@ -96,10 +89,8 @@ def SVDCoGTimeCalibration(files, tags, uniqueID):
 
     # algorithm setup
     algorithm = SVD3SampleCoGTimeCalibrationAlgorithm(uniqueID)  # changed
-    # algorithm.setMinEntries(100)
-    algorithm.setMinEntries(10000)
-    # algorithm.setAllowedTimeShift(2.)
-    algorithm.setAllowedTimeShift(200.)
+    algorithm.setMinEntries(100)
+    algorithm.setAllowedTimeShift(2.)
 
     # calibration setup
     calibration = Calibration('SVD3SampleCoGTime',  # changed
@@ -114,7 +105,6 @@ def SVDCoGTimeCalibration(files, tags, uniqueID):
                               )
 
     calibration.strategies = strategies.SequentialBoundaries
-    # calibration.strategies = strategies.SequentialRunByRun
 
     return calibration
 
@@ -171,12 +161,12 @@ if __name__ == "__main__":
     print("")
     b2.conditions.override_globaltags()
     svdCoGCAF = SVDCoGTimeCalibration(good_input_files,
-                                      ["online_proc11",
-                                       "online", "Reco_master_patch_rel5",
-                                       "data_reprocessing_proc11_baseline",
-                                       "staging_data_reprocessing_proc11",
-                                       # "data_reprocessing_proc10",
-                                       "svd_NOCoGCorrections"],
+                                      [  # "online_proc11",
+                                          "online", "Reco_master_patch_rel5"],
+                                      # "data_reprocessing_proc11_baseline",
+                                      # "staging_data_reprocessing_proc11",
+                                      # "data_reprocessing_proc10",
+                                      # "svd_NOCoGCorrections"],
                                       uniqueID)
 
     cal_fw = CAF()

@@ -111,8 +111,7 @@ CalibrationAlgorithm::EResult SVD3SampleELSTimeCalibrationAlgorithm::calibrate()
           pol1pole->FixParameter(3, 7);
           pfx->Fit("pol1pole", "QMRS");
           pol1pole->SetParLimits(3, 0, 15);
-          // TFitResultPtr tfr = pfx->Fit("pol1pole", "QMRS");
-          pfx->Fit("pol1pole", "QMRS");
+          TFitResultPtr tfr = pfx->Fit("pol1pole", "QMRS");
           // There is small possibility that the chi2 minimization ends at the parameter boundary.
           // In such case, we may get a completely wrong fit function, thus we refit w/o boundaries.
           // if (tfr->Chi2() > 500) {
@@ -137,17 +136,18 @@ CalibrationAlgorithm::EResult SVD3SampleELSTimeCalibrationAlgorithm::calibrate()
           hEventT0nosync->Write();
           pfx->Write();
 
-          a = par[0]; b = par[1]; c = par[2]; d = par[3];
-          // a_err = tfr->ParError(0); b_err = tfr->ParError(1); c_err = tfr->ParError(2); d_err = tfr->ParError(3);
-          // chi2 = tfr->Chi2();
-          // ndf  = tfr->Ndf();
-          // p    = tfr->Prob();
-          auto parerr = pol1pole->GetParErrors();
-          a_err = parerr[0]; b_err = parerr[1]; c_err = parerr[2]; d_err = parerr[3];
-          chi2 = pol1pole->GetChisquare();
-          ndf  = pol1pole->GetNDF();
-          p    = pol1pole->GetProb();
-          m_tree->Fill();
+          if (!tfr) {
+            f->Close();
+            B2FATAL("Fit to the histogram failed in SVD3SampleELSTimeCalibrationAlgorithm. "
+                    << "Check the 2-D histogram to clarify the reason.");
+          } else {
+            a = par[0]; b = par[1]; c = par[2]; d = par[3];
+            a_err = tfr->ParError(0); b_err = tfr->ParError(1); c_err = tfr->ParError(2); d_err = tfr->ParError(3);
+            chi2 = tfr->Chi2();
+            ndf  = tfr->Ndf();
+            p    = tfr->Prob();
+            m_tree->Fill();
+          }
 
         }
       }

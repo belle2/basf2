@@ -47,7 +47,7 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
                                     80));
   // apply parameter limits to be monotonic: [1] > 0 and [2] > 0. upper limits are loose on [2].
   // lower limit on [1] is the minimum tilt (= tilt at the pole)
-  pol3->SetParLimits(1, 0, 3);
+  pol3->SetParLimits(1, 0, 100);
   pol3->SetParLimits(2, 0, 0.1);
   // the pole position [3] is different in the data (~40) and the current MC (~45)
   // apply parameter limits on [3] to help non-linear minimization

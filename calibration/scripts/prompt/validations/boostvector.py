@@ -242,7 +242,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
         allLimits += expert_config['plotsRanges']
 
     # Path to the database.txt file and to the payloads.
-    dbFile = glob(f'{job_path}/**/database.txt', recursive=True)
+    dbFile = glob(f'{job_path}/**/BoostVector/outputdb/database.txt', recursive=True)
     assert(len(dbFile) == 1)
     dbFile = dbFile[0]
     inputDir = dbFile[:dbFile.rfind('/')]

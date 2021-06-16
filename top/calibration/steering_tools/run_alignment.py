@@ -29,7 +29,7 @@ dimuon_skim_dir = 'offskim/offskim_mumutop/cdst/sub00'
 bhabha_skim_dir = 'skim/hlt_bhabha/cdst/sub00'
 main_output_dir = 'top_calibration'
 default_sample = 'dimuon'
-fixedParameters = ['dn/n']  # to list all names: basf2 -m TOPAlignmentCollector
+fixedParameters = None  # list of parameters to be fixed, for the names see: basf2 -m TOPAlignmentCollector
 new_cdst_format = False  # set to True for input in new cdst format
 #
 # ---------------------------------------------------------------------------------------

@@ -8,9 +8,6 @@ Eventually these checks can be included as git hooks.
 
 import re
 from b2test_utils import check_error_free
-from b2test_utils import skip_test
-
-skip_test("New doxygen version in latest externals.")
 
 if __name__ == "__main__":
     # run the check ignoring OrcaKinFit errors

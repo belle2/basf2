@@ -83,9 +83,9 @@ namespace Belle2 {
      */
     //bool setValues(const RelationVector<RecoTrack>& recoTracks);
     virtual bool setValues(const StoreArray<RecoTrack>& recoTracks,
-                           const std::string recoTracksName = "",
-                           const std::string pxdInterceptsName = "",
-                           const std::string pxdTrackClustersName = "PXDClustersFromTracks"
+                           const std::string& recoTracksName = "",
+                           const std::string& pxdInterceptsName = "",
+                           const std::string& pxdTrackClustersName = "PXDClustersFromTracks"
                           );
 
   protected:
@@ -100,9 +100,9 @@ namespace Belle2 {
 
   template <class T>
   bool PXD2TrackBase<T>::setValues(const StoreArray<RecoTrack>& recoTracks,
-                                   const std::string recoTracksName,
-                                   const std::string pxdInterceptsName,
-                                   const std::string pxdTrackClustersName
+                                   const std::string& recoTracksName,
+                                   const std::string& pxdInterceptsName,
+                                   const std::string& pxdTrackClustersName
                                   )
   {
     // Exactly 2 tracks

@@ -108,8 +108,8 @@ namespace Belle2 {
           m_cellularAutomaton.applyTo(cellHolders, cellHolderRelations);
 
           auto lessStartCellState = [this](ACellHolder * lhs, ACellHolder * rhs) {
-            AutomatonCell& lhsCell = lhs->getAutomatonCell();
-            AutomatonCell& rhsCell = rhs->getAutomatonCell();
+            const AutomatonCell& lhsCell = lhs->getAutomatonCell();
+            const AutomatonCell& rhsCell = rhs->getAutomatonCell();
 
             // Cells with state lower than the minimal cell state are one lowest category
             if (rhsCell.getCellState() < m_param_minState) return false;

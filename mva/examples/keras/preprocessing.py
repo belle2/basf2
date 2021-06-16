@@ -14,7 +14,7 @@ import numpy as np
 from keras.layers import Input, Dense, Dropout
 from keras.layers.normalization import BatchNormalization
 from keras.models import Model
-from keras.optimizers import adam
+from keras.optimizers import Adam
 from keras.losses import binary_crossentropy
 from keras.activations import sigmoid, tanh
 from keras.callbacks import Callback
@@ -45,7 +45,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     # The interface is designed to automatically save every kwarg, which is passed in the initializer in end_fit.
     state = State(Model(input, output), preprocessor_state=None)
 
-    state.model.compile(optimizer=adam(lr=0.01), loss=binary_crossentropy, metrics=['accuracy'])
+    state.model.compile(optimizer=Adam(lr=0.01), loss=binary_crossentropy, metrics=['accuracy'])
 
     state.model.summary()
 
@@ -120,7 +120,7 @@ if __name__ == "__main__":
                  'daughter(0, dr)', 'daughter(1, dr)',
                  'daughter(0, dz)', 'daughter(1, dz)',
                  'daughter(0, chiProb)', 'daughter(1, chiProb)', 'daughter(2, chiProb)',
-                 'daughter(0, Kid)', 'daughter(0, piid)',
+                 'daughter(0, kaonID)', 'daughter(0, pionID)',
                  'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"

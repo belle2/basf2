@@ -14,7 +14,7 @@ import reconstruction
 from tracking.validation.run import TrackingValidationRun
 import logging
 import basf2
-VALIDATION_OUTPUT_FILE = 'toCDCfromEclCKFTrackingValidation_expert.root'
+VALIDATION_OUTPUT_FILE = 'toCDCfromEclCKFTrackingValidation.root'
 N_EVENTS = 10000
 ACTIVE = True
 
@@ -110,8 +110,6 @@ class toCDCfromEclCKF(TrackingValidationRun):
     resolution = True
     #: name of the output ROOT file
     output_file_name = VALIDATION_OUTPUT_FILE
-    #: Store additional information in output file (like the full trees)
-    extended = True
 
 
 def main():

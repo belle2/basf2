@@ -215,7 +215,7 @@ def write_stats_metadata(logDirectory, samples, CombinedSkimDefinitions={}):
         json.dump(metadata, f, indent=2)
 
 
-def verify_combined_skims(CombinedSkimDefinitions, SkimsToRun):
+def verify_combined_skims(CombinedSkimDefinitions, SkimsToRun, filename):
     """Perform basic checks on combined skim definitions to catch issues early."""
     # Check all the requested combined skims are defined in the YAML file
     unrecognised = set(SkimsToRun).difference(CombinedSkimDefinitions)

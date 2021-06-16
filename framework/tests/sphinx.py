@@ -73,6 +73,5 @@ if __name__ == "__main__":
                          re.findall(ignoreduplicatewhatsnewlabel, x) or
                          re.findall(ignoreduplicatecalibrationlabel, x) or
                          re.findall(ignoreduplicatedescriptionofrole, x) or
-                         re.findall(ignoreonlinebook, x) or
                          re.findall(ignoregeometry, x)
                          )

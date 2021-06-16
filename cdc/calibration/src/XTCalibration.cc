@@ -110,7 +110,7 @@ void XTCalibration::CreateHisto()
   for (int i = 0; i < nEntries; ++i) {
     nbytes += tree->GetEntry(i);
     /* protect in case |alpha|>90*/
-    if (fabs(alpha > 90)) {
+    if (fabs(alpha) > 90) {
       if (alpha < 0) alpha += 180;
       if (alpha > 0) alpha -= 180;
     }

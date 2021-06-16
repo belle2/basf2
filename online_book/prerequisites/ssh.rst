@@ -623,7 +623,7 @@ Port Forwarding
 
 One of the last topics we need to discuss is the ability of SSH to do port
 forwarding. For this we first need to quickly explain what a port is: In
-computer networks you need two things to connect to a computer, it's address and
+computer networks you need two things to connect to a computer, its address and
 a port number. The address identifies which machine to talk to and the port
 number is just a simple number between 1 and 65535 to identify the service or
 program to talk to.

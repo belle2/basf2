@@ -43,7 +43,6 @@ namespace Belle2 {
     virtual void terminate() override;
 
     // parameters
-    bool m_printCanvas; /**< if true print the pdf of the canvases */
     float m_occError; /**<error level of the occupancy */
     float m_occWarning; /**< warning level of the occupancy */
     float m_occEmpty; /**<empty level of the occupancy */

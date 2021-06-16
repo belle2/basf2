@@ -321,7 +321,7 @@ def add_cosmics_reconstruction(
                                    use_second_cdc_hits=use_second_cdc_hits)
 
     # Statistics summary
-    path.add_module('StatisticsSummary').set_name('Sum_Tracking')
+    path.add_module('StatisticsSummary').set_name('Sum_CR_Tracking')
 
     if reconstruct_cdst:
         # if PXD or SVD are included, you will need there two modules which are not part of the standard reconstruction
@@ -365,7 +365,7 @@ def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExp
                                    use_second_cdc_hits=use_second_cdc_hits)
 
     # Statistics summary
-    path.add_module('StatisticsSummary').set_name('Sum_Tracking')
+    path.add_module('StatisticsSummary').set_name('Sum_MC_Tracking')
 
     # add further reconstruction modules
     add_prefilter_posttracking_reconstruction(path,

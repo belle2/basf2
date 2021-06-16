@@ -660,6 +660,14 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
     // This doesn't change the charge collection, only charge collection timing.
     waveforms[readoutStrips[index]].add(m_currentTime + 0.5 * driftTime, readoutCharges[index],
                                         m_shapingTime, m_currentParticle, m_currentTrueHit, w_betaprime);
+    // coupled signal left neighbour
+    if (index > 0)
+      waveforms[readoutStrips[index]].add(m_currentTime + 0.5 * driftTime, apvCoupling * readoutCharges[index - 1],
+                                          1, m_currentParticle, m_currentTrueHit, w_adjacent);
+    // coupled signal right neighbour
+    if (index < readoutStrips.size() - 1)
+      waveforms[readoutStrips[index]].add(m_currentTime + 0.5 * driftTime, apvCoupling * readoutCharges[index + 1],
+                                          1, m_currentParticle, m_currentTrueHit, w_adjacent);
     recoveredCharge += readoutCharges[index];
     B2DEBUG(29, "strip: " << readoutStrips[index] << " charge: " << readoutCharges[index]);
   }

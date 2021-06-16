@@ -69,8 +69,6 @@ namespace Belle2 {
         RelationElement::index_type m_particle;
         /** DataStore index of the associated SVDTrueHit. */
         RelationElement::index_type m_truehit;
-        /** Waveform function. */
-        waveFunction m_wfun;
       };
 
       /** List of elementary waveforms. */

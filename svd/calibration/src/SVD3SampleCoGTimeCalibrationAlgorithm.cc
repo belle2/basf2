@@ -132,13 +132,9 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
           pfx->Write();
 
           if (!tfr) {
-            B2ERROR("Fit to the histogram failed in SVD3SampleCoGTimeCalibrationAlgorithm. "
-                    << "TTree is filled with 0. "
-                    << "Check the histogram to specify the reason.")
-            a = 0; b = 0; c = 0; d = 0;
-            a_err = 0; b_err = 0; c_err = 0; d_err = 0;
-            chi2 = 0; ndf = 0; p = 0;
-            m_tree->Fill();
+            f->Close();
+            B2FATAL("Fit to the histogram failed in SVD3SampleCoGTimeCalibrationAlgorithm. "
+                    << "Check the 2-D histogram to clarify the reason.")
           } else {
             a = par[0]; b = par[1]; c = par[2]; d = par[3];
             a_err = tfr->ParError(0); b_err = tfr->ParError(1); c_err = tfr->ParError(2); d_err = tfr->ParError(3);

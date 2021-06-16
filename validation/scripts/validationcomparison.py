@@ -602,7 +602,7 @@ class KolmogorovTest(PvalueTest):
                )
 
 # ------------------------------------------------------------------------------
-# Anderson Darling Test
+# Anderson-Darling Test
 # ------------------------------------------------------------------------------
 
 
@@ -611,7 +611,7 @@ class AndersonDarlingTest(PvalueTest):
 
     def __init__(self, *args, **kwargs):
         """
-        Initialize Kolmogorov test.
+        Initialize Anderson-Darling test.
         @param args: See arguments of :class:`ComparisonBase`
         @param kwargs:  See arguments of :class:`ComparisonBase`
         """
@@ -641,15 +641,15 @@ class AndersonDarlingTest(PvalueTest):
         if self.debug:
             option_str += "D"
 
-        self._pvalue = local_object_a.KolmogorovTest(local_object_b, option_str)
+        self._pvalue = local_object_a.AndersonDarlingTest(local_object_b, option_str)
 
     def _get_comparison_result_long(self) -> str:
         if self._pvalue is None:
-            return r"Could not perform Anderson Darling test between " \
+            return r"Could not perform-Anderson Darling test between " \
                    r"{{revision1}} and {{revision2}} due to an unknown error." \
                    r" Please support a bug report."
 
-        return r'Performed Anderson Darling test between {{revision1}} ' \
+        return r'Performed Anderson-Darling test between {{revision1}} ' \
                r'and {{revision2}} ' \
                r' <b>p-value: {pvalue:.6f}</b> (p-value warn: {pvalue_warn}, ' \
                r'p-value error: {pvalue_error})'.format(

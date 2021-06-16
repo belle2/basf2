@@ -1,0 +1,133 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+'''Tool to create the MC sample to used to calibrate the hit time in MC. The tool creates the rootfile to be used as input file for the `caf_svd_time.py` time calibration script.'''
+
+__author__ = 'Giulia Casarosa'
+__copyright__ = '2021 - Belle II Collaboration'
+
+
+import basf2 as b2
+from ROOT import Belle2
+import simulation as sim
+import tracking as trk
+from basf2 import conditions as b2c
+
+import argparse
+import os, glob
+
+
+def arg_parser():
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('-n', '--events',
+                        default=1000,
+                        type=int,
+                        help='number of events',
+                        metavar='EVENTS')
+    parser.add_argument('--add_bkg',
+                        default=False,
+                        action='store_true',
+                        help='flag to add beam background from simulation')
+    parser.add_argument('--exp',
+                        default=0,
+                        type=int,
+                        help='experiment number you want to simulate',
+                        metavar='EXP')
+    parser.add_argument('--run',
+                        default=0,
+                        type=int,
+
+                        help='run number you want to simulate',
+                        metavar='RUN')
+    parser.add_argument('--prepend_gt',
+                        default='',
+                        type=str,
+                        nargs='*',
+                        help='Global Tags to be prepended',
+                        metavar='GTs')
+
+    parser.add_argument('--timeAlgorithm',
+                        required=True,
+                        type=str,
+                        help='time algorithm',
+                        metavar='TIME_ALGORITHM')
+
+    parser.add_argument('--filename',
+                        required=True,
+                        type=str,
+                        help='output filename',
+                        metavar='OUTPUT')
+    return parser
+
+
+if __name__ == "__main__":
+
+    #####################################################
+    # Part 0: setup
+
+    # Argument parsing
+    args = arg_parser().parse_args()
+    args.events
+
+    # Prepend and/or append the input GTs
+    if not (args.prepend_gt == ''):
+        for gt in reversed(args.prepend_gt):
+            b2c.prepend_globaltag(gt)
+
+    bkgFiles = None
+    if args.add_bkg:
+        bkgFiles = glob.glob('/sw/belle2/bkg/*.root')
+
+    #####################################################
+    # Part 1: run the simulation and tracking reconstruction
+    #         create shaper digits from track and
+    #         store all  dataobjects required by calibration
+    #         in a root file
+
+    # Set the global log level
+    b2.set_log_level(b2.LogLevel.INFO)
+
+    # Create path
+    main = b2.Path()
+
+    b2.set_random_seed(1)
+
+    eventinfosetter = b2.register_module('EventInfoSetter')
+    eventinfosetter.param('expList', [args.exp])
+    eventinfosetter.param('runList', [args.run])
+    eventinfosetter.param('evtNumList', [args.events])
+    main.add_module(eventinfosetter)
+    main.add_module('EvtGenInput')
+
+    sim.add_simulation(main,
+                       simulateT0jitter=True,
+                       bkgfiles=bkgFiles,
+                       usePXDDataReduction=False,
+                       forceSetPXDDataReduction=True
+                   )
+    trk.add_tracking_reconstruction(main)
+
+    # set the time algorithm
+    b2.set_module_parameters(main, "SVDClusterizer",timeAlgorithm3Samples=args.timeAlgorithm)
+    b2.set_module_parameters(main, "SVDClusterizer",timeAlgorithm6Samples=args.timeAlgorithm)
+    b2.set_module_parameters(main, "SVDClusterizer",useDB=False)
+
+    # remove uselss modules for this purpose
+    main = b2.remove_module(main,"SVDMissingAPVsClusterCreator")
+    main = b2.remove_module(main,"V0Finder")
+
+    # create Shaper Digits from Tracks StoreArray
+    main.add_module("SVDShaperDigitsFromTracks")
+
+    main.add_module("RootOutput", outputFileName=args.filename,
+                    branchNames=['SVDShaperDigits', 'SVDShaperDigitsFromTracks', 'EventT0', 'SVDEventInfoSim', 'Tracks', 'RecoTracks']
+                )
+
+    main.add_module('Progress')
+
+    b2.print_path(main)
+
+    b2.process(main)
+
+    print(b2.statistics)

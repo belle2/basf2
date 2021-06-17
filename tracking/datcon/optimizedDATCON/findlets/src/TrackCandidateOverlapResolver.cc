@@ -36,7 +36,7 @@ void TrackCandidateOverlapResolver::exposeParameters(ModuleParamList* modulePara
                                 "Strategy used to resolve overlaps. Currently implemented are \"greedy\" and \"hopfield\".",
                                 m_param_resolveMethod);
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "NameSVDClusters"), m_param_nameSVDClusters,
-                                "Name of expected SVDClusters StoreArray.", std::string(""));
+                                "Name of expected SVDClusters StoreArray.", m_param_nameSVDClusters);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minActivityState"), m_param_minActivityState,
                                 "Sets the minimal value of activity for acceptance. [0,1]", m_param_minActivityState);

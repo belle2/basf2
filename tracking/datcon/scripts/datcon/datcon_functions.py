@@ -6,6 +6,8 @@ from svd import add_svd_reconstruction
 
 
 def add_datcon(path,
+               svd_space_points='SVDSpacePoints',
+               svd_clusters='SVDClusters',
                datcon_reco_tracks='DATCONRecoTracks',
                use_simple_roi_calculation=True,
                use_advanced_roi_calculation=False,
@@ -36,6 +38,11 @@ def add_datcon(path,
         advancedROIName = 'PXDROIFinder' + advancedROIName
 
     path.add_module('DATCON',
+                    SVDSpacePointStoreArrayName=svd_space_points,
+                    SVDClustersStoreArrayName=svd_clusters,
+                    finalOverlapResolverNameSVDClusters=svd_clusters,
+                    refinerOverlapResolverNameSVDClusters=svd_clusters,
+
                     minimumUClusterTime=-25,
                     minimumVClusterTime=-25,
                     maximumUClusterTime=40,

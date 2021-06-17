@@ -36,6 +36,9 @@ void RecoTrackStorer::exposeParameters(ModuleParamList* moduleParamList, const s
 {
   Super::exposeParameters(moduleParamList, prefix);
 
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "SVDClustersStoreArrayName"), m_param_SVDClustersStoreArrayName,
+                                "Name of the SVDClusters Store Array.", m_param_SVDClustersStoreArrayName);
+
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "RecoTracksStoreArrayName"), m_param_RecoTracksStoreArrayName,
                                 "Name of the RecoTracks Store Array.", m_param_RecoTracksStoreArrayName);
 
@@ -59,7 +62,7 @@ void RecoTrackStorer::initialize()
   Super::initialize();
 
   m_storeRecoTracks.registerInDataStore(m_param_RecoTracksStoreArrayName);
-  RecoTrack::registerRequiredRelations(m_storeRecoTracks, "", "SVDClusters", "", "", "", "");
+  RecoTrack::registerRequiredRelations(m_storeRecoTracks, "", m_param_SVDClustersStoreArrayName, "", "", "", "");
 
   // create pointer to chosen estimator
   if (m_param_EstimationMethod == "mcInfo") {
@@ -85,7 +88,8 @@ void RecoTrackStorer::beginRun()
   if (m_param_EstimationMethod == "mcInfo") {
     StoreArray<RecoTrack> mcRecoTracks;
     mcRecoTracks.isRequired(m_param_MCRecoTracksStoreArrayName);
-    std::string svdClustersName = ""; std::string pxdClustersName = "";
+    std::string svdClustersName = m_param_SVDClustersStoreArrayName;
+    std::string pxdClustersName = "";
 
     if (mcRecoTracks.getEntries() > 0) {
       svdClustersName = mcRecoTracks[0]->getStoreArrayNameOfSVDHits();
@@ -125,7 +129,8 @@ void RecoTrackStorer::apply(std::vector<SpacePointTrackCand>& finishedResults,
     const TVector3& trackMomentum = *estimatorResult.p;
     const short& trackChargeSeed = estimatorResult.curvatureSign ? -1 * (*(estimatorResult.curvatureSign)) : 0;
 
-    RecoTrack* newRecoTrack = m_storeRecoTracks.appendNew(trackPosition, trackMomentum, trackChargeSeed);
+    RecoTrack* newRecoTrack = m_storeRecoTracks.appendNew(trackPosition, trackMomentum, trackChargeSeed, "",
+                                                          m_param_SVDClustersStoreArrayName);
 
 
     // ATTENTION: the following lines are basically just a 1-to-1 copy from tracking/modules/spacePointCreator/SPTCmomentumSeedRetrieverModule
@@ -159,7 +164,7 @@ void RecoTrackStorer::apply(std::vector<SpacePointTrackCand>& finishedResults,
     for (const SpacePoint* spacePoint : sortedHits) {
       m_usedSpacePoints.insert(spacePoint);
 
-      const auto& relatedClusters = spacePoint->getRelationsTo<SVDCluster>();
+      RelationVector<SVDCluster> relatedClusters = spacePoint->getRelationsTo<SVDCluster>(m_param_SVDClustersStoreArrayName);
       for (const SVDCluster& relatedCluster : relatedClusters) {
         m_usedClusters.insert(&relatedCluster);
         newRecoTrack->addSVDHit(&relatedCluster, sortingParameter);
@@ -174,7 +179,7 @@ void RecoTrackStorer::apply(std::vector<SpacePointTrackCand>& finishedResults,
       continue;
     }
 
-    const auto& relatedClusters = spacePoint->getRelationsTo<SVDCluster>();
+    const auto& relatedClusters = spacePoint->getRelationsTo<SVDCluster>(m_param_SVDClustersStoreArrayName);
     for (const SVDCluster& relatedCluster : relatedClusters) {
       if (TrackFindingCDC::is_in(&relatedCluster, m_usedClusters)) {
         spacePoint->setAssignmentState(true);

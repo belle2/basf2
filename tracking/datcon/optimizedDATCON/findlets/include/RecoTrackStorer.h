@@ -53,8 +53,10 @@ namespace Belle2 {
                const std::vector<const SpacePoint*>& spacePoints) override;
 
   private:
-    /// StoreArray name of the input Track Store Array
+    /// StoreArray name of the output Track StoreArray
     std::string m_param_RecoTracksStoreArrayName = "DATCONRecoTracks";
+    /// StoreArray name of the SVDCluster StoreArray
+    std::string m_param_SVDClustersStoreArrayName = "SVDClusters";
 
     /// Output RecoTracks Store Array
     StoreArray<RecoTrack> m_storeRecoTracks;

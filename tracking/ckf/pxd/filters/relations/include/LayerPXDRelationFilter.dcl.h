@@ -30,11 +30,14 @@ namespace Belle2 {
     /// Default destructor
     ~LayerPXDRelationFilter();
 
+    /// Return all states the given state is possible related to.
     std::vector<CKFToPXDState*> getPossibleTos(CKFToPXDState* from,
                                                const std::vector<CKFToPXDState*>& states) const override;
 
+    /// Expose the parameters of the filter
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
+    /// Give a final weight to the possibilities by asking the filter.
     TrackFindingCDC::Weight operator()(const CKFToPXDState& from, const CKFToPXDState& to) override;
 
     void initialize() override;

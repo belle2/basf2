@@ -36,18 +36,13 @@ main.add_module('EvtGenInput')
 
 add_simulation(
     main,
-    components=[
-        'MagneticField',
-        'BeamPipe',
-        'PXD',
-        'SVD'],
     bkgfiles=bkgFiles,
     usePXDDataReduction=ROIfinding,
     simulateT0jitter=simulateJitter)
 
 add_svd_reconstruction(main)
 
-
+'''
 add_tracking_reconstruction(
     main,
     components=["SVD"],
@@ -64,7 +59,7 @@ main.add_module(clseval)
 svdperf = b2.register_module('SVDPerformance')
 svdperf.param('outputFileName', "SVDPerformance" + str(tag))
 main.add_module(svdperf)
-
+'''
 # main.add_module('RootOutput')
 main.add_module('Progress')
 

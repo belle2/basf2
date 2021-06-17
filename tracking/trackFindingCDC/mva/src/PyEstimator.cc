@@ -21,23 +21,24 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-PyEstimator::PyEstimator(const std::string& pickleFileName) try
-: m_pickleFileName(pickleFileName)
+PyEstimator::PyEstimator(const std::string& pickleFileName)
+  : m_pickleFileName(pickleFileName)
 {
-  // Construct an array with one entry
-  // Expand it once the number of variables is known.
-  boost::python::object numpy = boost::python::import("numpy");
-  boost::python::list initValues;
-  initValues.append(0.0);
-  m_array = numpy.attr("array")(initValues);
-  m_nCurrent = boost::python::len(m_array);
-  // boost::python::object array = boost::python::import("array");
-  // m_array = array.attr("array")("d");
-  unpickleEstimator(pickleFileName);
-} catch (const boost::python::error_already_set&)
-{
-  PyErr_Print();
-  B2ERROR("Could not construct PyEstimator from " << pickleFileName);
+  try {
+    // Construct an array with one entry
+    // Expand it once the number of variables is known.
+    boost::python::object numpy = boost::python::import("numpy");
+    boost::python::list initValues;
+    initValues.append(0.0);
+    m_array = numpy.attr("array")(initValues);
+    m_nCurrent = boost::python::len(m_array);
+    // boost::python::object array = boost::python::import("array");
+    // m_array = array.attr("array")("d");
+    unpickleEstimator(pickleFileName);
+  } catch (const boost::python::error_already_set&) {
+    PyErr_Print();
+    B2ERROR("Could not construct PyEstimator from " << pickleFileName);
+  }
 }
 
 double PyEstimator::predict(const std::vector<double>& inputVariables)

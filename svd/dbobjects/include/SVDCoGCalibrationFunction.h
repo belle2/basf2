@@ -155,7 +155,7 @@ namespace Belle2 {
       return raw_timeErr * m_scale[ tb % nTriggerBins];
     };
 
-    //data member usefule for polinomials
+    //data member useful for polinomials
     static const int m_nPar = 6; /**< number of parameters of highest-order implemented pol (5)*/
     double m_par[ m_nPar ] = {0}; /**< vector of parameters*/
 

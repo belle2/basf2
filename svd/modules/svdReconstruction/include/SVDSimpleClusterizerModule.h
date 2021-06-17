@@ -22,7 +22,8 @@
 
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
-#include <svd/calibration/SVDClusterCalibrations.h>
+#include <svd/calibration/SVDClustering.h>
+#include <svd/calibration/SVDOldDefaultErrorScaleFactors.h>
 #include <svd/calibration/SVD3SampleCoGTimeCalibrations.h>
 #include <svd/calibration/SVD3SampleELSTimeCalibrations.h>
 
@@ -110,7 +111,8 @@ namespace Belle2 {
       //calibration objects
       SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShape calibrations db object*/
       SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
-      SVDClusterCalibrations m_ClusterCal; /**<SVDCluster calibrations db object*/
+      SVDClustering m_ClusterCal; /**<SVDCluster calibrations db object*/
+      SVDOldDefaultErrorScaleFactors m_OldDefaultSF; /**<SVDCluster calibrations db object*/
 
       SVD3SampleCoGTimeCalibrations m_3CoGTimeCal; /**< SVD 3-sample CoG Time calibrations db object*/
       SVD3SampleELSTimeCalibrations m_3ELSTimeCal; /**< SVD 3-sample ELS Time calibrations db object*/

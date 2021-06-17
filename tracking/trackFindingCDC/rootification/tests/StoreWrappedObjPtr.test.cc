@@ -31,11 +31,15 @@ using namespace TrackFindingCDC;
 TEST(TrackFindingCDCTest, cpp_storeWrapper)
 {
   StoreObjPtr<StoreWrapper<std::vector<CDCWireHit> > > stdVector;
+  // do something so that cppcheck is happy
+  stdVector.isOptional();
 }
 
 TEST(TrackFindingCDCTest, cpp_storeWrappedObjPtr)
 {
   StoreWrappedObjPtr<std::vector<CDCWireHit> > stdVector;
+  // do something so that cppcheck is happy
+  stdVector.isOptional();
 }
 
 template <class T>

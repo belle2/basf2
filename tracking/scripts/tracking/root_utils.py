@@ -54,7 +54,7 @@ def root_open(tfile_or_file_path, tfile_options=None):
         with root_cd(tfile) as tfile:
             yield tfile
     else:
-        save_tdirectory = ROOT.gROOT.CurrentDirectory()
+        save_tdirectory = ROOT.gROOT.CurrentDirectory().load()
 
         if tfile_options is None:
             tfile = ROOT.TFile(tfile_or_file_path)
@@ -91,7 +91,7 @@ def root_cd(tdirectory):
     # Do not use ROOT.gDirectory here.
     # Since ROOT.gDirectory gets transported as a reference it changes on a call to cd() as well,
     # and can therefore not serve to save the former directory.
-    save_tdirectory = ROOT.gROOT.CurrentDirectory()
+    save_tdirectory = ROOT.gROOT.CurrentDirectory().load()
 
     if not tdirectory or "." == tdirectory:
         tdirectory = save_tdirectory

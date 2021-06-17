@@ -59,9 +59,6 @@ void FittedTracksStorerModule::event()
   StoreArray<RecoTrack> inputRecoTracks(m_param_inputRecoTracksStoreArrayName);
   StoreArray<RecoTrack> outputRecoTracks(m_param_outputRecoTracksStoreArrayName);
 
-  StoreArray<MCParticle> mcParticles;
-  StoreArray<Track> tracks;
-
   for (RecoTrack& recoTrack : inputRecoTracks) {
     if (recoTrack.wasFitSuccessful()) {
       auto newRecoTrack = recoTrack.copyToStoreArray(outputRecoTracks);

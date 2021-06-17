@@ -156,7 +156,9 @@ Alias f_2R        f_2
 Alias K*BR        anti-K*0
 Alias K*0R        K*0
 ChargeConj K*0R   K*BR
-
+Alias K*-R        K*-
+Alias K*+R        K*+
+ChargeConj K*+R   K*-R
 
 # PR LHCb: Alias for signal productions in LHCb
 Alias      B0sig             B0
@@ -7997,6 +7999,18 @@ Decay K*0R
 0.007344000   K0  gamma                                    VSP_PWAVE;
 Enddecay
 
+# Remove K0 pi+ channel to avoid double counting in D Dalitz models
+Decay K*+R
+0.997036000   K+  pi0                                      VSS;
+0.002964000   K+  gamma                                    VSP_PWAVE;
+Enddecay
+
+# Remove K0 pi- channel to avoid double counting in D Dalitz models
+Decay K*-R
+0.997036000   K-  pi0                                      VSS;
+0.002964000   K-  gamma                                    VSP_PWAVE;
+Enddecay
+
 
 
 
@@ -8562,8 +8576,8 @@ Decay D0
 0.008560000 K_L0  pi+  pi-  pi0  pi0                       PHSP;
 0.000000000 anti-K0  pi+  pi-  pi0  pi0                    PHSP;
 
-0.008798500 K_S0  pi+  pi-  pi0  pi0  pi0                  PHSP; # [New mode added EO 06/2021] - to compensate for decreases in other modes and make branching fractions sum to 1
-0.008798500 K_L0  pi+  pi-  pi0  pi0  pi0                  PHSP;
+0.008655500 K_S0  pi+  pi-  pi0  pi0  pi0                  PHSP; # [New mode added EO 06/2021] - to compensate for decreases in other modes and make branching fractions sum to 1
+0.008655500 K_L0  pi+  pi-  pi0  pi0  pi0                  PHSP;
 0.000000000 anti-K0  pi+  pi-  pi0  pi0  pi0               PHSP;
 
 0.000000000   K-  pi+  pi+  pi-  pi0                       PHSP;
@@ -8691,8 +8705,8 @@ Decay D0
 # Doubly Cabibbo suppressed modes
 ###############################################################
 0.000150000   K+  pi-                                      PHSP; # [PDG2019]
-0.000000000   K*+  pi-                                     SVS; # [Zero out to avoid double counting K_S0 pi+ pi-; contribution would be almost negligible anyway, not worth including]
-0.000019000   K+  pi-  pi0                                 PHSP; # [PDG2019] - subtract K*+ pi- BF from PDG value of 0.000306
+0.000113000   K*+R  pi-                                    SVS; # K*+R is "fake" resonance to prevent contribution to K_S0 pi+ pi- Dalitz mode
+0.000192000   K+  pi-  pi0                                 PHSP; # [PDG2021] - subtract resonance above from PDG value of 0.00305
 0.000249000   K+  pi+  pi-  pi-                            PHSP; # [PDG2019]
 0.000300000   K+  pi-  pi0  pi0                            PHSP; # [New moded added]
 Enddecay
@@ -8810,8 +8824,8 @@ Decay anti-D0
 0.008560000 K_L0  pi+  pi-  pi0  pi0                       PHSP;
 0.000000000 K0  pi+  pi-  pi0  pi0                         PHSP;
 
-0.008798500 K_S0  pi+  pi-  pi0  pi0  pi0                  PHSP; # [New mode added EO 06/2021] - to compensate for decreases in other modes and make branching fractions sum to 1
-0.008798500 K_L0  pi+  pi-  pi0  pi0  pi0                  PHSP;
+0.008655500 K_S0  pi+  pi-  pi0  pi0  pi0                  PHSP; # [New mode added EO 06/2021] - to compensate for decreases in other modes and make branching fractions sum to 1
+0.008655500 K_L0  pi+  pi-  pi0  pi0  pi0                  PHSP;
 0.000000000 K0  pi+  pi-  pi0  pi0  pi0                    PHSP;
 
 0.000000000   K+  pi-  pi+  pi-  pi0                       PHSP;
@@ -8939,8 +8953,8 @@ Decay anti-D0
 # Doubly Cabibbo suppressed modes
 ###############################################################
 0.000150000   K-  pi+                                      PHSP; # [PDG2019]
-0.000000000   K*-  pi+                                     SVS; # [Zero out to avoid double counting K_S0 pi+ pi-; contribution would be almost negligible anyway, not worth including]
-0.000019000   K-  pi+  pi0                                 PHSP; # [PDG2019] - subtract K*+ pi- BF from PDG value of 0.000306
+0.000113000   K*-R  pi+                                    SVS; # K*-R is "fake" resonance to prevent contribution to K_S0 pi+ pi- Dalitz mode
+0.000192000   K-  pi+  pi0                                 PHSP; # [PDG2021] - subtract resonance above from PDG value of 0.00305
 0.000249000   K-  pi+  pi+  pi-                            PHSP; # [PDG2019]
 0.000300000   K-  pi+  pi0  pi0                            PHSP; # [New mode added]
 Enddecay

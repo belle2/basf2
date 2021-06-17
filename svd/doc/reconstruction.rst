@@ -75,6 +75,7 @@ The **default** algorithm used to compute cluster time is the ``CoG3``: first al
 
 where the :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV readout chip and  :math:`a_{j}` is the amplitude of j-th summed-sample.
 
+
 The raw time is finally calibrated with a third order polynomial stored in the :ref:`SVDCoG3SampleTimeCalibration<svdcog3timecal>` DBObject.
 
 We have two alternative algorithms to compute the cluster time that can be selected by setting the :b2:mod:`SVDClusterizer` parameter ``timeAlgorithm{3/6}Samples``. 
@@ -143,13 +144,16 @@ For more-than-one strip clusters we have two algorithms:
 The available algorithms to determine the strip charge for the position computation are the same available for clusters, strips are considered as one-strip clusters. To choose the strip charge reconstruction algorithm for cluster position computation use the :b2:mod:`SVDClusterizer` parameter ``stripChargeAlgorithm{3/6}Samples``. The **default** algorithm is the ``MaxSample``.
 
 
-In the current **default** reconstruction the ``CoG`` is used for cluster size = 2, and ``AHT`` is used for cluster size > 2.
-Position errors are scaled depending on the cluster size, scale factors are stored in :ref:`SVDClusterCut<svdclustercuts>`.
+In the current **default** reconstruction the ``CoG`` is used for cluster size > 1 (``AHT`` is not used).
+
+.. note::
+
+   Position errors are scaled, scaling factors are stored in :ref:`SVDCoGOnlyErrorScaleFactors<svdcogonlycal>`.
 
 The ``SVDClusterizer`` supports the following position reconstruction algorithms (that can be passed as string, see the :b2:mod:`SVDClusterizer` parameter ``positionAlgorithm{3/6}Samples`` parameter)
 
-* ``OldDefault``: current default described above
-* ``CoGOnly``: the ``CoG`` is used for all cluster sizes :math:`\ge2` (``AHT`` is not used)
+* ``OldDefault``: ``CoG`` for cluster size = 2 and ``AHT`` for cluster sizes > 2 (scale factors stores in :ref:`SVDOldDefaultErrorScaleFactors<svdolddefaultcal>`
+* ``CoGOnly`` (**current default**): the ``CoG`` is used for all cluster sizes :math:`\ge2` (``AHT`` is not used), scale factors stored in :ref:`SVDCoGOnlyErrorScaleFactors<svdcogonlycal>`.
 
 .. seealso::
 

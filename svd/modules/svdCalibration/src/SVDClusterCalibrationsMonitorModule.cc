@@ -50,12 +50,14 @@ void SVDClusterCalibrationsMonitorModule::beginRun()
   b_clsScaleErr1 = m_tree->Branch("clsScaleErr1", &m_clsScaleErr1, "clsScaleErr1/F");
   b_clsScaleErr2 = m_tree->Branch("clsScaleErr2", &m_clsScaleErr2, "clsScaleErr2/F");
   b_clsScaleErr3 = m_tree->Branch("clsScaleErr3", &m_clsScaleErr3, "clsScaleErr3/F");
+  b_clsScaleErr4 = m_tree->Branch("clsScaleErr4", &m_clsScaleErr4, "clsScaleErr4/F");
+  b_clsScaleErr5 = m_tree->Branch("clsScaleErr5", &m_clsScaleErr5, "clsScaleErr5/F");
   b_clsTimeFunc = m_tree->Branch("clsTimeFunc", &m_clsTimeFunc, "clsTimeFunc/i");
   b_clsTimeMin = m_tree->Branch("clsTimeMin", &m_clsTimeMin, "clsTimeMin/F");
 
 
   if (! m_ClusterCal.isValid())
-    B2WARNING("No valid SVDClusterCalibrations for the requested IoV");
+    B2WARNING("No valid SVDClustering for the requested IoV");
 
 
   ///CLUSTER SNR CUTS
@@ -98,6 +100,19 @@ void SVDClusterCalibrationsMonitorModule::beginRun()
                      100, -0.5, 9.5);
   hClsScaleErr3.GetXaxis()->SetTitle("scale factor");
   m_hClsScaleErr3 = new SVDHistograms<TH1F>(hClsScaleErr3);
+
+  TH1F hClsScaleErr4("clusterScaleErr4__L@layerL@ladderS@sensor@view",
+                     "Cluster Position Error Scale Factor for Size 4 in @layer.@ladder.@sensor @view/@side",
+                     100, -0.5, 9.5);
+  hClsScaleErr4.GetXaxis()->SetTitle("scale factor");
+  m_hClsScaleErr4 = new SVDHistograms<TH1F>(hClsScaleErr4);
+
+  TH1F hClsScaleErr5("clusterScaleErr5__L@layerL@ladderS@sensor@view",
+                     "Cluster Position Error Scale Factor for Size > 4 in @layer.@ladder.@sensor @view/@side",
+                     100, -0.5, 9.5);
+  hClsScaleErr5.GetXaxis()->SetTitle("scale factor");
+  m_hClsScaleErr5 = new SVDHistograms<TH1F>(hClsScaleErr5);
+
 
   //CLUSTER TIME CUTS
   TH1F hClsTimeFuncVersion("clusterTimeSelFunction__L@layerL@ladderS@sensor@view",
@@ -161,19 +176,24 @@ void SVDClusterCalibrationsMonitorModule::event()
           m_clsAdjSNR = m_ClusterCal.getMinAdjSNR(theVxdID, m_side);
           m_hClsAdjSNR->fill(theVxdID, m_side, m_clsAdjSNR);
 
-          m_clsScaleErr1 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, m_side, 1, 1);
+          m_clsScaleErr1 = m_CoGOnlySF.getCorrectedClusterPositionError(theVxdID, m_side, 1, 1);
           m_hClsScaleErr1->fill(theVxdID, m_side, m_clsScaleErr1);
 
-          m_clsScaleErr2 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, m_side, 2, 1);
+          m_clsScaleErr2 = m_CoGOnlySF.getCorrectedClusterPositionError(theVxdID, m_side, 2, 1);
           m_hClsScaleErr2->fill(theVxdID, m_side, m_clsScaleErr2);
-          m_clsScaleErr3 = m_ClusterCal.getCorrectedClusterPositionError(theVxdID, m_side, 3, 1);
+          m_clsScaleErr3 = m_CoGOnlySF.getCorrectedClusterPositionError(theVxdID, m_side, 3, 1);
           m_hClsScaleErr3->fill(theVxdID, m_side, m_clsScaleErr3);
+          m_clsScaleErr4 = m_CoGOnlySF.getCorrectedClusterPositionError(theVxdID, m_side, 4, 1);
+          m_hClsScaleErr4->fill(theVxdID, m_side, m_clsScaleErr4);
+          m_clsScaleErr5 = m_CoGOnlySF.getCorrectedClusterPositionError(theVxdID, m_side, 5, 1);
+          m_hClsScaleErr5->fill(theVxdID, m_side, m_clsScaleErr5);
 
-          m_clsTimeMin = m_ClusterCal.getMinClusterTime(theVxdID, m_side);
+
+          m_clsTimeMin = m_HitTimeCut.getMinClusterTime(theVxdID, m_side);
           m_hClsTimeMin->fill(theVxdID, m_side, m_clsTimeMin);
 
-          m_clsTimeFunc = m_ClusterCal.getTimeSelectionFunction(theVxdID, m_side);
-          m_hClsTimeMin->fill(theVxdID, m_side, m_clsTimeFunc);
+          m_clsTimeFunc = m_HitTimeCut.getTimeSelectionFunction(theVxdID, m_side);
+          m_hClsTimeFuncVersion->fill(theVxdID, m_side, m_clsTimeFunc);
 
           m_tree->Fill();
 
@@ -232,6 +252,8 @@ void SVDClusterCalibrationsMonitorModule::endRun()
             (m_hClsScaleErr1->getHistogram(sensor, view))->Write();
             (m_hClsScaleErr2->getHistogram(sensor, view))->Write();
             (m_hClsScaleErr3->getHistogram(sensor, view))->Write();
+            (m_hClsScaleErr4->getHistogram(sensor, view))->Write();
+            (m_hClsScaleErr5->getHistogram(sensor, view))->Write();
 
 
           }

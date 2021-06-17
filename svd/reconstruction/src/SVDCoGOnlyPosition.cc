@@ -23,6 +23,10 @@ namespace Belle2 {
       reconstructStrips(rawCluster);
 
       applyCoGPosition(rawCluster, position, positionError);
+
+      //apply scale factors for the position errors
+      positionError = m_CoGOnlyCal.getCorrectedClusterPositionError(rawCluster.getSensorID(), rawCluster.isUSide(), rawCluster.getSize(),
+                      positionError);
     }
 
   }  //SVD namespace

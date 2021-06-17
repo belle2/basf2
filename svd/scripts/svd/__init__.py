@@ -62,17 +62,6 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         clusterizer.set_name(clusterizerName)
         clusterizer.param('ShaperDigits', shaperDigitsName)
         clusterizer.param('Clusters', clustersName)
-        clusterizer.param('timeAlgorithm6Samples', "CoG3")
-        clusterizer.param('timeAlgorithm3Samples', "CoG3")
-        clusterizer.param('chargeAlgorithm6Samples', "MaxSample")
-        clusterizer.param('chargeAlgorithm3Samples', "MaxSample")
-        clusterizer.param('positionAlgorithm6Samples', "OldDefault")
-        clusterizer.param('positionAlgorithm3Samples', "OldDefault")
-        clusterizer.param('stripTimeAlgorithm6Samples', "dontdo")
-        clusterizer.param('stripTimeAlgorithm3Samples', "dontdo")
-        clusterizer.param('stripChargeAlgorithm6Samples', "MaxSample")
-        clusterizer.param('stripChargeAlgorithm3Samples', "MaxSample")
-        clusterizer.param('useDB', False)
         path.add_module(clusterizer)
 
     if missingAPVsClusterCreatorName not in [e.name() for e in path.modules()]:
@@ -103,8 +92,8 @@ def add_svd_create_recodigits(path, recocreatorName="SVDRecoDigitCreator", shape
     if recocreatorName not in [e.name() for e in path.modules()]:
         recoDigitCreator = b2.register_module('SVDRecoDigitCreator')
         recoDigitCreator.param('ShaperDigits', shaperDigitsName)
-        recoDigitCreator.param('timeAlgorithm6Samples', "CoG6")
-        recoDigitCreator.param('timeAlgorithm3Samples', "CoG6")
+        recoDigitCreator.param('timeAlgorithm6Samples', "CoG3")
+        recoDigitCreator.param('timeAlgorithm3Samples', "CoG3")
         recoDigitCreator.param('chargeAlgorithm6Samples', "MaxSample")
         recoDigitCreator.param('chargeAlgorithm3Samples', "MaxSample")
         recoDigitCreator.param('useDB', False)

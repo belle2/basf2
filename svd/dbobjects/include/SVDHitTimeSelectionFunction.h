@@ -91,6 +91,7 @@ namespace Belle2 {
     void setMaxUVTimeDifference(double timeDiff) { m_maxUVTimeDifference = timeDiff; }
     /** get m_maxUVTimeDifference */
     float getMaxUVTimeDifference() const { return m_maxUVTimeDifference; }
+
   private:
 
     /** function parameters & implementations*/

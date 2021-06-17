@@ -54,6 +54,7 @@ namespace Belle2 {
           for (const auto& hit : collectionItem) {
             const CDCWireHit& wireHit = hit.getWireHit();
 
+            // cppcheck-suppress danglingLifetime
             m_hitLookup.insert(std::make_pair(&wireHit, &collectionItem));
           }
         }

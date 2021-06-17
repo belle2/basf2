@@ -100,9 +100,6 @@ void NoKickCutsEvalModule::initialize()
 
 void NoKickCutsEvalModule::event()
 {
-  StoreArray<SVDCluster> SVDClusters;
-  StoreArray<SVDTrueHit> SVDTrueHits;
-  StoreArray<MCParticle> MCParticles;
   StoreArray<RecoTrack> recoTracks;
 
   for (const RecoTrack& track : recoTracks) {

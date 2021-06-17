@@ -8101,7 +8101,7 @@ Decay D+
 0.001900000   K_L0  eta'  pi+                              PHSP; # [New mode added] - copied K_S0 eta' pi+, best estimate
 0.000000000   anti-K0  eta'  pi+                           PHSP;
 
-# Check that these should be commented out [PG 05/02/2018, update EO 06/2021]
+# Modes not in PDG, commented out for now [EO 06/2021]
 #0.0100   anti-K*0 eta  pi+                     PHSP;
 #0.0100   K*- rho+  pi+                         PHSP;
 #0.0188   anti-K0   pi+  pi0   pi0              PHSP;
@@ -8318,7 +8318,7 @@ Decay D-
 0.001900000   K_L0  eta'  pi-                              PHSP; # [New mode added] - copied K_S0 eta' pi-, best estimate
 0.000000000   K0  eta'  pi-                                PHSP;
 
-# Check that these should be commented out [PG 05/02/2018, update EO 06/2021]
+# Modes not in PDG, commented out for now [EO 06/2021]
 #0.0100   K*0 eta  pi-                    PHSP;
 #0.0100   K*+ rho-  pi-                   PHSP;
 #0.0188   K0  pi-  pi0   pi0              PHSP;
@@ -8550,20 +8550,19 @@ Decay D0
 0.006000000   K_L0  pi+  pi-  pi0                          PHSP;
 0.000000000   anti-K0  pi+  pi-  pi0                       PHSP;
 
-# Confirm that these should be commented out [PG 05/02/2018]
 # K- pi+ pi0 pi0 is not in PDG but was well-measured at BESIII
 #  to be (8.98 +/- 0.13(stat.) +/- 0.40(syst.))%
-0.025100000   K-  pi+  pi0  pi0                            PHSP; # [New mode added 03/2020] - subtract contributions from resonances and adjust decimal places to have everything add to 1
+0.025100000   K-  pi+  pi0  pi0                            PHSP; # [New mode added EO 03/2020] - subtract contributions from resonances and adjust decimal places to have everything add to 1
 
-0.008560000 K_S0  pi0  pi0  pi0                            PHSP; # [New mode added 06/2021 to compensate for changes in other modes]
+0.008560000 K_S0  pi0  pi0  pi0                            PHSP; # [New mode added EO 06/2021] - to compensate for decreases in other modes and make branching fractions sum to 1
 0.008560000 K_L0  pi0  pi0  pi0                            PHSP;
 0.000000000 anti-K0  pi0  pi0  pi0                         PHSP;
 
-0.008560000 K_S0  pi+  pi-  pi0  pi0                       PHSP; # [New mode added 06/2021 to compensate for changes in other modes]
+0.008560000 K_S0  pi+  pi-  pi0  pi0                       PHSP; # [New mode added EO 06/2021] - to compensate for decreases in other modes and make branching fractions sum to 1
 0.008560000 K_L0  pi+  pi-  pi0  pi0                       PHSP;
 0.000000000 anti-K0  pi+  pi-  pi0  pi0                    PHSP;
 
-0.008798500 K_S0  pi+  pi-  pi0  pi0  pi0                  PHSP; # [New mode added 06/2021 to compensate for changes in other modes]
+0.008798500 K_S0  pi+  pi-  pi0  pi0  pi0                  PHSP; # [New mode added EO 06/2021] - to compensate for decreases in other modes and make branching fractions sum to 1
 0.008798500 K_L0  pi+  pi-  pi0  pi0  pi0                  PHSP;
 0.000000000 anti-K0  pi+  pi-  pi0  pi0  pi0               PHSP;
 
@@ -8799,20 +8798,19 @@ Decay anti-D0
 0.006000000   K_L0  pi+  pi-  pi0                          PHSP;
 0.000000000   K0  pi+  pi-  pi0                            PHSP;
 
-# Confirm that these should be commented out [PG 05/02/2018]
 # K+ pi- pi0 pi0 is not in PDG but was well-measured at BESIII
 #  to be (8.98 +/- 0.13(stat.) +/- 0.40(syst.))%
-0.025100000   K+  pi-  pi0  pi0                            PHSP; # [New mode added 03/2020] - subtract contributions from resonances and adjust decimal places to have everything add to 1
+0.025100000   K+  pi-  pi0  pi0                            PHSP; # [New mode added EO 03/2020] - subtract contributions from resonances and adjust decimal places to have everything add to 1
 
-0.008560000 K_S0  pi0  pi0  pi0                            PHSP; # [New mode added 06/2021 to compensate for changes in other modes]
+0.008560000 K_S0  pi0  pi0  pi0                            PHSP; # [New mode added EO 06/2021] - to compensate for decreases in other modes and make branching fractions sum to 1
 0.008560000 K_L0  pi0  pi0  pi0                            PHSP;
 0.000000000 K0  pi0  pi0  pi0                              PHSP;
 
-0.008560000 K_S0  pi+  pi-  pi0  pi0                       PHSP; # [New mode added 06/2021 to compensate for changes in other modes]
+0.008560000 K_S0  pi+  pi-  pi0  pi0                       PHSP; # [New mode added EO 06/2021] - to compensate for decreases in other modes and make branching fractions sum to 1
 0.008560000 K_L0  pi+  pi-  pi0  pi0                       PHSP;
 0.000000000 K0  pi+  pi-  pi0  pi0                         PHSP;
 
-0.008798500 K_S0  pi+  pi-  pi0  pi0  pi0                  PHSP; # [New mode added 06/2021 to compensate for changes in other modes]
+0.008798500 K_S0  pi+  pi-  pi0  pi0  pi0                  PHSP; # [New mode added EO 06/2021] - to compensate for decreases in other modes and make branching fractions sum to 1
 0.008798500 K_L0  pi+  pi-  pi0  pi0  pi0                  PHSP;
 0.000000000 K0  pi+  pi-  pi0  pi0  pi0                    PHSP;
 

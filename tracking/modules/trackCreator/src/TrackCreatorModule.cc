@@ -108,8 +108,11 @@ void TrackCreatorModule::event()
       // Does not refit in case the particle hypotheses demanded in this module have already been fitted before.
       // Otherwise fits them with the default fitter.
       B2DEBUG(200, "Trying to fit with PDG = " << pdg);
-      if (recoTrack.getPositionSeed().Mag() > m_trackFitMomentumRange->getMomentumRange(pdg))
+      B2DEBUG(200, "PDG hypothesis: " << pdg << "\tMomentum cut: " << m_trackFitMomentumRange->getMomentumRange(
+                pdg) << "\tSeed p: " << recoTrack.getMomentumSeed().Mag());
+      if (recoTrack.getMomentumSeed().Mag() <= m_trackFitMomentumRange->getMomentumRange(pdg)) {
         trackFitter.fit(recoTrack, Const::ParticleType(abs(pdg)));
+      }
     }
     trackBuilder.storeTrackFromRecoTrack(recoTrack, m_useClosestHitToIP);
   }

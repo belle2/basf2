@@ -115,18 +115,34 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
 
   std::vector<float> avgOffOccL6UV = avgOccupancyUV(6, h_zs5countsU, h_zs5countsV, 0, 80, 93, 1, nE);
 
-  // average occupancy for middle plane sensors
+  // occupancy averaged over ladders
+  std::vector<float> avgOffOccL3X1UV = avgOccupancyUV(3, h_zs5countsU, h_zs5countsV, 0, 7, 0, 2, nE); // L3.X.1
+
+  std::vector<float> avgOffOccL3X2UV = avgOccupancyUV(3, h_zs5countsU, h_zs5countsV, 0, 7, 1, 2, nE); // L3.X.2
+
+  std::vector<float> avgOffOccL4X1UV = avgOccupancyUV(4, h_zs5countsU, h_zs5countsV, 0, 10, 15, 3, nE); // L4.X.1
+
   std::vector<float> avgOffOccL4X2UV = avgOccupancyUV(4, h_zs5countsU, h_zs5countsV, 0, 10, 16, 3, nE); // L4.X.2
+
+  std::vector<float> avgOffOccL4X3UV = avgOccupancyUV(4, h_zs5countsU, h_zs5countsV, 0, 10, 17, 3, nE); // L4.X.3
+
+  std::vector<float> avgOffOccL5X1UV = avgOccupancyUV(5, h_zs5countsU, h_zs5countsV, 0, 12, 35, 4, nE); // L5.X.1
 
   std::vector<float> avgOffOccL5X2UV = avgOccupancyUV(5, h_zs5countsU, h_zs5countsV, 0, 12, 36, 4, nE); // L5.X.2
 
   std::vector<float> avgOffOccL5X3UV = avgOccupancyUV(5, h_zs5countsU, h_zs5countsV, 0, 12, 37, 4, nE); // L5.X.3
+
+  std::vector<float> avgOffOccL5X4UV = avgOccupancyUV(5, h_zs5countsU, h_zs5countsV, 0, 12, 38, 4, nE); // L5.X.4
+
+  std::vector<float> avgOffOccL6X1UV = avgOccupancyUV(6, h_zs5countsU, h_zs5countsV, 0, 16, 93, 5, nE); // L6.X.1
 
   std::vector<float> avgOffOccL6X2UV = avgOccupancyUV(6, h_zs5countsU, h_zs5countsV, 0, 16, 94, 5, nE); // L6.X.2
 
   std::vector<float> avgOffOccL6X3UV = avgOccupancyUV(6, h_zs5countsU, h_zs5countsV, 0, 16, 95, 5, nE); // L6.X.3
 
   std::vector<float> avgOffOccL6X4UV = avgOccupancyUV(6, h_zs5countsU, h_zs5countsV, 0, 16, 96, 5, nE); // L6.X.4
+
+  std::vector<float> avgOffOccL6X5UV = avgOccupancyUV(6, h_zs5countsU, h_zs5countsV, 0, 16, 97, 5, nE); // L6.X.5
 
   // average occupancy for high occupancy sensors
   std::vector<float> avgOffOccL311UV = highOccupancySensor(3, h_zs5countsU, h_zs5countsV, 1, nE); // L3.1.1
@@ -156,12 +172,20 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("avgOffOccL4U", -1);
     m_monObj->setVariable("avgOffOccL5U", -1);
     m_monObj->setVariable("avgOffOccL6U", -1);
+    m_monObj->setVariable("avgOffOccL3X1U", -1);
+    m_monObj->setVariable("avgOffOccL3X2U", -1);
+    m_monObj->setVariable("avgOffOccL4X1U", -1);
     m_monObj->setVariable("avgOffOccL4X2U", -1);
+    m_monObj->setVariable("avgOffOccL4X3U", -1);
+    m_monObj->setVariable("avgOffOccL5X1U", -1);
     m_monObj->setVariable("avgOffOccL5X2U", -1);
     m_monObj->setVariable("avgOffOccL5X3U", -1);
+    m_monObj->setVariable("avgOffOccL5X4U", -1);
+    m_monObj->setVariable("avgOffOccL6X1U", -1);
     m_monObj->setVariable("avgOffOccL6X2U", -1);
     m_monObj->setVariable("avgOffOccL6X3U", -1);
     m_monObj->setVariable("avgOffOccL6X4U", -1);
+    m_monObj->setVariable("avgOffOccL6X5U", -1);
     m_monObj->setVariable("avgOffOccL311U", -1);
     m_monObj->setVariable("avgOffOccL312U", -1);
     m_monObj->setVariable("avgOffOccL321U", -1);
@@ -177,12 +201,20 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("avgOffOccL4U", avgOffOccL4UV[0]);
     m_monObj->setVariable("avgOffOccL5U", avgOffOccL5UV[0]);
     m_monObj->setVariable("avgOffOccL6U", avgOffOccL6UV[0]);
+    m_monObj->setVariable("avgOffOccL3X1U", avgOffOccL3X1UV[0]);
+    m_monObj->setVariable("avgOffOccL3X2U", avgOffOccL3X2UV[0]);
+    m_monObj->setVariable("avgOffOccL4X1U", avgOffOccL4X1UV[0]);
     m_monObj->setVariable("avgOffOccL4X2U", avgOffOccL4X2UV[0]);
+    m_monObj->setVariable("avgOffOccL4X3U", avgOffOccL4X3UV[0]);
+    m_monObj->setVariable("avgOffOccL5X1U", avgOffOccL5X1UV[0]);
     m_monObj->setVariable("avgOffOccL5X2U", avgOffOccL5X2UV[0]);
     m_monObj->setVariable("avgOffOccL5X3U", avgOffOccL5X3UV[0]);
+    m_monObj->setVariable("avgOffOccL5X4U", avgOffOccL5X4UV[0]);
+    m_monObj->setVariable("avgOffOccL6X1U", avgOffOccL6X1UV[0]);
     m_monObj->setVariable("avgOffOccL6X2U", avgOffOccL6X2UV[0]);
     m_monObj->setVariable("avgOffOccL6X3U", avgOffOccL6X3UV[0]);
     m_monObj->setVariable("avgOffOccL6X4U", avgOffOccL6X4UV[0]);
+    m_monObj->setVariable("avgOffOccL6X5U", avgOffOccL6X5UV[0]);
     m_monObj->setVariable("avgOffOccL311U", avgOffOccL311UV[0]);
     m_monObj->setVariable("avgOffOccL312U", avgOffOccL312UV[0]);
     m_monObj->setVariable("avgOffOccL321U", avgOffOccL321UV[0]);
@@ -201,12 +233,20 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("avgOffOccL4V", -1);
     m_monObj->setVariable("avgOffOccL5V", -1);
     m_monObj->setVariable("avgOffOccL6V", -1);
+    m_monObj->setVariable("avgOffOccL3X1V", -1);
+    m_monObj->setVariable("avgOffOccL3X2V", -1);
+    m_monObj->setVariable("avgOffOccL4X1V", -1);
     m_monObj->setVariable("avgOffOccL4X2V", -1);
+    m_monObj->setVariable("avgOffOccL4X3V", -1);
+    m_monObj->setVariable("avgOffOccL5X1V", -1);
     m_monObj->setVariable("avgOffOccL5X2V", -1);
     m_monObj->setVariable("avgOffOccL5X3V", -1);
+    m_monObj->setVariable("avgOffOccL5X4V", -1);
+    m_monObj->setVariable("avgOffOccL6X1V", -1);
     m_monObj->setVariable("avgOffOccL6X2V", -1);
     m_monObj->setVariable("avgOffOccL6X3V", -1);
     m_monObj->setVariable("avgOffOccL6X4V", -1);
+    m_monObj->setVariable("avgOffOccL6X5V", -1);
     m_monObj->setVariable("avgOffOccL311V", -1);
     m_monObj->setVariable("avgOffOccL312V", -1);
     m_monObj->setVariable("avgOffOccL321V", -1);
@@ -222,12 +262,20 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("avgOffOccL4V", avgOffOccL4UV[1]);
     m_monObj->setVariable("avgOffOccL5V", avgOffOccL5UV[1]);
     m_monObj->setVariable("avgOffOccL6V", avgOffOccL6UV[1]);
+    m_monObj->setVariable("avgOffOccL3X1V", avgOffOccL3X1UV[1]);
+    m_monObj->setVariable("avgOffOccL3X2V", avgOffOccL3X2UV[1]);
+    m_monObj->setVariable("avgOffOccL4X1V", avgOffOccL4X1UV[1]);
     m_monObj->setVariable("avgOffOccL4X2V", avgOffOccL4X2UV[1]);
+    m_monObj->setVariable("avgOffOccL4X3V", avgOffOccL4X3UV[1]);
+    m_monObj->setVariable("avgOffOccL5X1V", avgOffOccL5X1UV[1]);
     m_monObj->setVariable("avgOffOccL5X2V", avgOffOccL5X2UV[1]);
     m_monObj->setVariable("avgOffOccL5X3V", avgOffOccL5X3UV[1]);
+    m_monObj->setVariable("avgOffOccL5X4V", avgOffOccL5X4UV[1]);
+    m_monObj->setVariable("avgOffOccL6X1V", avgOffOccL6X1UV[1]);
     m_monObj->setVariable("avgOffOccL6X2V", avgOffOccL6X2UV[1]);
     m_monObj->setVariable("avgOffOccL6X3V", avgOffOccL6X3UV[1]);
     m_monObj->setVariable("avgOffOccL6X4V", avgOffOccL6X4UV[1]);
+    m_monObj->setVariable("avgOffOccL6X5V", avgOffOccL6X5UV[1]);
     m_monObj->setVariable("avgOffOccL311V", avgOffOccL311UV[1]);
     m_monObj->setVariable("avgOffOccL312V", avgOffOccL312UV[1]);
     m_monObj->setVariable("avgOffOccL321V", avgOffOccL321UV[1]);
@@ -267,23 +315,38 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
 
   std::vector<float> avgEffL6 = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 16, 14, 18);
 
-  // average efficiency
+  // average efficiency for all layers
   std::vector<float> avgEffL3456 = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 16, 2, 18);
 
-  // average efficiency for mid plane +x L3.1.1, L3.1.2
-  std::vector<float> avgEffL31X = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 1, 2, 3);
+  // average efficiency for mid plane: L3.X.1
+  std::vector<float> avgEffL3X1 = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 7, 2, 2);
 
-  // average efficiency for mid plane +x L3.2.1, L3.2.2
-  std::vector<float> avgEffL32X = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 2, 2, 2, 3);
+  // average efficiency for mid plane: L3.X.2
+  std::vector<float> avgEffL3X2 = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 7, 3, 3);
+
+  // average efficiency for mid plane: L4.X.1
+  std::vector<float> avgEffL4X1 = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 10, 5, 5);
 
   // average efficiency for mid plane: L4.X.2
   std::vector<float> avgEffL4X2 = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 10, 6, 6);
+
+  // average efficiency for mid plane: L4.X.3
+  std::vector<float> avgEffL4X3 = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 10, 7, 7);
+
+  // average efficiency for mid plane: L5.X.1
+  std::vector<float> avgEffL5X1 = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 12, 9, 9);
 
   // average efficiency for mid plane: L5.X.2
   std::vector<float> avgEffL5X2 = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 12, 10, 10);
 
   // average efficiency for mid plane: L5.X.3
   std::vector<float> avgEffL5X3 = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 12, 11, 11);
+
+  // average efficiency for mid plane: L5.X.4
+  std::vector<float> avgEffL5X4 = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 12, 12, 12);
+
+  // average efficiency for mid plane: L6.X.1
+  std::vector<float> avgEffL6X1 = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 16, 14, 14);
 
   // average efficiency for mid plane: L6.X.2
   std::vector<float> avgEffL6X2 = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 16, 15, 15);
@@ -293,6 +356,11 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
 
   // average efficiency for mid plane: L6.X.4
   std::vector<float> avgEffL6X4 = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 16, 17, 17);
+
+  // average efficiency for mid plane: L6.X.5
+  std::vector<float> avgEffL6X5 = avgEfficiencyUV(h_matched_clusU, h_matched_clusV, h_found_tracksU, h_found_tracksV, 1, 16, 18, 18);
+
+
 
   // average efficiency for high occupancy sensors
 
@@ -334,14 +402,20 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("avgEffL5U", -1);
     m_monObj->setVariable("avgEffL6U", -1);
     m_monObj->setVariable("avgEffL3456U", -1);
-    m_monObj->setVariable("avgEffL31XU", -1);
-    m_monObj->setVariable("avgEffL32XU", -1);
+    m_monObj->setVariable("avgEffL3X1U", -1);
+    m_monObj->setVariable("avgEffL3X2U", -1);
+    m_monObj->setVariable("avgEffL4X1U", -1);
     m_monObj->setVariable("avgEffL4X2U", -1);
+    m_monObj->setVariable("avgEffL4X3U", -1);
+    m_monObj->setVariable("avgEffL5X1U", -1);
     m_monObj->setVariable("avgEffL5X2U", -1);
     m_monObj->setVariable("avgEffL5X3U", -1);
+    m_monObj->setVariable("avgEffL5X4U", -1);
+    m_monObj->setVariable("avgEffL6X1U", -1);
     m_monObj->setVariable("avgEffL6X2U", -1);
     m_monObj->setVariable("avgEffL6X3U", -1);
     m_monObj->setVariable("avgEffL6X4U", -1);
+    m_monObj->setVariable("avgEffL6X5U", -1);
     m_monObj->setVariable("avgEffL311U", -1);
     m_monObj->setVariable("avgEffL312U", -1);
     m_monObj->setVariable("avgEffL321U", -1);
@@ -358,14 +432,20 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("avgEffL5U", avgEffL5[0]);
     m_monObj->setVariable("avgEffL6U", avgEffL6[0]);
     m_monObj->setVariable("avgEffL3456U", avgEffL3456[0]);
-    m_monObj->setVariable("avgEffL31XU", avgEffL31X[0]);
-    m_monObj->setVariable("avgEffL32XU", avgEffL32X[0]);
+    m_monObj->setVariable("avgEffL3X1U", avgEffL3X1[0]);
+    m_monObj->setVariable("avgEffL3X2U", avgEffL3X2[0]);
+    m_monObj->setVariable("avgEffL4X1U", avgEffL4X1[0]);
     m_monObj->setVariable("avgEffL4X2U", avgEffL4X2[0]);
+    m_monObj->setVariable("avgEffL4X3U", avgEffL4X3[0]);
+    m_monObj->setVariable("avgEffL5X1U", avgEffL5X1[0]);
     m_monObj->setVariable("avgEffL5X2U", avgEffL5X2[0]);
     m_monObj->setVariable("avgEffL5X3U", avgEffL5X3[0]);
+    m_monObj->setVariable("avgEffL5X4U", avgEffL5X4[0]);
+    m_monObj->setVariable("avgEffL6X1U", avgEffL6X1[0]);
     m_monObj->setVariable("avgEffL6X2U", avgEffL6X2[0]);
     m_monObj->setVariable("avgEffL6X3U", avgEffL6X3[0]);
     m_monObj->setVariable("avgEffL6X4U", avgEffL6X4[0]);
+    m_monObj->setVariable("avgEffL6X5U", avgEffL6X5[0]);
     m_monObj->setVariable("avgEffL311U", avgEffL311UV[0]);
     m_monObj->setVariable("avgEffL312U", avgEffL312UV[0]);
     m_monObj->setVariable("avgEffL321U", avgEffL321UV[0]);
@@ -385,14 +465,20 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("avgEffL5V", -1);
     m_monObj->setVariable("avgEffL6V", -1);
     m_monObj->setVariable("avgEffL3456V", -1);
-    m_monObj->setVariable("avgEffL31XV", -1);
-    m_monObj->setVariable("avgEffL32XV", -1);
+    m_monObj->setVariable("avgEffL3X1V", -1);
+    m_monObj->setVariable("avgEffL3X2V", -1);
+    m_monObj->setVariable("avgEffL4X1V", -1);
     m_monObj->setVariable("avgEffL4X2V", -1);
+    m_monObj->setVariable("avgEffL4X3V", -1);
+    m_monObj->setVariable("avgEffL5X1V", -1);
     m_monObj->setVariable("avgEffL5X2V", -1);
     m_monObj->setVariable("avgEffL5X3V", -1);
+    m_monObj->setVariable("avgEffL5X4V", -1);
+    m_monObj->setVariable("avgEffL6X1V", -1);
     m_monObj->setVariable("avgEffL6X2V", -1);
     m_monObj->setVariable("avgEffL6X3V", -1);
     m_monObj->setVariable("avgEffL6X4V", -1);
+    m_monObj->setVariable("avgEffL6X5V", -1);
     m_monObj->setVariable("avgEffL311V", -1);
     m_monObj->setVariable("avgEffL312V", -1);
     m_monObj->setVariable("avgEffL321V", -1);
@@ -409,14 +495,20 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("avgEffL5V", avgEffL5[1]);
     m_monObj->setVariable("avgEffL6V", avgEffL6[1]);
     m_monObj->setVariable("avgEffL3456V", avgEffL3456[1]);
-    m_monObj->setVariable("avgEffL31XV", avgEffL31X[1]);
-    m_monObj->setVariable("avgEffL32XV", avgEffL32X[1]);
+    m_monObj->setVariable("avgEffL3X1V", avgEffL3X1[1]);
+    m_monObj->setVariable("avgEffL3X2V", avgEffL3X2[1]);
+    m_monObj->setVariable("avgEffL4X1V", avgEffL4X1[1]);
     m_monObj->setVariable("avgEffL4X2V", avgEffL4X2[1]);
+    m_monObj->setVariable("avgEffL4X3V", avgEffL4X3[1]);
+    m_monObj->setVariable("avgEffL5X1V", avgEffL5X1[1]);
     m_monObj->setVariable("avgEffL5X2V", avgEffL5X2[1]);
     m_monObj->setVariable("avgEffL5X3V", avgEffL5X3[1]);
+    m_monObj->setVariable("avgEffL5X4V", avgEffL5X4[1]);
+    m_monObj->setVariable("avgEffL6X1V", avgEffL6X1[1]);
     m_monObj->setVariable("avgEffL6X2V", avgEffL6X2[1]);
     m_monObj->setVariable("avgEffL6X3V", avgEffL6X3[1]);
     m_monObj->setVariable("avgEffL6X4V", avgEffL6X4[1]);
+    m_monObj->setVariable("avgEffL6X5V", avgEffL6X5[1]);
     m_monObj->setVariable("avgEffL311V", avgEffL311UV[1]);
     m_monObj->setVariable("avgEffL312V", avgEffL312UV[1]);
     m_monObj->setVariable("avgEffL321V", avgEffL321UV[1]);

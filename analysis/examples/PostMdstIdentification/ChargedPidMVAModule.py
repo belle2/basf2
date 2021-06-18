@@ -148,7 +148,14 @@ if __name__ == '__main__':
     for det in ["CDC", "TOP", "ARICH", "ECL", "KLM"]:
         if global_pid:
             for pdgId, d in std_charged.items():
-                variables.addAlias(f"{d.get('FULLNAME')}ID_{det}", f"pidProbabilityExpert({pdgId}, {det})")
+                orig = f"pidProbabilityExpert({pdgId}, {det})"
+                alias = f"{d.get('FULLNAME')}ID_{det}"
+                variables.addAlias(alias, orig)
+                # Log-transformed sub-detector likelihood ratios.
+                epsilon = 1e-8  # To avoid singularities due to limited numerical precision.
+                orig_transfo = f"formula(-1. * log10(formula(((1. - {orig}) + {epsilon}) / ({orig} + {epsilon}))))"
+                alias_transfo = f"{d.get('FULLNAME')}ID_{det}_LogTransfo"
+                variables.addAlias(alias_transfo, orig_transfo)
         elif binary_pid:
             for s, b in args.testHyposPDGCodePair:
                 s_name = std_charged.get(s).get("NAME")

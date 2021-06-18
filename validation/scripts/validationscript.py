@@ -64,7 +64,9 @@ class Script:
     @var _object: Pointer to the object itself. Is this even necessary?
     """
 
-    def __init__(self, path: str, package: str, log: Optional[logging.Logger] = None):
+    def __init__(
+        self, path: str, package: str, log: Optional[logging.Logger] = None
+    ):
         """!
         The default constructor.
         """
@@ -83,8 +85,8 @@ class Script:
         self.path = path
 
         # The runtime of the script
-        self.runtime = None  # type: Optional[int]
-        self.start_time = None  # type: Optional[int]
+        self.runtime: Optional[int] = None
+        self.start_time: Optional[int] = None
 
         # The name of the steering file. Basically the file name of the
         # steering file, but everything that is not a letter is replaced
@@ -117,19 +119,19 @@ class Script:
         self.control = None
 
         # The returncode of the script. Should be 0 if all went well.
-        self.returncode = None  # type: Optional[int]
+        self.returncode: Optional[int] = None
 
         #: Id of job for job submission. This is set by some of the
         #: cluster controls in order to terminate the job if it exceeds the
         #: runtime.
-        self.job_id = None  # type: Optional[str]
+        self.job_id: Optional[str] = None
 
     @staticmethod
     def sanitize_file_name(file_name):
         """!
         Replaces the . between the file name and extension with an underscore _
         """
-        return re.sub(r'[\W_]+', '_', file_name)
+        return re.sub(r"[\W_]+", "_", file_name)
 
     def to_json(self, current_tag):
 
@@ -152,9 +154,9 @@ class Script:
             self.name_not_sanitized,
             self.path,
             string_status,
-            log_url=os.path.join(self.package, self.name_not_sanitized) +
-            ".log",
-            return_code=self.returncode
+            log_url=os.path.join(self.package, self.name_not_sanitized)
+            + ".log",
+            return_code=self.returncode,
         )
 
     def get_recursive_dependencies(self, scripts, level=0):
@@ -165,9 +167,9 @@ class Script:
 
         if level > 50:
             self.log.error(
-                f'Recurisve dependency lookup reached level {level} and will '
-                f'quit now. Possibly circular dependcencies in the validation '
-                f'scripts ? '
+                f"Recurisve dependency lookup reached level {level} and will "
+                f"quit now. Possibly circular dependcencies in the validation "
+                f"scripts ? "
             )
 
         all_deps = set()
@@ -182,11 +184,12 @@ class Script:
             rec_deps = []
             if len(dep_script) == 1:
                 rec_deps = dep_script[0].get_recursive_dependencies(
-                    scripts, next_level)
+                    scripts, next_level
+                )
             else:
                 self.log.error(
-                    f'Depending script with the name {dep.name} could not be '
-                    f'found in the list of registered scripts. '
+                    f"Depending script with the name {dep.name} could not be "
+                    f"found in the list of registered scripts. "
                 )
 
             # only add, if not already in the dependencies list
@@ -214,19 +217,15 @@ class Script:
 
             # Find the script which is responsible for the creation of
             # the input file (in the same package or in validation folder)
-            creator = find_creator(
-                root_file,
-                self.package,
-                scripts,
-                self.log
-            )
+            creator = find_creator(root_file, self.package, scripts, self.log)
 
             # If no creator could be found, raise an error!
             if creator is None:
                 self.log.error(
-                    f'Unmatched dependency for {self.path}: {root_file} '
-                    f'has no creator! This means that we will have to skip '
-                    f'this script.')
+                    f"Unmatched dependency for {self.path}: {root_file} "
+                    f"has no creator! This means that we will have to skip "
+                    f"this script."
+                )
                 self.status = ScriptStatus.skipped
 
             # If creator(s) could be found, add those scripts to the
@@ -257,14 +256,14 @@ class Script:
             steering_file_content = data.read()
 
         # Define the regex to extract everything between the <header>-tags
-        pat = re.compile('(<header>.*?</header>)', re.DOTALL | re.M)
+        pat = re.compile("(<header>.*?</header>)", re.DOTALL | re.M)
 
         # Apply the regex, i.e. filter out the <header>...</header> part of
         # each steering file.
         try:
             xml = pat.findall(steering_file_content)[0].strip()
         except IndexError:
-            self.log.error('No file header found: ' + self.path)
+            self.log.error("No file header found: " + self.path)
             self.header_parsing_errors = True
             return
 
@@ -272,7 +271,7 @@ class Script:
         try:
             xml_tree = XMLTree.ElementTree(XMLTree.fromstring(xml)).getroot()
         except XMLTree.ParseError:
-            self.log.error('Invalid XML in header: ' + self.path)
+            self.log.error("Invalid XML in header: " + self.path)
             self.header_parsing_errors = True
             return
 
@@ -283,7 +282,7 @@ class Script:
         for branch in xml_tree:
 
             # The keywords that should be parsed into a list
-            list_tags = ['input', 'output', 'contact']
+            list_tags = ["input", "output", "contact"]
 
             # If the tag is empty branch.text is None. Replacing None with an
             # empty string in this case.
@@ -291,11 +290,11 @@ class Script:
 
             # Format the values of each branch
             if branch.tag.strip() in list_tags:
-                branch_value = [__.strip() for __ in branch_text.split(',')]
-                if branch_value == ['']:
+                branch_value = [__.strip() for __ in branch_text.split(",")]
+                if branch_value == [""]:
                     branch_value = []
             else:
-                branch_value = re.sub(' +', ' ', branch_text.replace('\n', ''))
+                branch_value = re.sub(" +", " ", branch_text.replace("\n", ""))
                 branch_value = branch_value.strip()
 
             # Append the branch and its values to the header-dict. This
@@ -317,7 +316,7 @@ class Script:
         This information is only available, if load_header has been called
         """
         self.load_header()
-        return self._header.get('input', [])
+        return self._header.get("input", [])
 
     @property
     def output_files(self):
@@ -326,7 +325,7 @@ class Script:
         This information is only available, if load_header has been called
         """
         self.load_header()
-        return self._header.get('output', [])
+        return self._header.get("output", [])
 
     @property
     def is_cacheable(self):
@@ -336,7 +335,7 @@ class Script:
         This information is only available, if load_header has been called
         """
         self.load_header()
-        return 'cacheable' in self._header
+        return "cacheable" in self._header
 
     @property
     def noexecute(self) -> bool:
@@ -381,10 +380,7 @@ class Script:
 
 
 def find_creator(
-        outputfile: str,
-        package: str,
-        scripts: List[Script],
-        log: logging.Logger
+    outputfile: str, package: str, scripts: List[Script], log: logging.Logger
 ) -> Optional[List[Script]]:
     """!
     This function receives the name of a file and tries to find the file
@@ -401,8 +397,11 @@ def find_creator(
 
     # Get a list of all Script objects for scripts in the given package as well
     # as from the validation-folder
-    candidates = [script for script in scripts
-                  if script.package in [package, 'validation']]
+    candidates = [
+        script
+        for script in scripts
+        if script.package in [package, "validation"]
+    ]
 
     # Reserve some space for the results we will return
     results = []
@@ -417,5 +416,5 @@ def find_creator(
     if len(results) == 0:
         return None
     if len(results) > 1:
-        log.warning('Found multiple creators for' + outputfile)
+        log.warning("Found multiple creators for" + outputfile)
     return results

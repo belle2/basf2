@@ -4,6 +4,7 @@ import re
 import os
 from typing import Optional, List
 import logging
+from pathlib import Path
 
 # Import XML Parser. Use C-Version, if available
 try:
@@ -362,6 +363,21 @@ class Script:
         """ Interval of script executation as set in header """
         self.load_header()
         return self._header.get("interval", "nightly")
+
+    def remove_output_files(self) -> None:
+        """Remove all output files. This is used to clean up files after a
+        script is marked as failed. Leaving the output files in a possible
+        corrupted state and risk having them found by the validation framework
+        later for crashes isn't sensible.
+        """
+        for f in map(Path, self.output_files):
+            if f.exists():
+                self.log.warning(
+                    f"Removing output file {f} because script failed"
+                )
+                # from py 3.8 there will be missing_ok=True so we don't need
+                # the if
+                f.unlink()
 
 
 def find_creator(

@@ -174,7 +174,6 @@ def add_hlt_processing(path,
 
     # Perform HLT filter calculation
     path_utils.add_filter_software_trigger(path, store_array_debug_prescale=1)
-    path.add_module('StatisticsSummary').set_name('Sum_HLT_Filter_Calculation')
 
     # Add the part of the dqm modules, which should run after every reconstruction
     path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter,

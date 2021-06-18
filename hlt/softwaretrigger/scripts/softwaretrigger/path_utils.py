@@ -110,6 +110,8 @@ def add_filter_software_trigger(path,
                                      baseIdentifier="filter",
                                      preScaleStoreDebugOutputToDataStore=store_array_debug_prescale,
                                      useRandomNumbersForPreScale=use_random_numbers_for_prescale)
+    # Statistics Summary
+    path.add_module('StatisticsSummary').set_name('Sum_HLT_Filter_Calculation')
 
     return hlt_cut_module
 
@@ -165,6 +167,9 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     path.add_module("SoftwareTrigger", baseIdentifier="skim",
                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)
 
+    # Statistics Summary
+    path.add_module('StatisticsSummary').set_name('Sum_HLT_Skim_Calculation')
+
 
 def add_pre_filter_reconstruction(path, run_type, components, **kwargs):
     """
@@ -215,10 +220,8 @@ def add_post_filter_reconstruction(path, run_type, components):
         reconstruction.add_postfilter_reconstruction(path, components=components)
 
         add_skim_software_trigger(path, store_array_debug_prescale=1)
-        path.add_module('StatisticsSummary').set_name('Sum_HLT_Skim_Calculation')
     elif run_type == constants.RunTypes.cosmic:
         add_skim_software_trigger(path, store_array_debug_prescale=1)
-        path.add_module('StatisticsSummary').set_name('Sum_HLT_Skim_Calculation')
     else:
         basf2.B2FATAL(f"Run Type {run_type} not supported.")
 

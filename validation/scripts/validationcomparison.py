@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 import argparse
 import numpy
 import os.path
-from typing import Optional
+from typing import Optional, Any
 
 # 3rd
 import ROOT
@@ -62,7 +62,7 @@ class TooFewBins(Exception):
 def get_comparison(
         object_1,
         object_2,
-        mop: Optional[MetaOptionParser]
+        mop: Optional[MetaOptionParser] = None,
 ) -> "ComparisonBase":
     """ Uses the metaoptions to determine which comparison algorithm is used
     and initializes the corresponding subclass of :class:`ComparisonBase` that
@@ -71,8 +71,10 @@ def get_comparison(
     @param object_2 ROOT TObject
     @param mop Metaoption parser
     """
+    if mop is None:
+        mop = MetaOptionParser()
     if mop.has_option("kolmogorov"):
-        tester = KolmogorovTest
+        tester: Any = KolmogorovTest
     elif mop.has_option("andersondarling"):
         tester = AndersonDarlingTest
     else:

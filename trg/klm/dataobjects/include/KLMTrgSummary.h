@@ -73,6 +73,9 @@ namespace Belle2 {
       Sector_mask_Forward_Endcap = mask;
     }
 
+
+
+
     int getBKLM_n_trg_sectors() const
     {
       return m_bklm_n_trg_sectors;
@@ -135,6 +138,34 @@ namespace Belle2 {
       return Sector_mask_OR_Forward_Endcap ;
     }
 
+
+
+
+
+    void setSector_mask_OR_Backward_Barrel(int mask)
+    {
+      Sector_mask_OR_Backward_Barrel = mask;
+    }
+
+    void setSector_mask_OR_Forward_Barrel(int mask)
+    {
+      Sector_mask_OR_Forward_Barrel = mask;
+
+    }
+    void setSector_mask_OR_Backward_Endcap(int mask)
+    {
+      Sector_mask_OR_Backward_Endcap = mask;
+
+    }
+    void setSector_mask_OR_Forward_Endcap(int mask)
+    {
+      Sector_mask_OR_Forward_Endcap = mask;
+    }
+
+
+
+  private:
+
     int  Sector_mask_Backward_Barrel = 0;
     int  Sector_mask_Forward_Barrel = 0;
     int  Sector_mask_Backward_Endcap = 0;
@@ -153,9 +184,8 @@ namespace Belle2 {
     int  m_eklm_back_to_back_flag = 0;
 
 
-    //! Needed to make the ROOT object storable
-    //! version 4 adds ctime etc
-    ClassDef(KLMTrgSummary, 4);
+
+    ClassDef(KLMTrgSummary, 5);
   };
 } // end of namespace Belle2
 

@@ -303,14 +303,14 @@ void KLMTriggerModule::event()
   m_KLMTrgSummary->setSector_mask_Backward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(i_backward_eklm), 0 , sector_mask{}));
   m_KLMTrgSummary->setSector_mask_Forward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(i_forward_eklm) , 0 , sector_mask{}));
 
-  m_KLMTrgSummary->Sector_mask_OR_Backward_Barrel = first_or_default(n_triggered_sectors2, isectors_t(i_backward_bklm), 0 ,
-                                                    sector_mask_or{});
-  m_KLMTrgSummary->Sector_mask_OR_Forward_Barrel = first_or_default(n_triggered_sectors2, isectors_t(i_forward_bklm) , 0 ,
-                                                   sector_mask_or{});
-  m_KLMTrgSummary->Sector_mask_OR_Backward_Endcap = first_or_default(n_triggered_sectors2, isectors_t(i_backward_eklm), 0 ,
-                                                    sector_mask_or{});
-  m_KLMTrgSummary->Sector_mask_OR_Forward_Endcap = first_or_default(n_triggered_sectors2, isectors_t(i_forward_eklm) , 0 ,
-                                                   sector_mask_or{});
+  m_KLMTrgSummary->setSector_mask_OR_Backward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(i_backward_bklm), 0 ,
+                                                     sector_mask_or{}));
+  m_KLMTrgSummary->setSector_mask_OR_Forward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(i_forward_bklm) , 0 ,
+                                                    sector_mask_or{}));
+  m_KLMTrgSummary->setSector_mask_OR_Backward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(i_backward_eklm), 0 ,
+                                                     sector_mask_or{}));
+  m_KLMTrgSummary->setSector_mask_OR_Forward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(i_forward_eklm) , 0 ,
+                                                    sector_mask_or{}));
 
   m_KLMTrgSummary->setBKLM_back_to_back_flag(first_or_default(summery1, KLM_type(KLMElementNumbers::c_BKLM), 0 , back2back_t{}));
   m_KLMTrgSummary->setEKLM_back_to_back_flag(first_or_default(summery1, KLM_type(KLMElementNumbers::c_EKLM), 0 , back2back_t{}));

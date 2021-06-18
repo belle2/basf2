@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 import argparse
 import numpy
 import os.path
-from typing import Optional
+from typing import Optional, Any
 
 # 3rd
 import ROOT
@@ -62,7 +62,7 @@ class TooFewBins(Exception):
 def get_comparison(
         object_1,
         object_2,
-        mop: Optional[MetaOptionParser]
+        mop: Optional[MetaOptionParser] = None,
 ) -> "ComparisonBase":
     """ Uses the metaoptions to determine which comparison algorithm is used
     and initializes the corresponding subclass of :class:`ComparisonBase` that
@@ -71,8 +71,10 @@ def get_comparison(
     @param object_2 ROOT TObject
     @param mop Metaoption parser
     """
+    if mop is None:
+        mop = MetaOptionParser()
     if mop.has_option("kolmogorov"):
-        tester = KolmogorovTest
+        tester: Any = KolmogorovTest
     elif mop.has_option("andersondarling"):
         tester = AndersonDarlingTest
     else:
@@ -326,7 +328,7 @@ class PvalueTest(ComparisonBase):
 
     #: Default pvalue below which a warning is issued (unless supplied in
     #: metaoptions)
-    _default_pvalue_warn = 1.0
+    _default_pvalue_warn = 0.99
 
     #: Default pvalue below which an error is issued (unless supplied in
     #: metaoptions)
@@ -602,7 +604,7 @@ class KolmogorovTest(PvalueTest):
                )
 
 # ------------------------------------------------------------------------------
-# Anderson Darling Test
+# Anderson-Darling Test
 # ------------------------------------------------------------------------------
 
 
@@ -611,7 +613,7 @@ class AndersonDarlingTest(PvalueTest):
 
     def __init__(self, *args, **kwargs):
         """
-        Initialize Kolmogorov test.
+        Initialize Anderson-Darling test.
         @param args: See arguments of :class:`ComparisonBase`
         @param kwargs:  See arguments of :class:`ComparisonBase`
         """
@@ -641,15 +643,15 @@ class AndersonDarlingTest(PvalueTest):
         if self.debug:
             option_str += "D"
 
-        self._pvalue = local_object_a.KolmogorovTest(local_object_b, option_str)
+        self._pvalue = local_object_a.AndersonDarlingTest(local_object_b, option_str)
 
     def _get_comparison_result_long(self) -> str:
         if self._pvalue is None:
-            return r"Could not perform Anderson Darling test between " \
+            return r"Could not perform-Anderson Darling test between " \
                    r"{{revision1}} and {{revision2}} due to an unknown error." \
                    r" Please support a bug report."
 
-        return r'Performed Anderson Darling test between {{revision1}} ' \
+        return r'Performed Anderson-Darling test between {{revision1}} ' \
                r'and {{revision2}} ' \
                r' <b>p-value: {pvalue:.6f}</b> (p-value warn: {pvalue_warn}, ' \
                r'p-value error: {pvalue_error})'.format(

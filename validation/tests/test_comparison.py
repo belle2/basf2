@@ -40,20 +40,25 @@ class TestGetComparison(unittest.TestCase):
         Check that this indeed returns 'equal'.
         """
         for tester_name in self.test_options:
-            for obj in self.obj_pairs:
+            for objs in self.obj_pairs:
+                names: Tuple[str, str] = (objs[0].GetName(), objs[1].GetName())
                 with self.subTest(
                         tester=tester_name,
-                        obj1=obj[0].GetName(),
-                        obj2=obj[1].GetName()
+                        obj1=names[0],
+                        obj2=names[1],
                 ):
                     tester = validationcomparison.get_comparison(
-                        obj[0],
-                        obj[1],
+                        objs[0],
+                        objs[1],
                         metaoptions.MetaOptionParser(
                             self.test_options[tester_name].split(",")
                         )
                     )
-                    self.assertEqual(tester.comparison_result, obj[2])
+                    print(f"{names[0]}, {names[1]}: "
+                          f"{tester.comparison_result_long}. "
+                          f"Short result: {tester.comparison_result}. "
+                          f"Expectation: {objs[2]}")
+                    self.assertEqual(tester.comparison_result, objs[2])
 
 
 class TestComparison(unittest.TestCase):

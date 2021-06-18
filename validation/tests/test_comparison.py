@@ -24,15 +24,15 @@ class TestGetComparison(unittest.TestCase):
             "kolmogorov": "kolmogorov",
             "andersondarling": "andersondarling"
         }
-        basic_gaus_th1f = ROOT.TH1F("th1f", "th1f", 5, -3, 3)
-        basic_gaus_th1f.FillRandom("gaus", 1000)
-        different_gaus_th1f = ROOT.TH1F("th1f", "th1f", 5, -3, 3)
-        different_gaus_th1f.FillRandom("expo", 1000)
+        gaus_th1f = ROOT.TH1F("gaus", "gaus", 5, -3, 3)
+        gaus_th1f.FillRandom("gaus", 1000)
+        exponential_th1f = ROOT.TH1F("expo", "expo", 5, -3, 3)
+        exponential_th1f.FillRandom("expo", 1000)
         #: ROOT objects used to check if comparison executes
-        self.obj_pairs = [
-            (basic_gaus_th1f, basic_gaus_th1f, "equal"),
-            (basic_gaus_th1f, different_gaus_th1f, "error"),
-        ]  # type: List[Tuple[ROOT.TObject, ROOT.TObject, str]]
+        self.obj_pairs: List[Tuple[ROOT.TObject, ROOT.TObject, str]] = [
+            (gaus_th1f, gaus_th1f, "equal"),
+            (gaus_th1f, exponential_th1f, "error"),
+        ]
 
     def test_get_comparison(self):
         """ Use get_tester on the metaoptions to get the requested

@@ -36,23 +36,13 @@ using namespace std;
 using namespace Belle2;
 using namespace Belle2::group_helper;
 
-
-
-
-
 //! Total number of sections
 const int c_TotalSections_per_EKLM_BKLM = 2;
-
-
-
-
-
 
 const int i_forward_eklm = 2;
 const int i_backward_eklm = 3;
 const int i_forward_bklm = 0;
 const int i_backward_bklm = 1;
-
 
 const std::string m_klmTriggerSummery =  "TRGKLMSummery"; //"Name of the StoreArray holding the Trigger Summery"
 
@@ -112,24 +102,12 @@ KLMTriggerModule::KLMTriggerModule() : Module()
 {
   setDescription("KLM trigger simulation");
   setPropertyFlags(c_ParallelProcessingCertified);
-
-
-  addParam("nLayerTrigger", m_nLayerTrigger, "", 5);
-
-  addParam("LayerUsed", m_dummy_used_layers, "List of layers used for the simulation", string("2:16"));
-
-
-
-
-
 }
 
 void KLMTriggerModule::initialize()
 {
-
   m_KLMTrgSummary.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
-  B2INFO("KLMTrigger: m_dummy_used_layers " << m_dummy_used_layers);
-  m_layerUsed = layer_string_list_to_integer(m_dummy_used_layers);
+  B2DEBUG(20, "KLMTrigger: m_dummy_used_layers " << m_dummy_used_layers);
 
   StoreArray<KLMDigit> klmDigits;
   klmDigits.isRequired();
@@ -145,10 +123,6 @@ void KLMTriggerModule::initialize()
   klmTriggerTracks.registerInDataStore();
   klmTriggerTracks.registerRelationTo(klmTriggerHits);
 // end unused
-
-
-
-
 }
 
 void KLMTriggerModule::beginRun()
@@ -156,6 +130,16 @@ void KLMTriggerModule::beginRun()
   StoreObjPtr<EventMetaData> evtMetaData;
   B2DEBUG(100, "KLMTrigger: Experiment " << evtMetaData->getExperiment() << ", run " << evtMetaData->getRun());
 
+  if (not m_KLMTriggerParameters.isValid())
+    B2FATAL("KLM trigger parameters are not available.");
+  m_nLayerTrigger = m_KLMTriggerParameters->getNLayers();
+  try {
+    m_layerUsed = layer_string_list_to_integer(m_KLMTriggerParameters->getWhichLayers());
+  } catch (const std::exception& e) {
+    B2FATAL("Something went wrong when parsing the 'm_whichLayers' string"
+            << LogVar("string", m_KLMTriggerParameters->getWhichLayers())
+            << LogVar("exception", e.what()));
+  }
 }
 
 
@@ -163,11 +147,6 @@ void KLMTriggerModule::endRun()
 {
 
 }
-
-
-
-
-
 
 // cppcheck-suppress  noExplicitConstructor
 AXIS_NAME(KLM_type, int);// cppcheck-suppress  noExplicitConstructor
@@ -248,9 +227,6 @@ auto to_sector_bit_mask(const CONTAINER_T& container, TriggerCut TriggerCut_ , v
 
 void KLMTriggerModule::event()
 {
-
-
-
   m_KLMTrgSummary.create();
 
   StoreArray<KLMDigit> klmDigits;

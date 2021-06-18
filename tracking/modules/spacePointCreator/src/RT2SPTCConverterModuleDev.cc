@@ -394,6 +394,7 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
     }
 
     // Look up if it is part of single cluster SP collection. If no dedicated collection is given the default collection will be tried again!
+    // cppcheck-suppress knownConditionTrueFalse
     if (clusterA && spacePointCandidates.size() != 1 && m_useSingleClusterSP) {
 
       // look if it as single cluster!

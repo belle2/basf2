@@ -773,11 +773,13 @@ namespace VXDTFObserversTest {
         if (aParticle == nullptr) { nullptrTrap = 1; }
         EXPECT_EQ(0, nullptrTrap);
 
-        EXPECT_EQ(aSP.getArrayIndex(), aCluster.getArrayIndex());
-        EXPECT_EQ(aSP.getArrayIndex(), aParticle->getArrayIndex());
-        EXPECT_EQ(int(aParticle->getMomentum().X()), aParticle->getArrayIndex() + 1);
-        EXPECT_EQ(int(aParticle->getMomentum().Y()), aParticle->getArrayIndex() + 1);
-        EXPECT_EQ(int(aParticle->getMomentum().Z()), aParticle->getArrayIndex() + 1);
+        if (aParticle) {
+          EXPECT_EQ(aSP.getArrayIndex(), aCluster.getArrayIndex());
+          EXPECT_EQ(aSP.getArrayIndex(), aParticle->getArrayIndex());
+          EXPECT_EQ(int(aParticle->getMomentum().X()), aParticle->getArrayIndex() + 1);
+          EXPECT_EQ(int(aParticle->getMomentum().Y()), aParticle->getArrayIndex() + 1);
+          EXPECT_EQ(int(aParticle->getMomentum().Z()), aParticle->getArrayIndex() + 1);
+        }
 
         nullptrTrap = 0;
       }
@@ -788,11 +790,13 @@ namespace VXDTFObserversTest {
         if (aParticle == nullptr) { nullptrTrap = 2; }
         EXPECT_EQ(0, nullptrTrap);
 
-        EXPECT_EQ(aSP.getArrayIndex(), 2 + aCluster.getArrayIndex() / 2);
-        EXPECT_EQ(aSP.getArrayIndex() / 4, aParticle->getArrayIndex());
-        EXPECT_EQ(int(aParticle->getMomentum().X()), aParticle->getArrayIndex() + 1);
-        EXPECT_EQ(int(aParticle->getMomentum().Y()), aParticle->getArrayIndex() + 1);
-        EXPECT_EQ(int(aParticle->getMomentum().Z()), aParticle->getArrayIndex() + 1);
+        if (aParticle) {
+          EXPECT_EQ(aSP.getArrayIndex(), 2 + aCluster.getArrayIndex() / 2);
+          EXPECT_EQ(aSP.getArrayIndex() / 4, aParticle->getArrayIndex());
+          EXPECT_EQ(int(aParticle->getMomentum().X()), aParticle->getArrayIndex() + 1);
+          EXPECT_EQ(int(aParticle->getMomentum().Y()), aParticle->getArrayIndex() + 1);
+          EXPECT_EQ(int(aParticle->getMomentum().Z()), aParticle->getArrayIndex() + 1);
+        }
 
         nullptrTrap = 0;
       }

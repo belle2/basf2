@@ -123,7 +123,7 @@ def get1DBinningFromReference(name, refFileName):
         return nbins, x_min, x_max
 
     # store current directory to not confuse directories by opening a TFile
-    oldDirectory = ROOT.gROOT.CurrentDirectory()
+    oldDirectory = ROOT.gROOT.CurrentDirectory().load()
 
     tfile = ROOT.TFile(refFileName)
     if tfile.IsOpen():

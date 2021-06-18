@@ -63,7 +63,7 @@ class Script:
     @var _object: Pointer to the object itself. Is this even necessary?
     """
 
-    def __init__(self, path: str, package: str, log: Optional[logging.Logger]):
+    def __init__(self, path: str, package: str, log: Optional[logging.Logger] = None):
         """!
         The default constructor.
         """
@@ -74,7 +74,9 @@ class Script:
 
         # stores the reference to the logging object used in this validation
         # run
-        self.log = log
+        if log is None:
+            log = logging.Logger("script")
+        self.log: logging.Logger = log
 
         # The (absolute) path of the steering file
         self.path = path

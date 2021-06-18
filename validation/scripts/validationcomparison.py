@@ -328,7 +328,7 @@ class PvalueTest(ComparisonBase):
 
     #: Default pvalue below which a warning is issued (unless supplied in
     #: metaoptions)
-    _default_pvalue_warn = 1.0
+    _default_pvalue_warn = 0.99
 
     #: Default pvalue below which an error is issued (unless supplied in
     #: metaoptions)

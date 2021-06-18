@@ -647,7 +647,7 @@ class AndersonDarlingTest(PvalueTest):
 
     def _get_comparison_result_long(self) -> str:
         if self._pvalue is None:
-            return r"Could not perform-Anderson Darling test between " \
+            return r"Could not perform Anderson-Darling test between " \
                    r"{{revision1}} and {{revision2}} due to an unknown error." \
                    r" Please support a bug report."
 

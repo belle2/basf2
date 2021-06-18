@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <cdc/modules/cdcDigitizer/CDCDigitizerModule.h>
+#include <cdc/modules/cdcDigitizer/EDepInGas.h>
 #include <cdc/utilities/ClosestApproach.h>
 
 #include <framework/datastore/RelationArray.h>
@@ -95,12 +96,12 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
 
   //Threshold
   addParam("TDCThreshold4Outer", m_tdcThreshold4Outer,
-           "TDC threshold (dE in eV) for Layers#8-56. The value corresponds to He-C2H6 gas; for the gas+wire (MaterialDefinitionMode=0) case, (this value)*f will be used, where f is specified by GasToGasWire",
-           25.0);
+           "TDC threshold (dE in eV) for Layers#8-56. The value corresponds to He-C2H6 gas", 25.0);
   addParam("TDCThreshold4Inner", m_tdcThreshold4Inner,
            "Same as TDCThreshold4Outer but for Layers#0-7,", 25.0);
-  addParam("GasToGasWire", m_gasToGasWire,
-           "(Approximate) ratio of dE in He/C2H6-gas to dE in gas+wire, where dE is energy deposit.", 1. / 1.478);
+  addParam("EDepInGasMode", m_eDepInGasMode,
+           "Mode for extracting energy deposit in gas from energy deposit in gas+wire; =0: scaling using electron density; 1: scaling using most probab. energy deposit; 2: similar to 2 but slightly different; 3: extraction based on probability",
+           0);
 
   //ADC Threshold
   addParam("ADCThreshold", m_adcThreshold,
@@ -136,7 +137,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   //Some FEE params.
   addParam("TDCThresholdOffset", m_tdcThresholdOffset, "Offset for TDC (digital) threshold (mV)", 3820.);
   addParam("AnalogGain",   m_analogGain, "Analog  gain (V/pC)", 1.1);
-  addParam("DigitalGain", m_digitalGain, "Digital gain (V/pC)", 15.);
+  addParam("DigitalGain", m_digitalGain, "Digital gain (V/pC)", 7.);
   addParam("ADCBinWidth", m_adcBinWidth, "ADC bin width  (mV)",  2.);
 
   addParam("AddFudgeFactorForSigma", m_addFudgeFactorForSigma,
@@ -178,11 +179,6 @@ void CDCDigitizerModule::initialize()
   m_driftV       = cdcgp.getNominalDriftV();
   m_driftVInv    = 1. / m_driftV;
   m_propSpeedInv = 1. / cdcgp.getNominalPropSpeed();
-  m_scaleFac = 1.;
-  if (m_cdcgp->getMaterialDefinitionMode() == 0) { //gas+wire mode
-    m_scaleFac = m_gasToGasWire;
-  }
-  m_scaleFac *= Unit::GeV;
   m_gcp = &(CDCGeoControlPar::getInstance());
   m_totalFudgeFactor  = m_cdcgp->getFudgeFactorForSigma(2);
   m_totalFudgeFactor *= m_addFudgeFactorForSigma;
@@ -441,8 +437,12 @@ void CDCDigitizerModule::event()
     //Sum ADC count
     const double stepLength  = m_aCDCSimHit->getStepLength() * Unit::cm;
     const double costh = m_momentum.z() / m_momentum.Mag();
-    const double hitdE = m_scaleFac * m_aCDCSimHit->getEnergyDep();
-    //    B2DEBUG(29, "m_scaleFac,UnitGeV= " << m_scaleFac <<" "<< Unit::GeV);
+    double hitdE = m_aCDCSimHit->getEnergyDep();
+    if (m_cdcgp->getMaterialDefinitionMode() != 2) {  // for non wire-by-wire mode
+      static EDepInGas& edpg = EDepInGas::getInstance();
+      hitdE = edpg.getEDepInGas(m_eDepInGasMode, m_aCDCSimHit->getPDGCode(), m_momentum.Mag(), stepLength, hitdE);
+    }
+
     unsigned short layerID = m_wireID.getICLayer();
     unsigned short cellID  = m_wireID.getIWire();
     //    unsigned short adcCount = getADCCount(layerID, cellID, hitdE, stepLength, costh);
@@ -469,6 +469,7 @@ void CDCDigitizerModule::event()
       dEThreshold = (m_wireID.getISuperLayer() == 0) ? m_tdcThreshold4Inner : m_tdcThreshold4Outer;
       dEThreshold *= Unit::eV;
     }
+    dEThreshold /= m_runGain;
     B2DEBUG(m_debugLevel, "hitdE,dEThreshold,driftLength " << hitdE << " " << dEThreshold << " " << hitDriftLength);
 
     if (hitdE < dEThreshold) {

@@ -71,8 +71,6 @@ void ClawDigitizerModule::event()
 {
 
   StoreArray<ClawSimHit> ClawSimHits;
-  StoreArray<ClawHit> ClawHits;
-
   //Skip events with no ClawSimHits, but continue the event counter
   if (ClawSimHits.getEntries() == 0) {
     return;

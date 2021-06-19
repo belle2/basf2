@@ -30,7 +30,7 @@ namespace Belle2 {
    *
    * 32 Bits are reserved. 4 Bits for each layer: 2 Bits for each PXD normal/gated-mode, 2 Bits for each SVD U/V-side. In total 24 Bits are used to represent hit patterns.
    * Remaining upper 8 Bits are resevered for information.
-   * Lowest 2 Bits for V0 daghters (innermost hit share status), assigned in V0Finder. 0x1(0x2) bit represents V/z(U/r-phi)-hit share.
+   * Lowest 2 Bits for V0 daughters (innermost hit share status), assigned in V0Finder. 0x1(0x2) bit represents V/z(U/r-phi)-hit share.
    */
   class HitPatternVXD {
     friend class HitPatternVXDTest_General_Test;

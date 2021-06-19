@@ -1108,6 +1108,7 @@ class Validation:
                 self.log.warning(
                     f'exit_status was {result[1]} for {script_obj.path}'
                 )
+                script_obj.remove_output_files()
 
                 # Skip all dependent scripts
                 self.skip_script(

@@ -4,6 +4,7 @@ import re
 import os
 from typing import Optional, List
 import logging
+from pathlib import Path
 
 # Import XML Parser. Use C-Version, if available
 try:
@@ -63,7 +64,7 @@ class Script:
     @var _object: Pointer to the object itself. Is this even necessary?
     """
 
-    def __init__(self, path: str, package: str, log: Optional[logging.Logger]):
+    def __init__(self, path: str, package: str, log: Optional[logging.Logger] = None):
         """!
         The default constructor.
         """
@@ -74,7 +75,9 @@ class Script:
 
         # stores the reference to the logging object used in this validation
         # run
-        self.log = log
+        if log is None:
+            log = logging.Logger("script")
+        self.log: logging.Logger = log
 
         # The (absolute) path of the steering file
         self.path = path
@@ -360,6 +363,18 @@ class Script:
         """ Interval of script executation as set in header """
         self.load_header()
         return self._header.get("interval", "nightly")
+
+    def remove_output_files(self) -> None:
+        """Remove all output files. This is used to clean up files after a
+        script is marked as failed. Leaving the output files in a possible
+        corrupted state and risk having them found by the validation framework
+        later for crashes isn't sensible.
+        """
+        for f in map(Path, self.output_files):
+            self.log.warning(
+                f"Removing output file {f} (if exists) because script failed"
+            )
+            f.unlink(missing_ok=True)
 
 
 def find_creator(

@@ -71,9 +71,7 @@ void ClawsDigitizerModule::beginRun()
 void ClawsDigitizerModule::event()
 {
 
-  StoreArray<MCParticle> particles;
   StoreArray<CLAWSSimHit> CLAWSSimHits;
-  StoreArray<ClawsHit> ClawsHits;
 
   //Skip events with no CLAWSSimHits, but continue the event counter
   if (CLAWSSimHits.getEntries() == 0) {

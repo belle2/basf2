@@ -70,7 +70,6 @@ void ClawDigitizerModule::beginRun()
 void ClawDigitizerModule::event()
 {
 
-  StoreArray<MCParticle> particles;
   StoreArray<ClawSimHit> ClawSimHits;
   StoreArray<ClawHit> ClawHits;
 

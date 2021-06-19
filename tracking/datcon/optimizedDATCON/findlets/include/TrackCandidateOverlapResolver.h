@@ -51,7 +51,7 @@ namespace Belle2 {
     std::string m_param_resolveMethod = "greedy";
 
     /// Minimum of activityState of candidate required to be accepted by the algorithm.
-    float m_param_minActivityState = 0.7;
+    double m_param_minActivityState = 0.7;
 
     /// Estimated amount of active candidates used to reserve enough space.
     unsigned short m_estimatedActiveCandidates = 1000;

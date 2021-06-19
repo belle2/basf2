@@ -95,7 +95,7 @@ namespace Belle2 {
     uint m_param_nVerticalSectors = 256;
 
     /// vertical size of the Hough Space, defaults to the value for u-side
-    double m_param_verticalHoughSpaceSize = 0.2;
+    double m_param_verticalHoughSpaceSize = 0.25;
 
     /// minimum x value of the Hough Space, defaults to the value for u-side
     double m_param_minimumX = -3.168;

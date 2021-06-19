@@ -79,11 +79,11 @@ namespace Belle2 {
     //  b) the residuals show a larger sin(phi) and a smaller cos(phi modulation)
     //  Both of these can be corrected for
     /// Correction factor for radial bias: factor * charge / radius
-    double m_param_radiusCorrectionFactor = 3.0;
+    double m_param_radiusCorrectionFactor = 4.0;
     /// Correction factor for the sin(phi) modulation
-    double m_param_sinPhiCorrectionFactor = 0.05;
+    double m_param_sinPhiCorrectionFactor = 0.0;
     /// Correction factor for the cos(phi) modulation
-    double m_param_cosPhiCorrectionFactor = 0.02;
+    double m_param_cosPhiCorrectionFactor = 0.0;
 
 
     //  ROI calculation parameters
@@ -100,18 +100,18 @@ namespace Belle2 {
     /// For u: size = multiplier * 1/R + minimumROISize
     /// For v: size = (1 + abs(tan(lambda)) * multiplier) + minimumROISize
     /// Multiplier term for u-direction on L1
-    double m_param_multiplierUL1 = 100;
+    double m_param_multiplierUL1 = 600;
     /// Multiplier term for u-direction on L2
-    double m_param_multiplierUL2 = 100;
+    double m_param_multiplierUL2 = 800;
     /// Multiplier term for v-direction on L1
-    double m_param_multiplierVL1 = 0.5;
+    double m_param_multiplierVL1 = 0.8;
     /// Multiplier term for v-direction on L2
-    double m_param_multiplierVL2 = 0.5;
+    double m_param_multiplierVL2 = 1.2;
 
     /// maximum ROI size in u
     unsigned short m_param_maximumROISizeU = 120;
     /// maximum ROI size in v
-    unsigned short m_param_maximumROISizeV = 120;
+    unsigned short m_param_maximumROISizeV = 192;
 
     //  Constants used during extrapolation to PXD and ROI calculation
     // ATTENTION: hard coded values taken and derived from pxd/data/PXD-Components.xml

@@ -82,7 +82,7 @@ namespace Belle2 {
     uint m_param_nVerticalSectors = 256;
 
     /// vertical size of the Hough Space, defaults to the value for u-side
-    double m_param_verticalHoughSpaceSize = 0.2;
+    double m_param_verticalHoughSpaceSize = 0.25;
 
     /// minimum x value of the Hough Space, defaults to the value for u-side
     double m_param_minimumX = -3.168;
@@ -90,13 +90,13 @@ namespace Belle2 {
     double m_param_maximumX = 3.168;
 
     /// minimum cluster size of sectors belonging to intercepts in the Hough Space
-    uint m_param_MinimumHSClusterSize = 6;
+    uint m_param_MinimumHSClusterSize = 2;
     /// maximum cluster size of sectors belonging to intercepts in the Hough Space
-    uint m_param_MaximumHSClusterSize = 100;
+    uint m_param_MaximumHSClusterSize = 15;
     /// maximum cluster size in x of sectors belonging to intercepts in the Hough Space
-    uint m_param_MaximumHSClusterSizeX = 100;
+    uint m_param_MaximumHSClusterSizeX = 5;
     /// maximum cluster size in y of sectors belonging to intercepts in the Hough Space
-    uint m_param_MaximumHSClusterSizeY = 100;
+    uint m_param_MaximumHSClusterSizeY = 10;
 
     // class variables
     /// HS unit size in x

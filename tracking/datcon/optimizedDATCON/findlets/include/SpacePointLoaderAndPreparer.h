@@ -104,13 +104,13 @@ namespace Belle2 {
     std::string m_param_SVDSpacePointStoreArrayName = "SVDSpacePoints";
 
     /// Minimum u cluster time
-    double m_param_minimumUClusterTime = -100;
+    double m_param_minimumUClusterTime = -25;
     /// Minimum v cluster time
-    double m_param_minimumVClusterTime = -100;
+    double m_param_minimumVClusterTime = -25;
     /// Maximum u cluster time
-    double m_param_maximumUClusterTime = 200;
+    double m_param_maximumUClusterTime = 40;
     /// Maximum v cluster time
-    double m_param_maximumVClusterTime = 200;
+    double m_param_maximumVClusterTime = 40;
 
     /// Input SpacePoints Store Array
     StoreArray<SpacePoint> m_storeSpacePoints;

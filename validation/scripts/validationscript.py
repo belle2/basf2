@@ -370,13 +370,10 @@ class Script:
         later for crashes isn't sensible.
         """
         for f in map(Path, self.output_files):
-            if f.exists():
-                self.log.warning(
-                    f"Removing output file {f} because script failed"
-                )
-                # from py 3.8 there will be missing_ok=True so we don't need
-                # the if
-                f.unlink()
+            self.log.warning(
+                f"Removing output file {f} (if exists) because script failed"
+            )
+            f.unlink(missing_ok=True)
 
 
 def find_creator(

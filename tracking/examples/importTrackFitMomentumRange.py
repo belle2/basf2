@@ -12,5 +12,9 @@ parameters.setMomentumRange(2212, 100.)
 
 database = Database.Instance()
 
-iov = IntervalOfValidity(0, 0, -1, -1)
+iov = IntervalOfValidity(0, 0, 0, -1)
+database.storeData('TrackFitMomentumRange', parameters, iov)
+iov = IntervalOfValidity(1002, 0, 1002, -1)
+database.storeData('TrackFitMomentumRange', parameters, iov)
+iov = IntervalOfValidity(1003, 0, 1003, -1)
 database.storeData('TrackFitMomentumRange', parameters, iov)

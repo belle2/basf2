@@ -622,7 +622,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
           break;
         }
 
-        if (plane_size < 4) plane_size = 4;
+        // if (plane_size < 4) plane_size = 4;
         // finished setting variables ---------------------------------------------------------
 
         // draw planes if corresponding option is set -----------------------------------------

@@ -24,15 +24,15 @@ class TestGetComparison(unittest.TestCase):
             "kolmogorov": "kolmogorov",
             "andersondarling": "andersondarling"
         }
-        basic_gaus_th1f = ROOT.TH1F("th1f", "th1f", 5, -3, 3)
-        basic_gaus_th1f.FillRandom("gaus", 1000)
-        different_gaus_th1f = ROOT.TH1F("th1f", "th1f", 5, -3, 3)
-        different_gaus_th1f.FillRandom("expo", 1000)
+        gaus_th1f = ROOT.TH1F("gaus", "gaus", 5, -3, 3)
+        gaus_th1f.FillRandom("gaus", 1000)
+        exponential_th1f = ROOT.TH1F("expo", "expo", 5, -3, 3)
+        exponential_th1f.FillRandom("expo", 1000)
         #: ROOT objects used to check if comparison executes
-        self.obj_pairs = [
-            (basic_gaus_th1f, basic_gaus_th1f, "equal"),
-            (basic_gaus_th1f, different_gaus_th1f, "error"),
-        ]  # type: List[Tuple[ROOT.TObject, ROOT.TObject, str]]
+        self.obj_pairs: List[Tuple[ROOT.TObject, ROOT.TObject, str]] = [
+            (gaus_th1f, gaus_th1f, "equal"),
+            (gaus_th1f, exponential_th1f, "error"),
+        ]
 
     def test_get_comparison(self):
         """ Use get_tester on the metaoptions to get the requested
@@ -40,20 +40,25 @@ class TestGetComparison(unittest.TestCase):
         Check that this indeed returns 'equal'.
         """
         for tester_name in self.test_options:
-            for obj in self.obj_pairs:
+            for objs in self.obj_pairs:
+                names: Tuple[str, str] = (objs[0].GetName(), objs[1].GetName())
                 with self.subTest(
                         tester=tester_name,
-                        obj1=obj[0].GetName(),
-                        obj2=obj[1].GetName()
+                        obj1=names[0],
+                        obj2=names[1],
                 ):
                     tester = validationcomparison.get_comparison(
-                        obj[0],
-                        obj[1],
+                        objs[0],
+                        objs[1],
                         metaoptions.MetaOptionParser(
                             self.test_options[tester_name].split(",")
                         )
                     )
-                    self.assertEqual(tester.comparison_result, obj[2])
+                    print(f"{names[0]}, {names[1]}: "
+                          f"{tester.comparison_result_long}. "
+                          f"Short result: {tester.comparison_result}. "
+                          f"Expectation: {objs[2]}")
+                    self.assertEqual(tester.comparison_result, objs[2])
 
 
 class TestComparison(unittest.TestCase):

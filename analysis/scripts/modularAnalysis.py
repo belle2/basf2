@@ -3179,7 +3179,6 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
     - pi (211) vs. K (321)
     - K (321) vs. pi (211)
     - p (2212) vs. pi (211)
-    - d (1000010020) vs pi (211)
 
     , or 'global' PID, namely "one-vs-others" separation. The latter makes use of an MVA algorithm trained in multi-class mode,
     and it's the default behaviour.

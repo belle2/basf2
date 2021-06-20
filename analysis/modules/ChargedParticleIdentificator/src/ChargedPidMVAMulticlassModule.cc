@@ -93,7 +93,7 @@ void ChargedPidMVAMulticlassModule::event()
       // Otherwise, skip to next.
       const ECLCluster* eclCluster = particle->getECLCluster();
       if (!eclCluster) {
-        B2WARNING("\tParticle has invalid Track-ECLCluster relation, skip MVA application...");
+        B2DEBUG(11, "\t\tParticle has invalid Track-ECLCluster relation, skip MVA application...");
         continue;
       }
 
@@ -101,8 +101,8 @@ void ChargedPidMVAMulticlassModule::event()
       // given the reconstructed (clusterTheta, p, charge)
       auto clusterTheta = eclCluster->getTheta();
       auto p = particle->getP();
-      auto charge = (!m_charge_independent) ? particle->getCharge() :
-                    0.0; // Set a dummy charge of zero to pick charge-independent payloads, if requested.
+      // Set a dummy charge of zero to pick charge-independent payloads, if requested.
+      auto charge = (!m_charge_independent) ? particle->getCharge() : 0.0;
       int idx_theta, idx_p, idx_charge;
       auto index = (*m_weightfiles_representation.get())->getMVAWeightIdx(clusterTheta, p, charge, idx_theta, idx_p, idx_charge);
 

@@ -3183,6 +3183,10 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
     , or 'global' PID, namely "one-vs-others" separation. The latter makes use of an MVA algorithm trained in multi-class mode,
     and it's the default behaviour.
 
+    Warning:
+        In order to run the `ChargedPidMVA` and ensure the most up-to-date MVA training weights are applied,
+        it is necessary to append the latest analysis global tag (GT) to the steering script.
+
     Parameters:
         particleLists (list(str)): list of names of ParticleList objects for charged stable particles.
                                    The charge-conjugate ParticleLists will be also processed automatically.

@@ -96,28 +96,36 @@ void SVDDQMExpressRecoModule::defineHisto()
   int nSVDChips = gTools->getTotalSVDChips();
 
   // number of events counter
-  m_nEvents = new TH1F("SVDDQM_nEvents", "SVD Number of Events", 1, -0.5, 0.5);
+  TString title = Form("SVD Number of Events ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_nEvents = new TH1F("SVDDQM_nEvents", title.Data(), 1, -0.5, 0.5);
   m_nEvents->GetYaxis()->SetTitle("N events");
   m_histoList->Add(m_nEvents);
 
   // Create basic histograms:
   // basic counters per sensor:
-  m_hitMapCountsU = new TH1F("SVDDQM_StripCountsU", "SVD Integrated Number of ZS5 Fired U-Strips per sensor",
+  title = Form("SVD Integrated Number of ZS5 Fired U-Strips per sensor ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_hitMapCountsU = new TH1F("SVDDQM_StripCountsU", title.Data(),
                              nSVDSensors, 0, nSVDSensors);
   m_hitMapCountsU->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapCountsU->GetYaxis()->SetTitle("counts");
   m_histoList->Add(m_hitMapCountsU);
-  m_hitMapCountsV = new TH1F("SVDDQM_StripCountsV", "SVD Integrated Number of ZS5 Fired V-Strips per sensor",
+
+  title = Form("SVD Integrated Number of ZS5 Fired V-Strips per sensor ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_hitMapCountsV = new TH1F("SVDDQM_StripCountsV", title.Data(),
                              nSVDSensors, 0, nSVDSensors);
   m_hitMapCountsV->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapCountsV->GetYaxis()->SetTitle("counts");
   m_histoList->Add(m_hitMapCountsV);
-  m_hitMapClCountsU = new TH1F("SVDDQM_ClusterCountsU", "SVD Integrated Number of U-Clusters per sensor",
+
+  title = Form("SVD Integrated Number of U-Clusters per sensor ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_hitMapClCountsU = new TH1F("SVDDQM_ClusterCountsU", title.Data(),
                                nSVDSensors, 0, nSVDSensors);
   m_hitMapClCountsU->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapClCountsU->GetYaxis()->SetTitle("counts");
   m_histoList->Add(m_hitMapClCountsU);
-  m_hitMapClCountsV = new TH1F("SVDDQM_ClusterCountsV", "SVD Integrated Number of V-Clusters per sensor",
+
+  title = Form("SVD Integrated Number of V-Clusters per sensor ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_hitMapClCountsV = new TH1F("SVDDQM_ClusterCountsV", title.Data(),
                                nSVDSensors, 0, nSVDSensors);
   m_hitMapClCountsV->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapClCountsV->GetYaxis()->SetTitle("counts");
@@ -135,12 +143,15 @@ void SVDDQMExpressRecoModule::defineHisto()
   }
 
   // basic counters per chip:
-  m_hitMapCountsChip = new TH1F("SVDDQM_StripCountsChip", "SVD Integrated Number of ZS5 Fired Strips per chip",
+  title = Form("SVD Integrated Number of ZS5 Fired Strips per chip ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_hitMapCountsChip = new TH1F("SVDDQM_StripCountsChip", title.Data(),
                                 nSVDChips, 0, nSVDChips);
   m_hitMapCountsChip->GetXaxis()->SetTitle("Chip ID");
   m_hitMapCountsChip->GetYaxis()->SetTitle("counts");
   m_histoList->Add(m_hitMapCountsChip);
-  m_hitMapClCountsChip = new TH1F("SVDDQM_ClusterCountsChip", "SVD Integrated Number of Clusters per chip",
+
+  title = Form("SVD Integrated Number of Clusters per chip ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_hitMapClCountsChip = new TH1F("SVDDQM_ClusterCountsChip", title.Data(),
                                   nSVDChips, 0, nSVDChips);
   m_hitMapClCountsChip->GetXaxis()->SetTitle("Chip ID");
   m_hitMapClCountsChip->GetYaxis()->SetTitle("counts");
@@ -186,44 +197,46 @@ void SVDDQMExpressRecoModule::defineHisto()
   //----------------------------------------------------------------
   // Charge of clusters for all sensors
   //----------------------------------------------------------------
-  string name = str(format("SVDDQM_ClusterChargeUAll"));
-  string title = str(format("SVD U-Cluster Charge for all sensors"));
-  m_clusterChargeUAll = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+  TString name = "SVDDQM_ClusterChargeUAll";
+  title = Form("SVD U-Cluster Charge for all sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_clusterChargeUAll = new TH1F(name.Data(), title.Data(), ChargeBins, 0, ChargeMax);
   m_clusterChargeUAll->GetXaxis()->SetTitle("cluster charge [ke-]");
   m_clusterChargeUAll->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterChargeUAll);
-  name = str(format("SVDDQM_ClusterChargeVAll"));
-  title = str(format("SVD V-Cluster Charge for all sensors"));
-  m_clusterChargeVAll = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+
+  name = "SVDDQM_ClusterChargeVAll";
+  title = Form("SVD V-Cluster Charge for all sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_clusterChargeVAll = new TH1F(name.Data(), title.Data(), ChargeBins, 0, ChargeMax);
   m_clusterChargeVAll->GetXaxis()->SetTitle("cluster charge [ke-]");
   m_clusterChargeVAll->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterChargeVAll);
   //----------------------------------------------------------------
   // Charge of clusters for L3/L456 sensors
   //----------------------------------------------------------------
-  name = str(format("SVDDQM_ClusterChargeU3"));
-  title = str(format("SVD U-Cluster Charge for layer 3 sensors"));
-  m_clusterChargeU3 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+  name = "SVDDQM_ClusterChargeU3";
+  title = Form("SVD U-Cluster Charge for layer 3 sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_clusterChargeU3 = new TH1F(name.Data(), title.Data(), ChargeBins, 0, ChargeMax);
   m_clusterChargeU3->GetXaxis()->SetTitle("cluster charge [ke-]");
   m_clusterChargeU3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterChargeU3);
-  name = str(format("SVDDQM_ClusterChargeV3"));
-  title = str(format("SVD V-Cluster Charge for layer 3 sensors"));
-  m_clusterChargeV3 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+
+  name = "SVDDQM_ClusterChargeV3";
+  title = Form("SVD V-Cluster Charge for layer 3 sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_clusterChargeV3 = new TH1F(name.Data(), title.Data(), ChargeBins, 0, ChargeMax);
   m_clusterChargeV3->GetXaxis()->SetTitle("cluster charge [ke-]");
   m_clusterChargeV3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterChargeV3);
 
-  name = str(format("SVDDQM_ClusterChargeU456"));
-  title = str(format("SVD U-Cluster Charge for layers 4,5,6 sensors"));
-  m_clusterChargeU456 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+  name = "SVDDQM_ClusterChargeU456";
+  title = Form("SVD U-Cluster Charge for layers 4,5,6 sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_clusterChargeU456 = new TH1F(name.Data(), title.Data(), ChargeBins, 0, ChargeMax);
   m_clusterChargeU456->GetXaxis()->SetTitle("cluster charge [ke-]");
   m_clusterChargeU456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterChargeU456);
 
-  name = str(format("SVDDQM_ClusterChargeV456"));
-  title = str(format("SVD V-Cluster Charge for layers 4,5,6 sensors"));
-  m_clusterChargeV456 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+  name = "SVDDQM_ClusterChargeV456";
+  title = Form("SVD V-Cluster Charge for layers 4,5,6 sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_clusterChargeV456 = new TH1F(name.Data(), title.Data(), ChargeBins, 0, ChargeMax);
   m_clusterChargeV456->GetXaxis()->SetTitle("cluster charge [ke-]");
   m_clusterChargeV456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterChargeV456);
@@ -231,86 +244,92 @@ void SVDDQMExpressRecoModule::defineHisto()
   //----------------------------------------------------------------
   // SNR of clusters for all sensors
   //----------------------------------------------------------------
-  name = str(format("SVDDQM_ClusterSNRUAll"));
-  title = str(format("SVD U-Cluster SNR for all sensors"));
-  m_clusterSNRUAll = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);  // max = ~ 60
+  name = "SVDDQM_ClusterSNRUAll";
+  title = Form("SVD U-Cluster SNR for all sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_clusterSNRUAll = new TH1F(name.Data(), title.Data(), SNRBins, 0, SNRMax);  // max = ~ 60
   m_clusterSNRUAll->GetXaxis()->SetTitle("cluster SNR");
   m_clusterSNRUAll->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterSNRUAll);
-  name = str(format("SVDDQM_ClusterSNRVAll"));
-  title = str(format("SVD V-Cluster SNR for all sensors"));
-  m_clusterSNRVAll = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+
+  name = "SVDDQM_ClusterSNRVAll";
+  title = Form("SVD V-Cluster SNR for all sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_clusterSNRVAll = new TH1F(name.Data(), title.Data(), SNRBins, 0, SNRMax);
   m_clusterSNRVAll->GetXaxis()->SetTitle("cluster SNR");
   m_clusterSNRVAll->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterSNRVAll);
   //----------------------------------------------------------------
   // SNR of clusters for L3/L456 sensors
   //----------------------------------------------------------------
-  name = str(format("SVDDQM_ClusterSNRU3"));
-  title = str(format("SVD U-Cluster SNR for layer 3 sensors"));
-  m_clusterSNRU3 = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+  name = "SVDDQM_ClusterSNRU3";
+  title = Form("SVD U-Cluster SNR for layer 3 sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_clusterSNRU3 = new TH1F(name.Data(), title.Data(), SNRBins, 0, SNRMax);
   m_clusterSNRU3->GetXaxis()->SetTitle("cluster SNR");
   m_clusterSNRU3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterSNRU3);
-  name = str(format("SVDDQM_ClusterSNRV3"));
-  title = str(format("SVD V-Cluster SNR for layer 3 sensors"));
-  m_clusterSNRV3 = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+
+  name = "SVDDQM_ClusterSNRV3";
+  title = Form("SVD V-Cluster SNR for layer 3 sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_clusterSNRV3 = new TH1F(name.Data(), title.Data(), SNRBins, 0, SNRMax);
   m_clusterSNRV3->GetXaxis()->SetTitle("cluster SNR");
   m_clusterSNRV3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterSNRV3);
 
-  name = str(format("SVDDQM_ClusterSNRU456"));
-  title = str(format("SVD U-Cluster SNR for layers 4,5,6 sensors"));
-  m_clusterSNRU456 = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+  name = "SVDDQM_ClusterSNRU456";
+  title = Form("SVD U-Cluster SNR for layers 4,5,6 sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_clusterSNRU456 = new TH1F(name.Data(), title.Data(), SNRBins, 0, SNRMax);
   m_clusterSNRU456->GetXaxis()->SetTitle("cluster SNR");
   m_clusterSNRU456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterSNRU456);
-  name = str(format("SVDDQM_ClusterSNRV456"));
-  title = str(format("SVD V-Cluster SNR for layers 4,5,6 sensors"));
-  m_clusterSNRV456 = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+
+  name = "SVDDQM_ClusterSNRV456";
+  title = Form("SVD V-Cluster SNR for layers 4,5,6 sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_clusterSNRV456 = new TH1F(name.Data(), title.Data(), SNRBins, 0, SNRMax);
   m_clusterSNRV456->GetXaxis()->SetTitle("cluster SNR");
   m_clusterSNRV456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterSNRV456);
   //----------------------------------------------------------------
   // Cluster time distribution for all sensors
   //----------------------------------------------------------------
-  TString Name = "SVDDQM_ClusterTimeUAll";
-  TString Title = Form("SVD U-Cluster Time %s for all sensors", refFrame.Data());
-  m_clusterTimeUAll = new TH1F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  name = "SVDDQM_ClusterTimeUAll";
+  title = Form("SVD U-Cluster Time %s for all sensors ~ Exp%d Run%d", refFrame.Data(), m_expNumber, m_runNumber);
+  m_clusterTimeUAll = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
   m_clusterTimeUAll->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeUAll->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterTimeUAll);
-  Name = "SVDDQM_ClusterTimeVAll";
-  Title = Form("SVD V-Cluster Time %s for all sensors", refFrame.Data());
-  m_clusterTimeVAll = new TH1F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax);
+
+  name = "SVDDQM_ClusterTimeVAll";
+  title = Form("SVD V-Cluster Time %s for all sensors ~ Exp%d Run%d", refFrame.Data(), m_expNumber, m_runNumber);
+  m_clusterTimeVAll = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
   m_clusterTimeVAll->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeVAll->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterTimeVAll);
   //----------------------------------------------------------------
   // Time of clusters for L3/L456 sensors
   //----------------------------------------------------------------
-  Name = "SVDDQM_ClusterTimeU3";
-  Title = Form("SVD U-Cluster Time %s for layer 3 sensors", refFrame.Data());
-  m_clusterTimeU3 = new TH1F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  name = "SVDDQM_ClusterTimeU3";
+  title = Form("SVD U-Cluster Time %s for layer 3 sensors ~ Exp%d Run%d", refFrame.Data(), m_expNumber, m_runNumber);
+  m_clusterTimeU3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
   m_clusterTimeU3->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeU3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterTimeU3);
-  name = str(format("SVDDQM_ClusterTimeV3"));
-  Title = Form("SVD V-Cluster Time %s for layer 3 sensors", refFrame.Data());
-  m_clusterTimeV3 = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+
+  name = "SVDDQM_ClusterTimeV3";
+  title = Form("SVD V-Cluster Time %s for layer 3 sensors ~ Exp%d Run%d", refFrame.Data(), m_expNumber, m_runNumber);
+  m_clusterTimeV3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
   m_clusterTimeV3->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeV3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterTimeV3);
 
-  name = str(format("SVDDQM_ClusterTimeU456"));
-  Title = Form("SVD U-Cluster Time %s for layers 4,5,6 sensors", refFrame.Data());
-  m_clusterTimeU456 = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  name = "SVDDQM_ClusterTimeU456";
+  title = Form("SVD U-Cluster Time %s for layers 4,5,6 sensors ~ Exp%d Run%d", refFrame.Data(), m_expNumber, m_runNumber);
+  m_clusterTimeU456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
   m_clusterTimeU456->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeU456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterTimeU456);
-  name = str(format("SVDDQM_ClusterTimeV456"));
-  Title = Form("SVD V-Cluster Time %s for layers 4,5,6 sensors", refFrame.Data());
-  m_clusterTimeV456 = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+
+  name = "SVDDQM_ClusterTimeV456";
+  title = Form("SVD V-Cluster Time %s for layers 4,5,6 sensors ~ Exp%d Run%d", refFrame.Data(), m_expNumber, m_runNumber);
+  m_clusterTimeV456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
   m_clusterTimeV456->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeV456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterTimeV456);
@@ -318,41 +337,44 @@ void SVDDQMExpressRecoModule::defineHisto()
   //----------------------------------------------------------------
   // MaxBin of strips for all sensors (offline ZS)
   //----------------------------------------------------------------
-  name = str(format("SVDDQM_StripMaxBinUAll"));
-  title = str(format("SVD U-Strip MaxBin for all sensors"));
-  m_stripMaxBinUAll = new TH1F(name.c_str(), title.c_str(), MaxBinBins, 0, MaxBinMax);
+  name = "SVDDQM_StripMaxBinUAll";
+  title = Form("SVD U-Strip MaxBin for all sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_stripMaxBinUAll = new TH1F(name.Data(), title.Data(), MaxBinBins, 0, MaxBinMax);
   m_stripMaxBinUAll->GetXaxis()->SetTitle("max bin");
   m_stripMaxBinUAll->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_stripMaxBinUAll);
-  name = str(format("SVDDQM_StripMaxBinVAll"));
-  title = str(format("SVD V-Strip MaxBin for all sensors"));
-  m_stripMaxBinVAll = new TH1F(name.c_str(), title.c_str(), MaxBinBins, 0, MaxBinMax);
+
+  name = "SVDDQM_StripMaxBinVAll";
+  title = Form("SVD V-Strip MaxBin for all sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_stripMaxBinVAll = new TH1F(name.Data(), title.Data(), MaxBinBins, 0, MaxBinMax);
   m_stripMaxBinVAll->GetXaxis()->SetTitle("max bin");
   m_stripMaxBinVAll->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_stripMaxBinVAll);
 
-  name = str(format("SVDDQM_StripMaxBinU3"));
-  title = str(format("SVD U-Strip MaxBin for layer 3 sensors"));
-  m_stripMaxBinU3 = new TH1F(name.c_str(), title.c_str(), MaxBinBins, 0, MaxBinMax);
+  name = "SVDDQM_StripMaxBinU3";
+  title = Form("SVD U-Strip MaxBin for layer 3 sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_stripMaxBinU3 = new TH1F(name.Data(), title.Data(), MaxBinBins, 0, MaxBinMax);
   m_stripMaxBinU3->GetXaxis()->SetTitle("max bin");
   m_stripMaxBinU3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_stripMaxBinU3);
-  name = str(format("SVDDQM_StripMaxBinV3"));
-  title = str(format("SVD V-Strip MaxBin for layer 3 sensors"));
-  m_stripMaxBinV3 = new TH1F(name.c_str(), title.c_str(), MaxBinBins, 0, MaxBinMax);
+
+  name = "SVDDQM_StripMaxBinV3";
+  title = Form("SVD V-Strip MaxBin for layer 3 sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_stripMaxBinV3 = new TH1F(name.Data(), title.Data(), MaxBinBins, 0, MaxBinMax);
   m_stripMaxBinV3->GetXaxis()->SetTitle("max bin");
   m_stripMaxBinV3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_stripMaxBinV3);
 
-  name = str(format("SVDDQM_StripMaxBinU6"));
-  title = str(format("SVD U-Strip MaxBin for layer 6 sensors"));
-  m_stripMaxBinU6 = new TH1F(name.c_str(), title.c_str(), MaxBinBins, 0, MaxBinMax);
+  name = "SVDDQM_StripMaxBinU6";
+  title = Form("SVD U-Strip MaxBin for layer 6 sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_stripMaxBinU6 = new TH1F(name.Data(), title.Data(), MaxBinBins, 0, MaxBinMax);
   m_stripMaxBinU6->GetXaxis()->SetTitle("max bin");
   m_stripMaxBinU6->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_stripMaxBinU6);
-  name = str(format("SVDDQM_StripMaxBinV6"));
-  title = str(format("SVD V-Strip MaxBin for layer 6 sensors"));
-  m_stripMaxBinV6 = new TH1F(name.c_str(), title.c_str(), MaxBinBins, 0, MaxBinMax);
+
+  name = "SVDDQM_StripMaxBinV6";
+  title = Form("SVD V-Strip MaxBin for layer 6 sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  m_stripMaxBinV6 = new TH1F(name.Data(), title.Data(), MaxBinBins, 0, MaxBinMax);
   m_stripMaxBinV6->GetXaxis()->SetTitle("max bin");
   m_stripMaxBinV6->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_stripMaxBinV6);
@@ -364,139 +386,148 @@ void SVDDQMExpressRecoModule::defineHisto()
     int iSensor = id.getSensorNumber();
     VxdID sensorID(iLayer, iLadder, iSensor);
     SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-    string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
+    TString sensorDescr = Form("%d_%d_%d", iLayer, iLadder, iSensor);
     //----------------------------------------------------------------
     // Number of fired strips per sensor
     //----------------------------------------------------------------
-    name = str(format("SVDDQM_%1%_FiredU") % sensorDescr);
-    title = str(format("SVD Sensor %1% Number of Fired U-Strips") % sensorDescr);
-    m_firedU[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
+    name = Form("SVDDQM_%s_FiredU", sensorDescr.Data());
+    title = Form("SVD Sensor %s Number of Fired U-Strips ~ Exp%d Run%d", sensorDescr.Data(), m_expNumber, m_runNumber);
+    m_firedU[i] = new TH1F(name.Data(), title.Data(), 50, 0, 50);
     m_firedU[i]->GetXaxis()->SetTitle("# fired strips");
     m_firedU[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_firedU[i]);
-    name = str(format("SVDDQM_%1%_FiredV") % sensorDescr);
-    title = str(format("SVD Sensor %1% Number of Fired V-Strips") % sensorDescr);
-    m_firedV[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
+
+    name = Form("SVDDQM_%s_FiredV", sensorDescr.Data());
+    title = Form("SVD Sensor %s Number of Fired V-Strips", sensorDescr.Data());
+    m_firedV[i] = new TH1F(name.Data(), title.Data(), 50, 0, 50);
     m_firedV[i]->GetXaxis()->SetTitle("# fired strips");
     m_firedV[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_firedV[i]);
     //----------------------------------------------------------------
     // Number of clusters per sensor
     //----------------------------------------------------------------
-    name = str(format("SVDDQM_%1%_ClustersU") % sensorDescr);
-    title = str(format("SVD Sensor %1% Number of U-Clusters") % sensorDescr);
-    m_clustersU[i] = new TH1F(name.c_str(), title.c_str(), 20, 0, 20);
+    name = Form("SVDDQM_%1%_ClustersU", sensorDescr.Data());
+    title = Form("SVD Sensor %s Number of U-Clusters", sensorDescr.Data());
+    m_clustersU[i] = new TH1F(name.Data(), title.Data(), 20, 0, 20);
     m_clustersU[i]->GetXaxis()->SetTitle("# clusters");
     m_clustersU[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_clustersU[i]);
-    name = str(format("SVDDQM_%1%_ClustersV") % sensorDescr);
-    title = str(format("SVD Sensor %1% Number of V-Clusters") % sensorDescr);
-    m_clustersV[i] = new TH1F(name.c_str(), title.c_str(), 20, 0, 20);
+
+    name = Form("SVDDQM_%s_ClustersV", sensorDescr.Data());
+    title = Form("SVD Sensor %s Number of V-Clusters", sensorDescr.Data());
+    m_clustersV[i] = new TH1F(name.Data(), title.Data(), 20, 0, 20);
     m_clustersV[i]->GetXaxis()->SetTitle("# clusters");
     m_clustersV[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_clustersV[i]);
     //----------------------------------------------------------------
     // Charge of clusters
     //----------------------------------------------------------------
-    name = str(format("SVDDQM_%1%_ClusterChargeU") % sensorDescr);
-    title = str(format("SVD Sensor %1% U-Cluster Charge") % sensorDescr);
-    m_clusterChargeU[i] = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+    name = Form("SVDDQM_%s_ClusterChargeU", sensorDescr.Data());
+    title = Form("SVD Sensor %s U-Cluster Charge", sensorDescr.Data());
+    m_clusterChargeU[i] = new TH1F(name.Data(), title.Data(), ChargeBins, 0, ChargeMax);
     m_clusterChargeU[i]->GetXaxis()->SetTitle("cluster charge [ke-]");
     m_clusterChargeU[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_clusterChargeU[i]);
-    name = str(format("SVDDQM_%1%_ClusterChargeV") % sensorDescr);
-    title = str(format("SVD Sensor %1% V-Cluster Charge") % sensorDescr);
-    m_clusterChargeV[i] = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+
+    name = Form("SVDDQM_%s_ClusterChargeV", sensorDescr.Data());
+    title = Form("SVD Sensor %s V-Cluster Charge", sensorDescr.Data());
+    m_clusterChargeV[i] = new TH1F(name.Data(), title.Data(), ChargeBins, 0, ChargeMax);
     m_clusterChargeV[i]->GetXaxis()->SetTitle("cluster charge [ke-]");
     m_clusterChargeV[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_clusterChargeV[i]);
     //----------------------------------------------------------------
     // SNR of clusters
     //----------------------------------------------------------------
-    name = str(format("SVDDQM_%1%_ClusterSNRU") % sensorDescr);
-    title = str(format("SVD Sensor %1% U-Cluster SNR") % sensorDescr);
-    m_clusterSNRU[i] = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+    name = Form("SVDDQM_%s_ClusterSNRU", sensorDescr.Data());
+    title = Form("SVD Sensor %s U-Cluster SNR", sensorDescr.Data());
+    m_clusterSNRU[i] = new TH1F(name.Data(), title.Data(), SNRBins, 0, SNRMax);
     m_clusterSNRU[i]->GetXaxis()->SetTitle("cluster SNR");
     m_clusterSNRU[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_clusterSNRU[i]);
-    name = str(format("SVDDQM_%1%_ClusterSNRV") % sensorDescr);
-    title = str(format("SVD Sensor %1% V-Cluster SNR") % sensorDescr);
-    m_clusterSNRV[i] = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+
+    name = Form("SVDDQM_%s_ClusterSNRV", sensorDescr.Data());
+    title = Form("SVD Sensor %s V-Cluster SNR", sensorDescr.Data());
+    m_clusterSNRV[i] = new TH1F(name.Data(), title.Data(), SNRBins, 0, SNRMax);
     m_clusterSNRV[i]->GetXaxis()->SetTitle("cluster SNR");
     m_clusterSNRV[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_clusterSNRV[i]);
     //----------------------------------------------------------------
     // Charge of strips
     //----------------------------------------------------------------
-    name = str(format("SVDDQM_%1%_ADCStripU") % sensorDescr);
-    title = str(format("SVD Sensor %1% U-Strip signal in ADC Counts, all 6 APV samples") % sensorDescr);
-    m_stripSignalU[i] = new TH1F(name.c_str(), title.c_str(), 256, -0.5, 255.5);
+    name = Form("SVDDQM_%s_ADCStripU", sensorDescr.Data());
+    title = Form("SVD Sensor %s U-Strip signal in ADC Counts, all 6 APV samples", sensorDescr.Data());
+    m_stripSignalU[i] = new TH1F(name.Data(), title.Data(), 256, -0.5, 255.5);
     m_stripSignalU[i]->GetXaxis()->SetTitle("signal ADC");
     m_stripSignalU[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_stripSignalU[i]);
-    name = str(format("SVDDQM_%1%_ADCStripV") % sensorDescr);
-    title = str(format("SVD Sensor %1% V-Strip signal in ADC Counts, all 6 APV samples") % sensorDescr);
-    m_stripSignalV[i] = new TH1F(name.c_str(), title.c_str(), 256, -0.5, 255.5);
+
+    name = Form("SVDDQM_%s_ADCStripV", sensorDescr.Data());
+    title = Form("SVD Sensor %s V-Strip signal in ADC Counts, all 6 APV samples", sensorDescr.Data());
+    m_stripSignalV[i] = new TH1F(name.Data(), title.Data(), 256, -0.5, 255.5);
     m_stripSignalV[i]->GetXaxis()->SetTitle("signal ADC");
     m_stripSignalV[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_stripSignalV[i]);
     //----------------------------------------------------------------
     // Strips Counts
     //----------------------------------------------------------------
-    name = str(format("SVDDQM_%1%_StripCountU") % sensorDescr);
-    title = str(format("SVD Sensor %1% Integrated Number of ZS5 Fired U-Strip vs Strip Number") % sensorDescr);
-    m_stripCountU[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
+    name = Form("SVDDQM_%s_StripCountU", sensorDescr.Data());
+    title = Form("SVD Sensor %s Integrated Number of ZS5 Fired U-Strip vs Strip Number", sensorDescr.Data());
+    m_stripCountU[i] = new TH1F(name.Data(), title.Data(), 768, -0.5, 767.5);
     m_stripCountU[i]->GetXaxis()->SetTitle("cellID");
     m_stripCountU[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_stripCountU[i]);
-    name = str(format("SVDDQM_%1%_StripCountV") % sensorDescr);
-    title = str(format("SVD Sensor %1% Integrated Number of ZS5 Fired V-Strip vs Strip Number") % sensorDescr);
-    m_stripCountV[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
+
+    name = Form("SVDDQM_%s_StripCountV", sensorDescr.Data());
+    title = Form("SVD Sensor %s Integrated Number of ZS5 Fired V-Strip vs Strip Number", sensorDescr.Data());
+    m_stripCountV[i] = new TH1F(name.Data(), title.Data(), 768, -0.5, 767.5);
     m_stripCountV[i]->GetXaxis()->SetTitle("cellID");
     m_stripCountV[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_stripCountV[i]);
     //----------------------------------------------------------------
     // Strips Counts with online ZS
     //----------------------------------------------------------------
-    name = str(format("SVDDQM_%1%_OnlineZSStripCountU") % sensorDescr);
-    title = str(format("SVD Sensor %1% Integrated Number of online-ZS Fired U-Strip vs Strip Number") % sensorDescr);
-    m_onlineZSstripCountU[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
+    name = Form("SVDDQM_%s_OnlineZSStripCountU", sensorDescr.Data());
+    title = Form("SVD Sensor %s Integrated Number of online-ZS Fired U-Strip vs Strip Number", sensorDescr.Data());
+    m_onlineZSstripCountU[i] = new TH1F(name.Data(), title.Data(), 768, -0.5, 767.5);
     m_onlineZSstripCountU[i]->GetXaxis()->SetTitle("cellID");
     m_onlineZSstripCountU[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_onlineZSstripCountU[i]);
-    name = str(format("SVDDQM_%1%_OnlineZSStripCountV") % sensorDescr);
-    title = str(format("SVD Sensor %1% Integrated Number of online-ZS Fired V-Strip vs Strip Number") % sensorDescr);
-    m_onlineZSstripCountV[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
+
+    name = Form("SVDDQM_%s_OnlineZSStripCountV", sensorDescr.Data());
+    title = Form("SVD Sensor %s Integrated Number of online-ZS Fired V-Strip vs Strip Number", sensorDescr.Data());
+    m_onlineZSstripCountV[i] = new TH1F(name.Data(), title.Data(), 768, -0.5, 767.5);
     m_onlineZSstripCountV[i]->GetXaxis()->SetTitle("cellID");
     m_onlineZSstripCountV[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_onlineZSstripCountV[i]);
     //----------------------------------------------------------------
     // Cluster size distribution
     //----------------------------------------------------------------
-    name = str(format("SVDDQM_%1%_ClusterSizeU") % sensorDescr);
-    title = str(format("SVD Sensor %1% U-Cluster Size") % sensorDescr);
-    m_clusterSizeU[i] = new TH1F(name.c_str(), title.c_str(), 9, 1, 10);
+    name = Form("SVDDQM_%s_ClusterSizeU", sensorDescr.Data());
+    title = Form("SVD Sensor %s U-Cluster Size", sensorDescr.Data());
+    m_clusterSizeU[i] = new TH1F(name.Data(), title.Data(), 9, 1, 10);
     m_clusterSizeU[i]->GetXaxis()->SetTitle("cluster size");
     m_clusterSizeU[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_clusterSizeU[i]);
-    name = str(format("SVDDQM_%1%_ClusterSizeV") % sensorDescr);
-    title = str(format("SVD Sensor %1% V-Cluster Size") % sensorDescr);
-    m_clusterSizeV[i] = new TH1F(name.c_str(), title.c_str(), 9, 1, 10);
+
+    name = Form("SVDDQM_%s_ClusterSizeV", sensorDescr.Data());
+    title = Form("SVD Sensor %s V-Cluster Size", sensorDescr.Data());
+    m_clusterSizeV[i] = new TH1F(name.Data(), title.Data(), 9, 1, 10);
     m_clusterSizeV[i]->GetXaxis()->SetTitle("cluster size");
     m_clusterSizeV[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_clusterSizeV[i]);
     //----------------------------------------------------------------
     // Cluster time distribution
     //----------------------------------------------------------------
-    name = str(format("SVDDQM_%1%_ClusterTimeU") % sensorDescr);
-    Title = Form("SVD Sensor %s U-Cluster Time %s", sensorDescr.c_str(), refFrame.Data());
-    m_clusterTimeU[i] = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+    name = Form("SVDDQM_%s_ClusterTimeU", sensorDescr.Data());
+    title = Form("SVD Sensor %s U-Cluster Time %s", sensorDescr.Data(), refFrame.Data());
+    m_clusterTimeU[i] = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
     m_clusterTimeU[i]->GetXaxis()->SetTitle("cluster time (ns)");
     m_clusterTimeU[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_clusterTimeU[i]);
-    name = str(format("SVDDQM_%1%_ClusterTimeV") % sensorDescr);
-    Title = Form("SVD Sensor %s V-Cluster Time %s", sensorDescr.c_str(), refFrame.Data());
-    m_clusterTimeV[i] = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+
+    name = Form("SVDDQM_%s_ClusterTimeV", sensorDescr.Data());
+    title = Form("SVD Sensor %s V-Cluster Time %s", sensorDescr.Data(), refFrame.Data());
+    m_clusterTimeV[i] = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
     m_clusterTimeV[i]->GetXaxis()->SetTitle("cluster time (ns)");
     m_clusterTimeV[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_clusterTimeV[i]);
@@ -538,23 +569,25 @@ void SVDDQMExpressRecoModule::defineHisto()
       int iSensor = id.getSensorNumber();
       VxdID sensorID(iLayer, iLadder, iSensor);
       SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-      string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
+      TString sensorDescr = Form("%i_%i_%i", iLayer, iLadder, iSensor);
       //----------------------------------------------------------------
       // Hitmaps: Number of strips by coordinate
       //----------------------------------------------------------------
-      name = str(format("SVD_%1%_StripHitmapU") % sensorDescr);
-      title = str(format("SVD Sensor %1% Strip Hitmap in U") % sensorDescr);
+      name = Form("SVD_%s_StripHitmapU", sensorDescr.Data());
+      title = Form("SVD Sensor %s Strip Hitmap in U", sensorDescr.Data());
+
       int nStrips = SensorInfo.getUCells();
-      m_hitMapU[i] = new TH2F(name.c_str(), title.c_str(), nStrips, 0, nStrips, SVDShaperDigit::c_nAPVSamples, 0,
+      m_hitMapU[i] = new TH2F(name.Data(), title.Data(), nStrips, 0, nStrips, SVDShaperDigit::c_nAPVSamples, 0,
                               SVDShaperDigit::c_nAPVSamples);
       m_hitMapU[i]->GetXaxis()->SetTitle("u position [pitch units]");
       m_hitMapU[i]->GetYaxis()->SetTitle("timebin [time units]");
       m_hitMapU[i]->GetZaxis()->SetTitle("hits");
       m_histoList->Add(m_hitMapU[i]);
-      name = str(format("SVD_%1%_StripHitmapV") % sensorDescr);
-      title = str(format("SVD Sensor %1% Strip Hitmap in V") % sensorDescr);
+
+      name = Form("SVD_%s_StripHitmapV", sensorDescr.Data());
+      title = Form("SVD Sensor %s Strip Hitmap in V", sensorDescr.Data());
       nStrips = SensorInfo.getVCells();
-      m_hitMapV[i] = new TH2F(name.c_str(), title.c_str(), nStrips, 0, nStrips, SVDShaperDigit::c_nAPVSamples, 0,
+      m_hitMapV[i] = new TH2F(name.Data(), title.Data(), nStrips, 0, nStrips, SVDShaperDigit::c_nAPVSamples, 0,
                               SVDShaperDigit::c_nAPVSamples);
       m_hitMapV[i]->GetXaxis()->SetTitle("v position [pitch units]");
       m_hitMapV[i]->GetYaxis()->SetTitle("timebin [time units]");
@@ -563,17 +596,18 @@ void SVDDQMExpressRecoModule::defineHisto()
       //----------------------------------------------------------------
       // Hitmaps: Number of clusters by coordinate
       //----------------------------------------------------------------
-      name = str(format("SVD_%1%_HitmapClstU") % sensorDescr);
-      title = str(format("SVD Sensor %1% Hitmap Clusters in U") % sensorDescr);
+      name = Form("SVD_%s_HitmapClstU", sensorDescr.Data());
+      title = Form("SVD Sensor %s Hitmap Clusters in U", sensorDescr.Data());
       nStrips = SensorInfo.getUCells();
-      m_hitMapUCl[i] = new TH1F(name.c_str(), title.c_str(), nStrips, 0, nStrips);
+      m_hitMapUCl[i] = new TH1F(name.Data(), title.Data(), nStrips, 0, nStrips);
       m_hitMapUCl[i]->GetXaxis()->SetTitle("u position [pitch units]");
       m_hitMapUCl[i]->GetYaxis()->SetTitle("hits");
       m_histoList->Add(m_hitMapUCl[i]);
-      name = str(format("SVD_%1%_HitmapClstV") % sensorDescr);
-      title = str(format("SVD Sensor %1% Hitmap Clusters in V") % sensorDescr);
+
+      name = Form("SVD_%s_HitmapClstV", sensorDescr.Data());
+      title = Form("SVD Sensor %s Hitmap Clusters in V", sensorDescr.Data());
       nStrips = SensorInfo.getVCells();
-      m_hitMapVCl[i] = new TH1F(name.c_str(), title.c_str(), nStrips, 0, nStrips);
+      m_hitMapVCl[i] = new TH1F(name.Data(), title.Data(), nStrips, 0, nStrips);
       m_hitMapVCl[i]->GetXaxis()->SetTitle("v position [pitch units]");
       m_hitMapVCl[i]->GetYaxis()->SetTitle("hits");
       m_histoList->Add(m_hitMapVCl[i]);
@@ -615,15 +649,6 @@ void SVDDQMExpressRecoModule::beginRun()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;
 
-  // Add experiment and run number to the title of selected histograms (CR shifter plots)
-  TString runID = TString::Format(" ~ Exp%d Run%d", m_expNumber, m_runNumber);
-  TObject* obj;
-  TIter nextH(m_histoList);
-  while ((obj = nextH()))
-    if (obj->InheritsFrom("TH1")) {
-      ((TH1F*)obj)->SetTitle(obj->GetTitle() + runID);
-      ((TH1F*)obj)->Reset();
-    }
 }
 
 void SVDDQMExpressRecoModule::event()

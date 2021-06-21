@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <svd/modules/svdDQM/SVDDQMInjectionModule.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include "TDirectory.h"
 
 using namespace std;
@@ -42,20 +43,26 @@ void SVDDQMInjectionModule::defineHisto()
     oldDir->cd(m_histogramDirectoryName.c_str());//changing to the right directory
   }
 
-  m_hOccAfterInjLER  = new TH1F("SVDOccInjLER", "SVDOccInjLER/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
-  m_hOccAfterInjHER  = new TH1F("SVDOccInjHER", "SVDOccInjHER/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
-  m_hTrgOccAfterInjLER  = new TH1F("SVDTrgOccInjLER", "SVDTrgOccInjLER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0,
+  m_hOccAfterInjLER  = new TH1F("SVDOccInjLER", Form("SVDOccInjLER/Time;Time in #mus;Count/Time (5 #mus bins) ~ Exp%d Run%d",
+                                                     m_expNumber, m_runNumber), 4000, 0, 20000);
+  m_hOccAfterInjHER  = new TH1F("SVDOccInjHER", Form("SVDOccInjHER/Time;Time in #mus;Count/Time (5 #mus bins) ~ Exp%d Run%d",
+                                                     m_expNumber, m_runNumber), 4000, 0, 20000);
+  m_hTrgOccAfterInjLER  = new TH1F("SVDTrgOccInjLER",
+                                   Form("SVDTrgOccInjLER/Time;Time in #mus;Triggers/Time (5 #mus bins) ~ Exp%d Run%d", m_expNumber, m_runNumber), 4000, 0,
                                    20000);
-  m_hTrgOccAfterInjHER  = new TH1F("SVDTrgOccInjHER", "SVDTrgOccInjHER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0,
+  m_hTrgOccAfterInjHER  = new TH1F("SVDTrgOccInjHER",
+                                   Form("SVDTrgOccInjHER/Time;Time in #mus;Triggers/Time (5 #mus bins) ~ Exp%d Run%d", m_expNumber, m_runNumber), 4000, 0,
                                    20000);
-  m_hMaxOccAfterInjLER  = new TH1F("SVDMaxOccInjLER", "SVDMaxOccInjLER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0,
+  m_hMaxOccAfterInjLER  = new TH1F("SVDMaxOccInjLER",
+                                   Form("SVDMaxOccInjLER/Time;Time in #mus;Triggers/Time (5 #mus bins) ~ Exp%d Run%d", m_expNumber, m_runNumber), 4000, 0,
                                    20000);
-  m_hMaxOccAfterInjHER  = new TH1F("SVDMaxOccInjHER", "SVDMaxOccInjHER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0,
+  m_hMaxOccAfterInjHER  = new TH1F("SVDMaxOccInjHER",
+                                   Form("SVDMaxOccInjHER/Time;Time in #mus;Triggers/Time (5 #mus bins) ~ Exp%d Run%d", m_expNumber, m_runNumber), 4000, 0,
                                    20000);
-  m_hBunchNumVSNStrips  = new TH2F("SVDBunchNumVSNStrips", "SVDBunchNumVSNStrips;Bunch No.;Number of fired strips", 1280, 0, 1280, 10,
+  m_hBunchNumVSNStrips  = new TH2F("SVDBunchNumVSNStrips", Form("SVDBunchNumVSNStrips;Bunch No.;Number of fired strips ~ Exp%d Run%d",
+                                   m_expNumber, m_runNumber), 1280, 0, 1280, 10,
                                    0,
                                    10000);
-
 
   // cd back to root directory
   oldDir->cd();
@@ -71,7 +78,11 @@ void SVDDQMInjectionModule::initialize()
 
 void SVDDQMInjectionModule::beginRun()
 {
-  // Assume that everthing is non-yero ;-)
+  StoreObjPtr<EventMetaData> evtMetaData;
+  m_expNumber = evtMetaData->getExperiment();
+  m_runNumber = evtMetaData->getRun();
+
+  // Assume that everthing is non-zero ;-)
   m_hOccAfterInjLER->Reset();
   m_hOccAfterInjHER->Reset();
   m_hTrgOccAfterInjLER->Reset();

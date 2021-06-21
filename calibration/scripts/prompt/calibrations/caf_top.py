@@ -14,6 +14,7 @@ from top_calibration import BS13d_calibration_cdst
 from top_calibration import moduleT0_calibration_DeltaT, moduleT0_calibration_LL
 from top_calibration import commonT0_calibration_BF
 from prompt.calibrations.caf_top_pre import settings as top_pretracking
+from prompt.utils import filter_by_max_files_per_run
 
 #: Required variable - tells the automated system some details of this script
 settings = CalibrationSettings(

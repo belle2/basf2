@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-'''Tool to create the MC sample to used to calibrate the hit time in MC. The tool creates the rootfile to be used as input file for the ``caf_svd_time.py`` time calibration script.'''
+'''Tool to create the MC sample to calibrate the hit time in MC. The tool creates the rootfile to be used as input file for the ``caf_svd_time.py`` time calibration script. For the time calibration you will need 80k events, you can produce in parallel several samples, and then input all of them to caf_svd_time.py '''
 
 __author__ = 'Giulia Casarosa'
 __copyright__ = '2021 - Belle II Collaboration'
@@ -21,7 +21,7 @@ def arg_parser():
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-n', '--events',
-                        default=1000,
+                        default=5000,
                         type=int,
                         help='number of events',
                         metavar='EVENTS')
@@ -37,7 +37,6 @@ def arg_parser():
     parser.add_argument('--run',
                         default=0,
                         type=int,
-
                         help='run number you want to simulate',
                         metavar='RUN')
     parser.add_argument('--prepend_gt',
@@ -46,13 +45,11 @@ def arg_parser():
                         nargs='*',
                         help='Global Tags to be prepended',
                         metavar='GTs')
-
     parser.add_argument('--timeAlgorithm',
                         required=True,
                         type=str,
                         help='time algorithm',
                         metavar='TIME_ALGORITHM')
-
     parser.add_argument('--filename',
                         required=True,
                         type=str,
@@ -90,8 +87,6 @@ if __name__ == "__main__":
 
     # Create path
     main = b2.Path()
-
-    b2.set_random_seed(1)
 
     eventinfosetter = b2.register_module('EventInfoSetter')
     eventinfosetter.param('expList', [args.exp])

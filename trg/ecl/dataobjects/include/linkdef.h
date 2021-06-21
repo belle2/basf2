@@ -17,5 +17,6 @@
 #pragma link C++ class Belle2::TRGECLUnpackerSumStore+; // checksum=0xbae14368, version=4
 #pragma link C++ class Belle2::TRGECLTiming+; // checksum=0x1ffb8f6e, version=1
 #pragma link C++ class Belle2::TRGECLWaveform+; // checksum=0x9dfd598a, version=1
+#pragma link C++ class Belle2::TRGECLBGTCHit+;
 
 #endif

@@ -17,6 +17,8 @@
 #include <TObject.h>
 #include "trg/ecl/TrgEclMapping.h"
 #include "trg/ecl/TrgEclDataBase.h"
+#include "ecl/dataobjects/ECLHit.h"
+#include "trg/ecl/dataobjects/TRGECLBGTCHit.h"
 
 namespace Belle2 {
 
@@ -35,9 +37,11 @@ namespace Belle2 {
     /** get TC Hits from Xtal hits */
     void getTCHit(int);
     /** fit method,    digi with 125ns interval */
-    void digitization01(std::vector<std::vector<double>>&, std::vector<std::vector<double>>&);
+    void digitization01(std::vector<std::vector<double>>&,
+                        std::vector<std::vector<double>>&);
     /** orignal no fit method, digi with 12ns interval */
-    void digitization02(std::vector<std::vector<double>>&, std::vector<std::vector<double>>&);
+    void digitization02(std::vector<std::vector<double>>&,
+                        std::vector<std::vector<double>>&);
     /** save fitting result into tables */
     void save(int);
     /** Set flag of waveform table*/
@@ -59,6 +63,7 @@ namespace Belle2 {
     double ShapeF(double, double);
     /** Find max value between 2 vals; */
     double u_max(double, double);
+
   private:
     /** time range(defult : -4000 ~ 4000 ns ) */
     double TimeRange;
@@ -71,6 +76,10 @@ namespace Belle2 {
     /** TC Timing converted from Xtarl Timing [GeV] */
     double TCTiming_tot[576];
 
+    // background TC Energy [GeV]
+    double TCBGEnergy[576][80];
+    // backgrond TC Timing [GeV]
+    double TCBGTiming[576][80];
 
     /** Input  TC energy[GeV] */
     double TCRawEnergy[576][60];
@@ -83,8 +92,6 @@ namespace Belle2 {
     TrgEclMapping* _TCMap;
     /** Object of DataBase */
     TrgEclDataBase* _DataBase;
-
-
 
     /** Noise Matrix of Parallel and Serial Noise */
     /** Noise Low triangle Matrix of Parallel noise  */
@@ -105,7 +112,6 @@ namespace Belle2 {
     int _FADC;
     /** Flag of saving beam background tag  or not*/
     int _BeambkgTag;
-
   };
 } // end namespace Belle2
 

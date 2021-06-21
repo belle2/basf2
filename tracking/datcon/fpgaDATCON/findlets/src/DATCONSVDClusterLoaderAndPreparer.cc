@@ -111,7 +111,7 @@ void DATCONSVDClusterLoaderAndPreparer::apply(std::vector<SVDCluster>& uClusters
 
   const uint* maxOfClustersPerLayer = std::max_element(m_nClusterPerLayer.begin(), m_nClusterPerLayer.end());
   if (*maxOfClustersPerLayer > m_param_maxClustersPerLayer) {
-    B2WARNING("High occupancy in SVD, aborting DATCON...");
+    B2WARNING("High occupancy in SVD, aborting FPGA-DATCON...");
     uHits.clear();
     vHits.clear();
   }

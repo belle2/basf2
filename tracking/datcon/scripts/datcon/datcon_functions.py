@@ -128,8 +128,8 @@ def add_fpga_datcon(path):
                     vSideNVerticalSectors=64,
                     vSideMinimumHSClusterSize=5,
                     vSideMaximumHSClusterSize=50,
-                    vSideMaximumX=65. / 180. * PI,  # corresponds to +155° for theta, required as default values are for u side
-                    vSideMinimumX=-75. / 180. * PI,  # corresponds to  +15° for theta, required as default values are for u side
+                    vSideMinimumX=-75. / 180. * 3.14159265359,  # corresponds to  +15° for theta (default values are for u side)
+                    vSideMaximumX=65. / 180. * 3.14159265359,  # corresponds to +155° for theta (default values are for u side)
                     vSideVerticalHoughSpaceSize=20000000,
                     createPXDIntercepts=False,
                     extrapolationPhiCutL1=1.,

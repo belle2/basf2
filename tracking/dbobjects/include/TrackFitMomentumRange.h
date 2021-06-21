@@ -19,7 +19,7 @@ namespace Belle2 {
   /** The payload containing the momentum threshold to disable the particle hypothesis in the
       track fit. If the track momentum (from the seed) is greater than the hypothesis threshold,
       the particle hypothesis is disabled; if the momentum is lower, the particle
-      hypothesis is used. Pion (default hypothesis) threshold has to be always 100 (large, always
+      hypothesis is used. Pion (default hypothesis) threshold has to be always infinite (large, always
       enabled). The values are expressed in GeV/c. */
   class TrackFitMomentumRange: public TObject {
 
@@ -30,7 +30,7 @@ namespace Belle2 {
     /** Destructor */
     ~TrackFitMomentumRange() {}
 
-    /** Set the momentum threshold for the pdg particle hypothesis (100. means always enabled)
+    /** Set the momentum threshold for the pdg particle hypothesis (infinite means always enabled)
      * @param pdg Particle hypothesis pdg code
      * @param momentum Momentum cut un GeV/c
      */

@@ -135,7 +135,6 @@ void ClawsStudyModule::beginRun()
 void ClawsStudyModule::event()
 {
   //Here comes the actual event processing
-  //StoreArray<CLAWSSimHit>  SimHits;
   StoreArray<ClawsHit> Hits;
   StoreArray<SADMetaHit> MetaHits;
 

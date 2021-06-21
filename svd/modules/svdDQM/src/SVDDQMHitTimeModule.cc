@@ -51,7 +51,6 @@ void SVDDQMHitTimeModule::defineHisto()
   if (m_desynchSVDTime)
     refFrame = "in SVD reference";
 
-  title = Form("SVD Integrated Number of ZS5 Fired U-Strips per sensor ~ Exp%d Run%d", m_expNumber, m_runNumber);
   m_l3v_bhabha_L1_ECLTRG = new TH1F("SVDTime_L3V_bhabha_ECLTRG",
                                     Form("SVD L3 V-Side Cluster Time %s: bhabhas, ECLTRG time ~ Exp%d Run%d", refFrame.Data(), m_expNumber, m_runNumber),
                                     nBins, minT0, maxT0);

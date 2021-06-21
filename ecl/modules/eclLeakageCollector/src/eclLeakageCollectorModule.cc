@@ -77,12 +77,8 @@ void eclLeakageCollectorModule::prepare()
             n_e_barrel << " " << n_e_backward << " " << m_number_energies);
   }
 
-  //..Too many energies
-  if (m_number_energies > max_generated_energies) {
-    B2ERROR("eclLeakageCollector: too many input energies: " << m_number_energies << " < " << max_generated_energies);
-  }
-
   //..Store generated energies as integers in MeV
+  i_energies.resize(nLeakReg, std::vector<int>(m_number_energies, 0));
   for (int ie = 0; ie < m_number_energies; ie++) {
     i_energies[0][ie] = (int)(1000.*m_energies_forward[ie] + 0.001);
     i_energies[1][ie] = (int)(1000.*m_energies_barrel[ie] + 0.001);
@@ -106,7 +102,8 @@ void eclLeakageCollectorModule::prepare()
 
   //-----------------------------------------------------------------
   //..Define histogram to store parameters
-  auto inputParameters = new TH1F("inputParameters", "eclLeakageCollector job parameters", 100, 0, 100);
+  const int nBinX = 3 + nLeakReg * m_number_energies;
+  auto inputParameters = new TH1F("inputParameters", "eclLeakageCollector job parameters", nBinX, 0, nBinX);
   registerObject<TH1F>("inputParameters", inputParameters);
 
   //..TTree stores required quantities for each photon
@@ -228,7 +225,7 @@ void eclLeakageCollectorModule::collect()
 
   //..Crystals used to calculate energy
   int nForEnergy = (int)(m_eclShowerArray[minShower]->getNumberOfCrystalsForEnergy() + 0.001);
-  t_nCrys = std::min(21, nForEnergy);
+  t_nCrys = std::min(nCrysMax, nForEnergy);
 
   //..Reconstructed (without leakage corrections), normalized to generated
   t_energyFrac = m_eclShowerArray[minShower]->getEnergyRaw() / mcLabE;

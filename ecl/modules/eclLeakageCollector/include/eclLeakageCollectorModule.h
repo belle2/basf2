@@ -55,9 +55,10 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
 
     /** Some other useful quantities */
+    const int nLeakReg = 3; /**< 0 = forward, 1 = barrel, 2 = backward */
+    const int nCrysMax = 21; /**< max number of crystals used to calculate energy */
     bool storeCalib = true; /**< store parameters first event */
-    const int max_generated_energies = 12; /**< Max different energies per region */
-    int i_energies[3][12] = {}; /**< Generated energies in MeV. 0 = forward, 1 = barrel, 2 = backward */
+    std::vector< std::vector<int> > i_energies;/**< Generated energies in MeV in each region */
 
     ECL::ECLLeakagePosition* leakagePosition{nullptr}; /**< location of position of cluster */
 

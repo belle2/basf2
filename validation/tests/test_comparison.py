@@ -22,7 +22,7 @@ class TestGetComparison(unittest.TestCase):
         self.test_options = {
             "chi2": "",
             "kolmogorov": "kolmogorov",
-            "andersondarling": "andersondarling"
+            "andersondarling": "andersondarling",
         }
         gaus_th1f = ROOT.TH1F("gaus", "gaus", 5, -3, 3)
         gaus_th1f.FillRandom("gaus", 1000)
@@ -43,21 +43,21 @@ class TestGetComparison(unittest.TestCase):
             for objs in self.obj_pairs:
                 names: Tuple[str, str] = (objs[0].GetName(), objs[1].GetName())
                 with self.subTest(
-                        tester=tester_name,
-                        obj1=names[0],
-                        obj2=names[1],
+                    tester=tester_name, obj1=names[0], obj2=names[1],
                 ):
                     tester = validationcomparison.get_comparison(
                         objs[0],
                         objs[1],
                         metaoptions.MetaOptionParser(
                             self.test_options[tester_name].split(",")
-                        )
+                        ),
                     )
-                    print(f"{names[0]}, {names[1]}: "
-                          f"{tester.comparison_result_long}. "
-                          f"Short result: {tester.comparison_result}. "
-                          f"Expectation: {objs[2]}")
+                    print(
+                        f"{names[0]}, {names[1]}: "
+                        f"{tester.comparison_result_long}. "
+                        f"Short result: {tester.comparison_result}. "
+                        f"Expectation: {objs[2]}"
+                    )
                     self.assertEqual(tester.comparison_result, objs[2])
 
 
@@ -67,8 +67,9 @@ class TestComparison(unittest.TestCase):
     """
 
     @staticmethod
-    def create_profile(name, entries=5000, mu=10, sigma=0.3, max_fill=50,
-                       fixed_number=None):
+    def create_profile(
+        name, entries=5000, mu=10, sigma=0.3, max_fill=50, fixed_number=None
+    ):
         """
         Create a TProfile object with various content
         """
@@ -137,15 +138,13 @@ class TestComparison(unittest.TestCase):
 
         #: Profile with bins with 0 error
         self.profileZeroErrorBins = self.create_profile(
-            self.root_name("profileZeroErrorBins"),
-            max_fill=49
+            self.root_name("profileZeroErrorBins"), max_fill=49
         )
         self.profileZeroErrorBins.SetBinError(35, 0.0)
 
         #: Profile with bins with 0 error
         self.profileZeroErrorBinsTwo = self.create_profile(
-            self.root_name("profileZeroErrorBinsTwo"),
-            max_fill=49
+            self.root_name("profileZeroErrorBinsTwo"), max_fill=49
         )
         self.profileZeroErrorBinsTwo.SetBinError(35, 0.0)
 
@@ -161,21 +160,21 @@ class TestComparison(unittest.TestCase):
 
         #: Profile should be almost equal to A
         self.profileAequal = self.create_profile(
-            self.root_name("profileA_almostequal"),
-            sigma=0.4
+            self.root_name("profileA_almostequal"), sigma=0.4
         )
 
         #:  Profile should be almost equal to B
         self.profileBequal = self.create_profile(
-            self.root_name("profileB_almostequal"),
-            sigma=0.4
+            self.root_name("profileB_almostequal"), sigma=0.4
         )
 
         #: Profile with different bins
         self.profileDifferentBins = ROOT.TProfile(
             self.root_name("profileDifferentBins"),
             self.root_name("profileDifferentBins"),
-            40, 0, 50.0
+            40,
+            0,
+            50.0,
         )
 
         #: TEfficiemcy A
@@ -216,7 +215,8 @@ class TestComparison(unittest.TestCase):
         Test if the comparison of two TProfiles with very similar content works
         """
         c = validationcomparison.Chi2Test(
-            self.profileAequal, self.profileBequal)
+            self.profileAequal, self.profileBequal
+        )
 
         self.assertTrue(c.can_compare())
         c.ensure_compute()
@@ -237,8 +237,8 @@ class TestComparison(unittest.TestCase):
         # to disable comparison of this bin instead of
         # not doing the comparison at all
         c = validationcomparison.Chi2Test(
-            self.profileZeroErrorBins,
-            self.profileZeroErrorBinsTwo)
+            self.profileZeroErrorBins, self.profileZeroErrorBinsTwo
+        )
 
         self.assertTrue(c.can_compare())
 
@@ -316,8 +316,7 @@ class TestComparison(unittest.TestCase):
         fails properly
         """
         c = validationcomparison.Chi2Test(
-            self.profileA,
-            self.profileDifferentBins
+            self.profileA, self.profileDifferentBins
         )
         self.assertFalse(c.can_compare())
 

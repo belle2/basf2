@@ -12,6 +12,7 @@ from multiprocessing import Queue
 
 # Load ROOT
 import ROOT
+
 # In case some ROOT files loaded by the validation scripts contain some
 # RooFit objects, ROOT will auto-load RooFit. Due to some (yet not
 # understood) tear down problem, this results in this error:
@@ -27,16 +28,23 @@ import json_objects
 from basf2 import B2ERROR
 import validationpath
 from validationplotuple import Plotuple
-from validationfunctions import index_from_revision, get_style, \
-    available_revisions, terminal_title_line
+from validationfunctions import (
+    index_from_revision,
+    get_style,
+    available_revisions,
+    terminal_title_line,
+)
 import validationfunctions
 
 from validationrootobject import RootObject
 
 
 # Only execute the program if a basf2 release is set up!
-if os.environ.get('BELLE2_RELEASE_DIR', None) is None and os.environ.get('BELLE2_LOCAL_DIR', None) is None:
-    sys.exit('Error: No basf2 release set up!')
+if (
+    os.environ.get("BELLE2_RELEASE_DIR", None) is None
+    and os.environ.get("BELLE2_LOCAL_DIR", None) is None
+):
+    sys.exit("Error: No basf2 release set up!")
 
 pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 
@@ -46,7 +54,9 @@ pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 ##############################################################################
 
 
-def date_from_revision(revision: str, work_folder: str) -> Optional[Union[int, float]]:
+def date_from_revision(
+    revision: str, work_folder: str
+) -> Optional[Union[int, float]]:
     """
     Takes the name of a revision and returns the 'last modified'-timestamp of
     the corresponding directory, which holds the revision.
@@ -57,7 +67,7 @@ def date_from_revision(revision: str, work_folder: str) -> Optional[Union[int, f
 
     # Reference files do not need a date since there is always just one
     # version of it, which is presumed to be the latest
-    if revision == 'reference':
+    if revision == "reference":
         return 0
     # Regular releases and builds however do have a reasonably well defined
     # 'last modified'-date!
@@ -98,8 +108,7 @@ def merge_nested_list_dicts(a, b):
 
 
 def get_plot_files(
-        revisions: List[str],
-        work_folder: str
+    revisions: List[str], work_folder: str
 ) -> Dict[str, Dict[str, List[str]]]:
     """
     Returns a list of all plot files as absolute paths. For this purpose,
@@ -157,22 +166,24 @@ def get_tracked_reference_files() -> Dict[str, List[str]]:
     """
 
     # The base paths to the local and central release directories
-    basepaths = {'local': os.environ.get('BELLE2_LOCAL_DIR', None),
-                 'central': os.environ.get('BELLE2_RELEASE_DIR', None)}
+    basepaths = {
+        "local": os.environ.get("BELLE2_LOCAL_DIR", None),
+        "central": os.environ.get("BELLE2_RELEASE_DIR", None),
+    }
 
     # This is where we store the paths of reference ROOT files we've found
     results = {
-        'local': collections.defaultdict(list),
-        'central': collections.defaultdict(list)
+        "local": collections.defaultdict(list),
+        "central": collections.defaultdict(list),
     }
 
     # validation folder name used by the packages to keep the validation
     # reference plots
-    validation_folder_name = 'validation'
-    validation_test_folder_name = 'validation-test'
+    validation_folder_name = "validation"
+    validation_test_folder_name = "validation-test"
 
     # Now collect both local and central ROOT files:
-    for location in ['local', 'central']:
+    for location in ["local", "central"]:
 
         # Skip folders that do not exist (e.g. the central release dir might
         # not be setup if one is working with a completely local version)
@@ -190,40 +201,43 @@ def get_tracked_reference_files() -> Dict[str, List[str]]:
             glob_search = os.path.join(
                 root, package, validation_folder_name, "*.root"
             )
-            results[location][package].extend([
-                os.path.abspath(f) for f in glob.glob(glob_search)
-                if os.path.isfile(f)
-            ])
+            results[location][package].extend(
+                [
+                    os.path.abspath(f)
+                    for f in glob.glob(glob_search)
+                    if os.path.isfile(f)
+                ]
+            )
             # Special case: The validation-test folder in the validation package
             # which is used as a quick test of this framework.
             if package == "validation":
                 glob_search = os.path.join(
-                    root,
-                    package,
-                    validation_test_folder_name,
-                    "*.root"
+                    root, package, validation_test_folder_name, "*.root"
                 )
-                results[location][validation_test_folder_name].extend([
-                    os.path.abspath(f) for f in glob.glob(glob_search)
-                    if os.path.isfile(f)
-                ])
+                results[location][validation_test_folder_name].extend(
+                    [
+                        os.path.abspath(f)
+                        for f in glob.glob(glob_search)
+                        if os.path.isfile(f)
+                    ]
+                )
 
     # Now we need to get a rid of all the duplicates: Since local > central,
     # we will delete all central reference files that have a local counterpart.
     # First, loop over all local reference files
-    for package, local_files in results['local'].items():
+    for package, local_files in results["local"].items():
         for local_file in local_files:
             # Remove the location, i.e. reduce the path to /[package]/[filename]
-            local_path = local_file.replace(basepaths['local'], '')
+            local_path = local_file.replace(basepaths["local"], "")
             # Now loop over all central reference files
-            for central_file in results['central'][package]:
+            for central_file in results["central"][package]:
                 # Remove the location, i.e.
                 # reduce the path to /[package]/[filename]
-                central_path = central_file.replace(basepaths['central'], '')
+                central_path = central_file.replace(basepaths["central"], "")
                 # If package and filename are the same, we remove the central
                 # file from our results list
                 if local_path == central_path:
-                    results['central'][package].remove(central_file)
+                    results["central"][package].remove(central_file)
 
     # Return both local and central reference files. The return value does
     # not maintain the distinction between local and central files, because
@@ -231,20 +245,19 @@ def get_tracked_reference_files() -> Dict[str, List[str]]:
     # central reference files are treated the same anyway.
 
     ret = {
-        package:
-            results['central'][package] + results['local'][package]
-        for package in
-        list(results['central'].keys()) + list(results['central'].keys())
+        package: results["central"][package] + results["local"][package]
+        for package in list(results["central"].keys())
+        + list(results["central"].keys())
     }
 
     return ret
 
 
 def generate_new_plots(
-        revisions: List[str],
-        work_folder: str,
-        process_queue: Optional[Queue] = None,
-        root_error_ignore_level=ROOT.kWarning
+    revisions: List[str],
+    work_folder: str,
+    process_queue: Optional[Queue] = None,
+    root_error_ignore_level=ROOT.kWarning,
 ) -> None:
     """
     Creates the plots that contain the requested revisions. Each plot (or
@@ -258,9 +271,11 @@ def generate_new_plots(
     @return: No return value
     """
 
-    print(validationfunctions.terminal_title_line(
-        "Creating plots for the revision(s) " + ", ".join(revisions) + "."
-    ))
+    print(
+        validationfunctions.terminal_title_line(
+            "Creating plots for the revision(s) " + ", ".join(revisions) + "."
+        )
+    )
 
     # Since we are going to plot, we need to initialize ROOT
     ROOT.gROOT.SetBatch()
@@ -279,8 +294,11 @@ def generate_new_plots(
 
     # Collect all plot files, i.e. plot ROOT files from the requested revisions
     if len(revisions) == 0:
-        print("No revisions selected for plotting. Returning without "
-              "doing anything.", file=sys.stderr)
+        print(
+            "No revisions selected for plotting. Returning without "
+            "doing anything.",
+            file=sys.stderr,
+        )
         return
 
     plot_files = get_plot_files(revisions[1:], work_folder)
@@ -292,8 +310,9 @@ def generate_new_plots(
     # Only exception: If 'reference' is the only revision we have, we show it
     # because this is clearly what the user wants
     plot_packages = set()
-    only_tracked_reference = \
-        set(plot_files.keys()) | set(reference_files.keys()) == {"reference"}
+    only_tracked_reference = set(plot_files.keys()) | set(
+        reference_files.keys()
+    ) == {"reference"}
     for results in [plot_files, reference_files]:
         for rev in results:
             if rev == "reference" and not only_tracked_reference:
@@ -304,14 +323,10 @@ def generate_new_plots(
 
     # The dictionaries {package: {file: {key: [list of root objects]}}}
     plot_p2f2k2o = rootobjects_from_files(
-        plot_files,
-        is_reference=False,
-        work_folder=work_folder
+        plot_files, is_reference=False, work_folder=work_folder
     )
     reference_p2f2k2o = rootobjects_from_files(
-        reference_files,
-        is_reference=True,
-        work_folder=work_folder
+        reference_files, is_reference=True, work_folder=work_folder
     )
 
     # Delete all that doesn't belong to a package that we want to plot:
@@ -325,12 +340,10 @@ def generate_new_plots(
     # Open the output file
     # First: Create destination directory if it does not yet exist
     content_dir = validationpath.get_html_plots_tag_comparison_folder(
-        work_folder,
-        revisions
+        work_folder, revisions
     )
     comparison_json_file = validationpath.get_html_plots_tag_comparison_json(
-        work_folder,
-        revisions
+        work_folder, revisions
     )
 
     if not os.path.exists(content_dir):
@@ -345,10 +358,11 @@ def generate_new_plots(
     for i, package in enumerate(sorted(list(plot_packages))):
 
         # Some information to be printed out while the plots are created
-        print(terminal_title_line(
-            f'Creating plots for package: {package}',
-            level=1
-        ))
+        print(
+            terminal_title_line(
+                f"Creating plots for package: {package}", level=1
+            )
+        )
 
         compare_files = []
 
@@ -359,7 +373,7 @@ def generate_new_plots(
 
             # Some more information to be printed out while plots are
             # being created
-            print(f'Creating plots for file: {rootfile}')
+            print(f"Creating plots for file: {rootfile}")
 
             # A list in which we keep all the plotuples for this file
             plotuples = []
@@ -373,7 +387,7 @@ def generate_new_plots(
                             "total_package": len(plot_packages),
                             "status": "running",
                             "package_name": package,
-                            "file_name": file_name
+                            "file_name": file_name,
                         }
                     )
                 except queue.Full:
@@ -392,17 +406,15 @@ def generate_new_plots(
 
             for key in all_p2f2k2o[package][rootfile].keys():
                 plotuple = Plotuple(
-                    all_p2f2k2o[package][rootfile][key],
-                    revisions,
-                    work_folder
+                    all_p2f2k2o[package][rootfile][key], revisions, work_folder
                 )
                 plotuple.create_plotuple()
                 plotuples.append(plotuple)
                 has_reference = plotuple.has_reference()
 
-                if plotuple.type == 'TNtuple':
+                if plotuple.type == "TNtuple":
                     compare_ntuples.append(plotuple.create_json_object())
-                elif plotuple.type == 'TNamed':
+                elif plotuple.type == "TNamed":
                     compare_html_content.append(plotuple.create_json_object())
                 elif plotuple.type == "meta":
                     meta_key, meta_value = plotuple.get_meta_information()
@@ -419,7 +431,7 @@ def generate_new_plots(
                 has_reference=has_reference,
                 ntuples=compare_ntuples,
                 html_content=compare_html_content,
-                description=root_file_meta_data["description"]
+                description=root_file_meta_data["description"],
             )
             compare_files.append(compare_file)
 
@@ -427,8 +439,8 @@ def generate_new_plots(
 
         comparison_packages.append(
             json_objects.ComparisonPackage(
-                name=package,
-                plotfiles=compare_files)
+                name=package, plotfiles=compare_files
+            )
         )
         # Make the command line output more readable
         print()
@@ -450,31 +462,28 @@ def generate_new_plots(
             print(
                 f"ERROR: line_color for revision f{revision} could not be set!"
                 f" Choosing default color f{line_color}.",
-                file=sys.stderr
+                file=sys.stderr,
             )
         # print("For {} index {} color {}".format(revision, index, line_color))
 
         # todo the creation date and git_hash of the original revision should
         #  be transferred here
-        comparison_revs.append(json_objects.ComparisonRevision(
-            label=revision,
-            color=line_color)
+        comparison_revs.append(
+            json_objects.ComparisonRevision(label=revision, color=line_color)
         )
 
     # todo: refactor this information extraction -> json inside a specific
     #  class / method after the plots have been created
     json_objects.dump(
         comparison_json_file,
-        json_objects.Comparison(comparison_revs, comparison_packages)
+        json_objects.Comparison(comparison_revs, comparison_packages),
     )
 
     print_plotting_summary(all_plotuples)
 
 
 def print_plotting_summary(
-        plotuples: List[Plotuple],
-        warning_verbosity=1,
-        chi2_verbosity=1
+    plotuples: List[Plotuple], warning_verbosity=1, chi2_verbosity=1
 ) -> None:
     """
     Print summary of all plotuples plotted, especially printing information
@@ -487,10 +496,7 @@ def print_plotting_summary(
     :return: None
     """
     print()
-    print(terminal_title_line(
-        "Summary of plotting",
-        level=0
-    ))
+    print(terminal_title_line("Summary of plotting", level=0))
 
     print("Total number of plotuples considered: {}".format(len(plotuples)))
 
@@ -523,17 +529,20 @@ def print_plotting_summary(
         if n_warnings:
             print(f"A total of {n_warnings} warnings were issued.")
             for warning, perpetrators in plotuple_by_warning.items():
-                print(f"* '{warning}' was issued by {len(perpetrators)} "
-                      f"plotuples")
+                print(
+                    f"* '{warning}' was issued by {len(perpetrators)} "
+                    f"plotuples"
+                )
                 if warning_verbosity >= 2:
                     for perpetrator in perpetrators:
                         print(f"  - {perpetrator}")
         else:
             print("No warnings were issued. ")
-        print(validationfunctions.congratulator(
-            total=len(plotuples),
-            success=len(plotuple_no_warning)
-        ))
+        print(
+            validationfunctions.congratulator(
+                total=len(plotuples), success=len(plotuple_no_warning)
+            )
+        )
         print()
 
     if chi2_verbosity:
@@ -541,26 +550,32 @@ def print_plotting_summary(
             print()
         print("Chi2 comparisons")
         for result, perpetrators in plotuples_by_comparison_result.items():
-            print(f"* '{result}' was the result of {len(perpetrators)} "
-                  f"comparisons")
+            print(
+                f"* '{result}' was the result of {len(perpetrators)} "
+                f"comparisons"
+            )
             if chi2_verbosity >= 2:
                 for perpetrator in perpetrators:
                     print(f"  - {perpetrator}")
-        score = len(plotuples_by_comparison_result["equal"]) + \
-            0.75 * len(plotuples_by_comparison_result["not_compared"]) + \
-            0.5 * len(plotuples_by_comparison_result["warning"])
-        print(validationfunctions.congratulator(
-            rate_name="Weighted score: ",
-            total=len(plotuples),
-            success=score,
-        ))
+        score = (
+            len(plotuples_by_comparison_result["equal"])
+            + 0.75 * len(plotuples_by_comparison_result["not_compared"])
+            + 0.5 * len(plotuples_by_comparison_result["warning"])
+        )
+        print(
+            validationfunctions.congratulator(
+                rate_name="Weighted score: ",
+                total=len(plotuples),
+                success=score,
+            )
+        )
         print()
 
 
 def rootobjects_from_files(
-        root_files_dict: Dict[str, Dict[str, List[str]]],
-        is_reference: bool,
-        work_folder: str
+    root_files_dict: Dict[str, Dict[str, List[str]]],
+    is_reference: bool,
+    work_folder: str,
 ) -> Dict[str, Dict[str, Dict[str, List[RootObject]]]]:
     """
     Takes a nested dictionary of root file paths for different revisions
@@ -577,9 +592,7 @@ def rootobjects_from_files(
 
     # Return value: {package: {key: objects}}
     return_dict = collections.defaultdict(
-        lambda: collections.defaultdict(
-            lambda: collections.defaultdict(list)
-        )
+        lambda: collections.defaultdict(lambda: collections.defaultdict(list))
     )
 
     # Now loop over all given
@@ -587,14 +600,12 @@ def rootobjects_from_files(
         for package, root_files in package2root_files.items():
             for root_file in root_files:
                 key2objects = rootobjects_from_file(
-                    root_file,
-                    package,
-                    revision,
-                    is_reference,
-                    work_folder
+                    root_file, package, revision, is_reference, work_folder
                 )
                 for key, objects in key2objects.items():
-                    return_dict[package][os.path.basename(root_file)][key].extend(objects)
+                    return_dict[package][os.path.basename(root_file)][
+                        key
+                    ].extend(objects)
 
     return return_dict
 
@@ -607,24 +618,24 @@ def get_root_object_type(root_object: ROOT.TObject) -> str:
     :param root_object: ROOT TObject
     :return: type as string if the ROOT object
     """
-    if root_object.InheritsFrom('TNtuple'):
-        return 'TNtuple'
+    if root_object.InheritsFrom("TNtuple"):
+        return "TNtuple"
     # this will also match TProfile, as this root class derives from
     # TH1D
-    elif root_object.InheritsFrom('TH1'):
-        if root_object.InheritsFrom('TH2'):
-            return 'TH2'
+    elif root_object.InheritsFrom("TH1"):
+        if root_object.InheritsFrom("TH2"):
+            return "TH2"
         else:
-            return 'TH1'
+            return "TH1"
     # TEfficiency barks and quarks like a TProfile, but is unfortunately not
-    elif root_object.InheritsFrom('TEfficiency'):
-        return 'TEfficiency'
-    elif root_object.InheritsFrom('TGraph'):
-        return 'TGraph'
-    elif root_object.ClassName() == 'TNamed':
-        return 'TNamed'
-    elif root_object.InheritsFrom('TASImage'):
-        return 'TASImage'
+    elif root_object.InheritsFrom("TEfficiency"):
+        return "TEfficiency"
+    elif root_object.InheritsFrom("TGraph"):
+        return "TGraph"
+    elif root_object.ClassName() == "TNamed":
+        return "TNamed"
+    elif root_object.InheritsFrom("TASImage"):
+        return "TASImage"
     else:
         return ""
 
@@ -639,20 +650,17 @@ def get_metadata(root_object: ROOT.TObject) -> Dict[str, Any]:
         "description": "n/a",
         "check": "n/a",
         "contact": "n/a",
-        "metaoptions": []
+        "metaoptions": [],
     }
 
     # todo [ref, medium]: we should incorporate this in the MetaOptionParser and
     #   never pass them around as a list in the first place
     def metaoption_str_to_list(metaoption_str):
-        return [
-            opt.strip() for opt in metaoption_str.split(',') if opt.strip()
-        ]
+        return [opt.strip() for opt in metaoption_str.split(",") if opt.strip()]
 
-    if root_object_type in ['TH1', 'TH2', 'TEfficiency', 'TGraph']:
+    if root_object_type in ["TH1", "TH2", "TEfficiency", "TGraph"]:
         _metadata = {
-            e.GetName(): e.GetTitle()
-            for e in root_object.GetListOfFunctions()
+            e.GetName(): e.GetTitle() for e in root_object.GetListOfFunctions()
         }
 
         metadata["description"] = _metadata.get("Description", "n/a")
@@ -663,10 +671,10 @@ def get_metadata(root_object: ROOT.TObject) -> Dict[str, Any]:
             _metadata.get("MetaOptions", "")
         )
 
-    elif root_object_type == 'TNtuple':
-        _description = root_object.GetAlias('Description')
-        _check = root_object.GetAlias('Check')
-        _contact = root_object.GetAlias('Contact')
+    elif root_object_type == "TNtuple":
+        _description = root_object.GetAlias("Description")
+        _check = root_object.GetAlias("Check")
+        _contact = root_object.GetAlias("Contact")
 
         if _description:
             metadata["description"] = _description
@@ -675,7 +683,7 @@ def get_metadata(root_object: ROOT.TObject) -> Dict[str, Any]:
         if _contact:
             metadata["contact"] = _contact
 
-        _metaoptions_str = root_object.GetAlias('MetaOptions')
+        _metaoptions_str = root_object.GetAlias("MetaOptions")
         if _metaoptions_str:
             metadata["metaoptions"] = metaoption_str_to_list(_metaoptions_str)
 
@@ -685,11 +693,11 @@ def get_metadata(root_object: ROOT.TObject) -> Dict[str, Any]:
 
 
 def rootobjects_from_file(
-        root_file: str,
-        package: str,
-        revision: str,
-        is_reference: bool,
-        work_folder: str,
+    root_file: str,
+    package: str,
+    revision: str,
+    is_reference: bool,
+    work_folder: str,
 ) -> Dict[str, List[RootObject]]:
     """
     Takes a root file, loops over its contents and creates the RootObjects
@@ -718,10 +726,10 @@ def rootobjects_from_file(
     try:
         tfile = ROOT.TFile(root_file)
         if not tfile or not tfile.IsOpen():
-            B2ERROR(f'The file {root_file} can not be opened. Skipping it.')
+            B2ERROR(f"The file {root_file} can not be opened. Skipping it.")
             return key2object
     except OSError as e:
-        B2ERROR(f'{e}. Skipping it.')
+        B2ERROR(f"{e}. Skipping it.")
         return key2object
 
     # Get the 'last modified' timestamp of the revision that contains our
@@ -786,7 +794,7 @@ def rootobjects_from_file(
                 metadata["check"],
                 metadata["contact"],
                 metadata["metaoptions"],
-                is_reference
+                is_reference,
             )
         )
 
@@ -802,10 +810,10 @@ def rootobjects_from_file(
 
 
 def create_plots(
-        revisions=None,
-        force=False,
-        process_queue: Optional[Queue] = None,
-        work_folder="."
+    revisions=None,
+    force=False,
+    process_queue: Optional[Queue] = None,
+    work_folder=".",
 ):
     """!
     This function generates the plots and html
@@ -832,8 +840,10 @@ def create_plots(
         # 'reference' needs to be treated
         # separately, because it is always a viable option, but will never
         # be listed in 'available_revisions()'
-        if revision not in available_revisions(work_folder) \
-                and not revision == 'reference':
+        if (
+            revision not in available_revisions(work_folder)
+            and not revision == "reference"
+        ):
             print(f"Warning: Removing invalid revision '{revision}'.")
             revisions.pop(revision)
 
@@ -841,15 +851,14 @@ def create_plots(
     # available revisions and reference. The order should now be [reference,
     # newest_revision, ..., oldest_revision].
     if not revisions:
-        revisions = ['reference'] + available_revisions(work_folder)
+        revisions = ["reference"] + available_revisions(work_folder)
 
     # Now we check whether the plots for the selected revisions have been
     # generated before or not. In the path we use the alphabetical order of the
     # revisions, not the chronological one
     # (easier to work with on the web server side)
     expected_path = validationpath.get_html_plots_tag_comparison_json(
-        work_folder,
-        revisions
+        work_folder, revisions
     )
 
     # If the path exists and we don't want to force the regeneration of plots,
@@ -857,8 +866,7 @@ def create_plots(
     if os.path.exists(expected_path) and not force:
         print(
             "Plots for the revision(s) {} have already been created before "
-            "and will be served from the archive.".format(
-                ", ".join(revisions))
+            "and will be served from the archive.".format(", ".join(revisions))
         )
     # Otherwise: Create the requested plots
     else:

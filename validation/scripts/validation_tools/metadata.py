@@ -18,8 +18,9 @@ ROOT.gInterpreter.Declare("#include <framework/utilities/MakeROOTCompatible.h>")
 # @cond SUPPRESS_DOXYGEN
 
 
-def file_description_set(rootfile: Union[ROOT.TFile, str, pathlib.PurePath],
-                         description: str) -> None:
+def file_description_set(
+    rootfile: Union[ROOT.TFile, str, pathlib.PurePath], description: str
+) -> None:
     """
     Add file description validation metdata to a ROOT file.
 
@@ -52,11 +53,16 @@ def file_description_set(rootfile: Union[ROOT.TFile, str, pathlib.PurePath],
         rootfile.Close()
 
 
-def validation_metadata_set(obj: ROOT.TObject, title: str, contact: str,
-                            description: str, check: str,
-                            xlabel: Optional[str] = None,
-                            ylabel: Optional[str] = None,
-                            metaoptions="") -> None:
+def validation_metadata_set(
+    obj: ROOT.TObject,
+    title: str,
+    contact: str,
+    description: str,
+    check: str,
+    xlabel: Optional[str] = None,
+    ylabel: Optional[str] = None,
+    metaoptions="",
+) -> None:
     """
     Set the validation metadata for a given object by setting the necessary
     values. This function can be used on any object supported by the
@@ -114,8 +120,8 @@ def validation_metadata_set(obj: ROOT.TObject, title: str, contact: str,
 
 # noinspection PyIncorrectDocstring
 def validation_metadata_update(
-        rootfile: Union[str, ROOT.TFile, pathlib.PurePath],
-        name: str, *args, **argk) -> None:
+    rootfile: Union[str, ROOT.TFile, pathlib.PurePath], name: str, *args, **argk
+) -> None:
     """
     This is a convenience helper for `validation_metadata_set` in case the
     objects have already been saved in a ROOT file before: It will open the
@@ -183,8 +189,12 @@ class ValidationMetadataSetter(basf2.Module):
         might not be set correctly
     """
 
-    def __init__(self, variables: List[Tuple[str]],
-                 rootfile: Union[str, pathlib.PurePath], description=""):
+    def __init__(
+        self,
+        variables: List[Tuple[str]],
+        rootfile: Union[str, pathlib.PurePath],
+        description="",
+    ):
         """
         Initialize ValidationMetadataSetter
 
@@ -207,18 +217,19 @@ class ValidationMetadataSetter(basf2.Module):
         if isinstance(rootfile, pathlib.PurePath):
             rootfile = str(rootfile)
         #: And the name of the root file
-        self._rootfile = rootfile  # type: str
+        self._rootfile: str = rootfile
         #: Common description/information of/about all plots
         #: in this ROOT file (will be displayed above the plots)
         self._description = description
         #: Shared pointer to the root file that will be closed when the last
         #: user disconnects
-        self._tfile = None  # type: ROOT.TFile
+        self._tfile: ROOT.TFile = None
 
     def initialize(self):
         """Make sure we keep the file open"""
-        self._tfile = \
-            Belle2.RootFileCreationManager.getInstance().getFile(self._rootfile)
+        self._tfile = Belle2.RootFileCreationManager.getInstance().getFile(
+            self._rootfile
+        )
 
     def terminate(self):
         """And update the metadata at the end"""
@@ -231,11 +242,12 @@ class ValidationMetadataSetter(basf2.Module):
 
 
 def create_validation_histograms(
-    path: basf2.Path, rootfile: Union[str, pathlib.PurePath],
+    path: basf2.Path,
+    rootfile: Union[str, pathlib.PurePath],
     particlelist: str,
     variables_1d: Optional[List[Tuple]] = None,
     variables_2d: Optional[List[Tuple]] = None,
-    description=""
+    description="",
 ) -> None:
     """
     Create histograms for all the variables and also label them to be useful
@@ -305,6 +317,7 @@ def create_validation_histograms(
         variables_2d=histograms_2d,
         fileName=rootfile,
     )
+
 
 # End suppression of doxygen checks
 # @endcond

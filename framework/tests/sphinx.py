@@ -22,12 +22,8 @@ if __name__ == "__main__":
     ignorepythonclass = 'py:class reference target not found'
     #: ignore the warnings about duplicated labels in whatsnew part
     ignoreduplicatewhatsnewlabel = 'duplicate label whatsnew:'
-    #: ignore duplicate labels in calibration package (NEEDS TO BE FIXED!)
-    ignoreduplicatecalibrationlabel = 'duplicate label calibration'
     #: ignore framework description of role warnings (should be fixed)
     ignoreduplicatedescriptionofrole = 'duplicate description of role'
-    #: ignore warning about not finding Geometry module ?!
-    ignoregeometry = 'b2:mod reference target not found: Geometry'
     #: ignore further warnings in light builds
     #: ignore online_book
     ignoreonlinebook = 'online_book'
@@ -49,7 +45,6 @@ if __name__ == "__main__":
                      re.findall(ignoreenvironmentvariables, x) or
                      re.findall(ignorepythonclass, x) or
                      re.findall(ignoreduplicatewhatsnewlabel, x) or
-                     re.findall(ignoreduplicatecalibrationlabel, x) or
                      re.findall(ignoreduplicatedescriptionofrole, x) or
                      re.findall(ignoreaddsimulation, x) or
                      re.findall(ignoreaddtriggersimulation, x) or
@@ -57,8 +52,7 @@ if __name__ == "__main__":
                      re.findall(ignoreaddcdstoutput, x) or
                      re.findall(ignorevalidationtools, x) or
                      re.findall(ignoreincludeproblem, x) or
-                     re.findall(ignoreonlinebook, x) or
-                     re.findall(ignoregeometry, x),
+                     re.findall(ignoreonlinebook, x),
                      ['--light']
                      )
     if not light_build:
@@ -67,7 +61,5 @@ if __name__ == "__main__":
                          re.findall(ignoreenvironmentvariables, x) or
                          re.findall(ignorepythonclass, x) or
                          re.findall(ignoreduplicatewhatsnewlabel, x) or
-                         re.findall(ignoreduplicatecalibrationlabel, x) or
-                         re.findall(ignoreduplicatedescriptionofrole, x) or
-                         re.findall(ignoregeometry, x)
+                         re.findall(ignoreduplicatedescriptionofrole, x)
                          )

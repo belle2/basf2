@@ -18,8 +18,9 @@ class RunDB:
     Simple API class to just get run information from the RunDB.
 
     Parameters:
-        apikey (str): RunDB API key (see `here <https://questions.belle2.org/question/9847/obtaining-api-key-for-rundb/>`_
-                      how to get one)
+        apikey (str): RunDB API key (see
+          `here <https://questions.belle2.org/question/11145/obtaining-an-access-token-for-rundb-api-2021-version/>`_
+          how to get one)
         username (str): DESY username
     """
 

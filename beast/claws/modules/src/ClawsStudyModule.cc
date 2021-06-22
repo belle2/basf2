@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <beast/claws/modules/ClawsStudyModule.h>
-#include <beast/claws/dataobjects/CLAWSSimHit.h>
 #include <beast/claws/dataobjects/ClawsHit.h>
 #include <generators/SAD/dataobjects/SADMetaHit.h>
 #include <framework/datastore/StoreArray.h>

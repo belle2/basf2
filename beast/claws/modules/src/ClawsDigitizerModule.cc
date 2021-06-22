@@ -10,8 +10,6 @@
 
 #include <beast/claws/modules/ClawsDigitizerModule.h>
 #include <beast/claws/dataobjects/CLAWSSimHit.h>
-
-#include <mdst/dataobjects/MCParticle.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>

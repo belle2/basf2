@@ -423,7 +423,7 @@ Orca Kinematic Fitter
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. warning:: 
-    On order to populate these variables, you need to run the Orca kinematic fitter. I.e.
+    In order to populate these variables, you need to run the Orca kinematic fitter. I.e.
 
     .. code-block:: python
 

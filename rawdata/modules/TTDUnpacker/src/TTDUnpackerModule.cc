@@ -50,8 +50,13 @@ void TTDUnpackerModule::event()
               (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
               it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
 
-      m_EventLevelTriggerTimeInfo.assign(new EventLevelTriggerTimeInfo(true, it.GetIsHER(0), (it.GetFrameCount(0) & 0x1) != 0,
-                                         it.GetTimeSinceLastInjection(0), it.GetTimeSincePrevTrigger(0), it.GetBunchNumber(0)));
+      m_EventLevelTriggerTimeInfo.setIsHER(it.GetIsHER(0));
+      m_EventLevelTriggerTimeInfo.setRevo2((it.GetFrameCount(0) & 0x1) != 0);
+      m_EventLevelTriggerTimeInfo.setTimeSinceLastInjection(it.GetTimeSinceLastInjection(0));
+      m_EventLevelTriggerTimeInfo.setTimeSincePrevTrigger(it.GetTimeSincePrevTrigger(0));
+      m_EventLevelTriggerTimeInfo.setBunchNumber(it.GetBunchNumber(0));
+      m_EventLevelTriggerTimeInfo..setNoInjection() {m_timeSinceLastInjection = c_flagNoInjection;}
+      m_EventLevelTriggerTimeInfo.setValid();
     }
     break;
   }

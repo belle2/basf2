@@ -259,8 +259,7 @@ void SVDDQMClustersOnTrackModule::beginRun()
   while ((obj = nextH()))
     if (obj->InheritsFrom("TH1")) {
       ((TH1F*)obj)->SetTitle(obj->GetTitle() + runID);
-      if (obj != nullptr)((TH1F*)obj)->Reset();
-    }
+    } else if (obj != nullptr)((TH1F*)obj)->Reset();
 
 }
 

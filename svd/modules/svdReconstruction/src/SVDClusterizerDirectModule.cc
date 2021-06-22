@@ -277,18 +277,16 @@ void SVDClusterizerDirectModule::event()
 
       // If the strip is not masked away, save normalized samples (sample/stripNoise)
       apvSamples normedSamples;
-      // cppcheck-suppress knownConditionTrueFalse
+
       if (validDigit) {
         auto samples = digit.getSamples();
         transform(samples.begin(), samples.end(), normedSamples.begin(),
                   bind2nd(divides<float>(), stripNoiseADU));
         validDigit = validDigit && pass3Samples(normedSamples, m_cutAdjacent);
-      }
 
-      // If this is a valid digit, store normed samples.
-      // It's not just that we don't have to normalize again - we don't need other data than strip
-      // number and normed samples from the digits!
-      if (validDigit) {
+        // If this is a valid digit, store normed samples.
+        // It's not just that we don't have to normalize again - we don't need other data than strip
+        // number and normed samples from the digits!
         zeroSuppress(normedSamples, m_cutAdjacent);
         storedNormedSamples.insert(make_pair(iDigit, normedSamples));
       }

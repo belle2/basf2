@@ -556,7 +556,7 @@ void SVDUnpackerModule::event()
         p->setMissedHeader(missedHeader);
         p->setMissedTrailer(missedTrailer);
 
-        vDiagnostic_ptr.clear();
+        //vDiagnostic_ptr.clear();
       }
 
     } // end event loop

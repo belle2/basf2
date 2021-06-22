@@ -19,7 +19,10 @@ using namespace std;
 using boost::property_tree::ptree;
 
 
-SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename): m_MapUniqueName("")
+SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename)
+  : m_MapUniqueName("")
+  , m_currentChipInfo("")
+  , m_currentSensorInfo("")
 {
 
   // Create an empty property tree object

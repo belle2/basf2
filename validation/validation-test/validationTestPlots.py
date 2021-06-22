@@ -33,21 +33,24 @@ if __name__ == "__main__":
 
     tntuple = ROOT.TNtuple("ntuple_test", "ntuple test", "x:y:z:k")
 
-    array_of_values = array.array('f', [23.4, 4.4, 5.12, -23.0])
+    array_of_values = array.array("f", [23.4, 4.4, 5.12, -23.0])
     tntuple.Fill(array_of_values)
 
-    tntuple.SetAlias('Description', r"This is a description test. "
-                     r"Lorem ipsum sit dolor amet.  We also support $\LaTeX$! "
-                     "\n <br> \n For example, here is the infamous "
-                     "Einstein-Pythagoras-theorem: \n "
-                     r"$$a^2 + b^2 = \frac{E}{m}$$ "
-                     "\n Of course, you can also do other things, "
-                     r"like $\theta = 90^\circ$ or $D^- \rightarrow D^0 \pi^- \pi^+$. "
-                     "\n Sometimes it is necessary to escape commands with a double backslash, "
-                     r"because e.g. \\theta will be interpreted as [tab]heta.")
-    tntuple.SetAlias('Check', "This is the check text.")
-    tntuple.SetAlias('Contact', "Name of the contact person.")
-    tntuple.SetAlias('MetaOptions', "shifter, some_meta_options")
+    tntuple.SetAlias(
+        "Description",
+        r"This is a description test. "
+        r"Lorem ipsum sit dolor amet.  We also support $\LaTeX$! "
+        "\n <br> \n For example, here is the infamous "
+        "Einstein-Pythagoras-theorem: \n "
+        r"$$a^2 + b^2 = \frac{E}{m}$$ "
+        "\n Of course, you can also do other things, "
+        r"like $\theta = 90^\circ$ or $D^- \rightarrow D^0 \pi^- \pi^+$. "
+        "\n Sometimes it is necessary to escape commands with a double backslash, "
+        r"because e.g. \\theta will be interpreted as [tab]heta.",
+    )
+    tntuple.SetAlias("Check", "This is the check text.")
+    tntuple.SetAlias("Contact", "Name of the contact person.")
+    tntuple.SetAlias("MetaOptions", "shifter, some_meta_options")
 
     # Overwrite the former TNtuple if one was there
     tntuple.Write()
@@ -61,11 +64,11 @@ if __name__ == "__main__":
     add_properties(
         gaus_h,
         {
-            'Description': "xlog",
-            'Check': "Gaus Histogram Check",
-            'Contact': "Gaus Histogram Contact",
-            'MetaOptions': "shifter, logx, nostats"
-        }
+            "Description": "xlog",
+            "Check": "Gaus Histogram Check",
+            "Contact": "Gaus Histogram Contact",
+            "MetaOptions": "shifter, logx, nostats",
+        },
     )
 
     gaus_h.Write()
@@ -76,18 +79,20 @@ if __name__ == "__main__":
     warnings_h = ROOT.TH1F(
         "warnings_histogram",
         "Histogram with missing check and description",
-        100, -3, 3
+        100,
+        -3,
+        3,
     )
     warnings_h.FillRandom("gaus", 500)
 
     add_properties(
         warnings_h,
         {
-            'Description': "",
-            'Check': "",
-            'Contact': "Kilian Lieret, Kilian.Lieret@campus.lmu.de",
-            'MetaOptions': "shifter, logx, nostats"
-        }
+            "Description": "",
+            "Check": "",
+            "Contact": "Kilian Lieret, Kilian.Lieret@campus.lmu.de",
+            "MetaOptions": "shifter, logx, nostats",
+        },
     )
 
     warnings_h.Write()
@@ -103,12 +108,12 @@ if __name__ == "__main__":
     add_properties(
         exp_h,
         {
-            'Description': "Expert Validation Plot",
-            'Check': "Expert Histogram Check. Should only appear if expert button"
-                     "was checked.",
-            'Contact': "Expert Histogram Contact",
-            'MetaOptions': "logy, nostats, C"
-        }
+            "Description": "Expert Validation Plot",
+            "Check": "Expert Histogram Check. Should only appear if expert button"
+            "was checked.",
+            "Contact": "Expert Histogram Contact",
+            "MetaOptions": "logy, nostats, C",
+        },
     )
 
     exp_h.Write()
@@ -121,9 +126,7 @@ if __name__ == "__main__":
     basf2.set_random_seed(datetime.now().microsecond)
 
     gaus_changing = ROOT.TH1F(
-        "gaus_changing_histogram",
-        "Gaus Changing Histogram",
-        100, -5, 5
+        "gaus_changing_histogram", "Gaus Changing Histogram", 100, -5, 5
     )
     mean = ROOT.gRandom.Uniform(-1.0, 1.0)
 
@@ -134,19 +137,20 @@ if __name__ == "__main__":
     add_properties(
         gaus_changing,
         {
-            'Description': r"xlog ylog with stats. I can haz $\LaTeX$?",
-            'Check': "Gaus Changing Histogram Check",
-            'Contact': "Gaus Changing Histogram Contact",
-            'MetaOptions': "shifter, logx, logy"
-        }
+            "Description": r"xlog ylog with stats. I can haz $\LaTeX$?",
+            "Check": "Gaus Changing Histogram Check",
+            "Contact": "Gaus Changing Histogram Contact",
+            "MetaOptions": "shifter, logx, logy",
+        },
     )
 
     gaus_changing.Write()
 
     # 2D histogram
     # ======================================
-    hist2d = ROOT.TH2F("example_2d_histogram", "example_2d_title",
-                       60, -3, 3, 60, -3, 3)
+    hist2d = ROOT.TH2F(
+        "example_2d_histogram", "example_2d_title", 60, -3, 3, 60, -3, 3
+    )
 
     mean = (0, 0)
     cov = [[1, 0], [0, 1]]
@@ -157,11 +161,11 @@ if __name__ == "__main__":
     add_properties(
         hist2d,
         {
-            'Description': "Some 2D Histogram",
-            'Check': "Check For Something",
-            'Contact': "Contact Someone",
-            'MetaOptions': "shifter, contz"
-        }
+            "Description": "Some 2D Histogram",
+            "Check": "Check For Something",
+            "Contact": "Contact Someone",
+            "MetaOptions": "shifter, contz",
+        },
     )
 
     hist2d.Write()
@@ -189,11 +193,11 @@ if __name__ == "__main__":
     add_properties(
         teff,
         {
-            'Description': "Efficiency plot of something",
-            'Check': "Check For Something",
-            'Contact': "Contact Someone",
-            'MetaOptions': "shifter"
-        }
+            "Description": "Efficiency plot of something",
+            "Check": "Check For Something",
+            "Contact": "Contact Someone",
+            "MetaOptions": "shifter",
+        },
     )
 
     teff.Write()
@@ -216,11 +220,11 @@ if __name__ == "__main__":
     add_properties(
         graph_err,
         {
-            'Description': "TGraphErrors plot of something",
-            'Check': "Check For Something",
-            'Contact': "Contact Someone",
-            'MetaOptions': "shifter"
-        }
+            "Description": "TGraphErrors plot of something",
+            "Check": "Check For Something",
+            "Contact": "Contact Someone",
+            "MetaOptions": "shifter",
+        },
     )
 
     graph_err.Write()
@@ -229,7 +233,9 @@ if __name__ == "__main__":
     # ======================================
 
     # generate some user-defined HTML
-    html_content = ROOT.TNamed("This is a bold HTML tag", "<p><b>THIS IS USER'S HTML</b></p>")
+    html_content = ROOT.TNamed(
+        "This is a bold HTML tag", "<p><b>THIS IS USER'S HTML</b></p>"
+    )
 
     html_content.Write()
 
@@ -239,7 +245,9 @@ if __name__ == "__main__":
     # ======================================
 
     tfile = ROOT.TFile("validationTestPlotsExpertOnly.root", "RECREATE")
-    gaus_h = ROOT.TH1F("gaus_histogram_exprt", " Gaus Histogram Expert", 100, -3, 3)
+    gaus_h = ROOT.TH1F(
+        "gaus_histogram_exprt", " Gaus Histogram Expert", 100, -3, 3
+    )
     gaus_h.FillRandom("gaus", 500)
     gaus_h.Write()
     tfile.Close()

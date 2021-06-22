@@ -307,9 +307,10 @@ namespace Belle2 {
     }
 
     VARIABLE_GROUP("Dedx");
-//CDC variables
+    //CDC variables
     REGISTER_VARIABLE("CDCdEdx", CDCdedx, "CDC dE/dx truncated mean");
-    REGISTER_VARIABLE("CDCdEdxnosat", CDCdedxnosat, "CDC dE/dx truncated mean without saturation correction");
+    REGISTER_VARIABLE("CDCdEdxnosat", CDCdedxnosat,
+                      "CDC dE/dx truncated mean without saturation correction (NA for current track level MC)");
     REGISTER_VARIABLE("pCDC", pCDC, "Momentum valid in the CDC");
     REGISTER_VARIABLE("costhCDC", costhCDC, "costheta valid in the CDC");
     REGISTER_VARIABLE("CDCdEdx_nhits", CDCdEdx_nhits, "total hits of dedx track");
@@ -333,7 +334,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("CDCdEdx_llogP", CDCdEdx_llogP, "Log likelihood value of protons from CDC dEdx");
     REGISTER_VARIABLE("CDCdEdx_llogD", CDCdEdx_llogD, "Log likelihood value of duetrons from CDC dEdx");
 
-//SVD variables
+    //SVD variables
     REGISTER_VARIABLE("SVDdEdx", SVDdedx, "SVD dE/dx truncated mean");
     REGISTER_VARIABLE("pSVD", SVD_p, "momentum valid in the SVD");
     REGISTER_VARIABLE("SVD_pTrue", SVD_pTrue, "true MC momentum valid in the SVD");

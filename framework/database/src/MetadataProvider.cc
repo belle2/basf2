@@ -55,8 +55,8 @@ namespace Belle2::Conditions {
       // iteration on the first missing payload instead of going through all the
       // remaining as well.
       const size_t found = std::count_if(info.begin(), info.end(), [&existing](auto & payload) {
-        // already filled by previous gt so don't do anything
-        if (payload.revision > 0) return true;
+        // already filled by previous gt or has a filename from testing payloads ... so don't do anything
+        if (payload.revision > 0 or !payload.filename.empty()) return true;
         // otherwise look for the payload in the list of existing payloads for this run
         if (auto && it = existing.find(payload.name); it != existing.end()) {
           payload.update(it->second);
@@ -77,7 +77,7 @@ namespace Belle2::Conditions {
     // Again, we don't use std::all_of here because then it stops early and we
     // don't get errors for all missing payloads. But at least it would still be correct.
     const int missing = std::count_if(info.begin(), info.end(), [this, exp, run](const auto & p) {
-      if (p.revision == 0 and p.required) {
+      if (p.revision == 0 and p.filename.empty() and p.required) {
         B2ERROR("Cannot find payload in any of the configured global tags"
                 << LogVar("name", p.name)
                 << LogVar("globaltags", boost::algorithm::join(m_tags, ", "))

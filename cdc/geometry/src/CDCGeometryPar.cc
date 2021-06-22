@@ -1310,28 +1310,43 @@ void CDCGeometryPar::setT0()
 // Calculate mean t0
 void CDCGeometryPar::calcMeanT0()
 {
-  B2DEBUG(29, "calcMeanT0 start");
-  double effiSum = 0.;
-  m_meanT0 = 0.;
-  for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
-    for (unsigned short iW = 0; iW < MAX_N_SCELLS; ++iW) {
-      if (m_t0[iCL][iW] <= 0.) continue;
-      const WireID wid = WireID(iCL, iW);
-      if (isHotWire(wid)) continue;
-      if (isBadWire(wid)) continue;
-      //TODO try to reject strage t0s more
-      double effi = 1.;
-      isDeadWire(wid, effi);
-      effiSum += effi;
-      m_meanT0 += effi * m_t0[iCL][iW];
+  double minT0 = 3800; // ns
+  double maxT0 = 5800; // ns
+  double oldMeanT0 = 0;
+  const unsigned short maxIt = 10;
+  unsigned short it1 = 0;
+  for (unsigned short it = 0; it < maxIt; ++it) {
+    it1 = it;
+    double effiSum = 0.;
+    m_meanT0 = 0.;
+    double stdvT0 = 0;
+    for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
+      for (unsigned short iW = 0; iW < m_nWires[iCL]; ++iW) {
+        if (m_t0[iCL][iW] < minT0 || m_t0[iCL][iW] > maxT0) continue;
+        const WireID wid = WireID(iCL, iW);
+        if (isHotWire(wid)) continue;
+        if (isBadWire(wid)) continue;
+        double effi = 1.;
+        isDeadWire(wid, effi);
+        effiSum += effi;
+        m_meanT0 += effi * m_t0[iCL][iW];
+        stdvT0   += effi * m_t0[iCL][iW] * m_t0[iCL][iW];
+      }
+    }
+    if (effiSum > 0.) {
+      m_meanT0 /= effiSum;
+      stdvT0   /= effiSum;
+      stdvT0 = sqrt(fabs(stdvT0 - m_meanT0 * m_meanT0));
+      B2DEBUG(29, it << " " << effiSum << " " << m_meanT0 << " " << stdvT0);
+      if (fabs(m_meanT0 - oldMeanT0) < 0.1) break;
+      oldMeanT0 = m_meanT0;
+      minT0 = m_meanT0 - 3 * stdvT0;
+      maxT0 = m_meanT0 + 3 * stdvT0;
+    } else {
+      B2FATAL("Wire efficiency sum <= 0!");
     }
   }
-  if (effiSum > 0.) {
-    m_meanT0 /= effiSum;
-  } else {
-    B2FATAL("Wire efficiency sum <= 0!");
-  }
-  B2DEBUG(29, "calcMeanT0 end");
+  if (it1 == maxIt - 1) B2WARNING("Max. iterations(=" << maxIt << ") needed to calculte the mean t0. Strange.");
 }
 
 

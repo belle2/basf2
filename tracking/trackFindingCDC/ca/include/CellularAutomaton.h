@@ -75,8 +75,8 @@ namespace Belle2 {
         }
 
         auto lessStartCellState = [](ACellHolder * lhs, ACellHolder * rhs) {
-          AutomatonCell& lhsCell = lhs->getAutomatonCell();
-          AutomatonCell& rhsCell = rhs->getAutomatonCell();
+          const AutomatonCell& lhsCell = lhs->getAutomatonCell();
+          const AutomatonCell& rhsCell = rhs->getAutomatonCell();
           return (std::make_pair(lhsCell.hasStartFlag(), lhsCell.getCellState()) <
                   std::make_pair(rhsCell.hasStartFlag(), rhsCell.getCellState()));
         };

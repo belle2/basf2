@@ -49,7 +49,7 @@ namespace Belle2 {
     bool isHER() {return m_isHER;}
     /// get lowest bit of revolution counter
     bool isRevo2() {return m_revo2;}
-    /// get time since the last injection in clock ticks (FTSW clock)
+    /// get time since the last injection (i.e. the injection-pre-kick signal) in clock ticks (FTSW clock)
     unsigned int getTimeSinceLastInjection() {return m_timeSinceLastInjection;}
     /// get time since the previous trigger in clock ticks (FTSW clock)
     unsigned int getTimeSincePrevTrigger() {return m_timeSincePrevTrigger;}
@@ -67,7 +67,7 @@ namespace Belle2 {
     void setIsHER(bool isHER) {m_isHER = isHER;}
     /// set lowest bit of revolution counter
     void setRevo2(bool revo2) {m_revo2 = revo2;}
-    /// set time since the last injection in clock ticks (FTSW clock)
+    /// set time since the last injection (i.e. the injection-pre-kick signal) in clock ticks (FTSW clock)
     void setTimeSinceLastInjection(unsigned int timeSinceLastInjection) {m_timeSinceLastInjection = timeSinceLastInjection;}
     /// set time since the previous trigger in clock ticks (FTSW clock)
     void setTimeSincePrevTrigger(unsigned int timeSincePrevTrigger) {m_timeSincePrevTrigger = timeSincePrevTrigger;}
@@ -77,7 +77,7 @@ namespace Belle2 {
     void setNoInjection() {m_timeSinceLastInjection = c_flagNoInjection;}
 
     // Additional Functions (not inline)
-    /// get time since the last injection in microseconds
+    /// get time since the last injection (i.e. the injection-pre-kick signal) in microseconds
     double getTimeSinceLastInjectionInMicroSeconds();
     /// get time since the previous trigger in microseconds
     double getTimeSincePrevTriggerInMicroSeconds();
@@ -104,6 +104,8 @@ namespace Belle2 {
     unsigned int m_timeSinceLastInjection;
     /**
     * Time since the previous trigger in clock ticks (127MHz=RF/4 clock)
+    * Note: This is actually the time since the injection-pre-kick signal was received
+    *       so there is some offset (different for HER/LER) that will be handled by the analysis variable
     **/
     unsigned int m_timeSincePrevTrigger;
     /**

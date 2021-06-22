@@ -11,7 +11,7 @@
 
 using namespace Belle2;
 
-// get time since the last injection in microseconds
+// get time since the last injection (i.e. the injection-pre-kick signal) in microseconds
 double EventLevelTriggerTimeInfo::getTimeSinceLastInjectionInMicroSeconds()
 {
   // GlobalClockFrequency is in GHz, so we need an additional factor to convert to microseconds

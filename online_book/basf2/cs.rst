@@ -328,7 +328,7 @@ The word "boosted" refers to the specific way the tree is formed: gradient boost
 
 The reader is welcome to consult the Wikipedia pages on `Decision Tree Learning <https://en.wikipedia.org/wiki/Decision_tree_learning>`_ and `Gradient Tree Boosting <https://en.wikipedia.org/wiki/Gradient_boosting#Gradient_tree_boosting>`_ for a more detailed overview. 
 
-In our case BDT is used directly to distinguish between continuum and non-continuum events. The target variable is the "continuum probability" - the probability of an event being a continuum event. The input variables can be in principle any varible that distinguishes between continuum and non-continuum events. The recommended variables and the most used are the ones introduced in the previous lesson as well as others from the :ref:`analysis/doc/analysis_continuumsuppression:Continuum Suppression` variable group in the :ref:`analysis/doc/index-01-analysis:Variables`. As BDT is a supervised machine learning method, there are three steps needed to put it to use:
+In our case BDT is used directly to distinguish between continuum and non-continuum events. The target variable is the "continuum probability" - the probability of an event being a continuum event. The input variables can be in principle any varible that distinguishes between continuum and non-continuum events. The recommended variables and the most used are the ones introduced in the previous lesson as well as others from the :ref:`analysis/doc/ContinuumSuppression:Continuum Suppression` variable group in the :ref:`analysis/doc/index-01-analysis:Variables`. As BDT is a supervised machine learning method, there are three steps needed to put it to use:
 
 1. Create learning dataset.
 2. Make the algorithm "learn" and output a decision tree, that we can use.
@@ -336,8 +336,29 @@ In our case BDT is used directly to distinguish between continuum and non-contin
 
 When passing data over the last step, the BDT will write out a continuum probability, which then can be stored in the Ntuples. The actual cutting out of the continuum at the end narrows down to putting a selection criteria on the continuum probability. 
 
+.. admonition:: Exercise
+    :class: exercise stacked
+    
+    In the three initial exercises of this chapter you've learned how to create Ntuples for continuum suppression. For creating the Ntuples for the BDT training one would need to do the very same, but normally more different continuum suppression variables are needed. This time create the dataset following the procedure from previous exercises, but also include KSFW moments and CLEO cones into the Ntuples.
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    You can use the code from the previous exercises. You would only have to add the new variables to the ``simpleCSVariables``. See the documentation on the variables in :ref:`analysis/doc/ContinuumSuppression:Continuum suppression`. 
+
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    .. literalinclude:: steering_files/091_cs.py
+               :language: python
+
 .. include:: ../lesson_footer.rstinclude
 
 .. topic:: Authors of this lesson
 
-    Moritz Bauer
+    Moritz Bauer, Yaroslav Kulii
+
+.. topic:: Code contributors
+
+    P. Goldenzweig, I. Komarov

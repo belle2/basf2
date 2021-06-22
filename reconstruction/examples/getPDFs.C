@@ -11,6 +11,7 @@
 #include "TStyle.h"
 #include "TCanvas.h"
 #include <include/reconstruction/dbobjects/DedxPDFs.h>
+#include <framework/logging/Logger.h>
 
 void getPDFs(std::string inputfile = "temp.root") {
 

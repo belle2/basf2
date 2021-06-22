@@ -688,8 +688,6 @@ void EventDataPlotter::draw(const CDCTrack& track, const AttributeMap& attribute
 
 void EventDataPlotter::draw(const RecoTrack& recoTrack, const AttributeMap& attributeMap)
 {
-  StoreArray<CDCHit> storedHits;
-
   if (not m_ptrPrimitivePlotter) return;
   PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
 

@@ -57,6 +57,12 @@ Variables
  * Added new variables :b2:var:`L1TimeQuality` and :b2:var:`isPoissonTriggerInInjectionVeto` for returning the L1 trigger time quality and the injection veto flag. Renamed the variable ``L1TimType`` into :b2:var:`L1TimeType`.
  * Added a new variable :b2:var:`minC2TDistID` and a metavariable :b2:var:`minC2TDistVar`, which allow to call
    any variable for the nearest track to a given photon.
+ * New variables have been added to classify the true decay mode of an event (e.g. :b2:var:`BplusMode` and :b2:var:`B0Mode`). They
+   serve as an alternative to the `TopologyAnalysis`. Further information about the meaning of the variable values can be found in
+   :b2:ref:`GeneratedDecayModes`.
+ * Added new variables :b2:var:`useParticleRestFrame` and :b2:var:`useRecoilParticleRestFrame` for computing variables in the
+   rest frame of a given Particle (or in the rest frame of the recoiling system of a given Particle). If the ParticleList passed
+   to these variables contains more than one Particle, only the first one in the list will be considered.
 
 Modules
 +++++++
@@ -97,7 +103,12 @@ Modules
  * The :b2:mod:`TrackingMomentum` module has been extended. A ParticleList of composite particles can now be processed as well. In
    that case the momenta of all track-based daughter particles are scaled by the provided factor.
  * The wrapper functions for the tracking systematics modules have been renamed from ``trackingMomentum`` to `scaleTrackMomenta`
-   and from ``trackingEfficiency`` to `removeTracksForTrackingEfficiencyCalculation`. 
+   and from ``trackingEfficiency`` to `removeTracksForTrackingEfficiencyCalculation`.
+ * Added the :b2:mod:`TauDecayMode` module, which is an actualization of the :b2:mod:`TauDecayMarker` module for the new
+   TauolaBelle decays. Using a txt file, which defines the mapping between decay strings and decay numbers from TauolaBelle, the
+   module assigns a decay number for each tau in the event. This decay number is stored in the variables :b2:var:`tauMinusMCMode`
+   and :b2:var:`tauPlusMCMode`. It's possible to provide the path of a different txt file for the mapping as a parameter to the
+   module.
  * Added a `EnergyBiasCorrection` module, sub-percent correction only applied to E of photons not on clusterE and should only
    be applied on data. `correctEnergyBias` is a corresponding wrapper function.
 
@@ -106,6 +117,8 @@ Full Event Interpretation
 
  * Added option to reconstruct strange B mesons (at Y(5S)) in 51 decay channels. Can be switched on with the ``strangeB`` flag in
    `fei.get_default_channels()`.
+ * The FEI has been retrained with MC14 and release-05. The prefix ``FEIv4_2021_MC14_release_05_01_12`` has to be set in the FEI
+   configuration.
 
 Standard Particle Lists
 +++++++++++++++++++++++

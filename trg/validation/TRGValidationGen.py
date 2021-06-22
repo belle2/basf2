@@ -11,7 +11,7 @@
 
 import basf2 as b2
 from simulation import add_simulation
-from L1trigger import add_tsim
+from L1trigger import add_trigger_simulation
 
 
 main = b2.create_path()
@@ -36,7 +36,7 @@ main.add_module(particlegun)
 add_simulation(main)
 
 # add trigger
-add_tsim(main, components=["CDC", "ECL", "KLM", "GRL", "GDL"])
+add_trigger_simulation(main, components=["CDC", "ECL", "KLM", "GRL", "GDL"])
 
 # output
 rootoutput = b2.register_module('RootOutput')

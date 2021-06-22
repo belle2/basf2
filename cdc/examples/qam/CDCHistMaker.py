@@ -129,7 +129,7 @@ class CDCHistMakerModule(b2.Module):
         Draw histograms on canvas and save image.
         """
 
-        file = TFile(self.m_outputFile, "RECREATE")
+        TFile(self.m_outputFile, "RECREATE")
         for h in histADC:
             h.Write()
         for h in histTDC:

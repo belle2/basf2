@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import os
 from basf2 import create_path, process, B2FATAL, set_random_seed

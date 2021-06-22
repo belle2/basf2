@@ -78,6 +78,14 @@ namespace Belle2 {
     }
 
     /**
+     * Set delta-ray weight
+     */
+    void setDeltaRayWeight(float weight)
+    {
+      m_deltaRayWeight = weight;
+    }
+
+    /**
      * Returns PDG code of a particle hypothesis used to construct PDF
      */
     int getPDGHypothesis() const {return m_PDG;}
@@ -98,8 +106,13 @@ namespace Belle2 {
     float getBGWeight() const {return m_BGWeight;}
 
     /**
+     * Returns delta-ray weight
+     */
+    float getDeltaRayWeight() const {return m_deltaRayWeight;}
+
+    /**
      * Returns a PDF peak selected randomly according to weights.
-     * Null ptr is returned if background is selected instead.
+     * Null ptr is returned if background or delta-ray contribution is selected instead.
      */
     const PDFPeak* getSinglePeak() const;
 
@@ -109,8 +122,9 @@ namespace Belle2 {
     std::vector<PDFPeak> m_peaks; /**< collection of associated PDF peaks */
     std::vector<float> m_weights; /**< corresponding weights */
     float m_BGWeight = 0; /**< background weight */
+    float m_deltaRayWeight = 0; /**< delta-ray weight */
 
-    ClassDefOverride(TOPAssociatedPDF, 1); /**< ClassDef */
+    ClassDefOverride(TOPAssociatedPDF, 2); /**< ClassDef */
 
   };
 

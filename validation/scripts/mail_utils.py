@@ -17,11 +17,37 @@ def get_greeting(name):
     """
     Get a random greeting and closing statement using name
     """
-    greetings = ["Dear", "Dearest", "Hi", "Salutations", "Hello", "Exalted", "Yo",
-                 "Honorable", "To the esteemed", "Magnificent", "Glorious", "Howdy"]
-    closing = ["Bye", "Cheers", "Best Regards", "Best Wishes", "Yours sincerely",
-               "Yours truly", "Thank you", "Seeya", "Toodle-loo", "Ciao", "Hochachtungsvoll"]
-    return {"greeting": "{} {}".format(random.choice(greetings), name), "closing": random.choice(closing)}
+    greetings = [
+        "Dear",
+        "Dearest",
+        "Hi",
+        "Salutations",
+        "Hello",
+        "Exalted",
+        "Yo",
+        "Honorable",
+        "To the esteemed",
+        "Magnificent",
+        "Glorious",
+        "Howdy",
+    ]
+    closing = [
+        "Bye",
+        "Cheers",
+        "Best Regards",
+        "Best Wishes",
+        "Yours sincerely",
+        "Yours truly",
+        "Thank you",
+        "Seeya",
+        "Toodle-loo",
+        "Ciao",
+        "Hochachtungsvoll",
+    ]
+    return {
+        "greeting": "{} {}".format(random.choice(greetings), name),
+        "closing": random.choice(closing),
+    }
 
 
 def markdown_to_plaintext(text):
@@ -32,7 +58,7 @@ def markdown_to_plaintext(text):
     replace_links = re.compile(r"\[.*?]\(([^)]*)\)")
     text = replace_links.sub(r"\1", text)
     # also replace all {: ... } braces which contain attribute lists
-    replace_attrs = re.compile(r'\{:([^\}\n]*?)\}')
+    replace_attrs = re.compile(r"\{:([^\}\n]*?)\}")
     text = replace_attrs.sub(r"", text)
     # replace <http://link>, <https://link> and <me@mail.com> by removing <>
     replace_autolink = re.compile(r"<(https?://[^>]*|[^> ]+@[^> ]+)>")
@@ -40,7 +66,9 @@ def markdown_to_plaintext(text):
     return text
 
 
-def send_mail(name, recipient, subject, text, link=None, link_title=None, mood="normal"):
+def send_mail(
+    name, recipient, subject, text, link=None, link_title=None, mood="normal"
+):
     """
     Send an email to `name` at mail address `recipient` with the given subject and text.
 
@@ -52,20 +80,27 @@ def send_mail(name, recipient, subject, text, link=None, link_title=None, mood="
     """
     all_moods = ["happy", "normal", "meh", "angry", "livid", "dead"]
     if mood not in all_moods:
-        raise KeyError("Unknown mood please use one of {}".format(", ".join(all_moods)))
+        raise KeyError(
+            "Unknown mood please use one of {}".format(", ".join(all_moods))
+        )
 
     add_charset("utf-8", QP, QP, "utf-8")
-    msg = MIMEMultipart('alternative')
-    msg['Subject'] = subject
-    msg['From'] = "B2Bot <b2soft@mail.desy.de>"
-    msg['Reply-To'] = "Martin Ritter <martin.ritter@belle2.org>"
-    if "bamboo_email_override" in os.environ and os.environ["bamboo_email_override"].find("@") > 0:
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = subject
+    msg["From"] = "B2Bot <b2soft@mail.desy.de>"
+    if (
+        "bamboo_email_override" in os.environ
+        and os.environ["bamboo_email_override"].find("@") > 0
+    ):
         msg["To"] = os.environ["bamboo_email_override"]
     else:
-        msg['To'] = recipient
+        msg["To"] = recipient
 
-    if "bamboo_email_bcc" in os.environ and os.environ["bamboo_email_bcc"].find("@") > 0:
-        msg['Bcc'] = os.environ["bamboo_email_bcc"]
+    if (
+        "bamboo_email_bcc" in os.environ
+        and os.environ["bamboo_email_bcc"].find("@") > 0
+    ):
+        msg["Bcc"] = os.environ["bamboo_email_bcc"]
 
     data = get_greeting(name)
     data["mood"] = mood
@@ -82,15 +117,27 @@ def send_mail(name, recipient, subject, text, link=None, link_title=None, mood="
             data["plain_link"] = f"\n\n{link}"
 
     # parse plain text to html
-    data["body"] = markdown.markdown(text, output_format="xhtml1", extensions=["markdown.extensions.attr_list"])
+    data["body"] = markdown.markdown(
+        text,
+        output_format="xhtml1",
+        extensions=["markdown.extensions.attr_list"],
+    )
     # create multipart mime mail
-    msg.attach(MIMEText("{greeting},\n\n{text}{plain_link}\n\n{closing}"
-                        "\n\tThe Belle 2 Software Bot (B2Bot)".format(**data), "plain"))
+    msg.attach(
+        MIMEText(
+            "{greeting},\n\n{text}{plain_link}\n\n{closing}"
+            "\n\tThe Belle 2 Software Bot (B2Bot)".format(**data),
+            "plain",
+        )
+    )
     template = Template(
         open(
             os.path.join(
                 validationpath.get_basepath()["local"],
-                "validation/html_static/templates/template_mail.html")).read())
+                "validation/html_static/templates/template_mail.html",
+            )
+        ).read()
+    )
     msg.attach(MIMEText(template.substitute(**data), "html"))
 
     if os.environ.get("bamboo_DRYRUN", False):
@@ -101,15 +148,18 @@ def send_mail(name, recipient, subject, text, link=None, link_title=None, mood="
         # exists, otherwise use /usr/sbin/sendmail
         try:
             from mail_config import sendmail
+
             try:
                 sendmail(msg)
             except smtplib.SMTPAuthenticationError as e:
                 print(
                     "!!!!!!!!!!!!!!!!!!!!!\n"
                     "AN ERROR OCCURED DURING SENDING OF MAILS:",
-                    file=sys.stderr
+                    file=sys.stderr,
                 )
                 print(e, file=sys.stderr)
                 print("!!!!!!!!!!!!!!!!!!!!!", file=sys.stderr)
         except ImportError:
-            subprocess.run(["/usr/sbin/sendmail", "-t", "-oi"], input=msg.as_bytes())
+            subprocess.run(
+                ["/usr/sbin/sendmail", "-t", "-oi"], input=msg.as_bytes()
+            )

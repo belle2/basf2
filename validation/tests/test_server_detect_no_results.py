@@ -48,8 +48,10 @@ def main():
             pass
 
         if fail:
-            sys.exit("did not exit, even though there is no folders in "
-                     "results folder")
+            sys.exit(
+                "did not exit, even though there is no folders in "
+                "results folder"
+            )
 
     # will create a temporary folder and delete it once this block is left
     with tempfile.TemporaryDirectory() as tmpdir:

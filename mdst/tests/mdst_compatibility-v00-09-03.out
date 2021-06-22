@@ -137,6 +137,14 @@ Untested method MCParticle::setSeenInDetector
 Untested method MCParticle::setStatus
 Untested method MCParticle::setValidVertex
 Untested method MCParticle::setVirtual
+Untested method EventLevelTriggerTimeInfo::setBunchNumber
+Untested method EventLevelTriggerTimeInfo::setInvalid
+Untested method EventLevelTriggerTimeInfo::setIsHER
+Untested method EventLevelTriggerTimeInfo::setNoInjection
+Untested method EventLevelTriggerTimeInfo::setRevo2
+Untested method EventLevelTriggerTimeInfo::setTimeSinceLastInjection
+Untested method EventLevelTriggerTimeInfo::setTimeSincePrevTrigger
+Untested method EventLevelTriggerTimeInfo::setValid
 [INFO] ========================================================================
 [INFO] >>> Start new run: 0
 [INFO] ------------------------------------------------------------------------

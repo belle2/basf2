@@ -1,9 +1,0 @@
-c--  TOP_CONS.fi: some constants
-
-      REAL PI   ! pi
-      REAL C0   ! speed of light [cm/ns]
-      REAL C_HC ! Planck constant times speed of light [eV*nm]
-
-      COMMON /RND_GEN/ PI, C0, C_HC
-
-

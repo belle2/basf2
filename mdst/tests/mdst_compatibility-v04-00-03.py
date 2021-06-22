@@ -29,6 +29,8 @@ CHANGES since release-04-00-03:
   + chi2
 - ECLCluster:
   + getMinTrkDistanceID
+- EventLevelTriggerTimeInfo
+  *  added new storage element for information from the Trigger Timing Distribution (TTD)
 """
 
 from basf2 import create_path, process, set_random_seed, find_file

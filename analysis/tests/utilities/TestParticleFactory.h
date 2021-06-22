@@ -44,7 +44,6 @@ namespace TestUtilities {
      */
     const Belle2::Particle* produceParticle(const std::string& decayString, const TLorentzVector& momentum, const TVector3& vertex)
     {
-      Belle2::StoreArray<Belle2::Particle> myParticles;
       Belle2::DecayDescriptor* decaydescriptor = new Belle2::DecayDescriptor();
       bool isString = decaydescriptor->init(decayString);
       if (!isString) {

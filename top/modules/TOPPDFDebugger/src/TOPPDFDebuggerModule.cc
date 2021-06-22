@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2018, 2021 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric, Jan Strube, Sam Cunliffe                   *
@@ -8,29 +8,23 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-// Module manager
-
-
 // Own include
 #include <top/modules/TOPPDFDebugger/TOPPDFDebuggerModule.h>
 #include <top/geometry/TOPGeometryPar.h>
-#include <top/reconstruction/TOPreco.h>
-#include <top/reconstruction/TOPtrack.h>
-#include <top/reconstruction/TOPconfigure.h>
+#include <top/reconstruction_cpp/TOPRecoManager.h>
+#include <top/reconstruction_cpp/TOPTrack.h>
+#include <top/reconstruction_cpp/PDFConstructor.h>
 
 // Hit classes
 #include <tracking/dataobjects/ExtHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPBarHit.h>
 
-// framework - DataStore
-#include <framework/datastore/StoreArray.h>
-
 // framework aux
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <cmath>
+#include <algorithm>
 
 using namespace std;
 
@@ -57,31 +51,16 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("minBkgPerBar", m_minBkgPerBar,
-             "Minimal number of background photons per bar", 0.0);
-    addParam("scaleN0", m_scaleN0,
-             "Scale factor for N0", 1.0);
     addParam("minTime", m_minTime,
-             "lower limit for photon time [ns] (default if minTime >= maxTime)", 0.0);
+             "lower limit for photon time [ns] (default from DB used, if minTime >= maxTime)", 0.0);
     addParam("maxTime", m_maxTime,
-             "upper limit for photon time [ns] (default if minTime >= maxTime)", 0.0);
-    /* not implemented
-    addParam("writeNPdfs", m_writeNPdfs,
-       "Write out the PDF for the first N events. -1 is for all.", 0);
-    addParam("writeNPulls", m_writeNPulls,
-       "Write out pulls for the first N events. -1 is for all.", 0);
-    */
+             "upper limit for photon time [ns] (default from DB used, if minTime >= maxTime)", 0.0);
     addParam("pdfOption", m_pdfOption,
              "PDF option, one of 'rough', 'fine', 'optimal'", std::string("fine"));
     addParam("pdgCodes", m_pdgCodes,
              "PDG codes of charged stable particles for which to construct PDF. "
              "Empty list means all charged stable particles.",
              m_pdgCodes);
-  }
-
-
-  TOPPDFDebuggerModule::~TOPPDFDebuggerModule()
-  {
   }
 
 
@@ -108,198 +87,177 @@ namespace Belle2 {
     m_pixelData.registerInDataStore();
     m_tracks.registerRelationTo(m_pixelData);
 
-    // check for module debug level
-    if (getLogConfig().getLogLevel() == LogConfig::c_Debug) {
-      m_debugLevel = getLogConfig().getDebugLevel();
-    }
-
     // particle hypotheses
     if (m_pdgCodes.empty()) {
       for (const auto& part : Const::chargedStableSet) {
-        m_pdgCodes.push_back(abs(part.getPDGCode()));
-        m_masses.push_back(part.getMass());
+        m_chargedStables.push_back(part);
       }
     } else {
-      for (auto& pdg : m_pdgCodes) pdg = abs(pdg);
       for (auto pdg : m_pdgCodes) {
-        auto part = Const::ChargedStable(pdg); //throws runtime error for invalid pdg
-        m_masses.push_back(part.getMass());
+        auto part = Const::ChargedStable(abs(pdg)); //throws runtime error for invalid pdg
+        m_chargedStables.push_back(part);
       }
     }
 
-    // Configure TOP detector
-    TOPconfigure config;
-    if (m_debugLevel > 0) config.print();
-
     // Parse PDF option
     if (m_pdfOption == "rough") {
-      m_PDFOption = TOPreco::c_Rough;
+      m_PDFOption = PDFConstructor::c_Rough;
     } else if (m_pdfOption == "fine") {
-      m_PDFOption = TOPreco::c_Fine;
+      m_PDFOption = PDFConstructor::c_Fine;
     } else if (m_pdfOption == "optimal") {
-      m_PDFOption = TOPreco::c_Optimal;
+      m_PDFOption = PDFConstructor::c_Optimal;
     } else {
       B2ERROR("TOPPDFDebuggerModule: unknown PDF option '" << m_pdfOption << "'");
     }
 
   }
 
-  void TOPPDFDebuggerModule::beginRun()
-  {
-  }
 
   void TOPPDFDebuggerModule::event()
   {
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-
-    // create reconstruction object
-    TOPreco reco(m_masses.size(), m_masses.data(), m_pdgCodes.data(),
-                 m_minBkgPerBar, m_scaleN0);
-    reco.setPDFoption(m_PDFOption);
-    reco.setStoreOption(TOPreco::c_Full);
-
-    // set time limit for photons lower than that given by TDC range (optional)
-    if (m_maxTime > m_minTime) {
-      reco.setTimeWindow(m_minTime, m_maxTime);
-    }
-
-    // add photons
-    for (const auto& digit : m_digits) {
-      if (digit.getHitQuality() == TOPDigit::EHitQuality::c_Good) {
-        reco.addData(digit.getModuleID(), digit.getPixelID(),
-                     digit.getTime(), digit.getTimeError());
-      }
-    }
+    TOPRecoManager::setTimeWindow(m_minTime, m_maxTime);
 
     // reconstruct track-by-track and store the results
+
     for (const auto& track : m_tracks) {
-      // construct TOPtrack from mdst track
-      TOPtrack trk(&track);
-      if (!trk.isValid()) continue;
+      TOPTrack trk(track);
+      if (not trk.isValid()) continue;
 
       // add this vector of vector of triplets to the TOPPDFCollection
       TOPPDFCollection* topPDFColl = m_pdfCollection.appendNew();
       const auto& module = geo->getModule(trk.getModuleID());
-      topPDFColl->setLocalPositionMomentum(
-        module.pointToLocal(trk.getPosition()),
-        module.momentumToLocal(trk.getMomentum()),
-        trk.getModuleID()
-      );
+      topPDFColl->setLocalPositionMomentum(module.pointToLocal(trk.getExtHit()->getPosition()),
+                                           module.momentumToLocal(trk.getExtHit()->getMomentum()),
+                                           trk.getModuleID());
 
       TOPPixelLikelihood* topPLkhs = m_pixelData.appendNew();
       topPLkhs->setModuleID(trk.getModuleID());
 
-      for (unsigned i = 0; i < m_pdgCodes.size(); i++) {
-        double mass = m_masses[i];
-        int iPDGCode = m_pdgCodes[i];
-        reco.setMass(mass, iPDGCode);
-        reco.reconstruct(trk); // will run reconstruction only for this mass hypothesis
-        if (reco.getFlag() != 1) break; // track is not in the acceptance of TOP
+      for (const auto& chargedStable : m_chargedStables) {
+        const PDFConstructor pdfConstructor(trk, chargedStable, m_PDFOption, PDFConstructor::c_Full);
+        if (not pdfConstructor.isValid()) {
+          B2ERROR("PDFConstructor found not valid - bug in reconstruction code?"
+                  << LogVar("PDG", chargedStable.getPDGCode()));
+          continue;
+        }
 
         // associate PDF peaks with photons using S-plot technique
-        associatePDFPeaks(reco, trk.getModuleID(), iPDGCode);
+        associatePDFPeaks(pdfConstructor);
 
         // collection of gaussian_t's for each pixel
         TOPPDFCollection::modulePDF_t channelPDFCollection;
 
-        // the mean, width and normalisation for each peak in the pdf
-        float position = 0, width = 0, numPhotons = 0;
-        for (int pixelID = 1; pixelID <= static_cast<int>(channelPDFCollection.size()); pixelID++) {
-          for (int k = 0; k < reco.getNumofPDFPeaks(pixelID); k++) {
-
-            // get this peak
-            reco.getPDFPeak(pixelID, k, position, width, numPhotons);
-
+        // store PDF peaks in the collection
+        for (const auto& signalPDF : pdfConstructor.getSignalPDF()) {
+          int pixelID = signalPDF.getPixelID();
+          for (const auto& peak : signalPDF.getPDFPeaks()) {
+            float position = peak.t0;
+            float width = sqrt(peak.wid);
+            float numPhotons = pdfConstructor.getExpectedSignalPhotons() * peak.nph;
             auto tp = TOPPDFCollection::Gaussian(position, width, numPhotons);
             channelPDFCollection.at(pixelID - 1).push_back(tp);
-
           } // end loop over peaks in the pdf for this pixel
         } // end loop over pixels
 
-        topPDFColl->addHypothesisPDF(channelPDFCollection, iPDGCode);
+        topPDFColl->addHypothesisPDF(channelPDFCollection, chargedStable.getPDGCode());
 
         // Initialize logL and sfot pixel arrays
         TOPPixelLikelihood::PixelArray_t pixLogLs, pixSigPhots;
         pixLogLs.fill(0);
         pixSigPhots.fill(0);
 
-        double timeShift = 0, timeMin = 0, timeMax = 0, sigma = 0; /**< getLogL arguments */
-        reco.getLogL(timeShift, timeMin, timeMax, sigma, pixLogLs.data(), pixSigPhots.data());
+        const auto& pixelLogLs = pdfConstructor.getPixelLogLs(0);
+        for (size_t i = 0; i < std::min(pixelLogLs.size(), pixLogLs.size()); i++) {
+          pixLogLs[i] = pixelLogLs[i].logL;
+          pixSigPhots[i] = pixelLogLs[i].expPhotons;
+        }
 
-        topPLkhs->addHypothesisLikelihoods(pixLogLs, iPDGCode);
-        topPLkhs->addHypothesisSignalPhotons(pixSigPhots, iPDGCode);
+        topPLkhs->addHypothesisLikelihoods(pixLogLs, chargedStable.getPDGCode());
+        topPLkhs->addHypothesisSignalPhotons(pixSigPhots, chargedStable.getPDGCode());
       }
-      if (reco.getFlag() == 1) {
-        track.addRelationTo(topPDFColl);
-        track.addRelationTo(topPLkhs);
-      }
+      track.addRelationTo(topPDFColl);
+      track.addRelationTo(topPLkhs);
+
     } // end loop over tracks
-    ++m_iEvent;
+
   }
 
 
-  void TOPPDFDebuggerModule::associatePDFPeaks(const TOPreco& reco, int moduleID, int pdg)
+  void TOPPDFDebuggerModule::associatePDFPeaks(const PDFConstructor& pdfConstructor)
   {
 
-    for (const auto& digit : m_digits) {
-      if (digit.getModuleID() != moduleID) continue;
-      if (digit.getHitQuality() != TOPDigit::c_Good) continue;
+    const auto& signalPDFs = pdfConstructor.getSignalPDF();
+    auto signalPhotons = pdfConstructor.getExpectedSignalPhotons();
+    auto bkgPhotons = pdfConstructor.getExpectedBkgPhotons();
+    auto deltaPhotons = pdfConstructor.getExpectedDeltaPhotons();
+    int PDGCode = pdfConstructor.getHypothesis().getPDGCode();
 
-      auto* associatedPDF = m_associatedPDFs.appendNew(pdg);
+    for (const auto& digit : m_digits) {
+      if (digit.getModuleID() != pdfConstructor.getModuleID()) continue;
+      if (digit.getHitQuality() != TOPDigit::c_Good) continue;
+      int pixelID = digit.getPixelID();
+      unsigned index = pixelID - 1;
+      if (index >= signalPDFs.size()) continue;
+      const auto& signalPDF = signalPDFs[index];
+      const auto* tts = signalPDF.getTTS();
+      const auto& pdfPeaks = signalPDF.getPDFPeaks();
+      const auto& extraInfos = signalPDF.getPDFExtraInfo();
+      if (extraInfos.size() != pdfPeaks.size()) {
+        B2ERROR("associatePDFPeaks: sizes of PDFPeaks and ExtraInfo's differ");
+        continue;
+      }
+
+      auto* associatedPDF = m_associatedPDFs.appendNew(PDGCode);
       digit.addRelationTo(associatedPDF);
 
-      int pixelID = digit.getPixelID();
-      associatedPDF->setBackgroundWeight(reco.getBkgLevel(pixelID));
+      double bkgLevel = pdfConstructor.getBackgroundPDF()->getPDFValue(pixelID) * bkgPhotons;
+      associatedPDF->setBackgroundWeight(bkgLevel);
+      double deltaLevel = pdfConstructor.getDeltaRayPDF().getPDFValue(pixelID, digit.getTime()) * deltaPhotons;
+      associatedPDF->setDeltaRayWeight(deltaLevel);
 
-      const auto& tts = TOPGeometryPar::Instance()->getTTS(moduleID, digit.getPMTNumber());
       float time = digit.getTime();
       float timeErr = digit.getTimeError();
-      for (int k = 0; k < reco.getNumofPDFPeaks(pixelID); k++) {
+
+      for (size_t k = 0; k < pdfPeaks.size(); k++) {
+        const auto& pdfPeak = pdfPeaks[k];
+        const auto& pdfExtra = extraInfos[k];
         TOPAssociatedPDF::PDFPeak peak;
-        reco.getPDFPeak(pixelID, k, peak.position, peak.width, peak.numPhotons);
+        peak.position = pdfPeak.t0;
+        peak.width = sqrt(pdfPeak.wid);
+        peak.numPhotons = pdfPeak.nph * signalPhotons;
         float wt = 0;
-        for (const auto& gaus : tts.getTTS()) {
+        for (const auto& gaus : tts->getTTS()) {
           float sig2 = peak.width * peak.width + gaus.sigma * gaus.sigma + timeErr * timeErr;
           float x = pow(time - peak.position - gaus.position, 2) / sig2;
           if (x > 20) continue;
           wt += peak.numPhotons * gaus.fraction / sqrt(2 * M_PI * sig2) * exp(-x / 2);
         }
         if (wt > 0) {
-          peak.fic = reco.getPDFPeakFic(pixelID, k);
-          peak.e = reco.getPDFPeakE(pixelID, k);
-          peak.sige = reco.getPDFPeakSigE(pixelID, k);
-          peak.nx = reco.getPDFPeakNx(pixelID, k);
-          peak.ny = reco.getPDFPeakNy(pixelID, k);
-          peak.nxm = reco.getPDFPeakNxm(pixelID, k);
-          peak.nym = reco.getPDFPeakNym(pixelID, k);
-          peak.nxe = reco.getPDFPeakNxe(pixelID, k);
-          peak.nye = reco.getPDFPeakNye(pixelID, k);
-          peak.xd = reco.getPDFPeakXD(pixelID, k);
-          peak.yd = reco.getPDFPeakYD(pixelID, k);
-          peak.type = reco.getPDFPeakType(pixelID, k);
-          peak.kxe = reco.getPDFPeakKxe(pixelID, k);
-          peak.kye = reco.getPDFPeakKye(pixelID, k);
-          peak.kze = reco.getPDFPeakKze(pixelID, k);
-          peak.kxd = reco.getPDFPeakKxd(pixelID, k);
-          peak.kyd = reco.getPDFPeakKyd(pixelID, k);
-          peak.kzd = reco.getPDFPeakKzd(pixelID, k);
+          peak.fic = pdfPeak.fic;
+          peak.e = pdfExtra.e;
+          peak.sige = pdfExtra.sige;
+          peak.nx = abs(pdfExtra.Nxm) + abs(pdfExtra.Nxb) + abs(pdfExtra.Nxe);
+          peak.ny = abs(pdfExtra.Nym) + abs(pdfExtra.Nyb) + abs(pdfExtra.Nye);
+          peak.nxm = abs(pdfExtra.Nxm);
+          peak.nym = abs(pdfExtra.Nym);
+          peak.nxe = abs(pdfExtra.Nxe);
+          peak.nye = abs(pdfExtra.Nye);
+          peak.xd = pdfExtra.xD;
+          peak.yd = pdfExtra.yD;
+          peak.type = pdfExtra.type;
+          peak.kxe = pdfExtra.kxE;
+          peak.kye = pdfExtra.kyE;
+          peak.kze = pdfExtra.kzE;
+          peak.kxd = pdfExtra.kxD;
+          peak.kyd = pdfExtra.kyD;
+          peak.kzd = pdfExtra.kzD;
           associatedPDF->appendPeak(peak, wt);
         }
       }
     }
 
   }
-
-
-  void TOPPDFDebuggerModule::endRun()
-  {
-  }
-
-  void TOPPDFDebuggerModule::terminate()
-  {
-  }
-
-
 
 } // end Belle2 namespace
 

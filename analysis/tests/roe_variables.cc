@@ -143,7 +143,7 @@ namespace {
    */
   TEST_F(ROEVariablesTest, ROEParticleCompositionVariables)
   {
-    StoreArray<Particle> myParticles;
+    StoreArray<Particle> myParticles{};
     auto part = myParticles[2];  // B0
     auto* var = Manager::Instance().getVariable("nROE_Charged()");
     ASSERT_NE(var, nullptr);
@@ -183,7 +183,7 @@ namespace {
    */
   TEST_F(ROEVariablesTest, ROETrackClusterCompositionVariables)
   {
-    StoreArray<Particle> myParticles;
+    StoreArray<Particle> myParticles{};
     auto part = myParticles[2];  // B0
 
     auto* var = Manager::Instance().getVariable("nROE_Tracks()");
@@ -219,8 +219,8 @@ namespace {
    */
   TEST_F(ROEVariablesTest, ROERecoilFrameVariable)
   {
-    StoreArray<RestOfEvent> myROEs;
-    StoreArray<Particle> myParticles;
+    StoreArray<RestOfEvent> myROEs{};
+    StoreArray<Particle> myParticles{};
     auto part = myParticles[2];  // B0
     auto partNotROE = myParticles[0];  // electron has no ROE
 
@@ -353,7 +353,7 @@ namespace {
    */
   TEST_F(ROEVariablesTest, ROESpecificKinematicVariables)
   {
-    StoreArray<Particle> myParticles;
+    StoreArray<Particle> myParticles{};
     auto part = myParticles[2];  // B0
     // Signal side 4 vector
     TLorentzVector  sig4Vec = part->get4Vector();
@@ -385,9 +385,9 @@ namespace {
    */
   TEST_F(ROEVariablesTest, IsInROEVariables)
   {
-    StoreArray<Particle> myParticles;
+    StoreArray<Particle> myParticles{};
     auto part = myParticles[2];  // B0
-    StoreArray<RestOfEvent> myROEs;
+    StoreArray<RestOfEvent> myROEs{};
 
     DataStore::StoreEntry& roeobjptr = DataStore::Instance().getStoreEntryMap(DataStore::c_Event).at("RestOfEvent");
     roeobjptr.object = myROEs[0];

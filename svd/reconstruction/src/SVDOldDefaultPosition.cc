@@ -30,7 +30,8 @@ namespace Belle2 {
         applyAHTPosition(rawCluster, position, positionError);
 
       //apply scale factors for the position errors
-      positionError = m_ClusterCal.getCorrectedClusterPositionError(rawCluster.getSensorID(), rawCluster.isUSide(), rawCluster.getSize(),
+      positionError = m_OldDefaultCal.getCorrectedClusterPositionError(rawCluster.getSensorID(), rawCluster.isUSide(),
+                      rawCluster.getSize(),
                       positionError);
     }
 

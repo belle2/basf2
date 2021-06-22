@@ -34,6 +34,8 @@
 #include <TRandom.h>
 #include <TRotation.h>
 #include <TChain.h>
+#include <TString.h>
+#include <TObjString.h>
 
 
 #include <functional>
@@ -1980,7 +1982,7 @@ namespace Belle2 {
       vector<double> indKX =  {};
       vector<double> indKY =  {};
 
-      UnknownPars allPars, allParsZ;
+      UnknownPars allPars;
       const int kPlot = -1; //do plots for index kPlot
       for (int k = 0; k < 1; ++k) { //loop over BootStrap replicas
         for (auto& e : evts) e.isSig = true; //reset cuts

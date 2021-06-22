@@ -10,7 +10,7 @@ import os.path
 import pathlib
 from itertools import product
 from secrets import randbelow
-from typing import Union
+from typing import Callable, Union
 
 import basf2
 from ROOT.Belle2 import DataStore, PyStoreArray, PyStoreObj
@@ -21,9 +21,12 @@ from .models import MODELS
 from .models import _get_model_cls, _get_generate_func
 
 ##
-# Sequence of forty arguments represented as
-# tuples with elements `(layer, ladder, sensor)` used to
-# instantiate `VxdID` objects that collectively specify all distinct PXD modules.
+# Sequence of forty tuples `(layer, ladder, sensor)` used to
+# instantiate `VxdID` specifier objects for distinct PXD modules.
+#
+# It is assumed that the indices of tuples in the sequence match
+# indices along the first axis of tensors with shape `(40, 250, 768)`
+# that are produced by the generator.
 VXDID_ARGS = tuple(
     tuple(product([1], [ladder + 1 for ladder in range(8)], [1, 2]))
     + tuple(product([2], [ladder + 1 for ladder in range(12)], [1, 2]))
@@ -345,38 +348,44 @@ class PXDBackgroundGenerator(basf2.Module):
 
 
 ##
-# Helper function to inject a module into `add_simulation`
-# after `BGOverlayInput` without source code modifications.
+# Helper function to incorporate a module instance
+# into `add_simulation` after `BGOverlayInput`.
 #
-# @param module: Module to be injected,
-#     defaults to None - no injection
-def inject_simulation(module=None):
-    """Inject a module into :py:func:`.add_simulation`
-    after `!BGOverlayInput` without source code modifications.
+# @param module: Module instance to be incorporated,
+#     defaults to None - return unmodified function
+#
+# @return Drop-in replacement function for `add_simulation`
+def inject_simulation(module: Union[None, basf2.Module] = None) -> Callable:
+    """Incorporate a module instance
+    into :py:func:`.add_simulation` after `!BGOverlayInput`.
 
-    :param module: Module to be injected,
-        defaults to None - no injection
-    :type module: :py:class:`basf2.Module`
+    :param module: Module instance to be incorporated,
+        defaults to None - return unmodified function
+    :type module: :py:class:`basf2.Module`, optional
+
+    :returns: Drop-in replacement function for :py:func:`.add_simulation`
     """
     from simulation import add_simulation
 
     if module is None:
-        # nothing to inject
+        # no modifications necessary
         return add_simulation
+    elif not isinstance(module, basf2.Module):
+        raise TypeError("expecting None or type basf2.Module `module`")
 
     @functools.wraps(add_simulation)
-    def injected_simulation(main, *args, **kwargs):
-        # create a separate path for simulation
-        simulation = basf2.Path()
-        add_simulation(simulation, *args, **kwargs)
+    def injected_simulation(path, *args, **kwargs):
+        # create a separate path with simulation modules
+        simulation_path = basf2.Path()
+        add_simulation(simulation_path, *args, **kwargs)
 
-        # iterate over simulation modules - modify the main path
-        for simulation_module in simulation.modules():
-            # append the next simulation module
-            main.add_module(simulation_module)
+        # manually add the simulation modules to the given path
+        for simulation_module in simulation_path.modules():
+            # append the next module from the simulation path
+            path.add_module(simulation_module)
 
             if simulation_module.name() == "BGOverlayInput":
-                # append the module to be injected
-                main.add_module(module)
+                # incorporate the given module
+                path.add_module(module)
 
     return injected_simulation

@@ -22,12 +22,12 @@ def main():
     with tempfile.TemporaryDirectory() as tmpdir:
         print(f"Created temporary test folder {tmpdir}")
 
-        expect_html_plots_comparison_json = \
-            validationpath.get_html_plots_tag_comparison_json(str(tmpdir),
-                                                              all_tags)
-        expect_html_plots_comparison_folder = \
-            validationpath.get_html_plots_tag_comparison_folder(str(tmpdir),
-                                                                all_tags)
+        expect_html_plots_comparison_json = validationpath.get_html_plots_tag_comparison_json(
+            str(tmpdir), all_tags
+        )
+        expect_html_plots_comparison_folder = validationpath.get_html_plots_tag_comparison_folder(
+            str(tmpdir), all_tags
+        )
 
         # switch to this folder
         os.chdir(str(tmpdir))
@@ -37,20 +37,21 @@ def main():
         # todo: check if results folder has been created and is filled
         path_to_check = [
             validationpath.get_results_tag_folder(str(tmpdir), rev_to_gen),
-            validationpath.get_results_tag_revision_file(str(tmpdir),
-                                                         rev_to_gen),
-            os.path.join(
-                validationpath.get_results_tag_folder(str(tmpdir), rev_to_gen),
-                "validation-test",
-                "validationTestPlots.py.log"
+            validationpath.get_results_tag_revision_file(
+                str(tmpdir), rev_to_gen
             ),
             os.path.join(
                 validationpath.get_results_tag_folder(str(tmpdir), rev_to_gen),
                 "validation-test",
-                "validationTestPlots.root"
+                "validationTestPlots.py.log",
+            ),
+            os.path.join(
+                validationpath.get_results_tag_folder(str(tmpdir), rev_to_gen),
+                "validation-test",
+                "validationTestPlots.root",
             ),
             expect_html_plots_comparison_json,
-            expect_html_plots_comparison_folder
+            expect_html_plots_comparison_folder,
         ]
 
         check_path_exists(path_to_check)
@@ -66,8 +67,8 @@ def main():
             os.path.join(
                 str(tmpdir),
                 validationpath.folder_name_html,
-                validationpath.folder_name_plots
-            )
+                validationpath.folder_name_plots,
+            ),
         ]
         check_path_exists(path_to_check)
 

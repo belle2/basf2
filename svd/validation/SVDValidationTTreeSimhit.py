@@ -17,7 +17,7 @@ import basf2 as b2
 # Some ROOT tools
 import ROOT
 from ROOT import Belle2  # make Belle2 namespace available
-from ROOT import gROOT, AddressOf
+from ROOT import gROOT, addressof
 
 # Define a ROOT struct to hold output data in the TTree
 gROOT.ProcessLine('struct EventDataSimhit {\
@@ -54,7 +54,7 @@ class SVDValidationTTreeSimhit(b2.Module):
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
-                self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
+                self.tree.Branch(key, addressof(self.data, key), key + formstring)
 
     def event(self):
         """Find simhits with a truehit and save needed information"""

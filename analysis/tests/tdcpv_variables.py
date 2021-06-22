@@ -42,4 +42,4 @@ tdcpv_vars = ['DeltaT', 'DeltaTErr', 'DeltaTBelle', 'TagVz', 'TagVzErr']
 # Print the variables to log
 testpath.add_module('ParticlePrinter', listName=signal_list, fullPrint=False,
                     variables=tdcpv_vars)
-process(testpath, 10)
+process(testpath)

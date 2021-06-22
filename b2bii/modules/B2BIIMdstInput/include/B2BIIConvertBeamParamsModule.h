@@ -1,9 +1,10 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015-2018 Belle II Collaboration                          *
+ * Copyright(C) 2015-2021 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter                                            *
+ *               Umberto Tamponi                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -40,6 +41,23 @@ namespace Belle2 {
     std::string m_missingBenergy{"missing_benergy.txt"};
     /** Where to store information about runs without IP profile information */
     std::string m_missingIp{"missing_ip.txt"};
+    /** Smear energy when generating initial events. */
+    bool m_SmearEnergy;
+    /** Smear beam direction when generating initial events. */
+    bool m_SmearDirection;
+    /** Smear vertex position when generating initial events. */
+    bool m_SmearVertex;
+    /** Generate events in CMS, not lab system. */
+    bool m_GenerateCMS = false;
+    /** Store the BeamParameters payloads in the localDB. */
+    bool m_storeBeamParameters = true;
+    /** Store the CollisionInvariantMass payloads in the localDB. */
+    bool m_storeCollisionInvariantMass = true;
+    /** Store the CollisionBoostVector payloads in the localDB. */
+    bool m_storeCollisionBoostVector = true;
+    /** Store the BeamSpot payloads in the localDB. */
+    bool m_storeBeamSpot = true;
+
     /** Event metadata */
     StoreObjPtr<EventMetaData> m_event;
   };

@@ -31,7 +31,7 @@ namespace Belle2 {
 
     public:
       /// Constructor from filter to be inverted
-      NotFilter(std::unique_ptr<AFilter> filter);
+      explicit NotFilter(std::unique_ptr<AFilter> filter);
 
       /// Default destructor.
       ~NotFilter();

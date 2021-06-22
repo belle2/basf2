@@ -32,7 +32,7 @@ SVDTimeCalibrationsMonitorModule::SVDTimeCalibrationsMonitorModule() : Module()
   // Parameter definitions
   addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDTimeCalibrationMonitor_output.root"));
 
-  addParam("timeAlgo", m_timeAlgo, "Name of the time algorithm: CoG6, CoG3, ELS3.", std::string("CoG6"));
+  addParam("timeAlgo", m_timeAlgo, "Name of the time algorithm: CoG6, CoG3, ELS3.", std::string("CoG3"));
 }
 
 void SVDTimeCalibrationsMonitorModule::beginRun()
@@ -132,6 +132,12 @@ void SVDTimeCalibrationsMonitorModule::event()
               f1 = m_CoG3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 1 /*raw time*/, m_triggerBin);
               f2 = m_CoG3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 2 /*raw time*/, m_triggerBin);
               f4 = m_CoG3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 4 /*raw time*/, m_triggerBin);
+
+              m_c0 = f0;
+              m_c1 = 1. / 12 * (-21 * f0 + 32 * f1 - 12 * f2 + f4);
+              m_c2 = 1. / 8  * (7 * f0 - 16 * f1 + 10 * f2 - f4);
+              m_c3 = 1. / 24 * (-3 * f0 +  8 * f1 -  6 * f2 + f4);
+
             }
 
             if (TString(m_timeAlgo).Contains("ELS3")) {
@@ -140,11 +146,6 @@ void SVDTimeCalibrationsMonitorModule::event()
               f2 = m_ELS3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 2 /*raw time*/, m_triggerBin);
               f4 = m_ELS3TimeCal.getCorrectedTime(theVxdID, m_side, 0 /*strip*/, 4 /*raw time*/, m_triggerBin);
             }
-
-            m_c0 = f0;
-            m_c1 = 1. / 12 * (-21 * f0 + 32 * f1 - 12 * f2 + f4);
-            m_c2 = 1. / 8  * (7 * f0 - 16 * f1 + 10 * f2 - f4);
-            m_c3 = 1. / 24 * (-3 * f0 +  8 * f1 -  6 * f2 + f4);
 
             m_tree->Fill();
           }

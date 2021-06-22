@@ -522,7 +522,6 @@ namespace TreeFitter {
 
   ErrCode ParticleBase::projectConstraint(Constraint::Type type, const FitParams& fitparams, Projection& p) const
   {
-    ErrCode status;
     if (type == Constraint::mass) {
       return projectMassConstraint(fitparams, p);
     } else {

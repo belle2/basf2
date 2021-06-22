@@ -82,6 +82,9 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   TH1* h_hlt_triggers = findHist("softwaretrigger/filter");
   TH1* h_l1_triggers = findHist("TRGGDL/hGDL_psn_all");
   TH1* h_l1_triggers_filt = findHist("softwaretrigger/l1_total_result");
+  TH1* h_l1_cat_w_overlap = findHist("TRGGDL/hGDL_psn_raw_rate_all");
+  TH1* h_l1_cat_wo_overlap = findHist("TRGGDL/hGDL_psn_effect_to_l1_all");
+  TH1* h_full_mem = findHist("timing_statistics/fullMemoryHistogram");
 
   // set the content of filter canvas
   m_c_filter->Clear(); // clear existing content
@@ -115,14 +118,20 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   if (h_meantime) h_meantime->Draw();
   m_c_hardware->cd(7);
   if (h_procs) h_procs->Draw();
+  m_c_hardware->cd(8);
+  if (h_full_mem) h_full_mem->Draw();
 
   // set the content of L1 canvas
   m_c_l1->Clear(); // clear existing content
-  m_c_l1->Divide(2, 1);
+  m_c_l1->Divide(2, 2);
   m_c_l1->cd(1);
   if (h_l1_triggers) h_l1_triggers->Draw();
   m_c_l1->cd(2);
   if (h_l1_triggers_filt) h_l1_triggers_filt->Draw();
+  m_c_l1->cd(3);
+  if (h_l1_cat_w_overlap) h_l1_cat_w_overlap->Draw();
+  m_c_l1->cd(4);
+  if (h_l1_cat_wo_overlap) h_l1_cat_wo_overlap->Draw();
 
   double n_hlt = 0.;
   if (h_hlt) n_hlt = (double)h_hlt->GetBinContent((h_hlt->GetXaxis())->FindFixBin("total_result"));
@@ -192,6 +201,24 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
     }
   }
 
+  if (h_l1_cat_w_overlap) {
+    // loop bins, add variable to monObj named as "l1_Ov_" + bin label
+    for (int ibin = 1; ibin < h_l1_cat_w_overlap->GetXaxis()->GetNbins() + 1; ibin++) {
+      double nentr = (double)h_l1_cat_w_overlap->GetBinContent(ibin);
+      std::string bin_name(h_l1_cat_w_overlap->GetXaxis()->GetBinLabel(ibin));
+      m_monObj->setVariable(bin_name.insert(0, "l1_Ov_"), nentr);
+    }
+  }
+
+  if (h_l1_cat_wo_overlap) {
+    // loop bins, add variable to monObj named as "l1_noOv_" + bin label
+    for (int ibin = 1; ibin < h_l1_cat_wo_overlap->GetXaxis()->GetNbins() + 1; ibin++) {
+      double nentr = (double)h_l1_cat_wo_overlap->GetBinContent(ibin);
+      std::string bin_name(h_l1_cat_wo_overlap->GetXaxis()->GetBinLabel(ibin));
+      m_monObj->setVariable(bin_name.insert(0, "l1_noOv_"), nentr);
+    }
+  }
+
   double bgt = 0.;
   if (h_budget) bgt = h_budget->GetMean();
   m_monObj->setVariable("budget_time", bgt);
@@ -202,7 +229,12 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   if (h_processing) procTime = h_processing->GetMean();
   m_monObj->setVariable("processing_time", procTime);
 
+  double fullMemory = 0.;
+  if (h_full_mem) fullMemory = h_full_mem->GetBinLowEdge(h_full_mem->FindLastBinAbove(0) + 1);
+  m_monObj->setVariable("full_memory", fullMemory);
+
   TH1* h_budgetUnit = nullptr;
+  TH1* h_memoryUnit = nullptr;
 
   for (unsigned int index = 1; index <= SoftwareTrigger::HLTUnit::max_hlt_units; index++) {
     // add budget time per unit
@@ -215,6 +247,11 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
     if (h_budgetUnit) bgunit = h_budgetUnit->GetMean();
     else bgunit = 0.;
     m_monObj->setVariable(("processing_time_HLT" + std::to_string(index)).c_str(), bgunit);
+    // add memory per unit
+    h_memoryUnit = findHist(("timing_statistics/fullMemoryPerUnitHistogram_HLT" + std::to_string(index)).c_str());
+    double memunit = 0.;
+    if (h_memoryUnit && bgunit > 0) memunit = h_memoryUnit->GetBinLowEdge(h_memoryUnit->FindLastBinAbove(0.) + 1);
+    m_monObj->setVariable(("memory_HLT" + std::to_string(index)).c_str(), memunit);
   }
 
   B2DEBUG(20, "DQMHistAnalysisHLTMonObj : endRun called");

@@ -16,14 +16,13 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <boost/spirit/home/support/detail/endian.hpp>
+#include <boost/endian/arithmetic.hpp>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;
 using namespace Belle2::PXD::PXDError;
 
-using namespace boost::spirit::endian;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------

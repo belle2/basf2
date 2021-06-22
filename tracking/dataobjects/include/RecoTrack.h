@@ -310,6 +310,7 @@ namespace Belle2 {
       for (RecoHitInformation& recoHitInformation : relatedHitInformationToHit) {
         // cppcheck-suppress useStlAlgorithm
         if (recoHitInformation.getRelatedFrom<RecoTrack>(this->getArrayName()) == this) {
+          // cppcheck-suppress returnDanglingLifetime
           return &recoHitInformation;
         }
       }
@@ -753,7 +754,7 @@ namespace Belle2 {
     void deleteFittedInformationForRepresentation(const genfit::AbsTrackRep* rep);
 
     /// Get useful information on EventDisplay
-    virtual std::string getInfoHTML() const;
+    std::string getInfoHTML() const override;
 
   private:
     /// Internal storage for the genfit track.
@@ -866,7 +867,6 @@ namespace Belle2 {
           hitList.push_back(relatedHit);
         }
       }
-
       return hitList;
     }
 
@@ -884,7 +884,7 @@ namespace Belle2 {
         // cppcheck-suppress useStlAlgorithm
         hitList.push_back(&hit);
       }
-
+      // cppcheck-suppress returnDanglingLifetime
       return hitList;
     }
 
@@ -897,7 +897,7 @@ namespace Belle2 {
     }
 
     /** Making this class a ROOT class.*/
-    ClassDef(RecoTrack, 9);
+    ClassDefOverride(RecoTrack, 9);
   };
 
   /**

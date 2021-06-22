@@ -10,22 +10,19 @@ void loadStyle();
 void fit(TH1D* h1);
 
 
-
-void compare2Tracks()
+// Apply loose or tight selection
+// bool loose_selection(false);
+// "compare" this result with a previous result.
+// The previous result should be defined by result4Compare.
+//  bool compare(true);
+void compare2Tracks(bool loose_selection = false, bool compare = true)
 {
 
   // Input file names:
   std::vector<std::string> input_filenames = {"cosmic/rootfile/twotracks*"};
 
-  // Apply loose or tight selection
-  bool loose_selection(false);
-
   // Run analysis for positve (pos) or negative (neg) or both (all)
   TString sCharge = "all";
-
-  // "compare" this result with a previous result.
-  // The previous result should be defined by result4Compare.
-  bool compare(true);
 
   // Root file contain histograms for comparing with this results.
   // it must be set properly if compare= true

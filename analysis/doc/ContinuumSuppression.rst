@@ -40,33 +40,13 @@ which are in general analysis dependet. Some examples will be given below.
 .. autofunction:: modularAnalysis.buildContinuumSuppression
    :noindex:
 
-Clean Mask
-""""""""""
-
-The ROE cuts should be tuned for each analysis.
-However it may be a good idea to require a minimum of 1 CDC hit in the ROE, to exclude VXD-only fake tracks.
+The ROE mask cuts should be tuned for each individual physics analysis.
+However, it may be a good idea to always require a minimum of 1 CDC hit for the charged ROE particles to exclude VXD-only fake tracks.
 Here is a simple example that you can use as a starting point:
 
 ::
 
   cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
-
-.. note::
-        Prior to Feb. 2017 B2GM, these selections for ROE: ``'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2'`` were hard coded in the module. Since then the explicit usage of a cleanMask is mandatory.
-
-Another new feature is the addition of an event-level R2 variable
-(`R2EventLevel`). It has been added as a Continuum Suppression variable, even
-though it is event-level. This returns the event-level R2, where no cuts have
-been applied. Being event-level, it does not reconstruct a B or build a ROE, so
-no masks can be applied. This may be useful for skimming purposes, as R2 is a
-highly discriminating variable and running the continuum suppression module to
-apply such a simple cut is wasteful.
-
-On that note, the original analysis-level R2 variable still exists (`R2`). This
-remains included in the continuum suppression module, where cuts, including ROE
-masks can now be applied.
-
- 
 
 The default `CleoConeCS` variable returns the cones calculated from all final state
 particles. It is now possible to construct CLEO Cones using only particles in
@@ -94,6 +74,27 @@ from the Belle software):
   variables = ['KSFWVariables(hso00)','KSFWVariables(hso00,FS1)']
 
 Again, as shown in this example, you can store both cases in your ntuple.
+
+Continuum Suppression variables
+-------------------------------
+
+The Continuum Suppression variables are defined as following:
+
+Thrust and thrust axis
+  For a set of :math:`N` particles with momenta :math:`p_i` the thrust axis :math:`\vec{T}` is defined as the unit vector along which their total projection is maximal.
+  The thrust scalar is 
+  :math:`T=\frac{\sum^N_{i=1} |\vec{T}\cdot \vec{p}_i|}{\sum^N_{i=1} |\vec{p}_i|}`,
+
+CLEO Cones 
+  The CLEO collaboration introduced variables based on the sum of the
+  absolute values of the momenta of all particles within angular sectors around the thrust
+  axis in intervals of 10 degrees, resulting in 9 concentric cones.
+
+Fox-Wolfram moments
+  For a set of :math:`N` particles with momenta :math:`p_i`, the l-th order Fox-Wolfram moment is defined as
+  :math:`H_l = \sum^N_{i,j=1}|\vec{p}_i||\vec{p}_j| P_l (\cos{\theta_{i,j}})`,
+  where :math:`P_l` are Legendre polynomials and :math:`\theta_{i,j}` is the angle between the particles
+
 
 Deep Continuum Suppression
 --------------------------

@@ -40,4 +40,6 @@
 #pragma link C++ class Belle2::TOP::PDFConstructor-;
 #pragma link C++ class Belle2::TOP::PDFConstructor::LogL-;
 #pragma link C++ class Belle2::TOP::PDFConstructor::Pull-;
+#pragma link C++ class Belle2::TOP::PDF1Dim-;
+#pragma link C++ class Belle2::TOP::ModuleAlignment-;
 #endif

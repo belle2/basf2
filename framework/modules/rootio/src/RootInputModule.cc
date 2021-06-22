@@ -491,6 +491,16 @@ void RootInputModule::readTree()
       B2FATAL("Could not read data from parent file!");
   }
 
+  // Nooow, if the object didn't exist in the event when we wrote it to File we still have it in the file but it's marked as invalid Object.
+  // So go through everything and check for the bit and invalidate as necessary
+  for (auto entry : m_storeEntries) {
+    if (entry->object->TestBit(kInvalidObject)) entry->invalidate();
+  }
+  for (const auto& storeEntries : m_parentStoreEntries) {
+    for (auto entry : storeEntries) {
+      if (entry->object->TestBit(kInvalidObject)) entry->invalidate();
+    }
+  }
 }
 
 bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durability, StoreEntries* storeEntries)

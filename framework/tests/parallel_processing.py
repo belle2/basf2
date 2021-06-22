@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Test the parallel processing functionality by simulating a few events
 # using 2 processes (so nothing too taxing)
@@ -7,7 +6,7 @@
 import os
 import basf2
 from ROOT import TFile, Belle2
-from b2test_utils import skip_test_if_light
+from b2test_utils import skip_test_if_light, clean_working_directory
 skip_test_if_light()  # cannot simulate events in a light release
 
 
@@ -30,7 +29,7 @@ class CheckEventNumbers(basf2.Module):
     def terminate(self):
         """Check if event numbers are as they should be"""
         seen = self.__evtNumbers
-        should = list(range(1, self.__evtNumList+1))
+        should = list(range(1, self.__evtNumList + 1))
         all_numbers = sorted(set(seen) | set(should))
         all_ok = True
         for evtNr in all_numbers:
@@ -47,9 +46,9 @@ main = basf2.Path()
 main.add_module("EventInfoSetter", evtNumList=[5])
 particlegun = main.add_module("ParticleGun", pdgCodes=[211, -211, 321, -321],
                               momentumGeneration="fixed", momentumParams=[3])
-main.add_module("Gearbox")
 
 # event path
+main.add_module("Gearbox")
 main.add_module("Geometry", components=['MagneticField', 'BeamPipe', 'PXD'], logLevel=basf2.LogLevel.ERROR)
 simulation = main.add_module("FullSim", logLevel=basf2.LogLevel.ERROR)
 
@@ -67,27 +66,25 @@ if not simulation.has_properties(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFI
 # Process events in one more process than we have events to make sure at least
 # one of them doesn't get an event
 basf2.set_nprocesses(5)
-basf2.process(main)
+with clean_working_directory():
+    basf2.process(main)
 
-print(basf2.statistics)
-print(basf2.statistics(basf2.statistics.TOTAL))
-assert basf2.statistics.get(simulation).calls(basf2.statistics.EVENT) == 5
-# +1 because of extra call to master module
-assert basf2.statistics.get_global().calls(basf2.statistics.EVENT) == 6
+    print(basf2.statistics)
+    print(basf2.statistics(basf2.statistics.TOTAL))
+    assert basf2.statistics.get(simulation).calls(basf2.statistics.EVENT) == 5
+    # +1 because of extra call to master module
+    assert basf2.statistics.get_global().calls(basf2.statistics.EVENT) == 6
 
-# check wether output file contains correct number of events
-file = TFile('parallel_processing_test.root')
-tree = file.Get('tree')
-if tree.GetEntries() != 5:
-    basf2.B2FATAL('Created output file contains wrong number of events! (' + str(tree.GetEntries()) + ')')
+    # check wether output file contains correct number of events
+    file = TFile('parallel_processing_test.root')
+    tree = file.Get('tree')
+    if tree.GetEntries() != 5:
+        basf2.B2FATAL('Created output file contains wrong number of events! (' + str(tree.GetEntries()) + ')')
 
-nummcparticles = tree.Project("", "MCParticles.m_pdg")
-if nummcparticles < 5:
-    basf2.B2FATAL('Output file should contain at least five MCParticles!')
+    nummcparticles = tree.Project("", "MCParticles.m_pdg")
+    if nummcparticles < 5:
+        basf2.B2FATAL('Output file should contain at least five MCParticles!')
 
-numhits = tree.Project("", "PXDSimHits.getArrayIndex()")
-if numhits < 5:  # usually much more, existence is most important thing here
-    basf2.B2FATAL('Output file should contain at least 5 hits!')
-
-
-os.remove('parallel_processing_test.root')
+    numhits = tree.Project("", "PXDSimHits.getArrayIndex()")
+    if numhits < 5:  # usually much more, existence is most important thing here
+        basf2.B2FATAL('Output file should contain at least 5 hits!')

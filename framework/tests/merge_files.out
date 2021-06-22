@@ -1,6 +1,6 @@
 [INFO] Steering file: framework/tests/merge_files.py
 running check_01_existing: Check that merging a non exsiting file fails
-[ERROR] input file "test1.root": Could not open file
+[ERROR] input file "/test1.root": Could not open file
 [WARNING] File "test2.root" is empty.
 [WARNING] All Files were empty
 check_01_existing passed
@@ -15,7 +15,7 @@ check_03_overwrite passed
 running check_04_access: Check that it fails if we cannot create output file
 [WARNING] File "test1.root" is empty.
 [WARNING] All Files were empty
-[ERROR] Could not create output file "nosuchdir/foo"
+[ERROR] Could not create output file "/nosuchdir/foo"
 check_04_access passed
 running check_05_release: Check that it fails if the releases are different
 [WARNING] File "test1.root" is empty.

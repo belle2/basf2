@@ -44,13 +44,15 @@ void TTDUnpackerModule::event()
 {
   m_EventLevelTriggerTimeInfo.create();// defaults to be invalid
   for (auto& it : m_rawTTD) {
-    B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
-            (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
-            it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
+    if (it.m_version >= 2) {
+      // attention, accessing a non supported variable results in B2FATAL :-/
+      B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
+              (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
+              it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
 
-    m_EventLevelTriggerTimeInfo.assign(new EventLevelTriggerTimeInfo(true, it.GetIsHER(0), (it.GetFrameCount(0) & 0x1) != 0,
-                                       it.GetTimeSinceLastInjection(0), it.GetTimeSincePrevTrigger(0),
-                                       it.GetBunchNumber(0)));
+      m_EventLevelTriggerTimeInfo.assign(new EventLevelTriggerTimeInfo(true, it.GetIsHER(0), (it.GetFrameCount(0) & 0x1) != 0,
+                                         it.GetTimeSinceLastInjection(0), it.GetTimeSincePrevTrigger(0), it.GetBunchNumber(0)));
+    }
     break;
   }
 }

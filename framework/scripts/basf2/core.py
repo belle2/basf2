@@ -26,9 +26,11 @@ from basf2 import _constwrapper  # noqa
 
 
 #: name of the framework
-basf2label = 'BASF2 (Belle Analysis Software Framework 2)'
+basf2label = 'basf2 (Belle II Analysis Software Framework)'
 #: and copyright notice
-basf2copyright = 'Copyright(C) 2010-2021 Belle II Collaboration'
+basf2copyright = 'Copyright(C) 2010-2021 Members of the Belle II Collaboration'
+#: license details
+basf2license = '(See "basf2 --license" for more information.)'
 
 # -----------------------------------------------
 #               Prepare basf2

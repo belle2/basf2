@@ -77,7 +77,8 @@ def add_unpackers(path, components=None, writeKLMDigitRaws=False):
         path.add_module("Geometry")
 
     # TTD
-    path.add_module('TTDUnpacker')
+    if 'SimulateEventLevelTriggerTimeInfo' not in path:
+        path.add_module('TTDUnpacker')
 
     # PXD
     if components is None or 'PXD' in components:

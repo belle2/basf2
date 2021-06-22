@@ -213,7 +213,6 @@ int main(int argc, char* argv[])
       pythonFile = "basf2_cli/print_info.py";
     } else if (varMap.count("license")) {
       pythonFile = "basf2_cli/print_license.py";
-    } else if (varMap.count("info")) {
     } else if (varMap.count("modules")) {
       string modArgs = varMap["modules"].as<string>();
       if (!modArgs.empty()) {

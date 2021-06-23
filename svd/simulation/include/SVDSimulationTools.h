@@ -96,33 +96,31 @@ namespace Belle2 {
      */
     inline double w_adjacentU(double t)
     {
-      // Convert from ns to 1/8 clock units
-      t /= 3.93;
 
       double f1_p[8];
       double f2_p[5];
       double y = 0;
 
       // First polynomial coefficients
-      f1_p[0] = -0.0175348;
-      f1_p[1] = -0.00818826;
-      f1_p[2] =  0.100159;
-      f1_p[3] = -0.0202636;
-      f1_p[4] =  0.00177548;
-      f1_p[5] = -8.30634e-05;
-      f1_p[6] =  2.03843e-06;
-      f1_p[7] = -2.06582e-08;
+      f1_p[0] = -0.006645;
+      f1_p[1] = -0.001809;
+      f1_p[2] =  0.005312;
+      f1_p[3] = -0.0002398;
+      f1_p[4] =  4.489e-06;
+      f1_p[5] = -4.259e-08;
+      f1_p[6] =  1.982e-10;
+      f1_p[7] = -3.438e-13;
 
       // Second polynomial coefficients
-      f2_p[0] =  4.85747;
-      f2_p[1] = -0.472951;
-      f2_p[2] =  0.0159236;
-      f2_p[3] = -0.000237671;
-      f2_p[4] =  1.33053e-06;
+      f2_p[0] =  5.505;
+      f2_p[1] = -0.1345;
+      f2_p[2] =  0.001164;
+      f2_p[3] = -4.492e-06;
+      f2_p[4] =  6.537e-09;
 
-      if (t > 0 && t <= 23.00) {
+      if (t > 0 && t <= 90.00) {
         for (int i = 0; i <= 7; i++) y += f1_p[i] * pow(t, i);
-      } else if (t > 23.00) {
+      } else if (t > 90.00) {
         for (int i = 0; i <= 4; i++) y += f2_p[i] * pow(t, i);
         if (y > 0) y = 0;
       }
@@ -136,22 +134,20 @@ namespace Belle2 {
      */
     inline double w_adjacentV(double t)
     {
-      // Convert from ns to 1/8 clock units
-      t /= 3.93;
 
       double f1_p[8];
       double f2_p[5];
       double y = 0;
 
       // First polynomial coefficients
-      f1_p[0] = -0.0175348;
-      f1_p[1] = -0.00818826;
-      f1_p[2] =  0.100159;
-      f1_p[3] = -0.0202636;
-      f1_p[4] =  0.00177548;
-      f1_p[5] = -8.30634e-05;
-      f1_p[6] =  2.03843e-06;
-      f1_p[7] = -2.06582e-08;
+      f1_p[0] =  0.003744;
+      f1_p[1] =  0.02302;
+      f1_p[2] =  0.008032;
+      f1_p[3] = -0.0005945;
+      f1_p[4] =  1.743e-05;
+      f1_p[5] = -2.631e-07;
+      f1_p[6] =  2.03e-09;
+      f1_p[7] = -6.335e-12;
 
       // Second polynomial coefficients
       f2_p[0] =  4.85747;
@@ -160,9 +156,9 @@ namespace Belle2 {
       f2_p[3] = -0.000237671;
       f2_p[4] =  1.33053e-06;
 
-      if (t > 0 && t <= 23.00) {
+      if (t > 0 && t <= 70.00) {
         for (int i = 0; i <= 7; i++) y += f1_p[i] * pow(t, i);
-      } else if (t > 23.00) {
+      } else if (t > 70.00) {
         for (int i = 0; i <= 4; i++) y += f2_p[i] * pow(t, i);
         if (y > 0) y = 0;
       }

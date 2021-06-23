@@ -44,6 +44,7 @@ void TTDUnpackerModule::event()
 {
   m_EventLevelTriggerTimeInfo.create();// defaults to be invalid
   for (auto& it : m_rawTTD) {
+    it.SetVersion();
     if (it.m_version >= 2) {
       // attention, accessing a non supported variable results in B2FATAL :-/
       B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<

@@ -37,7 +37,7 @@ class ValidationFunctionstTest(unittest.TestCase):
         os.chdir(cwd)
 
         # in the source folder, we should get a sensible output
-        local_dir = os.environ.get('BELLE2_LOCAL_DIR', None)
+        local_dir = os.environ.get("BELLE2_LOCAL_DIR", None)
         if local_dir:
             ret = validationfunctions.get_compact_git_hash(local_dir)
             self.assertTrue(ret is not None)

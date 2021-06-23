@@ -57,15 +57,25 @@ namespace Belle2 {
     double m_vertexChi2CutOutside;    ///< Chi2 cut for V0s outside of the beampipe. Applies to all.
     int    m_v0FitterMode;            ///< fitter mode (0: store V0 at the first vertex fit, regardless of inner hits, 1: remove hits inside the V0 vertex position, 2: mode 1 +  don't use SVD hits if there is only one available SVD hit-pair (default))
 
+    /// range for reconstructed Kshort mass used after removing material effects and inner hits
+    /// default range set to { 0.425, 0.575 } GeV
+    std::tuple<double, double> m_invMassRangeKshort = { 0.425, 0.575 };
+    /// range for reconstructed Lambda mass used after removing material effects and inner hits
+    /// default range set to { 1.09, 1.14 } GeV
+    std::tuple<double, double> m_invMassRangeLambda = { 1.09, 1.14 };
+    /// range for reconstructed Photon mass used after removing material effects and inner hits
+    /// default range set to { 0, 0.1 } GeV
+    std::tuple<double, double> m_invMassRangePhoton = { 0, 0.1 };
+
     bool m_validation;                         ///< Flag if use validation.
     std::string m_arrayNameV0ValidationVertex; ///< StoreArray name of the V0ValidationVertex.
 
     /// range for reconstructed Kshort mass used for pre-selection
-    /// default range set to nomminal KS mass +/- 0.005 GeV
-    std::tuple<double, double> m_MassRangeKshort = { 0.497614 - 0.005 , 0.497614 + 0.005 };
+    /// default range set to nominal KS mass + 0.015 GeV and 0.45 GeV
+    std::tuple<double, double> m_preFilterMassRangeKshort = { 0.45, Const::K0Mass + 0.015 };
     /// range for reconstructed Lambda mass used for pre-selection
     /// Default range set to nominal Lambda mass +/- 0.03
-    std::tuple<double, double> m_MassRangeLambda = { 1.115683 - 0.03, 1.115683 + 0.03 };
+    std::tuple<double, double> m_preFilterMassRangeLambda = { Const::Lambda.getMass() - 0.03, Const::Lambda.getMass() + 0.03 };
 
     /** helper function that gets the approximate mass range for the two given tracks and rejects candidates which
       do not fall into a user given mass range for lambda and Kshort.

@@ -148,7 +148,7 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
                     if final_state:
                         # Check the exitcode for failed Process()
                         if child.exitcode == 0:
-                            B2INFO(f"AlgorithStrategy subprocess for {strategy.algorithm.name} exited")
+                            B2INFO(f"AlgorithmStrategy subprocess for {strategy.algorithm.name} exited")
                             break
                         else:
                             raise RunnerError(f"Error during subprocess of AlgorithmStrategy for {strategy.algorithm.name}")

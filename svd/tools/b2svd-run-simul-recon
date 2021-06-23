@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+'''Tool to run SVD-only simulation and reconstruction. No output is produced unless --root_output is used.'''
+
+__author__ = 'Giulia Casarosa'
+__copyright__ = '2021 - Belle II Collaboration'
+
+
+import basf2 as b2
+from ROOT import Belle2
+from svd import add_svd_reconstruction, add_svd_simulation
+from basf2 import conditions as b2c
+
+import argparse
+import os, glob
+
+
+def arg_parser():
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('-n', '--events',
+                        default=100,
+                        type=int,
+                        help='number of events',
+                        metavar='EVENTS')
+    parser.add_argument('--no_bkg',
+                        default=False,
+                        action='store_true',
+                        help='flag to remove beam background from simulation')
+    parser.add_argument('--exp',
+                        default=0,
+                        type=int,
+                        help='experiment number you want to simulate',
+                        metavar='EXP')
+    parser.add_argument('--run',
+                        default=0,
+                        type=int,
+                        help='run number you want to simulate',
+                        metavar='RUN')
+    parser.add_argument('--prepend_gt',
+                        default='',
+                        type=str,
+                        nargs='*',
+                        help='Global Tags to be prepended',
+                        metavar='GTs')
+
+    parser.add_argument('--root_output',
+                        default=True,
+                        action='store_false',
+                        help='add this option to append the RootOuput module')
+    return parser
+
+
+if __name__ == "__main__":
+
+    #####################################################
+    # Part 0: setup
+
+    # Argument parsing
+    args = arg_parser().parse_args()
+    args.events
+
+    # Prepend and/or append the input GTs
+    if not (args.prepend_gt == ''):
+        for gt in reversed(args.prepend_gt):
+            b2c.prepend_globaltag(gt)
+
+    b2c.prepend_globaltag("svd_onlySVDinGeoConfiguration")
+
+    bkgFiles = glob.glob('/sw/belle2/bkg/*.root')
+    if args.no_bkg:
+        bkgFiles = None
+
+    #####################################################
+    # Part 1: run the SVD simulation and reconstruction
+
+    # Set the global log level
+    b2.set_log_level(b2.LogLevel.INFO)
+
+    # Create path
+    main = b2.Path()
+
+    b2.set_random_seed(1)
+
+    eventinfosetter = b2.register_module('EventInfoSetter')
+    eventinfosetter.param('expList', [args.exp])
+    eventinfosetter.param('runList', [args.run])
+    eventinfosetter.param('evtNumList', [args.events])
+    main.add_module(eventinfosetter)
+    main.add_module('EvtGenInput')
+
+    main.add_module('Gearbox')
+    main.add_module('Geometry')
+    main.add_module('FullSim')
+
+    add_svd_simulation(main)
+
+    if bkgFiles is not None:
+        bkginput = b2.register_module('BGOverlayInput')
+        bkginput.param('inputFileNames', bkgFiles)
+        main.add_module(bkginput)
+        main.add_module('BGOverlayExecutor', components=['SVD'])
+        main.add_module('SVDShaperDigitSorter')
+        main.add_module('SVDZeroSuppressionEmulator')
+
+    add_svd_reconstruction(main)
+
+    if args.root_output:
+        main.add_module('RootOutput')
+
+    main.add_module('Progress')
+
+    b2.print_path(main)
+
+    b2.process(main)
+
+    print(b2.statistics)

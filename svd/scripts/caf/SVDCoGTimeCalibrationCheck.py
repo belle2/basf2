@@ -20,14 +20,6 @@ from svd.CoGCalibration_utils_checkCalibration import SVDCoGTimeCalibrationCheck
 import rawdata as raw
 
 
-def remove_module(path, name):
-    new_path = b2.create_path()
-    for m in path.modules():
-        if name != m.name():
-            new_path.add_module(m)
-    return new_path
-
-
 localdb = sys.argv[1]
 filename = sys.argv[2]
 run = sys.argv[3]
@@ -85,7 +77,7 @@ for moda in main.modules():
     if moda.name() == 'SVDSpacePointCreator':
         moda.param("SVDClusters", 'SVDClustersFromTracks')
 
-main = remove_module(main, 'SVDMissingAPVsClusterCreator')
+main = b2.remove_module(main, 'SVDMissingAPVsClusterCreator')
 
 check = SVDCoGTimeCalibrationCheckModule()
 check.set_localdb(localdb)

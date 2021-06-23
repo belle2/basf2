@@ -180,6 +180,11 @@ def add_simulation(
         eventt0.param("isCosmics", isCosmics)
         path.add_module(eventt0)
 
+    # create EventLevelTriggerTimeInfo if it doesn't exist in BG Overlay
+    if 'SimulateEventLevelTriggerTimeInfo' not in path:
+        eventleveltriggertimeinfo = b2.register_module('SimulateEventLevelTriggerTimeInfo')
+        path.add_module(eventleveltriggertimeinfo)
+
     # detector simulation
     if 'FullSim' not in path:
         g4sim = b2.register_module('FullSim')

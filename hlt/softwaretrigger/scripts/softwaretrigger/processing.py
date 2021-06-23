@@ -170,7 +170,10 @@ def add_hlt_processing(path,
     accept_path = basf2.Path()
 
     # Do the reconstruction needed for the HLT decision
-    path_utils.add_filter_reconstruction(path, run_type=run_type, components=reco_components, **kwargs)
+    path_utils.add_pre_filter_reconstruction(path, run_type=run_type, components=reco_components, **kwargs)
+
+    # Perform HLT filter calculation
+    path_utils.add_filter_software_trigger(path, store_array_debug_prescale=1)
 
     # Add the part of the dqm modules, which should run after every reconstruction
     path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter,

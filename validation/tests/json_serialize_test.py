@@ -26,9 +26,11 @@ class TestJsonSerialize(unittest.TestCase):
 
     def test_serialize_comparison(self):
 
-        revs = [json_objects.Revision("run1", "iae223auiae", "git_hash1", ""),
-                json_objects.Revision("run2", "iuiaehuiaen", "git_hash1", ""),
-                json_objects.Revision("arun", "buie223aae", "git_hash1", "")]
+        revs = [
+            json_objects.Revision("run1", "iae223auiae", "git_hash1", ""),
+            json_objects.Revision("run2", "iuiaehuiaen", "git_hash1", ""),
+            json_objects.Revision("arun", "buie223aae", "git_hash1", ""),
+        ]
 
         cplot = json_objects.ComparisonPlot("plot_one")
 
@@ -37,7 +39,7 @@ class TestJsonSerialize(unittest.TestCase):
             plots=[cplot],
             title="",
             rootfile="",
-            package=""
+            package="",
         )
 
         cp = json_objects.ComparisonPackage("pack1", [cfile])
@@ -65,9 +67,7 @@ class TestJsonSerialize(unittest.TestCase):
 
     def test_comparison_plot_file(self):
         ccp1 = json_objects.ComparisonPlotFile(
-            title="title",
-            package="package",
-            rootfile="rootfile"
+            title="title", package="package", rootfile="rootfile"
         )
         ccp2 = json_objects.ComparisonPlotFile("package", "title", "rootfile")
 

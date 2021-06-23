@@ -32,7 +32,8 @@ def add_generator_preselection(
         MinPhotonEnergy=-1,
         MinPhotonTheta=0.0,
         MaxPhotonTheta=180.0,
-        applyInCMS=False):
+        applyInCMS=False,
+        stableParticles=False):
     """
         Adds generator preselection.
         Should be added to the path after the generator.add_abc_generator but before simulation.add_simulation modules
@@ -57,6 +58,7 @@ def add_generator_preselection(
             MinPhotonTheta (float): minimum polar angle of photon [deg]
             MaxPhotonTheta (float): maximum polar angle of photon [deg]
             applyInCMS (bool): if true apply the P,Pt,theta, and energy cuts in the center of mass frame
+            stableParticles (bool): if true apply the selection criteria for stable particles in the generator
     """
 
     generatorpreselection = path.add_module('GeneratorPreselection',
@@ -70,7 +72,8 @@ def add_generator_preselection(
                                             nPhotonMax=nPhotonMax,
                                             MinPhotonEnergy=MinPhotonEnergy,
                                             MinPhotonTheta=MinPhotonTheta,
-                                            MaxPhotonTheta=MaxPhotonTheta
+                                            MaxPhotonTheta=MaxPhotonTheta,
+                                            stableParticles=stableParticles
                                             )
 
     # empty path for unwanted events
@@ -185,7 +188,7 @@ def add_aafh_generator(
             B2WARNING("The tau decays will not be generated.")
 
 
-def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=False):
+def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=False, tauinputfile=''):
     """
     Add the default muon pair and tau pair generator KKMC.
     For tau decays, TauolaBelle and TauolaBelle2 are available.
@@ -198,6 +201,7 @@ def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=
         signalconfigfile(str): File with configuration of the signal event to generate. It doesn't affect mu-mu+ decays.
         useTauolaBelle(bool): If true, tau decay is driven by TauolaBelle. Otherwise TauolaBelle2 is used.
                               It doesn't affect mu-mu+ decays.
+        tauinputfile(str) : File to override KK2f_defaults. Only [sometimes] needed when tau decay is driven by TauolaBelle.
     """
 
     #: kkmc input file
@@ -234,6 +238,9 @@ def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=
                 kkmc_tauconfigfile = find_file(signalconfigfile)
             else:
                 kkmc_inputfile = find_file(signalconfigfile)
+        #: Check if there is a tauinputfile to override KK2f_defaults. Only [sometimes] needed when using TauolaBelle.
+        if not tauinputfile == '':
+            kkmc_inputfile = find_file(tauinputfile)
 
     elif finalstate == 'mu-mu+':
         kkmc_inputfile = find_file('data/generators/kkmc/mu.input.dat')
@@ -745,4 +752,4 @@ def add_treps_generator(path, finalstate='', useDiscreteAndSortedW=False):
         ApplyCosThetaCutCharged=True,
         MinimalTransverseMomentum=0,
         ApplyTransverseMomentumCutCharged=True,
-        )
+    )

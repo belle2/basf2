@@ -86,7 +86,7 @@ ma.applyCuts('B-:sigT', 'abs(mcPDG)==521', path=my_path)
 
 ma.reconstructDecay('Upsilon(4S):sig -> B+:tag B-:sigT', '', path=my_path)
 
-mytestmodule2 = ma.register_module('BtubeCreator')
+mytestmodule2 = b2.register_module('BtubeCreator')
 # select the daughter which will be used as reference to create Btube.
 # Order of daughters should be identical to decay string used in
 # reconstructDecay

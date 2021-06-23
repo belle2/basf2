@@ -19,15 +19,16 @@ mypath = basf2.create_path()
 testinput = basf2.find_file('analysis/tests/mdst.root')
 inputMdst("default", testinput, path=mypath)
 
-fillParticleListFromMC('K+:MC', 'mcPrimary', path=mypath)
-fillParticleListFromMC('pi+:MC', 'mcPrimary', path=mypath)
-fillParticleListFromMC('e+:MC', 'mcPrimary', path=mypath)
-fillParticleListFromMC('nu_e:MC', 'mcPrimary', path=mypath)
-fillParticleListFromMC('gamma:MC', 'mcPrimary', path=mypath)
+fillParticleListFromMC('K+:primaryMC', 'mcPrimary', path=mypath)
+fillParticleListFromMC('pi+:primaryMC', 'mcPrimary', path=mypath)
+fillParticleListFromMC('e+:primaryMC', 'mcPrimary', path=mypath)
+fillParticleListFromMC('nu_e:primaryMC', 'mcPrimary', path=mypath)
+fillParticleListFromMC('gamma:primaryMC', 'mcPrimary', path=mypath)
 
-reconstructMCDecay('pi0:gg =direct=> gamma:MC gamma:MC', '', path=mypath)
+reconstructMCDecay('pi0:gg =direct=> gamma:primaryMC gamma:primaryMC', '', path=mypath)
 reconstructMCDecay(
-    'B+:DstENu =direct=> [anti-D*0 =direct=> [anti-D0 =direct=> K+:MC pi-:MC pi0:gg] pi0:gg ] e+:MC nu_e:MC ',
+    'B+:DstENu =direct=> [anti-D*0 =direct=> [anti-D0 =direct=> K+:primaryMC pi-:primaryMC pi0:gg] pi0:gg ]\
+     e+:primaryMC nu_e:primaryMC ',
     '',
     path=mypath)
 
@@ -37,8 +38,8 @@ reconstructMCDecay(
 #
 # reconstructMCDecay(
 #     'B+:DstENu =direct=>\
-# [anti-D*0 =direct=> [anti-D0 =direct=> K+:MC pi-:MC [pi0:gg =direct=> gamma:MC gamma:MC]] pi0:gg ]\
-# e+:MC nu_e:MC ',
+# [anti-D*0 =direct=> [anti-D0 =direct=> K+:primaryMC pi-:primaryMC [pi0:gg =direct=> gamma:primaryMC gamma:primaryMC]] pi0:gg ]\
+# e+:primaryMC nu_e:primaryMC ',
 #     '',
 #     path=mypath)
 

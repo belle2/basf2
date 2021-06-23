@@ -542,7 +542,6 @@ void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
   } else if (isErrorIn(25)) {
     append_int32(0xCAFE0000);// HLT HEADER, NO accepted flag
   } else {
-    // cppcheck-suppress knownConditionTrueFalse
     append_int32(0xCAFE8000 | (m_send_all ? 0x4000 : 0) | (m_send_roi ? 0x2000 : 0)); // HLT HEADER, accepted flag set
   }
   if (isErrorIn(26)) {

@@ -116,7 +116,7 @@ Returns unique identifier of final state particle.
 Particles created from the same object (e.g. from the same track) have different :b2:var:`uniqueParticleIdentifier` value.)DOC");
 
     REGISTER_VARIABLE("isUnspecified", particleIsUnspecified,
-                      "returns 1 if the particle is marked as an unspecified object (like B0 -> @Xsd e+ e-), 0 if not");
+                      "Returns 1 if the particle is marked as an unspecified object (like B0 -> @Xsd e+ e-), 0 otherwise");
     REGISTER_VARIABLE("chiProb", particlePvalue, R"DOC(
 A context-dependent :math:`\chi^2` probability for 'the fit' related to this particle.
 
@@ -130,9 +130,9 @@ A context-dependent :math:`\chi^2` probability for 'the fit' related to this par
 .. seealso:: :b2:var:`pValue` for tracks
     )DOC");
     REGISTER_VARIABLE("nDaughters", particleNDaughters,
-                      "number of daughter particles");
+                      "Returns number of daughter particles");
     REGISTER_VARIABLE("flavor", particleFlavorType,
-                      "flavor type of decay(0 = unflavored, 1 = flavored)");
-    REGISTER_VARIABLE("charge", particleCharge, "charge of particle");
+                      "Returns 1.0 if particle is flavored type, 0.0 if it is unflavored.");
+    REGISTER_VARIABLE("charge", particleCharge, "Returns electric charge of particle in units of :math:`e`.");
   }
 }

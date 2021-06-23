@@ -262,16 +262,10 @@ namespace VXDTFfilterTest {
   TEST_F(FilterTest, SwitchingObservers)
   {
     //build an dummy filter which is unobserved (VoidObserver)
-    auto dummyFilter = (
-                         // cppcheck-suppress compareBoolExpressionWithInt
-                         (-10. <= SquaredDistance3D() <= 10.) &&
-                         // cppcheck-suppress compareBoolExpressionWithInt
-                         ((-100. <=  SquaredDistance2Dxy() <= -10.) ||    // put 2nd pair of parentheses to silence warning
-                          // cppcheck-suppress compareBoolExpressionWithInt
-                          (-10. <= SquaredDistance1Dx() <= 10.)) &&
-                         // cppcheck-suppress compareBoolExpressionWithInt
-                         !(-10. <= SquaredDistance1Dx() <= -10.)
-                       );
+    auto dummyFilter = ((-10. <= SquaredDistance3D() <= 10.) &&
+                        ((-100. <=  SquaredDistance2Dxy() <= -10.) ||    // put 2nd pair of parentheses to silence warning
+                         (-10. <= SquaredDistance1Dx() <= 10.)) &&
+                        !(-10. <= SquaredDistance1Dx() <= -10.));
 
     // values are chosen in that way that all sub-filters of dummyFilter have to be called (see comment below)
     // and so that dummyFilter is always true

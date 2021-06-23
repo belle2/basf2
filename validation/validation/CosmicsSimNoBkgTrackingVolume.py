@@ -22,20 +22,24 @@ set_random_seed(12345)
 main = create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', evtNumList=[10000], runList=[1], expList=[1003])
+main.add_module(
+    "EventInfoSetter", evtNumList=[10000], runList=[1], expList=[1003]
+)
 
 # Generate cosmic events. Note: with default settings the cosmics are
 # generated on a cylinder of 125cm (closely outside the tracking valume)!
-main.add_module('Cosmics')
+main.add_module("Cosmics")
 
 # detector simulation
 add_simulation(main)
 
 # memory profile
-main.add_module('Profile')
+main.add_module("Profile")
 
 # output
-main.add_module('RootOutput', outputFileName='../CosmicsSimNoBkgTrackingVolume.root')
+main.add_module(
+    "RootOutput", outputFileName="../CosmicsSimNoBkgTrackingVolume.root"
+)
 
 process(main)
 
@@ -43,14 +47,15 @@ process(main)
 print(statistics)
 
 statistics_plots(
-    'CosmicsSimNoBkgTrackingVolume_statistics.root',
-    contact='Software team b2soft@mail.desy.de',
-    job_desc='a standard simulation job with Cosmics events',
-    prefix='CosmicsSimNoBkgTrackingVolume'
+    "CosmicsSimNoBkgTrackingVolume_statistics.root",
+    contact="Software team b2soft@mail.desy.de",
+    job_desc="a standard simulation job with Cosmics events",
+    prefix="CosmicsSimNoBkgTrackingVolume",
 )
 event_timing_plot(
-    '../CosmicsSimNoBkgTrackingVolume.root', 'CosmicsSimNoBkgTrackingVolume_statistics.root',
-    contact='Software team b2soft@mail.desy.de',
-    job_desc='a standard simulation job with Cosmics events',
-    prefix='CosmicsSimNoBkgTrackingVolume'
+    "../CosmicsSimNoBkgTrackingVolume.root",
+    "CosmicsSimNoBkgTrackingVolume_statistics.root",
+    contact="Software team b2soft@mail.desy.de",
+    job_desc="a standard simulation job with Cosmics events",
+    prefix="CosmicsSimNoBkgTrackingVolume",
 )

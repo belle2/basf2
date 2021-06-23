@@ -8,11 +8,12 @@ Author: qingyuan.liu@desy.de
 import basf2
 from pxd.calibration import gain_calibration
 from prompt.utils import filter_by_max_files_per_run, filter_by_max_events_per_run
-from prompt import CalibrationSettings
+from prompt import CalibrationSettings, input_data_filters
 from caf.utils import ExpRun, IoV
 from itertools import groupby
 from itertools import chain
 from math import ceil, inf
+from prompt.calibrations.caf_beamspot import settings as beamspot_calibration
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="PXD gain calibration",
@@ -20,12 +21,14 @@ settings = CalibrationSettings(name="PXD gain calibration",
                                description=__doc__,
                                input_data_formats=["cdst"],
                                input_data_names=["physics"],
-                               # input_data_filters={
-                               # "physics": [
-                               # "bhabha_all_calib",
-                               # "4S", "Continuum", "Scan",
-                               # "physics", "Good"]
-                               # },
+                               input_data_filters={
+                                   "physics": [
+                                       input_data_filters["Data Tag"]["bhabha_all_calib"],
+                                       input_data_filters["Beam Energy"]["4S"],
+                                       input_data_filters["Beam Energy"]["Continuum"],
+                                       input_data_filters["Beam Energy"]["Scan"],
+                                       input_data_filters["Run Type"]["physics"],
+                                       input_data_filters["Data Quality Tag"]["Good"]]},
                                expert_config={
                                    "debug": False,
                                    "total_jobs": 1000,
@@ -36,7 +39,7 @@ settings = CalibrationSettings(name="PXD gain calibration",
                                    "max_files_per_run": 20,  # only valid when max_events/run = 0
                                    "payload_boundaries": []
                                },
-                               depends_on=[])
+                               depends_on=[beamspot_calibration])
 
 
 def get_calibrations(input_data, **kwargs):

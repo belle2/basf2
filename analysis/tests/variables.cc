@@ -581,7 +581,7 @@ namespace {
 
   TEST_F(MCTruthVariablesTest, ECLMCMatchWeightVariable)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const auto* photon = particles[0];
     const auto* electron = particles[1];
     const auto* pion = particles[2];
@@ -594,7 +594,7 @@ namespace {
 
   TEST_F(MCTruthVariablesTest, ECLBestMCMatchVariables)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const auto* photon = particles[0];
     const auto* electron = particles[1];
     const auto* pion = particles[2];
@@ -1823,7 +1823,7 @@ namespace {
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
+      Particle d(TLorentzVector(-1, 1.0 - 2 * (i % 2), 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -1853,6 +1853,14 @@ namespace {
     var = Manager::Instance().getVariable("daughterDiffOf(0, 2, PDG)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(p), 0);
+
+    var = Manager::Instance().getVariable("daughterDiffOf(1, 0, phi)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -1.5707964);
+
+    var = Manager::Instance().getVariable("daughterDiffOf(1, 0, useCMSFrame(phi))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -1.513103);
 
     EXPECT_B2FATAL(Manager::Instance().getVariable("daughterDiffOf(0, NOTINT, PDG)"));
   }
@@ -1913,7 +1921,7 @@ namespace {
   TEST_F(MetaVariableTest, daughterClusterAngleInBetween)
   {
     // declare all the array we need
-    StoreArray<Particle> particles, particles_noclst;
+    StoreArray<Particle> particles;
     std::vector<int> daughterIndices, daughterIndices_noclst;
 
     //proxy initialize where to declare the needed array
@@ -1986,7 +1994,7 @@ namespace {
   TEST_F(MetaVariableTest, grandDaughterDiffOfs)
   {
     // declare all the array we need
-    StoreArray<Particle> particles, particles_noclst;
+    StoreArray<Particle> particles;
     std::vector<int> daughterIndices0_noclst, daughterIndices1_noclst, daughterIndices2_noclst;
     std::vector<int> daughterIndices0, daughterIndices1, daughterIndices2;
 
@@ -2045,10 +2053,10 @@ namespace {
     const Manager::Var* var_E_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,2,3,E)");
     const Manager::Var* var_ClusterE_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,2,3,clusterE)");
 
-    const Manager::Var* var_ClusterPhi = Manager::Instance().getVariable("grandDaughterDiffOfClusterPhi(0,1,0,0)");
-    const Manager::Var* var_Phi = Manager::Instance().getVariable("grandDaughterDiffOfPhi(0,1,0,0)");
-    const Manager::Var* var_ClusterPhi_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOfClusterPhi(0,1,2,3)");
-    const Manager::Var* var_Phi_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOfPhi(0,1,2,3)");
+    const Manager::Var* var_ClusterPhi = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,0,0,clusterPhi)");
+    const Manager::Var* var_Phi = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,0,0,phi)");
+    const Manager::Var* var_ClusterPhi_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,2,3,clusterPhi)");
+    const Manager::Var* var_Phi_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,2,3,phi)");
 
     // when no relations are set between the particles and the eclClusters, nan is expected to be returned for the Cluster- vars
     // no problems are supposed to happen for non-Cluster- vars
@@ -3465,14 +3473,11 @@ namespace {
 
     EXPECT_B2FATAL(Manager::Instance().getVariable("mcDaughterDiffOf(0, NOTINT, PDG)"));
 
-
-    // Test mcDaughterDiffOfPhi
-    var = Manager::Instance().getVariable("mcDaughterDiffOfPhi(0, 1)");
+    // Test azimuthal angle as well
+    var = Manager::Instance().getVariable("mcDaughterDiffOf(0, 1, phi)");
     ASSERT_NE(var, nullptr);
     v_test = momentum_2.Vect().DeltaPhi(momentum_1.Vect());
     EXPECT_FLOAT_EQ(var->function(p), v_test);
-
-    EXPECT_B2FATAL(Manager::Instance().getVariable("mcDaughterDiffOfPhi(0, NOTINT)"));
 
   }
 
@@ -4553,7 +4558,7 @@ namespace {
   };
   TEST_F(FlightInfoTest, flightDistance)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[1]; //  Ks had flight distance of 5 cm
 
     const Manager::Var* var = Manager::Instance().getVariable("flightDistance");
@@ -4562,7 +4567,7 @@ namespace {
   }
   TEST_F(FlightInfoTest, flightDistanceErr)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[1]; //  Ks had flight distance of 5 cm
 
     const Manager::Var* var = Manager::Instance().getVariable("flightDistanceErr");
@@ -4571,7 +4576,7 @@ namespace {
   }
   TEST_F(FlightInfoTest, flightTime)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[1]; //  Ks had flight time of 0.0427 us (t = d/c * m/p)
 
     const Manager::Var* var = Manager::Instance().getVariable("flightTime");
@@ -4581,7 +4586,7 @@ namespace {
 
   TEST_F(FlightInfoTest, flightTimeErr)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[1]; //  Ks should have positive flight distance uncertainty
 
     const Manager::Var* var = Manager::Instance().getVariable("flightTimeErr");
@@ -4589,10 +4594,9 @@ namespace {
     EXPECT_GT(var->function(newKs), 0.0);
   }
 
-
   TEST_F(FlightInfoTest, flightDistanceOfDaughter)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter Ks had flight distance of 5 cm
 
     const Manager::Var* var = Manager::Instance().getVariable("flightDistanceOfDaughter(1)");
@@ -4605,7 +4609,7 @@ namespace {
   }
   TEST_F(FlightInfoTest, flightDistanceOfDaughterErr)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter Ks should have positive flight distance uncertainty
 
     const Manager::Var* var = Manager::Instance().getVariable("flightDistanceOfDaughterErr(1)");
@@ -4618,7 +4622,7 @@ namespace {
   }
   TEST_F(FlightInfoTest, flightTimeOfDaughter)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter Ks had flight time of 0.0427 us (t = d/c * m/p)
 
     const Manager::Var* var = Manager::Instance().getVariable("flightTimeOfDaughter(1)");
@@ -4633,7 +4637,7 @@ namespace {
   }
   TEST_F(FlightInfoTest, flightTimeOfDaughterErr)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter Ks should have positive flight time uncertainty
 
     const Manager::Var* var = Manager::Instance().getVariable("flightTimeOfDaughterErr(1)");
@@ -4646,7 +4650,7 @@ namespace {
   }
   TEST_F(FlightInfoTest, mcFlightDistanceOfDaughter)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter Ks had flight distance of 5 cm
 
     const Manager::Var* var = Manager::Instance().getVariable("mcFlightDistanceOfDaughter(1)");
@@ -4660,7 +4664,7 @@ namespace {
   }
   TEST_F(FlightInfoTest, mcFlightTimeOfDaughter)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter Ks had flight time of 0.0427 us (t = d/c * m/p)
 
     const Manager::Var* var = Manager::Instance().getVariable("mcFlightTimeOfDaughter(1)");
@@ -4678,7 +4682,7 @@ namespace {
 
   TEST_F(FlightInfoTest, vertexDistance)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKS = particles[1]; // Get KS, as it has both a production and decay vertex
 
     const Manager::Var* var = Manager::Instance().getVariable("vertexDistance");
@@ -4688,7 +4692,7 @@ namespace {
 
   TEST_F(FlightInfoTest, vertexDistanceError)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKS = particles[1]; // Get KS, as it has both a production and decay vertex
 
     const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceErr");
@@ -4698,7 +4702,7 @@ namespace {
 
   TEST_F(FlightInfoTest, vertexDistanceSignificance)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKS = particles[1]; // Get KS, as it has both a production and decay vertex
 
     const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceSignificance");
@@ -4708,7 +4712,7 @@ namespace {
 
   TEST_F(FlightInfoTest, vertexDistanceOfDaughter)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter KS has both a production and decay vertex
 
     const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughter(1, noIP)");
@@ -4726,7 +4730,7 @@ namespace {
 
   TEST_F(FlightInfoTest, vertexDistanceOfDaughterError)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter KS has both a production and decay vertex
 
     const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughterErr(1, noIP)");
@@ -4740,7 +4744,7 @@ namespace {
 
   TEST_F(FlightInfoTest, vertexDistanceOfDaughterSignificance)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter KS has both a production and decay vertex
 
     const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughterSignificance(1, noIP)");
@@ -4805,7 +4809,7 @@ namespace {
   // MC vertex tests
   TEST_F(VertexVariablesTest, mcDecayVertexX)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had truth decay x is 4.0
 
     const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexX");
@@ -4815,7 +4819,7 @@ namespace {
 
   TEST_F(VertexVariablesTest, mcDecayVertexY)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had truth decay y is 5.0
 
     const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexY");
@@ -4825,7 +4829,7 @@ namespace {
 
   TEST_F(VertexVariablesTest, mcDecayVertexZ)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had truth decay z is 0.0
 
     const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexZ");
@@ -4836,7 +4840,7 @@ namespace {
 
   TEST_F(VertexVariablesTest, mcDecayVertexFromIPDistance)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had truth distance of sqrt(41)
 
     const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexFromIPDistance");
@@ -4846,7 +4850,7 @@ namespace {
 
   TEST_F(VertexVariablesTest, mcDecayVertexRho)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had truth rho of sqrt(41)
 
     const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexRho");
@@ -4856,7 +4860,7 @@ namespace {
 
   TEST_F(VertexVariablesTest, mcProductionVertexX)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had production vertex x of 1.0 cm
 
     const Manager::Var* var = Manager::Instance().getVariable("mcProductionVertexX");
@@ -4866,7 +4870,7 @@ namespace {
 
   TEST_F(VertexVariablesTest, mcProductionVertexY)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had production vertex y of 2.0 cm
 
     const Manager::Var* var = Manager::Instance().getVariable("mcProductionVertexY");
@@ -4876,7 +4880,7 @@ namespace {
 
   TEST_F(VertexVariablesTest, mcProductionVertexZ)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had production vertex z of 3.0 cm
 
     const Manager::Var* var = Manager::Instance().getVariable("mcProductionVertexZ");
@@ -4888,7 +4892,7 @@ namespace {
 
   TEST_F(VertexVariablesTest, prodVertexX)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had production vertex x of 1.0 cm
 
     const Manager::Var* var = Manager::Instance().getVariable("prodVertexX");
@@ -4897,7 +4901,7 @@ namespace {
   }
   TEST_F(VertexVariablesTest, prodVertexY)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had production vertex y of 2.0 cm
 
     const Manager::Var* var = Manager::Instance().getVariable("prodVertexY");
@@ -4906,7 +4910,7 @@ namespace {
   }
   TEST_F(VertexVariablesTest, prodVertexZ)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had production vertex z of 3.0 cm
 
     const Manager::Var* var = Manager::Instance().getVariable("prodVertexZ");
@@ -4918,7 +4922,7 @@ namespace {
 
   TEST_F(VertexVariablesTest, prodVertexCov)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had production vertex covariance xx of .1 cm
 
     //const Manager::Var* var = Manager::Instance().getVariable("prodVertexCovXX");

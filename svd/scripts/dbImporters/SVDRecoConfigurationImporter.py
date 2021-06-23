@@ -5,21 +5,16 @@
 Importer of the SVD Reconstruction Configuration
 """
 import basf2
-from basf2 import *
-from svd import *
-import ROOT
 from ROOT import Belle2
-from ROOT.Belle2 import SVDRecoConfiguration
 import datetime
-import os
 
 now = datetime.datetime.now()
 
 # cluster reconstruction algorithms:
-algorithmFor_timeRecoWith6Samples = "CoG6"
-algorithmFor_timeRecoWith3Samples = "CoG6"
-algorithmFor_positionRecoWith6Samples = "oldDefault"
-algorithmFor_positionRecoWith3Samples = "oldDefault"
+algorithmFor_timeRecoWith6Samples = "CoG3"
+algorithmFor_timeRecoWith3Samples = "CoG3"
+algorithmFor_positionRecoWith6Samples = "CoGOnly"
+algorithmFor_positionRecoWith3Samples = "CoGOnly"
 algorithmFor_chargeRecoWith6Samples = "MaxSample"
 algorithmFor_chargeRecoWith3Samples = "MaxSample"
 # strip reconstruction algorithms:
@@ -37,8 +32,11 @@ class recoConfigurationImporter(basf2.Module):
 
         iov = Belle2.IntervalOfValidity.always()
 
-        payload = Belle2.SVDRecoConfiguration("SVDRecoConfiguration_default_" +
-                                              str(now.isoformat()) + "_INFO:_CoG6Time_MaxSampleCharge_oldDefaultPosition")
+        payload = Belle2.SVDRecoConfiguration("SVDRecoConfiguration_default_3=6_" +
+                                              str(now.isoformat()) + "_INFO:" +
+                                              "_" + str(algorithmFor_timeRecoWith6Samples) + "Time" +
+                                              "_" + str(algorithmFor_chargeRecoWith6Samples) + "Charge" +
+                                              "_" + str(algorithmFor_positionRecoWith6Samples) + "Position")
 
         # cluster time
         payload.setTimeRecoWith6Samples(algorithmFor_timeRecoWith6Samples)
@@ -59,14 +57,14 @@ class recoConfigurationImporter(basf2.Module):
         Belle2.Database.Instance().storeData(Belle2.SVDRecoConfiguration.name, payload, iov)
 
 
-main = create_path()
+main = basf2.create_path()
 
 # Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = basf2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
 main.add_module(recoConfigurationImporter())
 
 # Process events
-process(main)
+basf2.process(main)

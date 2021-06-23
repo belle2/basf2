@@ -5,6 +5,23 @@ from b2test_utils.datastoreprinter import DataStorePrinter, PrintObjectsModule
 from ROOT.Belle2 import Const
 
 
+MDST_OBJECTS = (
+    'ECLClusters',
+    'ECLClustersToTracksNamedBremsstrahlung',
+    'EventLevelClusteringInfo',
+    'EventLevelTrackingInfo',
+    'EventLevelTriggerTimeInfo',
+    'KLMClusters',
+    'KlIds',
+    'PIDLikelihoods',
+    'SoftwareTriggerResult',
+    'TrackFitResults',
+    'Tracks',
+    'TRGSummary',
+    'V0s',
+)
+
+
 def add_mdst_output(
     path,
     mc=True,
@@ -24,27 +41,10 @@ def add_mdst_output(
         dataDescription (dict or None): Additional key->value pairs to be added as data description
            fields to the output FileMetaData
     """
-    branches = [
-        'Tracks',
-        'V0s',
-        'TrackFitResults',
-        'EventLevelTrackingInfo',
-        'PIDLikelihoods',
-        'TracksToPIDLikelihoods',
-        'ECLClusters',
-        'ECLClustersToTracksNamedBremsstrahlung',
-        'EventLevelClusteringInfo',
-        'TracksToECLClusters',
-        'KLMClusters',
-        'KlIds',
-        'KLMClustersToKlIds',
-        'TRGSummary',
-        'SoftwareTriggerResult',
-    ]
+    branches = list(MDST_OBJECTS)
     persistentBranches = ['FileMetaData']
     if mc:
-        branches += ['MCParticles', 'TracksToMCParticles',
-                     'ECLClustersToMCParticles', 'KLMClustersToMCParticles']
+        branches += ['MCParticles']
         persistentBranches += ['BackgroundInfo']
     branches += additionalBranches
     # set dataDescription correctly
@@ -158,5 +158,10 @@ def add_mdst_dump(path, print_untested=False):
             "getSecondaryPhysicsProcess", "getSeenInDetector",
             "isVirtual", "isInitial", "isPrimaryParticle", "getName"
         ]),
+        DataStorePrinter("EventLevelTriggerTimeInfo", [
+            "isValid", "hasInjection", "isHER", "isRevo2",
+            "getTimeSinceLastInjection", "getTimeSincePrevTrigger", "getBunchNumber",
+            "getTimeSinceLastInjectionInMicroSeconds", "getTimeSincePrevTriggerInMicroSeconds"
+            ], array=False),
     ]
     path.add_module(PrintObjectsModule(mdst_dataobjects, print_untested))

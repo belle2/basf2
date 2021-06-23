@@ -53,9 +53,11 @@ class Cluster:
 
         #: The command to submit a job. 'LOGFILE' will be replaced by the
         # actual log file name
-        self.submit_command = ('qsub -cwd -l h_vmem={requirement_vmem}G,'
-                               'h_fsize={requirement_storage}G '
-                               '-oo {logfile} -q {queuename} -V')
+        self.submit_command = (
+            "qsub -cwd -l h_vmem={requirement_vmem}G,"
+            "h_fsize={requirement_storage}G "
+            "-oo {logfile} -q {queuename} -V"
+        )
 
         #: required vmem by the job in GB, required on DESY NAF, otherwise
         #: jobs get killed due to memory consumption
@@ -77,39 +79,42 @@ class Cluster:
         #: Set up the logging functionality for the 'cluster execution'-Class,
         #: so we can log to validate_basf2.py's log what is going on in
         #: .execute and .is_finished
-        self.logger = logging.getLogger('validate_basf2')
+        self.logger = logging.getLogger("validate_basf2")
 
         #: We need to set up the same environment on the cluster like on the
         #: local machine. The information can be extracted from $BELLE2_TOOLS,
         #: $BELLE2_RELEASE_DIR and $BELLE2_LOCAL_DIR
 
         #: Path to the basf2 tools and central/local release
-        self.tools = self.adjust_path(os.environ['BELLE2_TOOLS'])
-        belle2_release_dir = os.environ.get('BELLE2_RELEASE_DIR', None)
-        belle2_local_dir = os.environ.get('BELLE2_LOCAL_DIR', None)
+        self.tools = self.adjust_path(os.environ["BELLE2_TOOLS"])
+        belle2_release_dir = os.environ.get("BELLE2_RELEASE_DIR", None)
+        belle2_local_dir = os.environ.get("BELLE2_LOCAL_DIR", None)
 
         #: The command for b2setup (and setoption)
-        self.b2setup = 'b2setup'
+        self.b2setup = "b2setup"
         if belle2_release_dir is not None:
-            self.b2setup += ' ' + belle2_release_dir.split('/')[-1]
+            self.b2setup += " " + belle2_release_dir.split("/")[-1]
         if belle2_local_dir is not None:
-            self.b2setup = 'MY_BELLE2_DIR=' + \
-                self.adjust_path(belle2_local_dir) + ' ' + self.b2setup
-        if os.environ.get('BELLE2_OPTION') != 'debug':
-            self.b2setup += '; b2code-option ' + \
-                            os.environ.get('BELLE2_OPTION')
+            self.b2setup = (
+                "MY_BELLE2_DIR="
+                + self.adjust_path(belle2_local_dir)
+                + " "
+                + self.b2setup
+            )
+        if os.environ.get("BELLE2_OPTION") != "debug":
+            self.b2setup += "; b2code-option " + os.environ.get("BELLE2_OPTION")
 
         # Write to log which revision we are using
-        self.logger.debug(f'Setting up the following release: {self.b2setup}')
+        self.logger.debug(f"Setting up the following release: {self.b2setup}")
 
         # Define the folder in which the log of the cluster messages will be
         # stored (same folder like the log for validate_basf2.py)
-        clusterlog_dir = './html/logs/__general__/'
+        clusterlog_dir = "./html/logs/__general__/"
         if not os.path.exists(clusterlog_dir):
             os.makedirs(clusterlog_dir)
 
         #: The file object to which all cluster messages will be written
-        self.clusterlog = open(clusterlog_dir + 'clusterlog.log', 'w+')
+        self.clusterlog = open(clusterlog_dir + "clusterlog.log", "w+")
 
     # noinspection PyMethodMayBeStatic
     def adjust_path(self, path: str):
@@ -131,7 +136,7 @@ class Cluster:
 
         return True
 
-    def execute(self, job: Script, options='', dry=False, tag='current'):
+    def execute(self, job: Script, options="", dry=False, tag="current"):
         """!
         Takes a Script object and a string with options and runs it on the
         cluster, either with ROOT or with basf2, depending on the file type.
@@ -148,12 +153,12 @@ class Cluster:
         # convention, data files will be stored in the parent dir.
         # Then make sure the folder exists (create if it does not exist) and
         # change to cwd to this folder.
-        output_dir = os.path.abspath(f'./results/{tag}/{job.package}')
+        output_dir = os.path.abspath(f"./results/{tag}/{job.package}")
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
         # Path where log file is supposed to be created
-        log_file = output_dir + '/' + os.path.basename(job.path) + '.log'
+        log_file = output_dir + "/" + os.path.basename(job.path) + ".log"
 
         # Remove any left over done files
         donefile_path = f"{self.path}/script_{job.name}.done"
@@ -162,9 +167,9 @@ class Cluster:
 
         # Now we need to distinguish between .py and .C files:
         extension = os.path.splitext(job.path)[1]
-        if extension == '.C':
+        if extension == ".C":
             # .c files are executed with root
-            command = 'root -b -q ' + job.path
+            command = "root -b -q " + job.path
         else:
             # .py files are executed with basf2
             # 'options' contains an option-string for basf2, e.g. '-n 100'
@@ -179,16 +184,17 @@ class Cluster:
         # revision. The execute the command (i.e. run basf2 or ROOT on a
         # steering file). Write the return code of that into a *.done file.
         # Delete the helpfile-shellscript.
-        tmp_name = self.path + '/' + 'script_' + job.name + '.sh'
-        with open(tmp_name, 'w+') as tmp_file:
-            tmp_file.write('#!/bin/bash \n\n' +
-                           'BELLE2_NO_TOOLS_CHECK=1 \n' +
-                           f'source {self.tools}/b2setup \n' +
-                           'cd {} \n'.format(self.adjust_path(output_dir)) +
-                           f'{command} \n' +
-                           'echo $? > {}/script_{}.done \n'
-                           .format(self.path, job.name) +
-                           f'rm {tmp_name} \n')
+        tmp_name = self.path + "/" + "script_" + job.name + ".sh"
+        with open(tmp_name, "w+") as tmp_file:
+            tmp_file.write(
+                "#!/bin/bash \n\n"
+                + "BELLE2_NO_TOOLS_CHECK=1 \n"
+                + f"source {self.tools}/b2setup \n"
+                + "cd {} \n".format(self.adjust_path(output_dir))
+                + f"{command} \n"
+                + "echo $? > {}/script_{}.done \n".format(self.path, job.name)
+                + f"rm {tmp_name} \n"
+            )
 
         # Make the helpfile-shellscript executable
         st = os.stat(tmp_name)
@@ -199,7 +205,7 @@ class Cluster:
             queuename=self.queuename,
             requirement_storage=self.requirement_storage,
             requirement_vmem=self.requirement_vmem,
-            logfile=log_file
+            logfile=log_file,
         ).split() + [tmp_name]
 
         # Log the command we are about the execute
@@ -210,14 +216,15 @@ class Cluster:
         # If we are performing a dry run, don't send anything to the cluster
         # and just create the *.done file right away and delete the *.sh file.
         if not dry:
-            process = subprocess.Popen(params, stdout=self.clusterlog,
-                                       stderr=subprocess.STDOUT)
+            process = subprocess.Popen(
+                params, stdout=self.clusterlog, stderr=subprocess.STDOUT
+            )
 
             # Check whether the submission succeeded
             if process.wait() != 0:
-                job.status = 'failed'
+                job.status = "failed"
         else:
-            os.system(f'echo 0 > {self.path}/script_{job.name}.done')
+            os.system(f"echo 0 > {self.path}/script_{job.name}.done")
             os.unlink(tmp_name)
 
     def is_job_finished(self, job: Script):
@@ -242,7 +249,7 @@ class Cluster:
                 try:
                     returncode = int(f.read().strip())
                 except ValueError:
-                    returncode = -666
+                    returncode = -654
 
             # Delete the *.done file
             os.remove(donefile_path)

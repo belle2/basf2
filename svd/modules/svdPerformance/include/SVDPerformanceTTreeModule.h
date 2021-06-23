@@ -56,6 +56,7 @@ namespace Belle2 {
     float m_svdClPhi = 0;   /**< cluster global phi */
     float m_svdClZ = 0;     /**< cluster global Z */
     std::vector<float> m_svdStripCharge; /**< charge of the strips of the cluster*/
+    std::vector<float> m_svdStrip6Samples; /**< 6 samples of the strips of the cluster*/
     std::vector<float> m_svdStripTime; /**< time of the strips of the cluster*/
     std::vector<float> m_svdStripPosition; /**< absolute position of the strips of the cluster*/
     int m_svdTrkPXDHits = 0; /**< number of PXD hits on the track*/

@@ -510,7 +510,7 @@ class Job:
         Dumps the Job object configuration to a JSON file so that it can be read in again later.
 
         Parameters:
-          file_path(`Path`): The filepath we'll dump to
+          file_path(`basf2.Path`): The filepath we'll dump to
         """
         with open(file_path, mode="w") as job_file:
             json.dump(self.job_dict, job_file, indent=2)
@@ -525,8 +525,8 @@ class Job:
     def job_dict(self):
         """
         Returns:
-            dict: A JSON serialisable representation of the `Job` and its `SubJob` objects. `Path` objects are converted to
-            string via ``Path.as_posix()``.
+            dict: A JSON serialisable representation of the `Job` and its `SubJob` objects.
+            `Path <basf2.Path>` objects are converted to string via ``Path.as_posix()``.
         """
         job_dict = {}
         job_dict["name"] = self.name
@@ -615,6 +615,14 @@ class Job:
         """
         if "BELLE2_TOOLS" not in os.environ:
             raise BackendError("No BELLE2_TOOLS found in environment")
+        if "BELLE2_CONFIG_DIR" in os.environ:
+            self.setup_cmds.append(f"""if [ -z "${{BELLE2_CONFIG_DIR}}" ]; then
+              export BELLE2_CONFIG_DIR={os.environ['BELLE2_CONFIG_DIR']}
+            fi""")
+        if "VO_BELLE2_SW_DIR" in os.environ:
+            self.setup_cmds.append(f"""if [ -z "${{VO_BELLE2_SW_DIR}}" ]; then
+              export VO_BELLE2_SW_DIR={os.environ['VO_BELLE2_SW_DIR']}
+            fi""")
         if "BELLE2_RELEASE" in os.environ:
             self.setup_cmds.append(f"source {os.environ['BELLE2_TOOLS']}/b2setup {os.environ['BELLE2_RELEASE']}")
         elif 'BELLE2_LOCAL_DIR' in os.environ:
@@ -701,7 +709,7 @@ class SubJob(Job):
     def job_dict(self):
         """
         Returns:
-            dict: A JSON serialisable representation of the `SubJob`. `Path` objects are converted to
+            dict: A JSON serialisable representation of the `SubJob`. `Path <basf2.Path>` objects are converted to
             `string` via ``Path.as_posix()``. Since Subjobs inherit most of the parent job's config
             we only output the input files and arguments that are specific to this subjob and no other details.
         """
@@ -1936,11 +1944,21 @@ class HTCondor(Batch):
         """
         job_dir = Path(cmd[-1]).parent.as_posix()
         sub_out = ""
-        try:
-            sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, cwd=job_dir)
-        except subprocess.CalledProcessError as e:
-            B2ERROR(f"Error during condor_submit: {str(e)}")
-            raise e
+        attempt = 0
+        sleep_time = 30
+
+        while attempt < 3:
+            try:
+                sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, cwd=job_dir)
+                break
+            except subprocess.CalledProcessError as e:
+                attempt += 1
+                if attempt == 3:
+                    B2ERROR(f"Error during condor_submit: {str(e)} occurred more than 3 times.")
+                    raise e
+                else:
+                    B2ERROR(f"Error during condor_submit: {str(e)}, sleeping for {sleep_time} seconds.")
+                    time.sleep(30)
         return sub_out.split()[0]
 
     class HTCondorResult(Result):
@@ -2037,12 +2055,11 @@ class HTCondor(Batch):
 
             job_info = jobs_info[0]
             backend_status = job_info["JobStatus"]
-            # if job is held (backend_status = 5) then report why then kill the job
+            # if job is held (backend_status = 5) then report why then keep waiting
             if backend_status == 5:
-                hold_reason = job_info["HoldReason"]
-                B2WARNING(f"{self.job} on hold because of {hold_reason}. Killing it")
-                subprocess.check_output(["condor_rm", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
-                backend_status = 6
+                hold_reason = job_info.get("HoldReason", None)
+                B2WARNING(f"{self.job} on hold because of {hold_reason}. Keep waiting.")
+                backend_status = 2
             try:
                 new_job_status = self.backend_code_to_status[backend_status]
             except KeyError as err:
@@ -2137,13 +2154,15 @@ class HTCondor(Batch):
         # We get a JSON serialisable summary from condor_q. But we will alter it slightly to be more similar to other backends
         cmd = " ".join(cmd_list)
         B2DEBUG(29, f"Calling subprocess with command = '{cmd}'")
+        # condor_q occassionally fails
         try:
             records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
-            if records:
-                records = decode_json_string(records)
-            else:
-                records = []
         except BaseException:
+            records = None
+
+        if records:
+            records = decode_json_string(records)
+        else:
             records = []
         jobs_info = {"JOBS": records}
         jobs_info["NJOBS"] = len(jobs_info["JOBS"])  # Just to avoid having to len() it in the future
@@ -2200,11 +2219,16 @@ class HTCondor(Batch):
         # We get a JSON serialisable summary from condor_q. But we will alter it slightly to be more similar to other backends
         cmd = " ".join(cmd_list)
         B2DEBUG(29, f"Calling subprocess with command = '{cmd}'")
-        records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        try:
+            records = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        except BaseException:
+            records = None
+
         if records:
             records = decode_json_string(records)
         else:
             records = []
+
         jobs_info = {"JOBS": records}
         jobs_info["NJOBS"] = len(jobs_info["JOBS"])  # Just to avoid having to len() it in the future
         return jobs_info

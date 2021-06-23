@@ -108,6 +108,8 @@ However this is not the most probable result in an :math:`e^+e^-` collision.
     At around 125 nb, the most probably process is :math:`e^+e^-\to e^+e^-`.
     The cross section for hadronic events is around 5.8 nb, the cross section
     for :math:`B\bar B` hadronic events is around 1.1 nb.
+    Note that the measured cross sections depend on the selection criteria that
+    were being applied to the events.
 
 
 We call anything that is not "what you want to analyse": **background**.

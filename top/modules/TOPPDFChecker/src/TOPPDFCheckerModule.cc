@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2017, 2021 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -11,18 +11,12 @@
 // Own include
 #include <top/modules/TOPPDFChecker/TOPPDFCheckerModule.h>
 #include <top/geometry/TOPGeometryPar.h>
-#include <top/reconstruction/TOPreco.h>
-#include <top/reconstruction/TOPtrack.h>
-#include <top/reconstruction/TOPconfigure.h>
-
-// framework - DataStore
-#include <framework/datastore/StoreArray.h>
+#include <top/reconstruction_cpp/TOPTrack.h>
+#include <top/reconstruction_cpp/PDFConstructor.h>
+#include <top/reconstruction_cpp/TOPRecoManager.h>
 
 // DataStore classes
-#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
-#include <top/dataobjects/TOPDigit.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPBarHit.h>
 
 // framework aux
@@ -53,7 +47,7 @@ namespace Belle2 {
   TOPPDFCheckerModule::TOPPDFCheckerModule() : HistoModule()
 
   {
-    // set module description (e.g. insert text)
+    // set module description
     setDescription("Module for checking analytic PDF used in likelihood calculation");
     setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -65,10 +59,6 @@ namespace Belle2 {
     addParam("numBins", m_numBins,
              "histogram number of bins in time", 1000);
 
-  }
-
-  TOPPDFCheckerModule::~TOPPDFCheckerModule()
-  {
   }
 
   void TOPPDFCheckerModule::defineHisto()
@@ -105,11 +95,8 @@ namespace Belle2 {
 
     // input
 
-    StoreArray<TOPDigit> topDigits;
-    topDigits.isRequired();
-
-    StoreArray<Track> tracks;
-    tracks.isRequired();
+    m_digits.isRequired();
+    m_tracks.isRequired();
 
     StoreArray<ExtHit> extHits;
     extHits.isRequired();
@@ -120,73 +107,55 @@ namespace Belle2 {
     StoreArray<TOPBarHit> barHits;
     barHits.isRequired();
 
-    // Configure TOP detector
-
-    TOPconfigure config;
-
   }
 
-  void TOPPDFCheckerModule::beginRun()
-  {
-  }
 
   void TOPPDFCheckerModule::event()
   {
-
+    TOPRecoManager::setTimeWindow(m_minTime, m_maxTime);
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-
-    // create reconstruction object and set various options
-
-    int Nhyp = 1;
-    double mass = Const::pion.getMass(); // pion used just to initialize
-    int pdg = Const::pion.getPDGCode();
-    TOPreco reco(Nhyp, &mass, &pdg);
-    reco.setPDFoption(TOPreco::c_Fine);
-    reco.setTimeWindow(m_minTime, m_maxTime);
 
     // loop over reconstructed tracks, call reconstruction and fill histograms
 
-    StoreArray<Track> tracks;
     int numTrk = 0;
-    for (const auto& track : tracks) {
-      TOPtrack trk(&track);
-      if (!trk.isValid()) continue;
-      if (!trk.getMCParticle()) continue;
-      if (!trk.getBarHit()) continue;
-      mass = trk.getMCParticle()->getMass();
-      pdg = trk.getMCParticle()->getPDG();
-      reco.setMass(mass, pdg);
-      reco.reconstruct(trk);
-      if (reco.getFlag() != 1) continue; // track is not in the acceptance of TOP
+    for (const auto& track : m_tracks) {
+      TOPTrack trk(track);
+      if (not trk.isValid()) continue;
+      if (not trk.getMCParticle()) continue;
+      if (not trk.getBarHit()) continue;
+
+      auto chargedStable = Const::chargedStableSet.find(abs(trk.getPDGCode()));
+      if (chargedStable == Const::invalidParticle) continue;
+
+      PDFConstructor pdfConstructor(trk, chargedStable, PDFConstructor::c_Fine);
+      if (not pdfConstructor.isValid()) continue;
       numTrk++;
 
       // average values - to print in terminate()
       const auto& module = geo->getModule(trk.getModuleID());
-      m_avrgMomentum += module.momentumToLocal(trk.getMomentum());
-      m_avrgPosition += module.pointToLocal(trk.getPosition());
+      m_avrgMomentum += module.momentumToLocal(trk.getExtHit()->getMomentum());
+      m_avrgPosition += module.pointToLocal(trk.getExtHit()->getPosition());
       m_numTracks++;
       m_slotIDs.emplace(trk.getModuleID());
-      m_PDGCodes.emplace(trk.getPDGcode());
+      m_PDGCodes.emplace(trk.getPDGCode());
 
       // histogram photons in a slot crossed by the track
-      StoreArray<TOPDigit> digits;
-      for (const auto& digit : digits) {
+      for (const auto& digit : m_digits) {
         if (digit.getModuleID() == trk.getModuleID() and digit.getTime() < m_maxTime) {
-          if (!isFromThisParticle(digit, trk.getMCParticle())) continue;
+          if (not isFromThisParticle(digit, trk.getMCParticle())) continue;
           m_hits->Fill(digit.getPixelID(), digit.getTime());
           m_hitsCol->Fill(digit.getPixelCol(), digit.getTime());
         }
       }
 
       // histogram PDF using MC approach
-      for (int pixelID = 1; pixelID <= 512; pixelID++) {
-        for (int peak = 0; peak < reco.getNumofPDFPeaks(pixelID); peak++) {
-          float t0 = 0;
-          float sigma = 0;
-          float numPhot = 0;
-          reco.getPDFPeak(pixelID, peak, t0, sigma, numPhot);
+      for (const auto& signalPDF : pdfConstructor.getSignalPDF()) {
+        int pixelID = signalPDF.getPixelID();
+        for (const auto& peak : signalPDF.getPDFPeaks()) {
+          double numPhot = pdfConstructor.getExpectedSignalPhotons() * peak.nph;
+          double sigma = sqrt(peak.wid);
           for (int i = 0; i < gRandom->Poisson(numPhot); i++) {
-            double time = gRandom->Gaus(t0, sigma);
+            double time = gRandom->Gaus(peak.t0, sigma);
             m_pdf->Fill(pixelID, time);
             int pixelCol = (pixelID - 1) % 64 + 1;
             m_pdfCol->Fill(pixelCol, time);
@@ -205,13 +174,8 @@ namespace Belle2 {
   }
 
 
-  void TOPPDFCheckerModule::endRun()
-  {
-  }
-
   void TOPPDFCheckerModule::terminate()
   {
-
     m_avrgPosition *= 1.0 / m_numTracks;
     m_avrgMomentum *= 1.0 / m_numTracks;
 

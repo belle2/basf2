@@ -2,16 +2,34 @@
 
 """ECL single crystal energy calibration using three control samples."""
 
-from prompt import CalibrationSettings
+from prompt import CalibrationSettings, input_data_filters
 
 # --------------------------------------------------------------
 # ..Tell the automated script some required details
-settings = CalibrationSettings(name="ecl_energy",
-                               expert_username="hearty",
-                               description=__doc__,
-                               input_data_formats=["cdst"],
-                               input_data_names=["hlt_bhabhaecl", "hlt_gamma_gamma", "hlt_mumu_2trk"],
-                               depends_on=[])
+settings = CalibrationSettings(
+    name="ecl_energy",
+    expert_username="hearty",
+    description=__doc__,
+    input_data_formats=["cdst"],
+    input_data_names=[
+        "bhabha_all_calib",
+        "gamma_gamma_calib",
+        "mumutight_calib"],
+    input_data_filters={
+        "bhabha_all_calib": [
+            input_data_filters["Data Tag"]["bhabha_all_calib"],
+            input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
+            input_data_filters["Magnet"]["On"]],
+        "gamma_gamma_calib": [
+            input_data_filters["Data Tag"]["gamma_gamma_calib"],
+            input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
+            input_data_filters["Magnet"]["On"]],
+        "mumutight_calib": [
+            input_data_filters["Data Tag"]["mumutight_calib"],
+            input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
+            input_data_filters["Magnet"]["On"]]},
+    depends_on=[],
+    expert_config={"ee5x5_min_entries": 100})
 
 # --------------------------------------------------------------
 # ..The calibration functions
@@ -28,12 +46,14 @@ def get_calibrations(input_data, **kwargs):
     # ..Bhabha
 
     # ..Input data
-    file_to_iov_bhabha = input_data["hlt_bhabhaecl"]
+    file_to_iov_bhabha = input_data["bhabha_all_calib"]
     input_files_bhabha = list(file_to_iov_bhabha.keys())
 
     # ..Algorithm
     algo_ee5x5 = Belle2.ECL.eclee5x5Algorithm()
-    algo_ee5x5.setMinEntries(150)
+    expert_config = kwargs.get("expert_config")
+    ee5x5minEntries = expert_config["ee5x5_min_entries"]
+    algo_ee5x5.setMinEntries(ee5x5minEntries)
     algo_ee5x5.setPayloadName("ECLCrystalEnergy5x5")
     algo_ee5x5.setStoreConst(True)
 
@@ -54,6 +74,7 @@ def get_calibrations(input_data, **kwargs):
                                 algorithms=[algo_ee5x5],
                                 input_files=input_files_bhabha
                                 )
+    cal_ecl_ee5x5.backend_args = {"request_memory": "4 GB"}
 
     # ..Add prepare_cdst_analysis to pre_collector_path
     ee5x5_pre_path = basf2.create_path()
@@ -64,7 +85,7 @@ def get_calibrations(input_data, **kwargs):
     # ..gamma gamma
 
     # ..Input data
-    file_to_iov_gamma_gamma = input_data["hlt_gamma_gamma"]
+    file_to_iov_gamma_gamma = input_data["gamma_gamma_calib"]
     input_files_gamma_gamma = list(file_to_iov_gamma_gamma.keys())
 
     # ..Algorithm
@@ -106,7 +127,7 @@ def get_calibrations(input_data, **kwargs):
     # ..muon pair
 
     # ..Input data
-    file_to_iov_mu_mu = input_data["hlt_mumu_2trk"]
+    file_to_iov_mu_mu = input_data["mumutight_calib"]
     input_files_mu_mu = list(file_to_iov_mu_mu.keys())
 
     # ..Algorithm

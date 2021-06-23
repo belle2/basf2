@@ -1,7 +1,0 @@
-c--   TOP_PMTTYPE.fi: type of PMT in a pixel
-c--   0 = nominal, 1 = conventional, 2 = ALD, 3 = life extended ALD, etc.
-c--   needs TOP_GEO.fi and TOP_PIK.fi to be included
-
-      INTEGER PMT_TYPE(0:NUM_CHA-1,0:NSIZ_MOD-1) ! PMT types
-
-      COMMON /TOP_PMTTYPE/ PMT_TYPE

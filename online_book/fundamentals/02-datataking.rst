@@ -60,20 +60,21 @@ of the physics program.
 .. admonition:: Another hint
     :class: toggle xhint stacked
 
-    The goal instantaneous luminosity of SuperKEKB is :math:`8\times 10^35\ \textrm
-    {cm}^-2 \textrm{s}^-1`. It takes a beam particle bunch roughly 10 μs to complete
+    The goal instantaneous luminosity of SuperKEKB is :math:`8\times 10^{35}\, \textrm
+    {cm}^{-2} \textrm{s}^{-1}`. It takes a beam particle bunch roughly 10 μs to complete
     a full revolution around the accelerator ring. Up to 2376 bunches will circulate
     in each ring.
 
 .. admonition:: Solution
     :class: toggle solution
 
-    At a final design luminosity of :math:`8\times 10^{35}\ \textrm{cm}^{-2}\textrm{s}^
-    {-1}` at 2376 bunches per ring, each taking about 10us to complete a revolution, the
-    delivered luminosity per bunch crossing is about :math:`8\times 10^{35}\ \textrm
-    {cm}^{-2} \textrm{s}^{-1} \cdot 1\times 10^{-6}\ \textrm{s} / 2376 = 3.4\times10^{-7}\
-    \textrm{nb}`, so even the most likely Bhabha process at :math:`125\
-    \textrm{nb}` only happens once every 25000 bunch crossings.
+    At a final design luminosity of :math:`8\times 10^{35}\, \textrm{cm}^{-2}\textrm{s}^
+    {-1}` at 2376 bunches per ring, each taking about 10 μs to complete a revolution, the
+    delivered luminosity per bunch crossing is about :math:`8\times 10^{35}\, \textrm
+    {cm}^{-2} \textrm{s}^{-1} \cdot 10\times 10^{-6}\ \textrm{s} / 2376 = 3.4\times10^{-6}\,
+    (\textrm{nb})^{-1}`, so even the most likely Bhabha process at :math:`125\,
+    \textrm{nb}` only happens about once every
+    :math:`(3.4\times 10^{-6}\cdot 125)^{-1} \approx 2400` bunch crossings.
 
 .. figure:: belle2.png
     :align: center

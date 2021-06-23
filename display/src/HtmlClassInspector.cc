@@ -16,6 +16,7 @@
 #include <TClassRef.h>
 #include <TDataType.h>
 #include <TDataMember.h>
+#include <TDatime.h>
 #include <TROOT.h>
 #include <TStreamerElement.h>
 #include <TVirtualStreamerInfo.h>

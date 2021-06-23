@@ -6,7 +6,7 @@ information.
 """
 
 import sqlite3
-from . import PayloadInformation
+from conditions_db import PayloadInformation
 
 
 class LocalMetadataProvider:

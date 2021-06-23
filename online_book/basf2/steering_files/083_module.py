@@ -4,6 +4,8 @@ import basf2 as b2
 
 
 class MinModule(b2.Module):
+    """A minimal example of a basf2 module in python."""
+
     def __init__(self):
         """Constructor"""
         # call constructor of base class, required if you implement __init__

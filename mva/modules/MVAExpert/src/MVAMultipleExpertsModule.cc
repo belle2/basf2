@@ -166,8 +166,10 @@ namespace Belle2 {
 
         for (unsigned int j = 0; j < m_identifiers.size(); ++j) {
           if (particle->hasExtraInfo(m_extraInfoNames[j])) {
-            B2WARNING("Extra Info with given name is already set! Overwriting old value!");
-            particle->setExtraInfo(m_extraInfoNames[j], targetValues[j]);
+            if (particle->getExtraInfo(m_extraInfoNames[j]) != targetValues[j]) {
+              B2WARNING("Extra Info with given name is already set! Overwriting old value!");
+              particle->setExtraInfo(m_extraInfoNames[j], targetValues[j]);
+            }
           } else {
             particle->addExtraInfo(m_extraInfoNames[j], targetValues[j]);
           }

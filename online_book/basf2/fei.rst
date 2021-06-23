@@ -121,7 +121,7 @@ There is also a convenience function for that!
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    You can get the recommended tag using `modularAnalaysis.getAnalysisGlobaltag`
+    You can get the recommended tag using `modularAnalysis.getAnalysisGlobaltag`
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -189,8 +189,8 @@ in a single Global Tag and is ``prefix=FEIv4_2020_MC13_release_04_01_01`` for th
 
 The configuration created above must now be turned into a ``basf2`` path which can be appended to the main path.
 This is done with the `fei.get_path` function which takes the channel configuration
-and the general FEI configuration as arguments and returns a `FeiState` object.
-The ``path`` attribute of this newly-created `FeiState` (e.g. ``feistate.path``) is then appended
+and the general FEI configuration as arguments and returns a `FeiState <fei.core.FeiState>` object.
+The ``path`` attribute of this newly-created `FeiState  <fei.core.FeiState>` (e.g. ``feistate.path``) is then appended
 to the main path with the `basf2.Path.add_path` method.
 
 .. admonition:: Exercise
@@ -391,7 +391,7 @@ indicator for the quality of the B mesons we have reconstructed.
 
 Congratulations, you have now discovered the B meson in Monte Carlo data!
 This concludes the first part of this lesson. The second part of this lesson will show you now how to use
-the reconstructed B\ :sub:`tag` in you own analysis.
+the reconstructed B\ :sub:`tag` in your own analysis.
 
 
 Reconstructing the full ϒ(4S) event

@@ -7,8 +7,8 @@ Author: qingyuan.liu@desy.de
 
 import basf2
 from pxd.calibration import hot_pixel_mask_calibration
-from prompt.utils import filter_by_max_files_per_run
-from prompt import CalibrationSettings
+from prompt.utils import filter_by_max_files_per_run, filter_by_max_events_per_run
+from prompt import CalibrationSettings, input_data_filters
 from caf.utils import IoV
 from itertools import groupby
 from itertools import chain
@@ -20,6 +20,23 @@ settings = CalibrationSettings(name="PXD hot/dead pixel calibration",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["beamorphysics", "cosmic"],
+                               input_data_filters={
+                                   "beamorphysics": [
+                                       input_data_filters["Data Tag"]["bhabha_all_calib"],
+                                       input_data_filters["Data Tag"]["gamma_gamma_calib"],
+                                       input_data_filters["Data Tag"]["hadron_calib"],
+                                       input_data_filters["Data Tag"]["offip_calib"],
+                                       input_data_filters["Data Tag"]["cosmic_calib"],
+                                       input_data_filters["Beam Energy"]["4S"],
+                                       input_data_filters["Beam Energy"]["Continuum"],
+                                       input_data_filters["Beam Energy"]["Scan"],
+                                       input_data_filters["Run Type"]["physics"],
+                                       input_data_filters["Data Quality Tag"]["Good Or Recoverable"]],
+                                   "cosmic": [input_data_filters["Run Type"]["cosmic"]]},
+                               expert_config={
+                                   "max_events_per_run": 400000,
+                                   "max_files_per_run": 20,  # only valid when max_events/run <= 0
+                                   },
                                depends_on=[])
 
 
@@ -46,7 +63,9 @@ def get_calibrations(input_data, **kwargs):
     expert_config = kwargs.get("expert_config")
     cal_kwargs = expert_config.get("kwargs", {})
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
-    max_files_per_run = 20
+    expert_config = kwargs.get("expert_config")
+    max_events_per_run = expert_config["max_events_per_run"]
+    max_files_per_run = expert_config["max_files_per_run"]
     min_files_per_chunk = 10
     min_events_per_file = 1000  # avoid empty files
 
@@ -56,8 +75,18 @@ def get_calibrations(input_data, **kwargs):
 
     # Reduce data and create calibration instances for different data categories
     cal_list = []
-    reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, max_files_per_run, min_events_per_file)
-    reduced_file_to_iov_cosmics = filter_by_max_files_per_run(file_to_iov_cosmics, max_files_per_run, min_events_per_file)
+    if max_events_per_run <= 0:
+        basf2.B2INFO(f"Reducing to a maximum of {max_files_per_run} files per run.")
+        reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics,
+                                                                  max_files_per_run, min_events_per_file)
+        reduced_file_to_iov_cosmics = filter_by_max_files_per_run(file_to_iov_cosmics,
+                                                                  max_files_per_run, min_events_per_file)
+    else:
+        basf2.B2INFO(f"Reducing to a maximum of {max_events_per_run} events per run.")
+        reduced_file_to_iov_physics = filter_by_max_events_per_run(file_to_iov_physics,
+                                                                   max_events_per_run, random_select=True)
+        reduced_file_to_iov_cosmics = filter_by_max_events_per_run(file_to_iov_cosmics,
+                                                                   max_events_per_run, random_select=True)
 
     # Create run chunks based on exp no. and run type
     iov_set_physics = set(reduced_file_to_iov_physics.values())

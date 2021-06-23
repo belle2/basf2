@@ -89,7 +89,7 @@ namespace Belle2 {
       bool m_updateMother;               /**< update mother kinematics*/
       bool m_updateDaughters;            /**< update daughter kinematics*/
       double m_recoilMass;               /**< Recoil mass for RecoilMass constraint */
-      double m_invMass;                  /**< Inviriant mass for Mass constraint */
+      double m_invMass;                  /**< Invariant mass for Mass constraint */
 
       // internal variables
       TextTracer* m_textTracer;                           /**< internal text output variable */

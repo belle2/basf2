@@ -51,10 +51,28 @@ namespace Belle2 {
     std::string m_pvPrefix;
     /** Update entry intervall */
     int m_minEntries = 10000;
+
     /** warn level for mean adhoc plot */
     double m_warnMeanAdhoc{};
     /** error level for mean adhoc plot */
     double m_errorMeanAdhoc{};
+    /** warn level for outside fraction */
+    double m_warnOutsideAdhoc{};
+    /** error level for outside fraction */
+    double m_errorOutsideAdhoc{};
+    /** threshold level/line for outside fraction */
+    int m_upperLineAdhoc{};
+
+    /** warn level for mean adhoc plot */
+    double m_warnMeanFull{};
+    /** error level for mean adhoc plot */
+    double m_errorMeanFull{};
+    /** warn level for outside fraction */
+    double m_warnOutsideFull{};
+    /** error level for outside fraction */
+    double m_errorOutsideFull{};
+    /** threshold level/line for outside fraction */
+    int m_upperLineFull{};
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
@@ -72,9 +90,9 @@ namespace Belle2 {
     //! Line in the Canvas to guide the eye
     TLine* m_line1 = nullptr;
     //! Line in the Canvas to guide the eye
-    TLine* m_line2 = nullptr;
+    TLine* m_lineA = nullptr;
     //! Line in the Canvas to guide the eye
-//     TLine* m_line3 = nullptr;
+    TLine* m_lineF = nullptr;
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};

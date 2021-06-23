@@ -17,6 +17,36 @@ be adapted when changing to the new release.
 Changes since release-05
 ========================
 
+.. only:: not light
+
+   .. rubric:: The jitter of the L1 trigger is included in the standard simulation
+
+   The L1 trigger jitter is randomly extracted from a double gaussian whose parameters have been tuned with 2020 data.
+   The machine filling pattern is taken into account in the simulation of the jitter.
+
+
+.. only:: not light
+
+   .. rubric:: The L1 trigger simulation is included in :py:func:`simulation.add_simulation`
+
+   The L1 trigger simulation (``tsim``) is now executed in the standard simulation: before SVD and PXD simulation but after the simulation of the rest of the subdetectors. For this reason, the python function ``add_tsim()`` is deprecated. If you already have a ``add_simulation`` in your path, you already get L1 trigger simulation.
+    If you do not have ``add_simulation``, and you need the L1 trigger simulation,\
+    please use :py:func:`L1trigger.add_trigger_simulation`.
+
+
+.. only:: not light
+
+   .. rubric:: Discontinue the support of the old "fullFormat" for cDSTs and extend the "rawFormat" cDSTs to MC
+
+   The support of the ``fullFormat`` cDSTs is discontinued. :py:func:`reconstruction.add_cdst_output` does not store
+   anymore additional branches when the option ``rawFormat=False`` is selected, being simply an alias of
+   :py:func:`mdst.add_mdst_output`. The users have to explicitly define the additional branches they want to store
+   using the ``additionalBranches`` paramenter.
+
+   The only supported format is the ``rawFormat``, that is now extended to MC. If ``rawFormat=True`` and ``mc=False`` are
+   selected, the rawdata + tracking data objects are stored, while with ``rawFormat=True`` and ``mc=True`` the digits +
+   tracking data objects, including the ``MCParticles`` and the relations between them and the digits, are stored.
+
 .. rubric:: Removal of old and deprecated database functions
 
 Some functions used in the past to handle the conditions database (like ``basf2.use_local_database`` or ``basf2.reset_database``) are removed, and any script using them does not work anymore.
@@ -26,6 +56,13 @@ This removal does not imply any functionality loss, since the users can use the 
 
 Fixed the issue where PHOTOS photons were not correctly flagged in continuum events, e.g., charm decays (:issue:`BII-5934`).
 This was present in ``release-05-00-01`` and earlier, including MC13 files.
+
+.. rubric:: Unification of B2BII settings
+
+A single switch between Belle and Belle II settings has been implemented, which is automatically set when reading in a Belle type mdst.
+No individual options have to be set in modular analysis functions. 
+
+.. include:: analysis/doc/whatsnew-since/release-05-02.txt
 
 .. include:: analysis/doc/whatsnew-since/release-05-01.txt
 

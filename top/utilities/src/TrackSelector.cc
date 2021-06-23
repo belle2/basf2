@@ -10,11 +10,10 @@
 
 #include <top/utilities/TrackSelector.h>
 #include <framework/logging/Logger.h>
-#include <top/reconstruction/TOPtrack.h>
 #include <top/geometry/TOPGeometryPar.h>
 #include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/ExtHit.h>
 #include <analysis/utility/PCmsLabTransform.h>
-
 
 namespace Belle2 {
   namespace TOP {
@@ -38,11 +37,12 @@ namespace Belle2 {
       }
     }
 
-    bool TrackSelector::isSelected(const TOPtrack& trk) const
+
+    bool TrackSelector::isSelected(const TOPTrack& trk) const
     {
 
       if (m_sampleType == c_undefined) {
-        B2ERROR("TOP::TrackSelector: sample type is undefined, default constructor used");
+        B2ERROR("TOP::TrackSelector:isSelected sample type is undefined, returning false");
         return false;
       }
 
@@ -76,8 +76,8 @@ namespace Belle2 {
       // cut on local z
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
       const auto& module = geo->getModule(trk.getModuleID());
-      m_localPosition = module.pointToLocal(trk.getPosition());
-      m_localMomentum = module.momentumToLocal(trk.getMomentum());
+      m_localPosition = module.pointToLocal(trk.getExtHit()->getPosition());
+      m_localMomentum = module.momentumToLocal(trk.getExtHit()->getMomentum());
       if (m_localPosition.Z() < m_minZ or m_localPosition.Z() > m_maxZ) return false;
 
       return true;

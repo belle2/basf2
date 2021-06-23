@@ -30,8 +30,7 @@ REG_MODULE(KLMUnpacker)
 
 KLMUnpackerModule::KLMUnpackerModule() : Module(),
   m_ElementNumbers(&(KLMElementNumbers::Instance())),
-  m_triggerCTimeOfPreviousEvent(0),
-  m_eklmElementNumbers(&(EKLMElementNumbers::Instance()))
+  m_triggerCTimeOfPreviousEvent(0)
 {
   setDescription("KLM unpacker (creates KLMDigits from RawKLM).");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -56,11 +55,6 @@ KLMUnpackerModule::KLMUnpackerModule() : Module(),
   addParam("keepEvenPackages", m_keepEvenPackages,
            "Keep packages that have even length normally indicating that "
            "data was corrupted ", false);
-  addParam("SciThreshold", m_scintThreshold,
-           "Scintillator strip hits with charge lower this value will be "
-           "marked as bad.", double(140.0));
-  addParam("loadThresholdFromDB", m_loadThresholdFromDB,
-           "Load threshold from database (true) or not (false)", true);
 }
 
 KLMUnpackerModule::~KLMUnpackerModule()
@@ -89,15 +83,10 @@ void KLMUnpackerModule::beginRun()
 {
   if (!m_ElectronicsMap.isValid())
     B2FATAL("KLM electronics map is not available.");
+  if (!m_FEEParameters.isValid())
+    B2FATAL("KLM scintillator FEE parameters are not available.");
   if (!m_TimeConversion.isValid())
     B2FATAL("EKLM time conversion parameters are not available.");
-  if (!m_eklmChannels.isValid())
-    B2FATAL("EKLM channel data are not available.");
-  if (m_loadThresholdFromDB) {
-    if (!m_bklmADCParams.isValid())
-      B2FATAL("BKLM ADC threshold paramenters are not available.");
-    m_scintThreshold = m_bklmADCParams->getADCThreshold();
-  }
   m_triggerCTimeOfPreviousEvent = 0;
 }
 
@@ -135,23 +124,15 @@ void KLMUnpackerModule::createDigit(
     double time = m_TimeConversion->getScintillatorTime(
                     raw->getCTime(), klmDigitEventInfo->getTriggerCTime());
     klmDigit->setTime(time);
-    if (subdetector == KLMElementNumbers::c_BKLM) {
-      if (raw->getCharge() < m_scintThreshold)
-        klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
-      else
-        klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
-    } else {
-      int stripGlobal = m_eklmElementNumbers->stripNumber(
-                          section, layer, sector, plane, strip);
-      const EKLMChannelData* channelData =
-        m_eklmChannels->getChannelData(stripGlobal);
-      if (channelData == nullptr)
-        B2FATAL("Incomplete EKLM channel data.");
-      if (raw->getCharge() < channelData->getThreshold())
-        klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
-      else
-        klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
-    }
+    uint16_t channelNumber = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
+    const KLMScintillatorFEEData* FEEData =
+      m_FEEParameters->getFEEData(channelNumber);
+    if (FEEData == nullptr)
+      B2FATAL("Incomplete KLM scintillator FEE data.");
+    if (raw->getCharge() < FEEData->getThreshold())
+      klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
+    else
+      klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
   }
   klmDigit->setSubdetector(subdetector);
   klmDigit->setSection(section);

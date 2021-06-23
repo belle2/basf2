@@ -212,7 +212,6 @@ unsigned short Const::DetectorSet::getBit(Const::EDetector det)
   if (det > TEST) {
     B2ERROR("Const::DetectorSet::getBit(): Invalid detector ID");
   }
-  // cppcheck-suppress shiftTooManyBits
   return (1 << (det - 1));
 }
 
@@ -344,6 +343,7 @@ const Const::ParticleSet Const::clusterSet =
   Const::ParticleType(22) + Const::ParticleType(130) + Const::ParticleType(11)
   + Const::ParticleType(211) + Const::ParticleType(13) + Const::ParticleType(9900001);
 
+
 const Const::ChargedStable Const::electron = Const::chargedStableSet.find(11);
 const Const::ChargedStable Const::muon = Const::chargedStableSet.find(13);
 const Const::ChargedStable Const::pion = Const::chargedStableSet.find(211);
@@ -367,6 +367,10 @@ const Const::ParticleType Const::Lambda = Const::ParticleType(3122);
 const Const::ParticleType Const::antiLambda = Const::ParticleType(-3122);
 const Const::ParticleType Const::invalidParticle = Const::ParticleType(9900000); // codes beginning with 99... are reserved
 const Const::ParticleType Const::unspecifiedParticle = Const::ParticleType(9900001); // codes beginning with 99... are reserved
+
+const Const::ParticleSet Const::finalStateParticlesSet =
+  Const::chargedStableSet + Const::photon + Const::Kshort + Const::Klong
+  + Const::Lambda + Const::antiLambda + Const::neutron;
 
 const double Const::electronMass = Const::electron.getMass();
 const double Const::muonMass = Const::muon.getMass();

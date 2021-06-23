@@ -1,3 +1,4 @@
+import os
 import argparse
 import multiprocessing
 
@@ -43,7 +44,7 @@ def setup_basf2_and_db(zmq=False):
                             help="Don't write any output files",
                             action="store_true", default=False)
 
-    parser.add_argument('--number-processes', type=int, default=multiprocessing.cpu_count()-5,
+    parser.add_argument('--number-processes', type=int, default=multiprocessing.cpu_count() - 5,
                         help='Number of parallel processes to use')
     parser.add_argument('--local-db-path', type=str,
                         help="set path to the local payload locations to use for the ConditionDB",
@@ -71,6 +72,9 @@ def setup_basf2_and_db(zmq=False):
     # And because reasons we want every log message to be only one line,
     # otherwise the LogFilter in daq_slc throws away the other lines
     basf2.logging.enable_escape_newlines = True
+
+    # Online realm
+    basf2.set_realm("online")
 
     return args
 
@@ -102,7 +106,9 @@ def start_path(args, location):
     if not args.histo_output_file:
         path.add_module('DqmHistoManager', Port=args.histo_port, DumpInterval=1000, workDirName="/tmp/")
     else:
-        path.add_module('HistoManager', histoFileName=args.histo_output_file)
+        workdir = os.path.dirname(args.histo_output_file)
+        filename = os.path.basename(args.histo_output_file)
+        path.add_module('HistoManager', histoFileName=filename, workDirName=workdir)
 
     return path
 
@@ -164,7 +170,10 @@ def add_hlt_processing(path,
     accept_path = basf2.Path()
 
     # Do the reconstruction needed for the HLT decision
-    path_utils.add_filter_reconstruction(path, run_type=run_type, components=reco_components, **kwargs)
+    path_utils.add_pre_filter_reconstruction(path, run_type=run_type, components=reco_components, **kwargs)
+
+    # Perform HLT filter calculation
+    path_utils.add_filter_software_trigger(path, store_array_debug_prescale=1)
 
     # Add the part of the dqm modules, which should run after every reconstruction
     path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter,
@@ -180,7 +189,6 @@ def add_hlt_processing(path,
         path_utils.hlt_event_abort(hlt_filter_module, "==0", ROOT.Belle2.EventMetaData.c_HLTDiscard)
         # (2) the event is accepted -> go on with the hlt reconstruction
         hlt_filter_module.if_value("==1", accept_path, basf2.AfterConditionPath.CONTINUE)
-        accept_path.add_module('StatisticsSummary').set_name('Sum_HLT_Discard')
     elif softwaretrigger_mode == constants.SoftwareTriggerModes.monitor:
         # Otherwise just always go with the accept path
         path.add_path(accept_path)
@@ -255,7 +263,10 @@ def add_expressreco_processing(path,
         path.add_module("PruneDataStore", matchEntries=constants.EXPRESSRECO_INPUT_OBJECTS)
 
     path_utils.add_geometry_if_not_present(path)
-    add_unpackers(path, components=unpacker_components)
+    add_unpackers(path, components=unpacker_components, writeKLMDigitRaws=True)
+
+    # dont filter/prune pxd for partly broken events, as we loose diagnostics in DQM
+    basf2.set_module_parameters(path, "PXDPostErrorChecker", CriticalErrorMask=0)
 
     if do_reconstruction:
         if run_type == constants.RunTypes.beam:
@@ -268,6 +279,23 @@ def add_expressreco_processing(path,
             basf2.B2FATAL("Run Type {} not supported.".format(run_type))
 
     path_utils.add_expressreco_dqm(path, run_type, components=reco_components)
+
+    # Will be removed later if not going to be used:
+    # Build one path for all events coming from L1 passthrough...
+    # l1_passthrough_path = basf2.Path()
+
+    # Find if the event is triggered in L1_trigger filter line, if yes, send through l1_passthrough_path
+    # l1_passthrough_module = path.add_module(
+    #     "TriggerSkim",
+    #     triggerLines=["software_trigger_cut&filter&L1_trigger"],
+    #     resultOnMissing=0)
+    # l1_passthrough_module.if_value("==1", l1_passthrough_path, basf2.AfterConditionPath.CONTINUE)
+
+    # path_utils.add_expressreco_dqm(
+    #     l1_passthrough_path,
+    #     run_type,
+    #     components=reco_components,
+    #     dqm_mode=constants.DQMModes.l1_passthrough.name)
 
     if prune_output:
         path.add_module("PruneDataStore", matchEntries=constants.ALWAYS_SAVE_OBJECTS + constants.RAWDATA_OBJECTS +

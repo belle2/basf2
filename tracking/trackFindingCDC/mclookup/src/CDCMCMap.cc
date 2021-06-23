@@ -104,7 +104,6 @@ void CDCMCMap::fillSimHitByHitMap()
 
 void CDCMCMap::fillMCParticleByHitMap()
 {
-  StoreArray<MCParticle> mcParticles;
   StoreArray<CDCHit> hits;
 
   std::map<const MCParticle*, std::vector<const CDCSimHit*>> primarySimHitsByMCParticle;
@@ -187,7 +186,6 @@ void CDCMCMap::fillMCParticleByHitMap()
 
 void CDCMCMap::fillMCParticleBySimHitMap()
 {
-  StoreArray<MCParticle> mcParticles;
   StoreArray<CDCSimHit> simHits;
 
   for (const CDCSimHit& simHit : simHits) {

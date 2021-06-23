@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2017, 2021 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors:                                                          *
@@ -11,8 +11,7 @@
  **************************************************************************/
 
 #include <top/modules/TOPChannelMasker/TOPChannelMaskerModule.h>
-#include <top/reconstruction/TOPreco.h>     // reconstruction wrapper
-#include <top/reconstruction/TOPconfigure.h>
+#include <top/reconstruction_cpp/TOPRecoManager.h>
 
 using namespace std;
 
@@ -32,14 +31,12 @@ namespace Belle2 {
   TOPChannelMaskerModule::TOPChannelMaskerModule() : Module()
   {
     // Set module properties
-    setDescription("Masks dead PMs from the reconstruction");
+    setDescription("Masks dead, hot and uncalibrated channels from the reconstruction");
 
     // Set property flags
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("printMask", m_printMask,
-             "if true, print channel mask as set in reconstruction", false);
     addParam("maskUncalibratedChannelT0", m_maskUncalibratedChannelT0,
              "if true, mask channelT0-uncalibrated channels", true);
     addParam("maskUncalibratedTimebase", m_maskUncalibratedTimebase,
@@ -51,9 +48,6 @@ namespace Belle2 {
     // register data objects
     m_digits.isRequired();
     m_eventAsicMask.isOptional();
-
-    // Configure TOP detector in FORTRAN code
-    TOPconfigure config;
   }
 
   void TOPChannelMaskerModule::beginRun()
@@ -84,7 +78,7 @@ namespace Belle2 {
     // if at least one then pass pixel relative efficiencies to the reconstructon code
 
     if (pmtInstalled or pmtQEData or channelRQE or thresholdEff) {
-      TOPreco::setChannelEffi();
+      TOPRecoManager::setChannelEffi();
     }
 
     // have asic masks changed?
@@ -109,10 +103,13 @@ namespace Belle2 {
         (m_maskUncalibratedChannelT0 and channelT0Changed) or
         (m_maskUncalibratedTimebase and timebaseChanged)) {
 
-      TOPreco::setChannelMask(m_channelMask, m_savedAsicMask);
-      if (m_maskUncalibratedChannelT0) TOPreco::setUncalibratedChannelsOff(m_channelT0);
-      if (m_maskUncalibratedTimebase) TOPreco::setUncalibratedChannelsOff(m_timebase);
-      if (m_printMask) TOPreco::printChannelMask();
+      TOPRecoManager::setChannelMask(m_channelMask, m_savedAsicMask);
+      if (m_maskUncalibratedChannelT0) {
+        TOPRecoManager::setUncalibratedChannelsOff(m_channelT0);
+      }
+      if (m_maskUncalibratedTimebase) {
+        TOPRecoManager::setUncalibratedChannelsOff(m_timebase);
+      }
     }
 
     // now flag actual data Cherenkov hits as coming from masked channels

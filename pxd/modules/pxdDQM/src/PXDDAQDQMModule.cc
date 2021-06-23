@@ -175,6 +175,7 @@ void PXDDAQDQMModule::beginRun()
 
 void PXDDAQDQMModule::event()
 {
+  hDAQErrorEvent->Fill(-1);// Event counter
   hDAQStat->Fill(-1); // to normalize to the number of events
   hDAQDHPDataMissing->Fill(-1); // to normalize to the number of events
   hDAQErrorDHC->Fill(-1, -1); // to normalize to the number of events
@@ -264,13 +265,19 @@ void PXDDAQDQMModule::event()
           // uint8_t, uint16_t, uint8_t ; tuple of Chip ID (2 bit), Row (10 bit), Common Mode (6 bit)
           if (hDAQCM[dhe.getSensorID()]) hDAQCM[dhe.getSensorID()]->Fill(std::get<0>(*cm) * 192 + std::get<1>(*cm) / 4, std::get<2>(*cm));
           if (hDAQCM2[dhe.getSensorID()]) hDAQCM2[dhe.getSensorID()]->Fill(std::get<2>(*cm));
+          //if (hDAQCM2[dhe.getSensorID()] && std::get<1>(*cm) < 768 - 2) {
+          // Deactivated again as the clean-up effect was insignificant for beam data
+          // ignore the always-on rows (second to last: 766 and last 767)
+          // row in CM array is already in readout-direction and not V-ID
+          // hDAQCM2[dhe.getSensorID()]->Fill(std::get<2>(*cm));
+          //}
           cm63Flag |= 63 == std::get<2>(*cm);
         }
       }
     }
   }
-  // Now fill the histograms which need flags set above
-  // the code is unluckily a copy of whats in PXDInjection Module, but there we dont have the DAQ flags :-/
+// Now fill the histograms which need flags set above
+// the code is unluckily a copy of whats in PXDInjection Module, but there we dont have the DAQ flags :-/
   for (auto& it : m_rawTTD) {
 //     B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
 //             (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
@@ -330,7 +337,7 @@ void PXDDAQDQMModule::event()
     break; // only first TTD packet
   }
 
-  // make some nice statistics
+// make some nice statistics
   if (truncFlag) hDAQStat->Fill(1);
   if (cm63Flag) hDAQStat->Fill(4);
   if (missingFlag) hDAQStat->Fill(11);
@@ -338,6 +345,6 @@ void PXDDAQDQMModule::event()
   if (nolinkFlag) hDAQStat->Fill(13);
   if (mismatchFlag) hDAQStat->Fill(14);
 
-  // Check Event-of-doom-busted or otherwise HLT rejected events
+// Check Event-of-doom-busted or otherwise HLT rejected events
   if (eodbFlag) hDAQStat->Fill(0);
 }

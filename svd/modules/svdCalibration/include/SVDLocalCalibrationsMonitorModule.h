@@ -12,7 +12,8 @@
 
 #include <framework/core/Module.h>
 
-#include <svd/calibration/SVDDetectorConfiguration.h>
+#include <svd/dbobjects/SVDLocalConfigParameters.h>
+#include <svd/dbobjects/SVDGlobalConfigParameters.h>
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
@@ -138,7 +139,9 @@ namespace Belle2 {
     std::string m_rootFileName = "SVDLocalCalibrationMonitor_output.root";   /**< root file name */
 
   private:
-    SVDDetectorConfiguration m_DetectorConf; /**< Detector Configuration Payload */
+    DBObjPtr<SVDLocalConfigParameters> m_svdLocalConfig;  /**< SVD Local Configuration payload*/
+
+    DBObjPtr<SVDGlobalConfigParameters> m_svdGlobalConfig;  /**< SVD Global Configuration payload*/
 
     SVDFADCMaskedStrips m_MaskedStr; /**< FADC masked strip payload*/
     SVDNoiseCalibrations m_NoiseCal; /**< noise payload*/

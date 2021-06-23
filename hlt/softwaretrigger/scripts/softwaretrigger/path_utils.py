@@ -1,4 +1,5 @@
 import basf2
+import ROOT
 from softwaretrigger import constants
 import modularAnalysis
 import stdV0s
@@ -43,12 +44,12 @@ def add_hlt_dqm(path, run_type, components, dqm_mode, create_hlt_unit_histograms
     path.add_module('StatisticsSummary').set_name('Sum_HLT_DQM_' + dqm_mode.name)
 
 
-def add_expressreco_dqm(path, run_type, components):
+def add_expressreco_dqm(path, run_type, components, dqm_mode=constants.DQMModes.dont_care.name):
     """
     Add all the DQM modules for ExpressReco to the path
     """
     add_online_dqm(path, run_type=run_type, dqm_environment=constants.Location.expressreco.name, components=components,
-                   dqm_mode=constants.DQMModes.dont_care.name)
+                   dqm_mode=dqm_mode)
 
 
 def add_geometry_if_not_present(path):
@@ -110,6 +111,8 @@ def add_filter_software_trigger(path,
                                      baseIdentifier="filter",
                                      preScaleStoreDebugOutputToDataStore=store_array_debug_prescale,
                                      useRandomNumbersForPreScale=use_random_numbers_for_prescale)
+    # Statistics Summary
+    path.add_module('StatisticsSummary').set_name('Sum_HLT_Filter_Calculation')
 
     return hlt_cut_module
 
@@ -165,13 +168,14 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     path.add_module("SoftwareTrigger", baseIdentifier="skim",
                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)
 
+    # Statistics Summary
+    path.add_module('StatisticsSummary').set_name('Sum_HLT_Skim_Calculation')
 
-def add_filter_reconstruction(path, run_type, components, **kwargs):
+
+def add_pre_filter_reconstruction(path, run_type, components, **kwargs):
     """
     Add everything needed to calculation a filter decision and if possible,
     also do the HLT filtering. This is only possible for beam runs (in the moment).
-
-    Up to now, we add the full reconstruction, but this will change in the future.
 
     Please note that this function adds the HLT decision, but does not branch
     according to it.
@@ -179,7 +183,7 @@ def add_filter_reconstruction(path, run_type, components, **kwargs):
     check_components(components)
 
     if run_type == constants.RunTypes.beam:
-        reconstruction.add_reconstruction(
+        reconstruction.add_prefilter_reconstruction(
             path,
             skipGeometryAdding=True,
             pruneTracks=False,
@@ -188,12 +192,10 @@ def add_filter_reconstruction(path, run_type, components, **kwargs):
             event_abort=hlt_event_abort,
             **kwargs)
 
-        add_filter_software_trigger(path, store_array_debug_prescale=1)
-        path.add_module('StatisticsSummary').set_name('Sum_HLT_Filter_Calculation')
-
     elif run_type == constants.RunTypes.cosmic:
         reconstruction.add_cosmics_reconstruction(path, skipGeometryAdding=True, pruneTracks=False,
                                                   components=components, **kwargs)
+
     else:
         basf2.B2FATAL(f"Run Type {run_type} not supported.")
 
@@ -210,16 +212,17 @@ def add_post_filter_reconstruction(path, run_type, components):
     """
     Add all modules which should run after the HLT decision is taken
     and only on the accepted events.
-    Up to now, this only includes the skim part, but this will
-    change in the future.
+    This includes reconstruction modules not essential
+    to calculate filter decision and then the skim calculation.
     """
     check_components(components)
 
     if run_type == constants.RunTypes.beam:
+        reconstruction.add_postfilter_reconstruction(path, components=components)
+
         add_skim_software_trigger(path, store_array_debug_prescale=1)
-        path.add_module('StatisticsSummary').set_name('Sum_HLT_Skim_Calculation')
     elif run_type == constants.RunTypes.cosmic:
-        pass
+        add_skim_software_trigger(path, store_array_debug_prescale=1)
     else:
         basf2.B2FATAL(f"Run Type {run_type} not supported.")
 
@@ -233,3 +236,5 @@ def hlt_event_abort(module, condition, error_flag):
     p.add_module("EventErrorFlag", errorFlag=error_flag)
     add_store_only_metadata_path(p)
     module.if_value(condition, p, basf2.AfterConditionPath.CONTINUE)
+    if error_flag == ROOT.Belle2.EventMetaData.c_HLTDiscard:
+        p.add_module('StatisticsSummary').set_name('Sum_HLT_Discard')

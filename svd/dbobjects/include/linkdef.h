@@ -29,6 +29,10 @@
 #pragma link C++ class Belle2::SVDCalibrationsVector<Belle2::SVDStripCalAmp> +; // checksum=0xfff37002, version=-1
 #pragma link C++ struct Belle2::SVDStripCalAmp +;
 
+#pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsScalar<Belle2::SVDChargeSimCal>>+; // checksum=0x98e032e5, version=2
+#pragma link C++ class Belle2::SVDCalibrationsScalar<Belle2::SVDChargeSimCal> +; // checksum=0x8b93e80, version=-1
+#pragma link C++ struct Belle2::SVDChargeSimCal +;
+
 #pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsBitmap> +; // checksum=0x34de8474, version=2
 #pragma link C++ class Belle2::SVDCalibrationsBitmap +; // checksum=0xf2ee9bed, version=-1
 
@@ -37,6 +41,10 @@
 #pragma link C++ class Belle2::SVDCoGCalibrationFunction +; // checksum=0xb36585eb, version=6
 
 #pragma link C++ struct Belle2::SVDStripCalAmp +;
+
+#pragma link C++ class Belle2::SVDCalibrationsBase< Belle2::SVDCalibrationsScalar< Belle2::SVDPosErrScaleFactors>> +; // checksum=0x15aff4f5, version=2
+#pragma link C++ class Belle2::SVDCalibrationsScalar< Belle2::SVDPosErrScaleFactors> +; // checksum=0x4599fb4c, version=-1
+#pragma link C++ struct Belle2::SVDPosErrScaleFactors +;
 
 #pragma link C++ class Belle2::SVDCalibrationsBase< Belle2::SVDCalibrationsScalar< Belle2::SVDClusterCuts>> +; // checksum=0x49d91267, version=2
 #pragma link C++ class Belle2::SVDCalibrationsScalar< Belle2::SVDClusterCuts> +; // checksum=0x2f2a326, version=-1

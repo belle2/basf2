@@ -3,15 +3,21 @@
 """A simple example calibration that takes one input data list from raw data and performs
 a single calibration."""
 
-from prompt import CalibrationSettings
+from prompt import CalibrationSettings, input_data_filters
 
 #: Tells the automated system some details of this script
-settings = CalibrationSettings(name="ARICH channel masks",
-                               expert_username="luka",
-                               description=__doc__,
-                               input_data_formats=["raw"],
-                               input_data_names=["physics"],
-                               depends_on=[])
+settings = CalibrationSettings(
+    name="ARICH channel masks",
+    expert_username="luka",
+    description=__doc__,
+    input_data_formats=["raw"],
+    input_data_names=["bhabha_all_calib"],
+    input_data_filters={
+        "bhabha_all_calib": [
+            input_data_filters["Data Tag"]["bhabha_all_calib"],
+            input_data_filters["Run Type"]["physics"],
+            input_data_filters["Data Quality Tag"]["Good Or Recoverable"]]},
+    depends_on=[])
 
 ##############################
 
@@ -38,7 +44,7 @@ def get_calibrations(input_data, **kwargs):
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
-    file_to_iov_physics = input_data["physics"]
+    file_to_iov_physics = input_data["bhabha_all_calib"]
 
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!

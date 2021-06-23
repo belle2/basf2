@@ -4,7 +4,7 @@
 # Dennis Weyland 2017
 
 from keras.layers.core import Reshape
-from keras.layers import activations
+from keras import activations
 from keras.activations import sigmoid, tanh
 from keras.engine.topology import Layer
 from keras import backend as K
@@ -39,7 +39,7 @@ class Relations(Layer):
         #: how many neurons has one comparable object
         self.group_len = 0
         #: saves weights for call
-        self.variables = []
+        self.weightvariables = []
         #: number of relation combinations
         self.combinations = 0
 
@@ -68,7 +68,7 @@ class Relations(Layer):
             bias = self.add_weight(name='relation_weights_{}'.format(i),
                                    shape=(dense_shape[i + 1],), initializer='zeros', trainable=True)
 
-            self.variables.append([weights, bias])
+            self.weightvariables.append([weights, bias])
 
         super(Relations, self).build(input_shape)
 
@@ -82,9 +82,9 @@ class Relations(Layer):
         outputs = []
         for index, group1 in enumerate(input_groups[:-1]):
             for group2 in input_groups[index + 1:]:
-                net = K.dot(K.concatenate([group1, group2]), self.variables[0][0])
-                net = K.bias_add(net, self.variables[0][1])
-                for variables in self.variables[1:]:
+                net = K.dot(K.concatenate([group1, group2]), self.weightvariables[0][0])
+                net = K.bias_add(net, self.weightvariables[0][1])
+                for variables in self.weightvariables[1:]:
                     net = self.activation(net)
                     net = K.dot(net, variables[0])
                     net = K.bias_add(net, variables[1])

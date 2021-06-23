@@ -109,6 +109,9 @@ namespace Belle2 {
           }
 
           if (found) continue;
+          // this should really be avoided but it in this case it seems to be on purpose (push_back to container that is iterated)
+          // tell cppcheck it is fine..
+          // cppcheck-suppress invalidContainerLoop
           trunks.push_back({graph.getFound(), {&graph} });
         }
       }

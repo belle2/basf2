@@ -15,7 +15,6 @@ namespace {
   {
     DecayNode photon_1(22);
     DecayNode photon_2(22);
-    // cppcheck-suppress unreadVariable ; cppcheck complains that 'pi0' is assigned a value that is never used?
     DecayNode pi0(111, {photon_1, photon_2});
 
     EXPECT_EQ(photon_1.pdg, Const::photon.getPDGCode());

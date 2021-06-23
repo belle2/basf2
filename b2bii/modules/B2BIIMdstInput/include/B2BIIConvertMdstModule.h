@@ -289,18 +289,6 @@ namespace Belle2 {
                       std::vector<float>& helixError);
 
     /**
-     * Fills 4-momentum, position and 7x7 error matrix from Belle Helix stored in Mdst_trk_fit.
-     */
-    int belleHelixToCartesian(const Belle::Mdst_trk_fit& trk_fit, const double mass, const HepPoint3D& newPivot,
-                              CLHEP::HepLorentzVector& momentum, HepPoint3D& position, CLHEP::HepSymMatrix& error, double dPhi = 0.0);
-
-    /**
-     * obtains the helix parameters from trk_fit and moves the pivot to 0,0,0
-     */
-    void belleHelixToHelix(const Belle::Mdst_trk_fit& trk_fit,
-                           std::vector<float>& helixParam, std::vector<float>& helixError);
-
-    /**
      * Fills 4-momentum, position and 7x7 error matrix from Belle Vee daughter.
      */
     void belleVeeDaughterToCartesian(const Belle::Mdst_vee2& vee, const int charge, const Const::ParticleType& pType,

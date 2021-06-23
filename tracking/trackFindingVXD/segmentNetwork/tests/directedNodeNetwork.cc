@@ -80,7 +80,6 @@ namespace DirectedNodeNetworkTests {
       m_spacePointData.registerRelationTo(m_pxdClusterData);
 
       m_networkContainerInDataStore.registerInDataStore();
-      StoreObjPtr<DirectedNodeNetworkContainer> networkContainerInDataStore;
 
       DataStore::Instance().setInitializeActive(false);
 

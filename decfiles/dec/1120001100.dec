@@ -1,0 +1,36 @@
+# EventType: 1120001100
+# Descriptor: [B0 -> f_2(-> K_S0 K_S0) gamma]cc
+# NickName: B0_KS0KS0gamma
+# Documentation: Rare b->d gamma process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Saurabh Sandilya
+# Email: saurabhsandilya@gmail.com
+# Cuts: None
+# Date: 20210421
+#
+#
+
+Alias B0sig B0
+Alias anti-B0sig anti-B0
+ChargeConj B0sig anti-B0sig
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0 VSS;
+Enddecay
+
+Alias f_2sig f_2
+LSFLAT f_2sig
+ChangeMassMin f_2sig 1.0
+ChangeMassMax f_2sig 3.0
+
+Decay B0sig
+1.0 f_2sig gamma  HELAMP 1.0 0.0 1.0 0.0;
+Enddecay
+
+Decay f_2sig
+1.0 K_S0 K_S0   TSS;
+Enddecay
+
+End
+

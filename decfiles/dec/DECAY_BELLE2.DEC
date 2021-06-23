@@ -11246,12 +11246,32 @@ Enddecay
 
 CDecay anti-Sigma_c--
 
+
 # Xi_c0
 Decay Xi_c0
-1.000000000                                                PYTHIA         84;
+# Using branching fractions:
+# 1) Br(Xi_c0 -> p+ K- anti-K*(892)0, anti-K*(892)0 -> K- pi+) = 0.002000000
+# 2) Br(non-resonant Xi_c0 -> p+ K- K- pi+) = 0.003000000
+0.891710000                                                     PYTHIA 84; # [Reconstructed PDG2020]
+# Cabibbo-favored decays
+0.003000000   p+ K- K- pi+                                      PHSP;   # [New mode added] #[Reconstructed PDG2020]
+0.002000000   p+ K- anti-K*0                                    PHSP;   # [New mode added] #[Reconstructed PDG2020]
+0.003000000   Lambda0 K_S0                                      PHSP;   # [New mode added] #[Reconstructed PDG2020]
+0.014500000   Lambda0 K- pi+                                    PHSP;   # [New mode added] #[Reconstructed PDG2020]
+0.014300000   Xi- pi+                                           PHSP;   # [New mode added] #[Reconstructed PDG2020]
+0.048000000   Xi- pi+ pi+ pi-                                   PHSP;   # [New mode added] #[Reconstructed PDG2020]
+0.004200000   Omega- K+                                         PHSP;   # [New mode added] #[Reconstructed PDG2020]
+0.018000000   Xi- e+ nu_e                                       PHSP;   # [New mode added] #[Reconstructed PDG2020]
+
+#Cabibbo-suppressed decays
+0.000390000  Xi- K+                                            PHSP;    # [New mode added] #[Reconstructed PDG2020]
+0.000410000  Lambda0 K+ K-                                     PHSP;    # [New mode added] #[Reconstructed PDG2020]
+0.000490000  Lambda0 phi                                       PHSP;    # [New mode added] #[Reconstructed PDG2020]
+
 Enddecay
 
 CDecay anti-Xi_c0
+
 
 # Xi_c+
 Decay Xi_c+

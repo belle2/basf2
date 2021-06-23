@@ -806,7 +806,7 @@ class ConditionsDB:
             issue = issue[0]
         else:
             description = f"""
-|*Upload globaltag*     | {data['tag']} |
+|*Upload globaltag*      | {data['tag']} |
 |*Request reason*        | {data['reason']} |
 |*Required release*      | {data['release']} |
 |*Type of request*       | {data['request']} |
@@ -837,6 +837,8 @@ class ConditionsDB:
                 issue["project"] = {"key": "BII"}
             if "issuetype" not in issue.keys():
                 issue["issuetype"] = {"name": "Task"}
+            if data["task"] == "master":
+                issue["labels"] == ["TUPPR"]
 
             B2INFO(f"Creating jira issue for {data['task']} globaltag request")
             if isinstance(password, str):

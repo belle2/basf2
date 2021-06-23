@@ -40,7 +40,8 @@ namespace Belle2 {
                    "according to double gaussian distribution and adds it to the "
                    "production and decay times of MCParticles. This means that after "
                    "this module the time origin (t = 0) is set to what L1 trigger "
-                   "would give as the collision time.");
+                   "would give as the collision time. In case of cosmics, the L1 trigger"
+                   "jitter is generated according to a continuos double gaussian distribution");
 
     setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -54,6 +55,13 @@ namespace Belle2 {
     addParam("maximumT0",  m_maximumT0,
              "If set, randomize between -maximum and maximum.",
              m_maximumT0);
+    addParam("isCosmics", m_isCosmics,
+             "if True simulate L1 jitter for cosmics", bool(false));
+    addParam("coreGaussWidthCosmics", m_coreGaussWidthCosmics, "sigma of core gaussian for cosmics [ns]", double(13));
+    addParam("tailGaussMeanCosmics", m_tailGaussMeanCosmics, "mean of tail gaussian for cosmics [ns]", double(28));
+    addParam("tailGaussWidthCosmics", m_tailGaussWidthCosmics, "sigma of tail gaussian for cosmics [ns]", double(15));
+    addParam("tailGaussFractionCosmics", m_tailGaussFractionCosmics,
+             "fraction (by area) of tail gaussian for cosmics", double(0.09));
 
   }
 
@@ -73,50 +81,68 @@ namespace Belle2 {
   void EventT0GeneratorModule::event()
   {
 
-    // generate bucket number w.r.t revo9 marker
 
-    int bucket = m_bunchStructure->generateBucketNumber(); // [RF clock]
-    int beamRevo9Cycle = gRandom->Integer(9); // number of beam revolutions w.r.t revo9 marker
-    int bucketRevo9 = bucket + beamRevo9Cycle * m_bunchStructure->getRFBucketsPerRevolution(); // [RF clock]
+    double eventTime = 0;
+    int bucket = 0;
+    int beamRevo9Cycle = 0;
+    int relBucketNo = 0;
+    //if m_isCosmics we need to randomize revo9count,
+    //at least for the SVD trigger bin
+    //if !m_isCosmics the revo9Count value is overwritten
+    unsigned revo9range = (m_bunchStructure->getRFBucketsPerRevolution() / 4) * 9;
+    int revo9count = gRandom->Integer(revo9range);
 
-    // generate L1 time jitter
+    if (!m_isCosmics) {
+      // generate bucket number w.r.t revo9 marker
 
-    double timeJitter = 0;
-    if (not std::isnan(m_maximumT0)) {
-      timeJitter = -m_maximumT0 + (2 * m_maximumT0) * gRandom->Rndm();
-    } else if (not std::isnan(m_fixedT0)) {
-      timeJitter = m_fixedT0;
+      bucket = m_bunchStructure->generateBucketNumber(); // [RF clock]
+      beamRevo9Cycle = gRandom->Integer(9); // number of beam revolutions w.r.t revo9 marker
+      int bucketRevo9 = bucket + beamRevo9Cycle * m_bunchStructure->getRFBucketsPerRevolution(); // [RF clock]
+
+      // generate L1 time jitter
+
+      double timeJitter = 0;
+      if (not std::isnan(m_maximumT0)) {
+        timeJitter = -m_maximumT0 + (2 * m_maximumT0) * gRandom->Rndm();
+      } else if (not std::isnan(m_fixedT0)) {
+        timeJitter = m_fixedT0;
+      } else {
+        double sigma = m_coreGaussWidth;
+        if (gRandom->Rndm() < m_tailGaussFraction) sigma = m_tailGaussWidth;
+        timeJitter = gRandom->Gaus(0., sigma);
+      }
+
+      // calculate revo9count (system clock ticks since revo9 marker as determined by L1 trigger)
+
+      double bucketTimeSep = 1 / m_clockSettings->getAcceleratorRF();
+      relBucketNo = round(timeJitter / bucketTimeSep); // RF clock
+      revo9count = (bucketRevo9 + relBucketNo) / 4; // system clock
+
+      // calculate collision time w.r.t L1 trigger
+
+      eventTime = (bucketRevo9 - revo9count * 4) * bucketTimeSep;
+
     } else {
-      double sigma = m_coreGaussWidth;
-      if (gRandom->Rndm() < m_tailGaussFraction) sigma = m_tailGaussWidth;
-      timeJitter = gRandom->Gaus(0., sigma);
+
+      //compute jitter for cosmics, .i.e. no filling pattern
+      double sigma = m_coreGaussWidthCosmics;
+      if (gRandom->Rndm() < m_tailGaussFractionCosmics) sigma = m_tailGaussWidthCosmics;
+      eventTime = gRandom->Gaus(0., sigma);
     }
-
-    // calculate revo9count (system clock ticks since revo9 marker as determined by L1 trigger)
-
-    double bucketTimeSep = 1 / m_clockSettings->getAcceleratorRF();
-    int relBucketNo = round(timeJitter / bucketTimeSep); // RF clock
-    int revo9count = (bucketRevo9 + relBucketNo) / 4; // system clock
-
-    // calculate collision time w.r.t L1 trigger
-
-    double collisionTime = (bucketRevo9 - revo9count * 4) * bucketTimeSep;
 
     // correct MC particle times according to generated collision time
 
     for (auto& particle : m_mcParticles) {
-      particle.setProductionTime(particle.getProductionTime() + collisionTime);
-      particle.setDecayTime(particle.getDecayTime() + collisionTime);
+      particle.setProductionTime(particle.getProductionTime() + eventTime);
+      particle.setDecayTime(particle.getDecayTime() + eventTime);
     }
 
     // store collision time to MC initial particles (e.g. beam particles)
 
     if (not m_initialParticles.isValid()) m_initialParticles.create();
-    m_initialParticles->setTime(collisionTime);
+    m_initialParticles->setTime(eventTime);
 
     // store revo9count (modulo range) in order to be distibuted to sub-detectors
-
-    unsigned revo9range = (m_bunchStructure->getRFBucketsPerRevolution() / 4) * 9;
     revo9count %= revo9range;
     if (revo9count < 0) revo9count += revo9range;
 

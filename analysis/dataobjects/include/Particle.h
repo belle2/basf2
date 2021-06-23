@@ -802,10 +802,10 @@ namespace Belle2 {
     const MCParticle* getMCParticle() const;
 
     /** Return name of this particle. */
-    virtual std::string getName() const;
+    std::string getName() const override;
 
     /** Return a short summary of this object's contents in HTML format. */
-    virtual std::string getInfoHTML() const;
+    std::string getInfoHTML() const override;
 
     /**
      * Prints the contents of a Particle object to standard output.
@@ -1042,7 +1042,7 @@ namespace Belle2 {
      */
     int generatePDGCodeFromCharge(const int chargedSign, const Const::ChargedStable& chargedStable);
 
-    ClassDef(Particle, 14); /**< Class to store reconstructed particles. */
+    ClassDefOverride(Particle, 14); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit
     // v10: added m_properties

@@ -12,8 +12,6 @@
 """
 import math
 import basf2 as b2
-from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = 1  # noqa
 import svd
 import pxd
 import ROOT

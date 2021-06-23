@@ -203,7 +203,7 @@ namespace Belle2 {
     unsigned long m_eventHigh;
 
     /** Whether or not we want to build an event index */
-    bool m_buildIndex{true};
+    bool m_buildIndex{false};
 
     /** Whether to keep parents same as that of input file */
     bool m_keepParents{false};

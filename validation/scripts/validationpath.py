@@ -18,8 +18,10 @@ file_name_runtimes_dat = "runtimes.dat"
 
 
 def get_basepath():
-    return {'local': os.environ.get('BELLE2_LOCAL_DIR', None),
-            'central': os.environ.get('BELLE2_RELEASE_DIR', None)}
+    return {
+        "local": os.environ.get("BELLE2_LOCAL_DIR", None),
+        "central": os.environ.get("BELLE2_RELEASE_DIR", None),
+    }
 
 
 class TagFolderRainbowTable(dict):
@@ -98,10 +100,7 @@ def get_html_plots_tag_comparison_folder(output_base_dir, tags):
         RAINBOW_TABLE.update_to_json(
             os.path.join(get_html_plots_folder(output_base_dir), "rainbow.json")
         )
-    return os.path.join(
-        get_html_plots_folder(output_base_dir),
-        tag_folder
-    )
+    return os.path.join(get_html_plots_folder(output_base_dir), tag_folder)
 
 
 def get_html_plots_tag_comparison_json(output_base_dir, tags):
@@ -110,7 +109,7 @@ def get_html_plots_tag_comparison_json(output_base_dir, tags):
     """
     return os.path.join(
         get_html_plots_tag_comparison_folder(output_base_dir, tags),
-        file_name_comparison_json
+        file_name_comparison_json,
     )
 
 
@@ -127,8 +126,7 @@ def get_results_tag_general_folder(output_base_dir, tag):
     tag. In this general folder, the common log files will be placed
     """
     return os.path.join(
-        get_results_tag_folder(output_base_dir, tag),
-        folder_name_general
+        get_results_tag_folder(output_base_dir, tag), folder_name_general
     )
 
 
@@ -137,8 +135,7 @@ def get_results_tag_revision_file(output_base_dir, tag):
     Return the absolute path to the revision.json file for one tag folder
     """
     return os.path.join(
-        get_results_tag_folder(output_base_dir, tag),
-        file_name_results_json
+        get_results_tag_folder(output_base_dir, tag), file_name_results_json
     )
 
 
@@ -147,6 +144,4 @@ def get_results_tag_package_folder(output_base_dir, tag, package):
     Returns the absolute path for a tag and package. This folder will contain
     the ROOT files plots which will be displayed on the validation website
     """
-    return os.path.join(
-        get_results_tag_folder(output_base_dir, tag),
-        package)
+    return os.path.join(get_results_tag_folder(output_base_dir, tag), package)

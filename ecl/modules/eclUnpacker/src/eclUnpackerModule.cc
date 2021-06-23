@@ -22,7 +22,6 @@
 
 //ECL
 #include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/utility/ECLChannelMapper.h>
 #include <ecl/utility/ECLDspUtilities.h>
@@ -128,10 +127,10 @@ void ECLUnpackerModule::initialize()
   m_eclDigits.registerInDataStore(m_eclDigitsName);
   if (m_storeTrigTime) {
     m_eclTrigs.registerInDataStore(m_eclTrigsName);
-    m_eclDigits.registerRelationTo(m_eclTrigs);
+    m_relDigitToTrig.registerInDataStore();
   }
   m_eclDsps.registerInDataStore(m_eclDspsName);
-  m_eclDigits.registerRelationTo(m_eclDsps);
+  m_relDigitToDsp.registerInDataStore();
   m_eclDsps.registerRelationTo(m_eclDigits);
 
 }
@@ -158,12 +157,21 @@ void ECLUnpackerModule::event()
   m_eclDigits.clear();
   m_eclDsps.clear();
   m_eclTrigs.clear();
+  // clear relations arrays
+  if (m_relDigitToTrig) m_relDigitToTrig.clear();
+  if (m_relDigitToDsp) m_relDigitToDsp.clear();
 
   if (m_eventMetaData.isValid()) {
     m_globalEvtNum = m_eventMetaData->getEvent();
   } else {
     m_globalEvtNum = -1;
   }
+
+  for (int i = 0; i < ECL_CRATES; i++) {
+    m_eclTrigsBuffer[i].setTrigId(0);
+  }
+
+  //=== Read raw event data
 
   int nRawEclEntries = m_rawEcl.getEntries();
 
@@ -172,6 +180,23 @@ void ECLUnpackerModule::event()
   for (int i = 0; i < nRawEclEntries; i++) {
     for (int n = 0; n < m_rawEcl[i]->GetNumEntries(); n++) {
       readRawECLData(m_rawEcl[ i ], n); // read data from RawECL and put into the m_eclDigits container
+    }
+  }
+
+  //=== Add created ECLTrig objects to the StoreArray
+
+  ECLTrig* new_ecl_trigs[ECL_CRATES] = {};
+  for (int i = 0; i < ECL_CRATES; i++) {
+    if (m_eclTrigsBuffer[i].getTrigId() > 0) {
+      new_ecl_trigs[i] = m_eclTrigs.appendNew(m_eclTrigsBuffer[i]);
+    }
+  }
+
+  for (int i = 0; i < m_eclDigits.getEntries(); i++) {
+    int cid = m_eclDigits[i]->getCellId();
+    int crate0 = m_eclMapper.getCrateID(cid) - 1;
+    if (new_ecl_trigs[crate0]) {
+      m_relDigitToTrig.add(i, crate0);
     }
   }
 
@@ -289,8 +314,6 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
     }
 
     try {
-
-      ECLTrig* eclTrig = 0;
       burstSuppressionMask = 0;
 
       // trigger phase of the Collector connected to this FINESSE
@@ -304,9 +327,6 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
       compressMode = (value & 0xF000) >> 12; // compression mode for ADC data, 0 -- disabled, 1 -- enabled
 
       B2DEBUG_eclunpacker(22, "ShapersMask = " << std::hex << shapersMask << " compressMode =  "  <<  compressMode);
-
-      // make new eclTrig oject to store trigger time for crate if there are triggered shapers in the crate
-      if (m_storeTrigTime && shapersMask != 0) eclTrig = m_eclTrigs.appendNew();
 
       // loop over all shapers in crate
       for (iShaper = 1; iShaper <= nShapers; iShaper++) {
@@ -366,6 +386,9 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         adcHighMask = (value >> 16) & 0xFFFF;
         B2DEBUG_eclunpacker(22, "ADCMASK = 0x" << std::hex << adcMask << " adcHighMask = 0x" << adcHighMask);
 
+        ECLDigit* newEclDigits[ECL_CHANNELS_IN_SHAPER] = {};
+        int newEclDigitsIdx[ECL_CHANNELS_IN_SHAPER] = {};
+
         nRead = 0;
         // read DSP data (quality, fitted time, amplitude)
         for (ind = 0; ind < ECL_CHANNELS_IN_SHAPER; ind++) {
@@ -388,6 +411,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
           // construct eclDigit object and save it in DataStore
           ECLDigit* newEclDigit = m_eclDigits.appendNew();
+          newEclDigitsIdx[ind]  = m_eclDigits.getEntries() - 1;
+          newEclDigits[ind]     = newEclDigit;
           newEclDigit->setCellId(cellID);
           newEclDigit->setAmp(dspAmplitude);
           newEclDigit->setQuality(dspQualityFlag);
@@ -405,7 +430,6 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
             newEclDigit->setTimeFit(dspTime);
             newEclDigit->setChi(0);
           }
-          if (m_storeTrigTime) newEclDigit->addRelationTo(eclTrig);
 
         }
 
@@ -417,8 +441,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
           // do something (throw an exception etc.) TODO
         }
 
-
         //read ADC data
+        eclWaveformSamples.resize(nADCSamplesPerChannel);
         nRead = 0;
         for (ind = 0; ind < ECL_CHANNELS_IN_SHAPER; ind++) {
           //check if there is ADC data for this channel
@@ -426,7 +450,6 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
           iChannel = ind + 1;
           adcDataBase = 0;
           adcDataDiffWidth = 0;
-          eclWaveformSamples.clear();
           for (indSample = 0; indSample < nADCSamplesPerChannel; indSample++) {
             if (compressMode == 0) value = readNextCollectorWord();
             else {
@@ -443,22 +466,16 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
               value += adcDataBase;
             }
             // fill waveform data for single channel
-            eclWaveformSamples.push_back(value);
+            eclWaveformSamples[indSample] = value;
           }
 
           // save ADC data to the eclDsp DataStore object if any
-          if (eclWaveformSamples.size() > 0) {
-
-            if (eclWaveformSamples.size() != nADCSamplesPerChannel)
-              B2ERROR("Wrong number of ADC samples. Actual number of read samples "
-                      " != number of samples in header "
-                      << LogVar("Actual number of read samples", eclWaveformSamples.size())
-                      << LogVar("Number of samples in header", nADCSamplesPerChannel));
+          if (nADCSamplesPerChannel > 0) {
 
             cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 
             if (cellID > 0 || m_storeUnmapped) {
-              ECLDsp* newEclDsp = m_eclDsps.appendNew(cellID, eclWaveformSamples);
+              m_eclDsps.appendNew(cellID, eclWaveformSamples);
 
               if (m_useUnpackingParameters) {
                 // Check run-dependent unpacking parameters
@@ -467,34 +484,21 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
                   auto result = ECLDspUtilities::shapeFitter(cellID, eclWaveformSamples, triggerPhase0);
                   if (result.quality == 2) result.time = 0;
 
-                  bool found = false;
-                  for (auto& newEclDigit : m_eclDigits) {
-                    if (newEclDsp->getCellId() == newEclDigit.getCellId()) {
-                      newEclDigit.setAmp(result.amp);
-                      newEclDigit.setTimeFit(result.time);
-                      newEclDigit.setQuality(result.quality);
-                      newEclDigit.setChi(result.chi2);
-                      found = true;
-                      break;
-                    }
-                  }
-                  if (!found) {
+                  if (!newEclDigits[ind]) {
                     ECLDigit* newEclDigit = m_eclDigits.appendNew();
+                    newEclDigits[ind] = newEclDigit;
                     newEclDigit->setCellId(cellID);
                     newEclDigit->setAmp(result.amp);
                     newEclDigit->setTimeFit(result.time);
                     newEclDigit->setQuality(result.quality);
                     newEclDigit->setChi(result.chi2);
-                    if (m_storeTrigTime) newEclDigit->addRelationTo(eclTrig);
                   }
                 }
               }
               // Add relation from ECLDigit to ECLDsp
-              for (auto& newEclDigit : m_eclDigits) {
-                if (newEclDsp->getCellId() == newEclDigit.getCellId()) {
-                  newEclDigit.addRelationTo(newEclDsp);
-                  break;
-                }
+              if (newEclDigits[ind]) {
+                int eclDspIdx = m_eclDsps.getEntries() - 1;
+                m_relDigitToDsp.add(newEclDigitsIdx[ind], eclDspIdx);
               }
             }
 
@@ -520,9 +524,11 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
       } // loop over shapers
 
-      // fill trigid, trgtime for eclTrig object
-      if (eclTrig) {
+      // make new eclTrig oject to store trigger time for crate if there are triggered shapers in the crate
+      if (m_storeTrigTime && shapersMask != 0) {
         int trigId = iCrate & 0x3F;
+        ECLTrig* eclTrig = &m_eclTrigsBuffer[trigId - 1];
+        // fill trigid, trgtime for eclTrig object
         trigId |= (burstSuppressionMask & 0xFFF) << 6;
         eclTrig->setTrigId(trigId);
         eclTrig->setTimeTrig(triggerPhase0);

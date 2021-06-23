@@ -18,6 +18,6 @@ env['LIBS'] = ['online_book_awesome_dataobjects',
               ]
 
 if 'simulation' in env['AVAILABLE_PACKAGES']:
-	env['LIBS'] += ['simulation', 'simulation_dataobjects']
+	env['LIBS'] += ['simulation']
 
 Return('env')

@@ -217,7 +217,6 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   for (int i = 0; i < 300; ++i) {
     fitFunc[i] = new TF1(Form("f%d", i), "[0]+[6]*x+[1]*(exp([2]*(x-[3]))/(1+exp(-([4]-x)/[5])))",
                          4921 - 100, 4921 + 100);
-    fitFunc[i]->SetParLimits(0, 0, 100);
     fitFunc[i]->SetParLimits(6, 0, 0.1);
     fitFunc[i]->SetParLimits(4, 4850., 5000.0);
     fitFunc[i]->SetParLimits(5, 0, 50.0);
@@ -272,10 +271,13 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     m_hTDCs[i]->SetTitle(Form("hTDC%d", i));
     if (m_hTDCs[i]->GetEntries() == 0 || m_hTDCs[i] == nullptr) {
       nDeadTDC += 1;
+      tdcEdges.push_back(0);
+      tdcSlopes.push_back(0);
     } else {
-      fitFunc[i]->SetParameters(0, 100, 0.01, 4700, 4900, 2, 0.01);
-      fitFunc[i]->SetParameter(0, 10);
+      double init_p0 = m_hTDCs[i]->GetBinContent(700 + 60);
+      fitFunc[i]->SetParameters(init_p0, 100, 0.01, 4700, 4900, 2, 0.01);
       fitFunc[i]->SetParameter(6, 0.02);
+      fitFunc[i]->SetParLimits(0, init_p0 - 200, init_p0 + 200);
       int xxx = -1;
       if (i < 28) {
         xxx = m_hTDCs[i]->Fit(fitFunc[i], "qM0", "", 4850, 5000);
@@ -284,18 +286,18 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
       }
       float p4 = fitFunc[i]->GetParameter(4);
       float p5 = fitFunc[i]->GetParameter(5);
+
       if (xxx != -1 && 4850 < p4 && p4 < 5000) {
         hTDCEdge->SetBinContent(i + 1, p4);
         hTDCEdge->SetBinError(i + 1, 0);
         hTDCSlope->SetBinContent(i + 1, p5);
         hTDCSlope->SetBinError(i + 1, 0);
-        tdcEdges.push_back(p4);
-        tdcSlopes.push_back(p5);
       }
+      tdcEdges.push_back(p4);
+      tdcSlopes.push_back(p5);
     }
 
   }
-
 
   // Hit related
   B2DEBUG(20, "hit related");
@@ -409,9 +411,9 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     max = m_hTDCs[i]->GetMaximum();
     TLine* l1 = new TLine(tdcEdges[i], 0, tdcEdges[i], max * 1.05);
     l1->SetLineColor(kRed);
-    l1->Draw();
-    TLine* l0 = new TLine(4900, 0, 4900, max * 1.05);
+    TLine* l0 = new TLine(4910, 0, 4910, max * 1.05);
     l0->Draw();
+    l1->Draw();
   }
 
   m_cMain->cd(6);

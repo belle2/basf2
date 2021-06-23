@@ -14,7 +14,9 @@ import os
 try:
     from git import Repo
 except ImportError:
-    print("This script requires GitPython, please install it via `pip3 install --user GitPython")
+    print(
+        "This script requires GitPython, please install it via `pip3 install --user GitPython"
+    )
     sys.exit(1)
 
 
@@ -40,7 +42,9 @@ def get_basf2_repo(non_dirty_check=False):
     assert not repo.bare
 
     if non_dirty_check and repo.is_dirty():
-        basf2.B2WARNING("Your git repo is dirty! I can not guarantee for valid results...")
+        basf2.B2WARNING(
+            "Your git repo is dirty! I can not guarantee for valid results..."
+        )
 
     return repo
 
@@ -90,6 +94,7 @@ def fix_root_command_line():
     Fix for ROOT to give the command line options directly to python.
     """
     from ROOT import PyConfig
+
     PyConfig.IgnoreCommandLineOptions = True
 
 
@@ -99,8 +104,18 @@ def get_git_hashes_between(git_end_hash, git_start_hash):
     (but not including them).
     """
     try:
-        git_hashs = check_output(["git", "log", str(git_start_hash + ".." + git_end_hash),
-                                  "--pretty=format:%H"]).decode("utf-8").split("\n")
+        git_hashs = (
+            check_output(
+                [
+                    "git",
+                    "log",
+                    str(git_start_hash + ".." + git_end_hash),
+                    "--pretty=format:%H",
+                ]
+            )
+            .decode("utf-8")
+            .split("\n")
+        )
         return git_hashs
     except CalledProcessError:
         basf2.B2FATAL("Error while receiving the git history.")

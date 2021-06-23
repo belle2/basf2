@@ -9,7 +9,6 @@ from simulation import add_simulation
 # from reconstruction import add_mdst_output
 from reconstruction import add_reconstruction
 from generators import add_evtgen_generator
-# from L1trigger import add_tsim
 # import pandas as pd
 import sys
 import glob

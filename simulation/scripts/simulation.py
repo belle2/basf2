@@ -3,7 +3,7 @@
 
 import basf2 as b2
 from geometry import check_components
-from L1trigger import add_tsim
+from L1trigger import add_trigger_simulation
 from pxd import add_pxd_simulation
 from svd import add_svd_simulation
 from svd import add_svd_reconstruction
@@ -120,7 +120,9 @@ def add_simulation(
         usePXDDataReduction=True,
         cleanupPXDDataReduction=True,
         generate_2nd_cdc_hits=False,
-        simulateT0jitter=False,
+        simulateT0jitter=True,
+        isCosmics=False,
+        FilterEvents=False,
         usePXDGatedMode=False,
         skipExperimentCheckForBG=False):
     """
@@ -129,6 +131,9 @@ def add_simulation(
     @param usePXDDataReduction: if 'forceSetPXDDataReduction==True', override settings from the DB
     @param cleanupPXDDataReduction: if True the datastore objects used by PXDDataReduction are emptied
     @param simulateT0jitter: if True simulate L1 trigger jitter
+    @param isCosmics: if True the filling pattern is removed from L1 jitter simulation
+    @param FilterEvents: if True only the events that pass the L1 trigger will survive simulation, the other are discarded.
+        Make sure you do need to filter events before you set the value to True.
     @param skipExperimentCheckForBG: If True, skip the check on the experiment number consistency between the basf2
       process and the beam background files. Note that this check should be skipped only by experts.
     """
@@ -172,7 +177,13 @@ def add_simulation(
     # event T0 jitter simulation
     if simulateT0jitter and 'EventT0Generator' not in path:
         eventt0 = b2.register_module('EventT0Generator')
+        eventt0.param("isCosmics", isCosmics)
         path.add_module(eventt0)
+
+    # create EventLevelTriggerTimeInfo if it doesn't exist in BG Overlay
+    if 'SimulateEventLevelTriggerTimeInfo' not in path:
+        eventleveltriggertimeinfo = b2.register_module('SimulateEventLevelTriggerTimeInfo')
+        path.add_module(eventleveltriggertimeinfo)
 
     # detector simulation
     if 'FullSim' not in path:
@@ -218,10 +229,8 @@ def add_simulation(
         m = path.add_module('BGOverlayExecutor', components=['CDC', 'TOP', 'ARICH', 'KLM'])
         m.set_name('BGOverlayExecutor_CDC...KLM')
 
-    # TO DO: L1 TRIGGER simulation
-    # !!! DO NOT UNCOMMENT !!!
-    # if simulateL1trigger:
-    #    add_tsim(path)
+    if components is None or 'TRG' in components:
+        add_trigger_simulation(path, simulateT0jitter=simulateT0jitter, FilterEvents=FilterEvents)
 
     # SVD digitization, BG Overlay, sorting and zero suppression
     if components is None or 'SVD' in components:

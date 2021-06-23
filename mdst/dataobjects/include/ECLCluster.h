@@ -299,7 +299,7 @@ namespace Belle2 {
     double getR() const { return m_r; }
 
     /** Return Energy (GeV). */
-    double getEnergy(const EHypothesisBit& hypothesis) const;
+    double getEnergy(EHypothesisBit hypothesis) const;
 
     /** Return Uncorrected Energy deposited (GeV) */
     double getEnergyRaw() const {return exp(m_logEnergyRaw);}

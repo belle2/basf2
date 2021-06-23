@@ -18,7 +18,7 @@ the validation suite properly handles this case.
 from ROOT import TFile
 
 
-VALIDATION_OUTPUT_FILE = 'validationTestEmptyRootFile.root'
+VALIDATION_OUTPUT_FILE = "validationTestEmptyRootFile.root"
 
 
 if __name__ == "__main__":

@@ -21,6 +21,7 @@
 #include <mdst/dataobjects/TRGSummary.h>
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
 #include "trg/gdl/TRGGDL.h"
+#include <simulation/dataobjects/SimClockState.h>
 #include <TDirectory.h>
 #include <TH1I.h>
 
@@ -105,10 +106,14 @@ namespace Belle2 {
     /// Threshold to determine timing quality flag with MC truth: fine
     double _timquality_threshold_fine;
 
+    bool m_simulateT0Jitter; /**< if True, L1 jitter is simulated by EventT0Generator*/
+
   private:
 
     /// A pointer to a TRGGDL;
     static TRGGDL* _gdl;
+
+    StoreObjPtr<SimClockState> m_simClockState; /**< generated hardware clock state */
 
   protected:
 

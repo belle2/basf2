@@ -62,17 +62,6 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         clusterizer.set_name(clusterizerName)
         clusterizer.param('ShaperDigits', shaperDigitsName)
         clusterizer.param('Clusters', clustersName)
-        clusterizer.param('timeAlgorithm6Samples', "CoG6")
-        clusterizer.param('timeAlgorithm3Samples', "CoG3")
-        clusterizer.param('chargeAlgorithm6Samples', "MaxSample")
-        clusterizer.param('chargeAlgorithm3Samples', "MaxSample")
-        clusterizer.param('positionAlgorithm6Samples', "oldDefault")
-        clusterizer.param('positionAlgorithm3Samples', "oldDefault")
-        clusterizer.param('stripTimeAlgorithm6Samples', "dontdo")
-        clusterizer.param('stripTimeAlgorithm3Samples', "dontdo")
-        clusterizer.param('stripChargeAlgorithm6Samples', "MaxSample")
-        clusterizer.param('stripChargeAlgorithm3Samples', "MaxSample")
-        clusterizer.param('useDB', False)
         path.add_module(clusterizer)
 
     if missingAPVsClusterCreatorName not in [e.name() for e in path.modules()]:
@@ -103,8 +92,8 @@ def add_svd_create_recodigits(path, recocreatorName="SVDRecoDigitCreator", shape
     if recocreatorName not in [e.name() for e in path.modules()]:
         recoDigitCreator = b2.register_module('SVDRecoDigitCreator')
         recoDigitCreator.param('ShaperDigits', shaperDigitsName)
-        recoDigitCreator.param('timeAlgorithm6Samples', "CoG6")
-        recoDigitCreator.param('timeAlgorithm3Samples', "CoG6")
+        recoDigitCreator.param('timeAlgorithm6Samples', "CoG3")
+        recoDigitCreator.param('timeAlgorithm3Samples', "CoG3")
         recoDigitCreator.param('chargeAlgorithm6Samples', "MaxSample")
         recoDigitCreator.param('chargeAlgorithm3Samples', "MaxSample")
         recoDigitCreator.param('useDB', False)
@@ -233,8 +222,10 @@ def add_svd_unpacker_simulate3sampleDAQ(path, latencyShift=-1, relativeShift=-1)
     Adds the SVD Unpacker to the path, emulating the 3-sample mode from the 6-sample mode.
 
     @param path: add the modules to this basf2 path.
-    @param latencyShift: relative time shift between the 3-sample and the 6-sample mode, in APV clocks.
-    @param relativeShift: relative time shift between the 3-sample and the 6-sample mode, in units of 1/4 of APV clock.
+    @param latencyShift: relative time shift between the 3-sample and the 6-sample mode, in APV clocks.\
+                         0 <= latencyShift <=3
+    @param relativeShift: relative time shift between the 3-sample and the 6-sample mode, in units of 1/4 of APV clock.\
+                         0 <= relativeShift <=12
 
     .. warning:: at least one between ``relativeShift`` and ``latencyShift`` should be set (different from -1).
     """
@@ -256,13 +247,19 @@ def add_svd_unpacker_simulate3sampleDAQ(path, latencyShift=-1, relativeShift=-1)
         emulator.param("chooseStartingSample", False)
     else:
         emulator.param("chooseStartingSample", True)
-        emulator.param("StartingSample", latencyShift)
+        if latencyShift < 0 or latencyShift > 3:
+            B2FATAL("the latencyShift must be an integer >=0 and <= 3")
+        else:
+            emulator.param("StartingSample", latencyShift)
 
     if relativeShift == -1:
         emulator.param("chooseRelativeShift", False)
     else:
         emulator.param("chooseRelativeShift", True)
-        emulator.param("relativeShift", relativeShift)
+        if relativeShift < 0 or relativeShift > 12:
+            B2FATAL("the relativeShift must be an integer >=0 and <= 12")
+        else:
+            emulator.param("relativeShift", relativeShift)
 
     emulator.param("outputSVDEventInfo", "SVDEventInfo")
     emulator.param("outputSVDShaperDigits", "SVDShaperDigits3SampleAll")

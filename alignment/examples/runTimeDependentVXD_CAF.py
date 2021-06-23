@@ -15,7 +15,6 @@ import reconstruction as reco
 
 from generators import add_kkmc_generator
 from simulation import add_simulation
-from L1trigger import add_tsim
 
 b2.set_log_level(b2.LogLevel.INFO)
 # Generate 4 runs, with run number 4, 5, 6, 7
@@ -178,7 +177,6 @@ def generate_test_data(filename):
     add_kkmc_generator(main, 'mu-mu+')
 
     add_simulation(main)
-    add_tsim(main)
 
     main.add_module("RootOutput", outputFileName=filename)
     main.add_module("Progress")

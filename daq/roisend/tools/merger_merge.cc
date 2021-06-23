@@ -1,11 +1,12 @@
 /* merger_merge.cc */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <unistd.h>
-#include <string.h>
+#include <cstring>
 #include <poll.h>
-#include <signal.h>
+#include <csignal>
+#include <cerrno>
 #include <netinet/in.h>
 #include <map>
 #include <set>
@@ -13,13 +14,14 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <netdb.h>
+#include <string>
 
 #define ROI_MAX_PACKET_SIZE       (16384) /* bytes */
 
 #define NETWORK_ESTABLISH_TIMEOUT (-1)     /* seconds (0 or negative specifies forever wait) */
 #define NETWORK_IO_TIMEOUT        (-1)     /* seconds (0 or negative specifies forever wait) */
 
-#include <boost/spirit/home/support/detail/endian.hpp>
+#include <boost/endian/arithmetic.hpp>
 
 using namespace std;
 
@@ -854,7 +856,7 @@ main(int argc, char* argv[])
           //    enum { HEADER_SIZE_WO_LENGTH = 3, HEADER_SIZE_WITH_LENGTH = 5, HEADER_SIZE_WITH_LENGTH_AND_CRC = 6};
 
           if (n_bytes_from_hltout >= 6 * 4) {
-            boost::spirit::endian::ubig32_t* iptr = (boost::spirit::endian::ubig32_t*)ptr_head_to_onsen;
+            auto* iptr = (boost::endian::big_uint32_t*)ptr_head_to_onsen;
             eventnr = iptr[3];
             runnr = (iptr[4] & 0x3FFF00) >> 8;
 //             ERR_FPRINTF(stderr, "%08X %08X %08X %08X %08X -> %08X %08X \n",
@@ -947,4 +949,3 @@ main(int argc, char* argv[])
   ERR_FPRINTF(stderr, "[RESULT] %s terminated\n", argv[0]);
   return 0;
 }
-

@@ -26,8 +26,8 @@ namespace Belle2 {
     /// define our CRC function
     typedef boost::crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhc_crc_32_type;
 
-    using boost::spirit::endian::ubig16_t;
-    using boost::spirit::endian::ubig32_t;
+    using ubig16_t = boost::endian::big_uint16_t;
+    using ubig32_t = boost::endian::big_uint32_t;
     using namespace Belle2::PXD::PXDError;
     using Belle2::PXD::EDHCFrameHeaderDataType;
 

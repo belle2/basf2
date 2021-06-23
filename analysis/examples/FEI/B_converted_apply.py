@@ -13,8 +13,7 @@ import b2biiConversion
 # To properly read the Belle database the user name is set to g0db
 os.environ['PGUSER'] = 'g0db'
 # Add the necessary global tag
-# b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
-b2.conditions.prepend_globaltag('analysis_tools_light-2012-minos')
+b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
 # Create path
 path = b2.create_path()

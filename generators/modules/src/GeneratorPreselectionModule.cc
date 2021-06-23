@@ -38,6 +38,7 @@ GeneratorPreselectionModule::GeneratorPreselectionModule() : Module()
   addParam("MinChargedTheta", m_MinChargedTheta, "minimum polar angle of charged particle [deg]", 17.);
   addParam("MaxChargedTheta", m_MaxChargedTheta, "maximum polar angle of charged particle [deg]", 150.);
   addParam("applyInCMS", m_applyInCMS, "if true apply the P,Pt,theta, and energy cuts in the center of mass frame", false);
+  addParam("stableParticles", m_stableParticles, "if true apply the selection criteria for stable particles in the generator", false);
 
   addParam("nPhotonMin", m_nPhotonMin, "minimum number of photons", 0);
   addParam("nPhotonMax", m_nPhotonMax, "maximum number of photons", 999);
@@ -101,6 +102,8 @@ void GeneratorPreselectionModule::checkParticle(const MCParticle& mc)
 {
   if (!mc.hasStatus(MCParticle::c_PrimaryParticle)) return;
   if (mc.hasStatus(MCParticle::c_Initial) or mc.hasStatus(MCParticle::c_IsVirtual)) return;
+  if (m_stableParticles)
+    if (!mc.hasStatus(MCParticle::c_StableInGenerator)) return;
 
   const TVector3& p = mc.getMomentum();
   double energy     = mc.getEnergy();

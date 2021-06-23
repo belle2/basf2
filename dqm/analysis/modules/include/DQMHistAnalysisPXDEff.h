@@ -101,6 +101,9 @@ namespace Belle2 {
     /** flag if to export to EPICS */
     bool m_useEpics;
 
+    /** flag if to import from EPICS only */
+    bool m_useEpicsRO;
+
 #ifdef _BELLE2_EPICS
     //! one EPICS PV
     std::vector <chid>  mychid_status;

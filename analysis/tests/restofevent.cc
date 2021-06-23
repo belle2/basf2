@@ -102,7 +102,7 @@ namespace {
     gearbox.close();
     gearbox.open("geometry/Belle2.xml", false);
     StoreArray<Particle> myParticles;
-    StoreArray<RestOfEvent> myROEs;
+    StoreArray<RestOfEvent> myROEs{};
     const RestOfEvent* roe = myROEs[0];
     EXPECT_TRUE(roe->hasParticle(myParticles[0]));  // K_S0_pi0
     EXPECT_TRUE(roe->hasParticle(myParticles[1]));  // K_S0_pi1
@@ -157,8 +157,7 @@ namespace {
 
   TEST_F(ROETest, getParticles)
   {
-    StoreArray<Particle> myParticles;
-    StoreArray<RestOfEvent> myROEs;
+    StoreArray<RestOfEvent> myROEs{};
     const RestOfEvent* roe = myROEs[0];
 
     EXPECT_TRUE(roe->getParticles().size() == 6);
@@ -172,7 +171,7 @@ namespace {
   TEST_F(ROETest, updateMaskWithCuts)
   {
     StoreArray<Particle> myParticles;
-    StoreArray<RestOfEvent> myROEs;
+    StoreArray<RestOfEvent> myROEs{};
     const RestOfEvent* roe = myROEs[0];
 
     EXPECT_FALSE(roe->hasParticle(myParticles[0], "cutMask")); // K_S0_pi0
@@ -185,7 +184,7 @@ namespace {
   TEST_F(ROETest, excludeParticlesFromMask)
   {
     StoreArray<Particle> myParticles;
-    StoreArray<RestOfEvent> myROEs;
+    StoreArray<RestOfEvent> myROEs{};
     const RestOfEvent* roe = myROEs[0];
 
     EXPECT_TRUE(roe->hasParticle(myParticles[0], "excludeMask")); // K_S0_pi0
@@ -206,7 +205,7 @@ namespace {
   TEST_F(ROETest, updateMaskWithV0)
   {
     StoreArray<Particle> myParticles;
-    StoreArray<RestOfEvent> myROEs;
+    StoreArray<RestOfEvent> myROEs{};
     const RestOfEvent* roe = myROEs[0];
     // Has particle checks for daughters
     EXPECT_TRUE(roe->hasParticle(myParticles[0], "V0Mask")); // K_S0_pi0

@@ -57,8 +57,13 @@ namespace Belle2 {
     double m_coreGaussWidth; /**< sigma of core gaussian [ns] */
     double m_tailGaussWidth; /**< sigma of tail gaussian [ns] */
     double m_tailGaussFraction; /**< area fraction of core gaussian */
-    double m_fixedT0 = NAN; /**< if set, a fixed t0 value is used instead of a gaussian distrubtion */
+    double m_fixedT0 = NAN; /**< if set, a fixed t0 value is used instead of a gaussian distribution */
     double m_maximumT0 = NAN; /**< if set, randomize between -maximum and maximum */
+    bool m_isCosmics = false; /**< if true L1 jitter for cosmics is simulated*/
+    double m_coreGaussWidthCosmics; /**< sigma of core gaussian [ns] for cosmics*/
+    double m_tailGaussMeanCosmics; /**< mean of tail gaussian [ns] for cosmics*/
+    double m_tailGaussWidthCosmics; /**< sigma of tail gaussian [ns] for cosmics*/
+    double m_tailGaussFractionCosmics; /**< area fraction of core gaussian for cosmics*/
 
     // datastore collections
     StoreArray<MCParticle> m_mcParticles; /**< MC particles */

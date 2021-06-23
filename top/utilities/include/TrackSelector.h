@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2018, 2021 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <top/reconstruction/TOPtrack.h> // old version (TODO: to be removed)
 #include <top/reconstruction_cpp/TOPTrack.h>
 #include <framework/gearbox/Const.h>
 #include <string>
@@ -158,13 +157,6 @@ namespace Belle2 {
        * @return momentum vector in local frame if track is selected, otherwise undefined
        */
       const TVector3& getLocalMomentum() const {return m_localMomentum;}
-
-      /**
-       * Returns selection status - old version (TODO: to be removed)
-       * @param track track extrapolated to TOP
-       * @return true if track passes selection criteria
-       */
-      bool isSelected(const TOPtrack& track) const;
 
       /**
        * Returns selection status

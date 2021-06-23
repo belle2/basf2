@@ -24,7 +24,7 @@ ma.inputMdst(environmentType='default',
 
 # Max 12 tracks per event - this avoids much computing time.
 empty_path = b2.create_path()
-skimfilter = ma.register_module('VariableToReturnValue')
+skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
 skimfilter.if_value('>12', empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
@@ -60,7 +60,7 @@ clean_roe_mask = (
 ma.appendROEMasks('B+:sig', [clean_roe_mask], path=path)
 ma.applyCuts('B+:sig', 'roeDeltae(CleanROE) < 2.0 and roeMbc(CleanROE) > 4.8', path=path)
 
-skimfilter = ma.register_module('SkimFilter')
+skimfilter = b2.register_module('SkimFilter')
 skimfilter.param('particleLists', ['B+:sig'])
 empty_path = b2.create_path()
 skimfilter.if_value('=0', empty_path, b2.AfterConditionPath.END)
@@ -72,10 +72,10 @@ path.add_module(skimfilter)
 # fei_tag = 'my_specFEI'
 
 # Here we use a prefix of an existing FEI training
-fei_tag = 'FEIv4_2020_MC13_release_04_01_01'
+fei_tag = 'FEIv4_2021_MC14_release_05_01_12'
 
 # Add the necessary database
-# b2.conditions.globaltags = ['name of database containing the specific training']
+# b2.conditions.prepend_globaltag('name of database containing the specific training')
 
 # Here we use a generic FEI training to demonstrate applying the FEI in an ROE of the signal
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())

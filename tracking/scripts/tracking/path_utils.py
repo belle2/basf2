@@ -69,6 +69,27 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
     :param add_mva_quality_indicator: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found tracks.
     """
+
+    add_prefilter_track_fit_and_track_creator(path,
+                                              trackFitHypotheses=trackFitHypotheses,
+                                              reco_tracks=reco_tracks,
+                                              add_mva_quality_indicator=add_mva_quality_indicator)
+
+    add_postfilter_track_fit(path, components=components, pruneTracks=pruneTracks, reco_tracks=reco_tracks)
+
+
+def add_prefilter_track_fit_and_track_creator(path, trackFitHypotheses=None,
+                                              reco_tracks="RecoTracks", add_mva_quality_indicator=False):
+    """
+    Helper function to add only the modules required to calculate HLT filter decision:
+    performing the track fit and the Belle2 track creation to the path.
+
+    :param path: The path to add the tracking reconstruction modules to
+    :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
+    :param add_mva_quality_indicator: If true, add the MVA track quality estimation
+        to the path that sets the quality indicator property of the found tracks.
+    """
+
     # Correct time seed
     path.add_module("IPTrackTimeEstimator",
                     recoTracksStoreArrayName=reco_tracks, useFittedInformation=False)
@@ -88,6 +109,18 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
     # implementation.
     path.add_module('TrackCreator', recoTrackColName=reco_tracks,
                     pdgCodes=[211, 321, 2212] if not trackFitHypotheses else trackFitHypotheses)
+
+
+def add_postfilter_track_fit(path, components=None, pruneTracks=False, reco_tracks="RecoTracks"):
+    """
+    Helper function to add the modules not requred to calcualte HLT filter decision: performing
+    the V0 fit to the path.
+
+    :param path: The path to add the tracking reconstruction modules to
+    :param components: the list of geometry components in use or None for all components.
+    :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
+    :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
+    """
 
     # V0 finding
     path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)

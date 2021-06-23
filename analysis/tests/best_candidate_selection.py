@@ -49,7 +49,9 @@ class RankChecker(basf2.Module):
         for p in self.plist:
             px.append(p.getPx())
             py.append(p.getPy())
-            names = p.getExtraInfoNames()
+            # get all names of existing extra infos but convert to a native list of python strings to avoid
+            # possible crashes if the std::vector returned by the particle goes out of scope
+            names = [str(n) for n in p.getExtraInfoNames()]
             for n in names:
                 einfo[n].append(p.getExtraInfo(n))
 

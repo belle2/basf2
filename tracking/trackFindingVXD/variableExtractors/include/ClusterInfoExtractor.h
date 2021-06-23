@@ -51,6 +51,8 @@ namespace Belle2 {
         }
       }
 
+      // this is fine as it is pointing to the `relatedClusters`, which are in the datastore..
+      // cppcheck-suppress invalidLifetime
       std::vector<float> values(clusters.size());
       for (unsigned int i = 0; i < clusters.size(); ++i) {
         values[i] = clusters[i]->getCharge();

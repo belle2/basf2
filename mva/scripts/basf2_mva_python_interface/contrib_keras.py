@@ -5,7 +5,6 @@ import numpy as np
 
 from keras.layers import Dense, Input
 from keras.models import Model, load_model
-from keras.optimizers import adam
 from keras.losses import binary_crossentropy
 
 
@@ -45,7 +44,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
     state = State(Model(input, net))
 
-    state.model.compile(optimizer=adam(), loss=binary_crossentropy, metrics=['accuracy'])
+    state.model.compile(optimizer="adam", loss=binary_crossentropy, metrics=['accuracy'])
 
     state.model.summary()
 

@@ -156,9 +156,9 @@ void CDCCalibrationCollectorModule::collect()
   for (int i = 0; i < nTr; ++i) {
     RecoTrack* track = m_RecoTracks[i];
     if (track->getDirtyFlag()) continue;
-    if (!track->getTrackFitStatus()->isFitted()) continue;
     const genfit::FitStatus* fs = track->getTrackFitStatus();
-    if (!fs || !fs->isFitConverged()) continue; //not fully convergence
+    if (!fs || !fs->isFitted()) continue;
+    if (!fs->isFitConverged()) continue; //not fully convergence
 
     const Belle2::Track* b2track = track->getRelatedFrom<Belle2::Track>();
     if (!b2track) {B2DEBUG(99, "No relation found"); continue;}

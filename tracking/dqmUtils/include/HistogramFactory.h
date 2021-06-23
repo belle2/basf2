@@ -24,25 +24,22 @@ namespace Belle2::HistogramFactory {
   public:
     /** Constructor.
     * @param defaultValue - a value which is returned when permanent nor temporary value is set. */
-    Parameter(AType defaultValue)
-    {
-      m_value = defaultValue;
-      m_isSet = false;
-      m_isSetTemporarily = false;
-    }
+    explicit Parameter(const AType& defaultValue) :
+      m_value(defaultValue), m_temporaryValue(defaultValue), m_isSet(false), m_isSetTemporarily(false)
+    {}
 
     /** Permanently sets inner quantity to given value.
     * @param value - a value we want to set */
-    void Set(AType value);
+    void Set(const AType& value);
     /** Copy permanent value from another parameter but only if its permanent value is set
     * @param parameter - another parameter whose permanent value is copied */
-    void Set(Parameter<AType> parameter);
+    void Set(const Parameter<AType>& parameter);
     /** Temporarily sets inner quantity to given value
     * @param value - a value we want to set */
-    void SetTemporarily(AType value);
+    void SetTemporarily(const AType& value);
     /** Copy temporary value from another parameter but only if its temporary value is set
     * @param parameter - another parameter whose temporary value is copied */
-    void SetTemporarily(Parameter<AType> parameter);
+    void SetTemporarily(const Parameter<AType>& parameter);
 
     /** Returns value of the inner quantity.
     * Order is: temporary value (if is set), permanent value (if is set), default value. Temporary value is invalidated. */
@@ -62,7 +59,7 @@ namespace Belle2::HistogramFactory {
   /** Sets the permanent value.
   * @param value - a value we want to assign to the permanent value. */
   template <class AType>
-  void Parameter<AType>::Set(AType value)
+  void Parameter<AType>::Set(const AType& value)
   {
     m_value = value;
     m_isSet = true;
@@ -71,7 +68,7 @@ namespace Belle2::HistogramFactory {
   /** Copy the permanent value setting.
   * @param parameter - another parameter which permanent value setting we want to copy. */
   template <class AType>
-  void Parameter<AType>::Set(Parameter<AType> parameter)
+  void Parameter<AType>::Set(const Parameter<AType>& parameter)
   {
     if (parameter.m_isSet)
       Set(parameter.m_value);
@@ -81,7 +78,7 @@ namespace Belle2::HistogramFactory {
   * @param value - a value we want to assign to the temporary value. */
 
   template <class AType>
-  void Parameter<AType>::SetTemporarily(AType value)
+  void Parameter<AType>::SetTemporarily(const AType& value)
   {
     m_temporaryValue = value;
     m_isSetTemporarily = true;
@@ -90,7 +87,7 @@ namespace Belle2::HistogramFactory {
   /** Copy the temporary value setting.
   * @param parameter - another parameter which temporary value setting we want to copy. */
   template <class AType>
-  void Parameter<AType>::SetTemporarily(Parameter<AType> parameter)
+  void Parameter<AType>::SetTemporarily(const Parameter<AType>& parameter)
   {
     if (parameter.m_isSet)
       SetTemporarily(parameter.m_value);
@@ -168,7 +165,7 @@ namespace Belle2::HistogramFactory {
     }
 
     /** Temporarily copies parameters for x axis from given Axis. */
-    Factory& xAxis(Axis& axis)
+    Factory& xAxis(const Axis& axis)
     {
       m_nbinsx.SetTemporarily(axis.m_nbins);
       m_xlow.SetTemporarily(axis.m_low);
@@ -179,7 +176,7 @@ namespace Belle2::HistogramFactory {
     }
 
     /** Temporarily copies parameters for y axis from given Axis. */
-    Factory& yAxis(Axis& axis)
+    Factory& yAxis(const Axis& axis)
     {
       m_nbinsy.SetTemporarily(axis.m_nbins);
       m_ylow.SetTemporarily(axis.m_low);
@@ -190,7 +187,7 @@ namespace Belle2::HistogramFactory {
     }
 
     /** Permanently copies parameters for x axis from given Axis. */
-    Factory& xAxisDefault(Axis& axis)
+    Factory& xAxisDefault(const Axis& axis)
     {
       m_nbinsx.Set(axis.m_nbins);
       m_xlow.Set(axis.m_low);
@@ -201,7 +198,7 @@ namespace Belle2::HistogramFactory {
     }
 
     /** Permanently copies parameters for y axis from given Axis. */
-    Factory& yAxisDefault(Axis& axis)
+    Factory& yAxisDefault(const Axis& axis)
     {
       m_nbinsy.Set(axis.m_nbins);
       m_ylow.Set(axis.m_low);

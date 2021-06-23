@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <cdc/modules/cdcDigitizer/CDCDigitizerModule.h>
+#include <cdc/modules/cdcDigitizer/EDepInGas.h>
 #include <cdc/utilities/ClosestApproach.h>
 
 #include <framework/datastore/RelationArray.h>
@@ -90,15 +91,17 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("CorrectForWireSag",   m_correctForWireSag,
            "A switch for sense wire sag effect; true: drift-time is calculated with the sag taken into account; false: not. Here, sag means the perturbative part which corresponds to alignment in case of wire-position. The main part (corresponding to design+displacement in wire-position) is taken into account in FullSim; you can control it via CDCJobCntlParModifier.",
            true);
+  //Switch for negative-t0 wires
+  addParam("TreatNegT0WiresAsGood", m_treatNegT0WiresAsGood, "Treat wires with negative t0 (calibrated) as good wire4s.", true);
 
   //Threshold
   addParam("TDCThreshold4Outer", m_tdcThreshold4Outer,
-           "TDC threshold (dE in eV) for Layers#8-56. The value corresponds to He-C2H6 gas; for the gas+wire (MaterialDefinitionMode=0) case, (this value)*f will be used, where f is specified by GasToGasWire",
-           25.0);
+           "TDC threshold (dE in eV) for Layers#8-56. The value corresponds to He-C2H6 gas", 25.0);
   addParam("TDCThreshold4Inner", m_tdcThreshold4Inner,
            "Same as TDCThreshold4Outer but for Layers#0-7,", 25.0);
-  addParam("GasToGasWire", m_gasToGasWire,
-           "(Approximate) ratio of dE in He/C2H6-gas to dE in gas+wire, where dE is energy deposit.", 1. / 1.478);
+  addParam("EDepInGasMode", m_eDepInGasMode,
+           "Mode for extracting energy deposit in gas from energy deposit in gas+wire; =0: scaling using electron density; 1: scaling using most probab. energy deposit; 2: similar to 2 but slightly different; 3: extraction based on probability",
+           0);
 
   //ADC Threshold
   addParam("ADCThreshold", m_adcThreshold,
@@ -134,7 +137,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   //Some FEE params.
   addParam("TDCThresholdOffset", m_tdcThresholdOffset, "Offset for TDC (digital) threshold (mV)", 3820.);
   addParam("AnalogGain",   m_analogGain, "Analog  gain (V/pC)", 1.1);
-  addParam("DigitalGain", m_digitalGain, "Digital gain (V/pC)", 15.);
+  addParam("DigitalGain", m_digitalGain, "Digital gain (V/pC)", 7.);
   addParam("ADCBinWidth", m_adcBinWidth, "ADC bin width  (mV)",  2.);
 
   addParam("AddFudgeFactorForSigma", m_addFudgeFactorForSigma,
@@ -176,11 +179,6 @@ void CDCDigitizerModule::initialize()
   m_driftV       = cdcgp.getNominalDriftV();
   m_driftVInv    = 1. / m_driftV;
   m_propSpeedInv = 1. / cdcgp.getNominalPropSpeed();
-  m_scaleFac = 1.;
-  if (m_cdcgp->getMaterialDefinitionMode() == 0) { //gas+wire mode
-    m_scaleFac = m_gasToGasWire;
-  }
-  m_scaleFac *= Unit::GeV;
   m_gcp = &(CDCGeoControlPar::getInstance());
   m_totalFudgeFactor  = m_cdcgp->getFudgeFactorForSigma(2);
   m_totalFudgeFactor *= m_addFudgeFactorForSigma;
@@ -439,8 +437,12 @@ void CDCDigitizerModule::event()
     //Sum ADC count
     const double stepLength  = m_aCDCSimHit->getStepLength() * Unit::cm;
     const double costh = m_momentum.z() / m_momentum.Mag();
-    const double hitdE = m_scaleFac * m_aCDCSimHit->getEnergyDep();
-    //    B2DEBUG(29, "m_scaleFac,UnitGeV= " << m_scaleFac <<" "<< Unit::GeV);
+    double hitdE = m_aCDCSimHit->getEnergyDep();
+    if (m_cdcgp->getMaterialDefinitionMode() != 2) {  // for non wire-by-wire mode
+      static EDepInGas& edpg = EDepInGas::getInstance();
+      hitdE = edpg.getEDepInGas(m_eDepInGasMode, m_aCDCSimHit->getPDGCode(), m_momentum.Mag(), stepLength, hitdE);
+    }
+
     unsigned short layerID = m_wireID.getICLayer();
     unsigned short cellID  = m_wireID.getIWire();
     //    unsigned short adcCount = getADCCount(layerID, cellID, hitdE, stepLength, costh);
@@ -467,6 +469,7 @@ void CDCDigitizerModule::event()
       dEThreshold = (m_wireID.getISuperLayer() == 0) ? m_tdcThreshold4Inner : m_tdcThreshold4Outer;
       dEThreshold *= Unit::eV;
     }
+    dEThreshold /= m_runGain;
     B2DEBUG(m_debugLevel, "hitdE,dEThreshold,driftLength " << hitdE << " " << dEThreshold << " " << hitDriftLength);
 
     if (hitdE < dEThreshold) {
@@ -610,7 +613,7 @@ void CDCDigitizerModule::event()
     }
 
     //N.B. No bias (+ or -0.5 count) is introduced on average in digitization by the real TDC (info. from KEK electronics division). So round off (t0 - drifttime) below.
-    unsigned short tdcCount = static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime) *
+    unsigned short tdcCount = static_cast<unsigned short>((getPositiveT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime) *
                                                           m_tdcBinWidthInv + 0.5);
 
     //calculate tot; hard-coded currently
@@ -641,7 +644,7 @@ void CDCDigitizerModule::event()
 
     //Set 2nd-hit related things if it exists
     if (m_output2ndHit && iterSignalMap->second.m_simHitIndex2 >= 0) {
-      unsigned short tdcCount2 = static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime2) *
+      unsigned short tdcCount2 = static_cast<unsigned short>((getPositiveT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime2) *
                                                              m_tdcBinWidthInv + 0.5);
       if (tdcCount2 != tdcCount) {
         CDCHit* secondHit = m_cdcHits.appendNew(tdcCount2, adcCount, iterSignalMap->first, 0, tot);
@@ -671,7 +674,7 @@ void CDCDigitizerModule::event()
       } else { //Check the 3rd hit when tdcCount = tdcCount2
         //        std::cout << "tdcCount1=2" << std::endl;
         if (iterSignalMap->second.m_simHitIndex3 >= 0) {
-          unsigned short tdcCount3 = static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime3) *
+          unsigned short tdcCount3 = static_cast<unsigned short>((getPositiveT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime3) *
                                                                  m_tdcBinWidthInv + 0.5);
           //          std::cout << "tdcCount3= " << tdcCount3 << " " << tdcCount << std::endl;
           if (tdcCount3 != tdcCount) {
@@ -724,7 +727,7 @@ void CDCDigitizerModule::event()
     //    unsigned short adcCount = getADCCount(iterSignalMapTrg->second.m_charge);
     unsigned short adcCount = iterSignalMapTrg->second.m_charge;
     unsigned short tdcCount =
-      static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMapTrg->first.first) -
+      static_cast<unsigned short>((getPositiveT0(iterSignalMapTrg->first.first) -
                                    iterSignalMapTrg->second.m_driftTime) * m_tdcBinWidthInv + 0.5);
     const CDCHit* cdcHit = m_cdcHits4Trg.appendNew(tdcCount, adcCount, iterSignalMapTrg->first.first);
 
@@ -1033,7 +1036,7 @@ void CDCDigitizerModule::addXTalk()
       WireID widx = m_cdcgp->getWireID(board, xTalks[i].first);
       if (!m_cdcgp->isBadWire(widx)) { // for non-bad wire
         if (m_includeEarlyXTalks || (xTalks[i].second.TDC <= tdcCount)) {
-          const double t0 = m_cdcgp->getT0(widx);
+          const double t0 = getPositiveT0(widx);
           const double ULOfTDC = (t0 - m_lowEdgeOfTimeWindow[board]) * m_tdcBinWidthInv;
           const double LLOfTDC = (t0 - m_uprEdgeOfTimeWindow[board]) * m_tdcBinWidthInv;
           if (LLOfTDC <= tdcCount4XTalk && tdcCount4XTalk <= ULOfTDC) {
@@ -1153,4 +1156,13 @@ void CDCDigitizerModule::addXTalk()
     }
   } //end of x-talk loop
   B2DEBUG(m_debugLevel4XTalk, "original #hits, #hits= " << OriginalNoOfHits << " " << m_cdcHits.getEntries());
+}
+
+
+double CDCDigitizerModule::getPositiveT0(const WireID& wid)
+{
+  double t0 = m_cdcgp->getT0(wid);
+  if (t0 <= 0 && m_treatNegT0WiresAsGood) t0 = m_cdcgp->getMeanT0();
+  //  B2DEBUG(m_debugLevel, m_cdcgp->getT0(wid) <<" "<< m_cdcgp->getMeanT0() <<" "<< t0);
+  return t0;
 }

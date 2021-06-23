@@ -3,7 +3,6 @@
 import basf2 as b2
 import generators as ge
 import simulation as si
-import L1trigger as l1
 import reconstruction as re
 import mdst
 
@@ -16,11 +15,8 @@ main.add_module('EventInfoSetter', evtNumList=[10], expList=[0])
 # Generate B0B0bar events
 ge.add_evtgen_generator(path=main, finalstate='mixed')
 
-# Simulate the detector response
+# Simulate the detector response and the L1 trigger
 si.add_simulation(path=main)
-
-# Simulate the L1 trigger
-l1.add_tsim(path=main)
 
 # Reconstruct the objects
 re.add_reconstruction(path=main)

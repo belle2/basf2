@@ -1,4 +1,10 @@
 Import('env')
-env['LIBS'] = ['framework','rawdata' ,'trg', 'trg_gdl_dataobjects', 'trg_grl_dataobjects', 'trg_top_dataobjects','rawdata_dataobjects']
+env['LIBS'] = ['framework',
+               'mdst_dataobjects',
+               'trg',
+               'trg_ecl_dataobjects',
+               'trg_gdl_dataobjects',
+               'trg_grl_dataobjects',
+               'trg_top_dataobjects']
 Return('env')
 

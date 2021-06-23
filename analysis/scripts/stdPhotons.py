@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ########################################################
 #
@@ -11,7 +10,7 @@
 from modularAnalysis import fillParticleList, cutAndCopyList
 
 
-def stdPhotons(listtype='loose', path=None):
+def stdPhotons(listtype='loose', path=None, loadPhotonBeamBackgroundMVA=True):
     """
     Function to prepare one of several standardized types of photon lists:
 
@@ -30,21 +29,26 @@ def stdPhotons(listtype='loose', path=None):
 
     -  For latest pi0 recommendations see https://confluence.desy.de/display/BI/Neutrals+Performance
 
-    @param listtype name of standard list
-    @param path     modules are added to this path
+    Parameters:
+        listtype (str): name of standard list
+        path (basf2.Path):           modules are added to this path
+        loadPhotonBeamBackgroundMVA (bool): If true, photon candidates will be assigned a beam background probability.
     """
 
     # all photons (all neutral ECLClusters that have the c_nPhotons hypothesis)
     if listtype == 'all':
-        fillParticleList('gamma:all', '', True, path)
+        fillParticleList('gamma:all', '', writeOut=True, path=path,
+                         loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA)
     # all photons within the cdc tracking acceptance: remove un track-matched
     # electrons from outside the tracking acceptance
     elif listtype == 'cdc':
         fillParticleList(
             'gamma:cdc',
             'inCDCAcceptance',
-            True,
-            path)
+            writeOut=True,
+            path=path,
+            loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA
+        )
     # clusterErrorTiming < 1e6 removes failed waveform fits, this is not an actual timing cut. A 99% efficiency cut
     # is already applied on mdst level for photons with E < 50 MeV.
     elif listtype == 'loose':
@@ -69,36 +73,46 @@ def stdPhotons(listtype='loose', path=None):
             'gamma:pi0eff10_May2020',
             '[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and \
              [[clusterReg==1 and E>0.200] or [clusterReg==2 and E>0.100] or [clusterReg==3 and E>0.180]] and [clusterE1E9>0.5]',
-            True,
-            path)
+            writeOut=True,
+            path=path,
+            loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA
+        )
     elif listtype == 'pi0eff20_May2020':
         fillParticleList(
             'gamma:pi0eff20_May2020',
             '[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and \
              [[clusterReg==1 and E>0.120] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.080]] and [clusterE1E9>0.4]',
-            True,
-            path)
+            writeOut=True,
+            path=path,
+            loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA
+        )
     elif listtype == 'pi0eff30_May2020' or listtype == 'pi0eff40_May2020':
         fillParticleList(
             f'gamma:{listtype}',
             '[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and \
              [[clusterReg==1 and E>0.080] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.060 ]]',
-            True,
-            path)
+            writeOut=True,
+            path=path,
+            loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA
+        )
     elif listtype == 'pi0eff50_May2020':
         fillParticleList(
             'gamma:pi0eff50_May2020',
             '[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and \
             [[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.025] or [clusterReg==3 and E>0.040]]',
-            True,
-            path)
+            writeOut=True,
+            path=path,
+            loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA
+        )
     elif listtype == 'pi0eff60_May2020':
         fillParticleList(
             'gamma:pi0eff60_May2020',
             '[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and \
              [[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.020] or [clusterReg==3 and E>0.020]]',
-            True,
-            path)
+            writeOut=True,
+            path=path,
+            loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA
+        )
     else:
         raise ValueError(f"\"{listtype}\" is none of the allowed standardized types of photon lists!")
 

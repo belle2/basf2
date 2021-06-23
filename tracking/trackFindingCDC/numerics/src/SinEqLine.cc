@@ -93,7 +93,6 @@ double SinEqLine::computeRootInInterval(double lowerX, double upperX) const
   next.setY(map(next.x()));
 
   // Should  always succeed since we checked everything before
-  // cppcheck-suppress unreadVariable
   bool updatedBound = updateBounds(lower, upper, next);
   if (not updatedBound) return NAN;
 

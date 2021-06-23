@@ -8,7 +8,6 @@
 import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
-from L1trigger import add_tsim
 
 # background (collision) files
 bg = None
@@ -34,11 +33,8 @@ main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=num_events)
 # generate BBbar events
 main.add_module('EvtGenInput')
 
-# detector simulation
+# detector and L1 trigger simulation
 add_simulation(main, bkgfiles=bg, bkgOverlay=True)
-
-# trigger simulation
-add_tsim(main)
 
 # reconstruction
 add_reconstruction(main)

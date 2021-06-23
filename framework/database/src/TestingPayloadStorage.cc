@@ -40,12 +40,12 @@ namespace Belle2::Conditions {
     bool found{false};
     // and check all of them for what is the highest revision containing the event
     for (const auto& [revision, iov] : it->second) {
-      if (iov.contains(event) and info.revision < revision) {
-        info.revision = revision;
+      if (iov.contains(event)) {
+        info.revision = 0;
         info.globaltag = "temp://" + m_absoluteFilename;
         info.baseUrl = "";
         info.payloadUrl = "";
-        info.filename = payloadFilename(m_payloadDir, info.name, info.revision);
+        info.filename = payloadFilename(m_payloadDir, info.name, revision);
         info.iov = iov;
         if (!FileSystem::fileExists(info.filename)) {
           B2FATAL("Could not find payload file specified in testing payload storage" << LogVar("storage filen", m_filename)
@@ -54,6 +54,7 @@ namespace Belle2::Conditions {
         }
         info.checksum = FileSystem::calculateMD5(info.filename);
         found = true;
+        break;
       }
     }
     if (found) {
@@ -94,18 +95,12 @@ namespace Belle2::Conditions {
         if (line.empty()) continue;
         // otherwise read name, revision and iov from the line
         std::string name;
-        std::string revisionStr;
+        std::string revision;
         IntervalOfValidity iov;
         try {
-          std::stringstream(line) >> name >> revisionStr >> iov;
+          std::stringstream(line) >> name >> revision >> iov;
         } catch (std::runtime_error& e) {
           throw std::runtime_error("line must be of the form 'dbstore/<payloadname> <revision> <firstExp>,<firstRun>,<finalExp>,<finalRun>'");
-        }
-        int revision{ -1};
-        try {
-          revision = stoi(revisionStr);
-        } catch (std::invalid_argument& e) {
-          throw std::runtime_error("revision must be an integer");
         }
         // parse name
         size_t pos = name.find('/');
@@ -114,18 +109,22 @@ namespace Belle2::Conditions {
         }
         std::string module = name.substr(pos + 1, name.length());
         // and add to map of payloads
-        B2DEBUG(39, "Found testing payload" << LogVar("storage file", m_filename) << LogVar("name", module) << LogVar("revision",
-                revision) << LogVar("iov", iov));
+        B2DEBUG(39, "Found testing payload" << LogVar("storage file", m_filename) << LogVar("name", module)
+                << LogVar("revision/md5", revision) << LogVar("iov", iov));
         m_payloads[module].emplace_back(revision, iov);
       }
     } catch (std::exception& e) {
       B2FATAL("Problem reading testing payloads storage" << LogVar("storage file", m_filename)
               << LogVar("line", lineno) << LogVar("error", e.what()));
     }
+    // and reverse all the payloads so the last ones in the file have highest priority
+    for (auto& [name, payloads] : m_payloads) {
+      std::reverse(payloads.begin(), payloads.end());
+    }
   }
 
   std::string TestingPayloadStorage::payloadFilename(const std::string& path, const std::string& name,
-                                                     int revision)
+                                                     const std::string& revision)
   {
     std::stringstream result;
     if (!path.empty()) result << path << '/';
@@ -135,7 +134,7 @@ namespace Belle2::Conditions {
 
   bool TestingPayloadStorage::storeData(const std::string& name, TObject* object, const IntervalOfValidity& iov)
   {
-    return store(name, iov, [this, &object, &name](const std::string & filename) {
+    return store(name, iov, "", [this, &object, &name](const std::string & filename) {
       return writePayload(filename, name, object);
     });
   }
@@ -143,20 +142,20 @@ namespace Belle2::Conditions {
   bool TestingPayloadStorage::storePayload(const std::string& name, const std::string& fileName, const IntervalOfValidity& iov)
   {
     // resolve all symbolic links to make sure we point to the real file
-    boost::filesystem::path resolved = boost::filesystem::canonical(fileName);
-    if (not boost::filesystem::is_regular_file(resolved)) {
+    fs::path resolved = fs::canonical(fileName);
+    if (not fs::is_regular_file(resolved)) {
       B2ERROR("Problem creating testing payload: Given payload storage file doesn't exist" << LogVar("storage file", fileName));
       return false;
     }
-    return store(name, iov, [&resolved](const std::string & destination) {
+    return store(name, iov, resolved.string(), [&resolved](const std::string & destination) {
       // copy payload file to payload directory and rename it to follow the file name convention
-      boost::filesystem::copy(resolved, destination);
+      fs::copy_file(resolved, destination, fs::copy_option::overwrite_if_exists);
       return true;
     });
   }
 
   bool TestingPayloadStorage::store(const std::string& name, const IntervalOfValidity& iov,
-                                    const std::function<bool(const std::string&)>& writer)
+                                    const std::string& source, const std::function<bool(const std::string&)>& writer)
   {
     if (iov.empty()) {
       B2ERROR("IoV is empty, refusing to store object in testing payload storage"
@@ -169,7 +168,36 @@ namespace Belle2::Conditions {
     if (!fs::exists(m_payloadDir)) {
       fs::create_directories(m_payloadDir);
     }
-    // get lock for write access to database file
+
+    // create a temporary file if we don't have a source file yet
+    fs::path sourcefile{source};
+    if (source.empty()) {
+      while (true) {
+        sourcefile = fs::path(m_payloadDir) / fs::unique_path();
+        auto fd = open(sourcefile.c_str(), O_CREAT | O_EXCL);
+        if (fd >= 0) {
+          close(fd);
+          break;
+        }
+        if (errno != EEXIST && errno != EINTR) {
+          B2ERROR("Cannot create payload file:" << strerror(errno));
+          return false;
+        }
+        B2DEBUG(35, "first try to create tempfile failed, trying again");
+      }
+      if (!writer(sourcefile.string())) return false;
+    }
+    // If we created a temporary file we want to delete it again so we'd like to
+    // use a scope guard to do so. However we need it in this scope so we need
+    // to create one in any case and release it if we didn't create a temporary
+    // file
+    ScopeGuard delete_srcfile([&sourcefile] {fs::remove(sourcefile);});
+    if (!source.empty()) delete_srcfile.release();
+
+    std::string md5 = FileSystem::calculateMD5(sourcefile.string());
+
+    // Ok, now we have the file and it's md5 sum so let's get a write lock to the database file
+    // to avoid race conditions when creating files and writing the info in the text file.
     FileSystem::Lock lock(m_absoluteFilename);
     if (!lock.lock()) {
       B2ERROR("Locking of testing payload storage file failed, cannot create payload"
@@ -181,32 +209,37 @@ namespace Belle2::Conditions {
       B2ERROR("Could not open testing payload storage file for writing" << LogVar("storage file", m_filename));
     }
 
-    // Find the next free revision number
-    for (int revision = 1; revision < INT_MAX; ++revision) {
+    // So let's try renaming our temporary payload file to final destination
+    // We start with a 5 digit hash and expand if there's a collision
+    std::string revision;
+    bool found = false;
+    for (int i = 6; i <= 32; ++i) {
+      revision = md5.substr(0, i);
       auto filename = payloadFilename(m_payloadDir, name, revision);
-      // FIXME: This could be a race condition, we check for existence and then
-      // create which could fail if two processes try this at the same time and
-      // thus overwrite the files of each other. We could instead check if an
-      // `open(filename.c_str(), O_CREAT|O_EXCL)` is successful in which the
-      // file is ours however I'm a bit sceptical if this will work on SL6. But
-      // since we locked the database file and no longer support the payloads be
-      // in a different directory then the text files this almost fine. However
-      // there could still be multiple text files in the same directory so still
-      // a slight chance for race conditions. Or locking could just not work on
-      // some file systems, for example misconfigured NFS
-      if (FileSystem::fileExists(filename)) continue;
-      // free revision found, try to save
-      if (!writer(filename)) return false;
-      // Ok, now we need to add it to the database file
-      file << "dbstore/" << name << " " << revision << " " << iov << std::endl;
-      B2DEBUG(32, "Storing testing payload" << LogVar("storage file", m_filename) << LogVar("name", name)
-              << LogVar("local revision", revision) << LogVar("iov", iov));
-      // And make sure we reread the file on next request to payloads
-      m_initialized = false;
-      return true;
+      if (FileSystem::fileExists(filename)) {
+        if (md5 != FileSystem::calculateMD5(filename)) continue;
+      } else {
+        if (source.empty()) {
+          fs::rename(sourcefile, filename);
+          delete_srcfile.release();
+        } else {
+          fs::copy_file(source, filename, fs::copy_option::overwrite_if_exists);
+        }
+      }
+      found = true;
+      break;
     }
-    B2ERROR("Could not find a suitable revision to create payload" << LogVar("storage file", m_filename) << LogVar("name", name));
-    return false;
+    if (!found) {
+      B2ERROR("Cannot create payload file: checksum mistmatch for existing files");
+      return false;
+    }
+    // Ok, add to the text file
+    file << "dbstore/" << name << " " << revision << " " << iov << std::endl;
+    B2DEBUG(32, "Storing testing payload" << LogVar("storage file", m_filename) << LogVar("name", name)
+            << LogVar("local revision", revision) << LogVar("iov", iov));
+    // And make sure we reread the file on next request to payloads
+    m_initialized = false;
+    return true;
   }
 
   bool TestingPayloadStorage::writePayload(const std::string& fileName, const std::string& name, const TObject* object)
@@ -219,7 +252,7 @@ namespace Belle2::Conditions {
       B2ERROR("Could not open payload file for writing." << LogVar("filename", m_filename));
       return false;
     }
-    // Write the payload and maybe the iov
+    // Write the payload
     object->Write(name.c_str(), TObject::kSingleKey);
     // Done, let's go
     file->Close();

@@ -67,10 +67,11 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
   try {
     //Check if the dynamic particle has a primary particle attached.
     //If the answer is yes, the UserInfo of the primary particle is recycled as the UserInfo of the track.
+    const bool isPrimary = dynamicParticle->GetPrimaryParticle() != nullptr;
     bool neutral_llp = false;
-    if (dynamicParticle->GetPrimaryParticle() != NULL) {
+    if (isPrimary) {
       const G4PrimaryParticle* primaryParticle = dynamicParticle->GetPrimaryParticle();
-      if (primaryParticle->GetUserInformation() != NULL) {
+      if (primaryParticle->GetUserInformation() != nullptr) {
         const_cast<G4Track*>(track)->SetUserInformation(new TrackInfo(ParticleInfo::getInfo(*primaryParticle)));
         //check for neutral long-lived primary particle
         if (primaryParticle->GetParticleDefinition() == G4ParticleTable::GetParticleTable()->FindParticle("LongLivedNeutralParticle")) {
@@ -86,11 +87,11 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
 
     G4ThreeVector dpMom  = dynamicParticle->GetMomentum() / CLHEP::MeV * Unit::MeV;
     currParticle.setTrackID(track->GetTrackID());
-    // If the particle has simulated parents update the production vertex and time
-    // to the real values from Geant4. As convention we set NaN as production time
-    // in the MCParticleGenerator if the particle wasn't directly placed with a
-    // primary vertex in Geant4.
-    if (std::isnan(currParticle.getProductionTime())) {
+    // If the particle is a primary particle with simulated parents update the
+    // production vertex and time to the real values from Geant4. As convention
+    // we set NaN as production time in the MCParticleGenerator if the particle
+    // wasn't directly placed with a primary vertex in Geant4.
+    if (!isPrimary or std::isnan(currParticle.getProductionTime())) {
       G4ThreeVector trVtxPos = track->GetVertexPosition() / CLHEP::mm * Unit::mm;
       currParticle.setProductionTime(track->GetGlobalTime()); // Time does not need a conversion factor
       currParticle.setProductionVertex(trVtxPos.x(), trVtxPos.y(), trVtxPos.z());
@@ -105,12 +106,12 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
     }
 
     //Primary or secondary particle?
-    if (dynamicParticle->GetPrimaryParticle() != NULL) {
+    if (isPrimary) {
       //Primary particle
       currParticle.setSecondaryPhysicsProcess(0);
       currParticle.setIgnore(false);  //Store the generator info in the MCParticles block.
 
-    } else if (track->GetCreatorProcess() != NULL) {
+    } else if (track->GetCreatorProcess() != nullptr) {
       //Secondary particle
       const int& processSubType = track->GetCreatorProcess()->GetProcessSubType();
       currParticle.setSecondaryPhysicsProcess(processSubType); //Store the physics process type.
@@ -127,7 +128,7 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
     //Either we store all the trajectories
     if (m_storeTrajectories > 2 ||
         //Or only the primary ones
-        (m_storeTrajectories == 1 && dynamicParticle->GetPrimaryParticle() != NULL) ||
+        (m_storeTrajectories == 1 && isPrimary) ||
         //Or all except optical photons
         (m_storeTrajectories == 2 && track->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition())) {
       TrackInfo& info = dynamic_cast<TrackInfo&>(*track->GetUserInformation());

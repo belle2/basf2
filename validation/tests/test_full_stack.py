@@ -30,11 +30,11 @@ def start_webserver():
 def http_post(command, json_args):
     call_url = validation_url + command
     print(f"Posting {json_args} to {command}")
-    r = requests.post(call_url,
-                      json=json_args)
+    r = requests.post(call_url, json=json_args)
     if not r.ok:
-        print("REST call {} with arguments {} failed".format(
-            call_url, json_args))
+        print(
+            "REST call {} with arguments {} failed".format(call_url, json_args)
+        )
         print(str(r))
         return None
 
@@ -78,15 +78,19 @@ def check_for_plotting(revs, tmp_folder):
         time.sleep(wait_time)
         summed_wait_time += wait_time
         if summed_wait_time > max_wait_time:
-            print("Waited for {} seconds for the requested plots to complete "
-                  "and nothing happened".format(summed_wait_time))
+            print(
+                "Waited for {} seconds for the requested plots to complete "
+                "and nothing happened".format(summed_wait_time)
+            )
             return False
 
     # check if the plots are really present
-    comp_folder = \
-        validationpath.get_html_plots_tag_comparison_folder(tmp_folder, revs)
-    comp_json = \
-        validationpath.get_html_plots_tag_comparison_json(tmp_folder, revs)
+    comp_folder = validationpath.get_html_plots_tag_comparison_folder(
+        tmp_folder, revs
+    )
+    comp_json = validationpath.get_html_plots_tag_comparison_json(
+        tmp_folder, revs
+    )
 
     if not os.path.exists(comp_folder):
         print(f"Comparison folder {comp_folder} does not exist")
@@ -99,7 +103,7 @@ def check_for_plotting(revs, tmp_folder):
     some_plot = os.path.join(
         comp_folder,
         "validation-test",
-        "validationTestPlotsB_gaus_histogram.pdf"
+        "validationTestPlotsB_gaus_histogram.pdf",
     )
     if not os.path.isfile(some_plot):
         print(f"Comparison plot {some_plot} does not exist")
@@ -116,8 +120,10 @@ def check_for_content(revs, min_matrix_plots, min_plot_objects):
     try:
         import splinter
     except ImportError:
-        print("The splinter package is required to run this test. Run 'pip3 "
-              "install splinter' to install")
+        print(
+            "The splinter package is required to run this test. Run 'pip3 "
+            "install splinter' to install"
+        )
         # don't give an error exit code here to not fail if splinter is not
         # available
         return True
@@ -137,17 +143,23 @@ def check_for_content(revs, min_matrix_plots, min_plot_objects):
         for r in revs:
             rr = [web_r for web_r in found_revs if web_r.value == r]
             if len(rr) == 0:
-                print("Revsion {} was not found on validation website. It "
-                      "should be there.".format(r))
+                print(
+                    "Revsion {} was not found on validation website. It "
+                    "should be there.".format(r)
+                )
                 return False
 
         plot_objects = browser.find_by_css(".object")
 
-        print("Checking for a minimum number of {} plot objects",
-              min_plot_objects)
+        print(
+            "Checking for a minimum number of {} plot objects", min_plot_objects
+        )
         if len(plot_objects) < min_plot_objects:
-            print("Only {} plots found, while {} are expected".format(
-                len(plot_objects), min_plot_objects))
+            print(
+                "Only {} plots found, while {} are expected".format(
+                    len(plot_objects), min_plot_objects
+                )
+            )
             return False
 
         # click the overview check box
@@ -178,10 +190,14 @@ def main():
     # problems to the test webserver on the central build system
     try:
         import splinter  # noqa
+
         pass
     except ImportError:
-        print("TEST SKIPPED: The splinter package is required to run this test." +
-              "Run 'pip3 install splinter' to install", file=sys.stderr)
+        print(
+            "TEST SKIPPED: The splinter package is required to run this test."
+            + "Run 'pip3 install splinter' to install",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     success = True
@@ -207,11 +223,14 @@ def main():
             # wait for one second for the server to start
             time.sleep(2)
             # check the content of the webserver, will need splinter
-            success = success and \
-                check_for_content(revs_to_gen + ["reference"], 7, 7)
+            success = success and check_for_content(
+                revs_to_gen + ["reference"], 7, 7
+            )
 
             # check if the plott creating triggering works
-            success = success and check_for_plotting(revs_to_gen[:-1], str(tmpdir))
+            success = success and check_for_plotting(
+                revs_to_gen[:-1], str(tmpdir)
+            )
         except BaseException:
             # catch any exceptions so the finally block can terminate the
             # webserver process properly

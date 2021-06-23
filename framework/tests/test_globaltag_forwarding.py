@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Test that globaltags are forwarded correclty to the output file even if the
 # database isn't used (BII-5790)

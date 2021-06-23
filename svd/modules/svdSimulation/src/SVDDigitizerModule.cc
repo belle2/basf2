@@ -62,7 +62,7 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
   m_mapping(m_xmlFileName)
 {
   //Set module properties
-  setDescription("Create SVDShaperDigits from SVDSimHits");
+  setDescription("Creates SVDShaperDigits from SVDSimHits");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Define module parameters
@@ -80,8 +80,6 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
   // 2. Physics
   addParam("SegmentLength", m_segmentLength,
            "Maximum segment length (in millimeters)", m_segmentLength);
-  addParam("WidthOfDiffusCloud", m_widthOfDiffusCloud,
-           "Integration range of charge cloud in sigmas", m_widthOfDiffusCloud);
 
   // 3. Noise
   addParam("PoissonSmearing", m_applyPoisson,
@@ -89,18 +87,18 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
   addParam("ZeroSuppressionCut", m_SNAdjacent,
            "Zero suppression cut in sigmas of strip noise", m_SNAdjacent);
   addParam("FADCmode", m_roundZS,
-           "FADC mode: if true, ZS cut is rounded to nearest ADU ", m_roundZS);
+           "FADC mode: if True, ZS cut is rounded to nearest ADU ", m_roundZS);
   addParam("numberOfSamples", m_nSamplesOverZS,
            "Keep digit if numberOfSamples or more samples are over ZS threshold",
            m_nSamplesOverZS);
 
   // 4. Timing
-  addParam("APVShapingTime", m_shapingTime, "APV25 shpaing time in ns",
+  addParam("APVShapingTime", m_shapingTime, "APV25 shaping time in ns",
            m_shapingTime);
   addParam("ADCSamplingTime", m_samplingTime,
-           "Interval between ADC samples in ns, if = -1 taken from HardwareClockSettings payload", m_samplingTime);
+           "Interval between ADC samples in ns, if = -1 taken from HardwareClockSettings payload (default).", m_samplingTime);
   addParam("StartSampling", m_startSampling,
-           "Start of the sampling window, in ns", m_startSampling);
+           "Start of the sampling window, in ns. Used to tune the SVD latency.", m_startSampling);
   addParam("RandomizeEventTimes", m_randomizeEventTimes,
            "Randomize event times over a frame interval", m_randomizeEventTimes);
   addParam("TimeFrameLow", m_minTimeFrame,
@@ -176,7 +174,6 @@ void SVDDigitizerModule::initialize()
   B2DEBUG(29, " -->  DigitTrueRel:       " << m_relShaperDigitTrueHitName);
   B2DEBUG(29, " PHYSICS: ");
   B2DEBUG(29, " -->  SegmentLength:      " << m_segmentLength);
-  B2DEBUG(29, " -->  Charge int. range:  " << m_widthOfDiffusCloud);
   B2DEBUG(29, " NOISE: ");
   B2DEBUG(29, " -->  Add Poisson noise   " << (m_applyPoisson ? "true" : "false"));
   B2DEBUG(29, " -->  Zero suppression cut" << m_SNAdjacent);

@@ -63,7 +63,7 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
   addParam("Deadchannel",
            m_deadchflag,
            "Mask dead channels based on database. True:mask False:unmask",
-           false);
+           true);
 }
 
 void

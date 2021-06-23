@@ -495,21 +495,21 @@ namespace Belle2 {
     }
 
     VARIABLE_GROUP("MCParticle tag variables");
-    REGISTER_VARIABLE("BplusMode", BplusMode, "It will return the decays mode of B+ particles");
-    REGISTER_VARIABLE("BminusMode", BminusMode, "It will return the decays mode of B- particles");
-    REGISTER_VARIABLE("B0Mode", B0Mode, "It will return the decays mode of B0 particles");
-    REGISTER_VARIABLE("Bbar0Mode", Bbar0Mode, "It will return the decays mode of anti-B0 particles");
-    REGISTER_VARIABLE("Bs0Mode", Bs0Mode, "It will return the decays mode of B_s0 particles");
-    REGISTER_VARIABLE("Bsbar0Mode", Bsbar0Mode, "It will return the decays mode of anti-B_s0 particles");
-    REGISTER_VARIABLE("DstplusMode", DstplusMode, "It will return the decays mode of D*+ particles");
-    REGISTER_VARIABLE("DstminusMode", DstminusMode, "It will return the decays mode of D*- particles");
-    REGISTER_VARIABLE("DsplusMode", DsplusMode, "It will return the decays mode of D_s+ particles");
-    REGISTER_VARIABLE("DsminusMode", DsminusMode, "It will return the decays mode of D_s- particles");
-    REGISTER_VARIABLE("DplusMode", DplusMode, "It will return the decays mode of D+ particles");
-    REGISTER_VARIABLE("DminusMode", DminusMode, "It will return the decays mode of D- particles");
-    REGISTER_VARIABLE("D0Mode", D0Mode, "It will return the decays mode of D0 particles");
-    REGISTER_VARIABLE("Dbar0Mode", Dbar0Mode, "It will return the decays mode of anti-D0 particles");
-    REGISTER_VARIABLE("TauplusMode", TauplusMode, "It will return the decays mode of tau+ particles");
-    REGISTER_VARIABLE("TauminusMode", TauminusMode, "It will return the decays mode of tau- particles");
+    REGISTER_VARIABLE("BplusMode", BplusMode, "[Eventbased] It will return the decays mode of B+ particles");
+    REGISTER_VARIABLE("BminusMode", BminusMode, "[Eventbased] It will return the decays mode of B- particles");
+    REGISTER_VARIABLE("B0Mode", B0Mode, "[Eventbased] It will return the decays mode of B0 particles");
+    REGISTER_VARIABLE("Bbar0Mode", Bbar0Mode, "[Eventbased] It will return the decays mode of anti-B0 particles");
+    REGISTER_VARIABLE("Bs0Mode", Bs0Mode, "[Eventbased] It will return the decays mode of B_s0 particles");
+    REGISTER_VARIABLE("Bsbar0Mode", Bsbar0Mode, "[Eventbased] It will return the decays mode of anti-B_s0 particles");
+    REGISTER_VARIABLE("DstplusMode", DstplusMode, "[Eventbased] It will return the decays mode of D*+ particles");
+    REGISTER_VARIABLE("DstminusMode", DstminusMode, "[Eventbased] It will return the decays mode of D*- particles");
+    REGISTER_VARIABLE("DsplusMode", DsplusMode, "[Eventbased] It will return the decays mode of D_s+ particles");
+    REGISTER_VARIABLE("DsminusMode", DsminusMode, "[Eventbased] It will return the decays mode of D_s- particles");
+    REGISTER_VARIABLE("DplusMode", DplusMode, "[Eventbased] It will return the decays mode of D+ particles");
+    REGISTER_VARIABLE("DminusMode", DminusMode, "[Eventbased] It will return the decays mode of D- particles");
+    REGISTER_VARIABLE("D0Mode", D0Mode, "[Eventbased] It will return the decays mode of D0 particles");
+    REGISTER_VARIABLE("Dbar0Mode", Dbar0Mode, "[Eventbased] It will return the decays mode of anti-D0 particles");
+    REGISTER_VARIABLE("TauplusMode", TauplusMode, "[Eventbased] It will return the decays mode of tau+ particles");
+    REGISTER_VARIABLE("TauminusMode", TauminusMode, "[Eventbased] It will return the decays mode of tau- particles");
   }
 }

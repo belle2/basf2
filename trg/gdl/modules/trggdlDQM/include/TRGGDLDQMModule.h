@@ -103,8 +103,8 @@ namespace Belle2 {
     TH1I* h_psn_rise[N_BITS_RESERVED][nskim_gdldqm] = {nullptr};
     TH1I* h_psn_fall[N_BITS_RESERVED][nskim_gdldqm] = {nullptr};
     TH1I* h_psn_extra[nskim_gdldqm] = {nullptr};
-    TH1I* h_psn_overlap[nskim_gdldqm] = {nullptr};
-    TH1I* h_psn_nooverlap[nskim_gdldqm] = {nullptr};
+    TH1I* h_psn_effect_to_l1[nskim_gdldqm] = {nullptr};
+    TH1I* h_psn_raw_rate[nskim_gdldqm] = {nullptr};
     TH1I* h_psn_pure_extra[nskim_gdldqm] = {nullptr};
     //! timtype
     TH1I* h_timtype[nskim_gdldqm] = {nullptr};
@@ -146,7 +146,7 @@ namespace Belle2 {
 
     static const int n_output_extra = 94;
     static const char* output_extra[n_output_extra];
-    static const int n_output_overlap = 10;
+    static const int n_output_overlap = 33;
     static const char* output_overlap[n_output_overlap];
     static const int n_output_pure_extra = 13;
     static const char* output_pure_extra[n_output_pure_extra];

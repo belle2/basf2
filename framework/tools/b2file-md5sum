@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """Tool to calculate a md5 checksum of a root file content excluding the metadata."""
 
@@ -39,4 +38,4 @@ if __name__ == "__main__":
                 checksum.update(key.title)
             checksum.update(key.data)
 
-    print('%s  %s' % (checksum.digest().hex(), args.filename))
+    print(f'{checksum.digest().hex()}  {args.filename}')

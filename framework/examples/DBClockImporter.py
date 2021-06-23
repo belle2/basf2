@@ -1,10 +1,7 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
-"""
-Import clocks payloads
-Note: frequencies must be given in GHz (default unit in basf2)
-"""
+# Import clocks payloads
+# Note: frequencies must be given in GHz (default unit in basf2)
 
 from ROOT import Belle2
 

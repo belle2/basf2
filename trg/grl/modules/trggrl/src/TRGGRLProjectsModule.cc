@@ -242,7 +242,7 @@ void TRGGRLProjectsModule::event()
     if (abs(z0) < 25.) {nTrkZ25++;}
     if (abs(z0) < 35.) {nTrkZ35++;}
   }
-  int nTrkNN = cdc3DTrkArray.getEntries();
+  int nTrkNN = cdcNNTrkArray.getEntries();
   int nTrkNNSTT = 0;
   int nTrkNN20 = 0;
   int nTrkNN40 = 0;
@@ -392,6 +392,7 @@ void TRGGRLProjectsModule::event()
   int Trk_b2b_1to7 = 0;
   int Trk_b2b_1to9 = 0;
   int Trk_open90 = 0;
+  int Trk_open30 = 0;
   for (int itrk = 0; itrk < cdc2DTrkArray.getEntries(); itrk++) {
 
     int phi_i_itrk = (int)((cdc2DTrkArray[itrk]->getPhi0()) * (180 / M_PI) / 10);
@@ -405,6 +406,7 @@ void TRGGRLProjectsModule::event()
       if (abs(phi_i_itrk - phi_i_jtrk) >= 15 && abs(phi_i_itrk - phi_i_jtrk) <= 21) {Trk_b2b_1to7 = 1;}
       if (abs(phi_i_itrk - phi_i_jtrk) >= 14 && abs(phi_i_itrk - phi_i_jtrk) <= 22) {Trk_b2b_1to9 = 1;}
       if (abs(phi_i_itrk - phi_i_jtrk) >= 9 && abs(phi_i_itrk - phi_i_jtrk) <= 27) {Trk_open90 = 1;}
+      if (abs(phi_i_itrk - phi_i_jtrk) >= 3 && abs(phi_i_itrk - phi_i_jtrk) <= 33) {Trk_open30 = 1;}
     }
   }
   trgInfo->setTrk_b2b_1to3(Trk_b2b_1to3);
@@ -412,6 +414,7 @@ void TRGGRLProjectsModule::event()
   trgInfo->setTrk_b2b_1to7(Trk_b2b_1to7);
   trgInfo->setTrk_b2b_1to9(Trk_b2b_1to9);
   trgInfo->setTrk_open90(Trk_open90);
+  trgInfo->setTrk_open30(Trk_open30);
 
   //---------------------------------------------------------------------
   //..cluster b2b
@@ -710,6 +713,8 @@ void TRGGRLProjectsModule::event()
   int s2f3 = trgInfo->gets2f3();
   int s2f5 = trgInfo->gets2f5();
   int s2fo = trgInfo->gets2fo();
+  int s2f30 = trgInfo->gets2f30();
+  int s2s30 = trgInfo->gets2s30();
   int bwdsb  = trgInfo->getbwdsb();
   int bwdnb  = trgInfo->getbwdnb();
   int fwdsb  = trgInfo->getfwdsb();
@@ -756,6 +761,7 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "fwd_s") {bit = N_ST_fwd > 0;}
     else if (bitname == "bwd_s") {bit = N_ST_bwd > 0;}
     else if (bitname == "cdc_open90") {bit = Trk_open90 == 1;}
+    else if (bitname == "f2f30") {bit = Trk_open30 == 1;}
     else if (bitname == "cdc_active") {bit = cdc_active;}
     else if (bitname == "cdc_b2b3") {bit = Trk_b2b_1to3;}
     else if (bitname == "cdc_b2b5") {bit = Trk_b2b_1to5;}
@@ -767,6 +773,8 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "s2f3") {bit = s2f3 > 0;}
     else if (bitname == "s2f5") {bit = s2f5 > 0;}
     else if (bitname == "s2fo") {bit = s2fo > 0;}
+    else if (bitname == "s2f30") {bit = s2f30;}
+    else if (bitname == "s2s30") {bit = s2s30;}
     else if (bitname == "bwdsb") {bit = bwdsb > 0;}
     else if (bitname == "bwdnb") {bit = bwdnb > 0;}
     else if (bitname == "fwdsb") {bit = fwdsb > 0;}
@@ -922,9 +930,6 @@ void TRGGRLProjectsModule::event()
 
     //other trigger bits
     else if (bitname == "itsfb2b") {bit = false;}
-    else if (bitname == "f2f30") {bit = false;}
-    else if (bitname == "s2f30") {bit = false;}
-    else if (bitname == "s2s30") {bit = false;}
 
     //DITTO: please don't change the WARNING message below.
     //If you change it, please update the test trg_tsim_check_warnings.py accordingly.

@@ -10,6 +10,7 @@
 #pragma once
 
 #include <map>
+#include <string>
 
 namespace Belle2 {
   namespace SoftwareTrigger {

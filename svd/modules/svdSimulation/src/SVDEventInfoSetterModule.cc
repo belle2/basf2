@@ -28,7 +28,7 @@ SVDEventInfoSetterModule::SVDEventInfoSetterModule() : Module()
 {
   //Set module properties
   setDescription(
-    "Sets the SVD event information. You must use this "
+    "Sets the SVD event information. Use this "
     "module to fill SVDEventInfo object which tells the digitizer "
     "the conditions for creating ShaperDigits."
   );
@@ -36,16 +36,17 @@ SVDEventInfoSetterModule::SVDEventInfoSetterModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //Parameter definition for SVDModeByte, TriggerType and cross-talk
-  addParam("SVDEventInfo", m_svdEventInfoName, "Defines the name of the EventInfo", string("SVDEventInfoSim"));
+  addParam("SVDEventInfo", m_svdEventInfoName, "SVDEventInfo name", string("SVDEventInfoSim"));
   addParam("runType", m_runType, "Defines the run type: raw/transparent/zero-suppressed/z-s+hit time finding", int(2));
   addParam("eventType", m_eventType, "Defines the event type: TTD event (global run)/standalone event (local run)", int(0));
-  addParam("daqMode", m_daqMode, "Defines the DAQ mode: 1/3/6 samples or 3-mixed-6 samples", int(2));
+  addParam("daqMode", m_daqMode,
+           "Defines the DAQ mode:  = 2 for the default 6-sample mode, = 1 for the 3-sample mode, = 3 for the 3-mixed-6 sample mode. ", int(2));
   addParam("fixedTriggerBin", m_fixedTriggerBin,
            "Trigger bin 0/1/2/3 - useful for timing studies. The default is random if SimClockState is not valid.", int(999));
   addParam("triggerType", m_triggerType, "Defines the trigger type, default: CDC trigger", uint8_t(3));
   addParam("crossTalk", m_xTalk, "Defines the cross-talk flag for the event", bool(false));
   addParam("relativeShift", m_relativeShift, "Relative shift between 3- and 6-sample events, in units of APV clock / 4", int(0));
-  addParam("useDB", m_useDB, "default = False. If true reads teh DAQMode from SVDDetectorConfiguration", bool(false));
+  addParam("useDB", m_useDB, "default = False. If true reads the DAQMode from SVDGlobalConfigParameters", bool(false));
   addParam("TRGSummaryName", m_objTrgSummaryName, "TRGSummary name", m_objTrgSummaryName);
 
   // default ModeByte settings: 10 0 10 000 (144)
@@ -56,18 +57,18 @@ SVDEventInfoSetterModule::~SVDEventInfoSetterModule() = default;
 void SVDEventInfoSetterModule::beginRun()
 {
   if (m_useDB) {
-    if (!m_svdConfig.isValid()) {
-      B2WARNING("No valid SVDDetectorConfiguration for the requested IoV, simulating a 6-sample event");
+    if (!m_svdGlobalConfig.isValid()) {
+      B2WARNING("No valid SVDGlobalConfigParameters for the requested IoV, simulating a 6-sample event");
       m_daqMode = 2; //6-sample event
       m_relativeShift = 0; // not needed later in reconstruction
     } else {
-      m_relativeShift = m_svdConfig.getRelativeTimeShift();
-      int nFrames = m_svdConfig.getNrFrames();
+      m_relativeShift = m_svdGlobalConfig->getRelativeTimeShift();
+      int nFrames = m_svdGlobalConfig->getNrFrames();
       if (nFrames == 3) m_daqMode = 1;
       else if (nFrames == 6) m_daqMode = 2;
       else if (nFrames == 9) m_daqMode = 3;
       else
-        B2ERROR("Invalid number of frames (" << nFrames << ") in SVDDetectorConfiguration");
+        B2ERROR("Invalid number of frames (" << nFrames << ") in SVDGlobalConfigParamters");
     }
   }
 }

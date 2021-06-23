@@ -6,7 +6,6 @@ import basf2
 # from beamparameters import add_beamparameters
 from generators import add_kkmc_generator
 from simulation import add_simulation
-from L1trigger import add_tsim
 
 main = basf2.create_path()
 
@@ -18,7 +17,6 @@ main.add_module('Geometry')
 add_kkmc_generator(main, 'mu-mu+')
 
 add_simulation(main)
-add_tsim(main)
 
 main.add_module("RootOutput")
 main.add_module("Progress")

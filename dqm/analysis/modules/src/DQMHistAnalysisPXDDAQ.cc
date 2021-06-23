@@ -52,11 +52,13 @@ void DQMHistAnalysisPXDDAQModule::initialize()
 
   gROOT->cd(); // this seems to be important, or strange things happen
 
+  m_cDAQError = new TCanvas((m_histogramDirectoryName + "/c_DAQError").data());
   m_cMissingDHC = new TCanvas((m_histogramDirectoryName + "/c_MissingDHC").data());
   m_cMissingDHE = new TCanvas((m_histogramDirectoryName + "/c_MissingDHE").data());
   m_cMissingDHP = new TCanvas((m_histogramDirectoryName + "/c_MissingDHP").data());
   m_cStatistic = new TCanvas((m_histogramDirectoryName + "/c_Statistic").data());
 
+  m_monObj->addCanvas(m_cDAQError);
   m_monObj->addCanvas(m_cMissingDHC);
   m_monObj->addCanvas(m_cMissingDHE);
   m_monObj->addCanvas(m_cMissingDHP);
@@ -107,12 +109,33 @@ void DQMHistAnalysisPXDDAQModule::event()
   if (m_cMissingDHP == nullptr || m_cMissingDHE == nullptr || m_cMissingDHC == nullptr
       || m_cStatistic == nullptr) return; // we could assume this
 
+  m_cDAQError->Clear();
   m_cMissingDHP->Clear();
   m_cMissingDHE->Clear();
   m_cMissingDHC->Clear();
   m_cStatistic->Clear();
 
 
+  {
+    std::string name = "PXDDAQError";
+
+    if (m_hDAQError) { delete m_hDAQError; m_hDAQError = nullptr;}
+
+    TH1* hh1 = findHist(name);
+    if (hh1 == NULL) {
+      hh1 = findHist(m_histogramDirectoryName, name);
+    }
+    m_cDAQError->cd();
+    if (hh1) {
+      m_hDAQError = (TH1F*)hh1->DrawClone("text");
+      m_hDAQError->SetName("hPXDDAQError");
+      m_hDAQError->SetTitle("PXD Fraction of DAQ Errors");
+      if (m_hDAQError->GetBinContent(0)) {
+        m_hDAQError->Scale(1.0 / m_hDAQError->GetBinContent(0));
+      }
+      m_hDAQError->Draw("text,hist");
+    }
+  }
   {
     // DHC histogram
     std::string name = "PXDDAQDHCError";

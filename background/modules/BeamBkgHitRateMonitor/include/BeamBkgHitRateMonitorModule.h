@@ -100,6 +100,8 @@ namespace Belle2 {
     double m_topTimeWindow; /**< TOP: time window in which to count hits [ns] */
     std::string m_svdShaperDigitsName; /**< SVD: name of the SVDShaperDigits collection */
     double m_svdThrCharge; /**< SVD: energy cut on cluster charge */
+    bool m_svdIgnoreHotStripsPayload; /**< SVD: count hot strips as active */
+    bool m_svdIgnoreMaskedStripsPayload; /**< SVD: count FADC-masked strips as active */
     std::map<std::string, std::string> m_additionalDataDescription; /**< additional metadata description */
     int m_cdcTimeWindowLowerEdgeSmallCell;  /**< CDC: lower edge of the time window for small cells [tdc count = ns] */
     int m_cdcTimeWindowUpperEdgeSmallCell;  /**< CDC: upper edge of the time window for small cells [tdc count = ns] */

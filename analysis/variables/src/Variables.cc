@@ -56,7 +56,6 @@ namespace Belle2 {
     {
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getMomentum(part).P();
-
     }
 
     double particleE(const Particle* part)
@@ -68,8 +67,8 @@ namespace Belle2 {
     double particleClusterEUncertainty(const Particle* part)
     {
       const ECLCluster* cluster = part->getECLCluster();
-      const auto EPhiThetaCov = cluster->getCovarianceMatrix3x3();
       if (cluster) {
+        const auto EPhiThetaCov = cluster->getCovarianceMatrix3x3();
         return std::sqrt(EPhiThetaCov[0][0]);
       }
       return std::numeric_limits<double>::quiet_NaN();
@@ -214,7 +213,6 @@ namespace Belle2 {
         return sqrt(errorSquared);
       else
         return std::numeric_limits<double>::quiet_NaN();
-
     }
 
     double momentumDeviationChi2(const Particle* part)
@@ -313,7 +311,6 @@ namespace Belle2 {
       else
         return std::numeric_limits<double>::quiet_NaN();
     }
-
 
     double particleXp(const Particle* part)
     {
@@ -566,8 +563,8 @@ namespace Belle2 {
     {
       // get associated ECLCluster
       const ECLCluster* cluster = part->getECLCluster();
-      const ECLCluster::EHypothesisBit clusterHypothesis = part->getECLClusterEHypothesisBit();
       if (!cluster) return std::numeric_limits<float>::quiet_NaN();
+      const ECLCluster::EHypothesisBit clusterHypothesis = part->getECLClusterEHypothesisBit();
 
       // get 4 momentum from cluster
       ClusterUtils clutls;
@@ -585,8 +582,8 @@ namespace Belle2 {
     {
       // get associated ECLCluster
       const ECLCluster* cluster = part->getECLCluster();
-      const ECLCluster::EHypothesisBit clusterHypothesis = part->getECLClusterEHypothesisBit();
       if (!cluster) return std::numeric_limits<float>::quiet_NaN();
+      const ECLCluster::EHypothesisBit clusterHypothesis = part->getECLClusterEHypothesisBit();
 
       // get 4 momentum from cluster
       ClusterUtils clutls;
@@ -745,7 +742,6 @@ namespace Belle2 {
       return frame.getMomentum(pIN - particle->get4Vector()).Pz();
     }
 
-
     double recoilMomentum(const Particle* particle)
     {
       PCmsLabTransform T;
@@ -822,6 +818,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
       double beamEnergy = T.getCMSEnergy() / 2.;
+      if (part->getNDaughters() != 2) return std::numeric_limits<double>::quiet_NaN();
       TLorentzVector tagVec = T.rotateLabToCms()
                               * part->getDaughter(0)->get4Vector();
       TLorentzVector sigVec = T.rotateLabToCms()
@@ -940,7 +937,6 @@ namespace Belle2 {
       }
       return result;
     }
-
 
     double False(const Particle*)
     {
@@ -1069,7 +1065,7 @@ Note that this is context-dependent variable and can take different values depen
     REGISTER_VARIABLE("pRecoilTheta", recoilMomentumTheta,
                       "Polar angle of a particle's missing momentum");
     REGISTER_VARIABLE("pRecoilPhi", recoilMomentumPhi,
-                      "Azimutal angle of a particle's missing momentum");
+                      "Azimuthal angle of a particle's missing momentum");
     REGISTER_VARIABLE("eRecoil", recoilEnergy,
                       "energy recoiling against given Particle");
     REGISTER_VARIABLE("mRecoil", recoilMass,

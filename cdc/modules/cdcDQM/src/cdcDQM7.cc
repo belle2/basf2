@@ -72,28 +72,28 @@ void cdcDQM7Module::defineHisto()
   dirDAQ->cd();
 
   int bmin = 0;
-  int bmax = 0;
+  int bmax;
   int ndiv[9] = {160, 160, 192, 224, 256, 288, 320, 352, 384};
 
   for (int b = 0; b < 56; b++) {
 
     if (b < 8) {
       bmax = ndiv[0];
-    } else if (b >= 8 && b < 14) {
+    } else if (b < 14) {
       bmax = ndiv[1];
-    } else if (b >= 14 && b < 20) {
+    } else if (b < 20) {
       bmax = ndiv[2];
-    } else if (b >= 20 && b < 26) {
+    } else if (b < 26) {
       bmax = ndiv[3];
-    } else if (b >= 26 && b < 32) {
+    } else if (b < 32) {
       bmax = ndiv[4];
-    } else if (b >= 32 && b < 38) {
+    } else if (b < 38) {
       bmax = ndiv[5];
-    } else if (b >= 38 && b < 44) {
+    } else if (b < 44) {
       bmax = ndiv[6];
-    } else if (b >= 44 && b < 50) {
+    } else if (b < 50) {
       bmax = ndiv[7];
-    } else if (b >= 50 && b < 56) {
+    } else {
       bmax = ndiv[8];
     }
 
@@ -276,21 +276,21 @@ void cdcDQM7Module::event()
     int n_wire = 0;
     if (b < 8) {
       n_wire = ndiv[0];
-    } else if (b >= 8 && b < 14) {
+    } else if (b < 14) {
       n_wire = ndiv[1];
-    } else if (b >= 14 && b < 20) {
+    } else if (b < 20) {
       n_wire = ndiv[2];
-    } else if (b >= 20 && b < 26) {
+    } else if (b < 26) {
       n_wire = ndiv[3];
-    } else if (b >= 26 && b < 32) {
+    } else if (b < 32) {
       n_wire = ndiv[4];
-    } else if (b >= 32 && b < 38) {
+    } else if (b < 38) {
       n_wire = ndiv[5];
-    } else if (b >= 38 && b < 44) {
+    } else if (b < 44) {
       n_wire = ndiv[6];
-    } else if (b >= 44 && b < 50) {
+    } else if (b < 50) {
       n_wire = ndiv[7];
-    } else if (b >= 50 && b < 56) {
+    } else {
       n_wire = ndiv[8];
     }
 
@@ -329,28 +329,28 @@ void cdcDQM7Module::event()
     if (brd < 28) {
       h_tdc_sL[0]->Fill(v_tdc);
       h_adc_sL[0]->Fill(v_adc);
-    } else if (brd > 27 && brd < 48) {
+    } else if (brd < 48) {
       h_tdc_sL[1]->Fill(v_tdc);
       h_adc_sL[1]->Fill(v_adc);
-    } else if (brd > 47 && brd < 72) {
+    } else if (brd < 72) {
       h_tdc_sL[2]->Fill(v_tdc);
       h_adc_sL[2]->Fill(v_adc);
-    } else if (brd > 71 && brd < 100) {
+    } else if (brd < 100) {
       h_tdc_sL[3]->Fill(v_tdc);
       h_adc_sL[3]->Fill(v_adc);
-    } else if (brd > 99 && brd < 132) {
+    } else if (brd < 132) {
       h_tdc_sL[4]->Fill(v_tdc);
       h_adc_sL[4]->Fill(v_adc);
-    } else if (brd > 131 && brd < 168) {
+    } else if (brd < 168) {
       h_tdc_sL[5]->Fill(v_tdc);
       h_adc_sL[5]->Fill(v_adc);
-    } else if (brd > 167 && brd < 208) {
+    } else if (brd < 208) {
       h_tdc_sL[6]->Fill(v_tdc);
       h_adc_sL[6]->Fill(v_adc);
-    } else if (brd > 207 && brd < 252) {
+    } else if (brd < 252) {
       h_tdc_sL[7]->Fill(v_tdc);
       h_adc_sL[7]->Fill(v_adc);
-    } else if (brd > 251) {
+    } else {
       h_tdc_sL[8]->Fill(v_tdc);
       h_adc_sL[8]->Fill(v_adc);
     }

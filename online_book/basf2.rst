@@ -14,6 +14,7 @@ Belle II software to perform analysis tasks.
    basf2/various_additions
    basf2/flavor_tagging
    basf2/vertex_fitting
+   basf2/event_display
    basf2/generating_mc
    basf2/fei
    basf2/cs

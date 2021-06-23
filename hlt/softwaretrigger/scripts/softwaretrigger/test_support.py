@@ -10,7 +10,6 @@ import basf2
 import generators
 from simulation import add_simulation
 from rawdata import add_packers
-from L1trigger import add_tsim
 from softwaretrigger import constants
 from softwaretrigger.constants import DEFAULT_EXPRESSRECO_COMPONENTS, RAWDATA_OBJECTS, DEFAULT_HLT_COMPONENTS
 from ROOT import Belle2
@@ -61,7 +60,6 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
         path.add_module("ParticleGun", pdgCodes=[-13, 13], momentumParams=[10, 200])
 
     add_simulation(path, usePXDDataReduction=(location == constants.Location.expressreco))
-    add_tsim(path)
 
     if location == constants.Location.hlt:
         components = DEFAULT_HLT_COMPONENTS
@@ -152,11 +150,11 @@ def test_script(script_location, input_file_name, temp_dir):
     os.chdir(os.path.dirname(script_location))
     cmd = [sys.executable, script_location,
            "--central-db-tag"] + globaltags + [
-           "--input-file", os.path.abspath(input_file_name),
-           "--histo-output-file", os.path.abspath(histos_file_name),
-           "--output-file", os.path.abspath(output_file_name),
-           "--number-processes", str(num_processes),
-           input_buffer, output_buffer, str(histo_port)]
+        "--input-file", os.path.abspath(input_file_name),
+        "--histo-output-file", os.path.abspath(histos_file_name),
+        "--output-file", os.path.abspath(output_file_name),
+        "--number-processes", str(num_processes),
+        input_buffer, output_buffer, str(histo_port)]
 
     subprocess.check_call(cmd)
 

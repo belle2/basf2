@@ -1,0 +1,28 @@
+# EventType: 1220011100
+# Descriptor: [B -> K K_S0 gamma]cc
+# NickName: B_KKS0gamma
+# Documentation: Rare b->d gamma process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Saurabh Sandilya
+# Email: saurabhsandilya@gmail.com
+# Cuts: None
+# Date: 20210421
+#
+#
+
+Alias Bsig B+
+Alias anti-Bsig B-
+ChargeConj Bsig anti-Bsig
+
+Decay Upsilon(4S)
+0.5 Bsig B- VSS;
+0.5 anti-Bsig B+ VSS;
+Enddecay
+
+Decay Bsig
+1.0 K+ K_S0 gamma		PHSP;
+Enddecay
+CDecay anti-Bsig
+
+End

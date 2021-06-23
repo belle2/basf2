@@ -21,20 +21,22 @@ set_random_seed(12345)
 main = create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', evtNumList=[10000], runList=[1], expList=[1003])
+main.add_module(
+    "EventInfoSetter", evtNumList=[10000], runList=[1], expList=[1003]
+)
 
 # Generate cosmic events.
 # Set initial radius to 350 cm to include KLM (excluded by default).
-main.add_module('Cosmics', cylindricalR=350)
+main.add_module("Cosmics", cylindricalR=350)
 
 # detector simulation
 add_simulation(main)
 
 # memory profile
-main.add_module('Profile')
+main.add_module("Profile")
 
 # output
-main.add_module('RootOutput', outputFileName='../CosmicsSimNoBkg.root')
+main.add_module("RootOutput", outputFileName="../CosmicsSimNoBkg.root")
 
 process(main)
 
@@ -42,14 +44,15 @@ process(main)
 print(statistics)
 
 statistics_plots(
-    'CosmicsSimNoBkg_statistics.root',
-    contact='Software team b2soft@mail.desy.de',
-    job_desc='a standard simulation job with Cosmics events',
-    prefix='CosmicsSimNoBkg'
+    "CosmicsSimNoBkg_statistics.root",
+    contact="Software team b2soft@mail.desy.de",
+    job_desc="a standard simulation job with Cosmics events",
+    prefix="CosmicsSimNoBkg",
 )
 event_timing_plot(
-    '../CosmicsSimNoBkg.root', 'CosmicsSimNoBkg_statistics.root',
-    contact='Software team b2soft@mail.desy.de',
-    job_desc='a standard simulation job with Cosmics events',
-    prefix='CosmicsSimNoBkg'
+    "../CosmicsSimNoBkg.root",
+    "CosmicsSimNoBkg_statistics.root",
+    contact="Software team b2soft@mail.desy.de",
+    job_desc="a standard simulation job with Cosmics events",
+    prefix="CosmicsSimNoBkg",
 )

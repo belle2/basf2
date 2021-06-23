@@ -32,7 +32,8 @@ def add_generator_preselection(
         MinPhotonEnergy=-1,
         MinPhotonTheta=0.0,
         MaxPhotonTheta=180.0,
-        applyInCMS=False):
+        applyInCMS=False,
+        stableParticles=False):
     """
         Adds generator preselection.
         Should be added to the path after the generator.add_abc_generator but before simulation.add_simulation modules
@@ -57,6 +58,7 @@ def add_generator_preselection(
             MinPhotonTheta (float): minimum polar angle of photon [deg]
             MaxPhotonTheta (float): maximum polar angle of photon [deg]
             applyInCMS (bool): if true apply the P,Pt,theta, and energy cuts in the center of mass frame
+            stableParticles (bool): if true apply the selection criteria for stable particles in the generator
     """
 
     generatorpreselection = path.add_module('GeneratorPreselection',
@@ -70,7 +72,8 @@ def add_generator_preselection(
                                             nPhotonMax=nPhotonMax,
                                             MinPhotonEnergy=MinPhotonEnergy,
                                             MinPhotonTheta=MinPhotonTheta,
-                                            MaxPhotonTheta=MaxPhotonTheta
+                                            MaxPhotonTheta=MaxPhotonTheta,
+                                            stableParticles=stableParticles
                                             )
 
     # empty path for unwanted events

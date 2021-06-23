@@ -13,15 +13,17 @@
 # The techniques are described in more detail in http://ekp-invenio.physik.uni-karlsruhe.de/record/48934
 #
 # Usage:
-#   basf2 B2A702-ContinuumSuppression_MVATrain.py
+#   basf2 B2A712-DeepContinuumSuppression_MVATrain.py
 #
 # Contributors: D. Weyland (November 2017), P. Goldenzweig (October 2016)
 #
 ################################################################################
 
+import basf2 as b2
 import basf2_mva
 import subprocess
 import json
+import os
 
 
 def choose_input_features(use_vertex_features=True, use_charge_and_ROE_features=False, use_continuum_features=1):
@@ -55,15 +57,15 @@ def choose_input_features(use_vertex_features=True, use_charge_and_ROE_features=
         'KSFWVariables(hoo2)',
         'KSFWVariables(hoo3)',
         'KSFWVariables(hoo4)',
-        'CleoCone(1)',
-        'CleoCone(2)',
-        'CleoCone(3)',
-        'CleoCone(4)',
-        'CleoCone(5)',
-        'CleoCone(6)',
-        'CleoCone(7)',
-        'CleoCone(8)',
-        'CleoCone(9)']
+        'CleoConeCS(1)',
+        'CleoConeCS(2)',
+        'CleoConeCS(3)',
+        'CleoConeCS(4)',
+        'CleoConeCS(5)',
+        'CleoConeCS(6)',
+        'CleoConeCS(7)',
+        'CleoConeCS(8)',
+        'CleoConeCS(9)']
 
     if use_continuum_features == 2:
         return contVar
@@ -91,12 +93,12 @@ def choose_input_features(use_vertex_features=True, use_charge_and_ROE_features=
     for plist in track_lists:
         for rank in range(5):
             for var in track_specific_variables:
-                variables.append('{}_{}{}'.format(var, plist, rank))
+                variables.append(f'{var}_{plist}{rank}')
 
     for plist in cluster_lists:
         for rank in range(10):
             for var in cluster_specific_variables:
-                variables.append('{}_{}{}'.format(var, plist, rank))
+                variables.append(f'{var}_{plist}{rank}')
 
     if use_continuum_features:
         variables += contVar
@@ -106,11 +108,13 @@ def choose_input_features(use_vertex_features=True, use_charge_and_ROE_features=
 
 if __name__ == "__main__":
 
-    # In this path there are already several trained weightfiles. Look at README for a short explanation
-    path = '/group/belle2/tutorial/release_01-00-00/inputForDCSTutorial/'
+    if not os.getenv('BELLE2_EXAMPLES_DATA_DIR'):
+        b2.B2FATAL("You need the example data installed. Run `b2install-data example` in terminal for it.")
 
-    train_data = path + 'train.root'
-    test_data = path + 'test.root'
+    path = os.getenv('BELLE2_EXAMPLES_DATA_DIR')+'/mva/'
+
+    train_data = path + 'DNN_train.root'
+    test_data = path + 'DNN_test.root'
 
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector(train_data)
@@ -122,7 +126,7 @@ if __name__ == "__main__":
 
     specific_options = basf2_mva.PythonOptions()
     specific_options.m_framework = "contrib_keras"
-    specific_options.m_steering_file = 'analysis/examples/tutorials/B2A714-DeepContinuumSuppression_MVAModel.py'
+    specific_options.m_steering_file = 'analysis/examples/mva/B2A714-DeepContinuumSuppression_MVAModel.py'
     specific_options.m_training_fraction = 0.9
 
     # These options are custom made in B2A714. You can also add your own parameters.
@@ -138,7 +142,7 @@ if __name__ == "__main__":
         'adversary_steps': 5}
     specific_options.m_config = json.dumps(keras_dic)
 
-    # Train a MVA method and store the weightfile (MVAFastBDT.root) locally.
+    # Train a MVA method and store the weightfile (Deep_Feed_Forward.xml) locally.
     basf2_mva.teacher(general_options, specific_options)
 
     # Evaluate training.

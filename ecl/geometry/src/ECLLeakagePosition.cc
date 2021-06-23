@@ -91,10 +91,11 @@ std::vector<int> ECLLeakagePosition::getLeakagePosition(const int cellIDFromEner
     iStatus = 0;
   }
 
-  //..Not the correct crystal
+  //..Theta and phi are not located in the maximum energy crystal. Check the
+  //  eight nearest neighbours.
   if (iStatus == -1) {
 
-    //..Check the nearest 8 neighbours.
+    //..Nearest neighbours (plus the central crystal)
     for (const auto& tempCellID : neighbours->getNeighbours(cellIDFromEnergy)) {
       int tempCrysID = tempCellID - 1;
       dTheta = theta - thetaEdge[tempCrysID];
@@ -128,7 +129,7 @@ std::vector<int> ECLLeakagePosition::getLeakagePosition(const int cellIDFromEner
     }
   }
 
-  //..Huh?
+  //..Above should cover all cases, but set sensible values if we missed something
   if (iStatus == -1) {
     iStatus = 3;
     crysID = cellIDFromEnergy - 1;

@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <vxd/dataobjects/VxdID.h>
 #include <pxd/calibration/PXDHotPixelMaskCalibrationAlgorithm.h>
 #include <pxd/dbobjects/PXDMaskedPixelPar.h>
 #include <pxd/dbobjects/PXDDeadPixelPar.h>
@@ -17,7 +16,6 @@
 #include <boost/format.hpp>
 #include <string>
 #include <vector>
-#include <map>
 #include "TH1I.h"
 #include "TMath.h"
 
@@ -36,6 +34,60 @@ PXDHotPixelMaskCalibrationAlgorithm::PXDHotPixelMaskCalibrationAlgorithm(): Cali
     "  Algorithm which masks hot pixels with too large occupancy and dead pixels w/o no hits. \n"
     " ----------------------------------------------------------------------------------------\n"
   );
+}
+
+void PXDHotPixelMaskCalibrationAlgorithm::createDebugHistogram()
+{
+  // Run list of current IoV and all runs to be calibrated
+  auto expRuns = getRunList();
+  auto expRunsAll = getRunListFromAllData();
+
+  // Save the current directory to change back later
+  TDirectory* currentDir = gDirectory;
+
+  // Create TFile if not exist
+  if (!m_file) {
+    std::string fileName = (this->getPrefix()) + "debug.root";
+    B2INFO("Creating file " << fileName);
+    m_file = std::make_shared<TFile>(fileName.c_str(), "RECREATE");
+  }
+
+  //m_file->cd();
+  string iov_str = str(format("E%1%_R%2%_E%3%_R%4%") % expRuns.front().first
+                       % expRuns.front().second % expRuns.back().first % expRuns.back().second);
+  m_file->mkdir(iov_str.c_str());
+  m_file->cd(iov_str.c_str());
+
+  // Collector info
+  auto collector_pxdhits = getObjectPtr<TH1I>("PXDHits");
+  auto collector_pxdhitcounts = getObjectPtr<TH1I>("PXDHitCounts");
+
+  auto nevents = collector_pxdhits->GetEntries();
+
+  for (auto sensBin = 1; sensBin <= collector_pxdhitcounts->GetXaxis()->GetNbins(); sensBin++) {
+    string sensorDescr =  collector_pxdhitcounts->GetXaxis()->GetBinLabel(sensBin);
+    VxdID id(sensorDescr);
+
+    // Get hitmap from collector
+    string name = str(format("PXD_%1%_PixelHitmap") % id.getID());
+    auto collector_pxdhitmap =  getObjectPtr<TH1I>(name.c_str());
+    if (collector_pxdhitmap == nullptr) {
+      continue;
+    }
+    TH1I* debugHisto = new TH1I(*collector_pxdhitmap);
+    // Set overflow to total number of events
+    debugHisto->SetBinContent(debugHisto->GetNbinsX() + 1, nevents);
+    debugHisto->Write();
+    delete debugHisto;
+  }
+
+  // Close TFile
+  if (expRuns.back() == expRunsAll.back()) {
+    B2INFO("Reached Final ExpRun: (" << expRuns.back().first << ", " << expRuns.back().second << ")");
+    m_file->Close();
+
+  }
+  currentDir->cd();
 }
 
 CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
@@ -87,13 +139,12 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
   B2RESULT("Found total of " << nPXDHits  << " raw hits in collected data.");
 
   // Check that the median number of hits is large enough
-  map<VxdID, double> medianOfHitsMap;
   for (auto sensBin = 1; sensBin <= collector_pxdhitcounts->GetXaxis()->GetNbins(); sensBin++) {
     // The bin label is assumed to be a string representation of VxdID
     string sensorDescr =  collector_pxdhitcounts->GetXaxis()->GetBinLabel(sensBin);
     VxdID id(sensorDescr);
 
-    medianOfHitsMap[id] = 0.0;
+    m_medianOfHitsMap[id] = 0.0;
 
     // Get hitmap from collector
     string name = str(format("PXD_%1%_PixelHitmap") % id.getID());
@@ -120,7 +171,7 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     }
 
     // Keep the median of later use
-    medianOfHitsMap[id] = medianNumberOfHits;
+    m_medianOfHitsMap[id] = medianNumberOfHits;
 
     // Check median number of hits is large enough
     if (medianNumberOfHits < minHits) {
@@ -167,7 +218,7 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
       continue;
     }
 
-    double medianNumberOfHits = medianOfHitsMap[id];
+    double medianNumberOfHits = m_medianOfHitsMap[id];
     int nBins = collector_pxdhitmap->GetXaxis()->GetNbins();
 
     // Dead pixel masking
@@ -348,6 +399,9 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
   saveCalibration(maskedPixelsPar, "PXDMaskedPixelPar");
   saveCalibration(deadPixelsPar, "PXDDeadPixelPar");
   saveCalibration(occupancyInfoPar, "PXDOccupancyInfoPar");
+
+  // Create debugging histo if we asked for it
+  if (m_debugHisto) createDebugHistogram();
 
   B2INFO("PXDHotPixelMask Calibration Successful");
   return c_OK;

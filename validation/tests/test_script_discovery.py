@@ -20,55 +20,51 @@ def main():
 
         # create a couple of fake validation scripts
         create_fake_scripts(
-            os.path.join(tmpdir, "pkg1", "validation"),
-            "pkg1_a.py"
+            os.path.join(tmpdir, "pkg1", "validation"), "pkg1_a.py"
         )
         create_fake_scripts(
-            os.path.join(tmpdir, "pkg1", "validation"),
-            "pkg1_b.py"
+            os.path.join(tmpdir, "pkg1", "validation"), "pkg1_b.py"
         )
         create_fake_scripts(
-            os.path.join(tmpdir, "pkg1", "validation"),
-            "pkg1_c.py"
+            os.path.join(tmpdir, "pkg1", "validation"), "pkg1_c.py"
         )
 
         create_fake_scripts(
-            os.path.join(tmpdir, "pkg2", "validation"),
-            "pkg2_b.py"
+            os.path.join(tmpdir, "pkg2", "validation"), "pkg2_b.py"
         )
         create_fake_scripts(
-            os.path.join(tmpdir, "pkg2", "validation"),
-            "pkg2_c.py"
+            os.path.join(tmpdir, "pkg2", "validation"), "pkg2_c.py"
         )
 
         # this should not be found !
         create_fake_scripts(
             os.path.join(tmpdir, "some_other_folder", "pkgother", "validation"),
-            "pkgother_b.py"
+            "pkgother_b.py",
         )
 
         # fake the basepath
         basepath = {"local": str(tmpdir)}
 
         folders = validationfunctions.get_validation_folders(
-            location="local",
-            basepaths=basepath,
-            log=Mock()
+            location="local", basepaths=basepath, log=Mock()
         )
 
-        if "pkg1" not in folders \
-                or "pkg2" not in folders \
-                or "some_other_folder" in folders:
+        if (
+            "pkg1" not in folders
+            or "pkg2" not in folders
+            or "some_other_folder" in folders
+        ):
             print("scripts were discovered in the wrong folders")
             sys.exit(1)
 
         scripts = validationfunctions.scripts_in_dir(
-            folders["pkg1"],
-            Mock(),
-            ".py"
+            folders["pkg1"], Mock(), ".py"
         )
 
-        if len([s for s in scripts if s.endswith("pkg1/validation/pkg1_a.py")]) == 0:
+        if (
+            len([s for s in scripts if s.endswith("pkg1/validation/pkg1_a.py")])
+            == 0
+        ):
             print("script file was not discovered")
             sys.exit(1)
 
@@ -80,45 +76,40 @@ def main():
 
         # create a couple of fake validation scripts
         create_fake_scripts(
-            os.path.join(tmpdir, "pkg1", "validation"),
-            "pkg1_a.py"
+            os.path.join(tmpdir, "pkg1", "validation"), "pkg1_a.py"
         )
         create_fake_scripts(
-            os.path.join(tmpdir, "pkg1", "validation"),
-            "pkg1_b.py"
+            os.path.join(tmpdir, "pkg1", "validation"), "pkg1_b.py"
         )
         create_fake_scripts(
-            os.path.join(tmpdir, "pkg1", "validation"),
-            "pkg1_c.py"
+            os.path.join(tmpdir, "pkg1", "validation"), "pkg1_c.py"
         )
 
         create_fake_scripts(
-            os.path.join(tmpdir, "pkg2", "validation"),
-            "pkg2_b.py"
+            os.path.join(tmpdir, "pkg2", "validation"), "pkg2_b.py"
         )
         create_fake_scripts(
-            os.path.join(tmpdir, "pkg2", "validation"),
-            "pkg2_c.py"
+            os.path.join(tmpdir, "pkg2", "validation"), "pkg2_c.py"
         )
 
         # this should not be found !
         create_fake_scripts(
             os.path.join(tmpdir, "some_other_folder", "pkgother", "validation"),
-            "pkgother_b.py"
+            "pkgother_b.py",
         )
 
         # fake the basepath
         basepath = {"local": str(tmpdir), "central": str(tmpdir)}
 
         folders = validationfunctions.get_validation_folders(
-            location="central",
-            basepaths=basepath,
-            log=Mock()
+            location="central", basepaths=basepath, log=Mock()
         )
 
-        if "pkg1" not in folders \
-                or "pkg2" not in folders \
-                or "some_other_folder" in folders:
+        if (
+            "pkg1" not in folders
+            or "pkg2" not in folders
+            or "some_other_folder" in folders
+        ):
             print("scripts were discovered in the wrong folders")
             sys.exit(1)
 

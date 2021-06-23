@@ -244,17 +244,6 @@ namespace Belle2 {
       std::string m_xmlMapFileName;
 
       /**
-       * Relation name between CDCRawHit and CDCHit.
-       */
-      std::string m_relCDCRawHitToCDCHitName;
-
-      /**
-       * Relation name between CDCRawHitWaveForm and CDCHit.
-       */
-
-      std::string m_relCDCRawHitWFToCDCHitName;
-
-      /**
        * Short ward buffer of CDC event block.
        */
       std::vector<unsigned short> m_buffer;
@@ -344,9 +333,14 @@ namespace Belle2 {
       StoreArray<CDCHit> m_CDCHits;
 
       /**
-       * Event number.
+       * True if data length error has been already reported.
        */
-      int m_eventNum;
+      bool m_dataLengthError;
+
+      /**
+       * True if data size error between CDCFE and COPPER has been already reported.
+       */
+      bool m_dataSizeError;
 
     };//end class declaration
 

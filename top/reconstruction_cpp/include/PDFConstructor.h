@@ -109,10 +109,38 @@ namespace Belle2 {
       bool isValid() const {return m_valid;}
 
       /**
+       * Switch off delta-ray PDF to speed-up log likelihood calculation
+       */
+      void switchOffDeltaRayPDF() const {m_deltaPDFOn = false;}
+
+      /**
+       * Switch on delta-ray PDF (back to default)
+       */
+      void switchOnDeltaRayPDF() const {m_deltaPDFOn = true;}
+
+      /**
+       * Returns slot ID
+       * @return slot ID
+       */
+      int getModuleID() const {return m_moduleID;}
+
+      /**
        * Returns particle hypothesis
        * @return particle hypothesis
        */
       const Const::ChargedStable& getHypothesis() const {return m_hypothesis;}
+
+      /**
+       * Returns selected photon hits belonging to this slot
+       * @return selected photon hits
+       */
+      const std::vector<TOPTrack::SelectedHit>& getSelectedHits() const {return m_selectedHits;}
+
+      /**
+       * Returns estimated background hit rate
+       * @return background hit rate per module
+       */
+      double getBkgRate() const {return m_bkgRate;}
 
       /**
        * Returns cosine of total reflection angle
@@ -494,8 +522,8 @@ namespace Belle2 {
       void appendPulls(const TOPTrack::SelectedHit& hit) const;
 
       int m_moduleID = 0; /**< slot ID */
-      const TOPTrack& m_track;   /**< track at TOP */
-      const Const::ChargedStable& m_hypothesis; /**< particle hypothesis */
+      const TOPTrack& m_track;   /**< temporary reference to track at TOP */
+      const Const::ChargedStable m_hypothesis; /**< particle hypothesis */
       const InverseRaytracer* m_inverseRaytracer = 0; /**< inverse ray-tracer */
       const FastRaytracer* m_fastRaytracer = 0; /**< fast ray-tracer */
       const YScanner* m_yScanner = 0; /**< PDF expander in y */
@@ -512,6 +540,8 @@ namespace Belle2 {
       double m_cosTotal = 0; /**< cosine of total reflection angle */
       double m_minTime = 0; /**< time window lower edge */
       double m_maxTime = 0; /**< time window upper edge */
+      std::vector<TOPTrack::SelectedHit> m_selectedHits; /**< selected photon hits */
+      double m_bkgRate = 0; /**< estimated background hit rate */
 
       std::vector<SignalPDF> m_signalPDFs; /**< parameterized signal PDF in pixels (index = pixelID - 1) */
       double m_signalPhotons = 0; /**< expected number of signal photons */
@@ -525,6 +555,7 @@ namespace Belle2 {
       mutable std::map <SignalPDF::EPeakType, int> m_ncallsExpandPDF; /**< number of calls to expandSignalPDF */
       mutable std::vector<LogL> m_pixelLLs; /**< pixel log likelihoods (index = pixelID - 1) */
       mutable std::vector<Pull> m_pulls; /**< photon pulls w.r.t PDF peaks */
+      mutable bool m_deltaPDFOn = true; /**< include/exclude delta-ray PDF in likelihood calculation */
 
     };
 
@@ -536,7 +567,7 @@ namespace Belle2 {
       if (k < m_signalPDFs.size() and m_valid) {
         double f = 0;
         f += m_signalPhotons * m_signalPDFs[k].getPDFValue(time, timeErr, sigt);
-        f += m_deltaPhotons * m_deltaRayPDF.getPDFValue(pixelID, time);
+        if (m_deltaPDFOn) f += m_deltaPhotons * m_deltaRayPDF.getPDFValue(pixelID, time);
         f += m_bkgPhotons * m_backgroundPDF->getPDFValue(pixelID);
         return f;
       }

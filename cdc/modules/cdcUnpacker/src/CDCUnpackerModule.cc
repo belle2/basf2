@@ -14,7 +14,6 @@
 #include <cdc/dbobjects/CDCChannelMap.h>
 
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 // framework - Database
@@ -67,7 +66,8 @@ CDCUnpackerModule::~CDCUnpackerModule()
 
 void CDCUnpackerModule::initialize()
 {
-  m_eventNum = 0;
+  m_dataLengthError = false;
+  m_dataSizeError = false;
   m_channelMapFromDB = new DBArray<CDCChannelMap>;
   if ((*m_channelMapFromDB).isValid()) {
     //    B2INFO("Channel map is  valid");
@@ -84,21 +84,8 @@ void CDCUnpackerModule::initialize()
   m_CDCRawHits.registerInDataStore(m_cdcRawHitName);
   m_CDCHits.registerInDataStore(m_cdcHitName);
 
-  // Relation.
-  m_CDCHits.registerRelationTo(m_CDCRawHitWaveForms);
-  m_CDCHits.registerRelationTo(m_CDCRawHits);
-
-  // Set default names for the relations.
-  m_relCDCRawHitToCDCHitName = DataStore::relationName(
-                                 DataStore::arrayName<CDCRawHit>(m_cdcRawHitName),
-                                 DataStore::arrayName<CDCHit>(m_cdcHitName));
-
-  m_relCDCRawHitWFToCDCHitName = DataStore::relationName(
-                                   DataStore::arrayName<CDCRawHitWaveForm>(m_cdcRawHitWaveFormName),
-                                   DataStore::arrayName<CDCHit>(m_cdcHitName));
-
   if (m_enablePrintOut == true) {
-    B2INFO("CDCUnpacker: FADC threshold: " << m_fadcThreshold);
+    B2INFO("CDCUnpacker: " << LogVar("FADC threshold", m_fadcThreshold));
   }
 }
 
@@ -125,9 +112,6 @@ void CDCUnpackerModule::event()
   // Create Data objects.
   m_CDCHits.clear();
 
-  RelationArray rawCDCsToCDCHits(m_CDCRawHits, m_CDCHits, m_relCDCRawHitToCDCHitName); // CDCRawHit <-> CDCHit
-  RelationArray rawCDCWFsToCDCHits(m_CDCRawHitWaveForms, m_CDCHits, m_relCDCRawHitWFToCDCHitName); // CDCRawHitWaveForm <-> CDCHit
-
   if (m_enableStoreCDCRawHit == true) {
     m_CDCRawHits.clear();
     m_CDCRawHitWaveForms.clear();
@@ -145,7 +129,7 @@ void CDCUnpackerModule::event()
     const int iNode = (subDetectorId & 0xFFFFFF);
     const int nEntriesRawCDC = m_rawCDCs[i]->GetNumEntries();
 
-    B2DEBUG(99, "nEntries of rawCDC[i] : " << nEntriesRawCDC);
+    B2DEBUG(99, LogVar("nEntries of rawCDC[i]", nEntriesRawCDC));
     for (int j = 0; j < nEntriesRawCDC; ++j) {
       int trigType = m_rawCDCs[i]->GetTRGType(j); // Get event type of L1 trigger.
       int nWords[4];
@@ -169,7 +153,7 @@ void CDCUnpackerModule::event()
       for (int iFiness = 0; iFiness < 4; ++iFiness) {
         int* ibuf = data32tab[iFiness];
         const int nWord = nWords[iFiness];
-        B2DEBUG(99, "nWords (from COPPER header) : " << nWord);
+        B2DEBUG(99, LogVar("nWords (from COPPER header)", nWord));
 
         if (m_enablePrintOut == true) {
           B2INFO("CDCUnpacker : Print out CDC data block.");
@@ -185,8 +169,10 @@ void CDCUnpackerModule::event()
         }
 
         if (m_enablePrintOut == true) {
-          B2INFO("CDCUnpacker : RawDataBlock(CDC) : Block #  " << i);
-          B2INFO("CDCUnpacker : Node ID " << iNode << ", Finness ID " << iFiness);
+          B2INFO("CDCUnpacker : RawDataBlock(CDC) : Block #  "
+                 << LogVar("Block", i)
+                 << LogVar("Node", iNode)
+                 << LogVar("Finness", iFiness));
         }
 
         setCDCPacketHeader(ibuf);
@@ -197,14 +183,20 @@ void CDCUnpackerModule::event()
 
 
         if (dataLength != (nWord - c_headearWords)) {
-          B2ERROR("Inconsistent data size between COPPER and CDC FEE."
-                  << LogVar("data length", dataLength) << LogVar("nWord", nWord)
-                  << LogVar("Node ID", iNode) << LogVar("Finness ID", iFiness));
-
+          if (m_dataSizeError == false) {
+            B2ERROR("Inconsistent data size between COPPER and CDC FEE."
+                    << LogVar("data length", dataLength) << LogVar("nWord", nWord)
+                    << LogVar("Node ID", iNode) << LogVar("Finness ID", iFiness));
+            m_dataSizeError = true;
+          } else {
+            B2WARNING("Inconsistent data size between COPPER and CDC FEE."
+                      << LogVar("data length", dataLength) << LogVar("nWord", nWord)
+                      << LogVar("Node ID", iNode) << LogVar("Finness ID", iFiness));
+          }
           continue;
         }
         if (m_enablePrintOut == true) {
-          B2INFO("CDCUnpacker : Data size " << dataLength <<  " words.");
+          B2INFO("CDCUnpacker : " << LogVar("Data size", dataLength));
         }
 
         const int board = getBoardId();
@@ -212,7 +204,8 @@ void CDCUnpackerModule::event()
         const int trgTime = getTriggerTime();
 
         if (m_enablePrintOut == true) {
-          B2INFO("CDCUnpacker : Board ID " << board <<  ", Trigger number " << trgNumber << ", Trigger time " << trgTime);
+          B2INFO("CDCUnpacker : " << LogVar("Board", board) <<  LogVar("Trigger number", trgNumber)
+                 << LogVar("Trigger time ", trgTime));
         }
 
         //
@@ -291,12 +284,6 @@ void CDCUnpackerModule::event()
                 secondHit->setOtherHitIndices(firstHit);
                 secondHit->set2ndHitFlag();
               }
-              if (m_enableStoreCDCRawHit == true) {
-                for (int iSample = 0; iSample < nSamples; ++iSample) {
-                  m_CDCHits[m_CDCHits.getEntries() - 1]->addRelationTo(m_CDCRawHitWaveForms[m_CDCRawHitWaveForms.getEntries() - 1 + iSample -
-                                                                       (nSamples - 1) ]);
-                }
-              }
             }
 
 
@@ -347,14 +334,17 @@ void CDCUnpackerModule::event()
             }
 
             if (!((length == 4) || (length == 5))) {
-              if (m_eventNum % 10000 == 0) {
-                B2ERROR("CDCUnpacker : data length should be 4 or 5 words.");
-                B2ERROR("CDCUnpacker : length " << LogVar("data length", length) << " words.");
-                B2ERROR("board= " << LogVar("board id", board) << " ch= " << LogVar("channel", ch));
+              if (m_dataLengthError == false) {
+                B2ERROR("CDCUnpacker : data length should be 4 or 5 words."
+                        << LogVar("data length", length)
+                        << LogVar("board id", board)
+                        << LogVar("channel", ch));
+                m_dataLengthError = true;
               } else {
-                B2WARNING("CDCUnpacker : data length should be 4 or 5 words.");
-                B2WARNING("CDCUnpacker : length " << LogVar("data length", length) << " words.");
-                B2WARNING("board= " << LogVar("board id", board) << " ch= " << LogVar("channel", ch));
+                B2WARNING("CDCUnpacker : data length should be 4 or 5 words."
+                          << LogVar("data length", length)
+                          << LogVar("board id", board)
+                          << LogVar("channel", ch));
               }
               it += length;
               break;
@@ -412,12 +402,8 @@ void CDCUnpackerModule::event()
 
                 if (m_enableStoreCDCRawHit == true) {
                   // Store to the CDCRawHit object.
-                  CDCRawHit* rawHit = m_CDCRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch,
-                                                             trgTime, fadcSum, tdc1, tdc2, tot);
-                  m_CDCHits[m_CDCHits.getEntries() - 1]->addRelationTo(rawHit);
-                  if (m_enable2ndHit == true) {
-                    m_CDCHits[m_CDCHits.getEntries() - 2]->addRelationTo(rawHit);
-                  }
+                  m_CDCRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch,
+                                         trgTime, fadcSum, tdc1, tdc2, tot);
                 }
 
               } else {
@@ -452,7 +438,6 @@ void CDCUnpackerModule::event()
       hit.setTDCCount(static_cast<unsigned short>(tdc));
     }
   }
-  m_eventNum++;
 }
 
 void CDCUnpackerModule::endRun()

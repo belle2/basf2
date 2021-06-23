@@ -3,6 +3,7 @@
 # Import timeit module and start a timer. Allows to get the runtime of the
 # program at any given point
 import timeit
+
 g_start_time = timeit.default_timer()  # noqa
 
 # std
@@ -45,9 +46,13 @@ def get_compact_git_hash(repo_folder: str) -> Optional[str]:
     Returns the compact git hash from a folder inside of a git repository
     """
     try:
-        cmd_output = subprocess.check_output(
-            ["git", "show", "--oneline", "-s"], cwd=repo_folder
-        ).decode().rstrip()
+        cmd_output = (
+            subprocess.check_output(
+                ["git", "show", "--oneline", "-s"], cwd=repo_folder
+            )
+            .decode()
+            .rstrip()
+        )
         # the first word in this string will be the hash
         cmd_output = cmd_output.split(" ")
         if len(cmd_output) > 1:
@@ -59,8 +64,9 @@ def get_compact_git_hash(repo_folder: str) -> Optional[str]:
         return
 
 
-def basf2_command_builder(steering_file: str, parameters: List[str],
-                          use_multi_processing=False) -> List[str]:
+def basf2_command_builder(
+    steering_file: str, parameters: List[str], use_multi_processing=False
+) -> List[str]:
     """
     This utility function takes the steering file name and other basf2
     parameters and returns a list which can be executed via the OS shell for
@@ -69,9 +75,9 @@ def basf2_command_builder(steering_file: str, parameters: List[str],
     parallel process in order to test if the code also performs as expected
     in multi-processing mode
     """
-    cmd_params = ['basf2']
+    cmd_params = ["basf2"]
     if use_multi_processing:
-        cmd_params += ['-p1']
+        cmd_params += ["-p1"]
     cmd_params += [steering_file]
     cmd_params += parameters
 
@@ -109,9 +115,7 @@ def get_start_time() -> float:
 
 
 def get_validation_folders(
-        location: str,
-        basepaths: Dict[str, str],
-        log: logging.Logger
+    location: str, basepaths: Dict[str, str], log: logging.Logger
 ) -> Dict[str, str]:
     """!
     Collects the validation folders for all packages from the stated release
@@ -124,13 +128,13 @@ def get_validation_folders(
     """
 
     # Make sure we only look in existing locations:
-    if location not in ['local', 'central']:
+    if location not in ["local", "central"]:
         return {}
     if basepaths[location] is None:
         return {}
 
     # Write to log what we are collecting
-    log.debug(f'Collecting {location} folders')
+    log.debug(f"Collecting {location} folders")
 
     # Reserve some memory for our results
     results = {}
@@ -139,18 +143,20 @@ def get_validation_folders(
     # First, collect the general validation folders, because it needs special
     # treatment (does not belong to any other package but may include
     # steering files):
-    if os.path.isdir(basepaths[location] + '/validation'):
-        results['validation'] = basepaths[location] + '/validation'
+    if os.path.isdir(basepaths[location] + "/validation"):
+        results["validation"] = basepaths[location] + "/validation"
 
     # get the special folder containing the validation tests
-    if os.path.isdir(basepaths[location] + '/validation/validation-test'):
-        results['validation-test'] = basepaths[location] \
-            + '/validation/validation-test'
+    if os.path.isdir(basepaths[location] + "/validation/validation-test"):
+        results["validation-test"] = (
+            basepaths[location] + "/validation/validation-test"
+        )
 
     # Now get a list of all folders with name 'validation' which are
     # subfolders of a folder (=package) in the release directory
-    package_dirs = glob.glob(os.path.join(basepaths[location], '*',
-                                          'validation'))
+    package_dirs = glob.glob(
+        os.path.join(basepaths[location], "*", "validation")
+    )
 
     # Now loop over all these folders, find the name of the package they belong
     # to and append them to our results dictionary
@@ -162,8 +168,9 @@ def get_validation_folders(
     return results
 
 
-def get_argument_parser(modes: Optional[List[str]] = None) \
-        -> argparse.ArgumentParser:
+def get_argument_parser(
+    modes: Optional[List[str]] = None,
+) -> argparse.ArgumentParser:
 
     if not modes:
         modes = ["local"]
@@ -176,124 +183,122 @@ def get_argument_parser(modes: Optional[List[str]] = None) \
         "-d",
         "--dry",
         help="Perform a dry run, i.e. run the validation module without "
-             "actually executing the steering files (for debugging purposes).",
-        action='store_true'
+        "actually executing the steering files (for debugging purposes).",
+        action="store_true",
     )
     parser.add_argument(
         "-m",
         "--mode",
         help="The mode which will be used for running the validation. "
-             "Possible values: " + ", ".join(modes) + ". Default is 'local'",
+        "Possible values: " + ", ".join(modes) + ". Default is 'local'",
         choices=modes,
         type=str,
-        default='local'
+        default="local",
     )
     parser.add_argument(
         "-i",
         "--intervals",
         help="Comma seperated list of intervals for which to execute the "
-             "validation scripts. Default is 'nightly'",
+        "validation scripts. Default is 'nightly'",
         type=str,
-        default='nightly'
+        default="nightly",
     )
     parser.add_argument(
         "-o",
         "--options",
         help="One or more strings that will be passed to basf2 as arguments. "
-             "Example: '-n 100'. Quotes are necessary!",
+        "Example: '-n 100'. Quotes are necessary!",
         type=str,
-        nargs='+'
+        nargs="+",
     )
     parser.add_argument(
         "-p",
         "--parallel",
         help="The maximum number of parallel processes to run the "
-             "validation. Only used for local execution. Default is number "
-             "of CPU cores.",
+        "validation. Only used for local execution. Default is number "
+        "of CPU cores.",
         type=int,
-        default=None
+        default=None,
     )
     parser.add_argument(
         "-pkg",
         "--packages",
         help="The name(s) of one or multiple packages. Validation will be "
-             "run only on these packages! E.g. -pkg analysis arich",
+        "run only on these packages! E.g. -pkg analysis arich",
         type=str,
-        nargs='+'
+        nargs="+",
     )
     parser.add_argument(
         "-s",
         "--select",
         help="The file name(s) of one or more space separated validation "
-             "scripts that should be executed exclusively. All dependent "
-             "scripts will also be executed. E.g. -s ECL2D.C",
+        "scripts that should be executed exclusively. All dependent "
+        "scripts will also be executed. E.g. -s ECL2D.C",
         type=str,
-        nargs='+'
+        nargs="+",
     )
     parser.add_argument(
         "-si",
         "--select-ignore-dependencies",
         help="The file name of one or more space separated validation "
-             "scripts that should be executed exclusively. This will ignore "
-             "all dependencies. This is useful if you modified a script that "
-             "produces plots based on the output of its dependencies.",
+        "scripts that should be executed exclusively. This will ignore "
+        "all dependencies. This is useful if you modified a script that "
+        "produces plots based on the output of its dependencies.",
         type=str,
-        nargs='+'
+        nargs="+",
     )
     parser.add_argument(
         "--send-mails",
         help="Send email to the contact persons who have failed comparison "
-             "plots. Mail is sent from b2soft@mail.desy.de via "
-             "/usr/sbin/sendmail.",
-        action='store_true')
+        "plots. Mail is sent from b2soft@mail.desy.de via "
+        "/usr/sbin/sendmail.",
+        action="store_true",
+    )
     parser.add_argument(
         "--send-mails-mode",
         help="How to send mails: Full report, incremental report (new/changed "
-             "warnings/failures only) or automatic (default; follow hard coded "
-             "rule, e.g. full reports every Monday).",
+        "warnings/failures only) or automatic (default; follow hard coded "
+        "rule, e.g. full reports every Monday).",
         choices=["full", "incremental", "automatic"],
-        default="automatic"
+        default="automatic",
     )
     parser.add_argument(
-        "-q",
-        "--quiet",
-        help="Suppress the progress bar",
-        action='store_true'
+        "-q", "--quiet", help="Suppress the progress bar", action="store_true"
     )
     parser.add_argument(
         "-t",
         "--tag",
         help="The name that will be used for the current revision in the "
-             "results folder. Default is 'current'.",
+        "results folder. Default is 'current'.",
         type=str,
-        default='current'
+        default="current",
     )
     parser.add_argument(
         "--test",
         help="Execute validation in testing mode where only the validation "
-             "scripts contained in the validation package are executed. "
-             "During regular validation, these scripts are ignored.",
-        action='store_true'
+        "scripts contained in the validation package are executed. "
+        "During regular validation, these scripts are ignored.",
+        action="store_true",
     )
     parser.add_argument(
         "--use-cache",
         help="If validation scripts are marked as cacheable and their output "
-             "files already exist, don't execute these scripts again",
-        action='store_true'
+        "files already exist, don't execute these scripts again",
+        action="store_true",
     )
     parser.add_argument(
         "--view",
         help="Once the validation is finished, start the local web server and "
-             "display the validation results in the system's default browser.",
-        action='store_true'
+        "display the validation results in the system's default browser.",
+        action="store_true",
     )
     parser.add_argument(
         "--max-run-time",
         help="By default, running scripts (that is, steering files executed by"
-             "the validation framework) are terminated after a "
-             "certain time. Use this flag to change this setting by supplying "
-             "the maximal run time in minutes. Value <=0 disables the run "
-             "time upper limit entirely.",
+        "the validation framework) are terminated after a "
+        "certain time. Use this flag to change this setting by supplying "
+        "the maximal run time in minutes. Value <=0 disables the run "
+        "time upper limit entirely.",
         type=int,
         default=None,
     )
@@ -301,7 +306,9 @@ def get_argument_parser(modes: Optional[List[str]] = None) \
     return parser
 
 
-def parse_cmd_line_arguments(modes: Optional[List[str]] = None) -> argparse.Namespace:
+def parse_cmd_line_arguments(
+    modes: Optional[List[str]] = None,
+) -> argparse.Namespace:
     """!
     Sets up a parser for command line arguments, parses them and returns the
     arguments.
@@ -317,7 +324,7 @@ def parse_cmd_line_arguments(modes: Optional[List[str]] = None) -> argparse.Name
     return get_argument_parser(modes).parse_args()
 
 
-def scripts_in_dir(dirpath: str, log: logging.Logger, ext='*') -> List[str]:
+def scripts_in_dir(dirpath: str, log: logging.Logger, ext="*") -> List[str]:
     """!
     Returns all the files in the given dir (and its subdirs) that have
     the extension 'ext', if an extension is given (default: all extensions)
@@ -331,7 +338,7 @@ def scripts_in_dir(dirpath: str, log: logging.Logger, ext='*') -> List[str]:
     """
 
     # Write to log what we are collecting
-    log.debug(f'Collecting *{ext} files from {dirpath}')
+    log.debug(f"Collecting *{ext} files from {dirpath}")
 
     # Some space where we store our results before returning them
     results = []
@@ -339,10 +346,10 @@ def scripts_in_dir(dirpath: str, log: logging.Logger, ext='*') -> List[str]:
     # A list of all folder names that will be ignored (e.g. folders that are
     # important for SCons
     blacklist = [
-        'tools',
-        'scripts',
-        'examples',
-        validationpath.folder_name_html_static
+        "tools",
+        "scripts",
+        "examples",
+        validationpath.folder_name_html_static,
     ]
 
     # Loop over the given directory and its subdirectories and find all files
@@ -378,23 +385,27 @@ def get_style(index: Optional[int], overall_item_count=1):
     """
 
     # Define the colors for the plot
-    colors = [ROOT.kRed,
-              ROOT.kOrange,
-              ROOT.kPink + 9,
-              ROOT.kOrange - 8,
-              ROOT.kGreen + 2,
-              ROOT.kCyan + 2,
-              ROOT.kBlue + 1,
-              ROOT.kRed + 2,
-              ROOT.kOrange + 3,
-              ROOT.kYellow + 2,
-              ROOT.kSpring]
+    colors = [
+        ROOT.kRed,
+        ROOT.kOrange,
+        ROOT.kPink + 9,
+        ROOT.kOrange - 8,
+        ROOT.kGreen + 2,
+        ROOT.kCyan + 2,
+        ROOT.kBlue + 1,
+        ROOT.kRed + 2,
+        ROOT.kOrange + 3,
+        ROOT.kYellow + 2,
+        ROOT.kSpring,
+    ]
 
     # Define the linestyles for the plot
-    linestyles = {'dashed': 2,    # Dashed: - - - - -
-                  'solid': 1,    # Solid: ----------
-                  'dashdot': 10}    # Dash-dot: -?-?-?-
-    ls_index = {0: 'dashed', 1: 'solid', 2: 'dashdot'}
+    linestyles = {
+        "dashed": 2,  # Dashed: - - - - -
+        "solid": 1,  # Solid: ----------
+        "dashdot": 10,
+    }  # Dash-dot: -?-?-?-
+    ls_index = {0: "dashed", 1: "solid", 2: "dashdot"}
 
     # Define the linewidth for the plots
     linewidth = 2
@@ -410,7 +421,7 @@ def get_style(index: Optional[int], overall_item_count=1):
     # If there is only one revision, make it solid!
     # It cannot overlap with any other line
     if overall_item_count == 1:
-        linestyle = linestyles['solid']
+        linestyle = linestyles["solid"]
     # Otherwise make sure the newest revision (which is drawn on top) gets a
     # dashed linestyle
     else:
@@ -463,15 +474,16 @@ def get_terminal_width() -> int:
     on b2master, so copy this here.
     """
     from shutil import get_terminal_size
+
     return get_terminal_size(fallback=(80, 24)).columns
 
 
 def congratulator(
-        success: Optional[Union[int, float]] = None,
-        failure: Optional[Union[int, float]] = None,
-        total: Optional[Union[int, float]] = None,
-        just_comment=False,
-        rate_name="Success rate"
+    success: Optional[Union[int, float]] = None,
+    failure: Optional[Union[int, float]] = None,
+    total: Optional[Union[int, float]] = None,
+    just_comment=False,
+    rate_name="Success rate",
 ) -> str:
     """ Keeping the morale up by commenting on success rates.
 
@@ -495,14 +507,14 @@ def congratulator(
         print(
             "ERROR (congratulator): Specify 2 of the arguments 'success',"
             "'failure', 'total'.",
-            file=sys.stderr
+            file=sys.stderr,
         )
         return ""
     elif n_nones >= 2:
         print(
             "ERROR (congratulator): Specify 2 of the arguments 'success',"
             "'failure', 'total'.",
-            file=sys.stderr
+            file=sys.stderr,
         )
         return ""
     else:
@@ -530,7 +542,7 @@ def congratulator(
         90.0: "Gold medal!",
         95.0: "Legendary!",
         99.0: "Nobel price!",
-        99.9: "Godlike!"
+        99.9: "Godlike!",
     }
 
     for value in sorted(comments.keys(), reverse=True):
@@ -544,11 +556,7 @@ def congratulator(
     if just_comment:
         return comment
     else:
-        return "{} {}%. {}".format(
-            rate_name,
-            int(success_rate),
-            comment
-        )
+        return "{} {}%. {}".format(rate_name, int(success_rate), comment)
 
 
 def terminal_title_line(title="", subtitle="", level=0) -> str:
@@ -564,11 +572,7 @@ def terminal_title_line(title="", subtitle="", level=0) -> str:
 
     # using the markdown title underlining chars for lack of better
     # alternatives
-    char_dict = {
-        0: "=",
-        1: "-",
-        2: "~"
-    }
+    char_dict = {0: "=", 1: "-", 2: "~"}
 
     for key in sorted(char_dict.keys(), reverse=True):
         if level >= key:

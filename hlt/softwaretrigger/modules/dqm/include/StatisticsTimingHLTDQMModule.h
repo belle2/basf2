@@ -57,9 +57,6 @@ namespace Belle2 {
       /// Total memory usage distribution of all events
       TH1F* m_fullMemoryHistogram;
 
-      /// Memory used for processing distribution of all events
-      TH1F* m_processingMemoryHistogram;
-
       /// Mean budget time of events per unit
       TH1F* m_fullTimeMeanPerUnitHistogram;
 
@@ -74,9 +71,6 @@ namespace Belle2 {
 
       /// Total memory distribution of events per unit
       std::map<unsigned int, TH1F*> m_fullMemoryPerUnitHistograms;
-
-      /// Memory used for processing distribution of events per unit
-      std::map<unsigned int, TH1F*> m_processingMemoryPerUnitHistograms;
 
       /// Number of processes per unit
       TH1F* m_processesPerUnitHistogram;
@@ -96,21 +90,6 @@ namespace Belle2 {
       /// Storage for the last time sum of certain modules
       std::map<std::string, double> m_lastModuleTimeSum;
 
-      /// Storage for the last full memory sum
-      double m_lastFullMemorySum = 0;
-
-      /// Storage for the last full memory sum per unit
-      std::map<unsigned int, double> m_lastFullMemorySumPerUnit;
-
-      /// Storage for the last processing memory sum
-      double m_lastProcessingMemorySum = 0;
-
-      /// Storage for the last processing memory sum per unit
-      std::map<unsigned int, double> m_lastProcessingMemorySumPerUnit;
-
-      /// Storage for the last memory sum of certain modules
-      std::map<std::string, double> m_lastModuleMemorySum;
-
       /// Parameter: Create HLT unit number histograms?
       bool m_param_create_hlt_unit_histograms;
 
@@ -118,10 +97,10 @@ namespace Belle2 {
       std::string m_param_histogramDirectoryName = "timing_statistics";
 
       /// Parameter: which modules should be shown in the overview list
-      std::vector<std::string> m_param_overviewModuleList = {"Sum_Wait", "Sum_Initialization", "Sum_Unpackers", "Sum_EventsofDoomBuster", "Sum_Clustering", "Sum_Tracking", "Sum_Posttracking_Reconstruction", "Sum_HLT_Filter_Calculation", "Sum_HLT_DQM_before_filter", "Sum_HLT_Discard", "Sum_HLT_Skim_Calculation", "Sum_ROI_Finder", "Sum_HLT_DQM_filtered", "Sum_ROI_Payload_Assembler", "Sum_HLT_DQM_all_events", "Sum_Close_Event"};
+      std::vector<std::string> m_param_overviewModuleList = {"Sum_Wait", "Sum_Initialization", "Sum_Unpackers", "Sum_EventsofDoomBuster", "Sum_Clustering", "Sum_Prefilter_Tracking", "Sum_Posttracking_Reconstruction", "Sum_HLT_Filter_Calculation", "Sum_HLT_DQM_before_filter", "Sum_HLT_Discard", "Sum_Postfilter_Reconstruction", "Sum_HLT_Skim_Calculation", "Sum_ROI_Finder", "Sum_HLT_DQM_filtered", "Sum_ROI_Payload_Assembler", "Sum_HLT_DQM_all_events", "Sum_Close_Event"};
 
       /// Summary modules of the actual processing
-      std::vector<std::string> m_summaryModuleList = {"Sum_Initialization", "Sum_Unpackers", "Sum_EventsofDoomBuster", "Sum_Clustering", "Sum_Tracking", "Sum_Posttracking_Reconstruction", "Sum_HLT_Filter_Calculation", "Sum_HLT_DQM_before_filter", "Sum_HLT_Discard", "Sum_HLT_Skim_Calculation", "Sum_ROI_Finder", "Sum_HLT_DQM_filtered", "Sum_ROI_Payload_Assembler", "Sum_HLT_DQM_all_events", "Sum_Close_Event"};
+      std::vector<std::string> m_summaryModuleList = {"Sum_Initialization", "Sum_Unpackers", "Sum_EventsofDoomBuster", "Sum_Clustering", "Sum_Prefilter_Tracking", "Sum_Posttracking_Reconstruction", "Sum_HLT_Filter_Calculation", "Sum_HLT_DQM_before_filter", "Sum_HLT_Discard", "Sum_Postfilter_Reconstruction", "Sum_HLT_Skim_Calculation", "Sum_ROI_Finder", "Sum_HLT_DQM_filtered", "Sum_ROI_Payload_Assembler", "Sum_HLT_DQM_all_events", "Sum_Close_Event"};
 
       /// Store HLT unit number on initialization
       int m_hlt_unit = 0;
@@ -138,23 +117,11 @@ namespace Belle2 {
       /// Number of bins for the histograms of processingTime
       const double m_processingTimeNBins = 250;
 
-      /// Minimum for the histograms of fullMemory
-      const double m_fullMemoryMin = -100000;
-
       /// Maximum for the histograms of fullMemory
-      const double m_fullMemoryMax = 100000;
+      const double m_fullMemoryMax = 4000;
 
       /// Number of bins for the histograms of fullMemory
-      const double m_fullMemoryNBins = 500;
-
-      /// Minimum for the histograms of processingMemory
-      const double m_processingMemoryMin = -100000;
-
-      /// Maximum for the histograms of processingMemory
-      const double m_processingMemoryMax = 100000;
-
-      /// Number of bins for the histograms of processingMemory
-      const double m_processingMemoryNBins = 500;
+      const double m_fullMemoryNBins = 100;
     };
 
   }

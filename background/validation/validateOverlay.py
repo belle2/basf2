@@ -95,7 +95,8 @@ eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 # Simulation
-add_simulation(main, bkgfiles=bg, bkgOverlay=True, usePXDDataReduction=False, forceSetPXDDataReduction=True)
+add_simulation(main, bkgfiles=bg, bkgOverlay=True, usePXDDataReduction=False, forceSetPXDDataReduction=True,
+               simulateT0jitter=False)
 
 # Make histograms
 main.add_module(Histogrammer())

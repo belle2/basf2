@@ -42,19 +42,19 @@ REG_MODULE(SVDDQMClustersOnTrack)
 SVDDQMClustersOnTrackModule::SVDDQMClustersOnTrackModule() : HistoModule()
 {
   //Set module properties
-  setDescription("SVD DQM module for Clusters related to Tracks.");
+  setDescription("SVD DQM module for clusters related to tracks.");
 
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
-  addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If TRUE skip events rejected by HLT", bool(true));
-  addParam("TriggerBin", m_tb, "select events for a specific trigger bin, if -1 then no seleciton is applied (default)", int(-1));
-  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+  addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If True, skip events rejected by HLT.", bool(true));
+  addParam("TriggerBin", m_tb, "select events for a specific trigger bin, if -1 then no selection is applied (default)", int(-1));
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed.",
            std::string("SVDClsTrk"));
   addParam("desynchronizeSVDTime", m_desynchSVDTime,
-           "if TRUE (default is FALSE): svdTime back in SVD time reference", bool(false));
-  addParam("EventInfo", m_svdEventInfoName, "SVDEventInfo StoreArray name", std::string(""));
-  addParam("Clusters", m_svdClustersName, "SVDCluster StoreArray name", std::string(""));
-  addParam("RecoDigits", m_svdRecoDigitsName, "SVDRecoDigits StoreArray name", std::string(""));
-  addParam("ShaperDigits", m_svdShaperDigitsName, "SVDShaperDigits StoreArray name", std::string(""));
+           "if True, svd time back in SVD time reference", bool(false));
+  addParam("EventInfo", m_svdEventInfoName, "SVDEventInfo StoreArray name.", std::string(""));
+  addParam("Clusters", m_svdClustersName, "SVDCluster StoreArray name.", std::string(""));
+  addParam("RecoDigits", m_svdRecoDigitsName, "SVDRecoDigits StoreArray name.", std::string(""));
+  addParam("ShaperDigits", m_svdShaperDigitsName, "SVDShaperDigits StoreArray name.", std::string(""));
 
   m_histoList = new TList();
 }

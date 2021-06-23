@@ -15,14 +15,17 @@ runs the fullsim w/ mixed in background, and dumps full output (*Digits containe
 # in case of clashing option names. Most notably, this would happen with the '-h', '--help' option.
 import argparse
 
-parser = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-parser.add_argument("--bkg_dir",
-                    type=str,
-                    default=None,
-                    help="The directory containing beam bkg files.\n"
-                    "If not set, basf2 will search for the 'BELLE2_BACKGROUND_DIR' env variable by default,\n"
-                    "which is defined on the validation server.")
+parser = argparse.ArgumentParser(
+    description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+)
+parser.add_argument(
+    "--bkg_dir",
+    type=str,
+    default=None,
+    help="The directory containing beam bkg files.\n"
+    "If not set, basf2 will search for the 'BELLE2_BACKGROUND_DIR' env variable by default,\n"
+    "which is defined on the validation server.",
+)
 args = parser.parse_args()
 
 from ROOT import Belle2  # noqa
@@ -72,7 +75,9 @@ add_simulation(main, bkgfiles=get_background_files(folder=args.bkg_dir))
 main.add_module("Profile")
 
 # Create output of event generation + detector simulation.
-main.add_module("RootOutput", outputFileName="../PartGunChargedStableGenSim.root")
+main.add_module(
+    "RootOutput", outputFileName="../PartGunChargedStableGenSim.root"
+)
 
 # Show progress of processing.
 main.add_module("Progress")

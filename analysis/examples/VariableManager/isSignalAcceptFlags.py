@@ -1,5 +1,4 @@
 #!/usr/bin/env/python3
-# -*-coding: utf-8-*-
 
 # isSignalAcceptFlags or isSignalAcceptSomething, means a special isSignal variable that accepts certain
 # bits in the mcErrors to be set. For example, the pure isSignal equals to 1 only when mcErrors == 0, while

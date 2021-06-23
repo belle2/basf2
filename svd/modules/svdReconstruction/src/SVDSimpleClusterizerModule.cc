@@ -248,7 +248,7 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   float size = cluster.size();
   float SNR = cluster.getSNR();
   float position = cluster.getPosition();
-  float positionError = m_ClusterCal.getCorrectedClusterPositionError(sensorID, isU, size, cluster.getPositionError());
+  float positionError = m_OldDefaultSF.getCorrectedClusterPositionError(sensorID, isU, size, cluster.getPositionError());
   //this is the 6-sample CoG time, it will not be used for in 3-sample time algorithms:
   float time = cluster.getTime();
   float timeError = cluster.getTimeError();

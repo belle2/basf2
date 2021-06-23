@@ -11,12 +11,10 @@ path = b2.create_path()
 
 # Load input ROOT file
 ma.inputMdst(environmentType='default',
-             filename=b2.find_file('mdst12.root', 'validation', False),
+             filename=b2.find_file('mdst14.root', 'validation', False),
              path=path)
 
 # Add the necessary database
-# You can use the command b2conditionsdb-recommend
-# b2.conditions.globaltags = ['name of analysis global tag']
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
 # Get FEI default channels.
@@ -24,7 +22,7 @@ b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 particles = fei.get_default_channels()
 
 # Set up FEI configuration specifying the FEI prefix
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2020_MC13_release_04_01_01', training=False, monitor=False, cache=0)
+configuration = fei.config.FeiConfiguration(prefix='FEIv4_2021_MC14_release_05_01_12', training=False, monitor=False, cache=0)
 
 # Get FEI path
 feistate = fei.get_path(particles, configuration)

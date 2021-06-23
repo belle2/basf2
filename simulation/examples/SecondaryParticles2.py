@@ -15,7 +15,6 @@ This script saves all the secondary particles in MCParticles.
 
 import basf2 as b2
 from simulation import add_simulation
-from L1trigger import add_tsim
 from reconstruction import add_reconstruction
 from background import get_background_files
 
@@ -30,14 +29,11 @@ main.add_module('EventInfoSetter', evtNumList=[100], runList=[1], expList=[1])
 # generate BBbar events
 main.add_module('EvtGenInput')
 
-# detector simulation
+# detector and L1 trigger simulation
 add_simulation(main, bkgfiles=get_background_files())
 
 # saving secondary particles with kinetic energy > 1.0 MeV.
 b2.set_module_parameters(main, "FullSim", StoreAllSecondaries=True, SecondariesEnergyCut=1.0)
-
-# trigger simulation
-add_tsim(main)
 
 # reconstruction
 add_reconstruction(main)

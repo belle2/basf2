@@ -11,13 +11,26 @@ import modularAnalysis as ma
 
 
 def add_analysis_dqm(path):
+    """Add the analysis DQM modules to the ``path``.
+    Builds a list of pi0's, Kshorts and the Fox Wolfram event shape variables.
+
+    Parameters:
+        path (basf2.Path): modules are loaded onto this path
+    """
+    # Kshorts and pi0s
     ma.fillParticleList('gamma:physDQM', 'E > 0.15', loadPhotonBeamBackgroundMVA=False, path=path)
     ma.fillParticleList('pi+:physDQM', 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4', path=path)
     ma.reconstructDecay('pi0:physDQM -> gamma:physDQM gamma:physDQM', '0.10 < M < 0.15', 1, True, path)
     ma.reconstructDecay('K_S0:physDQM -> pi-:physDQM pi+:physDQM', '0.48 < M < 0.52', 1, True, path)
+
+    # have to manually create "all" lists of pi+ and photons to use inside buildEventShape
+    # to avoid loading the photons' beamBackgroundMVA variable on the DQM
+    ma.fillParticleList('pi+:evtshape', '', path=path)
+    ma.fillParticleList('gamma:evtshape', '', loadPhotonBeamBackgroundMVA=False, path=path)
     ma.buildEventShape(
         path=path,
-        default_cleanup=False,
+        inputListNames=['pi+:evtshape', 'gamma:evtshape'],
+        default_cleanup=False,  # do not want any clean up
         foxWolfram=True,
         cleoCones=False,
         collisionAxis=False,
@@ -33,6 +46,13 @@ def add_analysis_dqm(path):
 
 
 def add_mirabelle_dqm(path):
+    """Add the mirabelle DQM modules to the ``path``.
+    Runs on conditional paths depending on the software trigger results.
+    Building D*'s or dimuons on the conditional paths.
+
+    Parameters:
+        path (basf2.Path): modules are loaded onto this path
+    """
     # Software Trigger to divert the path
     MiraBelleMumu_path = b2.create_path()
     MiraBelleDst1_path = b2.create_path()
@@ -75,7 +95,7 @@ def add_mirabelle_dqm(path):
 
     # MiraBelle D* (followed by D0 -> K pi) path
     ma.fillParticleList('pi+:MiraBelleDst1', 'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst1_path)
-    ma.fillParticleList('K+:MiraBelleDst1',  'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst1_path)
+    ma.fillParticleList('K+:MiraBelleDst1', 'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst1_path)
     ma.reconstructDecay('D0:MiraBelleDst1_kpi -> K-:MiraBelleDst1 pi+:MiraBelleDst1', '1.7 < M < 2.1', path=MiraBelleDst1_path)
     ma.reconstructDecay('D*+:MiraBelleDst1_kpi -> D0:MiraBelleDst1_kpi pi+:MiraBelleDst1',
                         'useCMSFrame(p) > 2.5 and massDifference(0) < 0.16', path=MiraBelleDst1_path)
@@ -85,8 +105,8 @@ def add_mirabelle_dqm(path):
 
     # MiraBelle D* (followed by D0 -> K pi pi0) path
     ma.fillParticleList('pi+:MiraBelleDst2', 'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst2_path)
-    ma.fillParticleList('K+:MiraBelleDst2',  'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst2_path)
-    stdPi0s(listtype='eff60_May2020', path=MiraBelleDst2_path)
+    ma.fillParticleList('K+:MiraBelleDst2', 'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst2_path)
+    stdPi0s(listtype='eff60_May2020', path=MiraBelleDst2_path, loadPhotonBeamBackgroundMVA=False)
     ma.reconstructDecay(
         'D0:MiraBelleDst2_kpipi0 -> K-:MiraBelleDst2 pi+:MiraBelleDst2 pi0:eff60_May2020',
         '1.7 < M < 2.1',

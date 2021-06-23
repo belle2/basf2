@@ -268,7 +268,6 @@ namespace Belle2 {
 
       auto getDensityScale = [this](const std::string & name) {
         std::optional<double> scale;
-        // cppcheck-suppress stlIfFind ; cppcheck doesn't like if with initializer ...
         if (auto it = m_densityScaling.find(name); it != m_densityScaling.end()) {
           scale = it->second;
         }

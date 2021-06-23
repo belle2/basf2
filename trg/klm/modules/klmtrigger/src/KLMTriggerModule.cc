@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <trg/klm/modules/klmtrigger/KLMTriggerModule.h>
+#include <trg/klm/modules/klmtrigger/group_helper.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
@@ -22,12 +23,44 @@
 
 #include <trg/klm/dataobjects/KLMTriggerHit.h>
 #include <trg/klm/dataobjects/KLMTriggerTrack.h>
+#include <trg/klm/dataobjects/KLMTrgSummary.h>
 
 #include <unordered_map>
+#include <algorithm>
+#include <numeric>
+#include <vector>
+#include <tuple>
 
 
 using namespace std;
 using namespace Belle2;
+using namespace Belle2::group_helper;
+
+
+
+
+
+//! Total number of sections
+const int c_TotalSections_per_EKLM_BKLM = 2;
+
+
+
+
+
+
+const int i_forward_eklm = 2;
+const int i_backward_eklm = 3;
+const int i_forward_bklm = 0;
+const int i_backward_bklm = 1;
+
+
+const std::string m_klmTriggerSummery =  "TRGKLMSummery"; //"Name of the StoreArray holding the Trigger Summery"
+
+// part of unused old Trigger collection
+const std::string m_klmtrackCollectionName = "TRGKLMTracks";
+const std::string m_klmhitCollectionName = "TRGKLMHits";
+// end
+
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -37,28 +70,73 @@ REG_MODULE(KLMTrigger)
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
+struct compare {
+  int key;
+  explicit compare(int const& i): key(i) { }
 
+  bool operator()(int const& i)
+  {
+    return (i == key);
+  }
+};
+
+
+vector<string> split(const string& str, const string& delim)
+{
+  vector<string> tokens;
+  size_t prev = 0, pos = 0;
+  do {
+    pos = str.find(delim, prev);
+    if (pos == string::npos) pos = str.length();
+    string token = str.substr(prev, pos - prev);
+    if (!token.empty()) tokens.push_back(token);
+    prev = pos + delim.length();
+  } while (pos < str.length() && prev < str.length());
+  return tokens;
+}
+
+std::vector<int> layer_string_list_to_integer(const std::string& instr)
+{
+  std::vector<int> ret;
+  auto str_spl = split(instr, ":");
+
+  int start = std::stoi(str_spl[0]);
+  int stop = std::stoi(str_spl[1]);
+  for (int i = start; i < stop ; ++i) {
+    ret.push_back(i);
+  }
+
+  return ret;
+}
 KLMTriggerModule::KLMTriggerModule() : Module()
 {
   setDescription("KLM trigger simulation");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("MaxChisq", m_maxChisq,
-           "Maximum chi squared for a track",
-           double(7.0));
-  addParam("MaxIP", m_maxIP,
-           "Maximum impact parameter for a track",
-           double(7.0));
-  addParam("MinLayers", m_minLayers,
-           "Minimum number of fired layers for a track",
-           int(10));
-  addParam("TrgKLMTracks", m_klmtrackCollectionName, "Name of the StoreArray holding the track list", string("TRGKLMTracks"));
-  addParam("TrgKLMHits", m_klmhitCollectionName, "Name of the StoreArray holding the hit list", string("TRGKLMHits"));
+
+
+  addParam("nLayerTrigger", m_nLayerTrigger, "", 5);
+
+  addParam("LayerUsed", m_dummy_used_layers, "List of layers used for the simulation", string("2:16"));
+
+
+
+
+
 }
 
 void KLMTriggerModule::initialize()
 {
-  StoreArray<KLMDigit> klmDigits;
 
+  m_KLMTrgSummary.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
+  B2INFO("KLMTrigger: m_dummy_used_layers " << m_dummy_used_layers);
+  m_layerUsed = layer_string_list_to_integer(m_dummy_used_layers);
+
+  StoreArray<KLMDigit> klmDigits;
+  klmDigits.isRequired();
+  if (!klmDigits.isValid())
+    return;
+
+// unused
   StoreArray<KLMTriggerHit> klmTriggerHits(m_klmhitCollectionName);
   klmTriggerHits.registerInDataStore();
   klmTriggerHits.registerRelationTo(klmDigits);
@@ -66,543 +144,175 @@ void KLMTriggerModule::initialize()
   StoreArray<KLMTriggerTrack> klmTriggerTracks(m_klmtrackCollectionName);
   klmTriggerTracks.registerInDataStore();
   klmTriggerTracks.registerRelationTo(klmTriggerHits);
+// end unused
+
+
+
+
 }
 
 void KLMTriggerModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
   B2DEBUG(100, "KLMTrigger: Experiment " << evtMetaData->getExperiment() << ", run " << evtMetaData->getRun());
-  m_nEvents = 0;
-  m_nTracks = 0;
+
 }
 
-void KLMTriggerModule::event()
-{
-  ++m_nEvents;
-
-  fillHits();
-  fillTracks();
-  calcChisq();
-}
 
 void KLMTriggerModule::endRun()
 {
-//  B2INFO("KLMTrigger: Processed " << m_nEvents << " events, found " << m_nTracks << " tracks");
+
 }
 
-void KLMTriggerModule::fillHits()
+
+
+
+
+
+// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(KLM_type, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(section_t, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(sector_t, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(layer_t, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(layer_count, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(layer_mask, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(n_triggered, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(sector_mask, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(sector_mask_or, int);// cppcheck-suppress  noExplicitConstructor
+
+AXIS_NAME(n_sections_trig, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(back2back_t, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(isectors_t, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(TriggerCut, int);// cppcheck-suppress  noExplicitConstructor
+AXIS_NAME(vetoCut, int);
+
+int to_i_sector(int KLM_type_, int section_)
 {
+  if (KLM_type_ == KLMElementNumbers::c_BKLM  && section_ == BKLMElementNumbers::c_BackwardSection) {
+    return i_backward_bklm;
+  } else if (KLM_type_ == KLMElementNumbers::c_BKLM  && section_ == BKLMElementNumbers::c_ForwardSection) {
+    return i_forward_bklm;
+  } else if (KLM_type_ == KLMElementNumbers::c_EKLM  && section_ == EKLMElementNumbers::c_BackwardSection) {
+    return i_backward_eklm;
+  } else if (KLM_type_ == KLMElementNumbers::c_EKLM  && section_ == EKLMElementNumbers::c_ForwardSection) {
+    return i_forward_eklm;
+  }
+  B2FATAL("unecpected KLM type");
+  return 0;
+}
+
+
+template <typename T>
+int to_i_sector(const T& e)
+{
+  return to_i_sector(KLM_type(e) , section_t(e));
+}
+
+
+template <typename AXIS_NAME_T, typename CONTAINER_T>
+auto to_bit_mask(const CONTAINER_T& container)
+{
+  return std::accumulate(container.begin(), container.end(), 0,  [](const auto & lhs, const auto & rhs) {  return lhs | (1 << AXIS_NAME_T(rhs));});
+}
+
+unsigned int countBits(unsigned int n)
+{
+  return std::bitset<16>(n).count();
+}
+
+
+template <typename CONTAINER_T>
+auto to_sector_bit_mask(const CONTAINER_T& container, TriggerCut TriggerCut_ , vetoCut vetoCut_ = 0)
+{
+  int ret = 0;
+  auto back = container.back();
+  for (const auto& e : container) {
+    int bitcount      = countBits(layer_mask(e));
+    int bitcount_or   = countBits(layer_mask(back) | layer_mask(e));
+    int bitcount_back = countBits(layer_mask(back));
+    if (bitcount >= TriggerCut_) {
+      ret |= (1 << sector_t(e));
+    } else if (
+      bitcount_or >= TriggerCut_
+      && bitcount_back < vetoCut_
+      && bitcount < vetoCut_
+    ) {
+      ret |= (1 << sector_t(e));
+      ret |= (1024);
+    }
+    back = e;
+  }
+  return ret;
+}
+
+
+void KLMTriggerModule::event()
+{
+
+
+
+  m_KLMTrgSummary.create();
+
   StoreArray<KLMDigit> klmDigits;
-  if (!klmDigits.isValid())
-    return;
 
-  StoreArray<KLMTriggerHit> klmTriggerHits(m_klmhitCollectionName);
+  auto hits = fill_vector(klmDigits,
+                          [](auto klmdig) -> KLM_type  { return klmdig->getSubdetector(); },
+                          [](auto klmdig) -> section_t { return klmdig->getSection(); },
+                          [](auto klmdig) -> sector_t  { return klmdig->getSector() - 1;},
+                          [](auto klmdig) -> layer_t   { return klmdig->getLayer() - 1;}
+                         );
 
-  int nEntries = klmDigits.getEntries();
-  for (int i = 0; i < nEntries; ++i) {
-    const KLMDigit* bklmDigit_i = klmDigits[i];
-    if (bklmDigit_i->getSubdetector() != KLMElementNumbers::c_BKLM)
-      continue;
-    for (int j = i + 1; j < nEntries; ++j) {
-      const KLMDigit* bklmDigit_j = klmDigits[j];
-      if (bklmDigit_j->getSubdetector() != KLMElementNumbers::c_BKLM)
-        continue;
 
-      if (bklmDigit_i->getSection() == bklmDigit_j->getSection() &&
-          bklmDigit_i->getSector() == bklmDigit_j->getSector() &&
-          bklmDigit_i->getLayer() == bklmDigit_j->getLayer() &&
-          bklmDigit_i->isPhiReadout() != bklmDigit_j->isPhiReadout()) {  // phi-theta match
-        int section = bklmDigit_i->getSection();
-        int sector = bklmDigit_i->getSector() - 1; // zero-based
-        int layer = bklmDigit_i->getLayer() - 1; // zero-based
-        int phiStrip = 0;
-        int zStrip = 0;
-        if (bklmDigit_i->isPhiReadout()) {
-          phiStrip = bklmDigit_i->getStrip() - 1; //zero-based
-          zStrip = bklmDigit_j->getStrip() - 1; // zero-based
-        } else {
-          zStrip = bklmDigit_i->getStrip() - 1; // zero-based
-          phiStrip = bklmDigit_j->getStrip() - 1; // zero-based
-        }
+  sort(hits);
+  drop_duplicates(hits);
 
-        int xInt = 0, yInt = 0, zInt = 0;
-        double x = 0.0, y = 0.0, z = 0.0;
-        geometryConverter(section, sector, layer, phiStrip, zStrip, xInt, yInt, zInt);
-        // covert 1/8 cm to cm
-        x = (double)(xInt >> 3);
-        y = (double)(yInt >> 3);
-        z = (double)(zInt >> 3);
 
-        KLMTriggerHit* hit = klmTriggerHits.appendNew(section, sector, layer, phiStrip, zStrip);
-        hit->setX(x);
-        hit->setY(y);
-        hit->setZ(z);
-        hit->setXInt(xInt);
-        hit->setYInt(yInt);
-        hit->setZInt(zInt);
-        hit->addRelationTo(klmDigits[i]);
-        hit->addRelationTo(klmDigits[j]);
-      }
-    }
+  auto grouped = group<KLM_type, section_t, sector_t>::apply(hits,
+                                                             [](const auto & e1) -> layer_count { return e1.size(); },
+                                                             [](const auto & e1) -> layer_mask  { return to_bit_mask<layer_t>(e1);}
+                                                            );
+
+
+  sort(grouped);
+
+
+  auto summery2 = group<KLM_type>::apply(grouped,
+  [&](const auto & e1) -> n_sections_trig    {
+    return count_if(e1, group_helper::greater_equal<int>{m_nLayerTrigger  }, layer_count());
+  });
+
+
+  auto n_triggered_sectors2 = group<KLM_type, section_t>::apply(grouped,
+                              [&](const auto & e1) -> sector_mask    { return to_sector_bit_mask(e1, TriggerCut(m_nLayerTrigger));},
+                              [&](const auto & e1) -> sector_mask_or { return to_sector_bit_mask(e1, TriggerCut(m_nLayerTrigger), vetoCut(m_nLayerTrigger));},
+                              [ ](const auto & e1) -> isectors_t     { return to_i_sector(e1[0]); }
+                                                               );
+
+
+  auto summery1 = group<KLM_type>::apply(n_triggered_sectors2,
+  [](const auto & e1) -> back2back_t {
+    return  count_if(e1, group_helper::greater<int>{0}, sector_mask()) >= c_TotalSections_per_EKLM_BKLM;
   }
-//    B2INFO("KLM TSIM: " << klmTriggerHits.getEntries() << " hits made");
-}
+                                        );
 
+  m_KLMTrgSummary->setBKLM_n_trg_sectors(first_or_default(summery2, KLM_type(KLMElementNumbers::c_BKLM), 0 , n_sections_trig{}));
+  m_KLMTrgSummary->setEKLM_n_trg_sectors(first_or_default(summery2, KLM_type(KLMElementNumbers::c_EKLM), 0 , n_sections_trig{}));
 
+  m_KLMTrgSummary->setSector_mask_Backward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(i_backward_bklm), 0 , sector_mask{}));
+  m_KLMTrgSummary->setSector_mask_Forward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(i_forward_bklm) , 0 , sector_mask{}));
+  m_KLMTrgSummary->setSector_mask_Backward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(i_backward_eklm), 0 , sector_mask{}));
+  m_KLMTrgSummary->setSector_mask_Forward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(i_forward_eklm) , 0 , sector_mask{}));
 
+  m_KLMTrgSummary->setSector_mask_OR_Backward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(i_backward_bklm), 0 ,
+                                                     sector_mask_or{}));
+  m_KLMTrgSummary->setSector_mask_OR_Forward_Barrel(first_or_default(n_triggered_sectors2, isectors_t(i_forward_bklm) , 0 ,
+                                                    sector_mask_or{}));
+  m_KLMTrgSummary->setSector_mask_OR_Backward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(i_backward_eklm), 0 ,
+                                                     sector_mask_or{}));
+  m_KLMTrgSummary->setSector_mask_OR_Forward_Endcap(first_or_default(n_triggered_sectors2, isectors_t(i_forward_eklm) , 0 ,
+                                                    sector_mask_or{}));
 
-void KLMTriggerModule::fillTracks()
-{
-  StoreArray<KLMTriggerHit> klmTriggerHits(m_klmhitCollectionName);
-  if (!klmTriggerHits.isValid())
-    return;
+  m_KLMTrgSummary->setBKLM_back_to_back_flag(first_or_default(summery1, KLM_type(KLMElementNumbers::c_BKLM), 0 , back2back_t{}));
+  m_KLMTrgSummary->setEKLM_back_to_back_flag(first_or_default(summery1, KLM_type(KLMElementNumbers::c_EKLM), 0 , back2back_t{}));
 
-  StoreArray<KLMTriggerTrack> klmTriggerTracks(m_klmtrackCollectionName);
-
-  std::unordered_map<int, KLMTriggerTrack*> trackMap;
-
-  int nEntries = klmTriggerHits.getEntries();
-//  B2INFO("KLM TSIM: " << nEntries << " hits found");
-  for (int i = 0; i < nEntries; ++i) {
-    const KLMTriggerHit* hit = klmTriggerHits[i];
-
-    int section = hit->getSection();
-    int sector = hit->getSector();
-
-    int sectorID = section * c_TotalSectors + sector;
-
-    if (!trackMap.count(sectorID))
-      trackMap[sectorID] = klmTriggerTracks.appendNew(section, sector);
-
-    trackMap[sectorID]->addRelationTo(klmTriggerHits[i]);
-  }
-}
-
-
-void KLMTriggerModule::calcChisq()
-{
-  StoreArray<KLMTriggerTrack> klmTriggerTracks(m_klmtrackCollectionName);
-  if (!klmTriggerTracks.isValid())
-    return;
-
-  int nEntries = klmTriggerTracks.getEntries();
-  for (int i = 0; i < nEntries; ++i) {
-    KLMTriggerTrack* track = klmTriggerTracks[i];
-    RelationVector<KLMTriggerHit> hits = track->getRelationsWith<KLMTriggerHit>(m_klmhitCollectionName);
-
-    int nHits = hits.size();
-//    B2INFO("KLM TSIM: " << nHits << " hits attached to track");
-    int sumX = 0, sumY = 0, sumZ = 0, sumXX = 0, sumXY = 0, sumXZ = 0, sumYY = 0, sumZZ = 0;
-    int nLayers = 0;
-    int firstLayer = c_TotalLayers;
-    int lastLayer = 0;
-//    bool firedLayers[c_TotalLayers] = { };
-    std::unordered_map<int, bool> layersMap;
-
-    for (int j = 0; j < nHits; ++j) {
-      const KLMTriggerHit* hit = hits[j];
-
-      const int xInt = hit->getXInt();
-      const int yInt = hit->getYInt();
-      const int zInt = hit->getZInt();
-      const int layer = hit->getLayer();
-
-      // calculate sums
-      sumX += xInt;
-      sumY += yInt;
-      sumZ += zInt;
-      sumXX += xInt * xInt;
-      sumXY += xInt * yInt;
-      sumXZ += xInt * zInt;
-      sumYY += yInt * yInt;
-      sumZZ += zInt * zInt;
-
-      // find minimum and maximum layers
-      if (layer < firstLayer)
-        firstLayer = layer;
-      if (layer > lastLayer)
-        lastLayer = layer;
-//      firedLayers[layer] = true;
-      layersMap[layer] = true;
-    }
-
-    // mimic firmware integer widths
-//    if(abs(sumX)>262144) // 5 bits upto 18 bits
-//      sumX = 0;
-//    if(abs(sumY)>262144)
-//      sumY = 0;
-//    if(abs(sumZ)>262144)
-//      sumZ = 0;
-
-//    if(abs(sumXX)>5.37e8) // 10 bits upto 29 bits
-//      sumXX = 0;
-//    if(abs(sumXY)>5.37e8)
-//      sumXY = 0;
-//    if(abs(sumXZ)>5.37e8)
-//      sumXZ = 0;
-//    if(abs(sumYY)>5.37e8)
-//      sumYY = 0;
-//    if(abs(sumZZ)>5.37e8)
-//      sumZZ = 0;
-
-    sumX = sumX >> 5;
-    sumY = sumY >> 5;
-    sumZ = sumZ >> 5;
-
-    sumXX = sumXX >> 10;
-    sumXY = sumXY >> 10;
-    sumXZ = sumXZ >> 10;
-    sumYY = sumYY >> 10;
-    sumZZ = sumZZ >> 10;
-
-    // calculate chisq
-    int denom = sumXX * nHits - sumX * sumX;
-    /* cppcheck-suppress variableScope */
-    double denomInversed = 0.0;
-    double slopeXY = 0.0;
-    double interceptXY = 0.0;
-    double chisqXY = 0.0;
-    double ipXY = 0.0;
-    double slopeXZ = 0.0;
-    double interceptXZ = 0.0;
-    double chisqXZ = 0.0;
-    double ipXZ = 0.0;
-
-    denom = denom >> 4;
-//    if(abs(denomInt)<1.074e6) { // 14 bits upto 30 bits
-    if (denom != 0) {
-      denomInversed = 1.0 / denom;
-
-      slopeXY = denomInversed * (sumXY * nHits - sumX * sumY);
-      interceptXY = denomInversed * (sumXX * sumY - sumX * sumXY);
-
-      slopeXZ = denomInversed * (sumXZ * nHits - sumX * sumZ);
-      interceptXZ = denomInversed * (sumXX * sumZ - sumX * sumXZ);
-
-      // denominator shift compensation
-      slopeXY /= 16;
-      interceptXY /= 16;
-
-      slopeXZ /= 16;
-      interceptXZ /= 16;
-
-      // to avoid additional division, and square root calculation,
-      // in the firmware we calculate ip^2 and
-      // approximate 1/(1+slope*slope) as (1-slope*slope)
-      // mimic this behaviour here
-      ipXY = interceptXY * interceptXY * (1.0 - slopeXY * slopeXY);
-      chisqXY = slopeXY * slopeXY * sumXX + interceptXY * interceptXY * nHits + sumYY + 2.0 * slopeXY * interceptXY * sumX - 2.0 *
-                slopeXY * sumXY - 2.0 * interceptXY * sumY;
-
-      ipXZ = interceptXZ * interceptXZ * (1.0 - slopeXZ * slopeXZ);
-      chisqXZ = slopeXZ * slopeXZ * sumXX + interceptXZ * interceptXZ * nHits + sumZZ + 2.0 * slopeXZ * interceptXZ * sumX - 2.0 *
-                slopeXZ * sumXZ - 2.0 * interceptXZ * sumZ;
-
-      // sumX, sumXX shift compensation (first factor)
-      // and convert 1/8 cm -> cm (second factor)
-      interceptXY *= (32 / 8);
-      chisqXY *= (1024 / 64);
-      ipXY *= (1024 / 64);
-
-      interceptXZ *= (32 / 8);
-      chisqXZ *= (1024 / 64);
-      ipXZ *= (1024 / 64);
-    }
-
-//    // calculate number of fired layers
-//    for(int i = 0; i < c_TotalLayers; ++i)
-//      if(firedLayers[i] == true)
-//        ++nLayers;
-    nLayers = layersMap.size();
-
-    track->setSlopeXY(slopeXY);
-    track->setInterceptXY(interceptXY);
-    track->setChisqXY(chisqXY);
-    track->setImpactParameterXY(ipXY);
-
-    track->setSlopeXZ(slopeXZ);
-    track->setInterceptXZ(interceptXZ);
-    track->setChisqXZ(chisqXZ);
-    track->setImpactParameterXZ(ipXZ);
-
-    track->setFirstLayer(firstLayer);
-    track->setLastLayer(lastLayer);
-    track->setNLayers(nLayers);
-
-    // to avoid additional division, in the firmware we do not calculate chisq/n
-    // we compare chisq to threshold*n
-    // mimic this behaviour here
-    if (chisqXY < m_maxChisq * nHits && ipXY < m_maxIP &&
-        chisqXZ < m_maxChisq * nHits && ipXZ < m_maxIP &&
-        nLayers > m_minLayers)
-      track->setTrigger(true);
-  }
-  m_nTracks += nEntries;
-}
-
-
-//void KLMTriggerModule::geometryConverter(bool section, int sector, int layer, int phiStrip, int zStrip, double& x, double& y, double& z)
-//{
-//  // lengths are in centimeters
-//  const double phi_width[c_TotalLayers] = {4.0, 4.0, 4.90, 5.11, 5.32, 5.53, 4.30, 4.46, 4.62, 4.77, 4.93, 5.09, 5.25, 5.40, 5.56};
-//  const int phi_nstrips[c_TotalLayers] = {37, 42, 36, 36, 36, 36, 48, 48, 48, 48, 48, 48, 48, 48, 48};
-//  const double cosine[c_TotalSectors] = {1.0, 0.707107, 0.0, -0.707107, -1.0, -0.707107, 0.0, 0.707107};
-//  const double sine[c_TotalSectors] = {0.0, 0.707107, 1.0, 0.707107, 0.0, -0.707107, -1.0, -0.707107};
-//  const double z_width = (layer < 2 ? 4.0 : 4.52);
-//  const double z_offset = 47.0;
-//  const double r0 = 201.9;
-//  const double gap_height = 4.4;
-//  const double first_gap_height = 4.1;
-//  const double iron_height = 4.7;
-//  const double frame_thickness = 0.3;
-//
-//  const double tan_pi_to_8 = 0.414214;
-//  const double gap_iron_width = (layer == 0 ? 7.94 : 3.0);
-//  const int y_offset_sign = (layer == 0 ? -1 : 1);
-//  const double spacer_width = 0.6;
-//  const double scint_height = 1.0;
-//  const double ps_inner_height = 0.635;
-//  const double ps_outer_height = 0.47625;
-//  const double glass_height = 0.238125;
-//  const double gas_height = 0.2;
-//
-//  if(layer == 0)
-//    x = r0 + 0.5 * first_gap_height;
-//  else
-//    x = r0 + first_gap_height + iron_height + (layer - 1) * (gap_height + iron_height) + 0.5 * gap_height;
-//  y = (0.5 + phiStrip - 0.5 * phi_nstrips[layer]) * phi_width[layer];
-//  z = (0.5 + zStrip) * z_width + frame_thickness;
-//
-//  // some small corrections
-//  if(layer < 2) { // scints
-//    if(layer == 0)
-//      y += ((x + 0.5 * first_gap_height) * tan_pi_to_8 - gap_iron_width - frame_thickness - 0.5 * phi_nstrips[layer] * phi_width[layer]) *
-//        y_offset_sign;
-//    else
-//      y += ((x + 0.5 * gap_height) * tan_pi_to_8 - gap_iron_width - frame_thickness - 0.5 * phi_nstrips[layer] * phi_width[layer]) *
-//        y_offset_sign;
-//    // x correction should go later, since in y correction calculation previous x is used (ActiveMiddleRadius vs ModuleMiddleRadius)
-//    x += -(0.5 * scint_height - 0.5 * (ps_inner_height - ps_outer_height));
-//  } else { // RPCs
-//    x += -(glass_height + 0.5 * gas_height);
-//    z += spacer_width;
-//  }
-//
-//  // backward part flip
-//  if(!section) {
-//    y = -y;
-//    z = -z;
-//  }
-//
-//  // detector asymmetry shift
-//  z += z_offset;
-//
-//  // rotate the sector to its position
-//  double x_tmp = x, y_tmp = y;
-//  x_tmp = x_tmp*cosine[sector] - y_tmp*sine[sector];
-//  y_tmp = x_tmp*sine[sector] + y_tmp*cosine[sector];
-//}
-
-
-void KLMTriggerModule::geometryConverter(int section, int sector, int layer, int phiStrip, int zStrip, int& x, int& y, int& z)
-{
-  const int c_LayerXCoord[c_TotalLayers] = {1628, 1700, 1773, 1846, 1919, 1992, 2064, 2137, 2210, 2283, 2356, 2428, 2501, 2574, 2647};
-  const int c_LayerY0[c_TotalLayers] = { -2403, -2566, -2744, -2862, -2979, -3097, -3234, -3354, -3474, -3587, -3708, -3828, -3948, -4061, -4181};
-  const int c_PhiWidth[c_TotalLayers] = {128, 128, 157, 164, 170, 177, 138, 143, 148, 153, 158, 163, 168, 173, 178};
-
-  const int c_Z01     = 18;
-  const int c_Z02     = 25;
-  const int c_ZWidth1 = 32;
-  const int c_ZWidth2 = 36;
-  const int c_ZOffset = 376;
-
-  bool flipped = false;
-  int dy = 0;
-  int dz = 0;
-  int z0 = 0;
-  int zWidth = 0;
-
-  // define if module is flipped
-  if (layer == 0 && section == 0 && sector == 0) // layer 0, backward, sector 0
-    flipped = true;
-  else if (layer == 0 && section == 0 && sector == 1)
-    flipped = true;
-  else if (layer == 0 && section == 0 && sector == 2)
-    flipped = false;
-  else if (layer == 0 && section == 0 && sector == 3)
-    flipped = false;
-  else if (layer == 0 && section == 0 && sector == 4)
-    flipped = false;
-  else if (layer == 0 && section == 0 && sector == 5)
-    flipped = false;
-  else if (layer == 0 && section == 0 && sector == 6)
-    flipped = true;
-  else if (layer == 0 && section == 0 && sector == 7)
-    flipped = true;
-  else if (layer == 0 && section == 1 && sector == 0) // layer 0, forward, sector 0
-    flipped = true;
-  else if (layer == 0 && section == 1 && sector == 1)
-    flipped = true;
-  else if (layer == 0 && section == 1 && sector == 2)
-    flipped = true;
-  else if (layer == 0 && section == 1 && sector == 3)
-    flipped = false;
-  else if (layer == 0 && section == 1 && sector == 4)
-    flipped = false;
-  else if (layer == 0 && section == 1 && sector == 5)
-    flipped = false;
-  else if (layer == 0 && section == 1 && sector == 6)
-    flipped = false;
-  else if (layer == 0 && section == 1 && sector == 7)
-    flipped = true;
-  else if (layer == 1 && section == 0 && sector == 0) // layer 1, backward, sector 0
-    flipped = false;
-  else if (layer == 1 && section == 0 && sector == 1)
-    flipped = false;
-  else if (layer == 1 && section == 0 && sector == 2)
-    flipped = false;
-  else if (layer == 1 && section == 0 && sector == 3)
-    flipped = true;
-  else if (layer == 1 && section == 0 && sector == 4)
-    flipped = true;
-  else if (layer == 1 && section == 0 && sector == 5)
-    flipped = true;
-  else if (layer == 1 && section == 0 && sector == 6)
-    flipped = true;
-  else if (layer == 1 && section == 0 && sector == 7)
-    flipped = false;
-  else if (layer == 1 && section == 1 && sector == 0) // layer 1, forward, sector 0
-    flipped = false;
-  else if (layer == 1 && section == 1 && sector == 1)
-    flipped = false;
-  else if (layer == 1 && section == 1 && sector == 2)
-    flipped = true;
-  else if (layer == 1 && section == 1 && sector == 3)
-    flipped = true;
-  else if (layer == 1 && section == 1 && sector == 4)
-    flipped = true;
-  else if (layer == 1 && section == 1 && sector == 5)
-    flipped = true;
-  else if (layer == 1 && section == 1 && sector == 6)
-    flipped = false;
-  else if (layer == 1 && section == 1 && sector == 7)
-    flipped = false;
-  else if (layer > 2 && section == 0) // backward RPCs
-    flipped = true;
-  else
-    flipped = false;
-
-  // convert channels to x, y, z
-  if (layer < 2) {
-    z0     = c_Z01;
-    zWidth = c_ZWidth1;
-  } else {
-    z0     = c_Z02;
-    zWidth = c_ZWidth2;
-  }
-
-  // corrections to y && z
-  if (layer == 2 || layer == 4 || layer == 8 ||
-      layer == 10 || layer == 11 || layer == 13) {
-    if (phiStrip > 45)
-      dy = -9;
-    else if (phiStrip > 40)
-      dy = -8;
-    else if (phiStrip > 35)
-      dy = -7;
-    else if (phiStrip > 29)
-      dy = -6;
-    else if (phiStrip > 24)
-      dy = -5;
-    else if (phiStrip > 18)
-      dy = -4;
-    else if (phiStrip > 13)
-      dy = -3;
-    else if (phiStrip > 8)
-      dy = -2;
-    else if (phiStrip > 2)
-      dy = -1;
-    else
-      dy = 0;
-  } else if (layer == 3 || layer == 6 or
-             layer == 7 || layer == 9) {
-    if (phiStrip > 47)
-      dy = -18;
-    else if (phiStrip > 45)
-      dy = -17;
-    else if (phiStrip > 42)
-      dy = -16;
-    else if (phiStrip > 39)
-      dy = -15;
-    else if (phiStrip > 36)
-      dy = -14;
-    else if (phiStrip > 34)
-      dy = -13;
-    else if (phiStrip > 31)
-      dy = -12;
-    else if (phiStrip > 28)
-      dy = -11;
-    else if (phiStrip > 25)
-      dy = -10;
-    else if (phiStrip > 23)
-      dy = -9;
-    else if (phiStrip > 20)
-      dy = -8;
-    else if (phiStrip > 17)
-      dy = -7;
-    else if (phiStrip > 15)
-      dy = -6;
-    else if (phiStrip > 12)
-      dy = -5;
-    else if (phiStrip > 9)
-      dy = -4;
-    else if (phiStrip > 6)
-      dy = -3;
-    else if (phiStrip > 4)
-      dy = -2;
-    else if (phiStrip > 1)
-      dy = -1;
-    else
-      dy = 0;
-  } else
-    dy = 0;
-
-  if (layer == 4)
-    dy = -dy;
-
-  if (layer >= 2) {
-    if (zStrip > 45)
-      dz = 8;
-    else if (zStrip > 38)
-      dz = 7;
-    else if (zStrip > 32)
-      dz = 6;
-    else if (zStrip > 26)
-      dz = 5;
-    else if (zStrip > 20)
-      dz = 4;
-    else if (zStrip > 13)
-      dz = 3;
-    else if (zStrip > 7)
-      dz = 2;
-    else if (zStrip > 1)
-      dz = 1;
-    else
-      dz = 0;
-  } else
-    dz = 0;
-
-  y  = c_LayerY0[layer] + dy + phiStrip * c_PhiWidth[layer];
-  if (flipped)
-    y = -y;
-
-  z  = z0 + dz + zStrip * zWidth;
-  if (section == 1)
-    z = z + c_ZOffset;
-  else
-    z = -z + c_ZOffset;
-
-  x      = c_LayerXCoord[layer];
-  y      = y >> 2; // y values are defined in 1/32 cm here, round up to 1/8 cm
-//z      = z;
 }

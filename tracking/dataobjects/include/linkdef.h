@@ -20,6 +20,7 @@
 #pragma link C++ class vector < pair < unsigned int, vector < pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > > > > >+; // checksum=0x47fe6901, version=6
 #pragma link C++ class pair <unsigned int, double >+; // checksum=0x71a4cb1e, version=-1
 #pragma link C++ class vector < pair <unsigned int, double > >+; // checksum=0x6b073150, version=6
+#pragma link C++ class pair <bool, bool>+; // checksum=0xd82e1600, version=-1
 
 #pragma link C++ class Belle2::ROIid+; // checksum=0x67e7bffd, version=1
 #pragma link C++ class Belle2::ROIpayload+; // checksum=0x24692265, version=2

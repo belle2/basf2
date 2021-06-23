@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Test whether we can create and read a sequential root file with 5 events
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+# this is a test executable, not a module so we don't need doxygen warnings
+# @cond SUPPRESS_DOXYGEN
 
 """
 Check that random numbers don't change and are consistent.
@@ -28,14 +30,14 @@ class RandomTestModule(basf2.Module):
 
     def __init__(self, name):
         """Make sure we can run in multiple processes"""
-        super(RandomTestModule, self).__init__()
+        super().__init__()
         self.set_property_flags(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
         #: save a name for the module to print it
         self.name = name
 
     def get_numbers(self, name):
         """Print the first 20 random numbers"""
-        numbers = ["First 20 random values in %s::%s()" % (self.name, name)]
+        numbers = [f"First 20 random values in {self.name}::{name}()"]
         for row in range(5):
             numbers.append(", ".join(double_to_hex(gRandom.Rndm()) for i in range(4)))
         basf2.B2INFO("\n  ".join(numbers))
@@ -72,12 +74,15 @@ main.add_module(RandomTestModule("test1"))
 main.add_module("RandomBarrier")
 main.add_module(RandomTestModule("test2"))
 
+#: framework logging configuration object
+logging_framework = basf2.logging.package("framework")
 # now the libraries are loaded so we can set the loglevel to debug, set the seed
 # and start processing
-logging_framework = basf2.logging.package("framework")
 logging_framework.set_log_level(basf2.LogLevel.DEBUG)
 logging_framework.set_debug_level(200)
 logging_framework.set_info(basf2.LogLevel.DEBUG, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
 basf2.set_random_seed("this is the seed")
 
 basf2.process(main)
+
+# @endcond

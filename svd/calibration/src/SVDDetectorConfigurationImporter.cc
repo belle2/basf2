@@ -26,8 +26,9 @@
 
 #include <framework/utilities/FileSystem.h>
 
-// wrapper objects
-#include <svd/calibration/SVDDetectorConfiguration.h>
+// DB objects
+#include <svd/dbobjects/SVDLocalConfigParameters.h>
+#include <svd/dbobjects/SVDGlobalConfigParameters.h>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
@@ -119,7 +120,7 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
 
   }
 
-  DBImportObjPtr<SVDDetectorConfiguration::t_svdGlobalConfig_payload> svdGlobalConfig(SVDDetectorConfiguration::svdGlobalConfig_name);
+  DBImportObjPtr<SVDGlobalConfigParameters> svdGlobalConfig("SVDGlobalConfigParameters");
 
   svdGlobalConfig.construct(xmlFileName);
 
@@ -180,7 +181,7 @@ void SVDDetectorConfigurationImporter::importSVDLocalConfigParametersFromXML(con
     }
   }
 
-  DBImportObjPtr<SVDDetectorConfiguration::t_svdLocalConfig_payload> svdLocalConfig(SVDDetectorConfiguration::svdLocalConfig_name);
+  DBImportObjPtr<SVDLocalConfigParameters> svdLocalConfig("SVDLocalConfigParameters");
 
   svdLocalConfig.construct(xmlFileName);
 

@@ -64,7 +64,7 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
   addParam("Deadchannel",
            m_deadchflag,
            "Mask dead channels based on database. True:mask False:unmask",
-           false);
+           true);
   addParam("Crosstalk_tdcfilter",
            m_crosstalk_tdcfilter,
            "TDC based crosstalk filtering logic on CDCFE. True:enable False:disable",

@@ -9,6 +9,8 @@ import tracking.harvest.harvesting as harvesting
 import tracking.harvest.refiners as refiners
 import tracking.validation.utilities as utilities
 
+from tracking.validation.utilities import getObjectList
+
 import tracking.harvest.peelers as peelers
 ROOT.gSystem.Load("libtracking")
 
@@ -110,7 +112,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         fit_status_crops = peelers.peel_fit_status(reco_track)
 
         correct_rl_information = sum(peelers.is_correct_rl_information(cdc_hit, reco_track, self.mc_hit_lookup)
-                                     for cdc_hit in reco_track.getCDCHitList())
+                                     for cdc_hit in getObjectList(reco_track.getCDCHitList()))
 
         crops = dict(
             correct_rl_information=correct_rl_information,

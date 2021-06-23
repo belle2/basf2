@@ -29,7 +29,7 @@ RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagati
     //    B2INFO("RealisticTDCCountTranslator:: judge from FileMetaData.");
   } else { //judge from MCParticle
     StoreArray<MCParticle> mcp;
-    if (!mcp) m_realData = true;
+    if (mcp.getEntries() > 0) m_realData = true;
     //    B2INFO("RealisticTDCCountTranslator:: judge from MCParticle.");
   }
   //  B2INFO("RealisticTDCCountTranslator:: m_realData= " << m_realData);

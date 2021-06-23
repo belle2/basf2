@@ -26,25 +26,27 @@ main = create_path()
 emptypath = create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', evtNumList=[1000], runList=[1], expList=[0])
+main.add_module("EventInfoSetter", evtNumList=[1000], runList=[1], expList=[0])
 
 # generate Bhabha events
-main.add_module('BabayagaNLOInput')
+main.add_module("BabayagaNLOInput")
 
 # register the preselection module
-generatorpreselection = main.add_module('GeneratorPreselection')
-generatorpreselection.param({
-    'nChargedMin': 1,
-    'MinChargedP': 0.5,
-    'MinChargedPt': 0.1,
-    'MinChargedTheta': 16.5,
-    'MaxChargedTheta': 150.5,
-    'nPhotonMin': 1,
-    'MinPhotonEnergy': 0.5,
-    'MinPhotonTheta': 12.,
-    'MaxPhotonTheta': 156.,
-})
-generatorpreselection.if_value('<1', emptypath)
+generatorpreselection = main.add_module("GeneratorPreselection")
+generatorpreselection.param(
+    {
+        "nChargedMin": 1,
+        "MinChargedP": 0.5,
+        "MinChargedPt": 0.1,
+        "MinChargedTheta": 16.5,
+        "MaxChargedTheta": 150.5,
+        "nPhotonMin": 1,
+        "MinPhotonEnergy": 0.5,
+        "MinPhotonTheta": 12.0,
+        "MaxPhotonTheta": 156.0,
+    }
+)
+generatorpreselection.if_value("<1", emptypath)
 
 # detector simulation
 add_simulation(main, bkgfiles=get_background_files())
@@ -53,10 +55,10 @@ add_simulation(main, bkgfiles=get_background_files())
 add_reconstruction(main)
 
 # memory profile
-main.add_module('Profile')
+main.add_module("Profile")
 
 # output
-main.add_module('RootOutput', outputFileName='../BabayagaNLOBhabhaSimRec.root')
+main.add_module("RootOutput", outputFileName="../BabayagaNLOBhabhaSimRec.root")
 
 process(main)
 
@@ -64,17 +66,17 @@ process(main)
 print(statistics)
 
 statistics_plots(
-    'BabayagaNLOBhabhaSimRec_statistics.root',
-    contact='Software team b2soft@mail.desy.de',
-    job_desc='a standard simulation and reconstruction job with radiative '
-             'Bhabha events using Babayaga.NLO',
-    prefix='BabayagaNLOBhabhaSimRec'
+    "BabayagaNLOBhabhaSimRec_statistics.root",
+    contact="Software team b2soft@mail.desy.de",
+    job_desc="a standard simulation and reconstruction job with radiative "
+    "Bhabha events using Babayaga.NLO",
+    prefix="BabayagaNLOBhabhaSimRec",
 )
 event_timing_plot(
-    '../BabayagaNLOBhabhaSimRec.root',
-    'BabayagaNLOBhabhaSimRec_statistics.root',
-    contact='Software team b2soft@mail.desy.de',
-    job_desc='a standard simulation and reconstruction job with radiative '
-             'Bhabha events using Babayaga.NLO',
-    prefix='BabayagaNLOBhabhaSimRec'
+    "../BabayagaNLOBhabhaSimRec.root",
+    "BabayagaNLOBhabhaSimRec_statistics.root",
+    contact="Software team b2soft@mail.desy.de",
+    job_desc="a standard simulation and reconstruction job with radiative "
+    "Bhabha events using Babayaga.NLO",
+    prefix="BabayagaNLOBhabhaSimRec",
 )

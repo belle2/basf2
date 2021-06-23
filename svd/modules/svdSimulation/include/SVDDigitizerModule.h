@@ -138,8 +138,10 @@ namespace Belle2 {
       // 4. Timing
       /** Hardware Clocks*/
       DBObjPtr<HardwareClockSettings> m_hwClock;
-      /** Shaping time of the APV25 shapers.*/
-      double m_shapingTime = 250.0;
+      /** Decay time of betaprime waveform U-side.*/
+      double m_betaPrimeDecayTimeU = 250.0;
+      /** Decay time of betaprime waveform V-side.*/
+      double m_betaPrimeDecayTimeV = 250.0;
       /** Interval between two waveform samples, by default taken from HardwareClockSettings */
       double m_samplingTime = -1;
       /** Time window start, excluding trigger bin effect.

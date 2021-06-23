@@ -93,8 +93,10 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
            m_nSamplesOverZS);
 
   // 4. Timing
-  addParam("APVShapingTime", m_shapingTime, "APV25 shaping time in ns",
-           m_shapingTime);
+  addParam("m_betaPrimeDecayTimeU", m_betaPrimeDecayTimeU, "Decay time of betaprime waveform in ns, U-side",
+           m_betaPrimeDecayTimeU);
+  addParam("m_betaPrimeDecayTimeV", m_betaPrimeDecayTimeV, "Decay time of betaprime waveform in ns, V-side",
+           m_betaPrimeDecayTimeV);
   addParam("ADCSamplingTime", m_samplingTime,
            "Interval between ADC samples in ns, if = -1 taken from HardwareClockSettings payload (default).", m_samplingTime);
   addParam("StartSampling", m_startSampling,
@@ -153,7 +155,8 @@ void SVDDigitizerModule::initialize()
   m_segmentLength *= Unit::mm;
   m_noiseFraction = TMath::Freq(m_SNAdjacent); // 0.9... !
   m_samplingTime *= Unit::ns;
-  m_shapingTime *= Unit::ns;
+  m_betaPrimeDecayTimeU *= Unit::ns;
+  m_betaPrimeDecayTimeV *= Unit::ns;
   m_minTimeFrame *= Unit::ns;
   m_maxTimeFrame *= Unit::ns;
 
@@ -181,7 +184,6 @@ void SVDDigitizerModule::initialize()
   B2DEBUG(29, " -->  Samples over ZS cut:" << m_nSamplesOverZS);
   B2DEBUG(29, " -->  Noise fraction*:    " << 1.0 - m_noiseFraction);
   B2DEBUG(29, " TIMING: ");
-  B2DEBUG(29, " -->  APV25 shaping time: " << m_shapingTime);
   B2DEBUG(29, " -->  Sampling time:      " << m_samplingTime);
   B2DEBUG(29, " -->  Start of int. wind.:" << m_startSampling);
   B2DEBUG(29, " -->  Random event times. " << (m_randomizeEventTimes ? "true" : "false"));
@@ -653,13 +655,14 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
           driftTime);
 
   double apvCoupling = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, "APVCoupling");
+  double betaPrimeDecayTime = (!have_electrons) ? m_betaPrimeDecayTimeU : m_betaPrimeDecayTimeV;
 
   double recoveredCharge = 0;
   for (std::size_t index = 0; index <  readoutStrips.size(); index ++) {
     // NB> To first approximation, we assign to the signal 1/2*driftTime.
     // This doesn't change the charge collection, only charge collection timing.
     waveforms[readoutStrips[index]].add(m_currentTime + 0.5 * driftTime, readoutCharges[index],
-                                        m_shapingTime, m_currentParticle, m_currentTrueHit, w_betaprime);
+                                        betaPrimeDecayTime, m_currentParticle, m_currentTrueHit, w_betaprime);
     // coupled signal left neighbour
     if (index > 0)
       waveforms[readoutStrips[index]].add(m_currentTime + 0.5 * driftTime, apvCoupling * readoutCharges[index - 1],

@@ -200,7 +200,6 @@ public :
   /** Version */
   virtual Int_t   Version() const { return 2; };
   virtual void    Begin(TTree* tree); /**< Begin */
-  virtual void    SlaveBegin(TTree* tree); /**< SlaveBegin */
   virtual void    Init(TTree* tree); /**< Init */
   virtual Bool_t  Notify(); /**< Notify */
   virtual Bool_t  Process(Long64_t entry); /**< Process */
@@ -214,7 +213,6 @@ public :
   virtual void    SetInputList(TList* input) { fInput = input; };
   /** GetOutputList */
   virtual TList*  GetOutputList() const { return fOutput; };
-  virtual void    SlaveTerminate(); /**< SlaveTerminate */
   virtual void    Terminate(); /**< Terminate */
 
   ClassDef(eclChargedPidSelector, 0); /**< ClassDef */

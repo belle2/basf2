@@ -13,12 +13,8 @@
 // The following methods are defined in this file:
 //    Begin():        called every time a loop on the tree starts,
 //                    a convenient place to create your histograms.
-//    SlaveBegin():   called after Begin(), when on PROOF called only on the
-//                    slave servers.
 //    Process():      called for each event, in this function you decide what
 //                    to read and fill your histograms.
-//    SlaveTerminate: called at the end of the loop on the tree, when on PROOF
-//                    called only on the slave servers.
 //    Terminate():    called at the end of the loop on the tree,
 //                    a convenient place to draw/fit your histograms.
 //
@@ -259,14 +255,6 @@ void eclChargedPidSelector::Begin(TTree * /*tree*/)
     TH2F* h_EoPvtheta = new TH2F("h_EoPvtheta", "E/P against Reconstructed Track Theta", 150, 0., 1.5, 150, 0., 180);    fOutput->Add( h_EoPvtheta );
     TH2F* h_EonEtrue = new TH2F("h_EonEtrue", "Shower Energy against True MC Energy", 150, 0., 6.0, 150, 0., 6.0);    fOutput->Add( h_EonEtrue );
     TH2F* h_PonPtrue = new TH2F("h_PonPtrue", "Track Momentum against True MC Momentum", 150, 0., 6.0, 150, 0., 6.0);    fOutput->Add( h_PonPtrue );
-}
-
-void eclChargedPidSelector::SlaveBegin(TTree * /*tree*/)
-{
-    // The SlaveBegin() function is called after the Begin() function.
-    // When running with PROOF SlaveBegin() is called on each slave server.
-    // The tree argument is deprecated (on PROOF 0 is passed).
-
 }
 
 Bool_t eclChargedPidSelector::Process(Long64_t entry)
@@ -709,14 +697,6 @@ Bool_t eclChargedPidSelector::Process(Long64_t entry)
     ( (TH2F*)fOutput->FindObject( "h_EonEtrue" ) )->Fill( eclShowerEnergy->at(i), mcEnergy->at(i) );
 
     return kTRUE;
-}
-
-void eclChargedPidSelector::SlaveTerminate()
-{
-    // The SlaveTerminate() function is called after all entries or objects
-    // have been processed. When running with PROOF SlaveTerminate() is called
-    // on each slave server.
-
 }
 
 void eclChargedPidSelector::SetOutputDir(const char* outpath)

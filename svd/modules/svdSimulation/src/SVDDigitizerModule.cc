@@ -654,8 +654,12 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   B2DEBUG(29, "currentTime = " << m_currentTime << " + 0.5 driftTime = " << 0.5 * driftTime << " = " << m_currentTime + 0.5 *
           driftTime);
 
-  double apvCoupling = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, "APVCoupling");
+  // Specify beta prime decay time
   double betaPrimeDecayTime = (!have_electrons) ? m_betaPrimeDecayTimeU : m_betaPrimeDecayTimeV;
+
+  // Specify coupling and adjacent-channel waveform shape
+  double apvCoupling = m_ChargeSimCal.getCouplingConstant(currentSensorID, !have_electrons, "APVCoupling");
+  WaveformShape w_adjacent = (!have_electrons) ? w_adjacentU : w_adjacentV;
 
   double recoveredCharge = 0;
   for (std::size_t index = 0; index <  readoutStrips.size(); index ++) {

@@ -56,7 +56,7 @@ namespace Belle2 {
     /// get number of triggered bunch
     unsigned int getBunchNumber() {return m_bunchNumber;}
     /// get if an injection happened recently (and the corresponding stored data is actually valid)
-    bool hasInjection() {return m_timeSinceLastInjection == c_flagNoInjection;}
+    bool hasInjection() {return m_timeSinceLastInjection != c_flagNoInjection;}
 
     // Simple Setters
     /// set that stored information is valid

@@ -24,6 +24,7 @@ __email__ = "marco.milesi@unimelb.edu.au"
 
 
 import argparse
+import re
 from modularAnalysis import getAnalysisGlobaltag
 
 
@@ -84,9 +85,9 @@ if __name__ == '__main__':
     args = argparser().parse_args()
 
     import basf2
-    from modularAnalysis import inputMdst, fillParticleLists, variablesToNtuple, matchMCTruth, applyCuts, applyChargedPidMVA
-    from variables import variables
+    import modularAnalysis as ma
     from ROOT import Belle2
+    import pdg
 
     for tag in args.global_tag_append:
         basf2.conditions.append_globaltag(tag)
@@ -102,27 +103,26 @@ if __name__ == '__main__':
     # Add input.
     # ----------
 
-    inputMdst(environmentType="default",
-              filename=basf2.find_file("mdst13.root", "validation"),
-              path=path)
+    ma.inputMdst(environmentType="default",
+                 filename=basf2.find_file("mdst13.root", "validation"),
+                 path=path)
 
     # ---------------------------------------
     # Load standard charged stable particles,
     # and fill corresponding particle lists.
     # ---------------------------------------
 
-    std_charged = {
-        Belle2.Const.electron.getPDGCode(): {"EVTGEN_ID": "e+", "NAME": "e", "FULLNAME": "electron", "CUT": ""},
-        Belle2.Const.muon.getPDGCode(): {"EVTGEN_ID": "mu+", "NAME": "mu", "FULLNAME": "muon", "CUT": ""},
-        Belle2.Const.pion.getPDGCode(): {"EVTGEN_ID": "pi+", "NAME": "pi", "FULLNAME": "pion", "CUT": ""},
-        Belle2.Const.kaon.getPDGCode(): {"EVTGEN_ID": "K+", "NAME": "K", "FULLNAME": "kaon", "CUT": ""},
-        Belle2.Const.proton.getPDGCode(): {"EVTGEN_ID": "p+", "NAME": "p", "FULLNAME": "proton", "CUT": ""},
-        Belle2.Const.deuteron.getPDGCode(): {"EVTGEN_ID": "deuteron", "NAME": "d", "FULLNAME": "deuteron", "CUT": ""},
-    }
+    std_charged = [
+        Belle2.Const.electron.getPDGCode(),
+        Belle2.Const.muon.getPDGCode(),
+        Belle2.Const.pion.getPDGCode(),
+        Belle2.Const.kaon.getPDGCode(),
+        Belle2.Const.proton.getPDGCode(),
+        Belle2.Const.deuteron.getPDGCode(),
+    ]
 
-    plists = [(f"{d.get('EVTGEN_ID')}:{d.get('FULLNAME')}s", d.get("CUT")) for d in std_charged.values()]
-
-    fillParticleLists(plists, path=path)
+    plists = [(f"{pdg.to_name(pdgId)}:my_{pdg.to_name(pdgId)}", "") for pdgId in std_charged]
+    ma.fillParticleLists(plists, path=path)
 
     # --------------------------
     # (Optional) truth matching.
@@ -130,7 +130,7 @@ if __name__ == '__main__':
 
     if args.matchTruth:
         for plistname, _ in plists:
-            matchMCTruth(plistname, path=path)
+            ma.matchMCTruth(plistname, path=path)
             applyCuts(plistname, "isSignal == 1", path=path)
 
     # -------------------
@@ -140,53 +140,31 @@ if __name__ == '__main__':
     global_pid = (args.testHyposPDGCodePair == (0, 0))
     binary_pid = not global_pid
 
-    # ----------------------------------------------------------------------------
-    # Set variable aliases to be consistent with the names in the MVA weightfiles.
-    # ----------------------------------------------------------------------------
-
-    variables.addAlias("__event__", "evtNum")
-    for det in ["CDC", "TOP", "ARICH", "ECL", "KLM"]:
-        if global_pid:
-            for pdgId, d in std_charged.items():
-                orig = f"pidProbabilityExpert({pdgId}, {det})"
-                alias = f"{d.get('FULLNAME')}ID_{det}"
-                variables.addAlias(alias, orig)
-                # Log-transformed sub-detector likelihood ratios.
-                epsilon = 1e-8  # To avoid singularities due to limited numerical precision.
-                orig_transfo = f"formula(-1. * log10(formula(((1. - {orig}) + {epsilon}) / ({orig} + {epsilon}))))"
-                alias_transfo = f"{d.get('FULLNAME')}ID_{det}_LogTransfo"
-                variables.addAlias(alias_transfo, orig_transfo)
-        elif binary_pid:
-            for s, b in args.testHyposPDGCodePair:
-                s_name = std_charged.get(s).get("NAME")
-                b_name = std_charged.get(b).get("NAME")
-                variables.addAlias(f"deltaLogL_{s_name}_{b_name}_{det}", f"pidDeltaLogLikelihoodValueExpert({s}, {b}, {det})")
-
     # ----------------------
     # Apply charged Pid MVA.
     # ----------------------
 
     if global_pid:
-        applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
-                           path=path,
-                           trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Multiclass,
-                           chargeIndependent=args.chargeIndependent)
+        ma.applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
+                              path=path,
+                              trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Multiclass,
+                              chargeIndependent=args.chargeIndependent)
         if args.add_ecl_only:
-            applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
-                               path=path,
-                               trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_Multiclass)
+            ma.applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
+                                  path=path,
+                                  trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_Multiclass)
     elif binary_pid:
         for s, b in args.testHyposPDGCodePair:
-            applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
-                               path=path,
-                               trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Classification,
-                               binaryHypoPDGCodes=(s, b),
-                               chargeIndependent=args.chargeIndependent)
+            ma.applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
+                                  path=path,
+                                  trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Classification,
+                                  binaryHypoPDGCodes=(s, b),
+                                  chargeIndependent=args.chargeIndependent)
             if args.add_ecl_only:
-                applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
-                                   path=path,
-                                   trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_Classification,
-                                   binaryHypoPDGCodes=(s, b))
+                ma.applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
+                                      path=path,
+                                      trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_Classification,
+                                      binaryHypoPDGCodes=(s, b))
 
     if args.debug:
         for m in path.modules():
@@ -200,7 +178,7 @@ if __name__ == '__main__':
 
     if global_pid:
 
-        append = "_vs_".join(map(str, std_charged.keys()))
+        append = "_vs_".join(map(str, std_charged))
 
         variables = [f"pidChargedBDTScore({pdgId}, ALL)" for pdgId in std_charged]
         if args.add_ecl_only:
@@ -217,18 +195,22 @@ if __name__ == '__main__':
     filename = f"chargedpid_ntuples__{append}.root"
 
     for plistname, _ in plists:
+
+        # ROOT doesn't like non-alphanum chars...
+        treename = re.sub(r"[\W]+", "", plistname.split(':')[1])
+
         if global_pid:
-            variablesToNtuple(decayString=plistname,
-                              variables=variables,
-                              treename=plistname.split(':')[1],
-                              filename=filename,
-                              path=path)
+            ma.variablesToNtuple(decayString=plistname,
+                                 variables=variables,
+                                 treename=treename,
+                                 filename=filename,
+                                 path=path)
         elif binary_pid:
-            variablesToNtuple(decayString=plistname,
-                              variables=variables,
-                              treename=plistname.split(':')[1],
-                              filename=filename,
-                              path=path)
+            ma.variablesToNtuple(decayString=plistname,
+                                 variables=variables,
+                                 treename=treename,
+                                 filename=filename,
+                                 path=path)
 
     # -----------------
     # Monitor progress.

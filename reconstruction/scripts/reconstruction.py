@@ -87,7 +87,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
 
     :param path: Add the modules to this path.
     :param components: list of geometry components to include reconstruction for, or None for all components.
-    :param pruneTracks: Delete all hits except the first and last of the tracks after the dEdX modules.
+    :param pruneTracks: Delete all hits except the first and last of the tracks after the V0Finder modules.
     :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
         determine, if the geometry is already loaded. This flag can be used to just turn off the geometry adding at
@@ -251,6 +251,7 @@ def add_postfilter_reconstruction(path, components=None, pruneTracks=False):
 
     :param path: Add the modules to this path.
     :param components: list of geometry components to include reconstruction for, or None for all components.
+    :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
     """
 
     # Add postfilter tracking reconstruction modules

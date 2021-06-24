@@ -354,23 +354,25 @@ When passing data over the last step, the BDT will write out a continuum probabi
                :language: python
 
 .. admonition:: Exercise
-       :class: exercise stacked
+    :class: exercise stacked
 
-    Let us now create the script to train BDT using Ntuples that we've just created. The training tools are implemented in basf2 within the :ref:`mva/doc/index-01-mva:mva-package`. One needs to configure the global options and then perform the training (see :ref:`mva/doc/index-01-mva:globaloptions` and :ref:`mva/doc/index-01-mva:fitting-howto-perform-a-training` respectively). Using the examples given in the links write down the script to perform the training.
+    Let us now create the script to train BDT using Ntuples that we've just created. The training tools are implemented in basf2 within the :ref:`mva/doc/index-01-mva:MVA package`. One needs to configure the global options and then perform the training (see :ref:`mva/doc/index-01-mva:globaloptions` and :ref:`mva/doc/index-01-mva:Fitting / Howto perform a training` respectively). Using the examples given in the links write down the script to perform the training.
 .. admonition:: Solution
-       :class: toggle solution
+    :class: toggle solution
 
     .. literalinclude:: steering_files/092_cs.py
-                      :language: python
+                :language: python
 
 To use the trained weights one should put the MVA-expert module after building the continuum suppression in the main steering file. In our case this would look like this:
 
-``path.add_module('MVAExpert',
-                listNames=['B0'],
-                extraInfoName='ContinuumProbability',
-                identifier='MVAFastBDT.root')``
+.. code-block:: python
 
-This would create the variable `extraInfo(ContinuumProbability)`, which should be added as an output variable to the Ntuples. The actual suppression then narrows down to putting a cut on the `extraInfo(ContinuumProbability)` in the very same way that we previously did a cut on R2 in previous exercises. 
+    path.add_module('MVAExpert',
+             listNames=['B0'],
+             extraInfoName='ContinuumProbability',
+             identifier='MVAFastBDT.root')
+
+This would create the variable `extraInfo(ContinuumProbability)`, which should be added as an output variable to the Ntuples. The actual suppression then narrows down to putting a cut on the `extraInfo(ContinuumProbability)` in the very same way that we previously did a cut on R2 in previous exercise. 
 
 .. include:: ../lesson_footer.rstinclude
 

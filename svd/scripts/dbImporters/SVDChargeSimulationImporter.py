@@ -23,7 +23,7 @@ c0_L3_U = 0.76
 c1_L3_U = 0.42
 c2_L3_U = 0.12
 c3_L3_U = 0.08
-apvCoupling_L3_U = 0.10
+apvCoupling_L3_U = 0.00
 
 ew_L3_V = 0.8529
 c0_L3_V = 0.98
@@ -38,7 +38,7 @@ c0_fw_U = 0.82
 c1_fw_U = 0.42
 c2_fw_U = 0.09
 c3_fw_U = 0.08
-apvCoupling_fw_U = 0.10
+apvCoupling_fw_U = 0.00
 
 ew_fw_V = 0.9486
 c0_fw_V = 0.92
@@ -53,7 +53,7 @@ c0_bk_U = 0.80
 c1_bk_U = 0.42
 c2_bk_U = 0.10
 c3_bk_U = 0.08
-apvCoupling_bk_U = 0.10
+apvCoupling_bk_U = 0.00
 
 ew_bk_V = 0.9
 c0_bk_V = 0.94
@@ -68,7 +68,7 @@ c0_or_U = 0.80
 c1_or_U = 0.42
 c2_or_U = 0.10
 c3_or_U = 0.08
-apvCoupling_or_U = 0.10
+apvCoupling_or_U = 0.00
 
 ew_or_V = 0.9472
 c0_or_V = 0.83

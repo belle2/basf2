@@ -93,9 +93,9 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
            m_nSamplesOverZS);
 
   // 4. Timing
-  addParam("m_betaPrimeDecayTimeU", m_betaPrimeDecayTimeU, "Decay time of betaprime waveform in ns, U-side",
+  addParam("BetaPrimeDecayTimeU", m_betaPrimeDecayTimeU, "Decay time of betaprime waveform in ns, U-side",
            m_betaPrimeDecayTimeU);
-  addParam("m_betaPrimeDecayTimeV", m_betaPrimeDecayTimeV, "Decay time of betaprime waveform in ns, V-side",
+  addParam("BetaPrimeDecayTimeV", m_betaPrimeDecayTimeV, "Decay time of betaprime waveform in ns, V-side",
            m_betaPrimeDecayTimeV);
   addParam("ADCSamplingTime", m_samplingTime,
            "Interval between ADC samples in ns, if = -1 taken from HardwareClockSettings payload (default).", m_samplingTime);

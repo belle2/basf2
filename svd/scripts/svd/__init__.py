@@ -21,7 +21,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
     """
 
     # register EventTrackingInfo
-    if 'RegisterEventLevelTrackingInfo' not in path:
+    if not isROIsimulation and 'RegisterEventLevelTrackingInfo' not in path:
         path.add_module('RegisterEventLevelTrackingInfo')
 
     if(isROIsimulation):
@@ -73,7 +73,8 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         missingAPVCreator.set_name(missingAPVsClusterCreatorName)
         path.add_module(missingAPVCreator)
 
-    path.add_module('SVDTrackingEventLevelMdstInfoFiller')
+    if not isROIsimulation:
+        path.add_module('SVDTrackingEventLevelMdstInfoFiller')
 
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)
@@ -119,6 +120,10 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
     in order to simulate the PXD Data Reduction with ROI finding.
     @param applyMasking: if True, hot strips found in :ref:`SVDHotStripsCalibration<svdhotstrips>` are masked.
     """
+
+    # register EventTrackingInfo
+    if not isROIsimulation and 'RegisterEventLevelTrackingInfo' not in path:
+        path.add_module('RegisterEventLevelTrackingInfo')
 
     if(isROIsimulation):
         fitterName = '__ROISVDCoGTimeEstimator'
@@ -175,7 +180,8 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         missingAPVCreator.set_name(missingAPVsClusterCreatorName)
         path.add_module(missingAPVCreator)
 
-    path.add_module('SVDTrackingEventLevelMdstInfoFiller')
+    if not isROIsimulation:
+        path.add_module('SVDTrackingEventLevelMdstInfoFiller')
 
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)
@@ -301,7 +307,7 @@ def add_svd_SPcreation(path, isROIsimulation=False):
     """
 
     # register EventTrackingInfo
-    if 'RegisterEventLevelTrackingInfo' not in path:
+    if not isROIsimulation and 'RegisterEventLevelTrackingInfo' not in path:
         path.add_module('RegisterEventLevelTrackingInfo')
 
     if(isROIsimulation):

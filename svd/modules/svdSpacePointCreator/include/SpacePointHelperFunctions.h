@@ -264,10 +264,12 @@ namespace Belle2 {
 
     // Do not make space-points if their number would be too large to be considered by tracking
     if (foundCombinations.size() > numMaxSpacePoints) {
-      // ...and set flag in EventLevelTrackingInfo
-      StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
-      if (m_eventLevelTrackingInfo.isValid()) {
-        m_eventLevelTrackingInfo->setSVDSpacePointCreatorAbortionFlag();
+      // ...and set flag in EventLevelTrackingInfo (if this is the actual tracking, not ROI-finding)
+      if (svdClusters.getName().find("__ROI") == std::string::npos) {
+        StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
+        if (m_eventLevelTrackingInfo.isValid()) {
+          m_eventLevelTrackingInfo->setSVDSpacePointCreatorAbortionFlag();
+        }
       }
       return;
     }

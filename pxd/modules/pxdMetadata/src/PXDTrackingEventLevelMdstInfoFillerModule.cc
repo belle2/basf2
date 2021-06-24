@@ -44,7 +44,6 @@ void PXDTrackingEventLevelMdstInfoFillerModule::event()
     for (int layer = 0; layer <= 1; layer++) {
       m_eventLevelTrackingInfo->setNVXDClustersInLayer(layer + 1, 0, nClustersPerLayer[layer]);
     }
-
   }
 }
 

@@ -8,9 +8,12 @@ import math
 from ROOT.Belle2 import TrackFitMomentumRange, Database, IntervalOfValidity
 
 parameters = TrackFitMomentumRange()
+parameters.setMomentumRange(11, math.inf)
+parameters.setMomentumRange(13, math.inf)
 parameters.setMomentumRange(211, math.inf)
 parameters.setMomentumRange(321, math.inf)
 parameters.setMomentumRange(2212, math.inf)
+parameters.setMomentumRange(1000010020, math.inf)
 
 database = Database.Instance()
 

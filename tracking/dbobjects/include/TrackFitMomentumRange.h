@@ -48,7 +48,7 @@ namespace Belle2 {
       if (it != m_pThreshold.end()) {
         return it->second;
       } else {
-        B2FATAL("Momentum threshold for pdf " << pdg << " not found");
+        B2FATAL("Momentum threshold for pdg " << pdg << " not found");
       }
     }
 

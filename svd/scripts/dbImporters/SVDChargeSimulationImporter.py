@@ -89,7 +89,7 @@ class defaultChargeSimulationImporter(b2.Module):
         chargeSimCal = SVDChargeSimCal()
 
         payload = Belle2.SVDChargeSimulationCalibrations.t_payload(chargeSimCal, "ChargeSimulationCalibrations_default_" +
-                                                                   str(now.isoformat()) + "_INFO:APVCouplings")
+                                                                   str(now.isoformat()) + "_INFO:release-06_APVCouplings=0")
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 

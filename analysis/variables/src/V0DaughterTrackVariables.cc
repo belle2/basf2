@@ -366,13 +366,23 @@ namespace Belle2 {
         return -1;
       }
 
+      //Check whether tracks used to calculate variable has been reconstructed as electrons/positrons or not (INCONSEQUENTIAL)
+      if (fabs(gamma->getDaughter(daughterIndex1)->getPDGCode()) != 11) {
+        B2INFO("The first track provided has not been reconstructed as an electron/positron. It has PDG code " << gamma->getDaughter(
+                 daughterIndex1)->getPDGCode() << ". However, this is still fully admissible.");
+      }
+      if (fabs(gamma->getDaughter(daughterIndex2)->getPDGCode()) != 11) {
+        B2INFO("The second track provided has not been reconstructed as an electron/positron. It has PDG code " << gamma->getDaughter(
+                 daughterIndex1)->getPDGCode() << ".However, this is still fully admissible.");
+      }
+
       return 0;
     }
 
 
-    void convertedPhotonLoadHelixParams(const Particle* gamma, int daughterIndex1, int daughterIndex2, double& Phi01, double& D01,
-                                        double& Omega1, double& Z01, double& TanLambda1, double& Phi02, double& D02, double& Omega2, double& Z02,
-                                        double& TanLambda2)
+    int convertedPhotonLoadHelixParams(const Particle* gamma, int daughterIndex1, int daughterIndex2, double& Phi01, double& D01,
+                                       double& Omega1, double& Z01, double& TanLambda1, double& Phi02, double& D02, double& Omega2, double& Z02,
+                                       double& TanLambda2)
     {
       //Get helix parameters
       //Electron/track 1
@@ -392,6 +402,12 @@ namespace Belle2 {
       Omega2  = e2Helix.getOmega();
       Z02   = e2Helix.getZ0();
       TanLambda2 = e2Helix.getTanLambda();
+
+      //Check if either track has zero curvature
+      if (Omega1 == 0) {return -1;}
+      else if (Omega2 == 0) {return -2;}
+      else {return 0;}
+
     }
 
     double convertedPhotonInvariantMass(const Particle* gamma, const std::vector<double>& daughterIndices)
@@ -404,8 +420,8 @@ namespace Belle2 {
       double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
       int daughterIndex1 = int(daughterIndices[0]);
       int daughterIndex2 = int(daughterIndices[1]);
-      convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
-                                     Omega2, Z02, TanLambda2);
+      errFlag = convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
+                                               Omega2, Z02, TanLambda2);
 
       //Calculating invariant mass
       //Sine and cosine Lambda
@@ -439,8 +455,8 @@ namespace Belle2 {
       double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
       int daughterIndex1 = int(daughterIndices[0]);
       int daughterIndex2 = int(daughterIndices[1]);
-      convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
-                                     Omega2, Z02, TanLambda2);
+      errFlag = convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
+                                               Omega2, Z02, TanLambda2);
 
       //Delta-TanLambda
       return (TanLambda2 - TanLambda1);
@@ -456,8 +472,16 @@ namespace Belle2 {
       double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
       int daughterIndex1 = int(daughterIndices[0]);
       int daughterIndex2 = int(daughterIndices[1]);
-      convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
-                                     Omega2, Z02, TanLambda2);
+      errFlag = convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
+                                               Omega2, Z02, TanLambda2);
+      if (errFlag == -1) {
+        B2ERROR("First track provided has curvature zero. Calculation of convertedPhotonDelR failed.");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      if (errFlag == -2) {
+        B2ERROR("Second track provided has curvature zero. Calculation of convertedPhotonDelR failed.");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
 
       //Delta-R
       double radius1 = 1 / Omega1;
@@ -481,8 +505,16 @@ namespace Belle2 {
       double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
       int daughterIndex1 = int(daughterIndices[0]);
       int daughterIndex2 = int(daughterIndices[1]);
-      convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
-                                     Omega2, Z02, TanLambda2);
+      errFlag = convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
+                                               Omega2, Z02, TanLambda2);
+      if (errFlag == -1) {
+        B2ERROR("First track provided has curvature zero. Calculation of convertedPhotonZ1Z2 failed.");
+        return  std::pair<double, double>(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());
+      }
+      if (errFlag == -2) {
+        B2ERROR("Second track provided has curvature zero. Calculation of convertedPhotonZ1Z2 failed.");
+        return  std::pair<double, double>(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());
+      }
 
       //Delta-Z
       //Radial unit vectors
@@ -533,8 +565,16 @@ namespace Belle2 {
       double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
       int daughterIndex1 = int(daughterIndices[0]);
       int daughterIndex2 = int(daughterIndices[1]);
-      convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
-                                     Omega2, Z02, TanLambda2);
+      errFlag = convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
+                                               Omega2, Z02, TanLambda2);
+      if (errFlag == -1) {
+        B2ERROR("First track provided has curvature zero. Calculation of convertedPhotonXY failed.");
+        return  TVector2(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());
+      }
+      if (errFlag == -2) {
+        B2ERROR("Second track provided has curvature zero. Calculation of convertedPhotonXY failed.");
+        return  TVector2(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());
+      }
 
       //Radial unit vectors
       double radius1 = 1 / Omega1;
@@ -579,8 +619,20 @@ namespace Belle2 {
       double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
       int daughterIndex1 = int(daughterIndices[0]);
       int daughterIndex2 = int(daughterIndices[1]);
-      convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02,
-                                     TanLambda2);
+      errFlag = convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
+                                               Omega2, Z02,
+                                               TanLambda2);
+      if (errFlag == -1) {
+        B2ERROR("First track provided has curvature zero. Calculation of convertedPhoton3Momentum failed.");
+        return  TVector3(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(),
+                         std::numeric_limits<double>::quiet_NaN());
+      }
+      if (errFlag == -2) {
+        B2ERROR("Second track provided has curvature zero. Calculation of convertedPhoton3Momentum failed.");
+        return  TVector3(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(),
+                         std::numeric_limits<double>::quiet_NaN());
+      }
+
       //Delta-Z
       //Radial unit vectors
       double radius1 = 1 / Omega1;
@@ -802,27 +854,27 @@ namespace Belle2 {
                       "(0,0), (0,1) ... (1,1), (1,2) ... (2,2) ...");
     /// Converted photon variables
     REGISTER_VARIABLE("convertedPhotonInvariantMass(i,j)",       convertedPhotonInvariantMass,
-                      "Invariant mass of the i-j daughter system assuming it's a converted photon");
+                      "Invariant mass of the i-j daughter system as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
     REGISTER_VARIABLE("convertedPhotonDelTanLambda(i,j)",       convertedPhotonDelTanLambda,
-                      "Discriminating variable Delta-TanLambda calculated for daughters (i,j), assuming it's a converted photon");
+                      "Discriminating variable Delta-TanLambda calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
     REGISTER_VARIABLE("convertedPhotonDelR(i,j)",       convertedPhotonDelR,
-                      "Discriminating variable Delta-R calculated for daughters (i,j), assuming it's a converted photon");
+                      "Discriminating variable Delta-R calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
     REGISTER_VARIABLE("convertedPhotonDelZ(i,j)",       convertedPhotonDelZ,
-                      "Discriminating variable Delta-Z calculated for daughters (i,j), assuming it's a converted photon");
+                      "Discriminating variable Delta-Z calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
     REGISTER_VARIABLE("convertedPhotonX(i,j)",       convertedPhotonX,
-                      "Estimate of vertex X coordinate  calculated for daughters (i,j), assuming it's a converted photon");
+                      "Estimate of vertex X coordinate  calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
     REGISTER_VARIABLE("convertedPhotonY(i,j)",       convertedPhotonY,
-                      "Estimate of vertex Y coordinate  calculated for daughters (i,j), assuming it's a converted photon");
+                      "Estimate of vertex Y coordinate  calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
     REGISTER_VARIABLE("convertedPhotonZ(i,j)",       convertedPhotonZ,
-                      "Estimate of vertex Z coordinate  calculated for daughters (i,j), assuming it's a converted photon");
+                      "Estimate of vertex Z coordinate  calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
     REGISTER_VARIABLE("convertedPhotonRho(i,j)",       convertedPhotonRho,
-                      "Estimate of vertex Rho  calculated for daughters (i,j), assuming it's a converted photon");
+                      "Estimate of vertex Rho  calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
     REGISTER_VARIABLE("convertedPhotonPx(i,j)", convertedPhotonPx,
-                      "Estimate of x-component of photon momentum calculated for daughters (i,j), assuming it's a converted photon");
+                      "Estimate of x-component of photon momentum calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
     REGISTER_VARIABLE("convertedPhotonPy(i,j)", convertedPhotonPy,
-                      "Estimate of y-component of photon momentum calculated for daughters (i,j), assuming it's a converted photon");
+                      "Estimate of y-component of photon momentum calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
     REGISTER_VARIABLE("convertedPhotonPz(i,j)", convertedPhotonPz,
-                      "Estimate of z-component of photon momentum calculated for daughters (i,j), assuming it's a converted photon");
+                      "Estimate of z-component of photon momentum calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
     /// check whether the innermost VXD hits are shared among daoughters
     REGISTER_VARIABLE("v0DaughtersShare1stHit", v0DaughtersShareInnermostHit,
                       "flag for V0 daughters sharing the first(innermost) VXD hit. 0x1(0x2) bit represents V/z(U/r-phi)-hit share.");

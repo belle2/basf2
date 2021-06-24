@@ -224,9 +224,9 @@ namespace Belle2 {
     int convertedPhotonErrorChecks(const Particle* gamma, const std::vector<double>& daughterIndices);
 
     /** helper function to load helix parameters for calculating converted photon variables */
-    void convertedPhotonLoadHelixParams(const Particle* gamma, int daughterIndex1, int daughterIndex2, double& Phi01, double& D01,
-                                        double& Omega1, double& Z01, double& TanLambda1, double& Phi02, double& D02, double& Omega2, double& Z02,
-                                        double& TanLambda2);
+    int convertedPhotonLoadHelixParams(const Particle* gamma, int daughterIndex1, int daughterIndex2, double& Phi01, double& D01,
+                                       double& Omega1, double& Z01, double& TanLambda1, double& Phi02, double& D02, double& Omega2, double& Z02,
+                                       double& TanLambda2);
 
     /**
      * returns the invariant-mass of the two-track system assuming it's a converted photon

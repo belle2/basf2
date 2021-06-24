@@ -26,10 +26,11 @@ REG_MODULE(TTDUnpacker)
 TTDUnpackerModule::TTDUnpackerModule() : Module(),  m_EventLevelTriggerTimeInfo()
 {
   //Set module properties
-  setDescription("TTD Unpacker");
+  setDescription("TTD Unpacker, unpacks first RawFTSW object");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("EventLevelTriggerTimeInfoName", m_EventLevelTriggerTimeInfoName, "The name of the StoreArray of TTD to be processed",
+  addParam("EventLevelTriggerTimeInfoName", m_EventLevelTriggerTimeInfoName,
+           "The name of the StoreArray of TTD to be processed (RawFTSW)",
            std::string(""));
 }
 

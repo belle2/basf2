@@ -35,7 +35,7 @@ settings = CalibrationSettings(
         "maxevt_rg": 75000,
         "maxevt_cc": 18e6,
         "maxevt_wg": 18e6,
-        "adjustment": 1.01},
+        "adjustment": 1.00798},
     input_data_filters={
         "bhabha_all_calib": [
             input_data_filters['Run Type']['physics'],

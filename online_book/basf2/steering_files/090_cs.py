@@ -28,7 +28,7 @@ ma.reconstructDecay(
 )
 
 ma.reconstructDecay(
-    decayString="B0  -> K_S0 pi0:eff60_May2020",
+    decayString="B0  -> K_S0 pi0:eff60_Jan2020",
     cut="5.1 < Mbc < 5.3 and abs(deltaE) < 2",
     path=main,
 )

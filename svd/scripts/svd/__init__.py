@@ -20,6 +20,10 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
     @param applyMasking: if True, hot strips found in :ref:`SVDHotStripsCalibration<svdhotstrips>` are masked.
     """
 
+    # register EventTrackingInfo
+    if 'RegisterEventLevelTrackingInfo' not in path:
+        path.add_module('RegisterEventLevelTrackingInfo')
+
     if(isROIsimulation):
         clusterizerName = '__ROISVDClusterizer'
         recocreatorName = '__ROISVDRecoDigitCreator'
@@ -68,6 +72,8 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         missingAPVCreator = b2.register_module('SVDMissingAPVsClusterCreator')
         missingAPVCreator.set_name(missingAPVsClusterCreatorName)
         path.add_module(missingAPVCreator)
+
+    path.add_module('SVDTrackingEventLevelMdstInfoFiller')
 
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)
@@ -168,6 +174,8 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         missingAPVCreator = b2.register_module('SVDMissingAPVsClusterCreator')
         missingAPVCreator.set_name(missingAPVsClusterCreatorName)
         path.add_module(missingAPVCreator)
+
+    path.add_module('SVDTrackingEventLevelMdstInfoFiller')
 
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)
@@ -291,6 +299,10 @@ def add_svd_SPcreation(path, isROIsimulation=False):
     @param isROIsimulation: SVD reconstruction can be run during simulation\
     in order to simulate the PXD Data Reduction with ROI finding.
     """
+
+    # register EventTrackingInfo
+    if 'RegisterEventLevelTrackingInfo' not in path:
+        path.add_module('RegisterEventLevelTrackingInfo')
 
     if(isROIsimulation):
         svdSPCreatorName = '__ROISVDSpacePointCreator'

@@ -26,12 +26,18 @@ RegisterEventLevelTrackingInfoModule::RegisterEventLevelTrackingInfoModule() : M
 
 void RegisterEventLevelTrackingInfoModule::initialize()
 {
-  m_eventLevelTrackingInfo.registerInDataStore(m_eventLevelTrackingInfoName, DataStore::c_ErrorIfAlreadyRegistered);
+  // If m_eventLevelTrackingInfo already exists we'd like to keep it (typically from svd/pxd reconstruction)
+  if (!m_eventLevelTrackingInfo.isOptional()) {
+    m_createNewObj = true;
+    m_eventLevelTrackingInfo.registerInDataStore(m_eventLevelTrackingInfoName, DataStore::c_ErrorIfAlreadyRegistered);
+  }
 }
 
 
 void RegisterEventLevelTrackingInfoModule::event()
 {
-  m_eventLevelTrackingInfo.create();
+  if (m_createNewObj) {
+    m_eventLevelTrackingInfo.create();
+  }
 }
 

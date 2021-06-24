@@ -8,6 +8,8 @@ See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fa
 
 CHANGES since release-05-00-00:
 
+- EventLevelTrackingInfo:
+  + hasSVDSpacePointCreatorAbortionFlag/setSVDSpacePointCreatorAbortionFlag
 - TrackFitResult:
   + ndf
   + chi2

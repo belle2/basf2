@@ -16,6 +16,8 @@
 #include <svd/dataobjects/SVDCluster.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <mdst/dataobjects/EventLevelTrackingInfo.h>
 
 #include <vxd/dataobjects/VxdID.h>
 
@@ -261,7 +263,14 @@ namespace Belle2 {
       findPossibleCombinations(aSensor.second, foundCombinations, hitTimeCut);
 
     // Do not make space-points if their number would be too large to be considered by tracking
-    if (foundCombinations.size() > numMaxSpacePoints) return;
+    if (foundCombinations.size() > numMaxSpacePoints) {
+      // ...and set flag in EventLevelTrackingInfo
+      StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
+      if (m_eventLevelTrackingInfo.isValid()) {
+        m_eventLevelTrackingInfo->setSVDSpacePointCreatorAbortionFlag();
+      }
+      return;
+    }
 
     for (auto& clusterCombi : foundCombinations) {
       SpacePointType* newSP = spacePoints.appendNew(clusterCombi);

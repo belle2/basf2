@@ -12,6 +12,7 @@ CHANGES since release-02-01-00:
 - EventLevelTrackingInfo:
   + hasSVDCKFAbortionFlag/setSVDCKFAbortionFlag
   + hasPXDCKFAbortionFlag/setPXDCKFAbortionFlag
+  + hasSVDSpacePointCreatorAbortionFlag/setSVDSpacePointCreatorAbortionFlag
 - ECLCluster:
   + getPulseShapeDiscriminationMVA added
   + hasFailedFitTime

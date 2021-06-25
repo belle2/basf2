@@ -48,7 +48,7 @@ std::vector<float> TC1GeV;
 
 //..Other
 double radtodeg;
-int iEvent(0);
+//int iEvent(0);
 //int nInAcc=0;
 
 //..Trigger counters
@@ -185,8 +185,8 @@ TRGGRLProjectsModule::beginRun()
 //-----------------------------------------------------------------------------------------
 void TRGGRLProjectsModule::event()
 {
-  cout << "TRGGRLProjects event " << iEvent << endl;
-  iEvent++;
+  //cout << "TRGGRLProjects event " << iEvent << endl;
+  //iEvent++;
 
   //---------------------------------------------------------------------
   //..Read in the necessary arrays
@@ -237,6 +237,9 @@ void TRGGRLProjectsModule::event()
   }
   int nTrkNN = cdcNNTrkArray.getEntries();
   int nTrkNNSTT = 0;
+  int nTrkNNSTT6 = 0;
+  int nTrkNNSTT5 = 0;
+  int nTrkNNSTT4 = 0;
   int nTrkNN20 = 0;
   int nTrkNN40 = 0;
   for (int itrk = 0; itrk < nTrkNN; itrk++) {
@@ -258,6 +261,9 @@ void TRGGRLProjectsModule::event()
     B2DEBUG(20, "NN momentum " << omega << " " << theta * 180 / 3.14 << " " << p * 0.1 << " " << p_abs << " " << pt);
 
     if (abs(z0) < 15. && p > 7) {nTrkNNSTT++;}
+    if (abs(z0) < 15. && p > 6) {nTrkNNSTT6++;}
+    if (abs(z0) < 15. && p > 5) {nTrkNNSTT5++;}
+    if (abs(z0) < 15. && p > 4) {nTrkNNSTT4++;}
     if (abs(z0) < 20.) {nTrkNN20++;}
     if (abs(z0) < 40.) {nTrkNN40++;}
   }
@@ -633,6 +639,13 @@ void TRGGRLProjectsModule::event()
   bool ecl_mumu = (ECLtoGDL[2] & (1 << (75 - 32 * 2))) != 0;
   // ecl_bst: 77
   bool ecl_bst = (ECLtoGDL[2] & (1 << (77 - 32 * 2))) != 0;
+  // ecl_pur: 74
+  bool ecl_bhapur = (ECLtoGDL[2] & (1 << (74 - 32 * 2))) != 0;
+  //3D Bhabha Veto Intrk: 86
+  bool bha_intrk = (ECLtoGDL[2] & (1 << (86 - 32 * 2))) != 0;
+  //3D Bhabha selection theta flag: 87-88
+  bool bha_theta_0 = (ECLtoGDL[2] & (1 << (87 - 32 * 2))) != 0;
+  bool bha_theta_1 = (ECLtoGDL[2] & (1 << (88 - 32 * 2))) != 0;
 
   //---------------------------------------------------------------------
   //..Other input bits
@@ -662,8 +675,8 @@ void TRGGRLProjectsModule::event()
   bool cdcklm_2 = (trackKLMmatch.getEntries() == 3);
   bool cdcklm_3 = (trackKLMmatch.getEntries() > 3);
   int n_seklm = trgInfo->getNsklm();
-  int n_seklm_fwd = trgInfo->getNsklm_fwd();
-  int n_seklm_bwd = trgInfo->getNsklm_bwd();
+  //int n_seklm_fwd = trgInfo->getNsklm_fwd();
+  //int n_seklm_bwd = trgInfo->getNsklm_bwd();
   int n_ieklm = trgInfo->getNiklm();
   bool ecleklm  = (trgInfo->getNeecleklm() > 0);
 
@@ -671,6 +684,8 @@ void TRGGRLProjectsModule::event()
   bool cdcecl_1 = (trackphimatch.getEntries() == 2);
   bool cdcecl_2 = (trackphimatch.getEntries() == 3);
   bool cdcecl_3 = (trackphimatch.getEntries() > 3);
+  bool trkbha1  = ecl_3dbha && (trackphimatch.getEntries() == 1);
+  bool trkbha2  = ecl_3dbha && (trackphimatch.getEntries() == 2);
 
 
 
@@ -719,15 +734,16 @@ void TRGGRLProjectsModule::event()
   int brlnb  = trgInfo->getbrlnb();
   int N_IT   = trgInfo->getNinnertrk();
   int i2fo   = trgInfo->geti2fo();
+  int i2io   = trgInfo->geti2io();
   int n_secl = trgInfo->getNsecl();
   int n_iecl = trgInfo->getNiecl();
 
-  std::cout << "klm    " << klm_hit << " " << klm_0 << " " << klm_1 << " " << klm_2 << " " << klmb2b << std::endl;
-  std::cout << "eklm   " << eklm_hit << " " << eklm_0 << " " << eklm_1 << " " << eklm_2 << " " << eklmb2b << std::endl;
-  std::cout << "2dklm  " << nTrk2D << " " << cdcklm_0 << " " << cdcklm_1 << std::endl;
-  std::cout << "sklm   " << N_ST   << " " << n_seklm << " " << n_seklm_fwd << " " << n_seklm_bwd << std::endl;
-  std::cout << "tiklm  " << N_IT   << " " << n_ieklm << " " << trgInfo->getNiecl() << std::endl;
-  std::cout << "eclklm " << trgInfo->getNeecleklm() << std::endl;
+  //std::cout << "klm    " << klm_hit << " " << klm_0 << " " << klm_1 << " " << klm_2 << " " << klmb2b << std::endl;
+  //std::cout << "eklm   " << eklm_hit << " " << eklm_0 << " " << eklm_1 << " " << eklm_2 << " " << eklmb2b << std::endl;
+  //std::cout << "2dklm  " << nTrk2D << " " << cdcklm_0 << " " << cdcklm_1 << std::endl;
+  //std::cout << "sklm   " << N_ST   << " " << n_seklm << " " << n_seklm_fwd << " " << n_seklm_bwd << std::endl;
+  //std::cout << "tiklm  " << N_IT   << " " << n_ieklm << " " << trgInfo->getNiecl() << std::endl;
+  //std::cout << "eclklm " << trgInfo->getNeecleklm() << std::endl;
 
 
   //---------------------------------------------------------------------
@@ -752,6 +768,9 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "ty_2") {bit = nTrkNN20 == 3;}
     else if (bitname == "ty_3") {bit = nTrkNN20 > 3;}
     else if (bitname == "typ")  {bit = nTrkNNSTT > 0;}
+    else if (bitname == "typ6")  {bit = nTrkNNSTT6 > 0;}
+    else if (bitname == "typ5")  {bit = nTrkNNSTT5 > 0;}
+    else if (bitname == "typ4")  {bit = nTrkNNSTT4 > 0;}
     else if (bitname == "t2_0") {bit = nTrk2D == 1;}
     else if (bitname == "t2_1") {bit = nTrk2D == 2;}
     else if (bitname == "t2_2") {bit = nTrk2D == 3;}
@@ -790,8 +809,11 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "ieklm") {bit = n_ieklm > 0;}
     else if (bitname == "secl") {bit = n_secl > 0;}
     else if (bitname == "iecl") {bit = n_iecl > 0;}
+    else if (bitname == "iecl_0") {bit = n_iecl == 1;}
+    else if (bitname == "iecl_1") {bit = n_iecl > 1;}
     else if (bitname == "ti") {bit = N_IT > 0;}
     else if (bitname == "i2fo") {bit = i2fo > 0;}
+    else if (bitname == "i2io") {bit = i2io > 0;}
     else if (bitname == "ehigh") {bit = ehigh;}
     else if (bitname == "elow") {bit = elow;}
     else if (bitname == "elum") {bit = elum;}
@@ -841,11 +863,6 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "ecl_lml_13") {bit = ecl_lml_13;}
     else if (bitname == "ecl_mumu") {bit = ecl_mumu;}
     else if (bitname == "ecl_bst") {bit = ecl_bst;}
-    else if (bitname == "top_0") {bit = false;}
-    else if (bitname == "top_1") {bit = false;}
-    else if (bitname == "top_2") {bit = false;}
-    else if (bitname == "top_bb") {bit = false;}
-    else if (bitname == "top_active") {bit = false;}
     else if (bitname == "klm_hit") {bit = klm_hit;}
     else if (bitname == "klm_0") {bit = klm_0;}
     else if (bitname == "klm_1") {bit = klm_1;}
@@ -896,9 +913,19 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "p5") {bit = Trkcluster_b2b_1to5 > 0;}
     else if (bitname == "p7") {bit = Trkcluster_b2b_1to7 > 0;}
     else if (bitname == "p9") {bit = Trkcluster_b2b_1to9 > 0;}
-    else if (bitname == "track") {bit = false;}
     else if (bitname == "trkfit") {bit = false;}
+    else if (bitname == "injv") {bit = false;}
+    else if (bitname == "nimin0") {bit = false;}
+    else if (bitname == "nimin1") {bit = false;}
+    else if (bitname == "track") {bit = nTrk2D > 0;}
+    else if (bitname == "bha_intrk") {bit = bha_intrk;}
+    else if (bitname == "bha_theta_0") {bit = bha_theta_0;}
+    else if (bitname == "bha_theta_1") {bit = bha_theta_1;}
+    else if (bitname == "ecl_bhapur") {bit = ecl_bhapur;}
 
+    //GRL related bits, not perfect. To do: judge bhabha cluster or not correctly
+    else if (bitname == "trkbha1") {bit = trkbha1;}
+    else if (bitname == "trkbha2") {bit = trkbha2;}
 
     //GRL related bits, not ready
     else if (bitname == "ta_0") {bit = false;}
@@ -909,27 +936,32 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "tsf0b2b") {bit = false;}
     else if (bitname == "tsf1b2b") {bit = false;}
     else if (bitname == "tsf2b2b") {bit = false;}
-    else if (bitname == "trkbha1") {bit = false;}
-    else if (bitname == "trkbha2") {bit = false;}
     else if (bitname == "grlgg1") {bit = false;}
     else if (bitname == "grlgg2") {bit = false;}
+    else if (bitname == "fwdsb") {bit = false;}
+    else if (bitname == "bwdsb") {bit = false;}
+    else if (bitname == "fwdnb") {bit = false;}
+    else if (bitname == "bwdnb") {bit = false;}
+    else if (bitname == "brlfb1") {bit = false;}
+    else if (bitname == "brlfb2") {bit = false;}
+    else if (bitname == "brlnb1") {bit = false;}
+    else if (bitname == "brlnb2") {bit = false;}
 
     //KLM TOP ECL not ready
     else if (bitname == "ecl_bhauni") {bit = false;}
-    else if (bitname == "ecl_bhapur") {bit = false;}
     else if (bitname == "cdctop_0") {bit = false;}
     else if (bitname == "cdctop_1") {bit = false;}
     else if (bitname == "cdctop_2") {bit = false;}
     else if (bitname == "cdctop_3") {bit = false;}
-
-    //random trigger
-    else if (bitname == "injv") {bit = false;}
-    else if (bitname == "nimin0") {bit = false;}
-    else if (bitname == "nimin1") {bit = false;}
-    else if (bitname == "inp159") {bit = false;}
+    else if (bitname == "top_0") {bit = false;}
+    else if (bitname == "top_1") {bit = false;}
+    else if (bitname == "top_2") {bit = false;}
+    else if (bitname == "top_bb") {bit = false;}
+    else if (bitname == "top_active") {bit = false;}
 
     //other trigger bits
     else if (bitname == "itsfb2b") {bit = false;}
+    else if (bitname == "inp159") {bit = false;}
 
     //DITTO: please don't change the WARNING message below.
     //If you change it, please update the test trg_tsim_check_warnings.py accordingly.

@@ -154,12 +154,6 @@ void TRGGDLDQMModule::defineHisto()
     for (int i = 0; i < n_output_extra; i++) {
       h_psn_extra[iskim]->GetXaxis()->SetBinLabel(i + 1, output_extra[i]);
     }
-    // output extra
-    h_psn_extra_fast[iskim] = new TH1I(Form("hGDL_psn_extra_fast_%s", skim_smap[iskim].c_str()), "psn extra fast", n_output_extra, 0,
-                                       n_output_extra);
-    for (int i = 0; i < n_output_extra; i++) {
-      h_psn_extra_fast[iskim]->GetXaxis()->SetBinLabel(i + 1, output_extra[i]);
-    }
     // output overlap
     h_psn_effect_to_l1[iskim] = new TH1I(Form("hGDL_psn_effect_to_l1_%s", skim_smap[iskim].c_str()), "psn effect to l1",
                                          n_output_overlap, 0,
@@ -251,19 +245,10 @@ void TRGGDLDQMModule::beginRun()
     h_ftd[iskim]->Reset();
     h_psn[iskim]->Reset();
     h_psn_extra[iskim]->Reset();
-    h_psn_extra_fast[iskim]->Reset();
     h_psn_pure_extra[iskim]->Reset();
     h_timtype[iskim]->Reset();
     h_psn_raw_rate[iskim]->Reset();
     h_psn_effect_to_l1[iskim]->Reset();
-  }
-
-  for (int iskim = 0; iskim < nskim_gdldqm; iskim++) {
-    for (int i = 0; i < nsample_fast; i++) {
-      for (int ibin = 0; ibin < n_output_extra; ibin++) {
-        array_psn_extra_fast[iskim][i][ibin] = 0;
-      }
-    }
   }
 
   oldDir->cd();
@@ -373,14 +358,6 @@ void TRGGDLDQMModule::initialize()
     for (unsigned int j = 0; j < n_outbit; j++)              h_p_vec.push_back(0);
     for (unsigned int j = 0; j < n_outbit; j++)              h_f_vec.push_back(0);
     for (unsigned int j = 0; j < n_inbit; j++)               h_i_vec.push_back(0);
-  }
-
-  for (int iskim = 0; iskim < nskim_gdldqm; iskim++) {
-    for (int i = 0; i < nsample_fast; i++) {
-      for (int ibin = 0; ibin < n_output_extra; ibin++) {
-        array_psn_extra_fast[iskim][i][ibin] = 0;
-      }
-    }
   }
 
 }
@@ -1275,460 +1252,348 @@ TRGGDLDQMModule::fillOutputOverlap(void)
 void
 TRGGDLDQMModule::fillOutputExtra(void)
 {
-  bool c4_fired = isFired_quick("c4");
-  bool hie_fired = isFired_quick("hie");
-  bool LML_fired = (isFired_quick("lml0", true) || isFired_quick("lml1", true) || isFired_quick("lml2", true)
-                    || isFired_quick("lml3", true) || isFired_quick("lml4", true) || isFired_quick("lml5", true)
-                    || isFired_quick("lml6", true) || isFired_quick("lml7", true) || isFired_quick("lml8", true)
-                    || isFired_quick("lml9", true) || isFired_quick("lml10", true) || isFired_quick("eclmumu", true));
-  bool CDC_fired = (isFired_quick("fff", true) || isFired_quick("ffo", true) || isFired_quick("ffb", true)
-                    || isFired_quick("ffy", true) || isFired_quick("fyo", true) || isFired_quick("fyb", true));
-  bool ECL_fired = (isFired_quick("c4", true) || isFired_quick("hie", true));
-  bool fff_fired = isFired_quick("fff");
-  bool ff_fired  = isFired_quick("ff");
-  bool f_fired   = isFired_quick("f");
-  bool ffo_fired = isFired_quick("ffo");
-  bool ffb_fired = isFired_quick("ffb");
-  bool ffy_fired = isFired_quick("ffy");
-  bool fyo_fired = isFired_quick("fyo");
-  bool fyb_fired = isFired_quick("fyb");
-  bool bha2D_fired = isFired_quick("bhabha");
-  bool bha3D_fired = isFired_quick("bha3d");
-  bool lml0_fired  = isFired_quick("lml0");
-  bool lml1_fired  = isFired_quick("lml1");
-  bool lml2_fired  = isFired_quick("lml2");
-  bool lml3_fired  = isFired_quick("lml3");
-  bool lml4_fired  = isFired_quick("lml4");
-  bool lml5_fired  = isFired_quick("lml5");
-  bool lml6_fired  = isFired_quick("lml6");
-  bool lml7_fired  = isFired_quick("lml7");
-  bool lml8_fired  = isFired_quick("lml8");
-  bool lml9_fired  = isFired_quick("lml9");
-  bool lml10_fired = isFired_quick("lml10");
-  bool lml12_fired = isFired_quick("lml12");
-  bool lml13_fired = isFired_quick("lml13");
-  bool eclmumu_fired = isFired_quick("eclmumu");
-  bool mu_b2b_fired = isFired_quick("mu_b2b");
-  bool mu_eb2b_fired = isFired_quick("mu_eb2b");
-  bool cdcklm1_fired = isFired_quick("cdcklm1");
-  bool cdcklm2_fired = isFired_quick("cdcklm2");
-  bool klm_hit_fired = isFired_quick("klm_hit");
-  bool eklm_hit_fired = isFired_quick("eklm_hit");
-  bool cdcecl1_fired = isFired_quick("cdcecl1");
-  bool cdcecl2_fired = isFired_quick("cdcecl2");
-  bool cdcecl3_fired = isFired_quick("cdcecl3");
-  bool cdcecl4_fired = isFired_quick("cdcecl4");
-  bool fso_fired = isFired_quick("fso");
-  bool fsb_fired = isFired_quick("fsb");
-  bool syo_fired = isFired_quick("syo");
-  bool syb_fired = isFired_quick("syb");
-  bool x_fired = isFired_quick("x");
-  bool fioiecl1_fired = isFired_quick("fioiecl1");
-  bool ecleklm1_fired = isFired_quick("ecleklm1");
-  bool seklm1_fired = isFired_quick("seklm1");
-  bool seklm2_fired = isFired_quick("seklm2");
-  bool ieklm_fired = isFired_quick("ieklm");
-  bool iecl_fired = isFired_quick("iecl");
-  bool yioiecl1_fired = isFired_quick("yioiecl1");
-  bool stt_fired = isFired_quick("stt");
-  bool ffz_fired = isFired_quick("ffz");
-  bool fzo_fired = isFired_quick("fzo");
-  bool fzb_fired = isFired_quick("fzb");
-
   for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
-
-    for (int i = nsample_fast - 1; i > 0; i--) {
-      for (int ibin = 0; ibin < n_output_extra; ibin++) {
-        array_psn_extra_fast[skim[ifill]][i][ibin] = array_psn_extra_fast[skim[ifill]][i - 1][ibin];
-      }
-    }
-    for (int ibin = 0; ibin < n_output_extra; ibin++) {
-      array_psn_extra_fast[skim[ifill]][0][ibin] = 0;
-    }
+    bool c4_fired = isFired_quick("c4");
+    bool hie_fired = isFired_quick("hie");
+    bool LML_fired = (isFired_quick("lml0", true) || isFired_quick("lml1", true) || isFired_quick("lml2", true)
+                      || isFired_quick("lml3", true) || isFired_quick("lml4", true) || isFired_quick("lml5", true)
+                      || isFired_quick("lml6", true) || isFired_quick("lml7", true) || isFired_quick("lml8", true)
+                      || isFired_quick("lml9", true) || isFired_quick("lml10", true) || isFired_quick("eclmumu", true));
+    bool CDC_fired = (isFired_quick("fff", true) || isFired_quick("ffo", true) || isFired_quick("ffb", true)
+                      || isFired_quick("ffy", true) || isFired_quick("fyo", true) || isFired_quick("fyb", true));
+    bool ECL_fired = (isFired_quick("c4", true) || isFired_quick("hie", true));
+    bool fff_fired = isFired_quick("fff");
+    bool ff_fired  = isFired_quick("ff");
+    bool f_fired   = isFired_quick("f");
+    bool ffo_fired = isFired_quick("ffo");
+    bool ffb_fired = isFired_quick("ffb");
+    bool ffy_fired = isFired_quick("ffy");
+    bool fyo_fired = isFired_quick("fyo");
+    bool fyb_fired = isFired_quick("fyb");
+    bool bha2D_fired = isFired_quick("bhabha");
+    bool bha3D_fired = isFired_quick("bha3d");
+    bool lml0_fired  = isFired_quick("lml0");
+    bool lml1_fired  = isFired_quick("lml1");
+    bool lml2_fired  = isFired_quick("lml2");
+    bool lml3_fired  = isFired_quick("lml3");
+    bool lml4_fired  = isFired_quick("lml4");
+    bool lml5_fired  = isFired_quick("lml5");
+    bool lml6_fired  = isFired_quick("lml6");
+    bool lml7_fired  = isFired_quick("lml7");
+    bool lml8_fired  = isFired_quick("lml8");
+    bool lml9_fired  = isFired_quick("lml9");
+    bool lml10_fired = isFired_quick("lml10");
+    bool lml12_fired = isFired_quick("lml12");
+    bool lml13_fired = isFired_quick("lml13");
+    bool eclmumu_fired = isFired_quick("eclmumu");
+    bool mu_b2b_fired = isFired_quick("mu_b2b");
+    bool mu_eb2b_fired = isFired_quick("mu_eb2b");
+    bool cdcklm1_fired = isFired_quick("cdcklm1");
+    bool cdcklm2_fired = isFired_quick("cdcklm2");
+    bool klm_hit_fired = isFired_quick("klm_hit");
+    bool eklm_hit_fired = isFired_quick("eklm_hit");
+    bool cdcecl1_fired = isFired_quick("cdcecl1");
+    bool cdcecl2_fired = isFired_quick("cdcecl2");
+    bool cdcecl3_fired = isFired_quick("cdcecl3");
+    bool cdcecl4_fired = isFired_quick("cdcecl4");
+    bool fso_fired = isFired_quick("fso");
+    bool fsb_fired = isFired_quick("fsb");
+    bool syo_fired = isFired_quick("syo");
+    bool syb_fired = isFired_quick("syb");
+    bool x_fired = isFired_quick("x");
+    bool fioiecl1_fired = isFired_quick("fioiecl1");
+    bool ecleklm1_fired = isFired_quick("ecleklm1");
+    bool seklm1_fired = isFired_quick("seklm1");
+    bool seklm2_fired = isFired_quick("seklm2");
+    bool ieklm_fired = isFired_quick("ieklm");
+    bool iecl_fired = isFired_quick("iecl");
+    bool yioiecl1_fired = isFired_quick("yioiecl1");
+    bool stt_fired = isFired_quick("stt");
+    bool ffz_fired = isFired_quick("ffz");
+    bool fzo_fired = isFired_quick("fzo");
+    bool fzb_fired = isFired_quick("fzb");
 
     if (1) {
       h_psn_extra[skim[ifill]]->Fill(0.5);
-      array_psn_extra_fast[skim[ifill]][0][0] = 1;
     }
     if (fff_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(1.5);
-      array_psn_extra_fast[skim[ifill]][0][1] = 1;
     }
     if (ffo_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(2.5);
-      array_psn_extra_fast[skim[ifill]][0][2] = 1;
     }
     if (ffb_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(3.5);
-      array_psn_extra_fast[skim[ifill]][0][3] = 1;
     }
     if (fff_fired) {
       h_psn_extra[skim[ifill]]->Fill(4.5);
-      array_psn_extra_fast[skim[ifill]][0][4] = 1;
     }
     if (ECL_fired) {
       h_psn_extra[skim[ifill]]->Fill(5.5);
-      array_psn_extra_fast[skim[ifill]][0][5] = 1;
     }
     if (CDC_fired) {
       h_psn_extra[skim[ifill]]->Fill(6.5);
-      array_psn_extra_fast[skim[ifill]][0][6] = 1;
     }
     if ((CDC_fired) && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(7.5);
-      array_psn_extra_fast[skim[ifill]][0][7] = 1;
     }
     if (bha2D_fired) {
       h_psn_extra[skim[ifill]]->Fill(8.5);
-      array_psn_extra_fast[skim[ifill]][0][8] = 1;
     }
     if (bha3D_fired) {
       h_psn_extra[skim[ifill]]->Fill(9.5);
-      array_psn_extra_fast[skim[ifill]][0][9] = 1;
     }
     if (ff_fired) {
       h_psn_extra[skim[ifill]]->Fill(10.5);
-      array_psn_extra_fast[skim[ifill]][0][10] = 1;
     }
     if (ff_fired && (LML_fired)) {
       h_psn_extra[skim[ifill]]->Fill(11.5);
-      array_psn_extra_fast[skim[ifill]][0][11] = 1;
     }
     if (f_fired) {
       h_psn_extra[skim[ifill]]->Fill(12.5);
-      array_psn_extra_fast[skim[ifill]][0][12] = 1;
     }
     if (f_fired && (LML_fired)) {
       h_psn_extra[skim[ifill]]->Fill(13.5);
-      array_psn_extra_fast[skim[ifill]][0][13] = 1;
     }
     if (LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(14.5);
-      array_psn_extra_fast[skim[ifill]][0][14] = 1;
     }
     if (fff_fired && (LML_fired)) {
       h_psn_extra[skim[ifill]]->Fill(15.5);
-      array_psn_extra_fast[skim[ifill]][0][15] = 1;
     }
     if (ffo_fired && (LML_fired)) {
       h_psn_extra[skim[ifill]]->Fill(16.5);
-      array_psn_extra_fast[skim[ifill]][0][16] = 1;
     }
     if (ffb_fired && (LML_fired)) {
       h_psn_extra[skim[ifill]]->Fill(17.5);
-      array_psn_extra_fast[skim[ifill]][0][17] = 1;
     }
     if (ffy_fired) {
       h_psn_extra[skim[ifill]]->Fill(18.5);
-      array_psn_extra_fast[skim[ifill]][0][18] = 1;
     }
     if (ffy_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(19.5);
-      array_psn_extra_fast[skim[ifill]][0][19] = 1;
     }
     if (fyo_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(20.5);
-      array_psn_extra_fast[skim[ifill]][0][20] = 1;
     }
     if (fyb_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(21.5);
-      array_psn_extra_fast[skim[ifill]][0][21] = 1;
     }
     if ((ffy_fired || fyo_fired || fyb_fired) && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(22.5);
-      array_psn_extra_fast[skim[ifill]][0][22] = 1;
     }
     if (ffy_fired && (LML_fired)) {
       h_psn_extra[skim[ifill]]->Fill(23.5);
-      array_psn_extra_fast[skim[ifill]][0][23] = 1;
     }
     if (fyo_fired && (LML_fired)) {
       h_psn_extra[skim[ifill]]->Fill(24.5);
-      array_psn_extra_fast[skim[ifill]][0][24] = 1;
     }
     if (fyb_fired && (LML_fired)) {
       h_psn_extra[skim[ifill]]->Fill(25.5);
-      array_psn_extra_fast[skim[ifill]][0][25] = 1;
     }
     if (c4_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(26.5);
-      array_psn_extra_fast[skim[ifill]][0][26] = 1;
     }
     if (hie_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(27.5);
-      array_psn_extra_fast[skim[ifill]][0][27] = 1;
     }
     if (lml0_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(28.5);
-      array_psn_extra_fast[skim[ifill]][0][28] = 1;
     }
     if (lml1_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(29.5);
-      array_psn_extra_fast[skim[ifill]][0][29] = 1;
     }
     if (lml2_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(30.5);
-      array_psn_extra_fast[skim[ifill]][0][30] = 1;
     }
     if (lml3_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(31.5);
-      array_psn_extra_fast[skim[ifill]][0][31] = 1;
     }
     if (lml4_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(32.5);
-      array_psn_extra_fast[skim[ifill]][0][32] = 1;
     }
     if (lml5_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(33.5);
-      array_psn_extra_fast[skim[ifill]][0][33] = 1;
     }
     if (lml6_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(34.5);
-      array_psn_extra_fast[skim[ifill]][0][34] = 1;
     }
     if (lml7_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(35.5);
-      array_psn_extra_fast[skim[ifill]][0][35] = 1;
     }
     if (lml8_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(36.5);
-      array_psn_extra_fast[skim[ifill]][0][36] = 1;
     }
     if (lml9_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(37.5);
-      array_psn_extra_fast[skim[ifill]][0][37] = 1;
     }
     if (lml10_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(38.5);
-      array_psn_extra_fast[skim[ifill]][0][38] = 1;
     }
     if (lml12_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(39.5);
-      array_psn_extra_fast[skim[ifill]][0][39] = 1;
     }
     if (lml13_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(40.5);
-      array_psn_extra_fast[skim[ifill]][0][40] = 1;
     }
     if (eclmumu_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(41.5);
-      array_psn_extra_fast[skim[ifill]][0][41] = 1;
     }
     if (mu_b2b_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(42.5);
-      array_psn_extra_fast[skim[ifill]][0][42] = 1;
     }
     if (mu_eb2b_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(43.5);
-      array_psn_extra_fast[skim[ifill]][0][43] = 1;
     }
     if (cdcklm1_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(44.5);
-      array_psn_extra_fast[skim[ifill]][0][44] = 1;
     }
     if (cdcklm2_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(45.5);
-      array_psn_extra_fast[skim[ifill]][0][45] = 1;
     }
     if (klm_hit_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(46.5);
-      array_psn_extra_fast[skim[ifill]][0][46] = 1;
     }
     if (eklm_hit_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(47.5);
-      array_psn_extra_fast[skim[ifill]][0][47] = 1;
     }
     if (mu_b2b_fired  && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(48.5);
-      array_psn_extra_fast[skim[ifill]][0][48] = 1;
     }
     if (mu_eb2b_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(49.5);
-      array_psn_extra_fast[skim[ifill]][0][49] = 1;
     }
     if (cdcklm1_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(50.5);
-      array_psn_extra_fast[skim[ifill]][0][50] = 1;
     }
     if (cdcklm2_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(51.5);
-      array_psn_extra_fast[skim[ifill]][0][51] = 1;
     }
     if (klm_hit_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(52.5);
-      array_psn_extra_fast[skim[ifill]][0][52] = 1;
     }
     if (eklm_hit_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(53.5);
-      array_psn_extra_fast[skim[ifill]][0][53] = 1;
     }
     if (cdcecl1_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(54.5);
-      array_psn_extra_fast[skim[ifill]][0][54] = 1;
     }
     if (cdcecl2_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(55.5);
-      array_psn_extra_fast[skim[ifill]][0][55] = 1;
     }
     if (cdcecl3_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(56.5);
-      array_psn_extra_fast[skim[ifill]][0][56] = 1;
     }
     if (cdcecl4_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(57.5);
-      array_psn_extra_fast[skim[ifill]][0][57] = 1;
     }
     if (cdcecl1_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(58.5);
-      array_psn_extra_fast[skim[ifill]][0][58] = 1;
     }
     if (cdcecl2_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(59.5);
-      array_psn_extra_fast[skim[ifill]][0][59] = 1;
     }
     if (cdcecl3_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(60.5);
-      array_psn_extra_fast[skim[ifill]][0][60] = 1;
     }
     if (cdcecl4_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(61.5);
-      array_psn_extra_fast[skim[ifill]][0][61] = 1;
     }
     if (fso_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(62.5);
-      array_psn_extra_fast[skim[ifill]][0][62] = 1;
     }
     if (fsb_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(63.5);
-      array_psn_extra_fast[skim[ifill]][0][63] = 1;
     }
     if (syo_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(64.5);
-      array_psn_extra_fast[skim[ifill]][0][64] = 1;
     }
     if (syb_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(65.5);
-      array_psn_extra_fast[skim[ifill]][0][65] = 1;
     }
     if (x_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(66.5);
-      array_psn_extra_fast[skim[ifill]][0][66] = 1;
     }
     if (fioiecl1_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(67.5);
-      array_psn_extra_fast[skim[ifill]][0][67] = 1;
     }
     if (ecleklm1_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(68.5);
-      array_psn_extra_fast[skim[ifill]][0][68] = 1;
     }
     if (seklm1_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(69.5);
-      array_psn_extra_fast[skim[ifill]][0][69] = 1;
     }
     if (seklm2_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(70.5);
-      array_psn_extra_fast[skim[ifill]][0][70] = 1;
     }
     if (ieklm_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(71.5);
-      array_psn_extra_fast[skim[ifill]][0][71] = 1;
     }
     if (iecl_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(72.5);
-      array_psn_extra_fast[skim[ifill]][0][72] = 1;
     }
     if (ecleklm1_fired && CDC_fired) {
       h_psn_extra[skim[ifill]]->Fill(73.5);
-      array_psn_extra_fast[skim[ifill]][0][73] = 1;
     }
     if (syo_fired && ECL_fired) {
       h_psn_extra[skim[ifill]]->Fill(74.5);
-      array_psn_extra_fast[skim[ifill]][0][74] = 1;
     }
     if (yioiecl1_fired && ECL_fired) {
       h_psn_extra[skim[ifill]]->Fill(75.5);
-      array_psn_extra_fast[skim[ifill]][0][75] = 1;
     }
     if (stt_fired && ECL_fired) {
       h_psn_extra[skim[ifill]]->Fill(76.5);
-      array_psn_extra_fast[skim[ifill]][0][76] = 1;
     }
     if (ffz_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(77.5);
-      array_psn_extra_fast[skim[ifill]][0][77] = 1;
     }
     if (fzo_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(78.5);
-      array_psn_extra_fast[skim[ifill]][0][78] = 1;
     }
     if (fzb_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(79.5);
-      array_psn_extra_fast[skim[ifill]][0][79] = 1;
     }
     if (ffy_fired && ffz_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(80.5);
-      array_psn_extra_fast[skim[ifill]][0][80] = 1;
     }
     if (fyo_fired && fzo_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(81.5);
-      array_psn_extra_fast[skim[ifill]][0][81] = 1;
     }
     if (fyb_fired && fzb_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(82.5);
-      array_psn_extra_fast[skim[ifill]][0][82] = 1;
     }
     if ((ffy_fired || ffz_fired) && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(83.5);
-      array_psn_extra_fast[skim[ifill]][0][83] = 1;
     }
     if ((fyo_fired || fzo_fired) && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(84.5);
-      array_psn_extra_fast[skim[ifill]][0][84] = 1;
     }
     if ((fyb_fired || fzb_fired) && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(85.5);
-      array_psn_extra_fast[skim[ifill]][0][85] = 1;
     }
     if (ffy_fired && ffz_fired) {
       h_psn_extra[skim[ifill]]->Fill(86.5);
-      array_psn_extra_fast[skim[ifill]][0][86] = 1;
     }
     if (fyo_fired && fzo_fired) {
       h_psn_extra[skim[ifill]]->Fill(87.5);
-      array_psn_extra_fast[skim[ifill]][0][87] = 1;
     }
     if (fyb_fired && fzb_fired) {
       h_psn_extra[skim[ifill]]->Fill(88.5);
-      array_psn_extra_fast[skim[ifill]][0][88] = 1;
     }
     if (ffy_fired || ffz_fired) {
       h_psn_extra[skim[ifill]]->Fill(89.5);
-      array_psn_extra_fast[skim[ifill]][0][89] = 1;
     }
     if (fyo_fired || fzo_fired) {
       h_psn_extra[skim[ifill]]->Fill(90.5);
-      array_psn_extra_fast[skim[ifill]][0][90] = 1;
     }
     if (fyb_fired || fzb_fired) {
       h_psn_extra[skim[ifill]]->Fill(91.5);
-      array_psn_extra_fast[skim[ifill]][0][91] = 1;
     }
     if (ffo_fired) {
       h_psn_extra[skim[ifill]]->Fill(92.5);
-      array_psn_extra_fast[skim[ifill]][0][92] = 1;
     }
     if (ffb_fired) {
       h_psn_extra[skim[ifill]]->Fill(93.5);
-      array_psn_extra_fast[skim[ifill]][0][93] = 1;
-    }
-
-    for (int ibin = 0; ibin < n_output_extra; ibin++) {
-      int sum_psn_extra_fast = 0;
-      for (int i = 0; i < nsample_fast; i++) {
-        sum_psn_extra_fast += array_psn_extra_fast[skim[ifill]][i][ibin];
-      }
-      h_psn_extra_fast[skim[ifill]]->SetBinContent(ibin + 1, sum_psn_extra_fast);
     }
   }
 

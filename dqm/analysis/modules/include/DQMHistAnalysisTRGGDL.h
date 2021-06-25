@@ -107,12 +107,9 @@ namespace Belle2 {
     }; /**<name of HLT skims*/
 
     TH1D* m_h_psn_extra[nskim_gdldqm] = {}; /**<DQM Histogram for PSN bits in each HLT skim*/
-    TH1D* m_h_psn_extra_fast[nskim_gdldqm] = {}; /**<DQM Histogram for PSN bits in each HLT skim*/
     TH1D* m_h_psn_pure_extra = nullptr;   /**<DQM Histogram for PSN bits with offline selection*/
     TCanvas* m_c_eff[nskim_gdldqm] = {}; /**<Canvas for TRGGDL efficiency in each HLT skim*/
-    TCanvas* m_c_eff_fast[nskim_gdldqm] = {}; /**<Canvas for TRGGDL efficiency in each HLT skim*/
     TH1D* m_h_eff[nskim_gdldqm] = {};   /**<Histogram for TRGGDL efficiency in each HLT skim*/
-    TH1D* m_h_eff_fast[nskim_gdldqm] = {};   /**<Histogram for TRGGDL efficiency in each HLT skim*/
     static const int n_eff = 40;        /**<number of bins for the efficiency histogram*/
     /**label of bins for the efficiency histogram*/
     const char* c_eff[n_eff] = {
@@ -159,9 +156,7 @@ namespace Belle2 {
     };
 
     TCanvas* m_c_eff_shifter = nullptr;                 /**<Canvas for TRGGDL efficiency, simplified one for CR shifter*/
-    TCanvas* m_c_eff_shifter_fast = nullptr;                 /**<Canvas for TRGGDL efficiency, simplified one for CR shifter*/
     TH1D* m_h_eff_shifter = nullptr;                    /**<Histogram for TRGGDL efficiency, simplified one for CR shifter*/
-    TH1D* m_h_eff_shifter_fast = nullptr;                    /**<Histogram for TRGGDL efficiency, simplified one for CR shifter*/
     static const int n_eff_shifter = 14;                /**<number of bins for the simplified efficiency histogram*/
     const char* c_eff_shifter[n_eff_shifter] = {
       "CDC fff",
@@ -197,10 +192,10 @@ namespace Belle2 {
     TLine* m_line_limit_low_shifter[n_eff_shifter] = {}; /**<lower limit line for the simplified efficiency histogram*/
     TLine* m_line_limit_high_shifter[n_eff_shifter] = {}; /**<upper limit line for the simplified efficiency histogram*/
     double m_limit_low_shifter[n_eff_shifter] = {
-      0.1, 0.80, 0.80, 0.80, 0.80, 0.80, 0.40, 0.10, 0.35, 0.80, 0.20, 0.40, 0.60, 0.70
+      0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.40, 0.10, 0.35, 0.80, 0.00, 0.00, 0.00, 0.00
     }; /**<lower limit value in each bin*/
     double m_limit_high_shifter[n_eff_shifter] = {
-      0.0, 0.95, 0.95, 0.95, 1.00, 1.00, 0.50, 0.20, 0.55, 1.00, 0.40, 0.60, 0.90, 0.90
+      0.95, 0.95, 0.95, 0.95, 1.00, 1.00, 0.50, 0.20, 0.55, 1.00, 1.00, 1.00, 1.00, 1.00
     }; /**<upper limit value in each bin*/
 
 #ifdef _BELLE2_EPICS

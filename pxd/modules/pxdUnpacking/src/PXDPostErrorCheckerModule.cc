@@ -114,8 +114,10 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
   addParam("PXDRawAdcsName", m_PXDRawAdcsName, "The name of the StoreArray of input PXDRawAdcs", std::string(""));
   addParam("PXDRawROIsName", m_PXDRawROIsName, "The name of the StoreArray of input PXDRawROIs", std::string(""));
 
-  addParam("CriticalErrorMask", m_criticalErrorMask, "Set error mask for which data is removed", defaulterrormask);
-  B2DEBUG(25, "The default error mask is $" << std::hex << defaulterrormask);
+  // TODO the bitfield cannot be set by Parameter
+  // addParam("CriticalErrorMask", m_criticalErrorMask, "Set error mask for which data is removed", defaulterrormask);
+  m_criticalErrorMask = defaulterrormask;
+  // B2DEBUG(25, "The default error mask is $" << std::hex << defaulterrormask);
 
   addParam("IgnoreTriggerGate", m_ignoreTriggerGate, "Ignore different triggergate between DHEs", true);
   addParam("IgnoreDHPFrame", m_ignoreDHPFrame, "Ignore different dhp frame between DHEs", true);

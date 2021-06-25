@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Own include
-#include <analysis/modules/PhotonEfficiencyCorrection/PhotonEfficiencyCorrection.h>
+#include <analysis/modules/PhotonEfficiencySystematics/PhotonEfficiencySystematics.h>
 #include <iostream>
 
 #include <framework/datastore/StoreObjPtr.h>
@@ -25,20 +25,20 @@ using namespace Belle2;
 //                 Register module
 //-----------------------------------------------------------------
 
-REG_MODULE(PhotonEfficiencyCorrection);
+REG_MODULE(PhotonEfficiencySystematics);
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-PhotonEfficiencyCorrectionModule::PhotonEfficiencyCorrectionModule() : Module()
+PhotonEfficiencySystematicsModule::PhotonEfficiencySystematicsModule() : Module()
 {
   setDescription(
     R"DOC(Module to include data/MC weights for photon detection efficiency. Include in your code as
 
     .. code:: python
 
-        mypath.add_module("PhotonEfficiencyCorrection", particleLists=['gamma:cut'], tableName=tableName_Weight)
+        mypath.add_module("PhotonEfficiencySystematics", particleLists=['gamma:cut'], tableName=tableName_Weight)
 
 The module modifies the input particleLists by scaling energy as given by the scale in the LookUpTable
 		     
@@ -49,7 +49,7 @@ The module modifies the input particleLists by scaling energy as given by the sc
 }
 
 // Getting LookUp info for given particle in given event
-WeightInfo PhotonEfficiencyCorrectionModule::getInfo(const Particle* particle)
+WeightInfo PhotonEfficiencySystematicsModule::getInfo(const Particle* particle)
 {
   std::vector<std::string> variables =  Variable::Manager::Instance().resolveCollections((
                                           *m_ParticleWeightingLookUpTable.get())->getAxesNames());
@@ -65,24 +65,14 @@ WeightInfo PhotonEfficiencyCorrectionModule::getInfo(const Particle* particle)
   return (*m_ParticleWeightingLookUpTable.get())->getInfo(values);
 }
 
-void PhotonEfficiencyCorrectionModule::beginRun()
+void PhotonEfficiencySystematicsModule::beginRun()
 {
-  //check if this module is used only for MC
-  if (!Environment::Instance().isMC()) {
-    B2ERROR("Attempting to run PhotonEfficiencyCorrection for Data but this should be only used on MC to normalise to real detection efficiency.");
-  }
-
   m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_tableName);
 }
 
 
-void PhotonEfficiencyCorrectionModule::event()
+void PhotonEfficiencySystematicsModule::event()
 {
-  //check if this module is used only for data
-  if (!Environment::Instance().isMC()) {
-    return;
-  }
-
   for (auto& iList : m_ParticleLists) {
     StoreObjPtr<ParticleList> particleList(iList);
 
@@ -95,13 +85,13 @@ void PhotonEfficiencyCorrectionModule::event()
     size_t nPart = particleList->getListSize();
     for (size_t iPart = 0; iPart < nPart; iPart++) {
       auto particle = particleList->getParticle(iPart);
-      addPhotonDetectionEfficiencyWeights(particle);
+      addPhotonDetectionEfficiencyRatios(particle);
     }
   }
 
 }
 
-void PhotonEfficiencyCorrectionModule::addPhotonDetectionEfficiencyWeights(Particle* particle)
+void PhotonEfficiencySystematicsModule::addPhotonDetectionEfficiencyRatios(Particle* particle)
 {
   // Should this necessarily be a photon??? TODO
   if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite) {
@@ -116,7 +106,5 @@ void PhotonEfficiencyCorrectionModule::addPhotonDetectionEfficiencyWeights(Parti
       particle->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
     }
   }
-// Not sure at the moment if debug messages are needed
-//B2DEBUG(10, "Called setMomentumScalingFactor for an unspecified, track-based or KLM cluster-based particle");
 }
 

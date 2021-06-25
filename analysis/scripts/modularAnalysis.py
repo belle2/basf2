@@ -3441,7 +3441,7 @@ def addPhotonEfficiencyRatioVariables(inputListNames, tableName, path=None):
         path (basf2.Path): module is added to this path
     """
 
-    photon_efficiency_correction = register_module('PhotonEfficiencyCorrection')
+    photon_efficiency_correction = register_module('PhotonEfficiencySystematics')
     photon_efficiency_correction.param('particleLists', inputListNames)
     photon_efficiency_correction.param('tableName', tableName)
     path.add_module(photon_efficiency_correction)

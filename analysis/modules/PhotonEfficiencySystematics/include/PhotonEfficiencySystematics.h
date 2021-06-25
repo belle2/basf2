@@ -24,13 +24,13 @@ namespace Belle2 {
   /**
   * Adds Photon Detection Efficiency Data/MC ratios To Particle List
   */
-  class PhotonEfficiencyCorrectionModule : public Module {
+  class PhotonEfficiencySystematicsModule : public Module {
 
   public:
     /**
     * Constructor: Sets the description, the properties and the parameters of the module.
     */
-    PhotonEfficiencyCorrectionModule();
+    PhotonEfficiencySystematicsModule();
     /**
     * Get LookUp information for the particle
     * @param particle
@@ -54,8 +54,8 @@ namespace Belle2 {
     /**
      * function to add appropriate data/mc ratio weight to a particle
      */
-    void addPhotonDetectionEfficiencyWeights(Particle* particle);
+    void addPhotonDetectionEfficiencyRatios(Particle* particle);
 
-  }; // PhotonEfficiencyCorrectionModule
+  }; // PhotonEfficiencySystematicsModule
 
 }; //namespace

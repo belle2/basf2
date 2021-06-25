@@ -304,8 +304,10 @@ namespace Belle2::KlongId {
     }// for gftrack
 
     if (not closestTrack) {
-      return std::make_tuple(closestTrack, oldDistance, std::unique_ptr<const TVector3>(nullptr));
+      return std::make_tuple(nullptr, oldDistance, std::unique_ptr<const TVector3>(nullptr));
     } else {
+      // actually this is fine because of the datastore
+      // cppcheck-suppress returnDanglingLifetime
       return std::make_tuple(closestTrack, oldDistance, std::unique_ptr<const TVector3>(new TVector3(poca)));
     }
   }

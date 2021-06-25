@@ -17,4 +17,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+If you use this software for a publication outside of Belle II,
+please cite https://doi.org/10.1007/s41781-018-0017-9.
+
 Belle II Collaboration: https://www.belle2.org/contact/

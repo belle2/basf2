@@ -290,6 +290,7 @@ SVDOnlineToOfflineMap::ReadSensorSide(int nlayer, int nladder, int nsensor, bool
       cinfo.apv  = chipN;
       cinfo.stripFirst = stripNumberCh0;
       cinfo.stripLast = stripNumberCh127;
+      cinfo.apvChannel = 0;
 
       vecInfo.push_back(cinfo);
 

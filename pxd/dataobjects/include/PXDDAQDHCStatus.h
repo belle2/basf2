@@ -37,7 +37,7 @@ namespace Belle2 {
      * @param dhcid DHC id
      * @param mask error mask
      */
-    explicit PXDDAQDHCStatus(int dhcid, PXDErrorFlags mask) : m_errorMask(mask),
+    explicit PXDDAQDHCStatus(int dhcid, PXDErrorFlags& mask) : m_errorMask(mask),
       m_critErrorMask(0), m_usable(true), m_dhcID(dhcid), m_rawCount(0), m_redCount(0), m_errorinfo(0) {}
 
     /** destructor */
@@ -52,7 +52,7 @@ namespace Belle2 {
      * This should be the OR of error masks of all sub-objects (DHC, DHE)
      * @param m Bit Mask to set
      */
-    void setErrorMask(PXDErrorFlags m) { m_errorMask = m; }
+    void setErrorMask(PXDErrorFlags& mask) { m_errorMask = mask; }
 
     /** Return Error bit mask
      * This is the OR of error masks of all sub-objects (DHC, DHE)
@@ -63,7 +63,7 @@ namespace Belle2 {
     /** Set Critical Error bit mask
      * @param m Bit Mask to set
      */
-    void setCritErrorMask(PXDErrorFlags m) { m_critErrorMask = m; }
+    void setCritErrorMask(PXDErrorFlags& mask) { m_critErrorMask = mask; }
 
     /** Return Critical Error bit mask
      * @return bit mask

@@ -42,17 +42,27 @@ namespace Belle2 {
 //
   TRGECLBGTCHitModule::TRGECLBGTCHitModule()
     : Module::Module(),
-      m_simTCEnergyCut(0.00001),
+      m_TCEnergyCut(0.005),
+      m_TCTimingCutLow(-1500),
+      m_TCTimingCutHigh(1500),
       m_debugLevel(0)
   {
     string desc = "TRGECLBGTCHitModule(" + version() + ")";
     setDescription(desc);
     setPropertyFlags(c_ParallelProcessingCertified);
 
-    addParam("simTCEnergyCut",
-             m_simTCEnergyCut,
-             "simulation TC energy cut: TC(E)<X (GeV), X=",
-             m_simTCEnergyCut);
+    addParam("TCEnergyCut",
+             m_TCEnergyCut,
+             "TC energy cut: TC(E)<X (GeV), X=",
+             m_TCEnergyCut);
+    addParam("TCTimingCutLow",
+             m_TCTimingCutLow,
+             "TC Timing cut low: TC(T)>X (ns), X=",
+             m_TCTimingCutLow);
+    addParam("TCTimingCutHigh",
+             m_TCTimingCutHigh,
+             "TC Timing cut high: TC(T)<X (ns), X=",
+             m_TCTimingCutHigh);
     addParam("DebugLevel",
              m_debugLevel,
              "TRGECL debug level",
@@ -77,8 +87,12 @@ namespace Belle2 {
   {
     B2DEBUG(100, "TRGECLBGTCHitModule::initialize>");
 
-    B2INFO("[TRGECLBGTCHitModule] simTCEnergyCut(TC(E)<X(GeV)) = "
-           << m_simTCEnergyCut);
+    B2INFO("[TRGECLBGTCHitModule] TCEnergyCut     : TC(E) GeV = "
+           << m_TCEnergyCut);
+    B2INFO("[TRGECLBGTCHitModule] TCTimingCutLow  : TC(T) ns  = "
+           << m_TCTimingCutLow);
+    B2INFO("[TRGECLBGTCHitModule] TCTimingCutHigh : TC(T) ns  = "
+           << m_TCTimingCutHigh);
 
     m_eclHits.registerInDataStore();
     m_trgeclUnpackerStores.registerInDataStore();
@@ -157,7 +171,9 @@ namespace Belle2 {
       int tcid = key / 160;
       const hit_t& h = t.second;
       // TC energy cut to reduce object size
-      if (h.e < m_simTCEnergyCut) { continue; }
+      if (h.e < m_TCEnergyCut) { continue; }
+      // TC timing cut to reduce object size
+      if (h.t < m_TCTimingCutLow || h.t > m_TCTimingCutHigh) { continue; }
       // store data
       m_trgeclBGTCHits.appendNew(tcid + 1, h.e, h.t);
     }
@@ -175,16 +191,20 @@ namespace Belle2 {
       // TC energy(ADC)
       double tcEnergyADC = (double) ttt.getTCEnergy();
       // TC timing(ns)
-      double tcCalTime   = (double) ttt.getTCCALTime();
+      double tcTime   = (double) ttt.getTCTime();
       if (tcID <= 0) {continue;}
       // ADC to Energy(MeV) conversion
       double adc2energy = 5.231;
       // TC energy (GeV)
       double tcEnergy = tcEnergyADC * (adc2energy / 1000);
+      // TC energy cut to reduce object size
+      if (tcEnergy < m_TCEnergyCut) { continue; }
+      // TC timing cut to reduce object size
+      if (tcTime < m_TCTimingCutLow || tcTime > m_TCTimingCutHigh) { continue; }
       // store data
       m_trgeclBGTCHits.appendNew(tcID,
                                  tcEnergy,
-                                 tcCalTime);
+                                 tcTime);
     }
   }
 

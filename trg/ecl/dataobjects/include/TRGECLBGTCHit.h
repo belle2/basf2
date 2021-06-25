@@ -10,9 +10,7 @@
 //-----------------------------------------------------------
 // $Log$
 //-----------------------------------------------------------
-#ifndef TRGECLBGTCHIT_H
-#define TRGECLBGTCHIT_H
-
+#pragma once
 
 #include <TObject.h>
 
@@ -20,14 +18,9 @@ namespace Belle2 {
 
   //! Example Detector
   class TRGECLBGTCHit : public TObject {
+
   public:
 
-    //! The TC id of this hit.
-    int m_TCId;
-    //! Deposited energy of this hit.
-    double m_edep;
-    //! Hit average time
-    double m_TimeAve;
     //! The method to set TC id
     void setTCId(int TCId) { m_TCId = TCId; }
     //! The method to set deposited energy
@@ -59,11 +52,19 @@ namespace Belle2 {
       m_edep = edep;
       m_TimeAve = TimeAve;
     }
+
+  private:
+
+    //! The TC id of this hit.
+    int m_TCId;
+    //! Deposited energy of this hit.
+    Double32_t m_edep;
+    //! Hit average time
+    Double32_t m_TimeAve;
+
     /** the class title */
     ClassDef(TRGECLBGTCHit, 1);
 
   };
 
 } // end namespace Belle2
-
-#endif

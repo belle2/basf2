@@ -10,9 +10,7 @@
 //---------------------------------------------------------
 // 0.00 : 2021/06/xx : First version
 //---------------------------------------------------------
-
-#ifndef TRGECLBGTCHitModule_H
-#define TRGECLBGTCHitModule_H
+#pragma once
 
 #include <string>
 #include <framework/core/Module.h>
@@ -56,8 +54,12 @@ namespace Belle2 {
     void genSimulationObj();
     // generate random trigger data TCHit data objection
     void genRandomTrgObj();
-    // TC energy cut (GeV) for simulation data
-    double m_simTCEnergyCut;
+    // TC energy cut (GeV)
+    double m_TCEnergyCut;
+    // TC timing cut (ns) for lower timing
+    double m_TCTimingCutLow;
+    // TC timing cut (ns) for high timing
+    double m_TCTimingCutHigh;
     // Debug level
     int m_debugLevel;
 
@@ -75,5 +77,3 @@ namespace Belle2 {
   };
 
 } // namespace Belle2
-
-#endif // TRGECLBGTCHitModule_H

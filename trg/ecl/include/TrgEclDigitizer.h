@@ -11,8 +11,7 @@
 // $Log$
 // 2017-02-16 : v01
 //---------------------------------------------------------------
-#ifndef TRGECLDIGITIZER_H
-#define TRGECLDIGITIZER_H
+#pragma once
 
 #include <TObject.h>
 #include "trg/ecl/TrgEclMapping.h"
@@ -114,5 +113,3 @@ namespace Belle2 {
     int _BeambkgTag;
   };
 } // end namespace Belle2
-
-#endif

@@ -94,14 +94,6 @@ void DQMHistAnalysisSVDDoseModule::initialize()
                     "Occupancy vs time since HER inj. (all events) " + group.titleSuffix);
     m_c_occuHER1All.push_back(c);
   }
-  m_h_occuLER.resize(c_sensorGroups.size(), nullptr);
-  m_h_occuHER.resize(c_sensorGroups.size(), nullptr);
-  m_h_occuLER1.resize(c_sensorGroups.size(), nullptr);
-  m_h_occuHER1.resize(c_sensorGroups.size(), nullptr);
-  m_h_occuLERAll.resize(c_sensorGroups.size(), nullptr);
-  m_h_occuHERAll.resize(c_sensorGroups.size(), nullptr);
-  m_h_occuLER1All.resize(c_sensorGroups.size(), nullptr);
-  m_h_occuHER1All.resize(c_sensorGroups.size(), nullptr);
 
   // The legend need to be memory-leaked, so we make it once and use it evey time
   m_legend = new TPaveText(0.53, 0.73, 0.68, 0.88, "brNDC");
@@ -313,8 +305,7 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
     auto hHits = findHistT<TH2F>("SVDDoseLERInjPois/SVDHitsVsTime_" + group.nameSuffix);
     auto hEvts = findHistT<TH2F>("SVDDoseLERInjPois/SVDEvtsVsTime");
     if (hHits && hEvts) {
-      if (m_h_occuLER[g]) delete m_h_occuLER[g];
-      auto hOccu = m_h_occuLER[g] = divide(hHits, hEvts, 100.0f / group.nStrips);
+      auto hOccu = divide(hHits, hEvts, 100.0f / group.nStrips); // Intentional memory leak
       hOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - LER inj. Pois. trig."
                       ";Time since last injection [#mus];Time in beam cycle [#mus]"
                       ";Occupancy [%]");
@@ -331,8 +322,7 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
     auto hpEvts = findHistT<TH1F>("SVDDoseLERInjPois/SVDEvtsVsTime1");
     auto hpHits = findHistT<TH1F>("SVDDoseLERInjPois/SVDHitsVsTime1_" + group.nameSuffix);
     if (hpHits && hpEvts) {
-      if (m_h_occuLER1[g]) delete m_h_occuLER1[g];
-      auto hpOccu = m_h_occuLER1[g] = divide(hpHits, hpEvts, 100.0f / group.nStrips);
+      auto hpOccu = divide(hpHits, hpEvts, 100.0f / group.nStrips); // Intentional memory leak
       hpOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - LER inj. Pois. trig."
                        ";Time since last injection [#mus];Occupancy [%]");
       hpOccu->SetMinimum(1e-3);
@@ -348,8 +338,7 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
     hHits = findHistT<TH2F>("SVDDoseHERInjPois/SVDHitsVsTime_" + group.nameSuffix);
     hEvts = findHistT<TH2F>("SVDDoseHERInjPois/SVDEvtsVsTime");
     if (hHits && hEvts) {
-      if (m_h_occuHER[g]) delete m_h_occuHER[g];
-      auto hOccu = m_h_occuHER[g] = divide(hHits, hEvts, 100.0f / group.nStrips);
+      auto hOccu = divide(hHits, hEvts, 100.0f / group.nStrips); // Intentional memory leak
       hOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - HER inj. Pois. trig."
                       ";Time since last injection [#mus];Time in beam cycle [#mus]"
                       ";Occupancy [%]");
@@ -366,8 +355,7 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
     hpEvts = findHistT<TH1F>("SVDDoseHERInjPois/SVDEvtsVsTime1");
     hpHits = findHistT<TH1F>("SVDDoseHERInjPois/SVDHitsVsTime1_" + group.nameSuffix);
     if (hpHits && hpEvts) {
-      if (m_h_occuHER1[g]) delete m_h_occuHER1[g];
-      auto hpOccu = m_h_occuHER1[g] = divide(hpHits, hpEvts, 100.0f / group.nStrips);
+      auto hpOccu = divide(hpHits, hpEvts, 100.0f / group.nStrips); // Intentional memory leak
       hpOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - HER inj. Pois. trig."
                        ";Time since last injection [#mus];Occupancy [%]");
       hpOccu->SetMinimum(1e-3);
@@ -405,8 +393,7 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
     hHits = findHistT<TH2F>("SVDDoseLERInjAll/SVDHitsVsTime_" + group.nameSuffix);
     hEvts = findHistT<TH2F>("SVDDoseLERInjAll/SVDEvtsVsTime");
     if (hHits && hEvts) {
-      if (m_h_occuLERAll[g]) delete m_h_occuLERAll[g];
-      auto hOccu = m_h_occuLERAll[g] = divide(hHits, hEvts, 100.0f / group.nStrips);
+      auto hOccu = divide(hHits, hEvts, 100.0f / group.nStrips); // Intentional memory leak
       hOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - LER inj. all events"
                       ";Time since last injection [#mus];Time in beam cycle [#mus]"
                       ";Occupancy [%]");
@@ -423,8 +410,7 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
     hpEvts = findHistT<TH1F>("SVDDoseLERInjAll/SVDEvtsVsTime1");
     hpHits = findHistT<TH1F>("SVDDoseLERInjAll/SVDHitsVsTime1_" + group.nameSuffix);
     if (hpHits && hpEvts) {
-      if (m_h_occuLER1All[g]) delete m_h_occuLER1All[g];
-      auto hpOccu = m_h_occuLER1All[g] = divide(hpHits, hpEvts, 100.0f / group.nStrips);
+      auto hpOccu = divide(hpHits, hpEvts, 100.0f / group.nStrips); // Intentional memory leak
       hpOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - LER inj. all events"
                        ";Time since last injection [#mus];Occupancy [%]");
       hpOccu->SetMinimum(1e-3);
@@ -440,8 +426,7 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
     hHits = findHistT<TH2F>("SVDDoseHERInjAll/SVDHitsVsTime_" + group.nameSuffix);
     hEvts = findHistT<TH2F>("SVDDoseHERInjAll/SVDEvtsVsTime");
     if (hHits && hEvts) {
-      if (m_h_occuHERAll[g]) delete m_h_occuHERAll[g];
-      auto hOccu = m_h_occuHERAll[g] = divide(hHits, hEvts, 100.0f / group.nStrips);
+      auto hOccu = divide(hHits, hEvts, 100.0f / group.nStrips); // Intentional memory leak
       hOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - HER inj. all events"
                       ";Time since last injection [#mus];Time in beam cycle [#mus]"
                       ";Occupancy [%]");
@@ -458,8 +443,7 @@ void DQMHistAnalysisSVDDoseModule::updateCanvases()
     hpEvts = findHistT<TH1F>("SVDDoseHERInjAll/SVDEvtsVsTime1");
     hpHits = findHistT<TH1F>("SVDDoseHERInjAll/SVDHitsVsTime1_" + group.nameSuffix);
     if (hpHits && hpEvts) {
-      if (m_h_occuHER1All[g]) delete m_h_occuHER1All[g];
-      auto hpOccu = m_h_occuHER1All[g] = divide(hpHits, hpEvts, 100.0f / group.nStrips);
+      auto hpOccu = divide(hpHits, hpEvts, 100.0f / group.nStrips); // Intentional memory leak
       hpOccu->SetTitle("SVD Occupancy " + group.titleSuffix + " - HER inj. all events"
                        ";Time since last injection [#mus];Occupancy [%]");
       hpOccu->SetMinimum(1e-3);

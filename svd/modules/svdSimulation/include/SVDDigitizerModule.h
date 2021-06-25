@@ -139,7 +139,7 @@ namespace Belle2 {
       /** Hardware Clocks*/
       DBObjPtr<HardwareClockSettings> m_hwClock;
       /** Decay time of betaprime waveform U-side.*/
-      double m_betaPrimeDecayTimeU = 270.0;
+      double m_betaPrimeDecayTimeU = 250.0;
       /** Decay time of betaprime waveform V-side.*/
       double m_betaPrimeDecayTimeV = 250.0;
       /** Interval between two waveform samples, by default taken from HardwareClockSettings */

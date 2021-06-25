@@ -87,7 +87,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
 
     :param path: Add the modules to this path.
     :param components: list of geometry components to include reconstruction for, or None for all components.
-    :param pruneTracks: Delete all hits except the first and last of the tracks after the dEdX modules.
+    :param pruneTracks: Delete all hits except the first and last of the tracks after the V0Finder modules.
     :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
         determine, if the geometry is already loaded. This flag can be used to just turn off the geometry adding at
@@ -118,7 +118,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  add_muid_hits=add_muid_hits,
                                  reconstruct_cdst=reconstruct_cdst,
                                  addClusterExpertModules=addClusterExpertModules,
-                                 pruneTracks=pruneTracks,
+                                 pruneTracks=False,
                                  event_abort=event_abort,
                                  use_random_numbers_for_hlt_prescale=use_random_numbers_for_hlt_prescale)
 
@@ -128,6 +128,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                     use_random_numbers_for_prescale=use_random_numbers_for_hlt_prescale)
 
     add_postfilter_reconstruction(path,
+                                  pruneTracks=pruneTracks,
                                   components=components)
 
     # Add the modules calculating the software trigger skims
@@ -244,16 +245,17 @@ def add_prefilter_reconstruction(path, components=None, add_trigger_calculation=
                                                   addClusterExpertModules=addClusterExpertModules)
 
 
-def add_postfilter_reconstruction(path, components=None):
+def add_postfilter_reconstruction(path, components=None, pruneTracks=False):
     """
     This function adds the reconstruction modules not required to calculate HLT filter decision to a path.
 
     :param path: Add the modules to this path.
     :param components: list of geometry components to include reconstruction for, or None for all components.
+    :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
     """
 
     # Add postfilter tracking reconstruction modules
-    add_postfilter_tracking_reconstruction(path, components=components, pruneTracks=False)
+    add_postfilter_tracking_reconstruction(path, components=components, pruneTracks=pruneTracks)
 
     path.add_module('StatisticsSummary').set_name('Sum_Postfilter_Reconstruction')
 

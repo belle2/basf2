@@ -31,5 +31,13 @@ namespace Belle2 {
   typedef std::vector<c4index> cell_index;
   typedef std::vector<std::vector<unsigned short>> vecTwo; //Clusterize
   typedef unsigned short ushort;
+  /** Default binning in one parcel (7/32 CDC phi) */
+  struct ndbinning {
+    c5elem omega = 40;
+    c5elem phi = 84;
+    c5elem theta = 9;
+    c5elem hitid; // 41 axial, 32 stereo
+    c5elem prio = 3;
+  };
 }
 #endif

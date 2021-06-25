@@ -52,6 +52,9 @@ namespace Belle2 {
     /** Cluster pruning: Minimum number of hits related to a cluster
      * for the cluster to be considered as a track */
     int m_minhits;
+    /** Cluster pruning: Minimum number of axial hits related to a cluster
+     * for the cluster to be considered as a track */
+    int m_minhits_axial;
     /** Clustering: Minimum weight of a cell in Hough space
      * for the cell to be considered as a cluster member */
     int m_minweight;
@@ -70,5 +73,11 @@ namespace Belle2 {
     bool m_diagonal;
     /**Clustering: minimum number of cells for a cluster */
     int m_mincells;
+    /** Print Hough planes and verbose output */
+    bool m_verbose;
+    /** File name of the axial hit patterns */
+    std::string m_axialFile;
+    /** File name of the stereo hit patterns */
+    std::string m_stereoFile;
   };
 }

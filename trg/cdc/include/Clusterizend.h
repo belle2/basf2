@@ -51,6 +51,7 @@ namespace Belle2 {
     void setParams(unsigned short dim)
     {
       m_dim = dim;
+      m_orientSum = 0;
     }
     std::vector<cell_index> getEntries()
     {
@@ -60,10 +61,19 @@ namespace Belle2 {
     {
       m_C.push_back(next_entry);
     }
-    void add_hit(unsigned short hit, unsigned short weight)
+    void add_hit(unsigned short hit, unsigned short weight, unsigned short orient)
     {
       m_hits.push_back(hit);
       m_hitWeights.push_back(weight);
+      m_orientSum += orient; /** orient == 1: axial, orient == 0: stereo */
+    }
+    unsigned long get_naxial()
+    {
+      return m_orientSum;
+    }
+    unsigned long get_nstereo()
+    {
+      return m_hits.size() - m_orientSum;
     }
     std::vector<unsigned short> get_hits()
     {
@@ -79,6 +89,7 @@ namespace Belle2 {
     unsigned short m_dim;
     std::vector<unsigned short> m_hits;
     std::vector<unsigned short> m_hitWeights;
+    unsigned short m_orientSum;
   };
 
 

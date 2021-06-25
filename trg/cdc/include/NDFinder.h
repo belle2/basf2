@@ -90,39 +90,30 @@ namespace Belle2 {
 
     /** Struct of ndFinder parameters */
     struct ndparameters {
-      /** Trained hit data */
-      std::string arrayAxialFile = "data/trg/cdc/ndFinderArrayAxial.txt.gz";
-      std::string arrayStereoFile = "data/trg/cdc/ndFinderArrayStereo.txt.gz";
-      std::string hitModAxStFile = "data/trg/cdc/hitModAxSt.txt.gz";
       /** Zero-Suppressed trained hit data */
-      std::string compAxialFile = "data/trg/cdc/ndFinderArrayAxialComp.txt.gz";
-      std::string compStereoFile = "data/trg/cdc/ndFinderArrayStereoComp.txt.gz";
-      /** TODO: reconstruct arrayAxial, arrayStereo from compAxial, compStereo */
+      std::string axialFile = "data/trg/cdc/ndFinderArrayAxialComp.txt.gz";
+      std::string stereoFile = "data/trg/cdc/ndFinderArrayStereoComp.txt.gz";
 
       /** Clustering options */
-      /**  only accept clusters with minhits */
-      long unsigned int minhits  = 4; //6; //7;
-      /**  members must have thresh x maxweight of cluster */
-      float thresh            = 0.85; //0.9;
+      /**  Only accept clusters with minhits */
+      long unsigned int minhits  = 4;
+      /**  Required number of axial hits per track */
+      long unsigned int minhits_axial  = 0;
+      /**  Members must have thresh x maxweight of cluster */
+      float thresh            = 0.85;
 
+      /** Required relative weight contribution to assign a hit to a cluster */
       float minassign = 0.2;
 
+      /** Minimum numeber of cells in the track parameter space */
       long unsigned int mincells  = 5;
 
       /** CDC symmetry: repeat wire pattern 32 times in phi */
       unsigned short phigeo = 32;
-      ///** CDC symmetry: phi range covered by hit data in training [0 .. phigeo] */
-      //unsigned short parcels = 7;
-      ///** CDC symmetry: phi range covered by compressed hit data [0 .. phigeo] */
-      //unsigned short parcelsComp = 11;
-    };
-    /** Default binning in one parcel (7/32 CDC phi) */
-    struct binning {
-      c5elem omega = 40;
-      c5elem phi = 84;
-      c5elem theta = 9;
-      c5elem hitid; // 41 for axial, 32 for stereo
-      c5elem prio = 3;
+      ///** CDC symmetry: phi range covered by hit data [0 .. phigeo] */
+      unsigned short parcels = 7;
+      /** CDC symmetry: phi range covered by expanded hit data [0 .. phigeo] */
+      unsigned short parcelsExp = 11;
     };
     std::vector<std::vector<float>> m_acceptRanges;
     std::vector<float> m_slotsizes;
@@ -170,13 +161,24 @@ namespace Belle2 {
     NDFinder() {}
 
     /** Default destructor. */
-    virtual ~NDFinder() {}
+    virtual ~NDFinder()
+    {
+      delete m_parrayAxial;
+      delete m_parrayStereo;
+      delete m_phoughPlane;
+      delete m_parrayHitMod;
+      delete m_pcompAxial;
+      delete m_pcompStereo;
+      delete m_parrayAxialExp;
+      delete m_parrayStereoExp;
+    }
 
 
     /** initialization */
 
     /** Set parameters
      * @param minhits minimum number of hits per cluster
+     * @param minhits minimum number of axial hits per cluster
      * @param minweight minimum weight of cluster member cells
      * @param minweight minimum neighboring cells with minweight for core cells
      * @param thresh selection of cells for weighted mean track estimation
@@ -184,15 +186,23 @@ namespace Belle2 {
      * @param mincells minumum number of cells per cluster
      * */
     void init(int minweight, int minpts, bool diagonal,
-              int minhits, double thresh, double minassign,
-              int mincells);
+              int minhits, int minhits_axial, double thresh, double minassign,
+              int mincells, bool verbose, std::string axialFile, std::string stereoFile);
+    void initBins();
 
     /** Load an NDFinder array of hit representations in track phase space.
      * Used to load axial and stereo hit arrays.
      * Represented in a 7/32 phi sector of the CDC. */
-    bool loadArray(const std::string& filename, binning bins, c5array& hitsToTracks);
-    /** Load NDFinder array of hit modulo mappings */
-    bool loadHitModAxSt(const std::string& filename, binning bins, c2array& hitMod);
+    void loadArray(const std::string& filename, ndbinning bins, c5array& hitsToTracks);
+    /** Restore non-zero suppressed hit curves.
+     * will make m_params.arrayAxialFile and m_params.arrayStereoFile obsolete */
+    void restoreZeros(ndbinning zerobins, ndbinning compbins, c5array& expArray, c5array& compArray);
+    void squeezeOne(c5array& writeArray, c5array& readArray, int outparcels, int inparcels, c5index ihit, c5index iprio, c5index itheta,
+                    c5elem nomega);
+    void squeezeAll(ndbinning writebins, c5array& writeArray, c5array& readArray, int outparcels, int inparcels);
+
+    /** Initialize hit modulo mappings */
+    void initHitModAxSt(c2array& hitMod);
 
     /** NDFinder reset data structure to process next event */
     void reset()
@@ -201,9 +211,10 @@ namespace Belle2 {
       m_hitIds.clear();
       m_prioPos.clear();
       m_nHits = 0;
-      m_houghPlane = c3array(m_c3shape);
       m_vecDstart.clear();
       m_hitOrients.clear();
+      delete m_phoughPlane;
+      m_phoughPlane = new c3array(m_pc3shape);
     }
     void printParams();
 
@@ -226,8 +237,8 @@ namespace Belle2 {
       return &m_NDFinderTracks;
     }
 
-    /** Debug Tool: Print (part) of the houghmap */
-    bool printArray3D(c3array& hitsToTracks, binning bins, ushort, ushort);
+    /** Debug Tool: Print part of the houghmap */
+    void printArray3D(c3array& hitsToTracks, ndbinning bins, ushort, ushort, ushort, ushort);
 
     /** NDFinder internal functions for track finding*/
   protected:
@@ -243,7 +254,7 @@ namespace Belle2 {
 
     /** In place array addition to houghmap Comp: A = A + B */
     void addC3Comp(ushort hitr, ushort prio, c5array& hitsToTracks,
-                   short Dstart, binning bins);
+                   short Dstart, ndbinning bins);
 
     /** Create hits to clusters confusion matrix */
     std::vector<std::vector<unsigned short>> getHitsVsClusters(
@@ -280,20 +291,26 @@ namespace Belle2 {
 
     /** NDFinder */
   private:
-    boost::array<c5index, 5> m_c5shapeax = {{ 41, 3, 40, 84, 9 }};
-    boost::array<c5index, 5> m_c5shapest =  {{ 32, 3, 40, 84, 9 }};
-    c5array m_arrayAxial = c5array(m_c5shapeax);
-    c5array m_arrayStereo = c5array(m_c5shapest);
-    boost::array<c3index, 3> m_c3shape =  {{ 40, 384, 9 }};
-    boost::array<c3index, 3> m_c3shapeSec =  {{ 40, 84, 9 }};
-    c3array m_houghPlane = c3array(m_c3shape);
-    boost::array<c2index, 2> m_c2shapeHitMod =  {{ 2336, 3}};
-    c2array m_arrayHitMod = c2array(m_c2shapeHitMod);
-    boost::array<c5index, 5> m_c5shapeCompAx = {{ 41, 3, 40, 15, 1 }};
-    boost::array<c5index, 5> m_c5shapeCompSt =  {{ 32, 3, 40, 15, 9 }};
-    c5array m_compAxial = c5array(m_c5shapeCompAx);
-    c5array m_compStereo = c5array(m_c5shapeCompSt);
+    boost::array<c5index, 5> m_pc5shapeax;
+    boost::array<c5index, 5> m_pc5shapest;
+    boost::array<c3index, 3> m_pc3shape;
+    boost::array<c2index, 2> m_pc2shapeHitMod;
+    boost::array<c5index, 5> m_pc5shapeCompAx;
+    boost::array<c5index, 5> m_pc5shapeCompSt;
+    boost::array<c5index, 5> m_pc5shapeExpAx;
+    boost::array<c5index, 5> m_pc5shapeExpSt;
 
+    c5array* m_parrayAxial = nullptr;
+    c5array* m_parrayStereo = nullptr;
+    c3array* m_phoughPlane = nullptr;
+    c2array* m_parrayHitMod = nullptr;
+    c5array* m_pcompAxial = nullptr;
+    c5array* m_pcompStereo = nullptr;
+    c5array* m_parrayAxialExp = nullptr;
+    c5array* m_parrayStereoExp = nullptr;
+
+    /** number of first priority wires in each super layer (TS per SL) */
+    std::vector<int> m_nWires;
 
     /** core */
 
@@ -313,19 +330,37 @@ namespace Belle2 {
     unsigned short m_nHits;
     ndparameters m_params;
 
-    binning m_axbins;
-    binning m_stbins;
-    binning m_fullbins;
-    binning m_compaxbins;
-    binning m_compstbins;
+    ndbinning m_axbins;
+    ndbinning m_stbins;
+    ndbinning m_fullbins;
+    ndbinning m_compaxbins;
+    ndbinning m_compstbins;
+    ndbinning m_expaxbins;
+    ndbinning m_expstbins;
     clusterer_params m_clusterer_params;
 
-    unsigned short m_nbinsPhi32;
-    unsigned short m_nbinsPhi1;
+    std::vector<ushort> m_planeShape;
+
+    unsigned short m_nPhiFull;
+    unsigned short m_nPhiOne;
+    unsigned short m_nPhiComp;
+    unsigned short m_nPhiExp;
+    unsigned short m_nPhiUse;
+    unsigned short m_nOmega;
+    unsigned short m_nTheta;
+
+    unsigned short m_nSL;
+    unsigned short m_nTS;
+    unsigned short m_nAx;
+    unsigned short m_nSt;
+    unsigned short m_nPrio;
 
     Belle2::Clusterizend m_clusterer;
 
     std::vector<short> m_vecDstart;
+
+    bool m_verbose;
+
 
   };
 }

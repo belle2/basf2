@@ -25,41 +25,52 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
                  "algorithm.\n");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("TrackSegmentHitsName", m_TrackSegmentHitsName,
-           "The name of the StoreArray of the CDCTriggerSegmentHits",
+           "The name of the StoreArray of the CDCTriggerSegmentHits.",
            string("CDCTriggerSegmentHits"));
   addParam("NDFinderTracksName", m_NDFinderTracksName,
-           "The name of the StoreArray where the tracks found by this NDFinder Module are stored",
+           "The name of the StoreArray where the tracks found by this NDFinder Module are stored.",
            string("CDCTrigger3DFinderTracks"));
   addParam("minhits", m_minhits,
-           "Cluster pruning: Minimum number of hits related to a cluster"
-           "for the cluster to be considered as a track",
+           "Cluster pruning: Minimum number of hits related to a cluster "
+           "for the cluster to be considered as a track.",
            6);
+  addParam("minhits_axial", m_minhits_axial,
+           "Cluster pruning: Minimum number of axial hits related to a cluster "
+           "for the cluster to be considered as a track.",
+           0);
   addParam("minweight", m_minweight,
-           "Clustering: Minimum weight of a cell in Hough space"
-           "for the cell to be considered as a cluster member",
+           "Clustering: Minimum weight of a cell in Hough space "
+           "for the cell to be considered as a cluster member.",
            26);
   addParam("minpts", m_minpts,
-           "Clustering: Minimum weight of a cell in Hough space"
-           "for the cell to be considered as a cluster member"
-           "Clustering: Minimum number of neighbor cells with minweight"
-           "for a cell to be considered a core cell",
+           "Clustering: Minimum number of neighbor cells with minweight "
+           "for a cell to be considered a core cell.",
            2);
   addParam("thresh", m_thresh,
-           "Track estimation: Minimum weight of a cluster member cell"
-           "relative to the peak weight of the cluster"
-           "for the cell to enter in the weighted mean"
-           "track parameter value estimation",
+           "Track estimation: Minimum weight of a cluster member cell "
+           "relative to the peak weight of the cluster "
+           "for the cell to enter in the weighted mean "
+           "track parameter value estimation.",
            0.85);
   addParam("minassign", m_minassign,
-           "Hit to cluster assignment limit:"
-           "Minimum relatively larger weight contribution to the largest cluster",
+           "Hit to cluster assignment limit: "
+           "Minimum relatively larger weight contribution to the largest cluster.",
            0.2);
   addParam("diagonal", m_diagonal,
-           "Clustering: consider diagonal neighbors",
+           "Clustering: consider diagonal neighbors.",
            false);
   addParam("mincells", m_mincells,
-           "Clustering: minimum number of cells for a cluster",
+           "Clustering: minimum number of cells for a cluster.",
            5);
+  addParam("verbose", m_verbose,
+           "Print Hough planes and verbose output. ",
+           false);
+  addParam("axialFile", m_axialFile,
+           "File name of the axial hit patterns. ",
+           string("data/trg/cdc/ndFinderAxialShallow.txt.gz"));
+  addParam("stereoFile", m_stereoFile,
+           "File name of the stereo hit patterns. ",
+           string("data/trg/cdc/ndFinderStereoShallow.txt.gz"));
 }
 
 CDCTriggerNDFinderModule::~CDCTriggerNDFinderModule()
@@ -70,13 +81,18 @@ void CDCTriggerNDFinderModule::initialize()
 {
   B2DEBUG(11, "CDCTriggerNDFinderModule initialize, m_minweight=" << m_minweight <<
           ", m_minpts=" << m_minpts << ", m_diagonal=" << m_diagonal <<
-          ", m_minhits=" << m_minhits << ", m_thresh= " << m_thresh <<
-          ", m_minassign=" << m_minassign << ", m_mincells=" << m_mincells);
+          ", m_minhits=" << m_minhits << ", m_minhits_axial=" << m_minhits_axial <<
+          ", m_thresh= " << m_thresh <<
+          ", m_minassign=" << m_minassign <<
+          ", m_mincells=" << m_mincells <<
+          ", m_verbose= " << m_verbose);
   m_TrackSegmentHits.isRequired(m_TrackSegmentHitsName);
   m_NDFinderTracks.registerInDataStore(m_NDFinderTracksName);
   m_NDFinderTracks.registerRelationTo(m_TrackSegmentHits);
   m_NDFinder.init(m_minweight, m_minpts, m_diagonal, m_minhits,
-                  m_thresh, m_minassign, m_mincells);
+                  m_minhits_axial,
+                  m_thresh, m_minassign, m_mincells, m_verbose,
+                  m_axialFile, m_stereoFile);
   m_NDFinder.printParams();
 }
 

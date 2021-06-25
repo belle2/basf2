@@ -6,7 +6,7 @@ This script provides a command line interface to all the tasks related to the
 or download of existing payloads.
 
 The usage of this program is similar to git: there are sub commands like for
-example ``tag`` wich groups all actions related to the management of global
+example ``tag`` which groups all actions related to the management of global
 tags. All the available commands are listed below.
 """
 
@@ -52,7 +52,7 @@ def escape_ctrl_chars(name):
     if not hasattr(escape_ctrl_chars, "_regex"):
         escape_ctrl_chars._regex = re.compile("[\x00-\x1f\x7f-\x9f]")
 
-    # escape the control characters by putting theim in as \xFF
+    # escape the control characters by putting them in as \xFF
     def escape(match):
         if match.group(0).isspace():
             return match.group(0)
@@ -86,7 +86,7 @@ def command_tag_list(args, db=None):
     --with-invalid as option. Alternatively one can use --only-published to show
     only tags which have been published
 
-    If the --regex option is supplied the searchterm will interpreted as a
+    If the --regex option is supplied the search term will be interpreted as a
     python regular expression where the case is ignored.
     """
 
@@ -187,7 +187,7 @@ def print_globaltag(db, *tags):
 def change_state(db, tag, state, force=False):
     """Change the state of a global tag
 
-    If the new state is not revertable then ask for confirmation
+    If the new state is not revertible then ask for confirmation
     """
     state = state.upper()
     if state in ["INVALID", "PUBLISHED"] and not force:
@@ -210,7 +210,7 @@ def command_tag_show(args, db=None):
     """
 
     # this one is a bit similar to command_tag_list but gets single tag
-    # informations from the database and thus no need for filtering. It will
+    # information from the database and thus no need for filtering. It will
     # always show the detailed information
 
     if db is None:
@@ -233,7 +233,7 @@ def command_tag_create(args, db=None):
 
     This command creates a new globaltag in the database with the given name
     and description. The name can only contain alpha-numeric characters and the
-    charachters '+-_:'.
+    characters '+-_:'.
     """
 
     if db is None:
@@ -257,7 +257,7 @@ def command_tag_create(args, db=None):
     req = db.request("POST", "/globalTag/{}".format(encode_name(typeinfo["name"])),
                      "Creating globaltag {name}".format(**info),
                      json=info)
-    B2INFO("Succesfully created globaltag {name} (id={globalTagId})".format(**req.json()))
+    B2INFO("Successfully created globaltag {name} (id={globalTagId})".format(**req.json()))
 
 
 def command_tag_modify(args, db=None):
@@ -418,12 +418,12 @@ def command_tag_invalidate(args, db):
     """
     Invalidate a globaltag.
 
-    This command ets the state of a globaltag to INVALID. This will disqualify
+    This command sets the state of a globaltag to INVALID. This will disqualify
     this tag from being used in user analysis.  A confirmation dialog will be
     shown.
 
     .. deprecated:: release-04-00-00
-       Use ``tag state $name PUBLISHED`` instead
+       Use ``tag state $name INVALID`` instead
     """
     if db is None:
         args.add_argument("tag", metavar="TAGNAME", help="globaltag to be invalidated")
@@ -511,7 +511,7 @@ def command_diff(args, db):
     If ``--full`` is given it will show all payloads, even the ones common to
     both globaltags. The differences can be limited to a given run and
     limited to a set of payloads names using ``--filter`` or ``--exclude``. If
-    the ``--regex`` option is supplied the searchterm will interpreted as a
+    the ``--regex`` option is supplied the search term will be interpreted as a
     python regular expression where the case is ignored.
 
     .. versionchanged:: release-03-00-00
@@ -617,7 +617,7 @@ def command_iov(args, db):
 
     This command lists all IoVs defined in a given globaltag. The list can be
     limited to a given run and optionally searched using --filter or --exclude.
-    If the --regex option is supplied the searchterm will interpreted as a
+    If the --regex option is supplied the search term will be interpreted as a
     python regular expression where the case is ignored.
 
     .. versionchanged:: release-03-00-00
@@ -901,7 +901,7 @@ def command_dump(args, db):
 
 
 class FullHelpAction(argparse._HelpAction):
-    """Class to recusively show help for an ArgumentParser and all it's sub_parsers"""
+    """Class to recursively show help for an ArgumentParser and all it's sub_parsers"""
 
     def print_subparsers(self, parser, prefix=""):
         """Print help message for given parser and call again for all sub parsers"""

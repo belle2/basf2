@@ -27,12 +27,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             all reconstruction
                      For dqm_mode == "filtered"  only the DQM modules which should run on filtered
                             events should be added
-                     For dqm_mode == "l1_passthrough" only the DQM modules which should run on the
-                            L1 passthrough events should be added
     @param create_hlt_unit_histograms: Parameter for SoftwareTiggerHLTDQMModule.
                                          Should be True only when running on the HLT servers
     """
-    assert dqm_mode in ["dont_care", "all_events", "filtered", "before_filter", "l1_passthrough"]
+    assert dqm_mode in ["dont_care", "all_events", "filtered", "before_filter"]
     # Check components.
     check_components(components)
 

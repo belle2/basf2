@@ -36,7 +36,7 @@ void PXDTrackingEventLevelMdstInfoFillerModule::event()
   // use a simple array for the PXD layers (if geometry is changed then also EventLevelTrackingInfo doesn't work)
   // index: layer number (shifted by 1)
   int nClustersPerLayer[2] = {};
-  for (auto& cluster : m_pxdClusters) {
+  for (const auto& cluster : m_pxdClusters) {
     nClustersPerLayer[((int)cluster.getSensorID().getLayerNumber()) - 1]++;
   }
 

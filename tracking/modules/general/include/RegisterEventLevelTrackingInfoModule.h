@@ -36,8 +36,6 @@ namespace Belle2 {
 
   private:
 
-    /// Name of the StoreObject to access the event level tracking information
-    std::string m_eventLevelTrackingInfoName = "EventLevelTrackingInfo";
     /// StoreObject to access the event level tracking information
     StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
 

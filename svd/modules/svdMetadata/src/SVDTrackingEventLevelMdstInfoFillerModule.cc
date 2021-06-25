@@ -36,7 +36,7 @@ void SVDTrackingEventLevelMdstInfoFillerModule::event()
   // use a simple array for the SVD layers (if geometry is changed then also EventLevelTrackingInfo doesn't work)
   // first index: layer number (shifted by 3), second index: isU
   int nClustersPerLayer[4][2] = {};
-  for (auto& cluster : m_svdClusters) {
+  for (const auto& cluster : m_svdClusters) {
     nClustersPerLayer[((int)cluster.getSensorID().getLayerNumber()) - 3][(int)cluster.isUCluster()]++;
   }
 

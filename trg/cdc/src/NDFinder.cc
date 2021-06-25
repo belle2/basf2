@@ -516,6 +516,34 @@ void NDFinder::getCM()
   }
 }
 
+float NDFinder::transformVar(float estVal, int idx)
+{
+  if (idx == 0) { //omega
+    if (estVal == 0.) {
+      return estVal;
+    } else {
+      return - 1 / cdc_track_radius(1. / estVal);
+    }
+  } else if (idx == 1) { // phi
+    float phiMod = estVal;
+    if (estVal > 180) {
+      phiMod -= 360.;
+    }
+    return phiMod * m_pi_deg;
+  } else { // theta
+    float thetRad = estVal * m_pi_deg;
+    return cos(thetRad) / sin(thetRad);
+  }
+}
+std::vector<double> NDFinder::transform(std::vector<double> estimate)
+{
+  std::vector<double> transformed;
+  for (int idx = 0; idx < 3; idx++) {
+    transformed.push_back(transformVar(estimate[idx], idx));
+  }
+  return transformed;
+}
+
 
 std::vector<double> NDFinder::getBinToVal(std::vector<double> thisAv)
 {

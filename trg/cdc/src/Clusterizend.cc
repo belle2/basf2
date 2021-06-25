@@ -107,9 +107,9 @@ Clusterizend::dbscan()
   vector<cell_index> candidates = getCandidates();
   for (unsigned long icand = 0; icand < candidates.size(); icand++) {
     cell_index entry = candidates[icand];
-    c4index iom = entry[0];
-    c4index iph = entry[1];
-    c4index ith = entry[2];
+    c3index iom = entry[0];
+    c3index iph = entry[1];
+    c3index ith = entry[2];
 
     if (m_houghVisit[iom][iph][ith] == 0) {
       //B2DEBUG(19, "dbscan: unvisited cell");
@@ -155,9 +155,9 @@ Clusterizend::getCandidates()
 {
   vector<cell_index> candidates;
   /** all candidiates TODO: select */
-  for (c4index iom = 0; iom < 40; iom++) {
-    for (c4index iph = 0; iph < 384; iph++) {
-      for (c4index ith = 0; ith < 9; ith++) {
+  for (c3index iom = 0; iom < 40; iom++) {
+    for (c3index iph = 0; iph < 384; iph++) {
+      for (c3index ith = 0; ith < 9; ith++) {
         if ((*m_houghVals)[iom][iph][ith] > m_params.minweight) {
           cell_index elem = {iom, iph, ith};
           candidates.push_back(elem);

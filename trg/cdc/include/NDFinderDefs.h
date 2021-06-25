@@ -15,23 +15,27 @@
 #include "boost/multi_array.hpp"
 
 namespace Belle2 {
+
+  /** Store hit patterns in a 5D array
+   * (hitid, prio, omega, phi, theta)*/
   typedef unsigned short c5elem;
   typedef boost::multi_array<c5elem, 5> c5array;
   typedef c5array::index c5index;
+
+  /** The Hough space is a 3D array
+   * (omega, phi, theta)*/
   typedef unsigned short c3elem;
   typedef boost::multi_array<c3elem, 3> c3array;
   typedef c3array::index c3index;
-  typedef unsigned short c4elem;
-  typedef boost::multi_array<c4elem, 4> c4array;//Clusterize Houghmap
-  typedef c4array::index c4index;
+
+  /** TS-Id to 1/32 phi-sector mapping is stored in a 2D array */
   typedef unsigned short c2elem;
   typedef boost::multi_array<c2elem, 2> c2array; //HitMod
   typedef c2array::index c2index;
-  typedef std::vector<unsigned short> vecOne; //Clusterize oneAxis
-  typedef std::vector<c4index> cell_index;
-  typedef std::vector<std::vector<unsigned short>> vecTwo; //Clusterize
+  typedef std::vector<c3index> cell_index;
   typedef unsigned short ushort;
-  /** Default binning in one parcel (7/32 CDC phi) */
+
+  /** Default binning in a (7/32) phi-sector */
   struct ndbinning {
     c5elem omega = 40;
     c5elem phi = 84;

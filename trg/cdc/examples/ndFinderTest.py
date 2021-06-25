@@ -38,9 +38,9 @@ def addRead(main, args):
     main.add_module('Geometry')
 
 
-def add_cdc_trigger(path):
+def add_cdc_finders(path):
     """
-    This function adds the CDC trigger modules to a path.
+    This function adds the CDC trigger TSF and Finder modules to a path.
     @path              modules are added to this path
     """
     # TSF
@@ -170,7 +170,7 @@ def mainFunc(args):
     main.add_module('RootOutput',
                     outputFileName=args.genFileName,
                     updateFileCatalog=False)
-    add_cdc_trigger(main)
+    add_cdc_finders(main)
     add_matching(main, ["CDCTrigger3DFinderTracks", "TRGCDC2DFinderTracks"])
     addTrgOutput(main, args)
     main.add_module('RootOutput',
@@ -185,7 +185,7 @@ def mainFuncRead(args):
     basf2.set_random_seed(args.seed)
     main = basf2.create_path()
     addRead(main, args)
-    add_cdc_trigger(main)
+    add_cdc_finders(main)
     add_matching(main, ["CDCTrigger3DFinderTracks", "TRGCDC2DFinderTracks"])
     addTrgOutput(main, args)
     main.add_module('RootOutput',

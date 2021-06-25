@@ -33,7 +33,7 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
   addParam("minhits", m_minhits,
            "Cluster pruning: Minimum number of hits related to a cluster "
            "for the cluster to be considered as a track.",
-           6);
+           4);
   addParam("minhits_axial", m_minhits_axial,
            "Cluster pruning: Minimum number of axial hits related to a cluster "
            "for the cluster to be considered as a track.",
@@ -41,11 +41,11 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
   addParam("minweight", m_minweight,
            "Clustering: Minimum weight of a cell in Hough space "
            "for the cell to be considered as a cluster member.",
-           26);
+           24);
   addParam("minpts", m_minpts,
            "Clustering: Minimum number of neighbor cells with minweight "
            "for a cell to be considered a core cell.",
-           2);
+           1);
   addParam("thresh", m_thresh,
            "Track estimation: Minimum weight of a cluster member cell "
            "relative to the peak weight of the cluster "
@@ -58,10 +58,10 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
            0.2);
   addParam("diagonal", m_diagonal,
            "Clustering: consider diagonal neighbors.",
-           false);
+           true);
   addParam("mincells", m_mincells,
            "Clustering: minimum number of cells for a cluster.",
-           5);
+           1);
   addParam("verbose", m_verbose,
            "Print Hough planes and verbose output. ",
            false);

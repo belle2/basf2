@@ -66,7 +66,8 @@ def add_cdc_trigger(path):
                     thresh=args.thresh,
                     diagonal=args.diagonal,
                     axialFile=axialFile,
-                    stereoFile=stereoFile
+                    stereoFile=stereoFile,
+                    verbose=args.verbose
                     )
 
 
@@ -204,26 +205,27 @@ if __name__ == "__main__":
     parser.add_argument('--bkgfiles', default=None, help='path to background mixing files')
     parser.add_argument('--outputFileName', default="ndFinderTest.root", help='output trg file name')
     parser.add_argument('--genFileName', default="ndFinderGen.root", help='output gen file name')
-    parser.add_argument('--minweight', default=26, type=int, help='NDFinder')
-    parser.add_argument('--minhits', default=5, type=int, help='NDFinder')
-    parser.add_argument('--minhits_axial', default=0, type=int, help='NDFinder')
+    parser.add_argument('--minweight', default=12, type=int, help='NDFinder')
+    parser.add_argument('--minhits', default=4, type=int, help='NDFinder')
+    parser.add_argument('--minhits_axial', default=2, type=int, help='NDFinder')
     parser.add_argument('--minpts', default=2, type=int, help='NDFinder')
-    parser.add_argument('--diagonal', default=True, type=bool, help='NDFinder')
-    parser.add_argument('--mincells', default=0, type=int, help='NDFinder')
-    parser.add_argument('--minassign', default=0.2, type=float, help='NDFinder')
+    parser.add_argument('--diagonal', action='store_true', help='NDFinder')
+    parser.add_argument('--mincells', default=5, type=int, help='NDFinder')
+    parser.add_argument('--minassign', default=0.8, type=float, help='NDFinder')
     parser.add_argument('--thresh', default=0.85, type=float, help='NDFinder')
-    parser.add_argument('--readInsteadGen', action='store_true', help='skip generation, read from file')
+    parser.add_argument('--readGen', action='store_true', help='skip generation, read from file')
     parser.add_argument('--axialFile',
                         default="data/trg/cdc/ndFinderAxialShallow.txt.gz",
                         # default="data/trg/cdc/ndFinderArrayAxialComp.txt.gz",
-                        help='File name of the axial hit patterns')
+                        help='NDFinder File name of the axial hit patterns')
     parser.add_argument('--stereoFile',
                         default="data/trg/cdc/ndFinderStereoShallow.txt.gz",
                         # default="data/trg/cdc/ndFinderArrayStereoComp.txt.gz",
-                        help='File name of the stereo hit patterns')
+                        help='NDFinder File name of the stereo hit patterns')
+    parser.add_argument('--verbose', action='store_true', help='NDFinder')
 
     args = parser.parse_args()
-    if args.readInsteadGen:
+    if args.readGen:
         mainFuncRead(args)
     else:
         mainFunc(args)

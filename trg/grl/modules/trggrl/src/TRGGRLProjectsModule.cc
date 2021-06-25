@@ -14,8 +14,8 @@
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/grl/dataobjects/TRGGRLMATCH.h>
 #include <trg/grl/dataobjects/TRGGRLMATCHKLM.h>
+#include <trg/klm/dataobjects/KLMTrgSummary.h>
 #include <trg/grl/dataobjects/TRGGRLPHOTON.h>
-#include <trg/klm/dataobjects/KLMTriggerTrack.h>
 #include <framework/dataobjects/BinnedEventT0.h>
 #include <trg/ecl/TrgEclMapping.h>
 #include <framework/datastore/StoreArray.h>
@@ -48,7 +48,7 @@ std::vector<float> TC1GeV;
 
 //..Other
 double radtodeg;
-//int iEvent(0);
+int iEvent(0);
 //int nInAcc=0;
 
 //..Trigger counters
@@ -101,9 +101,6 @@ TRGGRLProjectsModule::TRGGRLProjectsModule() : Module()
   addParam("2DfinderCollection", m_2DfinderCollectionName,
            "Name of the StoreArray holding the tracks made by the 2D finder to be used as input.",
            string("TRGCDC2DFinderTracks"));
-  addParam("2DfitterCollection", m_2DfitterCollectionName,
-           "Name of the StoreArray holding the tracks made by the 2D fitter to be used as input.",
-           string("TRGCDC2DFitterTracks"));
   addParam("3DfitterCollection", m_3DfitterCollectionName,
            "Name of the StoreArray holding the tracks made by the 3D fitter to be used as input.",
            string("TRGCDC3DFitterTracks"));
@@ -114,11 +111,12 @@ TRGGRLProjectsModule::TRGGRLProjectsModule() : Module()
            "Name of the StoreArray holding the macthed tracks and clusters made by the 2D fitter.",
            string("TRG2DMatchTracks"));
   addParam("PhimatchCollection", m_phimatch_tracklist, "the 2d tracklist with associated cluster", std::string("TRGPhiMatchTracks"));
+  addParam("KLMmatchCollection", m_klmmatch_tracklist, "the 2d tracklist with KLM", std::string("TRGKLMMatchTracks"));
+  addParam("KLMTrgSummaryCollection", m_KLMTrgSummaryName, "Name of the StoreObjPtr holding the information of KLM trigger",
+           std::string("KLMTrgSummary"));
   addParam("3DmatchCollection", m_3DmatchCollectionName,
            "Name of the StoreArray holding the matched 3D NN tracks and clusters made",
            string("TRG3DMatchTracks"));
-  addParam("KLMmatchCollection", m_klmmatch_tracklist, "the 2d tracklist with associated KLM track",
-           std::string("TRGKLMMatchTracks"));
   addParam("TrgGrlInformation", m_TrgGrlInformationName,
            "Name of the StoreArray holding the information of tracks and clusters from cdc ecl klm.",
            string("TRGGRLObjects"));
@@ -128,12 +126,7 @@ TRGGRLProjectsModule::TRGGRLProjectsModule() : Module()
   addParam("TRGECLTrgs", m_TrgECLTrgsName,
            "Name of the StoreArray holding the information of ecl trigger",
            string("TRGECLTrgs"));
-  addParam("TrgKLMTracks", m_KLMTrackName,
-           "Name of the StoreArray holding the information of klm track ",
-           string("TRGKLMTracks"));
-  addParam("TrgKLMHits", m_KLMHitName,
-           "Name of the StoreArray holding the information of klm hit",
-           string("TRGKLMHits"));
+  addParam("GRLphotonCollection", m_grlphotonlist, "the isolated cluster list", std::string("TRGGRLPhotons"));
   addParam("ECLClusterTimeWindow", m_eclClusterTimeWindow,
            "The time window of the signal eclclusters",
            100.0);
@@ -192,21 +185,21 @@ TRGGRLProjectsModule::beginRun()
 //-----------------------------------------------------------------------------------------
 void TRGGRLProjectsModule::event()
 {
-  //if(iEvent%1000==0) {cout << "TRGGRLProjects event " << iEvent << endl;}
-  //iEvent++;
+  cout << "TRGGRLProjects event " << iEvent << endl;
+  iEvent++;
 
   //---------------------------------------------------------------------
   //..Read in the necessary arrays
   StoreArray<TRGECLTrg> trgArray;
   //StoreArray<MCParticle> MCParticleArray;
-  StoreArray<CDCTriggerTrack> cdc2DTrkArray("TRGCDC2DFinderTracks");
-  StoreArray<CDCTriggerTrack> cdc3DTrkArray("TRGCDC3DFitterTracks");
-  StoreArray<CDCTriggerTrack> cdcNNTrkArray("TRGCDCNeuroTracks");
-  StoreArray<TRGECLCluster> eclTrgClusterArray("TRGECLClusters");
-  StoreArray<TRGGRLMATCH> trackphimatch("TRGPhiMatchTracks");
-  StoreArray<TRGGRLMATCHKLM> trackKLMmatch("TRGKLMMatchTracks");
-  StoreArray<KLMTriggerTrack> klmtracklist("TRGKLMTracks");
-  StoreArray<TRGGRLPHOTON> grlphoton("TRGGRLPhotons");
+  StoreArray<CDCTriggerTrack> cdc2DTrkArray(m_2DfinderCollectionName);
+  StoreArray<CDCTriggerTrack> cdc3DTrkArray(m_3DfitterCollectionName);
+  StoreArray<CDCTriggerTrack> cdcNNTrkArray(m_NNCollectionName);
+  StoreArray<TRGECLCluster> eclTrgClusterArray(m_TrgECLClusterName);
+  StoreArray<TRGGRLMATCH> trackphimatch(m_phimatch_tracklist);
+  StoreArray<TRGGRLMATCHKLM> trackKLMmatch(m_klmmatch_tracklist);
+  StoreObjPtr<KLMTrgSummary> klmtrgsummary(m_KLMTrgSummaryName);
+  StoreArray<TRGGRLPHOTON> grlphoton(m_grlphotonlist);
   StoreObjPtr<BinnedEventT0> m_eventTime;
   StoreObjPtr<TRGGRLInfo> trgInfo(m_TrgGrlInformationName);
   //trgInfo.create();
@@ -649,20 +642,37 @@ void TRGGRLProjectsModule::event()
     if (m_eventTime->getBinnedEventT0(Const::CDC) != 0) { cdc_active = true; }
   }
 
-  bool klm_hit = klmtracklist.getEntries() > 0;
-  bool klm_0 = (klmtracklist.getEntries() & (1 << 0)) != 0;
-  bool klm_1 = (klmtracklist.getEntries() & (1 << 1)) != 0;
-  bool klm_2 = (klmtracklist.getEntries() & (1 << 2)) != 0;
+  //KLM alone bits from klmtrg summary----------------------------------
+  int n_klm_barrel = klmtrgsummary->getBKLM_n_trg_sectors();
+  bool klm_hit = n_klm_barrel > 0;
+  bool klm_0 = (n_klm_barrel & (1 << 0)) != 0;
+  bool klm_1 = (n_klm_barrel & (1 << 1)) != 0;
+  bool klm_2 = (n_klm_barrel & (1 << 2)) != 0;
+  int n_eklm_barrel = klmtrgsummary->getEKLM_n_trg_sectors();
+  bool eklm_hit = n_eklm_barrel > 0;
+  bool eklm_0 = (n_eklm_barrel & (1 << 0)) != 0;
+  bool eklm_1 = (n_eklm_barrel & (1 << 1)) != 0;
+  bool eklm_2 = (n_eklm_barrel & (1 << 2)) != 0;
+  int klmb2b  = klmtrgsummary->getBKLM_back_to_back_flag();
+  int eklmb2b = klmtrgsummary->getEKLM_back_to_back_flag();
 
+  //KLM/CDC/ECL matching bits-------------------------------------------
   bool cdcklm_0 = (trackKLMmatch.getEntries() == 1);
   bool cdcklm_1 = (trackKLMmatch.getEntries() > 1);
   bool cdcklm_2 = (trackKLMmatch.getEntries() == 3);
   bool cdcklm_3 = (trackKLMmatch.getEntries() > 3);
+  int n_seklm = trgInfo->getNsklm();
+  int n_seklm_fwd = trgInfo->getNsklm_fwd();
+  int n_seklm_bwd = trgInfo->getNsklm_bwd();
+  int n_ieklm = trgInfo->getNiklm();
+  bool ecleklm  = (trgInfo->getNeecleklm() > 0);
 
   bool cdcecl_0 = (trackphimatch.getEntries() == 1);
   bool cdcecl_1 = (trackphimatch.getEntries() == 2);
   bool cdcecl_2 = (trackphimatch.getEntries() == 3);
   bool cdcecl_3 = (trackphimatch.getEntries() > 3);
+
+
 
   int n_c2gev = 0;
   for (int i = 0; i < trackphimatch.getEntries(); i++) {
@@ -673,20 +683,6 @@ void TRGGRLProjectsModule::event()
   bool c2gev_1 = (n_c2gev == 2);
   bool c2gev_2 = (n_c2gev == 3);
   bool c2gev_3 = (n_c2gev > 3);
-
-  int N_KLMb2b = 0;
-  for (int i = 0; i < klmtracklist.getEntries(); i++) {
-    for (int j = 0; j < klmtracklist.getEntries(); j++) {
-      if (i <= j) continue;
-      int sector_i = klmtracklist[i]->getSector();
-      int sector_j = klmtracklist[j]->getSector();
-      if (abs(sector_i - sector_j) == 4) { N_KLMb2b++; }
-    }
-  }
-
-  bool klmb2b_0 = (N_KLMb2b == 1);
-  bool klmb2b_1 = (N_KLMb2b == 2);
-  bool klmb2b_2 = (N_KLMb2b > 2);
 
   int N_clst1 = 0, N_clst2 = 0;
   for (int i = 0 ; i < grlphoton.getEntries() ; i++) {
@@ -725,8 +721,14 @@ void TRGGRLProjectsModule::event()
   int i2fo   = trgInfo->geti2fo();
   int n_secl = trgInfo->getNsecl();
   int n_iecl = trgInfo->getNiecl();
-  int n_seklm = trgInfo->getNsklm();
-  int n_ieklm = trgInfo->getNiklm();
+
+  std::cout << "klm    " << klm_hit << " " << klm_0 << " " << klm_1 << " " << klm_2 << " " << klmb2b << std::endl;
+  std::cout << "eklm   " << eklm_hit << " " << eklm_0 << " " << eklm_1 << " " << eklm_2 << " " << eklmb2b << std::endl;
+  std::cout << "2dklm  " << nTrk2D << " " << cdcklm_0 << " " << cdcklm_1 << std::endl;
+  std::cout << "sklm   " << N_ST   << " " << n_seklm << " " << n_seklm_fwd << " " << n_seklm_bwd << std::endl;
+  std::cout << "tiklm  " << N_IT   << " " << n_ieklm << " " << trgInfo->getNiecl() << std::endl;
+  std::cout << "eclklm " << trgInfo->getNeecleklm() << std::endl;
+
 
   //---------------------------------------------------------------------
   //..Filling InputBits
@@ -848,9 +850,13 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "klm_0") {bit = klm_0;}
     else if (bitname == "klm_1") {bit = klm_1;}
     else if (bitname == "klm_2") {bit = klm_2;}
-    else if (bitname == "klmb2b_0") {bit = klmb2b_0;}
-    else if (bitname == "klmb2b_1") {bit = klmb2b_1;}
-    else if (bitname == "klmb2b_2") {bit = klmb2b_2;}
+    else if (bitname == "klmb2b")   {bit = klmb2b;}
+    else if (bitname == "eklm_hit") {bit = eklm_hit;}
+    else if (bitname == "eklm_0") {bit = eklm_0;}
+    else if (bitname == "eklm_1") {bit = eklm_1;}
+    else if (bitname == "eklm_2") {bit = eklm_2;}
+    else if (bitname == "eklmb2b") {bit = eklmb2b;}
+    else if (bitname == "ecleklm") {bit = ecleklm;}
     else if (bitname == "revo") {bit = false;}
     else if (bitname == "her_kick") {bit = false;}
     else if (bitname == "ler_kick") {bit = false;}
@@ -911,12 +917,6 @@ void TRGGRLProjectsModule::event()
     //KLM TOP ECL not ready
     else if (bitname == "ecl_bhauni") {bit = false;}
     else if (bitname == "ecl_bhapur") {bit = false;}
-    else if (bitname == "klmb2b") {bit = false;}
-    else if (bitname == "eklm_hit") {bit = false;}
-    else if (bitname == "eklm_0") {bit = false;}
-    else if (bitname == "eklm_1") {bit = false;}
-    else if (bitname == "eklm_2") {bit = false;}
-    else if (bitname == "eklmb2b") {bit = false;}
     else if (bitname == "cdctop_0") {bit = false;}
     else if (bitname == "cdctop_1") {bit = false;}
     else if (bitname == "cdctop_2") {bit = false;}

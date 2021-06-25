@@ -97,6 +97,8 @@ namespace Belle2 {
     std::string m_3DfitterCollectionName;
     /** Name of the StoreArray holding projects information from grl */
     std::string m_TrgGrlInformationName;
+    /** Name of the StoreArray holding projects information from grlphoton */
+    std::string m_grlphotonlist;
 
     /** Name of the StoreArray holding the tracks made by NN*/
     std::string m_NNCollectionName;
@@ -104,10 +106,8 @@ namespace Belle2 {
     std::string m_TrgECLClusterName;
     /** Name of the StoreArray holding the ecl trg result*/
     std::string m_TrgECLTrgsName;
-    /**the collection of klm hits*/
-    std::string m_KLMHitName;
-    /**the collection of klm tracks*/
-    std::string m_KLMTrackName;
+    /**Name of the collection of KLM TRG*/
+    std::string m_KLMTrgSummaryName;
     /**the collection of energy threshold used in the projects*/
     std::vector<double> m_energythreshold;
     /**ecl cluster time window to suppress beam induced background*/

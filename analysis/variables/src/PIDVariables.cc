@@ -272,7 +272,7 @@ namespace Belle2 {
 
     double electronID(const Particle* part)
     {
-      return Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, TOP, ARICH, ECL, KLM)")->function(part);
+      return Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, ARICH, ECL, KLM)")->function(part);
     }
 
     double muonID(const Particle* part)
@@ -306,8 +306,15 @@ namespace Belle2 {
         B2ERROR("The variable binaryPID needs exactly two arguments: the PDG codes of two hypotheses.");
         return std::numeric_limits<float>::quiet_NaN();;
       }
-      return Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(int(std::lround(arguments[0]))) + ", "
-                                             + std::to_string(int(std::lround(arguments[1]))) + ", CDC, TOP, ARICH, ECL, KLM)")->function(part);
+      int pdgCodeHyp = std::abs(int(std::lround(arguments[0])));
+      int pdgCodeTest = std::abs(int(std::lround(arguments[1])));
+      if (pdgCodeHyp == Const::electron.getPDGCode() || pdgCodeTest == Const::electron.getPDGCode()) {
+        return Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(pdgCodeHyp) + ", " + std::to_string(
+                                                 pdgCodeTest) + ", CDC, ARICH, ECL, KLM)")->function(part);
+      } else {
+        return Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(pdgCodeHyp) + ", " + std::to_string(
+                                                 pdgCodeTest) + ", CDC, TOP, ARICH, ECL, KLM)")->function(part);
+      }
     }
 
     double pionID_SVD(const Particle* part)
@@ -539,10 +546,10 @@ namespace Belle2 {
     // PID variables to be used for analysis
     VARIABLE_GROUP("PID");
     REGISTER_VARIABLE("particleID", particleID,
-                      "the particle identification probability under the particle's own hypothesis, using info from all available detectors, excluding the SVD");
+                      "the particle identification probability under the particle's own hypothesis, using info from all available detectors, *excluding the SVD*. IF the particle is an *electron, TOP is excluded*");
 
     REGISTER_VARIABLE("electronID", electronID,
-                      "electron identification probability defined as :math:`\\mathcal{L}_e/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors, *excluding the SVD*");
+                      "electron identification probability defined as :math:`\\mathcal{L}_e/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors, *excluding the SVD and the TOP*");
     REGISTER_VARIABLE("muonID", muonID,
                       "muon identification probability defined as :math:`\\mathcal{L}_\\mu/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors, *excluding the SVD*");
     REGISTER_VARIABLE("pionID", pionID,
@@ -554,7 +561,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("deuteronID", deuteronID,
                       "deuteron identification probability defined as :math:`\\mathcal{L}_d/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors, *excluding the SVD*");
     REGISTER_VARIABLE("binaryPID(pdgCode1, pdgCode2)", binaryPID,
-                      "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, *excluding the SVD*.");
+                      "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, *excluding the SVD*. If either of the two mass hypotheses is that of an *electron, TOP is excluded*");
     REGISTER_VARIABLE("pionID_SVD", pionID_SVD,
                       "pion identification probability defined as :math:`\\mathcal{L}_\\pi/(\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+)`, using info from all available detectors, *including the SVD*");
     REGISTER_VARIABLE("kaonID_SVD", kaonID_SVD,

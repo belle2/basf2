@@ -98,7 +98,7 @@ namespace Belle2 {
      * For SVD hits, remove U- and V- hit pair at once.
      * Input RecoTrack is fitted in the funcion.
      * If track fit fails, return false.
-     * @param origRecoTrack original RecoTrack
+     * @param prevRecoTrack original RecoTrack
      * @param recoTrack input RecoTrack, updated in this function
      * @param trackPDG signed PDG used for the track fit hypothesis
      * @param vertexPosition V0 vertex position

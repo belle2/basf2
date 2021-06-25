@@ -8,7 +8,6 @@ from basf2 import register_module, create_path
 from basf2 import B2INFO, B2WARNING, B2ERROR, B2FATAL
 import basf2
 import subprocess
-from variables import variables as vm
 
 
 def setAnalysisConfigParams(configParametersAndValues, path):
@@ -3210,6 +3209,7 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
     """
 
     from ROOT import Belle2
+    from variables import variables as vm
 
     TrainingMode = Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode
     Const = Belle2.Const
@@ -3246,16 +3246,6 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
 
     payloadName = f"ChargedPidMVAWeights_{mode}"
 
-    # Inputs from these sub-detector identifiers are included in the training.
-    # At the moment, SVD is excluded.
-    detIDs = [
-        Const.EDetector.CDC,
-        Const.EDetector.TOP,
-        Const.EDetector.ARICH,
-        Const.EDetector.ECL,
-        Const.EDetector.KLM
-    ]
-
     # Map pdgIds of std charged particles to name identifiers,
     # and binary bkg identifiers.
     stdChargedMap = {
@@ -3275,7 +3265,12 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
 
     # Set aliases to be consistent with the variable names in the MVA weightfiles.
     vm.addAlias("__event__", "evtNum")
-    for detID in detIDs:
+    for detID in Const.PIDDetectors.c_set:
+
+        # At the moment, SVD is excluded.
+        if detID == Const.EDetector.SVD:
+            B2WARNING("The ChargedPidMVA training currently does not include the SVD.")
+            continue
 
         detName = Const.parseDetectors(detID)
 

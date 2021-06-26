@@ -1,0 +1,34 @@
+[INFO] Steering file: framework/tests/emptyrelations.py
+[INFO] The random number seed is set to "something important"
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Added file test.root
+[INFO] ============================================================================
+[INFO] DataStore collections in event 1
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] TOPLikelihood[]      TOPLikelihoods             0
+[INFO] Track[]              Tracks                     0
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+[INFO] ============================================================================
+[INFO] DataStore collections in event 2
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    TracksToTOPLikelihoods
+[INFO] TOPLikelihood[]      TOPLikelihoods             1
+[INFO] Track[]              Tracks                     1
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================

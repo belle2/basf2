@@ -224,7 +224,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
 
   B2DEBUG(25, "eclBhabhaTimeCalibrationValidationCollector:: loaded ECLCrateTimeOffset from the database"
           << LogVar("IoV", m_CrateTimeDB.getIoV())
-          << LogVar("Revision", m_CrateTimeDB.getRevision()));
+          << LogVar("Checksum", m_CrateTimeDB.getChecksum()));
 
   // Conversion coefficient from ADC ticks to nanoseconds
   // TICKS_TO_NS ~ 0.4931 ns/clock tick

@@ -607,7 +607,6 @@ def get_calibrations(input_data, **kwargs):
 
         # Make the algorithm loop over the runs, not just the collector
         # tShifts_alg.algorithmReadPayloads = True
-        tShifts_alg.forcePayloadIOVnotOpenEndedAndSequentialRevision = True
 
         cal_ecl_timeShifts = Calibration(name="ecl_t_shifts", algorithms=[tShifts_alg],
                                          input_files=input_files_plotting)
@@ -962,7 +961,6 @@ def get_calibrations(input_data, **kwargs):
 
         # Make the algorithm loop over the runs, not just the collector
         # tShifts_alg.algorithmReadPayloads = True
-        tShifts_alg.forcePayloadIOVnotOpenEndedAndSequentialRevision = True
 
         cal_ecl_timeShifts = Calibration(name="ecl_t_shifts", algorithms=[tShifts_alg],
                                          input_files=input_files_plotting)

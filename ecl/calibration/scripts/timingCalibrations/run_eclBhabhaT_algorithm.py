@@ -3,7 +3,7 @@
 
 # -----------------------------------------------------------
 # BASF2 (Belle Analysis Framework 2)
-# Copyright(C) 2019 Belle II Collaboration
+# Copyright(C) 2021 Belle II Collaboration
 #
 # Author: The Belle II Collaboration
 # Contributors: Ewan Hill
@@ -15,6 +15,9 @@
 # crate time calibration.  It has to run on the results of
 # the collector code.
 # This script is run directly with basf2.
+#
+# This script gives an example of how to create a new payload of
+# reference crystals:  refCrysPerCrate
 # -----------------------------------------------------------
 
 # Usage: basf2 run_eclBhabhaT_algorithm.py [input_file]

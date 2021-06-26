@@ -333,8 +333,8 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
       the bhabha calibrations as the default but then resort to the
       radiative bhabha calibrations if the bhabha calibraitons are not
       good enough (most likely to be when the electrons are outside
-      the CDC acceptance).  If the radiative bhabha calibrations are good
-      or unavailable then use the cosmic calibration values, shifted
+      the CDC acceptance).  If the radiative bhabha calibrations are not
+      good or unavailable then use the cosmic calibration values, shifted
       accordingly to align with the bhabha sample.*/
 
 

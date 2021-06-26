@@ -311,6 +311,7 @@ void ECLBhabhaTCollectorModule::collect()
   int cutIndexPassed = 0;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
   B2DEBUG(22, "Cutflow: no cuts: index = " << cutIndexPassed);
+  B2DEBUG(22, "Event number = " << m_EventMetaData->getEvent());
 
 
   /* Use ECLChannelMapper to get other detector indices for the crystals */
@@ -358,22 +359,22 @@ void ECLBhabhaTCollectorModule::collect()
 
   B2DEBUG(25, "ECLBhabhaTCollector:: loaded ECLCrystalTimeOffset from the database"
           << LogVar("IoV", m_PreviousCrystalTimeDB.getIoV())
-          << LogVar("Revision", m_PreviousCrystalTimeDB.getRevision()));
+          << LogVar("Checksum", m_PreviousCrystalTimeDB.getChecksum()));
   B2DEBUG(25, "ECLBhabhaTCollector:: loaded ECLCrateTimeOffset from the database"
           << LogVar("IoV", m_CrateTimeDB.getIoV())
-          << LogVar("Revision", m_CrateTimeDB.getRevision()));
+          << LogVar("Checksum", m_CrateTimeDB.getChecksum()));
   B2DEBUG(25, "ECLBhabhaTCollector:: loaded ECLCrystalElectronics from the database"
           << LogVar("IoV", m_ElectronicsDB.getIoV())
-          << LogVar("Revision", m_ElectronicsDB.getRevision()));
+          << LogVar("Checksum", m_ElectronicsDB.getChecksum()));
   B2DEBUG(25, "ECLBhabhaTCollector:: loaded ECLCrystalElectronicsTime from the database"
           << LogVar("IoV", m_ElectronicsTimeDB.getIoV())
-          << LogVar("Revision", m_ElectronicsTimeDB.getRevision()));
+          << LogVar("Checksum", m_ElectronicsTimeDB.getChecksum()));
   B2DEBUG(25, "ECLBhabhaTCollector:: loaded ECLCrystalFlightTime from the database"
           << LogVar("IoV", m_FlightTimeDB.getIoV())
-          << LogVar("Revision", m_FlightTimeDB.getRevision()));
+          << LogVar("Checksum", m_FlightTimeDB.getChecksum()));
   B2DEBUG(25, "ECLBhabhaTCollector:: loaded ECLReferenceCrystalPerCrateCalib from the database"
           << LogVar("IoV", m_RefCrystalsCalibDB.getIoV())
-          << LogVar("Revision", m_RefCrystalsCalibDB.getRevision()));
+          << LogVar("Checksum", m_RefCrystalsCalibDB.getChecksum()));
 
 
 
@@ -413,7 +414,7 @@ void ECLBhabhaTCollectorModule::collect()
   if (m_storeCalib) {
     B2INFO("ECLBhabhaTCollector:: ECLCrystalTimeOffset from the database information:"
            << LogVar("IoV", m_PreviousCrystalTimeDB.getIoV())
-           << LogVar("Revision", m_PreviousCrystalTimeDB.getRevision()));
+           << LogVar("Checksum", m_PreviousCrystalTimeDB.getChecksum()));
     B2INFO("First event so print out previous ts values");
     for (int crysID = 1; crysID <= 8736; crysID++) {
       B2INFO("cid = " << crysID << ", Ts previous = " << m_PreviousCrystalTime[crysID - 1]);
@@ -907,47 +908,6 @@ void ECLBhabhaTCollectorModule::collect()
   cutIndexPassed++;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
   B2DEBUG(22, "Cutflow: E_i/p_i > " << E_DIV_p_CUT  << ": index = " << cutIndexPassed);
-
-
-
-  // Now find energy clusters independently of the tracks
-  //------------------------------------------------------------------------
-
-  double clusterE_minCut = 0.06;  // GeV
-  int nclust = m_eclClusterArray.getEntries();
-  int nGoodClusts = 0;
-  vector<int> goodPhotonClusterIdxs;
-  vector<int> goodECLClusterIds;
-  for (int ic = 0; ic < nclust; ic++) {
-    if (m_eclClusterArray[ic]->hasHypothesis(Belle2::ECLCluster::EHypothesisBit::c_nPhotons)) {
-      double eClust = m_eclClusterArray[ic]->getEnergy(Belle2::ECLCluster::EHypothesisBit::c_nPhotons);
-      if (eClust > clusterE_minCut) {
-        goodPhotonClusterIdxs.push_back(ic);
-        goodECLClusterIds.push_back(m_eclClusterArray[ic]->getClusterId());
-        nGoodClusts++;
-      }
-    }
-  }
-
-  int numTrackless = 0;
-  for (int clustId = 0; clustId < 2; clustId++) {
-    B2DEBUG(26, "m_eclClusterArray[goodPhotonClusterIdxs[clustId]]->isTrack() = " <<
-            m_eclClusterArray[goodPhotonClusterIdxs[clustId]]->isTrack());
-    if (!m_eclClusterArray[goodPhotonClusterIdxs[clustId]]->isTrack()) {
-      numTrackless++;
-    }
-  }
-  if (numTrackless != 0) {
-    B2DEBUG(23, "Number of trackless ECL clusters != 0");
-  }
-
-  // There are exactly three energy clusters
-  cutIndexPassed++;
-  getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(22, "Cutflow: ECL cluster associated to photon does not have a track associated to it: index = " << cutIndexPassed);
-  B2DEBUG(22, "Cutflow: NEW CUT TO BHABHA CODE FROM eegamma code");
-
-
 
 
 

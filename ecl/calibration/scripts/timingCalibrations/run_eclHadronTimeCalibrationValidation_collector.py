@@ -41,7 +41,7 @@ import rawdata
 import reconstruction
 
 from basf2 import conditions as b2conditions
-from reconstruction import prepare_cdst_analysis
+from reconstruction import prepare_user_cdst_analysis
 
 
 env = Belle2.Environment.Instance()
@@ -120,7 +120,7 @@ if add_unpackers:
     reconstruction.add_ecl_modules(main, components)
     reconstruction.add_ecl_track_matcher_module(main, components)
 
-prepare_cdst_analysis(main)  # for new 2020 cdst format
+prepare_user_cdst_analysis(main)  # for new 2020 cdst format
 
 # == Generate time calibration matrix from ECLDigit
 ECLtimeCalibValidationCollectorInfo = main.add_module('eclHadronTimeCalibrationValidationCollector', timeAbsMax=TIME_ABS_MAX,

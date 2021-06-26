@@ -49,11 +49,6 @@ namespace Belle2 {
           over all the runs and read the payloads itself.  */
       bool algorithmReadPayloads;
 
-      /** Whether or not to veto runs where an older payload is used.
-          Force the payload revision number to increase as the
-          run number increases. */
-      bool forcePayloadIOVnotOpenEndedAndSequentialRevision;
-
     protected:
 
       /**..Run algorithm */

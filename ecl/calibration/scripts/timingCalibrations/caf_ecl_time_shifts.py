@@ -139,7 +139,6 @@ def get_calibrations(input_data, **kwargs):
 
     # Make the algorithm loop over the runs, not just the collector
     # tShifts_alg.algorithmReadPayloads = True
-    tShifts_alg.forcePayloadIOVnotOpenEndedAndSequentialRevision = True
 
     ###################################################
     # "Calibration" setup

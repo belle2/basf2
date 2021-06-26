@@ -299,7 +299,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   }
 
   //-----------------------------------------------------------------------------------
-  //..Loop over tree and histogram the location errors
+  //..Loop over tree and histogram the location errors for useful thetaIDs
   for (int i = 0; i < treeEntries; i++) {
     tree->GetEntry(i);
     if (t_thetaID >= firstUsefulThID and t_thetaID <= lastUsefulThID and t_energyBin >= 0) {
@@ -313,7 +313,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   const double peakFrac = 0.025; // look for distribution to drop to this fraction of peak value
   const double startOfPed = 10.0001; // cm
 
-  float maxLocCut[nEnergies][nThetaID] = {}; // location cut for each energy and thetaID
+  float maxLocCut[nEnergies][nThetaID]; // location cut for each energy and thetaID
 
   //..Summary histograms of cut values and fraction of events passing cut
   TH1F* locCutSummary = new TH1F("locCutSummary", "location cut for each thetaID/energy; xBin = thetaID + ie*nTheta", nbinX, 0,
@@ -321,8 +321,9 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   TH1F* locCutEfficiency = new TH1F("locCutEfficiency",
                                     "Fraction of events passing location cut for each thetaID/energy; xBin = thetaID + ie*nTheta", nbinX, 0, nbinX);
 
-  for (int thID = firstUsefulThID; thID <= lastUsefulThID; thID++) {
+  for (int thID = 0; thID < nThetaID; thID++) {
     for (int ie = 0; ie < nEnergies; ie++) {
+      maxLocCut[ie][thID] = 0.;
       if (locError[ie][thID]->Integral() < minLocEntries) {continue;}
 
       //..Pedestal per bin is average from 10 cm onwards
@@ -853,11 +854,12 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
   //..Keep track of the peak nCrys for each thetaID/energy. Use this later to fix up
   //  values of nCrys without a successful fit
-  int maxNCry[nEnergies][nThetaID] = {};
+  int maxNCry[nEnergies][nThetaID];
 
   for (int thID = firstUsefulThID; thID <= lastUsefulThID; thID++) {
     for (int ie = 0; ie < nEnergies; ie++) {
       double maxIntegral = 0;
+      maxNCry[ie][thID] = 0;
       for (int in = 0; in <= maxN; in++) {
 
         TH1F* hEnergy = (TH1F*)ePosnCry[ie][thID][in];

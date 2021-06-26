@@ -69,7 +69,6 @@ static double timeDensity(double x[2], double* par)
   return fabs(polynomial + gauss);
 }
 
-/* cppcheck-suppress constParameter */
 static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
 {
   (void)npar;

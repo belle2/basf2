@@ -272,24 +272,22 @@ void SVDClusterizerDirectModule::event()
       B2DEBUG(300, "Digit " << iDigit << ", strip: " << currentStrip << ", lastStrip: " << lastStrip);
       B2DEBUG(300, "First CD: " << firstClusterDigit << " Last CD: " << lastClusterDigit);
       // Get calibration
-      bool validDigit = true; // no local run mask
       float stripNoiseADU = m_noiseCal.getNoise(sensorID, isU, currentStrip);
 
       // If the strip is not masked away, save normalized samples (sample/stripNoise)
       apvSamples normedSamples;
 
-      if (validDigit) {
-        auto samples = digit.getSamples();
-        transform(samples.begin(), samples.end(), normedSamples.begin(),
-                  bind2nd(divides<float>(), stripNoiseADU));
-        validDigit = validDigit && pass3Samples(normedSamples, m_cutAdjacent);
+      auto samples = digit.getSamples();
+      transform(samples.begin(), samples.end(), normedSamples.begin(),
+                bind2nd(divides<float>(), stripNoiseADU));
+      bool validDigit = pass3Samples(normedSamples, m_cutAdjacent);
 
-        // If this is a valid digit, store normed samples.
-        // It's not just that we don't have to normalize again - we don't need other data than strip
-        // number and normed samples from the digits!
-        zeroSuppress(normedSamples, m_cutAdjacent);
-        storedNormedSamples.insert(make_pair(iDigit, normedSamples));
-      }
+      // If this is a valid digit, store normed samples.
+      // It's not just that we don't have to normalize again - we don't need other data than strip
+      // number and normed samples from the digits!
+      zeroSuppress(normedSamples, m_cutAdjacent);
+      storedNormedSamples.insert(make_pair(iDigit, normedSamples));
+
 
       // See if we have a gap in strip numbers.
       bool consecutive = ((currentStrip - lastStrip) == 1);

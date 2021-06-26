@@ -69,7 +69,6 @@ void FANGSDigitizerModule::beginRun()
 
 void FANGSDigitizerModule::event()
 {
-  StoreArray<MCParticle> mcParticles;
   StoreArray<FANGSSimHit> FANGSSimHits;
   m_nFANGS = 15;
   std::vector<double> T0(m_nFANGS,

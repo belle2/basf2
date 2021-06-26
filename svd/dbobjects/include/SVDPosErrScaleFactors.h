@@ -13,7 +13,7 @@
 namespace Belle2 {
 
   /** contains the scaling factors for the cluster position error*/
-  struct SVDPosErrScaleFactors {
+  struct SVDPosErrScaleFactors final {
 
     /** position error scale factor for cluster size = 1
      */
@@ -53,7 +53,6 @@ namespace Belle2 {
 
       return raw_error * scaleError_clSize5;
     }
-
 
     ClassDef(SVDPosErrScaleFactors, 2); /**< needed by root*/
 

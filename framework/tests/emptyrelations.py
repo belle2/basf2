@@ -9,18 +9,22 @@ set_random_seed("something important")
 
 
 class MakeRelations(Module):
+    '''Simple module that creates some relations.'''
 
     def initialize(self):
-
+        '''Initialize.'''
+        #: Tracks
         self.tracks = Belle2.PyStoreArray('Tracks')
+        #: TOPLikelihoods
         self.likelihoods = Belle2.PyStoreArray('TOPLikelihoods')
         self.tracks.registerInDataStore()
         self.likelihoods.registerInDataStore()
         self.tracks.registerRelationTo(self.likelihoods)
+        #: Bool for flagging the first event processed.
         self.first = True
 
     def event(self):
-
+        '''Event.'''
         if not self.first:
             track = self.tracks.appendNew()
             likelihood = self.likelihoods.appendNew()

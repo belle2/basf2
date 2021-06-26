@@ -2,18 +2,39 @@
 # -*- coding: utf-8 -*-
 
 # Import KLMTriggerParameters payloads
+# Usage: basf2 ImportKLMTriggerParameters.py [mc]
 
+import sys
 from ROOT.Belle2 import KLMTriggerParameters, Database, IntervalOfValidity
 
+mc = False
+if (len(sys.argv) >= 2):
+    if (sys.argv[1] == 'mc'):
+        mc = True
+
 parameters = KLMTriggerParameters()
-parameters.setNLayers(5)
-parameters.setWhichLayers("2:16")
+parameters.setWhichLayers("1:16")
 
 database = Database.Instance()
 
-iov = IntervalOfValidity(0, 0, 0, -1)
-database.storeData('KLMTriggerParameters', parameters, iov)
-iov = IntervalOfValidity(1002, 0, 1002, -1)
-database.storeData('KLMTriggerParameters', parameters, iov)
-iov = IntervalOfValidity(1003, 0, 1003, -1)
-database.storeData('KLMTriggerParameters', parameters, iov)
+if mc:
+    parameters.setNLayers(4)
+    iov = IntervalOfValidity(0, 0, 0, -1)
+    database.storeData('KLMTriggerParameters', parameters, iov)
+    iov = IntervalOfValidity(1002, 0, 1002, -1)
+    database.storeData('KLMTriggerParameters', parameters, iov)
+    iov = IntervalOfValidity(1003, 0, 1003, -1)
+    database.storeData('KLMTriggerParameters', parameters, iov)
+else:
+    parameters.setNLayers(7)
+    iov = IntervalOfValidity(1, 0, 16, 1131)
+    database.storeData('KLMTriggerParameters', parameters, iov)
+    parameters.setNLayers(4)
+    iov = IntervalOfValidity(16, 1132, 16, 1132)
+    database.storeData('KLMTriggerParameters', parameters, iov)
+    parameters.setNLayers(7)
+    iov = IntervalOfValidity(16, 1133, 17, 169)
+    database.storeData('KLMTriggerParameters', parameters, iov)
+    parameters.setNLayers(4)
+    iov = IntervalOfValidity(17, 170, -1, -1)
+    database.storeData('KLMTriggerParameters', parameters, iov)

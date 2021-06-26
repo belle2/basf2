@@ -63,7 +63,6 @@ void HitLevelInfoWriterModule::initialize()
 void HitLevelInfoWriterModule::event()
 {
 
-  StoreArray<CDCDedxTrack> dedxTracks;
   int nParticleList = m_strParticleList.size();
 
   // **************************************************

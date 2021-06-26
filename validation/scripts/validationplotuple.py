@@ -53,10 +53,10 @@ class Plotuple:
     """
 
     def __init__(
-            self,
-            root_objects: List[RootObject],
-            revisions: List[str],
-            work_folder: str
+        self,
+        root_objects: List[RootObject],
+        revisions: List[str],
+        work_folder: str,
     ):
         """!
         The default constructor for a Plotuple-object.
@@ -76,11 +76,11 @@ class Plotuple:
 
         # A list of all problems that occured with this Plotuple,
         # e.g. missing reference object, missing meta-information...
-        self.warnings = []  # type: List[str]
+        self.warnings: List[str] = []
 
         # Find the reference element. If we can't find one, set it to 'None'
         # The reference-object for this Plotuple object
-        self._reference = None  # type: Optional[RootObject]
+        self._reference: Optional[RootObject] = None
         for root_object in self._root_objects:
             if root_object.is_reference:
                 self._reference = root_object
@@ -88,7 +88,7 @@ class Plotuple:
 
         # If we couldn't find a reference element, add that to warnings
         if self._reference is None:
-            self.warnings = ['No reference object']
+            self.warnings = ["No reference object"]
 
         # All elements of the Plotuple that are not the reference-object
         # Get the elements, i.e. all RootObjects except for the
@@ -98,8 +98,7 @@ class Plotuple:
         # to be careful of how to sort
         self._elements = [ro for ro in root_objects if not ro.is_reference]
         self._elements.sort(
-            key=lambda ro: ro.date if ro.date else 0,
-            reverse=True
+            key=lambda ro: ro.date if ro.date else 0, reverse=True
         )
 
         # The newest element, i.e. the element belonging the revision
@@ -152,33 +151,33 @@ class Plotuple:
         # The result of the Chi^2-Test. By default, there is no such result.
         # If the Chi^2-Test has been performed, this variable holds between
         # which objects it has been performed.
-        self._comparison_result_long = 'n/a'
+        self._comparison_result_long = "n/a"
 
         self.comparison_result = "not_compared"
 
         # The json file, in which the ntuple information is stored
-        self._file = None  # type: Optional[str]
+        self._file: Optional[str] = None
 
-        self._html_content = None  # type: Optional[str]
+        self._html_content: Optional[str] = None
 
         #: width of the plotted image in pixels, will be set by the draw
         #: function
-        self._width = None  # type: Optional[int]
+        self._width: Optional[int] = None
 
         #: height of the plotted image in pixels, will be set by the draw
         #: function
-        self._height = None  # type: Optional[int]
+        self._height: Optional[int] = None
 
         # Deal with incomplete information
-        if self._description == '' or self._description is None:
-            self._description = 'n/a'
-            self.warnings.append('No description')
-        if self._check == '' or self._check is None:
-            self._check = 'n/a'
-            self.warnings.append('No Check')
-        if self._contact == '' or self._contact is None:
-            self._contact = 'n/a'
-            self.warnings.append('No Contact Person')
+        if self._description == "" or self._description is None:
+            self._description = "n/a"
+            self.warnings.append("No description")
+        if self._check == "" or self._check is None:
+            self._check = "n/a"
+            self.warnings.append("No Check")
+        if self._contact == "" or self._contact is None:
+            self._contact = "n/a"
+            self.warnings.append("No Contact Person")
 
         #: The folder in which the plots will be found. Note that this should
         #: be relative to the ``html`` directory, because this is the string
@@ -187,7 +186,7 @@ class Plotuple:
             validationpath.get_html_plots_tag_comparison_folder(
                 work_folder, tags=revisions
             ),
-            self.package
+            self.package,
         )
         os.makedirs(self._plot_folder, exist_ok=True)
 
@@ -202,24 +201,25 @@ class Plotuple:
         Creates the histogram/table/image that belongs to this Plotuble-object.
         """
 
-        if self.type == 'TH1' or self.type == 'TEfficiency':
-            self.create_histogram_plot('1D')
-        elif self.type == 'TGraph':
+        if self.type == "TH1" or self.type == "TEfficiency":
+            self.create_histogram_plot("1D")
+        elif self.type == "TGraph":
             self.create_graph_plot()
-        elif self.type == 'TH2':
-            self.create_histogram_plot('2D')
+        elif self.type == "TH2":
+            self.create_histogram_plot("2D")
         # used to store HTML user content
-        elif self.type == 'TNamed':
+        elif self.type == "TNamed":
             self.create_html_content()
-        elif self.type == 'TASImage':
+        elif self.type == "TASImage":
             self.create_image_plot()
-        elif self.type == 'TNtuple':
+        elif self.type == "TNtuple":
             self.create_ntuple_table_json()
         elif self.type == "meta":
             pass
         else:
-            raise ValueError('Tried to create histogram/n-tuple, but received'
-                             'invalid type')
+            raise ValueError(
+                "Tried to create histogram/n-tuple, but received" "invalid type"
+            )
 
     def is_expert(self):
         """!
@@ -236,14 +236,11 @@ class Plotuple:
         """
 
         tester = validationcomparison.get_comparison(
-            self._reference.object,
-            self._newest.object,
-            self._mop
+            self._reference.object, self._newest.object, self._mop
         )
 
         self._comparison_result_long = tester.comparison_result_long.format(
-            revision1=self._reference.revision,
-            revision2=self._newest.revision
+            revision1=self._reference.revision, revision2=self._newest.revision
         )
         self.comparison_result = tester.comparison_result
 
@@ -266,13 +263,13 @@ class Plotuple:
             "error": ROOT.kRed,
             "warning": ROOT.kOrange + 1,
             "equal": ROOT.kGreen - 3,
-            "not_compared": ROOT.kAzure - 2
+            "not_compared": ROOT.kAzure - 2,
         }
         colors_expert = {
             "error": ROOT.kRed - 9,
             "warning": ROOT.kOrange - 9,
             "equal": ROOT.kGreen - 10,
-            "not_compared": ROOT.kAzure - 9
+            "not_compared": ROOT.kAzure - 9,
         }
 
         if self.is_expert():
@@ -306,7 +303,7 @@ class Plotuple:
         self._draw_root_object(
             self.type,
             self._reference.object,
-            self._reference.object.GetOption()
+            self._reference.object.GetOption(),
         )
         canvas.Update()
         canvas.GetFrame().SetFillColor(ROOT.kWhite)
@@ -330,10 +327,10 @@ class Plotuple:
         # Create a ROOT canvas on which we will draw our histograms
         self._width = 700
         if len(self._elements) > 4:
-            canvas = ROOT.TCanvas('', '', 700, 1050)
+            canvas = ROOT.TCanvas("", "", 700, 1050)
             self._height = 1050
         else:
-            canvas = ROOT.TCanvas('', '', 700, 525)
+            canvas = ROOT.TCanvas("", "", 700, 525)
             self._height = 525
 
         # Split the canvas into enough parts to fit all image_objects
@@ -386,14 +383,13 @@ class Plotuple:
 
             # Draw the reference on the canvas
             self._draw_root_object(
-                self.type, plot.object,
-                plot.object.GetOption()
+                self.type, plot.object, plot.object.GetOption()
             )
             pad.Update()
             pad.GetFrame().SetFillColor(ROOT.kWhite)
 
             # Write the title in the correct color
-            title = pad.GetListOfPrimitives().FindObject('title')
+            title = pad.GetListOfPrimitives().FindObject("title")
             if title:
                 title.SetTextColor(style.GetLineColor())
 
@@ -403,17 +399,14 @@ class Plotuple:
 
         self._file = os.path.join(
             self._plot_folder,
-            "{}_{}".format(
-                strip_ext(self.rootfile),
-                self.key
-            )
+            "{}_{}".format(strip_ext(self.rootfile), self.key),
         )
 
     def get_png_filename(self):
-        return '{}_{}.png'.format(strip_ext(self.rootfile), self.key)
+        return "{}_{}.png".format(strip_ext(self.rootfile), self.key)
 
     def get_pdf_filename(self):
-        return '{}_{}.pdf'.format(strip_ext(self.rootfile), self.key)
+        return "{}_{}.pdf".format(strip_ext(self.rootfile), self.key)
 
     @staticmethod
     def _draw_root_object(typ, obj, options):
@@ -422,7 +415,7 @@ class Plotuple:
         ROOT objects have a slightly differen flavour.
         """
 
-        if typ == 'TEfficiency' or typ == "TGraph":
+        if typ == "TEfficiency" or typ == "TGraph":
             # TEff does not provide DrawCopy
             obj.Draw(options)
         else:
@@ -439,19 +432,19 @@ class Plotuple:
         """
 
         # If we don't get a valid 'mode', we can stop right here
-        if mode not in ['1D', '2D']:
+        if mode not in ["1D", "2D"]:
             return
 
         # Create a ROOT canvas on which we will draw our histograms
         self._width = 700
-        if mode == '2D' and len(self._elements) > 4:
+        if mode == "2D" and len(self._elements) > 4:
             self._height = 1050
         else:
             self._height = 525
-        canvas = ROOT.TCanvas('', '', self._width, self._height)
+        canvas = ROOT.TCanvas("", "", self._width, self._height)
 
         # Allow possibility to turn off the stats box
-        if self._mop.has_option('nostats'):
+        if self._mop.has_option("nostats"):
             ROOT.gStyle.SetOptStat("")
         else:
             ROOT.gStyle.SetOptStat("nemr")
@@ -459,8 +452,11 @@ class Plotuple:
         # If there is a reference object, and the list of plots is not empty,
         # perform a Chi^2-Test on the reference object and the first object in
         # the plot list:
-        if self._reference is not None and self._newest \
-                and not self._reference == self._newest:
+        if (
+            self._reference is not None
+            and self._newest
+            and not self._reference == self._newest
+        ):
             self.perform_comparison()
 
         # A variable which holds whether we
@@ -470,13 +466,13 @@ class Plotuple:
 
         # Now we distinguish between 1D and 2D histograms
         # If we have a 1D histogram
-        if mode == '1D':
+        if mode == "1D":
 
-            if not self._mop.has_option('nogrid'):
+            if not self._mop.has_option("nogrid"):
                 canvas.SetGrid()
-            if self._mop.has_option('logx'):
+            if self._mop.has_option("logx"):
                 canvas.SetLogx()
-            if self._mop.has_option('logy'):
+            if self._mop.has_option("logy"):
                 canvas.SetLogy()
 
             # If there is a reference object, plot it first
@@ -485,7 +481,7 @@ class Plotuple:
                 drawn = True
 
         # If we have a 2D histogram
-        elif mode == '2D':
+        elif mode == "2D":
 
             # Split the canvas into enough parts to fit all histogram_objects
             # Find numbers x and y so that x*y = N (number of histograms to be
@@ -525,17 +521,19 @@ class Plotuple:
             plot.object.SetLineStyle(style.GetLineStyle())
 
             # If we have a one-dimensional histogram
-            if mode == '1D':
+            if mode == "1D":
                 if not drawn:
                     # Get additional options for 1D histograms
                     # (Intersection with self.metaoptions)
-                    additional_options = ['C']
+                    additional_options = ["C"]
                     additional_options = [
-                        option for option in additional_options
+                        option
+                        for option in additional_options
                         if self._mop.has_option(option)
                     ]
-                    options_str = plot.object.GetOption() + \
-                        ' '.join(additional_options)
+                    options_str = plot.object.GetOption() + " ".join(
+                        additional_options
+                    )
                     drawn = True
                 else:
                     options_str = "SAME"
@@ -543,14 +541,14 @@ class Plotuple:
                 self._draw_root_object(self.type, plot.object, options_str)
 
                 # redraw grid ontop of histogram, if selected
-                if not self._mop.has_option('nogrid'):
+                if not self._mop.has_option("nogrid"):
                     canvas.RedrawAxis("g")
 
                 canvas.Update()
                 canvas.GetFrame().SetFillColor(ROOT.kWhite)
 
             # If we have a two-dimensional histogram
-            elif mode == '2D':
+            elif mode == "2D":
                 # Switch to the correct sub-panel of the canvas. If a ref-plot
                 # exists, we have to go one panel further compared to the
                 # no-ref-case
@@ -563,22 +561,22 @@ class Plotuple:
                 pad.SetFillColor(ROOT.kWhite)
 
                 # Get additional options for 2D histograms
-                additional_options = ''
-                for _ in ['col', 'colz', 'cont', 'contz', 'box']:
+                additional_options = ""
+                for _ in ["col", "colz", "cont", "contz", "box"]:
                     if self._mop.has_option(_):
-                        additional_options += ' ' + _
+                        additional_options += " " + _
 
                 # Draw the reference on the canvas
                 self._draw_root_object(
                     self.type,
                     plot.object,
-                    plot.object.GetOption() + additional_options
+                    plot.object.GetOption() + additional_options,
                 )
                 pad.Update()
                 pad.GetFrame().SetFillColor(ROOT.kWhite)
 
                 # Write the title in the correct color
-                title = pad.GetListOfPrimitives().FindObject('title')
+                title = pad.GetListOfPrimitives().FindObject("title")
                 if title:
                     title.SetTextColor(style.GetLineColor())
 
@@ -594,10 +592,7 @@ class Plotuple:
 
         self._file = os.path.join(
             self._plot_folder,
-            "{}_{}".format(
-                strip_ext(self.rootfile),
-                self.key
-            )
+            "{}_{}".format(strip_ext(self.rootfile), self.key),
         )
 
     def create_graph_plot(self):
@@ -609,10 +604,10 @@ class Plotuple:
         # Create a ROOT canvas on which we will draw our plots
         self._width = 700
         self._height = 525
-        canvas = ROOT.TCanvas('', '', self._width, self._height)
+        canvas = ROOT.TCanvas("", "", self._width, self._height)
 
         # Allow possibility to turn off the stats box
-        if self._mop.has_option('nostats'):
+        if self._mop.has_option("nostats"):
             ROOT.gStyle.SetOptStat("")
         else:
             ROOT.gStyle.SetOptStat("nemr")
@@ -620,15 +615,18 @@ class Plotuple:
         # If there is a reference object, and the list of plots is not empty,
         # perform a Chi^2-Test on the reference object and the first object in
         # the plot list:
-        if self._reference is not None and self._newest \
-                and not self._reference == self._newest:
+        if (
+            self._reference is not None
+            and self._newest
+            and not self._reference == self._newest
+        ):
             self.perform_comparison()
 
-        if not self._mop.has_option('nogrid'):
+        if not self._mop.has_option("nogrid"):
             canvas.SetGrid()
-        if self._mop.has_option('logx'):
+        if self._mop.has_option("logx"):
             canvas.SetLogx()
-        if self._mop.has_option('logy'):
+        if self._mop.has_option("logy"):
             canvas.SetLogy()
 
         # A variable which holds whether we
@@ -660,23 +658,23 @@ class Plotuple:
 
                 # todo: refactor like in plot hist
                 # Get additional options for 1D histograms
-                additional_options = ''
-                for _ in ['C']:
+                additional_options = ""
+                for _ in ["C"]:
                     if self._mop.has_option(_):
-                        additional_options += ' ' + _
+                        additional_options += " " + _
 
                 # Draw the reference on the canvas
                 self._draw_root_object(
                     self.type,
                     plot.object,
-                    plot.object.GetOption() + additional_options
+                    plot.object.GetOption() + additional_options,
                 )
                 drawn = True
             else:
                 self._draw_root_object(self.type, plot.object, "SAME")
 
             # redraw grid ontop of histogram, if selected
-            if not self._mop.has_option('nogrid'):
+            if not self._mop.has_option("nogrid"):
                 canvas.RedrawAxis("g")
 
             canvas.Update()
@@ -692,10 +690,7 @@ class Plotuple:
 
         self._file = os.path.join(
             self._plot_folder,
-            "{}_{}".format(
-                strip_ext(self.rootfile),
-                self.key
-            )
+            "{}_{}".format(strip_ext(self.rootfile), self.key),
         )
 
     def create_html_content(self):
@@ -704,10 +699,9 @@ class Plotuple:
         self._html_content = ""
 
         for elem in self._elements:
-            self._html_content += "<p>" + \
-                                  elem.revision + \
-                                 "</p>" + \
-                                  elem.object.GetTitle()
+            self._html_content += (
+                "<p>" + elem.revision + "</p>" + elem.object.GetTitle()
+            )
 
         # there is no file storing this, because it is directly in the json
         # file
@@ -753,18 +747,16 @@ class Plotuple:
 
         # If there is a reference object, print the reference values as the
         # first row of the table
-        if self._reference and 'reference' in self._revisions:
-            json_nutple['reference'] = []
+        if self._reference and "reference" in self._revisions:
+            json_nutple["reference"] = []
 
             key_list = list(self._reference.object.keys())
             for column in colum_names:
                 if column in key_list:
                     value_str = value2str(self._reference.object[column])
-                    json_nutple['reference'].append(
-                        (column, value_str)
-                    )
+                    json_nutple["reference"].append((column, value_str))
                 else:
-                    json_nutple['reference'].append((column, None))
+                    json_nutple["reference"].append((column, None))
 
         # Now print the values for all other revisions
         for ntuple in self._elements:
@@ -774,21 +766,16 @@ class Plotuple:
             for column in colum_names:
                 if column in ntuple.object:
                     value_str = value2str(ntuple.object[column])
-                    json_nutple[ntuple.revision].append(
-                        (column, value_str)
-                    )
+                    json_nutple[ntuple.revision].append((column, value_str))
                 else:
                     json_nutple[ntuple.revision].append((column, None))
 
         json_ntuple_file = os.path.join(
             self._plot_folder,
-            "{}_{}.json".format(
-                strip_ext(self.rootfile),
-                self.key
-            )
+            "{}_{}.json".format(strip_ext(self.rootfile), self.key),
         )
 
-        with open(json_ntuple_file, 'w+') as json_file:
+        with open(json_ntuple_file, "w+") as json_file:
             json.dump(json_nutple, json_file)
 
         self._file = json_ntuple_file
@@ -801,7 +788,7 @@ class Plotuple:
             return self.key
 
     def create_json_object(self):
-        if self.type == 'TNtuple':
+        if self.type == "TNtuple":
             return json_objects.ComparisonNTuple(
                 title=self.get_plot_title(),
                 description=self._description,
@@ -810,17 +797,17 @@ class Plotuple:
                 is_expert=self.is_expert(),
                 json_file_path=os.path.relpath(
                     self._file,
-                    validationpath.get_html_folder(self._work_folder)
+                    validationpath.get_html_folder(self._work_folder),
                 ),
             )
-        elif self.type == 'TNamed':
+        elif self.type == "TNamed":
             return json_objects.ComparisonHtmlContent(
                 title=self.get_plot_title(),
                 description=self._description,
                 contact=self._contact,
                 check=self._check,
                 is_expert=self.is_expert(),
-                html_content=self._html_content
+                html_content=self._html_content,
             )
         elif self.type == "meta":
             return None
@@ -837,9 +824,10 @@ class Plotuple:
                 is_expert=self.is_expert(),
                 plot_path=os.path.relpath(
                     self._plot_folder,
-                    validationpath.get_html_folder(self._work_folder)
-                ) + "/",
+                    validationpath.get_html_folder(self._work_folder),
+                )
+                + "/",
                 png_filename=self.get_png_filename(),
                 pdf_filename=self.get_pdf_filename(),
-                warnings=self.warnings
+                warnings=self.warnings,
             )

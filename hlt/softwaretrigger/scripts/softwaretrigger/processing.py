@@ -170,7 +170,10 @@ def add_hlt_processing(path,
     accept_path = basf2.Path()
 
     # Do the reconstruction needed for the HLT decision
-    path_utils.add_filter_reconstruction(path, run_type=run_type, components=reco_components, **kwargs)
+    path_utils.add_pre_filter_reconstruction(path, run_type=run_type, components=reco_components, **kwargs)
+
+    # Perform HLT filter calculation
+    path_utils.add_filter_software_trigger(path, store_array_debug_prescale=1)
 
     # Add the part of the dqm modules, which should run after every reconstruction
     path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter,
@@ -276,23 +279,6 @@ def add_expressreco_processing(path,
             basf2.B2FATAL("Run Type {} not supported.".format(run_type))
 
     path_utils.add_expressreco_dqm(path, run_type, components=reco_components)
-
-    # Will be removed later if not going to be used:
-    # Build one path for all events coming from L1 passthrough...
-    # l1_passthrough_path = basf2.Path()
-
-    # Find if the event is triggered in L1_trigger filter line, if yes, send through l1_passthrough_path
-    # l1_passthrough_module = path.add_module(
-    #     "TriggerSkim",
-    #     triggerLines=["software_trigger_cut&filter&L1_trigger"],
-    #     resultOnMissing=0)
-    # l1_passthrough_module.if_value("==1", l1_passthrough_path, basf2.AfterConditionPath.CONTINUE)
-
-    # path_utils.add_expressreco_dqm(
-    #     l1_passthrough_path,
-    #     run_type,
-    #     components=reco_components,
-    #     dqm_mode=constants.DQMModes.l1_passthrough.name)
 
     if prune_output:
         path.add_module("PruneDataStore", matchEntries=constants.ALWAYS_SAVE_OBJECTS + constants.RAWDATA_OBJECTS +

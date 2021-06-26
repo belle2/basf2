@@ -29,6 +29,8 @@ In the following we describe the ``svd`` package .
 
 .. toctree:: simulation
 
+.. toctree:: tools
+
 .. toctree:: utilities 
 
 .. toctree:: dqm
@@ -36,7 +38,5 @@ In the following we describe the ``svd`` package .
 .. toctree:: datastore
 
 .. toctree:: dbstore
-
-.. toctree:: tools
 
 .. toctree:: todo

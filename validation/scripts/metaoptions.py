@@ -24,7 +24,7 @@ class MetaOptionParser:
             meta_option_list = []
         meta_option_list = list(meta_option_list)
         #: store the meta option list for usage in the functions below
-        self.mo = meta_option_list  # type: List[str]
+        self.mo: List[str] = meta_option_list
 
     def has_option(self, option_name: str) -> bool:
         """

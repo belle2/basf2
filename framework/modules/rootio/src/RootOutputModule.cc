@@ -493,6 +493,9 @@ void RootOutputModule::fillTree(DataStore::EDurability durability)
     tree.SetBranchAddress(entry->name.c_str(), &entry->object);
   }
   tree.Fill();
+  for (auto* entry: m_entries[durability]) {
+    entry->object->ResetBit(kInvalidObject);
+  }
 
   const bool writeError = m_file->TestBit(TFile::kWriteError);
   if (writeError) {

@@ -61,7 +61,13 @@ if limits_file is not None:
             limits[entries[0]] /= float(entries[2])
 
 # get execution times
-categories = ['Simulation', 'TriggerSimulation', 'Tracking', 'PID', 'Clustering']
+categories = [
+    'Simulation',
+    'TriggerSimulation',
+    'Clustering',
+    'Prefilter_Tracking',
+    'Posttracking_Reconstruction',
+    'Postfilter_Reconstruction']
 times = {}
 for module in b2.statistics.modules:
     if module.name not in ['Sum_' + category for category in categories]:

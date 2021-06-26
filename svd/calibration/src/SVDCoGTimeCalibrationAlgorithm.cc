@@ -133,12 +133,18 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
           hEventT0nosync->Write();
           pfx->Write();
 
-          a = par[0]; b = par[1]; c = par[2]; d = par[3];
-          a_err = tfr->ParError(0); b_err = tfr->ParError(1); c_err = tfr->ParError(2); d_err = tfr->ParError(3);
-          chi2 = tfr->Chi2();
-          ndf = tfr->Ndf();
-          p = tfr->Prob();
-          m_tree->Fill();
+          if (!tfr) {
+            f->Close();
+            B2FATAL("Fit to the histogram failed in SVDCoGTimeCalibrationAlgorithm. "
+                    << "Check the 2-D histogram to clarify the reason.");
+          } else {
+            a = par[0]; b = par[1]; c = par[2]; d = par[3];
+            a_err = tfr->ParError(0); b_err = tfr->ParError(1); c_err = tfr->ParError(2); d_err = tfr->ParError(3);
+            chi2 = tfr->Chi2();
+            ndf  = tfr->Ndf();
+            p    = tfr->Prob();
+            m_tree->Fill();
+          }
 
         }
       }

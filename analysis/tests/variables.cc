@@ -4261,6 +4261,7 @@ namespace {
 
     allTrack->addRelationTo(lAll);
     noSVDTrack->addRelationTo(lAllNoSVD);
+    noSVDTOPTrack->addRelationTo(lAllNoSVDTOP);
     dEdxTrack->addRelationTo(ldEdx);
 
     // Table with the sum(LogL) for several cases
@@ -4326,7 +4327,7 @@ namespace {
 
     //expert stuff: LogL values
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, TOP)")->function(particleAll), 0.18);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, ALL)")->function(particleAll), 0.70);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, ALL)")->function(particleAll), 0.71);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(2212, TOP, CDC)")->function(particleAll), 0.86);
 
     // global probability

@@ -87,6 +87,12 @@ void TrackCreatorModule::initialize()
   m_beamAxisAsTVector = TVector3(m_beamAxis[0], m_beamAxis[1], m_beamAxis[2]);
 }
 
+void TrackCreatorModule::beginRun()
+{
+  if (!m_trackFitMomentumRange.isValid())
+    B2FATAL("TrackFitMomentumRange parameters are not available.");
+}
+
 void TrackCreatorModule::event()
 {
   StoreArray<RecoTrack> recoTracks(m_recoTrackColName);
@@ -101,8 +107,12 @@ void TrackCreatorModule::event()
     for (const auto& pdg : m_pdgCodes) {
       // Does not refit in case the particle hypotheses demanded in this module have already been fitted before.
       // Otherwise fits them with the default fitter.
-      B2DEBUG(200, "Trying to fit with PDG = " << pdg);
-      trackFitter.fit(recoTrack, Const::ParticleType(abs(pdg)));
+      B2DEBUG(25, "Trying to fit with PDG = " << pdg);
+      B2DEBUG(25, "PDG hypothesis: " << pdg << "\tMomentum cut: " << m_trackFitMomentumRange->getMomentumRange(
+                pdg) << "\tSeed p: " << recoTrack.getMomentumSeed().Mag());
+      if (recoTrack.getMomentumSeed().Mag() <= m_trackFitMomentumRange->getMomentumRange(pdg)) {
+        trackFitter.fit(recoTrack, Const::ParticleType(abs(pdg)));
+      }
     }
     trackBuilder.storeTrackFromRecoTrack(recoTrack, m_useClosestHitToIP);
   }

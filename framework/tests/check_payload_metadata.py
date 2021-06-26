@@ -67,13 +67,14 @@ if __name__ == '__main__':
 
     with b2tu.clean_working_directory():
 
-        # Path to the dabase with the testing payloads.
+        #: Path to the dabase with the testing payloads.
         testing_database_path = 'testingdb/testingdb.txt'
 
         # Create the testing payloads.
         assert(b2tu.run_in_subprocess(target=create_beam_parameters_payload, testing_database_path=testing_database_path) == 0)
 
         # Identify the md5 revision string of the payload.
+        #: mD5 revision.
         md5_revision = None
         with open(b2.find_file('testingdb/testingdb.txt')) as testing_database_file:
             for line in testing_database_file:

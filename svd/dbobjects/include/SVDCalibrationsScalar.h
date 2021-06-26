@@ -43,7 +43,7 @@ namespace Belle2 {
 
     /** set the calibration of the side*/
     static inline void set(payloadContainerType& svdScalar, unsigned int /*strip*/,
-                           calibrationType value)
+                           const calibrationType& value)
     {
       svdScalar = value;
     }

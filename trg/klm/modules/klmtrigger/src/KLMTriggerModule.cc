@@ -38,6 +38,7 @@ using namespace Belle2::group_helper;
 
 //! Total number of sections
 const int c_TotalSections_per_EKLM_BKLM = 2;
+const int c_MaxSectorID = 7;
 
 const int i_forward_eklm = 2;
 const int i_backward_eklm = 3;
@@ -200,6 +201,17 @@ unsigned int countBits(unsigned int n)
 }
 
 
+bool sectors_adjacent(int e1, int e2)
+{
+  if (e1 == 0 && e2 == c_MaxSectorID) {
+    return true;
+  }
+  if (e1 - e2 == 1) {
+    return true;
+  }
+  return false;
+}
+
 template <typename CONTAINER_T>
 auto to_sector_bit_mask(const CONTAINER_T& container, TriggerCut TriggerCut_ , vetoCut vetoCut_ = 0)
 {
@@ -215,6 +227,7 @@ auto to_sector_bit_mask(const CONTAINER_T& container, TriggerCut TriggerCut_ , v
       bitcount_or >= TriggerCut_
       && bitcount_back < vetoCut_
       && bitcount < vetoCut_
+      && (sectors_adjacent(sector_t(e) , sector_t(back)))
     ) {
       ret |= (1 << sector_t(e));
       ret |= (1024);

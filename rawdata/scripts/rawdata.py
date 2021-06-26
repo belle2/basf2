@@ -57,13 +57,14 @@ def add_packers(path, components=None):
         path.add_module(klmpacker)
 
 
-def add_unpackers(path, components=None, writeKLMDigitRaws=False):
+def add_unpackers(path, components=None, writeKLMDigitRaws=False, addTOPRelations=False):
     """
     This function adds the raw data unpacker modules to a path.
 
     :param components: list of geometry components to include reconstruction for, or None for all components.
     :param writeKLMDigitRaws: flag for creating the KLMDigitRaw object and storing it in the datastore. The KLMDQM
         module needs it for filling some histograms.
+    :param addTOPRelations: flag for creating relations in TOPUnpacker and TOPRawDigitConverter
     """
 
     # Check components.
@@ -100,8 +101,10 @@ def add_unpackers(path, components=None, writeKLMDigitRaws=False):
     # TOP
     if components is None or 'TOP' in components:
         topunpacker = b2.register_module('TOPUnpacker')
+        topunpacker.param('addRelations', addTOPRelations)
         path.add_module(topunpacker)
         topconverter = b2.register_module('TOPRawDigitConverter')
+        topconverter.param('addRelations', addTOPRelations)
         path.add_module(topconverter)
 
     # ARICH

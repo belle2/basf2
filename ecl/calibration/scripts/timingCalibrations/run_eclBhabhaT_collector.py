@@ -3,7 +3,7 @@
 #
 # -----------------------------------------------------------
 # BASF2 (Belle Analysis Framework 2)
-# Copyright(C) 2019 Belle II Collaboration
+# Copyright(C) 2021 Belle II Collaboration
 #
 # Author: The Belle II Collaboration
 # Contributors: Ewan Hill       (ehill@mail.ubc.ca)
@@ -25,13 +25,13 @@
 #
 # There are two ways you can use it:
 # 1. Provide parameters from command line:
-#   basf2 EclBhabhaTCollector.py -i "/path/to/input/files/*.root" -o collector_output.root
+#   basf2 run_eclBhabhaT_collector.py -i "/path/to/input/files/*.root" -o collector_output.root
 #
 # 2. Set parameters directly in steering file.
 #   Change INPUT_LIST and OUTPUT variables.
 #   (Multiple files can be easily added with glob.glob("/path/to/your/files/*.root"))
 #   And then call
-#   basf2 EclBhabhaTCollector.py
+#   basf2 run_eclBhabhaT_collector.py
 
 from basf2 import *
 from ROOT import Belle2
@@ -94,7 +94,7 @@ MIN_CRYSTAL = 1
 MAX_CRYSTAL = 8736
 
 # Bias of CDC event t0 in bhabha vs hadronic events (in ns)
-CDC_T0_BIAS_CORRECTION_OFFSET = -0.9
+CDC_T0_BIAS_CORRECTION_OFFSET = 0   # default is 0ns
 
 ###################################################################
 
@@ -155,9 +155,11 @@ set_debug_level(100)
 b2conditions.reset()
 b2conditions.override_globaltags()
 
-B2INFO("Adding Local Database {} to head of chain of local databases.")
+# These global tags will have to be updated for your files
+# Highest priority last
+b2.B2INFO("Adding Local Database {} to head of chain of local databases.")
 b2conditions.prepend_testing_payloads("localdb/database.txt")
-B2INFO("Using Global Tag {}")
+b2.B2INFO("Using Global Tag {}")
 b2conditions.prepend_globaltag("ECL_testingNewPayload_RefCrystalPerCrate")
 b2conditions.prepend_globaltag("master_2020-05-13")
 b2conditions.prepend_globaltag("online_proc11")

@@ -28,7 +28,6 @@ eclTimeShiftsAlgorithm::eclTimeShiftsAlgorithm():
   crysCrateShift_min(-20),
   crysCrateShift_max(20),
   algorithmReadPayloads(false),
-  forcePayloadIOVnotOpenEndedAndSequentialRevision(false),
   m_ECLCrystalTimeOffset("ECLCrystalTimeOffset"),
   m_ECLCrateTimeOffset("ECLCrateTimeOffset"),
   m_refCrysIDzeroingCrate("ECLReferenceCrystalPerCrateCalib")//,
@@ -46,7 +45,6 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
   B2INFO("eclTimeShiftsAlgorithm parameters:");
   B2INFO("debugFilenameBase = " << debugFilenameBase);
   B2INFO("algorithmReadPayloads = " << algorithmReadPayloads);
-  B2INFO("forcePayloadIOVnotOpenEndedAndSequentialRevision = " << forcePayloadIOVnotOpenEndedAndSequentialRevision);
   B2INFO("timeShiftForPlotStyle = {");
   for (int crateTest = 0; crateTest < 51; crateTest++) {
     B2INFO(timeShiftForPlotStyle[crateTest] << ",");
@@ -280,7 +278,10 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
   //------------------------------------------------------------------------
   //------------------------------------------------------------------------
   //------------------------------------------------------------------------
-  /* Extract out the time offset information from the database directly. */
+  /* Extract out the time offset information from the database directly.
+     This method loops over all run numbers so it can more easiy pick up
+     old payloads.  It is not the preferred method to use if the payloads
+     have iov gaps.*/
 
   if (algorithmReadPayloads) {
     //------------------------------------------------------------------------
@@ -339,7 +340,7 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
 
     B2INFO("eclTimeShiftsAlgorithm:: loaded ECLCrateTimeOffset from the database"
            << LogVar("IoV", m_ECLCrateTimeOffset.getIoV())
-           << LogVar("Revision", m_ECLCrateTimeOffset.getRevision()));
+           << LogVar("Checksum", m_ECLCrateTimeOffset.getChecksum()));
 
     for (int cellID = 1; cellID <= m_numCrystals; cellID += 511) {
       B2INFO("crystalCalib = " << crystalCalib[cellID - 1]);
@@ -352,8 +353,6 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
     }
 
 
-
-    int previousRevNum = -1 ;   // To keep track if the run number has changed
 
     //------------------------------------------------------------------------
     /** Loop over all the experiments and runs and extract the crate times*/
@@ -399,29 +398,10 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
       /** Populate database contents */
       B2INFO("eclTimeShiftsAlgorithm:: loaded ECLCrystalTimeOffset from the database"
              << LogVar("IoV", m_ECLCrystalTimeOffset.getIoV())
-             << LogVar("Revision", m_ECLCrystalTimeOffset.getRevision()));
+             << LogVar("Checksum", m_ECLCrystalTimeOffset.getChecksum()));
       B2INFO("eclTimeShiftsAlgorithm:: loaded ECLCrateTimeOffset from the database"
              << LogVar("IoV", m_ECLCrateTimeOffset.getIoV())
-             << LogVar("Revision", m_ECLCrateTimeOffset.getRevision()));
-
-
-      //------------------------------------------------------------------------
-      /** If requested by the user, check that the payload revision is
-          increasing by +1 and that the payload iov does not have a -1 as
-          the high run number.  This should hopefully skip the runs that
-          are gaps in the iov and use older payloads*/
-
-      if (forcePayloadIOVnotOpenEndedAndSequentialRevision) {
-        int revNumber = m_ECLCrateTimeOffset.getRevision();
-        if ((m_ECLCrateTimeOffset.getIoV().getExperimentHigh() == -1 && m_ECLCrateTimeOffset.getIoV().getRunHigh() == -1)
-            || (revNumber != previousRevNum + 1 && previousRevNum != -1)) {
-          // skip this run because it is using an older payload - probably an iov hole
-          B2INFO("Skipping run since payload has (*,*,-1,-1) and revision number is not incrementing");
-          continue;
-        } else {
-          previousRevNum = revNumber;
-        }
-      }
+             << LogVar("Checksum", m_ECLCrateTimeOffset.getChecksum()));
 
 
       //------------------------------------------------------------------------

@@ -121,13 +121,13 @@ void eclTimeShiftsPlottingCollectorModule::collect()
 
     B2DEBUG(25, "eclTimeShiftsPlottingCollector:: loaded ECLCrystalTimeOffset from the database"
             << LogVar("IoV", m_CrystalTimeDB.getIoV())
-            << LogVar("Revision", m_CrystalTimeDB.getRevision()));
+            << LogVar("Checksum", m_CrystalTimeDB.getChecksum()));
     B2DEBUG(25, "eclTimeShiftsPlottingCollector:: loaded ECLCrateTimeOffset from the database"
             << LogVar("IoV", m_CrateTimeDB.getIoV())
-            << LogVar("Revision", m_CrateTimeDB.getRevision()));
+            << LogVar("Checksum", m_CrateTimeDB.getChecksum()));
     B2DEBUG(25, "eclTimeShiftsPlottingCollector:: loaded ECLReferenceCrystalPerCrateCalib from the database"
             << LogVar("IoV", m_RefCrystalsCalibDB.getIoV())
-            << LogVar("Revision", m_RefCrystalsCalibDB.getRevision()));
+            << LogVar("Checksum", m_RefCrystalsCalibDB.getChecksum()));
 
     string objectName = "tree_perCrystal";
     auto tree_perCrystal = getObjectPtr<TTree>(objectName);

@@ -10,9 +10,12 @@
 #include <alignment/PedeApplication.h>
 #include <alignment/PedeResult.h>
 #include <framework/database/EventDependency.h>
+#include <framework/utilities/FileSystem.h>
 
 #include <TH1F.h>
 #include <TTree.h>
+
+
 
 using namespace std;
 using namespace Belle2;
@@ -36,8 +39,13 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   // Write out binary files from tree and add to steering
   prepareMilleBinary();
   auto mille = getObjectPtr<MilleData>("mille");
-  for (auto file : mille->getFiles())
+  for (auto file : mille->getFiles()) {
+    if (!FileSystem::fileExists(file)) {
+      B2ERROR("Missing file: " << file);
+      continue;
+    }
     m_steering.addFile(file);
+  }
 
   // Run calibration on steering
   m_result = m_pede.calibrate(m_steering);
@@ -63,10 +71,10 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 
 
   // This function gives you the vector of ExpRuns that were requested for this execution only
-  //auto expRuns = getRunList();
+  auto expRuns = getRunList();
 
   // Or you can inspect all the input files to get the full RunRange
-  auto expRuns = getRunListFromAllData();
+  //auto expRuns = getRunListFromAllData();
 
   int undeterminedParams = 0;
   double maxCorrectionPull = 0.;

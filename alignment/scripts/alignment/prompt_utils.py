@@ -37,7 +37,12 @@ def fix_mille_paths_for_algo(algo):
 
                 milleData.clear()
                 for f in fixed_milleFiles:
-                    milleData.addFile(f)
+                    if os.path.isfile(f):
+                        milleData.addFile(f)
+                        print(f)
+                    else:
+                        print(dirname, ":")
+                        print("Missing file: ", f)
 
                 file.cd(f"MillepedeCollector/mille/mille_{exp}.{run}/")
                 milleData.Write("", ROOT.TObject.kOverwrite)

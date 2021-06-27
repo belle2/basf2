@@ -229,7 +229,7 @@ namespace Belle2 {
           if (print1290) printf("Global Trigger TimeTag  0x%08x %u.data\n", dbuf[i], i);
           break;
         case 0x1:   // TDC header
-          if (print1290) printf("TDC header  0x%08x %u.data evid=%d wc=%u\n", dbuf[i], i, (dbuf[i] >> 12) & 0xFFF, dbuf[i] & 0xFFF);
+          if (print1290) printf("TDC header  0x%08x %u.data evid=%u wc=%u\n", dbuf[i], i, (dbuf[i] >> 12) & 0xFFF, dbuf[i] & 0xFFF);
 
           break;
         case 0x3:   // TDC trailer

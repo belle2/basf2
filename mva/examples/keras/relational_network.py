@@ -13,7 +13,7 @@ from basf2_mva_python_interface.contrib_keras import State
 from keras.layers import Dense, GlobalAveragePooling1D, Input
 from keras.layers.core import Reshape
 from keras.models import Model
-from keras.optimizers import adam
+from keras.optimizers import Adam
 from keras.losses import binary_crossentropy
 from keras.activations import sigmoid, tanh
 from keras.callbacks import Callback, EarlyStopping
@@ -43,7 +43,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
     state = State(Model(input, output), custom_objects={'Relations': Relations})
 
-    state.model.compile(optimizer=adam(lr=0.001), loss=binary_crossentropy, metrics=['accuracy'])
+    state.model.compile(optimizer=Adam(lr=0.001), loss=binary_crossentropy, metrics=['accuracy'])
     state.model.summary()
 
     return state

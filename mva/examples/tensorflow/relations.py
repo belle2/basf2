@@ -244,7 +244,7 @@ if __name__ == "__main__":
             dic.update({'isSignal': target})
 
             df = pandas.DataFrame(dic, dtype=np.float32)
-            to_root(df, os.path.join(path, filename), tree_key='variables')
+            to_root(df, os.path.join(path, filename), key='variables')
 
         # ##########################Do Training#################################
         # Do a comparison of different Nets for this task.

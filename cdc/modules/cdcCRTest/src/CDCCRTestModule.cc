@@ -267,12 +267,12 @@ void CDCCRTestModule::event()
       m_hNTracks->Fill("Track not fitted", 1.0);
       continue;
     }
-    if (!track->getTrackFitStatus()->isFitted()) {
+    const genfit::FitStatus* fs = track->getTrackFitStatus();
+    if (!fs || !fs->isFitted()) {
       m_hNTracks->Fill("Track not fitted", 1.0);
       continue;
     }
-    const genfit::FitStatus* fs = track->getTrackFitStatus();
-    if (!fs || !fs->isFitConverged()) {//not fully convergence
+    if (!fs->isFitConverged()) {//not fully convergence
       m_hNTracks->Fill("fitted, not converged", 1.0);
       B2DEBUG(99, "------Fitted but not converged");
       continue;

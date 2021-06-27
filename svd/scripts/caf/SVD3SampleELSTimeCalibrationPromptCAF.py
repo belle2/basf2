@@ -23,18 +23,6 @@ settings = CalibrationSettings(name="SVD3SampleELSTimeCalibrationPrompt",
                                input_data_names=["hlt_hadron"],
                                depends_on=[])
 
-##################################################################
-# Remove Module from the Path
-
-
-def remove_module(path, name):
-
-    new_path = b2.create_path()
-    for m in path.modules():
-        if name != m.name():
-            new_path.add_module(m)
-    return new_path
-#####################################################################################################
 # Definition of the class
 
 
@@ -65,7 +53,7 @@ def get_calibrations(input_data, **kwargs):
         if moda.name() == 'SVDSpacePointCreator':
             moda.param("SVDClusters", 'SVDClustersFromTracks')
 
-    path = remove_module(path, 'SVDMissingAPVsClusterCreator')
+    path = b2.remove_module(path, 'SVDMissingAPVsClusterCreator')
 
     file_to_iov_physics = input_data["hlt_hadron"]
 

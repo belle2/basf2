@@ -38,6 +38,7 @@
 #pragma link C++ class Belle2::EventLevelTrackingInfo+; // checksum=0x6360bfbf, version=2
 #pragma link C++ class Belle2::TRGSummary+; // checksum=0x62d98033, version=7
 #pragma link C++ class Belle2::SoftwareTriggerResult+; // checksum=0xe5e47e9, version=5
+#pragma link C++ class Belle2::EventLevelTriggerTimeInfo+; // checksum=0xde8c3c4d, version=1
 
 // ----------------------------------------------------------------------------
 // SoftwareTriggerResult

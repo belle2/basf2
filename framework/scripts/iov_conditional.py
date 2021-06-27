@@ -10,7 +10,7 @@ file for phases 2 and 3.
 Warning:
     All Modules will be initialized on startup of the framework. This might
     cause problems if the modules initialize some common global state. For
-    example adding :b2:mod:`Geometry` modules with different parameters will not
+    example, adding ``Geometry`` modules with different parameters will not
     work as expected.
 """
 import basf2

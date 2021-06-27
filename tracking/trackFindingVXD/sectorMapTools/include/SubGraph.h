@@ -49,7 +49,7 @@ namespace Belle2 {
     using Iterator = typename std::unordered_map<FilterType, MinMax>::iterator;
 
     /** constructor, mandatory iDChain musst at least contain one iD. */
-    SubGraph(SubGraphID& id, std::vector<FilterType>& fIDs) : m_id(id), m_found(1), m_rawDataCollected(nullptr)
+    SubGraph(SubGraphID& id, const std::vector<FilterType>& fIDs) : m_id(id), m_found(1), m_rawDataCollected(nullptr)
     {
       for (auto& iD : fIDs) {
         m_minMaxValues.insert({iD, MinMax()});

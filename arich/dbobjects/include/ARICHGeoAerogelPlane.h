@@ -225,7 +225,7 @@ namespace Belle2 {
      * @param trLen transmission length of aerogel tiles in layer
      * @param material material of aerogel tiles in layer
      */
-    void setAerogelLayer(unsigned ilayer, double thick, double rIndex, double trLen, std::string& material)
+    void setAerogelLayer(unsigned ilayer, double thick, double rIndex, double trLen, const std::string& material)
     {
       if (ilayer == m_nLayers + 1) {
         m_layers.push_back({thick, rIndex, trLen, material});

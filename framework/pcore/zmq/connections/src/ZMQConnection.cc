@@ -90,10 +90,7 @@ std::string ZMQConnectionOverSocket::getEndPoint() const
 {
   std::string endpoint{""};
   if (m_socket) {
-    endpoint.resize(1024);
-    size_t size{1024};
-    m_socket->getsockopt(ZMQ_LAST_ENDPOINT, endpoint.data(), &size);
-    endpoint.resize(size - 1);
+    endpoint = m_socket->get(zmq::sockopt::last_endpoint);
   }
   return endpoint;
 }

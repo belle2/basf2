@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019 - Belle II Collaboration                             *
+ * Copyright(C) 2019, 2021 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -12,7 +12,7 @@
 
 #include <calibration/CalibrationCollectorModule.h>
 #include <top/utilities/TrackSelector.h>
-#include <top/reconstruction/TOPalign.h>
+#include <top/reconstruction_cpp/ModuleAlignment.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -58,8 +58,6 @@ namespace Belle2 {
          };
 
     // steering parameters
-    double m_minBkgPerBar; /**< minimal assumed background photons per module */
-    double m_scaleN0; /**< scale factor for figure-of-merit N0 */
     int m_targetMid; /**< target module to align. Must be 1 <= Mid <= 16 */
     int m_maxFails; /**< maximum allowed number of failed iterations */
     std::string m_sample; /**< sample type */
@@ -71,14 +69,12 @@ namespace Belle2 {
     double m_stepPosition; /**< step size for translations */
     double m_stepAngle; /**< step size for rotations */
     double m_stepTime; /**< step size for t0 */
-    double m_stepRefind; /**< step size for scaling of refractive index (dn/n) */
-    std::vector<int> m_gridSize; /**< grid size */
     std::vector<double> m_parInit; /**< initial parameter values */
     std::vector<std::string> m_parFixed; /**< names of parameters to be fixed */
 
     // alignment procedure
     TOP::TrackSelector m_selector; /**< track selection utility */
-    std::vector<TOP::TOPalign> m_align;  /**< alignment objects */
+    std::vector<TOP::ModuleAlignment> m_align;  /**< alignment objects */
     std::vector<int> m_countFails;      /**< counters for failed iterations */
 
     // collections

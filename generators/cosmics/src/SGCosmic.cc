@@ -124,14 +124,14 @@ bool SGCosmic::generateEvent(MCParticleGraph& graph)
 
     // Calculate coordinates and momentum at ToP radius
     TVector3 vector;
-    vector = CosmicMCHelix.getPositionAtArcLength2D(arcLength);
+    vector = CosmicMCHelix.getPositionAtArcLength2D(- arcLength);
     double vx = vector[0];
     double vy = vector[1];
     double vz = vector[2];
-    vector = CosmicMCHelix.getMomentumAtArcLength2D(arcLength, bz);
-    double px = - vector[0];
-    double py = - vector[1];
-    double pz = - vector[2];
+    vector = CosmicMCHelix.getMomentumAtArcLength2D(- arcLength, bz);
+    double px = vector[0];
+    double py = vector[1];
+    double pz = vector[2];
     double m = p.getMass();
     double e  = sqrt(px * px + py * py + pz * pz + m * m);
 
@@ -234,7 +234,7 @@ void SGCosmic::mkdist_v1(const int charge, double* parameters)
           success = mkDr_neg_v1(parameters[0], rand2);
       }
       if (i == 1) { // phi
-        parameters[1] = rand1 * M_PI; // (0, pi)
+        parameters[1] = - rand1 * M_PI; // (-pi, 0)
         if (charge == 1)
           success = mkPhi_pos_v1(parameters[1], rand2);
         else
@@ -369,7 +369,7 @@ int SGCosmic::mkPhi_pos_v1(const double phi, const float rndm)
   // normalize by peak value --> max = 1
   double max = findMax(phi_pos, nch);
   for (int i = 0; i < nch; i++) phi_pos[i] /= max;
-  int index = (int)((double)nch / width * phi);
+  int index = (int)((double)nch / width * (phi + M_PI));
 
   if (phi_pos[index] > rndm) return 1;
   return 0;
@@ -403,7 +403,7 @@ int SGCosmic::mkPhi_neg_v1(const double phi, const float rndm)
   // normalize by peak value --> max = 1
   double max = findMax(phi_neg, nch);
   for (int i = 0; i < nch; i++) phi_neg[i] /= max;
-  int index = (int)((double)nch / width * phi);
+  int index = (int)((double)nch / width * (phi + M_PI));
 
   if (phi_neg[index] > rndm) return 1;
   return 0;
@@ -613,7 +613,7 @@ void SGCosmic::mkdist_v2(const int charge, double* parameters)
           success = mkDr_neg_v2(parameters[0], rand2);
       }
       if (i == 1) { // phi
-        parameters[1] = rand1 * M_PI; // (0, pi)
+        parameters[1] = - rand1 * M_PI; // (-pi, 0)
         if (charge == 1)
           success = mkPhi_pos_v2(parameters[1], rand2);
         else

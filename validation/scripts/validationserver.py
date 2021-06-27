@@ -22,7 +22,7 @@ from validationplots import create_plots
 import validationfunctions
 import validationpath
 
-g_plottingProcesses = {}  # type: Dict[str, Tuple[Process, Queue, Dict[str, Any]]]
+g_plottingProcesses: Dict[str, Tuple[Process, Queue, Dict[str, Any]]] = ({})
 
 
 def get_revision_label_from_json_filename(json_filename: str) -> str:
@@ -90,8 +90,7 @@ def check_plotting_status(progress_key: str):
     if progress_key not in g_plottingProcesses:
         return None
 
-    process, qu, last_status = \
-        g_plottingProcesses[progress_key]
+    process, qu, last_status = g_plottingProcesses[progress_key]
 
     # read latest message
     try:
@@ -111,12 +110,16 @@ def check_plotting_status(progress_key: str):
 # todo: remove this, once we're certain that the bug was fixed!
 def warn_wrong_directory():
     if not os.getcwd().endswith("html"):
-        print(f"ERROR: Expected to be in HTML directory, but my current "
-              f"working directory is {os.getcwd()}; abspath: {os.getcwd()}.")
+        print(
+            f"ERROR: Expected to be in HTML directory, but my current "
+            f"working directory is {os.getcwd()}; abspath: {os.getcwd()}."
+        )
 
 
 # todo: limit the number of running plotting requests and terminate hanging ones
-def start_plotting_request(revision_names: List[str], results_folder: str) -> str:
+def start_plotting_request(
+    revision_names: List[str], results_folder: str
+) -> str:
     """
     Start a new comparison between the supplied revisions
 
@@ -145,8 +148,8 @@ def start_plotting_request(revision_names: List[str], results_folder: str) -> st
             # go one folder up, because this function
             # expects the work dir, which contains
             # the results folder
-            os.path.dirname(results_folder)
-        )
+            os.path.dirname(results_folder),
+        ),
     )
     p.start()
     g_plottingProcesses[rev_key] = (p, qu, None)
@@ -192,10 +195,9 @@ class ValidationRoot:
         in revision_list
         """
         rev_list = cherrypy.request.json["revision_list"]
-        logging.debug('Creating plots for revisions: ' + str(rev_list))
+        logging.debug("Creating plots for revisions: " + str(rev_list))
         progress_key = start_plotting_request(
-            rev_list,
-            validationpath.get_results_folder(self.working_folder),
+            rev_list, validationpath.get_results_folder(self.working_folder),
         )
         return {"progress_key": progress_key}
 
@@ -224,7 +226,7 @@ class ValidationRoot:
             validationpath.get_html_plots_tag_comparison_folder(
                 self.working_folder, args[:-2]
             ),
-            validationpath.get_html_folder(self.working_folder)
+            validationpath.get_html_folder(self.working_folder),
         )
         path = os.path.join(tag_folder, *args[-2:])
         return cherrypy.lib.static.serve_file(path)
@@ -237,8 +239,7 @@ class ValidationRoot:
         Checks on the status of a comparison creation
         """
         progress_key = cherrypy.request.json["input"]
-        logging.debug('Checking status for plot creation: ' +
-                      str(progress_key))
+        logging.debug("Checking status for plot creation: " + str(progress_key))
         status = check_plotting_status(progress_key)
         return status
 
@@ -253,15 +254,13 @@ class ValidationRoot:
         # get list of available revision
         rev_list = get_json_object_list(
             validationpath.get_results_folder(self.working_folder),
-            validationpath.file_name_results_json
+            validationpath.file_name_results_json,
         )
 
         # always add the reference revision
         combined_list = []
         reference_revision = json.loads(
-            json_objects.dumps(
-                json_objects.Revision(label="reference")
-            )
+            json_objects.dumps(json_objects.Revision(label="reference"))
         )
 
         # load and combine
@@ -269,7 +268,7 @@ class ValidationRoot:
             full_path = os.path.join(
                 validationpath.get_results_folder(self.working_folder),
                 r,
-                validationpath.file_name_results_json
+                validationpath.file_name_results_json,
             )
 
             # update label, if dir has been moved
@@ -297,12 +296,7 @@ class ValidationRoot:
             # Will later reverse order to bring items in the same category
             # in reverse chronological order, so the following list will have
             # the items in reverse order as well:
-            order = [
-                "release",
-                "prerelease",
-                "build",
-                "nightly"
-            ]
+            order = ["release", "prerelease", "build", "nightly"]
             try:
                 index = order.index(category)
             except ValueError:
@@ -313,10 +307,7 @@ class ValidationRoot:
                 )
             return f"{index}-{datetag}"
 
-        combined_list.sort(
-            key=lambda rev: sort_key(rev["label"]),
-            reverse=True
-        )
+        combined_list.sort(key=lambda rev: sort_key(rev["label"]), reverse=True)
 
         # reference always on top
         combined_list = [reference_revision] + combined_list
@@ -372,16 +363,15 @@ class ValidationRoot:
                 validationpath.get_html_plots_tag_comparison_folder(
                     self.working_folder, comparison_label.split(",")
                 ),
-                validationpath.get_html_folder(self.working_folder)
+                validationpath.get_html_folder(self.working_folder),
             ),
-            "comparison.json"
+            "comparison.json",
         )
 
         # check if this comparison actually exists
         if not os.path.isfile(path):
             raise cherrypy.HTTPError(
-                404,
-                f"Json Comparison file {path} does not exist"
+                404, f"Json Comparison file {path} does not exist"
             )
 
         return deliver_json(path)
@@ -399,13 +389,12 @@ class ValidationRoot:
         # note: for some reason %Z doesn't work like this, so we use
         # time.tzname for the time zone.
         return {
-            "last_restart":
-                self.last_restart.strftime("%-d %b %H:%M ") + time.tzname[1],
+            "last_restart": self.last_restart.strftime("%-d %b %H:%M ")
+            + time.tzname[1],
             "version_restart": self.version,
-            "version_current":
-                validationfunctions.get_compact_git_hash(
-                    os.environ["BELLE2_LOCAL_DIR"]
-                )
+            "version_current": validationfunctions.get_compact_git_hash(
+                os.environ["BELLE2_LOCAL_DIR"]
+            ),
         }
 
 
@@ -417,14 +406,14 @@ def setup_gzip_compression(path, cherry_config):
 
     cherry_config[path].update(
         {
-            'tools.gzip.on': True,
-            'tools.gzip.mime_types': [
-                'text/html',
-                'text/plain',
-                'text/css',
-                'application/javascript',
-                'application/json'
-            ]
+            "tools.gzip.on": True,
+            "tools.gzip.mime_types": [
+                "text/html",
+                "text/plain",
+                "text/css",
+                "application/javascript",
+                "application/json",
+            ],
         }
     )
 
@@ -436,18 +425,34 @@ def get_argument_parser():
     parser = argparse.ArgumentParser()
 
     # Define the accepted command line flags and read them in
-    parser.add_argument("-ip", "--ip", help="The IP address on which the"
-                        "server starts. Default is '127.0.0.1'.",
-                        type=str, default='127.0.0.1')
-    parser.add_argument("-p", "--port", help="The port number on which"
-                        " the server starts. Default is '8000'.",
-                        type=str, default=8000)
-    parser.add_argument("-v", "--view", help="Open validation website"
-                        " in the system's default browser.",
-                        action='store_true')
-    parser.add_argument("--production", help="Run in production environment: "
-                        "no log/error output via website and no auto-reload",
-                        action="store_true")
+    parser.add_argument(
+        "-ip",
+        "--ip",
+        help="The IP address on which the"
+        "server starts. Default is '127.0.0.1'.",
+        type=str,
+        default="127.0.0.1",
+    )
+    parser.add_argument(
+        "-p",
+        "--port",
+        help="The port number on which"
+        " the server starts. Default is '8000'.",
+        type=str,
+        default=8000,
+    )
+    parser.add_argument(
+        "-v",
+        "--view",
+        help="Open validation website" " in the system's default browser.",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--production",
+        help="Run in production environment: "
+        "no log/error output via website and no auto-reload",
+        action="store_true",
+    )
 
     return parser
 
@@ -465,20 +470,30 @@ def parse_cmd_line_arguments():
     return parser.parse_args()
 
 
-def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
-               open_site=False, dry_run=False):
+def run_server(
+    ip="127.0.0.1",
+    port=8000,
+    parse_command_line=False,
+    open_site=False,
+    dry_run=False,
+):
 
     # Setup options for logging
-    logging.basicConfig(level=logging.DEBUG,
-                        format='%(asctime)s %(levelname)-8s %(message)s',
-                        datefmt='%H:%M:%S')
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s %(levelname)-8s %(message)s",
+        datefmt="%H:%M:%S",
+    )
 
     basepath = validationpath.get_basepath()
     cwd_folder = os.getcwd()
 
     # Only execute the program if a basf2 release is set up!
-    if os.environ.get('BELLE2_RELEASE_DIR', None) is None and os.environ.get('BELLE2_LOCAL_DIR', None) is None:
-        sys.exit('Error: No basf2 release set up!')
+    if (
+        os.environ.get("BELLE2_RELEASE_DIR", None) is None
+        and os.environ.get("BELLE2_LOCAL_DIR", None) is None
+    ):
+        sys.exit("Error: No basf2 release set up!")
 
     cherry_config = dict()
     # just empty, will be filled below
@@ -492,7 +507,8 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
 
     if basepath["central"] is not None:
         static_folder_central = os.path.join(
-            basepath["central"], *static_folder_list)
+            basepath["central"], *static_folder_list
+        )
         if os.path.isdir(static_folder_central):
             static_folder = static_folder_central
 
@@ -500,13 +516,16 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
     # this overwrites the usage of the central release
     if basepath["local"] is not None:
         static_folder_local = os.path.join(
-            basepath["local"], *static_folder_list)
+            basepath["local"], *static_folder_list
+        )
         if os.path.isdir(static_folder_local):
             static_folder = static_folder_local
 
     if static_folder is None:
-        sys.exit("Either BELLE2_RELEASE_DIR or BELLE2_LOCAL_DIR has to bet "
-                 "to provide static HTML content. Did you run b2setup ?")
+        sys.exit(
+            "Either BELLE2_RELEASE_DIR or BELLE2_LOCAL_DIR has to bet "
+            "to provide static HTML content. Did you run b2setup ?"
+        )
 
     # join the paths of the various result folders
     results_folder = validationpath.get_results_folder(cwd_folder)
@@ -517,57 +536,62 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
 
     # check if the results folder exists and has at least one folder
     if not os.path.isdir(results_folder):
-        sys.exit("Result folder {} does not exist, run validate_basf2 first "
-                 "to create validation output".format(results_folder))
+        sys.exit(
+            "Result folder {} does not exist, run validate_basf2 first "
+            "to create validation output".format(results_folder)
+        )
 
-    results_count = sum([
-        os.path.isdir(os.path.join(results_folder, f))
-        for f in os.listdir(results_folder)
-    ])
+    results_count = sum(
+        [
+            os.path.isdir(os.path.join(results_folder, f))
+            for f in os.listdir(results_folder)
+        ]
+    )
     if results_count == 0:
         sys.exit(
             f"Result folder {results_folder} contains no folders, run "
-            f"validate_basf2 first to create validation output")
+            f"validate_basf2 first to create validation output"
+        )
 
     # Go to the html directory
-    if not os.path.exists('html'):
-        os.mkdir('html')
-    os.chdir('html')
+    if not os.path.exists("html"):
+        os.mkdir("html")
+    os.chdir("html")
 
-    if not os.path.exists('plots'):
-        os.mkdir('plots')
+    if not os.path.exists("plots"):
+        os.mkdir("plots")
 
     # export js, css and html templates
     cherry_config["/static"] = {
-        'tools.staticdir.on': True,
+        "tools.staticdir.on": True,
         # only serve js, css, html and png files
-        'tools.staticdir.match': r"^.*\.(js|css|html|png|js.map)$",
-        'tools.staticdir.dir': static_folder
+        "tools.staticdir.match": r"^.*\.(js|css|html|png|js.map)$",
+        "tools.staticdir.dir": static_folder,
     }
     setup_gzip_compression("/static", cherry_config)
 
     # export generated plots
     cherry_config["/plots"] = {
-        'tools.staticdir.on': True,
+        "tools.staticdir.on": True,
         # only serve json and png files
-        'tools.staticdir.match': r"^.*\.(png|json|pdf)$",
-        'tools.staticdir.dir': comparison_folder
+        "tools.staticdir.match": r"^.*\.(png|json|pdf)$",
+        "tools.staticdir.dir": comparison_folder,
     }
     setup_gzip_compression("/plots", cherry_config)
 
     # export generated results and raw root files
     cherry_config["/results"] = {
-        'tools.staticdir.on': True,
-        'tools.staticdir.dir': results_folder,
+        "tools.staticdir.on": True,
+        "tools.staticdir.dir": results_folder,
         # only serve root files
-        'tools.staticdir.match': r"^.*\.(log|root)$",
+        "tools.staticdir.match": r"^.*\.(log|root)$",
         # server the log files as plain text files, and make sure to use
         # utf-8 encoding. Firefox might decide different, if the files
         # are located on a .jp domain and use Shift_JIS
-        'tools.staticdir.content_types': {
-            'log': 'text/plain; charset=utf-8',
-            'root': 'application/octet-stream'
-        }
+        "tools.staticdir.content_types": {
+            "log": "text/plain; charset=utf-8",
+            "root": "application/octet-stream",
+        },
     }
 
     setup_gzip_compression("/results", cherry_config)
@@ -584,11 +608,11 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
         open_site = cmd_arguments.view
         production_env = cmd_arguments.production
 
-    cherrypy.config.update({'server.socket_host': ip,
-                            'server.socket_port': port,
-                            })
+    cherrypy.config.update(
+        {"server.socket_host": ip, "server.socket_port": port, }
+    )
     if production_env:
-        cherrypy.config.update({'environment': 'production'})
+        cherrypy.config.update({"environment": "production"})
 
     logging.info(f"Server: Starting HTTP server on {ip}:{port}")
 
@@ -597,13 +621,9 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
 
     if not dry_run:
         cherrypy.quickstart(
-            ValidationRoot(
-                working_folder=cwd_folder
-            ),
-            '/',
-            cherry_config
+            ValidationRoot(working_folder=cwd_folder), "/", cherry_config
         )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run_server()

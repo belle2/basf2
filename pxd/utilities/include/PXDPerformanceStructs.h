@@ -117,9 +117,9 @@ namespace Belle2 {
        * @param pxdTrackClustersName Name of track matched PXDClusters
        */
       void setValues(const RecoTrack& recoTrack, const TVector3& ip = TVector3(0, 0, 0),
-                     const std::string recoTracksName = "",
-                     const std::string pxdInterceptsName = "",
-                     const std::string pxdTrackClustersName = "PXDClustersFromTracks"
+                     const std::string& recoTracksName = "",
+                     const std::string& pxdInterceptsName = "",
+                     const std::string& pxdTrackClustersName = "PXDClustersFromTracks"
                     );
 
       float d0;        /**< Impact parameter in r-phi. */
@@ -145,9 +145,9 @@ namespace Belle2 {
     template <typename TTrackCluster>
     void TrackBase_t<TTrackCluster>::setValues(
       const RecoTrack& recoTrack, const TVector3& ip,
-      const std::string recoTracksName,
-      const std::string pxdInterceptsName,
-      const std::string pxdTrackClustersName
+      const std::string& recoTracksName,
+      const std::string& pxdInterceptsName,
+      const std::string& pxdTrackClustersName
     )
     {
       // get Track pointer

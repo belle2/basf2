@@ -26,7 +26,7 @@
 
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
-#include <svd/calibration/SVDClusterCalibrations.h>
+#include <svd/calibration/SVDClustering.h>
 #include <svd/dbobjects/SVDRecoConfiguration.h>
 
 namespace Belle2 {
@@ -135,7 +135,7 @@ namespace Belle2 {
 
       DBObjPtr<SVDRecoConfiguration> m_recoConfig; /**< SVD Reconstruction Configuration payload*/
       SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
-      SVDClusterCalibrations m_ClusterCal; /**<SVDCluster calibrations db object*/
+      SVDClustering m_ClusterCal; /**<SVDCluster calibrations db object*/
 
 
       /**

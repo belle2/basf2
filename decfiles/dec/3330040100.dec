@@ -1,0 +1,22 @@
+# EventType: 3330040100
+# Descriptor: e+ e- -> [K_S0 [-> pi+ pi-] K+- pi-+]
+# NickName: ee_K0SKpiISR
+# Documentation: to be used with add_phokhara_evtgen_combination()
+# Tested: Yes
+# PhysicsWG: Dark Sector and Low Multiplicity
+# Responsible: Giacomo De Pietro
+# Email: depietro@infn.it
+# Cuts: None
+# Date: 20210608
+#
+
+Decay vpho
+0.500 K_S0 K+ pi- PHOTOS PHSP;
+0.500 K_S0 K- pi+ PHOTOS PHSP;
+Enddecay
+    
+Decay K_S0
+1.000 pi+ pi- PHOTOS PHSP;
+Enddecay
+    
+End

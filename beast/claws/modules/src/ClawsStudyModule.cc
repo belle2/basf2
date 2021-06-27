@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <beast/claws/modules/ClawsStudyModule.h>
-#include <beast/claws/dataobjects/CLAWSSimHit.h>
 #include <beast/claws/dataobjects/ClawsHit.h>
 #include <generators/SAD/dataobjects/SADMetaHit.h>
 #include <framework/datastore/StoreArray.h>
@@ -135,7 +134,6 @@ void ClawsStudyModule::beginRun()
 void ClawsStudyModule::event()
 {
   //Here comes the actual event processing
-  StoreArray<CLAWSSimHit>  SimHits;
   StoreArray<ClawsHit> Hits;
   StoreArray<SADMetaHit> MetaHits;
 

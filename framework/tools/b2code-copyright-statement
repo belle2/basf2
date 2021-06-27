@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+
+"""Tool to add or update the copyright and license statement to source files"""
+
+import argparse
+import glob
+import re
+import difflib
+
+
+# Copyright and license statements
+copyright_statement_C = """/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+"""
+copyright_statement_python = copyright_statement_C.replace('*', '#').replace('/', '').replace(' # ', '# ').replace(' ##', '##')
+
+# Regular expressions for finding the copyright statement
+re_copyright_C = re.compile('/\\*{50}.*Author:\\s*The Belle II Collaboration.*\\*{50}/\n', re.DOTALL)
+re_copyright_python = re.compile('#{50}.*Author:\\s*The Belle II Collaboration.*#{50}\n', re.DOTALL)
+
+
+def get_argument_parser():
+    """
+    Return an ArgumentParser with all defined arguments
+    """
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('-r', '--recursive', action='store_true', help='Apply to files in subdirectories matching the given pattern.')
+    parser.add_argument('-c', '--confirm', action='store_true', help='Ask for a confirmation of each change.')
+    parser.add_argument('-t', '--type', choices=['C', 'python'], help='Assume the given type for the files.')
+    parser.add_argument('-u', '--update-only', action='store_true', help='Only update files that already contain a copyright statement.')
+    parser.add_argument('file', nargs='+', help='File name or pattern of file names to be processed.')
+    return parser
+
+
+if __name__ == "__main__":
+    # Parse arguments
+    parser = get_argument_parser()
+    arguments = parser.parse_args()
+
+    # Determine list of files
+    files = []
+    for entry in arguments.file:
+        files += glob.glob(entry, recursive=arguments.recursive)
+        if arguments.recursive:
+            files += glob.glob('**/' + entry, recursive=True)
+
+    # Open each file
+    for file_name in files:
+
+        with open(file_name, 'r') as source:
+            text = source.read()
+
+        # C or python?
+        copyright_statement, re_copyright = (copyright_statement_C, re_copyright_C)
+        if arguments.type != 'C' and (arguments.type == 'python' or file_name.endswith('.py') or re_copyright_python.search(text) is not None):
+            copyright_statement, re_copyright = (copyright_statement_python, re_copyright_python)
+
+        # Existing statement?
+        match = re_copyright.search(text)
+        if match:
+            new_text = text[:match.start()] + copyright_statement + text[match.end():]
+        else:
+            if arguments.update_only:
+                continue
+            new_text = copyright_statement + text
+
+        if new_text == text:
+            continue
+
+        # If confirmation is desired print diff in case of updates
+        if arguments.confirm:
+            if match:
+                print(f'\n\033[34mFile: {file_name}\033[0m')
+                for line in difflib.unified_diff(text.splitlines(), new_text.splitlines(), 'current', 'new', lineterm=''):
+                    if line.startswith('+'):
+                        line = '\033[32m' + line + '\033[0m'
+                    elif line.startswith('-'):
+                        line = '\033[31m' + line + '\033[0m'
+                    print(line)
+            confirmation = input(f'Change {file_name} (Y/n)? ')
+            if confirmation not in ['', 'y', 'Y']:
+                continue
+
+        # Write changed file
+        with open(file_name, 'w') as source:
+            source.write(new_text)

@@ -30,7 +30,7 @@
 #include <numeric>
 #include <vector>
 #include <tuple>
-
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;
@@ -86,7 +86,7 @@ vector<string> split(const string& str, const string& delim)
   return tokens;
 }
 
-std::vector<int> layer_string_list_to_integer(const std::string& instr)
+std::vector<int> layer_string_list_to_integer_range(const std::string& instr)
 {
   std::vector<int> ret;
   auto str_spl = split(instr, ":");
@@ -99,6 +99,28 @@ std::vector<int> layer_string_list_to_integer(const std::string& instr)
 
   return ret;
 }
+std::vector<int> layer_string_list_to_integer_list(const std::string& instr)
+{
+  std::vector<int> ret;
+  auto str_spl = split(instr, ",");
+
+  for (const auto& e : str_spl) {
+    ret.push_back(std::stoi(e));
+  }
+
+  return ret;
+}
+std::vector<int> layer_string_list_to_integer(const std::string& instr)
+{
+  if (instr.find(":") != string::npos) {
+    return layer_string_list_to_integer_range(instr);
+  }
+  if (instr.find(",") != string::npos)  {
+    return layer_string_list_to_integer_list(instr);
+  }
+  std::vector<int> ret;
+  return ret;
+}
 KLMTriggerModule::KLMTriggerModule() : Module()
 {
   setDescription("KLM trigger simulation");
@@ -108,8 +130,6 @@ KLMTriggerModule::KLMTriggerModule() : Module()
 void KLMTriggerModule::initialize()
 {
   m_KLMTrgSummary.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
-  B2DEBUG(20, "KLMTrigger: m_dummy_used_layers " << m_dummy_used_layers);
-
   StoreArray<KLMDigit> klmDigits;
   klmDigits.isRequired();
   if (!klmDigits.isValid())
@@ -136,6 +156,10 @@ void KLMTriggerModule::beginRun()
   m_nLayerTrigger = m_KLMTriggerParameters->getNLayers();
   try {
     m_layerUsed = layer_string_list_to_integer(m_KLMTriggerParameters->getWhichLayers());
+    B2DEBUG(20, "KLMTrigger: m_layerUsed " << m_KLMTriggerParameters->getWhichLayers());
+    for (auto e : m_layerUsed) {
+      B2DEBUG(20, "KLMTrigger: layer " << e << " used.");
+    }
   } catch (const std::exception& e) {
     B2FATAL("Something went wrong when parsing the 'm_whichLayers' string"
             << LogVar("string", m_KLMTriggerParameters->getWhichLayers())
@@ -254,6 +278,15 @@ void KLMTriggerModule::event()
 
   sort(hits);
   drop_duplicates(hits);
+  auto is_not_containt_in_vector_with_projected = [](const auto & vec, auto project) {
+    return [&vec, project](const auto & ele) mutable {
+      return std::find_if(vec.begin(), vec.end(), [&](const auto & e1) { return e1 == project(ele);  }) == vec.end();
+    };
+  };
+
+  hits.erase(std::remove_if(hits.begin(), hits.end(),
+                            is_not_containt_in_vector_with_projected(m_layerUsed, layer_t())),
+             hits.end());
 
 
   auto grouped = group<KLM_type, section_t, sector_t>::apply(hits,

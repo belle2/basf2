@@ -22,6 +22,11 @@ namespace Belle2 {
   namespace Variable {
 
     /**
+     * returns the KlId associated to the KLMCluster
+     */
+    double eclClusterKlId(const Particle* particle);
+
+    /**
      * return digit level MVA that uses pulse shape discrimination to identify hadronic vs electromagnetic showers.
      */
     double eclPulseShapeDiscriminationMVA(const Particle* particle);

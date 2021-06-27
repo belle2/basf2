@@ -97,34 +97,22 @@ namespace Belle2 {
     inline double w_adjacentU(double t)
     {
 
-      double f1_p[8];
-      double f2_p[5];
-      double y = 0;
+      double p[8];
 
-      // First polynomial coefficients
-      f1_p[0] = -0.006645;
-      f1_p[1] = -0.001809;
-      f1_p[2] =  0.005312;
-      f1_p[3] = -0.0002398;
-      f1_p[4] =  4.489e-06;
-      f1_p[5] = -4.259e-08;
-      f1_p[6] =  1.982e-10;
-      f1_p[7] = -3.438e-13;
+      // waveform parameters
+      p[0] = -7.379;
+      p[1] = -0.3594;
+      p[2] =  0.07564;
+      p[3] =  7.391;
+      p[4] = -0.08004;
+      p[5] = -2.139e-5;
+      p[6] = -1.781e-7;
+      p[7] =  0.01827;
 
-      // Second polynomial coefficients
-      f2_p[0] =  5.505;
-      f2_p[1] = -0.1345;
-      f2_p[2] =  0.001164;
-      f2_p[3] = -4.492e-06;
-      f2_p[4] =  6.537e-09;
-
-      if (t > 0 && t <= 90.00) {
-        for (int i = 0; i <= 7; i++) y += f1_p[i] * pow(t, i);
-      } else if (t > 90.00) {
-        for (int i = 0; i <= 4; i++) y += f2_p[i] * pow(t, i);
-        if (y > 0) y = 0;
-      }
-      return y;
+      if (t < 0.0)
+        return 0.0;
+      else
+        return (p[0] + p[1] * t) * exp(-p[2] * t) + (p[3] + p[4] * t + p[5] * pow(t, 2) + p[6] * pow(t, 3)) * exp(-p[7] * t);
     }
 
     /** Adjacent-channel waveform V-side.
@@ -135,34 +123,22 @@ namespace Belle2 {
     inline double w_adjacentV(double t)
     {
 
-      double f1_p[8];
-      double f2_p[5];
-      double y = 0;
+      double p[8];
 
-      // First polynomial coefficients
-      f1_p[0] =  0.003744;
-      f1_p[1] =  0.02302;
-      f1_p[2] =  0.008032;
-      f1_p[3] = -0.0005945;
-      f1_p[4] =  1.743e-05;
-      f1_p[5] = -2.631e-07;
-      f1_p[6] =  2.03e-09;
-      f1_p[7] = -6.335e-12;
+      // waveform parameters
+      p[0] =  0.2043;
+      p[1] = -0.0197;
+      p[2] =  0.01448;
+      p[3] = -0.2076;
+      p[4] =  0.0387;
+      p[5] =  0.01055;
+      p[6] = -4.03e-6;
+      p[7] =  0.07193;
 
-      // Second polynomial coefficients
-      f2_p[0] =  4.85747;
-      f2_p[1] = -0.472951;
-      f2_p[2] =  0.0159236;
-      f2_p[3] = -0.000237671;
-      f2_p[4] =  1.33053e-06;
-
-      if (t > 0 && t <= 70.00) {
-        for (int i = 0; i <= 7; i++) y += f1_p[i] * pow(t, i);
-      } else if (t > 70.00) {
-        for (int i = 0; i <= 4; i++) y += f2_p[i] * pow(t, i);
-        if (y > 0) y = 0;
-      }
-      return y;
+      if (t < 0.0)
+        return 0.0;
+      else
+        return (p[0] + p[1] * t) * exp(-p[2] * t) + (p[3] + p[4] * t + p[5] * pow(t, 2) + p[6] * pow(t, 3)) * exp(-p[7] * t);
     }
 
 

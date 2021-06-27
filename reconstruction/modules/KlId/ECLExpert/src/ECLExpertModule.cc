@@ -23,8 +23,8 @@
 // here's where the functions are hidden
 #include "reconstruction/modules/KlId/KLMExpert/KlId.h"
 
-using namespace KlId;
 using namespace Belle2;
+using namespace KlongId;
 using namespace std;
 
 REG_MODULE(ECLExpert);

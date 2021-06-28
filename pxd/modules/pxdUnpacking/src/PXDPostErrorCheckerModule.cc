@@ -29,6 +29,7 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
   setDescription("PXD: Check Post Unpacking for DAQ errors");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  /*
   constexpr uint64_t defaulterrormask =
     c_EVENT_STRUCT |
     c_FRAME_TNR_MM |
@@ -37,11 +38,11 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
     //
     c_DHC_END_MISS |
     c_NR_FRAMES_TO_SMALL |
-//         c_ROI_PACKET_INV_SIZE | // does not affect pixel data
+  //         c_ROI_PACKET_INV_SIZE | // does not affect pixel data
     c_DATA_OUTSIDE |
     //
     c_DHC_START_SECOND |
-//    c_DHE_WRONG_ID_SEQ | // until this is fixed in FW, we have to live with this
+  //    c_DHE_WRONG_ID_SEQ | // until this is fixed in FW, we have to live with this
     c_FIX_SIZE |
     c_DHE_CRC |
     //
@@ -58,17 +59,17 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
     c_DHP_SIZE |
     c_DHE_DHP_DHEID |
     c_DHE_DHP_PORT |
-//    c_DHP_PIX_WO_ROW | // FIXME this should not be needed
+  //    c_DHP_PIX_WO_ROW | // FIXME this should not be needed
     //
     c_DHE_START_END_ID |
     c_DHE_START_ID |
     c_DHE_START_WO_END |
-//    c_NO_PXD | // THEN we anyway have no data
+  //    c_NO_PXD | // THEN we anyway have no data
     //
-//         c_NO_DATCON |  // does not affect pixel data
-//         c_FAKE_NO_DATA_TRIG | // this will trigger always!!!!
+  //         c_NO_DATCON |  // does not affect pixel data
+  //         c_FAKE_NO_DATA_TRIG | // this will trigger always!!!!
     c_DHE_ACTIVE |
-//         c_DHP_ACTIVE | // GHOST problem ... bit always set
+  //         c_DHP_ACTIVE | // GHOST problem ... bit always set
     //
     c_SENDALL_TYPE |
     c_NOTSENDALL_TYPE |
@@ -81,7 +82,7 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
     c_DHE_WIE |
     //
     c_ROW_OVERFLOW |
-//         c_DHP_NOT_CONT | // GHOST problem
+  //         c_DHP_NOT_CONT | // GHOST problem
     c_DHP_DHP_FRAME_DIFFER |
     c_DHP_DHE_FRAME_DIFFER |
     //
@@ -92,21 +93,21 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
     //
     c_META_MM_DHC |
     c_META_MM_DHE |
-//         c_COL_OVERFLOW | // we might get that for unconnected lines -> "DHPT fix"
+  //         c_COL_OVERFLOW | // we might get that for unconnected lines -> "DHPT fix"
     c_UNEXPECTED_FRAME_TYPE |
     //
     c_META_MM_DHC_ERS |
-//         c_META_MM_DHC_TT | // time tag is not set correctly in EvtMeta
+  //         c_META_MM_DHC_TT | // time tag is not set correctly in EvtMeta
     c_META_MM_ONS_HLT |
-//         c_META_MM_ONS_DC | // problem with NO-DATCON
+  //         c_META_MM_ONS_DC | // problem with NO-DATCON
     //
-//         c_EVT_TRG_GATE_DIFFER | // still a bug in DHE FW
-//         c_EVT_TRG_FRM_NR_DIFFER | // still a bug in DHE FW
-//         c_DHP_ROW_WO_PIX | // still a bug in DHE FW?
+  //         c_EVT_TRG_GATE_DIFFER | // still a bug in DHE FW
+  //         c_EVT_TRG_FRM_NR_DIFFER | // still a bug in DHE FW
+  //         c_DHP_ROW_WO_PIX | // still a bug in DHE FW?
     c_DHE_START_THIRD |
     //
     c_FAKE_NO_FAKE_DATA ;
-
+  */
   // other bits not used yet
 
   addParam("PXDDAQEvtStatsName", m_PXDDAQEvtStatsName, "The name of the StoreObjPtr of input PXDDAQEvtStats", std::string(""));
@@ -115,8 +116,20 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
   addParam("PXDRawROIsName", m_PXDRawROIsName, "The name of the StoreArray of input PXDRawROIs", std::string(""));
 
   // TODO the bitfield cannot be set by Parameter
-  // addParam("CriticalErrorMask", m_criticalErrorMask, "Set error mask for which data is removed", defaulterrormask);
-  m_criticalErrorMask = defaulterrormask;
+  int crit = 0;
+  addParam("CriticalErrorMask", crit, "Set error mask for which data is removed (0=none, 1=default, other undefined yet)", 1);
+  switch (crit) {
+    case 0:
+      m_criticalErrorMask = 0;
+      B2INFO("Disabling critical error mask");
+      break;
+    case 1:
+      // m_criticalErrorMask = defaulterrormask;
+      break;
+    default:
+      B2FATAL("Undefined value for criticalErrorMaskSet");
+      break;
+  }
   // B2DEBUG(25, "The default error mask is $" << std::hex << defaulterrormask);
 
   addParam("IgnoreTriggerGate", m_ignoreTriggerGate, "Ignore different triggergate between DHEs", true);

@@ -334,7 +334,7 @@ You can find up to date examples for training the specific or generic FEI, for t
 
 
 FEI Training on the Grid
-####################
+########################
 
 In this section, we will consider, how to run the FEI training workflow on the grid using `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ and `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_.
 

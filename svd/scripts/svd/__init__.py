@@ -24,7 +24,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
     if isROIsimulation:
         nameTrackingInfoModule = "RegisterEventLevelTrackingInfo__ROI"
         nameEventTrackingInfo = "EventLevelTrackingInfo__ROI"
-        nameSVDTrackingEventLevelMdstInfoFiller = "__ROISVDTrackingEventLevelMdstInfoFiller"
+        nameSVDTrackingEventLevelMdstInfoFiller = "SVDTrackingEventLevelMdstInfoFiller__ROI"
     else:
         nameTrackingInfoModule = "RegisterEventLevelTrackingInfo"
         nameEventTrackingInfo = "EventLevelTrackingInfo"
@@ -141,7 +141,7 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
     if isROIsimulation:
         nameTrackingInfoModule = "RegisterEventLevelTrackingInfo__ROI"
         nameEventTrackingInfo = "EventLevelTrackingInfo__ROI"
-        nameSVDTrackingEventLevelMdstInfoFiller = "__ROISVDTrackingEventLevelMdstInfoFiller"
+        nameSVDTrackingEventLevelMdstInfoFiller = "SVDTrackingEventLevelMdstInfoFiller__ROI"
     else:
         nameTrackingInfoModule = "RegisterEventLevelTrackingInfo"
         nameEventTrackingInfo = "EventLevelTrackingInfo"

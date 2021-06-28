@@ -42,8 +42,6 @@ void SVDTrackingEventLevelMdstInfoFillerModule::initialize()
 
 void SVDTrackingEventLevelMdstInfoFillerModule::event()
 {
-  B2INFO(m_svdClusters.getName() << " - " << m_eventLevelTrackingInfo.getName());
-
   // use a simple array for the SVD layers (if geometry is changed then also EventLevelTrackingInfo doesn't work)
   // first index: layer number (shifted by 3), second index: isU
   int nClustersPerLayer[4][2] = {};

@@ -18,15 +18,20 @@ RegisterEventLevelTrackingInfoModule::RegisterEventLevelTrackingInfoModule() : M
 {
   setDescription("Simple module that registers the EventLevelTrackingInfo that is used to set general tracking-related flags");
   setPropertyFlags(c_ParallelProcessingCertified);
+
+  addParam("EventLevelTrackingInfoName",
+           m_eventLevelTrackingInfoName,
+           "Name of the EventLevelTrackingInfo that should be used (different one for ROI-finding).",
+           m_eventLevelTrackingInfoName);
 }
 
 
 void RegisterEventLevelTrackingInfoModule::initialize()
 {
   // If m_eventLevelTrackingInfo already exists we'd like to keep it (typically from svd/pxd reconstruction)
-  if (!m_eventLevelTrackingInfo.isOptional()) {
+  if (!m_eventLevelTrackingInfo.isOptional(m_eventLevelTrackingInfoName)) {
     m_createNewObj = true;
-    m_eventLevelTrackingInfo.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
+    m_eventLevelTrackingInfo.registerInDataStore(m_eventLevelTrackingInfoName, DataStore::c_ErrorIfAlreadyRegistered);
   }
 }
 

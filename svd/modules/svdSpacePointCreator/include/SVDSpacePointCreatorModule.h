@@ -68,6 +68,8 @@ namespace Belle2 {
     StoreArray<SpacePoint>
     m_spacePoints; /**< the storeArray for spacePoints as member, is faster than recreating link for each event */
 
+    std::string m_eventLevelTrackingInfoName = ""; /**< Name of the EventLevelTrackingInfo */
+
     float m_minClusterTime = -999; /**< clusters with time below this value are not considered to make spacePoints*/
 
     // modification parameters

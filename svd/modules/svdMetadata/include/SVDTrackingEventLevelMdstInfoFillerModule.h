@@ -40,8 +40,14 @@ namespace Belle2 {
 
   private:
 
+    /// Name of the StoreObject to access the event level tracking information
+    std::string m_eventLevelTrackingInfoName = "";
+
     /// StoreObject to access the event level tracking information
     StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
+
+    /// StoreArray of SVDClusters
+    std::string m_svdClustersName = "";
 
     /// StoreArray of SVDClusters
     StoreArray<SVDCluster> m_svdClusters;

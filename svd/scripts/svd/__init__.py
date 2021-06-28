@@ -20,9 +20,21 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
     @param applyMasking: if True, hot strips found in :ref:`SVDHotStripsCalibration<svdhotstrips>` are masked.
     """
 
-    # register EventTrackingInfo
-    if not isROIsimulation and 'RegisterEventLevelTrackingInfo' not in path:
-        path.add_module('RegisterEventLevelTrackingInfo')
+    # setup the event level tracking info to log errors and stuff
+    if isROIsimulation:
+        nameTrackingInfoModule = "RegisterEventLevelTrackingInfo__ROI"
+        nameEventTrackingInfo = "EventLevelTrackingInfo__ROI"
+        nameSVDTrackingEventLevelMdstInfoFiller = "__ROISVDTrackingEventLevelMdstInfoFiller"
+    else:
+        nameTrackingInfoModule = "RegisterEventLevelTrackingInfo"
+        nameEventTrackingInfo = "EventLevelTrackingInfo"
+        nameSVDTrackingEventLevelMdstInfoFiller = "SVDTrackingEventLevelMdstInfoFiller"
+
+    if nameTrackingInfoModule not in path:
+        registerEventlevelTrackingInfo = b2.register_module('RegisterEventLevelTrackingInfo')
+        registerEventlevelTrackingInfo.set_name(nameTrackingInfoModule)
+        registerEventlevelTrackingInfo.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
+        path.add_module(registerEventlevelTrackingInfo)
 
     if(isROIsimulation):
         clusterizerName = '__ROISVDClusterizer'
@@ -73,8 +85,12 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         missingAPVCreator.set_name(missingAPVsClusterCreatorName)
         path.add_module(missingAPVCreator)
 
-    if not isROIsimulation:
-        path.add_module('SVDTrackingEventLevelMdstInfoFiller')
+    if nameSVDTrackingEventLevelMdstInfoFiller not in path:
+        svdTrackingEventLevelMdstInfoFiller = b2.register_module('SVDTrackingEventLevelMdstInfoFiller')
+        svdTrackingEventLevelMdstInfoFiller.set_name(nameSVDTrackingEventLevelMdstInfoFiller)
+        svdTrackingEventLevelMdstInfoFiller.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
+        svdTrackingEventLevelMdstInfoFiller.param('svdClustersName', clustersName)
+        path.add_module(svdTrackingEventLevelMdstInfoFiller)
 
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)
@@ -121,9 +137,21 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
     @param applyMasking: if True, hot strips found in :ref:`SVDHotStripsCalibration<svdhotstrips>` are masked.
     """
 
-    # register EventTrackingInfo
-    if not isROIsimulation and 'RegisterEventLevelTrackingInfo' not in path:
-        path.add_module('RegisterEventLevelTrackingInfo')
+    # setup the event level tracking info to log errors and stuff
+    if isROIsimulation:
+        nameTrackingInfoModule = "RegisterEventLevelTrackingInfo__ROI"
+        nameEventTrackingInfo = "EventLevelTrackingInfo__ROI"
+        nameSVDTrackingEventLevelMdstInfoFiller = "__ROISVDTrackingEventLevelMdstInfoFiller"
+    else:
+        nameTrackingInfoModule = "RegisterEventLevelTrackingInfo"
+        nameEventTrackingInfo = "EventLevelTrackingInfo"
+        nameSVDTrackingEventLevelMdstInfoFiller = "SVDTrackingEventLevelMdstInfoFiller"
+
+    if nameTrackingInfoModule not in path:
+        registerEventlevelTrackingInfo = b2.register_module('RegisterEventLevelTrackingInfo')
+        registerEventlevelTrackingInfo.set_name(nameTrackingInfoModule)
+        registerEventlevelTrackingInfo.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
+        path.add_module(registerEventlevelTrackingInfo)
 
     if(isROIsimulation):
         fitterName = '__ROISVDCoGTimeEstimator'
@@ -180,8 +208,12 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         missingAPVCreator.set_name(missingAPVsClusterCreatorName)
         path.add_module(missingAPVCreator)
 
-    if not isROIsimulation:
-        path.add_module('SVDTrackingEventLevelMdstInfoFiller')
+    if nameSVDTrackingEventLevelMdstInfoFiller not in path:
+        svdTrackingEventLevelMdstInfoFiller = b2.register_module('SVDTrackingEventLevelMdstInfoFiller')
+        svdTrackingEventLevelMdstInfoFiller.set_name(nameSVDTrackingEventLevelMdstInfoFiller)
+        svdTrackingEventLevelMdstInfoFiller.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
+        svdTrackingEventLevelMdstInfoFiller.param('svdClustersName', clustersName)
+        path.add_module(svdTrackingEventLevelMdstInfoFiller)
 
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)
@@ -307,8 +339,18 @@ def add_svd_SPcreation(path, isROIsimulation=False):
     """
 
     # register EventTrackingInfo
-    if not isROIsimulation and 'RegisterEventLevelTrackingInfo' not in path:
-        path.add_module('RegisterEventLevelTrackingInfo')
+    if isROIsimulation:
+        nameTrackingInfoModule = "RegisterEventLevelTrackingInfo__ROI"
+        nameEventTrackingInfo = "EventLevelTrackingInfo__ROI"
+    else:
+        nameTrackingInfoModule = "RegisterEventLevelTrackingInfo"
+        nameEventTrackingInfo = "EventLevelTrackingInfo"
+
+    if nameTrackingInfoModule not in path:
+        registerEventlevelTrackingInfo = b2.register_module('RegisterEventLevelTrackingInfo')
+        registerEventlevelTrackingInfo.set_name(nameTrackingInfoModule)
+        registerEventlevelTrackingInfo.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
+        path.add_module(registerEventlevelTrackingInfo)
 
     if(isROIsimulation):
         svdSPCreatorName = '__ROISVDSpacePointCreator'
@@ -325,4 +367,5 @@ def add_svd_SPcreation(path, isROIsimulation=False):
         spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
         spCreatorSVD.param('SpacePoints', nameSPs)
         spCreatorSVD.param('SVDClusters', svd_clusters)
+        spCreatorSVD.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
         path.add_module(spCreatorSVD)

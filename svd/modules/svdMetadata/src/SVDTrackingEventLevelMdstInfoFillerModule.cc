@@ -20,18 +20,29 @@ SVDTrackingEventLevelMdstInfoFillerModule::SVDTrackingEventLevelMdstInfoFillerMo
 {
   setDescription("This module adds additional global event level information about SVD track finding to the MDST object 'EventLevelTrackingInfo'");
   setPropertyFlags(c_ParallelProcessingCertified);
+
+  addParam("EventLevelTrackingInfoName",
+           m_eventLevelTrackingInfoName,
+           "Name of the EventLevelTrackingInfo that should be used (different one for ROI-finding).",
+           m_eventLevelTrackingInfoName);
+
+  addParam("svdClustersName",
+           m_svdClustersName,
+           "Name of the SVDClusters that should be used (different one for ROI-finding).",
+           m_svdClustersName);
 }
 
 
 void SVDTrackingEventLevelMdstInfoFillerModule::initialize()
 {
-  m_svdClusters.isRequired();
-  m_eventLevelTrackingInfo.isRequired();
+  m_svdClusters.isRequired(m_svdClustersName);
+  m_eventLevelTrackingInfo.isRequired(m_eventLevelTrackingInfoName);
 }
 
 
 void SVDTrackingEventLevelMdstInfoFillerModule::event()
 {
+  B2INFO(m_svdClusters.getName() << " - " << m_eventLevelTrackingInfo.getName());
 
   // use a simple array for the SVD layers (if geometry is changed then also EventLevelTrackingInfo doesn't work)
   // first index: layer number (shifted by 3), second index: isU

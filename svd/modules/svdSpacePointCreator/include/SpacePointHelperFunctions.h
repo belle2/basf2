@@ -244,7 +244,7 @@ namespace Belle2 {
    */
   template <class SpacePointType> void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters,
       StoreArray<SpacePointType>& spacePoints, SVDHitTimeSelection& hitTimeCut, bool useQualityEstimator, TFile* pdfFile,
-      bool useLegacyNaming, unsigned int numMaxSpacePoints)
+      bool useLegacyNaming, unsigned int numMaxSpacePoints, std::string m_eventLevelTrackingInfoName)
   {
     std::unordered_map<VxdID::baseType, ClustersOnSensor>
     activatedSensors; // collects one entry per sensor, each entry will contain all Clusters on it TODO: better to use a sorted vector/list?
@@ -264,12 +264,9 @@ namespace Belle2 {
 
     // Do not make space-points if their number would be too large to be considered by tracking
     if (foundCombinations.size() > numMaxSpacePoints) {
-      // ...and set flag in EventLevelTrackingInfo (if this is the actual tracking, not ROI-finding)
-      if (svdClusters.getName().find("__ROI") == std::string::npos) {
-        StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
-        if (m_eventLevelTrackingInfo.isValid()) {
-          m_eventLevelTrackingInfo->setSVDSpacePointCreatorAbortionFlag();
-        }
+      StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo(m_eventLevelTrackingInfoName);
+      if (m_eventLevelTrackingInfo.isValid()) {
+        m_eventLevelTrackingInfo->setSVDSpacePointCreatorAbortionFlag();
       }
       return;
     }

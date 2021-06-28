@@ -17,6 +17,7 @@
 #include <tracking/ckf/general/findlets/OverlapResolver.icc.h>
 #include <tracking/ckf/general/findlets/SpacePointTagger.icc.h>
 #include <tracking/ckf/general/findlets/ResultStorer.icc.h>
+#include <tracking/ckf/general/utilities/Helpers.h>
 
 #include <tracking/ckf/pxd/entities/CKFToPXDResult.h>
 #include <tracking/ckf/pxd/entities/CKFToPXDState.h>
@@ -96,29 +97,12 @@ void CKFToPXDFindlet::beginEvent()
   // Since std::vector.shrink() or std::vector.shrink_to_fit() not necessarily reduce the capacity in the desired way,
   // create a temporary vector of the same type and swap them to use the vector at the new location afterwards.
   m_recoTracksVector.clear();
-  if (m_spacePointVector.capacity() > 2000) {
-    decltype(m_spacePointVector) tmp;
-    std::swap(m_spacePointVector, tmp);
-    tmp.clear();
-  }
-  m_spacePointVector.clear();
-  m_spacePointVector.reserve(1000);
+  checkAndResize<const SpacePoint*>(m_spacePointVector, 2000);
 
   m_seedStates.clear();
-  if (m_states.capacity() > 2000) {
-    decltype(m_states) tmp;
-    std::swap(m_states, tmp);
-    tmp.clear();
-  }
-  m_states.clear();
-  m_states.reserve(1000);
+  checkAndResize<CKFToPXDState>(m_states, 2000);
 
-  if (m_relations.capacity() > 20000) {
-    decltype(m_relations) tmp;
-    std::swap(m_relations, tmp);
-    tmp.clear();
-  }
-  m_relations.clear();
+  checkAndResize<TrackFindingCDC::WeightedRelation<CKFToPXDState>>(m_relations, 2000);
 
   m_results.clear();
   m_filteredResults.clear();

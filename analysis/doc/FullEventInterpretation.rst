@@ -334,10 +334,10 @@ The FEI algorithm itself just assumes that the DataStore already contains a vali
 You can find up to date examples for training the specific or generic FEI, for the cases of Belle II of Belle converted data / MC in ``analysis/examples/FEI``.
 
 
-FEI Training on Grid
+FEI Training on the Grid
 ####################
 
-In this section, we will consider, how to run the FEI training workflow on grid using `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ and `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_.
+In this section, we will consider, how to run the FEI training workflow on the grid using `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ and `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_.
 
 .. seealso::
 
@@ -363,7 +363,7 @@ In case the required developments are not merged into a `basf2` release yet, the
     b2code-create development
     cd development; b2setup
 
-After this, you would need to merge in the changes required to run on grid from the branch
+After this, you would need to merge in the changes required to run on the grid from the branch
 ``feature/BII-2765-make-fei-great-again-training-grid-compatible-v2``:
 
 .. code-block:: bash
@@ -410,7 +410,7 @@ is not resolved in the release used in your setup.
 
 * JIRA issue `BIIDCD-1260 <https://agira.desy.de/projects/BIIDCD/issues/BIIDCD-1260>`_. Please follow the procedure to adapt ``BelleDIRAC/gbasf2/lib/job/gbasf2helper.py`` as given in the corresponding pull request, such that additional non-basf2 inputs uploaded to SE's are recognized properly and downloaded to the batch node.
 * JIRA issue `BIIDCO-3332 <https://agira.desy.de/projects/BIIDCO/issues/BIIDCO-3332>`_. Please follow the procedure to adapt ``BelleDIRAC/gbasf2/lib/basf2helper.py`` as given in the corresponding pull request, such that a too long printout from FEI initialization is not leading to a stalled job, which is then marked as failed.
-* JIRA issue `BIIDCD-1256 <https://agira.desy.de/projects/BIIDCD/issues/BIIDCD-1256>`_. Please incorporate the changes documented further below to be able to upload non-basf2 data to remote SE's on grid.
+* JIRA issue `BIIDCD-1256 <https://agira.desy.de/projects/BIIDCD/issues/BIIDCD-1256>`_. Please incorporate the changes documented further below to be able to upload non-basf2 data to remote SE's on the grid.
 
 Within the file ``BelleDIRAC/gbasf2/lib/ds/manager.py`` in function ``putDatasetMetadata(...)``, the lines
 
@@ -440,12 +440,12 @@ After installing all prerequisites, you would need to get the example `FEIOnGrid
 General Workflow Concept
 ************************
 
-The `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ workflow of running FEI on grid is constructed from 4 building blocks contained in `fei_grid_workflow.py <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/fei_grid_workflow.py>`_:
+The `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ workflow of running FEI on the grid is constructed from 4 building blocks contained in `fei_grid_workflow.py <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/fei_grid_workflow.py>`_:
 
-* ``FEIAnalysisTask`` and ``FEIAnalysisSummaryTask``: these tasks are performed to produce FEI training inputs based on ``mdst`` samples. They are used to run a `basf2` steering file for FEI on grid using `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ as grid submission tool. In one instance of ``FEIAnalysisSummaryTask``, several instances of ``FEIAnalysisTask`` are created, based on the provided dataset list. This allows to run this step on an unlimited number of input files.
+* ``FEIAnalysisTask`` and ``FEIAnalysisSummaryTask``: these tasks are performed to produce FEI training inputs based on ``mdst`` samples. They are used to run a `basf2` steering file for FEI on the grid using `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ as grid submission tool. In one instance of ``FEIAnalysisSummaryTask``, several instances of ``FEIAnalysisTask`` are created, based on the provided dataset list. This allows to run this step on an unlimited number of input files.
 * ``MergeOutputsTask``: After all outputs produced by ``FEIAnalysisSummaryTask`` are downloaded, they need to be merged into a single file to be able to run the MVA training on it.
-* ``FEITrainingTask``: Peforms the MVA training on merged outputs produced by ``MergeOutputsTask``.
-* ``PrepareInputsTask``: After a certain stage of MVA training is performed, all ingredients to produce FEI training inputs for the next stage require an upload to grid storage elements. This is accomplished by this task, such that the ``FEIAnalysisSummaryTask`` can be run for the next stage based on these uploaded ingredients.
+* ``FEITrainingTask``: Performs the MVA training on merged outputs produced by ``MergeOutputsTask``.
+* ``PrepareInputsTask``: After a certain stage of MVA training is performed, all ingredients to produce FEI training inputs for the next stage require an upload to the grid storage elements. This is accomplished by this task, such that the ``FEIAnalysisSummaryTask`` can be run for the next stage based on these uploaded ingredients.
 
 In the figure below, the concept of the workflow is visualized.
 
@@ -455,7 +455,7 @@ In the figure below, the concept of the workflow is visualized.
   :width: 900
   :align: left
 
-  Visualization of the workflow concept of FEI training running on grid.
+  Visualization of the workflow concept of FEI training running on the grid.
 
 Starting with stage -1, at first the ``FEIAnalysisSummaryTask`` spawns several instances of ``FEIAnalysisTask``, which are created for each line in the dataset list, assuming that one line is one dataset. By this task, a cycle of four steps is started, containing ``FEIAnalysisSummaryTask`` at the beginning, followed by ``MergeOutputsTask``, ``FEITrainingTask`` and ``PrepareInputsTask``. As soon as ``FEIAnalysisSummaryTask`` is reached again, the stage number is increased by 1. This cycle is repeated until stage 5 is reached. Then, for stage 6, the workflow ends with ``FEITrainingTask``.
 
@@ -463,7 +463,7 @@ Starting with stage -1, at first the ``FEIAnalysisSummaryTask`` spawns several i
 Technical details
 *****************
 
-In the following, more technical details will be discussed to be able to run FEI on grid.
+In the following, more technical details will be discussed to be able to run the FEI on the grid.
 
 settings.json
 -------------
@@ -480,17 +480,17 @@ The `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ configuration of the 
         /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014088/s00/e0000/4S/r00000/charged/mdst
         /belle/MC/release-04-00-03/DB00000757/MC13a/prod00014089/s00/e0000/4S/r00000/charged/mdst
 
-* ``gbasf2_project_name_prefix``: Prefix for the `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tasks which will be created by `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ in the FEI grid workflow. Please try to keep it short and it is suggested to you to attach a date to it. Within the workflow, an additional string ``_part{index}`` will be added for each enumerated instance of ``FEIAnalysisTask``, and `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ adds an additional hash number to the project name to keep it unique.
-* ``gbasf2_release``: The release to be used on grid. Please make a choice here depending on what is supported by the `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ release you have checked out. You don't have to worry about the case, that the developments in `basf2` specific to running FEI training on grid might not be contained in the official release. The FEI training steering file is adapted such, that it can run both with a development and an official release.
+* ``gbasf2_project_name_prefix``: Prefix for the `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tasks which will be created by `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ in the FEI grid workflow. Please try to keep it short and it is recommended to you to attach a date to it. Within the workflow, an additional string ``_part{index}`` will be added for each enumerated instance of ``FEIAnalysisTask``, and `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ adds an additional hash number to the project name to keep it unique.
+* ``gbasf2_release``: The release to be used on the grid. Please make a choice here depending on what is supported by the `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ release you have checked out. You don't have to worry about the case, that the developments in `basf2` specific to running FEI training on the grid might not be contained in the official release. The FEI training steering file is adapted such, that it can run both with a development and an official release.
 * ``gbasf2_print_status_updates``: Convenient option to monitor the progress of running `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tasks submitted by the FEI grid workflow, so it is good to set it to ``true``. As an alternative, the progress can also be monitored with the **Job Monitor** application of `Belle II DIRAC <https://dirac.cc.kek.jp:8443/DIRAC/>`_.
 * ``gbasf2_noscout``: Option to disable scouting, which would slow down the progress, so it is set to ``true``. Feel free to activate it for testing purposes.
-* ``gbasf2_basf2opt``: To reduce the amount of print output of the `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ jobs, this option should be set to ``"-l ERROR"``, which is then passed to the `basf2` steering file. Having too many print outputs may cause problems on grid worker nodes.
+* ``gbasf2_basf2opt``: To reduce the amount of print output of the `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ jobs, this option should be set to ``"-l ERROR"``, which is then passed to the `basf2` steering file. Having too many print outputs may cause problems on the grid worker nodes.
 * ``gbasf2_max_retries``: An option that handles how often a job is allowed to be resubmitted, before its `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ task is marked as failed in the `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ workflow. Since it is well possible that individual jobs fail due to connection issues or temporarily bad sites, it is good to set that option to a relatively high number, e.g. 5 or even 10. Of course, you are advised to have a look at log files of failed jobs in any case, e.g. by using `Belle II DIRAC <https://dirac.cc.kek.jp:8443/DIRAC/>`_ for that.
 * ``gbasf2_download_logs``: To reduce the overall time of the FEI grid workflow, this option should be disabled by setting it to ``false``. You can have a look at specific job logs by using `Belle II DIRAC <https://dirac.cc.kek.jp:8443/DIRAC/>`_.
-* ``remote_tmp_directory``: This option is used by the ``PrepareInputsTask`` to upload tarballs of input files required by ``FEIAnalysisTask`` running on grid. The directory specified in this option serves as a main directory, where several subdirectories will be created by the uploads performed by ``PrepareInputsTask``. To be able to access your temporary user folders on remote storage elements, the directory name should contain ``/belle/user/<your-grid-username>``.
+* ``remote_tmp_directory``: This option is used by the ``PrepareInputsTask`` to upload tarballs of input files required by ``FEIAnalysisTask`` running on the grid. The directory specified in this option serves as a main directory, where several subdirectories will be created by the uploads performed by ``PrepareInputsTask``. To be able to access your temporary user folders on remote storage elements, the directory name should contain ``/belle/user/<your-grid-username>``.
 * ``remote_initial_se``: Initial storage element used by the ``PrepareInputsTask`` to upload the tarballs for the first time. After that first upload, the tarballs are replicated to storage elements corresponding to the ones, where the datasets specified in ``gbasf2_input_dslist`` are located. Possible initial storage element would be e.g. ``"KIT-TMP-SE"``.
-* ``local_cpus``: Number of CPU's used in parallel by the ``MergeOutputsTask`` on the local machine you are using. Please specifiy a sensible number, which does not lead to an overloaded machine.
-* ``working_dir``, ``log_dir`` and ``result_dir``: directories used by `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ for processing the specified workflow. In case of the FEI grid worklow, please choose a local storage element with enough space of at least several 100 GB.
+* ``local_cpus``: Number of CPU's used in parallel by the ``MergeOutputsTask`` on the local machine you are using. Please specify a sensible number, which does not lead to an overloaded machine.
+* ``working_dir``, ``log_dir`` and ``result_dir``: directories used by `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ for processing the specified workflow. In case of the FEI grid workflow, please choose a local storage element with enough space of at least several 100 GB.
 * ``executable``: List of executables to be used for the `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ tasks, to be specified in this case to ``["python3"]``.
 
 B_generic_train.py
@@ -506,19 +506,19 @@ In contrast to the original steering file from ``analysis/examples/FEI/B_generic
 FEIAnalysisSummaryTask and FEIAnalysisTask
 ------------------------------------------
 
-These modules are producing inputs for the FEI training. Since this is the most computationally intensive task, it is performed on grid resources.
+These modules are producing inputs for the FEI training. Since this is the most computationally intensive task, it is performed on the grid resources.
 The ``FEIAnalysisSummaryTask`` module is designed such, that it creates a ``FEIAnalysisTask`` module for each line entry in the dataset list given with the ``gbasf2_input_dslist`` setting.
 Each instance of ``FEIAnalysisTask`` is assigned with an individual dataset list containing the corresponding line entry and with a name modified with ``_part{index}``.
-In consequence, the module just ``FEIAnalysisSummaryTask`` summarizes the list of outputs produced by the individual tasks ``FEIAnalysisTask``, saving the lists in the file
+In consequence, the module ``FEIAnalysisSummaryTask`` just summarizes the list of outputs produced by the individual tasks ``FEIAnalysisTask``, saving the lists in the file
 ``list_of_output_directories.json``.
 
 Both modules have the following common settings:
 
-* ``cache``: is used within the path creation of FEI steering file to configure, which inputs are already precomputed. In contrast to the procedure used by ``distributed.py``, the only used values are -1 for stage -1 of FEI, and 0 for all other stages. This is done in that way to avoid large cache outputs ``RootOutput.root``, which would require a lot of space on grid. In consequence, to construct training data for a certain stage, all previous stages beginning from stage 0 need to be reconstructed from scratch using the corresponding trained BDT's that already exist.
+* ``cache``: is used within the path creation of FEI steering file to configure, which inputs are already precomputed. In contrast to the procedure used by ``distributed.py``, the only used values are -1 for stage -1 of FEI, and 0 for all other stages. This is done in that way to avoid large cache outputs ``RootOutput.root``, which would require a lot of space on the grid. In consequence, to construct training data for a certain stage, all previous stages beginning from stage 0 need to be reconstructed from scratch using the corresponding trained BDTs that already exist.
 * ``monitor``: is used within the path creation of FEI steering file to enable creation of ROOT files used for monitoring the training. This is essentially only required for the evaluation of trainings done during stage 6, and therefore is only enabled for that stage.
 * ``stage``: is a task-specific setting to make a proper folder structure of the entire FEI training workflow. It is also used to set ``cache`` and ``monitor`` settings.
 * ``mode``: is another task-specific setting to make a proper folder structure of the entire FEI training workflow. In case of ``FEIAnalysisSummaryTask``, it is set to ``TrainingInput`` and extended with ``Part{index}`` for the individual instances of ``FEIAnalysisTask``.
-* ``gbasf2_project_name_prefix``: taken from the `settings.json <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/settings.json>`_ for ``FEIAnalysisSummaryTask`` and is extended with ``_Part{index}`` for instances of ``FEIAnalysisTask``. These prefixes is then used for the names of `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tasks created by the corresponding `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ batch process.
+* ``gbasf2_project_name_prefix``: taken from the `settings.json <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/settings.json>`_ for ``FEIAnalysisSummaryTask`` and is extended with ``_Part{index}`` for instances of ``FEIAnalysisTask``. These prefixes are then used for the names of `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tasks created by the corresponding `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ batch process.
 * ``gbasf2_input_dslist``: taken from `settings.json <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/settings.json>`_ for ``FEIAnalysisSummaryTask`` and is extended with ``_part{index}`` for instances of ``FEIAnalysisTask``. Corresponding individual dataset lists are created by ``FEIAnalysisSummaryTask``.
 
 The following outputs are produced by ``FEIAnalysisTask`` for different stages:
@@ -534,7 +534,7 @@ To spawn several instances of ``FEIAnalysisTask`` at a certain stage, the follow
 * Time stamp of inputs listed above, which were successfully uploaded to TMP-SE as a tarball by ``PrepareInputsTask`` of the previous stage.
 
 During the sequential execution of all required instances of ``FEIAnalysisTask``, symlinks are created for all input files (``mcParticlesCount.root`` and ``*.xml``, where applicable)
-to the current directory to correctly configure the `basf2` path. The path is then pickled by `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ and send out to grid with `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ with an appropriate configuration of the grid
+to the current directory to correctly configure the `basf2` path. The path is then pickled by `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ and send out to the grid with `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ with an appropriate configuration of the grid
 path to the inputs tarball. The jobs are then monitored with corresponding `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tools and are resubmitted, if necessary. As soon as all jobs of an instance of ``FEIAnalysisTask``
 are successfully completed, the job outputs required for further processing are downloaded.
 
@@ -559,12 +559,12 @@ The BDT trainings of the various stages of FEI are performed by ``FEITrainingTas
 fits the technical procedure exactly in case of stages 0 to 5.
 
 For stage -1, the task is (ab)used to determine storage elements, where the input datasets given in
-``gbasf2_input_dslist`` are located, and construc a list of sites (TMP-SE), where to put the tarballs created by instances of ``PrepareInputsTask``.
+``gbasf2_input_dslist`` are located, and construct a list of sites (TMP-SE), where to put the tarballs created by instances of ``PrepareInputsTask``.
 
-In case of stage 6, all BDT's are already trained. Therefore, the merged ``Monitor*.root`` files are evaluated together with ``mcParticlesCount.root`` and  ``*.xml`` files with the scripts
+In case of stage 6, all BDTs are already trained. Therefore, the merged ``Monitor*.root`` files are evaluated together with ``mcParticlesCount.root`` and  ``*.xml`` files with the scripts
 ``analysis/scripts/fei/printReporting.py`` and ``analysis/scripts/fei/latexReporting.py`` within this task.
 
-In consequence, the output produced by this module depend on the particular stage considered:
+In consequence, the output produced by this module depends on the particular stage considered:
 
 * stage -1: ``dataset_sites.txt`` listing the TMP-SE sites to upload the tarball from ``PrepareInputsTask``.
 * stages 0 to 5: ``*.xml`` BDT training files.
@@ -596,14 +596,14 @@ After ``FEITrainingTask`` is finished successfully, the last step before increas
 
 To be able to upload necessary files to SE, the following inputs are required:
 
-* ``dataset_sites.txt`` from ``FEITrainingTask`` of stage -1 which containes all sites required for tarball replicas.
+* ``dataset_sites.txt`` from ``FEITrainingTask`` of stage -1 which contains all sites required for tarball replicas.
 * Merged ``mcParticlesCount.root`` from stage -1. This indicates also the dependence, that ``FEITrainingTask`` of stage -1 should start after ``MergeOutputsTask`` of stage -1 is successfully completed.
 * All training files ``*.xml`` from previous stages and current stage, in case BDT trainings were already performed.
 
 The files ``mcParticlesCount.root`` and ``*.xml`` are then put into a tarball, copied over to the initial TMP-SE storage element configured by `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tools, and then the tarball is replicated
-to the storage elements from ``dataset_sites.txt``. In case of a successfull upload and replication, the timestamp used in the remote path of the tarball is written to ``successfull_input_upload.txt``, which is checked by the ``FEIAnalysisSummaryTask`` directly following this ``PrepareInputsTask``.
+to the storage elements from ``dataset_sites.txt``. In case of a successful upload and replication, the timestamp used in the remote path of the tarball is written to ``successful_input_upload.txt``, which is checked by the ``FEIAnalysisSummaryTask`` directly following this ``PrepareInputsTask``.
 
-The following paramaters are used in this module:
+The following parameters are used in this module:
 
 * ``remote_tmp_directory``: TMP-SE directory, where to put the tarballs. Extracted from `settings.json <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/settings.json>`_.
 * ``remote_initial_se``: TMP-SE server, where the tarballs should be put at first to be used for replication. Extracted from `settings.json <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/settings.json>`_.
@@ -612,7 +612,7 @@ The following paramaters are used in this module:
 Further Comments on fei_grid_workflow.py
 ----------------------------------------
 
-To run the workflow chain perpared in `fei_grid_workflow.py <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/fei_grid_workflow.py>`_,
+To run the workflow chain prepared in `fei_grid_workflow.py <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/fei_grid_workflow.py>`_,
 you would need to start it from the last task in this workflow that you would like to consider. From that point on,
 all other tasks will be constructed from the requirements, down to the ``FEIAnalysisSummaryTask`` of stage -1. This can be done with the wrapper task called ``ProduceStatisticsTask``.
 
@@ -632,25 +632,25 @@ names of the ``mode`` and ``stage`` settings should be chosen as expected by the
 Tips and Tricks
 ***************
 
-In this concluding section of running FEI training on grid, a few tips and tricks are given, such that you get a better feeling what to expect from the workflow and which pitfalls you may encounter,
-especially when running on grid.
+In this concluding section of running FEI training on the grid, a few tips and tricks are given, such that you get a better feeling what to expect from the workflow and which pitfalls you may encounter,
+especially when running on the grid.
 
 * In general, you should always test the setup locally before submitting it to the grid. Therefore, please adapt your steering file equivalent to `B_generic_train.py <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/B_generic_train.py>`_ in such a way, that you would be able to run it both locally (potentially with a development version of `basf2`) and on the grid (using an official `basf2` release).
-* To test the workflow on the grid in a fast way, you can construct the dataset list provided to the ``gbasf2_input_dslist`` setting using individual file paths as content instead of dataset paths, and setting the maximum number of events to a small value, e.g. 10. There are several possibilitis to do that. You can either set it directly for the ``FEIAnalysisTask`` using the ``max_event`` task parameter (see `b2luigi documentation <https://b2luigi.readthedocs.io/en/latest/>`_), or extend the setting ``gbasf2_basf2opt`` from ``"-l ERROR"`` to ``"-l ERROR --events 10"``. The training itself will then have no meaning, since too few events for training, but you would be able to test the technical setup with that approach.
-* To run instances of ``FEIAnalysisTask`` efficiently on grid, you should prepare yourself well for that.
+* To test the workflow on the grid in a fast way, you can construct the dataset list provided to the ``gbasf2_input_dslist`` setting using individual file paths as content instead of dataset paths, and setting the maximum number of events to a small value, e.g. 10. There are several possibilities to do that. You can either set it directly for the ``FEIAnalysisTask`` using the ``max_event`` task parameter (see `b2luigi documentation <https://b2luigi.readthedocs.io/en/latest/>`_), or extend the setting ``gbasf2_basf2opt`` from ``"-l ERROR"`` to ``"-l ERROR -n 10"``. The training itself will then have no meaning, since too few events for training, but you would be able to test the technical setup with that approach.
+* To run instances of ``FEIAnalysisTask`` efficiently on the grid, you should prepare yourself well for that.
 
     * You should make sure, that the datasets you would like to process are available on as many sites as possible. In that way you would also increase the number of potential computing nodes on the grid that you can use.
-    * In case you would like to perform a central FEI training, which will then be provided centrally and used by several analysis groups, it would be good, that your jobs will get an increased priority on grid to allow you to get the resources you need faster.
-    * If you do not trust some computing sites, or you trust only a few, you can make use of ``gbasf2_additional_params`` setting of `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ to bann some sites (``"--banned_site <SITE-1,SITE-2>"``) or specify sites you would like to run on (``"--site <SITE-1,SITE-2>"``). The value of the parameter ``gbasf2_additional_params`` will then be passed to `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_.
+    * In case you would like to perform a central FEI training, which will then be provided centrally and used by several analysis groups, it would be good, that your jobs will get an increased priority on the grid to allow you to get the resources you need faster.
+    * If you do not trust some computing sites, or you trust only a few, you can make use of ``gbasf2_additional_params`` setting of `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ to ban some sites (``"--banned_site <SITE-1,SITE-2>"``) or specify sites you would like to run on (``"--site <SITE-1,SITE-2>"``). The value of the parameter ``gbasf2_additional_params`` will then be passed to `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_.
 
 * Although the workflow is (more or less) automatic, you are strongly advised to have a look at its progress regularly and check, whether everything is done correctly and do not run it as a black box.
-* Please expect, that problems may arise during the process, because of (possible temporarily) bad state of sites, failing downloads due to connection problems etc. Individual jobs may need to be resubmittedseveral times until they are finished successfully.
-* In case you encounter problems specific to `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_, do not hesitate to ask experts on `comp-users-forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_ mailing list.
+* Please expect, that problems may arise during the process, because of (possible temporarily) bad state of sites, failing downloads due to connection problems etc. Individual jobs may need to be resubmitted several times until they are finished successfully.
+* In case you encounter problems specific to `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_, do not hesitate to ask experts on the `comp-users-forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_ mailing list.
 
 Possible Improvements
 *********************
 
-Some ideas of improvements of the workflow constructed to run FEI training on grid will be given below.
+Some ideas of improvements of the workflow constructed to run the FEI training on the grid will be given below.
 
 The Problem of Too Long Runtimes
 --------------------------------
@@ -659,43 +659,43 @@ One major drawback of the workflow presented here is that in particular the late
 that most FEI stages have to be recomputed from scratch with the corresponding trainings applied, since cache output files ``RootOutput.root`` are not produced by the
 `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tasks since they occupy too much space.
 
-This is large problem because of the fact, that individual jobs may fail for several reasons, causing potentially a large number of resubmission attempts. In consequence,
-a task submitted with `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ to the grid may be delayed significantly by the potentially only a few restarted jobs, which have to be run again for a long time.
+This is a huge problem because of the fact, that individual jobs may fail for several reasons, causing potentially a large number of resubmission attempts. In consequence,
+a task submitted with `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ to the grid may be delayed significantly by potentially only a few restarted jobs, which have to be run again for a long time.
 
-A possible way out of this problem would be to split the processing within a jobs by the number of events to be processed, and not by the number of files. This not (yet) supported
-by `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_, but may be accomplished by passing ``--events`` and ``--skip-events`` options to `basf2` via ``gbasf2_basf2opt`` of `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_. In that case, a `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ task would need to be
+A possible way out of this problem would be to split the processing per job by the number of events to be processed, and not by the number of files. This is not (yet) supported
+by `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_, but may be accomplished by passing ``-n`` and ``--skip-events`` options to `basf2` via ``gbasf2_basf2opt`` of `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_. In that case, a `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ task would need to be
 started for a single file only.
 
 To realize this within the workflow constructed in `fei_grid_workflow.py <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/fei_grid_workflow.py>`_, the modules ``FEIAnalysisTask``
 and ``FEIAnalysisSummaryTask`` would require several major extensions. Some ideas on technical implementations are given below:
 
 * For ``FEIAnalysisSummaryTask``, a stage dependent decision should be taken to decide, whether the jobs should be run on multiple files, or only on a subset of events from one single file.
-* File-based processing (stages -1 to 2): Due to limitations of scratch space on grid worker nodes, a realistic number for files per job would be 1 or 2. In that case, it is most presumably sufficient to keep the setup as it is currently for stages suitable for file-based processing.
+* File-based processing (stages -1 to 2): Due to limitations of scratch space on the grid worker nodes, a realistic number for files per job would be 1 or 2. In that case, it is most presumably sufficient to keep the setup as it is currently for stages suitable for file-based processing.
 * Event-based processing (stages 3 to 6):
 
     #. The first extension required for the workflow would be to determine the individual files from the datasets given in the setting ``gbasf2_input_dslist``, and the number of events per file. This can be done technically within the ``FEITrainingTask`` at stage -1.
     #. As currently done for the expected runtimes in `fei_grid_workflow.py <https://github.com/ArturAkh/FEIOnGridWorkflow/blob/main/fei_grid_workflow.py>`_, the required number of events to be processed within a job should be determined to optimize the runtime of a job to be at most of about 12 hours.
     #. Using the information from previous two points, ``FEIAnalysisSummaryTask`` should be extended such, that it can determine, how many `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tasks should be created for a single file and which events from that file should be processed within a job.
-    #. Then, ``FEIAnalysisSummaryTask`` should pass the file as a dataset list to an instance of correspondingly adapted ``FEIAnalysisTask`` and extend the setting ``gbasf2_basf2opt`` with ``--events`` and ``--skip-events`` accordingly.
+    #. Then, ``FEIAnalysisSummaryTask`` should pass the file as a dataset list to an instance of correspondingly adapted ``FEIAnalysisTask`` and extend the setting ``gbasf2_basf2opt`` with ``-n`` and ``--skip-events`` accordingly.
 
-With this approach, the problem of too long runtimes per job is shifted to the requirement of having a large number of worker nodes in place to perform the computations. Since this is a grid workflow, this should be given in the ideal case. But be aware, that there are days, on which you get only a few free slots on the grid. Therefore, in case of central production of FEI training, a privileged access to grid worker nodes would be very benificial.
+With this approach, the problem of too long runtimes per job is shifted to the requirement of having a large number of worker nodes in place to perform the computations. Since this is a grid workflow, this should be given in the ideal case. But be aware, that there are days, on which you get only a few free slots on the grid. Therefore, in case of central production of FEI training, a privileged access to the grid worker nodes would be very beneficial.
 
-A potential and perhaps a bit more important problem of the improved approach described above is a grid related issue of the current way of processing files placed on grid.
-Currently, the files are not streamed, but copied completely to a worker node on grid. In contrast to the file-based processing, where a single file is needed to be copied only once for an instance
+A potential and perhaps a bit more important problem of the improved approach described above is a grid related issue of the current way of processing files placed on the grid.
+Currently, the files are not streamed, but copied completely to a worker node on the grid. In contrast to the file-based processing, where a single file is needed to be copied only once for an instance
 of ``FEIAnalysisTask``, an event-based splitting may lead to multiple copy transfers of a single file within an instance of ``FEIAnalysisTask``. In consequence, if you specify too few events per job,
 a significant amount of jobs may fail at the beginning due to too many copy transfer requests for the same file. So please keep this in mind, when optimizing on a suitable number of events per job.
 This problem might become less relevant, when input files are streamed and not copied, for example via `XRootD <https://xrootd.slac.stanford.edu/>`_ transfers.
 
-In the current state of `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_, the parallel instances of `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tasks (like ``FEIAnalysisTask`` in this workflow) are handled sequentially, and not in parallel. This means, that you should avoid creating too many tasks with the event-based splitting discussed above. So try to optimize in that case between the runtimes of single jobs and the total number of the tasks. However, in the view of the fact, that this is done for stages 3 to 6, which anyhow run very long, this issue should not be a major problem.
+In the current state of `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_, the parallel instances of `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tasks (like ``FEIAnalysisTask`` in this workflow) are handled sequentially, and not in parallel. This means, that you should avoid creating too many tasks with the event-based splitting discussed above. So try to optimize in that case between the runtimes of single jobs and the total number of the tasks. However, in view of the fact, that this is done for stages 3 to 6, which anyhow run very long, this issue should not be a major problem.
 
 Potential Improvements Following gbasf2 Development
 ---------------------------------------------------
 
 In the current state of the workflow and `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_, some print outputs from `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ have to be parsed to obtain desired information. Depending on the future improvements of `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_,
-such parsing may be changed to more convenient way, for example parsing a json file output created by `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tools on request.
+such parsing may be changed to a more convenient way, for example parsing a json file output created by `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tools on request.
 
 In general, it is good to have a look at the process of `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ developments and extend the workflow and/or `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ to make use of the new features and improvements of future `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ releases.
-One example would be the possibility to resubmit jobs with changed settings, e.g. sites to blacklist, and/or the estimated runtime of the job.
+One example would be the possibility to resubmit jobs with changed settings, e.g. sites to reject, and/or the estimated runtime of the job.
 
 Troubleshooting
 ###############

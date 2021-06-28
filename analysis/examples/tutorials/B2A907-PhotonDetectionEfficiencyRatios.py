@@ -46,7 +46,7 @@ ma.fillParticleList(decayString='gamma:full',
                     path=path)
 
 # Apply the photon module
-ma.addPhotonEfficiencyRatioVariables(['gamma:full'], 'PhotonEfficiencyDataMCRatio_June2021', path=path)
+ma.addPhotonEfficiencyRatioVariables(['gamma:full'], weight_table_id, path=path)
 
 # The ratios are added wrt to E, theta, phi of the photon
 weight_vars = ['M', 'p', 'E', 'theta', 'phi',

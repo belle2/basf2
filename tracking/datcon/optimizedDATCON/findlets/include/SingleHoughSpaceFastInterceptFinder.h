@@ -92,7 +92,7 @@ namespace Belle2 {
     /// minimum cluster size of sectors belonging to intercepts in the Hough Space
     uint m_param_MinimumHSClusterSize = 2;
     /// maximum cluster size of sectors belonging to intercepts in the Hough Space
-    uint m_param_MaximumHSClusterSize = 15;
+    uint m_param_MaximumHSClusterSize = 10;
     /// maximum cluster size in x of sectors belonging to intercepts in the Hough Space
     uint m_param_MaximumHSClusterSizeX = 5;
     /// maximum cluster size in y of sectors belonging to intercepts in the Hough Space

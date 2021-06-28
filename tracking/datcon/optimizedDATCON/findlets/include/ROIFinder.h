@@ -55,7 +55,7 @@ namespace Belle2 {
 
   private:
     /// Calculate ROI in this findlet?
-    bool m_param_calculateROI = true;
+    bool m_param_calculateROI = false;
 
     // StoreArrays
     /// Name of the PXDIntercepts StoreArray

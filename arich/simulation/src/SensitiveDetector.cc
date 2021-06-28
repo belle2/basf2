@@ -104,7 +104,8 @@ namespace Belle2 {
         double energy = track.GetKineticEnergy() / CLHEP::eV;
         double qeffi  = m_simPar->getQE(energy) * m_simPar->getColEff();
 
-        double fraction = info->getFraction();
+        double fraction = 1.;
+        if (info) fraction = info->getFraction();
         //correct Q.E. for internally reflected photons
         if (theStatus == 3) qeffi *= m_simPar->getQEScaling();
         if (gRandom->Uniform() * fraction > qeffi) {

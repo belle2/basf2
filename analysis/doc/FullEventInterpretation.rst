@@ -360,17 +360,10 @@ In case the required developments are not merged into a `basf2` release yet, the
 
     source /cvmfs/belle.cern.ch/tools/b2setup
     cd </path/to/your/work/directory>
-    b2code-create development
+    b2code-create development --light
     cd development; b2setup
 
-After this, you would need to merge in the changes required to run on the grid from the branch
-``feature/BII-2765-make-fei-great-again-training-grid-compatible-v2``:
-
-.. code-block:: bash
-
-    git fetch origin
-    git merge origin/feature/BII-2765-make-fei-great-again-training-grid-compatible-v2
-
+Changes required to run the FEI on the grid are summarized on the branch ``feature/BII-2765-make-fei-great-again-training-grid-compatible-v2``.
 You can monitor the changes and updates for this branch by looking at the JIRA issue `BII-2765 <https://agira.desy.de/browse/BII-2765>`_.
 There you would also see, whether it is already merged into a certain release or not.
 

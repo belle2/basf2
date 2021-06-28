@@ -92,6 +92,10 @@ def add_pxd_packer(path):
 
 def add_pxd_reconstruction(path, clusterName=None, digitsName=None, usePXDClusterShapes=False):
 
+    # register EventTrackingInfo
+    if 'RegisterEventLevelTrackingInfo' not in path:
+        path.add_module('RegisterEventLevelTrackingInfo')
+
     if usePXDClusterShapes:
         if 'ActivatePXDClusterPositionEstimator' not in [e.name() for e in path.modules()]:
             shape_activator = b2.register_module('ActivatePXDClusterPositionEstimator')
@@ -106,6 +110,8 @@ def add_pxd_reconstruction(path, clusterName=None, digitsName=None, usePXDCluste
         if digitsName:
             clusterizer.param('Digits', digitsName)
         path.add_module(clusterizer)
+
+    path.add_module('PXDTrackingEventLevelMdstInfoFiller')
 
 
 def add_pxd_simulation(path, digitsName=None, activatePixelMasks=True, activateGainCorrection=True):

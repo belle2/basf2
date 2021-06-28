@@ -33,6 +33,7 @@ Untested method EventLevelTrackingInfo::setNVXDClustersInLayer
 Untested method EventLevelTrackingInfo::setPXDCKFAbortionFlag
 Untested method EventLevelTrackingInfo::setSVDCKFAbortionFlag
 Untested method EventLevelTrackingInfo::setSVDFirstSampleTime
+Untested method EventLevelTrackingInfo::setSVDSpacePointCreatorAbortionFlag
 Untested method EventLevelTrackingInfo::setUnspecifiedTrackFindingFailure
 Untested method EventLevelTrackingInfo::setVXDTF2AbortionFlag
 Untested method PIDLikelihood::getDeltaLogL
@@ -3674,6 +3675,7 @@ EventLevelTrackingInfo:
   hasCDCLayer(55): False
   hasPXDCKFAbortionFlag(): False
   hasSVDCKFAbortionFlag(): False
+  hasSVDSpacePointCreatorAbortionFlag(): False
   hasUnspecifiedTrackFindingFailure(): False
   hasVXDTF2AbortionFlag(): False
 PIDLikelihood#0:
@@ -15258,6 +15260,7 @@ EventLevelTrackingInfo:
   hasCDCLayer(55): False
   hasPXDCKFAbortionFlag(): False
   hasSVDCKFAbortionFlag(): False
+  hasSVDSpacePointCreatorAbortionFlag(): False
   hasUnspecifiedTrackFindingFailure(): False
   hasVXDTF2AbortionFlag(): False
 PIDLikelihood#0:
@@ -21986,6 +21989,7 @@ EventLevelTrackingInfo:
   hasCDCLayer(55): False
   hasPXDCKFAbortionFlag(): False
   hasSVDCKFAbortionFlag(): False
+  hasSVDSpacePointCreatorAbortionFlag(): False
   hasUnspecifiedTrackFindingFailure(): False
   hasVXDTF2AbortionFlag(): False
 PIDLikelihood#0:

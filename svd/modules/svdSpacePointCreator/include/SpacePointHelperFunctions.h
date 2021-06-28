@@ -16,6 +16,8 @@
 #include <svd/dataobjects/SVDCluster.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <mdst/dataobjects/EventLevelTrackingInfo.h>
 
 #include <vxd/dataobjects/VxdID.h>
 
@@ -242,7 +244,7 @@ namespace Belle2 {
    */
   template <class SpacePointType> void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters,
       StoreArray<SpacePointType>& spacePoints, SVDHitTimeSelection& hitTimeCut, bool useQualityEstimator, TFile* pdfFile,
-      bool useLegacyNaming, unsigned int numMaxSpacePoints)
+      bool useLegacyNaming, unsigned int numMaxSpacePoints, std::string m_eventLevelTrackingInfoName)
   {
     std::unordered_map<VxdID::baseType, ClustersOnSensor>
     activatedSensors; // collects one entry per sensor, each entry will contain all Clusters on it TODO: better to use a sorted vector/list?
@@ -261,7 +263,13 @@ namespace Belle2 {
       findPossibleCombinations(aSensor.second, foundCombinations, hitTimeCut);
 
     // Do not make space-points if their number would be too large to be considered by tracking
-    if (foundCombinations.size() > numMaxSpacePoints) return;
+    if (foundCombinations.size() > numMaxSpacePoints) {
+      StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo(m_eventLevelTrackingInfoName);
+      if (m_eventLevelTrackingInfo.isValid()) {
+        m_eventLevelTrackingInfo->setSVDSpacePointCreatorAbortionFlag();
+      }
+      return;
+    }
 
     for (auto& clusterCombi : foundCombinations) {
       SpacePointType* newSP = spacePoints.appendNew(clusterCombi);

@@ -118,10 +118,10 @@ namespace Belle2 {
     /** output of a BDT fitted on various Z-moments for the closest ECL cluster */
     float m_ECLZMVA;
 
-    /**< Energy [GeV]. */
+    /** Energy [GeV]. */
     Double32_t  m_ECLEnergy;  //[-5, 3., 18]
 
-    /**< Log. Energy [GeV]. */
+    /** Log. Energy [GeV]. */
     Double32_t  m_ECLlogEnergy;  //[-5, 3., 18]
 
     /** Log. Highest Crystal Energy [GeV]. */

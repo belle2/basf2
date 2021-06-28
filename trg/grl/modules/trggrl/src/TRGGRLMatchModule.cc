@@ -56,7 +56,7 @@ TRGGRLMatchModule::TRGGRLMatchModule() : Module()
   addParam("DphidMatch", m_dphi_d_threshold, "the threshold of dphi_d between track and cluster if they are matched successfully", 2);
   addParam("Ephoton", m_e_threshold, "the threshold of cluster energy as a photon", 1.0);
   addParam("KLMMatch", m_dphi_klm_threshold,
-           "the threshold of dphi (in degree) between track and KLM sector if they are matched successfully", 65.0);
+           "the threshold of dphi (in degree) between track and KLM sector if they are matched successfully", 32.5);
   addParam("2DtrackCollection", m_2d_tracklist, "the 2d track list used in the match", std::string("TRGCDC2DFinderTracks"));
   addParam("3DtrackCollection", m_3d_tracklist, "the 3d track list used in the match", std::string("TRGCDCNeuroTracks"));
   addParam("TRGECLClusterCollection", m_clusterlist, "the cluster list used in the match", std::string("TRGECLClusters"));
@@ -259,7 +259,7 @@ void TRGGRLMatchModule::event()
       clusterlist[cluster_ind_phi]->addRelationTo(track2Dlist[i]);
     }
 
-    if (dphi_klm_tmp < m_dphi_klm_threshold * M_PI * 0.5 / 180.0 && klmtrack_ind_phi > -1 && klmtrack_ind_phi < 8) {
+    if (dphi_klm_tmp < m_dphi_klm_threshold * M_PI / 180.0 && klmtrack_ind_phi > -1 && klmtrack_ind_phi < 8) {
       if (klmtrack_ind_phi_map[klmtrack_ind_phi] == 0) {
         TRGGRLMATCHKLM* matklm = trackKLMmatch.appendNew();
         matklm->set_dphi(dphi_klm_tmp);

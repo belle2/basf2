@@ -52,7 +52,7 @@ namespace Belle2 {
      * This should be the OR of error masks of all sub-objects (DHC, DHE)
      * @param m Bit Mask to set
      */
-    void setErrorMask(PXDErrorFlags& mask) { m_errorMask = mask; }
+    void setErrorMask(const PXDErrorFlags& mask) { m_errorMask = mask; }
 
     /** Return Error bit mask
      * This is the OR of error masks of all sub-objects (DHC, DHE)
@@ -63,7 +63,7 @@ namespace Belle2 {
     /** Set Critical Error bit mask
      * @param m Bit Mask to set
      */
-    void setCritErrorMask(PXDErrorFlags& mask) { m_critErrorMask = mask; }
+    void setCritErrorMask(const PXDErrorFlags& mask) { m_critErrorMask = mask; }
 
     /** Return Critical Error bit mask
      * @return bit mask

@@ -113,7 +113,6 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
   addParam("PXDRawAdcsName", m_PXDRawAdcsName, "The name of the StoreArray of input PXDRawAdcs", std::string(""));
   addParam("PXDRawROIsName", m_PXDRawROIsName, "The name of the StoreArray of input PXDRawROIs", std::string(""));
 
-  // TODO the bitfield cannot be set by Parameter
   int crit = 0;
   addParam("CriticalErrorMask", crit, "Set error mask for which data is removed (0=none, 1=default, other undefined yet)", 1);
   switch (crit) {

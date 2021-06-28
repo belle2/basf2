@@ -45,7 +45,7 @@ namespace Belle2 {
      * @param tg Trigger Gate (Start Row, Trigger Offset)
      * @param fn (absolute) Readout Frame Number, lower bits only
      */
-    PXDDAQDHEStatus(VxdID id, int dheid, PXDErrorFlags& mask, unsigned short tg,
+    PXDDAQDHEStatus(VxdID id, int dheid, const PXDErrorFlags& mask, unsigned short tg,
                     unsigned short fn) : m_errorMask(mask), m_critErrorMask(0), m_usable(true), m_sensorID(id), m_dheID(dheid),
       m_triggerGate(tg), m_frameNr(fn), m_dhp_found_mask(0), m_rawCount(0), m_redCount(0), m_errorinfo(0)
     {}
@@ -65,7 +65,7 @@ namespace Belle2 {
     /** Set Error bit mask
      * @param m Bit Mask to set
      */
-    void setErrorMask(PXDErrorFlags& mask) { m_errorMask = mask; }
+    void setErrorMask(const PXDErrorFlags& mask) { m_errorMask = mask; }
     /** Return Error bit mask
      * @return bit mask
      */
@@ -74,7 +74,7 @@ namespace Belle2 {
     /** Set Critical Error bit mask
      * @param m Bit Mask to set
      */
-    void setCritErrorMask(PXDErrorFlags& mask) { m_critErrorMask = mask; }
+    void setCritErrorMask(const PXDErrorFlags& mask) { m_critErrorMask = mask; }
 
     /** Return Critical Error bit mask
      * @return bit mask

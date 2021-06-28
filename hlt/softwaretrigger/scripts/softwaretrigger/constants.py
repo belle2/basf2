@@ -52,7 +52,7 @@ RAWDATA_OBJECTS = [
     "RawECLs",
     "RawTRGs",
     "ROIs",
-    "OnlineEventT0"]
+    "OnlineEventT0s"]
 
 #: Objects which will be kept after the ExpressReconstruction, for example for the Event Display
 PROCESSED_OBJECTS = ['Tracks', 'TrackFitResults',

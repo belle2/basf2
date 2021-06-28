@@ -19,18 +19,15 @@ OnlineEventT0CreatorModule::OnlineEventT0CreatorModule() : Module()
 {
   setDescription("Module to write the EventT0s computed on HLT");
 
-  addParam("OnlineEventT0Name", m_onlineEventT0Name, "Name of the OnlineEventT0 StoreArray", std::string(m_onlineEventT0Name));
-  addParam("eventT0Name", m_eventT0Name, "Name of the EventT0 StoreArray", std::string(m_eventT0Name));
-
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 void OnlineEventT0CreatorModule::initialize()
 {
 
-  m_onlineEventT0.registerInDataStore(m_onlineEventT0Name);
+  m_onlineEventT0.registerInDataStore();
 
-  m_eventT0.isRequired(m_eventT0Name);
+  m_eventT0.isRequired();
 
 }
 
@@ -54,7 +51,7 @@ void OnlineEventT0CreatorModule::event()
   } else {
     // get the most accurate TOP eventT0 (there is only one)
     const auto topBestT0 = topHypos.back();
-    m_onlineEventT0.appendNew(OnlineEventT0(topBestT0.eventT0, topBestT0.eventT0Uncertainty, Const::EDetector::TOP));
+    m_onlineEventT0.appendNew(topBestT0.eventT0, topBestT0.eventT0Uncertainty, Const::EDetector::TOP);
   }
 
   // check if a CDC hypothesis exists
@@ -65,7 +62,7 @@ void OnlineEventT0CreatorModule::event()
   } else {
     // get the most accurate CDC evenT0 (latest)
     const auto cdcBestT0 = cdcHypos.back();
-    m_onlineEventT0.appendNew(OnlineEventT0(cdcBestT0.eventT0, cdcBestT0.eventT0Uncertainty, Const::EDetector::CDC));
+    m_onlineEventT0.appendNew(cdcBestT0.eventT0, cdcBestT0.eventT0Uncertainty, Const::EDetector::CDC);
   }
 
 
@@ -78,14 +75,14 @@ void OnlineEventT0CreatorModule::event()
     // get the most accurate ECL evenT0 (smallest chi2/quality)
     double bestECL_quality = eclHypos[0].quality ;
     int bestECL_idx = 0 ;
-    for (int i = 0; i < (int)eclHypos.size(); i++) {
+    for (int i = 1; i < (int)eclHypos.size(); i++) {
       if (eclHypos[i].quality < bestECL_quality) {
         bestECL_quality = eclHypos[i].quality ;
         bestECL_idx = i ;
       }
     }
-    m_onlineEventT0.appendNew(OnlineEventT0(eclHypos[bestECL_idx].eventT0, eclHypos[bestECL_idx].eventT0Uncertainty,
-                                            Const::EDetector::ECL));
+    m_onlineEventT0.appendNew(eclHypos[bestECL_idx].eventT0, eclHypos[bestECL_idx].eventT0Uncertainty,
+                              Const::EDetector::ECL);
 
   }
 

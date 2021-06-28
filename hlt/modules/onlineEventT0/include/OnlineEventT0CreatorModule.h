@@ -39,12 +39,6 @@ namespace Belle2 {
      * takes place in this method. */
     void event() override;
 
-    /* name of the OnlineEventT0 StoreArray*/
-    std::string m_onlineEventT0Name = "OnlineEventT0";
-
-    /* name of the EventT0 StoreArray*/
-    std::string m_eventT0Name = "EventT0";
-
     /* StoreArray of OnlineEventT0*/
     StoreArray<OnlineEventT0> m_onlineEventT0;
 

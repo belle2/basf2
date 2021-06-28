@@ -54,6 +54,6 @@ namespace Belle2 {
     /// Storage of the detector, who has determined the event T0.
     Const::DetectorSet m_detector;
 
-    ClassDef(OnlineEventT0, 1) /**< Storage element for the eventwise T0 estimation. */
+    ClassDef(OnlineEventT0, 1) /**< Storage element for the eventwise T0 estimation on HLT. */
   };
 }

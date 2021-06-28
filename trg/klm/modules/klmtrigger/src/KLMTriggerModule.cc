@@ -173,7 +173,6 @@ void KLMTriggerModule::endRun()
 
 }
 
-// cppcheck-suppress  noExplicitConstructor
 AXIS_NAME(KLM_type, int);// cppcheck-suppress  noExplicitConstructor
 AXIS_NAME(section_t, int);// cppcheck-suppress  noExplicitConstructor
 AXIS_NAME(sector_t, int);// cppcheck-suppress  noExplicitConstructor
@@ -188,7 +187,7 @@ AXIS_NAME(n_sections_trig, int);// cppcheck-suppress  noExplicitConstructor
 AXIS_NAME(back2back_t, int);// cppcheck-suppress  noExplicitConstructor
 AXIS_NAME(isectors_t, int);// cppcheck-suppress  noExplicitConstructor
 AXIS_NAME(TriggerCut, int);// cppcheck-suppress  noExplicitConstructor
-AXIS_NAME(vetoCut, int);
+AXIS_NAME(vetoCut, int);// cppcheck-suppress  noExplicitConstructor
 
 int to_i_sector(int KLM_type_, int section_)
 {

@@ -3180,10 +3180,11 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
     - mu (13) vs. pi (211)
     - pi (211) vs. K (321)
     - K (321) vs. pi (211)
-    - p (2212) vs. pi (211)
 
-    , or 'global' PID, namely "one-vs-others" separation. The latter makes use of an MVA algorithm trained in multi-class mode,
-    and it's the default behaviour.
+    , or 'global' PID, namely "one-vs-others" separation. The latter exploits an MVA algorithm trained in multi-class mode,
+    and it's the default behaviour. Currently, the multi-class training separates the following standard charged hypotheses:
+
+    - e (11), mu (13), pi (211), K (321)
 
     Warning:
         In order to run the `ChargedPidMVA` and ensure the most up-to-date MVA training weights are applied,

@@ -301,7 +301,7 @@ Here's a complete example:
     python3 analysis/scripts/fei/distributed.py -s kekcc \
         -f analysis/examples/FEI/B_generic_train.py \
         -w /<local>/<path>/<to>/<project>/<directory>/ \
-        -n 1000 -d /<local>/<path>/<to>/<input>/<mdst>/<files>/\*.root
+        -n 1000 -d /<local>/<path>/<to>/<input>/<mdst>/<files>/*.root
 
 Known issues when training the FEI on the KEK system:
 

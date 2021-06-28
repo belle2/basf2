@@ -93,6 +93,7 @@ def _PyDBArray__iter__(self):
 
 @pythonization(namespace="Belle2")
 def _pythonize(klass, name):
+    """Adjust the python interface of some Py* classes"""
     if not name.startswith("Py"):
         return
 

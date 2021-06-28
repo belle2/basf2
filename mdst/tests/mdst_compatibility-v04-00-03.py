@@ -11,6 +11,7 @@ CHANGES since release-04-00-03:
 - EventLevelTrackingInfo:
   + hasSVDCKFAbortionFlag/setSVDCKFAbortionFlag
   + hasPXDCKFAbortionFlag/setPXDCKFAbortionFlag
+  + hasSVDSpacePointCreatorAbortionFlag/setSVDSpacePointCreatorAbortionFlag
 - Global tags:
   * The compatibility tag "Legacy_IP_Information" is no longer added for
     release 4 input files.

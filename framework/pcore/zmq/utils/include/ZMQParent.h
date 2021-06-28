@@ -114,12 +114,12 @@ namespace Belle2 {
 
       if (AZMQType == ZMQ_DEALER) {
         auto identity = createIdentity();
-        socket->setsockopt(ZMQ_IDENTITY, identity.c_str(), identity.length());
+        socket->set(zmq::sockopt::routing_id, identity);
       }
 
       // Linger means: close the socket immediately if requested, do not wait until all messages have been sent.
       // This is needed because if we want to ABORT, we usually know what we are doing (and want to do it now).
-      socket->setsockopt(ZMQ_LINGER, 0);
+      socket->set(zmq::sockopt::linger, 0);
       if (bind) {
         socket->bind(socketAddress.c_str());
       } else {

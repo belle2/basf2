@@ -280,6 +280,7 @@ namespace Belle2 {
 
     bool m_swapBytes = false;     /**< if true, swap bytes */
     int m_dataFormat = 0;         /**< data format */
+    bool m_addRelations = false;  /**< switch ON/OFF relations to TOPProductionHitDebugs */
 
     TOP::TOPGeometryPar* m_topgp = TOP::TOPGeometryPar::Instance(); /**< geometry param */
 

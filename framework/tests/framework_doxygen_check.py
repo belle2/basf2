@@ -6,9 +6,6 @@ Perform code doxygen checks for every commit to the framework package.
 
 import re
 from b2test_utils import check_error_free
-from b2test_utils import skip_test
-
-skip_test("New doxygen version in latest externals.")
 
 if __name__ == "__main__":
     #: define regular expression to ignore when checking doxygen warnings

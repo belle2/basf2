@@ -69,9 +69,7 @@ void QcsmonitorDigitizerModule::beginRun()
 void QcsmonitorDigitizerModule::event()
 {
 
-  StoreArray<MCParticle> particles;
   StoreArray<QcsmonitorSimHit> QcsmonitorSimHits;
-  StoreArray<QcsmonitorHit> QcsmonitorHits;
 
   //Skip events with no QcsmonitorSimHits, but continue the event counter
   if (QcsmonitorSimHits.getEntries() == 0) {

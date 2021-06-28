@@ -206,7 +206,7 @@ bool GlobalProcHandler::startProc(ProcType procType, int id)
       s_processID = id;
 
     // Reset some python state: signals, threads, gil in the child
-    PyOS_AfterFork();
+    PyOS_AfterFork_Child();
     // InputController becomes useless in child process
     InputController::resetForChildProcess();
     // die when parent dies

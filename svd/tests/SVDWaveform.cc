@@ -2,7 +2,7 @@
 
 
 #include <framework/dataobjects/RelationElement.h>
-#include <svd/simulation/SVDSignal.h>
+#include <svd/simulation/SVDWaveform.h>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <sstream>
@@ -15,9 +15,9 @@ namespace Belle2 {
     /**
      * Check object creation and simple object getters.
      */
-    TEST(SVDSignal, Getters)
+    TEST(SVDWaveform, Getters)
     {
-      // First create an artificial signal and load it with data.
+      // First create an artificial waveform and load it with data.
       vector<double> charges;
       charges.push_back(10);
       charges.push_back(11);
@@ -29,14 +29,14 @@ namespace Belle2 {
       vector<RelationElement::index_type> trueHits;
       for (int i = 0; i < 3; ++i) trueHits.push_back(7 * i);
       const float tau = 25.0e-9;
-      SVDSignal signal;
-      for (int i = 0; i < 3; ++i) signal.add(times.at(i), charges.at(i), tau, mcParticles.at(i), trueHits.at(i));
-      // Test SVDSignal::getCharge()
+      SVDWaveform waveform;
+      for (int i = 0; i < 3; ++i) waveform.add(times.at(i), charges.at(i), tau, mcParticles.at(i), trueHits.at(i));
+      // Test SVDWaveform::getCharge()
       double totalcharge = 0;
       for (int i = 0; i < 3; ++i) totalcharge += charges.at(i);
-      EXPECT_EQ(signal.getCharge(), totalcharge);
-      //Test SVDSignal::getFunctions()
-      SVDSignal::function_list functions = signal.getFunctions();
+      EXPECT_EQ(waveform.getCharge(), totalcharge);
+      //Test SVDWaveform::getElementaryWaveforms()
+      SVDWaveform::elementary_waveform_list functions = waveform.getElementaryWaveforms();
       for (int i = 0; i < 3; ++i) {
         EXPECT_EQ(functions.at(i).m_initTime, times.at(i));
         EXPECT_EQ(functions.at(i).m_charge, charges.at(i));
@@ -47,9 +47,9 @@ namespace Belle2 {
     }
 
     /** Check the different constructors. */
-    TEST(SVDSignal, Constructors)
+    TEST(SVDWaveform, Constructors)
     {
-      // Create an artificial signal and load it with data.
+      // Create an artificial waveform and load it with data.
       vector<double> charges;
       charges.push_back(10);
       charges.push_back(11);
@@ -61,15 +61,15 @@ namespace Belle2 {
       vector<RelationElement::index_type> trueHits;
       for (int i = 0; i < 3; ++i) trueHits.push_back(7 * i);
       const float tau = 25.0e-9;
-      SVDSignal signal;
-      for (int i = 0; i < 3; ++i) signal.add(times.at(i), charges.at(i), tau, mcParticles.at(i), trueHits.at(i));
+      SVDWaveform waveform;
+      for (int i = 0; i < 3; ++i) waveform.add(times.at(i), charges.at(i), tau, mcParticles.at(i), trueHits.at(i));
       // Test the copy constructor
-      SVDSignal signal2(signal);
+      SVDWaveform waveform2(waveform);
       double totalcharge = 0;
       for (int i = 0; i < 3; ++i) totalcharge += charges.at(i);
-      EXPECT_EQ(signal2.getCharge(), totalcharge);
-      //Test SVDSignal::getFunctions()
-      SVDSignal::function_list functions = signal2.getFunctions();
+      EXPECT_EQ(waveform2.getCharge(), totalcharge);
+      //Test SVDWaveform::getElementaryWaveforms()
+      SVDWaveform::elementary_waveform_list functions = waveform2.getElementaryWaveforms();
       size_t n = functions.size();
       EXPECT_EQ(n, 3);
       for (int i = 0; i < 3; ++i) {
@@ -82,9 +82,9 @@ namespace Belle2 {
     }
 
     /** Check assignment operators. */
-    TEST(SVDSignal, Assignment)
+    TEST(SVDWaveform, Assignment)
     {
-      // Create an artificial signal and load it with data.
+      // Create an artificial waveform and load it with data.
       vector<double> charges;
       charges.push_back(10);
       charges.push_back(11);
@@ -96,15 +96,15 @@ namespace Belle2 {
       vector<RelationElement::index_type> trueHits;
       for (int i = 0; i < 3; ++i) trueHits.push_back(7 * i);
       const float tau = 25.0e-9;
-      SVDSignal signal;
-      for (int i = 0; i < 3; ++i) signal.add(times.at(i), charges.at(i), tau, mcParticles.at(i), trueHits.at(i));
+      SVDWaveform waveform;
+      for (int i = 0; i < 3; ++i) waveform.add(times.at(i), charges.at(i), tau, mcParticles.at(i), trueHits.at(i));
       // Test the assignment operator
-      SVDSignal signal2 = signal;
+      SVDWaveform waveform2 = waveform;
       double totalcharge = 0;
       for (int i = 0; i < 3; ++i) totalcharge += charges.at(i);
-      EXPECT_EQ(signal2.getCharge(), totalcharge);
-      //Test SVDSignal::getFunctions()
-      SVDSignal::function_list functions = signal2.getFunctions();
+      EXPECT_EQ(waveform2.getCharge(), totalcharge);
+      //Test SVDWaveform::getElementaryWaveforms()
+      SVDWaveform::elementary_waveform_list functions = waveform2.getElementaryWaveforms();
       for (int i = 0; i < 3; ++i) {
         EXPECT_EQ(functions.at(i).m_initTime, times.at(i));
         EXPECT_EQ(functions.at(i).m_charge, charges.at(i));
@@ -115,9 +115,9 @@ namespace Belle2 {
     }
 
     /** Check the waveform values and relations. */
-    TEST(SVDSignal, Waveform)
+    TEST(SVDWaveform, Waveform)
     {
-      // Create an artificial signal and load it with data.
+      // Create an artificial waveform and load it with data.
       vector<double> charges;
       charges.push_back(10);
       charges.push_back(11);
@@ -129,30 +129,30 @@ namespace Belle2 {
       vector<RelationElement::index_type> trueHits;
       for (int i = 0; i < 3; ++i) trueHits.push_back(7 * i);
       const float tau = 25.0e-9; // 25 ns shaping time
-      SVDSignal signal;
-      for (int i = 0; i < 3; ++i) signal.add(times.at(i), charges.at(i), tau, mcParticles.at(i), trueHits.at(i));
+      SVDWaveform waveform;
+      for (int i = 0; i < 3; ++i) waveform.add(times.at(i), charges.at(i), tau, mcParticles.at(i), trueHits.at(i));
       // Test operator()
       double time = 40.0e-9; // 40 ns
       // expected function value
       double expected_value = 0;
-      SVDSignal::relations_map expected_particles_map;
-      SVDSignal::relations_map expected_truehits_map;
+      SVDWaveform::relations_map expected_particles_map;
+      SVDWaveform::relations_map expected_truehits_map;
       int i = 0;
-      for (SVDSignal::Wave wave : signal.getFunctions()) {
-        double value = signal.waveform(time, wave);
+      for (SVDWaveform::ElementaryWaveform wave : waveform.getElementaryWaveforms()) {
+        double value = waveform.waveform(time, wave);
         expected_value += value;
         expected_particles_map[mcParticles.at(i)] += wave.m_charge;
         expected_truehits_map[trueHits.at(i)] += wave.m_charge;
         i++;
       }
-      double function_value = signal(time);
+      double function_value = waveform(time);
       EXPECT_EQ(function_value, expected_value);
     }
 
     /** Check the waveform string representation. */
-    TEST(SVDSignal, toString)
+    TEST(SVDWaveform, toString)
     {
-      // Create an artificial signal and load it with data.
+      // Create an artificial waveform and load it with data.
       vector<double> charges;
       charges.push_back(10);
       charges.push_back(11);
@@ -164,12 +164,12 @@ namespace Belle2 {
       vector<RelationElement::index_type> trueHits;
       for (int i = 0; i < 3; ++i) trueHits.push_back(7 * i);
       const float tau = 50.0e-9; // 25 ns shaping time
-      SVDSignal signal;
-      for (int i = 0; i < 3; ++i) signal.add(times.at(i), charges.at(i), tau, mcParticles.at(i), trueHits.at(i));
+      SVDWaveform waveform;
+      for (int i = 0; i < 3; ++i) waveform.add(times.at(i), charges.at(i), tau, mcParticles.at(i), trueHits.at(i));
       std::ostringstream os;
       for (int i = 0; i < 3; ++i)
         os << i + 1 << '\t' << times.at(i) << '\t' << charges.at(i) << '\t' << tau << std::endl;
-      EXPECT_EQ(signal.toString(), os.str());
+      EXPECT_EQ(waveform.toString(), os.str());
     }
 
   } // namespace SVD

@@ -12,7 +12,7 @@
 
 #include <framework/core/Module.h>
 #include <svd/dataobjects/SVDSimHit.h>
-#include <svd/simulation/SVDSignal.h>
+#include <svd/simulation/SVDWaveform.h>
 #include <svd/geometry/SensorInfo.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
@@ -34,14 +34,14 @@
 namespace Belle2 {
   namespace SVD {
 
-    /** Map of all signals in one sensor. */
-    typedef std::map<short int, SVDSignal> StripSignals;
+    /** Map of all channels' waveforms in one sensor side. */
+    typedef std::map<short int, SVDWaveform> StripWaveforms;
 
-    /** Signals of u- and v- strips in one sensor. */
-    typedef std::pair<StripSignals, StripSignals> Sensor;
+    /** Waveforms of u- and v- channels in one sensor. */
+    typedef std::pair<StripWaveforms, StripWaveforms> SensorWaveforms;
 
-    /** Map of all signals in all sensors */
-    typedef std::map<VxdID, Sensor> Sensors;
+    /** Map of all waveforms in all sensors */
+    typedef std::map<VxdID, SensorWaveforms> Waveforms;
 
     /** The SVD Digitizer module.
      * This module is responsible for converting the simulated energy
@@ -130,7 +130,7 @@ namespace Belle2 {
       double m_SNAdjacent = 3.0;
       /** Round ZS cut to nearest ADU */
       bool m_roundZS = true;
-      /** Keek digit if at least m_nSamplesOverZS are over threshold */
+      /** Keep digit if at least m_nSamplesOverZS are over threshold */
       int m_nSamplesOverZS = 1;
       /** (derived from SNAdjacent) Fraction of noisy strips per sensor. */
       double m_noiseFraction = 0.01;
@@ -138,8 +138,10 @@ namespace Belle2 {
       // 4. Timing
       /** Hardware Clocks*/
       DBObjPtr<HardwareClockSettings> m_hwClock;
-      /** Shaping time of the APV25 shapers.*/
-      double m_shapingTime = 250.0;
+      /** Decay time of betaprime waveform U-side.*/
+      double m_betaPrimeDecayTimeU = 250.0;
+      /** Decay time of betaprime waveform V-side.*/
+      double m_betaPrimeDecayTimeV = 250.0;
       /** Interval between two waveform samples, by default taken from HardwareClockSettings */
       double m_samplingTime = -1;
       /** Time window start, excluding trigger bin effect.
@@ -176,14 +178,14 @@ namespace Belle2 {
       std::string m_rootFilename = "";
       /** Store waveform data in the reporting file? */
       bool m_storeWaveforms = false;
-      /** Name of the tab-delimited listing of signals */
+      /** Name of the tab-delimited listing of waveforms */
       std::string m_signalsList = "";
 
 
       // Other data members:
 
-      /** Structure containing signals in all existing sensors */
-      Sensors m_sensors;
+      /** Structure containing waveforms in all existing sensors */
+      Waveforms m_waveforms;
 
       /** Pointer to the SVDSimhit currently digitized */
       const SVDSimHit*   m_currentHit = nullptr;
@@ -192,7 +194,7 @@ namespace Belle2 {
       /** Index of the TrueHit the current hit belongs to */
       int                m_currentTrueHit = -1;
       /** Pointer to the sensor in which the current hit occurred */
-      Sensor*            m_currentSensor = nullptr;
+      SensorWaveforms*            m_currentSensorWaveforms = nullptr;
       /** Pointer to the SensorInfo of the current sensor */
       const SensorInfo*  m_currentSensorInfo = nullptr;
       /** Time of the current SimHit.. */

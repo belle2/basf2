@@ -12,6 +12,7 @@ CHANGES since release-00-09-03:
 - EventLevelTrackingInfo:
   + hasSVDCKFAbortionFlag/setSVDCKFAbortionFlag
   + hasPXDCKFAbortionFlag/setPXDCKFAbortionFlag
+  + hasSVDSpacePointCreatorAbortionFlag/setSVDSpacePointCreatorAbortionFlag
 - The default magnetic field is changed affecting all momentum measurements.
 - Track:
   * getTrackFitResult behavior changed for non-pion tracks

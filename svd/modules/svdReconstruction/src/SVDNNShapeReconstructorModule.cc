@@ -264,14 +264,11 @@ void SVDNNShapeReconstructorModule::event()
 
       // If the strip is not masked away, normalize samples (sample/stripNoise)
       apvSamples normedSamples;
-      // cppcheck-suppress knownConditionTrueFalse
-      if (validDigit) {
-        auto samples = shaperDigit.getSamples();
-        transform(samples.begin(), samples.end(), normedSamples.begin(),
-                  bind2nd(divides<float>(), stripNoiseADU));
-        // FIXME: This won't work in 3 sample mode, we have no control over the number of non-zero samples.
-        validDigit = validDigit && pass3Samples(normedSamples, m_cutAdjacent);
-      }
+      auto samples = shaperDigit.getSamples();
+      transform(samples.begin(), samples.end(), normedSamples.begin(),
+                bind2nd(divides<float>(), stripNoiseADU));
+      // FIXME: This won't work in 3 sample mode, we have no control over the number of non-zero samples.
+      validDigit = validDigit && pass3Samples(normedSamples, m_cutAdjacent);
 
       if (validDigit) {
         zeroSuppress(normedSamples, m_cutAdjacent);

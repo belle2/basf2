@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 
-from basf2 import B2ERROR
-from modularAnalysis import fillParticleList
+import re
 
+import basf2 as b2
+import modularAnalysis as ma
+import pdg
+
+from ROOT import Belle2
+Const = Belle2.Const
 
 # define arrays to interpret cut matrix
 _chargednames = ['pi', 'K', 'p', 'e', 'mu']
@@ -26,7 +31,7 @@ def _stdChargedEffCuts(particletype, listtype):
 
     # efficiency cuts = [.95,.90,.85] efficiency; values outside (0,1) mean the cut does not exist and an error will be thrown
     effcuts = [[0.001, 0.019, 0.098],
-               [5e-6,  0.027, 0.167],
+               [5e-6, 0.027, 0.167],
                [0.000, 0.043, 0.251],
                [0.093, 0.301, 0.709],
                [0.187, 0.418, 0.909]]
@@ -60,40 +65,40 @@ def stdCharged(particletype, listtype, path):
     goodTrack = trackQuality + ' and ' + ipCut
 
     if particletype not in _chargednames:
-        B2ERROR("The requested list is not a standard charged particle. Use one of pi, K, e, mu, p.")
+        b2.B2ERROR("The requested list is not a standard charged particle. Use one of pi, K, e, mu, p.")
 
     if listtype == 'all':
-        fillParticleList(particletype + '+:all', '', True, path=path)
+        ma.fillParticleList(particletype + '+:all', '', True, path=path)
     elif listtype == 'good':
-        fillParticleList(
+        ma.fillParticleList(
             particletype + '+:good',
             _pidnames[_chargednames.index(particletype)] + ' > 0.5 and ' + goodTrack,
             True,
             path=path)
     elif listtype == 'loose':
-        fillParticleList(
+        ma.fillParticleList(
             particletype + '+:loose',
             _pidnames[_chargednames.index(particletype)] + ' > 0.1 and ' + goodTrack,
             True,
             path=path)
     elif listtype == 'loosepid':
-        fillParticleList(
+        ma.fillParticleList(
             particletype + '+:loosepid',
             _pidnames[_chargednames.index(particletype)] + ' > 0.1',
             True,
             path=path)
     elif listtype == 'higheff':
-        fillParticleList(
+        ma.fillParticleList(
             particletype + '+:higheff',
             _pidnames[_chargednames.index(particletype)] + ' > 0.002 and ' + goodTrack,
             True,
             path=path)
     elif listtype not in _effnames:
-        B2ERROR("The requested list is not defined. Please refer to the stdCharged documentation.")
+        b2.B2ERROR("The requested list is not defined. Please refer to the stdCharged documentation.")
     else:
         pidcut = _stdChargedEffCuts(particletype, listtype)
         if 0.0 < pidcut < 1.0:
-            fillParticleList(
+            ma.fillParticleList(
                 particletype +
                 '+:' +
                 listtype,
@@ -105,10 +110,8 @@ def stdCharged(particletype, listtype, path):
                 True,
                 path=path)
         else:
-            B2ERROR('The requested standard particle list ' + particletype +
-                    '+:' + listtype + ' is not available in this release.')
-
-###
+            b2.B2ERROR('The requested standard particle list ' + particletype +
+                       '+:' + listtype + ' is not available in this release.')
 
 
 def stdPi(listtype=_defaultlist, path=None):
@@ -141,24 +144,101 @@ def stdPr(listtype=_defaultlist, path=None):
     stdCharged('p', listtype, path)
 
 
-def stdE(listtype=_defaultlist, path=None):
+def stdLep(pdgId, listtype, method, classification, path=None):
     """
-    Function to prepare standard electron lists, refer to stdCharged for details
+    Function to prepare one of several standardized types of lepton (e, mu) lists:
 
-    @param listtype     name of standard list
-    @param path         modules are added to this path
+    - 'eff50' 50% lepton efficiency list.
+    - 'eff90' 90% lepton efficiency list.
+    - 'eff99' 99% lepton efficiency list.
+
+    Parameters:
+        pdgId (int): the lepton pdg code.
+        listtype (str): name of standard list
+        path (basf2.Path): modules are added to this path
     """
-    stdCharged('e', listtype, path)
+
+    if pdgId not in (Const.electron.getPDGCode(), Const.muon.getPDGCode()):
+        b2.B2FATAL(f"{pdgId} is not that of a light charged lepton.")
+
+    pid_variables = {
+        "likelihood": {
+            "global": "electronID" if pdgId == Const.electron.getPDGCode() else "muonID",
+            "binary": f"binaryPID({pdgId}, 211)"
+        },
+        "bdt": {
+            "global": f"pidChargedBDTScore({pdgId}, ALL)",
+            "binary": f"pidPairChargedBDTScore({pdgId}, 211, ALL)"
+        }
+    }
+
+    # Start creating the particle list, w/o any selection.
+    plistname = f"{pdg.to_name(pdgId)}:{listtype}"
+    ma.fillParticleList(plistname, "", path=path)
+
+    # The PID variable name, as it appears in the VariableManager.
+    pid_var = pid_variables[method][classification]
+
+    # Remove non-alphanumeric chars from the variable name, and strip last "_" if present.
+    # This is needed to match the name of the payload in the CDB.
+    pid_var_stripped = re.sub(r"[\W]+", "_", pid_var)
+    pid_var_stripped = pid_var_stripped[:-1] if pid_var_stripped.endswith("_") else pid_var_stripped
+
+    # The names of the payloads w/ efficiency and mis-id corrections.
+    payload_eff = f"ParticleReweighting:{pid_var_stripped}_eff_combination_{listtype}"
+    payload_misid_pi = f"ParticleReweighting:{pid_var_stripped}_misid_pi_combination_{listtype}"
+    payload_misid_K = f"ParticleReweighting:{pid_var_stripped}_misid_K_combination_{listtype}"
+
+    # Configure weighting module(s).
+    reweighter_eff = path.add_module("ParticleWeighting",
+                                     particleList=plistname,
+                                     tableName=payload_eff)
+    reweighter.set_name(f"ParticleWeighting_eff_{plistname}")
+    reweighter_misid_pi = path.add_module("ParticleWeighting",
+                                          particleList=plistname,
+                                          tableName=payload_misid_pi)
+    reweighter.set_name(f"ParticleWeighting_misid_pi_{plistname}")
+    reweighter_misid_K = path.add_module("ParticleWeighting",
+                                         particleList=plistname,
+                                         tableName=payload_misid_K)
+    reweighter.set_name(f"ParticleWeighting_misid_K_{plistname}")
+
+    # Apply the PID selection cut, which is read from the efficiency payload.
+    cut = f"{pid_var} > extraInfo({payload_eff}_threshold)"
+    ma.applyCuts(plistname, cut, path=path)
+    ma.matchMCTruth(plistname, path=path)
 
 
-def stdMu(listtype=_defaultlist, path=None):
+def stdE(listtype, method, classification, path=None):
     """
-    Function to prepare standard muon lists, refer to stdCharged for details
+    Function to prepare one of several standardized types of electron lists.
+    See the documentation of `stdLep` for details.
 
-    @param listtype     name of standard list
-    @param path         modules are added to this path
+    Also accepts "all" for the ``listtype`` parameter
+    to return a list of tracks fitted with electron mass hypothesis and no cuts.
     """
-    stdCharged('mu', listtype, path)
+
+    if listtype == "all":
+        stdCharged("e", "all", path)
+        return
+
+    stdLep(Const.electron.getPDGCode(), listtype, method, classification, path=path)
+
+
+def stdMu(listtype, method, classification, path=None):
+    """
+    Function to prepare one of several standardized types of muon lists.
+    See the documentation of `stdLep` for details.
+
+    Also accepts "all" for the ``listtype`` parameter
+    to return a list of tracks fitted with electron mass hypothesis and no cuts.
+    """
+
+    if listtype == "all":
+        stdCharged("mu", "all", path)
+        return
+
+    stdLep(Const.muon.getPDGCode(), listtype, method, classification, path=path)
 
 
 def stdMostLikely(pidPriors=None, suffix='', custom_cuts='', path=None):
@@ -180,5 +260,5 @@ def stdMostLikely(pidPriors=None, suffix='', custom_cuts='', path=None):
     if custom_cuts != '':
         trackQuality = custom_cuts
     for name in _chargednames:
-        fillParticleList(f'{name}+:{_mostLikelyList}{suffix}',
-                         f'pidIsMostLikely({args}) > 0 and {trackQuality}', True, path=path)
+        ma.fillParticleList(f'{name}+:{_mostLikelyList}{suffix}',
+                            f'pidIsMostLikely({args}) > 0 and {trackQuality}', True, path=path)

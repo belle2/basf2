@@ -299,10 +299,9 @@ Here's a complete example:
 .. code-block:: bash
 
     python3 analysis/scripts/fei/distributed.py -s kekcc \
-        -f /home/belle2/tkeck/basf2/analysis/examples/FEI/B_generic.py \
-        -w /gpfs/fs02/belle2/users/tkeck/Belle2Generic_20160222 \
-        -n 1000 -d /ghi/fs01/belle2/bdata/MC/fab/merge/release-00-05-03/DBxxxxxxxx/MC5/prod00000013/s00/e0002/4S/r00001/mixed/sub00/\*.root \
-        -d /ghi/fs01/belle2/bdata/MC/fab/merge/release-00-05-03/DBxxxxxxxx/MC5/prod00000014/s00/e0002/4S/r00001/charged/sub00/\*.root
+        -f analysis/examples/FEI/B_generic_train.py \
+        -w /<local>/<path>/<to>/<project>/<directory>/ \
+        -n 1000 -d /<local>/<path>/<to>/<input>/<mdst>/<files>/\*.root
 
 Known issues when training the FEI on the KEK system:
 

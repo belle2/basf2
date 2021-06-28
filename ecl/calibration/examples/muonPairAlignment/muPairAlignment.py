@@ -17,9 +17,7 @@ from modularAnalysis import fillParticleList
 from variables import variables
 from modularAnalysis import reconstructDecay
 from modularAnalysis import applyEventCuts
-from modularAnalysis import variablesToHistogram
 from modularAnalysis import rankByHighest
-from modularAnalysis import rankByLowest
 from modularAnalysis import cutAndCopyList
 from modularAnalysis import variablesToEventExtraInfo
 

@@ -223,7 +223,6 @@ void BeamBack_arich(std::string path = "/gpfs/home/belle/mmanca/basf2/background
     tree->GetEvent(e);
 
     if (source < 0) continue;
-    if (modID < 1) continue;
 
     // read the corresponding module (HAPD) x,y coordinates
     if (modID > 0) {

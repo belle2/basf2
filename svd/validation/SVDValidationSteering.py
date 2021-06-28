@@ -26,6 +26,7 @@
 """
 
 import basf2 as b2
+from basf2 import conditions as b2c
 # Individual validation packages
 from SVDValidationTTree import SVDValidationTTree
 from SVDValidationTTreeStrip import SVDValidationTTreeStrip
@@ -37,6 +38,8 @@ from SVDValidationTTreeTrueHit import SVDValidationTTreeTrueHit
 from SVDValidationTTreeCluster import SVDValidationTTreeCluster
 
 b2.set_random_seed(12345)
+
+b2c.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 
 main = b2.create_path()
 
@@ -52,11 +55,7 @@ gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # Create geometry
-geometry = b2.register_module('Geometry')
-# Select subdetectors to be built
-geometry.param('components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD'])
-# geometry.param("excludedComponents", "MagneticField")
-main.add_module(geometry)
+main.add_module("Geometry")
 
 # Show progress of processing
 progress = b2.register_module('Progress')

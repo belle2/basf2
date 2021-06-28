@@ -11,7 +11,6 @@ import basf2
 from caf.framework import Calibration, Collection
 from caf.strategies import SequentialRunByRun, SingleIOV, SequentialBoundaries
 from ROOT.Belle2 import TOP
-from math import ceil
 
 
 def BS13d_calibration_local(inputFiles, look_back=28, globalTags=None, localDBs=None):
@@ -443,7 +442,7 @@ def pulseHeight_calibration_rawdata(inputFiles, globalTags=None, localDBs=None):
     return cal
 
 
-def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
+def module_alignment(inputFiles, sample='dimuon', fixedParameters=None,
                      globalTags=None, localDBs=None, new_cdst_format=True,
                      backend_args=None):
     '''
@@ -467,12 +466,6 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
             cal.use_local_database(localDB)
     cal.strategies = SingleIOV
 
-    # Since each Collection has its own maximum number of jobs to submit, we limit the number from each one
-    # so that the total adds up to something reasonable e.g. ~1600
-    total_jobs = 1600
-    number_of_slots = 16
-    jobs_per_collection = ceil(total_jobs / number_of_slots)
-
     #   add collections
     for slot in range(1, 17):
         #   create path
@@ -495,16 +488,19 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
             main.add_module('TOPBunchFinder', autoRange=True,
                             usePIDLikelihoods=True, subtractRunningOffset=False)
 
-        #   collector module
+        #   collector module: executing iterative alignment method
         collector = basf2.register_module('TOPAlignmentCollector')
         collector.param('sample', sample)
-        collector.param('parFixed', fixedParameters)
+        if fixedParameters:
+            collector.param('parFixed', fixedParameters)
         collector.param('targetModule', slot)
         collector.param('granularity', 'all')
 
-        #   define collection
+        #   define collection:
+        #   because of iterative nature of the method we must run exactly one job per collection
+        #   which must process all the files from input list
         collection = Collection(collector=collector, input_files=inputFiles,
-                                pre_collector_path=main, max_collector_jobs=jobs_per_collection)
+                                pre_collector_path=main, max_collector_jobs=1)
         if globalTags:
             for globalTag in reversed(globalTags):
                 collection.use_central_database(globalTag)
@@ -517,7 +513,7 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
         #   add collection to calibration
         cal.add_collection(name='slot_' + '{:0=2d}'.format(slot), collection=collection)
 
-    #   algorithm
+    #   algorithm: it just greps the last iterations of collections and prepares the payload
     algorithm = TOP.TOPAlignmentAlgorithm()
     cal.algorithms = algorithm
 

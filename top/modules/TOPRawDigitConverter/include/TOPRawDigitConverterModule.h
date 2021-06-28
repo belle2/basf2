@@ -105,6 +105,8 @@ namespace Belle2 {
     double m_calpulseTimeMin;  /**< minimal time of calibration pulse */
     double m_calpulseTimeMax;  /**< maximal time of calibration pulse */
 
+    bool m_addRelations = false;  /**< switch ON/OFF relations to TOPRawDigits */
+
     // front-end settings (lookback, storage depths etc)
     DBObjPtr<TOPFrontEndSetting> m_feSetting;   /**< front-end settings */
 

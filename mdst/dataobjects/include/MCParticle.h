@@ -497,10 +497,10 @@ namespace Belle2 {
     void setInitial() {  addStatus(c_Initial); }
 
     /** Return name of this particle. */
-    virtual std::string getName() const;
+    virtual std::string getName() const override;
 
     /** Return a short summary of this object's contents in HTML format. */
-    virtual std::string getInfoHTML() const;
+    virtual std::string getInfoHTML() const override;
 
   protected:
 
@@ -548,7 +548,7 @@ namespace Belle2 {
 
     Const::DetectorSet m_seenIn;  /**< Each bit is a seen-in flag for the corresoponding subdetector of Belle II */
 
-    ClassDef(MCParticle, 5); /**< A Class to store the Monte Carlo particle information. */
+    ClassDefOverride(MCParticle, 5); /**< A Class to store the Monte Carlo particle information. */
   };
 
 

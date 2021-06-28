@@ -58,6 +58,7 @@
 #include "trg/cdc/Link.h"
 #include "trg/cdc/EventTime.h"
 #include <framework/gearbox/Const.h>
+#include <TObjString.h>
 
 #define NOT_USE_SOCKETLIB
 //#define NOT_SEND
@@ -2820,4 +2821,3 @@ namespace Belle2 {
   }
 
 } // namespace Belle2
-

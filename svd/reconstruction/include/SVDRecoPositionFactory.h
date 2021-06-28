@@ -33,10 +33,10 @@ namespace Belle2::SVD {
     {
       if (description == "CoGOnly")
         return new SVDCoGOnlyPosition;
-      if (description == "oldDefault")
+      if (description == "OldDefault")
         return new SVDOldDefaultPosition;
 
-      B2WARNING("the SVD cluster position algorithm is not recognized, using oldDefault!");
+      B2WARNING("the SVD cluster position algorithm is not recognized, using OldDefault!");
 
       return new SVDOldDefaultPosition;
     }

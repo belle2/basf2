@@ -50,11 +50,11 @@ class addECLDigitsModule(b2.Module):
         # Create new ECLDigits and add them to datastore
         for digitParam in self.digitParams:
             # Skip combination of quality != 2 and chi != 0. Electronics can't output this
-            if (digitParam['quality'] is not 2) and (digitParam['chi'] is not 0):
+            if (digitParam['quality'] != 2) and (digitParam['chi'] != 0):
                 continue
 
             # Skip combination of quality == 2 and amp != 0. Electronics can't output this
-            if (digitParam['quality'] is 2) and (digitParam['time'] is not 0):
+            if (digitParam['quality'] == 2) and (digitParam['time'] != 0):
                 continue
 
             # Choose cellId that's not already used

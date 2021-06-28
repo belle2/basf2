@@ -35,7 +35,6 @@ namespace {
     std::vector<int> collectorItems = {1, 2};
     std::vector<double> collectionItems = {2.1, 2.2, 2.3};
 
-    std::sort(relations.begin(), relations.end());
     matcher.apply(collectorItems, collectionItems, relations);
 
     std::sort(relations.begin(), relations.end(), GreaterWeight());

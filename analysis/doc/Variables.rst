@@ -417,6 +417,24 @@ Here is a list of production and decay vertex variables:
 .. b2-variables::
    :group: Vertex Information
 
+.. _orca_kin_fit_variables:
+
+Orca Kinematic Fitter
+~~~~~~~~~~~~~~~~~~~~~
+
+.. warning:: 
+    In order to populate these variables, you need to run the Orca kinematic fitter. I.e.
+
+    .. code-block:: python
+
+        import kinfit
+        kinfit.fitKinematic4C(your_candidates, path=mypath) # or similar
+
+.. seealso:: :ref:`kinfit`
+
+.. b2-variables::
+   :group: OrcaKinFit
+
 For fully-inclusive particles
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

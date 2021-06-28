@@ -127,7 +127,6 @@ namespace TreeFitter {
 
   ErrCode RecoKlong::projectRecoConstraint(const FitParams& fitparams, Projection& p) const
   {
-    ErrCode status ;
     const int momindex  = momIndex() ;
     const int posindex  = mother()->posIndex();
 

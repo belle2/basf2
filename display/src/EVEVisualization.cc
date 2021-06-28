@@ -605,14 +605,12 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
           }
         } else if (dynamic_cast<const genfit::SpacepointMeasurement*>(m) != NULL) {
           space_hit = true;
-          plane_size = 4;
         } else if (dynamic_cast<const CDCRecoHit*>(m)
                    || dynamic_cast<const genfit::WireMeasurement*>(m)
                    || dynamic_cast<const genfit::WireMeasurementNew*>(m)) {
           wire_hit = true;
           hit_u = fabs(hit_coords(0));
           hit_v = v * (track_pos - o); // move the covariance tube so that the track goes through it
-          plane_size = 4;
           if (dynamic_cast<const genfit::WirePointMeasurement*>(m) != NULL) {
             wirepoint_hit = true;
             hit_v = hit_coords(1);
@@ -622,7 +620,6 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
           break;
         }
 
-        if (plane_size < 4) plane_size = 4;
         // finished setting variables ---------------------------------------------------------
 
         // draw planes if corresponding option is set -----------------------------------------

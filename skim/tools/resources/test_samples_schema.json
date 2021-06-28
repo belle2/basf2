@@ -1,0 +1,135 @@
+{
+  "title": "SkimSamples",
+  "description": "Specification of skim test sample list.",
+  "type": "object",
+  "properties": {
+    "MC": {
+      "description": "MC test samples.",
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "description": "Filename of the test sample.",
+            "type": "string"
+          },
+          "process": {
+            "description": "Physics process simulated in test sample.",
+            "type": "string"
+          },
+          "campaign": {
+            "description": "MC production campaign number.",
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^MC\\d+"
+              },
+              {
+                "type": "integer"
+              }
+            ]
+          },
+          "beam_energy": {
+            "description": "Beam energy.",
+            "type": "string",
+            "default": "4S"
+          },
+          "beam_background": {
+            "description": "Beam background simulated in test sample.",
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^BGx\\d$"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "default": "BGx1"
+          }
+        },
+        "required": [
+          "location",
+          "process",
+          "campaign"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Data": {
+      "description": "Data test samples.",
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "description": "Filename of the test sample.",
+            "type": "string"
+          },
+          "processing": {
+            "description": "Data processing campaign.",
+            "type": "string"
+          },
+          "beam_energy": {
+            "description": "Beam energy.",
+            "type": "string"
+          },
+          "experiment": {
+            "description": "Experiment number.",
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^exp\\d+$"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "default": "4S"
+          },
+          "general_skim": {
+            "description": "General skim name, e.g. 'all' or 'hadron'.",
+            "type": "string",
+            "default": "all"
+          }
+        },
+        "required": [
+          "location",
+          "processing",
+          "experiment"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Custom": {
+      "description": "Data test samples.",
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "description": "Filename of the test sample.",
+            "type": "string"
+          },
+          "label": {
+            "description": "Human-readable sample label to be printed.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "location"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+}

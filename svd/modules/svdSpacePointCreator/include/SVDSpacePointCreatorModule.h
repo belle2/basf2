@@ -11,7 +11,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <svd/calibration/SVDClusterCalibrations.h>
+#include <svd/calibration/SVDHitTimeSelection.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 
@@ -89,8 +89,8 @@ namespace Belle2 {
 
     unsigned int m_TESTERSpacePointCtr = 0; /**< counts total number of SpacePoints occured */
 
-    unsigned int m_numMaxSpacePoints = 2e6; /**< do not crete SPs if their number exceeds m_numMaxSpacePoints*/
+    unsigned int m_numMaxSpacePoints = 7e4; /**< do not crete SPs if their number exceeds m_numMaxSpacePoints, tuned with BG19*/
 
-    SVDClusterCalibrations m_ClusterCal; /**< SVDCluster calibration db object*/
+    SVDHitTimeSelection m_HitTimeCut; /**< selection based on clustr time db object*/
   };
 } // end namespace Belle2

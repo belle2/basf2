@@ -29,7 +29,7 @@ V0::V0(const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& tra
 
 Const::ParticleType V0::getV0Hypothesis() const
 {
-  StoreArray<TrackFitResult> trackFitResults;
+  StoreArray<TrackFitResult> trackFitResults{};
   const auto posParticleType = trackFitResults[m_trackFitResultIndexPositive]->getParticleType();
   const auto negParticleType = trackFitResults[m_trackFitResultIndexNegative]->getParticleType();
 

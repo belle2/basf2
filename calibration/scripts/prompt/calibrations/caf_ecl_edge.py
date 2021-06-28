@@ -9,7 +9,7 @@ from prompt import CalibrationSettings, input_data_filters
 settings = CalibrationSettings(name="ecl_edge",
                                expert_username="hearty",
                                description=__doc__,
-                               input_data_formats=["mdst"],
+                               input_data_formats=["cdst"],
                                input_data_names=["mumutight_calib"],
                                input_data_filters={"mumutight_calib": [input_data_filters["Data Tag"]["mumutight_calib"],
                                                                        input_data_filters["Data Quality Tag"]["Good"]]},

@@ -104,8 +104,11 @@ def linkdef_emitter(target, source, env):
 
 
 # define builder for root dictionaries
-rootcling = Builder(action='rootcling -f $TARGET $CLINGFLAGS -rmf "${TARGET.base}.rootmap" -rml lib${ROOTCLING_ROOTMAP_LIB}.so '
-                    '$_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES', emitter=linkdef_emitter, source_scanner=CScanner())
+rootcling = Builder(
+    action='rootcling --failOnWarnings -f $TARGET $CLINGFLAGS -rmf "${TARGET.base}.rootmap" -rml lib${ROOTCLING_ROOTMAP_LIB}.so '
+    '$_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES',
+    emitter=linkdef_emitter,
+    source_scanner=CScanner())
 rootcling.action.cmdstr = '${ROOTCLINGCOMSTR}'
 
 # define builder for class version check

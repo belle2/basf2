@@ -15,15 +15,11 @@
 #
 ##############################################################################
 
-import os
 import sys
-import glob
-from basf2 import set_log_level, register_module, process, LogLevel, \
-    set_random_seed, print_params, create_path, statistics, conditions
+from basf2 import (register_module, process, print_params, create_path,
+                   statistics, conditions)
 from modularAnalysis import fillParticleList
 from modularAnalysis import cutAndCopyList
-from modularAnalysis import matchMCTruth
-from modularAnalysis import rankByHighest
 from modularAnalysis import applyEventCuts
 from simulation import add_simulation
 from reconstruction import add_reconstruction

@@ -18,7 +18,7 @@ import basf2 as b2
 # Some ROOT tools
 import ROOT
 from ROOT import Belle2
-from ROOT import gROOT, AddressOf
+from ROOT import gROOT, addressof
 from ROOT import TVector3
 
 # Define a ROOT struct to hold output data in the TTree
@@ -74,7 +74,7 @@ class SVDValidationTTree(b2.Module):
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
-                self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
+                self.tree.Branch(key, addressof(self.data, key), key + formstring)
 
     def beginRun(self):
         """ Does nothing """

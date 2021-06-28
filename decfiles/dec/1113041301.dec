@@ -1,0 +1,38 @@
+# EventType: 1113041301
+# Descriptor: [B0 -> [D_s0*- -> D_s-[-> Ks K-] pi0] K+]cc
+# NickName: Bd_DSstarK+_DSstarToDspi0_DsToKsK-
+# Tested: Yes
+# PhysicsWG: Hadronic B Decay to Open Charm WG
+# Responsible: Yi Zhang
+# Email: yizhang738@gmail.com
+# Author: Nadiia Maslova
+# Email: nadiiamaslova@knu.ua
+# Cuts: None
+# Date: 20210614
+ 
+Alias D_s0*-sig D_s0*-
+Alias D_s0*+sig D_s0*+
+ChargeConj D_s0*+sig D_s0*-sig
+
+Decay Upsilon(4S)
+1.000    B0sig     anti-B0sig  B0 anti-B0  VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.0000   K+   D_s0*-sig        PHSP;
+Enddecay
+CDecay anti-B0sig
+
+Decay D_s0*-sig
+1.00   D_s-sig  pi0            PHSP;
+Enddecay
+CDecay D_s0*+sig
+
+Decay D_s-sig
+1.000  K_S0  K-               PHSP;
+Enddecay
+CDecay D_s+sig
+
+End
+
+

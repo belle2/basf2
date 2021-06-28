@@ -25,9 +25,6 @@
 
 using namespace Belle2;
 
-/** Whether to use momentum components or energy and two angles. */
-static bool s_UseMomentum;
-
 /** Invariant mass. */
 static double s_InvariantMass;
 
@@ -69,20 +66,14 @@ static TLorentzVector getMomentum(double energy, double thetaX, double thetaY,
   return result;
 }
 
-/* cppcheck-suppress constParameter */
 static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
 {
   (void)npar;
   (void)grad;
   (void)iflag;
   TLorentzVector pHER, pLER;
-  if (s_UseMomentum) {
-    pHER.SetXYZM(par[0], par[1], par[2], Const::electronMass);
-    pLER.SetXYZM(par[3], par[4], par[5], Const::electronMass);
-  } else {
-    pHER = getMomentum(par[0], par[1], par[2], false);
-    pLER = getMomentum(par[3], par[4], par[5], true);
-  }
+  pHER = getMomentum(par[0], par[1], par[2], false);
+  pLER = getMomentum(par[3], par[4], par[5], true);
   TLorentzVector pBeam = pHER + pLER;
   TVector3 beamBoost = pBeam.BoostVector();
   TVectorD boostDifference(3);
@@ -232,41 +223,27 @@ void BeamParametersFitter::fit()
   s_DirectionLER.SetZ(1);
   s_DirectionLER.RotateY(m_AngleLER + M_PI);
   s_AngleError = m_AngleError;
-  s_UseMomentum = m_UseMomentum;
   TMinuit minuit(6);
   if (!m_Verbose)
     minuit.SetPrintLevel(-1);
   minuit.SetFCN(fcn);
-  if (m_UseMomentum) {
-    minuit.mnparm(0, "PHER_X", 0, 0.01, 0, 0, minuitResult);
-    minuit.mnparm(1, "PHER_Y", 0, 0.01, 0, 0, minuitResult);
-    minuit.mnparm(2, "PHER_Z", 7, 0.01, 0, 0, minuitResult);
-    minuit.mnparm(3, "PLER_X", 0, 0.01, 0, 0, minuitResult);
-    minuit.mnparm(4, "PLER_Y", 0, 0.01, 0, 0, minuitResult);
-    minuit.mnparm(5, "PLER_Z", -4, 0.01, 0, 0, minuitResult);
-    minuit.mncomd("FIX 1 2 4 5", minuitResult);
-    minuit.mncomd("MIGRAD 10000", minuitResult);
-    minuit.mncomd("RELEASE 1 2 4 5", minuitResult);
-    minuit.mncomd("MIGRAD 10000", minuitResult);
-  } else {
-    minuit.mnparm(0, "PHER_E", 7, 0.01, 0, 0, minuitResult);
-    minuit.mnparm(1, "PHER_TX", 0, 0.01, 0, 0, minuitResult);
-    minuit.mnparm(2, "PHER_TY", 0, 0.01, 0, 0, minuitResult);
-    minuit.mnparm(3, "PLER_E", 4, 0.01, 0, 0, minuitResult);
-    minuit.mnparm(4, "PLER_TX", 0, 0.01, 0, 0, minuitResult);
-    minuit.mnparm(5, "PLER_TY", 0, 0.01, 0, 0, minuitResult);
-    minuit.mncomd("FIX 2 3 5 6", minuitResult);
-    minuit.mncomd("MIGRAD 10000", minuitResult);
-    minuit.mncomd("RELEASE 2 3 5 6", minuitResult);
-    minuit.mncomd("MIGRAD 10000", minuitResult);
-    double error;
-    minuit.GetParameter(0, herMomentum, error);
-    minuit.GetParameter(1, herThetaX, error);
-    minuit.GetParameter(2, herThetaY, error);
-    minuit.GetParameter(3, lerMomentum, error);
-    minuit.GetParameter(4, lerThetaX, error);
-    minuit.GetParameter(5, lerThetaY, error);
-  }
+  minuit.mnparm(0, "PHER_E", 7, 0.01, 0, 0, minuitResult);
+  minuit.mnparm(1, "PHER_TX", 0, 0.01, 0, 0, minuitResult);
+  minuit.mnparm(2, "PHER_TY", 0, 0.01, 0, 0, minuitResult);
+  minuit.mnparm(3, "PLER_E", 4, 0.01, 0, 0, minuitResult);
+  minuit.mnparm(4, "PLER_TX", 0, 0.01, 0, 0, minuitResult);
+  minuit.mnparm(5, "PLER_TY", 0, 0.01, 0, 0, minuitResult);
+  minuit.mncomd("FIX 2 3 5 6", minuitResult);
+  minuit.mncomd("MIGRAD 10000", minuitResult);
+  minuit.mncomd("RELEASE 2 3 5 6", minuitResult);
+  minuit.mncomd("MIGRAD 10000", minuitResult);
+  double error;
+  minuit.GetParameter(0, herMomentum, error);
+  minuit.GetParameter(1, herThetaX, error);
+  minuit.GetParameter(2, herThetaY, error);
+  minuit.GetParameter(3, lerMomentum, error);
+  minuit.GetParameter(4, lerThetaX, error);
+  minuit.GetParameter(5, lerThetaY, error);
   /* Calculate error. */
   TLorentzVector pHER = getMomentum(herMomentum, herThetaX, herThetaY, false);
   TLorentzVector pLER = getMomentum(lerMomentum, lerThetaX, lerThetaY, true);

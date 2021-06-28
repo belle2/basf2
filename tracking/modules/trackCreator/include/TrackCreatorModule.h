@@ -10,6 +10,9 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
+
+#include <tracking/dbobjects/TrackFitMomentumRange.h>
 
 #include <TVector3.h>
 #include <vector>
@@ -30,6 +33,9 @@ namespace Belle2 {
 
     /// Require and register the store arrays.
     void initialize() override;
+
+    /// Called when entering a new run, to load TrackFitMomentumRange parameters.
+    void beginRun() override;
 
     /// Build/fit the track fit results.
     void event() override;
@@ -65,5 +71,9 @@ namespace Belle2 {
       * Use this for cosmics to prevent problems, when cosmics reconstruction end up in the QCS magnet.
       */
     bool m_useBFieldAtHit = false;
+
+    /// TrackFitMomentumRange Database OjbPtr
+    DBObjPtr<TrackFitMomentumRange> m_trackFitMomentumRange;
+
   };
 }

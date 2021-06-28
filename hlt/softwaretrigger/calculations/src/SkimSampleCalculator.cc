@@ -795,4 +795,57 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       if (hasNN) calculationResult["NeuroTRG"] = 1;
     }
   }
+
+  //Dimuon skim with invariant mass cut allowing at most one track not to be associated with ECL clusters
+
+  double mumuHighMass = 0.;
+
+  if (mumutight == 0 && trackWithMaximumRho && trackWithSecondMaximumRho) {
+    int hasClus = 0;
+    double eclE1 = 0., eclE2 = 0.;
+
+    const auto charge1 = trackWithMaximumRho->getCharge();
+    const auto charge2 = trackWithSecondMaximumRho->getCharge();
+    const auto chSum = charge1 + charge2;
+
+    const ECLCluster* eclTrack1 = trackWithMaximumRho->getECLCluster();
+    if (eclTrack1) {
+      hasClus++;
+      eclE1 = eclTrack1->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+    }
+
+    const ECLCluster* eclTrack2 = trackWithSecondMaximumRho->getECLCluster();
+    if (eclTrack2) {
+      hasClus++;
+      eclE2 = eclTrack2->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+    }
+    const TLorentzVector  V4p1 = PCmsLabTransform::labToCms(trackWithMaximumRho->get4Vector());
+    const TLorentzVector V4p2 = PCmsLabTransform::labToCms(trackWithSecondMaximumRho->get4Vector());
+
+    const TLorentzVector V4pSum = V4p1 + V4p2;
+    const double mSum = V4pSum.M();
+
+    const double thetaSumCMS = (V4p1.Theta() + V4p2.Theta()) * TMath::RadToDeg();
+    const double phi1CMS = V4p1.Phi() * TMath::RadToDeg();
+    const double phi2CMS = V4p2.Phi() * TMath::RadToDeg();
+
+    double diffPhi = phi1CMS - phi2CMS;
+    if (fabs(diffPhi) > 180) {
+      if (diffPhi > 180) {
+        diffPhi = diffPhi - 2 * 180;
+      } else {
+        diffPhi = 2 * 180 + diffPhi;
+      }
+    }
+    const double delThetaCMS = fabs(fabs(thetaSumCMS) - 180);
+    const double delPhiCMS = fabs(180 - fabs(diffPhi));
+
+    const bool mumuHighMassCand = chSum == 0 && (mSum > 8. && mSum < 12.) && hasClus > 0 && eclE1 <= 1
+                                  && eclE2 <= 1 && delThetaCMS < 10 && delPhiCMS < 10;
+
+    if (mumuHighMassCand)  mumuHighMass = 1;
+
+  }
+
+  calculationResult["MumuHighM"] = mumuHighMass;
 }

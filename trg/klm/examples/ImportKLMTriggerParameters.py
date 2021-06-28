@@ -13,7 +13,7 @@ if (len(sys.argv) >= 2):
         mc = True
 
 parameters = KLMTriggerParameters()
-parameters.setWhichLayers("1:16")
+parameters.setWhichLayers('0:16')
 
 database = Database.Instance()
 

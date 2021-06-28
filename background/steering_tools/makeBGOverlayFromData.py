@@ -84,7 +84,7 @@ compress.if_false(emptypath)
 
 # Output: digitized hits only
 output = basf2.register_module('RootOutput')
-output.param('branchNames', ['PXDDigits', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
+output.param('branchNames', ['EventLevelTriggerTimeInfo', 'PXDDigits', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
                              'ARICHDigits', 'ECLWaveforms', 'KLMDigits', 'TRGECLBGTCHits'])
 main.add_module(output)
 

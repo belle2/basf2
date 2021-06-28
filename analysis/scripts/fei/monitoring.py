@@ -326,7 +326,6 @@ def MonitorCosBDLPlot(particle, filename):
                                   ['unique', 'cosThetaBDl', 'probability', 'signal'])
     for i, cut in enumerate([0.0, 0.01, 0.05, 0.1, 0.2, 0.5]):
         p = plotting.VerboseDistribution(range_in_std=5.0)
-        # common = (df['unique'] == 1) & (np.abs(df['cosThetaBDl']) < 10) & (df['probability'] >= cut)
         common = (np.abs(df['cosThetaBDl']) < 10) & (df['probability'] >= cut)
         p.add(df, 'cosThetaBDl', common & (df['signal'] == 1), label="Signal")
         p.add(df, 'cosThetaBDl', common & (df['signal'] == 0), label="Background")
@@ -346,7 +345,6 @@ def MonitorMbcPlot(particle, filename):
                                   ['unique', 'Mbc', 'probability', 'signal'])
     for i, cut in enumerate([0.0, 0.01, 0.05, 0.1, 0.2, 0.5]):
         p = plotting.VerboseDistribution(range_in_std=5.0)
-        # common = (df['unique'] == 1) & (df['Mbc'] > 5.23) & (df['probability'] >= cut)
         common = (df['Mbc'] > 5.23) & (df['probability'] >= cut)
         p.add(df, 'Mbc', common & (df['signal'] == 1), label="Signal")
         p.add(df, 'Mbc', common & (df['signal'] == 0), label="Background")
@@ -366,7 +364,6 @@ def MonitorROCPlot(particle, filename):
                                   ['unique', 'probability', 'signal'])
     p = plotting.RejectionOverEfficiency()
     p.add(df, 'probability', df['signal'] == 1, df['signal'] == 0, label='All')
-    # p.add(df, 'probability', (df['signal'] == 1) & (df['unique'] == 1), (df['signal'] == 0) & (df['unique'] == 1), label='Unique')
     p.finish()
     p.save(filename + '.png')
 
@@ -381,7 +378,6 @@ def MonitorDiagPlot(particle, filename):
                                   ['unique', 'probability', 'signal'])
     p = plotting.Diagonal()
     p.add(df, 'probability', df['signal'] == 1, df['signal'] == 0)
-    # p.add(df, 'probability', (df['signal'] == 1) & (df['unique'] == 1), (df['signal'] == 0) & (df['unique'] == 1))
     p.finish()
     p.save(filename + '.png')
 

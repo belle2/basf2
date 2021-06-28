@@ -68,12 +68,6 @@ namespace Belle2 {
                      [](typename APVFloatSamples::value_type x)->APVRawSampleType { return trimToSampleRange(x); });
     }
 
-    /** Default constructor for the ROOT IO. */
-    // cppcheck does not recognize initialization through other constructor
-    // cppcheck-suppress uninitMemberVar
-    DATCONSVDDigit() : DATCONSVDDigit(0, true, 0, APVFloatSamples( {{0, 0, 0, 0, 0, 0}}))
-    {}
-
     /** Getter for the sensor ID. */
     VxdID getSensorID() const { return m_sensorID; }
 
@@ -116,7 +110,7 @@ namespace Belle2 {
     }
 
     /** Getter for the charge of the biggest sample of the array in ADUs. */
-    unsigned short getMaxSampleCharge()
+    unsigned short getMaxSampleCharge() const
     {
       unsigned short maxCharge = 0;
       for (unsigned int i = 0; i < c_nAPVSamples; i++) {

@@ -54,8 +54,8 @@ void ROICalculator::initialize()
 
 }
 
-void ROICalculator::apply(std::vector<std::pair<VxdID, long>>& uExtrapolations,
-                          std::vector<std::pair<VxdID, long>>& vExtrapolations)
+void ROICalculator::apply(const std::vector<std::pair<VxdID, long>>& uExtrapolations,
+                          const std::vector<std::pair<VxdID, long>>& vExtrapolations)
 {
   /** Reminder: 250 px in u-direction = r-phi, in total 768 (512+256) px in v-direction = z */
   const unsigned short uCells = 250, vCells = 768;

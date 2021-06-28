@@ -22,11 +22,11 @@ namespace Belle2 {
   /**
    * Select hits to be analysed in the Hough Space intercept finder for a given layer 6 sensor based on the simple sensor friend map.
    */
-  class HitSelector : public TrackFindingCDC::Findlet<HitData, VxdID, HitData*> {
+  class HitSelector : public TrackFindingCDC::Findlet<HitData, const VxdID, HitData*> {
 
   public:
     /// Load the hits in a sensor friend list for a given L6 sensor from hits and store them in selectedHits, which then are used for the Hough trafo and intercept finding
-    void apply(std::vector<HitData>& hits, std::vector<VxdID>& friendSensorList,
+    void apply(std::vector<HitData>& hits, const std::vector<VxdID>& friendSensorList,
                std::vector<HitData*>& selectedHits) override
     {
       const unsigned short sensorInLayerSixLadder = friendSensorList.back().getSensorNumber();

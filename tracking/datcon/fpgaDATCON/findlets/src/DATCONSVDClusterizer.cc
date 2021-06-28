@@ -60,7 +60,7 @@ void DATCONSVDClusterizer::exposeParameters(ModuleParamList* moduleParamList, co
 
 void DATCONSVDClusterizer::beginRun()
 {
-  svdNoiseMap.clear();
+  m_svdNoiseMap.clear();
   fillDATCONSVDNoiseMap();
 }
 
@@ -70,15 +70,14 @@ void DATCONSVDClusterizer::initialize()
 
   if (m_param_saveClusterToDataStore) {
     m_storeSVDClusters.registerInDataStore(m_param_storeSVDClustersName);
-    m_param_storeSVDClustersName = m_storeSVDClusters.getName();
   }
 }
 
-void DATCONSVDClusterizer::apply(std::vector<DATCONSVDDigit>& digits, std::vector<SVDCluster>& clusters)
+void DATCONSVDClusterizer::apply(const std::vector<DATCONSVDDigit>& digits, std::vector<SVDCluster>& clusters)
 {
   if (digits.size() == 0) return;
 
-  clusterCandidate clusterCand;
+  ClusterCandidate clusterCand;
 
   // create a dummy cluster just to start
   clusterCand.vxdID = digits.at(0).getSensorID();
@@ -99,7 +98,7 @@ void DATCONSVDClusterizer::apply(std::vector<DATCONSVDDigit>& digits, std::vecto
     if (! clusterCand.add(thisSensorID, thisCharge, thisCellID, stripSNR, m_param_maxiClusterSize)) {
       //if the strip is not added, write the cluster, if present and good:
       if (clusterCand.strips.size() > 0) {
-        const VXD::SensorInfoBase& info = geoCache.getSensorInfo(clusterCand.vxdID);
+        const VXD::SensorInfoBase& info = m_geoCache.getSensorInfo(clusterCand.vxdID);
         double pitch = m_param_isU ? info.getUPitch() : info.getVPitch();
         unsigned short numberofStrips = m_param_isU ? info.getUCells() : info.getVCells();
 
@@ -130,7 +129,7 @@ void DATCONSVDClusterizer::apply(std::vector<DATCONSVDDigit>& digits, std::vecto
   //write the last cluster, if good
   if (clusterCand.strips.size() > 0) {
 
-    const VXD::SensorInfoBase& info = geoCache.getSensorInfo(clusterCand.vxdID);
+    const VXD::SensorInfoBase& info = m_geoCache.getSensorInfo(clusterCand.vxdID);
     double pitch = m_param_isU ? info.getUPitch() : info.getVPitch();
     unsigned short numberofStrips = m_param_isU ? info.getUCells() : info.getVCells();
 
@@ -157,11 +156,7 @@ void DATCONSVDClusterizer::apply(std::vector<DATCONSVDDigit>& digits, std::vecto
 
 }
 
-// /*
-// * Simple noise filter.
-// * Run the noise filter over the given numbers of samples.
-// * If it fulfills the requirements true is returned.
-// */
+
 float DATCONSVDClusterizer::calculateSNR(DATCONSVDDigit digit)
 {
   unsigned short maxSampleIndex = digit.getMaxSampleIndex();
@@ -173,14 +168,13 @@ float DATCONSVDClusterizer::calculateSNR(DATCONSVDDigit digit)
 
   // set noise value to default value and only use actual noise if it is too large (> m_param_noiseCut)
   float stripNoise = m_param_noiseCut;
-  if (svdNoiseMap.find(simpleVXDID) != svdNoiseMap.end()) {
-    stripNoise = svdNoiseMap.at(simpleVXDID);
+  if (m_svdNoiseMap.find(simpleVXDID) != m_svdNoiseMap.end()) {
+    stripNoise = m_svdNoiseMap.at(simpleVXDID);
   }
 
   float currentSNR = (float)sample[maxSampleIndex] / stripNoise;
   return currentSNR;
 }
-
 
 
 void DATCONSVDClusterizer::fillDATCONSVDNoiseMap()
@@ -227,7 +221,7 @@ void DATCONSVDClusterizer::fillDATCONSVDNoiseMap()
           }
 
           if (noise > m_param_noiseCut) {
-            svdNoiseMap.insert(std::make_pair(simpleVXDID + strip, noise));
+            m_svdNoiseMap.insert(std::make_pair(simpleVXDID + strip, noise));
             if (m_param_writeNoiseMapsToFile) {
               noiseMap << 4096 * (layer - 3) + 16 * (ladder - 1) + (sensor - 1) << " " << strip << " " << noise << std::endl;
             }

@@ -29,12 +29,12 @@ namespace Belle2 {
    * This finldet only clusters strips on one side.
    * The created SVDClusters can be stored in the DataStore by setting m_param_saveClusterToDataStore to true.
    */
-  class DATCONSVDClusterizer : public TrackFindingCDC::Findlet<DATCONSVDDigit, SVDCluster> {
+  class DATCONSVDClusterizer : public TrackFindingCDC::Findlet<const DATCONSVDDigit, SVDCluster> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<DATCONSVDDigit, SVDCluster>;
+    using Super = TrackFindingCDC::Findlet<const DATCONSVDDigit, SVDCluster>;
 
     /** Simple representation of a SVD Noise Map */
-    typedef std::map<int, float> simpleSVDNoiseMap;
+    typedef std::map<int, float> SimpleSVDNoiseMap;
 
   public:
     /// Cluster SVD strips
@@ -50,7 +50,7 @@ namespace Belle2 {
     void beginRun() override;
 
     /// Load in the DATCONSVDDigits and create SVDClusters from them
-    void apply(std::vector<DATCONSVDDigit>& digits, std::vector<SVDCluster>& clusters) override;
+    void apply(const std::vector<DATCONSVDDigit>& digits, std::vector<SVDCluster>& clusters) override;
 
   private:
     /// fill the noise map to be used for SNR cuts
@@ -66,7 +66,7 @@ namespace Belle2 {
 
     // Parameters
     /// Simple noise map for u-strips*/
-    simpleSVDNoiseMap svdNoiseMap;
+    SimpleSVDNoiseMap m_svdNoiseMap;
 
     /// File name for a file containing the noise of the strips for export to FPGA
     std::string m_param_noiseMapfileName = "noiseMap.txt";
@@ -92,14 +92,14 @@ namespace Belle2 {
     float m_param_requiredSNRcluster = 5;
 
     /// instance of GeoCache to avoid creating it again for every cluster
-    const VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
+    const VXD::GeoCache& m_geoCache = VXD::GeoCache::getInstance();
 
     /// struct containing a cluster candidate for easier handling
-    struct clusterCandidate {
+    struct ClusterCandidate {
       VxdID vxdID = 0; /**< VxdID of the cluster */
       std::vector<unsigned short> strips; /**< Vector containing strips (DATCONSVDDigits) that are added */
       std::vector<unsigned short> charges; /**< Vector containing the charges of the corresponding strips that are added */
-      float maxSNRinClusterCandidate; /**< Maximum SNR of all the strips in the cluster candidate */
+      float maxSNRinClusterCandidate = 0; /**< Maximum SNR of all the strips in the cluster candidate */
 
       int charge = 0; /**< Charge of the cluster */
       int seedStripIndex = 0; /**< Index of the seed strip of the cluster (0...m_Size) */
@@ -124,12 +124,11 @@ namespace Belle2 {
         // add if it's the first strip
         if (strips.size() == 0) added = true;
 
-        /**add if it adjacent to the last strip added
-        * (we assume that SVDRecoDigits are ordered)
-        * and if cluster size would still be <= 4 strips
-        */
-        if (strips.size() > 0 and nextCellID == strips.back() + 1 and strips.size() < maxClusterSize)
+        // add if it adjacent to the last strip added (we assume that SVDRecoDigits are ordered)
+        // and if cluster size would still be <= 4 strips
+        if (strips.size() > 0 and nextCellID == strips.back() + 1 and strips.size() < maxClusterSize) {
           added  = true;
+        }
 
         //add it to the vector od strips, update the seed nextCharge and index:
         if (added) {

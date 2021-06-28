@@ -34,7 +34,6 @@ void SVDShaperDigitConverter::initialize()
   Super::initialize();
 
   m_storeSVDShaperDigits.isRequired(m_param_storeSVDShaperDigitsName);
-  m_param_storeSVDShaperDigitsName = m_storeSVDShaperDigits.getName();
 }
 
 void SVDShaperDigitConverter::apply(std::vector<DATCONSVDDigit>& svdUDigits, std::vector<DATCONSVDDigit>& svdVDigits)

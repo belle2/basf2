@@ -50,12 +50,12 @@ void ToPXDExtrapolator::initialize()
 
   if (m_param_createPXDIntercepts) {
     m_pxdIntercepts.registerInDataStore(m_param_PXDInterceptStoreArrayName);
-    m_param_PXDInterceptStoreArrayName = m_pxdIntercepts.getName();
   }
 
 }
 
-void ToPXDExtrapolator::apply(std::vector<std::pair<double, double>>& uTracks, std::vector<std::pair<double, double>>& vTracks,
+void ToPXDExtrapolator::apply(const std::vector<std::pair<double, double>>& uTracks,
+                              const std::vector<std::pair<double, double>>& vTracks,
                               std::vector<std::pair<VxdID, long>>& uExtrapolations, std::vector<std::pair<VxdID, long>>& vExtrapolations)
 {
   VxdID sensorID;

@@ -24,10 +24,10 @@ namespace Belle2 {
   /**
    * Findlet to extrapolate found tracks to the PXD sensors and calculate intercepts.
    */
-  class ToPXDExtrapolator : public TrackFindingCDC::Findlet<std::pair<double, double>, std::pair<double, double>,
+  class ToPXDExtrapolator : public TrackFindingCDC::Findlet<const std::pair<double, double>, const std::pair<double, double>,
     std::pair<VxdID, long>, std::pair<VxdID, long>> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<std::pair<double, double>, std::pair<double, double>,
+    using Super = TrackFindingCDC::Findlet<const std::pair<double, double>, const std::pair<double, double>,
           std::pair<VxdID, long>, std::pair<VxdID, long>>;
 
   public:
@@ -41,7 +41,7 @@ namespace Belle2 {
     void initialize() override;
 
     /// Load in the prepared hits and create tracks for extrapolation to PXD
-    void apply(std::vector<std::pair<double, double>>& uTracks, std::vector<std::pair<double, double>>& vTracks,
+    void apply(const std::vector<std::pair<double, double>>& uTracks, const std::vector<std::pair<double, double>>& vTracks,
                std::vector<std::pair<VxdID, long>>& uExtrapolations, std::vector<std::pair<VxdID, long>>& vExtrapolations) override;
 
   private:

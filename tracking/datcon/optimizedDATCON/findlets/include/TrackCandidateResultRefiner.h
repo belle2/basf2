@@ -43,7 +43,7 @@ namespace Belle2 {
     void beginRun() override;
 
     /// Reject bad SpacePointTrackCands and bad hits inside the remaining
-    void apply(std::vector<SpacePointTrackCand>& unprunedResults, std::vector<SpacePointTrackCand>& prunedResults) override;
+    void apply(std::vector<SpacePointTrackCand>& unrefinedResults, std::vector<SpacePointTrackCand>& refinedResults) override;
 
   private:
     /// Identifier which estimation method to use. Valid identifiers are:

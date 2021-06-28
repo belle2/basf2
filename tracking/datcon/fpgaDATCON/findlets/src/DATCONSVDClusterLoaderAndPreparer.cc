@@ -33,7 +33,7 @@ void DATCONSVDClusterLoaderAndPreparer::initialize()
   Super::initialize();
 }
 
-void DATCONSVDClusterLoaderAndPreparer::apply(std::vector<SVDCluster>& uClusters, std::vector<SVDCluster>& vClusters,
+void DATCONSVDClusterLoaderAndPreparer::apply(const std::vector<SVDCluster>& uClusters, const std::vector<SVDCluster>& vClusters,
                                               std::vector<std::pair<VxdID, std::pair<long, long>>>& uHits,
                                               std::vector<std::pair<VxdID, std::pair<long, long>>>& vHits)
 {
@@ -41,7 +41,6 @@ void DATCONSVDClusterLoaderAndPreparer::apply(std::vector<SVDCluster>& uClusters
     return;
   }
 
-//   for (uint i = 0; i < 8; i++) m_nClusterPerLayer.at(i) = 0;
   m_nClusterPerLayer.fill(0);
 
   for (auto& cluster : uClusters) {

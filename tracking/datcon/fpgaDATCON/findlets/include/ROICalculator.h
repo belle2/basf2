@@ -23,9 +23,9 @@ namespace Belle2 {
   /**
    * Findlet to calculate ROI on the PXD sensors based on input hits
    */
-  class ROICalculator : public TrackFindingCDC::Findlet<std::pair<VxdID, long>, std::pair<VxdID, long>> {
+  class ROICalculator : public TrackFindingCDC::Findlet<const std::pair<VxdID, long>, const std::pair<VxdID, long>> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<std::pair<VxdID, long>, std::pair<VxdID, long>>;
+    using Super = TrackFindingCDC::Findlet<const std::pair<VxdID, long>, const std::pair<VxdID, long>>;
 
   public:
     /// Find intercepts in the 2D Hough space
@@ -38,7 +38,8 @@ namespace Belle2 {
     void initialize() override;
 
     /// Load in the prepared hits and create tracks for extrapolation to PXD
-    void apply(std::vector<std::pair<VxdID, long>>& uExtrapolations, std::vector<std::pair<VxdID, long>>& vExtrapolations) override;
+    void apply(const std::vector<std::pair<VxdID, long>>& uExtrapolations,
+               const std::vector<std::pair<VxdID, long>>& vExtrapolations) override;
 
   private:
 

@@ -102,14 +102,14 @@ void TrackCandidateResultRefiner::beginRun()
   }
 }
 
-void TrackCandidateResultRefiner::apply(std::vector<SpacePointTrackCand>& unprunedResults,
-                                        std::vector<SpacePointTrackCand>& prunedResults)
+void TrackCandidateResultRefiner::apply(std::vector<SpacePointTrackCand>& unrefinedResults,
+                                        std::vector<SpacePointTrackCand>& refinedResults)
 {
-  prunedResults.clear();
+  refinedResults.clear();
   std::vector<SpacePointTrackCand> selectedResults;
-  selectedResults.reserve(unprunedResults.size());
+  selectedResults.reserve(unrefinedResults.size());
   // assign a QI computed using the selected QualityEstimator for each given SpacePointTrackCand
-  for (SpacePointTrackCand& aTrackCandidate : unprunedResults) {
+  for (SpacePointTrackCand& aTrackCandidate : unrefinedResults) {
     double qi = m_estimator->estimateQuality(aTrackCandidate.getSortedHits());
     aTrackCandidate.setQualityIndicator(qi);
 
@@ -123,7 +123,7 @@ void TrackCandidateResultRefiner::apply(std::vector<SpacePointTrackCand>& unprun
 
   // return early if nothing to do
   if (selectedResults.size() <= 1) {
-    std::swap(selectedResults, prunedResults);
+    std::swap(selectedResults, refinedResults);
     return;
   }
 
@@ -135,13 +135,13 @@ void TrackCandidateResultRefiner::apply(std::vector<SpacePointTrackCand>& unprun
   });
 
   std::array<uint, 8> numberOfHitsInCheckedSPTCs{{0, 0, 0, 0, 0, 0, 0, 0}};
-  prunedResults.reserve(selectedResults.size());
+  refinedResults.reserve(selectedResults.size());
   for (auto& currentSPTC : selectedResults) {
     if (numberOfHitsInCheckedSPTCs[currentSPTC.size()] < m_param_maxNumberOfEachPathLength) {
       numberOfHitsInCheckedSPTCs[currentSPTC.size()] += 1;
-      prunedResults.emplace_back(currentSPTC);
+      refinedResults.emplace_back(currentSPTC);
     }
   }
 
-  m_overlapResolver.apply(prunedResults);
+  m_overlapResolver.apply(refinedResults);
 }

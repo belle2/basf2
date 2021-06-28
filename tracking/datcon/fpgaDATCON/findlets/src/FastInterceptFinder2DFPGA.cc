@@ -112,7 +112,7 @@ void FastInterceptFinder2DFPGA::initialize()
           " unitX: " << m_unitX << " unitY: " << m_unitY);
 }
 
-void FastInterceptFinder2DFPGA::apply(std::vector<std::pair<VxdID, std::pair<long, long>>>& hits,
+void FastInterceptFinder2DFPGA::apply(const std::vector<std::pair<VxdID, std::pair<long, long>>>& hits,
                                       std::vector<std::pair<double, double>>& tracks)
 {
   m_SectorArray.assign(m_param_nAngleSectors * m_param_nVerticalSectors, 0);
@@ -144,7 +144,7 @@ void FastInterceptFinder2DFPGA::apply(std::vector<std::pair<VxdID, std::pair<lon
 
 }
 
-void FastInterceptFinder2DFPGA::fastInterceptFinder2d(std::vector<std::pair<VxdID, std::pair<long, long>>>& hits,
+void FastInterceptFinder2DFPGA::fastInterceptFinder2d(const std::vector<std::pair<VxdID, std::pair<long, long>>>& hits,
                                                       uint xmin, uint xmax, uint ymin, uint ymax, uint currentRecursion)
 {
   std::vector<std::pair<VxdID, std::pair<long, long>>> containedHits;
@@ -347,7 +347,7 @@ void FastInterceptFinder2DFPGA::DepthFirstSearch(uint lastIndexX, uint lastIndex
   }
 }
 
-void FastInterceptFinder2DFPGA::gnuplotoutput(std::vector<std::pair<VxdID, std::pair<long, long>>>& hits)
+void FastInterceptFinder2DFPGA::gnuplotoutput(const std::vector<std::pair<VxdID, std::pair<long, long>>>& hits)
 {
   std::ofstream hsoutstream;
   hsoutstream.open(m_param_gnuplotHSOutputFileName.c_str(), std::ios::trunc);

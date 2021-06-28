@@ -27,9 +27,9 @@ namespace Belle2 {
    * fastInterceptFinder2d.
    */
   class FastInterceptFinder2DFPGA : public
-    TrackFindingCDC::Findlet<std::pair<VxdID, std::pair<long, long>>, std::pair<double, double>> {
+    TrackFindingCDC::Findlet<const std::pair<VxdID, std::pair<long, long>>, std::pair<double, double>> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<std::pair<VxdID, std::pair<long, long>>, std::pair<double, double>>;
+    using Super = TrackFindingCDC::Findlet<const std::pair<VxdID, std::pair<long, long>>, std::pair<double, double>>;
 
   public:
     /// Find intercepts in the 2D Hough space
@@ -42,11 +42,12 @@ namespace Belle2 {
     void initialize() override;
 
     /// Load in the prepared hits and create tracks for extrapolation to PXD
-    void apply(std::vector<std::pair<VxdID, std::pair<long, long>>>& hits, std::vector<std::pair<double, double>>& tracks) override;
+    void apply(const std::vector<std::pair<VxdID, std::pair<long, long>>>& hits,
+               std::vector<std::pair<double, double>>& tracks) override;
 
   private:
 
-    /// convert float to long int for more similarity to the FPGA implementation
+    /// Convert float to long int for more similarity to the FPGA implementation
     /// @param value to be converted
     /// @param power multiply value by 10^power
     inline long convertToInt(double value, int power)
@@ -55,8 +56,8 @@ namespace Belle2 {
       return round(factor * value);
     }
 
-    /// layer filter, checks if at least hits from 3 layers are in a set of hits
-    /// @param layer bool-vector containing information whether there as a hit in a layer
+    /// Layer filter, checks if at least hits from 3 layers are in a set of hits
+    /// @param layer bool-vector containing information whether there is a hit in a layer
     inline unsigned short layerFilter(std::vector<bool> layer)
     {
       uint layercount = std::count(layer.begin(), layer.end(), true);
@@ -71,7 +72,7 @@ namespace Belle2 {
     /// @param ymin minimum y-index of the sub-Hough Space in the current recursion step
     /// @param ymax maximum y-index of the sub-Hough Space in the current recursion step
     /// @param currentRecursion current recursion step, has to be < m_maxRecursionLevel
-    void fastInterceptFinder2d(std::vector<std::pair<VxdID, std::pair<long, long>>>& hits,
+    void fastInterceptFinder2d(const std::vector<std::pair<VxdID, std::pair<long, long>>>& hits,
                                uint xmin, uint xmax, uint ymin, uint ymax, uint currentRecursion);
 
     /// Find Hough Space clusters. Looop over all found sectors in m_SectorArray and then calls
@@ -84,7 +85,7 @@ namespace Belle2 {
     void DepthFirstSearch(uint lastIndexX, uint lastIndexY);
 
     /// gnuplot output for debugging
-    void gnuplotoutput(std::vector<std::pair<VxdID, std::pair<long, long>>>& hits);
+    void gnuplotoutput(const std::vector<std::pair<VxdID, std::pair<long, long>>>& hits);
 
     // Parameters
     /// Is this the intercept finder for the u-side hits (r-phi) or v-side (r-z)?

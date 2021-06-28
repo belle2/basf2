@@ -26,10 +26,10 @@ namespace Belle2 {
    * of coordinates for finding track candidates in r-phi and r-z.
    */
   class DATCONSVDClusterLoaderAndPreparer : public
-    TrackFindingCDC::Findlet<SVDCluster, SVDCluster, std::pair<VxdID, std::pair<long, long>>,
+    TrackFindingCDC::Findlet<const SVDCluster, const SVDCluster, std::pair<VxdID, std::pair<long, long>>,
         std::pair<VxdID, std::pair<long, long>>> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<SVDCluster, SVDCluster, std::pair<VxdID, std::pair<long, long>>,
+    using Super = TrackFindingCDC::Findlet<const SVDCluster, const SVDCluster, std::pair<VxdID, std::pair<long, long>>,
           std::pair<VxdID, std::pair<long, long>>>;
 
   public:
@@ -44,7 +44,7 @@ namespace Belle2 {
 
     /// Load the SVDClusters and create two vectors containing the hits prepared for intercept finding
     /// This function takes uClusters and vClusters as distinct vectors which where created by the DATCONSVDClusterizer findlet
-    void apply(std::vector<SVDCluster>& uClusters, std::vector<SVDCluster>& vClusters,
+    void apply(const std::vector<SVDCluster>& uClusters, const std::vector<SVDCluster>& vClusters,
                std::vector<std::pair<VxdID, std::pair<long, long>>>& uHits,
                std::vector<std::pair<VxdID, std::pair<long, long>>>& vHits) override;
 

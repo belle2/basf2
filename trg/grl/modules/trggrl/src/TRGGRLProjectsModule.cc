@@ -646,6 +646,8 @@ void TRGGRLProjectsModule::event()
   //3D Bhabha selection theta flag: 87-88
   bool bha_theta_0 = (ECLtoGDL[2] & (1 << (87 - 32 * 2))) != 0;
   bool bha_theta_1 = (ECLtoGDL[2] & (1 << (88 - 32 * 2))) != 0;
+  //ecltaub2b
+  bool ecltaub2b = (ECLtoGDL[2] & (1 << (89 - 32 * 2))) != 0;
 
   //---------------------------------------------------------------------
   //..Other input bits
@@ -863,6 +865,7 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "ecl_lml_13") {bit = ecl_lml_13;}
     else if (bitname == "ecl_mumu") {bit = ecl_mumu;}
     else if (bitname == "ecl_bst") {bit = ecl_bst;}
+    else if (bitname == "ecl_taub2b") {bit = ecltaub2b;}
     else if (bitname == "klm_hit") {bit = klm_hit;}
     else if (bitname == "klm_0") {bit = klm_0;}
     else if (bitname == "klm_1") {bit = klm_1;}

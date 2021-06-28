@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
 #pragma once
 
 #include <framework/gearbox/Const.h>
@@ -16,18 +17,21 @@
 namespace Belle2 {
 
   /**
-     * Storage element for the eventwise T0 estimation computed on HLT.
-     * It can store a float value with uncertainty together with the detector component.
-     */
+   * Storage element for the eventwise T0 estimation computed on HLT.
+   * It can store a float value with uncertainty together with the detector component.
+   */
   class OnlineEventT0 : public TObject {
 
   public:
 
+    /** default constructor */
+    OnlineEventT0() {}
+
     /** Constructor.
-         * @param eventT0 EventT0 computed on HLT
-         * @param eventT0Uncertainty uncertainity on EventT0 computed on HLT
-         * @param detector detector which provided the EventT0
-         */
+     * @param eventT0 EventT0 computed on HLT
+     * @param eventT0Uncertainty uncertainity on EventT0 computed on HLT
+     * @param detector detector which provided the EventT0
+     */
     OnlineEventT0(float eventT0, float eventT0Uncertainty, const Const::DetectorSet& detector)
       : m_eventT0(eventT0)
       , m_eventT0Uncertainty(eventT0Uncertainty)

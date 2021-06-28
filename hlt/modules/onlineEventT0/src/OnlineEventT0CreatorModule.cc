@@ -41,7 +41,7 @@ void OnlineEventT0CreatorModule::event()
     return;
   }
 
-  if (m_onlineEventT0.isValid()) {
+  if (m_onlineEventT0.getEntries() > 0) {
     B2DEBUG(20, "OnlineEventT0 object already present, do nothing");
     return;
   }
@@ -54,7 +54,7 @@ void OnlineEventT0CreatorModule::event()
   } else {
     // get the most accurate TOP eventT0 (there is only one)
     const auto topBestT0 = topHypos.back();
-    m_onlineEventT0.appendNew(topBestT0.eventT0, topBestT0.eventT0Uncertainty, Const::EDetector::TOP);
+    m_onlineEventT0.appendNew(OnlineEventT0(topBestT0.eventT0, topBestT0.eventT0Uncertainty, Const::EDetector::TOP));
   }
 
   // check if a CDC hypothesis exists
@@ -65,7 +65,7 @@ void OnlineEventT0CreatorModule::event()
   } else {
     // get the most accurate CDC evenT0 (latest)
     const auto cdcBestT0 = cdcHypos.back();
-    m_onlineEventT0.appendNew(cdcBestT0.eventT0, cdcBestT0.eventT0Uncertainty, Const::EDetector::CDC);
+    m_onlineEventT0.appendNew(OnlineEventT0(cdcBestT0.eventT0, cdcBestT0.eventT0Uncertainty, Const::EDetector::CDC));
   }
 
 
@@ -84,7 +84,8 @@ void OnlineEventT0CreatorModule::event()
         bestECL_idx = i ;
       }
     }
-    m_onlineEventT0.appendNew(eclHypos[bestECL_idx].eventT0, eclHypos[bestECL_idx].eventT0Uncertainty, Const::EDetector::ECL);
+    m_onlineEventT0.appendNew(OnlineEventT0(eclHypos[bestECL_idx].eventT0, eclHypos[bestECL_idx].eventT0Uncertainty,
+                                            Const::EDetector::ECL));
 
   }
 

@@ -2,13 +2,14 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
- * This module performs the correction for EM shower leakage              *
+ * This module performs the correction for EM shower leakage, beam        *
+ * backgrounds, and clustering                                            *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
  *               Alon Hershenhorn (hersehn@physics.ubc.ca)                *
  *               Suman Koirala (suman@ntu.edu.tw)                         *
- *               Christopher Hearty (hearty@physics.ubc.ca                *
+ *               Christopher Hearty (hearty@physics.ubc.ca)               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -43,7 +44,7 @@ ECLShowerCorrectorModule::ECLShowerCorrectorModule() : Module(),
 {
 
   // Set description
-  setDescription("ECLShowerCorrectorModule: Corrects energy of ECLShowers and highest energy crystal for shower leakage");
+  setDescription("ECLShowerCorrectorModule: Corrects energy of ECLShowers and highest energy crystal for shower leakage, beam backgrounds, and clustering");
   setPropertyFlags(c_ParallelProcessingCertified);
 
 }

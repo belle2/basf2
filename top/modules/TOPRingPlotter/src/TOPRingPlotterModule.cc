@@ -37,7 +37,6 @@
 #include <framework/logging/Logger.h>
 
 // DataStore classes
-#include <framework/dataobjects/EventMetaData.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPLikelihood.h>
@@ -337,8 +336,6 @@ void TOPRingPlotterModule::event()
 {
   TOPRecoManager::setTimeWindow(0, 100);
 
-  StoreObjPtr<EventMetaData> evtMetaData;
-  StoreArray<Track> tracks;
   StoreArray<TOPDigit> digits;
   StoreObjPtr<ParticleList> particles(m_particleList);
 

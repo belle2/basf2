@@ -86,6 +86,7 @@ void KLMUnpackerModule::beginRun()
   if (!m_FEEParameters.isValid())
     B2FATAL("KLM scintillator FEE parameters are not available.");
   m_triggerCTimeOfPreviousEvent = 0;
+  m_Time.updateConstants();
 }
 
 void KLMUnpackerModule::createDigit(

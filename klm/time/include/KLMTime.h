@@ -41,6 +41,28 @@ namespace Belle2 {
     }
 
     /**
+     * Update constants from database objects. This function needs to be called
+     * when database objects change, for example, at the beginning of the run.
+     */
+    void updateConstants();
+
+    /**
+     * Get TDC period.
+     */
+    double getTDCPeriod() const
+    {
+      return m_TDCPeriod;
+    }
+
+    /**
+     * Get CTIME period.
+     */
+    double getCTimePeriod() const
+    {
+      return m_CTimePeriod;
+    }
+
+    /**
      * Get time for scintillator.
      * @param[in] ctime        CTIME.
      * @param[in] triggerCTime Trigger CTIME.
@@ -74,6 +96,15 @@ namespace Belle2 {
 
     /** Hardware clock settings. */
     DBObjPtr<HardwareClockSettings> m_HardwareClockSettings;
+
+    /**
+     * TDC period (stored here because getting it from m_HardwareClockSettings
+     * requires to search in a map).
+     */
+    double m_TDCPeriod;
+
+    /** CTIME period. */
+    double m_CTimePeriod;
 
   };
 

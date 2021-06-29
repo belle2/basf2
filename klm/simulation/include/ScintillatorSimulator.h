@@ -16,6 +16,7 @@
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMScintillatorFEEData.h>
 #include <klm/simulation/ScintillatorFirmware.h>
+#include <klm/time/KLMTime.h>
 
 /* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
@@ -195,6 +196,9 @@ namespace Belle2 {
 
       /** Hardware clock settings. */
       DBObjPtr<HardwareClockSettings> m_HardwareClockSettings;
+
+      /** Time. */
+      KLMTime m_Time;
 
       /** Parameters. */
       const KLMScintillatorDigitizationParameters* m_DigPar;

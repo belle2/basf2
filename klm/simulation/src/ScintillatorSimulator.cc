@@ -83,8 +83,8 @@ KLM::ScintillatorSimulator::ScintillatorSimulator(
   m_SiPMMCTime(-1)
 {
   int i;
-  const double samplingTime = m_DigPar->getADCSamplingTDCPeriods() /
-                              m_HardwareClockSettings->getKLMTDCFrequency();
+  const double samplingTime = m_DigPar->getADCSamplingTDCPeriods() *
+                              m_Time.getTDCPeriod();
   /* cppcheck-suppress variableScope */
   double time, attenuationTime;
   m_histRange = m_DigPar->getNDigitizations() * samplingTime;
@@ -340,8 +340,8 @@ void KLM::ScintillatorSimulator::generatePhotoelectrons(
   double stripLen, double distSiPM, int nPhotons, double timeShift,
   bool isReflected)
 {
-  const double samplingTime = m_DigPar->getADCSamplingTDCPeriods() /
-                              m_HardwareClockSettings->getKLMTDCFrequency();
+  const double samplingTime = m_DigPar->getADCSamplingTDCPeriods() *
+                              m_Time.getTDCPeriod();
   const double maxHitTime = m_DigPar->getNDigitizations() * samplingTime;
   int i;
   /* cppcheck-suppress variableScope */
@@ -398,8 +398,8 @@ void KLM::ScintillatorSimulator::generatePhotoelectrons(
  * t0 * exp(-(t1 - tau) / t0) - t0 * exp(-(t2 - tau) / t0).
  *
  * The integration is performed over digitization bins from (t_dig * i) to
- * (t_dig * (i + 1)), where t_dig = m_DigPar->ADCSamplingTDCPeriods() /
- * m_HardwareClockSettings->getKLMTDCFrequency() and i is the bin number.
+ * (t_dig * (i + 1)), where t_dig = m_DigPar->ADCSamplingTDCPeriods() *
+ * m_Time->getTDCPeriod() and i is the bin number.
  * The integrals are
  *
  * I1 = t0 - t0 * exp(-(t_dig * (i + 1) - tau) / t0)

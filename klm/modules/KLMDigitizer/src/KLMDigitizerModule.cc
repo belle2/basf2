@@ -121,6 +121,7 @@ void KLMDigitizerModule::beginRun()
     B2FATAL("KLM strip efficiency data are not available.");
   if (m_ChannelSpecificSimulation)
     checkScintillatorFEEParameters();
+  m_Time.updateConstants();
   m_Fitter = new KLM::ScintillatorFirmware(m_DigPar->getNDigitizations());
 }
 
@@ -151,8 +152,7 @@ void KLMDigitizerModule::digitizeBKLM()
   int tdc;
   KLM::ScintillatorSimulator simulator(
     &(*m_DigPar), m_Fitter,
-    m_DigitizationInitialTime /
-    m_HardwareClockSettings->getGlobalClockFrequency(), m_Debug);
+    m_DigitizationInitialTime * m_Time.getCTimePeriod(), m_Debug);
   const KLMScintillatorFEEData* FEEData;
   std::multimap<uint16_t, const BKLMSimHit*>::iterator it, it2, ub;
   for (it = m_bklmSimHitChannelMap.begin(); it != m_bklmSimHitChannelMap.end();
@@ -232,8 +232,7 @@ void KLMDigitizerModule::digitizeEKLM()
   uint16_t tdc;
   KLM::ScintillatorSimulator simulator(
     &(*m_DigPar), m_Fitter,
-    m_DigitizationInitialTime /
-    m_HardwareClockSettings->getGlobalClockFrequency(), m_Debug);
+    m_DigitizationInitialTime * m_Time.getCTimePeriod(), m_Debug);
   const KLMScintillatorFEEData* FEEData;
   std::multimap<uint16_t, const EKLMSimHit*>::iterator it, ub;
   for (it = m_eklmSimHitChannelMap.begin(); it != m_eklmSimHitChannelMap.end();

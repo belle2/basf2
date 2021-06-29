@@ -56,14 +56,6 @@ namespace Belle2 {
     double getAcceleratorRF() const;
 
     /**
-     * Get KLM TDC frequency (= global clock * 8 = RF clock * 2).
-     */
-    double getKLMTDCFrequency() const
-    {
-      return m_acceleratorRF * 2;
-    }
-
-    /**
      * Set the prescale value used to derive a detector clock from the global clock frequency.
      * @param detector The ID of the detector.
      * @param label The label for the clock.

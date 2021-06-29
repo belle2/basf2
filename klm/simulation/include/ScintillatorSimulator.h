@@ -20,7 +20,6 @@
 
 /* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
-#include <framework/dbobjects/HardwareClockSettings.h>
 
 namespace Belle2 {
 
@@ -193,9 +192,6 @@ namespace Belle2 {
        * Debug output (signal and fit result histograms).
        */
       void debugOutput();
-
-      /** Hardware clock settings. */
-      DBObjPtr<HardwareClockSettings> m_HardwareClockSettings;
 
       /** Time. */
       const KLMTime* m_Time;

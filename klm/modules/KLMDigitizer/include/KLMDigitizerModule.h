@@ -26,7 +26,6 @@
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/dbobjects/HardwareClockSettings.h>
 
 namespace Belle2 {
 
@@ -126,9 +125,6 @@ namespace Belle2 {
 
     /** Strip efficiency. */
     DBObjPtr<KLMStripEfficiency> m_StripEfficiency;
-
-    /** Hardware clock settings. */
-    DBObjPtr<HardwareClockSettings> m_HardwareClockSettings;
 
     /** Time conversion. */
     KLMTime* m_Time;

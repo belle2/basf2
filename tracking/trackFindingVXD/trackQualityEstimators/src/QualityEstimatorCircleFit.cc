@@ -114,10 +114,10 @@ double QualityEstimatorCircleFit::estimateQuality(std::vector<SpacePoint const*>
   // Estimating theta of the track with the theta of the innermost hit.
   // Otherwise the track is solely a circle without theta information.
   double innermostHitTheta = 0.;
-  double innermostHitRadiusSpared = 100000000;
+  double innermostHitRadiusSquared = 100000000;
   for (const SpacePoint* hit : measurements) {
-    if (hit->getPosition().Perp2() < innermostHitRadiusSpared) {
-      innermostHitRadiusSpared = hit->getPosition().Perp2();
+    if (hit->getPosition().Perp2() < innermostHitRadiusSquared) {
+      innermostHitRadiusSquared = hit->getPosition().Perp2();
       innermostHitTheta = hit->getPosition().Theta();
     }
   }

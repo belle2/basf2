@@ -10,6 +10,7 @@ clocks.setAcceleratorRF(508.887e-3)
 clocks.setClockPrescale(Belle2.Const.EDetector.TOP, "sampling", 6)
 clocks.setClockPrescale(Belle2.Const.EDetector.SVD, "sampling", 4)
 clocks.setClockPrescale(Belle2.Const.EDetector.ECL, "sampling", 3 * 24)
+clocks.setClockPrescale(Belle2.Const.EDetector.KLM, "TDC", 0.125)
 
 iov = Belle2.IntervalOfValidity.always()
 db = Belle2.Database.Instance()

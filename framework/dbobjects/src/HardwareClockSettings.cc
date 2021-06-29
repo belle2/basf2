@@ -33,7 +33,7 @@ bool HardwareClockSettings::isFrequencyAvailable(Const::EDetector detector, std:
   else return true;
 }
 
-Double_t  HardwareClockSettings::getClockFrequency(Const::EDetector detector, std::string label) const
+double HardwareClockSettings::getClockFrequency(Const::EDetector detector, std::string label) const
 {
   bool isDetectorInPrescaleMap = true;
 
@@ -51,17 +51,17 @@ Double_t  HardwareClockSettings::getClockFrequency(Const::EDetector detector, st
   return std::numeric_limits<float>::quiet_NaN();
 }
 
-Double_t  HardwareClockSettings::getGlobalClockFrequency() const
+double HardwareClockSettings::getGlobalClockFrequency() const
 {
   return  m_acceleratorRF / 4.;
 }
 
-Double_t  HardwareClockSettings::getAcceleratorRF() const
+double HardwareClockSettings::getAcceleratorRF() const
 {
   return  m_acceleratorRF;
 }
 
-Int_t HardwareClockSettings::getClockPrescale(Const::EDetector detector, std::string label) const
+double HardwareClockSettings::getClockPrescale(Const::EDetector detector, std::string label) const
 {
   if (m_prescaleMap.find(detector) == m_prescaleMap.end()) B2ERROR("No clocks available for " << Const::parseDetectors(detector));
   else if (m_prescaleMap.at(detector).find(label) != m_prescaleMap.at(detector).end())
@@ -82,7 +82,7 @@ void HardwareClockSettings::setClockFrequency(const Const::EDetector detector, s
   m_clocksMap[detector][label] = frequency;
 }
 
-void HardwareClockSettings::setAcceleratorRF(Double_t acceleratorRF)
+void HardwareClockSettings::setAcceleratorRF(double acceleratorRF)
 {
   m_acceleratorRF = acceleratorRF;
 }

@@ -612,10 +612,9 @@ To run the full workflow, the wrapper contains the following piece of code:
 
 .. code-block:: python3
 
-        yield MergeOutputsTask(
-            mode="Merging",
+        yield FEITrainingTask(
+            mode="Training",
             stage=6,
-            ncpus=luigi.get_setting("local_cpus"),
         )
 
 For testing purposes, feel free to change it to a different step in the workflow. Examples are given as comments within the ``ProduceStatisticsTask`` module. Please also note, that the

@@ -49,6 +49,7 @@
 //                   |      1 |  85 downto 84 | event timing quality flag
 //                   |      1 |         86    | 3D Bhabha Veto Intrk
 //                   |      1 |  88 downto 87 | 3D Bhabha selection theta flag
+//                   |      1 |         89    | ecltaub2b for 1x1 tau process (110<delta phi(CM)<250, 130<Thata Sum(CM)<230, Etot1to17(Lab)<7GeV, E(1CL)(Lab)<1.9GeV)
 // ---------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------

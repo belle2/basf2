@@ -617,7 +617,7 @@ namespace Belle2 {
 
       // And check if the stored data is valid
       if (TTDInfo->isValid()) {
-        return TTDInfo->hasInjection() > 0.5 ? 1 : 0;
+        return TTDInfo->hasInjection();
       } else {
         return std::numeric_limits<float>::quiet_NaN();
       }
@@ -671,7 +671,7 @@ namespace Belle2 {
 
       // And check if the stored data is valid and if an injection happened recently
       if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
-        return TTDInfo->isHER() > 0.5 ? 1 : 0;
+        return TTDInfo->isHER();
       } else {
         return std::numeric_limits<float>::quiet_NaN();
       }
@@ -689,7 +689,7 @@ namespace Belle2 {
 
       // And check if the stored data is valid
       if (TTDInfo->isValid()) {
-        return TTDInfo->isRevo2() > 0.5 ? 1 : 0;
+        return TTDInfo->isRevo2();
       } else {
         return std::numeric_limits<float>::quiet_NaN();
       }

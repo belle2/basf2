@@ -29,16 +29,12 @@ TTDUnpackerModule::TTDUnpackerModule() : Module(),  m_EventLevelTriggerTimeInfo(
   setDescription("TTD Unpacker, unpacks first RawFTSW object");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("EventLevelTriggerTimeInfoName", m_EventLevelTriggerTimeInfoName,
-           "The name of the StoreArray of TTD to be processed (RawFTSW)",
-           std::string(""));
 }
 
 void TTDUnpackerModule::initialize()
 {
   m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
-  m_EventLevelTriggerTimeInfo.registerInDataStore(m_EventLevelTriggerTimeInfoName,
-                                                  DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
+  m_EventLevelTriggerTimeInfo.registerInDataStore(DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
 }
 
 void TTDUnpackerModule::event()

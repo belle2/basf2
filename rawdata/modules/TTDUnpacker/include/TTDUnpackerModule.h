@@ -35,8 +35,6 @@ namespace Belle2 {
     /** Output object for TTD mdst object */
     StoreObjPtr<EventLevelTriggerTimeInfo> m_EventLevelTriggerTimeInfo;
 
-    std::string m_EventLevelTriggerTimeInfoName;  /**< The name of the StoreArray of filled EventLevelTriggerTimeInfo */
-
     void initialize() override final; /**< initialize function */
 
     void event() override final; /**< event function */

@@ -57,7 +57,7 @@ void OnlineEventT0CreatorModule::event()
   }
 
   // check if a CDC hypothesis exists
-  auto cdcHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC)
+  auto cdcHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
   if (cdcHypos.size() == 0) {
     B2DEBUG(20, "No CDC EventT0 available");
   } else {

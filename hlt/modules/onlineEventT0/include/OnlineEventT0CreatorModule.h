@@ -39,13 +39,11 @@ namespace Belle2 {
      * takes place in this method. */
     void event() override;
 
-    /* StoreArray of OnlineEventT0*/
+    /** StoreArray of OnlineEventT0 */
     StoreArray<OnlineEventT0> m_onlineEventT0;
 
-    /* StoreArray of EventT0*/
+    /** StoreArray of EventT0*/
     StoreObjPtr<EventT0> m_eventT0;
-
-  private:
 
   };
 } // Belle2 namespace

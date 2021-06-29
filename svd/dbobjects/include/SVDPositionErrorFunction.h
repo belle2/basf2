@@ -27,7 +27,7 @@ namespace Belle2 {
     typedef double (SVDPositionErrorFunction::*posErrFunction)(double, int) const;
 
     /** returns the position error, depending on the cluster SNR and size*/
-    double positionError(double snr, int size) const
+    double getPositionError(double snr, int size) const
     {
       posErrFunction f = m_implementations[m_current];
       return (this->*f)(snr, size) ;
@@ -95,6 +95,16 @@ namespace Belle2 {
         for (int i = 0; i < maxClusterSize; i++)
           m_c1[i] = c1[i];
     }
+    /** set the cluster size dependent scaleFactors*/
+    void set_scaleFactor(double* scaleFactor, int maxSize)
+    {
+      if (maxSize != maxClusterSize)
+        B2ERROR("please provide the scaleFactors for exactly a max cluster size = " << maxClusterSize <<
+                ", i.e. >= " << maxClusterSize << "share the same scale factor");
+      else
+        for (int i = 0; i < maxClusterSize; i++)
+          m_scaleFactor[i] = scaleFactor[i];
+    }
 
 
     /** copy constructor */
@@ -109,7 +119,7 @@ namespace Belle2 {
     static const int maxClusterSize = 5;
 
     /** scale factors */
-    float m_scaleFactor[ maxClusterSize ] = {1};
+    float m_scaleFactor[ maxClusterSize ] = {1, 1, 1, 1, 1};
 
     /** function parameters & implementations*/
 

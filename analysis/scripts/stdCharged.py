@@ -12,6 +12,7 @@ Const = Belle2.Const
 # define arrays to interpret cut matrix
 _chargednames = ['pi', 'K', 'p', 'e', 'mu']
 _pidnames = ['pionID', 'kaonID', 'protonID', 'electronID', 'muonID']
+_stdnames = ['all', 'loose', 'loosepid', 'good', 'higheff']
 _effnames = ['95eff', '90eff', '85eff']
 # default particle list for stdPi() and similar functions
 _defaultlist = 'good'
@@ -165,6 +166,14 @@ def stdLep(pdgId, listtype, method, classification, path=None):
     if pdgId not in (Const.electron.getPDGCode(), Const.muon.getPDGCode()):
         b2.B2FATAL(f"{pdgId} is not that of a light charged lepton.")
 
+    available_methods = ("likelihood", "bdt")
+    available_classificators = ("global", "binary")
+
+    if method not in available_methods:
+        b2.B2FATAL(f"method: {method}. Must be any of: {available_methods}.")
+    if classification not in available_classificators:
+        b2.B2FATAL(f"classification: {classification}. Must be any of: {available_classificators}.")
+
     pid_variables = {
         "likelihood": {
             "global": "electronID" if pdgId == Const.electron.getPDGCode() else "muonID",
@@ -211,33 +220,45 @@ def stdLep(pdgId, listtype, method, classification, path=None):
     ma.applyCuts(plistname, cut, path=path)
 
 
-def stdE(listtype, method, classification, path=None):
-    """
-    Function to prepare one of several standardized types of electron lists.
+def stdE(listtype, method=None, classification=None, path=None):
+    """ Function to prepare one of several standardized types of electron lists.
     See the documentation of `stdLep` for details.
 
-    Also accepts "all" for the ``listtype`` parameter
-    to return a list of tracks fitted with electron mass hypothesis and no cuts.
+    It also accepts any of the standard definitions:
+
+      - 'all'
+      - 'good'
+      - 'loosepid'
+      - 'loose'
+      - 'higheff'
+
+    for the ``listtype`` parameter to fall back to the `stdCharged` behaviour.
     """
 
-    if listtype == "all":
-        stdCharged("e", "all", path)
+    if listtype in _stdnames:
+        stdCharged("e", listtype, path)
         return
 
     stdLep(Const.electron.getPDGCode(), listtype, method, classification, path=path)
 
 
-def stdMu(listtype, method, classification, path=None):
-    """
-    Function to prepare one of several standardized types of muon lists.
+def stdMu(listtype, method=None, classification=None, path=None):
+    """ Function to prepare one of several standardized types of muon lists.
     See the documentation of `stdLep` for details.
 
-    Also accepts "all" for the ``listtype`` parameter
-    to return a list of tracks fitted with electron mass hypothesis and no cuts.
+    It also accepts any of the standard definitions:
+
+      - 'all'
+      - 'good'
+      - 'loosepid'
+      - 'loose'
+      - 'higheff'
+
+    for the ``listtype`` parameter to fall back to the `stdCharged` behaviour.
     """
 
-    if listtype == "all":
-        stdCharged("mu", "all", path)
+    if listtype in _stdnames:
+        stdCharged("mu", listtype, path)
         return
 
     stdLep(Const.muon.getPDGCode(), listtype, method, classification, path=path)

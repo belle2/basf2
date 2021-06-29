@@ -61,8 +61,8 @@ Variables
  * Added new variables :b2:var:`useParticleRestFrame` and :b2:var:`useRecoilParticleRestFrame` for computing variables in the
    rest frame of a given Particle (or in the rest frame of the recoiling system of a given Particle). If the ParticleList passed
    to these variables contains more than one Particle, only the first one in the list will be considered.
- * The PID variables :b2:var:`electronID`, :b2:var:`binaryPID` (when any input hypothesis is that of an electron)
-   are defined in such a way to exclude the TOP completely. This is due to buggy electron TOP PDFs in release-05 that degrade electron identification performance.
+ * New **temporary** convenience PID variables :b2:var:`electronID_noTOP`, :b2:var:`binaryPID_noTOP` (where any input hypothesis must be that of an electron)
+   are defined in such a way to exclude the TOP completely. These are expected to recover electron identification performance with respect to the standard PID variables, which are affected by buggy electron TOP PDFs in release 5.
 
 Modules
 +++++++

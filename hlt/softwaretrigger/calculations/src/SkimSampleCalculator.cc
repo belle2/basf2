@@ -800,7 +800,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
   double mumuHighMass = 0.;
 
-  if (mumutight == 0 && trackWithMaximumRho && trackWithSecondMaximumRho) {
+  if (trackWithMaximumRho && trackWithSecondMaximumRho) {
     int hasClus = 0;
     double eclE1 = 0., eclE2 = 0.;
 

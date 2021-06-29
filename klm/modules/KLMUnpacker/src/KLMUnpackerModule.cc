@@ -85,8 +85,6 @@ void KLMUnpackerModule::beginRun()
     B2FATAL("KLM electronics map is not available.");
   if (!m_FEEParameters.isValid())
     B2FATAL("KLM scintillator FEE parameters are not available.");
-  if (!m_TimeConversion.isValid())
-    B2FATAL("EKLM time conversion parameters are not available.");
   m_triggerCTimeOfPreviousEvent = 0;
 }
 
@@ -112,8 +110,7 @@ void KLMUnpackerModule::createDigit(
     klmDigitEventInfo->increaseRPCHits();
     float triggerTime = klmDigitEventInfo->getRevo9TriggerWord();
     std::pair<int, double> rpcTimes =
-      m_TimeConversion->getRPCTimes(raw->getCTime(), raw->getTDC(),
-                                    triggerTime);
+      m_Time.getRPCTimes(raw->getCTime(), raw->getTDC(), triggerTime);
     klmDigit->setTime(rpcTimes.second);
   } else {
     /*
@@ -121,7 +118,7 @@ void KLMUnpackerModule::createDigit(
      * trigger ctime.
      */
     klmDigitEventInfo->increaseSciHits();
-    double time = m_TimeConversion->getScintillatorTime(
+    double time = m_Time.getScintillatorTime(
                     raw->getCTime(), klmDigitEventInfo->getTriggerCTime());
     klmDigit->setTime(time);
     uint16_t channelNumber = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);

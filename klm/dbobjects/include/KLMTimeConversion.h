@@ -25,35 +25,23 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    KLMTimeConversion();
+    KLMTimeConversion()
+    {
+    }
 
     /**
      * Destructor.
      */
-    ~KLMTimeConversion();
-
-    /**
-     * Get TDC period.
-     */
-    double getTDCPeriod() const
+    ~KLMTimeConversion()
     {
-      return m_TDCPeriod;
     }
 
     /**
-     * Set TDC frequency.
+     * Get time offset.
      */
-    void setTDCFrequency(double frequency)
+    double getTimeOffset() const
     {
-      m_TDCPeriod = 1.0 / frequency;
-    }
-
-    /**
-     * Get CTIME period.
-     */
-    double getCTimePeriod() const
-    {
-      return m_TDCPeriod * 8;
+      return m_TimeOffset;
     }
 
     /**
@@ -66,6 +54,14 @@ namespace Belle2 {
     }
 
     /**
+     * Get CTIME shift.
+     */
+    int getCTimeShift() const
+    {
+      return m_CTimeShift;
+    }
+
+    /**
      * Set CTIME shift.
      * @param[in] shift Shift in bits.
      */
@@ -74,49 +70,16 @@ namespace Belle2 {
       m_CTimeShift = shift;
     }
 
-    /**
-     * Get time for scintillator.
-     * @param[in] ctime        CTIME.
-     * @param[in] triggerCTime Trigger CTIME.
-     */
-    double getScintillatorTime(int ctime, int triggerCTime) const;
-
-    /**
-     * Get coarse and fine times for RPC.
-     * @param[in] ctime        REVO9 time.
-     * @param[in] tdc          TDC.
-     * @param[in] triggerTime  REVO9 Trigger time.
-     */
-    std::pair<int, double> getRPCTimes(int ctime, int tdc, int triggerTime) const;
-
-    /**
-     * Get time for simulation.
-     * @param[in] tdc          TDC.
-     * @param[in] scintillator Scintillator (true) or RPC (false).
-     */
-    double getTimeSimulation(int tdc, bool scintillator) const;
-
-    /**
-     * Get TDC by time.
-     */
-    uint16_t getTDCByTime(double time) const
-    {
-      return (time - m_TimeOffset) / m_TDCPeriod;
-    }
-
   private:
 
-    /** TDC period in ns. */
-    double m_TDCPeriod;
-
     /** Time offset. */
-    double m_TimeOffset;
+    double m_TimeOffset = 0.0;
 
     /** CTIME shift in bits. */
-    int m_CTimeShift;
+    int m_CTimeShift = 0;
 
     /** Class version, */
-    ClassDef(KLMTimeConversion, 1);
+    ClassDef(KLMTimeConversion, 2);
 
   };
 

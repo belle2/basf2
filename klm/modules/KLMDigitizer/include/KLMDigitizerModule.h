@@ -19,13 +19,14 @@
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMScintillatorFEEParameters.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
-#include <klm/dbobjects/KLMTimeConversion.h>
 #include <klm/simulation/ScintillatorFirmware.h>
+#include <klm/time/KLMTime.h>
 
 /* Belle 2 headers. */
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 
 namespace Belle2 {
 
@@ -126,8 +127,11 @@ namespace Belle2 {
     /** Strip efficiency. */
     DBObjPtr<KLMStripEfficiency> m_StripEfficiency;
 
+    /** Hardware clock settings. */
+    DBObjPtr<HardwareClockSettings> m_HardwareClockSettings;
+
     /** Time conversion. */
-    DBObjPtr<KLMTimeConversion> m_TimeConversion;
+    KLMTime m_Time;
 
     /** Element numbers. */
     const KLMElementNumbers* m_ElementNumbers;

@@ -497,9 +497,8 @@ namespace Belle2 {
   double EvtBSemiTauonicHelicityAmplitudeCalculator::mD(int Dhel) const
   {
     assert(chkDhel(Dhel));
-    double mesonMass(-1.);
-    if (Dhel == 2)mesonMass = m_mD;
-    else mesonMass = m_mDst;
+    double mesonMass = m_mDst;
+    if (Dhel == 2) mesonMass = m_mD;
     assert(mesonMass >= 0.);
     return mesonMass;
   }

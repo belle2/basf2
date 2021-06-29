@@ -69,6 +69,8 @@ eventinfosetter.param({'evtNumList': [10]})
 main.add_module(eventinfosetter)
 
 particlegun = b2.register_module('ParticleGun')
+particlegun.param('momentumGeneration', 'fixed')
+particlegun.param('momentumParams', 6.0)
 particlegun.param('pdgCodes', [13, -13])
 particlegun.param('nTracks', 10)
 particlegun.param('thetaGeneration', 'uniformCos')
@@ -83,6 +85,7 @@ Packer = b2.register_module('ARICHPacker')
 main.add_module(Packer)
 
 unPacker = b2.register_module('ARICHUnpacker')
+
 unPacker.param('outputDigitsName', 'ARICHDigitsUnpacked')
 main.add_module(unPacker)
 

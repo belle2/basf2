@@ -207,13 +207,12 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   float generatedE[nLeakReg][nEnergies]; // 3 regions forward barrel backward
   int bin = 2; // bin 1 = nPositions, bin 2 = nEnergies, bin 3 = first energy
   for (int ireg = 0; ireg < nLeakReg; ireg++) {
-    std::cout << "energies ireg " << ireg << ": ";
+    B2INFO("Generated energies for ireg = " << ireg);
     for (int ie = 0; ie < nEnergies; ie++) {
       bin++;
       generatedE[ireg][ie] = inputParameters->GetBinContent(bin);
-      std::cout << generatedE[ireg][ie] << " ";
+      B2INFO("  " << ie << " " << generatedE[ireg][ie] << " GeV");
     }
-    std::cout << std::endl;
   }
 
   //..Energy per thetaID (in MeV, for use in titles etc)
@@ -236,7 +235,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   const double eFracHi = 1.5; // high edge of eFrac histograms
   int nEfracBins[nEnergies][nThetaID];
   for (int thID = 0; thID < nThetaID; thID++) {
-    std::cout << "nBins for thetaID = " << thID << ": ";
+    B2DEBUG(25, "eFrac nBins for thetaID " << thID);
     for (int ie = 0; ie < nEnergies; ie++) {
 
       //..ballpark resolution
@@ -246,9 +245,8 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
       double binNumOver2 = 3. / sqrt(res_squared);
       int tempNBin = (int)(binNumOver2 + 0.5);
       nEfracBins[ie][thID] = 2 * tempNBin;
-      std::cout << nEfracBins[ie][thID] << " ";
+      B2DEBUG(25, " ie = " << ie << " E = " << iEnergiesMeV[ie][thID] << " nBins = " << nEfracBins[ie][thID]);
     }
-    std::cout << std::endl;
   }
 
   //-----------------------------------------------------------------------------------
@@ -354,8 +352,8 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
           break;
         }
       }
-      std::cout << "  thID " << thID << " E " << iEnergiesMeV[ie][thID] << " ped " << pedestal << " threshold " << threshold << " cut " <<
-                maxLocCut[ie][thID] << std::endl;
+      B2DEBUG(25, "  thID " << thID << " E " << iEnergiesMeV[ie][thID] << " ped " << pedestal << " threshold " << threshold <<
+              " location cut " << maxLocCut[ie][thID]);
 
       //..Write this one to disk, after supplementing the title with cut and efficiency
       title = locError[ie][thID]->GetTitle();
@@ -443,7 +441,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
         //..Fit
         name = hEnergy->GetName();
-        std::cout << "Fitting " << name.Data() << std::endl;
+        B2DEBUG(40, "Fitting " << name.Data());
         hEnergy->Fit(func, "LIEQ", "", startingParameters[3], startingParameters[4]);
         peak = func->GetParameter(1);
         double effSigma = func->GetParameter(2);
@@ -620,7 +618,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
             //..Fit
             name = hEnergy->GetName();
-            std::cout << "Fitting " << name.Data() << std::endl;
+            B2DEBUG(40, "Fitting " << name.Data());
             hEnergy->Fit(func, "LIEQ", "", fitLow, fitHigh);
             double peak = func->GetParameter(1);
             double effSigma = func->GetParameter(2);
@@ -766,7 +764,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
         //..Fit
         name = hEnergy->GetName();
-        std::cout << "Fitting " << name.Data() << std::endl;
+        B2DEBUG(40, "Fitting " << name.Data());
         hEnergy->Fit(func, "LIEQ", "", startingParameters[3], startingParameters[4]);
         double peak = func->GetParameter(1);
         double effSigma = func->GetParameter(2);
@@ -915,7 +913,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
           //..Fit
           name = hEnergy->GetName();
-          std::cout << "Fitting " << name.Data() << std::endl;
+          B2DEBUG(40, "Fitting " << name.Data());
           hEnergy->Fit(func, "LIEQ", "", fitLow, fitHigh);
           double peak = func->GetParameter(1);
           double effSigma = func->GetParameter(2);
@@ -1268,7 +1266,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
           //..Fit
           name = hEnergy->GetName();
-          std::cout << "Fitting " << name.Data() << std::endl;
+          B2DEBUG(40, "Fitting " << name.Data());
           hEnergy->Fit(func, "LIEQ", "", startingParameters[3], startingParameters[4]);
           peak = func->GetParameter(1);
           double effSigma = func->GetParameter(2);
@@ -1308,11 +1306,12 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   TH1F* resolutionSummary = new TH1F("resolutionSummary", "Resolution/peak for each method, region, energy;Energy energy point",
                                      nresBins, 0, nEnergies);
 
-  std::cout << std::endl << "Energy bin, region, Resolution/peak 4 ways: " << std::endl;
+  B2INFO("Resolution divided by peak for each energy bin and region " << nResType << " ways");
   ix = 0;
   for (int ie = 0; ie < nEnergies; ie++) {
+    B2INFO("  energy point " << ie);
     for (int ireg = 0; ireg < nLeakReg; ireg++) {
-      std::printf("%2d %1d ", ie, ireg);
+      B2INFO("    region " << ireg);
       for (int ires = 0; ires < nResType; ires++) {
 
         //..Store in summary histograms
@@ -1323,10 +1322,9 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
         resolutionSummary->SetBinError(ix, 0.);
 
         //..Print out as well
-        std::printf("%6.4f ", energyRes[ireg][ie][ires] / peakEnergy[ireg][ie][ires]);
+        B2INFO("      " << ires << " " << energyRes[ireg][ie][ires] / peakEnergy[ireg][ie][ires]);
       }
       ix++;
-      std::cout << std::endl;
     }
   }
 
@@ -1355,6 +1353,6 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   leakagePayload->setnCrystalCorrections(nCrystalCorrection);
   saveCalibration(leakagePayload, "ECLLeakageCorrections");
 
-  B2RESULT("eclLeakageAlgorithm: successfully stored payload ECLLeakageCorrections");
+  B2INFO("eclLeakageAlgorithm: successfully stored payload ECLLeakageCorrections");
   return c_OK;
 }

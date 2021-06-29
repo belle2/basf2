@@ -19,7 +19,8 @@
 #include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dbobjects/eklm/EKLMReconstructionParameters.h>
-#include <klm/dbobjects/eklm/EKLMTimeCalibration.h>
+#include <klm/dbobjects/KLMTimeCableDelay.h>
+#include <klm/dbobjects/KLMTimeConstants.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMTimeWindow.h>
 #include <klm/eklm/geometry/GeometryData.h>
@@ -97,11 +98,11 @@ namespace Belle2 {
     bool isNormal(const KLMDigit* digit) const;
 
     /**
-     * Get 2d hit time corresponding to EKLM digit.
-     * @param[in] d    EKLM Digit.
-     * @param[in] dist Distance from 2d hit to SiPM.
+     * Time correction by subtract cable delay.
+     * @param[in] td    Original time of the digit.
+     * @param[in] digit KLM Digit.
      */
-    double getTime(KLMDigit* d, double dist);
+    void correctCableDelay(double& td, const KLMDigit* digit);
 
     /* Common member variables. */
 
@@ -120,6 +121,21 @@ namespace Belle2 {
      */
     double m_PromptWindow;
 
+    /** Delay (ns / cm) for EKLM scintillators. */
+    double m_DelayEKLMScintillators = 0.0;
+
+    /** Delay (ns / cm) for BKLM scintillators. */
+    double m_DelayBKLMScintillators = 0.0;
+
+    /** Delay (ns / cm) for RPC phi plane. */
+    double m_DelayRPCPhi = 0.0;
+
+    /** Delay (ns / cm) for RPC Z plane. */
+    double m_DelayRPCZ = 0.0;
+
+    /** Perform cable delay time correction (true) or not (false). */
+    bool m_TimeCableDelayCorrection;
+
     /**
      * Use only normal and dead (for debugging) channels during 2d hit
      * reconstruction.
@@ -131,6 +147,12 @@ namespace Belle2 {
 
     /** KLM time window. */
     DBObjPtr<KLMTimeWindow> m_TimeWindow;
+
+    /** KLM time constants. */
+    OptionalDBObjPtr<KLMTimeConstants> m_TimeConstants;
+
+    /** KLM time cable delay. */
+    OptionalDBObjPtr<KLMTimeCableDelay> m_TimeCableDelay;
 
     /** Channel status. */
     DBObjPtr<KLMChannelStatus> m_ChannelStatus;
@@ -177,15 +199,6 @@ namespace Belle2 {
 
     /** Reconstruction parameters. */
     DBObjPtr<EKLMReconstructionParameters> m_eklmRecPar;
-
-    /** Time calibration data. */
-    DBObjPtr<EKLMTimeCalibration> m_eklmTimeCalibration;
-
-    /** Time calibration data for individual strips. */
-    const EKLMTimeCalibrationData** m_eklmTimeCalibrationData;
-
-    /** Default time calibration data. */
-    EKLMTimeCalibrationData m_eklmDefaultTimeCalibrationData;
 
     /** EKLM 2d hits. */
     StoreArray<EKLMHit2d> m_eklmHit2ds;

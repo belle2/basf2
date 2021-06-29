@@ -11,8 +11,12 @@
 /* Own header. */
 #include <klm/bklm/geometry/Module.h>
 
+/* KLM headers. */
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+
 /* Belle 2 headers. */
 #include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
 
 /* C++ headers. */
 #include <iostream>
@@ -251,6 +255,16 @@ void Module::addZScint(int scint, double length, double offset, double position)
   m_ZScintPositions[scint] = position;
 }
 
+double Module::getStripLength(int plane, int strip) const
+{
+  if (plane == BKLMElementNumbers::c_ZPlane)
+    return m_ZScintLengths[strip];
+  else if (plane == BKLMElementNumbers::c_PhiPlane)
+    return m_PhiScintLengths[strip];
+  else
+    B2FATAL("Incorrect plane number.");
+}
+
 const CLHEP::Hep3Vector Module::getLocalPosition(double phiStripAve, double zStripAve) const
 {
   // "+0.5" assures that the local position is in the middle of the strip
@@ -281,6 +295,14 @@ const CLHEP::Hep3Vector Module::getPropagationDistance(const CLHEP::Hep3Vector& 
   double dy = m_PhiPositionBase * m_PhiStripWidth - m_PhiSensorSide * local.y();
   double dz = m_ZStripMax * m_ZStripWidth - local.z();
   return CLHEP::Hep3Vector(0.0, dz, dy);
+}
+
+const CLHEP::Hep3Vector Module::getPropagationDistance(
+  const CLHEP::Hep3Vector& local, int stripZ, int stripPhi) const
+{
+  double distanceZ = getPropagationDistance(local, stripZ, false);
+  double distancePhi = getPropagationDistance(local, stripPhi, true);
+  return CLHEP::Hep3Vector(0.0, distancePhi, distanceZ);
 }
 
 const CLHEP::Hep3Vector Module::getPropagationTimes(const CLHEP::Hep3Vector& local) const
@@ -315,7 +337,6 @@ const CLHEP::Hep3Vector Module::localToGlobal(const CLHEP::Hep3Vector& v, bool m
     vlocal = m_DisplacedGeoRotation * vlocal + m_DisplacedGeoTranslation; // to nominal local
     return m_Rotation * vlocal + m_GlobalOrigin; //to global
   }
-
 }
 
 const CLHEP::Hep3Vector Module::globalToLocal(const CLHEP::Hep3Vector& v, bool reco) const

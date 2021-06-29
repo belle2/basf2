@@ -66,9 +66,7 @@ G4LongLivedNeutralTransportation::G4LongLivedNeutralTransportation(G4int verbosi
   //    start of each Run -- for now this is at the Start of every Track. TODO
 
   static G4ThreadLocal G4TouchableHandle* pNullTouchableHandle = 0;
-  if (!pNullTouchableHandle) {
-    pNullTouchableHandle = new G4TouchableHandle;
-  }
+  pNullTouchableHandle = new G4TouchableHandle;
   fCurrentTouchableHandle = *pNullTouchableHandle;
   // Points to (G4VTouchable*) 0
 

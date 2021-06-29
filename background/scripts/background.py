@@ -73,7 +73,6 @@ def add_output(path, bgType, realTime, sampleType, phase=3, fileName='output.roo
     elif sampleType == 'usual' and phase == 3:
         madeFor = ''
         branches = [
-            'EventLevelTriggerTimeInfo',
             'PXDSimHits',
             'SVDSimHits',
             'CDCSimHits',

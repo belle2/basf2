@@ -115,8 +115,6 @@ void KLMDigitizerModule::beginRun()
     B2FATAL("KLM scintillator digitization parameters are not available.");
   if (!m_FEEPar.isValid())
     B2FATAL("KLM scintillator FEE parameters are not available.");
-  if (!m_TimeConversion.isValid())
-    B2FATAL("KLM time conversion parameters are not available.");
   if (!m_ChannelStatus.isValid())
     B2FATAL("KLM channel status data are not available.");
   if (!m_StripEfficiency.isValid())
@@ -153,7 +151,8 @@ void KLMDigitizerModule::digitizeBKLM()
   int tdc;
   KLM::ScintillatorSimulator simulator(
     &(*m_DigPar), m_Fitter,
-    m_DigitizationInitialTime * m_TimeConversion->getCTimePeriod(), m_Debug);
+    m_DigitizationInitialTime /
+    m_HardwareClockSettings->getGlobalClockFrequency(), m_Debug);
   const KLMScintillatorFEEData* FEEData;
   std::multimap<uint16_t, const BKLMSimHit*>::iterator it, it2, ub;
   for (it = m_bklmSimHitChannelMap.begin(); it != m_bklmSimHitChannelMap.end();
@@ -214,7 +213,7 @@ void KLMDigitizerModule::digitizeBKLM()
         bklmDigit->setCharge(m_DigPar->getADCRange() - 1);
       }
       bklmDigit->setTDC(tdc);
-      bklmDigit->setTime(m_TimeConversion->getTimeSimulation(tdc, true));
+      bklmDigit->setTime(m_Time.getTimeSimulation(tdc, true));
       bklmDigit->setFitStatus(simulator.getFitStatus());
       bklmDigit->setNPhotoelectrons(simulator.getNPhotoelectrons());
       bklmDigit->setEnergyDeposit(simulator.getEnergy());
@@ -233,7 +232,8 @@ void KLMDigitizerModule::digitizeEKLM()
   uint16_t tdc;
   KLM::ScintillatorSimulator simulator(
     &(*m_DigPar), m_Fitter,
-    m_DigitizationInitialTime * m_TimeConversion->getCTimePeriod(), m_Debug);
+    m_DigitizationInitialTime /
+    m_HardwareClockSettings->getGlobalClockFrequency(), m_Debug);
   const KLMScintillatorFEEData* FEEData;
   std::multimap<uint16_t, const EKLMSimHit*>::iterator it, ub;
   for (it = m_eklmSimHitChannelMap.begin(); it != m_eklmSimHitChannelMap.end();
@@ -274,7 +274,7 @@ void KLMDigitizerModule::digitizeEKLM()
       eklmDigit->setCharge(m_DigPar->getADCRange() - 1);
     }
     eklmDigit->setTDC(tdc);
-    eklmDigit->setTime(m_TimeConversion->getTimeSimulation(tdc, true));
+    eklmDigit->setTime(m_Time.getTimeSimulation(tdc, true));
     eklmDigit->setFitStatus(simulator.getFitStatus());
     eklmDigit->setNPhotoelectrons(simulator.getNPhotoelectrons());
     eklmDigit->setEnergyDeposit(simulator.getEnergy());

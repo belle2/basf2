@@ -57,30 +57,9 @@ namespace Belle2 {
       positionError = 0;
       double pitch = rawCluster.isUSide() ? info.getUPitch() : info.getVPitch();
       double sumStripCharge = getSumOfStripCharges(rawCluster);
-      double cutAdjacent = m_ClusterCal.getMinAdjSNR(rawCluster.getSensorID(), rawCluster.isUSide());
 
-      // if cluster size == 1
-      // add a strip charge equal to the zero-suppression threshold to compute the error
-      if (strips.size() == 1) {
-        float noiseFirstStrip =  m_NoiseCal.getNoiseInElectrons(rawCluster.getSensorID(), rawCluster.isUSide(), strips.at(0).cellID);
-        double phantomCharge = cutAdjacent * noiseFirstStrip;
-        positionError = pitch * phantomCharge / (sumStripCharge + phantomCharge);
-
-      } else {
-        // if cluster size > 1
-        double a = cutAdjacent; //Peter's implementation
-        double noiseAverage = getAverageStripNoise(rawCluster);
-        double sn = sumStripCharge / noiseAverage;
-
-        // to be improved looking at:
-        // NIM A, 335 (1993) 44-58 (Turchetta)
-        // NIM 178 (1980) 543-554 (Radeka)
-        // e.g.:
-        // if(strips.size() == 3)
-        //  a = 2.12; //Turchetta
-
-        positionError = a * pitch / sn;
-      }
+      positionError = m_CoGOnlyErr.getPositionError(rawCluster.getSensorID(), rawCluster.isUSide(), 0,
+                                                    sumStripCharge / getClusterNoise(rawCluster), rawCluster.getSize(), pitch);
 
     }
 

@@ -25,8 +25,6 @@ namespace Belle2 {
       applyCoGPosition(rawCluster, position, positionError);
 
       //apply scale factors for the position errors
-      // TO DO: REMOVE this line when SVDCoGOnlyPositionError will
-      // store scale factors != 1
       positionError = m_CoGOnlyCal.getCorrectedClusterPositionError(rawCluster.getSensorID(), rawCluster.isUSide(), rawCluster.getSize(),
                       positionError);
 

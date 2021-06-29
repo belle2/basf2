@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-SVD Default CoGOnly Error Scaling Factors importer.
+SVD Default CoGOnly Position Error Formulas importer.
 """
 import basf2 as b2
 from ROOT import Belle2
@@ -14,6 +14,7 @@ import datetime
 
 # default values
 # read the svd/dbobjects/SVDPositionErrorFunction class
+# now replicates the same formulas as in release-05
 
 now = datetime.datetime.now()
 
@@ -37,7 +38,7 @@ class defaultSVDCoGOnlyPositionErrorImporter(b2.Module):
             "CoGOnlyPositionError_default_" +
             str(
                 now.isoformat()) +
-            "_INFO:_formulas=rel05_scaleFactors=1")
+            "_INFO:_formulas=rel05")
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 

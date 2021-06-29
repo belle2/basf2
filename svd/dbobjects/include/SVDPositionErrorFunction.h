@@ -95,16 +95,6 @@ namespace Belle2 {
         for (int i = 0; i < maxClusterSize; i++)
           m_c1[i] = c1[i];
     }
-    /** set the cluster size dependent scaleFactors*/
-    void set_scaleFactor(double* scaleFactor, int maxSize)
-    {
-      if (maxSize != maxClusterSize)
-        B2ERROR("please provide the scaleFactors for exactly a max cluster size = " << maxClusterSize <<
-                ", i.e. >= " << maxClusterSize << "share the same scale factor");
-      else
-        for (int i = 0; i < maxClusterSize; i++)
-          m_scaleFactor[i] = scaleFactor[i];
-    }
 
 
     /** copy constructor */
@@ -117,9 +107,6 @@ namespace Belle2 {
 
     /** total number of cluster sizes */
     static const int maxClusterSize = 5;
-
-    /** scale factors */
-    float m_scaleFactor[ maxClusterSize ] = {1, 1, 1, 1, 1};
 
     /** function parameters & implementations*/
 
@@ -151,7 +138,7 @@ namespace Belle2 {
       double B = m_b1[clSize - 1] * x;
       double C = m_c1[clSize - 1];
 
-      return sqrt(A * A + B * B + C * C) * m_scaleFactor[clSize - 1];
+      return sqrt(A * A + B * B + C * C);
     };
 
     /** current function ID */
@@ -160,7 +147,7 @@ namespace Belle2 {
     /** vector of functions for position error, we use the m_current*/
     static std::vector < posErrFunction > m_implementations; //! Do not stream this, please throw it in the WC
 
-    ClassDef(SVDPositionErrorFunction, 1);
+    ClassDef(SVDPositionErrorFunction, 2);
   };
 
 }

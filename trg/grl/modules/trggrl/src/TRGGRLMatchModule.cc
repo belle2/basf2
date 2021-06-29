@@ -15,7 +15,7 @@
 #include <trg/grl/dataobjects/TRGGRLPHOTON.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/ecl/dataobjects/TRGECLCluster.h>
-#include <trg/klm/dataobjects/KLMTriggerTrack.h>
+#include <trg/klm/dataobjects/KLMTrgSummary.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
 #include <trg/grl/dataobjects/TRGGRLShortTrack.h>
@@ -56,11 +56,11 @@ TRGGRLMatchModule::TRGGRLMatchModule() : Module()
   addParam("DphidMatch", m_dphi_d_threshold, "the threshold of dphi_d between track and cluster if they are matched successfully", 2);
   addParam("Ephoton", m_e_threshold, "the threshold of cluster energy as a photon", 1.0);
   addParam("KLMMatch", m_dphi_klm_threshold,
-           "the threshold of dphi (in degree) between track and KLM sector if they are matched successfully", 65.0);
+           "the threshold of dphi (in degree) between track and KLM sector if they are matched successfully", 32.5);
   addParam("2DtrackCollection", m_2d_tracklist, "the 2d track list used in the match", std::string("TRGCDC2DFinderTracks"));
   addParam("3DtrackCollection", m_3d_tracklist, "the 3d track list used in the match", std::string("TRGCDCNeuroTracks"));
   addParam("TRGECLClusterCollection", m_clusterlist, "the cluster list used in the match", std::string("TRGECLClusters"));
-  addParam("KLMTriggerTrack", m_klmtracklist, "the KLM track list used in the match", std::string("TRGKLMTracks"));
+  addParam("KLMTrgrSummary", m_klmtrgsummarylist, "the KLM track list used in the match", std::string("KLMTrgSummary"));
   addParam("2DmatchCollection", m_2dmatch_tracklist, "the 2d tracklist with associated cluster", std::string("TRG2DMatchTracks"));
   addParam("PhimatchCollection", m_phimatch_tracklist, "the 2d tracklist with associated cluster", std::string("TRGPhiMatchTracks"));
   addParam("3DmatchCollection", m_3dmatch_tracklist, "the 3d NN tracklist with associated cluster", std::string("TRG3DMatchTracks"));
@@ -94,47 +94,30 @@ void TRGGRLMatchModule::initialize()
   clusterslist.isRequired();
   clusterslist.registerRelationTo(track2Dlist);
   clusterslist.registerRelationTo(track3Dlist);
-  StoreArray<KLMTriggerTrack> klmtracklist(m_klmtracklist);
-  klmtracklist.isRequired();
-  klmtracklist.registerRelationTo(track2Dlist);
+  StoreObjPtr<KLMTrgSummary> klmtrgsummary(m_klmtrgsummarylist);
+  klmtrgsummary.isRequired();
 
   StoreArray<CDCTriggerSegmentHit> tslist(m_hitCollectionName);
   tslist.isRequired();
 
-
-//  track2Dlist.registerRelationTo(clusterslist);
-// track3Dlist.registerRelationTo(clusterslist);
-
-// modified by ytlai 2017/12/15: registerPersistent should be replaced by registerInDataStore
-//  StoreArray<TRGGRLMATCH>::registerPersistent(m_2dmatch_tracklist);
-//  StoreArray<TRGGRLMATCH>::registerPersistent(m_phimatch_tracklist);
-//  StoreArray<TRGGRLMATCH>::register(m_2dmatch_tracklist);
-//  StoreArray<TRGGRLMATCH>::registerPersistent(m_3dmatch_tracklist);
-//  StoreArray<TRGGRLMATCHKLM>::registerPersistent(m_klmmatch_tracklist);
-
-//  StoreArray<TRGGRLMATCH> track2Dmatch(m_2dmatch_tracklist);
   StoreArray<TRGGRLMATCH> track2Dmatch;
   track2Dmatch.registerInDataStore(m_2dmatch_tracklist);
   track2Dmatch.registerRelationTo(track2Dlist);
   track2Dmatch.registerRelationTo(clusterslist);
 
-//  StoreArray<TRGGRLMATCH> trackphimatch(m_phimatch_tracklist);
   StoreArray<TRGGRLMATCH> trackphimatch;
   trackphimatch.registerInDataStore(m_phimatch_tracklist);
   trackphimatch.registerRelationTo(track2Dlist);
   trackphimatch.registerRelationTo(clusterslist);
 
-//  StoreArray<TRGGRLMATCH> track3Dmatch(m_3dmatch_tracklist);
   StoreArray<TRGGRLMATCH> track3Dmatch;
   track3Dmatch.registerInDataStore(m_3dmatch_tracklist);
   track3Dmatch.registerRelationTo(clusterslist);
   track3Dmatch.registerRelationTo(track3Dlist);
 
-//  StoreArray<TRGGRLMATCHKLM> trackKLMmatch(m_klmmatch_tracklist);
   StoreArray<TRGGRLMATCHKLM> trackKLMmatch;
   trackKLMmatch.registerInDataStore(m_klmmatch_tracklist);
   trackKLMmatch.registerRelationTo(track2Dlist);
-  trackKLMmatch.registerRelationTo(klmtracklist);
 
   StoreArray<TRGGRLPHOTON> grlphoton;
   grlphoton.registerInDataStore(m_grlphotonlist);
@@ -179,7 +162,7 @@ void TRGGRLMatchModule::event()
   StoreArray<CDCTriggerTrack> track2Dlist(m_2d_tracklist);
   StoreArray<CDCTriggerTrack> track3Dlist(m_3d_tracklist);
   StoreArray<TRGECLCluster> clusterlist(m_clusterlist);
-  StoreArray<KLMTriggerTrack> klmtracklist(m_klmtracklist);
+  StoreObjPtr<KLMTrgSummary> klmtrgsummary(m_klmtrgsummarylist);
   StoreArray<CDCTriggerSegmentHit> tslist(m_hitCollectionName);
   StoreArray<TRGGRLMATCH> track2Dmatch(m_2dmatch_tracklist);
   StoreArray<TRGGRLMATCH> trackphimatch(m_phimatch_tracklist);
@@ -198,6 +181,8 @@ void TRGGRLMatchModule::event()
   eecl_phimap.clear();
   eecl_phimap_fwd.clear();
   eecl_phimap_bwd.clear();
+  eecl_sectormap_fwd.clear();
+  eecl_sectormap_bwd.clear();
   eklm_sectormap.clear();
   eklm_sectormap_fwd.clear();
   eklm_sectormap_bwd.clear();
@@ -210,30 +195,26 @@ void TRGGRLMatchModule::event()
     eecl_phimap_bwd.push_back(false);
   }
   for (int i = 0; i < 4; i++) {
+    eecl_sectormap_fwd.push_back(false);
+    eecl_sectormap_bwd.push_back(false);
     eklm_sectormap.push_back(false);
     eklm_sectormap_fwd.push_back(false);
     eklm_sectormap_bwd.push_back(false);
   }
 
-//do 2d track match with cluster
+//do 2d track match with ECL and KLM cluster
+  int klmtrack_ind_phi_map[8] = {};
   for (int i = 0; i < track2Dlist.getEntries(); i++) {
 
     double dr_tmp = 99999.;
     int dphi_d_tmp = 100;
-    int dphi_klm_tmp = 100;
+    double dphi_klm_tmp = 100;
     int cluster_ind = -1;
     int cluster_ind_phi = -1;
     int klmtrack_ind_phi = -1;
 
-    // do 2d track match with KLM track
-    for (int j = 0; j < klmtracklist.getEntries(); j++) {
-      double dphi_klm = 99999.9;
-      sectormatching_klm(track2Dlist[i], klmtracklist[j], dphi_klm);
-      if (dphi_klm_tmp > dphi_klm) {
-        dphi_klm_tmp = dphi_klm;
-        klmtrack_ind_phi = j;
-      }
-    }
+// do 2d track match with KLMTrgSummary
+    sectormatching_klm(track2Dlist[i], klmtrgsummary, dphi_klm_tmp, klmtrack_ind_phi);
 
     for (int j = 0; j < clusterlist.getEntries(); j++) {
       // skip the end-cap cluster
@@ -278,12 +259,14 @@ void TRGGRLMatchModule::event()
       clusterlist[cluster_ind_phi]->addRelationTo(track2Dlist[i]);
     }
 
-    if (dphi_klm_tmp < m_dphi_klm_threshold * M_PI * 0.5 / 180.0 && klmtrack_ind_phi != -1) {
-      TRGGRLMATCHKLM* matklm = trackKLMmatch.appendNew();
-      matklm->set_dphi(dphi_klm_tmp);
-      matklm->addRelationTo(track2Dlist[i]);
-      matklm->addRelationTo(klmtracklist[klmtrack_ind_phi]);
-      klmtracklist[klmtrack_ind_phi]->addRelationTo(track2Dlist[i]);
+    if (dphi_klm_tmp < m_dphi_klm_threshold * M_PI / 180.0 && klmtrack_ind_phi > -1 && klmtrack_ind_phi < 8) {
+      if (klmtrack_ind_phi_map[klmtrack_ind_phi] == 0) {
+        TRGGRLMATCHKLM* matklm = trackKLMmatch.appendNew();
+        matklm->set_dphi(dphi_klm_tmp);
+        matklm->set_sector(klmtrack_ind_phi);
+        matklm->addRelationTo(track2Dlist[i]);
+        klmtrack_ind_phi_map[klmtrack_ind_phi] = 1;
+      }
     }
 
   }
@@ -318,12 +301,7 @@ void TRGGRLMatchModule::event()
       mat3d->setDeltaZ(dz_tmp);
       mat3d->addRelationTo(track3Dlist[i]);
       mat3d->addRelationTo(clusterlist[cluster_ind]);
-      // if(mat3d->getRelatedTo<CDCTriggerTrack>())std::cout<<"get match-track3D" <<std::endl;
-      //  track3Dlist[i]->addRelationTo(clusterlist[cluster_ind]);
-      // if(track3Dlist[i]->getRelatedTo<TRGECLCluster>())std::cout<<"get trk-cluster" <<std::endl;
       clusterlist[cluster_ind]->addRelationTo(track3Dlist[i]);
-      //if(clusterlist[cluster_ind]->getRelatedTo<CDCTriggerTrack>())std::cout<<"get cluster-trk" <<std::endl;
-      //if(track3Dlist[i]->getRelatedFrom<TRGECLCluster>())std::cout<<"from trk-cluster" <<std::endl;
     }
   }
 
@@ -337,7 +315,8 @@ void TRGGRLMatchModule::event()
   }
 
 //endcap cluster map
-  make_eecl_map(clusterlist, eecl_phimap, eecl_phimap_fwd, eecl_phimap_bwd);
+  make_eecl_map(clusterlist, eecl_phimap, eecl_phimap_fwd, eecl_phimap_bwd, eecl_sectormap_fwd, eecl_sectormap_bwd);
+  make_eklm_map(klmtrgsummary, eklm_sectormap, eklm_sectormap_fwd, eklm_sectormap_bwd);
 
 // Short tracking
   std::vector<bool> map_veto(64, 0);
@@ -347,6 +326,9 @@ void TRGGRLMatchModule::event()
 
 // Inner tracking
   inner_tracking(tslist, track_phimap_i, eecl_phimap, eklm_sectormap, grlit, trgInfo);
+
+// EECL-EKLM matching
+  matching_eecl_eklm(eecl_sectormap_fwd, eecl_sectormap_bwd, eklm_sectormap_fwd, eklm_sectormap_bwd, trgInfo);
 
 }
 
@@ -466,7 +448,8 @@ void TRGGRLMatchModule::calculationphiangle(CDCTriggerTrack* _track, TRGECLClust
 
 }
 
-void TRGGRLMatchModule::sectormatching_klm(CDCTriggerTrack* _track, KLMTriggerTrack* _klmtrack, double& dphi)
+void TRGGRLMatchModule::sectormatching_klm(CDCTriggerTrack* _track, StoreObjPtr<KLMTrgSummary> _klmtrgsummary, double& dphi,
+                                           int& phiid_klm)
 {
 
   //-- 2D track information
@@ -493,11 +476,21 @@ void TRGGRLMatchModule::sectormatching_klm(CDCTriggerTrack* _track, KLMTriggerTr
   else if (phi_CDC < 0) {phi_CDC = phi_CDC + 2 * M_PI;}
 
   // KLM track's sector central phi
-  int _sector = _klmtrack->getSector();
-  double _sector_central = 0.25 * M_PI * _sector;
-
-  if (fabs(phi_CDC - _sector_central) < M_PI) { dphi = fabs(phi_CDC - _sector_central); }
-  else  { dphi = 2 * M_PI - fabs(phi_CDC - _sector_central); }
+  int _sector_mask_fw = _klmtrgsummary->getSector_mask_Forward_Barrel();
+  int _sector_mask_bw = _klmtrgsummary->getSector_mask_Backward_Barrel();
+  int _sector_mask = _sector_mask_fw | _sector_mask_bw;
+  for (int _sector = 0; _sector < 8; _sector++) {
+    if (_sector_mask & (1 << _sector)) {
+      double _sector_central = 0.25 * M_PI * _sector;
+      double dphi_temp;
+      if (fabs(phi_CDC - _sector_central) < M_PI) { dphi_temp = fabs(phi_CDC - _sector_central); }
+      else  { dphi_temp = 2 * M_PI - fabs(phi_CDC - _sector_central); }
+      if (dphi_temp < dphi) {
+        dphi = dphi_temp;
+        phiid_klm = _sector;
+      }
+    }
+  }
 
 }
 
@@ -761,8 +754,15 @@ void TRGGRLMatchModule::make_veto_map(StoreArray<CDCTriggerTrack> track2Dlist, s
 }
 
 void TRGGRLMatchModule::make_eecl_map(StoreArray<TRGECLCluster> clusterlist,
-                                      std::vector<bool>& ecl_phimap, std::vector<bool>& ecl_phimap_fwd, std::vector<bool>& ecl_phimap_bwd)
+                                      std::vector<bool>& ecl_phimap, std::vector<bool>& ecl_phimap_fwd, std::vector<bool>& ecl_phimap_bwd,
+                                      std::vector<bool>& ecl_sectormap_fwd, std::vector<bool>& ecl_sectormap_bwd)
 {
+  bool ecl_phimap_loose_fwd[36];
+  bool ecl_phimap_loose_bwd[36];
+  for (int i = 0; i < 36; i++) {
+    ecl_phimap_loose_fwd[i] = false;
+    ecl_phimap_loose_bwd[i] = false;
+  }
 
   for (int iclst = 0; iclst < clusterlist.getEntries(); iclst++) {
     //-- cluster/TRGECL information
@@ -787,9 +787,67 @@ void TRGGRLMatchModule::make_eecl_map(StoreArray<TRGECLCluster> clusterlist,
     if (_cluster_thetaid < 4 || _cluster_thetaid > 15) ecl_phimap[phi_ECL_d] = true;
     if (_cluster_thetaid < 4)  ecl_phimap_fwd[phi_ECL_d] = true;
     if (_cluster_thetaid > 15) ecl_phimap_bwd[phi_ECL_d] = true;
+    if (_cluster_thetaid < 5)  ecl_phimap_loose_fwd[phi_ECL_d] = true;
+    if (_cluster_thetaid > 14) ecl_phimap_loose_bwd[phi_ECL_d] = true;
   }
 
+  //-- 36b into 4b
+  ecl_sectormap_fwd[0] = ecl_phimap_loose_fwd[35] or ecl_phimap_loose_fwd[0] or ecl_phimap_loose_fwd[1] or ecl_phimap_loose_fwd[2] or
+                         ecl_phimap_loose_fwd[3] or ecl_phimap_loose_fwd[4] or ecl_phimap_loose_fwd[5] or ecl_phimap_loose_fwd[6] or
+                         ecl_phimap_loose_fwd[7] or ecl_phimap_loose_fwd[8] or ecl_phimap_loose_fwd[9];
+  ecl_sectormap_fwd[1] = ecl_phimap_loose_fwd[8]  or ecl_phimap_loose_fwd[9] or ecl_phimap_loose_fwd[10] or ecl_phimap_loose_fwd[11]
+                         or
+                         ecl_phimap_loose_fwd[12] or ecl_phimap_loose_fwd[13] or ecl_phimap_loose_fwd[14] or ecl_phimap_loose_fwd[15] or
+                         ecl_phimap_loose_fwd[16] or ecl_phimap_loose_fwd[17] or ecl_phimap_loose_fwd[18] or ecl_phimap_loose_fwd[19];
+  ecl_sectormap_fwd[2] = ecl_phimap_loose_fwd[18]  or ecl_phimap_loose_fwd[19] or ecl_phimap_loose_fwd[20]
+                         or ecl_phimap_loose_fwd[21] or
+                         ecl_phimap_loose_fwd[22] or ecl_phimap_loose_fwd[23] or ecl_phimap_loose_fwd[24] or ecl_phimap_loose_fwd[25] or
+                         ecl_phimap_loose_fwd[26] or ecl_phimap_loose_fwd[27] or ecl_phimap_loose_fwd[28];
+  ecl_sectormap_fwd[3] = ecl_phimap_loose_fwd[26]  or ecl_phimap_loose_fwd[27] or ecl_phimap_loose_fwd[28]
+                         or ecl_phimap_loose_fwd[29] or
+                         ecl_phimap_loose_fwd[30] or ecl_phimap_loose_fwd[31] or ecl_phimap_loose_fwd[32] or ecl_phimap_loose_fwd[33] or
+                         ecl_phimap_loose_fwd[34] or ecl_phimap_loose_fwd[36] or ecl_phimap_loose_fwd[0];
+  //-- 36b into 4b
+  ecl_sectormap_bwd[0] = ecl_phimap_loose_bwd[35] or ecl_phimap_loose_bwd[0] or ecl_phimap_loose_bwd[1] or ecl_phimap_loose_bwd[2] or
+                         ecl_phimap_loose_bwd[3] or ecl_phimap_loose_bwd[4] or ecl_phimap_loose_bwd[5] or ecl_phimap_loose_bwd[6] or
+                         ecl_phimap_loose_bwd[7] or ecl_phimap_loose_bwd[8] or ecl_phimap_loose_bwd[9];
+  ecl_sectormap_bwd[1] = ecl_phimap_loose_bwd[8]  or ecl_phimap_loose_bwd[9] or ecl_phimap_loose_bwd[10] or ecl_phimap_loose_bwd[11]
+                         or
+                         ecl_phimap_loose_bwd[12] or ecl_phimap_loose_bwd[13] or ecl_phimap_loose_bwd[14] or ecl_phimap_loose_bwd[15] or
+                         ecl_phimap_loose_bwd[16] or ecl_phimap_loose_bwd[17] or ecl_phimap_loose_bwd[18] or ecl_phimap_loose_bwd[19];
+  ecl_sectormap_bwd[2] = ecl_phimap_loose_bwd[18]  or ecl_phimap_loose_bwd[19] or ecl_phimap_loose_bwd[20]
+                         or ecl_phimap_loose_bwd[21] or
+                         ecl_phimap_loose_bwd[22] or ecl_phimap_loose_bwd[23] or ecl_phimap_loose_bwd[24] or ecl_phimap_loose_bwd[25] or
+                         ecl_phimap_loose_bwd[26] or ecl_phimap_loose_bwd[27] or ecl_phimap_loose_bwd[28];
+  ecl_sectormap_bwd[3] = ecl_phimap_loose_bwd[26]  or ecl_phimap_loose_bwd[27] or ecl_phimap_loose_bwd[28]
+                         or ecl_phimap_loose_bwd[29] or
+                         ecl_phimap_loose_bwd[30] or ecl_phimap_loose_bwd[31] or ecl_phimap_loose_bwd[32] or ecl_phimap_loose_bwd[33] or
+                         ecl_phimap_loose_bwd[34] or ecl_phimap_loose_bwd[36] or ecl_phimap_loose_bwd[0];
+
 }
+
+void TRGGRLMatchModule::make_eklm_map(StoreObjPtr<KLMTrgSummary> _klmtrgsummary,
+                                      std::vector<bool>& _eklm_sectormap, std::vector<bool>& _eklm_sectormap_fwd, std::vector<bool>& _eklm_sectormap_bwd)
+{
+
+  int _sector_mask_fw = _klmtrgsummary->getSector_mask_Forward_Endcap();
+  int _sector_mask_bw = _klmtrgsummary->getSector_mask_Backward_Endcap();
+
+  for (int _sector = 0; _sector < 4; _sector++) {
+    //if(_sector_mask_fw & (1<<_sector) ) _eklm_sectormap_fwd[_sector]=true;
+    if (_sector_mask_bw & (1 << _sector)) _eklm_sectormap_bwd[_sector] = true;
+    //if(_sector_mask &    (1<<_sector) ) _eklm_sectormap[_sector]=true;
+  }
+  if (_sector_mask_fw & (1 << 0)) _eklm_sectormap_fwd[1] = true;
+  if (_sector_mask_fw & (1 << 1)) _eklm_sectormap_fwd[0] = true;
+  if (_sector_mask_fw & (1 << 2)) _eklm_sectormap_fwd[3] = true;
+  if (_sector_mask_fw & (1 << 3)) _eklm_sectormap_fwd[2] = true;
+
+  for (int _sector = 0; _sector < 4; _sector++) {
+    _eklm_sectormap[_sector] = (_eklm_sectormap_fwd[_sector] || _eklm_sectormap_bwd[_sector]);
+  }
+}
+
 
 void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, std::vector<bool>  map_veto,
                                        std::vector<bool>  phimap_i,
@@ -1346,6 +1404,7 @@ void TRGGRLMatchModule::inner_tracking(StoreArray<CDCTriggerSegmentHit> tslist,
   //-- Summary info
   int N_IT = 0;
   bool i2fo = false;
+  bool i2io = false;
   int iecl = 0;
   int iklm = 0;
 
@@ -1368,10 +1427,38 @@ void TRGGRLMatchModule::inner_tracking(StoreArray<CDCTriggerSegmentHit> tslist,
                              or IT0_36b[N36(i + 10)] or IT0_36b[N36(i + 26)]
                              or IT0_36b[N36(i + 9)] or IT0_36b[N36(i + 27)])) or i2fo ;
   }
-  //inner-ecl matching at endcap
+  //-- b2b info with IT0
   for (int i = 0; i < 36; i++) {
-    if (ecl_phimap[i] and IT0_36b[i])iecl++;
+    i2io = (IT0_36b[i] and (IT0_36b[N36(i + 18)] or IT0_36b[N36(i + 17)] or IT0_36b[N36(i + 19)]
+                            or IT0_36b[N36(i + 16)] or IT0_36b[N36(i + 20)]
+                            or IT0_36b[N36(i + 15)] or IT0_36b[N36(i + 21)]
+                            or IT0_36b[N36(i + 14)] or IT0_36b[N36(i + 22)]
+                            or IT0_36b[N36(i + 13)] or IT0_36b[N36(i + 23)]
+                            or IT0_36b[N36(i + 12)] or IT0_36b[N36(i + 24)]
+                            or IT0_36b[N36(i + 11)] or IT0_36b[N36(i + 25)]
+                            or IT0_36b[N36(i + 10)] or IT0_36b[N36(i + 26)]
+                            or IT0_36b[N36(i + 9)] or IT0_36b[N36(i + 27)])) or i2io ;
   }
+  //inner-ecl matching at endcap
+  bool IT0_36b_temp[36 * 2];
+  for (int i = 0; i < 36; i++) {
+    IT0_36b_temp[i]   = IT0_36b[i];
+    IT0_36b_temp[i + 36] = IT0_36b[i];
+  }
+  for (int i = 0; i < 36; i++) {
+    if (ecl_phimap[i] and
+        (IT0_36b_temp[i + 36] or IT0_36b_temp[i + 36 + 1] or IT0_36b_temp[i + 36 + 2] or IT0_36b_temp[i + 36 + 3]
+         or IT0_36b_temp[i + 36 + 4] or
+         IT0_36b_temp[i + 36 - 1] or IT0_36b_temp[i + 36 - 2] or IT0_36b_temp[i + 36 - 3] or IT0_36b_temp[i + 36 - 4])
+       )iecl++;
+  }
+
+  //std::cout << "sector map " ;
+  //for (int i = 0; i < 4; i++) {
+  // std::cout << " " << i << " " << IT0_4b[i] << " " << klm_sectormap[i];
+  //}
+  //std::cout << std::endl;
+
   //inner-klm matching at endcap
   for (int i = 0; i < 4; i++) {
     if (klm_sectormap[i] and IT0_4b[i])iklm++;
@@ -1379,6 +1466,7 @@ void TRGGRLMatchModule::inner_tracking(StoreArray<CDCTriggerSegmentHit> tslist,
   //-- set results
   trgInfo->setNinnertrk(N_IT);
   trgInfo->seti2fo(i2fo);
+  trgInfo->seti2io(i2io);
   trgInfo->setNiecl(iecl);
   trgInfo->setNiklm(iklm);
 
@@ -1411,6 +1499,22 @@ void TRGGRLMatchModule::inner_tracking(StoreArray<CDCTriggerSegmentHit> tslist,
   //}
   //std::cout << std::endl;
   //std::cout << i2fo << " " << iecl << std::endl;
+
+}
+
+void TRGGRLMatchModule::matching_eecl_eklm(std::vector<bool>  _eecl_sectormap_fw,
+                                           std::vector<bool>  _eecl_sectormap_bw,
+                                           std::vector<bool>  _eklm_sectormap_fw,
+                                           std::vector<bool>  _eklm_sectormap_bw,
+                                           StoreObjPtr<TRGGRLInfo> trgInfo)
+{
+  int ieclklm = 0;
+  for (int i = 0; i < 4; i++) {
+    if (_eklm_sectormap_fw[i] && _eecl_sectormap_fw[i])ieclklm++;
+    if (_eklm_sectormap_bw[i] && _eecl_sectormap_bw[i])ieclklm++;
+  }
+
+  trgInfo->setNeecleklm(ieclklm);
 
 }
 

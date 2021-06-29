@@ -17,6 +17,10 @@
 #include <klm/dbobjects/KLMScintillatorFEEData.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 
+/* Belle 2 headers. */
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
+
 namespace Belle2 {
 
   namespace KLM {
@@ -189,6 +193,9 @@ namespace Belle2 {
        */
       void debugOutput();
 
+      /** Hardware clock settings. */
+      DBObjPtr<HardwareClockSettings> m_HardwareClockSettings;
+
       /** Parameters. */
       const KLMScintillatorDigitizationParameters* m_DigPar;
 
@@ -201,7 +208,7 @@ namespace Belle2 {
       /** Debug mode (generates additional output files with histograms). */
       bool m_Debug;
 
-      /** Stands for nDigitizations*ADCSamplingTime. */
+      /** Time range, (number of digitizations) * (ADC sampling time). */
       double m_histRange;
 
       /** Analog amplitude (direct). */

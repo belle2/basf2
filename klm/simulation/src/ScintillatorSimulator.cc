@@ -83,9 +83,11 @@ KLM::ScintillatorSimulator::ScintillatorSimulator(
   m_SiPMMCTime(-1)
 {
   int i;
+  const double samplingTime = m_DigPar->getADCSamplingTDCPeriods() /
+                              m_HardwareClockSettings->getKLMTDCFrequency();
   /* cppcheck-suppress variableScope */
   double time, attenuationTime;
-  m_histRange = m_DigPar->getNDigitizations() * m_DigPar->getADCSamplingTime();
+  m_histRange = m_DigPar->getNDigitizations() * samplingTime;
   m_Pedestal = m_DigPar->getADCPedestal();
   m_PhotoelectronAmplitude = m_DigPar->getADCPEAmplitude();
   m_Threshold = m_DigPar->getADCThreshold();
@@ -114,10 +116,10 @@ KLM::ScintillatorSimulator::ScintillatorSimulator(
     B2FATAL(MemErr);
   attenuationTime = 1.0 / m_DigPar->getPEAttenuationFrequency();
   for (i = 0; i <= m_DigPar->getNDigitizations(); i++) {
-    time = digPar->getADCSamplingTime() * i;
+    time = samplingTime * i;
     m_SignalTimeDependence[i] =
       exp(-digPar->getPEAttenuationFrequency() * time) * attenuationTime /
-      digPar->getADCSamplingTime();
+      samplingTime;
     if (i > 0) {
       m_SignalTimeDependenceDiff[i - 1] = m_SignalTimeDependence[i - 1] -
                                           m_SignalTimeDependence[i];
@@ -338,8 +340,9 @@ void KLM::ScintillatorSimulator::generatePhotoelectrons(
   double stripLen, double distSiPM, int nPhotons, double timeShift,
   bool isReflected)
 {
-  const double maxHitTime = m_DigPar->getNDigitizations() *
-                            m_DigPar->getADCSamplingTime();
+  const double samplingTime = m_DigPar->getADCSamplingTDCPeriods() /
+                              m_HardwareClockSettings->getKLMTDCFrequency();
+  const double maxHitTime = m_DigPar->getNDigitizations() * samplingTime;
   int i;
   /* cppcheck-suppress variableScope */
   double hitTime, deExcitationTime, cosTheta, hitDist, selection;
@@ -373,8 +376,7 @@ void KLM::ScintillatorSimulator::generatePhotoelectrons(
     if (hitTime >= maxHitTime)
       continue;
     if (hitTime >= 0)
-      m_Photoelectrons[m_npe].bin =
-        floor(hitTime / m_DigPar->getADCSamplingTime());
+      m_Photoelectrons[m_npe].bin = floor(hitTime / samplingTime);
     else
       m_Photoelectrons[m_npe].bin = -1;
     m_Photoelectrons[m_npe].expTime =
@@ -396,8 +398,9 @@ void KLM::ScintillatorSimulator::generatePhotoelectrons(
  * t0 * exp(-(t1 - tau) / t0) - t0 * exp(-(t2 - tau) / t0).
  *
  * The integration is performed over digitization bins from (t_dig * i) to
- * (t_dig * (i + 1)), where t_dig = m_DigPar->ADCSamplingTime and i is the bin
- * number. The integrals are
+ * (t_dig * (i + 1)), where t_dig = m_DigPar->ADCSamplingTDCPeriods() /
+ * m_HardwareClockSettings->getKLMTDCFrequency() and i is the bin number.
+ * The integrals are
  *
  * I1 = t0 - t0 * exp(-(t_dig * (i + 1) - tau) / t0)
  *

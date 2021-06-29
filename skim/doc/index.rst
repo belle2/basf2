@@ -9,11 +9,9 @@ The input to a skim are :ref:`mdst` files of processed data.
 The output are so-called :ref:`analysis_udstoutput` (udst) files.
 These files actually contain more information but fewer events.
 
-.. tip:: Analysts are recommended to use skimmed udst files as input to their analysis.
+.. tip:: Analysts are recommended to use skimmed udst files as input to their analysis. For an introductory lesson, take a look at :numref:`onlinebook_skim`.
 
-To get information about existing skim, ask the current skim group liaison.
-
-.. tip:: For an introductory lesson, take a look at :numref:`onlinebook_skim`.
+.. tip:: If you would like to know which skims are available, please browse the `skim_physics`_ section of the documentation. If you would like to know which cuts are made by a particular skim, then consult the source code by clicking the ``[source]`` button on that skim in `skim_physics`_, or by navigating to ``skim/scripts/skim/WGs/<your working group name>/`` in the basf2 repository.
 
 .. versionchanged:: release-06-00-00
 
@@ -36,7 +34,7 @@ Systematics skims
 .. toctree:: 01-systematics
 
 
-Physics skims
+pPhysics skims
 -------------
 
 .. toctree:: 02-physics

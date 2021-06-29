@@ -57,23 +57,31 @@ void TOPLLScannerModule::scanLikelihood(std::vector<float>masses, std::vector<fl
   maxLL =  logLs[llMaxIndex];
   massMax = masses[llMaxIndex];
 
-  minMassRange = masses[0];
-  maxMassRange = masses.back();
-  // search forward
-  auto llValue = maxLL;
-  auto llIndex = llMaxIndex;
-  while (llValue > maxLL - deltaLL && llIndex < int(masses.size())) {
-    llValue = logLs[llIndex];
-    maxMassRange = masses[llIndex];
-    llIndex++;
-  }
-  // search backward
-  llValue = maxLL;
-  llIndex = llMaxIndex;
-  while (llValue > maxLL - deltaLL && llIndex >= 0) {
-    llValue = logLs[llIndex];
-    minMassRange = masses[llIndex];
-    llIndex--;
+  if (isnan(deltaLL)) {
+    minMassRange = massMax - 0.03;
+    if (minMassRange < masses[0])
+      minMassRange = masses[0];
+
+    maxMassRange = massMax + 0.03;
+    if (maxMassRange < masses[0])
+      maxMassRange = masses.back();
+  } else {
+    // search forward
+    auto llValue = maxLL;
+    auto llIndex = llMaxIndex;
+    while (llValue > maxLL - deltaLL && llIndex < int(masses.size())) {
+      llValue = logLs[llIndex];
+      maxMassRange = masses[llIndex];
+      llIndex++;
+    }
+    // search backward
+    llValue = maxLL;
+    llIndex = llMaxIndex;
+    while (llValue > maxLL - deltaLL && llIndex >= 0) {
+      llValue = logLs[llIndex];
+      minMassRange = masses[llIndex];
+      llIndex--;
+    }
   }
 }
 
@@ -94,20 +102,13 @@ void TOPLLScannerModule::initialize()
 
   // go up to 4 GeV to capture all light nuclei
   float step = 0;
-  float lastVal = 0;
-  for (auto i = 0; i < 200; i++) {
+  float lastVal = 0.0001;
+  for (auto i = 0; i < 240; i++) {
     if (i < 10)
       step = 0.001;
-    else if (i < 20)
-      step = 0.005;
-    else if (i < 30)
-      step = 0.008;
-    else if (i < 40)
-      step = 0.01;
     else if (i < 50)
-      step = 0.015;
-    else
-      step = 0.020;
+      step = 0.005;
+    else step = 0.01;
     m_massPoints.push_back(lastVal);
     lastVal = lastVal + step;
   }
@@ -135,20 +136,21 @@ void TOPLLScannerModule::event()
     std::vector<float> logLcoarseScan;
     std::vector<float> nSignalPhotonsCoarseScan;
 
-    short iGuard = 0;
+    TGraph* gr = new TGraph();
     for (const auto& mass : m_massPoints) {
       const PDFConstructor pdfConstructor(trk, Const::pion, PDFConstructor::c_Fine, PDFConstructor::c_Reduced, mass);
       pdfConstructor.switchOffDeltaRayPDF();
       auto LL = pdfConstructor.getLogL();
       logLcoarseScan.push_back(LL.logL);
       nSignalPhotonsCoarseScan.push_back(pdfConstructor.getExpectedSignalPhotons());
+      gr->AddPoint(mass, LL.logL);
     }
 
     float massMax = -1;
     float minMassRange = 0;
     float maxMassRange = 0;
     float maxLL = 0;
-    scanLikelihood(m_massPoints, logLcoarseScan, 1, maxLL, massMax, minMassRange, maxMassRange);
+    scanLikelihood(m_massPoints, logLcoarseScan, std::numeric_limits<float>::quiet_NaN(), maxLL, massMax, minMassRange, maxMassRange);
 
 
     // -------------
@@ -157,7 +159,7 @@ void TOPLLScannerModule::event()
     std::vector<float> logLfineScan;
     std::vector<float> massPointsFineScan;
     std::vector<float> nSignalPhotonsFineScan;
-    auto mass = minMassRange;
+    auto mass = minMassRange + 0.0001;
     auto step = (maxMassRange - minMassRange) / m_nFineScanPoints;
     while (mass < maxMassRange) {
       const PDFConstructor pdfConstructor(trk, Const::pion, PDFConstructor::c_Fine, PDFConstructor::c_Reduced, mass);
@@ -166,11 +168,25 @@ void TOPLLScannerModule::event()
       logLfineScan.push_back(LL.logL);
       nSignalPhotonsFineScan.push_back(pdfConstructor.getExpectedSignalPhotons());
       massPointsFineScan.push_back(mass);
+      gr->AddPoint(mass, LL.logL);
       mass += step;
     }
 
+    TF1* parab = new TF1("parab", "[0]*(x-[1])*(x-[1])+[2]", minMassRange, maxMassRange);
+    parab->SetParameter(0, -0.5);
+    parab->SetParLimits(0, -1000, 0);
+    parab->SetParameter(1, massMax);
+    parab->SetParLimits(1, minMassRange, maxMassRange);
+    parab->SetParameter(2, maxLL);
+
+    gr->Fit(parab, "RQ");
+
     scanLikelihood(massPointsFineScan, logLfineScan, 0.5, maxLL, massMax, minMassRange, maxMassRange);
 
+    massMax = parab->GetParameter(1);
+
+    delete gr;
+    delete parab;
 
     // finally grab the number of expected photons at the LL maximum
     const PDFConstructor pdfConstructor(trk, Const::pion, PDFConstructor::c_Fine, PDFConstructor::c_Reduced, massMax);

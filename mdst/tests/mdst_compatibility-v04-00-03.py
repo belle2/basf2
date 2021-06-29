@@ -11,6 +11,7 @@ CHANGES since release-04-00-03:
 - EventLevelTrackingInfo:
   + hasSVDCKFAbortionFlag/setSVDCKFAbortionFlag
   + hasPXDCKFAbortionFlag/setPXDCKFAbortionFlag
+  + hasSVDSpacePointCreatorAbortionFlag/setSVDSpacePointCreatorAbortionFlag
 - Global tags:
   * The compatibility tag "Legacy_IP_Information" is no longer added for
     release 4 input files.
@@ -27,6 +28,8 @@ CHANGES since release-04-00-03:
 - TrackFitResult:
   + ndf
   + chi2
+- EventLevelTriggerTimeInfo
+  *  added new storage element for information from the Trigger Timing Distribution (TTD)
 """
 
 from basf2 import create_path, process, set_random_seed, find_file

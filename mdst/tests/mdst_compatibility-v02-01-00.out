@@ -33,6 +33,7 @@ Untested method EventLevelTrackingInfo::setNVXDClustersInLayer
 Untested method EventLevelTrackingInfo::setPXDCKFAbortionFlag
 Untested method EventLevelTrackingInfo::setSVDCKFAbortionFlag
 Untested method EventLevelTrackingInfo::setSVDFirstSampleTime
+Untested method EventLevelTrackingInfo::setSVDSpacePointCreatorAbortionFlag
 Untested method EventLevelTrackingInfo::setUnspecifiedTrackFindingFailure
 Untested method EventLevelTrackingInfo::setVXDTF2AbortionFlag
 Untested method PIDLikelihood::getDeltaLogL
@@ -135,6 +136,14 @@ Untested method MCParticle::setSeenInDetector
 Untested method MCParticle::setStatus
 Untested method MCParticle::setValidVertex
 Untested method MCParticle::setVirtual
+Untested method EventLevelTriggerTimeInfo::setBunchNumber
+Untested method EventLevelTriggerTimeInfo::setInvalid
+Untested method EventLevelTriggerTimeInfo::setIsHER
+Untested method EventLevelTriggerTimeInfo::setNoInjection
+Untested method EventLevelTriggerTimeInfo::setRevo2
+Untested method EventLevelTriggerTimeInfo::setTimeSinceLastInjection
+Untested method EventLevelTriggerTimeInfo::setTimeSincePrevTrigger
+Untested method EventLevelTriggerTimeInfo::setValid
 [INFO] ========================================================================
 [INFO] >>> Start new run: 0
 [INFO] ------------------------------------------------------------------------
@@ -3666,6 +3675,7 @@ EventLevelTrackingInfo:
   hasCDCLayer(55): False
   hasPXDCKFAbortionFlag(): False
   hasSVDCKFAbortionFlag(): False
+  hasSVDSpacePointCreatorAbortionFlag(): False
   hasUnspecifiedTrackFindingFailure(): False
   hasVXDTF2AbortionFlag(): False
 PIDLikelihood#0:
@@ -15250,6 +15260,7 @@ EventLevelTrackingInfo:
   hasCDCLayer(55): False
   hasPXDCKFAbortionFlag(): False
   hasSVDCKFAbortionFlag(): False
+  hasSVDSpacePointCreatorAbortionFlag(): False
   hasUnspecifiedTrackFindingFailure(): False
   hasVXDTF2AbortionFlag(): False
 PIDLikelihood#0:
@@ -21978,6 +21989,7 @@ EventLevelTrackingInfo:
   hasCDCLayer(55): False
   hasPXDCKFAbortionFlag(): False
   hasSVDCKFAbortionFlag(): False
+  hasSVDSpacePointCreatorAbortionFlag(): False
   hasUnspecifiedTrackFindingFailure(): False
   hasVXDTF2AbortionFlag(): False
 PIDLikelihood#0:

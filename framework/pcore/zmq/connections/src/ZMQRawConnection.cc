@@ -55,7 +55,7 @@ std::vector<zmq::message_t> ZMQRawInput::handleIncomingData()
   B2ASSERT("No message received", received);
   B2ASSERT("Message should not be empty", *received > 0);
   std::string identityString(identity.data<char>(), identity.size());
-  B2ASSERT("The message is incomplete!", m_socket->getsockopt<int>(ZMQ_RCVMORE) == 1);
+  B2ASSERT("The message is incomplete!", m_socket->get(zmq::sockopt::rcvmore) == 1);
   B2ASSERT("The app can only handle a single connection!",
            m_inputIdentity == identityString or m_inputIdentity.empty());
 

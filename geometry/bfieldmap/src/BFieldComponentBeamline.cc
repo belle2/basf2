@@ -699,6 +699,7 @@ namespace Belle2 {
       // Constructor creates a new instance, inits gInstance.
       new BFieldComponentBeamline();
     }
+    // cppcheck-suppress nullPointerRedundantCheck ; it's not obvious, but if *gInstance is null it's set in the constructor
     return **gInstance;
   }
 

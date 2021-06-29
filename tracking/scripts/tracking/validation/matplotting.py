@@ -7,6 +7,7 @@ import functools
 import numpy as np
 import collections
 from tracking.validation.plot import ValidationPlot
+import ctypes
 
 import logging
 
@@ -420,14 +421,14 @@ def get_fit_parameters(tf1):
     n_parameters = tf1.GetNpar()
     for i_parameter in range(n_parameters):
 
-        lower_bound = ROOT.Double()
-        upper_bound = ROOT.Double()
+        lower_bound = ctypes.c_double()
+        upper_bound = ctypes.c_double()
         tf1.GetParLimits(i_parameter, lower_bound, upper_bound)
 
         name = tf1.GetParName(i_parameter)
         value = tf1.GetParameter(i_parameter)
 
-        if lower_bound == upper_bound and lower_bound != 0:
+        if lower_bound.value == upper_bound.value and lower_bound.value != 0:
             # fixed parameter, is an additional stats entry
             continue
 
@@ -570,13 +571,13 @@ def plot_tgraph_data_into(ax,
     y_lower_errors = np.ndarray((n_points,), dtype=float)
     y_upper_errors = np.ndarray((n_points,), dtype=float)
 
-    x = ROOT.Double()
-    y = ROOT.Double()
+    x = ctypes.c_double()
+    y = ctypes.c_double()
 
     for i_point in range(n_points):
         tgraph.GetPoint(i_point, x, y)
-        xs[i_point] = float(x)
-        ys[i_point] = float(y)
+        xs[i_point] = float(x.value)
+        ys[i_point] = float(y.value)
 
         x_lower_errors[i_point] = tgraph.GetErrorXlow(i_point)
         x_upper_errors[i_point] = tgraph.GetErrorXhigh(i_point)

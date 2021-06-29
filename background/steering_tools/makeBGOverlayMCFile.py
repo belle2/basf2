@@ -115,9 +115,12 @@ main.add_module('ECLDigitizer', WaveformMaker=True, CompressionAlgorithm=compres
 # KLM digitization
 main.add_module('KLMDigitizer')
 
+# ECL trigger (generate BGOverlay dataobject for ecl trigger)
+main.add_module('TRGECLBGTCHit')
+
 # Output: digitized hits only
 branches = ['PXDDigits', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
-            'ARICHDigits', 'ECLWaveforms', 'KLMDigits']
+            'ARICHDigits', 'ECLWaveforms', 'KLMDigits', 'TRGECLBGTCHits']
 if gatedMode:
     branches += ['PXDInjectionBGTiming']
 main.add_module('RootOutput', outputFileName='BGforOverlay.root', branchNames=branches)

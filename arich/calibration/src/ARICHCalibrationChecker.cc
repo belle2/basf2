@@ -53,7 +53,6 @@ void ARICHCalibrationChecker::setExperimentRun(int experiment, int run)
 void ARICHCalibrationChecker::initializeDatabase()
 {
   /* Mimic a module initialization. */
-  StoreObjPtr<EventMetaData> eventMetaData;
   DataStore::Instance().setInitializeActive(true);
   m_EventMetaData.registerInDataStore();
   DataStore::Instance().setInitializeActive(false);

@@ -8,6 +8,8 @@ See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fa
 
 CHANGES since release-05-00-00:
 
+- EventLevelTrackingInfo:
+  + hasSVDSpacePointCreatorAbortionFlag/setSVDSpacePointCreatorAbortionFlag
 - TrackFitResult:
   + ndf
   + chi2
@@ -18,6 +20,8 @@ CHANGES since release-05-00-00:
     The mapping is from the database and doesn't affect mdst content and is thus not tested here.
   + getInputBitNumber added
   + getOutputBitNumber added
+- EventLevelTriggerTimeInfo
+  *  added new storage element for information from the Trigger Timing Distribution (TTD)
 """
 
 from basf2 import create_path, process, set_random_seed, find_file

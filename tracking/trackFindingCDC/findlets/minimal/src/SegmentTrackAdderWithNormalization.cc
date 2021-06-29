@@ -123,6 +123,7 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
   for (CDCTrack& track : tracks) {
     for (const CDCRecoHit3D& recoHit3D : track) {
       recoHits3D.push_back(recoHit3D);
+      // cppcheck-suppress invalidContainer
       trackHitRelations.push_back({&track, -INFINITY, &recoHits3D.back()});
     }
   }

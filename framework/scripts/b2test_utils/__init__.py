@@ -357,3 +357,13 @@ def skip_test_if_light(py_case=None):
         import generators  # noqa
     except ModuleNotFoundError:
         skip_test(reason="We're in a light build.", py_case=py_case)
+
+
+def print_belle2_environment():
+    """
+    Prints all the BELLE2 environment variables on the screen.
+    """
+    basf2.B2INFO('The BELLE2 environment variables are:')
+    for key, value in sorted(dict(os.environ).items()):
+        if 'BELLE2' in key.upper():
+            print(f'  {key}={value}')

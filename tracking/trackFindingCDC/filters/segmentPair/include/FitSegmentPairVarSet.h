@@ -34,6 +34,9 @@ namespace Belle2 {
     struct FitSegmentPairVarNames : public VarNames<CDCSegmentPair> {
 
       /// Number of variables to be generated
+      // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
+      // at least tell cppcheck that everything is fine
+      // cppcheck-suppress duplInheritedMember
       static const size_t nVars = size(fitSegmentPairVarNames);
 
       /// Getter for the name at the given index

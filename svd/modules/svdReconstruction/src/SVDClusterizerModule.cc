@@ -116,6 +116,8 @@ void SVDClusterizerModule::beginRun()
     m_timeRecoWith3SamplesAlgorithm = m_recoConfig->getTimeRecoWith3Samples();
     m_chargeRecoWith6SamplesAlgorithm = m_recoConfig->getChargeRecoWith6Samples();
     m_chargeRecoWith3SamplesAlgorithm = m_recoConfig->getChargeRecoWith3Samples();
+    m_positionRecoWith6SamplesAlgorithm = m_recoConfig->getPositionRecoWith6Samples();
+    m_positionRecoWith3SamplesAlgorithm = m_recoConfig->getPositionRecoWith3Samples();
 
     //strip algorithms
     m_stripTimeRecoWith6SamplesAlgorithm = m_recoConfig->getStripTimeRecoWith6Samples();
@@ -128,8 +130,8 @@ void SVDClusterizerModule::beginRun()
   SVDReconstructionBase recoBase;
 
   if (!recoBase.isTimeAlgorithmAvailable(m_timeRecoWith6SamplesAlgorithm)) {
-    B2WARNING("cluster time algorithm " << m_timeRecoWith6SamplesAlgorithm << " is NOT available, using CoG6");
-    m_timeRecoWith6SamplesAlgorithm = "CoG6";
+    B2WARNING("cluster time algorithm " << m_timeRecoWith6SamplesAlgorithm << " is NOT available, using CoG3");
+    m_timeRecoWith6SamplesAlgorithm = "CoG3";
   };
 
   if (!recoBase.isTimeAlgorithmAvailable(m_timeRecoWith3SamplesAlgorithm)) {
@@ -145,12 +147,12 @@ void SVDClusterizerModule::beginRun()
     m_chargeRecoWith3SamplesAlgorithm = "MaxSample";
   };
   if (!recoBase.isPositionAlgorithmAvailable(m_positionRecoWith6SamplesAlgorithm)) {
-    B2WARNING("cluster position algorithm " << m_positionRecoWith6SamplesAlgorithm << " is NOT available, using oldDefault");
-    m_positionRecoWith6SamplesAlgorithm = "oldDefault";
+    B2WARNING("cluster position algorithm " << m_positionRecoWith6SamplesAlgorithm << " is NOT available, using OldDefault");
+    m_positionRecoWith6SamplesAlgorithm = "OldDefault";
   };
   if (!recoBase.isPositionAlgorithmAvailable(m_positionRecoWith3SamplesAlgorithm)) {
-    B2WARNING("cluster position algorithm " << m_positionRecoWith3SamplesAlgorithm << " is NOT available, using oldDefault");
-    m_positionRecoWith3SamplesAlgorithm = "oldDefault";
+    B2WARNING("cluster position algorithm " << m_positionRecoWith3SamplesAlgorithm << " is NOT available, using OldDefault");
+    m_positionRecoWith3SamplesAlgorithm = "OldDefault";
   };
 
 

@@ -64,7 +64,8 @@ namespace Belle2 {
     addParam("swapBytes", m_swapBytes, "if true, swap bytes", false);
     addParam("dataFormat", m_dataFormat,
              "data format as defined in top/include/RawDataTypes.h, 0 = auto detect", 0);
-
+    addParam("addRelations", m_addRelations,
+             "if true, make relations to TOPProductionHitDebugs (production debug data format only)", true);
   }
 
   TOPUnpackerModule::~TOPUnpackerModule()
@@ -1074,7 +1075,7 @@ namespace Belle2 {
         hitDebug->appendExtraWord(word);
       }
 
-      if (hitDebug) {
+      if (m_addRelations and hitDebug) {
         digit->addRelationTo(hitDebug);
       }
 

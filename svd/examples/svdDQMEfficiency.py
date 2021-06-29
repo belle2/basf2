@@ -6,7 +6,6 @@ import sys
 import rawdata as raw
 import tracking as tr
 from basf2 import conditions as b2conditions
-from caf.SVD3SampleCoGTimeCalibrationPromptCAF import remove_module
 
 main = b2.Path()
 outputFile = sys.argv[1]
@@ -27,7 +26,7 @@ for module in main.modules():
 
 tr.add_tracking_reconstruction(main)
 
-main = remove_module(main, 'FullGridChi2TrackTimeExtractor')
+main = b2.remove_module(main, 'FullGridChi2TrackTimeExtractor')
 
 
 # ROI finder

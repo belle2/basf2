@@ -14,12 +14,14 @@ import json
 
 import numpy as np
 import scipy.linalg as la
+import scipy.stats
 import matplotlib.pyplot as plt
 
 import re
 import os
 from glob import glob
 from math import sqrt, frexp, asin
+from itertools import groupby
 
 from datetime import datetime, timedelta
 from ROOT.Belle2 import Unit
@@ -86,8 +88,6 @@ def getBSvalues(path):
             fN = ll[0].replace('/', '_') + '_rev_' + ll[1] + '.root'
 
             r = ll[2].split(',')
-            assert(r[0] == r[2])
-            assert(r[1] == r[3])
             runDict[fN] = (int(r[0]), int(r[1]))
 
     arr = []
@@ -99,6 +99,7 @@ def getBSvalues(path):
 
         f = ROOT.TFile.Open(fName)
         bsAll = f.Get("BeamSpot")
+        assert(bsAll.ClassName() == "Belle2::EventDependency")
 
         evNums = bsAll.getEventNumbers()
 
@@ -171,41 +172,67 @@ def printToFile(arr):
 def plotVar(arr, limits, vName, getterV, getterE=None):
 
     tVals = []
-    bsVals = []
-    bsErrs = []
+    Vals = []
+    Errs = []
+
+    tGapVals = []
+    GapVals = []
+
     for i, el in enumerate(arr):
         s, e = el[1], el[2]
         s = datetime.utcfromtimestamp((s + 9) * 3600)  # Convert to the JST (+9 hours)
         e = datetime.utcfromtimestamp((e + 9) * 3600)
         tVals.append(s)
         tVals.append(e)
-        bsVals.append(getterV(el))
-        bsVals.append(getterV(el))
+        Vals.append(getterV(el))
+        Vals.append(getterV(el))
 
         if getterE is not None:
-            bsErrs.append(getterE(el))
-            bsErrs.append(getterE(el))
+            Errs.append(getterE(el))
+            Errs.append(getterE(el))
 
-        # Add breaks if gap more than 180s
-        if i < len(arr) - 1:
-            dt = (arr[i + 1][1] - arr[i][2]) * 3600
-            if dt > 180:
-                tVals.append(e + timedelta(seconds=90))
-                bsVals.append(np.nan)
-                if getterE is not None:
-                    bsErrs.append(np.nan)
+        # Add breaks for longer gap if not the last interval
+        if i >= len(arr) - 1:
+            continue
 
-    plt.plot(tVals, bsVals)
+        dt = (arr[i + 1][1] - arr[i][2]) * 3600
 
-    bsVals = np.array(bsVals)
-    bsErrs = np.array(bsErrs)
+        # only consider gaps longer than 10 mins
+        if dt < 10 * 60:
+            continue
+
+        # start-time of gap, end-time of gap
+        gS = datetime.utcfromtimestamp((arr[i][2] + 9) * 3600)  # Convert to the JST (+9 hours)
+        gE = datetime.utcfromtimestamp((arr[i + 1][1] + 9) * 3600)
+
+        tVals.append(gS + (gE - gS) / 2)
+        Vals.append(np.nan)
+        if getterE is not None:
+            Errs.append(np.nan)
+
+        # store curve connecting gaps
+        tGapVals.append(gS - timedelta(seconds=1))
+        tGapVals.append(gS)
+        tGapVals.append(gE)
+        tGapVals.append(gE + timedelta(seconds=1))
+
+        GapVals.append(np.nan)
+        GapVals.append(getterV(arr[i]))
+        GapVals.append(getterV(arr[i + 1]))
+        GapVals.append(np.nan)
+
+    plt.plot(tVals, Vals, linewidth=2, color='C0')
+    plt.plot(tGapVals, GapVals, linewidth=2, color='C0', alpha=0.35)
+
+    Vals = np.array(Vals)
+    Errs = np.array(Errs)
 
     if getterE is not None:
-        plt.fill_between(tVals, bsVals - bsErrs, bsVals + bsErrs, alpha=0.2)
+        plt.fill_between(tVals, Vals - Errs, Vals + Errs, alpha=0.2)
 
     plt.xlabel('time')
     if 'Angle' in vName:
-        plt.ylabel(vName + ' [urad]')
+        plt.ylabel(vName + ' [mrad]')
     else:
         plt.ylabel(vName + ' [um]')
 
@@ -217,6 +244,33 @@ def plotVar(arr, limits, vName, getterV, getterE=None):
     # if not os.path.isdir(loc):
     os.makedirs(loc, exist_ok=True)
 
+    plt.savefig(loc + '/' + vName + '.png')
+    plt.clf()
+
+
+def plotPullSpectrum(arr, vName, getterV, getterE):
+
+    valsOrg = np.array([getterV(v) for v in arr])
+    errsOrg = np.array([getterE(v) for v in arr])
+
+    # remove repeating values
+    indx = np.array([list(g)[0][0] for k, g in groupby(zip(np.arange(len(valsOrg)), valsOrg), lambda x: x[1])])
+    vals = valsOrg[indx]
+    errs = errsOrg[indx]
+
+    diffs = (vals[1:] - vals[:-1]) / np.hypot(errs[1:], errs[:-1])
+
+    # Get 1sigma quantiles of the normal distribution
+    n1, n2 = scipy.stats.norm.cdf([-1, 1])
+
+    q1 = np.quantile(diffs, n1)
+    q2 = np.quantile(diffs, n2)
+
+    plt.hist(diffs, bins=np.linspace(-20, 20, 80), label=f'q1={round(q1,1)}, q2={round(q2,1)}')
+    plt.xlabel(vName)
+    plt.legend()
+
+    loc = 'plots/allData'
     plt.savefig(loc + '/' + vName + '.png')
     plt.clf()
 
@@ -235,13 +289,18 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
         allLimits += expert_config['plotsRanges']
 
     # Path to the database.txt file and to the payloads.
-    inputDir = f'{job_path}/BeamSpot/outputdb'
+    dbFile = glob(f'{job_path}/**/database.txt', recursive=True)
+    dbFile = [db for db in dbFile if 'algorithm_output' not in db]
+    assert(len(dbFile) == 1)
+    dbFile = dbFile[0]
+    inputDir = dbFile[:dbFile.rfind('/')]
+
     arr = getBSvalues(inputDir)
 
     # print the results to the CSV file
     printToFile(arr)
 
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(18, 9))
 
     # plot the results
     for limits in allLimits:
@@ -249,17 +308,21 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
         plotVar(arr, limits, 'yIP', lambda e: e[3][1], lambda e: e[4][1])
         plotVar(arr, limits, 'zIP', lambda e: e[3][2], lambda e: e[4][2])
 
-        plotVar(arr, limits, 'xSize', lambda e: sqrt(e[5][0]))
-        plotVar(arr, limits, 'ySize', lambda e: sqrt(e[5][1]))
-        plotVar(arr, limits, 'zSize', lambda e: sqrt(e[5][2]))
+        plotVar(arr, limits, 'xSpotSize', lambda e: sqrt(e[5][0]))
+        plotVar(arr, limits, 'ySpotSize', lambda e: sqrt(e[5][1]))
+        plotVar(arr, limits, 'zSpotSize', lambda e: sqrt(e[5][2]))
 
-        plotVar(arr, limits, 'xSizeEig', lambda e: e[6][0])
-        plotVar(arr, limits, 'ySizeEig', lambda e: e[6][1])
-        plotVar(arr, limits, 'zSizeEig', lambda e: e[6][2])
+        plotVar(arr, limits, 'xSpotSizeEig', lambda e: e[6][0])
+        plotVar(arr, limits, 'ySpotSizeEig', lambda e: e[6][1])
+        plotVar(arr, limits, 'zSpotSizeEig', lambda e: e[6][2])
 
-        plotVar(arr, limits, 'xzAngle', lambda e: e[6][3])
-        plotVar(arr, limits, 'yzAngle', lambda e: e[6][4])
-        plotVar(arr, limits, 'xyAngle', lambda e: e[6][5])
+        plotVar(arr, limits, 'xzSpotAngle', lambda e: e[6][3])
+        plotVar(arr, limits, 'yzSpotAngle', lambda e: e[6][4])
+        plotVar(arr, limits, 'xySpotAngle', lambda e: e[6][5])
+
+    plotPullSpectrum(arr, 'xIPpulls', lambda e: e[3][0], lambda e: e[4][0])
+    plotPullSpectrum(arr, 'yIPpulls', lambda e: e[3][1], lambda e: e[4][1])
+    plotPullSpectrum(arr, 'zIPpulls', lambda e: e[3][2], lambda e: e[4][2])
 
 
 if __name__ == "__main__":

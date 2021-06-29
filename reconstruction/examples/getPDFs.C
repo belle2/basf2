@@ -11,11 +11,12 @@
 #include "TStyle.h"
 #include "TCanvas.h"
 #include <include/reconstruction/dbobjects/DedxPDFs.h>
+#include <framework/logging/Logger.h>
 
 void getPDFs(std::string inputfile = "temp.root") {
 
     TFile* runfile = new TFile(Form("%s", inputfile.data()));
-    if (!runfile)std::cout << "Input payload file not found" << std::endl;
+    if (!runfile) B2FATAL("Input payload file not found");
 
     Belle2::DedxPDFs* pdfs = (Belle2::DedxPDFs*)runfile->Get("DedxPDFs");
     std::vector<TH2F*> hDedxPDFs(6);
@@ -28,20 +29,21 @@ void getPDFs(std::string inputfile = "temp.root") {
     gStyle->SetOptStat(11);
 
     for (const auto& idet : det) {
-        for (bool trunmean : { false, true }) {
-            std::stringstream check;
-            check << std::boolalpha << trunmean;
-            for (int iPart = 0; iPart < 6; iPart++) {
-                if (idet.compare("CDC") == 0)hDedxPDFs[iPart] = (TH2F*)pdfs->getCDCPDF(iPart, trunmean);
-                else if (idet.compare("SVD") == 0)hDedxPDFs[iPart] = (TH2F*)pdfs->getSVDPDF(iPart, trunmean);
-                else if (idet.compare("VXD") == 0)hDedxPDFs[iPart] = (TH2F*)pdfs->getPXDPDF(iPart, trunmean);
-                can->cd(iPart + 1);
-                hDedxPDFs[iPart]->SetTitle(Form("%s; p(GeV/c) of %s; dE/dx", hDedxPDFs[iPart]->GetTitle(), part[iPart].data()));
-                hDedxPDFs[iPart]->DrawCopy("colz");
-            }
-            can->SetTitle(Form("Likehood dist. of charged particles from %s, trunmean = %s", idet.data(), check.str().data()));
-            can->SaveAs(Form("Plots_%sDedxPDFs_wTrucMean_%s.pdf", idet.data(), check.str().data()));
-        }
+      for (bool trunmean : { false, true }) {
+	std::stringstream check;
+	check << std::boolalpha << trunmean;
+	for (int iPart = 0; iPart < 6; iPart++) {
+	  if (idet.compare("CDC") == 0)hDedxPDFs[iPart] = (TH2F*)pdfs->getCDCPDF(iPart, trunmean);
+	  else if (idet.compare("SVD") == 0)hDedxPDFs[iPart] = (TH2F*)pdfs->getSVDPDF(iPart, trunmean);
+	  else if (idet.compare("VXD") == 0)hDedxPDFs[iPart] = (TH2F*)pdfs->getPXDPDF(iPart, trunmean);
+	  can->cd(iPart + 1);
+	  hDedxPDFs[iPart]->SetTitle(Form("%s; p(GeV/c) of %s; dE/dx", hDedxPDFs[iPart]->GetTitle(), part[iPart].data()));
+	  hDedxPDFs[iPart]->DrawCopy("colz");
+	}
+	can->SetTitle(Form("Likehood dist. of charged particles from %s, trunmean = %s", idet.data(), check.str().data()));
+	can->SaveAs(Form("Plots_%sDedxPDFs_wTrucMean_%s.pdf", idet.data(), check.str().data()));
+      }
     }
     delete can;
+    
 }

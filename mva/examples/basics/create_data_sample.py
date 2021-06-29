@@ -20,18 +20,18 @@ variables = ['p', 'pt', 'pz', 'phi',
              'daughter(2, daughter(0, E))', 'daughter(2, daughter(1, E))',
              'daughter(2, daughter(0, clusterTiming))', 'daughter(2, daughter(1, clusterTiming))',
              'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
-             'daughter(2, daughter(0, minC2HDist))', 'daughter(2, daughter(1, minC2HDist))',
+             'daughter(2, daughter(0, minC2TDist))', 'daughter(2, daughter(1, minC2TDist))',
              'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
 spectators = ['isSignal', 'M']
 
 
 def reconstruction_path(inputfiles):
     path = b2.create_path()
-    ma.inputMdstList('MC7', inputfiles, path=path)
+    ma.inputMdstList('default', inputfiles, path=path)
     ma.fillParticleLists([('K-', 'kaonID > 0.5'), ('pi+', 'pionID > 0.5'),
                           ('gamma', '[[clusterReg == 1 and E > 0.10] or [clusterReg == 2 and E > 0.09] or '
                            '[clusterReg == 3 and E > 0.16]] and abs(clusterTiming) < 20 and clusterE9E25 > 0.7'
-                           ' and minC2HDist > 35')],
+                           ' and minC2TDist > 35')],
                          path=path)
     ma.reconstructDecay('pi0 -> gamma gamma', '0.1 < M < 1.6', path=path)
     vx.kFit('pi0', 0.1, fit_type='massvertex', path=path)
@@ -39,24 +39,21 @@ def reconstruction_path(inputfiles):
     vx.kFit('D0', 0.1, path=path)
     ma.applyCuts('D0', '1.7 < M < 1.9', path=path)
     ma.matchMCTruth('D0', path=path)
+    ma.applyCuts('D0', 'isNAN(isSignal) == False', path=path)
     return path
 
 
 if __name__ == "__main__":
 
     # Create a train, test and validation sample with different MC files
-    # Add your root files here
-    f = 'mdst_002001_prod00000789_task00004203.root'
-    path = reconstruction_path([f])
+    path = reconstruction_path([b2.find_file('ccbar_sample_to_train.root', 'examples', False)])
     ma.variablesToNtuple('D0', variables + spectators, filename='train.root', treename='tree', path=path)
-    b2.process(path)
+    b2.process(path, 100000)
 
-    # Add your root files here
-    path = reconstruction_path([f])
+    path = reconstruction_path([b2.find_file('ccbar_sample_to_test.root', 'examples', False)])
     ma.variablesToNtuple('D0', variables + spectators, filename='test.root', treename='tree', path=path)
-    b2.process(path)
+    b2.process(path, 100000)
 
-    # Add your root files here
-    path = reconstruction_path([f])
+    path = reconstruction_path([b2.find_file('ccbar_sample_to_test.root', 'examples', False)])
     ma.variablesToNtuple('D0', variables + spectators, filename='validation.root', treename='tree', path=path)
-    b2.process(path)
+    b2.process(path, 100000)

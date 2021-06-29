@@ -225,7 +225,7 @@ namespace Belle2 {
     }
 
     /** Get the AccessorParams of the underlying relation. */
-    const AccessorParams& getAccessorParams()     const { return m_index->getAccessorParams(); }
+    AccessorParams getAccessorParams()     const { return m_index->getAccessorParams(); }
 
     /** Get the AccessorParams of the StoreArray the relation points from. */
     const AccessorParams& getFromAccessorParams() const { return m_index->getFromAccessorParams(); }

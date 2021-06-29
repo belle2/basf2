@@ -49,9 +49,12 @@ namespace Belle2 {
     genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
     genfit::FieldManager::getInstance()->init(new genfit::ConstField(0., 0., 1.5));
     V0Fitter v0Fitter;
-    v0Fitter.initializeCuts(1.0, 52.);
+    v0Fitter.initializeCuts(1.0, 10000., {0.425, 0.575}, {1.09, 1.14}, {0, 0.1});
     EXPECT_EQ(1.0, v0Fitter.m_beamPipeRadius);
-    EXPECT_EQ(52., v0Fitter.m_vertexChi2CutOutside);
+    EXPECT_EQ(10000., v0Fitter.m_vertexChi2CutOutside);
+    EXPECT_EQ(std::make_tuple(0.425, 0.575), v0Fitter.m_invMassRangeKshort);
+    EXPECT_EQ(std::make_tuple(1.09, 1.14),   v0Fitter.m_invMassRangeLambda);
+    EXPECT_EQ(std::make_tuple(0, 0.1),       v0Fitter.m_invMassRangePhoton);
   }
 
 }  // namespace

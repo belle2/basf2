@@ -249,6 +249,7 @@ namespace Belle2 {
 
       //store general fit results
       mother->addExtraInfo("OrcaKinFitProb", prob);
+      mother->setPValue(prob);
       mother->addExtraInfo("OrcaKinFitChi2", chi2);
       mother->addExtraInfo("OrcaKinFitErrorCode", errorcode);
 

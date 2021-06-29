@@ -193,7 +193,7 @@ namespace Belle2 {
       Alternation() = default;
 
       /// Constructor from the nested functors
-      Alternation(const AFunctor1& functor1, const AFunctor2& functor2 = AFunctor2())
+      explicit Alternation(const AFunctor1& functor1, const AFunctor2& functor2 = AFunctor2())
         : m_functor1(functor1)
         , m_functor2(functor2)
       {

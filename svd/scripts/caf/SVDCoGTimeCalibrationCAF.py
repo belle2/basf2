@@ -27,14 +27,6 @@ input_branches = [
 now = datetime.datetime.now()
 
 
-def remove_module(path, name):
-
-    new_path = b2.create_path()
-    for m in path.modules():
-        if name != m.name():
-            new_path.add_module(m)
-    return new_path
-
 # pre_collector
 
 
@@ -65,7 +57,7 @@ def pre_collector():
         if moda.name() == 'SVDSpacePointCreator':
             moda.param("SVDClusters", 'SVDClustersFromTracks')
 
-    pre_path = remove_module(pre_path, 'SVDMissingAPVsClusterCreator')
+    pre_path = b2.remove_module(pre_path, 'SVDMissingAPVsClusterCreator')
 
     b2.print_path(pre_path)
 

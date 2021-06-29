@@ -20,6 +20,22 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
     @param applyMasking: if True, hot strips found in :ref:`SVDHotStripsCalibration<svdhotstrips>` are masked.
     """
 
+    # setup the event level tracking info to log errors and stuff
+    if isROIsimulation:
+        nameTrackingInfoModule = "RegisterEventLevelTrackingInfo__ROI"
+        nameEventTrackingInfo = "EventLevelTrackingInfo__ROI"
+        nameSVDTrackingEventLevelMdstInfoFiller = "SVDTrackingEventLevelMdstInfoFiller__ROI"
+    else:
+        nameTrackingInfoModule = "RegisterEventLevelTrackingInfo"
+        nameEventTrackingInfo = "EventLevelTrackingInfo"
+        nameSVDTrackingEventLevelMdstInfoFiller = "SVDTrackingEventLevelMdstInfoFiller"
+
+    if nameTrackingInfoModule not in path:
+        registerEventlevelTrackingInfo = b2.register_module('RegisterEventLevelTrackingInfo')
+        registerEventlevelTrackingInfo.set_name(nameTrackingInfoModule)
+        registerEventlevelTrackingInfo.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
+        path.add_module(registerEventlevelTrackingInfo)
+
     if(isROIsimulation):
         clusterizerName = '__ROISVDClusterizer'
         recocreatorName = '__ROISVDRecoDigitCreator'
@@ -62,23 +78,19 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         clusterizer.set_name(clusterizerName)
         clusterizer.param('ShaperDigits', shaperDigitsName)
         clusterizer.param('Clusters', clustersName)
-        clusterizer.param('timeAlgorithm6Samples', "CoG6")
-        clusterizer.param('timeAlgorithm3Samples', "CoG3")
-        clusterizer.param('chargeAlgorithm6Samples', "MaxSample")
-        clusterizer.param('chargeAlgorithm3Samples', "MaxSample")
-        clusterizer.param('positionAlgorithm6Samples', "oldDefault")
-        clusterizer.param('positionAlgorithm3Samples', "oldDefault")
-        clusterizer.param('stripTimeAlgorithm6Samples', "dontdo")
-        clusterizer.param('stripTimeAlgorithm3Samples', "dontdo")
-        clusterizer.param('stripChargeAlgorithm6Samples', "MaxSample")
-        clusterizer.param('stripChargeAlgorithm3Samples', "MaxSample")
-        clusterizer.param('useDB', False)
         path.add_module(clusterizer)
 
     if missingAPVsClusterCreatorName not in [e.name() for e in path.modules()]:
         missingAPVCreator = b2.register_module('SVDMissingAPVsClusterCreator')
         missingAPVCreator.set_name(missingAPVsClusterCreatorName)
         path.add_module(missingAPVCreator)
+
+    if nameSVDTrackingEventLevelMdstInfoFiller not in path:
+        svdTrackingEventLevelMdstInfoFiller = b2.register_module('SVDTrackingEventLevelMdstInfoFiller')
+        svdTrackingEventLevelMdstInfoFiller.set_name(nameSVDTrackingEventLevelMdstInfoFiller)
+        svdTrackingEventLevelMdstInfoFiller.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
+        svdTrackingEventLevelMdstInfoFiller.param('svdClustersName', clustersName)
+        path.add_module(svdTrackingEventLevelMdstInfoFiller)
 
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)
@@ -103,8 +115,8 @@ def add_svd_create_recodigits(path, recocreatorName="SVDRecoDigitCreator", shape
     if recocreatorName not in [e.name() for e in path.modules()]:
         recoDigitCreator = b2.register_module('SVDRecoDigitCreator')
         recoDigitCreator.param('ShaperDigits', shaperDigitsName)
-        recoDigitCreator.param('timeAlgorithm6Samples', "CoG6")
-        recoDigitCreator.param('timeAlgorithm3Samples', "CoG6")
+        recoDigitCreator.param('timeAlgorithm6Samples', "CoG3")
+        recoDigitCreator.param('timeAlgorithm3Samples', "CoG3")
         recoDigitCreator.param('chargeAlgorithm6Samples', "MaxSample")
         recoDigitCreator.param('chargeAlgorithm3Samples', "MaxSample")
         recoDigitCreator.param('useDB', False)
@@ -124,6 +136,22 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
     in order to simulate the PXD Data Reduction with ROI finding.
     @param applyMasking: if True, hot strips found in :ref:`SVDHotStripsCalibration<svdhotstrips>` are masked.
     """
+
+    # setup the event level tracking info to log errors and stuff
+    if isROIsimulation:
+        nameTrackingInfoModule = "RegisterEventLevelTrackingInfo__ROI"
+        nameEventTrackingInfo = "EventLevelTrackingInfo__ROI"
+        nameSVDTrackingEventLevelMdstInfoFiller = "SVDTrackingEventLevelMdstInfoFiller__ROI"
+    else:
+        nameTrackingInfoModule = "RegisterEventLevelTrackingInfo"
+        nameEventTrackingInfo = "EventLevelTrackingInfo"
+        nameSVDTrackingEventLevelMdstInfoFiller = "SVDTrackingEventLevelMdstInfoFiller"
+
+    if nameTrackingInfoModule not in path:
+        registerEventlevelTrackingInfo = b2.register_module('RegisterEventLevelTrackingInfo')
+        registerEventlevelTrackingInfo.set_name(nameTrackingInfoModule)
+        registerEventlevelTrackingInfo.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
+        path.add_module(registerEventlevelTrackingInfo)
 
     if(isROIsimulation):
         fitterName = '__ROISVDCoGTimeEstimator'
@@ -179,6 +207,13 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         missingAPVCreator = b2.register_module('SVDMissingAPVsClusterCreator')
         missingAPVCreator.set_name(missingAPVsClusterCreatorName)
         path.add_module(missingAPVCreator)
+
+    if nameSVDTrackingEventLevelMdstInfoFiller not in path:
+        svdTrackingEventLevelMdstInfoFiller = b2.register_module('SVDTrackingEventLevelMdstInfoFiller')
+        svdTrackingEventLevelMdstInfoFiller.set_name(nameSVDTrackingEventLevelMdstInfoFiller)
+        svdTrackingEventLevelMdstInfoFiller.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
+        svdTrackingEventLevelMdstInfoFiller.param('svdClustersName', clustersName)
+        path.add_module(svdTrackingEventLevelMdstInfoFiller)
 
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)
@@ -303,6 +338,20 @@ def add_svd_SPcreation(path, isROIsimulation=False):
     in order to simulate the PXD Data Reduction with ROI finding.
     """
 
+    # register EventTrackingInfo
+    if isROIsimulation:
+        nameTrackingInfoModule = "RegisterEventLevelTrackingInfo__ROI"
+        nameEventTrackingInfo = "EventLevelTrackingInfo__ROI"
+    else:
+        nameTrackingInfoModule = "RegisterEventLevelTrackingInfo"
+        nameEventTrackingInfo = "EventLevelTrackingInfo"
+
+    if nameTrackingInfoModule not in path:
+        registerEventlevelTrackingInfo = b2.register_module('RegisterEventLevelTrackingInfo')
+        registerEventlevelTrackingInfo.set_name(nameTrackingInfoModule)
+        registerEventlevelTrackingInfo.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
+        path.add_module(registerEventlevelTrackingInfo)
+
     if(isROIsimulation):
         svdSPCreatorName = '__ROISVDSpacePointCreator'
         svd_clusters = '__ROIsvdClusters'
@@ -318,4 +367,5 @@ def add_svd_SPcreation(path, isROIsimulation=False):
         spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
         spCreatorSVD.param('SpacePoints', nameSPs)
         spCreatorSVD.param('SVDClusters', svd_clusters)
+        spCreatorSVD.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
         path.add_module(spCreatorSVD)

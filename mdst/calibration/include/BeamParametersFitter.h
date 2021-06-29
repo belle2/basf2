@@ -93,14 +93,6 @@ namespace Belle2 {
     }
 
     /**
-     * Set whether to use momentum components or energy and two angles.
-     */
-    void useMomentum(bool use)
-    {
-      m_UseMomentum = use;
-    }
-
-    /**
      * Set whether to be verbose (print Minuit output).
      */
     void setVerbose(bool verbose)
@@ -167,9 +159,6 @@ namespace Belle2 {
 
     /** Invariant-mass error (use only if error is 0). */
     double m_InvariantMassError = 0.0001;
-
-    /** Whether to use momentum components or energy and two angles. */
-    bool m_UseMomentum = false;
 
     /** Whether to be verbose (print Minuit output). */
     bool m_Verbose = false;

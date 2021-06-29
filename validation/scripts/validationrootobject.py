@@ -37,19 +37,19 @@ class RootObject:
     """
 
     def __init__(
-            self,
-            revision: str,
-            package: str,
-            rootfile: str,
-            key: str,
-            root_object,
-            root_object_type: str,
-            date: Optional[int],
-            description: str,
-            check: str,
-            contact: str,
-            metaoptions: List[str],
-            is_reference: bool,
+        self,
+        revision: str,
+        package: str,
+        rootfile: str,
+        key: str,
+        root_object,
+        root_object_type: str,
+        date: Optional[int],
+        description: str,
+        check: str,
+        contact: str,
+        metaoptions: List[str],
+        is_reference: bool,
     ):
         """!
         The constructor. Sets the element up and store the information in a
@@ -87,18 +87,20 @@ class RootObject:
         # A dict with all information about the Root-object
         # Have all information as a dictionary so that we can search and
         # filter the objects by properties
-        self.data = {'revision': revision,
-                     'package': package,
-                     'rootfile': rootfile,
-                     'key': key,
-                     'object': root_object,
-                     'type': root_object_type,
-                     'check': check,
-                     'description': description,
-                     'contact': contact,
-                     'date': date,
-                     'metaoptions': metaoptions,
-                     'is_reference': is_reference}
+        self.data = {
+            "revision": revision,
+            "package": package,
+            "rootfile": rootfile,
+            "key": key,
+            "object": root_object,
+            "type": root_object_type,
+            "check": check,
+            "description": description,
+            "contact": contact,
+            "date": date,
+            "metaoptions": metaoptions,
+            "is_reference": is_reference,
+        }
 
     # For convenient access, define the following properties, which are
     # only references to the values from the dict
@@ -106,65 +108,65 @@ class RootObject:
     @property
     def revision(self):
         """ The revision to which the object belongs to """
-        return self.data['revision']
+        return self.data["revision"]
 
     @property
     def package(self):
         """ The package to which the object belongs to"""
-        return self.data['package']
+        return self.data["package"]
 
     @property
     def rootfile(self):
         """ The root file to which the object belongs to"""
-        return self.data['rootfile']
+        return self.data["rootfile"]
 
     @property
     def key(self):
         """ The key (more precisely: the name of they) which the object has
         within the root file
         """
-        return self.data['key']
+        return self.data["key"]
 
     @property
     def object(self):
         """ The root object itself """
-        return self.data['object']
+        return self.data["object"]
 
     @property
     def type(self):
         """ The type, i.e. whether its a histogram or an n-tuple """
-        return self.data['type']
+        return self.data["type"]
 
     @property
     def description(self):
         """ The description, what the histogram/n-tuple contains """
-        return self.data['description']
+        return self.data["description"]
 
     @property
     def check(self):
         """ A brief description how the histogram or the values should look
         like (e.g. characteristic peaks etc.) """
-        return self.data['check']
+        return self.data["check"]
 
     @property
     def contact(self):
         """ A contact person for this histogram/n-tuple """
-        return self.data['contact']
+        return self.data["contact"]
 
     @property
     def date(self):
         """ The date of the object (identical with the date of its rootfile) """
-        return self.data['date']
+        return self.data["date"]
 
     @property
     def metaoptions(self):
         """ Meta-options for the object, e.g. colz or log-scale for the axes """
-        return self.data['metaoptions']
+        return self.data["metaoptions"]
 
     @property
     def is_reference(self):
         """ Boolean value if it is an object from a reference file or not """
-        return self.data['is_reference']
+        return self.data["is_reference"]
 
     def __str__(self):
         return str(self.data)

@@ -53,7 +53,16 @@ V0FinderModule::V0FinderModule() : Module()
            1.);
 
   addParam("vertexChi2CutOutside", m_vertexChi2CutOutside,
-           "Maximum chi² for the vertex fit (NDF = 1)", 50.);
+           "Maximum chi² for the vertex fit (NDF = 1)", 10000.);
+
+  addParam("invMassRangeKshort", m_invMassRangeKshort,
+           "mass range in GeV for reconstructed Kshort after removing material effects and inner hits", m_invMassRangeKshort);
+
+  addParam("invMassRangeLambda", m_invMassRangeLambda,
+           "mass range in GeV for reconstructed Lambda after removing material effects and inner hits", m_invMassRangeLambda);
+
+  addParam("invMassRangePhoton", m_invMassRangePhoton,
+           "mass range in GeV for reconstructed Photon after removing material effects and inner hits", m_invMassRangePhoton);
 
   addParam("v0FitterMode", m_v0FitterMode,
            "designate which fitAndStore function is called in V0Fitter.\n"
@@ -62,10 +71,12 @@ V0FinderModule::V0FinderModule() : Module()
            "    2: mode 2 +  don't use SVD hits if there is only one available SVD hit-pair (default)",
            1);
 
-  addParam("massRangeKshort", m_MassRangeKshort, "mass range in GeV for reconstructed Kshort used for pre-selection of candidates"
-           " (to be chosen loosely as used momenta ignore material effects)", m_MassRangeKshort);
-  addParam("massRangeLambda", m_MassRangeLambda, "mass range in GeV for reconstructed Lambda used for pre-selection of candidates"
-           " (to be chosen loosely as used momenta ignore material effects)", m_MassRangeLambda);
+  addParam("massRangeKshort", m_preFilterMassRangeKshort,
+           "mass range in GeV for reconstructed Kshort used for pre-selection of candidates"
+           " (to be chosen loosely as used momenta ignore material effects)", m_preFilterMassRangeKshort);
+  addParam("massRangeLambda", m_preFilterMassRangeLambda,
+           "mass range in GeV for reconstructed Lambda used for pre-selection of candidates"
+           " (to be chosen loosely as used momenta ignore material effects)", m_preFilterMassRangeLambda);
 }
 
 
@@ -79,28 +90,33 @@ void V0FinderModule::initialize()
                                           m_arrayNameV0ValidationVertex, m_arrayNameRecoTrack,
                                           m_arrayNameCopiedRecoTrack, m_validation);
 
-  m_v0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside);
+  m_v0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside,
+                             m_invMassRangeKshort, m_invMassRangeLambda, m_invMassRangePhoton);
   m_v0Fitter->setFitterMode(m_v0FitterMode);
 
   // safeguard for users that try to break the code
-  if (std::get<0>(m_MassRangeKshort) > std::get<1>(m_MassRangeKshort)) {
+  if (std::get<0>(m_preFilterMassRangeKshort) > std::get<1>(m_preFilterMassRangeKshort)) {
     B2FATAL("The minimum has to be smaller than the maximum of the Kshort mass range! min = " <<  std::get<0>
-            (m_MassRangeKshort) << " max = " << std::get<1>(m_MassRangeKshort));
+            (m_preFilterMassRangeKshort) << " max = " << std::get<1>(m_preFilterMassRangeKshort));
   }
-  if (std::get<0>(m_MassRangeLambda) > std::get<1>(m_MassRangeLambda)) {
+  if (std::get<0>(m_preFilterMassRangeLambda) > std::get<1>(m_preFilterMassRangeLambda)) {
     B2FATAL("The minimum has to be smaller than the maximum of the Lambda mass range! min = " <<  std::get<0>
-            (m_MassRangeLambda) << " max = " << std::get<1>(m_MassRangeLambda));
+            (m_preFilterMassRangeLambda) << " max = " << std::get<1>(m_preFilterMassRangeLambda));
   }
 
   // precalculate the mass range squared
-  m_mKshortMin2 = std::get<0>(m_MassRangeKshort) < 0 ? -std::get<0>(m_MassRangeKshort) * std::get<0>(m_MassRangeKshort) : std::get<0>
-                  (m_MassRangeKshort) * std::get<0>(m_MassRangeKshort);
-  m_mKshortMax2 = std::get<1>(m_MassRangeKshort) < 0 ? -std::get<1>(m_MassRangeKshort) * std::get<1>(m_MassRangeKshort) : std::get<1>
-                  (m_MassRangeKshort) * std::get<1>(m_MassRangeKshort);
-  m_mLambdaMin2 = std::get<0>(m_MassRangeLambda) < 0 ? -std::get<0>(m_MassRangeLambda) * std::get<0>(m_MassRangeLambda) : std::get<0>
-                  (m_MassRangeLambda) * std::get<0>(m_MassRangeLambda);
-  m_mLambdaMax2 = std::get<1>(m_MassRangeLambda) < 0 ? -std::get<1>(m_MassRangeLambda) * std::get<1>(m_MassRangeLambda) : std::get<1>
-                  (m_MassRangeLambda) * std::get<1>(m_MassRangeLambda);
+  m_mKshortMin2 = std::get<0>(m_preFilterMassRangeKshort) < 0 ? -std::get<0>(m_preFilterMassRangeKshort) * std::get<0>
+                  (m_preFilterMassRangeKshort) : std::get<0>
+                  (m_preFilterMassRangeKshort) * std::get<0>(m_preFilterMassRangeKshort);
+  m_mKshortMax2 = std::get<1>(m_preFilterMassRangeKshort) < 0 ? -std::get<1>(m_preFilterMassRangeKshort) * std::get<1>
+                  (m_preFilterMassRangeKshort) : std::get<1>
+                  (m_preFilterMassRangeKshort) * std::get<1>(m_preFilterMassRangeKshort);
+  m_mLambdaMin2 = std::get<0>(m_preFilterMassRangeLambda) < 0 ? -std::get<0>(m_preFilterMassRangeLambda) * std::get<0>
+                  (m_preFilterMassRangeLambda) : std::get<0>
+                  (m_preFilterMassRangeLambda) * std::get<0>(m_preFilterMassRangeLambda);
+  m_mLambdaMax2 = std::get<1>(m_preFilterMassRangeLambda) < 0 ? -std::get<1>(m_preFilterMassRangeLambda) * std::get<1>
+                  (m_preFilterMassRangeLambda) : std::get<1>
+                  (m_preFilterMassRangeLambda) * std::get<1>(m_preFilterMassRangeLambda);
 
 }
 

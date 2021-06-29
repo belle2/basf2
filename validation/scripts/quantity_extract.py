@@ -27,7 +27,9 @@ def default_extractor():
         countZeroSuppressed = 0
         for i in range(nbinsx):
             v = profile_obj.GetBinContent(i + 1)
-            sum = sum + v  # from first bin, ignored underflow (i=0) and overflow (i=nbinsx+1) bins
+            sum = (
+                sum + v
+            )  # from first bin, ignored underflow (i=0) and overflow (i=nbinsx+1) bins
             if v > 0.0:
                 sumZeroSuppressed = sumZeroSuppressed + v
                 countZeroSuppressed = countZeroSuppressed + 1
@@ -44,24 +46,35 @@ def default_extractor():
             for branch in ntuple_obj.GetListOfBranches():
                 branch_name = branch.GetName()
                 # create tuple with the branch name and value
-                results.append((ntuple_obj.GetName() + "_" + branch_name, float(getattr(ntuple_obj, branch_name))))
+                results.append(
+                    (
+                        ntuple_obj.GetName() + "_" + branch_name,
+                        float(getattr(ntuple_obj, branch_name)),
+                    )
+                )
         return results
 
-    th1_like = [lambda x: [("mean_x", x.GetMean(1))],
-                lambda x: [("entries", x.GetEntries())],
-                lambda x: [("mean_y", computeMean(x)[0])],
-                lambda x: [("mean_y_zero_suppressed", computeMean(x)[1])]]
+    th1_like = [
+        lambda x: [("mean_x", x.GetMean(1))],
+        lambda x: [("entries", x.GetEntries())],
+        lambda x: [("mean_y", computeMean(x)[0])],
+        lambda x: [("mean_y_zero_suppressed", computeMean(x)[1])],
+    ]
 
-    tprofile = [lambda x: [("mean_y", computeMean(x)[0])],
-                lambda x: [("mean_y_zero_suppressed", computeMean(x)[1])]]
+    tprofile = [
+        lambda x: [("mean_y", computeMean(x)[0])],
+        lambda x: [("mean_y_zero_suppressed", computeMean(x)[1])],
+    ]
 
     tntuple = [extractNtupleValues]
 
-    return {"TH1D": th1_like,
-            "TH1F": th1_like,
-            "TH1": th1_like,
-            "TProfile": tprofile,
-            "TNtuple": tntuple}
+    return {
+        "TH1D": th1_like,
+        "TH1F": th1_like,
+        "TH1": th1_like,
+        "TProfile": tprofile,
+        "TNtuple": tntuple,
+    }
 
 
 class RootQuantityExtract:

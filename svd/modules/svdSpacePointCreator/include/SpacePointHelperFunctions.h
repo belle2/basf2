@@ -12,10 +12,12 @@
 
 #include <vector>
 
-#include <svd/calibration/SVDClusterCalibrations.h>
+#include <svd/calibration/SVDHitTimeSelection.h>
 #include <svd/dataobjects/SVDCluster.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <mdst/dataobjects/EventLevelTrackingInfo.h>
 
 #include <vxd/dataobjects/VxdID.h>
 
@@ -88,21 +90,21 @@ namespace Belle2 {
    * Condition which has to be fulfilled: the first entry is always an u cluster, the second always a v-cluster
    */
   inline void findPossibleCombinations(const Belle2::ClustersOnSensor& aSensor,
-                                       std::vector< std::vector<const SVDCluster*> >& foundCombinations, const SVDClusterCalibrations& clusterCal)
+                                       std::vector< std::vector<const SVDCluster*> >& foundCombinations, const SVDHitTimeSelection& hitTimeCut)
   {
 
     for (const SVDCluster* uCluster : aSensor.clustersU) {
-      if (! clusterCal.isClusterInTime(uCluster->getSensorID(), 1, uCluster->getClsTime())) {
+      if (! hitTimeCut.isClusterInTime(uCluster->getSensorID(), 1, uCluster->getClsTime())) {
         B2DEBUG(1, "Cluster rejected due to timing cut. Cluster time: " << uCluster->getClsTime());
         continue;
       }
       for (const SVDCluster* vCluster : aSensor.clustersV) {
-        if (! clusterCal.isClusterInTime(vCluster->getSensorID(), 0, vCluster->getClsTime())) {
+        if (! hitTimeCut.isClusterInTime(vCluster->getSensorID(), 0, vCluster->getClsTime())) {
           B2DEBUG(1, "Cluster rejected due to timing cut. Cluster time: " << vCluster->getClsTime());
           continue;
         }
 
-        if (! clusterCal.areClusterTimesCompatible(vCluster->getSensorID(), uCluster->getClsTime(), vCluster->getClsTime())) {
+        if (! hitTimeCut.areClusterTimesCompatible(vCluster->getSensorID(), uCluster->getClsTime(), vCluster->getClsTime())) {
           B2DEBUG(1, "Cluster combination rejected due to timing cut. Cluster time U (" << uCluster->getClsTime() <<
                   ") is incompatible with Cluster time V (" << vCluster->getClsTime() << ")");
           continue;
@@ -241,8 +243,8 @@ namespace Belle2 {
    * relationweights code the type of the cluster. +1 for u and -1 for v
    */
   template <class SpacePointType> void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters,
-      StoreArray<SpacePointType>& spacePoints, SVDClusterCalibrations& clusterCal, bool useQualityEstimator, TFile* pdfFile,
-      bool useLegacyNaming, unsigned int numMaxSpacePoints)
+      StoreArray<SpacePointType>& spacePoints, SVDHitTimeSelection& hitTimeCut, bool useQualityEstimator, TFile* pdfFile,
+      bool useLegacyNaming, unsigned int numMaxSpacePoints, std::string m_eventLevelTrackingInfoName)
   {
     std::unordered_map<VxdID::baseType, ClustersOnSensor>
     activatedSensors; // collects one entry per sensor, each entry will contain all Clusters on it TODO: better to use a sorted vector/list?
@@ -258,10 +260,16 @@ namespace Belle2 {
 
 
     for (auto& aSensor : activatedSensors)
-      findPossibleCombinations(aSensor.second, foundCombinations, clusterCal);
+      findPossibleCombinations(aSensor.second, foundCombinations, hitTimeCut);
 
     // Do not make space-points if their number would be too large to be considered by tracking
-    if (foundCombinations.size() > numMaxSpacePoints) return;
+    if (foundCombinations.size() > numMaxSpacePoints) {
+      StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo(m_eventLevelTrackingInfoName);
+      if (m_eventLevelTrackingInfo.isValid()) {
+        m_eventLevelTrackingInfo->setSVDSpacePointCreatorAbortionFlag();
+      }
+      return;
+    }
 
     for (auto& clusterCombi : foundCombinations) {
       SpacePointType* newSP = spacePoints.appendNew(clusterCombi);

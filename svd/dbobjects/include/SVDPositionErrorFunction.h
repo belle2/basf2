@@ -123,7 +123,7 @@ namespace Belle2 {
 
     /** function parameters & implementations*/
 
-    /** ID = {0}, HIKARU: error is the sum in quadrature of
+    /** ID = {0}, rel05: error is the sum in quadrature of
      * A = a1/(x+a2)
      * B = b1 * x
      * C = c1
@@ -141,10 +141,11 @@ namespace Belle2 {
      */
     double v0(double clSNR, int clSize) const
     {
-      if (clSize > maxClusterSize - 1)
-        clSize = maxClusterSize - 1;
 
       double x = sqrt(clSize) * clSNR;
+
+      if (clSize > maxClusterSize)
+        clSize = maxClusterSize;
 
       double A = m_a1[clSize - 1] / (x + m_a2[clSize - 1]);
       double B = m_b1[clSize - 1] * x;

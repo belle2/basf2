@@ -29,6 +29,8 @@
 #include <top/dataobjects/TOPBarHit.h>
 #include <tracking/dataobjects/ExtHit.h>
 
+// ROOT
+#include <TDirectory.h>
 
 using namespace std;
 
@@ -63,7 +65,7 @@ namespace Belle2 {
 
   void TOPNtupleModule::initialize()
   {
-
+    TDirectory::TContext context;
     m_file = TFile::Open(m_outputFileName.c_str(), "RECREATE");
     if (m_file->IsZombie()) {
       B2FATAL("Couldn't open file '" << m_outputFileName << "' for writing!");
@@ -231,11 +233,11 @@ namespace Belle2 {
 
   void TOPNtupleModule::terminate()
   {
+    TDirectory::TContext context;
     m_file->cd();
     m_tree->Write();
     m_file->Close();
   }
-
 
 } // end Belle2 namespace
 

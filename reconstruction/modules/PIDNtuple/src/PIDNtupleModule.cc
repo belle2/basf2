@@ -26,6 +26,7 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 // ROOT
+#include <TDirectory.h>
 #include <TRandom3.h>
 
 using namespace Belle2;
@@ -76,6 +77,7 @@ void PIDNtupleModule::initialize()
   tracks.optionalRelationTo(mcparticles);
 
   // Create and book the ROOT file and TTree
+  TDirectory::TContext context;
   m_file = new TFile(m_outputFileName.c_str(), "RECREATE");
   m_tree = new TTree("pid", "PID tree");
 
@@ -225,6 +227,7 @@ void PIDNtupleModule::endRun() { }
 
 void PIDNtupleModule::terminate()
 {
+  TDirectory::TContext context;
   m_file->cd();
   m_tree->Write();
   m_file->Close();

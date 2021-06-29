@@ -24,6 +24,7 @@
 #include <TH2F.h>
 #include <TFile.h>
 #include <TRandom.h>
+#include <TDirectory.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -231,6 +232,7 @@ void TOPRingPlotterModule::initialize()
 
   m_pdfAsHisto = new TH2F("pdfAsHisto", "tms holder for the pdf to be sampled", 512, 0, 512, 500, 0, 100);
 
+  TDirectory::TContext context;
   B2INFO("creating a tree for TOPRingPlotterModule");
   m_outputFile = new TFile(m_outputName.c_str(), "recreate");
   m_tree = new TTree("tree", "tree");
@@ -450,6 +452,8 @@ void TOPRingPlotterModule::event()
 
 void TOPRingPlotterModule::terminate()
 {
+  TDirectory::TContext context;
+  m_outputFile->cd();
   m_tree->Write();
   m_outputFile->Close();
 }

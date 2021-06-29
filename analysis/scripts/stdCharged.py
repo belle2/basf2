@@ -158,6 +158,10 @@ def stdLep(pdgId, listtype, method, classification, path=None):
         path (basf2.Path): modules are added to this path
     """
 
+    # We stick to positive pdgId by convention.
+    # Anyway, the particle list will be filled for anti-particles too.
+    pdgId = abs(pdgId)
+
     if pdgId not in (Const.electron.getPDGCode(), Const.muon.getPDGCode()):
         b2.B2FATAL(f"{pdgId} is not that of a light charged lepton.")
 
@@ -181,8 +185,7 @@ def stdLep(pdgId, listtype, method, classification, path=None):
 
     # Remove non-alphanumeric chars from the variable name, and strip last "_" if present.
     # This is needed to match the name of the payload in the CDB.
-    pid_var_stripped = re.sub(r"[\W]+", "_", pid_var)
-    pid_var_stripped = pid_var_stripped[:-1] if pid_var_stripped.endswith("_") else pid_var_stripped
+    pid_var_stripped = re.sub(r"[\W]+", "_", pid_var).rstrip("_")
 
     # The names of the payloads w/ efficiency and mis-id corrections.
     payload_eff = f"ParticleReweighting:{pid_var_stripped}_eff_combination_{listtype}"
@@ -206,7 +209,6 @@ def stdLep(pdgId, listtype, method, classification, path=None):
     # Apply the PID selection cut, which is read from the efficiency payload.
     cut = f"{pid_var} > extraInfo({payload_eff}_threshold)"
     ma.applyCuts(plistname, cut, path=path)
-    ma.matchMCTruth(plistname, path=path)
 
 
 def stdE(listtype, method, classification, path=None):

@@ -149,30 +149,45 @@ def stdLep(pdgId, listtype, method, classification, path=None):
     """
     Function to prepare one of several standardized types of lepton (e, mu) lists:
 
-    - 'eff50' 50% lepton efficiency list.
-    - 'eff90' 90% lepton efficiency list.
-    - 'eff99' 99% lepton efficiency list.
+    - 'UniformEff50' 50% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
+    - 'UniformEff90' 90% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
+    - 'UniformEff99' 99% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
 
     Parameters:
         pdgId (int): the lepton pdg code.
-        listtype (str): name of standard list
-        path (basf2.Path): modules are added to this path
+        listtype (str): name of standard list.
+        method (str): the PID method: 'likelihood' or 'bdt'.
+        classification (str): the type of classifier: 'binary' (one-vs-other) or 'global' (one-vs-all).
+        path (basf2.Path): modules are added to this path.
     """
+
+    std_lepton_list_names = (
+        "UniformEff50",
+        "UniformEff90",
+        "UniformEff99",
+    )
+
+    available_methods = ("likelihood", "bdt")
+    available_classificators = ("global", "binary")
 
     # We stick to positive pdgId by convention.
     # Anyway, the particle list will be filled for anti-particles too.
     pdgId = abs(pdgId)
 
-    if pdgId not in (Const.electron.getPDGCode(), Const.muon.getPDGCode()):
-        b2.B2FATAL(f"{pdgId} is not that of a light charged lepton.")
+    if listtype not in std_lepton_list_names:
+        b2.B2ERROR("The requested lepton list is not defined. Please refer to the stdLep and stdCharged documentation.")
+        return
 
-    available_methods = ("likelihood", "bdt")
-    available_classificators = ("global", "binary")
+    if pdgId not in (Const.electron.getPDGCode(), Const.muon.getPDGCode()):
+        b2.B2ERROR(f"{pdgId} is not that of a light charged lepton.")
+        return
 
     if method not in available_methods:
-        b2.B2FATAL(f"method: {method}. Must be any of: {available_methods}.")
+        b2.B2ERROR(f"method: {method}. Must be any of: {available_methods}.")
+        return
     if classification not in available_classificators:
-        b2.B2FATAL(f"classification: {classification}. Must be any of: {available_classificators}.")
+        b2.B2ERROR(f"classification: {classification}. Must be any of: {available_classificators}.")
+        return
 
     pid_variables = {
         "likelihood": {
@@ -220,44 +235,48 @@ def stdLep(pdgId, listtype, method, classification, path=None):
     ma.applyCuts(plistname, cut, path=path)
 
 
-def stdE(listtype, method=None, classification=None, path=None):
+def stdE(listtype=_defaultlist, method=None, classification=None, path=None):
     """ Function to prepare one of several standardized types of electron lists.
     See the documentation of `stdLep` for details.
 
-    It also accepts any of the standard definitions:
+    It also accepts any of the standard definitions
+    for the ``listtype`` parameter to fall back to the `stdCharged` behaviour:
 
-      - 'all'
-      - 'good'
-      - 'loosepid'
-      - 'loose'
-      - 'higheff'
-
-    for the ``listtype`` parameter to fall back to the `stdCharged` behaviour.
+    * 'all'
+    * 'good'
+    * 'loosepid'
+    * 'loose'
+    * 'higheff'
+    * '95eff'
+    * '90eff'
+    * '85eff'
     """
 
-    if listtype in _stdnames:
+    if listtype in _stdnames + _effnames:
         stdCharged("e", listtype, path)
         return
 
     stdLep(Const.electron.getPDGCode(), listtype, method, classification, path=path)
 
 
-def stdMu(listtype, method=None, classification=None, path=None):
+def stdMu(listtype=_defaultlist, method=None, classification=None, path=None):
     """ Function to prepare one of several standardized types of muon lists.
     See the documentation of `stdLep` for details.
 
-    It also accepts any of the standard definitions:
+    It also accepts any of the standard definitions
+    for the ``listtype`` parameter to fall back to the `stdCharged` behaviour:
 
-      - 'all'
-      - 'good'
-      - 'loosepid'
-      - 'loose'
-      - 'higheff'
-
-    for the ``listtype`` parameter to fall back to the `stdCharged` behaviour.
+    * 'all'
+    * 'good'
+    * 'loosepid'
+    * 'loose'
+    * 'higheff'
+    * '95eff'
+    * '90eff'
+    * '85eff'
     """
 
-    if listtype in _stdnames:
+    if listtype in _stdnames + _effnames:
         stdCharged("mu", listtype, path)
         return
 

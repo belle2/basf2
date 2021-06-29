@@ -23,6 +23,7 @@
 
 // DataStore classes
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/dataobjects/MCInitialParticles.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPLikelihood.h>
@@ -111,7 +112,8 @@ namespace Belle2 {
     mcParticles.isOptional();
     StoreArray<TOPBarHit> barHits;
     barHits.isOptional();
-
+    StoreObjPtr<MCInitialParticles> mcInitialParticles;
+    mcInitialParticles.isOptional();
   }
 
   void TOPNtupleModule::beginRun()
@@ -123,6 +125,9 @@ namespace Belle2 {
 
     StoreObjPtr<EventMetaData> evtMetaData;
     StoreArray<Track> tracks;
+    StoreObjPtr<MCInitialParticles> mcInitialParticles;
+    double trueEventT0 = 0;
+    if (mcInitialParticles.isValid()) trueEventT0 = mcInitialParticles->getTime();
 
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
@@ -218,7 +223,7 @@ namespace Belle2 {
         m_top.barHit.p = momentum.Mag();
         m_top.barHit.theta = momentum.Theta();
         m_top.barHit.phi = momentum.Phi();
-        m_top.barHit.time = barHit->getTime();
+        m_top.barHit.time = barHit->getTime() - trueEventT0;
       }
 
       m_tree->Fill();

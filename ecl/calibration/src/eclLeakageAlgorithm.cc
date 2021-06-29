@@ -254,8 +254,8 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   TString statusString[7] = {"good", "refit", "lowStat", "lowProb", "peakAtLimit", "sigmaAtLimit", "etaAtLimit"}; /**< categories of fit status */
   const double fracEnt[2] = {0.683, 0.5}; // fit range includes 68% or 50% of entries
   const double minEntries = 100.; // don't use fits with fewer entries
-  const double minMaxBin = 50.; // rebin if max bin is below this
-  const double highMaxBin = 300.; // can float eta is max bin is above this
+  const double minMaxBin = 50.; // rebin if max bin is below this value
+  const double highMaxBin = 300.; // can float eta if max bin is above this value
 
   TF1* func = new TF1("eclLeakageNovo", eclLeakageNovo, eFracLo, eFracHi, 4);
   func->SetParNames("normalization", "peak", "effSigma", "eta");

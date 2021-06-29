@@ -51,11 +51,11 @@ void EKLMADCModule::generateHistogram(const char* name, double l, double d,
   int j;
   double t, s;
   KLM::ScintillatorSimulator fe(m_SciSimPar, nullptr, 0, false);
-  KLMTime klmTime;
-  klmTime.updateConstants();
+  KLMTime* klmTime = &(KLMTime::Instance());
+  klmTime->updateConstants();
   TH1F* h = nullptr;
   t = m_SciSimPar->getNDigitizations() *
-      m_SciSimPar->getADCSamplingTDCPeriods() * klmTime.getTDCPeriod();
+      m_SciSimPar->getADCSamplingTDCPeriods() * klmTime->getTDCPeriod();
   try {
     h = new TH1F(name, "", m_SciSimPar->getNDigitizations(), 0, t);
   } catch (std::bad_alloc& ba) {

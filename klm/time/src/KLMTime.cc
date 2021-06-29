@@ -13,6 +13,12 @@
 
 using namespace Belle2;
 
+KLMTime& KLMTime::Instance()
+{
+  static KLMTime klmElementNumbers;
+  return klmElementNumbers;
+}
+
 void KLMTime::updateConstants()
 {
   m_TDCPeriod =

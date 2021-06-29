@@ -131,7 +131,7 @@ namespace Belle2 {
     DBObjPtr<HardwareClockSettings> m_HardwareClockSettings;
 
     /** Time conversion. */
-    KLMTime m_Time;
+    KLMTime* m_Time;
 
     /** Element numbers. */
     const KLMElementNumbers* m_ElementNumbers;

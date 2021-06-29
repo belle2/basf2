@@ -29,6 +29,7 @@ using namespace Belle2::KLM;
 REG_MODULE(KLMUnpacker)
 
 KLMUnpackerModule::KLMUnpackerModule() : Module(),
+  m_Time(&(KLMTime::Instance())),
   m_ElementNumbers(&(KLMElementNumbers::Instance())),
   m_triggerCTimeOfPreviousEvent(0)
 {
@@ -86,7 +87,7 @@ void KLMUnpackerModule::beginRun()
   if (!m_FEEParameters.isValid())
     B2FATAL("KLM scintillator FEE parameters are not available.");
   m_triggerCTimeOfPreviousEvent = 0;
-  m_Time.updateConstants();
+  m_Time->updateConstants();
 }
 
 void KLMUnpackerModule::createDigit(
@@ -111,7 +112,7 @@ void KLMUnpackerModule::createDigit(
     klmDigitEventInfo->increaseRPCHits();
     float triggerTime = klmDigitEventInfo->getRevo9TriggerWord();
     std::pair<int, double> rpcTimes =
-      m_Time.getRPCTimes(raw->getCTime(), raw->getTDC(), triggerTime);
+      m_Time->getRPCTimes(raw->getCTime(), raw->getTDC(), triggerTime);
     klmDigit->setTime(rpcTimes.second);
   } else {
     /*
@@ -119,7 +120,7 @@ void KLMUnpackerModule::createDigit(
      * trigger ctime.
      */
     klmDigitEventInfo->increaseSciHits();
-    double time = m_Time.getScintillatorTime(
+    double time = m_Time->getScintillatorTime(
                     raw->getCTime(), klmDigitEventInfo->getTriggerCTime());
     klmDigit->setTime(time);
     uint16_t channelNumber = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);

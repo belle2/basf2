@@ -29,6 +29,7 @@ REG_MODULE(KLMDigitizer)
 
 KLMDigitizerModule::KLMDigitizerModule() :
   Module(),
+  m_Time(&(KLMTime::Instance())),
   m_ElementNumbers(&(KLMElementNumbers::Instance())),
   m_ChannelSpecificSimulation(false),
   m_EfficiencyMode(c_Plane),
@@ -121,7 +122,7 @@ void KLMDigitizerModule::beginRun()
     B2FATAL("KLM strip efficiency data are not available.");
   if (m_ChannelSpecificSimulation)
     checkScintillatorFEEParameters();
-  m_Time.updateConstants();
+  m_Time->updateConstants();
   m_Fitter = new KLM::ScintillatorFirmware(m_DigPar->getNDigitizations());
 }
 
@@ -152,7 +153,7 @@ void KLMDigitizerModule::digitizeBKLM()
   int tdc;
   KLM::ScintillatorSimulator simulator(
     &(*m_DigPar), m_Fitter,
-    m_DigitizationInitialTime * m_Time.getCTimePeriod(), m_Debug);
+    m_DigitizationInitialTime * m_Time->getCTimePeriod(), m_Debug);
   const KLMScintillatorFEEData* FEEData;
   std::multimap<uint16_t, const BKLMSimHit*>::iterator it, it2, ub;
   for (it = m_bklmSimHitChannelMap.begin(); it != m_bklmSimHitChannelMap.end();
@@ -213,7 +214,7 @@ void KLMDigitizerModule::digitizeBKLM()
         bklmDigit->setCharge(m_DigPar->getADCRange() - 1);
       }
       bklmDigit->setTDC(tdc);
-      bklmDigit->setTime(m_Time.getTimeSimulation(tdc, true));
+      bklmDigit->setTime(m_Time->getTimeSimulation(tdc, true));
       bklmDigit->setFitStatus(simulator.getFitStatus());
       bklmDigit->setNPhotoelectrons(simulator.getNPhotoelectrons());
       bklmDigit->setEnergyDeposit(simulator.getEnergy());
@@ -232,7 +233,7 @@ void KLMDigitizerModule::digitizeEKLM()
   uint16_t tdc;
   KLM::ScintillatorSimulator simulator(
     &(*m_DigPar), m_Fitter,
-    m_DigitizationInitialTime * m_Time.getCTimePeriod(), m_Debug);
+    m_DigitizationInitialTime * m_Time->getCTimePeriod(), m_Debug);
   const KLMScintillatorFEEData* FEEData;
   std::multimap<uint16_t, const EKLMSimHit*>::iterator it, ub;
   for (it = m_eklmSimHitChannelMap.begin(); it != m_eklmSimHitChannelMap.end();
@@ -273,7 +274,7 @@ void KLMDigitizerModule::digitizeEKLM()
       eklmDigit->setCharge(m_DigPar->getADCRange() - 1);
     }
     eklmDigit->setTDC(tdc);
-    eklmDigit->setTime(m_Time.getTimeSimulation(tdc, true));
+    eklmDigit->setTime(m_Time->getTimeSimulation(tdc, true));
     eklmDigit->setFitStatus(simulator.getFitStatus());
     eklmDigit->setNPhotoelectrons(simulator.getNPhotoelectrons());
     eklmDigit->setEnergyDeposit(simulator.getEnergy());

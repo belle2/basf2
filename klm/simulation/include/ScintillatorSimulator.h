@@ -198,7 +198,7 @@ namespace Belle2 {
       DBObjPtr<HardwareClockSettings> m_HardwareClockSettings;
 
       /** Time. */
-      KLMTime m_Time;
+      const KLMTime* m_Time;
 
       /** Parameters. */
       const KLMScintillatorDigitizationParameters* m_DigPar;

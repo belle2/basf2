@@ -169,7 +169,7 @@ namespace Belle2 {
     DBObjPtr<KLMScintillatorFEEParameters> m_FEEParameters;
 
     /** Time conversion. */
-    KLMTime m_Time;
+    KLMTime* m_Time;
 
     /** Raw data. */
     StoreArray<RawKLM> m_RawKLMs;

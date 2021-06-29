@@ -72,6 +72,7 @@ KLM::ScintillatorSimulator::ScintillatorSimulator(
   const KLMScintillatorDigitizationParameters* digPar,
   ScintillatorFirmware* fitter,
   double digitizationInitialTime, bool debug) :
+  m_Time(&(KLMTime::Instance())),
   m_DigPar(digPar),
   m_fitter(fitter),
   m_DigitizationInitialTime(digitizationInitialTime),
@@ -84,7 +85,7 @@ KLM::ScintillatorSimulator::ScintillatorSimulator(
 {
   int i;
   const double samplingTime = m_DigPar->getADCSamplingTDCPeriods() *
-                              m_Time.getTDCPeriod();
+                              m_Time->getTDCPeriod();
   /* cppcheck-suppress variableScope */
   double time, attenuationTime;
   m_histRange = m_DigPar->getNDigitizations() * samplingTime;
@@ -341,7 +342,7 @@ void KLM::ScintillatorSimulator::generatePhotoelectrons(
   bool isReflected)
 {
   const double samplingTime = m_DigPar->getADCSamplingTDCPeriods() *
-                              m_Time.getTDCPeriod();
+                              m_Time->getTDCPeriod();
   const double maxHitTime = m_DigPar->getNDigitizations() * samplingTime;
   int i;
   /* cppcheck-suppress variableScope */

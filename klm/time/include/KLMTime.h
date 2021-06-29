@@ -27,18 +27,9 @@ namespace Belle2 {
   public:
 
     /**
-     * Constructor.
+     * Instantiation.
      */
-    KLMTime()
-    {
-    }
-
-    /**
-     * Destructor.
-     */
-    ~KLMTime()
-    {
-    }
+    static KLMTime& Instance();
 
     /**
      * Update constants from database objects. This function needs to be called
@@ -90,6 +81,20 @@ namespace Belle2 {
     uint16_t getTDCByTime(double time) const;
 
   private:
+
+    /**
+     * Constructor.
+     */
+    KLMTime()
+    {
+    }
+
+    /**
+     * Destructor.
+     */
+    ~KLMTime()
+    {
+    }
 
     /** KLM time conversion. */
     DBObjPtr<KLMTimeConversion> m_KLMTimeConversion;

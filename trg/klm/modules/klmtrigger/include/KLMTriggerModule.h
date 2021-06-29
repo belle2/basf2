@@ -13,7 +13,10 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 #include <trg/klm/dataobjects/KLMTrgSummary.h>
+#include <trg/klm/dbobjects/KLMTriggerParameters.h>
+
 namespace Belle2 {
 
   class KLMTriggerModule : public Module {
@@ -33,12 +36,11 @@ namespace Belle2 {
 
   private: // Parameters
 
-
-
-    int m_nLayerTrigger = 0;
-
     StoreObjPtr<KLMTrgSummary> m_KLMTrgSummary;
 
+    DBObjPtr<KLMTriggerParameters> m_KLMTriggerParameters;
+
+    int m_nLayerTrigger = 0;
     std::vector<int> m_layerUsed;
     std::string m_dummy_used_layers;
   };

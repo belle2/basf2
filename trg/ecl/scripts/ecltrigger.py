@@ -25,5 +25,13 @@ def add_ecl_trigger(path):
     trgecl.param('ClusterLimit', 6)
     # Theta ID region(low and high) of 3DBhabhaVetoInTrack
     trgecl.param('3DBhabhaVetoInTrackThetaRegion', [3, 15])
+    # taub2b 2 cluster angle selection in CM (degree)
+    # (phi low, phi high, theta low, theta high)
+    trgecl.param('Taub2bAngleCut', [110, 250, 130, 230])
+    # taub2b total energy cut in lab (GeV)
+    trgecl.param('Taub2bEtotCut', 7.0)
+    # taub2b cluster energy selection in lab (GeV) : E(CL1) and E(CL2)
+    trgecl.param('Taub2bClusterECut1', 1.9)
+    trgecl.param('Taub2bClusterECut2', 999.0)
     #
     path.add_module(trgecl)

@@ -92,17 +92,17 @@ void CKFToPXDFindlet::beginEvent()
 {
   Super::beginEvent();
 
-  // If the capacity of a std::vector is very large without being used, it just allocates RAM for no reason,
-  // increasing the RAM usage unnecessarily. In this case, start with a fresh one.
-  // Since std::vector.shrink() or std::vector.shrink_to_fit() not necessarily reduce the capacity in the desired way,
-  // create a temporary vector of the same type and swap them to use the vector at the new location afterwards.
+  // If the capacity of a std::vector is very large without being used, it just allocates RAM for no reason, increasing the RAM
+  // usage unnecessarily. In this case, start with a fresh one.
+  // Since std::vector.shrink() or std::vector.shrink_to_fit() not necessarily reduce the capacity in the desired way, create a
+  // temporary vector of the same type, swap them to use the vector at the new location afterwards, and clear the tempoary vector.
   m_recoTracksVector.clear();
-  checkAndResize<const SpacePoint*>(m_spacePointVector, 2000);
+  checkResizeClear<const SpacePoint*>(m_spacePointVector, 2000);
 
   m_seedStates.clear();
-  checkAndResize<CKFToPXDState>(m_states, 2000);
+  checkResizeClear<CKFToPXDState>(m_states, 2000);
 
-  checkAndResize<TrackFindingCDC::WeightedRelation<CKFToPXDState>>(m_relations, 2000);
+  checkResizeClear<TrackFindingCDC::WeightedRelation<CKFToPXDState>>(m_relations, 2000);
 
   m_results.clear();
   m_filteredResults.clear();

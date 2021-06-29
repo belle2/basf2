@@ -83,17 +83,17 @@ void CKFToSVDFindlet::beginEvent()
 {
   Super::beginEvent();
 
-  // If the capacity of a std::vector is very large without being used, it just allocates RAM for no reason,
-  // increasing the RAM usage unnecessarily. In this case, start with a fresh one.
-  // Since std::vector.shrink() or std::vector.shrink_to_fit() not necessarily reduce the capacity in the desired way,
-  // create a temporary vector of the same type and swap them to use the vector at the new location afterwards.
+  // If the capacity of a std::vector is very large without being used, it just allocates RAM for no reason, increasing the RAM
+  // usage unnecessarily. In this case, start with a fresh one.
+  // Since std::vector.shrink() or std::vector.shrink_to_fit() not necessarily reduce the capacity in the desired way, create a
+  // temporary vector of the same type, swap them to use the vector at the new location afterwards, and clear the tempoary vector.
   m_cdcRecoTrackVector.clear();
-  checkAndResize<const SpacePoint*>(m_spacePointVector, 40000);
+  checkResizeClear<const SpacePoint*>(m_spacePointVector, 40000);
 
   m_seedStates.clear();
-  checkAndResize<CKFToSVDState>(m_states, 40000);
+  checkResizeClear<CKFToSVDState>(m_states, 40000);
 
-  checkAndResize<TrackFindingCDC::WeightedRelation<CKFToSVDState>>(m_relations, 100000);
+  checkResizeClear<TrackFindingCDC::WeightedRelation<CKFToSVDState>>(m_relations, 100000);
 
   m_results.clear();
   m_filteredResults.clear();

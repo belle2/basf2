@@ -45,15 +45,20 @@ namespace Belle2 {
                std::vector<std::pair<VxdID, long>>& uExtrapolations, std::vector<std::pair<VxdID, long>>& vExtrapolations) override;
 
   private:
+    /// extrapolate the u-track to the two PXD layers
+    /// @param trackPhi azimtutal angle of the track
+    /// @param trackRadius radius of the track
+    /// @param layer PXD layer to extrapolate to
+    /// @param uExtrapolations vector containing the extrapolated positions in u
+    void extrapolateUTrack(const double trackPhi, const double trackRadius, const uint layer,
+                           std::vector<std::pair<VxdID, long>>& uExtrapolations);
 
-    /// convert float to long int for more similarity to the FPGA implementation
-    /// @param value to be converted
-    /// @param power multiply value by 10^power
-    inline long convertToInt(double value, int power)
-    {
-      long factor = (long)pow(10, power);
-      return round(factor * value);
-    }
+    /// extrapolate the v-track to the two PXD layers
+    /// @param tanLambda azimtutal angle of the track
+    /// @param layer PXD layer to extrapolate to
+    /// @param uExtrapolations vector containing the extrapolated positions in u
+    void extrapolateVTrack(const long tanLambda, const uint layer,
+                           std::vector<std::pair<VxdID, long>>& vExtrapolations);
 
     /// Create ROIs in phi only if the absolute difference in phi between sensor and track is smaller than this value on L1.
     double m_param_phiCutL1 = M_PI / 3.;
@@ -84,6 +89,9 @@ namespace Belle2 {
     const long sensorMaxY  = 8900000;
     /// shift of the sensor center in r-phi
     const long shiftY      = (sensorMaxY + sensorMinY) / 2;
+
+    /// number of ladders per layer
+    const uint laddersPerLayer[2] = {8, 12};
 
   };
 }

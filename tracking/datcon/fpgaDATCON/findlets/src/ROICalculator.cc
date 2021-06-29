@@ -73,7 +73,7 @@ void ROICalculator::apply(const std::vector<std::pair<VxdID, long>>& uExtrapolat
       }
 
       // Convert back from nm to cm.
-      // Before the all values were upscaled with "convertToInt" as the FPGA only works with integers.
+      // Before the all values were upscaled with "convertFloatToInt" as the FPGA only works with integers.
       // This conversion from nm to cm is hardcoded, if the powers of 10 are changed in the other modules, this conversion
       // would not necessarily be right anymore, so maybe there is a better way of doing this - I didn't find any.
       double uCoordinateInCM = uExtrapolatedHit.second * Unit::nm;

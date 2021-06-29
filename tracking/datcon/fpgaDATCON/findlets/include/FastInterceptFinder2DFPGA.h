@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/datcon/fpgaDATCON/utilities/fpgaDATCONHelpers.h>
 
 #include <string>
 #include <vector>
@@ -46,15 +47,6 @@ namespace Belle2 {
                std::vector<std::pair<double, double>>& tracks) override;
 
   private:
-
-    /// Convert float to long int for more similarity to the FPGA implementation
-    /// @param value to be converted
-    /// @param power multiply value by 10^power
-    inline long convertToInt(double value, int power)
-    {
-      long factor = (long)pow(10, power);
-      return round(factor * value);
-    }
 
     /// Layer filter, checks if at least hits from 3 layers are in a set of hits
     /// @param layer bool-vector containing information whether there is a hit in a layer
@@ -101,7 +93,7 @@ namespace Belle2 {
     uint m_param_nVerticalSectors = 256;
 
     /// vertical size of the Hough Space, defaults to the value for u-side
-    long m_param_verticalHoughSpaceSize = convertToInt(64, 6);
+    long m_param_verticalHoughSpaceSize = convertFloatToInt(64, 6);
 
     /// minimum x value of the Hough Space, defaults to the value for u-side
     double m_param_minimumX = -3.168;

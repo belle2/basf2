@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/datcon/fpgaDATCON/findlets/DATCONSVDClusterLoaderAndPreparer.h>
+#include <tracking/datcon/fpgaDATCON/utilities/fpgaDATCONHelpers.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <vxd/dataobjects/VxdID.h>
@@ -47,7 +48,7 @@ void DATCONSVDClusterLoaderAndPreparer::apply(const std::vector<SVDCluster>& uCl
     const VxdID& sensorID = cluster.getSensorID();
     const uint& layerNumber = sensorID.getLayerNumber();
     const uint& ladderNumber = sensorID.getLadderNumber();
-    const long localPosition = convertToInt(cluster.getPosition(), 4); // convert the cluster position from cm to µm
+    const long localPosition = convertFloatToInt(cluster.getPosition(), 4); // convert the cluster position from cm to µm
 
     m_nClusterPerLayer.at(layerNumber - 3)++;
     const double rotangle = m_const_InitialAngle[layerNumber - 3] + (ladderNumber - 1) * m_const_AngleStep[layerNumber - 3];
@@ -62,8 +63,8 @@ void DATCONSVDClusterLoaderAndPreparer::apply(const std::vector<SVDCluster>& uCl
     const long radiusSquared = x * x + y * y; // therefore radius is in µm as well, like all other length values
     // x or y divided by r^2 can create values very close to 0. To cope for this and still
     // have non-zero numbers after conversion and rounding, the conversion to int is made with 10^10
-    std::pair<long, long> pos2D = std::make_pair(convertToInt(2. * (double)x / (double)radiusSquared, 10),
-                                                 convertToInt(2. * (double)y / (double)radiusSquared, 10));
+    std::pair<long, long> pos2D = std::make_pair(convertFloatToInt(2. * (double)x / (double)radiusSquared, 10),
+                                                 convertFloatToInt(2. * (double)y / (double)radiusSquared, 10));
     B2DEBUG(29, "x, y: " << x << " " << y << " Hough-values: " << pos2D.first << " " << pos2D.second);
     uHits.emplace_back(std::make_pair(sensorID, pos2D));
   }
@@ -73,7 +74,7 @@ void DATCONSVDClusterLoaderAndPreparer::apply(const std::vector<SVDCluster>& uCl
     const VxdID& sensorID = cluster.getSensorID();
     const uint& layerNumber = sensorID.getLayerNumber();
     const uint& sensorNumber = sensorID.getSensorNumber();
-    const long localPosition = convertToInt(cluster.getPosition(), 4); // convert the cluster position from cm to µm
+    const long localPosition = convertFloatToInt(cluster.getPosition(), 4); // convert the cluster position from cm to µm
 
     m_nClusterPerLayer.at(4 + layerNumber - 3)++;
     const int radius = m_const_SVDRadii[layerNumber - 3];

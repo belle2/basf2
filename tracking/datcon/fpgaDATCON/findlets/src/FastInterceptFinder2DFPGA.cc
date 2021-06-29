@@ -93,15 +93,15 @@ void FastInterceptFinder2DFPGA::initialize()
     }
 
     m_HSXLUT[i] = x;
-    m_HSSinValuesLUT[i] = convertToInt(sin(x), 3);
-    m_HSCosValuesLUT[i] = convertToInt(cos(x), 3);
-    m_HSCenterSinValuesLUT[i] = convertToInt(sin(xc), 3);
-    m_HSCenterCosValuesLUT[i] = convertToInt(cos(xc), 3);
+    m_HSSinValuesLUT[i] = convertFloatToInt(sin(x), 3);
+    m_HSCosValuesLUT[i] = convertFloatToInt(cos(x), 3);
+    m_HSCenterSinValuesLUT[i] = convertFloatToInt(sin(xc), 3);
+    m_HSCenterCosValuesLUT[i] = convertFloatToInt(cos(xc), 3);
     m_HSXCenterLUT[i] = xc;
   }
   m_HSXLUT[m_param_nAngleSectors] = m_param_maximumX;
-  m_HSSinValuesLUT[m_param_nAngleSectors] = convertToInt(sin(m_param_maximumX), 3);
-  m_HSCosValuesLUT[m_param_nAngleSectors] = convertToInt(cos(m_param_maximumX), 3);
+  m_HSSinValuesLUT[m_param_nAngleSectors] = convertFloatToInt(sin(m_param_maximumX), 3);
+  m_HSCosValuesLUT[m_param_nAngleSectors] = convertFloatToInt(cos(m_param_maximumX), 3);
 
   m_unitY = 2. * m_param_verticalHoughSpaceSize / m_param_nVerticalSectors;
   for (uint i = 0; i <= m_param_nVerticalSectors; i++) {

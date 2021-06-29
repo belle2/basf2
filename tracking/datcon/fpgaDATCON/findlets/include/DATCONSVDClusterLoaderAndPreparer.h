@@ -77,14 +77,5 @@ namespace Belle2 {
     /// shift along z of the L6 senosrs, in µn
     const std::array<int, 5> m_const_ZShiftL6 = {303471, 182060, 57060, -67940, -192940};
 
-    /// convert double to long int for more similarity to the FPGA implementation
-    /// @param value to be converted
-    /// @param power multiply value by 10^power
-    inline long convertToInt(double value, int power)
-    {
-      long factor = (long)pow(10, power);
-      return round(factor * value);
-    };
-
   };
 }

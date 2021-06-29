@@ -48,7 +48,7 @@ namespace Belle2 {
   private:
     // Parameters
     /// SVDShaperDigits StoreArray name
-    std::string m_param_storeSVDShaperDigitsName = "SVDShaperDigits";
+    std::string m_param_storeSVDShaperDigitsName = "";
 
     /// SVDShaperDigit StoreArray
     StoreArray<SVDShaperDigit> m_storeSVDShaperDigits;

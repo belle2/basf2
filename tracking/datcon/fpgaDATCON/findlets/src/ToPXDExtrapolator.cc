@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/datcon/fpgaDATCON/findlets/ToPXDExtrapolator.h>
+#include <tracking/datcon/fpgaDATCON/utilities/fpgaDATCONHelpers.h>
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <pxd/geometry/SensorInfo.h>
@@ -60,127 +61,20 @@ void ToPXDExtrapolator::apply(const std::vector<std::pair<double, double>>& uTra
 {
   VxdID sensorID;
 
-  double angleDiff;
-
   for (auto& uTrack : uTracks) {
     const double trackPhi = uTrack.first;
     const double trackRadius = uTrack.second;
 
-    // layer 1 extrapolation
-    uint layer = 1;
-    long sensorPerpRadius = layerRadius[layer - 1];
-    for (uint ladder = 1; ladder <= 8; ladder++) {
-      double sensorPhi = M_PI / 4. * (ladder - 1);
-      if (sensorPhi > M_PI) {
-        sensorPhi -= 2. * M_PI;
-      }
-
-      angleDiff = trackPhi - sensorPhi;
-      if (angleDiff > M_PI) {
-        angleDiff -= 2. * M_PI;
-      }
-      if (angleDiff < -M_PI) {
-        angleDiff += 2. * M_PI;
-      }
-      if (fabs(angleDiff) >= m_param_phiCutL1) continue;
-
-      // additional factor of 10^3, as the sine and cosine values are also multiplied by 1000
-      long trackRadiusSquared = convertToInt(trackRadius, 3) * convertToInt(trackRadius, 3);
-      // additional factor of 10^3, as the sine and cosine values are also multiplied by 1000
-      long b = convertToInt(sensorPerpRadius, 3) - trackRadius * convertToInt(sin(angleDiff), 3);
-      double y = -trackRadius * convertToInt(cos(angleDiff), 3) + sqrt(trackRadiusSquared - b * b);
-
-      if (y >= sensorMinY && y <= sensorMaxY) {
-        long localUPosition = y - shiftY;
-
-        // store extrapolated hit for first sensor in ladder
-        sensorID = VxdID(layer, ladder, 1);
-        uExtrapolations.emplace_back(sensorID, localUPosition);
-
-        // store extrapolated hit for second sensor in ladder
-        sensorID = VxdID(layer, ladder, 2);
-        uExtrapolations.emplace_back(sensorID, localUPosition);
-      }
-    }
-
-    // layer 2 extrapolation
-    layer = 2;
-    sensorPerpRadius = layerRadius[layer - 1];
-    for (uint ladder = 1; ladder <= 12; ladder++) {
-      double sensorPhi = M_PI / 6. * (ladder - 1);
-      if (sensorPhi > M_PI) {
-        sensorPhi -= 2. * M_PI;
-      }
-
-      angleDiff = trackPhi - sensorPhi;
-      if (angleDiff > M_PI) {
-        angleDiff -= 2. * M_PI;
-      }
-      if (angleDiff < -M_PI) {
-        angleDiff += 2. * M_PI;
-      }
-      if (fabs(angleDiff) >= m_param_phiCutL2) continue;
-
-      // additional factor of 10^3, as the sine and cosine values are also multiplied by 1000
-      long trackRadiusSquared = convertToInt(trackRadius, 3) * convertToInt(trackRadius, 3);
-      // additional factor of 10^3, as the sine and cosine values are also multiplied by 1000
-      long b = convertToInt(sensorPerpRadius, 3) - trackRadius * convertToInt(sin(angleDiff), 3);
-      double y = -trackRadius * convertToInt(cos(angleDiff), 3) + sqrt(trackRadiusSquared - b * b);
-
-      if (y >= sensorMinY && y <= sensorMaxY) {
-        long localUPosition = y - shiftY;
-
-        // store extrapolated hit for first sensor in ladder
-        sensorID = VxdID(layer, ladder, 1);
-        uExtrapolations.emplace_back(sensorID, localUPosition);
-
-        // store extrapolated hit for second sensor in ladder
-        sensorID = VxdID(layer, ladder, 2);
-        uExtrapolations.emplace_back(sensorID, localUPosition);
-      }
-    }
+    extrapolateUTrack(trackPhi, trackRadius, 1, uExtrapolations);
+    extrapolateUTrack(trackPhi, trackRadius, 2, uExtrapolations);
   }
 
   for (auto& vTrack : vTracks) {
     const double& trackLambda = -vTrack.first;
-    const long tanLambda = convertToInt(tan(trackLambda), 3);
+    const long tanLambda = convertFloatToInt(tan(trackLambda), 3);
 
-    // layer 1 extrapolation
-    uint layer = 1;
-    for (uint sensor = 1; sensor <= 2; sensor++) {
-      const long& sensorPerpRadius = layerRadius[layer - 1];
-      const long& lengthOfSensor = sensorLength[layer - 1];
-      const long& shiftZ = centerZShiftLayer1[sensor - 1];
-      // sensorPerpRadius is in µm, inverseTanTheta is multiplied by 1000, so this is basically nm
-      const long globalz = sensorPerpRadius * tanLambda;
-      // shift globalz into local coordinate system by subtracting the z-shift of this sensor
-      const long localVPosition = globalz - shiftZ;
-      if (localVPosition >= -lengthOfSensor / 2. && localVPosition <= lengthOfSensor / 2.) {
-
-        for (uint ladder = 1; ladder <= 8; ladder++) {
-          sensorID = VxdID(layer, ladder, sensor);
-          vExtrapolations.emplace_back(sensorID, localVPosition);
-        }
-      }
-    }
-
-    // layer 2 extrapolation
-    layer = 2;
-    for (uint sensor = 1; sensor <= 2; sensor++) {
-      const long& sensorPerpRadius = layerRadius[layer - 1]; // convert from mm to µm as integer
-      const long& lengthOfSensor = sensorLength[layer - 1]; // convert from mm to µm as integer
-      const long& shiftZ = centerZShiftLayer2[sensor - 1];
-      const long globalz = sensorPerpRadius * tanLambda;
-
-      // shift globalz into local coordinate system by subtracting the z-shift of this sensor
-      const long localVPosition = globalz - shiftZ;
-      if (localVPosition >= -lengthOfSensor / 2. && localVPosition <= lengthOfSensor / 2.) {
-        for (uint ladder = 1; ladder <= 12; ladder++) {
-          sensorID = VxdID(layer, ladder, sensor);
-          vExtrapolations.emplace_back(sensorID, localVPosition);
-        }
-      }
-    }
+    extrapolateVTrack(tanLambda, 1, vExtrapolations);
+    extrapolateVTrack(tanLambda, 2, vExtrapolations);
   }
 
   if (m_param_createPXDIntercepts) {
@@ -208,4 +102,64 @@ void ToPXDExtrapolator::apply(const std::vector<std::pair<double, double>>& uTra
   }
 
   B2DEBUG(29, "uExtrapolations.size: " << uExtrapolations.size() << " vExtrapolations.size: " << vExtrapolations.size());
+}
+
+void ToPXDExtrapolator::extrapolateUTrack(const double trackPhi, const double trackRadius, const uint layer,
+                                          std::vector<std::pair<VxdID, long>>& uExtrapolations)
+{
+  long sensorPerpRadius = layerRadius[layer - 1];
+  for (uint ladder = 1; ladder <= laddersPerLayer[layer - 1]; ladder++) {
+    double sensorPhi = M_PI / (laddersPerLayer[layer - 1] / 2) * (ladder - 1);
+    if (sensorPhi > M_PI) {
+      sensorPhi -= 2. * M_PI;
+    }
+
+    double angleDiff = trackPhi - sensorPhi;
+    if (angleDiff > M_PI) {
+      angleDiff -= 2. * M_PI;
+    }
+    if (angleDiff < -M_PI) {
+      angleDiff += 2. * M_PI;
+    }
+    if (fabs(angleDiff) >= (layer == 1 ? m_param_phiCutL1 : m_param_phiCutL2)) continue;
+
+    // additional factor of 10^3, as the sine and cosine values are also multiplied by 1000
+    long trackRadiusSquared = convertFloatToInt(trackRadius, 3) * convertFloatToInt(trackRadius, 3);
+    // additional factor of 10^3, as the sine and cosine values are also multiplied by 1000
+    long b = convertFloatToInt(sensorPerpRadius, 3) - trackRadius * convertFloatToInt(sin(angleDiff), 3);
+    double y = -trackRadius * convertFloatToInt(cos(angleDiff), 3) + sqrt(trackRadiusSquared - b * b);
+
+    if (y >= sensorMinY && y <= sensorMaxY) {
+      long localUPosition = y - shiftY;
+
+      // store extrapolated hit for first sensor in ladder
+      VxdID sensorID = VxdID(layer, ladder, 1);
+      uExtrapolations.emplace_back(sensorID, localUPosition);
+
+      // store extrapolated hit for second sensor in ladder
+      sensorID = VxdID(layer, ladder, 2);
+      uExtrapolations.emplace_back(sensorID, localUPosition);
+    }
+  }
+}
+
+void ToPXDExtrapolator::extrapolateVTrack(const long tanLambda, const uint layer,
+                                          std::vector<std::pair<VxdID, long>>& vExtrapolations)
+{
+  for (uint sensor = 1; sensor <= 2; sensor++) {
+    const long& sensorPerpRadius = layerRadius[layer - 1];
+    const long& lengthOfSensor = sensorLength[layer - 1];
+    const long& shiftZ = (layer == 1 ? centerZShiftLayer1[sensor - 1] : centerZShiftLayer2[sensor - 1]);
+    // sensorPerpRadius is in µm, inverseTanTheta is multiplied by 1000, so this is basically nm
+    const long globalz = sensorPerpRadius * tanLambda;
+    // shift globalz into local coordinate system by subtracting the z-shift of this sensor
+    const long localVPosition = globalz - shiftZ;
+    if (localVPosition >= -lengthOfSensor / 2. && localVPosition <= lengthOfSensor / 2.) {
+
+      for (uint ladder = 1; ladder <= laddersPerLayer[layer - 1]; ladder++) {
+        VxdID sensorID = VxdID(layer, ladder, sensor);
+        vExtrapolations.emplace_back(sensorID, localVPosition);
+      }
+    }
+  }
 }

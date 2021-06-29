@@ -9,6 +9,7 @@
  **************************************************************************/
 #include <tracking/datcon/fpgaDATCON/findlets/DATCONSVDClusterizer.h>
 #include <tracking/datcon/fpgaDATCON/entities/DATCONSVDDigit.h>
+#include <tracking/datcon/fpgaDATCON/entities/DATCONSVDClusterCandidate.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
@@ -77,7 +78,7 @@ void DATCONSVDClusterizer::apply(const std::vector<DATCONSVDDigit>& digits, std:
 {
   if (digits.size() == 0) return;
 
-  ClusterCandidate clusterCand;
+  DATCONSVDClusterCandidate clusterCand;
 
   // create a dummy cluster just to start
   clusterCand.vxdID = digits.at(0).getSensorID();
@@ -98,22 +99,7 @@ void DATCONSVDClusterizer::apply(const std::vector<DATCONSVDDigit>& digits, std:
     if (! clusterCand.add(thisSensorID, thisCharge, thisCellID, stripSNR, m_param_maxiClusterSize)) {
       //if the strip is not added, write the cluster, if present and good:
       if (clusterCand.strips.size() > 0) {
-        const VXD::SensorInfoBase& info = m_geoCache.getSensorInfo(clusterCand.vxdID);
-        double pitch = m_param_isU ? info.getUPitch() : info.getVPitch();
-        unsigned short numberofStrips = m_param_isU ? info.getUCells() : info.getVCells();
-
-        clusterCand.finalizeCluster(pitch, numberofStrips);
-        if (clusterCand.maxSNRinClusterCandidate >= m_param_requiredSNRcluster) {
-          double clusterPositionError = pitch;
-          if (clusterCand.strips.size() == 1) {
-            clusterPositionError = pitch / sqrt(12.);
-          } else if (clusterCand.strips.size() == 2) {
-            clusterPositionError = pitch / 2.;
-          }
-
-          clusters.emplace_back(SVDCluster(clusterCand.vxdID, m_param_isU, clusterCand.clusterPosition, clusterPositionError,
-                                           0.0, 0.0, clusterCand.charge, clusterCand.seedCharge, clusterCand.strips.size(), 0.0, 0.0));
-        }
+        saveCluster(clusterCand, clusters);
       }
 
       // start the next cluster
@@ -128,24 +114,7 @@ void DATCONSVDClusterizer::apply(const std::vector<DATCONSVDDigit>& digits, std:
 
   //write the last cluster, if good
   if (clusterCand.strips.size() > 0) {
-
-    const VXD::SensorInfoBase& info = m_geoCache.getSensorInfo(clusterCand.vxdID);
-    double pitch = m_param_isU ? info.getUPitch() : info.getVPitch();
-    unsigned short numberofStrips = m_param_isU ? info.getUCells() : info.getVCells();
-
-    clusterCand.finalizeCluster(pitch, numberofStrips);
-    if (clusterCand.maxSNRinClusterCandidate >= m_param_requiredSNRcluster) {
-
-      double clusterPositionError = pitch;
-      if (clusterCand.strips.size() == 1) {
-        clusterPositionError = pitch / sqrt(12.);
-      } else if (clusterCand.strips.size() == 2) {
-        clusterPositionError = pitch / 2.;
-      }
-
-      clusters.emplace_back(SVDCluster(clusterCand.vxdID, m_param_isU, clusterCand.clusterPosition, clusterPositionError,
-                                       0.0, 0.0, clusterCand.charge, clusterCand.seedCharge, clusterCand.strips.size(), 0.0, 0.0));
-    }
+    saveCluster(clusterCand, clusters);
   }
 
   if (m_param_saveClusterToDataStore) {
@@ -154,6 +123,28 @@ void DATCONSVDClusterizer::apply(const std::vector<DATCONSVDDigit>& digits, std:
     }
   }
 
+}
+
+
+void DATCONSVDClusterizer::saveCluster(DATCONSVDClusterCandidate& clusterCand, std::vector<SVDCluster>& clusters)
+{
+  const VXD::SensorInfoBase& info = m_geoCache.getSensorInfo(clusterCand.vxdID);
+  double pitch = m_param_isU ? info.getUPitch() : info.getVPitch();
+  unsigned short numberofStrips = m_param_isU ? info.getUCells() : info.getVCells();
+
+  clusterCand.finalizeCluster(pitch, numberofStrips);
+  if (clusterCand.maxSNRinClusterCandidate >= m_param_requiredSNRcluster) {
+
+    double clusterPositionError = pitch;
+    if (clusterCand.strips.size() == 1) {
+      clusterPositionError = pitch / sqrt(12.);
+    } else if (clusterCand.strips.size() == 2) {
+      clusterPositionError = pitch / 2.;
+    }
+
+    clusters.emplace_back(SVDCluster(clusterCand.vxdID, m_param_isU, clusterCand.clusterPosition, clusterPositionError,
+                                     0.0, 0.0, clusterCand.charge, clusterCand.seedCharge, clusterCand.strips.size(), 0.0, 0.0));
+  }
 }
 
 
@@ -189,7 +180,7 @@ void DATCONSVDClusterizer::fillDATCONSVDNoiseMap()
     noiseMap.open(m_param_noiseMapfileName, std::ios::trunc);
   }
 
-  while ((itSvdLayers != svdLayers.end()) && (itSvdLayers->getLayerNumber() != 7)) { //loop on Layers
+  while (itSvdLayers != svdLayers.end()) { //loop on Layers
 
     std::set<Belle2::VxdID> svdLadders = aGeometry.getLadders(*itSvdLayers);
     std::set<Belle2::VxdID>::iterator itSvdLadders = svdLadders.begin();

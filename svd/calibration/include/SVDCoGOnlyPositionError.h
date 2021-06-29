@@ -49,7 +49,7 @@ namespace Belle2 {
      *
      * Output: double corresponding to the position error
      */
-    inline double getCorrectedTime(
+    inline double getPositionError(
       const Belle2::VxdID& sensorID,
       const bool& isU, const unsigned short& strip,
       const double& clSNR,

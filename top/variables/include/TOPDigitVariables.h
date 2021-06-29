@@ -239,6 +239,24 @@ namespace Belle2 {
        */
       double getProtonLogL(const Particle* particle);
 
+
+      /**
+       * returns the mass corresponding to the max LL
+       */
+      double getLogLScanMass(const Particle* particle);
+
+      /**
+       * returns the lower edge of the mass interval
+       */
+      double getLogLScanMassLowerInterval(const Particle* particle);
+
+      /**
+       * returns the upper edge of the mass interval
+       */
+      double getLogLScanMassUpperInterval(const Particle* particle);
+
+
+
       //---------------- TOPRecBunch related --------------------
 
       /**

@@ -49,11 +49,9 @@ void OnlineEventT0CreatorModule::event()
     B2DEBUG(20, "No ECL EventT0 available");
   } else {
     // get the most accurate ECL evenT0 (smallest chi2/quality)
-    auto bestECL_quality = std::min_element(eclHypos.begin(), eclHypos.end(), [](EventT0::EventT0Component c1,
+    auto eclBestT0 = std::min_element(eclHypos.begin(), eclHypos.end(), [](EventT0::EventT0Component c1,
     EventT0::EventT0Component c2) {return c1.quality < c2.quality;});
-    auto bestECL_idx = std::distance(eclHypos.begin(), bestECL_quality);
-    m_onlineEventT0.appendNew(eclHypos.at(bestECL_idx).eventT0, eclHypos.at(bestECL_idx).eventT0Uncertainty,
-                              Const::EDetector::ECL);
+    m_onlineEventT0.appendNew(eclBestT0->eventT0, eclBestT0->eventT0Uncertainty, Const::EDetector::ECL);
   }
 
   // check if a CDC hypothesis exists
@@ -62,7 +60,7 @@ void OnlineEventT0CreatorModule::event()
     B2DEBUG(20, "No CDC EventT0 available");
   } else {
     // get the most accurate CDC evenT0 (latest)
-    const auto cdcBestT0 = cdcHypos.back();
+    const auto& cdcBestT0 = cdcHypos.back();
     m_onlineEventT0.appendNew(cdcBestT0.eventT0, cdcBestT0.eventT0Uncertainty, Const::EDetector::CDC);
   }
 
@@ -72,7 +70,7 @@ void OnlineEventT0CreatorModule::event()
     B2DEBUG(20, "No TOP EventT0 available");
   } else {
     // get the most accurate TOP eventT0 (there is only one)
-    const auto topBestT0 = topHypos.back();
+    const auto& topBestT0 = topHypos.back();
     m_onlineEventT0.appendNew(topBestT0.eventT0, topBestT0.eventT0Uncertainty, Const::EDetector::TOP);
   }
 

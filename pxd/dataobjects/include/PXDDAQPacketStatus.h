@@ -49,7 +49,7 @@ namespace Belle2 {
      * This should be the OR of error masks of all sub-objects (DHC, DHE)
      * @param m Bit Mask to set
      */
-    void setErrorMask(PXDErrorFlags m) { m_errorMask = m; }
+    void setErrorMask(const PXDErrorFlags& mask) { m_errorMask = mask; }
 
     /** Return Error bit mask
      * This is the OR of error masks of all sub-objects (DHC, DHE)
@@ -60,7 +60,7 @@ namespace Belle2 {
     /** Set Critical Error bit mask
      * @param m Bit Mask to set
      */
-    void setCritErrorMask(PXDErrorFlags m) { m_critErrorMask = m; }
+    void setCritErrorMask(const PXDErrorFlags& mask) { m_critErrorMask = mask; }
 
     /** Return Critical Error bit mask
      * @return bit mask
@@ -72,7 +72,7 @@ namespace Belle2 {
      * the PXD data from this packet is not usable for analysis
      * TODO Maybe this decision needs improvement.
      */
-    void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0;}
+    void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == PXDErrorFlags(0);}
 
     /** Set Packet index
      * @param inx packet index
@@ -124,7 +124,7 @@ namespace Belle2 {
     std::vector <PXDDAQDHCStatus> m_pxdDHC;
 
     /** necessary for ROOT */
-    ClassDef(PXDDAQPacketStatus, 2);
+    ClassDef(PXDDAQPacketStatus, 3);
 
   }; // class PXDDAQPacketStatus
 

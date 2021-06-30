@@ -378,14 +378,26 @@ class TestSampleList:
         beam_energy=None,
         beam_background=None,
         exact_match=False,
+        inplace=False,
     ):
         """
         Find all MC samples matching query.
 
-        If ``exact_match`` is passed, an error is raised if there is not exactly one
-        matching sample. If there is exactly one matching sample, then the single sample
-        is returned, rather than a list.
+        Parameters:
+            process (str): Simulated MC process to query.
+            campaign (str, int): MC campaign number to query.
+            beam_energy (str): Beam energy to query.
+            beam_background (str, int): Nominal beam background to query.
+            exact_match (bool): If passed, an error is raised if there is not exactly
+                one matching sample. If there is exactly one matching sample, then the
+                single sample is returned, rather than a list.
+            inplace (bool): Replace MC samples with the list obtained from query.
         """
+        if inplace and exact_match:
+            raise ValueError(
+                "Incompatible arguments passed: `inplace` and `exact_match`"
+            )
+
         samples = [
             s
             for s in self.mc_samples
@@ -402,7 +414,10 @@ class TestSampleList:
                     "`exact_match=True` was specified, but did not find exactly one match."
                 )
         else:
-            return samples
+            if inplace:
+                self.mc_samples = samples
+            else:
+                return samples
 
     def query_data_samples(
         self,
@@ -412,14 +427,26 @@ class TestSampleList:
         beam_energy=None,
         general_skim=None,
         exact_match=False,
+        inplace=False,
     ):
         """
-        Find all data samples matching query.
+        Find all MC samples matching query.
 
-        If ``exact_match`` is passed, an error is raised if there is not exactly one
-        matching sample. If there is exactly one matching sample, then the single sample
-        is returned, rather than a list.
+        Parameters:
+            processing (str): Data processing campaign number to query.
+            experiment (str, int): Experiment number to query.
+            beam_energy (str): Beam energy to query.
+            general_skim (skim): ``GeneralSkimName`` to query.
+            exact_match (bool): If passed, an error is raised if there is not exactly
+                one matching sample. If there is exactly one matching sample, then the
+                single sample is returned, rather than a list.
+            inplace (bool): Replace MC samples with the list obtained from query.
         """
+        if inplace and exact_match:
+            raise ValueError(
+                "Incompatible arguments passed: `inplace` and `exact_match`"
+            )
+
         samples = [
             s
             for s in self.data_samples
@@ -436,7 +463,10 @@ class TestSampleList:
                     "`exact_match=True` was specified, but did not find exactly one match."
                 )
         else:
-            return samples
+            if inplace:
+                self.data_samples = samples
+            else:
+                return samples
 
 
 if __name__ == "__main__":

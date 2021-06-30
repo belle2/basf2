@@ -34,6 +34,7 @@ import mdst
 
 
 CDST_TRACKING_OBJECTS = (
+    'EventLevelTrackingInfo',
     'RecoTracks',
     'Tracks',
     'V0s',
@@ -517,6 +518,7 @@ def add_cdst_output(
             branches += ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS
         else:
             branches += list(DIGITS_OBJECTS) + [
+                'EventLevelTriggerTimeInfo',
                 'SoftwareTriggerResult',
                 'TRGSummary']
         if not ignoreInputModulesCheck and "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:

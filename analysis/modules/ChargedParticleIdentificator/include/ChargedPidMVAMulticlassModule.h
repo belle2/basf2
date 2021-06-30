@@ -112,6 +112,11 @@ namespace Belle2 {
     std::string m_payload_name;
 
     /**
+     * Flag to specify if we use a charge-independent training.
+     */
+    bool m_charge_independent;
+
+    /**
      * Flag to specify if we use an ECL-only based training.
      */
     bool m_ecl_only;

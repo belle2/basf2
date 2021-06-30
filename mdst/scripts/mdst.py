@@ -97,7 +97,7 @@ def add_mdst_dump(path, print_untested=False):
             "getNCDCHitsNotAssigned", "getNCDCHitsNotAssignedPostCleaning",
             "getNCDCSegments", "getSVDFirstSampleTime", "hasAnErrorFlag",
             "hasUnspecifiedTrackFindingFailure", "hasVXDTF2AbortionFlag",
-            "hasSVDCKFAbortionFlag", "hasPXDCKFAbortionFlag"], {
+            "hasSVDCKFAbortionFlag", "hasPXDCKFAbortionFlag", "hasSVDSpacePointCreatorAbortionFlag"], {
             "hasCDCLayer": range(56)
         }, array=False),
         DataStorePrinter("PIDLikelihood", ["getMostLikely"], {

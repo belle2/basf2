@@ -39,8 +39,12 @@ KLMDigitizerModule::KLMDigitizerModule() :
   addParam("SimulationMode", m_SimulationMode,
            "Simulation mode (\"Generic\" or \"ChannelSpecific\").",
            std::string("Generic"));
+  /*
+   * Initial digitization time is negative to work with cosmic events (the part
+   * of the track directed to the interaction pointhas a negative time).
+   */
   addParam("DigitizationInitialTime", m_DigitizationInitialTime,
-           "Initial digitization time in TDC periods.", -40);
+           "Initial digitization time in CTIME periods.", -5);
   addParam("SaveFPGAFit", m_SaveFPGAFit, "Save FPGA fit data and set a relation with KLMDigits.", false);
   addParam("Efficiency", m_Efficiency,
            "Efficiency determination mode (\"Strip\" or \"Plane\").",
@@ -147,7 +151,9 @@ bool KLMDigitizerModule::efficiencyCorrection(float efficiency)
 void KLMDigitizerModule::digitizeBKLM()
 {
   int tdc;
-  KLM::ScintillatorSimulator simulator(&(*m_DigPar), m_Fitter, 0, false);
+  KLM::ScintillatorSimulator simulator(
+    &(*m_DigPar), m_Fitter,
+    m_DigitizationInitialTime * m_TimeConversion->getCTimePeriod(), m_Debug);
   const KLMScintillatorFEEData* FEEData;
   std::multimap<uint16_t, const BKLMSimHit*>::iterator it, it2, ub;
   for (it = m_bklmSimHitChannelMap.begin(); it != m_bklmSimHitChannelMap.end();
@@ -227,7 +233,7 @@ void KLMDigitizerModule::digitizeEKLM()
   uint16_t tdc;
   KLM::ScintillatorSimulator simulator(
     &(*m_DigPar), m_Fitter,
-    m_DigitizationInitialTime * m_TimeConversion->getTDCPeriod(), m_Debug);
+    m_DigitizationInitialTime * m_TimeConversion->getCTimePeriod(), m_Debug);
   const KLMScintillatorFEEData* FEEData;
   std::multimap<uint16_t, const EKLMSimHit*>::iterator it, ub;
   for (it = m_eklmSimHitChannelMap.begin(); it != m_eklmSimHitChannelMap.end();

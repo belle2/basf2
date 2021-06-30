@@ -13,6 +13,7 @@
 
 #include <framework/database/DBObjPtr.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
+#include <mdst/dbobjects/TTDOffsets.h>
 
 
 namespace Belle2 {
@@ -44,19 +45,19 @@ namespace Belle2 {
 
     // Simple Getters
     /// get if stored information is valid
-    bool isValid() {return m_isValid;}
+    bool isValid() const {return m_isValid;}
     /// get if injection in HER/LER
-    bool isHER() {return m_isHER;}
+    bool isHER() const {return m_isHER;}
     /// get lowest bit of revolution counter
-    bool isRevo2() {return m_revo2;}
+    bool isRevo2() const {return m_revo2;}
     /// get time since the last injection (i.e. the injection-pre-kick signal) in clock ticks (FTSW clock)
-    unsigned int getTimeSinceLastInjection() {return m_timeSinceLastInjection;}
+    unsigned int getTimeSinceLastInjection() const {return m_timeSinceLastInjection;}
     /// get time since the previous trigger in clock ticks (FTSW clock)
-    unsigned int getTimeSincePrevTrigger() {return m_timeSincePrevTrigger;}
-    /// get number of triggered bunch
-    unsigned int getBunchNumber() {return m_bunchNumber;}
+    unsigned int getTimeSincePrevTrigger() const {return m_timeSincePrevTrigger;}
+    /// get number of triggered bunch as provided by TTD
+    unsigned int getBunchNumber() const {return m_bunchNumber;}
     /// get if an injection happened recently (and the corresponding stored data is actually valid)
-    bool hasInjection() {return m_timeSinceLastInjection != c_flagNoInjection;}
+    bool hasInjection() const {return m_timeSinceLastInjection != c_flagNoInjection;}
 
     // Simple Setters
     /// set that stored information is valid
@@ -78,9 +79,15 @@ namespace Belle2 {
 
     // Additional Functions (not inline)
     /// get time since the last injection (i.e. the injection-pre-kick signal) in microseconds
-    double getTimeSinceLastInjectionInMicroSeconds();
+    double getTimeSinceLastInjectionInMicroSeconds() const;
     /// get time since the previous trigger in microseconds
-    double getTimeSincePrevTriggerInMicroSeconds();
+    double getTimeSincePrevTriggerInMicroSeconds() const;
+    /// get time since the injected bunch passed the detector in clock ticks (FTSW clock)
+    int getTimeSinceInjectedBunch() const;
+    /// get time since the injected bunch passed the detector in microseconds
+    double getTimeSinceInjectedBunchInMicroSeconds() const;
+    /// get the actual (=global) number of the triggered bunch
+    int getTriggeredBunchNumberGlobal() const;
 
   private:
     /**
@@ -112,6 +119,8 @@ namespace Belle2 {
     * Number of triggered bunch, ranging from 0-1279
     * Note: There are a maximum of 5120 buckets, which could each carry one bunch of e+/e-,
     *       but we only have 1280 clock ticks (=5120/4) to identify the bunches
+    * Note: This is the bunch number as given by the TTD. This might not be the 'global' bunch number,
+    *       but the offset is taken into account by the method `getTriggeredBunchNumberGlobal()`.
     **/
     unsigned int m_bunchNumber;
 
@@ -119,6 +128,8 @@ namespace Belle2 {
     static const unsigned int c_flagNoInjection = 0x7FFFFFFF; //! tells ROOT not to write it to file (transient)
     /// The clock, to translate clock ticks to microseconds
     DBObjPtr<HardwareClockSettings> m_clockSettings; //! tells ROOT not to write it to file (transient)
+    /// The TTDOffsets to derive actual timing and bunch numbers from TTD Info
+    DBObjPtr<TTDOffsets> m_ttdOffsets; //! tells ROOT not to write it to file (transient)
 
     ClassDef(EventLevelTriggerTimeInfo, 1) ///< Storage element for TTD information
   };

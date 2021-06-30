@@ -57,6 +57,7 @@ void TOPLLScannerModule::scanLikelihood(std::vector<float>masses, std::vector<fl
   maxLL =  logLs[llMaxIndex];
   massMax = masses[llMaxIndex];
 
+  // if no deltaLL value is given, return a +/- 30 MeV range around the maximum
   if (isnan(deltaLL)) {
     minMassRange = massMax - 0.03;
     if (minMassRange < masses[0])
@@ -100,10 +101,10 @@ void TOPLLScannerModule::initialize()
   m_tracks.registerRelationTo(m_likelihoodScanResults);
 
 
-  // go up to 4 GeV to capture all light nuclei
+  // Fill the array of masses for the coarse scan in un-even steps
   float step = 0;
-  float lastVal = 0.0001;
-  for (auto i = 0; i < 240; i++) {
+  float lastVal = 0.0002;
+  for (auto i = 1; i < 240; i++) {
     if (i < 10)
       step = 0.001;
     else if (i < 50)
@@ -136,21 +137,19 @@ void TOPLLScannerModule::event()
     std::vector<float> logLcoarseScan;
     std::vector<float> nSignalPhotonsCoarseScan;
 
-    TGraph* gr = new TGraph();
     for (const auto& mass : m_massPoints) {
       const PDFConstructor pdfConstructor(trk, Const::pion, PDFConstructor::c_Fine, PDFConstructor::c_Reduced, mass);
       pdfConstructor.switchOffDeltaRayPDF();
       auto LL = pdfConstructor.getLogL();
       logLcoarseScan.push_back(LL.logL);
       nSignalPhotonsCoarseScan.push_back(pdfConstructor.getExpectedSignalPhotons());
-      gr->AddPoint(mass, LL.logL);
     }
 
     float massMax = -1;
     float minMassRange = 0;
     float maxMassRange = 0;
     float maxLL = 0;
-    scanLikelihood(m_massPoints, logLcoarseScan, std::numeric_limits<float>::quiet_NaN(), maxLL, massMax, minMassRange, maxMassRange);
+    scanLikelihood(m_massPoints, logLcoarseScan, 0.8, maxLL, massMax, minMassRange, maxMassRange);
 
 
     // -------------
@@ -159,8 +158,10 @@ void TOPLLScannerModule::event()
     std::vector<float> logLfineScan;
     std::vector<float> massPointsFineScan;
     std::vector<float> nSignalPhotonsFineScan;
-    auto mass = minMassRange + 0.0001;
+    auto mass = minMassRange;
     auto step = (maxMassRange - minMassRange) / m_nFineScanPoints;
+    if (step > 0.001)
+      step = 0.001;
     while (mass < maxMassRange) {
       const PDFConstructor pdfConstructor(trk, Const::pion, PDFConstructor::c_Fine, PDFConstructor::c_Reduced, mass);
       pdfConstructor.switchOffDeltaRayPDF();
@@ -168,25 +169,12 @@ void TOPLLScannerModule::event()
       logLfineScan.push_back(LL.logL);
       nSignalPhotonsFineScan.push_back(pdfConstructor.getExpectedSignalPhotons());
       massPointsFineScan.push_back(mass);
-      gr->AddPoint(mass, LL.logL);
       mass += step;
     }
 
-    TF1* parab = new TF1("parab", "[0]*(x-[1])*(x-[1])+[2]", minMassRange, maxMassRange);
-    parab->SetParameter(0, -0.5);
-    parab->SetParLimits(0, -1000, 0);
-    parab->SetParameter(1, massMax);
-    parab->SetParLimits(1, minMassRange, maxMassRange);
-    parab->SetParameter(2, maxLL);
-
-    gr->Fit(parab, "RQ");
-
+    // findthe maximum and the confidence interval usin the fine-grained scan
     scanLikelihood(massPointsFineScan, logLfineScan, 0.5, maxLL, massMax, minMassRange, maxMassRange);
 
-    massMax = parab->GetParameter(1);
-
-    delete gr;
-    delete parab;
 
     // finally grab the number of expected photons at the LL maximum
     const PDFConstructor pdfConstructor(trk, Const::pion, PDFConstructor::c_Fine, PDFConstructor::c_Reduced, massMax);

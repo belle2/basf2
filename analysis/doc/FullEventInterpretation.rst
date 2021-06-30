@@ -476,7 +476,7 @@ settings.json
 The `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ configuration of the FEI grid workflow is handled by the file `settings.json <https://stash.desy.de/users/aakhmets/repos/feiongridworkflow/browse/settings.json>`_. Further below some explanations for the required settings:
 
 * ``gbasf2_install_directory``: Absolute path to the directory where you have installed the `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tool. Please correct it to a meaningful path according to the installation you have performed previously.
-* ``gbasf2_input_dslist``: Absolute path to the dataset list of all datasets you would like to process. It is assumed by the ``FEIAnalysisSummaryTask``, that each line corresponds to a dataset sample, such for each line in this dataset list an instance of ``FEIAnalysisTask`` is spawned. An example of a possible dataset list is given below:
+* ``gbasf2_input_dslist``: Absolute path to the dataset list of all datasets you would like to process. It is assumed by the ``FEIAnalysisSummaryTask``, that each line corresponds to a dataset sample, such that for each line in this dataset list one instance (file-based case) or multuple instances (event-based case) of ``FEIAnalysisTask`` are spawned. An example of a possible dataset list is given below:
 
     .. code-block:: bash
 

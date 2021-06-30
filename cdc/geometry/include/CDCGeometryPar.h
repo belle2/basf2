@@ -277,6 +277,7 @@ namespace Belle2 {
       /** Return edep-to-ADC conversion main factor (in count/keV)
        * @param layer no. (0-55)
        * @param cell  no. (0-)
+       * @param costh cosine of incident angle (theta) of particle
        */
       double getEDepToADCMainFactor(unsigned short layer, unsigned short cell, double costh = 0)
       {

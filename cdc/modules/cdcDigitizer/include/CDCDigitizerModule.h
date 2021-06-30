@@ -116,6 +116,8 @@ namespace Belle2 {
      *  @param edep energy deposit (GeV).
      *  @param dx step length (cm).
      *  @param costh cos(theta) of particle.
+     *  @param adcCount ADC-count.
+     *  @param convFactorForThreshold conversin factor needed for threshold setting.
      *
      *  @return ADC-count and conversion factor for threshold.
      *
@@ -141,7 +143,7 @@ namespace Belle2 {
     //! Return semi-total gain of the specified wire
     /*!
       \param clayer layer no. (0-56)
-      \param celll  cell  no.
+      \param cell   cell  no.
       \return       gain
     */
     double getSemiTotalGain(int clayer, int cell) const

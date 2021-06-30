@@ -547,6 +547,87 @@ are successfully completed, the job outputs required for further processing are 
 In the current state of `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_, the workflow is interrupted, in case not all output files could be downloaded.
 In that case, you can resume the workflow (after checking the cause for the failed download) by simply restarting the workflow again and only the files for which the download failed will be downloaded.
 
+The Problem of Too Long Runtimes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+One major drawback of the workflow presented here is that in particular the later stages of ``FEIAnalysisTask``, beginning from stage 3 to stage 6, have large runtimes due to the fact,
+that most FEI stages have to be recomputed from scratch with the corresponding trainings applied, because cache output files ``RootOutput.root`` are not produced by the
+`gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tasks since they occupy too much space.
+
+This is a huge problem because of the fact, that individual jobs may fail for several reasons, causing potentially a large number of resubmission attempts. In consequence,
+a task submitted with `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ to the grid may be delayed significantly by potentially only a few restarted jobs, which have to be run again for a long time.
+
+A possible way out of this problem would be to split the processing per job by the number of events to be processed, and not by the number of files. This is not (yet) supported
+by `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_, but may be accomplished by passing ``-n`` and ``--skip-events`` options to `basf2` via ``gbasf2_basf2opt``
+of `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_. In that case, a `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ task would need to be started for a single file only.
+
+To realize this within the workflow constructed in `fei_grid_workflow.py <https://stash.desy.de/users/aakhmets/repos/feiongridworkflow/browse/fei_grid_workflow.py>`_, the modules ``FEIAnalysisTask``
+and ``FEIAnalysisSummaryTask`` are extended:
+
+For ``FEIAnalysisSummaryTask``, a stage dependent decision is taken, whether the jobs should be run on an entire file (file-based processing),
+or only on a subset of events from one single file (event-based processing). The configuration, whether to run a stage in a file-based or event-based manner is given in the dictionary
+``processing_type`` in `fei_grid_workflow.py <https://stash.desy.de/users/aakhmets/repos/feiongridworkflow/browse/fei_grid_workflow.py>`_:
+
+.. code-block:: python
+
+    processing_type = {
+        -1: {"type": "file_based"},
+        0: {"type": "file_based"},
+        1: {"type": "file_based"},
+        2: {"type": "file_based"},
+        3: {"type": "event_based", "n_events": 100000},  # usually 1/2 of a file
+        4: {"type": "event_based", "n_events": 50000},  # usually 1/4 of a file
+        5: {"type": "event_based", "n_events": 20000},  # usually 1/10 of a file
+        6: {"type": "event_based", "n_events": 10000},  # usually 1/20 of a file
+    }
+
+While stages -1 to 2 are fast enough to run them on an entire file, stages 3 to 6 should be run event-based by setting ``type`` to ``event_based``.
+In that case, the number of events to be processed for a certain stage is configured
+by the key ``n_events`` in the ``processing_type`` dictionary. The configured numbers of events shown above are rough estimates to ensure, that the individual jobs run about 6 to 10 hours on a node.
+However, feel free to optimize these numbers and the choice of type of processing based on your own experience on the grid and your needs. If it is fine for you to run completely file-based,
+you can also set the ``type`` to ``file_based`` for all stages.
+
+To determine, how many jobs should run for a single file to process all its events, a database is required for all files of the datasets to be used for training, which contains the information on
+the number of events per file. Since this information is required to create the workflow tree, and a `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ workflow is constructed in a deterministic
+manner, it is not possible to create the database at runtime of the different tasks spawned by the workflow. In consequence, this is implemented in the ``def requires(self):`` function of
+``FEIAnalysisSummaryTask``. This means, that the module ``FEIAnalysisSummaryTask`` with the **largest** stage number is creating this database to setup the instances of ``FEIAnalysisTask``. All
+other modules ``FEIAnalysisSummaryTask`` with smaller stage numbers access the already created database to save time.
+
+Technically, the `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tool ``gb2_ds_query_file`` is used to created this database called ``files_database.json``, which is stored in
+the same directory as the dataset list configured with the ``gbasf2_input_dslist`` setting. Currently, this is taking some amount of time, in particular for a set of many large datasets,
+therefore this is only done once.
+
+After the database ``files_database.json`` is created, the maximum number of events stored in the files is determined per dataset corresponding to a single line in the original dataset list.
+Based on these numbers, and the value of ``n_events`` in the ``processing_type`` dictionary for a considered stage, the number of instances of ``FEIAnalysisTask`` to be spawned is computed
+for each single dataset. Furthermore, the corresponding `basf2` option values for ``-n`` and ``--skip-events``, and
+a partial dataset list are constructed and then passed to the corresponding ``FEIAnalysisTask`` instance, which is extented with further properties ``process_events`` and ``skip_events`` to pass
+them to `basf2`.
+
+The options ``-n`` and ``--skip-events`` of `basf2` take care automatically of cases, when the number of remaining events to be processed from a file is smaller than configured by ``-n`` or
+the option ``--skip-events`` exceeds the maximum number of events in a file. In consequence, all files processed in an event-based manner are processed correctly.
+In summary, each instance of ``FEIAnalysisTask`` starts a `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ task, which is configured to process all files from the assigned
+dataset, using the same fixed subset of events from the input files.
+
+With this approach, the problem of too long runtimes per job is shifted to the requirement of having a large number of worker nodes in place to perform the computations and having
+a larger number of output files to be transferred in total. Since this is a grid workflow, this should be given in the ideal case.
+But be aware, that there are days, on which you get only a few free slots on the grid.
+Therefore, in case of central production of FEI training, a privileged access to the grid worker nodes would be very beneficial.
+
+A potential and perhaps a bit more important problem of the event-based processing approach described above is a grid related issue of the current way of processing files placed on the grid.
+Currently, the files are not streamed, but copied completely to a worker node on the grid. In contrast to the file-based processing, where a single file is needed to be copied only once for an instance
+of ``FEIAnalysisTask``, an event-based splitting may lead to multiple copy transfers of a single file, requested by multiple `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tasks
+at the same time. In consequence, if you specify too few events per job, a significant amount of jobs may fail at the beginning due to too many copy transfer requests for the same file.
+So please keep this in mind, when optimizing on a suitable number of events per job.
+
+This problem might become less relevant, when input files are streamed and not copied, for example via `XRootD <https://xrootd.slac.stanford.edu/>`_ transfers.
+Streaming via `XRootD <https://xrootd.slac.stanford.edu/>`_ then usually takes care of transferring only the relevant information to the jobs, so only the events required by an instance of
+``FEIAnalysisTask`` in case of event-based processing.
+
+In the current state of `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_, the parallel instances of `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tasks
+(like ``FEIAnalysisTask`` in this workflow) are handled sequentially, and not in parallel. This means, that you should avoid creating too many tasks with the event-based splitting discussed above.
+So try to optimize in that case between the runtimes of single jobs and the total number of the tasks. However, in view of the fact, that this is done for stages 3 to 6, which anyhow run very long,
+this issue should not be a major problem.
+
 MergeOutputsTask
 ----------------
 
@@ -656,42 +737,6 @@ Possible Improvements
 *********************
 
 Some ideas of improvements of the workflow constructed to run the FEI training on the grid will be given below.
-
-The Problem of Too Long Runtimes
---------------------------------
-
-One major drawback of the workflow presented here is that in particular the later stages, beginning from stage 3 to stage 6, have large runtimes due to the fact,
-that most FEI stages have to be recomputed from scratch with the corresponding trainings applied, since cache output files ``RootOutput.root`` are not produced by the
-`gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tasks since they occupy too much space.
-
-This is a huge problem because of the fact, that individual jobs may fail for several reasons, causing potentially a large number of resubmission attempts. In consequence,
-a task submitted with `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ to the grid may be delayed significantly by potentially only a few restarted jobs, which have to be run again for a long time.
-
-A possible way out of this problem would be to split the processing per job by the number of events to be processed, and not by the number of files. This is not (yet) supported
-by `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_, but may be accomplished by passing ``-n`` and ``--skip-events`` options to `basf2` via ``gbasf2_basf2opt`` of `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_. In that case, a `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ task would need to be
-started for a single file only.
-
-To realize this within the workflow constructed in `fei_grid_workflow.py <https://stash.desy.de/users/aakhmets/repos/feiongridworkflow/browse/fei_grid_workflow.py>`_, the modules ``FEIAnalysisTask``
-and ``FEIAnalysisSummaryTask`` would require several major extensions. Some ideas on technical implementations are given below:
-
-* For ``FEIAnalysisSummaryTask``, a stage dependent decision should be taken to decide, whether the jobs should be run on multiple files, or only on a subset of events from one single file.
-* File-based processing (stages -1 to 2): Due to limitations of scratch space on the grid worker nodes, a realistic number for files per job would be 1 or 2. In that case, it is most presumably sufficient to keep the setup as it is currently for stages suitable for file-based processing.
-* Event-based processing (stages 3 to 6):
-
-    #. The first extension required for the workflow would be to determine the individual files from the datasets given in the setting ``gbasf2_input_dslist``, and the number of events per file. This can be done technically within the ``FEITrainingTask`` at stage -1.
-    #. As currently done for the expected runtimes in `fei_grid_workflow.py <https://stash.desy.de/users/aakhmets/repos/feiongridworkflow/browse/fei_grid_workflow.py>`_, the required number of events to be processed within a job should be determined to optimize the runtime of a job to be at most of about 12 hours.
-    #. Using the information from previous two points, ``FEIAnalysisSummaryTask`` should be extended such, that it can determine, how many `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tasks should be created for a single file and which events from that file should be processed within a job.
-    #. Then, ``FEIAnalysisSummaryTask`` should pass the file as a dataset list to an instance of correspondingly adapted ``FEIAnalysisTask`` and extend the setting ``gbasf2_basf2opt`` with ``-n`` and ``--skip-events`` accordingly.
-
-With this approach, the problem of too long runtimes per job is shifted to the requirement of having a large number of worker nodes in place to perform the computations. Since this is a grid workflow, this should be given in the ideal case. But be aware, that there are days, on which you get only a few free slots on the grid. Therefore, in case of central production of FEI training, a privileged access to the grid worker nodes would be very beneficial.
-
-A potential and perhaps a bit more important problem of the improved approach described above is a grid related issue of the current way of processing files placed on the grid.
-Currently, the files are not streamed, but copied completely to a worker node on the grid. In contrast to the file-based processing, where a single file is needed to be copied only once for an instance
-of ``FEIAnalysisTask``, an event-based splitting may lead to multiple copy transfers of a single file within an instance of ``FEIAnalysisTask``. In consequence, if you specify too few events per job,
-a significant amount of jobs may fail at the beginning due to too many copy transfer requests for the same file. So please keep this in mind, when optimizing on a suitable number of events per job.
-This problem might become less relevant, when input files are streamed and not copied, for example via `XRootD <https://xrootd.slac.stanford.edu/>`_ transfers.
-
-In the current state of `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_, the parallel instances of `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tasks (like ``FEIAnalysisTask`` in this workflow) are handled sequentially, and not in parallel. This means, that you should avoid creating too many tasks with the event-based splitting discussed above. So try to optimize in that case between the runtimes of single jobs and the total number of the tasks. However, in view of the fact, that this is done for stages 3 to 6, which anyhow run very long, this issue should not be a major problem.
 
 Potential Improvements Following gbasf2 Development
 ---------------------------------------------------

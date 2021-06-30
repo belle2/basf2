@@ -6,7 +6,7 @@
 from ROOT import Belle2
 
 clocks = Belle2.HardwareClockSettings()
-clocks.setAcceleratorRF(508.887e-3)
+clocks.setAcceleratorRF(508.876e-3)
 clocks.setClockPrescale(Belle2.Const.EDetector.TOP, "sampling", 6)
 clocks.setClockPrescale(Belle2.Const.EDetector.SVD, "sampling", 4)
 clocks.setClockPrescale(Belle2.Const.EDetector.ECL, "sampling", 3 * 24)

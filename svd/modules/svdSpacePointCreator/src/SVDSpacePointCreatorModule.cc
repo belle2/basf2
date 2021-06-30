@@ -53,7 +53,8 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
            "Use old PDF name convention?", bool(true));
 
   addParam("numMaxSpacePoints", m_numMaxSpacePoints,
-           "Maximum number of SpacePoints allowed in an event, above this threshold no SpacePoint will be created", unsigned(2e6));
+           "Maximum number of SpacePoints allowed in an event, above this threshold no SpacePoint will be created",
+           unsigned(m_numMaxSpacePoints));
 
 }
 

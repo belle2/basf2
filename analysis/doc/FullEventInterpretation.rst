@@ -359,7 +359,7 @@ In case the required developments are not merged into a `basf2` release yet, the
 
     source /cvmfs/belle.cern.ch/tools/b2setup
     cd </path/to/your/work/directory>
-    b2code-create --light development
+    b2code-create development
     cd development; b2setup
 
 Changes required to run the FEI on the grid are summarized on the branch ``feature/BII-2765-make-fei-great-again-training-grid-compatible-v2``.

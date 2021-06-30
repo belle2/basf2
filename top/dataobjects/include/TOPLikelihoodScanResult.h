@@ -32,9 +32,10 @@ namespace Belle2 {
     /**
      * Sets other data members for a given particle hypothesis
      */
-    void set(double mostLikelyMass,
-             double mostLikelyMassIntervalLow,
-             double mostLikelyMassIntervalUp,
+    void set(float mostLikelyMass,
+             float mostLikelyMassIntervalLow,
+             float mostLikelyMassIntervalUp,
+             float threshold,
              float mostLikelySignalPhotonCount,
              float mostLikelyBackgroundPhotonCount,
              float mostLikelyDeltaPhotonCount,
@@ -48,6 +49,7 @@ namespace Belle2 {
       m_mostLikelyMass =  mostLikelyMass;
       m_mostLikelyMassIntervalLow =  mostLikelyMassIntervalLow;
       m_mostLikelyMassIntervalUp =  mostLikelyMassIntervalUp;
+      m_threshold = threshold;
       m_mostLikelySignalPhotonCount =  mostLikelySignalPhotonCount;
       m_mostLikelyBackgroundPhotonCount =  mostLikelyBackgroundPhotonCount;
       m_mostLikelyDeltaPhotonCount =  mostLikelyDeltaPhotonCount;
@@ -77,6 +79,11 @@ namespace Belle2 {
      */
     float getMostLikelyMassIntervalUp() const {return m_mostLikelyMassIntervalUp;}
 
+    /**
+     * Return the position of the Cherenkov threshold from the LL scan
+     * @return threshold the Cherenkov threshold
+     */
+    float getThreshold() const {return m_threshold;}
 
 
     /**
@@ -139,8 +146,9 @@ namespace Belle2 {
 
   private:
     float m_mostLikelyMass = 0;     /**< mass that maximizes the LL  */
-    float m_mostLikelyMassIntervalLow = 0;     /**< mass that maximizes the LL  */
-    float m_mostLikelyMassIntervalUp = 0;     /**< mass that maximizes the LL  */
+    float m_mostLikelyMassIntervalLow = 0;     /**< lower edge of the mass interval from  the LL  */
+    float m_mostLikelyMassIntervalUp = 0;     /**< upper edge of the mass interval from the LL  */
+    float m_threshold = 0;     /**< location of the Chrerenkov threshold from the LL scan */
 
     float m_mostLikelySignalPhotonCount = 0; /**< Expected number of signal photons at the LL max */
     float m_mostLikelyBackgroundPhotonCount = 0; /**< Expected number of background photons at the LL max */

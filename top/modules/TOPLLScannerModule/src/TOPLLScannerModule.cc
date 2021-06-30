@@ -172,11 +172,23 @@ void TOPLLScannerModule::event()
       mass += step;
     }
 
-    // findthe maximum and the confidence interval usin the fine-grained scan
+    // find the maximum and the confidence interval usin the fine-grained scan
     scanLikelihood(massPointsFineScan, logLfineScan, 0.5, maxLL, massMax, minMassRange, maxMassRange);
 
 
-    // finally grab the number of expected photons at the LL maximum
+    // finally find the location of the cherenkov threshold looking for a plateau of the
+    // LL value
+    auto lastLL = logLcoarseScan.back();
+    auto currentLL = logLcoarseScan.back();
+    auto index = m_massPoints.size() - 1;
+    while (TMath::Abs(lastLL - currentLL) < 0.01 && index > 0) {
+      lastLL = currentLL;
+      currentLL = logLcoarseScan[index];
+      index--;
+    }
+    float threshold = m_massPoints[index + 1];
+
+    // grab the number of expected photons at the LL maximum
     const PDFConstructor pdfConstructor(trk, Const::pion, PDFConstructor::c_Fine, PDFConstructor::c_Reduced, massMax);
     pdfConstructor.switchOffDeltaRayPDF();
     float nSignalPhotons = pdfConstructor.getExpectedSignalPhotons();
@@ -186,6 +198,7 @@ void TOPLLScannerModule::event()
     topLLScanRes->set(massMax,
                       minMassRange,
                       maxMassRange,
+                      threshold,
                       nSignalPhotons,
                       nBackgroundPhotons,
                       nDeltaPhotons,

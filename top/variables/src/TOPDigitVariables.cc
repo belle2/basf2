@@ -4,6 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributor: Jan Strube (jan.strube@desy.de)                           *
+ *              Umberto Tamponi (tamponi@to.infn.it)                      *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -571,6 +572,31 @@ namespace Belle2 {
         return scanRes->getMostLikelyMassIntervalLow();
       }
 
+      double getLogLScanThreshold(const Particle* particle)
+      {
+        const auto* track = particle->getTrack();
+        if (!track) return -1;
+        auto scanRes = track->getRelated<TOPLikelihoodScanResult>();
+        if (!scanRes) {
+          B2WARNING("No TOPLikelihoodScanResult objcte found. Are you sure you added TOPLLScanner to the path?");
+          return -1;
+        }
+        return scanRes->getThreshold();
+      }
+
+
+      double getLogLScanExpectedSignalPhotons(const Particle* particle)
+      {
+        const auto* track = particle->getTrack();
+        if (!track) return -1;
+        auto scanRes = track->getRelated<TOPLikelihoodScanResult>();
+        if (!scanRes) {
+          B2WARNING("No TOPLikelihoodScanResult objcte found. Are you sure you added TOPLLScanner to the path?");
+          return -1;
+        }
+        return scanRes->getMostLikelySignalPhotonCount();
+      }
+
 
       //---------------- TOPRecBunch related --------------------
 
@@ -744,7 +770,10 @@ namespace Belle2 {
                       "[calibration] Upper edge of the mass interval determined by the LL scan");
     REGISTER_VARIABLE("logLScanMassLowerInterval", TOPVariable::getLogLScanMassLowerInterval,
                       "[calibration] Lower edge of the mass interval determined by the LL scan");
-
+    REGISTER_VARIABLE("logLScanThreshold", TOPVariable::getLogLScanThreshold,
+                      "[calibration] Cherenkov threshold determind by the LL scan");
+    REGISTER_VARIABLE("logLScanExpectedSignalPhotons", TOPVariable::getLogLScanExpectedSignalPhotons,
+                      "[calibration] Expected signal photon yeild at the LL maximum");
     REGISTER_VARIABLE("topRecBunchUsedTrackCount", TOPVariable::TOPRecBunchUsedTrackCount,
                       "[calibration] The number of tracks used in the bunch reconstruction");
     REGISTER_VARIABLE("topRecBunchTrackCount", TOPVariable::TOPRecBunchTrackCount,

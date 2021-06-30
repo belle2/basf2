@@ -61,7 +61,7 @@ namespace Belle2 {
      * @param label The label for the clock.
      * @param prescale The prescale factor of the clock.
      */
-    void setClockPrescale(const Const::EDetector detector, std::string label, Int_t prescale);
+    void setClockPrescale(const Const::EDetector detector, std::string label, double prescale);
 
     /**
      * Set the frequency value of detector clock not derived from the global clock
@@ -69,7 +69,7 @@ namespace Belle2 {
      * @param label The label for the clock.
      * @param frequency The frequency for the clock [GHz]
      */
-    void setClockFrequency(const Const::EDetector detector, std::string label, float frequency);
+    void setClockFrequency(const Const::EDetector detector, std::string label, double frequency);
 
     /**
      * Set the accelerator RF value.

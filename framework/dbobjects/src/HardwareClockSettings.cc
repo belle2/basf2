@@ -48,7 +48,7 @@ double HardwareClockSettings::getClockFrequency(Const::EDetector detector, std::
     return  m_clocksMap.at(detector).at(label);
   else B2ERROR("Clock named " << label << " not available for " << Const::parseDetectors(detector));
 
-  return std::numeric_limits<float>::quiet_NaN();
+  return std::numeric_limits<double>::quiet_NaN();
 }
 
 double HardwareClockSettings::getGlobalClockFrequency() const
@@ -68,16 +68,16 @@ double HardwareClockSettings::getClockPrescale(Const::EDetector detector, std::s
     return m_prescaleMap.at(detector).at(label);
   else B2ERROR("Clock named " << label << " not available for " << Const::parseDetectors(detector));
 
-  return std::numeric_limits<Int_t>::quiet_NaN();
+  return std::numeric_limits<double>::quiet_NaN();
 }
 
-void HardwareClockSettings::setClockPrescale(const Const::EDetector detector, std::string label, Int_t prescale)
+void HardwareClockSettings::setClockPrescale(const Const::EDetector detector, std::string label, double prescale)
 {
   m_prescaleMap[detector][label] = prescale;
 }
 
 
-void HardwareClockSettings::setClockFrequency(const Const::EDetector detector, std::string label, float frequency)
+void HardwareClockSettings::setClockFrequency(const Const::EDetector detector, std::string label, double frequency)
 {
   m_clocksMap[detector][label] = frequency;
 }

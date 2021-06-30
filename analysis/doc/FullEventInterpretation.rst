@@ -649,13 +649,15 @@ For stage -1, the task is (ab)used to determine storage elements, where the inpu
 ``gbasf2_input_dslist`` are located, and construct a list of sites (TMP-SE), where to put the tarballs created by instances of ``PrepareInputsTask``.
 
 In case of stage 6, all BDTs are already trained. Therefore, the merged ``Monitor*.root`` files are evaluated together with ``mcParticlesCount.root`` and  ``*.xml`` files with the scripts
-``analysis/scripts/fei/printReporting.py`` and ``analysis/scripts/fei/latexReporting.py`` within this task.
+``analysis/scripts/fei/printReporting.py`` and ``analysis/scripts/fei/latexReporting.py`` within this task. As an additional validation step, the ``basf2_mva_evaluate.py`` script is used
+to process valid BDT ``*.xml`` training files using the merged ``training_input.root`` files from stages 0 to 5. For that purpose, these ``training_input.root`` files are merged into
+``training_input_merged.root``.
 
 In consequence, the output produced by this module depends on the particular stage considered:
 
 * stage -1: ``dataset_sites.txt`` listing the TMP-SE sites to upload the tarball from ``PrepareInputsTask``.
 * stages 0 to 5: ``*.xml`` BDT training files.
-* stage 6: ``summary.tex`` and ``summary.txt`` files, containing information on performance of FEI. The file ``summary.tex`` can then be compiled with ``pdflatex`` into a pdf document.
+* stage 6: ``summary.tex`` and ``summary.txt`` files, containing information on performance of FEI. The file ``summary.tex`` can then be compiled with ``pdflatex`` into a pdf document. In addition, ``training_input_merged.root`` is created for BDT evaluation, followed by ``*.zip`` outputs from this evaluation. For invalid BDT ``*.xml`` training files, zero-sized ``*.zip`` are created, as well as a zero-sized ``training_input_merged.root`` if all BDT trainings are invalid. This is done for the purpose of having the workflow finished successfully, since this is most probably not an intrinsic BDT training error, but an error due to low statistics.
 
 Following inputs are required for ``FEITrainingTask`` depending on the current stage:
 
@@ -664,12 +666,14 @@ Following inputs are required for ``FEITrainingTask`` depending on the current s
 * Merged ``training_input.root`` from current stage, in case such a file was produced. This is true for stages 0 to 5.
 * Merged ``Monitor*.root`` from current stage, in case such a file was produced. This is true for stage 6.
 
-For all required inputs, symlinks are created to the current directory for stages 0 to 6.
+For the required inputs listed above, symlinks are created to the current directory for stages 0 to 6. In case of merged ``training_input.root`` files from stages 0 to 5 to create
+``training_input_merged.root``, the paths to the original files are used directly to merge them.
 
 To correctly configure the training for stages 0 to 5, the `basf2` path needs to be created again to have the ``Summary.pickle`` file created, containing a local pickled version of the path.
 After that, the ``do_trainings(particles, configuration)`` function of the ``fei`` package is called to start BDT trainings needed for the current stage.
 
-For stage 6, the scripts ``analysis/scripts/fei/printReporting.py`` and ``analysis/scripts/fei/latexReporting.py`` are executed on top of the inputs provided via symlinks.
+For stage 6, the scripts ``analysis/scripts/fei/printReporting.py`` and ``analysis/scripts/fei/latexReporting.py`` are executed on top of the inputs provided via symlinks, and the script
+``basf2_mva_evaluate.py`` on ``training_input_merged.root``.
 
 Also for this module, the usual parameters are used to define the folder structure of outputs:
 

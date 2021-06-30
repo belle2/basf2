@@ -11,8 +11,7 @@
 #pragma once
 
 namespace Belle2 {
-  /** This class contains information to correct the information obtained from the TTD,
-   *  i.e. provide numbers relative to the detector etc.
+  /** This class contains information to correct the information obtained from the TTD (simple offsets)
    */
   class TTDOffsets: public TObject {
   public:
@@ -27,25 +26,25 @@ namespace Belle2 {
       m_triggeredBunchOffsetHER(0), m_triggeredBunchOffsetLER(0)
     { }
 
-    /**  Destructor */
+    /** Destructor */
     ~TTDOffsets() {}
 
-    /** Set the delay of the injection for HER in clock ticks. */
+    /** Set the delay between the pre-kick signal and arrival of bunch at IP for HER in clock ticks. */
     void setInjectionDelayHER(int delay) { m_injectionDelayHER = delay; }
-    /** Set the delay of the injection for LER in clock ticks. */
+    /** Set the delay between the pre-kick signal and arrival of bunch at IP for LER in clock ticks. */
     void setInjectionDelayLER(int delay) { m_injectionDelayLER = delay; }
-    /** Set the offset of the bunch number for HER. */
+    /** Set the offset between triggered bunch nr and SKB bunch nr for HER. */
     void setTriggeredBunchOffsetHER(int offset) { m_triggeredBunchOffsetHER = offset; }
-    /** Set the offset of the bunch number for LER. */
+    /** Set the offset between triggered bunch nr and SKB bunch nr for LER. */
     void setTriggeredBunchOffsetLER(int offset) { m_triggeredBunchOffsetLER = offset; }
 
-    /** Get the delay of the injection for HER in clock ticks. */
+    /** Get the delay between the pre-kick signal and arrival of bunch at IP for HER in clock ticks. */
     int getInjectionDelayHER() const { return m_injectionDelayHER; }
-    /** Get the delay of the injection for LER in clock ticks. */
+    /** Get the delay between the pre-kick signal and arrival of bunch at IP for LER in clock ticks. */
     int getInjectionDelayLER() const { return m_injectionDelayLER; }
-    /** Get the offset of the bunch number for HER. */
+    /** Get the offset between triggered bunch nr and SKB bunch nr for HER. */
     int getTriggeredBunchOffsetHER() const { return m_triggeredBunchOffsetHER; }
-    /** Get the offset of the bunch number for LER. */
+    /** Get the offset between triggered bunch nr and SKB bunch nr for LER. */
     int getTriggeredBunchOffsetLER() const { return m_triggeredBunchOffsetLER; }
 
 

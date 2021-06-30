@@ -587,7 +587,7 @@ namespace Belle2 {
       }
     }
 
-    double triggeredBunchNumber(const Particle*)
+    double triggeredBunchNumberTTD(const Particle*)
     {
       StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;
 
@@ -600,6 +600,24 @@ namespace Belle2 {
       // And check if the stored data is valid
       if (TTDInfo->isValid()) {
         return TTDInfo->getBunchNumber();
+      } else {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double triggeredBunchNumber(const Particle*)
+    {
+      StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;
+
+      // Check if the pointer is valid
+      if (!TTDInfo.isValid()) {
+        B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
+      // And check if the stored data is valid
+      if (TTDInfo->isValid()) {
+        return TTDInfo->getTriggeredBunchNumberGlobal();
       } else {
         return std::numeric_limits<float>::quiet_NaN();
       }
@@ -654,6 +672,42 @@ namespace Belle2 {
       // And check if the stored data is valid and if an injection happened recently
       if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
         return TTDInfo->getTimeSinceLastInjectionInMicroSeconds();
+      } else {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double timeSinceLastInjectionClockTicks(const Particle*)
+    {
+      StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;
+
+      // Check if the pointer is valid
+      if (!TTDInfo.isValid()) {
+        B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
+      // And check if the stored data is valid and if an injection happened recently
+      if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
+        return TTDInfo->getTimeSinceInjectedBunch();
+      } else {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double timeSinceLastInjectionMicroSeconds(const Particle*)
+    {
+      StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;
+
+      // Check if the pointer is valid
+      if (!TTDInfo.isValid()) {
+        B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
+      // And check if the stored data is valid and if an injection happened recently
+      if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
+        return TTDInfo->getTimeSinceInjectedBunchInMicroSeconds();
       } else {
         return std::numeric_limits<float>::quiet_NaN();
       }
@@ -838,6 +892,12 @@ Returns NaN for data.
 
 .. note:: this returns the time without the delay until the injected bunch reaches the detector (which differs for HER/LER)
 )DOC");
+
+    REGISTER_VARIABLE("timeSinceLastInjectionClockTicks", timeSinceLastInjectionClockTicks,
+      "[Eventbased] Time since the last injected bunch passed by the detector in micro seconds.")
+
+    REGISTER_VARIABLE("timeSinceLastInjectionMicroSeconds", timeSinceLastInjectionMicroSeconds,
+      "[Eventbased] Time since the last injected bunch passed by the detector in micro seconds.")
 
     REGISTER_VARIABLE("injectionInHER", injectionInHER,
                   "[Eventbased] Returns 1 if injection was in HER, 0 otherwise.");

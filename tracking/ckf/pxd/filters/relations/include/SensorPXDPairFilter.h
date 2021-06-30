@@ -23,8 +23,8 @@ namespace Belle2 {
 
   private:
     /// Pre-filter relations in phi between seed states and hit states
-    double m_param_PhiRecoTrackToHitCut = 0.8;
+    float m_param_PhiRecoTrackToHitCut = 0.8;
     /// Pre-filter relations in theta between hit states
-    double m_param_PhiHitHitCut = 1.0;
+    float m_param_PhiHitHitCut = 1.0;
   };
 }

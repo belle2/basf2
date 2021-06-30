@@ -11,8 +11,8 @@
 #pragma once
 
 namespace Belle2 {
-  /** This class contains the beam spot position and size modeled as a
-   * gaussian distribution in space.
+  /** This class contains information to correct the information obtained from the TTD,
+   *  i.e. provide numbers relative to the detector etc.
    */
   class TTDOffsets: public TObject {
   public:

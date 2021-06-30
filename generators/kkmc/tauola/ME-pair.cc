@@ -442,7 +442,7 @@ double nunul_(const double& Mtau, const double* pl, const double* pnu, const dou
   yw = log(wp / wm) / 2.;
   if (isnan(yw) || isinf(yw)) yw = 0;
   eps2 = u0 * u0 - u3 * u3;
-  eps = eps2 > 0 ? sqrt(eps2) : 0;
+  eps = sqrt(eps2);
   y = w0 * w0 - w3 * w3;
   al = ak0 / Mtau;
 

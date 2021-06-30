@@ -1,0 +1,136 @@
+#!/usr/bin/env python3
+
+"""
+Update the pythia decay mode ids from Pythia6 to Pythia8
+
+This does the same conversion that was ususally done by evtgen each time and
+writes out the modified file. It needs to be done for every decay file but
+only once.
+
+So it will leave a comment in the beginning of the file indicating that the
+conversion has been done and refuse to do it again if the comment is found.
+"""
+
+
+import re
+import datetime
+import argparse
+from pathlib import Path
+import basf2
+
+def convert(old):
+    """Extracted from evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp"""
+    if ( old == 0 ):
+        new = 0    # phase-space
+    elif ( old == 1 ):
+        new = 1    # omega or phi -> 3pi
+    elif ( old == 2 ):
+        new = 11    # Dalitz decay
+    elif ( old == 3 ):
+        new = 2    # V -> PS PS
+    elif ( old == 4 ):
+        new = 92    # onium -> ggg or gg gamma
+    elif ( old == 11 ):
+        new = 42    # phase-space of hadrons from available quarks
+    elif ( old == 12 ):
+        new = 42    # phase-space for onia resonances
+    elif ( old == 13 ):
+        new = 43    # phase-space of at least 3 hadrons
+    elif ( old == 14 ):
+        new = 44    # phase-space of at least 4 hadrons
+    elif ( old == 15 ):
+        new = 45    # phase-space of at least 5 hadrons
+    elif ( old >= 22 and old <= 30 ):
+        new = old + 40    # phase space of hadrons with fixed multiplicity (new - 60)
+    elif ( old == 31 ):
+        new = 42    # two or more quarks phase-space; one spectactor quark
+    elif ( old == 32 ):
+        new = 91    # qqbar or gg pair
+    elif ( old == 33 ):
+        new = 0    # triplet q X qbar, where X = gluon or colour singlet (superfluous, since g's are created anyway)
+    elif ( old == 41 ):
+        new = 21    # weak decay phase space, weighting nu_tau spectrum
+    elif ( old == 42 ):
+        new = 22    # weak decay V-A matrix element
+    elif ( old == 43 ):
+        new = 22    # weak decay V-A matrix element, quarks as jets (superfluous)
+    elif ( old == 44 ):
+        new = 22    # weak decay V-A matrix element, parton showers (superfluous)
+    elif ( old == 48 ):
+        new = 23    # weak decay V-A matrix element, at least 3 decay products
+    elif ( old == 50 ):
+        new = 0    # default behaviour
+    elif ( old == 51 ):
+        new = 0    # step threshold (channel switched off when mass daughters > mother mass
+    elif ( old == 52 or old == 53 ):
+        new = 0    # beta-factor threshold
+    elif ( old == 84 ):
+        new = 42    # unknown physics process - just use phase-space
+    elif ( old == 101 ):
+        new = 0    # continuation line
+    elif ( old == 102 ):
+        new = 0    # off mass shell particles.
+    else:
+        basf2.B2ERROR(f"Pythia mode integer {old} is not recognised. Using phase-space model")
+        new = 0    # Use phase-space for anything else
+    return new
+
+def get_argument_parser():
+    """
+    Return an ArgumentParser with all defined arguments
+    """
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("directory", nargs="*", help="Name of a directory or dec file to check. "
+                        "If it's a directory it will be searched recursively for .dec/.DEC files")
+    return parser
+
+def update_decfile(decfile):
+    date = datetime.datetime.now().strftime("%B %Y")
+    modified = []
+    pythia_mode = re.compile(r"PYTHIA\s+(\d+)")
+    with open(decfile) as f:
+        added_comment = False
+        changed = 0
+        for i, line in enumerate(f, 1):
+            # remove trailing whitespace in all lines since we're at it ...
+            line = line.rstrip() + "\n"
+            match = pythia_mode.search(line)
+            if not added_comment:
+                if not line.strip().startswith("#"):
+                    modified += [
+                        "#\n",
+                        f"# {date} Automated: Converted PYTHIA ids\n",
+                        "#   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp\n"
+                    ]
+                    added_comment = True
+                elif line.find("Converted PYTHIA ids")>=0:
+                    basf2.B2WARNING(f"{decfile}: Conversion already done, skipping")
+                    return
+
+            if match:
+                old = int(match.group(1))
+                new = convert(old)
+                if old != new:
+                    basf2.B2INFO(f"{decfile}:{i}: replacing Pythia id {old=}, {new=}")
+                    changed += 1
+                line = line[:match.start()] + f"PYTHIA {new:2d}" + line[match.end():]
+            modified.append(line)
+    # only write out the new file if there has been at least one line changed
+    if changed:
+        with open(decfile, "w") as f:
+            f.writelines(modified)
+
+if __name__ == "__main__":
+    parser = get_argument_parser()
+    args = parser.parse_args()
+    if not args.directory:
+        args.directory = [basf2.find_file("decfiles/dec")]
+
+    for base in args.directory:
+        base = Path(base)
+        if not base.exists():
+            basf2.B2ERROR(f"{base} doesn't exist")
+            continue
+        files = (list(base.glob("**/*.dec")) + list(base.glob("**/*.DEC"))) if base.is_dir() else [base]
+        for filename in files:
+            update_decfile(filename)

@@ -394,6 +394,14 @@ with the following commands (they work only for ``bash``):
     export PATH="$(readlink -f sw)/luigi/bin:$PATH"
     export PYTHONPATH="$(readlink -f sw)/luigi:$(readlink -f sw)/b2luigi:$PYTHONPATH"
 
+Because of checking out the main branches of `luigi <https://luigi.readthedocs.io/en/latest/>`_ and `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_, it might be
+that they do not work properly because of missing ``python`` packages. In that case, you can install them via the ``pip`` module:
+
+.. code-block:: bash
+
+    python3 -m pip install colorama tenacity --user
+
+
 The last step is to install `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_. For that purpose, please switch to a new terminal window with fresh environment
 on your machine, and follow the steps for `gbasf2 installation <https://confluence.desy.de/display/BI/Computing+GBasf2#ComputingGBasf2-gBasf2installationprocedure>`_.
 

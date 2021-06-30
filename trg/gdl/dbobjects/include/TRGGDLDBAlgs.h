@@ -38,7 +38,7 @@ namespace Belle2 {
     /** Getter for a GDL logic alghrithm */
     std::string getalg(int i) const
     {
-      return m_algs[i];
+      return m_algs.at(i);
     }
 
     /** Getter of the number of algorithms */

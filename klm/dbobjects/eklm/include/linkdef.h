@@ -20,7 +20,5 @@
 #pragma link C++ class Belle2::EKLMReconstructionParameters+; // checksum=0xafad81c2, version=1
 #pragma link C++ class Belle2::EKLMSegmentAlignment+; // checksum=0xaf127699, version=1
 #pragma link C++ class Belle2::EKLMSimulationParameters+; // checksum=0x114cf589, version=1
-#pragma link C++ class Belle2::EKLMTimeCalibration+; // checksum=0xa02a4ad, version=2
-#pragma link C++ class Belle2::EKLMTimeCalibrationData+; // checksum=0x877f758b, version=2
 
 #endif

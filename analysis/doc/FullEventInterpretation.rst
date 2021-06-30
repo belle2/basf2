@@ -687,7 +687,8 @@ To be able to upload necessary files to SE, the following inputs are required:
 * Merged ``mcParticlesCount.root`` from stage -1. This indicates also the dependence, that ``FEITrainingTask`` of stage -1 should start after ``MergeOutputsTask`` of stage -1 is successfully completed.
 * All training files ``*.xml`` from previous stages and current stage, in case BDT trainings were already performed.
 
-The files ``mcParticlesCount.root`` and ``*.xml`` are then put into a tarball, copied over to the initial TMP-SE storage element configured by `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tools, and then the tarball is replicated
+The files ``mcParticlesCount.root`` and ``*.xml`` are then put into a tarball, copied over by `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tools to the initial TMP-SE
+storage element configured in `settings.json <https://stash.desy.de/users/aakhmets/repos/feiongridworkflow/browse/settings.json>`_., and then the tarball is replicated
 to the storage elements from ``dataset_sites.txt``. In case of a successful upload and replication, the timestamp used in the remote path of the tarball is written to ``successful_input_upload.txt``, which is checked by the ``FEIAnalysisSummaryTask`` directly following this ``PrepareInputsTask``.
 
 The following parameters are used in this module:

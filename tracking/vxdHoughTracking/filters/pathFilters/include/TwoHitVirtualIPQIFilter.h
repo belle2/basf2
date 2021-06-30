@@ -12,16 +12,15 @@
 #include <tracking/vxdHoughTracking/filters/pathFilters/BasePathFilter.h>
 #include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
-#include <framework/database/DBObjPtr.h>
-#include <mdst/dbobjects/BeamSpot.h>
 
 namespace Belle2 {
   namespace vxdHoughTracking {
 
-    /// Filter for three hits using QualityEstimators plus a virtual IP.
+    /// Filter for two hits plus a virtual IP using QualityEstimators.
     class TwoHitVirtualIPQIFilter : public BasePathFilter {
     public:
-      /// Return the weight based on azimuthal-angle separation
+      /// Return the weight based on the quality estimator.
+      /// Returns the QI value obtained from the fit with the chosen QualityEstimator
       TrackFindingCDC::Weight operator()(const BasePathFilter::Object& pair) override;
       /// Expose the parameters.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
@@ -34,8 +33,6 @@ namespace Belle2 {
     private:
       /// virtual IP SpacePoint
       SpacePoint m_virtualIPSpacePoint;
-      /// cut on the POCA distance in xy obtained from the helixFitEstimator
-      double m_param_helixFitPocaVirtIPDCut = 1.0;
 
       /// Identifier which estimation methsod to use. Valid identifiers are:
       /// mcInfo, tripletFit, helixFit
@@ -46,11 +43,6 @@ namespace Belle2 {
       bool m_param_MCStrictQualityEstimator = true;
       /// pointer to the selected QualityEstimator
       std::unique_ptr<QualityEstimatorBase> m_estimator;
-
-      /// BeamSpot from DB
-      DBObjPtr<BeamSpot> m_BeamSpotDB;
-      /// Actual BeamSpot
-      BeamSpot m_BeamSpot;
     };
 
   }

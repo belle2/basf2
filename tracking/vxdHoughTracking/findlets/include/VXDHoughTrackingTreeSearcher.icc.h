@@ -34,7 +34,7 @@ namespace Belle2 {
 
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "twoHitFilterLimit"),
                                     m_param_applyTwoHitFilterIfMoreChildStates,
-                                    "Use the TwoHitFilter (path length == 1) if thera are more child states than this value.",
+                                    "Use the TwoHitFilter (path length == 1) if there are more child states than this value.",
                                     m_param_applyTwoHitFilterIfMoreChildStates);
     }
 

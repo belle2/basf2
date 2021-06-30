@@ -77,7 +77,7 @@ namespace Belle2 {
       void fastInterceptFinder2d(const std::vector<VXDHoughState*>& hits, uint xmin, uint xmax, uint ymin, uint ymax,
                                  uint currentRecursion);
 
-      /// Find Hough Space clusters. Looop over all found sectors in m_SectorArray and then calls
+      /// Find Hough Space clusters. Loop over all found sectors in m_SectorArray and then calls
       /// the DepthFirstSearch function to recursively find the clusters
       void FindHoughSpaceCluster();
 

@@ -95,7 +95,7 @@ namespace Belle2 {
         /// Ladder this state is based on (only use for SpacePoint based states)
         unsigned short ladder = std::numeric_limits<unsigned short>::quiet_NaN();
         /// SensorID of this hit
-        VxdID sensorID = VxdID(0);
+        VxdID sensorID = 0;
       };
       /// Get the cached data of this state
       const DataCache getDataCache() const { return m_dataCache; }

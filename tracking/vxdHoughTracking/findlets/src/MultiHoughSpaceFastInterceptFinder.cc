@@ -66,7 +66,6 @@ void MultiHoughSpaceFastInterceptFinder::initialize()
 {
   Super::initialize();
 
-  // TODO: fix value for max recursion level, should be the maximum of the parameter given, and the calculation below
   m_param_maxRecursionLevel = ceil(log2(std::max(m_param_nAngleSectors, m_param_nVerticalSectors))) - 1;
   B2ASSERT("The maximum number of recursions (maximumRecursionLevel) must not be larger than 14, but it is " <<
            m_param_maxRecursionLevel <<

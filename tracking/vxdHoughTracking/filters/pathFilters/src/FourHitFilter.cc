@@ -20,12 +20,12 @@ using namespace vxdHoughTracking;
 void FourHitFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "circleRadiusDifferenceCut"), m_param_CircleRadiusDifferenceCut,
-                                "TODO: Cut on the absolute value of cosine between the vectors (oHit - cHit) and (cHit - iHit).",
+                                "Cut on the difference of the radii of the two circles that can be defined by two hit triplets.",
                                 m_param_CircleRadiusDifferenceCut);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "circleCenterPositionDifferenceCut"),
                                 m_param_CircleCenterPositionDifferenceCut,
-                                "TODO: Cut on the difference between circle radius and circle center to check whether the circle is compatible with passing through the IP.",
+                                "Cut on the difference between the center positions of the two circles that can be defined by two hit triplets.",
                                 m_param_CircleCenterPositionDifferenceCut);
 }
 

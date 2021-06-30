@@ -33,6 +33,7 @@ namespace Belle2 {
         m_innerDifferenceVector = cHit - iHit;
       };
 
+      /// Set hits if not given in constructor of if they need to be changed.
       void setHits(const B2Vector3D& oHit, const B2Vector3D& cHit, const B2Vector3D& iHit)
       {
         m_oHit = oHit;
@@ -44,12 +45,13 @@ namespace Belle2 {
 
       /// helper function which calculates the average distance in XY from the given center
       /// @param circleCenter center of the cirlce for which the average distance is calculated
+      /// returns the average distance in cm of the hits to the circle center position
       double calcAvgDistanceXY(const B2Vector3D& circleCenter)
       {
         return (sqrt(std::pow(circleCenter.X() - m_oHit.X(), 2) + std::pow(circleCenter.Y() - m_oHit.Y(), 2)) +
                 sqrt(std::pow(circleCenter.X() - m_cHit.X(), 2) + std::pow(circleCenter.Y() - m_cHit.Y(), 2)) +
                 sqrt(std::pow(circleCenter.X() - m_iHit.X(), 2) + std::pow(circleCenter.Y() - m_iHit.Y(), 2))) / 3.;
-      } // = radius in [cm], sign here not needed. normally: signKappaAB/normAB1
+      }
 
 
       /// calculates the angle between the hits/vectors (3D), returning unit: angle in radian
@@ -93,13 +95,14 @@ namespace Belle2 {
         return twoHitVariables.getCosXY();
       }
 
-      /// return unit: none (calculation for degrees is incomplete, if you want readable numbers, use AngleRZFull instead)
+      /// Calculates the angle in x-y between two vectors
+      /// return unit: rad (0 - pi)
       double getAngleXY()
       {
         TwoHitVariables twoHitVariables(m_outerDifferenceVector, m_innerDifferenceVector);
         double result = acos(twoHitVariables.getCosXY());   // 0-pi
         return (std::isnan(result) || std::isinf(result)) ? double(0) : result;
-      } // return unit: rad (0 - pi)
+      }
 
 
       /// calculates an estimation of circleCenter position, result is returned as the x and y value of the B2Vector3.
@@ -144,7 +147,7 @@ namespace Belle2 {
         // distance of closest approach of circle to the IP :
         // WARNING only valid for IP=0,0,X
         return (fabs(circleCenter.Perp() - circleRadius));
-      } // return unit: cm
+      }
 
 
       /// calculates the estimation of the circle radius of the 3-hit-tracklet, returning unit: cm.
@@ -155,7 +158,7 @@ namespace Belle2 {
           return NAN;
         }
         return calcAvgDistanceXY(circleCenter);
-      } // return unit: cm
+      }
 
 
       /// calculates the angle between the hits/vectors (XY),
@@ -167,7 +170,7 @@ namespace Belle2 {
                         (m_outerDifferenceVector.Perp() * m_innerDifferenceVector.Perp());
 
         return (std::isnan(result) || std::isinf(result)) ? double(0) : result;
-      } // return unit: none (calculation for degrees is incomplete, if you want readable numbers, use AngleXYFull instead)
+      }
 
 
       /// calculates deviations in the slope of the inner segment and the outer segment, returning unit: none
@@ -179,7 +182,7 @@ namespace Belle2 {
         double slopeCI = innerTwoHitVariables.getRZSlope();
 
         return slopeCI - slopeOC;
-      } // return unit: none
+      }
 
 
       /// compares the "slopes" z over arc length. calcDeltaSlopeZOverS is invariant under rotations in the r-z plane.
@@ -227,7 +230,7 @@ namespace Belle2 {
 
         // equals to alfaAB/dZAB and alfaBC/dZBC, but this solution here can not produce a division by zero:
         return (alfaOC * double(m_cHit.Z() - m_iHit.Z())) - (alfaCI * double(m_oHit.Z() - m_cHit.Z()));
-      } // return unit: radians*cm
+      }
 
 
       /// calculates the helixparameter describing the deviation in z per unit angle, returning unit: none
@@ -251,7 +254,7 @@ namespace Belle2 {
         double result = (alfaAB * double(m_cHit.Z() - m_iHit.Z())) / (alfaBC * double(m_oHit.Z() - m_cHit.Z()));
 
         return (std::isnan(result) || std::isinf(result)) ? double(0) : result;
-      } // return unit: none
+      }
 
 
       /// calculates the estimation of the transverse momentum of the 3-hit-tracklet, returning unit: GeV/c
@@ -264,7 +267,7 @@ namespace Belle2 {
         double circleRadius = calcAvgDistanceXY(circleCenter);
 
         return 0.00299792458 * m_BFieldZ * circleRadius;
-      } // return unit: GeV/c
+      }
 
 
       /// calculates calculates the sign of the curvature of given 3-hit-tracklet.

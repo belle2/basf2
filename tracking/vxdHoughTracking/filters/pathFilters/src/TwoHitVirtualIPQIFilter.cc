@@ -15,6 +15,8 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/geometry/BFieldManager.h>
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/BeamSpot.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -22,11 +24,6 @@ using namespace vxdHoughTracking;
 
 void TwoHitVirtualIPQIFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "helixFitPocaVirtIPDCut"), m_param_helixFitPocaVirtIPDCut,
-                                "Cut on the POCA difference in xy with the POCA obtained from a helix fit, adding a virtual IP at the origin "
-                                "(tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit).",
-                                m_param_helixFitPocaVirtIPDCut);
-
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "trackQualityEstimationMethod"), m_param_EstimationMethod,
                                 "Identifier which estimation method to use. Valid identifiers are: [mcInfo, tripletFit, helixFit]",
                                 m_param_EstimationMethod);
@@ -60,10 +57,11 @@ void TwoHitVirtualIPQIFilter::beginRun()
   }
 
 
-  if (m_BeamSpotDB.isValid()) {
-    m_BeamSpot = *m_BeamSpotDB;
-    const B2Vector3D& BeamSpotPosition = m_BeamSpot.getIPPosition();
-    const TMatrixDSym posErr = m_BeamSpot.getIPPositionCovMatrix();
+  /// BeamSpot from DB
+  DBObjPtr<BeamSpot> beamSpotDB;
+  if (beamSpotDB.isValid()) {
+    const B2Vector3D& BeamSpotPosition = (*beamSpotDB).getIPPosition();
+    const TMatrixDSym posErr = (*beamSpotDB).getIPPositionCovMatrix();
     const B2Vector3D BeamSpotPositionError(sqrt(posErr[0][0]), sqrt(posErr[1][1]), sqrt(posErr[2][2]));
     m_virtualIPSpacePoint = SpacePoint(BeamSpotPosition, BeamSpotPositionError, {0.5, 0.5}, {false, false}, VxdID(0),
                                        Belle2::VXD::SensorInfoBase::VXD);

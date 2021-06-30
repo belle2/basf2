@@ -45,7 +45,7 @@ namespace Belle2 {
       auto newEnd = std::unique(chargeSigns.begin(), chargeSigns.end());
 
       return std::distance(chargeSigns.begin(), newEnd);
-    } // return unit: none
+    }
 
 
     /// checks whether chain of segments are zigg-zagging (changing sign of curvature of neighbouring segments) in the X-Y-plane,
@@ -71,7 +71,7 @@ namespace Belle2 {
       auto newEnd = std::unique(chargeSigns.begin(), chargeSigns.end());
 
       return std::distance(chargeSigns.begin(), newEnd);
-    } // return unit: none
+    }
 
   }
 }

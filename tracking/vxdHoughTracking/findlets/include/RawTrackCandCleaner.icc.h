@@ -64,42 +64,41 @@ void RawTrackCandCleaner<AHit>::apply(std::vector<std::vector<AHit*>>& rawTrackC
     // If the capacity of a std::vector is too large, start with a fresh one.
     // Since std::vector.shrink() or std::vector.shrink_to_fit() not necessarily reduce the capacity in the desired way,
     // create a temporary vector of the same type and swap them to use the vector at the new location afterwards.
+//     checkResizeClear<TrackFindingCDC::WeightedRelation<AHit>>(m_relations, 8192);
+//     checkResizeClear<Result>(m_results, 8192);
+//     checkResizeClear<SpacePointTrackCand>(m_unfilteredResults, 8192);
+//     checkResizeClear<SpacePointTrackCand>(m_filteredResults, 8192);
+    if (m_relations.capacity() > 8192) {
+      decltype(m_relations) tmp;
+      std::swap(m_relations, tmp);
+      tmp.clear();
+    }
+    m_relations.clear();
+    m_relations.reserve(8192);
 
-    checkResizeClear(m_relations, 8192);
-//     if (m_relations.capacity() > 8192) {
-//       decltype(m_relations) tmp;
-//       std::swap(m_relations, tmp);
-//       tmp.clear();
-//     }
-//     m_relations.clear();
-//     m_relations.reserve(8192);
+    if (m_results.capacity() > 8192) {
+      decltype(m_results) tmp;
+      std::swap(m_results, tmp);
+      tmp.clear();
+    }
+    m_results.clear();
+    m_results.reserve(8192);
 
-    checkResizeClear(m_results, 8192);
-//     if (m_results.capacity() > 8192) {
-//       decltype(m_results) tmp;
-//       std::swap(m_results, tmp);
-//       tmp.clear();
-//     }
-//     m_results.clear();
-//     m_results.reserve(8192);
+    if (m_unfilteredResults.capacity() > 8192) {
+      decltype(m_unfilteredResults) tmp;
+      std::swap(m_unfilteredResults, tmp);
+      tmp.clear();
+    }
+    m_unfilteredResults.clear();
+    m_unfilteredResults.reserve(8192);
 
-    checkResizeClear(m_unfilteredResults, 8192);
-//     if (m_unfilteredResults.capacity() > 8192) {
-//       decltype(m_unfilteredResults) tmp;
-//       std::swap(m_unfilteredResults, tmp);
-//       tmp.clear();
-//     }
-//     m_unfilteredResults.clear();
-//     m_unfilteredResults.reserve(8192);
-
-    checkResizeClear(m_filteredResults, 8192);
-//     if (m_filteredResults.capacity() > 64) {
-//       decltype(m_filteredResults) tmp;
-//       std::swap(m_filteredResults, tmp);
-//       tmp.clear();
-//     }
-//     m_filteredResults.clear();
-//     m_filteredResults.reserve(64);
+    if (m_filteredResults.capacity() > 64) {
+      decltype(m_filteredResults) tmp;
+      std::swap(m_filteredResults, tmp);
+      tmp.clear();
+    }
+    m_filteredResults.clear();
+    m_filteredResults.reserve(64);
 
     m_relationCreator.apply(rawTrackCand, m_relations);
 

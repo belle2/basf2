@@ -17,7 +17,7 @@
 namespace Belle2 {
   namespace vxdHoughTracking {
 
-    /// Base filter for hits in VXDHoughState
+    /// Relation filter the creation of relations
     template <class AFilter>
     class LayerRelationFilter : public TrackFindingCDC::RelationFilter<VXDHoughState> {
       /// The parent class

@@ -14,6 +14,8 @@
 #include <framework/core/ModuleParamList.h>
 #include <framework/geometry/BFieldManager.h>
 #include <framework/geometry/B2Vector3.h>
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/BeamSpot.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 
@@ -124,10 +126,9 @@ void ROIFinder::beginRun()
 
   m_bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
 
-  if (m_BeamSpotDB.isValid()) {
-    m_BeamSpot = *m_BeamSpotDB;
-    const TVector3& BeamSpotPosition = m_BeamSpot.getIPPosition();
-    m_BeamSpotPosition.SetXYZ(BeamSpotPosition.X(), BeamSpotPosition.Y(), BeamSpotPosition.Z());
+  DBObjPtr<BeamSpot> beamSpotDB;
+  if (beamSpotDB.isValid()) {
+    m_BeamSpotPosition = (*beamSpotDB).getIPPosition();
   } else {
     m_BeamSpotPosition.SetXYZ(0., 0., 0.);
   }
@@ -200,9 +201,9 @@ void ROIFinder::apply(const std::vector<SpacePointTrackCand>& finalTracks)
         // coordinate system defined by the (rotated) line perpendicular
         // to the sensor (with length sensorPerpRadius)
         double relTrackCenterPhi = 0;
-        if (trackCharge == -1) {
+        if (trackCharge < 0) {
           relTrackCenterPhi = trackPhi - M_PI_2 - sensorPhi;
-        } else if (trackCharge == +1) {
+        } else if (trackCharge > 0) {
           relTrackCenterPhi = trackPhi + M_PI_2 - sensorPhi;
         }
         const double xCenter  = trackRadius * cos(relTrackCenterPhi);

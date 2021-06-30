@@ -19,14 +19,11 @@ namespace Belle2 {
 
     class TwoHitVariables {
     public:
-      /// basic constructor
-      TwoHitVariables() : m_oHit(0., 0., 0.), m_iHit(0., 0., 0.)
-      {};
-
-      /// actual useful constructor
+      /// Constructor
       TwoHitVariables(const B2Vector3D& oHit, const B2Vector3D& iHit) : m_oHit(oHit), m_iHit(iHit)
       {};
 
+      /// Set hits if not given in constructor of if they need to be changed.
       void setHits(const B2Vector3D& oHit, const B2Vector3D& iHit)
       {
         m_oHit = oHit;
@@ -37,7 +34,6 @@ namespace Belle2 {
       double getCosXY()
       {
         return (m_oHit.X() * m_iHit.X() + m_oHit.Y() * m_iHit.Y()) / (m_oHit.Perp() * m_iHit.Perp());
-        // return m_oHit.Unit() * m_iHit.Unit();
       }
 
       /// get the difference in z between two vectors

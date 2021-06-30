@@ -29,7 +29,7 @@ namespace Belle2 {
         tmp.clear();
       }
       vectorToCheck.clear();
-      vectorToCheck.reserve(limit / 4);
+      vectorToCheck.reserve(limit / 10);
     }
 
   }

@@ -27,11 +27,12 @@ TrackletFilterFactory::~TrackletFilterFactory() = default;
 std::string TrackletFilterFactory::getIdentifier() const
 {
   return "SVD Hit Pair";
+  return "Factory for Filters for SpacePointTrackCands";
 }
 
 std::string TrackletFilterFactory::getFilterPurpose() const
 {
-  return "Rejects SVD hit pairs. ";
+  return "Rejects SpacePointTrackCands. ";
 }
 
 std::map<std::string, std::string> TrackletFilterFactory::getValidFilterNamesAndDescriptions() const

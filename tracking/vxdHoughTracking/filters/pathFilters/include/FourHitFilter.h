@@ -22,7 +22,10 @@ namespace Belle2 {
     /// the variables specified in FourHitVariables and ThreeHitVariables for the four positions
     class FourHitFilter : public BasePathFilter {
     public:
-      /// Return the weight based on azimuthal-angle separation
+      /// Return the weight based on the ThreeHitVariables.
+      /// Returns NAN if m_fourHitVariables.getCircleRadiusDifference() of the hit triplet is larger than m_param_CircleRadiusDifferenceCut
+      /// Returns NAN if m_fourHitVariables.getCircleCenterPositionDifference() of the hit triplet is larger than m_param_CircleCenterPositionDifferenceCut
+      /// Returns 1/m_fourHitVariables.getCircleRadiusDifference() else
       TrackFindingCDC::Weight operator()(const BasePathFilter::Object& pair) override;
       /// Expose the parameters.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;

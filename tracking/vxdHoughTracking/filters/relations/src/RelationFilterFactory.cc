@@ -28,12 +28,12 @@ RelationFilterFactory::~RelationFilterFactory() = default;
 
 std::string RelationFilterFactory::getIdentifier() const
 {
-  return "SVD Hit Pair Relation Filter";
+  return "Factory for SVD Hit Pair Relation Filters";
 }
 
 std::string RelationFilterFactory::getFilterPurpose() const
 {
-  return "Rejects SVD hit pairs. ";
+  return "Rejects SVD hit pairs based on their relation. ";
 }
 
 std::map<std::string, std::string> RelationFilterFactory::getValidFilterNamesAndDescriptions() const

@@ -32,6 +32,7 @@ namespace Belle2 {
         m_innerThreeHitVariables = ThreeHitVariables(ocHit, icHit, iHit);
       };
 
+      /// Set hits if not given in constructor of if they need to be changed.
       void setHits(const B2Vector3D& oHit, const B2Vector3D& ocHit, const B2Vector3D& icHit, const B2Vector3D& iHit)
       {
         m_oHit = oHit;
@@ -54,7 +55,7 @@ namespace Belle2 {
         double innerCircleRadius = m_innerThreeHitVariables.calcAvgDistanceXY(innerCircleCenter);
 
         return outerCircleRadius - innerCircleRadius;
-      } // return unit: cm
+      }
 
 
       /** calculates the distance between the estimated circle centers (using 2 subsets of given hits) in the xy-plane, returning unit: cm */
@@ -67,7 +68,7 @@ namespace Belle2 {
         }
 
         return fabs(outerCircleCenter.Perp() - innerCircleCenter.Perp());
-      } // return unit: GeV/c
+      }
 
 
       /** calculates dpt-value (dpt= difference in transverse momentum of 2 subsets of the hits), returning unit: GeV/c */
@@ -82,7 +83,7 @@ namespace Belle2 {
         double innerCircleRadius = m_innerThreeHitVariables.calcAvgDistanceXY(innerCircleCenter);
 
         return fabs(0.00299792458 * m_BFieldZ * (outerCircleRadius - innerCircleRadius));
-      } // return unit: GeV/c
+      }
 
       /// Set the B-Field value used for pT calculations
       /// @param bfieldZ B-Field value to be used

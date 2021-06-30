@@ -15,7 +15,7 @@
 namespace Belle2 {
   namespace vxdHoughTracking {
 
-    /// Factory that can create appropriate cluster filters from associated names.
+    /// Factory that can create filters for tracklets = SpacePointTrackCands from associated names.
     class TrackletFilterFactory : public TrackFindingCDC::FilterFactory<BaseTrackletFilter> {
 
     private:

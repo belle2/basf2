@@ -24,7 +24,10 @@ namespace Belle2 {
     class ThreeHitFilter : public BasePathFilter {
 
     public:
-      /// Return the weight based on azimuthal-angle separation
+      /// Return the weight based on the ThreeHitVariables.
+      /// Returns NAN if m_threeHitVariables.getCosAngleRZSimple() of the hit triplet is smaller than m_param_cosRZCut
+      /// Returns NAN if m_threeHitVariables.getCircleDistanceIP() of the hit triplet is larger than m_param_circleIPDistanceCut
+      /// Returns 1/m_threeHitVariables.getCircleDistanceIP() else
       TrackFindingCDC::Weight operator()(const BasePathFilter::Object& pair) override;
       /// Expose the parameters.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;

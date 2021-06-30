@@ -46,6 +46,8 @@ namespace Belle2 {
       // if currentPath.size() == 2, including the single child hits makes the total path length 3, so use the threeHitFilter
       // if currentPath.size() == 3, including the single child hits makes the total path length 4, so use the fourHitFilter
       // if currentPath.size() == 4, including the single child hits makes the total path length 5, so use the fiveHitFilter
+      // in the rare case that currentPath already contains five or more hits, it's very likely already that it's a valid track
+      // candidate, so no filter is applied here, but only the best N candidates sorted by quality are used further.
       if (currentPath.size() == 1) {
         m_twoHitFilterFindlet.apply(currentPath, childHits);
       } else if (currentPath.size() == 2) {

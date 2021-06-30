@@ -50,8 +50,6 @@ void ROICalculator::initialize()
   Super::initialize();
 
   m_storeDATCONROIs.registerInDataStore(m_param_ROIsStoreArrayName);
-  m_param_ROIsStoreArrayName = m_storeDATCONROIs.getName();
-
 }
 
 void ROICalculator::apply(const std::vector<std::pair<VxdID, long>>& uExtrapolations,

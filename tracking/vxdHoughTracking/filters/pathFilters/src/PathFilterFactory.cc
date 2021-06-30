@@ -38,7 +38,7 @@ std::string PathFilterFactory::getIdentifier() const
 
 std::string PathFilterFactory::getFilterPurpose() const
 {
-  return "Rejects SVD hit combination of different length. ";
+  return "Rejects track candidates based on the number of hits. ";
 }
 
 std::map<std::string, std::string> PathFilterFactory::getValidFilterNamesAndDescriptions() const

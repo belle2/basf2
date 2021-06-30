@@ -15,7 +15,7 @@
 namespace Belle2 {
   namespace vxdHoughTracking {
 
-    /// Factory that can create appropriate cluster filters from associated names.
+    /// Factory that can create appropriate filters for relations between hits from associated names.
     class RelationFilterFactory : public TrackFindingCDC::FilterFactory<BaseRelationFilter> {
 
     private:

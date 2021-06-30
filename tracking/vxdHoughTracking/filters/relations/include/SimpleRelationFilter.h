@@ -15,7 +15,7 @@
 namespace Belle2 {
   namespace vxdHoughTracking {
 
-    /// Base filter for CKF PXD states
+    /// Filter for relations based on the polar angle difference.
     class SimpleRelationFilter : public BaseRelationFilter {
     public:
       /// Return the weight based on azimuthal-angle separation

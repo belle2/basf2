@@ -14,8 +14,6 @@
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/geometry/B2Vector3.h>
-#include <framework/database/DBObjPtr.h>
-#include <mdst/dbobjects/BeamSpot.h>
 
 #include <string>
 #include <vector>
@@ -76,7 +74,7 @@ namespace Belle2 {
       /// Allowed tolerance (in cm) in z to create intercepts per sensor
       double m_param_toleranceZ = 0.5;
 
-      //  The etrapolation has two charge dependent biases:
+      //  The extrapolation has two charge dependent biases:
       //  a) the residuals show a ~1/R bias, that is larger for low pT = small track radii
       //  b) the residuals show a larger sin(phi) and a smaller cos(phi modulation)
       //  Both of these can be corrected for
@@ -89,13 +87,13 @@ namespace Belle2 {
 
 
       //  ROI calculation parameters
-      /// Minimum size of ROI in u-direction on L1
+      /// Minimum size of ROI in u-direction on L1 in pixel
       double m_param_minimumROISizeUL1 = 40;
-      /// Minimum size of ROI in v-direction on L1
+      /// Minimum size of ROI in v-direction on L1 in pixel
       double m_param_minimumROISizeVL1 = 40;
-      /// Minimum size of ROI in u-direction on L2
+      /// Minimum size of ROI in u-direction on L2 in pixel
       double m_param_minimumROISizeUL2 = 40;
-      /// Minimum size of ROI in v-direction on L2
+      /// Minimum size of ROI in v-direction on L2 in pixel
       double m_param_minimumROISizeVL2 = 40;
 
       /// Multiplier term in ROI size estimation
@@ -110,9 +108,9 @@ namespace Belle2 {
       /// Multiplier term for v-direction on L2
       double m_param_multiplierVL2 = 1.2;
 
-      /// maximum ROI size in u
+      /// maximum ROI size in u in pixel
       unsigned short m_param_maximumROISizeU = 120;
-      /// maximum ROI size in v
+      /// maximum ROI size in v in pixel
       unsigned short m_param_maximumROISizeV = 192;
 
       //  Constants used during extrapolation to PXD and ROI calculation
@@ -145,10 +143,6 @@ namespace Belle2 {
       double m_bFieldZ = 1.5;
 
 
-      /// BeamSpot from DB
-      DBObjPtr<BeamSpot> m_BeamSpotDB;
-      /// Actual BeamSpot
-      BeamSpot m_BeamSpot;
       /// B2Vector3D actually contining the BeamSpot position. This will be used as the starting point of the extrapolation.
       B2Vector3D m_BeamSpotPosition;
 

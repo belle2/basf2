@@ -75,7 +75,7 @@ void TrackCandidateResultRefiner::initialize()
   } else if (m_param_EstimationMethod == "helixFit") {
     m_estimator = std::make_unique<QualityEstimatorRiemannHelixFit>();
   }
-  B2ASSERT("QualityEstimator could not be initialized with method: " << m_param_EstimationMethod, m_estimator);
+  B2FATAL("QualityEstimator could not be initialized with method: " << m_param_EstimationMethod);
 }
 
 void TrackCandidateResultRefiner::beginRun()
@@ -114,6 +114,8 @@ void TrackCandidateResultRefiner::apply(std::vector<SpacePointTrackCand>& unrefi
     double qi = m_estimator->estimateQuality(aTrackCandidate.getSortedHits());
     aTrackCandidate.setQualityIndicator(qi);
 
+    // Track candidates of size >= 6 are very rare. If the track candidate already is quite long (>= 6 hits),
+    // it's very likely it's a valid track anyway, so QI is not checked.
     if ((aTrackCandidate.getNHits() == 3 and qi >= m_param_minQualitiyIndicatorSize3) or
         (aTrackCandidate.getNHits() == 4 and qi >= m_param_minQualitiyIndicatorSize4) or
         (aTrackCandidate.getNHits() == 5 and qi >= m_param_minQualitiyIndicatorSize5) or

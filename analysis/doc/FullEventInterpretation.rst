@@ -457,7 +457,12 @@ In the figure below, the concept of the workflow is visualized.
 
   Visualization of the workflow concept of FEI training running on the grid.
 
-Starting with stage -1, at first the ``FEIAnalysisSummaryTask`` spawns several instances of ``FEIAnalysisTask``, which are created for each line in the dataset list, assuming that one line is one dataset. By this task, a cycle of four steps is started, containing ``FEIAnalysisSummaryTask`` at the beginning, followed by ``MergeOutputsTask``, ``FEITrainingTask`` and ``PrepareInputsTask``. As soon as ``FEIAnalysisSummaryTask`` is reached again, the stage number is increased by 1. This cycle is repeated until stage 5 is reached. Then, for stage 6, the workflow ends with ``FEITrainingTask``.
+Starting with stage -1, at first the ``FEIAnalysisSummaryTask`` spawns several instances of ``FEIAnalysisTask``, which are created for each individual line in the dataset list,
+assuming that one line is one dataset. In case of a file-based dataset processing, exactly one instance of ``FEIAnalysisTask`` is created for each dataset. In contrast to that,
+in case of an event-based processing, multiple instances of ``FEIAnalysisTask`` are created for each dataset, with the number of instances determined from the number of events
+to be processed at a certain stage. By the ``FEIAnalysisSummaryTask`` task, a cycle of four steps is started, containing ``FEIAnalysisSummaryTask`` at the beginning,
+followed by ``MergeOutputsTask``, ``FEITrainingTask`` and ``PrepareInputsTask``. As soon as ``FEIAnalysisSummaryTask`` is reached again, the stage number is increased by 1.
+This cycle is repeated until stage 5 is reached. Then, for stage 6, the workflow ends with ``FEITrainingTask``.
 
 
 Technical details

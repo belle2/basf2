@@ -212,7 +212,7 @@ bool PXDPackerErrModule::CheckErrorMaskInEvent(unsigned int eventnr, PXDErrorFla
 {
   /** Check that at least the expected error bit are set, there could be more ... */
 
-  PXDErrorFlags expected = c_NO_ERROR;
+  PXDErrorFlags expected; // constructed to no error
   if (eventnr > 0 && eventnr < m_errors.size()) {
     expected = m_errors[eventnr];
   }
@@ -232,13 +232,13 @@ bool PXDPackerErrModule::CheckErrorMaskInEvent(unsigned int eventnr, PXDErrorFla
     }
   }
   bool flag = (mask & expected) == expected;
-  if (expected == EPXDErrMask::c_NO_ERROR) {
+  if (expected == PXDErrorFlags(0)) {
     // special check, this event should not contain any error!
-    if (mask != EPXDErrMask::c_NO_ERROR) {
+    if (mask != PXDErrorFlags(0)) {
       B2ERROR("There should be no error in this event, but there were (see above)!");
       m_found_fatal = true;
     }
-    flag = (mask == EPXDErrMask::c_NO_ERROR);
+    flag = (mask == PXDErrorFlags(0));
   }
   B2INFO("-- PXD Packer Error Check END --- ");
   // Bail out on the first check which fails.

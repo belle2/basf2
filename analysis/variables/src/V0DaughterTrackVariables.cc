@@ -420,14 +420,8 @@ namespace Belle2 {
       double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
       int daughterIndex1 = int(daughterIndices[0]);
       int daughterIndex2 = int(daughterIndices[1]);
-      errFlag = convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
-                                               Omega2, Z02, TanLambda2);
-      if (errFlag == -1) {
-        B2INFO("First track provided has curvature zero. Proceed to calculate convertedPhotonInvariantMass.");
-      }
-      if (errFlag == -2) {
-        B2ERROR("Second track provided has curvature zero. Proceed to calculate convertedPhotonInvariantMass.");
-      }
+      convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
+                                     Omega2, Z02, TanLambda2);
 
 
       //Calculating invariant mass
@@ -462,14 +456,8 @@ namespace Belle2 {
       double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
       int daughterIndex1 = int(daughterIndices[0]);
       int daughterIndex2 = int(daughterIndices[1]);
-      errFlag = convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
-                                               Omega2, Z02, TanLambda2);
-      if (errFlag == -1) {
-        B2INFO("First track provided has curvature zero. Proceed to calculate convertedPhotonDelTanLambda.");
-      }
-      if (errFlag == -2) {
-        B2ERROR("Second track provided has curvature zero. Proceed to calculate convertedPhotonDelTanLambda.");
-      }
+      convertedPhotonLoadHelixParams(gamma, daughterIndex1, daughterIndex2, Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02,
+                                     Omega2, Z02, TanLambda2);
 
 
 

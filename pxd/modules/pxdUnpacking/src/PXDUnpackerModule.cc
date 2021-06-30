@@ -53,7 +53,11 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("PXDRawROIsName", m_PXDRawROIsName, "The name of the StoreArray of generated PXDRawROIs", std::string(""));
   addParam("DoNotStore", m_doNotStore, "only unpack and check, but do not store", false);
 //   addParam("CriticalErrorMask", m_criticalErrorMask, "Set error mask which stops processing by returning false by task", 0);
+  // m_criticalErrorMask not longer a aparameter
+  // the constructor default to zero anyway
 //   addParam("SuppressErrorMask", m_suppressErrorMask, "Set mask for errors msgs which are not printed", getSilenceMask());
+  // m_suppressErrorMask not longer a aparameter
+  m_suppressErrorMask = getSilenceMask();
   addParam("ForceMapping", m_forceMapping, "Force Mapping even if DHH bit is NOT requesting it", false);
   addParam("ForceNoMapping", m_forceNoMapping, "Force NO Mapping even if DHH bit is requesting it", false);
   addParam("CheckPaddingCRC", m_checkPaddingCRC, "Check for susp. padding (debug option, many false positive)", false);

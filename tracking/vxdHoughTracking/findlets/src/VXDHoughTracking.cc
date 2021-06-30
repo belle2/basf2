@@ -63,38 +63,11 @@ void VXDHoughTracking::beginEvent()
   // If the capacity of a std::vector is too large, start with a fresh one.
   // Since std::vector.shrink() or std::vector.shrink_to_fit() not necessarily reduce the capacity in the desired way,
   // create a temporary vector of the same type and swap them to use the vector at the new location afterwards.
-//   checkResizeClear<const SpacePoint*>(m_spacePointVector, 5000);
-//   checkResizeClear<VXDHoughState>(m_vxdHoughStates, 5000);
-//   checkResizeClear<std::vector<VXDHoughState*>>(m_rawTrackCandidates, 500);
-//   checkResizeClear<SpacePointTrackCand>(m_trackCandidates, 500);
+  checkResizeClear<const SpacePoint*>(m_spacePointVector, 5000);
+  checkResizeClear<VXDHoughState>(m_vxdHoughStates, 5000);
+  checkResizeClear<std::vector<VXDHoughState*>>(m_rawTrackCandidates, 500);
+  checkResizeClear<SpacePointTrackCand>(m_trackCandidates, 500);
 
-  if (m_spacePointVector.capacity() > 5000) {
-    decltype(m_spacePointVector) tmp;
-    std::swap(m_spacePointVector, tmp);
-    tmp.clear();
-  }
-  m_spacePointVector.clear();
-
-  if (m_vxdHoughStates.capacity() > 5000) {
-    decltype(m_vxdHoughStates) tmp;
-    std::swap(m_vxdHoughStates, tmp);
-    tmp.clear();
-  }
-  m_vxdHoughStates.clear();
-
-  if (m_rawTrackCandidates.capacity() > 500) {
-    decltype(m_rawTrackCandidates) tmp;
-    std::swap(m_rawTrackCandidates, tmp);
-    tmp.clear();
-  }
-  m_rawTrackCandidates.clear();
-
-  if (m_trackCandidates.capacity() > 50) {
-    decltype(m_trackCandidates) tmp;
-    std::swap(m_trackCandidates, tmp);
-    tmp.clear();
-  }
-  m_trackCandidates.clear();
 }
 
 void VXDHoughTracking::apply()

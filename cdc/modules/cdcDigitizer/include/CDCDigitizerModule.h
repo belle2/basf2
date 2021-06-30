@@ -25,6 +25,8 @@
 #include <cdc/geometry/CDCGeoControlPar.h>
 #include <cdc/dbobjects/CDCFEElectronics.h>
 #include <reconstruction/dbobjects/CDCDedxRunGain.h>
+#include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
+#include <reconstruction/dbobjects/CDCDedxWireGain.h>
 //#include <cdc/dbobjects/CDCEDepToADCConversions.h>
 #include <cdc/dbobjects/CDCCrossTalkLibrary.h>
 
@@ -67,6 +69,8 @@ namespace Belle2 {
       if (m_fEElectronicsFromDB) delete m_fEElectronicsFromDB;
       //      if (m_eDepToADCConversionsFromDB) delete m_eDepToADCConversionsFromDB;
       if (m_runGainFromDB) delete m_runGainFromDB;
+      if (m_gain0FromDB) delete m_gain0FromDB;
+      if (m_wireGainFromDB) delete m_wireGainFromDB;
       if (m_xTalkFromDB) delete m_xTalkFromDB;
     };
 
@@ -106,9 +110,18 @@ namespace Belle2 {
     double getDriftTime(double driftLength, bool addTof, bool addDelay);
 
 
-    /** Edep to ADC Count converter */
-    //    unsigned short getADCCount(unsigned short layer, unsigned short cell, double edep, double dx, double costh);
-    unsigned short getADCCount(const WireID& wid, double edep, double dx, double costh);
+    /** Function to make signals after shapers
+     *
+     *  @param wid wire id.
+     *  @param edep energy deposit (GeV).
+     *  @param dx step length (cm).
+     *  @param costh cos(theta) of particle.
+     *
+     *  @return ADC-count and conversion factor for threshold.
+     *
+     */
+    void makeSignalsAfterShapers(const WireID& wid, double edep, double dx, double costh, unsigned short& adcCount,
+                                 double& convFactorForThreshold);
 
     /** Modify t0 for negative-t0 case */
     double getPositiveT0(const WireID&);
@@ -116,8 +129,35 @@ namespace Belle2 {
     /** Set FEE parameters (from DB) */
     void setFEElectronics();
 
-    /** Set run-gain (from DB) */
-    void setRunGain();
+    /** Generate randum number according to Polya distribution
+     *  @param xmax max of no. generated
+     *  @return randum no.
+     */
+    double Polya(double xmax = 10);
+
+    /** Set semi-total gain (from DB) */
+    void setSemiTotalGain();
+
+    //! Return semi-total gain of the specified wire
+    /*!
+      \param clayer layer no. (0-56)
+      \param celll  cell  no.
+      \return       gain
+    */
+    double getSemiTotalGain(int clayer, int cell) const
+    {
+      return m_semiTotalGain[clayer][cell];
+    }
+
+    //! Return semi-total gain of the specified wire
+    /*!
+      \param wireID Wire id.
+      \return       gain
+    */
+    double getSemiTotalGain(const WireID& wireID) const
+    {
+      return m_semiTotalGain[wireID.getICLayer()][wireID.getIWire()];
+    }
 
     /** Add crosstalk */
     void addXTalk();
@@ -182,8 +222,15 @@ namespace Belle2 {
     double m_addFudgeFactorForSigma; /**< additional fudge factor for space resol. */
     double m_totalFudgeFactor = 1.;  /**< total fudge factor for space resol. */
 
+    bool m_gasGainSmearing = false;  /**< Swtich for gas gain smearing */
+    double m_effWForGasGainSmearing = 0.0265;  /**< Effective energy (keV) for one electron prod. for gas gain smearing */
+    double m_thetaOfPolya = 0.5;     /**< theta of Polya function for gas gain smearing */
+    bool m_extraADCSmearing = true; /**< Swtich for extra ADC smearing */
+    //    double m_sigmaForExtraADCSmearing = 0.3;  /**< Gaussian sigma for extra ADC smearing */
     double m_runGain = 1.;  /**< run gain. */
+    float m_semiTotalGain[MAX_N_SLAYERS][MAX_N_SCELLS] = {{}}; /**< total gain per wire */
     double m_overallGainFactor = 1.;  /**< Overall gain factor. */
+    double m_degOfSPEOnThreshold;     /**< Degree of space charge effect on timing threshold */
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_doSmearing; /**< A switch to control drift length smearing */
     bool m_addTimeWalk; /**< A switch used to control adding time-walk delay into the total drift time or not */
@@ -211,6 +258,8 @@ namespace Belle2 {
     bool m_spaceChargeEffect;           /**< Space charge effect */
 
     DBObjPtr<CDCDedxRunGain>* m_runGainFromDB = nullptr; /*!< Pointer to run gain from DB. */
+    DBObjPtr<CDCDedxScaleFactor>* m_gain0FromDB = nullptr; /*!< Pointer to overall gain factor from DB. */
+    DBObjPtr<CDCDedxWireGain>* m_wireGainFromDB = nullptr; /*!< Pointer to wire gain from DB. */
     //    DBObjPtr<CDCEDepToADCConversions>* m_eDepToADCConversionsFromDB = nullptr; /*!< Pointer to edep-to-ADC conv. params. from DB. */
     //    float m_eDepToADCParams[MAX_N_SLAYERS][4]; /*!< edep-to-ADC conv. params. */
 

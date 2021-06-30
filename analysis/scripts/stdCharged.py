@@ -149,22 +149,26 @@ def stdLep(pdgId, listtype, method, classification, path=None):
     """
     Function to prepare one of several standardized types of lepton (e, mu) lists:
 
-    - 'UniformEff50' 50% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
-    - 'UniformEff90' 90% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
-    - 'UniformEff99' 99% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
+    * 'UniformEff60' 60% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
+    * 'UniformEff70' 70% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
+    * 'UniformEff80' 80% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
+    * 'UniformEff90' 90% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
+    * 'UniformEff95' 95% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
 
     Parameters:
         pdgId (int): the lepton pdg code.
-        listtype (str): name of standard list.
+        listtype (str): name of standard list. Choose among the above values.
         method (str): the PID method: 'likelihood' or 'bdt'.
         classification (str): the type of classifier: 'binary' (one-vs-other) or 'global' (one-vs-all).
         path (basf2.Path): modules are added to this path.
     """
 
     std_lepton_list_names = (
-        "UniformEff50",
+        "UniformEff60",
+        "UniformEff70",
+        "UniformEff80",
         "UniformEff90",
-        "UniformEff99",
+        "UniformEff95",
     )
 
     available_methods = ("likelihood", "bdt")
@@ -191,8 +195,10 @@ def stdLep(pdgId, listtype, method, classification, path=None):
 
     pid_variables = {
         "likelihood": {
-            "global": "electronID" if pdgId == Const.electron.getPDGCode() else "muonID",
-            "binary": f"binaryPID({pdgId}, 211)"
+            # TEMP: use 'electronID_noTOP' for electrons to circumvent bug in TOP electron PDFs in release 5.
+            "global": "electronID_noTOP" if pdgId == Const.electron.getPDGCode() else "muonID",
+            # TEMP: use 'binaryPID_noTOP' for electrons to circumvent bug in TOP electron PDFs in release 5.
+            "binary": f"binaryPID_noTOP({pdgId}, 211)" if pdgId == Const.electron.getPDGCode() else f"binaryPID({pdgId}, 211)"
         },
         "bdt": {
             "global": f"pidChargedBDTScore({pdgId}, ALL)",

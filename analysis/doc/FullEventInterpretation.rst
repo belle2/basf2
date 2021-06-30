@@ -749,7 +749,18 @@ Potential Improvements Following gbasf2 Development
 In the current state of the workflow and `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_, some print outputs from `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ have to be parsed to obtain desired information. Depending on the future improvements of `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_,
 such parsing may be changed to a more convenient way, for example parsing a json file output created by `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tools on request.
 
-In general, it is good to have a look at the process of `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ developments and extend the workflow and/or `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ to make use of the new features and improvements of future `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ releases.
+According to the discussions with `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ developers, developments are ongoing to allow the
+`gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tasks to save the sandbox not on a central server, but distributed on several storage sites. This would allow to use the
+option ``--input_sandboxfiles`` of `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ to take care of uploading the inputs collected currently by the ``PrepareInputsTask``.
+The reason for doing it currently with ``PrepareInputsTask`` by hand, is that the sandbox is not allowed to exceed the size of 10 MB. As soon as the distribution of the sandbox among multiple
+storage elements is introduced to `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_, the option ``--input_sandboxfiles`` can then be used directly and this would make the
+module ``PrepareInputsTask`` obsolete.
+
+Another possibile improvement of `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ which is currently considered by the developers is the possibility to start merging jobs on the grid.
+This would allow for performing ``MergeOutputsTask`` on the grid with the potential to speed up this part of the workflow, avoiding the time spent for downloads and merging on the local machine.
+
+In general, it is good to have a look at the process of `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ developments and extend the workflow and/or
+`b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ to make use of the new features and improvements of future `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ releases.
 One example would be the possibility to resubmit jobs with changed settings, e.g. sites to reject, and/or the estimated runtime of the job.
 
 Troubleshooting

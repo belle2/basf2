@@ -52,12 +52,3 @@ const std::string& Belle2::PXD::PXDError::getPXDBitErrorName(int bit)
   if (bit < 0 || bit >= ONSEN_MAX_TYPE_ERR) return undefined;
   return error_name[bit];
 }
-
-const std::string& Belle2::PXD::PXDError::getPXDBitMaskErrorName(EPXDErrMask mask)
-{
-  static const std::string undefined("no bit or more than one bit set");
-  for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
-    if ((mask & (1ull << i)) == mask) return getPXDBitErrorName(i);
-  }
-  return undefined;
-}

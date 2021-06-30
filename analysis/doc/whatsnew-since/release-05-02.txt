@@ -50,7 +50,7 @@ Variables
  * Added ``b2help-variables`` which behaves identical to ``basf2 variables.py`` but more in-keeping with the ``b2help-<something>``
    theme.
  * The variables :b2:var:`EventType` and :b2:var:`trackMatchType` have been declared deprecated. Instead the variables
-   :b2:var:`isMC` and :b2:var:`clusterTrackMatch` should be used.   
+   :b2:var:`isMC` and :b2:var:`clusterTrackMatch` should be used.
  * New MCTruthVariable `isBBCrossfeed` checks for crossfeed in the reconstruction of the given B meson.
  * Modified the ``L1 Trigger`` variables (:b2:var:`L1PSNM`, :b2:var:`L1PSNMBit`, etc.) to return ``NAN`` instead of ``0`` in case the requested
    trigger bit or number does not exist. These variables now return ``0`` only when the requested bit is not fired.
@@ -109,6 +109,7 @@ Modules
    module.
  * Added a `EnergyBiasCorrection` module, sub-percent correction only applied to E of photons not on clusterE and should only
    be applied on data. `correctEnergyBias` is a corresponding wrapper function.
+ * The `ChargedPidMVA` and `ChargedPidMVAMulticlass` modules now apply by default charge-dependent BDT training for particle identification. The charge-independent training can be used optionally.
 
 Full Event Interpretation
 +++++++++++++++++++++++++

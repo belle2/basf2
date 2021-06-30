@@ -284,6 +284,18 @@ namespace Belle2 {
       //! Get the number of phi-measuring scintillators in a scintillator module
       int getNPhiScints(int layer) const;
 
+      //! Get maximal phi strip length (for scintillators).
+      double getMaximalPhiStripLength() const
+      {
+        return m_MaximalPhiStripLength;
+      }
+
+      //! Get maximal Z strip length (for scintillators).
+      double getMaximalZStripLength() const
+      {
+        return m_MaximalZStripLength;
+      }
+
       //! Get the length along z of the module
       double getModuleLength(void) const
       {
@@ -718,6 +730,12 @@ namespace Belle2 {
 
       //! Shortening of the nominal length of the z scintillators
       double m_ZScintDLength[BKLMElementNumbers::getMaximalLayerNumber()][NZSCINT];
+
+      //! Maximal phi strip length (for scintillators).
+      double m_MaximalPhiStripLength = 0;
+
+      //! maximal Z strip length (for scintillators).
+      double m_MaximalZStripLength = 0;
 
       //! length along z of the module
       double m_ModuleLength;

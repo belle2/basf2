@@ -72,11 +72,12 @@ KLMReconstructorModule::KLMReconstructorModule() :
   m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
   m_eklmGeoDat(nullptr),
   m_eklmNStrip(0),
-  m_eklmTransformData(nullptr),
-  m_eklmTimeCalibrationData(nullptr)
+  m_eklmTransformData{nullptr}
 {
   setDescription("Create BKLMHit1ds from KLMDigits and then create BKLMHit2ds from BKLMHit1ds; create EKLMHit2ds from KLMDigits.");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("TimeCableDelayCorrection", m_TimeCableDelayCorrection,
+           "Perform cable delay time correction (true) or not (false).", false);
   addParam("IfAlign", m_bklmIfAlign,
            "Perform alignment correction (true) or not (false).",
            bool(true));
@@ -114,11 +115,14 @@ void KLMReconstructorModule::initialize()
   if (m_eklmGeoDat->getNPlanes() != 2)
     B2FATAL("It is not possible to run EKLM reconstruction with 1 plane.");
   m_eklmNStrip = m_eklmElementNumbers->getMaximalStripGlobalNumber();
-  m_eklmTimeCalibrationData = new const EKLMTimeCalibrationData*[m_eklmNStrip];
 }
 
 void KLMReconstructorModule::beginRun()
 {
+  if (m_TimeCableDelayCorrection) {
+    if (!m_TimeConstants.isValid() || !m_TimeCableDelay.isValid())
+      B2FATAL("KLM time calibration data is not available.");
+  }
   if (!m_ChannelStatus.isValid())
     B2FATAL("KLM channel status data are not available.");
   if (!m_TimeWindow.isValid())
@@ -126,24 +130,17 @@ void KLMReconstructorModule::beginRun()
   m_CoincidenceWindow = m_TimeWindow->getCoincidenceWindow();
   m_PromptTime = m_TimeWindow->getPromptTime();
   m_PromptWindow = m_TimeWindow->getPromptWindow();
+  if (m_TimeCableDelayCorrection) {
+    m_DelayEKLMScintillators = m_TimeConstants->getDelay(
+                                 KLMTimeConstants::c_EKLM);
+    m_DelayBKLMScintillators = m_TimeConstants->getDelay(
+                                 KLMTimeConstants::c_BKLM);
+    m_DelayRPCPhi = m_TimeConstants->getDelay(KLMTimeConstants::c_RPCPhi);
+    m_DelayRPCZ = m_TimeConstants->getDelay(KLMTimeConstants::c_RPCZ);
+  }
   /* EKLM. */
-  /* cppcheck-suppress variableScope */
-  int i;
   if (!m_eklmRecPar.isValid())
     B2FATAL("EKLM digitization parameters are not available.");
-  if (!m_eklmTimeCalibration.isValid())
-    B2FATAL("EKLM time calibration data is not available.");
-  if (m_eklmTimeCalibration.hasChanged()) {
-    for (i = 0; i < m_eklmNStrip; i++) {
-      m_eklmTimeCalibrationData[i] =
-        m_eklmTimeCalibration->getTimeCalibrationData(i + 1);
-      if (m_eklmTimeCalibrationData[i] == nullptr) {
-        B2FATAL("EKLM time calibration data is missing for strip "
-                << i + 1 << ".");
-        m_eklmTimeCalibrationData[i] = &m_eklmDefaultTimeCalibrationData;
-      }
-    }
-  }
 }
 
 void KLMReconstructorModule::event()
@@ -151,6 +148,30 @@ void KLMReconstructorModule::event()
   reconstructBKLMHits();
   reconstructEKLMHits();
 }
+
+void KLMReconstructorModule::correctCableDelay(double& ct, const KLMDigit* d)
+{
+  unsigned int cID = d->getUniqueChannelID();
+  ct -= m_TimeCableDelay->getTimeDelay(cID);
+}
+
+/*
+double KLMReconstructorModule::getTime(KLMDigit* d, double dist)
+{
+  int strip;
+  strip = m_eklmElementNumbers->stripNumber(
+            d->getSection(), d->getLayer(), d->getSector(),
+            d->getPlane(), d->getStrip()) - 1;
+  return d->getTime() -
+         (dist / m_eklmTimeCalibration->getEffectiveLightSpeed() +
+          m_eklmTimeCalibrationData[strip]->getTimeShift());
+
+   // TODO: Subtract time correction given by
+   // m_eklmTimeCalibration->getAmplitudeTimeConstant() / sqrt(d->getNPhotoelectrons()).
+   // It requires a new firmware version that will be able to extract amplitude.
+
+}
+*/
 
 bool KLMReconstructorModule::isNormal(const KLMDigit* digit) const
 {
@@ -197,9 +218,13 @@ void KLMReconstructorModule::reconstructBKLMHits()
   std::vector<const KLMDigit*> digitCluster;
   uint16_t previousChannel = channelDigitMap.begin()->first;
   double averageTime = m_Digits[channelDigitMap.begin()->second]->getTime();
+  if (m_TimeCableDelayCorrection)
+    correctCableDelay(averageTime, m_Digits[channelDigitMap.begin()->second]);
   for (std::map<uint16_t, int>::iterator it = channelDigitMap.begin(); it != channelDigitMap.end(); ++it) {
     const KLMDigit* digit = m_Digits[it->second];
     double digitTime = digit->getTime();
+    if (m_TimeCableDelayCorrection)
+      correctCableDelay(digitTime, digit);
     if ((it->first > previousChannel + 1) || (std::fabs(digitTime - averageTime) > m_CoincidenceWindow)) {
       m_bklmHit1ds.appendNew(digitCluster); // Also sets relation BKLMHit1d -> KLMDigit
       digitCluster.clear();
@@ -228,27 +253,36 @@ void KLMReconstructorModule::reconstructBKLMHits()
       const BKLMHit1d* phiHit = m_bklmHit1ds[phiIndex];
       const BKLMHit1d* zHit = m_bklmHit1ds[zIndex];
       CLHEP::Hep3Vector local = m->getLocalPosition(phiHit->getStripAve(), zHit->getStripAve());
-      CLHEP::Hep3Vector propagationTimes;
+      CLHEP::Hep3Vector propagationDist;
       if (m_bklmHit1ds[i]->getLayer() < BKLMElementNumbers::c_FirstRPCLayer) {
         if (isPhiReadout) {
-          propagationTimes = m->getPropagationTimes(
-                               local, m_bklmHit1ds[j]->getStripMin(),
-                               m_bklmHit1ds[i]->getStripMin());
+          propagationDist = m->getPropagationDistance(
+                              local, m_bklmHit1ds[j]->getStripMin(),
+                              m_bklmHit1ds[i]->getStripMin());
         } else {
-          propagationTimes = m->getPropagationTimes(
-                               local, m_bklmHit1ds[i]->getStripMin(),
-                               m_bklmHit1ds[j]->getStripMin());
+          propagationDist = m->getPropagationDistance(
+                              local, m_bklmHit1ds[i]->getStripMin(),
+                              m_bklmHit1ds[j]->getStripMin());
         }
       } else {
-        propagationTimes = m->getPropagationTimes(local);
+        propagationDist = m->getPropagationTimes(local);
       }
-      double phiTime = phiHit->getTime() - propagationTimes.y();
-      double zTime = zHit->getTime() - propagationTimes.z();
+      double delayPhi, delayZ;
+      if (phiHit->inRPC())
+        delayPhi = m_DelayRPCPhi;
+      else
+        delayPhi = m_DelayBKLMScintillators;
+      if (zHit->inRPC())
+        delayZ = m_DelayRPCZ;
+      else
+        delayZ = m_DelayBKLMScintillators;
+      double phiTime = phiHit->getTime() - propagationDist.y() * delayPhi;
+      double zTime = zHit->getTime() - propagationDist.z() * delayZ;
       if (std::fabs(phiTime - zTime) > m_CoincidenceWindow)
         continue;
       // The second param in localToGlobal is whether do the alignment correction (true) or not (false)
       CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift(), m_bklmIfAlign);
-      double time = 0.5 * (phiTime + zTime) - global.mag() / Const::speedOfLight;
+      double time = 0.5 * (phiTime + zTime);
       BKLMHit2d* hit2d = m_bklmHit2ds.appendNew(phiHit, zHit, global, time); // Also sets relation BKLMHit2d -> BKLMHit1d
       if (std::fabs(time - m_PromptTime) > m_PromptWindow)
         hit2d->isOutOfTime(true);
@@ -256,21 +290,6 @@ void KLMReconstructorModule::reconstructBKLMHits()
   }
 }
 
-double KLMReconstructorModule::getTime(KLMDigit* d, double dist)
-{
-  int strip;
-  strip = m_eklmElementNumbers->stripNumber(
-            d->getSection(), d->getLayer(), d->getSector(),
-            d->getPlane(), d->getStrip()) - 1;
-  return d->getTime() -
-         (dist / m_eklmTimeCalibration->getEffectiveLightSpeed() +
-          m_eklmTimeCalibrationData[strip]->getTimeShift());
-  /**
-   * TODO: Subtract time correction given by
-   * m_eklmTimeCalibration->getAmplitudeTimeConstant() / sqrt(d->getNPhotoelectrons()).
-   * It requires a new firmware version that will be able to extract amplitude.
-   */
-}
 
 void KLMReconstructorModule::reconstructEKLMHits()
 {
@@ -379,8 +398,14 @@ void KLMReconstructorModule::reconstructEKLMHits()
         }
         for (it8 = it4; it8 != it5; ++it8) {
           for (it9 = it6; it9 != it7; ++it9) {
-            t1 = getTime(*it8, d1) + 0.5 * sd / Const::speedOfLight;
-            t2 = getTime(*it9, d2) - 0.5 * sd / Const::speedOfLight;
+            t1 = (*it8)->getTime() - d1 * m_DelayEKLMScintillators
+                 + 0.5 * sd / Const::speedOfLight;
+            t2 = (*it9)->getTime() - d2 * m_DelayEKLMScintillators
+                 - 0.5 * sd / Const::speedOfLight;
+            if (m_TimeCableDelayCorrection) {
+              correctCableDelay(t1, *it8);
+              correctCableDelay(t2, *it9);
+            }
             if (std::fabs(t1 - t2) > m_CoincidenceWindow)
               continue;
             t = (t1 + t2) / 2;
@@ -419,5 +444,4 @@ void KLMReconstructorModule::endRun()
 void KLMReconstructorModule::terminate()
 {
   delete m_eklmTransformData;
-  delete[] m_eklmTimeCalibrationData;
 }

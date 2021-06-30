@@ -101,8 +101,10 @@ namespace Belle2 {
       m_n_sklm_bwd(-1),
       m_n_it(-1),
       m_i2fo(-1),
+      m_i2io(-1),
       m_n_iecl(-1),
-      m_n_iklm(-1)
+      m_n_iklm(-1),
+      m_n_eecleklm(-1)
     {}
     ~TRGGRLInfo() {}
 
@@ -261,10 +263,14 @@ namespace Belle2 {
     int getNinnertrk() const  {return m_n_it;}
     /**get i2fo: inner-to-full opening angle > 90 degrees*/
     int geti2fo() const  {return m_i2fo;}
+    /**get i2io: inner-to-inner opening angle > 90 degrees*/
+    int geti2io() const  {return m_i2io;}
     /**get the number of ecl matched inner tracks*/
     int getNiecl() const  {return m_n_iecl;}
     /**get the number of klm matched inner tracks*/
     int getNiklm() const  {return m_n_iklm;}
+    /**get the number of klm matched ecl clusters at the endcap */
+    int getNeecleklm() const  {return m_n_eecleklm;}
     /**get GDL input bit */
     bool getInputBits(int i) const {return m_InputBits[i];}
 
@@ -420,10 +426,14 @@ namespace Belle2 {
     void setNinnertrk(int Ninnertrk)  {m_n_it = Ninnertrk;}
     /**set i2fo: inner-to-full opening angle > 90 degrees*/
     void seti2fo(int i2fo) {m_i2fo = i2fo;}
+    /**set i2io: inner-to-inner opening angle > 90 degrees*/
+    void seti2io(int i2io) {m_i2io = i2io;}
     /**set the number of ecl matched inner tracks*/
     void setNiecl(int Niecl)  {m_n_iecl = Niecl;}
     /**set the number of klm matched inner tracks*/
     void setNiklm(int Niklm)  {m_n_iklm = Niklm;}
+    /**set GDL input bit*/
+    void setNeecleklm(int Nieecleklm)  {m_n_eecleklm = Nieecleklm;}
     /**set GDL input bit*/
     void setInputBits(int i, bool bit) {m_InputBits[i] = bit;}
 
@@ -589,15 +599,19 @@ namespace Belle2 {
     int m_n_it;
     /**i2fo: inner-to-full opening angle > 90 degrees*/
     int m_i2fo;
+    /**i2io: inner-to-inner opening angle > 90 degrees*/
+    int m_i2io;
     /**the number of ecl matched inner tracks*/
     int m_n_iecl;
     /**the number of klm matched inner tracks*/
     int m_n_iklm;
+    /**the number of klm matched ecl clusters at endcap*/
+    int m_n_eecleklm;
     /**GDL input bits**/
     std::vector<bool> m_InputBits = std::vector<bool>(320, false);
 
     /**! The Class title*/
-    ClassDef(TRGGRLInfo, 6); /*< the class title */
+    ClassDef(TRGGRLInfo, 7); /*< the class title */
   };
 } // end namespace Belle2
 

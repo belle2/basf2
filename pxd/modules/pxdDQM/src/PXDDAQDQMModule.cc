@@ -197,20 +197,18 @@ void PXDDAQDQMModule::event()
 
   B2DEBUG(20, "Iterate PXD DAQ Status");
   auto evt = *m_storeDAQEvtStats;
-  PXDErrorFlags evt_emask = evt.getErrorMask();
+  auto evt_emask = evt.getErrorMask();
   for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
-    PXDErrorFlags mask = (1ull << i);
-    if ((evt_emask & mask) == mask) hDAQErrorEvent->Fill(getPXDBitErrorName(i).c_str(), 1);
+    if (evt_emask[i]) hDAQErrorEvent->Fill(getPXDBitErrorName(i).c_str(), 1);
   }
   B2DEBUG(20, "Iterate PXD Packets, Err " << evt_emask);
   for (auto& pkt : evt) {
     B2DEBUG(20, "Iterate PXD DHC in Pkt " << pkt.getPktIndex());
     for (auto& dhc : pkt) {
       hDAQErrorDHC->Fill(dhc.getDHCID(), -1);// normalize
-      PXDErrorFlags dhc_emask = dhc.getErrorMask();
+      auto dhc_emask = dhc.getErrorMask();
       for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
-        PXDErrorFlags mask = (1ull << i);
-        if ((dhc_emask & mask) == mask) hDAQErrorDHC->Fill(dhc.getDHCID(), i);
+        if (dhc_emask[i]) hDAQErrorDHC->Fill(dhc.getDHCID(), i);
       }
       unsigned int cmask = dhc.getEndErrorInfo();
       for (int i = 0; i < 32; i++) {
@@ -226,11 +224,10 @@ void PXDDAQDQMModule::event()
       B2DEBUG(20, "Iterate PXD DHE in DHC " << dhc.getDHCID() << " , Err " << dhc_emask);
       for (auto& dhe : dhc) {
         hDAQErrorDHE->Fill(dhe.getDHEID(), -1);// normalize
-        PXDErrorFlags dhe_emask = dhe.getErrorMask();
+        auto dhe_emask = dhe.getErrorMask();
         B2DEBUG(20, "DHE " << dhe.getDHEID() << " , Err " << dhe_emask);
         for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
-          PXDErrorFlags mask = (1ull << i);
-          if ((dhe_emask & mask) == mask) hDAQErrorDHE->Fill(dhe.getDHEID(), i);
+          if (dhe_emask[i]) hDAQErrorDHE->Fill(dhe.getDHEID(), i);
         }
         if (dhe.isUsable()) {
           hDAQUseableModule->Fill(dhe.getDHEID());

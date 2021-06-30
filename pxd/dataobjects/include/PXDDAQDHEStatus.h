@@ -63,7 +63,7 @@ namespace Belle2 {
     void markUnusable() { m_usable = false; m_errorMask[EPXDErrNr::c_nrUNUSABLE_DATA] = true;}
 
     /** Set Error bit mask
-     * @param m Bit Mask to set
+     * @param mask Bit Mask to set
      */
     void setErrorMask(const PXDErrorFlags& mask) { m_errorMask = mask; }
     /** Return Error bit mask
@@ -72,7 +72,7 @@ namespace Belle2 {
     PXDErrorFlags getErrorMask(void) const { return m_errorMask; }
 
     /** Set Critical Error bit mask
-     * @param m Bit Mask to set
+     * @param mask Bit Mask to set
      */
     void setCritErrorMask(const PXDErrorFlags& mask) { m_critErrorMask = mask; }
 

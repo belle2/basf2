@@ -60,15 +60,13 @@ G4LongLivedNeutralTransportation::G4LongLivedNeutralTransportation(G4int verbosi
 
   // Cannot determine whether a field exists here, as it would
   //  depend on the relative order of creating the detector's
-  //  field and this process. That order is not guaranted.
+  //  field and this process. That order is not guaranteed.
   fAnyFieldExists = DoesGlobalFieldExist();
   //  This value must be updated using DoesAnyFieldExist() at least at the
   //    start of each Run -- for now this is at the Start of every Track. TODO
 
   static G4ThreadLocal G4TouchableHandle* pNullTouchableHandle = 0;
-  if (!pNullTouchableHandle) {
-    pNullTouchableHandle = new G4TouchableHandle;
-  }
+  pNullTouchableHandle = new G4TouchableHandle;
   fCurrentTouchableHandle = *pNullTouchableHandle;
   // Points to (G4VTouchable*) 0
 
@@ -124,7 +122,7 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
   //    it will be necessary to add here (for all steps)
   // fCurrentTouchableHandle = aTrack->GetTouchableHandle();
 
-  // GPILSelection is set to defaule value of CandidateForSelection
+  // GPILSelection is set to default value of CandidateForSelection
   // It is a return value
   //
   *selection = CandidateForSelection ;
@@ -506,11 +504,11 @@ G4LongLivedNeutralTransportation::StartTracking(G4Track* aTrack)
 
 /////////////////////////////////////////////////////////////////////////////
 //
-//  Supress (or not) warnings about 'looping' particles
+//  Suppress (or not) warnings about 'looping' particles
 
 void G4LongLivedNeutralTransportation::SetSilenceLooperWarnings(G4bool val)
 {
-  fSilenceLooperWarnings = val; // Flag to *Supress* all 'looper' warnings
+  fSilenceLooperWarnings = val; // Flag to *Suppress* all 'looper' warnings
   // G4CoupledTransportation::fSilenceLooperWarnings= val;
 }
 

@@ -39,12 +39,12 @@ namespace Belle2 {
              float mostLikelySignalPhotonCount,
              float mostLikelyBackgroundPhotonCount,
              float mostLikelyDeltaPhotonCount,
-             std::vector<float> coarseScanMassPoints,
-             std::vector<float> fineScanMassPoints,
-             std::vector<float> coarseScanLLValues,
-             std::vector<float> fineScanLLValues,
-             std::vector<float> coarseScanExpectedPhotons,
-             std::vector<float> fineScanExpectedPhotons)
+             const std::vector<float>& coarseScanMassPoints,
+             const std::vector<float>& fineScanMassPoints,
+             const std::vector<float>& coarseScanLLValues,
+             const std::vector<float>& fineScanLLValues,
+             const std::vector<float>& coarseScanExpectedPhotons,
+             const std::vector<float>& fineScanExpectedPhotons)
     {
       m_mostLikelyMass =  mostLikelyMass;
       m_mostLikelyMassIntervalLow =  mostLikelyMassIntervalLow;
@@ -154,14 +154,14 @@ namespace Belle2 {
     float m_mostLikelyBackgroundPhotonCount = 0; /**< Expected number of background photons at the LL max */
     float m_mostLikelyDeltaPhotonCount = 0; /**< Expected number of delta rays photons at the LL max */
 
-    std::vector<float> m_coarseScanMassPoints = {0}; /**< mass points used in the coarse scan */
-    std::vector<float> m_fineScanMassPoints = {0}; /**< mass points used in the fine scan */
+    std::vector<float> m_coarseScanMassPoints; /**< mass points used in the coarse scan */
+    std::vector<float> m_fineScanMassPoints; /**< mass points used in the fine scan */
 
-    std::vector<float> m_coarseScanLLValues = {0}; /**< LL values of the coarse scan */
-    std::vector<float> m_fineScanLLValues = {0}; /**< LL values of the fine scan */
+    std::vector<float> m_coarseScanLLValues; /**< LL values of the coarse scan */
+    std::vector<float> m_fineScanLLValues; /**< LL values of the fine scan */
 
-    std::vector<float> m_coarseScanExpectedPhotons = {0}; /**< expcted photons from the coarse scan */
-    std::vector<float> m_fineScanExpectedPhotons = {0}; /**< expcted photons from the fine scan */
+    std::vector<float> m_coarseScanExpectedPhotons; /**< expected signal photons from the coarse scan */
+    std::vector<float> m_fineScanExpectedPhotons; /**< expected signal photons from the fine scan */
 
     ClassDef(TOPLikelihoodScanResult, 1); /**< ClassDef */
 

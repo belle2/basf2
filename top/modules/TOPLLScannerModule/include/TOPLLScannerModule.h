@@ -54,7 +54,7 @@ namespace Belle2 {
     void scanLikelihood(std::vector<float>masses, std::vector<float>logLs, float deltaLL, float& maxLL, float& massMax,
                         float& minMassRange, float& maxMassRange);
 
-    std::vector<float> m_massPoints = {}; /**< vector with the mass points used in the coarse scan */
+    std::vector<float> m_massPoints; /**< vector with the mass points used in the coarse scan */
     short m_nFineScanPoints = 50; /**< number of points for the fine-graned scan */
     // datastore objects
     StoreArray<TOPDigit> m_digits; /**< collection of digits */

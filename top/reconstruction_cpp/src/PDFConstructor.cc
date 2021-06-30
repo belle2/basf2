@@ -23,7 +23,7 @@ namespace Belle2 {
   namespace TOP {
 
     PDFConstructor::PDFConstructor(const TOPTrack& track, const Const::ChargedStable& hypothesis,
-                                   EPDFOption PDFOption, EStoreOption storeOption, float overrideMass):
+                                   EPDFOption PDFOption, EStoreOption storeOption, double overrideMass):
       m_moduleID(track.getModuleID()), m_track(track), m_hypothesis(hypothesis),
       m_inverseRaytracer(TOPRecoManager::getInverseRaytracer(m_moduleID)),
       m_fastRaytracer(TOPRecoManager::getFastRaytracer(m_moduleID)),

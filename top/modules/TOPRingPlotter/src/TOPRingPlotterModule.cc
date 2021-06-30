@@ -355,8 +355,6 @@ void TOPRingPlotterModule::event()
 {
   TOPRecoManager::setTimeWindow(0, 100);
 
-  StoreObjPtr<EventMetaData> evtMetaData;
-  StoreArray<Track> tracks;
   StoreArray<TOPDigit> digits;
   StoreObjPtr<ParticleList> particles(m_particleList);
 

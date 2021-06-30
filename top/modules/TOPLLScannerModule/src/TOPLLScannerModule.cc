@@ -69,7 +69,7 @@ void TOPLLScannerModule::scanLikelihood(std::vector<float>masses, std::vector<fl
   } else {
     // search forward
     auto llValue = maxLL;
-    auto llIndex = llMaxIndex;
+    int llIndex = llMaxIndex;
     while (llValue > maxLL - deltaLL && llIndex < int(masses.size())) {
       llValue = logLs[llIndex];
       maxMassRange = masses[llIndex];
@@ -102,7 +102,7 @@ void TOPLLScannerModule::initialize()
 
 
   // Fill the array of masses for the coarse scan in un-even steps
-  float step = 0;
+  float step;
   float lastVal = 0.0002;
   for (auto i = 1; i < 240; i++) {
     if (i < 10)
@@ -117,8 +117,6 @@ void TOPLLScannerModule::initialize()
 
 void TOPLLScannerModule::event()
 {
-  if (! m_tracks.isValid())
-    return;
 
   for (const auto& track : m_tracks) {
     auto* topLLScanRes = m_likelihoodScanResults.appendNew();
@@ -138,7 +136,7 @@ void TOPLLScannerModule::event()
     std::vector<float> nSignalPhotonsCoarseScan;
 
     for (const auto& mass : m_massPoints) {
-      const PDFConstructor pdfConstructor(trk, Const::pion, PDFConstructor::c_Fine, PDFConstructor::c_Reduced, mass);
+      const PDFConstructor pdfConstructor(trk, Const::pion, PDFConstructor::c_Optimal, PDFConstructor::c_Reduced, mass);
       pdfConstructor.switchOffDeltaRayPDF();
       auto LL = pdfConstructor.getLogL();
       logLcoarseScan.push_back(LL.logL);
@@ -163,7 +161,7 @@ void TOPLLScannerModule::event()
     if (step > 0.001)
       step = 0.001;
     while (mass < maxMassRange) {
-      const PDFConstructor pdfConstructor(trk, Const::pion, PDFConstructor::c_Fine, PDFConstructor::c_Reduced, mass);
+      const PDFConstructor pdfConstructor(trk, Const::pion, PDFConstructor::c_Optimal, PDFConstructor::c_Reduced, mass);
       pdfConstructor.switchOffDeltaRayPDF();
       auto LL = pdfConstructor.getLogL();
       logLfineScan.push_back(LL.logL);
@@ -189,7 +187,7 @@ void TOPLLScannerModule::event()
     float threshold = m_massPoints[index + 1];
 
     // grab the number of expected photons at the LL maximum
-    const PDFConstructor pdfConstructor(trk, Const::pion, PDFConstructor::c_Fine, PDFConstructor::c_Reduced, massMax);
+    const PDFConstructor pdfConstructor(trk, Const::pion, PDFConstructor::c_Optimal, PDFConstructor::c_Reduced, massMax);
     pdfConstructor.switchOffDeltaRayPDF();
     float nSignalPhotons = pdfConstructor.getExpectedSignalPhotons();
     float nBackgroundPhotons = pdfConstructor.getExpectedBkgPhotons();

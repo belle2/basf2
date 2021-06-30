@@ -169,10 +169,10 @@ namespace Belle2 {
       /**
        * Returns particle beta
        * @param particle particle mass hypothesis
-       * @param overrideMass alternative mass value to be used to calculate beta. Ignored if < 0.
+       * @param overrideMass alternative mass value to be used to calculate beta. Ignored if <= 0.
        * @return particle beta
        */
-      double getBeta(const Const::ChargedStable& particle, float overrideMass = -1.) const;
+      double getBeta(const Const::ChargedStable& particle, double overrideMass = 0) const;
 
       /**
        * Returns assumed photon emission position and track direction
@@ -185,10 +185,10 @@ namespace Belle2 {
        * Returns time-of-flight from IP to photon emission position
        * @param particle particle mass hypothesis
        * @param dL length difference to the average emission position
-       * @param overrideMass alternative mass value to be used to calculate beta. Ignored if < 0.
+       * @param overrideMass alternative mass value to be used to calculate beta. Ignored if <= 0.
        * @return time-of-flight
        */
-      double getTOF(const Const::ChargedStable& particle, double dL = 0, float overrideMass = -1.) const;
+      double getTOF(const Const::ChargedStable& particle, double dL = 0, double overrideMass = 0) const;
 
       /**
        * Returns helix
@@ -308,7 +308,7 @@ namespace Belle2 {
     };
 
 
-    inline double TOPTrack::getBeta(const Const::ChargedStable& chargedStable, float overrideMass) const
+    inline double TOPTrack::getBeta(const Const::ChargedStable& chargedStable, double overrideMass) const
     {
       double mass = chargedStable.getMass();
       if (overrideMass > 0)
@@ -316,7 +316,7 @@ namespace Belle2 {
       return m_momentum / sqrt(m_momentum * m_momentum + mass * mass);
     }
 
-    inline double TOPTrack::getTOF(const Const::ChargedStable& chargedStable, double dL, float overrideMass) const
+    inline double TOPTrack::getTOF(const Const::ChargedStable& chargedStable, double dL, double overrideMass) const
     {
       return (m_trackLength + dL) / getBeta(chargedStable, overrideMass) / Const::speedOfLight;
     }

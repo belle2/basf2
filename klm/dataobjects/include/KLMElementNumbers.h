@@ -15,6 +15,7 @@
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 
 /* C++ headers. */
+#include <cstdint>
 #include <string>
 
 namespace Belle2 {

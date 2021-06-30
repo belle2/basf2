@@ -73,6 +73,9 @@ selector.if_false(emptypath)
 add_unpackers(main,
               components=['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM'])
 
+# Shift the time of KLMDigits
+main.add_module('KLMDigitTimeShifter')
+
 # ECL trigger unpacker and BGOverlay dataobject
 main.add_module('TRGECLUnpacker')
 main.add_module('TRGECLBGTCHit')

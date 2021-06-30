@@ -476,7 +476,7 @@ settings.json
 The `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_ configuration of the FEI grid workflow is handled by the file `settings.json <https://stash.desy.de/users/aakhmets/repos/feiongridworkflow/browse/settings.json>`_. Further below some explanations for the required settings:
 
 * ``gbasf2_install_directory``: Absolute path to the directory where you have installed the `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ tool. Please correct it to a meaningful path according to the installation you have performed previously.
-* ``gbasf2_input_dslist``: Absolute path to the dataset list of all datasets you would like to process. It is assumed by the ``FEIAnalysisSummaryTask``, that each line corresponds to a dataset sample, such that for each line in this dataset list one instance (file-based case) or multuple instances (event-based case) of ``FEIAnalysisTask`` are spawned. An example of a possible dataset list is given below:
+* ``gbasf2_input_dslist``: Absolute path to the dataset list of all datasets you would like to process. It is assumed by the ``FEIAnalysisSummaryTask``, that each line corresponds to a dataset sample, such that for each line in this dataset list one instance (file-based case) or multiple instances (event-based case) of ``FEIAnalysisTask`` are spawned. An example of a possible dataset list is given below:
 
     .. code-block:: bash
 
@@ -512,7 +512,8 @@ FEIAnalysisSummaryTask and FEIAnalysisTask
 ------------------------------------------
 
 These modules are producing inputs for the FEI training. Since this is the most computationally intensive task, it is performed on the grid resources.
-The ``FEIAnalysisSummaryTask`` module is designed such, that it creates a ``FEIAnalysisTask`` module for each line entry in the dataset list given with the ``gbasf2_input_dslist`` setting.
+The ``FEIAnalysisSummaryTask`` module is designed such, that it creates one instance (file-based case) or multiple instances (event-based case) of the ``FEIAnalysisTask`` module
+for each line entry in the dataset list given with the ``gbasf2_input_dslist`` setting.
 Each instance of ``FEIAnalysisTask`` is assigned with an individual dataset list containing the corresponding line entry and with a name modified with ``_Part{index}``.
 In consequence, the module ``FEIAnalysisSummaryTask`` just summarizes the list of outputs produced by the individual tasks ``FEIAnalysisTask``, saving the lists in the file
 ``list_of_output_directories.json``.

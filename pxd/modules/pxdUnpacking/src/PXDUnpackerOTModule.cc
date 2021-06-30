@@ -122,7 +122,7 @@ void PXDUnpackerOTModule::terminate()
 
 void PXDUnpackerOTModule::event()
 {
-  m_storeDAQEvtStats.create(c_NO_ERROR);
+  m_storeDAQEvtStats.create();
 
   m_errorMask = 0;
   m_errorMaskEvent = 0;

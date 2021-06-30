@@ -57,6 +57,7 @@ PXDUnpackerNewModule::PXDUnpackerNewModule() :
   addParam("ForceMapping", m_forceMapping, "Force Mapping even if DHH bit is NOT requesting it", false);
   addParam("ForceNoMapping", m_forceNoMapping, "Force NO Mapping even if DHH bit is requesting it", false);
   addParam("CheckPaddingCRC", m_checkPaddingCRC, "Check for susp. padding (debug option, many false positive)", false);
+  // MaxDHPFrameDiff is only useful for old firmware
   addParam("MaxDHPFrameDiff", m_maxDHPFrameDiff, "Maximum DHP Frame Nr Difference w/o reporting error", 2u);
   addParam("FormatBonnDAQ", m_formatBonnDAQ, "ONSEN or BonnDAQ format", false);
   addParam("Verbose", m_verbose, "Turn on extra verbosity for log-level debug", false);
@@ -133,7 +134,7 @@ void PXDUnpackerNewModule::terminate()
 
 void PXDUnpackerNewModule::event()
 {
-  m_storeDAQEvtStats.create(c_NO_ERROR);
+  m_storeDAQEvtStats.create();
 
   m_errorMask = 0;
   m_errorMaskEvent = 0;
@@ -977,7 +978,7 @@ void PXDUnpackerNewModule::unpack_dhc_frame_v01(void* data, const int len, const
   // What do we do with wrong checksum frames? As we do not know WHAT is wrong, we have to skip them alltogether.
   // As they might contain HEADER Info, we might better skip the processing of the full package, too.
   dhc.check_crc(m_errorMask, m_suppressErrorMask[c_nrDHE_CRC]);
-  if (!m_continueOnError && m_errorMask[c_DHE_CRC]) {
+  if (!m_continueOnError && m_errorMask[c_nrDHE_CRC]) {
     // if CRC is wrong, we cannot rely on the content of the frame, thus skipping is the best option
     return;
   }

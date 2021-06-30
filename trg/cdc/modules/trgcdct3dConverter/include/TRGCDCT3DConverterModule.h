@@ -24,6 +24,7 @@
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <framework/dataobjects/BinnedEventT0.h>
+#include "boost/multi_array.hpp"
 
 namespace Belle2 {
 
@@ -63,44 +64,44 @@ namespace Belle2 {
       std::string version() const;
 
       /** converts firmwareResults of TS to a vector*/
-      void storeTSFirmwareData(std::vector<std::vector<std::vector<std::vector<double> > > >& tsfInfo);
+      void storeTSFirmwareData(boost::multi_array<double, 4>& tsfInfo);
 
       /** filters tsfFirmwareInfo to tsfInfo*/
-      void filterTSData(std::vector<std::vector<std::vector<std::vector<double> > > >& tsfFirmwareInfo,
-                        std::vector<std::vector<std::vector<double> > >& tsfInfo);
+      void filterTSData(boost::multi_array<double, 4>& tsfFirmwareInfo,
+                        boost::multi_array<double, 3>& tsfInfo);
 
       /** adds tsfInfo to TS data store*/
-      void addTSDatastore(std::vector<std::vector<std::vector<double> > >& tsfInfo, int isSt = 1);
+      void addTSDatastore(boost::multi_array<double, 3>& tsfInfo, int isSt = 1);
 
       /** converts firmwareResults of 2D to a vector*/
-      void store2DFirmwareData(std::vector<std::vector<std::vector<double> > >& t2DFirmwareInfo,
-                               std::vector<std::vector<std::vector<std::vector<double> > > >& axTsfFirmwareInfo);
+      void store2DFirmwareData(boost::multi_array<double, 3>& t2DFirmwareInfo,
+                               boost::multi_array<double, 4>& axTsfFirmwareInfo);
 
       ///** filters t2DFirmwareInfo to t2DInfo*/
-      //void filter2DData(std::vector<std::vector<std::vector<double> > > & t2DFirmwareInfo, std::vector<std::vector<std::vector<std::vector<double> > > > & t2DTsfFirmwareInfo, std::vector<std::vector<double> > & t2DInfo, std::vector<std::vector<std::vector<double> > > & t2DTsfInfo, std::vector<int> & t2DClks, std::vector<int> & t2DId);
+      //void filter2DData(boost::multi_array<double, 3>  & t2DFirmwareInfo, boost::multi_array<double, 4> & t2DTsfFirmwareInfo, boost::multi_array<double, 2> & t2DInfo, boost::multi_array<double, 3>  & t2DTsfInfo, std::vector<int> & t2DClks, std::vector<int> & t2DId);
 
       /** filters t2DFirmwareInfo to t2DInfo*/
-      void filter2DData(std::vector<std::vector<std::vector<double> > >& t2DFirmwareInfo,
-                        std::vector<std::vector<std::vector<std::vector<double> > > >& t2DTsfFirmwareInfo, std::vector<std::vector<double> >& t2DInfo,
-                        std::vector<std::vector<std::vector<double> > >& t2DTsfInfo);
+      void filter2DData(boost::multi_array<double, 3>& t2DFirmwareInfo,
+                        boost::multi_array<double, 4>& t2DTsfFirmwareInfo, boost::multi_array<double, 2>& t2DInfo,
+                        boost::multi_array<double, 3>& t2DTsfInfo);
 
       /** adds t2DInfo to track data store*/
-      void add2DDatastore(std::vector<std::vector<double> >& t2DInfo, std::vector<std::vector<std::vector<double> > >& t2DTsfInfo);
+      void add2DDatastore(boost::multi_array<double, 2>& t2DInfo, boost::multi_array<double, 3>& t2DTsfInfo);
 
       /** converts firmwareResults of 3D to a vector*/
-      void store3DFirmwareData(std::vector<std::vector<std::vector<double> > >& t3DFirmwareInfo);
+      void store3DFirmwareData(boost::multi_array<double, 3>& t3DFirmwareInfo);
 
       /** uses fast sim with debug*/
-      void store3DFastSimData(std::vector<std::vector<std::vector<double> > >& t3DFirmwareInfo);
+      void store3DFastSimData(boost::multi_array<double, 3>& t3DFirmwareInfo);
 
       /** uses firm sim with debug*/
-      void store3DFirmSimData(std::vector<std::vector<std::vector<double> > >& t3DFirmwareInfo);
+      void store3DFirmSimData(boost::multi_array<double, 3>& t3DFirmwareInfo);
 
       /** filters t3DFirmwareInfo to t3DInfo*/
-      void filter3DData(std::vector<std::vector<std::vector<double> > >& t3DFirmwareInfo, std::vector<std::vector<double> >& t3DInfo);
+      void filter3DData(boost::multi_array<double, 3>& t3DFirmwareInfo, boost::multi_array<double, 2>& t3DInfo);
 
       /** adds t3DInfo to track data store*/
-      void add3DDatastore(std::vector<std::vector<double> >& t3DInfo, bool doConvert = 1);
+      void add3DDatastore(boost::multi_array<double, 2>& t3DInfo, bool doConvert = 1);
 
       /** Used for debugging 3D firmware */
       void debug3DFirmware();
@@ -111,8 +112,8 @@ namespace Belle2 {
       /** converts to signed value*/
       int toSigned(int value, int nBits);
 
-      /** converts to 2D rho to 3D rho value*/
-      int t2DRhoTot3DRho(int value, bool isSigned = 1);
+      /** converts to 2D rho to 3D rho value,  obselete*/
+//     int t2DRhoTot3DRho(int value, bool isSigned = 1);
 
       /** converts to 2D phi to 3D phi value*/
       int t2DPhiTot3DPhi(int phi, int rho);

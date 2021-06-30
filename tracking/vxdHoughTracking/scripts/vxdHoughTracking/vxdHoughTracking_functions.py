@@ -48,6 +48,11 @@ def add_VXDHoughTracking(path,
                                               'AngleAndTimeThetaCutDeltaL2': 0.20,
                                               'AngleAndTimeDeltaUTime': 15.,
                                               'AngleAndTimeDeltaVTime': 15., },
+
+                    twoHitUseNBestHits=5,
+                    threeHitUseNBestHits=5,
+                    fourHitUseNBestHits=3,
+                    fiveHitUseNBestHits=2,
                     )
 
     if usePXDROIFinderModule:

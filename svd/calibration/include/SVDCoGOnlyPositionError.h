@@ -42,10 +42,11 @@ namespace Belle2 {
      *
      * Input:
      * @param sensorID: identity of the sensor for which the calibration is required
-     * @param isU: sensor side, true for p side, false for n side
-     * @param strip: strip number - NOT USED
-     * @param clSNR : cluster SNR
-     * @param size : cluster size
+     * @param isU sensor side, true for p side, false for n side
+     * @param strip strip number - NOT USED
+     * @param clSNR cluster SNR
+     * @param clSize cluster size
+     * @param pitch sensor pitch
      *
      * Output: double corresponding to the position error
      */

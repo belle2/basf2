@@ -129,6 +129,14 @@ namespace Belle2 {
     double binaryPID_SVD(const Particle* part, const std::vector<double>& arguments);
 
     /**
+    * returns the MVA score for anti-neutron PID (not for neutron)
+    * -1 means invalid
+    *  0 background-like
+    *  1 signal-like
+    */
+    double antineutronID(const Particle* particle);
+
+    /**
      * @return the charged PID BDT score for a certain mass hypothesis with respect to all other charged stable particle hypotheses.
      *
      * The signal hypothesis pdgId and the detector(s) used for the BDT training are passed as a vector of strings of size = 2.

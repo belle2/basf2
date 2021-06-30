@@ -3537,6 +3537,33 @@ def getAnalysisGlobaltag(timeout=180) -> str:
                 'the experts.')
 
 
+def getNbarIDMVA(particleList, path=None, ):
+    """
+    This function can give a score to predict if it is a anti-n0.
+    It is not used to predict n0.
+    Currently, this can be used only for ECL cluster.
+    output will be stored in extraInfo(nbarID); -1 means MVA invalid
+    @param particleList     The input ParticleList
+    @param path             modules are added to this path
+    """
+    from variables import variables
+    variables.addAlias('V1', 'clusterHasPulseShapeDiscrimination')
+    variables.addAlias('V2', 'clusterE')
+    variables.addAlias('V3', 'clusterLAT')
+    variables.addAlias('V4', 'clusterE1E9')
+    variables.addAlias('V5', 'clusterE9E21')
+    variables.addAlias('V6', 'clusterZernikeMVA')
+    variables.addAlias('V7', 'clusterAbsZernikeMoment40')
+    variables.addAlias('V8', 'clusterAbsZernikeMoment51')
+
+    variables.addAlias('nbarIDValid',
+                       'passesCut(V1 == 1 and V2 >= 0 and V3 >= 0 and V4 >= 0 and V5 >= 0 and V6 >= 0 and V7 >= 0 and V8 >= 0)')
+    variables.addAlias('nbarIDmod', 'conditionalVariableSelector(nbarIDValid == 1, extraInfo(nbarIDFromMVA), constant(-1.0))')
+    basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
+    path.add_module('MVAExpert', listNames=particleList, extraInfoName='nbarIDFromMVA', identifier='db_nbarIDECL')
+    variablesToExtraInfo(particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
+
+
 if __name__ == '__main__':
     from basf2.utils import pretty_print_module
     pretty_print_module(__name__, "modularAnalysis")

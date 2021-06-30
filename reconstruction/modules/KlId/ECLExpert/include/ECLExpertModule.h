@@ -1,14 +1,15 @@
-/***************************************************************************
+/**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Jo-Frederik Krohn                                        *
+ * Author: Riccardo de Sangro                                             *
+ * Contributors:                                                          *
+ *                                                                        *
+ * Based on Jo-Frederik Krohn's KLMExpert module                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  *************************************************************************/
-#ifndef ECLExpertModule_H
-#define ECLExpertModule_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -27,8 +28,9 @@
 namespace Belle2 {
 
 
-  /** Module to perform the ECL KlId classification. This module only classifies ECL clusters.
-   * The output is a KlId object on the datastore. It contains KlId, bkgProb and wheter its an ECL or ECL cluster */
+  /** Module to perform the ECL Klong ID classification. This module only classifies ECL clusters.
+   * The output is a KlId object on the datastore.
+   */
   class ECLExpertModule : public Module {
 
   public:
@@ -42,7 +44,7 @@ namespace Belle2 {
     /** init */
     virtual void initialize() override;
 
-    /** beginn run */
+    /** begin run */
     virtual void beginRun() override;
 
     /** process event */
@@ -59,7 +61,7 @@ namespace Belle2 {
 
     /**
      * Initialize mva expert, dataset and features
-     * Called everytime the weightfile in the database changes in begin run
+     * Called every time the weightfile in the database changes in begin run
      */
     void init_mva(MVA::Weightfile& weightfile);
 
@@ -109,14 +111,11 @@ namespace Belle2 {
     /** MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers. Classifier value is 1.0 EM showers and 0.0 for hadronic showers. */
     Double32_t  m_ECLPulseShapeDiscriminationMVA;  //[0.0, 1.0, 18]
 
-    /** Cluster Hadron Component Intensity (pulse shape discrimination variable). Sum of the CsI(Tl) hadron scintillation component emission normalized to the sum of CsI(Tl) total scintillation emission.  Computed only using cluster digits with energy greater than 50 MeV and good offline waveform fit chi2. Will be removed in release-04*/
-    //    Double32_t  m_ECLClusterHadronIntensity;  //[-0.1, 0.8, 18]
-
     /** Number of hadron digits in cluster (pulse shape discrimination variable).  Weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component.*/
     Double32_t m_ECLNumberOfHadronDigits;  //[0, 255, 18]
 
     /** output of a BDT fitted on various Z-moments for the closest ECL cluster */
-    float m_ECLZMVA;
+    Double32_t m_ECLZMVA;
 
     /** Energy [GeV]. */
     Double32_t  m_ECLEnergy;  //[-5, 3., 18]
@@ -135,7 +134,7 @@ namespace Belle2 {
     /** vars to be classified */
     std::vector<float> m_feature_variables;
 
-    /** mva identifier. no ending means its loaded from the database  */
+    /** mva identifier. no ending means it's loaded from the database  */
     std::string m_identifier =
       "ECL_fBDT_1xBkgPhiGamma.xml";
     //      "ECL_fBDT_1xBkgpGunMulti.xml";
@@ -153,6 +152,3 @@ namespace Belle2 {
 
   }; // end class
 } // end namespace Belle2
-
-
-#endif

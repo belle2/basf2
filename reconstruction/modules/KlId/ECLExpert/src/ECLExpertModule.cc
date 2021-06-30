@@ -1,14 +1,14 @@
 /**************************************************************************
- *
- *
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Jo-Frederik Krohn                                        *
+ * Author: Riccardo de Sangro                                             *
+ * Contributors:                                                          *
+ *                                                                        *
+ * Based on Jo-Frederik Krohn's KLMExpert module                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+ *************************************************************************/
 #include <reconstruction/modules/KlId/ECLExpert/ECLExpertModule.h>
 #include <mdst/dataobjects/KlId.h>
 #include <framework/datastore/StoreArray.h>
@@ -41,10 +41,7 @@ ECLExpertModule::ECLExpertModule(): Module(), m_feature_variables(17, 0) //12
 
 
 
-ECLExpertModule::~ECLExpertModule()
-{
-}
-
+ECLExpertModule::~ECLExpertModule() = default;
 
 // --------------------------------------Module----------------------------------------------
 void ECLExpertModule::initialize()
@@ -58,13 +55,13 @@ void ECLExpertModule::initialize()
 
 
   if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
-    m_weightfile_representation = std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
-                                  DBObjPtr<DatabaseRepresentationOfWeightfile>(m_identifier));
+    m_weightfile_representation = std::make_unique<DBObjPtr<DatabaseRepresentationOfWeightfile>>(MVA::makeSaveForDatabase(
+                                    m_identifier));
   }
 
   MVA::AbstractInterface::initSupportedInterfaces();
-  printf("%s::initialize() Using BDT %s with %lu variables\n", getName().data(), m_identifier.data(), m_feature_variables.size());
-
+  B2INFO(getName().data() << "::initialize() Using BDT " << m_identifier.data() << " with " << m_feature_variables.size() <<
+         " variables");
 }
 
 
@@ -95,7 +92,7 @@ void ECLExpertModule::init_mva(MVA::Weightfile& weightfile)
 
   std::vector<float> dummy;
   dummy.resize(m_feature_variables.size(), 0);
-  m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(general_options, std::move(dummy), 0));
+  m_dataset = std::make_unique<MVA::SingleDataset>(general_options, dummy, 0);
 
 }
 
@@ -112,28 +109,6 @@ void ECLExpertModule::event()
   for (ECLCluster& cluster : m_eclClusters) {
 
     if (!cluster.hasHypothesis(eclHypothesis)) {continue;}
-    const TVector3& clusterPos = cluster.getClusterPosition();
-
-    m_ECLminTrkDistance     = -9999;
-    m_ECLDeltaL                            = -9999;
-    m_ECLZMVA       = -9999;
-    m_ECLZ40        = -9999;
-    m_ECLZ51        = -9999;
-    m_ECLE1oE9        = -9999;
-    m_ECLE9oE21       = -9999;
-    m_ECLsecondMoment     = -9999;
-    m_ECLLAT        = -9999;
-    m_ECLnumberOfCrystals   = -9999;
-    m_ECLtime       = -9999;
-    m_ECLdeltaTime99      = -9999;
-    m_ECLtheta        = -9999;
-    m_ECLphi        = -9999;
-    m_ECLr        = -9999;
-    m_ECLPulseShapeDiscriminationMVA  = -9999;
-    m_ECLNumberOfHadronDigits   = -9999;
-    m_ECLEnergy                         = -9999;
-    m_ECLlogEnergy      = -9999;
-    m_ECLlogEnergyHighestCrystal  = -9999;
 
     // Cluster properties
     m_ECLminTrkDistance                 = cluster.getMinTrkDistance();

@@ -22,7 +22,7 @@ namespace Belle2 {
   namespace Variable {
 
     /**
-     * returns the KlId associated to the KLMCluster
+     * returns the KlId associated to the ECL cluster
      */
     double eclClusterKlId(const Particle* particle);
 

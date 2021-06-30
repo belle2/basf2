@@ -53,8 +53,8 @@ static double s_UpperTimeBoundary = 0;
 /** Maximal propagation distance (strip length). */
 static double s_StripLength = 0;
 
-static bool compareEventNumber(const std::pair<uint16_t, unsigned int>& pair1,
-                               const std::pair<uint16_t, unsigned int>& pair2)
+static bool compareEventNumber(const std::pair<KLMChannelNumber, unsigned int>& pair1,
+                               const std::pair<KLMChannelNumber, unsigned int>& pair2)
 {
   return pair1.second < pair2.second;
 }
@@ -592,7 +592,7 @@ void KLMTimeAlgorithm::fillTimeDistanceProfiles(
   TProfile* profileEKLMScintillatorPlane2, bool fill2dHistograms)
 {
   for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
-    uint16_t channel = klmChannel.getKLMChannelNumber();
+    KLMChannelNumber channel = klmChannel.getKLMChannelNumber();
     if (m_cFlag[channel] == ChannelCalibrationStatus::c_NotEnoughData)
       continue;
 
@@ -647,7 +647,7 @@ void KLMTimeAlgorithm::fillTimeDistanceProfiles(
 }
 
 void KLMTimeAlgorithm::timeDistance2dFit(
-  const std::vector< std::pair<uint16_t, unsigned int> >& channels,
+  const std::vector< std::pair<KLMChannelNumber, unsigned int> >& channels,
   double& delay, double& delayError)
 {
   std::vector<struct Event>::iterator it;
@@ -771,11 +771,11 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   m_minimizerOptions.SetDefaultStrategy(2);
 
   /* Sort channels by number of events. */
-  std::vector< std::pair<uint16_t, unsigned int> > channelsBKLM;
-  std::vector< std::pair<uint16_t, unsigned int> > channelsEKLM;
+  std::vector< std::pair<KLMChannelNumber, unsigned int> > channelsBKLM;
+  std::vector< std::pair<KLMChannelNumber, unsigned int> > channelsEKLM;
   KLMChannelIndex klmChannels;
   for (KLMChannelIndex& klmChannel : klmChannels) {
-    uint16_t channel = klmChannel.getKLMChannelNumber();
+    KLMChannelNumber channel = klmChannel.getKLMChannelNumber();
     m_cFlag[channel] = ChannelCalibrationStatus::c_NotEnoughData;
     if (m_evts.find(channel) == m_evts.end())
       continue;
@@ -790,11 +790,11 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
     if (klmChannel.getSubdetector() == KLMElementNumbers::c_BKLM &&
         klmChannel.getLayer() < BKLMElementNumbers::c_FirstRPCLayer) {
       channelsBKLM.push_back(
-        std::pair<uint16_t, unsigned int>(channel, nEvents));
+        std::pair<KLMChannelNumber, unsigned int>(channel, nEvents));
     }
     if (klmChannel.getSubdetector() == KLMElementNumbers::c_EKLM) {
       channelsEKLM.push_back(
-        std::pair<uint16_t, unsigned int>(channel, nEvents));
+        std::pair<KLMChannelNumber, unsigned int>(channel, nEvents));
     }
   }
   std::sort(channelsBKLM.begin(), channelsBKLM.end(), compareEventNumber);

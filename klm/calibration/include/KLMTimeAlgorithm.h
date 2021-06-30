@@ -248,29 +248,29 @@ namespace Belle2 {
      * @param[out] delayError Delay error.
      */
     void timeDistance2dFit(
-      const std::vector< std::pair<uint16_t, unsigned int> >& channels,
+      const std::vector< std::pair<KLMChannelNumber, unsigned int> >& channels,
       double& delay, double& delayError);
 
     /**
      * Container of hit information.
      * the global element number of the strip is used as the key.
      */
-    std::map<uint16_t, std::vector<struct Event> > m_evts;
+    std::map<KLMChannelNumber, std::vector<struct Event> > m_evts;
 
     /**
      * Calibration flag if the channel has enough hits collected and
      * fitted OK.
      */
-    std::map<uint16_t, int> m_cFlag;
+    std::map<KLMChannelNumber, int> m_cFlag;
 
     /** Shift values of ecah channel. */
-    std::map<uint16_t, double> m_timeShift;
+    std::map<KLMChannelNumber, double> m_timeShift;
 
     /** Time distribution central value of each channel. */
-    std::map<uint16_t, double> m_time_channel;
+    std::map<KLMChannelNumber, double> m_time_channel;
 
     /** Time distribution central value Error of each channel. */
-    std::map<uint16_t, double> m_etime_channel;
+    std::map<KLMChannelNumber, double> m_etime_channel;
 
     /** Lower time boundary for RPC. */
     double m_LowerTimeBoundaryRPC = -10.0;

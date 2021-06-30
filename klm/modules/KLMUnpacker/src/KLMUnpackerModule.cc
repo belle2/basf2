@@ -124,7 +124,7 @@ void KLMUnpackerModule::createDigit(
     double time = m_TimeConversion->getScintillatorTime(
                     raw->getCTime(), klmDigitEventInfo->getTriggerCTime());
     klmDigit->setTime(time);
-    uint16_t channelNumber = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
+    KLMChannelNumber channelNumber = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
     const KLMScintillatorFEEData* FEEData =
       m_FEEParameters->getFEEData(channelNumber);
     if (FEEData == nullptr)
@@ -154,7 +154,7 @@ void KLMUnpackerModule::unpackKLMDigit(
   KLMDigitRaw* klmDigitRaw;
   KLM::RawData raw(copper, hslb + 1, rawData,
                    &m_klmDigitRaws, &klmDigitRaw, m_WriteDigitRaws);
-  const uint16_t* detectorChannel;
+  const KLMChannelNumber* detectorChannel;
   int subdetector, section, sector, layer, plane, strip;
   /* Get channel groups. */
   std::vector<ChannelGroup> channelGroups;
@@ -282,7 +282,7 @@ void KLMUnpackerModule::unpackKLMDigit(
         strip = raw.getChannel();
     }
     if (m_DAQChannelModule >= 0) {
-      uint16_t klmModule =
+      KLMModuleNumber klmModule =
         m_ElementNumbers->moduleNumberByChannel(*detectorChannel);
       if (klmModule == m_DAQChannelModule)
         strip = raw.getChannel();

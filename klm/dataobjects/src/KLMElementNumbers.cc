@@ -34,7 +34,7 @@ const KLMElementNumbers& KLMElementNumbers::Instance()
   return klmElementNumbers;
 }
 
-uint16_t KLMElementNumbers::channelNumber(
+KLMChannelNumber KLMElementNumbers::channelNumber(
   int subdetector, int section, int sector, int layer, int plane,
   int strip) const
 {
@@ -47,24 +47,24 @@ uint16_t KLMElementNumbers::channelNumber(
   B2FATAL("Incorrect subdetector number: " << subdetector);
 }
 
-uint16_t KLMElementNumbers::channelNumberBKLM(
+KLMChannelNumber KLMElementNumbers::channelNumberBKLM(
   int section, int sector, int layer, int plane, int strip) const
 {
-  uint16_t channel;
+  KLMChannelNumber channel;
   channel = BKLMElementNumbers::channelNumber(
               section, sector, layer, plane, strip);
   return channel + m_BKLMOffset;
 }
 
-uint16_t KLMElementNumbers::channelNumberBKLM(int bklmChannel) const
+KLMChannelNumber KLMElementNumbers::channelNumberBKLM(int bklmChannel) const
 {
   return bklmChannel + m_BKLMOffset;
 }
 
-uint16_t KLMElementNumbers::channelNumberEKLM(
+KLMChannelNumber KLMElementNumbers::channelNumberEKLM(
   int section, int sector, int layer, int plane, int strip) const
 {
-  uint16_t channel;
+  KLMChannelNumber channel;
   /*
    * Note that the default order of elements is different
    * for EKLM-specific code!
@@ -74,29 +74,29 @@ uint16_t KLMElementNumbers::channelNumberEKLM(
   return channel;
 }
 
-uint16_t KLMElementNumbers::channelNumberEKLM(int eklmStrip) const
+KLMChannelNumber KLMElementNumbers::channelNumberEKLM(int eklmStrip) const
 {
   return eklmStrip;
 }
 
-bool KLMElementNumbers::isBKLMChannel(uint16_t channel) const
+bool KLMElementNumbers::isBKLMChannel(KLMChannelNumber channel) const
 {
   return (channel >= m_BKLMOffset);
 }
 
-bool KLMElementNumbers::isEKLMChannel(uint16_t channel) const
+bool KLMElementNumbers::isEKLMChannel(KLMChannelNumber channel) const
 {
   return (channel < m_BKLMOffset);
 }
 
-int KLMElementNumbers::localChannelNumberBKLM(uint16_t channel) const
+int KLMElementNumbers::localChannelNumberBKLM(KLMChannelNumber channel) const
 {
   if (!isBKLMChannel(channel))
     B2FATAL("Cannot get BKLM local channel number for non-BKLM channel.");
   return channel - m_BKLMOffset;
 }
 
-int KLMElementNumbers::localChannelNumberEKLM(uint16_t channel) const
+int KLMElementNumbers::localChannelNumberEKLM(KLMChannelNumber channel) const
 {
   if (!isEKLMChannel(channel))
     B2FATAL("Cannot get EKLM local channel number for non-EKLM channel.");
@@ -104,7 +104,7 @@ int KLMElementNumbers::localChannelNumberEKLM(uint16_t channel) const
 }
 
 void KLMElementNumbers::channelNumberToElementNumbers(
-  uint16_t channel, int* subdetector, int* section, int* sector, int* layer,
+  KLMChannelNumber channel, int* subdetector, int* section, int* sector, int* layer,
   int* plane, int* strip) const
 {
   int localChannel;
@@ -125,18 +125,18 @@ void KLMElementNumbers::channelNumberToElementNumbers(
   }
 }
 
-uint16_t KLMElementNumbers::planeNumberBKLM(
+KLMPlaneNumber KLMElementNumbers::planeNumberBKLM(
   int section, int sector, int layer, int plane) const
 {
-  uint16_t planeGlobal;
+  KLMPlaneNumber planeGlobal;
   planeGlobal = BKLMElementNumbers::planeNumber(section, sector, layer, plane);
   return planeGlobal + m_BKLMOffset;
 }
 
-uint16_t KLMElementNumbers::planeNumberEKLM(
+KLMPlaneNumber KLMElementNumbers::planeNumberEKLM(
   int section, int sector, int layer, int plane) const
 {
-  uint16_t planeGlobal;
+  KLMPlaneNumber planeGlobal;
   /*
    * Note that the default order of elements is different
    * for EKLM-specific code!
@@ -146,7 +146,7 @@ uint16_t KLMElementNumbers::planeNumberEKLM(
   return planeGlobal;
 }
 
-uint16_t KLMElementNumbers::moduleNumber(
+KLMModuleNumber KLMElementNumbers::moduleNumber(
   int subdetector, int section, int sector, int layer) const
 {
   if (subdetector == c_BKLM)
@@ -155,18 +155,18 @@ uint16_t KLMElementNumbers::moduleNumber(
     return moduleNumberEKLM(section, sector, layer);
 }
 
-uint16_t KLMElementNumbers::moduleNumberBKLM(
+KLMModuleNumber KLMElementNumbers::moduleNumberBKLM(
   int section, int sector, int layer) const
 {
-  uint16_t module;
+  KLMModuleNumber module;
   module = BKLMElementNumbers::moduleNumber(section, sector, layer);
   return module + m_BKLMOffset;
 }
 
-uint16_t KLMElementNumbers::moduleNumberEKLM(
+KLMModuleNumber KLMElementNumbers::moduleNumberEKLM(
   int section, int sector, int layer) const
 {
-  uint16_t module;
+  KLMModuleNumber module;
   /*
    * Note that the default order of elements is different
    * for EKLM-specific code!
@@ -175,7 +175,8 @@ uint16_t KLMElementNumbers::moduleNumberEKLM(
   return module;
 }
 
-uint16_t KLMElementNumbers::moduleNumberByChannel(uint16_t channel) const
+KLMModuleNumber KLMElementNumbers::moduleNumberByChannel(
+  KLMChannelNumber channel) const
 {
   int subdetector, section, sector, layer, plane, strip;
   channelNumberToElementNumbers(channel, &subdetector, &section, &sector,
@@ -184,7 +185,7 @@ uint16_t KLMElementNumbers::moduleNumberByChannel(uint16_t channel) const
 }
 
 void KLMElementNumbers::moduleNumberToElementNumbers(
-  uint16_t module, int* subdetector, int* section, int* sector,
+  KLMModuleNumber module, int* subdetector, int* section, int* sector,
   int* layer) const
 {
   int localModule;
@@ -205,7 +206,7 @@ void KLMElementNumbers::moduleNumberToElementNumbers(
   }
 }
 
-unsigned int KLMElementNumbers::getNChannelsModule(uint16_t module) const
+unsigned int KLMElementNumbers::getNChannelsModule(KLMModuleNumber module) const
 {
   if (isBKLMChannel(module)) {
     int localModule = localChannelNumberBKLM(module);
@@ -219,16 +220,18 @@ unsigned int KLMElementNumbers::getNChannelsModule(uint16_t module) const
   }
 }
 
-uint16_t KLMElementNumbers::sectorNumberBKLM(int section, int sector) const
+KLMSectorNumber KLMElementNumbers::sectorNumberBKLM(
+  int section, int sector) const
 {
-  uint16_t sect;
+  KLMSectorNumber sect;
   sect = BKLMElementNumbers::sectorNumber(section, sector);
   return sect + m_BKLMOffset;
 }
 
-uint16_t KLMElementNumbers::sectorNumberEKLM(int section, int sector) const
+KLMSectorNumber KLMElementNumbers::sectorNumberEKLM(
+  int section, int sector) const
 {
-  uint16_t sect;
+  KLMSectorNumber sect;
   sect = m_eklmElementNumbers->sectorNumberKLMOrder(section, sector);
   return sect;
 }

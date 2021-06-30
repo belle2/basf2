@@ -11,6 +11,7 @@
 #pragma once
 
 /* KLM headers. */
+#include <klm/dataobjects/KLMElementNumberDefinitions.h>
 #include <klm/dbobjects/KLMScintillatorFEEData.h>
 
 /* ROOT headers. */
@@ -44,18 +45,18 @@ namespace Belle2 {
      * @param[in] strip Strip (channel) number.
      * @param[in] data  Scintillator FEE data.
      */
-    void setFEEData(uint16_t strip, KLMScintillatorFEEData* data);
+    void setFEEData(KLMChannelNumber strip, KLMScintillatorFEEData* data);
 
     /**
      * Get scintillator FEE data.
      * @param[in] strip Strip (channel) number.
      */
-    const KLMScintillatorFEEData* getFEEData(uint16_t strip) const;
+    const KLMScintillatorFEEData* getFEEData(KLMChannelNumber strip) const;
 
   private:
 
     /** Scintillator FEE parameters. */
-    std::map<uint16_t, KLMScintillatorFEEData> m_FEEParameters;
+    std::map<KLMChannelNumber, KLMScintillatorFEEData> m_FEEParameters;
 
     /** Class version. */
     ClassDef(Belle2::KLMScintillatorFEEParameters, 1);

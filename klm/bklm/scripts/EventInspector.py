@@ -1597,7 +1597,7 @@ class EventInspector(basf2.Module):
                             self.hist_mappedSectorOccupancy.Fill(sectorFB)
                         if isRPC:
                             self.hist_RPCTimeLowBitsBySector.Fill(sectorFB, (tdc & 3))
-                            tCal = int(tdc - trigCtime - self.t0RPC[axis][sectorFB][lane-6]) & 0x03ff  # in ns, range 0..1023
+                            tCal = int(tdc - trigCtime - self.t0RPC[axis][sectorFB][lane - 6]) & 0x03ff  # in ns, range 0..1023
                             if j == 0:
                                 self.hist_tdcRangeRPC.Fill(tdcRangeRPC)
                                 self.hist_ctimeRangeRPC.Fill(ctimeRangeRPC)
@@ -1620,7 +1620,7 @@ class EventInspector(basf2.Module):
                                 self.hist_mappedRPCPhiTimePerLayer[sectorFB][lane - 6].Fill(t)
                         elif isScint:
                             self.hist_ScintTimeLowBitsBySector.Fill(sectorFB, (tdc & 3))
-                            ctCal = int((ctime << 3) - trigCtime - self.ct0Scint[1-axis][sectorFB][lane-1]) & 0x03ff  # in ns
+                            ctCal = int((ctime << 3) - trigCtime - self.ct0Scint[1 - axis][sectorFB][lane - 1]) & 0x03ff  # in ns
                             if abs(ctCal - self.ct0Cal) < 50:
                                 self.hist_mappedChannelOccupancyPrompt[sectorFB][1 - axis].Fill(lane, channel)
                             else:

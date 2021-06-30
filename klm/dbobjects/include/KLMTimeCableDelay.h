@@ -10,6 +10,9 @@
 
 #pragma once
 
+/* KLM headers. */
+#include <klm/dataobjects/KLMElementNumberDefinitions.h>
+
 /* ROOT headers. */
 #include <TObject.h>
 
@@ -41,13 +44,13 @@ namespace Belle2 {
      * @param[in] channel   Channel number.
      * @param[in] timeDelay Time calibration constant.
      */
-    void setTimeDelay(uint16_t channel, float timeDelay);
+    void setTimeDelay(KLMChannelNumber channel, float timeDelay);
 
     /**
      * Get the time calibration constant.
      * @param[in] channel Channel number.
      */
-    float getTimeDelay(uint16_t channel) const;
+    float getTimeDelay(KLMChannelNumber channel) const;
 
     /**
      * Clear the time calibration constants.
@@ -57,7 +60,7 @@ namespace Belle2 {
   private:
 
     /** Map of the time calibration constants. */
-    std::map<uint16_t, float> m_timeDelay;
+    std::map<KLMChannelNumber, float> m_timeDelay;
 
     /** Class version. */
     ClassDef(KLMTimeCableDelay, 1);

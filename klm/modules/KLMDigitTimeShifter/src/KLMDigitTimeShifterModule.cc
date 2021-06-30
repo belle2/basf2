@@ -43,7 +43,7 @@ void KLMDigitTimeShifterModule::beginRun()
 void KLMDigitTimeShifterModule::event()
 {
   for (KLMDigit& digit : m_Digits) {
-    uint16_t channel = digit.getUniqueChannelID();
+    KLMChannelNumber channel = digit.getUniqueChannelID();
     float digitTimeShifted = digit.getTime() - m_TimeDelay->getTimeDelay(channel);
     digit.setTime(digitTimeShifted);
   }

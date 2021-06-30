@@ -24,7 +24,7 @@ BKLMElementNumbers::~BKLMElementNumbers()
 {
 }
 
-uint16_t BKLMElementNumbers::channelNumber(
+KLMChannelNumber BKLMElementNumbers::channelNumber(
   int section, int sector, int layer, int plane, int strip)
 {
   checkChannelNumber(section, sector, layer, plane, strip);
@@ -36,7 +36,7 @@ uint16_t BKLMElementNumbers::channelNumber(
 }
 
 void BKLMElementNumbers::channelNumberToElementNumbers(
-  uint16_t channel, int* section, int* sector, int* layer, int* plane,
+  KLMChannelNumber channel, int* section, int* sector, int* layer, int* plane,
   int* strip)
 {
   *section = ((channel & BKLM_SECTION_MASK) >> BKLM_SECTION_BIT);
@@ -46,7 +46,7 @@ void BKLMElementNumbers::channelNumberToElementNumbers(
   *strip = ((channel & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1;
 }
 
-uint16_t BKLMElementNumbers::planeNumber(
+KLMPlaneNumber BKLMElementNumbers::planeNumber(
   int section, int sector, int layer, int plane)
 {
   checkSection(section);
@@ -60,7 +60,7 @@ uint16_t BKLMElementNumbers::planeNumber(
 }
 
 void BKLMElementNumbers::planeNumberToElementNumbers(
-  uint16_t planeGlobal, int* section, int* sector, int* layer, int* plane)
+  KLMPlaneNumber planeGlobal, int* section, int* sector, int* layer, int* plane)
 {
   *section = ((planeGlobal & BKLM_SECTION_MASK) >> BKLM_SECTION_BIT);
   *sector = ((planeGlobal & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1;
@@ -68,7 +68,8 @@ void BKLMElementNumbers::planeNumberToElementNumbers(
   *plane = ((planeGlobal & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT);
 }
 
-uint16_t BKLMElementNumbers::moduleNumber(int section, int sector, int layer, bool fatalError)
+KLMModuleNumber BKLMElementNumbers::moduleNumber(
+  int section, int sector, int layer, bool fatalError)
 {
   checkSection(section);
   checkSector(sector, fatalError);
@@ -79,14 +80,14 @@ uint16_t BKLMElementNumbers::moduleNumber(int section, int sector, int layer, bo
 }
 
 void BKLMElementNumbers::moduleNumberToElementNumbers(
-  uint16_t module, int* section, int* sector, int* layer)
+  KLMModuleNumber module, int* section, int* sector, int* layer)
 {
   *section = ((module & BKLM_SECTION_MASK) >> BKLM_SECTION_BIT);
   *sector = ((module & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1;
   *layer = ((module & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1;
 }
 
-uint16_t BKLMElementNumbers::sectorNumber(int section, int sector)
+KLMSectorNumber BKLMElementNumbers::sectorNumber(int section, int sector)
 {
   checkSection(section);
   checkSector(sector);

@@ -285,13 +285,14 @@ namespace Belle2 {
      * @param[in] averageHitsActiveSector
      * Average number of hits per active sector.
      */
-    void calibrateSector(uint16_t sector, double averageHitsActiveSector);
+    void calibrateSector(KLMSectorNumber sector,
+                         double averageHitsActiveSector);
 
     /**
      * Calibrate module.
      * @param[in] module Module number.
      */
-    void calibrateModule(uint16_t module);
+    void calibrateModule(KLMModuleNumber module);
 
     /**
      * Mark hot channel.
@@ -300,14 +301,14 @@ namespace Belle2 {
      * @param[in] activeChannels Number of active channels in this module.
      * @return True if the channel is marked as hot.
      */
-    bool markHotChannel(uint16_t channel, unsigned int moduleHits,
+    bool markHotChannel(KLMChannelNumber channel, unsigned int moduleHits,
                         int activeChannels);
 
     /**
      * Calibrate channel.
      * @param[in] channel Channel number.
      */
-    void calibrateChannel(uint16_t channel);
+    void calibrateChannel(KLMChannelNumber channel);
 
     /**
      * Whether the calibration is forced (calibrate even for

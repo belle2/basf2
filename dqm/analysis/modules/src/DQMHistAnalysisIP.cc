@@ -92,7 +92,6 @@ void DQMHistAnalysisIPModule::beginRun()
 
   if (hh1 == NULL) {
     B2DEBUG(20, "Histo " << m_histoname << " not in memfile");
-    // the following code sux ... is there no root function for that?
     TDirectory* d = gROOT;
     TString myl = m_histoname;
     TString tok;
@@ -142,7 +141,6 @@ void DQMHistAnalysisIPModule::event()
   hh1 = findHist(m_histoname.c_str());
   if (hh1 == NULL) {
     B2DEBUG(20, "Histo " << m_histoname << " not in memfile");
-    // the following code sux ... is there no root function for that?
     TDirectory* d = gROOT;
     TString myl = m_histoname;
     TString tok;

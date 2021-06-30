@@ -11,6 +11,9 @@
 /* Own header. */
 #include <klm/modules/KLMDigitTimeShifter/KLMDigitTimeShifterModule.h>
 
+/** C++ headers. */
+#include <cstdint>
+
 using namespace Belle2;
 
 REG_MODULE(KLMDigitTimeShifter)
@@ -40,7 +43,7 @@ void KLMDigitTimeShifterModule::beginRun()
 void KLMDigitTimeShifterModule::event()
 {
   for (KLMDigit& digit : m_Digits) {
-    unsigned int channel = digit.getUniqueChannelID();
+    uint16_t channel = digit.getUniqueChannelID();
     float digitTimeShifted = digit.getTime() - m_TimeDelay->getTimeDelay(channel);
     digit.setTime(digitTimeShifted);
   }

@@ -11,11 +11,6 @@
 
 #include <TObject.h>
 
-#include <framework/database/DBObjPtr.h>
-#include <framework/dbobjects/HardwareClockSettings.h>
-#include <mdst/dbobjects/TTDOffsets.h>
-
-
 namespace Belle2 {
   /**
    * Storage element for information from the Trigger Timing Distribution (TTD)
@@ -126,10 +121,6 @@ namespace Belle2 {
 
     /// This number is defined by the FTSW to indicate no injection happened recently
     static const unsigned int c_flagNoInjection = 0x7FFFFFFF; //! tells ROOT not to write it to file (transient)
-    /// The clock, to translate clock ticks to microseconds
-    DBObjPtr<HardwareClockSettings> m_clockSettings; //! tells ROOT not to write it to file (transient)
-    /// The TTDOffsets to derive actual timing and bunch numbers from TTD Info
-    DBObjPtr<TTDOffsets> m_ttdOffsets; //! tells ROOT not to write it to file (transient)
 
     ClassDef(EventLevelTriggerTimeInfo, 1) ///< Storage element for TTD information
   };

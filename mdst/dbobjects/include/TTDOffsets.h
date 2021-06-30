@@ -17,9 +17,7 @@ namespace Belle2 {
   public:
 
     /** default constructor
-     * IP position at the nominal origin
-     * error on the position 0 in all directions
-     * Luminous region size set to 0 in all directions
+     *  all offsets set to 0, use corresponding setters
      */
     TTDOffsets():
       m_injectionDelayHER(0), m_injectionDelayLER(0),

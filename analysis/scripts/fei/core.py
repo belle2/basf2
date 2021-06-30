@@ -485,7 +485,8 @@ class PostReconstruction:
             if particle.postCutConfig.value > 0.0:
                 cutstring = str(particle.postCutConfig.value) + ' < extraInfo(SignalProbability)'
 
-            ma.copyLists(particle.identifier, [c.name for c in particle.channels], writeOut=True, path=path)
+            ma.mergeListsWithBestDuplicate(particle.identifier, [c.name for c in particle.channels],
+                                           variable='particleSource', writeOut=True, path=path)
 
             if self.config.monitor:
                 hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)',

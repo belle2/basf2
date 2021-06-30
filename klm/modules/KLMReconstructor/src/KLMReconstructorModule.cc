@@ -67,6 +67,7 @@ KLMReconstructorModule::KLMReconstructorModule() :
   m_CoincidenceWindow(0),
   m_PromptTime(0),
   m_PromptWindow(0),
+  m_EventT0Value(0.),
   m_ElementNumbers(&(KLMElementNumbers::Instance())),
   m_bklmGeoPar(nullptr),
   m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
@@ -78,6 +79,8 @@ KLMReconstructorModule::KLMReconstructorModule() :
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("TimeCableDelayCorrection", m_TimeCableDelayCorrection,
            "Perform cable delay time correction (true) or not (false).", false);
+  addParam("EventT0Correction", m_EventT0Correction,
+           "Perform EventT0 correction (true) or not (false)", true);
   addParam("IfAlign", m_bklmIfAlign,
            "Perform alignment correction (true) or not (false).",
            bool(true));
@@ -98,6 +101,8 @@ KLMReconstructorModule::~KLMReconstructorModule()
 void KLMReconstructorModule::initialize()
 {
   m_Digits.isRequired();
+  if (m_EventT0Correction)
+    m_EventT0.isRequired();
   /* BKLM. */
   m_bklmHit1ds.registerInDataStore();
   m_bklmHit2ds.registerInDataStore();
@@ -120,8 +125,10 @@ void KLMReconstructorModule::initialize()
 void KLMReconstructorModule::beginRun()
 {
   if (m_TimeCableDelayCorrection) {
-    if (!m_TimeConstants.isValid() || !m_TimeCableDelay.isValid())
-      B2FATAL("KLM time calibration data is not available.");
+    if (!m_TimeConstants.isValid())
+      B2FATAL("KLM time constants data are not available.");
+    if (!m_TimeCableDelay.isValid())
+      B2FATAL("KLM time cable decay data are not available.");
   }
   if (!m_ChannelStatus.isValid())
     B2FATAL("KLM channel status data are not available.");
@@ -145,6 +152,10 @@ void KLMReconstructorModule::beginRun()
 
 void KLMReconstructorModule::event()
 {
+  m_EventT0Value = 0.;
+  if (m_EventT0.isValid())
+    if (m_EventT0->hasEventT0())
+      m_EventT0Value = m_EventT0->getEventT0();
   reconstructBKLMHits();
   reconstructEKLMHits();
 }
@@ -283,6 +294,8 @@ void KLMReconstructorModule::reconstructBKLMHits()
       // The second param in localToGlobal is whether do the alignment correction (true) or not (false)
       CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift(), m_bklmIfAlign);
       double time = 0.5 * (phiTime + zTime);
+      if (m_EventT0Correction)
+        time -= m_EventT0Value;
       BKLMHit2d* hit2d = m_bklmHit2ds.appendNew(phiHit, zHit, global, time); // Also sets relation BKLMHit2d -> BKLMHit1d
       if (std::fabs(time - m_PromptTime) > m_PromptWindow)
         hit2d->isOutOfTime(true);
@@ -294,7 +307,7 @@ void KLMReconstructorModule::reconstructBKLMHits()
 void KLMReconstructorModule::reconstructEKLMHits()
 {
   int i, n;
-  double d1, d2, t, t1, t2, sd;
+  double d1, d2, time, t1, t2, sd;
   std::vector<KLMDigit*> digitVector;
   std::vector<KLMDigit*>::iterator it1, it2, it3, it4, it5, it6, it7, it8, it9;
   n = m_Digits.getEntries();
@@ -408,14 +421,16 @@ void KLMReconstructorModule::reconstructEKLMHits()
             }
             if (std::fabs(t1 - t2) > m_CoincidenceWindow)
               continue;
-            t = (t1 + t2) / 2;
+            time = (t1 + t2) / 2;
+            if (m_EventT0Correction)
+              time -= m_EventT0Value;
             EKLMHit2d* hit2d = m_eklmHit2ds.appendNew(*it8);
             hit2d->setEnergyDeposit((*it8)->getEnergyDeposit() + (*it9)->getEnergyDeposit());
             hit2d->setPosition(crossPoint.x(), crossPoint.y(), crossPoint.z());
             hit2d->setChiSq((t1 - t2) * (t1 - t2) /
                             m_eklmRecPar->getTimeResolution() /
                             m_eklmRecPar->getTimeResolution());
-            hit2d->setTime(t);
+            hit2d->setTime(time);
             hit2d->setMCTime(((*it8)->getMCTime() + (*it9)->getMCTime()) / 2);
             hit2d->addRelationTo(*it8);
             hit2d->addRelationTo(*it9);

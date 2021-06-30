@@ -15,11 +15,11 @@ class MakeRelations(Module):
         '''Initialize.'''
         #: Tracks
         self.tracks = Belle2.PyStoreArray('Tracks')
-        #: TOPLikelihoods
-        self.likelihoods = Belle2.PyStoreArray('TOPLikelihoods')
+        #: KLMClusters
+        self.clusters = Belle2.PyStoreArray('KLMClusters')
         self.tracks.registerInDataStore()
-        self.likelihoods.registerInDataStore()
-        self.tracks.registerRelationTo(self.likelihoods)
+        self.clusters.registerInDataStore()
+        self.tracks.registerRelationTo(self.clusters)
         #: Bool for flagging the first event processed.
         self.first = True
 
@@ -27,8 +27,8 @@ class MakeRelations(Module):
         '''Event.'''
         if not self.first:
             track = self.tracks.appendNew()
-            likelihood = self.likelihoods.appendNew()
-            track.addRelationTo(likelihood)
+            cluster = self.clusters.appendNew()
+            track.addRelationTo(cluster)
         self.first = False
 
 

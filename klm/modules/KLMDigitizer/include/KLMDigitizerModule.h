@@ -138,7 +138,7 @@ namespace Belle2 {
     /** Whether the simulation is channel-specific. */
     bool m_ChannelSpecificSimulation;
 
-    /** Initial digitization time in TDC periods. */
+    /** Initial digitization time in CTIME periods. */
     int m_DigitizationInitialTime;
 
     /** Save FPGA fit data (KLMScintillatorFirmwareFitResult). */

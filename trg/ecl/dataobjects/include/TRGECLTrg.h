@@ -10,8 +10,7 @@
 //-----------------------------------------------------------
 // $Log$
 //-----------------------------------------------------------
-#ifndef TRGECLTRG_H
-#define TRGECLTRG_H
+#pragma once
 
 #include <TObject.h>
 
@@ -58,7 +57,7 @@ namespace Belle2 {
     void setPRS16(double prs16) { m_prs16 = prs16; }
     //! Set Phi ring sum thetaid == 17
     void setPRS17(double prs17) { m_prs17 = prs17; }
-    //! Set Etot
+    //! Set Etot (total energy in ThetaID 2-15)
     void setEtot(double etot) { m_etot = etot; }
     //! Set Bhabha combination 01
     void setBhabha01(double bhabha01) { m_bhabha01 = bhabha01; }
@@ -275,6 +274,18 @@ namespace Belle2 {
     {
       m_EventTimingTCEnergy = vEventTimingTCEnergy;
     }
+    //! Set Etot1to17 (total energy in ThetaID 1-17)
+    void setEtot1to17(double etot1to17) { m_etot1to17 = etot1to17; }
+    //! Set taub2b bit flag
+    void setTaub2bFlag(int taub2bFlag) { m_taub2bFlag = taub2bFlag; }
+    //! Set taub2b angle flag
+    void setTaub2bAngleFlag(int taub2bAngleFlag) { m_taub2bAngleFlag = taub2bAngleFlag; }
+    //! Set taub2b total energy flag (total energy sum cut for taub2b bit)
+    void setTaub2bEtotFlag(int taub2bEtotFlag) { m_taub2bEtotFlag = taub2bEtotFlag; }
+    //! Set taub2b cluster energy cut flag
+    void setTaub2bClusterEFlag(int taub2bClusterEFlag) { m_taub2bClusterEFlag = taub2bClusterEFlag; }
+    //! set the number of cluster in all theta region (thetaID=1-17)
+    void setNofCluster1to17(int NofCluster1to17) { m_NofCluster1to17 = NofCluster1to17; }
     // Set data clock start timing (ns)
     void setDataClockWindowStartTime(double vDataClockWindowStartTime)
     {
@@ -282,7 +293,7 @@ namespace Belle2 {
     }
     //! Get No of TC Hit
     double getNofTCHit() { return m_NofTCHit; }
-    //! Get Etot
+    //! Get Etot (total energy in ThetaID 2-15)
     double getEtot() { return m_etot; }
     //! Get Event Timing
     double getEventTiming() { return m_eventtiming; }
@@ -336,7 +347,7 @@ namespace Belle2 {
     double m_prs16;
     //! theta id 16
     double m_prs17;
-    //! Etot : Total Energy Sum
+    //! Etot (total energy in ThetaID 2-15)
     double m_etot;
     //! Bhabha* (11 phi ring combination in total)
     //! Bhabha cobibation 1
@@ -467,6 +478,18 @@ namespace Belle2 {
     int m_EventTimingTCThetaId;
     // Energy of TC of event timing (GeV)
     double m_EventTimingTCEnergy;
+    // Total Energy (total energy in ThetaID 1-17)
+    double m_etot1to17;
+    // taub2b trigger flag
+    int m_taub2bFlag = 0;
+    // taub2b angle cut flag
+    int m_taub2bAngleFlag = 0;
+    // taub2b total enrgy cut flag
+    int m_taub2bEtotFlag = 0;
+    // taub2b cluster energy cut flag
+    int m_taub2bClusterEFlag = 0;
+    // the number of cluster in all thata region (theta ID=1-17)
+    int m_NofCluster1to17 = 0;
     // Start timing of data clock (ns)
     double m_DataClockWindowStartTime;
 
@@ -570,13 +593,17 @@ namespace Belle2 {
       m_EventTimingTCId = 0;
       m_EventTimingTCThetaId = 0;
       m_EventTimingTCEnergy = 0;
+      m_etot1to17 = 0;
+      m_taub2bFlag = 0;
+      m_taub2bAngleFlag = 0;
+      m_taub2bEtotFlag = 0;
+      m_taub2bClusterEFlag = 0;
+      m_NofCluster1to17 = 0;
       m_DataClockWindowStartTime = 0;
     }
     //! the class title
-    ClassDef(TRGECLTrg, 3);
+    ClassDef(TRGECLTrg, 4);
 
   };
 
 } // end namespace Belle2
-
-#endif

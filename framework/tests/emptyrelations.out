@@ -8,7 +8,7 @@
 [INFO] ============================================================================
 [INFO] Type                 Name                       #Entries           <Event>
 [INFO] EventMetaData        EventMetaData
-[INFO] TOPLikelihood[]      TOPLikelihoods             0
+[INFO] KLMCluster[]         KLMClusters                0
 [INFO] Track[]              Tracks                     0
 [INFO] 
 [INFO] ----------------------------------------------------------------------------
@@ -22,8 +22,8 @@
 [INFO] ============================================================================
 [INFO] Type                 Name                       #Entries           <Event>
 [INFO] EventMetaData        EventMetaData
-[INFO] RelationContainer    TracksToTOPLikelihoods
-[INFO] TOPLikelihood[]      TOPLikelihoods             1
+[INFO] RelationContainer    TracksToKLMClusters
+[INFO] KLMCluster[]         KLMClusters                1
 [INFO] Track[]              Tracks                     1
 [INFO] 
 [INFO] ----------------------------------------------------------------------------

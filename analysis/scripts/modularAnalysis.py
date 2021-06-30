@@ -3164,7 +3164,7 @@ def tagCurlTracks(particleLists,
     path.add_module(curlTagger)
 
 
-def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0, 0)):
+def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=False, binaryHypoPDGCodes=(0, 0)):
     """
     Use an MVA to perform particle identification for charged stable particles, using the `ChargedPidMVA` module.
 
@@ -3172,7 +3172,7 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
     containing the appropriate MVA score, which can be used to select candidates by placing a cut on it.
 
     Note:
-        The MVA algorithm used is a gradient boosted decision tree (**TMVA 4.2.1**, **ROOT 6.14/06**).
+        The MVA algorithm used is a gradient boosted decision tree (**TMVA 4.3.0**, **ROOT 6.20/04**).
 
     The module can perform either 'binary' PID between input S, B particle mass hypotheses according to the following scheme:
 
@@ -3180,14 +3180,15 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
     - mu (13) vs. pi (211)
     - pi (211) vs. K (321)
     - K (321) vs. pi (211)
-    - p (2212) vs. pi (211)
-    - d (1000010020) vs pi (211)
 
-    , or 'global' PID, namely "one-vs-others" separation. The latter makes use of an MVA algorithm trained in multi-class mode,
-    and it's the default behaviour.
+    , or 'global' PID, namely "one-vs-others" separation. The latter exploits an MVA algorithm trained in multi-class mode,
+    and it's the default behaviour. Currently, the multi-class training separates the following standard charged hypotheses:
 
-    Note:
-        Currently the MVA is charge-agnostic, i.e. the training is not done independently for +/- charged particles.
+    - e (11), mu (13), pi (211), K (321)
+
+    Warning:
+        In order to run the `ChargedPidMVA` and ensure the most up-to-date MVA training weights are applied,
+        it is necessary to append the latest analysis global tag (GT) to the steering script.
 
     Parameters:
         particleLists (list(str)): list of names of ParticleList objects for charged stable particles.
@@ -3205,31 +3206,38 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
           * c_ECL_PSD_Classification=6
           * c_ECL_PSD_Multiclass=7
 
+        chargeIndependent (bool, ``optional``): use a BDT trained on a sample of inclusively charged particles.
         binaryHypoPDGCodes (tuple(int, int), ``optional``): the pdgIds of the signal, background mass hypothesis.
           Required only for binary PID mode.
     """
 
     from ROOT import Belle2
+    from variables import variables as vm
+
+    import os
+
+    TrainingMode = Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode
+    Const = Belle2.Const
 
     plSet = set(particleLists)
 
     # Map the training mode enum value to the actual name of the payload in the GT.
     payloadNames = {
-        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Classification:
+        TrainingMode.c_Classification:
         {"mode": "Classification", "detector": "ALL"},
-        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Multiclass:
+        TrainingMode.c_Multiclass:
         {"mode": "Multiclass", "detector": "ALL"},
-        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_Classification:
+        TrainingMode.c_ECL_Classification:
         {"mode": "ECL_Classification", "detector": "ECL"},
-        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_Multiclass:
+        TrainingMode.c_ECL_Multiclass:
         {"mode": "ECL_Multiclass", "detector": "ECL"},
-        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_PSD_Classification:
+        TrainingMode.c_PSD_Classification:
         {"mode": "PSD_Classification", "detector": "ALL"},
-        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_PSD_Multiclass:
+        TrainingMode.c_PSD_Multiclass:
         {"mode": "PSD_Multiclass", "detector": "ALL"},
-        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_PSD_Classification:
+        TrainingMode.c_ECL_PSD_Classification:
         {"mode": "ECL_PSD_Classification", "detector": "ECL"},
-        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_PSD_Multiclass:
+        TrainingMode.c_ECL_PSD_Multiclass:
         {"mode": "ECL_PSD_Multiclass", "detector": "ECL"},
     }
 
@@ -3243,24 +3251,88 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
 
     payloadName = f"ChargedPidMVAWeights_{mode}"
 
-    if binaryHypoPDGCodes == (0, 0):
-        # MULTI-CLASS training mode.
+    # Map pdgIds of std charged particles to name identifiers,
+    # and binary bkg identifiers.
+    stdChargedMap = {
+        Const.electron.getPDGCode():
+        {"pName": "e", "pFullName": "electron", "pNameBkg": "pi", "pdgIdBkg": Const.pion.getPDGCode()},
+        Const.muon.getPDGCode():
+        {"pName": "mu", "pFullName": "muon", "pNameBkg": "pi", "pdgIdBkg": Const.pion.getPDGCode()},
+        Const.pion.getPDGCode():
+        {"pName": "pi", "pFullName": "pion", "pNameBkg": "K", "pdgIdBkg": Const.kaon.getPDGCode()},
+        Const.kaon.getPDGCode():
+        {"pName": "K", "pFullName": "kaon", "pNameBkg": "pi", "pdgIdBkg": Const.pion.getPDGCode()},
+        Const.proton.getPDGCode():
+        {"pName": "p", "pFullName": "proton", "pNameBkg": "pi", "pdgIdBkg": Const.pion.getPDGCode()},
+        Const.deuteron.getPDGCode():
+        {"pName": "d", "pFullName": "deuteron", "pNameBkg": "pi", "pdgIdBkg": Const.pion.getPDGCode()},
+    }
 
+    # Set aliases to be consistent with the variable names in the MVA weightfiles.
+    vm.addAlias("__event__", "evtNum")
+    iDet = 0
+    for detID in Const.PIDDetectors.c_set:
+
+        # At the moment, SVD is excluded.
+        if detID == Const.EDetector.SVD:
+            B2WARNING("The ChargedPidMVA training currently does not include the SVD.")
+            continue
+
+        detName = Const.parseDetectors(detID)
+
+        for pdgIdSig, info in stdChargedMap.items():
+
+            if binaryHypoPDGCodes == (0, 0):
+
+                pFullName = info["pFullName"]
+
+                # MULTI-CLASS training mode.
+                # Aliases for sub-detector likelihood ratios.
+                alias = f"{pFullName}ID_{detName}"
+                orig = f"pidProbabilityExpert({pdgIdSig}, {detName})"
+                vm.addAlias(alias, orig)
+                # Aliases for Log-transformed sub-detector likelihood ratios.
+                epsilon = 1e-8  # To avoid singularities due to limited numerical precision.
+                alias_trf = f"{pFullName}ID_{detName}_LogTransfo"
+                orig_trf = f"formula(-1. * log10(formula(((1. - {orig}) + {epsilon}) / ({orig} + {epsilon}))))"
+                vm.addAlias(alias_trf, orig_trf)
+                # Create only once an alias for the Log-transformed likelihood ratio for all detectors combination.
+                # This is just a spectator, but it needs to be defined still..
+                if iDet == 0:
+                    alias_trf = f"{pFullName}ID_LogTransfo"
+                    orig_trf = f"formula(-1. * log10(formula(((1. - {pFullName}ID) + {epsilon}) / ({pFullName}ID + {epsilon}))))"
+                    vm.addAlias(alias_trf, orig_trf)
+
+            else:
+
+                pName, pNameBkg, pdgIdBkg = info["pName"], info["pNameBkg"], info["pdgIdBkg"]
+
+                # BINARY training mode.
+                # Aliases for deltaLL(s, b) of sub-detectors.
+                alias = f"deltaLogL_{pName}_{pNameBkg}_{detName}"
+                orig = f"pidDeltaLogLikelihoodValueExpert({pdgIdSig}, {pdgIdBkg}, {detName})"
+                vm.addAlias(alias, orig)
+                # Create only once an alias for deltaLL(s, b) for all detectors combination.
+                # This is just a spectator, but it needs to be defined still..
+                if iDet == 0:
+                    alias = f"deltaLogL_{pName}_{pNameBkg}_ALL"
+                    orig = f"pidDeltaLogLikelihoodValueExpert({pdgIdSig}, {pdgIdBkg}, ALL)"
+                    vm.addAlias(alias, orig)
+
+        iDet += 1
+
+    if binaryHypoPDGCodes == (0, 0):
+
+        # MULTI-CLASS training mode.
         chargedpid = register_module("ChargedPidMVAMulticlass")
         chargedpid.set_name(f"ChargedPidMVAMulticlass_{mode}")
 
     else:
-        # BINARY training mode.
 
+        # BINARY training mode.
         # In binary mode, enforce check on input S, B hypotheses compatibility.
-        binaryOpts = [
-            (Belle2.Const.electron.getPDGCode(), Belle2.Const.pion.getPDGCode()),
-            (Belle2.Const.muon.getPDGCode(), Belle2.Const.pion.getPDGCode()),
-            (Belle2.Const.pion.getPDGCode(), Belle2.Const.kaon.getPDGCode()),
-            (Belle2.Const.kaon.getPDGCode(), Belle2.Const.pion.getPDGCode()),
-            (Belle2.Const.proton.getPDGCode(), Belle2.Const.pion.getPDGCode()),
-            (Belle2.Const.deuteron.getPDGCode(), Belle2.Const.pion.getPDGCode())
-        ]
+
+        binaryOpts = [(pdgIdSig, info["pdgIdBkg"]) for pdgIdSig, info in stdChargedMap.items()]
 
         if binaryHypoPDGCodes not in binaryOpts:
             B2FATAL("No charged pid MVA was trained to separate ", binaryHypoPDGCodes[0], " vs. ", binaryHypoPDGCodes[1],
@@ -3273,8 +3345,8 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
         chargedpid.param("bkgHypoPDGCode", binaryHypoPDGCodes[1])
 
     chargedpid.param("particleLists", list(plSet))
-
     chargedpid.param("payloadName", payloadName)
+    chargedpid.param("chargeIndependent", chargeIndependent)
 
     # Ensure the module knows whether we are using ECL-only training mode.
     if detector == "ECL":

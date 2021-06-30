@@ -197,6 +197,9 @@ namespace Belle2 {
         return m_ZScintPositions[scint];
       }
 
+      //! Get scintillator length.
+      double getStripLength(int plane, int strip) const;
+
       //! Convert 2D strip position (0..nStrips along each axis) to local coordinates
       const CLHEP::Hep3Vector getLocalPosition(double phiStripAve, double zStripAve) const;
 
@@ -208,6 +211,11 @@ namespace Belle2 {
       //! Version for scintillators.
       double getPropagationDistance(const CLHEP::Hep3Vector& local,
                                     int strip, bool phiReadout) const;
+
+      //! Convert local coordinates to signal-propagation distance (cm)
+      //! Version for scintillators.
+      const CLHEP::Hep3Vector getPropagationDistance(
+        const CLHEP::Hep3Vector&, int stripZ, int stripPhi) const;
 
       //! Convert local coordinates to signal-propagation time (ns)
       //! Version for RPCs.

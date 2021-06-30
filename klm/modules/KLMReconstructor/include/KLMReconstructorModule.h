@@ -18,9 +18,9 @@
 #include <klm/dataobjects/eklm/EKLMAlignmentHit.h>
 #include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <klm/dataobjects/KLMDigit.h>
-#include <klm/dbobjects/eklm/EKLMReconstructionParameters.h>
 #include <klm/dbobjects/KLMTimeCableDelay.h>
 #include <klm/dbobjects/KLMTimeConstants.h>
+#include <klm/dbobjects/KLMTimeResolution.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMTimeWindow.h>
 #include <klm/eklm/geometry/GeometryData.h>
@@ -154,6 +154,9 @@ namespace Belle2 {
     /** KLM time cable delay. */
     OptionalDBObjPtr<KLMTimeCableDelay> m_TimeCableDelay;
 
+    /** KLM time resolution. */
+    OptionalDBObjPtr<KLMTimeResolution> m_TimeResolution;
+
     /** Channel status. */
     DBObjPtr<KLMChannelStatus> m_ChannelStatus;
 
@@ -196,9 +199,6 @@ namespace Belle2 {
 
     /** Transformation data. */
     EKLM::TransformData* m_eklmTransformData;
-
-    /** Reconstruction parameters. */
-    DBObjPtr<EKLMReconstructionParameters> m_eklmRecPar;
 
     /** EKLM 2d hits. */
     StoreArray<EKLMHit2d> m_eklmHit2ds;

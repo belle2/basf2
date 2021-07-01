@@ -106,6 +106,7 @@ void DQMHistAnalysisOutputMonObjModule::endRun()
   time_t ts = lastEvtMeta->getTime() / 1e9;
   struct tm* timeinfo;
   timeinfo = localtime(&ts);
+  // cppcheck-suppress asctimeCalled
   m_metaData->setRunDate(asctime(timeinfo));
 
   m_metaData->Write();

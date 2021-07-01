@@ -124,3 +124,6 @@ Standard Particle Lists
 
  * The selection criteria of the pi0 standard particle lists have been updated from the January 2020 to the May 2020
    recommendations.
+ * Defined new `stdCharged.stdE` and `stdCharged.stdMu` lepton lists, based on uniform target efficiency selection working points.
+   Available both for likelihood-ratio based PID selection and new BDT-based selection, both global and binary (:math:`\ell` vs. :math:`\pi`).
+   These are recommended for analysis once correction factors payloads become available.

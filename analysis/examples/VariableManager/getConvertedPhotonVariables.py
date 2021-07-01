@@ -4,11 +4,11 @@
 # @cond
 
 """
-This script loads specified input ROOT file, reconstructs photon conversions and
-saves converted-photon variables and their generator-level counterparts for comparison.
+This script loads a specified input ROOT file, reconstructs photon conversions and
+saves converted-photon variables and some of their generator-level counterparts for comparison.
 
 Execute script with:
-  $> basf2 printMCParticleArray.py -i [input_ROOT_file]
+  $> basf2 getConvertedPhotonVariables -i [input_ROOT_file]
 """
 
 import basf2 as b2

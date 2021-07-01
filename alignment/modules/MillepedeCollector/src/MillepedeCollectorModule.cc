@@ -1408,7 +1408,7 @@ std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getTwoBodyToLocalTransfo
 
     B2Vector3D dpdtheta = R * B2Vector3D(sign * c1 * cos(theta) * cos(phi),
                                          sign * c1 * cos(theta) * sin(phi),
-                                         p / 2. + sign * c2 * (- sin(phi)));
+                                         sign * c2 * (- sin(theta)));
 
 
     B2Vector3D dpdphi = R * B2Vector3D(sign * c1 * sin(theta) * (- sin(phi)),

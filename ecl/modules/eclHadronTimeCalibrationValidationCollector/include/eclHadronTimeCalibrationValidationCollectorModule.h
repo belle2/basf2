@@ -2,6 +2,9 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
+ * Select photons from a hadronic event selection to be used as a         *
+ * validation of the ECL timing calibration.                              *
+ *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors:                                                          *
  *    Ewan Hill                                                           *
@@ -78,8 +81,8 @@ namespace Belle2 {
     /**
      * Output tree with detailed event data.
      */
-    TTree* m_dbg_tree_photonClusters ;
-    TTree* m_dbg_tree_event ;
+    TTree* m_dbg_tree_photonClusters ;    /**< debug output tree for per electron cluster*/
+    TTree* m_dbg_tree_event ;     /**< debug output tree for per event*/
 
     /*** tree branches ***/
     /*** See inDefineHisto method for branches description ***/
@@ -95,24 +98,25 @@ namespace Belle2 {
     double m_tree_t0 = -1;   /**< EventT0 (not from ECL) for debug TTree output */
     double m_tree_t0_unc = -1;   /**< EventT0 uncertainty for debug TTree output */
 
-    int m_NtightTracks = -1;
-    int m_NphotonClusters = -1;
-    int m_NGoodClusters = -1;
+    int m_NtightTracks = -1;       /**< Number of tight tracks */
+    int m_NphotonClusters = -1;    /**< Number of photon clusters */
+    int m_NGoodClusters = -1;      /**< Number of good clusters */
 
     /*** tree branches END ***/
 
     std::vector<float> m_EperCrys ; /**< ECL Cal digit energy for each crystal */
 
 
+    double m_E_photon_clust = -1;    /**< Photon cluster energy*/
+
     /****** Parameters for cuts ******/
     short m_timeAbsMax ; /**< Events with abs(time) > m_timeAbsMax are excluded, mostly for histogram x-range purposes*/
 
-    double m_looseTrkZ0 ;
-    double m_tightTrkZ0 ;
-    double m_looseTrkD0 ;
-    double m_tightTrkD0 ;
+    double m_looseTrkZ0 ;   /**< Loose track z0 minimum cut*/
+    double m_tightTrkZ0 ;   /**< Tight track z0 minimum cut*/
+    double m_looseTrkD0 ;   /**< Loose track d0 minimum cut*/
+    double m_tightTrkD0 ;   /**< Tight track d0 minimum cut*/
 
-    double m_E_photon_clust = -1;
 
   } ;
 }

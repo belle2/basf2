@@ -2,6 +2,12 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
+ * A code to collect just the calibration constants to be then plotted    *
+ * by the algorithm to see how much they jump from run to run.  This      *
+ * collector does not need to look at individual events as the            *
+ * calibration constants are constant over all the events in a single     *
+ * file (run or bucket of data).                                          *
+ *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors:                                                          *
  *    Ewan Hill                                                           *
@@ -68,7 +74,7 @@ namespace Belle2 {
     DBObjPtr<ECLReferenceCrystalPerCrateCalib> m_RefCrystalsCalibDB; /**< database object */
     std::vector<short> m_RefCrystalsCalib; /**< vector obtained from DB object */
 
-    StoreObjPtr<EventMetaData> m_evtMetaData;
+    StoreObjPtr<EventMetaData> m_evtMetaData;    /**< Event meta data */
 
     /*** tree branches ***/
     double m_crateTimeConst = -1;         /**< crate time constant in ticks */
@@ -90,7 +96,7 @@ namespace Belle2 {
                                           several runs.  Different initial value
                                           from the current run number variable. */
 
-    const int NUM_CRYSTALS = 8736;
+    const int NUM_CRYSTALS = 8736;    /**< Number of crystals in the ECL */
 
   };
 }

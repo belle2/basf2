@@ -1,13 +1,16 @@
 # EventType: 4120004015
 # Descriptor: [vpho_pi0pi0Y1S_PHSP]
-# NickName: vpho_pi0pi0Y1S_PHSP 
+# NickName: vpho_pi0pi0Y1S_PHSP
 # Cuts: None
-# Documentation: 
+# Documentation:
 # PhysicsWG: Bottomonium
 # Tested: Yes
 # Responsible: Bryan Fulsom
 # Email: bryan.fulsom@pnnl.gov
 # Date: 20170223
+#
+# June 2021 Automated: Converted PYTHIA ids
+#   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
 
 Decay vpho
 1.0 pi0 pi0 Upsilon PHSP;
@@ -17,12 +20,12 @@ Decay Upsilon
 0.023800000 e+ e- PHOTOS VLL; #[Reconstructed PDG2011]
 0.024800000 mu+ mu- PHOTOS VLL; #[Reconstructed PDG2011]
 0.026000000 tau+ tau- VLL; #[Reconstructed PDG2011]
-0.008700000 d anti-d PYTHIA 32; #[Reconstructed PDG2011], all qqbar have been corrected to 1/4 ratio
-0.034900000 u anti-u PYTHIA 32; #[Reconstructed PDG2011]
-0.008700000 s anti-s PYTHIA 32; #[Reconstructed PDG2011]
-0.034900000 c anti-c PYTHIA 32; #[Reconstructed PDG2011]
-0.816000000 g g g PYTHIA 4; #[Reconstructed PDG2011] PDG says: 0.817
-0.022000000 gamma g g PYTHIA 4; #[Reconstructed PDG2011] PDG says: 0.022
+0.008700000 d anti-d PYTHIA 91; #[Reconstructed PDG2011], all qqbar have been corrected to 1/4 ratio
+0.034900000 u anti-u PYTHIA 91; #[Reconstructed PDG2011]
+0.008700000 s anti-s PYTHIA 91; #[Reconstructed PDG2011]
+0.034900000 c anti-c PYTHIA 91; #[Reconstructed PDG2011]
+0.816000000 g g g PYTHIA 92; #[Reconstructed PDG2011] PDG says: 0.817
+0.022000000 gamma g g PYTHIA 92; #[Reconstructed PDG2011] PDG says: 0.022
 Enddecay
 
 End

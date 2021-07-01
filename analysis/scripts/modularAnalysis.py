@@ -3505,6 +3505,22 @@ def correctEnergyBias(inputListNames, tableName, path=None):
     path.add_module(correctenergybias)
 
 
+def addPhotonEfficiencyRatioVariables(inputListNames, tableName, path=None):
+    """
+    Add photon Data/MC detection efficiency ratio weights to the specified particle list
+
+    Parameters:
+        inputListNames (list(str)): input particle list names
+        tableName : taken from database with appropriate name
+        path (basf2.Path): module is added to this path
+    """
+
+    photon_efficiency_correction = register_module('PhotonEfficiencySystematics')
+    photon_efficiency_correction.param('particleLists', inputListNames)
+    photon_efficiency_correction.param('tableName', tableName)
+    path.add_module(photon_efficiency_correction)
+
+
 def getAnalysisGlobaltag(timeout=180) -> str:
     """
     Returns a string containing the name of the latest and recommended analysis globaltag.

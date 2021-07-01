@@ -192,7 +192,7 @@ bool KLMReconstructorModule::isNormal(const KLMDigit* digit) const
   int layer = digit->getLayer();
   int plane = digit->getPlane();
   int strip = digit->getStrip();
-  uint16_t channel = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
+  KLMChannelNumber channel = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
   enum KLMChannelStatus::ChannelStatus status = m_ChannelStatus->getChannelStatus(channel);
   if (status == KLMChannelStatus::c_Unknown)
     B2FATAL("Incomplete KLM channel status data.");
@@ -205,7 +205,7 @@ void KLMReconstructorModule::reconstructBKLMHits()
 {
   /* Construct BKLMHit1Ds from KLMDigits. */
   /* Sort KLMDigits by module and strip number. */
-  std::map<uint16_t, int> channelDigitMap;
+  std::map<KLMChannelNumber, int> channelDigitMap;
   for (int index = 0; index < m_Digits.getEntries(); ++index) {
     const KLMDigit* digit = m_Digits[index];
     if (digit->getSubdetector() != KLMElementNumbers::c_BKLM)
@@ -217,21 +217,21 @@ void KLMReconstructorModule::reconstructBKLMHits()
     if (m_IgnoreHotChannels && !isNormal(digit))
       continue;
     if (digit->inRPC() || digit->isGood()) {
-      uint16_t channel = BKLMElementNumbers::channelNumber(
-                           digit->getSection(), digit->getSector(),
-                           digit->getLayer(), digit->getPlane(),
-                           digit->getStrip());
-      channelDigitMap.insert(std::pair<uint16_t, int>(channel, index));
+      KLMChannelNumber channel = BKLMElementNumbers::channelNumber(
+                                   digit->getSection(), digit->getSector(),
+                                   digit->getLayer(), digit->getPlane(),
+                                   digit->getStrip());
+      channelDigitMap.insert(std::pair<KLMChannelNumber, int>(channel, index));
     }
   }
   if (channelDigitMap.empty())
     return;
   std::vector<const KLMDigit*> digitCluster;
-  uint16_t previousChannel = channelDigitMap.begin()->first;
+  KLMChannelNumber previousChannel = channelDigitMap.begin()->first;
   double averageTime = m_Digits[channelDigitMap.begin()->second]->getTime();
   if (m_TimeCableDelayCorrection)
     correctCableDelay(averageTime, m_Digits[channelDigitMap.begin()->second]);
-  for (std::map<uint16_t, int>::iterator it = channelDigitMap.begin(); it != channelDigitMap.end(); ++it) {
+  for (std::map<KLMChannelNumber, int>::iterator it = channelDigitMap.begin(); it != channelDigitMap.end(); ++it) {
     const KLMDigit* digit = m_Digits[it->second];
     double digitTime = digit->getTime();
     if (m_TimeCableDelayCorrection)

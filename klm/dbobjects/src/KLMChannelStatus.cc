@@ -29,22 +29,22 @@ KLMChannelStatus::~KLMChannelStatus()
 }
 
 enum KLMChannelStatus::ChannelStatus
-KLMChannelStatus::getChannelStatus(uint16_t channel) const {
-  std::map<uint16_t, enum ChannelStatus>::const_iterator it;
+KLMChannelStatus::getChannelStatus(KLMChannelNumber channel) const {
+  std::map<KLMChannelNumber, enum ChannelStatus>::const_iterator it;
   it = m_ChannelStatus.find(channel);
   if (it == m_ChannelStatus.end())
     return c_Unknown;
   return it->second;
 }
 
-void KLMChannelStatus::setChannelStatus(uint16_t channel,
+void KLMChannelStatus::setChannelStatus(KLMChannelNumber channel,
                                         enum ChannelStatus status)
 {
-  std::map<uint16_t, enum ChannelStatus>::iterator it;
+  std::map<KLMChannelNumber, enum ChannelStatus>::iterator it;
   it = m_ChannelStatus.find(channel);
   if (it == m_ChannelStatus.end()) {
     m_ChannelStatus.insert(
-      std::pair<uint16_t, enum ChannelStatus>(channel, status));
+      std::pair<KLMChannelNumber, enum ChannelStatus>(channel, status));
   } else {
     it->second = status;
   }
@@ -57,7 +57,7 @@ void KLMChannelStatus::setStatusAllChannels(enum ChannelStatus status)
     setChannelStatus(klmChannel.getKLMChannelNumber(), status);
 }
 
-int KLMChannelStatus::getActiveStripsInModule(uint16_t module) const
+int KLMChannelStatus::getActiveStripsInModule(KLMChannelNumber module) const
 {
   int active;
   int subdetector, section, sector, layer;
@@ -78,7 +78,7 @@ int KLMChannelStatus::getActiveStripsInModule(uint16_t module) const
   klmChannel.setIndexLevel(KLMChannelIndex::c_IndexLevelStrip);
   active = 0;
   for (; klmChannel != klmNextModule; ++klmChannel) {
-    uint16_t channel = klmChannel.getKLMChannelNumber();
+    KLMChannelNumber channel = klmChannel.getKLMChannelNumber();
     ChannelStatus status = getChannelStatus(channel);
     if (status == c_Unknown)
       B2FATAL("Incomplete KLM channel data.");
@@ -92,7 +92,7 @@ bool KLMChannelStatus::operator==(KLMChannelStatus& status)
 {
   if (this->m_ChannelStatus.size() != status.m_ChannelStatus.size())
     return false;
-  std::map<uint16_t, enum ChannelStatus>::iterator it, it2;
+  std::map<KLMChannelNumber, enum ChannelStatus>::iterator it, it2;
   it = this->m_ChannelStatus.begin();
   it2 = status.m_ChannelStatus.begin();
   while (it != this->m_ChannelStatus.end()) {
@@ -111,7 +111,7 @@ unsigned int KLMChannelStatus::newNormalChannels(KLMChannelStatus& status)
   unsigned int channels = 0;
   if (this->m_ChannelStatus.size() != status.m_ChannelStatus.size())
     return 0;
-  std::map<uint16_t, enum ChannelStatus>::iterator it, it2;
+  std::map<KLMChannelNumber, enum ChannelStatus>::iterator it, it2;
   it = this->m_ChannelStatus.begin();
   it2 = status.m_ChannelStatus.begin();
   while (it != this->m_ChannelStatus.end()) {

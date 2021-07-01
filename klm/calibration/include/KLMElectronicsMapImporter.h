@@ -136,7 +136,7 @@ namespace Belle2 {
     const KLMElementNumbers* m_ElementNumbers;
 
     /** Data for creation of the electronics map. */
-    std::map<uint16_t, KLMElectronicsChannel> m_ChannelMap;
+    std::map<KLMChannelNumber, KLMElectronicsChannel> m_ChannelMap;
 
     /** Low experiment. */
     int m_ExperimentLow = 0;

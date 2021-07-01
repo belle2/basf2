@@ -106,10 +106,10 @@ namespace Belle2 {
      * TDC period (stored here because getting it from m_HardwareClockSettings
      * requires to search in a map).
      */
-    double m_TDCPeriod;
+    double m_TDCPeriod = 0.;
 
     /** CTIME period. */
-    double m_CTimePeriod;
+    double m_CTimePeriod = 0.;
 
   };
 

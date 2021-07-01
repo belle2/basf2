@@ -22,6 +22,7 @@ copyright_statement_python = copyright_statement_C.replace('*', '#').replace('/'
 # Regular expressions for finding the copyright statement
 re_copyright_C = re.compile('/\\*{50}.*Author:\\s*The Belle II Collaboration.*\\*{50}/\n', re.DOTALL)
 re_copyright_python = re.compile('#{50}.*Author:\\s*The Belle II Collaboration.*#{50}\n', re.DOTALL)
+re_shebang = re.compile('^#!.*\n(#.*\n)*')
 
 
 def get_argument_parser():
@@ -68,7 +69,11 @@ if __name__ == "__main__":
         else:
             if arguments.update_only:
                 continue
-            new_text = copyright_statement + text
+            if text[:2] == '#!':
+                shebang = re_shebang.search(text)
+                new_text = shebang.group(0) + '\n' + copyright_statement + text[shebang.end():]
+            else:
+                new_text = copyright_statement + text
 
         if new_text == text:
             continue

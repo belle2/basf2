@@ -11,7 +11,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
 
 
@@ -38,7 +38,11 @@ namespace Belle2 {
 
     /// Name of the StoreObject to access the event level tracking information
     std::string m_eventLevelTrackingInfoName = "EventLevelTrackingInfo";
+
     /// StoreObject to access the event level tracking information
     StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
+
+    /// Used to check if the object already exists (we need the object already during svd/pxd reconstruction)
+    bool m_createNewObj = false;
   };
 }

@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
-"""Calibration of KLM channel status."""
+"""
+Calibration of KLM channel status. It provides calibration constants for the KLMChannelStatus
+database object.
+"""
 
 import collections
 

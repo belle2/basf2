@@ -236,6 +236,18 @@ namespace Belle2 {
       m_flagBlock.set(c_pxdckfAbortion);
     }
 
+    /** Getter for flag indicating that the SVD Space Point Creator was aborted due to very busy event. */
+    bool hasSVDSpacePointCreatorAbortionFlag() const
+    {
+      return m_flagBlock[c_svdSpacePointAbortion];
+    }
+
+    /** Setter for flag indicating that the SVD Space Point Creator was aborted due to very busy event. */
+    void setSVDSpacePointCreatorAbortionFlag()
+    {
+      m_flagBlock.set(c_svdSpacePointAbortion);
+    }
+
   private:
     /** Enum to specify meaning of bits in m_flagBlock bitset. */
     enum ETrackingErrorFlags {
@@ -243,6 +255,7 @@ namespace Belle2 {
       c_vxdtf2Abortion   = 1, /**< Indicating abortion of the VXDTF2 due to high combinatorics in the event. */
       c_svdckfAbortion   = 2, /**< Indicating abortion of the SVD CKF due to high combinatorics in the event. */
       c_pxdckfAbortion   = 3, /**< Indicating abortion of the PXD CKF due to high combinatorics in the event. */
+      c_svdSpacePointAbortion   = 4, /**< Indicating abortion of the SVD Space Point Creator due to very busy event. */
     };
 
     /** Number of hits in the CDC, that were not assigned to any Track.

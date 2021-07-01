@@ -47,6 +47,7 @@ void PXDSpacePointCreatorModule::initialize()
   // prepare all store- and relationArrays:
   m_spacePoints.registerInDataStore(m_spacePointsName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
   m_pxdClusters.isRequired(m_pxdClustersName);
+  m_eventLevelTrackingInfo.isOptional();
 
 
   //Relations to cluster objects only if the ancestor relations exist:
@@ -66,6 +67,13 @@ void PXDSpacePointCreatorModule::initialize()
 
 void PXDSpacePointCreatorModule::event()
 {
+  // Abort in case SVDSpacePointCreator was aborted (high occupancy events)
+  // as we do not add PXD hits to CDC standalone tracks
+  if (m_eventLevelTrackingInfo.isValid()) {
+    if (m_eventLevelTrackingInfo->hasSVDSpacePointCreatorAbortionFlag()) {
+      return;
+    }
+  }
 
   for (unsigned int i = 0; i < uint(m_pxdClusters.getEntries()); ++i) {
     const PXDCluster* currentCluster = m_pxdClusters[i];

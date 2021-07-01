@@ -11,8 +11,10 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
+#include <mdst/dataobjects/EventLevelTrackingInfo.h>
 
 #include <string>
 
@@ -67,6 +69,8 @@ namespace Belle2 {
     StoreArray<SpacePoint>
     m_spacePoints; /**< the storeArray for spacePoints as member, is faster than recreating link for each event */
 
+    StoreObjPtr<EventLevelTrackingInfo>
+    m_eventLevelTrackingInfo; /**< StoreObject to access the event level tracking information */
 
     // modification parameters
     std::string

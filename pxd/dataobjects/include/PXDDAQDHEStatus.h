@@ -21,7 +21,7 @@ namespace Belle2 {
   /** tuple of Chip ID (2 bit), Row (10 bit), Common Mode (6 bit) */
   typedef std::tuple<uint8_t, uint16_t, uint8_t> PXDDAQDHPComMode;
   using Belle2::PXD::PXDError::PXDErrorFlags;
-  using Belle2::PXD::PXDError::EPXDErrMask;
+  using Belle2::PXD::PXDError::EPXDErrNr;
 
   /**
    * The PXD DAQ DHE Status class
@@ -45,7 +45,7 @@ namespace Belle2 {
      * @param tg Trigger Gate (Start Row, Trigger Offset)
      * @param fn (absolute) Readout Frame Number, lower bits only
      */
-    PXDDAQDHEStatus(VxdID id, int dheid, PXDErrorFlags mask, unsigned short tg,
+    PXDDAQDHEStatus(VxdID id, int dheid, const PXDErrorFlags& mask, unsigned short tg,
                     unsigned short fn) : m_errorMask(mask), m_critErrorMask(0), m_usable(true), m_sensorID(id), m_dheID(dheid),
       m_triggerGate(tg), m_frameNr(fn), m_dhp_found_mask(0), m_rawCount(0), m_redCount(0), m_errorinfo(0)
     {}
@@ -60,13 +60,12 @@ namespace Belle2 {
 
     /** Mark Data in DHE as Unusable
      */
-    void markUnusable() { m_usable = false; m_errorMask |= EPXDErrMask::c_UNUSABLE_DATA;}
+    void markUnusable() { m_usable = false; m_errorMask[EPXDErrNr::c_nrUNUSABLE_DATA] = true;}
 
     /** Set Error bit mask
      * @param m Bit Mask to set
      */
-    void setErrorMask(PXDErrorFlags m) { m_errorMask = m; }
-
+    void setErrorMask(const PXDErrorFlags& mask) { m_errorMask = mask; }
     /** Return Error bit mask
      * @return bit mask
      */
@@ -75,7 +74,7 @@ namespace Belle2 {
     /** Set Critical Error bit mask
      * @param m Bit Mask to set
      */
-    void setCritErrorMask(PXDErrorFlags m) { m_critErrorMask = m; }
+    void setCritErrorMask(const PXDErrorFlags& mask) { m_critErrorMask = mask; }
 
     /** Return Critical Error bit mask
      * @return bit mask
@@ -87,7 +86,7 @@ namespace Belle2 {
      * the PXD data from this DHE is not usable for analysis
      * TODO Maybe this decision needs improvement.
      */
-    void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0ull && (m_errorMask & EPXDErrMask::c_UNUSABLE_DATA) == 0ull;}
+    void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == PXDErrorFlags(0) && !m_errorMask[EPXDErrNr::c_nrUNUSABLE_DATA];}
 
     /** Set VxdID and DHE ID of sensor */
     void setDHEID(VxdID id, int dheid) { m_sensorID = id; m_dheID = dheid;};
@@ -196,7 +195,7 @@ namespace Belle2 {
     std::vector < PXDDAQDHPComMode> m_commode;
 
     /** necessary for ROOT */
-    ClassDef(PXDDAQDHEStatus, 7);
+    ClassDef(PXDDAQDHEStatus, 8);
 
   }; // class PXDDAQDHEStatus
 

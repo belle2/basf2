@@ -63,6 +63,14 @@ Variables
    to these variables contains more than one Particle, only the first one in the list will be considered.
  * New **temporary** convenience PID variables :b2:var:`electronID_noTOP`, :b2:var:`binaryPID_noTOP` (where any input hypothesis must be that of an electron)
    are defined in such a way to exclude the TOP completely. These are expected to recover electron identification performance with respect to the standard PID variables, which are affected by buggy electron TOP PDFs in release 5.
+ * Added new variables that are derived from the TriggerTimeDistribution (TTD), i.e. variables related to trigger and injections.
+   So far, only available for actual data or if BGOverlay from data was used.
+   The variables related to triggering are :b2:var:`timeSincePrevTriggerClockTicks` (in 127MHz=RF/4) and :b2:var:`timeSincePrevTriggerMicroSeconds`, :b2:var:`triggeredBunchNumberTTD` (bunch number as provided by TTD) and :b2:var:`triggeredBunchNumber` ('global' bunch number of SKB).
+   The variables related to injections are :b2:var:`hasRecentInjection` (to see if an injection actually happened recently), :b2:var:`injectionInHER` (injection in HER/LER), and
+   :b2:var:`timeSinceLastInjectionSignalClockTicks` (in 127MHz=RF/4) and :b2:var:`timeSinceLastInjectionSignalMicroSeconds`
+   (please note, there is an offset between this time of the injection pre-kick signal and the actual injection, which is also different for HER/LER).
+   'Corrected' variables taking this offset into account are :b2:var:`timeSinceLastInjectionClockTicks` (in 127MHz=RF/4) and :b2:var:`timeSinceLastInjectionMicroSeconds`.
+   Finally, :b2:var:`revolutionCounter2` returns the lowest bit of the revolution counter (even or odd), which is mostly interesting for PXD (full read out of PXD takes about 2 revolutions).
 
 Modules
 +++++++

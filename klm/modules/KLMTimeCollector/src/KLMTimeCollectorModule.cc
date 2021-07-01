@@ -470,14 +470,14 @@ void KLMTimeCollectorModule::collectRPC(RelationVector<BKLMHit2d>& bklmHit2ds)
   }
 }
 
-std::pair<ExtHit*, ExtHit*> KLMTimeCollectorModule::matchExt(uint16_t kID,
-    std::multimap<unsigned int, ExtHit>& v_ExtHits)
+std::pair<ExtHit*, ExtHit*> KLMTimeCollectorModule::matchExt(
+  KLMChannelNumber channelID, std::multimap<unsigned int, ExtHit>& v_ExtHits)
 {
   ExtHit* entryHit = nullptr;
   ExtHit* exitHit = nullptr;
   std::multimap<unsigned int, ExtHit>::iterator it, itlow, itup;
-  itlow = v_ExtHits.lower_bound(kID);
-  itup = v_ExtHits.upper_bound(kID);
+  itlow = v_ExtHits.lower_bound(channelID);
+  itup = v_ExtHits.upper_bound(channelID);
 
   for (it = itlow; it != itup; ++it) {
     if (entryHit == nullptr) {

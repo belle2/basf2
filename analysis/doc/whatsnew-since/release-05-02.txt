@@ -61,6 +61,16 @@ Variables
  * Added new variables :b2:var:`useParticleRestFrame` and :b2:var:`useRecoilParticleRestFrame` for computing variables in the
    rest frame of a given Particle (or in the rest frame of the recoiling system of a given Particle). If the ParticleList passed
    to these variables contains more than one Particle, only the first one in the list will be considered.
+ * New **temporary** convenience PID variables :b2:var:`electronID_noTOP`, :b2:var:`binaryPID_noTOP` (where any input hypothesis must be that of an electron)
+   are defined in such a way to exclude the TOP completely. These are expected to recover electron identification performance with respect to the standard PID variables, which are affected by buggy electron TOP PDFs in release 5.
+ * Added new variables that are derived from the TriggerTimeDistribution (TTD), i.e. variables related to trigger and injections.
+   So far, only available for actual data or if BGOverlay from data was used.
+   The variables related to triggering are :b2:var:`timeSincePrevTriggerClockTicks` (in 127MHz=RF/4) and :b2:var:`timeSincePrevTriggerMicroSeconds`, :b2:var:`triggeredBunchNumberTTD` (bunch number as provided by TTD) and :b2:var:`triggeredBunchNumber` ('global' bunch number of SKB).
+   The variables related to injections are :b2:var:`hasRecentInjection` (to see if an injection actually happened recently), :b2:var:`injectionInHER` (injection in HER/LER), and
+   :b2:var:`timeSinceLastInjectionSignalClockTicks` (in 127MHz=RF/4) and :b2:var:`timeSinceLastInjectionSignalMicroSeconds`
+   (please note, there is an offset between this time of the injection pre-kick signal and the actual injection, which is also different for HER/LER).
+   'Corrected' variables taking this offset into account are :b2:var:`timeSinceLastInjectionClockTicks` (in 127MHz=RF/4) and :b2:var:`timeSinceLastInjectionMicroSeconds`.
+   Finally, :b2:var:`revolutionCounter2` returns the lowest bit of the revolution counter (even or odd), which is mostly interesting for PXD (full read out of PXD takes about 2 revolutions).
 
 Modules
 +++++++
@@ -110,6 +120,9 @@ Modules
  * Added a `EnergyBiasCorrection` module, sub-percent correction only applied to E of photons not on clusterE and should only
    be applied on data. `correctEnergyBias` is a corresponding wrapper function.
  * The `ChargedPidMVA` and `ChargedPidMVAMulticlass` modules now apply by default charge-dependent BDT training for particle identification. The charge-independent training can be used optionally.
+ * Added a `PhotonEfficiencySystematics` module which adds photon detection efficiency Data/MC ratios, systematic, statistical and total uncertainties
+   as variables in extrainfo to a given photon list. Ratios can only added for particles in photon lists. `addPhotonEfficiencyRatioVariables` is
+   a corresponding wrapper function.
 
 Full Event Interpretation
 +++++++++++++++++++++++++
@@ -124,3 +137,6 @@ Standard Particle Lists
 
  * The selection criteria of the pi0 standard particle lists have been updated from the January 2020 to the May 2020
    recommendations.
+ * Defined new `stdCharged.stdE` and `stdCharged.stdMu` lepton lists, based on uniform target efficiency selection working points.
+   Available both for likelihood-ratio based PID selection and new BDT-based selection, both global and binary (:math:`\ell` vs. :math:`\pi`).
+   These are recommended for analysis once correction factors payloads become available.

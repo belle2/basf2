@@ -2,10 +2,10 @@
 
 # Import bunch structure payload for master GT.
 # Create payload taking information from the RunDB.
-# Usage: basf2 DBBunchStructureImporter.py <username> <minexp> <minrun> <maxexp> <maxrun>
+# Usage: basf2 DBBunchStructureImporter.py <minexp> <minrun> <maxexp> <maxrun>
 #
 # if minexp is 0 the designed filling patter will be created. Meaning 10101010...
-# if minexp is 1003 the early phase 3 pattern will be created. Meaning 1001001001..
+# if minexp is 1003 the early phase 3 pattern will be created. Take the most used filling pattern.
 
 from ROOT import Belle2
 from rundb import RunDB
@@ -20,7 +20,6 @@ def fill(fillPatternHex, firstExp, firstRun, lastExp, lastRun):
         return
 
     bunches = Belle2.BunchStructure()
-
     fillPatternBin = bin(int(fillPatternHex, 16))
     fillPatternBin = fillPatternBin.replace('0b', '')
 
@@ -56,11 +55,16 @@ else:
 
 
 if(minexp == "0"):
-
     bunches = Belle2.BunchStructure()
 
+    extraStep = 0
     for b in range(0, 5120, 2):
-        bunches.setBucket(b)
+
+        # Shift of 1 bunch every 300 bunches to simulate bunch trains
+        if((b % 300 == 0) & (b != 0)):
+            extraStep += 1
+
+        bunches.setBucket(b + extraStep)
 
     iov = Belle2.IntervalOfValidity(0, 0, 0, -1)
 
@@ -68,15 +72,23 @@ if(minexp == "0"):
     db.storeData("BunchStructure", bunches, iov)
 
 elif(minexp == "1003"):
-    bunches = Belle2.BunchStructure()
 
-    for b in range(0, 5120, 3):
-        bunches.setBucket(b)
+    username = input("Enter your username: ")
+    rundb = RunDB(username=username)
 
-    iov = Belle2.IntervalOfValidity(1003, 0, 1003, -1)
+    runInfo = rundb.get_run_info(
+        min_experiment=12,
+        max_experiment=12,
+        min_run=1859,
+        max_run=1859,
+        run_type='physics',
+        expand=True
+    )
 
-    db = Belle2.Database.Instance()
-    db.storeData("BunchStructure", bunches, iov)
+    for it in runInfo:
+        pattern = it['ler']['fill_pattern']
+    fill(pattern, 1003, 0, 1003, -1)
+
 
 else:
     username = input("Enter your username: ")
@@ -91,26 +103,52 @@ else:
         expand=True
     )
 
-current_pattern = None
-current_start = None, None
-current_end = None, None
+    current_pattern = None
+    current_start = None, None
+    current_end = None, None
 
-for it in runInfo:
+    lumiMax = 0
+    runExpMaxBegin = 0
+    runExpMaxEnd = 0
 
-    exprun = it['experiment'], it['run']
-    pattern = it['ler']['fill_pattern']
+    lumi = 0
+    for it in runInfo:
+        exprun = it['experiment'], it['run']
+        pattern = it['ler']['fill_pattern']
 
-    # pattern different to previous one or first run
-    if pattern != current_pattern:
-        # close the last iov if any
-        fill(current_pattern, *current_start, *current_end)
-        # and remember new values
-        current_pattern = pattern
-        current_start = exprun
-        current_end = exprun
-    else:
-        # pattern unchanged, extend current iov
-        current_end = exprun
+        if(pattern == ""):
+            continue
 
-# close the last iov if any
-fill(current_pattern, *current_start, *current_end)
+        # pattern different to previous one or first run
+        if pattern != current_pattern:
+
+            if(lumi > lumiMax):
+                runExpMaxBegin = current_start
+                runExpMaxEnd = current_end
+                lumiMax = lumi
+
+            # close the iov
+            fill(current_pattern, *current_start, *current_end)
+            if current_pattern is not None:
+                print(f"Corresponding to {lumi/1000.:.2f} pb-1\n")
+
+            # and remember new values
+            current_pattern = pattern
+            current_start = exprun
+            current_end = exprun
+
+            lumi = it['statistics']['lumi_recorded']
+
+        else:
+            # pattern unchanged, extend current iov
+            current_end = exprun
+            lumi += it['statistics']['lumi_recorded']
+
+    # close the last iov if any
+    fill(current_pattern, *current_start, *current_end)
+    print(f"Corresponding to {lumi/1000.:.2f} pb-1\n")
+
+    print(
+        f"Most used filling pattern:\niov: \
+        {runExpMaxBegin[0]},{runExpMaxBegin[1]},{runExpMaxEnd[0]},{runExpMaxEnd[1]} \
+        \nIntegrated luminosity: {lumiMax/1000:.2f} pb-1")

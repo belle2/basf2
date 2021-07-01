@@ -30,6 +30,7 @@
 #include <mdst/dataobjects/KLMCluster.h>
 
 #include <framework/dataobjects/EventT0.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 // database
 #include <framework/database/DBObjPtr.h>
@@ -550,6 +551,204 @@ namespace Belle2 {
       }
     }
 
+    double timeSincePrevTriggerClockTicks(const Particle*)
+    {
+      StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;
+
+      // Check if the pointer is valid
+      if (!TTDInfo.isValid()) {
+        B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
+      // And check if the stored data is valid
+      if (TTDInfo->isValid()) {
+        return TTDInfo->getTimeSincePrevTrigger();
+      } else {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double timeSincePrevTriggerMicroSeconds(const Particle*)
+    {
+      StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;
+
+      // Check if the pointer is valid
+      if (!TTDInfo.isValid()) {
+        B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
+      // And check if the stored data is valid
+      if (TTDInfo->isValid()) {
+        return TTDInfo->getTimeSincePrevTriggerInMicroSeconds();
+      } else {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double triggeredBunchNumberTTD(const Particle*)
+    {
+      StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;
+
+      // Check if the pointer is valid
+      if (!TTDInfo.isValid()) {
+        B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
+      // And check if the stored data is valid
+      if (TTDInfo->isValid()) {
+        return TTDInfo->getBunchNumber();
+      } else {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double triggeredBunchNumber(const Particle*)
+    {
+      StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;
+
+      // Check if the pointer is valid
+      if (!TTDInfo.isValid()) {
+        B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
+      // And check if the stored data is valid
+      if (TTDInfo->isValid()) {
+        return TTDInfo->getTriggeredBunchNumberGlobal();
+      } else {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double hasRecentInjection(const Particle*)
+    {
+      StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;
+
+      // Check if the pointer is valid
+      if (!TTDInfo.isValid()) {
+        B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
+      // And check if the stored data is valid
+      if (TTDInfo->isValid()) {
+        return TTDInfo->hasInjection();
+      } else {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double timeSinceLastInjectionSignalClockTicks(const Particle*)
+    {
+      StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;
+
+      // Check if the pointer is valid
+      if (!TTDInfo.isValid()) {
+        B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
+      // And check if the stored data is valid and if an injection happened recently
+      if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
+        return TTDInfo->getTimeSinceLastInjection();
+      } else {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double timeSinceLastInjectionSignalMicroSeconds(const Particle*)
+    {
+      StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;
+
+      // Check if the pointer is valid
+      if (!TTDInfo.isValid()) {
+        B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
+      // And check if the stored data is valid and if an injection happened recently
+      if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
+        return TTDInfo->getTimeSinceLastInjectionInMicroSeconds();
+      } else {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double timeSinceLastInjectionClockTicks(const Particle*)
+    {
+      StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;
+
+      // Check if the pointer is valid
+      if (!TTDInfo.isValid()) {
+        B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
+      // And check if the stored data is valid and if an injection happened recently
+      if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
+        return TTDInfo->getTimeSinceInjectedBunch();
+      } else {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double timeSinceLastInjectionMicroSeconds(const Particle*)
+    {
+      StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;
+
+      // Check if the pointer is valid
+      if (!TTDInfo.isValid()) {
+        B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
+      // And check if the stored data is valid and if an injection happened recently
+      if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
+        return TTDInfo->getTimeSinceInjectedBunchInMicroSeconds();
+      } else {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double injectionInHER(const Particle*)
+    {
+      StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;
+
+      // Check if the pointer is valid
+      if (!TTDInfo.isValid()) {
+        B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
+      // And check if the stored data is valid and if an injection happened recently
+      if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
+        return TTDInfo->isHER();
+      } else {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double revolutionCounter2(const Particle*)
+    {
+      StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;
+
+      // Check if the pointer is valid
+      if (!TTDInfo.isValid()) {
+        B2WARNING("StoreObjPtr<EventLevelTriggerTimeInfo> does not exist, are you running over data reconstructed with release-05 or earlier?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
+      // And check if the stored data is valid
+      if (TTDInfo->isValid()) {
+        return TTDInfo->isRevo2();
+      } else {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
 
     VARIABLE_GROUP("Event");
 
@@ -665,6 +864,55 @@ Returns NaN for data.
 
 .. tip::
   Use eventTimeSeconds + eventTimeSecondsFractionRemainder to get the total event time in seconds.
+)DOC");
+
+    REGISTER_VARIABLE("timeSincePrevTriggerClockTicks", timeSincePrevTriggerClockTicks,
+                      "[Eventbased] Time since the previous trigger in clock ticks (127MHz=RF/4 clock).");
+
+    REGISTER_VARIABLE("timeSincePrevTriggerMicroSeconds", timeSincePrevTriggerMicroSeconds,
+                      "[Eventbased] Time since the previous trigger in micro seconds.");
+
+    REGISTER_VARIABLE("triggeredBunchNumberTTD", triggeredBunchNumberTTD, R"DOC(
+[Eventbased] Number of triggered bunch ranging from 0-1279.
+
+.. warning:: This is the bunch number as provided by the TTD, which does not necessarily correspond to the 'global' SKB bunch number.
+.. note:: There are a maximum of 5120 buckets, which could each carry one bunch of e+/e-, but we only have 1280 clock ticks (=5120/4) to identify the bunches.
+)DOC");
+
+    REGISTER_VARIABLE("triggeredBunchNumber", triggeredBunchNumber, R"DOC(
+[Eventbased] Number of triggered bunch ranging from 0-1279.
+
+.. note:: There are a maximum of 5120 buckets, which could each carry one bunch of e+/e-, but we only have 1280 clock ticks (=5120/4) to identify the bunches
+)DOC");
+
+    REGISTER_VARIABLE("hasRecentInjection", hasRecentInjection,
+                      "[Eventbased] Returns 1 if an injection happened recently, 0 otherwise.");
+
+    REGISTER_VARIABLE("timeSinceLastInjectionSignalClockTicks", timeSinceLastInjectionSignalClockTicks, R"DOC(
+[Eventbased] Time since the last injection pre-kick signal in clock ticks (127MHz=RF/4 clock)
+
+.. warning:: this returns the time without the delay until the injected bunch reaches the detector (which differs for HER/LER)
+)DOC");
+
+    REGISTER_VARIABLE("timeSinceLastInjectionSignalMicroSeconds", timeSinceLastInjectionSignalMicroSeconds, R"DOC(
+[Eventbased] Time since the last injection pre-kick signal in micro seconds
+
+.. warning:: this returns the time without the delay until the injected bunch reaches the detector (which differs for HER/LER)
+)DOC");
+
+    REGISTER_VARIABLE("timeSinceLastInjectionClockTicks", timeSinceLastInjectionClockTicks,
+      "[Eventbased] Time since the last injected bunch passed by the detector in micro seconds.")
+
+    REGISTER_VARIABLE("timeSinceLastInjectionMicroSeconds", timeSinceLastInjectionMicroSeconds,
+      "[Eventbased] Time since the last injected bunch passed by the detector in micro seconds.")
+
+    REGISTER_VARIABLE("injectionInHER", injectionInHER,
+                  "[Eventbased] Returns 1 if injection was in HER, 0 otherwise.");
+
+    REGISTER_VARIABLE("revolutionCounter2", revolutionCounter2, R"DOC(
+[Eventbased] The lowest bit of revolution counter, i.e. return 0 or 1
+
+.. note:: related to PXD data acquisition; PXD needs ~2 revolutions to read out one frame
 )DOC");
 
     VARIABLE_GROUP("EventKinematics");

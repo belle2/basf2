@@ -755,7 +755,7 @@ void GeometryPar::readAlignmentFromDB()
   KLMChannelIndex bklmModules(KLMChannelIndex::c_IndexLevelLayer);
   for (KLMChannelIndex bklmModule = bklmModules.beginBKLM();
        bklmModule != bklmModules.endBKLM(); ++bklmModule) {
-    uint16_t module = bklmModule.getKLMModuleNumber();
+    KLMModuleNumber module = bklmModule.getKLMModuleNumber();
     const KLMAlignmentData* alignmentData =
       bklmAlignment->getModuleAlignment(module);
     if (alignmentData == nullptr)
@@ -785,7 +785,7 @@ void GeometryPar::readDisplacedGeoFromDB()
   KLMChannelIndex bklmModules(KLMChannelIndex::c_IndexLevelLayer);
   for (KLMChannelIndex bklmModule = bklmModules.beginBKLM();
        bklmModule != bklmModules.endBKLM(); ++bklmModule) {
-    uint16_t module = bklmModule.getKLMModuleNumber();
+    KLMModuleNumber module = bklmModule.getKLMModuleNumber();
     const KLMAlignmentData* displacementData =
       bklmDisplacement->getModuleAlignment(module);
     if (displacementData == nullptr)

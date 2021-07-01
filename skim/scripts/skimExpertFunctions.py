@@ -413,6 +413,11 @@ class BaseSkim(ABC):
     validation dataset (see documentation for `basf2.find_file`).
     """
 
+    mc = True
+    """
+    Include Monte Carlo quantities in skim output.
+    """
+
     @property
     @abstractmethod
     def __description__(self):
@@ -445,6 +450,7 @@ class BaseSkim(ABC):
         additionalDataDescription=None,
         udstOutput=True,
         validation=False,
+        mc=True,
     ):
         """Initialise the BaseSkim class.
 
@@ -455,12 +461,14 @@ class BaseSkim(ABC):
             udstOutput (bool): If True, add uDST output to the path.
             validation (bool): If True, build lists and write validation histograms
                 instead of writing uDSTs.
+            mc (bool): If True, include MC quantities in output.
         """
         self.name = self.__class__.__name__
         self.OutputFileName = OutputFileName
         self.additionalDataDescription = additionalDataDescription
         self._udstOutput = udstOutput
         self._validation = validation
+        self.mc = mc
         self.SkimLists = []
 
     def load_standard_lists(self, path):
@@ -755,6 +763,7 @@ class BaseSkim(ABC):
             skimParticleLists=self.SkimLists,
             outputFile=self.OutputFileName,
             dataDescription=self.additionalDataDescription,
+            mc=self.mc,
             path=path,
         )
         summaryOfLists(self.SkimLists, path=path)
@@ -817,6 +826,7 @@ class CombinedSkim(BaseSkim):
             mdst_kwargs=None,
             CombinedSkimName="CombinedSkim",
             OutputFileName=None,
+            mc=None,
     ):
         """Initialise the CombinedSkim class.
 
@@ -832,6 +842,7 @@ class CombinedSkim(BaseSkim):
             CombinedSkimName (str): Sets output of ``__str__`` method of this combined skim.
             OutputFileName (str): If mdstOutput=True, this option sets the name of the combined output file.
                 If mdstOutput=False, this option does nothing.
+            mc (bool): If True, include MC quantities in output.
         """
 
         if NoisyModules is None:
@@ -858,9 +869,17 @@ class CombinedSkim(BaseSkim):
             for skim in self:
                 skim._udstOutput = udstOutput
 
+        self.mc = mc
+        if mc is not None:
+            for skim in self:
+                skim.mc = mc
+
         self._mdstOutput = mdstOutput
         self.mdst_kwargs = mdst_kwargs or {}
         self.mdst_kwargs.update(OutputFileName=OutputFileName)
+
+        if mc is not None:
+            self.mdst_kwargs.update(mc=mc)
 
         self.merge_data_structures()
 

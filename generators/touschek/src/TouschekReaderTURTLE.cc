@@ -14,7 +14,6 @@
 #include <framework/gearbox/Unit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/tokenizer.hpp>
@@ -69,7 +68,7 @@ int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph& graph)
     tokenizer tokens(currLine, sep);
 
     int index = 0;
-    BOOST_FOREACH(const string & tok, tokens) {
+    for (const string& tok : tokens) {
       try {
         if (index >= 7) {
           B2WARNING("This Touschek file has more than 7 fields ! Only the first 7 fields were read.");

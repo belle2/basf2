@@ -57,10 +57,10 @@ EvtGen* EvtGenInterface::createEvtGen(const std::string& DECFileName, const bool
   // Official BelleII models
   std::list<EvtDecayBase*> extraModels = EvtGenModelRegister::getModels();
 
-  //fill model list with pythia, photos etc.
-  // TODO: but keep converting pythia codes until we modified all decay files.
-  // Once that is done we should change this to false.
-  EvtExternalGenList genList(true);
+  // Fill model list with pythia, photos etc.
+  // The parameter 'false' means that Pythia codes must not be converted,
+  // since the conversion is applied to all the decfiles since release-06.
+  EvtExternalGenList genList{false};
   EvtAbsRadCorr* radCorrEngine = genList.getPhotosModel();
   list<EvtDecayBase*> modelList = genList.getListOfModels();
   extraModels.insert(extraModels.end(), modelList.begin(), modelList.end());

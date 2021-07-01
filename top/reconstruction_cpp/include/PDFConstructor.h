@@ -98,9 +98,10 @@ namespace Belle2 {
        * @param hypothesis particle hypothesis
        * @param PDFOption signal PDF construction option
        * @param storeOption signal PDF store option
+       * @param overrideMass alternative mass value to be used intestead of the one from hypothesis. Ignored if <= 0.
        */
       PDFConstructor(const TOPTrack& track, const Const::ChargedStable& hypothesis,
-                     EPDFOption PDFOption = c_Optimal, EStoreOption storeOption = c_Reduced);
+                     EPDFOption PDFOption = c_Optimal, EStoreOption storeOption = c_Reduced, double overrideMass = 0);
 
       /**
        * Checks the object status

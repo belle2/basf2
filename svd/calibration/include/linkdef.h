@@ -10,6 +10,7 @@
 #pragma link C++ class Belle2::SVDCrossTalkStripsCalibrations-; // checksum=0x6bd85b66, version=-1
 #pragma link C++ class Belle2::SVDOccupancyCalibrations-; // checksum=0xf86a6c36, version=-1
 #pragma link C++ class Belle2::SVDCoGTimeCalibrations-; // checksum=0x3c67791c, version=-1
+#pragma link C++ class Belle2::SVDCoGOnlyPositionError-;
 #pragma link C++ class Belle2::SVD3SampleCoGTimeCalibrations-; // checksum=0x8950f4e1, version=-1
 #pragma link C++ class Belle2::SVD3SampleELSTimeCalibrations-; // checksum=0x371ee746, version=-1
 #pragma link C++ class Belle2::SVDHitTimeSelection-;

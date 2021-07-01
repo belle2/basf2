@@ -27,6 +27,7 @@ namespace Belle2 {
       //apply scale factors for the position errors
       positionError = m_CoGOnlyCal.getCorrectedClusterPositionError(rawCluster.getSensorID(), rawCluster.isUSide(), rawCluster.getSize(),
                       positionError);
+
     }
 
   }  //SVD namespace

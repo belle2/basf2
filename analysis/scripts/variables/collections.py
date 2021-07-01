@@ -9,6 +9,7 @@ kinematics = ['px', 'py', 'pz', 'pt', 'p', 'E']
 
 #: Cluster-related variables
 cluster = [
+    'clusterKlId',
     'clusterPulseShapeDiscriminationMVA',
     'clusterHasPulseShapeDiscrimination',
     'clusterNumberOfHadronDigits',

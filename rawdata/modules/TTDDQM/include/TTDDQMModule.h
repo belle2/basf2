@@ -11,7 +11,7 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 #include <TH1.h>

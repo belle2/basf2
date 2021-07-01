@@ -585,10 +585,14 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   m_c_MPVSNRClusterOnTrack->cd(4);
   if (h_clusterSNR_L456V) h_clusterSNR_L456V->Draw();
 
-  float MPVClusterSNRL3U = xForMaxY(h_clusterSNR_L3U);
-  float MPVClusterSNRL3V = xForMaxY(h_clusterSNR_L3V);
-  float MPVClusterSNRL456U = xForMaxY(h_clusterSNR_L456U);
-  float MPVClusterSNRL456V = xForMaxY(h_clusterSNR_L456V);
+  float MPVClusterSNRL3U = -1;
+  if (h_clusterSNR_L3U) MPVClusterSNRL3U = xForMaxY(h_clusterSNR_L3U);
+  float MPVClusterSNRL3V = -1;
+  if (h_clusterSNR_L3V) MPVClusterSNRL3V = xForMaxY(h_clusterSNR_L3V);
+  float MPVClusterSNRL456U = -1;
+  if (h_clusterSNR_L456U) MPVClusterSNRL456U = xForMaxY(h_clusterSNR_L456U);
+  float MPVClusterSNRL456V = -1;
+  if (h_clusterSNR_L456V) MPVClusterSNRL456V = xForMaxY(h_clusterSNR_L456V);
 
   if (h_clusterSNR_L3U == NULL || h_clusterSNR_L456U == NULL) {
     B2INFO("Histograms needed for MPV cluster SNR on U side are not found");
@@ -719,8 +723,10 @@ std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::highOccupancySensor(int 
     B2DEBUG(20, "Layer out of range [3,6].");
   }
   std::vector<float> avgOffOccUV(2, 0.0);
-  avgOffOccUV[0] = hU->GetBinContent(iBin) / 768 / nEvents * 100;
-  avgOffOccUV[1] = hV->GetBinContent(iBin) / nStripsV / nEvents * 100;
+  avgOffOccUV[0] = 0;
+  if (hU) avgOffOccUV[0] = hU->GetBinContent(iBin) * 1.0 / 768 / nEvents * 100;
+  avgOffOccUV[1] = 0;
+  if (hV) avgOffOccUV[1] = hV->GetBinContent(iBin) * 1.0 / nStripsV / nEvents * 100;
   return avgOffOccUV;
 }
 

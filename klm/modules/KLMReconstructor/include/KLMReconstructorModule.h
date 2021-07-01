@@ -29,7 +29,9 @@
 /* Belle 2 headers. */
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/dataobjects/EventT0.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
 
@@ -136,11 +138,17 @@ namespace Belle2 {
     /** Perform cable delay time correction (true) or not (false). */
     bool m_TimeCableDelayCorrection;
 
+    /** Perform EventT0 correction (true) or not (false). */
+    bool m_EventT0Correction;
+
     /**
      * Use only normal and dead (for debugging) channels during 2d hit
      * reconstruction.
      */
     bool m_IgnoreHotChannels;
+
+    /** Value of the EventT0. */
+    double m_EventT0Value;
 
     /** KLM element numbers. */
     const KLMElementNumbers* m_ElementNumbers;
@@ -162,6 +170,9 @@ namespace Belle2 {
 
     /** KLM digits. */
     StoreArray<KLMDigit> m_Digits;
+
+    /** EventT0. */
+    StoreObjPtr<EventT0> m_EventT0;
 
     /* BKLM member variables. */
 

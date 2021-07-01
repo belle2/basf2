@@ -1,12 +1,9 @@
 Import('env')
 
 env['LIBS'] = [
-    'vxd',
-    'svd_dataobjects', 
     'framework',
-    'tracking',
-    'tracking_dataobjects', 
-    'mdst_dataobjects',
+    'tracking_trackFindingCDC',
+    'tracking_datcon',
     '$ROOT_LIBS']
 
 Return('env')

@@ -13,7 +13,6 @@ env['LIBS'] = [
     'cdc', 'cdc_dataobjects',
     "mva", 'mva_dataobjects',
     'mdst_dataobjects',
-    'simulation_dataobjects',
     'framework',
     'genfit2',
     '$ROOT_LIBS',

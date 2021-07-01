@@ -176,14 +176,18 @@ void AAFHInterface::setSupressionLimits(std::vector<double> limits)
 {
   if (limits.size() == 1) {
     B2WARNING("AAFH: Only one suppression limit supplied, using same value for all limits");
-    limits.resize(4, limits[0]);
-  } else if (limits.size() != 4) {
+    factor_.face = limits[0];
+    factor_.facm = limits[0];
+    factor_.facl = limits[0];
+    factor_.proc = limits[0];
+  } else if (limits.size() == 4) {
+    factor_.face = limits[0];
+    factor_.facm = limits[1];
+    factor_.facl = limits[2];
+    factor_.proc = limits[3];
+  } else {
     B2ERROR("AAFH: Wrong number of suppression limits: supply either one or 4 values");
   }
-  factor_.face = limits[0];
-  factor_.facm = limits[1];
-  factor_.facl = limits[2];
-  factor_.proc = limits[3];
 }
 
 int AAFHInterface::getMaxTries() const

@@ -4,6 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributor: Jan Strube (jan.strube@desy.de)                           *
+ *              Umberto Tamponi (tamponi@to.infn.it)                      *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -22,9 +23,15 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/dataobjects/TOPLikelihood.h>
 #include <top/dataobjects/TOPRecBunch.h>
+#include <top/dataobjects/TOPLikelihoodScanResult.h>
 
 #include <top/dataobjects/TOPBarHit.h>
 #include <mdst/dataobjects/MCParticle.h>
+
+#include <top/reconstruction_cpp/TOPRecoManager.h>
+#include <top/reconstruction_cpp/TOPTrack.h>
+#include <top/reconstruction_cpp/PDFConstructor.h>
+
 
 #include <algorithm> // for sort
 using namespace std;
@@ -527,6 +534,70 @@ namespace Belle2 {
         return topLikelihood->getLogL_p();
       }
 
+
+      double getLogLScanMass(const Particle* particle)
+      {
+        const auto* track = particle->getTrack();
+        if (!track) return -1;
+        auto scanRes = track->getRelated<TOPLikelihoodScanResult>();
+        if (!scanRes) {
+          B2WARNING("No TOPLikelihoodScanResult objcte found. Are you sure you added TOPLLScanner to the path?");
+          return -1;
+        }
+        return scanRes->getMostLikelyMass();
+      }
+
+      double getLogLScanMassUpperInterval(const Particle* particle)
+      {
+        const auto* track = particle->getTrack();
+        if (!track) return -1;
+        auto scanRes = track->getRelated<TOPLikelihoodScanResult>();
+        if (!scanRes) {
+          B2WARNING("No TOPLikelihoodScanResult object found. Are you sure you added TOPLLScanner to the path?");
+          return -1;
+        }
+        return scanRes->getMostLikelyMassIntervalUp();
+      }
+
+
+      double getLogLScanMassLowerInterval(const Particle* particle)
+      {
+        const auto* track = particle->getTrack();
+        if (!track) return -1;
+        auto scanRes = track->getRelated<TOPLikelihoodScanResult>();
+        if (!scanRes) {
+          B2WARNING("No TOPLikelihoodScanResult object found. Are you sure you added TOPLLScanner to the path?");
+          return -1;
+        }
+        return scanRes->getMostLikelyMassIntervalLow();
+      }
+
+      double getLogLScanThreshold(const Particle* particle)
+      {
+        const auto* track = particle->getTrack();
+        if (!track) return -1;
+        auto scanRes = track->getRelated<TOPLikelihoodScanResult>();
+        if (!scanRes) {
+          B2WARNING("No TOPLikelihoodScanResult objcte found. Are you sure you added TOPLLScanner to the path?");
+          return -1;
+        }
+        return scanRes->getThreshold();
+      }
+
+
+      double getLogLScanExpectedSignalPhotons(const Particle* particle)
+      {
+        const auto* track = particle->getTrack();
+        if (!track) return -1;
+        auto scanRes = track->getRelated<TOPLikelihoodScanResult>();
+        if (!scanRes) {
+          B2WARNING("No TOPLikelihoodScanResult objcte found. Are you sure you added TOPLLScanner to the path?");
+          return -1;
+        }
+        return scanRes->getMostLikelySignalPhotonCount();
+      }
+
+
       //---------------- TOPRecBunch related --------------------
 
       //! @returns whether the rec bunch is reconstructed
@@ -693,6 +764,16 @@ namespace Belle2 {
                       "[calibration] kaon log likelihood");
     REGISTER_VARIABLE("topProtonLogL", TOPVariable::getProtonLogL,
                       "[calibration] proton log likelihood");
+    REGISTER_VARIABLE("logLScanMass", TOPVariable::getLogLScanMass,
+                      "[calibration] mass at the logL maximum from the LL scan");
+    REGISTER_VARIABLE("logLScanMassUpperInterval", TOPVariable::getLogLScanMassUpperInterval,
+                      "[calibration] Upper edge of the mass interval determined by the LL scan");
+    REGISTER_VARIABLE("logLScanMassLowerInterval", TOPVariable::getLogLScanMassLowerInterval,
+                      "[calibration] Lower edge of the mass interval determined by the LL scan");
+    REGISTER_VARIABLE("logLScanThreshold", TOPVariable::getLogLScanThreshold,
+                      "[calibration] Cherenkov threshold determind by the LL scan");
+    REGISTER_VARIABLE("logLScanExpectedSignalPhotons", TOPVariable::getLogLScanExpectedSignalPhotons,
+                      "[calibration] Expected signal photon yeild at the LL maximum");
     REGISTER_VARIABLE("topRecBunchUsedTrackCount", TOPVariable::TOPRecBunchUsedTrackCount,
                       "[calibration] The number of tracks used in the bunch reconstruction");
     REGISTER_VARIABLE("topRecBunchTrackCount", TOPVariable::TOPRecBunchTrackCount,

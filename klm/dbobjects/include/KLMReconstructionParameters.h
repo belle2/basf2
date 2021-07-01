@@ -16,7 +16,7 @@
 namespace Belle2 {
 
   /**
-   * Class to store EKLM simulation in the database.
+   * Class to store KLM reconstruction parameters in the database.
    */
   class KLMReconstructionParameters : public TObject {
 
@@ -55,10 +55,10 @@ namespace Belle2 {
   private:
 
     /** Whether multi-strip digits are enabled. */
-    float m_MultiStripDigitsEnabled = false;
+    bool m_MultiStripDigitsEnabled = false;
 
     /** Class version. */
-    ClassDef(Belle2::KLMReconstructionParameters, 1);
+    ClassDef(Belle2::KLMReconstructionParameters, 2);
 
   };
 

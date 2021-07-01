@@ -7,10 +7,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 __author__ = 'Abtin Narimani Charan'
-__copyright__ = 'Copyright 2020 - Belle II Collaboration'
+__copyright__ = 'Copyright 2021 - Belle II Collaboration'
 __maintainer__ = 'Abtin Narimani Charan'
 __email__ = 'abtin.narimani.charan@desy.de'
-__updated__ = '31.05.2021'
 
 
 def findConv2dOutShape(
@@ -19,13 +18,24 @@ def findConv2dOutShape(
     conv,
     pool
 ):
-    # get conv argument
+    """ Find proper height and width of an image in each convolution step.
+
+    Inputs:
+
+    @param H_in: Height of the image (in this case 7)
+    @param H_in: Width of the image (in this case 7)
+    @param conv: convolutional layer
+    @param pool: maxpooling
+
+    Outputs:
+        - H_out: Height of the image after convolution
+        - W_out: Width of the image after convolution
+    """
     kernel_size = conv.kernel_size
     stride = conv.stride
     padding = conv.padding
     dilation = conv.dilation
 
-    # Ref: https://pytorch.org/docs/stable/nn.html
     H_out = np.floor(
         (H_in + 2 * padding[0] - dilation[0] * (kernel_size[0] - 1) - 1) / stride[0] + 1)
     W_out = np.floor(
@@ -34,14 +44,23 @@ def findConv2dOutShape(
     if pool:
         H_out /= pool
         W_out /= pool
+
     return(int(H_out),
            int(W_out))
 
 
 class ConvNet(nn.Module):
+    """ ConvNet generator model """
 
-    def __init__(self, params):
+    def __init__(
+        self,
+        params
+    ):
+        """ Constructor to create a new model instance.
 
+        fc represents fully-connected layer
+        conv represents convolutional layer
+        """
         super(ConvNet, self).__init__()
         C_in, H_in, W_in = params['input_shape']
         num_emb_theta = params['num_emb_theta']
@@ -64,7 +83,6 @@ class ConvNet(nn.Module):
         self.conv1 = nn.Conv2d(C_in, init_f, kernel_size=3, padding=1, stride=1)
         h, w = findConv2dOutShape(H_in, W_in, self.conv1, pool=1)
 
-        # compute the flatten size
         self.num_flatten = h * w * init_f
 
         self.fc1 = nn.Linear(
@@ -73,18 +91,24 @@ class ConvNet(nn.Module):
 
         self.fc2 = nn.Linear(num_fc1, num_classes)
 
-    def forward(self,
-                energy,
-                theta_input,
-                phi_input,
-                extra_input):
+    def forward(
+        self,
+        energy,
+        theta_input,
+        phi_input,
+        pt
+    ):
+        """ Function to perform a forward pass.
 
+        It computes the model output for a given input.
+        """
         x1 = F.relu(self.conv1(energy))
         x1 = x1.view(-1, self.num_flatten)
 
+        pt = torch.reshape(pt, (1, 1))
         x = torch.cat(
             (x1,
-             extra_input,
+             pt,
              self.emb_theta(theta_input),
              self.emb_phi(phi_input)),
             dim=1
@@ -93,4 +117,5 @@ class ConvNet(nn.Module):
         x = F.relu(self.fc1(x))
         x = F.dropout(x, self.dropout_rate, training=self.training)
         output = self.fc2(x)
+
         return(output)

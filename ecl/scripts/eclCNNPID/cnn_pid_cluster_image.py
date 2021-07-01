@@ -7,16 +7,27 @@ from torch.utils.data import Dataset
 from sklearn.preprocessing import LabelEncoder
 
 __author__ = 'Abtin Narimani Charan'
-__copyright__ = 'Copyright 2020 - Belle II Collaboration'
+__copyright__ = 'Copyright 2021 - Belle II Collaboration'
 __maintainer__ = 'Abtin Narimani Charan'
 __email__ = 'abtin.narimani.charan@desy.de'
-__updated__ = '31.05.2021'
 
 
 class ClusterImage(Dataset):
+    """ Prepare an image with necessary inputs for ConvNet.
 
-    def __init__(self, params):
+    It gets 7x7(=49) pixels of energy + 1 thetaId + 1 PhiId + 1 Pt.
+    Then prepare proper format for each input.
 
+    Regarding energy pixels, the specified threshold of 1 MeV is applied
+    which means pixels with < 1 MeV will become 0.
+    Clipping is also applied on pixels with the condition that
+    pixels with energy more than 1.0 GeV will be replaced with 1.0 GeV.
+    """
+
+    def __init__(
+        self,
+        params
+    ):
         np_energy = params['energy_image'].astype(dtype=np.float32)
 
         np_shape = (1, 1, params['image_length'], params['image_length'])

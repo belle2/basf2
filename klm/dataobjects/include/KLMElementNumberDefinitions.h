@@ -15,25 +15,25 @@
 
 namespace Belle2 {
 
-  /* Subdetector number. */
+  /** Subdetector number. */
   typedef uint16_t KLMSubdetectorNumber;
 
-  /* Section number. */
+  /** Section number. */
   typedef uint16_t KLMSectionNumber;
 
-  /* Sector number. */
+  /** Sector number. */
   typedef uint16_t KLMSectorNumber;
 
-  /* Module number. */
+  /** Module number. */
   typedef uint16_t KLMModuleNumber;
 
-  /* Plane number. */
+  /** Plane number. */
   typedef uint16_t KLMPlaneNumber;
 
-  /* Channel number. */
+  /** Channel number. */
   typedef uint16_t KLMChannelNumber;
 
-  /* EKLM segment number. */
+  /** EKLM segment number. */
   typedef uint16_t EKLMSegmentNumber;
 
 }

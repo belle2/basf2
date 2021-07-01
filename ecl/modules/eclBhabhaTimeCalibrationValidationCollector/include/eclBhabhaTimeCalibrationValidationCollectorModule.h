@@ -75,12 +75,9 @@ namespace Belle2 {
      */
     StoreObjPtr<EventT0> m_eventT0 ;
 
-    /**
-     * Output tree with detailed event data.
-     */
-    TTree* m_dbg_tree_electronClusters ;
-    TTree* m_dbg_tree_event ;
-    TTree* m_dbg_tree_run ;
+    TTree* m_dbg_tree_electronClusters ;    /**< debug output tree for per electron cluster*/
+    TTree* m_dbg_tree_event ;    /**< debug output tree for per event*/
+    TTree* m_dbg_tree_run ;    /**< debug output tree for per run*/
 
     /*** tree branches ***/
     /*** See inDefineHisto method for branches description ***/
@@ -98,7 +95,7 @@ namespace Belle2 {
     double m_tree_t0 = -1;   /**< EventT0 (not from ECL) for debug TTree output */
     double m_tree_t0_unc = -1;   /**< EventT0 uncertainty for debug TTree output */
 
-    int m_NtightTracks = -1;
+    int m_NtightTracks = -1;   /**< Number of tight tracks */
 
 
     // for crate time plotting
@@ -115,16 +112,17 @@ namespace Belle2 {
 
     std::vector<float> m_EperCrys ; /**< ECL Cal digit energy for each crystal */
 
+    double m_E_electron_clust = -1 ;   /**< Electron cluster energy*/
+
 
     /****** Parameters for cuts ******/
     short m_timeAbsMax ; /**< Events with abs(time) > m_timeAbsMax are excluded, mostly for histogram x-range purposes*/
 
-    double m_looseTrkZ0 ;
-    double m_tightTrkZ0 ;
-    double m_looseTrkD0 ;
-    double m_tightTrkD0 ;
+    double m_looseTrkZ0 ;   /**< Loose track z0 minimum cut*/
+    double m_tightTrkZ0 ;   /**< Tight track z0 minimum cut*/
+    double m_looseTrkD0 ;   /**< Loose track d0 minimum cut*/
+    double m_tightTrkD0 ;   /**< Tight track d0 minimum cut*/
 
-    double m_E_electron_clust = -1 ;
 
   } ;
 }

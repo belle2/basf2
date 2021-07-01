@@ -41,9 +41,8 @@ namespace Belle2 {
            constants around zero */
       double timeShiftForPlotStyle[52] ;
 
-      /** Plotting time min/max for crystal+crate+shift plots */
-      double crysCrateShift_min;
-      double crysCrateShift_max;
+      double crysCrateShift_min;   /**< Plotting time min for crystal+crate shift plots */
+      double crysCrateShift_max;   /**< Plotting time max for crystal+crate shift plots */
 
       /** Whether or not to have the algorithm code to loop
           over all the runs and read the payloads itself.  */
@@ -72,25 +71,25 @@ namespace Belle2 {
       const int m_numCrates = 52;
 
       // Variables to be read in from the per-crystal tree
-      Int_t m_run_perCrystal;
-      Int_t m_exp_perCrystal;
-      Int_t m_crystalID;
-      Double_t m_crateTimeConst;
-      Double_t m_crystalTimeConst;
-      Double_t m_crateTimeUnc;
-      Double_t m_crystalTimeUnc;
-      Int_t m_crateID;
+      Int_t m_run_perCrystal;         /**< Run number */
+      Int_t m_exp_perCrystal;         /**< Experiment number  */
+      Int_t m_crystalID;              /**< Crystal ID number*/
+      Double_t m_crateTimeConst;      /**< Crate time calibration constant */
+      Double_t m_crystalTimeConst;    /**< Crystal time calibration constant */
+      Double_t m_crateTimeUnc;        /**< Uncertainty on the crate time calibration constant */
+      Double_t m_crystalTimeUnc;      /**< Uncertainty on the crystal time calibration constant */
+      Int_t m_crateID;                /**< Crate ID number */
 
       // Variables to be read in from the per-crate tree
       //Int_t m_run_perCrate;
       //Int_t m_exp_perCrate;
-      Int_t m_refCrystalID;
+      Int_t m_refCrystalID;    /**< Crystal ID number for the reference crystal */
 
       // Cuts for runs to plot
-      double m_tcrate_min_cut = -150;
-      double m_tcrate_max_cut = 150;
-      double m_tcrate_unc_min_cut = 0.0001 ;
-      double m_tcrate_unc_max_cut = 0.4 ;
+      double m_tcrate_min_cut = -150;           /**< Minimum value cut for the crate time calibration constant for plotting */
+      double m_tcrate_max_cut = 150;            /**< Maximum value cut for the crate time calibration constant for plotting  */
+      double m_tcrate_unc_min_cut = 0.0001 ;    /**< Minimum value cut for the crate time calibration constant uncertainty for plotting */
+      double m_tcrate_unc_max_cut = 0.4 ;       /**< Maximum value cut for the crate time calibration constant uncertainty for plotting */
 
 
     };

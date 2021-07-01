@@ -3,7 +3,7 @@
  * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Validate the ecl timing calibrations using a hadronic event            *
- * selection.                                                             *
+ * selection or bhabha event selection.                                   *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Ewan Hill        (ehill@mail.ubc.ca)                     *

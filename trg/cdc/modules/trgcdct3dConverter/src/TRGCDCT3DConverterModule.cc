@@ -115,7 +115,7 @@ void TRGCDCT3DConverterModule::event()
     storeTSFirmwareData(stTsfFirmwareInfo);
 
     // stTsfInfo[stSL][iTS][id, rt, lr, pr, foundTime]
-    multi_array<double, 3> stTsfInfo{extents[4][48][5]};
+    multi_array<double, 3> stTsfInfo{extents[4][0][5]};
 
     filterTSData(stTsfFirmwareInfo, stTsfInfo);
     // Add to TS datastore
@@ -292,7 +292,6 @@ int TRGCDCT3DConverterModule::t2DPhiTot3DPhi(int phi, int rho)
   return phiInt;
 }
 
-
 void TRGCDCT3DConverterModule::filterTSData(multi_array<double, 4>& tsfFirmwareInfo,
                                             multi_array<double, 3>& tsfInfo)
 {
@@ -307,12 +306,14 @@ void TRGCDCT3DConverterModule::filterTSData(multi_array<double, 4>& tsfFirmwareI
         double lr = tsfFirmwareInfo[iSL][iTS][iClk][2];
         double pr = tsfFirmwareInfo[iSL][iTS][iClk][3];
         double ft = tsfFirmwareInfo[iSL][iTS][iClk][4];
+
         if (pr != 0) {
           double ts_ref[5] = {id, rt, lr, pr, ft};
           multi_array_ref<double, 1> ts((double*)ts_ref, extents[5]);
-          tsfInfo[iSL][iTS_filter] = ts;
-          iTS_filter = iTS_filter++;
+          tsfInfo.resize(extents[4][tsfInfo.shape()[1] + 1][5]);
+          tsfInfo[iSL][iTS_filter++] = ts;
         }
+
       }
     }
   }
@@ -353,7 +354,6 @@ void TRGCDCT3DConverterModule::filter2DData(multi_array<double, 3>& t2DFirmwareI
                                             multi_array<double, 3>& t2DTsfInfo)
 {
 
-  unsigned tIndex_filter = 0;
   for (unsigned iTrack = 0; iTrack < t2DFirmwareInfo.shape()[0]; iTrack++) {
     for (unsigned iClk = 0; iClk < t2DFirmwareInfo.shape()[1]; iClk++) {
       if (t2DFirmwareInfo[iTrack][iClk][0] == 0) continue;
@@ -364,8 +364,8 @@ void TRGCDCT3DConverterModule::filter2DData(multi_array<double, 3>& t2DFirmwareI
 
       double track_ref[3] = {t2DFirmwareInfo[iTrack][iClk][2], t2DFirmwareInfo[iTrack][iClk][3], t2DFirmwareInfo[iTrack][iClk][4]};
       multi_array_ref<double, 1> track((double*)track_ref, extents[3]);
-      t2DInfo.resize(extents[tIndex_filter + 1][3]);
-      t2DInfo[tIndex_filter] = track;
+      t2DInfo.resize(extents[t2DInfo.shape()[0] + 1][3]);
+      t2DInfo[t2DInfo.shape()[0] - 1] = track;
 
 
       multi_array<double, 2>  axTSInfo{extents[5][5]};
@@ -381,9 +381,8 @@ void TRGCDCT3DConverterModule::filter2DData(multi_array<double, 3>& t2DFirmwareI
         axTSInfo[iAx][3] = pr;
         axTSInfo[iAx][4] = -9999;
       }
-      t2DTsfInfo.resize(extents[tIndex_filter + 1][5][5]);
-      t2DTsfInfo[tIndex_filter] = axTSInfo;
-      tIndex_filter += 1;
+      t2DTsfInfo.resize(extents[t2DTsfInfo.shape()[0] + 1][5][5]);
+      t2DTsfInfo[t2DTsfInfo.shape()[0] - 1] = axTSInfo;
     }
   }
   //for(unsigned iTrack = 0; iTrack < t2DInfo.size(); iTrack++)
@@ -522,9 +521,9 @@ void TRGCDCT3DConverterModule::addTSDatastore(multi_array<double, 3>& tsfInfo, i
       double lr = tsfInfo[iSL][iTS][2];
       double pr = tsfInfo[iSL][iTS][3];
       double ft = tsfInfo[iSL][iTS][4];
+      if (m_isVerbose) cout << "[TSF] iSL:" << iSL << " iTS:" << iTS << " id:" << id << " rt:" << rt << " lr:" << lr << " pr:" << pr <<
+                              " ft:" << ft << endl;
       if (pr != 0) {
-        if (m_isVerbose) cout << "[TSF] iSL:" << iSL << " iTS:" << iTS << " id:" << id << " rt:" << rt << " lr:" << lr << " pr:" << pr <<
-                                " ft:" << ft << endl;
         CDCHit prHit(rt, 0, iSL * 2 + isSt, pr == 3 ? 2 : 3, id);
         m_hits.appendNew(prHit, toTSID(int(iSL * 2 + isSt), id), pr, lr, rt, 0, ft);
       }
@@ -1543,7 +1542,6 @@ void TRGCDCT3DConverterModule::debug3DFirmware()
 void TRGCDCT3DConverterModule::filter3DData(multi_array<double, 3>& t3DFirmwareInfo,
                                             multi_array<double, 2>& t3DInfo)
 {
-  unsigned iTrack_filter = 0;
   for (unsigned iTrack = 0; iTrack < t3DFirmwareInfo.shape()[0]; iTrack++) {
     for (unsigned iClk = 0; iClk < t3DFirmwareInfo.shape()[1]; iClk++) {
       //cout<<iClk<<" 2d: "<<t3DFirmwareInfo[iTrack][iClk][0]<<" tsf: "<<t3DFirmwareInfo[iTrack][iClk][2]<<" evt: "<<t3DFirmwareInfo[iTrack][iClk][3]<<" isOld: "<<t3DFirmwareInfo[iTrack][iClk][1]<<endl;
@@ -1564,9 +1562,9 @@ void TRGCDCT3DConverterModule::filter3DData(multi_array<double, 3>& t3DFirmwareI
 
       multi_array_ref<double, 1> track3D((double*)track3D_ref, extents[7]);
 
-      t3DInfo.resize(extents[iTrack_filter + 1][7]);
-      t3DInfo[iTrack_filter] = track3D;
-      iTrack_filter += 1;
+      t3DInfo.resize(extents[t3DInfo.shape()[0] + 1][7]);
+      t3DInfo[t3DInfo.shape()[0] - 1] = track3D;
+
     }
   }
 }

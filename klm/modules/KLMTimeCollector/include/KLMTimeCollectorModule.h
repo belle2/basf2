@@ -88,7 +88,7 @@ namespace Belle2 {
      * Match KLM hit and extHit.
      */
     std::pair<ExtHit*, ExtHit*> matchExt(
-      uint16_t channelID, std::multimap<unsigned int, ExtHit>&);
+      KLMChannelNumber channelID, std::multimap<unsigned int, ExtHit>&);
 
     /** Save position difference betwen matched kLMHit and ExtHit. */
     void storeDistDiff(TVector3&);

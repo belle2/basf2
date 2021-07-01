@@ -37,9 +37,9 @@
 #include <framework/logging/Logger.h>
 
 // DataStore classes
-#include <framework/dataobjects/EventMetaData.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <top/dataobjects/TOPLikelihoodScanResult.h>
 #include <top/dataobjects/TOPLikelihood.h>
 #include <top/dataobjects/TOPBarHit.h>
 #include <tracking/dataobjects/ExtHit.h>
@@ -77,6 +77,9 @@ TOPRingPlotterModule::TOPRingPlotterModule() : Module()
            1);
   addParam("saveHistograms", m_saveHistograms,
            "Set true to save the histograms of the maps in addition to the list of sampled pseudo-digits", false);
+  addParam("saveLLScan", m_saveLLScan,
+           "Set true to save the results of the LL scan. Requires to add TOPLLScannerModule to the path", false);
+
 }
 
 
@@ -97,6 +100,12 @@ void TOPRingPlotterModule::resetTree()
   m_hitMapMCP->Reset();
   m_hitMapMCE->Reset();
   m_hitMapMCMU->Reset();
+  m_nScanPoints = 0;
+
+  for (int i = 0; i < 10000; i++) {
+    m_scanMass[i] = 0;
+    m_scanLL[i] = 0;
+  }
 
   for (int i = 0; i < m_MaxPDFPhotons; i++) {
     m_pdfPixelE[i] = 0;
@@ -293,6 +302,12 @@ void TOPRingPlotterModule::initialize()
   m_tree->Branch("pdfPixelE", m_pdfPixelE, "m_pdfPixelE[m_pdfSamplesE]/S");
   m_tree->Branch("pdfTimeE", m_pdfTimeE, "m_pdfTimeE[m_pdfSamplesE]/F");
 
+  if (m_saveLLScan) {
+    m_tree->Branch("nScanPoints", &m_nScanPoints, "m_nScanPoints/I");
+    m_tree->Branch("scanMass", m_scanMass, "m_scanMass[m_nScanPoints]/F");
+    m_tree->Branch("scanLL", m_scanLL, "m_scanLL[m_nScanPoints]/F");
+  }
+
   // This parts parses the list of variables and creates the branches in the output tree.
   // This is copy-pasted from VariablesToNtupleModule
   m_variables = Variable::Manager::Instance().resolveCollections(m_variables);
@@ -329,6 +344,8 @@ void TOPRingPlotterModule::initialize()
   digits.isRequired();
   StoreArray<TOPBarHit> barHits;
   barHits.isOptional();
+  StoreArray<TOPLikelihoodScanResult> likelihoodScans;
+  likelihoodScans.isOptional();
 
 }
 
@@ -337,8 +354,6 @@ void TOPRingPlotterModule::event()
 {
   TOPRecoManager::setTimeWindow(0, 100);
 
-  StoreObjPtr<EventMetaData> evtMetaData;
-  StoreArray<Track> tracks;
   StoreArray<TOPDigit> digits;
   StoreObjPtr<ParticleList> particles(m_particleList);
 
@@ -428,8 +443,21 @@ void TOPRingPlotterModule::event()
       m_branchAddresses[iVar] = m_functions[iVar](particle);
     }
 
+
     // Save the PDF samplings
     if (isFromTrack) {
+
+      if (m_saveLLScan) {
+        auto llScan = track->getRelated<TOPLikelihoodScanResult>();
+        auto masses = llScan->getCoarseScanMassPoints();
+        auto lls = llScan->getCoarseScanLLValues();
+        m_nScanPoints = lls.size();
+        for (unsigned int j = 0; j < lls.size(); j++) {
+          m_scanMass[j] = masses[j];
+          m_scanLL[j] = lls[j];
+        }
+      }
+
       for (auto pdg : m_pdgHyp) {
         if (pdg == Const::electron.getPDGCode())
           fillPDF(Belle2::Const::electron, track, m_hitMapMCE, m_pdfPixelE, m_pdfTimeE, m_pdfSamplesE, m_pdfToysE);

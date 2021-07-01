@@ -239,6 +239,33 @@ namespace Belle2 {
        */
       double getProtonLogL(const Particle* particle);
 
+
+      /**
+       * returns the mass corresponding to the max LL
+       */
+      double getLogLScanMass(const Particle* particle);
+
+      /**
+       * returns the lower edge of the mass interval
+       */
+      double getLogLScanMassLowerInterval(const Particle* particle);
+
+      /**
+       * returns the upper edge of the mass interval
+       */
+      double getLogLScanMassUpperInterval(const Particle* particle);
+
+      /**
+       * returns the location of the Cherenkov threshold
+       */
+      double getLogLScanThreshold(const Particle* particle);
+
+      /**
+       * returns the expected signal photon yield at the LL maximum
+       */
+      double getLogLScanExpectedSignalPhotons(const Particle* particle);
+
+
       //---------------- TOPRecBunch related --------------------
 
       /**

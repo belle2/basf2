@@ -21,22 +21,22 @@ EKLMSegmentAlignment::~EKLMSegmentAlignment()
 {
 }
 
-void EKLMSegmentAlignment::setSegmentAlignment(uint16_t segment,
+void EKLMSegmentAlignment::setSegmentAlignment(EKLMSegmentNumber segment,
                                                KLMAlignmentData* dat)
 {
-  std::map<uint16_t, KLMAlignmentData>::iterator it;
+  std::map<EKLMSegmentNumber, KLMAlignmentData>::iterator it;
   it = m_SegmentAlignment.find(segment);
   if (it == m_SegmentAlignment.end()) {
     m_SegmentAlignment.insert(
-      std::pair<uint16_t, KLMAlignmentData>(segment, *dat));
+      std::pair<EKLMSegmentNumber, KLMAlignmentData>(segment, *dat));
   } else
     it->second = *dat;
 }
 
 const KLMAlignmentData* EKLMSegmentAlignment::getSegmentAlignment(
-  uint16_t segment) const
+  EKLMSegmentNumber segment) const
 {
-  std::map<uint16_t, KLMAlignmentData>::const_iterator it;
+  std::map<EKLMSegmentNumber, KLMAlignmentData>::const_iterator it;
   it = m_SegmentAlignment.find(segment);
   if (it == m_SegmentAlignment.end())
     return nullptr;
@@ -67,7 +67,7 @@ void EKLMSegmentAlignment::setGlobalParam(double value, unsigned short element,
     newAlignmentData.setParameter(
       static_cast<enum KLMAlignmentData::ParameterNumbers>(param), value);
     m_SegmentAlignment.insert(
-      std::pair<uint16_t, KLMAlignmentData>(element, newAlignmentData));
+      std::pair<EKLMSegmentNumber, KLMAlignmentData>(element, newAlignmentData));
   } else {
     alignmentData->setParameter(
       static_cast<enum KLMAlignmentData::ParameterNumbers>(param), value);

@@ -18,6 +18,7 @@
 #pragma link C++ class Belle2::KLMTimeCableDelay+; // checksum=0xdaabeabe, version=1
 #pragma link C++ class Belle2::KLMTimeConstants+; // checksum=0x771043a0, version=1
 #pragma link C++ class Belle2::KLMTimeConversion+; // checksum=0x411acf7f, version=2
+#pragma link C++ class Belle2::KLMTimeResolution+; // checksum=0xf349648b, version=1
 #pragma link C++ class Belle2::KLMTimeWindow+; // checksum=0x546af69b, version=1
 
 // Evolution of KLMScintillatorDigitizationParameters.

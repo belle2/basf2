@@ -144,7 +144,7 @@ if __name__ == "__main__":
     importer.param("maxPulls", args.max_pulls)
     importer.param("nBinsPulls", args.nBins_pulls)
     importer.param("noOutliers", args.no_outliers)
-    uniqueid = str(args.posAlgorithm)+"ErrorScaleFactors_default_" + str(now.isoformat()) + "_INFO:_scaleFactors=fromSimulation_exp"+str(args.exp)+"_nEvents="+str(args.events)+"_noOutliers="
+    uniqueid = str(args.posAlgorithm)+"ErrorScaleFactors_default_" + str(now.isoformat()) + "_INFO:_formulas=rel05_scaleFactors=fromSimulation_exp"+str(args.exp)+"_nEvents="+str(args.events)+"_noOutliers="
 
     if args.no_outliers:
         uniqueid += "True"

@@ -120,7 +120,7 @@ void KLMChannelIndex::useEKLMSegments(bool useSegments)
   setNStripsPlane();
 }
 
-void KLMChannelIndex::setKLMModule(uint16_t module)
+void KLMChannelIndex::setKLMModule(KLMModuleNumber module)
 {
   m_ElementNumbers->moduleNumberToElementNumbers(
     module, &m_Subdetector, &m_Section, &m_Sector, &m_Layer);
@@ -142,7 +142,7 @@ void KLMChannelIndex::setEKLMSegment(int segment)
   m_IndexLevel = c_IndexLevelStrip;
 }
 
-uint16_t KLMChannelIndex::getKLMChannelNumber() const
+KLMChannelNumber KLMChannelIndex::getKLMChannelNumber() const
 {
   if (m_Subdetector == KLMElementNumbers::c_BKLM) {
     return m_ElementNumbers->channelNumberBKLM(
@@ -153,7 +153,7 @@ uint16_t KLMChannelIndex::getKLMChannelNumber() const
   }
 }
 
-uint16_t KLMChannelIndex::getKLMPlaneNumber() const
+KLMPlaneNumber KLMChannelIndex::getKLMPlaneNumber() const
 {
   if (m_Subdetector == KLMElementNumbers::c_BKLM) {
     return m_ElementNumbers->planeNumberBKLM(
@@ -164,7 +164,7 @@ uint16_t KLMChannelIndex::getKLMPlaneNumber() const
   }
 }
 
-uint16_t KLMChannelIndex::getKLMModuleNumber() const
+KLMModuleNumber KLMChannelIndex::getKLMModuleNumber() const
 {
   if (m_Subdetector == KLMElementNumbers::c_BKLM)
     return m_ElementNumbers->moduleNumberBKLM(m_Section, m_Sector, m_Layer);
@@ -172,7 +172,7 @@ uint16_t KLMChannelIndex::getKLMModuleNumber() const
     return m_ElementNumbers->moduleNumberEKLM(m_Section, m_Sector, m_Layer);
 }
 
-uint16_t KLMChannelIndex::getKLMSectorNumber() const
+KLMSectorNumber KLMChannelIndex::getKLMSectorNumber() const
 {
   if (m_Subdetector == KLMElementNumbers::c_BKLM)
     return m_ElementNumbers->sectorNumberBKLM(m_Section, m_Sector);

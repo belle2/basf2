@@ -143,11 +143,11 @@ namespace Belle2 {
         //                ----|----                    ----|----                 ----|----
 
         // for PXD its the other way round!
-        if (currentStateCache.localNormalizedu <= 0.8) {
+        if (currentStateCache.localNormalizedu <= 0.8f) {
           continue;
         }
 
-        if (nextStateCache.localNormalizedu > 0.2) {
+        if (nextStateCache.localNormalizedu > 0.2f) {
           continue;
         }
       }

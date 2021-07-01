@@ -15,6 +15,7 @@
 #include <framework/logging/Logger.h>
 #include <cmath>
 #include <algorithm>
+#include <iostream>
 
 using namespace std;
 
@@ -22,7 +23,7 @@ namespace Belle2 {
   namespace TOP {
 
     PDFConstructor::PDFConstructor(const TOPTrack& track, const Const::ChargedStable& hypothesis,
-                                   EPDFOption PDFOption, EStoreOption storeOption):
+                                   EPDFOption PDFOption, EStoreOption storeOption, double overrideMass):
       m_moduleID(track.getModuleID()), m_track(track), m_hypothesis(hypothesis),
       m_inverseRaytracer(TOPRecoManager::getInverseRaytracer(m_moduleID)),
       m_fastRaytracer(TOPRecoManager::getFastRaytracer(m_moduleID)),
@@ -42,10 +43,10 @@ namespace Belle2 {
         return;
       }
 
-      m_beta = track.getBeta(hypothesis);
+      m_beta = track.getBeta(hypothesis, overrideMass);
       m_yScanner->prepare(track.getMomentumMag(), m_beta, track.getLengthInQuartz());
+      m_tof = track.getTOF(hypothesis, 0, overrideMass);
 
-      m_tof = track.getTOF(hypothesis);
       m_groupIndex = TOPGeometryPar::Instance()->getGroupIndex(m_yScanner->getMeanEnergy());
       m_groupIndexDerivative = TOPGeometryPar::Instance()->getGroupIndexDerivative(m_yScanner->getMeanEnergy());
       m_cosTotal = m_yScanner->getCosTotal();

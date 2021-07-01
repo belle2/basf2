@@ -99,6 +99,7 @@ namespace Belle2 {
        * @param particle Index of the particle contributing the charge, -1 for no particle/noise
        * @param truehit Index of the truehit corresponding to the particle that contributed
        * the charge.
+       * @param wfun waveform shaper function
        */
       void add(double initTime, double charge, double tau, int particle = -1, int truehit = -1, WaveformShape wfun = w_betaprime)
       {

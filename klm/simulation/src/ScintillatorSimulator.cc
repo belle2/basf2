@@ -170,8 +170,8 @@ void KLM::ScintillatorSimulator::prepareSimulation()
 }
 
 void KLM::ScintillatorSimulator::simulate(
-  const std::multimap<uint16_t, const BKLMSimHit*>::iterator& firstHit,
-  const std::multimap<uint16_t, const BKLMSimHit*>::iterator& end)
+  const std::multimap<KLMChannelNumber, const BKLMSimHit*>::iterator& firstHit,
+  const std::multimap<KLMChannelNumber, const BKLMSimHit*>::iterator& end)
 {
   m_stripName = "strip_" + std::to_string(firstHit->first);
   prepareSimulation();
@@ -184,7 +184,7 @@ void KLM::ScintillatorSimulator::simulate(
            module->getPhiScintHalfLength(hit->getStrip()) :
            module->getZScintHalfLength(hit->getStrip()));
   std::vector<const BKLMSimHit*> hits;
-  for (std::multimap<uint16_t, const BKLMSimHit*>::iterator it = firstHit;
+  for (std::multimap<KLMChannelNumber, const BKLMSimHit*>::iterator it = firstHit;
        it != end; ++it)
     hits.push_back(it->second);
   std::sort(hits.begin(), hits.end(), compareBKLMSimHits);
@@ -220,8 +220,8 @@ void KLM::ScintillatorSimulator::simulate(
 }
 
 void KLM::ScintillatorSimulator::simulate(
-  const std::multimap<uint16_t, const EKLMSimHit*>::iterator& firstHit,
-  const std::multimap<uint16_t, const EKLMSimHit*>::iterator& end)
+  const std::multimap<KLMChannelNumber, const EKLMSimHit*>::iterator& firstHit,
+  const std::multimap<KLMChannelNumber, const EKLMSimHit*>::iterator& end)
 {
   m_stripName = "strip_" + std::to_string(firstHit->first);
   prepareSimulation();
@@ -229,7 +229,7 @@ void KLM::ScintillatorSimulator::simulate(
   double stripLength = EKLM::GeometryData::Instance().getStripLength(
                          hit->getStrip()) / CLHEP::mm * Unit::mm;
   std::vector<const EKLMSimHit*> hits;
-  for (std::multimap<uint16_t, const EKLMSimHit*>::iterator it = firstHit;
+  for (std::multimap<KLMChannelNumber, const EKLMSimHit*>::iterator it = firstHit;
        it != end; ++it)
     hits.push_back(it->second);
   std::sort(hits.begin(), hits.end(), compareEKLMSimHits);

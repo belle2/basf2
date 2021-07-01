@@ -50,9 +50,9 @@ namespace Belle2 {
      * Get channel data.
      * @param[in] channel Channel number.
      */
-    const T getChannelData(uint16_t channel) const
+    const T getChannelData(KLMChannelNumber channel) const
     {
-      typename std::map<uint16_t, T>::const_iterator it;
+      typename std::map<KLMChannelNumber, T>::const_iterator it;
       it = m_ChannelData.find(channel);
       if (it == m_ChannelData.end()) {
         B2ERROR("No data for KLM channel in map." <<
@@ -66,12 +66,12 @@ namespace Belle2 {
      * @param[in] channel Channel number.
      * @param[in] data    Data.
      */
-    void setChannelData(uint16_t channel, const T data)
+    void setChannelData(KLMChannelNumber channel, const T data)
     {
-      typename std::map<uint16_t, T>::iterator it;
+      typename std::map<KLMChannelNumber, T>::iterator it;
       it = m_ChannelData.find(channel);
       if (it == m_ChannelData.end()) {
-        m_ChannelData.insert(std::pair<uint16_t, T>(channel, data));
+        m_ChannelData.insert(std::pair<KLMChannelNumber, T>(channel, data));
       } else {
         it->second = data;
       }
@@ -91,7 +91,7 @@ namespace Belle2 {
   private:
 
     /** Channel data. */
-    std::map<uint16_t, T> m_ChannelData;
+    std::map<KLMChannelNumber, T> m_ChannelData;
 
     /** Class version. */
     ClassDef(Belle2::KLMChannelMapValue<T>, 1);

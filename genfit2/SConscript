@@ -10,7 +10,7 @@ src_dir = 'code2'
 dirs = ['core', 'fields', 'finitePlanes', 'fitters', 'GBL', 'GFRave', 'measurements', 'trackReps', 'utilities']
 
 # libraries
-env['LIBS'] = ['framework', '$ROOT_LIBS', 'RaveBase', 'Geom', 'EG']
+env['LIBS'] = ['$ROOT_LIBS', 'RaveBase', 'Geom', 'EG']
 
 # prevent cling c++11 warnins as genfit is c++03 compatible
 env.Append(CLINGFLAGS=["-Wno-inconsistent-missing-override"])

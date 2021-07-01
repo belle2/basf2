@@ -67,6 +67,7 @@ KLMReconstructorModule::KLMReconstructorModule() :
   m_CoincidenceWindow(0),
   m_PromptTime(0),
   m_PromptWindow(0),
+  m_EventT0Value(0.),
   m_ElementNumbers(&(KLMElementNumbers::Instance())),
   m_bklmGeoPar(nullptr),
   m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
@@ -78,6 +79,8 @@ KLMReconstructorModule::KLMReconstructorModule() :
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("TimeCableDelayCorrection", m_TimeCableDelayCorrection,
            "Perform cable delay time correction (true) or not (false).", false);
+  addParam("EventT0Correction", m_EventT0Correction,
+           "Perform EventT0 correction (true) or not (false)", true);
   addParam("IfAlign", m_bklmIfAlign,
            "Perform alignment correction (true) or not (false).",
            bool(true));
@@ -98,6 +101,8 @@ KLMReconstructorModule::~KLMReconstructorModule()
 void KLMReconstructorModule::initialize()
 {
   m_Digits.isRequired();
+  if (m_EventT0Correction)
+    m_EventT0.isRequired();
   /* BKLM. */
   m_bklmHit1ds.registerInDataStore();
   m_bklmHit2ds.registerInDataStore();
@@ -120,8 +125,14 @@ void KLMReconstructorModule::initialize()
 void KLMReconstructorModule::beginRun()
 {
   if (m_TimeCableDelayCorrection) {
-    if (!m_TimeConstants.isValid() || !m_TimeCableDelay.isValid())
-      B2FATAL("KLM time calibration data is not available.");
+    if (!m_TimeConstants.isValid())
+      B2FATAL("KLM time constants data are not available.");
+    if (!m_TimeCableDelay.isValid())
+      B2FATAL("KLM time cable decay data are not available.");
+    if (!m_TimeResolution.isValid())
+      B2ERROR("KLM time resolution data are not available. "
+              "The error is non-fatal because the data are only used to set "
+              "chi^2 of 2d hit, which is informational only now.");
   }
   if (!m_ChannelStatus.isValid())
     B2FATAL("KLM channel status data are not available.");
@@ -138,13 +149,14 @@ void KLMReconstructorModule::beginRun()
     m_DelayRPCPhi = m_TimeConstants->getDelay(KLMTimeConstants::c_RPCPhi);
     m_DelayRPCZ = m_TimeConstants->getDelay(KLMTimeConstants::c_RPCZ);
   }
-  /* EKLM. */
-  if (!m_eklmRecPar.isValid())
-    B2FATAL("EKLM digitization parameters are not available.");
 }
 
 void KLMReconstructorModule::event()
 {
+  m_EventT0Value = 0.;
+  if (m_EventT0.isValid())
+    if (m_EventT0->hasEventT0())
+      m_EventT0Value = m_EventT0->getEventT0();
   reconstructBKLMHits();
   reconstructEKLMHits();
 }
@@ -181,7 +193,7 @@ bool KLMReconstructorModule::isNormal(const KLMDigit* digit) const
   int layer = digit->getLayer();
   int plane = digit->getPlane();
   int strip = digit->getStrip();
-  uint16_t channel = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
+  KLMChannelNumber channel = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
   enum KLMChannelStatus::ChannelStatus status = m_ChannelStatus->getChannelStatus(channel);
   if (status == KLMChannelStatus::c_Unknown)
     B2FATAL("Incomplete KLM channel status data.");
@@ -194,7 +206,7 @@ void KLMReconstructorModule::reconstructBKLMHits()
 {
   /* Construct BKLMHit1Ds from KLMDigits. */
   /* Sort KLMDigits by module and strip number. */
-  std::map<uint16_t, int> channelDigitMap;
+  std::map<KLMChannelNumber, int> channelDigitMap;
   for (int index = 0; index < m_Digits.getEntries(); ++index) {
     const KLMDigit* digit = m_Digits[index];
     if (digit->getSubdetector() != KLMElementNumbers::c_BKLM)
@@ -206,21 +218,21 @@ void KLMReconstructorModule::reconstructBKLMHits()
     if (m_IgnoreHotChannels && !isNormal(digit))
       continue;
     if (digit->inRPC() || digit->isGood()) {
-      uint16_t channel = BKLMElementNumbers::channelNumber(
-                           digit->getSection(), digit->getSector(),
-                           digit->getLayer(), digit->getPlane(),
-                           digit->getStrip());
-      channelDigitMap.insert(std::pair<uint16_t, int>(channel, index));
+      KLMChannelNumber channel = BKLMElementNumbers::channelNumber(
+                                   digit->getSection(), digit->getSector(),
+                                   digit->getLayer(), digit->getPlane(),
+                                   digit->getStrip());
+      channelDigitMap.insert(std::pair<KLMChannelNumber, int>(channel, index));
     }
   }
   if (channelDigitMap.empty())
     return;
   std::vector<const KLMDigit*> digitCluster;
-  uint16_t previousChannel = channelDigitMap.begin()->first;
+  KLMChannelNumber previousChannel = channelDigitMap.begin()->first;
   double averageTime = m_Digits[channelDigitMap.begin()->second]->getTime();
   if (m_TimeCableDelayCorrection)
     correctCableDelay(averageTime, m_Digits[channelDigitMap.begin()->second]);
-  for (std::map<uint16_t, int>::iterator it = channelDigitMap.begin(); it != channelDigitMap.end(); ++it) {
+  for (std::map<KLMChannelNumber, int>::iterator it = channelDigitMap.begin(); it != channelDigitMap.end(); ++it) {
     const KLMDigit* digit = m_Digits[it->second];
     double digitTime = digit->getTime();
     if (m_TimeCableDelayCorrection)
@@ -283,6 +295,8 @@ void KLMReconstructorModule::reconstructBKLMHits()
       // The second param in localToGlobal is whether do the alignment correction (true) or not (false)
       CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift(), m_bklmIfAlign);
       double time = 0.5 * (phiTime + zTime);
+      if (m_EventT0Correction)
+        time -= m_EventT0Value;
       BKLMHit2d* hit2d = m_bklmHit2ds.appendNew(phiHit, zHit, global, time); // Also sets relation BKLMHit2d -> BKLMHit1d
       if (std::fabs(time - m_PromptTime) > m_PromptWindow)
         hit2d->isOutOfTime(true);
@@ -294,7 +308,7 @@ void KLMReconstructorModule::reconstructBKLMHits()
 void KLMReconstructorModule::reconstructEKLMHits()
 {
   int i, n;
-  double d1, d2, t, t1, t2, sd;
+  double d1, d2, time, t1, t2, sd;
   std::vector<KLMDigit*> digitVector;
   std::vector<KLMDigit*>::iterator it1, it2, it3, it4, it5, it6, it7, it8, it9;
   n = m_Digits.getEntries();
@@ -408,14 +422,22 @@ void KLMReconstructorModule::reconstructEKLMHits()
             }
             if (std::fabs(t1 - t2) > m_CoincidenceWindow)
               continue;
-            t = (t1 + t2) / 2;
+            time = (t1 + t2) / 2;
+            if (m_EventT0Correction)
+              time -= m_EventT0Value;
             EKLMHit2d* hit2d = m_eklmHit2ds.appendNew(*it8);
-            hit2d->setEnergyDeposit((*it8)->getEnergyDeposit() + (*it9)->getEnergyDeposit());
+            hit2d->setEnergyDeposit((*it8)->getEnergyDeposit() +
+                                    (*it9)->getEnergyDeposit());
             hit2d->setPosition(crossPoint.x(), crossPoint.y(), crossPoint.z());
-            hit2d->setChiSq((t1 - t2) * (t1 - t2) /
-                            m_eklmRecPar->getTimeResolution() /
-                            m_eklmRecPar->getTimeResolution());
-            hit2d->setTime(t);
+            double timeResolution = 1.0;
+            if (m_TimeResolution.isValid()) {
+              timeResolution *= m_TimeResolution->getTimeResolution(
+                                  (*it8)->getUniqueChannelID());
+              timeResolution *= m_TimeResolution->getTimeResolution(
+                                  (*it9)->getUniqueChannelID());
+            }
+            hit2d->setChiSq((t1 - t2) * (t1 - t2) / timeResolution);
+            hit2d->setTime(time);
             hit2d->setMCTime(((*it8)->getMCTime() + (*it9)->getMCTime()) / 2);
             hit2d->addRelationTo(*it8);
             hit2d->addRelationTo(*it9);

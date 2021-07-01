@@ -74,12 +74,12 @@ int main(int argc, char* argv[])
     return 0;
   }
   for (int i = 2; i <= nChannels + 1; ++i) {
-    uint16_t channelNumber = std::atoi(argv[i]);
+    KLMChannelNumber channelNumber = std::atoi(argv[i]);
     int subdetector, section, sector, layer, plane, strip;
     elementNumbers->channelNumberToElementNumbers(
       channelNumber, &subdetector, &section, &sector, &layer, &plane, &strip);
     /* First: mask the channel in occupancy plot. */
-    uint16_t channelIndex = channelArrayIndex->getIndex(channelNumber);
+    KLMChannelNumber channelIndex = channelArrayIndex->getIndex(channelNumber);
     int nHistoOccupancy;
     if (subdetector == KLMElementNumbers::c_BKLM)
       nHistoOccupancy = 2;
@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
       }
     }
     /* Second: add the masked channel to the summary plot. */
-    uint16_t sectorNumber;
+    KLMSectorNumber sectorNumber;
     if (subdetector == KLMElementNumbers::c_BKLM)
       sectorNumber = elementNumbers->sectorNumberBKLM(section, sector);
     else

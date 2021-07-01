@@ -2896,7 +2896,7 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
         from stdCharged import stdMostLikely
         stdMostLikely(chargedPIDPriors, '_evtkin', path=path)
         inputListNames = ['%s:mostlikely_evtkin' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
-        fillParticleList('gamma:evtkin', '', path=path)
+        fillParticleList('gamma:evtkin', '', loadPhotonBeamBackgroundMVA=False, path=path)
         inputListNames += ['gamma:evtkin']
         if default_cleanup:
             B2INFO("Using default cleanup in EventKinematics module.")
@@ -2908,7 +2908,7 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtkin and gamma:evtkin to get the global kinematics of the event.")
         fillParticleList('pi+:evtkin', '', path=path)
-        fillParticleList('gamma:evtkin', '', path=path)
+        fillParticleList('gamma:evtkin', '', loadPhotonBeamBackgroundMVA=False, path=path)
         particleLists = ['pi+:evtkin', 'gamma:evtkin']
         if default_cleanup:
             if (custom_cuts is not None):
@@ -3039,7 +3039,7 @@ def buildEventShape(inputListNames=None,
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.")
         fillParticleList('pi+:evtshape', '', path=path)
-        fillParticleList('gamma:evtshape', '', path=path)
+        fillParticleList('gamma:evtshape', '', loadPhotonBeamBackgroundMVA=False, path=path)
         particleLists = ['pi+:evtshape', 'gamma:evtshape']
 
         if default_cleanup:
@@ -3505,6 +3505,22 @@ def correctEnergyBias(inputListNames, tableName, path=None):
     path.add_module(correctenergybias)
 
 
+def addPhotonEfficiencyRatioVariables(inputListNames, tableName, path=None):
+    """
+    Add photon Data/MC detection efficiency ratio weights to the specified particle list
+
+    Parameters:
+        inputListNames (list(str)): input particle list names
+        tableName : taken from database with appropriate name
+        path (basf2.Path): module is added to this path
+    """
+
+    photon_efficiency_correction = register_module('PhotonEfficiencySystematics')
+    photon_efficiency_correction.param('particleLists', inputListNames)
+    photon_efficiency_correction.param('tableName', tableName)
+    path.add_module(photon_efficiency_correction)
+
+
 def getAnalysisGlobaltag(timeout=180) -> str:
     """
     Returns a string containing the name of the latest and recommended analysis globaltag.
@@ -3535,6 +3551,33 @@ def getAnalysisGlobaltag(timeout=180) -> str:
         B2FATAL(f'A {ce} exception was raised during the call of getAnalysisGlobalTag(). '
                 'Please try to re-run your job. In case of persistent failures, please contact '
                 'the experts.')
+
+
+def getNbarIDMVA(particleList, path=None, ):
+    """
+    This function can give a score to predict if it is a anti-n0.
+    It is not used to predict n0.
+    Currently, this can be used only for ECL cluster.
+    output will be stored in extraInfo(nbarID); -1 means MVA invalid
+    @param particleList     The input ParticleList
+    @param path             modules are added to this path
+    """
+    from variables import variables
+    variables.addAlias('V1', 'clusterHasPulseShapeDiscrimination')
+    variables.addAlias('V2', 'clusterE')
+    variables.addAlias('V3', 'clusterLAT')
+    variables.addAlias('V4', 'clusterE1E9')
+    variables.addAlias('V5', 'clusterE9E21')
+    variables.addAlias('V6', 'clusterZernikeMVA')
+    variables.addAlias('V7', 'clusterAbsZernikeMoment40')
+    variables.addAlias('V8', 'clusterAbsZernikeMoment51')
+
+    variables.addAlias('nbarIDValid',
+                       'passesCut(V1 == 1 and V2 >= 0 and V3 >= 0 and V4 >= 0 and V5 >= 0 and V6 >= 0 and V7 >= 0 and V8 >= 0)')
+    variables.addAlias('nbarIDmod', 'conditionalVariableSelector(nbarIDValid == 1, extraInfo(nbarIDFromMVA), constant(-1.0))')
+    basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
+    path.add_module('MVAExpert', listNames=particleList, extraInfoName='nbarIDFromMVA', identifier='db_nbarIDECL')
+    variablesToExtraInfo(particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
 
 
 if __name__ == '__main__':

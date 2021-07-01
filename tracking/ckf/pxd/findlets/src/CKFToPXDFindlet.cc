@@ -17,6 +17,7 @@
 #include <tracking/ckf/general/findlets/OverlapResolver.icc.h>
 #include <tracking/ckf/general/findlets/SpacePointTagger.icc.h>
 #include <tracking/ckf/general/findlets/ResultStorer.icc.h>
+#include <tracking/ckf/general/utilities/Helpers.h>
 
 #include <tracking/ckf/pxd/entities/CKFToPXDResult.h>
 #include <tracking/ckf/pxd/entities/CKFToPXDState.h>
@@ -91,12 +92,17 @@ void CKFToPXDFindlet::beginEvent()
 {
   Super::beginEvent();
 
+  // If the capacity of a std::vector is very large without being used, it just allocates RAM for no reason, increasing the RAM
+  // usage unnecessarily. In this case, start with a fresh one.
+  // Since std::vector.shrink() or std::vector.shrink_to_fit() not necessarily reduce the capacity in the desired way, create a
+  // temporary vector of the same type, swap them to use the vector at the new location afterwards, and clear the tempoary vector.
   m_recoTracksVector.clear();
-  m_spacePointVector.clear();
+  checkResizeClear<const SpacePoint*>(m_spacePointVector, 2000);
 
   m_seedStates.clear();
-  m_states.clear();
-  m_relations.clear();
+  checkResizeClear<CKFToPXDState>(m_states, 2000);
+
+  checkResizeClear<TrackFindingCDC::WeightedRelation<CKFToPXDState>>(m_relations, 2000);
 
   m_results.clear();
   m_filteredResults.clear();

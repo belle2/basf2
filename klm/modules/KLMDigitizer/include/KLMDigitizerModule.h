@@ -105,7 +105,7 @@ namespace Belle2 {
      * Check if channel is active (status is not KLMChannelStatus::c_Dead).
      * @param[in] channel Channel.
      */
-    bool checkActive(uint16_t channel);
+    bool checkActive(KLMChannelNumber channel);
 
     /**
      * Efficiency correction.
@@ -154,16 +154,16 @@ namespace Belle2 {
     bool m_Debug;
 
     /** Simulation hit map for BKLM (by channel). */
-    std::multimap<uint16_t, const BKLMSimHit*> m_bklmSimHitChannelMap;
+    std::multimap<KLMChannelNumber, const BKLMSimHit*> m_bklmSimHitChannelMap;
 
     /** Simulation hit map for BKLM (by plane). */
-    std::multimap<uint16_t, const BKLMSimHit*> m_bklmSimHitPlaneMap;
+    std::multimap<KLMPlaneNumber, const BKLMSimHit*> m_bklmSimHitPlaneMap;
 
     /** Simulation hit map for EKLM (by channel). */
-    std::multimap<uint16_t, const EKLMSimHit*> m_eklmSimHitChannelMap;
+    std::multimap<KLMChannelNumber, const EKLMSimHit*> m_eklmSimHitChannelMap;
 
     /** Simulation hit map for EKLM (by plane). */
-    std::multimap<uint16_t, const EKLMSimHit*> m_eklmSimHitPlaneMap;
+    std::multimap<KLMPlaneNumber, const EKLMSimHit*> m_eklmSimHitPlaneMap;
 
     /** FPGA fitter. */
     KLM::ScintillatorFirmware* m_Fitter;

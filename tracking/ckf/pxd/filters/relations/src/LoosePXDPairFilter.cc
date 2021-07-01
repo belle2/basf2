@@ -31,7 +31,7 @@ LoosePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFTo
     }
   }
 
-  double phiDiff = currentStateCache.phi - nextStateCache.phi;
+  float phiDiff = currentStateCache.phi - nextStateCache.phi;
   while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
   while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
 

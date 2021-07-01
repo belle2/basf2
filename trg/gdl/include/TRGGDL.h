@@ -149,9 +149,13 @@ namespace Belle2 {
     static TRGState timingDecision(const TRGState& input,
                                    TRGState& registers,
                                    bool& logicStillActive);
+
     bool doprescale(int f);
 
     bool isFiredFTDL(std::vector<bool> input, std::string alg);
+
+    /// Check the content of the DBObjects used by this class.
+    void checkDatabase() const;
 
     std::vector<bool> getInpBits(void) {return _inpBits;}
 
@@ -260,7 +264,7 @@ namespace Belle2 {
     DBObjPtr<TRGGDLDBInputBits> m_InputBitsDB;
     DBObjPtr<TRGGDLDBFTDLBits>  m_FTDLBitsDB;
     DBObjPtr<TRGGDLDBPrescales> m_PrescalesDB;
-    DBObjPtr<TRGGDLDBAlgs> db_algs;
+    DBObjPtr<TRGGDLDBAlgs> m_AlgsDB;
 
     /// Threshold to determine timing quality flag with MC truth: super fine
     double _timquality_threshold_sfin;

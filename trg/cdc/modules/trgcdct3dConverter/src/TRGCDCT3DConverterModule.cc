@@ -11,17 +11,19 @@
 // $Log$
 //---------------------------------------------------------------
 
+
 #include <trg/cdc/modules/trgcdct3dConverter/TRGCDCT3DConverterModule.h>
 #include <bitset>
 #include "trg/cdc/Fitter3D.h"
 #include "trg/cdc/Fitter3DUtility.h"
 #include "trg/cdc/JSignal.h"
 #include "trg/cdc/JSignalData.h"
+#include "boost/multi_array.hpp"
 
+using namespace boost;
 using namespace std;
 using namespace Belle2;
 using namespace TRGCDCT3DCONVERTERSPACE;
-
 //! Register Module
 REG_MODULE(TRGCDCT3DConverter);
 
@@ -89,6 +91,7 @@ void TRGCDCT3DConverterModule::initialize()
   if (m_addEventTimeToDatastore) m_eventTime.registerInDataStore(m_EventTimeName);
 
   if (m_add2DFinderToDatastore && m_addTSToDatastore) m_tracks2D.registerRelationTo(m_hits);
+  if (m_add2DFinderToDatastore && m_add3DToDatastore) m_tracks3D.registerRelationTo(m_tracks2D);
 
   m_commonData = new Belle2::TRGCDCJSignalData();
 }
@@ -108,10 +111,12 @@ void TRGCDCT3DConverterModule::event()
   if (m_addTSToDatastore) {
     // Process firmware stereo TS
     // stTsfFirmwareInfo[stSL][tsIndex][iClk][id, rt, lr, pr, foundTime]
-    vector<vector<vector<vector<double> > > > stTsfFirmwareInfo;
+    multi_array<double, 4> stTsfFirmwareInfo{extents[4][15][48][5]};
     storeTSFirmwareData(stTsfFirmwareInfo);
+
     // stTsfInfo[stSL][iTS][id, rt, lr, pr, foundTime]
-    vector<vector<vector<double> > > stTsfInfo;
+    multi_array<double, 3> stTsfInfo{extents[4][0][5]};
+
     filterTSData(stTsfFirmwareInfo, stTsfInfo);
     // Add to TS datastore
     addTSDatastore(stTsfInfo, 1);
@@ -119,15 +124,18 @@ void TRGCDCT3DConverterModule::event()
 
   if (m_add2DFinderToDatastore) {
     // Process firmware 2D
+
     // t2DFirmwareInfo[tIndex][iClk][valid, isOld, charge, rho, phi0]
-    vector<vector<vector< double> > > t2DFirmwareInfo;
+    multi_array<double, 3> t2DFirmwareInfo{extents[4][48][5]};
     // t2DTsfFirmwareInfo[tIndex][iClk][axSL][id, rt, lr, pr]
-    vector<vector<vector<vector<double> > > > t2DTsfFirmwareInfo;
+    multi_array<double, 4> t2DTsfFirmwareInfo{extents[4][48][5][4]};
     store2DFirmwareData(t2DFirmwareInfo, t2DTsfFirmwareInfo);
+
     // t2DInfo[tIndex][charge, rho, phi0]
-    vector<vector<double> > t2DInfo;
+    multi_array<double, 2> t2DInfo{extents[0][3]};
     // t2DTsfInfo[tIndex][axSL][id, rt, lr, pr, -9999]
-    vector<vector<vector<double> > > t2DTsfInfo;
+    multi_array<double, 3> t2DTsfInfo{extents[0][5][5]};
+
     filter2DData(t2DFirmwareInfo, t2DTsfFirmwareInfo, t2DInfo, t2DTsfInfo);
     add2DDatastore(t2DInfo, t2DTsfInfo);
   }
@@ -137,7 +145,7 @@ void TRGCDCT3DConverterModule::event()
     // add eventTime
     bool validEventTime = 0;
     int eventTime = 0;
-    for (int iClk = 0; iClk < m_firmwareResults.getEntries() - 11 - 1; iClk++) {
+    for (int iClk = 0; iClk < m_firmwareResults.getEntries() - 17 - 1; iClk++) {
       TRGCDCT3DUnpackerStore* result = m_firmwareResults[iClk];
       if (result->m_t3dtrk0_evtTimeValid_delay) {
         validEventTime = 1;
@@ -155,7 +163,7 @@ void TRGCDCT3DConverterModule::event()
 
   if (m_add3DToDatastore) {
     // t3DFirmwareInfo[tIndex][iClk][2DValid, 2DisOld, TSFValid, EventTimeValid, eventTime, charge, rho, phi0, z0, cot, zchi]
-    vector<vector<vector< double> > > t3DFirmwareInfo;
+    multi_array<double, 3> t3DFirmwareInfo{extents[4][48][11]};
 
     // m_fit3DWithTSIM 0:firmware 1:fastSim 2:firmSim
     // Use Firmware results
@@ -165,8 +173,10 @@ void TRGCDCT3DConverterModule::event()
     // Use firm sim with debug
     if (m_fit3DWithTSIM == 2) store3DFirmSimData(t3DFirmwareInfo);
 
-    vector<vector<double> > t3DInfo;
     // t3DInfo[eventTime, charge, rho, phi0, z0, cot, zchi]
+    multi_array<double, 2> t3DInfo{extents[0][7]};
+
+
     filter3DData(t3DFirmwareInfo, t3DInfo);
 
     if (m_fit3DWithTSIM == 0) add3DDatastore(t3DInfo);
@@ -215,7 +225,29 @@ int TRGCDCT3DConverterModule::toTSID(int iSL, int iWire)
   for (int i = 0; i < (int)iSL; i++) {
     id += nWires[i];
   }
-  id += iWire;
+
+//Correct the segmentID.  The zero points of raw segmentID for four boards are different.
+  if (m_firmwareResultCollectionName == "TRGCDCT3DUnpackerStore0") {
+    id = id + iWire + nWires[(int)iSL] / 4.0 * 0;
+    if (iWire + nWires[(int)iSL] / 4.0 * 0 > nWires[(int)iSL]) {
+      id = id - nWires[(int)iSL];
+    }
+  } else if (m_firmwareResultCollectionName == "TRGCDCT3DUnpackerStore1") {
+    id = id + iWire + nWires[(int)iSL] / 4.0 * 1;
+    if (iWire + nWires[(int)iSL] / 4.0 * 1 > nWires[(int)iSL]) {
+      id = id - nWires[(int)iSL];
+    }
+  } else if (m_firmwareResultCollectionName == "TRGCDCT3DUnpackerStore2") {
+    id = id + iWire + nWires[(int)iSL] / 4.0 * 2;
+    if (iWire + nWires[(int)iSL] / 4.0 * 2 > nWires[(int)iSL]) {
+      id = id - nWires[(int)iSL];
+    }
+  } else if (m_firmwareResultCollectionName == "TRGCDCT3DUnpackerStore3") {
+    id = id + iWire + nWires[(int)iSL] / 4.0 * 3;
+    if (iWire + nWires[(int)iSL] / 4.0 * 3 > nWires[(int)iSL]) {
+      id = id - nWires[(int)iSL];
+    }
+  }
   //cout<<"toID: iSL"<<iSL<<" iWire:"<<iWire<<" id:"<<id<<endl;
   return id;
 }
@@ -230,44 +262,58 @@ int TRGCDCT3DConverterModule::toSigned(int value, int nBits)
   return value;
 }
 
-int TRGCDCT3DConverterModule::t2DRhoTot3DRho(int value, bool isSigned)
-{
-  if (value == 0) return 2047;
-  if (value == 125) {
-    B2WARNING("Bug in 2D parser.");
-    return 451;
-  }
-  if (isSigned) return int(0.3 * 34 / 30 / 1.5e-4 / abs(toSigned(value, 7)) * (pow(2, 11) - 0.5) / 2500);
-  else return int(0.3 * 34 / 30 / 1.5e-4 / abs(value) * (pow(2, 11) - 0.5) / 2500);
-}
+////obselete
+//int TRGCDCT3DConverterModule::t2DRhoTot3DRho(int value, bool isSigned)
+//{
+//  if (value == 0) return 2047;
+//  if (value == 125) {
+//    B2WARNING("Bug in 2D parser.");
+//    return 451;
+//  }
+//  if (isSigned) return int(0.3 * 34 / 30 / 1.5e-4 / abs(toSigned(value, 7)) * (pow(2, 11) - 0.5) / 2500);
+//  else return int(0.3 * 34 / 30 / 1.5e-4 / abs(value) * (pow(2, 11) - 0.5) / 2500);
+//}
+//
 
 int TRGCDCT3DConverterModule::t2DPhiTot3DPhi(int phi, int rho)
 {
   double phiReal = 45 + 90. / 80 * (1 + phi);
   if (toSigned(rho, 7) >= 0) phiReal -= 90;
   else phiReal += 90;
-  if (phiReal > 180) phiReal -= 360;
+
+  while (phiReal > 180) {
+    phiReal -= 360;
+  }
+  while (phiReal < -180) {
+    phiReal += 360;
+  }
+
   int phiInt = phiReal * (pow(2, 12) - 0.5) / 180;
   return phiInt;
 }
 
-void TRGCDCT3DConverterModule::filterTSData(vector<vector<vector<vector<double> > > >& tsfFirmwareInfo,
-                                            vector<vector<vector<double> > >& tsfInfo)
+void TRGCDCT3DConverterModule::filterTSData(multi_array<double, 4>& tsfFirmwareInfo,
+                                            multi_array<double, 3>& tsfInfo)
 {
-  tsfInfo.resize(4);
+  unsigned iTS_filter = 0;
   // iSl is stereo SL index
-  for (unsigned iSL = 0; iSL < tsfFirmwareInfo.size(); iSL++) {
-    for (unsigned iTS = 0; iTS < tsfFirmwareInfo[iSL].size(); iTS++) {
-      for (unsigned iClk = 0; iClk < tsfFirmwareInfo[iSL][iTS].size(); iClk++) {
+  for (unsigned iSL = 0; iSL < tsfFirmwareInfo.shape()[0]; iSL++) {
+    iTS_filter = 0;
+    for (unsigned iTS = 0; iTS < tsfFirmwareInfo.shape()[1]; iTS++) {
+      for (unsigned iClk = 0; iClk < tsfFirmwareInfo.shape()[2]; iClk++) {
         double id = tsfFirmwareInfo[iSL][iTS][iClk][0];
         double rt = tsfFirmwareInfo[iSL][iTS][iClk][1];
         double lr = tsfFirmwareInfo[iSL][iTS][iClk][2];
         double pr = tsfFirmwareInfo[iSL][iTS][iClk][3];
         double ft = tsfFirmwareInfo[iSL][iTS][iClk][4];
+
         if (pr != 0) {
-          vector<double> ts = {id, rt, lr, pr, ft};
-          tsfInfo[iSL].push_back(ts);
+          double ts_ref[5] = {id, rt, lr, pr, ft};
+          multi_array_ref<double, 1> ts((double*)ts_ref, extents[5]);
+          tsfInfo.resize(extents[4][tsfInfo.shape()[1] + 1][5]);
+          tsfInfo[iSL][iTS_filter++] = ts;
         }
+
       }
     }
   }
@@ -303,21 +349,27 @@ void TRGCDCT3DConverterModule::filterTSData(vector<vector<vector<vector<double> 
 // t2DTsfFirmwareInfo[tIndex][iClk][axSL][id, rt, lr, pr]
 // t2DInfo[tIndex][charge, rho, phi0]
 // t2DTsfInfo[tIndex][axSL][id, rt, lr, pr, -9999]
-void TRGCDCT3DConverterModule::filter2DData(std::vector<std::vector<std::vector<double> > >& t2DFirmwareInfo,
-                                            std::vector<std::vector<std::vector<std::vector<double> > > >& t2DTsfFirmwareInfo, std::vector<std::vector<double> >& t2DInfo,
-                                            std::vector<std::vector<std::vector<double> > >& t2DTsfInfo)
+void TRGCDCT3DConverterModule::filter2DData(multi_array<double, 3>& t2DFirmwareInfo,
+                                            multi_array<double, 4>& t2DTsfFirmwareInfo, multi_array<double, 2>& t2DInfo,
+                                            multi_array<double, 3>& t2DTsfInfo)
 {
-  for (unsigned iTrack = 0; iTrack < t2DFirmwareInfo.size(); iTrack++) {
-    for (unsigned iClk = 0; iClk < t2DFirmwareInfo[iTrack].size(); iClk++) {
+
+  for (unsigned iTrack = 0; iTrack < t2DFirmwareInfo.shape()[0]; iTrack++) {
+    for (unsigned iClk = 0; iClk < t2DFirmwareInfo.shape()[1]; iClk++) {
       if (t2DFirmwareInfo[iTrack][iClk][0] == 0) continue;
       // TODO make an algorithm to follow the track.
-      if (t2DInfo.size() != 0 && t2DFirmwareInfo[iTrack][iClk][1] == 1) continue;
 
-      vector<double> track = {t2DFirmwareInfo[iTrack][iClk][2], t2DFirmwareInfo[iTrack][iClk][3], t2DFirmwareInfo[iTrack][iClk][4]};
-      t2DInfo.push_back(track);
+      //choose new tracks
+      //if (t2DInfo.shape()[0] != 0 && t2DFirmwareInfo[iTrack][iClk][1] == 1) continue;
 
-      vector<vector< double> > axTSInfo(5, vector<double> (5));
-      for (unsigned iAx = 0; iAx < t2DTsfFirmwareInfo[iTrack][iClk].size(); iAx++) {
+      double track_ref[3] = {t2DFirmwareInfo[iTrack][iClk][2], t2DFirmwareInfo[iTrack][iClk][3], t2DFirmwareInfo[iTrack][iClk][4]};
+      multi_array_ref<double, 1> track((double*)track_ref, extents[3]);
+      t2DInfo.resize(extents[t2DInfo.shape()[0] + 1][3]);
+      t2DInfo[t2DInfo.shape()[0] - 1] = track;
+
+
+      multi_array<double, 2>  axTSInfo{extents[5][5]};
+      for (unsigned iAx = 0; iAx < t2DTsfFirmwareInfo.shape()[2]; iAx++) {
         double id = t2DTsfFirmwareInfo[iTrack][iClk][iAx][0];
         double rt = t2DTsfFirmwareInfo[iTrack][iClk][iAx][1];
         double lr = t2DTsfFirmwareInfo[iTrack][iClk][iAx][2];
@@ -329,7 +381,8 @@ void TRGCDCT3DConverterModule::filter2DData(std::vector<std::vector<std::vector<
         axTSInfo[iAx][3] = pr;
         axTSInfo[iAx][4] = -9999;
       }
-      t2DTsfInfo.push_back(axTSInfo);
+      t2DTsfInfo.resize(extents[t2DTsfInfo.shape()[0] + 1][5][5]);
+      t2DTsfInfo[t2DTsfInfo.shape()[0] - 1] = axTSInfo;
     }
   }
   //for(unsigned iTrack = 0; iTrack < t2DInfo.size(); iTrack++)
@@ -390,11 +443,12 @@ void TRGCDCT3DConverterModule::filter2DData(std::vector<std::vector<std::vector<
 
 //// t2DInfo[tIndex][charge, rho, phi0]
 //// t2DTsfInfo[tIndex][axSL][id, rt, lr, pr, -9999]
-void TRGCDCT3DConverterModule::add2DDatastore(std::vector<std::vector<double> >& t2DInfo,
-                                              std::vector<std::vector<std::vector<double> > >& t2DTsfInfo)
+// t3DInfo[eventTime, charge, rho, phi0, z0, cot, zchi]
+void TRGCDCT3DConverterModule::add2DDatastore(multi_array<double, 2>& t2DInfo,
+                                              multi_array<double, 3>& t2DTsfInfo)
 {
   // Add 2D track
-  for (unsigned iTrack = 0; iTrack < t2DInfo.size(); ++iTrack) {
+  for (unsigned iTrack = 0; iTrack < t2DInfo.shape()[0]; ++iTrack) {
     double charge = 0, phi0_i = 0, omega = 0, chi2D = 0;
     //double phi0_c = 0;
     //Convert
@@ -403,9 +457,30 @@ void TRGCDCT3DConverterModule::add2DDatastore(std::vector<std::vector<double> >&
     //phi0_i = phi0_c + charge * M_PI_2;
     //cout<<phi0_i<<" "<<(45 + 90./80 * (1+ t2DInfo[iTrack][2]))/180*M_PI<<endl;
     phi0_i = (45 + 90. / 80 * (1 + t2DInfo[iTrack][2])) / 180 * M_PI;
+
+    //Correct phi0_i.  The zero points of raw phi0_i for four boards are different.
+    if (m_firmwareResultCollectionName == "TRGCDCT3DUnpackerStore0") {
+      phi0_i = phi0_i + (M_PI / 2.0) * 0;
+    } else if (m_firmwareResultCollectionName == "TRGCDCT3DUnpackerStore1") {
+      phi0_i = phi0_i + (M_PI / 2.0) * 1;
+    } else if (m_firmwareResultCollectionName == "TRGCDCT3DUnpackerStore2") {
+      phi0_i = phi0_i + (M_PI / 2.0) * 2;
+    } else if (m_firmwareResultCollectionName == "TRGCDCT3DUnpackerStore3") {
+      phi0_i = phi0_i + (M_PI / 2.0) * 3;
+    }
+
+    // Confine the range of the angle to -pi ~ pi
+    while (phi0_i > M_PI) {
+      phi0_i -= 2 * M_PI;
+    }
+    while (phi0_i < -M_PI) {
+      phi0_i += 2 * M_PI;
+    }
+
     //omega = charge / t2DRhoTot3DRho(t2DInfo[iTrack][1])/(pow(2,11)-0.5)*2500;
     //cout<<omega<<" "<<toSigned(t2DInfo[iTrack][1],7)*1.5e-4*30/0.3/34<<endl;
-    omega = toSigned(t2DInfo[iTrack][1], 7) * 1.5e-4 * 30 / 0.3 / 34;
+    //omega = toSigned(t2DInfo[iTrack][1], 7) * 1.5e-4 * 30 / 0.3 / 34;
+    omega = toSigned(t2DInfo[iTrack][1], 7) / 33.0 * 3.2;
     //cout<<"iTrack: "<<iTrack<<" charge:"<<t2DInfo[iTrack][0]<<" "<<charge<<"  rho: "<<t2DInfo[iTrack][1]<<" "<<omega<<" phi0_i: "<<t2DInfo[iTrack][2]<<" "<<phi0_i<<endl;
 
     CDCTriggerTrack* track = m_tracks2D.appendNew(phi0_i, omega, chi2D, 0, 0, 0);
@@ -413,7 +488,7 @@ void TRGCDCT3DConverterModule::add2DDatastore(std::vector<std::vector<double> >&
     if (m_isVerbose) cout << "[2D] iTrack:" << iTrack << " charge:" << charge << " phi0_i:" << phi0_i << " " << phi0_i * 180 / M_PI <<
                             " omega:" << omega << " pt:" << charge / omega * 0.3 * 1.5 * 0.01 << endl;
 
-    for (unsigned iAx = 0; iAx < t2DTsfInfo[iTrack].size(); ++iAx) {
+    for (unsigned iAx = 0; iAx < t2DTsfInfo.shape()[1]; ++iAx) {
       double rawId = t2DTsfInfo[iTrack][iAx][0];
       double id = -1;
       if (iAx != 4) id = rawId;
@@ -437,10 +512,10 @@ void TRGCDCT3DConverterModule::add2DDatastore(std::vector<std::vector<double> >&
   }
 }
 
-void TRGCDCT3DConverterModule::addTSDatastore(vector<vector<vector<double> > >& tsfInfo, int isSt)
+void TRGCDCT3DConverterModule::addTSDatastore(multi_array<double, 3>& tsfInfo, int isSt)
 {
-  for (unsigned iSL = 0; iSL < tsfInfo.size(); iSL++) {
-    for (unsigned iTS = 0; iTS < tsfInfo[iSL].size(); iTS++) {
+  for (unsigned iSL = 0; iSL < tsfInfo.shape()[0]; iSL++) {
+    for (unsigned iTS = 0; iTS < tsfInfo.shape()[1]; iTS++) {
       double id = tsfInfo[iSL][iTS][0];
       double rt = tsfInfo[iSL][iTS][1];
       double lr = tsfInfo[iSL][iTS][2];
@@ -448,15 +523,16 @@ void TRGCDCT3DConverterModule::addTSDatastore(vector<vector<vector<double> > >& 
       double ft = tsfInfo[iSL][iTS][4];
       if (m_isVerbose) cout << "[TSF] iSL:" << iSL << " iTS:" << iTS << " id:" << id << " rt:" << rt << " lr:" << lr << " pr:" << pr <<
                               " ft:" << ft << endl;
-      CDCHit prHit(rt, 0, iSL * 2 + isSt, pr == 3 ? 2 : 3, id);
-      m_hits.appendNew(prHit, toTSID(int(iSL * 2 + isSt), id), pr, lr, rt, 0, ft);
+      if (pr != 0) {
+        CDCHit prHit(rt, 0, iSL * 2 + isSt, pr == 3 ? 2 : 3, id);
+        m_hits.appendNew(prHit, toTSID(int(iSL * 2 + isSt), id), pr, lr, rt, 0, ft);
+      }
     }
   }
 }
 
-void TRGCDCT3DConverterModule::storeTSFirmwareData(vector<vector<vector<vector<double> > > >& tsfInfo)
+void TRGCDCT3DConverterModule::storeTSFirmwareData(multi_array<double, 4>& tsfInfo)
 {
-  tsfInfo.resize(4, vector<vector<vector<double> > > (15, vector<vector<double> > (48, vector<double> (4))));
   for (int iClk = 0; iClk < m_firmwareResults.getEntries(); iClk++) {
     TRGCDCT3DUnpackerStore* result = m_firmwareResults[iClk];
     //cout<<"iClk:"<<iClk<<" tsf1_cc:"<<result->m_tsf1_cc<<" tsf1ts0_id:"<<result->m_tsf1ts0_id<<" tsf1ts0_rt:"<<result->m_tsf1ts0_rt<<" tsf1ts0_lr:"<<result->m_tsf1ts0_lr<<" tsf1ts0_pr:"<<result->m_tsf1ts0_pr<<endl;
@@ -769,11 +845,10 @@ void TRGCDCT3DConverterModule::storeTSFirmwareData(vector<vector<vector<vector<d
 
 // t2DFirmwareInfo[tIndex][iClk][valid, isOld charge, rho, phi0]
 // t2DTsfFirmwareInfo[tIndex][iClk][axSL][id, rt, lr, pr]
-void TRGCDCT3DConverterModule::store2DFirmwareData(vector<vector<vector<double> > >& t2DFirmwareInfo,
-                                                   vector<vector<vector<vector<double> > > >& t2DTsfFirmwareInfo)
+void TRGCDCT3DConverterModule::store2DFirmwareData(multi_array<double, 3>& t2DFirmwareInfo,
+                                                   multi_array<double, 4>& t2DTsfFirmwareInfo)
 {
-  t2DFirmwareInfo.resize(4, vector<vector<double> > (48, vector<double> (5)));
-  t2DTsfFirmwareInfo.resize(4, vector<vector<vector<double> > > (48, vector<vector<double> > (5, vector<double> (4))));
+
   for (int iClk = 0; iClk < m_firmwareResults.getEntries(); iClk++) {
     TRGCDCT3DUnpackerStore* result = m_firmwareResults[iClk];
     bitset<6> t2d_fnf(int(result->m_t2d_fnf));
@@ -788,19 +863,19 @@ void TRGCDCT3DConverterModule::store2DFirmwareData(vector<vector<vector<double> 
     t2DFirmwareInfo[0][iClk][4] = result->m_t2d0_phi;
 
     t2DFirmwareInfo[1][iClk][0] = t2d_fnf[4];
-    t2DFirmwareInfo[0][iClk][1] = t2d_oldfnf[4];;
+    t2DFirmwareInfo[1][iClk][1] = t2d_oldfnf[4];;
     t2DFirmwareInfo[1][iClk][2] = result->m_t2d1_charge;
     t2DFirmwareInfo[1][iClk][3] = result->m_t2d1_rho_s;
     t2DFirmwareInfo[1][iClk][4] = result->m_t2d1_phi;
 
     t2DFirmwareInfo[2][iClk][0] = t2d_fnf[3];
-    t2DFirmwareInfo[0][iClk][1] = t2d_oldfnf[3];;
+    t2DFirmwareInfo[2][iClk][1] = t2d_oldfnf[3];;
     t2DFirmwareInfo[2][iClk][2] = result->m_t2d2_charge;
     t2DFirmwareInfo[2][iClk][3] = result->m_t2d2_rho_s;
     t2DFirmwareInfo[2][iClk][4] = result->m_t2d2_phi;
 
     t2DFirmwareInfo[3][iClk][0] = t2d_fnf[2];
-    t2DFirmwareInfo[0][iClk][1] = t2d_oldfnf[2];;
+    t2DFirmwareInfo[3][iClk][1] = t2d_oldfnf[2];;
     t2DFirmwareInfo[3][iClk][2] = result->m_t2d3_charge;
     t2DFirmwareInfo[3][iClk][3] = result->m_t2d3_rho_s;
     t2DFirmwareInfo[3][iClk][4] = result->m_t2d3_phi;
@@ -885,34 +960,34 @@ void TRGCDCT3DConverterModule::store2DFirmwareData(vector<vector<vector<double> 
     t2DTsfFirmwareInfo[3][iClk][3][2] = result->m_t2d3ts6_lr;
     t2DTsfFirmwareInfo[3][iClk][3][3] = result->m_t2d3ts6_pr;
     t2DTsfFirmwareInfo[3][iClk][4][0] = result->m_t2d3ts8_id;
-    // Due to 32 bit problem
-    //t2DTsfFirmwareInfo[3][iClk][4][1] = result->m_t2d3ts8_rt;
-    //t2DTsfFirmwareInfo[3][iClk][4][2] = result->m_t2d3ts8_lr;
-    //t2DTsfFirmwareInfo[3][iClk][4][3] = result->m_t2d3ts8_pr;
+    t2DTsfFirmwareInfo[3][iClk][4][1] = result->m_t2d3ts8_rt;
+    t2DTsfFirmwareInfo[3][iClk][4][2] = result->m_t2d3ts8_lr;
+    t2DTsfFirmwareInfo[3][iClk][4][3] = result->m_t2d3ts8_pr;
   }
 }
 
 
 // t3DFirmwareInfo[tIndex][iClk][2DValid, 2DisOld, TSFValid, EventTimeValid, eventTime, charge, rho, phi0, z0, cot, zchi]
-void TRGCDCT3DConverterModule::store3DFirmwareData(vector<vector<vector<double> > >& t3DFirmwareInfo)
+void TRGCDCT3DConverterModule::store3DFirmwareData(multi_array<double, 3>& t3DFirmwareInfo)
 {
-  t3DFirmwareInfo.resize(4, vector<vector<double> > (48, vector<double> (11)));
 
-  for (int iClk = 0; iClk < m_firmwareResults.getEntries() - 11 - 1; iClk++) {
+  for (int iClk = 0; iClk < m_firmwareResults.getEntries() - 17 - 1; iClk++) {
     TRGCDCT3DUnpackerStore* result = m_firmwareResults[iClk];
-    TRGCDCT3DUnpackerStore* result3D = m_firmwareResults[iClk + 11];
+    TRGCDCT3DUnpackerStore* result3D = m_firmwareResults[iClk + 17];
 
-    bitset<6> t2d_fnf(int(result3D->m_t3d_2dfnf));
+    bitset<6> t3d_fnf(int(result3D->m_t3d_2dfnf));
     bitset<4> tsf_fnf(int(result3D->m_t3d_validTS));
-    bitset<6> t2d_oldfnf(int(result->m_t3d_2doldtrk));
+    bitset<6> t3d_oldfnf(int(result->m_t3d_2doldtrk));
 
-    //cout<<iClk<<" "<<t2d_fnf<<" "<<t2d_oldfnf<<endl;
+    //cout<<iClk<<" "<<t3d_fnf<<" "<<t3d_oldfnf<<endl;
 
-    t3DFirmwareInfo[0][iClk][0] = t2d_fnf[5];
-    t3DFirmwareInfo[0][iClk][1] = t2d_oldfnf[5];
-    t3DFirmwareInfo[0][iClk][2] = tsf_fnf[3];
-    t3DFirmwareInfo[0][iClk][3] = result3D->m_t3dtrk0_evtTimeValid_delay;
-    t3DFirmwareInfo[0][iClk][4] = result3D->m_t3dtrk0_evtTime_delay;
+//The evtTime information was for debugging, but the currnet firmware doese not output the evtTime information corresponding to every track.
+
+    t3DFirmwareInfo[0][iClk][0] = t3d_fnf[5];
+    t3DFirmwareInfo[0][iClk][1] = t3d_oldfnf[5];
+    t3DFirmwareInfo[0][iClk][2] = tsf_fnf[0];
+//    t3DFirmwareInfo[0][iClk][3] = result3D->m_t3dtrk0_evtTimeValid_delay;
+//    t3DFirmwareInfo[0][iClk][4] = result3D->m_t3dtrk0_evtTime_delay;
     t3DFirmwareInfo[0][iClk][5] = result->m_t2d0_charge;
     t3DFirmwareInfo[0][iClk][6] = result->m_t2d0_rho_s;
     t3DFirmwareInfo[0][iClk][7] = result->m_t2d0_phi;
@@ -920,37 +995,54 @@ void TRGCDCT3DConverterModule::store3DFirmwareData(vector<vector<vector<double> 
     t3DFirmwareInfo[0][iClk][9] = result3D->m_t3dtrk0_cot_s;
     t3DFirmwareInfo[0][iClk][10] = result3D->m_t3dtrk0_zchisq;
 
-    // [TODO] I am not sure of the sequence for the below information
-    //t3DFirmwareInfo[1][iClk][0] = t2d_fnf[4];
-    //t3DFirmwareInfo[1][iClk][1] = tsf_fnf[0];
-    //t3DFirmwareInfo[1][iClk][2] = result->m_t3dtrk1_z0_s;
-    //t3DFirmwareInfo[1][iClk][3] = result->m_t3dtrk1_cot_s;
-    //t3DFirmwareInfo[1][iClk][4] = result->m_t3dtrk1_zchisq;
+    t3DFirmwareInfo[1][iClk][0] = t3d_fnf[4];
+    t3DFirmwareInfo[1][iClk][1] = t3d_oldfnf[4];
+    t3DFirmwareInfo[1][iClk][2] = tsf_fnf[1];
+//    t3DFirmwareInfo[1][iClk][3] = result3D->m_t3dtrk1_evtTimeValid_delay;
+//    t3DFirmwareInfo[1][iClk][4] = result3D->m_t3dtrk1_evtTime_delay;
+    t3DFirmwareInfo[1][iClk][5] = result->m_t2d1_charge;
+    t3DFirmwareInfo[1][iClk][6] = result->m_t2d1_rho_s;
+    t3DFirmwareInfo[1][iClk][7] = result->m_t2d1_phi;
+    t3DFirmwareInfo[1][iClk][8] = result3D->m_t3dtrk1_z0_s;
+    t3DFirmwareInfo[1][iClk][9] = result3D->m_t3dtrk1_cot_s;
+    t3DFirmwareInfo[1][iClk][10] = result3D->m_t3dtrk1_zchisq;
 
-    //t3DFirmwareInfo[2][iClk][0] = t2d_fnf[3];
-    //t3DFirmwareInfo[2][iClk][1] = tsf_fnf[1];
-    //t3DFirmwareInfo[2][iClk][2] = result->m_t3dtrk2_z0_s;
-    //t3DFirmwareInfo[2][iClk][3] = result->m_t3dtrk2_cot_s;
-    //t3DFirmwareInfo[2][iClk][4] = result->m_t3dtrk2_zchisq;
+    t3DFirmwareInfo[2][iClk][0] = t3d_fnf[3];
+    t3DFirmwareInfo[2][iClk][1] = t3d_oldfnf[3];
+    t3DFirmwareInfo[2][iClk][2] = tsf_fnf[2];
+//    t3DFirmwareInfo[2][iClk][3] = result3D->m_t3dtrk2_evtTimeValid_delay;
+//    t3DFirmwareInfo[2][iClk][4] = result3D->m_t3dtrk2_evtTime_delay;
+    t3DFirmwareInfo[2][iClk][5] = result->m_t2d2_charge;
+    t3DFirmwareInfo[2][iClk][6] = result->m_t2d2_rho_s;
+    t3DFirmwareInfo[2][iClk][7] = result->m_t2d2_phi;
+    t3DFirmwareInfo[2][iClk][8] = result3D->m_t3dtrk2_z0_s;
+    t3DFirmwareInfo[2][iClk][9] = result3D->m_t3dtrk2_cot_s;
+    t3DFirmwareInfo[2][iClk][10] = result3D->m_t3dtrk2_zchisq;
 
-    //t3DFirmwareInfo[3][iClk][0] = t2d_fnf[2];
-    //t3DFirmwareInfo[3][iClk][1] = tsf_fnf[2];
-    //t3DFirmwareInfo[3][iClk][2] = result->m_t3dtrk3_z0_s;
-    //t3DFirmwareInfo[3][iClk][3] = result->m_t3dtrk3_cot_s;
-    //t3DFirmwareInfo[3][iClk][4] = result->m_t3dtrk3_zchisq;
+    t3DFirmwareInfo[3][iClk][0] = t3d_fnf[2];
+    t3DFirmwareInfo[3][iClk][1] = t3d_oldfnf[2];
+    t3DFirmwareInfo[3][iClk][2] = tsf_fnf[3];
+//    t3DFirmwareInfo[3][iClk][3] = result3D->m_t3dtrk3_evtTimeValid_delay;
+//    t3DFirmwareInfo[3][iClk][4] = result3D->m_t3dtrk3_evtTime_delay;
+    t3DFirmwareInfo[3][iClk][5] = result->m_t2d3_charge;
+    t3DFirmwareInfo[3][iClk][6] = result->m_t2d3_rho_s;
+    t3DFirmwareInfo[3][iClk][7] = result->m_t2d3_phi;
+    t3DFirmwareInfo[3][iClk][8] = result3D->m_t3dtrk3_z0_s;
+    t3DFirmwareInfo[3][iClk][9] = result3D->m_t3dtrk3_cot_s;
+    t3DFirmwareInfo[3][iClk][10] = result3D->m_t3dtrk3_zchisq;
+
   }
 
 }
 
 // t3DFirmwareInfo[tIndex][iClk][2DValid, 2DisOld, TSFValid, EventTimeValid, eventTime, charge, rho, phi0, z0, cot, zchi]
-void TRGCDCT3DConverterModule::store3DFastSimData(vector<vector<vector<double> > >& t3DFirmwareInfo)
+void TRGCDCT3DConverterModule::store3DFastSimData(multi_array<double, 3>& t3DFirmwareInfo)
 {
-  t3DFirmwareInfo.resize(4, vector<vector<double> > (48, vector<double> (11)));
 
-  for (int iClk = 0; iClk < m_firmwareResults.getEntries() - 11 - 1; iClk++) {
+  for (int iClk = 0; iClk < m_firmwareResults.getEntries() - 17 - 1; iClk++) {
 
     TRGCDCT3DUnpackerStore* result = m_firmwareResults[iClk];
-    TRGCDCT3DUnpackerStore* result3D = m_firmwareResults[iClk + 11];
+    TRGCDCT3DUnpackerStore* result3D = m_firmwareResults[iClk + 17];
     TRGCDCT3DUnpackerStore* resultDebug = m_firmwareResults[iClk + 4];
 
     if (bitset<6> (result->m_t2d_fnf)[5] == 0) continue;
@@ -1008,14 +1100,12 @@ void TRGCDCT3DConverterModule::store3DFastSimData(vector<vector<vector<double> >
 }
 
 // t3DFirmwareInfo[tIndex][iClk][2DValid, 2DisOld, TSFValid, EventTimeValid, eventTime, charge, rho, phi0, z0, cot, zchi]
-void TRGCDCT3DConverterModule::store3DFirmSimData(vector<vector<vector<double> > >& t3DFirmwareInfo)
+void TRGCDCT3DConverterModule::store3DFirmSimData(multi_array<double, 3>& t3DFirmwareInfo)
 {
-  t3DFirmwareInfo.resize(4, vector<vector<double> > (48, vector<double> (11)));
-
-  for (int iClk = 0; iClk < m_firmwareResults.getEntries() - 11 - 1; iClk++) {
+  for (int iClk = 0; iClk < m_firmwareResults.getEntries() - 17 - 1; iClk++) {
 
     TRGCDCT3DUnpackerStore* result = m_firmwareResults[iClk];
-    TRGCDCT3DUnpackerStore* result3D = m_firmwareResults[iClk + 11];
+    TRGCDCT3DUnpackerStore* result3D = m_firmwareResults[iClk + 17];
     TRGCDCT3DUnpackerStore* resultDebug = m_firmwareResults[iClk + 4];
 
     if (bitset<6> (result->m_t2d_fnf)[5] == 0) continue;
@@ -1208,9 +1298,9 @@ void TRGCDCT3DConverterModule::debug3DFirmware()
     //}
 
     // Compare 2D with debug and 3D after 4 clks and 11 clks
-    if (result->m_t2d_fnf && iClk < 48 - 11 - 1 && bitset<6> (result->m_t2d_fnf)[5]) {
+    if (result->m_t2d_fnf && iClk < 48 - 17 - 1 && bitset<6> (result->m_t2d_fnf)[5]) {
       TRGCDCT3DUnpackerStore* resultDebug = m_firmwareResults[iClk + 4];
-      TRGCDCT3DUnpackerStore* result3D = m_firmwareResults[iClk + 11];
+      TRGCDCT3DUnpackerStore* result3D = m_firmwareResults[iClk + 17];
 
       // Store information(charge, radius(cm), phi_c(rad), eventTime, eventTimeValid, [TS ID, TS LR, TS driftTime])
       // [TODO] Is evtTime clock correct?
@@ -1325,8 +1415,8 @@ void TRGCDCT3DConverterModule::debug3DFirmware()
         bitset<6> t2d_oldfnf(int(result->m_t3d_2doldtrk));
         cout << "iClk:" << iClk << endl;
         cout << "  [2D] fnf:" << result->m_t2d_fnf << " " << bitset<6> (result->m_t2d_fnf) << " oldfnf: " << t2d_oldfnf << endl;
-        cout << "    [0] rho: " << result->m_t2d0_rho_s << " " << t2DRhoTot3DRho(result->m_t2d0_rho_s) << " phi0: " << result->m_t2d0_phi <<
-             " " << t2DPhiTot3DPhi(result->m_t2d0_phi, result->m_t2d0_rho_s) << endl;
+//        cout << "    [0] rho: " << result->m_t2d0_rho_s << " " << t2DRhoTot3DRho(result->m_t2d0_rho_s) << " phi0: " << result->m_t2d0_phi <<
+//             " " << t2DPhiTot3DPhi(result->m_t2d0_phi, result->m_t2d0_rho_s) << endl;
         cout << "  [debug] MSB" << endl;
         cout << "    charge: " << resultDebug->m_t3dtrk0_charge << " rho: " << resultDebug->m_t3dtrk0_rho << " phi0: " << toSigned(
                resultDebug->m_t3dtrk0_phi0, 13) << endl;;
@@ -1449,53 +1539,90 @@ void TRGCDCT3DConverterModule::debug3DFirmware()
 
 // t3DFirmwareInfo[tIndex][iClk][2DValid, 2DisOld, TSFValid, EventTimeValid, eventTime, charge, rho, phi0, z0, cot, zchi]
 // t3DInfo[eventTime, charge, rho, phi0, z0, cot, zchi]
-void TRGCDCT3DConverterModule::filter3DData(std::vector<std::vector<std::vector<double> > >& t3DFirmwareInfo,
-                                            std::vector<std::vector<double> >& t3DInfo)
+void TRGCDCT3DConverterModule::filter3DData(multi_array<double, 3>& t3DFirmwareInfo,
+                                            multi_array<double, 2>& t3DInfo)
 {
-  for (unsigned iTrack = 0; iTrack < t3DFirmwareInfo.size(); iTrack++) {
-    for (unsigned iClk = 0; iClk < t3DFirmwareInfo[iTrack].size(); iClk++) {
+  for (unsigned iTrack = 0; iTrack < t3DFirmwareInfo.shape()[0]; iTrack++) {
+    for (unsigned iClk = 0; iClk < t3DFirmwareInfo.shape()[1]; iClk++) {
       //cout<<iClk<<" 2d: "<<t3DFirmwareInfo[iTrack][iClk][0]<<" tsf: "<<t3DFirmwareInfo[iTrack][iClk][2]<<" evt: "<<t3DFirmwareInfo[iTrack][iClk][3]<<" isOld: "<<t3DFirmwareInfo[iTrack][iClk][1]<<endl;
       // 2DValid
       if (t3DFirmwareInfo[iTrack][iClk][0] == 0) continue;
       //cout<<iClk<<" 2d: "<<t3DFirmwareInfo[iTrack][iClk][0]<<" tsf: "<<t3DFirmwareInfo[iTrack][iClk][2]<<" evt: "<<t3DFirmwareInfo[iTrack][iClk][3]<<" isOld: "<<t3DFirmwareInfo[iTrack][iClk][1]<<endl;
       // TSFValid
-      if (t3DFirmwareInfo[iTrack][iClk][2] == 0) continue;
+//t3DFirmwareInfo[iTrack][iClk][0] (t3d_fnf) := t2d_fnf & TSFValid, so using t3d_fnf is alreay sufficient
+//      if (t3DFirmwareInfo[iTrack][iClk][2] == 0) continue;
       // EventTimeValid
-      if (t3DFirmwareInfo[iTrack][iClk][3] == 0) continue;
+//      if (t3DFirmwareInfo[iTrack][iClk][3] == 0) continue;
       // TODO make an algorithm to follow the track.
       // Start follow status of track.
-      if (t3DInfo.size() != 0 && t3DFirmwareInfo[iTrack][iClk][1] == 1) continue;
+      //choose new tracks
+//      if (t3DInfo.size() != 0 && t3DFirmwareInfo[iTrack][iClk][1] == 1) continue;
       //if (t3DFirmwareInfo[iTrack][iClk][1] == 1) continue;
-      vector<double> track3D = {t3DFirmwareInfo[iTrack][iClk][4], t3DFirmwareInfo[iTrack][iClk][5], t3DFirmwareInfo[iTrack][iClk][6], t3DFirmwareInfo[iTrack][iClk][7], t3DFirmwareInfo[iTrack][iClk][8], t3DFirmwareInfo[iTrack][iClk][9], t3DFirmwareInfo[iTrack][iClk][10]};
-      t3DInfo.push_back(track3D);
+      double track3D_ref[7] = {t3DFirmwareInfo[iTrack][iClk][4], t3DFirmwareInfo[iTrack][iClk][5], t3DFirmwareInfo[iTrack][iClk][6], t3DFirmwareInfo[iTrack][iClk][7], t3DFirmwareInfo[iTrack][iClk][8], t3DFirmwareInfo[iTrack][iClk][9], t3DFirmwareInfo[iTrack][iClk][10]};
+
+      multi_array_ref<double, 1> track3D((double*)track3D_ref, extents[7]);
+
+      t3DInfo.resize(extents[t3DInfo.shape()[0] + 1][7]);
+      t3DInfo[t3DInfo.shape()[0] - 1] = track3D;
+
     }
   }
 }
 
 // t3DInfo[eventTime, charge, rho, phi0, z0, cot, zchi]
-void TRGCDCT3DConverterModule::add3DDatastore(std::vector<std::vector<double> >& t3DInfo, bool doConvert)
+void TRGCDCT3DConverterModule::add3DDatastore(multi_array<double, 2>& t3DInfo, bool doConvert)
 {
-  for (unsigned iTrack = 0; iTrack < t3DInfo.size(); ++iTrack) {
+  for (unsigned iTrack = 0; iTrack < t3DInfo.shape()[0]; ++iTrack) {
     double charge = 0, phi0_i = 0, omega = 0, chi2D = 0, z0 = 0, cot = 0, zchi2 = 0;
     double phi0_c = 0;
     if (doConvert) {
       charge = t3DInfo[iTrack][1] == 2 ? -1 : 1;
       phi0_c = t2DPhiTot3DPhi(t3DInfo[iTrack][3], t3DInfo[iTrack][2]) / (pow(2, 12) - 0.5) * M_PI;
-      phi0_i = phi0_c + charge * M_PI_2;
-      omega = charge / t2DRhoTot3DRho(t3DInfo[iTrack][2]) / (pow(2, 11) - 0.5) * 2500;
+      //phi0_i = phi0_c + charge * M_PI_2;
+      phi0_i = (45 + 90. / 80 * (1 + t3DInfo[iTrack][3])) / 180 * M_PI;
+      //omega = charge / t2DRhoTot3DRho(t3DInfo[iTrack][2]) / (pow(2, 11) - 0.5) * 2500;
+      omega = toSigned(t3DInfo[iTrack][2], 7) / 33.0 * 3.2;
       z0 = toSigned(t3DInfo[iTrack][4], 11) * 0.0382;
       cot = toSigned(t3DInfo[iTrack][5], 11) * 0.00195;
       zchi2 = t3DInfo[iTrack][6];
     } else {
       charge = t3DInfo[iTrack][1] == 1 ? 1 : -1;
-      phi0_c = t3DInfo[iTrack][3];
-      phi0_i = phi0_c + charge * M_PI_2;
-      omega = charge / t3DInfo[iTrack][2];
+      phi0_c = t2DPhiTot3DPhi((t3DInfo[iTrack][3] - 34 / 90.*80 - 1), t3DInfo[iTrack][2]) / (pow(2, 12) - 0.5) * M_PI;
+      phi0_i = t3DInfo[iTrack][3];
+      omega = t3DInfo[iTrack][2];
       z0 = t3DInfo[iTrack][4];
       cot = t3DInfo[iTrack][5];
       zchi2 = t3DInfo[iTrack][6];
     }
-    if (phi0_i > M_PI) phi0_i -= 2 * M_PI;
+
+    //Correct phi0_i.  The zero points of raw phi0_i for four boards are different.
+    if (m_firmwareResultCollectionName == "TRGCDCT3DUnpackerStore0") {
+      phi0_c = phi0_c + (M_PI / 2.0) * 0;
+      phi0_i = phi0_i + (M_PI / 2.0) * 0;
+    } else if (m_firmwareResultCollectionName == "TRGCDCT3DUnpackerStore1") {
+      phi0_c = phi0_c + (M_PI / 2.0) * 1;
+      phi0_i = phi0_i + (M_PI / 2.0) * 1;
+    } else if (m_firmwareResultCollectionName == "TRGCDCT3DUnpackerStore2") {
+      phi0_c = phi0_c + (M_PI / 2.0) * 2;
+      phi0_i = phi0_i + (M_PI / 2.0) * 2;
+    } else if (m_firmwareResultCollectionName == "TRGCDCT3DUnpackerStore3") {
+      phi0_c = phi0_c + (M_PI / 2.0) * 3;
+      phi0_i = phi0_i + (M_PI / 2.0) * 3;
+    }
+    // Confine the range of the angle to -pi ~ pi
+    while (phi0_c > M_PI) {
+      phi0_c -= 2 * M_PI;
+    }
+    while (phi0_i < -M_PI) {
+      phi0_c += 2 * M_PI;
+    }
+    while (phi0_i > M_PI) {
+      phi0_i -= 2 * M_PI;
+    }
+    while (phi0_i < -M_PI) {
+      phi0_i += 2 * M_PI;
+    }
+
     //cout<<"iTrack: "<<iTrack<<" eventTime:"<<t3DInfo[iTrack][0]<<" charge:"<<charge<<" omega: "<<omega<<" rho: "<<charge/omega<<" pt: "<<charge/omega*0.3*1.5*0.01<<" phi0_i: "<<phi0_i<<" "<<phi0_i*180/M_PI<<" phi0_c: "<<phi0_c<<" "<<phi0_c*180/M_PI<<" z0:"<<z0<<" cot:"<<cot<<" theta: "<<M_PI/2-atan(cot)<<" zchi:"<<zchi2<<endl;
     if (m_isVerbose) cout << "[3D] iTrack:" << iTrack << " charge: " << charge << " phi0_i:" << phi0_i << " " << phi0_i * 180 / M_PI <<
                             " omega:" << omega << " pt:" << charge / omega * 0.3 * 1.5 * 0.01 << " z0:" << z0 << " cot:" << cot << " zchi2:" << zchi2 << endl;

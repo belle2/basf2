@@ -1392,7 +1392,12 @@ class CAF():
                         if calibration.dependencies_met():
                             if not calibration.is_alive():
                                 B2DEBUG(29, f"Starting {calibration.name}.")
-                                calibration.start()
+                                try:
+                                    calibration.start()
+                                except RuntimeError:
+                                    # Catch the case when the calibration just finished so it ended up here
+                                    # in the "else" and not above where it should have been joined.
+                                    B2DEBUG(29, f"{calibration.name} probably just finished, join it later.")
                             remaining_calibrations.append(calibration)
                         else:
                             if not calibration.failed_dependencies():

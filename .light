@@ -2,6 +2,8 @@
 /.externals
 /index.rst
 /whatsnew.rst
+/COPYING
+/LICENSE.md
 /site_scons/
 /framework/
 /mdst/

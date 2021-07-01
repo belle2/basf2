@@ -75,7 +75,7 @@ void TrackCandidateResultRefiner::initialize()
   } else if (m_param_EstimationMethod == "helixFit") {
     m_estimator = std::make_unique<QualityEstimatorRiemannHelixFit>();
   }
-  B2FATAL("QualityEstimator could not be initialized with method: " << m_param_EstimationMethod);
+  B2ASSERT("QualityEstimator could not be initialized with method: " << m_param_EstimationMethod, m_estimator);
 }
 
 void TrackCandidateResultRefiner::beginRun()

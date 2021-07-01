@@ -24,6 +24,7 @@
 #include <analysis/VariableManager/Utility.h>
 
 //MDST
+#include <mdst/dataobjects/KlId.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
@@ -45,6 +46,21 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
       }
     }
+
+    double eclClusterKlId(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster) {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      const KlId* klid = cluster->getRelatedTo<KlId>();
+      if (!klid) {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return klid->getKlId();
+    }
+
+
     double eclPulseShapeDiscriminationMVA(const Particle* particle)
     {
       const ECLCluster* cluster = particle->getECLCluster();
@@ -1218,6 +1234,12 @@ Returns MVA classifier that uses shower shape variables to distinguish true clus
 
 The variables used in the training (in decreasing order of significance): clusterTiming, clusterE, clusterTheta, 
 clusterZernikeMVA,  clusterE1E9, clusterLat, clusterSecondMoment and clusterPhi. )DOC");
+    REGISTER_VARIABLE("clusterKlId", eclClusterKlId, R"DOC(
+Returns MVA classifier that uses ECL clusters variables to discriminate Klong clusters from em background.
+    
+    - 1 for Kl
+    - 0 for background
+)DOC");
     REGISTER_VARIABLE("clusterPulseShapeDiscriminationMVA", eclPulseShapeDiscriminationMVA, R"DOC(
 Returns MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers.
 

@@ -47,6 +47,15 @@ def get_argument_parser():
     )
 
     parser.add_argument(
+        "--data",
+        action="store_true",
+        help=(
+            "Pass this flag if intending to run this skim on data, so that MC "
+            "quantities are not saved in the output."
+        ),
+    )
+
+    parser.add_argument(
         "--no-stats",
         action="store_true",
         help=(
@@ -132,6 +141,7 @@ def main():
     CodeString = template.render(
         skims=skims,
         modules=modules,
+        data=args.data,
         stats=(not args.no_stats),
         hints=(not args.no_user_hints),
         mdstOutput=args.skimmed_mdst_output,

@@ -415,6 +415,13 @@ class RejectionOverEfficiency(Plotter):
         efficiency, efficiency_error = hists.get_efficiency(['Signal'])
         rejection, rejection_error = hists.get_efficiency(['Background'])
         rejection = 1 - rejection
+        if type(efficiency) == int and type(rejection) != int:
+            efficiency = np.array([efficiency]*len(rejection))
+        elif type(rejection) == int and type(efficiency) != int:
+            rejection = np.array([rejection]*len(efficiency))
+        elif type(rejection) == int and type(efficiency) == int:
+            efficiency = np.array([efficiency])
+            rejection = np.array([rejection])
 
         self.xmin, self.xmax = numpy.nanmin([efficiency.min(), self.xmin]), numpy.nanmax([efficiency.max(), self.xmax])
         self.ymin, self.ymax = numpy.nanmin([rejection.min(), self.ymin]), numpy.nanmax([rejection.max(), self.ymax])

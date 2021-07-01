@@ -289,6 +289,72 @@ namespace Belle2 {
     */
     double eventT0(const Particle*);
 
+    /**
+    * return the time since the previous trigger in clock ticks (127MHz=RF/4 clock)
+    */
+    double timeSincePrevTriggerClockTicks(const Particle*);
+
+    /**
+    * return the time since the previous trigger in micro seconds
+    */
+    double timeSincePrevTriggerMicroSeconds(const Particle*);
+
+    /**
+    * return number of triggered bunch ranging from 0-1279
+    * Note: There are a maximum of 5120 buckets, which could each carry one bunch of e+/e-,
+    *       but we only have 1280 clock ticks (=5120/4) to identify the bunches
+    * Note: This returns the number as provided by the TTD, which might differ from the 'global'
+    *       bunch number.
+    */
+    double triggeredBunchNumberTTD(const Particle*);
+
+    /**
+    * return 'global' number of triggered bunch ranging from 0-1279 as given by SKB
+    * Note: There are a maximum of 5120 buckets, which could each carry one bunch of e+/e-,
+    *       but we only have 1280 clock ticks (=5120/4) to identify the bunches
+    */
+    double triggeredBunchNumber(const Particle*);
+
+    /**
+    * return 1 if an injection happened recently
+    */
+    double hasRecentInjection(const Particle*);
+
+    /**
+    * return the time since the last injection pre-kick signal in clock ticks (127MHz=RF/4 clock)
+    * Note: this returns the time without the delay until the injected bunch reaches the detector
+    *       (which differs for HER/LER)
+    */
+    double timeSinceLastInjectionSignalClockTicks(const Particle*);
+
+    /**
+    * return the time since the last injection pre-kick signal in micro seconds
+    * Note: this returns the time without the delay until the injected bunch reaches the detector
+    *       (which differs for HER/LER)
+    */
+    double timeSinceLastInjectionSignalMicroSeconds(const Particle*);
+
+    /**
+    * return the time since the last injected bunchh passed by the IP in clock ticks (127MHz=RF/4 clock)
+    */
+    double timeSinceLastInjectionClockTicks(const Particle*);
+
+    /**
+    * return the time since the last injected bunchh passed by the IP in micro seconds
+    */
+    double timeSinceLastInjectionMicroSeconds(const Particle*);
+
+    /**
+    * return 1 for injection in HER, 0 for injection in LER
+    */
+    double injectionInHER(const Particle*);
+
+    /**
+    * return lowest bit of revolution counter
+    * Note: Mostly important for PXD; needs ~2 revolutions to read out one frame
+    */
+    double revolutionCounter2(const Particle*);
+
   }
 } // Belle2 namespace
 

@@ -73,7 +73,7 @@ void eclLeakageCollectorModule::prepare()
   const int n_e_barrel = m_energies_barrel.size();
   const int n_e_backward = m_energies_backward.size();
   if (n_e_forward != m_number_energies or n_e_barrel != m_number_energies or n_e_backward != m_number_energies) {
-    B2ERROR("eclLeakageCollector: length of energy vectors inconsistent with parameter number_energies: " << n_e_forward << " " <<
+    B2FATAL("eclLeakageCollector: length of energy vectors inconsistent with parameter number_energies: " << n_e_forward << " " <<
             n_e_barrel << " " << n_e_backward << " " << m_number_energies);
   }
 
@@ -83,6 +83,18 @@ void eclLeakageCollectorModule::prepare()
     i_energies[0][ie] = (int)(1000.*m_energies_forward[ie] + 0.001);
     i_energies[1][ie] = (int)(1000.*m_energies_barrel[ie] + 0.001);
     i_energies[2][ie] = (int)(1000.*m_energies_backward[ie] + 0.001);
+  }
+
+  //..Require all energies are different, and that there are at least two
+  if (m_number_energies < 2) {
+    B2FATAL("eclLeakageCollector: require at least two energy points. m_number_energies = " << m_number_energies);
+  }
+  for (int ie = 0; ie < m_number_energies - 1; ie++) {
+    for (int ireg = 0; ireg < nLeakReg; ireg++) {
+      if (i_energies[ireg][ie] == i_energies[ireg][ie + 1]) {
+        B2FATAL("eclLeakageCollector: identical energies, ireg = " << ireg << ", " << i_energies[ireg][ie] << " MeV");
+      }
+    }
   }
 
   //-----------------------------------------------------------------

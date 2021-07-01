@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
   const KLMChannelArrayIndex* channelArrayIndex = &(KLMChannelArrayIndex::Instance());
   for (int i = 1; i <= nChannels; ++i) {
     uint16_t index = std::atoi(argv[i]);
-    uint16_t number = channelArrayIndex->getNumber(index);
+    KLMChannelNumber number = channelArrayIndex->getNumber(index);
     B2INFO("Channel index: " << index << "  ==> Channel number: " << number);
   }
   return 0;

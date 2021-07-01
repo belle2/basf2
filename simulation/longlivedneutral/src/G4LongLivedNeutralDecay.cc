@@ -160,7 +160,7 @@ G4VParticleChange* G4LongLivedNeutralDecay::DecayIt(const G4Track& aTrack, const
     finalGlobalTime += fRemainderLifeTime;
     finalLocalTime += fRemainderLifeTime;
     energyDeposit += aPrimaryParticle->GetKineticEnergy();
-    if (isPreAssigned) products->Boost(ParentEnergy, ParentDirection);
+    products->Boost(ParentEnergy, ParentDirection);
   } else {
     // default for LongLivedNeutral: PostStep case (decay in flight)
     products->Boost(ParentEnergy, ParentDirection);

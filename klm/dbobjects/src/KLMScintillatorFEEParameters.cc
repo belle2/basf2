@@ -21,19 +21,21 @@ KLMScintillatorFEEParameters::~KLMScintillatorFEEParameters()
 {
 }
 
-void KLMScintillatorFEEParameters::setFEEData(uint16_t strip, KLMScintillatorFEEData* data)
+void KLMScintillatorFEEParameters::setFEEData(
+  KLMChannelNumber strip, KLMScintillatorFEEData* data)
 {
-  std::map<uint16_t, KLMScintillatorFEEData>::iterator it;
+  std::map<KLMChannelNumber, KLMScintillatorFEEData>::iterator it;
   it = m_FEEParameters.find(strip);
   if (it == m_FEEParameters.end())
-    m_FEEParameters.insert(std::pair<uint16_t, KLMScintillatorFEEData>(strip, *data));
+    m_FEEParameters.insert(std::pair<KLMChannelNumber, KLMScintillatorFEEData>(strip, *data));
   else
     it->second = *data;
 }
 
-const KLMScintillatorFEEData* KLMScintillatorFEEParameters::getFEEData(uint16_t strip) const
+const KLMScintillatorFEEData* KLMScintillatorFEEParameters::getFEEData(
+  KLMChannelNumber strip) const
 {
-  std::map<uint16_t, KLMScintillatorFEEData>::const_iterator it;
+  std::map<KLMChannelNumber, KLMScintillatorFEEData>::const_iterator it;
   it = m_FEEParameters.find(strip);
   if (it == m_FEEParameters.end())
     return nullptr;

@@ -230,7 +230,8 @@ namespace Belle2 {
       ibyte++;
     }
 
-    unsigned char* len = (unsigned char*)&head.length;
+    auto len = reinterpret_cast<const unsigned char*>(&head.length);
+
     for (int i = 0; i < 4; i++) {
       shift = (3 - ibyte % 4) * 8;
       buffer[ibyte / 4] |= len[3 - i] << shift;
@@ -238,7 +239,7 @@ namespace Belle2 {
     }
 
     // trigger number
-    unsigned char* trg = (unsigned char*)(&head.trigger);
+    auto trg = reinterpret_cast<const unsigned char*>(&head.trigger);
     for (int i = 0; i < 4; i++) {
       shift = (3 - ibyte % 4) * 8;
       buffer[ibyte / 4] |= trg[3 - i] << shift;

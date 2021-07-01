@@ -118,11 +118,18 @@ namespace Belle2 {
       return m_ModuleID;
     }
 
-    //! Get reconstructed hit time
-    //! @return reconstructed hit time (ns)
+    //! Get reconstructed hit time.
+    //! @return Reconstructed hit time (ns).
     float getTime() const
     {
       return m_Time;
+    }
+
+    //! Set reconstructed hit time.
+    //! @parameter time Reconstructed hit time (ns).
+    void setTime(double time)
+    {
+      m_Time = time;
     }
 
     //! Get energy deposition

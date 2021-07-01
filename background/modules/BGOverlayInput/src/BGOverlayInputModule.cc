@@ -199,6 +199,9 @@ bool BGOverlayInputModule::connectBranches()
   auto storeFlags = DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered;
   auto& map = DataStore::Instance().getStoreEntryMap(durability);
 
+  // StoreObjPointers have to be included explicitly
+  const std::set<std::string> objPtrNames = {"Belle2::ECLWaveforms", "Belle2::PXDInjectionBGTiming", "Belle2::EventLevelTriggerTimeInfo"};
+
   const TObjArray* branches = m_tree->GetListOfBranches();
   if (!branches) return false;
 
@@ -233,7 +236,7 @@ bool BGOverlayInputModule::connectBranches()
       DataStore::StoreEntry& entry = (map.find(name))->second;
       m_tree->SetBranchAddress(branchName.c_str(), &(entry.object));
       m_storeEntries.push_back(&entry);
-    } else if (objName == "Belle2::ECLWaveforms" or objName == "Belle2::PXDInjectionBGTiming") {
+    } else if (objPtrNames.find(objName) != objPtrNames.end()) {
       std::string name = branchName;// + m_extensionName;
       bool ok = DataStore::Instance().registerEntry(name, durability, objectPtr->IsA(),
                                                     false, storeFlags);

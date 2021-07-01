@@ -15,6 +15,7 @@
 #include <analysis/dbobjects/ChargedPidMVAWeights.h>
 
 #include <gtest/gtest.h>
+#include <random>
 
 #include <TH2F.h>
 
@@ -36,9 +37,9 @@ namespace Belle2 {
     Const::ChargedStable m_testHypo = Const::electron;
 
     /**
-     * The (clusterTheta, p) grid for which xml files are stored in the payload.
+     * The (clusterTheta, p, charge) grid for which xml files are stored in the payload.
      */
-    std::unique_ptr<TH2F> m_grid;
+    std::unique_ptr<TH3F> m_grid;
 
     /**
      * The clusterTheta bin edges in [rad].
@@ -48,12 +49,12 @@ namespace Belle2 {
     /**
      * The p bin edges in [GeV/c].
      */
-    std::vector<float> m_pbins = {0.0, 0.5, 0.75, 1.0, 3.0, 100.0};
+    std::vector<float> m_pbins = {0.2, 0.6, 0.75, 1.0, 3.0, 7.0};
 
     /**
-     * The clusterRegion bins.
+     * The charge bin edges.
      */
-    std::vector<int> m_eclregbins = {1, 11, 2, 13, 3};
+    std::vector<float> m_chbins = { -1.5, -0.5, 0.5, 1.5};
 
     /**
      * Base common name for all dummy weight files.
@@ -75,35 +76,39 @@ namespace Belle2 {
     void SetUp() override
     {
 
-      m_grid = std::make_unique<TH2F>("theta_p_binsgrid",
-                                      ";ECL cluster #theta;p_{lab}",
+      m_grid = std::make_unique<TH3F>("theta_p_charge_binsgrid",
+                                      ";ECL cluster #theta;p_{lab}; Q",
                                       m_thetabins.size() - 1,
                                       m_thetabins.data(),
                                       m_pbins.size() - 1,
-                                      m_pbins.data());
+                                      m_pbins.data(),
+                                      m_chbins.size() - 1,
+                                      m_chbins.data());
 
       m_dbrep.setWeightCategories(m_grid.get());
 
-      m_dbrep.setAngularUnit(Unit::rad);
-      m_dbrep.setEnergyUnit(Unit::GeV);
+      std::vector<std::tuple<double, double, double>> gridBinCentres;
 
-      std::vector<std::pair<float, float>> gridBinCentres;
+      for (unsigned int kch(0); kch < m_chbins.size() - 1; kch++) {
+        auto ch_bin_centre = (m_chbins.at(kch) + m_chbins.at(kch + 1)) / 2.0;
+        for (unsigned int ip(0); ip < m_pbins.size() - 1; ip++) {
+          auto p_bin_centre = (m_pbins.at(ip) + m_pbins.at(ip + 1)) / 2.0;
+          for (unsigned int jth(0); jth < m_thetabins.size() - 1; jth++) {
+            auto th_bin_centre = (m_thetabins.at(jth) + m_thetabins.at(jth + 1)) / 2.0;
+            auto fname = m_basename
+                         + "__clusterTheta__" + std::to_string(m_thetabins.at(jth)) + "_" + std::to_string(m_thetabins.at(jth + 1))
+                         + "__p__" + std::to_string(m_pbins.at(ip)) + "_" + std::to_string(m_pbins.at(ip + 1))
+                         + "__charge__" + std::to_string(ch_bin_centre);
 
-      for (unsigned int ip(0); ip < m_pbins.size() - 1; ip++) {
-        auto p_bin_centre = (m_pbins.at(ip) + m_pbins.at(ip + 1)) / 2.0;
-        for (unsigned int jth(0); jth < m_thetabins.size() - 1; jth++) {
-          auto th_bin_centre = (m_thetabins.at(jth) + m_thetabins.at(jth + 1)) / 2.0;
-          auto fname = m_basename
-                       + "__p__" + std::to_string(m_pbins.at(ip)) + "_" + std::to_string(m_pbins.at(ip + 1))
-                       + "__clusterTheta__" + std::to_string(m_thetabins.at(jth)) + "_" + std::to_string(m_thetabins.at(jth + 1));
-          std::replace(fname.begin(), fname.end(), '.', '_');
-          fname += ".xml";
-          std::ofstream dummyfile(fname);
-          dummyfile.close();
-          m_dummyfiles.push_back(fname);
+            std::replace(fname.begin(), fname.end(), '.', '_');
+            fname += ".xml";
+            std::ofstream dummyfile(fname);
+            dummyfile.close();
+            m_dummyfiles.push_back(fname);
 
-          auto centre = std::make_pair(th_bin_centre, p_bin_centre);
-          gridBinCentres.push_back(centre);
+            auto centre = std::make_tuple(th_bin_centre, p_bin_centre, ch_bin_centre);
+            gridBinCentres.push_back(centre);
+          }
         }
       }
       m_dbrep.storeMVAWeights(m_testHypo.getPDGCode(), m_dummyfiles, gridBinCentres);
@@ -134,30 +139,41 @@ namespace Belle2 {
   TEST_F(ChargedParticleIdentificatorTest, TestDBRep)
   {
 
-    // Pick a value for (clusterTheta, p) in the grid.
-    int binx = 3;
-    int biny = 4;
+    // Pick a random index in the clusterTheta, p, charge bins arrays.
+    // Exclude underflow and overflow.
+    std::random_device rd; // non-deterministic uniform int rand generator.
+    std::uniform_int_distribution<int> binx_idx_distr(1, m_thetabins.size() - 1);
+    std::uniform_int_distribution<int> biny_idx_distr(1, m_pbins.size() - 1);
+    std::uniform_int_distribution<int> binz_idx_distr(1, m_chbins.size() - 1);
+    int binx = binx_idx_distr(rd);
+    int biny = biny_idx_distr(rd);
+    int binz = binz_idx_distr(rd);
+
+    // Pick each axis' bin centre as a test value for (clusterTheta, p, charge).
     auto theta = m_grid->GetXaxis()->GetBinCenter(binx);
     auto p = m_grid->GetYaxis()->GetBinCenter(biny);
+    auto charge = m_grid->GetZaxis()->GetBinCenter(binz);
 
-    int jth, ip;
-    auto ji = m_dbrep.getMVAWeightIdx(theta, p, jth, ip);
+    int jth, ip, kch;
+    auto jik = m_dbrep.getMVAWeightIdx(theta, p, charge, jth, ip, kch);
 
     EXPECT_EQ(jth, binx);
     EXPECT_EQ(ip, biny);
+    EXPECT_EQ(kch, binz);
 
     auto thisfname = m_basename
+                     + "__clusterTheta__" + std::to_string(m_thetabins.at(jth - 1)) + "_" + std::to_string(m_thetabins.at(jth))
                      + "__p__" + std::to_string(m_pbins.at(ip - 1)) + "_" + std::to_string(m_pbins.at(ip))
-                     + "__clusterTheta__" + std::to_string(m_thetabins.at(jth - 1)) + "_" + std::to_string(m_thetabins.at(jth));
+                     + "__charge__" + std::to_string(charge);
     std::replace(thisfname.begin(), thisfname.end(), '.', '_');
     thisfname += ".xml";
 
-    EXPECT_EQ(thisfname, m_dummyfiles.at(ji));
+    EXPECT_EQ(thisfname, m_dummyfiles.at(jik));
 
     auto matchitr = std::find(m_dummyfiles.begin(), m_dummyfiles.end(), thisfname);
     auto thisidx = std::distance(m_dummyfiles.begin(), matchitr);
 
-    EXPECT_EQ(thisidx, ji);
+    EXPECT_EQ(thisidx, jik);
 
   }
 

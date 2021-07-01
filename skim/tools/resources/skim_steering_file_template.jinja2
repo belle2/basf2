@@ -37,7 +37,13 @@ except (ImportError, ModuleNotFoundError):
 {% endif %}
 path = b2.Path()
 {% if skims|length == 1 and not mdstOutput -%}
-    skim = {{ skims[0] }}(){%- if hints %}  # pass udstOutput=False to disable udstOutput{%- endif %}
+    skim = {{ skims[0] }}(
+    {%- if data -%}
+    mc=False
+    {%- else -%}
+    mc=True
+    {%- endif -%}
+){%- if hints %}  # pass udstOutput=False to disable udstOutput{%- endif %}
 {% else -%}
     skim = CombinedSkim(
     {% for skim in skims -%}
@@ -47,6 +53,11 @@ path = b2.Path()
     {{ "    " }}udstOutput=False,
     mdstOutput=True,
     mdst_kwargs=dict(),
+    {% endif -%}
+    {%- if data -%}
+    {{ "    " }}mc=False,
+    {% else -%}
+    {{ "    " }}mc=True,
     {% endif -%}
     )
 {% endif %}

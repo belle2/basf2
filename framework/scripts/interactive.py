@@ -12,11 +12,12 @@ be used. Use Ctrl+D to exit the shell.
     >>> interactive.embed()
     In [1]:
 
-See framework/examples/interactive.py for an example.
+See framework/examples/interactive_python.py for an example.
 """
 
 from traitlets.config.loader import Config
 from IPython.terminal.prompts import Prompts, Token
+from IPython import embed
 
 
 class Basf2IPythonPrompt(Prompts):

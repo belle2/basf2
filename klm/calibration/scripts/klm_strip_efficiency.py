@@ -14,7 +14,7 @@ from caf.strategies import AlgorithmStrategy, StrategyError
 from caf.state_machines import AlgorithmMachine
 from ROOT.Belle2 import KLMStripEfficiencyAlgorithm
 from klm_strategies_common import get_lowest_exprun, get_highest_exprun, \
-                                  calibration_result_string
+    calibration_result_string
 
 
 class KLMStripEfficiency(AlgorithmStrategy):
@@ -186,7 +186,7 @@ class KLMStripEfficiency(AlgorithmStrategy):
         # the next or previous normal run.
         def can_merge(run_data, run_not_enough_data, run_normal):
             return run_data[run_not_enough_data][3].newExtHitsPlanes(
-                       run_data[run_normal][3].getExtHitsPlane()) == 0
+                run_data[run_normal][3].getExtHitsPlane()) == 0
 
         for run_range in run_ranges:
             next_run = run_range[1]

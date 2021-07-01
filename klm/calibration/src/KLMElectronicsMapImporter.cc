@@ -164,10 +164,10 @@ void KLMElectronicsMapImporter::loadBKLMElectronicsMap(int version)
         }
       }
 
-      uint16_t detectorChannel = m_ElementNumbers->channelNumberBKLM(
-                                   section, sector, layer, plane, iStrip);
+      KLMChannelNumber detectorChannel = m_ElementNumbers->channelNumberBKLM(
+                                           section, sector, layer, plane, iStrip);
       m_ChannelMap.insert(
-        std::pair<uint16_t, KLMElectronicsChannel>(
+        std::pair<KLMChannelNumber, KLMElectronicsChannel>(
           detectorChannel,
           KLMElectronicsChannel(copperId, slotId, laneId, axisId, channelId)));
     }
@@ -193,10 +193,10 @@ void KLMElectronicsMapImporter::addEKLMLane(
     for (int strip = 1; strip <= EKLMElementNumbers::getMaximalStripNumber(); ++strip) {
       int axis = plane - 1;
       int channel = getEKLMStripFirmwareBySoftware(strip);
-      uint16_t detectorChannel = m_ElementNumbers->channelNumberEKLM(
-                                   section, sector, layer, plane, strip);
+      KLMChannelNumber detectorChannel = m_ElementNumbers->channelNumberEKLM(
+                                           section, sector, layer, plane, strip);
       m_ChannelMap.insert(
-        std::pair<uint16_t, KLMElectronicsChannel>(
+        std::pair<KLMChannelNumber, KLMElectronicsChannel>(
           detectorChannel,
           KLMElectronicsChannel(EKLM_ID + copper, slot, lane, axis, channel)));
     }
@@ -207,11 +207,11 @@ void KLMElectronicsMapImporter::setChannelsEKLMSegment(
   int section, int sector, int layer, int plane, int segment,
   int firmwareSegment)
 {
-  std::map<uint16_t, KLMElectronicsChannel>:: iterator it;
+  std::map<KLMChannelNumber, KLMElectronicsChannel>:: iterator it;
   for (int strip = 1; strip <= EKLMElementNumbers::getNStripsSegment(); ++strip) {
     int stripPlane = strip + EKLMElementNumbers::getNStripsSegment() * (segment - 1);
-    uint16_t detectorChannel = m_ElementNumbers->channelNumberEKLM(
-                                 section, sector, layer, plane, stripPlane);
+    KLMChannelNumber detectorChannel = m_ElementNumbers->channelNumberEKLM(
+                                         section, sector, layer, plane, stripPlane);
     it = m_ChannelMap.find(detectorChannel);
     if (it == m_ChannelMap.end())
       B2FATAL("The KLM electronics map is not loaded or incomplete.");
@@ -393,7 +393,7 @@ void KLMElectronicsMapImporter::loadEKLMElectronicsMap(int version, bool mc)
 void KLMElectronicsMapImporter::setLane(
   int subdetector, int section, int sector, int layer, int lane)
 {
-  std::map<uint16_t, KLMElectronicsChannel>::iterator it;
+  std::map<KLMChannelNumber, KLMElectronicsChannel>::iterator it;
   int minimalPlane = m_ElementNumbers->getMinimalPlaneNumber(subdetector);
   KLMChannelIndex klmChannel(subdetector, section, sector, layer, minimalPlane, 1);
   KLMChannelIndex klmModule(klmChannel);
@@ -401,7 +401,7 @@ void KLMElectronicsMapImporter::setLane(
   KLMChannelIndex klmNextModule(klmModule);
   ++klmNextModule;
   for (; klmChannel != klmNextModule; ++klmChannel) {
-    uint16_t channel = klmChannel.getKLMChannelNumber();
+    KLMChannelNumber channel = klmChannel.getKLMChannelNumber();
     it = m_ChannelMap.find(channel);
     if (it == m_ChannelMap.end())
       B2FATAL("The KLM electronics map is not loaded or incomplete.");
@@ -412,14 +412,14 @@ void KLMElectronicsMapImporter::setLane(
 void KLMElectronicsMapImporter::setLane(
   int subdetector, int section, int sector, int layer, int plane, int lane)
 {
-  std::map<uint16_t, KLMElectronicsChannel>::iterator it;
+  std::map<KLMChannelNumber, KLMElectronicsChannel>::iterator it;
   KLMChannelIndex klmChannel(subdetector, section, sector, layer, plane, 1);
   KLMChannelIndex klmPlane(klmChannel);
   klmPlane.setIndexLevel(KLMChannelIndex::c_IndexLevelPlane);
   KLMChannelIndex klmNextPlane(klmPlane);
   ++klmNextPlane;
   for (; klmChannel != klmNextPlane; ++klmChannel) {
-    uint16_t channel = klmChannel.getKLMChannelNumber();
+    KLMChannelNumber channel = klmChannel.getKLMChannelNumber();
     it = m_ChannelMap.find(channel);
     if (it == m_ChannelMap.end())
       B2FATAL("The KLM electronics map is not loaded or incomplete.");
@@ -431,7 +431,7 @@ void KLMElectronicsMapImporter::importElectronicsMap()
 {
   DBImportObjPtr<KLMElectronicsMap> electronicsMap;
   electronicsMap.construct();
-  std::map<uint16_t, KLMElectronicsChannel>::iterator it;
+  std::map<KLMChannelNumber, KLMElectronicsChannel>::iterator it;
   for (it = m_ChannelMap.begin(); it != m_ChannelMap.end(); ++it) {
     electronicsMap->addChannel(
       it->first,

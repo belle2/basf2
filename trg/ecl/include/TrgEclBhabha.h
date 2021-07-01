@@ -10,8 +10,7 @@
 //---------------------------------------------------------
 // $Log$
 //---------------------------------------------------------
-#ifndef TRGECLBHABHA_FLAG_
-#define TRGECLBHABHA_FLAG_
+#pragma once
 
 #include <vector>
 
@@ -53,6 +52,8 @@ namespace Belle2 {
     bool GetBhabha02();
     //!  MuMu selection for calibration
     bool Getmumu();
+    //!  Taub2b selection
+    bool GetTaub2b(double);
     //! Output 2D Bhabha combination
     std::vector<double> GetBhabhaComb() {return BhabhaComb ;}
     //! Save
@@ -92,6 +93,24 @@ namespace Belle2 {
     void set3DBhabhaVetoInTrackThetaRegion(const std::vector<int>& i3DBhabhaVetoInTrackThetaRegion)
     {
       m_3DBhabhaVetoInTrackThetaRegion = i3DBhabhaVetoInTrackThetaRegion;
+    }
+    // set 2 Cluster angle selection for tau 1x1 decay
+    // [0], [1] for low and high of dphi, [2], [3] for low and high of Theta Sum
+    void setTaub2bAngleCut(const std::vector<int>& iTaub2bAngleCut)
+    {
+      m_Taub2bAngleCut = iTaub2bAngleCut;
+    }
+    //
+    void setTaub2bEtotCut(const double iTaub2bEtotCut)
+    {
+      m_Taub2bEtotCut = iTaub2bEtotCut;
+    }
+    //
+    void setTaub2bClusterECut(const double iTaub2bClusterECut1,
+                              const double iTaub2bClusterECut2)
+    {
+      m_Taub2bClusterECut1 = iTaub2bClusterECut1;
+      m_Taub2bClusterECut2 = iTaub2bClusterECut2;
     }
     // get trigger bit of flag(1bit) whether two clusters statisfy 3D Bhabha veto
     // are in CDCTRG region in theta (="InTrack") or not
@@ -177,6 +196,12 @@ namespace Belle2 {
       }
       return m_3DBhabhaSelectionClusterTimings[cl_idx];
     }
+    // get taub2b 2 cluster angle cut flag
+    int getTaub2bAngleFlag(void) { return m_Taub2bAngleFlag; }
+    // get total energy(TC theta id=1-17) flag for taub2b
+    int getTaub2bEtotFlag(void) { return m_Taub2bEtotFlag; }
+    // taub2b Cluster energy flag
+    int getTaub2bClusterEFlag(void) { return m_Taub2bClusterEFlag; }
 
   private:
     /** Object of TC Mapping */
@@ -211,6 +236,19 @@ namespace Belle2 {
     double _mumuThreshold;
     //! mumu bit  Angle
     std::vector<double> _mumuAngle;
+    // taub2b 2 Cluster angle cut
+    std::vector<int> m_Taub2bAngleCut;
+    // taub2b total energy(TC theta id=1-17) cut
+    double m_Taub2bEtotCut;
+    // taub2b Cluster energy cut
+    double m_Taub2bClusterECut1;
+    double m_Taub2bClusterECut2;
+    // taub2b 2 cluster angle cut flag
+    int m_Taub2bAngleFlag;
+    // taub2b total energy(TC theta id=1-17) flag
+    int m_Taub2bEtotFlag;
+    // taub2b Cluster energy flag
+    int m_Taub2bClusterEFlag;
     // trigger bit of flag(1bit) whether two clusters statisfy 3D Bhabha veto
     // are in CDCTRG region in theta (="InTrack") or not
     int                 m_3DBhabhaVetoInTrackFlag;
@@ -240,5 +278,3 @@ namespace Belle2 {
 //
 //
 } // namespace Belle2
-
-#endif /* TRGECLBhabha_FLAG_ */

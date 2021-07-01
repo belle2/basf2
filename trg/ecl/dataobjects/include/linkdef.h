@@ -8,7 +8,7 @@
 #pragma link C++ class Belle2::TRGECLHit+; // checksum=0x6fddf1ee, version=1
 #pragma link C++ class Belle2::TRGECLFAMAna+; // checksum=0x3f565bdb, version=1
 #pragma link C++ class Belle2::TRGECLDigi0+; // checksum=0x6202df37, version=1
-#pragma link C++ class Belle2::TRGECLTrg+; // checksum=0x219f1a13, version=3
+#pragma link C++ class Belle2::TRGECLTrg+; // checksum=0xd902afea, version=4
 #pragma link C++ class Belle2::TRGECLDigi0MC+; // checksum=0x6400910f, version=1
 #pragma link C++ class Belle2::TRGECLHitMC+; // checksum=0x68b05823, version=1
 #pragma link C++ class Belle2::TRGECLCluster+; // checksum=0x5678a1b6, version=3

@@ -767,7 +767,7 @@ def warn_local_script(args):
 
 
 def make_combined_steering_file(
-    SkimName, CombinedSkimDefinitions, SteeringFileDirectory, LocalModule=None
+    SkimName, CombinedSkimDefinitions, SteeringFileDirectory, mc, LocalModule=None,
 ):
     """Construct a steering file for the requested combined skim."""
     SteeringFileDirectory = Path(SteeringFileDirectory)
@@ -794,6 +794,7 @@ def make_combined_steering_file(
     CodeString = template.render(
         skims=skims,
         modules=modules,
+        data=(not mc),
         stats=False,
         hints=False,
         mdstOutput=False,
@@ -917,7 +918,8 @@ def write_json_files(sampleRegistry, args, outputDirectory):
             skimName,
             CombinedSkimDefinitions,
             SteeringFileDirectory,
-            args.local_skim_script,
+            mc=args.mc,
+            LocalModule=args.local_skim_script,
         )
 
         for sampleLabel, sampleInfo in sampleRegistry.items():

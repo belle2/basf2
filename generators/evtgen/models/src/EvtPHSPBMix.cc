@@ -232,22 +232,21 @@ void EvtPHSPBBMix::decay(EvtParticle* p)
   //p->initializePhaseSpace(getNDaug(),getDaugs());
   //return;
 
-  bool pr(false);
-  if (pr) prlp(1);
+  if (_print_info) prlp(1);
 
   static const EvtId B0(EvtPDL::getId("B0"));
   static const EvtId B0B(EvtPDL::getId("anti-B0"));
 
   // generate a final state according to phase space
 
-  //  const bool ADaug(getNDaug()==4);//true if aliased Daugthers
-  if (pr) prlp(102);
+  //  const bool ADaug(getNDaug()==4);//true if aliased daughters
+  if (_print_info) prlp(102);
 
   const bool NCC(getNDaug() >= 4 && !_BBpipi); //true if daughters not charged-conjugated
   //    const bool BBpi(getNDaug()==
-  if (pr) prlp(103);
+  if (_print_info) prlp(103);
   if (NCC) {
-    if (pr) prlp(2);
+    if (_print_info) prlp(2);
     std::vector<EvtId> tempDaug(getNDaug() - 2);
     tempDaug[0] = getDaug(0);
     tempDaug[1] = getDaug(1);
@@ -256,12 +255,12 @@ void EvtPHSPBBMix::decay(EvtParticle* p)
 
     p->initializePhaseSpace(getNDaug() - 2, tempDaug.data());
 
-    if (pr) prlp(222);
+    if (_print_info) prlp(222);
   } else { //nominal case.
     p->initializePhaseSpace(getNDaug(), getDaugs());
 
   }
-  if (pr) prlp(3);
+  if (_print_info) prlp(3);
   EvtParticle* s1, *s2;
 
   s1 = p->getDaug(0);
@@ -277,7 +276,7 @@ void EvtPHSPBBMix::decay(EvtParticle* p)
   // throw 2 random numbers to decide whether B1 and B2 are B0 or B0B
   const EvtId B1(EvtRandom::random() > 0.5 ? B0 : B0B);
   const EvtId B2(EvtRandom::random() > 0.5 ? B0 : B0B);
-  if (pr) prlp(5);
+  if (_print_info) prlp(5);
 
   if (NCC)
 
@@ -295,7 +294,7 @@ void EvtPHSPBBMix::decay(EvtParticle* p)
     s2->init(B2 == B0 ? getDaug(0) : getDaug(1), p2);
   }
 
-  if (pr) prlp(6);
+  if (_print_info) prlp(6);
 
   // choose a decay time for each final state particle using the
   // lifetime (which must be the same for both particles) in pdt.table
@@ -308,16 +307,16 @@ void EvtPHSPBBMix::decay(EvtParticle* p)
 
   // calculate the oscillation amplitude, based on whether this event is mixed or not
   EvtComplex osc_amp(Amplitude(t1, t2, B1 == B0, B2 == B0)); //Amplitude return <B0(B)B0(B)|B1B2>
-  if (pr) prlp(8);
+  if (_print_info) prlp(8);
 
 
   // store the amplitudes for each parent spin basis state
   double norm = 1.0 / p1.d3mag();
-  if (pr)  prlp(9);
+  if (_print_info)  prlp(9);
   vertex(0, norm * osc_amp * p1 * (p->eps(0)));
   vertex(1, norm * osc_amp * p1 * (p->eps(1)));
   vertex(2, norm * osc_amp * p1 * (p->eps(2)));
-  if (pr)   prlp(10);
+  if (_print_info)   prlp(10);
   return ;
 }
 
@@ -457,11 +456,10 @@ void EvtPHSPBMix::initProbMax()
 void EvtPHSPBMix::decay(EvtParticle* p)
 {
 
-  bool pr(false);//prompt
   // generate a final state according to phase space
 
   //  const bool BBpipi(getNDaug()!=4);//true if BBpipi, if not BBpi
-  if (pr)    std::cout << "decay B_MIX (0)" << std::endl;
+  if (_print_info)    std::cout << "decay B_MIX (0)" << std::endl;
   std::vector<EvtId> tempDaug(getNDaug() - 1);
   tempDaug[0] = getDaug(0);
   tempDaug[1] = getDaug(1);
@@ -469,7 +467,7 @@ void EvtPHSPBMix::decay(EvtParticle* p)
   if (getNDaug() == 5)
     tempDaug[3] = getDaug(3);
 
-  if (pr)    std::cout << "decay B_MIX (1)" << std::endl;
+  if (_print_info)    std::cout << "decay B_MIX (1)" << std::endl;
 
 
   p->initializePhaseSpace(getNDaug() - 1, tempDaug.data());
@@ -486,27 +484,27 @@ void EvtPHSPBMix::decay(EvtParticle* p)
 
   // throw 1 random numbers to decide whether B1 is B0 or B0B
   const bool changed_flavor(EvtRandom::random() > 0.5); //Daug(0) becomes Daug(1)
-  if (pr)    std::cout << "decay B_MIX (3)" << std::endl;
+  if (_print_info)    std::cout << "decay B_MIX (3)" << std::endl;
   s1->init(changed_flavor ? getDaug(getNDaug() - 1) : getDaug(0), p1);
 
   // choose a decay time for each final state particle using the
   // lifetime (which must be the same for both particles) in pdt.table
   // and calculate the lifetime difference for this event
   s1->setLifetime();
-  if (pr)      std::cout << "decay B_MIX (4)" << std::endl;
+  if (_print_info)      std::cout << "decay B_MIX (4)" << std::endl;
   const double t1(s1->getLifetime());
 
   // calculate the oscillation amplitude, based on whether this event is mixed or not
   EvtComplex osc_amp(changed_flavor ? EvtComplex(0,
                                                  -sin(_freq * t1 / 2.)) : EvtComplex(cos(_freq * t1 / 2.))); //Amplitude return <B0(B)|B1>
-  if (pr)    std::cout << "decay B_MIX (5)" << std::endl;
+  if (_print_info)    std::cout << "decay B_MIX (5)" << std::endl;
   // store the amplitudes for each parent spin basis state
   double norm = 1.0 / p1.d3mag();
-  if (pr)    std::cout << "decay B_MIX (6)" << std::endl;
+  if (_print_info)    std::cout << "decay B_MIX (6)" << std::endl;
   vertex(0, norm * osc_amp * p1 * (p->eps(0)));
   vertex(1, norm * osc_amp * p1 * (p->eps(1)));
   vertex(2, norm * osc_amp * p1 * (p->eps(2)));
-  if (pr)  std::cout << "decay B_MIX (7)" << std::endl;
+  if (_print_info)  std::cout << "decay B_MIX (7)" << std::endl;
   return ;
 }
 

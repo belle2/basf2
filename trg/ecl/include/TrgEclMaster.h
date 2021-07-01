@@ -10,9 +10,7 @@
 //-----------------------------------------------------------
 // $Log$
 //-----------------------------------------------------------
-
-#ifndef TRGECL_FLAG_
-#define TRGECL_FLAG_
+#pragma once
 
 #include <string>
 #include <vector>
@@ -95,7 +93,7 @@ namespace Belle2 {
     /** make Trigger bit except for Low Multiplicity related bit **/
     void makeTriggerBit(int, int, int, int, double, int, int,
                         std::vector<int>, int, int, int, int,
-                        int, int, int, int, int, int, int, int);
+                        int, int, int, int, int, int, int, int, int);
     /** Set Total Energy*/
     double setTotalEnergy(std::vector<double>);
     //! Get ECL Trigger bit
@@ -136,6 +134,23 @@ namespace Belle2 {
     void setmumuAngle(const std::vector<double>& imumuAngle)
     {
       _mumuAngle = imumuAngle;
+    }
+    //! set tau b2b 2 cluster angle cut
+    void setTaub2bAngleCut(const std::vector<int>& itaub2bAngleCut)
+    {
+      m_taub2bAngleCut = itaub2bAngleCut;
+    }
+    //! set tau b2b total energy cut
+    void setTaub2bEtotCut(double itaub2bEtotCut)
+    {
+      m_taub2bEtotCut = itaub2bEtotCut;
+    }
+    //! set tau b2b  1Cluster energy cut
+    void setTaub2bClusterECut(double itaub2bClusterECut1,
+                              double itaub2bClusterECut2)
+    {
+      m_taub2bClusterECut1 = itaub2bClusterECut1;
+      m_taub2bClusterECut2 = itaub2bClusterECut2;
     }
     //! set the number of cluster exceeding 300 MeV
     void setn300MeVClusterThreshold(int n300MeVCluster)
@@ -236,6 +251,14 @@ namespace Belle2 {
     double _mumuThreshold;
     //! mumu bit  Angle
     std::vector<double> _mumuAngle;
+    //! tau b2b 2 cluster angle cut (degree)
+    // (dphi low, dphi high, theta_sum low, theta_sum high)
+    std::vector<int> m_taub2bAngleCut;
+    //! tau b2b total energy (TC theta ID =1-17) (GeV)
+    double m_taub2bEtotCut;
+    //! tau b2b 1 Cluster energy selection (GeV)
+    double m_taub2bClusterECut1;
+    double m_taub2bClusterECut2;
     //! The number of Cluster exceeding 300 MeV
     int _n300MeVCluster;
     //!ECL Burst Bit Threshold
@@ -269,5 +292,3 @@ namespace Belle2 {
 //
 //
 } /// namespace Belle2
-
-#endif /* TRGECL_FLAG_ */

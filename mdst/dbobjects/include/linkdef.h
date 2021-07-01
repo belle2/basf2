@@ -16,6 +16,7 @@
 #pragma link C++ class Belle2::SoftwareTriggerCutBase+; // checksum=0x8470ca2a, version=-1
 #pragma link C++ class Belle2::DBRepresentationOfSoftwareTriggerCut+; // checksum=0xaaf47daf, version=2
 #pragma link C++ class Belle2::SoftwareTriggerMenu+; // checksum=0xd05aa8b, version=1
+#pragma link C++ class Belle2::TTDOffsets+; // checksum=0x78b2c7ea, version=1
 
 #endif
 

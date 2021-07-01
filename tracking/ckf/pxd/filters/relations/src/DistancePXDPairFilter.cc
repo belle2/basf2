@@ -26,13 +26,13 @@ DistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CK
 
   B2ASSERT("You have filled the wrong states into this!", toStateCache.isHitState);
 
-  double phiDiff = fromStateCache.phi - toStateCache.phi;
+  float phiDiff = fromStateCache.phi - toStateCache.phi;
   while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
   while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
 
   if (not fromStateCache.isHitState) {
     // We are coming from an SVD track, so we can use its position to only look for matching ladders
-    if (abs(phiDiff) < 0.2) {
+    if (abs(phiDiff) < 0.2f) {
       return 1.0;
     }
 
@@ -46,7 +46,7 @@ DistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CK
     return 1.0;
   }
 
-  if (abs(phiDiff) < 0.05) {
+  if (abs(phiDiff) < 0.05f) {
     return 1.0;
   }
 

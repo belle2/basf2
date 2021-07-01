@@ -11,6 +11,7 @@
 #pragma once
 
 /* KLM headers. */
+#include <klm/dataobjects/KLMElementNumberDefinitions.h>
 #include <klm/dbobjects/KLMAlignmentData.h>
 
 /* ROOT headers. */
@@ -44,13 +45,13 @@ namespace Belle2 {
      * @param[in] module Module number.
      * @param[in] dat    Alignment data.
      */
-    void setModuleAlignment(uint16_t module, KLMAlignmentData* dat);
+    void setModuleAlignment(KLMModuleNumber module, KLMAlignmentData* dat);
 
     /**
      * Get module alignment data.
      * @param[in] module Module number.
      */
-    const KLMAlignmentData* getModuleAlignment(uint16_t module) const;
+    const KLMAlignmentData* getModuleAlignment(KLMModuleNumber module) const;
 
     /* Interface to global Millepede calibration. */
 
@@ -87,7 +88,7 @@ namespace Belle2 {
   private:
 
     /** Module alignment. */
-    std::map<uint16_t, KLMAlignmentData> m_ModuleAlignment;
+    std::map<KLMModuleNumber, KLMAlignmentData> m_ModuleAlignment;
 
     /** Class version. */
     ClassDef(Belle2::BKLMAlignment, 3);

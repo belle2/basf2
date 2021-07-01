@@ -10,9 +10,7 @@
 //---------------------------------------------------------
 // 0.00 : 2011/11/12 : First version
 //---------------------------------------------------------
-
-#ifndef TRGECLModule_H
-#define TRGECLModule_H
+#pragma once
 
 #include <string>
 #include <framework/core/Module.h>
@@ -136,6 +134,15 @@ namespace Belle2 {
     std::vector<int> m_3DBhabhaVetoInTrackThetaRegion;
     // Energy threshold(low, high) of event timing quality flag (GeV)
     std::vector<double> m_EventTimingQualityThresholds;
+    //! taub2b 2 cluster angle cut (degree)
+    // (dphi low, dphi high, theta_sum low, theta_sum high)
+    std::vector<int> m_taub2bAngleCut;
+    //! taub2b total energy (TC theta ID =1-17) (GeV)
+    double m_taub2bEtotCut;
+    //! taub2b Cluster energy selection (GeV)
+    double m_taub2bClusterECut1;
+    double m_taub2bClusterECut2;
+    //! The number of Cluster exceeding 300 MeV
 
     /** output for TRGECLHit */
     StoreArray<TRGECLHit> m_TRGECLHit;
@@ -149,5 +156,3 @@ namespace Belle2 {
   };
 
 } // namespace Belle2
-
-#endif // TRGECLModule_H

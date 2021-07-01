@@ -468,8 +468,11 @@ void GeometryPar::calculate(void)
           m_Modules.insert(std::pair<int, Module*>(moduleID, pModule));
           double base = -0.5 * (m_NPhiScints[layer - 1] + 1) * m_ScintWidth;
           for (int scint = 1; scint <= m_NPhiScints[layer - 1]; ++scint) {
+            double length = nZScints * m_ScintWidth;
+            if (length > m_MaximalPhiStripLength)
+              m_MaximalPhiStripLength = length;
             pModule->addPhiScint(scint,
-                                 nZScints * m_ScintWidth,
+                                 length,
                                  0.0,
                                  base + scint * m_ScintWidth
                                 );
@@ -478,8 +481,11 @@ void GeometryPar::calculate(void)
           for (int scint = 1; scint <= nZScints; ++scint) {
             int scint0 = m_NZScints - getNZScints(hasChimney);
             double dLength = m_ZScintDLength[layer - 1][scint0 + scint - 1];
+            double length = m_NPhiScints[layer - 1] * m_ScintWidth + dLength;
+            if (length > m_MaximalZStripLength)
+              m_MaximalZStripLength = length;
             pModule->addZScint(scint,
-                               m_NPhiScints[layer - 1] * m_ScintWidth + dLength,
+                               length,
                                -0.5 * dLength,
                                base + scint * m_ScintWidth
                               );
@@ -749,7 +755,7 @@ void GeometryPar::readAlignmentFromDB()
   KLMChannelIndex bklmModules(KLMChannelIndex::c_IndexLevelLayer);
   for (KLMChannelIndex bklmModule = bklmModules.beginBKLM();
        bklmModule != bklmModules.endBKLM(); ++bklmModule) {
-    uint16_t module = bklmModule.getKLMModuleNumber();
+    KLMModuleNumber module = bklmModule.getKLMModuleNumber();
     const KLMAlignmentData* alignmentData =
       bklmAlignment->getModuleAlignment(module);
     if (alignmentData == nullptr)
@@ -779,7 +785,7 @@ void GeometryPar::readDisplacedGeoFromDB()
   KLMChannelIndex bklmModules(KLMChannelIndex::c_IndexLevelLayer);
   for (KLMChannelIndex bklmModule = bklmModules.beginBKLM();
        bklmModule != bklmModules.endBKLM(); ++bklmModule) {
-    uint16_t module = bklmModule.getKLMModuleNumber();
+    KLMModuleNumber module = bklmModule.getKLMModuleNumber();
     const KLMAlignmentData* displacementData =
       bklmDisplacement->getModuleAlignment(module);
     if (displacementData == nullptr)

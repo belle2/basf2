@@ -49,6 +49,8 @@ def get_alignment_pre_collector_path_cosmic(entry_sequence=""):
     add_unpackers(main)
     add_cosmics_reconstruction(main, pruneTracks=False, add_muid_hits=True,
                                merge_tracks=False)
+    # Disable the EventT0 correction.
+    basf2.set_module_parameters(main, 'KLMReconstructor', EventT0Correction=False)
     # Disable the time window in muid module by setting it to 1 second.
     # This is necessary because the  alignment needs to be performed before
     # the time calibration; if the time window is not disabled, then all
@@ -86,8 +88,10 @@ def get_alignment_pre_collector_path_physics(entry_sequence=""):
     # Unpackers and reconstruction.
     add_unpackers(main)
     add_reconstruction(main, pruneTracks=False, add_muid_hits=True)
+    # Disable the EventT0 correction.
+    basf2.set_module_parameters(main, 'KLMReconstructor', EventT0Correction=False)
     # Disable the time window in muid module by setting it to 1 second.
-    # This is necessary because the  alignment needs to be performed before
+    # This is necessary because the alignment needs to be performed before
     # the time calibration; if the time window is not disabled, then all
     # scintillator hits are rejected.
     basf2.set_module_parameters(main, 'Muid', MaxDt=1e9)
@@ -102,9 +106,10 @@ def get_alignment_pre_collector_path_physics(entry_sequence=""):
     return main
 
 
-def get_strip_efficiency_pre_collector_path(entry_sequence="", raw_format=True):
+def get_strip_efficiency_pre_collector_path(muon_list_name, entry_sequence="", raw_format=True):
     """
     Parameters:
+        muon_list_name  (str): Name of the muon ParticleList to be filled.
         entry_sequence  (str): A single entry sequence e.g. '0:100' to help limit processed events.
         raw_format  (bool): True if cDST input files are in the raw+tracking format.
 
@@ -117,12 +122,47 @@ def get_strip_efficiency_pre_collector_path(entry_sequence="", raw_format=True):
                         entrySequences=[entry_sequence])
     if raw_format:
         prepare_cdst_analysis(main)
+        # Disable the EventT0 correction.
+        basf2.set_module_parameters(main, 'KLMReconstructor', EventT0Correction=False)
     else:
         main.add_module('Gearbox')
         main.add_module('Geometry')
 
     # Fill muon particle list
-    ma.fillParticleList('mu+:klmStripEfficiency',
+    ma.fillParticleList(f'mu+:{muon_list_name}',
+                        '[1 < p] and [p < 11] and [abs(d0) < 2] and [abs(z0) < 5]',
+                        path=main)
+
+    return main
+
+
+def get_time_pre_collector_path(muon_list_name, entry_sequence="", raw_format=True, ):
+    """
+    Parameters:
+        muon_list_name  (str): Name of the muon ParticleList to be filled.
+        entry_sequence  (str): A single entry sequence e.g. '0:100' to help limit processed events.
+        raw_format  (bool): True if cDST input files are in the raw+tracking format.
+
+    Returns:
+        basf2.Path:  A reconstruction path to run before the collector. Used for cDST input files.
+    """
+    main = basf2.create_path()
+    if entry_sequence:
+        main.add_module('RootInput',
+                        entrySequences=[entry_sequence])
+    if raw_format:
+        prepare_cdst_analysis(main)
+        # Disable the EventT0 correction.
+        basf2.set_module_parameters(main, 'KLMReconstructor', EventT0Correction=False)
+        # Disable the time window in muid module by setting it to 1 second.
+        # This is necessary because we are running now the time calibration.
+        basf2.set_module_parameters(main, 'Muid', MaxDt=1e9)
+    else:
+        main.add_module('Gearbox')
+        main.add_module('Geometry')
+
+    # Fill muon particle list
+    ma.fillParticleList(f'mu+:{muon_list_name}',
                         '[1 < p] and [p < 11] and [abs(d0) < 2] and [abs(z0) < 5]',
                         path=main)
 

@@ -22,11 +22,14 @@ EXPECTED_CHECKSUMS = {
     'Belle2::SoftwareTrigger::SoftwareTriggerVariables': (1, 638196437),
     'Belle2::SoftwareTriggerResult': (5, 241059817),
     'Belle2::TRGSummary': (7, 1658421299),
+    'Belle2::OnlineEventT0': (1, 0x42ae59a2),
+    'Belle2::Const::DetectorSet': (1, 0x48dd0c12),
 }
 
 # Map the name of the DataStore objects to their corresponding C++ object names
 NAME_TO_CPP_REPLACEMENTS = {
     "SoftwareTriggerVariables": "SoftwareTrigger::SoftwareTriggerVariables",
+    "OnlineEventT0s": "OnlineEventT0",
     "ROIs": "ROIid",
     "RawARICHs": "RawARICH",
     "RawCDCs": "RawCDC",

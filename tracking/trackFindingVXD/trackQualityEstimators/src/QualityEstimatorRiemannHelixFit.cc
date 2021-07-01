@@ -184,8 +184,9 @@ double QualityEstimatorRiemannHelixFit::estimateQuality(std::vector<SpacePoint c
   Precision pZ = pT * p(1);
   momVec(2) = pZ;
   m_results.pt = pT;
-  m_results.p = TVector3(momVec(0), momVec(1), momVec(2));
+  m_results.p = B2Vector3D(momVec(0), momVec(1), momVec(2));
   m_results.curvatureSign = curvatureSign;
+  m_results.pocaD = pocaD;
 
   return TMath::Prob(*(m_results.chiSquared), 2 * measurements.size() - 5);
 }

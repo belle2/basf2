@@ -69,64 +69,87 @@ namespace Belle2 {
     Manager::FunctionPtr pidMissingProbabilityExpert(const std::vector<std::string>& arguments);
 
     /**
-     * @return The particle ID (of the particle's own hypothesis)
+     * @return The particle ID (of the particle's own hypothesis).
+     * SVD is excluded for all hypotheses.
      */
     double particleID(const Particle* part);
 
     /**
-     * return electron ID to be used in the physics analyses
+     * @return electron ID to be used in the physics analyses. SVD excluded.
      */
     double electronID(const Particle* part);
 
     /**
-     * return muon ID to be used in the physics analyses
+     * @return muon ID to be used in the physics analyses. SVD excluded.
      */
     double muonID(const Particle* part);
 
     /**
-     * return pion ID to be used in the physics analyses
+     * @return pion ID to be used in the physics analyses. SVD excluded.
      */
     double pionID(const Particle* part);
 
     /**
-     * return kaon ID to be used in the physics analyses
+     * @return kaon ID to be used in the physics analyses. SVD excluded.
      */
     double kaonID(const Particle* part);
 
     /**
-     * return proton ID to be used in the physics analyses
+     * @return proton ID to be used in the physics analyses. SVD excluded.
      */
     double protonID(const Particle* part);
 
     /**
-     * return deuteron ID to be used in the physics analyses
+     * @return deuteron ID to be used in the physics analyses. SVD excluded.
      */
     double deuteronID(const Particle* part);
 
     /**
-     * return binary PID between two particle hypotheses
+     * @return binary PID between two particle hypotheses.
+     * SVD is excluded for all hypotheses.
      */
     double binaryPID(const Particle* part, const std::vector<double>& arguments);
 
     /**
-     * return pion ID to be used in the physics analyses. SVD is included.
+     * SPECIAL (TEMP) variable (BII-8376).
+     * @return electron ID to be used in the physics analyses. TOP and SVD are excluded.
+     */
+    double electronID_noTOP(const Particle* part);
+
+    /**
+     * SPECIAL (TEMP) variable (BII-8376).
+     * @return binary PID between two particle hypotheses, where either in the pair must be of an electron.
+     * TOP and SVD are excluded.
+     */
+    double binaryPID_noTOP(const Particle* part, const std::vector<double>& arguments);
+
+    /**
+     * @return pion ID to be used in the physics analyses. Ternary PID: pi, K, p. SVD is included.
      */
     double pionID_SVD(const Particle* part);
 
     /**
-     * return kaon ID to be used in the physics analyses. SVD is included.
+     * @return kaon ID to be used in the physics analyses. Ternary PID: pi, K, p. SVD is included.
      */
     double kaonID_SVD(const Particle* part);
 
     /**
-     * return proton ID to be used in the physics analyses. SVD is included.
+     * @return proton ID to be used in the physics analyses. Ternary PID: pi, K, p. SVD is included.
      */
     double protonID_SVD(const Particle* part);
 
     /**
-     * return binary PID between two particle hypotheses. SVD is included.
+     * @return binary PID between two particle hypotheses. Accepted hypotheses: pi, K, p. SVD is included.
      */
     double binaryPID_SVD(const Particle* part, const std::vector<double>& arguments);
+
+    /**
+    * returns the MVA score for anti-neutron PID (not for neutron)
+    * -1 means invalid
+    *  0 background-like
+    *  1 signal-like
+    */
+    double antineutronID(const Particle* particle);
 
     /**
      * @return the charged PID BDT score for a certain mass hypothesis with respect to all other charged stable particle hypotheses.

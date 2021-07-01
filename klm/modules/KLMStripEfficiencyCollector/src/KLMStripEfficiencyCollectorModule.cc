@@ -115,7 +115,7 @@ void KLMStripEfficiencyCollectorModule::startRun()
       KLMChannelIndex klmChannel(klmPlane);
       klmChannel.setIndexLevel(KLMChannelIndex::c_IndexLevelStrip);
       for (; klmChannel != klmNextPlane; ++ klmChannel) {
-        uint16_t channel = klmChannel.getKLMChannelNumber();
+        KLMChannelNumber channel = klmChannel.getKLMChannelNumber();
         enum KLMChannelStatus::ChannelStatus status =
           m_ChannelStatus->getChannelStatus(channel);
         if (status == KLMChannelStatus::c_Unknown)
@@ -178,17 +178,17 @@ void KLMStripEfficiencyCollectorModule::collect()
 }
 
 void KLMStripEfficiencyCollectorModule::addHit(
-  std::map<uint16_t, struct HitData>& hitMap,
-  uint16_t planeGlobal, struct HitData* hitData)
+  std::map<KLMPlaneNumber, struct HitData>& hitMap,
+  KLMPlaneNumber planeGlobal, struct HitData* hitData)
 {
-  std::map<uint16_t, struct HitData>::iterator it;
+  std::map<KLMPlaneNumber, struct HitData>::iterator it;
   it = hitMap.find(planeGlobal);
   /*
    * There may be more than one such hit e.g. if track crosses the edge
    * of the strips or WLS fiber groove. Select only one hit per plane.
    */
   if (it == hitMap.end()) {
-    hitMap.insert(std::pair<uint16_t, struct HitData>(
+    hitMap.insert(std::pair<KLMPlaneNumber, struct HitData>(
                     planeGlobal, *hitData));
   }
 }
@@ -223,9 +223,9 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(
     KLMElementNumbers::getMaximalExtrapolationLayer();
   const Track* track = muon->getTrack();
   RelationVector<ExtHit> extHits = track->getRelationsTo<ExtHit>();
-  std::map<uint16_t, struct HitData> selectedHits;
-  std::map<uint16_t, struct HitData>::iterator it;
-  uint16_t channel;
+  std::map<KLMPlaneNumber, struct HitData> selectedHits;
+  std::map<KLMPlaneNumber, struct HitData>::iterator it;
+  KLMChannelNumber channel;
   enum KLMChannelStatus::ChannelStatus status;
   struct HitData hitData, hitDataPrevious;
   TVector3 extHitPosition;
@@ -253,7 +253,7 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(
       if (hit.isBackwardPropagated())
         continue;
     }
-    uint16_t planeGlobal = 0;
+    KLMPlaneNumber planeGlobal = 0;
     hitData.hit = &hit;
     hitData.digit = nullptr;
     if (hit.getDetectorID() == Const::EDetector::EKLM) {

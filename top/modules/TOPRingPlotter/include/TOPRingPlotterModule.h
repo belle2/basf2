@@ -61,6 +61,7 @@ namespace Belle2 {
     std::string m_outputName = "TOPRings.root";  /**< Name of the output file */
     int m_toyNumber = 1; /**< Number of toys used to populate the arrays of expected hits*/
     bool m_saveHistograms = false;  /**< Set true to save the histograms of the maps */
+    bool m_saveLLScan = false; /**< Set to true to save the results of the LL scan */
 
     TFile* m_outputFile = nullptr;   /**< output file */
     TTree* m_tree = nullptr;   /**< tree where data are saved. One entry per particle in m_particleList */
@@ -110,6 +111,11 @@ namespace Belle2 {
     int m_pdfToysMU = 0; /**< total number of toys from the muon PDF */
     int m_pdfSamplesE = 0; /**< total number of samples drawn from the electron PDF */
     int m_pdfToysE = 0; /**< total number of toys from the electron PDF */
+
+    int m_nScanPoints = 0; /**< number of points used in the LL scan */
+    float m_scanMass[10000] = {0}; /**< masses used in the LL scan */
+    float m_scanLL[10000] = {0}; /**< LL values of the scan */
+
 
     TH2F* m_hitMapMCK = nullptr; /**< x-t plot of the kaon PDF*/
     TH2F* m_hitMapMCPI =  nullptr; /**< x-t plot of the pion PDF*/

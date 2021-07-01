@@ -61,6 +61,10 @@ main.add_module(gearbox)
 geometry = b2.register_module('Geometry')
 main.add_module(geometry)
 
+# Simulate the EventLevelTriggerTimeInfo (empty object for now)
+simulateEventLevelTriggerTimeInfo = b2.register_module('SimulateEventLevelTriggerTimeInfo')
+main.add_module(simulateEventLevelTriggerTimeInfo)
+
 # particle generator can be put here
 
 # Mix beam background

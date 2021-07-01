@@ -39,11 +39,6 @@ namespace Belle2 {
       /** Constructor defining the parameters */
       PXDUnpackerModule();
 
-      /// Static function to return PXDError::c_ALL_ERROR
-      static PXDError::PXDErrorFlags getSilenceMask(void) { return PXDError::c_ALL_ERROR;};
-      /// Static function to return PXDError::c_NO_ERROR
-      static PXDError::PXDErrorFlags getVerboseMask(void) { return PXDError::c_NO_ERROR;};
-
     private:
 
       /** Initialize the module */

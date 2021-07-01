@@ -90,7 +90,7 @@ namespace Belle2 {
      * Set KLM module.
      * @param[in] module Module.
      */
-    void setKLMModule(uint16_t module);
+    void setKLMModule(KLMModuleNumber module);
 
     /**
      * Set EKLM segment.
@@ -149,22 +149,22 @@ namespace Belle2 {
     /**
      * Get KLM channel number.
      */
-    uint16_t getKLMChannelNumber() const;
+    KLMChannelNumber getKLMChannelNumber() const;
 
     /**
      * Get KLM plane number.
      */
-    uint16_t getKLMPlaneNumber() const;
+    KLMPlaneNumber getKLMPlaneNumber() const;
 
     /**
      * Get KLM module number.
      */
-    uint16_t getKLMModuleNumber() const;
+    KLMModuleNumber getKLMModuleNumber() const;
 
     /**
      * Get KLM sector number.
      */
-    uint16_t getKLMSectorNumber() const;
+    KLMSectorNumber getKLMSectorNumber() const;
 
     /**
      * Get EKLM segment number.

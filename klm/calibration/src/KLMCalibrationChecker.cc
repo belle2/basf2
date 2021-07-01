@@ -164,7 +164,7 @@ void KLMCalibrationChecker::checkAlignment()
   KLMAlignmentData zeroAlignment(0, 0, 0, 0, 0, 0);
   KLMChannelIndex klmModules(KLMChannelIndex::c_IndexLevelLayer);
   for (KLMChannelIndex& klmModule : klmModules) {
-    uint16_t module = klmModule.getKLMModuleNumber();
+    KLMModuleNumber module = klmModule.getKLMModuleNumber();
     if (klmModule.getSubdetector() == KLMElementNumbers::c_BKLM) {
       alignment = bklmAlignment->getModuleAlignment(module);
       alignmentError = bklmAlignmentErrors->getModuleAlignment(module);
@@ -384,8 +384,8 @@ void KLMCalibrationChecker::checkStripEfficiency()
     sector = klmPlane.getSector();
     layer = klmPlane.getLayer();
     plane = klmPlane.getPlane();
-    uint16_t channel = m_ElementNumbers->channelNumber(
-                         subdetector, section, sector, layer, plane, 1);
+    KLMChannelNumber channel = m_ElementNumbers->channelNumber(
+                                 subdetector, section, sector, layer, plane, 1);
     efficiency = stripEfficiency->getEfficiency(channel);
     error = stripEfficiency->getEfficiencyError(channel);
     efficiencyTree->Fill();

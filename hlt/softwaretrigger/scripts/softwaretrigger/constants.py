@@ -42,7 +42,17 @@ ALWAYS_SAVE_OBJECTS = ["EventMetaData", "RawFTSWs", "ROIpayload", "SoftwareTrigg
                        "TRGSummary"]
 
 #: Objects to be left on output
-RAWDATA_OBJECTS = ["RawCDCs", "RawSVDs", "RawPXDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "RawTRGs", "ROIs"]
+RAWDATA_OBJECTS = [
+    "RawCDCs",
+    "RawSVDs",
+    "RawPXDs",
+    "RawTOPs",
+    "RawARICHs",
+    "RawKLMs",
+    "RawECLs",
+    "RawTRGs",
+    "ROIs",
+    "OnlineEventT0s"]
 
 #: Objects which will be kept after the ExpressReconstruction, for example for the Event Display
 PROCESSED_OBJECTS = ['Tracks', 'TrackFitResults',

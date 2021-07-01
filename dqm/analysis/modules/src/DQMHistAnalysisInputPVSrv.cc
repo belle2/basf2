@@ -115,7 +115,6 @@ void DQMHistAnalysisInputPVSrvModule::initialize()
     pmynode.push_back(n);
 
     {
-      // the following code sux ... is there no root function for that?
       TDirectory* oldDir = gDirectory;
       TDirectory* d = oldDir;
       TString myl = it.at(1).c_str();

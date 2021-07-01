@@ -78,6 +78,9 @@ private:
   /** Is BBpipi? */
   bool _BBpipi{0};
 
+  /** Print evtgeninfo? */
+  bool _print_info{false};
+
 };
 
 /** The class provides routine to decay vector-> particle particle with B0 mixing, handles states with only one neutral B
@@ -114,6 +117,9 @@ private:
 
   /** mixing frequency in hbar/mm */
   double _freq{0};
+
+  /** Print evtgeninfo? */
+  bool _print_info{false};
 
 };
 

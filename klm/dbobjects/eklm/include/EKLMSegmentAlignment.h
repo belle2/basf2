@@ -11,6 +11,7 @@
 #pragma once
 
 /* Belle 2 headers. */
+#include <klm/dataobjects/KLMElementNumberDefinitions.h>
 #include <klm/dbobjects/KLMAlignmentData.h>
 
 /* ROOT headers. */
@@ -44,13 +45,13 @@ namespace Belle2 {
      * @param[in] segment Segment number.
      * @param[in] dat     Alignment data.
      */
-    void setSegmentAlignment(uint16_t segment, KLMAlignmentData* dat);
+    void setSegmentAlignment(EKLMSegmentNumber segment, KLMAlignmentData* dat);
 
     /**
      * Get segment alignment data.
      * @param[in] segment Segment number.
      */
-    const KLMAlignmentData* getSegmentAlignment(uint16_t segment) const;
+    const KLMAlignmentData* getSegmentAlignment(EKLMSegmentNumber segment) const;
 
     /* Interface to global Millepede calibration. */
 
@@ -88,7 +89,7 @@ namespace Belle2 {
   private:
 
     /** Segment alignment. */
-    std::map<uint16_t, KLMAlignmentData> m_SegmentAlignment;
+    std::map<EKLMSegmentNumber, KLMAlignmentData> m_SegmentAlignment;
 
     /** Class version. */
     ClassDef(Belle2::EKLMSegmentAlignment, 1);

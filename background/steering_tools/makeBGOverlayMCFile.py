@@ -80,6 +80,9 @@ main.add_module('Gearbox')
 # Geometry
 main.add_module('Geometry')
 
+# Simulate the EventLevelTriggerTimeInfo (empty object for now)
+main.add_module('SimulateEventLevelTriggerTimeInfo')
+
 if gatedMode:
     # Beam background mixer
     main.add_module('BeamBkgMixer', backgroundFiles=bg, overallScaleFactor=scaleFactor,
@@ -119,7 +122,7 @@ main.add_module('KLMDigitizer')
 main.add_module('TRGECLBGTCHit')
 
 # Output: digitized hits only
-branches = ['PXDDigits', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
+branches = ['EventLevelTriggerTimeInfo', 'PXDDigits', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
             'ARICHDigits', 'ECLWaveforms', 'KLMDigits', 'TRGECLBGTCHits']
 if gatedMode:
     branches += ['PXDInjectionBGTiming']

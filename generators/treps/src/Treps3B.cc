@@ -408,7 +408,6 @@ namespace Belle2 {
     // generates one event
     B2DEBUG(20, "W = " << w);
     imode = 0 ;
-    int comp = 0 ;
     int npoint;
 
     do {
@@ -608,8 +607,8 @@ namespace Belle2 {
 
       int iret = tpuser(pe, pp, partgen, npoint);
       if (iret <= 0) continue ;
-      comp = 1;
-    } while (comp != 1);
+      break;
+    } while (true);
     //************* Generation end ********************
     // variable for the kinematical check
     TLorentzVector pfinal = TLorentzVector(0., 0., 0., 0.);

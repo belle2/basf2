@@ -219,4 +219,4 @@ if __name__ == '__main__':
                       vertex_pre_cut=p.after_vertex[channel.label].purity)
         o += table.finish()
 
-    o.save(output_file, compile=True)
+    o.save(output_file, compile=False)

@@ -431,6 +431,10 @@ def add_prefilter_posttracking_reconstruction(path, components=None, pruneTracks
     if not for_cdst_analysis or add_eventt0_combiner_for_cdst:
         path.add_module("EventT0Combiner")
 
+    # only add the OnlineEventT0Creator if not preparing cDST
+    if not for_cdst_analysis:
+        path.add_module("OnlineEventT0Creator")
+
     add_ecl_finalizer_module(path, components)
 
     add_ecl_mc_matcher_module(path, components)

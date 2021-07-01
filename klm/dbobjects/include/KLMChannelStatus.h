@@ -10,6 +10,9 @@
 
 #pragma once
 
+/* KLM headers. */
+#include <klm/dataobjects/KLMElementNumberDefinitions.h>
+
 /* ROOT headers. */
 #include <TObject.h>
 
@@ -62,14 +65,14 @@ namespace Belle2 {
      * Get channel status.
      * @param[in] channel Channel number.
      */
-    enum ChannelStatus getChannelStatus(uint16_t channel) const;
+    enum ChannelStatus getChannelStatus(KLMChannelNumber channel) const;
 
     /**
      * Set channel status.
      * @param[in] channel Channel number.
      * @param[in] status  Status.
      */
-    void setChannelStatus(uint16_t channel, enum ChannelStatus status);
+    void setChannelStatus(KLMChannelNumber channel, enum ChannelStatus status);
 
     /**
      * Set staus for all channels.
@@ -81,7 +84,7 @@ namespace Belle2 {
      * Get number of active strips in the specified KLM module.
      * @param[in] module Module number.
      */
-    int getActiveStripsInModule(uint16_t module) const;
+    int getActiveStripsInModule(KLMChannelNumber module) const;
 
     /**
      * Operator ==.
@@ -97,7 +100,7 @@ namespace Belle2 {
   private:
 
     /** Channel data. */
-    std::map<uint16_t, enum ChannelStatus> m_ChannelStatus;
+    std::map<KLMChannelNumber, enum ChannelStatus> m_ChannelStatus;
 
     /** Class version. */
     ClassDef(Belle2::KLMChannelStatus, 1);

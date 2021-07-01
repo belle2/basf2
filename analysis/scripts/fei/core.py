@@ -127,7 +127,7 @@ class TrainingDataInformation:
         Read out the number of MC particles from the file created by reconstruct
         """
         # Unique absolute pdg-codes of all particles
-        root_file = ROOT.TFile(self.filename)
+        root_file = ROOT.TFile.Open(self.filename, 'read')
         mc_counts = {}
 
         Belle2.Variable.Manager
@@ -146,6 +146,7 @@ class TrainingDataInformation:
 
         mc_counts[0] = {}
         mc_counts[0]['sum'] = hist.GetEntries()
+        root_file.Close()
         return mc_counts
 
 
@@ -238,7 +239,7 @@ class TrainingData:
                 nSignal /= 10000
 
             for channel in particle.channels:
-                filename = f'{channel.label}.root'
+                filename = 'training_input.root'
 
                 nBackground = self.mc_counts[0]['sum'] * channel.preCutConfig.bestCandidateCut
                 inverseSamplingRates = {}
@@ -257,16 +258,16 @@ class TrainingData:
                     hist_variables = ['mcErrors', 'mcParticleStatus'] + channel.mvaConfig.variables + spectators
                     hist_variables_2d = [(x, channel.mvaConfig.target)
                                          for x in channel.mvaConfig.variables + spectators if x is not channel.mvaConfig.target]
-                    hist_filename = f'Monitor_TrainingData_{channel.label}.root'
-                    ma.variablesToHistogram(channel.name,
-                                            variables=config.variables2binnings(hist_variables),
+                    hist_filename = f'Monitor_TrainingData.root'
+                    ma.variablesToHistogram(channel.name, variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                            filename=config.removeJPsiSlash(hist_filename), path=path)
+                                            filename=config.removeJPsiSlash(hist_filename),
+                                            directory=config.removeJPsiSlash(f'{channel.label}'), path=path)
 
                 teacher = basf2.register_module('VariablesToNtuple')
                 teacher.set_name('VariablesToNtuple_' + channel.name)
                 teacher.param('fileName', filename)
-                teacher.param('treeName', 'variables')
+                teacher.param('treeName', f'{channel.label} variables')
                 teacher.param('variables', channel.mvaConfig.variables + spectators)
                 teacher.param('particleList', channel.name)
                 teacher.param('sampling', (channel.mvaConfig.target, inverseSamplingRates))
@@ -325,11 +326,11 @@ class PreReconstruction:
                     hist_variables_2d = [(bc_variable, channel.mvaConfig.target),
                                          (bc_variable, 'mcErrors'),
                                          (bc_variable, 'mcParticleStatus')]
-                    filename = f'Monitor_PreReconstruction_BeforeRanking_{channel.label}.root'
+                    filename = f'Monitor_PreReconstruction_BeforeRanking.root'
                     ma.variablesToHistogram(channel.name,
                                             variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                            filename=filename, path=path)
+                                            filename=filename, directory=f'{channel.label}', path=path)
 
                 if channel.preCutConfig.bestCandidateMode == 'lowest':
                     ma.rankByLowest(channel.name,
@@ -347,7 +348,7 @@ class PreReconstruction:
                     raise RuntimeError("Unknown bestCandidateMode " + repr(channel.preCutConfig.bestCandidateMode))
 
                 if self.config.monitor:
-                    filename = f'Monitor_PreReconstruction_AfterRanking_{channel.label}.root'
+                    filename = f'Monitor_PreReconstruction_AfterRanking.root'
                     hist_variables += ['extraInfo(preCut_rank)']
                     hist_variables_2d += [('extraInfo(preCut_rank)', channel.mvaConfig.target),
                                           ('extraInfo(preCut_rank)', 'mcErrors'),
@@ -355,7 +356,7 @@ class PreReconstruction:
                     ma.variablesToHistogram(channel.name,
                                             variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                            filename=filename, path=path)
+                                            filename=filename, directory=f'{channel.label}', path=path)
                 # If we are not in monitor mode we do the mc matching now,
                 # otherwise we did it above already!
                 elif self.config.training:
@@ -387,11 +388,11 @@ class PreReconstruction:
                     hist_variables_2d = [('chiProb', channel.mvaConfig.target),
                                          ('chiProb', 'mcErrors'),
                                          ('chiProb', 'mcParticleStatus')]
-                    filename = f'Monitor_PreReconstruction_AfterVertex_{channel.label}.root'
+                    filename = f'Monitor_PreReconstruction_AfterVertex.root'
                     ma.variablesToHistogram(channel.name,
                                             variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                            filename=filename, path=path)
+                                            filename=filename, directory=f'{channel.label}', path=path)
 
         return path
 
@@ -474,17 +475,18 @@ class PostReconstruction:
                                          ('extraInfo(decayModeID)', 'mcErrors'),
                                          ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
                                          ('extraInfo(decayModeID)', 'mcParticleStatus')]
-                    filename = f'Monitor_PostReconstruction_AfterMVA_{channel.label}.root'
+                    filename = f'Monitor_PostReconstruction_AfterMVA.root'
                     ma.variablesToHistogram(channel.name,
                                             variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                            filename=filename, path=path)
+                                            filename=filename, directory=f'{channel.label}', path=path)
 
             cutstring = ''
             if particle.postCutConfig.value > 0.0:
                 cutstring = str(particle.postCutConfig.value) + ' < extraInfo(SignalProbability)'
 
-            ma.copyLists(particle.identifier, [c.name for c in particle.channels], writeOut=True, path=path)
+            ma.mergeListsWithBestDuplicate(particle.identifier, [c.name for c in particle.channels],
+                                           variable='particleSource', writeOut=True, path=path)
 
             if self.config.monitor:
                 hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)',
@@ -492,20 +494,26 @@ class PostReconstruction:
                 hist_variables_2d = [('extraInfo(decayModeID)', particle.mvaConfig.target),
                                      ('extraInfo(decayModeID)', 'mcErrors'),
                                      ('extraInfo(decayModeID)', 'mcParticleStatus')]
-                filename = f'Monitor_PostReconstruction_BeforePostCut_{particle.identifier}.root'
-                ma.variablesToHistogram(particle.identifier,
-                                        variables=config.variables2binnings(hist_variables),
-                                        variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                        filename=config.removeJPsiSlash(filename), path=path)
+                filename = f'Monitor_PostReconstruction_BeforePostCut.root'
+                ma.variablesToHistogram(
+                    particle.identifier,
+                    variables=config.variables2binnings(hist_variables),
+                    variables_2d=config.variables2binnings_2d(hist_variables_2d),
+                    filename=config.removeJPsiSlash(filename),
+                    directory=config.removeJPsiSlash(f'{particle.identifier}'),
+                    path=path)
 
             ma.applyCuts(particle.identifier, cutstring, path=path)
 
             if self.config.monitor:
-                filename = f'Monitor_PostReconstruction_BeforeRanking_{particle.identifier}.root'
-                ma.variablesToHistogram(particle.identifier,
-                                        variables=config.variables2binnings(hist_variables),
-                                        variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                        filename=config.removeJPsiSlash(filename), path=path)
+                filename = f'Monitor_PostReconstruction_BeforeRanking.root'
+                ma.variablesToHistogram(
+                    particle.identifier,
+                    variables=config.variables2binnings(hist_variables),
+                    variables_2d=config.variables2binnings_2d(hist_variables_2d),
+                    filename=config.removeJPsiSlash(filename),
+                    directory=config.removeJPsiSlash(f'{particle.identifier}'),
+                    path=path)
 
             ma.rankByHighest(particle.identifier, 'extraInfo(SignalProbability)',
                              particle.postCutConfig.bestCandidateCut, 'postCut_rank', path=path)
@@ -516,11 +524,14 @@ class PostReconstruction:
                                       (particle.mvaConfig.target, 'extraInfo(postCut_rank)'),
                                       ('mcErrors', 'extraInfo(postCut_rank)'),
                                       ('mcParticleStatus', 'extraInfo(postCut_rank)')]
-                filename = f'Monitor_PostReconstruction_AfterRanking_{particle.identifier}.root'
-                ma.variablesToHistogram(particle.identifier,
-                                        variables=config.variables2binnings(hist_variables),
-                                        variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                        filename=config.removeJPsiSlash(filename), path=path)
+                filename = f'Monitor_PostReconstruction_AfterRanking.root'
+                ma.variablesToHistogram(
+                    particle.identifier,
+                    variables=config.variables2binnings(hist_variables),
+                    variables_2d=config.variables2binnings_2d(hist_variables_2d),
+                    filename=config.removeJPsiSlash(filename),
+                    directory=config.removeJPsiSlash(f'{particle.identifier}'),
+                    path=path)
 
                 variables = ['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
                              'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
@@ -530,9 +541,9 @@ class PostReconstruction:
                 elif 'B' in particle.name:
                     variables += ['Mbc', 'cosThetaBetweenParticleAndNominalB']
 
-                filename = f'Monitor_Final_{particle.identifier}.root'
-                ma.variablesToNtuple(particle.identifier, variables, treename='variables',
-                                     filename=config.removeJPsiSlash(filename), path=path)
+                filename = f'Monitor_Final.root'
+                ma.variablesToNtuple(particle.identifier, variables, treename=config.removeJPsiSlash(
+                    f'{particle.identifier} variables'), filename=config.removeJPsiSlash(filename), path=path)
         return path
 
 
@@ -618,59 +629,51 @@ class Teacher:
         Do all trainings for which we find training data
         """
         job_list = []
-        for particle in self.particles:
-            for channel in particle.channels:
-                filename = f'{channel.label}.root'
-                # weightfile = self.config.prefix + '_' + channel.label
-                weightfile = channel.label + '.xml'
-                if not basf2_mva.available(weightfile) and os.path.isfile(filename):
-                    f = ROOT.TFile(filename)
-                    if not f:
-                        B2WARNING("Training of MVC failed. Couldn't find ROOT file. "
-                                  f"Ignoring channel {channel.label}.")
-                        self.create_fake_weightfile(channel.label)
-                        self.upload(channel.label)
-                        continue
-                    keys = [m for m in f.GetListOfKeys()]
-                    if not keys:
-                        B2WARNING("Training of MVC failed. ROOT file does not contain a tree. "
-                                  f"Ignoring channel {channel.label}.")
-                        self.create_fake_weightfile(channel.label)
-                        self.upload(channel.label)
-                        continue
-                    tree = keys[0].ReadObj()
-                    nSig = tree.GetEntries(channel.mvaConfig.target + ' == 1.0')
-                    nBg = tree.GetEntries(channel.mvaConfig.target + ' != 1.0')
-                    if nSig < Teacher.MinimumNumberOfMVASamples:
-                        B2WARNING("Training of MVC failed. "
-                                  f"Tree contains too few signal events {nSig}. Ignoring channel {channel}.")
-                        self.create_fake_weightfile(channel.label)
-                        self.upload(channel.label)
-                        continue
-                    if nBg < Teacher.MinimumNumberOfMVASamples:
-                        B2WARNING("Training of MVC failed. "
-                                  f"Tree contains too few bckgrd events {nBg}. Ignoring channel {channel}.")
-                        self.create_fake_weightfile(channel.label)
-                        self.upload(channel.label)
-                        continue
-                    variable_str = "' '".join(channel.mvaConfig.variables)
+        filename = 'training_input.root'
+        f = ROOT.TFile.Open(filename, 'read')
+        if not f:
+            B2WARNING("Training of MVC failed. Couldn't find ROOT file. "
+                      "No weight files will be provided.")
+        else:
+            for particle in self.particles:
+                for channel in particle.channels:
+                    weightfile = channel.label + '.xml'
+                    if not basf2_mva.available(weightfile):
+                        keys = [m for m in f.GetListOfKeys() if f"{channel.label}" in m.GetName()]
+                        if not keys:
+                            continue
+                        tree = keys[0].ReadObj()
+                        nSig = tree.GetEntries(channel.mvaConfig.target + ' == 1.0')
+                        nBg = tree.GetEntries(channel.mvaConfig.target + ' != 1.0')
+                        if nSig < Teacher.MinimumNumberOfMVASamples:
+                            B2WARNING("Training of MVC failed. "
+                                      f"Tree contains too few signal events {nSig}. Ignoring channel {channel}.")
+                            self.create_fake_weightfile(channel.label)
+                            self.upload(channel.label)
+                            continue
+                        if nBg < Teacher.MinimumNumberOfMVASamples:
+                            B2WARNING("Training of MVC failed. "
+                                      f"Tree contains too few bckgrd events {nBg}. Ignoring channel {channel}.")
+                            self.create_fake_weightfile(channel.label)
+                            self.upload(channel.label)
+                            continue
+                        variable_str = "' '".join(channel.mvaConfig.variables)
 
-                    command = (f"{self.config.externTeacher}"
-                               f" --method '{channel.mvaConfig.method}'"
-                               f" --target_variable '{channel.mvaConfig.target}'"
-                               f" --treename variables --datafile '{channel.label}.root'"
-                               f" --signal_class 1 --variables '{variable_str}'"
-                               f" --identifier '{channel.label}.xml'"
-                               f" {channel.mvaConfig.config} > '{channel.label}'.log 2>&1")
-                    B2INFO(f"Used following command to invoke teacher: \n {command}")
-                    job_list.append((channel.label, command))
-
+                        command = (f"{self.config.externTeacher}"
+                                   f" --method '{channel.mvaConfig.method}'"
+                                   f" --target_variable '{channel.mvaConfig.target}'"
+                                   f" --treename '{channel.label} variables' --datafile 'training_input.root'"
+                                   f" --signal_class 1 --variables '{variable_str}'"
+                                   f" --identifier '{channel.label}.xml'"
+                                   f" {channel.mvaConfig.config} > '{channel.label}'.log 2>&1")
+                        B2INFO(f"Used following command to invoke teacher: \n {command}")
+                        job_list.append((channel.label, command))
+            f.Close()
         p = multiprocessing.Pool(None, maxtasksperchild=1)
         func = functools.partial(subprocess.call, shell=True)
         p.map(func, [c for _, c in job_list])
         p.close()
         p.join()
-
         weightfiles = []
         for name, _ in job_list:
             if not basf2_mva.available(name + '.xml'):

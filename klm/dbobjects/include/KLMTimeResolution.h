@@ -13,52 +13,53 @@
 /* ROOT headers. */
 #include <TObject.h>
 
+/* C++ headers. */
+#include <cstdint>
+#include <map>
+
 namespace Belle2 {
 
   /**
-   * Class to store EKLM simulation in the database.
+   * Class to store KLM time resolution in the database.
    */
-  class EKLMReconstructionParameters : public TObject {
+  class KLMTimeResolution : public TObject {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMReconstructionParameters()
+    KLMTimeResolution()
     {
     }
 
     /**
      * Destructor.
      */
-    ~EKLMReconstructionParameters()
+    ~KLMTimeResolution()
     {
     }
 
     /**
-     * Get time resolution (of reconstructed time, not ADC).
+     * Get time resolution.
+     * @param[in] channel Channel number.
      */
-    float getTimeResolution() const
-    {
-      return m_TimeResolution;
-    }
+    float getTimeResolution(uint16_t channel) const;
 
     /**
-     * Set time resolution (of reconstructed time, not ADC).
+     * Set time resolution.
+     * @param[in] channel    Channel number.
+     * @param[in] resolution Resolution.
      */
-    void setTimeResolution(float resolution)
-    {
-      m_TimeResolution = resolution;
-    }
+    void setTimeResolution(uint16_t channel, float resolution);
 
   private:
 
     /** Time resolution. */
-    float m_TimeResolution = 0;
+    std::map<uint16_t, float> m_TimeResolution ;
 
     /** Class version. */
-    ClassDef(Belle2::EKLMReconstructionParameters, 1);
+    ClassDef(Belle2::KLMTimeResolution, 1);
 
   };
 

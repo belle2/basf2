@@ -129,6 +129,10 @@ void KLMReconstructorModule::beginRun()
       B2FATAL("KLM time constants data are not available.");
     if (!m_TimeCableDelay.isValid())
       B2FATAL("KLM time cable decay data are not available.");
+    if (!m_TimeResolution.isValid())
+      B2ERROR("KLM time resolution data are not available. "
+              "The error is non-fatal because the data are only used to set "
+              "chi^2 of 2d hit, which is informational only now.");
   }
   if (!m_ChannelStatus.isValid())
     B2FATAL("KLM channel status data are not available.");
@@ -145,9 +149,6 @@ void KLMReconstructorModule::beginRun()
     m_DelayRPCPhi = m_TimeConstants->getDelay(KLMTimeConstants::c_RPCPhi);
     m_DelayRPCZ = m_TimeConstants->getDelay(KLMTimeConstants::c_RPCZ);
   }
-  /* EKLM. */
-  if (!m_eklmRecPar.isValid())
-    B2FATAL("EKLM digitization parameters are not available.");
 }
 
 void KLMReconstructorModule::event()
@@ -425,11 +426,17 @@ void KLMReconstructorModule::reconstructEKLMHits()
             if (m_EventT0Correction)
               time -= m_EventT0Value;
             EKLMHit2d* hit2d = m_eklmHit2ds.appendNew(*it8);
-            hit2d->setEnergyDeposit((*it8)->getEnergyDeposit() + (*it9)->getEnergyDeposit());
+            hit2d->setEnergyDeposit((*it8)->getEnergyDeposit() +
+                                    (*it9)->getEnergyDeposit());
             hit2d->setPosition(crossPoint.x(), crossPoint.y(), crossPoint.z());
-            hit2d->setChiSq((t1 - t2) * (t1 - t2) /
-                            m_eklmRecPar->getTimeResolution() /
-                            m_eklmRecPar->getTimeResolution());
+            double timeResolution = 1.0;
+            if (m_TimeResolution.isValid()) {
+              timeResolution *= m_TimeResolution->getTimeResolution(
+                                  (*it8)->getUniqueChannelID());
+              timeResolution *= m_TimeResolution->getTimeResolution(
+                                  (*it9)->getUniqueChannelID());
+            }
+            hit2d->setChiSq((t1 - t2) * (t1 - t2) / timeResolution);
             hit2d->setTime(time);
             hit2d->setMCTime(((*it8)->getMCTime() + (*it9)->getMCTime()) / 2);
             hit2d->addRelationTo(*it8);

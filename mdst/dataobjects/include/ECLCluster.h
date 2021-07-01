@@ -78,6 +78,7 @@ namespace Belle2 {
       m_sqrtcovmat_22(0.),
       m_deltaL(0.),
       m_minTrkDistance(0.),
+      m_minTrkDistanceID(65535),
       m_absZernike40(0.),
       m_absZernike51(0.),
       m_zernikeMVA(0.),
@@ -172,6 +173,9 @@ namespace Belle2 {
     /** Set distance between cluster COG and track extrapolation to ECL. */
     void setMinTrkDistance(double distance) { m_minTrkDistance = distance; }
 
+    /** Set array index of the nearest track */
+    void setMinTrkDistanceID(unsigned short distanceID) { m_minTrkDistanceID = distanceID; }
+
     /** Set Zernike 40. */
     void setAbsZernike40(double zernike40) { m_absZernike40 = zernike40; }
 
@@ -249,6 +253,9 @@ namespace Belle2 {
 
     /** Get distance between cluster COG and track extrapolation to ECL. */
     double getMinTrkDistance() const { return m_minTrkDistance; }
+
+    /** Get array index of the nearest track */
+    double getMinTrkDistanceID() const { return m_minTrkDistanceID; }
 
     /** Return deltaL. */
     double getDeltaL() const { return m_deltaL; }
@@ -404,6 +411,9 @@ namespace Belle2 {
     /** Distance between cluster center and track extrapolation to ECL. */
     Double32_t  m_minTrkDistance;  //[0.0, 250., 10]
 
+    /** Array index of the nearest track */
+    unsigned short m_minTrkDistanceID;
+
     /** Zernike 40. */
     Double32_t  m_absZernike40;  //[0.0, 1.7, 10]
 
@@ -462,7 +472,8 @@ namespace Belle2 {
     Double32_t m_NumberOfHadronDigits;  //[0, 255, 18]
 
     /** Class definition */
-    ClassDef(ECLCluster, 14);
+    ClassDef(ECLCluster, 15);
+    // 15: Added m_minTrkDistanceID
     // 14: Added m_maxECellId
     // 13: Added m_hypotheses
     // 12: Added m_PulseShapeDiscriminationMVA. Indicated that m_ClusterHadronIntensity will be removed in release-04.

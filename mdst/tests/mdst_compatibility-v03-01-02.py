@@ -15,6 +15,7 @@ CHANGES since release-03-01-02:
   + hasPXDCKFAbortionFlag/setPXDCKFAbortionFlag
   + hasSVDSpacePointCreatorAbortionFlag/setSVDSpacePointCreatorAbortionFlag
 - ECLCluster:
+  + getMinTrkDistanceID
   + hasFailedFitTime
   + hasFailedTimeResolution
 - TrackFitResult:

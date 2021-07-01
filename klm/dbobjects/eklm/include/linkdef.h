@@ -19,7 +19,5 @@
 #pragma link C++ class Belle2::EKLMGeometry::ShieldGeometry+; // checksum=0x2231877b, version=1
 #pragma link C++ class Belle2::EKLMSegmentAlignment+; // checksum=0xaf127699, version=1
 #pragma link C++ class Belle2::EKLMSimulationParameters+; // checksum=0x114cf589, version=1
-#pragma link C++ class Belle2::EKLMTimeCalibration+; // checksum=0xa02a4ad, version=2
-#pragma link C++ class Belle2::EKLMTimeCalibrationData+; // checksum=0x877f758b, version=2
 
 #endif

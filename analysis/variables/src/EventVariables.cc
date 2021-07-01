@@ -872,7 +872,7 @@ Returns NaN for data.
     REGISTER_VARIABLE("timeSincePrevTriggerMicroSeconds", timeSincePrevTriggerMicroSeconds,
                       "[Eventbased] Time since the previous trigger in micro seconds.");
 
-    REGISTER_VARIABLE("triggeredBunchNumbertTTD", triggeredBunchNumberTTD, R"DOC(
+    REGISTER_VARIABLE("triggeredBunchNumberTTD", triggeredBunchNumberTTD, R"DOC(
 [Eventbased] Number of triggered bunch ranging from 0-1279.
 
 .. warning:: This is the bunch number as provided by the TTD, which does not necessarily correspond to the 'global' SKB bunch number.

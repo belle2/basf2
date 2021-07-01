@@ -306,8 +306,34 @@ namespace Belle2 {
         B2ERROR("The variable binaryPID needs exactly two arguments: the PDG codes of two hypotheses.");
         return std::numeric_limits<float>::quiet_NaN();;
       }
-      return Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(int(std::lround(arguments[0]))) + ", "
-                                             + std::to_string(int(std::lround(arguments[1]))) + ", CDC, TOP, ARICH, ECL, KLM)")->function(part);
+      int pdgCodeHyp = std::abs(int(std::lround(arguments[0])));
+      int pdgCodeTest = std::abs(int(std::lround(arguments[1])));
+      return Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(pdgCodeHyp) + ", " + std::to_string(
+                                               pdgCodeTest) + ", CDC, TOP, ARICH, ECL, KLM)")->function(part);
+    }
+
+    double electronID_noTOP(const Particle* part)
+    {
+      // Excluding TOP for electron ID. This is temporary. BII-8376
+      return Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, ARICH, ECL, KLM)")->function(part);
+    }
+
+    double binaryPID_noTOP(const Particle* part, const std::vector<double>& arguments)
+    {
+      // Excluding TOP for electron ID. This is temporary. BII-8376
+      if (arguments.size() != 2) {
+        B2ERROR("The variable binaryPID_noTOP needs exactly two arguments: the PDG codes of two hypotheses.");
+        return std::numeric_limits<float>::quiet_NaN();;
+      }
+      int pdgCodeHyp = std::abs(int(std::lround(arguments[0])));
+      int pdgCodeTest = std::abs(int(std::lround(arguments[1])));
+      std::vector<int> pdgIds {pdgCodeHyp, pdgCodeTest};
+      if (std::any_of(pdgIds.begin(), pdgIds.end(), [](int p) {return (p != Const::electron.getPDGCode());})) {
+        B2ERROR("The variable binaryPID_noTOP is defined only for particle hypothesis: 11.");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      return Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(pdgCodeHyp) + ", " + std::to_string(
+                                               pdgCodeTest) + ", CDC, ARICH, ECL, KLM)")->function(part);
     }
 
     double pionID_SVD(const Particle* part)
@@ -552,8 +578,7 @@ namespace Belle2 {
     // PID variables to be used for analysis
     VARIABLE_GROUP("PID");
     REGISTER_VARIABLE("particleID", particleID,
-                      "the particle identification probability under the particle's own hypothesis, using info from all available detectors, excluding the SVD");
-
+                      "the particle identification probability under the particle's own hypothesis, using info from all available detectors, *excluding the SVD*");
     REGISTER_VARIABLE("electronID", electronID,
                       "electron identification probability defined as :math:`\\mathcal{L}_e/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors, *excluding the SVD*");
     REGISTER_VARIABLE("muonID", muonID,
@@ -567,7 +592,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("deuteronID", deuteronID,
                       "deuteron identification probability defined as :math:`\\mathcal{L}_d/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors, *excluding the SVD*");
     REGISTER_VARIABLE("binaryPID(pdgCode1, pdgCode2)", binaryPID,
-                      "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, *excluding the SVD*.");
+                      "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, *excluding the SVD*");
+    REGISTER_VARIABLE("binaryPID_noTOP(pdgCode1, pdgCode2)", binaryPID_noTOP,
+                      "(SPECIAL (TEMP) variable) Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, *excluding the SVD and the TOP*. Note that either hypothesis in the pair *must be of an electron*.");
+    REGISTER_VARIABLE("electronID_noTOP", electronID_noTOP,
+                      "(SPECIAL (TEMP) variable) electron identification probability defined as :math:`\\mathcal{L}_e/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors *excluding the SVD and the TOP*");
     REGISTER_VARIABLE("pionID_SVD", pionID_SVD,
                       "pion identification probability defined as :math:`\\mathcal{L}_\\pi/(\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+)`, using info from all available detectors, *including the SVD*");
     REGISTER_VARIABLE("kaonID_SVD", kaonID_SVD,

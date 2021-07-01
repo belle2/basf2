@@ -159,6 +159,9 @@ Here is a list of particle identification variables:
   Please note, this distinction is meant to be only temporary: as soon as SVD PDFs are available for all particle hypotheses and thoroughly validated, the standard PID variables will include the SVD information back.
 
 .. warning ::
+   In release 5, a bug has been found in the TOP **electron** PDFs that degrades the electron identification performance. A set of two convenience PID variables where the TOP likelihoods are completely excluded - `electronID_noTOP` and `binaryPID_noTOP` - has been thus defined. These are expected to perform significantly better than the standard ones. Note that these are just temporary, and will be removed as soon as fixed TOP electron PDFs are available.
+
+.. warning ::
   The **definitions** of the default PID variables have changed between
   release-01 and release-02.
 
@@ -366,7 +369,7 @@ Continuum Suppression
 For a detailed description of the continuum suppression, see `ContinuumSuppression`.
 All variables in this group require the :b2:mod:`ContinuumSuppressionBuilder` module to be added to the path,
 and a rest of event for the candidate particles. This can be done with both the
-`modularAnalysis.buildRestOfEvent`, and the `modularAnalysis.buildContinuumSuppression` 
+`modularAnalysis.buildRestOfEvent`, and the `modularAnalysis.buildContinuumSuppression`
 convenience functions.
 
 .. b2-variables::
@@ -422,7 +425,7 @@ Here is a list of production and decay vertex variables:
 Orca Kinematic Fitter
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. warning:: 
+.. warning::
     In order to populate these variables, you need to run the Orca kinematic fitter. I.e.
 
     .. code-block:: python

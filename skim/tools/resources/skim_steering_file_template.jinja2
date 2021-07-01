@@ -38,10 +38,12 @@ except (ImportError, ModuleNotFoundError):
 path = b2.Path()
 {% if skims|length == 1 and not mdstOutput -%}
     skim = {{ skims[0] }}(
+    {%- if not backward_compatibility -%}
     {%- if data -%}
     mc=False
     {%- else -%}
     mc=True
+    {%- endif -%}
     {%- endif -%}
 ){%- if hints %}  # pass udstOutput=False to disable udstOutput{%- endif %}
 {% else -%}

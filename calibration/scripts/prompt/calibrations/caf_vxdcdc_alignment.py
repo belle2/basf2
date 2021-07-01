@@ -2,21 +2,13 @@
 
 """
 
-Simultaneous Global and Local VXD and CDC (layers-only) alignment with Millepede II
+Full Simultaneous Global and Local VXD and CDC alignment with Millepede II
 
-The input collections can be (only single tracks currently):
+The input collections are:
 - cosmics (hlt skim) - mandatorry
-- physics - all raw data -> once off-ip is available, this can be omitted
 - hadron - for "low" momentum tracks from IP
 - mumu - mumu_2trk or mumu_tight - for high momentum tracks from IP
-- offip - not yet available - tracks from outside IP (beam background, beam-gas)
-
-Time-dependence can be (manually) configured for VXD half-shells and CDC layers.
-For example to allow VXD alignment to change in run 10, 20 an 30 in experiment 12, you set:
-
->>> timedep_vxd : [[0, 10, 12], [0, 20, 12], [0, 30, 12]]
-
-Note that the first run in your requested iov will be added automatically.
+- offip - tracks from outside IP (beam background, beam-gas)
 
 """
 
@@ -75,6 +67,18 @@ settings = CalibrationSettings(name="VXD and CDC Alignment",
 
 
 def select_files(all_input_files, min_events, max_processed_events_per_file):
+    """
+    Select files randomly
+
+    Parameters
+    ----------
+    all_input_files : list(str)
+      List of all input file names
+    min_events : int
+      Minimum number of events to select from files
+    max_processed_events_per_file : int
+      Maximum number of events to consider per file
+    """
     all_input_files = all_input_files[:]
     # Let's iterate, taking a sample of files from the total (no repeats or replacement) until we get enough events
     total_events = 0
@@ -108,7 +112,9 @@ def select_files(all_input_files, min_events, max_processed_events_per_file):
 
 
 def create_std_path():
-
+    """
+    Returns default path for collections with standard reconstruction
+    """
     path = basf2.create_path()
     path.add_module('Progress')
     path.add_module('RootInput')
@@ -126,7 +132,9 @@ def create_std_path():
 
 
 def create_cosmics_path():
-
+    """
+    Returns default path for cosmic collection
+    """
     path = basf2.create_path()
     path.add_module('Progress')
     path.add_module('RootInput')
@@ -157,13 +165,10 @@ def create_cosmics_path():
 
 
 def make_mumu_collection(
-        name="make_mumu_collection",
+        name,
         files=None,
-        add_unpackers=True,
-        skim_mumu_2trk=False,
         muon_cut='p > 1.0 and abs(dz) < 2.0 and dr < 0.5 and nTracks==2',
         dimuon_cut='9.5 < M and M < 11.',
-        klm=False,
         prescale=1.):
     """
     Di-muons with vertex+beam constraint collection
@@ -174,16 +179,10 @@ def make_mumu_collection(
       Collection name
     files : list(str)
       List of input data files
-    add_unpackers : bool
-      Whether to add unpacking (set to False for MC)
-    skim_hlt_cosmic : bool
-      Whether to add TriggerSkim module and process only events with accept_mumu_2trk TRG
     muon_cut : str
       Cut string to select daughter muons
     dimuon_cut : str
       Cut string to apply for reconstructed di-muon decay
-    klm : bool
-      Whether to add muid hits to the track fit
     prescale : float
       Process only 'prescale' fraction of events
     """
@@ -196,18 +195,9 @@ def make_mumu_collection(
     path.add_module('Gearbox')
     path.add_module('Geometry')
 
-    if skim_mumu_2trk:
-        path.add_module(
-            "TriggerSkim",
-            triggerLines=["software_trigger_cut&skim&accept_mumu_2trk"]).if_value(
-            "==0",
-            basf2.Path(),
-            basf2.AfterConditionPath.END)
+    raw.add_unpackers(path)
 
-    if add_unpackers:
-        raw.add_unpackers(path)
-
-    reco.add_reconstruction(path, pruneTracks=False, add_muid_hits=klm)
+    reco.add_reconstruction(path, pruneTracks=False)
 
     path.add_module('DAFRecoFitter', pdgCodesToUseForFitting=[13])
 
@@ -246,16 +236,21 @@ def make_mumu_collection(
                 0.1)})
 
 
-################################################
-# Required function called by b2caf-prompt-run #
-################################################
-
 def create_prompt(files, cfg):
+    """
+    Returns configured (original) prompt stage alignment
 
-    mumu = select_files(files["mumu"], 0.4e6, cfg["mumu.max_processed_events_per_file"])
+    Parameters
+    ----------
+    files : list(str)
+      Dictionary with all input files by category (name)
+    cfg : dict
+      Expert config dictionary
+    """
+    mumu = select_files(files["mumu"], 0.2e6, cfg["mumu.max_processed_events_per_file"])
     cosmic = select_files(files["cosmic"], 1e6, cfg["cosmic.max_processed_events_per_file"])
-    hadron = select_files(files["hadron"], 1e5, cfg["hadron.max_processed_events_per_file"])
-    offip = select_files(files["offip"], 0.4e6, cfg["offip.max_processed_events_per_file"])
+    hadron = select_files(files["hadron"], 0.5e5, cfg["hadron.max_processed_events_per_file"])
+    offip = select_files(files["offip"], 0.2e6, cfg["offip.max_processed_events_per_file"])
 
     cal = mpc.create(
         name='VXDCDCalignment_prompt',
@@ -278,7 +273,7 @@ def create_prompt(files, cfg):
             "method diagonalization 3 0.1",
             "scaleerrors 1. 1.",
             "entries 1000"],
-        params=dict(minPValue=0.00001, externalIterations=0),
+        params=dict(minPValue=0.00001, externalIterations=0, granularity="run"),
         min_entries=1000000)
 
     cal.max_iterations = 0
@@ -287,6 +282,17 @@ def create_prompt(files, cfg):
 
 
 def create_beamspot(files, cfg):
+    """
+    Returns configured beamspot calibration
+
+    Parameters
+    ----------
+    files : list(str)
+      Dictionary with all input files by category (name)
+    cfg : dict
+      Expert config dictionary
+    """
+
     mumu = files["mumu"]
 
     ###################################################
@@ -298,7 +304,7 @@ def create_beamspot(files, cfg):
     ###################################################
     # Calibration setup
 
-    from caf.framework import Calibration
+    from caf.framework import Calibration, Collection
     from caf.strategies import SingleIOV
 
     # module to be run prior the collector
@@ -323,11 +329,12 @@ def create_beamspot(files, cfg):
     # algorithm_bs.setOuterLoss(cfg['outerLoss'])
     # algorithm_bs.setInnerLoss(cfg['innerLoss'])
 
-    calibration_bs = Calibration('VXDCDCalignment_beamspot',
-                                 collector=collector_bs,
-                                 algorithms=algorithm_bs,
-                                 input_files=mumu,
-                                 pre_collector_path=path)
+    collection_bs = Collection(collector=collector_bs,
+                               input_files=mumu,
+                               pre_collector_path=path)
+
+    calibration_bs = Calibration('VXDCDCalignment_beamspot', algorithms=algorithm_bs)
+    calibration_bs.add_collection("mumu", collection_bs)
 
     calibration_bs.strategies = SingleIOV
 
@@ -335,6 +342,16 @@ def create_beamspot(files, cfg):
 
 
 def create_stage1(files, cfg):
+    """
+    Returns configured stage1 alignment (full constant alignment with wires, beamspot fixed)
+
+    Parameters
+    ----------
+    files : list(str)
+      Dictionary with all input files by category (name)
+    cfg : dict
+      Expert config dictionary
+    """
 
     mumu = select_files(files["mumu"], 1.5e6, cfg["mumu.max_processed_events_per_file"])
     cosmic = select_files(files["cosmic"], 0.7e6, cfg["cosmic.max_processed_events_per_file"])
@@ -377,7 +394,16 @@ def create_stage1(files, cfg):
 
 
 def create_stage2(files, cfg):
+    """
+    Returns configured stage2 alignment (run-dependent alignment)
 
+    Parameters
+    ----------
+    files : list(str)
+      Dictionary with all input files by category (name)
+    cfg : dict
+      Expert config dictionary
+    """
     mumu = select_files(files["mumu"], 10e6, cfg["mumu.max_processed_events_per_file"])
     cosmic = select_files(files["cosmic"], 2e6, cfg["cosmic.max_processed_events_per_file"])
 
@@ -392,10 +418,9 @@ def create_stage2(files, cfg):
         timedep=None,
         constraints=[
             alignment.constraints.VXDHierarchyConstraints(type=2, pxd=True, svd=True),
-            alignment.constraints.CDCLayerConstraints(z_offset=True, z_scale=False, twist=False),
-            alignment.constraints.CDCWireConstraints(layer_rigid=True, layer_radius=[53], cdc_radius=True, hemisphere=[55])],
-        fixed=alignment.parameters.vxd_sensors(layers=[3, 4, 5, 6])
-        + alignment.parameters.vxd_sensors(layers=[1, 2], rigid=False, surface2=False, surface3=False, surface4=True),
+            alignment.constraints.CDCLayerConstraints(z_offset=True, z_scale=False, twist=False)],
+        fixed=alignment.parameters.vxd_sensors(layers=[3, 4, 5, 6]) +
+        alignment.parameters.vxd_sensors(layers=[1, 2], rigid=False, surface2=False, surface3=False, surface4=True),
         commands=["method inversion 6 0.001", "entries 1000", "threads 10 10"],
         params=dict(minPValue=0.00001, externalIterations=0, granularity="run"),
         min_entries=80000)
@@ -412,8 +437,17 @@ def create_stage2(files, cfg):
 
     return cal
 
+################################################
+# Required function called by b2caf-prompt-run #
+################################################
+
 
 def get_calibrations(input_data, **kwargs):
+    """
+    Required function called by b2caf-prompt-run.
+    Returns full configured 4-stage final alignment for prompt
+
+    """
     seed(1234)
 
     cfg = kwargs['expert_config']
@@ -442,13 +476,13 @@ def get_calibrations(input_data, **kwargs):
                 'RootInput',
                 entrySequences=[f'0:{max_processed_events_per_file}'], branchNames=HLT_INPUT_OBJECTS)
 
-        # Bugfix for Condor:
-        if isinstance(cal.algorithms[0].algorithm, type(Belle2.MillepedeAlgorithm)):
-            from alignment.prompt_utils import fix_mille_paths_for_algo
-            fix_mille_paths_for_algo(cal.algorithms[0])
-
         for algorithm in cal.algorithms:
             algorithm.params = {"apply_iov": output_iov}
+
+    # Bugfix for Condor:
+    for cal in [prompt, stage1, stage2]:
+        from alignment.prompt_utils import fix_mille_paths_for_algo
+        fix_mille_paths_for_algo(cal.algorithms[0])
 
     beamspot.depends_on(prompt)
     stage1.depends_on(beamspot)

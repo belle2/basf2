@@ -3437,7 +3437,7 @@ def addPhotonEfficiencyRatioVariables(inputListNames, tableName, path=None):
 
     Parameters:
         inputListNames (list(str)): input particle list names
-        tableName : stored in localdb and created using ParticleWeightingLookUpCreator
+        tableName : taken from database with appropriate name
         path (basf2.Path): module is added to this path
     """
 

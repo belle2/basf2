@@ -29,7 +29,6 @@ def make_3D_bin(bin_x, bin_y, bin_z):
     bin_3d = bin_x.copy()
     bin_3d.update(bin_y)
     bin_3d.update(bin_z)
-    print(bin_3d)
     return bin_3d
 
 # To make these one needs tables generated with the photon efficiency code

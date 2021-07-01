@@ -8,7 +8,7 @@ This script loads a specified input ROOT file, reconstructs photon conversions a
 saves converted-photon variables and some of their generator-level counterparts for comparison.
 
 Execute script with:
-  $> basf2 getConvertedPhotonVariables -i [input_ROOT_file]
+  $> basf2 getConvertedPhotonVariables.py -i [input_ROOT_file]
 """
 
 import basf2 as b2

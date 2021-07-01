@@ -981,7 +981,7 @@ void TRGCDCT3DConverterModule::store3DFirmwareData(multi_array<double, 3>& t3DFi
 
     //cout<<iClk<<" "<<t3d_fnf<<" "<<t3d_oldfnf<<endl;
 
-//The evtTime information was for debugging, but the currnet firmware doese not output the evtTime information time corresponding to every the track.
+//The evtTime information was for debugging, but the currnet firmware doese not output the evtTime information corresponding to every track.
 
     t3DFirmwareInfo[0][iClk][0] = t3d_fnf[5];
     t3DFirmwareInfo[0][iClk][1] = t3d_oldfnf[5];

@@ -2,6 +2,14 @@
 #
 # Thomas Keck 2017
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """
  Contains some example configurations of the FEI
  Mostly you want to use get_default_channels,

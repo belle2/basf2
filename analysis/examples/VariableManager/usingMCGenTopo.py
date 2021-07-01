@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # This example demonstrates the detailed usage of the parameter lists of variables returned by mc_gen_topo(n).
 # For details on mc_gen_topo(n), please refer to its definition in analysis/scripts/variables/MCGenTopo.py.
 # Xing-Yu Zhou

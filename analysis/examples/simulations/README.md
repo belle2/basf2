@@ -1,3 +1,10 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 Here are collected examples of simulation scripts for MC.
 Simulations means generation of Monte Carlo (MC) simulated events.
 In Belle 2, MC simulation is normally held by the experts, so these scripts were removed from tutorials but stored as examples.

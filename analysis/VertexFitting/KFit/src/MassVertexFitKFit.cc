@@ -1,11 +1,9 @@
 /**************************************************************************
- * Copyright(C) 1997 - J. Tanaka                                          *
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
  *                                                                        *
- * Author: J. Tanaka                                                      *
- * Contributor: J. Tanaka and                                             *
- *              conversion to Belle II structure by T. Higuchi            *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #include <TMatrixFSym.h>

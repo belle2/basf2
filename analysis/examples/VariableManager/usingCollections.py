@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # The VariablesToNtuple (and VariablesToTree) module support collections of variables.
 # You specify a collection instead of a variable name, and the collection will be automatically
 # resolved to a set of variable names

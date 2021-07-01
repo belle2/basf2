@@ -2,6 +2,14 @@
 #
 # Thomas Keck 2017
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """
  This script can be used to train the FEI on a cluster like available at KEKCC
  All you need is a basf2 steering file (see analysis/examples/FEI/ ) and some MC O(100) million

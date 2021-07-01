@@ -1,5 +1,13 @@
 #!/usr/bin/env/python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # isSignalAcceptFlags or isSignalAcceptSomething, means a special isSignal variable that accepts certain
 # bits in the mcErrors to be set. For example, the pure isSignal equals to 1 only when mcErrors == 0, while
 # isSignalAcceptMissingGamma euqals to 1 when mcErrors == 0 or mcErrors == 16, which could be interpreted

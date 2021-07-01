@@ -36,7 +36,7 @@ algorithm.setMinimalDigitNumber(0)
 cal_klm = Calibration(name='KLMTime', algorithms=algorithm)
 
 coll_cdst = get_collector('hlt_mumu', 'klmTime')
-rec_path_cdst = get_time_pre_collector_path(muon_list_name='klmTime')
+rec_path_cdst = get_time_pre_collector_path(muon_list_name='klmTime', mc=True)
 collection_cdst = Collection(collector=coll_cdst,
                              input_files=input_files,
                              pre_collector_path=rec_path_cdst)

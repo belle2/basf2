@@ -164,7 +164,7 @@ void PXDPostErrorCheckerModule::event()
   unsigned short triggergate = 0;
   unsigned short dheframenr = 0;
   std::map <int, int> found_dhe;
-  PXDErrorFlags mask = EPXDErrMask::c_NO_ERROR;
+  PXDErrorFlags mask{};// construct to no error
   B2DEBUG(25, "Iterate PXD Packets for this Event");
   for (auto& pkt : *m_storeDAQEvtStats) {
     B2DEBUG(25, "Iterate DHC in Pkt " << pkt.getPktIndex());

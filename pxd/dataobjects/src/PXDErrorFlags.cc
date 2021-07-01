@@ -11,6 +11,11 @@
 
 #include "pxd/dataobjects/PXDErrorFlags.h"
 
+/// Static function to return PXDError::PXDErrorFlags with no bits set (default)
+const Belle2::PXD::PXDError::PXDErrorFlags Belle2::PXD::PXDError::getVerboseMask(void) { return Belle2::PXD::PXDError::PXDErrorFlags();};
+/// Static function to return PXDError::PXDErrorFlags with all bits set
+const Belle2::PXD::PXDError::PXDErrorFlags Belle2::PXD::PXDError::getSilenceMask(void) { return ~getVerboseMask();};
+
 const std::string& Belle2::PXD::PXDError::getPXDBitErrorName(int bit)
 {
   static const std::string undefined("undefined");

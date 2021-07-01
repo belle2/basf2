@@ -117,7 +117,7 @@ def stdCharged(particletype, listtype, path):
 
 def stdPi(listtype=_defaultlist, path=None):
     """
-    Function to prepare standard pion lists, refer to stdCharged for details
+    Function to prepare standard pion lists, refer to `stdCharged` for details
 
     @param listtype     name of standard list
     @param path         modules are added to this path
@@ -127,7 +127,7 @@ def stdPi(listtype=_defaultlist, path=None):
 
 def stdK(listtype=_defaultlist, path=None):
     """
-    Function to prepare standard kaon lists, refer to stdCharged for details
+    Function to prepare standard kaon lists, refer to `stdCharged` for details
 
     @param listtype     name of standard list
     @param path         modules are added to this path
@@ -137,7 +137,7 @@ def stdK(listtype=_defaultlist, path=None):
 
 def stdPr(listtype=_defaultlist, path=None):
     """
-    Function to prepare standard proton lists, refer to stdCharged for details
+    Function to prepare standard proton lists, refer to `stdCharged` for details
 
     @param listtype     name of standard list
     @param path         modules are added to this path
@@ -147,13 +147,18 @@ def stdPr(listtype=_defaultlist, path=None):
 
 def stdLep(pdgId, listtype, method, classification, path=None):
     """
-    Function to prepare one of several standardized types of lepton (e, mu) lists:
+    Function to prepare one of several standardized types of lepton (:math:`e,\\mu`) lists:
 
     * 'UniformEff60' 60% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
     * 'UniformEff70' 70% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
     * 'UniformEff80' 80% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
     * 'UniformEff90' 90% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
     * 'UniformEff95' 95% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
+
+
+    The function will select particles according to the chosen ``listtype``, and decorate each candidate
+    with the nominal Data/MC :math:`\\ell` ID efficiency and :math:`\\pi,K` fake rate
+    correction factors and their stat, syst uncertainty, reading the info from the Conditions Database.
 
     Parameters:
         pdgId (int): the lepton pdg code.
@@ -243,7 +248,7 @@ def stdE(listtype=_defaultlist, method=None, classification=None, path=None):
     """ Function to prepare one of several standardized types of electron lists.
     See the documentation of `stdLep` for details.
 
-    It also accepts any of the standard definitions
+    It also accepts any of the legacy definitions
     for the ``listtype`` parameter to fall back to the `stdCharged` behaviour:
 
     * 'all'
@@ -267,7 +272,7 @@ def stdMu(listtype=_defaultlist, method=None, classification=None, path=None):
     """ Function to prepare one of several standardized types of muon lists.
     See the documentation of `stdLep` for details.
 
-    It also accepts any of the standard definitions
+    It also accepts any of the legacy definitions
     for the ``listtype`` parameter to fall back to the `stdCharged` behaviour:
 
     * 'all'

@@ -11,7 +11,7 @@ These files actually contain more information but fewer events.
 
 .. tip:: Analysts are recommended to use skimmed udst files as input to their analysis. For an introductory lesson, take a look at :numref:`onlinebook_skim`.
 
-.. tip:: If you would like to know which skims are available, please browse the Physics Skims section of the documentation. If you would like to know which cuts are made by a particular skim, then consult the source code by clicking the ``[source]`` button on that skim in `skim_physics`_, or by navigating to ``skim/scripts/skim/WGs/<your working group name>/`` in the basf2 repository.
+.. tip:: If you would like to know which skims are available, please browse the :ref:`skim_physics` section of the documentation. If you would like to know which cuts are made by a particular skim, then consult the source code by clicking the ``[source]`` button on that skim in :ref:`skim_physics`, or by navigating to ``skim/scripts/skim/WGs/<your working group name>/`` in the basf2 repository.
 
 .. versionchanged:: release-06-00-00
 

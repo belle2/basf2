@@ -77,6 +77,10 @@
 #   Pythia hadron contributions rescaled by S. Duell (https://stash.desy.de/projects/B2/repos/software/pull-requests/6690/overview)
 #   All Decay B0 & Decay anti-B0 channels have symmetric values. Same for B+ / B-. I.e., no Acp included.
 #   Updates flagged with #[BF update - PG 09/2020].
+#
+# June 2021, U. Tamponi (tamponi@to.infn.it)
+#   Updated all the narrow bottomonia (M < Y(4S))
+#
 
 Define qoverp_incohMix_B_s0 1.0
 Define dm_incohMix_B_s0 17.8e12
@@ -10825,20 +10829,21 @@ Enddecay
 ##########                         bb=  mesons                          ##########
 ##########                                                              ##########
 ##################################################################################
-Decay  eta_b
-1.000000000   rndmflav  anti-rndmflav                      PYTHIA         12;
+# As suggested by Roman Mizuk:
+Decay eta_b
+1.0  g  g  PHOTOS PYTHIA  32;
 Enddecay
 
 Decay  Upsilon
-0.023800000   e+  e-                                       VLL; #[Reconstructed PDG2011]
-0.024800000   mu+  mu-                                     VLL; #[Reconstructed PDG2011]
-0.026000000   tau+  tau-                                   VLL; #[Reconstructed PDG2011]
-0.011967979   d  anti-d                                    PYTHIA         32; #[Reconstructed PDG2011], all qqbar have been corrected to 1/4 ratio
-0.047871914   u  anti-u                                    PYTHIA         32; #[Reconstructed PDG2011]
-0.011967979   s  anti-s                                    PYTHIA         32; #[Reconstructed PDG2011]
-0.047871914   c  anti-c                                    PYTHIA         32; #[Reconstructed PDG2011]
-0.776708685   g  g  g                                      PYTHIA         4; #[Reconstructed PDG2011]  PDG says: 0.817
-0.029011529   gamma  g  g                                  PYTHIA         4; #[Reconstructed PDG2011]  PDG says: 0.022
+0.023800000 e+      e-                                      VLL; #[Reconstructed PDG2021]
+0.024800000 mu+     mu-                                     VLL; #[Reconstructed PDG2021]
+0.026000000 tau+    tau-                                    VLL; #[Reconstructed PDG2021]
+0.008700000 d       anti-d                                  PYTHIA 32; #[Reconstructed PDG2021], all qqbar have been corrected to 1/4 ratio
+0.034900000 u       anti-u                                  PYTHIA 32; #[Reconstructed PDG2021]
+0.008700000 s       anti-s                                  PYTHIA 32; #[Reconstructed PDG2021]
+0.034900000 c       anti-c                                  PYTHIA 32; #[Reconstructed PDG2021]
+0.816200000 g       g       g                               PYTHIA 4; # PDG 2021 says 0.817; changed to 0.8162 to preserve unitarity. 
+0.022000000 gamma   g       g                               PYTHIA 4; #[Reconstructed PDG2021]  
 
 # Would leave everything below this out, let gamma g g cover it
 #0.000063000 gamma   pi+     pi-                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
@@ -10857,64 +10862,56 @@ Decay  Upsilon
 Enddecay
 
 
+Decay eta_b(2S)
+1.0  g  g  PHOTOS PYTHIA  32;
+Enddecay
 
 Decay  Upsilon(2S)
-0.019100000   e+  e-                                       VLL; #[Reconstructed PDG2011]
-0.019300000   mu+  mu-                                     VLL; #[Reconstructed PDG2011]
-0.020000000   tau+  tau-                                   VLL; #[Reconstructed PDG2011]
-0.178500000   Upsilon  pi+  pi-                            YMSTOYNSPIPICLEO -0.753 0.000; #[Reconstructed PDG2011]
-0.086000000   Upsilon  pi0  pi0                            YMSTOYNSPIPICLEO -0.753 0.000; #[Reconstructed PDG2011]
-# V-> gamma S    Partial wave (L,S)=(0,1)
-0.038000000   gamma  chi_b0                                HELAMP 1. 0. +1. 0.; #[Reconstructed PDG2011]
-# V-> gamma V    Partial wave (L,S)=(0,1)
-0.069000000   gamma  chi_b1                                HELAMP 1. 0. 1. 0. -1. 0. -1. 0.; #[Reconstructed PDG2011]
-# V-> gamma T    Partial wave (L,S)=(0,1)
-0.071500000   gamma  chi_b2                                HELAMP 2.4494897 0. 1.7320508 0. 1. 0.                                 1. 0. 1.7320508 0. 2.4494897 0.; #[Reconstructed PDG2011]
-0.005000000   d  anti-d                                    PYTHIA         32;
-0.020000000   u  anti-u                                    PYTHIA         32;
-0.005000000   s  anti-s                                    PYTHIA         32;
-0.020000000   c  anti-c                                    PYTHIA         32;
-0.389611000   g  g  g                                      PYTHIA         4;
-0.058309000   gamma  g  g                                  PYTHIA         4; #The PDG values bring the sum to ~1.2, so these were rescaled.
-0.000290000   Upsilon  eta                                 PARTWAVE 0. 0. 1. 0. 0. 0.;  #[New mode added] #[Reconstructed PDG2014]
-0.000390000   gamma  eta_b                                 HELAMP 1. 0. -1. 0.;  #[New mode added] #[Reconstructed PDG2011]
+0.019100000 e+      e-                                      VLL; #[Reconstructed PDG2021]
+0.019300000 mu+     mu-                                     VLL; #[Reconstructed PDG2021]
+0.020000000 tau+    tau-                                    VLL; #[Reconstructed PDG2021]
+0.178500000 Upsilon pi+     pi-                             YMSTOYNSPIPICLEOBOOST -0.753 0.000; #[Reconstructed PDG2021]
+0.086000000 Upsilon pi0     pi0                             YMSTOYNSPIPICLEOBOOST -0.753 0.000; #[Reconstructed PDG2021]
+0.038000000 gamma   chi_b0                                  HELAMP 1. 0. +1. 0.; #[Reconstructed PDG2021]
+0.069000000 gamma   chi_b1                                  HELAMP 1. 0. 1. 0. -1. 0. -1. 0.; #[Reconstructed PDG2021]
+0.071500000 gamma   chi_b2                                  HELAMP 2.4494897 0. 1.7320508 0. 1. 0. 1. 0. 1.7320508 0. 2.4494897 0.; #[Reconstructed PDG2021]
+0.006800000 d       anti-d  PYTHIA         32;              #Using R=3.51 and latest B(Ups->mumu)
+0.027100000 u       anti-u  PYTHIA         32;
+0.006800000 s       anti-s  PYTHIA         32;
+0.027100000 c       anti-c  PYTHIA         32;
+0.417000000 g       g       g       PYTHIA         4;         #PDG values had sum of ~1.2, so these were rescaled.
+0.013300000 gamma           g       g       PYTHIA    4; #PDG values had sum of ~1.2, so these were rescaled.
+0.000290000 Upsilon eta                                     PARTWAVE 0. 0. 1. 0. 0. 0.;  #[New mode added] #[Reconstructed PDG2014] Changed from PHSP
+0.000390000 gamma   eta_b                                   HELAMP 1.0 0.0 -1.0 0.0;  #[Reconstructed PDG2014]  Changed from PHSP  
 Enddecay
 
 
-
 Decay  Upsilon(3S)
-0.021800000   e+  e-                                       VLL; #[was 0.0181 - is there any Justification for not setting this equal to mumu?]
-0.021800000   mu+  mu-                                     VLL; #[Reconstructed PDG2014]
-0.022900000   tau+  tau-                                   VLL; #[Reconstructed PDG2014]
-0.043700000   Upsilon  pi+  pi-                            YMSTOYNSPIPICLEO -2.523 1.189; #[Reconstructed PDG2014]
-0.022000000   Upsilon  pi0  pi0                            YMSTOYNSPIPICLEO -2.523 1.189; #[Reconstructed PDG2014]
-0.028200000   Upsilon(2S)  pi+  pi-                        YMSTOYNSPIPICLEO -0.395 0.001; #[Reconstructed PDG2014]
-0.018500000   Upsilon(2S)  pi0  pi0                        YMSTOYNSPIPICLEO -0.395 0.001; #[Reconstructed PDG2014]
-#0.050000000 Upsilon(2S) gamma   gamma                       PHSP; #[Reconstructed PDG2011]  This is definitely wrong.  It is saturated by Chi(2P) cascades
-
-# V-> gamma S    Partial wave (L,S)=(0,1)
-0.059000000   gamma  chi_b0(2P)                            HELAMP 1. 0. 1. 0.; #[Reconstructed PDG2014]
-# V-> gamma V    Partial wave (L,S)=(0,1)
-0.126000000   gamma  chi_b1(2P)                            HELAMP 1. 0. 1. 0. -1. 0. -1. 0.; #[Reconstructed PDG2014]
-# V-> gamma T    Partial wave (L,S)=(0,1)
-0.131000000   gamma  chi_b2(2P)                            HELAMP 2.4494897 0. 1.7320508 0. 1. 0.                                   1. 0. 1.7320508 0. 2.4494897 0.; #[Reconstructed PDG2014]
-
-# V-> gamma S    Partial wave (L,S)=(0,1)
-0.002700000   gamma  chi_b0                                HELAMP 1. 0. 1. 0.; #[Reconstructed PDG2014]
-# V-> gamma V    Partial wave (L,S)=(0,1)
-0.001000000   gamma  chi_b1                                HELAMP 1. 0. 1. 0. -1. 0. -1. 0.; #BBR 2014 compilation
-# V-> gamma T    Partial wave (L,S)=(0,1)
-0.009900000   gamma  chi_b2                                HELAMP 2.4494897 0. 1.7320508 0. 1. 0.                                   1. 0. 1.7320508 0. 2.4494897 0.; #BBR 2014 compilation
-
-0.000510000   gamma  eta_b                                 HELAMP 1. 0. -1. 0.;  #[Reconstructed PDG2014]  Why phase space?
-0.000870000   pi0  h_b                                     PARTWAVE 0. 0. 1. 0. 0. 0.; #Derived from Y(3S)->pi0 hb->gam etab measurement
-
-0.012439000   d  anti-d                                    PYTHIA         32;
-0.049756000   u  anti-u                                    PYTHIA         32;
-0.012439000   s  anti-s                                    PYTHIA         32;
-0.049756000   c  anti-c                                    PYTHIA         32;
-0.356056000   g  g  g                                      PYTHIA         4;  #[PDG2014 - was 0.37780]
-0.009674000   gamma  g  g                                  PYTHIA         4; #[PDG2014 - was 0.01]
+0.021800000    e+    e-                                     VLL; #[Reconstructed PDG2021]
+0.021800000 mu+     mu-                                     VLL; #[Reconstructed PDG2014]
+0.022900000 tau+    tau-                                    VLL; #[Reconstructed PDG2014]
+0.043700000 Upsilon pi+     pi-                             YMSTOYNSPIPICLEOBOOST -2.523 1.189; #[Reconstructed PDG2014]
+0.022000000 Upsilon pi0     pi0                             YMSTOYNSPIPICLEOBOOST -2.523 1.189; #[Reconstructed PDG2014]
+0.028200000 Upsilon(2S) pi+     pi-                         YMSTOYNSPIPICLEOBOOST -0.395 0.001; #[Reconstructed PDG2014]
+0.018500000 Upsilon(2S) pi0     pi0                         YMSTOYNSPIPICLEOBOOST -0.395 0.001; #[Reconstructed PDG2014]
+#
+0.059000000 gamma   chi_b0(2P)                              HELAMP 1. 0. 1. 0.; #[Reconstructed PDG2014]
+0.126000000 gamma   chi_b1(2P)                              HELAMP 1. 0. 1. 0. -1. 0. -1. 0.; #[Reconstructed PDG2014]
+0.131000000 gamma   chi_b2(2P)                              HELAMP 2.4494897 0. 1.7320508 0. 1. 0.  1. 0. 1.7320508 0. 2.4494897 0.; #[Reconstructed PDG2014]
+#
+0.002700000 gamma   chi_b0                                  HELAMP 1. 0. 1. 0.; #[Reconstructed PDG2014]
+0.001000000 gamma   chi_b1                                  HELAMP 1. 0. 1. 0. -1. 0. -1. 0.; #BBR 2014 compilation
+0.009900000 gamma   chi_b2                                  HELAMP 2.4494897 0. 1.7320508 0. 1. 0. 1. 0. 1.7320508 0. 2.4494897 0.; #BBR 2014 compilation
+#
+0.000510000 gamma   eta_b                                   HELAMP 1.0 0.0 -1.0 0.0;  #[Reconstructed PDG2014]  Changed from PHSP  
+0.000870000 pi0   h_b                                       PARTWAVE 1. 0. 0. 0. 0. 0.; #Derived from Y(3S)->pi0 hb->gam etab measurement  Changed from PHSP
+#
+0.007700        d       anti-d  PYTHIA         32;          #Using R=3.51 and latest B(Ups->mumu)
+0.030600        u       anti-u  PYTHIA         32;
+0.007700        s       anti-s  PYTHIA         32;
+0.030600        c       anti-c  PYTHIA         32;
+0.403000        g       g       g       PYTHIA         4;          #Rescaled from PDG2014 - was 0.37780
+0.011000        gamma           g       g       PYTHIA         4;  #Rescaled from PDG2014 - was 0.01
 Enddecay
 
 
@@ -10932,91 +10929,49 @@ Enddecay
 
 
 Decay chi_b0
-# S-> gamma V    Partial wave (L,S)=(0,0)
-0.019200000   gamma  Upsilon                               HELAMP 1. 0. 1. 0.;  #best values from BBR 2014, using B(Y2S->gamma chib)
-0.980800000   g  g                                         PYTHIA       32;
+0.0192    gamma  Upsilon          HELAMP 1. 0. 1. 0.;  #best values from BBR 2014, using B(Y2S->gamma chib)
+0.9808    g      g                PYTHIA       32;
 Enddecay
 
 Decay chi_b1
-# V-> gamma V    Partial wave (L,S)=(0,1)
-0.349000000   gamma  Upsilon                               HELAMP 1. 0. 1. 0. -1. 0. -1. 0.;   #best values from BBR 2014, using B(Y2S->gamma chib)
-0.162750000   d  anti-d                                    PYTHIA         32;
-0.162750000   u  anti-u                                    PYTHIA         32;
-0.162750000   s  anti-s                                    PYTHIA         32;
-0.162750000   c  anti-c                                    PYTHIA         32;
+0.349    gamma  Upsilon         HELAMP 1. 0. 1. 0. -1. 0. -1. 0.;   #best values from BBR 2014, using B(Y2S->gamma chib)
+0.16275         d       anti-d  PYTHIA         32;
+0.16275         u       anti-u  PYTHIA         32;
+0.16275         s       anti-s  PYTHIA         32;
+0.16275         c       anti-c  PYTHIA         32;
 Enddecay
 
 Decay chi_b2
-# T-> gamma V    Partial wave (L,S)=(0,2)
-0.187000000   gamma  Upsilon                               HELAMP 1. 0. 1.7320508 0. 2.4494897 0.
-                                      2.4494897 0. 1.7320508 0. 1. 0.;  #best values from BBR 2014, using B(Y2S->gamma chib)
-0.813000000   g  g                                         PYTHIA         32;
+0.187    gamma  Upsilon       HELAMP 1. 0. 1.7320508 0. 2.4494897 0.          2.4494897 0. 1.7320508 0. 1. 0.;  #best values from BBR 2014, using B(Y2S->gamma chib)
+0.813         g       g       PYTHIA         32;
 Enddecay
 
 Decay chi_b0(2P)
-# S-> gamma V    Partial wave (L,S)=(0,0)
-0.003900000   gamma  Upsilon                               HELAMP 1. 0. 1. 0.;  #best values from BBR 2014, using B(Y3S->gamma chib)
-0.013900000   gamma  Upsilon(2S)                           HELAMP 1. 0. 1. 0.;
-0.982200000   g  g                                         PYTHIA         32;
-#Below this line not used
-# S-> gamma V    Partial wave (L,S)=(0,0)
-#0.00150   gamma  Upsilon_1(1D)      HELAMP 1. 0. 1. 0.;
-# pi pi chi_b0 estimated from Kuang & Yan PRD 24 2874
-#0.0005    chi_b0  pi+  pi-                PHSP;
-#0.00025    chi_b0  pi0  pi0                PHSP;
+0.0039    gamma  Upsilon             HELAMP 1. 0. 1. 0.;  #best values from BBR 2014, using B(Y3S->gamma chib)
+0.0139    gamma  Upsilon(2S)         HELAMP 1. 0. 1. 0.;
+0.9822          g       g            PYTHIA         32;
 Enddecay
 
 Decay chi_b1(2P)
-# V-> gamma V    Partial wave (L,S)=(0,1)
-0.099500000   gamma  Upsilon                               HELAMP 1. 0. 1. 0. -1. 0. -1. 0.; #best values from BBR 2014, using B(Y3S->gamma chib)
-0.199700000   gamma  Upsilon(2S)                           HELAMP 1. 0. 1. 0. -1. 0. -1. 0.;
-# V-> gamma V    Partial wave (L,S)=(0,1)
-#0.0097    gamma  Upsilon_1(1D) HELAMP 1. 0. 1. 0. -1. 0. -1. 0.; #leave out for now
-# V-> gamma T    Partial wave (L,S)=(0,1)
-#0.0236    gamma  Upsilon_2(1D)   HELAMP 2.4494897 0. 1.7320508 0. 1. 0.
-#                                        1. 0. 1.7320508 0. 2.4494897 0.;
-# Hadronic decays omega and pi pi from PDG. CLEO PRD 73 012003 defines pi+pi- = 2 * pi0pi0
-0.016300000   Upsilon  omega                               PHSP;
-0.009100000   chi_b1  pi+  pi-                             PHSP;
-0.004550000   chi_b1  pi0  pi0                             PHSP;
-0.167713000   d  anti-d                                    PYTHIA         32;
-0.167713000   u  anti-u                                    PYTHIA         32;
-0.167713000   s  anti-s                                    PYTHIA         32;
-0.167713000   c  anti-c                                    PYTHIA         32;
+0.0995    gamma  Upsilon       HELAMP 1. 0. 1. 0. -1. 0. -1. 0.; #best values from BBR 2014, using B(Y3S->gamma chib)
+0.1997    gamma  Upsilon(2S)   HELAMP 1. 0. 1. 0. -1. 0. -1. 0.;
+0.0163     Upsilon omega       PHSP;
+0.00910    chi_b1  pi+  pi-                PHSP;
+0.00455    chi_b1  pi0  pi0                PHSP;
+0.167713         d       anti-d  PYTHIA         32;
+0.167713         u       anti-u  PYTHIA         32;
+0.167713         s       anti-s  PYTHIA         32;
+0.167713         c       anti-c  PYTHIA         32;
 Enddecay
 
 Decay chi_b2(2P)
-# T-> gamma V    Partial wave (L,S)=(0,2)
-0.064800000   gamma  Upsilon                               HELAMP 1. 0. 1.7320508 0. 2.4494897 0.
-                                           2.4494897 0. 1.7320508 0. 1. 0.;
-0.092100000   gamma  Upsilon(2S)                           HELAMP 1. 0. 1.7320508 0. 2.4494897 0.
-                                           2.4494897 0. 1.7320508 0. 1. 0.;
-#Following are not used now
-# T-> gamma V    Partial wave (L,S)=(0,2)
-#0.00023   gamma  Upsilon_1(1D)      PHSP;
-#0.00023   gamma  Upsilon_1(1D)      HELAMP 1. 0. 1.7320508 0. 2.4494897 0.
-#                                           2.4494897 0. 1.7320508 0. 1. 0.;
-# T -> gamma T   Partial wave (L,S)=(0,2)
-#0.00290         gamma Upsilon_2(1D)  PHSP;
-#0.00290         gamma Upsilon_2(1D) HELAMP -1. 0. -1.2247449 0.
-#                                           -1.2247449 0. -1. 0.
-#                                            1. 0.  1.2247449 0.
-#                                            1.2247449 0.  1. 0.;
-# spin 3 not yet in HELAMP.
-# T-> gamma 3    Partial wave (L,S)=(0,2)
-#0.01420   gamma  Upsilon_3(1D)    HELAMP 3.8729833 0. 3.1622777 0.
-#                                         2.4494897 0. 1.7320508. 0. 1. 0.
-#                                         1. 0. 1.7320508 0.  2.4494897 0.
-#                                         3.1622777 0. 3.8729833 0.;
-# Upsilon omega and pi pi chi_b2 PDG2007. Note that pi pi is
-# defined to be 1.5x pi+pi- & 3x pi0 pi0; see CLEO PRD 73 012003.
-# pi pi chi_b1 estimated from Kuang & Yan PRD 24 2874
-0.011000000   Upsilon  omega                               PHSP;
-0.005100000   chi_b2  pi+  pi-                             PHSP;
-0.002550000   chi_b2  pi0  pi0                             PHSP;
-0.824450000   g  g                                         PYTHIA         32;
+0.0648    gamma  Upsilon            HELAMP 1. 0. 1.7320508 0. 2.4494897 0.     2.4494897 0. 1.7320508 0. 1. 0.; 
+0.0921    gamma  Upsilon(2S)        HELAMP 1. 0. 1.7320508 0. 2.4494897 0.     2.4494897 0. 1.7320508 0. 1. 0.;
+0.011     Upsilon omega             PHSP;
+0.00510   chi_b2  pi+  pi-                PHSP;
+0.00255    chi_b2  pi0  pi0                PHSP;
+0.82445         g       g       PYTHIA         32;
 Enddecay
-
 
 
 Decay  h_b
@@ -11038,7 +10993,7 @@ Decay   chi_b1(3P)
 # V-> gamma V    Partial wave (L,S)=(0,1)
 0.150000000   gamma  Upsilon(3S)                           HELAMP 1. 0. 1. 0. -1. 0. -1. 0.;
 # V-> gamma T    Partial wave (L,S)=(0,1)
-0.031000000   gamma  Upsilon_2(2D)                         HELAMP 2.4494897 0. 1.7320508 0. 1. 0.                                             1. 0. 1.7320508 0. 2.4494897 0.;
+0.031000000   gamma  Upsilon_2(2D)                         HELAMP 2.4494897 0. 1.7320508 0. 1. 0. 1. 0. 1.7320508 0. 2.4494897 0.;
 # V-> gamma V    Partial wave (L,S)=(0,1)
 0.013000000   gamma  Upsilon_1(2D)                         HELAMP 1. 0. 1. 0. -1. 0. -1. 0.;
 0.806000000   g  g                                         PYTHIA 32;
@@ -11085,7 +11040,7 @@ Decay   Upsilon_1(1D)
 # V-> gamma V    Partial wave (L,S)=(0,1)
 0.318000000   gamma  chi_b1                                HELAMP 1. 0. 1. 0. -1. 0. -1. 0.;
 # V-> gamma T    Partial wave (L,S)=(0,1)
-0.026000000   gamma  chi_b2                                HELAMP 2.4494897 0. 1.7320508 0. 1. 0.                                               1. 0. 1.7320508 0. 2.4494897 0.;
+0.026000000   gamma  chi_b2                                HELAMP 2.4494897 0. 1.7320508 0. 1. 0.   1. 0. 1.7320508 0. 2.4494897 0.;
 0.051900000   g  g  g                                      PYTHIA 4;
 Enddecay
 
@@ -11125,7 +11080,7 @@ Decay   Upsilon_1(2D)
 # V-> gamma V    Partial wave (L,S)=(0,1)
 0.260000000   gamma  chi_b1(2P)                            HELAMP 1. 0. 1. 0. -1. 0. -1. 0.;
 # V-> gamma T    Partial wave (L,S)=(0,1)
-0.014000000   gamma  chi_b2(2P)                            HELAMP 2.4494897 0. 1.7320508 0. 1. 0.                                               1. 0. 1.7320508 0. 2.4494897 0.;
+0.014000000   gamma  chi_b2(2P)                            HELAMP 2.4494897 0. 1.7320508 0. 1. 0. 1. 0. 1.7320508 0. 2.4494897 0.;
 0.216000000   g  g  g                                      PYTHIA 4;
 Enddecay
 
@@ -11159,14 +11114,19 @@ Decay   Upsilon_3(2D)
 Enddecay
 
 Decay   h_b(2P)
-1.000000000   g  g                                         PYTHIA 32;
+0.22   gamma  eta_b        HELAMP 1. 0. 1. 0.; # [PDG 2021]
+0.48   gamma eta_b(2S)     HELAMP 1. 0. 1. 0.;  # [PDG 2021]
+0.30   g g                 PYTHIA  32;  # By subtraction of the radiative decays
 Enddecay
+
 Decay   h_b(3P)
 1.000000000   g  g                                         PYTHIA 32;
 Enddecay
+
 Decay   eta_b2(1D)
 1.000000000   g  g                                         PYTHIA 32;
 Enddecay
+
 Decay   eta_b2(2D)
 1.000000000   g  g                                         PYTHIA 32;
 Enddecay

@@ -1073,7 +1073,7 @@ void CDCDigitizerModule::setSemiTotalGain()
   B2DEBUG(m_debugLevel, " ");
 
   //read individual wire gains
-  const int nLyrs = m_cdcgp->nWireLayers();
+  const int nLyrs = MAX_N_SLAYERS;
   B2DEBUG(m_debugLevel, "nLyrs= " << nLyrs);
   int nGoodL[nLyrs] = {};
   float  wgL[nLyrs] = {};

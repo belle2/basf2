@@ -3039,7 +3039,7 @@ def buildEventShape(inputListNames=None,
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.")
         fillParticleList('pi+:evtshape', '', path=path)
-        fillParticleList('gamma:evtshape', '', path=path)
+        fillParticleList('gamma:evtshape', '', loadPhotonBeamBackgroundMVA=False, path=path)
         particleLists = ['pi+:evtshape', 'gamma:evtshape']
 
         if default_cleanup:

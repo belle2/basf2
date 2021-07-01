@@ -1,7 +1,7 @@
 '''
 @author: Claus Kleinwort (DESY), Tadeas Bilka
 '''
-from basf2 import *
+import basf2
 from ROOT import Belle2
 
 import os
@@ -462,7 +462,7 @@ class CDCWireConstraints(Constraints):
     def configure_collector(self, collector):
         """Enables wire-by-wire derivatives in collector
         """
-        B2WARNING("Adding CDC wire constraints -> enabling wire-by-wire alignment derivatives")
+        basf2.B2WARNING("Adding CDC wire constraints -> enabling wire-by-wire alignment derivatives")
         collector.param('enableWireByWireAlignment', True)
 
     def get_label(self, layer, wire, parameter):

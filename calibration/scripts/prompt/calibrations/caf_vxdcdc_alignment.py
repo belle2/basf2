@@ -50,7 +50,7 @@ quality_flags = [input_data_filters["Run Type"]["physics"],
                  input_data_filters["Magnet"]["On"]]
 
 #: Tells the automated system some details of this script
-settings = CalibrationSettings(name="VXD and CDC Alignment",
+settings = CalibrationSettings(name="Full VXD and CDC Alignment",
                                expert_username="bilkat",
                                description=__doc__,
                                input_data_formats=["raw"],

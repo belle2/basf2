@@ -2896,7 +2896,7 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
         from stdCharged import stdMostLikely
         stdMostLikely(chargedPIDPriors, '_evtkin', path=path)
         inputListNames = ['%s:mostlikely_evtkin' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
-        fillParticleList('gamma:evtkin', '', path=path)
+        fillParticleList('gamma:evtkin', '', loadPhotonBeamBackgroundMVA=False, path=path)
         inputListNames += ['gamma:evtkin']
         if default_cleanup:
             B2INFO("Using default cleanup in EventKinematics module.")
@@ -2908,7 +2908,7 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtkin and gamma:evtkin to get the global kinematics of the event.")
         fillParticleList('pi+:evtkin', '', path=path)
-        fillParticleList('gamma:evtkin', '', path=path)
+        fillParticleList('gamma:evtkin', '', loadPhotonBeamBackgroundMVA=False, path=path)
         particleLists = ['pi+:evtkin', 'gamma:evtkin']
         if default_cleanup:
             if (custom_cuts is not None):

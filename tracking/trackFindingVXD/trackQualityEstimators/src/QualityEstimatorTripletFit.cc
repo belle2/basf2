@@ -58,14 +58,9 @@ double QualityEstimatorTripletFit::estimateQuality(std::vector<SpacePoint const*
     const double z01 = hit1.Z() - hit0.Z();
     const double z12 = hit2.Z() - hit1.Z();
 
-    // This looks way more complex and computationally expensive compared to what is done in
-    // equation (8) in the reference paper
-    // (in which the order of the cross product is reversed by accident, with the order given in the paper, R_C has the wrong sign)
-    // const double R_C = (d01 * d12 * d02) / sqrt(-d01sq * d01sq - d12sq * d12sq - d02sq * d02sq +
-    //                                             2 * d01sq * d12sq + 2 * d12sq * d02sq + 2 * d02sq * d01sq);
-    const double R_C = (d01 * d12 * d02) /
-                       (2. * ((hit1.Y() - hit0.Y()) * (hit2.X() - hit1.X()) -
-                              (hit1.X() - hit0.X()) * (hit2.Y() - hit1.Y())));
+    // equation (8)
+    const double R_C = (d01 * d12 * d02) / sqrt(-d01sq * d01sq - d12sq * d12sq - d02sq * d02sq +
+                                                2 * d01sq * d12sq + 2 * d12sq * d02sq + 2 * d02sq * d01sq);
 
     // equations (9)
     const double Phi1C = 2. * asin(d01 / (2. * R_C));

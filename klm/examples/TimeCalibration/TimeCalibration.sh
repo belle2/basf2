@@ -2,7 +2,7 @@
 # This file provides an example of how to call KLM time calibration examples.
 DIR=${BELLE2_LOCAL_DIR}/klm/examples/TimeCalibration
 NEVENTS=1000
-NFILES=100
+NFILES=500
 SUBMISSION="bsub -qs"
 mkdir time_calibration
 for ((i = 0; i < ${NFILES}; i++)); do

@@ -39,7 +39,6 @@ TH1* DQMHistAnalysisPlotOnlyModule::GetHisto(TString histoname)
   hh1 = findHist(histoname.Data());
   if (hh1 == NULL) {
     B2DEBUG(20, "Histo " << histoname << " not in memfile");
-    // the following code sux ... is there no root function for that?
     TDirectory* d = gROOT;
     TString myl = histoname;
     TString tok;

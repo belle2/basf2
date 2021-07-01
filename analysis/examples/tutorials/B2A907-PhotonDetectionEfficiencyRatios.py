@@ -49,14 +49,14 @@ ma.fillParticleList(decayString='gamma:full',
 ma.addPhotonEfficiencyRatioVariables(['gamma:full'], weight_table_id, path=path)
 
 # The ratios are added wrt to E, theta, phi of the photon
-weight_vars = ['M', 'p', 'E', 'theta', 'phi',
+weight_vars = ['p', 'E', 'theta', 'phi',
                'Weight', 'TotalErrUp', 'TotalErrDown', 'StatErrUp', 'StatErrDown', 'SystErrUp', 'SystErrDown',
                ]
 
 
 ma.variablesToNtuple(decayString='gamma:full',
                      variables=weight_vars,
-                     filename=f'gamma_with_effratio_weights.root',
+                     filename=f'B2A907-PhotonDetectionEfficiencyRatios.root',
                      path=path)
 
 # process the events

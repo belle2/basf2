@@ -40,8 +40,6 @@ PhotonEfficiencySystematicsModule::PhotonEfficiencySystematicsModule() : Module(
 
         mypath.add_module("PhotonEfficiencySystematics", particleLists=['gamma:cut'], tableName=tableName_Weight)
 
-The module modifies the input particleLists by scaling energy as given by the scale in the LookUpTable
-		     
 		     )DOC");
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
@@ -93,13 +91,8 @@ void PhotonEfficiencySystematicsModule::event()
 
 void PhotonEfficiencySystematicsModule::addPhotonDetectionEfficiencyRatios(Particle* particle)
 {
-  // Should this necessarily be a photon??? TODO
-  if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite) {
-    B2ERROR("This should be called on photons only, not composite particles.");
-  }
-
-  else if (particle->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster
-           && particle->getPDGCode() == Const::photon.getPDGCode()) {
+  if (particle->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster
+      && particle->getPDGCode() == Const::photon.getPDGCode()) {
     //particle is photon reconstructed from ECL cluster
     WeightInfo info = getInfo(particle);
     for (const auto& entry : info) {

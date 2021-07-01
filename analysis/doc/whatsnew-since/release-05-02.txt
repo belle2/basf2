@@ -109,6 +109,9 @@ Modules
    module.
  * Added a `EnergyBiasCorrection` module, sub-percent correction only applied to E of photons not on clusterE and should only
    be applied on data. `correctEnergyBias` is a corresponding wrapper function.
+ * Added a `PhotonEfficiencySystematics` module which adds photon detection efficiency Data/MC ratios, systematic, statistical and total uncertainties
+   as variables in extrainfo to a given photon list. Ratios can only added for particles in photon lists. `addPhotonEfficiencyRatioVariables` is
+   a corresponding wrapper function.
 
 Full Event Interpretation
 +++++++++++++++++++++++++

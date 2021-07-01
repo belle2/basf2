@@ -80,7 +80,7 @@ KLMReconstructorModule::KLMReconstructorModule() :
   addParam("TimeCableDelayCorrection", m_TimeCableDelayCorrection,
            "Perform cable delay time correction (true) or not (false).", true);
   addParam("EventT0Correction", m_EventT0Correction,
-           "Perform EventT0 correction (true) or not (false)", false);
+           "Perform EventT0 correction (true) or not (false)", true);
   addParam("IfAlign", m_bklmIfAlign,
            "Perform alignment correction (true) or not (false).",
            bool(true));

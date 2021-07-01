@@ -872,6 +872,13 @@ Returns NaN for data.
     REGISTER_VARIABLE("timeSincePrevTriggerMicroSeconds", timeSincePrevTriggerMicroSeconds,
                       "[Eventbased] Time since the previous trigger in micro seconds.");
 
+    REGISTER_VARIABLE("triggeredBunchNumbertTTD", triggeredBunchNumberTTD, R"DOC(
+[Eventbased] Number of triggered bunch ranging from 0-1279.
+
+.. warning:: This is the bunch number as provided by the TTD, which does not necessarily correspond to the 'global' SKB bunch number.
+.. note:: There are a maximum of 5120 buckets, which could each carry one bunch of e+/e-, but we only have 1280 clock ticks (=5120/4) to identify the bunches.
+)DOC");
+
     REGISTER_VARIABLE("triggeredBunchNumber", triggeredBunchNumber, R"DOC(
 [Eventbased] Number of triggered bunch ranging from 0-1279.
 
@@ -884,13 +891,13 @@ Returns NaN for data.
     REGISTER_VARIABLE("timeSinceLastInjectionSignalClockTicks", timeSinceLastInjectionSignalClockTicks, R"DOC(
 [Eventbased] Time since the last injection pre-kick signal in clock ticks (127MHz=RF/4 clock)
 
-.. note:: this returns the time without the delay until the injected bunch reaches the detector (which differs for HER/LER)
+.. warning:: this returns the time without the delay until the injected bunch reaches the detector (which differs for HER/LER)
 )DOC");
 
     REGISTER_VARIABLE("timeSinceLastInjectionSignalMicroSeconds", timeSinceLastInjectionSignalMicroSeconds, R"DOC(
 [Eventbased] Time since the last injection pre-kick signal in micro seconds
 
-.. note:: this returns the time without the delay until the injected bunch reaches the detector (which differs for HER/LER)
+.. warning:: this returns the time without the delay until the injected bunch reaches the detector (which differs for HER/LER)
 )DOC");
 
     REGISTER_VARIABLE("timeSinceLastInjectionClockTicks", timeSinceLastInjectionClockTicks,

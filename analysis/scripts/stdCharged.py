@@ -159,7 +159,7 @@ def stdLep(pdgId, listtype, method, classification, path=None):
         pdgId (int): the lepton pdg code.
         listtype (str): name of standard list. Choose among the above values.
         method (str): the PID method: 'likelihood' or 'bdt'.
-        classification (str): the type of classifier: 'binary' (one-vs-other) or 'global' (one-vs-all).
+        classification (str): the type of classifier: 'binary' (one-vs-pion) or 'global' (one-vs-all).
         path (basf2.Path): modules are added to this path.
     """
 
@@ -198,7 +198,8 @@ def stdLep(pdgId, listtype, method, classification, path=None):
             # TEMP: use 'electronID_noTOP' for electrons to circumvent bug in TOP electron PDFs in release 5.
             "global": "electronID_noTOP" if pdgId == Const.electron.getPDGCode() else "muonID",
             # TEMP: use 'binaryPID_noTOP' for electrons to circumvent bug in TOP electron PDFs in release 5.
-            "binary": f"binaryPID_noTOP({pdgId}, 211)" if pdgId == Const.electron.getPDGCode() else f"binaryPID({pdgId}, 211)"
+            "binary": f"binaryPID_noTOP({pdgId}, {Const.pion.getPDGCode()})" if pdgId == Const.electron.getPDGCode() \
+                      else f"binaryPID({pdgId}, {Const.pion.getPDGCode()})"
         },
         "bdt": {
             "global": f"pidChargedBDTScore({pdgId}, ALL)",
@@ -225,16 +226,13 @@ def stdLep(pdgId, listtype, method, classification, path=None):
     # Configure weighting module(s).
     reweighter_eff = path.add_module("ParticleWeighting",
                                      particleList=plistname,
-                                     tableName=payload_eff)
-    reweighter.set_name(f"ParticleWeighting_eff_{plistname}")
+                                     tableName=payload_eff).set_name(f"ParticleWeighting_eff_{plistname}")
     reweighter_misid_pi = path.add_module("ParticleWeighting",
                                           particleList=plistname,
-                                          tableName=payload_misid_pi)
-    reweighter.set_name(f"ParticleWeighting_misid_pi_{plistname}")
+                                          tableName=payload_misid_pi).set_name(f"ParticleWeighting_misid_pi_{plistname}")
     reweighter_misid_K = path.add_module("ParticleWeighting",
                                          particleList=plistname,
-                                         tableName=payload_misid_K)
-    reweighter.set_name(f"ParticleWeighting_misid_K_{plistname}")
+                                         tableName=payload_misid_K).set_name(f"ParticleWeighting_misid_K_{plistname}")
 
     # Apply the PID selection cut, which is read from the efficiency payload.
     cut = f"{pid_var} > extraInfo({payload_eff}_threshold)"

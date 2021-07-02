@@ -1,12 +1,10 @@
-/*************************************************************************
-* basf2 (Belle II Analysis Software Framework)                           *
-* Copyright(C) 2020  Belle II Collaboration                              *
-*                                                                        *
-* Author: The Belle II Collaboration                                     *
-* Contributors: Leo Piilonen, Giacomo De Pietro                          *
-*                                                                        *
-* This software is provided "as is" without any warranty.                *
-**************************************************************************/
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #pragma once
 

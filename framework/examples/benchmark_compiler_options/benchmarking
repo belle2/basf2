@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 echo "This script will build basf2 with different compiler options and run framework/examples/tools/benchmark_compiler_options/scripts/script to check the resulting performance."
 echo "Note that this will edit your SConstruct file. Please make a backup if you have local changes."
 echo "Press return to continue, Ctrl-c to abort."

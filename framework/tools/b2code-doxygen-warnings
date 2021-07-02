@@ -1,5 +1,13 @@
 #!/bin/bash
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 which doxygen &> /dev/null
 if [ $? -ne 0 ]; then
     echo "doxygen executable not found. Doxygen must be installed for this script to work"

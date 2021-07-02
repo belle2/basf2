@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """Tool to reset the non-reproducible root file metadata: UUID and datimes.
 It can also reset the initial file name stored in the file itself, but
 (WARNING!) this can corrupt the root file.

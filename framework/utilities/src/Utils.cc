@@ -1,3 +1,10 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 // weird bug in intel compiler and or boost::process: If we include boost
 // process intel compile fails. It seems that including sys/wait.h after
 // other c++ std:: headers triggers a weird behavior failing two static

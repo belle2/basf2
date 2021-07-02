@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -5,13 +7,10 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
-# -*- coding: utf-8 -*-
 
 """
 Airflow script for TOP pre-tracking calibration:
    channel masks
-
-Author: Marko Staric, Shahab Kohani
 """
 import basf2
 from prompt import CalibrationSettings, input_data_filters

@@ -10,7 +10,7 @@ __authors__ = [
 ]
 
 import modularAnalysis as ma
-from skimExpertFunctions import BaseSkim, fancy_skim_header
+from skim import BaseSkim, fancy_skim_header
 from stdV0s import stdKshorts
 from skim.standardlists.charmless import (
     loadStdVeryLooseTracks,
@@ -52,7 +52,7 @@ class BtoPi0Pi0(BaseSkim):
         BsigList = []
         ma.reconstructDecay('B0:Pi0Pi0 -> pi0:charmlessFit pi0:charmlessFit', Bcuts, path=path)
         BsigList.append('B0:Pi0Pi0')
-        self.SkimLists = BsigList
+        return BsigList
 
 
 @fancy_skim_header
@@ -146,7 +146,7 @@ class BtoHadTracks(BaseSkim):
                                 cut=Bcuts, dmID=chID, path=path)
             BsigList.append(channel)
         path = self.skim_event_cuts("nTracks >= 2", path=path)
-        self.SkimLists = BsigList
+        return BsigList
 
 
 @fancy_skim_header
@@ -203,7 +203,7 @@ class BtoHad1Pi0(BaseSkim):
             ma.reconstructDecay(decayString=channel + ' -> ' + channels[channel],
                                 cut=Bcuts, dmID=chID, path=path)
             BsigList.append(channel)
-        self.SkimLists = BsigList
+        return BsigList
 
 
 @fancy_skim_header
@@ -248,4 +248,4 @@ class BtoHad3Tracks1Pi0(BaseSkim):
                              outputVariable="cosMdstIndex_rank", path=path)
             BsigList.append(channel)
         path = self.skim_event_cuts("nTracks >= 2", path=path)
-        self.SkimLists = BsigList
+        return BsigList

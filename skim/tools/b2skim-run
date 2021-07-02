@@ -9,7 +9,7 @@ from textwrap import indent
 
 import basf2 as b2
 import modularAnalysis as ma
-from skimExpertFunctions import CombinedSkim
+from skim import CombinedSkim
 from skim.registry import Registry
 
 

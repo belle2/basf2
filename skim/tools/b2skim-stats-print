@@ -40,8 +40,8 @@ from textwrap import wrap
 import warnings
 
 from skim.registry import Registry
-from skim.testfiles import MCSample, TestSampleList
-from skimExpertFunctions import get_eventN
+from skim.utils.misc import get_eventN
+from skim.utils.testfiles import MCSample, TestSampleList
 
 from tabulate import tabulate
 

@@ -12,7 +12,7 @@ from skim.standardlists.lightmesons import (loadStdSkimHighEffTracks,
                                             loadStdSkimHighEffRho0, loadStdSkimHighEffOmega,
                                             loadStdSkimHighEffF_0)
 
-from skimExpertFunctions import BaseSkim, fancy_skim_header
+from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons
 from stdPi0s import loadStdSkimPi0, stdPi0s
@@ -187,9 +187,7 @@ class TDCPV_qqs(BaseSkim):
         ]
         path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
 
-        tcpvLists = bd_qqs_List + bu_qqs_List
-
-        self.SkimLists = tcpvLists
+        return bd_qqs_List + bu_qqs_List
 
     def validation_histograms(self, path):
         ma.reconstructDecay("B0:etap -> eta':SkimHighEff K_S0:merged", '5.20 < Mbc < 5.3 and abs(deltaE) < 0.3', path=path)
@@ -341,9 +339,7 @@ class TDCPV_ccs(BaseSkim):
         ]
         path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
 
-        tcpvLists = bd_ccs_List + bPlustoJPsiK_List + b0toJPsiKL_List
-
-        self.SkimLists = tcpvLists
+        return bd_ccs_List + bPlustoJPsiK_List + b0toJPsiKL_List
 
     def validation_histograms(self, path):
         ma.reconstructDecay('B0:jpsiee -> J/psi:ee K_S0:merged', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)

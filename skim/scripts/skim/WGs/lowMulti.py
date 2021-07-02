@@ -11,7 +11,7 @@ __authors__ = [
 
 
 import modularAnalysis as ma
-from skimExpertFunctions import BaseSkim, fancy_skim_header
+from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdPi
 from stdPhotons import stdPhotons
 from variables import variables as vm
@@ -96,7 +96,7 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
             path=path)
 
         ma.copyLists('vpho:' + skim_label, ['vpho:' + skim_label_2, 'vpho:' + skim_label_1], path=path)
-        self.SkimLists = ['vpho:' + skim_label]
+        return ['vpho:' + skim_label]
 
 
 @fancy_skim_header
@@ -170,10 +170,11 @@ class LowMassTwoTrack(BaseSkim):
             (f"vpho:{label}_pK", f" -> gamma:{label}_ISR p+:{label} K-:{label}", hhMassWindow),
         ]
 
-        self.SkimLists = []
+        ParticleLists = []
         for dmID, (mode, decayString, cut) in enumerate(ModesAndCuts):
             ma.reconstructDecay(mode + decayString, cut, dmID=dmID, path=path)
-            self.SkimLists.append(mode)
+            ParticleLists.append(mode)
+        return ParticleLists
 
     def validation_histograms(self, path):
         vm.addAlias('pip_p_cms', 'daughter(0, useCMSFrame(p))')
@@ -273,4 +274,4 @@ class SingleTagPseudoScalar(BaseSkim):
         # tracks, are quite stringent.
         path = self.skim_event_cuts(EventCuts, path=path)
 
-        self.SkimLists = [f"e+:{label}"]
+        return [f"e+:{label}"]

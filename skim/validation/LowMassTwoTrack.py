@@ -15,7 +15,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.lowMulti import LowMassTwoTrack
+from skim.WGs.lowMulti import LowMassTwoTrack
 
 path = b2.Path()
 skim = LowMassTwoTrack(validation=True, udstOutput=False)

@@ -23,8 +23,8 @@ import yaml
 
 from basf2 import find_file
 from skim.registry import Registry
-from skim.testfiles import TestSampleList
-from skimExpertFunctions import get_eventN
+from skim.utils.misc import get_eventN
+from skim.utils.testfiles import TestSampleList
 
 
 class CustomHelpFormatter(argparse.HelpFormatter):

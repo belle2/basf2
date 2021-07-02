@@ -15,7 +15,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.btocharm import BtoD0h_hh
+from skim.WGs.btocharm import BtoD0h_hh
 
 path = b2.Path()
 skim = BtoD0h_hh(validation=True, udstOutput=False)

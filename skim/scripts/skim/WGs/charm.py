@@ -15,7 +15,7 @@ Skim list building functions for charm analyses.
 from functools import lru_cache
 
 import modularAnalysis as ma
-from skimExpertFunctions import BaseSkim, fancy_skim_header
+from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import loadStdSkimPhoton
 from stdPi0s import loadStdSkimPi0
@@ -85,7 +85,7 @@ class XToD0_D0ToHpJm(BaseSkim):
 
     def build_lists(self, path):
         """Builds :math:`D^0` skim lists defined in `XToD0_D0ToHpJm.D0ToHpJm`."""
-        self.SkimLists = self.D0ToHpJm(path)
+        return self.D0ToHpJm(path)
 
 
 @fancy_skim_header
@@ -142,7 +142,7 @@ class XToD0_D0ToNeutrals(BaseSkim):
 
     def build_lists(self, path):
         """Builds :math:`D^0` skim lists defined in `XToD0_D0ToNeutrals.D0ToNeutrals`."""
-        self.SkimLists = self.D0ToNeutrals(path)
+        return self.D0ToNeutrals(path)
 
 
 @fancy_skim_header
@@ -193,7 +193,7 @@ class DstToD0Pi_D0ToRare(BaseSkim):
                                 Dstcuts, chID, path=path)
             DstList.append("D*+:" + str(chID))
 
-        self.SkimLists = DstList
+        return DstList
 
 
 @fancy_skim_header
@@ -240,7 +240,7 @@ class XToDp_DpToKsHp(BaseSkim):
             ma.reconstructDecay("D+:KsHp" + str(chID) + " -> " + channel, Dpcuts, chID, path=path)
             DpList.append("D+:KsHp" + str(chID))
 
-        self.SkimLists = DpList
+        return DpList
 
 
 @fancy_skim_header
@@ -285,7 +285,7 @@ class XToDp_DpToHpHmJp(BaseSkim):
             ma.reconstructDecay("D+:HpHmJp" + str(chID) + " -> " + channel, Dpcuts, chID, path=path)
             DpList.append("D+:HpHmJp" + str(chID))
 
-        self.SkimLists = DpList
+        return DpList
 
 
 @fancy_skim_header
@@ -330,7 +330,7 @@ class LambdacTopHpJm(BaseSkim):
             ma.reconstructDecay("Lambda_c+:pHpJm" + str(chID) + " -> " + channel, LambdacCuts, chID, path=path)
             LambdacList.append("Lambda_c+:pHpJm" + str(chID))
 
-        self.SkimLists = LambdacList
+        return LambdacList
 
 
 @fancy_skim_header
@@ -372,7 +372,7 @@ class DstToDpPi0_DpToHpPi0(BaseSkim):
             ma.reconstructDecay("D*+:HpPi0" + str(chID) + " -> D+:HpPi0" + str(chID) + " pi0:skim", "0 < Q < 0.018", path=path)
             DstList.append("D*+:HpPi0" + str(chID))
 
-        self.SkimLists = DstList
+        return DstList
 
 
 @fancy_skim_header
@@ -410,7 +410,7 @@ class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
             ma.reconstructDecay('D*+:HpJm' + str(chID) + ' -> D0:HpJm' + str(chID) + ' pi+:mygood', Dstcuts, chID, path=path)
             DstList.append('D*+:HpJm' + str(chID))
 
-        self.SkimLists = DstList
+        return DstList
 
 
 @fancy_skim_header
@@ -458,7 +458,7 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
         ma.copyLists("D*+:HpJmPi0_withPID", ["D*+:HpJmPi0RS_withPID", "D*+:HpJmPi0WS_withPID"], path=path)
         DstList.append("D*+:HpJmPi0_withPID")
 
-        self.SkimLists = DstList
+        return DstList
 
 
 @fancy_skim_header
@@ -508,7 +508,7 @@ class DstToD0Pi_D0ToHpHmPi0(BaseSkim):
                 Dstcuts, chID, path=path)
             DstList.append("D*+:HpHmPi0" + str(chID) + "_withPID")
 
-        self.SkimLists = DstList
+        return DstList
 
 
 @fancy_skim_header
@@ -553,7 +553,7 @@ class DstToD0Pi_D0ToKsOmega(BaseSkim):
         ma.reconstructDecay("D*+:KsOmega -> D0:KsOmega pi+:ksomega", "0 < Q < 0.018", path=path)
         DstList.append("D*+:KsOmega")
 
-        self.SkimLists = DstList
+        return DstList
 
 
 @fancy_skim_header
@@ -609,7 +609,7 @@ class DstToD0Pi_D0ToHpHmHpJm(BaseSkim):
             ma.reconstructDecay("D*+:HpHmHpJm" + str(chID) + " -> pi+:hphmhpjm D0:HpHmHpJm" + str(chID), Dstcuts, chID, path=path)
             DstList.append("D*+:HpHmHpJm" + str(chID))
 
-        self.SkimLists = DstList
+        return DstList
 
 
 @fancy_skim_header
@@ -668,7 +668,7 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
                 Dstcuts, chID, path=path)
             DstList.append("D*+:HpJmEta" + str(chID))
 
-        self.SkimLists = DstList
+        return DstList
 
 
 @fancy_skim_header
@@ -708,7 +708,7 @@ class DstToD0Pi_D0ToNeutrals(XToD0_D0ToNeutrals):
             ma.reconstructDecay("D*+:2Nbdy" + str(chID) + " -> pi+:2Nbdy " + channel, Dstcuts, chID, path=path)
             DstList.append("D*+:2Nbdy" + str(chID))
 
-        self.SkimLists = DstList
+        return DstList
 
 
 @fancy_skim_header
@@ -762,7 +762,7 @@ class DstToD0Pi_D0ToHpJmKs(BaseSkim):
             ma.reconstructDecay("D*+:HpJmKs" + str(chID) + " -> pi+:hpjmks D0:HpJmKs" + str(chID), Dstcuts, chID, path=path)
             DstList.append("D*+:HpJmKs" + str(chID))
 
-        self.SkimLists = DstList
+        return DstList
 
 
 @fancy_skim_header
@@ -804,7 +804,7 @@ class EarlyData_DstToD0Pi_D0ToHpJmPi0(BaseSkim):
         ma.copyLists("D*+:HpJmPi0", ["D*+:HpJmPi0RS", "D*+:HpJmPi0WS"], path=path)
         DstList.append("D*+:HpJmPi0")
 
-        self.SkimLists = DstList
+        return DstList
 
 
 @fancy_skim_header
@@ -850,4 +850,4 @@ class EarlyData_DstToD0Pi_D0ToHpHmPi0(BaseSkim):
                                 Dstcuts, chID, path=path)
             DstList.append("D*+:HpHmPi0" + str(chID))
 
-        self.SkimLists = DstList
+        return DstList

@@ -15,7 +15,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.fei import feiHadronicB0
+from skim.WGs.fei import feiHadronicB0
 
 path = b2.Path()
 skim = feiHadronicB0(validation=True, udstOutput=False)

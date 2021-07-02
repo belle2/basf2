@@ -1,364 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+The core classes of the skim package are defined in ``skim.core``: ``BaseSkim`` and
+``CombinedSkim``.
+
+* ``BaseSkim`` is an abstract base class from which all skims inherit. It defines
+  template functions for a skim, and includes attributes describing the skim metadata.
+
+* ``CombinedSkim`` is a class for combining ``BaseSkim`` objects into a single steering
+  file.
+"""
+
 from abc import ABC, abstractmethod
-import subprocess
-import json
-from pathlib import Path
-import re
 import warnings
 
 import basf2 as b2
 from modularAnalysis import applyCuts, summaryOfLists
 from skim.registry import Registry
-from skim.testfiles import TestSampleList
-
-
-def get_test_file(process, *, SampleYAML=None):
-    """
-    Attempt to find a test sample of the given MC process.
-
-    Parameters:
-        process (str): Physics process, e.g. mixed, charged, ccbar, eemumu.
-        SampleYAML (str, pathlib.Path): Path to a YAML file containing sample
-                specifications.
-
-    Returns:
-        str: Path to test sample file.
-
-    Raises:
-        FileNotFoundError: Raised if no sample can be found.
-    """
-    samples = TestSampleList(SampleYAML=SampleYAML)
-    matches = samples.query_mc_samples(process=process)
-    try:
-        # Return the first match found
-        return matches[0].location
-    except IndexError as e:
-        raise ValueError(f"No test samples found for MC process '{process}'.") from e
-
-
-def get_file_metadata(filename):
-    """
-    Retrieve the metadata for a file using ``b2file-metadata-show``.
-
-    Parameters:
-       metadata (str): File to get number of events from.
-
-    Returns:
-        metadata: Metadata of file in dict format.
-    """
-    if not Path(filename).exists():
-        raise FileNotFoundError(f"Could not find file {filename}")
-
-    proc = subprocess.run(
-        ["b2file-metadata-show", "--json", str(filename)],
-        stdout=subprocess.PIPE,
-        check=True,
-    )
-    metadata = json.loads(proc.stdout.decode("utf-8"))
-    return metadata
-
-
-def get_eventN(filename):
-    """
-    Retrieve the number of events in a file using ``b2file-metadata-show``.
-
-    Parameters:
-       filename (str): File to get number of events from.
-
-    Returns:
-        nEvents: Number of events in the file.
-    """
-    return int(get_file_metadata(filename)["nEvents"])
-
-
-def resolve_skim_modules(SkimsOrModules, *, LocalModule=None):
-    """
-    Produce an ordered list of skims, by expanding any Python skim module names into a
-    list of skims in that module. Also produce a dict of skims grouped by Python module.
-
-    Raises:
-        RuntimeError: Raised if a skim is listed twice.
-        ValueError: Raised if ``LocalModule`` is passed and skims are normally expected
-            from more than one module.
-    """
-    skims = []
-
-    for name in SkimsOrModules:
-        if name in Registry.names:
-            skims.append(name)
-        elif name in Registry.modules:
-            skims.extend(Registry.get_skims_in_module(name))
-
-    duplicates = set([skim for skim in skims if skims.count(skim) > 1])
-    if duplicates:
-        raise RuntimeError(
-            f"Skim{'s'*(len(duplicates)>1)} requested more than once: {', '.join(duplicates)}"
-        )
-
-    modules = sorted({Registry.get_skim_module(skim) for skim in skims})
-    if LocalModule:
-        if len(modules) > 1:
-            raise ValueError(
-                f"Local module {LocalModule} specified, but the combined skim expects "
-                "skims from more than one module. No steering file written."
-            )
-        modules = {LocalModule.rstrip(".py"): sorted(skims)}
-    else:
-        modules = {
-            f"skim.{module}": sorted(
-                [skim for skim in skims if Registry.get_skim_module(skim) == module]
-            )
-            for module in modules
-        }
-
-    return skims, modules
-
-
-class InitialiseSkimFlag(b2.Module):
-    """
-    *[Module for skim expert usage]* Create the EventExtraInfo DataStore object, and set
-    all required flag variables to zero.
-
-    .. Note::
-
-        Add this module to the path before adding any skims, so that the skim flags are
-        defined in the datastore for all events.
-    """
-
-    def __init__(self, *skims):
-        """
-        Initialise module.
-
-        Parameters:
-            skims (skimExpertFunctions.BaseSkim): Skim to initialise event flag for.
-        """
-
-        from variables import variables as vm
-        from ROOT import Belle2
-
-        super().__init__()
-        self.skims = skims
-        self.EventExtraInfo = Belle2.PyStoreObj("EventExtraInfo")
-
-        # Create aliases for convenience
-        for skim in skims:
-            vm.addAlias(skim.flag, f"eventExtraInfo({skim.flag})")
-
-    def initialize(self):
-        """
-        Register EventExtraInfo in datastore if it has not been registered already.
-        """
-        if not self.EventExtraInfo.isValid():
-            self.EventExtraInfo.registerInDataStore()
-
-    def event(self):
-        """
-        Initialise flags to zero.
-        """
-
-        self.EventExtraInfo.create()
-        for skim in self.skims:
-            self.EventExtraInfo.addExtraInfo(skim.flag, 0)
-
-
-class UpdateSkimFlag(b2.Module):
-    """
-    *[Module for skim expert usage]* Update the skim flag to be 1 if there is at least
-    one candidate in any of the skim lists.
-
-    .. Note::
-
-        Add this module to the post-skim path of each skim in the combined skim, as the
-        skim lists are only guaranteed to exist on the conditional path (if a
-        conditional path was used).
-    """
-
-    def __init__(self, skim):
-        """
-        Initialise module.
-
-        Parameters:
-            skim (skimExpertFunctions.BaseSkim): Skim to update event flag for.
-        """
-
-        from ROOT import Belle2
-
-        super().__init__()
-        self.skim = skim
-        self.EventExtraInfo = Belle2.PyStoreObj("EventExtraInfo")
-
-    def initialize(self):
-        """
-        Check EventExtraInfo has been registered previously. This registration should be
-        done by InitialiseSkimFlag.
-        """
-        self.EventExtraInfo.isRequired()
-
-    def event(self):
-        """
-        Check if at least one skim list is non-empty; if so, update the skim flag to 1.
-        """
-
-        from ROOT import Belle2
-
-        ListObjects = [Belle2.PyStoreObj(lst) for lst in self.skim.SkimLists]
-
-        # Check required skim lists have been built on this path
-        if any([not ListObj.isValid() for ListObj in ListObjects]):
-            b2.B2FATAL(
-                f"Error in UpdateSkimFlag for {self.skim}: particle lists not built. "
-                "Did you add this module to the pre-skim path rather than the post-skim path?"
-            )
-
-        nCandidates = sum(ListObj.getListSize() for ListObj in ListObjects)
-
-        # Override ExtraInfo flag if at least one candidate from any list passed
-        if nCandidates > 0:
-            self.EventExtraInfo.setExtraInfo(self.skim.flag, 1)
-
-
-def _sphinxify_decay(decay_string):
-    """Format the given decay string by using LaTeX commands instead of plain-text.
-    Output is formatted for use with Sphinx (ReStructured Text).
-
-    This is a utility function for autogenerating skim documentation.
-
-    Parameters:
-        decay_string (str): A decay descriptor.
-
-    Returns:
-        sphinxed_string (str): LaTeX version of the decay descriptor.
-    """
-
-    decay_string = re.sub("^(B.):generic", "\\1_{\\\\text{had}}", decay_string)
-    decay_string = decay_string.replace(":generic", "")
-    decay_string = decay_string.replace(":semileptonic", "_{\\text{SL}}")
-    decay_string = decay_string.replace(":FSP", "_{FSP}")
-    decay_string = decay_string.replace(":V0", "_{V0}")
-    decay_string = re.sub("_[0-9]+", "", decay_string)
-    # Note: these are applied from top to bottom, so if you have
-    # both B0 and anti-B0, put anti-B0 first.
-    substitutes = [
-        ("==>", "\\to"),
-        ("->", "\\to"),
-        ("gamma", "\\gamma"),
-        ("p+", "p"),
-        ("anti-p-", "\\bar{p}"),
-        ("pi+", "\\pi^+"),
-        ("pi-", "\\pi^-"),
-        ("pi0", "\\pi^0"),
-        ("K_S0", "K^0_S"),
-        ("K_L0", "K^0_L"),
-        ("mu+", "\\mu^+"),
-        ("mu-", "\\mu^-"),
-        ("tau+", "\\tau^+"),
-        ("tau-", "\\tau^-"),
-        ("nu", "\\nu"),
-        ("K+", "K^+"),
-        ("K-", "K^-"),
-        ("e+", "e^+"),
-        ("e-", "e^-"),
-        ("J/psi", "J/\\psi"),
-        ("anti-Lambda_c-", "\\Lambda^{-}_{c}"),
-        ("anti-Sigma+", "\\overline{\\Sigma}^{+}"),
-        ("anti-Lambda0", "\\overline{\\Lambda}^{0}"),
-        ("anti-D0*", "\\overline{D}^{0*}"),
-        ("anti-D*0", "\\overline{D}^{0*}"),
-        ("anti-D0", "\\overline{D}^0"),
-        ("anti-B0", "\\overline{B}^0"),
-        ("Sigma+", "\\Sigma^{+}"),
-        ("Lambda_c+", "\\Lambda^{+}_{c}"),
-        ("Lambda0", "\\Lambda^{0}"),
-        ("D+", "D^+"),
-        ("D-", "D^-"),
-        ("D0", "D^0"),
-        ("D*+", "D^{+*}"),
-        ("D*-", "D^{-*}"),
-        ("D*0", "D^{0*}"),
-        ("D_s+", "D^+_s"),
-        ("D_s-", "D^-_s"),
-        ("D_s*+", "D^{+*}_s"),
-        ("D_s*-", "D^{-*}_s"),
-        ("B+", "B^+"),
-        ("B-", "B^-"),
-        ("B0", "B^0"),
-        ("B_s0", "B^0_s"),
-        ("K*0", "K^{0*}"),
-    ]
-    tex_string = decay_string
-    for (key, value) in substitutes:
-        tex_string = tex_string.replace(key, value)
-    return f":math:`{tex_string}`"
-
-
-def fancy_skim_header(SkimClass):
-    """Decorator to generate a fancy header to skim documentation and prepend it to the
-    docstring. Add this just above the definition of a skim.
-
-    Also ensures the documentation of the template functions like `BaseSkim.build_lists`
-    is not repeated in every skim documentation.
-
-    .. code-block:: python
-
-        @fancy_skim_header
-        class MySkimName(BaseSkim):
-            # docstring here describing your skim, and explaining cuts.
-    """
-    SkimName = SkimClass.__name__
-    SkimCode = Registry.encode_skim_name(SkimName)
-    authors = SkimClass.__authors__ or ["(no authors listed)"]
-    description = SkimClass.__description__ or "(no description)"
-    contact = SkimClass.__contact__ or "(no contact listed)"
-    category = SkimClass.__category__ or "(no category listed)"
-
-    if isinstance(authors, str):
-        # If we were given a string, split it up at: commas, "and", "&", and newlines
-        authors = re.split(
-            r",\s+and\s+|\s+and\s+|,\s+&\s+|\s+&\s+|,\s+|\s*\n\s*", authors
-        )
-        # Strip any remaining whitespace either side of an author's name
-        authors = [re.sub(r"^\s+|\s+$", "", author) for author in authors]
-
-    if isinstance(category, list):
-        category = ", ".join(category)
-
-    # If the contact is of the form "NAME <EMAIL>" or "NAME (EMAIL)", then make it a link
-    match = re.match("([^<>()`]+) [<(]([^<>()`]+@[^<>()`]+)[>)]", contact)
-    if match:
-        name, email = match[1], match[2]
-        contact = f"`{name} <mailto:{email}>`_"
-
-    header = f"""
-    Note:
-        * **Skim description**: {description}
-        * **Skim name**: {SkimName}
-        * **Skim LFN code**: {SkimCode}
-        * **Category**: {category}
-        * **Author{"s"*(len(authors) > 1)}**: {", ".join(authors)}
-        * **Contact**: {contact}
-    """
-
-    if SkimClass.ApplyHLTHadronCut:
-        HLTLine = "*This skim includes a selection on the HLT flag* ``hlt_hadron``."
-        header = f"{header.rstrip()}\n\n        {HLTLine}\n"
-
-    if SkimClass.__doc__:
-        SkimClass.__doc__ = header + "\n\n" + SkimClass.__doc__.lstrip("\n")
-    else:
-        # Handle case where docstring is empty, or was not redefined
-        SkimClass.__doc__ = header
-
-    # If documentation of template functions not redefined, make sure BaseSkim docstring is not repeated
-    SkimClass.load_standard_lists.__doc__ = SkimClass.load_standard_lists.__doc__ or ""
-    SkimClass.build_lists.__doc__ = SkimClass.build_lists.__doc__ or ""
-    SkimClass.validation_histograms.__doc__ = (
-        SkimClass.validation_histograms.__doc__ or ""
-    )
-    SkimClass.additional_setup.__doc__ = SkimClass.additional_setup.__doc__ or ""
-
-    return SkimClass
+from skim.utils.flags import InitialiseSkimFlag, UpdateSkimFlag
+from skim.utils.testfiles import get_test_file
 
 
 class BaseSkim(ABC):
@@ -374,7 +35,7 @@ class BaseSkim(ABC):
 
     TestSampleProcess = "mixed"
     """MC process of test file. `BaseSkim.TestFiles` passes this property to
-    `skimExpertFunctions.get_test_file` to retrieve an appropriate file location.
+    `skim.utils.testfiles.get_test_file` to retrieve an appropriate file location.
     Defaults to a :math:`B^{0}\\overline{B^{0}}` sample.
     """
 
@@ -469,7 +130,6 @@ class BaseSkim(ABC):
         self._udstOutput = udstOutput
         self._validation = validation
         self.mc = mc
-        self.SkimLists = []
 
     def load_standard_lists(self, path):
         """
@@ -501,11 +161,17 @@ class BaseSkim(ABC):
     @abstractmethod
     def build_lists(self, path):
         """Create the skim lists to be saved in the output uDST. This function is where
-        the main skim cuts should be applied. At the end of this method, the attribute
-        ``SkimLists`` must be set so it can be used by `BaseSkim.output_udst`.
+        the main skim cuts should be applied. This function should return a list of
+        particle list names.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
+
+        .. versionchanged:: release-06-00-00
+
+           Previously, this function was expected to set the attribute
+           `BaseSkim.SkimLists`. Now this is handled by `BaseSkim`, and this function is
+           expected to return the list of particle list names.
         """
 
     def validation_histograms(self, path):
@@ -516,28 +182,12 @@ class BaseSkim(ABC):
         """
 
     # Everything beyond this point can remain as-is when defining a skim
-    def __call__(self, path, *, udstOutput=None, validation=None):
+    def __call__(self, path):
         """Produce the skim particle lists and write uDST file.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
-            udstOutput (bool): [DEPRECATED ARGUMENT] If True, add uDST output to the path.
-            validation (bool): [DEPRECATED ARGUMENT] If True, build lists and write
-                validation histograms instead of writing uDSTs.
         """
-        # Deprecation warning. All configuration should be done during initialisation.
-        warning = (
-            "Passing the `{arg}` argument to `BaseSkim.__call__` is deprecated. "
-            "Please pass all configuration parameters to the initialisation of "
-            "the skim object."
-        )
-        if udstOutput is not None:
-            b2.B2WARNING(warning.format(arg="udstOutput"))
-            self._udstOutput = udstOutput
-        if validation is not None:
-            b2.B2WARNING(warning.format(arg="validation"))
-            self._validation = validation
-
         self._MainPath = path
 
         self.set_skim_logging(path)
@@ -547,7 +197,7 @@ class BaseSkim(ABC):
         # At this point, BaseSkim.skim_event_cuts may have been run, so pass
         # self._ConditionalPath for the path if it is not None (otherwise just pass the
         # regular path)
-        self.build_lists(self._ConditionalPath or path)
+        self.SkimLists = self.build_lists(self._ConditionalPath or path)
         self.apply_hlt_hadron_cut_if_required(self._ConditionalPath or path)
 
         self.update_skim_flag(self._ConditionalPath or path)
@@ -576,6 +226,12 @@ class BaseSkim(ABC):
         if not self._MainPath:
             raise ValueError("Skim has not been added to the path yet!")
         return self._ConditionalPath or self._MainPath
+
+    SkimLists = []
+    """
+    List of particle lists reconstructed by the skim. This attribute should only be
+    accessed after running the ``__call__`` method.
+    """
 
     _MainPath = None
     """Main analysis path."""
@@ -668,15 +324,15 @@ class BaseSkim(ABC):
 
     def initialise_skim_flag(self, path):
         """
-        Add the module `skimExpertFunctions.InitialiseSkimFlag` to the path, which
+        Add the module `skim.utils.flags.InitialiseSkimFlag` to the path, which
         initialises flag for this skim to zero.
         """
         path.add_module(InitialiseSkimFlag(self))
 
     def update_skim_flag(self, path):
         """
-        Add the module `skimExpertFunctions.InitialiseSkimFlag` to the path, which
-        initialises flag for this skim to zero.
+        Add the module `skim.utils.flags.UpdateSkimFlag` to the path, which
+        updates flag for this skim.
 
         .. Warning::
 
@@ -685,20 +341,6 @@ class BaseSkim(ABC):
             to exist for all events on the main path.
         """
         path.add_module(UpdateSkimFlag(self))
-
-    def get_skim_list_names(self):
-        """
-        Get the list of skim particle list names, without creating the particle lists on
-        the current path.
-        """
-        DummyPath = b2.Path()
-
-        OriginalSkimListsValue = self.SkimLists
-        self.build_lists(DummyPath)
-        SkimLists = self.SkimLists
-        self.SkimLists = OriginalSkimListsValue
-
-        return SkimLists
 
     def _method_unchanged(self, method):
         """Check if the method of the class is the same as in its parent class, or if it has
@@ -790,7 +432,7 @@ class CombinedSkim(BaseSkim):
 
         import basf2 as b2
         import modularAnalysis as ma
-        from skim.foo import OneSkim, TwoSkim, RedSkim, BlueSkim
+        from skim.WGs.foo import OneSkim, TwoSkim, RedSkim, BlueSkim
 
         path = b2.Path()
         ma.inputMdstList("default", [], path=path)
@@ -961,7 +603,7 @@ class CombinedSkim(BaseSkim):
             path (basf2.Path): Skim path to be processed.
         """
         for skim in self:
-            skim.build_lists(skim._ConditionalPath or path)
+            skim.SkimLists = skim.build_lists(skim._ConditionalPath or path)
 
     def output_udst(self, path):
         """Run the `BaseSkim.output_udst` function of each skim.
@@ -1058,14 +700,14 @@ class CombinedSkim(BaseSkim):
 
     def initialise_skim_flag(self, path):
         """
-        Add the module `skimExpertFunctions.InitialiseSkimFlag` to the path, to
+        Add the module `skim.utils.flags.InitialiseSkimFlag` to the path, to
         initialise flags for each skim.
         """
         path.add_module(InitialiseSkimFlag(*self))
 
     def update_skim_flag(self, path):
         """
-        Add the module `skimExpertFunctions.InitialiseSkimFlag` to the conditional path
+        Add the module `skim.utils.flags.UpdateSkimFlag` to the conditional path
         of each skims.
         """
         for skim in self:

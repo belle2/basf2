@@ -15,7 +15,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.leptonic import LeptonicUntagged
+from skim.WGs.leptonic import LeptonicUntagged
 
 path = b2.Path()
 skim = LeptonicUntagged(validation=True, udstOutput=False)

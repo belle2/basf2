@@ -21,7 +21,7 @@ class RetentionCheck(b2.Module):
     The module stores its results in the static variable "summary".
 
     To monitor the effect of every module of an initial path, this module should be added after
-    each module of the path. A function was written (`skimExpertFunctions.pathWithRetentionCheck`) to do it:
+    each module of the path. A function was written (`skim.utils.retention.pathWithRetentionCheck`) to do it:
 
     >>> path = pathWithRetentionCheck(particle_lists, path)
 
@@ -73,6 +73,7 @@ class RetentionCheck(b2.Module):
         super().__init__()
 
     def event(self):
+        """"""
 
         for particle_list in self.particle_lists:
 
@@ -87,6 +88,7 @@ class RetentionCheck(b2.Module):
                     self.event_with_candidate_count[particle_list] += 1
 
     def terminate(self):
+        """"""
 
         N = Belle2.Environment.Instance().getNumberOfEvents()
 
@@ -140,7 +142,7 @@ class RetentionCheck(b2.Module):
             b2.B2INFO("\n" + "=" * 160 + "\n" +
                       "Results of the modules RetentionCheck for the list " + particle_list + ".\n" +
                       "=" * 160 + "\n" +
-                      "Note: the module RetentionCheck is defined in skim/scripts/skimExpertFunctions.py\n" +
+                      "Note: the module RetentionCheck is defined in skim/scripts/skim/utils/retention.py\n" +
                       "=" * 160 + "\n" +
                       summary_table +
                       "=" * 160 + "\n" +

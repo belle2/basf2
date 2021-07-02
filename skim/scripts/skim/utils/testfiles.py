@@ -469,6 +469,30 @@ class TestSampleList:
                 return samples
 
 
+def get_test_file(process, *, SampleYAML=None):
+    """
+    Attempt to find a test sample of the given MC process.
+
+    Parameters:
+        process (str): Physics process, e.g. mixed, charged, ccbar, eemumu.
+        SampleYAML (str, pathlib.Path): Path to a YAML file containing sample
+                specifications.
+
+    Returns:
+        str: Path to test sample file.
+
+    Raises:
+        FileNotFoundError: Raised if no sample can be found.
+    """
+    samples = TestSampleList(SampleYAML=SampleYAML)
+    matches = samples.query_mc_samples(process=process)
+    try:
+        # Return the first match found
+        return matches[0].location
+    except IndexError as e:
+        raise ValueError(f"No test samples found for MC process '{process}'.") from e
+
+
 if __name__ == "__main__":
     # Print the parsed contents of the YAML file
     try:

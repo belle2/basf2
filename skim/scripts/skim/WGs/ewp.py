@@ -14,7 +14,7 @@ __authors__ = [
 
 import basf2 as b2
 import modularAnalysis as ma
-from skimExpertFunctions import BaseSkim, fancy_skim_header
+from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons
 from variables import variables as vm
@@ -80,7 +80,7 @@ class BtoXgamma(BaseSkim):
 
         ma.reconstructDecay('B+:gamma -> gamma:ewp', '', path=path, allowChargeViolation=True)
 
-        self.SkimLists = ['B+:gamma']
+        return ['B+:gamma']
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import
@@ -200,7 +200,7 @@ class BtoXll(BaseSkim):
 
         ma.copyLists('B+:xll', ['B+:ch1', 'B+:ch2', 'B+:ch3', 'B+:ch4'], path=path)
 
-        self.SkimLists = ['B+:xll']
+        return ['B+:xll']
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import
@@ -311,7 +311,7 @@ class BtoXll_LFV(BaseSkim):
 
         ma.copyLists('B+:lfv', ['B+:lfvch1', 'B+:lfvch2', 'B+:lfvch3'], path=path)
 
-        self.SkimLists = ['B+:lfv']
+        return ['B+:lfv']
 
 
 class inclusiveBplusToKplusNuNu(BaseSkim):
@@ -389,7 +389,7 @@ class inclusiveBplusToKplusNuNu(BaseSkim):
         vm.addAlias(mva_identifier, f'extraInfo({mva_identifier})')
         ma.applyCuts('B+:inclusiveBplusToKplusNuNu', mva_identifier + '>0.5', path=path)
 
-        self.SkimLists = ['B+:inclusiveBplusToKplusNuNu']
+        return ['B+:inclusiveBplusToKplusNuNu']
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import

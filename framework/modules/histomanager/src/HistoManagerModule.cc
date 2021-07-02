@@ -5,13 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : HistoManager.cc
-// Description : A module to manager histograms/ntuples/ttrees; implementation
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 27 - Jul - 2010
-//-
 
 #include <framework/modules/histomanager/HistoManagerModule.h>
 

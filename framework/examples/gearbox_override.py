@@ -10,8 +10,6 @@
 
 ############################################################
 # This steering file shows how to use overrides for xml files
-#
-# Example steering file - 2014 Belle II Collaboration
 ############################################################
 
 from basf2 import Path, process, statistics

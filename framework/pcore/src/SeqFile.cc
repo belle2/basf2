@@ -5,13 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : SeqFile.cc
-// Description : Sequential file I/O privitives with file blocking
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 28 - Jun - 2008
-//-
 
 #include <framework/pcore/SeqFile.h>
 #include <framework/logging/Logger.h>

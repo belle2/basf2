@@ -5,11 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 13 - Aug - 2010
-//         6 - Sep - 2012,  Use of DataStoreStreamer, clean up
-//-
 
 #include <framework/modules/rootio/SeqRootOutputModule.h>
 #include <framework/datastore/DataStore.h>

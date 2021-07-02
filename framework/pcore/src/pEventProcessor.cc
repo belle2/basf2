@@ -5,13 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-/*
- * pEventProcessor.cc
- *
- *  Created on: Oct 26, 2010
- *      Author: R.Itoh, IPNS, KEK
- *  Updated : Jul. 25, 2011
- */
 
 #include <framework/pcore/pEventProcessor.h>
 #include <framework/pcore/ProcHandler.h>

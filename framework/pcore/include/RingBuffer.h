@@ -5,10 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-/// @file RingBuffer.h
-/// @brief Ring buffer definition
-/// @author Ryosuke Itoh
-/// @date Feb 22 2010
 
 #pragma once
 

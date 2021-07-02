@@ -5,10 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-/// @file ProcHandler.cc
-/// @brief Process handler class implementation
-/// @author Soohyung Lee
-/// @date Jul 14 2008
 
 #include <framework/pcore/ProcHandler.h>
 #include <framework/core/InputController.h>

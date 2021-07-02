@@ -5,13 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : txmodule.h
-// Description : Module to put DataStore in RingBuffer
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 13 - Aug - 2010
-//-
 
 #pragma once
 

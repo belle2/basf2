@@ -5,13 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : rbtuple.cc
-// Description : Collect histograms from multiple processes
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 21 - Apr - 2009
-//-
 
 #include <framework/core/HistoModule.h>
 #include <framework/pcore/RbTuple.h>

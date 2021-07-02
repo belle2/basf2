@@ -5,14 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : RbTuple.h
-// Description : Collect ROOT histogram/Ntuples from event processes
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 16 - Apr - 2009
-// Modified : 27 - Jul - 2010, for pbasf2
-//-
 
 #pragma once
 

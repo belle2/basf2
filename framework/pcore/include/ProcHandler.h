@@ -5,10 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-/// @file ProcHandler.h
-/// @brief Process handler class definition
-/// @author Soohyung Lee
-/// @date Jul 14 2008
 
 #pragma once
 

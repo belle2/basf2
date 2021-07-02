@@ -11,8 +11,6 @@
 ######################################################
 # This steering file shows how to use the statistics
 # object exposed by the framework
-#
-# Example steering file - 2011 Belle II Collaboration
 ######################################################
 
 from basf2 import Path, process, statistics

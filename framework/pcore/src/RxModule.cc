@@ -5,13 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : RxModule.cc
-// Description : Module to encode DataStore and place it in Ringbuffer
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 13 - Aug - 2010
-//-
 
 #include <framework/pcore/RxModule.h>
 #include <framework/pcore/EvtMessage.h>

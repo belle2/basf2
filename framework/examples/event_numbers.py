@@ -20,8 +20,6 @@
 # Experiment 73, Run 10, 2 Events
 # Experiment 73, Run 20, 5 Events
 # Experiment 73, Run 30, 3 Events
-#
-# Example steering file - 2011 Belle II Collaboration
 ######################################################
 
 from basf2 import Path, process

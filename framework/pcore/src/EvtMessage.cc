@@ -5,14 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-// +
-// File : EvtMessage.cc
-// Description : Low level interface to transfer serialized object
-//
-// Author : Soohyung Lee and Ryosuke Itoh
-// Date : 24 - Jul - 2008
-// Modified : 9 - Jun - 2010
-//-
 
 #include <framework/pcore/EvtMessage.h>
 

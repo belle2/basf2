@@ -5,18 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-/// @file RingBuffer.cc
-/// @brief RingBuffer class implementation
-/// @author Ryosuke Itoh
-/// @date Feb. 22, 2010
-
-//+
-// File : RingBuffer.cc
-// Description : Ring Buffer manager on shared memory
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 29 - Apr - 2000
-//-
 
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/SemaphoreLocker.h>

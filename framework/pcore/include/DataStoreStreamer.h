@@ -5,12 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : DataStoreStreamer.h
-// Description : Stream/Destream DataStore objects in EvtMessage
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 5 - Sep - 2012
 
 #pragma once
 

@@ -10,8 +10,6 @@
 
 ######################################################
 # shows how to use the logging object exposed by the framework
-#
-# Example steering file - 2011 Belle II Collaboration
 ######################################################
 
 from basf2 import Path, process, logging, set_log_level, set_debug_level, \

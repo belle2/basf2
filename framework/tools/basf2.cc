@@ -5,37 +5,15 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-/**************************************************************************
- *                             BASF2                                      *
- *                                                                        *
- *              The Belle Analysis Software Framework 2                   *
- *                                                                        *
- *                                                                        *
- * There are two ways to work with the framework. Either                  *
- * by executing "basf2" and providing a python steering                   *
- * file as an argument or by using the framework within                   *
- * python itself.                                                         *
- *                                                                        *
- * This file implements the main executable "basf2".                      *
- *                                                                        *
- *                                                                        *
- * Copyright(C) 2010-2016  Belle II Collaboration                         *
- *                                                                        *
- * Contributing authors :                                                 *
- * (main framework)                                                       *
- *                        Andreas Moll                                    *
- *                        Martin Heck                                     *
- *                        Nobu Katayama                                   *
- *                        Ryosuke Itoh                                    *
- *                        Thomas Kuhr                                     *
- *                        Kolja Prothmann                                 *
- *                        Martin Ritter                                   *
- *                        Zbynek Drasal                                   *
- *                        Christian Pulvermacher                          *
- *                        Thomas Keck                                     *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+
+/*
+ * There are two ways to work with the framework. Either
+ * by executing "basf2" and providing a python steering
+ * file as an argument or by using the framework within
+ * python itself.
+ *
+ * This file implements the main executable "basf2".
+ */
 
 #include <boost/python.hpp> //Has to be the first include (restriction due to python)
 

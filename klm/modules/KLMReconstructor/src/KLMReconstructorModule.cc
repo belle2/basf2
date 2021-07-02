@@ -78,7 +78,7 @@ KLMReconstructorModule::KLMReconstructorModule() :
   setDescription("Create BKLMHit1ds from KLMDigits and then create BKLMHit2ds from BKLMHit1ds; create EKLMHit2ds from KLMDigits.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("TimeCableDelayCorrection", m_TimeCableDelayCorrection,
-           "Perform cable delay time correction (true) or not (false).", false);
+           "Perform cable delay time correction (true) or not (false).", true);
   addParam("EventT0Correction", m_EventT0Correction,
            "Perform EventT0 correction (true) or not (false)", true);
   addParam("IfAlign", m_bklmIfAlign,

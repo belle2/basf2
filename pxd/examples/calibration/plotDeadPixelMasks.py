@@ -20,8 +20,7 @@
 # basf2 plotDeadPixelMasks.py
 #
 # basf2 plotDeadPixelMasks.py -- --maps
-#
-# author: benjamin.schwenker@phys.uni-goettingen.de
+
 
 import basf2 as b2
 import ROOT

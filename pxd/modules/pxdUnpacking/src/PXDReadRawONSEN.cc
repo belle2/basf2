@@ -5,14 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : PXDReadRawONSEN.cc
-// Description : Module to Load Raw PXD Data from ONSEN network-dump file and store it as RawPXD in Data Store
-// This is meant for lab use (standalone testing, debugging) without an event builder.
-//
-// Author : Bjoern Spruck
-// Date : 15 - Apr - 2014
-//-
 
 #include <pxd/modules/pxdUnpacking/PXDReadRawONSEN.h>
 #include <pxd/unpacking/PXDRawDataDefinitions.h>

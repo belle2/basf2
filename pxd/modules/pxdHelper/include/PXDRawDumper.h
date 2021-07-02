@@ -5,13 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : PXDRawDumperModule.cc
-// Description : Dump Raw PXD/ ONSEN event data
-//
-// Author : Bjoern Spruck
-// Date : Updated on 20 - Dec - 2019
-//-
 
 
 #pragma once

@@ -14,8 +14,6 @@
 # test the cluster position estimator payloads from CAF.
 #
 # Execute as: basf2 test_cluster_position_estimator.py
-#
-# author: benjamin.schwenker@phys.uni-goettingen.de
 
 import math
 import basf2 as b2

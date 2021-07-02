@@ -19,8 +19,6 @@
 #
 # Full set of training sources for PXD requires starting the script 4x wiht clusterkinds
 # 0-3.
-#
-# author: benjamin.schwenker@phys.uni-goettingen.de
 
 import basf2 as b2
 

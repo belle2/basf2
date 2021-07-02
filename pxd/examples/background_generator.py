@@ -20,7 +20,6 @@
 # Input: None
 # Output: output.root, mdst.root
 #
-# Example steering file - 2021 Belle II Collaboration
 # Based on `reconstruction/examples/example.py`
 #############################################################
 

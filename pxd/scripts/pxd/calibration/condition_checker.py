@@ -11,7 +11,6 @@
 
 """\
 This module contains classes for plotting calibration constants.
-Author: qingyuan.liu@desy.de
 """
 
 __all__ = ["ConditionCheckerBase", "PXDMaskedPixelsChecker", "PXDDeadPixelsChecker", "PXDOccupancyInfoChecker"]

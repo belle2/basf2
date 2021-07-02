@@ -11,7 +11,6 @@
 
 """\
 Utilities for PXD calibration and performance study
-Author: qingyuan.liu@desy.de
 """
 
 import ROOT

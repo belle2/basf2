@@ -20,8 +20,6 @@
 #
 # This will compute tuples run-by-run for all runs between runLow and runHigh for the
 # given experiment number.
-#
-# author: benjamin.schwenker@pyhs.uni-goettingen.de
 
 import multiprocessing
 import SetMetaTimeModule

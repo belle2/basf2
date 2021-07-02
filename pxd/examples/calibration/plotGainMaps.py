@@ -20,8 +20,7 @@
 # basf2 plotGainMaps.py
 #
 # basf2 plotGainMaps.py -- --maps
-#
-# author: benjamin.schwenker@phys.uni-goettingen.de
+
 
 import basf2 as b2
 import ROOT

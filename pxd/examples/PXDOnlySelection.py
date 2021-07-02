@@ -12,7 +12,6 @@
 #############################################################
 # Simple steering file to demonstrate how to run:
 #   PXD selection on BelleII or Phase2 geometry
-# Contributors: Peter Kodys                                              *
 #############################################################
 
 import basf2 as b2

@@ -23,8 +23,6 @@
 # for run=3360 in exp=3 being part of the phase2 campaign.
 #
 # basf2 create_mcrun.py -- --tag='Calibration_Offline_Development'  --expNo=3 --runNo=3360 --setNo=0
-#
-# author: benjamin.schwenker@phys.uni-goettingen.de
 
 
 import glob

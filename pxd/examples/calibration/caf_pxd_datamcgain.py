@@ -5,6 +5,7 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 # This steering file computes PXD calibrations for energy loss (gain). The script uses the CAF framework.
 # This script uses by default the SequentialRunByRun strategy and is designed to try to compute new calibration
 # constants regularly to follow temporal changes of the PXD.
@@ -73,8 +74,6 @@
 # b2conditionsdb upload pxd_calibration ./database.txt
 #
 # The option --help provides extensive help for the b2conditionsdb tool.
-#
-# author: benjamin.schwenker@pyhs.uni-goettingen.de, maiko.takahashi@desy.de
 
 
 import argparse

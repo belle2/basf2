@@ -13,8 +13,6 @@
 # in a localdb
 #
 # Execute as: basf2 cluster_position_algo.py
-#
-# author: benjamin.schwenker@phys.uni-goettingen.de
 
 from ROOT import Belle2
 from ROOT.Belle2 import IntervalOfValidity

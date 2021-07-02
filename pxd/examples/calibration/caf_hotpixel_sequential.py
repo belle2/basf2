@@ -27,8 +27,6 @@
 # b2conditionsdb upload Calibration_Offline_Development ./database.txt
 #
 # The option --help provides extensive help for the b2conditionsdb tool.
-#
-# author: benjamin.schwenker@phys.uni-goettingen.de
 
 import argparse
 from caf.strategies import SequentialRunByRun

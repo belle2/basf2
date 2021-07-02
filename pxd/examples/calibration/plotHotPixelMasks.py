@@ -20,8 +20,7 @@
 # basf2 plotHotPixelMasks.py
 #
 # basf2 plotHotPixelMasks.py -- --maps
-#
-# author: benjamin.schwenker@phys.uni-goettingen.de
+
 
 import basf2 as b2
 import ROOT

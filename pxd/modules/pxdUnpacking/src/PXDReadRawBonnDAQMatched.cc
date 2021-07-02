@@ -5,15 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : PXDReadRawBonnDAQMatched.cc
-// Description : Module to Load Raw PXD Data from DHH network-dump file and store it as RawPXD in Data Store
-// This is meant for lab use (standalone testing, debugging) without an event builder.
-// This module is able to read the BonnDAQ data unordered, e.g. scan for the current event number
-//
-// Author : Bjoern Spruck
-// Date : 16.06.2019
-//-
 
 #include <pxd/modules/pxdUnpacking/PXDReadRawBonnDAQMatched.h>
 #include <boost/endian/arithmetic.hpp>

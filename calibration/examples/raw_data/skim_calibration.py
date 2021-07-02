@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -5,8 +8,6 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
-# Add the cut module to the pat#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # An example of how to skim off events that pass a set of trigger lines (using a custom module for now)
 # and how to also convert SROOT->ROOT at the same time. This is roughly the planned data flow after the DAQ

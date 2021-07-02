@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -5,11 +7,9 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
-# -*- coding: utf-8 -*-
 
 """
 airflow script for PXD hot/dead pixel masking.
-Author: qingyuan.liu@desy.de
 """
 
 import basf2

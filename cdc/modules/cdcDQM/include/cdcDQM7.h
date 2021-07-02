@@ -5,10 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-/* Nanae Taniguchi 2017.07.12 */
-/* Nanae Taniguchi 2018.02.06 */
-/* Nanae Taniguchi 2019.02.17 */
-/* Junhao Yin 2019.11 */
 
 #pragma once
 

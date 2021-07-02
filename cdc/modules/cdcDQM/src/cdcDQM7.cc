@@ -5,12 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-/* Nanae Taniguchi 2017.07.12 */
-/* Nanae Taniguchi 2018.02.06 */
-/* add occupancy plot 2019.03 */
-/* add occupancy hist for PV 2019.04 */
-/* add occupancy hist for PV, updated 2019.04.28 */
-/* update shifter's plots */
 
 #include "cdc/modules/cdcDQM/cdcDQM7.h"
 

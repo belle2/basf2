@@ -106,15 +106,15 @@ namespace Belle2 {
       /** Destructor */
       virtual ~SVDBackgroundModule();
 
-      /* Initialize module */
+      /** Initialize module */
       virtual void initialize() override;
-      /* Start-of-run initializations */
+      /** Start-of-run initializations */
       virtual void beginRun() override;
-      /* Event processing */
+      /** Event processing */
       virtual void event() override;
-      /* End-of-run tasks */
+      /** End-of-run tasks */
       virtual void endRun() override;
-      /* Final summary and cleanup */
+      /** Final summary and cleanup */
       virtual void terminate() override;
 
     private:

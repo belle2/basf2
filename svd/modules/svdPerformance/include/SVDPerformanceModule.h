@@ -38,14 +38,16 @@ namespace Belle2 {
 
   public:
 
+    /** constructor */
     SVDPerformanceModule();
 
-    virtual ~SVDPerformanceModule();
-    virtual void initialize() override;
-    virtual void beginRun() override;
-    virtual void event() override;
-    virtual void endRun() override;
-    virtual void terminate() override;
+    /** destructor */
+    virtual ~SVDPerformanceModule() {};
+
+    virtual void initialize() override; /**< check StoreArrays & create rootfile */
+    virtual void beginRun() override; /**< create histograms */
+    virtual void event() override; /**< fill histograms */
+    virtual void endRun() override; /**< write histogrmas */
 
     std::string m_ShaperDigitName = "SVDShaperDigits"; /**< ShaperDigits Store Array name*/
     std::string m_RecoDigitName = "SVDRecoDigits"; /**< SVDRecoDigits Store Array name*/

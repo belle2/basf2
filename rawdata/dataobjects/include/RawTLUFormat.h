@@ -5,13 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : RawTLUFormat.h
-// Description : Module to handle raw data from TLU(for the telescope beam test)
-//
-// Author : Satoru Yamada, IPNS, KEK
-// Date : 2 - Jan - 2014
-//-
 
 #ifndef RAWTLUFORMAT_H
 #define RAWTLUFORMAT_H

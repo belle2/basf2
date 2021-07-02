@@ -5,13 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : HexDataPacker.h
-// Description : Module to store dummy data in RawCOPPER object
-//
-// Author : Satoru Yamada, IPNS, KEK
-// Date : 14 - Jul - 2014
-//-
+
 #ifndef HEXDATAPACKER_H
 #define HEXDATAPACKER_H
 

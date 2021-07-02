@@ -5,13 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : DummyDataPacker.cc
-// Description : Module to store dummy data in RawSVD(and others) object
-//
-// Author : Satoru Yamada, IPNS, KEK
-// Date : 14 - Jul - 2014
-//-
 
 #include <rawdata/modules/DummyDataPacker.h>
 

@@ -5,13 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : Convert2RawDet.cc
-// Description : Module to convert from RawCOPPER or RawDataBlock to RawDetector objects
-//
-// Author : Satoru Yamada Itoh, IPNS, KEK
-// Date : 24 - Oct - 2014
-//-
+
 #include <rawdata/modules/Convert2RawDet.h>
 #include <TSystem.h>
 #include <stdlib.h>

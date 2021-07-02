@@ -5,13 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : RawHeader_v0.h
-// Description : Module to handle RawHeader_v0 attached to raw data from COPPER
-//
-// Author : Satoru Yamada, IPNS, KEK
-// Date : 2 - Aug - 2013
-//-
 
 #ifndef RAWHEADER_V0_H
 #define RAWHEADER_V0_H

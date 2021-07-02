@@ -5,13 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : PrintEventRate.h
-// Description : Print event rate of input data
-//
-// Author : Satoru Yamada, IPNS, KEK
-// Date : 2 - Aug - 2013
-//-
 
 #ifndef PRINTEVENTRATE_H
 #define PRINTEVENTRATE_H

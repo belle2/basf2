@@ -5,13 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : PrintData.cc
-// Description : Show the contetns of RawCOPPER
-//
-// Author : Satoru Yamada Itoh, IPNS, KEK
-// Date : 2 - Aug - 2013
-//-
+
 #include <rawdata/modules/PrintData.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <framework/core/InputController.h>

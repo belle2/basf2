@@ -5,14 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : RawPXD.h
-// Description : pseudo raw data of PXD for test
-//
-// Author : Bjoern Spruck / Klemens Lautenbach
-// Date : 13 - Jul - 2013
-// Updated 17.7.2015
-//-
 
 #ifndef RAWPXD_H
 #define RAWPXD_H

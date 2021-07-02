@@ -5,13 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : RawFTSWFormat_latest.cc
-// Description : Module to handle raw data from COPPER.
-//
-// Author : Satoru Yamada, IPNS, KEK
-// Date : 18 - Feb - 2019
-//-
+
 #include <rawdata/dataobjects/RawFTSWFormat_latest.h>
 
 

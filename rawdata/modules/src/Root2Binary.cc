@@ -5,13 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : PrintData.cc
-// Description : Module to get data from DataStore and send it to another network node
-//
-// Author : Satoru Yamada Itoh, IPNS, KEK
-// Date : 2 - Aug - 2013
-//-
+
 #include <rawdata/modules/Root2Binary.h>
 
 using namespace std;

@@ -1,15 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
- *                                                                        *
- * A local maximum is defined by its energy and the number and energy of  *
- * its neighbours. It holds a relation to to an ECLConnectedRegion and    *
- * a list of ECLCalDigits (set in SplitterN1).                            *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber                                            *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #pragma once

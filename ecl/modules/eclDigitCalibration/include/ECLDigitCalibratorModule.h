@@ -1,20 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2020 - Belle II Collaboration                             *
- *                                                                        *
- * Digit Calibration.                                                     *
- *                                                                        *
- * This  module converts the fitted amplitude into calibrated energy,     *
- * fitted time into calibrated time, and determines the time resolution   *
- * per digit. It furthermore determines the background level by counting  *
- * out of time digits above a certain energy threshold.                   *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (torben.ferber@desy.de) (TF)               *
- *               Chris Hearty (hearty@physics.ubc.ca) (CH)                *
- *               Ewan Hill (ehill@mail.ubc.ca)                            *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #pragma once

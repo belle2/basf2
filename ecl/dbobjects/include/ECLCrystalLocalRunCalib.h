@@ -1,16 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019 - Belle II Collaboration                             *
- *                                                                        *
- * ECLCrystalLocalRunCalib                                                *
- *                                                                        *
- * This class is designed to store ECL local run calibration              *
- * results to database (separately for amplitude and time).               *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Gribanov Sergei (S.S.Gribanov@inp.nsk.su) (BINP)         *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #pragma once

@@ -1,35 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Christopher Hearty   hearty@physics.ubc.ca               *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
- *                                                                        *
- * Standard usage is to read payloads ECLRefAmpl, ECLRefAmplNom,          *
- * ECLRefTime and ECLRefTimeNom and use them to derive payloads           *
- * ECLCrystalElectronics or ECLCrystalElectronicsTime                     *
- *                                                                        *
- * Alternatively, find new payloads ECLRefAmplNom or ECLRefTimeNom  to    *
- * keep ECLCrystalElectronics or ECLCrystalElectronicsTime constant       *
- *                                                                        *
- * Also performs a comparison of new and existing calibration values and  *
- * writes these to a root file.                                           *
- *                                                                        *
- * Payloads are read from localdb if present, otherwise from              *
- * ECL_localrun_data                                                      *
- * They are written to localdb with iov = exp,run,-1,-1                   *
- *                                                                        *
- * Usage:                                                                 *
- * eclElectronicsPayloads payloadName exp run [writeToDB]                 *
- * where payloadName = ECLCrystalElectronics, ECLCrystalElectronicsTime,  *
- * ECLRefAmplNom, or ECLRefTimeNom                                        *
- *                                                                        *
- * exp and run specify the start of the iov, and are used to read         *
- * the reference amplitudes and times                                     *
- * Option argument writeToDB = 0 to not write output to database          *
- *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #include <framework/database/DBImportObjPtr.h>

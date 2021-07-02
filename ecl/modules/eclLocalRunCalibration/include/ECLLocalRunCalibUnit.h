@@ -1,16 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019 - Belle II Collaboration                             *
- *                                                                        *
- * ECLLocalRunCalibUnit                                                   *
- *                                                                        *
- * This class controls feature (mean value, standard deviation and        *
- * number of accepted events) accumulators for each cell id.              *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Sergei Gribanov (S.S.Gribanov@inp.nsk.su) (BINP)         *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #pragma once
 

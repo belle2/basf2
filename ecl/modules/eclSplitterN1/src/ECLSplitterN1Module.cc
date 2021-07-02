@@ -1,20 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
- *                                                                        *
- * Main reconstruction splitter code for the n photon hypothesis.         *
- * Based on a connected region (CR) we look for local maxima and          *
- * create one shower for each local maximum (LM). In case of multiple     *
- * LM in one CR the energy is shared between the showers based on         *
- * their exponentially weighted distance in an iterative procedure. If    *
- * a CR has no LM the highest energetic digit in the CR is taken as LM.   *
- * The position is reconstructed using logarithmic weights for not too    *
- * small shower and linear weights otherwise ('lilo').                    *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (torben.ferber@desy.de) (TF)               *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 // THIS MODULE

@@ -1,29 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# -----------------------------------------------------------
-# BASF2 (Belle Analysis Framework 2)
-# Copyright(C) 2020  Belle II Collaboration
-#
-# Author: The Belle II Collaboration
-# Contributors: Mikhail Remnev (mikhail.a.remnev@gmail.com)
-#
-# This software is provided "as is" without any warranty.
-#
-# eclDSPWriter converts DSP coefficients between multiple formats.
-#
-# Usage: eclDSPWriter input_files output_path
-#   input_files: one of three options to access DSP data:
-#     path/to/folder                Path to folder with crate??/dsp??.dat files
-#     localdb/database.txt,exp,run  Path to local database
-#     db://GLOBAL_TAG,exp,run       global tag from ConditionsDB
-#
-#   output_path: one of two options to output DSP data:
-#     path/to/folder                Path to folder where crate??/dsp??.dat files
-#                                   will be saved
-#     localdb/database.txt,expLow,runLow,expHigh,runHigh  Path to local database
-#
-# -----------------------------------------------------------
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+###################################################################################
+#                                                                                 #
+# eclDSPWriter converts DSP coefficients between multiple formats.                #
+#                                                                                 #
+# Usage: eclDSPWriter input_files output_path                                     #
+#   input_files: one of three options to access DSP data:                         #
+#     path/to/folder                Path to folder with crate??/dsp??.dat files   #
+#     localdb/database.txt,exp,run  Path to local database                        #
+#     db://GLOBAL_TAG,exp,run       global tag from ConditionsDB                  #
+#                                                                                 #
+#   output_path: one of two options to output DSP data:                           #
+#     path/to/folder                Path to folder where crate??/dsp??.dat files  #
+#                                   will be saved                                 #
+#     localdb/database.txt,expLow,runLow,expHigh,runHigh  Path to local database  #
+#                                                                                 #
+###################################################################################
 
 ################################################
 # IMPORT MODULES

@@ -1,22 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# -----------------------------------------------------------
-# BASF2 (Belle Analysis Framework 2)
-# Copyright(C) 2020 - Belle II Collaboration
-#
-# Program that records covariance matrices and other
-# parameters in ECL-WF.root file that is used by ECLDigitizer
-# module in ECL simulation
-# (based on ecldigitconfigfile.cc)
-# 
-# Author: The Belle II Collaboration
-# Contributors: Mikhail Remnev (mikhail.a.remnev@gmail.com)
-#
-# This software is provided "as is" without any warranty.
-#
-# USAGE: see printUsageInfo function for usage information
-# -----------------------------------------------------------
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# Program that records covariance matrices and other                     #
+# parameters in ECL-WF.root file that is used by ECLDigitizer            #
+# module in ECL simulation                                               #
+# (based on ecldigitconfigfile.cc)                                       #
+#                                                                        #
+# USAGE: see printUsageInfo function for usage information               #
+##########################################################################
 
 import sys
 import os

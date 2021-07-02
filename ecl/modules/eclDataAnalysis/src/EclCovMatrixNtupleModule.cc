@@ -1,18 +1,18 @@
-/*******************************************************************************
- * Module: EclCovMatrixNtuple                                                  *
- *                                                                             *
- * Contributors: Peter Lukin, Alexander Bobrov, Guglielmo De Nardo             *
- *                                                                             *
- * Description: This module write ECL digi information in a root tuple         *
- *              to study amplitude and time info                               *
- *                                                                             *
- * This software is provided "as is" without any warranty. Due to the          *
- * limited knowledge of BASF2 by the author some parts of the module might     *
- * be written more elegantly. Eventualy also the reconstrcution/analysis tools *
- * will be improved and parts of the code might become obsolete or could be    *
- * performed in a better way. If you find a better solution to anything below  *
- * please fill free to modify it.                                              *
- *******************************************************************************/
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
+/**************************************************************************
+ *                                                                        *
+ * Description: This module write ECL digi information in a root tuple    *
+ *              to study amplitude and time info                          *
+ *                                                                        *
+ **************************************************************************/
+
 //This module
 #include <ecl/modules/eclDataAnalysis/EclCovMatrixNtupleModule.h>
 

@@ -1,15 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
- *                                                                        *
- * Take the previously created DBObjects for ECL crystal energy from      *
- * gamma pair events, mumu events, and bhabha events. Use these to create *
- * the final values for ECLCrystalEnergy DBObjects                        *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: David Dossett, Christopher Hearty                        *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #pragma once

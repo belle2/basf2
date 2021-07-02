@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# This steering file
-# shows all options for the generation of radiative Bhabha scattering.
-#
-# 10000 radiative Bhabha events are generated using the BHWide Fortran
-# generator and some plots are shown at the end.
-#
-# Example steering file - 2011 Belle II Collaboration
-########################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 import sys
 import math

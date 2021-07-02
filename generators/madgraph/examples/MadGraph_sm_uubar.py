@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-########################################################
-# MadGraph
-#
-# Torben Ferber
-#
-# Example production script using SM model to produce
-# 100 events e+ e- -> mu+ mu- in the Belle II labframe
-########################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+# MadGraph                                                               #
+#                                                                        #
+# Example production script using SM model to produce                    #
+# 100 events e+ e- -> mu+ mu- in the Belle II labframe                   #
+##########################################################################
 
 from basf2 import *
 from beamparameters import add_beamparameters

@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-########################################################
-# Run TREPS to generate e+e- -> e+e-pi+pi- events
-#
-# differentialCrossSection file is used to generate events
-# with smooth W distribution. This is useful to produce
-# background samples for study of e+e-l+l- or taupair
-#
-# Example steering file
-########################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 import basf2
 from basf2 import set_log_level, LogLevel, process, statistics

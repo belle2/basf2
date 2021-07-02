@@ -1,23 +1,29 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
 # Usage: basf2 MadGraph_darkphoton_isr.py 0 (or 1) for ISR Off (or On)
-########################################################
-# MadGraph  Version2.6.1 needed for ISR
 #
-# Torben Ferber
+# MadGraph  Version2.6.1 needed for ISR
 #
 # Example production script using dark model to
 # produce 100 events e+ e- -> gamma A' [->mu+ mu-]
 # in the Belle II labframe at the Y(4S)
 #
-# Qiang Li updated for including ISR
-# https://confluence.desy.de/display/BI/WG8+Meeting+%28Dark+Sector%29+January+30th+2018+08%3A00-09%3A00+AM+JST
 # Setting isr=1 to switch on ISR, otherwise not
-
+#
 # NOTICE!
 # Please be careful to set the MG parameters listed below, including "mg_el"... "mg_bwcutoff" etc.
 # Especially all these rapidity cuts and minium energy requirements change the cross sections.
-########################################################
+##########################################################################
 
 from basf2 import *
 from beamparameters import add_beamparameters

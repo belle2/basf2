@@ -1,17 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-##############################################################################
-# This steering file which shows all usage options for the particle gun module
-# in the generators package. The generated particles from the particle gun are
-# then fed through a full Geant4 simulation and the output is stored in a root
-# file.
-#
-# The different options for the particle gun are explained below.
-# Uncomment/comment different lines to get the wanted settings
-#
-# Example steering file - 2011 Belle II Collaboration
-##############################################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 from basf2 import set_log_level, register_module, process, LogLevel, \
     set_random_seed, print_params, create_path, statistics

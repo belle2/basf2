@@ -1,9 +1,15 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 '''
 This module contains convenience functions to setup most commonly used physics
 generators correctly with their default settings. More information can be found
 in `BELLE2-NOTE-PH-2015-006`_
-
-Contact: Torben Ferber (ferber@physics.ubc.ca)
 
 .. _BELLE2-NOTE-PH-2015-006: https://docs.belle2.org/record/282
 '''

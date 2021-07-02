@@ -1,19 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-##############################################################################
-# This steering file shows how to use several ParticleGun modules in series to
-# emuleate the behavoir of a "vertex gun". A vertex gun places 2 or more
-# vertices at user chosen postions with user difined particles and track
-# parameters.
-# Its main use is to test vertex fitting algorithms in a clean artificial
-# enviroment
-#
-# This creates 3 vertices with 3 instances of the ParticleGun module and passes
-# them to the Geant4 simulation
-#
-# Example steering file - 2012 the Belle II Collaboration
-##############################################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 from basf2 import set_log_level, LogLevel, register_module, create_path, process, statistics, set_random_seed, print_params
 

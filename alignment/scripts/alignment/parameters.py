@@ -18,7 +18,10 @@ def cdc_layers(layers=None):
     return result
 
 
-def cdc_wires():
+def cdc_wires(layers=None):
+    if layers is None:
+        layers = list(range(0, 56))
+
     wires_in_layer = [
         160, 160, 160, 160, 160, 160, 160, 160,
         160, 160, 160, 160, 160, 160,
@@ -32,7 +35,7 @@ def cdc_wires():
 
     result = []
 
-    for layer in range(0, 56):
+    for layer in layers:
         for wire in range(0, wires_in_layer[layer]):
             # Unique id of CDCAlignment db object
             cdcid = Belle2.CDCAlignment.getGlobalUniqueID()

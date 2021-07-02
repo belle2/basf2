@@ -94,6 +94,8 @@ namespace Belle2 {
     /// - Total momentum of the pair (particles are back-to-back in their CM) (px,py,pz) and the invariant mass (M) of the decay
     /// - 2 angles describing the orientation of the decay particles in the system of the mother (CM)
     ///
+    /// Reference: Widl, Edmund ; Frühwirth R;  "Representation and Estimation of Trajectories from Two-body Decays", CMS-NOTE-2007-032, http://cds.cern.ch/record/1073690
+    ///
     std::pair<TMatrixD, TMatrixD> getTwoBodyToLocalTransform(Particle& mother, double motherMass);
 
     /** Write down a GBL trajectory (to TTree or binary file) */

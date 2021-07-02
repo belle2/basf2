@@ -1321,11 +1321,11 @@ std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getTwoBodyToLocalTransfo
   // Need to rotate and boost daughters' momenta to know which goes forward (+sign in decay model)
   // and to get the angles theta, phi of the decaying daughter system in mothers' reference frame
   RestFrame boostedFrame(&mother);
-  TLorentzVector fourVector1(lab2mother * mother.getDaughter(0)->get4Vector().Vect(), mother.getDaughter(0)->get4Vector().T());
-  TLorentzVector fourVector2(lab2mother * mother.getDaughter(1)->get4Vector().Vect(), mother.getDaughter(1)->get4Vector().T());
+  TLorentzVector fourVector1 = mother.getDaughter(0)->get4Vector();
+  TLorentzVector fourVector2 = mother.getDaughter(1)->get4Vector();
 
-  auto mom1 = boostedFrame.getMomentum(fourVector1).Vect();
-  auto mom2 = boostedFrame.getMomentum(fourVector2).Vect();
+  auto mom1 = lab2mother * boostedFrame.getMomentum(fourVector1).Vect();
+  auto mom2 = lab2mother * boostedFrame.getMomentum(fourVector2).Vect();
   // One momentum has opposite direction (otherwise should be same in CMS of mother), but which?
   double sign = 1.;
   auto avgMom = 0.5 * (mom1 - mom2);
@@ -1394,13 +1394,16 @@ std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getTwoBodyToLocalTransfo
     dRdpz(2, 1) = 0.;
     dRdpz(2, 2) = (px * px + py * py) / p3;
 
-    B2Vector3D dpdpx = dRdpx * P;
-    B2Vector3D dpdpy = dRdpy * P;
-    B2Vector3D dpdpz = dRdpz * P;
+    auto K = 1. / 2. / p + sign * cos(theta) * m * m * (M * M / 4. / m / m - 1.) / M / M / sqrt(m * m * (M * M / 4. / m / m - 1.) *
+             (M * M + p * p) / M / M);
+
+    B2Vector3D dpdpx = dRdpx * P + R * K * px * B2Vector3D(0., 0., 1.);
+    B2Vector3D dpdpy = dRdpy * P + R * K * py * B2Vector3D(0., 0., 1.);
+    B2Vector3D dpdpz = dRdpz * P + R * K * pz * B2Vector3D(0., 0., 1.);
 
     B2Vector3D dpdtheta = R * B2Vector3D(sign * c1 * cos(theta) * cos(phi),
                                          sign * c1 * cos(theta) * sin(phi),
-                                         p / 2. + sign * c2 * (- sin(phi)));
+                                         sign * c2 * (- sin(theta)));
 
 
     B2Vector3D dpdphi = R * B2Vector3D(sign * c1 * sin(theta) * (- sin(phi)),

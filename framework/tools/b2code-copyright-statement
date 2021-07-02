@@ -66,7 +66,7 @@ if __name__ == "__main__":
         if os.path.isdir(file_name):
             continue
 
-        bad_extensions = ('.root', '.sroot', '.xml', '.rst', '.txt', '.dat', '.data', '.j2', '.jinja2', '.json', '.yaml', '.sh', '.svg', '.csv', '.png', '.pdf', '.jpg', '.ipynb', '.dec', '.log', '.out', '.err', '.pdl', '.md', '.rstinclude', '.drawio')
+        bad_extensions = ('.root', '.sroot', '.xml', '.rst', '.txt', '.dat', '.data', '.j2', '.jinja2', '.json', '.yaml', '.sh', '.svg', '.csv', '.png', '.pdf', '.jpg', '.ipynb', '.dec', '.log', '.out', '.err', '.pdl', '.md', '.rstinclude', '.drawio', '.limits', '.fit')
         if file_name.lower().endswith(bad_extensions):
             continue
 

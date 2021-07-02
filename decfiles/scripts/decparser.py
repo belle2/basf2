@@ -10,8 +10,7 @@
 ##########################################################################
 
 """
-Decay File Parser to check whether a decay file is correctly defined before committing to svn
-P. Urquijo
+Decay File Parser to check whether a decay file is correctly defined
 """
 
 import sys

@@ -9,10 +9,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-#
-#  CreateProdScripts.py :
-#  Author   Phillip Urquijo, December 2014
-#
 #  create an mc production file from a decay file
 #  warning: this script is under development
 

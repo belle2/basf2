@@ -11,8 +11,6 @@
 
 # --------------------------------------
 # Class for comparing decfile descriptors
-# Written by Phillip Urquijo
-# December 2014
 # --------------------------------------
 
 import settings

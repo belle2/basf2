@@ -12,7 +12,6 @@
 # Compare the length of decay description measured in number of lines
 # (excluding comments and empty lines) as well as the sum of the decay
 # mode branching fractions.
-# Authors: Kirill Chilikin, Stephan Duell
 
 import re
 import basf2

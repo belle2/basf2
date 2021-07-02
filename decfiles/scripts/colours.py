@@ -9,11 +9,10 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# --------------------------------------
-# Class holding colours for printing coloured text to terminal and printing functions, also handles the general log
-# Written by Phillip Urquijo
-# December 2014
-# --------------------------------------
+# ------------------------------------------------------------------------
+# Class holding colours for printing coloured text to terminal and
+# printing functions, also handles the general log
+# ------------------------------------------------------------------------
 
 import settings
 import os

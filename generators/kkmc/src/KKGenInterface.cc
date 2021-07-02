@@ -222,7 +222,7 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
       hepevt_.jmohep[index - 1][0] == 0 &&
       hepevt_.jmohep[index - 1][1] == 0 &&
       hepevt_.isthep[index - 1] == 3 &&
-      index > 0 && index < 3) {
+      index < 3) {
     gParticle->addStatus(MCParticle::c_Initial);
   }
 

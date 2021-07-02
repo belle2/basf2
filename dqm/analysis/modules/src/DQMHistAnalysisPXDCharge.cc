@@ -66,7 +66,8 @@ void DQMHistAnalysisPXDChargeModule::initialize()
   gROOT->cd(); // this seems to be important, or strange things happen
 
   m_cCharge = new TCanvas((m_histogramDirectoryName + "/c_Charge").data());
-  m_hCharge = new TH1F("Cluster Charge", "Cluster Charge; Module; Track Cluster Charge", m_PXDModules.size(), 0, m_PXDModules.size());
+  m_hCharge = new TH1F("hPXDClusterCharge", "PXD Cluster Charge; Module; Track Cluster Charge", m_PXDModules.size(), 0,
+                       m_PXDModules.size());
   m_hCharge->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCharge->SetStats(false);
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
@@ -194,12 +195,13 @@ void DQMHistAnalysisPXDChargeModule::event()
     SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
   }
 #endif
+
   int status = 0;
 
   if (!enough) {
     // not enough Entries
     m_cCharge->Pad()->SetFillColor(kGray);// Magenta or Gray
-    // status = 0; default
+    status = 0; // default
   } else {
     /// FIXME: what is the accpetable limit?
     if (fabs(data - 50.) > 20. || diff > 30) {
@@ -224,7 +226,7 @@ void DQMHistAnalysisPXDChargeModule::event()
   }
 #endif
 
-  auto tt = new TLatex(5.5, 0, "1.3.2 Module is broken, please ignore");
+  auto tt = new TLatex(5.5, 0, "1.3.2 Module is excluded, please ignore");
   tt->SetTextAngle(90);// Rotated
   tt->SetTextAlign(12);// Centered
   tt->Draw();

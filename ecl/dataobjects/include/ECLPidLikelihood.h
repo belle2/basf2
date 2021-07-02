@@ -31,8 +31,8 @@ namespace Belle2 {
     }
 
     /** actually const float (&logl)[Const::ChargedStable::c_SetSize], but CINT complains. */
-    ECLPidLikelihood(const float* logl, float energy = 0, float eop = 0, float e9e25 = 0, float lat = 0, float dist = 0,
-                     float trkDepth = 0, float shDepth = 0, int ncrystals = 0, int nclusters = 0): RelationsObject()
+    explicit ECLPidLikelihood(const float* logl, float energy = 0, float eop = 0, float e9e25 = 0, float lat = 0, float dist = 0,
+                              float trkDepth = 0, float shDepth = 0, int ncrystals = 0, int nclusters = 0): RelationsObject()
     {
       //for all particles
       for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {

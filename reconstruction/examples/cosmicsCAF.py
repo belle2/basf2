@@ -17,9 +17,8 @@
 # Example steering file - 2017 Belle II Collaboration
 #############################################################
 
-from basf2 import *
+import basf2 as b2
 import os
-import sys
 import ROOT
 from ROOT.Belle2 import CDCDedxMomentumAlgorithm, CDCDedxCosineAlgorithm
 from ROOT.Belle2 import CDCDedxWireGainAlgorithm, CDCDedxRunGainAlgorithm
@@ -33,7 +32,7 @@ input_files = [os.path.abspath(
     '/group/belle2/users/jbennett/GCR2/release-01-02-01/DB00000359/r00282/dst.cosmic.0002.0282.f00000.root')]
 
 # Modify the collector to apply other calibration constants
-momentum_col = register_module('CDCDedxElectronCollector')
+momentum_col = b2.register_module('CDCDedxElectronCollector')
 momentum_col_params = {'cleanupCuts': False,
                        'scaleCor': False,
                        'momentumCor': False,
@@ -42,7 +41,7 @@ momentum_col_params = {'cleanupCuts': False,
                        }
 momentum_col.param(momentum_col_params)
 
-mod_col = register_module('CDCDedxElectronCollector')
+mod_col = b2.register_module('CDCDedxElectronCollector')
 mod_col_params = {'cleanupCuts': True,
                   'scaleCor': False,
                   'momentumCor': False,
@@ -118,20 +117,20 @@ other_cal.use_local_database(wgdb)
 other_cal.use_local_database(rgdb)
 
 # Add a pre-collector path to apply old calibration constants
-correct_for_mom = create_path()
+correct_for_mom = b2.create_path()
 correct_for_mom.add_module('CDCDedxCorrection', scaleCor=False, momentumCor=False,
                            momentumCorFromDB=False, cosineCor=True,
                            runGain=True, wireGain=True)
 momentum_cal.pre_collector_path = correct_for_mom
 
-correct_for_cos = create_path()
+correct_for_cos = b2.create_path()
 correct_for_cos.add_module('CDCDedxCorrection', scaleCor=False, momentumCor=True,
                            momentumCorFromDB=True, cosineCor=False,
                            runGain=True, wireGain=True)
 cosine_cal.pre_collector_path = correct_for_cos
 cosine_cal.depends_on(momentum_cal)
 
-correct_for_wire_gain = create_path()
+correct_for_wire_gain = b2.create_path()
 correct_for_wire_gain.add_module('CDCDedxCorrection', scaleCor=False, momentumCor=True,
                                  momentumCorFromDB=True, cosineCor=True,
                                  runGain=True, wireGain=False)
@@ -139,7 +138,7 @@ wire_gain_cal.pre_collector_path = correct_for_wire_gain
 wire_gain_cal.depends_on(momentum_cal)
 wire_gain_cal.depends_on(cosine_cal)
 
-correct_for_run_gain = create_path()
+correct_for_run_gain = b2.create_path()
 correct_for_run_gain.add_module('CDCDedxCorrection', scaleCor=False, momentumCor=True,
                                 momentumCorFromDB=True, cosineCor=True,
                                 runGain=False, wireGain=True)
@@ -148,7 +147,7 @@ run_gain_cal.depends_on(momentum_cal)
 run_gain_cal.depends_on(cosine_cal)
 run_gain_cal.depends_on(wire_gain_cal)
 
-correct_for_others = create_path()
+correct_for_others = b2.create_path()
 correct_for_others.add_module('CDCDedxCorrection', scaleCor=False, momentumCor=True,
                               momentumCorFromDB=True, cosineCor=True,
                               runGain=True, wireGain=True)

@@ -92,7 +92,6 @@ void DQMHistAnalysisIPModule::beginRun()
 
   if (hh1 == NULL) {
     B2DEBUG(20, "Histo " << m_histoname << " not in memfile");
-    // the following code sux ... is there no root function for that?
     TDirectory* d = gROOT;
     TString myl = m_histoname;
     TString tok;
@@ -142,7 +141,6 @@ void DQMHistAnalysisIPModule::event()
   hh1 = findHist(m_histoname.c_str());
   if (hh1 == NULL) {
     B2DEBUG(20, "Histo " << m_histoname << " not in memfile");
-    // the following code sux ... is there no root function for that?
     TDirectory* d = gROOT;
     TString myl = m_histoname;
     TString tok;
@@ -236,13 +234,10 @@ void DQMHistAnalysisIPModule::terminate()
 {
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
-    // cppcheck-suppress knownConditionTrueFalse
-    if (m_parameters > 0) {
-      for (auto i = 0; i < m_parameters; i++) {
-        if (mychid[i]) SEVCHK(ca_clear_channel(mychid[i]), "ca_clear_channel failure");
-      }
-      SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+    for (auto i = 0; i < m_parameters; i++) {
+      if (mychid[i]) SEVCHK(ca_clear_channel(mychid[i]), "ca_clear_channel failure");
     }
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif
   B2DEBUG(20, "DQMHistAnalysisIP: terminate called");

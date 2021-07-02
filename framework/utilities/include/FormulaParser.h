@@ -172,7 +172,7 @@ namespace Belle2 {
       // cppcheck-suppress unreadVariable; used in lambda below
       OutputToken op1 = m_outputStack.top(); m_outputStack.pop();
       // and apply ...
-      m_outputStack.push(std::visit(Utils::VisitOverload{
+      m_outputStack.push(std::visit(Utils::VisitOverload {
         // eagerly apply operations if both operands are numbers
         [op](double a, double b) -> OutputToken { return OutputToken(applyOperator(op, a, b)); },
         // otherwise defer to variable constructor
@@ -183,7 +183,7 @@ namespace Belle2 {
     /** Add the variable to the output token stack, create it from a string or keep it as it is */
     void addVariable(const InputToken& var) override
     {
-      m_outputStack.push(std::visit(Utils::VisitOverload{
+      m_outputStack.push(std::visit(Utils::VisitOverload {
         // if the variable is a string its an identifier and we have to construct a variable from it
         [](const std::string & s) -> OutputToken { return VariableConstructor()(s); },
         // otherwise keep as is

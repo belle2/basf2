@@ -30,7 +30,9 @@ namespace Belle2 {
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
     PXDRawHotPixelMaskCollectorModule();
+    /** Prepare */
     void prepare() override final;
+    /** Collect */
     void collect() override final;
 
   private:

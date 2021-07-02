@@ -8,7 +8,6 @@ installed. But we can try to implement tests using the Local multiprocessing bac
 basic behaviour of the classes so that they will fail if we modify assumptions in the future.
 """
 
-import basf2
 from basf2 import find_file
 
 import unittest
@@ -16,7 +15,7 @@ from unittest import TestCase
 import shutil
 from pathlib import Path
 
-from caf.backends import Local, Job, SubJob, MaxFilesSplitter, MaxSubjobsSplitter, ArgumentsSplitter
+from caf.backends import ArgumentsSplitter, Job, MaxFilesSplitter, MaxSubjobsSplitter
 from caf.backends import ArgumentsGenerator, range_arguments, SplitterError
 
 # A testing directory so that we can do cleanup

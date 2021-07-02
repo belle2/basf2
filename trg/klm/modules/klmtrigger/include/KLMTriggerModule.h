@@ -12,8 +12,13 @@
 #define KLMTRIGGERMODULE_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
+#include <trg/klm/dataobjects/KLMTrgSummary.h>
+#include <trg/klm/dbobjects/KLMTriggerParameters.h>
 
 namespace Belle2 {
+
   class KLMTriggerModule : public Module {
   public:
 
@@ -31,49 +36,14 @@ namespace Belle2 {
 
   private: // Parameters
 
-    //! Create 2D hits from KLM Digits
-    void fillHits();
+    StoreObjPtr<KLMTrgSummary> m_KLMTrgSummary;
 
-    //! Create tracks from 2D hits
-    void fillTracks();
+    DBObjPtr<KLMTriggerParameters> m_KLMTriggerParameters;
 
-    //! Calculate track parameters, chi squared, impact parameter and number of fired layers
-    void calcChisq();
-
-    //! Convert sector, layer and channel numbers to x, y, z coordinates
-    //! @param section section number
-    //! @param sector sector number
-    //! @param layer layer number
-    //! @param phiStrip phi strip number
-    //! @param zStrip z strip number
-    //! @param x x coordinate of the hit
-    //! @param y y coordinate of the hit
-    //! @param z x coordinate of the hit
-    void geometryConverter(int section, int sector, int layer, int phiStrip, int zStrip, int& x, int& y, int& z);
-
-    //! Total number of sectors (eight, a constant)
-    static const int c_TotalSectors = 8;
-    //! Total number of layers (fifteen, a constant)
-    static const int c_TotalLayers = 15;
-
-    //! Trigger threshold on chisq
-    double m_maxChisq;
-    //! Trigger threshold on the impact parameter
-    double m_maxIP;
-    //! Trigger threshold on the number of fired layers
-    int m_minLayers;
-
-    //! Total number of processed events
-    int m_nEvents = 0;
-    //! Total number of found tracks
-    int m_nTracks = 0;
-
-    /**name of StoreArray Tracks*/
-    std::string m_klmtrackCollectionName;
-    /**name of StoreArray Hits*/
-    std::string m_klmhitCollectionName;
+    int m_nLayerTrigger = 0;
+    std::vector<int> m_layerUsed;
+    std::string m_dummy_used_layers;
   };
 } // namespace Belle2
 
 #endif // KLMTRIGGERMODULE_H
-

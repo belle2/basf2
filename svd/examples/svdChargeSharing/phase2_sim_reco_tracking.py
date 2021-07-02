@@ -6,14 +6,8 @@
 # usage: basf2 phase2_sim_reco_tracking.py fileIN fileOUT
 ##################################################################################
 
-import os
-from basf2 import *
-from tracking import *
-from svd import *
-from rawdata import *
-from ROOT import Belle2
-from reconstruction import add_reconstruction
-import os.path
+import basf2 as b2
+from tracking import add_tracking_reconstruction
 import sys
 
 print('***')
@@ -26,16 +20,16 @@ print('***')
 fileIN = sys.argv[1]
 fileOUT = sys.argv[2]
 
-main = create_path()
+main = b2.create_path()
 main.add_module('RootInput', inputFileName=fileIN)
 
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 geomfile = '/geometry/Beast2_phase2.xml'
 if geomfile != 'None':
     gearbox.param('fileName', geomfile)
 
 main.add_module(gearbox)
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('useDB', False)
 geometry.param('components', ['SVD'])
 main.add_module(geometry)
@@ -70,8 +64,8 @@ main.add_module(
         "TracksToVXDDedxTracks",
         "VXDDedxLikelihoods",
         "VXDDedxTracks"])
-print_path(main)
+b2.print_path(main)
 main.add_module('ProgressBar')
 # Process events
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

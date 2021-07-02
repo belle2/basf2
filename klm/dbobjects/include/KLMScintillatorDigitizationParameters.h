@@ -49,35 +49,19 @@ namespace Belle2 {
     }
 
     /**
-     * Get ADC sampling frequency in GHz.
+     * Get ADC sampling time in TDC periods.
      */
-    float getADCSamplingFrequency() const
+    int getADCSamplingTDCPeriods() const
     {
-      return 1.0 / m_ADCSamplingTime;
+      return m_ADCSamplingTDCPeriods;
     }
 
     /**
-     * Set ADC sampling frequency in GHz.
+     * Set ADC sampling time in TDC periods.
      */
-    void setADCSamplingFrequency(float frequency)
+    void setADCSamplingTDCPeriods(int periods)
     {
-      m_ADCSamplingTime = 1.0 / frequency;
-    }
-
-    /**
-     * Get ADC sampling time in ns.
-     */
-    float getADCSamplingTime() const
-    {
-      return m_ADCSamplingTime;
-    }
-
-    /**
-     * Set ADC sampling time in ns.
-     */
-    void setADCSamplingTime(float time)
-    {
-      m_ADCSamplingTime = time;
+      m_ADCSamplingTDCPeriods = periods;
     }
 
     /**
@@ -325,8 +309,8 @@ namespace Belle2 {
     /** ADC range: 2**(resolution in bits). */
     int m_ADCRange;
 
-    /** ADC sampling time, ns. */
-    float m_ADCSamplingTime;
+    /** ADC sampling time (TDC periods). */
+    int m_ADCSamplingTDCPeriods;
 
     /** Number of digitizations (points) in one sample. */
     int m_NDigitizations;
@@ -376,7 +360,7 @@ namespace Belle2 {
     bool m_EnableConstBkg;
 
     /** Class version. */
-    ClassDef(Belle2::KLMScintillatorDigitizationParameters, 1);
+    ClassDef(Belle2::KLMScintillatorDigitizationParameters, 2);
 
   };
 

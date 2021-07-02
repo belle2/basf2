@@ -54,7 +54,7 @@ void KLMChannelStatusCollectorModule::collect()
     /* Multi-strip digits do not correspond to individual channels. */
     if (digit.isMultiStrip())
       continue;
-    uint16_t channel =
+    KLMChannelNumber channel =
       m_ElementNumbers->channelNumber(
         digit.getSubdetector(), digit.getSection(), digit.getSector(),
         digit.getLayer(), digit.getPlane(), digit.getStrip());
@@ -64,7 +64,7 @@ void KLMChannelStatusCollectorModule::collect()
 
 void KLMChannelStatusCollectorModule::closeRun()
 {
-  uint16_t channel;
+  KLMChannelNumber channel;
   unsigned int hits;
   TTree* calibrationData = getObjectPtr<TTree>("calibration_data");
   calibrationData->Branch("channel", &channel, "channel/s");
@@ -104,8 +104,8 @@ void KLMChannelStatusCollectorModule::collectFromDQM(
       }
       int n = histogram->GetXaxis()->GetNbins();
       for (int i = 1; i <= n; ++i) {
-        uint16_t channelIndex = std::round(histogram->GetBinCenter(i));
-        uint16_t channelNumber = m_ChannelArrayIndex->getNumber(channelIndex);
+        KLMChannelNumber channelIndex = std::round(histogram->GetBinCenter(i));
+        KLMChannelNumber channelNumber = m_ChannelArrayIndex->getNumber(channelIndex);
         m_HitMap->setChannelData(channelNumber, histogram->GetBinContent(i));
       }
     }

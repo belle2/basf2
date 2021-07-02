@@ -6,7 +6,8 @@ import re
 import functools
 import numpy as np
 import collections
-from .plot import ValidationPlot
+from tracking.validation.plot import ValidationPlot
+import ctypes
 
 import logging
 
@@ -30,7 +31,6 @@ try:
     matplotlib.use('Agg')
 
     import matplotlib.pyplot as plt
-    import matplotlib.transforms as transforms
 except ImportError:
     raise ImportError("matplotlib is not installed in your basf2 environment. "
                       "You may install it with 'pip install matplotlib'")
@@ -96,8 +96,6 @@ def plot(tobject, **kwd):
 
     else:
         raise ValueError("Plotting to matplot lib only supported for TH1, TProfile, and THStack.")
-
-    return fig
 
 
 def use_style(plot_function):
@@ -364,7 +362,7 @@ def put_legend_outside(ax,
     if exclude_handles:
         select_handles = [handle for handle in select_handles if handle not in exclude_handles]
 
-    fig = ax.get_figure()
+    # fig = ax.get_figure()
     # trans = transforms.blended_transform_factory(fig.transFigure, ax.transAxes)
 
     if bottom:
@@ -423,14 +421,14 @@ def get_fit_parameters(tf1):
     n_parameters = tf1.GetNpar()
     for i_parameter in range(n_parameters):
 
-        lower_bound = ROOT.Double()
-        upper_bound = ROOT.Double()
+        lower_bound = ctypes.c_double()
+        upper_bound = ctypes.c_double()
         tf1.GetParLimits(i_parameter, lower_bound, upper_bound)
 
         name = tf1.GetParName(i_parameter)
         value = tf1.GetParameter(i_parameter)
 
-        if lower_bound == upper_bound and lower_bound != 0:
+        if lower_bound.value == upper_bound.value and lower_bound.value != 0:
             # fixed parameter, is an additional stats entry
             continue
 
@@ -483,7 +481,7 @@ def get_stats_from_th(th):
     th.GetStats(stats_values)
 
     sum_w = stats_values[0]
-    sum_w2 = stats_values[1]
+    # sum_w2 = stats_values[1]
     sum_wx = stats_values[2]
     sum_wx2 = stats_values[3]
     sum_wy = stats_values[4]  # Only for TH2 and TProfile
@@ -509,11 +507,10 @@ def get_stats_from_th(th):
     return stats
 
 
-def compose_stats_label(title, additional_stats=Nnoe):
+def compose_stats_label(title, additional_stats=None):
     """Render the summary statistics to a label string."""
     if additional_stats is None:
         additional_stats = {}
-    keys = list(additional_stats.keys())
     labeled_value_template = "{0:<9}: {1:.3g}"
     labeled_string_template = "{0:<9}: {1:>9s}"
     label_elements = []
@@ -574,13 +571,13 @@ def plot_tgraph_data_into(ax,
     y_lower_errors = np.ndarray((n_points,), dtype=float)
     y_upper_errors = np.ndarray((n_points,), dtype=float)
 
-    x = ROOT.Double()
-    y = ROOT.Double()
+    x = ctypes.c_double()
+    y = ctypes.c_double()
 
     for i_point in range(n_points):
         tgraph.GetPoint(i_point, x, y)
-        xs[i_point] = float(x)
-        ys[i_point] = float(y)
+        xs[i_point] = float(x.value)
+        ys[i_point] = float(y.value)
 
         x_lower_errors[i_point] = tgraph.GetErrorXlow(i_point)
         x_upper_errors[i_point] = tgraph.GetErrorXhigh(i_point)
@@ -790,8 +787,8 @@ def plot_th2_data_into(ax,
     # May set these from th2 properties
     log_scale = False
 
-    root_color_index = th2.GetLineColor()
-    linecolor = root_color_to_matplot_color(root_color_index)
+    # root_color_index = th2.GetLineColor()
+    # linecolor = root_color_to_matplot_color(root_color_index)
 
     if plot_3d:
         raise NotImplementedError("3D plotting of two dimensional histograms not implemented yet")

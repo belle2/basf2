@@ -314,7 +314,7 @@ version to use.
     (we allow only ``[^a-zA-Z0-9+-_]``).
 
 
-Once located the dataset to use for your analysis, you can specify the LFN of the **datablock** to use as input with
+Once you located the dataset to use for your analysis, you can specify the LFN of the **datablock** to use as input
 with the flag ``-i``.
 
 .. note::
@@ -616,7 +616,7 @@ You need to reschedule these jobs by yourself.
 
 You can use ``gb2_job_reschedule -p <project name>``:
 
-.. code-block:: bash
+.. code-block::
 
     gb2_job_reschedule --usage
 
@@ -698,7 +698,7 @@ Take a look to the `gbasf2 tutorials <https://confluence.desy.de/display/BI/GBas
 
 You can also ask in `questions.belle2.org <https://questions.belle2.org/questions>`_.
 
-.. include:: ../survey.rst
+.. include:: ../lesson_footer.rstinclude
 
 .. topic:: Author of this lesson
 

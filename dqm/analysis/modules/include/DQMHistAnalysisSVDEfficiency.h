@@ -1,6 +1,6 @@
 //+
 // File : DQMHistAnalysisSVDEfficiency.h
-// Description : An example module for DQM histogram analysis
+// Description : module for DQM histogram analysis of SVD sensors efficiencies
 //
 // Author : Giulia Casarosa (PI), Gaetano De Marino (PI)
 // Date : 20190428
@@ -37,13 +37,9 @@ namespace Belle2 {
     virtual void terminate() override;
 
     //parameters
-    bool m_printCanvas; /**< if true print the pdf of the canvases */
     float m_effError; /**<error level of the efficiency */
     float m_effWarning; /**< warning level of the efficiency */
-    float m_effEmpty; /**<empty level of the efficiency */
-    float m_errEffError = 1; /**<error level of the efficiency error*/
-    float m_errEffWarning = 0.5; /**< warning level of the efficiency error*/
-
+    float m_statThreshold; /**<minimal number of tracks per sensor to set green or red frame */
     //! Data members
   private:
 
@@ -54,9 +50,9 @@ namespace Belle2 {
 
     TCanvas* m_cEfficiencyU = nullptr; /**< efficiency U plot canvas */
     TCanvas* m_cEfficiencyV = nullptr; /**< efficiency V plot canvas */
-    SVDSummaryPlots* m_hEfficiency = nullptr; /**< efficiency  histo */
+    SVDSummaryPlots* m_hEfficiency = nullptr; /**< efficiency histo */
     TCanvas* m_cEfficiencyErrU = nullptr; /**<efficiency U error plot canvas */
-    TCanvas* m_cEfficiencyErrV = nullptr; /**<efficiency Verror plot canvas */
+    TCanvas* m_cEfficiencyErrV = nullptr; /**<efficiency V error plot canvas */
     SVDSummaryPlots* m_hEfficiencyErr = nullptr; /**< efficiency error histo */
 
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, efficiency plot*/
@@ -66,10 +62,15 @@ namespace Belle2 {
     TPaveText* m_legNormal = nullptr; /**< efficiency plot legend, normal */
     TPaveText* m_legEmpty = nullptr; /**< efficiency plot legend, empty */
 
-    Int_t m_effUstatus; /**< number representing the status of the efficiency U side */
-    Int_t m_effVstatus;/**< number representing the status of the efficiency V side */
-    Int_t m_effUErrstatus; /**< number representing the status of the efficiency error U side */
-    Int_t m_effVErrstatus; /**< number representing the status of the efficiency error V side */
+    /** efficiency status flags */
+    enum effStatus {
+      lowStat = 0, /**< gray frame */
+      good = 1,    /**< green frame */
+      warning = 2, /**< orange frame */
+      error = 3    /**< red frame */
+    };
+    effStatus m_effUstatus; /**< number representing the status of the efficiency U side */
+    effStatus m_effVstatus;/**< number representing the status of the efficiency V side */
 
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;

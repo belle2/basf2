@@ -5,11 +5,7 @@
 #   basf2 module to histogram useful values in PocketDAQ data created by the
 #   test stand at Indiana University.
 #
-import basf2
-import math
-import ctypes
 import ROOT
-from ROOT import Belle2, TH1F, TH2F, TCanvas, THistPainter, TPad, TFile
 
 
 class EventInspectorPocketDAQ:

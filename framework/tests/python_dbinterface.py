@@ -1,4 +1,3 @@
-import basf2
 from basf2 import _constwrapper
 from b2test_utils import configure_logging_for_tests
 import ROOT
@@ -55,12 +54,6 @@ class DBInterface(unittest.TestCase):
         with self.assertRaises(AttributeError):
             # aka no setters
             bp.obj().setVertex()
-        with self.assertRaises(AttributeError):
-            # random new attributes
-            bp.obj().foo = "bar"
-        with self.assertRaises(AttributeError):
-            # or changing existing ones
-            bp.obj().getVertex = "bar"
 
         # but static members like Class should work
         bp.obj().Class()
@@ -69,12 +62,6 @@ class DBInterface(unittest.TestCase):
         copy = Belle2.BeamParameters(bp.obj())
         # and compare
         self.assertEqual(copy, bp.obj())
-
-        # ok, finally we want to make sure we can convert it back to non-const.
-        # Hopefully nobody finds this :D
-        e = _constwrapper._make_tobject_nonconst(bp.obj())
-        e.setVertex(ROOT.TVector3(0, 0, 0), ROOT.std.vector("double")())
-        self.assertEqual(bp.obj().getVertex(), ROOT.TVector3(0, 0, 0))
 
     def test_array(self):
         bplist = Belle2.PyDBArray("BeamParameterList")
@@ -115,10 +102,6 @@ class DBInterface(unittest.TestCase):
             # and check that modification is blocked
             with self.assertRaises(AttributeError):
                 e.setVertex(ROOT.TVector3(1, 2, 3), ROOT.std.vector("double")())
-            with self.assertRaises(AttributeError):
-                e.getVertex = "foo"
-            with self.assertRaises(AttributeError):
-                e.foo = "bar"
 
         self.assertEqual(i + 1, len(bplist))
 

@@ -7,21 +7,12 @@
 
 import os
 import sys
-from tools import *
-from basf2 import *
-from modularAnalysis import inputMdstList
-from modularAnalysis import reconstructDecay
-from modularAnalysis import matchMCTruth
+from tools import getBelleUrl_data, getBelleUrl_mc
+import basf2 as b2
 from modularAnalysis import variablesToNtuple
 from modularAnalysis import fillParticleList
-from modularAnalysis import fillConvertedPhotonsList
-from modularAnalysis import loadGearbox
-from modularAnalysis import printVariableValues
-from stdCharged import *
 
-import b2biiConversion
-import ROOT
-from ROOT import Belle2
+from b2biiConversion import convertBelleMdstToBelleIIMdst
 
 
 # ------- Arguments sorting
@@ -54,8 +45,7 @@ else:
 
 # ------- B2BII
 
-b2biiConversion.setupB2BIIDatabase(isMC)
-
+os.environ['PGUSER'] = 'g0db'
 os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
 
 if isMC:
@@ -65,9 +55,8 @@ else:
     url = getBelleUrl_data(expNo, minRunNo, maxRunNo,
                            skimType, dataType, belleLevel)
 
-mypath = create_path()
-b2biiConversion.convertBelleMdstToBelleIIMdst(url, applySkim=True, path=mypath)
-loadGearbox(mypath)
+mypath = b2.create_path()
+convertBelleMdstToBelleIIMdst(url, applySkim=True, path=mypath)
 
 
 # ------- Output file
@@ -82,7 +71,7 @@ outputFileName = outDir + '/output_' + filenameEnd
 
 # this sample code is taken from b2bii/examples
 
-fillParticleList('pi+:all', '', mypath)
+fillParticleList('pi+:all', '', path=mypath)
 
 kinematic_variables = ['px', 'py', 'pz', 'E']
 
@@ -90,10 +79,10 @@ variablesToNtuple(
     'pi+:all', kinematic_variables, filename=outputFileName, path=mypath)
 
 # progress
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 mypath.add_module(progress)
 
-process(mypath)
+b2.process(mypath)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

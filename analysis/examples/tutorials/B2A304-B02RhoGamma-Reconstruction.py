@@ -13,7 +13,7 @@
 #
 #
 # Contributors: A. Zupanc (June 2014)
-#               I. Komarov (Demeber 2017)
+#               I. Komarov (December 2017)
 #               I. Komarov (September 2018)
 #
 ################################################################################
@@ -68,7 +68,7 @@ b_vars = vc.kinematics + \
                                    decay_string='B0 -> rho0 ^gamma') + \
     vu.create_aliases_for_selected(list_of_variables=rho_vars,
                                    decay_string='B0 -> ^rho0 gamma') + \
-    vu.create_aliases_for_selected(list_of_variables=rho_vars,
+    vu.create_aliases_for_selected(list_of_variables=pi_vars,
                                    decay_string='B0 -> [rho0 -> ^pi+ ^pi-] gamma')
 
 # Saving variables to ntuple

@@ -45,6 +45,9 @@ namespace Belle2 {
     struct BasicFacetVarNames : public VarNames<const CDCFacet> {
 
       /// Number of variables to be generated
+      // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
+      // at least tell cppcheck that everything is fine
+      // cppcheck-suppress duplInheritedMember
       static const size_t nVars = size(basicFacetVarNames);
 
       /// Getter for the name at the given index

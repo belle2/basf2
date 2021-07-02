@@ -4,16 +4,25 @@
 Airflow script to perform BeamSpot calibration.
 """
 
-from prompt import CalibrationSettings
+from prompt import CalibrationSettings, input_data_filters
 
 #: Tells the automated system some details of this script
-settings = CalibrationSettings(name="BeamSpot Calibrations",
-                               expert_username="zlebcr",
-                               description=__doc__,
-                               input_data_formats=["cdst"],
-                               input_data_names=["hlt_mumu"],
-                               expert_config={"size_interval_len": 2.0, "position_interval_len": 0.5, "gap_penalty": 10},
-                               depends_on=[])
+settings = CalibrationSettings(
+    name="BeamSpot Calibrations",
+    expert_username="zlebcr",
+    description=__doc__,
+    input_data_formats=["cdst"],
+    input_data_names=["mumutight_calib"],
+    input_data_filters={
+        "mumutight_calib": [
+            input_data_filters["Data Tag"]["mumutight_calib"],
+            input_data_filters["Run Type"]["physics"],
+            input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
+            input_data_filters["Magnet"]["On"]]},
+    expert_config={
+        "outerLoss": "pow(rawTime - 2.0, 2) + 10 * pow(maxGap, 2)",
+        "innerLoss": "pow(rawTime - 0.5, 2) + 10 * pow(maxGap, 2)"},
+    depends_on=[])
 
 ##############################
 
@@ -40,7 +49,7 @@ def get_calibrations(input_data, **kwargs):
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
-    file_to_iov_physics = input_data["hlt_mumu"]
+    file_to_iov_physics = input_data["mumutight_calib"]
 
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!
@@ -66,7 +75,6 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     # Algorithm setup
 
-    import ROOT
     from ROOT.Belle2 import BeamSpotAlgorithm
     from basf2 import create_path, register_module
     import modularAnalysis as ana
@@ -79,6 +87,7 @@ def get_calibrations(input_data, **kwargs):
 
     # module to be run prior the collector
     rec_path_1 = create_path()
+
     muSelection = '[p>1.0]'
     muSelection += ' and abs(dz)<2.0 and abs(dr)<0.5'
     muSelection += ' and nPXDHits >=1 and nSVDHits >= 8 and nCDCHits >= 20'
@@ -87,8 +96,8 @@ def get_calibrations(input_data, **kwargs):
 
     collector_bs = register_module('BeamSpotCollector', Y4SPListName='Upsilon(4S):BS')
     algorithm_bs = BeamSpotAlgorithm()
-    algorithm_bs.setIntervalsLength(kwargs['expert_config']["size_interval_len"],  kwargs['expert_config']["position_interval_len"])
-    algorithm_bs.setGapPenalty(kwargs['expert_config']["gap_penalty"])
+    algorithm_bs.setOuterLoss(kwargs['expert_config']['outerLoss'])
+    algorithm_bs.setInnerLoss(kwargs['expert_config']['innerLoss'])
 
     calibration_bs = Calibration('BeamSpot',
                                  collector=collector_bs,

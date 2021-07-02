@@ -121,7 +121,7 @@ void TRGGDLDSTModule::event()
 
 
   GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[_e_timtype][0];
-  TRGSummary::ETimingType tt = TRGSummary::TTYP_NONE;
+  TRGSummary::ETimingType tt;
   if (gtt == GDL::e_tt_cdc) {
     tt = TRGSummary::TTYP_CDC;
   } else if (gtt == GDL::e_tt_ecl) {

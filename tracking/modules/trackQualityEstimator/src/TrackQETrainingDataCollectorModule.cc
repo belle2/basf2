@@ -72,7 +72,11 @@ void TrackQETrainingDataCollectorModule::initialize()
   m_subRecoTrackExtractor = std::make_unique<SubRecoTrackExtractor>(m_variableSet);
   m_hitInfoExtractor = std::make_unique<HitInfoExtractor>(m_variableSet);
 
-  m_variableSet.emplace_back("truth", &m_truth);
+  m_variableSet.emplace_back("truth", &m_matched);
+  m_variableSet.emplace_back("background", &m_background);
+  m_variableSet.emplace_back("ghost", &m_ghost);
+  m_variableSet.emplace_back("fake", &m_fake);
+  m_variableSet.emplace_back("clone", &m_clone);
 
   m_recorder = std::make_unique<SimpleVariableRecorder>(m_variableSet, m_TrainingDataOutputName, "tree");
 }
@@ -85,7 +89,12 @@ void TrackQETrainingDataCollectorModule::beginRun()
 void TrackQETrainingDataCollectorModule::event()
 {
   for (const RecoTrack& recoTrack : m_recoTracks) {
-    m_truth = float(recoTrack.getMatchingStatus() ==  RecoTrack::MatchingStatus::c_matched);
+    m_matched = float(recoTrack.getMatchingStatus() ==  RecoTrack::MatchingStatus::c_matched);
+    m_background = float(recoTrack.getMatchingStatus() ==  RecoTrack::MatchingStatus::c_background);
+    m_ghost = float(recoTrack.getMatchingStatus() ==  RecoTrack::MatchingStatus::c_ghost);
+    m_fake = float((recoTrack.getMatchingStatus() ==  RecoTrack::MatchingStatus::c_background)
+                   || (recoTrack.getMatchingStatus() ==  RecoTrack::MatchingStatus::c_ghost));
+    m_clone = float(recoTrack.getMatchingStatus() ==  RecoTrack::MatchingStatus::c_clone);
 
     RecoTrack* pxdRecoTrackPtr = recoTrack.getRelatedTo<RecoTrack>(m_pxdRecoTracksStoreArrayName);
     // combined CDC and SVD tracks after both CDC-to-SVD and also SVD-to-CDC CKF

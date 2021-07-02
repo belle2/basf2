@@ -13,14 +13,13 @@
 # Example steering file - 2017 Belle II Collaboration
 #############################################################
 
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
-from L1trigger import add_tsim
-from reconstruction import add_reconstruction, add_cdst_output
+from reconstruction import add_reconstruction
 from mdst import add_mdst_output
 
 # create path
-main = create_path()
+main = b2.create_path()
 
 # specify number of events to be generated
 main.add_module('EventInfoSetter', evtNumList=[10])
@@ -31,12 +30,9 @@ main.add_module('EventInfoPrinter')
 # generate BBbar events
 main.add_module('EvtGenInput')
 
-# detector simulation
+# detector and L1 trigger simulation
 add_simulation(main)
-# or add_simulation(main, components) to simulate a selection of detectors
-
-# trigger simulation
-add_tsim(main)
+# or add_simulation(main, components) to simulate a selection of detectors and triggr
 
 # reconstruction
 add_reconstruction(main)
@@ -52,5 +48,5 @@ add_mdst_output(main)
 # add_cdst_output(main)
 
 # process events and print call statistics
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

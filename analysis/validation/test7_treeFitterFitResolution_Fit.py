@@ -18,7 +18,6 @@ from modularAnalysis import inputMdst, reconstructDecay, fillParticleList, match
 import os
 from vertex import treeFit
 
-from variables import variables
 import sys
 
 path = create_path()

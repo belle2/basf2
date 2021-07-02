@@ -2,21 +2,21 @@
 # -*- coding: utf-8 -*-
 
 import os
-from basf2 import *
-logging.log_level = LogLevel.WARNING
+import basf2 as b2
+b2.logging.log_level = b2.LogLevel.WARNING
 
 # Set the environment variable to automatically start the VRML viewer
 # for example http://freewrl.sourceforge.net/
 os.environ['G4VRMLFILE_VIEWER'] = 'freewrl'
 
 # create path
-main = create_path()
+main = b2.create_path()
 # process one event
 main.add_module('EventInfoSetter', evtNumList=[1])
 # Load XML parameters
 main.add_module('Gearbox')
 # Create Geometry and show info messages for that
-main.add_module('Geometry', logLevel=LogLevel.INFO)
+main.add_module('Geometry', logLevel=b2.LogLevel.INFO)
 particlegun = main.add_module('ParticleGun')
 simulation = main.add_module('FullSim')
 
@@ -44,4 +44,4 @@ particlegun.param('momentumParams', [2.0, 5.0])
 particlegun.param('thetaParams', [85.0, 95.0])
 particlegun.param('phiParams', [-5.0, 5.0])
 
-process(main)
+b2.process(main)

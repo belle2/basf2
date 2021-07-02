@@ -173,8 +173,13 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0 (all vectors are empty).
      */
-    explicit RestOfEvent(int pdgCode = 0, bool isNested = false, bool isFromMC = false, bool useKLMEnergy = false):
-      m_pdgCode(pdgCode), m_isNested(isNested), m_isFromMC(isFromMC), m_useKLMEnergy(useKLMEnergy) { };
+    explicit RestOfEvent(int pdgCode = 0,
+                         bool isNested = false,
+                         bool isFromMC = false,
+                         bool useKLMEnergy = false,
+                         bool builtWithMostLikely = false):
+      m_pdgCode(pdgCode), m_isNested(isNested), m_isFromMC(isFromMC), m_useKLMEnergy(useKLMEnergy),
+      m_builtWithMostLikely(builtWithMostLikely) { };
     // setters
     /**
      * Add StoreArray indices of given Particles to the list of unused particles in the event.
@@ -229,10 +234,10 @@ namespace Belle2 {
                             bool updateExisting = false);
     /**
      * Update mask by keeping or excluding particles
-     * @param Name of the mask to work with
-     * @param Reference to particle collection
-     * @param ParticleSourceObject of the collection
-     * @param Update the ROE mask by passing or discarding particles in the provided particle list
+     * @param maskName Name of the mask to work with
+     * @param particles Reference to particle collection
+     * @param listType ParticleSourceObject of the collection
+     * @param discard Update the ROE mask by passing or discarding particles in the provided particle list
      */
     void excludeParticlesFromMask(const std::string& maskName, const std::vector<const Particle*>& particles,
                                   Particle::EParticleSourceObject listType,
@@ -256,6 +261,11 @@ namespace Belle2 {
      * Returns true if the ROE is nested
      */
     bool getIsNested() const {return m_isNested;}
+
+    /**
+     * Returns true if the ROE was built with most-likely particle lists
+     */
+    bool isBuiltWithMostLikely() const {return m_builtWithMostLikely;}
     // getters
     /**
      * Get all Particles from ROE mask.
@@ -291,30 +301,6 @@ namespace Belle2 {
     */
     std::vector<const Particle*> getChargedParticles(const std::string& maskName = "", unsigned int pdg = 0,
                                                      bool unpackComposite = true) const;
-
-    /**
-     * Get vector of all (no mask) or a subset (use mask) of all Tracks in ROE.
-     *
-     * @param maskName Name of mask
-     * @return vector of pointers to unused Tracks
-     */
-    std::vector<const Track*> getTracks(const std::string& maskName = "") const;
-
-    /**
-     * Get vector of all (no mask) or a subset (use mask) of all ECLClusters in ROE.
-     *
-     * @param maskName Name of mask
-     * @return vector of pointers to unused ECLClusters
-     */
-    std::vector<const ECLCluster*> getECLClusters(const std::string& maskName = "") const;
-
-    /**
-     * Get vector of all unused KLMClusters.
-     *
-     * @param maskName Name of mask
-     * @return vector of pointers to unused KLMClusters
-     */
-    std::vector<const KLMCluster*> getKLMClusters(const std::string& maskName = "") const;
 
     /**
      * Get 4-momentum vector all (no mask) or a subset (use mask) of all Tracks and ECLClusters in ROE.
@@ -376,6 +362,8 @@ namespace Belle2 {
     bool m_isNested;                   /**< Nested ROE indicator */
     bool m_isFromMC;                   /**< MC ROE indicator */
     bool m_useKLMEnergy;               /**< Include KLM energy into ROE 4-vector */
+    bool m_builtWithMostLikely;        /**< indicates whether most-likely particle lists were used in build of ROE */
+
     // Private methods
     /**
      *  Checks if a particle has its copy in the provided list
@@ -390,7 +378,9 @@ namespace Belle2 {
      * Prints indices in the given set in a single line
      */
     void printIndices(const std::string& maskName = "", bool unpackComposite = true, const std::string& tab = " - ") const;
-    ClassDef(RestOfEvent, 6) /**< class definition */
+
+    ClassDef(RestOfEvent, 7) /**< class definition */
+    // v7: added m_builtWithMostLikely
 
   };
 

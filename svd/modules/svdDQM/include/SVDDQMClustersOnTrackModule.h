@@ -56,14 +56,15 @@ namespace Belle2 {
     /** if TRUE: svdTime back in SVD time reference*/
     bool m_desynchSVDTime = false;
 
-    /** parameter to change the range of the time histograms*/
-    bool m_isSVDTimeCalibrated = false;
-
-    StoreObjPtr<SVDEventInfo> m_svdEventInfo ;  /**< SVDEventInfo data object */
-    StoreObjPtr<EventT0> m_eventT0 ;  /**< EventT0 data object */
+    std::string m_svdShaperDigitsName;   /**< SVDShaperDigits data object  name*/
+    std::string m_svdRecoDigitsName;   /**< SVDRecoDigits data object  name*/
+    std::string m_svdClustersName;   /**< SVDClusters data object  name*/
+    std::string m_svdEventInfoName;   /**< SVDEventInfo data object  name*/
+    StoreObjPtr<SVDEventInfo> m_svdEventInfo;  /**< SVDEventInfo data object */
+    StoreObjPtr<EventT0> m_eventT0;  /**< EventT0 data object */
 
     /** StoreArray of the Tracks*/
-    StoreArray<Track> m_storeTracks;
+    StoreArray<Track> m_tracks;
 
     /** Store Object for reading the trigger decision. */
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;

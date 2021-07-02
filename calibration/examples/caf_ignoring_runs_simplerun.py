@@ -3,20 +3,18 @@
 # data already from running calibration/examples/1_create_sample_DSTs.sh
 # or just make your own any change the input data below.
 
-from basf2 import *
+import basf2 as b2
 
 import os
 import sys
 
-import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm
 
 from caf.framework import Calibration, CAF
-from caf import backends
 from caf.utils import ExpRun, IoV
 from caf.strategies import SimpleRunByRun
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 
 def main(argv):
@@ -35,7 +33,7 @@ def main(argv):
     # Test Calibration Setup
 
     # Make a bunch of test calibrations
-    col_test = register_module('CaTest')
+    col_test = b2.register_module('CaTest')
     # Specific parameter to our test collector, proportional to the probability of algorithm requesting iteration.
     col_test.param('spread', 15)
 

@@ -7,27 +7,27 @@
 # Example steering file - 2011 Belle II Collaboration
 ######################################################
 
-from basf2 import *
+import basf2 as b2
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 # input
-input = register_module('SeqRootInput')
+input = b2.register_module('SeqRootInput')
 
 # dump
 # dump = register_module('RootOutput')
 
 # progress monitor
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 
 # converts RawCOPPER->RawARICH
-convert = register_module('Convert2RawDet')
+convert = b2.register_module('Convert2RawDet')
 
 # converts RawARICH->ARICHRawDigits
-unpack = register_module('ARICHRawunpacker')
+unpack = b2.register_module('ARICHRawunpacker')
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Add modules to main path
 main.add_module(input)
@@ -37,6 +37,6 @@ main.add_module(unpack)
 main.add_module(progress)
 
 # Process all events
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

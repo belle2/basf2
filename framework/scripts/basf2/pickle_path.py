@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 basf2.pickle_path - Functions necessary to pickle and unpickle a Path
@@ -18,6 +17,7 @@ import sys as _sys
 
 
 def serialize_value(module, parameter):
+    """Serialize a single basf2 module parameter"""
     if parameter.name == 'path' and module.type() == 'SubEvent':
         return serialize_path(parameter.values)
     else:
@@ -25,6 +25,7 @@ def serialize_value(module, parameter):
 
 
 def deserialize_value(module, parameter_state):
+    """Deserialize a single basf2 module paramater"""
     if parameter_state['name'] == 'path' and module.type() == 'SubEvent':
         return deserialize_path(parameter_state['values'])
     else:
@@ -32,6 +33,7 @@ def deserialize_value(module, parameter_state):
 
 
 def serialize_conditions(module):
+    """Serialize all conditions attached to a basf2 module"""
     condition_list = []
 
     for condition in module.get_all_conditions():
@@ -44,6 +46,7 @@ def serialize_conditions(module):
 
 
 def deserialize_conditions(module, module_state):
+    """Deserialize all conditions for a given basf2 module"""
     conditions = module_state['condition']
     for cond in conditions:
         module.if_value(str(pybasf2.ConditionOperator.values[cond['operator']]) + str(cond['value']),
@@ -51,6 +54,7 @@ def deserialize_conditions(module, module_state):
 
 
 def serialize_module(module):
+    """Serialize a basf2 module into a python dictionary. Doesn't work for python modules"""
     if module.type() == '' or module.type() == 'PyModule':
         raise RuntimeError("Module '%s' doesn't have a type or is a Python module! Note that --dump-path cannot work"
                            "properly with basf2 modules written in Python." % (module.name()))
@@ -65,6 +69,7 @@ def serialize_module(module):
 
 
 def deserialize_module(module_state):
+    """Deserialize a basf2 module from a python dictionary"""
     module = pybasf2._register_module(module_state['type'])
     module.set_name(module_state['name'])
     if 'condition' in module_state and module_state['condition'] is not None:
@@ -79,10 +84,12 @@ def deserialize_module(module_state):
 
 
 def serialize_path(path):
+    """Serialize a basf2 Path into a python dictionary"""
     return {'modules': [serialize_module(module) for module in path.modules()]}
 
 
 def deserialize_path(path_state):
+    """Deserialize a basf2 Path from a python dictionary"""
     path = pybasf2.Path()
     for module_state in path_state['modules']:
         module = deserialize_module(module_state)

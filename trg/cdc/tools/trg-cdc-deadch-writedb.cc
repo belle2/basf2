@@ -23,8 +23,8 @@
 
 using namespace Belle2;
 
-//#define ONLINE 0
-#define ONLINE 1
+#define ONLINE 0
+//#define ONLINE 1
 
 bool get_wire_mgr(int mask_sl[], int mask_layer[], int mask_ch[], int mgr)
 {
@@ -76,10 +76,10 @@ void setdeadch()
 {
   const static int MAX_N_LAYERS = 8;
 
-  const int N_config = 24;
+  const int N_config = 27;
 
   const int run[N_config][4] = { //itnitial exp, initial run, end exp, end run
-    0,    0,   -1,   -1, // 0
+    0,    0,    7, 3585, // 0
     7, 3586,    8, 1052, // 1
     8, 1053,    8, 1108, // 2
     8, 1109,    8, 1115, // 3
@@ -89,9 +89,9 @@ void setdeadch()
     8, 2529,    8, 2550, // 7
     8, 2551,    8, 2578, // 8
     8, 2579,    8, 2580, // 9
-    8, 2581,    8,   -1, // 10
+    8, 2581,    9,   -1, // 10
     10,    0,   10, 5210, // 11
-    10, 5211,   10,   -1, // 12
+    10, 5211,   11,   -1, // 12
     12,    0,   12, 1197, // 13
     12, 1198,   12, 1294, // 14
     12, 1295,   12, 2830, // 15
@@ -102,7 +102,10 @@ void setdeadch()
     12, 3490,   12, 4214, // 20
     12, 4215,   12, 4406, // 21
     12, 4407,   12, 4419, // 22
-    12, 4420,   12, 4420  // 23
+    12, 4420,   14, 1382, // 23
+    14, 1383,   16,  685, // 24
+    16,  686,   18,   90, // 25
+    18,   91,   -1,   -1  // 26
   };
 
 
@@ -131,6 +134,9 @@ void setdeadch()
   //21 nomask
   mgr[22].push_back(3031);
   //23 nomask
+  mgr[24].push_back(3010);
+  //25 nomask
+  mgr[26].push_back(3010);
 
   bool badch_map[N_config][9][8][384]; //sl layer ch
   for (int i = 0; i < N_config; i++) {
@@ -190,7 +196,7 @@ void setdeadch()
     }
   } else if (ONLINE == 1) {
     for (int i = 0; i < 1; i++) { //no merger dead channel for run-independent MC. L54 is masked.
-      IntervalOfValidity iov(run[i][0], run[i][1], run[i][2], run[i][3]);
+      IntervalOfValidity iov(0, 0, -1, -1);
       for (unsigned int j = 0; j < nSuperLayers; j++) {
         for (unsigned int k = 0; k < MAX_N_LAYERS; k++) {
           for (unsigned int l = 0; l < MAX_N_SCELLS; l++) {

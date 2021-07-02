@@ -17,7 +17,8 @@
 #include <vxd/dataobjects/VxdID.h>
 
 #include <vector>
-#include <TH2F.h>
+#include <map>
+#include <TH2.h>
 #include <TCanvas.h>
 #include <TLine.h>
 
@@ -51,15 +52,37 @@ namespace Belle2 {
     /** Update entry intervall */
     int m_minEntries = 10000;
 
+    /** warn level for mean adhoc plot */
+    double m_warnMeanAdhoc{};
+    /** error level for mean adhoc plot */
+    double m_errorMeanAdhoc{};
+    /** warn level for outside fraction */
+    double m_warnOutsideAdhoc{};
+    /** error level for outside fraction */
+    double m_errorOutsideAdhoc{};
+    /** threshold level/line for outside fraction */
+    int m_upperLineAdhoc{};
+
+    /** warn level for mean adhoc plot */
+    double m_warnMeanFull{};
+    /** error level for mean adhoc plot */
+    double m_errorMeanFull{};
+    /** warn level for outside fraction */
+    double m_warnOutsideFull{};
+    /** error level for outside fraction */
+    double m_errorOutsideFull{};
+    /** threshold level/line for outside fraction */
+    int m_upperLineFull{};
+
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
 
     //! histogram covering all modules
-    TH2F* m_hCommonMode = nullptr;
+    TH2D* m_hCommonMode = nullptr;
     //! histogram covering all modules
-    TH2F* m_hCommonModeDelta = nullptr;
+    TH2D* m_hCommonModeDelta = nullptr;
     //! histogram covering all modules
-    TH2F* m_hCommonModeOld = nullptr;
+    TH2D* m_hCommonModeOld = nullptr;
     //! Final Canvas
     TCanvas* m_cCommonMode = nullptr;
     //! Final Canvas
@@ -67,9 +90,9 @@ namespace Belle2 {
     //! Line in the Canvas to guide the eye
     TLine* m_line1 = nullptr;
     //! Line in the Canvas to guide the eye
-    TLine* m_line2 = nullptr;
+    TLine* m_lineA = nullptr;
     //! Line in the Canvas to guide the eye
-//     TLine* m_line3 = nullptr;
+    TLine* m_lineF = nullptr;
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
@@ -80,6 +103,8 @@ namespace Belle2 {
 #ifdef _BELLE2_EPICS
     //! epics PVs
     std::vector <chid> mychid;
+    //! epics PVs
+    std::map <VxdID, chid> mychid_mean;
 #endif
   };
 } // end namespace Belle2

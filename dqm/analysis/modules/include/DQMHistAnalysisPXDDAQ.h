@@ -47,18 +47,26 @@ namespace Belle2 {
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
 
+    //! Histogram covering all error types
+    TH1* m_hDAQError = nullptr;
     //! Histogram covering all DHC modules
     TH2F* m_hMissingDHC = nullptr;
     //! Histogram covering all DHE modules
     TH2F* m_hMissingDHE = nullptr;
     //! Histogram covering all modules*DHP
     TH1F* m_hMissingDHP = nullptr;
+    //! Histogram covering stat
+    TH1F* m_hStatistic = nullptr;
+    //! Final Canvas
+    TCanvas* m_cDAQError = nullptr;
     //! Final Canvas
     TCanvas* m_cMissingDHC = nullptr;
     //! Final Canvas
     TCanvas* m_cMissingDHE = nullptr;
     //! Final Canvas
     TCanvas* m_cMissingDHP = nullptr;
+    //! Final Canvas
+    TCanvas* m_cStatistic = nullptr;
 
 
     /** Monitoring Object */
@@ -69,7 +77,7 @@ namespace Belle2 {
 
 #ifdef _BELLE2_EPICS
     //! one EPICS PV
-    chid  mychid;
+    std::vector <chid> mychid;
 #endif
   };
 } // end namespace Belle2

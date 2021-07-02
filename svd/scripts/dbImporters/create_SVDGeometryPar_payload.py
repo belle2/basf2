@@ -11,10 +11,10 @@
 #
 ############################################################################
 
-from basf2 import *
+import basf2 as b2
 
 
-main = create_path()
+main = b2.create_path()
 main.add_module('EventInfoSetter')
 
 # Phase2 Geometry
@@ -28,5 +28,5 @@ main.add_module('Geometry', components=['SVD'], createPayloads=True)
 # NOTE: uncomment display to see what you get - but it does not work together with creating the payloads above
 # main.add_module('Display', fullGeometry=True)
 
-process(main)
-print(statistics(statistics.BEGIN_RUN))
+b2.process(main)
+print(b2.statistics(b2.statistics.BEGIN_RUN))

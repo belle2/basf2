@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2018, 2021 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -10,14 +10,13 @@
 
 #pragma once
 
+#include <top/reconstruction_cpp/TOPTrack.h>
 #include <framework/gearbox/Const.h>
 #include <string>
 #include <TVector3.h>
 
 namespace Belle2 {
   namespace TOP {
-
-    class TOPtrack;
 
     /**
      * Utility for the track selection - used in various calibration modules
@@ -164,7 +163,7 @@ namespace Belle2 {
        * @param track track extrapolated to TOP
        * @return true if track passes selection criteria
        */
-      bool isSelected(const TOPtrack& track) const;
+      bool isSelected(const TOPTrack& track) const;
 
     private:
 

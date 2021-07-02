@@ -1,0 +1,40 @@
+# EventType: 111414100
+# Descriptor: [B0 -> [D*- [ D0 -> K- pi+ pi0] mu+ nu] pi+]
+# NickName: Bd_Dstmunu_DsttoDpi-_DtoK-pi+pi0
+# Documentation:
+# Tested: yes
+# PhysicsWG: TDCPV group
+# Responsible: Chiara La Licata
+# Email: chiara.lalicata@ipmu.jp
+# Cuts: None
+# Date: 20210203
+#
+
+Alias pi0sig pi0
+
+# Upsilon(4S) decay
+Decay Upsilon(4S)
+1.000 B0 anti-B0 B0sig anti-B0sig VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.000 D*-sig mu+ nu_mu BGL 0.02596 -0.06049 0.01311 0.01713 0.00753 -0.09346;
+Enddecay
+CDecay anti-B0sig
+
+Decay D*-sig
+1.000 anti-D0sig pi- VSS;
+Enddecay
+CDecay D*+sig
+
+Decay anti-D0sig
+1.000 K+ pi- pi0sig D_DALITZ;
+Enddecay
+CDecay D0sig
+
+Decay pi0sig
+1.000 gamma gamma PHSP;
+Enddecay
+
+
+End

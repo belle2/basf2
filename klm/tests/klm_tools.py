@@ -7,27 +7,28 @@ Test the klm tools.
 
 import os
 import glob
+import subprocess as sp
 
-import basf2 as b2
+import basf2
 import b2test_utils as b2u
 import validation_gt as vgt
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     # Test b2klm-create-dqm (it also tests b2klm-mask-dqm and b2klm-execute-masking)
     if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
-        b2.B2INFO('Skipping the b2klm-create-dqm test.')
+        # Silently skip the test, otherwise the test fails on the buildbot.
+        pass
     else:
         globaltags = ' '.join(vgt.get_validation_globaltags())
-        for input_file in glob.glob(os.environ['BELLE2_VALIDATION_DATA_DIR'] + '/rawdata/*HLT?.*.root'):
-            with b2u.clean_working_directory() as test_klm_tools:
-                command = f'b2klm-create-dqm -i {input_file} -n 100 --prepend_gt {globaltags}'
-                assert(0 == os.system(command))
+        input_files = glob.glob(os.environ['BELLE2_VALIDATION_DATA_DIR'] + '/rawdata/*HLT?.*.root')
+        input_files.sort(reverse=True)
+        with b2u.clean_working_directory():
+            assert(0 == sp.call(['b2klm-create-dqm', '-i', f'{basf2.find_file(input_files[0])}', '-n', '100',
+                                 '--prepend_gt'] + vgt.get_validation_globaltags(), stdout=sp.DEVNULL))
 
     # Test b2klm-numberToIndex
-    command = 'b2klm-numberToIndex 20 50020'
-    assert(0 == os.system(command))
+    assert(0 == sp.call(['b2klm-numberToIndex', '20', '50020']))
 
     # Test b2klm-indexToNumber
-    command = 'b2klm-indexToNumber 11489 21997'
-    assert(0 == os.system(command))
+    assert(0 == sp.call(['b2klm-indexToNumber', '11489', '21997']))

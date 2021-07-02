@@ -13,12 +13,12 @@
 """
 from collections import OrderedDict
 
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
 from ROOT import Belle2
-from ROOT import gROOT, AddressOf
+from ROOT import gROOT, addressof
 
 # Define a ROOT struct to hold output data in the TTree
 gROOT.ProcessLine('struct EventDataRecoTrack {\
@@ -37,19 +37,19 @@ gROOT.ProcessLine('struct EventDataRecoTrack {\
 from ROOT import EventDataRecoTrack  # noqa
 
 
-class SVDValidationTTreeRecoTrack(Module):
+class SVDValidationTTreeRecoTrack(b2.Module):
     '''class to create the reco track ttree'''
 
     def __init__(self):
         """Initialize the module"""
 
         super(SVDValidationTTreeRecoTrack, self).__init__()
+        #: output root file
         self.file = ROOT.TFile('../SVDValidationTTreeRecoTrack.root', 'recreate')
-        '''Output ROOT file'''
+        #: output ttree
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-        '''TTrees for output data'''
+        #: instance of EventData class
         self.data = EventDataRecoTrack()
-        '''Instance of the EventData class'''
 
         # Declare tree branches
         for key in EventDataRecoTrack.__dict__:
@@ -57,7 +57,7 @@ class SVDValidationTTreeRecoTrack(Module):
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
-                self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
+                self.tree.Branch(key, addressof(self.data, key), key + formstring)
 
     def event(self):
         """Take clusters from SVDRecoTracks with a truehit and save needed information"""
@@ -67,7 +67,7 @@ class SVDValidationTTreeRecoTrack(Module):
             dict_cluster = OrderedDict({'L3': [], 'L4': [], 'L5': [], 'L6': []})  # keys: layers, values: list of dicts
             # clusters are ordered acording layers and sides, so we can read two at once
             for i in range(0, len(clusters), 2):
-                c_U, c_V = clusters[i], clusters[i+1]  # read at once two clusters
+                c_U, c_V = clusters[i], clusters[i + 1]  # read at once two clusters
                 cluster_U_truehits = c_U.getRelationsTo('SVDTrueHits')  # SVDClustersToSVDTrueHits
                 U_id = c_U.getSensorID()
                 sensorNum_U = U_id.getSensorNumber()

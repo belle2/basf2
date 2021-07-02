@@ -36,6 +36,12 @@ namespace Belle2 {
     /** Destructor */
     virtual ~TrgEclBeamBKG();/// Destructor
 
+    /** Copy constructor, deleted. */
+    TrgEclBeamBKG(TrgEclBeamBKG&) = delete;
+
+    /** Assignment operator, deleted. */
+    TrgEclBeamBKG& operator=(TrgEclBeamBKG&) = delete;
+
   public:
 
     int GetBeamBkg(std::vector<std::vector<double>>);

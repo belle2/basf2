@@ -3,6 +3,12 @@
    <Creator library="ir">CryostatCreator</Creator>
    <Content>
       <LimitStepLength desc="select 1 to limit step length inside beam pipes to be less than 5mm">0</LimitStepLength>
+
+      <CrossingAngle>
+         <sec name="HER" unit="rad">0.0415</sec>
+         <sec name="LER" unit="rad">-0.0415</sec>
+      </CrossingAngle>
+
       <TubeR>
          <N desc="Number of planes">4</N>
          <sec name="Z0" unit="cm">63.35</sec>

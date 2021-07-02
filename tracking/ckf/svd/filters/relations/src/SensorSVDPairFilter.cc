@@ -32,7 +32,7 @@ SensorSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFT
   if (not fromStateCache.isHitState) {
     // We are coming from a CDC track, so we can use its position to only look for matching ladders
     // This is done with the sensorCenterPhi, using the state's phi (and/or theta) wouldn't be a SensorFilter anymore.
-    double phiDiff = fromStateCache.phi - toStateCache.sensorCenterPhi;
+    float phiDiff = fromStateCache.phi - toStateCache.sensorCenterPhi;
     while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
     while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
 
@@ -64,7 +64,7 @@ SensorSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFT
     return NAN;
   }
 
-  double phiDiff = fromStateCache.sensorCenterPhi - toStateCache.sensorCenterPhi;
+  float phiDiff = fromStateCache.sensorCenterPhi - toStateCache.sensorCenterPhi;
   while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
   while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
 

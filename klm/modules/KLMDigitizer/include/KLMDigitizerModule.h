@@ -13,15 +13,14 @@
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMSimHit.h>
 #include <klm/dataobjects/eklm/EKLMSimHit.h>
-#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/dbobjects/eklm/EKLMChannels.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
+#include <klm/dbobjects/KLMScintillatorFEEParameters.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
-#include <klm/dbobjects/KLMTimeConversion.h>
 #include <klm/simulation/ScintillatorFirmware.h>
+#include <klm/time/KLMTime.h>
 
 /* Belle 2 headers. */
 #include <framework/core/Module.h>
@@ -88,9 +87,9 @@ namespace Belle2 {
     };
 
     /**
-     * Check channel parameters for channel-specific simulation.
+     * Check scintillator FEE parameters for channel-specific simulation.
      */
-    void checkChannelParameters();
+    void checkScintillatorFEEParameters();
 
     /**
      * Digitization in BKLM.
@@ -106,7 +105,7 @@ namespace Belle2 {
      * Check if channel is active (status is not KLMChannelStatus::c_Dead).
      * @param[in] channel Channel.
      */
-    bool checkActive(uint16_t channel);
+    bool checkActive(KLMChannelNumber channel);
 
     /**
      * Efficiency correction.
@@ -115,26 +114,23 @@ namespace Belle2 {
      */
     bool efficiencyCorrection(float efficiency);
 
-    /** Digitization parameters. */
-    DBObjPtr<KLMScintillatorDigitizationParameters> m_DigPar;
-
-    /** Time conversion. */
-    DBObjPtr<KLMTimeConversion> m_TimeConversion;
-
-    /** Channel data. */
-    DBObjPtr<EKLMChannels> m_Channels;
-
     /** Channel status. */
     DBObjPtr<KLMChannelStatus> m_ChannelStatus;
+
+    /** Scintillator digitization parameters. */
+    DBObjPtr<KLMScintillatorDigitizationParameters> m_DigPar;
+
+    /** Scintillator FEE parameters. */
+    DBObjPtr<KLMScintillatorFEEParameters> m_FEEPar;
 
     /** Strip efficiency. */
     DBObjPtr<KLMStripEfficiency> m_StripEfficiency;
 
+    /** Time conversion. */
+    KLMTime* m_Time;
+
     /** Element numbers. */
     const KLMElementNumbers* m_ElementNumbers;
-
-    /** EKLM element numbers. */
-    const EKLMElementNumbers* m_eklmElementNumbers;
 
     /** Simulation mode. */
     std::string m_SimulationMode;
@@ -142,8 +138,8 @@ namespace Belle2 {
     /** Whether the simulation is channel-specific. */
     bool m_ChannelSpecificSimulation;
 
-    /** Initial digitization time. */
-    double m_DigitizationInitialTime;
+    /** Initial digitization time in CTIME periods. */
+    int m_DigitizationInitialTime;
 
     /** Save FPGA fit data (KLMScintillatorFirmwareFitResult). */
     bool m_SaveFPGAFit;
@@ -158,16 +154,16 @@ namespace Belle2 {
     bool m_Debug;
 
     /** Simulation hit map for BKLM (by channel). */
-    std::multimap<uint16_t, const BKLMSimHit*> m_bklmSimHitChannelMap;
+    std::multimap<KLMChannelNumber, const BKLMSimHit*> m_bklmSimHitChannelMap;
 
     /** Simulation hit map for BKLM (by plane). */
-    std::multimap<uint16_t, const BKLMSimHit*> m_bklmSimHitPlaneMap;
+    std::multimap<KLMPlaneNumber, const BKLMSimHit*> m_bklmSimHitPlaneMap;
 
     /** Simulation hit map for EKLM (by channel). */
-    std::multimap<uint16_t, const EKLMSimHit*> m_eklmSimHitChannelMap;
+    std::multimap<KLMChannelNumber, const EKLMSimHit*> m_eklmSimHitChannelMap;
 
     /** Simulation hit map for EKLM (by plane). */
-    std::multimap<uint16_t, const EKLMSimHit*> m_eklmSimHitPlaneMap;
+    std::multimap<KLMPlaneNumber, const EKLMSimHit*> m_eklmSimHitPlaneMap;
 
     /** FPGA fitter. */
     KLM::ScintillatorFirmware* m_Fitter;

@@ -1,0 +1,451 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Tool for producing summary statistics of skims for the distributed computing group.
+The expected input is the JSON output of :ref`b2skim-stats-print<b2skim-stats-print>`.
+
+The values produced by the script are aggregated over all skims (either averaged or
+summed, depending on the flag passed by the user). For MC samples, this aggregate is
+printed per-sample. For data, the values are first aggregated over all skims per test
+data file, and then those values are averaged and are attached an uncertainty given by
+the standard deviation of the individual aggregated values. This is done to account for
+the wide variation in skim performance when tested on data samples from different runs.
+"""
+
+
+import argparse
+from functools import lru_cache
+import json
+import pandas as pd
+from pathlib import Path
+import re
+from tempfile import TemporaryDirectory
+import subprocess
+import warnings
+
+from tabulate import tabulate
+
+from skim.utils.testfiles import TestSampleList
+from skim.registry import Registry
+
+
+def get_working_groups():
+    WGs = {
+        0: "Systematics",
+        1: "SL + Missing Energy",
+        2: "EWP",
+        3: "TDCPV",
+        4: "B→charm",
+        5: "Bottomonium",
+        6: "Quarkonium",
+        7: "Charm",
+        8: "Dark, τ, low-multi",
+        9: "B→charmless",
+    }
+    return WGs
+
+
+def get_argument_parser():
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+
+    parser.add_argument(
+        "-j",
+        "--stats-json",
+        dest="StatsJSON",
+        help="JSON file of stats produced by ``b2skim-stats-print``.",
+    )
+
+    table_format = parser.add_mutually_exclusive_group()
+    table_format.add_argument(
+        "-C",
+        "--confluence",
+        action="store_true",
+        help="If passed, print tables in Confluence-friendly format.",
+    )
+    table_format.add_argument(
+        "-M",
+        "--markdown",
+        action="store_true",
+        help="If passed, print tables in Markdown format.",
+    )
+
+    requested = parser.add_mutually_exclusive_group(required=True)
+    requested.add_argument(
+        "-r",
+        "--requested-skims",
+        nargs="+",
+        metavar="SKIM",
+        choices=Registry.names,
+        help=(
+            "List of all skims that are requested for production. "
+            "This list will be used to produce resource usage estimates "
+            "based on the skims that are actually requested."
+        ),
+    )
+    requested.add_argument(
+        "-f",
+        "--requested-skims-file",
+        help=(
+            "File containing list of all skims that are requested for production. "
+            "This list will be used to produce resource usage estimates "
+            "based on the skims that are actually requested. "
+            "The expected format of this file is *one skim name per line*, with "
+            "each skim name exactly matching a name in the skim registry."
+        ),
+    )
+
+    requested = parser.add_mutually_exclusive_group(required=True)
+    requested.add_argument(
+        "-a", "--average-tables", action="store_true", help="Print tables of averages."
+    )
+    requested.add_argument(
+        "-t", "--total-tables", action="store_true", help="Print tables of totals."
+    )
+    requested.add_argument(
+        "-b",
+        "--both-tables",
+        action="store_true",
+        help="Print both tables of averages and tables of totals.",
+    )
+
+    return parser
+
+
+@lru_cache()
+def get_metadata(filename):
+    """
+    Use ``b2file-metadata-show`` to retrieve metadata JSON of file.
+    """
+    if not Path(filename).exists():
+        raise FileNotFoundError(f"Could not find file {filename}")
+
+    proc = subprocess.run(
+        ["b2file-metadata-show", "--json", str(filename)],
+        stdout=subprocess.PIPE,
+        check=True,
+    )
+    metadata = json.loads(proc.stdout.decode("utf-8"))
+    return metadata
+
+
+@lru_cache()
+def get_fraction_of_events_used(filename, nInputEvents):
+    """
+    Parameters:
+        filename (str): Filename to get metadata for.
+        nInputEvents (int): Number of events from file used.
+    """
+    metadata = get_metadata(filename)
+    return min(metadata["nEvents"], nInputEvents) / metadata["nEvents"]
+
+
+@lru_cache()
+def get_luminosity(filename):
+    """
+    Use ``b2info-luminosity`` to get luminosity of data file. Returns luminosity in
+    inverse femtobarns.
+    """
+    metadata = get_metadata(filename)
+
+    exp = metadata["experimentLow"], metadata["experimentHigh"]
+    runs = metadata["runLow"], metadata["runHigh"]
+
+    with TemporaryDirectory():
+        # Put CSV output of b2info-luminosity in temporary directory
+        subprocess.run(
+            [
+                "b2info-luminosity",
+                "--exp",
+                "-".join(map(str, exp)),
+                "--run",
+                "-".join(map(str, runs)),
+                "--what",
+                "offline",
+                # Pass a dummy token so script does not ask for password.
+                # No password is required, since only using offline DB.
+                "--token",
+                "DUMMY_ARGUMENT",
+            ],
+            check=True,
+            stdout=subprocess.PIPE,
+        )
+        with open("dfruns.csv") as f:
+            df = pd.read_csv(f)
+
+    # If luminosity is found to be zero, return None
+    lumi = df["intLumi"].sum()
+    if lumi > 0:
+        return lumi
+
+
+def get_total_cross_section():
+    # The cross section (nb) of each process in e+e- collisions
+    processCrossSections = {
+        "mixed": 0.555,
+        "charged": 0.555,
+        "ccbar": 1.3,
+        "uubar": 1.61,
+        "ddbar": 0.40,
+        "ssbar": 0.38,
+        "taupair": 0.91,
+    }
+
+    return sum(processCrossSections.values())
+
+
+def get_nEvents_per_invab():
+    """
+    Calculate the number of e^+e^- events per inverse attobarn using the total process
+    cross section.
+    """
+    CrossSection_nb = get_total_cross_section()
+    CrossSection_ab = CrossSection_nb * 1e9
+
+    # NOTE: Written out explicitly N=σ.L
+    invab = 1  # 1/ab
+    return CrossSection_ab * invab
+
+
+def get_samples_of_interest(StatsDict):
+    """
+    Retrieve list of samples, and filter down to only the ones we're interested in
+    printing: only BGx1 samples for MC, and only 4S and GeneralSkimName=all for data.
+    """
+    samples = TestSampleList(SampleDict=StatsDict)
+    samples.query_mc_samples(beam_background="BGx1", inplace=True)
+    samples.query_data_samples(beam_energy="4S", general_skim="all", inplace=True)
+    return samples
+
+
+def load_df(StatsDict, *, RequestedSkims, samples):
+    # Read in the nested stats dict and concatenate into a single dataframe
+    dfs = {
+        skim: pd.DataFrame(stats).reset_index(level=0)
+        for (skim, stats) in StatsDict.items()
+    }
+    df = (
+        pd.concat(dfs)
+        .reset_index()
+        .rename(columns={"index": "Sample", "level_0": "Skim"})
+        .drop(columns="level_1")
+    )
+
+    # Infer working group from second digit of skim code
+    WGs = get_working_groups()
+    df["WorkingGroup"] = df["Skim"].apply(
+        lambda skim: WGs[int(Registry.encode_skim_name(skim)[1])]
+    )
+
+    # Add column to indicate whether the skim has been requested
+    df["Requested"] = df.apply(lambda row: row["Skim"] in RequestedSkims, axis=1)
+
+    # Filter into data and MC dataframes using sample labels
+    MCMask = df["Sample"].isin([s.encodeable_name for s in samples.mc_samples])
+    DataMask = df["Sample"].isin([s.encodeable_name for s in samples.data_samples])
+
+    # Use human-readable labels from now on
+    labels = {s.encodeable_name: s.printable_name for s in samples}
+    df = df.replace({"Sample": labels})
+
+    return df.loc[DataMask], df.loc[MCMask]
+
+
+def add_data_fields(df, *, samples, add_lumi=False):
+    """
+    Add stats to dataframe for data samples.
+
+    In particular, add luminosity of full file and luminosity actually used in test.
+    """
+
+    # Policy of dealing with NaN: replace with zeros
+    df = df.fillna(0)
+
+    # Add columns with info about input file
+    locations = {s.printable_name: s.location for s in samples.data_samples}
+    df["SampleFile"] = df["Sample"].apply(lambda sample: locations[sample])
+
+    # NOTE: very slow to query the DB multiple times, so don't do this if we don't need to
+    if add_lumi:
+        df["FractionOfEventsUsed"] = df.apply(
+            lambda row: get_fraction_of_events_used(row["SampleFile"], row["nInputEvents"]),
+            axis=1,
+        )
+
+        # Get luminosity associated with each
+        df["SampleIntLumi"] = df["SampleFile"].apply(
+            lambda SampleFile: get_luminosity(SampleFile)
+        )
+
+        # Remove rows for any data samples that the b2 tools couldn't get a luminosity for
+        df.dropna(subset=["SampleIntLumi"], inplace=True)
+
+        # Scale down luminosity using fraction of file used in test
+        df["SampleIntLumiUsed"] = df["SampleIntLumi"] * df["FractionOfEventsUsed"]
+
+        # udstSize in MB, SampleIntLumiUsed in 1/fb
+        df["OutputFileSize_MBPerInvfb"] = df["udstSize"] / df["SampleIntLumiUsed"]
+        df["OutputFileSize_TBPerInvab"] = df["OutputFileSize_MBPerInvfb"] / 1024
+
+    return df
+
+
+def add_mc_fields(df):
+    """
+    Add stats to dataframe for data samples.
+    """
+
+    # Policy of dealing with NaN: replace with zeros
+    df = df.fillna(0)
+
+    df["OutputFileSize_TBPerInvab"] = (
+        df["udstSizePerInputEvent"] * get_nEvents_per_invab() / 1024 ** 3
+    )
+    return df
+
+
+def aggregate_table(
+    x,
+    xlabel,
+    df_Data,
+    df_MC,
+    *,
+    tablefmt,
+    aggregator_function,
+    aggregator_function_name,
+    fmt_string=".1f",
+):
+    headers = [f"{xlabel} [{aggregator_function_name}]", "Requested skims", "All skims"]
+
+    agg = aggregator_function  # Short alias for aggregator_function
+
+    # Aggregate over skims and average over data samples
+    df_Data_AggPerSample = df_Data.groupby(["Sample"], as_index=False).agg(agg)[x]
+    df_ReqData_AggPerSample = (
+        df_Data.query("Requested").groupby(["Sample"], as_index=False).agg(agg)[x]
+    )
+
+    table = [
+        [
+            "Data",
+            f"{float(df_ReqData_AggPerSample.mean()):{fmt_string}} ± {float(df_ReqData_AggPerSample.std()):{fmt_string}}",
+            f"{float(df_Data_AggPerSample.mean()):{fmt_string}} ± {float(df_Data_AggPerSample.std()):{fmt_string}}",
+        ]
+    ]
+    for sample in sorted(set(df_MC["Sample"])):
+        df_sample = df_MC.query(f"Sample == '{sample}'")
+        table.append(
+            [
+                sample,
+                f"{df_sample.query('Requested')[x].agg(agg):{fmt_string}}",
+                f"{df_sample[x].agg(agg):{fmt_string}}",
+            ]
+        )
+
+    print(tabulate(table, tablefmt=tablefmt, headers=headers) + "\n")
+
+
+def total_table(*args, **kwargs):
+    aggregate_table(
+        *args, aggregator_function=sum, aggregator_function_name="total", **kwargs,
+    )
+
+
+def average_table(*args, **kwargs):
+    try:
+        # Average is about 75x smaller than total, so do some fancy regex footwork to
+        # add one more decimal place to fmt_string
+        kwargs["fmt_string"] = re.sub(
+            r"^(\d*\.)(\d+)(f)$",
+            lambda m: "{}{}{}".format(
+                m.groups()[0], int(m.groups()[1]) + 1, m.groups()[2]
+            ),
+            kwargs["fmt_string"],
+        )
+    except KeyError:
+        pass
+
+    aggregate_table(
+        *args,
+        aggregator_function=lambda v: sum(v) / len(v),
+        aggregator_function_name="average",
+        **kwargs,
+    )
+
+
+def average_and_total_tables(*args, **kwargs):
+    average_table(*args, **kwargs)
+    total_table(*args, **kwargs)
+
+
+def main():
+    parser = get_argument_parser()
+    args = parser.parse_args()
+
+    # If just passed a list of skims, read that. If passed a filename, read list from file
+    if args.requested_skims:
+        RequestedSkims = args.requested_skims
+    else:
+        with open(args.requested_skims_file) as f:
+            RequestedSkims = list(filter(None, f.read().split("\n")))
+            # Remove any surrounding whitespace from names
+            RequestedSkims = [skim.strip() for skim in RequestedSkims]
+        # Check that all skims are valid
+        InvalidSkims = [skim for skim in RequestedSkims if skim not in Registry.names]
+        if InvalidSkims:
+            raise RuntimeError(
+                f"Invalid skim name/s in {args.requested_skims_file}: "
+                + ", ".join(InvalidSkims)
+            )
+
+    with open(args.StatsJSON) as f:
+        JSONContent = json.load(f)
+
+    samples = get_samples_of_interest(JSONContent["Samples"])
+
+    df_Data, df_MC = load_df(
+        JSONContent["stats"], RequestedSkims=RequestedSkims, samples=samples
+    )
+
+    df_Data = add_data_fields(df_Data, samples=samples)
+    df_MC = add_mc_fields(df_MC)
+
+    # Select the table printing format based on flag
+    if args.confluence:
+        tablefmt = "jira"
+    elif args.markdown:
+        tablefmt = "pipe"
+    else:
+        tablefmt = "fancy_grid"
+
+    # Select a table printing function based on the flag passed to the script
+    if args.average_tables:
+        table_function = average_table
+    elif args.total_tables:
+        table_function = total_table
+    elif args.both_tables:
+        table_function = average_and_total_tables
+
+    VariablesToPrint = (
+        ("HS06TimePerEvent", "CPU time to process one input event (HS06)", ".2f"),
+        ("RetentionRate", "Event-based retention rate (%)", ".1f"),
+        ("FilesizeRetentionRate", "Filesize-based retention rate (%)", ".1f"),
+        ("udstSizePerSkimmedEvent", "Size of one event in uDST format (kB)", ".1f"),
+        ("udstSizePerInputEvent", "Size of one event per input event(kB)", ".1f"),
+    )
+    for variable, description, fmt_string in VariablesToPrint:
+        table_function(
+            variable,
+            description,
+            df_Data,
+            df_MC,
+            tablefmt=tablefmt,
+            fmt_string=fmt_string,
+        )
+
+
+if __name__ == "__main__":
+    warnings.filterwarnings("ignore", "This pattern has match groups")
+    main()

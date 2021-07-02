@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 
 # suppress messages and warnings during processing:
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
-input = register_module('RootInput')
+input = b2.register_module('RootInput')
 input.param('inputFileName', 'PXDRawHit.root')
 
 input.param('branchNames', ['EventMetaData', 'PXDDigits', 'PXDDigit'])
@@ -19,10 +19,10 @@ input.param('branchNames', ['EventMetaData', 'PXDDigits', 'PXDDigit'])
 # eventinfosetter.param('runList', [1])  # from run number 1
 # eventinfosetter.param('expList', [1])  # and experiment number 1
 
-histoman = register_module('HistoManager')
+histoman = b2.register_module('HistoManager')
 histoman.param('histoFileName', 'your_histo_file.root')
 
-packer = register_module('PXDPacker')
+packer = b2.register_module('PXDPacker')
 # [[dhhc1, dhh1, dhh2, dhh3, dhh4, dhh5] [ ... ]]
 # -1 is disable port
 packer.param('dhe_to_dhc', [
@@ -44,16 +44,16 @@ packer.param('dhe_to_dhc', [
 #    [    5, 35    ]
 # ])
 
-unpacker = register_module('PXDUnpacker')
+unpacker = b2.register_module('PXDUnpacker')
 
-simpleoutput = register_module('RootOutput')
+simpleoutput = b2.register_module('RootOutput')
 simpleoutput.param('outputFileName', 'Output.root')
 
 # Load parameters
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 
 # Create geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 
 # Select subdetectors to be built
 # geometry.param('Components', ['PXD','SVD'])
@@ -61,7 +61,7 @@ geometry.param('components', ['PXD'])
 
 
 # creating the path for the processing
-main = create_path()
+main = b2.create_path()
 main.add_module(input)
 main.add_module(gearbox)
 main.add_module(geometry)
@@ -78,6 +78,6 @@ main.add_module('Progress')
 main.add_module(simpleoutput)
 
 # Process the events
-process(main)
+b2.process(main)
 # if there are less events in the input file the processing will be stopped at
 # EOF.

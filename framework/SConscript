@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['$ROOT_LIBS', 'PyROOT',
+env['LIBS'] = ['$ROOT_LIBS', 'ROOTTPython',
                'EG', # for TDatabasePDG
                'XMLIO', # for TBufferXML
                'boost_python', 'boost_filesystem', 'boost_iostreams', 'boost_system',

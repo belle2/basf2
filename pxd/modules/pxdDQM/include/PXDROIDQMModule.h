@@ -34,12 +34,16 @@ namespace Belle2 {
       PXDROIDQMModule();
 
     private:
+      /** Initialize */
       void initialize() override final;
 
+      /** Begin run */
       void beginRun() override final;
 
+      /** Event */
       void event() override final;
 
+      /** Define histograms */
       void defineHisto() override final;
 
     private:

@@ -1,0 +1,26 @@
+# EventType: 1190520001
+# Descriptor: [B0 -> Xs e+ e-]cc
+# NickName: Bd_Xsee_lowmb
+# Documentation: Rare b->s l+ l- process. mb = 4.65 GeV
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Yo Sato
+# Email: yosato@epx.phys.tohoku.ac.jp
+# Cuts: None
+# Date: 20200825
+#
+#
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0	VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+1.      Xsd  e+   e-   PHOTOS BTOXSLL 4.65 0.2 0.0 0.461;
+Enddecay
+#
+Decay anti-B0sig
+1.     anti-Xsd  e+   e-   PHOTOS BTOXSLL 4.65 0.2 0.0 0.461;
+Enddecay
+#
+End

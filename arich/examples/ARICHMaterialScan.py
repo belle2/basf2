@@ -8,7 +8,6 @@
 # Author: Leonid Burmistrov (May 2018)
 # --------------------------------------------------------------------
 
-import sys
 import os
 
 from basf2 import logging, LogLevel, create_path, process

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+# @cond SUPPRESS_DOXYGEN
 
 """
 <header>
@@ -17,7 +18,11 @@ the validation suite properly handles this case.
 from ROOT import TFile
 
 
-VALIDATION_OUTPUT_FILE = 'validationTestEmptyRootFile.root'
+VALIDATION_OUTPUT_FILE = "validationTestEmptyRootFile.root"
 
-tfile = TFile(VALIDATION_OUTPUT_FILE, "RECREATE")
-tfile.Close()
+
+if __name__ == "__main__":
+    tfile = TFile(VALIDATION_OUTPUT_FILE, "RECREATE")
+    tfile.Close()
+
+# @endcond

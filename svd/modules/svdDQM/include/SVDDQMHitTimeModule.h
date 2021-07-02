@@ -54,11 +54,16 @@ namespace Belle2 {
 
   private:
 
+    /** Name of the histogram directory in ROOT file */
+    std::string m_histogramDirectoryName;
+
+    /** SVDClusters StoreArray name */
+    std::string m_storeSVDClustersName;
+    /** SVDEventInfo StoreObjPtry name */
+    std::string m_storeSVDEventInfoName;
+
     /** if TRUE: svdTime back in SVD time reference*/
     bool m_desynchSVDTime = false;
-
-    /** parameter to change the range of the time histograms*/
-    bool m_isSVDTimeCalibrated = false;
 
     StoreObjPtr<TRGSummary>    m_objTrgSummary;   /**< Trigger Summary data object */
 

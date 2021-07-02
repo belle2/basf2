@@ -40,8 +40,10 @@ namespace Belle2 {
       PXDEventPlotModule();
 
     private:
+      /** Initialize */
       void initialize() override final;
 
+      /** Event */
       void event() override final;
 
     private:
@@ -67,7 +69,9 @@ namespace Belle2 {
       std::map <VxdID, TH2F*> m_histos_gm; /**< map for plots per modules with gm+ */
       std::map <VxdID, TH2F*> m_histos_gm2; /**< map for plots per modules with gm- */
 
-      TLine* m_l1{}, *m_l2{}, *m_l3{}; /**< Lines to guide the eye in plots/canvases */
+      TLine* m_l1{}, /**< Lines to guide the eye in plots/canvases */
+             *m_l2{}, /**< Lines to guide the eye in plots/canvases */
+             *m_l3{}; /**< Lines to guide the eye in plots/canvases */
 
     };//end class declaration
 

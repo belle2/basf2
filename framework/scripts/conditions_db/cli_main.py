@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 This script provides a command line interface to all the tasks related to the
@@ -7,7 +6,7 @@ This script provides a command line interface to all the tasks related to the
 or download of existing payloads.
 
 The usage of this program is similar to git: there are sub commands like for
-example ``tag`` wich groups all actions related to the management of global
+example ``tag`` which groups all actions related to the management of global
 tags. All the available commands are listed below.
 """
 
@@ -29,7 +28,6 @@ import argparse
 import textwrap
 import json
 import difflib
-from urllib.parse import urljoin
 import shutil
 import pprint
 import requests
@@ -39,13 +37,13 @@ from basf2.utils import pretty_print_table
 from terminal_utils import Pager
 from dateutil.parser import parse as parse_date
 from getpass import getuser
-from . import ConditionsDB, enable_debugging, encode_name, PayloadInformation
-from .cli_utils import ItemFilter
+from conditions_db import ConditionsDB, enable_debugging, encode_name, PayloadInformation
+from conditions_db.cli_utils import ItemFilter
 # the command_* functions are imported but not used so disable warning about
 # this if pylama/pylint is used to check
-from .cli_upload import command_upload  # noqa
-from .cli_download import command_download, command_legacydownload  # noqa
-from .cli_management import command_tag_merge, command_tag_runningupdate  # noqa
+from conditions_db.cli_upload import command_upload  # noqa
+from conditions_db.cli_download import command_download, command_legacydownload  # noqa
+from conditions_db.cli_management import command_tag_merge, command_tag_runningupdate  # noqa
 
 
 def escape_ctrl_chars(name):
@@ -54,7 +52,7 @@ def escape_ctrl_chars(name):
     if not hasattr(escape_ctrl_chars, "_regex"):
         escape_ctrl_chars._regex = re.compile("[\x00-\x1f\x7f-\x9f]")
 
-    # escape the control characters by putting theim in as \xFF
+    # escape the control characters by putting them in as \xFF
     def escape(match):
         if match.group(0).isspace():
             return match.group(0)
@@ -88,7 +86,7 @@ def command_tag_list(args, db=None):
     --with-invalid as option. Alternatively one can use --only-published to show
     only tags which have been published
 
-    If the --regex option is supplied the searchterm will interpreted as a
+    If the --regex option is supplied the search term will be interpreted as a
     python regular expression where the case is ignored.
     """
 
@@ -110,7 +108,7 @@ def command_tag_list(args, db=None):
     if not tagfilter.check_arguments():
         return 1
 
-    req = db.request("GET", "/globalTags", "Getting list of globaltags{}".format(tagfilter))
+    req = db.request("GET", "/globalTags", f"Getting list of globaltags{tagfilter}")
 
     # now let's filter the tags
     taglist = []
@@ -159,7 +157,7 @@ def print_globaltag(db, *tags):
         if isinstance(info, str):
             try:
                 req = db.request("GET", "/globalTag/{}".format(encode_name(info)),
-                                 "Getting info for globaltag {}".format(info))
+                                 f"Getting info for globaltag {info}")
             except ConditionsDB.RequestError as e:
                 # ok, there's an error for this one, let's continue with the other
                 # ones
@@ -189,7 +187,7 @@ def print_globaltag(db, *tags):
 def change_state(db, tag, state, force=False):
     """Change the state of a global tag
 
-    If the new state is not revertable then ask for confirmation
+    If the new state is not revertible then ask for confirmation
     """
     state = state.upper()
     if state in ["INVALID", "PUBLISHED"] and not force:
@@ -212,7 +210,7 @@ def command_tag_show(args, db=None):
     """
 
     # this one is a bit similar to command_tag_list but gets single tag
-    # informations from the database and thus no need for filtering. It will
+    # information from the database and thus no need for filtering. It will
     # always show the detailed information
 
     if db is None:
@@ -235,7 +233,7 @@ def command_tag_create(args, db=None):
 
     This command creates a new globaltag in the database with the given name
     and description. The name can only contain alpha-numeric characters and the
-    charachters '+-_:'.
+    characters '+-_:'.
     """
 
     if db is None:
@@ -259,7 +257,7 @@ def command_tag_create(args, db=None):
     req = db.request("POST", "/globalTag/{}".format(encode_name(typeinfo["name"])),
                      "Creating globaltag {name}".format(**info),
                      json=info)
-    B2INFO("Succesfully created globaltag {name} (id={globalTagId})".format(**req.json()))
+    B2INFO("Successfully created globaltag {name} (id={globalTagId})".format(**req.json()))
 
 
 def command_tag_modify(args, db=None):
@@ -281,7 +279,7 @@ def command_tag_modify(args, db=None):
 
     # first we need to get the old tag information
     req = db.request("GET", "/globalTag/{}".format(encode_name(args.tag)),
-                     "Getting info for globaltag {}".format(args.tag))
+                     f"Getting info for globaltag {args.tag}")
 
     # now we update the tag information
     info = req.json()
@@ -331,7 +329,7 @@ def command_tag_clone(args, db=None):
 
     # first we need to get the old tag information
     req = db.request("GET", "/globalTag/{}".format(encode_name(args.tag)),
-                     "Getting info for globaltag {}".format(args.tag))
+                     f"Getting info for globaltag {args.tag}")
     info = req.json()
 
     # now we clone the tag. id came from the database so no need for escape
@@ -420,12 +418,12 @@ def command_tag_invalidate(args, db):
     """
     Invalidate a globaltag.
 
-    This command ets the state of a globaltag to INVALID. This will disqualify
+    This command sets the state of a globaltag to INVALID. This will disqualify
     this tag from being used in user analysis.  A confirmation dialog will be
     shown.
 
     .. deprecated:: release-04-00-00
-       Use ``tag state $name PUBLISHED`` instead
+       Use ``tag state $name INVALID`` instead
     """
     if db is None:
         args.add_argument("tag", metavar="TAGNAME", help="globaltag to be invalidated")
@@ -513,7 +511,7 @@ def command_diff(args, db):
     If ``--full`` is given it will show all payloads, even the ones common to
     both globaltags. The differences can be limited to a given run and
     limited to a set of payloads names using ``--filter`` or ``--exclude``. If
-    the ``--regex`` option is supplied the searchterm will interpreted as a
+    the ``--regex`` option is supplied the search term will be interpreted as a
     python regular expression where the case is ignored.
 
     .. versionchanged:: release-03-00-00
@@ -619,7 +617,7 @@ def command_iov(args, db):
 
     This command lists all IoVs defined in a given globaltag. The list can be
     limited to a given run and optionally searched using --filter or --exclude.
-    If the --regex option is supplied the searchterm will interpreted as a
+    If the --regex option is supplied the search term will be interpreted as a
     python regular expression where the case is ignored.
 
     .. versionchanged:: release-03-00-00
@@ -657,7 +655,7 @@ def command_iov(args, db):
         req = db.request("GET", "/iovPayloads", msg, params={'gtName': args.tag, 'expNumber': args.run[0],
                                                              'runNumber': args.run[1]})
     else:
-        msg = "Obtaining list of iovs for globaltag {tag}{filter}".format(tag=args.tag, filter=iovfilter)
+        msg = f"Obtaining list of iovs for globaltag {args.tag}{iovfilter}"
         req = db.request("GET", "/globalTag/{}/globalTagPayloads".format(encode_name(args.tag)), msg)
 
     with Pager("List of IoVs{}{}".format(iovfilter, " (detailed)" if args.detail else ""), True):
@@ -903,7 +901,7 @@ def command_dump(args, db):
 
 
 class FullHelpAction(argparse._HelpAction):
-    """Class to recusively show help for an ArgumentParser and all it's sub_parsers"""
+    """Class to recursively show help for an ArgumentParser and all it's sub_parsers"""
 
     def print_subparsers(self, parser, prefix=""):
         """Print help message for given parser and call again for all sub parsers"""
@@ -917,15 +915,15 @@ class FullHelpAction(argparse._HelpAction):
             # get all subparsers and print help
             for choice, subparser in subparsers_action.choices.items():
                 print()
-                print("Command '{}{}'".format(prefix, choice))
+                print(f"Command '{prefix}{choice}'")
                 print(subparser.format_help())
 
-                self.print_subparsers(subparser, prefix="{}{} ".format(prefix, choice))
+                self.print_subparsers(subparser, prefix=f"{prefix}{choice} ")
 
     def __call__(self, parser, namespace, values, option_string=None):
         """Show full help message"""
         # run in pager because amount of options will be looong
-        with Pager("{} {}".format(parser.prog, option_string)):
+        with Pager(f"{parser.prog} {option_string}"):
             parser.print_help()
             self.print_subparsers(parser)
             parser.exit()

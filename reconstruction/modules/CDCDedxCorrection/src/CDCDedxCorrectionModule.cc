@@ -79,9 +79,6 @@ void CDCDedxCorrectionModule::initialize()
 void CDCDedxCorrectionModule::event()
 {
 
-  // outputs
-  StoreArray<CDCDedxTrack> dedxArray;
-
   // **************************************************
   //  LOOP OVER EACH DEDX MEASUREMENT (TRACK LEVEL)
   // **************************************************

@@ -3,17 +3,17 @@
 """
 This module contains various utility functions for the prompt calibration CAF scripts to use.
 """
-from basf2 import B2INFO, B2WARNING, B2DEBUG
+from basf2 import B2INFO
 from collections import defaultdict, OrderedDict
 from itertools import groupby
 import ROOT
 from caf.utils import ExpRun, IoV
-from random import choice
+from random import choice, shuffle
 
 
-def filter_by_max_files_per_run(files_to_iov, max_files_per_run=1, min_events_per_file=0):
+def filter_by_max_files_per_run(files_to_iov, max_files_per_run=1, min_events_per_file=0, random_select=False):
     """This function creates a new files_to_iov dictionary by adding files
-    until the maximum numbe of files per run is reached. After this no more files
+    until the maximum number of files per run is reached. After this no more files
     are added.
 
     It makes the assumption that the IoV is a single run, and that the exp_low and run_low of the IoV object
@@ -28,6 +28,7 @@ def filter_by_max_files_per_run(files_to_iov, max_files_per_run=1, min_events_pe
             input dictionary.
 
         min_events_per_file (int): The minimum number of events that is allowed to be in any included file's tree.
+        random_select (bool): true will select random nfile and false will take first nfile.
 
     Returns:
         dict: The same style of dict as the input file_to_iov, but filtered down.
@@ -35,6 +36,12 @@ def filter_by_max_files_per_run(files_to_iov, max_files_per_run=1, min_events_pe
     B2INFO(f"Beginning filtering process to only choose {max_files_per_run} file(s) per run.")
     if min_events_per_file:
         B2INFO(f"We also require that each file must have at least {min_events_per_file} events in the tree.")
+
+    # Shuffle the order of the dictionary for a random selection, converting back to the same type
+    if random_select:
+        files_to_iov_list = list(files_to_iov.items())
+        shuffle(files_to_iov_list)
+        files_to_iov = type(files_to_iov)(files_to_iov_list)
 
     # Our dictionary for appending files to and checking the number per run
     run_to_files = defaultdict(list)
@@ -179,7 +186,7 @@ def events_in_basf2_file(file_path):
     Returns:
         int: Number of entries in tree.
     """
-    f = ROOT.TFile(file_path, "READ")
+    f = ROOT.TFile.Open(file_path, "READ")
     events = f.tree.GetEntries()
     f.Close()
     return events

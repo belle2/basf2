@@ -14,6 +14,8 @@ from tracking.validation.run import TrackingValidationRun
 import tracking
 import logging
 import basf2
+import svd
+
 VALIDATION_OUTPUT_FILE = 'toCDCCKFTrackingValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
@@ -37,7 +39,7 @@ class toCDCCKFValidationBkg(TrackingValidationRun):
         path.add_module('SetupGenfitExtrapolation',
                         energyLossBrems=False, noiseBrems=False)
 
-        tracking.add_svd_reconstruction(path)
+        svd.add_svd_reconstruction(path)
         tracking.add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracksSVD", components=["SVD"])
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracksSVD")
 

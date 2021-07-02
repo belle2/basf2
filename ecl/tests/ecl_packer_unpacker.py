@@ -8,22 +8,21 @@
 # 1) From simulated muons
 # 2) "Custom" ECLDigits that have different combinations of parameters spanning the allowed range.
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 from unittest import TestCase
 from ROOT import gRandom
 import simulation
 import itertools
-import random
 
-logLevel = LogLevel.INFO  # LogLevel.DEBUG #
-set_random_seed(42)
+logLevel = b2.LogLevel.INFO  # LogLevel.DEBUG #
+b2.set_random_seed(42)
 
 eclDigitsDatastoreName = 'ECLDigits'
 unpackerOutputDatastoreName = 'someECLUnpackerDatastoreName'
 
 
-class addECLDigitsModule(Module):
+class addECLDigitsModule(b2.Module):
     """
     Adds ECLDigits with very large/small time/amplitude values
     """
@@ -51,11 +50,11 @@ class addECLDigitsModule(Module):
         # Create new ECLDigits and add them to datastore
         for digitParam in self.digitParams:
             # Skip combination of quality != 2 and chi != 0. Electronics can't output this
-            if (digitParam['quality'] is not 2) and (digitParam['chi'] is not 0):
+            if (digitParam['quality'] != 2) and (digitParam['chi'] != 0):
                 continue
 
             # Skip combination of quality == 2 and amp != 0. Electronics can't output this
-            if (digitParam['quality'] is 2) and (digitParam['time'] is not 0):
+            if (digitParam['quality'] == 2) and (digitParam['time'] != 0):
                 continue
 
             # Choose cellId that's not already used
@@ -79,7 +78,7 @@ class addECLDigitsModule(Module):
             newDigit.__assign__(eclDigit)
 
 
-class ECLPackerUnpackerTestModule(Module):
+class ECLPackerUnpackerTestModule(b2.Module):
     """
     module which checks if two collections of ECLDigits are equal
     """
@@ -108,7 +107,7 @@ class ECLPackerUnpackerTestModule(Module):
         eclDigitsFromSimulation_unsorted = Belle2.PyStoreArray(eclDigitsDatastoreName)
 
         if not len(eclDigitsFromSimulation_unsorted) == len(eclDigitsPackedUnpacked_unsorted):
-            B2FATAL("Different number of ECLDigits from simulation and after packing+unpacking")
+            b2.B2FATAL("Different number of ECLDigits from simulation and after packing+unpacking")
 
         eclDigitsPackedUnpacked = self.sortECLDigits(eclDigitsPackedUnpacked_unsorted)
         eclDigitsFromSimulation = self.sortECLDigits(eclDigitsFromSimulation_unsorted)
@@ -120,26 +119,26 @@ class ECLPackerUnpackerTestModule(Module):
             digit = eclDigitsFromSimulation[idx]
             digitPackedUnpacked = eclDigitsPackedUnpacked[idx]
 
-            B2DEBUG(5, 'MC digit: cellid = ' +
-                    str(digit.getCellId()) +
-                    ', amp = ' +
-                    str(digit.getAmp()) +
-                    ', time = ' +
-                    str(digit.getTimeFit()) +
-                    ', quality = ' +
-                    str(digit.getQuality()) +
-                    ', chi = ' +
-                    str(digit.getChi()) +
-                    '\nUnpackedDigit: cellid = ' +
-                    str(digitPackedUnpacked.getCellId()) +
-                    ', amp = ' +
-                    str(digitPackedUnpacked.getAmp()) +
-                    ', time = ' +
-                    str(digitPackedUnpacked.getTimeFit()) +
-                    ', quality = ' +
-                    str(digitPackedUnpacked.getQuality()) +
-                    ', chi = ' +
-                    str(digitPackedUnpacked.getChi()))
+            b2.B2DEBUG(5, 'MC digit: cellid = ' +
+                       str(digit.getCellId()) +
+                       ', amp = ' +
+                       str(digit.getAmp()) +
+                       ', time = ' +
+                       str(digit.getTimeFit()) +
+                       ', quality = ' +
+                       str(digit.getQuality()) +
+                       ', chi = ' +
+                       str(digit.getChi()) +
+                       '\nUnpackedDigit: cellid = ' +
+                       str(digitPackedUnpacked.getCellId()) +
+                       ', amp = ' +
+                       str(digitPackedUnpacked.getAmp()) +
+                       ', time = ' +
+                       str(digitPackedUnpacked.getTimeFit()) +
+                       ', quality = ' +
+                       str(digitPackedUnpacked.getQuality()) +
+                       ', chi = ' +
+                       str(digitPackedUnpacked.getChi()))
 
             tc.assertEqual(digit.getCellId(), digitPackedUnpacked.getCellId())
             tc.assertEqual(digit.getAmp(), digitPackedUnpacked.getAmp())
@@ -148,31 +147,31 @@ class ECLPackerUnpackerTestModule(Module):
             tc.assertEqual(digit.getChi(), digitPackedUnpacked.getChi())
 
 
-main = create_path()
+main = b2.create_path()
 # Create Event information
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [10]})
 main.add_module(eventinfosetter)
 
 # to run the framework the used modules need to be registered
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 particlegun.param('pdgCodes', [13, -13])
 particlegun.param('nTracks', 10)
 main.add_module(particlegun)
 
 # add simulation for ECL only
 simulation.add_simulation(main, components=['ECL'])
-set_module_parameters(main, type="Geometry", useDB=False, components=["ECL"])
+b2.set_module_parameters(main, type="Geometry", useDB=False, components=["ECL"])
 
 # Add ECLDigits with wide range of amp, time, quality, chi2
 main.add_module(addECLDigitsModule())
 
 # add the packer which packs the ECLDigits from the simulation
-ecl_packer = register_module('ECLPacker')
+ecl_packer = b2.register_module('ECLPacker')
 main.add_module(ecl_packer)
 
 # add the unpacker which unpacks the RawECL into ECLDigits and store them in a seperate datstore container
-ecl_unpacker = register_module('ECLUnpacker')
+ecl_unpacker = b2.register_module('ECLUnpacker')
 # set the unpacker output datastore name, so that we don't overwrite the "normal" ECLDigits
 ecl_unpacker.param('ECLDigitsName', unpackerOutputDatastoreName)
 main.add_module(ecl_unpacker)
@@ -183,4 +182,4 @@ main.add_module(eclPackUnpackerChecker, logLevel=logLevel)
 
 
 # Process events
-process(main)
+b2.process(main)

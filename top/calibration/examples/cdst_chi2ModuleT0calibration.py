@@ -11,7 +11,7 @@
 # note: runLast is inclusive
 # --------------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 from ROOT import TFile, TH1F, TH2F, TF1, TMatrixDSym
 from array import array
@@ -52,7 +52,7 @@ for run in range(run_first, run_last + 1):
         folder = data_dir + '/' + expNo + '/' + typ + '/' + runNo + '/' + skim_dir
         files += glob.glob(folder + '/cdst.*.root')
 if len(files) == 0:
-    B2ERROR('No cdst files found')
+    b2.B2ERROR('No cdst files found')
     sys.exit()
 
 # Output folder
@@ -70,7 +70,7 @@ fileName += run1 + '_to_' + run2 + '.root'
 print('Output file:', fileName)
 
 
-class Mask_BS13d(Module):
+class Mask_BS13d(b2.Module):
     ''' exclude (mask-out) BS 13d '''
 
     def event(self):
@@ -81,7 +81,7 @@ class Mask_BS13d(Module):
                 digit.setHitQuality(Belle2.TOPDigit.c_Junk)
 
 
-class ModuleT0cal(Module):
+class ModuleT0cal(b2.Module):
     ''' module T0 calibrator using chi2 minimization of time differences between slots '''
 
     def initialize(self):
@@ -225,7 +225,7 @@ class ModuleT0cal(Module):
         det = array('d', [0])
         B.Invert(det)
         if det[0] == 0:
-            B2ERROR("Matrix inversion failed")
+            b2.B2ERROR("Matrix inversion failed")
             return False
 
         # construct the right side of a linear system of equations
@@ -275,7 +275,7 @@ class ModuleT0cal(Module):
             self.h_moduleT0.SetBinContent(i+1, x[i] + T0[i] - average)
             self.h_moduleT0.SetBinError(i+1, e[i])
 
-        B2RESULT("Module T0 calibration constants successfully determined, " + chi_ndf)
+        b2.B2RESULT("Module T0 calibration constants successfully determined, " + chi_ndf)
         return True
 
     def terminate(self):
@@ -300,22 +300,22 @@ class ModuleT0cal(Module):
             h.Write()
         file.Close()
 
-        B2RESULT("Output written to " + fileName)
+        b2.B2RESULT("Output written to " + fileName)
 
 
 # Database
-use_central_database(globalTag)
+b2.use_central_database(globalTag)
 for tag in stagingTags:
-    use_central_database(tag)
+    b2.use_central_database(tag)
 for db in localDB:
     if os.path.isfile(db):
-        use_local_database(db, invertLogging=True)
+        b2.use_local_database(db, invertLogging=True)
     else:
-        B2ERROR(db + ": local database not found")
+        b2.B2ERROR(db + ": local database not found")
         sys.exit()
 
 # Create paths
-main = create_path()
+main = b2.create_path()
 
 # Input (cdst files)
 main.add_module('RootInput', inputFileNames=files)
@@ -342,7 +342,7 @@ main.add_module(ModuleT0cal())
 main.add_module('Progress')
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print statistics
-print(statistics)
+print(b2.statistics)

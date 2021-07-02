@@ -8,7 +8,7 @@ We make it so that this calibration depends on the result of a completely
 different one 'example_simple'. Even though that calibration will not be run in this process, the automated
 system can discover this dependency and use it when submitting tasks."""
 
-from prompt import CalibrationSettings
+from prompt import CalibrationSettings, input_data_filters
 
 ##############################
 # REQUIRED VARIABLE #
@@ -22,19 +22,32 @@ from prompt import CalibrationSettings
 # tasks. This script can always be run standalone.
 from prompt.calibrations.example_simple import settings as example_simple
 
-#: Tells the automated system some details of this script
+#: Tells the automated system some details of this script. The input_data_filters is only used for automated calibration (optional).
 settings = CalibrationSettings(name="Example Complex",
                                expert_username="ddossett",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["physics", "cosmics", "Bcosmics"],
+                               input_data_filters={"physics": [f"NOT {input_data_filters['Magnet']['On']}",
+                                                               input_data_filters["Data Tag"]["hadron_calib"],
+                                                               input_data_filters["Data Quality Tag"]["Good"],
+                                                               input_data_filters["Beam Energy"]["4S"],
+                                                               input_data_filters["Run Type"]["physics"]],
+                                                   "cosmics": [input_data_filters['Magnet']['Off'],
+                                                               input_data_filters["Data Tag"]["cosmic_calib"],
+                                                               input_data_filters["Data Quality Tag"]["Bad For Alignment"],
+                                                               input_data_filters["Beam Energy"]["Continuum"],
+                                                               f"NOT {input_data_filters['Run Type']['physics']}"],
+                                                   "Bcosmics": [input_data_filters["Data Tag"]["cosmic_calib"],
+                                                                input_data_filters["Data Quality Tag"]["Good"],
+                                                                input_data_filters["Beam Energy"]["4S"]]},
                                depends_on=[example_simple],
                                expert_config={
-                                              "physics_prescale": 0.2,
-                                              "max_events_per_file": 100,
-                                              "max_files_per_run": 2,
-                                              "payload_boundaries": []
-                                             })
+                                   "physics_prescale": 0.2,
+                                   "max_events_per_file": 100,
+                                   "max_files_per_run": 2,
+                                   "payload_boundaries": []
+                               })
 
 # The values in expert_config above are the DEFAULT for this script. They will be overwritten by values in caf_config.json
 
@@ -79,7 +92,6 @@ def get_calibrations(input_data, **kwargs):
     # Set up config options
     import basf2
     from basf2 import register_module, create_path
-    import ROOT
     from ROOT.Belle2 import TestCalibrationAlgorithm, TestBoundarySettingAlgorithm
     from caf.framework import Calibration, Collection
     from caf.strategies import SequentialBoundaries

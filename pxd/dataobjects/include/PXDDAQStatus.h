@@ -38,8 +38,11 @@ namespace Belle2 {
     /** constructor setting the error mask.
      * @param mask Error mask
      */
-    explicit PXDDAQStatus(PXDErrorFlags mask) : m_errorMask(mask), m_critErrorMask(0), m_usable(false) , m_gated(false),
+    explicit PXDDAQStatus(const PXDErrorFlags& mask) : m_errorMask(mask), m_critErrorMask(0), m_usable(false) , m_gated(false),
       m_unfiltered(false) {}
+
+    /** destructor */
+    virtual ~PXDDAQStatus() {};
 
     /** Return pointer to PXDDAQDHEStatus for the DHE connected to sensor with VxdID id
      *  If id not found, it returns nullptr!
@@ -74,15 +77,15 @@ namespace Belle2 {
 
     /** Set Error bit mask
      * This should be the OR of error masks of all sub-objects (DHC, DHE)
-     * @param m Bit Mask to set
+     * @param mask Bit Mask to set
      */
-    void setErrorMask(PXDErrorFlags m) { m_errorMask = m; }
+    void setErrorMask(const PXDErrorFlags& mask) { m_errorMask = mask; }
 
     /** Add (OR) Error bit mask
      * This should be the OR of error masks of all sub-objects (DHC, DHE)
-     * @param m Bit Mask to add (or)
+     * @param mask Bit Mask to add (or)
      */
-    void addErrorMask(PXDErrorFlags m) { m_errorMask |= m; }
+    void addErrorMask(const PXDErrorFlags& mask) { m_errorMask |= mask; }
 
     /** Return Error bit mask
      * This is the OR of error masks of all sub-objects (DHC, DHE)
@@ -91,9 +94,9 @@ namespace Belle2 {
     PXDErrorFlags getErrorMask(void) const { return m_errorMask; }
 
     /** Set Critical Error bit mask
-     * @param m Bit Mask to set
+     * @param mask Bit Mask to set
      */
-    void setCritErrorMask(PXDErrorFlags m) { m_critErrorMask = m; }
+    void setCritErrorMask(const PXDErrorFlags& mask) { m_critErrorMask = mask; }
 
     /** Return Critical Error bit mask
      * @return bit mask
@@ -105,7 +108,7 @@ namespace Belle2 {
      * the PXD data is not usable for analysis
      * TODO Maybe this decision needs improvement.
      */
-    void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0 && !m_gated;}
+    void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == PXDErrorFlags(0) && !m_gated;}
 
     /** Add Data packet information including its DHC/DHE tree
      * @param daqpktstat Packet Status Object
@@ -153,7 +156,7 @@ namespace Belle2 {
     /** Vector of packet informations beloning to this event */
     std::vector <PXDDAQPacketStatus> m_pxdPacket;
 
-    ClassDef(PXDDAQStatus, 2)
+    ClassDef(PXDDAQStatus, 3)
 
   }; // class PXDDAQStatus
 

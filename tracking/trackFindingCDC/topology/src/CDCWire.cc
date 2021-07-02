@@ -97,8 +97,6 @@ void CDCWire::initialize(EWirePosition wirePosition, bool ignoreWireSag)
 
 bool CDCWire::isInCell(const Vector3D& pos3D) const
 {
-  // Necessary for cppcheck not understanding that the variable is read on the next line
-  // cppcheck-suppress unreadVariable
   bool inZ = getBackwardZ() < pos3D.z() and pos3D.z() < getForwardZ();
   if (not inZ) return false;
 
@@ -108,8 +106,6 @@ bool CDCWire::isInCell(const Vector3D& pos3D) const
   double outerCylindricalR = wireLayer.getOuterCylindricalR();
   double cylindricalR = pos3D.cylindricalR();
 
-  // Necessary for cppcheck not understanding that the variable is read on the next line
-  // cppcheck-suppress unreadVariable
   bool inCylindricalR = innerCylindricalR < cylindricalR and cylindricalR < outerCylindricalR;
   if (not inCylindricalR) return false;
 

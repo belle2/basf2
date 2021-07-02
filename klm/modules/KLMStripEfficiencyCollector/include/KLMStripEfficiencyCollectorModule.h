@@ -127,8 +127,8 @@ namespace Belle2 {
      * @param[in] planeGlobal Plane global number.
      * @param[in] hitData     Hit data.
      */
-    void addHit(std::map<uint16_t, struct HitData>& hitMap,
-                uint16_t planeGlobal, struct HitData* hitData);
+    void addHit(std::map<KLMPlaneNumber, struct HitData>& hitMap,
+                KLMPlaneNumber planeGlobal, struct HitData* hitData);
 
     /**
      * Find matching digit.
@@ -166,6 +166,9 @@ namespace Belle2 {
 
     /** Whether to remove unused muons. */
     bool m_RemoveUnusedMuons;
+
+    /** Whether to ignore ExtHits with backward propagation. */
+    bool m_IgnoreBackwardPropagation;
 
     /** Channel status. */
     DBObjPtr<KLMChannelStatus> m_ChannelStatus;

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import numbers
 import json
@@ -10,7 +9,7 @@ from html import escape
 from dateutil.relativedelta import relativedelta
 
 
-class IPythonWidget(object):
+class IPythonWidget:
     """
     A base class for widgets in the hep ipython projects.
     """
@@ -118,7 +117,7 @@ class ProgressBarViewer(IPythonWidget):
                 self.progress_bar.value = float(current_percentage)
         else:
             # text_or_percentage is status string
-            self.progress_label.value = "Status: {}".format(text_or_percentage)
+            self.progress_label.value = f"Status: {text_or_percentage}"
             if "finished" in str(text_or_percentage):
                 self.progress_bar.value = 1.0
                 self.progress_bar.bar_style = "success"
@@ -243,7 +242,7 @@ class StatisticsViewer(IPythonWidget):
         return html
 
 
-class ProcessViewer(object):
+class ProcessViewer:
     """
     A widget to summarize all the infromation from different processes.
     Must be filled with the widgets of the single processes
@@ -369,7 +368,7 @@ class LogViewer(IPythonWidget):
                     level = message["level"].lower()
                     output.write(self.log_message.format(info=info, type_lower=level, var_output=variables, **message))
                     continue
-                except json.JSONDecodeError as e:
+                except json.JSONDecodeError:
                     # any error: treat as default output, not a log line
                     pass
 

@@ -4,14 +4,9 @@ import variables.collections as vc
 import variables.utils as vu
 import vertex as vx
 import stdCharged as stdc
-import sys
 import b2test_utils
 
-from basf2 import conditions
 from variables import variables
-from ROOT import Belle2
-from ROOT import TFile
-from ROOT import TNtuple
 
 variables.addAlias('TubeX', 'extraInfo(TubePosX)')
 variables.addAlias('TubeY', 'extraInfo(TubePosY)')
@@ -49,6 +44,7 @@ variables.addAlias('mcECms', 'useCMSFrame(mcE)')
 variables.addAlias('tube_dir_X', 'extraInfo(TubeDirX)')
 variables.addAlias('tube_dir_Y', 'extraInfo(TubeDirY)')
 variables.addAlias('tube_dir_Z', 'extraInfo(TubeDirZ)')
+variables.addAlias('tube_B_aparent_Momentum_from_creatorB', 'extraInfo(TubeB_p_estimated)')
 
 variables.addAlias('truex', 'matchedMC(x)')
 variables.addAlias('truey', 'matchedMC(y)')
@@ -90,7 +86,7 @@ ma.applyCuts('B-:sigT', 'abs(mcPDG)==521', path=my_path)
 
 ma.reconstructDecay('Upsilon(4S):sig -> B+:tag B-:sigT', '', path=my_path)
 
-mytestmodule2 = ma.register_module('BtubeCreator')
+mytestmodule2 = b2.register_module('BtubeCreator')
 # select the daughter which will be used as reference to create Btube.
 # Order of daughters should be identical to decay string used in
 # reconstructDecay
@@ -115,7 +111,8 @@ tube_vars = [
     'Tube22',
     'tube_dir_X',
     'tube_dir_Y',
-    'tube_dir_Z']
+    'tube_dir_Z',
+    'tube_B_aparent_Momentum_from_creatorB']
 
 common_vars = vc.kinematics + vc.vertex + vc.mc_vertex + vc.mc_truth + \
     vc.mc_kinematics + ['InvM', 'mcPxCms', 'mcPyCms', 'mcPzCms', 'mcECms']

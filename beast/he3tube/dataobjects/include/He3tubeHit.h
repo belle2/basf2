@@ -31,7 +31,11 @@ namespace Belle2 {
 
 
     /** Standard constructor
-     * @param energyDep Deposited energy in electrons
+     * @param energyDep the energy deposition in electrons
+     * @param detNb the tube number
+     * @param peakV peak
+     * @param time time of hit
+     * @param definiteNeutron true if this is definitely a neutron event
      */
     He3tubeHit(double energyDep, int detNb, double peakV, double time, bool definiteNeutron)
     {

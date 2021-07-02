@@ -170,7 +170,6 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
   //  }
 
   // various test patterns will be used to check the data
-  /* cppcheck-suppress variableScope */
   unsigned int testPattern;
 
   int revoClockLast = -1;
@@ -180,7 +179,12 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
   unsigned int errorCountEvent = 0;
 
   // need to know when a new decision is made (there could be more than one TOP L1 timing decision stored in the same B2L buffer)
+  // cppcheck-suppress variableScope
   int t0CombinedDecisionLast = -1;
+
+  bool performBufferAnalysis = true;
+  bool reportAllErrors = true;
+  bool reportSummaryErrors = true;
 
   // check if this event's buffer is a dummy buffer
   int counterDummyWindows = 0;
@@ -191,15 +195,21 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
     if (testPattern == testPatternDummyEvent) {
       counterDummyWindows++;
     }
+    // Oct. 31, 2020: three most significant bits are now used to control unpacker from FW
+    // Note that setting either flag for any of the windows changes it for all windows here
+    testPattern = (rdat[index + 2] >> 29) & 0x7;
+    if (testPattern & 0x1) performBufferAnalysis = false;
+    if (testPattern & 0x2) reportAllErrors = false;
+    if (testPattern & 0x4) reportSummaryErrors = false;
   }
 
-  bool performBufferAnalysis = true;
   // note that events with empty buffer have numberOfWindows=0
   if (counterDummyWindows == numberOfWindows) {
     performBufferAnalysis = false;
   } else {
     if (counterDummyWindows != 0) {
-      B2ERROR("Corrupted data? numberOfWindows = " << numberOfWindows << ", counterDummyWindows = " << counterDummyWindows);
+      if (reportAllErrors) B2ERROR("Corrupted data? numberOfWindows = " << numberOfWindows << ", counterDummyWindows = " <<
+                                     counterDummyWindows);
       performBufferAnalysis = false;
     }
   }
@@ -236,8 +246,9 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
               iWindowFirst = iWindow;
             }
           } else if (revoClockDeltaNow != -1276) {
-            B2ERROR("rvc changed by an unexpected number of units: " << revoClockDeltaNow << ", last rvc = " << revoClockLast <<
-                    ", current rvc = " << revoClockNow << ", window " << iWindow << ", index = " << index);
+            if (reportAllErrors) B2ERROR("rvc changed by an unexpected number of units: " << revoClockDeltaNow << ", last rvc = " <<
+                                           revoClockLast <<
+                                           ", current rvc = " << revoClockNow << ", window " << iWindow << ", index = " << index);
             numberRvcJumps++;
             if (windowRvcJumpFirst < 0) {
               windowRvcJumpFirst = iWindow;
@@ -257,8 +268,9 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
         if (cntr127DeltaNow != cntr127DeltaExpected) {
           // 65444 is the value of the difference in cntr127 (VME counter) because we use 16 bits of 64 bit-long counter (these numbers are such for 24 windows @ 32MHz)
           if (cntr127DeltaNow != 65444 && cntr127DeltaNow != -92 && cntr127DeltaNow != -65532) {
-            B2ERROR("cntr127 changed by an unexpected number of units: " << cntr127DeltaNow << ", cntr127 last = " << cntr127Last <<
-                    ", cntr127 now = " << cntr127Now << ", window " << iWindow << ", index = " << index + 1);
+            if (reportAllErrors) B2ERROR("cntr127 changed by an unexpected number of units: " << cntr127DeltaNow << ", cntr127 last = " <<
+                                           cntr127Last <<
+                                           ", cntr127 now = " << cntr127Now << ", window " << iWindow << ", index = " << index + 1);
             numberCntr127Jumps++;
             if (windowCntr127JumpFirst < 0) {
               windowCntr127JumpFirst = iWindow;
@@ -347,8 +359,9 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
       testPattern = (rdat[index] >> 16) & 0xffff;
       //    B2INFO("testPattern = " << std::hex << testPattern << std::dec);
       if (testPattern != testPatternExpected) {
-        //      B2ERROR("Unexpected test pattern 1: " << std::hex << testPattern << std::dec);
-        B2ERROR("Unexpected test pattern 1: " << std::hex << testPattern << std::dec << ", window " << iWindow << ", index = " << index);
+        //      if (reportAllErrors) B2ERROR("Unexpected test pattern 1: " << std::hex << testPattern << std::dec);
+        if (reportAllErrors) B2ERROR("Unexpected test pattern 1: " << std::hex << testPattern << std::dec << ", window " << iWindow <<
+                                       ", index = " << index);
         errorCountWindowMajor++;
       }
 
@@ -359,7 +372,8 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
       }
 
       if (dataFormatVersionNow != dataFormatVersionExpected) {
-        B2ERROR("Unexpected data format version: " << dataFormatVersionNow << ", window " << iWindow << ", index = " << index);
+        if (reportAllErrors) B2ERROR("Unexpected data format version: " << dataFormatVersionNow << ", window " << iWindow << ", index = " <<
+                                       index);
         errorCountWindowMajor++;
       }
 
@@ -372,14 +386,15 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
         int revoClockDeltaNow = revoClockNow - revoClockLast;
         if (revoClockDeltaNow != revoClockDeltaExpected) {
           if (revoClockDeltaNow != 1188 && revoClockDeltaNow != -92 && revoClockDeltaNow != -1276) {
-            B2ERROR("rvc changed by an unexpected number of units: " << revoClockDeltaNow << ", last rvc = " << revoClockLast <<
-                    ", current rvc = " << revoClockNow << ", window " << iWindow << ", index = " << index);
+            if (reportAllErrors) B2ERROR("rvc changed by an unexpected number of units: " << revoClockDeltaNow << ", last rvc = " <<
+                                           revoClockLast <<
+                                           ", current rvc = " << revoClockNow << ", window " << iWindow << ", index = " << index);
             errorCountWindowMinor++;
           }
         }
       }
       if (revoClockNow > 1279) {
-        B2ERROR("Unexpected rvc value = " << revoClockNow << ", window " << iWindow << ", index = " << index);
+        if (reportAllErrors) B2ERROR("Unexpected rvc value = " << revoClockNow << ", window " << iWindow << ", index = " << index);
         errorCountWindowMajor++;
       }
       revoClockLast = revoClockNow;
@@ -393,8 +408,9 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
         if (cntr127DeltaNow != cntr127DeltaExpected) {
           // 65444 is the value of the difference in cntr127 (VME counter) because we use 16 bits of 64 bit-long counter
           if (cntr127DeltaNow != 65444 && cntr127DeltaNow != -92 && cntr127DeltaNow != -65532) {
-            B2ERROR("cntr127 changed by an unexpected number of units: " << cntr127DeltaNow << ", cntr127 last = " << cntr127Last <<
-                    ", cntr127 now = " << cntr127Now << ", window " << iWindow << ", index = " << index + 1);
+            if (reportAllErrors) B2ERROR("cntr127 changed by an unexpected number of units: " << cntr127DeltaNow << ", cntr127 last = " <<
+                                           cntr127Last <<
+                                           ", cntr127 now = " << cntr127Now << ", window " << iWindow << ", index = " << index + 1);
             errorCountWindowMinor++;
           }
         }
@@ -404,7 +420,7 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
       testPattern = (rdat[index + 1]) & 0x0000ffff;
       //    B2INFO("testPattern = " << std::hex << testPattern << std::dec);
       if (testPattern != 0) {
-        B2ERROR("Unexpected test pattern 2: " << testPattern << ", window " << iWindow << ", index = " << index + 1);
+        if (reportAllErrors) B2ERROR("Unexpected test pattern 2: " << testPattern << ", window " << iWindow << ", index = " << index + 1);
         errorCountWindowMajor++;
       }
 
@@ -417,12 +433,13 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
       int revoClockGDL = (rdat[index + 2] >> 18) & 0x7ff;
       //    B2INFO("rvc when t0 was supposed to be posted to GDL/GRL = " << revoClockGDL);
 
-      testPattern = (rdat[index + 2] >> 29) & 0x7;
+      // Oct. 31, 2020: these three bits are now used to control unpacker from FW
+      //      testPattern = (rdat[index + 2] >> 29) & 0x7;
       //    B2INFO("testPattern = " << std::hex << testPattern << std::dec);
-      if (testPattern != 0) {
-        B2ERROR("Unexpected test pattern 3: " << testPattern << ", window " << iWindow << ", index = " << index + 2);
-        errorCountWindowMajor++;
-      }
+      //      if (testPattern != 0) {
+      //       if (reportAllErrors) B2ERROR("Unexpected test pattern 3: " << testPattern << ", window " << iWindow << ", index = " << index + 2);
+      //        errorCountWindowMajor++;
+      //      }
 
       int t0CombinedSegments[16];
 
@@ -448,7 +465,8 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
 
       for (int iSlot = 0; iSlot < NUMBER_OF_SLOTS; iSlot++) {
         if (t0CombinedSegments[iSlot] != 0) {
-          //  B2INFO("Slot " << iSlot+1 << ", segment = " << t0CombinedSegments[iSlot]);
+          //        if (t0CombinedSegments[iSlot] != 0 && iWindow == 0) {
+          //    B2INFO("Slot " << iSlot+1 << ", segment = " << t0CombinedSegments[iSlot]);
           nSegmentsCombinedDecision++;
         }
       }
@@ -474,25 +492,23 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
 
       int nSlotsCombinedDecision = 0;
 
+      int nSegmentErrors = 0;
+
       for (int iSlot = 0; iSlot < NUMBER_OF_SLOTS; iSlot++) {
         if (t0CombinedSegments[iSlot] != 0) {
-          //  B2INFO("Slot " << iSlot+1 << ", t0 (raw ns) = " << 3*t0CombinedSlots[iSlot]);
-          t0CombinedDecisionNowEstimated = t0CombinedDecisionNowEstimated + 3 * t0CombinedSlots[iSlot];
+          //    B2INFO("Slot " << iSlot+1 << ", t0 (raw ns) = " << 2 * t0CombinedSlots[iSlot]);
+          t0CombinedDecisionNowEstimated = t0CombinedDecisionNowEstimated + 2 * t0CombinedSlots[iSlot];
           nSlotsCombinedDecision++;
         } else if (t0CombinedSlots[iSlot] != 0) {
-          B2ERROR("Segment==0 for Slot " << iSlot + 1 << ", t0 (raw ns) = " << 3 * t0CombinedSlots[iSlot] << ", window " << iWindow);
+          if (reportAllErrors) B2ERROR("Segment==0 for Slot " << iSlot + 1 << ", t0 (raw ns) = " << 2 * t0CombinedSlots[iSlot] <<
+                                         ", nSegmentsCombinedDecision = " << nSegmentsCombinedDecision << ", combined t0 decision (FW) = " << t0CombinedDecisionNow <<
+                                         ", window " << iWindow);
           errorCountWindowMajor++;
+          nSegmentErrors++;
         }
       }
 
       //    if ( nSlotsCombinedDecision == 0 ) error = true;
-
-      if (nSlotsCombinedDecision != 0) {
-        t0CombinedDecisionNowEstimated = t0CombinedDecisionNowEstimated / nSlotsCombinedDecision;
-      } else {
-        t0CombinedDecisionNowEstimated = -1;
-        errorCountWindowMajor++;
-      }
 
       int nHitsSlots[16];
 
@@ -514,13 +530,17 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
       nHitsSlots[15] = (rdat[index + 20]) & 0x3ff;
 
       int nHitsCombinedDecision = 0;
+      int nSlotsHitsCombinedDecision = 0;
 
       for (int iSlot = 0; iSlot < NUMBER_OF_SLOTS; iSlot++) {
         if (t0CombinedSegments[iSlot] != 0) {
-          //  B2INFO("Slot " << iSlot+1 << ", N hits = " << nHitsSlots[iSlot]);
-          nHitsCombinedDecision++;
+          //          B2INFO("Slot " << iSlot+1 << ", N hits = " << nHitsSlots[iSlot]);
+          nSlotsHitsCombinedDecision++;
+          nHitsCombinedDecision = nHitsCombinedDecision + nHitsSlots[iSlot];
         } else if (nHitsSlots[iSlot] != 0) {
-          B2ERROR("Unexpected nHit = " << nHitsSlots[iSlot] << " for slot " << iSlot << ", window " << iWindow);
+          if (reportAllErrors) B2ERROR("Unexpected nHit (via segments) = " << nHitsSlots[iSlot] << " for slot " << iSlot + 1 <<
+                                         ", nSegmentsCombinedDecision = " << nSegmentsCombinedDecision << ", combined t0 decision (FW) = " << t0CombinedDecisionNow <<
+                                         ", window " << iWindow);
           errorCountWindowMajor++;
         }
       }
@@ -530,7 +550,8 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
         testPattern = (rdat[index + 13 + iWord]) & 0xfc00fc00;
         //    B2INFO("testPattern = " << std::hex << testPattern << std::dec);
         if (testPattern != 0) {
-          B2ERROR("Unexpected test pattern 4: " << testPattern << ", window " << iWindow << ", index = " << index + 13 + iWord);
+          if (reportAllErrors) B2ERROR("Unexpected test pattern 4: " << testPattern << ", window " << iWindow << ", index = " << index + 13 +
+                                         iWord);
           errorCountWindowMajor++;
         }
       }
@@ -577,11 +598,37 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
 
       for (int iSlot = 0; iSlot < NUMBER_OF_SLOTS; iSlot++) {
         if (t0CombinedSegments[iSlot] != 0) {
-          //  B2INFO("Slot " << iSlot+1 << ", log likelihood = " << logLikelihoodsSlots[iSlot]);
+          //    B2INFO("Slot " << iSlot+1 << ", log likelihood = " << logLikelihoodsSlots[iSlot]);
           nLogLikelihoodsCombinedDecision++;
         } else if (logLikelihoodsSlots[iSlot] != 0) {
-          B2ERROR("Unexpected log likelihood = " << logLikelihoodsSlots[iSlot] << " for slot " << iSlot << ", window " << iWindow);
+          if (reportAllErrors) B2ERROR("Unexpected log likelihood (via segments) = " << logLikelihoodsSlots[iSlot] << " for slot " << iSlot +
+                                         1 << ", nSegmentsCombinedDecision = " << nSegmentsCombinedDecision << ", combined t0 decision (FW) = " << t0CombinedDecisionNow <<
+                                         ", window " << iWindow);
           errorCountWindowMajor++;
+        }
+      }
+
+      if (nSlotsCombinedDecision != 0) {
+        t0CombinedDecisionNowEstimated = t0CombinedDecisionNowEstimated / nSlotsCombinedDecision;
+      } else {
+        t0CombinedDecisionNowEstimated = -1;
+        if (reportAllErrors) B2ERROR("nSlotsCombinedDecision (via segments) is zero! FW t0 decision = " << t0CombinedDecisionNow <<
+                                       ", window " << iWindow);
+        errorCountWindowMajor++;
+      }
+
+      if (reportAllErrors) {
+        if (nSegmentErrors != 0) {
+          B2ERROR("nSegmentErrors = " << nSegmentErrors << ", nSegmentsCombinedDecision = " << nSegmentsCombinedDecision <<
+                  ", combined t0 decision (FW) = " << t0CombinedDecisionNow << ", window " << iWindow);
+          for (int iSlot = 0; iSlot < NUMBER_OF_SLOTS; iSlot++) {
+            if (t0CombinedSegments[iSlot] == 0 && logLikelihoodsSlots[iSlot] != 0) {
+              B2ERROR("Segment==0, t0Combined (ns)   = " << 2 * t0CombinedSlots[iSlot] << " for slot " << iSlot + 1);
+              B2ERROR("Segment==0, nHits             = " << nHitsSlots[iSlot] << " for slot " << iSlot + 1);
+              B2ERROR("Segment==0, logLikelihood     = " << logLikelihoodsSlots[iSlot] << " for slot " << iSlot + 1);
+              B2ERROR("Segment==0, t0CombinedSegment = " << t0CombinedSegments[iSlot] << " for slot " << iSlot + 1);
+            }
+          }
         }
       }
 
@@ -606,7 +653,8 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
         testPattern = rdat[index];
         //    B2INFO("testPattern = " << std::hex << testPattern << std::dec);
         if (testPattern != testPatternExpected) {
-          B2ERROR("Unexpected test pattern 5: " << std::hex << testPattern << std::dec << ", window " << iWindow << ", index = " << index);
+          if (reportAllErrors) B2ERROR("Unexpected test pattern 5: " << std::hex << testPattern << std::dec << ", window " << iWindow <<
+                                         ", index = " << index);
           errorCountWindowMajor++;
         }
       } else if (dataFormatVersionExpected == 3) {
@@ -658,8 +706,8 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
           if ( t0CombinedSegments[iSlot] != 0 ) {
           B2INFO("slot= " << iSlot+1
           << ", segment= " << t0CombinedSegments[iSlot]
-          << ", TOP timing (+1735, ns, frame) = " << (int) ((3*t0CombinedSlots[iSlot])%10240*clkTo1ns+1735)
-          << ", t0 (raw ns, frame9) = " << 3*t0CombinedSlots[iSlot]
+          << ", TOP timing (+1735, ns, frame) = " << (int) (( 2 * t0CombinedSlots[iSlot])%10240*clkTo1ns+1735)
+          << ", t0 (raw ns, frame9) = " << 2 * t0CombinedSlots[iSlot]
           << ", N hits= " << nHitsSlots[iSlot]
           << ", log L= " << logLikelihoodsSlots[iSlot]
           );
@@ -713,7 +761,7 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
             logLSum_d = logLSum_d + logLikelihoodsSlots[iSlot];
             logLSum2_d = logLSum2_d + logLikelihoodsSlots[iSlot] * logLikelihoodsSlots[iSlot];
 
-            int timingNow = (3 * t0CombinedSlots[iSlot] % 10240);
+            int timingNow = (2 * t0CombinedSlots[iSlot] % 10240);
 
             //    B2INFO("   timingNow = " << timingNow );
 
@@ -721,7 +769,7 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
             timingSum2_d = timingSum2_d + pow(timingNow, 2);
 
             TRGTOPSlotTiming slotTiming(iSlot + 1);
-            slotTiming.setSlotTiming(3 * t0CombinedSlots[iSlot]);
+            slotTiming.setSlotTiming(2 * t0CombinedSlots[iSlot]);
             slotTiming.setSlotSegment(t0CombinedSegments[iSlot]);
             slotTiming.setSlotNHits(nHitsSlots[iSlot]);
             slotTiming.setSlotLogL(logLikelihoodsSlots[iSlot]);
@@ -789,22 +837,24 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
   // at this time any unexpected features in the data are lumped together
   // this includes possibly corrupted data (checksum would be a better solution to diagnose such problem)
   // AND incorrectly prepared (but not corrupted) data
-  if (errorCountEvent != 0) {
-    B2INFO("Number of instances of unexpected data diagnozed during unpacking = " << errorCountEvent);
-  }
+  if (reportSummaryErrors) {
+    if (errorCountEvent != 0) {
+      B2INFO("Number of instances of unexpected data diagnozed during unpacking = " << errorCountEvent);
+    }
 
-  if (numberRvcJumps > 0) {
-    B2INFO("The number of rvc jumps = " << numberRvcJumps);
-    B2INFO("The window of the first rvc jump = " << windowRvcJumpFirst);
-    B2INFO("The number of clock cycles associated with the first rvc jump = " << clocksRvcJumpFirst);
-    B2INFO("The number of combined decisions = " << m_TRGTOPCombinedTimingArray.getEntries());
-  }
+    if (numberRvcJumps > 0) {
+      B2INFO("The number of rvc jumps = " << numberRvcJumps);
+      B2INFO("The window of the first rvc jump = " << windowRvcJumpFirst);
+      B2INFO("The number of clock cycles associated with the first rvc jump = " << clocksRvcJumpFirst);
+      B2INFO("The number of combined decisions = " << m_TRGTOPCombinedTimingArray.getEntries());
+    }
 
-  if (numberCntr127Jumps > 0) {
-    B2INFO("The number of cntr127 jumps = " << numberCntr127Jumps);
-    B2INFO("The window of the first cntr127 jump = " << windowCntr127JumpFirst);
-    B2INFO("The number of clock cycles associated with the first cntr127 jump = " << clocksCntr127JumpFirst);
-    B2INFO("The number of combined decisions = " << m_TRGTOPCombinedTimingArray.getEntries());
+    if (numberCntr127Jumps > 0) {
+      B2INFO("The number of cntr127 jumps = " << numberCntr127Jumps);
+      B2INFO("The window of the first cntr127 jump = " << windowCntr127JumpFirst);
+      B2INFO("The number of clock cycles associated with the first cntr127 jump = " << clocksCntr127JumpFirst);
+      B2INFO("The number of combined decisions = " << m_TRGTOPCombinedTimingArray.getEntries());
+    }
   }
 
   // need to store the info about error rate / type of errors in unpacking

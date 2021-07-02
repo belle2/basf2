@@ -35,7 +35,11 @@ namespace Belle2 {
       m_nLayers(0),
       m_firstLayer(0),
       m_lastLayer(0),
-      m_trigger(false)
+      m_trigger(false),
+      m_bklm_n_trg_sectors(0),
+      m_eklm_n_trg_sectors(0),
+      m_bklm_back_to_back_flag(0),
+      m_eklm_back_to_back_flag(0)
     { }
 
     //! Constructor with initial values for a track
@@ -56,7 +60,11 @@ namespace Belle2 {
       m_nLayers(0),
       m_firstLayer(0),
       m_lastLayer(0),
-      m_trigger(false)
+      m_trigger(false),
+      m_bklm_n_trg_sectors(0),
+      m_eklm_n_trg_sectors(0),
+      m_bklm_back_to_back_flag(0),
+      m_eklm_back_to_back_flag(0)
     { }
 
     //! Destructor
@@ -170,6 +178,27 @@ namespace Belle2 {
     //! @param trg if the track generates a trigger
     void setTrigger(bool trg) { m_trigger = trg; }
 
+
+    void setBKLM_n_trg_sectors(int n_trg)
+    {
+      m_bklm_n_trg_sectors = n_trg;
+    }
+
+
+    void setEKLM_n_trg_sectors(int n_trg)
+    {
+      m_eklm_n_trg_sectors = n_trg;
+    }
+    void setBKLM_back_to_back_flag(int n_trg)
+    {
+      m_bklm_back_to_back_flag = n_trg;
+
+    }
+    void setEKLM_back_to_back_flag(int n_trg)
+    {
+      m_eklm_back_to_back_flag = n_trg;
+
+    }
   private:
     //! forward-backward
     int m_fwd;
@@ -215,6 +244,13 @@ namespace Belle2 {
 
     //! if the track generates a trigger
     bool m_trigger;
+
+
+    int  m_bklm_n_trg_sectors;
+    int  m_eklm_n_trg_sectors;
+    int  m_bklm_back_to_back_flag;
+    int  m_eklm_back_to_back_flag;
+
 
     //! Needed to make the ROOT object storable
     //! version 4 adds ctime etc

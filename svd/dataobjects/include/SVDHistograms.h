@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Eugenio Paoloni, Giulia Casarosa                         *
+ * Contributors: Eugenio Paoloni, Giulia Casarosa, Ludovico Massaccesi    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  * WARNING! Have the potential to cause addiction, but not always...      *
@@ -27,7 +27,7 @@ namespace Belle2 {
     SVDHistograms():
       SVDHistograms(H(), H(), H() , H()) {}; /**< the class is built with a default histogram for L3 and L456, U and V sides*/
 
-    /** Use @param template to initialize all the histograms*/
+    /** Use @param templateHisto to initialize all the histograms*/
     explicit SVDHistograms(const H& templateHisto):
       SVDHistograms(templateHisto, templateHisto,
                     templateHisto, templateHisto)
@@ -56,9 +56,9 @@ namespace Belle2 {
     {
       H* returnValue = m_defaultHistogram;
       try {
-        auto layer = m_histograms.at(vxdID.getLayerNumber());
-        auto ladder = layer.at(vxdID.getLadderNumber());
-        auto sensor = ladder.at(vxdID.getSensorNumber());
+        auto& layer = m_histograms.at(vxdID.getLayerNumber());
+        auto& ladder = layer.at(vxdID.getLadderNumber());
+        auto& sensor = ladder.at(vxdID.getSensorNumber());
         returnValue = sensor.at(view);
       } catch (...) {
         B2WARNING("Unexpected VxdID /view. VxdID: " << (std::string)(vxdID)
@@ -106,14 +106,22 @@ namespace Belle2 {
     void clean()
     {
 
-      for (auto layer : m_histograms)
-        for (auto ladder : layer)
-          for (auto sensor : ladder)
-            for (auto view : sensor)
+      for (auto& layer : m_histograms)
+        for (auto& ladder : layer)
+          for (auto& sensor : ladder)
+            for (auto& view : sensor)
               delete view;
     }
 
-
+    /** Call Reset() on all histograms */
+    void reset()
+    {
+      for (auto& layer : m_histograms)
+        for (auto& ladder : layer)
+          for (auto& sensor : ladder)
+            for (auto& view : sensor)
+              view->Reset();
+    }
 
 
   private:

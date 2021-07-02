@@ -16,7 +16,7 @@
 //! *************************************************************
 
 #include <pxd/dataobjects/PXDRawAdc.h>
-#include <boost/spirit/home/support/detail/endian.hpp>
+#include <boost/endian/arithmetic.hpp>
 #include <framework/logging/Logger.h>
 #include <cstring>
 
@@ -27,7 +27,7 @@ PXDRawAdc::PXDRawAdc(VxdID sensorID, void* data, int len):
   m_sensorID(sensorID) , m_adcs()
 {
   unsigned char* d = (unsigned char*)data;
-  m_dhp_header = ((boost::spirit::endian::ubig16_t*)data)[2];
+  m_dhp_header = ((boost::endian::big_uint16_t*)data)[2];
   d += 8; // Skip DHH and DHP header, data is 64kb large (+ 8 bytes)
   len -= 8;
   if (len < 0) {

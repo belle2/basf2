@@ -1,6 +1,7 @@
 #include "trg/cdc/modules/trgcdc/CDCTriggerTSFModule.h"
 
 #include <cdc/dataobjects/CDCSimHit.h>
+#include <cdc/dataobjects/CDCRawHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -63,7 +64,11 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
   addParam("Deadchannel",
            m_deadchflag,
            "Mask dead channels based on database. True:mask False:unmask",
-           false);
+           true);
+  addParam("Crosstalk_tdcfilter",
+           m_crosstalk_tdcfilter,
+           "TDC based crosstalk filtering logic on CDCFE. True:enable False:disable",
+           true);
 }
 
 void
@@ -86,7 +91,7 @@ CDCTriggerTSFModule::initialize()
   // Prepare track segment shapes.
   // First a structure of wires is created for all layers and super layers.
   // Each track segment consists of pointers to wires in this structure.
-  CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
+  const CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
   const unsigned nLayers = cdc.nWireLayers();
   TRGClock* clockTDC = new TRGClock("CDCTrigger TDC clock", 0, 500. / cdc.getTdcBinWidth());
   TRGClock* clockData = new TRGClock("CDCTrigger data clock", *clockTDC, 1, 16);
@@ -283,9 +288,60 @@ CDCTriggerTSFModule::initialize()
 void
 CDCTriggerTSFModule::event()
 {
-  CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
+  const CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
 
   // fill CDCHits into track segment shapes
+
+  //crosstalk filter
+  vector<int> filtered_hit;
+  for (int i = 0; i < m_cdcHits.getEntries(); ++i) {
+    filtered_hit.push_back(0);
+  }
+
+  if (m_crosstalk_tdcfilter) {
+    //check number of hits in each asic
+    int ncdchit_asic[500][6] = {0};
+    vector<int> id_ncdchit_asic[500][6];
+    for (int i = 0; i < m_cdcHits.getEntries(); ++i) {
+      RelationVector<CDCRawHit> cdcrawHits = m_cdcHits[i]->getRelationsTo<CDCRawHit>();
+      if (cdcrawHits.size() > 0) {
+        CDCRawHit* cdcrawhit = cdcrawHits[0];
+        int boardid = cdcrawhit->getBoardId();
+        int fechid = cdcrawhit->getFEChannel();
+        int asicid = fechid / 8;
+        if (boardid >= 0 && boardid < 500 && asicid >= 0 && asicid < 6) {
+          ncdchit_asic[boardid][asicid]++;
+          id_ncdchit_asic[boardid][asicid].push_back(i);
+        }
+      }
+    }
+    //check 16ns time coinsidence if >=4 hits are found in the same asic
+    for (int i = 0; i < 500; i++) {
+      for (int j = 0; j < 6; j++) {
+        if (ncdchit_asic[i][j] >= 4) {
+          std::vector<short> tdc_asic;
+          for (int k = 0; k < ncdchit_asic[i][j]; k++) {
+            short tdc = m_cdcHits[id_ncdchit_asic[i][j][k]]->getTDCCount();
+            tdc_asic.push_back(tdc);
+          }
+          std::sort(tdc_asic.begin(), tdc_asic.end());
+          for (int ncoin = ncdchit_asic[i][j]; ncoin >= 4; ncoin--) {
+            for (int k = 0; k < ncdchit_asic[i][j] - ncoin; k++) {
+              if (tdc_asic[k + ncoin - 1] - tdc_asic[k] <= 16) {
+                for (int l = k; l < k + ncoin - 1; l++) {
+                  filtered_hit[id_ncdchit_asic[i][j][l]] = 1;
+                }
+                //break loop
+                ncoin = 0;
+                k = 8;
+              }
+            }
+          }
+          tdc_asic.clear();
+        }
+      }
+    }
+  }
 
   //...Loop over CDCHits...
   for (int i = 0; i < m_cdcHits.getEntries(); ++i) {
@@ -297,6 +353,9 @@ CDCTriggerTSFModule::event()
         continue;
       }
     }
+    // skim crosstalk hit
+    if (filtered_hit[i] == 1)continue;
+
     TRGCDCWire& w =
       (TRGCDCWire&) superLayers[h.getISuperLayer()][h.getILayer()]->cell(h.getIWire());
 

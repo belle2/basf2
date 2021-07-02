@@ -13,6 +13,9 @@
 
 #include <vector>
 #include <utility>
+#include <limits>
+
+static const double realNaN = std::numeric_limits<double>::quiet_NaN();
 
 namespace Belle2 {
   namespace ECL {
@@ -71,43 +74,43 @@ namespace Belle2 {
       static constexpr double _filterdt = 0.2;
 
       /** linear coefficient before sin of the first Bessel stage    */
-      double _cs0;
+      double _cs0 = realNaN;
       /** linear coefficient before cos of the first Bessel stage    */
-      double _cc0;
+      double _cc0 = realNaN;
       /** linear coefficient before sin of the second Bessel stage    */
-      double _cs1;
+      double _cs1 = realNaN;
       /** linear coefficient before cos of the second Bessel stage    */
-      double _cc1;
+      double _cc1 = realNaN;
       /** linear coefficient before first part of tail section    */
-      double _ces;
+      double _ces = realNaN;
       /** linear coefficient before second part of tail section    */
-      double _ced;
+      double _ced = realNaN;
       /**  circular frequency of the first Bessel stage  */
-      double  _dw0;
+      double  _dw0 = realNaN;
       /**  circular frequency of the second Bessel stage  */
-      double  _dw1;
+      double  _dw1 = realNaN;
       /**  decrement of the first Bessel stage  */
-      double _dks0;
+      double _dks0 = realNaN;
       /**  decrement of the second Bessel stage  */
-      double _dks1;
+      double _dks1 = realNaN;
       /** inverse scintillation decay time */
-      double   _ds;
+      double   _ds = realNaN;
       /** inverse time of the differential stage */
-      double   _dd;
+      double   _dd = realNaN;
       /** coefficient for first exponent factor  */
-      double  _dt0;
+      double  _dt0 = realNaN;
       /** coefficient for second exponent factor  */
-      double  _dt1;
+      double  _dt1 = realNaN;
 
       /** time offset  */
-      double _toff;
+      double _toff = realNaN;
       /** weight coefficient at sv123(t)  = (1-a)  */
-      double  _w0;
+      double  _w0 = realNaN;
       /** weight coefficient at sv123(t+_filterdt) +sv123(t-_filterdt)  = a/2  */
-      double  _w1;
+      double  _w1 = realNaN;
 
       /**  exponent factor for tail part of the signal   */
-      double _ccc;
+      double _ccc = realNaN;
 
       /**  _filterdt   */
       sv123shift_t _tp;

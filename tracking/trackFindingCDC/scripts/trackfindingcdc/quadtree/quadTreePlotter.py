@@ -1,11 +1,7 @@
 from trackfindingcdc.cdcdisplay.svgdrawing import attributemaps
 import bisect
 from datetime import datetime
-import subprocess
 import numpy as np
-import matplotlib.cm as cmx
-import matplotlib.colors as colors
-import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import basf2
 import ROOT
@@ -72,11 +68,11 @@ class QuadTreePlotter(basf2.Module):
         xAxis = hist.GetXaxis()
         yAxis = hist.GetYaxis()
 
-        x_edges = np.array([xAxis.GetBinLowEdge(iX) for iX in xrange(1, xAxis.GetNbins() + 2)])
-        y_edges = np.array([yAxis.GetBinLowEdge(iY) for iY in xrange(1, yAxis.GetNbins() + 2)])
+        x_edges = np.array([xAxis.GetBinLowEdge(iX) for iX in range(1, xAxis.GetNbins() + 2)])
+        y_edges = np.array([yAxis.GetBinLowEdge(iY) for iY in range(1, yAxis.GetNbins() + 2)])
 
-        l2 = np.array([[hist.GetBinContent(iX, iY) for iY in xrange(1, yAxis.GetNbins() + 1)]
-                       for iX in xrange(1, xAxis.GetNbins() + 1)])
+        l2 = np.array([[hist.GetBinContent(iX, iY) for iY in range(1, yAxis.GetNbins() + 1)]
+                       for iX in range(1, xAxis.GetNbins() + 1)])
 
         cmap = sb.cubehelix_palette(8, start=2, rot=0, dark=0, light=1, reverse=False, as_cmap=True)
 
@@ -510,14 +506,14 @@ class StereoQuadTreePlotter(QuadTreePlotter):
                     recoHit3D = Belle2.TrackFindingCDC.CDCRecoHit3D.reconstruct(wireHit, rlInfo, trajectory)
 
                     if (self.delete_bad_hits and
-                        (rlWireHit.getRLInfo() != mcHitLookUp.getRLInfo(rlWireHit.getWireHit().getHit()) or
+                        (wireHit.getRLInfo() != mcHitLookUp.getRLInfo(wireHit.getWireHit().getHit()) or
                          not recoHit3D.isInCellZBounds())):
                         continue
 
                     if recoHit3D in list(last_track.items()):
                         color = map[len(track_vector) % len(map)]
                     else:
-                        if rlWireHit.getRLInfo() == 1:
+                        if wireHit.getRLInfo() == 1:
                             color = "black"
                         else:
                             color = "gray"

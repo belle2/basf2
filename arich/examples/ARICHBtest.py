@@ -6,13 +6,13 @@
 # basf2 arich/examples/ARICHBtest2011.py --
 #       -r 102 -n 10000
 #
-from basf2 import *
+import basf2 as b2
 from optparse import OptionParser
 import os
 import os.path
 import sys
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 outroot = 'arichbtest.root'
 
@@ -71,13 +71,13 @@ print('TrackMask:' + options.mask)
 # this variable is called from GeoARICHBtest2011Creator
 averageagel = int(options.avgagel)
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [int(options.neve)])
 eventinfosetter.param('runList', [int(options.runno)])
 eventinfosetter.param('expList', [1])
 
 # Load XML parameters
-paramloader = register_module('Gearbox')
+paramloader = b2.register_module('Gearbox')
 
 xmlgeometry = 'file://%s/arich/modules/arichBtest/data/%s/arichBtest%s.xml' \
     % (os.getcwd(), options.year, options.year)
@@ -96,10 +96,10 @@ paramloader.param('fileName', xmlgeometry)
 # paramloader.param('Filename',
 #   'file:///net/f9pc137/data0/belle2/rok/local/basf2/test/Belle2-merged.xml');
 # Create Geometry
-geobuilder = register_module('Geometry')
+geobuilder = b2.register_module('Geometry')
 geobuilder.param('components', ['ARICHBtest'])
 
-btest = register_module('arichBtest')
+btest = b2.register_module('arichBtest')
 btest.param('mwpcTrackMask', [mask])
 # btest.param('Filename', 'arich/modules/arichBtest/data/2011/track.dat')
 btest.param('runList', [fname])
@@ -111,7 +111,7 @@ print('Beam momentum ' + str(momentum))
 btest.param('beamMomentum', momentum)
 
 # Simulation module
-g4sim = register_module('FullSim')
+g4sim = b2.register_module('FullSim')
 # This line is necessary if you want to simulate Cerenkov photons!
 # By default optical processes are not registered.
 g4sim.param('RegisterOptics', 1)
@@ -128,19 +128,19 @@ g4sim.param('UICommandsAtIdle', ['/vis/open VRML2FILE', '/vis/drawVolume',
                                  '/vis/scene/add/axes 0 0 0 100 mm'])
 
 # Saves the geometry as a Root file
-geosaver = register_module('ExportGeometry')
+geosaver = b2.register_module('ExportGeometry')
 geosaver.param('Filename', 'Belle2Geo.root')
 
-arichrec = register_module('ARICHReconstructor')
+arichrec = b2.register_module('ARICHReconstructor')
 arichrec.param('inputTrackType', 1)
 arichrec.param('beamtest', 3)
 arichrec.param('trackPositionResolution', 0.0)
 arichrec.param('trackAngleResolution', 0.0)
 
-profile = register_module('Profile')
+profile = b2.register_module('Profile')
 profile.param('outputFileName', 'profileusage.ps')
 
-main = create_path()
+main = b2.create_path()
 main.add_module(eventinfosetter)
 main.add_module(paramloader)
 # main.add_module(profile)
@@ -150,8 +150,8 @@ main.add_module(arichrec)
 # main.add_module(g4sim)
 main.add_module(geosaver)
 
-process(main)
+b2.process(main)
 
 # Print basic event statistics to stdout
 print('Event Statistics:')
-print(statistics)
+print(b2.statistics)

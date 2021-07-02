@@ -133,6 +133,7 @@ int main(int argc, char* argv[])
     ("help,h", "Print this help")
     ("version,v", "Print version string")
     ("info", "Print information about basf2")
+    ("license", "Print the short version of the basf2 license")
     ("modules,m", prog::value<string>()->implicit_value(""),
      "Print a list of all available modules (can be limited to a given package), or give detailed information on a specific module given as an argument (case sensitive).")
     ;
@@ -181,6 +182,8 @@ int main(int argc, char* argv[])
      "Use ZMQ for multiprocessing instead of a RingBuffer. This has many implications and should only be used by experts.")
     ("job-information", prog::value<string>(),
      "Create json file with metadata of output files and basf2 execution status.")
+    ("realm", prog::value<string>(),
+     "Set the realm of the basf2 execution (online or production).")
 #ifdef HAS_CALLGRIND
     ("profile", prog::value<string>(),
      "Name of a module to profile using callgrind. If more than one module of that name is registered only the first one will be profiled.")
@@ -208,6 +211,8 @@ int main(int argc, char* argv[])
       pythonFile = "basf2/version.py";
     } else if (varMap.count("info")) {
       pythonFile = "basf2_cli/print_info.py";
+    } else if (varMap.count("license")) {
+      pythonFile = "basf2_cli/print_license.py";
     } else if (varMap.count("modules")) {
       string modArgs = varMap["modules"].as<string>();
       if (!modArgs.empty()) {
@@ -390,6 +395,22 @@ int main(int argc, char* argv[])
       string jobInfoFile = varMap["job-information"].as<string>();
       MetadataService::Instance().setJsonFileName(jobInfoFile);
       B2INFO("Job information file: " << jobInfoFile);
+    }
+
+    if (varMap.count("realm")) {
+      std::string realmParam = varMap["realm"].as<string>();
+      int realm = -1;
+      for (int i = LogConfig::c_Online; i <= LogConfig::c_Production; i++) {
+        std::string thisRealm = LogConfig::logRealmToString((LogConfig::ELogRealm)i);
+        if (boost::iequals(realmParam, thisRealm)) { //case-insensitive
+          realm = i;
+          break;
+        }
+      }
+      if (realm < 0) {
+        B2FATAL("Invalid realm! Needs to be one of online or production.");
+      }
+      Environment::Instance().setRealm((LogConfig::ELogRealm)realm);
     }
 
 

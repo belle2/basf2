@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 
 import basf2
 
-from . import utilities
+from tracking.run import utilities
 
 import argparse
 import logging
@@ -87,7 +86,6 @@ class EmptyRun(object):
 
     def adjust_path(self, path):
         """Hook that gives the opportunity to check the path for consistency before processing it"""
-        pass
 
 # Minimal run stub defining some general parameters
 

@@ -1,6 +1,7 @@
 #include <analysis/utility/DecayNode.h>
 #include <analysis/utility/DecayTree.h>
 #include <analysis/utility/DecayForest.h>
+#include <framework/gearbox/Const.h>
 
 #include <gtest/gtest.h>
 
@@ -14,13 +15,12 @@ namespace {
   {
     DecayNode photon_1(22);
     DecayNode photon_2(22);
-    // cppcheck-suppress unreadVariable ; cppcheck complains that 'pi0' is assigned a value that is never used?
     DecayNode pi0(111, {photon_1, photon_2});
 
-    EXPECT_EQ(photon_1.pdg, 22);
+    EXPECT_EQ(photon_1.pdg, Const::photon.getPDGCode());
     EXPECT_EQ(photon_1.daughters.size(), 0);
 
-    EXPECT_EQ(pi0.pdg, 111);
+    EXPECT_EQ(pi0.pdg, Const::pi0.getPDGCode());
     EXPECT_EQ(pi0.daughters.size(), 2);
 
   }
@@ -137,17 +137,17 @@ namespace {
 
     EXPECT_EQ(D_1.getMatchSymbolPosition(), 3);
     EXPECT_EQ(D_1.getNumberOfDecayNodes(), 5);
-    EXPECT_EQ(D_1.getDecayNode(3).pdg, 11);
+    EXPECT_EQ(D_1.getDecayNode(3).pdg, Const::electron.getPDGCode());
     EXPECT_EQ(D_1.getDecayNode(3).daughters.size(), 0);
 
     EXPECT_EQ(D_2.getMatchSymbolPosition(), 1);
     EXPECT_EQ(D_2.getNumberOfDecayNodes(), 5);
-    EXPECT_EQ(D_2.getDecayNode(1).pdg, 11);
+    EXPECT_EQ(D_2.getDecayNode(1).pdg, Const::electron.getPDGCode());
     EXPECT_EQ(D_2.getDecayNode(1).daughters.size(), 0);
 
     EXPECT_EQ(D_3.getMatchSymbolPosition(), 0);
     EXPECT_EQ(D_3.getNumberOfDecayNodes(), 5);
-    EXPECT_EQ(D_3.getDecayNode(0).pdg, 321);
+    EXPECT_EQ(D_3.getDecayNode(0).pdg, Const::kaon.getPDGCode());
     EXPECT_EQ(D_3.getDecayNode(0).daughters.size(), 2);
 
   }
@@ -157,29 +157,29 @@ namespace {
 
     DecayTree photon("22");
     EXPECT_EQ(photon.getNumberOfDecayNodes(), 1);
-    EXPECT_EQ(photon.getDecayNode(0).pdg, 22);
+    EXPECT_EQ(photon.getDecayNode(0).pdg, Const::photon.getPDGCode());
     EXPECT_EQ(photon.getDecayNode(0).daughters.size(), 0);
 
     DecayTree pi0("111 (--> 22 22)");
     EXPECT_EQ(pi0.getNumberOfDecayNodes(), 3);
-    EXPECT_EQ(pi0.getDecayNode(0).pdg, 111);
+    EXPECT_EQ(pi0.getDecayNode(0).pdg, Const::pi0.getPDGCode());
     EXPECT_EQ(pi0.getDecayNode(0).daughters.size(), 2);
-    EXPECT_EQ(pi0.getDecayNode(1).pdg, 22);
+    EXPECT_EQ(pi0.getDecayNode(1).pdg, Const::photon.getPDGCode());
     EXPECT_EQ(pi0.getDecayNode(1).daughters.size(), 0);
-    EXPECT_EQ(pi0.getDecayNode(2).pdg, 22);
+    EXPECT_EQ(pi0.getDecayNode(2).pdg, Const::photon.getPDGCode());
     EXPECT_EQ(pi0.getDecayNode(2).daughters.size(), 0);
 
     DecayTree D("321 (--> 11 111 (--> 11 -11))");
     EXPECT_EQ(D.getNumberOfDecayNodes(), 5);
-    EXPECT_EQ(D.getDecayNode(0).pdg, 321);
+    EXPECT_EQ(D.getDecayNode(0).pdg, Const::kaon.getPDGCode());
     EXPECT_EQ(D.getDecayNode(0).daughters.size(), 2);
-    EXPECT_EQ(D.getDecayNode(1).pdg, 11);
+    EXPECT_EQ(D.getDecayNode(1).pdg, Const::electron.getPDGCode());
     EXPECT_EQ(D.getDecayNode(1).daughters.size(), 0);
-    EXPECT_EQ(D.getDecayNode(2).pdg, 111);
+    EXPECT_EQ(D.getDecayNode(2).pdg, Const::pi0.getPDGCode());
     EXPECT_EQ(D.getDecayNode(2).daughters.size(), 2);
-    EXPECT_EQ(D.getDecayNode(3).pdg, 11);
+    EXPECT_EQ(D.getDecayNode(3).pdg, Const::electron.getPDGCode());
     EXPECT_EQ(D.getDecayNode(3).daughters.size(), 0);
-    EXPECT_EQ(D.getDecayNode(4).pdg, -11);
+    EXPECT_EQ(D.getDecayNode(4).pdg, -Const::electron.getPDGCode());
     EXPECT_EQ(D.getDecayNode(4).daughters.size(), 0);
 
   }
@@ -193,14 +193,14 @@ namespace {
 
     auto& reconstructed_decay_tree = D.getReconstructedTree();
     EXPECT_EQ(reconstructed_decay_tree.getNumberOfDecayNodes(), 5);
-    EXPECT_EQ(reconstructed_decay_tree.getDecayNode(0).pdg, 321);
+    EXPECT_EQ(reconstructed_decay_tree.getDecayNode(0).pdg, Const::kaon.getPDGCode());
 
     auto& no_match_decay_tree = D.getTree(1);
     EXPECT_FALSE(no_match_decay_tree.isValid());
 
     auto& original_decay_tree = D.getOriginalTree();
     EXPECT_TRUE(original_decay_tree.isValid());
-    EXPECT_EQ(original_decay_tree.getDecayNode(0).pdg, 111);
+    EXPECT_EQ(original_decay_tree.getDecayNode(0).pdg, Const::pi0.getPDGCode());
 
   }
 
@@ -213,14 +213,14 @@ namespace {
 
     auto& reconstructed_decay_tree = D.getReconstructedTree();
     EXPECT_EQ(reconstructed_decay_tree.getNumberOfDecayNodes(), 5);
-    EXPECT_EQ(reconstructed_decay_tree.getDecayNode(0).pdg, 321);
+    EXPECT_EQ(reconstructed_decay_tree.getDecayNode(0).pdg, Const::kaon.getPDGCode());
 
     auto& no_match_decay_tree = D.getTree(1);
     EXPECT_FALSE(no_match_decay_tree.isValid());
 
     auto& original_decay_tree = D.getOriginalTree();
     EXPECT_TRUE(original_decay_tree.isValid());
-    EXPECT_EQ(original_decay_tree.getDecayNode(0).pdg, 111);
+    EXPECT_EQ(original_decay_tree.getDecayNode(0).pdg, Const::pi0.getPDGCode());
 
   }
 

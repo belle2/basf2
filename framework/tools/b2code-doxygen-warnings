@@ -17,27 +17,27 @@ supply them as arguments:
 
 To run on the full release directory run it without any arguments:
     $0
+
+Use the option --all to show all doxygen warnings and not only those about
+undocumented items.
 EOT
     exit 1;
 fi
 
+# check for all option
+GREP_STR=" not documented"
+if [ "$1" = "--all" ]; then
+  GREP_STR=""
+  shift
+fi
+
 # collect arguments or use belle2 release directory
 FILES=${@:-$BELLE2_LOCAL_DIR}
-# create temp dir for output
-tmpdir=`mktemp -d`
-# remove temporary directory on exit
-trap "rm -rf $tmpdir" EXIT
-# create script to convert #: comments to doxygen ## on the fly
-cat <<EOT > $tmpdir/doxygen_filter.sh
-#!/bin/sh
-sed -e 's/#: /## /' \$1
-EOT
-chmod +x $tmpdir/doxygen_filter.sh
+
+# store doxygen error messages in temporary file
+TMPFILE=`mktemp`
+trap "rm -f $TMPFILE" EXIT
+
 # call doxygen on the files from the command line arguments
-cat <<EOT | doxygen - 2>&1 >/dev/null | grep "is not documented" && exit 1 || exit 0
-OUTPUT_DIRECTORY=$tmpdir
-INPUT_FILTER=$tmpdir/doxygen_filter.sh
-HAVE_DOT=NO
-INPUT=$FILES
-RECURSIVE=YES
-EOT
+sed "s;INPUT                  =;INPUT                  = ${FILES};" ${BELLE2_LOCAL_DIR}/site_scons/doxygen/Doxyfile | doxygen - 2>&1 >/dev/null | grep "${GREP_STR}" | tee $TMPFILE
+grep " not documented" $TMPFILE > /dev/null && exit 1 || exit 0

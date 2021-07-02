@@ -7,6 +7,7 @@ Perform code quality cppchecks for every commit to the reconstruction package.
 
 import re
 from b2test_utils import check_error_free
+from b2test_utils import skip_test
 
 if __name__ == "__main__":
     # Comment from Giacomo: this is a temporary workaround, since this package is affected by cppcheck warnings
@@ -15,4 +16,4 @@ if __name__ == "__main__":
     # but at least the test will correctly check if there are cppcheck warnings affecting this package.
     ignoreme = r"^((?!reconstruction\/).)*$"
     check_error_free("b2code-cppcheck", "cppcheck", "reconstruction",
-                     lambda x: re.findall(ignoreme, x) or x is "'")
+                     lambda x: re.findall(ignoreme, x) or x == "'")

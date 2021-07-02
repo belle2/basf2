@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
 from ROOT import Belle2
 
 payload = Belle2.CDCAlignment()

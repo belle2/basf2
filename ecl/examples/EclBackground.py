@@ -23,8 +23,6 @@ found here:
     https://confluence.desy.de/display/BI/Background+WebHome
 """
 
-import os
-import sys
 import subprocess
 import basf2 as b2
 from reconstruction import add_ecl_modules

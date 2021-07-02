@@ -5,15 +5,14 @@ import math
 import collections
 import numpy as np
 
-import tracking.metamodules as metamodules
 from tracking.root_utils import root_save_name
 
-from .plot import ValidationPlot, compose_axis_label
+from tracking.validation.plot import ValidationPlot, compose_axis_label
 
-from .pull import PullAnalysis
-from .resolution import ResolutionAnalysis
-from .fom import ValidationFiguresOfMerit
-from .utilities import (
+from tracking.validation.pull import PullAnalysis
+from tracking.validation.resolution import ResolutionAnalysis
+from tracking.validation.fom import ValidationFiguresOfMerit
+from tracking.validation.utilities import (
     getHelixFromMCParticle,
     getSeedTrackFitResult,
     is_primary,
@@ -22,8 +21,6 @@ from .utilities import (
 )
 
 import basf2
-
-import logging
 
 import ROOT
 from ROOT import Belle2
@@ -309,7 +306,6 @@ class TrackingValidationModule(basf2.Module):
             z0_estimate = float('nan')
             pt_estimate = float('nan')
 
-            momentum_pt = float('nan')
             momentum = float('nan')
 
             # store seed information, they are always available from the pattern reco
@@ -778,22 +774,3 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                 validation_plots.append(profile_plot)
 
         return validation_plots
-
-
-def main():
-    from tracking.run.tracked_event_generation import StandardReconstructionEventsRun
-    standard_reco_run = StandardReconstructionEventsRun()
-    standard_reco_run.configure_from_commandline()
-
-    validation_module = SeparatedTrackingValidationModule(name="test_run",
-                                                          contact="dummy",
-                                                          output_file_name="test_separated_module.root",
-                                                          expert_level=0)
-
-    standard_reco_run.add_module(validation_module)
-    standard_reco_run.execute()
-
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    main()

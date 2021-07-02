@@ -5,17 +5,16 @@
 <header>
   <contact>simon.kurz@desy.de</contact>
   <input>EvtGenSimNoBkg.root</input>
-  <output>toCDCfromEclCKFTrackingValidation.root</output>
+  <output>toCDCfromEclCKFTrackingValidation_onlyEclSeed.root</output>
   <description>This module validates toCDCfromEclCKF module using Y(4S) runs.</description>
 </header>
 """
 
 import reconstruction
 from tracking.validation.run import TrackingValidationRun
-import tracking
 import logging
 import basf2
-VALIDATION_OUTPUT_FILE = 'toCDCfromEclCKFTrackingValidation_onlyEclSeed_expert.root'
+VALIDATION_OUTPUT_FILE = 'toCDCfromEclCKFTrackingValidation_onlyEclSeed.root'
 N_EVENTS = 10000
 ACTIVE = True
 
@@ -98,8 +97,6 @@ class toCDCfromEclCKF(TrackingValidationRun):
     resolution = True
     #: name of the output ROOT file
     output_file_name = VALIDATION_OUTPUT_FILE
-    #: Store additional information in output file (like the full trees)
-    extended = True
 
 
 def main():

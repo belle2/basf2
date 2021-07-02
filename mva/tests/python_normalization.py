@@ -5,9 +5,11 @@
 
 import basf2_mva
 
+import numpy as np
 import os
 import tempfile
 import sys
+from b2test_utils import skip_test
 
 variables = ['M', 'p', 'pt', 'pz',
              'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)',
@@ -55,8 +57,7 @@ if __name__ == "__main__":
 
     # Skip test if files are not available
     if not (os.path.isfile('train.root') and os.path.isfile('test.root')):
-        print("TEST SKIPPED: Not runnable on build bot", file=sys.stderr)
-        sys.exit(1)
+        skip_test('Necessary files "train.root" and "test.root" not available.')
 
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")

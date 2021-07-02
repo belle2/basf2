@@ -1,24 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import math
 import collections
 import numpy as np
 
-# Need for B2WARNING for some reason
-import inspect
-
-from .pull import PullAnalysis
-from .fom import (
+from tracking.validation.fom import (
     ValidationFiguresOfMerit,
     ValidationManyFiguresOfMerit
 )
 
-from .module import (
+from tracking.validation.module import (
     AlwaysPassFilter,
-    getHelixFromMCParticle,
     TrackingValidationModule
 )
+
+from tracking.validation.utilities import getObjectList
 
 import basf2
 
@@ -150,7 +146,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         # # CDC Hits in MC tracks
         totalHitListMC = []
         for mcTrackCand in mcTrackCands:
-            cdcHitIDs = [cdcHit.getArrayIndex() for cdcHit in mcTrackCand.getCDCHitList()]  # Checked
+            cdcHitIDs = [cdcHit.getArrayIndex() for cdcHit in getObjectList(mcTrackCand.getCDCHitList())]  # Checked
             # Working around a bug in ROOT where you should not access empty std::vectors
             if len(cdcHitIDs) == 0:
                 cdcHitIDs = set()
@@ -171,7 +167,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
                 basf2.B2WARNING("Encountered a pattern recognition track with no hits")
                 continue
 
-            cdcHitIDs = [cdcHit.getArrayIndex() for cdcHit in trackCand.getCDCHitList()]  # Checked
+            cdcHitIDs = [cdcHit.getArrayIndex() for cdcHit in getObjectList(trackCand.getCDCHitList())]  # Checked
             # Working around a bug in ROOT where you should not access empty std::vectors
             if len(cdcHitIDs) == 0:
                 cdcHitIDs = set()
@@ -210,7 +206,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             is_matched = self.trackMatchLookUp.isMatchedPRRecoTrack(trackCand)
             is_clone = self.trackMatchLookUp.isClonePRRecoTrack(trackCand)
 
-            trackCandHits = [cdcHit.getArrayIndex() for cdcHit in trackCand.getCDCHitList()]
+            trackCandHits = [cdcHit.getArrayIndex() for cdcHit in getObjectList(trackCand.getCDCHitList())]
             # Working around a bug in ROOT where you should not access empty std::vectors
             if len(trackCandHits) == 0:
                 trackCandHits = set()
@@ -220,11 +216,11 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             # this is not very efficient...
             list_of_connected_mc_tracks = set()
             list_of_numbers_of_hits_for_connected_tracks = collections.deque()
-            number_of_connected_tracks = 0
-            number_of_wrong_hits = 0
+            # number_of_connected_tracks = 0
+            # number_of_wrong_hits = 0
 
             for mcTrackCand in mcTrackCands:
-                mcTrackCandHits = [cdcHit.getArrayIndex() for cdcHit in mcTrackCand.getCDCHitList()]
+                mcTrackCandHits = [cdcHit.getArrayIndex() for cdcHit in getObjectList(mcTrackCand.getCDCHitList())]
                 # Working around a bug in ROOT where you should not access empty std::vectors
                 if len(mcTrackCandHits) == 0:
                     mcTrackCandHits = set()
@@ -251,7 +247,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             if is_matched or is_clone:
                 mcTrackCand = \
                     self.trackMatchLookUp.getRelatedMCRecoTrack(trackCand)
-                mcTrackCandHits = [cdcHit.getArrayIndex() for cdcHit in mcTrackCand.getCDCHitList()]  # Checked
+                mcTrackCandHits = [cdcHit.getArrayIndex() for cdcHit in getObjectList(mcTrackCand.getCDCHitList())]  # Checked
                 # Working around a bug in ROOT where you should not access empty std::vectors
                 if len(mcTrackCandHits) == 0:
                     mcTrackCandHits = set()
@@ -266,7 +262,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             is_missing = \
                 self.trackMatchLookUp.isMissingMCRecoTrack(mcTrackCand)
 
-            mcTrackCandHits = [cdcHit.getArrayIndex() for cdcHit in mcTrackCand.getCDCHitList()]  # Checked
+            mcTrackCandHits = [cdcHit.getArrayIndex() for cdcHit in getObjectList(mcTrackCand.getCDCHitList())]  # Checked
 
             # Working around a bug in ROOT where you should not access empty std::vectors
             if len(mcTrackCandHits) == 0:

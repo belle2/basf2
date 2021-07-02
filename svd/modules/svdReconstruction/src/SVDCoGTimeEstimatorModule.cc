@@ -84,16 +84,16 @@ void SVDCoGTimeEstimatorModule::initialize()
   m_relShaperDigitTrueHitName = relShaperDigitTrueHits.getName();
   m_relShaperDigitMCParticleName = relShaperDigitMCParticles.getName();
 
-  B2DEBUG(1, " 1. COLLECTIONS:");
-  B2DEBUG(1, " -->  MCParticles:        " << m_storeMCParticlesName);
-  B2DEBUG(1, " -->  Digits:             " << m_storeShaperDigitsName);
-  B2DEBUG(1, " -->  RecoDigits:           " << m_storeRecoDigitsName);
-  B2DEBUG(1, " -->  TrueHits:           " << m_storeTrueHitsName);
-  B2DEBUG(1, " -->  DigitMCRel:         " << m_relShaperDigitMCParticleName);
-  B2DEBUG(1, " -->  RecoDigitMCRel:       " << m_relRecoDigitMCParticleName);
-  B2DEBUG(1, " -->  RecoDigitDigitRel:    " << m_relRecoDigitShaperDigitName);
-  B2DEBUG(1, " -->  DigitTrueRel:       " << m_relShaperDigitTrueHitName);
-  B2DEBUG(1, " -->  RecoDigitTrueRel:     " << m_relRecoDigitTrueHitName);
+  B2DEBUG(25, " 1. COLLECTIONS:");
+  B2DEBUG(25, " -->  MCParticles:        " << m_storeMCParticlesName);
+  B2DEBUG(25, " -->  Digits:             " << m_storeShaperDigitsName);
+  B2DEBUG(25, " -->  RecoDigits:           " << m_storeRecoDigitsName);
+  B2DEBUG(25, " -->  TrueHits:           " << m_storeTrueHitsName);
+  B2DEBUG(25, " -->  DigitMCRel:         " << m_relShaperDigitMCParticleName);
+  B2DEBUG(25, " -->  RecoDigitMCRel:       " << m_relRecoDigitMCParticleName);
+  B2DEBUG(25, " -->  RecoDigitDigitRel:    " << m_relRecoDigitShaperDigitName);
+  B2DEBUG(25, " -->  DigitTrueRel:       " << m_relShaperDigitTrueHitName);
+  B2DEBUG(25, " -->  RecoDigitTrueRel:     " << m_relRecoDigitTrueHitName);
 
 }
 void SVDCoGTimeEstimatorModule::beginRun()
@@ -139,7 +139,7 @@ void SVDCoGTimeEstimatorModule::event()
 
   m_NumberOfAPVSamples = m_storeSVDEvtInfo->getNSamples();
 
-  B2DEBUG(1, "number of APV samples = " << m_NumberOfAPVSamples);
+  B2DEBUG(25, "number of APV samples = " << m_NumberOfAPVSamples);
 
   for (const SVDShaperDigit& shaper : m_storeShaper) {
 
@@ -170,7 +170,7 @@ void SVDCoGTimeEstimatorModule::event()
 
     //check too high ADC
     if (m_amplitude > 255)
-      B2DEBUG(10, "ERROR: m_amplitude = " << m_amplitude << ", should be <= 255");
+      B2DEBUG(25, "ERROR: m_amplitude = " << m_amplitude << ", should be <= 255");
 
     //CALIBRATION
     //convert ADC into #e- and apply offset to shift estimated peak time to hit time (to be completed)
@@ -189,19 +189,19 @@ void SVDCoGTimeEstimatorModule::event()
 
     //check high charges and too high ADC
     if (m_amplitude > 100000) {
-      B2DEBUG(42, "Charge = " << m_amplitude);
-      B2DEBUG(42, "corresponding ADC = " << m_PulseShapeCal.getADCFromCharge(thisSensorID, thisSide, thisCellID, m_amplitude));
-      B2DEBUG(42, "thisLayerNumber = " << thisSensorID.getLayerNumber());
-      B2DEBUG(42, "thisLadderNumber = " << thisSensorID.getLadderNumber());
-      B2DEBUG(42, "thisSensorNumber = " << thisSensorID.getSensorNumber());
-      B2DEBUG(42, "thisSide = " << thisSide);
-      B2DEBUG(42, "thisCellID = " << thisCellID);
-      B2DEBUG(42, "-----");
+      B2DEBUG(25, "Charge = " << m_amplitude);
+      B2DEBUG(25, "corresponding ADC = " << m_PulseShapeCal.getADCFromCharge(thisSensorID, thisSide, thisCellID, m_amplitude));
+      B2DEBUG(25, "thisLayerNumber = " << thisSensorID.getLayerNumber());
+      B2DEBUG(25, "thisLadderNumber = " << thisSensorID.getLadderNumber());
+      B2DEBUG(25, "thisSensorNumber = " << thisSensorID.getSensorNumber());
+      B2DEBUG(25, "thisSide = " << thisSide);
+      B2DEBUG(25, "thisCellID = " << thisCellID);
+      B2DEBUG(25, "-----");
     }
 
     //recording of the RecoDigit
-    m_storeReco.appendNew(SVDRecoDigit(shaper.getSensorID(), shaper.isUStrip(), shaper.getCellID(), m_amplitude, m_amplitudeError,
-                                       m_weightedMeanTime, m_weightedMeanTimeError, probabilities, m_chi2));
+    m_storeReco.appendNew(shaper.getSensorID(), shaper.isUStrip(), shaper.getCellID(), m_amplitude, m_amplitudeError,
+                          m_weightedMeanTime, m_weightedMeanTimeError, probabilities, m_chi2);
 
     //Add digit to the RecoDigit->ShaperDigit relation list
     int recoDigitIndex = m_storeReco.getEntries() - 1;

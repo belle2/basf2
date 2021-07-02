@@ -89,11 +89,9 @@ class CalculationProcess(Process):
         Resets the logging system, logs onto console and a file and sets the queues
         (the result queue and the process queue) correctly.
         """
-        pass
 
     def prepare(self):
         """
         Overload this function if you need to process some preparations
         before doing the real calculation.
         """
-        pass

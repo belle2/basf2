@@ -30,19 +30,15 @@ class EventCountLimiter(basf2.Module):
 
     def initialize(self):
         """Handle job initialization (nothing to do here)"""
-        pass
 
     def terminate(self):
         """Handle job termination (nothing to do here)"""
-        pass
 
     def beginRun(self):
         """Handle begin of run (nothing to do here)"""
-        pass
 
     def endRun(self):
         """Handle end of run (nothing to do here)"""
-        pass
 
     def event(self):
         """Process one event: has eventCounter reached or exceeded its limit?"""

@@ -27,6 +27,7 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 // utility
 #include <analysis/utility/ReferenceFrame.h>
@@ -502,16 +503,7 @@ namespace Belle2 {
           return std::numeric_limits<float>::quiet_NaN();
         }
 
-        // Get unused ECLClusters in ROE
-        std::vector<const ECLCluster*> roeClusters = roe->getECLClusters(maskName);
-        int nNeutrals = 0;
-
-        // Select ECLClusters with no associated tracks
-        for (auto& roeCluster : roeClusters)
-          if (roeCluster->isNeutral())
-            nNeutrals++;
-
-        return nNeutrals;
+        return roe->getPhotons(maskName).size();
       };
       return func;
     }
@@ -537,7 +529,15 @@ namespace Belle2 {
           return std::numeric_limits<float>::quiet_NaN();
         }
 
-        return roe->getPhotons(maskName).size();
+        // Get unused ECLClusters in ROE
+        auto roeClusters = roe->getPhotons(maskName);
+        int nPhotons = 0;
+
+        // Select ECLClusters with photon hypothesis
+        for (auto& roeCluster : roeClusters)
+          if (roeCluster->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons)
+            nPhotons++;
+        return nPhotons;
       };
       return func;
     }
@@ -578,8 +578,8 @@ namespace Belle2 {
       if (arguments.size() == 2) {
         maskName = arguments[0];
         try {
-          pdgCode = std::stoi(arguments[1]);
-        } catch (std::invalid_argument& e) {
+          pdgCode = Belle2::convertString<int>(arguments[1]);
+        } catch (std::invalid_argument&) {
           B2ERROR("First argument of nROE_ChargedParticles must be a PDG code");
           return nullptr;
         }
@@ -741,11 +741,21 @@ namespace Belle2 {
           return std::numeric_limits<float>::quiet_NaN();
         }
 
-        std::vector<const ECLCluster*> roeClusters = roe->getECLClusters(maskName);
         double extraE = 0.0;
 
+        auto roeClusters = roe->getPhotons(maskName);
+
         for (auto& roeCluster : roeClusters)
-          extraE += roeCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+          if (roeCluster->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons)
+            extraE += roeCluster->getECLClusterEnergy();
+
+        auto roeChargedParticles = roe->getChargedParticles(maskName);
+
+        for (auto& roeChargedParticle : roeChargedParticles)
+        {
+          if (roeChargedParticle->getECLCluster())
+            extraE += roeChargedParticle->getECLClusterEnergy();
+        }
 
         return extraE;
       };
@@ -1641,7 +1651,7 @@ namespace Belle2 {
         for (unsigned i = 0; i < particle->getNDaughters(); i++)
         {
           int absPDG = abs(particle->getDaughter(i)->getPDGCode());
-          if (absPDG == 11 || absPDG == 13 || absPDG == 15) {
+          if (absPDG == Const::electron.getPDGCode() || absPDG == Const::muon.getPDGCode() || absPDG == 15) {
             pLep = particle->getDaughter(i)->get4Vector();
             break;
           }

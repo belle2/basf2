@@ -19,7 +19,7 @@
 # based on B2A403-KFit-VertexFit.py
 #
 # Contributors: C. Pulvermacher
-#               I. Komarov (Demeber 2017)
+#               I. Komarov (December 2017)
 #               I. Komarov (September 2018)
 #
 ################################################################################

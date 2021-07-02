@@ -171,9 +171,9 @@ namespace Belle2 {
      * Determine which triangle side is crossed by a line segment defined by r and v0 points
      *
      * @param prev  Triangle number which has been already checked
-     * @param xmin  Triangle number which is being checked
+     * @param curr  Triangle number which is being checked
      * @param r     Starting point of the line segment
-     * @param ny    Ending point of the line segment
+     * @param v0    Ending point of the line segment
      * @return      Next triangle index in the list if nothing found returns the total number of triangles in the list
      */
     [[nodiscard]] short int sideCross(short int prev, short int curr, const xy_t& r, const xy_t& v0) const
@@ -699,6 +699,7 @@ namespace Belle2 {
       // Constructor creates a new instance, inits gInstance.
       new BFieldComponentBeamline();
     }
+    // cppcheck-suppress nullPointerRedundantCheck ; it's not obvious, but if *gInstance is null it's set in the constructor
     return **gInstance;
   }
 

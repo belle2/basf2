@@ -43,7 +43,7 @@ namespace Belle2 {
     std::string    m_outputFileName; /**< Name of output file. */
     std::ofstream* m_outputFile = nullptr;     /**< output file. */
 
-    std::string    m_svdRawName; /**raw name*/
+    std::string    m_svdRawName; /**< raw name*/
 
   };
 } // Namaspace Belle2

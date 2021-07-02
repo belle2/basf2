@@ -40,7 +40,7 @@ reconstructDecay('vpho:4 -> e-:minimumE e-:minimumE', '', 4, path=mypath, allowC
 copyLists('vpho:bhabha', ['vpho:1', 'vpho:2', 'vpho:3', 'vpho:4'], path=mypath)
 
 # aliases to make output better readable
-# For more information on alias definitions (including an intrdouction to
+# For more information on alias definitions (including an introduction to
 # some very handy convenience functions with which you could
 # define below aliases in very few lines), head over to
 # ``VariableManager/variableAliases.py``.

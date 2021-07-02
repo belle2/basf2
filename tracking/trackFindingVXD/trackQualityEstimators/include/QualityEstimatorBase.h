@@ -25,9 +25,10 @@ namespace Belle2 {
     double qualityIndicator = 0; /**< return value of the quality estimator */
     boost::optional<double> chiSquared; /**< chi squared value obtained by the fit of the QE */
     boost::optional<short> curvatureSign; /**< direction of curvature as obtained by the QE */
+    boost::optional<double> pocaD; /**< distance to the z-axis of the POCA */
     boost::optional<double> pt; /**< transverse momentum estimate from the QE */
     boost::optional<double> pmag; /**< momentum magnitute estimate from the QE */
-    boost::optional<B2Vector3<double>> p; /**< momentum vector estimate from the QE */
+    boost::optional<B2Vector3D> p; /**< momentum vector estimate from the QE */
   };
 
   /** BaseClass for QualityEstimators

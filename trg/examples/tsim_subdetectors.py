@@ -4,20 +4,17 @@
 # The example of running simulation of subdetectors trigger.
 # basf2 tsim_subdetectors.py -o outputrootfile
 
-import os
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
 from L1trigger import add_subdetector_tsim
-from modularAnalysis import *
 
-import glob
 
-main = create_path()
-eventinfosetter = register_module('EventInfoSetter')
+main = b2.create_path()
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
 main.add_module(eventinfosetter)
 
-babayaganlo = register_module('BabayagaNLOInput')
+babayaganlo = b2.register_module('BabayagaNLOInput')
 babayaganlo.param('FMax', 7.5e4)
 babayaganlo.param('FinalState', 'ee')
 babayaganlo.param('MaxAcollinearity', 180.0)
@@ -53,6 +50,6 @@ main.add_module('RootOutput', branchNames=branches)
 
 
 # main
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)
 # ===<END>

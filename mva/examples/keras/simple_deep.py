@@ -10,13 +10,11 @@ import time
 
 from basf2_mva_python_interface.contrib_keras import State
 
-import tensorflow as tf
-import tensorflow.contrib.keras as keras
 
 from keras.layers import Input, Dense, Dropout
 from keras.layers.normalization import BatchNormalization
 from keras.models import Model
-from keras.optimizers import adam
+from keras.optimizers import Adam
 from keras.losses import binary_crossentropy
 from keras.activations import sigmoid, tanh
 from keras.callbacks import Callback
@@ -43,7 +41,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
     state = State(Model(input, output))
 
-    state.model.compile(optimizer=adam(lr=0.01), loss=binary_crossentropy, metrics=['accuracy'])
+    state.model.compile(optimizer=Adam(lr=0.01), loss=binary_crossentropy, metrics=['accuracy'])
 
     state.model.summary()
 

@@ -10,15 +10,8 @@
 # ------------------------------------------------------------------------
 
 
-from basf2 import *
-import sys
-import glob
-from ROOT import Belle2
-from ROOT import TH1F, TH2F, TF1, TFile, TGraphErrors, TSpectrum, TCanvas, TTree, TMath
-import ROOT
-import pylab
-import numpy
-import time
+import basf2 as b2
+from ROOT import TF1, TFile, TH1F, TSpectrum, TTree
 from array import array
 
 
@@ -69,10 +62,10 @@ def fitLaserResolution(
     """
 
     if maxPeaks > 2 or maxPeaks < 1:
-        B2FATAL('Usupported value for the maximum number for peaks (maxPeaks = ' +
-                str(maxPeaks) + '). Please set maxPeak o either 1 or 2.')
-    if pdfType is not 'cb' and pdfType is not 'gaus' and pdfType is not 'gausExpo':
-        B2FATAL(
+        b2.B2FATAL('Usupported value for the maximum number for peaks (maxPeaks = ' +
+                   str(maxPeaks) + '). Please set maxPeak o either 1 or 2.')
+    if pdfType != 'cb' and pdfType != 'gaus' and pdfType != 'gausExpo':
+        b2.B2FATAL(
             'Unknown PDF type ' +
             pdfType +
             ". The possible options are cb for the Crystal Ball,"
@@ -123,7 +116,7 @@ def fitLaserResolution(
     histoData = tFileData.Get('LaserTimingVSChannel')
 
     # Prepares the output file and tree
-    tFileOut = TFile(outputFile, "RECREATE")
+    # tFileOut = TFile(outputFile, "RECREATE")
     outTree = TTree("tree", "tree")
 
     # Slot ID (1-based)

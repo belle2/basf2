@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
 
 from daqdqm.commondqm import add_common_dqm
 
@@ -28,7 +27,8 @@ def add_cosmic_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     """
     assert dqm_mode in ["dont_care", "all_events", "filtered", "before_filter"]
 
-    add_common_dqm(path, components=components, dqm_environment=dqm_environment, dqm_mode=dqm_mode)
+    add_common_dqm(path, components=components, dqm_environment=dqm_environment,
+                   dqm_mode=dqm_mode)
 
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         # PXD (not useful on HLT)

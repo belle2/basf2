@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2017, 2021 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors:                                                          *
@@ -64,7 +64,6 @@ namespace Belle2 {
   private:
 
     // steering parameters
-    bool m_printMask; /**< if true print channel mask as set in rec */
     bool m_maskUncalibratedChannelT0; /**< if true mask channelT0-uncalibrated channels */
     bool m_maskUncalibratedTimebase; /**< if true mask timebase-uncalibrated channels */
 

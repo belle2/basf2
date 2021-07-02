@@ -5,16 +5,15 @@ import os
 import basf2
 import ROOT
 import b2test_utils
-from ROOT import Belle2
 
-inputFile = b2test_utils.require_file('mdst12.root', 'validation')
+inputFile = b2test_utils.require_file('mdst14.root', 'validation')
 path = basf2.create_path()
 path.add_module('RootInput', inputFileName=inputFile)
-path.add_module('ParticleLoader', decayStringsWithCuts=[('e+', '')])
+path.add_module('ParticleLoader', decayStrings=['e+'])
 
 # Write out electron id and mc information of all electron candidates into histograms
 path.add_module('VariablesToHistogram',
-                particleList='e+',
+                particleList='e+:all',
                 variables=[('electronID', 100, 0, 1), ('isSignal', 2, -0.5, 1.5)],
                 variables_2d=[('mcErrors', 513, -0.5, 512.5, 'isSignal', 2, -0.5, 1.5)],
                 fileName='particleListNtuple.root')
@@ -51,8 +50,7 @@ with b2test_utils.clean_working_directory():
         else:
             assert t.GetBinContent(i, 1) == 0, 'Expected no entries for mcError < 4 and false electron candidates'
             signal_2d.append(t.GetBinContent(i, 2))
-    assert signal_1d == sum(signal_2d),\
-        'Expected same amount of signal in 1D and 2D histograms got {} {}'.format(signal_1d, sum(signal_2d))
+    assert signal_1d == sum(signal_2d), f'Expected same amount of signal in 1D and 2D histograms got {signal_1d} {sum(signal_2d)}'
 
     assert os.path.isfile('eventNtuple.root'), "eventNtuple.root wasn't created"
     f = ROOT.TFile('eventNtuple.root')
@@ -77,4 +75,4 @@ with b2test_utils.clean_working_directory():
     for i in range(53):
         ntracks_12_2d.append(t.GetBinContent(13, i))
     assert ntracks_12_1d == sum(ntracks_12_2d),\
-        'Expected same amount of events with 12 tracks in 1D and 2D histograms got {} {}'.format(ntracks_12_1d, sum(ntracks_12_2d))
+        f'Expected same amount of events with 12 tracks in 1D and 2D histograms got {ntracks_12_1d} {sum(ntracks_12_2d)}'

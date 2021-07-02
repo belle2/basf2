@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 from ROOT import Belle2, kIsPublic, kIsStatic, TVector3, TLorentzVector
-from basf2 import Module
+from basf2 import Module, B2FATAL
 
 
 def get_public_members(classname):
@@ -28,7 +27,7 @@ def get_public_members(classname):
     return list(sorted(members))
 
 
-class DataStorePrinter(object):
+class DataStorePrinter:
     """
     Class to print contents of a StoreObjPtr or StoreArray.
 
@@ -138,7 +137,7 @@ class DataStorePrinter(object):
     def print_untested(self):
         """Print all the public member functions we will not test"""
         members = get_public_members(self.name)
-        tested = set(e[0] for e in self.object_members)
+        tested = {e[0] for e in self.object_members}
         for member in members:
             if member in tested:
                 continue
@@ -156,7 +155,7 @@ class DataStorePrinter(object):
         else:
             index = ""
 
-        print("%s%s:" % (self.name, index))
+        print(f"{self.name}{index}:")
 
         # loop over all defined member/argument combinations
         # and print "member(arguments): result" for each
@@ -186,7 +185,7 @@ class DataStorePrinter(object):
                     print("  " + display + ": ", end="")
                 else:
                     # otherwise just print name and arguments
-                    print("  %s(%s): " % (name, ",".join(map(str, args))), end="")
+                    print("  {}({}): ".format(name, ",".join(map(str, args))), end="")
                 # if a callback is set the callback is used to print the result
                 if callback is not None:
                     print("", end="", flush=True)
@@ -242,8 +241,8 @@ class DataStorePrinter(object):
             print("pair%s" % weight)
             self._printResult(result.first, depth + 1)
             self._printResult(result.second, depth + 1)
-        # or, could it be a std::vector like container?
-        elif hasattr(result, "size") and hasattr(result, "begin") and hasattr(result, "end"):
+        # or, could it be a std::vector like container? But ROOT might wrap a std::string so if it has npos assume it's a string
+        elif (hasattr(result, "size") and hasattr(result, "begin") and hasattr(result, "end")) and not hasattr(result, "npos"):
             print("size(%d)%s" % (result.size(), weight))
             # if it is a RelationVector we also want to print the weights. So
             # check whether we have weights and pass them to the _printResult
@@ -257,7 +256,7 @@ class DataStorePrinter(object):
                 self._printResult(e, depth + 1, weight=weight)
         # print floats with 6 valid digits
         elif isinstance(result, float):
-            print("%.6g%s" % (result, weight))
+            print(f"{result:.6g}{weight}")
         # print char as int
         elif isinstance(result, str) and len(result) == 1:
             print(ord(result), weight, sep="")
@@ -295,5 +294,8 @@ class PrintObjectsModule(Module):
 
     def event(self):
         """print the contents of the mdst mdst_dataobjects"""
-        for printer in self.objects_to_print:
-            printer.print()
+        try:
+            for printer in self.objects_to_print:
+                printer.print()
+        except Exception as e:
+            B2FATAL("Error in datastore printer: ", e)

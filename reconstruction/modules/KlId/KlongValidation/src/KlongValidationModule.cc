@@ -13,6 +13,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 // here's where the functions are hidden
 #include <reconstruction/modules/KlId/KLMExpert/KlId.h>
@@ -74,7 +75,7 @@ void KlongValidationModule::initialize()
   m_fakeMom_Pass   = new TH1F("Momentum Fake Passed", "Momentum Fake Passed;Momentum;Count", 25, 0, 5);
   m_fakeMom     = new TH1F("Momentum Fake Rate", "Momentum Fake Rate;Momentum;Fake Rate", 25, 0, 5);
 
-  m_time     = new TH1F("KLM Cluster Time", "Cluster Timing;Cluster time;Count", 20, -5, 15);
+  m_time     = new TH1F("KLM Cluster Time", "Cluster Timing;Cluster time;Count", 125, -5, 20);
   m_trackSep     = new TH1F("KLM trackSeperation Distance", "KLM trackSeperation Distance;Distance;Count", 100, 0, 4000);
   m_energy     = new TH1F("KLM Energy", "KLM Energy;Energy;count", 25, 0, 5);
   m_nLayer     = new TH1F("KLM N-Layer", "N-layer;N-layer;count", 20, 0, 20);
@@ -136,7 +137,7 @@ void KlongValidationModule::event()
     } else {
       m_isBeamBKG = 0;
       while (!(mcpart -> getMother() == nullptr)) {
-        if (mcpart -> getPDG() == 130) {
+        if (mcpart -> getPDG() == Const::Klong.getPDGCode()) {
           m_isKl = 1;
           break;
         }
@@ -318,7 +319,7 @@ void KlongValidationModule::terminate()
     std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("Check", "Should not change"));
     std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("Contact", "fnc@lnf.infn.it"));
     if (std::get<2>(hist))
-      std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("MetaOptions", "shifter,pvalue-warn=0.99,pvalue-error=0.1"));
+      std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("MetaOptions", "shifter,pvalue-warn=0.99,pvalue-error=0.02"));
     else
       std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("MetaOptions", "pvalue-warn=0.99,pvalue-error=0.1"));
     std::get<0>(hist) -> Write();

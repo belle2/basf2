@@ -8,8 +8,7 @@
 # In this example one can easily set the direction to be incoming or outcoming
 # ----------------------------------------------------------------------------
 
-from basf2 import *
-import os
+import basf2 as b2
 import math
 
 # particle parameters (given in local bar frame) - change as you like
@@ -41,33 +40,33 @@ z = zloc + 60.5
 phi += alpha
 
 # Suppress messages and warnings during processing:
-set_log_level(LogLevel.WARNING)
+b2.set_log_level(b2.LogLevel.WARNING)
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Set number of events to generate
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])
 main.add_module(eventinfosetter)
 
 # Histogram manager immediately after master module
-histo = register_module('HistoManager')
+histo = b2.register_module('HistoManager')
 histo.param('histoFileName', outputFile)  # File to save histograms
 main.add_module(histo)
 
 # Gearbox: access to database (xml files)
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # Geometry (only TOP and B-field)
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('useDB', False)
 geometry.param('components', ['MagneticField', 'TOP'])
 main.add_module(geometry)
 
 # Particle gun: generate single particle w/ fixed vertex, momentum and kind
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 particlegun.param('pdgCodes', [pdg])
 particlegun.param('nTracks', 1)
 particlegun.param('varyNTracks', False)
@@ -85,11 +84,11 @@ particlegun.param('independentVertices', False)
 main.add_module(particlegun)
 
 # Simulation
-simulation = register_module('FullSim')
+simulation = b2.register_module('FullSim')
 main.add_module(simulation)
 
 # TOP digitization: all time jitters turned OFF
-topdigi = register_module('TOPDigitizer')
+topdigi = b2.register_module('TOPDigitizer')
 topdigi.param('useWaveforms', False)
 topdigi.param('simulateTTS', False)
 topdigi.param('electronicJitter', 0.0)
@@ -97,19 +96,19 @@ topdigi.param('timeZeroJitter', 0.0)
 main.add_module(topdigi)
 
 # Dedicated track maker using MC information only
-trackmaker = register_module('TOPMCTrackMaker')
+trackmaker = b2.register_module('TOPMCTrackMaker')
 main.add_module(trackmaker)
 
 # TOP PDF: time jitters are excluded
-toppdf = register_module('TOPPDFChecker')
+toppdf = b2.register_module('TOPPDFChecker')
 main.add_module(toppdf)
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

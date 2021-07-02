@@ -132,7 +132,6 @@ SectorMapComparer::compareTrees(TTree* t_first, TTree* t_second, bool unmatchedE
   bool isTriplet =  t_first->GetBranch("centerFullSecID") != nullptr;
 
   // some cross checks
-  // cppcheck-suppress knownConditionTrueFalse
   if (vals_t_second.size() != vals_t_first.size()) {
     B2WARNING("Number of filters stored in the two SectorMaps seem to differ! This is per se not dangerous, but some cuts may be compared to zero.");
   }
@@ -251,16 +250,16 @@ SectorMapComparer::showSetups(TString secmapFileName)
   if (setupKeyName == nullptr) {
     B2WARNING("setupKeyName not found");
     return;
-  }
+  } else {
+    std::cout << "Following setups found for file: " << secmapFileName << std::endl;
+    std::cout << "================================ " << std::endl;
+    for (long i = 0; i < t->GetEntries(); ++i) {
+      t->GetEntry(i);
+      std::cout << (*setupKeyName) << std::endl;
+    }
 
-  std::cout << "Following setups found for file: " << secmapFileName << std::endl;
-  std::cout << "================================ " << std::endl;
-  for (long i = 0; i < t->GetEntries(); ++i) {
-    t->GetEntry(i);
-    std::cout << (*setupKeyName) << std::endl;
+    delete setupKeyName;
   }
-
-  if (setupKeyName) delete setupKeyName;
 }
 
 // fills the listOfTrees with the names of all trees in this directory (including their full root-path)

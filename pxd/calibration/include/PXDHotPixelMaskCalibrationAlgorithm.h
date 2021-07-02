@@ -10,6 +10,8 @@
 
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
+#include <vxd/dataobjects/VxdID.h>
+#include <map>
 
 namespace Belle2 {
   /**
@@ -45,6 +47,9 @@ namespace Belle2 {
     /// The occupancy threshold for masking hot rows is the median occupancy x rowMultiplier
     float rowMultiplier;
 
+    /// setter for m_debugHisto
+    void setDebugHisto(bool debugHisto) {m_debugHisto = debugHisto;}
+
   protected:
 
     /// Run algo on data
@@ -57,6 +62,18 @@ namespace Belle2 {
     const unsigned short c_nUCells = 250;
     /** Number of drain lines of Belle II PXD sensors*/
     const unsigned short c_nDrains = 1000;
+
+    /// Set if a debugging histogram should be created in the algorithm output directory
+    int m_debugHisto = false;
+
+    /// map of VxdID to median hits of each sensor
+    std::map<VxdID, double> m_medianOfHitsMap;
+
+    /// Pointer for TFile
+    std::shared_ptr<TFile> m_file;
+
+    /// Perform debug histogram file creation
+    void createDebugHistogram();
 
   };
 } // namespace Belle2

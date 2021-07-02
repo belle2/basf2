@@ -13,6 +13,7 @@
 
 /* Belle2 headers. */
 #include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
 
 /* C++ headers. */
 #include <bitset>
@@ -54,7 +55,7 @@ namespace Belle2 {
     StoreArray<KLMMuidLikelihood> muids;
 
     // Test the non-default constructor
-    int pdg = 13;
+    int pdg = Const::muon.getPDGCode();
     m_muid = muids.appendNew();
     m_muid->setPDGCode(pdg);
     EXPECT_EQ(m_muid->getPDGCode(), pdg);
@@ -70,7 +71,7 @@ namespace Belle2 {
     m_muid->setExtEKLMEfficiencyValue(layer, efficiency);
     EXPECT_FLOAT_EQ(m_muid->getExtEKLMEfficiencyValue(layer), efficiency);
 
-    // Test the methods to count the hits
+    // Test the methods to count the hits and to check the crossed layer
     // 111111
     // it means 6 hits in BKLM and 0 in EKLM
     std::bitset<30> bitPattern(std::string("111111"));
@@ -79,6 +80,10 @@ namespace Belle2 {
     EXPECT_EQ(m_muid->getHitLayerPattern(), pattern);
     EXPECT_EQ(m_muid->getTotalBarrelHits(), 6);
     EXPECT_EQ(m_muid->getTotalEndcapHits(), 0);
+    m_muid->setExtLayerPattern(pattern);
+    EXPECT_TRUE(m_muid->isExtrapolatedBarrelLayerCrossed(5));
+    EXPECT_FALSE(m_muid->isExtrapolatedBarrelLayerCrossed(6));
+    EXPECT_FALSE(m_muid->isExtrapolatedEndcapLayerCrossed(0));
     // 1000000000000000
     // it means 0 hits in BKLM and 1 in EKLM
     bitPattern = std::bitset<30>(std::string("1000000000000000"));
@@ -87,6 +92,10 @@ namespace Belle2 {
     EXPECT_EQ(m_muid->getHitLayerPattern(), pattern);
     EXPECT_EQ(m_muid->getTotalBarrelHits(), 0);
     EXPECT_EQ(m_muid->getTotalEndcapHits(), 1);
+    m_muid->setExtLayerPattern(pattern);
+    EXPECT_FALSE(m_muid->isExtrapolatedBarrelLayerCrossed(0));
+    EXPECT_TRUE(m_muid->isExtrapolatedEndcapLayerCrossed(0));
+    EXPECT_FALSE(m_muid->isExtrapolatedEndcapLayerCrossed(1));
     // 10101000000000111000
     // it means 3 hits in BKLM and 3 in EKLM
     bitPattern = std::bitset<30>(std::string("10101000000000111000"));
@@ -95,6 +104,10 @@ namespace Belle2 {
     EXPECT_EQ(m_muid->getHitLayerPattern(), pattern);
     EXPECT_EQ(m_muid->getTotalBarrelHits(), 3);
     EXPECT_EQ(m_muid->getTotalEndcapHits(), 3);
+    m_muid->setExtLayerPattern(pattern);
+    EXPECT_TRUE(m_muid->isExtrapolatedBarrelLayerCrossed(4));
+    EXPECT_TRUE(m_muid->isExtrapolatedEndcapLayerCrossed(0));
+    EXPECT_FALSE(m_muid->isExtrapolatedEndcapLayerCrossed(10));
     // 11111111111111111111111111111
     // it means 15 hits in BKLM, 14 in EKLM and 1 "fake" hit
     bitPattern = std::bitset<30>(std::string("11111111111111111111111111111"));
@@ -103,6 +116,10 @@ namespace Belle2 {
     EXPECT_EQ(m_muid->getHitLayerPattern(), pattern);
     EXPECT_EQ(m_muid->getTotalBarrelHits(), 15);
     EXPECT_EQ(m_muid->getTotalEndcapHits(), 14);
+    m_muid->setExtLayerPattern(pattern);
+    EXPECT_TRUE(m_muid->isExtrapolatedBarrelLayerCrossed(14));
+    EXPECT_FALSE(m_muid->isExtrapolatedBarrelLayerCrossed(15));
+    EXPECT_TRUE(m_muid->isExtrapolatedEndcapLayerCrossed(13));
   }
 
 }

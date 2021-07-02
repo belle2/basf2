@@ -1,26 +1,21 @@
-from basf2 import *
+import basf2 as b2
 
 import os
 import sys
-import multiprocessing
 import datetime
 import glob
 
-import ROOT
 from ROOT import Belle2, TFile
 from ROOT.Belle2 import SVD3SampleELSTimeCalibrationAlgorithm  # changed
 
-from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
+from caf.framework import CAF, Calibration, CentralDatabase
 from caf import backends
 from caf import strategies
-from caf.utils import ExpRun, IoV
 
 import reconstruction as reco
-import modularAnalysis as ana
-from caf.strategies import SequentialBoundaries
 import svd as svd
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 input_branches = [
     'SVDShaperDigitsFromTracks',
     'EventT0',
@@ -32,21 +27,13 @@ input_branches = [
 now = datetime.datetime.now()
 
 
-def remove_module(path, name):
-
-    new_path = create_path()
-    for m in path.modules():
-        if name != m.name():
-            new_path.add_module(m)
-    return new_path
-
 # pre_collector
 
 
 def pre_collector():
 
-    B2INFO("Pre-collector")
-    pre_path = create_path()
+    b2.B2INFO("Pre-collector")
+    pre_path = b2.create_path()
     pre_path.add_module('RootInput', branchNames=input_branches)
 
     pre_path.add_module("Gearbox")
@@ -70,9 +57,9 @@ def pre_collector():
         if moda.name() == 'SVDSpacePointCreator':
             moda.param("SVDClusters", 'SVDClustersFromTracks')
 
-    pre_path = remove_module(pre_path, 'SVDMissingAPVsClusterCreator')
+    pre_path = b2.remove_module(pre_path, 'SVDMissingAPVsClusterCreator')
 
-    print_path(pre_path)
+    b2.print_path(pre_path)
 
     return pre_path
 
@@ -80,12 +67,12 @@ def pre_collector():
 def SVDCoGTimeCalibration(files, tags, uniqueID):
 
     # Set-up re-processing path
-    path = create_path()
+    path = b2.create_path()
 
     path.add_module('Progress')
 
     # collector setup
-    collector = register_module('SVDTimeCalibrationCollector')
+    collector = b2.register_module('SVDTimeCalibrationCollector')
     collector.param("SVDClustersFromTracksName", "SVDClustersFromTracks")
     collector.param("SVDEventInfoName", "SVDEventInfo")
     collector.param("EventT0Name", "EventT0")
@@ -164,7 +151,7 @@ if __name__ == "__main__":
     print("")
     print(str(uniqueID))
     print("")
-    conditions.override_globaltags()
+    b2.conditions.override_globaltags()
     svdCoGCAF = SVDCoGTimeCalibration(good_input_files,
                                       [  # "online_proc11",
                                           "online", "Reco_master_patch_rel5"],

@@ -13,6 +13,7 @@
 #include <G4TwoVector.hh>
 #include <G4Vector3D.hh>
 #include <framework/utilities/FileSystem.h>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 
@@ -146,21 +147,17 @@ namespace Belle2 {
         p2.push_back(G4TwoVector(v[3 + 4].x(), v[3 + 4].y()));
         p2.push_back(G4TwoVector(v[4 + 4].x(), v[4 + 4].y()));
 
-        double sum = 0, sum2 = 0,  smin = 1e9, smax = -1e9;
+        double sum = 0, smin = 1e9, smax = -1e9;
         for (int i = 0; i < 4; i++) {
           for (int j = i + 1; j < 4; j++) {
             double s2 = (p2[j] - p2[i]).mag2() / (p1[j] - p1[i]).mag2();
             double s = sqrt(s2);
-            sum2 += s2;
             sum += s;
             if (s > smax) smax = s;
             if (s < smin) smin = s;
-            //  cout<<i<<" "<<j<<" "<<s<<endl;
           }
         }
         double ave = sum / 6;
-        //    double rms = sqrt(sum2/6 - ave*ave);
-        //    cout<<sum<<" +- "<<rms<<" "<<rms/sum*100<<" "<<60*(smin-ave)<<" "<<60*(smax-ave)<<endl;
 
         double scale = ave;
         G4TwoVector off1(0, 0), off2(scale * p1[0].x() - p2[0].x(), scale * p1[0].y() - p2[0].y());
@@ -288,21 +285,27 @@ namespace Belle2 {
       map<int, G4ThreeVector> make_verticies(double wrapthick) const override
       {
         map<int, G4ThreeVector> v;
-        v[1] = G4ThreeVector(-a / 2, -h / 2, 150);
-        v[2] = G4ThreeVector(-b / 2, h / 2, 150);
-        v[3] = G4ThreeVector(b / 2, h / 2, 150);
-        v[4] = G4ThreeVector(a / 2, -h / 2, 150);
-        v[5] = G4ThreeVector(-A / 2, -H / 2, -150);
-        v[6] = G4ThreeVector(-B / 2, H / 2, -150);
-        v[7] = G4ThreeVector(B / 2, H / 2, -150);
-        v[8] = G4ThreeVector(A / 2, -H / 2, -150);
+        // ensure sides to be parallel
+        double wh = h * h, wH = H * H, wnorm = wh + wH;
+        double tn = ((b - a) / 2 / h * wh + (B - A) / 2 / H * wH) / wnorm, d = h * tn, D = H * tn;
+        // double tn = tan(alpha*M_PI/180), d = h*tn, D = H*tn;
+        double m = (a + b) * 0.5, M = (A + B) * 0.5;
 
-        for (int j = 1; j <= 8; j++) v[j] = G4ThreeVector(v[j].x(), -v[j].y(), -v[j].z());
+        const double eps = 0.5e-3; // crystal sides are defined with 0.5 micron precision
+        if (fabs(a - (m - d)) > eps || fabs(b - (m + d)) > eps || fabs(A - (M - D)) > eps || fabs(B - (M + D)) > eps) {
+          double alfa = atan(tn) * 180 / M_PI;
+          B2WARNING("Cannot make parallel sides better than 0.5 mcm: alpha =" << alpha << " alpha from sides = " << alfa << " da = " << a -
+                    (m - d) << " db = " << b - (m + d) << " dA = " << A - (M - D) << " dB = " << B - (M + D));
+        }
 
-        // G4ThreeVector c0 = centerofgravity(v, 1, 4);
-        // G4ThreeVector c1 = centerofgravity(v, 5, 4);
-        // G4ThreeVector cz = 0.5*(c0+c1);
-        // cout<<c0<<" "<<c1<<" "<<cz<<endl;
+        v[1] = G4ThreeVector(-(m - d) / 2,  h / 2, -150);
+        v[2] = G4ThreeVector(-(m + d) / 2, -h / 2, -150);
+        v[3] = G4ThreeVector((m + d) / 2, -h / 2, -150);
+        v[4] = G4ThreeVector((m - d) / 2,  h / 2, -150);
+        v[5] = G4ThreeVector(-(M - D) / 2,  H / 2,  150);
+        v[6] = G4ThreeVector(-(M + D) / 2, -H / 2,  150);
+        v[7] = G4ThreeVector((M + D) / 2, -H / 2,  150);
+        v[8] = G4ThreeVector((M - D) / 2,  H / 2,  150);
 
         if (wrapthick != 0) {
           map<int, G4ThreeVector> nv;
@@ -498,23 +501,19 @@ namespace Belle2 {
         p2.push_back(G4TwoVector(v[3 + 4].x(), v[3 + 4].y()));
         p2.push_back(G4TwoVector(v[4 + 4].x(), v[4 + 4].y()));
 
-        double sum = 0, sum2 = 0,  smin = 1e9, smax = -1e9;
+        double sum = 0, smin = 1e9, smax = -1e9;
         int count = 0;
         for (int i = 0; i < 5; i++) {
           for (int j = i + 1; j < 5; j++) {
             double s2 = (p2[j] - p2[i]).mag2() / (p1[j] - p1[i]).mag2();
             double s = sqrt(s2);
-            sum2 += s2;
             sum += s;
             if (s > smax) smax = s;
             if (s < smin) smin = s;
-            //  cout<<i<<" "<<j<<" "<<s<<endl;
             count++;
           }
         }
         double ave = sum / count;
-        //    double rms = sqrt(sum2/count - ave*ave);
-        //    cout<<sum<<" +- "<<rms<<" "<<rms/sum*100<<" "<<60*(smin-ave)<<" "<<60*(smax-ave)<<endl;
 
         double scale = ave;
         G4TwoVector off1(0, 0), off2(scale * p1[0].x() - p2[0].x(), scale * p1[0].y() - p2[0].y());

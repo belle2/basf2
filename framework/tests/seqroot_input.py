@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Test SeqRootInputModule. Input data is the same as used by chain_input.py
 # (both files)
@@ -44,7 +43,7 @@ class TestModule(basf2.Module):
 # ============================================================================
 # Now lets create the necessary modules to perform a simulation
 
-filename = Belle2.FileSystem.findFile('framework/tests/seqroot_input.sroot')
+filename = basf2.find_file('framework/tests/seqroot_input.sroot')
 
 main = basf2.Path()
 seqinput = main.add_module("SeqRootInput", logLevel=basf2.LogLevel.WARNING)

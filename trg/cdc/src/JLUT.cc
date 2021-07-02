@@ -419,7 +419,7 @@ namespace Belle2 {
   }
 
   /// make COE file.
-  void TRGCDCJLUT::makeCOE(string fileName)
+  void TRGCDCJLUT::makeCOE(const string& fileName)
   {
     m_write = 1;
     // Check if function is set.
@@ -493,7 +493,8 @@ namespace Belle2 {
     return t_offsetName.str();
   }
 
-  TRGCDCJSignal const TRGCDCJLUT::operate(TRGCDCJSignal const& in, TRGCDCJSignal& out)
+  // cppcheck-suppress constParameter
+  TRGCDCJSignal const TRGCDCJLUT::operate(const TRGCDCJSignal& in, TRGCDCJSignal& out)
   {
 
     //cout<<"Operate start"<<endl;
@@ -577,7 +578,7 @@ namespace Belle2 {
       // Fill signal map for definition.
       {
         map<string, vector<int> >& t_signals = out.getCommonData()->m_signals;
-        if (t_signals.find(t_offsetOutput.getName()) == t_signals.end()) {
+        if (!t_signals.count(t_offsetOutput.getName())) {
           t_signals[t_offsetOutput.getName()] = {t_offsetOutput.getType(), (int)t_offsetOutput.getBitsize()};
         }
       }

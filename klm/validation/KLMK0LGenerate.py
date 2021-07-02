@@ -9,48 +9,45 @@
 </header>
 """
 
-import os
-import random
-from basf2 import *
-from ROOT import Belle2
+import basf2
 from beamparameters import add_beamparameters
 
-set_log_level(LogLevel.WARNING)
+basf2.set_log_level(basf2.LogLevel.WARNING)
 
 # Fixed random seed
-set_random_seed(123456)
+basf2.set_random_seed(123456)
 
 # Create main path
-main = create_path()
+main = basf2.create_path()
 
 # Event data
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = basf2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])
 
 # Evtgen and beam parameters.
-evtgen = register_module('EvtGenInput')
-evtgen.param('userDECFile', Belle2.FileSystem.findFile('klm/validation/btojpsikl0.dec'))
+evtgen = basf2.register_module('EvtGenInput')
+evtgen.param('userDECFile', basf2.find_file('klm/validation/btojpsikl0.dec'))
 beamparameters = add_beamparameters(main, "Y4S")
 
 # Geometry and Geant simulation
-paramloader = register_module('Gearbox')
-geometry = register_module('Geometry')
+paramloader = basf2.register_module('Gearbox')
+geometry = basf2.register_module('Geometry')
 geometry.param('components', ['KLM'])
 geometry.param('useDB', False)
-g4sim = register_module('FullSim')
+g4sim = basf2.register_module('FullSim')
 
 # KLM modules.
-klmDigitizer = register_module('KLMDigitizer')
-klmReconstructor = register_module('KLMReconstructor')
-klmClustersReconstructor = register_module('KLMClustersReconstructor')
-mc_matcher = register_module('MCMatcherKLMClusters')
+klmDigitizer = basf2.register_module('KLMDigitizer')
+klmReconstructor = basf2.register_module('KLMReconstructor')
+klmClustersReconstructor = basf2.register_module('KLMClustersReconstructor')
+mc_matcher = basf2.register_module('MCMatcherKLMClusters')
 
 # Add progress bars
-progress = register_module('Progress')
-progressBar = register_module('ProgressBar')
+progress = basf2.register_module('Progress')
+progressBar = basf2.register_module('ProgressBar')
 
 # Output
-output = register_module('RootOutput')
+output = basf2.register_module('RootOutput')
 output.param('outputFileName', '../KLMK0LOutput.root')
 
 # Add modules to main path
@@ -71,4 +68,4 @@ main.add_module(progressBar)
 main.add_module(output)
 
 # Process the path
-process(main)
+basf2.process(main)

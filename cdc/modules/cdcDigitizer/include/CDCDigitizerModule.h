@@ -14,6 +14,8 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
+#include <simulation/dataobjects/SimClockState.h>
+
 //cdc package headers
 #include <mdst/dataobjects/MCParticle.h>
 #include <cdc/dataobjects/CDCSimHit.h>
@@ -23,6 +25,8 @@
 #include <cdc/geometry/CDCGeoControlPar.h>
 #include <cdc/dbobjects/CDCFEElectronics.h>
 #include <reconstruction/dbobjects/CDCDedxRunGain.h>
+#include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
+#include <reconstruction/dbobjects/CDCDedxWireGain.h>
 //#include <cdc/dbobjects/CDCEDepToADCConversions.h>
 #include <cdc/dbobjects/CDCCrossTalkLibrary.h>
 
@@ -65,6 +69,8 @@ namespace Belle2 {
       if (m_fEElectronicsFromDB) delete m_fEElectronicsFromDB;
       //      if (m_eDepToADCConversionsFromDB) delete m_eDepToADCConversionsFromDB;
       if (m_runGainFromDB) delete m_runGainFromDB;
+      if (m_gain0FromDB) delete m_gain0FromDB;
+      if (m_wireGainFromDB) delete m_wireGainFromDB;
       if (m_xTalkFromDB) delete m_xTalkFromDB;
     };
 
@@ -104,15 +110,56 @@ namespace Belle2 {
     double getDriftTime(double driftLength, bool addTof, bool addDelay);
 
 
-    /** Edep to ADC Count converter */
-    //    unsigned short getADCCount(unsigned short layer, unsigned short cell, double edep, double dx, double costh);
-    unsigned short getADCCount(const WireID& wid, double edep, double dx, double costh);
+    /** Function to make signals after shapers
+     *
+     *  @param wid wire id.
+     *  @param edep energy deposit (GeV).
+     *  @param dx step length (cm).
+     *  @param costh cos(theta) of particle.
+     *  @param adcCount ADC-count.
+     *  @param convFactorForThreshold conversin factor needed for threshold setting.
+     *
+     *  @return ADC-count and conversion factor for threshold.
+     *
+     */
+    void makeSignalsAfterShapers(const WireID& wid, double edep, double dx, double costh, unsigned short& adcCount,
+                                 double& convFactorForThreshold);
+
+    /** Modify t0 for negative-t0 case */
+    double getPositiveT0(const WireID&);
 
     /** Set FEE parameters (from DB) */
     void setFEElectronics();
 
-    /** Set run-gain (from DB) */
-    void setRunGain();
+    /** Generate randum number according to Polya distribution
+     *  @param xmax max of no. generated
+     *  @return randum no.
+     */
+    double Polya(double xmax = 10);
+
+    /** Set semi-total gain (from DB) */
+    void setSemiTotalGain();
+
+    //! Return semi-total gain of the specified wire
+    /*!
+      \param clayer layer no. (0-56)
+      \param cell   cell  no.
+      \return       gain
+    */
+    double getSemiTotalGain(int clayer, int cell) const
+    {
+      return m_semiTotalGain[clayer][cell];
+    }
+
+    //! Return semi-total gain of the specified wire
+    /*!
+      \param wireID Wire id.
+      \return       gain
+    */
+    double getSemiTotalGain(const WireID& wireID) const
+    {
+      return m_semiTotalGain[wireID.getICLayer()][wireID.getIWire()];
+    }
 
     /** Add crosstalk */
     void addXTalk();
@@ -141,8 +188,7 @@ namespace Belle2 {
     double m_resolution2;       /**< Resolution of the second Gassian used to smear drift length */
     double m_tdcThreshold4Outer; /**< TDC threshold for outer layers in unit of eV */
     double m_tdcThreshold4Inner; /**< TDC threshold for inner layers in unit of eV */
-    double m_gasToGasWire;      /**< Approx. ratio of dE(gas) to dE(gas+wire) */
-    double m_scaleFac = 1.;     /**< Factor to mutiply to edep */
+    int    m_eDepInGasMode;     /**< Mode for extracting dE(gas) from dE(gas+wire) */
     int    m_adcThreshold;      /**< Threshold for ADC in unit of count */
     double m_tMin;              /**< Lower edge of time window in ns */
     double m_tMaxOuter;         /**< Upper edge of time window in ns for the outer layers*/
@@ -178,8 +224,15 @@ namespace Belle2 {
     double m_addFudgeFactorForSigma; /**< additional fudge factor for space resol. */
     double m_totalFudgeFactor = 1.;  /**< total fudge factor for space resol. */
 
+    bool m_gasGainSmearing = false;  /**< Swtich for gas gain smearing */
+    double m_effWForGasGainSmearing = 0.0265;  /**< Effective energy (keV) for one electron prod. for gas gain smearing */
+    double m_thetaOfPolya = 0.5;     /**< theta of Polya function for gas gain smearing */
+    bool m_extraADCSmearing = true; /**< Swtich for extra ADC smearing */
+    //    double m_sigmaForExtraADCSmearing = 0.3;  /**< Gaussian sigma for extra ADC smearing */
     double m_runGain = 1.;  /**< run gain. */
+    float m_semiTotalGain[MAX_N_SLAYERS][MAX_N_SCELLS] = {{}}; /**< total gain per wire */
     double m_overallGainFactor = 1.;  /**< Overall gain factor. */
+    double m_degOfSPEOnThreshold;     /**< Degree of space charge effect on timing threshold */
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_doSmearing; /**< A switch to control drift length smearing */
     bool m_addTimeWalk; /**< A switch used to control adding time-walk delay into the total drift time or not */
@@ -191,6 +244,7 @@ namespace Belle2 {
     bool m_output2ndHit;         /**< A switch to output 2nd hit */
     bool m_align;             /**< A switch to control alignment */
     bool m_correctForWireSag;    /**< A switch to control wire sag */
+    bool m_treatNegT0WiresAsGood;    /**< A switch for negative-t0 wires */
 //    float m_eventTime;         /**< It is a timing of event, which includes a time jitter due to the trigger system */
 
     bool m_useDB4FEE;             /**< Fetch FEE params from DB */
@@ -199,21 +253,33 @@ namespace Belle2 {
     float m_uprEdgeOfTimeWindow[nBoards] = {0}; /*!< Upper edge of time-window */
     float m_tdcThresh          [nBoards] = {0}; /*!< Threshold for timing-signal */
     float m_adcThresh          [nBoards] = {0}; /*!< Threshold for FADC */
-    unsigned short m_widthOfTimeWindow  [nBoards] = {0}; /*!< Width of time window */
+    unsigned short m_widthOfTimeWindowInCount  [nBoards] = {0}; /*!< Width of time window */
 
     bool m_useDB4EDepToADC;             /**< Fetch edep-to-ADC conversion params. from DB */
     bool m_useDB4RunGain;               /**< Fetch run gain from DB */
     bool m_spaceChargeEffect;           /**< Space charge effect */
 
     DBObjPtr<CDCDedxRunGain>* m_runGainFromDB = nullptr; /*!< Pointer to run gain from DB. */
+    DBObjPtr<CDCDedxScaleFactor>* m_gain0FromDB = nullptr; /*!< Pointer to overall gain factor from DB. */
+    DBObjPtr<CDCDedxWireGain>* m_wireGainFromDB = nullptr; /*!< Pointer to wire gain from DB. */
     //    DBObjPtr<CDCEDepToADCConversions>* m_eDepToADCConversionsFromDB = nullptr; /*!< Pointer to edep-to-ADC conv. params. from DB. */
     //    float m_eDepToADCParams[MAX_N_SLAYERS][4]; /*!< edep-to-ADC conv. params. */
 
     bool m_addXTalk;           /**< Flag to switch on/off crosstalk */
     bool m_issue2ndHitWarning; /**< Flag to switch on/off a warning on the 2nd TDC hit */
     bool m_includeEarlyXTalks; /**< Flag to switch on/off xtalks earlier than the hit */
+    int  m_debugLevel      ;   /**< Debug level */
     int  m_debugLevel4XTalk;   /**< Debug level for crosstalk */
     DBObjPtr<CDCCrossTalkLibrary>* m_xTalkFromDB = nullptr; /*!< Pointer to cross-talk from DB. */
+
+    StoreObjPtr<SimClockState> m_simClockState; /**< generated hardware clock state */
+    bool m_synchronization = true; /**< Flag to switch on/off timing synchronization */
+    bool m_randomization = true; /**< Flag to switch on/off timing randmization */
+    int m_tSimMode = 0; /**< Timing simulation mode */
+    int m_offsetForTriggerBin = 1; /**< Input to getCDCTriggerBin(offset) */
+    int m_trgTimingOffsetInCount   = 4; /**< Trigger timing offset in unit of count */
+    int m_shiftOfTimeWindowIn32Count = 153; /**< Shift of time window for synchronization in 32count */
+    unsigned short m_trgDelayInCount[nBoards] = {0}; /**< Trigger delay in frontend electronics in count */
 
     /** Structure for saving the signal information. */
     struct SignalInfo {

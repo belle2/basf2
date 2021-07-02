@@ -1,5 +1,6 @@
 import functools
-from concurrent.futures import ProcessPoolExecutor
+import time
+from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict
 from basf2 import B2INFO, B2ERROR, B2WARNING, LogPythonInterface  # noqa
 from basf2.utils import pretty_print_table
@@ -54,7 +55,8 @@ def create_iov_wrapper(db, globaltag_id, payload):
     Wrapper function for adding payloads into a given globaltag.
     """
     for iov in payload.iov:
-        db.create_iov(globaltag_id, payload.payload_id, *iov.tuple)
+        if db.create_iov(globaltag_id, payload.payload_id, *iov.tuple) is None:
+            raise RuntimeError(f"Cannot create iov for {payload.name} r{payload.revision}")
 
 
 def command_tag_merge(args, db=None):
@@ -133,8 +135,8 @@ def command_tag_merge(args, db=None):
                           help="Can be for numbers to limit the run range to put"
                           "in the output globaltag: All iovs will be limited to "
                           "be in this range.")
-        args.add_argument("-j", type=int, default=1, dest="nprocess",
-                          help="Number of concurrent processes to use for "
+        args.add_argument("-j", type=int, default=10, dest="nprocess",
+                          help="Number of concurrent threads to use for "
                           "creating payloads into the output globaltag.")
         return
 
@@ -201,10 +203,19 @@ def command_tag_merge(args, db=None):
 
     # Ok, we're still alive, create all the payloads using multiple processes.
     if not args.dry_run:
-        B2INFO(f'Now copying the payloads into {args.output}...')
+        B2INFO(f'Now copying the {len(final)} payloads into {args.output} to create {len(table)-1} iovs ...')
         create_iov = functools.partial(create_iov_wrapper, db, output_id)
-        with ProcessPoolExecutor(max_workers=args.nprocess) as pool:
-            pool.map(create_iov, final)
+        try:
+            with ThreadPoolExecutor(max_workers=args.nprocess) as pool:
+                start = time.monotonic()
+                for payload, _ in enumerate(pool.map(create_iov, final), 1):
+                    eta = (time.monotonic() - start) / payload * (len(final) - payload)
+                    B2INFO(f"{payload}/{len(final)} payloads copied, ETA: {eta:.1f} seconds")
+        except RuntimeError:
+            B2ERROR("Not all iovs could be created. This could be a server/network problem "
+                    "or the destination globaltag was not empty or not writeable. Please make "
+                    "sure the target tag is empty and try again")
+            return 1
 
     return 0
 
@@ -344,7 +355,7 @@ def command_tag_runningupdate(args, db=None):
         return
 
     try:
-        updater = RunningTagUpdater(db, args.running, args.staging, args.run, args.mode)
+        updater = RunningTagUpdater(db, args.running, args.staging, args.run, args.mode, args.dry_run)
         operations = updater.calculate_update()
     except RunningTagUpdaterError as e:
         B2ERROR(e, **e.extra_vars)

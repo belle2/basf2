@@ -30,7 +30,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
         number_of_spectators = 0
 
     def layer(x, shape, name, unit=tf.sigmoid):
-        with tf.name_scope(name) as scope:
+        with tf.name_scope(name):
             weights = tf.Variable(tf.truncated_normal(shape, stddev=1.0 / np.sqrt(float(shape[0]))), name='weights')
             biases = tf.Variable(tf.constant(0.0, shape=[shape[1]]), name='biases')
             layer = unit(tf.matmul(x, weights) + biases)
@@ -166,7 +166,7 @@ if __name__ == "__main__":
                  'daughter(2, daughter(0, E))', 'daughter(2, daughter(1, E))',
                  'daughter(2, daughter(0, clusterTiming))', 'daughter(2, daughter(1, clusterTiming))',
                  'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
-                 'daughter(2, daughter(0, minC2HDist))', 'daughter(2, daughter(1, minC2HDist))',
+                 'daughter(2, daughter(0, minC2TDist))', 'daughter(2, daughter(1, minC2TDist))',
                  'M']
 
     variables2 = ['p', 'pt', 'pz', 'phi',
@@ -176,7 +176,7 @@ if __name__ == "__main__":
                   'daughter(2, daughter(0, E))', 'daughter(2, daughter(1, E))',
                   'daughter(2, daughter(0, clusterTiming))', 'daughter(2, daughter(1, clusterTiming))',
                   'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
-                  'daughter(2, daughter(0, minC2HDist))', 'daughter(2, daughter(1, minC2HDist))']
+                  'daughter(2, daughter(0, minC2TDist))', 'daughter(2, daughter(1, minC2TDist))']
 
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")

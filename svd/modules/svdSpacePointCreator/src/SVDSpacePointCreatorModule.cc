@@ -32,6 +32,8 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
            "SVDCluster collection name", string(""));
   addParam("SpacePoints", m_spacePointsName,
            "SpacePoints collection name", string("SVDSpacePoints"));
+  addParam("EventLevelTrackingInfoName", m_eventLevelTrackingInfoName,
+           "EventLevelTrackingInfo collection name", string(""));
 
   // 2.Modification parameters:
   addParam("NameOfInstance", m_nameOfInstance,
@@ -49,6 +51,10 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
 
   addParam("useLegacyNaming", m_useLegacyNaming,
            "Use old PDF name convention?", bool(true));
+
+  addParam("numMaxSpacePoints", m_numMaxSpacePoints,
+           "Maximum number of SpacePoints allowed in an event, above this threshold no SpacePoint will be created",
+           unsigned(m_numMaxSpacePoints));
 
 }
 
@@ -100,8 +106,8 @@ void SVDSpacePointCreatorModule::event()
     provideSVDClusterSingles(m_svdClusters,
                              m_spacePoints); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
   } else {
-    provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_ClusterCal, m_useQualityEstimator, m_calibrationFile,
-                                  m_useLegacyNaming);
+    provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_HitTimeCut, m_useQualityEstimator, m_calibrationFile,
+                                  m_useLegacyNaming, m_numMaxSpacePoints, m_eventLevelTrackingInfoName);
   }
 
 

@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import basf2
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 import math as m
 import ROOT as r
-from basf2 import conditions as b2conditions
 
 ##################################################################################
 #
@@ -19,7 +17,7 @@ from basf2 import conditions as b2conditions
 ##################################################################################
 
 
-class printSVDPitches(basf2.Module):
+class printSVDPitches(b2.Module):
     '''class to print SVD pitches'''
 
     def printPitch(self, layer, ladder, sensor):
@@ -53,7 +51,7 @@ class printSVDPitches(basf2.Module):
         self.printPitch(4, 1, 1)
 
 
-class printSVDSizes(basf2.Module):
+class printSVDSizes(b2.Module):
     ''' class to print SVD sizes'''
 
     def printSize(self, layer, ladder, sensor):
@@ -83,7 +81,7 @@ class printSVDSizes(basf2.Module):
         self.printSize(4, 1, 1)
 
 
-class printSVDStripLengths(basf2.Module):
+class printSVDStripLengths(b2.Module):
     '''class to print strip length'''
 
     def printStripLength(self, layer, ladder, sensor):
@@ -114,7 +112,7 @@ class printSVDStripLengths(basf2.Module):
         self.printStripLength(4, 1, 1)
 
 
-class printSVDStripPositions(basf2.Module):
+class printSVDStripPositions(b2.Module):
     '''class to print strip positions'''
 
     def printStripPosition(self, layer, ladder, sensor):
@@ -155,7 +153,7 @@ class printSVDStripPositions(basf2.Module):
         self.printStripPosition(4, 1, 1)
 
 
-class printSVDSensors(basf2.Module):
+class printSVDSensors(b2.Module):
     '''class to print svd sensors'''
 
     def beginRun(self):
@@ -172,7 +170,7 @@ class printSVDSensors(basf2.Module):
                     print(str(layerNumber) + "." + str(ladderNumber) + "." + str(sensorNumber))
 
 
-class printSVDLadders(basf2.Module):
+class printSVDLadders(b2.Module):
     '''class to print svd ladders'''
 
     def beginRun(self):
@@ -214,14 +212,15 @@ class printSVDLadders(basf2.Module):
                     degStr = "{0:.2f}".format(round(angleDeg, 2))
                     print(sensorID + '     ' + xStr + '     ' + yStr + '     ' + radStr + '     ' + degStr)
 
+
 # add your GT here:
 # gt = ""
 # b2conditions.prepend_globaltag(gt)
 
 # Create paths
-main = create_path()
+main = b2.create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('expList', [1003])
 eventinfosetter.param('runList', [0])
 eventinfosetter.param('evtNumList', [1])
@@ -237,9 +236,9 @@ main.add_module(printSVDSizes())
 main.add_module(printSVDStripLengths())
 main.add_module(printSVDStripPositions())
 
-print_path(main)
+b2.print_path(main)
 
 # Process events
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

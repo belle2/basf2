@@ -12,7 +12,7 @@
 
 namespace Belle2 {
 
-  /** contains the calibration parameters of the clusterizer*/
+  /** contains the clustering parameters*/
   struct SVDClusterCuts {
 
     /** minimum value of SNR of the seed strip
@@ -27,33 +27,8 @@ namespace Belle2 {
      */
     float minClusterSNR;
 
-    /** position error scale factor for cluster size = 1
-     */
-    float scaleError_clSize1;
 
-    /** position error scale factor for cluster size = 2
-     */
-    float scaleError_clSize2;
-
-    /** position error scale factor for cluster size > 2
-     */
-    float scaleError_clSize3;
-
-    /** returns the corrected cluster position error */
-    float getCorrectedValue(float raw_error, int size)
-    {
-
-      if (size == 1)
-        return raw_error * scaleError_clSize1;
-
-      if (size == 2)
-        return raw_error * scaleError_clSize2;
-
-      return raw_error * scaleError_clSize3;
-    }
-
-
-    ClassDef(SVDClusterCuts, 1); /**< needed by root*/
+    ClassDef(SVDClusterCuts, 2); /**< needed by root*/
 
   };
 

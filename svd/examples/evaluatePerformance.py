@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
-from svd import *
-from tracking import *
+from svd import add_svd_reconstruction
+from tracking import add_tracking_reconstruction
 import glob
 
 numEvents = 2000
@@ -18,15 +18,15 @@ MCTracking = True
 # set this string to identify the output rootfiles
 tag = "_Y4S_noJitter_noBKG_noROI_MCTF.root"
 
-main = create_path()
+main = b2.create_path()
 
-set_random_seed(1)
+b2.set_random_seed(1)
 
 expList = [0]
 if Phase2:
     expList = [1002]
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('expList', expList)
 eventinfosetter.param('runList', [0])
 eventinfosetter.param('evtNumList', [numEvents])
@@ -36,18 +36,13 @@ main.add_module('EvtGenInput')
 
 add_simulation(
     main,
-    components=[
-        'MagneticField',
-        'BeamPipe',
-        'PXD',
-        'SVD'],
     bkgfiles=bkgFiles,
     usePXDDataReduction=ROIfinding,
     simulateT0jitter=simulateJitter)
 
 add_svd_reconstruction(main)
 
-
+'''
 add_tracking_reconstruction(
     main,
     components=["SVD"],
@@ -57,19 +52,19 @@ add_tracking_reconstruction(
 
 
 tag = "_Y4S_jitter10ns_wBKG_noROI_MCTF.root"
-clseval = register_module('SVDClusterEvaluationTrueInfo')
+clseval = b2.register_module('SVDClusterEvaluationTrueInfo')
 clseval.param('outputFileName', "ClusterEvaluationTrueInfo" + str(tag))
 main.add_module(clseval)
 
-svdperf = register_module('SVDPerformance')
+svdperf = b2.register_module('SVDPerformance')
 svdperf.param('outputFileName', "SVDPerformance" + str(tag))
 main.add_module(svdperf)
-
+'''
 # main.add_module('RootOutput')
 main.add_module('Progress')
 
-print_path(main)
+b2.print_path(main)
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

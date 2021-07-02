@@ -2,9 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import basf2
-from ROOT import Belle2
 
-import beamparameters
 import simulation
 
 main = basf2.create_path()

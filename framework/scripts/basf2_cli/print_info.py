@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-from basf2.core import basf2label, basf2copyright, list_module_search_paths, LogPythonInterface
+from basf2.core import basf2label, basf2copyright, basf2license, list_module_search_paths, LogPythonInterface
 from basf2.version import version, release
 from basf2 import conditions
 
@@ -56,6 +55,7 @@ for line in logo.splitlines():
 print('')
 print(basf2label.center(48))
 print(basf2copyright.center(48))
+print(basf2license.center(48))
 print(('Release ' + release).center(48))
 print(('Version ' + version).center(48))
 print('')

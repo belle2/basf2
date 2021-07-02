@@ -12,7 +12,6 @@
 #include <klm/eklm/calibration/EKLMDatabaseImporter.h>
 
 /* KLM headers. */
-#include <klm/dbobjects/eklm/EKLMReconstructionParameters.h>
 #include <klm/dbobjects/eklm/EKLMSimulationParameters.h>
 
 /* Belle 2 headers. */
@@ -38,18 +37,6 @@ void EKLMDatabaseImporter::setIOV(int experimentLow, int runLow,
   m_RunLow = runLow;
   m_ExperimentHigh = experimentHigh;
   m_RunHigh = runHigh;
-}
-
-void EKLMDatabaseImporter::importReconstructionParameters()
-{
-  DBImportObjPtr<EKLMReconstructionParameters> recPar;
-  recPar.construct();
-  GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/"
-             "Content/DigitizationParams");
-  recPar->setTimeResolution(gd.getDouble("TimeResolution"));
-  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
-                         m_ExperimentHigh, m_RunHigh);
-  recPar.import(iov);
 }
 
 void EKLMDatabaseImporter::importSimulationParameters()

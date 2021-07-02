@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 import os
+import sys
 import glob
 
 # ----------------------------------------------------------------------------------
@@ -15,11 +16,11 @@ import glob
 # Note: in multiprocessing mode put BG mixer in the path first then FullSim
 # ----------------------------------------------------------------------------------
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 
 if 'BELLE2_BACKGROUND_MIXING_DIR' not in os.environ:
-    B2ERROR('BELLE2_BACKGROUND_MIXING_DIR variable is not set - it must contain the path to BG mixing samples')
+    b2.B2ERROR('BELLE2_BACKGROUND_MIXING_DIR variable is not set - it must contain the path to BG mixing samples')
     sys.exit()
 
 # define background (collision) files
@@ -28,7 +29,7 @@ if 'BELLE2_BACKGROUND_MIXING_DIR' not in os.environ:
 
 bg = glob.glob(os.environ['BELLE2_BACKGROUND_MIXING_DIR'] + '/*.root')
 if len(bg) == 0:
-    B2ERROR('No files found in ', os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
+    b2.B2ERROR('No files found in ', os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
     sys.exit()
 
 # alternative: you can specify files explicitely
@@ -45,25 +46,29 @@ if len(bg) == 0:
 # change the file names if differ, remove some or add some more files
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Set number of events to generate
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # Geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 main.add_module(geometry)
+
+# Simulate the EventLevelTriggerTimeInfo (empty object for now)
+simulateEventLevelTriggerTimeInfo = b2.register_module('SimulateEventLevelTriggerTimeInfo')
+main.add_module(simulateEventLevelTriggerTimeInfo)
 
 # particle generator can be put here
 
 # Mix beam background
-bkgmixer = register_module('BeamBkgMixer')
+bkgmixer = b2.register_module('BeamBkgMixer')
 bkgmixer.param('backgroundFiles', bg)  # specify BG files
 bkgmixer.param('components', ['CDC', 'TOP', 'ECL'])  # mix BG only for those components
 bkgmixer.param('minTime', -5000)  # set time window start time [ns]
@@ -74,16 +79,16 @@ main.add_module(bkgmixer)
 # FullSim, digitizers, clusterizers and reconstruction modules can be put here
 
 # Output
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 output.param('outputFileName', 'testMixer.root')
 main.add_module(output)
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

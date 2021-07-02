@@ -34,9 +34,13 @@ class LocalMetadataComparison:
 
     def __init__(self, filename, globaltag, payloads):
         """Create the local metadata providers for the given globaltag and payload names"""
+        #: Globaltag
         self._globaltag = globaltag
+        #: Payloads
         self._payloads = payloads
+        #: Local metadata provider, python version
         self._localpy = LocalMetadataProvider(filename)
+        #: Local metadata provider, C++ version
         self._localcpp = self.create_cpp_metadataprovider(filename, [globaltag])
 
     def check(self, exp, run):

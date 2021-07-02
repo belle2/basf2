@@ -10,10 +10,9 @@
 
 #include <generators/modules/phokharainput/PhokharaInputModule.h>
 
-#include <framework/utilities/FileSystem.h>
-#include <framework/utilities/EnvironmentVariables.h>
-
 #include <framework/datastore/StoreArray.h>
+#include <framework/utilities/FileSystem.h>
+#include <framework/utilities/IOIntercept.h>
 
 using namespace std;
 using namespace Belle2;
@@ -81,7 +80,7 @@ PhokharaInputModule::PhokharaInputModule() : Module(), m_initial(BeamParameters:
            0.15);
 
   const std::string defaultParameterFile =
-    EnvironmentVariables::expand("${BELLE2_EXTERNALS_DIR}/share/phokhara/const_and_model_paramall10.0.dat");
+    FileSystem::findFile("/data/generators/phokhara/const_and_model_paramall10.0.dat");
   addParam("ParameterFile", m_ParameterFile,
            "File that contains particle properties.",
            defaultParameterFile);
@@ -158,6 +157,8 @@ void PhokharaInputModule::event()
     }
   }
 
+  StoreObjPtr<EventMetaData> evtMetaData("EventMetaData", DataStore::c_Event);
+
   // initial particle from beam parameters
   const MCInitialParticles& initial = m_initial.generate();
 
@@ -171,12 +172,18 @@ void PhokharaInputModule::event()
   if (m_BeamEnergySpread) {
     // PHOKHARA does not support beam-energy spread. To simulate it,
     // the generator is initialized with the new energy for every event.
+    IOIntercept::OutputToLogMessages initLogCapture(
+      "PHOKHARA", LogConfig::c_Debug, LogConfig::c_Debug, 100, 100);
+    initLogCapture.start();
     m_generator.setCMSEnergy(initial.getMass());
     m_generator.init(m_ParameterFile);
+    initLogCapture.finish();
   }
-  m_generator.generateEvent(m_mcGraph, vertex, boost);
+  double weight = m_generator.generateEvent(m_mcGraph, vertex, boost);
   m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 
+  //store the weight (1.0 for unweighted events)
+  evtMetaData->setGeneratedWeight(weight);
 }
 
 

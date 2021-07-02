@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-import ROOT
-from ROOT import Belle2
+import basf2 as b2
 from modularAnalysis import fillParticleList
 from modularAnalysis import copyParticles
 from modularAnalysis import copyList
@@ -23,7 +21,7 @@ def addBeamParamsConversionMonitors(outputRootFile='b2biiBeamParamsConversionMon
     """
 
     # register VariablesToHistogram and fill it with monitored variables
-    beam2hist = register_module('VariablesToHistogram')
+    beam2hist = b2.register_module('VariablesToHistogram')
     beam2hist.param('particleList', '')
 
     # define variables that are monitored and specify
@@ -86,9 +84,9 @@ def addKshortConversionMonitors(outputRootFile='b2biiKshortConversionMonitors.ro
     matchMCTruth('K_S0:b2bii_monitor', path)
 
     # register VariablesToHistogram and fill it with monitored variables
-    kshorts2hist = register_module('VariablesToHistogram')
+    kshorts2hist = b2.register_module('VariablesToHistogram')
     kshorts2hist.param('particleList', 'K_S0:mdst')
-    fittdKS2hist = register_module('VariablesToHistogram')
+    fittdKS2hist = b2.register_module('VariablesToHistogram')
     fittdKS2hist.param('particleList', 'K_S0:b2bii_monitor')
 
     # define variables that are monitored and specify
@@ -214,7 +212,7 @@ def addKlongConversionMonitors(outputRootFile='b2biiKlongConversionMonitors.root
     matchMCTruth('K_L0:mdst', path)
 
     # register VariablesToHistogram and fill it with monitored variables
-    klong2hist = register_module('VariablesToHistogram')
+    klong2hist = b2.register_module('VariablesToHistogram')
     klong2hist.param('particleList', 'K_L0:mdst')
 
     # define variables that are monitored and specify
@@ -258,9 +256,9 @@ def addLambda0ConversionMonitors(outputRootFile='b2biiLambda0ConversionMonitors.
     matchMCTruth('Lambda0:b2bii_monitor', path)
 
     # register VariablesToHistogram and fill it with monitored variables
-    lambdas2hist = register_module('VariablesToHistogram')
+    lambdas2hist = b2.register_module('VariablesToHistogram')
     lambdas2hist.param('particleList', 'Lambda0:mdst')
-    fittdL02hist = register_module('VariablesToHistogram')
+    fittdL02hist = b2.register_module('VariablesToHistogram')
     fittdL02hist.param('particleList', 'Lambda0:b2bii_monitor')
 
     # define variables that are monitored and specify
@@ -382,9 +380,9 @@ def addConvertedPhotonConversionMonitors(outputRootFile='b2biiConvertedPhotonCon
     matchMCTruth('gamma:v0_b2bii_monitor', path)
 
     # register VariablesTohistogram and fill it with monitored variables
-    convgam2hist = register_module('VariablesToHistogram')
+    convgam2hist = b2.register_module('VariablesToHistogram')
     convgam2hist.param('particleList', 'gamma:v0mdst')
-    fittdCG2hist = register_module('VariablesToHistogram')
+    fittdCG2hist = b2.register_module('VariablesToHistogram')
     fittdCG2hist.param('particleList', 'gamma:v0_b2bii_monitor')
 
     # define variables that are monitored and specify
@@ -505,7 +503,7 @@ def addTrackConversionMonitors(outputRootFile='b2biiTrackConversionMonitors.root
     fillParticleList('pi+:b2bii_monitor', '', False, path)
 
     # register VariablesToHistogram and fill it with monitored variables
-    tracks2hist = register_module('VariablesToHistogram')
+    tracks2hist = b2.register_module('VariablesToHistogram')
     tracks2hist.param('particleList', 'pi+:b2bii_monitor')
 
     # define variables that are monitored and specify
@@ -598,12 +596,12 @@ def addNeutralsConversionMonitors(gammaOutputRootFile='b2biiGammaConversionMonit
     cutAndCopyLists('pi0:b2bii_monitorMC', 'pi0:b2bii_monitor', 'mcPDG == 111', path=path)
 
     # register VariablesToHistogram and fill them with monitored variables
-    gamma2hist = register_module('VariablesToHistogram')
+    gamma2hist = b2.register_module('VariablesToHistogram')
     gamma2hist.param('particleList', 'gamma:b2bii_monitor')
-    neutralPi2hist = register_module('VariablesToHistogram')
+    neutralPi2hist = b2.register_module('VariablesToHistogram')
     neutralPi2hist.param('particleList', 'pi0:b2bii_monitor')
 
-    MCneutralPi2hist = register_module('VariablesToHistogram')
+    MCneutralPi2hist = b2.register_module('VariablesToHistogram')
     MCneutralPi2hist.param('particleList', 'pi0:b2bii_monitorMC')
 
     # define variables that are monitored and specify
@@ -857,8 +855,8 @@ def addMCParticlesConversionMonitors(outputRootFile='b2biiMCParticlesConversionM
     @param path modules are added to this path
     """
 
-    histo = register_module("HistoManager")
-    MCParticles2hist = register_module('B2BIIMCParticlesMonitor')
+    histo = b2.register_module("HistoManager")
+    MCParticles2hist = b2.register_module('B2BIIMCParticlesMonitor')
 
     histo.param("histoFileName", outputRootFile)
 

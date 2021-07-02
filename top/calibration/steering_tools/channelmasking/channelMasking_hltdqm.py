@@ -4,9 +4,8 @@
 import sys
 import os
 import glob
-import ROOT
 import logging
-from ROOT import TH1F, TH2F, TProfile, TFile
+from ROOT import TFile, TH1F
 
 
 # checks if the run can be analyzed based on the HLT histograms, returns -1 if not and the number of events otherwise
@@ -113,7 +112,7 @@ logging.info("Starting channelmasking from HLT histograms")
 logging.info("Experiment: "+str(experiment))
 
 numFiles = len(fileNames)
-if numFiles is 0:
+if numFiles == 0:
     logging.error('No files found, exiting')
     sys.exit()
 

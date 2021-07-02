@@ -1,11 +1,11 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-from ROOT import Belle2, TH2F, TH1F, TFile, gStyle, TColor, TCanvas
+import os
+import basf2 as b2
+from ROOT import Belle2, TCanvas, TColor, TH1F, TH2F, gStyle
 import numpy
 from math import pi
-from interactive import embed
 
 
 # make the monitoring plots
@@ -43,7 +43,7 @@ used = numpy.zeros(2336, numpy.int)
 in_tsim = numpy.zeros(2336, numpy.int)
 
 
-class Monitor(Module):
+class Monitor(b2.Module):
     """
     Module to make some monitor plots for TSF
     """
@@ -106,14 +106,14 @@ class Monitor(Module):
         termination
         """
         if self.nevents == 0:
-            B2WARNING("The monitor module is never called.\n" +
-                      "There seems to be no CDC Trigger data at all!")
+            b2.B2WARNING("The monitor module is never called.\n" +
+                         "There seems to be no CDC Trigger data at all!")
             return
         elif hhit.GetEntries() == 0:
-            B2WARNING("No recorded TS hits at all!")
+            b2.B2WARNING("No recorded TS hits at all!")
             return
         elif hall.GetEntries() == 0:
-            B2ERROR("No simulated TS hits at all!")
+            b2.B2ERROR("No simulated TS hits at all!")
             return
         if not os.path.exists('monitor_plots'):
             os.mkdir('monitor_plots')
@@ -175,7 +175,7 @@ class Monitor(Module):
                     try:
                         h.Scale(1 / h.Integral('width'))
                     except ZeroDivisionError:
-                        B2WARNING(f'Not a single hit in SL{i * 2}!')
+                        b2.B2WARNING(f'Not a single hit in SL{i * 2}!')
                         continue
             height = max([g.GetMaximum() for g in hits])
             for h in hits:

@@ -39,11 +39,6 @@ namespace Belle2 {
       /** Constructor defining the parameters */
       PXDUnpackerModule();
 
-      /// Static function to return PXDError::c_ALL_ERROR
-      static PXDError::PXDErrorFlags getSilenceMask(void) { return PXDError::c_ALL_ERROR;};
-      /// Static function to return PXDError::c_NO_ERROR
-      static PXDError::PXDErrorFlags getVerboseMask(void) { return PXDError::c_NO_ERROR;};
-
     private:
 
       /** Initialize the module */
@@ -71,11 +66,11 @@ namespace Belle2 {
       unsigned int m_maxDHPFrameDiff{0};
 
       /** Critical error mask which defines return value of task */
-      uint64_t m_criticalErrorMask{0}; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
+      PXDError::PXDErrorFlags m_criticalErrorMask{};
       /** Mask for suppressing selected error messages */
-      uint64_t m_suppressErrorMask{0}; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
+      PXDError::PXDErrorFlags m_suppressErrorMask{};
       /** Mask for error which stop package unpacking directly */
-      uint64_t m_errorSkipPacketMask{0}; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
+      PXDError::PXDErrorFlags m_errorSkipPacketMask{};
 
       /** Event Number from MetaInfo */
       unsigned long m_meta_event_nr{0};
@@ -138,6 +133,7 @@ namespace Belle2 {
        * @param dhe_DHPport raw DHP port from DHC frame
        * @param dhe_reformat flag if DHE did reformatting
        * @param vxd_id vertex Detector ID
+       * @param daqpktstat Daq Packet Status Object
        */
       void unpack_dhp(void* data, unsigned int len, unsigned int dhe_first_readout_frame_lo, unsigned int dhe_ID, unsigned dhe_DHPport,
                       unsigned dhe_reformat, VxdID vxd_id, PXDDAQPacketStatus& daqpktstat);
@@ -154,7 +150,7 @@ namespace Belle2 {
       /** Unpack DHP/FCE data within one DHE frame
        * Not fully implemented as cluster format not 100% fixed
        * @param data pointer to dhp data
-       * @param len length of dhp data
+       * @param length length of dhp data
        * @param vxd_id vertex Detector ID
        */
       void unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id);

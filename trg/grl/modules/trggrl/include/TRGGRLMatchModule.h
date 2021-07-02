@@ -13,9 +13,10 @@
 #include <framework/core/Module.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/ecl/dataobjects/TRGECLCluster.h>
-#include <trg/klm/dataobjects/KLMTriggerTrack.h>
+#include <trg/klm/dataobjects/KLMTrgSummary.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/grl/dataobjects/TRGGRLShortTrack.h>
+#include <trg/grl/dataobjects/TRGGRLInnerTrack.h>
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
 #include <string>
 #include <vector>
@@ -65,7 +66,7 @@ namespace Belle2 {
                              std::vector<bool>& track_phimap_i);
 
     /**calculate dphi between 2D track and KLM track*/
-    void sectormatching_klm(CDCTriggerTrack* track, KLMTriggerTrack* klmtrack, double& dphi);
+    void sectormatching_klm(CDCTriggerTrack* track, StoreObjPtr<KLMTrgSummary> klmtrgsummary, double& dphi, int& klmtrack_ind_phi);
 
     /**determine photon from isolated cluster*/
     bool photon_cluster(TRGECLCluster* cluster, std::vector<bool> track_phimap, double e_threshold);
@@ -82,11 +83,32 @@ namespace Belle2 {
     /** Make the full track phi veto map for short tracking*/
     void make_veto_map(StoreArray<CDCTriggerTrack> track2Dlist, std::vector<bool>&  map_veto);
 
+    /** Make the ecl endcap phi map for inner/short track matching*/
+    void make_eecl_map(StoreArray<TRGECLCluster> clusterlist, std::vector<bool>& ecl_phimap, std::vector<bool>& ecl_phimap_fwd,
+                       std::vector<bool>& ecl_phimap_bwd, std::vector<bool>& ecl_sectormap_fwd, std::vector<bool>& ecl_sectormap_bwd);
+
+    /** Make the klm endcap phi map for inner/short track matching*/
+    void make_eklm_map(StoreObjPtr<KLMTrgSummary> klmtrgsummary,
+                       std::vector<bool>& eklm_sectormap, std::vector<bool>& eklm_sectormap_fwd, std::vector<bool>& eklm_sectormap_bwd);
+
     /** Short tracking logic*/
     void short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, std::vector<bool>  map_veto, std::vector<bool>  phimap_i,
+                        std::vector<bool>  ecl_phimap_fwd, std::vector<bool>  ecl_phimap_bwd,
+                        std::vector<bool>  klm_sectormap_fwd, std::vector<bool>  klm_sectormap_bwd,
                         std::vector< std::vector<int> >& pattern_base0, std::vector< std::vector<int> >& pattern_base2,
                         StoreArray<TRGGRLShortTrack> grlst,
                         StoreObjPtr<TRGGRLInfo> trgInfo);
+
+    void inner_tracking(StoreArray<CDCTriggerSegmentHit> tslist, std::vector<bool>  phimap_i,
+                        std::vector<bool>  ecl_phimap, std::vector<bool>  klm_sectormap,
+                        StoreArray<TRGGRLInnerTrack> grlit,
+                        StoreObjPtr<TRGGRLInfo> trgInfo);
+
+    void matching_eecl_eklm(std::vector<bool>  eecl_sectormap_fw,
+                            std::vector<bool>  eecl_setormap_bw,
+                            std::vector<bool>  eklm_sectormap_fw,
+                            std::vector<bool>  eklm_sectormap_bw,
+                            StoreObjPtr<TRGGRLInfo> trgInfo);
 
     /** Short track extrapolation (to endcap) function*/
     void extrapolation(int pattern, int& l, int& r, int& ec);
@@ -119,6 +141,22 @@ namespace Belle2 {
     std::vector<bool> track_phimap;
     /**36 bits phi map of all 2D tracks */
     std::vector<bool> track_phimap_i;
+    /**36 bits phi map of ECL clusters at endcap */
+    std::vector<bool> eecl_phimap;
+    /**36 bits phi map of ECL clusters at forward endcap */
+    std::vector<bool> eecl_phimap_fwd;
+    /**36 bits phi map of ECL clusters at backward endcap */
+    std::vector<bool> eecl_phimap_bwd;
+    /**8 bits sector map of ECL clusters at forward endcap */
+    std::vector<bool> eecl_sectormap_fwd;
+    /**8 bits sector map of ECL clusters at backward endcap */
+    std::vector<bool> eecl_sectormap_bwd;
+    /**8 bits phi map of KLM clusters at endcap */
+    std::vector<bool> eklm_sectormap;
+    /**8 bits sector map of KLM clusters at forward endcap */
+    std::vector<bool> eklm_sectormap_fwd;
+    /**8 bits sector map of KLM clusters at backward endcap */
+    std::vector<bool> eklm_sectormap_bwd;
     /**the 2D finder track list*/
     std::string m_2d_tracklist;
     /**the 3D NN track list*/
@@ -126,7 +164,7 @@ namespace Belle2 {
     /**the ecl cluster list*/
     std::string m_clusterlist;
     /**the KLM track list*/
-    std::string m_klmtracklist;
+    std::string m_klmtrgsummarylist;
     /**the distance in phi direction between track and cluster*/
     //double m_dr;
     /**the distance in z direction between track and cluster*/
@@ -145,6 +183,8 @@ namespace Belle2 {
     std::string m_hitCollectionName;
     /**GRL short track list*/
     std::string m_grlstCollectionName;
+    /**GRL inner track list*/
+    std::string m_grlitCollectionName;
     /** Name of the StoreArray holding projects information from grl */
     std::string m_TrgGrlInformationName;
     /** Short tracking patterns based on SL0*/

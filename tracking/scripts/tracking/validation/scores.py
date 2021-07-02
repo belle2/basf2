@@ -80,7 +80,7 @@ def efficiency(truths, predictions):
 
 def accuracy(truths, predictions):
     """Score function: accuracy = (accepted signal + rejected background) / total"""
-    n_correct = accepted_signal_amount(truths, predictions) + rejected_background(truths, predictions)
+    n_correct = accepted_signal_amount(truths, predictions) + rejected_background_amount(truths, predictions)
     n_data = data_amount(truths, predictions)
     return np.divide(1.0 * n_correct, n_data)
 

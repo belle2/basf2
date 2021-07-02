@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # Thomas Keck 2017
 
@@ -16,15 +15,11 @@
 """
 
 
-import ROOT
-from ROOT import Belle2
-
 from fei import monitoring
 
 from B2Tools import b2latex
 from B2Tools import format
 
-import pickle
 import sys
 import glob
 
@@ -114,7 +109,7 @@ if __name__ == '__main__':
 
         table = b2latex.LongTable(columnspecs=r'lrcrr',
                                   caption='Total CPU time spent in event() calls for each channel. Bars show ' +
-                                          ', '.join('\\textcolor{%s}{%s}' % (c, m)
+                                          ', '.join(f'\\textcolor{{{c}}}{{{m}}}'
                                                     for c, m in zip(colour_list.colours, moduleTypes)) +
                                           ', in this order. Does not include I/O, initialisation, training, post-cuts etc.',
                                   head=r'Decay & CPU time & by module & per (true) candidate & Relative time ',
@@ -224,4 +219,4 @@ if __name__ == '__main__':
                       vertex_pre_cut=p.after_vertex[channel.label].purity)
         o += table.finish()
 
-    o.save(output_file, compile=True)
+    o.save(output_file, compile=False)

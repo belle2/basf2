@@ -9,10 +9,8 @@
 
 import basf2
 from caf.framework import Calibration, Collection
-from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
-from ROOT import Belle2
+from caf.strategies import SequentialRunByRun, SingleIOV, SequentialBoundaries
 from ROOT.Belle2 import TOP
-from math import ceil
 
 
 def BS13d_calibration_local(inputFiles, look_back=28, globalTags=None, localDBs=None):
@@ -119,13 +117,13 @@ def BS13d_calibration_cdst(inputFiles, time_offset=0, globalTags=None, localDBs=
         main.add_module('TOPUnpacker')
         main.add_module('TOPRawDigitConverter')
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', subtractRunningOffset=False)
+        main.add_module('TOPBunchFinder', autoRange=True, subtractRunningOffset=False)
         main.add_module('TOPTimeRecalibrator',
-                        useAsicShiftCalibration=False, useChannelT0Calibration=False)
+                        useAsicShiftCalibration=False, useChannelT0Calibration=True)
     else:
         main.add_module('TOPGeometryParInitializer')
         main.add_module('TOPTimeRecalibrator',
-                        useAsicShiftCalibration=False, useChannelT0Calibration=False)
+                        useAsicShiftCalibration=False, useChannelT0Calibration=True)
 
     #   collector module
     collector = basf2.register_module('TOPAsicShiftsBS13dCollector',
@@ -171,17 +169,17 @@ def moduleT0_calibration_DeltaT(inputFiles, globalTags=None, localDBs=None,
         main.add_module('TOPUnpacker')
         main.add_module('TOPRawDigitConverter')
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', subtractRunningOffset=False)
+        main.add_module('TOPBunchFinder', autoRange=True, subtractRunningOffset=False)
     else:
         main.add_module('TOPGeometryParInitializer')
         main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', usePIDLikelihoods=True,
+        main.add_module('TOPBunchFinder', usePIDLikelihoods=True, autoRange=True,
                         subtractRunningOffset=False)
 
     #   collector module
     collector = basf2.register_module('TOPModuleT0DeltaTCollector')
-    collector.param('granularity', 'all')
+    collector.param('granularity', 'run')
 
     #   algorithm
     algorithm = TOP.TOPModuleT0DeltaTAlgorithm()
@@ -196,7 +194,7 @@ def moduleT0_calibration_DeltaT(inputFiles, globalTags=None, localDBs=None,
         for localDB in reversed(localDBs):
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
-    cal.strategies = SingleIOV
+    cal.strategies = SequentialBoundaries  # Was SingleIOV before proc12
 
     return cal
 
@@ -224,18 +222,18 @@ def moduleT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
         main.add_module('TOPUnpacker')
         main.add_module('TOPRawDigitConverter')
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', subtractRunningOffset=False)
+        main.add_module('TOPBunchFinder', autoRange=True, subtractRunningOffset=False)
     else:
         main.add_module('TOPGeometryParInitializer')
         main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', usePIDLikelihoods=True,
+        main.add_module('TOPBunchFinder', usePIDLikelihoods=True, autoRange=True,
                         subtractRunningOffset=False)
 
     #   collector module
     collector = basf2.register_module('TOPModuleT0LLCollector')
     collector.param('sample', sample)
-    collector.param('granularity', 'all')
+    collector.param('granularity', 'run')
 
     #   algorithm
     algorithm = TOP.TOPModuleT0LLAlgorithm()
@@ -250,7 +248,7 @@ def moduleT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
         for localDB in reversed(localDBs):
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
-    cal.strategies = SingleIOV
+    cal.strategies = SequentialBoundaries  # Was SingleIOV before proc12
 
     return cal
 
@@ -277,12 +275,12 @@ def commonT0_calibration_BF(inputFiles, globalTags=None, localDBs=None,
         main.add_module('TOPUnpacker')
         main.add_module('TOPRawDigitConverter')
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', subtractRunningOffset=False)
+        main.add_module('TOPBunchFinder', autoRange=True, subtractRunningOffset=False)
     else:
         main.add_module('TOPGeometryParInitializer')
         main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', usePIDLikelihoods=True,
+        main.add_module('TOPBunchFinder', usePIDLikelihoods=True, autoRange=True,
                         subtractRunningOffset=False)
 
     #   collector module
@@ -329,12 +327,12 @@ def commonT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
         main.add_module('TOPUnpacker')
         main.add_module('TOPRawDigitConverter')
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', subtractRunningOffset=False)
+        main.add_module('TOPBunchFinder', autoRange=True, subtractRunningOffset=False)
     else:
         main.add_module('TOPGeometryParInitializer')
         main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
         main.add_module('TOPChannelMasker')
-        main.add_module('TOPBunchFinder', usePIDLikelihoods=True,
+        main.add_module('TOPBunchFinder', usePIDLikelihoods=True, autoRange=True,
                         subtractRunningOffset=False)
 
     #   collector module
@@ -444,7 +442,7 @@ def pulseHeight_calibration_rawdata(inputFiles, globalTags=None, localDBs=None):
     return cal
 
 
-def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
+def module_alignment(inputFiles, sample='dimuon', fixedParameters=None,
                      globalTags=None, localDBs=None, new_cdst_format=True,
                      backend_args=None):
     '''
@@ -468,12 +466,6 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
             cal.use_local_database(localDB)
     cal.strategies = SingleIOV
 
-    # Since each Collection has its own maximum number of jobs to submit, we limit the number from each one
-    # so that the total adds up to something reasonable e.g. ~1600
-    total_jobs = 1600
-    number_of_slots = 16
-    jobs_per_collection = ceil(total_jobs/number_of_slots)
-
     #   add collections
     for slot in range(1, 17):
         #   create path
@@ -488,24 +480,27 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
             main.add_module('TOPUnpacker')
             main.add_module('TOPRawDigitConverter')
             main.add_module('TOPChannelMasker')
-            main.add_module('TOPBunchFinder', subtractRunningOffset=False)
+            main.add_module('TOPBunchFinder', autoRange=True, subtractRunningOffset=False)
         else:
             main.add_module('TOPGeometryParInitializer')
             main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
             main.add_module('TOPChannelMasker')
-            main.add_module('TOPBunchFinder',
+            main.add_module('TOPBunchFinder', autoRange=True,
                             usePIDLikelihoods=True, subtractRunningOffset=False)
 
-        #   collector module
+        #   collector module: executing iterative alignment method
         collector = basf2.register_module('TOPAlignmentCollector')
         collector.param('sample', sample)
-        collector.param('parFixed', fixedParameters)
+        if fixedParameters:
+            collector.param('parFixed', fixedParameters)
         collector.param('targetModule', slot)
         collector.param('granularity', 'all')
 
-        #   define collection
+        #   define collection:
+        #   because of iterative nature of the method we must run exactly one job per collection
+        #   which must process all the files from input list
         collection = Collection(collector=collector, input_files=inputFiles,
-                                pre_collector_path=main, max_collector_jobs=jobs_per_collection)
+                                pre_collector_path=main, max_collector_jobs=1)
         if globalTags:
             for globalTag in reversed(globalTags):
                 collection.use_central_database(globalTag)
@@ -518,8 +513,48 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
         #   add collection to calibration
         cal.add_collection(name='slot_' + '{:0=2d}'.format(slot), collection=collection)
 
-    #   algorithm
+    #   algorithm: it just greps the last iterations of collections and prepares the payload
     algorithm = TOP.TOPAlignmentAlgorithm()
     cal.algorithms = algorithm
+
+    return cal
+
+
+def channel_mask_calibration(inputFiles, globalTags=None, localDBs=None, unpack=True):
+    '''
+    Returns calibration object for channel masking
+    :param inputFiles: A list of input files in raw data or cdst format
+    :param globalTags: a list of global tags, highest priority first
+    :param localDBs: a list of local databases, highest priority first
+    :param unpack: True if data unpacking is required (i.e. for raw data or for new cdst format)
+    '''
+
+    #   create path
+    main = basf2.create_path()
+
+    #   add basic modules
+    main.add_module('RootInput')
+    main.add_module('TOPGeometryParInitializer')
+    if unpack:
+        main.add_module('TOPUnpacker')
+        main.add_module('TOPRawDigitConverter')
+
+    #   collector module
+    collector = basf2.register_module('TOPChannelMaskCollector')
+
+    #   algorithm
+    algorithm = TOP.TOPChannelMaskAlgorithm()
+
+    #   define calibration
+    cal = Calibration(name='TOP_ChannelMaskCalibration', collector=collector,
+                      algorithms=algorithm, input_files=inputFiles)
+    if globalTags:
+        for globalTag in reversed(globalTags):
+            cal.use_central_database(globalTag)
+    if localDBs:
+        for localDB in reversed(localDBs):
+            cal.use_local_database(localDB)
+    cal.pre_collector_path = main
+    cal.strategies = SequentialRunByRun
 
     return cal

@@ -22,7 +22,6 @@ class JsonBase:
     """
     Base object for all json-serializable objects of the validation suite
     """
-    pass
 
 
 class Revision(JsonBase):
@@ -31,8 +30,14 @@ class Revision(JsonBase):
     Contains information about a specific revision
     """
 
-    def __init__(self, label, git_hash=None, creation_date=None, packages=None,
-                 creation_timezone=None):
+    def __init__(
+        self,
+        label,
+        git_hash=None,
+        creation_date=None,
+        packages=None,
+        creation_timezone=None,
+    ):
         """
         Create a new Revision object and fill all members
         """
@@ -133,8 +138,15 @@ class Plot(JsonBase):
     Wrapper for one specfic plot.
     """
 
-    def __init__(self, is_expert=False, description=None, check=None,
-                 contact=None, width=None, height=None):
+    def __init__(
+        self,
+        is_expert=False,
+        description=None,
+        check=None,
+        contact=None,
+        width=None,
+        height=None,
+    ):
         """
         Create a new Plot object and fill all members
         """
@@ -293,8 +305,9 @@ class ComparisonPlotFile(PlotFile):
         if not html_content:
             html_content = []
 
-        super().__init__(package, title, rootfile, plots,
-                         description=description)
+        super().__init__(
+            package, title, rootfile, plots, description=description
+        )
         #: label of the revision which were used in this comparison
         self.compared_revision = compared_revisions
         #: the ntuples which were compared
@@ -306,35 +319,39 @@ class ComparisonPlotFile(PlotFile):
         self.has_reference = has_reference
 
         #: the number of failed comparisons in this file
-        self.comparison_error = len([
-            plt for plt in self.plots if plt.comparison_result == "error"
-        ])
+        self.comparison_error = len(
+            [plt for plt in self.plots if plt.comparison_result == "error"]
+        )
         #: the number of failed comparisons of shifter plots in this file
-        self.comparison_error_shifter = len([
-            plt for plt in self.plots
-            if (not plt.is_expert) and plt.comparison_result == "error"
-        ])
+        self.comparison_error_shifter = len(
+            [
+                plt
+                for plt in self.plots
+                if (not plt.is_expert) and plt.comparison_result == "error"
+            ]
+        )
         #: the number of comparisons which resulted in a warning
-        self.comparison_warning = len([
-            plt for plt in self.plots if plt.comparison_result == "warning"
-        ])
+        self.comparison_warning = len(
+            [plt for plt in self.plots if plt.comparison_result == "warning"]
+        )
         #: the number of comparisons of shifter plots in this file which
         #: resulted in a warning
-        self.comparison_warning_shifter = len([
-            plt for plt in self.plots
-            if (not plt.is_expert) and plt.comparison_result == "warning"
-        ])
+        self.comparison_warning_shifter = len(
+            [
+                plt
+                for plt in self.plots
+                if (not plt.is_expert) and plt.comparison_result == "warning"
+            ]
+        )
 
         #: Number of shifter ntuples
-        self.n_shifter_ntuples = sum([
-            not tuple.is_expert for tuple in self.ntuples
-        ])
+        self.n_shifter_ntuples = sum(
+            [not tuple.is_expert for tuple in self.ntuples]
+        )
 
         #: Show to shifter, i.e. is there at least one non-expert plot?
         self.show_shifter = bool(
-            self.n_shifter_plots or
-            self.n_shifter_ntuples or
-            self.html_content
+            self.n_shifter_plots or self.n_shifter_ntuples or self.html_content
         )
 
 
@@ -345,20 +362,21 @@ class ComparisonPlot(Plot):
     """
 
     def __init__(
-            self,
-            title,
-            comparison_result=None,
-            png_filename=None,
-            pdf_filename=None,
-            contact=None,
-            description=None,
-            check=None,
-            is_expert=None,
-            plot_path=None,
-            comparison_text=None,
-            height=None,
-            width=None,
-            warnings=None):
+        self,
+        title,
+        comparison_result=None,
+        png_filename=None,
+        pdf_filename=None,
+        contact=None,
+        description=None,
+        check=None,
+        is_expert=None,
+        plot_path=None,
+        comparison_text=None,
+        height=None,
+        width=None,
+        warnings=None,
+    ):
         """
         Create a new ComparisonPlot object and fill all members
         """
@@ -370,7 +388,7 @@ class ComparisonPlot(Plot):
             check=check,
             contact=contact,
             height=height,
-            width=width
+            width=width,
         )
         #: tile used to display this plot
         self.title = title
@@ -404,22 +422,21 @@ class ComparisonNTuple(NTuple):
     """
 
     def __init__(
-            self,
-            title,
-            contact=None,
-            description=None,
-            check=None,
-            is_expert=None,
-            json_file_path=None):
+        self,
+        title,
+        contact=None,
+        description=None,
+        check=None,
+        is_expert=None,
+        json_file_path=None,
+    ):
         """
         Create a new ComparisonNTuple object and fill all members
         """
 
         # todo: move more into the base class
         super().__init__(
-            is_expert=is_expert,
-            description=description,
-            check=check
+            is_expert=is_expert, description=description, check=check
         )
         #: Text used as title for the ntuple item
         self.title = title
@@ -437,19 +454,22 @@ class ComparisonHtmlContent(HtmlContent):
     """
 
     def __init__(
-            self,
-            title,
-            contact=None,
-            description=None,
-            check=None,
-            is_expert=None,
-            html_content=None):
+        self,
+        title,
+        contact=None,
+        description=None,
+        check=None,
+        is_expert=None,
+        html_content=None,
+    ):
         """
         Create a new ComparisonNTuple object and fill all members
         """
 
         # todo: move more into the base class
-        super().__init__(is_expert=is_expert, description=description, check=check)
+        super().__init__(
+            is_expert=is_expert, description=description, check=check
+        )
         #: Text used as title for the ntuple item
         self.title = title
         #: name of contact person
@@ -465,8 +485,9 @@ class ComparisonPackage(Package):
     Information about a Package which was used in a comparison operation
     """
 
-    def __init__(self, name, plotfiles=None, scriptfiles=None,
-                 ntuplefiles=None):
+    def __init__(
+        self, name, plotfiles=None, scriptfiles=None, ntuplefiles=None
+    ):
         """
         Create a new ComparisonPackage object and fill all members
         """
@@ -481,22 +502,20 @@ class ComparisonPackage(Package):
         super().__init__(name, plotfiles=plotfiles, scriptfiles=scriptfiles)
 
         #: the number of failed comparisons in this package
-        self.comparison_error = sum([
-            pf.comparison_error for pf in plotfiles
-        ])
+        self.comparison_error = sum([pf.comparison_error for pf in plotfiles])
         #: the number of failed comparisons of shifter plots in this package
-        self.comparison_error_shifter = sum([
-            pf.comparison_error_shifter for pf in plotfiles
-        ])
+        self.comparison_error_shifter = sum(
+            [pf.comparison_error_shifter for pf in plotfiles]
+        )
         #: the number of comparisons which resulted in a warning
-        self.comparison_warning = sum([
-            pf.comparison_warning for pf in plotfiles
-        ])
+        self.comparison_warning = sum(
+            [pf.comparison_warning for pf in plotfiles]
+        )
         #: the number of comparisons of shifter plots which resulted in a
         #: warning
-        self.comparison_warning_shifter = sum([
-            pf.comparison_warning_shifter for pf in plotfiles
-        ])
+        self.comparison_warning_shifter = sum(
+            [pf.comparison_warning_shifter for pf in plotfiles]
+        )
 
 
 class ComparisonRevision(Revision):
@@ -542,8 +561,7 @@ class Comparison(JsonBase):
         sorted_revs = sorted(revisions, key=lambda x: x.label)
         #: the unique label of this comparison
         self.label = functools.reduce(
-            lambda x, y: x + "_" + y.label,
-            sorted_revs, ""
+            lambda x, y: x + "_" + y.label, sorted_revs, ""
         )[1:]
 
 
@@ -551,12 +569,13 @@ class Comparison(JsonBase):
 # Functions
 # ==============================================================================
 
+
 def dump(file_name, obj):
     """
     Output a tree of objects into a json file
     """
 
-    with open(file_name, 'w+') as f:
+    with open(file_name, "w+") as f:
         json.dump(dump_rec(obj), f, sort_keys=True, indent=4)
 
 

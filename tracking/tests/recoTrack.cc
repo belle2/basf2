@@ -288,7 +288,7 @@ namespace Belle2 {
 
     auto recoTrack = recoTracks.appendNew(m_recoTrack->getPositionSeed(), m_recoTrack->getMomentumSeed(), m_recoTrack->getChargeSeed(),
                                           m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits,
-                                          m_storeArrayNameOfBKLMHits, m_storeArrayNameOfBKLMHits,
+                                          m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits,
                                           m_storeArrayNameOfHitInformation);
     EXPECT_FALSE(recoTrack->hasCDCHits());
 
@@ -318,7 +318,7 @@ namespace Belle2 {
     RecoTrack* recoTrack2 = recoTracks.appendNew(m_recoTrack->getPositionSeed(), m_recoTrack->getMomentumSeed(),
                                                  m_recoTrack->getChargeSeed(),
                                                  m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits,
-                                                 m_storeArrayNameOfBKLMHits, m_storeArrayNameOfBKLMHits,
+                                                 m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits,
                                                  m_storeArrayNameOfHitInformation);
     recoTrack2->addCDCHit(cdcHits[1], 2);
 

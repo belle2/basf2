@@ -42,13 +42,12 @@ std::string SVDUnpackerDQMModule::m_xmlFileName = std::string("SVDChannelMapping
 SVDUnpackerDQMModule::SVDUnpackerDQMModule() : HistoModule(), m_mapping(m_xmlFileName), m_FADCs(nullptr)
 {
   //Set module properties
-  setDescription("DQM Histogram for the SVD Unpacker");
+  setDescription("DQM Histogram of the SVD Raw Data format.");
 
-  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed.",
            std::string("SVDUnpacker"));
-  addParam("ShaperDigitsName", m_ShaperDigitName, "Name of ShaperDigit Store Array.", std::string(""));
-  addParam("DiagnosticsName", m_SVDDAQDiagnosticsName, "Name of DAQDiagnostics Store Array.", std::string(""));
-  addParam("EventInfoName", m_SVDEventInfoName, "Name of SVDEventInfo object", std::string(""));
+  addParam("DAQDiagnostics", m_SVDDAQDiagnosticsName, "Name of DAQDiagnostics Store Array.", std::string(""));
+  addParam("EventInfo", m_SVDEventInfoName, "Name of SVDEventInfo object.", std::string(""));
 
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
 }

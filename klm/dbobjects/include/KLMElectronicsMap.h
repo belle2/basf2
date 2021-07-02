@@ -11,6 +11,7 @@
 #pragma once
 
 /* KLM headers. */
+#include <klm/dataobjects/KLMElementNumberDefinitions.h>
 #include <klm/dbobjects/KLMElectronicsChannel.h>
 
 /* C++ headers. */
@@ -40,7 +41,7 @@ namespace Belle2 {
      * @param[in] electronicsChannel Electronics channel.
      * @return Detector channel, nullptr if not found.
      */
-    const uint16_t* getDetectorChannel(
+    const KLMChannelNumber* getDetectorChannel(
       KLMElectronicsChannel* electronicsChannel) const;
 
     /**
@@ -49,7 +50,7 @@ namespace Belle2 {
      * @return Electronics channel, nullptr if not found.
      */
     const KLMElectronicsChannel* getElectronicsChannel(
-      uint16_t detectorChannel) const;
+      KLMChannelNumber detectorChannel) const;
 
     /**
      * Add channel.
@@ -60,16 +61,16 @@ namespace Belle2 {
      * @param[in] axis            Axis.
      * @param[in] channel         Channel.
      */
-    void addChannel(uint16_t detectorChannel, int copper, int slot, int lane,
-                    int axis, int channel);
+    void addChannel(KLMChannelNumber detectorChannel, int copper, int slot,
+                    int lane, int axis, int channel);
 
   private:
 
     /** Detector channel - electronics channel map. */
-    std::map<uint16_t, KLMElectronicsChannel> m_MapDetectorElectronics;
+    std::map<KLMChannelNumber, KLMElectronicsChannel> m_MapDetectorElectronics;
 
     /** Electronics channel - detector channel map. */
-    std::map<KLMElectronicsChannel, uint16_t> m_MapElectronicsDetector;
+    std::map<KLMElectronicsChannel, KLMChannelNumber> m_MapElectronicsDetector;
 
     /** Class version. */
     ClassDef(Belle2::KLMElectronicsMap, 1);

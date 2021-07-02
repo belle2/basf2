@@ -28,6 +28,10 @@ ChargedPidMVAMulticlassModule::ChargedPidMVAMulticlassModule() : Module()
            m_payload_name,
            "The name of the database payload object with the MVA weights.",
            std::string("ChargedPidMVAWeights"));
+  addParam("chargeIndependent",
+           m_charge_independent,
+           "Specify whether to use a charge-independent training of the MVA.",
+           bool(false));
   addParam("useECLOnlyTraining",
            m_ecl_only,
            "Specify whether to use an ECL-only training of the MVA.",
@@ -89,26 +93,31 @@ void ChargedPidMVAMulticlassModule::event()
       // Otherwise, skip to next.
       const ECLCluster* eclCluster = particle->getECLCluster();
       if (!eclCluster) {
-        B2WARNING("\tParticle has invalid Track-ECLCluster relation, skip MVA application...");
+        B2DEBUG(11, "\t\tParticle has invalid Track-ECLCluster relation, skip MVA application...");
         continue;
       }
 
       // Retrieve the index for the correct MVA expert and dataset,
-      // given reconstructed (clusterTheta, p)
-      auto theta   = eclCluster->getTheta();
-      auto p       = particle->getP();
-      int jth, ip;
-      auto index   = (*m_weightfiles_representation.get())->getMVAWeightIdx(theta, p, jth, ip);
+      // given the reconstructed (clusterTheta, p, charge)
+      auto clusterTheta = eclCluster->getTheta();
+      auto p = particle->getP();
+      // Set a dummy charge of zero to pick charge-independent payloads, if requested.
+      auto charge = (!m_charge_independent) ? particle->getCharge() : 0.0;
+      int idx_theta, idx_p, idx_charge;
+      auto index = (*m_weightfiles_representation.get())->getMVAWeightIdx(clusterTheta, p, charge, idx_theta, idx_p, idx_charge);
 
       // Get the cut defining the MVA category under exam (this reflects the one used in the training).
       const auto cuts   = (*m_weightfiles_representation.get())->getCutsMulticlass();
       const auto cutstr = (!cuts->empty()) ? cuts->at(index) : "";
 
-      B2DEBUG(11, "\t\tcharge          = " << particle->getCharge());
-      B2DEBUG(11, "\t\tclusterTheta    = " << theta << " [rad]");
+      B2DEBUG(11, "\t\tclusterTheta    = " << clusterTheta << " [rad]");
       B2DEBUG(11, "\t\tp               = " << p << " [GeV/c]");
+      if (!m_charge_independent) {
+        B2DEBUG(11, "\t\tcharge          = " << charge);
+      }
       B2DEBUG(11, "\t\tBrems corrected = " << particle->hasExtraInfo("bremsCorrectedPhotonEnergy"));
-      B2DEBUG(11, "\t\tWeightfile idx  = " << index << " - (clusterTheta, p) = (" << jth << ", " << ip << ")");
+      B2DEBUG(11, "\t\tWeightfile idx  = " << index << " - (clusterTheta, p, charge) = (" << idx_theta << ", " << idx_p << ", " <<
+              idx_charge << ")");
       if (!cutstr.empty()) {
         B2DEBUG(11, "\t\tCategory cut    = " << cutstr);
       }
@@ -124,7 +133,7 @@ void ChargedPidMVAMulticlassModule::event()
 
         auto var = varobj->function(particle);
 
-        // Manual imputation value of -999 for NaN (undefined) variables.
+        // Manual imputation value of -999 for NaN (undefined) variables. Needed by TMVA.
         var = (std::isnan(var)) ? -999.0 : var;
 
         B2DEBUG(11, "\t\tvar[" << ivar << "] : " << varobj->name << " = " << var);
@@ -165,11 +174,13 @@ void ChargedPidMVAMulticlassModule::event()
       B2DEBUG(11, "\tMVA response:");
 
       std::string score_varname("");
+      // We deal w/ a SingleDataset, so 0 is the only existing component by construction.
+      std::vector<float> scores = m_experts.at(index)->applyMulticlass(*m_datasets.at(index))[0];
+
       for (unsigned int classID(0); classID < m_classes.size(); ++classID) {
 
         const std::string className(m_classes.at(classID));
 
-        float score = m_experts.at(index)->apply(*m_datasets.at(index), classID)[0];
         score_varname = "pidChargedBDTScore_" + className;
 
         if (m_ecl_only) {
@@ -180,11 +191,11 @@ void ChargedPidMVAMulticlassModule::event()
           }
         }
 
-        B2DEBUG(11, "\t\tclass[" << classID << "] = " << className << " - score = " << score);
+        B2DEBUG(11, "\t\tclass[" << classID << "] = " << className << " - score = " << scores[classID]);
         B2DEBUG(12, "\t\tExtraInfo: " << score_varname);
 
         // Store the MVA score as a new particle object property.
-        particle->writeExtraInfo(score_varname, score);
+        particle->writeExtraInfo(score_varname, scores[classID]);
 
       }
 

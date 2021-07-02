@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import sys
 import ROOT
@@ -31,6 +30,17 @@ def is_statistics_file(tfile):
         return True
     return False
 
+def is_monitor_ntuple_file(tfile):
+    if 'Monitor_Final' in tfile.GetName():
+        return True
+    else:
+        return False
+
+def is_training_ntuple_file(tfile):
+    if 'training_input' in tfile.GetName():
+        return True
+    else:
+        return False
 
 def doMerge(outFile, inFiles):
     out = ROOT.TFile.Open(outFile, 'NEW')
@@ -62,6 +72,18 @@ def doMerge(outFile, inFiles):
     outTree.Write()
     out.Close()
 
+def doMergeNtuple(outFile, inFiles):
+    first_input = ROOT.TFile.Open(inFiles[0],'read')
+    tchains = [ROOT.TChain(k.GetName()) for k in first_input.GetListOfKeys()]
+
+    output = ROOT.TFile.Open(outFile,'recreate')
+
+    for t in tchains:
+        for f in inFiles:
+            t.Add(f)
+        t.Write(t.GetName(), ROOT.TObject.kOverwrite)
+
+    output.Close()
 
 if len(sys.argv) < 3:
     printUsage()
@@ -69,7 +91,7 @@ if len(sys.argv) < 3:
 
 outFile = sys.argv[1]
 
-if os.path.isfile(outFile):
+if os.path.isfile(outFile) and not is_training_ntuple_file(ROOT.TFile.Open(outFile, 'read')):
     os.remove(outFile)
 
 inFiles = sys.argv[2:]
@@ -78,10 +100,24 @@ ROOT.gSystem.Load('libdataobjects')
 
 # pick first input file to check what we want to do
 filename = inFiles[0]
-tfile = ROOT.TFile(filename)
+tfile = ROOT.TFile.Open(filename, 'read')
+print(f'Preparing merging for {outFile}')
 if is_statistics_file(tfile):
+    print('Is a statistics file')
     doMerge(outFile, inFiles)
+elif is_monitor_ntuple_file(tfile):
+    print('Is a monitor ntuple file')
+    doMergeNtuple(outFile, inFiles)
+elif is_training_ntuple_file(tfile):
+    print('Is a training ntuple file')
+    import subprocess
+    if os.path.exists(outFile):
+        print(f'\t{outFile} exists already! Appending...')
+        ret = subprocess.call(['hadd', '-a', outFile] + inFiles)
+    else:
+        ret = subprocess.call(['hadd', outFile] + inFiles)
 else:
+    print('Is a histogram file')
     import subprocess
     ret = subprocess.call(['hadd', outFile] + inFiles)
     sys.exit(ret)

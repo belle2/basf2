@@ -13,7 +13,10 @@
 
 #include <framework/core/Module.h>
 
-#include <svd/calibration/SVDClusterCalibrations.h>
+#include <svd/calibration/SVDClustering.h>
+#include <svd/calibration/SVDHitTimeSelection.h>
+#include <svd/calibration/SVDCoGOnlyErrorScaleFactors.h>
+#include <svd/calibration/SVDOldDefaultErrorScaleFactors.h>
 
 #include <svd/dataobjects/SVDHistograms.h>
 
@@ -64,6 +67,8 @@ namespace Belle2 {
     TBranch* b_clsScaleErr1 = nullptr; /**< cluster size 1 pos err scale factor SNR */
     TBranch* b_clsScaleErr2 = nullptr; /**< cluster size 2 pos err scale factor SNR */
     TBranch* b_clsScaleErr3 = nullptr; /**< cluster size 3 pos err scale factor SNR */
+    TBranch* b_clsScaleErr4 = nullptr; /**< cluster size 4 pos err scale factor SNR */
+    TBranch* b_clsScaleErr5 = nullptr; /**< cluster size 5 pos err scale factor SNR */
     TBranch* b_clsTimeFunc = nullptr; /**< cluster cut time function ID */
     TBranch* b_clsTimeMin = nullptr; /**< cluster cut min time */
 
@@ -80,12 +85,17 @@ namespace Belle2 {
     float m_clsScaleErr1 = -1; /**< cluster size 1 pos err scale factor SNR */
     float m_clsScaleErr2 = -1; /**< cluster size 2 pos err scale factor SNR */
     float m_clsScaleErr3 = -1; /**< cluster size 3 pos err scale factor SNR */
+    float m_clsScaleErr4 = -1; /**< cluster size 4 pos err scale factor SNR */
+    float m_clsScaleErr5 = -1; /**< cluster size 5 pos err scale factor SNR */
     int m_clsTimeFunc = -1; /**< cluster cut time function version */
     float m_clsTimeMin = -1; /**< cluster cut min time */
 
   private:
 
-    SVDClusterCalibrations m_ClusterCal; /**< cluster calibrations payload */
+    SVDClustering m_ClusterCal; /**< cluster calibrations payload */
+    SVDHitTimeSelection m_HitTimeCut; /**< hit time cuts payload */
+    SVDCoGOnlyErrorScaleFactors m_CoGOnlySF;/**< scale factors for the CoGOnly algorithm*/
+    SVDOldDefaultErrorScaleFactors m_OldDefaultSF;/**< scale factors for the OldDefault algorithm*/
 
     //CLUSTERS SNR CUTS
     SVDHistograms<TH1F>* m_hClsSNR = nullptr; /**< cluster SNR histo */
@@ -96,6 +106,8 @@ namespace Belle2 {
     SVDHistograms<TH1F>* m_hClsScaleErr1 = nullptr; /**< cluster size 1, position error scale factor histo */
     SVDHistograms<TH1F>* m_hClsScaleErr2 = nullptr; /**< cluster size 2, position error scale factor histo */
     SVDHistograms<TH1F>* m_hClsScaleErr3 = nullptr; /**< cluster size 3, position error scale factor histo */
+    SVDHistograms<TH1F>* m_hClsScaleErr4 = nullptr; /**< cluster size 4, position error scale factor histo */
+    SVDHistograms<TH1F>* m_hClsScaleErr5 = nullptr; /**< cluster size 5, position error scale factor histo */
 
     //CLUSTER TIME CUTS
     SVDHistograms<TH1F>* m_hClsTimeFuncVersion = nullptr; /**< cluster cut time function version histo */

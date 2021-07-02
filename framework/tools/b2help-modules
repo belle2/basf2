@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+
+"""
+You can run ``b2help-modules`` to list all available modules.
+"""
+import subprocess
+import argparse
+import basf2_cli.modules
+
+
+def get_argument_parser():
+    parser = argparse.ArgumentParser(description="""
+This returns either all available modules within basf2 or returs specific information about a module when requested.
+
+Usage:
+    ``b2help-modules`` will return the full list of available modules.
+    ``b2help-modules PACKAGE`` will return a list of modules associated with the given PACKAGE name.
+    ``b2help-modules MODULENAME`` will return specific information about the module with the name MODULENAME.
+""")
+    parser.add_argument('module', nargs="?", default=None,
+                        help='Get information specific to the requested module.')
+    return parser
+
+
+if __name__ == "__main__":
+
+    args = get_argument_parser().parse_args()
+
+    if args.module is None:
+        basf2_cli.modules.print_module_list()
+    else:
+        basf2_cli.modules.print_module_list(args.module)

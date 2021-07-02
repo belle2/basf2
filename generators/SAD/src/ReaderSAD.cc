@@ -453,7 +453,7 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
     straights[name] = straight;
   }
 
-  string str_checklist[] = {"LHR1", "LHR2", "LLR1", "LLR2", "LLR3", "LLR4", "LLR5", "LHL1", "LHL2", "LLL1", "LLL2", "LLL3", "LLL4"};
+  string str_checklist[] = {"LHR1", "LHR2", "LLR1", "LLR2", "LLR3", "LLR4", "LLR5", "LHL1", "LHL2", "LLL1", "LLL2", "LLL3", "LLL4", "LLL5"};
   for (const string& str : str_checklist) {
     if (straights.count(str) == 0)
       B2FATAL("You need FarBeamLine.xml to run SADInput module. Please include FarBeamLine.xml in Belle2.xml. You also need to change 'length' in Belle2.xml to be 40m.");
@@ -486,14 +486,14 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
     bendings[name] = bending;
   }
 
-  string bend_checklist[] = {"BLC2RE", "BC1RP", "BLCWRP", "BLC1RP", "BLC2RP", "BLC1LE", "BC1LP", "BLC1LP", "BLC2LP"};
+  string bend_checklist[] = {"BLC2RE", "BC1RP", "BLCWRP", "BLC1RP", "BLC2RP", "BLC1LE", "BC1LP", "BLC1LP1", "BLC1LP2", "BLC2LP"};
   for (const string& bnd : bend_checklist) {
     if (bendings.count(bnd) == 0)
       B2FATAL("You need FarBeamLine.xml to run SADInput module. Please include FarBeamLine.xml in Belle2.xml. You also need to change 'length' in Belle2.xml to be 40m.");
   }
 
   static double her_breakpoints[6];
-  static double ler_breakpoints[16];
+  static double ler_breakpoints[18];
 
   // positive s
   her_breakpoints[0] = straights["LHL1"].l;
@@ -509,9 +509,9 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
   ler_breakpoints[0] = straights["LLL1"].l;
   ler_breakpoints[1] = ler_breakpoints[0] + bendings["BC1LP"].rt * bendings["BC1LP"].dphi;
   ler_breakpoints[2] = ler_breakpoints[1] + straights["LLL2"].l;
-  ler_breakpoints[3] = ler_breakpoints[2] + bendings["BLC1LP"].rt * bendings["BLC1LP"].dphi;
+  ler_breakpoints[3] = ler_breakpoints[2] + bendings["BLC1LP1"].rt * bendings["BLC1LP1"].dphi;
   ler_breakpoints[4] = ler_breakpoints[3] + straights["LLL3"].l;
-  ler_breakpoints[5] = ler_breakpoints[4] + bendings["BLC2LP"].rt * bendings["BLC2LP"].dphi;
+  ler_breakpoints[5] = ler_breakpoints[4] + bendings["BLC1LP2"].rt * bendings["BLC1LP2"].dphi;
   ler_breakpoints[6] = ler_breakpoints[5] + straights["LLL4"].l;
 
   // negative s
@@ -524,6 +524,10 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
   ler_breakpoints[13] = ler_breakpoints[12] - straights["LLR4"].l;
   ler_breakpoints[14] = ler_breakpoints[13] - bendings["BLC2RP"].rt * bendings["BLC2RP"].dphi;
   ler_breakpoints[15] = ler_breakpoints[14] - straights["LLR5"].l;
+
+  // positive s (extended)
+  ler_breakpoints[16] = ler_breakpoints[6] + bendings["BLC2LP"].rt * bendings["BLC2LP"].dphi;
+  ler_breakpoints[17] = ler_breakpoints[16] + straights["LLL5"].l;
 
   double dx = 0;
   double dz = 0;
@@ -553,10 +557,10 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
         dz = straights["LLL2"].z0 + sloc * cos(phi);
       } else if (s < ler_breakpoints[3]) {
         double sloc = s - ler_breakpoints[2];
-        phi = bendings["BLC1LP"].sphi + sloc / bendings["BLC1LP"].rt;
+        phi = bendings["BLC1LP1"].sphi + sloc / bendings["BLC1LP1"].rt;
         phi = -phi;
-        dx = bendings["BLC1LP"].x0 + bendings["BLC1LP"].rt * cos(-phi);
-        dz = bendings["BLC1LP"].z0 + bendings["BLC1LP"].rt * sin(-phi);
+        dx = bendings["BLC1LP1"].x0 + bendings["BLC1LP1"].rt * cos(-phi);
+        dz = bendings["BLC1LP1"].z0 + bendings["BLC1LP1"].rt * sin(-phi);
       } else if (s < ler_breakpoints[4]) {
         double sloc = s - ler_breakpoints[3];
         phi = straights["LLL3"].phi;
@@ -569,16 +573,21 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
         // and we need to use -s and not change phi.
         // Since we add pi to phi later,
         // we subtract it now for this element.
-        phi = bendings["BLC2LP"].sphi + bendings["BLC2LP"].dphi - sloc / bendings["BLC2LP"].rt;
+        phi = bendings["BLC1LP2"].sphi + bendings["BLC1LP2"].dphi - sloc / bendings["BLC1LP2"].rt;
         phi = -phi;
-        dx = bendings["BLC2LP"].x0 + bendings["BLC2LP"].rt * cos(-phi);
-        dz = bendings["BLC2LP"].z0 + bendings["BLC2LP"].rt * sin(-phi);
+        dx = bendings["BLC1LP2"].x0 + bendings["BLC1LP2"].rt * cos(-phi);
+        dz = bendings["BLC1LP2"].z0 + bendings["BLC1LP2"].rt * sin(-phi);
         phi -= M_PI;
       } else if (s < ler_breakpoints[6]) {
         double sloc = s - ler_breakpoints[5];
         phi = straights["LLL4"].phi;
         dx = straights["LLL4"].x0 + sloc * sin(phi);
         dz = straights["LLL4"].z0 + sloc * cos(phi);
+      } else if (s < ler_breakpoints[17]) {
+        double sloc = s - ler_breakpoints[16];
+        phi = straights["LLL5"].phi;
+        dx = straights["LLL5"].x0 + sloc * sin(phi);
+        dz = straights["LLL5"].z0 + sloc * cos(phi);
       }
       // For this direction rotation angle of elements changes to negative,
       // while SAD coordinates keep orientation.

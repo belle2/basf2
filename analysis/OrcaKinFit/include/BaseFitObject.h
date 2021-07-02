@@ -71,7 +71,7 @@
  *
  *
  *
- * Author:  Benno List, Jenny Böhme
+ * Author:  Benno List, Jenny BÃ¶hme
  * $Date: 2011/03/03 15:03:02 $
  * $Author: blist $
  *

@@ -23,11 +23,14 @@ class Cluster(ClusterBase):
         Check if qsub is available
         """
         try:
-            import drmaa
+            import drmaa  # noqa
+
             return True
         except ImportError:
-            print("drmaa library is not installed, please ues 'pip3 install "
-                  "drmaa'")
+            print(
+                "drmaa library is not installed, please ues 'pip3 install "
+                "drmaa'"
+            )
             return False
         except RuntimeError as re:
             print("drmaa library not properly configured")
@@ -59,9 +62,11 @@ class Cluster(ClusterBase):
 
         #: The command to submit a job. 'LOGFILE' will be replaced by the
         #: actual log file name
-        self.native_spec = ('-l h_vmem={requirement_vmem}G,h_fsize={'
-                            'requirement_storage}G '
-                            '-q {queuename} -V')
+        self.native_spec = (
+            "-l h_vmem={requirement_vmem}G,h_fsize={"
+            "requirement_storage}G "
+            "-q {queuename} -V"
+        )
 
         #: required vmem by the job in GB, required on DESY NAF, otherwise
         #: jobs get killed due to memory consumption
@@ -99,7 +104,7 @@ class Cluster(ClusterBase):
 
         return True
 
-    def execute(self, job: Script, options='', dry=False, tag='current'):
+    def execute(self, job: Script, options="", dry=False, tag="current"):
         """!
         Takes a Script object and a string with options and runs it on the
         cluster, either with ROOT or with basf2, depending on the file type.
@@ -115,8 +120,7 @@ class Cluster(ClusterBase):
         # installations which have no drmaa at all
         import drmaa
 
-        ss = drmaa.Session()
-        print(str(drmaa.Session))
+        print(str(drmaa.Session()))
 
         with drmaa.Session() as session:
             print("got session ")
@@ -129,10 +133,10 @@ class Cluster(ClusterBase):
             native_spec_string = self.native_spec.format(
                 requirement_storage=self.requirement_storage,
                 requirement_vmem=self.requirement_vmem,
-                queuename=self.queuename
+                queuename=self.queuename,
             )
             print(
-                f'Creating job template for wrapper script {shell_script_name}'
+                f"Creating job template for wrapper script {shell_script_name}"
             )
             jt = session.createJobTemplate()
             jt.remoteCommand = shell_script_name
@@ -157,7 +161,7 @@ class Cluster(ClusterBase):
 
         @param job: The job of which we want to know if it finished
         @return: (True if the job has finished, exit code). If we can't find the
-            exit code in the '.done'-file, the returncode will be -666.
+            exit code in the '.done'-file, the returncode will be -654.
             If the job is not finished, the exit code is returned as 0.
         """
 
@@ -166,8 +170,10 @@ class Cluster(ClusterBase):
         import drmaa
 
         if job.job_id is None:
-            print("Job has not been started with cluster drmaaa because "
-                  "job id is missing")
+            print(
+                "Job has not been started with cluster drmaaa because "
+                "job id is missing"
+            )
             sys.exit(0)
 
         with drmaa.Session() as session:
@@ -176,11 +182,12 @@ class Cluster(ClusterBase):
             try:
                 status = session.jobStatus(job.job_id)
             except drmaa.errors.InvalidJobException:
-                print("Job info for jobid {} cannot be retrieved, assuming "
-                      "job has terminated".format(job.job_id))
+                print(
+                    "Job info for jobid {} cannot be retrieved, assuming "
+                    "job has terminated".format(job.job_id)
+                )
 
-                (donefile_exists, donefile_returncode) = \
-                    self.checkDoneFile(job)
+                (donefile_exists, donefile_returncode) = self.checkDoneFile(job)
 
                 # always return the job es complete even if there is no done
                 #  file at this ponint tho job is also not longer

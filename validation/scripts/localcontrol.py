@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # std
 import logging
@@ -61,13 +60,13 @@ class Local:
 
         #: A dict which holds the connections between the jobs (=Script
         #: objects) and the processes that were spawned for them
-        self.jobs_processes = {}  # type: Dict[Script, subprocess.Popen]
+        self.jobs_processes: Dict[Script, subprocess.Popen] = {}
 
         #: Contains a reference to the logger-object from validate_basf2
         #: Set up the logging functionality for the 'local execution'-Class,
         #: so we can log to validate_basf2.py's log what is going on in
         #: .execute and .is_finished
-        self.logger = logging.getLogger('validate_basf2')
+        self.logger = logging.getLogger("validate_basf2")
 
         # Parameter for maximal number of parallel processes, use system CPU
         # count if not specified use the default of 10 if the cpu_count call
@@ -89,7 +88,8 @@ class Local:
         # noinspection PyUnresolvedReferences
         self.logger.note(
             f"Local job control will use {self.max_number_of_processes} "
-            f"parallel processes.")
+            f"parallel processes."
+        )
 
         #: Counter for number of running parallel processes
         self.current_number_of_processes = 0
@@ -101,10 +101,11 @@ class Local:
         @return: True if a new process can be spawned, otherwise False
         """
 
-        return (self.max_number_of_processes > 0) and \
-            (self.current_number_of_processes < self.max_number_of_processes)
+        return (self.max_number_of_processes > 0) and (
+            self.current_number_of_processes < self.max_number_of_processes
+        )
 
-    def execute(self, job: Script, options='', dry=False, tag='current'):
+    def execute(self, job: Script, options="", dry=False, tag="current"):
         """!
         Takes a Script object and a string with options and runs it locally,
         either with ROOT or with basf2, depending on the file type.
@@ -134,13 +135,13 @@ class Local:
 
         # fixme: Don't we need to close this later? /klieret
         # Create a logfile for this job and make sure it's empty!
-        log = open(os.path.basename(job.path) + '.log', 'w+')
+        log = open(os.path.basename(job.path) + ".log", "w+")
 
         # Now we need to distinguish between .py and .C files:
         extension = os.path.splitext(job.path)[1]
-        if extension == '.C':
+        if extension == ".C":
             # .c files are executed with ROOT. No options available here.
-            params = ['root', '-b', '-q', job.path]
+            params = ["root", "-b", "-q", job.path]
         else:
             # .py files are executed with basf2.
             # 'options' contains an option-string for basf2, e.g. '-n 100 -p
@@ -157,10 +158,8 @@ class Local:
         # Output of it will be written to the file defined above ('log').
         # If we are performing a dry run, just start an empty process.
         if dry:
-            params = ['echo', '"Performing a dry run!"']
-        process = subprocess.Popen(
-            params, stdout=log, stderr=subprocess.STDOUT
-        )
+            params = ["echo", '"Performing a dry run!"']
+        process = subprocess.Popen(params, stdout=log, stderr=subprocess.STDOUT)
 
         # Save the connection between the job and the given process-ID
         self.jobs_processes[job] = process

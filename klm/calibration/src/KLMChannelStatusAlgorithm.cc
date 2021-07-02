@@ -60,7 +60,7 @@ KLMChannelStatusAlgorithm::~KLMChannelStatusAlgorithm()
 
 CalibrationAlgorithm::EResult KLMChannelStatusAlgorithm::calibrate()
 {
-  uint16_t channel, module, sector;
+  KLMChannelNumber channel, module, sector;
   unsigned int hits, moduleHits, maxHits;
   /*
    * Fill channel hit map. Note that more than one entry can exist for the same
@@ -87,8 +87,11 @@ CalibrationAlgorithm::EResult KLMChannelStatusAlgorithm::calibrate()
       m_Results.m_HitNumberEKLM += hits;
   }
   clearCalibrationData();
-  if (m_Results.m_ChannelStatus != nullptr)
-    delete m_Results.m_ChannelStatus;
+  /*
+   * A new object is created, because saveCalibration() stores a pointer
+   * to KLMChannelStatus, and it is necessary to save the payloads to commit
+   * them at the end of calibration.
+   */
   m_Results.m_ChannelStatus = new KLMChannelStatus();
   m_Results.m_ChannelStatus->setStatusAllChannels(KLMChannelStatus::c_Undetermined);
   /* If there are no hits, then mark all channels as dead. */
@@ -275,7 +278,7 @@ CalibrationAlgorithm::EResult KLMChannelStatusAlgorithm::calibrate()
 }
 
 void KLMChannelStatusAlgorithm::calibrateSector(
-  uint16_t sector, double averageHitsActiveSector)
+  KLMSectorNumber sector, double averageHitsActiveSector)
 {
   unsigned int hits = m_Results.m_HitMapSectorNoHot.getChannelData(sector);
   if (hits == 0)
@@ -289,7 +292,7 @@ void KLMChannelStatusAlgorithm::calibrateSector(
   }
 }
 
-void KLMChannelStatusAlgorithm::calibrateModule(uint16_t module)
+void KLMChannelStatusAlgorithm::calibrateModule(KLMModuleNumber module)
 {
   unsigned int hits = m_Results.m_HitMapModule.getChannelData(module);
   if (hits >= m_MinimalModuleHitNumber) {
@@ -302,7 +305,7 @@ void KLMChannelStatusAlgorithm::calibrateModule(uint16_t module)
 }
 
 bool KLMChannelStatusAlgorithm::markHotChannel(
-  uint16_t channel, unsigned int moduleHits, int activeChannels)
+  KLMChannelNumber channel, unsigned int moduleHits, int activeChannels)
 {
   unsigned int hits = m_Results.m_HitMapChannel.getChannelData(channel);
   if (activeChannels == 1) {
@@ -323,7 +326,7 @@ bool KLMChannelStatusAlgorithm::markHotChannel(
   return false;
 }
 
-void KLMChannelStatusAlgorithm::calibrateChannel(uint16_t channel)
+void KLMChannelStatusAlgorithm::calibrateChannel(KLMChannelNumber channel)
 {
   unsigned int hits = m_Results.m_HitMapChannel.getChannelData(channel);
   if (m_Results.m_ChannelStatus->getChannelStatus(channel) ==

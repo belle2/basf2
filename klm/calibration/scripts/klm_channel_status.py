@@ -2,22 +2,20 @@
 
 """Custom calibration strategy for KLM channel status."""
 
-import collections
 import numpy
-import os
 
 import basf2
 import ROOT
 from ROOT import Belle2
 
-from caf.utils import ExpRun, IoV, AlgResult
+from caf.utils import AlgResult, IoV
 from caf.utils import runs_overlapping_iov, runs_from_vector
 from caf.utils import split_runs_by_exp
-from caf.strategies import AlgorithmStrategy
+from caf.strategies import AlgorithmStrategy, StrategyError
 from caf.state_machines import AlgorithmMachine
 from ROOT.Belle2 import KLMChannelStatusAlgorithm, KLMChannelIndex
 from klm_strategies_common import get_lowest_exprun, get_highest_exprun, \
-                                  calibration_result_string
+    calibration_result_string
 
 
 class KLMChannelStatus(AlgorithmStrategy):
@@ -293,8 +291,8 @@ class KLMChannelStatus(AlgorithmStrategy):
         # to the next or previous normal run.
         def can_merge(run_data, run_not_enough_data, run_normal):
             return run_data[run_not_enough_data][3].getModuleStatus(). \
-                       newNormalChannels(
-                       run_data[run_normal][3].getModuleStatus()) == 0
+                newNormalChannels(
+                run_data[run_normal][3].getModuleStatus()) == 0
 
         for run_range in run_ranges:
             next_run = run_range[1]
@@ -543,8 +541,8 @@ class KLMChannelStatus(AlgorithmStrategy):
                 iov = run_data[previous_run][5].front().iov
                 if (previous_run == 0):
                     run_data[previous_run][5].front().iov = Belle2.IntervalOfValidity(
-                            lowest_exprun.exp, lowest_exprun.run,
-                            experiment, first_run - 1)
+                        lowest_exprun.exp, lowest_exprun.run,
+                        experiment, first_run - 1)
                 else:
                     run_data[previous_run][5].front().iov = Belle2.IntervalOfValidity(experiment, iov.getRunLow(),
                                                                                       experiment, first_run - 1)
@@ -556,6 +554,6 @@ class KLMChannelStatus(AlgorithmStrategy):
             if (i == len(run_data) - 1):
                 iov = run_data[i][5].front().iov
                 run_data[i][5].front().iov = Belle2.IntervalOfValidity(
-                        experiment, iov.getRunLow(),
-                        highest_exprun.exp, highest_exprun.run)
+                    experiment, iov.getRunLow(),
+                    highest_exprun.exp, highest_exprun.run)
                 write_result(run_data, i)

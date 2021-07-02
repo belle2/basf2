@@ -485,8 +485,6 @@ TH1* DQMHistAnalysisPXDERModule::GetHisto(TString histoname)
   hh1 = findHist(histoname.Data());
   if (hh1 == NULL) {
     B2INFO("Histo " << histoname << " not in memfile");
-    // the following code sux ... is there no root function for that?
-
 
     // first search reference root file ... if ther is one
     if (m_refFile && m_refFile->IsOpen()) {
@@ -539,7 +537,6 @@ TH1* DQMHistAnalysisPXDERModule::GetHisto(TString histoname)
 
     if (hh1 == NULL) {
       B2INFO("Histo " << histoname << " not in memfile or ref file");
-      // the following code sux ... is there no root function for that?
 
       TDirectory* d = gROOT;
       TString myl = histoname;

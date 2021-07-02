@@ -32,6 +32,7 @@ class TestValidationMetadataSetter(unittest.TestCase):
     """ This test tests the ValidationMetadataSetter module via its interface
     :func:`validation_tools.metadata.create_validation_histograms`
     """
+
     def setUp(self):
         """ Open temporary directory to work in. """
         #: Temporary directory
@@ -56,8 +57,8 @@ class TestValidationMetadataSetter(unittest.TestCase):
         modularAnalysis.setupEventInfo(noEvents=10, path=path)
         ge.add_evtgen_generator(
             path=path,
-            finalstate='signal',
-            signaldecfile=basf2.find_file(str(dec_path))
+            finalstate="signal",
+            signaldecfile=basf2.find_file(str(dec_path)),
         )
 
         modularAnalysis.loadGearbox(path=path)
@@ -71,19 +72,37 @@ class TestValidationMetadataSetter(unittest.TestCase):
             "Upsilon(4S)",
             variables_1d=[
                 (
-                    "M", 100, 5, 15, "mass", "me <wontreply@dont.try>",
-                    "description of M", "nothing to check",
-                    "x label"
+                    "M",
+                    100,
+                    5,
+                    15,
+                    "mass",
+                    "me <wontreply@dont.try>",
+                    "description of M",
+                    "nothing to check",
+                    "x label",
                 )
             ],
             variables_2d=[
                 (
-                    "M", 100, 5, 15, "M", 100, 5, 15, "mass vs mass",
-                    "me <wontreply@dont.try>", "some description nobody reads",
-                    "nothing to check", "x label", "why label?", "mop1, mop2"
+                    "M",
+                    100,
+                    5,
+                    15,
+                    "M",
+                    100,
+                    5,
+                    15,
+                    "mass vs mass",
+                    "me <wontreply@dont.try>",
+                    "some description nobody reads",
+                    "nothing to check",
+                    "x label",
+                    "why label?",
+                    "mop1, mop2",
                 )
             ],
-            description="Overall description of plots in this package."
+            description="Overall description of plots in this package.",
         )
 
         basf2.process(path=path)
@@ -98,8 +117,7 @@ class TestValidationMetadataSetter(unittest.TestCase):
 
         d = tf.Get("Description")
         self.assertEqual(
-            d.GetTitle(),
-            "Overall description of plots in this package."
+            d.GetTitle(), "Overall description of plots in this package."
         )
 
         # 1D Histogram

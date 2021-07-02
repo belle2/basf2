@@ -22,6 +22,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
 
 #include <utility>
 #include <map>
@@ -132,8 +133,8 @@ namespace VXDTFObserversTest {
         newSP->addRelationTo(pxdCluster);
       }
 
-      mcParticleData[0]->setPDG(11);
-      mcParticleData[1]->setPDG(13);
+      mcParticleData[0]->setPDG(Const::electron.getPDGCode());
+      mcParticleData[1]->setPDG(Const::muon.getPDGCode());
       mcParticleData[1]->addStatus(MCParticle::c_PrimaryParticle);
 
 
@@ -772,11 +773,13 @@ namespace VXDTFObserversTest {
         if (aParticle == nullptr) { nullptrTrap = 1; }
         EXPECT_EQ(0, nullptrTrap);
 
-        EXPECT_EQ(aSP.getArrayIndex(), aCluster.getArrayIndex());
-        EXPECT_EQ(aSP.getArrayIndex(), aParticle->getArrayIndex());
-        EXPECT_EQ(int(aParticle->getMomentum().X()), aParticle->getArrayIndex() + 1);
-        EXPECT_EQ(int(aParticle->getMomentum().Y()), aParticle->getArrayIndex() + 1);
-        EXPECT_EQ(int(aParticle->getMomentum().Z()), aParticle->getArrayIndex() + 1);
+        if (aParticle) {
+          EXPECT_EQ(aSP.getArrayIndex(), aCluster.getArrayIndex());
+          EXPECT_EQ(aSP.getArrayIndex(), aParticle->getArrayIndex());
+          EXPECT_EQ(int(aParticle->getMomentum().X()), aParticle->getArrayIndex() + 1);
+          EXPECT_EQ(int(aParticle->getMomentum().Y()), aParticle->getArrayIndex() + 1);
+          EXPECT_EQ(int(aParticle->getMomentum().Z()), aParticle->getArrayIndex() + 1);
+        }
 
         nullptrTrap = 0;
       }
@@ -787,11 +790,13 @@ namespace VXDTFObserversTest {
         if (aParticle == nullptr) { nullptrTrap = 2; }
         EXPECT_EQ(0, nullptrTrap);
 
-        EXPECT_EQ(aSP.getArrayIndex(), 2 + aCluster.getArrayIndex() / 2);
-        EXPECT_EQ(aSP.getArrayIndex() / 4, aParticle->getArrayIndex());
-        EXPECT_EQ(int(aParticle->getMomentum().X()), aParticle->getArrayIndex() + 1);
-        EXPECT_EQ(int(aParticle->getMomentum().Y()), aParticle->getArrayIndex() + 1);
-        EXPECT_EQ(int(aParticle->getMomentum().Z()), aParticle->getArrayIndex() + 1);
+        if (aParticle) {
+          EXPECT_EQ(aSP.getArrayIndex(), 2 + aCluster.getArrayIndex() / 2);
+          EXPECT_EQ(aSP.getArrayIndex() / 4, aParticle->getArrayIndex());
+          EXPECT_EQ(int(aParticle->getMomentum().X()), aParticle->getArrayIndex() + 1);
+          EXPECT_EQ(int(aParticle->getMomentum().Y()), aParticle->getArrayIndex() + 1);
+          EXPECT_EQ(int(aParticle->getMomentum().Z()), aParticle->getArrayIndex() + 1);
+        }
 
         nullptrTrap = 0;
       }

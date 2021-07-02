@@ -25,41 +25,40 @@
 </header>
 """
 
-from basf2 import *
+import basf2 as b2
+from basf2 import conditions as b2c
 # Individual validation packages
-from SVDValidationTTree import *
-from SVDValidationTTreeStrip import *
-from SVDValidationTTreeSimhit import *
-from SVDValidationTTreeSpacePoint import *
-from SVDValidationTTreeRecoTrack import *
-from SVDValidationTTreeRecoDigit import *
-from SVDValidationTTreeTrueHit import *
-from SVDValidationTTreeCluster import *
+from SVDValidationTTree import SVDValidationTTree
+from SVDValidationTTreeStrip import SVDValidationTTreeStrip
+from SVDValidationTTreeSimhit import SVDValidationTTreeSimhit
+from SVDValidationTTreeSpacePoint import SVDValidationTTreeSpacePoint
+from SVDValidationTTreeRecoTrack import SVDValidationTTreeRecoTrack
+from SVDValidationTTreeRecoDigit import SVDValidationTTreeRecoDigit
+from SVDValidationTTreeTrueHit import SVDValidationTTreeTrueHit
+from SVDValidationTTreeCluster import SVDValidationTTreeCluster
 
-set_random_seed(12345)
+b2.set_random_seed(12345)
 
-main = create_path()
+b2c.prepend_globaltag("svd_onlySVDinGeoConfiguration")
+
+main = b2.create_path()
 
 # Using 1000 EvtGen events already simulated and reconstructed
-input = register_module('RootInput')
+input = b2.register_module('RootInput')
 input.param('inputFileName', '../EvtGenSimRec.root')
 main.add_module(input)
 
 # Gearbox and Geometry modules need to be registered anyway
 
 # Load parameters
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # Create geometry
-geometry = register_module('Geometry')
-# Select subdetectors to be built
-geometry.param('components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD'])
-# geometry.param("excludedComponents", "MagneticField")
-main.add_module(geometry)
+main.add_module("Geometry")
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # SVD validation modules
@@ -81,7 +80,7 @@ svdvalidationcluster = SVDValidationTTreeCluster()
 main.add_module(svdvalidationcluster)
 
 
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

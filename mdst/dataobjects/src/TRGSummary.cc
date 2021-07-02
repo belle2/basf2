@@ -9,6 +9,7 @@
 #include <TColor.h>
 
 #include <sstream>
+#include <stdexcept>
 
 using namespace Belle2;
 
@@ -35,40 +36,48 @@ bool TRGSummary::test() const
 
 bool TRGSummary::testInput(unsigned int bit) const
 {
-  if (bit > c_trgWordSize * c_ntrgWords) {
+  if (bit >= c_trgWordSize * c_ntrgWords) {
     B2ERROR("Requested input trigger bit number is out of range" << LogVar("bit", bit));
-    return false;
+    throw std::out_of_range("The requested input trigger bit is out of range: " + std::to_string(bit));
   }
   int iWord = bit / c_trgWordSize;
   int iBit = bit % c_trgWordSize;
-  return (m_inputBits[iWord] & (1 << iBit)) != 0;
+  return (m_inputBits[iWord] & (1u << iBit)) != 0;
 }
 
 bool TRGSummary::testFtdl(unsigned int bit) const
 {
-  if (bit > c_trgWordSize * c_ntrgWords) {
+  if (bit >= c_trgWordSize * c_ntrgWords) {
     B2ERROR("Requested ftdl trigger bit number is out of range" << LogVar("bit", bit));
-    return false;
+    throw std::out_of_range("The requested FTDL trigger bit is out of range: " + std::to_string(bit));
   }
   int iWord = bit / c_trgWordSize;
   int iBit = bit % c_trgWordSize;
-  return (m_ftdlBits[iWord] & (1 << iBit)) != 0;
+  return (m_ftdlBits[iWord] & (1u << iBit)) != 0;
 }
 
 bool TRGSummary::testPsnm(unsigned int bit) const
 {
-  if (bit > c_trgWordSize * c_ntrgWords) {
+  if (bit >= c_trgWordSize * c_ntrgWords) {
     B2ERROR("Requested psnm trigger bit number is out of range" << LogVar("bit", bit));
-    return false;
+    throw std::out_of_range("The requested PSNM trigger bit is out of range: " + std::to_string(bit));
   }
   int iWord = bit / c_trgWordSize;
   int iBit = bit % c_trgWordSize;
-  return (m_psnmBits[iWord] & (1 << iBit)) != 0;
+  return (m_psnmBits[iWord] & (1u << iBit)) != 0;
 }
 
 unsigned int TRGSummary::getInputBitNumber(const std::string& name) const
 {
+  // Instead of returning a magic number, let's throw an exception:
+  // this will help us to distinguish "trigger not fired" cases
+  // from "trigger not found" at analysis level.
   static DBObjPtr<TRGGDLDBInputBits> inputBits;
+
+  if (not inputBits) {
+    B2ERROR("The mapping of input trigger names does not exist in the given globaltags");
+    throw std::runtime_error("No input trigger map in the given globaltags");
+  }
 
   for (unsigned int bit = 0; bit < c_trgWordSize * c_ntrgWords; bit++) {
     if (std::string(inputBits->getinbitname((int)bit)) == name) {
@@ -77,12 +86,20 @@ unsigned int TRGSummary::getInputBitNumber(const std::string& name) const
   }
 
   B2ERROR("The requested input trigger name does not exist" << LogVar("name", name));
-  return c_trgWordSize * c_ntrgWords;
+  throw std::invalid_argument("The requested input trigger name does not exist: " + name);
 }
 
 unsigned int TRGSummary::getOutputBitNumber(const std::string& name) const
 {
+  // Instead of returning a magic number, let's throw an exception:
+  // this will help us to distinguish "trigger not fired" cases
+  // from "trigger not found" at analysis level.
   static DBObjPtr<TRGGDLDBFTDLBits> ftdlBits;
+
+  if (not ftdlBits) {
+    B2ERROR("The mapping of output trigger names does not exist in the given globaltags");
+    throw std::runtime_error("No input trigger map in the given globaltags");
+  }
 
   for (unsigned int bit = 0; bit < c_trgWordSize * c_ntrgWords; bit++) {
     if (std::string(ftdlBits->getoutbitname((int)bit)) == name) {
@@ -91,7 +108,10 @@ unsigned int TRGSummary::getOutputBitNumber(const std::string& name) const
   }
 
   B2ERROR("The requested output trigger name does not exist" << LogVar("name", name));
-  return c_trgWordSize * c_ntrgWords;
+  // Instead of returning a magic number, let's throw an exception:
+  // this will help us to distinguish "trigger not fired" cases
+  // from "trigger not found" at analysis level.
+  throw std::invalid_argument("The requested input trigger name does not exist: " + name);
 }
 
 std::string TRGSummary::getInfoHTML() const

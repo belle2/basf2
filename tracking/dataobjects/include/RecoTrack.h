@@ -212,13 +212,13 @@ namespace Belle2 {
 
     /**
      * Add all hits from another RecoTrack to this RecoTrack.
-     * @param recoTrack Pointer to the RecoTrack where the hits are copied from
-     * @param sortingParameterOffset This number will be added to the sortingParameter of all hits copied
+     * @param recoTrack : Pointer to the RecoTrack where the hits are copied from
+     * @param sortingParameterOffset : This number will be added to the sortingParameter of all hits copied
      *        from recoTrack. Set this to (largest sorting parameter) + 1 in order to add hits at the end of
      *        this reco track.
-     * @param reversed: add the hits in a reversed order - each sorting parameter is set to
+     * @param reversed : add the hits in a reversed order - each sorting parameter is set to
      *        maximal sorting parameter - sorting parameter + offset
-     * @param minimalWeight: if set, do only copy hits with a weight above this (if fitted already with the DAF).
+     * @param optionalMinimalWeight : if set, do only copy hits with a weight above this (if fitted already with the DAF).
      * @return The number of hits copied.
      */
     size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int sortingParameterOffset = 0,
@@ -285,7 +285,7 @@ namespace Belle2 {
     /**
      * Adds an eklm hit with the given information to the reco track.
      * You only have to provide the hit and the sorting parameter, all other parameters have default value.
-     * @param bklmHit The pointer to a stored BKLMHit in the store array you provided earlier, which you want to add.
+     * @param eklmHit The pointer to a stored BKLMHit in the store array you provided earlier, which you want to add.
      * @param sortingParameter The index of the hit. It starts with 0 with the first hit.
      * @param foundByTrackFinder Which track finder has found the hit?
      * @return True if the hit was not already added to the track.
@@ -310,6 +310,7 @@ namespace Belle2 {
       for (RecoHitInformation& recoHitInformation : relatedHitInformationToHit) {
         // cppcheck-suppress useStlAlgorithm
         if (recoHitInformation.getRelatedFrom<RecoTrack>(this->getArrayName()) == this) {
+          // cppcheck-suppress returnDanglingLifetime
           return &recoHitInformation;
         }
       }
@@ -753,7 +754,7 @@ namespace Belle2 {
     void deleteFittedInformationForRepresentation(const genfit::AbsTrackRep* rep);
 
     /// Get useful information on EventDisplay
-    virtual std::string getInfoHTML() const;
+    std::string getInfoHTML() const override;
 
   private:
     /// Internal storage for the genfit track.
@@ -866,7 +867,6 @@ namespace Belle2 {
           hitList.push_back(relatedHit);
         }
       }
-
       return hitList;
     }
 
@@ -884,7 +884,7 @@ namespace Belle2 {
         // cppcheck-suppress useStlAlgorithm
         hitList.push_back(&hit);
       }
-
+      // cppcheck-suppress returnDanglingLifetime
       return hitList;
     }
 
@@ -897,7 +897,7 @@ namespace Belle2 {
     }
 
     /** Making this class a ROOT class.*/
-    ClassDef(RecoTrack, 9);
+    ClassDefOverride(RecoTrack, 9);
   };
 
   /**
@@ -928,7 +928,7 @@ namespace Belle2 {
      * but not both.
      *
      * @param recoTrack Track to add TrackRep to
-     * @param PDG code of the hypothesis which is negative or positive, depending on
+     * @param PDGcode : code of the hypothesis which is negative or positive, depending on
      * the charge of the hypothesis particle.
      */
     static genfit::AbsTrackRep* createOrReturnRKTrackRep(RecoTrack& recoTrack, int PDGcode);

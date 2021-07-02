@@ -187,7 +187,7 @@ namespace Belle2 {
       nnBoundsType m_waveWidthBounds; /**< Waveform width range of the network */
       nnBoundsType m_timeShiftBounds; /**< Time shift range of the network */
       TauEncoder m_tauCoder; /**< Tau encoder class instance to scale tau values */
-      waveFunction m_wave; /**< Wave function used in training the network. */
+      WaveformShape m_wave; /**< Wave function used in training the network. */
       std::shared_ptr<NNWaveFitTool> m_fitTool; /**< FitterTool object allowing calculations on network fits. */
 
     }; // class NNWaveFitter

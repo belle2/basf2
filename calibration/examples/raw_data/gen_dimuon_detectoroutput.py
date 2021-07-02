@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
+from generators import add_kkmc_generator
 from simulation import add_simulation
 from reconstruction import add_reconstruction
-from reconstruction import add_mdst_output
 from beamparameters import add_beamparameters
-from rawdata import add_packers, add_raw_output, add_raw_seqoutput
-from ROOT import Belle2
-from modularAnalysis import printMCParticles, printDataStore
+from rawdata import add_packers, add_raw_seqoutput
 
-set_random_seed(5433)
+b2.set_random_seed(5433)
 
-use_central_database('production')
+b2.use_central_database('production')
 
 # Show the Trigger cuts and their properties that are in the database
 # from softwaretrigger import db_access
@@ -24,10 +22,10 @@ use_central_database('production')
 #     B2RESULT("Cut condition: " + cut.decompile())
 #     B2RESULT("Cut is a reject cut: " + str(cut.isRejectCut()))
 
-main = create_path()
+main = b2.create_path()
 
 # specify number of events to be generated
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [100])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [1])
@@ -36,12 +34,7 @@ main.add_module(eventinfosetter)
 # set the BeamParameters for running at Y(4S)
 beamparameters = add_beamparameters(main, "Y4S")
 
-kkgeninput = register_module('KKGenInput')
-kkgeninput.param('tauinputFile', Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat'))
-kkgeninput.param('KKdefaultFile', Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat'))
-kkgeninput.param('taudecaytableFile', '')
-kkgeninput.param('kkmcoutputfilename', 'kkmc_mumu.txt')
-main.add_module(kkgeninput)
+add_kkmc_generator(main, 'mu-mu+')
 
 # Print out list of generated particles to check decay is correct
 # printMCParticles(path=main)
@@ -65,7 +58,7 @@ add_raw_seqoutput(main, 'raw.sroot', additionalObjects=['SoftwareTriggerResult',
 # add_raw_seqoutput(main, 'raw.sroot', additionalObjects=['SoftwareTriggerResult'])
 
 # Go!
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

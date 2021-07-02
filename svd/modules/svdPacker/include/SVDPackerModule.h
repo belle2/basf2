@@ -95,7 +95,7 @@ namespace Belle2 {
       struct DataInfo {
         short data[6]; /**< 6 samples*/
         unsigned short channel; /**< APV channel number*/
-      } dataInfo;
+      } dataInfo; /**< data info*/
 
       // The following assumes i386 byte order: MSB comes last!
 

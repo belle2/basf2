@@ -11,7 +11,6 @@
 </header>
 """
 
-from tracking.adjustments import adjust_module
 from tracking.validation.run import TrackingValidationRun
 import tracking
 import logging

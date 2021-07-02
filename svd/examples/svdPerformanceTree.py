@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from basf2 import *
+import basf2 as b2
 from basf2 import conditions as b2conditions
 import rawdata as raw
 import tracking as trk
 import simulation as sim
 import glob
-import modularAnalysis as ma
 
 ##################################################################################
 #
@@ -21,9 +20,9 @@ useSimulation = True
 # set this string to identify the output rootfiles
 tag = "_test"
 
-main = create_path()
+main = b2.create_path()
 
-set_random_seed(1)
+b2.set_random_seed(1)
 
 if useSimulation:
     # options for simulation:
@@ -34,7 +33,7 @@ if useSimulation:
     simulateJitter = False
     ROIfinding = False
     MCTracking = False
-    eventinfosetter = register_module('EventInfoSetter')
+    eventinfosetter = b2.register_module('EventInfoSetter')
     eventinfosetter.param('expList', expList)
     eventinfosetter.param('runList', [0])
     eventinfosetter.param('evtNumList', [numEvents])
@@ -79,12 +78,12 @@ mySelection = 'pt>1.0 and abs(dz)<0.5 and dr<0.4'
 ma.fillParticleList('mu+:DQM', mySelection, path=main)
 ma.reconstructDecay('Upsilon(4S):IPDQM -> mu+:DQM mu-:DQM', '10<M<11', path=main)
 
-skimfilter = register_module('SkimFilter')
+skimfilter = b2.register_module('SkimFilter')
 skimfilter.set_name('SkimFilter_MUMU')
 skimfilter.param('particleLists', ['Upsilon(4S):IPDQM'])
 main.add_module(skimfilter)
-filter_path = create_path()
-skimfilter.if_value('=1', filter_path, AfterConditionPath.CONTINUE)
+filter_path = b2.create_path()
+skimfilter.if_value('=1', filter_path, b2.AfterConditionPath.CONTINUE)
 '''
 
 # fill TTrees
@@ -96,8 +95,8 @@ main.add_module('OverlapResiduals', ExpertLevel=True)
 # main.add_module('RootOutput')
 main.add_module('Progress')
 
-print_path(main)
+b2.print_path(main)
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

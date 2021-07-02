@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # Thomas Keck 2017
 
@@ -19,8 +18,8 @@
  at each stage.
 
  At the end it produces summary outputs using printReporting.py and latexReporting.py
- (this will only work of you use the monitoring mode)
- And a summary file for each mva training using basf2_mva_evaluate
+ (this will only work if you use the monitoring mode)
+ In addition, a summary file for each mva training is produced using basf2_mva_evaluate.
 
  If your training fails for some reason (e.g. a job fails on the cluster),
  the FEI will stop, you can fix the problem and resume the training using the -x option.
@@ -54,12 +53,7 @@ import stat
 import shutil
 import pickle
 import json
-try:
-    import b2biiConversion
-    b2biifound = True
-except ModuleNotFoundError:
-    print("B2BII not found, can't use process_urls for training.")
-    b2biifound = False
+import b2biiConversion
 import fei
 
 
@@ -116,7 +110,7 @@ def setup(args):
 
     for x in args.data:
         for y in x:
-            if (y.startswith("http://") or y.startswith("https://")) and b2biifound:
+            if (y.startswith("http://") or y.startswith("https://")):
                 data_files += b2biiConversion.parse_process_url(y)
             else:
                 data_files += glob.glob(y)
@@ -136,7 +130,6 @@ def setup(args):
     shutil.rmtree('jobs', ignore_errors=True)
     os.mkdir('collection')
     os.mkdir('collection/localdb')
-    os.mkdir('collection/B2BII_MC_database')
     os.mkdir('jobs')
     if args.large_dir:
         if not os.path.isdir(args.large_dir):
@@ -155,7 +148,6 @@ def setup(args):
             os.symlink(data_input, f'jobs/{i}/input_{j}.root')
         # Symlink weight directory and basf2_path
         os.symlink(args.directory + '/collection/localdb', f'jobs/{i}/localdb')
-        os.symlink(args.directory + '/collection/B2BII_MC_database', f'jobs/{i}/B2BII_MC_database')
 
 
 def create_report(args):
@@ -164,8 +156,7 @@ def create_report(args):
     Create all the reports for the FEI training and the individual mva trainings.
     This will only work if
       1) Monitoring mode is used (see FeiConfiguration)
-      2) Latex works on your system
-      3) The system has enough memory to hold the training data for the mva classifiers
+      2) The system has enough memory to hold the training data for the mva classifiers
     If this fails you can also copy the collection directory somewhere and
     execute the commands by hand.
     """
@@ -189,8 +180,8 @@ def create_report(args):
     ret = subprocess.call('basf2 fei/latexReporting.py ../summary.tex', shell=True)
     for i in glob.glob("*.xml"):
         if not fei.core.Teacher.check_if_weightfile_is_fake(i):
-            subprocess.call(f"basf2_mva_evaluate.py -id '{i[:-4]}.xml' -data '{i[:-4]}.root' "
-                            f"--treename variables -o '../{i[:-4]}.pdf'", shell=True)
+            subprocess.call(f"basf2_mva_evaluate.py -id '{i[:-4]}.xml' -data 'training_input.root' "
+                            f"--treename '{i[:-4]} variables' -o '../{i[:-4]}.zip'", shell=True)
     os.chdir(args.directory)
     return ret == 0
 
@@ -275,7 +266,8 @@ def merge_root_files(args):
             continue
         if f.startswith('input_'):
             continue
-        if os.path.isfile(args.directory + '/collection/' + f):
+        # in case of training_input.root, append to already existing file
+        if os.path.isfile(args.directory + '/collection/' + f) and not f == 'training_input.root':
             continue
         rootfiles.append(f)
     if len(rootfiles) == 0:
@@ -375,7 +367,6 @@ if __name__ == '__main__':
             raise RuntimeError(f'Unknown skip parameter {args.skip}')
 
         if start == 7:
-            import sys
             create_report(args)
             sys.exit(0)
 

@@ -12,7 +12,7 @@
 #####################################################################
 
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 
 import os
@@ -28,7 +28,7 @@ def setup_Geometry(path=None):
 
     """
 
-    B2WARNING("This function is deprecated and should not be used anymore! The geometry should now be loaded from the DB")
+    b2.B2WARNING("This function is deprecated and should not be used anymore! The geometry should now be loaded from the DB")
 
 
 def setup_VXDTF2(path=None,
@@ -41,7 +41,7 @@ def setup_VXDTF2(path=None,
                  overlap_filter='greedy',
                  sec_map_file=None,
                  setup_name='SVDOnlyDefault',
-                 log_level=LogLevel.INFO,
+                 log_level=b2.LogLevel.INFO,
                  debug_level=1):
     """
     Convenience Method to setup the redesigned vxd track finding module chain.
@@ -69,7 +69,7 @@ def setup_VXDTF2(path=None,
     # Preparation
     #################
     if use_pxd:
-        spCreatorPXD = register_module('PXDSpacePointCreator')
+        spCreatorPXD = b2.register_module('PXDSpacePointCreator')
         spCreatorPXD.logging.log_level = log_level
         spCreatorPXD.logging.debug_level = debug_level
         spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
@@ -77,7 +77,7 @@ def setup_VXDTF2(path=None,
         modules.append(spCreatorPXD)
 
     if use_svd:
-        spCreatorSVD = register_module('SVDSpacePointCreator')
+        spCreatorSVD = b2.register_module('SVDSpacePointCreator')
         spCreatorSVD.logging.log_level = log_level
         spCreatorSVD.logging.debug_level = debug_level
         spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
@@ -86,7 +86,7 @@ def setup_VXDTF2(path=None,
         modules.append(spCreatorSVD)
 
     # SecMap Bootstrap
-    secMapBootStrap = register_module('SectorMapBootstrap')
+    secMapBootStrap = b2.register_module('SectorMapBootstrap')
     secMapBootStrap.param('ReadSectorMap', True)
     if sec_map_file:
         secMapBootStrap.param('SectorMapsInputFile', sec_map_file)
@@ -95,7 +95,7 @@ def setup_VXDTF2(path=None,
     modules.append(secMapBootStrap)
 
     # Register EventLevelTrackingInfo
-    regEventLevelTrackingInfo = register_module('RegisterEventLevelTrackingInfo')
+    regEventLevelTrackingInfo = b2.register_module('RegisterEventLevelTrackingInfo')
     modules.append(regEventLevelTrackingInfo)
 
     ##################
@@ -103,7 +103,7 @@ def setup_VXDTF2(path=None,
     # SegmentNet
     ##################
 
-    segNetProducer = register_module('SegmentNetworkProducer')
+    segNetProducer = b2.register_module('SegmentNetworkProducer')
     # segNetProducer.param('CreateNeworks', 3)
     segNetProducer.param('NetworkOutputName', 'test2Hits')
     segNetProducer.param('allFiltersOff', not use_segment_network_filters)
@@ -121,7 +121,7 @@ def setup_VXDTF2(path=None,
     # TrackFinder
     #################
 
-    cellOmat = register_module('TrackFinderVXDCellOMat')
+    cellOmat = b2.register_module('TrackFinderVXDCellOMat')
     cellOmat.param('NetworkName', 'test2Hits')
     cellOmat.param('SpacePointTrackCandArrayName', 'SPTCs')
     cellOmat.param('printNetworks', False)
@@ -137,14 +137,14 @@ def setup_VXDTF2(path=None,
 
     # Quality
 
-    qualityEstimator = register_module('QualityEstimatorVXD')
+    qualityEstimator = b2.register_module('QualityEstimatorVXD')
     qualityEstimator.param('EstimationMethod', quality_estimator)
     qualityEstimator.param('SpacePointTrackCandsStoreArrayName', 'SPTCs')
     qualityEstimator.logging.log_level = log_level
     qualityEstimator.logging.debug_level = debug_level
     modules.append(qualityEstimator)
 
-    maxCandidateSelection = register_module('BestVXDTrackCandidatesSelector')
+    maxCandidateSelection = b2.register_module('BestVXDTrackCandidatesSelector')
     maxCandidateSelection.param('NameSpacePointTrackCands', 'SPTCs')
     maxCandidateSelection.param('SubsetCreation', True)
     maxCandidateSelection.param('NewNameSpacePointTrackCands', '')
@@ -153,7 +153,7 @@ def setup_VXDTF2(path=None,
     modules.append(maxCandidateSelection)
 
     # Properties
-    vIPRemover = register_module('SPTCvirtualIPRemover')
+    vIPRemover = b2.register_module('SPTCvirtualIPRemover')
     vIPRemover.param('tcArrayName', '')
     vIPRemover.param('maxTCLengthForVIPKeeping', 0)  # want to remove virtualIP for any track length
     vIPRemover.logging.log_level = log_level
@@ -166,7 +166,7 @@ def setup_VXDTF2(path=None,
     #################
 
     if filter_overlapping:
-        overlapResolver = register_module('SVDOverlapResolver')
+        overlapResolver = b2.register_module('SVDOverlapResolver')
         overlapResolver.logging.log_level = log_level
         overlapResolver.logging.debug_level = debug_level
         overlapResolver.param('NameSpacePointTrackCands', '')
@@ -178,13 +178,13 @@ def setup_VXDTF2(path=None,
     # VXDTF2 Step 5
     # Converter
     #################
-    momSeedRetriever = register_module('SPTCmomentumSeedRetriever')
+    momSeedRetriever = b2.register_module('SPTCmomentumSeedRetriever')
     momSeedRetriever.param('tcArrayName', '')
     momSeedRetriever.logging.log_level = log_level
     momSeedRetriever.logging.debug_level = debug_level
     modules.append(momSeedRetriever)
 
-    converter = register_module('SPTC2RTConverter')
+    converter = b2.register_module('SPTC2RTConverter')
     converter.param('spacePointsTCsStoreArrayName', '')
     converter.logging.log_level = log_level
     converter.logging.debug_level = debug_level
@@ -204,7 +204,7 @@ def setup_RTCtoSPTCConverters(
         RTCinput='mcTracks',
         sptcOutput='checkedSPTCs',
         usePXD=True,
-        logLevel=LogLevel.INFO,
+        logLevel=b2.LogLevel.INFO,
         debugVal=1,
         useNoKick=False,
         useOnlyFittedTracks=False):
@@ -249,7 +249,7 @@ def setup_RTCtoSPTCConverters(
 
     # module to create relations between SpacePoints and TrueHits -> some of
     # the following modules will be utilizing these relations!
-    sp2thConnector = register_module('SpacePoint2TrueHitConnector')
+    sp2thConnector = b2.register_module('SpacePoint2TrueHitConnector')
     sp2thConnector.logging.log_level = logLevel
     sp2thConnector.param('DetectorTypes', detectorTypes)
     sp2thConnector.param('TrueHitNames', trueHitNames)
@@ -265,7 +265,7 @@ def setup_RTCtoSPTCConverters(
     sp2thConnector.param('positionAnalysis', False)
 
     # TCConverter, RecoTrack -> SPTC
-    recoTrackCandConverter = register_module('RT2SPTCConverter')
+    recoTrackCandConverter = b2.register_module('RT2SPTCConverter')
     recoTrackCandConverter.logging.log_level = logLevel
     recoTrackCandConverter.param('RecoTracksName', RTCinput)
     recoTrackCandConverter.param('SpacePointTCName', 'SPTracks')
@@ -292,7 +292,7 @@ def setup_RTCtoSPTCConverters(
         recoTrackCandConverter.param('noKickCutsFile', "")  # NoKickCuts not applied
 
     # SpacePointTrackCand referee
-    sptcReferee = register_module('SPTCReferee')
+    sptcReferee = b2.register_module('SPTCReferee')
     sptcReferee.logging.log_level = logLevel
     sptcReferee.param('sptcName', 'SPTracks')
     sptcReferee.param('newArrayName', sptcOutput)
@@ -305,7 +305,7 @@ def setup_RTCtoSPTCConverters(
     sptcReferee.param('useMCInfo', True)
     # sptcReferee.logging.log_level = LogLevel.DEBUG
 
-    if path is 0:
+    if path == 0:
         return [sp2thConnector, recoTrackCandConverter, sptcReferee]
     else:
         path.add_module(sp2thConnector)
@@ -331,7 +331,7 @@ def setup_sim(path=0, useEDeposit=True, useMultipleScattering=True, allowDecay=T
     @param verbose if True, some extra debug output is given.
     """
     print("setup FullSim...")
-    g4sim = register_module('FullSim')
+    g4sim = b2.register_module('FullSim')
     g4sim.param('StoreAllSecondaries', True)
     uiCommandList = []
     if verbose:
@@ -432,7 +432,7 @@ def setup_sim(path=0, useEDeposit=True, useMultipleScattering=True, allowDecay=T
     g4sim.param('UICommandsAtIdle', uiCommandList)
 
     # print(uiCommandList)
-    if (path is 0):
+    if (path == 0):
         return g4sim
     else:
         path.add_module(g4sim)

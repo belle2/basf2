@@ -47,8 +47,7 @@ namespace Belle2 {
      * the calibration results and strips permanently masked regardless the
      * outcome of the calibration runs.
      * Input:
-     * @param sensor ID: identity of the sensor for which the
-     * calibration is required
+     * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU: sensor side, true for p (u) side, false for n (v) side
      * @param strip: strip number
      *

@@ -16,6 +16,7 @@
 /* Belle 2 headers. */
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 
 /* ROOT headers. */
 #include <TFile.h>
@@ -91,6 +92,9 @@ namespace Belle2 {
 
     /** Scintillator simulation parameters. */
     KLMScintillatorDigitizationParameters* m_SciSimPar;
+
+    /** Hardware clock settings. */
+    DBObjPtr<HardwareClockSettings> m_HardwareClockSettings;
 
     /** Direct histogram. */
     float* m_hDir;

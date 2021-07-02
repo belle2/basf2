@@ -1,12 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import basf2
-from basf2 import*
-import ROOT
-from ROOT import Belle2
-import os.path
+import basf2 as b2
 import sys
 from basf2 import conditions as b2conditions
 
@@ -29,7 +24,7 @@ print('***')
 b2conditions.prepend_globaltag("svd_basic")
 
 # Create path 1
-main = create_path()
+main = b2.create_path()
 
 main.add_module('RootInput', branchNames=['RawSVDs'])
 
@@ -43,7 +38,7 @@ main.add_module('SVDDataFormatCheck', ShaperDigits='SVDShaperDigits')
 
 main.add_module('Progress')
 
-print_path(main)
-process(main)
+b2.print_path(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

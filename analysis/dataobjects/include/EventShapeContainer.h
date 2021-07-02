@@ -74,8 +74,8 @@ namespace Belle2 {
 
     /**
      * Sets the i-th sphericity eigenvector
-     * @param short the order (0,1,2)
-     * @param TVector3 the eigenvector
+     * @param i the order (0,1,2)
+     * @param eigenvector the eigenvector
      */
     void setSphericityEigenvector(short i, TVector3 eigenvector)
     {
@@ -87,8 +87,8 @@ namespace Belle2 {
 
     /**
      * Sets the i-th sphericity eigenvalue
-     * @param short the order (0,1,2)
-     * @param float the eigenvector
+     * @param i the order (0,1,2)
+     * @param eigenvalue the eigenvalue
      */
     void setSphericityEigenvalue(short i, float eigenvalue)
     {
@@ -100,8 +100,8 @@ namespace Belle2 {
 
     /**
      * Sets the Fox-Wolfram (FW) moment of order n. This is NOT the normalized FW moment (R1, R2...), but the original one.
-     * @param short The order (0 to 9)
-     * @param float The Fox-Wolfram moment value
+     * @param order The order (0 to 9)
+     * @param moment The Fox-Wolfram moment value
      */
     void setFWMoment(short order, float moment)
     {
@@ -144,8 +144,8 @@ namespace Belle2 {
 
     /**
      * Sets the harmonic moment of order n, calculated using the thrust axis.
-     * @param short The order (0 to 9)
-     * @param float The harmonic moment value
+     * @param order The order (0 to 9)
+     * @param moment The harmonic moment value
      */
     void setHarmonicMomentThrust(short order, float moment)
     {
@@ -157,8 +157,8 @@ namespace Belle2 {
 
     /**
      * Sets the harmonic moment of order n, calculated using the collision axis.
-     * @param short The order (0 to 9)
-     * @param float The harmonic moment value
+     * @param order The order (0 to 9)
+     * @param moment The harmonic moment value
      */
     void setHarmonicMomentCollision(short order, float moment)
     {
@@ -170,8 +170,8 @@ namespace Belle2 {
 
     /**
      * Sets the Cleo cone of order n, calculated using the thrust axis.
-     * @param short The order (0 to 9)
-     * @param float The Cleo cone value
+     * @param order The order (0 to 9)
+     * @param moment The Cleo cone value
      */
     void setCleoConeThrust(short order, float moment)
     {
@@ -183,8 +183,8 @@ namespace Belle2 {
 
     /**
      * Sets the Cleo cone of order n, calculated using the collision axis.
-     * @param short The order (0 to 9)
-     * @param float The Cleo cone value
+     * @param order The order (0 to 9)
+     * @param moment The Cleo cone value
      */
     void setCleoConeCollision(short order, float moment)
     {

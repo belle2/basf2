@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-import sys
+import basf2 as b2
 
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # input
-roinput = register_module('SeqRootInput')
+roinput = b2.register_module('SeqRootInput')
 main.add_module(roinput)
 
 # conversion from RawCOPPER or RawDataBlock to RawTOP
@@ -18,22 +17,22 @@ main.add_module(roinput)
 # main.add_module(converter)
 
 # geometry parameters
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # Geometry (only TOP needed)
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 
 # Unpacking
-unpack = register_module('TOPUnpacker')
+unpack = b2.register_module('TOPUnpacker')
 unpack.param('swapBytes', True)
 unpack.param('dataFormat', 0x0301)
 main.add_module(unpack)
 
 # Convert to TOPDigits
-converter = register_module('TOPRawDigitConverter')
+converter = b2.register_module('TOPRawDigitConverter')
 converter.param('useSampleTimeCalibration', False)
 converter.param('useChannelT0Calibration', False)
 converter.param('useModuleT0Calibration', False)
@@ -42,21 +41,21 @@ main.add_module(converter)
 
 # TOP's data quality module
 # histo = register_module("HistoManager")
-histo = register_module("DqmHistoManager")
+histo = b2.register_module("DqmHistoManager")
 histo.param('HostName', 'localhost')
 histo.param('Port', 9991)
 histo.param('DumpInterval', 1000)
 main.add_module(histo)
 
-dqm = register_module('TOPDataQualityOnline')
+dqm = b2.register_module('TOPDataQualityOnline')
 main.add_module(dqm)
 
 # Print progress
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print statistics
-print(statistics)
+print(b2.statistics)

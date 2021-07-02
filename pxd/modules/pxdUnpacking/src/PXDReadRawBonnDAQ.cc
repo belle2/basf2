@@ -8,14 +8,17 @@
 //-
 
 #include <pxd/modules/pxdUnpacking/PXDReadRawBonnDAQ.h>
-#include <boost/spirit/home/support/detail/endian.hpp>
+#include <boost/endian/arithmetic.hpp>
 #include <boost/crc.hpp>
 
 using namespace std;
 using namespace Belle2;
 using namespace PXD;
 
-using namespace boost::spirit::endian;
+using ulittle16_t = boost::endian::little_uint16_t;
+using ulittle32_t = boost::endian::little_uint32_t;
+using ubig16_t = boost::endian::big_uint16_t;
+using ubig32_t = boost::endian::big_uint32_t;
 
 using boost::crc_optimal;
 typedef crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhe_crc_32_type;
@@ -250,4 +253,3 @@ void PXDReadRawBonnDAQModule::terminate()
     fh = 0;
   }
 }
-

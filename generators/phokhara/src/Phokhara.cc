@@ -24,8 +24,9 @@ extern "C" {
   extern struct {
     double bp1[4];        /**< 4-momenta of incoming positron. */
     double bq1[4];        /**< 4-momenta of incoming electron. */
-    double bp2[6][10];     /**< 4-momenta[0..3], pdg code [4] and mother [5] of outgoing hadrons/muons. */
+    double bp2[6][10];    /**< 4-momenta[0..3], pdg code [4] and mother [5] of outgoing hadrons/muons. */
     double bphot[4][2];   /**< 4-momenta of real photons. */
+    double wgt;      /**< event weight. */
     int bnphot;           /**< Number of photons. */
     int bnhad;            /**< Number of hadrons/muons. */
   } momset_;
@@ -174,7 +175,7 @@ void Phokhara::init(const std::string& paramFile)
 }
 
 
-void Phokhara::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost)
+double Phokhara::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost)
 {
 
   //Generate event
@@ -248,6 +249,9 @@ void Phokhara::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentz
     lambda->removeStatus(MCParticle::c_StableInGenerator);
   }
 
+  if (m_weighted) return momset_.wgt;
+  return 1.0;
+
 }
 
 
@@ -301,6 +305,7 @@ void Phokhara::applySettings()
   m_npar[40]  = m_fullNLO;
   m_npar[50]  = m_chi_sw;
   m_npar[51]  = m_be_r;
+  m_npar[60]  = m_weighted;
 
   //--------------------
   // Double parameters

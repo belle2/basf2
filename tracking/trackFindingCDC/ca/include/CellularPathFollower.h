@@ -118,7 +118,7 @@ namespace Belle2 {
       /**
        *  Helper function for recursively growing paths.
        *  @param[in]  path                    Current path to be extended
-       *  @param[in]  cellHolderNeighborhood  Considered relations to follow to extend the path
+       *  @param[in]  cellHolderRelations     Considered relations to follow to extend the path
        *  @param[out] paths                   Longest paths generated
        */
       void growAllPaths(Path<ACellHolder>& path,

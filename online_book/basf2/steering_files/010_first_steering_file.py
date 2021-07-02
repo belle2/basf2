@@ -9,7 +9,7 @@ main = b2.Path()
 # load input data from mdst/udst file
 ma.inputMdstList(
     environmentType="default",
-    filelist=["/group/belle2/users/tenchini/prerelease-05-00-00a/1111540100/1111540100_eph3_BGx0_99.root"],
+    filelist=[b2.find_file("starterkit/2021/1111540100_eph3_BGx0_0.root", "examples")],
     path=main
 )
 

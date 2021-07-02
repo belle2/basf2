@@ -40,7 +40,10 @@ namespace Belle2 {
 
     /// Initialize the cuts which will be applied during the fit and store process.
     void initializeCuts(double beamPipeRadius,
-                        double vertexChi2CutOutside);
+                        double vertexChi2CutOutside,
+                        std::tuple<double, double> invMassRangeKshort,
+                        std::tuple<double, double> invMassRangeLambda,
+                        std::tuple<double, double> invMassRangePhoton);
 
     /// set V0 fitter mode.
     /// switch the mode of fitAndStore function.
@@ -77,42 +80,39 @@ namespace Belle2 {
                                  unsigned int& hasInnerHitStatus, TVector3& vertexPos,
                                  const bool forceStore);
 
-    /** Create a copy of RecoTrack.
+    /** Create a copy of RecoTrack. Track fit should be executed in removeInnerHits function.
+     * @param origRecoTrack original RecoTrack
+     * @return copied RecoTrack stored in the m_copiedRecoTracks, nullptr if track fit fails (this should not happen)
+     */
+    RecoTrack* copyRecoTrack(RecoTrack* origRecoTrack);
+
+    /** Create a copy of RecoTrack and fit the Track.
      * @param origRecoTrack original RecoTrack
      * @param trackPDG signed PDG used for the track fit hypothesis
      * @return copied RecoTrack stored in the m_copiedRecoTracks, nullptr if track fit fails (this should not happen)
      */
-    RecoTrack* copyRecoTrack(RecoTrack* origRecoTrack, const int trackPDG);
+    RecoTrack* copyRecoTrackAndFit(RecoTrack* origRecoTrack, const int trackPDG);
 
-    /** Remove inner hits from RecoTrack.
+    /** Remove inner hits from RecoTrack at once.
      * Hits are removed from the minus-end of the momentum direction.
      * For SVD hits, remove U- and V- hit pair at once.
      * Input RecoTrack is fitted in the funcion.
      * If track fit fails, return false.
-     * @param origRecoTrack original RecoTrack
+     * @param prevRecoTrack original RecoTrack
      * @param recoTrack input RecoTrack, updated in this function
      * @param trackPDG signed PDG used for the track fit hypothesis
-     * @param nRemoveHits the number of removed hits. This can be incremented in the function if the outermost removed hit is an SVD U-hit.
+     * @param vertexPosition V0 vertex position
      * @return
      */
-    bool removeInnerHits(RecoTrack* origRecoTrack, RecoTrack* recoTrack,
-                         const int trackPDG, unsigned int& nRemoveHits);
+    bool removeInnerHits(RecoTrack* prevRecoTrack, RecoTrack* recoTrack,
+                         const int trackPDG, const TVector3& vertexPosition);
 
-
-    /** Starting point: point closest to axis where either track is defined
-     * This is intended to reject tracks that curl away before
-     * meeting, there are corner cases where this could throw away
-     * legitimate candidates, namely where one track makes a full
-     * circle through the detector without hitting any detectors
-     * then making it past Rstart without hitting the detector there
-     * -- while still being part of the V0.  Unlikely, I didn't find
-     * a single example in MC.  On the other hand it rejects
-     * impossible candidates.
-     * @param stPlus MeasuredStateOnPlane of positively-charged daughter
-     * @param stMinus MeasuredStateOnPlane of negatively-charged daughter
-     * @return
+    /** Compare innermost hits of daughter pairs to check if they are the same (shared) or not.
+     * For SVD hits, compare U- and V- hit pair.
+     * @param recoTrackPlus, recoTrackMinus input RecoTrack pair
+     * @return If 1D- or 2D-hits are shared as the innermost hits among V0 daughters. 0x1(0x2) bit represents V/z(U/r-phi)-hit share. -1 for exception.
      */
-    bool rejectCandidate(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus);
+    int checkSharedInnermostCluster(const RecoTrack* recoTrackPlus, const RecoTrack* recoTrackMinus);
 
     /** Fit the V0 vertex.
      *
@@ -138,7 +138,8 @@ namespace Belle2 {
     /// Build TrackFitResult of V0 Track and set relation to genfit Track.
     TrackFitResult* buildTrackFitResult(const genfit::Track& track, const RecoTrack* recoTrack,
                                         const genfit::MeasuredStateOnPlane& msop, const double Bz,
-                                        const Const::ParticleType& trackHypothesis);
+                                        const Const::ParticleType& trackHypothesis,
+                                        const int sharedInnermostCluster);
 
 
   private:
@@ -152,9 +153,12 @@ namespace Belle2 {
 
     double m_beamPipeRadius;  ///< Radius where inside/outside beampipe is defined.
     double m_vertexChi2CutOutside;  ///< Chi2 cut outside beampipe.
-    int    m_v0FitterMode;  ///0: store V0 at the first vertex fit, regardless of inner hits, 1: remove hits inside the V0 vertex position, 2: mode 1 +  don't use SVD hits if there is only one available SVD hit-pair (default)
-    bool   m_forcestore;/// true only if the V0Fitter mode is 1
-    bool   m_useOnlyOneSVDHitPair;/// false only if the V0Fitter mode is 3
+    std::tuple<double, double> m_invMassRangeKshort; ///< invariant mass cut for Kshort.
+    std::tuple<double, double> m_invMassRangeLambda; ///< invariant mass cut for Lambda.
+    std::tuple<double, double> m_invMassRangePhoton; ///< invariant mass cut for Photon.
+    int    m_v0FitterMode;  ///< 0: store V0 at the first vertex fit, regardless of inner hits, 1: remove hits inside the V0 vertex position, 2: mode 1 +  don't use SVD hits if there is only one available SVD hit-pair (default)
+    bool   m_forcestore;///< true only if the V0Fitter mode is 1
+    bool   m_useOnlyOneSVDHitPair;///< false only if the V0Fitter mode is 3
   };
 
 }

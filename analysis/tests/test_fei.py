@@ -8,17 +8,15 @@ import os
 import tempfile
 import atexit
 import shutil
-import contextlib
-import subprocess
 import ROOT
+
+import b2bii
 
 import fei
 from fei.config import Particle
 
 import numpy as np
 
-import ROOT
-from ROOT import Belle2
 import basf2_mva
 import pdg
 
@@ -43,7 +41,7 @@ def print_path(a, b):
             if n.name != m.name:
                 print(n.name, m.name)
             if n.values != m.values:
-                print(n.values, m.values)
+                print(n.name, n.values, m.values)
 
 
 def get_small_unittest_channels():
@@ -130,7 +128,7 @@ class TestTrainingDataInformation(unittest.TestCase):
         particles = fei.get_unittest_channels()
         x = fei.core.TrainingDataInformation(particles)
         self.assertEqual(x.available(), False)
-        f = ROOT.TFile('mcParticlesCount.root', 'RECREATE')
+        f = ROOT.TFile('mcParticlesCount.root', 'RECREATE')  # noqa
         self.assertEqual(x.available(), True)
 
     def test_get_mc_counts(self):
@@ -204,15 +202,16 @@ class TestFSPLoader(unittest.TestCase):
         x = fei.core.FSPLoader(particles, config)
 
         path = basf2.create_path()
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                                                ('mu+:FSP', ''), ('gamma:FSP', ''),
-                                                                ('p+:FSP', ''), ('K_L0:FSP', '')],
-                        writeOut=True)
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('K_S0:V0 -> pi+ pi-', '')],
-                        writeOut=True)
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('Lambda0:V0 -> p+ pi-', '')],
-                        writeOut=True)
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma:V0 -> e+ e-', '')], addDaughters=True, writeOut=True)
+        fsps = ['K+:FSP', 'pi+:FSP', 'e+:FSP', 'mu+:FSP', 'gamma:FSP', 'p+:FSP', 'K_L0:FSP']
+        path.add_module('ParticleLoader', decayStrings=fsps, writeOut=True)
+        for fsp in fsps:
+            path.add_module('ParticleListManipulator', outputListName=fsp,
+                            inputListNames=[fsp.split(':')[0] + ':all'], writeOut=True)
+            if 'gamma' in fsp:
+                path.add_module('ParticleSelector', decayString='gamma:FSP', cut='isFromECL')
+        path.add_module('ParticleLoader', decayStrings=['K_S0:V0 -> pi+ pi-'], writeOut=True)
+        path.add_module('ParticleLoader', decayStrings=['Lambda0:V0 -> p+ pi-'], writeOut=True)
+        path.add_module('ParticleLoader', decayStrings=['gamma:V0 -> e+ e-'], addDaughters=True, writeOut=True)
         print_path(path, x.reconstruct())
         self.assertEqual(x.reconstruct(), path)
 
@@ -222,16 +221,17 @@ class TestFSPLoader(unittest.TestCase):
         x = fei.core.FSPLoader(particles, config)
 
         path = basf2.create_path()
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                                                ('mu+:FSP', ''), ('gamma:FSP', ''),
-                                                                ('p+:FSP', ''), ('K_L0:FSP', '')],
-                        writeOut=True)
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('K_S0:V0 -> pi+ pi-', '')],
-                        writeOut=True)
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('Lambda0:V0 -> p+ pi-', '')],
-                        writeOut=True)
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma:V0 -> e+ e-', '')], addDaughters=True, writeOut=True)
-        hist_variables = [('NumberOfMCParticlesInEvent({i})'.format(i=pdgcode), 100, -0.5, 99.5)
+        fsps = ['K+:FSP', 'pi+:FSP', 'e+:FSP', 'mu+:FSP', 'gamma:FSP', 'p+:FSP', 'K_L0:FSP']
+        path.add_module('ParticleLoader', decayStrings=fsps, writeOut=True)
+        for fsp in fsps:
+            path.add_module('ParticleListManipulator', outputListName=fsp,
+                            inputListNames=[fsp.split(':')[0] + ':all'], writeOut=True)
+            if 'gamma' in fsp:
+                path.add_module('ParticleSelector', decayString='gamma:FSP', cut='isFromECL')
+        path.add_module('ParticleLoader', decayStrings=['K_S0:V0 -> pi+ pi-'], writeOut=True)
+        path.add_module('ParticleLoader', decayStrings=['Lambda0:V0 -> p+ pi-'], writeOut=True)
+        path.add_module('ParticleLoader', decayStrings=['gamma:V0 -> e+ e-'], addDaughters=True, writeOut=True)
+        hist_variables = [(f'NumberOfMCParticlesInEvent({pdgcode})', 100, -0.5, 99.5)
                           for pdgcode in set([11, 321, 211, 13, 22, 310, 2212, 130, 3122, 111])]
         path.add_module('VariablesToHistogram', particleList='',
                         variables=hist_variables,
@@ -241,54 +241,64 @@ class TestFSPLoader(unittest.TestCase):
 
     def test_belle1_without_monitoring(self):
         particles = get_small_unittest_channels()
-        config = fei.config.FeiConfiguration(monitor=False, b2bii=True)
+        b2bii.setB2BII()
+        config = fei.config.FeiConfiguration(monitor=False)
         x = fei.core.FSPLoader(particles, config)
 
         path = basf2.create_path()
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                                                ('mu+:FSP', ''),
-                                                                ('p+:FSP', ''), ('K_L0:FSP', '')],
-                        writeOut=True)
+        fsps = ['K+:FSP', 'pi+:FSP', 'e+:FSP', 'mu+:FSP', 'p+:FSP']
+        path.add_module('ParticleLoader', decayStrings=fsps, writeOut=True)
+        for fsp in fsps:
+            path.add_module('ParticleListManipulator', outputListName=fsp,
+                            inputListNames=[fsp.split(':')[0] + ':all'], writeOut=True)
         path.add_module('ParticleListManipulator', outputListName='gamma:FSP', inputListNames=['gamma:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['gamma:FSP'])
         path.add_module('ParticleListManipulator', outputListName='K_S0:V0', inputListNames=['K_S0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['K_S0:V0'])
         path.add_module('ParticleListManipulator', outputListName='Lambda0:V0', inputListNames=['Lambda0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['Lambda0:V0'])
+        path.add_module('ParticleListManipulator', outputListName='K_L0:FSP', inputListNames=['K_L0:mdst'], writeOut=True)
+        path.add_module('ParticleCopier', inputListNames=['K_L0:FSP'])
         path.add_module('ParticleListManipulator', outputListName='pi0:FSP', inputListNames=['pi0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['pi0:FSP'])
         path.add_module('ParticleListManipulator', outputListName='gamma:V0', inputListNames=['gamma:v0mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['gamma:V0'])
         print_path(path, x.reconstruct())
         self.assertEqual(x.reconstruct(), path)
+        b2bii.unsetB2BII()
 
     def test_belle1_with_monitoring(self):
         particles = get_small_unittest_channels()
-        config = fei.config.FeiConfiguration(monitor=True, b2bii=True)
+        b2bii.setB2BII()
+        config = fei.config.FeiConfiguration(monitor=True)
         x = fei.core.FSPLoader(particles, config)
 
         path = basf2.create_path()
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                                                ('mu+:FSP', ''),
-                                                                ('p+:FSP', ''), ('K_L0:FSP', '')],
-                        writeOut=True)
+        fsps = ['K+:FSP', 'pi+:FSP', 'e+:FSP', 'mu+:FSP', 'p+:FSP']
+        path.add_module('ParticleLoader', decayStrings=fsps, writeOut=True)
+        for fsp in fsps:
+            path.add_module('ParticleListManipulator', outputListName=fsp,
+                            inputListNames=[fsp.split(':')[0] + ':all'], writeOut=True)
         path.add_module('ParticleListManipulator', outputListName='gamma:FSP', inputListNames=['gamma:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['gamma:FSP'])
         path.add_module('ParticleListManipulator', outputListName='K_S0:V0', inputListNames=['K_S0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['K_S0:V0'])
         path.add_module('ParticleListManipulator', outputListName='Lambda0:V0', inputListNames=['Lambda0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['Lambda0:V0'])
+        path.add_module('ParticleListManipulator', outputListName='K_L0:FSP', inputListNames=['K_L0:mdst'], writeOut=True)
+        path.add_module('ParticleCopier', inputListNames=['K_L0:FSP'])
         path.add_module('ParticleListManipulator', outputListName='pi0:FSP', inputListNames=['pi0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['pi0:FSP'])
         path.add_module('ParticleListManipulator', outputListName='gamma:V0', inputListNames=['gamma:v0mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['gamma:V0'])
-        hist_variables = [('NumberOfMCParticlesInEvent({i})'.format(i=pdgcode), 100, -0.5, 99.5)
+        hist_variables = [(f'NumberOfMCParticlesInEvent({pdgcode})', 100, -0.5, 99.5)
                           for pdgcode in set([11, 321, 211, 13, 22, 310, 2212, 130, 3122, 111])]
         path.add_module('VariablesToHistogram', particleList='',
                         variables=hist_variables,
                         fileName='Monitor_FSPLoader.root')
         print_path(path, x.reconstruct())
         self.assertEqual(x.reconstruct(), path)
+        b2bii.unsetB2BII()
 
 
 class TestTrainingData(unittest.TestCase):
@@ -306,16 +316,18 @@ class TestTrainingData(unittest.TestCase):
         x = fei.core.TrainingData(particles, config, self.mc_counts)
 
         path = basf2.create_path()
-        path.add_module('VariablesToNtuple', fileName='pi+:generic ==> pi+:FSP.root', treeName='variables',
+        path.add_module('VariablesToNtuple', fileName='training_input.root', treeName='pi+:generic ==> pi+:FSP variables',
                         variables=['p', 'dr', 'isPrimarySignal'],
                         particleList='pi+:generic_0', sampling=('isPrimarySignal', {}))
-        path.add_module('VariablesToNtuple', fileName='K+:generic ==> K+:FSP.root', treeName='variables',
+        path.add_module('VariablesToNtuple', fileName='training_input.root', treeName='K+:generic ==> K+:FSP variables',
                         variables=['p', 'dr', 'isPrimarySignal'],
                         particleList='K+:generic_0', sampling=('isPrimarySignal', {}))
-        path.add_module('VariablesToNtuple', fileName='D0:generic ==> K-:generic pi+:generic.root', treeName='variables',
+        path.add_module('VariablesToNtuple', fileName='training_input.root',
+                        treeName='D0:generic ==> K-:generic pi+:generic variables',
                         variables=['M', 'p', 'isSignal'],
                         particleList='D0:generic_0', sampling=('isSignal', {}))
-        path.add_module('VariablesToNtuple', fileName='D0:generic ==> pi-:generic pi+:generic.root', treeName='variables',
+        path.add_module('VariablesToNtuple', fileName='training_input.root',
+                        treeName='D0:generic ==> pi-:generic pi+:generic variables',
                         variables=['M', 'p', 'isSignal'],
                         particleList='D0:generic_1', sampling=('isSignal', {}))
         print_path(path, x.reconstruct())
@@ -330,29 +342,31 @@ class TestTrainingData(unittest.TestCase):
         path.add_module('VariablesToHistogram', particleList='pi+:generic_0',
                         variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'p', 'dr', 'isPrimarySignal']),
                         variables_2d=fei.config.variables2binnings_2d([('p', 'isPrimarySignal'), ('dr', 'isPrimarySignal')]),
-                        fileName='Monitor_TrainingData_pi+:generic ==> pi+:FSP.root')
-        path.add_module('VariablesToNtuple', fileName='pi+:generic ==> pi+:FSP.root', treeName='variables',
+                        fileName='Monitor_TrainingData.root', directory='pi+:generic ==> pi+:FSP')
+        path.add_module('VariablesToNtuple', fileName='training_input.root', treeName='pi+:generic ==> pi+:FSP variables',
                         variables=['p', 'dr', 'isPrimarySignal'],
                         particleList='pi+:generic_0', sampling=('isPrimarySignal', {}))
         path.add_module('VariablesToHistogram', particleList='K+:generic_0',
                         variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'p', 'dr', 'isPrimarySignal']),
                         variables_2d=fei.config.variables2binnings_2d([('p', 'isPrimarySignal'), ('dr', 'isPrimarySignal')]),
-                        fileName='Monitor_TrainingData_K+:generic ==> K+:FSP.root')
-        path.add_module('VariablesToNtuple', fileName='K+:generic ==> K+:FSP.root', treeName='variables',
+                        fileName='Monitor_TrainingData.root', directory='K+:generic ==> K+:FSP')
+        path.add_module('VariablesToNtuple', fileName='training_input.root', treeName='K+:generic ==> K+:FSP variables',
                         variables=['p', 'dr', 'isPrimarySignal'],
                         particleList='K+:generic_0', sampling=('isPrimarySignal', {}))
         path.add_module('VariablesToHistogram', particleList='D0:generic_0',
                         variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'M', 'p', 'isSignal']),
                         variables_2d=fei.config.variables2binnings_2d([('M', 'isSignal'), ('p', 'isSignal')]),
-                        fileName='Monitor_TrainingData_D0:generic ==> K-:generic pi+:generic.root')
-        path.add_module('VariablesToNtuple', fileName='D0:generic ==> K-:generic pi+:generic.root', treeName='variables',
+                        fileName='Monitor_TrainingData.root', directory='D0:generic ==> K-:generic pi+:generic')
+        path.add_module('VariablesToNtuple', fileName='training_input.root',
+                        treeName='D0:generic ==> K-:generic pi+:generic variables',
                         variables=['M', 'p', 'isSignal'],
                         particleList='D0:generic_0', sampling=('isSignal', {}))
         path.add_module('VariablesToHistogram', particleList='D0:generic_1',
                         variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'M', 'p', 'isSignal']),
                         variables_2d=fei.config.variables2binnings_2d([('M', 'isSignal'), ('p', 'isSignal')]),
-                        fileName='Monitor_TrainingData_D0:generic ==> pi-:generic pi+:generic.root')
-        path.add_module('VariablesToNtuple', fileName='D0:generic ==> pi-:generic pi+:generic.root', treeName='variables',
+                        fileName='Monitor_TrainingData.root', directory='D0:generic ==> pi-:generic pi+:generic')
+        path.add_module('VariablesToNtuple', fileName='training_input.root',
+                        treeName='D0:generic ==> pi-:generic pi+:generic variables',
                         variables=['M', 'p', 'isSignal'],
                         particleList='D0:generic_1', sampling=('isSignal', {}))
         print_path(path, x.reconstruct())
@@ -411,7 +425,7 @@ class TestPreReconstruction(unittest.TestCase):
                         variables_2d=fei.config.variables2binnings_2d([('piid', 'isPrimarySignal'),
                                                                        ('piid', 'mcErrors'),
                                                                        ('piid', 'mcParticleStatus')]),
-                        fileName='Monitor_PreReconstruction_BeforeRanking_pi+:generic ==> pi+:FSP.root')
+                        fileName='Monitor_PreReconstruction_BeforeRanking.root', directory='pi+:generic ==> pi+:FSP')
         path.add_module('BestCandidateSelection', particleList='pi+:generic_0', variable='piid', selectLowest=False,
                         numBest=20, outputVariable='preCut_rank')
         path.add_module('VariablesToHistogram', particleList='pi+:generic_0',
@@ -423,14 +437,14 @@ class TestPreReconstruction(unittest.TestCase):
                                                                        ('extraInfo(preCut_rank)', 'isPrimarySignal'),
                                                                        ('extraInfo(preCut_rank)', 'mcErrors'),
                                                                        ('extraInfo(preCut_rank)', 'mcParticleStatus')]),
-                        fileName='Monitor_PreReconstruction_AfterRanking_pi+:generic ==> pi+:FSP.root')
+                        fileName='Monitor_PreReconstruction_AfterRanking.root', directory='pi+:generic ==> pi+:FSP')
         path.add_module('VariablesToHistogram', particleList='pi+:generic_0',
                         variables=fei.config.variables2binnings(['chiProb', 'mcErrors', 'mcParticleStatus',
                                                                  'isPrimarySignal']),
                         variables_2d=fei.config.variables2binnings_2d([('chiProb', 'isPrimarySignal'),
                                                                        ('chiProb', 'mcErrors'),
                                                                        ('chiProb', 'mcParticleStatus')]),
-                        fileName='Monitor_PreReconstruction_AfterVertex_pi+:generic ==> pi+:FSP.root')
+                        fileName='Monitor_PreReconstruction_AfterVertex.root', directory='pi+:generic ==> pi+:FSP')
 
         path.add_module('ParticleListManipulator', inputListNames=['K+:FSP'], outputListName='K+:generic_0',
                         cut='[dr < 2] and [abs(dz) < 4]', writeOut=True)
@@ -442,7 +456,7 @@ class TestPreReconstruction(unittest.TestCase):
                         variables_2d=fei.config.variables2binnings_2d([('Kid', 'isPrimarySignal'),
                                                                        ('Kid', 'mcErrors'),
                                                                        ('Kid', 'mcParticleStatus')]),
-                        fileName='Monitor_PreReconstruction_BeforeRanking_K+:generic ==> K+:FSP.root')
+                        fileName='Monitor_PreReconstruction_BeforeRanking.root', directory='K+:generic ==> K+:FSP')
         path.add_module('BestCandidateSelection', particleList='K+:generic_0', variable='Kid', selectLowest=False,
                         numBest=20, outputVariable='preCut_rank')
         path.add_module('VariablesToHistogram', particleList='K+:generic_0',
@@ -454,14 +468,14 @@ class TestPreReconstruction(unittest.TestCase):
                                                                        ('extraInfo(preCut_rank)', 'isPrimarySignal'),
                                                                        ('extraInfo(preCut_rank)', 'mcErrors'),
                                                                        ('extraInfo(preCut_rank)', 'mcParticleStatus')]),
-                        fileName='Monitor_PreReconstruction_AfterRanking_K+:generic ==> K+:FSP.root')
+                        fileName='Monitor_PreReconstruction_AfterRanking.root', directory='K+:generic ==> K+:FSP')
         path.add_module('VariablesToHistogram', particleList='K+:generic_0',
                         variables=fei.config.variables2binnings(['chiProb', 'mcErrors', 'mcParticleStatus',
                                                                  'isPrimarySignal']),
                         variables_2d=fei.config.variables2binnings_2d([('chiProb', 'isPrimarySignal'),
                                                                        ('chiProb', 'mcErrors'),
                                                                        ('chiProb', 'mcParticleStatus')]),
-                        fileName='Monitor_PreReconstruction_AfterVertex_K+:generic ==> K+:FSP.root')
+                        fileName='Monitor_PreReconstruction_AfterVertex.root', directory='K+:generic ==> K+:FSP')
 
         path.add_module('ParticleCombiner', decayString='D0:generic_0 -> K-:generic pi+:generic', writeOut=True,
                         decayMode=0, cut='1.7 < M < 1.95')
@@ -471,7 +485,7 @@ class TestPreReconstruction(unittest.TestCase):
                         variables_2d=fei.config.variables2binnings_2d([('abs(dM)', 'isSignal'),
                                                                        ('abs(dM)', 'mcErrors'),
                                                                        ('abs(dM)', 'mcParticleStatus')]),
-                        fileName='Monitor_PreReconstruction_BeforeRanking_D0:generic ==> K-:generic pi+:generic.root')
+                        fileName='Monitor_PreReconstruction_BeforeRanking.root', directory='D0:generic ==> K-:generic pi+:generic')
         path.add_module('BestCandidateSelection', particleList='D0:generic_0',
                         variable='abs(dM)', selectLowest=True, numBest=20, outputVariable='preCut_rank')
         path.add_module('VariablesToHistogram', particleList='D0:generic_0',
@@ -483,7 +497,7 @@ class TestPreReconstruction(unittest.TestCase):
                                                                        ('extraInfo(preCut_rank)', 'isSignal'),
                                                                        ('extraInfo(preCut_rank)', 'mcErrors'),
                                                                        ('extraInfo(preCut_rank)', 'mcParticleStatus')]),
-                        fileName='Monitor_PreReconstruction_AfterRanking_D0:generic ==> K-:generic pi+:generic.root')
+                        fileName='Monitor_PreReconstruction_AfterRanking.root', directory='D0:generic ==> K-:generic pi+:generic')
         path.add_module('ParticleVertexFitter', listName='D0:generic_0', confidenceLevel=-2.0,
                         vertexFitter='KFit', fitType='vertex')
         path.add_module('VariablesToHistogram', particleList='D0:generic_0',
@@ -492,7 +506,7 @@ class TestPreReconstruction(unittest.TestCase):
                         variables_2d=fei.config.variables2binnings_2d([('chiProb', 'isSignal'),
                                                                        ('chiProb', 'mcErrors'),
                                                                        ('chiProb', 'mcParticleStatus')]),
-                        fileName='Monitor_PreReconstruction_AfterVertex_D0:generic ==> K-:generic pi+:generic.root')
+                        fileName='Monitor_PreReconstruction_AfterVertex.root', directory='D0:generic ==> K-:generic pi+:generic')
 
         path.add_module('ParticleCombiner', decayString='D0:generic_1 -> pi-:generic pi+:generic', writeOut=True,
                         decayMode=1, cut='1.7 < M < 1.95')
@@ -502,7 +516,7 @@ class TestPreReconstruction(unittest.TestCase):
                         variables_2d=fei.config.variables2binnings_2d([('abs(dM)', 'isSignal'),
                                                                        ('abs(dM)', 'mcErrors'),
                                                                        ('abs(dM)', 'mcParticleStatus')]),
-                        fileName='Monitor_PreReconstruction_BeforeRanking_D0:generic ==> pi-:generic pi+:generic.root')
+                        fileName='Monitor_PreReconstruction_BeforeRanking.root', directory='D0:generic ==> pi-:generic pi+:generic')
         path.add_module('BestCandidateSelection', particleList='D0:generic_1',
                         variable='abs(dM)', selectLowest=True, numBest=20, outputVariable='preCut_rank')
         path.add_module('VariablesToHistogram', particleList='D0:generic_1',
@@ -514,7 +528,7 @@ class TestPreReconstruction(unittest.TestCase):
                                                                        ('extraInfo(preCut_rank)', 'isSignal'),
                                                                        ('extraInfo(preCut_rank)', 'mcErrors'),
                                                                        ('extraInfo(preCut_rank)', 'mcParticleStatus')]),
-                        fileName='Monitor_PreReconstruction_AfterRanking_D0:generic ==> pi-:generic pi+:generic.root')
+                        fileName='Monitor_PreReconstruction_AfterRanking.root', directory='D0:generic ==> pi-:generic pi+:generic')
         path.add_module('ParticleVertexFitter', listName='D0:generic_1', confidenceLevel=-2.0,
                         vertexFitter='KFit', fitType='vertex')
         path.add_module('VariablesToHistogram', particleList='D0:generic_1',
@@ -523,7 +537,7 @@ class TestPreReconstruction(unittest.TestCase):
                         variables_2d=fei.config.variables2binnings_2d([('chiProb', 'isSignal'),
                                                                        ('chiProb', 'mcErrors'),
                                                                        ('chiProb', 'mcParticleStatus')]),
-                        fileName='Monitor_PreReconstruction_AfterVertex_D0:generic ==> pi-:generic pi+:generic.root')
+                        fileName='Monitor_PreReconstruction_AfterVertex.root', directory='D0:generic ==> pi-:generic pi+:generic')
 
         print_path(path, x.reconstruct())
         self.assertEqual(x.reconstruct(), path)
@@ -608,7 +622,7 @@ class TestPostReconstruction(unittest.TestCase):
         path.add_module('TagUniqueSignal', particleList='pi+:generic_0', target='isPrimarySignal',
                         extraInfoName='uniqueSignal')
         path.add_module('ParticleListManipulator', outputListName='pi+:generic', inputListNames=['pi+:generic_0'],
-                        writeOut=True)
+                        variable='particleSource', writeOut=True)
         path.add_module('ParticleSelector', decayString='pi+:generic', cut='0.01 < extraInfo(SignalProbability)')
         path.add_module('BestCandidateSelection', particleList='pi+:generic', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
@@ -618,7 +632,7 @@ class TestPostReconstruction(unittest.TestCase):
         path.add_module('TagUniqueSignal', particleList='K+:generic_0', target='isPrimarySignal',
                         extraInfoName='uniqueSignal')
         path.add_module('ParticleListManipulator', outputListName='K+:generic', inputListNames=['K+:generic_0'],
-                        writeOut=True)
+                        variable='particleSource', writeOut=True)
         path.add_module('ParticleSelector', decayString='K+:generic', cut='0.01 < extraInfo(SignalProbability)')
         path.add_module('BestCandidateSelection', particleList='K+:generic', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
@@ -634,7 +648,7 @@ class TestPostReconstruction(unittest.TestCase):
                         extraInfoName='uniqueSignal')
 
         path.add_module('ParticleListManipulator', outputListName='D0:generic',
-                        inputListNames=['D0:generic_0', 'D0:generic_1'],
+                        inputListNames=['D0:generic_0', 'D0:generic_1'], variable='particleSource',
                         writeOut=True)
         path.add_module('ParticleSelector', decayString='D0:generic', cut='0.001 < extraInfo(SignalProbability)')
         path.add_module('BestCandidateSelection', particleList='D0:generic', variable='extraInfo(SignalProbability)',
@@ -655,7 +669,7 @@ class TestPostReconstruction(unittest.TestCase):
         path.add_module('TagUniqueSignal', particleList='pi+:generic_0', target='isPrimarySignal',
                         extraInfoName='uniqueSignal')
         path.add_module('ParticleListManipulator', outputListName='pi+:generic', inputListNames=['pi+:generic_0'],
-                        writeOut=True)
+                        variable='particleSource', writeOut=True)
         path.add_module('ParticleSelector', decayString='pi+:generic', cut='0.01 < extraInfo(SignalProbability)')
         path.add_module('BestCandidateSelection', particleList='pi+:generic', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
@@ -665,7 +679,7 @@ class TestPostReconstruction(unittest.TestCase):
         path.add_module('TagUniqueSignal', particleList='K+:generic_0', target='isPrimarySignal',
                         extraInfoName='uniqueSignal')
         path.add_module('ParticleListManipulator', outputListName='K+:generic', inputListNames=['K+:generic_0'],
-                        writeOut=True)
+                        variable='particleSource', writeOut=True)
         path.add_module('ParticleSelector', decayString='K+:generic', cut='0.01 < extraInfo(SignalProbability)')
         path.add_module('BestCandidateSelection', particleList='K+:generic', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
@@ -681,7 +695,7 @@ class TestPostReconstruction(unittest.TestCase):
                         extraInfoName='uniqueSignal')
 
         path.add_module('ParticleListManipulator', outputListName='D0:generic',
-                        inputListNames=['D0:generic_0', 'D0:generic_1'],
+                        inputListNames=['D0:generic_0', 'D0:generic_1'], variable='particleSource',
                         writeOut=True)
         path.add_module('ParticleSelector', decayString='D0:generic', cut='0.001 < extraInfo(SignalProbability)')
         path.add_module('BestCandidateSelection', particleList='D0:generic', variable='extraInfo(SignalProbability)',
@@ -713,9 +727,9 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('extraInfo(decayModeID)', 'mcErrors'),
                                                                        ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
                                                                        ('extraInfo(decayModeID)', 'mcParticleStatus')]),
-                        fileName='Monitor_PostReconstruction_AfterMVA_pi+:generic ==> pi+:FSP.root')
+                        fileName='Monitor_PostReconstruction_AfterMVA.root', directory='pi+:generic ==> pi+:FSP')
         path.add_module('ParticleListManipulator', outputListName='pi+:generic', inputListNames=['pi+:generic_0'],
-                        writeOut=True)
+                        variable='particleSource', writeOut=True)
         path.add_module('VariablesToHistogram', particleList='pi+:generic',
                         variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
                                                                  'extraInfo(SignalProbability)',
@@ -723,7 +737,7 @@ class TestPostReconstruction(unittest.TestCase):
                         variables_2d=fei.config.variables2binnings_2d([('extraInfo(decayModeID)', 'isPrimarySignal'),
                                                                        ('extraInfo(decayModeID)', 'mcErrors'),
                                                                        ('extraInfo(decayModeID)', 'mcParticleStatus')]),
-                        fileName='Monitor_PostReconstruction_BeforePostCut_pi+:generic.root')
+                        fileName='Monitor_PostReconstruction_BeforePostCut.root', directory='pi+:generic')
         path.add_module('ParticleSelector', decayString='pi+:generic', cut='0.01 < extraInfo(SignalProbability)')
         path.add_module('VariablesToHistogram', particleList='pi+:generic',
                         variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
@@ -732,7 +746,7 @@ class TestPostReconstruction(unittest.TestCase):
                         variables_2d=fei.config.variables2binnings_2d([('extraInfo(decayModeID)', 'isPrimarySignal'),
                                                                        ('extraInfo(decayModeID)', 'mcErrors'),
                                                                        ('extraInfo(decayModeID)', 'mcParticleStatus')]),
-                        fileName='Monitor_PostReconstruction_BeforeRanking_pi+:generic.root')
+                        fileName='Monitor_PostReconstruction_BeforeRanking.root', directory='pi+:generic')
         path.add_module('BestCandidateSelection', particleList='pi+:generic', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
         path.add_module('VariablesToHistogram', particleList='pi+:generic',
@@ -746,8 +760,8 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('isPrimarySignal', 'extraInfo(postCut_rank)'),
                                                                        ('mcErrors', 'extraInfo(postCut_rank)'),
                                                                        ('mcParticleStatus', 'extraInfo(postCut_rank)')]),
-                        fileName='Monitor_PostReconstruction_AfterRanking_pi+:generic.root')
-        path.add_module('VariablesToNtuple', fileName='Monitor_Final_pi+:generic.root', treeName='variables',
+                        fileName='Monitor_PostReconstruction_AfterRanking.root', directory='pi+:generic')
+        path.add_module('VariablesToNtuple', fileName='Monitor_Final.root', treeName='pi+:generic variables',
                         variables=['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', 'isPrimarySignal',
                                    'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
                         particleList='pi+:generic')
@@ -767,9 +781,9 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('extraInfo(decayModeID)', 'mcErrors'),
                                                                        ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
                                                                        ('extraInfo(decayModeID)', 'mcParticleStatus')]),
-                        fileName='Monitor_PostReconstruction_AfterMVA_K+:generic ==> K+:FSP.root')
+                        fileName='Monitor_PostReconstruction_AfterMVA.root', directory='K+:generic ==> K+:FSP')
         path.add_module('ParticleListManipulator', outputListName='K+:generic', inputListNames=['K+:generic_0'],
-                        writeOut=True)
+                        variable='particleSource', writeOut=True)
         path.add_module('VariablesToHistogram', particleList='K+:generic',
                         variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
                                                                  'extraInfo(SignalProbability)',
@@ -777,7 +791,7 @@ class TestPostReconstruction(unittest.TestCase):
                         variables_2d=fei.config.variables2binnings_2d([('extraInfo(decayModeID)', 'isPrimarySignal'),
                                                                        ('extraInfo(decayModeID)', 'mcErrors'),
                                                                        ('extraInfo(decayModeID)', 'mcParticleStatus')]),
-                        fileName='Monitor_PostReconstruction_BeforePostCut_K+:generic.root')
+                        fileName='Monitor_PostReconstruction_BeforePostCut.root', directory='K+:generic')
         path.add_module('ParticleSelector', decayString='K+:generic', cut='0.01 < extraInfo(SignalProbability)')
         path.add_module('VariablesToHistogram', particleList='K+:generic',
                         variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
@@ -786,7 +800,7 @@ class TestPostReconstruction(unittest.TestCase):
                         variables_2d=fei.config.variables2binnings_2d([('extraInfo(decayModeID)', 'isPrimarySignal'),
                                                                        ('extraInfo(decayModeID)', 'mcErrors'),
                                                                        ('extraInfo(decayModeID)', 'mcParticleStatus')]),
-                        fileName='Monitor_PostReconstruction_BeforeRanking_K+:generic.root')
+                        fileName='Monitor_PostReconstruction_BeforeRanking.root', directory='K+:generic')
         path.add_module('BestCandidateSelection', particleList='K+:generic', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
         path.add_module('VariablesToHistogram', particleList='K+:generic',
@@ -800,8 +814,8 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('isPrimarySignal', 'extraInfo(postCut_rank)'),
                                                                        ('mcErrors', 'extraInfo(postCut_rank)'),
                                                                        ('mcParticleStatus', 'extraInfo(postCut_rank)')]),
-                        fileName='Monitor_PostReconstruction_AfterRanking_K+:generic.root')
-        path.add_module('VariablesToNtuple', fileName='Monitor_Final_K+:generic.root', treeName='variables',
+                        fileName='Monitor_PostReconstruction_AfterRanking.root', directory='K+:generic')
+        path.add_module('VariablesToNtuple', fileName='Monitor_Final.root', treeName='K+:generic variables',
                         variables=['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', 'isPrimarySignal',
                                    'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
                         particleList='K+:generic')
@@ -821,7 +835,7 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('extraInfo(decayModeID)', 'mcErrors'),
                                                                        ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
                                                                        ('extraInfo(decayModeID)', 'mcParticleStatus')]),
-                        fileName='Monitor_PostReconstruction_AfterMVA_D0:generic ==> K-:generic pi+:generic.root')
+                        fileName='Monitor_PostReconstruction_AfterMVA.root', directory='D0:generic ==> K-:generic pi+:generic')
 
         path.add_module('MVAExpert', identifier='UNITTEST_D0:generic ==> pi-:generic pi+:generic',
                         extraInfoName='SignalProbability', listNames=['D0:generic_1'])
@@ -838,10 +852,10 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('extraInfo(decayModeID)', 'mcErrors'),
                                                                        ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
                                                                        ('extraInfo(decayModeID)', 'mcParticleStatus')]),
-                        fileName='Monitor_PostReconstruction_AfterMVA_D0:generic ==> pi-:generic pi+:generic.root')
+                        fileName='Monitor_PostReconstruction_AfterMVA.root', directory='D0:generic ==> pi-:generic pi+:generic')
 
         path.add_module('ParticleListManipulator', outputListName='D0:generic',
-                        inputListNames=['D0:generic_0', 'D0:generic_1'],
+                        inputListNames=['D0:generic_0', 'D0:generic_1'], variable='particleSource',
                         writeOut=True)
         path.add_module('VariablesToHistogram', particleList='D0:generic',
                         variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
@@ -850,7 +864,7 @@ class TestPostReconstruction(unittest.TestCase):
                         variables_2d=fei.config.variables2binnings_2d([('extraInfo(decayModeID)', 'isSignal'),
                                                                        ('extraInfo(decayModeID)', 'mcErrors'),
                                                                        ('extraInfo(decayModeID)', 'mcParticleStatus')]),
-                        fileName='Monitor_PostReconstruction_BeforePostCut_D0:generic.root')
+                        fileName='Monitor_PostReconstruction_BeforePostCut.root', directory='D0:generic')
         path.add_module('ParticleSelector', decayString='D0:generic', cut='0.001 < extraInfo(SignalProbability)')
         path.add_module('VariablesToHistogram', particleList='D0:generic',
                         variables=fei.config.variables2binnings(['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)',
@@ -859,7 +873,7 @@ class TestPostReconstruction(unittest.TestCase):
                         variables_2d=fei.config.variables2binnings_2d([('extraInfo(decayModeID)', 'isSignal'),
                                                                        ('extraInfo(decayModeID)', 'mcErrors'),
                                                                        ('extraInfo(decayModeID)', 'mcParticleStatus')]),
-                        fileName='Monitor_PostReconstruction_BeforeRanking_D0:generic.root')
+                        fileName='Monitor_PostReconstruction_BeforeRanking.root', directory='D0:generic')
         path.add_module('BestCandidateSelection', particleList='D0:generic', variable='extraInfo(SignalProbability)',
                         selectLowest=False, numBest=10, outputVariable='postCut_rank')
         path.add_module('VariablesToHistogram', particleList='D0:generic',
@@ -873,8 +887,8 @@ class TestPostReconstruction(unittest.TestCase):
                                                                        ('isSignal', 'extraInfo(postCut_rank)'),
                                                                        ('mcErrors', 'extraInfo(postCut_rank)'),
                                                                        ('mcParticleStatus', 'extraInfo(postCut_rank)')]),
-                        fileName='Monitor_PostReconstruction_AfterRanking_D0:generic.root')
-        path.add_module('VariablesToNtuple', fileName='Monitor_Final_D0:generic.root', treeName='variables',
+                        fileName='Monitor_PostReconstruction_AfterRanking.root', directory='D0:generic')
+        path.add_module('VariablesToNtuple', fileName='Monitor_Final.root', treeName='D0:generic variables',
                         variables=['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', 'isSignal',
                                    'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)'],
                         particleList='D0:generic')
@@ -888,9 +902,9 @@ class TestTeacher(unittest.TestCase):
         fei.core.Teacher.MaximumNumberOfMVASamples = int(1e7)
         fei.core.Teacher.MinimumNumberOfMVASamples = int(10)
 
-        f = ROOT.TFile('pi+:generic ==> pi+:FSP.root', 'RECREATE')
+        f = ROOT.TFile('training_input.root', 'RECREATE')
         f.cd()
-        tree = ROOT.TTree('variables', 'variables')
+        tree = ROOT.TTree('pi+:generic ==> pi+:FSP variables', 'pi+:generic ==> pi+:FSP variables')
         isSignal = np.zeros(1, dtype=float)
         p = np.zeros(1, dtype=float)
         pt = np.zeros(1, dtype=float)
@@ -902,14 +916,11 @@ class TestTeacher(unittest.TestCase):
             p[0] = i
             pt[0] = i * 2
             tree.Fill()
-        f.Write("variables")
+        tree.Write("", ROOT.TObject.kOverwrite)
 
-        # Broken file
-        f = ROOT.TFile('K+:generic ==> K+:FSP.root', 'RECREATE')
+        # Test case, where tree not existent for K+:generic ==> K+:FSP, so skip creating it
 
-        f = ROOT.TFile('D0:generic ==> K-:generic pi+:generic.root', 'RECREATE')
-        f.cd()
-        tree = ROOT.TTree('variables', 'variables')
+        tree = ROOT.TTree('D0:generic ==> K-:generic pi+:generic variables', 'D0:generic ==> K-:generic pi+:generic variables')
         isSignal = np.zeros(1, dtype=float)
         p = np.zeros(1, dtype=float)
         pt = np.zeros(1, dtype=float)
@@ -922,11 +933,9 @@ class TestTeacher(unittest.TestCase):
             p[0] = i
             pt[0] = i * 2
             tree.Fill()
-        f.Write("variables")
+        tree.Write("", ROOT.TObject.kOverwrite)
 
-        f = ROOT.TFile('D0:generic ==> pi-:generic pi+:generic.root', 'RECREATE')
-        f.cd()
-        tree = ROOT.TTree('variables', 'variables')
+        tree = ROOT.TTree('D0:generic ==> pi-:generic pi+:generic variables', 'D0:generic ==> pi-:generic pi+:generic variables')
         isSignal = np.zeros(1, dtype=float)
         p = np.zeros(1, dtype=float)
         pt = np.zeros(1, dtype=float)
@@ -938,27 +947,21 @@ class TestTeacher(unittest.TestCase):
             p[0] = i
             pt[0] = i * 2
             tree.Fill()
-        f.Write("variables")
+        tree.Write("", ROOT.TObject.kOverwrite)
 
     def tearDown(self):
         if os.path.isfile('UNITTEST_TEACHER.xml'):
             os.remove('UNITTEST_TEACHER.xml')
-        if os.path.isfile('pi+:generic ==> pi+:FSP.root'):
-            os.remove('pi+:generic ==> pi+:FSP.root')
         if os.path.isfile('UNITTEST_pi+:generic ==> pi+:FSP.xml'):
             os.remove('UNITTEST_pi+:generic ==> pi+:FSP.xml')
-        if os.path.isfile('K+:generic ==> K+:FSP.root'):
-            os.remove('K+:generic ==> K+:FSP.root')
         if os.path.isfile('UNITTEST_K+:generic ==> K+:FSP.xml'):
             os.remove('UNITTEST_K+:generic ==> K+:FSP.xml')
-        if os.path.isfile('D0:generic ==> K-:generic pi+:generic.root'):
-            os.remove('D0:generic ==> K-:generic pi+:generic.root')
         if os.path.isfile('UNITTEST_D0:generic ==> K-:generic pi+:generic.xml'):
             os.remove('UNITTEST_D0:generic ==> K-:generic pi+:generic.xml')
-        if os.path.isfile('D0:generic ==> pi-:generic pi+:generic.root'):
-            os.remove('D0:generic ==> pi-:generic pi+:generic.root')
         if os.path.isfile('UNITTEST_D0:generic ==> pi-:generic pi+:generic.xml'):
             os.remove('UNITTEST_D0:generic ==> pi-:generic pi+:generic.xml')
+        if os.path.isfile('training_input.root'):
+            os.remove('training_input.root')
 
     def test_create_fake_weightfile(self):
         self.assertEqual(os.path.isfile('UNITTEST_pi+:generic ==> pi+:FSP.xml'), False)
@@ -990,7 +993,7 @@ class TestTeacher(unittest.TestCase):
         x.do_all_trainings()
 
         self.assertEqual(basf2_mva.available('UNITTEST_pi+:generic ==> pi+:FSP'), True)
-        self.assertEqual(basf2_mva.available('UNITTEST_K+:generic ==> K+:FSP'), True)
+        self.assertEqual(basf2_mva.available('UNITTEST_K+:generic ==> K+:FSP'), False)
         self.assertEqual(basf2_mva.available('UNITTEST_D0:generic ==> K-:generic pi+:generic'), True)
         self.assertEqual(basf2_mva.available('UNITTEST_D0:generic ==> pi-:generic pi+:generic'), True)
 
@@ -1010,11 +1013,11 @@ class TestGetPath(unittest.TestCase):
         f.cd()
 
         for pdgnumber in set([abs(pdg.from_name(particle.name)) for particle in particles]):
-            hist = ROOT.TH1F("NumberOfMCParticlesInEvent__bo{}__bc".format(pdgnumber),
-                             "NumberOfMCParticlesInEvent__bo{}__bc".format(pdgnumber), 11, -0.5, 10.5)
+            hist = ROOT.TH1F(f"NumberOfMCParticlesInEvent__bo{pdgnumber}__bc",
+                             f"NumberOfMCParticlesInEvent__bo{pdgnumber}__bc", 11, -0.5, 10.5)
             for i in range(10):
                 hist.Fill(5)
-            f.Write("NumberOfMCParticlesInEvent__bo{}__bc".format(pdgnumber))
+            f.Write(f"NumberOfMCParticlesInEvent__bo{pdgnumber}__bc")
 
     def tearDown(self):
         if os.path.isfile('mcParticlesCount.root'):
@@ -1025,7 +1028,7 @@ class TestGetPath(unittest.TestCase):
     def test_get_path_default_cache(self):
         particles = fei.get_unittest_channels()
         config = fei.config.FeiConfiguration(training=True)
-        x = fei.core.Teacher(particles, config)
+        x = fei.core.Teacher(particles, config)  # noqa
 
         # Should try to create mcParticlesCount
         # -> Returns at stage 0
@@ -1112,7 +1115,7 @@ class TestGetPath(unittest.TestCase):
     def test_get_path(self):
         particles = fei.get_unittest_channels()
         config = fei.config.FeiConfiguration(cache=-1, training=True)
-        x = fei.core.Teacher(particles, config)
+        x = fei.core.Teacher(particles, config)  # noqa
 
         # Should try to create mcParticlesCount
         # -> Returns at stage 0

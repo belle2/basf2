@@ -21,6 +21,7 @@
 
 namespace Belle2 {
 
+
   //! Example Detector
   class TRGTOPUnpackerStore : public TObject {
 
@@ -28,17 +29,50 @@ namespace Belle2 {
 
     // Empty constructor
     // Recommended for ROOT IO
-    TRGTOPUnpackerStore()
-    {
-    }
+    TRGTOPUnpackerStore() :
+      m_eventIdL1(intNaN),
+      m_eventIdTOP(intNaN),
+      m_windowIdTOP(intNaN),
+      m_rvcB2L(intNaN),
+      m_rvcWindow(intNaN),
+      m_rvcTopTimingDecisionPrev(intNaN),
+      m_rvcTopTimingDecisionNow(intNaN),
+      m_rvcTopTimingDecisionNowGdl(intNaN),
+      m_combinedTimingTop(intNaN),
+      m_nSlotsCombinedTimingTop(intNaN),
+      m_combinedTimingTopResidual(intNaN),
+      m_nErrorsMinor(intNaN),
+      m_nErrorsMajor(intNaN),
+      m_trigType(intNaN),
+      m_nHitSum(intNaN),
+      m_logLSum(intNaN),
+      m_logLVar(intNaN),
+      m_timingVar(intNaN)
+    {}
 
     //! A Useful Constructor
     explicit TRGTOPUnpackerStore(
       int eventIdL1
-    )
-    {
-      m_eventIdL1                       = eventIdL1;
-    }
+    ) :
+      m_eventIdL1(eventIdL1),
+      m_eventIdTOP(intNaN),
+      m_windowIdTOP(intNaN),
+      m_rvcB2L(intNaN),
+      m_rvcWindow(intNaN),
+      m_rvcTopTimingDecisionPrev(intNaN),
+      m_rvcTopTimingDecisionNow(intNaN),
+      m_rvcTopTimingDecisionNowGdl(intNaN),
+      m_combinedTimingTop(intNaN),
+      m_nSlotsCombinedTimingTop(intNaN),
+      m_combinedTimingTopResidual(intNaN),
+      m_nErrorsMinor(intNaN),
+      m_nErrorsMajor(intNaN),
+      m_trigType(intNaN),
+      m_nHitSum(intNaN),
+      m_logLSum(intNaN),
+      m_logLVar(intNaN),
+      m_timingVar(intNaN)
+    {}
 
     //! Another Useful Constructor
     TRGTOPUnpackerStore(
@@ -60,27 +94,26 @@ namespace Belle2 {
       int logLSum,
       int logLVar,
       int timingVar
-    )
-    {
-      m_eventIdL1                       = eventIdL1;
-      m_eventIdTOP                      = eventIdTOP;
-      m_windowIdTOP                     = windowIdTOP;
-      m_rvcB2L                          = rvcB2L;
-      m_rvcWindow                       = rvcWindow;
-      m_rvcTopTimingDecisionPrev        = rvcTopTimingDecisionPrev;
-      m_rvcTopTimingDecisionNow         = rvcTopTimingDecisionNow;
-      m_rvcTopTimingDecisionNowGdl            = rvcTopTimingDecisionNowGdl;
-      m_combinedTimingTop               = combinedTimingTop;
-      m_nSlotsCombinedTimingTop         = nSlotsCombinedTimingTop;
-      m_combinedTimingTopResidual       = combinedTimingTopResidual;
-      m_nErrorsMinor                    = nErrorsMinor;
-      m_nErrorsMajor                    = nErrorsMajor;
-      m_trigType                        = trigType;
-      m_nHitSum                         = nHitSum;
-      m_logLSum                         = logLSum;
-      m_logLVar                         = logLVar;
-      m_timingVar                         = timingVar;
-    }
+    ) :
+      m_eventIdL1(eventIdL1),
+      m_eventIdTOP(eventIdTOP),
+      m_windowIdTOP(windowIdTOP),
+      m_rvcB2L(rvcB2L),
+      m_rvcWindow(rvcWindow),
+      m_rvcTopTimingDecisionPrev(rvcTopTimingDecisionPrev),
+      m_rvcTopTimingDecisionNow(rvcTopTimingDecisionNow),
+      m_rvcTopTimingDecisionNowGdl(rvcTopTimingDecisionNowGdl),
+      m_combinedTimingTop(combinedTimingTop),
+      m_nSlotsCombinedTimingTop(nSlotsCombinedTimingTop),
+      m_combinedTimingTopResidual(combinedTimingTopResidual),
+      m_nErrorsMinor(nErrorsMinor),
+      m_nErrorsMajor(nErrorsMajor),
+      m_trigType(trigType),
+      m_nHitSum(nHitSum),
+      m_logLSum(logLSum),
+      m_logLVar(logLVar),
+      m_timingVar(timingVar)
+    {}
 
     //! Destructor
     ~TRGTOPUnpackerStore() {}

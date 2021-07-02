@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """ Compare ROOT objects and perform e.g. chi2 tests.
 A small command line interface for testing/debugging purposes is included.
@@ -10,7 +9,7 @@ from abc import ABC, abstractmethod
 import argparse
 import numpy
 import os.path
-from typing import Optional
+from typing import Optional, Any
 
 # 3rd
 import ROOT
@@ -33,7 +32,6 @@ class ComparisonFailed(Exception):
     The comparison failed for some reason. For example
     because ROOT was not able to compute the Chi^2 properly
     """
-    pass
 
 
 class ObjectsNotSupported(Exception):
@@ -41,7 +39,6 @@ class ObjectsNotSupported(Exception):
     The type and/or combination of provided ROOT objects
     is not supported for comparison
     """
-    pass
 
 
 class DifferingBinCount(Exception):
@@ -49,14 +46,12 @@ class DifferingBinCount(Exception):
     The two ROOT objects provided have a different bin count
     and therefor, cannot be compared using the Chi2 test
     """
-    pass
 
 
 class TooFewBins(Exception):
     """
     Not sufficient bins to perform the Chi^2 test
     """
-    pass
 
 
 # ==============================================================================
@@ -65,9 +60,7 @@ class TooFewBins(Exception):
 
 
 def get_comparison(
-        object_1,
-        object_2,
-        mop: Optional[MetaOptionParser]
+    object_1, object_2, mop: Optional[MetaOptionParser] = None,
 ) -> "ComparisonBase":
     """ Uses the metaoptions to determine which comparison algorithm is used
     and initializes the corresponding subclass of :class:`ComparisonBase` that
@@ -76,18 +69,16 @@ def get_comparison(
     @param object_2 ROOT TObject
     @param mop Metaoption parser
     """
+    if mop is None:
+        mop = MetaOptionParser()
     if mop.has_option("kolmogorov"):
-        tester = KolmogorovTest
+        tester: Any = KolmogorovTest
     elif mop.has_option("andersondarling"):
         tester = AndersonDarlingTest
     else:
         tester = Chi2Test
 
-    test = tester(
-        object_1,
-        object_2,
-        mop=mop
-    )
+    test = tester(object_1, object_2, mop=mop)
 
     return test
 
@@ -95,6 +86,7 @@ def get_comparison(
 # ==============================================================================
 # Comparison Base Class
 # ==============================================================================
+
 
 class ComparisonBase(ABC):
     """
@@ -122,8 +114,13 @@ class ComparisonBase(ABC):
     allow to access the results.
     """
 
-    def __init__(self, object_a, object_b,
-                 mop: Optional[MetaOptionParser] = None, debug=False):
+    def __init__(
+        self,
+        object_a,
+        object_b,
+        mop: Optional[MetaOptionParser] = None,
+        debug=False,
+    ):
         """
         Initialize ComparisonBase class
 
@@ -165,7 +162,7 @@ class ComparisonBase(ABC):
 
         if self.mop.has_option("nocompare"):
             # is comparison disabled for this plot ?
-            self._comparison_result_long = 'Testing is disabled for this plot'
+            self._comparison_result_long = "Testing is disabled for this plot"
             return
 
         fail_message = "Comparison failed: "
@@ -185,8 +182,10 @@ class ComparisonBase(ABC):
             self._comparison_result_long = fail_message + str(e)
         except Exception as e:
             self._comparison_result = "error"
-            self._comparison_result_long = "Unknown error occurred. Please " \
-                                           "submit a bug report. " + str(e)
+            self._comparison_result_long = (
+                "Unknown error occurred. Please "
+                "submit a bug report. " + str(e)
+            )
         else:
             # Will be already set in case of errors above and we don't want
             # to overwrite this.
@@ -198,12 +197,10 @@ class ComparisonBase(ABC):
     @abstractmethod
     def _get_comparison_result(self) -> str:
         """ Used to format the value of :attr:`_comparison_result`. """
-        pass
 
     @abstractmethod
     def _get_comparison_result_long(self) -> str:
         """ Used to format the value of :attr:`_comparison_result_long`. """
-        pass
 
     @property
     def comparison_result(self):
@@ -220,7 +217,6 @@ class ComparisonBase(ABC):
     @abstractmethod
     def _compute(self):
         """ This method performs the actual computations. """
-        pass
 
     def can_compare(self):
         """
@@ -258,15 +254,17 @@ class ComparisonBase(ABC):
         @return: None
         """
         if not self._has_correct_types():
-            msg = "Comparison of {} (Type {}) with {} (Type {}) not " \
-                  "supported.\nPlease open a JIRA issue (validation " \
-                  "component) if you need this supported. "
+            msg = (
+                "Comparison of {} (Type {}) with {} (Type {}) not "
+                "supported.\nPlease open a JIRA issue (validation "
+                "component) if you need this supported. "
+            )
             raise ObjectsNotSupported(
                 msg.format(
                     self.object_a.GetName(),
                     self.object_a.ClassName(),
                     self.object_b.GetName(),
-                    self.object_b.ClassName()
+                    self.object_b.ClassName(),
                 )
             )
 
@@ -275,8 +273,11 @@ class ComparisonBase(ABC):
         Check if both ROOT obeject have the same amount of bins
         @return: True if the bins are equal, otherwise False
         """
-        if self.object_a.ClassName() == "TEfficiency" == \
-                self.object_b.ClassName():
+        if (
+            self.object_a.ClassName()
+            == "TEfficiency"
+            == self.object_b.ClassName()
+        ):
             nbins_a = self.object_a.GetTotalHistogram().GetNbinsX()
             nbins_b = self.object_b.GetTotalHistogram().GetNbinsX()
         else:
@@ -291,14 +292,16 @@ class ComparisonBase(ABC):
         @return: None
         """
         if not self._has_compatible_bins():
-            msg = "The objects have differing x bin count: {} has {} vs. {} " \
-                  "has {}."
+            msg = (
+                "The objects have differing x bin count: {} has {} vs. {} "
+                "has {}."
+            )
             raise DifferingBinCount(
                 msg.format(
                     self.object_a.GetName(),
                     self.object_a.GetNbinsX(),
                     self.object_b.GetName(),
-                    self.object_b.GetNbinsX()
+                    self.object_b.GetNbinsX(),
                 )
             )
 
@@ -318,7 +321,7 @@ class ComparisonBase(ABC):
             teff_a.GetName(),
             xbin_count,
             xbin_low,
-            xbin_max
+            xbin_max,
         )
         # starting from the first to the last bin, ignoring the under/overflow
         # bins
@@ -334,7 +337,7 @@ class PvalueTest(ComparisonBase):
 
     #: Default pvalue below which a warning is issued (unless supplied in
     #: metaoptions)
-    _default_pvalue_warn = 1.0
+    _default_pvalue_warn = 0.99
 
     #: Default pvalue below which an error is issued (unless supplied in
     #: metaoptions)
@@ -388,6 +391,7 @@ class PvalueTest(ComparisonBase):
 # Chi2 Test
 # ------------------------------------------------------------------------------
 
+
 class Chi2Test(PvalueTest):
 
     """
@@ -428,9 +432,11 @@ class Chi2Test(PvalueTest):
                 a.SetBinContent(ibin, 0.0)
                 b.SetBinContent(ibin, 0.0)
                 if self.debug:
-                    print("DEBUG: Warning: Setting bin content of bin {} to "
-                          "zero for both histograms, because both histograms "
-                          "have vanishing errors there.".format(ibin))
+                    print(
+                        "DEBUG: Warning: Setting bin content of bin {} to "
+                        "zero for both histograms, because both histograms "
+                        "have vanishing errors there.".format(ibin)
+                    )
 
     def _compute(self) -> None:
         """
@@ -453,8 +459,10 @@ class Chi2Test(PvalueTest):
         nbins = local_object_a.GetNbinsX()
 
         if nbins < 2:
-            raise TooFewBins("{} bin(s) is too few to perform the Chi2 "
-                             "test.".format(nbins))
+            raise TooFewBins(
+                "{} bin(s) is too few to perform the Chi2 "
+                "test.".format(nbins)
+            )
 
         weighted_types = ["TProfile", "TH1D", "TH1F"]
         comp_weight_a = local_object_a.ClassName() in weighted_types
@@ -470,8 +478,10 @@ class Chi2Test(PvalueTest):
             # to be unweighted
             first_obj, second_obj = second_obj, first_obj
             if self.debug:
-                print("Debug: Warning: Switching the two objects, because "
-                      "ROOT can only have the first one to be unweighted")
+                print(
+                    "Debug: Warning: Switching the two objects, because "
+                    "ROOT can only have the first one to be unweighted"
+                )
 
         # Construct the option string for the Chi2Test call
         comp_options = "P "  # for debugging output
@@ -491,11 +501,7 @@ class Chi2Test(PvalueTest):
         res_ndf = numpy.array([1], numpy.int32)
 
         res_pvalue = first_obj.Chi2TestX(
-            second_obj,
-            res_chi2,
-            res_ndf,
-            res_igood,
-            comp_options
+            second_obj, res_chi2, res_ndf, res_igood, comp_options
         )
 
         if self.debug:
@@ -503,57 +509,85 @@ class Chi2Test(PvalueTest):
             print()
             print_contents_and_errors(first_obj, second_obj)
             print()
-            print("Here's what ROOT's Chi2Test gave us (comp_options: '{}'):"
-                  " ".format(comp_options))
+            print(
+                "Here's what ROOT's Chi2Test gave us (comp_options: '{}'):"
+                " ".format(comp_options)
+            )
 
             tp = TablePrinter(3, width=(10, 10, 40))
             print()
             tp.print_divider()
             tp.print(["Key", "Value", "Comment"])
             tp.print_divider()
-            tp.print(["chi2", numpy.asscalar(res_chi2),
-                      "Should roughly match above 'Total chi2'"])
+            tp.print(
+                [
+                    "chi2",
+                    numpy.asscalar(res_chi2),
+                    "Should roughly match above 'Total chi2'",
+                ]
+            )
             tp.print(["ndf", numpy.asscalar(res_ndf), "#Non-empty bins - 1"])
             tp.print(["chi2/ndf", numpy.asscalar(res_chi2 / res_ndf), ""])
-            tp.print(["igood", numpy.asscalar(res_igood),
-                      "a debug indicator, 0 if all good"])
+            tp.print(
+                [
+                    "igood",
+                    numpy.asscalar(res_igood),
+                    "a debug indicator, 0 if all good",
+                ]
+            )
             tp.print(["pvalue", res_pvalue, ""])
             tp.print_divider()
             print()
-            print("See https://root.cern.ch/doc/master/classTH1.html for more "
-                  "information.")
+            print(
+                "See https://root.cern.ch/doc/master/classTH1.html for more "
+                "information."
+            )
             print()
 
         if res_ndf < 1:
-            msg = "Comparison failed, no Chi^2 could be computed. For " \
-                  "debugging, you can use the CLI of " \
-                  "'validation/scripts/validationcomparison.py' on your root " \
-                  "file and the reference. Run 'validationcomparison.py " \
-                  "--help' for info. If problem persists, please open " \
-                  "JIRA issue (validation component)."
+            msg = (
+                "Comparison failed, no Chi^2 could be computed. For "
+                "debugging, you can use the CLI of "
+                "'validation/scripts/validationcomparison.py' on your root "
+                "file and the reference. Run 'validationcomparison.py "
+                "--help' for info. If problem persists, please open "
+                "JIRA issue (validation component)."
+            )
             raise ComparisonFailed(msg)
 
         res_chi2ndf = res_chi2 / res_ndf
 
-        self._pvalue, self._chi2, self._chi2ndf, self._ndf = \
-            res_pvalue, res_chi2[0], res_chi2ndf[0], res_ndf[0]
+        self._pvalue, self._chi2, self._chi2ndf, self._ndf = (
+            res_pvalue,
+            res_chi2[0],
+            res_chi2ndf[0],
+            res_ndf[0],
+        )
 
     def _get_comparison_result_long(self) -> str:
         if self._pvalue is None or self._chi2ndf is None or self._chi2 is None:
-            return r"Could not perform $\chi^2$-Test  between {{revision1}} " \
-                   r"and {{revision2}} due to an unknown error. Please " \
-                   r"submit a bug report."
+            return (
+                r"Could not perform $\chi^2$-Test  between {{revision1}} "
+                r"and {{revision2}} due to an unknown error. Please "
+                r"submit a bug report."
+            )
 
-        return r'Performed $\chi^2$-Test between {{revision1}} ' \
-               r'and {{revision2}} ' \
-               r'($\chi^2$ = {chi2:.4f}; NDF = {ndf}; ' \
-               r'$\chi^2/\text{{{{NDF}}}}$ = {chi2ndf:.4f}).' \
-               r' <b>p-value: {pvalue:.6f}</b> (p-value warn: {pvalue_warn}, ' \
-               r'p-value error: {pvalue_error})'.format(
-                   chi2=self._chi2, ndf=self._ndf, chi2ndf=self._chi2ndf,
-                   pvalue=self._pvalue, pvalue_warn=self._pvalue_warn,
-                   pvalue_error=self._pvalue_error
-               )
+        return (
+            r"Performed $\chi^2$-Test between {{revision1}} "
+            r"and {{revision2}} "
+            r"($\chi^2$ = {chi2:.4f}; NDF = {ndf}; "
+            r"$\chi^2/\text{{{{NDF}}}}$ = {chi2ndf:.4f})."
+            r" <b>p-value: {pvalue:.6f}</b> (p-value warn: {pvalue_warn}, "
+            r"p-value error: {pvalue_error})".format(
+                chi2=self._chi2,
+                ndf=self._ndf,
+                chi2ndf=self._chi2ndf,
+                pvalue=self._pvalue,
+                pvalue_warn=self._pvalue_warn,
+                pvalue_error=self._pvalue_error,
+            )
+        )
+
 
 # ------------------------------------------------------------------------------
 # Kolmogorov Test
@@ -597,20 +631,26 @@ class KolmogorovTest(PvalueTest):
 
     def _get_comparison_result_long(self) -> str:
         if self._pvalue is None:
-            return r"Could not perform Kolmogorov test between {{revision1}} " \
-                   r"and {{revision2}} due to an unknown error. Please submit " \
-                   r"a bug report."
+            return (
+                r"Could not perform Kolmogorov test between {{revision1}} "
+                r"and {{revision2}} due to an unknown error. Please submit "
+                r"a bug report."
+            )
 
-        return r'Performed Komlogorov test between {{revision1}} ' \
-               r'and {{revision2}} ' \
-               r' <b>p-value: {pvalue:.6f}</b> (p-value warn: {pvalue_warn}, ' \
-               r'p-value error: {pvalue_error})'.format(
-                   pvalue=self._pvalue, pvalue_warn=self._pvalue_warn,
-                   pvalue_error=self._pvalue_error
-               )
+        return (
+            r"Performed Komlogorov test between {{revision1}} "
+            r"and {{revision2}} "
+            r" <b>p-value: {pvalue:.6f}</b> (p-value warn: {pvalue_warn}, "
+            r"p-value error: {pvalue_error})".format(
+                pvalue=self._pvalue,
+                pvalue_warn=self._pvalue_warn,
+                pvalue_error=self._pvalue_error,
+            )
+        )
+
 
 # ------------------------------------------------------------------------------
-# Anderson Darling Test
+# Anderson-Darling Test
 # ------------------------------------------------------------------------------
 
 
@@ -619,7 +659,7 @@ class AndersonDarlingTest(PvalueTest):
 
     def __init__(self, *args, **kwargs):
         """
-        Initialize Kolmogorov test.
+        Initialize Anderson-Darling test.
         @param args: See arguments of :class:`ComparisonBase`
         @param kwargs:  See arguments of :class:`ComparisonBase`
         """
@@ -649,28 +689,36 @@ class AndersonDarlingTest(PvalueTest):
         if self.debug:
             option_str += "D"
 
-        self._pvalue = local_object_a.KolmogorovTest(local_object_b, option_str)
+        self._pvalue = local_object_a.AndersonDarlingTest(
+            local_object_b, option_str
+        )
 
     def _get_comparison_result_long(self) -> str:
         if self._pvalue is None:
-            return r"Could not perform Anderson Darling test between " \
-                   r"{{revision1}} and {{revision2}} due to an unknown error." \
-                   r" Please support a bug report."
+            return (
+                r"Could not perform-Anderson Darling test between "
+                r"{{revision1}} and {{revision2}} due to an unknown error."
+                r" Please support a bug report."
+            )
 
-        return r'Performed Anderson Darling test between {{revision1}} ' \
-               r'and {{revision2}} ' \
-               r' <b>p-value: {pvalue:.6f}</b> (p-value warn: {pvalue_warn}, ' \
-               r'p-value error: {pvalue_error})'.format(
-                   pvalue=self._pvalue, pvalue_warn=self._pvalue_warn,
-                   pvalue_error=self._pvalue_error
-               )
+        return (
+            r"Performed Anderson-Darling test between {{revision1}} "
+            r"and {{revision2}} "
+            r" <b>p-value: {pvalue:.6f}</b> (p-value warn: {pvalue_warn}, "
+            r"p-value error: {pvalue_error})".format(
+                pvalue=self._pvalue,
+                pvalue_warn=self._pvalue_warn,
+                pvalue_error=self._pvalue_error,
+            )
+        )
+
 
 # ==============================================================================
 # Helpers
 # ==============================================================================
 
 
-class TablePrinter(object):
+class TablePrinter:
     """ A tiny class to print columns of fixed width numbers. """
 
     def __init__(self, ncols, width=None):
@@ -708,12 +756,12 @@ class TablePrinter(object):
 
     def print(self, cols):
         """ Print one row """
-        assert(len(cols) == self.ncols)
+        assert len(cols) == self.ncols
         out = []
         for icol, col in enumerate(cols):
             width = self.widths[icol]
             if isinstance(col, int):
-                form = "{{:{}d}}".format(width)
+                form = f"{{:{width}d}}"
                 out.append(form.format(col))
             elif isinstance(col, float):
                 form = "{{:{}.{}f}}".format(width, width // 2)
@@ -757,19 +805,13 @@ def print_contents_and_errors(obj_a, obj_b):
         # This is implemented according to
         # https://root.cern.ch/doc/master/classTH1.html
         try:
-            chi2 = (total_b * content_a - total_a * content_b)**2 / \
-                   (total_b**2 * error_a**2 + total_a**2 * error_b**2)
+            chi2 = (total_b * content_a - total_a * content_b) ** 2 / (
+                total_b ** 2 * error_a ** 2 + total_a ** 2 * error_b ** 2
+            )
             chi2_tot += chi2
         except ZeroDivisionError:
             chi2 = "nan"
-        cp.print([
-            ibin,
-            content_a,
-            error_a,
-            content_b,
-            error_b,
-            chi2
-        ])
+        cp.print([ibin, content_a, error_a, content_b, error_b, chi2])
     cp.print_divider()
     print()
 
@@ -780,14 +822,17 @@ def print_contents_and_errors(obj_a, obj_b):
 # Command Line Interface
 # ==============================================================================
 
+
 def debug_cli():
     """ A small command line interface for debugging purposes. """
 
     # 1. Get command line arguments
     # =============================
 
-    desc = "For testing purposes: Run the chi2 comparison with objects from " \
-           "two root files."
+    desc = (
+        "For testing purposes: Run the chi2 comparison with objects from "
+        "two root files."
+    )
     parser = argparse.ArgumentParser(desc)
 
     _ = "Rootfile to read the first object from"
@@ -818,14 +863,16 @@ def debug_cli():
     if not obj_a:
         raise ValueError(
             f"Could not find object '{args.name_a}' "
-            f"in file '{args.rootfile_a}'.")
+            f"in file '{args.rootfile_a}'."
+        )
 
     rootfile_b = ROOT.TFile(args.rootfile_b)
     obj_b = rootfile_b.Get(args.name_b)
     if not obj_b:
         raise ValueError(
             f"Could not find object '{args.name_b}' "
-            f"in file '{args.rootfile_b}'.")
+            f"in file '{args.rootfile_b}'."
+        )
 
     # 3. Performe testing with debug option
     # =====================================

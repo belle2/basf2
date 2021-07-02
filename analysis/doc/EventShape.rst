@@ -1,3 +1,5 @@
+.. _analysis_eventshape:
+
 EventShape
 ==========
 
@@ -95,7 +97,7 @@ Here you can find some deeper theoretical explanation about their meaning, and h
       The eigenvectors of :math:`S` define the ellipsoid that best matches with the particle distribution in the event. The eigenvalues
       :math:`\lambda_1, \lambda_2, \lambda_3`, ordered from the largest to the smallest, are proportional to the lengths of the axes of this ellipsoid.
       Since :math:`S` is unitary, only two independent quantities can be constructed out of its eigenvalues. The `VariableManager` provides the :b2:var:`sphericity` (:math:`3(\lambda_2+\lambda_3)/2`)
-      and the :b2:var:`aplanarity` (:math:`3 lambda_3/2`).
+      and the :b2:var:`aplanarity` (:math:`3 \lambda_3/2`).
 
    Thrust and thrust axis
       The thrust axis is the axis that maximizes the sum the projections of all the particles' momenta onto it. It is the best proxy for the main symmetry axis

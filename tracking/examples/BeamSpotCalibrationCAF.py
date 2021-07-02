@@ -10,11 +10,10 @@ import os
 import sys
 import multiprocessing
 
-import ROOT
 from ROOT import Belle2
 from ROOT.Belle2 import BeamSpotAlgorithm
 
-from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
+from caf.framework import CAF, Calibration, CentralDatabase
 from caf import backends
 from caf import strategies
 

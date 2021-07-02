@@ -45,6 +45,8 @@ KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
            "Minimal momentum in case there are no hits in outer layers.", 0.0);
   addParam("RemoveUnusedMuons", m_RemoveUnusedMuons,
            "Whether to remove unused muons.", false);
+  addParam("IgnoreBackwardPropagation", m_IgnoreBackwardPropagation,
+           "Whether to ignore ExtHits with backward propagation.", false);
   addParam("Debug", m_Debug, "Debug mode.", false);
   addParam("DebugFileName", m_MatchingFileName, "Debug file name.", std::string("matching.root"));
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -96,6 +98,8 @@ void KLMStripEfficiencyCollectorModule::finish()
 
 void KLMStripEfficiencyCollectorModule::startRun()
 {
+  if (!m_ChannelStatus.isValid())
+    B2FATAL("KLM channel status data are not available.");
   int minimalActivePlanes = -1;
   KLMChannelIndex klmSectors(KLMChannelIndex::c_IndexLevelSector);
   for (KLMChannelIndex& klmSector : klmSectors) {
@@ -111,7 +115,7 @@ void KLMStripEfficiencyCollectorModule::startRun()
       KLMChannelIndex klmChannel(klmPlane);
       klmChannel.setIndexLevel(KLMChannelIndex::c_IndexLevelStrip);
       for (; klmChannel != klmNextPlane; ++ klmChannel) {
-        uint16_t channel = klmChannel.getKLMChannelNumber();
+        KLMChannelNumber channel = klmChannel.getKLMChannelNumber();
         enum KLMChannelStatus::ChannelStatus status =
           m_ChannelStatus->getChannelStatus(channel);
         if (status == KLMChannelStatus::c_Unknown)
@@ -174,17 +178,17 @@ void KLMStripEfficiencyCollectorModule::collect()
 }
 
 void KLMStripEfficiencyCollectorModule::addHit(
-  std::map<uint16_t, struct HitData>& hitMap,
-  uint16_t planeGlobal, struct HitData* hitData)
+  std::map<KLMPlaneNumber, struct HitData>& hitMap,
+  KLMPlaneNumber planeGlobal, struct HitData* hitData)
 {
-  std::map<uint16_t, struct HitData>::iterator it;
+  std::map<KLMPlaneNumber, struct HitData>::iterator it;
   it = hitMap.find(planeGlobal);
   /*
    * There may be more than one such hit e.g. if track crosses the edge
    * of the strips or WLS fiber groove. Select only one hit per plane.
    */
   if (it == hitMap.end()) {
-    hitMap.insert(std::pair<uint16_t, struct HitData>(
+    hitMap.insert(std::pair<KLMPlaneNumber, struct HitData>(
                     planeGlobal, *hitData));
   }
 }
@@ -219,9 +223,9 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(
     KLMElementNumbers::getMaximalExtrapolationLayer();
   const Track* track = muon->getTrack();
   RelationVector<ExtHit> extHits = track->getRelationsTo<ExtHit>();
-  std::map<uint16_t, struct HitData> selectedHits;
-  std::map<uint16_t, struct HitData>::iterator it;
-  uint16_t channel;
+  std::map<KLMPlaneNumber, struct HitData> selectedHits;
+  std::map<KLMPlaneNumber, struct HitData>::iterator it;
+  KLMChannelNumber channel;
   enum KLMChannelStatus::ChannelStatus status;
   struct HitData hitData, hitDataPrevious;
   TVector3 extHitPosition;
@@ -239,7 +243,17 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(
      */
     if (hit.getStatus() != EXT_EXIT)
       continue;
-    uint16_t planeGlobal = 0;
+    /*
+     * Ignore ExtHits with backward propagation. This affects cosmic events
+     * only. The removal of hits with backward propagation is normally
+     * not needed, however, it is added because of backward error propagation
+     * bug in Geant4 10.6.
+     */
+    if (m_IgnoreBackwardPropagation) {
+      if (hit.isBackwardPropagated())
+        continue;
+    }
+    KLMPlaneNumber planeGlobal = 0;
     hitData.hit = &hit;
     hitData.digit = nullptr;
     if (hit.getDetectorID() == Const::EDetector::EKLM) {

@@ -26,13 +26,15 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <analysis/variables/AcceptanceVariables.h>
 #include <analysis/variables/FlightInfoVariables.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
 SkimSampleCalculator::SkimSampleCalculator() :
   m_pionParticles("pi+:skim"), m_gammaParticles("gamma:skim"), m_pionHadParticles("pi+:hadb"), m_pionTauParticles("pi+:tau"),
-  m_KsParticles("K_S0:merged"), m_LambdaParticles("Lambda0:merged"), m_DstParticles("D*+:d0pi"), m_offIpParticles("pi+:offip")
+  m_KsParticles("K_S0:merged"), m_LambdaParticles("Lambda0:merged"), m_DstParticles("D*+:d0pi"), m_offIpParticles("pi+:offip"),
+  m_filterL1TrgNN("software_trigger_cut&filter&L1_trigger_nn_info")
 {
 
 }
@@ -741,7 +743,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   unsigned int nDstp1 = 0;
   unsigned int nDstp2 = 0;
   unsigned int nDstp3 = 0;
-
+  unsigned int nDstp4 = 0;
 
   if (m_DstParticles.isValid() && (ntrk_bha >= 3 && Bhabha2Trk == 0)) {
     for (unsigned int i = 0; i < m_DstParticles->getListSize(); i++) {
@@ -750,6 +752,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       if (dstDecID == 1.) nDstp1++;
       if (dstDecID == 2.) nDstp2++;
       if (dstDecID == 3.) nDstp3++;
+      if (dstDecID == 4.) nDstp4++;
     }
   }
 
@@ -772,6 +775,77 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
     calculationResult["Dstp3"] = 0;
   }
 
+  if (nDstp4 > 0) {
+    calculationResult["Dstp4"] = 1;
+  } else {
+    calculationResult["Dstp4"] = 0;
+  }
+
   // nTracksOffIP
   calculationResult["nTracksOffIP"] = m_offIpParticles->getListSize();
+
+  // Flag for events with Trigger B2Link information
+  calculationResult["NeuroTRG"] = 0;
+
+  StoreObjPtr<SoftwareTriggerResult> filter_result;
+  if (filter_result.isValid()) {
+    const std::map<std::string, int>& nonPrescaledResults = filter_result->getNonPrescaledResults();
+    if (nonPrescaledResults.find(m_filterL1TrgNN) != nonPrescaledResults.end()) {
+      const bool hasNN = (filter_result->getNonPrescaledResult(m_filterL1TrgNN) == SoftwareTriggerCutResult::c_accept);
+      if (hasNN) calculationResult["NeuroTRG"] = 1;
+    }
+  }
+
+  //Dimuon skim with invariant mass cut allowing at most one track not to be associated with ECL clusters
+
+  double mumuHighMass = 0.;
+
+  if (trackWithMaximumRho && trackWithSecondMaximumRho) {
+    int hasClus = 0;
+    double eclE1 = 0., eclE2 = 0.;
+
+    const auto charge1 = trackWithMaximumRho->getCharge();
+    const auto charge2 = trackWithSecondMaximumRho->getCharge();
+    const auto chSum = charge1 + charge2;
+
+    const ECLCluster* eclTrack1 = trackWithMaximumRho->getECLCluster();
+    if (eclTrack1) {
+      hasClus++;
+      eclE1 = eclTrack1->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+    }
+
+    const ECLCluster* eclTrack2 = trackWithSecondMaximumRho->getECLCluster();
+    if (eclTrack2) {
+      hasClus++;
+      eclE2 = eclTrack2->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+    }
+    const TLorentzVector  V4p1 = PCmsLabTransform::labToCms(trackWithMaximumRho->get4Vector());
+    const TLorentzVector V4p2 = PCmsLabTransform::labToCms(trackWithSecondMaximumRho->get4Vector());
+
+    const TLorentzVector V4pSum = V4p1 + V4p2;
+    const double mSum = V4pSum.M();
+
+    const double thetaSumCMS = (V4p1.Theta() + V4p2.Theta()) * TMath::RadToDeg();
+    const double phi1CMS = V4p1.Phi() * TMath::RadToDeg();
+    const double phi2CMS = V4p2.Phi() * TMath::RadToDeg();
+
+    double diffPhi = phi1CMS - phi2CMS;
+    if (fabs(diffPhi) > 180) {
+      if (diffPhi > 180) {
+        diffPhi = diffPhi - 2 * 180;
+      } else {
+        diffPhi = 2 * 180 + diffPhi;
+      }
+    }
+    const double delThetaCMS = fabs(fabs(thetaSumCMS) - 180);
+    const double delPhiCMS = fabs(180 - fabs(diffPhi));
+
+    const bool mumuHighMassCand = chSum == 0 && (mSum > 8. && mSum < 12.) && hasClus > 0 && eclE1 <= 1
+                                  && eclE2 <= 1 && delThetaCMS < 10 && delPhiCMS < 10;
+
+    if (mumuHighMassCand)  mumuHighMass = 1;
+
+  }
+
+  calculationResult["MumuHighM"] = mumuHighMass;
 }

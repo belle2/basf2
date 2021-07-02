@@ -95,6 +95,7 @@ int main(int argc, char* argv[])
   }
 
   // update the IDs and write the updated BackgroundMetaData to the file
+  // cppcheck-suppress nullPointerRedundantCheck
   bgMetaData->setRealTime(realTime * Unit::us);
   if (setName)
     bgMetaData->setBackgroundType(compName);

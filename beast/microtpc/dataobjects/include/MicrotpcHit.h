@@ -32,7 +32,13 @@ namespace Belle2 {
     MicrotpcHit(): m_column(0), m_row(0), m_BCID(0), m_TOT(0), m_detNb(0), m_pdg(0), m_trkID(0) {}
 
     /** Standard constructor
-     * @param energyDep Deposited energy in electrons
+     * @param column column vector
+     * @param row row vector
+     * @param BCID BCID vector
+     * @param TOT TOT vector
+     * @param detNb the TPC number
+     * @param pdg the PDG of particles
+     * @param trkID the track ID
      */
     /*
     MicrotpcHit(int column, int row, int BCID, int TOT, int detNb, int pdg):

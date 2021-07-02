@@ -131,6 +131,9 @@ namespace Belle2 {
     // false = mc
     bool m_realData;
 
+    //! Convert beam parameters or use information stored in Belle II database.
+    bool m_convertBeamParameters;
+
     //! flag that tells which form of covariance matrix should be used in the conversion of charged tracks
     // true = use 6x6 (position, momentum) covariance matrix
     // false = use 5x5 (helix parameters) covariance matrix
@@ -284,18 +287,6 @@ namespace Belle2 {
      */
     void convertHelix(const Belle::Mdst_trk_fit& trk_fit, const HepPoint3D& newPivot, std::vector<float>& helixParams,
                       std::vector<float>& helixError);
-
-    /**
-     * Fills 4-momentum, position and 7x7 error matrix from Belle Helix stored in Mdst_trk_fit.
-     */
-    int belleHelixToCartesian(const Belle::Mdst_trk_fit& trk_fit, const double mass, const HepPoint3D& newPivot,
-                              CLHEP::HepLorentzVector& momentum, HepPoint3D& position, CLHEP::HepSymMatrix& error, double dPhi = 0.0);
-
-    /**
-     * obtains the helix parameters from trk_fit and moves the pivot to 0,0,0
-     */
-    void belleHelixToHelix(const Belle::Mdst_trk_fit& trk_fit,
-                           std::vector<float>& helixParam, std::vector<float>& helixError);
 
     /**
      * Fills 4-momentum, position and 7x7 error matrix from Belle Vee daughter.

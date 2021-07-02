@@ -42,7 +42,7 @@ from stdCharged import stdK, stdPi
 my_path = b2.create_path()
 
 # writePi0EtaVeto uses a payload in analysis global tag.
-b2.conditions.prepend_globaltag('analysis_tools_release-04-02')
+b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
 # load input ROOT file
 ma.inputMdst(environmentType='default',
@@ -69,7 +69,7 @@ ma.reconstructDecay(decayString='B0 -> rho0 gamma:highE',
                     cut='5.2 < Mbc and abs(deltaE) < 2.0',
                     path=my_path)
 
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 ma.matchMCTruth(list_name='B0',
                 path=my_path)
 
@@ -80,7 +80,7 @@ ma.buildRestOfEvent(target_list_name='B0',
 
 # perform pi0/eta veto
 # particleList : Signal side particle's particleList
-# decayString : DecayString specifing a particle which is used to calculate the pi0/eta probability
+# decayString : DecayString specifying a particle which is used to calculate the pi0/eta probability
 # mode : One can select the payload from 'standard'(default), 'tight', 'cluster', and 'both'.
 #        Each payload is optimized for different soft-photon selection criteria.
 #        If one wants to use one's own payload and soft-photon criteria, please use arguments,
@@ -106,8 +106,8 @@ ma.reconstructDecay("B+:Dpi -> anti-D0:Kpi pi+:loose", "useCMSFrame(daughter(1,E
 ma.matchMCTruth("B+:Dpi", path=my_path)
 ma.buildRestOfEvent("B+:Dpi", path=my_path)
 
-# hardParticle : If one wants to use non-gamma particle to calcuate the pi0/eta probability,
-#                you have to tell the particle name with an argument hardParticle. (default: gammma)
+# hardParticle : If one wants to use non-gamma particle to calculate the pi0/eta probability,
+#                you have to tell the particle name with an argument hardParticle. (default: gamma)
 ma.writePi0EtaVeto(particleList='B+:Dpi',
                    decayString='B+ -> [anti-D0 -> K+ pi-] ^pi+',
                    mode='standard',
@@ -134,11 +134,11 @@ ma.writePi0EtaVeto(particleList='B+:Dpi',
 roe_path = b2.create_path()
 
 # The ROE objects might in general be related to Particle from multiple
-# particle lists therfore we need to check if the current ROE object
+# particle lists therefore we need to check if the current ROE object
 # is related to the Particle from our signal decay. If it is not
 # the execution of roe_path will be finished (by starting empty,
 # dead end path). Note that in this example this x-check is not
-# neccessary, but is anyway added for sake of completness
+# necessary, but is anyway added for sake of completeness
 deadEndPath = b2.create_path()
 
 # Note again: all actions (modules) included in roe_path will be
@@ -158,7 +158,7 @@ ma.fillParticleList(decayString='gamma:roe',
                     path=roe_path)
 
 # in order to be able to use modularAnalysis functions (reconstructDecay in particular)
-# we need a ParticleList containg the photon candidate used to reconstruct the
+# we need a ParticleList containing the photon candidate used to reconstruct the
 # current B meson as well
 # The DecayString is used to specify the selected particle (^)
 ma.fillSignalSideParticleList(outputListName='gamma:sig',
@@ -178,7 +178,7 @@ ma.reconstructDecay(decayString='pi0:veto -> gamma:sig gamma:roe',
 
 # in this example the variable, which is used to veto pi0 is very simple:
 # invariant mass of pi0 that is closest to the pi0's nominal mass
-# Therfore, we just simply rank pi0 candidates according to their distance
+# Therefore, we just simply rank pi0 candidates according to their distance
 # from nominal mass (dM variable) and keep only the best candidate
 ma.rankByLowest(particleList='pi0:veto',
                 variable='abs(dM)',
@@ -201,7 +201,7 @@ my_path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 # candidates whose gamma daughter could not be combined with
 # any of the remaining photons to form pi0 within given mass
 # range the extraInfo(pi0veto) does not exist. In these cases
-# -999 will be written to the extraInfo(pi0veto) branch
+# NaN will be written to the extraInfo(pi0veto) branch
 # Select variables that we want to store to ntuple
 
 gamma_vars = vc.cluster + \
@@ -222,7 +222,7 @@ b_vars = vc.kinematics + \
                                    decay_string='B0 -> rho0 ^gamma') + \
     vu.create_aliases_for_selected(list_of_variables=rho_vars,
                                    decay_string='B0 -> ^rho0 gamma') + \
-    vu.create_aliases_for_selected(list_of_variables=rho_vars,
+    vu.create_aliases_for_selected(list_of_variables=pi_vars,
                                    decay_string='B0 -> [rho0 -> ^pi+ ^pi-] gamma') + \
     ['pi0Prob(standard)', 'etaProb(standard)', 'extraInfo(pi0veto)']
 

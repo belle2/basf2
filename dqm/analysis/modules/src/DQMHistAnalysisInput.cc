@@ -12,6 +12,7 @@
 #include <daq/slc/base/StringUtil.h>
 #include <ctime>
 
+#include <TROOT.h>
 #include <TKey.h>
 
 using namespace Belle2;
@@ -57,6 +58,7 @@ void DQMHistAnalysisInputModule::initialize()
     m_memory = new DqmMemFile(m_shm_id, m_sem_id);
   if (m_autocanvas && m_enable_run_info) {
     m_c_info = new TCanvas("DQMInfo/c_info", "");
+    m_c_info->SetTitle("");
   } else {
     m_c_info = NULL;
   }
@@ -156,6 +158,7 @@ void DQMHistAnalysisInputModule::event()
           if (s.size() > 1) {
             std::string dirname = s[0];
             std::string hname = s[1];
+            if ((dirname + "/" + hname) == "softwaretrigger/skim") hname = "skim_hlt";
             TCanvas* c = new TCanvas((dirname + "/c_" + hname).c_str(), ("c_" + hname).c_str());
             m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
           } else {
@@ -228,6 +231,15 @@ void DQMHistAnalysisInputModule::event()
 void DQMHistAnalysisInputModule::endRun()
 {
   B2INFO("DQMHistAnalysisInput : endRun called");
+
+  TIter nextckey(gROOT->GetListOfCanvases());
+  TObject* cobj = NULL;
+
+  while ((cobj = dynamic_cast<TObject*>(nextckey()))) {
+    if (cobj->IsA()->InheritsFrom("TCanvas")) {
+      (dynamic_cast<TCanvas*>(cobj))->Clear();
+    }
+  }
 }
 
 

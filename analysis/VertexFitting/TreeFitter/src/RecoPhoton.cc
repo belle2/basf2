@@ -30,7 +30,8 @@ namespace TreeFitter {
     m_init(false),
     m_useEnergy(useEnergy(*particle)),
     m_clusterPars(),
-    m_covariance()
+    m_covariance(),
+    m_momentumScalingFactor(particle->getMomentumScalingFactor())
   {
     initParams() ;
   }
@@ -45,12 +46,12 @@ namespace TreeFitter {
     }
 
     const double distanceToMother = vertexToCluster.norm();
-    const double energy =  m_clusterPars(3);
+    const double energy = m_momentumScalingFactor * m_clusterPars(3); // apply scaling factor to correct energy bias
     const int momindex = momIndex();
 
     for (unsigned int i = 0; i < 3; ++i) {
       //px = E dx/|dx|
-      fitparams.getStateVector()(momindex + i) =  energy * vertexToCluster(i) / distanceToMother;
+      fitparams.getStateVector()(momindex + i) = energy * vertexToCluster(i) / distanceToMother;
     }
 
     return ErrCode(ErrCode::Status::success);
@@ -161,7 +162,6 @@ namespace TreeFitter {
 
   ErrCode RecoPhoton::projectRecoConstraint(const FitParams& fitparams, Projection& p) const
   {
-    ErrCode status ;
     const int momindex  = momIndex() ;
     const int posindex  = mother()->posIndex();
     /**
@@ -193,7 +193,7 @@ namespace TreeFitter {
     Eigen::Matrix<double, 3, 1> residual3 = Eigen::Matrix<double, 3, 1>::Zero(3, 1);
     residual3(0) = m_clusterPars[m_i2] - x_vertex[m_i2] - p_vec[m_i2] * elim;
     residual3(1) = m_clusterPars[m_i3] - x_vertex[m_i3] - p_vec[m_i3] * elim;
-    residual3(2) = m_clusterPars[3] - mom;
+    residual3(2) = m_momentumScalingFactor * m_clusterPars[3] - mom; // scale measured energy by scaling factor
 
     // dr'/dm | m:={xc,yc,zc,Ec} the measured quantities
     Eigen::Matrix<double, 3, 4> P = Eigen::Matrix<double, 3, 4>::Zero(3, 4);

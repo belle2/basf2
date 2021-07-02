@@ -18,12 +18,20 @@
 #include <framework/logging/Logger.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBArray.h>
+#include <framework/utilities/FileSystem.h>
+// ROOT
+#include <TFile.h>
+#include <TTree.h>
 
 using namespace Belle2;
 using namespace ECL;
 
 /** Version of ECL DSP file format */
 const short ECLDSP_FORMAT_VERSION = 1;
+
+int ECLDspUtilities::pedestal_fit_initialized = 0;
+float ECLDspUtilities::pedfit_fg31[768] = {};
+float ECLDspUtilities::pedfit_fg32[768] = {};
 
 /**
  * @brief Read data from file to ptr.
@@ -244,7 +252,8 @@ short int* vectorsplit(std::vector<short int>& vectorFrom, int channel)
   return (vectorFrom.data() + (size / 16) * (channel - 1));
 }
 
-ECLShapeFit ECLDspUtilities::shapeFitter(int cid, std::vector<int> adc, int ttrig)
+ECLShapeFit ECLDspUtilities::shapeFitter(int cid, std::vector<int> adc, int ttrig,
+                                         bool adjusted_timing)
 {
   ECLChannelMapper mapper;
   mapper.initFromDB();
@@ -305,9 +314,82 @@ ECLShapeFit ECLDspUtilities::shapeFitter(int cid, std::vector<int> adc, int ttri
   //== Perform fit
   auto result = lftda_(f, f1, fg41, fg43, fg31, fg32, fg33, y, ttrig2, A0,
                        Ahard, Askip, k_a, k_b, k_c, k_16, k_1, k_2,
-                       chi_thres);
+                       chi_thres, adjusted_timing);
 
   return result;
 }
 
+void ECLDspUtilities::initPedestalFit()
+{
+  std::string path = FileSystem::findFile("ecl/data/ecl_pedestal_peak_fit.root");
+  TFile* file = new TFile(path.c_str(), "read");
+  if (!file->IsOpen()) {
+    B2FATAL("Unable to load coefficients for ECL pedestal fit");
+  }
+  TTree* tree = (TTree*)file->Get("dsp_coefs");
+  int nentries = tree->GetEntries();
+  float fg31_i, fg32_i;
+  tree->SetBranchAddress("fg31", &fg31_i);
+  tree->SetBranchAddress("fg32", &fg32_i);
+  //== Load DSP coefficients used in pedestal fitting
+  for (int i = 0; i < nentries; i++) {
+    tree->GetEntry(i);
+    pedfit_fg31[i] = fg31_i;
+    pedfit_fg32[i] = fg32_i;
+  }
+  file->Close();
+
+  pedestal_fit_initialized = 1;
+}
+
+ECLPedestalFit ECLDspUtilities::pedestalFit(std::vector<int> adc)
+{
+  if (!pedestal_fit_initialized) {
+    initPedestalFit();
+  }
+
+  ECLPedestalFit result;
+  float amp;
+
+  //== Find maximum in the pedestal
+
+  int ped_max = 0;
+  int ped_max_pos = 0;
+  for (int i = 0; i < 16; i++) {
+    if (adc[i] > ped_max) {
+      ped_max = adc[i];
+      ped_max_pos = i;
+    }
+  }
+
+  // Skip fit if the peak position is on the edge of the fit region
+  if (ped_max_pos < 2 || ped_max_pos > 13) {
+    result.amp = -128;
+    return result;
+  }
+
+  //== Get first position estimate from maximum location
+
+  int time_index = ped_max_pos * 4 - 8;
+  if (time_index > 47) time_index = 47;
+  if (time_index < 0)  time_index = 0;
+
+  //== Run two iterations of chi2 minimization
+  for (int iter = 0; iter < 2; iter++) {
+    amp = 0;
+    float tim = 0;
+    for (int j = 0; j < 16; j++) {
+      amp += pedfit_fg31[j + time_index * 16] * adc[j];
+      tim += pedfit_fg32[j + time_index * 16] * adc[j];
+    }
+    tim = tim / amp;
+    time_index -= tim * 4;
+    if (time_index > 47) time_index = 47;
+    if (time_index < 0)  time_index = 0;
+  }
+
+  result.amp = amp;
+
+  return result;
+}
 

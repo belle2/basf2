@@ -1,0 +1,34 @@
+# EventType: 1121820000
+# Descriptor: [B0 -> J/psi(l+l-) K*0] cc
+# NickName: Bd_JpsiK*0
+# Test : Yes
+# Documentation: EWP analysis
+# PhysicsWG: EWP
+# Responsible: Seema Choudhury
+# Email: ph16resch11007@iith.ac.in
+# Cuts: None
+# Date: 2021/02/04
+#
+# Decay table to generate
+# Upsilon(4S) -> B0 anti-B0 -> Generic
+#             |
+#             -> K*0 J/psi
+#                     |
+#                       -> e+e- or mu+mu-
+#
+Decay Upsilon(4S)
+1.000   B0sig anti-B0sig B0 anti-B0       VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.000    J/psisig  K*0    SVV_HELAMP 0.6417 3.1633 0.7556 0.0 0.1312 0.0199;
+Enddecay
+CDecay anti-B0sig
+
+Decay J/psisig
+0.500    e+    e-     PHOTOS     VLL;
+0.500   mu+   mu-   PHOTOS     VLL;
+Enddecay
+
+End
+

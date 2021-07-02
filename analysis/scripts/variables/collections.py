@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from variables import utils
 
 #: Replacement for DeltaEMbc
@@ -10,6 +9,7 @@ kinematics = ['px', 'py', 'pz', 'pt', 'p', 'E']
 
 #: Cluster-related variables
 cluster = [
+    'clusterKlId',
     'clusterPulseShapeDiscriminationMVA',
     'clusterHasPulseShapeDiscrimination',
     'clusterNumberOfHadronDigits',

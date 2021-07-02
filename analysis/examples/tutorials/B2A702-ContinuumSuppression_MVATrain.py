@@ -17,6 +17,7 @@
 #
 ################################################################################
 
+import basf2 as b2
 import basf2_mva
 import subprocess
 
@@ -64,15 +65,15 @@ if __name__ == "__main__":
         'KSFWVariables(hoo2)',
         'KSFWVariables(hoo3)',
         'KSFWVariables(hoo4)',
-        'CleoCone(1)',
-        'CleoCone(2)',
-        'CleoCone(3)',
-        'CleoCone(4)',
-        'CleoCone(5)',
-        'CleoCone(6)',
-        'CleoCone(7)',
-        'CleoCone(8)',
-        'CleoCone(9)'
+        'CleoConeCS(1)',
+        'CleoConeCS(2)',
+        'CleoConeCS(3)',
+        'CleoConeCS(4)',
+        'CleoConeCS(5)',
+        'CleoConeCS(6)',
+        'CleoConeCS(7)',
+        'CleoConeCS(8)',
+        'CleoConeCS(9)'
     ]
 
     general_options = basf2_mva.GeneralOptions()

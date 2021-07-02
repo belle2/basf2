@@ -214,9 +214,6 @@ namespace Belle2 {
     /** mc-meas/err_meas for the respective helix parameter for the given particle */
     double getHelixTanLambdaPull(const Particle* part);
 
-    /** helper function to get track fit result from particle */
-    TrackFitResult const* getTrackFitResultFromParticle(Particle const* particle);
-
     /** helper function to get the position on the Helix */
     TVector3 getPositionOnHelix(const Particle* part, const std::vector<double>& pars);
   }

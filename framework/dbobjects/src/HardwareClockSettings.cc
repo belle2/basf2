@@ -33,7 +33,7 @@ bool HardwareClockSettings::isFrequencyAvailable(Const::EDetector detector, std:
   else return true;
 }
 
-Double_t  HardwareClockSettings::getClockFrequency(Const::EDetector detector, std::string label) const
+double HardwareClockSettings::getClockFrequency(Const::EDetector detector, std::string label) const
 {
   bool isDetectorInPrescaleMap = true;
 
@@ -48,41 +48,41 @@ Double_t  HardwareClockSettings::getClockFrequency(Const::EDetector detector, st
     return  m_clocksMap.at(detector).at(label);
   else B2ERROR("Clock named " << label << " not available for " << Const::parseDetectors(detector));
 
-  return std::numeric_limits<float>::quiet_NaN();
+  return std::numeric_limits<double>::quiet_NaN();
 }
 
-Double_t  HardwareClockSettings::getGlobalClockFrequency() const
+double HardwareClockSettings::getGlobalClockFrequency() const
 {
   return  m_acceleratorRF / 4.;
 }
 
-Double_t  HardwareClockSettings::getAcceleratorRF() const
+double HardwareClockSettings::getAcceleratorRF() const
 {
   return  m_acceleratorRF;
 }
 
-Int_t HardwareClockSettings::getClockPrescale(Const::EDetector detector, std::string label) const
+double HardwareClockSettings::getClockPrescale(Const::EDetector detector, std::string label) const
 {
   if (m_prescaleMap.find(detector) == m_prescaleMap.end()) B2ERROR("No clocks available for " << Const::parseDetectors(detector));
   else if (m_prescaleMap.at(detector).find(label) != m_prescaleMap.at(detector).end())
     return m_prescaleMap.at(detector).at(label);
   else B2ERROR("Clock named " << label << " not available for " << Const::parseDetectors(detector));
 
-  return std::numeric_limits<Int_t>::quiet_NaN();
+  return std::numeric_limits<double>::quiet_NaN();
 }
 
-void HardwareClockSettings::setClockPrescale(const Const::EDetector detector, std::string label, Int_t prescale)
+void HardwareClockSettings::setClockPrescale(const Const::EDetector detector, std::string label, double prescale)
 {
   m_prescaleMap[detector][label] = prescale;
 }
 
 
-void HardwareClockSettings::setClockFrequency(const Const::EDetector detector, std::string label, float frequency)
+void HardwareClockSettings::setClockFrequency(const Const::EDetector detector, std::string label, double frequency)
 {
   m_clocksMap[detector][label] = frequency;
 }
 
-void HardwareClockSettings::setAcceleratorRF(Double_t acceleratorRF)
+void HardwareClockSettings::setAcceleratorRF(double acceleratorRF)
 {
   m_acceleratorRF = acceleratorRF;
 }

@@ -1,10 +1,7 @@
 import os
-import time
-from pathlib import Path
 from unittest import main
 import basf2
 
-import zmq
 
 from zmq_daq.test_support import HLTZMQTestCase
 

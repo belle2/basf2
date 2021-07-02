@@ -13,6 +13,7 @@
 ########################################################
 
 import basf2
+import generators as gen
 import simulation as sim
 
 bklm_dataObjects = ['BKLMDigits',
@@ -35,11 +36,8 @@ main.add_module('Progress')
 main.add_module('ProgressBar')
 
 if use_KKMC:  # Use KKMC to generate generic mu+mu- events
-    main.add_module('KKGenInput',
-                    tauinputFile=Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat'),
-                    KKdefaultFile=Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat'),
-                    taudecaytableFile='',
-                    kkmcoutputfilename='output.kkmc.dat')
+    gen.add_kkmc_generator(path=main,
+                           finalstate='mu-mu+')
 else:  # Use ParticleGun to generate 4GeV mu+ and mu-
     main.add_module('ParticleGun',
                     nTracks=1,

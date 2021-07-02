@@ -14,10 +14,7 @@ class TutorialsTest(unittest.TestCase):
     """Test to run all tutorials. Will fail if no tutorial directory is found."""
 
     #: list of the broken tutorials (to be removed when they are individually fixed)
-    broken_tutorials = ['B2A702-ContinuumSuppression_MVATrain.py',  # BII-4246
-                        'B2A703-ContinuumSuppression_MVAExpert.py',  # BII-4246
-                        'B2A503-ReadDecayHash.py',  # BII-4254
-                        ]
+    broken_tutorials = []
 
     @unittest.skipIf(not os.getenv('BELLE2_EXAMPLES_DATA_DIR'),
                      "$BELLE2_EXAMPLES_DATA_DIR not found.")
@@ -27,7 +24,7 @@ class TutorialsTest(unittest.TestCase):
         """
         Test supported tutorials.
         """
-        all_tutorials = sorted(glob.glob(find_file('analysis/examples/tutorials/') + "*.py"))
+        all_tutorials = sorted(glob.glob(find_file('analysis/examples/tutorials/') + "/*.py"))
         for tutorial in all_tutorials:
             filename = os.path.basename(tutorial)
             if filename not in self.broken_tutorials:

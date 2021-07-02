@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 import os
-import tempfile
-import shutil
 import json
 from concurrent.futures import ThreadPoolExecutor
 import difflib
@@ -74,7 +72,6 @@ class DownloadableDatabase:
         from ROOT import Belle2
         Belle2.DBStore.Instance().reset()
 
-        basf2.reset_database(False)
         basf2.conditions.override_globaltags()
 
         for database in self._database:
@@ -410,7 +407,6 @@ top in the localdb will be shown.
                               type=DownloadableDatabase, default=DownloadableDatabase("online,localdb:latest"))
     choices = ["human-readable", "json", "list", "pandas"]
     try:
-        from tabulate import tabulate
         choices += ['jira', 'grid']
     except ImportError:
         pass

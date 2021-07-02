@@ -1,0 +1,69 @@
+import os
+
+Import('env')
+
+env['CONTINUE'] = False
+env.Append(FORTRANFLAGS=["-ff2c"], CPPDEFINES=["HAVE_CONFIG_H"])
+# sources lists are copied from Makefile
+# ffinit_auto.f is usually generated automatically but the change is just a
+# different data root dir which we want to be relocatable anyway. So we use the
+# upstream ff/ffinit_mine.f instead.
+# FIXME: relocation needs to be done
+sources = dict(
+    qcdloop1="ff/ffxc0.f ff/ffxd0.f \
+        ff/fftran.f ff/ffxd0h.f ff/ffdel2.f ff/ffdel3.f ff/ffdel4.f \
+        ff/ff2dl2.f ff/ffabcd.f ff/ffxc0i.f ff/ffxc0p.f ff/ffxd0p.f ff/ffxdbd.f \
+        ff/ffxli2.f ff/ffcli2.f ff/ffcxs3.f ff/ffcxs4.f ff/ffxxyz.f ff/ffcxyz.f \
+        ff/ffcc0p.f ff/ffcxr.f ff/ffcrr.f ff/ffdxc0.f ff/ffdcc0.f ff/ffxd0i.f \
+        ff/ffcel2.f ff/ffcel3.f ff/ffdcxs.f \
+        ql/qlinit.f ql/qlI1.f ql/qlI2.f ql/qlI3.f ql/qlI4.f \
+        ql/qlI2fin.f ql/qlI3fin.f ql/qlI4fin.f \
+        ql/qlI3sub.f ql/qlI4array.f ql/qlI4sub0m.f ql/qlI4sub1m.f \
+        ql/qlI4sub2m.f ql/qlI4sub2ma.f ql/qlI4sub2mo.f ql/qlI4sub3m.f \
+        ql/auxCD.f ql/qlzero.f ql/qltrisort.f ql/qlsnglsort.f ql/qlfndd.f \
+        ql/qlkfn.f ql/qllnrat.f ql/qlYcalc.f ql/ddilog.f \
+        ql/qltri1.f ql/qltri2.f ql/qltri3.f ql/qltri4.f ql/qltri5.f ql/qltri6.f \
+        ql/qlbox1.f ql/qlbox2.f ql/qlbox3.f ql/qlbox4.f ql/qlbox5.f ql/qlbox6.f \
+        ql/qlbox7.f ql/qlbox8.f ql/qlbox9.f ql/qlbox10.f \
+        ql/qlbox11.f ql/qlbox12.f ql/qlbox13.f ql/qlbox14.f ql/qlbox15.f ql/qlbox16.f \
+        ql/qlfunctions.f ql/qlratgam.f ql/qlratreal.f ql/qlspencer.f ql/qlI4DNS41.f ql/qlxpicheck.f \
+        ql/qlcLi2omx2.f ql/qlcLi2omx3.f ql/qlLi2omprod.f ql/qlLi2omrat.f ql/qlLi2omx.f ql/qlLi2omx2.f \
+        ff/ffinit_mine.f",
+    pjfry="./src/integral.cpp ./src/minor.cpp ./src/minorex.cpp\
+        ./src/pjfry.cpp ./src/cache.cpp ./src/minoreval.cpp",
+    eemmg5="eemmg5/sqampeemmg-main.f eemmg5/sqampeemmg-wrap.f eemmg5/sqampeemmg-1.f \
+        eemmg5/sqampeemmg-2.f eemmg5/sqampeemmg-3.f eemmg5/sqampeemmg-4.f eemmg5/sqampeemmg-5.f",
+    eemmgisr="eemmgisr/sqampeemmg-main.f eemmgisr/sqampeemmg-wrap.f eemmgisr/sqampeemmg-1.f",
+    eemmgisrfsr="eemmgisrfsr/sqampeemmg-main.f eemmgisrfsr/sqampeemmg-wrap.f eemmgisrfsr/sqampeemmg-1.f",
+    eemmgmix="eemmgmix/sqampeemmg-main.f eemmgmix/sqampeemmg-wrap.f eemmgmix/sqampeemmg-1.f",
+)
+
+# make sure we build in build directory, ie. define an object file for each
+# source file in the correct place. And since this is complicated due to
+# central local release let's just use the build dir of the first item in the
+# auto generated SRC_FILES entry as base. This should always work as long as
+# there is as least one .f file in the current directory
+build_dir = os.path.dirname(env['SRC_FILES'][0])
+for key, files in sources.items():
+    sources[key] = [os.path.join(build_dir, f) for f in files.split()]
+
+dependencies = dict(
+    qcdloop1=["gfortran"],
+    pjfry=["qcdloop1"],
+    eemmg5=["pjfry", "qcdloop1"],
+    eemmgisr=["pjfry", "qcdloop1"],
+    eemmgisrfsr=["pjfry", "qcdloop1"],
+    eemmgmix=["pjfry", "qcdloop1"],
+)
+
+all_libs = []
+for libname, files in sources.items():
+    lib = env.SharedLibrary("$LIBDIR/" + libname, files, LIBS=dependencies[libname],
+                            LINKFLAGS=["-Wl,--version-script=" + File("lib%s.vers" % libname).abspath])
+    all_libs.append(lib)
+
+# add to generators package quick build and library build target
+env.Alias("generators", all_libs)
+env.Alias("lib", all_libs)
+
+Return('env')

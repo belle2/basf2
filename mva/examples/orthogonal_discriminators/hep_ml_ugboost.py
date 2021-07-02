@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Thomas Keck 2017
-
 import basf2_mva
 import hep_ml
 import hep_ml.losses

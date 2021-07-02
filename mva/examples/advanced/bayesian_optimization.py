@@ -8,10 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Markus Prim 2017
-# Thomas Keck
-# Dennis Weyland
-
 # A simple example to use bayesian optimization for the hyperparameters of a FastBDT.
 # The package used in this example is https://github.com/scikit-optimize
 # and can be installed with

@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Dennis Weyland 2017
-
 # This example shows how to convert a model trained with keras inside a basf2 weightfile.
 
 from basf2_mva_python_interface.contrib_keras import State

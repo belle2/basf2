@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Thomas Keck 2017
-
 # In some cases you create a training outside of basf2
 # but you still want to apply the training in basf2
 # In this case you can create a fake training which produces a weightfile

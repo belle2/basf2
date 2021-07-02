@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Dennis Weyland 2017
-
 # This example serves as a basic example of implementing Relational networks into basf2 with tensorflow.
 # As a toy example it will try to tell if 2 out of multiple lines are hitting each other in three dimensional space.
 # Relevant Paper: https://arxiv.org/abs/1706.01427

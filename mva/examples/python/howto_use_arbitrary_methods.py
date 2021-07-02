@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Thomas Keck 2017
-
 # The MVA package does support arbitrary python-based mva frameworks.
 # You just have to:
 # Install them (e.g. via pip3)

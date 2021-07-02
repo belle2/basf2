@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Thomas Keck 2016
-
 # You can use the basf2_mva_evaluation.py tool as well
 
 from basf2_mva_util import tree2dict, calculate_roc_auc

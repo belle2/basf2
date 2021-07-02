@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Thomas Keck 2016
-
 import basf2_mva
 import basf2_mva_util
 import collections

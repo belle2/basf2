@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Thomas Keck 2017
-
 # We want to find out which variables/features are the most important
 # There are three approaches
 # 1. You can use the variable importance estimate outputted by the method itself,

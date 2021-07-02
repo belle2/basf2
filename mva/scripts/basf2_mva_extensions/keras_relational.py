@@ -9,8 +9,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Dennis Weyland 2017
-
 from keras.layers.core import Reshape
 from keras import activations
 from keras.activations import sigmoid, tanh

@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Thomas Keck 2016
-
 # The mva package has a builtin sideband subtraction mechanism.
 # If your data and mc do not match, you can use the MetaOptions to do a meta-training.
 # Using 'm_use_sideband_substraction = True' the mva package will train

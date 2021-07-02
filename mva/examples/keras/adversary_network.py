@@ -8,10 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Dennis Weyland 2017
-# Justin Tan 2017
-# Thomas Keck 2017
-
 # This example shows how to remove bias on one or several spectator variables.
 # Relevant paper: https://arxiv.org/abs/1611.01046
 # use basf2_mva_evaluation.py with train.root and test.root at the end to see the impact on the spectator variables.

@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Dennis Weyland 2017
-
 # This example shows the implementation of a simple MLP in keras.
 
 import basf2_mva

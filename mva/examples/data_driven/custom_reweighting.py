@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Thomas Keck 2016
-
 # Besides the builtin reweighting, you can also implement the reweighting yourself.
 # This can be useful if you want to do something special which is not supported by the mva package
 

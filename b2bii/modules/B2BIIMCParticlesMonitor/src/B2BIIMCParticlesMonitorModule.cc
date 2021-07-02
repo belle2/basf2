@@ -9,8 +9,6 @@
 // File : B2BIIMCParticlesMonitorModule.cc
 // Description : A module to plot MCParticles monitor histograms in basf2
 //
-// Contributors: Hulya Atmacan
-// Date : November 21, 2015
 //-
 
 #include <b2bii/modules/B2BIIMCParticlesMonitor/B2BIIMCParticlesMonitorModule.h>

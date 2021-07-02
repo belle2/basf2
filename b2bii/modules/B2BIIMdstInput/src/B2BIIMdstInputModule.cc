@@ -5,15 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : B2BIIMdstInutModule.cc
-// Description : A module to read panther records in basf2
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 16 - Feb - 2015
-//
-// Contributors: Anze Zupanc, Martin Ritter
-//-
 
 #include <b2bii/modules/B2BIIMdstInput/B2BIIMdstInputModule.h>
 

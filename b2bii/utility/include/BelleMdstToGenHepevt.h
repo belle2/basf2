@@ -5,12 +5,11 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 // ****************************************************************
 // Belle MDST objects -> MC Particle relations
 //
 // Original file: ${BELLE_TOP_DIR}/src/anal/mdst/mdst/mdst.h
-//
-// Ported by: A. Zupanc (March 2015)
 //
 // ****************************************************************
 

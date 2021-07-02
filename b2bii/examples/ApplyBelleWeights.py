@@ -9,16 +9,14 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-#######################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to weight tracks using
-# Belle LooKUpTable from the database
-#
-# Contributors: I. Komarov (August 2019)
-#
-#######################################################
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to weight tracks using                  #
+# Belle LooKUpTable from the database                                    #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

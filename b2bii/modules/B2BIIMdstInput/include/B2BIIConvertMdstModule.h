@@ -5,15 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : PantherInputModule.h
-// Description : A module to read Panther record in basf2
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 16 - Feb - 2015
-//
-// Contirbutors: Anze Zupanc, Matic Lubej,
-//-
 
 #pragma once
 

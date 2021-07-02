@@ -9,8 +9,6 @@
 // File : B2BIIMdstInputModule.h
 // Description : A module to read Panther record in basf2 from Belle MDST file
 //
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 16 - Feb - 2015
 //-
 
 #pragma once

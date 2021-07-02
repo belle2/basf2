@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """
 Simple example script to reconstruct Dstart for the purpose of ARICH PID performance studies
 Usage : basf2 reconstruct_Dstar.py exp start_run end_run

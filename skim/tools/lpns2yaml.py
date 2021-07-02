@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """\
 ``%(prog)s`` is a tool for converting a list of LPNs into YAML format expected by
 :ref:`b2skim-prod<b2skim-prod>`. The expected input to ``%(prog)s`` is a text file of

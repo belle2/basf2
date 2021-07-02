@@ -1,3 +1,10 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 # Test for the parallel certified flag in all modules in the default, hlt and expressreco
 # reconstruction chains.
 # It creates a path and fills it with all reconstruction modules, without anything else

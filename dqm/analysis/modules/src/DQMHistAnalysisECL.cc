@@ -1,18 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
- *                                                                        *
- * ECL Data Quality Monitor (Analysis part)                               *
- *                                                                        *
- * This module provides analysis of ECL DQM histograms                    *
- * @ 2D Histos comparitor (color alert)                                   *
- * @ Histo title renew (adc_flag)                                         *
- * @ 2D histo analysis (time_crate_%1%_Thr1GeV)                           *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Dmitry Matvienko (d.v.matvienko@inp.nsk.su)              *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 //THIS MODULE

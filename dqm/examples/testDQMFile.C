@@ -1,3 +1,10 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 // this is an example for storing DQM TCanvases and control variables into an output root file
 // The file should containg one DQMFileMetaData object which holds information about the data processing
 // Several MonitoringObjects can then be stored in the same file. For example for mumu, Dstar, etc.

@@ -8,9 +8,6 @@
 //+
 // File : CosmicRayHLTDQMModule.h
 // Description : Module to monitor the reconstruction of cosmic ray on hlt
-//
-// Author : Chunhua LI
-// Date :  19 - May - 2017
 //-
 
 #pragma once

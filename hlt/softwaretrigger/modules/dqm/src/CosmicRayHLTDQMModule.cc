@@ -8,10 +8,8 @@
 //+
 // File : CosmicRayHLTDQMModule.cc
 // Description : Module to monitor Cosmic Ray on HLT
-//
-// Author : Chunhua LI
-// Date : 19 - May - 2017
 //-
+
 #include <hlt/softwaretrigger/modules/dqm/CosmicRayHLTDQMModule.h>
 
 // framework - DataStore

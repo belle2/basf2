@@ -5,14 +5,13 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 # Test for the parallel certified flag in all modules in the default, hlt and expressreco
 # reconstruction chains.
 # It creates a path and fills it with all reconstruction modules, without anything else
 # (this path can never be executed, but we do not want that anyway).
 # Then it goes through all modules and checks it flag.
-#
-#
-# Author: Nils Braun
+
 import basf2
 import reconstruction
 from softwaretrigger.processing import add_hlt_processing, add_expressreco_processing

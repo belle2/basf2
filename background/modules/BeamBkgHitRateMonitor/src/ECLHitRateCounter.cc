@@ -135,7 +135,7 @@ namespace Belle2 {
             m_segmentMap.insert(std::pair<int, int>(cid, 3));
             m_crystalsInSegment[3] += 1;
           }
-        } else if (cid > 1152 && cid < 7777) {
+        } else if (cid < 7777) {
           if (z > 0) {
             if (phi > 0.7853 && phi < 2.356) {
               m_segmentMap.insert(std::pair<int, int>(cid, 4));

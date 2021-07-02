@@ -20,7 +20,7 @@ def cdc_layers(layers=None):
 
 def cdc_wires(layers=None):
     if layers is None:
-        layers = range(0, 56)
+        layers = list(range(0, 56))
 
     wires_in_layer = [
         160, 160, 160, 160, 160, 160, 160, 160,

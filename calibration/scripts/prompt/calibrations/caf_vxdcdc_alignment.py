@@ -204,36 +204,13 @@ def make_mumu_collection(
     ana.fillParticleList(f"mu+:{name}", muon_cut, path=path)
     ana.reconstructDecay(f"Upsilon(4S):{name} -> mu+:{name} mu-:{name}", dimuon_cut, path=path)
 
-    vtx.raveFit(f"Upsilon(4S):{name}", 0.001, daughtersUpdate=False, silence_warning=True, path=path, constraint="ipprofile")
-
-    import variables.collections
-
-    track_variables = ['d0', 'z0', 'phi0', 'omega', 'tanlambda', 'pt', 'pionID', 'protonID', 'electronID',
-                       'muonID', 'deuteronID', 'nVXDHits', 'nPXDHits', 'nSVDHits', 'nCDCHits', 'nTracks', 'x', 'y', 'z']
-
-    ana.variablesToNtuple(f'Upsilon(4S):{name}',
-                          variables=['chiProb', 'nTracks', 'pt', 'pz', 'p', 'E',
-                                     'theta', 'phi', 'b2bTheta', 'b2bPhi', 'InvM', 'date']
-                          + variables.collections.vertex
-                          + ['useCMSFrame(daughter(0, {}))'.format(var) for var in track_variables]
-                          + ['useCMSFrame(daughter(1, {}))'.format(var) for var in track_variables]
-                          + ['useLabFrame(daughter(0, {}))'.format(var) for var in track_variables]
-                          + ['useLabFrame(daughter(1, {}))'.format(var) for var in track_variables]
-                          + ['V0d0(0)', 'V0d0(1)', 'V0z0(0)', 'V0z0(1)'],
-                          filename='analysis_dimuons.root', path=path)
-
     vtx.raveFit(f"Upsilon(4S):{name}", 0.001, daughtersUpdate=True, silence_warning=True, path=path, constraint="ipprofile")
-    path.add_module('SkimFilter', particleLists=[f"Upsilon(4S):{name}"]).if_false(basf2.create_path())
-    path.add_module('TrackDQM')
+
     return alignment.collections.make_collection(
         name,
         files=files,
         path=path,
-        primaryVertices=[f"Upsilon(4S):{name}"],
-        customMassConfig={
-            f"Upsilon(4S):{name}": (
-                10.579,
-                0.1)})
+        primaryVertices=[f"Upsilon(4S):{name}"])
 
 
 def create_prompt(files, cfg):

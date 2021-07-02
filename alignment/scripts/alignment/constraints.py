@@ -481,7 +481,7 @@ class CDCWireConstraints(Constraints):
                     const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdY), 1.)
                 consts.append(const)
 
-            for layer in [lyr for lyr in layers if lyr not in self.hemisphere]:
+            for layer in set(layers) - set(self.hemisphere):
                 const = Constraint()
                 # sum of wire rotations (BWD) in layer
                 for wire in range(0, self.wires_in_layer[layer]):
@@ -506,7 +506,7 @@ class CDCWireConstraints(Constraints):
                     const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdY), 1.)
                 consts.append(const)
 
-            for layer in [lyr for lyr in layers if lyr not in self.hemisphere]:
+            for layer in set(layers) - set(self.hemisphere):
                 const = Constraint()
                 # sum of wire rotations (FWD) in layer
                 for wire in range(0, self.wires_in_layer[layer]):

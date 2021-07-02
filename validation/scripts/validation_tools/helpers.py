@@ -8,9 +8,6 @@
 """
 Helper scripts needed to run tools and checks on the validation.
 Mainly for git checkout and compilation.
-
-  Author: The Belle II Collaboration
-  Contributors: Nils Braun, Thomas Hauth
 """
 
 from subprocess import check_call, check_output, CalledProcessError

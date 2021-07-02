@@ -11,13 +11,13 @@ import functools
 
 # todo: shouldn't I call super().__init__() or similar to make sure that I
 # execute code from mother classes?? This seems to only have been done for
-# some of the subclasses here... /klieret
+# some of the subclasses here...
 
 """
 Define datatypes for later serialization by json
 """
 
-# todo: write a short overview over the many classes and their relationships here /klieret
+# todo: write a short overview over the many classes and their relationships here
 
 # ==============================================================================
 # Data classes

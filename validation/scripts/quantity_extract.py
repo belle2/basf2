@@ -11,10 +11,6 @@
 
 """
 Functionality to extract quantities from various ROOT objects (TH1).
-
- Author: The Belle II Collaboration
- Contributors: Thomas Hauth
-
 """
 
 

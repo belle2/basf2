@@ -33,8 +33,6 @@ the ``zeroSupressedMeanY`` of the ``TNtuple hEfficiency`` in the file
 ``~/basf2/tracking/validation/results/current/tracking/TrackingValidation.root``.
 
 The options ``--script`` and ``--check-quantity`` can be given more than once.
-
-:Authors: The Belle II Collaboration. Contributors: Nils Braun, Thomas Hauth
 """
 from collections import defaultdict
 

@@ -46,8 +46,6 @@ below 0.93, the following snippet can be used::
   git bisect run bisect_validation.py --script 13_trackingEfficiency_createPlots.py
       --check-quantity "results/current/tracking/TrackingValidation.root:hEfficiency[mean_y]:>:0.93"
 
-:Authors: Thomas Hauth
-
 .. [1] http://git-scm.com/docs/git-bisect
 """
 

@@ -14,10 +14,7 @@
   It is assumed file names contain source of background ...RBB,BHWide...,...
 
   !! IMPORTANT
-  set the correct time size of each background sample!  (in line 37)
-
-  Author: Luka Santelj
-  Contributor: Manca Mrvar, Leonid Burmistrov
+  set the correct time size of each background sample!  (in line 42)
 */
 
 #include <iostream>

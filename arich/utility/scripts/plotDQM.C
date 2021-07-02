@@ -8,7 +8,6 @@
 /*
  * Plots histograms from ARICHDQM module output file 
  * run as: "root -l histogram_file.root plotDQM.C" 
- * By: Luka Santelj
  */
 
 void plotDQM(){

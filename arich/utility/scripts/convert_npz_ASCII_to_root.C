@@ -18,8 +18,7 @@
  * > python3 ../utility/scripts/convert_npz_to_ASCII.py --npzfile=ARICHStandAlone_memory.npz --arrayname total_memory
  * > root -l ../utility/scripts/convert_npz_ASCII_to_root.C"(\"total_memory.dat\")"
  *                                                                     *
- *Author: Leonid Burmistrov (Fri Jun 15 22:13:34 JST 2018)             *
-***********************************************************************/
+ ***********************************************************************/
 
 //root
 #include <TROOT.h>

@@ -14,7 +14,6 @@
  *
  * run as: "root -l ntuplefile.root plotEfficiency.C"
  * saves ARICHPerformance.root
- * Author: Luka Santelj, 28.10.2016
  **/
 
 void plotEfficiency(){

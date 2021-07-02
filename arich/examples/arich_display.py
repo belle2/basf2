@@ -1,3 +1,6 @@
+# !/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -5,8 +8,6 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
-# !/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Script for running arich event display, DQM module, and arich reconstruction on
 # processed data (containing arichHits)
@@ -20,8 +21,6 @@
 # two parameters (MinHits and MaxHits) are available for DQM module (check below)
 # only events with number of hits within the range are included in DQM histograms
 # and shown in the event display (set to 5 and 40, but change accoring your need)
-#
-# Author: Luka Santelj
 
 import basf2 as b2
 import os

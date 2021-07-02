@@ -20,9 +20,6 @@ import os
 # on aerogel plane (ARICHAeroHit).
 # Smearing of track position and direction is applied to mimic tracking
 # resolution.
-#
-# Author: Luka Santelj (Oct. 2016)
-# Contributors : Luka Santelj, Leonid Burmistrov
 # --------------------------------------------------------------------
 
 parser = OptionParser()

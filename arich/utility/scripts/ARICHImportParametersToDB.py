@@ -15,8 +15,6 @@
 # basf2 arich/utility/scripts/ARICHImportPrametersToDB.py -- 3 0 3 -1
 # for example for all runs of experiment 3
 # arguments: 1 experimentLow, 2 runLow, 3 experimentHigh , 4 runHigh
-#
-# Author: luka.santelj@ijs.si
 
 import basf2 as b2
 from ROOT.Belle2 import ARICHDatabaseImporter

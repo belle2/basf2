@@ -28,9 +28,6 @@
 # "-t 1" include CDC track reconstruction (reconstructed tracks are stored into output )
 # "-a 1" store only data from events with track hit in arich
 # "-g 1" include GDL unpacker to have TRGSummary
-#
-#
-# Author: Luka Santelj
 
 import basf2 as b2
 import os

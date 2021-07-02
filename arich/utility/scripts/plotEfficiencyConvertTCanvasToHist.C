@@ -11,7 +11,6 @@
  *
  * run as: "root -l ../../examples/ARICHPerformance.root plotEfficiencyConvertTCanvasToHist.C"
  *
- * Author: Leonid Burmistrov, 06.06.2018
  **/
 
 Int_t plotEfficiencyConvertTCanvasToHist(){

@@ -12,8 +12,6 @@
 # --------------------------------------------------------------------
 # This script generate root which contains the map of ARICH material budget
 # Initial script : simulation/examples/MaterialScan.py
-#
-# Author: Leonid Burmistrov (May 2018)
 # --------------------------------------------------------------------
 
 import os

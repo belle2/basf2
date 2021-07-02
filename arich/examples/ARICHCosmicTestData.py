@@ -19,8 +19,6 @@
 # two parameters (MinHits and MaxHits) are available for DQM module (check below)
 # only events with number of hits within the range are included in DQM histograms
 # and shown in the event display (set to 5 and 40, but change accoring your need)
-#
-# By: Luka Santelj
 
 import basf2 as b2
 import os

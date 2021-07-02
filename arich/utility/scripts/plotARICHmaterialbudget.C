@@ -10,7 +10,6 @@
  *
  * run as: "root -l ../../examples/ARICHMaterialScan.root plotARICHmaterialbudget.C"
  *
- * Author: Leonid Burmistrov, 27.05.2018
  **/
 
 Int_t plotARICHmaterialbudget(){

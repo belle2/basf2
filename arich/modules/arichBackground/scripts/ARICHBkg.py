@@ -17,8 +17,6 @@
 # Please check and adjust input file list and method, as this example is
 # specific for background files produced by Nakayama-san.
 #
-# Author: Luka Santelj
-#
 
 import sys
 import basf2 as b2

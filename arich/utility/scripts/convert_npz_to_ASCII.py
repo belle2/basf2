@@ -19,8 +19,6 @@ Script to convert plots from npz format to ASCII - used for the memory testing
 > python3 ../utility/scripts/convert_npz_to_ASCII.py --npzfile=ARICHStandAlone_memory.npz --dump
 > python3 ../utility/scripts/convert_npz_to_ASCII.py --npzfile=ARICHStandAlone_memory.npz --arrayname total_memory
 > root -l ../utility/scripts/convert_npz_ASCII_to_root.C"(\"total_memory.dat\")"
-
-Author: Leonid Burmistrov (Fri Jun 15 14:58:32 JST 2018)
 ---------------------------------------------------------------------------
 """
 

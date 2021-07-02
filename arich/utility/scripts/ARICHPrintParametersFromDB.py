@@ -10,7 +10,6 @@
 ##########################################################################
 
 # this prints parameters from the database for a given tag, experiment and run number
-# Author: luka.santelj@ijs.si
 
 import basf2 as b2
 from ROOT.Belle2 import ARICHDatabaseImporter

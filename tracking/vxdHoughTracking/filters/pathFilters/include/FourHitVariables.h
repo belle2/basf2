@@ -18,6 +18,7 @@
 namespace Belle2 {
   namespace vxdHoughTracking {
 
+    /// Class that allows the calculation of simple variables to estimate the quality of two triplets of hits using four hits.
     class FourHitVariables {
     public:
       /// basic constructor
@@ -25,6 +26,10 @@ namespace Belle2 {
       {};
 
       /// actual useful constructor
+      /// @param oHit B2Vector3D of the outer hit used for calculating the single variables
+      /// @param ocHit B2Vector3D of the second-outer hit used for calculating the single variables
+      /// @param icHit B2Vector3D of the second-inner hit used for calculating the single variables
+      /// @param iHit B2Vector3D of the inner hit used for calculating the single variables
       FourHitVariables(const B2Vector3D& oHit, const B2Vector3D& ocHit, const B2Vector3D& icHit, const B2Vector3D& iHit) :
         m_oHit(oHit), m_ocHit(ocHit), m_icHit(icHit), m_iHit(iHit)
       {
@@ -33,6 +38,10 @@ namespace Belle2 {
       };
 
       /// Set hits if not given in constructor of if they need to be changed.
+      /// @param oHit B2Vector3D of the outer hit used for calculating the single variables
+      /// @param ocHit B2Vector3D of the second-outer hit used for calculating the single variables
+      /// @param icHit B2Vector3D of the second-inner hit used for calculating the single variables
+      /// @param iHit B2Vector3D of the inner hit used for calculating the single variables
       void setHits(const B2Vector3D& oHit, const B2Vector3D& ocHit, const B2Vector3D& icHit, const B2Vector3D& iHit)
       {
         m_oHit = oHit;

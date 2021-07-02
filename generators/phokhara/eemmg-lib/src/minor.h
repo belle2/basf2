@@ -1,4 +1,3 @@
-/** @cond EEMMG */
 /*
  * minor.h - signed minors classes
  *
@@ -221,18 +220,18 @@ public:
 #else
 #define ix(i) i
 #endif
-  virtual ncomplex A(int ep) override { return evalE(ep); }
-  virtual ncomplex A(int ep, int i) override { return evalE(ep, ix(i)); }
-  virtual ncomplex A(int ep, int i, int j) override { return evalE(ep, ix(i), ix(j)); }
-  virtual ncomplex A(int ep, int i, int j, int k) override { return evalE(ep, ix(i), ix(j), ix(k)); }
-  virtual ncomplex A(int ep, int i, int j, int k, int l) override { return evalE(ep, ix(i), ix(j), ix(k), ix(l)); }
-  virtual ncomplex A(int ep, int i, int j, int k, int l, int m) override { return evalE(ep, ix(i), ix(j), ix(k), ix(l), ix(m)); }
-  virtual ncomplex B(int ep) override { return evalE(ep, 0, 0); }
-  virtual ncomplex B(int ep, int i) override { return evalE(ep, 0, 0, ix(i)); }
-  virtual ncomplex B(int ep, int i, int j) override { return evalE(ep, 0, 0, ix(i), ix(j)); }
-  virtual ncomplex B(int ep, int i, int j, int k) override { return evalE(ep, 0, 0, ix(i), ix(j), ix(k)); }
-  virtual ncomplex C(int ep) override { return evalE(ep, 0, 0, 0, 0); }
-  virtual ncomplex C(int ep, int i) override { return evalE(ep, 0, 0, 0, 0, ix(i)); }
+  virtual ncomplex A(int ep) { return evalE(ep); }
+  virtual ncomplex A(int ep, int i) { return evalE(ep, ix(i)); }
+  virtual ncomplex A(int ep, int i, int j) { return evalE(ep, ix(i), ix(j)); }
+  virtual ncomplex A(int ep, int i, int j, int k) { return evalE(ep, ix(i), ix(j), ix(k)); }
+  virtual ncomplex A(int ep, int i, int j, int k, int l) { return evalE(ep, ix(i), ix(j), ix(k), ix(l)); }
+  virtual ncomplex A(int ep, int i, int j, int k, int l, int m) { return evalE(ep, ix(i), ix(j), ix(k), ix(l), ix(m)); }
+  virtual ncomplex B(int ep) { return evalE(ep, 0, 0); }
+  virtual ncomplex B(int ep, int i) { return evalE(ep, 0, 0, ix(i)); }
+  virtual ncomplex B(int ep, int i, int j) { return evalE(ep, 0, 0, ix(i), ix(j)); }
+  virtual ncomplex B(int ep, int i, int j, int k) { return evalE(ep, 0, 0, ix(i), ix(j), ix(k)); }
+  virtual ncomplex C(int ep) { return evalE(ep, 0, 0, 0, 0); }
+  virtual ncomplex C(int ep, int i) { return evalE(ep, 0, 0, 0, 0, ix(i)); }
 #undef ix
 #endif /* USE_GOLEM_MODE */
 
@@ -503,15 +502,15 @@ public:
   ncomplex evalD(int ep, int i, int j, int k, int l);
 
 #ifdef USE_GOLEM_MODE
-  virtual ncomplex A(int ep) override;
-  virtual ncomplex A(int ep, int i) override;
-  virtual ncomplex A(int ep, int i, int j) override;
-  virtual ncomplex A(int ep, int i, int j, int k) override;
-  virtual ncomplex A(int ep, int i, int j, int k, int l) override;
-  virtual ncomplex B(int ep) override;
-  virtual ncomplex B(int ep, int i) override;
-  virtual ncomplex B(int ep, int i, int j) override;
-  virtual ncomplex C(int ep) override;
+  virtual ncomplex A(int ep);
+  virtual ncomplex A(int ep, int i);
+  virtual ncomplex A(int ep, int i, int j);
+  virtual ncomplex A(int ep, int i, int j, int k);
+  virtual ncomplex A(int ep, int i, int j, int k, int l);
+  virtual ncomplex B(int ep);
+  virtual ncomplex B(int ep, int i);
+  virtual ncomplex B(int ep, int i, int j);
+  virtual ncomplex C(int ep);
 #endif /* USE_GOLEM_MODE */
 
 private:
@@ -538,12 +537,12 @@ public:
   ncomplex evalC(int ep, int i, int j, int k);
 
 #ifdef USE_GOLEM_MODE
-  virtual ncomplex A(int ep) override;
-  virtual ncomplex A(int ep, int i) override;
-  virtual ncomplex A(int ep, int i, int j) override;
-  virtual ncomplex A(int ep, int i, int j, int k) override;
-  virtual ncomplex B(int ep) override;
-  virtual ncomplex B(int ep, int i) override;
+  virtual ncomplex A(int ep);
+  virtual ncomplex A(int ep, int i);
+  virtual ncomplex A(int ep, int i, int j);
+  virtual ncomplex A(int ep, int i, int j, int k);
+  virtual ncomplex B(int ep);
+  virtual ncomplex B(int ep, int i);
 #endif /* USE_GOLEM_MODE */
 
 private:
@@ -570,10 +569,10 @@ public:
   ncomplex evalB(int ep, int i, int j);
 
 #ifdef USE_GOLEM_MODE
-  virtual ncomplex A(int ep) override;
-  virtual ncomplex A(int ep, int i) override;
-  virtual ncomplex A(int ep, int i, int j) override;
-  virtual ncomplex B(int ep) override;
+  virtual ncomplex A(int ep);
+  virtual ncomplex A(int ep, int i);
+  virtual ncomplex A(int ep, int i, int j);
+  virtual ncomplex B(int ep);
 #endif /* USE_GOLEM_MODE */
 
 private:
@@ -625,4 +624,3 @@ int MinorBase::signM2ud(int i, int j, int l, int m)
 }
 
 #endif /* QUL_MINOR_H */
-/** @endcond EEMMG */

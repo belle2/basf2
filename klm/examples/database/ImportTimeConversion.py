@@ -17,8 +17,6 @@ if (len(sys.argv) >= 2):
 dbImporter = KLMDatabaseImporter()
 
 timeConversion = KLMTimeConversion()
-# TDC frequency in GHz
-timeConversion.setTDCFrequency(1.017728000)
 # Time offset in ns.
 timeConversion.setTimeOffset(0)
 # CTIME shift in bits.

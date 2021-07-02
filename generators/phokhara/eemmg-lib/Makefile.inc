@@ -6,7 +6,7 @@ F77 = gfortran
 
 # create dynamic libraries
 CXXFLAGS = -O2 -fPIC -DHAVE_CONFIG_H
-FFLAGS = -O2 -fPIC -ff2c
+FFLAGS = -O2 -std=legacy -fPIC -ff2c
 LIB_LDFLAGS = -shared -Wl,-no-undefined -Wl,-export-dynamic
 BIN_LDFLAGS = -Wl,-rpath=.
 LIBEXT=.so

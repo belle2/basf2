@@ -15,7 +15,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.fei import feiSLBplus
+from skim.WGs.fei import feiSLBplus
 
 path = b2.Path()
 skim = feiSLBplus(validation=True, udstOutput=False)

@@ -8,15 +8,44 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-{% if skims|length > 1 -%}
-from skimExpertFunctions import CombinedSkim
-{% endif -%}
-{% for module, ModuleSkims in modules.items() -%}
-    from {{ module }} import {{ ", ".join(ModuleSkims) }}
-{% endfor %}
+{% if backward_compatibility %}
+# For backward compatibility, wrap skim imports in try-except block
+try:
+    # release 6+ imports
+    {% if skims|length > 1 -%}
+    {{ "    " }}from skim import CombinedSkim
+    {% endif -%}
+    {% for module, ModuleSkims in modules.items() -%}
+        {{ "    " }}from skim.WGs.{{ module }} import {{ ", ".join(ModuleSkims) }}
+    {% endfor -%}
+except (ImportError, ModuleNotFoundError):
+    # release 5 imports
+    {% if skims|length > 1 -%}
+    {{ "    " }}from skimExpertFunctions import CombinedSkim
+    {% endif -%}
+    {% for module, ModuleSkims in modules.items() -%}
+        {{ "    " }}from skim.{{ module }} import {{ ", ".join(ModuleSkims) }}
+    {% endfor -%}
+{% else %}
+    {#- Just write release 6 imports. -#}
+    {% if skims|length > 1 -%}
+    from skim import CombinedSkim
+    {% endif -%}
+    {% for module, ModuleSkims in modules.items() -%}
+        from skim.WGs.{{ module }} import {{ ", ".join(ModuleSkims) }}
+    {% endfor %}
+{% endif %}
 path = b2.Path()
 {% if skims|length == 1 and not mdstOutput -%}
-    skim = {{ skims[0] }}(){%- if hints %}  # pass udstOutput=False to disable udstOutput{%- endif %}
+    skim = {{ skims[0] }}(
+    {%- if not backward_compatibility -%}
+    {%- if data -%}
+    mc=False
+    {%- else -%}
+    mc=True
+    {%- endif -%}
+    {%- endif -%}
+){%- if hints %}  # pass udstOutput=False to disable udstOutput{%- endif %}
 {% else -%}
     skim = CombinedSkim(
     {% for skim in skims -%}
@@ -26,6 +55,11 @@ path = b2.Path()
     {{ "    " }}udstOutput=False,
     mdstOutput=True,
     mdst_kwargs=dict(),
+    {% endif -%}
+    {%- if data -%}
+    {{ "    " }}mc=False,
+    {% else -%}
+    {{ "    " }}mc=True,
     {% endif -%}
     )
 {% endif %}

@@ -16,7 +16,7 @@ from b2test_utils import get_object_with_name, get_streamer_checksums
 #: A mapping name -> version, checksum of the expected objects
 EXPECTED_CHECKSUMS = {
     'Belle2::Const::DetectorSet': (1, 1222446098),
-    'Belle2::ECLCluster': (14, 932603982),
+    'Belle2::ECLCluster': (15, 835771092),
     'Belle2::EventLevelClusteringInfo': (1, 162935545),
     'Belle2::EventLevelTrackingInfo': (2, 1667284927),
     'Belle2::EventMetaData': (4, 2999207747),

@@ -17,13 +17,18 @@
 namespace Belle2 {
   namespace vxdHoughTracking {
 
+    /// Class that allows the calculation of simple variables to check whether a combination of two hits should be used or discarded in tracking.
     class TwoHitVariables {
     public:
       /// Constructor
+      /// @param oHit B2Vector3D of the outer hit used for calculating the single variables
+      /// @param iHit B2Vector3D of the inner hit used for calculating the single variables
       TwoHitVariables(const B2Vector3D& oHit, const B2Vector3D& iHit) : m_oHit(oHit), m_iHit(iHit)
       {};
 
       /// Set hits if not given in constructor of if they need to be changed.
+      /// @param oHit B2Vector3D of the outer hit used for calculating the single variables
+      /// @param iHit B2Vector3D of the inner hit used for calculating the single variables
       void setHits(const B2Vector3D& oHit, const B2Vector3D& iHit)
       {
         m_oHit = oHit;
@@ -76,7 +81,7 @@ namespace Belle2 {
 
       ///  get the time difference of two space points for the u-side measurement
       /// @param outerSpacePoint outer space point used for calculating the time difference in u
-      /// @param outerSpacePoint inner space point used for calculating the time difference in u
+      /// @param innerSpacePoint inner space point used for calculating the time difference in u
       double getDistanceInTimeU(const SpacePoint& outerSpacePoint, const SpacePoint& innerSpacePoint)
       {
         return outerSpacePoint.TimeU() - innerSpacePoint.TimeU();
@@ -84,7 +89,7 @@ namespace Belle2 {
 
       ///  get the time difference of two space points for the v-side measurement
       /// @param outerSpacePoint outer space point used for calculating the time difference in v
-      /// @param outerSpacePoint inner space point used for calculating the time difference in v
+      /// @param innerSpacePoint inner space point used for calculating the time difference in v
       double getDistanceInTimeV(const SpacePoint& outerSpacePoint, const SpacePoint& innerSpacePoint)
       {
         return outerSpacePoint.TimeV() - innerSpacePoint.TimeV();

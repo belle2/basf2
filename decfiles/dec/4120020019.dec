@@ -1,6 +1,6 @@
 # EventType: 4120020019
 # Descriptor: [vpho_pipihb1p_PHSP]
-# NickName: vpho_pipihb1p_PHSP 
+# NickName: vpho_pipihb1p_PHSP
 # Cuts: None
 # Documentation: Decay for non-Y(4S) physics
 # PhysicsWG: Bottomonium
@@ -8,6 +8,9 @@
 # Responsible: Bryan Fulsom
 # Email: bryan.fulsom@pnnl.gov
 # Date: 20170306
+#
+# June 2021 Automated: Converted PYTHIA ids
+#   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
 
 Decay vpho
 1.0 pi+ pi- h_b PHSP;
@@ -15,11 +18,11 @@ Enddecay
 
 Decay h_b
 0.492 gamma eta_b HELAMP 1.0 0.0 1.0 0.0;
-0.508 g g g PHOTOS PYTHIA 4;
+0.508 g g g PHOTOS PYTHIA 92;
 Enddecay
 
 Decay eta_b
-1.0 g g PHOTOS PYTHIA 32;
+1.0 g g PHOTOS PYTHIA 91;
 Enddecay
 
 End

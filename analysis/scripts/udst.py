@@ -23,7 +23,7 @@ from b2test_utils.datastoreprinter import DataStorePrinter, PrintObjectsModule
 
 
 def add_udst_output(
-    path, filename, particleLists=None, additionalBranches=None, dataDescription=None,
+    path, filename, particleLists=None, additionalBranches=None, dataDescription=None, mc=True,
 ):
     """
     Save uDST (user-defined Data Summary Tables) = MDST + Particles + ParticleLists
@@ -44,6 +44,7 @@ def add_udst_output(
         file in addition to mdst and particle information
     :param dict dataDescription: Additional data descriptions to add to the output
         file. For example {"mcEventType":"mixed"}
+    :param bool mc: Save Monte Carlo quantities? (MCParticles and corresponding relations)
     """
 
     if particleLists is None:
@@ -79,7 +80,7 @@ def add_udst_output(
 
     return mdst.add_mdst_output(
         path,
-        mc=True,
+        mc=mc,
         filename=filename,
         additionalBranches=partBranches,
         dataDescription=dataDescription,
@@ -94,6 +95,7 @@ def add_skimmed_udst_output(
     additionalBranches=None,
     outputFile=None,
     dataDescription=None,
+    mc=True,
 ):
     """
     Create a new path for events that contain a non-empty particle list specified via skimParticleLists.
@@ -115,6 +117,7 @@ def add_skimmed_udst_output(
     :param str outputFile: Name of the output file if different from the skim name
     :param dict dataDescription: Additional data descriptions to add to the output
         file. For example {"mcEventType":"mixed"}
+    :param bool mc: Save Monte Carlo quantities? (MCParticles and corresponding relations)
     """
 
     if skimParticleLists is None:
@@ -155,6 +158,7 @@ def add_skimmed_udst_output(
         saveParticleLists,
         additionalBranches,
         dataDescription=dataDescription,
+        mc=mc,
     )
     filter_path.add_independent_path(skim_path, "skim_" + skimDecayMode)
 

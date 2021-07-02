@@ -14,6 +14,7 @@ CHANGES since release-02-01-00:
   + hasPXDCKFAbortionFlag/setPXDCKFAbortionFlag
   + hasSVDSpacePointCreatorAbortionFlag/setSVDSpacePointCreatorAbortionFlag
 - ECLCluster:
+  + getMinTrkDistanceID
   + getPulseShapeDiscriminationMVA added
   + hasFailedFitTime
   + hasFailedTimeResolution

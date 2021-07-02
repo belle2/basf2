@@ -15,7 +15,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.ewp import BtoXll
+from skim.WGs.ewp import BtoXll
 
 path = b2.Path()
 skim = BtoXll(validation=True, udstOutput=False)

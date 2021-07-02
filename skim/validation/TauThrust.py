@@ -15,7 +15,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.taupair import TauThrust
+from skim.WGs.taupair import TauThrust
 
 path = b2.Path()
 skim = TauThrust(validation=True, udstOutput=False)

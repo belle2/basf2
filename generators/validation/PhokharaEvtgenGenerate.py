@@ -9,58 +9,38 @@
 </header>
 """
 
-from basf2 import *
+import basf2
+import generators
+from ROOT import Belle2
 
-set_log_level(LogLevel.INFO)
+# Logging level.
+basf2.set_log_level(basf2.LogLevel.INFO)
 
-set_random_seed(12345)
+# Random seed.
+basf2.set_random_seed(12345)
 
-main = create_path()
+# Create the main path.
+main = basf2.create_path()
 
 # Event information
 main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=25000)
 
-# PHOKHARA
-phokhara = register_module('PhokharaInput')
-phokhara.param('FinalState', 0)
-phokhara.param('ReplaceMuonsByVirtualPhoton', True)
-phokhara.param('Epsilon', 0.0001)
-phokhara.param('SearchMax', 5000)
-phokhara.param('nMaxTrials', 25000)
-phokhara.param('LO', 1)
-phokhara.param('NLO', 1)
-phokhara.param('QED', 0)
-phokhara.param('NLOIFI', 0)
-phokhara.param('Alpha', 1)
-phokhara.param('PionFF', 0)
-phokhara.param('KaonFF', 0)
-phokhara.param('PionStructure', 0)
-phokhara.param('NarrowRes', 0)
-phokhara.param('ProtonFF', 1)
-phokhara.param('ScatteringAngleRangePhoton', [0., 180.])
-phokhara.param('ScatteringAngleRangeFinalStates', [0., 180.])
-phokhara.param('MinInvMassHadronsGamma', 0.)
-phokhara.param('MinInvMassHadrons', 36.932554310656)
-phokhara.param('ForceMinInvMassHadronsCut', True)
-phokhara.param('MaxInvMassHadrons', 200.0)
-phokhara.param('MinEnergyGamma', 0.01)
+# Add combination of PHOKHARA and EvtGen.
+user_decay_file_name = 'generators/examples/PhokharaEvtgenDoubleCharmonium.dec'
+user_decay_file = Belle2.FileSystem.findFile(user_decay_file_name)
+generators.add_phokhara_evtgen_combination(
+    main, ['J/psi', 'eta_c'], user_decay_file, beam_energy_spread=False)
 
-# EvtGen
-evtgendecay = register_module('EvtGenDecay')
-evtgendecay.param('UserDecFile', find_file('generators/examples/PhokharaEvtgenDoubleCharmonium.dec'))
-
-# Output
-output = register_module('RootOutput')
+# Output.
+output = basf2.register_module('RootOutput')
 output.param('outputFileName', 'PhokharaEvtgenData.root')
-
-# Create the main path and add the modules
-main.add_module(phokhara)
-main.add_module(evtgendecay)
 main.add_module(output)
+
+# Progress.
 main.add_module('Progress')
 
-# generate events
-process(main)
+# Generate events.
+basf2.process(main)
 
-# show call statistics
-print(statistics)
+# Show call statistics.
+print(basf2.statistics)

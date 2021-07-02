@@ -26,7 +26,7 @@ import warnings
 
 from tabulate import tabulate
 
-from skim.testfiles import TestSampleList
+from skim.utils.testfiles import TestSampleList
 from skim.registry import Registry
 
 

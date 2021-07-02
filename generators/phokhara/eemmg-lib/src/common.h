@@ -1,4 +1,3 @@
-/** @cond EEMMG */
 /*
  * common.h - common includes and parameters
  *
@@ -55,4 +54,3 @@ class Kinem2;
 
 #endif /* QUL_COMMON_H */
 
-/** @endcond EEMMG */

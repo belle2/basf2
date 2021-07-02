@@ -124,7 +124,7 @@ namespace Belle2 {
     /**
      * Output the contents in text file format
      */
-    /*
+
     void outputToFile(std::string fileName) const
     {
       std::ofstream fout(fileName);
@@ -132,25 +132,32 @@ namespace Belle2 {
       if (fout.bad()) {
         B2ERROR("Specified output file could not be opened!");
       } else {
-        fout << m_twParamMode << "  " << m_nTwParams << std::endl;
-        for (auto const& ent : m_tws) {
+        std::map<unsigned short, std::vector<float>>::const_iterator it = m_cvs.find(0);
+        int nParams = (it->second).size();
+        fout << m_paramMode << "  " << nParams << std::endl;
+        fout << m_groupID << std::endl;
+        for (auto const& ent : m_cvs) {
           fout << std::setw(3) << std::right << ent.first;
-          for (unsigned short i = 0; i < m_nTwParams; ++i) {
-            fout << "  " << std::setw(15) << std::scientific << std::setprecision(8) << ent.second[i];
+          for (unsigned short i = 0; i < nParams; ++i) {
+            fout << "  " << std::setw(15) << std::scientific << std::setprecision(8) << (ent.second)[i];
           }
           fout << std::endl;
         }
         fout.close();
       }
     }
-    */
 
   private:
     unsigned short m_paramMode = 0; /*!< Mode for parameterization */
     unsigned short m_groupID = 0;   /*!< Group id (parameterized per group) */
     std::map<unsigned short, std::vector<float>> m_cvs; /**< cv list */
 
-    ClassDef(CDCEDepToADCConversions, 2); /**< ClassDef */
+    ClassDef(CDCEDepToADCConversions, 3); /**< ClassDef */
+    // Version histroy:
+    // v2: original: paramMode=0, nParams=6.
+    // v3: paramMode=1, nParams=7; added sigma for gaussian smearing;
+    //     main-factor is now of order(1), while was of order(10) before;
+    //     activated outputToFile().
   };
 
 } // end namespace Belle2

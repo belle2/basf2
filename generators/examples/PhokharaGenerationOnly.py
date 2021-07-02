@@ -57,7 +57,7 @@ phokhara.param('QED', 0)
 
 # NLO options (only if NLO=1 and QED=2) - CODE RUNS VERY (!) SLOW
 # original comment: IFSNLO: no(0), yes(1)
-phokhara.param('NLOIFI', 0)
+phokhara.param('IFSNLO', 0)
 
 # Vacuum polarization switch: off (0), on (1, [by Fred Jegerlehner, alphaQED/hadr5]), on (2,[by Thomas Teubner])
 phokhara.param('Alpha', 0)

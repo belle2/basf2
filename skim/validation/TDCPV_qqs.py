@@ -15,7 +15,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.tdcpv import TDCPV_qqs
+from skim.WGs.tdcpv import TDCPV_qqs
 
 path = b2.Path()
 skim = TDCPV_qqs(validation=True, udstOutput=False)

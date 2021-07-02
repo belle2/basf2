@@ -13,7 +13,7 @@ import argparse
 import jinja2
 
 from basf2 import find_file
-from skimExpertFunctions import resolve_skim_modules
+from skim.utils.misc import resolve_skim_modules
 from skim.registry import Registry
 
 
@@ -47,6 +47,15 @@ def get_argument_parser():
     )
 
     parser.add_argument(
+        "--data",
+        action="store_true",
+        help=(
+            "Pass this flag if intending to run this skim on data, so that MC "
+            "quantities are not saved in the output."
+        ),
+    )
+
+    parser.add_argument(
         "--no-stats",
         action="store_true",
         help=(
@@ -70,6 +79,16 @@ def get_argument_parser():
         help=(
             "If flag passed, the steering file will not include a comment explaining "
             "how to add modules to the path after building the skim lists."
+        ),
+    )
+
+    parser.add_argument(
+        "--no-backward-compatibility",
+        action="store_true",
+        help=(
+            "If this flag is not passed, the steering file will include additional "
+            "imports wrapped in a try-except block, in order to be work with both "
+            "release 5 and 6."
         ),
     )
 
@@ -122,9 +141,11 @@ def main():
     CodeString = template.render(
         skims=skims,
         modules=modules,
+        data=args.data,
         stats=(not args.no_stats),
         hints=(not args.no_user_hints),
         mdstOutput=args.skimmed_mdst_output,
+        backward_compatibility=(not args.no_backward_compatibility)
     )
 
     output(CodeString, OutputFilename=args.OutputFilename, skims=skims)

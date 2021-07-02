@@ -15,7 +15,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.systematics import SystematicsPhiGamma
+from skim.WGs.systematics import SystematicsPhiGamma
 
 path = b2.Path()
 skim = SystematicsPhiGamma(validation=True, udstOutput=False)

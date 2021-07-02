@@ -17,7 +17,7 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMElectronicsMap.h>
 #include <klm/dbobjects/KLMScintillatorFEEParameters.h>
-#include <klm/dbobjects/KLMTimeConversion.h>
+#include <klm/time/KLMTime.h>
 
 /* Belle 2 headers. */
 #include <framework/core/Module.h>
@@ -169,7 +169,7 @@ namespace Belle2 {
     DBObjPtr<KLMScintillatorFEEParameters> m_FEEParameters;
 
     /** Time conversion. */
-    DBObjPtr<KLMTimeConversion> m_TimeConversion;
+    KLMTime* m_Time;
 
     /** Raw data. */
     StoreArray<RawKLM> m_RawKLMs;

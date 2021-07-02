@@ -55,6 +55,8 @@ Variables
  * Modified the ``L1 Trigger`` variables (:b2:var:`L1PSNM`, :b2:var:`L1PSNMBit`, etc.) to return ``NAN`` instead of ``0`` in case the requested
    trigger bit or number does not exist. These variables now return ``0`` only when the requested bit is not fired.
  * Added new variables :b2:var:`L1TimeQuality` and :b2:var:`isPoissonTriggerInInjectionVeto` for returning the L1 trigger time quality and the injection veto flag. Renamed the variable ``L1TimType`` into :b2:var:`L1TimeType`.
+ * Added a new variable :b2:var:`minC2TDistID` and a metavariable :b2:var:`minC2TDistVar`, which allow to call
+   any variable for the nearest track to a given photon.
  * New variables have been added to classify the true decay mode of an event (e.g. :b2:var:`BplusMode` and :b2:var:`B0Mode`). They
    serve as an alternative to the `TopologyAnalysis`. Further information about the meaning of the variable values can be found in
    :b2:ref:`GeneratedDecayModes`.

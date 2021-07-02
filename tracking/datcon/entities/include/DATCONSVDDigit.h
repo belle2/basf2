@@ -49,10 +49,10 @@ namespace Belle2 {
     * @param samples std::array of 6 APV raw samples.
     */
     DATCONSVDDigit(VxdID sensorID, bool isU, short cellID, APVFloatSampleType samples[c_nAPVSamples]):
-      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_totalCharge(0), m_maxSampleCharge(0), m_maxSampleIndex(0)
+      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_totalCharge(0), m_maxSampleIndex(0)
     {
       std::transform(samples, samples + c_nAPVSamples, m_samples.begin(),
-                     [this](APVFloatSampleType x)->APVRawSampleType { return trimToSampleRange(x); });
+                     [](APVFloatSampleType x)->APVRawSampleType { return trimToSampleRange(x); });
     }
 
     /** Constructor using a stl container of samples.
@@ -62,7 +62,7 @@ namespace Belle2 {
     * @param samples std::array of 6 APV raw samples.
     */
     DATCONSVDDigit(VxdID sensorID, bool isU, short cellID, APVFloatSamples samples) :
-      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_totalCharge(0), m_maxSampleCharge(0), m_maxSampleIndex(0)
+      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_totalCharge(0), m_maxSampleIndex(0)
     {
       std::transform(samples.begin(), samples.end(), m_samples.begin(),
                      [](typename APVFloatSamples::value_type x)->APVRawSampleType { return trimToSampleRange(x); });
@@ -178,7 +178,6 @@ namespace Belle2 {
     short m_cellID;                   /**< Strip coordinate in pitch units. */
     APVRawSamples m_samples;          /**< 6 APV signals from the strip. */
     unsigned short m_totalCharge;     /**< Total charge of this DATCONSVDDigit */
-    unsigned short m_maxSampleCharge; /**< Charge of sample max */
     unsigned short m_maxSampleIndex;  /**< Index of charge of sample max */
 
   }; // class DATCONSVDDigit

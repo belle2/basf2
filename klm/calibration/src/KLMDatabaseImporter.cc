@@ -52,6 +52,16 @@ void KLMDatabaseImporter::importChannelStatus(
   channelStatusImport.import(iov);
 }
 
+void KLMDatabaseImporter::importReconstructionParameters(
+  const KLMReconstructionParameters* digitizationParameters)
+{
+  DBImportObjPtr<KLMReconstructionParameters> digPar;
+  digPar.construct(*digitizationParameters);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  digPar.import(iov);
+}
+
 void KLMDatabaseImporter::importScintillatorDigitizationParameters(
   const KLMScintillatorDigitizationParameters* digitizationParameters)
 {

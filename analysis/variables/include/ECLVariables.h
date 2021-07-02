@@ -53,6 +53,18 @@ namespace Belle2 {
     double eclClusterIsolation(const Particle* particle);
 
     /**
+     * return array index of the nearest track hitting the ECL
+     * Note: This distance is calculated on the reconstructed level
+     */
+    double eclClusterIsolationID(const Particle* particle);
+
+    /**
+     * return variable value of the nearest track hitting the ECL
+     * Note: This distance is calculated on the reconstructed level
+     */
+    Manager::FunctionPtr eclClusterIsolationVar(const std::vector<std::string>& arguments);
+
+    /**
      * return DeltaL for the shower shape
      * Note: This distance is calculated on the reconstructed level and is temporarily
      * included to the ECLCLuster MDST data format for studying purposes. If it is found

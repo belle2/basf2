@@ -1,7 +1,7 @@
 Systematics skims
 ~~~~~~~~~~~~~~~~~
 
-.. automodule:: skim.systematics
+.. automodule:: skim.WGs.systematics
     :members:
     :undoc-members:
 

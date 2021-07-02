@@ -15,7 +15,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.ewp import BtoXgamma
+from skim.WGs.ewp import BtoXgamma
 
 path = b2.Path()
 skim = BtoXgamma(validation=True, udstOutput=False)

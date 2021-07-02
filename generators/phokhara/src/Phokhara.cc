@@ -22,14 +22,15 @@ extern "C" {
   extern struct {
     double bp1[4];        /**< 4-momenta of incoming positron. */
     double bq1[4];        /**< 4-momenta of incoming electron. */
-    double bp2[6][10];     /**< 4-momenta[0..3], pdg code [4] and mother [5] of outgoing hadrons/muons. */
+    double bp2[6][10];    /**< 4-momenta[0..3], pdg code [4] and mother [5] of outgoing hadrons/muons. */
     double bphot[4][2];   /**< 4-momenta of real photons. */
+    double wgt;      /**< event weight. */
     int bnphot;           /**< Number of photons. */
     int bnhad;            /**< Number of hadrons/muons. */
   } momset_;
 
   /** Replace internal random generator with the framework random generator */
-  double phokhara_rndm_(int*)
+  double phokhara_rndm()
   {
     double r = gRandom->Rndm();
     return r;
@@ -40,7 +41,7 @@ extern "C" {
    * @param drvec array to store the random numbers
    * @param lenght size of the array
    */
-  void phokhara_rndmarray_(double* drvec, int* lengt)
+  void phokhara_rndmarray(double* drvec, int* lengt)
   {
     for (int i = 0; i < *lengt; ++i) {
       drvec[i] = gRandom->Rndm();
@@ -48,11 +49,11 @@ extern "C" {
   }
 
   /** main FORTRAN routine*/
-  void phokhara_(int* mode, double* xpar, int* npar);
+  void phokhara(int* mode, double* xpar, int* npar);
 
   /** particle parameters and inputs used by PHOKHARA */
 //   void phokhara_setinputfile_(const char* inputfilename, size_t* length);
-  void phokhara_setparamfile_(const char* paramfilename, size_t* length);
+  void phokhara_set_parameter_file(const char* paramfilename);
 
   /** Callback to show error if event is rejected*/
   void phokhara_error_trials_(double* trials)
@@ -103,7 +104,7 @@ void Phokhara::setDefaultSettings()
 //   m_LO = 1;
 //   m_NLO = 0;
 //   m_QED = 0;
-//   m_NLOIFI = 0;
+//   m_IFSNLO = 0;
 //   m_alpha = 1;
 //   m_pionff = 0;
 //   m_pionstructure = 0;
@@ -123,10 +124,12 @@ void Phokhara::setDefaultSettings()
   m_nMaxTrials = -1;
   m_nSearchMax = -1;
   m_epsilon = 1.e-4;
+  m_weighted = 0;
   m_LO = -1;
   m_NLO = -1;
+  m_fullNLO = -1;
   m_QED = -1;
-  m_NLOIFI = -1;
+  m_IFSNLO = -1;
   m_alpha = -1;
   m_pionff = -1;
   m_pionstructure = -1;
@@ -140,6 +143,9 @@ void Phokhara::setDefaultSettings()
   m_ForceMinInvMassHadronsCut = false;
   m_MaxInvMassHadrons = 0.;
   m_MinEnergyGamma = 0.;
+  m_chi_sw = 0;
+  m_be_r = 0;
+  m_beamres = 0.;
 
   m_pi = 0.;
   m_conversionFactor = 0.;
@@ -157,8 +163,7 @@ void Phokhara::init(const std::string& paramFile)
   B2INFO("Phokhara::init, using paramater file: " << paramFile);
 
   if (paramFile.empty()) B2FATAL("Phokhara: The specified param file is empty!");
-  size_t fileLength = paramFile.size();
-  phokhara_setparamfile_(paramFile.c_str(), &fileLength);
+  phokhara_set_parameter_file(paramFile.c_str());
 
 //   if (inputFile.empty()) B2FATAL("Phokhara: The specified input file is empty!")
 //   fileLength = inputFile.size();
@@ -168,14 +173,14 @@ void Phokhara::init(const std::string& paramFile)
 }
 
 
-void Phokhara::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost)
+double Phokhara::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost)
 {
 
   //Generate event
   int mode = 1;
   if (m_ForceMinInvMassHadronsCut) {
     while (1) {
-      phokhara_(&mode, m_xpar, m_npar);
+      phokhara(&mode, m_xpar, m_npar);
       double partMom[4] = {0, 0, 0, 0};
       for (int iPart = 0; iPart < momset_.bnhad; ++iPart) {
         for (int j = 0; j < 4; ++j)
@@ -187,7 +192,7 @@ void Phokhara::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentz
         break;
     }
   } else
-    phokhara_(&mode, m_xpar, m_npar);
+    phokhara(&mode, m_xpar, m_npar);
 
   //Store the initial particles as virtual particles into the MCParticleGraph
   double eMom[4] = {momset_.bp1[1], momset_.bp1[2], momset_.bp1[3], momset_.bp1[0]};
@@ -242,6 +247,9 @@ void Phokhara::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentz
     lambda->removeStatus(MCParticle::c_StableInGenerator);
   }
 
+  if (m_weighted) return momset_.wgt;
+  return 1.0;
+
 }
 
 
@@ -249,7 +257,7 @@ void Phokhara::term()
 {
 
   int mode = 2;
-  phokhara_(&mode, m_xpar, m_npar);
+  phokhara(&mode, m_xpar, m_npar);
 
 //   B2INFO("> Crosssection ")
 //   B2INFO(">> xsec (weighted)   = (" << bresults_.rescross << " +/- " << bresults_.rescrosserr << ") nb")
@@ -280,17 +288,22 @@ void Phokhara::applySettings()
   //--------------------
   m_npar[1]   = m_nMaxTrials;
   m_npar[2]   = m_nSearchMax;
+  m_npar[3]   = m_weighted;
   m_npar[20]  = m_finalState;
   m_npar[30]  = m_LO;
   m_npar[31]  = m_NLO;
   m_npar[32]  = m_QED;
-  m_npar[33]  = m_NLOIFI;
+  m_npar[33]  = m_IFSNLO;
   m_npar[34]  = m_alpha;
   m_npar[35]  = m_pionff;
   m_npar[36]  = m_pionstructure;
   m_npar[37]  = m_kaonff;
   m_npar[38]  = m_narres;
   m_npar[39]  = m_protonff;
+  m_npar[40]  = m_fullNLO;
+  m_npar[50]  = m_chi_sw;
+  m_npar[51]  = m_be_r;
+  m_npar[60]  = m_weighted;
 
   //--------------------
   // Double parameters
@@ -308,8 +321,10 @@ void Phokhara::applySettings()
   m_xpar[22] = m_ScatteringAngleRangeFinalStates.first;
   m_xpar[23] = m_ScatteringAngleRangeFinalStates.second;
 
+  m_xpar[30] = m_beamres;
+
   int mode = -1; //use mode to control init/generation/finalize in FORTRAN code
-  phokhara_(&mode, m_xpar, m_npar);
+  phokhara(&mode, m_xpar, m_npar);
 }
 
 

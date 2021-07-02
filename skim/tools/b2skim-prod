@@ -157,8 +157,9 @@ import jinja2
 
 from basf2 import B2ERROR, B2INFO, B2WARNING, find_file
 from conditions_db import ConditionsDB, encode_name
-from skimExpertFunctions import resolve_skim_modules
+from skim import CombinedSkim
 from skim.registry import Registry
+from skim.utils.misc import resolve_skim_modules
 
 
 def read_registry_yaml(sampleRegistryYaml, mc):
@@ -710,8 +711,6 @@ def produce_on_tau_samples(skims):
     Returns:
         ProduceOnTau (bool): True if combined skim should be produced on taupair samples.
     """
-    from skimExpertFunctions import CombinedSkim  # noqa
-
     # Create the CombinedSkim object, and try to access produce_on_tau_samples.
     # If the skims contain a mix of True and False, then the CombinedSkim method will
     # raise a ValueError, and the user will be made aware of the problem.
@@ -768,7 +767,7 @@ def warn_local_script(args):
 
 
 def make_combined_steering_file(
-    SkimName, CombinedSkimDefinitions, SteeringFileDirectory, LocalModule=None
+    SkimName, CombinedSkimDefinitions, SteeringFileDirectory, mc, LocalModule=None,
 ):
     """Construct a steering file for the requested combined skim."""
     SteeringFileDirectory = Path(SteeringFileDirectory)
@@ -795,9 +794,11 @@ def make_combined_steering_file(
     CodeString = template.render(
         skims=skims,
         modules=modules,
+        data=(not mc),
         stats=False,
         hints=False,
         mdstOutput=False,
+        backward_compatibility=True,
     )
 
     with open(SteeringFile, "w") as f:
@@ -917,7 +918,8 @@ def write_json_files(sampleRegistry, args, outputDirectory):
             skimName,
             CombinedSkimDefinitions,
             SteeringFileDirectory,
-            args.local_skim_script,
+            mc=args.mc,
+            LocalModule=args.local_skim_script,
         )
 
         for sampleLabel, sampleInfo in sampleRegistry.items():

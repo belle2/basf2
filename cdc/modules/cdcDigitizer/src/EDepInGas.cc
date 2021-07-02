@@ -194,6 +194,9 @@ double EDepInGas::getEDepInGas(int mode, int pdg, double mom, double dx, double 
     deltal = dldlm1 / dl2dlm12;
     //    edm  = dldlm1 * deltal; //drop 0.5* for speed up
   }
+
+  if (mode == 3) return xi1 * lm1 + me1;
+
   double lm2 = lm2b - r * lm1;
   double lmin = 0.5 * (lm1 + lm2 + exp(-lm1) + exp(-lm2));
   const double ymax = exp(-lmin);

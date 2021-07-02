@@ -1,4 +1,3 @@
-/** @cond EEMMG */
 /*
  * pjfry.h - interface header
  *
@@ -324,4 +323,3 @@ pj_complex pgb22_(int* s, int* ep);
 #endif
 
 #endif /* QUL_PJFRY_H */
-/** @endcond EEMMG */

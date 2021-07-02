@@ -29,7 +29,7 @@ from pathlib import Path
 import re
 import sys
 
-from skim.testfiles import DataSample, MCSample
+from skim.utils.testfiles import DataSample, MCSample
 
 import yaml
 

@@ -203,11 +203,11 @@ void CDCDatabaseImporter::importEDepToADC(std::string fileName)
   }
   stream.close();
 
-  unsigned short nId = 9;
+  unsigned short nId = nSuperLayers;
   if (groupId == 1) {
     nId = MAX_N_SLAYERS;
   } else if (groupId == 2) {
-    nId = 14336;
+    nId = nSenseWires;
   }
   if (nRead != nId) B2FATAL("#lines read-in (=" << nRead << ") is not equal #ids (=" << nId << ") !");
 

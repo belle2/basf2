@@ -1,4 +1,3 @@
-/** @cond EEMMG */
 /*
  * qcdloop1.h - header file for QCDLoop1 library
  *
@@ -89,4 +88,3 @@ extern QL_EXPORT(struct ffflag_struct) ffflag_;
 #endif
 
 #endif /* QCDLOOP1_H */
-/** @endcond EEMMG */

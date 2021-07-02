@@ -30,29 +30,20 @@
 #include <numeric>
 #include <vector>
 #include <tuple>
-
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::group_helper;
 
-
-
-
-
 //! Total number of sections
 const int c_TotalSections_per_EKLM_BKLM = 2;
-
-
-
-
-
+const int c_MaxSectorID = 7;
 
 const int i_forward_eklm = 2;
 const int i_backward_eklm = 3;
 const int i_forward_bklm = 0;
 const int i_backward_bklm = 1;
-
 
 const std::string m_klmTriggerSummery =  "TRGKLMSummery"; //"Name of the StoreArray holding the Trigger Summery"
 
@@ -95,7 +86,7 @@ vector<string> split(const string& str, const string& delim)
   return tokens;
 }
 
-std::vector<int> layer_string_list_to_integer(const std::string& instr)
+std::vector<int> layer_string_list_to_integer_range(const std::string& instr)
 {
   std::vector<int> ret;
   auto str_spl = split(instr, ":");
@@ -108,29 +99,37 @@ std::vector<int> layer_string_list_to_integer(const std::string& instr)
 
   return ret;
 }
+std::vector<int> layer_string_list_to_integer_list(const std::string& instr)
+{
+  std::vector<int> ret;
+  auto str_spl = split(instr, ",");
+
+  for (const auto& e : str_spl) {
+    ret.push_back(std::stoi(e));
+  }
+
+  return ret;
+}
+std::vector<int> layer_string_list_to_integer(const std::string& instr)
+{
+  if (instr.find(":") != string::npos) {
+    return layer_string_list_to_integer_range(instr);
+  }
+  if (instr.find(",") != string::npos)  {
+    return layer_string_list_to_integer_list(instr);
+  }
+  std::vector<int> ret;
+  return ret;
+}
 KLMTriggerModule::KLMTriggerModule() : Module()
 {
   setDescription("KLM trigger simulation");
   setPropertyFlags(c_ParallelProcessingCertified);
-
-
-  addParam("nLayerTrigger", m_nLayerTrigger, "", 5);
-
-  addParam("LayerUsed", m_dummy_used_layers, "List of layers used for the simulation", string("2:16"));
-
-
-
-
-
 }
 
 void KLMTriggerModule::initialize()
 {
-
   m_KLMTrgSummary.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
-  B2INFO("KLMTrigger: m_dummy_used_layers " << m_dummy_used_layers);
-  m_layerUsed = layer_string_list_to_integer(m_dummy_used_layers);
-
   StoreArray<KLMDigit> klmDigits;
   klmDigits.isRequired();
   if (!klmDigits.isValid())
@@ -145,10 +144,6 @@ void KLMTriggerModule::initialize()
   klmTriggerTracks.registerInDataStore();
   klmTriggerTracks.registerRelationTo(klmTriggerHits);
 // end unused
-
-
-
-
 }
 
 void KLMTriggerModule::beginRun()
@@ -156,6 +151,20 @@ void KLMTriggerModule::beginRun()
   StoreObjPtr<EventMetaData> evtMetaData;
   B2DEBUG(100, "KLMTrigger: Experiment " << evtMetaData->getExperiment() << ", run " << evtMetaData->getRun());
 
+  if (not m_KLMTriggerParameters.isValid())
+    B2FATAL("KLM trigger parameters are not available.");
+  m_nLayerTrigger = m_KLMTriggerParameters->getNLayers();
+  try {
+    m_layerUsed = layer_string_list_to_integer(m_KLMTriggerParameters->getWhichLayers());
+    B2DEBUG(20, "KLMTrigger: m_layerUsed " << m_KLMTriggerParameters->getWhichLayers());
+    for (auto e : m_layerUsed) {
+      B2DEBUG(20, "KLMTrigger: layer " << e << " used.");
+    }
+  } catch (const std::exception& e) {
+    B2FATAL("Something went wrong when parsing the 'm_whichLayers' string"
+            << LogVar("string", m_KLMTriggerParameters->getWhichLayers())
+            << LogVar("exception", e.what()));
+  }
 }
 
 
@@ -164,12 +173,6 @@ void KLMTriggerModule::endRun()
 
 }
 
-
-
-
-
-
-// cppcheck-suppress  noExplicitConstructor
 AXIS_NAME(KLM_type, int);// cppcheck-suppress  noExplicitConstructor
 AXIS_NAME(section_t, int);// cppcheck-suppress  noExplicitConstructor
 AXIS_NAME(sector_t, int);// cppcheck-suppress  noExplicitConstructor
@@ -184,7 +187,7 @@ AXIS_NAME(n_sections_trig, int);// cppcheck-suppress  noExplicitConstructor
 AXIS_NAME(back2back_t, int);// cppcheck-suppress  noExplicitConstructor
 AXIS_NAME(isectors_t, int);// cppcheck-suppress  noExplicitConstructor
 AXIS_NAME(TriggerCut, int);// cppcheck-suppress  noExplicitConstructor
-AXIS_NAME(vetoCut, int);
+AXIS_NAME(vetoCut, int);// cppcheck-suppress  noExplicitConstructor
 
 int to_i_sector(int KLM_type_, int section_)
 {
@@ -221,6 +224,17 @@ unsigned int countBits(unsigned int n)
 }
 
 
+bool sectors_adjacent(int e1, int e2)
+{
+  if (e1 == 0 && e2 == c_MaxSectorID) {
+    return true;
+  }
+  if (e1 - e2 == 1) {
+    return true;
+  }
+  return false;
+}
+
 template <typename CONTAINER_T>
 auto to_sector_bit_mask(const CONTAINER_T& container, TriggerCut TriggerCut_ , vetoCut vetoCut_ = 0)
 {
@@ -236,6 +250,7 @@ auto to_sector_bit_mask(const CONTAINER_T& container, TriggerCut TriggerCut_ , v
       bitcount_or >= TriggerCut_
       && bitcount_back < vetoCut_
       && bitcount < vetoCut_
+      && (sectors_adjacent(sector_t(e) , sector_t(back)))
     ) {
       ret |= (1 << sector_t(e));
       ret |= (1024);
@@ -248,9 +263,6 @@ auto to_sector_bit_mask(const CONTAINER_T& container, TriggerCut TriggerCut_ , v
 
 void KLMTriggerModule::event()
 {
-
-
-
   m_KLMTrgSummary.create();
 
   StoreArray<KLMDigit> klmDigits;
@@ -265,6 +277,15 @@ void KLMTriggerModule::event()
 
   sort(hits);
   drop_duplicates(hits);
+  auto is_not_containt_in_vector_with_projected = [](const auto & vec, auto project) {
+    return [&vec, project](const auto & ele) mutable {
+      return std::find_if(vec.begin(), vec.end(), [&](const auto & e1) { return e1 == project(ele);  }) == vec.end();
+    };
+  };
+
+  hits.erase(std::remove_if(hits.begin(), hits.end(),
+                            is_not_containt_in_vector_with_projected(m_layerUsed, layer_t())),
+             hits.end());
 
 
   auto grouped = group<KLM_type, section_t, sector_t>::apply(hits,

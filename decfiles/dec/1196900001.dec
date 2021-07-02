@@ -9,6 +9,9 @@
 # Cuts: None
 # Date: 20201207
 #
+#
+# June 2021 Automated: Converted PYTHIA ids
+#   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
 
 Alias Bsig B0
 Alias Btag B0
@@ -47,13 +50,13 @@ CDecay anti-Bsig
 
 Decay Btag
 0.0176        D*-  pi+  pi+  pi-  pi0                 PHSP;
-0.013         D*-  a_1+                               SVV_HELAMP  0.458 0.0 0.866 0.0 0.458 0.0;      
+0.013         D*-  a_1+                               SVV_HELAMP  0.458 0.0 0.866 0.0 0.458 0.0;
 0.0057        D*-  rho0  pi+                          PHSP;
 0.0047        D*-  pi+  pi+  pi+  pi-  pi-            PHSP;
 0.0027        D*0  pi+  pi+  pi-  pi-                 PHSP;
 0.00129       D*-  K+  anti-K0                        PHSP;
 0.00129       D*-  K+  anti-K*0                       PHSP;
-0.000860770   u  anti-c  anti-s  d                    PYTHIA  48;         
+0.000860770   u  anti-c  anti-s  d                    PYTHIA 23;
 0.00075       D*-  pi+  pi0                           PHSP;
 0.0003        D*-  K0  pi+                            PHSP;
 0.000214      D*-  K+                                 SVS;
@@ -96,4 +99,4 @@ Enddecay
 CDecay D-
 
 
-End 
+End

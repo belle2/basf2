@@ -20,6 +20,8 @@ CHANGES since release-05-00-00:
     The mapping is from the database and doesn't affect mdst content and is thus not tested here.
   + getInputBitNumber added
   + getOutputBitNumber added
+- ECLCluster:
+  + getMinTrkDistanceID
 - EventLevelTriggerTimeInfo
   *  added new storage element for information from the Trigger Timing Distribution (TTD)
 """

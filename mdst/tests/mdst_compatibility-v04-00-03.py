@@ -28,6 +28,8 @@ CHANGES since release-04-00-03:
 - TrackFitResult:
   + ndf
   + chi2
+- ECLCluster:
+  + getMinTrkDistanceID
 - EventLevelTriggerTimeInfo
   *  added new storage element for information from the Trigger Timing Distribution (TTD)
 """

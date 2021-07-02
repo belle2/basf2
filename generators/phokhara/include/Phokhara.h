@@ -16,7 +16,7 @@
 namespace Belle2 {
 
   /**
-   * C++ Interface for the Fortran generator Phokhara.
+   * C++ Interface for the Fortran generator PHOKHARA.
    *
    */
 
@@ -31,7 +31,7 @@ namespace Belle2 {
     /** Destructor. */
     ~Phokhara();
 
-    /** Sets the default settings for the BhWide Fortran generator. */
+    /** Sets the default settings for the PHOKHARA generator. */
     void setDefaultSettings();
 
     /** Sets LO correction mode
@@ -39,20 +39,30 @@ namespace Belle2 {
     */
     void setLO(int LO) { m_LO = LO; }
 
+    /** Sets weighted mode
+      * @param weighted generate weighted events.
+    */
+    void setWeighted(int weighted) { m_weighted = weighted; }
+
     /** Sets NLO mode
       * @param NLO Defines NLO, for 1ph only: off (0, default), on (1)
     */
     void setNLO(int NLO) { m_NLO = NLO; }
+
+    /** Sets Full NLO mode
+      * @param full NLO : No(0), Yes(1)
+    */
+    void setFullNLO(int FullNLO) { m_fullNLO = FullNLO; }
 
     /** Sets QED corrections
       * @param QED QED corrections: ISR only(0), ISR+FSR(1), ISR+INT+FSR(2)
     */
     void setQED(int QED) { m_QED = QED; }
 
-    /** Sets NLO options
-      * @param NLOIFI NLOIFI: yes(1), no(0)
+    /** Sets IFSNLO options
+      * @param IFSNLO: no(0), yes(1)
     */
-    void setNLOIFI(int NLOIFI) { m_NLOIFI = NLOIFI; }
+    void setIFSNLO(int IFSNLO) { m_IFSNLO = IFSNLO; }
 
     /** Sets alpha qed options
       * @param alpha Vacuum polarization switch: off (0), on (1,[by Fred Jegerlehner], default), on (2,[by Thomas Teubner])
@@ -75,7 +85,7 @@ namespace Belle2 {
     void setPionStructure(int pionstructure) { m_pionstructure = pionstructure; }
 
     /** Sets narrow resonances
-      * @param narres no narrow resonances (0), J/Psi (1), Psi(2S) (2) (narro resonances only for pion = 0, 1, 6, 7
+      * @param narres no narrow resonances (0), J/Psi (1), Psi(2S) (2) (narrow resonances only for pion = 0, 1, 6, 7
     */
     void setNarrowRes(int narres) { m_narres = narres; }
 
@@ -83,6 +93,21 @@ namespace Belle2 {
       * @param protonff f0+f0(600): KK model(0), no structure(1), no f0+f0(600)(2), f0 KLOE(3)
     */
     void setProtonFF(int protonff) { m_protonff = protonff; }
+
+    /** Sets Chi production
+      * @param chi_sw: Radiative return(0), Chi production(1), Radiative return + Chi production (2)
+    */
+    void setChiSW(int chisw) { m_chi_sw = chisw; }
+
+    /** Switches beam resolution for Chi production
+      * @param be_r without beam resolution(0), with beam resolution(1). Works only for pion=11 and pion=12
+    */
+    void setSwitchBeamResolution(int be_r) { m_be_r = be_r; }
+
+    /** Beam resolution for Chi production
+      * @param beamres - beam resolution for pion==11 and pion==12 only
+    */
+    void setBeamResolution(double beamres) { m_beamres = beamres; }
 
     /** Sets the theta scattering angle range for the photon.
       * @param angleRange A pair of values, representing the min and max theta angle of the photon in [deg].
@@ -162,7 +187,7 @@ namespace Belle2 {
      * @param vertex generated vertex.
      * @param boost generated boost.
      */
-    void generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost);
+    double generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost);
 
     /**
      * Terminates the generator.
@@ -188,16 +213,20 @@ namespace Belle2 {
     int m_nSearchMax;  /**< Events used to search maximum of differential cross section. */
     double m_cmsEnergy;         /**< CMS Energy = 2*Ebeam [GeV]. */
     double m_epsilon;           /**< Soft/hard photon separator in units of CMS/2., called 'w' in Phokhara */
+    int m_weighted;  /**< generate weighted events */
     int m_LO;  /**< LO: 1ph(0, default), Born: 0ph(1), only Born: 0ph(-1) */
     int m_NLO;  /**< NLO, for 1ph only: off (0, default), on (1) */
+    int m_fullNLO;  /**< NLO, full NLO : No(0), Yes(1) */
     int m_QED;  /**< ISR only(0), ISR+FSR(1), ISR+INT+FSR(2) */
-    int m_NLOIFI;  /**< IFSNLO: no(0), yes(1) */
+    int m_IFSNLO;  /**< IFSNLO: no(0), yes(1) */
     int m_alpha;  /**< vacuum polarization switch: off (0), on (1,[by Fred Jegerlehner]), on (2,[by Thomas Teubner]) */
     int m_pionff;  /**< FF_pion: KS PionFormFactor(0),GS old (1),GS new (2) */
     int m_pionstructure;  /**< for pi+pi- only: f0+f0(600): K+K- model(0), "no structure" model(1), no f0+f0(600)(2), f0 KLOE(3) */
     int m_kaonff;  /**< FF_kaon: KaonFormFactor constrained(0), KaonFormFactor unconstrained(1) KaonFormFactor old(2) */
     int m_narres;  /**< narr_res: no narrow resonances (0), J/psi (1) and psi(2S) (2) only for m_finalState = 0,1,6,7 */
     int m_protonff;  /**< ProtonFormFactor old(0), ProtonFormFactor new(1) */
+    int m_chi_sw;  /**< chi_sw: Radiative return(0), Chi production(1), Radiative return + Chi production (2) */
+    int m_be_r;  /**< be_r: without beam resolution(0), with beam resolution(1) */
 
     std::pair<double, double> m_ScatteringAngleRangePhoton; /**< Minimal/Maximal photon angle/missing momentum angle. */
     std::pair<double, double> m_ScatteringAngleRangeFinalStates; /**< Minimal/Maximal pions(muons,nucleons,kaons) momentum angle. */
@@ -206,6 +235,7 @@ namespace Belle2 {
     bool m_ForceMinInvMassHadronsCut; /**< Force application of the above cut. */
     double m_MaxInvMassHadrons; /**< maximum mass of the hadron system [GeV^2] */
     double m_MinEnergyGamma; /**< minimum gamma energy [GeV] */
+    double m_beamres; /**< beam resolution for chi2 studies*/
 
     /**
     * Apply the settings to the internal Fortran generator.

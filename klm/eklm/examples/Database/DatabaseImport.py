@@ -14,5 +14,4 @@ gearbox = basf2.register_module('Gearbox')
 gearbox.initialize()
 
 dbImporter = EKLMDatabaseImporter()
-# dbImporter.importReconstructionParameters()
 dbImporter.importSimulationParameters()

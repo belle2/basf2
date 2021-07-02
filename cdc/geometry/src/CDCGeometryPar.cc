@@ -126,6 +126,7 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
     }
   }
 
+  //TODO in future: make a new (singleton?) class and move all EDepToADC things there.
   if (gcp.getEDepToADCInputType()) {
     m_eDepToADCConversionsFromDB = new OptionalDBObjPtr<CDCEDepToADCConversions>;
     if ((*m_eDepToADCConversionsFromDB).isValid()) {
@@ -1248,8 +1249,8 @@ void CDCGeometryPar::readEDepToADC(const GearDir& gbxParams, const int mode)
 
   unsigned short paramMode(0), nParams(0);
   ifs >> paramMode >> nParams;
-  if (paramMode > 0) B2FATAL("Param mode > 0!");
-  if (nParams > 6)   B2FATAL("No. of params. > 6!");
+  if (paramMode > 1) B2FATAL("Param mode > 1!");
+  if (nParams > 7)   B2FATAL("No. of params. > 7!");
   unsigned short groupId(0);
   ifs >> groupId;
   B2DEBUG(29, paramMode << " " << nParams << " " << groupId);
@@ -1306,12 +1307,9 @@ void CDCGeometryPar::setT0()
 
 
 // Calculate mean t0
-void CDCGeometryPar::calcMeanT0()
+void CDCGeometryPar::calcMeanT0(double minT0, double maxT0, int maxIt, double nStdv, double epsi)
 {
-  double minT0 = 3800; // ns
-  double maxT0 = 5800; // ns
   double oldMeanT0 = 0;
-  const unsigned short maxIt = 10;
   unsigned short it1 = 0;
   for (unsigned short it = 0; it < maxIt; ++it) {
     it1 = it;
@@ -1336,10 +1334,10 @@ void CDCGeometryPar::calcMeanT0()
       stdvT0   /= effiSum;
       stdvT0 = sqrt(fabs(stdvT0 - m_meanT0 * m_meanT0));
       B2DEBUG(29, it << " " << effiSum << " " << m_meanT0 << " " << stdvT0);
-      if (fabs(m_meanT0 - oldMeanT0) < 0.1) break;
+      if (fabs(m_meanT0 - oldMeanT0) < epsi) break;
       oldMeanT0 = m_meanT0;
-      minT0 = m_meanT0 - 3 * stdvT0;
-      maxT0 = m_meanT0 + 3 * stdvT0;
+      minT0 = m_meanT0 - nStdv * stdvT0;
+      maxT0 = m_meanT0 + nStdv * stdvT0;
     } else {
       B2FATAL("Wire efficiency sum <= 0!");
     }
@@ -1543,7 +1541,7 @@ void CDCGeometryPar::setEDepToADCConversions()
 
   for (unsigned short id = 0; id < nEnt; ++id) {
     unsigned short np = ((*m_eDepToADCConversionsFromDB)->getParams(id)).size();
-    if (np > 6) B2FATAL("CDCGeometryPar:: No. of edep-to-ADC conversion params. > 6");
+    if (np > 7) B2FATAL("CDCGeometryPar:: No. of edep-to-ADC conversion params. > 7");
     if (groupId == 0) { //per super-layer; id=super-layer
       for (unsigned short cL = cLMin[id]; cL <= cLMax[id]; ++cL) { //clayer loop
         for (unsigned short cell = 0; cell < m_nWires[cL]; ++cell) { //cell loop

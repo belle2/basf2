@@ -14,6 +14,7 @@
 #include <svd/reconstruction/RawCluster.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
 #include <svd/calibration/SVDClustering.h>
+#include <svd/calibration/SVDCoGOnlyPositionError.h>
 #include <svd/calibration/SVDCoGOnlyErrorScaleFactors.h>
 #include <svd/calibration/SVDOldDefaultErrorScaleFactors.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
@@ -69,6 +70,7 @@ namespace Belle2::SVD {
     /** helper, returns the average strip noise*/
     double getAverageStripNoise(const Belle2::SVD::RawCluster& rawCluster);
 
+    SVDCoGOnlyPositionError m_CoGOnlyErr; /**< CoGOnly Position Error*/
     SVDCoGOnlyErrorScaleFactors m_CoGOnlyCal; /**< Scaling Factors for the CoGOnly algorithm*/
     SVDOldDefaultErrorScaleFactors m_OldDefaultCal; /**< Scaling Factors for the OldDefault algorithm*/
     SVDClustering m_ClusterCal; /**< SVD clustering parameters*/

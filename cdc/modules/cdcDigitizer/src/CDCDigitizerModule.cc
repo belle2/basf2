@@ -23,7 +23,6 @@ using namespace std;
 using namespace Belle2;
 using namespace CDC;
 
-
 // register module
 REG_MODULE(CDCDigitizer)
 CDCDigitizerModule::CDCDigitizerModule() : Module(),
@@ -94,11 +93,11 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
 
   //Threshold
   addParam("TDCThreshold4Outer", m_tdcThreshold4Outer,
-           "TDC threshold (dE in eV) for Layers#8-56. The value corresponds to He-C2H6 gas", 25.0);
+           "TDC threshold (dE in eV) for Layers#8-56. The value corresponds to He-C2H6 gas", 250.);
   addParam("TDCThreshold4Inner", m_tdcThreshold4Inner,
-           "Same as TDCThreshold4Outer but for Layers#0-7,", 25.0);
+           "Same as TDCThreshold4Outer but for Layers#0-7,", 150.);
   addParam("EDepInGasMode", m_eDepInGasMode,
-           "Mode for extracting energy deposit in gas from energy deposit in gas+wire; =0: scaling using electron density; 1: scaling using most probab. energy deposit; 2: similar to 2 but slightly different; 3: extraction based on probability",
+           "Mode for extracting energy deposit in gas from energy deposit in gas+wire; =0: scaling using electron density; 1: scaling using most probab. energy deposit; 2: similar to 2 but slightly different; 3: extraction based on probability; 4: regeneration following probability",
            0);
 
   //ADC Threshold
@@ -141,6 +140,9 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("AddFudgeFactorForSigma", m_addFudgeFactorForSigma,
            "Additional fudge factor for space resol. (common to all cells)",  1.);
   addParam("SpaceChargeEffect", m_spaceChargeEffect, "Switch for space charge effect", true);
+  addParam("DegOfSPEOnThreshold", m_degOfSPEOnThreshold,
+           "Degree of space charge effect on timing threshold; specify the range [0,1]; =1: full effect on threshold; =0: no effect",
+           m_degOfSPEOnThreshold);
 
   addParam("AddXTalk", m_addXTalk, "A switch for crosstalk; true: on; false: off", true);
   addParam("Issue2ndHitWarning", m_issue2ndHitWarning, "=true: issue a warning when a 2nd TDC hit is found.", true);
@@ -148,6 +150,14 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            true);
   addParam("DebugLevel", m_debugLevel, "Debug level; 20-29 are usable.", 20);
   addParam("DebugLevel4XTalk", m_debugLevel4XTalk, "Debug level for crosstalk; 20-29 are usable.", 21);
+
+  //Gain smearing
+  addParam("GasGainSmearing", m_gasGainSmearing, "Switch for gas gain smearing; true: on; false: off", m_gasGainSmearing);
+  addParam("EffWForGasGainSmearing", m_effWForGasGainSmearing,
+           "Effective energy (keV) needed for one electron production for gas gain smearing", m_effWForGasGainSmearing);
+  addParam("ThetaOfPolyaFunction", m_thetaOfPolya, "Theta of Polya function for gas gain smearing", m_thetaOfPolya);
+  addParam("ExtraADCSmearing", m_extraADCSmearing, "Switch for extra ADC smearing; true: on; false: off", m_extraADCSmearing);
+  //  addParam("SigmaForExtraADCSmearing", m_sigmaForExtraADCSmearing, "Gaussian sigma for extra ADC smearing; specify range [0,1]", m_sigmaForExtraADCSmearing);
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;
@@ -214,13 +224,26 @@ void CDCDigitizerModule::initialize()
   if (m_useDB4RunGain) {
     m_runGainFromDB = new DBObjPtr<CDCDedxRunGain>;
     if ((*m_runGainFromDB).isValid()) {
-      (*m_runGainFromDB).addCallback(this, &CDCDigitizerModule::setRunGain);
-      setRunGain();
+      (*m_runGainFromDB).addCallback(this, &CDCDigitizerModule::setSemiTotalGain);
     } else {
       B2FATAL("CDCDedxRunGain invalid!");
     }
+
+    m_gain0FromDB = new DBObjPtr<CDCDedxScaleFactor>;
+    if ((*m_gain0FromDB).isValid()) {
+      (*m_gain0FromDB).addCallback(this, &CDCDigitizerModule::setSemiTotalGain);
+    } else {
+      B2FATAL("CDCDedxScaleFactor invalid!");
+    }
+
+    m_wireGainFromDB = new DBObjPtr<CDCDedxWireGain>;
+    if ((*m_wireGainFromDB).isValid()) {
+      (*m_wireGainFromDB).addCallback(this, &CDCDigitizerModule::setSemiTotalGain);
+      setSemiTotalGain();
+    } else {
+      B2FATAL("CDCDedxWireGain invalid!");
+    }
   }
-  B2DEBUG(m_debugLevel, "run-gain = " << m_runGain);
 
   if (m_addXTalk) {
     m_xTalkFromDB = new DBObjPtr<CDCCrossTalkLibrary>;
@@ -441,12 +464,12 @@ void CDCDigitizerModule::event()
       hitdE = edpg.getEDepInGas(m_eDepInGasMode, m_aCDCSimHit->getPDGCode(), m_momentum.Mag(), stepLength, hitdE);
     }
 
-    unsigned short layerID = m_wireID.getICLayer();
-    unsigned short cellID  = m_wireID.getIWire();
-    //    unsigned short adcCount = getADCCount(layerID, cellID, hitdE, stepLength, costh);
-    unsigned short adcCount = getADCCount(m_wireID, hitdE, stepLength, costh);
+    double convFactorForThreshold = 1;
+    //TODO: modify the following function so that it can output timing signal in Volt in future
+    unsigned short adcCount = 0;
+    makeSignalsAfterShapers(m_wireID, hitdE, stepLength, costh, adcCount, convFactorForThreshold);
     const unsigned short adcTh = m_useDB4FEE ? m_adcThresh[m_boardID] : m_adcThreshold;
-    //    B2DEBUG(29, "adcTh,adcCount= " << adcTh <<" "<< adcCount);
+    //    B2DEBUG(29, "adcTh,adcCount,convFactorForThreshold= " << adcTh <<" "<< adcCount <<" "<< convFactorForThreshold);
     if (adcCount < adcTh) adcCount = 0;
     iterADCMap = adcMap.find(m_wireID);
     if (iterADCMap == adcMap.end()) {
@@ -462,12 +485,11 @@ void CDCDigitizerModule::event()
     // M. Uchida 2012.08.31
     double dEThreshold = 0.;
     if (m_useDB4FEE && m_useDB4EDepToADC) {
-      dEThreshold = (m_tdcThresh[m_boardID] / m_cdcgp->getEDepToADCMainFactor(layerID, cellID)) * Unit::keV;
+      dEThreshold = m_tdcThresh[m_boardID] / convFactorForThreshold;
     } else {
       dEThreshold = (m_wireID.getISuperLayer() == 0) ? m_tdcThreshold4Inner : m_tdcThreshold4Outer;
-      dEThreshold *= Unit::eV;
     }
-    dEThreshold /= m_runGain;
+    dEThreshold *= Unit::eV;
     B2DEBUG(m_debugLevel, "hitdE,dEThreshold,driftLength " << hitdE << " " << dEThreshold << " " << hitDriftLength);
 
     if (hitdE < dEThreshold) {
@@ -911,29 +933,78 @@ double CDCDigitizerModule::getDriftTime(const double driftLength, const bool add
 }
 
 
-//unsigned short CDCDigitizerModule::getADCCount(unsigned short layer, unsigned short cell, double edep, double dx, double costh)
-unsigned short CDCDigitizerModule::getADCCount(const WireID& wid, double dEinGeV, double dx, double costh)
+void CDCDigitizerModule::makeSignalsAfterShapers(const WireID& wid, double dEinGeV, double dx, double costh,
+                                                 unsigned short& adcCount, double& convFactorForThreshold)
 {
-  unsigned short adcCount = 0;
-  if (dEinGeV <= 0. || dx <= 0.) return adcCount;
+  static double conv00  = (100.0 / 3.2); //keV -> coun (original from E. Nakano from some test beam results)
+  convFactorForThreshold = conv00;
+  adcCount = 0;
+  if (dEinGeV <= 0. || dx <= 0.) return;
 
-  // The current value is taken from E. Nakano from some test beam results. This should be a somewhat realistic value, but doesn't need to be exact.
-  // Similar as geometry parameters are for the ideal geometry, not the real one.
-  //  const double conversionEDepToADC = (100.0 / 3.2) * 1e6;
-  double conv  = (100.0 / 3.2); //keV -> count
   const unsigned short layer = wid.getICLayer();
   const unsigned short cell  = wid.getIWire();
   double dEInkeV = dEinGeV / Unit::keV;
+
+  double conv = conv00;
   if (m_spaceChargeEffect) {
-    if (m_useDB4EDepToADC) conv = m_cdcgp->getEDepToADCConvFactor(layer, cell, dEInkeV, dx, costh);
+    if (m_useDB4EDepToADC) {
+      conv = m_cdcgp->getEDepToADCConvFactor(layer, cell, dEInkeV, dx, costh);
+      double conv0 = m_cdcgp->getEDepToADCMainFactor(layer, cell, costh);
+      convFactorForThreshold = (conv0 + m_degOfSPEOnThreshold * (conv - conv0));
+    }
   } else {
-    if (m_useDB4EDepToADC) conv = m_cdcgp->getEDepToADCMainFactor(layer, cell);
+    if (m_useDB4EDepToADC) conv = m_cdcgp->getEDepToADCMainFactor(layer, cell, costh);
+    convFactorForThreshold = conv;
   }
-  conv *= m_runGain;
+
+  if (convFactorForThreshold > 0.) {
+    convFactorForThreshold *= getSemiTotalGain(layer, cell);
+  } else {
+    convFactorForThreshold = conv00;
+  }
+
+  if (m_gasGainSmearing) {
+    //TODO: replace the following sum with a gaussian for large nElectrons if gas-gain smearing turns out to be important
+    const double nElectrons = dEInkeV / m_effWForGasGainSmearing;
+    double relGain = 0;
+    if (nElectrons >= 1) {
+      for (int i = 1; i <= nElectrons; ++i) {
+        relGain += Polya();
+      }
+      relGain /= nElectrons;
+    } else {
+      relGain = 1;
+    }
+    conv *= relGain;
+  }
+
+  if (m_extraADCSmearing) {
+    conv *= max(0., gRandom->Gaus(1., m_cdcgp->getEDepToADCSigma(layer, cell)));
+  }
+
+  conv *= getSemiTotalGain(layer, cell);
 
   //The ADCcount is obtained by rounding-up (measured voltage)/bin in real ADC. This is true both for pedestal and signal voltages, so the pedestal-subtracted ADCcount (simulated here) is rounded.
   adcCount = static_cast<unsigned short>(std::round(conv * dEInkeV));
-  return adcCount;
+  return;
+}
+
+
+double CDCDigitizerModule::Polya(double xmax)
+{
+  double x  = 0;
+  double y  = 1;
+  double fx = 0;
+  double urndm[2];
+  static double ymax = pow(m_thetaOfPolya, m_thetaOfPolya) * exp(-m_thetaOfPolya);
+  while (y > fx) {
+    gRandom->RndmArray(2, urndm);
+    x = xmax * urndm[0];
+    double a = (1 + m_thetaOfPolya) * x;
+    fx = pow(a, m_thetaOfPolya) * exp(-a);
+    y = ymax * urndm[1];
+  }
+  return x;
 }
 
 
@@ -995,11 +1066,98 @@ void CDCDigitizerModule::setFEElectronics()
 }
 
 // Set Run-gain (from DB)
-void CDCDigitizerModule::setRunGain()
+void CDCDigitizerModule::setSemiTotalGain()
 {
+  B2DEBUG(m_debugLevel, " ");
+
+  //read individual wire gains
+  const int nLyrs = MAX_N_SLAYERS;
+  B2DEBUG(m_debugLevel, "nLyrs= " << nLyrs);
+  int nGoodL[nLyrs] = {};
+  float  wgL[nLyrs] = {};
+  int nGoodSL[nSuperLayers] = {};
+  float  wgSL[nSuperLayers] = {};
+  int nGoodAll = 0;
+  float  wgAll = 0;
+  int iw = -1;
+  for (int lyr = 0; lyr < nLyrs; ++lyr) {
+    int nWs = m_cdcgp->nWiresInLayer(lyr);
+    for (int w = 0; w < nWs; ++w) {
+      ++iw;
+      float wg = (*m_wireGainFromDB)->getWireGain(iw);
+      m_semiTotalGain[lyr][w] = wg;
+      if (wg > 0) {
+        ++nGoodL[lyr];
+        wgL[lyr] += wg;
+        WireID wid(lyr, w);
+        ++nGoodSL[wid.getISuperLayer()];
+        wgSL[wid.getISuperLayer()] += wg;
+        ++nGoodAll;
+        wgAll += wg;
+      }
+    }
+  }
+
+  //calculate mean gain per layer
+  for (int lyr = 0; lyr < nLyrs; ++lyr) {
+    if (nGoodL[lyr] > 0) wgL[lyr] /= nGoodL[lyr];
+    B2DEBUG(m_debugLevel, "lyr,ngood,gain= " << lyr << " " << nGoodL[lyr] << " " << wgL[lyr]);
+  }
+  //calculate mean gain per superlayer
+  for (unsigned int sl = 0; sl < nSuperLayers; ++sl) {
+    if (nGoodSL[sl] > 0) wgSL[sl] /= nGoodSL[sl];
+    B2DEBUG(m_debugLevel, "slyr,ngood,gain= " << sl << " " << nGoodSL[sl] << " " << wgSL[sl]);
+  }
+
+
+  //calculate mean gain over all wires
+  if (nGoodAll > 0) {
+    wgAll /= nGoodAll;
+  } else {
+    B2FATAL("No good wires !");
+  }
+  B2DEBUG(m_debugLevel, "ngoodAll,gain= " << nGoodAll << " " << wgAll);
+
+  //set gain also for bad/dead wires (bad/dead in terms of dE/dx pid)
+  for (int lyr = 0; lyr < nLyrs; ++lyr) {
+    int nWs = m_cdcgp->nWiresInLayer(lyr);
+    for (int w = 0; w < nWs; ++w) {
+      if (m_semiTotalGain[lyr][w] <= 0) {
+        if (wgL[lyr] > 0) {
+          m_semiTotalGain[lyr][w] = wgL[lyr];
+        } else {
+          WireID wid(lyr, w);
+          m_semiTotalGain[lyr][w] = wgSL[wid.getISuperLayer()];
+        }
+      }
+    }
+  }
+
+  //check if all gains > 0
+  for (int lyr = 0; lyr < nLyrs; ++lyr) {
+    int nWs = m_cdcgp->nWiresInLayer(lyr);
+    for (int w = 0; w < nWs; ++w) {
+      if (m_semiTotalGain[lyr][w] <= 0) {
+        B2WARNING("Gain for lyr and wire " << lyr << " " << w << "not > 0. Strange! Replace it with " << wgAll << ".");
+        m_semiTotalGain[lyr][w] = wgAll;
+      }
+    }
+  }
+
+//multiply common factor for all wires
   m_runGain = (*m_runGainFromDB)->getRunGain();
-  m_runGain *= m_overallGainFactor;
+  double cgain = (*m_gain0FromDB)->getScaleFactor();
+  B2DEBUG(m_debugLevel, "runGain, sf= " << m_runGain << " " << cgain);
+  cgain *= m_runGain * m_overallGainFactor;
+  for (int lyr = 0; lyr < nLyrs; ++lyr) {
+    int nWs = m_cdcgp->nWiresInLayer(lyr);
+    for (int w = 0; w < nWs; ++w) {
+      m_semiTotalGain[lyr][w] *= cgain;
+      B2DEBUG(m_debugLevel, "lyr,wire,gain= " << lyr << " " << w << " " << m_semiTotalGain[lyr][w]);
+    }
+  }
 }
+
 
 void CDCDigitizerModule::addXTalk()
 {

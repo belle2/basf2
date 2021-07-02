@@ -1,4 +1,3 @@
-/** @cond EEMMG */
 /*
  * integral.h - scalar integrals
  *
@@ -78,4 +77,3 @@ extern "C" {
 #endif /* USE_ONELOOP */
 
 #endif /* QUL_INTEGRAL_H */
-/** @endcond EEMMG */

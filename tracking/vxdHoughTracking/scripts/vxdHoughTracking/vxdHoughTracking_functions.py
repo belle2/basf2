@@ -41,6 +41,7 @@ def add_VXDHoughTracking(path,
                     SVDClustersStoreArrayName=svd_clusters,
                     finalOverlapResolverNameSVDClusters=svd_clusters,
                     refinerOverlapResolverNameSVDClusters=svd_clusters,
+                    RecoTracksStoreArrayName=reco_tracks,
 
                     relationFilter='angleAndTime',
                     relationFilterParameters={'AngleAndTimeThetaCutDeltaL0': 0.03,

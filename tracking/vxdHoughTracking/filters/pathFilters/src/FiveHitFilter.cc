@@ -24,11 +24,6 @@ void FiveHitFilter::exposeParameters(ModuleParamList* moduleParamList, const std
                                 m_param_helixFitPocaDCut);
 }
 
-void FiveHitFilter::beginRun()
-{
-  const double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
-}
-
 TrackFindingCDC::Weight
 FiveHitFilter::operator()(const BasePathFilter::Object& pair)
 {

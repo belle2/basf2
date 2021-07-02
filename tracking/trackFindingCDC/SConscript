@@ -9,6 +9,7 @@ env.Dictionary()['SUBLIB'] = True
 env['LIBS'] = [
     'tracking',
     'tracking_dataobjects',
+    'simulation_dataobjects',
     'geometry',
     'cdc', 'cdc_dataobjects',
     "mva", 'mva_dataobjects',

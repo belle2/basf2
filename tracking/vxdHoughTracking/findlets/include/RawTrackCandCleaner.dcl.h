@@ -32,6 +32,7 @@ namespace Belle2 {
       /// Parent class
       using Super =  TrackFindingCDC::Findlet<std::vector<AHit*>, SpacePointTrackCand>;
 
+      /// Shortcut definition for Result
       using Result = std::vector<TrackFindingCDC::WithWeight<const AHit*>>;
 
     public:
@@ -75,8 +76,6 @@ namespace Belle2 {
 
       /// maximum number of relations that can be created per track candidate
       uint m_param_maxRelations = 2000;
-
-      void initializeHists();
     };
 
   }

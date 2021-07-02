@@ -9,15 +9,9 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# ------------------------------------------------------------
-#
-# Minimal steering file to simulate the awesome detector
-#
-# Contributors: Martin Ritter
-#               Giacomo De Pietro
-#               Umberto Tamponi
-#
-# ------------------------------------------------------------
+'''
+Minimal steering file to simulate the awesome detector.
+'''
 
 import basf2 as b2
 

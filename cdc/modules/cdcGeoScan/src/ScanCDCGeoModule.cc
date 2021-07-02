@@ -5,13 +5,12 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-/******************************************************************
-* BASF2 (Belle II Analysis Software Framework)                    *
-* Copyright(C) YEAR Belle II Collaboration                        *
-*                                                                 *
-* Test module to get CDC geometry parameters into a .root files   *
-* To run this module use script: cdc/examples/runScanGeo.py       *
-*******************************************************************/
+
+/**************************************************************************
+ * Test module to get CDC geometry parameters into a .root files          *
+ * To run this module use script: cdc/examples/runScanGeo.py              *
+ **************************************************************************/
+
 #include <cdc/modules/cdcGeoScan/ScanCDCGeoModule.h>
 #include <geometry/GeometryManager.h>
 #include <framework/gearbox/GearDir.h>

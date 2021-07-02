@@ -8,10 +8,6 @@
 //+
 // File : DQMHistAnalysisOutputRelayMsg.cc
 // Description : DQM Output, send Canvases to jsroot server.
-//
-// Author : B. Spruck
-// Date : 25 - Mar - 2017
-// based on work from Tomoyuki Konno, Tokyo Metropolitan Univerisity
 //-
 
 

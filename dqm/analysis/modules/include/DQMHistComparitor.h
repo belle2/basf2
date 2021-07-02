@@ -8,9 +8,6 @@
 //+
 // File : DQMHistComparitor.h
 // Description :
-//
-// Author : Bjoern Spruck, Uni Mainz
-// Date : yesterday
 //-
 
 #pragma once

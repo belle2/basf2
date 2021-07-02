@@ -8,8 +8,6 @@
 //+
 // File : DQMHistAnalysisIP.h
 // Description : Median for IP position with delta histogramming
-//
-// Author : Björn Spruck
 //-
 
 #pragma once

@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisPXDCM.h
 // Description : DAQM Analysis for PXD Common Modes
-//
-// Author : Bjoern Spruck, University Mainz
-// Date : 2018
 //-
 
 #pragma once

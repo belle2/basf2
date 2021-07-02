@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisPXDFits.h
 // Description : An example module for DQM histogram analysis
-//
-// Author : Bjoern Spruck, University Mainz
-// Date : 2017
 //-
 
 #pragma once

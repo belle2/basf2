@@ -5,13 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : DQMHistAnalysisOutputNSM.cc
-// Description :
-//
-// Author : Tomoyuki Konno, Tokyo Metropolitan Univerisity
-// Date : 25 - Dec - 2015
-//-
 
 #include <dqm/analysis/modules/DQMHistAnalysisOutputNSM.h>
 

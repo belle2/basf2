@@ -8,10 +8,6 @@
 //+
 // File : DQMHistAnalysisInputPVSrv.h
 // Description : Input module for DQM Histogram analysis
-//
-// Author : B. Spruck
-// Date : 25 - Mar - 2017
-// based on work from Tomoyuki Konno, Tokyo Metropolitan Univerisity
 //-
 
 #pragma once

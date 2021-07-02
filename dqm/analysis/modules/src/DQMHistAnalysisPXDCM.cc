@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisPXDCM.cc
 // Description : Analysis of PXD Common Modes
-//
-// Author : Bjoern Spruck, University Mainz
-// Date : 2018
 //-
 
 

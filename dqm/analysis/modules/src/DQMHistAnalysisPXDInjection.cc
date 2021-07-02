@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisPXDInjection.cc
 // Description : DQM module, which gives histograms showing occupancies after injection
-//
-// Author : B. Spruck
-// Date : someday
 //-
 
 

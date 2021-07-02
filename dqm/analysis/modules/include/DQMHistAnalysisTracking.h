@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisTracking.h
 // Description : DQM Tracking Analysis
-//
-// Author : Bjoern Spruck, University Mainz
-// Date : 2019
 //-
 
 #pragma once

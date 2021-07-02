@@ -8,10 +8,6 @@
 //+
 // File : DQMHistAnalysisRooFitExample.h
 // Description : An example module for DQM histogram analysis
-//
-// Author : B. Spruck
-// Date : 25 - Mar - 2017
-// based on wrok from Tomoyuki Konno, Tokyo Metropolitan Univerisity
 //-
 
 #pragma once

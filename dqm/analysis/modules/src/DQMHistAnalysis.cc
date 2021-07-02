@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisModule.cc
 // Description : DQM histgram analysis module
-//
-// Author : Tomoyuki Konno, Tokyo Metropolitan Univerisity
-// Date : 20 - Dec - 2015
 //-
 
 #include <dqm/analysis/modules/DQMHistAnalysis.h>

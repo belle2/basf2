@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisPXDDAQ.h
 // Description : DAQM Analysis for PXD Data DAQ
-//
-// Author : Bjoern Spruck, University Mainz
-// Date : 2018
 //-
 
 #pragma once

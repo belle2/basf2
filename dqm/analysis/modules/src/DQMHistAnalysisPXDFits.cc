@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisPXDFits.cc
 // Description : DQM module, which fits many PXD histograms and writes out fit parameters in new histograms
-//
-// Author : Bjoern Spruck, University Mainz
-// Date : 5 - May - 2017
 //-
 
 

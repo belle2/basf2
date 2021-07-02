@@ -8,9 +8,6 @@
 //+
 // File : DAQMonitor.h
 // Description : Module to monitor raw data accumulating histos
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date :  5 - Sep - 2013
 //-
 
 #pragma once

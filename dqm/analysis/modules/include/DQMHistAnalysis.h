@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysis.h
 // Description : Histogram analysis module for DQM
-//
-// Author : Tomoyuki Konno, Tokyo Metropolitan University
-// Date : 25 - Dec - 2015 ; first commit
 //-
 
 #pragma once

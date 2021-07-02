@@ -5,14 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : DQMHistAnalysisInputSrv.cc
-// Description :
-//
-// Author : B. Spruck
-// Date : 25 - Mar - 2017
-// based on work from Tomoyuki Konno, Tokyo Metropolitan Univerisity
-//-
 
 #include <dqm/analysis/modules/DQMHistAnalysisInputSrv.h>
 

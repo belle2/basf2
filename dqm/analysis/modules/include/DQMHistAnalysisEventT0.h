@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisEventT0.h
 // Description : module for DQM histogram analysis of trigger jitter
-//
-// Author : Giulia Casarosa (PI),
-// Date : 20181128
 //-
 
 #pragma once

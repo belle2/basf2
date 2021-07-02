@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisV0.cc
 // Description : Overlay plotting for V0
-//
-// Author : Bryan Fulsom (PNNL), B Spruck
-// Date : 2019-01-17
 //-
 
 

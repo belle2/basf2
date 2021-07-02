@@ -8,10 +8,6 @@
 //+
 // File : DQMHistAnalysisRooFitExample.cc
 // Description : DQM Histogram analysis module, using roofit to fit the histogram
-//
-// Author : B. Spruck
-// Date : 25 - Mar - 2017
-// based on work from Tomoyuki Konno, Tokyo Metropolitan Univerisity
 //-
 
 

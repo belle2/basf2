@@ -8,9 +8,6 @@
 //+
 // File : DQMHistOutputToEPICS.cc
 // Description : Write Histogram Content to EPICS Arrays
-//
-// Author : Bjoern Spruck, University Mainz
-// Date : 2019
 //-
 
 

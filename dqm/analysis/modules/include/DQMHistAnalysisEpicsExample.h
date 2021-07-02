@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisEpicsExample.h
 // Description : An example module for DQM histogram analysis
-//
-// Author : Tomoyuki Konno, Tokyo Metroplitan Univerisity
-// Date : 25  - Dec - 2015 ; first commit
 //-
 
 #pragma once

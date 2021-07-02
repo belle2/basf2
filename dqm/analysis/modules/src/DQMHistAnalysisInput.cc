@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisInput.cc
 // Description :
-//
-// Author : Tomoyuki Konno, Tokyo Metropolitan Univerisity
-// Date : 25 - Dec - 2015
 //-
 
 

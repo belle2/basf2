@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisIP.cc
 // Description : Mean for IP position with delta histogramming
-//
-// Author : Bjoern Spruck, Mainz Univerisity
-// Date : 2019
 //-
 
 

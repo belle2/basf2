@@ -8,9 +8,6 @@
 //+
 // File : DQMHistDeltaHisto.h
 // Description :
-//
-// Author : Boqun Wang, MPI for Physics
-// Date : yesterday
 //-
 
 #pragma once

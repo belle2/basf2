@@ -8,9 +8,6 @@
 //+
 // File : V0ObjectsDQMModule.h
 // Description : Module to monitor displaced vertices
-//
-// Author : Bryan Fulsom PNNL
-// Date : 2019-01-17
 //-
 
 #include <framework/core/HistoModule.h>

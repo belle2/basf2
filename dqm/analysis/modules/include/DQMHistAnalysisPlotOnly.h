@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisPlotOnly.h
 // Description : Module for DQM Histogram analysis
-//
-// Author : B. Spruck
-// Date : 13 - Oct - 2017
 //-
 
 #pragma once

@@ -8,9 +8,6 @@
 //+
 // File : V0ObjectsDQMModule.cc
 // Description : Module to monitor displaced vertices on HLT
-//
-// Author : Bryan Fulsom, PNNL
-// Date : 2019-01-17
 //-
 
 #include <dqm/modules/V0ObjectsDQM/V0ObjectsDQMModule.h>

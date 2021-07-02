@@ -8,9 +8,6 @@
 ﻿//+
 // File : DQMHistAnalysisPlotOnly.cc
 // Description : DQM ANalalysis, plots a list of histograms into canvases
-//
-// Author : B. Spruck
-// Date : 13 - Oct - 2017
 //-
 
 

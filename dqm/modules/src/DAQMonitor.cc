@@ -8,9 +8,6 @@
 //+
 // File : DAQMonitor.cc
 // Description : Module to monitor raw data
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 2 - Aug - 2013
 //-
 
 /* Own header. */

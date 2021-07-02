@@ -5,15 +5,13 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 /**
  * This example prints the content of the DQM file with MonitoringObjects 
  * if "name" is set it only prints content of MonitoringObject with this name 
  * if "opt" is set to "draw" all canvases are shown
  *
  * run as: root -l intputfile.root printDQMFile.C
- *
- * Author: Luka Santelj, Feb. 2020 
- * (luka.santelj@ijs.si)
  */
 
 void printDQMFile(TString name="",TString opt=""){

@@ -8,9 +8,6 @@
 //+
 // File : PhysicsObjectsDQMModule.cc
 // Description : Module to monitor physics objects on HLT
-//
-// Author : Boqun Wang, University of Cincinnati
-// Date : May - 2018
 //-
 
 #include <dqm/modules/PhysicsObjectsDQM/PhysicsObjectsDQMModule.h>

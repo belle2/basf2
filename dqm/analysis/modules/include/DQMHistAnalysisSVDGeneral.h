@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisSVDGeneral.h
 // Description : module for DQM histogram analysis of SVD sensors occupancies
-//
-// Author : Giulia Casarosa (PI), Gaetano De Marino (PI)
-// Date : 20181128
 //-
 
 #pragma once

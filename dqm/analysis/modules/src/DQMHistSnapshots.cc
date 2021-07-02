@@ -5,12 +5,9 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-﻿//+
+//+
 // File : DQMHistSnapshots.cc
 // Description : DQM Histogram analysis module, generate snapshots of histograms
-//
-// Author : Boqun Wang, U. of Cincinnati
-// Date : yesterday
 //-
 
 

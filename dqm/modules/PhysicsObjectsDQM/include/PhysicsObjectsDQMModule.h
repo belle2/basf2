@@ -8,9 +8,6 @@
 //+
 // File : PysicsObjectsDQMModule.h
 // Description : Module to monitor physics objects
-//
-// Author : Boqun Wang, University of Cincinnati
-// Date :  May - 2018
 //-
 
 #include <framework/core/HistoModule.h>

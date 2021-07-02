@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisTracking.cc
 // Description : Analysis of Tracking
-//
-// Author : Bjoern Spruck, Univerisity Mainz
-// Date : 2018
 //-
 
 

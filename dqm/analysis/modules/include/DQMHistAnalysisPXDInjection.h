@@ -9,9 +9,6 @@
 // File : DQMHistAnalysisPXDInjection.h
 // Description : DQM module, which gives occupancies in time after injection
 // PXD specific per module plots without EPICS export
-//
-// Author: Björn Spruck
-// Date : Now
 //-
 
 #pragma once

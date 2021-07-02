@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisPXDDAQ.cc
 // Description : Analysis of PXD Reduction
-//
-// Author : Bjoern Spruck, Univerisity Mainz
-// Date : 2020
 //-
 
 

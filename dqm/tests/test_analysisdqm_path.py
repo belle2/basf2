@@ -5,14 +5,12 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 """
 Simple test script to check `analysisDQM.add_analysis_dqm` adds the modules it
 should, and runs without errors (or problematic database accesses).
 
 """
-
-# Sam Cunliffe
-# (but in case this test breaks, better check with Boqun and/or Longke)
 
 import basf2 as b2
 import b2test_utils

@@ -8,9 +8,6 @@
 //+
 // File : DQMHistInjection.h
 // Description : DQM module, which gives occupancies in time after injection
-//
-// Author: Björn Spruck
-// Date : Now
 //-
 
 #pragma once

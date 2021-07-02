@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisExampleFlags.cc
 // Description : Example code, creates a new "flag" histo in DQM analysis
-//
-// Author : Bjoern Spruck, Univerisity Mainz
-// Date : 2017
 //-
 
 

@@ -9,9 +9,6 @@
 // File : DQMHistAnalysisInputRootFile.cc
 // Description : Module for offline testing of histogram analysis code.
 //               Root file containing DQM histograms can be used as input.
-//
-// Author : Boqun Wang
-// Date : Jun - 2018
 //-
 
 

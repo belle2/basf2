@@ -8,10 +8,6 @@
 //+
 // File : DQMHistAnalysisOutputFile.cc
 // Description : DQM Analysis, dump histograms to file (as reference histograms)
-//
-// Author : B. Spruck
-// Date : 25 - Mar - 2017
-// based on work from Tomoyuki Konno, Tokyo Metropolitan Univerisity
 //-
 
 

@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisOut.h
 // Description : DQM Analysis, dump histograms to file (as reference histograms)
-//
-// Author : B. Spruck
-// Date : 11 - Dec - 2017 ; first commit
 //-
 
 #pragma once

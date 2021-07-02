@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisPXDCharge.h
 // Description : DQM Analysis for PXD Cluster Charges
-//
-// Author : Bjoern Spruck, University Mainz
-// Date : 2018
 //-
 
 #pragma once

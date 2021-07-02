@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisEventT0.cc
 // Description : module for DQM histogram analysis of SVD sensors occupancies
-//
-// Author : Giulia Casarosa (PI)
-// Date : 20210210
 //-
 
 

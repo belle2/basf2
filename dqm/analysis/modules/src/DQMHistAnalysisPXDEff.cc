@@ -8,8 +8,6 @@
 //+
 // File : DQMHistAnalysisPXDEff.cc
 // Description : DQM module, which gives histograms showing the efficiency of PXD sensors
-//
-// Author : Uwe Gebauer, Bjoern Spruck
 //-
 
 

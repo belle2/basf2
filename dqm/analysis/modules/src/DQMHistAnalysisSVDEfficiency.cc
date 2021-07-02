@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisSVDEfficiency.cc
 // Description : module for DQM histogram analysis of SVD sensors efficiencies
-//
-// Author : Giulia Casarosa (PI), Gaetano De Marino (PI)
-// Date : 20190428
 //-
 
 

@@ -8,10 +8,6 @@
 //+
 // File : DQMHistAnalysisOutputRelayMsg.h
 // Description : Output module for DQM Histogram analysis
-//
-// Author : B. Spruck
-// Date : 25 - Mar - 2017
-// based on wrok from Tomoyuki Konno, Tokyo Metropolitan Univerisity
 //-
 
 #pragma once

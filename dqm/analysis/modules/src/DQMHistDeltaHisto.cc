@@ -8,9 +8,6 @@
 //+
 // File : DQMHistDeltaHisto.cc
 // Description : DQM Histogram analysis module to generate delta histograms
-//
-// Author : Boqun Wang, MPI for physics
-// Date : yesterday
 //-
 
 

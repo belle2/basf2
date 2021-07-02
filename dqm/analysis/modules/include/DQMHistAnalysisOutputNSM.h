@@ -8,9 +8,6 @@
 //+
 // File : DQMHistAnalysisOut.h
 // Description : Output module to NSM vars for DQM Histogram analysis
-//
-// Author : Tomoyuki Konno, Tokyo Metropolitan University
-// Date : 25 - Dec - 2015 ; first commit
 //-
 
 #pragma once

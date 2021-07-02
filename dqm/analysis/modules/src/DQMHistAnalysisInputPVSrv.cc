@@ -8,9 +8,6 @@
 ﻿//+
 // File : DQMHistAnalysisInputPVSrv.cc
 // Description : DQM input module, convert epics PVs to histograms for analysis
-//
-// Author : B. Spruck
-// Date : 25 - Mar - 2017
 //-
 
 

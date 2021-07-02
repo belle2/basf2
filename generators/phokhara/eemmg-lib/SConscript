@@ -21,7 +21,7 @@ sources = dict(
         ql/qlI3sub.f ql/qlI4array.f ql/qlI4sub0m.f ql/qlI4sub1m.f \
         ql/qlI4sub2m.f ql/qlI4sub2ma.f ql/qlI4sub2mo.f ql/qlI4sub3m.f \
         ql/auxCD.f ql/qlzero.f ql/qltrisort.f ql/qlsnglsort.f ql/qlfndd.f \
-        ql/qlkfn.f ql/qllnrat.f ql/qlYcalc.f ql/ddilog.f \
+        ql/qlkfn.f ql/qllnrat.f ql/qlYcalc.f \
         ql/qltri1.f ql/qltri2.f ql/qltri3.f ql/qltri4.f ql/qltri5.f ql/qltri6.f \
         ql/qlbox1.f ql/qlbox2.f ql/qlbox3.f ql/qlbox4.f ql/qlbox5.f ql/qlbox6.f \
         ql/qlbox7.f ql/qlbox8.f ql/qlbox9.f ql/qlbox10.f \

@@ -15,9 +15,6 @@
 #  the reconstruction chain of the BKLM only
 #  (no KLMClusters or Muid related modules are used).
 #
-#  Contact: Giacomo De Pietro (2018)
-#           giacomo.depietro@roma3.infn.it
-#
 ########################################################
 
 import basf2

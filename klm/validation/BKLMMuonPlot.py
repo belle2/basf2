@@ -14,9 +14,6 @@
 #     Create several bklm validation plots                      #
 #     and store them in a root file                             #
 #                                                               #
-#    written by Leo Piilonen, VT                                #
-#    piilonen@vt.edu                                            #
-#                                                               #
 #################################################################
 
 """

@@ -14,9 +14,6 @@
 #    Script to simulate 2000 charged-muon single-track events   #
 #    using the ParticleGun for BKLM and EKLM validation.        #
 #                                                               #
-#    written by Leo Piilonen, VT                                #
-#    piilonen@vt.edu                                            #
-#                                                               #
 #################################################################
 
 """

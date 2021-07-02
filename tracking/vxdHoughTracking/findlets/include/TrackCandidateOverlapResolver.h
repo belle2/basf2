@@ -54,9 +54,6 @@ namespace Belle2 {
 
       /// Minimum of activityState of candidate required to be accepted by the algorithm.
       double m_param_minActivityState = 0.7;
-
-      /// Estimated amount of active candidates used to reserve enough space.
-      unsigned short m_estimatedActiveCandidates = 1000;
     };
 
   }

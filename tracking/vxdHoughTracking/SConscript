@@ -15,7 +15,6 @@ env['LIBS'] = [
     'framework',
     'svd_dataobjects',
     'vxd',
-    'vxd_dataobjects',
     '$ROOT_LIBS',
     ]
 

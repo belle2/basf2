@@ -26,7 +26,6 @@ void FiveHitFilter::exposeParameters(ModuleParamList* moduleParamList, const std
 
 void FiveHitFilter::beginRun()
 {
-  const double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
 }
 
 TrackFindingCDC::Weight

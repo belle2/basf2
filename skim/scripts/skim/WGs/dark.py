@@ -11,16 +11,6 @@
 
 """ Skim list building functions for the dark sector physics working group """
 
-__authors__ = [
-    "Sam Cunliffe",
-    "Michael De Nuccio",
-    "Ilya Komarov",
-    "Giacomo De Pietro",
-    "Miho Wakai",
-    "Savino Longo"
-]
-
-
 import basf2 as b2
 import modularAnalysis as ma
 import pdg

@@ -11,13 +11,6 @@
 
 """ Skim list building functions for the low multiplicity physics working group """
 
-__authors__ = [
-    "Xing-Yu Zhou",
-    "Hisaki Hayashii",
-    "Guanda Gong"
-]
-
-
 import modularAnalysis as ma
 from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdPi

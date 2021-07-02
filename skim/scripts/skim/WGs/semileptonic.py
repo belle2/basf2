@@ -12,12 +12,6 @@
 """(Semi-)Leptonic Working Group Skim list building functions for semi-leptonic analyses.
 """
 
-__authors__ = [
-    "Racha Cheaib",
-    "Hannah Wakeling",
-    "Phil Grace"
-]
-
 import modularAnalysis as ma
 from skim.standardlists.charm import (loadKForBtoHadrons, loadPiForBtoHadrons,
                                       loadStdD0, loadStdDplus, loadStdDstar0,

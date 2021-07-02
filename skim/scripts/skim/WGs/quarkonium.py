@@ -11,12 +11,6 @@
 
 """ Skim list building functions for quarkonium analyses: bottomonium, charmonium, resonance """
 
-__authors__ = [
-    "Stefano Spataro"
-    "Sen Jia"
-    "..."
-]
-
 import modularAnalysis as ma
 from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdMu

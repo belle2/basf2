@@ -13,12 +13,6 @@
 (Semi-)Leptonic Working Group Skims for missing energy modes that use the `FullEventInterpretation` (FEI) algorithm.
 """
 
-__authors__ = [
-    "Racha Cheaib",
-    "Hannah Wakeling",
-    "Phil Grace"
-]
-
 from functools import lru_cache, wraps
 
 import basf2 as b2

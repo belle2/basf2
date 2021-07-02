@@ -12,13 +12,6 @@
 """(Semi-)Leptonic Working Group Skims for leptonic analyses.
 """
 
-__authors__ = [
-    "Sophie Hollit",
-    "Racha Cheaib",
-    "Hannah Wakeling",
-    "Phil Grace"
-]
-
 import modularAnalysis as ma
 from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdMu

@@ -148,10 +148,6 @@ for producing a production request and combined steering file is as follows:
     $ %(prog)s Registry_MC13.yaml SkimStats.json -N 1 -l ewp_local.py -s EWP --data -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
 """
 
-__author__ = "Phil Grace, Racha Cheaib"
-__email__ = "philip.grace@adelaide.edu.au, rachac@mail.ubc.ca"
-
-
 import argparse
 from functools import lru_cache
 from itertools import product, zip_longest

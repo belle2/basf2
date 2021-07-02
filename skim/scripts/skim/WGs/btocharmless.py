@@ -13,10 +13,6 @@
 Skim list building functions for :math:`B\\to X_u +h` analyses
 """
 
-__authors__ = [
-    "Fernando Abudinen", "Riccardo Manfredi", "Sebastiano Raiz", "Benedikt Wach"
-]
-
 import modularAnalysis as ma
 from skim import BaseSkim, fancy_skim_header
 from stdV0s import stdKshorts

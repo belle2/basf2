@@ -15,14 +15,6 @@ where :math:`X_c` stays for :math:`D^0`, :math:`D^{\\pm}`, :math:`D^{*0}` and :m
 and :math:`h` stays for :math:`\\pi^{\\pm}`, :math:`K^{\\pm}`, :math:`\\rho^{\\pm}` and :math:`a_1^{\\pm}`.
 """
 
-__authors__ = [
-    "Fernando Abudinen",
-    "Hulya Atmacan",
-    "Chiara La Licata",
-    "Minakshi Nayak",
-    "Niharika Rout"
-]
-
 import modularAnalysis as ma
 from skim.standardlists.charm import (loadD0_hh_loose, loadD0_Kshh_loose,
                                       loadD0_Kspi0_loose, loadD0_Kspipipi0,

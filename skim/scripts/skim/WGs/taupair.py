@@ -11,10 +11,6 @@
 
 """ Skim list building functions for tau-pair analyses """
 
-__authors__ = [
-    "Kenji Inami"
-]
-
 import modularAnalysis as ma
 from skim.standardlists.lightmesons import (loadStdAllF_0, loadStdAllKstar0,
                                             loadStdAllPhi, loadStdAllRho0)

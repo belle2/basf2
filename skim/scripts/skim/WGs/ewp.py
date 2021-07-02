@@ -16,10 +16,6 @@ B->Xgamma, B->Xll, B->Xll (LFV modes)
 
 """
 
-__authors__ = [
-    "Trevor Shillington"
-]
-
 import basf2 as b2
 import modularAnalysis as ma
 from skim import BaseSkim, fancy_skim_header

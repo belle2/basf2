@@ -29,11 +29,6 @@ The functions ``printToJson``, ``printToScreen``, ``printToConfluence``, and
 ``printToMarkdown`` handle all the output of the statistics tables.
 """
 
-
-__author__ = "Phil Grace, Racha Cheaib"
-__email__ = "philip.grace@adelaide.edu.au, rachac@mail.ubc.ca"
-
-
 import argparse
 from functools import lru_cache
 from itertools import product

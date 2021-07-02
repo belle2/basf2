@@ -20,9 +20,6 @@ from optparse import OptionParser
 # by uncommenting root output module lines
 #
 # run as: basf2 beast/examples/digitize.py -- -f inputfile -o outputfile
-#
-# Author: Luka Santelj
-# Date: 15.2.2018
 # --------------------------------------------------------------------
 
 parser = OptionParser()

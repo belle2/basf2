@@ -14,9 +14,6 @@
 # Builds beast2 geometry and uses particle gun module to shoot particles
 # Uncomment the lines related to the display module to show the detector geometry
 # Simulation output hits are stored into "beast_test.root"
-#
-# Author: Luka Santelj
-# Date: 15.2.2018
 # -------------------------------------------------------------------------------------
 
 import basf2 as b2

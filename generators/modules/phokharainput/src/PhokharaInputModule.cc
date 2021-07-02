@@ -1,6 +1,6 @@
 /************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2014  Belle II Collaboration                              *
+* Copyright(C) 2020  Belle II Collaboration                              *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
 * Contributors: Torben Ferber                                            *
@@ -28,11 +28,11 @@ REG_MODULE(PhokharaInput)
 PhokharaInputModule::PhokharaInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)
 {
   //Set module properties
-  setDescription("Generates radiative return events with PHOKHARA.");
+  setDescription("Generates radiative return events with PHOKHARA 10.");
 
   //Parameter definition
   addParam("FinalState", m_finalState,
-           "Final state: mu+mu-(0, default), pi+pi-(1), 2pi0pi+pi-(2), 2pi+2pi-(3), ppbar(4), nnbar(5), K+K-(6), K0K0bar(7), pi+pi-pi0(8), lamb(->pi-p)lambbar(->pi+pbar)(9), eta pi+ pi- (10)",
+           "Final state:  mu+mu-(0), pi+pi-(1), 2pi0pi+pi-(2), 2pi+2pi-(3), ppbar(4), nnbar(5), K+K-(6), K0K0bar(7), pi+pi-pi0(8), lamb(->pi-p)lambbar(->pi+pbar)(9), eta pi+ pi- (10), chi_c1 production (11), chi_c2 production (12), pi0 g (13), eta g (14), etaP g (15)",
            1);
   addParam("ReplaceMuonsByVirtualPhoton", m_replaceMuonsByVirtualPhoton,
            "Replace muons by a virtual photon (for FinalState == 0 only).",
@@ -40,11 +40,13 @@ PhokharaInputModule::PhokharaInputModule() : Module(), m_initial(BeamParameters:
   addParam("SearchMax", m_nSearchMax, "Number of events used to search for maximum of differential cross section", 100000);
   addParam("Epsilon", m_epsilon, "Soft/hard photon separator", 0.0001);
   addParam("nMaxTrials", m_nMaxTrials, "Maximum trials per event", 10000);
+  addParam("Weighted", m_weighted, "generate weighted events", 0);
 
-  addParam("LO", m_LO, "LO: 1ph(0, default), Born: 0ph(1), only Born: 0ph(-1)", 0);
-  addParam("NLO", m_NLO, "NLO, for 1ph only: off(0, default), on(1)", 0);
+  addParam("LO", m_LO, "ph0  Born: 1ph(0), Born: 0ph(1), only Born: 0ph(-1)", 0);
+  addParam("NLO", m_NLO, "1 photon : Born(0), NLO(1)", 0);
+  addParam("FullNLO", m_fullNLO, "full NLO : No(0), Yes(1). Allowed only for ph0=1, nlo=1, fsr=2, fsrnlo=1", 0);
   addParam("QED", m_QED, "ISR only(0, default), ISR+FSR(1), ISR+INT+FSR(2)", 0);
-  addParam("NLOIFI", m_NLOIFI, "IFI, NLO only: off(0, default), on(1)", 0);
+  addParam("IFSNLO", m_IFSNLO, "IFSNLO: no(0), yes(1)", 0);
   addParam("Alpha", m_alpha, "Vacuum polarization switch: off (0), on (1,[by Fred Jegerlehner], default), on (2,[by Thomas Teubner])",
            1);
   addParam("PionFF", m_pionff, "Pion FF: KS PionFormFactor(0, default), GS old 1), GS new(2)", 0);
@@ -54,6 +56,12 @@ PhokharaInputModule::PhokharaInputModule() : Module(), m_initial(BeamParameters:
            "Kaon FF: KaonFormFactor constrained(0, default), KaonFormFactor unconstrained(1) KaonFormFactor old(2)", 0);
   addParam("NarrowRes", m_narres, "Only for m_finalState = 0,1,6,7: No narrow resonances (0, default), J/Psi (1) and Psi(2S) (2)", 0);
   addParam("ProtonFF", m_protonff, "ProtonFormFactor old(0), ProtonFormFactor new(1)", 1);
+  addParam("ChiSW", m_chi_sw,
+           "chi_sw: Radiative return(0), Chi production(1), Radiative return + Chi production (2). Works only for pion=11 and pion=12.", 0);
+  addParam("SwitchBeamResolution", m_be_r,
+           "be_r: without beam resolution(0), with beam resolution(1). Works only for pion=11 and pion=12; (0) assumes exact CMS-Energy, (1) each beam ennergy (=CMS-Energy/2) is smeared with Gaussian distribution of the given variance=BeamResolution**2.",
+           0);
+  addParam("BeamResolution", m_beamres, "beamres - beam resolution for pion==11 and pion==12 only", 0.);
 
   addParam("ScatteringAngleRangePhoton", m_ScatteringAngleRangePhoton,
            "Min [0] and Max [1] value for the scattering angle of photons [deg], default (0, 180)", make_vector(0.0, 180.0));
@@ -71,8 +79,11 @@ PhokharaInputModule::PhokharaInputModule() : Module(), m_initial(BeamParameters:
   addParam("MinEnergyGamma", m_MinEnergyGamma, "Minimal photon energy/missing energy, must be greater than 0.0098 * CMS energy [GeV]",
            0.15);
 
-  addParam("ParameterFile", m_ParameterFile, "File that contain particle properties",
-           FileSystem::findFile("/data/generators/phokhara/const_and_model_paramall9.1.dat"));
+  const std::string defaultParameterFile =
+    FileSystem::findFile("/data/generators/phokhara/const_and_model_paramall10.0.dat");
+  addParam("ParameterFile", m_ParameterFile,
+           "File that contains particle properties.",
+           defaultParameterFile);
   addParam("BeamEnergySpread", m_BeamEnergySpread,
            "Simulate beam-energy spread (initializes PHOKHARA for every "
            "event - very slow).", false);
@@ -107,12 +118,19 @@ void PhokharaInputModule::initialize()
               "should be set to 0 (ISR only). If FSR is taken into account "
               "(QED = 1 or 2), the results will be incorrect.");
     }
-    if (m_NLOIFI != 0) {
+    if (m_IFSNLO != 0) {
       B2FATAL("You requested to replace muons by a virtual photon. In this "
-              "mode, PHOKHARA works as an ISR generator. The parameter NLOIFI "
+              "mode, PHOKHARA works as an ISR generator. The parameter IFSNLO "
               "should be set to 0 (off). If simultaneous emission of initial "
-              "and final-state photons is taken into account (NLOIFI = 1), "
+              "and final-state photons is taken into account (IFSNLO = 1), "
               "the results will be incorrect.");
+    }
+  }
+  if (m_finalState == 11 || m_finalState == 12) {
+    if (m_narres != 1 || m_LO != 0 || m_NLO != 0) {
+      B2FATAL("Generation of the chi_c1 or chi_c2 (final states 11 and 12, "
+              "respectively) requires to turn on the J/psi (NarrowRes = 1) "
+              "and use LO radiative-return mode (LO = 0, NLO = 0)");
     }
   }
   //Beam Parameters, initial particle - PHOKHARA cannot handle beam energy spread
@@ -139,6 +157,8 @@ void PhokharaInputModule::event()
     }
   }
 
+  StoreObjPtr<EventMetaData> evtMetaData("EventMetaData", DataStore::c_Event);
+
   // initial particle from beam parameters
   const MCInitialParticles& initial = m_initial.generate();
 
@@ -159,9 +179,11 @@ void PhokharaInputModule::event()
     m_generator.init(m_ParameterFile);
     initLogCapture.finish();
   }
-  m_generator.generateEvent(m_mcGraph, vertex, boost);
+  double weight = m_generator.generateEvent(m_mcGraph, vertex, boost);
   m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 
+  //store the weight (1.0 for unweighted events)
+  evtMetaData->setGeneratedWeight(weight);
 }
 
 
@@ -183,20 +205,26 @@ void PhokharaInputModule::initializeGenerator()
   m_generator.setCMSEnergy(m_cmsEnergy);
 
   m_generator.setNSearchMax(m_nSearchMax);
+  m_generator.setWeighted(m_weighted);
   m_generator.setFinalState(m_finalState);
   m_generator.setReplaceMuonsByVirtualPhoton(m_replaceMuonsByVirtualPhoton);
   m_generator.setNMaxTrials(m_nMaxTrials);
   m_generator.setEpsilon(m_epsilon);
   m_generator.setLO(m_LO);
   m_generator.setNLO(m_NLO);
+  m_generator.setFullNLO(m_fullNLO);
   m_generator.setQED(m_QED);
-  m_generator.setNLOIFI(m_NLOIFI);
+  m_generator.setIFSNLO(m_IFSNLO);
   m_generator.setAlpha(m_alpha);
   m_generator.setPionFF(m_pionff);
   m_generator.setKaonFF(m_kaonff);
   m_generator.setPionStructure(m_pionstructure);
   m_generator.setNarrowRes(m_narres);
   m_generator.setProtonFF(m_protonff);
+  m_generator.setChiSW(m_chi_sw);
+  m_generator.setSwitchBeamResolution(m_be_r);
+  m_generator.setBeamResolution(m_beamres);
+
 
   m_generator.setMinInvMassHadronsGamma(m_MinInvMassHadronsGamma);
   m_generator.setm_MinInvMassHadrons(m_MinInvMassHadrons);

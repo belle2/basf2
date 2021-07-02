@@ -1,4 +1,3 @@
-/** @cond EEMMG */
 /*
  * cache.h - cache classes header
  *
@@ -274,4 +273,3 @@ insertMinorN(2)
 #undef insertMinorN
 
 #endif /* _QUL_CACHE_H */
-/** @endcond EEMMG */

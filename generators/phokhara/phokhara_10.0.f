@@ -1,16 +1,17 @@
 c ======================================================================== c
 c                                                                          c
 c Monte Carlo event generator for simulation of hadron or muon production  c
-c with or witjout radiated photons in e+e- collisions at high luminosity   c
+c with or without radiated photons in e+e- collisions at high luminosity   c
 c meson factories                                                          c
 c                                                                          c 
-c                         PHOKHARA version 9.1                             c
+c                         PHOKHARA version 10.0                             c
 c                                                                          c
-c                           (December 2014)                                c
+c                           (October 2020)                                c
 c                                                                          c
 c simulates the production of two, three or four pions, two muons,         c
 c two nucleons, two kaons, two lambdas (with their subsequent decays into  c
-c pion and proton) or eta-pi-pi together  with zero, one or two hard       c
+c pion and proton), eta-pi-pi, pi0-gamma, eta-gamma or etaP-gamma     c
+c  together  with zero, one or two hard       c
 c photons emitted from the initial state (ISR); it includes virtual and    c
 c soft photon corrections to single photon emission at NLO and virtual and c
 c soft photon corrections to zero photon emission at NNLO. It includes FSR c
@@ -140,11 +141,27 @@ c           contains complete NLO radiative corrections                    c
 c        to e+e- -> mu+ mu- gamma reaction                                 c
 c                                                                          c
 c  The upgrade to  PHOKHARA 9.1                                            c
-c    H. Czyz,  J.H.Kuehn,  S. Tracz  arXiv:1407.7995v2                     c
-c  contains new form factors in e+e- -> p pbar gamma                       c
-c                         and   e+e- -> n nbar gamma reactions             c
-c    and FSR corrections in e+e- -> p pbar gamma reaction                  c
+c    H. Czyz,  J.H.Kuehn,  S. Tracz, Phys.Rev. D90 (2014) no.11, 114021    c
 c                                                                          c
+c  The upgrade to PHOKHARA 9.2                                             c 
+c    H. Czyz,  J.H.Kuehn,  S. Tracz, Phys.Rev. D94 (2016) no.3, 034033     c                                  
+c                                                                          c  
+c   New channel was added - production of chi_c1 and chic2                 c
+c                                                                          c
+c  The upgrade to PHOKHARA 9.3                                             c 
+c    H. Czyz,  P.Kisza,  S. Tracz,     Phys.Rev.D 97 (2018) 1, 016006 [arXiv:1711.00820]                      c                                   
+c                                                                          c  
+c   New channel was added - pi0 (eta,etaP) gamma                           c
+c                                                                          c
+c   The upgrade to PHOKHARA 10.0                                           c
+c    F. Campanario, H. Czyz, J. Gluza, T. Jelinski, G. Rodrigo,            c
+c    S. Tracz and D. Zhuridov  Phys.Rev.D 100 (2019) 7, 076004                           c
+c                                                                          c
+c     Complete NLO radiative corrections to e+ e- -> pi+ pi- gamma reaction    c
+c      were added                                                          c
+c
+c
+c
 c Further reading concerning the radiative return method and the PHOKHARA  c
 c event generator:                                                         c    
 c     A Chapter in a review:                                               c
@@ -187,43 +204,19 @@ c        Acta Phys.Polon.B40:3185-3192,2009.                               c
 c     H.Czyz, A.Grzelinska                                                 c
 c        Nucl.Phys.Proc.Suppl. 218 (2011) 201-206                          c
 c     S. Tracz, H.Czyz, Acta Phys.Polon. B44 (2013) 11, 2281-2287          c
+c     S. Tracz, H.Czyz, Acta Phys.Polon. B46 (2015) no.11, 2273            c
 c ======================================================================== c
-c  version 9.1: (c) December 2014,  http://ific.uv.es/~rodrigo/phokhara/   c
+c  version 10.0: (c) October 2020,  http://ific.uv.es/~rodrigo/phokhara/  c
 c ======================================================================== c
 
-      ! ========================================================================
-      !  added by Torben Ferber, 2015
-      ! ========================================================================
-      subroutine phokhara_setparamfile(param_file, file_len)                                                                                                                                                                    
-      implicit none
-      byte           param_file(250)
-      integer        file_len, i
-      character*250  parameterfile
-      common / paramfile / parameterfile
-      write (parameterfile,'(250a)') (param_file(i),i=1,file_len)
-      end
+      subroutine phokhara(MODE,XPAR,NPAR) bind(c) !TF added subroutine and parameters for extern C call
+      use, intrinsic :: iso_c_binding
+      use belle2_phokhara_interface
+      include 'phokhara_10.0.inc'
 
-
-      ! ========================================================================
-      !  added by Torben Ferber, 2015
-      ! ========================================================================
-      subroutine phokhara_setinputfile(input_file, file_len)
-      implicit none
-      byte           input_file(250)
-      integer        file_len, i
-      character*250  inputfile
-      common / infile / inputfile
-      write (inputfile,'(250a)') (input_file(i),i=1,file_len)
-      end
-
-      ! ========================================================================                                                                                       
-      subroutine phokhara(MODE,XPAR,NPAR) !TF added subroutine and parameters for extern C call
-
-      include 'phokhara_9.1.inc'
-
-      integer MODE !TF, steering of weight calculation, generation and finalization
-      real*8 XPAR(0:99) !TF, real parameters
-      integer NPAR(0:99) !TF, integer parameters
+      integer(c_int) MODE !TF, steering of weight calculation, generation and finalization
+      real(c_double) XPAR(0:99) !TF, real parameters
+      integer(c_int) NPAR(0:99) !TF, integer parameters
 
       integer BNPHOT,BNHAD !TF
       double precision BP1(0:3),BQ1(0:3),BP2(0:9,0:5),BPHOT(0:1,0:3) !TF
@@ -241,41 +234,45 @@ c ======================================================================== c
 
       real*8 int2ph,int2ph_err,inte,inte_s,int1ph,
      & int1ph_err,intezero,int0ph,int0ph_err
-      real*8 sum_MC,sum_MC_err
+      real*8 sum_MC,sum_MC_err,energi_m
       integer nm,i,s_seed(0:104)
-      integer*8 nges,k,j
+      integer*8 nges,k,j,n_ph
       character outfile*20
 
-      integer nmaxtrials !TF                                                                                                                                          
-      common / maxtrials / nmaxtrials !TF                                                                                                                              
-      integer nmaxsearch !TF                                                                                                                                           
-      common / maxsearch / nmaxsearch !TF                                                                                                                              
-c      integer*8 nges !TF                                                                                                                                              
+      integer nmaxtrials !TF
+      common / maxtrials / nmaxtrials !TF
+      integer nmaxsearch !TF
+      common / maxsearch / nmaxsearch !TF
       common / eventcount / nges !TF
-      
+
       common / intsigma / int2ph,int2ph_err,int1ph,
-     & int1ph_err,int0ph,int0ph_err !TF
-      
+     & int1ph_err,int0ph,int0ph_err !T
+
       integer acc !TF
       
       real*8 ecm !TF
       common / beam / ecm !TF
-
 c
       common/muonfsr/inte
       common/virtsoft/inte_s
       common/zeroph/intezero
+      
+      
 c
+c      open(16,file='cross1.dat',ACCESS='append')
+c      open(17,file='cross2.dat',ACCESS='append')
 c --- reads the seed ------
 c      open(9,file='seed.dat',status='old')
+c      open(10,file='phokhara.out')!,status='new')
 c      read(9,*)s_seed
 c      call rlxdresetf(s_seed)
 c      call rlxdinit(1,32767)    
 c --- input parameters ----------------------------
+      
 
       if(MODE.eq.-1)then
       
-	nmaxtrials = NPAR(1)  ! maximum number of trials per event
+        nmaxtrials = NPAR(1)  ! maximum number of trials per event
         nmaxsearch = NPAR(2)  ! events used to search cross section maximum
         pion       = NPAR(20) ! final state (very intuitive name...)
         ph0        = NPAR(30) ! Born: 1ph(0)radiative return; Born: 0ph(1) scan
@@ -288,27 +285,31 @@ c --- input parameters ----------------------------
         f0_model   = NPAR(37) ! f0+f0(600): KK model(0), no structure(1), no f0+f0(600)(2), f0 KLOE(3)
         narr_res   = NPAR(38) ! no narrow resonances (0), J/Psi (1), Psi(2S) (2) (narro resonances only for pion = 0, 1, 6, 7
         FF_pp      = NPAR(39) ! ProtonFormFactor old(0), ProtonFormFactor new(1)        
+        nlo2       = NPAR(40) ! full NLO : No(0), Yes(1)
+        chi_sw     = NPAR(50) ! Radiative return(0), Chi production(1), Radiative return + Chi production (2).
+        be_r       = NPAR(51) ! Chi production without beam resolution(0), with beam resolution(1)
         
         ecm        = XPAR(0)  ! CMS energy
         w          = XPAR(11) ! soft photon cutoff
         q2min      = XPAR(15) ! minimal  hadrons(muons)-gamma-inv mass squared 
         q2_min_c   = XPAR(16) ! minimal inv. mass squared of the hadrons(muons)
-	q2_max_c   = XPAR(17) ! maximal inv. mass squared of the hadrons(muons)
-	gmin       = XPAR(18) ! minimal photon energy/missing energy             
-	phot1cut   = XPAR(20) ! minimal photon angle/missing momentum angle
-	phot2cut   = XPAR(21) ! maximal photon angle/missing momentum angle
-	pi1cut     = XPAR(22) ! minimal hadrons(muons) angle
-	pi2cut     = XPAR(23) ! maximal hadrons(muons) angle
-	
+        q2_max_c   = XPAR(17) ! maximal inv. mass squared of the hadrons(muons)
+        gmin       = XPAR(18) ! minimal photon energy/missing energy
+        phot1cut   = XPAR(20) ! minimal photon angle/missing momentum angle
+        phot2cut   = XPAR(21) ! maximal photon angle/missing momentum angle
+        pi1cut     = XPAR(22) ! minimal hadrons(muons) angle
+        pi2cut     = XPAR(23) ! maximal hadrons(muons) angle
+        pi2cut     = XPAR(23) ! maximal hadrons(muons) angle
+        beamres    = XPAR(30) ! beam resolution for pion==11 and pion==12 only
+        
         call input(nges,nm,outfile)
 
         nges=0
       endif
+c      energi_m=sqrt(Sp)
 
 c --- open output file for generated momenta ------
-!       if((iprint.ne.0).and.(MODE.eq.-1)) then
-        !open (10,file=outfile,status='new')
-!       endif
+!      if(iprint.ne.0) open (10,file=outfile,status='new')
 
       if(MODE.eq.-1) then
 c --- print run data ------------------------------
@@ -316,75 +317,91 @@ c --- print run data ------------------------------
 
       if(ph0.eq.0)then
       if (pion.eq.0) then 
-         write(*,*) '     PHOKHARA 9.1 : e^+ e^- -> mu^+ mu^- gamma'
+         write(*,*) '     PHOKHARA 10.0 : e^+ e^- -> mu^+ mu^- gamma'
       elseif (pion.eq.1) then
-         write(*,*) '     PHOKHARA 9.1: e^+ e^- -> pi^+ pi^- gamma'    
+         write(*,*) '     PHOKHARA 10.0: e^+ e^- -> pi^+ pi^- gamma' 
       elseif (pion.eq.2) then
          write(*,*) 
-     1    '   PHOKHARA 9.1: e^+ e^- -> pi^+ pi^- 2pi^0 gamma'        
+     1    '   PHOKHARA 10.0: e^+ e^- -> pi^+ pi^- 2pi^0 gamma' 
       elseif (pion.eq.3) then
          write(*,*) 
-     1    '   PHOKHARA 9.1: e^+ e^- -> 2pi^+ 2pi^- gamma' 
+     1    '   PHOKHARA 10.0: e^+ e^- -> 2pi^+ 2pi^- gamma'
       elseif (pion.eq.4) then
          write(*,*) 
-     1    '   PHOKHARA 9.1: e^+ e^- -> p pbar gamma' 
+     1    '   PHOKHARA 10.0: e^+ e^- -> p pbar gamma' 
       elseif (pion.eq.5) then
          write(*,*) 
-     1    '   PHOKHARA 9.1: e^+ e^- -> n nbar gamma'                
+     1    '   PHOKHARA 10.0: e^+ e^- -> n nbar gamma'  
       elseif (pion.eq.6) then
          write(*,*) 
-     1    '   PHOKHARA 9.1: e^+ e^- -> K^+ K^- gamma'                
+     1    '   PHOKHARA 10.0: e^+ e^- -> K^+ K^- gamma' 
       elseif (pion.eq.7) then
          write(*,*) 
-     1    '   PHOKHARA 9.1: e^+ e^- -> K_0 K_0bar gamma'                
+     1    '   PHOKHARA 10.0: e^+ e^- -> K_0 K_0bar gamma'    
       elseif (pion.eq.8) then
          write(*,*)
-     1    '   PHOKHARA 9.1: e^+ e^- -> pi^+ pi^- pi^0 gamma'                
+     1    '   PHOKHARA 10.0: e^+ e^- -> pi^+ pi^- pi^0 gamma'  
       elseif (pion.eq.9) then
-         write(*,*) 'PHOKHARA 9.1 : e^+ e^- ->'
+         write(*,*) 'PHOKHARA 10.0 : e^+ e^- ->'
       write(*,*)'  Lambda (-> pi^- p) Lambda bar (-> pi^+ pbar) gamma'
       elseif (pion.eq.10) then
          write(*,*)
-     1    '   PHOKHARA 9.1: e^+ e^- -> pi^+ pi^- eta gamma'                
+     1    '   PHOKHARA 10.0: e^+ e^- -> pi^+ pi^- eta gamma'
+         elseif(pion.eq.11) then
+      write(*,*) 'PHOKHARA 10.0 : Chi_c1 production'
+         elseif(pion.eq.12) then   
+      write(*,*) 'PHOKHARA 10.0 : Chi_c2 production'
+         elseif(pion.eq.13) then   
+      write(*,*) 'PHOKHARA 10.0 : e^+ e^- -> pi^0  gamma gamma' 
+         elseif(pion.eq.14) then   
+      write(*,*) 'PHOKHARA 10.0 : e^+ e^- -> eta  gamma gamma'
+         elseif(pion.eq.15) then   
+      write(*,*) 'PHOKHARA 10.0 : e^+ e^- -> etaP  gamma gamma'
       else 
-         write(*,*) '     PHOKHARA 9.1: not yet implemented'
+         write(*,*) '     PHOKHARA 10.0: not yet implemented'
          stop        
       endif
       endif
       if((ph0.eq.1).or.(ph0.eq.-1))then
       if (pion.eq.0) then 
-         write(*,*) '     PHOKHARA 9.1 : e^+ e^- -> mu^+ mu^-'
+         write(*,*) '     PHOKHARA 10.0 : e^+ e^- -> mu^+ mu^-'
       elseif (pion.eq.1) then
-         write(*,*) '     PHOKHARA 9.1: e^+ e^- -> pi^+ pi^-'    
+         write(*,*) '     PHOKHARA 10.0: e^+ e^- -> pi^+ pi^-'
       elseif (pion.eq.2) then
          write(*,*) 
-     1    '   PHOKHARA 9.1: e^+ e^- -> pi^+ pi^- 2pi^0'        
+     1    '   PHOKHARA 10.0: e^+ e^- -> pi^+ pi^- 2pi^0' 
       elseif (pion.eq.3) then
          write(*,*) 
-     1    '   PHOKHARA 9.1: e^+ e^- -> 2pi^+ 2pi^-' 
+     1    '   PHOKHARA 10.0: e^+ e^- -> 2pi^+ 2pi^-' 
       elseif (pion.eq.4) then
          write(*,*) 
-     1    '   PHOKHARA 9.1: e^+ e^- -> p pbar' 
+     1    '   PHOKHARA 10.0: e^+ e^- -> p pbar' 
       elseif (pion.eq.5) then
          write(*,*) 
-     1    '   PHOKHARA 9.1: e^+ e^- -> n nbar'                
+     1    '   PHOKHARA 10.0: e^+ e^- -> n nbar'  
       elseif (pion.eq.6) then
          write(*,*) 
-     1    '   PHOKHARA 9.1: e^+ e^- -> K^+ K^-'                
+     1    '   PHOKHARA 10.0: e^+ e^- -> K^+ K^-' 
       elseif (pion.eq.7) then
          write(*,*) 
-     1    '   PHOKHARA 9.1: e^+ e^- -> K_0 K_0bar'                
+     1    '   PHOKHARA 10.0: e^+ e^- -> K_0 K_0bar' 
       elseif (pion.eq.8) then
          write(*,*)
-     1    '   PHOKHARA 9.1: e^+ e^- -> pi^+ pi^- pi^0'                
+     1    '   PHOKHARA 10.0: e^+ e^- -> pi^+ pi^- pi^0'  
       elseif (pion.eq.9) then
-         write(*,*) 'PHOKHARA 9.1 : e^+ e^- ->'
+         write(*,*) 'PHOKHARA 10.0 : e^+ e^- ->'
       write(*,*)'  Lambda (-> pi^- p) Lambda bar (-> pi^+ pbar)'
       elseif (pion.eq.10) then
          write(*,*)
-     1    '   PHOKHARA 9.1: e^+ e^- -> pi^+ pi^- eta'                
+     1    '   PHOKHARA 10.0: e^+ e^- -> pi^+ pi^- eta'
+      elseif(pion.eq.13) then   
+      write(*,*) 'PHOKHARA 10.0 : e^+ e^- -> pi^0 gamma'
+      elseif(pion.eq.14) then   
+      write(*,*) 'PHOKHARA 10.0 : e^+ e^- -> eta gamma'
+      elseif(pion.eq.15) then   
+      write(*,*) 'PHOKHARA 10.0 : e^+ e^- -> etaP gamma' 
       else 
-         write(*,*) '     PHOKHARA 9.1: not yet implemented'
+         write(*,*) '     PHOKHARA 10.0: not yet implemented'
          stop        
       endif
       endif
@@ -403,7 +420,7 @@ c --------------------------------
      &                 phot1cut,',',phot2cut
         endif
 c --------------------------------
-      if (pion.eq.0) then 
+      if((pion.eq.0).or.(pion.eq.11).or.(pion.eq.12)) then 
          write(*,110)'angular cuts on muons                  = ',
      &                 pi1cut,',',pi2cut
       elseif (pion.eq.4) then 
@@ -421,12 +438,21 @@ c --------------------------------
       elseif (pion.eq.10) then 
          write(*,110)'angular cuts on pions and eta          = ',
      &                 pi1cut,',',pi2cut
+      elseif(pion.eq.13)then
+         write(*,110)'angular cuts on pion                  = ',
+     &                 pi1cut,',',pi2cut
+      elseif(pion.eq.14)then
+         write(*,110)'angular cuts on eta                  = ',
+     &                 pi1cut,',',pi2cut
+      elseif(pion.eq.15)then
+         write(*,110)'angular cuts on etaP                  = ',
+     &                 pi1cut,',',pi2cut
       else
          write(*,110)'angular cuts on pions                  = ',
      &                 pi1cut,',',pi2cut
       endif
       if(ph0.eq.0)then
-         if (pion.eq.0) then  
+         if ((pion.eq.0).or.(pion.eq.11).or.(pion.eq.12)) then  
          write(*,*)'min. muons-tagged photon inv.mass^2    = ',
      &                 q2min,' GeV^2' 
          elseif (pion.eq.4) then  
@@ -444,6 +470,15 @@ c --------------------------------
          elseif (pion.eq.10) then  
          write(*,*)' min. pi-pi-eta-tagged photon inv.mass^2 = ',
      &                 q2min,' GeV^2' 
+         elseif (pion.eq.13) then  
+         write(*,*)' min. pion-tagged photon inv.mass^2 = ',
+     &                 q2min,' GeV^2'
+         elseif (pion.eq.14) then  
+         write(*,*)' min. eta-tagged photon inv.mass^2 = ',
+     &                 q2min,' GeV^2'
+         elseif (pion.eq.15) then  
+         write(*,*)' min. etaP-tagged photon inv.mass^2 = ',
+     &                 q2min,' GeV^2' 
          else
          write(*,*)'min. pions-tagged photon inv.mass^2    = ',	 
      &                 q2min,' GeV^2' 
@@ -460,7 +495,7 @@ c --- set cuts ------------------------------------
       cos2max =  1.d0                        !                           
       cos3min = -1.d0                        ! hadrons/muons angle limits    
       cos3max =  1.d0                        ! in their rest frame
-      if (pion.eq.0) then                    ! virtual photon energy cut 
+      if ((pion.eq.0).or.(pion.eq.11).or.(pion.eq.12)) then                    ! virtual photon energy cut 
          qqmin = 4.d0*mmu*mmu
       elseif (pion.eq.1) then
          qqmin = 4.d0*mpi*mpi
@@ -482,6 +517,12 @@ c --- set cuts ------------------------------------
          qqmin = 4.d0*mlamb*mlamb
       elseif (pion.eq.10) then
          qqmin = (2.d0*mpi+meta)**2
+      elseif (pion.eq.13) then
+         qqmin = (mpi0f)**2
+      elseif (pion.eq.14) then
+         qqmin = (metaf)**2
+      elseif (pion.eq.15) then
+         qqmin = (metaP)**2
        else
          continue
       endif
@@ -497,7 +538,16 @@ c -------------------
          write(*,*)' Q^2_min TOO SMALL'
          write(*,*)' Q^2_min CHANGED BY PHOKHARA = ',qqmin,' GeV^2'
          write(*,*)'------------------------------'
-      endif       
+      endif
+      
+        if((pion.eq.13).or.(pion.eq.14).or.(pion.eq.15))then
+         write(*,*)'-- in modes pion=13,14,15,  --'
+         write(*,*)'--  Q^2_min = (m_P)^2 is used in generation  -- ' 
+         write(*,*)'-- Please put your cuts when selecting events  --'
+         write(*,*)' Q^2_min CHANGED BY PHOKHARA = ',qqmin,' GeV^2'
+         write(*,*)'------------------------------'
+        endif
+            
 c -------------------
       if(qqmax.le.qqmin)then
          write(*,*)' Q^2_max to small '
@@ -507,7 +557,7 @@ c -------------------
       endif
 c -------------------
       if(ph0.eq.0)then
-      if (pion.eq.0) then
+      if((pion.eq.0).or.(pion.eq.11).or.(pion.eq.12)) then
          write(*,100) 'minimal muon-pair invariant mass^2     = ',
      &                 qqmin,' GeV^2'
          write(*,100) 'maximal muon-pair invariant mass^2     = ',
@@ -536,17 +586,32 @@ c -------------------
          write(*,100) 'minimal three-pion invariant mass^2    = ',
      &                 qqmin,' GeV^2'
          write(*,100) 'maximal three-pion invariant mass^2    = ',
-     &                 qqmax,' GeV^2'     
+     &                 qqmax,' GeV^2'
       elseif(pion.eq.9)then
          write(*,100) 'minimal lambda-pair invariant mass^2  = ',
      &                 qqmin,' GeV^2'
          write(*,100) 'maximal lambda-pair invariant mass^2  = ',
-     &                 qqmax,' GeV^2'     
+     &                 qqmax,' GeV^2' 
       elseif(pion.eq.10)then
          write(*,100) 'minimal pi-pi-eta invariant mass^2  = ',
      &                 qqmin,' GeV^2'
          write(*,100) 'maximal pi-pi-eta invariant mass^2  = ',
-     &                 qqmax,' GeV^2'     
+     &                 qqmax,' GeV^2' 
+      elseif(pion.eq.13)then
+         write(*,100) 'minimal pion - photon invariant mass^2  = ',
+     &                 qqmin,' GeV^2'
+         write(*,100) 'maximal pion - photon invariant mass^2  = ',
+     &                 qqmax,' GeV^2'
+      elseif(pion.eq.14)then
+         write(*,100) 'minimal eta - photon invariant mass^2  = ',
+     &                 qqmin,' GeV^2'
+         write(*,100) 'maximal eta - photon invariant mass^2  = ',
+     &                 qqmax,' GeV^2'
+      elseif(pion.eq.15)then
+         write(*,100) 'minimal etaP - photon invariant mass^2  = ',
+     &                 qqmin,' GeV^2'
+         write(*,100) 'maximal etaP - photon invariant mass^2  = ',
+     &                 qqmax,' GeV^2'
       else
          write(*,100) 'minimal four-pion invariant mass^2     = ',
      &                 qqmin,' GeV^2'
@@ -583,17 +648,32 @@ c -------------------
          write(*,100) 'minimal three-pion invariant mass^2    = ',
      &                 qqmin,' GeV^2'
          write(*,100) 'maximal three-pion invariant mass^2    = ',
-     &                 Sp,' GeV^2'     
+     &                 Sp,' GeV^2'  
       elseif(pion.eq.9)then
          write(*,100) 'minimal lambda-pair invariant mass^2  = ',
      &                 qqmin,' GeV^2'
          write(*,100) 'maximal lambda-pair invariant mass^2  = ',
-     &                 Sp,' GeV^2'     
+     &                 Sp,' GeV^2' 
       elseif(pion.eq.10)then
          write(*,100) 'minimal pi-pi-eta invariant mass^2  = ',
      &                 qqmin,' GeV^2'
          write(*,100) 'maximal pi-pi-eta invariant mass^2  = ',
-     &                 Sp,' GeV^2'     
+     &                 Sp,' GeV^2'
+       elseif(pion.eq.13)then
+         write(*,100) 'minimal pion - photon invariant mass^2  = ',
+     &                 qqmin,' GeV^2'
+         write(*,100) 'maximal pion - photon invariant mass^2  = ',
+     &                 Sp,' GeV^2'
+       elseif(pion.eq.14)then
+         write(*,100) 'minimal eta - photon invariant mass^2  = ',
+     &                 qqmin,' GeV^2'
+         write(*,100) 'maximal eta - photon invariant mass^2  = ',
+     &                 Sp,' GeV^2'
+       elseif(pion.eq.15)then
+         write(*,100) 'minimal etaP - photon invariant mass^2  = ',
+     &                 qqmin,' GeV^2'
+         write(*,100) 'maximal etaP - photon invariant mass^2  = ',
+     &                 Sp,' GeV^2'  
       else
          write(*,100) 'minimal four-pion invariant mass^2     = ',
      &                 qqmin,' GeV^2'
@@ -602,6 +682,21 @@ c -------------------
       endif
       endif
 c -------------------
+      if(be_r.eq.0)then
+      continue
+      elseif(be_r.eq.1)then
+          if((pion.eq.11).or.(pion.eq.12))then
+            write(*,*) 'Beam resolution is included'
+            continue
+          else
+      write(*,*) 'Beam resolution allowed only for pion=11 or pion=12'
+      stop 
+      endif
+      else
+      write(*,*) 'Wrong be_r switch'
+      stop
+      endif
+ 
       if(ph0.eq.-1)then
          write(*,*) 'Born'
       elseif(ph0.eq.0)then
@@ -632,6 +727,23 @@ c -------------------
         write(*,*)'please contact the authors'
         stop
       endif
+
+        if(((pion.eq.11).or.(pion.eq.12)).and.(nlo.ne.0))then
+        write(*,*) 'WRONG NLO flag'
+        write(*,*)'only nlo=0 allowed for chi production'
+        write(*,*)'If you feel that you need better precision'
+        write(*,*)'please contact the authors'
+       stop
+       endif
+     
+        if(((pion.eq.11).or.(pion.eq.12)).and.(ph0.ne.0))then
+         write(*,*) 'WRONG NLO flag'
+        write(*,*)'only ph0=0 allowed for chi production'
+        write(*,*)'please contact the authors'
+       stop
+       endif
+
+       
 
 c------------------
        if((ph0.eq.1).and.(fsr.ne.0))then
@@ -685,13 +797,77 @@ c-----------------------
            endif
          endif
         endif
-        endif 
+        endif
+
 c--------------
+c pi+pi-
+      if(pion.eq.1)then
+        if(nlo2.eq.1)then
+          if((fsr.eq.2).and.(fsrnlo.eq.1).and.
+     1 (nlo.eq.1).and.(ph0.eq.0))then
+             continue
+          else
+        write(*,*)'only ph0=0, nlo=1,frs=2 and fsrnlo=1
+     1  is allowed for nlo2=1'
+            stop
+          endif
+        endif
+      endif
+
+      if((ph0.eq.0).and.(pion.eq.1))then
+      if(((fsr.eq.1).or.(fsr.eq.2)).and.(fsrnlo.eq.0))then
+c          if(fsr.eq.1) write(10,*) 'ISR+FSR'
+c          if(fsr.eq.2) write(10,*) 'ISR+INT+FSR'
+        continue
+       elseif((fsr.eq.1).and.(fsrnlo.eq.1))then
+c          if(fsrnlo.eq.1) write(10,*) 'IFSNLO included'
+         continue
+       elseif((fsr.eq.0).and.(fsrnlo.eq.0))then
+        continue
+       else
+        if(nlo2.eq.1)then
+        write(*,*)'full NLO'
+           continue
+        else
+        write(*,*)'WRONG combination of FSR, FSRNLO flags'
+        stop
+        endif
+       endif
+
+          if (fsr.eq.0) then
+         write(*,*) 'ISR only'
+       elseif (fsr.eq.1) then
+         write(*,*) 'ISR+FSR'
+       elseif (fsr.eq.2) then
+         if (nlo.eq.0) then
+            write(*,*) 'ISR+INT+FSR'
+         else
+             if(nlo2.eq.1)then
+                 continue
+             else
+         write(*,*)
+     1   'WRONG FSR flag: interference is included only for nlo=0'
+         stop
+             endif
+         endif
+       else
+          write(*,*)'WRONG FSR flag', fsr
+         stop
+       endif
+         if(fsrnlo.eq.1) then
+            write(*,*)'IFSNLO included'
+         endif
+        
+      endif
+c
+c ------------------
+
+c---------------------------------------------------------------------
 c
       if(ph0.eq.0)then
       if (nlo.eq.1) write(*,*) 
      &                'NLO:    soft photon cutoff w           = ',w
-      if ((pion.eq.1).or.(pion.eq.4).or.(pion.eq.6)) then
+      if ((pion.eq.4).or.(pion.eq.6)) then
 c
        if(((fsr.eq.1).or.(fsr.eq.2)).and.(fsrnlo.eq.0))then
         continue
@@ -703,8 +879,8 @@ c
         write(*,*)'WRONG combination of FSR, FSRNLO flags'
         stop
        endif
-c
-c ------------------
+
+
        if (fsr.eq.0) then
          write(*,*) 'ISR only'
        elseif (fsr.eq.1) then
@@ -728,7 +904,7 @@ c ------------------
         if((fsr.eq.0).and.(fsrnlo.eq.0))then
          write(*,*)'ISR only'
         else
-          if(pion.eq.0) then 
+          if((pion.eq.0).or.(pion.eq.1) )then 
           continue
           else
         write(*,*)'FSR is implemented only for pi+pi-, mu+mu-,K+K- and
@@ -757,6 +933,7 @@ c ------------------
         write(*,*)'WRONG vacuum polarization switch'
         stop      
       endif
+       
 c -----------------
       if(pion.eq.1)then
         if(FF_pion.eq.0)then
@@ -823,10 +1000,12 @@ c --- TF copy some of them to the common block ------
         ccos3max = cos3max
 
       endif !endif MODE.e1.-1
+
 c
 c =================================================
+c --- finding the maximum -------------------------
       if(MODE.eq.-1)then
-      
+
       do i = 1,3
          Mmax(i-1) = 1.d0
          gross(i-1) = 0.d0
@@ -853,6 +1032,7 @@ c =================================================
       count(0) = 0.d0
       count(1) = 0.d0
       count(2) = 0.d0
+
 c                                                                                                                                                            
       int2ph = 0.d0
       int2ph_err = 0.d0
@@ -861,37 +1041,46 @@ c
       int1ph_err=0.d0
 c
       int0ph = 0d0
-      int0ph_err = 0d0      
+      int0ph_err = 0d0
+c
+c =================================================
+c --- beginning the MC loop event generation ------
       
       do j = 1,nmaxsearch
           
-         call phokhara_rndmarray(Ar_r,1)
+         call ranlxdf(Ar_r,1)
          Ar(1) = Ar_r(0)
-
+ 
          if (Ar(1).le.(Mmax(0)/(Mmax(1)+Mmax(2)+Mmax(0)))) then 
             count(0)=count(0)+1
-            call gen_0ph(i,cqqmin,Sp,ccos3min,ccos3max,acc)
+            call gen_0ph(i,qqmin,Sp,cos3min,cos3max,acc)
            int0ph = int0ph + intezero
            int0ph_err = int0ph_err + intezero*intezero
          elseif(Ar(1).le.(Mmax(0)+Mmax(1))
      &            /(Mmax(1)+Mmax(2)+Mmax(0)))then
+            
             count(1) = count(1)+1.d0
-            call gen_1ph(i,cqqmin,cqqmax,ccos1min,ccos1max,
-     &	         ccos3min,ccos3max,acc)
-c
+            call gen_1ph(i,qqmin,qqmax,cos1min,cos1max,
+     &          cos3min,cos3max,acc)
+            
+   
          int1ph=int1ph + inte_s
          int1ph_err=int1ph_err + inte_s*inte_s
-c
+         
+
          else
             count(2) = count(2)+1.d0
-            call gen_2ph(i,cqqmin,ccos1min,ccos1max,
-     &           ccos2min,ccos2max,ccos3min,ccos3max,acc)
+            call gen_2ph(i,qqmin,cos1min,cos1max,
+     &           cos2min,cos2max,cos3min,cos3max,acc)
            int2ph=int2ph + inte
            int2ph_err=int2ph_err + inte*inte
          endif
 
-      enddo
+
+       
+      enddo    
 c --- end of the MC loop --------------------------
+
 c =================================================
 c --- for the second run ---
       if (i.eq.1) then
@@ -899,6 +1088,7 @@ c --- for the second run ---
          Mmax(1) = gross(1)+.05d0*Sqrt(gross(1)*gross(1))
          Mmax(2) = gross(2)+(.03d0+.02d0*Sp)*Sqrt(gross(2)*gross(2)) 
 c 
+       
          if((pion.eq.1).and.(fsrnlo.eq.1)) Mmax(2)=Mmax(2)*1.5d0
          if((pion.eq.0).and.(fsrnlo.eq.1)) Mmax(2)=Mmax(2)*1.5d0
 
@@ -913,41 +1103,44 @@ c
           Mmax(1)=Mmax(1)*1.08d0
           Mmax(2)=Mmax(2)*1.1d0
          endif
+         if((pion.eq.13).or.(pion.eq.14).or.(pion.eq.15))then
+            Mmax(1)=Mmax(1)*1.5d0
+         endif
       endif
-      
+
       tr(0) = 0.d0
-      tr(1) = 0.d0      
+      tr(1) = 0.d0
       tr(2) = 0.d0
-      
+
       count(0) = 0.d0
       count(1) = 0.d0
       count(2) = 0.d0
-c                                                                                                                                                            
+c
       int2ph = 0.d0
       int2ph_err = 0.d0
-c                                                                                                                                                            
+c
       int1ph=0.d0
       int1ph_err=0.d0
 c
       int0ph = 0d0
-      int0ph_err = 0d0      
-      
+      int0ph_err = 0d0
+
       nges=0 !TF number of generated events
-      
+
       endif !TF MODE.eq.-1
-      
-c =================================================      
+
+c =================================================
       if(MODE.eq.1)then
       i=2
-      
+
       do j = 1,nmaxtrials
-          
-         call phokhara_rndmarray(Ar_r,1)
+
+         call ranlxdf(Ar_r,1)
          Ar(1) = Ar_r(0)
-         
+
          acc=0
 
-         if (Ar(1).le.(Mmax(0)/(Mmax(1)+Mmax(2)+Mmax(0)))) then 
+         if (Ar(1).le.(Mmax(0)/(Mmax(1)+Mmax(2)+Mmax(0)))) then
             count(0)=count(0)+1
             call gen_0ph(i,cqqmin,Sp,ccos3min,ccos3max,acc)
            int0ph = int0ph + intezero
@@ -956,7 +1149,7 @@ c =================================================
      &            /(Mmax(1)+Mmax(2)+Mmax(0)))then
             count(1) = count(1)+1.d0
             call gen_1ph(i,cqqmin,cqqmax,ccos1min,ccos1max,
-     &	         ccos3min,ccos3max,acc)
+     &          ccos3min,ccos3max,acc)
 c
          int1ph=int1ph + inte_s
          int1ph_err=int1ph_err + inte_s*inte_s
@@ -968,9 +1161,9 @@ c
            int2ph=int2ph + inte
            int2ph_err=int2ph_err + inte*inte
          endif
-         
+
          nges=nges+1
-         
+
          if(acc.eq.1) then
            call belle2event
            goto 600
@@ -982,7 +1175,7 @@ c
 
 
       if(MODE.eq.2)then
-      
+
       if(pion.eq.9)then
          Mmax(0) = Mmax(0) * (1.d0 + alpha_lamb)**2 * ratio_lamb**2
          Mmax(1) = Mmax(1) * (1.d0 + alpha_lamb)**2 * ratio_lamb**2
@@ -997,6 +1190,7 @@ c --- value of the cross section ------------------
       dsigm0 = 0.d0
       dsigm1 = 0.d0
       dsigm2 = 0.d0
+       
       if ((ph0.eq.0).and.(nlo.eq.0)) then 
             sigma1 = Mmax(1)/count(1)*tr(1)
             dsigm1 = 
@@ -1032,6 +1226,8 @@ c --- value of the cross section ------------------
       endif
          sigma = sigma0+sigma1+sigma2
          dsigm = dSqrt(dsigm0**2+dsigm1**2+dsigm2**2) 
+
+        
 
 c-----------------------------------------------------------------------                                                                                     
 c                                                                                                                                       
@@ -1083,11 +1279,10 @@ c --- output --------------------------------------
       write(*,*) int(tr(2)),      ' two photon events accepted of '
       write(*,*) int(count(2)),   ' events generated'
       write(*,*)
-c
+
       write(*,*) 'sigma0(nbarn) = ',sigma0,' +- ',dsigm0
       write(*,*) 'sigma1(nbarn) = ',sigma1,' +- ',dsigm1
       write(*,*) 'sigma2(nbarn) = ',sigma2,' +- ',dsigm2
-c      
       write(*,*) 'sigma (nbarn) = ',sigma, ' +- ',dsigm
       write(*,*)
       write(*,*) 'maximum0 = ',gross(0),'  minimum1 = ',klein(0)
@@ -1098,8 +1293,12 @@ c
       write(*,*) 'Mmax2    = ',Mmax(2)            
       write(*,*) '----------------------------------------------------'
 
+  200 FORMAT('',A16,G20.10E3,A15,G20.10E3)
+  201 FORMAT('',A16,G20.10E3)
+      
+c      write(16,*) energi_m,sigma,dsigm,sigma0,dsigm0,sigma1,dsigm1
 
-
+c      
       if(pion.ne.9)then
       write(*,*)'Monte Carlo integrand'
       write(*,*)'sigma0_MC(nbarn) = ',int0ph,'+-',int0ph_err 
@@ -1107,21 +1306,25 @@ c
       write(*,*)'sigma2_MC(nbarn) = ',int2ph,'+-',int2ph_err
       write(*,*)'sigma_MC (nbarn) = ',sum_MC,'+-',sum_MC_err
       endif
-      
+
       endif !TF end MODE.eq.2
       
  600  continue     
+       
+c      write(17,*) energi_m,sum_MC,sum_MC_err,int0ph,int0ph_err,
+c     1 int1ph,int1ph_err
+      
   
  100  format (a42,f10.6,a6)
  110  format (a42,f6.1,a1,f6.1)
 c --- saves the new seed --------------------------
 
-c      close (9,DISP='delete')
+c      close (9,STATUS='delete')
 c      open(9,file='seed.dat',status='new')
 
 c      call rlxdgetf(s_seed)
 c      write(9,*)s_seed
-
+c      enddo
       end
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       
@@ -1165,88 +1368,111 @@ c Mode  lambda (-> pi^- p) lambda bar (-> pi^+ pbar) (pion=9)
 c Mode eta pi+  pi-  (pion=10)
 c
       subroutine writeevent()
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
 
-      write(10,*),'-------------------------------------------'
-      write(10,*),'Photon1:',momenta(3,0),momenta(3,1),
+      write(10,*)'-------------------------------------------'
+      if(pion.lt.13)then
+      write(10,*)'Photon1:',momenta(3,0),momenta(3,1),
      &   momenta(3,2),momenta(3,3)
-      write(10,*),'Photon2:',momenta(4,0),momenta(4,1),
+      write(10,*)'Photon2:',momenta(4,0),momenta(4,1),
      &   momenta(4,2),momenta(4,3)
-      if (pion.eq.0) then 
-         write(10,*),'Mu+:    ',momenta(6,0),momenta(6,1),
+      endif
+      if ((pion.eq.0).or.(pion.eq.11).or.(pion.eq.12)) then 
+         write(10,*)'Mu+:    ',momenta(6,0),momenta(6,1),
      &      momenta(6,2),momenta(6,3)
-         write(10,*),'Mu-:    ',momenta(7,0),momenta(7,1),
+         write(10,*)'Mu-:    ',momenta(7,0),momenta(7,1),
      &      momenta(7,2),momenta(7,3)
       elseif(pion.eq.1)then
-         write(10,*),'Pi+:    ',momenta(6,0),momenta(6,1),
+         write(10,*)'Pi+:    ',momenta(6,0),momenta(6,1),
      &      momenta(6,2),momenta(6,3)
-         write(10,*),'Pi-:    ',momenta(7,0),momenta(7,1),
+         write(10,*)'Pi-:    ',momenta(7,0),momenta(7,1),
      &      momenta(7,2),momenta(7,3)
       elseif(pion.eq.2)then
-         write(10,*),'Pi0:    ',momenta(6,0),momenta(6,1),
+         write(10,*)'Pi0:    ',momenta(6,0),momenta(6,1),
      &      momenta(6,2),momenta(6,3)
-         write(10,*),'Pi0:    ',momenta(7,0),momenta(7,1),
+         write(10,*)'Pi0:    ',momenta(7,0),momenta(7,1),
      &      momenta(7,2),momenta(7,3)
-         write(10,*),'Pi-:    ',momenta(8,0),momenta(8,1),
+         write(10,*)'Pi-:    ',momenta(8,0),momenta(8,1),
      &      momenta(8,2),momenta(8,3)
-         write(10,*),'Pi+:    ',momenta(9,0),momenta(9,1),
+         write(10,*)'Pi+:    ',momenta(9,0),momenta(9,1),
      &      momenta(9,2),momenta(9,3)
       elseif(pion.eq.3)then
-         write(10,*),'Pi+:    ',momenta(6,0),momenta(6,1),
+         write(10,*)'Pi+:    ',momenta(6,0),momenta(6,1),
      &      momenta(6,2),momenta(6,3)
-         write(10,*),'Pi-:    ',momenta(7,0),momenta(7,1),
+         write(10,*)'Pi-:    ',momenta(7,0),momenta(7,1),
      &      momenta(7,2),momenta(7,3)
-         write(10,*),'Pi-:    ',momenta(8,0),momenta(8,1),
+         write(10,*)'Pi-:    ',momenta(8,0),momenta(8,1),
      &      momenta(8,2),momenta(8,3)
-         write(10,*),'Pi+:    ',momenta(9,0),momenta(9,1),
+         write(10,*)'Pi+:    ',momenta(9,0),momenta(9,1),
      &      momenta(9,2),momenta(9,3)
       elseif(pion.eq.4)then
-         write(10,*),'Pbar:    ',momenta(6,0),momenta(6,1),
+         write(10,*)'Pbar:    ',momenta(6,0),momenta(6,1),
      &      momenta(6,2),momenta(6,3)
-         write(10,*),'P:    ',momenta(7,0),momenta(7,1),
+         write(10,*)'P:    ',momenta(7,0),momenta(7,1),
      &      momenta(7,2),momenta(7,3)
       elseif(pion.eq.5)then
-         write(10,*),'Nbar:    ',momenta(6,0),momenta(6,1),
+         write(10,*)'Nbar:    ',momenta(6,0),momenta(6,1),
      &      momenta(6,2),momenta(6,3)
-         write(10,*),'N:    ',momenta(7,0),momenta(7,1),
+         write(10,*)'N:    ',momenta(7,0),momenta(7,1),
      &      momenta(7,2),momenta(7,3)
       elseif(pion.eq.6)then
-         write(10,*),'K+:    ',momenta(6,0),momenta(6,1),
+         write(10,*)'K+:    ',momenta(6,0),momenta(6,1),
      &      momenta(6,2),momenta(6,3)
-         write(10,*),'K-:    ',momenta(7,0),momenta(7,1),
+         write(10,*)'K-:    ',momenta(7,0),momenta(7,1),
      &      momenta(7,2),momenta(7,3)
       elseif(pion.eq.7)then
-         write(10,*),'KL:    ',momenta(6,0),momenta(6,1),
+         write(10,*)'KL:    ',momenta(6,0),momenta(6,1),
      &      momenta(6,2),momenta(6,3)
-         write(10,*),'KS:    ',momenta(7,0),momenta(7,1),
+         write(10,*)'KS:    ',momenta(7,0),momenta(7,1),
      &      momenta(7,2),momenta(7,3)
       elseif(pion.eq.8)then
-         write(10,*),'Pi+:    ',momenta(6,0),momenta(6,1),
+         write(10,*)'Pi+:    ',momenta(6,0),momenta(6,1),
      &      momenta(6,2),momenta(6,3)
-         write(10,*),'Pi-:    ',momenta(7,0),momenta(7,1),
+         write(10,*)'Pi-:    ',momenta(7,0),momenta(7,1),
      &      momenta(7,2),momenta(7,3)
-         write(10,*),'Pi0:    ',momenta(8,0),momenta(8,1),
+         write(10,*)'Pi0:    ',momenta(8,0),momenta(8,1),
      &      momenta(8,2),momenta(8,3)
       elseif(pion.eq.9)then
-         write(10,*),'Lambda bar:    ',momenta(6,0),momenta(6,1),
+         write(10,*)'Lambda bar:    ',momenta(6,0),momenta(6,1),
      &      momenta(6,2),momenta(6,3)
-         write(10,*),'Lambda:    ',momenta(7,0),momenta(7,1),
+         write(10,*)'Lambda:    ',momenta(7,0),momenta(7,1),
      &      momenta(7,2),momenta(7,3)
-         write(10,*),'Pi+:    ',momenta(8,0),momenta(8,1),
+         write(10,*)'Pi+:    ',momenta(8,0),momenta(8,1),
      &      momenta(8,2),momenta(8,3)
-         write(10,*),'Pbar:   ',momenta(9,0),momenta(9,1),
+         write(10,*)'Pbar:   ',momenta(9,0),momenta(9,1),
      &      momenta(9,2),momenta(9,3)
-         write(10,*),'Pi-:    ',momenta(10,0),momenta(10,1),
+         write(10,*)'Pi-:    ',momenta(10,0),momenta(10,1),
      &      momenta(10,2),momenta(10,3)
-         write(10,*),'P:    ',momenta(11,0),momenta(11,1),
+         write(10,*)'P:    ',momenta(11,0),momenta(11,1),
      &      momenta(11,2),momenta(11,3)
       elseif(pion.eq.10)then
-         write(10,*),'eta:    ',momenta(6,0),momenta(6,1),
+         write(10,*)'eta:    ',momenta(6,0),momenta(6,1),
      &      momenta(6,2),momenta(6,3)
-         write(10,*),'Pi+:    ',momenta(7,0),momenta(7,1),
+         write(10,*)'Pi+:    ',momenta(7,0),momenta(7,1),
      &      momenta(7,2),momenta(7,3)
-         write(10,*),'Pi-:    ',momenta(8,0),momenta(8,1),
+         write(10,*)'Pi-:    ',momenta(8,0),momenta(8,1),
      &      momenta(8,2),momenta(8,3)
+      elseif(pion.eq.13)then
+        write(10,*)'Photon1:',momenta(7,0),momenta(7,1),
+     &   momenta(7,2),momenta(7,3)
+      write(10,*)'Photon2:',momenta(3,0),momenta(3,1),
+     &   momenta(3,2),momenta(3,3)
+      write(10,*)'Pi0:    ',momenta(6,0),momenta(6,1),
+     &      momenta(6,2),momenta(6,3)
+      elseif(pion.eq.14)then
+        write(10,*)'Photon1:',momenta(7,0),momenta(7,1),
+     &   momenta(7,2),momenta(7,3)
+      write(10,*)'Photon2:',momenta(3,0),momenta(3,1),
+     &   momenta(3,2),momenta(3,3)
+      write(10,*)'eta:    ',momenta(6,0),momenta(6,1),
+     &      momenta(6,2),momenta(6,3)
+      elseif(pion.eq.15)then
+       write(10,*)'Photon1:',momenta(7,0),momenta(7,1),
+     &   momenta(7,2),momenta(7,3)
+      write(10,*)'Photon2:',momenta(3,0),momenta(3,1),
+     &   momenta(3,2),momenta(3,3)
+      write(10,*)'etaP:    ',momenta(6,0),momenta(6,1),
+     &      momenta(6,2),momenta(6,3)
       else
        continue
       endif 
@@ -1256,28 +1482,30 @@ c ======================================================================
 c --- generates 0 photon ---------------------------------------------
 c ======================================================================
       subroutine gen_0ph(i,qqmin,qqmax,cos3min,cos3max,acc)
-      include 'phokhara_9.1.inc'
+      use belle2_phokhara_interface
+      include 'phokhara_10.0.inc'
       real*8 Ar(14),Ar_r(0:13),z,inte,amplit,pom
       real*8 qqmin,qqmax,qq,jac4,helicityampLO,Matrix 
       real*8 q0p,q2p,q0b,q2b,jac0,cos3min,cos3max,cos1,phi1
-     & ,jac1,cos3,phi3
+     & ,jac1,cos3,phi3,qqii
       real*8 costhm_ll,phim_ll,costhp_ll,phip_ll,intezero
-      complex*16 Hadronic(0:3,0:3)
-      integer i,ru
-      logical accepted
+      complex*16 Hadronic(0:3,0:3),pionggFF_dprime
+      integer i,ru,ll
+      logical accepted    
       integer acc
       common/zeroph/intezero
-      call phokhara_rndmarray(Ar_r,7)
+      call ranlxdf(Ar_r,7)
       do ru=0,6
        Ar(ru+1)=Ar_r(ru)
-      enddo      
-      
-      acc=0
+      enddo  
+
+      acc = 0
 
 c --- get the variables ---------------------------
 c
        call qquadrat_0(qqmin,qqmax,cos3min,cos3max,Ar
      1,Sp,q0p,q2p,q0b,q2b,cos3,phi3,jac4)
+
 c
       z = Mmax(0)*Ar(6)
 c --- real photon1 ---
@@ -1294,7 +1522,8 @@ c virtual part
 
 c --- 4-momenta in the CMS frame ---
       if((pion.le.1).or.(pion.eq.4).or.(pion.eq.5).or.(pion.eq.6)
-     1              .or.(pion.eq.7).or.(pion.eq.9))then
+     1              .or.(pion.eq.7).or.(pion.eq.9).or.(pion.eq.13).or.
+     2 (pion.eq.14).or.(pion.eq.15))then
        call hadronmomenta_0ph(Sp,cos3,phi3)
        call HadronicTensorISR(Sp,q0p,q2p,q0b,q2b,Hadronic)
       elseif((pion.eq.2).or.(pion.eq.3))then
@@ -1308,27 +1537,27 @@ c --- 4-momenta in the CMS frame ---
        call hadronmomenta_Lamb0(Sp,cos3,phi3,costhm_ll,phim_ll,costhp_ll
      1                        , phip_ll)
       endif
+      
 c
       call testcuts(0,accepted)
 c
       if (accepted) then
-c
+c  
       amplit = Matrix(Leptonic_epl_emin,Hadronic)/Sp**2
+
 c    
       inte = gev2nbarn * amplit *(1.d0 + Ophvirtsoft)* jac4/(8.d0*Sp) 
-c      write(*,*)'inte',inte
-c      write(*,*)'OphvirtsoftOphvirtsoft',Ophvirtsoft
-c      stop
       intezero = inte
          if (inte.gt.gross(0)) gross(0) = inte
          if (inte.lt.klein(0)) klein(0) = inte
 
 c --- in the second rund ---
          if (i.eq.2) then
-      call addiereMC(intezero,qq,0)
+      call addiereMC(intezero,Sp,0)
           if (Mmax(0).lt.inte) write(*,*) 'Warning! Max(0) too small!'
           if (inte.lt.0.d0)   write(*,*) '0ph:Warning! negative weight'
           if (inte.lt.0.d0)   write(*,*) 'inte',inte
+  203 FORMAT('',A10,G20.12E3)
 c --- event accepted? ---
           if (z.le.inte) then
                if((pion.eq.9).and.(alpha_lamb.ne.0.d0))then
@@ -1337,16 +1566,21 @@ c --- event accepted? ---
                      tr(0) = tr(0) + 1.d0
                      call addiere(1.d0,qq,0)
                      if (iprint.ne.0) call writeevent()
-                     acc=1
+                     acc = 1
                    endif
                else
                tr(0) = tr(0) + 1.d0 
 c --- add to the histogrammes ---
                call addiere(1.d0,Sp,0) ! hadrons invariant mass
 c polar angle distribution
-    
+       pom = momenta(6,3)/
+     &         dSqrt(momenta(6,1)**2+momenta(6,2)**2+momenta(6,3)**2)
+               call addiere(1.d0,pom,3) ! cos(th+)
+       pom = momenta(7,3)/
+     &         dSqrt(momenta(7,1)**2+momenta(7,2)**2+momenta(7,3)**2)
+              call addiere(1.d0,pom,4) ! cos(th-)
               if (iprint.ne.0) call writeevent()
-              acc=1
+              acc = 1
               endif
          endif
          endif    
@@ -1362,39 +1596,88 @@ c --- generates one photon ---------------------------------------------
 c ======================================================================
       subroutine gen_1ph(i,qqmin,qqmax,cos1min,cos1max,
      &                   cos3min,cos3max,acc)
-      include 'phokhara_9.1.inc'
-      complex*16 Leptonic(0:3,0:3),Hadronic(0:3,0:3)
+      use belle2_phokhara_interface
+      include 'phokhara_10.0.inc'
+      complex*16 Leptonic(0:3,0:3),Hadronic(0:3,0:3),
+     1 Leptonic2(0:3,0:3),Hadronic2(0:3,0:3),
+     2 LeptonicP(0:3,0:3),HadronicP(0:3,0:3),ptemp(0:3)
       real*8 qqmin,qqmax,qq,q0p,q2p,q0b,q2b,jac0,pom,
      &  cos1min,cos1max,cos1,phi1,jac1,cos3min,cos3max,cos3,phi3,jac4,
-     &  Ar(14),Ar_r(0:13),z,inte,helicityampLO,Matrix,amplit,rk1(4)
-      real*8 costhm_ll,phim_ll,costhp_ll,phip_ll,inte_s,dps
-      real*8 virt_full,virt_muons
-      integer i,ru
-      logical accepted   
+     &  Ar(14),Ar_r(0:13),z,inte,helicityampLO,Matrix,amplit,rk1(4),
+     & AmpChi,pom1,chi_prod2,NLOpions
+      real*8 costhm_ll,phim_ll,costhp_ll,phip_ll,inte_s,dps,chi_prod1
+      real*8 virt_full,virt_muons,tracepi0,test_trace,pi0gammaAmp,test1,
+     1 test2,check
+      real*8 softint_p1p2,softint_pjpj,softint_q1q2,softint_qjqj,
+     1 softint_sum,Int_f1,Int_f2,Int_f,ampNLO,amppenta
+      real*16 q1(0:3),q2(0:3),p2(0:3),p1(0:3),p4(0:3),qq_quad,virt_pions
+      complex*16 fsr_no_em
+      integer i,ru,mu,nu
+      logical accepted      
       integer acc
       common/Lept_ee/Leptonic
       common/pedf/rk1,dps 
       common/virtsoft/inte_s
+      common/test_no_em/fsr_no_em
 c
-      call phokhara_rndmarray(Ar_r,7)
+      if(pion.lt.13)then
+         call ranlxdf(Ar_r,7)
       do ru=0,6
        Ar(ru+1)=Ar_r(ru)
-      enddo  
-      
-      acc=0
+      enddo
+      else
+      call ranlxdf(Ar_r,9)
+      do ru=0,8
+       Ar(ru+1)=Ar_r(ru)
+      enddo 
+      endif
+          
+        if(((pion.eq.11).or.(pion.eq.12)).and.(be_r.eq.1))then
+             call beam_res
+       endif 
+
+       call addiere(1.d0,momenta(1,0),6)
+       call addiere(1.d0,momenta(2,0),7)
+       call addiere(1.d0,momenta(2,0)+momenta(1,0),8)     
+
+      acc = 0
 
 c --- get the variables ---------------------------
+
+      if((pion.eq.13).or.(pion.eq.14).or.(pion.eq.15))then  
+       z = Mmax(1)*Ar(6)
+       call qquadrat_Pg1(qq,qqmin,qqmax,cos1min,cos1max,
+     &                   cos3min,cos3max,Ar,jac0)
+      else
+      if((pion.eq.1).and.(nlo2.eq.1))then
+         call momenta_quad(qq_quad,Ar,p1,q1,p2,q2,p4,jac0,jac1,cos1)
+c         print*,'q=',jac0,jac1
+         qq=dble(qq_quad)
+         z = Mmax(1)*Ar(6)
+      else
       call qquadrat(qqmin,qqmax,cos3min,cos3max,Ar
      1,qq,q0p,q2p,q0b,q2b,cos3,phi3,jac0)
+c       print*,'d=',jac0,jac1
+      
+
       call photonangles1(cos1min,cos1max,Ar,cos1,phi1,jac1)
       z = Mmax(1)*Ar(6)  
 c --- 4-momenta in the CMS frame ---
       call leptonmomenta1(qq,cos1,phi1)
+      endif
       call LeptonicTensor1ISR(qq,cos1,Leptonic)
       if((pion.le.1).or.(pion.eq.4).or.(pion.eq.5).or.(pion.eq.6)
-     1              .or.(pion.eq.7).or.(pion.eq.9))then
+     1              .or.(pion.eq.7).or.(pion.eq.9).or.(pion.eq.11)
+     2 .or.(pion.eq.12))then
+       if((pion.eq.1).and.(nlo2.eq.1))then
+        continue
+       else
        call hadronmomenta(qq,cos3,phi3)
-       call HadronicTensorISR(qq,q0p,q2p,q0b,q2b,Hadronic)
+       endif
+
+       if((pion.ne.11).or.(pion.ne.12))then
+         call HadronicTensorISR(qq,q0p,q2p,q0b,q2b,Hadronic)
+       endif
       elseif((pion.eq.2).or.(pion.eq.3))then
        call hadronmomenta_1(4)
        call HadronicTensorISR(qq,q0p,q2p,q0b,q2b,Hadronic)
@@ -1408,13 +1691,40 @@ c --- 4-momenta in the CMS frame ---
        call hadronmomenta_Lamb(qq,cos3,phi3,costhm_ll,phim_ll,costhp_ll,
      1                         phip_ll)
       endif
+      
+      endif
 c --- tests cuts ---
       call testcuts(1,accepted)
 c --- value of the integrand ---
       if (accepted) then
 c ---
+        if(pion.eq.11)then
+         amplit= chi_prod1(qq)
+         dps = (1.d0-qq/Sp)/(32.d0*pi*pi)        ! Phase space factors
+         dps = dps*dSqrt(1.d0-4.d0*mmu*mmu/qq)/(32.d0*pi*pi) 
+         elseif(pion.eq.12)then
+          amplit= chi_prod2(qq)
+         dps = (1.d0-qq/Sp)/(32.d0*pi*pi)        ! Phase space factors
+         dps = dps*dSqrt(1.d0-4.d0*mmu*mmu/qq)/(32.d0*pi*pi)
+         elseif(pion.eq.13)then
+         dps = (1.d0-qq/Sp)/(32.d0*pi*pi)        ! Phase space factors
+         dps = dps*(1.d0-mpi0f**2/qq)/(32.d0*pi*pi)        
+         amplit=pi0gammaAmp(qq,Ar)*dps
+         elseif(pion.eq.14)then
+         dps = (1.d0-qq/Sp)/(32.d0*pi*pi)        ! Phase space factors
+         dps = dps*(1.d0-metaf**2/qq)/(32.d0*pi*pi)
+         amplit=pi0gammaAmp(qq,Ar) *dps
+         elseif(pion.eq.15)then
+         dps = (1.d0-qq/Sp)/(32.d0*pi*pi)        ! Phase space factors
+         dps = dps*(1.d0-metaP**2/qq)/(32.d0*pi*pi)
+         amplit=pi0gammaAmp(qq,Ar)*dps              
+         else 
+           amplit = Matrix(Leptonic,Hadronic)
+c           print*, 'ISR old=',amplit
+         endif
 
-        amplit = Matrix(Leptonic,Hadronic)
+
+
 c
         if((pion.eq.0).and.(ph0.eq.0).and.(fsr.ne.0))then
          virt_full = virt_muons(w*dsqrt(Sp),qq)
@@ -1431,11 +1741,32 @@ c
         elseif((pion.eq.4).and.(ph0.eq.1))then
          inte = gev2nbarn * amplit * jac0*jac1/(4.d0*pi*Sp)
          inte_s=inte
+         elseif(pion.eq.11)then
+        inte=(4.d0*pi*alpha)**3*amplit * jac0*
+     1 jac1/(4.d0*pi*Sp)*dps/4.d0*gev2nbarn
+         inte_s=inte
+         elseif(pion.eq.12)then
+         inte=(4.d0*pi*alpha)**3*amplit * jac0*
+     1 jac1/(4.d0*pi*Sp)*dps/4.d0*gev2nbarn
+         inte_s=inte
+         elseif((pion.eq.13).or.(pion.eq.14).or.(pion.eq.15))then
+         inte=(4.d0*pi*alpha)**4*amplit*jac0
+     1 /(4.d0*pi*Sp)/4.d0*gev2nbarn/2.d0 ! 1.d0/2.d0 statistical factor 2 photons in final state  
+         inte_s=inte
         else 
          inte = gev2nbarn * amplit * jac0*jac1/(4.d0*pi*Sp)
 c
          if(fsr.ne.0) inte = inte+gev2nbarn*helicityampLO(qq)*
      1               jac0*jac1/(4.d0*pi*Sp)
+c         print*,'1=', inte
+c
+c full pi0-------------------------------------------------------------
+         if((pion.eq.1).and.(nlo2.eq.1))then !ST - full soft
+           amppenta= dble(virt_pions(qq_quad,p1,q1,p2,q2,p4,check))
+           inte=inte+gev2nbarn*NLOpions(qq)*jac0*jac1/(4.d0*pi*Sp)
+     1     + gev2nbarn*amppenta*jac0*jac1/(4.d0*pi*Sp)
+         endif
+c----------------------------------------------------------------------
         inte_s=inte
         endif
 c ---
@@ -1444,9 +1775,16 @@ c ---
 c --- in the second rund ---
          if (i.eq.2) then
          call addiereMC(inte_s,qq,1)
+         pom = momenta(6,3)/
+     &         dSqrt(momenta(6,1)**2+momenta(6,2)**2+momenta(6,3)**2)
+              call addiereMC(inte_s,pom,3)
+        pom = momenta(7,3)/
+     &         dSqrt(momenta(7,1)**2+momenta(7,2)**2+momenta(7,3)**2)
+              call addiereMC(inte_s,pom,4)
             if (Mmax(1).lt.inte) write(*,*)'Warning! Max(1) too small!'
-          if (inte.lt.0.d0)    write(*,*)'1ph:Warning! negative weight'
-          if (inte.lt.0.d0)    write(*,*)'inte',inte
+c          if (inte.lt.0.d0)    write(*,*)'1ph:Warning! negative weight'
+c          if (inte.lt.0.d0)    write(*,*)'inte',inte
+  203 FORMAT('',A10,G20.12E3)
 c --- event accepted? ---
             if (z.le.inte) then
 
@@ -1456,18 +1794,36 @@ c --- event accepted? ---
                      tr(1) = tr(1) + 1.d0
                      call addiere(1.d0,qq,1)
                     if (iprint.ne.0) call writeevent()
-                    acc=1
+                    acc = 1
                  endif
                else
                   tr(1) = tr(1) + 1.d0
 c --- add to the histogrammes ---
                call addiere(1.d0,qq,1)
-c polar angle distribution
-       
+
+c polar angle distributions
+c       if(momenta(3,0).gt.momenta(7,0))then
+c       pom = momenta(3,3)/
+c     &         dSqrt(momenta(3,1)**2+momenta(3,2)**2+momenta(3,3)**2)
+c               call addiere(1.d0,pom,4) ! cos(th+)
+c        else
+c        pom = momenta(7,3)/
+c     &         dSqrt(momenta(7,1)**2+momenta(7,2)**2+momenta(7,3)**2)
+c              call addiere(1.d0,pom,4)
+c        endif
+        pom = momenta(6,3)/
+     &         dSqrt(momenta(6,1)**2+momenta(6,2)**2+momenta(6,3)**2)
+              call addiere(1.d0,pom,3) ! cos(th+)
+        pom = momenta(7,3)/
+     &         dSqrt(momenta(7,1)**2+momenta(7,2)**2+momenta(7,3)**2)
+              call addiere(1.d0,pom,4) ! cos(th-)
+
                 if (iprint.ne.0) call writeevent()
-                acc=1
+                acc = 1
                endif
             endif 
+
+c
          endif
       else
          inte = 0.d0
@@ -1480,25 +1836,26 @@ c --- generates two photons --------------------------------------------
 c ======================================================================
       subroutine gen_2ph(i,qqmin,cos1min,cos1max,
      &   cos2min,cos2max,cos3min,cos3max,acc)
-      include 'phokhara_9.1.inc'
+      use belle2_phokhara_interface
+      include 'phokhara_10.0.inc'
       real*8 qqmin,qqmax,qq,jac0,q0p,q2p,q0b,q2b,
      &  cos1min,cos1max,cos1,phi1,jac1,sin1,cos12,
      &  cos2min,cos2max,cos2,phi2,jac2,sin2,
      &  w1,w2,w1min,jac3,cos3min,cos3max,cos3,phi3,jac4,
      &  Ar(14),Ar_r(0:14),z,inte,helicityamp,pom
       integer i,ru
-      logical accepted
+      logical accepted    
       integer acc
 c  
       common/muonfsr/inte
 c
-      call phokhara_rndmarray(Ar_r,13)
+      call ranlxdf(Ar_r,13)
       do ru=0,12
          Ar(ru+1) = Ar_r(ru)
       enddo
       
-      acc=0
-      
+      acc = 0
+
 c --- get the variables -----------------------------------------------
 c --- one of the photons is generated inside the angular cuts and -----
 c --- the other is generated everywhere -------------------------------
@@ -1562,17 +1919,30 @@ c ---
 c --- in the second rund ---
          if (i.eq.2) then
          call addiereMC(inte,qq,2)
+         pom = momenta(6,3)/
+     &         dSqrt(momenta(6,1)**2+momenta(6,2)**2+momenta(6,3)**2)
+               call addiereMC(inte,pom,5)
+       pom = momenta(7,3)/
+     &         dSqrt(momenta(7,1)**2+momenta(7,2)**2+momenta(7,3)**2)
+              call addiereMC(inte,pom,6)
             if (Mmax(2).lt.inte) write(*,*)'Warning! Max(2) too small!'
           if (inte.lt.0.d0)    write(*,*)'2ph:Warning! negative weight'
           if (inte.lt.0.d0)    write(*,*)'inte',inte
+  203 FORMAT('',A10,G20.12E3)
 c --- event accepted? ---
             if (z.le.inte) then
                   tr(2) = tr(2) + 1.d0
                if (iprint.ne.0) call writeevent()
+               acc = 1
 c --- add to the histogrammes ---
                call addiere(1.d0,qq,2)
 c polar angle distribution
-               acc=1       
+       pom = momenta(6,3)/
+     &         dSqrt(momenta(6,1)**2+momenta(6,2)**2+momenta(6,3)**2)
+               call addiere(1.d0,pom,5) ! cos(th+)
+       pom = momenta(7,3)/
+     &         dSqrt(momenta(7,1)**2+momenta(7,2)**2+momenta(7,3)**2)
+              call addiere(1.d0,pom,6) ! cos(th-)
  
             endif
          endif
@@ -1585,17 +1955,12 @@ c ======================================================================
 c --- input parameters -------------------------------------------------
 c ======================================================================
       subroutine input(nges,nm,outfile)
-      include 'phokhara_9.1.inc'
-
-      common / paramfile / parameterfile !TF
-      character*250  inputfile !TF
-      common / infile / inputfile !TF
-      character*250  parameterfile !TF 
-
+      use belle2_phokhara_interface
+      include 'phokhara_10.0.inc'
       integer nm,i,jj,kk,ii
       integer*8 nges
       character outfile*20
-      real*8 E,lll,qq1
+      real*8 E,lll,qq1,soft
       real*8 betarho_pp, betaomega_pp,betaphi_pp,alphaphi_pp,mrho_pp,
      &       momega_pp,mphi_pp,gammarho_pp,theta_pp,gam_pp
       real*8 mm_ph,gg_ph,bp2smm,mm_f0,gg_f0,c_phi_KK_f0_pi,c_phi_gam
@@ -1613,18 +1978,20 @@ c ======================================================================
       complex*16 jp_resonance,p2s_resonance
       real*8 g_K1_jp,g_K1_p2s
       real*8 p1(4),p2(4),dme,el_m2             ! inteface to helicity amp
-      real*8 gfun_4pi
+      real*8 gfun_4pi,del_chi
       real*8 modcjp_Kp,phacjp_Kp,modcjp_K0,phacjp_K0,
      1      modcp2s_Kp,phacp2s_Kp,modcp2s_K0,phacp2s_K0
       real*8 m_rho0_P,g_rho0_P,beta_pion,beta_pion_p,ilocz_pion,
-     1       p_rho,vv_rho,DGAMMF,HH_P
+     1       p_rho,vv_rho,GAMMA,HH_P
       real*8 vprehadsp,vprehadtm,vpimhad,vprelepsp,vpreleptm,vpimlep,
      & vpretopsp,vpretoptm,g_met(4,4),sm(4)
+      real*8 a_chi,b_chi
       complex*16 vacpol_and_nr,result_thomas,iii
       integer mu,nu,j
       complex*16 Jee11(4),Jee12(4),Jee21(4),Jee22(4),
-     1           Jeemin(2,2,2,2),cpp(2,2,2,2)
+     1           Jeemin(2,2,2,2),cpp(2,2,2,2),adg_chi
       real*8 con1,con2,con3,con4,lambda
+      real*8 softint_pjpj,softint_p1p2
 c
       common/com1/lambda
 c
@@ -1653,60 +2020,64 @@ c J/Psi and Psi(2S) generation common
       common /genres/QgK2,QgK2_p2s
       common/ssmm/sm
       
+        
+       
       real*8 ecm !TF
       common / beam / ecm !TF
 c
 c --- input file ---------------------------------
-c      open(7,file='input_9.1.dat',status='old')
-c      open(8,file='const_and_model_paramall9.1.dat',status='old')
-!       open(7,file=inputfile,status='old')
-      open(8,file=parameterfile,status='old')
-! 
-! c --- input generation parameters ----------------
-!       read(7,*)           !                                   
-!       read(7,*) nges      ! number of generated events TF bad name
-!       read(7,*) nm        ! events to determine the maximum   
-!       read(7,*) outfile   ! output file                       
-!       read(7,*) iprint    ! printing(1), nonprinting(0) generated events
-!       read(7,*) ph0       ! Born: 1ph(0)radiative return; Born: 0ph(1) scan
-!       read(7,*) nlo       ! radiative return mode: Born(0), NLO(1)
-!       read(7,*) w         ! soft photon cutoff                
-!       read(7,*) pion      ! mu+mu-(0),pi+pi-(1),2pi0pi+pi-(2),2pi+2pi-(3),ppbar(4),nnbar(5),K+K-(6),K0K0bar(7),pi+pi-pi0(8), Lamb Lambbar->pi-pi+ppbar(9) 
-!       read(7,*) fsr       ! ISR only(0), ISR+FSR(1), ISR+INT+FSR(2)
-!       read(7,*) fsrnlo    ! yes(1), no(0)
-!       read(7,*) ivac      ! no(0),yes; by Fred Jegerlehner(1),yes;by Thomas Teubner(2)
-!       read(7,*) FF_Pion   ! KS Pionformfactor(0), GS Pionformfactor(1) old, GS Pionformfactor new(2)
-!       read(7,*) f0_model  ! f0+f0(600): KK model(0), no structure(1), no f0+f0(600)(2), f0 KLOE(3)
-!       read(7,*) FF_kaon   ! KaonFormFactor constrained (0),KaonFormFactor unconstrained (1),KaonFormFactor old (2)
-!       read(7,*) narr_res  ! no narrow resonances (0), J/Psi (1), Psi(2S) (2) (narro resonances only for pion = 0, 1, 6, 7
-!       read(7,*) FF_pp     !ProtonFormFactor old(0), ProtonFormFactor new(1)
-! c --- input collider parameters -------------------
-!       read(7,*)           !                                   
-!       read(7,*) E         ! CMS-energy                        
-! c --- input experimental cuts ---------------------
-!       read(7,*)           !                                   
-!       read(7,*) q2min     ! minimal  hadrons(muons)-gamma-inv mass squared 
-!       read(7,*) q2_min_c  ! minimal inv. mass squared of the hadrons(muons)
-!       read(7,*) q2_max_c  ! maximal inv. mass squared of the hadrons(muons)
-!       read(7,*) gmin      ! minimal photon energy/missing energy             
-!       read(7,*) phot1cut  ! minimal photon angle/missing momentum angle
-!       read(7,*) phot2cut  ! maximal photon angle/missing momentum angle
-!       read(7,*) pi1cut    ! minimal hadrons(muons) angle
-!       read(7,*) pi2cut    ! maximal hadrons(muons) angle
-! c --- read histogram paremeters -------------------
-!       read(7,*)           ! 
-!       do i = 0,20         ! read title, limits and bins       
-!          read(7,*) title(i)
-!          read(7,*) xlow(i),xup(i),bins(i)
-!       enddo
-!       close(7)
-
-
-
+!      open(7,file=belle2_phokhara_parameters%input_file,status='old')
+      open(8,file=belle2_phokhara_parameters%parameter_file,
+     &  status='old')
+c --- input generation parameters ----------------
+!      read(7,*)           !                                   
+!      read(7,*) nges      ! number of generated events        
+!      read(7,*) nm        ! events to determine the maximum   
+!      read(7,*) outfile   ! output file                       
+!      read(7,*) iprint    ! printing(1), nonprinting(0) generated events
+!      read(7,*) ph0       ! Born: 1ph(0)radiative return; Born: 0ph(1) scan
+!      read(7,*) nlo       ! radiative return mode: Born(0), NLO(1)
+!      read(7,*) nlo2      ! full NLO: No(0), Yes(1)
+!      read(7,*) w         ! soft photon cutoff                
+!      read(7,*) pion      ! mu+mu-(0),pi+pi-(1),2pi0pi+pi-(2),2pi+2pi-(3),ppbar(4),nnbar(5),K+K-(6),K0K0bar(7),pi+pi-pi0(8), Lamb Lambbar->pi-pi+ppbar(9) 
+!      read(7,*) fsr       ! ISR only(0), ISR+FSR(1), ISR+INT+FSR(2)
+!      read(7,*) fsrnlo    ! yes(1), no(0)
+!      read(7,*) ivac      ! no(0),yes; by Fred Jegerlehner(1),yes;by Thomas Teubner(2)
+!      read(7,*) FF_Pion   ! KS Pionformfactor(0), GS Pionformfactor(1) old, GS Pionformfactor new(2)
+!      read(7,*) f0_model  ! f0+f0(600): KK model(0), no structure(1), no f0+f0(600)(2), f0 KLOE(3)
+!      read(7,*) FF_kaon   ! KaonFormFactor constrained (0),KaonFormFactor unconstrained (1),KaonFormFactor old (2)
+!      read(7,*) narr_res  ! no narrow resonances (0), J/Psi (1), Psi(2S) (2) (narro resonances only for pion = 0, 1, 6, 7
+!      read(7,*) FF_pp     !ProtonFormFactor old(0), ProtonFormFactor new(1)
+!      read(7,*) FF_Pgg
+!      read(7,*) chi_sw         !Radiative return(0), Chi production(1), Radiative return + Chi production (2)
+!      read(7,*) be_r            !be_r: without beam resolution(0), with beam resolution(1)
+c --- input collider parameters -------------------
+!      read(7,*)           !                                   
+!      read(7,*) E         ! CMS-energy 
+!      read(7,*) beamres ! beam resolution                         
+c --- input experimental cuts ---------------------
+!      read(7,*)           !                                   
+!      read(7,*) q2min     ! minimal  hadrons(muons)-gamma-inv mass squared 
+!      read(7,*) q2_min_c  ! minimal inv. mass squared of the hadrons(muons)
+!      read(7,*) q2_max_c  ! maximal inv. mass squared of the hadrons(muons)
+!      read(7,*) gmin      ! minimal photon energy/missing energy             
+!      read(7,*) phot1cut  ! minimal photon angle/missing momentum angle
+!      read(7,*) phot2cut  ! maximal photon angle/missing momentum angle
+!      read(7,*) pi1cut    ! minimal hadrons(muons) angle
+!      read(7,*) pi2cut    ! maximal hadrons(muons) angle
+c --- read histogram paremeters -------------------
+!      read(7,*)           ! 
+!      do i = 0,20         ! read title, limits and bins       
+!         read(7,*) title(i)
+!         read(7,*) xlow(i),xup(i),bins(i)
+!      enddo
+!      close(7)
 c
 c --- input couplings, masses and meson widths ---
       read(8,*)           !                                   
-      read(8,*) alpha     ! 1/alpha (QED)                     
+      read(8,*) alpha     ! 1/alpha (QED) 
+      read(8,*) GFermi    ! Fermi constant
+      read(8,*) sinthW2   ! sin^2(theta_W)                  
       read(8,*) me        ! Electron mass   
       read(8,*) mp        ! Proton mass 
       read(8,*) mnt       ! Neutron mass   
@@ -1719,18 +2090,23 @@ c --- input couplings, masses and meson widths ---
       read(8,*) meta      ! Eta mass
 
 c --- fix constants -------------------------------
- 
+      mpi_q=mpi
       alpha = 1.d0/alpha
-!       Sp = E*E                                ! CMS-energy squared
-      Sp = ecm*ecm                            ! CMS-energy squared TF
-
+      alpha_q= alpha
+      Sp = ecm*ecm    
+      Sp_q= ecm*ecm                           ! CMS-energy squared
       ebeam = dSqrt(Sp)/2.d0                  ! beam energy
-      pi = 4.d0*dAtan(1.d0)   
+      ebeam_q = Sqrt(Sp_q)/2.q0
+      w_q=w
+      pi = 4.d0*dAtan(1.d0) 
+      piq= 4.q0*atan(1.q0)  
       gev2nbarn = .389379292d6               ! from GeV^2 to nbarn
       gev2pbarn = .389379292d9
 
-      dme   = me                             ! inteface to helicity amp
+      dme   = me   
+      me_q=me                          ! inteface to helicity amp
       el_m2 = me**2
+      el_m2q = me**2
 c
 c p1 - positron, p2 - electron four momenta
 c
@@ -1750,6 +2126,12 @@ c
       do i=1,4
         sm(i)=p1(i)+p2(i)
       enddo
+      
+      if((pion.ne.1).and.(nlo2.eq.1))then
+         write(*,*)'nlo2=1 allowed only for 2pi mode (pion=1)'
+         write(10,*)'nlo2=1 allowed only for 2pi mode (pion=1)'
+         stop
+      endif
 
       call init_ha
 c 
@@ -1770,27 +2152,41 @@ c J/Psi resonance parameters and EM and strong couplings
          stop
       endif
 
+      if((pion.eq.11).or.(pion.eq.12))then
+        if(narr_res.eq.1)then
+       continue
+       else
+       write(*,*)
+     1 'for chi_c1 and chi_c2 production you have to use narr_res=1 !!!' 
+       stop
+       endif
+       endif
+
       if(narr_res.eq.1)then
 
         read(8,*)
         read(8,*)  mjp
+        mjp_q=mjp
         read(8,*)  gamjp
+        gamjp_q=gamjp
         read(8,*)  gamjpee
         read(8,*)  modcjp_Kp
         read(8,*)  phacjp_Kp
         read(8,*)  modcjp_K0
         read(8,*)  phacjp_K0
         Qjp = 3.D0 * gamjpee/gamjp/alpha
+        Qjp_q=3.q0 * gamjpee/gamjp/alpha
         phacjp_Kp = phacjp_Kp/180.d0*pi
         phacjp_K0 = phacjp_K0/180.d0*pi
         cjp_Kp = modcjp_Kp*exp(dcmplx(0.d0,phacjp_Kp))
         cjp_K0 = modcjp_K0*exp(dcmplx(0.d0,phacjp_K0))
+       
 
       endif
 
 c Psi(2S) resonance parameters and EM and strong couplings 
 
-      if(narr_res.eq.2)then
+      if((narr_res.eq.2))then
         do i=1,9
            read(8,*) 
         enddo
@@ -1803,6 +2199,7 @@ c Psi(2S) resonance parameters and EM and strong couplings
         read(8,*)  modcp2s_K0
         read(8,*)  phacp2s_K0
         Qp2s = 3.D0 * gamp2see/gamp2s/alpha
+        Qp2s_q = 3.q0 * gamp2see/gamp2s/alpha
         phacp2s_Kp = phacp2s_Kp/180.d0*pi
         phacp2s_K0 = phacp2s_K0/180.d0*pi
         cp2s_Kp = modcp2s_Kp*exp(dcmplx(0.d0,phacp2s_Kp))
@@ -1810,8 +2207,17 @@ c Psi(2S) resonance parameters and EM and strong couplings
 
       endif
 
+      if((pion.eq.11).or.(pion.eq.12))then
+         read(8,*)
+         read(8,*)  mp2s
+         read(8,*)  gamp2s
+         read(8,*)  gamp2see
+      endif
+
+
       if(narr_res.eq.0) kk = 16
-      if(narr_res.eq.1) kk = 8
+      if((narr_res.eq.1)) kk = 8
+      if(((pion.eq.11).or.(pion.eq.12))) kk=4
       if(narr_res.eq.2) kk = 0
         do i=1,kk
            read(8,*) 
@@ -1980,6 +2386,20 @@ c
      1     (lll-1.d0)*log(2.d0*w) + 0.75d0*lll -1.d0 +pi**2/6.d0)
       endif
       endif
+
+      if(nlo2.eq.1)then !ST soft subtraction
+        lll = log(Sp/el_m2)
+        ver_s = 2.d0*alpha/pi*( 
+     1     (lll-1.d0)*log(2.d0*w) + 0.75d0*lll -1.d0 +pi**2/6.d0)
+        soft=alpha/pi*(
+     1 (-log(4.d0*w*w))*(1.d0+log(me**2/Sp))
+     1 -log(me**2/Sp)**2/2.d0-log(me**2/Sp)-pi**2/3.d0)
+        ver_s=ver_s-soft
+c       call softintegral_p1p2(softint_p1p2)
+c       call softintegral_pjpj(softint_pjpj)
+c       print*,'ver_s(soft)=',2.d0*alpha/pi*( 
+c     1     (lll-1.d0)*log(2.d0*w)),2.d0*(-softint_p1p2+softint_pjpj)
+       endif
 c
 c 2 pi mode -----------
 c
@@ -2173,9 +2593,9 @@ c
         do ii=1,2000
 c
            ilocz_pion = ilocz_pion * (1.d0 - beta_pion_p/ii)
-           c_n_pionGS(ii) = (-1.d0)**ii * DGAMMF(beta_pion-0.5d0)
+           c_n_pionGS(ii) = (-1.d0)**ii * GAMMA(beta_pion-0.5d0)
      1                    * 2.d0/sqrt(pi) / (1.d0+2.d0*ii) 
-     3                    * ilocz_pion /pi *DGAMMF(2.d0-beta_pion)
+     3                    * ilocz_pion /pi *GAMMA(2.d0-beta_pion)
      2                    * sin(pi*(beta_pion-1.d0-ii))
         if(ii.ge.6)then
            m_n_pionGS(ii) = sqrt(m_rho0_pion**2*(1.d0+2.d0*ii))
@@ -2671,6 +3091,103 @@ c
         enddo 
 c
       endif
+       
+
+       if(pion.eq.11)then
+        do i=1,307
+         read(8,*)
+        enddo
+        read(8,*) mchic1
+        read(8,*) gamchic1
+        m2c=1.6945326920515436d0
+        ac= 7.8610011134006008d-2
+        aj= 0.14744703348488764d0 
+        apsi=-6.5841506711080910d-2
+c  
+c        GFermi=1.1663787d-5
+c        sinthW2=0.23126d0
+          gg1=adg_chi()
+          gamchiee=gg1*dconjg(gg1)/12.d0/pi*mchic1+ac*GFermi/3.d0/pi
+     1 /dsqrt(2.d0)/dsqrt(m2c)/(2.d0/3.d0)**2*mchic1*dble(gg1)+
+     2 ac**2*GFermi**2/3.d0/pi/m2c/(2.d0/3.d0)**4*mchic1*
+     3 (1.d0-4.d0*sinthW2+8.d0*sinthW2**2)
+
+
+       endif   
+       
+        if(pion.eq.12) then
+          do i=1,307
+            read(8,*)
+          enddo
+         read(8,*) mchic1
+         read(8,*) gamchic1      
+         read(8,*)
+          read(8,*) mchic2
+         read(8,*) gamchic2 
+        m2c=1.6945326920515436d0
+        ac= 7.8610011134006008d-2
+        aj= 0.14744703348488764d0 
+        apsi=-6.5841506711080910d-2
+c
+          gg2=adg_chi()  
+          gamchiee2=dconjg(gg2)*gg2/40.d0/pi*mchic2
+         endif  
+      
+
+       if((pion.eq.13).or.(pion.eq.14).or.(pion.eq.15))then
+         if(FF_Pgg.eq.0)then
+         do i=1,313
+           read(8,*)
+         enddo
+         elseif(FF_Pgg.eq.1)then
+         do i=1,355
+           read(8,*)
+         enddo
+         endif
+         read(8,*) hv1 
+         print*, hv1
+         read(8,*) A1pi0
+         read(8,*) A2pi0
+         read(8,*) Fsmv2Hv2
+         read(8,*) A1eta
+         read(8,*) A1etaP
+         read(8,*) fsmv1
+         read(8,*) H_om
+         read(8,*) F_om
+         read(8,*) F_phi
+         read(8,*) Fchir
+         read(8,*) A_pi_phiom
+         read(8,*) A_eta_phiom
+         read(8,*) Cq_c
+         read(8,*) Cs_c
+         read(8,*) Cq_P
+         read(8,*) Cs_P
+         read(8,*) GammaTotalrho_c
+         read(8,*) GammaTotalomega_c
+         read(8,*) GammaTotalphi_c
+         read(8,*) GammaTotalrho_c2
+         read(8,*) GammaTotalomega_c2
+         read(8,*) GammaTotalphi_c2
+         read(8,*) GammaTotalrho_c3
+         read(8,*) GammaTotalomega_c3
+         read(8,*) GammaTotalphi_c3
+         read(8,*) Mrho_c
+         read(8,*) Momega_c
+         read(8,*) Mphi_c
+         read(8,*) Mrho_pr
+         read(8,*) Momega_pr
+         read(8,*) Mphi_pr
+         read(8,*) Mrho_dpr
+         read(8,*) Momega_dpr
+         read(8,*) Mphi_dpr
+         read(8,*) mpi0f
+         read(8,*) metaf
+         read(8,*) metaP
+         read(8,*) A3pi0
+         read(8,*) A3eta
+         read(8,*) A3etaP
+          
+         endif
 
       if(pion.eq.0)then
 c
@@ -2751,8 +3268,7 @@ c
       !  added by Kirill Chilikin, 2019
       ! ========================================================================
       close(8)
-      ! ========================================================================
-      return
+      ! ========================================================================      return
       end
 c***********************************************************************
       subroutine init_ha
@@ -2824,7 +3340,7 @@ c       call minmat_new(i1,sigmispl,smisigpl,mk2)
 c ========================================================================
       subroutine qquadrat_0(qqmin,qqmax,cosmin,cosmax,Ar
      1,qq,q0p,q2p,q0b,q2b,costheta,phi,jacobian)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 qqmin,qqmax,Ar(14),qq,jacobian,fak1c,
      &  x,a,b,c,amin,amax,bmin,bmax,fak1,fak2,fak3,p,y,ppp,jac4,vv,eqt,
      &  cosmin,cosmax,costheta,phi,delcos,vol1,vol2,vol3,vol4,cmin,cmax,
@@ -2898,7 +3414,12 @@ c
       dps = dSqrt(1.d0-4.d0*mlamb*mlamb/qq)/(32.d0*pi*pi)!Phase space factors
 
       jacobian =  jac4 * pionFF * dps
-
+     
+      elseif((pion.eq.13).or.(pion.eq.14).or.(pion.eq.15))then
+   
+      call pionangles(cosmin,cosmax,Ar,costheta,phi,jac4)
+c
+      jacobian = jac4 
       else
        continue
       endif
@@ -2908,10 +3429,10 @@ c-----------------------------------------------------------------------
 c  virual and soft parts for O photon mode
 c
       subroutine Oph_emission_virtualsoft(delta)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 L_log,L_log2,L_log3,L_log4
       real*8 eps_cut,coeff1,coeff1_2
-      real*8 dzeta2,dzeta3,delta
+      real*8 dzeta2,dzeta3,delta,betae
       real*8 ReF_1,ImF_1,modF_1_2,ReF_2
       real*8 delta_s1_1,delta_v1_1
       real*8 delta_s2_2,delta_v2_2,delta_s1v1_2 
@@ -2927,6 +3448,7 @@ c names from Berends
       dzeta2 = pi*pi/6.d0
       dzeta3 = 1.202056903159594d0
 c      dzeta3 = 1.2020569032d0
+      betae = sqrt(1.d0-4.d0*me**2/Sp)
 c functions 
 
       ReF_1 = coeff1*(-L_log2/4.d0 +3.d0*L_log/4.d0 -1.d0 + 2.d0*dzeta2)
@@ -2942,7 +3464,11 @@ c
 c_____________________ one photon: soft and virtual ____________________
 c
 c one soft photon emission - without part that canceled with virtual part
-
+c mass corrections added
+c      delta_s1_1 = 0.5d0*L_log2 
+c     1  + 2.d0*dlog(eps_cut)*((1+betae**2)/2.d0/betae
+c     2     *dlog((1.d0+betae)**2/4.d0*Sp/me**2) -1.d0)
+c     &   - 2.d0*dzeta2
       delta_s1_1 = 0.5d0*L_log2 + 2.d0*dlog(eps_cut)*L_log
      &  - 2.d0*dlog(eps_cut) - 2.d0*dzeta2
 c
@@ -2984,12 +3510,12 @@ c used in one photon emission
 c ------------------------------------------------------------------------
       subroutine qquadrat(qqmin,qqmax,cosmin,cosmax,Ar
      1,qq,q0p,q2p,q0b,q2b,costheta,phi,jacobian)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 qqmin,qqmax,Ar(14),qq,jacobian,fak1c,
      &  x,a,b,c,amin,amax,bmin,bmax,fak1,fak2,fak3,p,y,ppp,jac4,vv,eqt,
      &  cosmin,cosmax,costheta,phi,delcos,vol1,vol2,vol3,vol4,cmin,cmax,
      &  delyy,yy,ymin,ea,q0p,q2p,q0b,q2b,fak4,d,dmin,dmax,fak6,fak7,
-     &  e_1,e_1min,e_1max
+     &  e_1,e_1min,e_1max,ehmin,ehmax,eh,fakeh
       real*8 pionFF,dps
       real*8  Qjp,QgK2,Qp2s,QgK2_p2s 
       complex*16 g_eK_jp,g_eK_p2s
@@ -3001,8 +3527,9 @@ c ------------------------------------------------------------------------
 c
 c --- muons -----------------------------------------------------
 c --- the Q2 distribution is peaked at threshold and Q2->Sp (soft photon). 
-      if (pion.eq.0) then
+      if ((pion.eq.0).or.(pion.eq.11).or.(pion.eq.12)) then
 c
+       if(pion.eq.0)then
 c  isr only
       if(fsr.eq.0)then
       fak1 = -1.d0/Sp
@@ -3014,6 +3541,7 @@ c  isr only
 
 c --- which substitution? ---
       p = Ar(7)      
+
 ! J/psi
       if(narr_res.eq.1)then  
 
@@ -3201,6 +3729,78 @@ c
        endif
 
        endif
+       
+       elseif(pion.eq.11)then 
+c     chi_c production chi_c -> J/psi (-> mu+mu-)+gamma
+      fak1 = -1.d0/Sp
+      amin = fak1*dLog(Sp-qqmin)
+      amax = fak1*dLog(Sp-qqmax)
+      a = amax-amin
+      bmin = dLog(qqmin/Sp)/Sp
+      b    = dLog(qqmax/qqmin)/Sp
+
+c --- which substitution? ---
+      p = Ar(7)      
+
+        fak4 = 1.D0/70.D0
+        cmin = Qjp**2*mjp*gamjp*fak4*dAtan((qqmin-mjp**2)/(mjp*gamjp))
+        cmax = Qjp**2*mjp*gamjp*fak4*dAtan((qqmax-mjp**2)/(mjp*gamjp))
+        c = cmax-cmin
+
+        ppp  = a+b+c
+        if(p.lt.a/ppp)then
+           y  = amin+a*x
+           qq = Sp-dExp(y/fak1)                                       
+        elseif(p.lt.((a+b)/ppp))then
+           y  = bmin+b*x
+           qq = Sp*exp(Sp*y)
+        else
+           y = cmin+c*x 
+           qq = mjp*gamjp*dtan(y/fak4/mjp/gamjp/Qjp**2) + mjp**2
+        endif
+        jacobian = ppp/(1.d0/(Sp*(Sp-qq)) + 1.d0/Sp/qq  
+     1  + Qjp**2*mjp**2*gamjp**2*fak4/((mjp**2-qq)**2+mjp**2*gamjp**2) ) 
+
+
+      call pionangles(cosmin,cosmax,Ar,costheta,phi,jac4)
+c
+      jacobian = jacobian*jac4  
+      elseif(pion.eq.12)then 
+c     chi_c production chi_c -> J/psi (-> mu+mu-)+gamma
+      fak1 = -1.d0/Sp
+      amin = fak1*dLog(Sp-qqmin)
+      amax = fak1*dLog(Sp-qqmax)
+      a = amax-amin
+      bmin = dLog(qqmin/Sp)/Sp
+      b    = dLog(qqmax/qqmin)/Sp
+
+c --- which substitution? ---
+      p = Ar(7)      
+
+        fak4 = 1.D0/70.D0
+        cmin = Qjp**2*mjp*gamjp*fak4*dAtan((qqmin-mjp**2)/(mjp*gamjp))
+        cmax = Qjp**2*mjp*gamjp*fak4*dAtan((qqmax-mjp**2)/(mjp*gamjp))
+        c = cmax-cmin
+
+        ppp  = a+b+c
+        if(p.lt.a/ppp)then
+           y  = amin+a*x
+           qq = Sp-dExp(y/fak1)                                       
+        elseif(p.lt.((a+b)/ppp))then
+           y  = bmin+b*x
+           qq = Sp*exp(Sp*y)
+        else
+           y = cmin+c*x 
+           qq = mjp*gamjp*dtan(y/fak4/mjp/gamjp/Qjp**2) + mjp**2
+        endif
+        jacobian = ppp/(1.d0/(Sp*(Sp-qq)) + 1.d0/Sp/qq  
+     1  + Qjp**2*mjp**2*gamjp**2*fak4/((mjp**2-qq)**2+mjp**2*gamjp**2) ) 
+
+
+      call pionangles(cosmin,cosmax,Ar,costheta,phi,jac4)
+c
+      jacobian = jacobian*jac4      
+        endif
 c
 c --- 2 pions -----------------------------------------------------
 c --- the Q2 distribution is peaked at Q2=rho and w mass^2       
@@ -3456,19 +4056,234 @@ c
       dps = dSqrt(1.d0-4.d0*mlamb*mlamb/qq)/(32.d0*pi*pi)!Phase space factors
 
       jacobian = jacobian * jac4 * pionFF * dps
-
+      
       else
        continue
       endif
       return
       end
+c-----------------------------------------------------------------------
+c---------------------------------------------------------------------
+c-----------------------------------------------------------------------      
+      subroutine qquadrat_Pg1(qq,qqmin,qqmax,cos1min,cos1max,
+     &                   cos3min,cos3max,Ar,jacobian)
+      include 'phokhara_10.0.inc'
+      real*8 qqmin,qqmax,Ar(14),qq,jacobian,fak1c,
+     &  x,a,b,c,amin,amax,bmin,bmax,fak1,fak2,fak3,p,y,ppp,jac4,vv,eqt,
+     &  cosmin,cosmax,costheta,phi,delcos,vol1,vol2,vol3,vol4,cmin,cmax,
+     &  delyy,yy,ymin,ea,q0p,q2p,q0b,q2b,fak4,d,dmin,dmax,fak6,fak7,
+     &  e_1,e_1min,e_1max,ehmin,ehmax,eh,fakeh
+      real*8 cos1min,cos1max,cos3min,cos3max
+      real*8 mincos1,mincos2,fakch,
+     1 volch,pch,minqch1,minqch2,maxqch1,maxqch2,qch1,qch2
+      real*8 phi1,phi3,x1,x3,rat,cosmax2,cosmin2,bb,a1,a2,cos3,cos1,
+     1 b1,b2,sum_de,sin1,sin3,E,jac2,q2,z1,z2,qq1,qq2,Mpsc,
+     2 pompom
+      integer i,l1,l2
+      common/qqvec12/qq1,qq2
+        
+
+      if(pion.eq.13)then !pi0
+        Mpsc=mpi0f
+         
+           fak1 = -1.d0/Sp
+           fak4 = 27.d0
+           fak6 = 1.d0/3.d0
+           fakeh=1.d0/44.d0         
+ 
+      elseif(pion.eq.14)then !eta
+       Mpsc=metaf
+         
+           fak1 = -1.d0/Sp
+           fak4 = 1.d0
+           fak6 = 42.d0
+           fakeh=1.d0
+           
+      elseif(pion.eq.15)then !eta'
+       Mpsc=metaP
+
+           fak1 = -1.d0/Sp
+           fak4 = 1.d0
+           fak6 = 1.d0
+           fakeh=1.d0
+
+      endif
+      
+      pch=Ar(8)  ! for choosing channel
+      x = Ar(1)  ! for generation of q^2
+      p = Ar(7)  ! q^2 channels
+   
+      x1   = Ar(2) !k1
+      x3   = Ar(4) !k2
+c     
+c    azimuthal angles
+c
+      phi1 = 2.d0*pi*Ar(3) !k1
+      phi3 = 2.d0*pi*Ar(5) !k2
+      rat = 4.d0*me*me/Sp
+
+c         polar angles      
+      
+      bb = dSqrt(1.d0-rat)
+      mincos1 = dLog((rat)/(1.d0+bb)**2)
+     1      /(2.d0*bb)
+      a1 = dLog( (1+bb)**2/rat)
+     2          / (bb)
+
+
+c---------------------------------------------------------------------      
+c for Q^2 
+      qqmax=Sp*(1.d0-2.d0*w)
+      qqmin=Mpsc**2
+      amin = fak1*dLog(Sp-qqmin)
+      amax = fak1*dLog(Sp-qqmax)
+      a = amax-amin
+      bmin = dLog(qqmin/Sp)/Sp
+      b    = dLog(qqmax/qqmin)/Sp
+
+c --- which substitution? ---
+            
+      
+      cmin = Momega_c*GammaTotalomega_c*fak4*dAtan((qqmin-Momega_c**2)/
+     1 (Momega_c*GammaTotalomega_c))
+      cmax = Momega_c*GammaTotalomega_c*fak4*dAtan((qqmax-Momega_c**2)/
+     2 (Momega_c*GammaTotalomega_c))
+      c = cmax-cmin
+
+        
+        dmin = Mphi_c*GammaTotalphi_c*fak6*dAtan((qqmin-Mphi_c**2)/
+     1 (Mphi_c*GammaTotalphi_c))
+      dmax = Mphi_c*GammaTotalphi_c*fak6*dAtan((qqmax-Mphi_c**2)/
+     2 (Mphi_c*GammaTotalphi_c))
+        d = dmax-dmin
+         
+         ehmin=fakeh*qqmin
+         ehmax=fakeh*qqmax
+         eh=ehmax-ehmin
+c----------------------------------------------------------------------
+        ppp  = a+b+c+d+eh
+
+ 
+        if(p.lt.a/ppp)then
+           y  = amin+a*x
+           qq1 = Sp-dExp(y/fak1)                                       
+        elseif(p.lt.((a+b)/ppp))then
+           y  = bmin+b*x
+           qq1 = Sp*exp(Sp*y)
+        elseif(p.lt.((a+b+c)/ppp))then
+           y = cmin+c*x 
+           qq1 = Momega_c*GammaTotalomega_c*
+     1 dtan(y/fak4/Momega_c/GammaTotalomega_c) + Momega_c**2
+        elseif(p.lt.((a+b+c+d)/ppp))then
+           y = dmin+d*x 
+           qq1 = Mphi_c*GammaTotalphi_c*
+     1 dtan(y/fak6/Mphi_c/GammaTotalphi_c) + Mphi_c**2
+        else
+          y=ehmin+x*eh
+          qq1=y/fakeh
+         
+        endif
+
+        
+       
+       qq=qq1
+       
+       y = mincos1+x1*a1
+       onemb2c2 = 1.d0/(dcosh(bb*y))**2
+       cos1 = dTanh(bb*y)/bb
+       cos3 = cos3min+(cos3max-cos3min)*x3
+       z1=1.d0/(1.d0-bb**2*cos1**2)
+       
+      
+      jac2 = 4.d0*pi*2.d0*pi*a1
+
+
+c------------------------- Momenta-------------------------------------
+c----------------------------------------------------------------------
+      q2 = qq/Sp
+      sin1 = dSqrt(1.d0-cos1*cos1)
+      E = (1.d0-q2)*dSqrt(Sp)/2.d0
+      momenta(3,0) = E
+      momenta(3,1) = E*sin1*dCos(phi1)
+      momenta(3,2) = E*sin1*dSin(phi1)
+      momenta(3,3) = E*cos1
+
+c --- virtual photon ---
+      momenta(5,0) = (1.d0+q2)*dSqrt(Sp)/2.d0
+      do i = 1,3
+        momenta(5,i) = -momenta(3,i)
+      enddo
+
+      
+           sin3 = dSqrt(1.d0-cos3*cos3)
+           momenta(6,0)=(qq+Mpsc**2)/(2.d0*dsqrt(qq)) 
+           momenta(7,0)=(qq-Mpsc**2)/(2.d0*dsqrt(qq))
+           p=momenta(7,0) ! p=momenta(6,0)**2-Mpsc**2
+           momenta(6,1) = p*sin3*dCos(phi3)
+           momenta(6,2) = p*sin3*dSin(phi3)
+           momenta(6,3) = p*cos3
+         
+         do i = 1,3
+             momenta(7,i) = -momenta(6,i)
+         enddo
+         call hadronmomenta_1(2)
+
+       qq2=(momenta(6,0)+momenta(3,0))**2-(momenta(6,1)+momenta(3,1))**2      
+     1 -(momenta(6,2)+momenta(3,2))**2-(momenta(6,3)+momenta(3,3))**2
+
+       cos3=momenta(7,3)/momenta(7,0)
+
+       z2=1.d0/(1.d0-bb**2*cos3**2)
+
+
+      if(pch.le.0.5d0)then       
+      pompom = qq1
+      qq1 = qq2
+      qq2 = pompom
+      pompom = z1
+      z1=z2
+      z2 = pompom
+      do i = 0,3
+      pompom = momenta(3,i) 
+      momenta(3,i) = momenta(7,i)
+      momenta(7,i) = pompom
+      enddo
+      qq = qq2
+      endif
+         
+
+        jacobian=2.d0*ppp*jac2/(
+     1   z1*(1.d0/(Sp*(Sp-qq1))+ 1.d0/Sp/qq1+fakeh
+     1 + Momega_c**2*GammaTotalomega_c**2*fak4/((Momega_c**2-qq1)**2+
+     2 Momega_c**2*GammaTotalomega_c**2)
+     3 + Mphi_c**2*GammaTotalphi_c**2*fak6/((Mphi_c**2-qq1)**2+
+     2 Mphi_c**2*GammaTotalphi_c**2))
+     2 +z2*(1.d0/(Sp*(Sp-qq2))+ 1.d0/Sp/qq2+fakeh
+     1 + Momega_c**2*GammaTotalomega_c**2*fak4/((Momega_c**2-qq2)**2+
+     2 Momega_c**2*GammaTotalomega_c**2)
+     3 + Mphi_c**2*GammaTotalphi_c**2*fak6/((Mphi_c**2-qq2)**2+
+     2 Mphi_c**2*GammaTotalphi_c**2))
+     3)
+
+  
+
+
+
+c----------------------------------------------------------------------
+c
+      jacobian = jacobian
+
+
+      end
+c---------------------------------------------------------------------
+c---------------------------------------------------------------------
 c ========================================================================
 c --- Generates: photon virtuality Q2 using a two-component substitution -
 c used in 2 photon part
 c ------------------------------------------------------------------------
       subroutine qquadrat2(qqmin,qqmax,cos3min,cos3max,Ar,
      1                         qq,q0p,q2p,q0b,q2b,cos3,phi3,jacobian)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 qqmin,qqmax,Ar(14),qq,jacobian,x,a,b,amin,amax
      1      ,bmin,bmax,fak1,fak2,p,y,ppp,c,cmin,cmax,d,dmin,dmax,fak3
      2      ,mm_1,gg_1,const_1,const_2,fak4,e_1,e_1min,e_1max,fak6,f,
@@ -3836,7 +4651,7 @@ c *******************************************************************
 c
       subroutine qquadrat_1(qqmin,qqmax,x,p,mmm,ggg,fak5,fak6,
      1                                                   qq,jacobian)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 qqmin,qqmax,Ar(14),qq,jacobian,mmm,ggg,
      &  x,a,b,amin,amax,bmin,bmax,fak1,fak2,p,y,ppp,fak5,c,cmin,cmax,
      2  fak6,d,dmin,dmax
@@ -3924,7 +4739,7 @@ c   3 pi 1ph
 c ---------------------------------------------------------------------
 
       subroutine qquadrat_2(qq,qqmax,qqmin,x,p,jac)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
 
       real*8 jac,xx_om0_max,xx_om0_min,xx_om1_max,xx_om1_min,
      1   xx_phi0_max,xx_phi0_min,xx_ss_max,xx_ss_min,d_om0,d_om1,d_phi0,
@@ -4052,7 +4867,7 @@ c   eta pi pi  1ph and 2 ph
 c ---------------------------------------------------------------------
 
       subroutine qquadrat_eta(qq,qqmax,qqmin,x,p,jac)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
 
       real*8 jac,xx_om0_max,xx_om0_min,xx_om1_max,xx_om1_min,
      1   xx_phi0_max,xx_phi0_min,xx_ss_max,xx_ss_min,d_om0,d_om1,d_phi0,
@@ -4106,7 +4921,7 @@ c   3 pi 2ph
 c ---------------------------------------------------------------------
 
       subroutine qquadrat_2a(qq,qqmax,qqmin,x,p,jac)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
 
       real*8 jac,xx_om0_max,xx_om0_min,xx_om1_max,xx_om1_min,
      1   xx_phi0_max,xx_phi0_min,xx_ss_max,xx_ss_min,d_om0,d_om1,d_phi0,
@@ -4233,7 +5048,7 @@ c ========================================================================
 c --- Generates: real photon costheta and phi angles in the e^+e^- CMS ---
 c ------------------------------------------------------------------------
       subroutine photonangles1(cosmin,cosmax,Ar,costheta,phi,jacobian)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 cosmin,cosmax,Ar(14),costheta,phi,jacobian,x,b,cmin,cmax,y,
      1       cosmin2,cosmax2,cmaxmcmin,rat
 
@@ -4270,7 +5085,7 @@ c ========================================================================
 c --- Generates: real photon costheta and phi angles in the e^+e^- CMS ---
 c ------------------------------------------------------------------------
       subroutine photonangles2(cosmin,cosmax,Ar,costheta,phi,jacobian)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 cosmin,cosmax,Ar(14),costheta,phi,jacobian,x,b,cmin,cmax,y
      1      ,cmaxmcmin,rat,cosmin2,cosmax2
 
@@ -4303,7 +5118,7 @@ c --- CMS energy ---------------------------------------------------------
 c ------------------------------------------------------------------------
       subroutine photonenergy2(qq,c1min,c1max,cos1,cos2,cos12,Ar
      &                        ,w1,w2,jacobian)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 qq,c1min,c1max,cos1,cos2,cos12,Ar(14),
      &  w1,w2,jacobian,x,wmin,q2,qqb,w1max,w2max,u,umin,umax
 
@@ -4388,10 +5203,10 @@ c ------------------------------------------------------------------
 c    lepton four-momenta: one real photon                           
 c ------------------------------------------------------------------
       subroutine leptonmomenta1(qq,costheta,phi)
-      include 'phokhara_9.1.inc'
-      real*8 qq,q2,E,costheta,sintheta,phi
+      include 'phokhara_10.0.inc'
+      real*8 qq,q2,E,costheta,sintheta,phi,ransym
       integer i
-
+      common/sym/ransym
       q2 = qq/Sp
       sintheta = dSqrt(1.d0-costheta*costheta)
 c --- real photon1 ---
@@ -4416,7 +5231,7 @@ c ------------------------------------------------------------------
 c    lepton four-momenta: two real photons                          
 c ------------------------------------------------------------------
       subroutine leptonmomenta2(qq,w1,w2,cos1,phi1,cos2,phi2)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 qq,w1,w2,cos1,sin1,phi1,cos2,sin2,phi2,E1,E2
       integer i
 
@@ -4447,8 +5262,10 @@ c afterwards boosted into the e^+ e^- CMS --------------------------------
 c used in 2 photon emission
 c ------------------------------------------------------------------------
       subroutine pionangles(cosmin,cosmax,Ar,costheta,phi,jacobian)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 cosmin,cosmax,Ar(14),costheta,phi,jacobian,x 
+      real*8 rat,cosmin2,cosmax2,b,cmin,cmaxmcmin,y
+      
 
       x   = Ar(4)
       phi = 2.d0*pi*Ar(5)
@@ -4456,6 +5273,8 @@ c ------------------------------------------------------------------------
 c --- flat ---
       costheta = cosmin+(cosmax-cosmin)*x
       jacobian = 2.d0*pi*(cosmax-cosmin)
+     
+      
       return
       end
 c ========================================================================
@@ -4463,11 +5282,12 @@ c --- Generates: pion costheta and phi angles in Lambda rest-frame
 c ------------------------------------------------------------------------
       subroutine pionanglesLamb(cosmin,cosmax,costhm,phim,
      1                          costhp,phip)
-      include 'phokhara_9.1.inc'
+      use belle2_phokhara_interface
+      include 'phokhara_10.0.inc'
       real*8 jacobian,x1,x2,jac1,jac2,cosmin,cosmax,x
       real*8 costhm,phim,costhp,phip,rr1_ll(0:3)
 
-      call phokhara_rndmarray(rr1_ll,4)
+      call ranlxdf(rr1_ll,4)
       x1   = rr1_ll(0)
       x2   = rr1_ll(1)
       phim = 2.d0*pi*rr1_ll(2)
@@ -4494,7 +5314,8 @@ c q3    - four momentum of pi^-    |   q2,q3 - four momenta of pi^-
 c q4    - four momentum of pi^+    |
 c ------------------------------------------------------------------
       subroutine pionangles_1(qq2,q0p,q2p,q0b,q2b,fac)
-      include 'phokhara_9.1.inc'
+      use belle2_phokhara_interface
+      include 'phokhara_10.0.inc'
       integer ip0,i,ru
       real*8 Arp(8),Arp_r(0:7)
       real*8 q1(4),q2(4),q3(4),q4(4),pom_v(4) 
@@ -4503,7 +5324,7 @@ c ------------------------------------------------------------------
      2       sinth2,cosphi2,sinphi2,phi3,costh3,sinth3,cosphi3,sinphi3,
      3       rm12,e1,vq1,rm22,e2,vq2,e3,vq3,q2pp,appr1,fac
 c
-      call phokhara_rndmarray(Arp_r,8)
+      call ranlxdf(Arp_r,8)
       do ru=0,7
          Arp(ru+1) = Arp_r(ru)
       enddo
@@ -4626,7 +5447,8 @@ c q2    - four momentum of pi^-
 c q3    - four momentum of pi^0
 c
       subroutine pionangles_2(qq2,q0p,q2p,fac)
-      include 'phokhara_9.1.inc'
+      use belle2_phokhara_interface
+      include 'phokhara_10.0.inc'
 
       real*8 rr,rr_r(0:5),qq2,q1,q2,q3,fac,rlam,a,b,c,x1min,q0,x1max,
      1   dx1,q2p,q0p,pp,xx2,phi1,costh1,sinth1,cosphi1,sinphi1,phi2,
@@ -4635,11 +5457,12 @@ c
       real*8 gg_1,mm_1,const_s,pom,q12p,q13p,q23p,
      1       qq12_3pi,qq13_3pi,qq23_3pi
       integer i,jj,ru
+
 c
       dimension rr(6),q1(4),q2(4),q3(4)
       common/qqij_3pi/qq12_3pi,qq13_3pi,qq23_3pi
 c
-      call phokhara_rndmarray(rr_r,6)
+      call ranlxdf(rr_r,6)
       do ru=0,5
          rr(ru+1) = rr_r(ru)
       enddo
@@ -4772,7 +5595,8 @@ c q2    - four momentum of pi^+
 c q3    - four momentum of pi^-
 c
       subroutine pionangles_eta(qq2,q0p,q2p,fac)
-      include 'phokhara_9.1.inc'
+      use belle2_phokhara_interface
+      include 'phokhara_10.0.inc'
 
       real*8 rr,rr_r(0:5),qq2,q1,q2,q3,fac,rlam,a,b,c,x1min,q0,x1max,
      1   dx1,q2p,q0p,pp,xx2,phi1,costh1,sinth1,cosphi1,sinphi1,phi2,
@@ -4785,7 +5609,7 @@ c
       dimension rr(6),q1(4),q2(4),q3(4)
       common/qqij_3pi/qq12_3pi,qq13_3pi,qq23_3pi
 c
-      call phokhara_rndmarray(rr_r,6)
+      call ranlxdf(rr_r,6)
       do ru=0,5
          rr(ru+1) = rr_r(ru)
       enddo
@@ -4903,6 +5727,7 @@ c *******************************************************************
 c generation of the 3pi invariant mass: flat + omega Breit-Wigner
 c *******************************************************************
       subroutine chann1(rrr,q2p_min,q2p_max,q2p,dx1,ip0)
+      use belle2_phokhara_interface
       implicit none
       real*8 rrr,q2p_min,q2p_max,q2p,dx1,dm,dg,dm2,dmg,rr1(1),
      1       rr1_r(0:2),vol1,vol2,vol3,vol4,vol,r1_test,r2_test,r3_test,
@@ -4927,7 +5752,7 @@ c
       r2_test = (vol1+vol2)/vol
       r3_test = (vol1+vol2+vol3)/vol
 c
-      call phokhara_rndmarray(rr1_r,1)
+      call ranlxdf(rr1_r,1)
       rr1(1) = rr1_r(0)
 c
       if(rr1(1).lt.r1_test)then
@@ -4968,13 +5793,15 @@ c ------------------------------------------------------------------
 c     hadron four momenta                                            
 c ------------------------------------------------------------------
       subroutine hadronmomenta(qq,costheta,phi)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 qq,p,costheta,sintheta,phi,m2,
-     &        cmsvector(0:3),boostvector(0:3),labvector(0:3)
+     &        cmsvector(0:3),boostvector(0:3),labvector(0:3),
+     & ransym
       integer i
+      common/sym/ransym
       
       sintheta = dSqrt(1.d0-costheta*costheta)
-      if (pion.eq.0) then 
+      if ((pion.eq.0).or.(pion.eq.11).or.(pion.eq.12)) then 
          m2 = mmu*mmu
       elseif (pion.eq.4) then 
          m2 = mp*mp
@@ -5001,6 +5828,7 @@ c --- pi^-/mu^-/p/n/K^-/K^0bar/lambda---
       do i = 1,3
         momenta(7,i) = -momenta(6,i)
       enddo
+
 c --- boost the hadron momenta into the e^+ e^- CMS ---
       call hadronmomenta_1(2)
       return
@@ -5009,7 +5837,7 @@ c ------------------------------------------------------------------
 c     hadron four momenta                                            
 c ------------------------------------------------------------------
       subroutine hadronmomenta_0ph(qq,costheta,phi)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 qq,p,costheta,sintheta,phi,m2,
      &        cmsvector(0:3),boostvector(0:3),labvector(0:3)
       integer i
@@ -5042,13 +5870,53 @@ c --- pi^-/mu^-/p/n/K^-/K^0bar/lambda---
       do i = 1,3
         momenta(7,i) = -momenta(6,i)
       enddo
+c-----------------------------------------
+cST----for pi0 gamma channel-------------
+      if(pion.eq.13)then
+c momenta(6,mu) - pi0 momentum
+c momenta(7,mu) - gamm momentum
+      momenta(6,0)=(qq+mpi0f**2)/(2.d0*dsqrt(qq)) 
+      momenta(7,0)=(qq-mpi0f**2)/(2.d0*dsqrt(qq))
+      p=momenta(7,0) ! p=momenta(6,0)**2-mpi0**2
+      momenta(6,1) = p*sintheta*dCos(phi)
+      momenta(6,2) = p*sintheta*dSin(phi)
+      momenta(6,3) = p*costheta
+         do i = 1,3
+             momenta(7,i) = -momenta(6,i)
+         enddo 
+      elseif(pion.eq.14)then
+c momenta(6,mu) - eta momentum
+c momenta(7,mu) - gamm momentum
+      momenta(6,0)=(qq+metaf**2)/(2.d0*dsqrt(qq)) 
+      momenta(7,0)=(qq-metaf**2)/(2.d0*dsqrt(qq))
+      p=momenta(7,0) ! p=momenta(6,0)**2-mpi0**2
+      momenta(6,1) = p*sintheta*dCos(phi)
+      momenta(6,2) = p*sintheta*dSin(phi)
+      momenta(6,3) = p*costheta
+         do i = 1,3
+             momenta(7,i) = -momenta(6,i)
+         enddo 
+      elseif(pion.eq.15)then
+c momenta(6,mu) - etaP momentum
+c momenta(7,mu) - gamm momentum
+      momenta(6,0)=(qq+metaP**2)/(2.d0*dsqrt(qq)) 
+      momenta(7,0)=(qq-metaP**2)/(2.d0*dsqrt(qq))
+      p=momenta(7,0) ! p=momenta(6,0)**2-mpi0**2
+      momenta(6,1) = p*sintheta*dCos(phi)
+      momenta(6,2) = p*sintheta*dSin(phi)
+      momenta(6,3) = p*costheta
+         do i = 1,3
+             momenta(7,i) = -momenta(6,i)
+         enddo   
+      endif
+c-----------------------------------------
       return
       end
 c ------------------------------------------------------------------
 c        boost four momenta from Q rest frame to e^+ e^- CMS             
 c ------------------------------------------------------------------
       subroutine hadronmomenta_1(Np)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 p,costheta,sintheta,phi,m2,
      &        cmsvector(0:3),boostvector(0:3),labvector(0:3),
      1        q1(4),q2(4),q3(4),q4(4)
@@ -5071,6 +5939,7 @@ c
       enddo
       return
       end
+c ------------------------------------------------------------------
 c --------------------------------------------------------------------
 c        hadron four momenta pi^- p (pi^+ pbar) (pion=9)  
 c        boost from Lambda (Lambda bar) rest frame to Q rest frame 
@@ -5078,7 +5947,7 @@ c        boost from Q rest frame to e^+ e^- CMS
 c --------------------------------------------------------------------
       subroutine hadronmomenta_Lamb(qq,costheta,phi,costhm,phim,costhp,
      1                                                            phip)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 qq,p,costheta,sintheta,phi,m2,
      2        cmsvector(0:3),boostvector(0:3),labvector(0:3)
       real*8 costhm,phim,sinthm,costhp,phip,sinthp,e1pi,e1p,vpp1,
@@ -5209,7 +6078,7 @@ c --- boost the hadron momenta into the e^+ e^- CMS ---   !!!!!!!!!!!!!
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       subroutine hadronmomenta_Lamb0(qq,costheta,phi,costhm,phim,costhp,
      1                                                            phip)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 qq,p,costheta,sintheta,phi,m2,
      2        cmsvector(0:3),boostvector(0:3),labvector(0:3)
       real*8 costhm,phim,sinthm,costhp,phip,sinthp,e1pi,e1p,vpp1,
@@ -5409,7 +6278,8 @@ c ========================================================================
 c --- Spin Lambda test
 c ------------------------------------------------------------------------
       subroutine test_spin(qq,Hadronic,amplit,accepted)
-      include 'phokhara_9.1.inc'
+      use belle2_phokhara_interface
+      include 'phokhara_10.0.inc'
       real*8 Matrix,qq,amplit
       real*8 rr_ll,ff_min_ll,ff_max_ll,ff_ll,ff_spin_ll
       complex*16 Leptonic(0:3,0:3),Hadronic(0:3,0:3),
@@ -5419,7 +6289,7 @@ c ------------------------------------------------------------------------
 
       common/Lept_ee/Leptonic
 
-      call phokhara_rndmarray(rr_ll,1)  
+      call ranlxdf(rr_ll,1)  
 
       accepted = .true.
 
@@ -5439,7 +6309,8 @@ c========================================================================
 c        Spin lambda test for 0 photon part
 c 
       subroutine test_spin0(qq,Hadronic,amplit,accepted)
-      include 'phokhara_9.1.inc'
+      use belle2_phokhara_interface
+      include 'phokhara_10.0.inc'
       real*8 Matrix,qq,amplit
       real*8 rr_ll,ff_min_ll,ff_max_ll,ff_ll,ff_spin_ll
       complex*16 Leptonic(0:3,0:3),Hadronic(0:3,0:3),
@@ -5449,7 +6320,7 @@ c
 
 
 
-      call phokhara_rndmarray(rr_ll,1)
+      call ranlxdf(rr_ll,1)
 
       accepted = .true.
 
@@ -5469,17 +6340,22 @@ c ========================================================================
 c --- Test experimental cuts ---------------------------------------------
 c ------------------------------------------------------------------------
       subroutine testcuts(n,accepted)
-      include 'phokhara_9.1.inc'
-      real*8 piplab,pimlab,m2,phot1,invmom(0:3),invm2
+      include 'phokhara_10.0.inc'
+      real*8 piplab,pimlab,m2,phot1,invmom(0:3),invm2,q1long,q2long
       integer n,i,j,ij,mj
       logical accepted,accept(3:4)
-
+      logical BABAR,KLOE,BES
+      real*8 qu(4),pipicut1,pmodtr(2),Efot_pi
+      real*8 asquared,trkmass,Mphi,pipicut1_min,pipicut1_max
+      real*8 ptran1,ptran2,angpho
+      
       accepted = .true.
 c -----------------------------------------
 c --- angular cuts on the hadrons/muons ---
       mj = 6
       if ((pion.le.1).or.(pion.eq.4).or.(pion.eq.5).or.
-     1    (pion.eq.6).or.(pion.eq.7)) j = 7
+     1    (pion.eq.6).or.(pion.eq.7).or.(pion.eq.11)
+     2 .or.(pion.eq.12)) j = 7
       if ((pion.eq.2).or.(pion.eq.3)) j = 9 
       if ((pion.eq.8).or.(pion.eq.10)) j = 8
 c      if (pion.eq.9) j = 7 ! Lambda (Lambda bar) 
@@ -5487,6 +6363,9 @@ c      if (pion.eq.9) j = 7 ! Lambda (Lambda bar)
              mj = 8
              j = 11 
        endif
+      if((pion.eq.13).or.(pion.eq.14).or.(pion.eq.15))then
+         j=6
+      endif
 
       do i = mj,j
       piplab = dacos(momenta(i,3)/
@@ -5494,12 +6373,99 @@ c      if (pion.eq.9) j = 7 ! Lambda (Lambda bar)
      &         *180.d0/pi
       accepted = (accepted.and.(piplab.ge.pi1cut.and.piplab.le.pi2cut))
       enddo 
+
+
+      BABAR=.false.
+      KLOE=.false.
+      BES=.false.
+
+      if(BABAR) then
+c BABAR
+      angpho=-(momenta(6,3)+momenta(7,3))/sqrt(
+     1 (momenta(6,1)+momenta(7,1))**2+(momenta(6,2)+momenta(7,2))**2
+     2 +(momenta(6,3)+momenta(7,3))**2)
+
+      q1long =dsqrt(momenta(7,1)**2 + momenta(7,2)**2 + momenta(7,3)**2)
+      q2long =dsqrt(momenta(6,1)**2 + momenta(6,2)**2 + momenta(6,3)**2)
+c
+      accepted = (accepted.and.(q1long.gt.1.d0).and.(q2long.gt.1.d0)
+     1 .and.(angpho.gt.-0.939692621d0).and.(angpho.lt.0.939692621d0))
+
+      elseif(KLOE)then
+c KLOE 
+      if(pion.eq.0)then
+      qu(1) = momenta(6,0) + momenta(7,0)
+      qu(2) = momenta(6,1) + momenta(7,1)
+      qu(3) = momenta(6,2) + momenta(7,2)
+      qu(4) = momenta(6,3) + momenta(7,3)
+c
+      pipicut1_min = 50.d0*pi/180.d0
+      pipicut1_max = 130.d0*pi/180.d0
+
+c
+      pipicut1 = acos( -qu(4)/Sqrt(qu(2)**2 +
+     &           qu(3)**2 + qu(4)**2) )  !*180.d0/pi
+c
+      pmodtr(1)=sqrt(momenta(6,1)**2 + momenta(6,2)**2 +momenta(6,3)**2)
+      pmodtr(2)=sqrt(momenta(7,1)**2 + momenta(7,2)**2 +momenta(7,3)**2)
+c
+      Mphi = 1.02d0
+c
+      Efot_pi = Sqrt(qu(2)**2+qu(3)**2+qu(4)**2)
+c
+      asquared = (Efot_pi - Mphi)**2 - pmodtr(1)**2
+     1           - pmodtr(2)**2
+c
+      asquared = 0.5d0*asquared
+c
+      trkmass = ( asquared**2 - pmodtr(1)**2*pmodtr(2)**2 ) /
+     1     ( 2.d0*asquared + pmodtr(1)**2 + pmodtr(2)**2 )
+c
+      if ( trkmass.ge.0.d0) then
+        trkmass = Sqrt(trkmass)
+       else
+        trkmass = -Sqrt(-trkmass)
+      endif
+
+      angpho=-(momenta(6,3)+momenta(7,3))/sqrt(
+     1 (momenta(6,1)+momenta(7,1))**2+(momenta(6,2)+momenta(7,2))**2
+     2 +(momenta(6,3)+momenta(7,3))**2)
+c
+
+       accepted = (accepted.and.
+     & ((pipicut1.lt.pipicut1_min).or.(pipicut1.gt.pipicut1_max))
+     &  .and.
+     & ((trkmass.gt.0.13d0).and.(abs(angpho).gt.0.965925826d0))
+     & .and.(abs(momenta(6,3)).gt.0.09d0)
+     & .and.(abs(momenta(7,3)).gt.0.09d0)!.and.
+c     &  (trkmass.lt.0.115d0))
+     &    )
+
+      endif
+
+      elseif(BES)then
+      ptran1=sqrt(momenta(6,1)**2+momenta(6,2)**2)
+      ptran2=sqrt(momenta(7,1)**2+momenta(7,2)**2)
+
+      angpho=-(momenta(6,3)+momenta(7,3))/sqrt(
+     1 (momenta(6,1)+momenta(7,1))**2+(momenta(6,2)+momenta(7,2))**2
+     2 +(momenta(6,3)+momenta(7,3))**2)
+
+      accepted=(accepted.and.((abs(angpho).lt.0.8d0).or.
+     1 ((abs(angpho).gt.0.86d0).and.(abs(angpho).lt.0.92d0))).and.
+     2 (ptran1.gt.0.3d0).and.(ptran2.gt.0.3d0))
+
+      endif
+
 c -------------------------------------------------------------
 c    tagged photons: one photon is tagged, a second photon is 
 c    generated everywhere
 c -------------------------------------------------------------
 c --- one of the photons has energy > gmin ---
 c without 0
+      if((pion.eq.13).or.(pion.eq.14).or.(pion.eq.15))then
+       continue
+      else
       if((n.eq.1).or.(n.eq.2))then
       accepted = (accepted.and.
      &           (momenta(3,0).ge.gmin.or.momenta(4,0).ge.gmin))
@@ -5521,13 +6487,14 @@ c --- (muons,protons,neutrons,kaons) ---
          endif
       enddo
       accepted = (accepted.and.(accept(3).or.accept(4)))
-      endif            
+      endif  
+      endif          
       end
 c ====================================================================
 c --- Matrix element squared: contract Leptonic and Hadronic tensors -
 c --------------------------------------------------------------------
       real*8 function Matrix(Leptonic,Hadronic)
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       complex*16 Leptonic(0:3,0:3),Hadronic(0:3,0:3)
       real*8 metric1,metric2
       integer mu,nu
@@ -5581,12 +6548,16 @@ c ------------------------------------------------------------------------
 c (c) German Rodrigo 2000                                                 
 c ------------------------------------------------------------------------
       subroutine LeptonicTensor1ISR(qq,cosphoton,Leptonic)
-      include 'phokhara_9.1.inc' 
-      complex*16 Leptonic(0:3,0:3),dggvap,BW_om,vacpol_and_nr
+      include 'phokhara_10.0.inc' 
+      complex*16 Leptonic(0:3,0:3),dggvap,BW_om,vacpol_and_nr,
+     1 Leptonics(0:3,0:3)
       real*8 qq,cosphoton,aa_phi,mm_ph,gg_ph,
      &  a00,a11,a22,a12,am1,dps,metric,vac_qq
+      real*8 a00s,a11s,a22s,a12s,am1s
+      real*8 soft
       integer mu,nu
       common/param_PFF/aa_phi,mm_ph,gg_ph
+      common/subtract_soft/a00s,a11s,a22s,a12s,am1s
 
       dps = (1.d0-qq/Sp)/(32.d0*pi*pi)        ! Phase space factors
       vac_qq = cdabs(vacpol_and_nr(qq))**2 
@@ -5604,17 +6575,38 @@ c --- ISR ---
      &             momenta(2,mu)*momenta(1,nu)))*dps*vac_qq
          enddo
       enddo
+      if(nlo2.eq.1)then !ST soft subtraction
+      soft=alpha/pi*(
+     1 (-log(4.d0*w*w))*(1.d0+log(me**2/Sp))
+     1 -log(me**2/Sp)**2/2.d0-log(me**2/Sp)-pi**2/3.d0)
+c      print*, 'soft=',soft
+      do mu = 0,3
+         do nu = 0,3
+      Leptonics(mu,nu) = dcmplx((a00s*metric(mu,nu)+
+     &        a11s*momenta(1,mu)*momenta(1,nu)/Sp+
+     &        a22s*momenta(2,mu)*momenta(2,nu)/Sp+
+     &        a12s*(momenta(1,mu)*momenta(2,nu)+
+     &             momenta(2,mu)*momenta(1,nu))/Sp),
+     &         pi*am1s/Sp*(momenta(1,mu)*momenta(2,nu)-
+     &             momenta(2,mu)*momenta(1,nu)))*dps*vac_qq
+
+       Leptonic(mu,nu)=Leptonic(mu,nu)-Leptonics(mu,nu)*soft
+         enddo
+      enddo
+      endif
       return
       end
 c **********************************************************************
 c 
       subroutine Bornvirtualsoft(qq,cosphoton,a00,a11,a22,a12,am1)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 qq,cosphoton,a00,a11,a22,a12,am1,app,m2,q2,uq2,
      1  b,x,y1,y2,globalfactor,a00NLO,a11NLO,a22NLO,a12NLO,api,
      &  t1,t2,t3,t4,t5,t6,t7,t8,t9,s1,t10,t11,t12,t13,t14,Ny1,Ny2,z,
      &  soft,coll,extramass
+      real*8 a00s,a11s,a22s,a12s,am1s
       complex*16 cdilog,dcmplx
+      common/subtract_soft/a00s,a11s,a22s,a12s,am1s
        
       m2 = me*me/Sp
       q2 = qq/Sp
@@ -5641,6 +6633,14 @@ c --- LO ---
       a22 = (8.d0*m2/y1-4.d0*q2/y2)/y1
       a12 = -8.d0*m2/(y1*y2)
       am1 = 0.d0
+
+      if(nlo2.eq.1)then !ST part for subtract soft emission
+            a00s=a00
+            a11s=a11
+            a22s=a22
+            a12s=a12
+            am1s=am1
+      endif
 
 c --- NLO ---
       if (nlo.ne.0) then    
@@ -5746,18 +6746,36 @@ c --- soft and collinear logs
       coll = (-1.5d0*t2-2.d0+t3)
 
 c --- final result
-      a00 = a00 + api*(a00*(soft+coll)+a00NLO)
-      a11 = a11 + api*(a11*(soft+coll)+a11NLO)
-      a22 = a22 + api*(a22*(soft+coll)+a22NLO)
-      a12 = a12 + api*(a12*(soft+coll)+a12NLO)                   
+      a00 = a00 + api*(a00*(soft+coll)+a00NLO)!-a00
+      a11 = a11 + api*(a11*(soft+coll)+a11NLO)!-a11
+      a22 = a22 + api*(a22*(soft+coll)+a22NLO)!-a22
+      a12 = a12 + api*(a12*(soft+coll)+a12NLO)!-a12                   
       am1 = api*am1
       endif 
+c soft test
+
+c      a00 = a00+api*a00*soft!a00 + api*(a00*(soft+coll)+a00NLO)
+c      a11 = a11+api*a11*soft!a11 + api*(a11*(soft+coll)+a11NLO)
+c      a22 = a22+api*a22*soft!a22 + api*(a22*(soft+coll)+a22NLO)
+c      a12 = a12+api*a12*soft!a12 + api*(a12*(soft+coll)+a12NLO)                   
+c      am1 = 0.d0!api*a11*soft!api*am1
+
+
 
       a00 = globalfactor * a00
       a11 = globalfactor * a11
       a22 = globalfactor * a22
       a12 = globalfactor * a12
       am1 = globalfactor * am1
+
+      if(nlo2.eq.1)then !ST part for subtract soft emission
+           a00s = globalfactor * a00s
+           a11s = globalfactor * a11s
+           a22s = globalfactor * a22s
+           a12s = globalfactor * a12s
+           am1s = globalfactor * am1s
+      endif
+
       return 
       end
 
@@ -5785,15 +6803,17 @@ c                         p pbar, n nbar, K^+ K^-, K^0 K^0bar, pi^+ pi^- pi^0,
 c                         lambda lambdabar
 c ----------------------------------------------------------------------------
       subroutine HadronicTensorISR(qq,q0p,q2p,q0b,q2b,Hadronic)
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       real*8 qq,pionFF,q0p,q2p,q0b,q2b,metric,dps,q1(4),q2(4),
-     1                 q3(4),q4(4),rlam,a,b,c,mmu1
+     1                 q3(4),q4(4),rlam,a,b,c,mmu1,bb,
+     2 qqvec(0:3)
       complex*16 Hadronic(0:3,0:3),hadr(4),hadr_3pi(4),PionFormFactor,
-     1           KaonFormFactor
+     1           KaonFormFactor,pionggFF_dprime,etaggFF_dprime2,
+     2 etaPggFF_dprime2
       real*8 protGE2,protGM2,tau_pp,Columb_F
       real*8 lambGE2,lambGM2,tau_ll,t1_ll,aa_ll,qqp_ll(0:3),qqm_ll(0:3)
-      real*8 mm_phi_lam,mm_om_lam,mu_lamb,phase_f2_lamb
-      integer mu,nu,i
+      real*8 mm_phi_lam,mm_om_lam,mu_lamb,phase_f2_lamb,qqsqpi0
+      integer mu,nu,i,j,bnu
       complex*16 protF1,protF2,GM_pp,GE_pp,lambF1,lambF2,GM_ll,GE_ll
       common/lambF1F2/lambF1,lambF2,tau_ll,GM_ll,GE_ll,lambGM2,lambGE2,
      1                t1_ll,aa_ll,qqp_ll,qqm_ll
@@ -5896,11 +6916,11 @@ c----- PPbar (pion=4) and  NNbar (pion=5) ----------------
       enddo
 
 c including Coulumb Factor
-        if((pion.eq.4).and.(fsr.ne.0))then
+        if((pion.eq.4))then
+            bb=pi*alpha/sqrt(abs(1.d0-4.d0*mp**2/qq))
            do mu=0,3
              do nu=0,3
-              Hadronic(mu,nu)=Hadronic(mu,nu)*Columb_F(qq)
-            !bez if *bb/(1.d0-exp(-bb)) bb=bb=pi*alpha/sqrt(abs(1.d0-4.d0*mp**2/qq))
+              Hadronic(mu,nu)=Hadronic(mu,nu)*bb/(1.d0-exp(-bb))
           enddo
             enddo
           endif 
@@ -5982,16 +7002,93 @@ c----- Lambda (Lambda bar) pion=9  ----------------
      1    - metric(mu,nu)*qq) + 4.d0 * aa_ll * qqm_ll(mu)*qqm_ll(nu) 
          enddo
       enddo
+c ----   pi0 gamma pion=13 ---------------------------
+      elseif(pion.eq.13)then
+c
+        
+       do nu=0,3
+        qqvec(nu)=momenta(6,nu)+momenta(7,nu)
+       enddo
+
+        
+      pionFF=(4.d0*pi*alpha)**2*cdabs(pionggFF_dprime(qq,0.d0))**2
+      dps =  (1.d0-mpi0f**2/qq)/(32.d0*pi*pi)  ! Phase space factors
+      do nu = 0,3
+         do bnu = 0,3
+       Hadronic(nu,bnu)=-pionFF*( 1.D0/4.D0*metric(nu,bnu)*qq**2-
+     &1.D0/2.D0*metric(nu,bnu)*mpi0f**2*qq 
+     &  + 1.D0/4.D0*metric(nu,bnu)*mpi0f**4 - 1.D0/2.D0*
+     &    momenta(7,nu)*qqvec(bnu)*qq + 1.D0/2.D0*momenta(7,nu)*
+     &    qqvec(bnu)*mpi0f**2 + momenta(7,nu)*momenta(7,bnu)*qq-1.D0/2.
+     &    D0*momenta(7,bnu)*qqvec(nu)*qq + 1.D0/2.D0*momenta(7,bnu)*
+     &    qqvec(nu)*mpi0f**2 )*dps
+
+         enddo
+      enddo
+     
+c      print*, 'FF=',qq,cdabs(-qq*pionggFF_dprime(-qq,0.d0))
+
+
+
+      elseif(pion.eq.14)then
+c
+        
+       do nu=0,3
+        qqvec(nu)=momenta(6,nu)+momenta(7,nu)
+       enddo
+
+        
+      pionFF=(4.d0*pi*alpha)**2*cdabs(etaggFF_dprime2(qq,0.d0))**2
+      dps =  (1.d0-metaf**2/qq)/(32.d0*pi*pi)  ! Phase space factors
+      do nu = 0,3
+         do bnu = 0,3
+       Hadronic(nu,bnu)=-pionFF*( 1.D0/4.D0*metric(nu,bnu)*qq**2-
+     &1.D0/2.D0*metric(nu,bnu)*metaf**2*qq 
+     &  + 1.D0/4.D0*metric(nu,bnu)*metaf**4 - 1.D0/2.D0*
+     &    momenta(7,nu)*qqvec(bnu)*qq + 1.D0/2.D0*momenta(7,nu)*
+     &   qqvec(bnu)*metaf**2 + momenta(7,nu)*momenta(7,bnu)*qq - 1.D0/2.
+     &    D0*momenta(7,bnu)*qqvec(nu)*qq + 1.D0/2.D0*momenta(7,bnu)*
+     &    qqvec(nu)*metaf**2 )*dps
+
+         enddo
+      enddo
+c      print*, 'FF=',qq,cdabs(-qq*etaggFF_dprime2(-qq,0.d0)) 
+
+
+      elseif(pion.eq.15)then
+c
+        
+       do nu=0,3
+        qqvec(nu)=momenta(6,nu)+momenta(7,nu)
+       enddo
+
+        
+      pionFF=(4.d0*pi*alpha)**2*cdabs(etaPggFF_dprime2(qq,0.d0))**2
+      dps =  (1.d0-metaP**2/qq)/(32.d0*pi*pi)  ! Phase space factors
+      do nu = 0,3
+         do bnu = 0,3
+       Hadronic(nu,bnu)=-pionFF*( 1.D0/4.D0*metric(nu,bnu)*qq**2-
+     &1.D0/2.D0*metric(nu,bnu)*metaP**2*qq 
+     &  + 1.D0/4.D0*metric(nu,bnu)*metaP**4 - 1.D0/2.D0*
+     &    momenta(7,nu)*qqvec(bnu)*qq + 1.D0/2.D0*momenta(7,nu)*
+     &   qqvec(bnu)*metaP**2 + momenta(7,nu)*momenta(7,bnu)*qq - 1.D0/2.
+     &    D0*momenta(7,bnu)*qqvec(nu)*qq + 1.D0/2.D0*momenta(7,bnu)*
+     &    qqvec(nu)*metaP**2 )*dps
+         enddo
+      enddo
+c      print*, 'FF=',qq,cdabs(-qq*etaPggFF_dprime2(-qq,0.d0))
 
       else
        continue
       endif
+
+       
 c
       return
       end
 c ----------------------------------------------------------------------------
       subroutine HadroLamb(qq,Hadronic,HadronicLamb)
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       real*8 qq,metric
       real*8 lambGE2,lambGM2,tau_ll,t1_ll,veclamb1(0:3),veclamb1_d(0:3),
      1       veclamb2(0:3),veclamb2_d(0:3),qqp_ll(0:3),qqp_d_ll(0:3),
@@ -6120,7 +7217,7 @@ c      epsyl(3,2,1,0) = 1.d0          epsyl(3,2,0,1) = -1.d0
       end
 c **********************************************************************
       subroutine skalarLamb()
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
 
       real*8 veclamb1(0:3),veclamb2(0:3),qqp_ll(0:3)
       real*8 qqpS1_ll,qqpS2_ll,S1S2_ll
@@ -6145,7 +7242,7 @@ c ------
       end
 c **********************************************************************
       subroutine LambdaFormFactor(qq,tau_ll,lambF1,lambF2) 
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       real*8 qq,tau_ll,mm_phi_lam2,mm_om_lam2,mm_om1_lam2,mm_om2_lam2,
      1       mm_phi1_lam2,mm_phi2_lam2,const_model_lamb
       real*8 mm_phi_lam,mm_om_lam,mu_lamb,phase_f2_lamb    
@@ -6182,7 +7279,7 @@ c **********************************************************************
       end
 c **********************************************************************
       complex*16 function PionFormFactor(a)
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       integer nnn
       double precision a         
       complex*16 BW,BW_rho,BW_GS,BW_om,c_sum,appr_sum,BW_GS_09,tail_sum
@@ -6221,13 +7318,15 @@ c
         write(6,*)' Wrong pion FF switch'
       endif
 
+c       PionFormFactor=dcmplx(1.d0,0.d0)
+       
       return
       end
 c **********************************************************************
 c only for FF_pion = 2
 c **********************************************************************
       complex*16 function PionFormFactor_ex(a)
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       double precision a         
       complex*16 BW_om,BW_GS_09,tail_sum
  
@@ -6250,7 +7349,7 @@ c **********************************************************************
       end
 cc **********************************************************************
       complex*16 function PionFormFactor_3pi(qq2)
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       real*8 qq2,omm_PDG,omg_PDG,qq12_3pi,qq13_3pi,qq23_3pi
       complex*16 RR_3pi,HH_3pi,RRro_3pi
       common/qqij_3pi/qq12_3pi,qq13_3pi,qq23_3pi
@@ -6282,9 +7381,507 @@ c PDG 2004
      3                      rhom0p_3pi,rhog0p_3pi,rhom0z_3pi,rhog0z_3pi)
       return
       end
+cc**********************************************************************
+c      
+c    pi^0 Form Factor
+c-------------------------------------------------------------
+      complex*16 function pionggFF_dprime(t1_a,t2_a)
+      include 'phokhara_10.0.inc'
+c      implicit none
+c      include 'common.ekhara.inc.for'
+      real*8 t1_a,t2_a,W2_a,par(20),A1,A2,Fsmv3Hv3
+      complex*16 Drho, Domega, Dphi   ! function (q2t)
+      complex*16 Drho2, Domega2, Dphi2   ! function (q2t); 2nd octet
+      complex*16 Drho3, Domega3, Dphi3 
+c      real*8 theta0, theta8, Cs_c, Cq_c   ! this is enough for ETA
+      real*8 coef!,pi,Fpi
+      real*8 SIGvFsmv2,SIGv2Fsmv2,SIGv3Fsmv2
+      complex*16 ffdummy,cpom
+      save
+      
+      coef = 1.d0 !4.d0 * pi**2 * feta!!!!! changed by HC
+
+!coef stands for the normalization change:
+![etaggFF( 0 , 0 , meta^2 ) == Nc/(12 pi^2 Feta)]
+!                                   ==>>> [etaggFF( 0 , 0 , meta^2 ) == 1]
+!
+!  for fits:
+      
+      Fsmv3Hv3 = (3.d0/4.d0/pi/pi -4.d0*sqrt(2.d0)*hv1*Fsmv1
+     &          *(1.d0+F_om*H_om+A1pi0*F_phi)
+     & -4.d0*sqrt(2.d0)*Fsmv2Hv2
+     &          *(2.d0+A2pi0)
+     & )/4.d0/sqrt(2.d0)/(2.d0+A3pi0)
+      SIGvFsmv2=dsqrt(2.d0)*Hv1*Fsmv1
+      SIGv2Fsmv2=dsqrt(2.d0)*Fsmv2Hv2
+      SIGv3Fsmv2=dsqrt(2.d0)*Fsmv3Hv3
+
+
+
+       ffdummy =  coef *(
+c     & (-1.d0,0.d0) / 4.d0 /pi**2 / Fchir
+     & -3.d0/(12.d0*pi**2*Fchir)
+     & + 4.d0*sqrt(2.d0)*Fsmv1*Hv1/3.d0/Fchir *t1_a
+     & *(Drho(t1_a) + F_om*H_om*Domega(t1_a) 
+     & +A1pi0*F_phi*Dphi(t1_a))
+     & + 4.d0*sqrt(2.d0)*Fsmv1*Hv1/3.d0/Fchir *t2_a*(Drho(t2_a)
+     & +F_om*H_om*Domega(t2_a)+A1pi0*F_phi*Dphi(t2_a))
+     & - 4.d0*SIGvFsmv2/Fchir/3.d0 * t1_a*t2_a
+     & *(   Drho(t1_a)* Domega(t2_a) +  Drho(t2_a)* Domega(t1_a)
+     & +(A1pi0*F_phi-A_pi_phiom)*Dphi(t1_a)*Dphi(t2_a)
+     &  + (F_om*H_om-1.d0-A_pi_phiom)*Domega(t2_a)*Domega(t1_a) 
+     &  +A_pi_phiom*
+     & (Domega(t1_a)*Dphi(t2_a)+Dphi(t1_a)*Domega(t2_a)))
+     &   )
+c       print*,'1',ffdummy
+c      write(6,*)'ffdummy =',ffdummy
+      ffdummy = ffdummy +coef*(
+     & + 4.d0*sqrt(2.d0)*Fsmv2Hv2/3.d0/Fchir*t1_a
+     & *(Drho2(t1_a) + Domega2(t1_a)+A2pi0*Dphi2(t1_a))
+     & + 4.d0*sqrt(2.d0)*Fsmv2Hv2/3.d0/Fchir*t2_a
+     & *(Drho2(t2_a) + Domega2(t2_a)+A2pi0*Dphi2(t2_a))
+     & - 4.d0*SIGv2Fsmv2/Fchir/3.d0 * t1_a*t2_a
+     & *(   Drho2(t1_a)* Domega2(t2_a) +  Drho2(t2_a)* Domega2(t1_a)
+     &  +A2pi0*Dphi2(t1_a)*Dphi2(t2_a))
+     &  )
+c      write(6,*)'ffdummy =',ffdummy
+c      print*,'2',ffdummy
+      ffdummy = ffdummy +coef*(
+     & + 4.d0*sqrt(2.d0)*Fsmv3Hv3/3.d0/Fchir*t1_a
+     & *(Drho3(t1_a) + Domega3(t1_a)+A3pi0*Dphi3(t1_a))
+     & + 4.d0*sqrt(2.d0)*Fsmv3Hv3/3.d0/Fchir*t2_a
+     & *(Drho3(t2_a) + Domega3(t2_a)+A3pi0*Dphi3(t2_a))
+     & - 4.d0*SIGv3Fsmv2/Fchir/3.d0 * t1_a*t2_a
+     & *(   Drho3(t1_a)* Domega3(t2_a) +  Drho3(t2_a)* Domega3(t1_a)
+     &  +A3pi0*Dphi3(t1_a)*Dphi3(t2_a))
+     &  )
+c      print*,'3',ffdummy
+      pionggFF_dprime =ffdummy  !dcmplx(1.d0,0.d0)
+      return
+      end
+cc**********************************************************************
+c      
+c    eta Form Factor
+c-------------------------------------------------------------
+      complex*16 function etaggFF_dprime2(t1_a,t2_a)
+      include 'phokhara_10.0.inc'
+      real*8 t1_a,t2_a,W2_a,par(20),Fsmv3Hv3,SIGv3Fsmv2
+      complex*16 Drho, Domega, Dphi   ! function (q2t)
+      complex*16 Drho2, Domega2, Dphi2   ! function (q2t) SECOND OCTET
+      complex*16 Drho3, Domega3, Dphi3 
+      real*8 coef
+      real*8 SIGvFsmv2,SIGv2Fsmv2,A2eta,B1
+      complex*16 ffdummy
+
+      coef = 1.d0 !  HC 4.d0 * pi**2 * feta
+      
+!coef stands for the normalization change:
+![etaggFF( 0 , 0 , meta^2 ) == Nc/(12 pi^2 Feta)]
+!                                   ==>>> [etaggFF( 0 , 0 , meta^2 ) == 1]
+!
+!  for fits:
+      
+      
+
+      Fsmv3Hv3 = (3.d0/4.d0/pi/pi -4.d0*sqrt(2.d0)*hv1*Fsmv1
+     &          *(1.d0+F_om*H_om+A1pi0*F_phi)
+     & -4.d0*sqrt(2.d0)*Fsmv2Hv2
+     &          *(2.d0+A2pi0)
+     & )/4.d0/sqrt(2.d0)/(2.d0+A3pi0)
+      SIGvFsmv2=dsqrt(2.d0)*Hv1*Fsmv1
+      SIGv2Fsmv2=dsqrt(2.d0)*Fsmv2Hv2
+      SIGv3Fsmv2=dsqrt(2.d0)*Fsmv3Hv3
+
+      A2eta= (3.d0/4.d0/pi/pi*(5.d0/3.d0*Cq_c-dsqrt(2.d0)/3.d0*Cs_c)
+     1  -4.d0*dsqrt(2.d0)*Hv1*Fsmv1*((3.d0*Cq_c+Cq_c/3.d0*F_om
+     3  -2.d0*dsqrt(2.d0)/3.d0*Cs_c*F_phi)+
+     2 (5.d0/3.d0*Cq_c-dsqrt(2.d0)/3.d0*Cs_c)*A1eta*F_phi) !1
+     4  -4.d0*dsqrt(2.d0)*Fsmv2Hv2*(10.d0/3.d0*Cq_c
+     3  -2.d0*dsqrt(2.d0)/3.d0*Cs_c)
+     3 -4.d0*dsqrt(2.d0)*Fsmv3Hv3*(10.d0/3.d0*Cq_c
+     3  -2.d0*dsqrt(2.d0)/3.d0*Cs_c+
+     4 (5.d0/3.d0*Cq_c-dsqrt(2.d0)/3.d0*Cs_c)*A3eta)) !2
+     2 /(4.d0*dsqrt(2.d0)*Fsmv2Hv2*
+     1 (5.d0/3.d0*Cq_c-dsqrt(2.d0)/3.d0*Cs_c))
+
+
+
+c     &  )
+
+      ffdummy =  coef *(
+     & -3.d0/12.d0/pi/pi/Fchir
+     & *(Cq_c*5.d0/3.d0- Cs_c*sqrt(2.d0)/3.d0)
+     & +(1.d0,0.d0)
+     & * 4.d0*sqrt(2.d0)*Fsmv1*Hv1/3.d0/Fchir * t1_a
+     & *((3.d0*Cq_c* Drho(t1_a) + Cq_c*F_om*Domega(t1_a)/3.d0 
+     &     - 2.d0*sqrt(2.d0)/3.d0 *F_phi* Cs_c* Dphi(t1_a))
+     & +(Cq_c*5.d0/3.d0- Cs_c*sqrt(2.d0)/3.d0)*A1eta*F_phi
+     & *Dphi(t1_a))
+     & +(1.d0,0.d0)
+     & * 4.d0*sqrt(2.d0)*Fsmv1*Hv1/3.d0/Fchir * t2_a
+     & *((3.d0*Cq_c* Drho(t2_a) + Cq_c*F_om* Domega(t2_a)/3.d0 
+     &     - 2.d0*sqrt(2.d0)/3.d0 *F_phi* Cs_c* Dphi(t2_a))
+     & +(Cq_c*5.d0/3.d0- Cs_c*sqrt(2.d0)/3.d0)*A1eta*F_phi
+     & *Dphi(t2_a))
+     & -(1.d0,0.d0)
+     & * 8.d0*SIGvFsmv2/Fchir * t1_a*t2_a
+     & *(( Cq_c* Drho(t1_a)* Drho(t2_a)/2.d0 
+     &   + Cq_c*F_om* Domega(t1_a)* Domega(t2_a)/18.d0
+     &   - sqrt(2.d0)/9.d0*F_phi * Cs_c* Dphi(t1_a)* Dphi(t2_a))
+     &   +(Cq_c*5.d0/3.d0- Cs_c*sqrt(2.d0)/3.d0)/6.d0
+     &   *A1eta*F_phi*Dphi(t1_a)*Dphi(t2_a)
+     &   -A_eta_phiom*Dphi(t1_a)*Dphi(t2_a)
+     &   -A_eta_phiom*Domega(t1_a)*Domega(t2_a)
+     &   +A_eta_phiom*(Dphi(t1_a)*Domega(t2_a) 
+     &              + Dphi(t2_a)*Domega(t1_a)))
+     &  )
+
+      ffdummy = ffdummy +coef*(
+     & (1.d0,0.d0)
+     & * 4.d0*sqrt(2.d0)*Fsmv2Hv2/3.d0/Fchir*t1_a
+     & *(3.d0*Cq_c*Drho2(t1_a) 
+     &   + Cq_c*Domega2(t1_a)/3.d0 
+     &     - 2.d0*sqrt(2.d0)/3.d0 * Cs_c*Dphi2(t1_a)
+     & +( Cq_c*5.d0/3.d0- Cs_c*sqrt(2.d0)/3.d0 )*A2eta*Dphi2(t1_a))
+     & +(1.d0,0.d0)
+     & * 4.d0*sqrt(2.d0)*Fsmv2Hv2/3.d0/Fchir * t2_a
+     & *(3.d0*Cq_c* Drho2(t2_a) + Cq_c* Domega2(t2_a)/3.d0 
+     &     - 2.d0*sqrt(2.d0)/3.d0 * Cs_c* Dphi2(t2_a)
+     & +( Cq_c*5.d0/3.d0- Cs_c*sqrt(2.d0)/3.d0 )*A2eta*Dphi2(t2_a))
+     & -(1.d0,0.d0)
+     & * 8.d0*SIGv2Fsmv2/Fchir * t1_a*t2_a
+     & *(  Cq_c* Drho2(t1_a)* Drho2(t2_a)/2.d0 
+     &   + Cq_c* Domega2(t1_a)* Domega2(t2_a)/18.d0 
+     &   - sqrt(2.d0)/9.d0 * Cs_c* Dphi2(t1_a)* Dphi2(t2_a)
+     & +( Cq_c*5.d0/3.d0- Cs_c*sqrt(2.d0)/3.d0 )*A2eta/6.d0*
+     & Dphi2(t1_a)* Dphi2(t2_a))
+     &  )
+   
+      ffdummy = ffdummy +coef*(
+     & (1.d0,0.d0)
+     & * 4.d0*sqrt(2.d0)*Fsmv3Hv3/3.d0/Fchir*t1_a
+     & *(3.d0*Cq_c*Drho3(t1_a) 
+     &   + Cq_c*Domega3(t1_a)/3.d0 
+     &     - 2.d0*sqrt(2.d0)/3.d0 * Cs_c*Dphi3(t1_a)
+     & +( Cq_c*5.d0/3.d0- Cs_c*sqrt(2.d0)/3.d0 )*A3eta*Dphi3(t1_a))
+     & +(1.d0,0.d0)
+     & * 4.d0*sqrt(2.d0)*Fsmv3Hv3/3.d0/Fchir * t2_a
+     & *(3.d0*Cq_c* Drho3(t2_a) + Cq_c* Domega3(t2_a)/3.d0 
+     &     - 2.d0*sqrt(2.d0)/3.d0 * Cs_c* Dphi3(t2_a)
+     & +( Cq_c*5.d0/3.d0- Cs_c*sqrt(2.d0)/3.d0 )*A3eta*Dphi3(t2_a))
+     & -(1.d0,0.d0)
+     & * 8.d0*SIGv3Fsmv2/Fchir * t1_a*t2_a
+     & *(  Cq_c* Drho3(t1_a)* Drho3(t2_a)/2.d0 
+     &   + Cq_c* Domega3(t1_a)* Domega3(t2_a)/18.d0 
+     &   - sqrt(2.d0)/9.d0 * Cs_c* Dphi3(t1_a)* Dphi3(t2_a)
+     & +( Cq_c*5.d0/3.d0- Cs_c*sqrt(2.d0)/3.d0 )*A3eta/6.d0*
+     & Dphi3(t1_a)* Dphi3(t2_a))
+     &  )
+
+
+      etaggFF_dprime2 = ffdummy
+      return
+      end
+cc**********************************************************************
+c      
+c    etaP Form Factor
+c-------------------------------------------------------------
+      complex*16 function etaPggFF_dprime2(t1_a,t2_a)
+      include 'phokhara_10.0.inc'
+      real*8 t1_a,t2_a,W2_a,par(20),Fsmv3Hv3,SIGv3Fsmv2
+      complex*16 Drho, Domega, Dphi   ! function (q2t)
+      complex*16 Drho2, Domega2, Dphi2   ! function (q2t)
+      complex*16 Drho3, Domega3, Dphi3
+      real*8 coef!,pi,Fpi
+      real*8 SIGvFsmv2,SIGv2Fsmv2,A2etaP
+     1 ,B1
+      complex*16 ffdummy
+ 
+      coef = 1.d0 !  HC 4.d0 * pi**2 * feta
+
+!coef stands for the normalization change:
+![etaPggFF( 0 , 0 , meta'^2 ) == Nc/(12 pi^2 FetaP)]
+!                                   ==>>> [etaPggFF( 0 , 0 , meta'^2 ) == 1]
+!
+
+      
+      
+
+      Fsmv3Hv3 = (3.d0/4.d0/pi/pi -4.d0*sqrt(2.d0)*hv1*Fsmv1
+     &          *(1.d0+F_om*H_om+A1pi0*F_phi)
+     & -4.d0*sqrt(2.d0)*Fsmv2Hv2
+     &          *(2.d0+A2pi0)
+     & )/4.d0/sqrt(2.d0)/(2.d0+A3pi0)
+      SIGvFsmv2=dsqrt(2.d0)*Hv1*Fsmv1
+      SIGv2Fsmv2=dsqrt(2.d0)*Fsmv2Hv2
+      SIGv3Fsmv2=dsqrt(2.d0)*Fsmv3Hv3
+
+       A2etaP= (3.d0/4.d0/pi/pi*(5.d0/3.d0*Cq_P+dsqrt(2.d0)/3.d0*Cs_P)
+     1  -4.d0*dsqrt(2.d0)*Hv1*Fsmv1*((3.d0*Cq_P+Cq_P/3.d0*F_om
+     3  +2.d0*dsqrt(2.d0)/3.d0*Cs_P*F_phi)+
+     2 (5.d0/3.d0*Cq_P+dsqrt(2.d0)/3.d0*Cs_P)*A1etaP*F_phi) !1
+     4  -4.d0*dsqrt(2.d0)*Fsmv2Hv2*(10.d0/3.d0*Cq_P
+     3  +2.d0*dsqrt(2.d0)/3.d0*Cs_P)
+     3 -4.d0*dsqrt(2.d0)*Fsmv3Hv3*(10.d0/3.d0*Cq_P
+     3  +2.d0*dsqrt(2.d0)/3.d0*Cs_P+
+     4 (Cq_P*5.d0/3.d0+Cs_P*sqrt(2.d0)/3.d0 )*A3etaP)) !2
+     2 /(4.d0*dsqrt(2.d0)*Fsmv2Hv2*
+     1 (5.d0/3.d0*Cq_P+dsqrt(2.d0)/3.d0*Cs_P))
+
+
+
+      ffdummy =  coef *(
+     & -3.d0/12.d0/pi/pi/Fchir
+     & *(Cq_P*5.d0/3.d0+Cs_P*sqrt(2.d0)/3.d0)
+     & +(1.d0,0.d0)
+     & * 4.d0*sqrt(2.d0)*Fsmv1*Hv1/3.d0/Fchir * t1_a
+     & *((3.d0*Cq_P* Drho(t1_a) + Cq_P*F_om* Domega(t1_a)/3.d0 
+     &     + 2.d0*sqrt(2.d0)/3.d0 *F_phi* Cs_P* Dphi(t1_a))
+     & +(Cq_P*5.d0/3.d0+ Cs_P*sqrt(2.d0)/3.d0)*A1etaP*F_phi
+     & *Dphi(t1_a))
+     & +(1.d0,0.d0)
+     & * 4.d0*sqrt(2.d0)*Fsmv1*Hv1/3.d0/Fchir * t2_a
+     & *((3.d0*Cq_P* Drho(t2_a) + Cq_P*F_om* Domega(t2_a)/3.d0
+     &     + 2.d0*sqrt(2.d0)/3.d0 *F_phi* Cs_P* Dphi(t2_a))
+     & +(Cq_P*5.d0/3.d0+ Cs_P*sqrt(2.d0)/3.d0)*A1etaP*F_phi
+     & *Dphi(t2_a))
+     & -(1.d0,0.d0)
+     & * 8.d0*SIGvFsmv2/Fchir * t1_a*t2_a
+     & *(( Cq_P* Drho(t1_a)* Drho(t2_a)/2.d0 
+     &   + Cq_P*F_om* Domega(t1_a)* Domega(t2_a)/18.d0
+     &   + sqrt(2.d0)/9.d0 * Cs_P*F_phi*Dphi(t1_a)* Dphi(t2_a))
+     &   +(Cq_P*5.d0/3.d0+ Cs_P*sqrt(2.d0)/3.d0)/6.d0
+     &   *F_phi*A1etaP*Dphi(t1_a)*Dphi(t2_a))
+     &  )
+
+       ffdummy = ffdummy +coef*(
+     & +(1.d0,0.d0)
+     & * 4.d0*sqrt(2.d0)*Fsmv2Hv2/3.d0/Fchir*t1_a 
+     & *(3.d0*Cq_P*Drho2(t1_a) 
+     &      + Cq_P* Domega2(t1_a)/3.d0 
+     &     + 2.d0*sqrt(2.d0)/3.d0 * Cs_P*Dphi2(t1_a)
+     & +( Cq_P*5.d0/3.d0+Cs_P*sqrt(2.d0)/3.d0 )*A2etaP*Dphi2(t1_a))
+     & +(1.d0,0.d0)
+     & * 4.d0*sqrt(2.d0)*Fsmv2Hv2/3.d0/Fchir * t2_a
+     & *(3.d0*Cq_P* Drho2(t2_a) + Cq_P* Domega2(t2_a)/3.d0 
+     &     + 2.d0*sqrt(2.d0)/3.d0 * Cs_P* Dphi2(t2_a)
+     & +( Cq_P*5.d0/3.d0+Cs_P*sqrt(2.d0)/3.d0 )*A2etaP*Dphi2(t2_a))
+     & -(1.d0,0.d0)
+     & * 8.d0*SIGv2Fsmv2/Fchir * t1_a*t2_a
+     & *(  Cq_P* Drho2(t1_a)* Drho2(t2_a)/2.d0 
+     &   + Cq_P* Domega2(t1_a)* Domega2(t2_a)/18.d0 
+     &   + sqrt(2.d0)/9.d0 * Cs_P* Dphi2(t1_a)* Dphi2(t2_a)
+     & +( Cq_P*5.d0/3.d0+Cs_P*sqrt(2.d0)/3.d0 )*A2etaP/6.d0
+     & *Dphi2(t1_a)*Dphi2(t2_a))
+     &  )
+
+      ffdummy = ffdummy +coef*(
+     & +(1.d0,0.d0)
+     & * 4.d0*sqrt(2.d0)*Fsmv3Hv3/3.d0/Fchir*t1_a 
+     & *(3.d0*Cq_P*Drho3(t1_a) 
+     &      + Cq_P* Domega3(t1_a)/3.d0 
+     &     + 2.d0*sqrt(2.d0)/3.d0 * Cs_P*Dphi3(t1_a)
+     & +( Cq_P*5.d0/3.d0+Cs_P*sqrt(2.d0)/3.d0 )*A3etaP*Dphi3(t1_a))
+     & +(1.d0,0.d0)
+     & * 4.d0*sqrt(2.d0)*Fsmv3Hv3/3.d0/Fchir * t2_a
+     & *(3.d0*Cq_P* Drho3(t2_a) + Cq_P* Domega3(t2_a)/3.d0 
+     &     + 2.d0*sqrt(2.d0)/3.d0 * Cs_P* Dphi3(t2_a)
+     & +( Cq_P*5.d0/3.d0+Cs_P*sqrt(2.d0)/3.d0 )*A3etaP*Dphi3(t2_a))
+     & -(1.d0,0.d0)
+     & * 8.d0*SIGv3Fsmv2/Fchir * t1_a*t2_a
+     & *(  Cq_P* Drho3(t1_a)* Drho3(t2_a)/2.d0 
+     &   + Cq_P* Domega3(t1_a)* Domega3(t2_a)/18.d0 
+     &   + sqrt(2.d0)/9.d0 * Cs_P* Dphi3(t1_a)* Dphi3(t2_a)
+     & +( Cq_P*5.d0/3.d0+Cs_P*sqrt(2.d0)/3.d0 )*A3etaP/6.d0
+     & *Dphi3(t1_a)*Dphi3(t2_a))
+     & )
+
+      etaPggFF_dprime2 = ffdummy
+      return
+      end
+   
+c **********************************************************************
+c     Vector meson propagators
+c----------------------------------------------------------
+c
+c     Vector meson propagators
+c   1st octet
+      complex*16 function Drho(q2t)
+      include 'phokhara_10.0.inc'
+c$$$      implicit none
+c$$$      real*8            Mrho_c, Momega_c, Mphi_c
+c$$$      common /masses_c/  Mrho_c, Momega_c, Mphi_c
+      complex*16 GammaRhoTotal
+      real*8 q2t
+c      call const_input
+      if (q2t .gt. 0.d0) then
+c        Drho = (q2t - Mrho_c**2 
+c     &      + (0.d0, 1.d0) * sqrt(q2t)
+c     &       * GammaRhoTotal(q2t))**(-1.d0)
+        Drho = 1.d0/(q2t - Mrho_c**2 
+     &      + (0.d0, 1.d0) * sqrt(q2t)
+     &       * GammaTotalrho_c)
+      else
+        Drho = 1.d0/(q2t - Mrho_c**2)
+      endif
+      return
+      end
+
+      complex*16 function Domega(q2t)
+      include 'phokhara_10.0.inc'
+c$$$      implicit none
+c$$$      real*8            Mrho_c, Momega_c, Mphi_c
+c$$$      common /masses_c/  Mrho_c, Momega_c, Mphi_c
+      complex*16 GammaOmegaTotal
+      real*8 q2t,par(20)
+c      call const_input   
+      if (q2t .gt. 0.0) then
+        Domega = 1.d0/(q2t - Momega_c**2 
+     &      + (0.d0, 1.d0) * sqrt(q2t)
+     &       * GammaTotalomega_c)
+      else
+        Domega = 1.d0/(q2t - Momega_c**2)
+      endif
+      return
+      end
+
+      complex*16 function DPhi(q2t)
+      include 'phokhara_10.0.inc'
+c$$$      implicit none
+c$$$      real*8            Mrho_c, Momega_c, Mphi_c
+c$$$      common /masses_c/  Mrho_c, Momega_c, Mphi_c
+      complex*16 GammaPhiTotal
+      real*8 q2t,par(20)
+c      call const_input 
+      if (q2t .gt. 0.d0) then
+        DPhi = 1.d0/(q2t - MPhi_c **2 
+     &       + (0.d0, 1.d0) * sqrt(q2t)
+     &       * GammaTotalphi_c )
+      else
+        DPhi =1.d0/(q2t - MPhi_c**2)
+      endif
+      return
+      end
+c----------------------------------------------------------------------
+
+c     Vector meson propagators
+c 2nd octet
+      complex*16 function Drho2(q2t)
+      include 'phokhara_10.0.inc'
+c$$$      implicit none
+c$$$      real*8            Mrho_c, Momega_c, Mphi_c
+c$$$      common /masses_c/  Mrho_c, Momega_c, Mphi_c
+      complex*16 GammaRhoTotal
+      real*8 q2t
+c      call const_input
+      if (q2t .gt. 0.d0) then
+        Drho2 = 1.d0/(q2t - Mrho_pr**2 
+     &      + (0.d0, 1.d0) * sqrt(q2t)
+     &       * GammaTotalrho_c2)
+      else
+        Drho2 = 1.d0/(q2t - Mrho_pr**2)
+      endif
+      return
+      end
+
+      complex*16 function Domega2(q2t)
+      include 'phokhara_10.0.inc'
+c$$$      implicit none
+c$$$      real*8            Mrho_c, Momega_c, Mphi_c
+c$$$      common /masses_c/  Mrho_c, Momega_c, Mphi_c
+      complex*16 GammaOmegaTotal
+      real*8 q2t
+c      call const_input   
+      if (q2t .gt. 0.0) then
+        Domega2 = 1.d0/(q2t - Momega_pr**2 
+     &      + (0.d0, 1.d0) * sqrt(q2t)
+     &       * GammaTotalomega_c2)
+      else
+        Domega2 = 1.d0/(q2t - Momega_pr**2)
+      endif
+      return
+      end
+
+      complex*16 function DPhi2(q2t)
+      include 'phokhara_10.0.inc'
+c$$$      implicit none
+c$$$      real*8            Mrho_c, Momega_c, Mphi_c
+c$$$      common /masses_c/  Mrho_c, Momega_c, Mphi_c
+      complex*16 GammaPhiTotal
+      real*8 q2t
+c      call const_input 
+
+      if (q2t .gt. 0.d0) then
+        DPhi2 = 1.d0/(q2t - MPhi_pr **2 
+     &       + (0.d0, 1.d0) * sqrt(q2t)
+     &       * GammaTotalphi_c2 )
+      else
+        DPhi2 =1.d0/(q2t - MPhi_pr**2)
+      endif
+      return
+      end
+c---------------------------------------------------------------------
+c     Vector meson propagators
+c 3rd octet
+      complex*16 function Drho3(q2t)
+      include 'phokhara_10.0.inc'
+c$$$      implicit none
+c$$$      real*8            Mrho_c, Momega_c, Mphi_c
+c$$$      common /masses_c/  Mrho_c, Momega_c, Mphi_c
+      complex*16 GammaRhoTotal
+      real*8 q2t
+c      call const_input
+      if (q2t .gt. 0.d0) then
+        Drho3 = 1.d0/(q2t - Mrho_dpr**2 
+     &      + (0.d0, 1.d0) * sqrt(q2t)
+     &       * GammaTotalrho_c3)
+      else
+        Drho3 = 1.d0/(q2t - Mrho_dpr**2)
+      endif
+      return
+      end
+
+      complex*16 function Domega3(q2t)
+      include 'phokhara_10.0.inc'
+c$$$      implicit none
+c$$$      real*8            Mrho_c, Momega_c, Mphi_c
+c$$$      common /masses_c/  Mrho_c, Momega_c, Mphi_c
+      complex*16 GammaOmegaTotal
+      real*8 q2t
+c      call const_input   
+      if (q2t .gt. 0.0) then
+        Domega3 = 1.d0/(q2t - Momega_dpr**2 
+     &      + (0.d0, 1.d0) * sqrt(q2t)
+     &       * GammaTotalomega_c3)
+      else
+        Domega3 = 1.d0/(q2t - Momega_dpr**2)
+      endif
+      return
+      end
+
+      complex*16 function DPhi3(q2t)
+      include 'phokhara_10.0.inc'
+c$$$      implicit none
+c$$$      real*8            Mrho_c, Momega_c, Mphi_c
+c$$$      common /masses_c/  Mrho_c, Momega_c, Mphi_c
+      complex*16 GammaPhiTotal
+      real*8 q2t
+c      call const_input 
+
+      if (q2t .gt. 0.d0) then
+        DPhi3 = 1.d0/(q2t - MPhi_dpr **2 
+     &       + (0.d0, 1.d0) * sqrt(q2t)
+     &       * GammaTotalphi_c3 )
+      else
+        DPhi3 =1.d0/(q2t - MPhi_dpr**2)
+      endif
+      return
+      end
+
+c----------------------------------------------------------
 cc **********************************************************************
       complex*16 function FormFactor_etapipi(qq2)
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       real*8 qq2,rho0m,rho0g,qq12_3pi,qq13_3pi,qq23_3pi,const,s1
       integer ii
       complex*16 RR_3pi,HH_3pi,RRro_3pi,Factor,bb0,bb1,arho
@@ -6340,7 +7937,7 @@ c*****************************************************************
       end function arho
 c **********************************************************************
       complex*16 function KaonFormFactor(a)
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       real*8 a
       complex*16 BW_K,BW_om,BW_rho,sum_rho_Kp,sum_om_Kp,sum_phi_Kp,BW_GS
 
@@ -6470,7 +8067,7 @@ c       call c_sum_Kp(a,sum_rho_Kp,sum_om_Kp,sum_phi_Kp)
       end
 c **********************************************************************
       complex*16 function tail_sum(qq)
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       real*8 qq
       complex*16 BW_GS_09
       integer ii
@@ -6484,7 +8081,7 @@ c
       end
 c **********************************************************************
       subroutine sum_FF_Kp1(a,sum_rho_Kp,sum_om_Kp,sum_phi_Kp)
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       real*8 a,deltaqq,qq_min_Kp
       complex*16 sum_rho_Kp,sum_om_Kp,sum_phi_Kp,c_sum_rho_Kp,aaa
       integer ii,jj
@@ -6517,9 +8114,9 @@ c **********************************************************************
       end
 c **********************************************************************
       subroutine sum_FF_Kp()
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       integer jj,ii
-      real*8 DGAMMF,qq_min_Kp,qq_max_Kp
+      real*8 GAMMA,qq_min_Kp,qq_max_Kp
       real*8 ilocz_rho_Kp,ilocz_phi_Kp,ilocz_om_Kp,beta_p_rho_Kp,
      1       beta_p_phi_Kp,beta_p_om_Kp
       complex*16 sum_rho_Kp,sum_om_Kp,sum_phi_Kp
@@ -6559,18 +8156,18 @@ c **********************************************************************
         if(FF_kaon.eq.1) ilocz_om_Kp = ilocz_om_Kp 
      1                               * ( 1.d0 - beta_p_om_Kp/jj )
 
-        coeff_rho_Kp(jj) = (-1.d0)**jj * DGAMMF(beta_rho_Kp-0.5d0) 
+        coeff_rho_Kp(jj) = (-1.d0)**jj * GAMMA(beta_rho_Kp-0.5d0) 
      1       * 2.d0 / sqrt(pi) / (1.d0+2.d0*jj) * ilocz_rho_Kp /pi 
-     2       * DGAMMF(2.d0-beta_rho_Kp) * sin(pi*(beta_rho_Kp-1.d0-jj))
-        coeff_phi_Kp(jj) = (-1.d0)**jj * DGAMMF(beta_phi_Kp-0.5d0) 
+     2       * GAMMA(2.d0-beta_rho_Kp) * sin(pi*(beta_rho_Kp-1.d0-jj))
+        coeff_phi_Kp(jj) = (-1.d0)**jj * GAMMA(beta_phi_Kp-0.5d0) 
      1       * 2.d0 / sqrt(pi) / (1.d0+2.d0*jj) * ilocz_phi_Kp /pi 
-     2       * DGAMMF(2.d0-beta_phi_Kp) * sin(pi*(beta_phi_Kp-1.d0-jj))
+     2       * GAMMA(2.d0-beta_phi_Kp) * sin(pi*(beta_phi_Kp-1.d0-jj))
         if(FF_kaon.eq.0) then 
            coeff_om_Kp(jj) = coeff_rho_Kp(jj)
         elseif(FF_kaon.eq.1) then
-           coeff_om_Kp(jj) = (-1.d0)**jj * DGAMMF(beta_om_Kp-0.5d0) 
+           coeff_om_Kp(jj) = (-1.d0)**jj * GAMMA(beta_om_Kp-0.5d0) 
      1          * 2.d0 / sqrt(pi) / (1.d0+2.d0*jj) * ilocz_om_Kp /pi 
-     2          * DGAMMF(2.d0-beta_om_Kp) * sin(pi*(beta_om_Kp-1.d0-jj))
+     2          * GAMMA(2.d0-beta_om_Kp) * sin(pi*(beta_om_Kp-1.d0-jj))
         endif
 
           mass_n_rho_Kp(jj)=sqrt( m_rho0_Kp**2 * (1.d0 + 2.d0*jj) )
@@ -6599,7 +8196,7 @@ c -----------------------------------------------------------------------
       end
 c **********************************************************************
       subroutine c_sum_Kp(a,sum_rho_Kp,sum_om_Kp,sum_phi_Kp)
-      include 'phokhara_9.1.inc' 
+      include 'phokhara_10.0.inc' 
       real*8 a
       complex*16 BW_GS,BW_om,BW_K,sum_rho_Kp,sum_om_Kp,sum_phi_Kp
       integer ii,jj,kk
@@ -6647,7 +8244,7 @@ c **********************************************************************
       end
 c **********************************************************************
       complex*16 function BW_K(m,breite,x,k)
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       integer k
       real*8 m,breite,x,g
       complex *16 i
@@ -6667,7 +8264,7 @@ c **********************************************************************
       end
 c **********************************************************************
       complex*16 function BW_rho(m,breite,x,k)
-      include 'phokhara_9.1.inc'              
+      include 'phokhara_10.0.inc'              
       integer k
       real*8 m,breite,x,g
       complex *16 i
@@ -6685,7 +8282,7 @@ c **********************************************************************
       end
 c **********************************************************************
       complex*16 function BW_GS(m,breite,x,k)
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       integer k
       real*8 m,breite,x,g,HH_GS,dd,p_rho
       complex *16 i
@@ -6712,7 +8309,7 @@ c **********************************************************************
       end
 c **********************************************************************
       complex*16 function BW_GS_09(kk,x)
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       integer kk
       real*8 x,g,HH_GS_09
       complex *16 i
@@ -6725,12 +8322,13 @@ c **********************************************************************
 
       BW_GS_09 = dd_ffpi(kk)
      1     /(m_n_pionGS(kk)*m_n_pionGS(kk)-x+HH_GS_09(kk,x)-i*sqrt(x)*g)
+
   
       return
       end
 c **********************************************************************
       real*8 function HH_GS(m,breite,x)
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       real*8 breite,x,HH_p,poch,vv_rho,m
 
       vv_rho = sqrt( 1.d0 - 4.d0*mpi**2/m**2 ) 
@@ -6746,7 +8344,7 @@ c **********************************************************************
       end
 c **********************************************************************
       double precision function HH_GS_09(kk,x)
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       integer kk
       real*8 x,HH_p
       
@@ -6758,7 +8356,7 @@ c **********************************************************************
       end
 c **********************************************************************
       real*8 function HH_p(m,breite,qq)
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       real*8 breite,qq,vv,m
 
       vv = sqrt( abs(1.d0 - 4.d0*mpi**2/qq) )
@@ -6794,7 +8392,7 @@ c **********************************************************************
       end
 c ***********************************************************************
       real*8 function Gam_3pi(qq,mm,mmg)
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       real*8 qq,mm,mmg,qq12_3pi,qq13_3pi,qq23_3pi
 
       integer ii
@@ -6846,7 +8444,7 @@ c **********************************************************************
 c **********************************************************************
 
       complex*16 function appr_sum(qq)
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       real*8 qq,appr_r,appr_i,q_ss
       real*8 aa,bb,cc,tt,dd,ee,ff,gg,hh,jj,kk,ll,mm,nn,oo,pp,rr,ss,uu     
       q_ss = sqrt(qq)
@@ -7044,7 +8642,7 @@ c*************************************************************************
 c this is a code of hadronic current rho(0) -> pi+ pi- 2pi0
 c
       subroutine had3(qq2,q1,q2,q3,q4,hadr)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
 c
       integer i
       real*8 q1(4),q2(4),q3(4),q4(4),q2m4(4),q3m1(4),q4m1(4),q3m2(4)
@@ -7263,7 +8861,7 @@ c
       end
 c*************************************************************************
       real*8 function gfun_4pi(q1_2)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
 c
       real*8 q1_2,c1
 c
@@ -7278,7 +8876,7 @@ c
       end
 c*************************************************************************
       complex*16 function bwgrho(q1_2)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
 c
       real*8 q1_2
       complex*16 cbw,cbw1,cbw2,cbwo,BW_rho
@@ -7292,7 +8890,7 @@ c
       end
 c*************************************************************************
       complex*16 function bwgrho_t(q1_2)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
 c
       real*8 q1_2,beta_4pi
       complex*16 cbw,cbw1,cbw2,cbwo,BW_rho
@@ -7309,7 +8907,7 @@ c*************************************************************************
 c i=1: a1, i=2: f0, i=3: omega
 c 
       complex*16 function bwgrho_o(ij,qq2)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
 c
       complex*16 cbw,cbw1,cbw2,cbw3
       real*8 qq2,c1,c2,gamrho,gamrho1,gamrho2,gamrho3,beta1,beta2,beta3
@@ -7357,7 +8955,7 @@ c
       end
 c ************************************************************************
       complex*16 function bwgrho_r(q1_2)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
 c
       real*8 q1_2
       complex*16 BW_rho
@@ -7369,7 +8967,7 @@ c
 c*************************************************************************
 c inner propagator in omega part
       complex*16 function Hrho(q1_2,q2_2,q3_2)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
 c
       real*8 q1_2,q2_2,q3_2
       complex*16 cbw,cbw1,cbw2,BW_rho
@@ -7383,7 +8981,7 @@ c
       end
 c*************************************************************************
       complex*16 function bwga1(q1_2)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
 c
       real*8 q1_2,ggm,gfun_4pi
 c
@@ -7393,7 +8991,7 @@ c
       end
 c ************************************************************************
       complex*16 function bwgf0(q1_2)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
 c
       real*8 q1_2
       real*8 c1,c2,gamf0
@@ -7407,7 +9005,7 @@ c
       end
 c ************************************************************************
       complex*16 function bwg_om(q1_2)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
 c
       real*8 q1_2
 c
@@ -7464,14 +9062,20 @@ c ========================================================================
 c --- all about the histogrammes -----------------------------------------
 
       subroutine addiere(wgt,qq,i)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 wgt,qq,qq_inv,q_sum(0:3)
       integer i,j
 c
       if (i.eq.0) call addhisto(0,qq,wgt)  ! events with no photons
       if (i.eq.1) call addhisto(1,qq,wgt)  ! one photon events
       if (i.eq.2) call addhisto(2,qq,wgt)  ! two photon events
-      
+      if (i.eq.3) call addhisto(3,qq,wgt)  ! two photon events
+      if (i.eq.4) call addhisto(4,qq,wgt)  ! two photon events
+      if(i.eq.5) call addhisto(5,qq,wgt)
+      if(i.eq.6) call addhisto(6,qq,wgt)
+c      if(i.eq.6) call addhisto(6,qq,wgt)
+c      if(i.eq.7) call addhisto(7,qq,wgt)
+c      if(i.eq.8) call addhisto(8,qq,wgt)
 c
       return
       end
@@ -7479,7 +9083,7 @@ c ------------------------------------------------------
 c     create histograms                                 
 c ------------------------------------------------------
       subroutine inithisto
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       integer i,j
       real*8 histo(0:20,200),error(0:20,200)
       common/histograms/histo,error
@@ -7496,7 +9100,7 @@ c ------------------------------------------------------
 c     add value to histo i at x                         
 c ------------------------------------------------------
       subroutine addhisto(i,x,value)   
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 x,value,histo(0:20,200),error(0:20,200)
       integer i,j
       common/histograms/histo,error
@@ -7510,7 +9114,7 @@ c ------------------------------------------------------
 c     save histograms
 c ------------------------------------------------------
       subroutine endhisto()
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 h,histo(0:20,200),error(0:20,200),x,count_1
       integer i,j
       real*8 suma,sumaerr
@@ -7519,8 +9123,7 @@ c --- fill histograms --------
 
 c      open(21,file='plik1.dat',status='new')
 c      open(22,file='plik2.dat',status='new')
-
-        do i=0,2     !=========================
+           do i=0,2     !=========================
           write(*,*)i
           do j=1,bins(i)
             x = xlow(i)+(j-.5d0)*(xup(i)-xlow(i))/dble(bins(i))
@@ -7528,9 +9131,10 @@ c      open(22,file='plik2.dat',status='new')
               error(i,j) = Mmax(i)*dSqrt((histo(i,j)/count(i)-
      &	                   (histo(i,j)/count(i))**2)/count(i))
               histo(i,j) = Mmax(i)/count(i)*histo(i,j)
+              
 c     dividing by interval width -> the result is delta sigma/delta q
-              histo(i,j)=histo(i,j)*dble(bins(i))/(xup(i)-xlow(i))
-              error(i,j)=error(i,j)*dble(bins(i))/(xup(i)-xlow(i))
+c              histo(i,j)=histo(i,j)*dble(bins(i))/(xup(i)-xlow(i))
+c              error(i,j)=error(i,j)*dble(bins(i))/(xup(i)-xlow(i))
             else
               histo(i,j) = 0.d0
               error(i,j) = 0.d0
@@ -7547,28 +9151,150 @@ c
               write(*,*) x,histo(0,j)+histo(1,j)+histo(2,j)
      1                ,sqrt(error(0,j)**2+error(1,j)**2+error(2,j)**2)
           enddo
-        
+  202 FORMAT('',G20.10E3,G20.10E3,G20.10E3)
+c----------------------------------------------------------------------
+c angular distributions 
+c      do i=3,4     !=========================
+c          write(*,*)i
+c          write(10,*)i
+c          do j=1,bins(i)
+c            x = xlow(i)+(j-.5d0)*(xup(i)-xlow(i))/dble(bins(i))
+c            if (count(1).ne.0.d0) then 
+c              histo(i,j) = Mmax(1)/count(1)*histo(i,j)
+c              error(i,j) = Mmax(1)*dSqrt((histo(i,j)/count(1)-
+c     &	                   (histo(i,j)/count(1))**2)/count(1))              
+c     dividing by interval width -> the result is delta sigma/delta q
+c              histo(i,j)=histo(i,j)*dble(bins(i))/(xup(i)-xlow(i))
+c              error(i,j)=error(i,j)*dble(bins(i))/(xup(i)-xlow(i))
+c            else
+c              histo(i,j) = 0.d0
+c              error(i,j) = 0.d0
+c            endif
+c              write(*,*) x,histo(i,j),error(i,j)
+c              write(10,202) x,histo(i,j),error(i,j)
+c              if(i.eq.1) write (21,*) x,histo(i,j),error(i,j)
+c              if(i.eq.2) write (22,*) x,histo(i,j),error(i,j)
+c          enddo
+c        enddo
+
+c        do i=5,6     !=========================
+c          write(*,*)i
+c          write(10,*)i
+c          do j=1,bins(i)
+c            x = xlow(i)+(j-.5d0)*(xup(i)-xlow(i))/dble(bins(i))
+c            if (count(2).ne.0.d0) then 
+c              histo(i,j) = Mmax(2)/count(2)*histo(i,j)
+c              error(i,j) = Mmax(2)*dSqrt((histo(i,j)/count(2)-
+c     &	                   (histo(i,j)/count(2))**2)/count(2))
+c     dividing by interval width -> the result is delta sigma/delta q
+c              histo(i,j)=histo(i,j)*dble(bins(i))/(xup(i)-xlow(i))
+c              error(i,j)=error(i,j)*dble(bins(i))/(xup(i)-xlow(i))
+c            else
+c              histo(i,j) = 0.d0
+c              error(i,j) = 0.d0
+c            endif
+c              write(*,*) x,histo(i,j),error(i,j)
+c              write(10,202) x,histo(i,j),error(i,j)
+c              if(i.eq.1) write (21,*) x,histo(i,j),error(i,j)
+c              if(i.eq.2) write (22,*) x,histo(i,j),error(i,j)
+c          enddo
+c        enddo
 c
+c          write(*,*)'pi+'
+c          write(10,*)'pi+'
+c          do j=1,bins(3)
+c              x = xlow(3)+(j-.5d0)*(xup(3)-xlow(3))/dble(bins(3))
+c              write(*,*) x,histo(3,j)+histo(5,j)
+c     1                ,sqrt(error(3,j)**2+error(5,j)**2)
+c              write(10,202) x,histo(3,j)+histo(5,j)
+c     1                ,sqrt(error(3,j)**2+error(5,j)**2)
+c          enddo
+
+c         write(*,*)'pi-'
+c          write(10,*)'pi-'
+c          do j=1,bins(3)
+c              x = xlow(3)+(j-.5d0)*(xup(3)-xlow(3))/dble(bins(3))
+c              write(*,*) x,histo(4,j)+histo(6,j)
+c     1                ,sqrt(error(4,j)**2+error(6,j)**2)
+c              write(10,202) x,histo(4,j)+histo(6,j)
+c     1                ,sqrt(error(4,j)**2+error(6,j)**2)
+c          enddo
+c  202 FORMAT('',G20.12E3,G20.12E3,G20.12E3)
+
+          
+c polar angle distributions
+c        do i=3,5     !=========================
+c          write(*,*)i
+c          do j=1,bins(i)
+c            x = xlow(i)+(j-.5d0)*(xup(i)-xlow(i))/dble(bins(i))
+c            if(count(1).ne.0.d0)then
+
+c              error(i,j) = Mmax(1)*dSqrt((histo(i,j)/count(1)-
+c     &	                   (histo(i,j)/count(1))**2)/count(1))
+c              histo(i,j) = Mmax(1)/count(1)*histo(i,j)
+c
+c     dividing by interval width -> the result is delta N/delta q
+c            histo(i,j)= histo(i,j)*dble(bins(i))/(xup(i)-xlow(i))
+c            error(i,j)= error(i,j)*dble(bins(i))/(xup(i)-xlow(i))
+c            else
+c              histo(i,j) = 0.d0
+c              error(i,j) = 0.d0
+c           endif
+c              write(*,*) x,histo(i,j),error(i,j)
+c              if(i.eq.1) write (21,*) x,histo(i,j),error(i,j)
+c              if(i.eq.2) write (22,*) x,histo(i,j),error(i,j)
+c          enddo
+c        enddo
+c
+ 
+c----------- histogramowanie ebeam1, ebeam2, ebeam1+ebeam2---------------------
+c          do i=6,8     !=========================
+c          write(*,*)i
+c          do j=1,bins(i)
+c            x = xlow(i)+(j-.5d0)*(xup(i)-xlow(i))/dble(bins(i))
+c            if(count(1).ne.0.d0)then
+
+c              error(i,j) = Mmax(1)*dSqrt((histo(i,j)/count(1)-
+c     &	                   (histo(i,j)/count(1))**2)/count(1))
+c              histo(i,j) = Mmax(1)/count(1)*histo(i,j)
+c
+c     dividing by interval width -> the result is delta N/delta q
+c            histo(i,j)= histo(i,j)*dble(bins(i))/(xup(i)-xlow(i))
+c            error(i,j)= error(i,j)*dble(bins(i))/(xup(i)-xlow(i))
+c            else
+c              histo(i,j) = 0.d0
+c              error(i,j) = 0.d0
+c            endif
+c              write(*,*) x,histo(i,j),error(i,j)
+c              if(i.eq.1) write (21,*) x,histo(i,j),error(i,j)
+c              if(i.eq.2) write (22,*) x,histo(i,j),error(i,j)
+c          enddo
+c        enddo      
+
       return
       end
 c-------------------------------------------------------
 c ========================================================================                                                                                  
 c --- all about the histogrammes MC integrand ----------------------------                                                                                  
       subroutine addiereMC(wgt,qq,i)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 wgt,qq,qq_inv,q_sum(0:3)
       integer i,j
 c                                                                                                                                                           
       if (i.eq.0) call addhistoMC(0,qq,wgt)  ! events with no photons                                                                                       
       if (i.eq.1) call addhistoMC(1,qq,wgt)  ! one photon events                                                                                            
-      if (i.eq.2) call addhistoMC(2,qq,wgt)  ! two photon events                                                                                            c                                                                                                                                                  
+      if (i.eq.2) call addhistoMC(2,qq,wgt)  ! two photon events 
+      if (i.eq.3) call addhistoMC(3,qq,wgt)  ! events with no photons                                                                                       
+      if (i.eq.4) call addhistoMC(4,qq,wgt)  ! one photon events                                                                                            
+      if (i.eq.5) call addhistoMC(5,qq,wgt)  ! two photon events     
+      if (i.eq.6) call addhistoMC(6,qq,wgt)  ! two photon events                                                                                      c                                                                                                                                                  
       return
       end
 c ------------------------------------------------------                                                                                                    
 c     create histograms MC integrand            
 c----------------------------------------------- 
       subroutine inithistoMC
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       integer i,j
       real*8 histoMC(0:20,200),errorMC(0:20,200)
       common/histogramsMC/histoMC,errorMC
@@ -7585,7 +9311,7 @@ c ------------------------------------------------------
 c  add value to histo i at x                                                                                                                             
 c ------------------------------------------------------                                                                                                    
       subroutine addhistoMC(i,x,value)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 x,value,histoMC(0:20,200),errorMC(0:20,200)
       integer i,j
       common/histogramsMC/histoMC,errorMC
@@ -7600,13 +9326,13 @@ c ------------------------------------------------------
 c     save histograms - MC integrand                                                                                                                
 c ------------------------------------------------------                                                                                                    
       subroutine endhistoMC()
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 h,histoMC(0:20,200),errorMC(0:20,200),x,count_1
       integer i,j
       common/histogramsMC/histoMC,errorMC
 c --- fill histograms --------                                                                                                                              
 c
-      write(*,*)'Histograms Monte Carlo integrand'                                                                                                          
+      write(*,*)'Histograms Monte Carlo integrand' 
         do i=0,2     !=========================                                                                                                             
           write(*,*)i
           do j=1,bins(i)
@@ -7631,6 +9357,74 @@ c
               write(*,*) x,histoMC(0,j)+histoMC(1,j)+histoMC(2,j)
      1            ,sqrt(errorMC(0,j)**2+errorMC(1,j)**2+errorMC(2,j)**2)
           enddo
+  202 FORMAT('',G20.10E3,G20.10E3,G20.10E3)
+c----------------------------------------------------------------------
+c angular distributions 
+c      do i=3,4     !=========================
+c          write(*,*)i
+c          write(10,*)i
+c          do j=1,bins(i)
+c            x = xlow(i)+(j-.5d0)*(xup(i)-xlow(i))/dble(bins(i))
+c            if (count(1).ne.0.d0) then 
+c              histoMC(i,j) = histoMC(i,j)/count(1)
+c              errorMC(i,j) = dsqrt(dabs(errorMC(i,j)/count(1)/count(1)
+c     &               - histoMC(i,j)*histoMC(i,j)/count(1))) 
+c     dividing by interval width -> the result is delta sigma/delta q
+c              histo(i,j)=histo(i,j)*dble(bins(i))/(xup(i)-xlow(i))
+c              error(i,j)=error(i,j)*dble(bins(i))/(xup(i)-xlow(i))
+c            else
+c              histoMC(i,j) = 0.d0
+c              errorMC(i,j) = 0.d0
+c            endif
+c              write(*,*) x,histoMC(i,j),errorMC(i,j)
+c              write(10,202) x,histoMC(i,j),errorMC(i,j)
+c              if(i.eq.1) write (21,*) x,histo(i,j),error(i,j)
+c              if(i.eq.2) write (22,*) x,histo(i,j),error(i,j)
+c          enddo
+c        enddo
+
+c        do i=5,6     !=========================
+c          write(*,*)i
+c          write(10,*)i
+c          do j=1,bins(i)
+c            x = xlow(i)+(j-.5d0)*(xup(i)-xlow(i))/dble(bins(i))
+c            if (count(2).ne.0.d0) then 
+c              histoMC(i,j) = histoMC(i,j)/count(2)
+c              errorMC(i,j) = dsqrt(dabs(errorMC(i,j)/count(2)/count(2)
+c     &               - histoMC(i,j)*histoMC(i,j)/count(2))) 
+c     dividing by interval width -> the result is delta sigma/delta q
+c              histo(i,j)=histo(i,j)*dble(bins(i))/(xup(i)-xlow(i))
+c              error(i,j)=error(i,j)*dble(bins(i))/(xup(i)-xlow(i))
+c            else
+c              histoMC(i,j) = 0.d0
+c              errorMC(i,j) = 0.d0
+c            endif
+c              write(*,*) x,histoMC(i,j),errorMC(i,j)
+c              write(10,202) x,histoMC(i,j),errorMC(i,j)
+c              if(i.eq.1) write (21,*) x,histo(i,j),error(i,j)
+c              if(i.eq.2) write (22,*) x,histo(i,j),error(i,j)
+c          enddo
+c        enddo
+c
+c          write(*,*)'pi+'
+c          write(10,*)'pi+'
+c          do j=1,bins(3)
+c              x = xlow(3)+(j-.5d0)*(xup(3)-xlow(3))/dble(bins(3))
+c              write(*,*) x,histoMC(3,j)+histoMC(5,j)
+c     1                ,sqrt(errorMC(3,j)**2+errorMC(5,j)**2)
+c              write(10,202) x,histoMC(3,j)+histoMC(5,j)
+c     1                ,sqrt(errorMC(3,j)**2+errorMC(5,j)**2)
+c          enddo
+
+c         write(*,*)'pi-'
+c          write(10,*)'pi-'
+c          do j=1,bins(3)
+c              x = xlow(3)+(j-.5d0)*(xup(3)-xlow(3))/dble(bins(3))
+c              write(*,*) x,histoMC(4,j)+histoMC(6,j)
+c     1                ,sqrt(errorMC(4,j)**2+errorMC(6,j)**2)
+c              write(10,202) x,histoMC(4,j)+histoMC(6,j)
+c     1                ,sqrt(errorMC(4,j)**2+errorMC(6,j)**2)
+c          enddo
 
 c                                                                                                                                                           
       return
@@ -7644,7 +9438,7 @@ c ************************************************************************
 c one photon
 c ************************************************************************
       real*8 function helicityampLO(qq)
-      include 'phokhara_9.1.inc'     
+      include 'phokhara_10.0.inc'     
       real*8 qq,rk1(4),q(4),dps,amp_h,ampLO,ampLOm,ampLOp
       complex*16 gam(4),gammu(4,2,2),v1(2,2),v2(2,2),up1(2,2),up2(2,2)
      1          ,gammu_ma(4,2,2)
@@ -7652,6 +9446,7 @@ c ************************************************************************
       common/pedf/rk1,dps
 c
       call gam1(gam,gammu,gammu_ma,v1,v2,up1,up2,qq)
+      
 c
       do i1=1,4
          rk1(i1) = momenta(3,i1-1)
@@ -7694,9 +9489,19 @@ c---------------------------------------------------------------------
 c-----------------FSR virtual+soft correction -pions and kaons K^+K^-
 c---------------------------------------------------------------------
       real*8 function vertLO(qq)
-      include 'phokhara_9.1.inc'     
-      complex*16 cdilog,pod1,pod2,wsp1,wsp2
+      include 'phokhara_10.0.inc' 
+      Complex*16 qlI1,qlI2,qlI3,qlI4,Ival(-2:0),A02,B012,B045,B025,
+     1 amp0,amp2,amp8,amp10,ampc,C02fun,C0count
+      complex*16 cdilog,pod1,pod2,wsp1,wsp2,fsr_no_emfull
       real*8 betapi,mpi2,qq,vert,pod3
+      real*8 softint_q1q2,softint_qjqj,soft
+      real*8 softint_q1q2_f,softint_qjqj_f,soft_f
+      real*8 s15,musq,betan,cc,vertLO_epjc,tt,soft_notes,cci,pij,sl,
+     1 slqjqj,mom1dl,mom2dl,q1(0:3),q2(0:3),EE,theta1,phi1,qmo,
+     2 soft_notes2,soft_notes1,soft_f1,soft_f2,berends,berends2,vertLO2,
+     3 temp
+      complex*16 C02new,C02fin,C02inf,fsr_no_em2
+      
 
       if(pion.eq.1)then
         mpi2 = mpi**2
@@ -7707,7 +9512,9 @@ c---------------------------------------------------------------------
       betapi = Sqrt(1.d0 - 4.d0*mpi2/qq)
       pod1 = dcmplx(2.d0*betapi/(1.d0+betapi),0.d0)
       pod3 = qq*(1.d0+betapi)**2/4.d0/mpi2
+      tt=(1.d0-betapi)/(1.d0+betapi)
 
+     
       vertLO = alpha/pi*( (3.d0*qq-4.d0*mpi2)/qq/betapi
      1       * Log(pod3) - 2.d0 
      2       - Log(qq/mpi2)
@@ -7718,13 +9525,38 @@ c---------------------------------------------------------------------
      7       + 2.d0*alpha/pi*( (1.d0+betapi**2)/2.d0/betapi*Log(pod3)
      8       - 1.d0 )*( Log(2.d0*w) + 1.d0 
      9                  + 1.d0/(1.d0-Sp/qq)*Log(Sp/qq) )
+
+c      print*, 'old V+S=',vertLO
+c      temp=vertLO
+
+        if(nlo2.eq.1)then 
+           vertLO2=alpha/pi*( (3.d0*qq-4.d0*mpi2)/qq/betapi
+     1       * Log(pod3) - 2.d0 
+     2       - Log(qq/mpi2)
+     3       - (1.d0+betapi**2)/betapi
+     4       * ( Log(pod3)* Log( (1.d0+betapi)/2.d0)
+     5        + 2.d0*cdilog(pod1)
+     6        - pi**2/2.d0 ) ) 
+c  soft part from Nucl.Phys B57 (1973) 381-400 (eq.(29)) without terms proportional to Log(2w)
+       soft=-(1.d0/betapi*log(tt)+(1.d0+betapi**2)/betapi*(
+     -   cdilog(dcmplx(2.d0*betapi/(1.d0+betapi),0.d0))        
+     -  +log(tt)**2/4.d0 ))*alpha/pi
+
+          call softintegral_q1q2_sub(softint_q1q2_f)
+          call softintegral_qjqj_sub(softint_qjqj_f)
+          soft_f=2.d0*(softint_qjqj_f-softint_q1q2_f)
+          vertLO=vertLO2-soft
+c          print*, 'vertlo',vertLO
+c          print*,'NEW V+S=',vertLO+soft_f,
+c     - (1.d0-(vertLO+soft_f)/(temp))*100.d0,'%'
+       endif
       return
       end
 c----------------------------------------------------------
 c-----------------FSR virtual+soft correction -muons ------
 c----------------------------------------------------------
       real*8 function vertLO_mu(qq)
-      include 'phokhara_9.1.inc'     
+      include 'phokhara_10.0.inc'     
       complex*16 cdilog,pod1,pod2,wsp1,wsp2
       real*8 betamu,mmu2,qq,vert,pod3
 
@@ -7749,7 +9581,7 @@ c----------------------------------------------------------
 c-----------------FSR virtual correction F2 part -muons ---
 c----------------------------------------------------------
       complex*16 function vert_ma(qq)
-      include 'phokhara_9.1.inc'     
+      include 'phokhara_10.0.inc'     
       real*8 betamu,mmu2,qq,pod3
 
       mmu2 = mmu**2
@@ -7763,7 +9595,7 @@ c
 c*****************************************************************************
 c----------------------------------------------------------
       real*8 function vertLO_mu2(qq)
-      include 'phokhara_9.1.inc'     
+      include 'phokhara_10.0.inc'     
       complex*16 cdilog,pod1,pod2,wsp1,wsp2
       real*8 betamu,mmu2,qq,vert,pod3
 
@@ -7788,7 +9620,7 @@ c----------------------------------------------------------
 c-----------------FSR virtual correction F2 part -muons ---
 c----------------------------------------------------------
       complex*16 function vert_ma2(qq)
-      include 'phokhara_9.1.inc'     
+      include 'phokhara_10.0.inc'     
       real*8 betamu,mmu2,qq,pod3
 
       mmu2 = mmu**2
@@ -7802,7 +9634,7 @@ c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
       real*8 function ampLO(qq,rk1,gam,q)
-      include 'phokhara_9.1.inc'     
+      include 'phokhara_10.0.inc'     
       complex*16 p1eck1,p1eck2,p2eck1,p2eck2,p1gam,p2gam,cvac_qq,dggvap
       complex*16 epsk1(2,4),epsk2(2,4),BW_om,vacpol_and_nr
       complex*16 gam(4),gam_ma(4),eck1(4),eck2(4)
@@ -7812,6 +9644,11 @@ c
       integer i
       real*8 qq,dme,el_m2,ebppb,vacuumpolarization,vertLO,ver_f
       real*8 rk1(4),rk2(4),p1(4),p2(4),q(4),aa_phi,mm_ph,gg_ph
+      real*8 amp_fullLO
+      real*8 softint_p1p2,softint_pjpj,softint_q1q2,softint_qjqj,
+     1 softint_sum
+      complex*16 apl(2,2),ami(2,2),apl2(2,2),ami2(2,2)
+      real*8 testISR,dps,trace
 c
       common/iloczs1/p1eck1,p1eck2,p2eck1,p2eck2,p1gam,p2gam
       common/matri1/ma,mb,ma_ma,mb_ma
@@ -7819,9 +9656,11 @@ c
       common/param_PFF/aa_phi,mm_ph,gg_ph
 c     
       ampLO = 0.d0
+      testISR=0.d0
       call pol_vec(rk1,epsk1)
       call skalar1LO(rk1)
       call skalar1aLO(gam,gam_ma)
+      
       ebppb = p1(1)+p1(4)
 
       if(fsrnlo.eq.1)then
@@ -7879,7 +9718,57 @@ c the FSR x ISR
 c
       endif
 c
+c FSR x (ISR+correction) + ISR x (FSR+corrections)
+      if((nlo2.eq.1).and.(pion.eq.1))then
+! vator 2 of this interference taken into account in ver_f and ver_s        
+!ST
+         ampLO = ampLO
+     4         +dreal(
+     5    dconjg(dme*(mb(1,1)-ma(1,1))*cvac_qq)
+     5              *dme*(ddpl(1,1)-ddmi(1,1))*cvac_s
+     6   +dconjg(dme*(mb(2,2)-ma(2,2))*cvac_qq)
+     6              *dme*(ddpl(2,2)-ddmi(2,2))*cvac_s
+     7   +dconjg((-ebppb*ma(2,1)+el_m2/ebppb*mb(2,1))*cvac_qq)*
+     8    (-ebppb*ddmi(2,1)+el_m2/ebppb*ddpl(2,1))*cvac_s
+     9   +dconjg((ebppb*mb(1,2)-el_m2/ebppb*ma(1,2))*cvac_qq)*
+     1    (ebppb*ddpl(1,2)-el_m2/ebppb*ddmi(1,2))*cvac_s
+     2    *(ver_f+ver_s) )
+
+         call NLO_ISR_no_mass_terms(qq,apl,ami,apl2,ami2,rk1,eck1)
+         
+c        testISR=testISR+dreal(
+c     5    dconjg(dme*(mb(1,1)-ma(1,1))*cvac_qq)
+c     5              *dme*(apl(1,1)-ami(1,1))*cvac_qq
+c     6   +dconjg(dme*(mb(2,2)-ma(2,2))*cvac_qq)
+c     6              *dme*(apl(2,2)-ami(2,2))*cvac_qq
+c     7   +dconjg((-ebppb*ma(2,1)+el_m2/ebppb*mb(2,1))*cvac_qq)*
+c     8    (-ebppb*ami(2,1)+el_m2/ebppb*apl(2,1))*cvac_qq
+c     9   +dconjg((ebppb*mb(1,2)-el_m2/ebppb*ma(1,2))*cvac_qq)*
+c     1    (ebppb*apl(1,2)-el_m2/ebppb*ami(1,2))*cvac_qq
+c     2     )
+
+
+       ampLO=ampLO+dreal(
+     5    dconjg(dme*(ddpl(1,1)-ddmi(1,1))*cvac_s)
+     5              *dme*(apl(1,1)-ami(1,1))*cvac_qq
+     6   +dconjg(dme*(ddpl(2,2)-ddmi(2,2))*cvac_s)
+     6              *dme*(apl(2,2)-ami(2,2))*cvac_qq
+     7   +dconjg((-ebppb*ddmi(2,1)+el_m2/ebppb*ddpl(2,1))*cvac_s)*
+     8    (-ebppb*ami(2,1)+el_m2/ebppb*apl(2,1))*cvac_qq
+     9   +dconjg((ebppb*ddpl(1,2)-el_m2/ebppb*ddmi(1,2))*cvac_s)*
+     1    (ebppb*apl(1,2)-el_m2/ebppb*ami(1,2))*cvac_qq
+     2     )
+
+       
+            
+      endif
+
+
+c     
+       dps=(1.d0-qq/Sp)/(32.d0*pi*pi)        ! Phase space factors
+       dps = dps*dSqrt(1.d0-4.d0*mpi*mpi/qq)/(32.d0*pi*pi)
       enddo
+c      print*,'new isr=', (4.d0*pi*alpha)**3*(testISR)/4.d0*dps,qq
 c
       return
       end
@@ -7888,7 +9777,7 @@ c used for muonic mode
 c
       real*8 function ampLOm(qq,rk1,gam,gammu,gammu_ma,v1,v2,up1,up2,q)
 c
-      include 'phokhara_9.1.inc'     
+      include 'phokhara_10.0.inc'     
       complex*16 p1eck1,p1eck2,p2eck1,p2eck2,p1gam,p2gam,ver_ma,vert_ma
       complex*16 epsk1(2,4),epsk2(2,4),cvac_qq,dggvap
       complex*16 gam(4),eck1(4),eck2(4),gammu(4,2,2),gammu_ma(4,2,2)
@@ -8019,7 +9908,7 @@ c
 c*******************************************************************
       real*8 function born_mu(qq,rk1,gam,gammu,gammu_ma,v1,v2,up1,up2,q)
 c                                                                                                                                                           
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       complex*16 p1eck1,p1eck2,p2eck1,p2eck2,p1gam,p2gam,ver_ma,vert_ma
       complex*16 epsk1(2,4),epsk2(2,4),cvac_qq,dggvap
       complex*16 gam(4),eck1(4),eck2(4),gammu(4,2,2),gammu_ma(4,2,2)
@@ -8086,7 +9975,8 @@ c
      1   + ((dme*cdabs(mb(1,1)-ma(1,1)))**2
      2   + (dme*cdabs(mb(2,2)-ma(2,2)))**2
      3   + (cdabs(-ebppb*ma(2,1)+el_m2/ebppb*mb(2,1)))**2
-     4   + (cdabs(ebppb*mb(1,2)-el_m2/ebppb*ma(1,2)))**2)*cvac_qq**2
+     4   + (cdabs(ebppb*mb(1,2)-el_m2/ebppb*ma(1,2)))**2)
+     5        *cdabs(cvac_qq)**2
 
 
 
@@ -8135,7 +10025,7 @@ c
       real*8 function
      &  ampLOm2(qq,rk1,gam,gammu,gammu_ma,v1,v2,up1,up2,q)
 c
-      include 'phokhara_9.1.inc'     
+      include 'phokhara_10.0.inc'     
       complex*16 p1eck1,p1eck2,p2eck1,p2eck2,p1gam,p2gam,ver_ma,vert_ma2
       complex*16 epsk1(2,4),epsk2(2,4),cvac_qq,dggvap
       complex*16 gam(4),eck1(4),eck2(4),gammu(4,2,2),gammu_ma(4,2,2)
@@ -8283,7 +10173,7 @@ c***********************************************************************
 c-------------------------------------- FSR virtual correction proton---
 c-----------------------------------------------------------------------
       real*8 function vertLO_p(qq)
-      include 'phokhara_9.1.inc'     
+      include 'phokhara_10.0.inc'     
       complex*16 cdilog,pod1,pod2,wsp1,wsp2
       real*8 betamu,mmu2,qq,vert,pod3
       complex*16 protF1,protF2
@@ -8302,7 +10192,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c used for proton code
 c
       real*8 function ampLOp(qq,rk1,gam,gammu,gammu_ma,v1,v2,up1,up2,q)
-      include 'phokhara_9.1.inc'     
+      include 'phokhara_10.0.inc'     
       complex*16 p1eck1,p1eck2,p2eck1,p2eck2,p1gam,p2gam,ver_ma,vert_ma
       complex*16 epsk1(2,4),epsk2(2,4),cvac_qq,dggvap
       complex*16 gam(4),eck1(4),eck2(4),gammu(4,2,2),gammu_ma(4,2,2)
@@ -8436,7 +10326,7 @@ c     matrices and scalar products; mi=minus, pl=plus,
 c     eck1=epsilon*(k1) etc.
 c
       subroutine skalar1LO(rk1) 
-      include 'phokhara_9.1.inc'     
+      include 'phokhara_10.0.inc'     
       complex*16 gam(4),eck1(4),eck2(4),pi1eck1,pi2eck1
       complex*16 qpl(2,2),qmi(2,2),gampl(2,2),gammi(2,2),k1pl(2,2),
      1          k1mi(2,2),k2pl(2,2),k2mi(2,2),eck1pl(2,2),eck1mi(2,2),
@@ -8472,12 +10362,66 @@ c
 c
       return
       end
+
+c     matrices and scalar products; mi=minus, pl=plus,
+c     eck1=epsilon*(k1) etc.
+c
+      subroutine skalar1LOpi0(rk1,rk2) 
+      include 'phokhara_10.0.inc'     
+      complex*16 gam(4),eck1(4),eck2(4),pi1eck1,pi2eck1
+      complex*16 qpl(2,2),qmi(2,2),gampl(2,2),gammi(2,2),k1pl(2,2),
+     1          k1mi(2,2),k2pl(2,2),k2mi(2,2),eck1pl(2,2),eck1mi(2,2),
+     2        eck2pl(2,2),eck2mi(2,2),I(2,2),sigpl(4,2,2),sigmi(4,2,2) 
+     3       ,gampl_ma(2,2),gammi_ma(2,2)
+      real*8 p1(4),p2(4),rk1(4),rk2(4),q(4)
+      real*8 rk1p1,rk1p2,rk2p1,rk2p2,rk1rk2,anaw1,anaw2,dme,el_m2
+     1      ,rat1,cos1,rk1pi1,rk1pi2,cos2
+      integer i1
+c
+      common/matri/qpl,qmi,gampl,gammi,k1pl,k1mi,k2pl,k2mi,eck1pl,
+     1             eck1mi,eck2pl,eck2mi,I,sigpl,sigmi,gampl_ma,gammi_ma
+      common/iloczs2/rk1p1,rk1p2,rk2p1,rk2p2,rk1rk2,anaw1,anaw2
+      common /cp1p2/p1,p2,dme,el_m2
+      common/iloczs3/pi1eck1,pi2eck1,rk1pi1,rk1pi2
+c
+c
+      rat1 = el_m2/(p1(1)+p1(4))
+c
+      cos1 = rk1(4) / rk1(1)
+c
+      rk1p1 = rk1(1) * ( rat1 + p1(4) * (1.d0 - cos1) )
+      rk1p2 = rk1(1) * ( rat1 + p1(4) * (1.d0 + cos1) )
+      
+      cos2 = rk2(4) / rk2(1)
+c
+      rk2p1 = rk2(1) * ( rat1 + p1(4) * (1.d0 - cos2) )
+      rk2p2 = rk2(1) * ( rat1 + p1(4) * (1.d0 + cos2) )
+c
+c      rk1p1=rk1(1)*momenta(1,0)
+c      rk1p2=rk1(1)*momenta(2,0)
+c      rk2p1=rk2(1)*momenta(1,0)
+c      rk2p2=rk2(1)*momenta(2,0)
+
+c      do i1=2,4
+c        rk1p1=rk1p1-rk1(i1)*momenta(1,i1-1)
+c        rk1p2=rk1p2-rk1(i1)*momenta(2,i1-1)
+c        rk2p1=rk2p1-rk2(i1)*momenta(1,i1-1)
+c        rk2p2=rk2p2-rk2(i1)*momenta(2,i1-1)
+c      enddo
+      call plus(rk1,k1pl)
+      call minus(rk1,k1mi)
+
+      call plus(rk2,k2pl)
+      call minus(rk2,k2mi)
+c
+      return
+      end
 c*****************************************************************************
 c     matrices and scalar products; mi=minus, pl=plus,
 c     eck1=epsilon*(k1) etc.
 c
       subroutine skalar1aLO(gam,gam_ma)
-      include 'phokhara_9.1.inc'     
+      include 'phokhara_10.0.inc'     
       complex*16 gam(4),gam_ma(4),gampl_ma(2,2),gammi_ma(2,2)
       complex*16 qpl(2,2),qmi(2,2),gampl(2,2),gammi(2,2),k1pl(2,2),
      1          k1mi(2,2),k2pl(2,2),k2mi(2,2),eck1pl(2,2),eck1mi(2,2),
@@ -8488,6 +10432,7 @@ c
 c
       call cplus(gam,gampl)
       call cminus(gam,gammi)
+
 c
       if((pion.eq.0).and.(fsrnlo.eq.1))then
        call cplus(gam_ma,gampl_ma)
@@ -8500,8 +10445,49 @@ c*****************************************************************************
 c     matrices and scalar products; mi=minus, pl=plus,
 c     eck1=epsilon*(k1) etc.
 c
+      subroutine skalar1aLOpi0(gamk1,gamk2,eck1,eck2)
+      include 'phokhara_10.0.inc'     
+      complex*16 gam(4),gam_ma(4),gampl_ma(2,2),gammi_ma(2,2)
+      complex*16 qpl(2,2),qmi(2,2),gampl(2,2),gammi(2,2),k1pl(2,2),
+     1          k1mi(2,2),k2pl(2,2),k2mi(2,2),eck1pl(2,2),eck1mi(2,2),
+     2        eck2pl(2,2),eck2mi(2,2),I(2,2),sigpl(4,2,2),sigmi(4,2,2),
+     3 eck1(4),eck2(4),gamk1e1(4),gamk2e2(4),
+     4 gamk1e1pl(2,2),gamk2e2pl(2,2),gamk1e1mi(2,2),gamk2e2mi(2,2)
+      real*8 gamk1(4,4),gamk2(4,4)
+      integer mu,nu
+c
+      common/matri/qpl,qmi,gampl,gammi,k1pl,k1mi,k2pl,k2mi,eck1pl,
+     1             eck1mi,eck2pl,eck2mi,I,sigpl,sigmi,gampl_ma,gammi_ma
+      common/matripi0/gamk1e1pl,gamk2e2pl,gamk1e1mi,gamk2e2mi
+c
+      do nu=1,4
+           gamk1e1(nu)=gamk1(nu,1)*eck1(1)
+           gamk2e2(nu)=gamk2(nu,1)*eck2(1)
+      enddo
+      
+      do nu=1,4
+         do mu=2,4
+           gamk1e1(nu)=gamk1e1(nu)-gamk1(nu,mu)*eck1(mu)
+           gamk2e2(nu)=gamk2e2(nu)-gamk2(nu,mu)*eck2(mu)
+         enddo
+      enddo
+   
+       
+       
+      call cplus(gamk1e1,gamk1e1pl)
+      call cminus(gamk1e1,gamk1e1mi)
+      call cplus(gamk2e2,gamk2e2pl)
+      call cminus(gamk2e2,gamk2e2mi)
+
+      return
+      end
+
+c*****************************************************************************
+c     matrices and scalar products; mi=minus, pl=plus,
+c     eck1=epsilon*(k1) etc.
+c
       subroutine skalar2LO(rk1,eck1)
-      include 'phokhara_9.1.inc'     
+      include 'phokhara_10.0.inc'     
       complex*16 gam(4),eck1(4),eck2(4),p1eck1,p1eck2,p2eck1,p2eck2
      1          ,p1gam,p2gam,dd(4)
       complex*16 qpl(2,2),qmi(2,2),gampl(2,2),gammi(2,2),k1pl(2,2),
@@ -8538,15 +10524,70 @@ c
 c
       return
       end
+
+c*****************************************************************************
+c     matrices and scalar products; mi=minus, pl=plus,
+c     eck1=epsilon*(k1) etc.
+c
+      subroutine skalar2LOpi0(rk1,eck1,rk2,eck2)
+      include 'phokhara_10.0.inc'     
+      complex*16 gam(4),eck1(4),eck2(4),p1eck1,p1eck2,p2eck1,p2eck2
+     1          ,p1gam,p2gam,dd(4)
+      complex*16 qpl(2,2),qmi(2,2),gampl(2,2),gammi(2,2),k1pl(2,2),
+     1          k1mi(2,2),k2pl(2,2),k2mi(2,2),eck1pl(2,2),eck1mi(2,2),
+     2          eck2pl(2,2),eck2mi(2,2),I(2,2)
+     3         ,sigpl(4,2,2),sigmi(4,2,2),ddpl(2,2),ddmi(2,2) 
+     3       ,gampl_ma(2,2),gammi_ma(2,2)
+      complex*16 pi1eck1,pi2eck1,f1,BW
+      real*8 rk1pi1,rk1pi2,dme,el_m2,p1(4),p2(4),rk1(4),rk2(4),q(4)
+      integer i1
+c
+      common/iloczs1/p1eck1,p1eck2,p2eck1,p2eck2,p1gam,p2gam
+      common/matri/qpl,qmi,gampl,gammi,k1pl,k1mi,k2pl,k2mi,eck1pl,
+     1             eck1mi,eck2pl,eck2mi,I,sigpl,sigmi,gampl_ma,gammi_ma
+      common /cp1p2/p1,p2,dme,el_m2
+      common/iloczs3/pi1eck1,pi2eck1,rk1pi1,rk1pi2
+c
+      call cplus(eck1,eck1pl)
+      call cminus(eck1,eck1mi)
+
+      call cplus(eck2,eck2pl)
+      call cminus(eck2,eck2mi)
+c
+c     scalar products multiplied by 2, not reflected in their names !
+c
+c      p1eck1=(p1(1)*eck1(1)-p1(2)*eck1(2)-p1(3)*eck1(3)-
+c     1            p1(4)*eck1(4))
+c      p2eck1=(p2(1)*eck1(1)-p2(2)*eck1(2)-p2(3)*eck1(3)-
+c     1            p2(4)*eck1(4))  
+
+c      p1eck2=(p1(1)*eck2(1)-p1(2)*eck2(2)-p1(3)*eck2(3)-
+c     1            p1(4)*eck2(4))
+c      p2eck2=(p2(1)*eck2(1)-p2(2)*eck2(2)-p2(3)*eck2(3)-
+c    1            p2(4)*eck2(4))
+      p1eck1=2.d0*(p1(1)*eck1(1)-p1(2)*eck1(2)-p1(3)*eck1(3)-
+     1            p1(4)*eck1(4))
+      p2eck1=2.d0*(p2(1)*eck1(1)-p2(2)*eck1(2)-p2(3)*eck1(3)-
+     1            p2(4)*eck1(4))  
+
+      p1eck2=2.d0*(p1(1)*eck2(1)-p1(2)*eck2(2)-p1(3)*eck2(3)-
+     1            p1(4)*eck2(4))
+      p2eck2=2.d0*(p2(1)*eck2(1)-p2(2)*eck2(2)-p2(3)*eck2(3)-
+     1            p2(4)*eck2(4))
+c
+c
+      return
+      end
 c*****************************************************************************
       subroutine blocksLO(qq)
-      include 'phokhara_9.1.inc'         
+      include 'phokhara_10.0.inc'         
       complex*16 p1eck1,p1eck2,p2eck1,p2eck2,p1gam,p2gam
      1          ,pi1eck1,pi2eck1
       complex*16 qpl(2,2),qmi(2,2),gampl(2,2),gammi(2,2),k1pl(2,2),
      1          k1mi(2,2),k2pl(2,2),k2mi(2,2),eck1pl(2,2),eck1mi(2,2),
      2        eck2pl(2,2),eck2mi(2,2),I(2,2),sigpl(4,2,2),sigmi(4,2,2)
-     3       ,gampl_ma(2,2),gammi_ma(2,2)
+     3       ,gampl_ma(2,2),gammi_ma(2,2),
+     4 gamk1e1pl(2,2),gamk2e2pl(2,2),gamk1e1mi(2,2),gamk2e2mi(2,2)
       complex*16 m1(2,2),m2(2,2),m3(2,2),m4(2,2),m5(2,2),m6(2,2),
      1         n1(2,2),n2(2,2),n3(2,2),n4(2,2),n5(2,2),n6(2,2),n7(2,2),
      2         n8(2,2),n9(2,2),n10(2,2),n11(2,2),n12(2,2)
@@ -8566,6 +10607,7 @@ c
       common/iloczs1/p1eck1,p1eck2,p2eck1,p2eck2,p1gam,p2gam
       common/matri/qpl,qmi,gampl,gammi,k1pl,k1mi,k2pl,k2mi,eck1pl,
      1             eck1mi,eck2pl,eck2mi,I,sigpl,sigmi,gampl_ma,gammi_ma
+      common/matripi0/gamk1e1pl,gamk2e2pl,gamk1e1mi,gamk2e2mi
       common/matri1/ma,mb,ma_ma,mb_ma
       common/iloczs3/pi1eck1,pi2eck1,rk1pi1,rk1pi2
       common/blocks1/block1,block2,block3,block4
@@ -8593,6 +10635,7 @@ c     adding matrices of the status A and B
 c
       call plumatLO(qq,m1amp3,m1amp4,ma)
       call plumatLO(qq,m2amp3,m2amp4,mb)
+
 c
 c additional part for muon FSR
 c     
@@ -8647,6 +10690,63 @@ c
         call plumatLO(qq,m1amp3_ma,m1amp4_ma,ma_ma)
         call plumatLO(qq,m2amp3_ma,m2amp4_ma,mb_ma)
        endif
+
+      elseif((pion.eq.13).or.(pion.eq.14).or.(pion.eq.15))then
+c k1
+       call conmat(p2eck1,I,m1)
+       call conmat(p1eck1,I,m3)
+
+c k2
+       call conmat(p2eck2,I,m2)
+       call conmat(p1eck2,I,m4)
+c
+c k1
+       call matr(k1pl,eck1mi,n1)
+       call matr(k1mi,eck1pl,n2)
+       call matr(eck1mi,k1pl,n3)
+       call matr(eck1pl,k1mi,n4)
+
+c k2
+       call matr(k2pl,eck2mi,n5)
+       call matr(k2mi,eck2pl,n6)
+       call matr(eck2mi,k2pl,n7)
+       call matr(eck2pl,k2mi,n8)
+
+c k1
+       call minmat(m1,n1,block1)
+       call minmat(m1,n2,block2)
+
+       call minmat(n3,m3,block3)
+       call minmat(n4,m3,block4)
+
+c k2
+
+       call minmat(m2,n5,block5)
+       call minmat(m2,n6,block6)
+
+       call minmat(n7,m4,block7)
+       call minmat(n8,m4,block8)
+c A matrices
+c k1
+       call matr(gamk2e2mi,block1,mamp1a) 
+       call matr(block3,gamk2e2mi,mamp2a) 
+c k2
+       call matr(gamk1e1mi,block5,mamp3a)
+       call matr(block7,gamk1e1mi,mamp4a)
+c B matrices
+c k1
+       call matr(gamk2e2pl,block2,mamp1b)
+       call matr(block4,gamk2e2pl,mamp2b)
+c k2
+       call matr(gamk1e1pl,block6,mamp3b)
+       call matr(block8,gamk1e1pl,mamp4b)
+c---------------------------------------------------------------------
+       call plumatLOpi01(mamp1a,mamp2a,ma)
+       call plumatLOpi01(mamp1b,mamp2b,mb)
+
+       call plumatLOpi02(mamp3a,mamp4a,ma_ma)
+       call plumatLOpi02(mamp3b,mamp4b,mb_ma)
+
 c-----------------------------------------------------------------------
       endif
 c
@@ -8654,7 +10754,7 @@ c
       end
 c**************************************************************************
       subroutine ddvec(rk1,eck1,uupp1,uupp2,vv1,vv2,ddpl,ddmi,qq)
-      include 'phokhara_9.1.inc'     
+      include 'phokhara_10.0.inc'     
       complex*16 gam(4),eck1(4),eck2(4),dd(4),dee(4),dmm(4),
      1               protF1,protF2
       complex*16 qpl(2,2),qmi(2,2),gampl(2,2),gammi(2,2),k1pl(2,2),
@@ -8794,7 +10894,7 @@ c
       end
 c *************************************************************************
       complex*16 function F_phi_KK(qq,xx)
-      include 'phokhara_9.1.inc'     
+      include 'phokhara_10.0.inc'     
       real*8 mm_ph,gg_ph,mm_f0,gg_f0,c_phi_KK_f0_pi,qq,aa_phi,
      1       c_phi_gam,mm_f0_600,gg_f0_600,c_phi_KK_f0_600_pi,xx
       complex*16 ff0_II,phas1,phas2,i,ff
@@ -8815,7 +10915,7 @@ c *************************************************************************
       end
 c *************************************************************************
       complex*16 function ff0_II(qq)
-      include 'phokhara_9.1.inc'         
+      include 'phokhara_10.0.inc'         
       real*8 qq,aa,bb,amb,mm_ph,gg_ph,aa_phi
       complex*16 ff_f0,gg_f0
       common/param_PFF/aa_phi,mm_ph,gg_ph
@@ -8828,8 +10928,9 @@ c------
       return
       end
 c ************************************************************************
+
       complex*16 function ff_f0(xx)
-      include 'phokhara_9.1.inc'         
+      include 'phokhara_10.0.inc'         
       real*8 xx
 c------
       if(xx.ge.0.25d0)then
@@ -8842,7 +10943,7 @@ c------
       end
 c ************************************************************************
       complex*16 function gg_f0(xx)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 xx
 c------
       if(xx.ge.0.25d0)then
@@ -8856,7 +10957,7 @@ c------
       end
 c *************************************************************************
       complex*16 function F_phi_no(qq,xx)
-      include 'phokhara_9.1.inc'     
+      include 'phokhara_10.0.inc'     
       real*8 mm_ph,gg_ph,mm_f0,gg_f0,c_phi_KK_f0_pi,qq,aa_phi,
      1       c_phi_gam,mm_f0_600,gg_f0_600,c_phi_KK_f0_600_pi,xx
       complex*16 phas1,phas2,i,ff
@@ -8876,7 +10977,7 @@ c *************************************************************************
       end
 c *************************************************************************
       complex*16 function F_phi_exp(qq,xx)
-      include 'phokhara_9.1.inc' 
+      include 'phokhara_10.0.inc' 
       real*8 aa_phi,mm_ph,gg_ph,qq
       real*8 mm_f0_exp,phas_rho_f0_exp,c_f0_KK_exp,c_f0_pipi_exp,
      1       ff_phi_exp,c_phi_KK,rho_phi_exp,lamb_phi_exp,xx
@@ -8900,7 +11001,7 @@ c 1/D_f0
       end
 c *************************************************************************
       complex*16 function gg_mm_exp(qq,rho_phi_exp,lamb_phi_exp)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
 
       real*8 qq,rho_phi_exp,aa_phi,mm_ph,gg_ph,rho_m_exp,
      1       lamb_m_exp,lamb_phi_exp
@@ -8939,7 +11040,7 @@ c *************************************************************************
       end
 c *************************************************************************
       complex*16 function D_f0_exp(qq)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
 
       real*8 qq,m_KKp_exp,m_pip_exp,mm_f0_exp,phas_rho_f0_exp,
      2       c_f0_KK_exp,c_f0_pipi_exp,ff_phi_exp,c_phi_KK,rho_phi_exp,
@@ -8962,7 +11063,7 @@ c m_K^+ = m_K^-
       end
 c *************************************************************************
       complex*16 function PP_ab(mm,mm_p)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
 
       real*8 mm,mm_p,rho_ab
       complex*16 i
@@ -8999,6 +11100,67 @@ c
          do j=1,2
             mat3(i,j)=  0.5d0*mat1(i,j)/rk1p1/qq
      1                 +0.5d0*mat2(i,j)/rk1p2/qq
+         enddo
+      enddo
+      end
+
+c**************************************************************************
+c     addind 4 matrices: with proper denominators
+c     for one photon initial state emission
+c
+      subroutine plumatLOpi01(mat1,mat2,mat5) 
+      include 'phokhara_10.0.inc' 
+      real*8 qq,rk1p1,rk1p2,rk2p1,rk2p2,rk1rk2,anaw1,anaw2,qq1,qq2
+      integer i,j
+      complex*16 mat1(2,2),mat2(2,2),mat3(2,2),mat4(2,2),mat5(2,2)
+      complex*16 pionggFF_dprime,etaggFF_dprime2,etaPggFF_dprime2,FFps
+c
+      common/iloczs2/rk1p1,rk1p2,rk2p1,rk2p2,rk1rk2,anaw1,anaw2
+      common/qqvec12/qq1,qq2
+c  
+      if(pion.eq.13)then
+         FFps=  pionggFF_dprime(qq1,0.d0)
+      elseif(pion.eq.14)then
+         FFps=  etaggFF_dprime2(qq1,0.d0)
+      else
+         FFps=  etaPggFF_dprime2(qq1,0.d0)
+      endif
+
+      do i=1,2
+         do j=1,2
+         mat5(i,j)=0.5d0*mat1(i,j)/rk1p2/qq1*FFps
+     1            +0.5d0*mat2(i,j)/rk1p1/qq1*FFps
+         enddo
+      enddo
+      end
+c**************************************************************************
+c**************************************************************************
+c     addind 4 matrices: with proper denominators
+c     for one photon initial state emission
+c
+      subroutine plumatLOpi02(mat3,mat4,mat5) 
+      include 'phokhara_10.0.inc' 
+      real*8 qq,rk1p1,rk1p2,rk2p1,rk2p2,rk1rk2,anaw1,anaw2,qq1,qq2
+      integer i,j
+      complex*16 mat1(2,2),mat2(2,2),mat3(2,2),mat4(2,2),mat5(2,2)
+      complex*16 pionggFF_dprime,etaggFF_dprime2,etaPggFF_dprime2,FFps
+c
+      common/iloczs2/rk1p1,rk1p2,rk2p1,rk2p2,rk1rk2,anaw1,anaw2
+      common/qqvec12/qq1,qq2
+c  
+      if(pion.eq.13)then
+         FFps=  pionggFF_dprime(qq2,0.d0)
+      elseif(pion.eq.14)then
+         FFps=  etaggFF_dprime2(qq2,0.d0)
+      else
+         FFps=  etaPggFF_dprime2(qq2,0.d0)
+      endif
+
+      do i=1,2
+         do j=1,2
+         mat5(i,j)=
+     2            +0.5d0*mat3(i,j)/rk2p2/qq2*FFps
+     3            +0.5d0*mat4(i,j)/rk2p1/qq2*FFps
          enddo
       enddo
       end
@@ -9055,10 +11217,10 @@ c ************************************************************************
 c ------------------------------------------------------------------------
 
       real*8 function helicityamp(qq,q0p,q2p,q0b,q2b)
-      include 'phokhara_9.1.inc'     
+      include 'phokhara_10.0.inc'     
       real*8 qq,rk1(4),rk2(4),q(4),dps,amp_h,amp,rlam
      1                ,pionFF,q0p,q2p,q0b,q2b,a,b,c,mmu_1,
-     2             Columb_F,ampsqr_mu
+     2             Columb_F,ampsqr_mu,bb
       complex*16 gam(4),gammu(4,2,2),v1(2,2),v2(2,2),up1(2,2),up2(2,2)
      1          ,gammu_ma(4,2,2)
       complex*16 uupp1(1,2),uupp2(1,2),vv1(2,1),vv2(2,1)
@@ -9114,9 +11276,12 @@ c----- PPbar ---------------
       mmu_1=mp
       call fermionamp
      &      (mmu_1,gammu,v1,v2,up1,up2,q,qq,rk1,rk2,dps,amp_h)
-
-      if(fsr.ne.0) amp_h=amp_h*Columb_F(qq)
+       bb=pi*alpha/sqrt(abs(1.d0-4.d0*mp**2/qq))
+c      if(fsr.ne.0) 
+        amp_h=amp_h*bb/(1.d0-exp(-bb))
        !bez if *bb/(1.d0-exp(-bb)) bb=bb=pi*alpha/sqrt(abs(1.d0-4.d0*mp**2/qq))
+      
+    
 c
 c----- NNbar ---------------
       elseif(pion.eq.5)then
@@ -9157,7 +11322,7 @@ c
 c*****************************************************************************
       subroutine fermionamp
      &      (mmu_1,gammu,v1,v2,up1,up2,q,qq,rk1,rk2,dps,amp_h)
-      include 'phokhara_9.1.inc'     
+      include 'phokhara_10.0.inc'     
       real*8 qq,rk1(4),rk2(4),q(4),dps,amp_h,amp,mmu_1
       complex*16 gam(4),gammu(4,2,2),v1(2,2),v2(2,2),up1(2,2),up2(2,2)
       complex*16 uupp1(1,2),uupp2(1,2),vv1(2,1),vv2(2,1)
@@ -9201,7 +11366,7 @@ c*****************************************************************************
 c the 2pi(pion=1) and mu+, mu-(pion=0) currents + 4pi currents
 c
       subroutine gam1(gam,gammu,gammu_ma,v1,v2,up1,up2,qq)
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       integer mu,ic1,ic2,ic3,i
       real*8 qq,th1,th2,sphi1,cphi1,sphi2,cphi2,cth1d2,sth1d2,
      &       cth2d2,sth2d2,sq1,sq2,em1,em2,pm1,pm2,sth1,sth2,
@@ -9219,7 +11384,7 @@ c  four different combinations of \mu^+, \mu^- helicities
 c ++,+-,-+,-- ; v1(i,1)==v1(i,+),v1(i,2)==v1(i,-) etc.
 c see notes p.4-6   
 c
-      if (pion.eq.0)then 
+      if ((pion.eq.0).or.(pion.eq.11).or.(pion.eq.12))then 
       mmu1=mmu
       call spinors(mmu1,up1,up2,v1,v2) 
 c
@@ -9344,7 +11509,7 @@ c
       end
 c ***************************************************************************
       subroutine  spinors(mmu1,up1,up2,v1,v2)
-      include 'phokhara_9.1.inc'      
+      include 'phokhara_10.0.inc'      
        real*8 th1,th2,sphi1,cphi1,sphi2,cphi2,cth1d2,sth1d2,
      &       cth2d2,sth2d2,sq1,sq2,em1,em2,pm1,pm2,sth1,sth2,mmu1
       complex*16 v1(2,2),v2(2,2),up1(2,2),up2(2,2),ex1,ex2
@@ -9415,7 +11580,7 @@ c and neutron (pion=5) formractors as well
 c---------------------------------------------------------------------
 c FF_pp=0
       subroutine ProtonFormFactor(qq,protF1,protF2)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       complex*16 protF1,protF2,F1ss,F1vv,F2ss,F2vv,alphafun_pp,
      &           meson_pp,gfun_pp,ex_pp
       real*8 qq
@@ -9466,7 +11631,7 @@ c FF_pp=0
 
 c FF_pp=1
       subroutine ProtonFormFactor_new(qq,protF1,protF2)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       complex*16 protF1,protF2,F1ss,F1vv,F2ss,F2vv,BW_om
       real*8 qq,aaaa,bbbb,mamom_p,mamom_n
       
@@ -9518,6 +11683,7 @@ c      endif
      &    +par16*BW_om(mrho_pp4,gammarho_pp4,qq,1))
      &   /(1.d0+par10+par11+par12+par16)
 
+
       F1ss = 0.5D0 * F1ss
       F1vv = 0.5D0 * F1vv
       F2ss = 0.5D0 * F2ss
@@ -9541,7 +11707,7 @@ c this function includes vacuum polarisation and J/psi or psi(2S)
 c as set by the input parameters     
 c---------------------------------------------------------------------
       complex*16 function vacpol_and_nr(qq)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 qq,aa_phi,mm_ph,gg_ph
       real*8 vprehadsp,vprehadtm,vpimhad,vprelepsp,vpreleptm,vpimlep,
      & vpretopsp,vpretoptm
@@ -9578,7 +11744,7 @@ c
       endif
 c
       if(narr_res.eq.1)then
-        if(pion.le.1)then
+        if((pion.le.1).or.(pion.eq.11).or.(pion.eq.12))then
           vacpol_and_nr = vacpol_and_nr         
      1   - 3.d0*sqrt(qq)*gamjpee/alpha/mjp**2*BW_om(mjp,gamjp,qq,1)
         elseif(pion.eq.6)then
@@ -9614,7 +11780,7 @@ c     matrices and scalar products; mi=minus, pl=plus,
 c     eck1=epsilon*(k1) etc.
 c
       subroutine skalar1(rk1,rk2,gam,q)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 dme,el_m2,p1,p2,q,rk1,rk2,rat1,cos1,cos2,
      1       rk1p1,rk1p2,rk2p1,rk2p2,rk1rk2,anaw1,anaw2,
      2       rk2pi1,rk2pi2,rk1pi1,rk1pi2,qqa1,qqa2
@@ -9625,6 +11791,7 @@ c
      2        eck2pl(2,2),eck2mi(2,2),I(2,2),sigpl(4,2,2),sigmi(4,2,2) 
      3        ,pi1eck2,pi2eck2,pi1eck1,pi2eck1  
      3       ,gampl_ma(2,2),gammi_ma(2,2)
+      real*8 Dk1k2q1,Dk1k2q2
 c
       dimension p1(4),p2(4),rk1(4),rk2(4),gam(4),q(4),eck1(4),eck2(4)
 c
@@ -9637,6 +11804,7 @@ c
       common/iloczs3/pi1eck1,pi2eck1,rk1pi1,rk1pi2
       common/iloczs4/pi1eck2,pi2eck2,rk2pi1,rk2pi2
       common/cqqa12/qqa1,qqa2
+      common/newdenpions/Dk1k2q1,Dk1k2q2
 c
       rat1 = el_m2/(p1(1)+p1(4))
 c
@@ -9690,6 +11858,18 @@ c
 c
       if(fsrnlo.eq.1) call qqa1qqa2(rk1,rk2)
 
+c pions : the two photons 2FSR
+c
+c******** Denominators: 1 / ((k1+k1+qi)^2 - m^2)
+c
+      if((nlo2.eq.1).and.(pion.eq.1)) then
+c
+	Dk1k2q1 = Sp - 2.d0*dsqrt(Sp)*momenta(7,0)
+	Dk1k2q2 = Sp - 2.d0*dsqrt(Sp)*momenta(6,0)
+c
+      endif
+c********
+
       return
       end
 c *************************************************************************
@@ -9697,7 +11877,7 @@ c     matrices and scalar products; mi=minus, pl=plus,
 c     eck1=epsilon*(k1) etc.
 c
       subroutine skalar2(rk1,rk2,gam,q,eck1,eck2,qq)
-      include 'phokhara_9.1.inc' 
+      include 'phokhara_10.0.inc' 
       real*8 qq
       real*8 dme,el_m2,p1,p2,q,rk1,rk2
       real*8 rk2pi1,rk2pi2,rk1pi1,rk1pi2,qqa1,qqa2
@@ -9709,6 +11889,7 @@ c
      3       ,gampl_ma(2,2),gammi_ma(2,2)
       complex*16 pi1eck2,pi2eck2,pi1eck1,pi2eck1,gam1pimi(2,2),
      1           gam1pipl(2,2),gam2pimi(2,2),gam2pipl(2,2)
+      complex*16 rk1eck2,rk2eck1,eck1eck2
 
       dimension p1(4),p2(4),rk1(4),rk2(4),gam(4),q(4),eck1(4),eck2(4)
 c
@@ -9720,6 +11901,7 @@ c
       common/iloczs3/pi1eck1,pi2eck1,rk1pi1,rk1pi2
       common/iloczs4/pi1eck2,pi2eck2,rk2pi1,rk2pi2
       common/cqqa12/qqa1,qqa2
+      common/newpions/rk1eck2,rk2eck1,eck1eck2
 c
       call cplus(eck1,eck1pl)
       call cminus(eck1,eck1mi)
@@ -9752,6 +11934,22 @@ c
        pi2eck2 = pi2eck2 - momenta(7,i1)*eck2(i1+1)
       enddo
 
+c pions : the two photons 2FSR
+c
+      if((nlo2.eq.1).and.(pion.eq.1)) then
+c
+      eck1eck2 = eck1(1)*eck2(1)
+      rk2eck1 = rk2(1)*eck1(1)
+      rk1eck2 = rk1(1)*eck2(1) 
+      do i1 =1,3
+       eck1eck2 = eck1eck2 - eck1(i1+1)*eck2(i1+1)
+       rk2eck1 = rk2eck1 - rk2(i1+1)*eck1(i1+1)
+       rk1eck2 = rk1eck2 - rk1(i1+1)*eck2(i1+1)
+      enddo
+c
+      endif
+c*****
+
       if((fsrnlo.eq.1).and.((pion.eq.1).or.(pion.eq.6))) 
      1                            call picurr(rk1,rk2,eck1,eck2,qq)
       
@@ -9760,7 +11958,7 @@ c
 c ************************************************************************
       subroutine qqa1qqa2(rk1,rk2)
 
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       real*8 rk1(4),rk2(4)
       real*8 qqa1,qqa2,prad1(4),prad2(4)
       integer i1,i2
@@ -9782,7 +11980,7 @@ c ************************************************************************
       end
 c ************************************************************************
       subroutine picurr(rk1,rk2,eck1,eck2,qq)
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       real*8 rk1(4),rk2(4),qq
       complex*16 eck1(4),eck2(4),pi1eck2,pi2eck2,pi1eck1,pi2eck1
       complex*16 gam1pi(4),gam2pi(4)
@@ -10078,7 +12276,7 @@ c****************************************************************************
 
       subroutine blocks(rk1,rk2)
 c
-      include 'phokhara_9.1.inc'       
+      include 'phokhara_10.0.inc'       
       real*8 rk1(4),rk2(4)
       complex*16 p1eck1,p1eck2,p2eck1,p2eck2,p1gam,p2gam
       complex*16 qpl(2,2),qmi(2,2),gampl(2,2),gammi(2,2),k1pl(2,2),
@@ -10103,6 +12301,7 @@ c
       complex*16 gam1pimi(2,2),gam1pipl(2,2),gam2pimi(2,2),gam2pipl(2,2)
       complex*16 mapi1(2,2),mbpi1(2,2),mapi2(2,2),mbpi2(2,2)
       complex*16 ma(2,2),mb(2,2),ma_ma(2,2),mb_ma(2,2)
+      complex*16 Jvect(1:4),Jplus(1:2,1:2),Jmin(1:2,1:2)
       integer i1,i2
 c
       common/iloczs1/p1eck1,p1eck2,p2eck1,p2eck2,p1gam,p2gam
@@ -10111,6 +12310,7 @@ c
       common/matri1/ma,mb,ma_ma,mb_ma
       common/matri2/mapi1,mbpi1,mapi2,mbpi2
       common/matri3/gam1pimi,gam1pipl,gam2pimi,gam2pipl
+      common/Jvectcom/Jplus,Jmin
 c
 c two photons ISR
 c
@@ -10217,13 +12417,23 @@ c
       call plumat2(m2amp7pi2,m2amp8pi2,mbpi2)
 
       endif
+
+c pions : the two photons 2FSR
+c
+      if((nlo2.eq.1).and.(pion.eq.1)) then
+c
+      call Jvector(Jvect,rk1,rk2)
+      call cplus(Jvect,Jplus)
+      call cminus(Jvect,Jmin)
+c
+      endif
 c
       return
       end
 c*************************************************************************
 
       subroutine blocks_mu(uupp1,uupp2,vv1,vv2) 
-      include 'phokhara_9.1.inc'     
+      include 'phokhara_10.0.inc'     
       real*8 rk2pi1,rk2pi2,rk1pi1,rk1pi2,qqa1,qqa2
       complex*16 mapi1(2,2),mbpi1(2,2),mapi2(2,2),mbpi2(2,2)
       complex*16 uupp1(1,2),uupp2(1,2),vv1(2,1),vv2(2,1)
@@ -10515,7 +12725,7 @@ c
 c**************************************************************************
 c
       real*8 function amp(rk1,rk2,gam,q,qq,uupp1,uupp2,vv1,vv2)
-      include 'phokhara_9.1.inc'     
+      include 'phokhara_10.0.inc'     
       real*8 qq
       real*8 rk1,rk2,p1,p2,dme,el_m2,q,ebppb,vac_qq,vac_qqa1,vac_qqa2
       real*8 qqa1,qqa2,aa_phi,mm_ph,gg_ph
@@ -10525,9 +12735,12 @@ c
       complex*16 epsk1(2,4),epsk2(2,4),BW_om,KaonFormFactor
       complex*16 jp_resonance_s,jp_resonance
       complex*16 vacpol_and_nr
+      complex*16 vac_qqpi,vac_qqa1pi,vac_qqa2pi
       complex*16 gam(4),eck1(4),eck2(4),dggvap
       complex*16 ma(2,2),mb(2,2),ma_ma(2,2),mb_ma(2,2)
       complex*16 mapi1(2,2),mbpi1(2,2),mapi2(2,2),mbpi2(2,2)
+      complex*16 Jplus(1:2,1:2),Jmin(1:2,1:2)
+      complex*16 Fplus(2,2),Fmin(2,2)
 c
       dimension rk1(4),rk2(4),p1(4),p2(4),q(4)
 c
@@ -10537,6 +12750,8 @@ c
       common /cp1p2/p1,p2,dme,el_m2
       common/cqqa12/qqa1,qqa2
       common/param_PFF/aa_phi,mm_ph,gg_ph
+      common/Jvectcom/Jplus,Jmin
+      common/polvec_pi/eck1,eck2
 c     
       amp = 0.d0
       call pol_vec(rk1,epsk1)
@@ -10558,6 +12773,12 @@ c in picurr()
        else
         continue
        endif
+
+      if(pion.eq.1)then
+         vac_qqpi=vacpol_and_nr(qq)
+         vac_qqa1pi=vacpol_and_nr(qqa1)
+         vac_qqa2pi=vacpol_and_nr(qqa2)
+      endif
 c
   
       do i=1,2
@@ -10576,6 +12797,90 @@ c
 c pions : the two photons ISR and the two photons 1ISR and 1FSR
 c muons : the two photons ISR
                   call blocks(rk1,rk2)
+        if((pion.eq.1).and.(nlo2.eq.1))then
+c         Jplus(1,1)=dcmplx(0.d0,0.d0)
+c         Jplus(2,1)=dcmplx(0.d0,0.d0)
+c         Jplus(1,2)=dcmplx(0.d0,0.d0)
+c         Jplus(2,2)=dcmplx(0.d0,0.d0)
+c         Jmin(1,1)=dcmplx(0.d0,0.d0)
+c         Jmin(2,1)=dcmplx(0.d0,0.d0)
+c         Jmin(1,2)=dcmplx(0.d0,0.d0)
+c         Jmin(2,2)=dcmplx(0.d0,0.d0)
+c         mapi1(1,1)=dcmplx(0.d0,0.d0)
+c         mapi1(2,1)=dcmplx(0.d0,0.d0)
+c         mapi1(1,2)=dcmplx(0.d0,0.d0)
+c         mapi1(2,2)=dcmplx(0.d0,0.d0)
+c         mbpi1(1,1)=dcmplx(0.d0,0.d0)
+c         mbpi1(2,1)=dcmplx(0.d0,0.d0)
+c         mbpi1(1,2)=dcmplx(0.d0,0.d0)
+c         mbpi1(2,2)=dcmplx(0.d0,0.d0)
+c         mapi2(1,1)=dcmplx(0.d0,0.d0)
+c         mapi2(2,1)=dcmplx(0.d0,0.d0)
+c         mapi2(1,2)=dcmplx(0.d0,0.d0)
+c         mapi2(2,2)=dcmplx(0.d0,0.d0)
+c         mbpi2(1,1)=dcmplx(0.d0,0.d0)
+c         mbpi2(2,1)=dcmplx(0.d0,0.d0)
+c         mbpi2(1,2)=dcmplx(0.d0,0.d0)
+c         mbpi2(2,2)=dcmplx(0.d0,0.d0)
+        
+        Fplus(1,1)=Jplus(1,1)*cvac_s/Sp*qq+ma(1,1)*vac_qqpi+
+     1 mapi1(1,1)*vac_qqa1pi*qq+mapi2(1,1)*vac_qqa2pi*qq
+        Fplus(2,2)=Jplus(2,2)*cvac_s/Sp*qq+ma(2,2)*vac_qqpi+
+     2 mapi1(2,2)*vac_qqa1pi*qq+mapi2(2,2)*vac_qqa2pi*qq
+        Fplus(2,1)=Jplus(2,1)*cvac_s/Sp*qq+ma(2,1)*vac_qqpi+
+     3 mapi1(2,1)*vac_qqa1pi*qq+mapi2(2,1)*vac_qqa2pi*qq
+        Fplus(1,2)=Jplus(1,2)*cvac_s/Sp*qq+ma(1,2)*vac_qqpi+
+     4 mapi1(1,2)*vac_qqa1pi*qq+mapi2(1,2)*vac_qqa2pi*qq
+
+        Fmin(1,1)=Jmin(1,1)*cvac_s/Sp*qq+mb(1,1)*vac_qqpi+
+     1 mbpi1(1,1)*vac_qqa1pi*qq+mbpi2(1,1)*vac_qqa2pi*qq
+        Fmin(2,2)=Jmin(2,2)*cvac_s/Sp*qq+mb(2,2)*vac_qqpi+
+     2 mbpi1(2,2)*vac_qqa1pi*qq+mbpi2(2,2)*vac_qqa2pi*qq
+        Fmin(2,1)=Jmin(2,1)*cvac_s/Sp*qq+mb(2,1)*vac_qqpi+
+     3 mbpi1(2,1)*vac_qqa1pi*qq+mbpi2(2,1)*vac_qqa2pi*qq
+        Fmin(1,2)=Jmin(1,2)*cvac_s/Sp*qq+mb(1,2)*vac_qqpi+
+     4 mbpi1(1,2)*vac_qqa1pi*qq+mbpi2(1,2)*vac_qqa2pi*qq
+
+        amp = amp+
+     1          ( (dme*cdabs(Fmin(1,1)-Fplus(1,1)))**2 
+     1            +(dme*cdabs(Fmin(2,2)-Fplus(2,2)))**2
+     2            +(cdabs(-ebppb*Fplus(2,1) + el_m2/ebppb*Fmin(2,1)))**2
+     3            +(cdabs(ebppb*Fmin(1,2)-el_m2/ebppb*Fplus(1,2)))**2
+     4          )
+c     amp = amp+
+c     1          ( (dme*cdabs(Jmin(1,1)-Jplus(1,1)))**2 
+c     1            +(dme*cdabs(Jmin(2,2)-Jplus(2,2)))**2
+c     2            +(cdabs(-ebppb*Jplus(2,1) + el_m2/ebppb*Jmin(2,1)))**2
+c     3            +(cdabs(ebppb*Jmin(1,2)-el_m2/ebppb*Jplus(1,2)))**2
+c     4          )*cdabs(cvac_s/Sp*qq)**2
+c     5          -( (dme*cdabs(Jmin(1,1)-Jplus(1,1)))**2
+c     1            +(dme*cdabs(Jmin(2,2)-Jplus(2,2)))**2
+c     2           +(cdabs(-ebppb*Jplus(2,1) + el_m2/ebppb*Jmin(2,1)))**2
+c     3            +(cdabs(ebppb*Jmin(1,2)-el_m2/ebppb*Jplus(1,2)))**2
+c     4          )*cdabs(cvac_s/Sp*qq)**2
+c        amp = amp+((dme*cdabs(mb(1,1)-ma(1,1)))**2
+c     1         +(dme*cdabs(mb(2,2)-ma(2,2)))**2
+c     2         +(cdabs(-ebppb*ma(2,1)+el_m2/ebppb*mb(2,1)))**2
+c     3         +(cdabs(ebppb*mb(1,2)-el_m2/ebppb*ma(1,2)))**2)
+c     4           * vac_qq
+c      amp = amp+( ((dme*cdabs(mbpi1(1,1)-mapi1(1,1)))**2
+c     1         +(dme*cdabs(mbpi1(2,2)-mapi1(2,2)))**2
+c     2         +(cdabs(-ebppb*mapi1(2,1)+el_m2/ebppb*mbpi1(2,1)))**2
+c     3         +(cdabs(ebppb*mbpi1(1,2)-el_m2/ebppb*mapi1(1,2)))**2)
+c     4          *vac_qqa1
+c     4         +((dme*cdabs(mbpi2(1,1)-mapi2(1,1)))**2
+c     1         +(dme*cdabs(mbpi2(2,2)-mapi2(2,2)))**2
+c     2         +(cdabs(-ebppb*mapi2(2,1)+el_m2/ebppb*mbpi2(2,1)))**2
+c     3         +(cdabs(ebppb*mbpi2(1,2)-el_m2/ebppb*mapi2(1,2)))**2)
+c     4          *vac_qqa2 )* qq**2
+c        amp = amp+((dme*cdabs(mb(1,1)-ma(1,1)))**2
+c     1         +(dme*cdabs(mb(2,2)-ma(2,2)))**2
+c     2         +(cdabs(-ebppb*ma(2,1)+el_m2/ebppb*mb(2,1)))**2
+c     3         +(cdabs(ebppb*mb(1,2)-el_m2/ebppb*ma(1,2)))**2)
+c     4           * vac_qq
+c        print*, 'FSR2=',amp,qq
+c + interferences      
+       else
 
       amp = amp+((dme*cdabs(mb(1,1)-ma(1,1)))**2
      1         +(dme*cdabs(mb(2,2)-ma(2,2)))**2
@@ -10601,9 +12906,11 @@ c the two photons 1ISR and 1FSR
      2         +(cdabs(-ebppb*mapi2(2,1)+el_m2/ebppb*mbpi2(2,1)))**2
      3         +(cdabs(ebppb*mbpi2(1,2)-el_m2/ebppb*mapi2(1,2)))**2)
      4          *vac_qqa2 )* qq**2
-
       
       endif
+      endif
+
+
 
          enddo
       enddo
@@ -10611,6 +12918,66 @@ c
       return
       end
 c*************************************************************************
+c*************************************************************************
+c the two photons 2FSR
+c
+      subroutine Jvector(Jvect,rk1,rk2)
+      include 'phokhara_10.0.inc'
+      real*8 Dk1k2q1,Dk1k2q2,rk1(1:4),rk2(1:4)
+      complex*16 eck1(1:4),eck2(1:4),rk1eck2,rk2eck1,eck1eck2,
+     & ff01,ff02,ff03,ff04,
+     & Afactor,Bfactor,Cfactor,Efactor,Ffactor,
+     & Jvect(1:4)
+      complex*16 pi1eck1,pi2eck1,pi1eck2,pi2eck2,PionFormFactor
+      real*8 rk1pi1,rk1pi2,rk2pi1,rk2pi2
+      integer i1
+      common/newpions/rk1eck2,rk2eck1,eck1eck2
+      common/newdenpions/Dk1k2q1,Dk1k2q2
+      common/iloczs3/pi1eck1,pi2eck1,rk1pi1,rk1pi2
+      common/iloczs4/pi1eck2,pi2eck2,rk2pi1,rk2pi2
+      common/polvec_pi/eck1,eck2
+c
+c******** k1.q2=rk1pi2,..., e1.q2=pi1eck1,..., e1.e2=eck1eck2
+c
+        ff01= (2.d0*eck1eck2) / Dk1k2q2 
+     1       - (2.d0*pi2eck1*(rk1eck2 + pi2eck2)) / (rk1pi2*Dk1k2q2) 
+     2       - (2.d0*pi2eck2*(rk2eck1 + pi2eck1)) / (rk2pi2*Dk1k2q2)
+c
+        ff02= (pi1eck1*pi2eck2) / (rk1pi1*rk2pi2)
+c
+        ff03= (2.d0*eck1eck2) / Dk1k2q1  
+     1       - (2.d0*pi1eck1*(rk1eck2 + pi1eck2))/(rk1pi1*Dk1k2q1) 
+     2       - (2.d0*pi1eck2*(rk2eck1 + pi1eck1)) / (rk2pi1*Dk1k2q1)
+c
+        ff04= (pi2eck1*pi1eck2) / (rk1pi2*rk2pi1)
+
+   
+c
+c********
+c
+        Afactor =  2.d0*(ff02 + ff03)
+c
+        Bfactor =  2.d0*(ff03 + ff04)
+c
+        Cfactor =  2.d0*(ff01 + ff02 + ff03 + ff04)
+c
+        Efactor = (2.d0*pi1eck2)/(rk2pi1) - (2.d0*pi2eck2)/(rk2pi2)
+c
+        Ffactor = (2.d0*pi1eck1)/(rk1pi1) - (2.d0*pi2eck1)/(rk1pi2)
+
+        
+c
+c********* J^μ(i,j) / e^3 / i
+c
+      do i1 =1,4
+      Jvect(i1) = (Afactor*rk1(i1) + Bfactor*rk2(i1) + Cfactor
+     1    *momenta(6,i1-1) + Efactor*eck1(i1) + Ffactor*eck2(i1))
+     2 *PionFormFactor(Sp)
+      enddo
+      
+      return
+      end
+c***********************************************************************
       subroutine plus(vect,mat)
       implicit none
       real*8 vect(4)
@@ -10738,7 +13105,7 @@ c
 c*********************************************************************************
 c Columb Factor
       real*8 function Columb_F(qq)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 bb,ff,qq,f0,b0
       integer nn,cf
       if(ph0.eq.0)then
@@ -10767,7 +13134,7 @@ c***********************************************************************
 c **********************************************************************
       complex*16 function isr_mu_amp
      &  (rk1,rk2,polepl,polemin,eck1,eck2,gam,q,qq,uupp1,uupp2,vv1,vv2)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
 c
       real*8 rk1,rk2,p1,p2,q,ebppb,dme,el_m2,qq
       complex*16 uupp1(1,2),uupp2(1,2),vv1(2,1),vv2(2,1)
@@ -10808,7 +13175,7 @@ c-----------------------------------------------------------------------
 c **********************************************************************
       complex*16 function isr_fsr_mu_amp
      &  (rk1,rk2,polepl,polemin,eck1,eck2,gam,q,qq,uupp1,uupp2,vv1,vv2)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
 c
       real*8 rk1,rk2,p1,p2,q,ebppb,dme,el_m2,qq,qqa1,qqa2
       complex*16 uupp1(1,2),uupp2(1,2),vv1(2,1),vv2(2,1)
@@ -10872,7 +13239,7 @@ c **********************************************************************
 c-----------------------------------------------------------------------
       complex*16 function fsr_mu_amp
      &  (q,qq,gam,rk1,rk2,polepl,polemin,eck1,eck2,uupp1,uupp2,vv1,vv2)
-      include 'phokhara_9.1.inc' 
+      include 'phokhara_10.0.inc' 
       complex*16 newblock1(2,2),newblock2(2,2),newblock3(2,2),
      1           newblock4(2,2),newblock5(2,2),newblock6(2,2),
      2           newblock7(2,2),newblock8(2,2),block1(2,2),block2(2,2),
@@ -11061,7 +13428,7 @@ c muon mode, hard part with 2 real hard photon
 c sum over all polarisations for e+,e-,mu+,mu-,gamma,gamma 
 c-----------------------------------------------------------------------
       real*8 function ampsqr_mu(q,qq,gammu,rk1,rk2)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 rk1(4),rk2(4),ampsgr,qq,q(4),con4,dps,B6,B5,error,B5ISR
       complex*16 fsr_mu_amp,isr_mu_amp,isr_fsr_mu_amp,isr_fsr_mu_amp2
       complex*16 eck1(4),eck2(4)
@@ -11301,7 +13668,7 @@ c***********************************************************************
 c soft part for 1 ISR and 1 FSR photon - one hard,one soft
 c*********************************************************************** 
       real*8 function Int_f(delta_2)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 delta_2
       real*8 t_a,t_b,t_3pl,t_4min
       real*8 p1(4),p2(4),q1(4),q2(4)
@@ -11355,8 +13722,11 @@ c_______________________________________________________________________
       Int2=integr_I2(p1,q1,delta_2) + int_end2
       Int3=integr_I2(p2,q2,delta_2) + int_end3
       Int4=integr_I2(p2,q1,delta_2) + int_end4
+
 c
       Int_f=-alpha/4.d0/pi/pi*(Int1-Int2-Int3+Int4)
+
+
 c
       return
       end
@@ -11366,7 +13736,7 @@ c soft part for 2 FSR photon - one hard,one soft
 c***********************************************************************
 
       real*8 function Int_f2(delta_2,qq)
-      include 'phokhara_9.1.inc' 
+      include 'phokhara_10.0.inc' 
       real*8 delta_2,qq
       real*8 q1(4),q2(4),p1(4),p2(4)
       real*8 integr_I2_FSR2,int_end
@@ -11402,7 +13772,7 @@ c***********************************************************************
 c soft part for 2 ISR photons - one hard,one soft
 c*********************************************************************** 
       real*8 function Int_f1(delta_2)
-      include 'phokhara_9.1.inc' 
+      include 'phokhara_10.0.inc' 
       real*8 delta_2
       real*8 p1(4),p2(4),q1(4),q2(4)
       real*8 integr_I2_ISR2,int_end
@@ -11436,7 +13806,7 @@ c***********************************************************************
 
 c***********************************************************************
       real*8 function integr_Int12(mom)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8 mom(4),vec_leng
 c
       call leng_v(mom,vec_leng)
@@ -11517,7 +13887,7 @@ c***********************************************************************
 c*********************************************************************** 
 c    logharytmic part for 1 fsr 1 isr
       real*8 function integr_I2(mom1_el,mom2_mu,delta)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
 c
       real*8 mom1_el(4),mom2_mu(4)
       real*8 lambda,delta
@@ -11528,6 +13898,7 @@ c
       pi=3.141592653589793238462643d0 
       mel=0.51099906d-3
       m_mu=0.1056583568d0
+c      m_mu=0.13957018d0 !for test !ST
 c
       call prod_4(mom1_el,mom2_mu,vec_4prod)
 c
@@ -11987,7 +14358,7 @@ c
 c***********************************************************************
 c    logarithmic part for 2 fsr
       real*8 function integr_I2_FSR2(mom1_mu,mom2_mu,delta,qq)
-      include 'phokhara_9.1.inc' 
+      include 'phokhara_10.0.inc' 
 c
       real*8 mom1_mu(4),mom2_mu(4)
       real*8 lambda,delta,qq
@@ -11997,7 +14368,7 @@ c
       real*8 coeff1_FSR,coeff2_FSR,coeff3_FSR
       real*8 delta_x,dif,rat1,lg2,beta
 c
-      m_mu = mmu
+      m_mu = mmu 
 
 c
       call prod_4(mom1_mu,mom1_mu,vec_4prod)
@@ -12033,7 +14404,7 @@ c***********************************************************************
 c******************************************************************************
 c    logarithmic part for 2 isr
       real*8 function integr_I2_ISR2(mom1_el,mom2_el,delta)
-      include 'phokhara_9.1.inc' 
+      include 'phokhara_10.0.inc' 
 c
       real*8 mom1_el(4),mom2_el(4)
       real*8 lambda,delta,qq
@@ -12072,7 +14443,7 @@ c
 c****************************************************************************** 
 c******************************************************************************
       real*8 function integr_Int4(mom1,mom2)
-       include 'phokhara_9.1.inc'
+       include 'phokhara_10.0.inc'
 c
       real*8 mom1(4),mom2(4)
       real*8 vec_4prod,const
@@ -12108,16 +14479,11 @@ c
       return
       end
 c***********************************************************************
-c      real*8 function dgammf(x)
-c      real*8 x
-c      dgammf=1.d0
-c      end
-c from Henryk Czyz: For the Phokhara 9.x there is a bug in the 'new' form factor.
-c (...) should not be there. It is replacing the cernlib function with the same name.
+
 c***********************************************************************
 c*********************************************************************** 
       real*8 function virt_muons(delta_2,qq)
-      include 'phokhara_9.1.inc'
+      include 'phokhara_10.0.inc'
       real*8     ISR_Born,FSR_Born,ISRFSR_Born
       real*8     virt_isr_fsr_box,virt_isr_fsr_penta,virt_triangle
       real*8     Int_f1,Int_f,Int_f2,soft,ampLOm2
@@ -12231,7 +14597,7 @@ c
       virt_triangle = ampLOm2(qq,rk1,gam,gammu,gammu_ma,v1,v2,up1,up2,q)
 c
       call eemmgloop5(loop,tree,p1,p2,p3,p4,p5,mle2,mlm2,mu2,eps)
-      virt_isr_fsr_penta = dreal(loop)
+      virt_isr_fsr_penta = dreal(loop)*dreal(cvac_qq*dconjg(cvac_s))
 c
       ISRFSR_Born = dreal(tree)
       ISRFSR_Born = born_mu(qq,rk1,gam,gammu,gammu_ma,v1,v2,up1,up2,q)
@@ -12249,277 +14615,1454 @@ c
 c
       return
       end
+
+c-----------------------------------------------------------------------      
+c********************chi production*************************************
+c-----------------------------------------------------------------------     
+      real*8 function chi_prod1(qq)
+      include 'phokhara_10.0.inc' 
+      real*8 qq, rk1(4),p1(4),p2(4),dme,el_m2,ebppb
+     1 ,facchi
+      complex*16 ma(2,2),mb(2,2),ma_ma(2,2),mb_ma(2,2)
+      complex*16 up1(2,2),up2(2,2),v1(2,2),v2(2,2),uupp1(1,2),uupp2(1,2)
+     1 ,vv1(2,1),vv2(2,1),eck1(4),epsk1(2,4),ten_chi(4,4),
+     1 gammu(4,2,2),gammu_ma(4,2,2),gam(4),gam_ma(4),ddpl(2,2),
+     1 ddmi(2,2),ddpl_ph(2,2),ddmi_ph(2,2),ddpl_Z(2,2),ddmi_Z(2,2),
+     2 ddmi_Zph(2,2),ddpl_Zph(2,2),mat_Z_vec,mat_Z_avec,
+     3 ve1mi(2,2),ve2mi(2,2),ve1pl(2,2),ve2pl(2,2),ax1mi(2,2),
+     4 ax2mi(2,2),ax1pl(2,2),ax2pl(2,2),vec_part,avec_part,
+     5 mbZ(2,2),maZ(2,2),mbZph(2,2),maZph(2,2),
+     6 ddpl_p2s(2,2),ddmi_p2s(2,2)
+       complex*16 cvac_qq,vacpol_and_nr
+      integer ic1,ic2,i1,i,imu
+        common/matri1/ma,mb,ma_ma,mb_ma
+        common /cp1p2/p1,p2,dme,el_m2
+        
+        
       
-      
-      
-c =================================================
-c --- convert output to four vectors for basf2 ----
-c =================================================
-c
-      subroutine belle2event()
-      include 'phokhara_9.1.inc'
+
+       facchi=(mchic1/2.d0+m2c)*mchic1*2.d0*dsqrt(2.d0)*dsqrt(m2c)*
+     1 (2.d0/3.d0)**2
+
+       vec_part=ac*facchi**(-1)*GFermi*( 2.D0*mchic1**2-8.D0*mchic1**2*
+     &    sinthW2 + 4.D0*m2c*mchic1 - 16.D0*m2c*mchic1*sinthW2 )
+
+       avec_part=  ac*facchi**(-1)*GFermi * ( 2.D0*mchic1**2 + 4.D
+     &    0*m2c*mchic1 )
+
+              
+       
+             chi_prod1=0.d0
+             
+            do i1=1,4
+             rk1(i1) = momenta(3,i1-1)
+             enddo
+             ebppb=p1(1)+p1(4)
+              call pol_vec(rk1,epsk1)    
+              call skalar1LO(rk1)   
+              
+            call gam1(gam,gammu,gammu_ma,v1,v2,up1,up2,qq)            
            
-      integer ii
-      integer BNPHOT,BNHAD
-      double precision BP1(0:3),BQ1(0:3),BP2(0:9,0:5),BPHOT(0:1,0:3)
-      COMMON / MOMSET / BP1,BQ1,BP2,BPHOT,BNPHOT,BNHAD
-      
-      BNPHOT = 0
-      BNHAD = 0
-      
-!       electron (e-) (+z direction)
-      do ii=0,3
-	BP1(ii) = momenta(1,ii)
-      enddo
-!       positron (e+) (-z direction)
-      do ii=0,3
-	BQ1(ii) = momenta(2,ii)
-      enddo      
-      
-!       photon 1
-      if(momenta(3,0).gt.0.0)then !(ii,0) is energy, (ii,3) is pz!
-      	do ii=0,3
-	  BPHOT(0,ii) = momenta(3,ii)
-        enddo
-        BNPHOT = BNPHOT + 1
-      endif
-!       photon 2
-      if(momenta(4,0).gt.0.0)then
-      	do ii=0,3
-	  BPHOT(1,ii) = momenta(4,ii)
-        enddo
-        BNPHOT = BNPHOT + 1
-      endif
-            
-!       all the rest...
-      if (pion.eq.0) then !mu+ mu-
-	do ii=0,3
-	  BP2(0,ii) = momenta(6,ii)
-	  BP2(1,ii) = momenta(7,ii)
-        enddo
-        BP2(0,4) = -13 !mu+
-	BP2(1,4) = 13  !mu-
-        BP2(0,5) = -1
-	BP2(1,5) = -1
-        BNHAD = 2
-        
-      elseif(pion.eq.1)then
-	do ii=0,3
-	  BP2(0,ii) = momenta(6,ii)
-	  BP2(1,ii) = momenta(7,ii)
-        enddo
-        BP2(0,4) = 211  !pi+
-	BP2(1,4) = -211 !pi-
-        BP2(0,5) = -1
-	BP2(1,5) = -1
-        BNHAD = 2
-                
-      elseif(pion.eq.2)then
-	do ii=0,3
-	  BP2(0,ii) = momenta(6,ii)
-	  BP2(1,ii) = momenta(7,ii)
-	  BP2(2,ii) = momenta(8,ii)
-	  BP2(3,ii) = momenta(9,ii)
-        enddo
-        BP2(0,4) = 111  !pi0
-	BP2(1,4) = 111  !pi0
-	BP2(2,4) = -211 !pi-
-	BP2(3,4) = 211  !pi+
-        BP2(0,5) = -1
-	BP2(1,5) = -1
-        BP2(2,5) = -1
-	BP2(3,5) = -1
-        BNHAD = 4
-        
-      elseif(pion.eq.3)then
-	do ii=0,3
-	  BP2(0,ii) = momenta(6,ii)
-	  BP2(1,ii) = momenta(7,ii)
-	  BP2(2,ii) = momenta(8,ii)
-	  BP2(3,ii) = momenta(9,ii)
-        enddo
-        BP2(0,4) = 211  !pi+
-	BP2(1,4) = -211 !pi-
-	BP2(2,4) = -211 !pi-
-	BP2(3,4) = 211  !pi+
-        BP2(0,5) = -1
-	BP2(1,5) = -1
-        BP2(2,5) = -1
-	BP2(3,5) = -1
-        BNHAD = 4
+           cvac_qq = vacpol_and_nr(qq)
 
-      elseif(pion.eq.4)then
-	do ii=0,3
-	  BP2(0,ii) = momenta(6,ii)
-	  BP2(1,ii) = momenta(7,ii)
-        enddo
-        BP2(0,4) = -2212  !Pbar
-	BP2(1,4) = 2212 !P
-        BP2(0,5) = -1
-	BP2(1,5) = -1
-        BNHAD = 2
-        
-      elseif(pion.eq.5)then
-	do ii=0,3
-	  BP2(0,ii) = momenta(6,ii)
-	  BP2(1,ii) = momenta(7,ii)
-        enddo
-        BP2(0,4) = -2112  !Nbar
-	BP2(1,4) = 2112 !N
-        BP2(0,5) = -1
-	BP2(1,5) = -1
-        BNHAD = 2
-        
-      elseif(pion.eq.6)then
-        do ii=0,3
-          BP2(0,ii) = momenta(6,ii)
-          BP2(1,ii) = momenta(7,ii)
-        enddo
-        BP2(0,4) = 321  !K+
-        BP2(1,4) = -321 !K-
-        BP2(0,5) = -1
-        BP2(1,5) = -1
-        BNHAD = 2
+            do ic1=1,2
+             do ic2=1,2
+c
+c the spinors
+c
+         uupp2(1,1) = up2(1,ic1)
+         uupp2(1,2) = up2(2,ic1)
+         uupp1(1,1) = up1(1,ic1)
+         uupp1(1,2) = up1(2,ic1)
+    
+         vv1(1,1) = v1(1,ic2)                 
+         vv1(2,1) = v1(2,ic2)                 
+         vv2(1,1) = v2(1,ic2)                 
+         vv2(2,1) = v2(2,ic2)    
 
-      elseif(pion.eq.7)then
-C       Kevin Varvell - Output KL and KS rather than K0 K0bar
-        do ii=0,3
-          BP2(0,ii) = momenta(6,ii)
-          BP2(1,ii) = momenta(7,ii)
-        enddo
-        BP2(0,4) = 130  !KL
-        BP2(1,4) = 310  !KS
-        BP2(0,5) = -1
-        BP2(1,5) = -1
-        BNHAD = 2
-        
-      elseif(pion.eq.8)then
-	do ii=0,3
-	  BP2(0,ii) = momenta(6,ii)
-	  BP2(1,ii) = momenta(7,ii)
-	  BP2(2,ii) = momenta(8,ii)
-        enddo
-        BP2(0,4) = 211  !Pi+
-	BP2(1,4) = -211 !Pi-
-	BP2(2,4) = 111 !Pi0
-        BP2(0,5) = -1
-	BP2(1,5) = -1
-	BP2(2,5) = -1
-        BNHAD = 3
-        
-      elseif(pion.eq.9)then
-	do ii=0,3
-	  BP2(0,ii) = momenta(6,ii)
-	  BP2(1,ii) = momenta(7,ii)
-	  BP2(2,ii) = momenta(8,ii)
-	  BP2(3,ii) = momenta(9,ii)
-	  BP2(4,ii) = momenta(10,ii)
-	  BP2(5,ii) = momenta(11,ii)
-        enddo
-        BP2(0,4) = -3122  !Lambda bar
-	BP2(1,4) = 3122 !Lambda
-	BP2(2,4) = 211 !pi+
-	BP2(3,4) = -2212 !Pbar
-	BP2(4,4) = -211 !pi-
-	BP2(5,4) = 2212 !P
-	BP2(0,5) = -1
-	BP2(1,5) = -1
-	BP2(2,5) = 0
-	BP2(3,5) = 0
-	BP2(4,5) = 1
-	BP2(5,5) = 1
-        BNHAD = 6
-        
-      elseif(pion.eq.10)then
-	do ii=0,3
-	  BP2(0,ii) = momenta(6,ii)
-	  BP2(1,ii) = momenta(7,ii)
-	  BP2(2,ii) = momenta(8,ii)
-        enddo
-        BP2(0,4) = 221  !eta
-	BP2(1,4) = 211  !pi+
-	BP2(2,4) = -211 !pi-
-	BP2(0,5) = -1
-	BP2(1,5) = -1
-	BP2(2,5) = -1
-        BNHAD = 3
 
-      else
-        continue
-      endif
+          do imu=1,4
+           gam(imu) = gammu(imu,ic1,ic2)           
+           gam_ma(imu) = gammu_ma(imu,ic1,ic2)
+         enddo
+         call skalar1aLO(gam,gam_ma)
+
+c           sum over photon polarizations
+c
+          do i=1,2
+c                  eck1(1)=rk1(1)
+c                  eck1(2)=rk1(2)
+c                  eck1(3)=rk1(3)
+c                  eck1(4)=rk1(4)
+                  eck1(1)=epsk1(i,1)
+                  eck1(2)=epsk1(i,2)
+                  eck1(3)=epsk1(i,3)
+                  eck1(4)=epsk1(i,4) 
+
+         call skalar2LO(rk1,eck1) 
+         call blocksLO(qq)
+         call tensorchi(rk1,eck1,ten_chi)
+
+         call block_chi(qq,ten_chi,ddpl,ddmi,ddpl_ph,ddmi_ph,rk1,gam,
+     1 ddmi_Z,ddpl_Z,ddmi_Zph,ddpl_Zph,ddpl_p2s,ddmi_p2s)
+
+         call conmat(vec_part,ddmi_Z,ve1mi)
+         call conmat(avec_part,ddmi_Z,ax1mi)
+         call conmat(vec_part,ddpl_Z,ve1pl)
+         call conmat(avec_part,ddpl_Z,ax1pl)
+
+         call minmat(ve1pl,ax1pl,maZ)
+         call dodmat(ve1mi,ax1mi,mbZ)
+  
+         call conmat(vec_part,ddmi_Zph,ve2mi)
+         call conmat(avec_part,ddmi_Zph,ax2mi)
+         call conmat(vec_part,ddpl_Zph,ve2pl)
+         call conmat(avec_part,ddpl_Zph,ax2pl)
+
+         call minmat(ve2pl,ax2pl,maZph)
+         call dodmat(ve2mi,ax2mi,mbZph)
+
+     
+
+            ! ma,mb --- radiative return
+            ! ddpl,ddmi --- J/psi gamma
+            ! ddpl_ph,ddmi_ph --- gamma gamma
+            ! ddpl_Z,ddmi_Z --- gamma gamma
+           
+
+! radiative return
+          if((chi_sw.eq.0).or.(chi_sw.eq.2))then
+          chi_prod1=chi_prod1+ ( (dme*cdabs(mb(1,1)-ma(1,1)))**2
+     1          +(dme*cdabs(mb(2,2)-ma(2,2)))**2
+     2          +(cdabs(-ebppb*ma(2,1)+el_m2/ebppb*mb(2,1)))**2
+     3          +(cdabs(ebppb*mb(1,2)-el_m2/ebppb*ma(1,2)))**2 )
+     4          *cdabs(cvac_qq)**2
+          endif
+       
+! chi production with decay to J/psi gamma and 2 gamma
+       if((chi_sw.eq.1).or.(chi_sw.eq.2))then
+        chi_prod1=chi_prod1+ ( (dme*cdabs(-ddpl(1,1)-ddmi(1,1)))**2
+     1         +(dme*cdabs(-ddpl(2,2)-ddmi(2,2)))**2
+     2         +(cdabs(-ebppb*ddmi(2,1)-el_m2/ebppb*ddpl(2,1)))**2
+     3         +(cdabs(-ebppb*ddpl(1,2)-el_m2/ebppb*ddmi(1,2)))**2 )
+     4    /(4.d0*pi*alpha)**3
+
+       chi_prod1=chi_prod1+((dme*cdabs(-ddpl_ph(1,1)-ddmi_ph(1,1)))**2
+     1       +(dme*cdabs(-ddpl_ph(2,2)-ddmi_ph(2,2)))**2
+     2       +(cdabs(-ebppb*ddmi_ph(2,1)-el_m2/ebppb*ddpl_ph(2,1)))**2
+     3       +(cdabs(-ebppb*ddpl_ph(1,2)-el_m2/ebppb*ddmi_ph(1,2)))**2)
+     4    /(4.d0*pi*alpha)**3
+
+        chi_prod1=chi_prod1+2.d0*dreal(
+     1    dconjg(dme*(-ddpl(1,1)-ddmi(1,1)))
+     2    *(dme*(-ddpl_ph(1,1)-ddmi_ph(1,1)))
+     3    +dconjg(dme*(-ddpl(2,2)-ddmi(2,2)))
+     4    *(dme*(-ddpl_ph(2,2)-ddmi_ph(2,2)))
+     5    +dconjg(-ebppb*ddmi(2,1)-el_m2/ebppb*ddpl(2,1))
+     6    *(-ebppb*ddmi_ph(2,1)-el_m2/ebppb*ddpl_ph(2,1))
+     7    +(dconjg(-ebppb*ddpl(1,2)-el_m2/ebppb*ddmi(1,2)))
+     8    *(-ebppb*ddpl_ph(1,2)-el_m2/ebppb*ddmi_ph(1,2))
+     9    )/(4.d0*pi*alpha)**3
+c psi' contribution
+      chi_prod1=chi_prod1+((dme*cdabs(-ddpl_p2s(1,1)-ddmi_p2s(1,1)))**2
+     1      +(dme*cdabs(-ddpl_p2s(2,2)-ddmi_p2s(2,2)))**2
+     2      +(cdabs(-ebppb*ddmi_p2s(2,1)-el_m2/ebppb*ddpl_p2s(2,1)))**2
+     3      +(cdabs(-ebppb*ddpl_p2s(1,2)-el_m2/ebppb*ddmi_p2s(1,2)))**2)
+     4    /(4.d0*pi*alpha)**3
+
+      chi_prod1=chi_prod1+2.d0*dreal(
+     1    dconjg(dme*(-ddpl(1,1)-ddmi(1,1)))
+     2    *(dme*(-ddpl_p2s(1,1)-ddmi_p2s(1,1)))
+     3    +dconjg(dme*(-ddpl(2,2)-ddmi(2,2)))
+     4    *(dme*(-ddpl_p2s(2,2)-ddmi_p2s(2,2)))
+     5    +dconjg(-ebppb*ddmi(2,1)-el_m2/ebppb*ddpl(2,1))
+     6    *(-ebppb*ddmi_p2s(2,1)-el_m2/ebppb*ddpl_p2s(2,1))
+     7    +(dconjg(-ebppb*ddpl(1,2)-el_m2/ebppb*ddmi(1,2)))
+     8    *(-ebppb*ddpl_p2s(1,2)-el_m2/ebppb*ddmi_p2s(1,2))
+     9    )/(4.d0*pi*alpha)**3
+
+
+      chi_prod1=chi_prod1+2.d0*dreal(
+     1    dconjg(dme*(-ddpl_p2s(1,1)-ddmi_p2s(1,1)))
+     2    *(dme*(-ddpl_ph(1,1)-ddmi_ph(1,1)))
+     3    +dconjg(dme*(-ddpl_p2s(2,2)-ddmi_p2s(2,2)))
+     4    *(dme*(-ddpl_ph(2,2)-ddmi_ph(2,2)))
+     5    +dconjg(-ebppb*ddmi_p2s(2,1)-el_m2/ebppb*ddpl_p2s(2,1))
+     6    *(-ebppb*ddmi_ph(2,1)-el_m2/ebppb*ddpl_ph(2,1))
+     7    +(dconjg(-ebppb*ddpl_p2s(1,2)-el_m2/ebppb*ddmi_p2s(1,2)))
+     8    *(-ebppb*ddpl_ph(1,2)-el_m2/ebppb*ddmi_ph(1,2))
+     9    )/(4.d0*pi*alpha)**3
+c
+! neutral current parts 
+
+       chi_prod1=chi_prod1+ ( (dme*cdabs(mbZ(1,1)-maZ(1,1)))**2
+     1          +(dme*cdabs(mbZ(2,2)-maZ(2,2)))**2
+     2          +(cdabs(-ebppb*maZ(2,1)+el_m2/ebppb*mbZ(2,1)))**2
+     3          +(cdabs(ebppb*mbZ(1,2)-el_m2/ebppb*maZ(1,2)))**2 )
+     4    /(4.d0*pi*alpha)**3
+
+       chi_prod1=chi_prod1+ ( (dme*cdabs(mbZph(1,1)-maZph(1,1)))**2
+     1          +(dme*cdabs(mbZph(2,2)-maZph(2,2)))**2
+     2          +(cdabs(-ebppb*maZph(2,1)+el_m2/ebppb*mbZph(2,1)))**2
+     3          +(cdabs(ebppb*mbZph(1,2)-el_m2/ebppb*maZph(1,2)))**2 )
+     4 /(4.d0*pi*alpha)**3
+
+      chi_prod1=chi_prod1+2.d0*dreal(
+     1    dconjg(dme*(mbZ(1,1)-maZ(1,1)))
+     2    *(dme*(mbZph(1,1)-maZph(1,1)))
+     3    +dconjg(dme*(mbZ(2,2)-maZ(2,2)))
+     4    *(dme*(mbZph(2,2)-maZph(2,2)))
+     5    +dconjg(-ebppb*maZ(2,1)+el_m2/ebppb*mbZ(2,1))
+     6    *(-ebppb*maZph(2,1)+el_m2/ebppb*mbZph(2,1))
+     7    +(dconjg(ebppb*mbZ(1,2)-el_m2/ebppb*maZ(1,2)))
+     8    *(ebppb*mbZph(1,2)-el_m2/ebppb*maZph(1,2))
+     9    )/(4.d0*pi*alpha)**3
+! interferences of Z with QED amplitudes
       
+      chi_prod1=chi_prod1+2.d0*dreal((
+     5    dconjg(dme*(mbZ(1,1)-maZ(1,1)))
+     5     *dme*(-ddpl(1,1)-ddmi(1,1))
+     6   +dconjg(dme*(mbZ(2,2)-maZ(2,2)))
+     6     *dme*(-ddpl(2,2)-ddmi(2,2))
+     7   +dconjg((-ebppb*maZ(2,1)+el_m2/ebppb*mbZ(2,1)))*
+     8    (-ebppb*ddmi(2,1)-el_m2/ebppb*ddpl(2,1))
+     9   +dconjg((ebppb*mbZ(1,2)-el_m2/ebppb*maZ(1,2)))*
+     1    (-ebppb*ddpl(1,2)-el_m2/ebppb*ddmi(1,2)))
+     2     )/(4.d0*pi*alpha)**3
+
+       chi_prod1=chi_prod1+2.d0*dreal((
+     5    dconjg(dme*(mbZph(1,1)-maZph(1,1)))
+     5     *dme*(-ddpl_ph(1,1)-ddmi_ph(1,1))
+     6   +dconjg(dme*(mbZph(2,2)-maZph(2,2)))
+     6     *dme*(-ddpl_ph(2,2)-ddmi_ph(2,2))
+     7   +dconjg((-ebppb*maZph(2,1)+el_m2/ebppb*mbZph(2,1)))*
+     8    (-ebppb*ddmi_ph(2,1)-el_m2/ebppb*ddpl_ph(2,1))
+     9   +dconjg((ebppb*mbZph(1,2)-el_m2/ebppb*maZph(1,2)))*
+     1 (-ebppb*ddpl_ph(1,2)-el_m2/ebppb*ddmi_ph(1,2)))
+     2  )/(4.d0*pi*alpha)**3
+
+       chi_prod1=chi_prod1+2.d0*dreal((
+     5    dconjg(dme*(mbZ(1,1)-maZ(1,1)))
+     5     *dme*(-ddpl_ph(1,1)-ddmi_ph(1,1))
+     6   +dconjg(dme*(mbZ(2,2)-maZ(2,2)))
+     6     *dme*(-ddpl_ph(2,2)-ddmi_ph(2,2))
+     7   +dconjg((-ebppb*maZ(2,1)+el_m2/ebppb*mbZ(2,1)))*
+     8    (-ebppb*ddmi_ph(2,1)-el_m2/ebppb*ddpl_ph(2,1))
+     9   +dconjg((ebppb*mbZ(1,2)-el_m2/ebppb*maZ(1,2)))*
+     1    (-ebppb*ddpl_ph(1,2)-el_m2/ebppb*ddmi_ph(1,2)))
+     2     )/(4.d0*pi*alpha)**3
+
+       chi_prod1=chi_prod1+2.d0*dreal((
+     5    dconjg(dme*(mbZph(1,1)-maZph(1,1)))
+     5     *dme*(-ddpl(1,1)-ddmi(1,1))
+     6   +dconjg(dme*(mbZph(2,2)-maZph(2,2)))
+     6     *dme*(-ddpl(2,2)-ddmi(2,2))
+     7   +dconjg((-ebppb*maZph(2,1)+el_m2/ebppb*mbZph(2,1)))*
+     8    (-ebppb*ddmi(2,1)-el_m2/ebppb*ddpl(2,1))
+     9   +dconjg((ebppb*mbZph(1,2)-el_m2/ebppb*maZph(1,2)))*
+     1 (-ebppb*ddpl(1,2)-el_m2/ebppb*ddmi(1,2)))
+     2  )/(4.d0*pi*alpha)**3
+
+c psi' interferences with Z
+       chi_prod1=chi_prod1+2.d0*dreal((
+     5    dconjg(dme*(mbZ(1,1)-maZ(1,1)))
+     5     *dme*(-ddpl_p2s(1,1)-ddmi_p2s(1,1))
+     6   +dconjg(dme*(mbZ(2,2)-maZ(2,2)))
+     6     *dme*(-ddpl_p2s(2,2)-ddmi_p2s(2,2))
+     7   +dconjg((-ebppb*maZ(2,1)+el_m2/ebppb*mbZ(2,1)))*
+     8    (-ebppb*ddmi_p2s(2,1)-el_m2/ebppb*ddpl_p2s(2,1))
+     9   +dconjg((ebppb*mbZ(1,2)-el_m2/ebppb*maZ(1,2)))*
+     1    (-ebppb*ddpl_p2s(1,2)-el_m2/ebppb*ddmi_p2s(1,2)))
+     2     )/(4.d0*pi*alpha)**3
+
+
+      chi_prod1=chi_prod1+2.d0*dreal((
+     5    dconjg(dme*(mbZph(1,1)-maZph(1,1)))
+     5     *dme*(-ddpl_p2s(1,1)-ddmi_p2s(1,1))
+     6   +dconjg(dme*(mbZph(2,2)-maZph(2,2)))
+     6     *dme*(-ddpl_p2s(2,2)-ddmi_p2s(2,2))
+     7   +dconjg((-ebppb*maZph(2,1)+el_m2/ebppb*mbZph(2,1)))*
+     8    (-ebppb*ddmi_p2s(2,1)-el_m2/ebppb*ddpl_p2s(2,1))
+     9   +dconjg((ebppb*mbZph(1,2)-el_m2/ebppb*maZph(1,2)))*
+     1 (-ebppb*ddpl_p2s(1,2)-el_m2/ebppb*ddmi_p2s(1,2)))
+     2  )/(4.d0*pi*alpha)**3
+  
+       endif
+! interferences with radiative return
+
+      if(chi_sw.eq.2)then
+         chi_prod1=chi_prod1+2.d0*dreal((
+     5    dconjg(dme*(mb(1,1)-ma(1,1)))
+     5     *dme*(-ddpl(1,1)-ddmi(1,1))
+     6   +dconjg(dme*(mb(2,2)-ma(2,2)))
+     6     *dme*(-ddpl(2,2)-ddmi(2,2))
+     7   +dconjg((-ebppb*ma(2,1)+el_m2/ebppb*mb(2,1)))*
+     8    (-ebppb*ddmi(2,1)-el_m2/ebppb*ddpl(2,1))
+     9   +dconjg((ebppb*mb(1,2)-el_m2/ebppb*ma(1,2)))*
+     1    (-ebppb*ddpl(1,2)-el_m2/ebppb*ddmi(1,2)))*dconjg(cvac_qq)
+     2     )/(sqrt(4.d0*pi*alpha))**3
+
+       chi_prod1=chi_prod1+2.d0*dreal(
+     5    dconjg(dme*(mb(1,1)-ma(1,1)))
+     5     *dme*(-ddpl_ph(1,1)-ddmi_ph(1,1))
+     6   +dconjg(dme*(mb(2,2)-ma(2,2)))
+     6     *dme*(-ddpl_ph(2,2)-ddmi_ph(2,2))
+     7   +dconjg((-ebppb*ma(2,1)+el_m2/ebppb*mb(2,1)))*
+     8    (-ebppb*ddmi_ph(2,1)-el_m2/ebppb*ddpl_ph(2,1))
+     9   +dconjg((ebppb*mb(1,2)-el_m2/ebppb*ma(1,2)))*
+     1 (-ebppb*ddpl_ph(1,2)-el_m2/ebppb*ddmi_ph(1,2))*dconjg(cvac_qq)
+     2  )/(sqrt(4.d0*pi*alpha))**3
+
+c psi'
+      chi_prod1=chi_prod1+2.d0*dreal(
+     5    dconjg(dme*(mb(1,1)-ma(1,1)))
+     5     *dme*(-ddpl_p2s(1,1)-ddmi_p2s(1,1))
+     6   +dconjg(dme*(mb(2,2)-ma(2,2)))
+     6     *dme*(-ddpl_p2s(2,2)-ddmi_p2s(2,2))
+     7   +dconjg((-ebppb*ma(2,1)+el_m2/ebppb*mb(2,1)))*
+     8    (-ebppb*ddmi_p2s(2,1)-el_m2/ebppb*ddpl_p2s(2,1))
+     9   +dconjg((ebppb*mb(1,2)-el_m2/ebppb*ma(1,2)))*
+     1 (-ebppb*ddpl_p2s(1,2)-el_m2/ebppb*ddmi_p2s(1,2))*dconjg(cvac_qq)
+     2  )/(sqrt(4.d0*pi*alpha))**3
+c
+
+! interferences of Z with radiative return
+
+      chi_prod1=chi_prod1+2.d0*dreal((
+     1    dconjg(dme*(mbZ(1,1)-maZ(1,1)))
+     2    *(dme*(mb(1,1)-ma(1,1)))
+     3    +dconjg(dme*(mbZ(2,2)-maZ(2,2)))
+     4    *(dme*(mb(2,2)-ma(2,2)))
+     5    +dconjg(-ebppb*maZ(2,1)+el_m2/ebppb*mbZ(2,1))
+     6    *(-ebppb*ma(2,1)+el_m2/ebppb*mb(2,1))
+     7    +(dconjg(ebppb*mbZ(1,2)-el_m2/ebppb*maZ(1,2)))
+     8    *(ebppb*mb(1,2)-el_m2/ebppb*ma(1,2))
+     9    )*dconjg(cvac_qq))/(sqrt(4.d0*pi*alpha))**3
+
+      chi_prod1=chi_prod1+2.d0*dreal((
+     1    dconjg(dme*(mb(1,1)-ma(1,1)))
+     2    *(dme*(mbZph(1,1)-maZph(1,1)))
+     3    +dconjg(dme*(mb(2,2)-ma(2,2)))
+     4    *(dme*(mbZph(2,2)-maZph(2,2)))
+     5    +dconjg(-ebppb*ma(2,1)+el_m2/ebppb*mb(2,1))
+     6    *(-ebppb*maZph(2,1)+el_m2/ebppb*mbZph(2,1))
+     7    +(dconjg(ebppb*mb(1,2)-el_m2/ebppb*ma(1,2)))
+     8    *(ebppb*mbZph(1,2)-el_m2/ebppb*maZph(1,2))
+     9    )*dconjg(cvac_qq))/(sqrt(4.d0*pi*alpha))**3
+      
+        endif    
+         
+
+         enddo
+        enddo
+         enddo
+         
+         
+
       return
       end
+c-----------------------------------------------------------------------    
+c----------------------tensor chi production----------------------------
+       subroutine tensorchi(vec1,vec2,ten_chi)
+       complex*16 vec2(4),ten_chi(4,4)
+       real*8 vec1(4)
+       integer ii,nn
+         do ii=1,4
+          ten_chi(ii,ii)=0.d0
+         enddo
+     
+        do ii=1,4
+          do nn=ii+1,4
+           ten_chi(ii,nn)=vec2(ii)*vec1(nn)-vec2(nn)*vec1(ii)
+           ten_chi(nn,ii)=-ten_chi(ii,nn)
+          enddo
+        enddo
+        return
+        end
+c-------------------------two parts for chi production------------------
+       subroutine block_chi(qq,ten1,ddpl,ddmi,ddpl_ph,ddmi_ph,rk1,gam,
+     1 ddmi_Z,ddpl_Z,ddmi_Zph,ddpl_Zph,ddpl_p2s,ddmi_p2s)
+       include 'phokhara_10.0.inc'
+       complex*16 ten1(4,4),gam(4),jj_chi(4),jj_chi_pho(4),
+     1 ddpl(2,2),ddmi(2,2),c_jp,pi_chi,const_chi,const_chi_pho,
+     2 s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,ddpl_ph(2,2),ddmi_ph(2,2),
+     3 ddmi_Z(2,2),ddpl_Z(2,2),jj_chiZ(4),const_chi_Z
+     4 ,ddmi_Zph(2,2),ddpl_Zph(2,2),jj_chiZph(4),const_chi_Zph,
+     5 ddpl_p2s(2,2),ddmi_p2s(2,2),c_p2s,c_p2s_prop,jj_chi_p2s(4),
+     6 const_chi_p2s
+       real*8 qq,rk1(4),jppho2,c_pho,d1
+       integer rr,rr2,jj,beta,kl
+       
+       
+        jppho2=(momenta(6,0)+momenta(7,0)-rk1(1))**2
+        do kl=2,4
+        jppho2=jppho2-(momenta(6,kl-1)+momenta(7,kl-1)-rk1(kl))**2
+        enddo
 
 
+
+
+        c_chi=16.d0*alpha*pi/sqrt(m2c)*ac    
+     1 /(0.5d0**2*jppho2-m2c**2)**2
+
+       c_chipsi=4.d0*sqrt(4.d0*pi*alpha)*aj/sqrt(m2c)/
+     1 (0.5d0**2*jppho2-m2c**2)**2
+
+       c_p2s=4.d0*sqrt(4.d0*pi*alpha)*apsi/sqrt(m2c)/
+     1 (0.5d0**2*jppho2-m2c**2)**2
+       
+
+
+       c_jp=sqrt(3.d0/sqrt(qq)/alpha*gamjpee)/(qq-mjp**2+
+     1 dcmplx(0.d0,1.d0)*mjp*gamjp)
+
+       c_pho=1.d0/qq
+
+      c_p2s_prop=sqrt(3.d0/sqrt(qq)/alpha*gamp2see)/(qq-mp2s**2+
+     1 dcmplx(0.d0,1.d0)*mp2s*gamp2s)
+        
+         
+ 
+         pi_chi=1.d0/(Sp-mchic1**2+
+     1 dcmplx(0.d0,1.d0)*mchic1*gamchic1)
+ 
+       const_chi=sqrt(4.d0*pi*alpha)*pi_chi*c_jp*c_chipsi
+     1 *dcmplx(0.d0,-1.d0)/2.d0*gg1
+
+       const_chi_p2s=sqrt(4.d0*pi*alpha)*pi_chi*c_p2s*c_p2s_prop
+     1 *dcmplx(0.d0,-1.d0)/2.d0*gg1
+       
+       const_chi_pho=sqrt(4.d0*pi*alpha)*pi_chi*c_pho*c_chi
+     1 *dcmplx(0.d0,-1.d0)/2.d0*gg1
+
+       const_chi_Z=sqrt(4.d0*pi*alpha)*pi_chi*c_jp*c_chipsi
+     1 *dcmplx(0.d0,-1.d0)/2.d0
+
+       const_chi_Zph=sqrt(4.d0*pi*alpha)*pi_chi*c_pho*c_chi
+     1 *dcmplx(0.d0,-1.d0)/2.d0
+                         
+       s1=-ten1(2,3)+ten1(3,2)
+       s2=ten1(2,4)-ten1(4,2)
+       s3=ten1(4,3)-ten1(3,4)
+       s4=ten1(1,3)-ten1(3,1)
+       s5=ten1(4,1)-ten1(1,4)
+       s6=ten1(3,4)-ten1(4,3) 
+       s7=ten1(2,1)-ten1(1,2)
+       s8=-ten1(2,4)+ten1(4,2)
+       s9=ten1(1,4)-ten1(4,1)
+       s10=ten1(1,2)-ten1(2,1)
+       s11=ten1(3,1)-ten1(1,3)
+       s12=ten1(2,3)-ten1(3,2)
+c******************** contribution from gamma J/psi
+        jj_chi(1)=(s1*gam(4)+s2*gam(3)+s3*gam(2))*qq*const_chi
+        jj_chi(2)=-(s4*gam(4)+s5*gam(3)+s6*gam(1))*qq*const_chi
+        jj_chi(3)=-(s7*gam(4)+s8*gam(1)+s9*gam(2))*qq*const_chi
+        jj_chi(4)=-(s10*gam(3)+s11*gam(2)+s12*gam(1))*qq*const_chi  
+c************contribution from gamma gamma  
+        jj_chi_pho(1)=(s1*gam(4)+s2*gam(3)+s3*gam(2))*qq*const_chi_pho
+        jj_chi_pho(2)=-(s4*gam(4)+s5*gam(3)+s6*gam(1))*qq*const_chi_pho
+        jj_chi_pho(3)=-(s7*gam(4)+s8*gam(1)+s9*gam(2))*qq*const_chi_pho
+       jj_chi_pho(4)=-(s10*gam(3)+s11*gam(2)+s12*gam(1))*qq*
+     & const_chi_pho 
+ 
+        jj_chiZ(1)=(s1*gam(4)+s2*gam(3)+s3*gam(2))*const_chi_Z*qq
+        jj_chiZ(2)=-(s4*gam(4)+s5*gam(3)+s6*gam(1))*const_chi_Z*qq
+        jj_chiZ(3)=-(s7*gam(4)+s8*gam(1)+s9*gam(2))*const_chi_Z*qq
+        jj_chiZ(4)=-(s10*gam(3)+s11*gam(2)+s12*gam(1))*const_chi_Z*qq
+
+        jj_chiZph(1)=(s1*gam(4)+s2*gam(3)+s3*gam(2))*const_chi_Zph*qq
+       jj_chiZph(2)=-(s4*gam(4)+s5*gam(3)+s6*gam(1))*const_chi_Zph*qq
+       jj_chiZph(3)=-(s7*gam(4)+s8*gam(1)+s9*gam(2))*const_chi_Zph*qq
+       jj_chiZph(4)=-(s10*gam(3)+s11*gam(2)+s12*gam(1))*const_chi_Zph*qq
+
+       jj_chi_p2s(1)=(s1*gam(4)+s2*gam(3)+s3*gam(2))*qq*const_chi_p2s
+        jj_chi_p2s(2)=-(s4*gam(4)+s5*gam(3)+s6*gam(1))*qq*const_chi_p2s
+        jj_chi_p2s(3)=-(s7*gam(4)+s8*gam(1)+s9*gam(2))*qq*const_chi_p2s
+      jj_chi_p2s(4)=-(s10*gam(3)+s11*gam(2)+s12*gam(1))*qq*const_chi_p2s  
+
+      
+       call cplus(jj_chi,ddpl)
+       call cminus(jj_chi,ddmi) 
+
+       call cplus(jj_chi_pho,ddpl_ph)
+       call cminus(jj_chi_pho,ddmi_ph)
+
+       call cplus(jj_chiZ,ddpl_Z)
+       call cminus(jj_chiZ,ddmi_Z)
+
+       call cplus(jj_chiZph,ddpl_Zph)
+       call cminus(jj_chiZph,ddmi_Zph)
+
+       call cplus(jj_chi_p2s,ddpl_p2s)
+       call cminus(jj_chi_p2s,ddmi_p2s)
+         
+       
+     
+      return 
+      end
+
+c----------beam resolution--------------------------------------------------------------------------------
+       subroutine beam_res
+      use belle2_phokhara_interface
+       include 'phokhara_10.0.inc'
+       real*8 r1(0:1),r2,rr,phi,ebeam1,ebeam2,p1(4),p2(4),sm(4)
+       real*8 dme,el_m2
+       integer i
+       common /cp1p2/p1,p2,dme,el_m2
+       common/ssmm/sm
+       
+       call ranlxdf(r1,2)
+       
+           
+           rr=dsqrt(-2.d0*beamres**2*dlog(r1(0)))
+           phi=2.d0*pi*r1(1)
+           ebeam1=rr*dcos(phi)+ebeam
+           ebeam2=rr*dsin(phi)+ebeam    
+           p1(1)=ebeam1
+           p1(2)=0.d0
+           p1(3)=0.d0
+           p1(4)=dsqrt(ebeam1**2-el_m2)
+           p2(1)=ebeam2
+           p2(2)=0.d0
+           p2(3)=0.d0
+           p2(4)=-dsqrt(ebeam2**2-el_m2)
+           Sp=(ebeam1+ebeam2)**2
+          do i=1,4
+             momenta(1,i-1) = p1(i)
+             momenta(2,i-1) = p2(i)
+          enddo
+           do i=1,4
+                sm(i)=p1(i)+p2(i)
+          enddo
+       end
+c---------------chi_c2 production-----------------------------------------------------
+      real*8 function chi_prod2(qq)
+      include 'phokhara_10.0.inc' 
+      real*8 qq, rk1(4),p1(4),p2(4),dme,el_m2,ebppb
+      real*8 chi_spin2(4,4,4,4)
+      complex*16 ma(2,2),mb(2,2),ma_ma(2,2),mb_ma(2,2),ddpl_ph(2,2),
+     1 ddmi_ph(2,2),ddpl_p2s(2,2),ddmi_p2s(2,2)
+      complex*16 up1(2,2),up2(2,2),v1(2,2),v2(2,2),uupp1(1,2),uupp2(1,2)
+     1 ,vv1(2,1),vv2(2,1),eck1(4),epsk1(2,4),ten_chi(4,4),
+     1 gammu(4,2,2),gammu_ma(4,2,2),gam(4),gam_ma(4),ddpl(2,2),
+     1 ddmi(2,2)
+       complex*16 cvac_qq,vacpol_and_nr
+      integer ic1,ic2,i1,i,imu
+        common/matri1/ma,mb,ma_ma,mb_ma
+        common /cp1p2/p1,p2,dme,el_m2
+        
+        
+         
+              
+
+              call prop_chic2(chi_spin2)
+
+             chi_prod2=0.d0
+             
+            do i1=1,4
+             rk1(i1) = momenta(3,i1-1)
+             enddo
+             ebppb=p1(1)+p1(4)
+              call pol_vec(rk1,epsk1)    
+              call skalar1LO(rk1)   
+              
+            call gam1(gam,gammu,gammu_ma,v1,v2,up1,up2,qq)            
+           
+           cvac_qq = vacpol_and_nr(qq)
+
+            do ic1=1,2
+             do ic2=1,2
+c
+c the spinors
+c
+         uupp2(1,1) = up2(1,ic1)
+         uupp2(1,2) = up2(2,ic1)
+         uupp1(1,1) = up1(1,ic1)
+         uupp1(1,2) = up1(2,ic1)
+    
+         vv1(1,1) = v1(1,ic2)                 
+         vv1(2,1) = v1(2,ic2)                 
+         vv2(1,1) = v2(1,ic2)                 
+         vv2(2,1) = v2(2,ic2)    
+
+
+          do imu=1,4
+           gam(imu) = gammu(imu,ic1,ic2)           
+           gam_ma(imu) = gammu_ma(imu,ic1,ic2)
+         enddo
+         call skalar1aLO(gam,gam_ma)
+
+c           sum over photon polarizations
+c
+          do i=1,2
+c                  eck1(1)=rk1(1)
+c                  eck1(2)=rk1(2)
+c                  eck1(3)=rk1(3)
+c                  eck1(4)=rk1(4)
+                  eck1(1)=epsk1(i,1)
+                  eck1(2)=epsk1(i,2)
+                  eck1(3)=epsk1(i,3)
+                  eck1(4)=epsk1(i,4) 
+
+         call skalar2LO(rk1,eck1) 
+         call blocksLO(qq)
+         call tensorchi(rk1,eck1,ten_chi)
+         call block_chi2(qq,ten_chi,chi_spin2,ddpl,ddmi,ddpl_ph,
+     1 ddmi_ph,rk1,gam,ddpl_p2s,ddmi_p2s)
+            
+          if((chi_sw.eq.0).or.(chi_sw.eq.2))then
+          chi_prod2=chi_prod2+ ( (dme*cdabs(mb(1,1)-ma(1,1)))**2
+     1          +(dme*cdabs(mb(2,2)-ma(2,2)))**2
+     2          +(cdabs(-ebppb*ma(2,1)+el_m2/ebppb*mb(2,1)))**2
+     3          +(cdabs(ebppb*mb(1,2)-el_m2/ebppb*ma(1,2)))**2 )
+     4          *cdabs(cvac_qq)**2
+          endif
+
+
+       if((chi_sw.eq.1).or.(chi_sw.eq.2))then
+        chi_prod2=chi_prod2+ ( (dme*cdabs(ddpl(1,1)-ddmi(1,1)))**2
+     1         +(dme*cdabs(ddpl(2,2)-ddmi(2,2)))**2
+     2         +(cdabs(-ebppb*ddmi(2,1)+el_m2/ebppb*ddpl(2,1)))**2
+     3         +(cdabs(ebppb*ddpl(1,2)-el_m2/ebppb*ddmi(1,2)))**2 )
+     4    /(4.d0*pi*alpha)**3
+      
+      chi_prod2=chi_prod2+ ( (dme*cdabs(ddpl_ph(1,1)-ddmi_ph(1,1)))**2
+     1      +(dme*cdabs(ddpl_ph(2,2)-ddmi_ph(2,2)))**2
+     2      +(cdabs(-ebppb*ddmi_ph(2,1)+el_m2/ebppb*ddpl_ph(2,1)))**2
+     3      +(cdabs(ebppb*ddpl_ph(1,2)-el_m2/ebppb*ddmi_ph(1,2)))**2 )
+     4    /(4.d0*pi*alpha)**3
+
+
+       chi_prod2=chi_prod2+2.d0*dreal(
+     1    dconjg(dme*(ddpl(1,1)-ddmi(1,1)))
+     2    *(dme*(ddpl_ph(1,1)-ddmi_ph(1,1)))
+     3    +dconjg(dme*(ddpl(2,2)-ddmi(2,2)))
+     4    *(dme*(ddpl_ph(2,2)-ddmi_ph(2,2)))
+     5    +dconjg(-ebppb*ddmi(2,1)+el_m2/ebppb*ddpl(2,1))
+     6    *(-ebppb*ddmi_ph(2,1)+el_m2/ebppb*ddpl_ph(2,1))
+     7    +(dconjg(ebppb*ddpl(1,2)-el_m2/ebppb*ddmi(1,2)))
+     8    *(ebppb*ddpl_ph(1,2)-el_m2/ebppb*ddmi_ph(1,2))
+     9    )/(4.d0*pi*alpha)**3
+c psi' contributions
+
+       chi_prod2=chi_prod2+((dme*cdabs(ddpl_p2s(1,1)-ddmi_p2s(1,1)))**2
+     1     +(dme*cdabs(ddpl_p2s(2,2)-ddmi_p2s(2,2)))**2
+     2     +(cdabs(-ebppb*ddmi_p2s(2,1)+el_m2/ebppb*ddpl_p2s(2,1)))**2
+     3     +(cdabs(ebppb*ddpl_p2s(1,2)-el_m2/ebppb*ddmi_p2s(1,2)))**2 )
+     4    /(4.d0*pi*alpha)**3
+
+       chi_prod2=chi_prod2+2.d0*dreal(
+     1    dconjg(dme*(ddpl_p2s(1,1)-ddmi_p2s(1,1)))
+     2    *(dme*(ddpl_ph(1,1)-ddmi_ph(1,1)))
+     3    +dconjg(dme*(ddpl_p2s(2,2)-ddmi_p2s(2,2)))
+     4    *(dme*(ddpl_ph(2,2)-ddmi_ph(2,2)))
+     5    +dconjg(-ebppb*ddmi_p2s(2,1)+el_m2/ebppb*ddpl_p2s(2,1))
+     6    *(-ebppb*ddmi_ph(2,1)+el_m2/ebppb*ddpl_ph(2,1))
+     7    +(dconjg(ebppb*ddpl_p2s(1,2)-el_m2/ebppb*ddmi_p2s(1,2)))
+     8    *(ebppb*ddpl_ph(1,2)-el_m2/ebppb*ddmi_ph(1,2))
+     9    )/(4.d0*pi*alpha)**3
+
+
+       chi_prod2=chi_prod2+2.d0*dreal(
+     1    dconjg(dme*(ddpl_p2s(1,1)-ddmi_p2s(1,1)))
+     2    *(dme*(ddpl(1,1)-ddmi(1,1)))
+     3    +dconjg(dme*(ddpl_p2s(2,2)-ddmi_p2s(2,2)))
+     4    *(dme*(ddpl(2,2)-ddmi(2,2)))
+     5    +dconjg(-ebppb*ddmi_p2s(2,1)+el_m2/ebppb*ddpl_p2s(2,1))
+     6    *(-ebppb*ddmi(2,1)+el_m2/ebppb*ddpl(2,1))
+     7    +(dconjg(ebppb*ddpl_p2s(1,2)-el_m2/ebppb*ddmi_p2s(1,2)))
+     8    *(ebppb*ddpl(1,2)-el_m2/ebppb*ddmi(1,2))
+     9    )/(4.d0*pi*alpha)**3
+c
+
+       endif
+
+      if(chi_sw.eq.2)then
+         chi_prod2=chi_prod2+2.d0*dreal((
+     5    dconjg(dme*(mb(1,1)-ma(1,1)))
+     5     *dme*(ddpl(1,1)-ddmi(1,1))
+     6   +dconjg(dme*(mb(2,2)-ma(2,2)))
+     6     *dme*(ddpl(2,2)-ddmi(2,2))
+     7   +dconjg((-ebppb*ma(2,1)+el_m2/ebppb*mb(2,1)))*
+     8    (-ebppb*ddmi(2,1)+el_m2/ebppb*ddpl(2,1))
+     9   +dconjg((ebppb*mb(1,2)-el_m2/ebppb*ma(1,2)))*
+     1    (ebppb*ddpl(1,2)-el_m2/ebppb*ddmi(1,2)))*dconjg(cvac_qq)
+     2   )/(sqrt(4.d0*pi*alpha))**3
+
+       chi_prod2=chi_prod2+2.d0*dreal((
+     5    dconjg(dme*(mb(1,1)-ma(1,1)))
+     5     *dme*(ddpl_ph(1,1)-ddmi_ph(1,1))
+     6   +dconjg(dme*(mb(2,2)-ma(2,2)))
+     6     *dme*(ddpl_ph(2,2)-ddmi_ph(2,2))
+     7   +dconjg((-ebppb*ma(2,1)+el_m2/ebppb*mb(2,1)))*
+     8    (-ebppb*ddmi_ph(2,1)+el_m2/ebppb*ddpl_ph(2,1))
+     9   +dconjg((ebppb*mb(1,2)-el_m2/ebppb*ma(1,2)))*
+     1 (ebppb*ddpl_ph(1,2)-el_m2/ebppb*ddmi_ph(1,2)))*dconjg(cvac_qq)
+     2  )/(sqrt(4.d0*pi*alpha))**3
+
+c psi'
+       chi_prod2=chi_prod2+2.d0*dreal((
+     5    dconjg(dme*(mb(1,1)-ma(1,1)))
+     5     *dme*(ddpl_p2s(1,1)-ddmi_p2s(1,1))
+     6   +dconjg(dme*(mb(2,2)-ma(2,2)))
+     6     *dme*(ddpl_p2s(2,2)-ddmi_p2s(2,2))
+     7   +dconjg((-ebppb*ma(2,1)+el_m2/ebppb*mb(2,1)))*
+     8    (-ebppb*ddmi_p2s(2,1)+el_m2/ebppb*ddpl_p2s(2,1))
+     9   +dconjg((ebppb*mb(1,2)-el_m2/ebppb*ma(1,2)))*
+     1 (ebppb*ddpl_p2s(1,2)-el_m2/ebppb*ddmi_p2s(1,2)))*dconjg(cvac_qq)
+     2  )/(sqrt(4.d0*pi*alpha))**3
+        endif    
+         
+
+         enddo
+        enddo
+         enddo
+
+         
+         
+
+      return
+      end
+c*********************************************************************
+       subroutine block_chi2(qq,ten1,chi_spin2,ddpl,ddmi,ddpl_ph,
+     1  ddmi_ph,rk1,gam,ddpl_p2s,ddmi_p2s)
+       include 'phokhara_10.0.inc'
+       complex*16 ten1(4,4),gam(4),jj_chi(4),
+     1 ddpl(2,2),ddmi(2,2),c_jp,pi_chi,const_chi,bl2(4,4,4),
+     2 bb_chi(4,4),ddpl_ph(2,2),ddmi_ph(2,2),const_chi_pho,jj_chi_pho(4)
+     3 ,bl2_ph(4,4,4),bb_chi_ph(4,4),ddpl_p2s(2,2),ddmi_p2s(2,2),
+     4 c_p2s_prop,const_chi_p2s,jj_chi_p2s(4),bl2_p2s(4,4,4),
+     5 bb_chi_p2s(4,4)
+       real*8 qq,rk1(4),g_m(4,4),chi_spin2(4,4,4,4),ten_jp(4,4,4),
+     1 p_jp(4),sm(4),bl1(4,4,4),jppho2,c_pho,ten_pho(4,4,4),d1,c_p2s,
+     2 ten_p2s(4,4,4)
+       integer rr,rr2,jj,beta,i,j,k,mu,nu,rho,sigma,gami,kl
+       common/ssmm/sm
+
+        do i=1,4
+        do j=1,4
+          g_m(i,j) =0.d0
+        enddo
+       enddo   
+c
+       g_m(1,1)=1.d0
+       do i=1,3
+        g_m(i+1,i+1)=-1.d0
+       enddo
+          
+          do i=1,4
+             p_jp(i)=momenta(6,i-1)+momenta(7,i-1)
+            enddo
+       
+        do i=1,4
+           do j=1,4
+             do k=1,4
+           ten_jp(i,j,k)=(-g_m(i,j)+p_jp(i)*p_jp(j)/mjp**2)*p_jp(k)-
+     1   (-g_m(k,j)+p_jp(k)*p_jp(j)/mjp**2)*p_jp(i)
+
+          ten_pho(i,j,k)=-g_m(i,j)*p_jp(k)+g_m(k,j)*p_jp(i)
+
+           ten_p2s(i,j,k)=(-g_m(i,j)+p_jp(i)*p_jp(j)/mp2s**2)*p_jp(k)-
+     1   (-g_m(k,j)+p_jp(k)*p_jp(j)/mp2s**2)*p_jp(i)
+        enddo
+          enddo
+            enddo
+
+
+          do mu=1,4
+             do rho=1,4
+                do sigma=1,4        
+           bl1(mu,rho,sigma)=(momenta(1,0)-
+     & momenta(2,0))*chi_spin2(mu,1,rho,sigma)-(momenta(1,1)-
+     & momenta(2,1))*chi_spin2(mu,2,rho,sigma)-(momenta(1,2)-
+     & momenta(2,2))*chi_spin2(mu,3,rho,sigma)-(momenta(1,3)-
+     & momenta(2,3))*chi_spin2(mu,4,rho,sigma)
+             enddo
+                enddo
+                    enddo         
+
+
+          do rho=1,4
+         do sigma=1,4
+         do gami=1,4
+           bl2(rho,sigma,gami)=ten1(1,rho)*ten_jp(sigma,gami,1)
+     & -ten1(2,rho)*ten_jp(sigma,gami,2)
+     & -ten1(3,rho)*ten_jp(sigma,gami,3)
+     & -ten1(4,rho)*ten_jp(sigma,gami,4)
+         enddo
+         enddo
+         enddo
+
+      do rho=1,4
+         do sigma=1,4
+         do gami=1,4
+           bl2_ph(rho,sigma,gami)=ten1(1,rho)*ten_pho(sigma,gami,1)
+     & -ten1(2,rho)*ten_pho(sigma,gami,2)
+     & -ten1(3,rho)*ten_pho(sigma,gami,3)
+     & -ten1(4,rho)*ten_pho(sigma,gami,4)
+         enddo
+         enddo
+         enddo
+
+
+      do rho=1,4
+         do sigma=1,4
+         do gami=1,4
+           bl2_p2s(rho,sigma,gami)=ten1(1,rho)*ten_p2s(sigma,gami,1)
+     & -ten1(2,rho)*ten_p2s(sigma,gami,2)
+     & -ten1(3,rho)*ten_p2s(sigma,gami,3)
+     & -ten1(4,rho)*ten_p2s(sigma,gami,4)
+         enddo
+         enddo
+         enddo
+        
+
+           
+          
+
+          do mu=1,4
+            do gami=1,4
+               
+          bb_chi(mu,gami)=bl1(mu,1,1)*bl2(1,1,gami)-
+     1 bl1(mu,1,2)*bl2(1,2,gami)
+     2 -bl1(mu,1,3)*bl2(1,3,gami)-bl1(mu,1,4)*bl2(1,4,gami)
+     3-bl1(mu,2,1)*bl2(2,1,gami)-bl1(mu,3,1)*bl2(3,1,gami)
+     4 -bl1(mu,4,1)*bl2(4,1,gami)+bl1(mu,2,2)*bl2(2,2,gami)
+     5+bl1(mu,2,3)*bl2(2,3,gami)+bl1(mu,2,4)*bl2(2,4,gami)
+     6+bl1(mu,3,2)*bl2(3,2,gami)+bl1(mu,3,3)*bl2(3,3,gami)
+     7+bl1(mu,3,4)*bl2(3,4,gami)+bl1(mu,4,2)*bl2(4,2,gami)
+     8 +bl1(mu,4,3)*bl2(4,3,gami)+bl1(mu,4,4)*bl2(4,4,gami)
+         enddo
+           enddo
+
+       do mu=1,4
+            do gami=1,4
+               
+          bb_chi_ph(mu,gami)=bl1(mu,1,1)*bl2_ph(1,1,gami)-
+     1 bl1(mu,1,2)*bl2_ph(1,2,gami)
+     2 -bl1(mu,1,3)*bl2_ph(1,3,gami)-bl1(mu,1,4)*bl2_ph(1,4,gami)
+     3-bl1(mu,2,1)*bl2_ph(2,1,gami)-bl1(mu,3,1)*bl2_ph(3,1,gami)
+     4 -bl1(mu,4,1)*bl2_ph(4,1,gami)+bl1(mu,2,2)*bl2_ph(2,2,gami)
+     5+bl1(mu,2,3)*bl2_ph(2,3,gami)+bl1(mu,2,4)*bl2_ph(2,4,gami)
+     6+bl1(mu,3,2)*bl2_ph(3,2,gami)+bl1(mu,3,3)*bl2_ph(3,3,gami)
+     7+bl1(mu,3,4)*bl2_ph(3,4,gami)+bl1(mu,4,2)*bl2_ph(4,2,gami)
+     8 +bl1(mu,4,3)*bl2_ph(4,3,gami)+bl1(mu,4,4)*bl2_ph(4,4,gami)
+         enddo
+           enddo
+
+
+      do mu=1,4
+            do gami=1,4
+               
+          bb_chi_p2s(mu,gami)=bl1(mu,1,1)*bl2_p2s(1,1,gami)-
+     1 bl1(mu,1,2)*bl2_p2s(1,2,gami)
+     2 -bl1(mu,1,3)*bl2_p2s(1,3,gami)-bl1(mu,1,4)*bl2_p2s(1,4,gami)
+     3-bl1(mu,2,1)*bl2_p2s(2,1,gami)-bl1(mu,3,1)*bl2_p2s(3,1,gami)
+     4 -bl1(mu,4,1)*bl2_p2s(4,1,gami)+bl1(mu,2,2)*bl2_p2s(2,2,gami)
+     5+bl1(mu,2,3)*bl2_p2s(2,3,gami)+bl1(mu,2,4)*bl2_p2s(2,4,gami)
+     6+bl1(mu,3,2)*bl2_p2s(3,2,gami)+bl1(mu,3,3)*bl2_p2s(3,3,gami)
+     7+bl1(mu,3,4)*bl2_p2s(3,4,gami)+bl1(mu,4,2)*bl2_p2s(4,2,gami)
+     8 +bl1(mu,4,3)*bl2_p2s(4,3,gami)+bl1(mu,4,4)*bl2_p2s(4,4,gami)
+         enddo
+           enddo
+
+
+        jppho2=(momenta(6,0)+momenta(7,0)-rk1(1))**2
+        do kl=2,4
+        jppho2=jppho2-(momenta(6,kl-1)+momenta(7,kl-1)-rk1(kl))**2
+        enddo
+           
+
+
+
+          c_chi2=16.d0*alpha*pi/sqrt(m2c)*ac 
+     1 /(0.5d0**2*jppho2-m2c**2)**2
+
+
+       c_chi2psi=4.d0*sqrt(4.d0*pi*alpha)*aj/sqrt(m2c)/
+     1 (0.5d0**2*jppho2-m2c**2)**2
+
+       c_p2s=4.d0*sqrt(4.d0*pi*alpha)*apsi/sqrt(m2c)/
+     1 (0.5d0**2*jppho2-m2c**2)**2
+
+                
+        
+       c_jp=sqrt(3.d0/sqrt(qq)/alpha*gamjpee)/(qq-mjp**2+
+     1 dcmplx(0.d0,1.d0)*mjp*gamjp)
+
+       c_p2s_prop=sqrt(3.d0/sqrt(qq)/alpha*gamp2see)/(qq-mp2s**2+
+     1 dcmplx(0.d0,1.d0)*mp2s*gamp2s)
+
+       c_pho=1.d0/qq
+       
+
+ 
+        
+          
+         pi_chi=1.d0/(Sp-mchic2**2+
+     1 dcmplx(0.d0,1.d0)*mchic2*gamchic2)
+ 
+       const_chi=-sqrt(4.d0*pi*alpha)*pi_chi*c_jp*c_chi2psi
+     1 *gg2*sqrt(2.d0)
+
+       const_chi_pho=-sqrt(4.d0*pi*alpha)*pi_chi*c_pho*c_chi2
+     1 *gg2*sqrt(2.d0)
+
+      const_chi_p2s=sqrt(4.d0*pi*alpha)*pi_chi*c_p2s*c_p2s_prop
+     1 *dcmplx(0.d0,-1.d0)/2.d0*gg2
+
+        do mu=1,4
+          jj_chi(mu)=0.d0
+          jj_chi_pho(mu)=0.d0
+          jj_chi_p2s(mu)=0.d0
+          enddo
+                         
+        do mu=1,4
+          jj_chi(mu)=bb_chi(mu,1)*gam(1)*const_chi
+     1 -bb_chi(mu,2)*gam(2)*const_chi-bb_chi(mu,3)*gam(3)*const_chi
+     2 -bb_chi(mu,4)*gam(4)*const_chi
+            enddo
+      do mu=1,4
+          jj_chi_pho(mu)=bb_chi_ph(mu,1)*gam(1)*const_chi_pho
+     1 -bb_chi_ph(mu,2)*gam(2)*const_chi_pho-
+     3 bb_chi_ph(mu,3)*gam(3)*const_chi_pho
+     2 -bb_chi_ph(mu,4)*gam(4)*const_chi_pho
+            enddo
+
+       do mu=1,4
+          jj_chi_p2s(mu)=bb_chi_p2s(mu,1)*gam(1)*const_chi_p2s
+     1 -bb_chi_p2s(mu,2)*gam(2)*const_chi_p2s-
+     3 bb_chi_p2s(mu,3)*gam(3)*const_chi_p2s
+     2 -bb_chi_p2s(mu,4)*gam(4)*const_chi_p2s
+            enddo
+
+      
+       call cplus(jj_chi,ddpl)
+       call cminus(jj_chi,ddmi) 
+         
+       call cplus(jj_chi_pho,ddpl_ph)
+       call cminus(jj_chi_pho,ddmi_ph)
+
+       call cplus(jj_chi_p2s,ddpl_p2s)
+       call cminus(jj_chi_p2s,ddmi_p2s)
+     
+      return 
+      end
+c-------------------------------------------------------------------------------------------------------
+       subroutine prop_chic2(chi_spin2)
+       include 'phokhara_10.0.inc'
+       real*8 vec1(4),chi_spin2(4,4,4,4),sm(4),Pc(4,4),g_m(4,4)
+       integer mu,nu,rho,sigma,i,j
+       common/ssmm/sm
+       
+        do i=1,4
+        do j=1,4
+          g_m(i,j) =0.d0
+        enddo
+       enddo   
+c
+       g_m(1,1)=1.d0
+       do i=1,3
+        g_m(i+1,i+1)=-1.d0
+       enddo
+       
+        do i=1,4
+          do j=1,4
+           Pc(i,j)=-g_m(i,j)+sm(i)*sm(j)/mchic2**2
+          enddo
+            enddo
+          
+          do mu=1,4
+            do nu=1,4
+              do rho=1,4
+                do sigma=1,4
+           chi_spin2(mu,nu,rho,sigma)=0.5d0*(Pc(mu,rho)*Pc(nu,sigma)+
+     &     Pc(mu,sigma)*Pc(nu,rho))-Pc(mu,nu)*Pc(rho,sigma)/3.d0
+
+
+            enddo
+              enddo
+                enddo
+                  enddo        
+        return
+        end
+    
+c---------------------------------------------------------------------
+c            Function from loop integrals for chi1 and chi2
+c---------------------------------------------------------------------
+      complex*16 function adg_chi()
+      include 'phokhara_10.0.inc'
+      real*8 xx,yy
+      complex*16 gg(2),cdilog,ff0,ff1,ff2,ff3,ff4,ff5,ii
+      real*8 rr,aat,rr1,d1,d2,mpsi_p,gamjpee_p
+
+c      gampsiee = 5.55d-6
+c       mpsi_p=3.686109d0
+c       gamjpee_p = 2.35d-6
+       d1=dsqrt(gamjpee*3.d0/4.d0/pi/alpha**2/mjp)
+       d2=dsqrt(gamp2see*3.d0/4.d0/pi/alpha**2/mp2s)
+       ii=dcmplx(0.d0,1.d0)
+       
+      if(pion.eq.11)then
+
+      xx = 4.d0*m2c**2/mchic1**2
+      yy = 4.d0*mjp**2/mchic1**2
+      rr = sqrt(xx -(1.d0-yy+xx)**2/4.d0)
+      rr1 = sqrt(yy -(1.d0+yy-xx)**2/4.d0)
+      
+      
+c
+c g-g part
+c
+   
+      gg(1) = alpha**2/mchic1**2*16.d0*ac/dsqrt(m2c)
+     1  *(log(xx/(1.d0+xx))*(1.d0-xx)
+     1 -(log(xx/(1.d0-xx))+dcmplx(0.d0,1.d0)*pi)
+     2        *(1.d0+xx))
+
+c
+c g-J/psi part
+c
+      aat = atan((1.d0-yy+xx)/2.d0/rr)-atan((-1.d0-yy+xx)/2.d0/rr)
+      ff0 = (1.d0+yy-xx)/4.d0*log(xx/yy)-rr*aat
+      ff1 = log(xx/yy)+(1.d0+yy-xx)/rr*aat
+      ff2 = 2.d0*log(2.d0)-xx*log(xx)+yy/2.d0*log(yy/2.d0) ! znak przy yy/2.d0*log(yy/2.d0)
+     1 -(1.d0-xx)*(log(1.d0-xx)-dcmplx(0.d0,pi))
+     2 +(2.d0-yy/2.d0)*(log(2.d0-yy/2.d0)-dcmplx(0.d0,pi))
+     3 +(-1.d0-xx+yy)/2.d0*log(xx)+(-1.d0+xx-yy)/2.d0*log(yy)
+     4 -2.d0*rr*aat
+      ff3 = -3.d0/2.d0*log(xx)
+     1 +log(1.d0-xx)-dcmplx(0.d0,1.d0)*pi+0.5d0*log(yy)
+     2 -(1.d0-xx+yy)/2.d0/rr*aat
+      ff4 =(log(1.d0-2.d0/yy)*log(yy/2.d0) 
+     4 - cdilog(dcmplx(2.d0/yy,0.d0)) 
+     5 +cdilog(dcmplx((1.d0-yy/2.d0)/(1.d0+xx-yy/2.d0),0.d0))
+     6 -cdilog(dcmplx((-yy/2.d0)/(1.d0+xx-yy/2.d0),0.d0))
+     7 -cdilog(dcmplx(1.d0-yy/2.d0,0.d0)/
+     8         dcmplx((1.d0-xx)/2.d0,rr1))
+     9 -cdilog(dcmplx(1.d0-yy/2.d0,0.d0)/
+     1         dcmplx((1.d0-xx)/2.d0,-rr1))
+     2 +cdilog(dcmplx(-yy/2.d0,0.d0)/
+     3         dcmplx((1.d0-xx)/2.d0,rr1))
+     4 +cdilog(dcmplx(-yy/2.d0,0.d0)/
+     5         dcmplx((1.d0-xx)/2.d0,-rr1)))
+      ff5 = (-1.d0/(1.d0+xx-yy/2.d0)*log((1.d0+xx)/xx)
+     7 +dcmplx(-rr1,(1.d0+yy-xx)/2.d0)/rr1/dcmplx(1.d0-xx,2.d0*rr1)
+     8*log(dcmplx((1.d0-xx+yy)/2.d0,rr1)/dcmplx((-1.d0-xx+yy)/2.d0,rr1))
+     9 -dcmplx(rr1,(1.d0+yy-xx)/2.d0)/rr1/dcmplx(1.d0-xx,-2.d0*rr1)
+     1*log(dcmplx((1.d0-xx+yy)/2.d0,-rr1)
+     2/dcmplx((-1.d0-xx+yy)/2.d0,-rr1)) )
+
+      gg(1)=gg(1)
+     1 + 0.5d0*alpha**2/mchic1**2*16.d0/sqrt(m2c)
+     2 *((log(xx/(1.d0-xx))+dcmplx(0.d0,1.d0)*pi)*(1.d0+xx-yy/2.d0)
+     3 + ff0
+     4 -(3.d0+xx+yy)/4.d0*ff1
+     5 -yy*(4.d0+yy)/2.d0/(2.d0+2.d0*xx-yy)**2*ff2
+     6 +yy*(1.d0+yy-xx)/2.d0/(2.d0+2.d0*xx-yy)*ff3
+     7 -yy/2.d0*ff4
+     8 +yy/2.d0*(3.d0-xx)*ff5)/2.d0/sqrt(pi*alpha)*d1*aj
+
+
+c----------------------------------------------------------------------
+c psi` contribution
+c--------------------------------------------------------------------
+      xx = 4.d0*m2c**2/mchic1**2
+      yy = 4.d0*mp2s**2/mchic1**2
+      
+      rr = sqrt((1.d0-yy+xx)**2/4.d0-xx)
+      rr1 = sqrt( (1.d0+yy-xx)**2/4.d0-xx)
+
+          
+      aat = 0.5d0/rr*(
+     1 log( ((1.d0-yy+xx)/2.d0-rr)/((1.d0-yy+xx)/2.d0+rr) )
+     2 -log( ((-1.d0-yy+xx)/2.d0-rr)/((-1.d0-yy+xx)/2.d0+rr) ) )
+      ff0 = (1.d0+yy-xx)/4.d0*log(xx/yy)-rr*aat
+      ff1 = log(xx/yy)+(1.d0+yy-xx)/rr*aat
+      ff2 = 2.d0*log(2.d0)-xx*log(xx)+yy/2.d0*log(yy/2.d0) ! znak przy yy/2.d0*log(yy/2.d0)
+     1 -(1.d0-xx)*(log(1.d0-xx)-dcmplx(0.d0,pi))
+     2 +(2.d0-yy/2.d0)*(log(yy/2.d0-2.d0))
+     3 +(-1.d0-xx+yy)/2.d0*log(xx)+(-1.d0+xx-yy)/2.d0*log(yy)
+     4 -2.d0*rr*aat
+      ff3 = -3.d0/2.d0*log(xx)
+     1 +log(1.d0-xx)-dcmplx(0.d0,1.d0)*pi+0.5d0*log(yy)
+     2 -(1.d0-xx+yy)/2.d0/rr*aat
+      ff4 =(log(1.d0-2.d0/yy)*log(yy/2.d0) 
+     4 - cdilog(dcmplx(2.d0/yy,0.d0)) 
+     5 +cdilog(dcmplx((1.d0-yy/2.d0)/(1.d0+xx-yy/2.d0),0.d0))
+     6 -cdilog(dcmplx((-yy/2.d0)/(1.d0+xx-yy/2.d0),0.d0))
+     7 -cdilog(dcmplx(1.d0-yy/2.d0,0.d0)/
+     8         dcmplx((1.d0-xx)/2.d0-rr1,0.d0))
+     9 -cdilog(dcmplx(1.d0-yy/2.d0,0.d0)/
+     1         dcmplx((1.d0-xx)/2.d0+rr1,0.d0))
+     2 +cdilog(dcmplx(-yy/2.d0,0.d0)/
+     3         dcmplx((1.d0-xx)/2.d0-rr1,0.d0))
+     4 +cdilog(dcmplx(-yy/2.d0,0.d0)/
+     5         dcmplx((1.d0-xx)/2.d0+rr1,0.d0)))
+      ff5 = (-1.d0/(1.d0+xx-yy/2.d0)*log((1.d0+xx)/xx)
+     7 +dcmplx(0.d0,-rr1+(1.d0+yy-xx)/2.d0)/ii
+     8 /rr1/dcmplx(1.d0-xx-2.d0*rr1,0.d0)
+     8*log(dcmplx((1.d0-xx+yy)/2.d0-rr1,0.d0)/
+     9 dcmplx((-1.d0-xx+yy)/2.d0-rr1,0.d0))
+     9 -dcmplx(0.d0,rr1+(1.d0+yy-xx)/2.d0)/ii
+     1 /rr1/dcmplx(1.d0-xx+2.d0*rr1,0.d0)
+     1*log(dcmplx((1.d0-xx+yy)/2.d0+rr1,0.d0)
+     2/dcmplx((-1.d0-xx+yy)/2.d0+rr1,0.d0)) )
+
+      
+     
+
+      gg(1)=gg(1)+0.5d0*alpha**2/mchic1**2*16.d0/sqrt(m2c)
+     3 *((log(xx/(1.d0-xx))+dcmplx(0.d0,1.d0)*pi)*(1.d0+xx-yy/2.d0)
+     4 + ff0
+     5 -(3.d0+xx+yy)/4.d0*ff1
+     6 -yy*(4.d0+yy)/2.d0/(2.d0+2.d0*xx-yy)**2*ff2
+     9 +yy*(1.d0+yy-xx)/2.d0/(2.d0+2.d0*xx-yy)*ff3
+     3 -yy/2.d0*ff4
+     6 +yy/2.d0*(3.d0-xx)*ff5)/2.d0/sqrt(pi*alpha)*d2*apsi
+     
+       adg_chi=gg(1)
+
+      
+
+      elseif(pion.eq.12)then
+c
+      xx = 4.d0*m2c**2/mchic2**2
+      yy = 4.d0*mjp**2/mchic2**2
+      rr = sqrt(yy-(1.d0-yy+xx)**2/4.d0)
+c
+      rr = sqrt(xx -(1.d0-yy+xx)**2/4.d0)
+      rr1 = sqrt(yy -(1.d0+yy-xx)**2/4.d0)  
+c***********************************************************************
+      aat = atan((1.d0-yy+xx)/2.d0/rr)-atan((-1.d0-yy+xx)/2.d0/rr)
+      ff0 = (1.d0+yy-xx)/4.d0*log(xx/yy)-rr*aat
+      ff1 = log(xx/yy)+(1.d0+yy-xx)/rr*aat
+      ff2 = 2.d0*log(2.d0)-xx*log(xx)+yy/2.d0*log(yy/2.d0) ! znak przy yy/2.d0*log(yy/2.d0)
+     1 -(1.d0-xx)*(log(1.d0-xx)-dcmplx(0.d0,pi))
+     2 +(2.d0-yy/2.d0)*(log(2.d0-yy/2.d0)-dcmplx(0.d0,pi))
+     3 +(-1.d0-xx+yy)/2.d0*log(xx)+(-1.d0+xx-yy)/2.d0*log(yy)
+     4 -2.d0*rr*aat
+      ff3 = -3.d0/2.d0*log(xx)
+     1 +log(1.d0-xx)-dcmplx(0.d0,1.d0)*pi+0.5d0*log(yy)
+     2 -(1.d0-xx+yy)/2.d0/rr*aat
+      ff4 =(log(1.d0-2.d0/yy)*log(yy/2.d0) 
+     4 - cdilog(dcmplx(2.d0/yy,0.d0)) 
+     5 +cdilog(dcmplx((1.d0-yy/2.d0)/(1.d0+xx-yy/2.d0),0.d0))
+     6 -cdilog(dcmplx((-yy/2.d0)/(1.d0+xx-yy/2.d0),0.d0))
+     7 -cdilog(dcmplx(1.d0-yy/2.d0,0.d0)/
+     8         dcmplx((1.d0-xx)/2.d0,rr1))
+     9 -cdilog(dcmplx(1.d0-yy/2.d0,0.d0)/
+     1         dcmplx((1.d0-xx)/2.d0,-rr1))
+     2 +cdilog(dcmplx(-yy/2.d0,0.d0)/
+     3         dcmplx((1.d0-xx)/2.d0,rr1))
+     4 +cdilog(dcmplx(-yy/2.d0,0.d0)/
+     5         dcmplx((1.d0-xx)/2.d0,-rr1)))
+      ff5 = (-1.d0/(1.d0+xx-yy/2.d0)*log((1.d0+xx)/xx)
+     7 +dcmplx(-rr1,(1.d0+yy-xx)/2.d0)/rr1/dcmplx(1.d0-xx,2.d0*rr1)
+     8*log(dcmplx((1.d0-xx+yy)/2.d0,rr1)/dcmplx((-1.d0-xx+yy)/2.d0,rr1))
+     9 -dcmplx(rr1,(1.d0+yy-xx)/2.d0)/rr1/dcmplx(1.d0-xx,-2.d0*rr1)
+     1*log(dcmplx((1.d0-xx+yy)/2.d0,-rr1)
+     2/dcmplx((-1.d0-xx+yy)/2.d0,-rr1)) )  
+
+
+
+c*********************************************************************  
+
+      
+
+      gg(2) = alpha**2/mchic2**2*32.d0*ac/sqrt(m2c)*sqrt(2.d0)/3.d0
+     1  *(log(1.d0-xx)*((1.d0+xx)/2.d0+8.d0/(1.d0+xx)**2)
+     2   +log(1.d0+xx)*3.d0/2.d0*(1.d0+xx)
+     3   -2.d0*log(xx)*(1.d0+xx+2.d0/(1.d0+xx)**2)
+     4   -8.d0/(1.d0+xx)**2*log(2.d0)-1.d0
+     5   -dcmplx(0.d0,1.d0)*pi/2.d0*(1.d0+xx+8.d0/(1.d0+xx)**2))
+     
+      
+      gg(2)=gg(2)
+     1 +0.5d0*alpha**2/mchic2**2*32.d0/sqrt(m2c)*sqrt(2.d0)/3.d0
+     2    *(2.d0+log(2.d0)*(-3.d0+16d0/(1.d0+xx)**2) 
+     3   + log(xx)*(1.d0-yy+2.d0*xx+8.d0/(1.d0+xx)**2)
+     4 +log(1.d0-xx)*(0.5d0+yy-2.d0*xx-16d0/(1.d0+xx)**2)
+     5 -3.d0*yy/8.d0*log(yy/4.d0)+log(1.d0-yy/4.d0)
+     6 *(-1.5d0+3.d0*yy/8.d0)+dcmplx(0.d0,1.d0)*pi*
+     7 (1.d0-11.d0*yy/8.d0+2.d0*xx+8.d0/(1.d0+xx)**2)
+     8 -ff0-ff1*(0.5d0+yy-xx/4.d0)
+     9 +(-55.d0-123.d0*xx*yy+126.d0*xx+93.d0*xx**2-94.d0*yy+38.d0*yy**2)
+     1   /(2.d0+2.d0*xx-yy)**2/16.d0*ff2
+     2 +(87.d0-5.d0*xx*yy-2.d0*yy+2.d0*yy**2+2.d0*xx+3.d0*xx**2)
+     3   /(2.d0+2.d0*xx-yy)/2.d0*ff3-3.d0*yy/4.d0*ff4
+     4  -3.d0*yy/4.d0*(1.d0+xx)*ff5)/2.d0/sqrt(pi*alpha)*d1*aj
+
+c-----------------------------------------------------------------------
+c  formulae for psi` contributions
+c-----------------------------------------------------------------------     
+      xx = 4.d0*m2c**2/mchic2**2
+      yy = 4.d0*mp2s**2/mchic2**2
+
+      rr = sqrt((1.d0-yy+xx)**2/4.d0-xx)
+      rr1 = sqrt( (1.d0+yy-xx)**2/4.d0-xx)
+     
+      
+      aat = 0.5d0/rr*(
+     1 log( ((1.d0-yy+xx)/2.d0-rr)/((1.d0-yy+xx)/2.d0+rr) )
+     2 -log( ((-1.d0-yy+xx)/2.d0-rr)/((-1.d0-yy+xx)/2.d0+rr) ) )
+     
+
+       aat = 0.5d0/rr*(
+     1 log( ((1.d0-yy+xx)/2.d0-rr)/((1.d0-yy+xx)/2.d0+rr) )
+     2 -log( ((-1.d0-yy+xx)/2.d0-rr)/((-1.d0-yy+xx)/2.d0+rr) ) )
+      ff0 = (1.d0+yy-xx)/4.d0*log(xx/yy)-rr*aat
+      ff1 = log(xx/yy)+(1.d0+yy-xx)/rr*aat
+      ff2 = 2.d0*log(2.d0)-xx*log(xx)+yy/2.d0*log(yy/2.d0) ! znak przy yy/2.d0*log(yy/2.d0)
+     1 -(1.d0-xx)*(log(1.d0-xx)-dcmplx(0.d0,pi))
+     2 +(2.d0-yy/2.d0)*(log(yy/2.d0-2.d0))
+     3 +(-1.d0-xx+yy)/2.d0*log(xx)+(-1.d0+xx-yy)/2.d0*log(yy)
+     4 -2.d0*rr*aat
+      ff3 = -3.d0/2.d0*log(xx)
+     1 +log(1.d0-xx)-dcmplx(0.d0,1.d0)*pi+0.5d0*log(yy)
+     2 -(1.d0-xx+yy)/2.d0/rr*aat
+      ff4 =(log(1.d0-2.d0/yy)*log(yy/2.d0) 
+     4 - cdilog(dcmplx(2.d0/yy,0.d0)) 
+     5 +cdilog(dcmplx((1.d0-yy/2.d0)/(1.d0+xx-yy/2.d0),0.d0))
+     6 -cdilog(dcmplx((-yy/2.d0)/(1.d0+xx-yy/2.d0),0.d0))
+     7 -cdilog(dcmplx(1.d0-yy/2.d0,0.d0)/
+     8         dcmplx((1.d0-xx)/2.d0-rr1,0.d0))
+     9 -cdilog(dcmplx(1.d0-yy/2.d0,0.d0)/
+     1         dcmplx((1.d0-xx)/2.d0+rr1,0.d0))
+     2 +cdilog(dcmplx(-yy/2.d0,0.d0)/
+     3         dcmplx((1.d0-xx)/2.d0-rr1,0.d0))
+     4 +cdilog(dcmplx(-yy/2.d0,0.d0)/
+     5         dcmplx((1.d0-xx)/2.d0+rr1,0.d0)))
+      ff5 = (-1.d0/(1.d0+xx-yy/2.d0)*log((1.d0+xx)/xx)
+     7 +dcmplx(0.d0,-rr1+(1.d0+yy-xx)/2.d0)/ii
+     8 /rr1/dcmplx(1.d0-xx-2.d0*rr1,0.d0)
+     8*log(dcmplx((1.d0-xx+yy)/2.d0-rr1,0.d0)/
+     9 dcmplx((-1.d0-xx+yy)/2.d0-rr1,0.d0))
+     9 -dcmplx(0.d0,rr1+(1.d0+yy-xx)/2.d0)/ii
+     1 /rr1/dcmplx(1.d0-xx+2.d0*rr1,0.d0)
+     1*log(dcmplx((1.d0-xx+yy)/2.d0+rr1,0.d0)
+     2/dcmplx((-1.d0-xx+yy)/2.d0+rr1,0.d0)) )
+
+
+      gg(2)=gg(2)+0.5d0*alpha**2/mchic2**2*32.d0/sqrt(m2c)
+     & *sqrt(2.d0)/3.d0
+     1    *(
+     2     2.d0+log(2.d0)*(-3.d0+16d0/(1.d0+xx)**2) 
+     3   + log(xx)*(1.d0-yy+2.d0*xx+8.d0/(1.d0+xx)**2)
+     4 +log(1.d0-xx)*(0.5d0+yy-2.d0*xx-16d0/(1.d0+xx)**2)
+     5 -3.d0*yy/8.d0*log(yy/4.d0)+(log(yy/4.d0-1.d0)+ii*pi)
+     6 *(-1.5d0+3.d0*yy/8.d0)+dcmplx(0.d0,1.d0)*pi*
+     7 (1.d0-11.d0*yy/8.d0+2.d0*xx+8.d0/(1.d0+xx)**2)
+     8 -ff0-ff1*(0.5d0+yy-xx/4.d0)
+     9 +(-55.d0-123.d0*xx*yy+126.d0*xx+93.d0*xx**2-94.d0*yy+38.d0*yy**2)
+     1   /(2.d0+2.d0*xx-yy)**2/16.d0*ff2
+     2 +(87.d0-5.d0*xx*yy-2.d0*yy+2.d0*yy**2+2.d0*xx+3.d0*xx**2)
+     3   /(2.d0+2.d0*xx-yy)/2.d0*ff3-3.d0*yy/4.d0*ff4
+     4  -3.d0*yy/4.d0*(1.d0+xx)*ff5)/2.d0/sqrt(pi*alpha)*d2*apsi
+
+       adg_chi=gg(2)
+
+      
+       endif
+
+      end
+
+      
+c******************************************************************
+      real*8 function pi0gammaAmp(qq,Ar)
+      include 'phokhara_10.0.inc' 
+      real*8 qq,rk1(4),p1(4),p2(4),dme,el_m2,ebppb,rk2(4)
+      real*8 qq2,qq1,cosphoton,q0p,q2p,q0b,q2b,amplit,matrix
+      complex*16 ma(2,2),mb(2,2),ma_ma(2,2),mb_ma(2,2)
+      complex*16 up1(2,2),up2(2,2),v1(2,2),v2(2,2),uupp1(1,2),uupp2(1,2)
+     1 ,vv1(2,1),vv2(2,1),eck1(4),epsk1(2,4),ten_chi(4,4),
+     1 gammu(4,2,2),gammu_ma(4,2,2),gam(4),gam_ma(4),ddpl(2,2),
+     1 ddmi(2,2),ddpl_ph(2,2),ddmi_ph(2,2),ddpl_Z(2,2),ddmi_Z(2,2),
+     2 ddmi_Zph(2,2),ddpl_Zph(2,2),mat_Z_vec,mat_Z_avec,
+     3 ve1mi(2,2),ve2mi(2,2),ve1pl(2,2),ve2pl(2,2),ax1mi(2,2),
+     4 ax2mi(2,2),ax1pl(2,2),ax2pl(2,2),vec_part,avec_part,
+     5 mbZ(2,2),maZ(2,2),mbZph(2,2),maZph(2,2),
+     6 ddpl_p2s(2,2),ddmi_p2s(2,2),eck2(4),epsk2(2,4),
+     7 Leptonic(0:3,0:3),Hadronic(0:3,0:3)
+      real*8 gamk1(4,4),gamk2(4,4)
+      real*8 Ar(14)
+       complex*16 cvac_qq,vacpol_and_nr
+      integer ic1,ic2,i1,i,imu,i2
+        common/matri1/ma,mb,ma_ma,mb_ma
+        common /cp1p2/p1,p2,dme,el_m2
+       common/qqvec12/qq1,qq2
+       
+        
+                   
+            
+             pi0gammaAmp=0.d0
+             
+            do i1=1,4
+             rk1(i1) = momenta(3,i1-1)
+             rk2(i1) = momenta(7,i1-1)
+             enddo
+             ebppb=p1(1)+p1(4)
+              call pol_vec(rk1,epsk1)  
+              call pol_vec(rk2,epsk2)  
+              call skalar1LOpi0(rk1,rk2)   
+             
+              
+            call gampi0(gamk1,gamk2,rk1,rk2)            
+           
+           cvac_qq = vacpol_and_nr(qq)
+
+c           sum over photon polarizations
+c
+          do i=1,2
+
+                  eck1(1)=epsk1(i,1)
+                  eck1(2)=epsk1(i,2)
+                  eck1(3)=epsk1(i,3)
+                  eck1(4)=epsk1(i,4)
+c                  eck1(1)=dcmplx(rk1(1),0.d0)
+c                  eck1(2)=dcmplx(rk1(2),0.d0)
+c                  eck1(3)=dcmplx(rk1(3),0.d0)
+c                  eck1(4)=dcmplx(rk1(4),0.d0)
+
+           do i2=1,2
+                  eck2(1)=epsk2(i2,1)
+                  eck2(2)=epsk2(i2,2)
+                  eck2(3)=epsk2(i2,3)
+                  eck2(4)=epsk2(i2,4) 
+c                  eck2(1)=dcmplx(rk2(1),0.d0)
+c                  eck2(2)=dcmplx(rk2(2),0.d0)
+c                  eck2(3)=dcmplx(rk2(3),0.d0)
+c                  eck2(4)=dcmplx(rk2(4),0.d0)
+
+
+         call skalar1aLOpi0(gamk1,gamk2,eck1,eck2)
+         call skalar2LOpi0(rk1,eck1,rk2,eck2) 
+         call blocksLO(qq)
+
+     
+
+           
+     
+! 
+          pi0gammaAmp=pi0gammaAmp+ ((dme*cdabs(mb(1,1)-ma(1,1)))**2
+     1          +(dme*cdabs(mb(2,2)-ma(2,2)))**2
+     2          +(cdabs(-ebppb*ma(2,1)+el_m2/ebppb*mb(2,1)))**2
+     3          +(cdabs(ebppb*mb(1,2)-el_m2/ebppb*ma(1,2)))**2 )
+     4          *cdabs(cvac_qq)**2 
+
+        pi0gammaAmp=pi0gammaAmp+((dme*cdabs(mb_ma(1,1)-ma_ma(1,1)))**2
+     1          +(dme*cdabs(mb_ma(2,2)-ma_ma(2,2)))**2
+     2          +(cdabs(-ebppb*ma_ma(2,1)+el_m2/ebppb*mb_ma(2,1)))**2
+     3          +(cdabs(ebppb*mb_ma(1,2)-el_m2/ebppb*ma_ma(1,2)))**2 )
+     4          *cdabs(cvac_qq)**2
+
+
+       pi0gammaAmp=pi0gammaAmp+2.d0*dreal((
+     5    dconjg(dme*(mb(1,1)-ma(1,1)))*dme*(mb_ma(1,1)-ma_ma(1,1))
+     6   +dconjg(dme*(mb(2,2)-ma(2,2)))*dme*(mb_ma(2,2)-ma_ma(2,2))
+     7   +dconjg((-ebppb*ma(2,1)+el_m2/ebppb*mb(2,1)))*
+     8    (-ebppb*ma_ma(2,1)+el_m2/ebppb*mb_ma(2,1))
+     9   +dconjg((ebppb*mb(1,2)-el_m2/ebppb*ma(1,2)))*
+     1    (ebppb*mb_ma(1,2)-el_m2/ebppb*ma_ma(1,2))))
+     2   * cdabs(cvac_qq)**2
+         
+
+         enddo
+         enddo
+  
+      return
+      end
+      real*8 function metric2(mu,nu)
+      implicit none
+      integer mu,nu
+      if (mu.ne.nu) then
+         metric2 = 0.d0
+      else
+         if (mu.eq.1) then
+             metric2 = 1.d0
+         else
+             metric2 = -1.d0
+         endif
+      endif
+      end
+
+      subroutine gampi0(gamk1,gamk2,rk1,rk2)
+      include 'phokhara_10.0.inc'
+      real*8 gamk1(4,4),gamk2(4,4)
+      real*8 k1(4),k2(4),qqvec1(4),qqvec2(4),metric2,qq1,qq2,rk1(4),
+     1 rk2(4),qq
+      integer be,nu,bnu,ii
+      common/qqvec12/qq1,qq2
+
+      do ii=1,4
+      k1(ii)=rk1(ii)
+      k2(ii)=rk2(ii)
+      qqvec1(ii)=momenta(6,ii-1)+k2(ii)
+      qqvec2(ii)=momenta(6,ii-1)+k1(ii)
+      enddo
+
+      qq1=qqvec1(1)**2
+      qq2=qqvec2(1)**2
+       do ii=2,4
+         qq1=qq1-qqvec1(ii)**2
+         qq2=qq2-qqvec2(ii)**2
+       enddo
+
+        do nu=1,4
+         do be=1,4
+       gamk1(nu,be) =
+     & metric2(1,nu)*metric2(2,be)*k1(3)*qqvec2(4) - metric2(1,nu)*
+     & metric2(2,be)*k1(4)*qqvec2(3) - metric2(1,nu)*metric2(3,be)*
+     & k1(2)*qqvec2(4) + metric2(1,nu)*metric2(3,be)*k1(4)*qqvec2(2) + 
+     & metric2(1,nu)*metric2(4,be)*k1(2)*qqvec2(3) - metric2(1,nu)*
+     & metric2(4,be)*k1(3)*qqvec2(2) - metric2(1,be)*metric2(2,nu)*
+     & k1(3)*qqvec2(4) + metric2(1,be)*metric2(2,nu)*k1(4)*qqvec2(3) + 
+     & metric2(1,be)*metric2(3,nu)*k1(2)*qqvec2(4) - metric2(1,be)*
+     & metric2(3,nu)*k1(4)*qqvec2(2) - metric2(1,be)*metric2(4,nu)*
+     & k1(2)*qqvec2(3) + metric2(1,be)*metric2(4,nu)*k1(3)*qqvec2(2) + 
+     & metric2(2,nu)*metric2(3,be)*k1(1)*qqvec2(4) - metric2(2,nu)*
+     & metric2(3,be)*k1(4)*qqvec2(1) - metric2(2,nu)*metric2(4,be)*
+     & k1(1)*qqvec2(3) + metric2(2,nu)*metric2(4,be)*k1(3)*qqvec2(1) - 
+     & metric2(2,be)*metric2(3,nu)*k1(1)*qqvec2(4) + metric2(2,be)*
+     & metric2(3,nu)*k1(4)*qqvec2(1) + metric2(2,be)*metric2(4,nu)*
+     & k1(1)*qqvec2(3)
+      gamk1(nu,be) = gamk1(nu,be)
+     &  - metric2(2,be)*metric2(4,nu)*k1(3)*qqvec2(1) + 
+     & metric2(3,nu)*metric2(4,be)*k1(1)*qqvec2(2) - metric2(3,nu)*
+     & metric2(4,be)*k1(2)*qqvec2(1) - metric2(3,be)*metric2(4,nu)*
+     & k1(1)*qqvec2(2) + metric2(3,be)*metric2(4,nu)*k1(2)*qqvec2(1)
+
+      gamk2(nu,be) =
+     & metric2(1,nu)*metric2(2,be)*k2(3)*qqvec1(4) - metric2(1,nu)*
+     & metric2(2,be)*k2(4)*qqvec1(3) - metric2(1,nu)*metric2(3,be)*
+     & k2(2)*qqvec1(4) + metric2(1,nu)*metric2(3,be)*k2(4)*qqvec1(2) + 
+     & metric2(1,nu)*metric2(4,be)*k2(2)*qqvec1(3) - metric2(1,nu)*
+     & metric2(4,be)*k2(3)*qqvec1(2) - metric2(1,be)*metric2(2,nu)*
+     & k2(3)*qqvec1(4) + metric2(1,be)*metric2(2,nu)*k2(4)*qqvec1(3) + 
+     & metric2(1,be)*metric2(3,nu)*k2(2)*qqvec1(4) - metric2(1,be)*
+     & metric2(3,nu)*k2(4)*qqvec1(2) - metric2(1,be)*metric2(4,nu)*
+     & k2(2)*qqvec1(3) + metric2(1,be)*metric2(4,nu)*k2(3)*qqvec1(2) + 
+     & metric2(2,nu)*metric2(3,be)*k2(1)*qqvec1(4) - metric2(2,nu)*
+     & metric2(3,be)*k2(4)*qqvec1(1) - metric2(2,nu)*metric2(4,be)*
+     & k2(1)*qqvec1(3) + metric2(2,nu)*metric2(4,be)*k2(3)*qqvec1(1) - 
+     & metric2(2,be)*metric2(3,nu)*k2(1)*qqvec1(4) + metric2(2,be)*
+     & metric2(3,nu)*k2(4)*qqvec1(1) + metric2(2,be)*metric2(4,nu)*
+     & k2(1)*qqvec1(3)
+      gamk2(nu,be) = gamk2(nu,be)
+     &  - metric2(2,be)*metric2(4,nu)*k2(3)*qqvec1(1) + 
+     & metric2(3,nu)*metric2(4,be)*k2(1)*qqvec1(2) - metric2(3,nu)*
+     & metric2(4,be)*k2(2)*qqvec1(1) - metric2(3,be)*metric2(4,nu)*
+     & k2(1)*qqvec1(2) + metric2(3,be)*metric2(4,nu)*k2(2)*qqvec1(1)
+
+         enddo
+      enddo
+
+      end
 c ========================================================================
-c === PHOKHARA 9.1, (c) December 2014     ================================
+c === PHOKHARA 10.0, (c) October 2020       ================================
 c ========================================================================
 
 
-c taken from CERNLIB 2005
-      REAL*8 FUNCTION DGAMMF(X)
-
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-
-      CHARACTER*(*) NAME
-      PARAMETER(NAME='GAMMF/DGAMMF')
-      CHARACTER*80 ERRTXT
-
-      DIMENSION C(0:15)
-
-      PARAMETER (PI = 3.14159 26535 89793 24D0)
-
-      DATA C( 0) /3.65738 77250 83382 44D0/
-      DATA C( 1) /1.95754 34566 61268 27D0/
-      DATA C( 2) /0.33829 71138 26160 39D0/
-      DATA C( 3) /0.04208 95127 65575 49D0/
-      DATA C( 4) /0.00428 76504 82129 09D0/
-      DATA C( 5) /0.00036 52121 69294 62D0/
-      DATA C( 6) /0.00002 74006 42226 42D0/
-      DATA C( 7) /0.00000 18124 02333 65D0/
-      DATA C( 8) /0.00000 01096 57758 66D0/
-      DATA C( 9) /0.00000 00059 87184 05D0/
-      DATA C(10) /0.00000 00003 07690 81D0/
-      DATA C(11) /0.00000 00000 14317 93D0/
-      DATA C(12) /0.00000 00000 00651 09D0/
-      DATA C(13) /0.00000 00000 00025 96D0/
-      DATA C(14) /0.00000 00000 00001 11D0/
-      DATA C(15) /0.00000 00000 00000 04D0/
-
-      U=X
-      IF(U .LE. 0) THEN
-      IF(U .EQ. INT(X)) THEN
-      H=0
-      GO TO 9
-      ELSE
-      U=1-X
-      END IF
-      ENDIF
-    8 F=1
-      IF(U .LT. 3) THEN
-      DO 1 I = 1,INT(4-U)
-      F=F/U
-    1  U=U+1
-      ELSE
-      DO 2 I = 1,INT(U-3)
-      U=U-1
-    2  F=F*U
-      END IF
-      H=U+U-7
-      ALFA=H+H
-      B1=0
-      B2=0
-      DO 3 I = 15,0,-1
-      B0=C(I)+ALFA*B1-B2
-      B2=B1
-    3 B1=B0
-      H=F*(B0-H*B2)
-      IF(X .LT. 0) H=PI/(SIN(PI*X)*H)
-    9 DGAMMF=H
-      RETURN
-
-      END
 
 
 

@@ -1,4 +1,3 @@
-/** @cond EEMMG */
 /*
  * kinem.h - kinematics classes
  *
@@ -216,4 +215,3 @@ public:
 };
 
 #endif /* QUL_KINEM_H */
-/** @endcond EEMMG */

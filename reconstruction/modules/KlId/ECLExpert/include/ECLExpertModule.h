@@ -5,17 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2021 - Belle II Collaboration                             *
- *                                                                        *
- * Author: Riccardo de Sangro                                             *
- * Contributors:                                                          *
- *                                                                        *
- * Based on Jo-Frederik Krohn's KLMExpert module                          *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- *************************************************************************/
+
 #pragma once
 
 #include <framework/core/Module.h>

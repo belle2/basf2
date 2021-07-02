@@ -17,9 +17,6 @@
 #
 # Input: B2Electrons.root
 # Output: CDCDedxDQM.root
-#
-#
-# Example steering file - 2011 Belle II Collaboration
 #############################################################
 
 import basf2 as b2

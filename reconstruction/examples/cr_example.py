@@ -16,8 +16,6 @@
 #
 # Input: CDC CR data after unpacker
 # Output: cr_output.root
-#
-# Example steering file - 2011 Belle II Collaboration
 #############################################################
 
 import os

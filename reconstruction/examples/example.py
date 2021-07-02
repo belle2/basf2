@@ -17,8 +17,6 @@
 #
 # Input: None
 # Output: output.root, mdst.root
-#
-# Example steering file - 2017 Belle II Collaboration
 #############################################################
 
 import basf2 as b2

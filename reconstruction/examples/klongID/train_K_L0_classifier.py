@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Jo-Frederik.krohn@desy.de
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #

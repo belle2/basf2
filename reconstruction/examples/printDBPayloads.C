@@ -14,8 +14,6 @@
 //
 // Input: calibration_results
 // Output: none
-//
-// Contributors: Jake Bennett
 //////////////////////////////////////////////////////////
 
 #include <iostream>

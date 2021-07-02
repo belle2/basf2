@@ -21,8 +21,6 @@
 # Input: mdst file specified by command line arguments
 #        (example above uses output.root from example.py)
 # Output: PID_TTree.root
-#
-# Example steering file - 2011 Belle II Collaboration
 #############################################################
 
 import basf2 as b2

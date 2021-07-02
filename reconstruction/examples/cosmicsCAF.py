@@ -19,10 +19,6 @@
 #
 # Input: cosmics data
 # Output: calibration_results
-#
-# Contributors: Jake Bennett
-#
-# Example steering file - 2017 Belle II Collaboration
 #############################################################
 
 import basf2 as b2

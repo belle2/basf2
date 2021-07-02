@@ -15,10 +15,6 @@
 #
 # The user should provide input and output root filname
 # as first and second argument respectively.
-#
-# Example steering file - 2017 Belle II Collaboration
-# Author(s): Jake Bennett
-#
 ########################################################
 
 from ROOT.Belle2 import CDCDedxDatabaseImporter

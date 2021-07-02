@@ -13,8 +13,6 @@
 #
 # Test script to produce DQM plots for the event t0
 #
-# Author:  Ewan Hill  (ehill@mail.ubc.ca)
-#
 # Usage: basf2 runEventT0DQM.py
 #
 # Default input: cdst_hadronEvents.root
@@ -22,8 +20,6 @@
 #
 # Optional input usage:
 #    basf2 runEventT0DQM.py -i "<path/to/file.root>"
-#
-# Example steering file - 2011 Belle II Collaboration
 #############################################################
 
 import basf2 as b2

@@ -17,8 +17,6 @@
 #
 # Input: None
 # Output: ll_diff.png
-#
-# Example steering file - 2011 Belle II Collaboration
 #############################################################
 
 import basf2 as b2

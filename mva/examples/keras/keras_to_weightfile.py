@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 
-# Dennis Weyland 2017
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 # This example shows how to convert a model trained with keras inside a basf2 weightfile.
 

@@ -1,14 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """
-<header>
-  <contact>Vladimir Chekelian; Fernando Abudinen; abudinen@mpp.mpg.de</contact>
-  <description> make Upsilon(4S) ntuple for checks and studies of the generator file:
+make Upsilon(4S) ntuple for checks and studies of the generator file:
 particles: Upsilon(4S), two daughters (i.e. BBbar) and four granddaughters (e.g. B0->Jpsi+K0S)
 variables: mcPDG,M,nDaughters,mcDecayTime,mcLifeTime,mcX,mcY,mcZ,mcE,mcPX,mcPY,mcPZ;
-created 12.02.2019 </description>
-</header>
 """
 
 import basf2 as b2

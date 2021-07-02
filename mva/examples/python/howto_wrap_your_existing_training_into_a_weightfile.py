@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 
-# Thomas Keck 2017
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 # In some cases you create a training outside of basf2
 # but you still want to apply the training in basf2

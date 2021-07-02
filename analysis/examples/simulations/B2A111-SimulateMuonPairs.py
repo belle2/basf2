@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
 
-#############################################################
-# This steering file generates, simulates, and reconstructs
-# a sample of 10 ee -> mu+mu- events.
-#
-# Usage: basf2 B2A111-SimulateMuonPairs.py
-#
-# Input: None
-# Output: B2A111-SimulateMuonPairs.root
-# Contributors: U.Tamponi (October 2019)
-#
-# Example steering file - 2019 Belle II Collaboration
-#############################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+# This steering file generates, simulates, and reconstructs              #
+# a sample of 10 ee -> mu+mu- events.                                    #
+#                                                                        #
+# Usage: basf2 B2A111-SimulateMuonPairs.py                               #
+#                                                                        #
+# Input: None                                                            #
+# Output: B2A111-SimulateMuonPairs.root                                  #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import simulation as si

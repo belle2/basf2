@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # Doxygen should skip this script
 # @cond
 
@@ -7,8 +15,6 @@
 An example script to reconstruct unspecified particles and the use of MC
 matching tools for inclusive analyses with sum-of-exclusive method.
 """
-
-__authors__ = "Sam Cunliffe and Yo Sato"
 
 import basf2
 from modularAnalysis import inputMdst, reconstructDecay, matchMCTruth, \

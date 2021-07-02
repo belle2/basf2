@@ -1,12 +1,20 @@
 #!/usr/bin/env python3
 
-#######################################################
-#
-# For photon energy bias correction
-# This tutorial demonstrates how to create LooKUpTable and
-# upload it to the database
-#
-######################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# For photon energy bias correction                                      #
+# This tutorial demonstrates how to create LooKUpTable and               #
+# upload it to the database                                              #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import random

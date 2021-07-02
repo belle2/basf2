@@ -1,27 +1,33 @@
 #!/usr/bin/env python3
 
-#######################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to load generated final
-# state particles (MCParticle objects) as Particles and
-# create ParticleLists for each final state particle type:
-# gamma/e/mu/pi/K/proton/K_L.
-#
-# All analysis modules and tools (e.g. making combinations, ...)
-# have interfaces for ParticleLists so this step is
-# necessary if analysis tools are to be used.
-#
-# NOTE: If you run into problems with the file
-# B2pi0D_D2hh_D2hhh_B2munu.root not being found, then basf2
-# can't find your examples data dir (or you don't have it).
-# Please take a look into the readme of /analysis/examples/
-# for how to debug this.
-#
-# Contributors: A. Zupanc (June 2014) I.Komarov(Sep 2018)
-#
-#######################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to load generated final                 #
+# state particles (MCParticle objects) as Particles and                  #
+# create ParticleLists for each final state particle type:               #
+# gamma/e/mu/pi/K/proton/K_L.                                            #
+#                                                                        #
+# All analysis modules and tools (e.g. making combinations, ...)         #
+# have interfaces for ParticleLists so this step is                      #
+# necessary if analysis tools are to be used.                            #
+#                                                                        #
+# NOTE: If you run into problems with the file                           #
+# B2pi0D_D2hh_D2hhh_B2munu.root not being found, then basf2              #
+# can't find your examples data dir (or you don't have it).              #
+# Please take a look into the readme of /analysis/examples/              #
+# for how to debug this.                                                 #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

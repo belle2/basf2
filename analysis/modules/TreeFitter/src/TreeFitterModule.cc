@@ -1,13 +1,10 @@
-/*************************************************************************
- * basf2 (Belle II Analysis Software Framework)                          *
- *                                                                       *
- * Copyright(C) 2013-2021 - Belle II Collaboration                       *
- *                                                                       *
- * Author: The Belle II Collaboration                                    *
- * Contributors: Francesco Tenchini, Jo-Frederik Krohn                   *
- *                                                                       *
- * This software is provided "as is" without any warranty.               *
- *************************************************************************/
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 // Implementation of Decay Tree Fitter based on arXiv:physics/0503191
 // Main module implementation

@@ -1,24 +1,33 @@
 #!/usr/bin/env python3
 
-################################################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial runs over skims of centrally produced B->KsPi0 or continuum MC
-# mdst files and reconstructs B->KsPi0 decays, applies the MVAExpert module,
-# and writes out flat NTuples containing all variables used in the deep continuum
-# suppression training + the (transformed) network output distribution.
-# Also have a look at the Continuum suppression section at https://software.belle2.org
-# The techniques are described in more detail in http://ekp-invenio.physik.uni-karlsruhe.de/record/48934
-#
-# This module requires the weightfile produced in B2A712 (Deep_Feed_Forward.xml).
-#
-# Usage:
-#   basf2 B2A713-ContinuumSuppression_MVAExpert.py <signal,qqbar>
-#
-# Contributors: D. Weyland (November 2017), P. Goldenzweig (October 2016)
-#
-################################################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial runs over skims of centrally produced B->KsPi0 or        #
+# continuum MC mdst files and reconstructs B->KsPi0 decays, applies the  #
+# MVAExpert module, and writes out flat NTuples containing all           #
+# variables used in the deep continuum suppression training + the        #
+# (transformed) network output distribution. Also have a look at the     #
+# Continuum suppression section at https://software.belle2.org The       #
+# techniques are described in more detail in                             #
+# http://ekp-invenio.physik.uni-karlsruhe.de/record/48934                #
+#                                                                        #
+# This module requires the weightfile produced in B2A712                 #
+# (Deep_Feed_Forward.xml).                                               #
+#                                                                        #
+# Usage:                                                                 #
+#   basf2 B2A713-ContinuumSuppression_MVAExpert.py <signal,qqbar>        #
+#                                                                        #
+##########################################################################
 
 import basf2
 import modularAnalysis as ma

@@ -1,23 +1,30 @@
 #!/usr/bin/env python3
 
-################################################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial runs over flat NTuples of reconstructed B->KsPi0 decays,
-# which were created running B2A711. The training and test datasets consist of
-# a mixture of reconstructed Bd->KsPi0 and qqbqr MC. The apply datasets are
-# pure signal and qqbar for running the expert as explained below.
-# The actual training model is described in B2A714.
-# Also have a look at the Continuum suppression section at https://software.belle2.org
-# The techniques are described in more detail in http://ekp-invenio.physik.uni-karlsruhe.de/record/48934
-#
-# Usage:
-#   basf2 B2A712-DeepContinuumSuppression_MVATrain.py
-#
-# Contributors: D. Weyland (November 2017), P. Goldenzweig (October 2016)
-#
-################################################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial runs over flat NTuples of reconstructed B->KsPi0 decays, #
+# which were created running B2A711. The training and test datasets      #
+# consist of a mixture of reconstructed Bd->KsPi0 and qqbar MC. The      #
+# apply datasets are pure signal and qqbar for running the expert as     #
+# explained below. The actual training model is described in B2A714.     #
+# Also have a look at the Continuum suppression section at               #
+# https://software.belle2.org The techniques are described in more       #
+# detail in http://ekp-invenio.physik.uni-karlsruhe.de/record/48934      #
+#                                                                        #
+# Usage:                                                                 #
+#   basf2 B2A712-DeepContinuumSuppression_MVATrain.py                    #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import basf2_mva

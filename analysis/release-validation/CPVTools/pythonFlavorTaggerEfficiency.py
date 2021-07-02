@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # **********************************  Flavor Tagging   *******************************
 # * This scripts calculates the effective efficiency of the flavor tagger based      *
 # * on python histograms. It serves as a crosscheck for the script                   *
@@ -10,8 +18,6 @@
 # * checking when they are true categories and when they are not true.               *
 # * True here means that the target (or targets) of the category are found in a      *
 # * certain event. For more information check Sec. 4.5.3 in BELLE2-PTHESIS-2018-003  *
-#                                                                                    *
-# * Author: Fernando Abudinen                                                        *
 #                                                                                    *
 # ************************************************************************************
 

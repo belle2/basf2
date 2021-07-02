@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 
-#######################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates create LooKUpTable and
-# upload it to the database
-#
-# Contributors: I. Komarov (April 2018)
-#               I. Komarov (September 2018)
-#
-######################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates create LooKUpTable and                      #
+# upload it to the database                                              #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import random

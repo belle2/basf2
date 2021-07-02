@@ -1,19 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################
-#        For flavor tagging validation
-# This script plots the distributions
-# of all input variables used in the flavor tagger
-# module. As argument one needs to specify if the
-# Monte Carlo is Belle or Belle2 MC, if it was generated
-# with background or not (BGx0 or BGx1), and the
-# working directory of the flavor tagger
-# (where the training samples are).
-#
-# Contributor: F. Abudinen (December 2018)
-#
-######################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#        For flavor tagging validation                                   #
+#                                                                        #
+# This script plots the distributions                                    #
+# of all input variables used in the flavor tagger                       #
+# module. As argument one needs to specify if the                        #
+# Monte Carlo is Belle or Belle2 MC, if it was generated                 #
+# with background or not (BGx0 or BGx1), and the                         #
+# working directory of the flavor tagger                                 #
+# (where the training samples are).                                      #
+#                                                                        #
+##########################################################################
 
 import os
 import glob

@@ -1,10 +1,18 @@
 #!/usr/bin/env/python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # isSignalAcceptFlags or isSignalAcceptSomething, means a special isSignal variable that accepts certain
 # bits in the mcErrors to be set. For example, the pure isSignal equals to 1 only when mcErrors == 0, while
-# isSignalAcceptMissingGamma euqals to 1 when mcErrors == 0 or mcErrors == 16, which could be interpreted
+# isSignalAcceptMissingGamma equals to 1 when mcErrors == 0 or mcErrors == 16, which could be interpreted
 # as "After setting the MissGamma bit (the 5th bit, or 16 = 0b00010000) to 0, if mcErrors == 0, then
-# isSignalAcceptMissingGamma euqals to 1". A new isSignalAcceptSomething variables could be added conveniently
+# isSignalAcceptMissingGamma equals to 1". A new isSignalAcceptSomething variables could be added conveniently
 # by create_isSignal_alias() in variable.utils:
 # >>> c_MissGamma = 16
 # >>> c_DecayInFlight = 4
@@ -23,8 +31,6 @@
 # ...             "%d) == %d)" % (c_MissGamma | c_DecayInFlight, c_Correct))
 # The full definition of mc match error flags could be found in:
 # https://b2-master.belle2.org/software/development/sphinx/analysis/doc/MCMatching.html#error-flags
-#
-# Guanda Gong
 #
 # For full documentation please refer to https://software.belle2.org
 # Anything unclear? Ask questions at https://questions.belle2.org

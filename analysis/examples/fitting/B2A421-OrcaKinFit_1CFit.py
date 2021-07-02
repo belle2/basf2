@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
 
-############################################################
-#
-# This tutorial demonstrates how to perform 1C fit with
-# the orcakinfit. In this example the following decay chain:
-# Y4S ->  gamma Z0
-#               |
-#               +-> mu+ mu-
-# with missing gamma is reconstructed.
-#
-# Contributors: Torben Ferber (2017)
-#
-############################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# This tutorial demonstrates how to perform 1C fit with                  #
+# the orcakinfit. In this example the following decay chain:             #
+# Y4S ->  gamma Z0                                                       #
+#               |                                                        #
+#               +-> mu+ mu-                                              #
+# with missing gamma is reconstructed.                                   #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 from modularAnalysis import inputMdst

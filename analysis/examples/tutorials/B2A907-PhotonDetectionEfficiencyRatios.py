@@ -1,15 +1,21 @@
 #!/usr/bin/env python3
 
-#######################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to get photon detection efficiency ratio variables
-# added to extraInfo for particles in photon lists.
-#
-# Contributors: Henrikas Svidras (June 2021)
-#
-################################################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to get photon detection efficiency      #
+# ratio variables added to extraInfo for particles in photon lists.      #
+#                                                                        #
+##########################################################################
 
 
 import basf2 as b2

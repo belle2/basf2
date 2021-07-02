@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # Doxygen should skip this script
 # @cond
 
@@ -16,12 +24,7 @@ basf2 -i /PATH/TO/MDST/FILE.root analysis/examples/PostMdstIdentification/Charge
 Input: *_mdst_*.root
 Output: *_ntup_*.root
 
-Example steering file - 2019 Belle II Collaboration.
 """
-
-__author__ = "Marco Milesi"
-__email__ = "marco.milesi@unimelb.edu.au"
-
 
 import argparse
 import re

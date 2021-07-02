@@ -1,24 +1,27 @@
 #!/usr/bin/env python3
 
-################################################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to load reconstructed
-# final state particles as Particles:
-# - Tracks are loaded as e/mu/pi/K/p Particles
-# - neutral ECLClusters are loaded as photons, Klongs or neutrons
-# - neutral KLMClusters are loaded as Klongs or neutrons
-#
-# Create ParticleList for each final state
-# particle type as well.
-#
-# Contributors: A. Zupanc (June 2014)
-#               Vishal (Oct2017) "Intermediate" option in MCHierarchy for Ks,pi0
-#               I.Komarov (Sep 2018)
-#               S Cunliffe (Feb 2019)
-#
-######################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to load reconstructed                   #
+# final state particles as Particles:                                    #
+# - Tracks are loaded as e/mu/pi/K/p Particles                           #
+# - neutral ECLClusters are loaded as photons, Klongs or neutrons        #
+# - neutral KLMClusters are loaded as Klongs or neutrons                 #
+#                                                                        #
+# Create ParticleList for each final state                               #
+# particle type as well.                                                 #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

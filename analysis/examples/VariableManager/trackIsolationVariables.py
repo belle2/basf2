@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # Doxygen should skip this script
 # @cond
 
@@ -9,12 +17,6 @@ Example script to calculate track isolation variables.
 For each particle's track in the input charged stable particle list,
 calculate the minimal distance to the other candidates' tracks at a given detector entry surface.
 """
-
-__author__ = 'Marco Milesi'
-__copyright__ = 'Copyright 2020 - Belle II Collaboration'
-__maintainer__ = 'Marco Milesi'
-__email__ = 'marco.milesi@unimelb.edu.au'
-
 
 import argparse
 

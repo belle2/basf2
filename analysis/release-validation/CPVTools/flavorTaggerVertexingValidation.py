@@ -1,26 +1,33 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#######################################################
-#
-# This script produces nTuple files using input mdst files
-# to validate the flavor tagger and the vertex
-# reconstrcution of B0 mesons.
-# The Rest Of Event of the following decay chain is built:
-#
-# B0 -> J/psi Ks
-#        |    |
-#        |    +-> pi+ pi-
-#        |
-#        +-> mu+ mu-
-#
-# The procedure for the benchmark channel
-# B0 -> nu_tau anti-nu_tau
-# is also defined.
-#
-# Contributor: F. Abudinen (Dec 2018)
-#
-######################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# This script produces nTuple files using input mdst files               #
+# to validate the flavor tagger and the vertex                           #
+# reconstruction of B0 mesons.                                           #
+# The Rest Of Event of the following decay chain is built:               #
+#                                                                        #
+# B0 -> J/psi Ks                                                         #
+#        |    |                                                          #
+#        |    +-> pi+ pi-                                                #
+#        |                                                               #
+#        +-> mu+ mu-                                                     #
+#                                                                        #
+# The procedure for the benchmark channel                                #
+# B0 -> nu_tau anti-nu_tau                                               #
+# is also defined.                                                       #
+#                                                                        #
+##########################################################################
+
 import basf2 as b2
 import modularAnalysis as ma
 import flavorTagger as ft

@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 
-# Dennis Weyland 2017
-# Justin Tan 2017
-# Thomas Keck 2017
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 # This example shows how to remove bias on one or several spectator variables.
 # Relevant paper: https://arxiv.org/abs/1611.01046

@@ -16,8 +16,6 @@
 # This currently doesn't work for the ECL as the ECL uses custom volume types
 # which cannot be converted to ROOT so for this to work we need to create a
 # geometry without the ECL.
-#
-# Example steering file - 2011 Belle II Collaboration
 ######################################################
 
 from basf2 import Path, process

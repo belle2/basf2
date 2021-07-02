@@ -16,7 +16,6 @@ namespace Belle2 {
 
   /**
    * Class to hold the information for the ECL shower energy corrections
-   * Corrections produced by Claudia Cecchi (claudia.cecchi@pg.infn.it) Elisa Manoni (elisa.manoni@pg.infn.it)
    * This is a temperary class as there is no information about phi dependence.
    * An improved version will be implemented at a later time.
    *

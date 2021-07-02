@@ -5,11 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-/* makePlots.C 
- * ROOT macro for ECL validation plots 
- * Authors: Benjamin Oberhof, Elisa Manoni 
- * 2015-06
-*/
 
 /*
 <header>

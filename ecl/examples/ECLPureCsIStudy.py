@@ -29,11 +29,6 @@ from reconstruction import add_reconstruction
 from reconstruction import add_mdst_output
 from beamparameters import add_beamparameters
 
-__authors__ = ['Guglielmo De Nardo', 'Abtin Narimani Charan']
-__copyright__ = 'Copyright 2020 - Belle II Collaboration'
-__maintainer__ = 'Abtin Narimani Charan'
-__email__ = 'abtin.narimani.charan@desy.de'
-
 
 def argparser():
 

@@ -17,11 +17,6 @@ import glob
 import basf2 as b2
 from ROOT import Belle2
 
-__author__ = 'Mikhail Remnev'
-__copyright__ = 'Copyright 2020 - Belle II Collaboration'
-__maintainer__ = 'Mikhail Remnev'
-__email__ = 'mikhail.a.remnev@gmail.com'
-
 env = Belle2.Environment.Instance()
 
 # PARAMETERS

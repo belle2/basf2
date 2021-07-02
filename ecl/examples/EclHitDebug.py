@@ -27,11 +27,6 @@ from simulation import add_simulation
 from reconstruction import add_tracking_reconstruction
 from reconstruction import add_ecl_modules
 
-__authors__ = ['Poyuan Chen', 'Benjamin Oberhof',
-               'Torben Ferber']
-__copyright__ = 'Copyright 2016 - Belle II Collaboration'
-__maintainer__ = 'Abtin Narimani Charan'
-__email__ = 'abtin.narimani.charan@desy.de'
 
 # Create path. Register necessary modules to this path.
 mainPath = b2.create_path()

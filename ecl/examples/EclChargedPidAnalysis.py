@@ -25,11 +25,6 @@ Usage:
 
 import basf2 as b2
 
-__authors__ = ['Caitlin MacQueen', 'Marco Milesi']
-__copyright__ = 'Copyright 2018 - Belle II Collaboration'
-__maintainer__ = 'Abtin Narimani Charan'
-__email__ = 'abtin.narimani.charan@desy.de'
-
 # Create path. Register necessary modules to this path.
 mainPath = b2.create_path()
 

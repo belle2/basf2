@@ -35,11 +35,6 @@ import subprocess
 import basf2 as b2
 from reconstruction import add_ecl_modules
 
-__authors__ = ['Samuel Rudy de Jong', 'Torben Ferber']
-__copyright__ = 'Copyright 2017 - Belle II Collaboration'
-__maintainer__ = '--'
-__email__ = '--'
-
 # Create path. Register necessary modules to this path.
 mainPath = b2.create_path()
 

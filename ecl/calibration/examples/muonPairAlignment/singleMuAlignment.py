@@ -9,19 +9,19 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-##############################################################################
-# Generate single muons and store quantities needed to study alignment
-#
-# usage:
-#
-# basf2 singleMuAlignment.py nEvents name newGeom
-#     nEvents = number of events to generate
-#     name: ntuple is written to "ntuples/name.root"
-#     newGeom = 0 means standard ECL geometry; 1 is aligned geometry from GT; 2 = localdb
-#
-# (c) Christopher Hearty, 2020 (hearty@physics.ubc.ca)
-#
-##############################################################################
+##########################################################################
+# Generate single muons and store quantities needed to study alignment   #
+#                                                                        #
+# usage:                                                                 #
+#                                                                        #
+# basf2 singleMuAlignment.py nEvents name newGeom                        #
+#     nEvents = number of events to generate                             #
+#     name: ntuple is written to "ntuples/name.root"                     #
+#     newGeom = 0 means standard ECL geometry;                           #
+#               1 is aligned geometry from GT;                           #
+#               2 = localdb                                              #
+#                                                                        #
+##########################################################################
 
 import sys
 from basf2 import (register_module, process, print_params, create_path,

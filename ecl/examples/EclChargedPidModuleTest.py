@@ -34,11 +34,6 @@ Usage:
 
 import basf2 as b2
 
-__author__ = 'Marco Milesi'
-__copyright__ = 'Copyright 2019 - Belle II Collaboration'
-__maintainer__ = 'Marco Milesi'
-__email__ = 'marco.milesi@unimelb.edu.au'
-
 # Create path. Register necessary modules to this path.
 mainPath = b2.create_path()
 

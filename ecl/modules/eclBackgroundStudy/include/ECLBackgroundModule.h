@@ -141,8 +141,6 @@ namespace Belle2 {
     /**Joules in a GeV */
     const double GeVtoJ = 1.6e-10;
 
-    //from Alex Beaulieu's implementation
-
     /**  Store crystal geometry and mass data*/
     ECLCrystalData* Crystal[8736] {0};
 

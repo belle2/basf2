@@ -9,14 +9,12 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-##############################################################################
-# Use e+e- --> mu+ mu- events to study ECL alignment
-#
-# usage:  basf2 -i inputData.root muPairAlignment.py [outputName.root]
-#
-# (c) Christopher Hearty, 2020 (hearty@physics.ubc.ca)
-#
-##############################################################################
+##########################################################################
+# Use e+e- --> mu+ mu- events to study ECL alignment                     #
+#                                                                        #
+# usage:  basf2 -i inputData.root muPairAlignment.py [outputName.root]   #
+#                                                                        #
+##########################################################################
 
 import sys
 import basf2 as b2

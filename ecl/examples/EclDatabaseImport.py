@@ -23,11 +23,6 @@ import basf2 as b2
 import ROOT
 from ROOT.Belle2 import ECLDatabaseImporter
 
-__authors__ = ['Torben Ferber', 'Alon Hershenhorn',
-               'Frank Meier']
-__copyright__ = 'Copyright 2018 - Belle II Collaboration'
-__maintainer__ = '--'
-__emails__ = '--'
 
 if len(sys.argv) != 3:
     print('Usage: basf2 {} inputFile outputFile'.format(sys.argv[0]))

@@ -21,8 +21,6 @@
 # newGeom = 2 reads the payload from localdb;
 # If not specified, the payload will be taken from the global tag of "inputFile.root"
 #
-# (c) Christopher Hearty, 2020 (hearty@physics.ubc.ca)
-#
 ################################################################################
 
 import sys

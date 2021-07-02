@@ -72,7 +72,7 @@ namespace Belle2 {
 
     /*! Get average time (implementation of base class function)
      *  @return average time
-     *  by Marko Staric */
+     */
     float getGlobalTime() const override { return m_TimeAve; }
 
     /** Shift the Hit in time (needed for beam background mixing)

@@ -22,10 +22,6 @@ Usage:
 
 import basf2 as b2
 
-__author__ = 'Dmitry Matvienko'
-__copyright__ = 'Copyright 2019 - Belle II Collaboration'
-__maintainer__ = 'Dmitry Matvienko'
-__email__ = 'd.v.matvienko@inp.nsk.su'
 
 # Create path. Register necessary modules to this path.
 mainPath = b2.create_path()

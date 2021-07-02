@@ -349,7 +349,7 @@ namespace Belle2 {
       //Check that there are at least (r+1) daughters where r is the bigger of the two indices provided
       int daughterIndex1 = int(daughterIndices[0]);
       int daughterIndex2 = int(daughterIndices[1]);
-      if (gamma->getNDaughters() <= std::max(daughterIndex1, daughterIndex2)) {
+      if (int(gamma->getNDaughters()) <= std::max(daughterIndex1, daughterIndex2)) {
         B2ERROR("Invalid daughter indices provided. Particle does not have that many daughters.");
         return -1;
       }

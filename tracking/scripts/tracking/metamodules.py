@@ -11,15 +11,12 @@ Note:
 """
 
 import basf2
-import ROOT
 from ROOT import Belle2
 
 import cProfile
 import pstats
 
 import logging
-
-from ROOT import Belle2
 
 
 def get_logger():

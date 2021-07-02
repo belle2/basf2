@@ -9,14 +9,13 @@ Contact: Torben Ferber (ferber@physics.ubc.ca)
 '''
 
 from basf2 import *
-from ROOT import Belle2
 import os
 import pdg
 
 
 def get_default_decayfile():
     """Return the default DECAY.dec for Belle2"""
-    return Belle2.FileSystem.findFile("decfiles/dec/DECAY_BELLE2.DEC")
+    return find_file("decfiles/dec/DECAY_BELLE2.DEC")
 
 
 def add_generator_preselection(
@@ -33,7 +32,8 @@ def add_generator_preselection(
         MinPhotonEnergy=-1,
         MinPhotonTheta=0.0,
         MaxPhotonTheta=180.0,
-        applyInCMS=False):
+        applyInCMS=False,
+        stableParticles=False):
     """
         Adds generator preselection.
         Should be added to the path after the generator.add_abc_generator but before simulation.add_simulation modules
@@ -58,6 +58,7 @@ def add_generator_preselection(
             MinPhotonTheta (float): minimum polar angle of photon [deg]
             MaxPhotonTheta (float): maximum polar angle of photon [deg]
             applyInCMS (bool): if true apply the P,Pt,theta, and energy cuts in the center of mass frame
+            stableParticles (bool): if true apply the selection criteria for stable particles in the generator
     """
 
     generatorpreselection = path.add_module('GeneratorPreselection',
@@ -71,7 +72,8 @@ def add_generator_preselection(
                                             nPhotonMax=nPhotonMax,
                                             MinPhotonEnergy=MinPhotonEnergy,
                                             MinPhotonTheta=MinPhotonTheta,
-                                            MaxPhotonTheta=MaxPhotonTheta
+                                            MaxPhotonTheta=MaxPhotonTheta,
+                                            stableParticles=stableParticles
                                             )
 
     # empty path for unwanted events
@@ -186,31 +188,32 @@ def add_aafh_generator(
             B2WARNING("The tau decays will not be generated.")
 
 
-def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=False):
+def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=False, tauinputfile=''):
     """
     Add the default muon pair and tau pair generator KKMC.
-    For tau decays, TauolaBelle and TauolaBBB are available.
+    For tau decays, TauolaBelle and TauolaBelle2 are available.
     Signal events can be produced setting a configuration file. Please notice that the configuration files for
-    TauolaBelle and TauolaBBB has a very different structure (see the examples below generators/examples).
+    TauolaBelle and TauolaBelle2 has a very different structure (see the examples below generators/examples).
 
     Parameters:
         path (basf2.Path): path where the generator should be added
         finalstate(str): either "mu-mu+" or "tau-tau+"
         signalconfigfile(str): File with configuration of the signal event to generate. It doesn't affect mu-mu+ decays.
-        useTauolaBelle(bool): If true, tau decay is driven by TauolaBelle. Otherwise TauolaBBB is used.
+        useTauolaBelle(bool): If true, tau decay is driven by TauolaBelle. Otherwise TauolaBelle2 is used.
                               It doesn't affect mu-mu+ decays.
+        tauinputfile(str) : File to override KK2f_defaults. Only [sometimes] needed when tau decay is driven by TauolaBelle.
     """
 
     #: kkmc input file
-    kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/tauola_bbb.input.dat')
+    kkmc_inputfile = find_file('data/generators/kkmc/tauola_bbb.input.dat')
 
     #: kkmc file that will hold cross section and other information
     kkmc_logfile = 'kkmc_tautau.txt'
 
     #: kkmc configuration file, should be fine as is
-    kkmc_config = Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat')
+    kkmc_config = find_file('data/generators/kkmc/KK2f_defaults.dat')
 
-    #: tau config file (empty for generic mu-mu+ and tau-tau+ with TauolaBBB)
+    #: tau config file (empty for generic mu-mu+ and tau-tau+ with TauolaBelle2)
     kkmc_tauconfigfile = ''
 
     if finalstate == 'tau+tau-':
@@ -226,18 +229,21 @@ def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=
         if useTauolaBelle:
             B2INFO("Generating tau pair events with TauolaBelle")
             #: If TauolaBelle, the tau decay must be controlled by Pythia flags
-            kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau.input.dat')
-            kkmc_tauconfigfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau_decaytable.dat')
+            kkmc_inputfile = find_file('data/generators/kkmc/tau.input.dat')
+            kkmc_tauconfigfile = find_file('data/generators/kkmc/tau_decaytable.dat')
         #: Check if there is a signal decfile provided by the user
         if not signalconfigfile == '':
             B2INFO(f"Using config file defined by user: {signalconfigfile}")
             if useTauolaBelle:
-                kkmc_tauconfigfile = signalconfigfile
+                kkmc_tauconfigfile = find_file(signalconfigfile)
             else:
-                kkmc_inputfile = signalconfigfile
+                kkmc_inputfile = find_file(signalconfigfile)
+        #: Check if there is a tauinputfile to override KK2f_defaults. Only [sometimes] needed when using TauolaBelle.
+        if not tauinputfile == '':
+            kkmc_inputfile = find_file(tauinputfile)
 
     elif finalstate == 'mu-mu+':
-        kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat')
+        kkmc_inputfile = find_file('data/generators/kkmc/mu.input.dat')
         kkmc_logfile = 'kkmc_mumu.txt'
 
     else:
@@ -266,7 +272,7 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
                         coherent decay only starting from the Y(4S).
         parentParticle (str): initial state (used only if it is not Upsilon(4S).
     """
-    evtgen_userdecfile = Belle2.FileSystem.findFile('data/generators/evtgen/charged.dec')
+    evtgen_userdecfile = find_file('data/generators/evtgen/charged.dec')
 
     if parentParticle != 'Upsilon(3S)' and parentParticle != 'Upsilon(4S)'\
             and parentParticle != 'Upsilon(5S)' and parentParticle != 'Upsilon(6S)':
@@ -275,7 +281,7 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
     if finalstate == 'charged':
         pass
     elif finalstate == 'mixed':
-        evtgen_userdecfile = Belle2.FileSystem.findFile('data/generators/evtgen/mixed.dec')
+        evtgen_userdecfile = find_file('data/generators/evtgen/mixed.dec')
     elif finalstate == 'signal':
         evtgen_userdecfile = signaldecfile
     else:
@@ -301,7 +307,7 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
             B2WARNING(
                 "add_evtgen_generator initial state {} is supported only with false coherentMixing, now switching it OFF"
                 .format(parentParticle))
-        pdg.load(Belle2.FileSystem.findFile('decfiles/dec/Y5S.pdl'))
+        pdg.load(find_file('decfiles/dec/Y5S.pdl'))
 
     if parentParticle == 'Upsilon(6S)':
         if finalstate != 'signal':
@@ -311,7 +317,7 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
             B2WARNING(
                 "add_evtgen_generator initial state {} is supported only with false coherentMixing, now switching it OFF"
                 .format(parentParticle))
-        pdg.load(Belle2.FileSystem.findFile('decfiles/dec/Y6S.pdl'))
+        pdg.load(find_file('decfiles/dec/Y6S.pdl'))
 
     evtgen = path.add_module(
         'EvtGenInput',
@@ -337,16 +343,16 @@ def add_continuum_generator(path, finalstate, userdecfile='', *, skip_on_failure
     """
 
     #: kkmc input file, one for each qqbar mode
-    kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/uubar_nohadronization.input.dat')
+    kkmc_inputfile = find_file('data/generators/kkmc/uubar_nohadronization.input.dat')
 
     #: kkmc file that will hold cross section and other information
     kkmc_logfile = 'kkmc_uubar.txt'
 
     #: pythia configuration, different for ccbar
-    pythia_config = Belle2.FileSystem.findFile('data/generators/modules/fragmentation/pythia_belle2.dat')
+    pythia_config = find_file('data/generators/modules/fragmentation/pythia_belle2.dat')
 
     #: user decay file
-    decay_user = Belle2.FileSystem.findFile('data/generators/modules/fragmentation/dec_belle2_qqbar.dec')
+    decay_user = find_file('data/generators/modules/fragmentation/dec_belle2_qqbar.dec')
     if userdecfile == '':
         pass
     else:
@@ -354,7 +360,7 @@ def add_continuum_generator(path, finalstate, userdecfile='', *, skip_on_failure
         decay_user = userdecfile
 
     #: kkmc configuration file, should be fine as is
-    kkmc_config = Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat')
+    kkmc_config = find_file('data/generators/kkmc/KK2f_defaults.dat')
 
     #: global decay file
     decay_file = get_default_decayfile()
@@ -362,14 +368,14 @@ def add_continuum_generator(path, finalstate, userdecfile='', *, skip_on_failure
     if finalstate == 'uubar':
         pass
     elif finalstate == 'ddbar':
-        kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/ddbar_nohadronization.input.dat')
+        kkmc_inputfile = find_file('data/generators/kkmc/ddbar_nohadronization.input.dat')
         kkmc_logfile = 'kkmc_ddbar.txt'
     elif finalstate == 'ssbar':
-        kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/ssbar_nohadronization.input.dat')
+        kkmc_inputfile = find_file('data/generators/kkmc/ssbar_nohadronization.input.dat')
         kkmc_logfile = 'kkmc_ssbar.txt'
     elif finalstate == 'ccbar':
-        kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/ccbar_nohadronization.input.dat')
-        pythia_config = Belle2.FileSystem.findFile('data/generators/modules/fragmentation/pythia_belle2_charm.dat')
+        kkmc_inputfile = find_file('data/generators/kkmc/ccbar_nohadronization.input.dat')
+        pythia_config = find_file('data/generators/modules/fragmentation/pythia_belle2_charm.dat')
         kkmc_logfile = 'kkmc_ccbar.txt'
     else:
         B2FATAL("add_continuum_generator final state not supported: {}".format(finalstate))
@@ -566,17 +572,17 @@ def add_koralw_generator(path, finalstate='', enableTauDecays=True):
 
     decayFile = ''
     if finalstate == 'e+e-e+e-':
-        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_eeee.data')
+        decayFile = find_file('data/generators/koralw/KoralW_eeee.data')
     elif finalstate == 'e+e-mu+mu-':
-        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_eeMuMu.data')
+        decayFile = find_file('data/generators/koralw/KoralW_eeMuMu.data')
     elif finalstate == 'e+e-tau+tau-':
-        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_eeTauTau.data')
+        decayFile = find_file('data/generators/koralw/KoralW_eeTauTau.data')
     elif finalstate == 'mu+mu-mu+mu-':
-        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_MuMuMuMu.data')
+        decayFile = find_file('data/generators/koralw/KoralW_MuMuMuMu.data')
     elif finalstate == 'mu+mu-tau+tau-':
-        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_MuMuTauTau.data')
+        decayFile = find_file('data/generators/koralw/KoralW_MuMuTauTau.data')
     elif finalstate == 'tau+tau-tau+tau-':
-        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_TauTauTauTau.data')
+        decayFile = find_file('data/generators/koralw/KoralW_TauTauTauTau.data')
     else:
         B2FATAL(f'add_koralw_generator final state not supported: {finalstate}')
 
@@ -667,10 +673,10 @@ in your steering file (the module parameter "acceptance" has to be set, see the 
     cry = path.add_module('CRYInput')
 
     # cosmic data input
-    cry.param('CosmicDataDir', Belle2.FileSystem.findFile(cosmics_data_dir))
+    cry.param('CosmicDataDir', find_file(cosmics_data_dir))
 
     # user input file
-    cry.param('SetupFile', Belle2.FileSystem.findFile(setup_file))
+    cry.param('SetupFile', find_file(setup_file))
 
     # acceptance half-lengths - at least one particle has to enter that box to use that event
     cry.param('acceptLength', accept_box[0])
@@ -720,18 +726,17 @@ def add_treps_generator(path, finalstate='', useDiscreteAndSortedW=False):
     """
 
     if finalstate == 'e+e-pi+pi-':
-        parameterFile = Belle2.FileSystem.findFile('generators/treps/data/parameterFiles/treps_par_pipi.dat')
-        differentialCrossSectionFile = Belle2.FileSystem.findFile('generators/treps/data/differentialCrossSectionFiles/pipidcs.dat')
-        wListTableFile = Belle2.FileSystem.findFile('generators/treps/data/wListFiles/wlist_table_pipi.dat')
+        parameterFile = find_file('generators/treps/data/parameterFiles/treps_par_pipi.dat')
+        differentialCrossSectionFile = find_file('generators/treps/data/differentialCrossSectionFiles/pipidcs.dat')
+        wListTableFile = find_file('generators/treps/data/wListFiles/wlist_table_pipi.dat')
     elif finalstate == 'e+e-K+K-':
-        parameterFile = Belle2.FileSystem.findFile('generators/treps/data/parameterFiles/treps_par_kk.dat')
-        differentialCrossSectionFile = Belle2.FileSystem.findFile('generators/treps/data/differentialCrossSectionFiles/kkdcs.dat')
-        wListTableFile = Belle2.FileSystem.findFile('generators/treps/data/wListFiles/wlist_table_kk.dat')
+        parameterFile = find_file('generators/treps/data/parameterFiles/treps_par_kk.dat')
+        differentialCrossSectionFile = find_file('generators/treps/data/differentialCrossSectionFiles/kkdcs.dat')
+        wListTableFile = find_file('generators/treps/data/wListFiles/wlist_table_kk.dat')
     elif finalstate == 'e+e-ppbar':
-        parameterFile = Belle2.FileSystem.findFile('generators/treps/data/parameterFiles/treps_par_ppbar.dat')
-        differentialCrossSectionFile = Belle2.FileSystem.findFile(
-            'generators/treps/data/differentialCrossSectionFiles/ppbardcs.dat')
-        wListTableFile = Belle2.FileSystem.findFile('generators/treps/data/wListFiles/wlist_table_ppbar.dat')
+        parameterFile = find_file('generators/treps/data/parameterFiles/treps_par_ppbar.dat')
+        differentialCrossSectionFile = find_file('generators/treps/data/differentialCrossSectionFiles/ppbardcs.dat')
+        wListTableFile = find_file('generators/treps/data/wListFiles/wlist_table_ppbar.dat')
     else:
         B2FATAL("add_treps_generator final state not supported: {}".format(finalstate))
 
@@ -747,4 +752,4 @@ def add_treps_generator(path, finalstate='', useDiscreteAndSortedW=False):
         ApplyCosThetaCutCharged=True,
         MinimalTransverseMomentum=0,
         ApplyTransverseMomentumCutCharged=True,
-        )
+    )

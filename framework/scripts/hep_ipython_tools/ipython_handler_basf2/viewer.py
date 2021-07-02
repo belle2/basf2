@@ -43,7 +43,7 @@ class PathViewer(viewer.IPythonWidget):
         #: The path to show
         try:
             self.path = path.modules()
-        except:
+        except BaseException:
             self.path = path
 
         #: In the standalone mode, the basic parameters of the modules are shown
@@ -185,7 +185,7 @@ class DependencyViewer(viewer.IPythonWidget):
         self.d3_include_string = """<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>"""
 
         #: Template for the element itself
-        self.d3_element_string = """<div id="{element_name}"></div>""".format(element_name=self.element_name)
+        self.d3_element_string = f"""<div id="{self.element_name}"></div>"""
 
         #: Template for the style
         self.style_template = """<style>

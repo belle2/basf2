@@ -29,13 +29,13 @@ namespace Belle2 {
     typedef double (SVDCoGCalibrationFunction::*cogFunctionErr)(double, double, int) const;
 
     /** returns the calibrated value of raw_time, depending on the trigger bin*/
-    double calibratedValue(double raw_time, int trigger_bin)
+    double calibratedValue(double raw_time, int trigger_bin) const
     {
       cogFunction f = m_implementations[m_current];
       return (this->*f)(raw_time, trigger_bin) ;
     }
     /** returns the error of the calibrated value of raw_time, depending on the trigger bin*/
-    double calibratedValueError(double raw_time, double raw_timeErr, int trigger_bin)
+    double calibratedValueError(double raw_time, double raw_timeErr, int trigger_bin) const
     {
       cogFunctionErr fErr = m_implementationsErr[m_current];
       return (this->*fErr)(raw_time, raw_timeErr, trigger_bin) ;
@@ -155,7 +155,7 @@ namespace Belle2 {
       return raw_timeErr * m_scale[ tb % nTriggerBins];
     };
 
-    //data member usefule for polinomials
+    //data member useful for polinomials
     static const int m_nPar = 6; /**< number of parameters of highest-order implemented pol (5)*/
     double m_par[ m_nPar ] = {0}; /**< vector of parameters*/
 

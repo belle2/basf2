@@ -19,21 +19,19 @@
 #
 ################################################################################
 
-import tensorflow as tf
 import tensorflow.contrib.keras as keras
 
 from keras.layers import Input, Dense, Concatenate, Dropout, Lambda, GlobalAveragePooling1D, Reshape
-from keras.models import Model, load_model
+from keras.models import Model
 from keras.optimizers import adam
 from keras.losses import binary_crossentropy, sparse_categorical_crossentropy
 from keras.activations import sigmoid, tanh, softmax
-from keras.callbacks import Callback, EarlyStopping
+from keras.callbacks import EarlyStopping
 from sklearn.metrics import roc_auc_score
 import numpy as np
-import os
 
 from basf2_mva_python_interface.contrib_keras import State
-from basf2_mva_extensions.keras_relational import Relations, EnhancedRelations
+from basf2_mva_extensions.keras_relational import EnhancedRelations
 from basf2_mva_extensions.preprocessing import fast_equal_frequency_binning
 
 import warnings
@@ -248,7 +246,7 @@ def partial_fit(state, X, S, y, w, epoch):
         def on_epoch_end(self, epoch, logs=None):
             val_y_pred = state.model.predict(state.Xtest).flatten()
             val_auc = roc_auc_score(state.ytest, val_y_pred)
-            print('\nTest AUC: {}\n'.format(val_auc))
+            print(f'\nTest AUC: {val_auc}\n')
             self.val_aucs.append(val_auc)
             return
 

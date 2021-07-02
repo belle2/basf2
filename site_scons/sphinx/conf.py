@@ -16,8 +16,6 @@
 import sys
 import os
 import re
-import glob
-import shutil
 import subprocess
 import jupytext
 
@@ -122,7 +120,7 @@ language = None
 # This patterns also effect to html_static_path and html_extra_path
 exclude_patterns = ['.*', '_sphinxbuild', 'Thumbs.db', 'build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons']
 # If we want to create the light release documentation then we need t exclude anything not in the light release.
-if tags.has('light'):
+if tags.has('light'):  # noqa
     light_packages = set([entry.strip('/') for entry in open('../../.light').read().split() if entry.endswith('/')])
     for entry in os.listdir("../../"):
         if entry.find('.') > -1 or os.path.isfile(entry) or entry in exclude_patterns or entry in light_packages:
@@ -178,7 +176,7 @@ html_theme = 'sphinx_rtd_theme'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-html_theme_options = {'stickysidebar': True}
+# html_theme_options = {'stickysidebar': True}
 
 # Add any paths that contain custom themes here, relative to this directory.
 html_theme_path = ["_themes", ]
@@ -279,7 +277,7 @@ latex_elements = {
     'pointsize': '10pt',
 
     # Additional stuff for the LaTeX preamble.
-    'preamble': '\setcounter{tocdepth}{2}',
+    'preamble': '\\setcounter{tocdepth}{2}',
 
     # Latex figure (float) alignment
     # 'figure_align': 'htbp',
@@ -361,7 +359,7 @@ def process_sig(app, what, name, obj, options, signature, return_annotation):
     remove unhelpful 'self' arguments from methods.
     """
     if what == 'method' and signature:
-        reg = re.compile('^\( \(.*\)arg1')
+        reg = re.compile('^\\( \\(.*\\)arg1')
         signature = reg.sub('(', signature)
         return (signature, return_annotation)
 
@@ -446,11 +444,11 @@ def process_docstring(app, what, name, obj, options, lines):
         re.compile(r'^( *)@returns? '): r':return: ',
     }
     newlines = []
-    for l in lines:
-        new = l
+    for line in lines:
+        new = line
         for reg, sub in substitutions.items():
             new = reg.sub(sub, new)
-        if new != l:
+        if new != line:
             # Sphinx wants a new paragraph before these, so let's add one
             newlines += ['']
         newlines += [new]
@@ -465,3 +463,24 @@ def setup(app):
     app.connect('autodoc-process-docstring', process_docstring)
     app.connect('autodoc-skip-member', skipmember)
     app.add_css_file('css/custom.css')
+
+
+# Work around https://github.com/sphinx-doc/sphinx/issues/9189 by monkey patching the member function in question
+# FIXME: Not needed with sphinx>=4.0.1
+
+from sphinx.ext import autodoc  # noqa
+# remember the old function
+old_directive_header = autodoc.PropertyDocumenter.add_directive_header
+
+
+# make a new one that ignores the value error
+def _fixed_directive_header(*args, **argk):
+    """Catch the ValueError and ignore it as done in https://github.com/sphinx-doc/sphinx/pull/9190"""
+    try:
+        old_directive_header(*args, **argk)
+    except ValueError:
+        return None
+
+
+# and override the existing function with our new and improved version.
+autodoc.PropertyDocumenter.add_directive_header = _fixed_directive_header

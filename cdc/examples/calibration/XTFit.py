@@ -1,20 +1,16 @@
-import basf2
-import ROOT
 import datetime
-import os
 import re
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
-from ROOT.Belle2 import FileSystem
 from ROOT import gSystem
 gSystem.Load('libcdc')
 # gSystem.SetBatch(1);
 
-reset_database()
-use_database_chain()
-use_central_database("Calibration_Offline_Development", LogLevel.INFO)
-logging.log_level = LogLevel.INFO
-set_debug_level(200)
+b2.reset_database()
+b2.use_database_chain()
+b2.use_central_database("Calibration_Offline_Development", b2.LogLevel.INFO)
+b2.logging.log_level = b2.LogLevel.INFO
+b2.set_debug_level(200)
 
 d = datetime.datetime.today()
 print(d.strftime('This Calculution is done at : %d-%m-%y %H:%M:%S\n'))
@@ -36,11 +32,11 @@ with open('location') as file:
 xtfile = param_dir + xt_file
 rootfile = rootdir + "/output_*"
 
-main = create_path()
+main = b2.create_path()
 main.add_module('EventInfoSetter',
                 evtNumList=[1],
                 runList=[1])
-basf2.process(main)
+b2.process(main)
 
 fit = Belle2.CDC.XTCalibration()
 fit.inputFileNames(rootfile)

@@ -528,7 +528,6 @@ void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, i
   }
 
   // add relation
-  // cppcheck-suppress constVariable ; no, this can obviously not be const, we modify it in the next line, admittedly weirdly
   TClonesArray& relations = relContainer->elements();
   new(relations.AddrAt(relations.GetLast() + 1)) RelationElement(fromIndex, toIndex, weight);
 

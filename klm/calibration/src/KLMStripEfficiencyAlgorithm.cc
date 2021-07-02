@@ -57,7 +57,8 @@ KLMStripEfficiencyAlgorithm::KLMStripEfficiencyAlgorithm() :
 
 KLMStripEfficiencyAlgorithm::~KLMStripEfficiencyAlgorithm()
 {
-  delete m_StripEfficiency;
+  if (m_StripEfficiency != nullptr)
+    delete m_StripEfficiency;
 }
 
 CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
@@ -86,7 +87,7 @@ CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
   m_Results.m_AchievedPrecision = 0;
   KLMChannelIndex klmPlanes(KLMChannelIndex::c_IndexLevelPlane);
   for (KLMChannelIndex& klmPlane : klmPlanes) {
-    uint16_t plane = klmPlane.getKLMPlaneNumber();
+    KLMPlaneNumber plane = klmPlane.getKLMPlaneNumber();
     uint16_t planeIndex = m_PlaneArrayIndex->getIndex(plane);
     int extHits = allExtHitsInPlane->GetBinContent(planeIndex + 1);
     float efficiencyError = efficiencyHistogram->GetBinError(planeIndex + 1);
@@ -123,7 +124,7 @@ CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
       int layer = klmChannel.getLayer();
       int plane = klmChannel.getPlane();
       int strip = klmChannel.getStrip();
-      uint16_t planeKLM = 0;
+      KLMPlaneNumber planeKLM = 0;
       if (subdetector == KLMElementNumbers::c_BKLM) {
         planeKLM = m_ElementNumbers->planeNumberBKLM(
                      section, sector, layer, plane);

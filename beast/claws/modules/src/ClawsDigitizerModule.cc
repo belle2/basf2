@@ -10,8 +10,6 @@
 
 #include <beast/claws/modules/ClawsDigitizerModule.h>
 #include <beast/claws/dataobjects/CLAWSSimHit.h>
-
-#include <mdst/dataobjects/MCParticle.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
@@ -71,9 +69,7 @@ void ClawsDigitizerModule::beginRun()
 void ClawsDigitizerModule::event()
 {
 
-  StoreArray<MCParticle> particles;
   StoreArray<CLAWSSimHit> CLAWSSimHits;
-  StoreArray<ClawsHit> ClawsHits;
 
   //Skip events with no CLAWSSimHits, but continue the event counter
   if (CLAWSSimHits.getEntries() == 0) {

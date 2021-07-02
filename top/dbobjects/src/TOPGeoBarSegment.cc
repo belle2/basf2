@@ -68,10 +68,10 @@ namespace Belle2 {
   void TOPGeoBarSegment::constructContour(double A, double B, double fraction, double angle,
                                           std::vector<Pair>& contour) const
   {
-    if (fraction <= 0) {
+    if (fraction <= 0.) {
       return;
     }
-    if (fraction >= 1) {
+    if (fraction >= 1.) {
       contour.push_back(Pair(-A, B));
       contour.push_back(Pair(A, B));
       contour.push_back(Pair(A, -B));

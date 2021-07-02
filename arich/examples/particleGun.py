@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 from optparse import OptionParser
 from tracking import add_tracking_reconstruction
-from reconstruction import add_reconstruction
-from svd import add_svd_reconstruction
-from svd import add_svd_reconstruction_CoG
-from pxd import add_pxd_reconstruction
 from simulation import add_simulation
 import os
 # --------------------------------------------------------------------
@@ -24,30 +20,33 @@ parser.add_option('-f', '--file', dest='filename',
 
 home = os.environ['BELLE2_LOCAL_DIR']
 
-# use_local_database("local_db/database.txt","localdb")
+# set specific database tag
+# b2.conditions.override_globaltags(["tagname"])
+# use local database
+# b2.conditions.testing_payloads = ["localdb/database.txt"]
 
 # Suppress messages and warnings during processing:
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Set number of events to generate
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [int(options.nevents)], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 # Histogram manager immediately after master module
-histo = register_module('HistoManager')
+histo = b2.register_module('HistoManager')
 histo.param('histoFileName', 'DQMhistograms.root')  # File to save histograms
 main.add_module(histo)
 
 # Gearbox: access to database (xml files)
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # Particle gun: generate multiple tracks
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 particlegun.param('pdgCodes', [211, -211, 321, -321])
 particlegun.param('nTracks', 1)
 # particlegun.param('varyNTracks', True)
@@ -70,29 +69,29 @@ add_simulation(main, usePXDDataReduction=False)
 add_tracking_reconstruction(main)
 
 # Track extrapolation
-ext = register_module('Ext')
+ext = b2.register_module('Ext')
 main.add_module(ext)
 
 # convert ARICHDigits to ARICHHits
-arichHits = register_module('ARICHFillHits')
+arichHits = b2.register_module('ARICHFillHits')
 main.add_module(arichHits)
 
 # ARICH reconstruction
 # calculate PID likelihoods for all tracks
-arichreco = register_module('ARICHReconstructor')
+arichreco = b2.register_module('ARICHReconstructor')
 # store cherenkov angle information
 arichreco.param('storePhotons', 1)
 main.add_module(arichreco)
 
 # ARICH Ntuple
 # create flat ntuple for performance analysis
-arichNtuple = register_module('ARICHNtuple')
+arichNtuple = b2.register_module('ARICHNtuple')
 arichNtuple.param('outputFile', options.filename)
 main.add_module(arichNtuple)
 
 # ARICH DQM
 # create DQM occupancy plots
-arichdqm = register_module('ARICHDQM')
+arichdqm = b2.register_module('ARICHDQM')
 main.add_module(arichdqm)
 
 # Uncomment to store DataStore content to root file
@@ -107,14 +106,14 @@ main.add_module(arichdqm)
 # main.add_module(display)
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)
 
 # Make basic performance plots
 com = 'root -l ' + options.filename + ' ' + home + '/arich/utility/scripts/plotEfficiency.C'

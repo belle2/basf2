@@ -1,15 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import basf2
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
-import math as m
 import ROOT as r
-import os.path
-import sys
-from basf2 import conditions as b2conditions
 
 ##################################################################################
 #
@@ -22,9 +16,11 @@ from basf2 import conditions as b2conditions
 ##################################################################################
 
 
-class printVelocity(basf2.Module):
+class printVelocity(b2.Module):
+    """ print velocity """
 
     def beginRun(self):
+        """do everything here"""
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -47,10 +43,11 @@ class printVelocity(basf2.Module):
             sensorInfo.getVelocity(+1, r.TVector3(0, 0, z)).Print()
 
 
-class printMobility(basf2.Module):
+class printMobility(b2.Module):
+    """print mobility"""
 
     def beginRun(self):
-
+        """do everything here"""
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
         layer = 3
@@ -77,13 +74,14 @@ class printMobility(basf2.Module):
 
         print('TEMPERATURE = ' + str(sensorInfo.getTemperature))
 
+
 # add your GT here:
 # gt = ""
 # b2conditions.prepend_globaltag(gt)
 
-main = create_path()
+main = b2.create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('expList', [1003])
 eventinfosetter.param('runList', [0])
 eventinfosetter.param('evtNumList', [1])
@@ -95,9 +93,9 @@ main.add_module('Geometry')
 main.add_module(printVelocity())
 main.add_module(printMobility())
 
-print_path(main)
+b2.print_path(main)
 
 # Process events
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

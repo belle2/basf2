@@ -29,84 +29,83 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
   setDescription("PXD: Check Post Unpacking for DAQ errors");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  constexpr uint64_t defaulterrormask =
-    c_EVENT_STRUCT |
-    c_FRAME_TNR_MM |
-    c_META_MM |
-    c_ONSEN_TRG_FIRST |
-    //
-    c_DHC_END_MISS |
-    c_NR_FRAMES_TO_SMALL |
-//         c_ROI_PACKET_INV_SIZE | // does not affect pixel data
-    c_DATA_OUTSIDE |
-    //
-    c_DHC_START_SECOND |
-//    c_DHE_WRONG_ID_SEQ | // until this is fixed in FW, we have to live with this
-    c_FIX_SIZE |
-    c_DHE_CRC |
-    //
-    c_DHC_UNKNOWN |
-    c_HEADERTYPE_INV |
-    c_PACKET_SIZE |
-    c_MAGIC |
-    //
-    c_FRAME_NR |
-    c_FRAME_SIZE |
-    c_HLTROI_MAGIC |
-    c_MERGER_TRIGNR |
-    //
-    c_DHP_SIZE |
-    c_DHE_DHP_DHEID |
-    c_DHE_DHP_PORT |
-//    c_DHP_PIX_WO_ROW | // FIXME this should not be needed
-    //
-    c_DHE_START_END_ID |
-    c_DHE_START_ID |
-    c_DHE_START_WO_END |
-//    c_NO_PXD | // THEN we anyway have no data
-    //
-//         c_NO_DATCON |  // does not affect pixel data
-//         c_FAKE_NO_DATA_TRIG | // this will trigger always!!!!
-    c_DHE_ACTIVE |
-//         c_DHP_ACTIVE | // GHOST problem ... bit always set
-    //
-    c_SENDALL_TYPE |
-    c_NOTSENDALL_TYPE |
-    c_DHP_DBL_HEADER |
-    c_HEADER_ERR |
-    //
-    c_HEADER_ERR_GHOST |
-    c_SUSP_PADDING |
-    c_DHC_WIE |
-    c_DHE_WIE |
-    //
-    c_ROW_OVERFLOW |
-//         c_DHP_NOT_CONT | // GHOST problem
-    c_DHP_DHP_FRAME_DIFFER |
-    c_DHP_DHE_FRAME_DIFFER |
-    //
-    c_DHE_ID_INVALID |
-    c_DHC_DHCID_START_END_MM |
-    c_DHE_END_WO_START |
-    c_DHC_END_DBL |
-    //
-    c_META_MM_DHC |
-    c_META_MM_DHE |
-//         c_COL_OVERFLOW | // we might get that for unconnected lines -> "DHPT fix"
-    c_UNEXPECTED_FRAME_TYPE |
-    //
-    c_META_MM_DHC_ERS |
-//         c_META_MM_DHC_TT | // time tag is not set correctly in EvtMeta
-    c_META_MM_ONS_HLT |
-//         c_META_MM_ONS_DC | // problem with NO-DATCON
-    //
-//         c_EVT_TRG_GATE_DIFFER | // still a bug in DHE FW
-//         c_EVT_TRG_FRM_NR_DIFFER | // still a bug in DHE FW
-//         c_DHP_ROW_WO_PIX | // still a bug in DHE FW?
-    c_DHE_START_THIRD |
-    //
-    c_FAKE_NO_FAKE_DATA ;
-
+  PXDError::PXDErrorFlags defaulterrormask;
+  defaulterrormask[c_nrEVENT_STRUCT ] = 1;
+  defaulterrormask[c_nrFRAME_TNR_MM ] = 1;
+  defaulterrormask[c_nrMETA_MM ] = 1;
+  defaulterrormask[c_nrONSEN_TRG_FIRST ] = 1;
+  //
+  defaulterrormask[c_nrDHC_END_MISS ] = 1;
+  defaulterrormask[c_nrNR_FRAMES_TO_SMALL ] = 1;
+  // defaulterrormask[c_nrROI_PACKET_INV_SIZE ] = 1; // does not affect pixel data
+  defaulterrormask[c_nrDATA_OUTSIDE ] = 1;
+  //
+  defaulterrormask[c_nrDHC_START_SECOND ] = 1;
+  // defaulterrormask[c_nrDHE_WRONG_ID_SEQ ] = 1; // until this is fixed in FW, we have to live with this
+  defaulterrormask[c_nrFIX_SIZE ] = 1;
+  defaulterrormask[c_nrDHE_CRC ] = 1;
+  //
+  defaulterrormask[c_nrDHC_UNKNOWN ] = 1;
+  defaulterrormask[c_nrHEADERTYPE_INV ] = 1;
+  defaulterrormask[c_nrPACKET_SIZE ] = 1;
+  defaulterrormask[c_nrMAGIC ] = 1;
+  //
+  defaulterrormask[c_nrFRAME_NR ] = 1;
+  defaulterrormask[c_nrFRAME_SIZE ] = 1;
+  defaulterrormask[c_nrHLTROI_MAGIC ] = 1;
+  defaulterrormask[c_nrMERGER_TRIGNR ] = 1;
+  //
+  defaulterrormask[c_nrDHP_SIZE ] = 1;
+  defaulterrormask[c_nrDHE_DHP_DHEID ] = 1;
+  defaulterrormask[c_nrDHE_DHP_PORT ] = 1;
+  // defaulterrormask[c_nrDHP_PIX_WO_ROW ] = 1; // FIXME this should not be needed
+  //
+  defaulterrormask[c_nrDHE_START_END_ID ] = 1;
+  defaulterrormask[c_nrDHE_START_ID ] = 1;
+  defaulterrormask[c_nrDHE_START_WO_END ] = 1;
+  // defaulterrormask[c_nrNO_PXD ] = 1; // THEN we anyway have no data
+  //
+  // defaulterrormask[c_nrNO_DATCON ] = 1;  // does not affect pixel data
+  // defaulterrormask[c_nrFAKE_NO_DATA_TRIG ] = 1; // this will trigger always!!!!
+  defaulterrormask[c_nrDHE_ACTIVE ] = 1;
+  // defaulterrormask[c_nrDHP_ACTIVE ] = 1; // GHOST problem ... bit always set
+  //
+  defaulterrormask[c_nrSENDALL_TYPE ] = 1;
+  defaulterrormask[c_nrNOTSENDALL_TYPE ] = 1;
+  defaulterrormask[c_nrDHP_DBL_HEADER ] = 1;
+  defaulterrormask[c_nrHEADER_ERR ] = 1;
+  //
+  defaulterrormask[c_nrHEADER_ERR_GHOST ] = 1;
+  defaulterrormask[c_nrSUSP_PADDING ] = 1;
+  defaulterrormask[c_nrDHC_WIE ] = 1;
+  defaulterrormask[c_nrDHE_WIE ] = 1;
+  //
+  defaulterrormask[c_nrROW_OVERFLOW ] = 1;
+  // defaulterrormask[c_nrDHP_NOT_CONT ] = 1; // GHOST problem
+  defaulterrormask[c_nrDHP_DHP_FRAME_DIFFER ] = 1;
+  defaulterrormask[c_nrDHP_DHE_FRAME_DIFFER ] = 1;
+  //
+  defaulterrormask[c_nrDHE_ID_INVALID ] = 1;
+  defaulterrormask[c_nrDHC_DHCID_START_END_MM ] = 1;
+  defaulterrormask[c_nrDHE_END_WO_START ] = 1;
+  defaulterrormask[c_nrDHC_END_DBL ] = 1;
+  //
+  defaulterrormask[c_nrMETA_MM_DHC ] = 1;
+  defaulterrormask[c_nrMETA_MM_DHE ] = 1;
+  // defaulterrormask[c_nrCOL_OVERFLOW ] = 1; // we might get that for unconnected lines -> "DHPT fix"
+  defaulterrormask[c_nrUNEXPECTED_FRAME_TYPE ] = 1;
+  //
+  defaulterrormask[c_nrMETA_MM_DHC_ERS ] = 1;
+  // defaulterrormask[c_nrMETA_MM_DHC_TT ] = 1; // time tag is not set correctly in EvtMeta
+  defaulterrormask[c_nrMETA_MM_ONS_HLT ] = 1;
+  // defaulterrormask[c_nrMETA_MM_ONS_DC ] = 1; // problem with NO-DATCON
+  //
+  // defaulterrormask[c_nrEVT_TRG_GATE_DIFFER ] = 1; // still a bug in DHE FW
+  // defaulterrormask[c_nrEVT_TRG_FRM_NR_DIFFER ] = 1; // still a bug in DHE FW
+  // defaulterrormask[c_nrDHP_ROW_WO_PIX ] = 1; // still a bug in DHE FW?
+  defaulterrormask[c_nrDHE_START_THIRD ] = 1;
+  //
+  defaulterrormask[c_nrFAKE_NO_FAKE_DATA ] = 1;
   // other bits not used yet
 
   addParam("PXDDAQEvtStatsName", m_PXDDAQEvtStatsName, "The name of the StoreObjPtr of input PXDDAQEvtStats", std::string(""));
@@ -114,8 +113,21 @@ PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
   addParam("PXDRawAdcsName", m_PXDRawAdcsName, "The name of the StoreArray of input PXDRawAdcs", std::string(""));
   addParam("PXDRawROIsName", m_PXDRawROIsName, "The name of the StoreArray of input PXDRawROIs", std::string(""));
 
-  addParam("CriticalErrorMask", m_criticalErrorMask, "Set error mask for which data is removed", defaulterrormask);
-  B2DEBUG(25, "The default error mask is $" << std::hex << defaulterrormask);
+  int crit = 0;
+  addParam("CriticalErrorMask", crit, "Set error mask for which data is removed (0=none, 1=default, other undefined yet)", 1);
+  switch (crit) {
+    case 0:
+      m_criticalErrorMask = 0;
+      B2INFO("Disabling critical error mask");
+      break;
+    case 1:
+      m_criticalErrorMask = defaulterrormask;
+      break;
+    default:
+      B2FATAL("Undefined value for criticalErrorMaskSet");
+      break;
+  }
+  // B2DEBUG(25, "The default error mask is $" << std::hex << defaulterrormask);
 
   addParam("IgnoreTriggerGate", m_ignoreTriggerGate, "Ignore different triggergate between DHEs", true);
   addParam("IgnoreDHPFrame", m_ignoreDHPFrame, "Ignore different dhp frame between DHEs", true);
@@ -152,7 +164,7 @@ void PXDPostErrorCheckerModule::event()
   unsigned short triggergate = 0;
   unsigned short dheframenr = 0;
   std::map <int, int> found_dhe;
-  PXDErrorFlags mask = EPXDErrMask::c_NO_ERROR;
+  PXDErrorFlags mask{};// construct to no error
   B2DEBUG(25, "Iterate PXD Packets for this Event");
   for (auto& pkt : *m_storeDAQEvtStats) {
     B2DEBUG(25, "Iterate DHC in Pkt " << pkt.getPktIndex());
@@ -165,12 +177,12 @@ void PXDPostErrorCheckerModule::event()
           if (dhe.getTriggerGate() != triggergate) {
             if (!m_ignoreTriggerGate) B2WARNING("Trigger Gate of DHEs not identical" << LogVar("Triggergate 1",
                                                   triggergate) << LogVar("TriggerGate 2", dhe.getTriggerGate()));
-            mask |= EPXDErrMask::c_EVT_TRG_GATE_DIFFER;
+            mask [c_nrEVT_TRG_GATE_DIFFER] = true;
           }
           if (dhe.getFrameNr() != dheframenr) {
             if (!m_ignoreDHPFrame) B2WARNING("Frame Nr of DHEs not identical" << LogVar("FrameNr 1", dheframenr) << LogVar("FrameNr 2",
                                                dhe.getFrameNr()));
-            mask |= EPXDErrMask::c_EVT_TRG_FRM_NR_DIFFER;
+            mask [c_nrEVT_TRG_FRM_NR_DIFFER] = true;
           }
         } else {
           triggergate = dhe.getTriggerGate();

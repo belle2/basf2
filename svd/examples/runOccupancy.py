@@ -12,13 +12,10 @@
 # 2020 Belle II Collaboration
 #############################################################
 
-import os
 import glob
 
-from basf2 import *
+import basf2 as b2
 from basf2 import conditions as b2conditions
-from svd import add_svd_reconstruction
-from tracking import add_tracking_reconstruction
 from rawdata import add_unpackers
 from simulation import add_simulation
 
@@ -39,16 +36,16 @@ if data:
     b2conditions.override_globaltags()
     b2conditions.globaltags = ['klm_alignment_testing', 'online']
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('expList', [1003])
 eventinfosetter.param('runList', [1])
 
-evtgeninput = register_module('EvtGenInput')
-evtgeninput.logging.log_level = LogLevel.INFO
+evtgeninput = b2.register_module('EvtGenInput')
+evtgeninput.logging.log_level = b2.LogLevel.INFO
 
 
 # main main
-main = create_path()
+main = b2.create_path()
 
 
 # read input rootfile
@@ -88,9 +85,9 @@ main.add_module(
 # == Show progress
 main.add_module('Progress')
 
-print_path(main)
+b2.print_path(main)
 
 # Process events
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

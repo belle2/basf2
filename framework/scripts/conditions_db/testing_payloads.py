@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Script to upload local database to ConditionsDB.
@@ -11,7 +10,7 @@ all tags already exist.
 
 import os
 from basf2 import B2ERROR, LogLevel, logging
-from . import file_checksum
+from conditions_db import file_checksum
 from B2Tools.b2root import normalize_file
 
 
@@ -25,11 +24,9 @@ class TestingPayloadEntry:
         except ValueError:
             raise ValueError("line must be of the form 'dbstore/<payloadname> <revision> "
                              "<firstExp>,<firstRun>,<finalExp>,<finalRun>'")
-        try:
-            #: revision stored in the file
-            self.revision = int(revision)
-        except ValueError:
-            raise ValueError("revision must be an integer")
+
+        #: revision stored in the file
+        self.revision = revision
 
         try:
             #: module name

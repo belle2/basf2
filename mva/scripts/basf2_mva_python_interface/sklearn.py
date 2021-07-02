@@ -6,7 +6,7 @@
 import numpy as np
 
 try:
-    import sklearn
+    import sklearn  # noqa
 except ImportError:
     print("Please install sklearn: pip3 install sklearn")
     import sys
@@ -19,6 +19,7 @@ class State(object):
     """
     SKLearn state
     """
+
     def __init__(self, estimator=None):
         """ Constructor of the state object """
         #: Pickable sklearn estimator

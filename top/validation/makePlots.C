@@ -15,7 +15,7 @@
 #include <TCut.h>
 
 // basic event selection requirement
-TCut evt_select = "primary == 1 && barHit.barID == extHit.barID && pValue > 0.001";
+TCut evt_select = "primary == 1 && barHit.moduleID == extHit.moduleID && pValue > 0.001";
 
 void kaonID(TTree* top);
 void numberOfPhotons(TTree* top);

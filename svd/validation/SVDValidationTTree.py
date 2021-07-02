@@ -11,16 +11,14 @@
   </description>
 </header>
 """
-import sys
 import math
 
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
 from ROOT import Belle2
-from ROOT import gROOT, AddressOf
-from ROOT import PyConfig
+from ROOT import gROOT, addressof
 from ROOT import TVector3
 
 # Define a ROOT struct to hold output data in the TTree
@@ -55,7 +53,7 @@ gROOT.ProcessLine('struct EventData {\
 from ROOT import EventData  # noqa
 
 
-class SVDValidationTTree(Module):
+class SVDValidationTTree(b2.Module):
     '''class to produced the validation ttree '''
 
     def __init__(self):
@@ -63,12 +61,12 @@ class SVDValidationTTree(Module):
 
         super(SVDValidationTTree, self).__init__()
 
+        #: Output ROOT file
         self.file = ROOT.TFile('../SVDValidationTTree.root', 'recreate')
-        '''Output ROOT file'''
+        #: TTree for output data
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-        '''TTrees for output data'''
+        #: instance of EventData class
         self.data = EventData()
-        '''Instance of the EventData class'''
 
         # Declare tree branches
         for key in EventData.__dict__:
@@ -76,7 +74,7 @@ class SVDValidationTTree(Module):
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
-                self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
+                self.tree.Branch(key, addressof(self.data, key), key + formstring)
 
     def beginRun(self):
         """ Does nothing """

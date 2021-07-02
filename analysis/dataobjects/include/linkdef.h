@@ -5,13 +5,13 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::Particle+; // checksum=0x5a78ef64, version=13
+#pragma link C++ class Belle2::Particle+; // checksum=0xd7cf258f, version=14
 #pragma link C++ class Belle2::EventExtraInfo+; // checksum=0x965ad50b, version=2
 #pragma link C++ class Belle2::ParticleList+; // checksum=0x98887650, version=3
-#pragma link C++ class Belle2::RestOfEvent+; // checksum=0x47e1a2eb, version=6
+#pragma link C++ class Belle2::RestOfEvent+; // checksum=0xe86f1658, version=7
 #pragma link C++ class Belle2::TagVertex+; // checksum=0xbc37ca67, version=5
 #pragma link C++ class Belle2::ContinuumSuppression+; // checksum=0xccdb3c88, version=1
-#pragma link C++ class Belle2::FlavorTaggerInfo+; // checksum=0x2e59c562, version=3
+#pragma link C++ class Belle2::FlavorTaggerInfo+; // checksum=0xa85ce063, version=4
 #pragma link C++ class Belle2::FlavorTaggerInfoMap+; // checksum=0xcdef997a, version=3
 #pragma link C++ class Belle2::StringWrapper+; // checksum=0xf15ef1c4, version=1
 #pragma link C++ class Belle2::EventShapeContainer+; // checksum=0x57e119da, version=1
@@ -43,13 +43,18 @@
 // ----------------------------------------------------------------------------
 // Particle evolution
 // In version 12 the member m_particleType has been renamed to m_particleSource.
-#pragma read                                                      \
-  sourceClass="Belle2::Particle"                                  \
-  source="Belle2::Particle::EParticleSourceObject m_particleType" \
-  version="[-11]"                                                 \
-  targetClass="Belle2::Particle"                                  \
-  target="m_particleSource"                                       \
-  code="{m_particleSource = onfile.m_particleType;}"              \
+#pragma read                                                                          \
+  sourceClass="Belle2::Particle"                                                      \
+  source="Belle2::Particle::EParticleSourceObject m_particleType"                     \
+  version="[-11]"                                                                     \
+  targetClass="Belle2::Particle"                                                      \
+  target="m_particleSource"                                                           \
+  code="{if (onfile.m_particleType == 4)                                              \
+           m_particleSource = Belle2::Particle::EParticleSourceObject::c_MCParticle;  \
+         else if (onfile.m_particleType == 5)                                         \
+           m_particleSource = Belle2::Particle::EParticleSourceObject::c_Composite;   \
+         else m_particleSource = onfile.m_particleType;                               \
+       }"                                                                             \
 
 // ----------------------------------------------------------------------------
 // TagVertex evolution

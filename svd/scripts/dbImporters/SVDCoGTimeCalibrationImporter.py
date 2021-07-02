@@ -17,20 +17,12 @@
 #################################################################################
 
 
-from basf2 import *
-from svd import *
+import basf2 as b2
+import svd
 import os
-import math
-from array import array
-import basf2
 import sys
-from ROOT.Belle2 import SVDCoGCalibrationFunction
-from ROOT.Belle2 import SVDCoGTimeCalibrations
-from svd import *
 from svd.CoGCalibration_utils import SVDCoGTimeCalibrationImporterModule
 from basf2 import conditions as b2conditions
-import matplotlib.pyplot as plt
-import simulation
 
 localdb = sys.argv[1]
 filename = sys.argv[2]
@@ -70,9 +62,9 @@ else:
     else:
         b2conditions.testing_payloads = [str(localdb)]
 
-main = create_path()
+main = b2.create_path()
 
-rootinput = register_module('RootInput')
+rootinput = b2.register_module('RootInput')
 rootinput.param('inputFileNames', inputFileList)
 rootinput.param('branchNames', branches)
 main.add_module(rootinput)
@@ -81,7 +73,7 @@ main.add_module("Gearbox")
 main.add_module("Geometry", useDB=True)
 
 # Track selection - NOT YET
-trkFlt = register_module('TrackFilter')
+trkFlt = b2.register_module('TrackFilter')
 trkFlt.param('outputFileName', trk_outputFile)
 trkFlt.param('outputINArrayName', 'SelectedTracks')
 trkFlt.param('outputOUTArrayName', 'ExcludedTracks')
@@ -91,11 +83,11 @@ trkFlt.param('min_Pvalue', pVal)
 # trkFlt.logging.log_level = LogLevel.DEBUG
 # main.add_module(trkFlt)
 
-fil = register_module('SVDShaperDigitsFromTracks')
+fil = b2.register_module('SVDShaperDigitsFromTracks')
 fil.param('outputINArrayName', 'SVDShaperDigitsFromTracks')
 main.add_module(fil)
 
-add_svd_reconstruction(main)
+svd.add_svd_reconstruction(main)
 
 for moda in main.modules():
     if moda.name() == 'SVDCoGTimeEstimator':
@@ -113,12 +105,12 @@ calib.notApplyCorrectForCDCLatency(False)  # False = apply correction, True = no
 main.add_module(calib)
 
 # Show progress of processing
-progress = register_module('ProgressBar')
+progress = b2.register_module('ProgressBar')
 main.add_module(progress)
 
-print_path(main)
+b2.print_path(main)
 
 # Process events
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

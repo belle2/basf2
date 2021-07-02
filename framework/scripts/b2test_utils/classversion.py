@@ -25,12 +25,12 @@ from basf2 import B2INFO, B2ERROR, B2WARNING
 
 class ClassVersionError(Exception):
     """Exception to report class version errors"""
-    pass
 
 
 class ErrorWithExtraVariables(Exception):
     """Exception class with extra keyword arguments to show in log message"""
     #: Initialize the class.
+
     def __init__(self, *args, **argk):
         super().__init__(*args)
         #: Class variables.
@@ -40,7 +40,7 @@ class ErrorWithExtraVariables(Exception):
 def check_base_classes(tclass):
     """Recursively check all base classes of a TClass to make sure all are well defined"""
     bases = tclass.GetListOfBases()
-    if not bases:
+    if bases is None:
         raise ClassVersionError("Cannot get list of base classes.")
     for base in bases:
         baseclass = base.GetClassPointer()
@@ -53,7 +53,7 @@ def check_dictionary(classname):
     """Make sure we have a dictionary for the class and all its members"""
     tclass = ROOT.TClass.GetClass(classname)
     if not tclass:
-        raise ClassVersionError(f"Cannot find TClass object")
+        raise ClassVersionError("Cannot find TClass object")
     streamerinfo = tclass.GetStreamerInfo()
     if streamerinfo:
         for element in streamerinfo.GetElements():
@@ -67,7 +67,7 @@ def get_class_version(classname):
     """Get the Class version and checksum for a fully qualified C++ class name"""
     tclass = ROOT.TClass.GetClass(classname)
     if not tclass:
-        raise ClassVersionError(f"Cannot find TClass object")
+        raise ClassVersionError("Cannot find TClass object")
     # good time to also check base classes
     check_base_classes(tclass)
     version = tclass.GetClassVersion()
@@ -201,6 +201,8 @@ def check_linkdef(filename, message_style="belle2"):
                 check_dictionary(classname)
             except ClassVersionError as e:
                 print_message("error", e)
+        else:
+            continue
 
         # and check expected version/checksum
         expected_version = get_int(options, "version")

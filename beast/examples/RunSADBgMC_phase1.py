@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
-import os
 import sys
-import math
-import string
 import datetime
 
 
-class PyTrigger(Module):
+class PyTrigger(b2.Module):
 
     """Returns 1 if current event contains at least one BEAST hit, 0 otherwise"""
 
@@ -160,21 +157,21 @@ print('readouttime:', readouttime)
 
 # Set the global log level
 # set_log_level(LogLevel.ERROR)
-set_log_level(LogLevel.WARNING)
+b2.set_log_level(b2.LogLevel.WARNING)
 # set_log_level(LogLevel.DEBUG)
 
-set_random_seed(int(seed))
+b2.set_random_seed(int(seed))
 
 # Register the event meta generator and set the number of events to a very
 # high number which exceeds the number of events in the input file.
 # Register the event meta generator and set the number of events to a very
 # high number which exceeds the number of events in the input file.
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [nevent], 'runList': [1], 'expList': [1]})
 
 # Register the TouschekSADInput module and specify the location of the Touschek
 # input file. The file can be downloaded from the TWiki.
-touschekinput = register_module('SADInput')
+touschekinput = b2.register_module('SADInput')
 touschekinput.param('Filename', inputfilename)
 
 # Set the ReadMode of the TouschekSAD input module
@@ -203,10 +200,10 @@ touschekinput.param('Range', range)
 
 # Register the standard chain of modules to the framework,
 # which are required for the simulation.
-gearbox = register_module('Gearbox')
-geometry = register_module('Geometry')
+gearbox = b2.register_module('Gearbox')
+geometry = b2.register_module('Geometry')
 gearbox.param('fileName', '/geometry/Beast2_phase1.xml')
-fullsim = register_module('FullSim')
+fullsim = b2.register_module('FullSim')
 
 param_fullsim = {'RegisterOptics': 1, 'PhotonFraction': 0.3}
 fullsim.param(param_fullsim)
@@ -221,10 +218,10 @@ fullsim.param('SecondariesEnergyCut', 0.0)  # in MeV
 # fullsim.set_log_level(LogLevel.DEBUG)
 
 # Add additional modules according to your own needs
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 
 # Write the output to a file
-rootoutput = register_module('RootOutput')
+rootoutput = b2.register_module('RootOutput')
 rootoutput.param('outputFileName', outputfilename)
 rootoutput.param('updateFileCatalog', False)
 # rootoutput.param('branchNames', ["BeamBackHits"])
@@ -237,7 +234,7 @@ rootoutput.param('branchNames', ['BgoSimHits', 'MicrotpcSimHits',
                                  'PindiodeSimHits', 'He3tubeSimHits', 'CsiSimHits'])
 
 # Create the main path and add the required modules
-main = create_path()
+main = b2.create_path()
 main.add_module(eventinfosetter)
 main.add_module(gearbox)
 main.add_module(touschekinput)
@@ -263,11 +260,11 @@ main.add_module(rootoutput)
 # he3tube.param('sampleTime', sampletime);
 # main.add_module(he3tube)
 
-process(main)
+b2.process(main)
 
 # Print some basic event statistics
 print('Event Statistics:')
-print(statistics)
+print(b2.statistics)
 
 d = datetime.datetime.today()
 print(d.strftime('job finish: %Y-%m-%d %H:%M:%S\n'))

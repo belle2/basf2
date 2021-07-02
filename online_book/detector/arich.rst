@@ -1,4 +1,0 @@
-ARICH
-=====
-
-.. include:: ../todo.rst

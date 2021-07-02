@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-# -*-  coding: utf-8 -*-
 # Author: Marcel Hohmann (marcel.hohmann@desy.de)
 
 import basf2
-from modularAnalysis import inputMdst, matchMCTruth, variablesToNtuple, process, statistics
+from basf2 import process, statistics
+from modularAnalysis import inputMdst, matchMCTruth, variablesToNtuple
 from stdV0s import stdKshorts
 import sys
 import os
@@ -87,9 +87,9 @@ data_base_file = here + "/localdb/database.txt"
 
 # upload to global database
 if upload:
-    os.system("conditionsdb upload {TAGNAME} {DATABASEFILE}".format(TAGNAME=tag_name, DATABASEFILE=data_base_file))
+    os.system(f"b2conditionsdb-upload {tag_name} {data_base_file}")
 
 if remove_local_files:
     os.system('rm -r {}'.format(here + '/localdb/'))
-    os.system('rm {}/{}'.format(here, training_file_name))
-    os.system('rm {}/{}'.format(here, identifier))
+    os.system(f'rm {here}/{training_file_name}')
+    os.system(f'rm {here}/{identifier}')

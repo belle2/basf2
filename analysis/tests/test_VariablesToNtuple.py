@@ -5,17 +5,17 @@ import os
 import basf2
 import ROOT
 import b2test_utils
-from ROOT import Belle2
 
-inputFile = b2test_utils.require_file('mdst12.root', 'validation')
+inputFile = b2test_utils.require_file('mdst14.root', 'validation')
 path = basf2.create_path()
 path.add_module('RootInput', inputFileName=inputFile)
-path.add_module('ParticleLoader', decayStringsWithCuts=[('e+', '')])
-path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma', 'clusterE > 2.5')])
+path.add_module('ParticleLoader', decayStrings=['e+'])
+path.add_module('ParticleLoader', decayStrings=['gamma'])
+path.add_module('ParticleListManipulator', outputListName='gamma', inputListNames=['gamma:all'], cut='clusterE > 2.5')
 
 # Write out electron id and momentum of all true electron candidates and every 10th wrong electron candidate
 path.add_module('VariablesToNtuple',
-                particleList='e+',
+                particleList='e+:all',
                 variables=['electronID', 'p', 'isSignal'],
                 sampling=('isSignal', {1: 0, 0: 20}),
                 fileName='particleListNtuple.root',
@@ -62,6 +62,7 @@ with b2test_utils.clean_working_directory():
     assert t1.GetListOfBranches().Contains('__event__'), "event number branch is missing from electronList tree"
     assert t1.GetListOfBranches().Contains('__run__'), "run number branch is missing from electronList tree"
     assert t1.GetListOfBranches().Contains('__experiment__'), "experiment number branch is missing from electronList tree"
+    assert t1.GetListOfBranches().Contains('__production__'), "production number branch is missing from electronList tree"
     assert t1.GetListOfBranches().Contains('__candidate__'), "candidate number branch is missing from electronList tree"
     assert t1.GetListOfBranches().Contains('__ncandidates__'), "candidate count branch is missing from electronList tree"
 
@@ -71,6 +72,7 @@ with b2test_utils.clean_working_directory():
     assert t2.GetListOfBranches().Contains('__event__'), "event number branch is missing from photonList tree"
     assert t2.GetListOfBranches().Contains('__run__'), "run number branch is missing from photonList tree"
     assert t2.GetListOfBranches().Contains('__experiment__'), "experiment number branch is missing from photonList tree"
+    assert t2.GetListOfBranches().Contains('__production__'), "production number branch is missing from photonList tree"
     assert t2.GetListOfBranches().Contains('__candidate__'), "candidate number branch is missing from photonList tree"
     assert t2.GetListOfBranches().Contains('__ncandidates__'), "candidate count branch is missing from photonList tree"
 
@@ -78,15 +80,15 @@ with b2test_utils.clean_working_directory():
     nBckgrd = 0
     for event in t1:
         if event.isSignal == 1:
-            assert event.__weight__ == 1, "Expected weight 1 for a true electron candidate got {}".format(event.__weight__)
+            assert event.__weight__ == 1, f"Expected weight 1 for a true electron candidate got {event.__weight__}"
             nSignal += 1
         else:
-            assert event.__weight__ == 20, "Expected weight 20 for a wrong electron candidate got {}".format(event.__weight__)
+            assert event.__weight__ == 20, f"Expected weight 20 for a wrong electron candidate got {event.__weight__}"
             nBckgrd += 1
     assert nBckgrd < nSignal, "Expected less background than signal due to the large sampling rate"
 
     for event in t2:
-        assert event.__weight__ == 1, "Expected weight 1 for all photon candidates got {}".format(event.__weight__)
+        assert event.__weight__ == 1, f"Expected weight 1 for all photon candidates got {event.__weight__}"
 
     assert os.path.isfile('eventNtuple.root'), "eventNtuple.root wasn't created"
     f = ROOT.TFile('eventNtuple.root')
@@ -98,22 +100,24 @@ with b2test_utils.clean_working_directory():
     assert t.GetListOfBranches().Contains('__event__'), "event number branch is missing"
     assert t.GetListOfBranches().Contains('__run__'), "run number branch is missing"
     assert t.GetListOfBranches().Contains('__experiment__'), "experiment number branch is missing"
+    assert t.GetListOfBranches().Contains('__production__'), "production number branch is missing"
     assert not t.GetListOfBranches().Contains('__candidate__'), "candidate number branch is present in eventwise tree"
     assert not t.GetListOfBranches().Contains('__ncandidates__'), "candidate count branch is present in eventwise tree"
 
     t.GetEntry(0)
     assert t.__run__ == 0, "run number not as expected"
-    assert t.__experiment__ == 0, "experiment number not as expected"
+    assert t.__experiment__ == 1003, "experiment number not as expected"
     assert t.__event__ == 1, "event number not as expected"
+    assert t.__production__ == 0, "production number not as expected"
 
     nTracks_12 = 0
     nTracks_11 = 0
     for event in t:
         if event.nTracks == 12:
-            assert event.__weight__ == 10, "Expected weight 10 in an event with 12 tracks got {}".format(event.__weight__)
+            assert event.__weight__ == 10, f"Expected weight 10 in an event with 12 tracks got {event.__weight__}"
             nTracks_12 += 1
         else:
-            assert event.__weight__ == 1, "Expected weight 1 in an event with unequal 12 tracks got {}".format(event.__weight__)
+            assert event.__weight__ == 1, f"Expected weight 1 in an event with unequal 12 tracks got {event.__weight__}"
             if event.nTracks == 11:
                 nTracks_11 += 1
     assert nTracks_12 * 5 < nTracks_11, "Expected much less events with 12 tracks than with 11, due to the large sampling rate"
@@ -128,10 +132,12 @@ with b2test_utils.clean_working_directory():
 
     t.GetEntry(0)
     assert t.__run__ == 0, "run number not as expected"
-    assert t.__experiment__ == 0, "experiment number not as expected"
+    assert t.__experiment__ == 1003, "experiment number not as expected"
     assert t.__event__ == 1, "event number not as expected"
+    assert t.__production__ == 0, "production number not as expected"
 
     t.GetEntry(9)
     assert t.__run__ == 0, "run number not as expected"
-    assert t.__experiment__ == 0, "experiment number not as expected"
+    assert t.__experiment__ == 1003, "experiment number not as expected"
     assert t.__event__ == 10, "event number not as expected"
+    assert t.__production__ == 0, "production number not as expected"

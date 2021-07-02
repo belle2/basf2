@@ -128,6 +128,7 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
     }
   }
 
+  //TODO in future: make a new (singleton?) class and move all EDepToADC things there.
   if (gcp.getEDepToADCInputType()) {
     m_eDepToADCConversionsFromDB = new OptionalDBObjPtr<CDCEDepToADCConversions>;
     if ((*m_eDepToADCConversionsFromDB).isValid()) {
@@ -326,12 +327,12 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   m_fieldWireDiameter = geom.getFieldDiameter();
 
   //Set various quantities (should be moved to CDC.xml later...)
-  m_clockFreq4TDC = 1.017774;  //in GHz
-  double tmp = geom.getClockFrequency();
-
-  if (tmp != m_clockFreq4TDC) {
-    B2WARNING("CDCGeometryPar: The default clock freq. for TDC (" << m_clockFreq4TDC << " GHz) is replaced with " << tmp << " (GHz).");
-    m_clockFreq4TDC = tmp;
+  m_clockFreq4TDC = geom.getClockFrequency();
+  const double officialClockFreq4TDC = 2 * m_clockSettings->getAcceleratorRF(); // in GHz
+  if (m_clockFreq4TDC != officialClockFreq4TDC) {
+    B2WARNING("ClockFreq4TDC changed from cdclocal " << scientific << setprecision(6) << m_clockFreq4TDC << " to official " <<
+              officialClockFreq4TDC << " (GHz)!");
+    m_clockFreq4TDC = officialClockFreq4TDC;
   }
   B2DEBUG(100, "CDCGeometryPar: Clock freq. for TDC= " << m_clockFreq4TDC << " (GHz).");
   m_tdcBinWidth = 1. / m_clockFreq4TDC;  //in ns
@@ -1250,8 +1251,8 @@ void CDCGeometryPar::readEDepToADC(const GearDir& gbxParams, const int mode)
 
   unsigned short paramMode(0), nParams(0);
   ifs >> paramMode >> nParams;
-  if (paramMode > 0) B2FATAL("Param mode > 0!");
-  if (nParams > 6)   B2FATAL("No. of params. > 6!");
+  if (paramMode > 1) B2FATAL("Param mode > 1!");
+  if (nParams > 7)   B2FATAL("No. of params. > 7!");
   unsigned short groupId(0);
   ifs >> groupId;
   B2DEBUG(29, paramMode << " " << nParams << " " << groupId);
@@ -1265,16 +1266,6 @@ void CDCGeometryPar::readEDepToADC(const GearDir& gbxParams, const int mode)
     cLMin[sl] = cLMax[0] + 6 * sl - 5;
     cLMax[sl] = cLMax[0] + 6 * sl;
   }
-  int nCell[56] = {160, 160, 160, 160, 160, 160, 160, 160,
-                   160, 160, 160, 160, 160, 160,
-                   192, 192, 192, 192, 192, 192,
-                   224, 224, 224, 224, 224, 224,
-                   256, 256, 256, 256, 256, 256,
-                   288, 288, 288, 288, 288, 288,
-                   320, 320, 320, 320, 320, 320,
-                   352, 352, 352, 352, 352, 352,
-                   384, 384, 384, 384, 384, 384
-                  }; //no. of cells in clayer
 
   unsigned short id = 0;
   double coef = 0.;
@@ -1283,7 +1274,7 @@ void CDCGeometryPar::readEDepToADC(const GearDir& gbxParams, const int mode)
     for (unsigned short i = 0; i < nParams; ++i) {
       ifs  >> coef;
       for (unsigned short cL = cLMin[id]; cL <= cLMax[id]; ++cL) { //clayer loop
-        for (unsigned short cell = 0; cell < nCell[cL]; ++cell) { //cell loop
+        for (unsigned short cell = 0; cell < m_nWires[cL]; ++cell) { //cell loop
           m_eDepToADCParams[cL][cell][i] = coef;
           //    B2DEBUG(29, "cL,cell,i,coef= "<< cL <<" "<< cell <<" "<< i <<" "<< coef);
         }
@@ -1318,30 +1309,42 @@ void CDCGeometryPar::setT0()
 
 
 // Calculate mean t0
-void CDCGeometryPar::calcMeanT0()
+void CDCGeometryPar::calcMeanT0(double minT0, double maxT0, int maxIt, double nStdv, double epsi)
 {
-  B2DEBUG(29, "calcMeanT0 start");
-  double effiSum = 0.;
-  m_meanT0 = 0.;
-  for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
-    for (unsigned short iW = 0; iW < MAX_N_SCELLS; ++iW) {
-      if (m_t0[iCL][iW] == 0.) continue;
-      const WireID wid = WireID(iCL, iW);
-      if (isHotWire(wid)) continue;
-      if (isBadWire(wid)) continue;
-      //TODO try to reject strage t0s more
-      double effi = 1.;
-      isDeadWire(wid, effi);
-      effiSum += effi;
-      m_meanT0 += effi * m_t0[iCL][iW];
+  double oldMeanT0 = 0;
+  unsigned short it1 = 0;
+  for (unsigned short it = 0; it < maxIt; ++it) {
+    it1 = it;
+    double effiSum = 0.;
+    m_meanT0 = 0.;
+    double stdvT0 = 0;
+    for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
+      for (unsigned short iW = 0; iW < m_nWires[iCL]; ++iW) {
+        if (m_t0[iCL][iW] < minT0 || m_t0[iCL][iW] > maxT0) continue;
+        const WireID wid = WireID(iCL, iW);
+        if (isHotWire(wid)) continue;
+        if (isBadWire(wid)) continue;
+        double effi = 1.;
+        isDeadWire(wid, effi);
+        effiSum += effi;
+        m_meanT0 += effi * m_t0[iCL][iW];
+        stdvT0   += effi * m_t0[iCL][iW] * m_t0[iCL][iW];
+      }
+    }
+    if (effiSum > 0.) {
+      m_meanT0 /= effiSum;
+      stdvT0   /= effiSum;
+      stdvT0 = sqrt(fabs(stdvT0 - m_meanT0 * m_meanT0));
+      B2DEBUG(29, it << " " << effiSum << " " << m_meanT0 << " " << stdvT0);
+      if (fabs(m_meanT0 - oldMeanT0) < epsi) break;
+      oldMeanT0 = m_meanT0;
+      minT0 = m_meanT0 - nStdv * stdvT0;
+      maxT0 = m_meanT0 + nStdv * stdvT0;
+    } else {
+      B2FATAL("Wire efficiency sum <= 0!");
     }
   }
-  if (effiSum > 0.) {
-    m_meanT0 /= effiSum;
-  } else {
-    B2FATAL("Wire efficiency sum <= 0!");
-  }
-  B2DEBUG(29, "calcMeanT0 end");
+  if (it1 == maxIt - 1) B2WARNING("Max. iterations(=" << maxIt << ") needed to calculte the mean t0. Strange.");
 }
 
 
@@ -1537,30 +1540,20 @@ void CDCGeometryPar::setEDepToADCConversions()
     cLMin[sl] = cLMax[0] + 6 * sl - 5;
     cLMax[sl] = cLMax[0] + 6 * sl;
   }
-  int nCell[56] = {160, 160, 160, 160, 160, 160, 160, 160,
-                   160, 160, 160, 160, 160, 160,
-                   192, 192, 192, 192, 192, 192,
-                   224, 224, 224, 224, 224, 224,
-                   256, 256, 256, 256, 256, 256,
-                   288, 288, 288, 288, 288, 288,
-                   320, 320, 320, 320, 320, 320,
-                   352, 352, 352, 352, 352, 352,
-                   384, 384, 384, 384, 384, 384
-                  }; //no. of cells in clayer
 
   for (unsigned short id = 0; id < nEnt; ++id) {
     unsigned short np = ((*m_eDepToADCConversionsFromDB)->getParams(id)).size();
-    if (np > 6) B2FATAL("CDCGeometryPar:: No. of edep-to-ADC conversion params. > 6");
+    if (np > 7) B2FATAL("CDCGeometryPar:: No. of edep-to-ADC conversion params. > 7");
     if (groupId == 0) { //per super-layer; id=super-layer
       for (unsigned short cL = cLMin[id]; cL <= cLMax[id]; ++cL) { //clayer loop
-        for (unsigned short cell = 0; cell < nCell[cL]; ++cell) { //cell loop
+        for (unsigned short cell = 0; cell < m_nWires[cL]; ++cell) { //cell loop
           for (unsigned short i = 0; i < np; ++i) {
             m_eDepToADCParams[cL][cell][i] = ((*m_eDepToADCConversionsFromDB)->getParams(id))[i];
           }
         }
       }
     } else if (groupId == 1) { //per clayer; id=clayer
-      for (unsigned short cell = 0; cell < nCell[id]; ++cell) { //cell loop
+      for (unsigned short cell = 0; cell < m_nWires[id]; ++cell) { //cell loop
         for (unsigned short i = 0; i < np; ++i) {
           m_eDepToADCParams[id][cell][i] = ((*m_eDepToADCConversionsFromDB)->getParams(id))[i];
         }

@@ -19,11 +19,11 @@ using namespace Belle2;
 LogConnectionUDP::LogConnectionUDP(const std::string& hostname, unsigned short port) : m_socket(m_ioservice)
 {
   ip::udp::resolver resolver(m_ioservice);
-  ip::udp::resolver::query query(udp::v4(), hostname, std::to_string(port));
+  ip::udp::resolver::query udpquery(udp::v4(), hostname, std::to_string(port));
 
   m_socket.open(ip::udp::v4());
   /// if the hostname can not be resolved, this will throw an exception so dereferencing the result is always safe
-  m_remoteEndpoint = *resolver.resolve(query);
+  m_remoteEndpoint = *resolver.resolve(udpquery);
 }
 
 bool LogConnectionUDP::isConnected()

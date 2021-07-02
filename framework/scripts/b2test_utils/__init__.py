@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 b2test_utils - Helper functions useful for test scripts
@@ -18,7 +17,7 @@ import multiprocessing
 import basf2
 import subprocess
 import re
-from . import logfilter
+from b2test_utils import logfilter
 
 
 def skip_test(reason, py_case=None):
@@ -69,7 +68,7 @@ def require_file(filename, data_type="", py_case=None):
 @contextmanager
 def set_loglevel(loglevel):
     """
-    temporarily set the log level to the specified `LogLevel`. This returns a
+    temporarily set the log level to the specified `LogLevel <basf2.LogLevel>`. This returns a
     context manager so it should be used in a ``with`` statement:
 
     >>> with set_log_level(LogLevel.ERROR):
@@ -145,7 +144,9 @@ def configure_logging_for_tests(user_replacements=None):
         if not replacement:
             replacement = env_name
         if env_name in os.environ:
-            replacements[os.environ[env_name]] = f"${{{replacement}}}"
+            # replace path from the environment with the name of the variable. But remove a trailing slash or whitespace so that
+            # the output doesn't depend on whether there is a tailing slash in the environment variable
+            replacements[os.environ[env_name].rstrip('/ ')] = f"${{{replacement}}}"
     if user_replacements is not None:
         replacements.update(user_replacements)
     # add cwd only if it doesn't overwrite anything ...
@@ -353,6 +354,16 @@ def skip_test_if_light(py_case=None):
             native unittest then pass the TestCase instance
     """
     try:
-        import generators
+        import generators  # noqa
     except ModuleNotFoundError:
         skip_test(reason="We're in a light build.", py_case=py_case)
+
+
+def print_belle2_environment():
+    """
+    Prints all the BELLE2 environment variables on the screen.
+    """
+    basf2.B2INFO('The BELLE2 environment variables are:')
+    for key, value in sorted(dict(os.environ).items()):
+        if 'BELLE2' in key.upper():
+            print(f'  {key}={value}')

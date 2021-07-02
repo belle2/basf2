@@ -185,7 +185,7 @@ void SVDChargeSharingAnalysisModule::event()
     h_nTracks->Fill(m_Tracks.getEntries());
     // Obtaining track momentum, P value & SVD hits, track hypothesis made for pions(or electrons in case of TB)
     const TrackFitResult* tfr = nullptr;
-    tfr = track.getTrackFitResult(Const::pion);
+    tfr = track.getTrackFitResultWithClosestMass(Const::pion);
 
     if (tfr) {
       h_TracksPvalue->Fill(tfr->getPValue());
@@ -266,17 +266,13 @@ void SVDChargeSharingAnalysisModule::terminate()
 
       c = comparisonPlot(h_clCharge[i][j][0], h_clCharge[i][j][1], h_clCharge[i][j][2]);
       c->SaveAs((m_outputDirName + "/clChargeComparison_" + nameSensorType + nameSide + ".png").c_str());
-      if (c) {
-        c->Close();
-        gSystem->ProcessEvents();
-      }
+      c->Close();
+      gSystem->ProcessEvents();
 
       c = comparisonPlot(h_clSNR[i][j][0], h_clSNR[i][j][1], h_clSNR[i][j][2]);
       c->SaveAs((m_outputDirName + "/clSNRComparison_" + nameSensorType + nameSide + ".png").c_str());
-      if (c) {
-        c->Close();
-        gSystem->ProcessEvents();
-      }
+      c->Close();
+      gSystem->ProcessEvents();
     }
   }
   // save to .root file

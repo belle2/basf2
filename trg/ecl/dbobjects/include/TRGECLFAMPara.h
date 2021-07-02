@@ -52,8 +52,8 @@ namespace Belle2 {
       int Threshold,
       int Wavemean,
       int Wavesigma,
-      std::vector<double>  SignalPDF,
-      std::vector<double>  NoiseCovarianceMatrix
+      const std::vector<double>&  SignalPDF,
+      const std::vector<double>&  NoiseCovarianceMatrix
 
     ):
       m_FPGAversion(FPGAversion),
@@ -65,11 +65,10 @@ namespace Belle2 {
       m_Toffset(Toffset),
       m_Threshold(Threshold),
       m_Wavemean(Wavemean),
-      m_Wavesigma(Wavesigma)
-    {
-      m_SignalPDF = SignalPDF;
-      m_NoiseCovarianceMatrix = NoiseCovarianceMatrix;
-    }
+      m_Wavesigma(Wavesigma),
+      m_SignalPDF(SignalPDF),
+      m_NoiseCovarianceMatrix(NoiseCovarianceMatrix)
+    { }
 
     //! Set FPGAversion
     void setFPGAversion(int FPGAversion) { m_FPGAversion = FPGAversion; }
@@ -102,9 +101,9 @@ namespace Belle2 {
     void setWavesigma(int Wavesigma) { m_Wavesigma = Wavesigma; }
 
     //! set Fitter Amplitude Coefficient
-    void setSignalPDF(std::vector<double> SignalPDF) { m_SignalPDF = SignalPDF;}
+    void setSignalPDF(const std::vector<double>& SignalPDF) { m_SignalPDF = SignalPDF;}
     //! set Fitter Timing Coefficient
-    void setNoiseCovarianceMatrix(std::vector<double> NoiseCovarianceMatrix) { m_NoiseCovarianceMatrix = NoiseCovarianceMatrix;}
+    void setNoiseCovarianceMatrix(const std::vector<double>& NoiseCovarianceMatrix) { m_NoiseCovarianceMatrix = NoiseCovarianceMatrix;}
 
     //! Get FPGAversion
     int getFPGAversion() const

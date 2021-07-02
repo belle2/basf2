@@ -10,8 +10,6 @@
 
 #include <beast/claw/modules/ClawDigitizerModule.h>
 #include <beast/claw/dataobjects/ClawSimHit.h>
-
-#include <mdst/dataobjects/MCParticle.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
 
@@ -70,10 +68,7 @@ void ClawDigitizerModule::beginRun()
 void ClawDigitizerModule::event()
 {
 
-  StoreArray<MCParticle> particles;
   StoreArray<ClawSimHit> ClawSimHits;
-  StoreArray<ClawHit> ClawHits;
-
   //Skip events with no ClawSimHits, but continue the event counter
   if (ClawSimHits.getEntries() == 0) {
     return;

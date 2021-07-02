@@ -6,8 +6,9 @@
 # command: basf2 split_file.py filename entries_per_file nfile
 ###############################################################################
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
+import sys
 argvs = sys.argv
 run = argvs[1]
 nevent = int(argvs[2])
@@ -16,7 +17,7 @@ nfile = int(argvs[3])
 Dir = 'GCR2017_unpacked/'
 
 
-class Split(Module):
+class Split(b2.Module):
     """
     Class to split one file to multi files with small data size.
     """
@@ -25,26 +26,26 @@ class Split(Module):
         """reimplementation of Module::event()."""
         evtmetadata = Belle2.PyStoreObj('EventMetaData')
         if not evtmetadata:
-            B2ERROR('No EventMetaData found')
+            b2.B2ERROR('No EventMetaData found')
         else:
             event = evtmetadata.obj().getEvent()
             self.return_value(event // nevent)
 
 
 out = []
-main = create_path()
+main = b2.create_path()
 main.add_module('RootInput', inputFileName=Dir + run + '.root')
 main.add_module('ProgressBar')
 split = Split()
 main.add_module(split)
 for i in range(0, int(nfile)):
-    out.append(create_path())
+    out.append(b2.create_path())
     out[i].add_module('RootOutput', outputFileName=Dir + run + '_' + str(i) + '.root')
     if i == nfile - 1:
         split.if_value('>={}'.format(i), out[i])
     else:
         split.if_value('={}'.format(i), out[i])
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

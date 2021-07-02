@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import basf2
 
-import ROOT
-from ROOT import Belle2  # make Belle2 namespace available
-from ROOT import std
+from ROOT import Belle2  # make Belle2 namespace available # noqa
 from ROOT.Belle2 import TrackFindingCDC as TFCDC
 
-import os
 import sys
 import random
 import numpy as np
@@ -19,7 +15,6 @@ import tracking.harvest.harvesting as harvesting
 import tracking.harvest.refiners as refiners
 from tracking.harvest.run import HarvestingRun
 
-import argparse
 
 import logging
 
@@ -132,9 +127,6 @@ class LegendreBinningValidationModule(harvesting.HarvestingModule):
 
     def peel(self, track):
         """Aggregate the track and MC information for track-segment analysis"""
-        mc_track_lookup = self.mc_track_lookup
-        mc_hit_lookup = self.mc_hit_lookup
-
         track_fitter = self.track_fitter
 
         rl_drift_circle = 1

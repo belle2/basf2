@@ -1,3 +1,15 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Sascha Dreyer                                            *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+// modified from BelleII monopole simulation
+
 #include <simulation/longlivedneutral/G4LongLivedNeutral.h>
 #include <simulation/longlivedneutral/G4LongLivedNeutralDecay.h>
 
@@ -148,7 +160,7 @@ G4VParticleChange* G4LongLivedNeutralDecay::DecayIt(const G4Track& aTrack, const
     finalGlobalTime += fRemainderLifeTime;
     finalLocalTime += fRemainderLifeTime;
     energyDeposit += aPrimaryParticle->GetKineticEnergy();
-    if (isPreAssigned) products->Boost(ParentEnergy, ParentDirection);
+    products->Boost(ParentEnergy, ParentDirection);
   } else {
     // default for LongLivedNeutral: PostStep case (decay in flight)
     products->Boost(ParentEnergy, ParentDirection);

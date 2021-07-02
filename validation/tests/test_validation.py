@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import unittest
 import metaoptions
@@ -23,16 +22,18 @@ class ValidationTest(unittest.TestCase):
         interval_sel = validation.IntervalSelector(["release", " nightly"])
 
         with tempfile.NamedTemporaryFile() as tf:
-            tf.write(b'#!/usr/bin/env python3\n'
-                     b'# -*- coding: utf-8 -*-\n'
-                     b'"""\n'
-                     b'<header>\n'
-                     b'<interval>release</interval>'
-                     b'<output>EvtGenSim.root</output>\n'
-                     b'<contact>Kilian Lieret kilian.lieret@lmu.de</contact>\n'
-                     b'<description>description_text</description>\n'
-                     b'</header>\n'
-                     b'"""\n')
+            tf.write(
+                b"#!/usr/bin/env python3\n"
+                b"# -*- coding: utf-8 -*-\n"
+                b'"""\n'
+                b"<header>\n"
+                b"<interval>release</interval>"
+                b"<output>EvtGenSim.root</output>\n"
+                b"<contact>Kilian Lieret kilian.lieret@lmu.de</contact>\n"
+                b"<description>description_text</description>\n"
+                b"</header>\n"
+                b'"""\n'
+            )
 
             # flush file content, so it can be read by the Script class used
             # below
@@ -43,16 +44,18 @@ class ValidationTest(unittest.TestCase):
             self.assertTrue(interval_sel.in_interval(script))
 
         with tempfile.NamedTemporaryFile() as tf:
-            tf.write(b'#!/usr/bin/env python3\n'
-                     b'# -*- coding: utf-8 -*-\n'
-                     b'"""\n'
-                     b'<header>\n'
-                     b'<interval>nightly</interval>'
-                     b'<output>EvtGenSim.root</output>\n'
-                     b'<contact>Kilian Lieret kilian.lieret@lmu.de</contact>\n'
-                     b'<description>description_text</description>\n'
-                     b'</header>\n'
-                     b'"""\n')
+            tf.write(
+                b"#!/usr/bin/env python3\n"
+                b"# -*- coding: utf-8 -*-\n"
+                b'"""\n'
+                b"<header>\n"
+                b"<interval>nightly</interval>"
+                b"<output>EvtGenSim.root</output>\n"
+                b"<contact>Kilian Lieret kilian.lieret@lmu.de</contact>\n"
+                b"<description>description_text</description>\n"
+                b"</header>\n"
+                b'"""\n'
+            )
 
             # flush file content, so it can be read by the Script class used
             # below
@@ -68,15 +71,17 @@ class ValidationTest(unittest.TestCase):
         interval setting in the validation header
         """
         with tempfile.NamedTemporaryFile() as tf:
-            tf.write(b'#!/usr/bin/env python3\n'
-                     b'# -*- coding: utf-8 -*-\n'
-                     b'"""\n'
-                     b'<header>\n'
-                     b'<output>EvtGenSim.root</output>\n'
-                     b'<contact>Kilian Lieret kilian.lieret@lmu.de</contact>\n'
-                     b'<description>description_text</description>\n'
-                     b'</header>\n'
-                     b'"""\n')
+            tf.write(
+                b"#!/usr/bin/env python3\n"
+                b"# -*- coding: utf-8 -*-\n"
+                b'"""\n'
+                b"<header>\n"
+                b"<output>EvtGenSim.root</output>\n"
+                b"<contact>Kilian Lieret kilian.lieret@lmu.de</contact>\n"
+                b"<description>description_text</description>\n"
+                b"</header>\n"
+                b'"""\n'
+            )
 
             # flush file content, so it can be read by the Script class used
             # below
@@ -99,8 +104,9 @@ class ValidationTest(unittest.TestCase):
         script1 = validation.Script("val1.py", "tracking", None)
         script2 = validation.Script("val2.py", "tracking", None)
         script3 = validation.Script("valOther.py", "other_package", None)
-        script4 = validation.Script("valOtherNotDepending.py", "other_package",
-                                    None)
+        script4 = validation.Script(
+            "valOtherNotDepending.py", "other_package", None
+        )
         script2.dependencies = [script3]
 
         val.add_script(script1)
@@ -114,17 +120,23 @@ class ValidationTest(unittest.TestCase):
         self.assertEqual(3, len(val.scripts))
         self.assertEqual(
             1,
-            len([
-                s for s in val.scripts
-                if s.unique_name() == script3.unique_name()
-            ])
+            len(
+                [
+                    s
+                    for s in val.scripts
+                    if s.unique_name() == script3.unique_name()
+                ]
+            ),
         )
         self.assertEqual(
             0,
-            len([
-                s for s in val.scripts
-                if s.unique_name() == script4.unique_name()
-            ])
+            len(
+                [
+                    s
+                    for s in val.scripts
+                    if s.unique_name() == script4.unique_name()
+                ]
+            ),
         )
 
         val_no_deps = validation.Validation()
@@ -140,10 +152,13 @@ class ValidationTest(unittest.TestCase):
         self.assertEqual(2, len(val_no_deps.scripts))
         self.assertEqual(
             0,
-            len([
-                s for s in val_no_deps.scripts
-                if s.unique_name() == script3.unique_name()
-            ])
+            len(
+                [
+                    s
+                    for s in val_no_deps.scripts
+                    if s.unique_name() == script3.unique_name()
+                ]
+            ),
         )
 
     def test_parse_header(self):
@@ -152,17 +167,19 @@ class ValidationTest(unittest.TestCase):
         interval setting in the validation header
         """
         with tempfile.NamedTemporaryFile() as tf:
-            tf.write(b'#!/usr/bin/env python3\n'
-                     b'# -*- coding: utf-8 -*-\n'
-                     b'"""\n'
-                     b'<header>\n'
-                     b'<input>SomeIn.root</input>\n'
-                     b'<output>EvtGenSim.root</output>\n'
-                     b'<cacheable/>\n'
-                     b'<contact>Kilian Lieret kilian.lieret@lmu.de</contact>\n'
-                     b'<description>description_text</description>\n'
-                     b'</header>\n'
-                     b'"""\n')
+            tf.write(
+                b"#!/usr/bin/env python3\n"
+                b"# -*- coding: utf-8 -*-\n"
+                b'"""\n'
+                b"<header>\n"
+                b"<input>SomeIn.root</input>\n"
+                b"<output>EvtGenSim.root</output>\n"
+                b"<cacheable/>\n"
+                b"<contact>Kilian Lieret kilian.lieret@lmu.de</contact>\n"
+                b"<description>description_text</description>\n"
+                b"</header>\n"
+                b'"""\n'
+            )
 
             # flush file content, so it can be read by the Script class used
             # below
@@ -170,9 +187,9 @@ class ValidationTest(unittest.TestCase):
 
             script = validationscript.Script(tf.name, "package", None)
             script.load_header()
-            self.assertTrue(script.is_cacheable())
-            self.assertTrue('EvtGenSim.root' in script.get_output_files())
-            self.assertTrue('SomeIn.root' in script.get_input_files())
+            self.assertTrue(script.is_cacheable)
+            self.assertTrue("EvtGenSim.root" in script.output_files)
+            self.assertTrue("SomeIn.root" in script.input_files)
 
     def test_meta_option_parser(self):
         """

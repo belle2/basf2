@@ -1,5 +1,4 @@
 # !/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 This module defines wrapper functions around the analysis modules.
@@ -7,6 +6,8 @@ This module defines wrapper functions around the analysis modules.
 
 from basf2 import register_module, create_path
 from basf2 import B2INFO, B2WARNING, B2ERROR, B2FATAL
+import basf2
+import subprocess
 
 
 def setAnalysisConfigParams(configParametersAndValues, path):
@@ -109,8 +110,7 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
     roinput.param('parentLevel', parentLevel)
 
     path.add_module(roinput)
-    progress = register_module('ProgressBar')
-    path.add_module(progress)
+    path.add_module('ProgressBar')
 
     # None means don't create custom magnetic field, use whatever comes from the
     # DB
@@ -137,16 +137,18 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
         # make sure the last database setup is the magnetic field for MC8-10
         from basf2 import conditions
         conditions.globaltags += ["Legacy_MagneticField_MC8_MC9_MC10"]
-    elif environmentType is 'None':
+    elif environmentType == 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:
         environments = ' '.join(list(environToMagneticField.keys()) + ["MC8", "MC9", "MC10"])
         B2FATAL('Incorrect environment type provided: ' + environmentType + '! Please use one of the following:' + environments)
 
     # set the correct MCMatching algorithm for MC5 and Belle MC
-    if environmentType is 'Belle':
+    if environmentType == 'Belle':
         setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
-    if environmentType is 'MC5':
+        import b2bii
+        b2bii.setB2BII()
+    if environmentType == 'MC5':
         setAnalysisConfigParams({'mcMatchingVersion': 'MC5'}, path)
 
     # fixECLCluster for MC5/MC6/MC7
@@ -158,6 +160,12 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
 def outputMdst(filename, path):
     """
     Saves mDST (mini-Data Summary Tables) to the output root file.
+
+    .. warning::
+
+        This function is kept for backward-compatibility.
+        Better to use `mdst.add_mdst_output` directly.
+
     """
 
     import mdst
@@ -166,105 +174,20 @@ def outputMdst(filename, path):
 
 def outputUdst(filename, particleLists=None, includeArrays=None, path=None, dataDescription=None):
     """
-    Save uDST (micro-Data Summary Tables) = MDST + Particles + ParticleLists
+    Save uDST (user-defined Data Summary Tables) = MDST + Particles + ParticleLists
     The charge-conjugate lists of those given in particleLists are also stored.
     Additional Store Arrays and Relations to be stored can be specified via includeArrays
     list argument.
 
-    Note that this does not reduce the amount of Particle objects saved,
-    see skimOutputUdst() for a function that does.
+    Note:
+        This does not reduce the amount of Particle objects saved,
+        see `udst.add_skimmed_udst_output` for a function that does.
+
     """
-
-    import mdst
-    import pdg
-
-    if particleLists is None:
-        particleLists = []
-    if includeArrays is None:
-        includeArrays = []
-    # also add anti-particle lists
-    plSet = set(particleLists)
-    for List in particleLists:
-        name, label = List.split(':')
-        plSet.add(pdg.conjugate(name) + ':' + label)
-
-    partBranches = ['Particles', 'ParticlesToMCParticles',
-                    'ParticlesToPIDLikelihoods', 'ParticleExtraInfoMap',
-                    'EventExtraInfo'] + includeArrays + list(plSet)
-
-    # set dataDescription: dictionary is mutable and thus not a good
-    # default argument.
-    if dataDescription is None:
-        dataDescription = {}
-
-    dataDescription.setdefault("dataLevel", "udst")
-
-    return mdst.add_mdst_output(path, mc=True, filename=filename,
-                                additionalBranches=partBranches,
-                                dataDescription=dataDescription)
-
-
-def skimOutputUdst(skimDecayMode, skimParticleLists=None, outputParticleLists=None,
-                   includeArrays=None, path=None, *,
-                   outputFile=None, dataDescription=None):
-    """
-    Create a new path for events that contain a non-empty particle list specified via skimParticleLists.
-    Write the accepted events as a udst file, saving only particles from skimParticleLists
-    and from outputParticleLists.
-    Additional Store Arrays and Relations to be stored can be specified via includeArrays
-    list argument.
-
-    :param str skimDecayMode: Name of the skim. If no outputFile is given this is
-        also the name of the output filename. This name will be added to the
-        FileMetaData as an extra data description "skimDecayMode"
-    :param list(str) skimParticleLists: Names of the particle lists to skim for.
-        An event will be accepted if at least one of the particle lists is not empty
-    :param list(str) outputParticleLists: Names of the particle lists to store in
-        the output in addition to the ones in skimParticleLists
-    :param list(str) includeArrays: datastore arrays/objects to write to the output
-        file in addition to mdst and particle information
-    :param basf2.Path path: Path to add the skim output to. Defaults to the default analysis path
-    :param str outputFile: Name of the output file if different from the skim name
-    :param dict dataDescription: Additional data descriptions to add to the output file. For example {"mcEventType":"mixed"}
-    """
-
-    from basf2 import AfterConditionPath
-
-    if skimParticleLists is None:
-        skimParticleLists = []
-    if outputParticleLists is None:
-        outputParticleLists = []
-    if includeArrays is None:
-        includeArrays = []
-    # if no outputfile is specified, set it to the skim name
-    if outputFile is None:
-        outputFile = skimDecayMode
-
-    # make sure the output filename has the correct extension
-    if not outputFile.endswith(".udst.root"):
-        outputFile += ".udst.root"
-
-    skimfilter = register_module('SkimFilter')
-    skimfilter.set_name('SkimFilter_' + skimDecayMode)
-    skimfilter.param('particleLists', skimParticleLists)
-    path.add_module(skimfilter)
-    filter_path = create_path()
-    skimfilter.if_value('=1', filter_path, AfterConditionPath.CONTINUE)
-
-    # add_independent_path() is rather expensive, only do this for skimmed events
-    skim_path = create_path()
-    saveParticleLists = skimParticleLists + outputParticleLists
-    removeParticlesNotInLists(saveParticleLists, path=skim_path)
-
-    # set dataDescription: dictionary is mutable and thus not a good
-    # default argument.
-    if dataDescription is None:
-        dataDescription = {}
-
-    dataDescription.setdefault("skimDecayMode", skimDecayMode)
-    outputUdst(outputFile, saveParticleLists, includeArrays, path=skim_path,
-               dataDescription=dataDescription)
-    filter_path.add_independent_path(skim_path, "skim_" + skimDecayMode)
+    import udst
+    udst.add_udst_output(
+        path=path, filename=filename, particleLists=particleLists,
+        additionalBranches=includeArrays, dataDescription=dataDescription)
 
 
 def outputIndex(filename, path, includeArrays=None, keepParents=False, mc=True):
@@ -507,15 +430,21 @@ def correctBrems(outputList,
 
     Warning:
         This can only work if the mdst file contains the *Bremsstrahlung* named relation. Official MC samples
-        up to and including MC12 and proc9 **do not** contain this. Newer production campaigns (from proc10 and MC13) will.
+        up to and including MC12 and proc9 **do not** contain this. Newer production campaigns (from proc10 and MC13) do.
+        However, studies by the tau WG revealed that the cuts applied by the ``ECLTrackBremFinder`` module are too tight.
+        These will be loosened but this will only have effect with proc13 and MC15.
+        If your analysis is very sensitive to the Bremsstrahlung corrections, it is advised to use `correctBremsBelle`.
 
     Information:
+        A detailed description of how the weights are set can be found directly at the documentation of the
+        `BremsFinder` module.
+
         Please note that a new particle is always generated, with the old particle and -if found- one or more
         photons as daughters.
 
-        The ``inputList`` should contain particles with associated tracks. Otherwise the module will exit with an error.
+        The ``inputList`` should contain particles with associated tracks. Otherwise, the module will exit with an error.
 
-        The ``gammaList`` should contain photons. Otherwise the module will exit with an error.
+        The ``gammaList`` should contain photons. Otherwise, the module will exit with an error.
 
     @param outputList   The output particle list name containing the corrected particles
     @param inputList    The initial particle list name containing the particles to correct. *It should already exist.*
@@ -558,14 +487,19 @@ def correctBremsBelle(outputListName,
                       inputListName,
                       gammaListName,
                       multiplePhotons=True,
-                      minimumEnergy=0.05,
                       angleThreshold=0.05,
                       writeOut=False,
                       path=None):
     """
     Run the Belle - like brems finding on the ``inputListName`` of charged particles.
     Adds all photons in ``gammaListName`` to a copy of the charged particle that are within
-    ``angleThreshold`` and above ``minimumEnergy``.
+    ``angleThreshold``.
+
+    Tip:
+        Studies by the tau WG show that using a rather wide opening angle (up to
+        0.2 rad) and rather low energetic photons results in good correction.
+        However, this should only serve as a starting point for your own studies
+        because the optimal criteria are likely mode-dependent
 
     Parameters:
        outputListName (str): The output charged particle list containing the corrected charged particles
@@ -575,7 +509,6 @@ def correctBremsBelle(outputListName,
              add all the photons within the cone -> True
        angleThreshold (float): The maximum angle in radians between the charged particle and the (radiative)
               gamma to be accepted.
-       minimumEnergy (float): The minimum energy in GeV of the (radiative) gamma to be accepted.
        writeOut (bool): whether RootOutput module should save the created ParticleList
        path (basf2.Path): modules are added to this path
     """
@@ -587,7 +520,6 @@ def correctBremsBelle(outputListName,
     fsrcorrector.param('gammaListName', gammaListName)
     fsrcorrector.param('multiplePhotons', multiplePhotons)
     fsrcorrector.param('angleThreshold', angleThreshold)
-    fsrcorrector.param('minimumEnergy', minimumEnergy)
     fsrcorrector.param('writeOut', writeOut)
     path.add_module(fsrcorrector)
 
@@ -665,7 +597,9 @@ def cutAndCopyLists(outputListName, inputListNames, cut, writeOut=False, path=No
     Example:
         Require energetic pions safely inside the cdc
 
-        >>> cutAndCopyLists("pi+:energeticPions", ["pi+:good", "pi+:loose"], "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+        .. code-block:: python
+
+            cutAndCopyLists("pi+:energeticPions", ["pi+:good", "pi+:loose"], "[E > 2] and thetaInCDCAcceptance", path=mypath)
 
     Warning:
         You must use square braces ``[`` and ``]`` for conditional statements.
@@ -698,7 +632,9 @@ def cutAndCopyList(outputListName, inputListName, cut, writeOut=False, path=None
     Example:
         require energetic pions safely inside the cdc
 
-        >>> cutAndCopyLists("pi+:energeticPions", "pi+:loose", "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+        .. code-block:: python
+
+            cutAndCopyList("pi+:energeticPions", "pi+:loose", "[E > 2] and thetaInCDCAcceptance", path=mypath)
 
     Warning:
         You must use square braces ``[`` and ``]`` for conditional statements.
@@ -713,7 +649,7 @@ def cutAndCopyList(outputListName, inputListName, cut, writeOut=False, path=None
     cutAndCopyLists(outputListName, [inputListName], cut, writeOut, path)
 
 
-def trackingEfficiency(inputListNames, fraction, path=None):
+def removeTracksForTrackingEfficiencyCalculation(inputListNames, fraction, path=None):
     """
     Randomly remove tracks from the provided particle lists to estimate the tracking efficiency.
     Takes care of the duplicates, if any.
@@ -730,9 +666,12 @@ def trackingEfficiency(inputListNames, fraction, path=None):
     path.add_module(trackingefficiency)
 
 
-def trackingMomentum(inputListNames, scale, path=None):
+def scaleTrackMomenta(inputListNames, scale, path=None):
     """
-    Scale momenta of the particles (based on charged tracks) according to the scaling factor scale.
+
+    Scale momenta of the particles according to the scaling factor scale.
+    If the particle list contains composite particles, the momenta of the track-based daughters are scaled.
+    Subsequently, the momentum of the mother particle is updated as well.
 
     Parameters:
         inputListNames (list(str)): input particle list names
@@ -798,7 +737,8 @@ def fillSignalSideParticleList(outputListName, decayString, path):
     path.add_module(pload)
 
 
-def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFitHypothesis=False):
+def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFitHypothesis=False,
+                      loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=True):
     """
     Creates Particles of the desired types from the corresponding ``mdst`` dataobjects,
     loads them to the ``StoreArray<Particle>`` and fills the ParticleLists.
@@ -810,7 +750,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
 
         kaons = ('K+:mykaons', 'kaonID>0.1')
         pions = ('pi+:mypions','pionID>0.1')
-        fillParticleLists([kaons, pions])
+        fillParticleLists([kaons, pions], path=mypath)
 
     If you are unsure what selection you want, you might like to see the
     :doc:`StandardParticles` functions.
@@ -838,6 +778,11 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
         fillParticleLists([kaons, pions, v0lambdas], path=mypath)
 
     Tip:
+        Gammas can also be loaded from KLMClusters by explicitly setting the
+        parameter ``loadPhotonsFromKLM`` to True. However, this should only be
+        done in selected use-cases and the effect should be studied carefully.
+
+    Tip:
         For "K_L0" it is now possible to load from ECLClusters, to revert to
         the old (Belle) behavior, you can require ``'isFromKLM > 0'``.
 
@@ -850,7 +795,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
     Parameters:
         decayStringsWithCuts (list): A list of python ntuples of (decayString, cut).
                                      The decay string determines the type of Particle
-                                     and determines the of the ParticleList.
+                                     and the name of the ParticleList.
                                      If the input MDST type is V0 the whole
                                      decay chain needs to be specified, so that
                                      the user decides and controls the daughters
@@ -864,17 +809,52 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
                                      If enforceFitHypothesis is False (the default) the next closest fit hypothesis
                                      in terms of mass difference will be used if the fit using exact particle
                                      type is not available.
+        loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
+        loadPhotonBeamBackgroundMVA (bool):   If true, photon candidates will be assigned a beam background probability.
     """
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + 'PLists')
-    pload.param('decayStringsWithCuts', decayStringsWithCuts)
+    pload.param('decayStrings', [decayString for decayString, cut in decayStringsWithCuts])
     pload.param('writeOut', writeOut)
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
 
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
+    for decayString, cut in decayStringsWithCuts:
+        if not decayDescriptor.init(decayString):
+            raise ValueError("Invalid decay string")
+        # need to check some logic to unpack possible scenarios
+        if decayDescriptor.getNDaughters() > 0:
+            # ... then we have an actual decay in the decay string which must be a V0
+            # the particle loader automatically calls this "V0" so we have to copy over
+            # the list to name/format that user wants
+            if decayDescriptor.getMother().getLabel() != 'V0':
+                copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut, path)
+        elif decayDescriptor.getMother().getLabel() != 'all':
+            # then we have a non-V0 particle which the particle loader automatically calls "all"
+            # as with the special V0 case we have to copy over the list to the name/format requested
+            copyList(decayString, decayDescriptor.getMother().getName() + ':all', writeOut, path)
 
-def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False):
+        # optionally apply a cut
+        if cut != "":
+            applyCuts(decayDescriptor.getMother().getFullName(), cut, path)
+
+        if decayString.startswith("gamma"):
+            # keep KLM-source photons as a experts-only for now: they are loaded by the particle loader,
+            # but the user has to explicitly request them.
+            if not loadPhotonsFromKLM:
+                applyCuts(decayString, 'isFromECL', path)
+
+            # if the user asked for the beam background MVA to be added, then also provide this
+            # (populates the variable named beamBackgroundProbabilityMVA)
+            if loadPhotonBeamBackgroundMVA:
+                getBeamBackgroundProbabilityMVA(decayString, path)
+
+
+def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False,
+                     loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=True):
     """
     Creates Particles of the desired type from the corresponding ``mdst`` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -897,11 +877,16 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
     Note:
         For "K_S0" and "Lambda0" you must specify the daughter ordering.
 
-    For example, to load V0s as :math:`\\Lambda^0\\to p^+\\pi^-` decays from V0ss:
+    For example, to load V0s as :math:`\\Lambda^0\\to p^+\\pi^-` decays from V0s:
 
     .. code-block:: python
 
         fillParticleList('Lambda0 -> p+ pi-', '0.9 < M < 1.3', path=mypath)
+
+    Tip:
+        Gammas can also be loaded from KLMClusters by explicitly setting the
+        parameter ``loadPhotonsFromKLM`` to True. However, this should only be
+        done in selected use-cases and the effect should be studied carefully.
 
     Tip:
         For "K_L0" it is now possible to load from ECLClusters, to revert to
@@ -923,14 +908,48 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
                                      If enforceFitHypothesis is False (the default) the next closest fit hypothesis
                                      in terms of mass difference will be used if the fit using exact particle
                                      type is not available.
+        loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
+
+        loadPhotonBeamBackgroundMVA (bool):   If true, photon candidates will be assigned a beam background probability.
     """
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
-    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('decayStrings', [decayString])
     pload.param('writeOut', writeOut)
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
+
+    # need to check some logic to unpack possible scenarios
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(decayString):
+        raise ValueError("Invalid decay string")
+    if decayDescriptor.getNDaughters() > 0:
+        # ... then we have an actual decay in the decay string which must be a V0
+        # the particle loader automatically calls this "V0" so we have to copy over
+        # the list to name/format that user wants
+        if decayDescriptor.getMother().getLabel() != 'V0':
+            copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut, path)
+    elif decayDescriptor.getMother().getLabel() != 'all':
+        # then we have a non-V0 particle which the particle loader automatically calls "all"
+        # as with the special V0 case we have to copy over the list to the name/format requested
+        copyList(decayString, decayDescriptor.getMother().getName() + ':all', writeOut, path)
+
+    # optionally apply a cut
+    if cut != "":
+        applyCuts(decayDescriptor.getMother().getFullName(), cut, path)
+
+    if decayString.startswith("gamma"):
+        # keep KLM-source photons as a experts-only for now: they are loaded by the particle loader,
+        # but the user has to explicitly request them.
+        if not loadPhotonsFromKLM:
+            applyCuts(decayString, 'isFromECL', path)
+
+        # if the user asked for the beam background MVA to be added, then also provide this
+        # (populates the variable named beamBackgroundProbabilityMVA)
+        if loadPhotonBeamBackgroundMVA:
+            getBeamBackgroundProbabilityMVA(decayString, path)
 
 
 def fillParticleListWithTrackHypothesis(decayString,
@@ -956,11 +975,24 @@ def fillParticleListWithTrackHypothesis(decayString,
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
-    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('decayStrings', [decayString])
     pload.param('trackHypothesis', hypothesis)
     pload.param('writeOut', writeOut)
     pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
+
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(decayString):
+        raise ValueError("Invalid decay string")
+    if decayDescriptor.getMother().getLabel() != 'all':
+        # the particle loader automatically calls particle lists of charged FSPs "all"
+        # so we have to copy over the list to the name/format requested
+        copyList(decayString, decayDescriptor.getMother().getName() + ':all', writeOut, path)
+
+    # apply a cut if a non-empty cut string is provided
+    if cut != "":
+        applyCuts(decayString, cut, path)
 
 
 def fillConvertedPhotonsList(decayString, cut, writeOut=False, path=None):
@@ -972,10 +1004,10 @@ def fillConvertedPhotonsList(decayString, cut, writeOut=False, path=None):
 
     .. code-block:: python
 
-        fillConvertedPhotonsList('gamma:converted -> e+ e-', '')
+        fillConvertedPhotonsList('gamma:converted -> e+ e-', '', path=mypath)
 
     Parameters:
-        decayString (str): Must be gamma to an e+e- pair. You muse specify the daughter ordering.
+        decayString (str): Must be gamma to an e+e- pair. You must specify the daughter ordering.
                            Will also determine the name of the particleList.
         cut (str):         Particles need to pass these selection criteria to be added to the ParticleList
         writeOut (bool):   whether RootOutput module should save the created ParticleList
@@ -984,10 +1016,23 @@ def fillConvertedPhotonsList(decayString, cut, writeOut=False, path=None):
     """
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
-    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('decayStrings', [decayString])
     pload.param('addDaughters', True)
     pload.param('writeOut', writeOut)
     path.add_module(pload)
+
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(decayString):
+        raise ValueError("Invalid decay string")
+    if decayDescriptor.getMother().getLabel() != 'V0':
+        # the particle loader automatically calls converted photons "V0" so we have to copy over
+        # the list to name/format that user wants
+        copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':V0', writeOut, path)
+
+    # apply a cut if a non-empty cut string is provided
+    if cut != "":
+        applyCuts(decayDescriptor.getMother().getFullName(), cut, path)
 
 
 def fillParticleListFromROE(decayString,
@@ -1018,13 +1063,26 @@ def fillParticleListFromROE(decayString,
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
-    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('decayStrings', [decayString])
     pload.param('writeOut', writeOut)
     pload.param('roeMaskName', maskName)
     pload.param('useMissing', useMissing)
     pload.param('sourceParticleListName', sourceParticleListName)
     pload.param('useROEs', True)
     path.add_module(pload)
+
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(decayString):
+        raise ValueError("Invalid decay string")
+    if decayDescriptor.getMother().getLabel() != 'ROE':
+        # the particle loader automatically uses the label "ROE" for particles built from the ROE
+        # so we have to copy over the list to name/format that user wants
+        copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':ROE', writeOut, path)
+
+    # apply a cut if a non-empty cut string is provided
+    if cut != "":
+        applyCuts(decayDescriptor.getMother().getFullName(), cut, path)
 
 
 def fillParticleListFromMC(decayString,
@@ -1050,12 +1108,25 @@ def fillParticleListFromMC(decayString,
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
-    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('decayStrings', [decayString])
     pload.param('addDaughters', addDaughters)
     pload.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
     path.add_module(pload)
+
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(decayString):
+        raise ValueError("Invalid decay string")
+    if decayDescriptor.getMother().getLabel() != 'MC':
+        # the particle loader automatically uses the label "MC" for particles built from MCParticles
+        # so we have to copy over the list to name/format that user wants
+        copyList(decayString, decayDescriptor.getMother().getName() + ':MC', writeOut, path)
+
+    # apply a cut if a non-empty cut string is provided
+    if cut != "":
+        applyCuts(decayString, cut, path)
 
 
 def fillParticleListsFromMC(decayStringsWithCuts,
@@ -1069,9 +1140,12 @@ def fillParticleListsFromMC(decayStringsWithCuts,
 
     The types of the particles to be loaded are specified via the (decayString, cut) tuples given in a list.
     For example:
-    kaons = ('K+:gen', '')
-    pions = ('pi+:gen', 'pionID>0.1')
-    fillParticleListsFromMC([kaons, pions])
+
+    .. code-block:: python
+
+        kaons = ('K+:gen', '')
+        pions = ('pi+:gen', 'pionID>0.1')
+        fillParticleListsFromMC([kaons, pions], path=mypath)
 
     @param decayString             specifies type of Particles and determines the name of the ParticleList
     @param cut                     Particles need to pass these selection criteria to be added to the ParticleList
@@ -1084,12 +1158,26 @@ def fillParticleListsFromMC(decayStringsWithCuts,
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + 'PLists')
-    pload.param('decayStringsWithCuts', decayStringsWithCuts)
+    pload.param('decayStrings', [decayString for decayString, cut in decayStringsWithCuts])
     pload.param('addDaughters', addDaughters)
     pload.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
     path.add_module(pload)
+
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
+    for decayString, cut in decayStringsWithCuts:
+        if not decayDescriptor.init(decayString):
+            raise ValueError("Invalid decay string")
+        if decayDescriptor.getMother().getLabel() != 'MC':
+            # the particle loader automatically uses the label "MC" for particles built from MCParticles
+            # so we have to copy over the list to name/format that user wants
+            copyList(decayString, decayDescriptor.getMother().getName() + ':MC', writeOut, path)
+
+        # apply a cut if a non-empty cut string is provided
+        if cut != "":
+            applyCuts(decayString, cut, path)
 
 
 def applyCuts(list_name, cut, path):
@@ -1100,7 +1188,9 @@ def applyCuts(list_name, cut, path):
     Example:
         require energetic pions safely inside the cdc
 
-        >>> applyCuts("pi+:mypions", "[E > 2] and [0.3 < theta < 2.6]", path=mypath)
+        .. code-block:: python
+
+            applyCuts("pi+:mypions", "[E > 2] and thetaInCDCAcceptance", path=mypath)
 
     Warning:
         You must use square braces ``[`` and ``]`` for conditional statements.
@@ -1125,7 +1215,9 @@ def applyEventCuts(cut, path):
     Example:
         continuum events (in mc only) with more than 5 tracks
 
-        >>> applyEventCuts("[nTracks > 5] and [isContinuumEvent], path=mypath)
+        .. code-block:: python
+
+            applyEventCuts("[nTracks > 5] and [isContinuumEvent], path=mypath)
 
     Warning:
         You must use square braces ``[`` and ``]`` for conditional statements.
@@ -1158,11 +1250,10 @@ def reconstructDecay(decayString,
     criteria are saved to a newly created (mother) ParticleList. By default the charge conjugated decay is reconstructed as well
     (meaning that the charge conjugated mother list is created as well) but this can be deactivated.
 
-    One can use an ``@``-sign to mark a particle as unspecified, e.g. in form of a DecayString: :code:`\@Xsd -> K+ pi-`. If the
-    particle is marked as unspecified, its identity will not be checked when doing :ref:`MCMatching`. Any particle which decays into
-    the correct daughters will be flagged as correct. For example the DecayString :code:`\@Xsd -> K+ pi-` would match all particles
-    which decay into a kaon and a pion, for example :math:`K^*`, :math:`B^0`, :math:`D^0`. Still the daughters need to be stated
-    correctly so this can be used for "sum of exclusive" decays.
+    One can use an ``@``-sign to mark a particle as unspecified for inclusive analyses,
+    e.g. in a DecayString: :code:`'@Xsd -> K+ pi-'`.
+
+    .. seealso:: :ref:`Marker_of_unspecified_particle`
 
     .. warning::
         The input ParticleLists are typically ordered according to the upstream reconstruction algorithm.
@@ -1716,12 +1807,14 @@ def signalRegion(particleList, cut, path=None, name="isSignalRegion", blind_data
     provided.
 
     Example:
-        >>> ma.reconstructDecay("B+:sig -> D+ pi0", "Mbc>5.2", path=path)
-        >>> ma.signalRegion("B+:sig",
-        >>>                  "Mbc>5.27 and abs(deltaE)<0.2",
-        >>>                  blind_data=True,
-        >>>                  path=path)
-        >>> ma.variablesToNtuples("B+:sig", ["isSignalRegion"], path=path)
+        .. code-block:: python
+
+            ma.reconstructDecay("B+:sig -> D+ pi0", "Mbc>5.2", path=path)
+            ma.signalRegion("B+:sig",
+                             "Mbc>5.27 and abs(deltaE)<0.2",
+                             blind_data=True,
+                             path=path)
+            ma.variablesToNtuples("B+:sig", ["isSignalRegion"], path=path)
 
     Parameters:
         particleList (str):     The input ParticleList
@@ -1874,16 +1967,20 @@ def findMCDecay(
     path.add_module(decayfinder)
 
 
-def summaryOfLists(particleLists, path):
+def summaryOfLists(particleLists, outputFile=None, path=None):
     """
     Prints out Particle statistics at the end of the job: number of events with at
     least one candidate, average number of candidates per event, etc.
+    If an output file name is provided the statistics is also dumped into a json file with that name.
 
     @param particleLists list of input ParticleLists
+    @param outputFile output file name (not created by default)
     """
 
     particleStats = register_module('ParticleStats')
     particleStats.param('particleLists', particleLists)
+    if outputFile is not None:
+        particleStats.param('outputFile', outputFile)
     path.add_module(particleStats)
 
 
@@ -1935,44 +2032,45 @@ def looseMCTruth(list_name, path):
 
 
 def buildRestOfEvent(target_list_name, inputParticlelists=None,
-                     belle_sources=False, fillWithMostLikely=False,
+                     fillWithMostLikely=True,
                      chargedPIDPriors=None, path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     dataobject and makes BASF2 relation between them. User can provide additional
-    particle lists with a different particle hypotheses like ['K+:good, e+:good'], etc.
+    particle lists with a different particle hypothesis like ['K+:good, e+:good'], etc.
 
-    @param target_list_name name of the input ParticleList
-    @param inputParticlelists list of input particle list names, which serve
-                              as a source of particles to build ROE, the FSP particles from
-                              target_list_name are excluded from ROE object
-    @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
-                              according to PID likelihood and the inputParticlelists
-                              option will be ignored.
-    @param chargedPIDPriors   The prior PID fractions, that are used to regulate
+    @param target_list_name   name of the input ParticleList
+    @param inputParticlelists list of user-defined input particle list names, which serve
+                              as source of particles to build the ROE, the FSP particles from
+                              target_list_name are automatically excluded from the ROE object
+    @param fillWithMostLikely By default the module uses the most likely particle mass hypothesis for charged particles
+                              based on the PID likelihood. Turn this behavior off if you want to configure your own
+                              input particle lists.
+    @param chargedPIDPriors   The prior PID fractions, that are used to regulate the
                               amount of certain charged particle species, should be a list of
                               six floats if not None. The order of particle types is
                               the following: [e-, mu-, pi-, K-, p+, d+]
-    @param belle_sources boolean to indicate that the ROE should be built from Belle sources only
-    @param path      modules are added to this path
+    @param path               modules are added to this path
     """
     if inputParticlelists is None:
         inputParticlelists = []
-    fillParticleList('pi+:roe_default', '', path=path)
+    fillParticleList('pi+:all', '', path=path)
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
         stdMostLikely(chargedPIDPriors, '_roe', path=path)
         inputParticlelists = ['%s:mostlikely_roe' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+']]
-    if not belle_sources:
-        fillParticleList('gamma:roe_default', '', path=path)
+    import b2bii
+    if not b2bii.isB2BII():
+        fillParticleList('gamma:all', '', path=path)
         fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
-        inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
+        inputParticlelists += ['pi+:all', 'gamma:all', 'K_L0:roe_default']
     else:
-        inputParticlelists += ['pi+:roe_default', 'gamma:mdst']
+        inputParticlelists += ['pi+:all', 'gamma:mdst']
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('ROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)
     roeBuilder.param('particleListsInput', inputParticlelists)
+    roeBuilder.param('mostLikely', fillWithMostLikely)
     path.add_module(roeBuilder)
 
 
@@ -2010,7 +2108,7 @@ def buildRestOfEventFromMC(target_list_name, inputParticlelists=None, path=None)
                  'n0', 'nu_e', 'nu_mu', 'nu_tau',
                  'K_S0', 'Lambda0']
         for t in types:
-            fillParticleListFromMC("%s:roe_default_gen" % t,   'mcPrimary > 0 and nDaughters == 0',
+            fillParticleListFromMC("%s:roe_default_gen" % t, 'mcPrimary > 0 and nDaughters == 0',
                                    True, True, path=path)
             inputParticlelists += ["%s:roe_default_gen" % t]
     roeBuilder = register_module('RestOfEventBuilder')
@@ -2033,12 +2131,16 @@ def appendROEMask(list_name,
 
     - append a ROE mask with all tracks in ROE coming from the IP region
 
-       >>> appendROEMask('B+:sig', 'IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
+        .. code-block:: python
+
+            appendROEMask('B+:sig', 'IPtracks', '[dr < 2] and [abs(dz) < 5]', path=mypath)
 
     - append a ROE mask with only ECL-based particles that pass as good photon candidates
 
-       >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
-       >>> appendROEMask('B+:sig', 'goodROEGamma', '', good_photons)
+        .. code-block:: python
+
+            goodPhotons = 'inCDCAcceptance and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
+            appendROEMask('B+:sig', 'goodROEGamma', '', goodPhotons, path=mypath)
 
 
     @param list_name             name of the input ParticleList
@@ -2067,11 +2169,13 @@ def appendROEMasks(list_name, mask_tuples, path=None):
 
     - Example for two tuples, one with and one without fractions
 
-       >>> ipTracks     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '', '')
-       >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
-       >>> goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', good_photons, '')
-       >>> goodROEKLM     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '', 'nKLMClusterTrackMatches == 0')
-       >>> appendROEMasks('B+:sig', [ipTracks, goodROEGamma, goodROEKLM])
+        .. code-block:: python
+
+            ipTracks     = ('IPtracks', '[dr < 2] and [abs(dz) < 5]', '', '')
+            goodPhotons = 'inCDCAcceptance and [clusterErrorTiming < 1e6] and [clusterE1E9 > 0.4 or E > 0.075]'
+            goodROEGamma = ('ROESel', '[dr < 2] and [abs(dz) < 5]', goodPhotons, '')
+            goodROEKLM     = ('IPtracks', '[dr < 2] and [abs(dz) < 5]', '', 'nKLMClusterTrackMatches == 0')
+            appendROEMasks('B+:sig', [ipTracks, goodROEGamma, goodROEKLM], path=mypath)
 
     @param list_name             name of the input ParticleList
     @param mask_tuples           array of ROEMask list tuples to be appended
@@ -2164,11 +2268,15 @@ def keepInROEMasks(list_name, mask_names, cut_string, path=None):
 
     - keep only those tracks that were used in provided particle list
 
-       >>> keepInROEMasks('pi+:goodTracks', 'mask', '')
+        .. code-block:: python
+
+            keepInROEMasks('pi+:goodTracks', 'mask', '', path=mypath)
 
     - keep only those clusters that were used in provided particle list and pass a cut, apply to several masks
 
-       >>> keepInROEMasks('gamma:goodClusters', ['mask1', 'mask2'], 'E > 0.1')
+        .. code-block:: python
+
+            keepInROEMasks('gamma:goodClusters', ['mask1', 'mask2'], 'E > 0.1', path=mypath)
 
 
     @param list_name    name of the input ParticleList
@@ -2201,11 +2309,15 @@ def discardFromROEMasks(list_name, mask_names, cut_string, path=None):
 
     - discard tracks that were used in provided particle list
 
-       >>> discardFromROEMasks('pi+:badTracks', 'mask', '')
+        .. code-block:: python
+
+            discardFromROEMasks('pi+:badTracks', 'mask', '', path=mypath)
 
     - discard clusters that were used in provided particle list and pass a cut, apply to several masks
 
-       >>> discardFromROEMasks('gamma:badClusters', ['mask1', 'mask2'], 'E < 0.1')
+        .. code-block:: python
+
+            discardFromROEMasks('gamma:badClusters', ['mask1', 'mask2'], 'E < 0.1', path=mypath)
 
 
     @param list_name    name of the input ParticleList
@@ -2237,7 +2349,9 @@ def optimizeROEWithV0(list_name, mask_names, cut_string, path=None):
 
     - treat tracks from K_S0 inside mass window separately, replace track momenta with K_S0 momentum
 
-       >>> optimizeROEWithV0('K_S0:opt', 'mask', '0.450 < M < 0.550')
+        .. code-block:: python
+
+            optimizeROEWithV0('K_S0:opt', 'mask', '0.450 < M < 0.550', path=mypath)
 
     @param list_name    name of the input ParticleList
     @param mask_names   array of ROEMasks to be updated
@@ -2338,8 +2452,9 @@ def buildContinuumSuppression(list_name, roe_mask, path):
     Creates for each Particle in the given ParticleList a ContinuumSuppression
     dataobject and makes BASF2 relation between them.
 
-    @param list_name name of the input ParticleList
-    @param path      modules are added to this path
+    :param list_name: name of the input ParticleList
+    :param roe_mask: name of the ROE mask
+    :param path: modules are added to this path
     """
 
     qqBuilder = register_module('ContinuumSuppressionBuilder')
@@ -2597,8 +2712,6 @@ def writePi0EtaVeto(
                                     (default is None)
     """
 
-    import basf2_mva
-
     renameSuffix = False
 
     for module in path.modules():
@@ -2607,7 +2720,6 @@ def writePi0EtaVeto(
                 if renameSuffix:
                     break
                 for submodule in subpath.modules():
-                    print(submodule.name())
                     if f'{hardParticle}:HardPhoton{suffix}' in submodule.name():
                         suffix += '_0'
                         B2WARNING("Same extension already used in writePi0EtaVeto, append '_0'")
@@ -2629,15 +2741,15 @@ def writePi0EtaVeto(
                         'cluster': '[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
                         'both': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]'}
 
-    dictEtaEnergyCut = {'standard': '[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]',
-                        'tight': '[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]',
-                        'cluster': '[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]',
-                        'both': '[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]'}
+    dictEtaEnergyCut = {'standard': '[[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]]',
+                        'tight': '[[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]]',
+                        'cluster': '[[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]]',
+                        'both': '[[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]]'}
 
-    dictTimingAndNHitsCut = {'standard': 'abs(clusterTiming)<clusterErrorTiming',
-                             'tight': 'abs(clusterTiming)<clusterErrorTiming',
-                             'cluster': 'abs(clusterTiming)<clusterErrorTiming and clusterNHits >= 2',
-                             'both': 'abs(clusterTiming)<clusterErrorTiming and clusterNHits >= 2'}
+    dictNHitsCut = {'standard': 'clusterNHits >= 0',
+                    'tight': 'clusterNHits >= 0',
+                    'cluster': 'clusterNHits >= 2',
+                    'both': 'clusterNHits >= 2'}
 
     dictPi0PayloadName = {'standard': 'Pi0VetoIdentifierStandard',
                           'tight': 'Pi0VetoIdentifierWithHigherEnergyThreshold',
@@ -2662,7 +2774,8 @@ def writePi0EtaVeto(
     ListName = dictListName[mode]
     Pi0EnergyCut = dictPi0EnergyCut[mode]
     EtaEnergyCut = dictEtaEnergyCut[mode]
-    TimingAndNHitsCut = dictTimingAndNHitsCut[mode]
+    TimingCut = 'abs(clusterTiming)<clusterErrorTiming'
+    NHitsCut = dictNHitsCut[mode]
     Pi0PayloadName = dictPi0PayloadName[mode]
     EtaPayloadName = dictEtaPayloadName[mode]
     Pi0ExtraInfoName = dictPi0ExtraInfoName[mode]
@@ -2674,7 +2787,11 @@ def writePi0EtaVeto(
     if pi0PayloadNameOverride is not None:
         Pi0PayloadName = pi0PayloadNameOverride
     if pi0SoftPhotonCutOverride is None:
-        Pi0SoftPhotonCut = Pi0EnergyCut + ' and ' + TimingAndNHitsCut
+        Pi0SoftPhotonCut = Pi0EnergyCut + ' and ' + NHitsCut
+        import b2bii
+        if not b2bii.isB2BII():
+            # timing cut is only valid for Belle II but not for B2BII
+            Pi0SoftPhotonCut += ' and ' + TimingCut
     else:
         Pi0SoftPhotonCut = pi0SoftPhotonCutOverride
 
@@ -2700,7 +2817,11 @@ def writePi0EtaVeto(
     if etaPayloadNameOverride is not None:
         EtaPayloadName = etaPayloadNameOverride
     if etaSoftPhotonCutOverride is None:
-        EtaSoftPhotonCut = EtaEnergyCut + ' and ' + TimingAndNHitsCut
+        EtaSoftPhotonCut = EtaEnergyCut + ' and ' + NHitsCut
+        import b2bii
+        if not b2bii.isB2BII():
+            # timing cut is only valid for Belle II but not for B2BII
+            EtaSoftPhotonCut += ' and ' + TimingCut
     else:
         EtaSoftPhotonCut = etaSoftPhotonCutOverride
 
@@ -2715,6 +2836,24 @@ def writePi0EtaVeto(
                                   {'extraInfo(' + EtaExtraInfoName + ')': EtaExtraInfoName + suffix}, path=roe_path)
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+
+def getBeamBackgroundProbabilityMVA(
+    particleList,
+    path=None,
+):
+    """
+    Assign a probability to each ECL cluster as being background like (0) or signal like (1)
+    @param particleList     The input ParticleList, must be a photon list
+    @param path       modules are added to this path
+    """
+
+    basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
+    path.add_module(
+        'MVAExpert',
+        listNames=particleList,
+        extraInfoName='beamBackgroundProbabilityMVA',
+        identifier='BeamBackgroundMVA')
 
 
 def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=None,
@@ -2749,6 +2888,7 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
 
     gammaCuts = 'E > 0.05'
     gammaCuts += ' and thetaInCDCAcceptance'
+    gammaCuts += ' and abs(clusterTiming) < 200'
     if (custom_cuts is not None):
         trackCuts, gammaCuts = custom_cuts
 
@@ -2756,7 +2896,7 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
         from stdCharged import stdMostLikely
         stdMostLikely(chargedPIDPriors, '_evtkin', path=path)
         inputListNames = ['%s:mostlikely_evtkin' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
-        fillParticleList('gamma:evtkin', '', path=path)
+        fillParticleList('gamma:evtkin', '', loadPhotonBeamBackgroundMVA=False, path=path)
         inputListNames += ['gamma:evtkin']
         if default_cleanup:
             B2INFO("Using default cleanup in EventKinematics module.")
@@ -2768,7 +2908,7 @@ def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtkin and gamma:evtkin to get the global kinematics of the event.")
         fillParticleList('pi+:evtkin', '', path=path)
-        fillParticleList('gamma:evtkin', '', path=path)
+        fillParticleList('gamma:evtkin', '', loadPhotonBeamBackgroundMVA=False, path=path)
         particleLists = ['pi+:evtkin', 'gamma:evtkin']
         if default_cleanup:
             if (custom_cuts is not None):
@@ -2805,7 +2945,7 @@ def buildEventKinematicsFromMC(inputListNames=None, selectionCut='', path=None):
         types = ['gamma', 'e+', 'mu+', 'pi+', 'K+', 'p+',
                  'K_S0', 'Lambda0']
         for t in types:
-            fillParticleListFromMC("%s:evtkin_default_gen" % t,   'mcPrimary > 0 and nDaughters == 0',
+            fillParticleListFromMC("%s:evtkin_default_gen" % t, 'mcPrimary > 0 and nDaughters == 0',
                                    True, True, path=path)
             if (selectionCut != ''):
                 applyCuts("%s:evtkin_default_gen" % t, selectionCut, path=path)
@@ -2892,13 +3032,14 @@ def buildEventShape(inputListNames=None,
 
     gammaCuts = 'E > 0.05'
     gammaCuts += ' and thetaInCDCAcceptance'
+    gammaCuts += ' and abs(clusterTiming) < 200'
     if (custom_cuts is not None):
         trackCuts, gammaCuts = custom_cuts
 
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.")
         fillParticleList('pi+:evtshape', '', path=path)
-        fillParticleList('gamma:evtshape', '', path=path)
+        fillParticleList('gamma:evtshape', '', loadPhotonBeamBackgroundMVA=False, path=path)
         particleLists = ['pi+:evtshape', 'gamma:evtshape']
 
         if default_cleanup:
@@ -2928,25 +3069,48 @@ def buildEventShape(inputListNames=None,
     path.add_module(eventShapeModule)
 
 
-def labelTauPairMC(printDecayInfo=False, path=None):
+def labelTauPairMC(printDecayInfo=False, path=None, TauolaBelle=False, mapping_minus=None, mapping_plus=None):
     """
     Search tau leptons into the MC information of the event. If confirms it's a generated tau pair decay,
     labels the decay generated of the positive and negative leptons using the ID of KKMC tau decay table.
 
     @param printDecayInfo:  If true, prints ID and prong of each tau lepton in the event.
     @param path:        module is added to this path
+    @param TauolaBelle: if False, TauDecayMarker is set. If True, TauDecayMode is set.
+    @param mapping_minus: if None, the map is the default one, else the path for the map is given by the user for tau-
+    @param mapping_plus: if None, the map is the default one, else the path for the map is given by the user for tau+
     """
-    tauDecayMarker = register_module('TauDecayMarker')
-    tauDecayMarker.set_name('TauDecayMarker_')
+    from basf2 import find_file
+    if not TauolaBelle:
 
-    path.add_module(tauDecayMarker, printDecayInfo=printDecayInfo)
+        if printDecayInfo:
+            m_printmode = 'all'
+        else:
+            m_printmode = 'default'
+
+        if mapping_minus is None:
+            mp_file_minus = find_file('data/analysis/modules/TauDecayMode/map_tauminus.txt')
+        else:
+            mp_file_minus = mapping_minus
+
+        if mapping_plus is None:
+            mp_file_plus = find_file('data/analysis/modules/TauDecayMode/map_tauplus.txt')
+        else:
+            mp_file_plus = mapping_plus
+
+        path.add_module('TauDecayMode', printmode=m_printmode, file_minus=mp_file_minus, file_plus=mp_file_plus)
+
+    else:
+        tauDecayMarker = register_module('TauDecayMarker')
+        tauDecayMarker.set_name('TauDecayMarker_')
+
+        path.add_module(tauDecayMarker, printDecayInfo=printDecayInfo)
 
 
 def tagCurlTracks(particleLists,
-                  belle=False,
                   mcTruth=False,
                   responseCut=0.324,
-                  selectorType='cUt',
+                  selectorType='cut',
                   ptCut=0.6,
                   train=False,
                   path=None):
@@ -2968,7 +3132,6 @@ def tagCurlTracks(particleLists,
 
 
     @param particleLists: list of particle lists to check for curls.
-    @param belle:         bool flag for Belle or Belle II data/mc.
     @param mcTruth:       bool flag to additionally assign particles with extraInfo(isTruthCurl) and
                           extraInfo(truthBundleSize). To calculate these particles are assigned to bundles by their
                           genParticleIndex then ranked and tagged as normal.
@@ -2981,6 +3144,9 @@ def tagCurlTracks(particleLists,
     @param train:         flag to set training mode if selector has a training mode (mva).
     @param path:          module is added to this path.
     """
+
+    import b2bii
+    belle = b2bii.isB2BII()
 
     if (not isinstance(particleLists, list)):
         particleLists = [particleLists]  # in case user inputs a particle list as string
@@ -2998,7 +3164,7 @@ def tagCurlTracks(particleLists,
     path.add_module(curlTagger)
 
 
-def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0, 0)):
+def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=False, binaryHypoPDGCodes=(0, 0)):
     """
     Use an MVA to perform particle identification for charged stable particles, using the `ChargedPidMVA` module.
 
@@ -3006,7 +3172,7 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
     containing the appropriate MVA score, which can be used to select candidates by placing a cut on it.
 
     Note:
-        The MVA algorithm used is a gradient boosted decision tree (**TMVA 4.2.1**, **ROOT 6.14/06**).
+        The MVA algorithm used is a gradient boosted decision tree (**TMVA 4.3.0**, **ROOT 6.20/04**).
 
     The module can perform either 'binary' PID between input S, B particle mass hypotheses according to the following scheme:
 
@@ -3014,14 +3180,15 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
     - mu (13) vs. pi (211)
     - pi (211) vs. K (321)
     - K (321) vs. pi (211)
-    - p (2212) vs. pi (211)
-    - d (1000010020) vs pi (211)
 
-    , or 'global' PID, namely "one-vs-others" separation. The latter makes use of an MVA algorithm trained in multi-class mode,
-    and it's the default behaviour.
+    , or 'global' PID, namely "one-vs-others" separation. The latter exploits an MVA algorithm trained in multi-class mode,
+    and it's the default behaviour. Currently, the multi-class training separates the following standard charged hypotheses:
 
-    Note:
-        Currently the MVA is charge-agnostic, i.e. the training is not done independently for +/- charged particles.
+    - e (11), mu (13), pi (211), K (321)
+
+    Warning:
+        In order to run the `ChargedPidMVA` and ensure the most up-to-date MVA training weights are applied,
+        it is necessary to append the latest analysis global tag (GT) to the steering script.
 
     Parameters:
         particleLists (list(str)): list of names of ParticleList objects for charged stable particles.
@@ -3039,31 +3206,38 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
           * c_ECL_PSD_Classification=6
           * c_ECL_PSD_Multiclass=7
 
+        chargeIndependent (bool, ``optional``): use a BDT trained on a sample of inclusively charged particles.
         binaryHypoPDGCodes (tuple(int, int), ``optional``): the pdgIds of the signal, background mass hypothesis.
           Required only for binary PID mode.
     """
 
     from ROOT import Belle2
+    from variables import variables as vm
+
+    import os
+
+    TrainingMode = Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode
+    Const = Belle2.Const
 
     plSet = set(particleLists)
 
     # Map the training mode enum value to the actual name of the payload in the GT.
     payloadNames = {
-        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Classification:
+        TrainingMode.c_Classification:
         {"mode": "Classification", "detector": "ALL"},
-        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Multiclass:
+        TrainingMode.c_Multiclass:
         {"mode": "Multiclass", "detector": "ALL"},
-        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_Classification:
+        TrainingMode.c_ECL_Classification:
         {"mode": "ECL_Classification", "detector": "ECL"},
-        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_Multiclass:
+        TrainingMode.c_ECL_Multiclass:
         {"mode": "ECL_Multiclass", "detector": "ECL"},
-        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_PSD_Classification:
+        TrainingMode.c_PSD_Classification:
         {"mode": "PSD_Classification", "detector": "ALL"},
-        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_PSD_Multiclass:
+        TrainingMode.c_PSD_Multiclass:
         {"mode": "PSD_Multiclass", "detector": "ALL"},
-        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_PSD_Classification:
+        TrainingMode.c_ECL_PSD_Classification:
         {"mode": "ECL_PSD_Classification", "detector": "ECL"},
-        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_PSD_Multiclass:
+        TrainingMode.c_ECL_PSD_Multiclass:
         {"mode": "ECL_PSD_Multiclass", "detector": "ECL"},
     }
 
@@ -3077,24 +3251,88 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
 
     payloadName = f"ChargedPidMVAWeights_{mode}"
 
-    if binaryHypoPDGCodes == (0, 0):
-        # MULTI-CLASS training mode.
+    # Map pdgIds of std charged particles to name identifiers,
+    # and binary bkg identifiers.
+    stdChargedMap = {
+        Const.electron.getPDGCode():
+        {"pName": "e", "pFullName": "electron", "pNameBkg": "pi", "pdgIdBkg": Const.pion.getPDGCode()},
+        Const.muon.getPDGCode():
+        {"pName": "mu", "pFullName": "muon", "pNameBkg": "pi", "pdgIdBkg": Const.pion.getPDGCode()},
+        Const.pion.getPDGCode():
+        {"pName": "pi", "pFullName": "pion", "pNameBkg": "K", "pdgIdBkg": Const.kaon.getPDGCode()},
+        Const.kaon.getPDGCode():
+        {"pName": "K", "pFullName": "kaon", "pNameBkg": "pi", "pdgIdBkg": Const.pion.getPDGCode()},
+        Const.proton.getPDGCode():
+        {"pName": "p", "pFullName": "proton", "pNameBkg": "pi", "pdgIdBkg": Const.pion.getPDGCode()},
+        Const.deuteron.getPDGCode():
+        {"pName": "d", "pFullName": "deuteron", "pNameBkg": "pi", "pdgIdBkg": Const.pion.getPDGCode()},
+    }
 
+    # Set aliases to be consistent with the variable names in the MVA weightfiles.
+    vm.addAlias("__event__", "evtNum")
+    iDet = 0
+    for detID in Const.PIDDetectors.c_set:
+
+        # At the moment, SVD is excluded.
+        if detID == Const.EDetector.SVD:
+            B2WARNING("The ChargedPidMVA training currently does not include the SVD.")
+            continue
+
+        detName = Const.parseDetectors(detID)
+
+        for pdgIdSig, info in stdChargedMap.items():
+
+            if binaryHypoPDGCodes == (0, 0):
+
+                pFullName = info["pFullName"]
+
+                # MULTI-CLASS training mode.
+                # Aliases for sub-detector likelihood ratios.
+                alias = f"{pFullName}ID_{detName}"
+                orig = f"pidProbabilityExpert({pdgIdSig}, {detName})"
+                vm.addAlias(alias, orig)
+                # Aliases for Log-transformed sub-detector likelihood ratios.
+                epsilon = 1e-8  # To avoid singularities due to limited numerical precision.
+                alias_trf = f"{pFullName}ID_{detName}_LogTransfo"
+                orig_trf = f"formula(-1. * log10(formula(((1. - {orig}) + {epsilon}) / ({orig} + {epsilon}))))"
+                vm.addAlias(alias_trf, orig_trf)
+                # Create only once an alias for the Log-transformed likelihood ratio for all detectors combination.
+                # This is just a spectator, but it needs to be defined still..
+                if iDet == 0:
+                    alias_trf = f"{pFullName}ID_LogTransfo"
+                    orig_trf = f"formula(-1. * log10(formula(((1. - {pFullName}ID) + {epsilon}) / ({pFullName}ID + {epsilon}))))"
+                    vm.addAlias(alias_trf, orig_trf)
+
+            else:
+
+                pName, pNameBkg, pdgIdBkg = info["pName"], info["pNameBkg"], info["pdgIdBkg"]
+
+                # BINARY training mode.
+                # Aliases for deltaLL(s, b) of sub-detectors.
+                alias = f"deltaLogL_{pName}_{pNameBkg}_{detName}"
+                orig = f"pidDeltaLogLikelihoodValueExpert({pdgIdSig}, {pdgIdBkg}, {detName})"
+                vm.addAlias(alias, orig)
+                # Create only once an alias for deltaLL(s, b) for all detectors combination.
+                # This is just a spectator, but it needs to be defined still..
+                if iDet == 0:
+                    alias = f"deltaLogL_{pName}_{pNameBkg}_ALL"
+                    orig = f"pidDeltaLogLikelihoodValueExpert({pdgIdSig}, {pdgIdBkg}, ALL)"
+                    vm.addAlias(alias, orig)
+
+        iDet += 1
+
+    if binaryHypoPDGCodes == (0, 0):
+
+        # MULTI-CLASS training mode.
         chargedpid = register_module("ChargedPidMVAMulticlass")
         chargedpid.set_name(f"ChargedPidMVAMulticlass_{mode}")
 
     else:
-        # BINARY training mode.
 
+        # BINARY training mode.
         # In binary mode, enforce check on input S, B hypotheses compatibility.
-        binaryOpts = [
-            (Belle2.Const.electron.getPDGCode(), Belle2.Const.pion.getPDGCode()),
-            (Belle2.Const.muon.getPDGCode(), Belle2.Const.pion.getPDGCode()),
-            (Belle2.Const.pion.getPDGCode(), Belle2.Const.kaon.getPDGCode()),
-            (Belle2.Const.kaon.getPDGCode(), Belle2.Const.pion.getPDGCode()),
-            (Belle2.Const.proton.getPDGCode(), Belle2.Const.pion.getPDGCode()),
-            (Belle2.Const.deuteron.getPDGCode(), Belle2.Const.pion.getPDGCode())
-        ]
+
+        binaryOpts = [(pdgIdSig, info["pdgIdBkg"]) for pdgIdSig, info in stdChargedMap.items()]
 
         if binaryHypoPDGCodes not in binaryOpts:
             B2FATAL("No charged pid MVA was trained to separate ", binaryHypoPDGCodes[0], " vs. ", binaryHypoPDGCodes[1],
@@ -3107,14 +3345,55 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
         chargedpid.param("bkgHypoPDGCode", binaryHypoPDGCodes[1])
 
     chargedpid.param("particleLists", list(plSet))
-
     chargedpid.param("payloadName", payloadName)
+    chargedpid.param("chargeIndependent", chargeIndependent)
 
     # Ensure the module knows whether we are using ECL-only training mode.
     if detector == "ECL":
         chargedpid.param("useECLOnlyTraining", True)
 
     path.add_module(chargedpid)
+
+
+def calculateTrackIsolation(list_name, path, *detectors, use2DRhoPhiDist=False, alias=None):
+    """
+    Given a list of charged stable particles, compute variables that quantify "isolation" of the associated tracks.
+
+    Currently, a proxy for isolation is defined as the 3D distance (or optionally, a 2D distance projecting on r-phi)
+    of each particle's track to its closest neighbour at a given detector entry surface.
+
+    Parameters:
+        list_name (str): name of the input ParticleList.
+                         It must be a list of charged stable particles as defined in ``Const::chargedStableSet``.
+                         The charge-conjugate ParticleList will be also processed automatically.
+        path (basf2.Path): the module is added to this path.
+        use2DRhoPhiDist (Optional[bool]): if true, will calculate the pair-wise track distance
+                                          as the cord length on the (rho, phi) projection.
+                                          By default, a 3D distance is calculated.
+        alias (Optional[str]): An alias to the extraInfo variable computed by the `TrackIsoCalculator` module.
+                               Please note, for each input detector a variable is calculated,
+                               and the detector's name is appended to the alias to distinguish them.
+        *detectors: detectors at whose entry surface track isolation variables will be calculated.
+                    Choose among: "CDC", "PID", "ECL", "KLM" (NB: 'PID' indicates TOP+ARICH entry surface.)
+
+    """
+
+    from variables import variables
+
+    det_choices = ("CDC", "PID", "ECL", "KLM")
+    if any(d not in det_choices for d in detectors):
+        B2ERROR("Your input detector list: ", detectors, " contains an invalid choice. Please select among: ", det_choices)
+
+    for det in detectors:
+        path.add_module("TrackIsoCalculator",
+                        particleList=list_name,
+                        detectorInnerSurface=det,
+                        use2DRhoPhiDist=use2DRhoPhiDist)
+        if isinstance(alias, str):
+            if not use2DRhoPhiDist:
+                variables.addAlias(f"{alias}{det}", f"extraInfo(dist3DToClosestTrkAt{det}Surface)")
+            else:
+                variables.addAlias(f"{alias}{det}", f"extraInfo(dist2DRhoPhiToClosestTrkAt{det}Surface)")
 
 
 def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):
@@ -3125,20 +3404,22 @@ def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):
     to get it. A full example steering file is at analysis/tests/test_DistanceCalculator.py
 
     Example:
-      >>> from modularAnalysis import calculateDistance
-      >>>calculateDistance('list_name', 'decay_string', "mode", path=user_path)
+        .. code-block:: python
+
+            from modularAnalysis import calculateDistance
+            calculateDistance('list_name', 'decay_string', "mode", path=user_path)
 
     @param list_name              name of the input ParticleList
-    @param decay_string           select particles between the distance of closest approch will be calculated
+    @param decay_string           select particles between the distance of closest approach will be calculated
     @param mode                   Specifies how the distance is calculated
-                                  vertextrack: calculate the distance of closest appreach between a track and a\
+                                  vertextrack: calculate the distance of closest approach between a track and a\
                                    vertex, taking the first candidate as vertex, default
-                                  trackvertex: calculate the distance of closest appreach between a track and a\
+                                  trackvertex: calculate the distance of closest approach between a track and a\
                                    vertex, taking the first candidate as track
-                                  2tracks: calculates the distance of closest appreach between two tracks
+                                  2tracks: calculates the distance of closest approach between two tracks
                                   2vertices: calculates the distance between two vertices
-                                  vertexbtube: calculates the distance of closest appreach between a vertex and btube
-                                  trackbtube: calculates the distance of closest appreach between a track and btube
+                                  vertexbtube: calculates the distance of closest approach between a vertex and btube
+                                  trackbtube: calculates the distance of closest approach between a track and btube
     @param path                   modules are added to this path
 
     """
@@ -3172,6 +3453,131 @@ def addInclusiveDstarReconstruction(decayString, slowPionCut, DstarCut, path):
     incl_dstar.param("slowPionCut", slowPionCut)
     incl_dstar.param("DstarCut", DstarCut)
     path.add_module(incl_dstar)
+
+
+def scaleError(outputListName, inputListName,
+               scaleFactors=[1.17, 1.12, 1.16, 1.15, 1.13],
+               d0Resolution=[12.2e-4, 14.1e-4],
+               z0Resolution=[13.4e-4, 15.3e-4],
+               path=None):
+    '''
+    This module creates a new charged particle list.
+    The helix errors of the new particles are scaled by constant factors.
+    These scale factors are defined for each helix parameter (d0, phi0, omega, z0, tanlambda).
+    The impact parameter resolution can be defined in a pseudo-momentum dependent form,
+    which limits the d0 and z0 errors so that they do not shrink below the resolution.
+    This module is supposed to be used for low-momentum (0-3 GeV/c) tracks in BBbar events.
+    Details will be documented in a Belle II note by the Belle II Japan ICPV group.
+
+    @param inputListName Name of input charged particle list to be scaled
+    @param outputListName Name of output charged particle list with scaled error
+    @param scaleFactors List of five constants to be multiplied to each of helix errors
+    @param d0Resolution List of two parameters, (a [cm], b [cm/(GeV/c)]),
+                        defining d0 resolution as sqrt{ a**2 + (b / (p*beta*sinTheta**1.5))**2 }
+    @param z0Resolution List of two parameters, (a [cm], b [cm/(GeV/c)]),
+                        defining z0 resolution as sqrt{ a**2 + (b / (p*beta*sinTheta**2.5))**2 }
+    '''
+    scale_error = register_module("HelixErrorScaler")
+    scale_error.set_name('ScaleError_' + inputListName)
+    scale_error.param('inputListName', inputListName)
+    scale_error.param('outputListName', outputListName)
+    scale_error.param('scaleFactors', scaleFactors)
+    scale_error.param('d0ResolutionParameters', d0Resolution)
+    scale_error.param('z0ResolutionParameters', z0Resolution)
+    path.add_module(scale_error)
+
+
+def correctEnergyBias(inputListNames, tableName, path=None):
+    """
+    Scale energy of the particles according to the scaling factor.
+    If the particle list contains composite particles, the energy of the daughters are scaled.
+    Subsequently, the energy of the mother particle is updated as well.
+
+    Parameters:
+        inputListNames (list(str)): input particle list names
+        tableName : stored in localdb and created using ParticleWeightingLookUpCreator
+        path (basf2.Path): module is added to this path
+    """
+
+    correctenergybias = register_module('EnergyBiasCorrection')
+    correctenergybias.param('particleLists', inputListNames)
+    correctenergybias.param('tableName', tableName)
+    path.add_module(correctenergybias)
+
+
+def addPhotonEfficiencyRatioVariables(inputListNames, tableName, path=None):
+    """
+    Add photon Data/MC detection efficiency ratio weights to the specified particle list
+
+    Parameters:
+        inputListNames (list(str)): input particle list names
+        tableName : taken from database with appropriate name
+        path (basf2.Path): module is added to this path
+    """
+
+    photon_efficiency_correction = register_module('PhotonEfficiencySystematics')
+    photon_efficiency_correction.param('particleLists', inputListNames)
+    photon_efficiency_correction.param('tableName', tableName)
+    path.add_module(photon_efficiency_correction)
+
+
+def getAnalysisGlobaltag(timeout=180) -> str:
+    """
+    Returns a string containing the name of the latest and recommended analysis globaltag.
+
+    Parameters:
+        timeout: Seconds to wait for b2conditionsdb-recommend
+    """
+    # b2conditionsdb-recommend relies on a different repository, so it's better to protect
+    # this function against potential failures of check_output.
+    try:
+        tags = subprocess.check_output(
+            ['b2conditionsdb-recommend', '--oneline'],
+            timeout=timeout
+        ).decode('UTF-8').rstrip().split(' ')
+        analysis_tag = ''
+        for tag in tags:
+            if tag.startswith('analysis_tools'):
+                analysis_tag = tag
+        return analysis_tag
+    # In case of issues with git, b2conditionsdb-recommend may take too much time.
+    except subprocess.TimeoutExpired as te:
+        B2FATAL(f'A {te} exception was raised during the call of getAnalysisGlobalTag(). '
+                'The function took too much time to retrieve the requested information '
+                'from the versioning repository.\n'
+                'Plase try to re-run your job. In case of persistent failures, there may '
+                'be issues with the DESY collaborative services, so please contact the experts.')
+    except subprocess.CalledProcessError as ce:
+        B2FATAL(f'A {ce} exception was raised during the call of getAnalysisGlobalTag(). '
+                'Please try to re-run your job. In case of persistent failures, please contact '
+                'the experts.')
+
+
+def getNbarIDMVA(particleList, path=None, ):
+    """
+    This function can give a score to predict if it is a anti-n0.
+    It is not used to predict n0.
+    Currently, this can be used only for ECL cluster.
+    output will be stored in extraInfo(nbarID); -1 means MVA invalid
+    @param particleList     The input ParticleList
+    @param path             modules are added to this path
+    """
+    from variables import variables
+    variables.addAlias('V1', 'clusterHasPulseShapeDiscrimination')
+    variables.addAlias('V2', 'clusterE')
+    variables.addAlias('V3', 'clusterLAT')
+    variables.addAlias('V4', 'clusterE1E9')
+    variables.addAlias('V5', 'clusterE9E21')
+    variables.addAlias('V6', 'clusterZernikeMVA')
+    variables.addAlias('V7', 'clusterAbsZernikeMoment40')
+    variables.addAlias('V8', 'clusterAbsZernikeMoment51')
+
+    variables.addAlias('nbarIDValid',
+                       'passesCut(V1 == 1 and V2 >= 0 and V3 >= 0 and V4 >= 0 and V5 >= 0 and V6 >= 0 and V7 >= 0 and V8 >= 0)')
+    variables.addAlias('nbarIDmod', 'conditionalVariableSelector(nbarIDValid == 1, extraInfo(nbarIDFromMVA), constant(-1.0))')
+    basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
+    path.add_module('MVAExpert', listNames=particleList, extraInfoName='nbarIDFromMVA', identifier='db_nbarIDECL')
+    variablesToExtraInfo(particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
 
 
 if __name__ == '__main__':

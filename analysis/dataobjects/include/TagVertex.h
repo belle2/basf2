@@ -60,6 +60,7 @@ namespace Belle2 {
       m_tagVNDF = 0;
       m_tagVChi2 = 0;
       m_tagVChi2IP = 0;
+      m_NFitTracks = 0;
       m_constraintType = "";
       m_constraintCenter(0) = 0; m_constraintCenter(1) = 0, m_constraintCenter(2) = 0;
       m_fitTruthStatus = 0;

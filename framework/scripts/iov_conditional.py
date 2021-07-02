@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 iov_conditional - Functions to Execute Paths Depending on Experiment Phases
 ===========================================================================
@@ -11,11 +10,12 @@ file for phases 2 and 3.
 Warning:
     All Modules will be initialized on startup of the framework. This might
     cause problems if the modules initialize some common global state. For
-    example adding :b2:mod:`Geometry` modules with different parameters will not
+    example, adding ``Geometry`` modules with different parameters will not
     work as expected.
 """
 import basf2
 
+#: Definition of Phase 2 in a) real data and b) run-independent MC/development globaltags
 PHASE2_IOVS = [(1, 0, 4, -1), (1002, 0, 1002, -1)]
 
 

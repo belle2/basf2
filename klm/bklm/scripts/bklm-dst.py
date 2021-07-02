@@ -41,15 +41,11 @@
 #
 
 import basf2
-from basf2 import *
 import sys
 import re
 import EventInspector
-from EventInspector import *
-import simulation
-import reconstruction
 import rawdata
-from optparse import Option, OptionValueError, OptionParser
+from optparse import OptionParser
 import glob
 
 parser = OptionParser()
@@ -167,11 +163,9 @@ if maxCount >= 0:
 else:
     print('bklm-dst: exp=' + exp + ' run=' + run + ' input=' + inputName + '. Analyze all events using ' + tagName)
 
-reset_database()
-use_database_chain()
-use_central_database(tagName)
+basf2.conditions.prepend_globaltag(tagName)
 
-main = create_path()
+main = basf2.create_path()
 if inputName.find(".sroot") >= 0:
     main.add_module('SeqRootInput', inputFileNames=inputName)
 else:
@@ -184,5 +178,5 @@ rawdata.add_unpackers(main, components=['KLM'])
 main.add_module('KLMReconstructor')
 main.add_module(eventInspector)
 
-process(main, max_event=maxCount)
-print(statistics)
+basf2.process(main, max_event=maxCount)
+print(basf2.statistics)

@@ -36,7 +36,7 @@
 #pragma link C++ class Belle2::CDCTriggerPlane+; // checksum=0xf09a69e5, version=1
 #pragma link C++ class Belle2::CDCADCDeltaPedestals+; // checksum=0x4f3c632d, version=1
 #pragma link C++ class Belle2::CDCFEElectronics+; // checksum=0x14613816, version=2
-#pragma link C++ class Belle2::CDCEDepToADCConversions+; // checksum=0x3d6b427c, version=2
+#pragma link C++ class Belle2::CDCEDepToADCConversions+; // checksum=0x3d6b427c, version=3
 #pragma link C++ class Belle2::CDCWireHitRequirements+; // checksum=0x4c504d88, version=2
 #pragma link C++ class Belle2::CDCCrossTalkLibrary+; // checksum=0x4ace6024, version=2
 #pragma link C++ class Belle2::CDCFudgeFactorsForSigma+; // checksum=0x37bcdd67, version=1

@@ -10,11 +10,9 @@ import basf2
 import generators
 from simulation import add_simulation
 from rawdata import add_packers
-from L1trigger import add_tsim
 from softwaretrigger import constants
 from softwaretrigger.constants import DEFAULT_EXPRESSRECO_COMPONENTS, RAWDATA_OBJECTS, DEFAULT_HLT_COMPONENTS
 from ROOT import Belle2
-find_file = Belle2.FileSystem.findFile
 
 
 class CheckForCorrectHLTResults(basf2.Module):
@@ -51,7 +49,7 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
     basf2.set_random_seed(12345)
 
     path = basf2.Path()
-    path.add_module('EventInfoSetter', evtNumList=[1], expList=[exp_number])
+    path.add_module('EventInfoSetter', evtNumList=[4], expList=[exp_number])
 
     if run_type == constants.RunTypes.beam:
         generators.add_continuum_generator(path, finalstate="uubar")
@@ -62,7 +60,6 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
         path.add_module("ParticleGun", pdgCodes=[-13, 13], momentumParams=[10, 200])
 
     add_simulation(path, usePXDDataReduction=(location == constants.Location.expressreco))
-    add_tsim(path)
 
     if location == constants.Location.hlt:
         components = DEFAULT_HLT_COMPONENTS
@@ -82,12 +79,32 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
                 self.results = Belle2.PyStoreObj(Belle2.SoftwareTriggerResult.Class(), "SoftwareTriggerResult")
                 self.results.registerInDataStore()
 
+                self.EventMetaData = Belle2.PyStoreObj("EventMetaData")
+
             def event(self):
                 self.results.create()
-                # and add all the results that are used on express reco just to test all paths
-                self.results.addResult("software_trigger_cut&all&total_result", 1)
-                self.results.addResult("software_trigger_cut&skim&accept_mumutight", 1)
-                self.results.addResult("software_trigger_cut&skim&accept_dstar_1", 1)
+                # First event: Add all the results that are used on express reco just to test all paths
+                if (self.EventMetaData.obj().getEvent() == 1):
+                    self.results.addResult("software_trigger_cut&all&total_result", 1)
+                    self.results.addResult("software_trigger_cut&skim&accept_mumutight", 1)
+                    self.results.addResult("software_trigger_cut&skim&accept_dstar_1", 1)
+                    self.results.addResult("software_trigger_cut&filter&L1_trigger", 1)
+                # Second event: No skim lines to replicate a HLT discared event with filter ON
+                elif (self.EventMetaData.obj().getEvent() == 2):
+                    self.results.addResult("software_trigger_cut&all&total_result", 1)
+                    self.results.addResult("software_trigger_cut&filter&L1_trigger", 1)
+                # Third event: Does not pass through L1 passthrough
+                elif (self.EventMetaData.obj().getEvent() == 3):
+                    self.results.addResult("software_trigger_cut&all&total_result", 1)
+                    self.results.addResult("software_trigger_cut&skim&accept_mumutight", 1)
+                    self.results.addResult("software_trigger_cut&skim&accept_dstar_1", 1)
+                    self.results.addResult("software_trigger_cut&filter&L1_trigger", 0)
+                # Fourth event: HLT discarded but passes HLT skims (possible in HLT filter OFF mode)
+                elif (self.EventMetaData.obj().getEvent() == 4):
+                    self.results.addResult("software_trigger_cut&all&total_result", 0)
+                    self.results.addResult("software_trigger_cut&skim&accept_mumutight", 1)
+                    self.results.addResult("software_trigger_cut&skim&accept_dstar_1", 1)
+                    self.results.addResult("software_trigger_cut&filter&L1_trigger", 0)
 
         path.add_module(FakeHLTResult())
 
@@ -99,9 +116,8 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
         branch_names.remove("RawPXDs")
         branch_names.remove("ROIs")
 
-    # There us no packer for these objects :-(
+    # There is no packer for the following objects :(
     branch_names.remove("RawTRGs")
-    branch_names.remove("RawFTSWs")
 
     path.add_module("RootOutput", outputFileName=output_file_name, branchNames=branch_names)
 
@@ -134,11 +150,11 @@ def test_script(script_location, input_file_name, temp_dir):
     os.chdir(os.path.dirname(script_location))
     cmd = [sys.executable, script_location,
            "--central-db-tag"] + globaltags + [
-           "--input-file", os.path.abspath(input_file_name),
-           "--histo-output-file", os.path.abspath(histos_file_name),
-           "--output-file", os.path.abspath(output_file_name),
-           "--number-processes", str(num_processes),
-           input_buffer, output_buffer, str(histo_port)]
+        "--input-file", os.path.abspath(input_file_name),
+        "--histo-output-file", os.path.abspath(histos_file_name),
+        "--output-file", os.path.abspath(output_file_name),
+        "--number-processes", str(num_processes),
+        input_buffer, output_buffer, str(histo_port)]
 
     subprocess.check_call(cmd)
 
@@ -177,7 +193,7 @@ def test_folder(location, run_type, exp_number, phase, passthrough=False):
                         output_file_name=output_file_name, exp_number=exp_number,
                         passthrough=passthrough)
 
-    script_dir = find_file(f"hlt/operation/{phase}/global/{location.name}/evp_scripts/")
+    script_dir = basf2.find_file(f"hlt/operation/{phase}/global/{location.name}/evp_scripts/")
     run_at_least_one = False
     for script_location in glob(os.path.join(script_dir, f"run_{run_type.name}*.py")):
         run_at_least_one = True

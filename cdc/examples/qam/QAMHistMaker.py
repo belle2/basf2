@@ -1,18 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-import ROOT
-from ROOT import Belle2
-from ROOT import TFile, TH1D, TH2D, TCanvas, TFile, TChain
-from ROOT import TH1F
+import basf2 as b2
 import argparse
 import glob
-import time
 
-reset_database()
-use_database_chain()
-use_central_database("GT_gen_data_003.04_gcr2017-08", LogLevel.WARNING)
+b2.reset_database()
+b2.use_database_chain()
+b2.use_central_database("GT_gen_data_003.04_gcr2017-08", b2.LogLevel.WARNING)
 
 
 def ana(exp=1, run=3118, magneticField=True, prefix='', dest='.'):
@@ -24,18 +19,18 @@ def ana(exp=1, run=3118, magneticField=True, prefix='', dest='.'):
     #    files = glob.glob(prefix + '/dst_run{0}'.format(run) + '.root')
 
     # create path
-    main = create_path()
+    main = b2.create_path()
     # Input (ROOT file).
     main.add_module('RootInput',
                     inputFileNames=files)
 
-    gearbox = register_module('Gearbox',
-                              fileName="/geometry/GCR_Summer2017.xml",
-                              override=[
+    gearbox = b2.register_module('Gearbox',
+                                 fileName="/geometry/GCR_Summer2017.xml",
+                                 override=[
                                   ("/Global/length", "8.", "m"),
                                   ("/Global/width", "8.", "m"),
                                   ("/Global/height", "8.", "m"),
-                              ])
+                                     ])
     main.add_module(gearbox)
     #    main.add_module('Geometry')
     main.add_module('Geometry',
@@ -51,8 +46,8 @@ def ana(exp=1, run=3118, magneticField=True, prefix='', dest='.'):
 
     main.add_module('Progress')
     # process events and print call statistics
-    process(main)
-    print(statistics)
+    b2.process(main)
+    print(b2.statistics)
 
 
 if __name__ == "__main__":

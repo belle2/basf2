@@ -143,5 +143,5 @@ o. check if :doc:`RestOfEvent` is related to any Particle from :code:`B0` list
 
     printVariableValues('B0', ['pi0veto'], path=mymainpath)
 
-If the signal photon candidate could not be paired with any other photon candidate from the :doc:`RestOfEvent` to form a :math:`\pi^0` candidate, then ``extraInfo(pi0veto) = -999``.
+If the signal photon candidate could not be paired with any other photon candidate from the :doc:`RestOfEvent` to form a :math:`\pi^0` candidate, then ``extraInfo(pi0veto) = NaN``.
 

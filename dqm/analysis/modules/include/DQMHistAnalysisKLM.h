@@ -24,6 +24,8 @@
 
 /* ROOT headers. */
 #include <TCanvas.h>
+#include <TH1.h>
+#include <TH2F.h>
 #include <TLatex.h>
 #include <TText.h>
 #include <TLine.h>
@@ -48,34 +50,34 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~DQMHistAnalysisKLMModule();
+    ~DQMHistAnalysisKLMModule();
 
     /**
      * Initializer.
      */
-    virtual void initialize() override;
+    void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /**
      * This method is called for each event.
      */
-    virtual void event() override;
+    void event() override;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun() override;
+    void endRun() override;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate() override;
+    void terminate() override;
 
-  protected:
+  private:
 
     /**
      * Get number of processed events.
@@ -94,6 +96,15 @@ namespace Belle2 {
     void analyseChannelHitHistogram(
       int subdetector, int section, int sector,
       TH1* histogram, TCanvas* canvas, TLatex& latex);
+
+    /**
+     * Process spatial 2D hits histograms for endcap.
+     * @param[in] section   Section.
+     * @param[in] histogram Histogram.
+     * @param[in] canvas    Canvas.
+     */
+    void processSpatial2DHitEndcapHistogram(
+      uint16_t section, TH2F* histogram, TCanvas* canvas);
 
     /**
      * Process histogram containing the number of hits in plane.
@@ -117,9 +128,6 @@ namespace Belle2 {
 
     /** Number of processed events. */
     double m_ProcessedEvents;
-
-    /** Electronics map. */
-    DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
 
     /** Threshold for masked channels. */
     int m_ThresholdForMasked;
@@ -145,6 +153,15 @@ namespace Belle2 {
     /** Vector of masked channels. */
     std::vector<uint16_t> m_MaskedChannels;
 
+    /** TLine for background region in 2d hits histograms. */
+    TLine m_2DHitsLine;
+
+    /** TLine for boundary in plane histograms. */
+    TLine m_PlaneLine;
+
+    /** TText for names in plane histograms. */
+    TText m_PlaneText;
+
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;
 
@@ -155,17 +172,10 @@ namespace Belle2 {
     const KLMElementNumbers* m_ElementNumbers;
 
     /** EKLM element numbers. */
-    const EKLMElementNumbers* m_eklmElementNumbers;
+    const EKLMElementNumbers* m_EklmElementNumbers;
 
-    /** EKLM strip number within a layer. */
-    TCanvas* m_eklmStripLayer[
-      EKLMElementNumbers::getMaximalLayerGlobalNumber()];
-
-    /** TLine for boundary in plane histograms. */
-    TLine m_PlaneLine;
-
-    /** TText for names in plane histograms. */
-    TText m_PlaneText;
+    /** Electronics map. */
+    DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
 
   };
 

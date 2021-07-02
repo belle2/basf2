@@ -31,6 +31,10 @@ namespace Belle2 {
     TRGCDCEventTime(const TRGCDC&, bool makeRootFile);
     /// destructor of TRGCDCEventTime class
     virtual ~TRGCDCEventTime();
+    /// copy constructor, deleted
+    TRGCDCEventTime(TRGCDCEventTime&) = delete;
+    /// assignment operator, deleted
+    TRGCDCEventTime& operator=(TRGCDCEventTime&) = delete;
 
   public :
 

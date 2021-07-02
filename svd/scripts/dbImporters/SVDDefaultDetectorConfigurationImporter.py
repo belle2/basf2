@@ -4,16 +4,10 @@
 SVD Default Detecotr Configuration importer.
 """
 
-import basf2
-from basf2 import *
-from svd import *
-import ROOT
+import basf2 as b2
 from ROOT import Belle2
-from ROOT.Belle2 import SVDLocalConfigParameters
-from ROOT.Belle2 import SVDGlobalConfigParameters
 from basf2 import conditions as b2conditions
 import datetime
-import os
 
 now = datetime.datetime.now()
 
@@ -33,7 +27,7 @@ relativeShift = 0
 nrFrames = 6
 
 
-class defaultSVDConfigParametersImporter(basf2.Module):
+class defaultSVDConfigParametersImporter(b2.Module):
     '''default importer for the detector configuration'''
 
     def beginRun(self):
@@ -41,11 +35,11 @@ class defaultSVDConfigParametersImporter(basf2.Module):
 
         iov = Belle2.IntervalOfValidity.always()
 
-        local_payload = Belle2.SVDDetectorConfiguration.t_svdLocalConfig_payload(
+        local_payload = Belle2.SVDLocalConfigParameters(
             "LocalConfiguration_default_" + str(now.isoformat()) +
             "_INFO:_injCharge=" + str(injCharge) + "_calTimeUnits=" + str(calibrationTimeUnits))
 
-        global_payload = Belle2.SVDDetectorConfiguration.t_svdGlobalConfig_payload(
+        global_payload = Belle2.SVDGlobalConfigParameters(
             "GlobalConfiguration_default_" + str(now.isoformat()) +
             "_INFO:_latency=" + str(latency) +
             "_maskFilter=" + str(maskFilter) + "_ZS=" + str(zeroSuppress) +
@@ -62,16 +56,16 @@ class defaultSVDConfigParametersImporter(basf2.Module):
         global_payload.setRelativeTimeShift(relativeShift)
         global_payload.setNrFrames(nrFrames)
 
-        Belle2.Database.Instance().storeData(Belle2.SVDDetectorConfiguration.svdLocalConfig_name, local_payload, iov)
-        Belle2.Database.Instance().storeData(Belle2.SVDDetectorConfiguration.svdGlobalConfig_name, global_payload, iov)
+        Belle2.Database.Instance().storeData("SVDLocalConfigParameters", local_payload, iov)
+        Belle2.Database.Instance().storeData("SVDGlobalConfigParameters", global_payload, iov)
 
 
 b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 
-main = create_path()
+main = b2.create_path()
 
 # Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
@@ -81,8 +75,8 @@ main.add_module("Geometry")
 main.add_module(defaultSVDConfigParametersImporter())
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)

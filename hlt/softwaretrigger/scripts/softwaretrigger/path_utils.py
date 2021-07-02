@@ -1,4 +1,5 @@
 import basf2
+import ROOT
 from softwaretrigger import constants
 import modularAnalysis
 import stdV0s
@@ -7,7 +8,7 @@ from geometry import check_components
 import reconstruction
 
 
-def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode):
+def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode, create_hlt_unit_histograms=False):
     """
     Add DQM plots for a specific run type and dqm environment
     """
@@ -17,9 +18,11 @@ def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode):
     from daqdqm.cosmicdqm import add_cosmic_dqm
 
     if run_type == constants.RunTypes.beam:
-        add_collision_dqm(path, components=components, dqm_environment=dqm_environment, dqm_mode=dqm_mode)
+        add_collision_dqm(path, components=components, dqm_environment=dqm_environment,
+                          dqm_mode=dqm_mode, create_hlt_unit_histograms=create_hlt_unit_histograms)
     elif run_type == constants.RunTypes.cosmic:
-        add_cosmic_dqm(path, components=components, dqm_environment=dqm_environment, dqm_mode=dqm_mode)
+        add_cosmic_dqm(path, components=components, dqm_environment=dqm_environment,
+                       dqm_mode=dqm_mode)
     else:
         basf2.B2FATAL("Run type {} not supported.".format(run_type))
 
@@ -27,7 +30,7 @@ def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode):
         path.add_module('DelayDQM', title=dqm_environment, histogramDirectoryName='DAQ')
 
 
-def add_hlt_dqm(path, run_type, components, dqm_mode):
+def add_hlt_dqm(path, run_type, components, dqm_mode, create_hlt_unit_histograms=False):
     """
     Add all the DQM modules for HLT to the path
     """
@@ -36,15 +39,17 @@ def add_hlt_dqm(path, run_type, components, dqm_mode):
         run_type=run_type,
         dqm_environment=constants.Location.hlt.name,
         components=components,
-        dqm_mode=dqm_mode.name)
+        dqm_mode=dqm_mode.name,
+        create_hlt_unit_histograms=create_hlt_unit_histograms)
+    path.add_module('StatisticsSummary').set_name('Sum_HLT_DQM_' + dqm_mode.name)
 
 
-def add_expressreco_dqm(path, run_type, components):
+def add_expressreco_dqm(path, run_type, components, dqm_mode=constants.DQMModes.dont_care.name):
     """
     Add all the DQM modules for ExpressReco to the path
     """
     add_online_dqm(path, run_type=run_type, dqm_environment=constants.Location.expressreco.name, components=components,
-                   dqm_mode=constants.DQMModes.dont_care.name)
+                   dqm_mode=dqm_mode)
 
 
 def add_geometry_if_not_present(path):
@@ -106,6 +111,8 @@ def add_filter_software_trigger(path,
                                      baseIdentifier="filter",
                                      preScaleStoreDebugOutputToDataStore=store_array_debug_prescale,
                                      useRandomNumbersForPreScale=use_random_numbers_for_prescale)
+    # Statistics Summary
+    path.add_module('StatisticsSummary').set_name('Sum_HLT_Filter_Calculation')
 
     return hlt_cut_module
 
@@ -125,21 +132,24 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     modularAnalysis.fillParticleList("pi+:skim", 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("pi+:hadb", 'p>0.1 and abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("pi+:tau", 'abs(d0) < 2 and abs(z0) < 8', path=path)
-    modularAnalysis.fillParticleList("gamma:skim", 'E>0.1', path=path)
+    modularAnalysis.fillParticleList("gamma:skim", 'E>0.1', loadPhotonBeamBackgroundMVA=False, path=path)
     stdV0s.stdKshorts(path=path, fitter='KFit')
+    modularAnalysis.cutAndCopyList('K_S0:dstSkim', 'K_S0:merged', 'goodBelleKshort == 1', True, path=path)
     stdV0s.stdLambdas(path=path)
     modularAnalysis.fillParticleList("K+:dstSkim", 'abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("pi+:dstSkim", 'abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("gamma:loose", 'theta > 0.296706 and theta < 2.61799 and \
     [[clusterReg == 1 and E > 0.03] or [clusterReg == 2 and E > 0.02] or [clusterReg == 3 and E > 0.03]] and \
-    [abs(clusterTiming) < formula(1.0 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.3 or E > 0.1] ', path=path)
+    [abs(clusterTiming) < formula(1.0 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.3 or E > 0.1]',
+                                     loadPhotonBeamBackgroundMVA=False, path=path)
     modularAnalysis.reconstructDecay('pi0:loose -> gamma:loose gamma:loose', '0.075 < M < 0.175', 1, True, path=path)
     modularAnalysis.cutAndCopyList('pi0:veryLooseFit', 'pi0:loose', '', True, path=path)
     vertex.kFit('pi0:veryLooseFit', 0.0, 'mass', path=path)
     D0_Cut = '1.7 < M < 2.1'
     D0_Ch = ['K-:dstSkim pi+:dstSkim',
              'K-:dstSkim pi+:dstSkim pi0:veryLooseFit',
-             'K-:dstSkim pi+:dstSkim pi-:dstSkim pi+:dstSkim']
+             'K-:dstSkim pi+:dstSkim pi-:dstSkim pi+:dstSkim',
+             'K_S0:dstSkim pi+:dstSkim pi-:dstSkim']
 
     for chID, channel in enumerate(D0_Ch):
         chID += 1
@@ -158,13 +168,14 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     path.add_module("SoftwareTrigger", baseIdentifier="skim",
                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)
 
+    # Statistics Summary
+    path.add_module('StatisticsSummary').set_name('Sum_HLT_Skim_Calculation')
 
-def add_filter_reconstruction(path, run_type, components, abort_path, **kwargs):
+
+def add_pre_filter_reconstruction(path, run_type, components, **kwargs):
     """
     Add everything needed to calculation a filter decision and if possible,
     also do the HLT filtering. This is only possible for beam runs (in the moment).
-
-    Up to now, we add the full reconstruction, but this will change in the future.
 
     Please note that this function adds the HLT decision, but does not branch
     according to it.
@@ -172,19 +183,19 @@ def add_filter_reconstruction(path, run_type, components, abort_path, **kwargs):
     check_components(components)
 
     if run_type == constants.RunTypes.beam:
-        reconstruction.add_reconstruction(
+        reconstruction.add_prefilter_reconstruction(
             path,
             skipGeometryAdding=True,
             pruneTracks=False,
             add_trigger_calculation=False,
             components=components,
-            abort_path=abort_path,
+            event_abort=hlt_event_abort,
             **kwargs)
 
-        add_filter_software_trigger(path, store_array_debug_prescale=1)
     elif run_type == constants.RunTypes.cosmic:
         reconstruction.add_cosmics_reconstruction(path, skipGeometryAdding=True, pruneTracks=False,
                                                   components=components, **kwargs)
+
     else:
         basf2.B2FATAL(f"Run Type {run_type} not supported.")
 
@@ -201,14 +212,29 @@ def add_post_filter_reconstruction(path, run_type, components):
     """
     Add all modules which should run after the HLT decision is taken
     and only on the accepted events.
-    Up to now, this only includes the skim part, but this will
-    change in the future.
+    This includes reconstruction modules not essential
+    to calculate filter decision and then the skim calculation.
     """
     check_components(components)
 
     if run_type == constants.RunTypes.beam:
+        reconstruction.add_postfilter_reconstruction(path, components=components)
+
         add_skim_software_trigger(path, store_array_debug_prescale=1)
     elif run_type == constants.RunTypes.cosmic:
-        pass
+        add_skim_software_trigger(path, store_array_debug_prescale=1)
     else:
         basf2.B2FATAL(f"Run Type {run_type} not supported.")
+
+
+def hlt_event_abort(module, condition, error_flag):
+    """
+    Create a discard path suitable for HLT processing, i.e. set an error flag and
+    keep only the metadata.
+    """
+    p = basf2.Path()
+    p.add_module("EventErrorFlag", errorFlag=error_flag)
+    add_store_only_metadata_path(p)
+    module.if_value(condition, p, basf2.AfterConditionPath.CONTINUE)
+    if error_flag == ROOT.Belle2.EventMetaData.c_HLTDiscard:
+        p.add_module('StatisticsSummary').set_name('Sum_HLT_Discard')

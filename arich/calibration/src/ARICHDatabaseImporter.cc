@@ -691,8 +691,8 @@ int ARICHDatabaseImporter::getAeroTileRing(int slot)
 {
   int ring = 0;
   if (slot < 23) ring = 1;
-  else if (slot > 22 && slot < 51) ring = 2;
-  else if (slot > 50 && slot < 85) ring = 3;
+  else if (slot < 51) ring = 2;
+  else if (slot < 85) ring = 3;
   else ring = 4;
 
   return ring;
@@ -702,8 +702,8 @@ int ARICHDatabaseImporter::getAeroTileColumn(int slot)
 {
   int column = 0;
   if (slot < 23) column = slot;
-  else if (slot > 22 && slot < 51) column = slot - 22;
-  else if (slot > 50 && slot < 85) column = slot - 50;
+  else if (slot < 51) column = slot - 22;
+  else if (slot < 85) column = slot - 50;
   else column = slot - 84;
 
   return column;

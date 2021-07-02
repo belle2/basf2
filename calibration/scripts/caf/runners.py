@@ -2,13 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABC, abstractmethod
-from threading import Thread
 import time
-import ROOT
-from .utils import decode_json_string
-from .utils import IoV_Result
-from .utils import AlgResult
-from basf2 import B2ERROR, B2FATAL, B2INFO, B2DEBUG
+from basf2 import B2DEBUG, B2ERROR, B2INFO
 import multiprocessing
 
 
@@ -20,7 +15,6 @@ class Runner(ABC):
     def run(self):
         """
         """
-        pass
 
 
 class AlgorithmsRunner(Runner):
@@ -100,7 +94,7 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
     def run(self, iov, iteration):
         """
         """
-        from .strategies import AlgorithmStrategy
+        from caf.strategies import AlgorithmStrategy
         B2INFO(f"SequentialAlgorithmsRunner begun for Calibration {self.name}.")
         # First we do the setup of algorithm strategies
         strategies = []
@@ -154,7 +148,7 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
                     if final_state:
                         # Check the exitcode for failed Process()
                         if child.exitcode == 0:
-                            B2INFO(f"AlgorithStrategy subprocess for {strategy.algorithm.name} exited")
+                            B2INFO(f"AlgorithmStrategy subprocess for {strategy.algorithm.name} exited")
                             break
                         else:
                             raise RunnerError(f"Error during subprocess of AlgorithmStrategy for {strategy.algorithm.name}")
@@ -192,4 +186,3 @@ class RunnerError(Exception):
     """
     Base exception class for Runners
     """
-    pass

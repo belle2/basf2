@@ -7,7 +7,6 @@ env['LIBS'] = [
     'svd',
     'pxd',
     'cdc_dataobjects',
-    'geometry',
     'vxd',
     'pxd_dataobjects',
     'svd_dataobjects',

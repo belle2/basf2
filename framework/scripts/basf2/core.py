@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 The core module of the Belle II Analysis Software Framework.
@@ -26,8 +25,12 @@ from pybasf2 import *  # noqa
 from basf2 import _constwrapper  # noqa
 
 
-basf2label = 'BASF2 (Belle Analysis Software Framework 2)'
-basf2copyright = 'Copyright(C) 2010-2020  Belle II Collaboration'
+#: name of the framework
+basf2label = 'basf2 (Belle II Analysis Software Framework)'
+#: and copyright notice
+basf2copyright = 'Copyright(C) 2010-2021 Members of the Belle II Collaboration'
+#: license details
+basf2license = '(See "basf2 --license" for more information.)'
 
 # -----------------------------------------------
 #               Prepare basf2
@@ -49,7 +52,7 @@ def register_module(name_or_module, shared_lib_path=None, logLevel=None, debugLe
     Parameters can be passed directly to the module as keyword parameters or can
     be set later using `Module.param`
 
-    >>> module = basf.register_module('EventInfoSetter', evtNumList=100, logLevel=LogLevel.ERROR)
+    >>> module = basf2.register_module('EventInfoSetter', evtNumList=100, logLevel=LogLevel.ERROR)
     >>> module.param("evtNumList", 100)
 
     Parameters:
@@ -132,6 +135,31 @@ def set_module_parameters(path, name=None, type=None, recursive=False, **kwargs)
         raise KeyError("No module with given name found anywhere in the path")
 
 
+def remove_module(old_path, name=None):
+    """Provides a new path with all modules that were in the ``old_path`` \
+    except the one with the given ``name`` (see `Module.set_name`)
+
+    Usage is very simple, in this example we remove Geometry the path:
+
+    >>> main = remove_module(main, "Geometry")
+
+    Parameters:
+      old_path (basf2.Path): The path to search for the module
+      name (str): Then name of the module you want to remove
+    """
+
+    if name is None:
+        raise ValueError("You should provide the module name")
+
+    new_path = create_path()
+
+    for module in old_path.modules():
+        if name != module.name():
+            new_path.add_module(module)
+
+    return new_path
+
+
 def create_path():
     """
     Creates a new path and returns it. You can also instantiate `basf2.Path` directly.
@@ -185,7 +213,7 @@ def process(path, max_event=0):
 
     # If a pickle path is set via  --dump-path or --execute-path we do something special
     if pybasf2.get_pickle_path() != "":
-        from . pickle_path import check_pickle_path
+        from basf2.pickle_path import check_pickle_path
         path = check_pickle_path(path)
 
     # apparently nothing to do

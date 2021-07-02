@@ -1,0 +1,42 @@
+.. This is meant to be included below every lesson
+
+.. admonition:: Stuck? We can help!
+   :class: hint toggle stacked
+
+   If you get stuck or have any questions to the online book material, the
+   `#starterkit-workshop channel <https://chat.belle2.org/channel/starterkit-workshop>`_
+   in our chat is full of nice people who will provide fast help.
+
+   Refer to :ref:`onlinebook_collaborative_tools` for other
+   places to get help if you have specific or detailed questions about your
+   own analysis.
+
+.. admonition:: Improving things!
+    :class: hint toggle stacked
+
+    If you know how to do it, we recommend you to report bugs and other requests
+    with `JIRA <https://agira.desy.de/>`_. Make sure to use the
+    ``documentation-training`` component of the ``Belle II Software`` project.
+
+    If you just want to give very quick feedback, use the last box
+    "Quick feedback".
+
+    Please make sure to be as precise as possible to make it easier for us
+    to fix things! So for example:
+
+    * typos (where?)
+    * missing bits of information (what?)
+    * bugs (what did you do? what goes wrong?)
+    * too hard exercises (which one?)
+    * etc.
+
+    If you are familiar with git and want to create your first pull request
+    for the software, take a look at :ref:`onlinebook_how_to_contribute`.
+    We'd be happy to have you on the team!
+
+.. admonition:: Quick feedback!
+    :class: hint toggle
+
+    .. raw:: html
+
+        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScr_ZdmXRGKKm5PGxw9ygdv4kx93T2E_avsISj09_s2eNk0HQ/viewform?embedded=true" width="640" height="700" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>

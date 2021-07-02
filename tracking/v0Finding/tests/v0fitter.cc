@@ -2,6 +2,11 @@
 
 #include <framework/gearbox/Const.h>
 
+#include <genfit/FieldManager.h>
+#include <genfit/MaterialEffects.h>
+#include <genfit/ConstField.h>
+#include <genfit/TGeoMaterialInterface.h>
+
 #include <utility>
 
 #include <gtest/gtest.h>
@@ -17,6 +22,8 @@ namespace Belle2 {
   /// Test getter for track hypotheses.
   TEST_F(V0FitterTest, GetTrackHypotheses)
   {
+    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
+    genfit::FieldManager::getInstance()->init(new genfit::ConstField(0., 0., 1.5));
     V0Fitter v0Fitter;
     const auto kShortTracks = v0Fitter.getTrackHypotheses(Const::Kshort);
     const auto photonTracks = v0Fitter.getTrackHypotheses(Const::photon);
@@ -39,10 +46,15 @@ namespace Belle2 {
   /// Test initialization of cuts.
   TEST_F(V0FitterTest, InitializeCuts)
   {
+    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
+    genfit::FieldManager::getInstance()->init(new genfit::ConstField(0., 0., 1.5));
     V0Fitter v0Fitter;
-    v0Fitter.initializeCuts(1.0, 52.);
+    v0Fitter.initializeCuts(1.0, 10000., {0.425, 0.575}, {1.09, 1.14}, {0, 0.1});
     EXPECT_EQ(1.0, v0Fitter.m_beamPipeRadius);
-    EXPECT_EQ(52., v0Fitter.m_vertexChi2CutOutside);
+    EXPECT_EQ(10000., v0Fitter.m_vertexChi2CutOutside);
+    EXPECT_EQ(std::make_tuple(0.425, 0.575), v0Fitter.m_invMassRangeKshort);
+    EXPECT_EQ(std::make_tuple(1.09, 1.14),   v0Fitter.m_invMassRangeLambda);
+    EXPECT_EQ(std::make_tuple(0, 0.1),       v0Fitter.m_invMassRangePhoton);
   }
 
 }  // namespace

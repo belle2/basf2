@@ -7,8 +7,8 @@
 using namespace Belle2;
 
 /// Add a new cut result to the storage or override the result with the same name.
-void SoftwareTriggerResult::addResult(const std::string& triggerIdentifier, const SoftwareTriggerCutResult& result,
-                                      const SoftwareTriggerCutResult& nonPrescalesResult)
+void SoftwareTriggerResult::addResult(const std::string& triggerIdentifier, SoftwareTriggerCutResult result,
+                                      SoftwareTriggerCutResult nonPrescalesResult)
 {
   m_results[triggerIdentifier] = std::make_pair(static_cast<int>(result), static_cast<int>(nonPrescalesResult));
 }

@@ -3,16 +3,14 @@
 
 # This example demonstrates showing user-defined things using DisplayData
 
-import os
-import random
-from basf2 import *
+import basf2 as b2
 
 from ROOT import Belle2
 from ROOT import TVector3
 import ROOT
 
 
-class DisplayDataTest(Module):
+class DisplayDataTest(b2.Module):
     """Test DisplayData"""
 
     def initialize(self):
@@ -51,26 +49,26 @@ class DisplayDataTest(Module):
 
 
 # register necessary modules
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [500])
 
 
 # create geometry
-gearbox = register_module('Gearbox')
-geometry = register_module('Geometry')
+gearbox = b2.register_module('Gearbox')
+geometry = b2.register_module('Geometry')
 geometry.param('components', ['CDC', 'MagneticField'])
 
-particlegun = register_module('ParticleGun')
+particlegun = b2.register_module('ParticleGun')
 particlegun.param('nTracks', 4)
 
 
 # simulation
-g4sim = register_module('FullSim')
+g4sim = b2.register_module('FullSim')
 # make the simulation less noisy
-g4sim.logging.log_level = LogLevel.ERROR
+g4sim.logging.log_level = b2.LogLevel.ERROR
 
 # create paths
-main = create_path()
+main = b2.create_path()
 
 # add modules to paths
 main.add_module(eventinfosetter)
@@ -83,9 +81,9 @@ main.add_module(particlegun)
 main.add_module(DisplayDataTest())
 
 # default parameters
-display = register_module('Display')
+display = b2.register_module('Display')
 display.param('showAllPrimaries', True)
 main.add_module(display)
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

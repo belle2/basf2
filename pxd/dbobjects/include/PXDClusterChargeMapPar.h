@@ -73,7 +73,7 @@ namespace Belle2 {
      * @param sensorID unique ID of the sensor
      * @param uBin calibration bin along u side of sensor
      * @param vBin calibration bin along v side of sensor
-     * @return value calibration value to store
+     * @param value calibration value to store
      */
     void setContent(unsigned short sensorID, unsigned short uBin, unsigned short vBin, float value)
     {

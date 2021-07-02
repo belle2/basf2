@@ -10,6 +10,9 @@
 
 #pragma once
 
+/* KLM headers. */
+#include <klm/dataobjects/KLMElementNumberDefinitions.h>
+
 /* C++ headers. */
 #include <cstdint>
 #include <string>
@@ -91,8 +94,8 @@ namespace Belle2 {
      * @param[in] plane   Plane (0-based).
      * @param[in] strip   Strip (1-based).
      */
-    static uint16_t channelNumber(int section, int sector, int layer, int plane,
-                                  int strip);
+    static KLMChannelNumber channelNumber(int section, int sector, int layer,
+                                          int plane, int strip);
 
     /**
      * Get element numbers by channel number.
@@ -104,7 +107,7 @@ namespace Belle2 {
      * @param[out] strip   Strip (1-based).
      */
     static void channelNumberToElementNumbers(
-      uint16_t channel, int* section, int* sector, int* layer, int* plane,
+      KLMChannelNumber channel, int* section, int* sector, int* layer, int* plane,
       int* strip);
 
     /**
@@ -114,7 +117,8 @@ namespace Belle2 {
      * @param[in] layer   Layer (1-based).
      * @param[in] plane   Plane (0-based).
      */
-    static uint16_t planeNumber(int section, int sector, int layer, int plane);
+    static KLMPlaneNumber planeNumber(int section, int sector, int layer,
+                                      int plane);
 
     /**
      * Get element numbers by plane number.
@@ -125,7 +129,8 @@ namespace Belle2 {
      * @param[out] plane       Plane (0-based).
      */
     static void planeNumberToElementNumbers(
-      uint16_t planeGlobal, int* section, int* sector, int* layer, int* plane);
+      KLMPlaneNumber planeGlobal, int* section, int* sector, int* layer,
+      int* plane);
 
     /**
      * Get module number.
@@ -134,7 +139,8 @@ namespace Belle2 {
      * @param[in] layer   Layer (1-based).
      * @param[in] fatalError Issue fatal error (default) or not.
      */
-    static uint16_t moduleNumber(int section, int sector, int layer, bool fatalError = true);
+    static KLMModuleNumber moduleNumber(int section, int sector, int layer,
+                                        bool fatalError = true);
 
     /**
      * Get element numbers by module number.
@@ -144,14 +150,14 @@ namespace Belle2 {
      * @param[out] layer   Layer (1-based).
      */
     static void moduleNumberToElementNumbers(
-      uint16_t module, int* section, int* sector, int* layer);
+      KLMModuleNumber module, int* section, int* sector, int* layer);
 
     /**
      * Get sector number.
      * @param[in] section Section (0-based).
      * @param[in] sector  Sector (1-based).
      */
-    static uint16_t sectorNumber(int section, int sector);
+    static KLMSectorNumber sectorNumber(int section, int sector);
 
     /**
      * Get layer global number.
@@ -263,6 +269,14 @@ namespace Belle2 {
     static constexpr int getMaximalLayerGlobalNumber()
     {
       return (m_MaximalSectionNumber + 1) * m_MaximalSectorNumber * m_MaximalLayerNumber;
+    }
+
+    /**
+     * Get total number of channels.
+     */
+    static constexpr int getTotalChannelNumber()
+    {
+      return m_TotalChannelNumber;
     }
 
     /**
@@ -419,6 +433,9 @@ namespace Belle2 {
 
     /** Maximal plane number (0-based). */
     static constexpr int m_MaximalPlaneNumber = 1;
+
+    /** Total number of channels (1-based). */
+    static constexpr int m_TotalChannelNumber = 21978;
 
     /** Bit position for strip-1 [0..47]. */
     static constexpr int BKLM_STRIP_BIT = 0;

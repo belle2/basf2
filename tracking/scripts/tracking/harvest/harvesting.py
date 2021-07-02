@@ -13,7 +13,7 @@ import basf2
 import ROOT
 from ROOT import Belle2  # make Belle2 namespace available
 
-from .refiners import Refiner
+from tracking.harvest.refiners import Refiner
 from tracking.root_utils import root_cd, root_browse
 
 import logging
@@ -411,7 +411,7 @@ class HarvestingModule(basf2.Module):
             output_tdirectory = None
 
         try:
-            with root_cd(output_tdirectory) as tdirectory:
+            with root_cd(output_tdirectory):
                 for refiner in self.refiners:
                     refiner(self, crops, tdirectory=output_tdirectory, **kwds)
 
@@ -462,7 +462,6 @@ class HarvestingModule(basf2.Module):
 
 def test():
     """Test a quick analysis of the MCParticles in generic events."""
-    from tracking.validation.utilities import is_primary, is_stable_in_generator
     from .refiners import save_histograms, save_tree, save_fom
 
     def primaries_seen_in_detector(mc_particle):

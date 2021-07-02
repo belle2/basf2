@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 pdg - access particle definitions
@@ -25,10 +24,9 @@ particles to generate. See `from_name`, `from_names`, `to_name` and `to_names`
 
 import re
 import basf2
-import ROOT
 from ROOT.Belle2 import EvtGenDatabasePDG
 
-# the particle database (filled from evt.pdl by framework)
+#: the particle database (filled from evt.pdl by framework)
 _database = EvtGenDatabasePDG.Instance()
 
 
@@ -102,7 +100,7 @@ def conjugate(name):
 
     try:
         return to_name(-from_name(name))
-    except LookupError as e:
+    except LookupError:
         return name
 
 

@@ -31,11 +31,15 @@ using namespace TrackFindingCDC;
 TEST(TrackFindingCDCTest, cpp_storeWrapper)
 {
   StoreObjPtr<StoreWrapper<std::vector<CDCWireHit> > > stdVector;
+  // do something so that cppcheck is happy
+  stdVector.isOptional();
 }
 
 TEST(TrackFindingCDCTest, cpp_storeWrappedObjPtr)
 {
   StoreWrappedObjPtr<std::vector<CDCWireHit> > stdVector;
+  // do something so that cppcheck is happy
+  stdVector.isOptional();
 }
 
 template <class T>
@@ -48,7 +52,7 @@ using RootifiedTypes =
   std::vector<CDCTrack>,
   std::vector<WeightedRelation<const CDCTrack> > >;
 
-TYPED_TEST_CASE(DISABLED_TrackFindingCDCTestRootification, RootifiedTypes);
+TYPED_TEST_SUITE(DISABLED_TrackFindingCDCTestRootification, RootifiedTypes);
 
 TYPED_TEST(DISABLED_TrackFindingCDCTestRootification, rootification_UsableAsStoreWrappedObjPtr)
 {

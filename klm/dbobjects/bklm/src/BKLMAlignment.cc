@@ -21,23 +21,23 @@ BKLMAlignment::~BKLMAlignment()
 {
 }
 
-void BKLMAlignment::setModuleAlignment(uint16_t module,
+void BKLMAlignment::setModuleAlignment(KLMModuleNumber module,
                                        KLMAlignmentData* dat)
 {
-  std::map<uint16_t, KLMAlignmentData>::iterator it;
+  std::map<KLMModuleNumber, KLMAlignmentData>::iterator it;
   it = m_ModuleAlignment.find(module);
   if (it == m_ModuleAlignment.end()) {
     m_ModuleAlignment.insert(
-      std::pair<uint16_t, KLMAlignmentData>(module, *dat));
+      std::pair<KLMModuleNumber, KLMAlignmentData>(module, *dat));
   } else {
     it->second = *dat;
   }
 }
 
 const KLMAlignmentData* BKLMAlignment::getModuleAlignment(
-  uint16_t module) const
+  KLMModuleNumber module) const
 {
-  std::map<uint16_t, KLMAlignmentData>::const_iterator it;
+  std::map<KLMModuleNumber, KLMAlignmentData>::const_iterator it;
   it = m_ModuleAlignment.find(module);
   if (it == m_ModuleAlignment.end())
     return nullptr;
@@ -68,7 +68,7 @@ void BKLMAlignment::setGlobalParam(double value, unsigned short element,
     newAlignmentData.setParameter(
       static_cast<enum KLMAlignmentData::ParameterNumbers>(param), value);
     m_ModuleAlignment.insert(
-      std::pair<uint16_t, KLMAlignmentData>(element, newAlignmentData));
+      std::pair<KLMModuleNumber, KLMAlignmentData>(element, newAlignmentData));
   } else {
     alignmentData->setParameter(
       static_cast<enum KLMAlignmentData::ParameterNumbers>(param), value);

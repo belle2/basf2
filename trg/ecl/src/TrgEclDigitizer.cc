@@ -34,15 +34,14 @@ using namespace Belle2;
 //
 //
 //
-TrgEclDigitizer::TrgEclDigitizer(): TimeRange(0), _waveform(0), _FADC(1), _BeambkgTag(0)
+TrgEclDigitizer::TrgEclDigitizer():
+  TimeRange(0), _waveform(0), _FADC(1), _BeambkgTag(0)
 {
-
   MatrixParallel.clear();
   MatrixSerial.clear();
 
   _TCMap = new TrgEclMapping();
   _DataBase = new TrgEclDataBase();
-
 
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
     TCEnergy_tot[iTCIdm] = 0;
@@ -53,7 +52,6 @@ TrgEclDigitizer::TrgEclDigitizer(): TimeRange(0), _waveform(0), _FADC(1), _Beamb
       TCBkgContribution[iTCIdm][iTime] = 0;
       TCSigContribution[iTCIdm][iTime] = 0;
       TCBeambkgTag[iTCIdm][iTime] = 0;
-
     }
 
     for (int iii = 0; iii < 60 ; iii++) {
@@ -65,19 +63,14 @@ TrgEclDigitizer::TrgEclDigitizer(): TimeRange(0), _waveform(0), _FADC(1), _Beamb
       WaveForm[iTCIdm][iii] = 0;
     }
   }
-
-
-
 }
 //
 //
 //
 TrgEclDigitizer::~TrgEclDigitizer()
 {
-
   delete _TCMap;
   delete _DataBase;
-
 }
 //
 //
@@ -90,7 +83,8 @@ TrgEclDigitizer::setup()
   //
   _DataBase->  readNoiseLMatrix(MatrixParallel, MatrixSerial);
   //
-  int TableFlag = 1;//1: ECLHit ,2: ECLSimHit
+  // 1=ECLHit, 2=ECLSimHit, 3=ECLHit+TRGECLBGTCHit
+  int TableFlag = 3;
   // initialize parameters
   getTCHit(TableFlag);
   //
@@ -112,7 +106,7 @@ TrgEclDigitizer::getTCHit(int TableFlag)
 
   int nBinTime = 80;
   TimeRange = 4000; // -4us ~ 4us
-  ////-------------------------------------------------------------------
+  //-------------------------------------------------------------------
   //                          read Xtal data
   //---------------------------------------------------------------------
   if (TableFlag == 1) { // read  ECLHit table
@@ -216,7 +210,6 @@ TrgEclDigitizer::getTCHit(int TableFlag)
     //
     //
     //
-
     for (int iXtalIdm = 0; iXtalIdm < 8736; iXtalIdm++) {
       int iTCIdm = _TCMap->getTCIdFromXtalId(iXtalIdm + 1) - 1;
       for (int  iTime = 0; iTime < nBinTime; iTime++) {
@@ -256,9 +249,49 @@ TrgEclDigitizer::getTCHit(int TableFlag)
     }
 
   }
+  //--------------------------------------------------------
+  //
+  //--------------------------------------------------------
+  if (TableFlag == 3) {
+    StoreArray<ECLHit> eclHitArray("ECLHits");
+    int nHits_hit = eclHitArray.getEntries() - 1;
+    // signal hit
+    for (int iHits = 0; iHits < nHits_hit; iHits++) {
+      // Get a hit
+      ECLHit* aECLHit = eclHitArray[iHits];
+      // Hit geom. info
+      int hitCellId  = aECLHit->getCellId() - 1;
+      float hitE     = aECLHit->getEnergyDep() / Unit::GeV;
+      float aveT     = aECLHit->getTimeAve(); // ns :time from  IP  to PD
+      // Choose - TimeRange ~ TimeTange
+      if (aveT < - TimeRange || aveT > TimeRange) {continue;}
+      // Binning : -4000 = 1st bin ~  4000 80th bin.
+      int TimeIndex = (int)((aveT + TimeRange) / 100);
 
-
-
+      int iTCIdm = _TCMap->getTCIdFromXtalId(hitCellId + 1) - 1;
+      TCEnergy[iTCIdm][TimeIndex] += hitE;
+      TCTiming[iTCIdm][TimeIndex] += hitE * aveT;
+    }
+    // background hit
+    StoreArray<TRGECLBGTCHit> m_trgeclBGTCHits("TRGECLBGTCHits_beamBG");
+    for (const TRGECLBGTCHit& ttt : m_trgeclBGTCHits) {
+      // TC timing
+      double tcbg_t = ttt.getTimeAve();
+      // Timing cut
+      if (abs(tcbg_t) > TimeRange) continue;
+      //Binning : -4000 = 1st bin ~  4000 80th bin.
+      int TimeIndex = (int)((tcbg_t + TimeRange) / 100);
+      // TC energy
+      double tcbg_e = ttt.getEnergyDep();
+      // TC ID index
+      int iTCIdm = ttt.getTCId() - 1;
+      // TC energy and timing
+      double tc_e = TCEnergy[iTCIdm][TimeIndex];
+      double tc_t = TCTiming[iTCIdm][TimeIndex];
+      TCEnergy[iTCIdm][TimeIndex] += tcbg_e;
+      TCTiming[iTCIdm][TimeIndex] += (tcbg_e * tcbg_t + tc_e * tc_t) / TCEnergy[iTCIdm][TimeIndex];
+    }
+  }
   //--------------------------
   // TC energy and timing in t=0-1us as true values.
   //--------------------------
@@ -268,17 +301,15 @@ TrgEclDigitizer::getTCHit(int TableFlag)
       TCTiming_tot[iTCIdm] += TCTiming[iTCIdm][iTime] * TCEnergy[iTCIdm][iTime];
     }
     TCTiming_tot[iTCIdm] /= TCEnergy_tot[iTCIdm];
-
   }
-
-
   return;
 }
 //
 //
 //
 void
-TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE, std::vector<std::vector<double>>& TCDigiT)
+TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
+                                std::vector<std::vector<double>>& TCDigiT)
 {
   TCDigiE.clear();
   TCDigiE.resize(576, vector<double>(64 , 0));
@@ -490,18 +521,18 @@ TrgEclDigitizer::digitization02(std::vector<std::vector<double>>& TCDigiE, std::
   double ttt0 = 0; // [us]
   double ttt1 = 0; // [us]
   double ttt2 = 0; // [us]
-  double frac_pileup   = 0.035; // pileup noise fraction?
-  double frac_parallel = 0.023; // parralel noise fraction?
-  double frac_serial   = 0.055; // serial noise fraction?
-  double times_pileup   =  1;   // noise scale based on Belle noise.
-  double times_parallel =  1;   // noise scale
-  double times_serial   =  1;   // noise scale
-  double corr_pileup   = times_pileup   * frac_pileup   * sqrt(fam_sampling_interval * 0.001);
-  double corr_parallel = times_parallel * frac_parallel * sqrt(fam_sampling_interval * 0.001);
-  double corr_serial   = times_serial   * frac_serial   * sqrt(fam_sampling_interval * 0.001);
-  corr_pileup   = 0.011068;
-  corr_parallel = 0.00727324;
-  corr_serial   = 0.0173925;
+  //double frac_pileup   = 0.035; // pileup noise fraction?
+  //double frac_parallel = 0.023; // parralel noise fraction?
+  //double frac_serial   = 0.055; // serial noise fraction?
+  //double times_pileup   =  1;   // noise scale based on Belle noise.
+  //double times_parallel =  1;   // noise scale
+  //double times_serial   =  1;   // noise scale
+  //double corr_pileup   = times_pileup   * frac_pileup   * sqrt(fam_sampling_interval * 0.001);
+  //double corr_parallel = times_parallel * frac_parallel * sqrt(fam_sampling_interval * 0.001);
+  //double corr_serial   = times_serial   * frac_serial   * sqrt(fam_sampling_interval * 0.001);
+  double corr_pileup   = 0.011068;
+  double corr_parallel = 0.00727324;
+  double corr_serial   = 0.0173925;
 
 
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
@@ -547,9 +578,7 @@ TrgEclDigitizer::save(int m_nEvent)
       TCDigiArray[m_hitNum]->setiBinTime(iBinTime);
       TCDigiArray[m_hitNum]->setRawEnergy(TCEnergy[iTCIdm][iBinTime]);
       TCDigiArray[m_hitNum]->setRawTiming(TCTiming[iTCIdm][iBinTime]);
-
       TCDigiArray[m_hitNum]->setBeamBkgTag(TCBeambkgTag[iTCIdm][iBinTime]);
-
     }
   }
 
@@ -559,7 +588,8 @@ TrgEclDigitizer::save(int m_nEvent)
       if (iTCIdm == 80) iTCIdm =  512; // skip barrel
       int tc_phi_id = _TCMap->getTCPhiIdFromTCId(iTCIdm + 1);
       int tc_theta_id   = _TCMap->getTCThetaIdFromTCId(iTCIdm + 1);
-      TRGECLWaveform* newWf = TCWaveformArray.appendNew(iTCIdm + 1, WaveForm[iTCIdm]);
+      TRGECLWaveform* newWf =
+        TCWaveformArray.appendNew(iTCIdm + 1, WaveForm[iTCIdm]);
       newWf->setThetaPhiIDs(tc_theta_id, tc_phi_id);
     }
 
@@ -568,6 +598,9 @@ TrgEclDigitizer::save(int m_nEvent)
 
   return;
 }
+//
+//
+//
 double
 TrgEclDigitizer::interFADC(double timing)
 {
@@ -581,7 +614,6 @@ TrgEclDigitizer::interFADC(double timing)
   timing = timing * 1000;
   int startbin = (int)(timing) / 12;
   int endbin = startbin + 1;
-
 
   SignalAmp = { 0, 3.47505e-06, 0.000133173, 0.000939532, 0.00337321, 0.00845977, 0.0170396, 0.0296601, 0.0465713, 0.0677693, 0.0930545, 0.122086, 0.154429, 0.189595, 0.227068, 0.266331, 0.306882, 0.348243, 0.389971, 0.431664, 0.472959, 0.513539, 0.553127, 0.59149, 0.628431, 0.663791, 0.697445, 0.729297, 0.759281, 0.787354, 0.813494, 0.837698, 0.859982, 0.880372, 0.898908, 0.915639, 0.930622, 0.943919, 0.955598, 0.965731, 0.97439, 0.98165, 0.987587, 0.992275, 0.995788, 0.9982, 0.999581, 1, 0.999525, 0.998219, 0.996143, 0.993356, 0.989846, 0.985364, 0.979439, 0.971558, 0.961304, 0.948421, 0.932809, 0.914509, 0.893664, 0.870494, 0.845267, 0.818279, 0.789837, 0.76025, 0.729815, 0.698815, 0.667511, 0.636141, 0.604919, 0.574035, 0.543654, 0.513915, 0.484939, 0.456822, 0.429643, 0.403462, 0.378324, 0.354259, 0.331286, 0.309412, 0.288633, 0.26894, 0.250316, 0.232736, 0.216174, 0.200597, 0.185972, 0.172262, 0.159428, 0.147431, 0.136232, 0.12579, 0.116067, 0.107022, 0.0986191, 0.0908193, 0.0835871, 0.0768874, 0.0706867, 0.0649528, 0.0596551, 0.0547641, 0.0502523, 0.0460932, 0.042262, 0.0387353, 0.0354909, 0.0325082, 0.0297677, 0.0272511, 0.0249416, 0.0228232, 0.020881, 0.0191014, 0.0174714, 0.0159792, 0.0146138, 0.0133649, 0.012223, 0.0111793, 0.0102258, 0.00935504, 0.00856, 0.00783438, 0.00717232, 0.00656842, 0.00601773, 0.00551567, 0.00505807, 0.00464106, 0.00426114, 0.00391506, 0.00359985, 0.0033128, 0.00305143, 0.00281346, 0.00259681, 0.00239957, 0.00222002, 0.00205655, 0.00190773, 0.00177223, 0.00164885, 0.00153648, 0.00143413, 0.00134087, 0.00125589, 0.00117842, 0.00110777, 0.00104332, 0.000984488, 0.000930766, 0.000881678, 0.000836798, 0.000795734, 0.000758134, 0.000723677, 0.00069207, 0.000663051, 0.000636377, 0.000611832, 0.000589219, 0.000568358, 0.000549086, 0.000531258, 0.000514738, 0.000499407, 0.000485156, 0.000471884, 0.000459502, 0.00044793, 0.000437092, 0.000426923, 0.000417363, 0.000408356, 0.000399853, 0.000391811, 0.000384187, 0.000376946, 0.000370055, 0.000363483, 0.000357203, 0.000351192, 0.000345426, 0.000339886, 0.000334554, 0.000329413, 0.000324448, 0.000319645, 0.000314993, 0.000310481, 0.000306098, 0.000301836, 0.000297686, 0.00029364, 0.000289693, 0.000285837, 0.000282068, 0.00027838, 0.000274768, 0.000271229, 0.000267759, 0.000264354, 0.000261011, 0.000257727, 0.000254499, 0.000251326, 0.000248204, 0.000245132, 0.000242108, 0.000239131, 0.000236198, 0.000233308, 0.00023046, 0.000227653, 0.000224885, 0.000222155, 0.000219463, 0.000216807, 0.000214187, 0.000211602, 0.00020905, 0.000206532, 0.000204046, 0.000201593, 0.00019917, 0.000196779, 0.000194417, 0.000192085, 0.000189782, 0.000187508, 0.000185262, 0.000183044, 0.000180853, 0.000178689, 0.000176552, 0.000174441, 0.000172355, 0.000170295, 0.00016826, 0.000166249, 0.000164263, 0.000162301,  };
 
@@ -621,12 +653,7 @@ TrgEclDigitizer::FADC(int flag_gen,
   double tsh, dd;
   static double tc, tc2, tsc, tris, b1, b2;
   static double amp, dft, as;
-  /* cppcheck-suppress variableScope */
-  static double td;
-  /* cppcheck-suppress variableScope */
-  static double t1;
-  /* cppcheck-suppress variableScope */
-  static double t2;
+  static double td, t1, t2;
 
   static int ifir = 0;
 
@@ -819,7 +846,7 @@ TrgEclDigitizer::SimplifiedFADC(int flag_gen,
   //--------------------------------------
   double tsh, dd;
   static double tc, tc2, tsc, tris;
-  static double amp, td, t1, t2,  dft, as;
+  static double amp, dft, as;
 
 
   //  int im, ij;
@@ -828,10 +855,10 @@ TrgEclDigitizer::SimplifiedFADC(int flag_gen,
 
   if (ifir == 0) {
 
-    td =  0.10;  // diff time    (  0.10)
-    t1 =  0.10;  // integ1 real  (  0.10)
+    const double td =  0.10;  // diff time    (  0.10)
+    const double t1 =  0.10;  // integ1 real  (  0.10)
     // b1 = 30.90;  // integ1 imag  ( 30.90)
-    t2 =  0.01;  // integ2 real  (  0.01)
+    const double t2 =  0.01;  // integ2 real  (  0.01)
     // b2 = 30.01;  // integ2 imag  ( 30.01)
     double ts =  1.00;  // scint decay  (  1.00)
     dft = 0.600; // diff delay   ( 0.600)
@@ -926,12 +953,13 @@ TrgEclDigitizer::SimplifiedFADC(int flag_gen,
 
 double TrgEclDigitizer::ShapeF(double t00, double ts1)
 {
+  static const double realNaN = std::numeric_limits<double>::quiet_NaN();
 
   double dzna;
   // double das1,das0,dac0;
-  double dcs0s, dsn0s, dcs0d, dsn0d;
-  double dcs1s, dsn1s, dcs1d, dsn1d;
-  double a1, a2, b1, b2, c1, c2;
+  double dcs0s = realNaN, dsn0s = realNaN, dcs0d, dsn0d;
+  double dcs1s = realNaN, dsn1s = realNaN, dcs1d, dsn1d;
+  double a1, a2, b1, b2, c1, c2 = realNaN;
   double sv123 = 0.0;
 
   if (t00 <= 0.0) return 0;
@@ -979,13 +1007,6 @@ double TrgEclDigitizer::ShapeF(double t00, double ts1)
   //
   dzna = 6.561e+07;
 
-
-
-
-
-
-
-
   sv123 = (
             (dcs0s + dcs1s) * exp(-c2 * t00) * (-1) +
             (dcs0d + dcs1d) * exp(-c1 * t00) +
@@ -994,22 +1015,17 @@ double TrgEclDigitizer::ShapeF(double t00, double ts1)
           )
           / dzna / (1 / c2 - 1 / c1);
 
-
   return sv123;
 }
-
-
-
 //
 //
 //
 double
 TrgEclDigitizer::u_max(double aaa, double bbb)
 {
-
   if (aaa > bbb) { return aaa; }
   else        { return bbb; }
 }
 //
 //
-
+//

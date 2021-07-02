@@ -78,6 +78,7 @@ namespace Belle2 {
       m_sqrtcovmat_22(0.),
       m_deltaL(0.),
       m_minTrkDistance(0.),
+      m_minTrkDistanceID(65535),
       m_absZernike40(0.),
       m_absZernike51(0.),
       m_zernikeMVA(0.),
@@ -172,6 +173,9 @@ namespace Belle2 {
     /** Set distance between cluster COG and track extrapolation to ECL. */
     void setMinTrkDistance(double distance) { m_minTrkDistance = distance; }
 
+    /** Set array index of the nearest track */
+    void setMinTrkDistanceID(unsigned short distanceID) { m_minTrkDistanceID = distanceID; }
+
     /** Set Zernike 40. */
     void setAbsZernike40(double zernike40) { m_absZernike40 = zernike40; }
 
@@ -186,10 +190,6 @@ namespace Belle2 {
 
     /** Set E9/E21 energy ratio. */
     void setE9oE21(double E9oE21) { m_E9oE21 = E9oE21; }
-
-    /** set Cluster Hadron Component Intensity. */
-    [[deprecated("will be removed in release-04.")]]
-    void setClusterHadronIntensity(double ClusterHadronIntensity) { m_ClusterHadronIntensity = ClusterHadronIntensity; }
 
     /** set Pulse Shape Discrimination MVA */
     void setPulseShapeDiscriminationMVA(double PulseShapeDiscriminationMVA) { m_PulseShapeDiscriminationMVA = PulseShapeDiscriminationMVA; }
@@ -248,20 +248,14 @@ namespace Belle2 {
     /** Return connected region id. */
     int getConnectedRegionId() const {return m_connectedRegionId;}
 
-    /** Return hypothesis id */
-    [[deprecated("Please use hasHypothesis().")]]
-    int getHypothesisId() const
-    {
-      if (hasHypothesis(EHypothesisBit::c_nPhotons)) return 5;
-      else if (hasHypothesis(EHypothesisBit::c_neutralHadron)) return 6;
-      else return 0;
-    }
-
     /** Return cluster id */
     int getClusterId() const {return m_clusterId;}
 
     /** Get distance between cluster COG and track extrapolation to ECL. */
     double getMinTrkDistance() const { return m_minTrkDistance; }
+
+    /** Get array index of the nearest track */
+    double getMinTrkDistanceID() const { return m_minTrkDistanceID; }
 
     /** Return deltaL. */
     double getDeltaL() const { return m_deltaL; }
@@ -280,10 +274,6 @@ namespace Belle2 {
 
     /** Return E9/E21 (shower shape variable). */
     double getE9oE21() const { return m_E9oE21; }
-
-    /** Return Cluster hadron intensity*/
-    [[deprecated("will be removed in release-04.")]]
-    double getClusterHadronIntensity() const { return m_ClusterHadronIntensity; }
 
     /** Return MVA classifier that uses pulse shape discrimination to identify electromagnetic vs hadronic showers.*/
     double getPulseShapeDiscriminationMVA() const { return m_PulseShapeDiscriminationMVA; }
@@ -316,7 +306,7 @@ namespace Belle2 {
     double getR() const { return m_r; }
 
     /** Return Energy (GeV). */
-    double getEnergy(const EHypothesisBit& hypothesis) const;
+    double getEnergy(EHypothesisBit hypothesis) const;
 
     /** Return Uncorrected Energy deposited (GeV) */
     double getEnergyRaw() const {return exp(m_logEnergyRaw);}
@@ -341,10 +331,6 @@ namespace Belle2 {
 
     /** Return detector region: 0: below acceptance, 1: FWD, 2: BRL, 3: BWD, 11: FWDGAP, 13: BWDGAP */
     int getDetectorRegion() const;
-
-    /** Return (pseudo) unique Id based on CRId, ShowerId and HypothesisID */
-    [[deprecated("will be removed in release-04.")]]
-    int getUniqueId() const;
 
     /**
      * Return if specific status bit is set.
@@ -425,6 +411,9 @@ namespace Belle2 {
     /** Distance between cluster center and track extrapolation to ECL. */
     Double32_t  m_minTrkDistance;  //[0.0, 250., 10]
 
+    /** Array index of the nearest track */
+    unsigned short m_minTrkDistanceID;
+
     /** Zernike 40. */
     Double32_t  m_absZernike40;  //[0.0, 1.7, 10]
 
@@ -483,7 +472,8 @@ namespace Belle2 {
     Double32_t m_NumberOfHadronDigits;  //[0, 255, 18]
 
     /** Class definition */
-    ClassDef(ECLCluster, 14);
+    ClassDef(ECLCluster, 15);
+    // 15: Added m_minTrkDistanceID
     // 14: Added m_maxECellId
     // 13: Added m_hypotheses
     // 12: Added m_PulseShapeDiscriminationMVA. Indicated that m_ClusterHadronIntensity will be removed in release-04.

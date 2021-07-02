@@ -121,24 +121,26 @@ namespace Belle2 {
 
     /// Cache containing the most important information of this state which will often be needed
     struct stateCache {
-      /// Is this state based on a hit (=SpacePoint) or a seed (=RecoTrack)
-      bool isHitState = false;
-      /// VxdID of this state, only set if based on SpacePoint
-      VxdID sensorID = VxdID(0);
+      /// getPtOfSeed (if seed state)
+      float ptSeed = 0.;
+      /// Phi of the sensor this state is based on, only set if based on SpacePoint
+      float sensorCenterPhi = std::numeric_limits<float>::quiet_NaN();
+      /// Phi if this state (from SpacePoint or RecoTrack)
+      float phi = std::numeric_limits<float>::quiet_NaN();
+      /// Theta if this state (from SpacePoint or RecoTrack)
+      float theta = std::numeric_limits<float>::quiet_NaN();
+      /// Local normalized uCoordinate of this state, only set if based on SpacePoint
+      float localNormalizedu = std::numeric_limits<float>::quiet_NaN();
+      /// Local normalized vCoordinate of this state, only set if based on SpacePoint
+      float localNormalizedv = std::numeric_limits<float>::quiet_NaN();
       /// Geometrical Layer this state is based on. Will be set to the SVD layer number if it's a state based on a SpacePoint, to an artificial layer else by using getGeometricalLayer()
       unsigned short geoLayer = std::numeric_limits<unsigned short>::quiet_NaN();
       /// Ladder this state is based on (only use for SpacePoint based states)
       unsigned short ladder = std::numeric_limits<unsigned short>::quiet_NaN();
-      /// Phi of the sensor this state is based on, only set if based on SpacePoint
-      double sensorCenterPhi = std::numeric_limits<double>::quiet_NaN();
-      /// Phi if this state (from SpacePoint or RecoTrack)
-      double phi = std::numeric_limits<double>::quiet_NaN();
-      /// Theta if this state (from SpacePoint or RecoTrack)
-      double theta = std::numeric_limits<double>::quiet_NaN();
-      /// Local normalized uCoordinate of this state, only set if based on SpacePoint
-      double localNormalizedu = std::numeric_limits<double>::quiet_NaN();
-      /// Local normalized vCoordinate of this state, only set if based on SpacePoint
-      double localNormalizedv = std::numeric_limits<double>::quiet_NaN();
+      /// VxdID of this state, only set if based on SpacePoint
+      VxdID sensorID = VxdID(0);
+      /// Is this state based on a hit (=SpacePoint) or a seed (=RecoTrack)
+      bool isHitState = false;
     };
 
   protected:
@@ -153,13 +155,13 @@ namespace Belle2 {
     const Hit* m_hit = nullptr;
     /// Chi2 of this special state with this hit and this reco track. Will only be set after fitting state.
     double m_chi2 = 0;
-    /// Flag, if this state was already fitted.
-    bool m_isFitted = false;
-    /// Flag, if this state has a valid mSoP
-    bool m_hasMSoP = false;
     /// MSoP after advancing. Is undetermined before extrapolating!
     genfit::MeasuredStateOnPlane m_measuredStateOnPlane;
     /// Memory for the automaton cell.
     TrackFindingCDC::AutomatonCell m_automatonCell;
+    /// Flag, if this state was already fitted.
+    bool m_isFitted = false;
+    /// Flag, if this state has a valid mSoP
+    bool m_hasMSoP = false;
   };
 }

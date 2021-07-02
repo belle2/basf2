@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 from basf2 import register_module
 from basf2 import B2WARNING
@@ -12,6 +11,7 @@ def fitVertex(
     fitter='KFit',
     fit_type='vertex',
     constraint='',
+    massConstraint=[],
     daughtersUpdate=False,
     smearing=0,
     path=None,
@@ -30,8 +30,10 @@ def fitVertex(
             The value of 0 rejects the particle candidates with failed fit.
         decay_string (str):     select particles used for the vertex fit
         fitter (str):           Rave or KFit
-        fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC)
+        fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC/massfourC)
         constraint (str):       add aditional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
+        massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
+            Please do not mix PDG id and particle names in massConstraint list (valid only for massfourC).
         daughtersUpdate (bool): make copy of the daughters and update them after the vertex fit
         smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'KFit/vertex/iptube' option.
         path (basf2.Path):      modules are added to this path
@@ -45,7 +47,7 @@ def fitVertex(
 
     B2WARNING(warning)
 
-    _fitVertex(list_name, conf_level, decay_string, fitter, fit_type, constraint, daughtersUpdate, smearing, path)
+    _fitVertex(list_name, conf_level, decay_string, fitter, fit_type, constraint, massConstraint, daughtersUpdate, smearing, path)
 
 
 def _fitVertex(
@@ -55,6 +57,7 @@ def _fitVertex(
     fitter='KFit',
     fit_type='vertex',
     constraint='',
+    massConstraint=[],
     daughtersUpdate=False,
     smearing=0,
     path=None,
@@ -72,8 +75,10 @@ def _fitVertex(
             The value of 0 rejects the particle candidates with failed fit.
         decay_string (str):     select particles used for the vertex fit
         fitter (str):           Rave or KFit
-        fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC)
+        fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC/massfourC)
         constraint (str):       add aditional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
+        massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
+            Please do not mix PDG id and particle names in massConstraint list (valid only for massfourC).
         daughtersUpdate (bool): make copy of the daughters and update them after the vertex fit
         smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'KFit/vertex/iptube' option.
         path (basf2.Path):      modules are added to this path
@@ -89,6 +94,11 @@ def _fitVertex(
     pvfit.param('updateDaughters', daughtersUpdate)
     pvfit.param('decayString', decay_string)
     pvfit.param('smearing', smearing)
+    if massConstraint:
+        if isinstance(massConstraint[0], str):
+            pvfit.param('massConstraintListParticlename', massConstraint)
+        else:
+            pvfit.param('massConstraintList', massConstraint)
     path.add_module(pvfit)
 
 
@@ -98,6 +108,7 @@ def kFit(list_name,
          constraint='',
          daughtersUpdate=False,
          decay_string='',
+         massConstraint=[],
          smearing=0,
          path=None):
     """
@@ -114,15 +125,18 @@ def kFit(list_name,
           * ``vertex`` for a vertex fit
           * ``massvertex`` for a vertex fit with a mass constraint on the mother particle
           * ``fourC`` for a vertex fit in which the mother particle's four-momentum is constrained to the beam four-momentum
+          * ``massfourC`` for a vertex fit with a 4-momentum constraint and mass constraints on the specified daughter particles
 
         constraint (str):       add an additional constraint to the fit (valid options are ipprofile or iptube)
+        massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
+            Please do not mix PDG id and particle names in massConstraint list (valid only for massfourC).
         daughtersUpdate (bool): make copy of the daughters and update them after the KFit
         decay_string (str):     select particles used for the KFit
         smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'iptube' constraint.
         path (basf2.Path):      modules are added to this path
     """
 
-    _fitVertex(list_name, conf_level, decay_string, 'KFit', fit_type, constraint, daughtersUpdate, smearing, path)
+    _fitVertex(list_name, conf_level, decay_string, 'KFit', fit_type, constraint, massConstraint, daughtersUpdate, smearing, path)
 
 
 def raveFit(
@@ -174,7 +188,7 @@ def raveFit(
     message_b = "To silence this warning, add silence_warning=True when you call this function."
 
     # if the user wants a constraint, they should check the doc, or send a ticket if it's not implemented
-    if constraint is '':
+    if constraint == '':
         message_if = ""
     else:
         message_if = (
@@ -185,7 +199,7 @@ def raveFit(
     if not silence_warning:
         B2WARNING(message_a + message_if + message_b)
 
-    _fitVertex(list_name, conf_level, decay_string, 'Rave', fit_type, constraint, daughtersUpdate, 0, path)
+    _fitVertex(list_name, conf_level, decay_string, 'Rave', fit_type, constraint, None, daughtersUpdate, 0, path)
 
 
 def treeFit(
@@ -338,8 +352,8 @@ def fitPseudo(
 
         from modularAnalysis import fitPseudo
         from stdPi0s import stdPi0s
-        stdPi0s("eff40_Jan2020", path=mypath)
-        fitPseudo("pi0:eff40_Jan2020", path=mypath)
+        stdPi0s("eff40_May2020", path=mypath)
+        fitPseudo("pi0:eff40_May2020", path=mypath)
 
     Parameters:
         list_name (str): the name of the list to add the covariance matrix to

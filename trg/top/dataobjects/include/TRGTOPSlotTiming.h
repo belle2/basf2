@@ -16,10 +16,12 @@
 #include <TObject.h>
 
 #include <vector>
+#include <limits>
 
-#include "trg/top/dataobjects/TRGTOPSlotTiming.h"
 
 namespace Belle2 {
+
+  static const int intNaN = std::numeric_limits<int>::quiet_NaN();
 
   //! Example Detector
   class TRGTOPSlotTiming : public TObject {
@@ -28,18 +30,26 @@ namespace Belle2 {
 
     // Empty constructor
     // Recommended for ROOT IO
-    TRGTOPSlotTiming()
-    {
-    }
+    TRGTOPSlotTiming() :
+      m_slotId(intNaN),
+      m_slotTiming(intNaN),
+      m_slotSegment(intNaN),
+      m_slotNHits(intNaN),
+      m_slotLogL(intNaN),
+      m_slotNErrors(intNaN)
+    {}
 
     //! A Useful Constructor
     explicit TRGTOPSlotTiming(
       int slotId
-    )
-    {
-      m_slotId  = slotId;
-      m_slotNErrors = 0;
-    }
+    ) :
+      m_slotId(slotId),
+      m_slotTiming(intNaN),
+      m_slotSegment(intNaN),
+      m_slotNHits(intNaN),
+      m_slotLogL(intNaN),
+      m_slotNErrors(0)
+    {}
 
     //! Another Useful Constructor
     TRGTOPSlotTiming(
@@ -49,15 +59,14 @@ namespace Belle2 {
       int slotNHits,
       int slotLogL,
       int slotNErrors
-    )
-    {
-      m_slotId      = slotId;
-      m_slotTiming  = slotTiming;
-      m_slotSegment = slotSegment;
-      m_slotNHits   = slotNHits;
-      m_slotLogL    = slotLogL;
-      m_slotNErrors = slotNErrors;
-    }
+    ) :
+      m_slotId(slotId),
+      m_slotTiming(slotTiming),
+      m_slotSegment(slotSegment),
+      m_slotNHits(slotNHits),
+      m_slotLogL(slotLogL),
+      m_slotNErrors(slotNErrors)
+    {}
 
     //! Destructor
     ~TRGTOPSlotTiming() {}
@@ -101,4 +110,3 @@ namespace Belle2 {
 } //end namespace Belle2
 
 #endif
-

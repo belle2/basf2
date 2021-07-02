@@ -1,10 +1,9 @@
-import basf2  # Import basf2 to make the Belle2 namespace available
+import basf2  # Import basf2 to make the Belle2 namespace available # noqa
 import ROOT
 from ROOT import Belle2
 
 import numpy as np
 import math
-import contextlib
 
 # Vectorised version of the error function for numpy arrays
 try:
@@ -51,6 +50,22 @@ def is_stable_in_generator(mc_particle):
     return mc_particle.hasStatus(Belle2.MCParticle.c_StableInGenerator)
 
 
+def getObjectList(pointerVec):
+    """ This is a temporary work-around for the new externals v01-10-00
+    A direct iteration on a vector of pointers creates significant memory leak
+    This can be avoid by a range based loop
+
+    Parameters
+    ----------
+    pointerVec : pointerVec
+        A vector of pointers
+    """
+    objList = []
+    for i in range(len(pointerVec)):
+        objList.append(pointerVec[i])
+    return objList
+
+
 def get_det_hit_ids(reco_track, det_ids=[Belle2.Const.PXD, Belle2.Const.SVD, Belle2.Const.CDC]):
     """Retrieves the hit ids contained in the track for the given detector ids
 
@@ -69,11 +84,11 @@ def get_det_hit_ids(reco_track, det_ids=[Belle2.Const.PXD, Belle2.Const.SVD, Bel
     det_hit_ids = set()
     for det_id in det_ids:
         if det_id == Belle2.Const.CDC:
-            hits = reco_track.getCDCHitList()
+            hits = getObjectList(reco_track.getCDCHitList())
         elif det_id == Belle2.Const.SVD:
-            hits = reco_track.getSVDHitList()
+            hits = getObjectList(reco_track.getSVDHitList())
         elif det_id == Belle2.Const.PXD:
-            hits = reco_track.getPXDHitList()
+            hits = getObjectList(reco_track.getPXDHitList())
         else:
             raise ValueError("DET ID not known.")
 

@@ -9,19 +9,17 @@
 </header>
 """
 
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
 import os
 import glob
-import sys
-import math
 from ROOT import Belle2
 from ROOT import TH1F, TFile, TNamed
 
-set_random_seed(123452)
+b2.set_random_seed(123452)
 
 
-class Histogrammer(Module):
+class Histogrammer(b2.Module):
 
     '''
     Make validation histograms for BG overlay.
@@ -82,32 +80,33 @@ bg = None
 if 'BELLE2_BACKGROUND_DIR' in os.environ:
     bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
     if bg is None:
-        B2FATAL('No beam background samples found in folder ' +
-                os.environ['BELLE2_BACKGROUND_DIR'])
-    B2INFO('Using background samples from ' + os.environ['BELLE2_BACKGROUND_DIR'])
+        b2.B2FATAL('No beam background samples found in folder ' +
+                   os.environ['BELLE2_BACKGROUND_DIR'])
+    b2.B2INFO('Using background samples from ' + os.environ['BELLE2_BACKGROUND_DIR'])
 else:
-    B2FATAL('variable BELLE2_BACKGROUND_DIR is not set')
+    b2.B2FATAL('variable BELLE2_BACKGROUND_DIR is not set')
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Set number of events to generate
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 # Simulation
-add_simulation(main, bkgfiles=bg, bkgOverlay=True, usePXDDataReduction=False, forceSetPXDDataReduction=True)
+add_simulation(main, bkgfiles=bg, bkgOverlay=True, usePXDDataReduction=False, forceSetPXDDataReduction=True,
+               simulateT0jitter=False)
 
 # Make histograms
 main.add_module(Histogrammer())
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

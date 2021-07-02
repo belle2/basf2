@@ -1,0 +1,48 @@
+#EventType:2721851010
+#Descriptor: B -> K X3872
+#Tested: Yes
+#PhysicsWG: Charmonium
+#Responsible: Junhao Yin
+#Email: yinjh2012@korea.ac.kr
+#Date: 20210111
+
+Alias omegasig omega
+Alias Jpsisig J/psi
+
+Decay Upsilon(4S)
+0.257 B+sig B- VSS;
+0.257 B+ B-sig VSS;
+0.243 B0sig anti-B0 VSS_BMIX dm;
+0.243 B0 anti-B0sig VSS_BMIX dm;
+Enddecay
+
+Decay B+sig
+1.0 K+ X_1(3872) PHSP;
+Enddecay
+
+Decay B-sig
+1.0 K- X_1(3872) PHSP;
+Enddecay
+
+Decay B0sig
+1.0 K0 X_1(3872) PHSP;
+Enddecay
+
+Decay anti-B0sig
+1.0 K_S0 X_1(3872) PHSP;
+Enddecay
+
+Decay X_1(3872)
+1.0 omegasig Jpsisig PHSP;
+Enddecay
+
+Decay omegasig
+1.0 pi+ pi- pi0 OMEGA_DALITZ;
+Enddecay
+
+Decay Jpsisig
+0.5 e+ e- VLL;
+0.5 mu+ mu- VLL;
+Enddecay
+
+End

@@ -133,12 +133,18 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
           hEventT0nosync->Write();
           pfx->Write();
 
-          a = par[0]; b = par[1]; c = par[2]; d = par[3];
-          a_err = tfr->ParError(0); b_err = tfr->ParError(1); c_err = tfr->ParError(2); d_err = tfr->ParError(3);
-          chi2 = tfr->Chi2();
-          ndf = tfr->Ndf();
-          p = tfr->Prob();
-          m_tree->Fill();
+          if (!tfr) {
+            f->Close();
+            B2FATAL("Fit to the histogram failed in SVDCoGTimeCalibrationAlgorithm. "
+                    << "Check the 2-D histogram to clarify the reason.");
+          } else {
+            a = par[0]; b = par[1]; c = par[2]; d = par[3];
+            a_err = tfr->ParError(0); b_err = tfr->ParError(1); c_err = tfr->ParError(2); d_err = tfr->ParError(3);
+            chi2 = tfr->Chi2();
+            ndf  = tfr->Ndf();
+            p    = tfr->Prob();
+            m_tree->Fill();
+          }
 
         }
       }
@@ -162,9 +168,15 @@ bool SVDCoGTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration::ExpRu
   auto rawTimeL3V = getObjectPtr<TH1F>("hRawTimeL3V");
   // float meanEventT0 = eventT0Hist->GetMean();
   if (!rawTimeL3V) {
-    meanRawTimeL3V = m_previousRawTimeMeanL3V.value();
+    if (m_previousRawTimeMeanL3V)
+      meanRawTimeL3V = m_previousRawTimeMeanL3V.value();
   } else {
-    meanRawTimeL3V = rawTimeL3V->GetMean();
+    if (rawTimeL3V->GetEntries() > m_minEntries)
+      meanRawTimeL3V = rawTimeL3V->GetMean();
+    else {
+      if (m_previousRawTimeMeanL3V)
+        meanRawTimeL3V = m_previousRawTimeMeanL3V.value();
+    }
   }
   if (!m_previousRawTimeMeanL3V) {
     B2INFO("Setting start payload boundary to be the first run ("
@@ -182,4 +194,3 @@ bool SVDCoGTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration::ExpRu
     return false;
   }
 }
-

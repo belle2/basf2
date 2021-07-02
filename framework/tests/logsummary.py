@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+# this is a test executable, not a module so we don't need doxygen warnings
+# @cond SUPPRESS_DOXYGEN
 
 """
 Test if the log summary is shown correctly in all cases
@@ -56,3 +58,5 @@ module.set_log_level(LogLevel.WARNING)
 print("run without summary")
 logging.enable_summary(False)
 fork_process(main)
+
+# @endcond

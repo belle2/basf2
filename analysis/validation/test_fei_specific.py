@@ -10,18 +10,14 @@
 import fei
 from fei.default_channels import get_unittest_channels
 import os
-import sys
 
 import tempfile
 import shutil
 import glob
-import sys
 
 import basf2 as b2
 import modularAnalysis as ma
-from ROOT import Belle2
 import basf2_mva
-import pdg
 
 basf2_mva.loadRootDictionary()
 
@@ -37,7 +33,7 @@ particles = fei.get_unittest_channels()
 
 sig_path = b2.create_path()
 ma.inputMdst(environmentType='default',
-             filename=b2.find_file('mdst12.root', 'validation', False),
+             filename=b2.find_file('mdst14.root', 'validation', False),
              path=sig_path)
 ma.fillParticleList('mu+:sig', 'muonID > 0.5 and dr < 1 and abs(dz) < 2', writeOut=True, path=sig_path)
 ma.reconstructDecay('tau+:sig -> mu+:sig', '', 1, writeOut=True, path=sig_path)
@@ -52,7 +48,7 @@ feistate = fei.get_path(particles, configuration)
 
 path = b2.create_path()
 roe_path = b2.create_path()
-cond_module = ma.register_module('SignalSideParticleFilter')
+cond_module = b2.register_module('SignalSideParticleFilter')
 cond_module.param('particleLists', ['B+:sig'])
 cond_module.if_true(feistate.path, b2.AfterConditionPath.END)
 roe_path.add_module(cond_module)
@@ -69,7 +65,7 @@ fei.do_trainings(particles, configuration)
 path = b2.create_path()
 feistate = fei.get_path(particles, configuration)
 roe_path = b2.create_path()
-cond_module = ma.register_module('SignalSideParticleFilter')
+cond_module = b2.register_module('SignalSideParticleFilter')
 cond_module.param('particleLists', ['B+:sig'])
 cond_module.if_true(feistate.path, b2.AfterConditionPath.END)
 roe_path.add_module(cond_module)
@@ -95,7 +91,7 @@ fei.do_trainings(particles, configuration)
 path = b2.create_path()
 feistate = fei.get_path(particles, configuration)
 roe_path = b2.create_path()
-cond_module = ma.register_module('SignalSideParticleFilter')
+cond_module = b2.register_module('SignalSideParticleFilter')
 cond_module.param('particleLists', ['B+:sig'])
 cond_module.if_true(feistate.path, b2.AfterConditionPath.END)
 roe_path.add_module(cond_module)
@@ -114,7 +110,7 @@ fei.do_trainings(particles, configuration)
 path = b2.create_path()
 feistate = fei.get_path(particles, configuration)
 roe_path = b2.create_path()
-cond_module = ma.register_module('SignalSideParticleFilter')
+cond_module = b2.register_module('SignalSideParticleFilter')
 cond_module.param('particleLists', ['B+:sig'])
 cond_module.if_true(feistate.path, b2.AfterConditionPath.END)
 roe_path.add_module(cond_module)
@@ -134,7 +130,7 @@ fei.do_trainings(particles, configuration)
 path = b2.create_path()
 feistate = fei.get_path(particles, configuration)
 roe_path = b2.create_path()
-cond_module = ma.register_module('SignalSideParticleFilter')
+cond_module = b2.register_module('SignalSideParticleFilter')
 cond_module.param('particleLists', ['B+:sig'])
 cond_module.if_true(feistate.path, b2.AfterConditionPath.END)
 roe_path.add_module(cond_module)
@@ -150,7 +146,7 @@ fei.do_trainings(particles, configuration)
 path = b2.create_path()
 feistate = fei.get_path(particles, configuration)
 roe_path = b2.create_path()
-cond_module = ma.register_module('SignalSideParticleFilter')
+cond_module = b2.register_module('SignalSideParticleFilter')
 cond_module.param('particleLists', ['B+:sig'])
 cond_module.if_true(feistate.path, b2.AfterConditionPath.END)
 roe_path.add_module(cond_module)

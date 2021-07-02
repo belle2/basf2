@@ -7,9 +7,7 @@
 # Nevertheless this script can be used to generate variables to consider
 # for improvements or cross checks with --task explore
 
-import os
 import sys
-import os.path
 
 from tracking.run.event_generation import StandardEventGenerationRun
 from trackfindingcdc.run.training import TrainingRunMixin
@@ -116,9 +114,9 @@ class FacetFilterTrainingRun(TrainingRunMixin, StandardEventGenerationRun):
                 "chi2_accept",
             ]
 
-        wire_hit_preparer = path.add_module("TFCDC_WireHitPreparer",
-                                            flightTimeEstimation="outwards",
-                                            UseNLoops=1.0)
+        path.add_module("TFCDC_WireHitPreparer",
+                        flightTimeEstimation="outwards",
+                        UseNLoops=1.0)
 
         path.add_module("TFCDC_ClusterPreparer")
 

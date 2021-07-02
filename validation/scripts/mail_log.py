@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # std
 import copy
@@ -13,8 +12,10 @@ from typing import Dict, Union, List, Optional
 # ours
 import validationpath
 from validationfunctions import available_revisions
+
 # martin's mail utils
 import mail_utils
+from validationscript import Script
 
 
 def parse_mail_address(obj: Union[str, List[str]]) -> List[str]:
@@ -22,12 +23,12 @@ def parse_mail_address(obj: Union[str, List[str]]) -> List[str]:
     Take a string or list and return list of email addresses that appear in it
     """
     if isinstance(obj, str):
-        return re.findall(r'[\w.-]+@[\w.-]+', obj)
+        return re.findall(r"[\w.-]+@[\w.-]+", obj)
     elif isinstance(obj, list):
         return [
-            re.search(r'[\w.-]+@[\w.-]+', c).group()
+            re.search(r"[\w.-]+@[\w.-]+", c).group()
             for c in obj
-            if re.search(r'[\w.-]+@[\w.-]+', c) is not None
+            if re.search(r"[\w.-]+@[\w.-]+", c) is not None
         ]
     else:
         raise TypeError("must be string or list of strings")
@@ -40,11 +41,6 @@ class Mails:
     plots.
     The mail data is built upon instantiation, the `send_mails` method
     sends the actual mails.
-
-
-    @var _validator: Instance of validation.Validation
-    @var _mail_data_old: Yesterday's mail data (generated from comparison_json)
-    @var _mail_data_new: Current mail data. Will be filled on instantiation.
     """
 
     def __init__(self, validation, include_expert_plots=False):
@@ -61,16 +57,17 @@ class Mails:
         @param include_expert_plots: Should expert plots be included?
         """
 
+        # Cannot import Validation to type hint because this would give us a
+        # circular import.
+        #: Instance of validation.Validation
         self._validator = validation
 
         # read contents from comparison.json
         work_folder = self._validator.work_folder
-        revisions = ['reference'] + available_revisions(work_folder)
-        comparison_json_file = \
-            validationpath.get_html_plots_tag_comparison_json(
-                work_folder,
-                revisions
-            )
+        revisions = ["reference"] + available_revisions(work_folder)
+        comparison_json_file = validationpath.get_html_plots_tag_comparison_json(
+            work_folder, revisions
+        )
         with open(comparison_json_file) as f:
             comparison_json = json.load(f)
 
@@ -78,17 +75,20 @@ class Mails:
         old_mail_data_path = os.path.join(
             self._validator.get_log_folder(), "mail_data.json"
         )
+        #: Yesterday's mail data (generated from comparison_json). Check
+        #: docstring of _create_mail_log for exact format
+        self._mail_data_old: Optional[dict] = None
         try:
             with open(old_mail_data_path) as f:
                 self._mail_data_old = json.load(f)
         except FileNotFoundError:
             print(
                 f"Could not find old mail_data.json at {old_mail_data_path}.",
-                file=sys.stderr
+                file=sys.stderr,
             )
-            self._mail_data_old = None
 
-        # current mail data
+        #: Current mail data. Will be filled on instantiation. Check
+        #: docstring of _create_mail_log for exact format
         self._mail_data_new = self._create_mail_log(
             comparison_json, include_expert_plots=include_expert_plots
         )
@@ -101,8 +101,11 @@ class Mails:
         """
 
         # get failed scripts
-        with open(os.path.join(self._validator.get_log_folder(),
-                               "list_of_failed_scripts.log")) as f:
+        with open(
+            os.path.join(
+                self._validator.get_log_folder(), "list_of_failed_scripts.log"
+            )
+        ) as f:
             failed_scripts = f.read().splitlines()
 
         # collect information about failed scripts
@@ -110,13 +113,9 @@ class Mails:
         for failed_script in failed_scripts:
 
             # get_script_by_name works with _ only ...
-            for suffix in ["py", "C"]:
-                failed_script = failed_script.replace("." + suffix,
-                                                      "_" + suffix)
-            if self._validator.get_script_by_name(failed_script):
-                script = self._validator.get_script_by_name(failed_script)
-            else:
-                # can't do anything if script is not found
+            failed_script = Script.sanitize_file_name(failed_script)
+            script = self._validator.get_script_by_name(failed_script)
+            if script is None:
                 continue
 
             script.load_header()
@@ -126,22 +125,15 @@ class Mails:
             # give failed_script the same format as error_data in method
             # create_mail_log
             failed_script["package"] = script.package
-            try:
-                failed_script["rootfile"] = ", ".join(script.header["input"])
-            except (KeyError, TypeError):
-                # TypeError occurs if script.header is None
-                failed_script["rootfile"] = " -- "
+            failed_script["rootfile"] = ", ".join(script.input_files)
             failed_script["comparison_text"] = " -- "
-            try:
-                failed_script["description"] = script.header["description"]
-            except (KeyError, TypeError):
-                failed_script["description"] = " -- "
+            failed_script["description"] = script.description
             # this is called comparison_result but it is handled as error
             # type when composing mail
             failed_script["comparison_result"] = "script failed to execute"
             # add contact of failed script to mail_log
             try:
-                for contact in parse_mail_address(script.header["contact"]):
+                for contact in parse_mail_address(script.contact):
                     if contact not in mail_log:
                         mail_log[contact] = {}
                     mail_log[contact][script.name] = failed_script
@@ -151,8 +143,9 @@ class Mails:
 
         return mail_log
 
-    def _create_mail_log(self, comparison, include_expert_plots=False) \
-            -> Dict[str, Dict[str, Dict[str, str]]]:
+    def _create_mail_log(
+        self, comparison, include_expert_plots=False
+    ) -> Dict[str, Dict[str, Dict[str, str]]]:
         """!
         Takes the entire comparison json file, finds all the plots where
         comparison failed, finds info about failed scripts and saves them in
@@ -200,9 +193,11 @@ class Mails:
                         "comparison_text": plot["comparison_text"],
                         "description": plot["description"],
                         "comparison_result": plot["comparison_result"],
-                        "warnings": sorted(list(
-                            set(plot["warnings"]) - {"No reference object"}
-                        ))
+                        "warnings": sorted(
+                            list(
+                                set(plot["warnings"]) - {"No reference object"}
+                            )
+                        ),
                     }
                     # every contact gets an email
                     for contact in parse_mail_address(plot["contact"]):
@@ -228,8 +223,8 @@ class Mails:
     @staticmethod
     def _flag_new_failures(
         mail_log: Dict[str, Dict[str, Dict[str, str]]],
-        old_mail_log: Optional[Dict[str, Dict[str, Dict[str, str]]]]) \
-            -> Dict[str, Dict[str, Dict[str, str]]]:
+        old_mail_log: Optional[Dict[str, Dict[str, Dict[str, str]]]],
+    ) -> Dict[str, Dict[str, Dict[str, str]]]:
         """ Add a new field 'compared_to_yesterday' which takes one of the
         values 'unchanged' (same revision comparison result as in yesterday's
         mail log, 'new' (new warning/failure), 'changed' (comparison result
@@ -238,23 +233,30 @@ class Mails:
         for contact in mail_log:
             for plot in mail_log[contact]:
                 if old_mail_log is None:
-                    mail_log_flagged[contact][plot]["compared_to_yesterday"] = \
-                        "n/a"
+                    mail_log_flagged[contact][plot][
+                        "compared_to_yesterday"
+                    ] = "n/a"
                 elif contact not in old_mail_log:
-                    mail_log_flagged[contact][plot]["compared_to_yesterday"] = \
-                        "new"
+                    mail_log_flagged[contact][plot][
+                        "compared_to_yesterday"
+                    ] = "new"
                 elif plot not in old_mail_log[contact]:
-                    mail_log_flagged[contact][plot]["compared_to_yesterday"] = \
-                        "new"
-                elif mail_log[contact][plot]["comparison_result"] != \
-                        old_mail_log[contact][plot]["comparison_result"] or \
-                        mail_log[contact][plot]["warnings"] != \
-                        old_mail_log[contact][plot]["warnings"]:
-                    mail_log_flagged[contact][plot]["compared_to_yesterday"] = \
-                        "changed"
+                    mail_log_flagged[contact][plot][
+                        "compared_to_yesterday"
+                    ] = "new"
+                elif (
+                    mail_log[contact][plot]["comparison_result"]
+                    != old_mail_log[contact][plot]["comparison_result"]
+                    or mail_log[contact][plot]["warnings"]
+                    != old_mail_log[contact][plot]["warnings"]
+                ):
+                    mail_log_flagged[contact][plot][
+                        "compared_to_yesterday"
+                    ] = "changed"
                 else:
-                    mail_log_flagged[contact][plot]["compared_to_yesterday"] = \
-                        "unchanged"
+                    mail_log_flagged[contact][plot][
+                        "compared_to_yesterday"
+                    ] = "unchanged"
         return mail_log_flagged
 
     @staticmethod
@@ -282,19 +284,25 @@ class Mails:
         # url = "http://localhost:8000/static/validation.html"
 
         if incremental:
-            body = "You are receiving this email, because additional" \
-                   " validation plots/scripts (that include you as contact " \
-                   "person) produced warnings/errors or " \
-                   "because their warning/error status " \
-                   "changed. \n" \
-                   "Below is a detailed list of all new/changed offenders:\n\n"
+            body = (
+                "You are receiving this email, because additional"
+                " validation plots/scripts (that include you as contact "
+                "person) produced warnings/errors or "
+                "because their warning/error status "
+                "changed. \n"
+                "Below is a detailed list of all new/changed offenders:\n\n"
+            )
         else:
-            body = "This is a full list of validation plots/scripts that" \
-                   " produced warnings/errors and include you as contact" \
-                   "person (sent out once a week).\n\n"
+            body = (
+                "This is a full list of validation plots/scripts that"
+                " produced warnings/errors and include you as contact"
+                "person (sent out once a week).\n\n"
+            )
 
-        body += "There were problems with the validation of the " \
+        body += (
+            "There were problems with the validation of the "
             "following plots/scripts:\n\n"
+        )
         for plot in plots:
             compared_to_yesterday = plots[plot]["compared_to_yesterday"]
             body_plot = ""
@@ -305,13 +313,16 @@ class Mails:
             elif compared_to_yesterday == "new":
                 body_plot = '<b style="color: red;">[NEW]</b><br>'
             elif compared_to_yesterday == "changed":
-                body_plot = '<b style="color: red;">' \
-                             '[Warnings/comparison CHANGED]</b><br>'
+                body_plot = (
+                    '<b style="color: red;">'
+                    "[Warnings/comparison CHANGED]</b><br>"
+                )
             else:
-                body_plot = \
-                    f'<b style="color: red;">[UNEXPECTED compared_to_yesterday ' \
-                    f'flag: "{compared_to_yesterday}". Please alert the ' \
-                    f'validation maintainer.]</b><br>'
+                body_plot = (
+                    f'<b style="color: red;">[UNEXPECTED compared_to_yesterday '
+                    f'flag: "{compared_to_yesterday}". Please alert the '
+                    f"validation maintainer.]</b><br>"
+                )
 
             # compose descriptive error message
             if plots[plot]["comparison_result"] == "error":
@@ -349,8 +360,10 @@ class Mails:
 
             body += body_plot
 
-        body += f"You can take a look at the plots/scripts " \
-                f'<a href="{url}">here</a>.'
+        body += (
+            f"You can take a look at the plots/scripts "
+            f'<a href="{url}">here</a>.'
+        )
 
         return body
 
@@ -384,7 +397,9 @@ class Mails:
         recipients = []
         for contact in self._mail_data_new:
             # if the errors are the same as yesterday, don't send a new mail
-            if incremental and self._check_if_same(self._mail_data_new[contact]):
+            if incremental and self._check_if_same(
+                self._mail_data_new[contact]
+            ):
                 # don't send mail
                 continue
             recipients.append(contact)
@@ -400,8 +415,7 @@ class Mails:
                 mood = "dead"
 
             body = self._compose_message(
-                self._mail_data_new[contact],
-                incremental=incremental
+                self._mail_data_new[contact], incremental=incremental
             )
 
             if incremental:
@@ -410,11 +424,7 @@ class Mails:
                 header = "Validation: Monday report"
 
             mail_utils.send_mail(
-                contact.split('@')[0],
-                contact,
-                header,
-                body,
-                mood=mood
+                contact.split("@")[0], contact, header, body, mood=mood
             )
 
         # send a happy mail to folks whose failed plots work now
@@ -424,11 +434,11 @@ class Mails:
                     recipients.append(contact)
                     body = "Your validation plots work fine now!"
                     mail_utils.send_mail(
-                        contact.split('@')[0],
+                        contact.split("@")[0],
                         contact,
                         "Validation confirmation",
                         body,
-                        mood="happy"
+                        mood="happy",
                     )
 
         print(f"Sent mails to the following people: {', '.join(recipients)}")
@@ -437,6 +447,8 @@ class Mails:
         """
         Dump mail json.
         """
-        with open(os.path.join(self._validator.get_log_folder(),
-                               "mail_data.json"), "w") as f:
+        with open(
+            os.path.join(self._validator.get_log_folder(), "mail_data.json"),
+            "w",
+        ) as f:
             json.dump(self._mail_data_new, f, sort_keys=True, indent=4)

@@ -99,6 +99,8 @@ namespace Belle2 {
              "calpulse selection (ON if max > min): minimal time [ns]", 0.0);
     addParam("calpulseTimeMax", m_calpulseTimeMax,
              "calpulse selection (ON if max > min): maximal time [ns]", 0.0);
+    addParam("addRelations", m_addRelations, "if true, make relations to TOPRawDigits", true);
+
   }
 
 
@@ -323,7 +325,9 @@ namespace Belle2 {
         if (window >= storageDepth) {
           B2WARNING("TOPRawDigitConverter: window number greater than storage depth."
                     << LogVar("window number", window)
-                    << LogVar("storage depth", storageDepth));
+                    << LogVar("storage depth", storageDepth)
+                    << LogVar("refWindow", refWindow)
+                    << LogVar("phase", phase));
           continue;
         }
 
@@ -434,7 +438,7 @@ namespace Belle2 {
       digit->setChannel(channel);
       digit->setFirstWindow(window);
       digit->setStatus(statusBits);
-      digit->addRelationTo(&rawDigit);
+      if (m_addRelations) digit->addRelationTo(&rawDigit);
 
       if (not rawDigit.isFEValid() or rawDigit.isPedestalJump())
         digit->setHitQuality(TOPDigit::c_Junk);

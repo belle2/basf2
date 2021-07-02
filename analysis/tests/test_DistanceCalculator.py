@@ -4,13 +4,9 @@ import variables.collections as vc
 import variables.utils as vu
 import vertex as vx
 import stdCharged as stdc
-import sys
 import b2test_utils
 
 from variables import variables
-from ROOT import Belle2
-from ROOT import TFile
-from ROOT import TNtuple
 
 variables.addAlias('TubeX', 'extraInfo(TubePosX)')
 variables.addAlias('TubeY', 'extraInfo(TubePosY)')
@@ -104,7 +100,7 @@ ma.applyCuts('B-:sigT', 'abs(mcPDG)==521', path=my_path)
 
 ma.reconstructDecay('Upsilon(4S):sig -> B+:tag B-:sigT', '', path=my_path)
 
-mytestmodule2 = ma.register_module('BtubeCreator')
+mytestmodule2 = b2.register_module('BtubeCreator')
 my_path.add_module(mytestmodule2,
                    listName='Upsilon(4S):sig')
 vx.raveFit('B-:sigT', 0.0, constraint='btube', path=my_path)

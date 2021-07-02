@@ -14,13 +14,21 @@
 #
 # Run this script by calling
 #
-# basf2 create_file_to_iov_map.py -- --option='metadata' --file_path_pattern='/hsm/belle2/bdata/Data/Raw/e0003/r*/**/*.root'
+# basf2 create_file_to_iov_map.py -- --option='metadata'
+# --file_path_pattern='/hsm/belle2/bdata/Data/Raw/e0003/r*/**/*.root'
 
 
+import pickle
+from pprint import PrettyPrinter
+import sys
 import argparse
-parser = argparse.ArgumentParser(description="Make a mapping file of file paths -> IoV")
-parser.add_argument('--file_path_patterns', default='/hsm/belle2/bdata/Data/Raw/e0003/r*/**/*.root', type=str,
-                    help='Lets take some file patterns. We could have put wildcards in more places but this is enough for testing.')
+parser = argparse.ArgumentParser(
+    description="Make a mapping file of file paths -> IoV")
+parser.add_argument(
+    '--file_path_patterns',
+    default='/hsm/belle2/bdata/Data/Raw/e0003/r*/**/*.root',
+    type=str,
+    help='Lets take some file patterns. We could have put wildcards in more places but this is enough for testing.')
 parser.add_argument('--output', default='file_iov_map.pkl', type=str,
                     help='Name of the output mapping file.')
 parser.add_argument(
@@ -41,7 +49,8 @@ def from_raw_data_file_paths(file_path_patterns):
     # First get the absolute file paths from the patterns
     file_paths = find_absolute_file_paths(file_path_patterns)
     file_to_iov = {}
-    # Now loop over them and parse the IoVs out by looking at their directory/filenames
+    # Now loop over them and parse the IoVs out by looking at their
+    # directory/filenames
     for file_path in file_paths:
         file_to_iov[file_path] = parse_raw_data_iov(file_path)
     return file_to_iov
@@ -67,7 +76,8 @@ def from_metadata_of_files(file_path_patterns):
         """
         from multiprocessing.pool import ThreadPool
         tp = ThreadPool(processes=max_processes)
-        mapping = make_file_to_iov_dictionary(file_path_patterns, polling_time=5, pool=tp)
+        mapping = make_file_to_iov_dictionary(
+            file_path_patterns, polling_time=5, pool=tp)
         tp.close()
         tp.join()
         return mapping
@@ -84,11 +94,9 @@ else:
     print("That wasn't one of the available options for this script. Run it again with no arguments to see the options.")
     sys.exit(1)
 
-from pprint import PrettyPrinter
 pp = PrettyPrinter(indent=2)
 pp.pprint(file_to_iov)
 
-import pickle
 # Save for later use
 with open(args.output, 'bw') as iov_map_file:
     pickle.dump(file_to_iov, iov_map_file)

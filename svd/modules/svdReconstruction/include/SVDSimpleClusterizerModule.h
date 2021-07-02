@@ -22,7 +22,8 @@
 
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
-#include <svd/calibration/SVDClusterCalibrations.h>
+#include <svd/calibration/SVDClustering.h>
+#include <svd/calibration/SVDOldDefaultErrorScaleFactors.h>
 #include <svd/calibration/SVD3SampleCoGTimeCalibrations.h>
 #include <svd/calibration/SVD3SampleELSTimeCalibrations.h>
 
@@ -95,17 +96,23 @@ namespace Belle2 {
       double m_cutCluster = 0;
       /** if true takes the clusterizer cuts from the DB object*/
       bool m_useDB = true;
-      /** selects the algorithm to compute the cluster tim
+      /** selects the algorithm to compute the cluster time
        *  0 = 6-sample CoG (default)
        *  1 = 3-sample CoG (TO DO: default if 3-sample acquisition mode)
        *  2 = 3-sample ELS
        */
       int m_timeAlgorithm = 0;
+      /** Name of the SVDEventInfo to be used instead of SVDEventInfo.
+       * The defauls is SVDEventInfoSim */
+      std::string m_svdEventInfoSet;
+      /** if true returns the calibrated time instead of the raw time for 3-sample time algorithms*/
+      bool m_calibrate3SampleWithEventT0 = true;
 
       //calibration objects
       SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShape calibrations db object*/
       SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
-      SVDClusterCalibrations m_ClusterCal; /**<SVDCluster calibrations db object*/
+      SVDClustering m_ClusterCal; /**<SVDCluster calibrations db object*/
+      SVDOldDefaultErrorScaleFactors m_OldDefaultSF; /**<SVDCluster calibrations db object*/
 
       SVD3SampleCoGTimeCalibrations m_3CoGTimeCal; /**< SVD 3-sample CoG Time calibrations db object*/
       SVD3SampleELSTimeCalibrations m_3ELSTimeCal; /**< SVD 3-sample ELS Time calibrations db object*/

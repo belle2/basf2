@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import unittest
 import sys
@@ -15,6 +14,7 @@ class TestClusterControlDrmaa(unittest.TestCase):
     """
     Test for for the DRMAA-backend of the clustercontrol
     """
+
     class SessionMock:
         """
         Class to mock a DRMAA session
@@ -24,6 +24,7 @@ class TestClusterControlDrmaa(unittest.TestCase):
             """
             Possible DRMAA Job States
             """
+
             #: job done
             DONE = 1
             #: job failed
@@ -40,7 +41,6 @@ class TestClusterControlDrmaa(unittest.TestCase):
 
         def __exit__(self, exc, value, tb):
             """ to support python with syntax"""
-            pass
 
         def createJobTemplate(self):
             """fake creating job template"""
@@ -62,7 +62,7 @@ class TestClusterControlDrmaa(unittest.TestCase):
         """
         Overwrite drmaa module and see what happens ...
         """
-        sys.modules['drmaa'] = None
+        sys.modules["drmaa"] = None
         self.assertFalse(Cluster.is_supported())
 
     def test_submit_and_monitor_job(self):
@@ -76,10 +76,12 @@ class TestClusterControlDrmaa(unittest.TestCase):
             os.chdir(str(td))
 
             drmaa_mock = MagicMock()
-            drmaa_mock.Session = self.SessionMock  # MagicMock(return_value=session_mock)
+            drmaa_mock.Session = (
+                self.SessionMock
+            )  # MagicMock(return_value=session_mock)
             drmaa_mock.JobState = self.SessionMock.JobState
 
-            sys.modules['drmaa'] = drmaa_mock
+            sys.modules["drmaa"] = drmaa_mock
 
             # this just imports the drmaa module which should always work with our
             # mock

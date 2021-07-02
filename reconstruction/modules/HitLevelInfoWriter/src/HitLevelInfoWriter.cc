@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <framework/gearbox/Const.h>
 #include <reconstruction/modules/HitLevelInfoWriter/HitLevelInfoWriter.h>
 #include <reconstruction/dataobjects/DedxConstants.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
@@ -45,7 +46,7 @@ void HitLevelInfoWriterModule::initialize()
   m_klmClusters.isOptional();
 
   // build a map to relate input strings to the right particle type
-  std::map<std::string, std::string> pdgMap = {{"pi+", "211"}, {"K+", "321"}, {"mu+", "13"}, {"e+", "11"}, {"p+", "2212"}, {"deuteron", "1000010020"}};
+  std::map<std::string, std::string> pdgMap = {{"pi+", "Const::pion.getPDGCode()"}, {"K+", "Const::kaon.getPDGCode()"}, {"mu+", "Const::muon.getPDGCode()"}, {"e+", "Const::electron.getPDGCode()"}, {"p+", "Const::proton.getPDGCode()"}, {"deuteron", "Const::deuteron.getPDGCode()"}};
 
   // if no particle lists are given, write out all tracks
   if (m_strParticleList.size() == 0) bookOutput(m_strOutputBaseName);
@@ -62,7 +63,6 @@ void HitLevelInfoWriterModule::initialize()
 void HitLevelInfoWriterModule::event()
 {
 
-  StoreArray<CDCDedxTrack> dedxTracks;
   int nParticleList = m_strParticleList.size();
 
   // **************************************************

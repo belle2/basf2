@@ -66,6 +66,8 @@ namespace Belle2 {
     bool m_deadchflag;
     /** dbobject to store deadchannel */
     DBObjPtr<CDCTriggerDeadch> m_db_deadchannel;
+    /** TDC based crosstalk filtering logic on CDCFE. True:enable False:disable */
+    bool m_crosstalk_tdcfilter;
 
   private:
     /** structure to hold pointers to all wires in the CDC */
@@ -83,7 +85,7 @@ namespace Belle2 {
     //** number of layers in Super layer**/
     const static int MAX_N_LAYERS = 8;
     /** bad channel mapping */
-    bool deadch_map[nSuperLayers][MAX_N_LAYERS][MAX_N_SCELLS];
+    bool deadch_map[nSuperLayers][MAX_N_LAYERS][MAX_N_SCELLS] = {};
 
     /** list of input CDC hits */
     StoreArray<CDCHit> m_cdcHits;

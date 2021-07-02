@@ -40,5 +40,7 @@
 #pragma link C++ class std::vector<TH1*>+; // checksum=0x1c8a598, version=6
 #pragma link C++ class Belle2::DisplayData::Arrow+; // checksum=0xf3209a92, version=-1
 #pragma link C++ class std::vector<Belle2::DisplayData::Arrow>+; // checksum=0xf328c034, version=6
+#pragma link C++ class std::pair<Belle2::Const::EDetector, std::map<std::string, int>>+; // checksum=0x32be0e15, version=-1
+#pragma link C++ class std::pair<Belle2::Const::EDetector, std::map<std::string, double>>+; // checksum=0x7add857, version=-1
 
 #endif

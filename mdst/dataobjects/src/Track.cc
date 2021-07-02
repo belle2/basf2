@@ -24,7 +24,7 @@ const TrackFitResult* Track::getTrackFitResult(const Const::ChargedStable& charg
     return nullptr;
   }
 
-  StoreArray<TrackFitResult> trackFitResults;
+  StoreArray<TrackFitResult> trackFitResults{};
   return trackFitResults[trackFitResultArrayIndex];
 }
 

@@ -51,23 +51,18 @@ if len(sys.argv) >= 2:
     else:
         step = str(sys.argv[1])
 
-if not os.getenv('BELLE2_EXAMPLES_DATA_DIR'):
-    b2.B2FATAL("You need the example data installed. Run `b2install-data example` in terminal for it.")
-
-path = os.getenv('BELLE2_EXAMPLES_DATA_DIR') + '/'
-
 # MC11 is not ready yet, so we have to manually put MC10 as a magnetic field config.
 magnetic_field = 'MC10'
 if step == 'train':
-    input_file_list = [path + 'ccbar_sample_to_train.root',
-                       path + 'Bd2K0spi0_to_train.root']
+    input_file_list = [b2.find_file('ccbar_sample_to_train.root', 'examples', False),
+                       b2.find_file('Bd2K0spi0_to_train.root', 'examples', False)]
 elif step == 'test':
-    input_file_list = [path + 'ccbar_sample_to_test.root',
-                       path + 'Bd2K0spi0_to_test.root']
+    input_file_list = [b2.find_file('ccbar_sample_to_test.root', 'examples', False),
+                       b2.find_file('Bd2K0spi0_to_test.root', 'examples', False)]
 elif step == 'apply_signal':
-    input_file_list = [path + 'Bd2K0spi0_to_test.root']
+    input_file_list = [b2.find_file('Bd2K0spi0_to_test.root', 'examples', False)]
 elif step == 'apply_qqbar':
-    input_file_list = [path + 'ccbar_sample_to_test.root', ]
+    input_file_list = [b2.find_file('ccbar_sample_to_test.root', 'examples', False)]
 else:
     sys.exit('Step does not match any of the available samples: `train`, `test`, `apply_signal`or `apply_qqbar`')
 outfile = step + '.root'

@@ -8,21 +8,16 @@
 # Relevant paper: https://arxiv.org/abs/1611.01046
 # use basf2_mva_evaluation.py with train.root and test.root at the end to see the impact on the spectator variables.
 
-import basf2
 import basf2_mva
 from basf2_mva_python_interface.contrib_keras import State
-import h5py
-import tensorflow as tf
-import tensorflow.contrib.keras as keras
-import keras
+import tensorflow.keras as keras
 
-from keras.layers import Input, Dense, Concatenate, Lambda
-from keras.models import Model, load_model
-from keras.optimizers import adam
+from keras.layers import Dense, Input
+from keras.models import Model
+from keras.optimizers import Adam
 from keras.losses import binary_crossentropy, sparse_categorical_crossentropy
 from keras.activations import sigmoid, tanh, softmax
-from keras import backend as K
-from keras.callbacks import Callback, EarlyStopping
+from keras.callbacks import EarlyStopping
 from keras.utils import plot_model
 
 import numpy as np
@@ -106,7 +101,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
     # Model for applying Data. Loss function will not be used for training, if adversary is used.
     apply_model = Model(input, output)
-    apply_model.compile(optimizer=adam(lr=parameters['learning_rate']), loss=binary_crossentropy, metrics=['accuracy'])
+    apply_model.compile(optimizer=Adam(lr=parameters['learning_rate']), loss=binary_crossentropy, metrics=['accuracy'])
 
     state = State(apply_model, use_adv=parameters['lambda'] > 0 and number_of_spectators > 0)
     state.number_bins = parameters['number_bins']
@@ -124,7 +119,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
         # Model which trains first part of the net
         model1 = Model(input, [output] + adversaries)
-        model1.compile(optimizer=adam(lr=parameters['learning_rate']),
+        model1.compile(optimizer=Adam(lr=parameters['learning_rate']),
                        loss=[binary_crossentropy] + adversary_losses_model, metrics=['accuracy'],
                        loss_weights=[1] + [-parameters['lambda']] * len(adversary_losses_model))
         model1.summary()
@@ -135,7 +130,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
         for layer in model2.layers:
             layer.trainable = not layer.trainable
 
-        model2.compile(optimizer=adam(lr=parameters['learning_rate']), loss=adversary_losses_model,
+        model2.compile(optimizer=Adam(lr=parameters['learning_rate']), loss=adversary_losses_model,
                        metrics=['accuracy'])
         model2.summary()
 
@@ -238,7 +233,7 @@ if __name__ == "__main__":
                  'daughter(2, daughter(0, E))', 'daughter(2, daughter(1, E))',
                  'daughter(2, daughter(0, clusterTiming))', 'daughter(2, daughter(1, clusterTiming))',
                  'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
-                 'daughter(2, daughter(0, minC2HDist))', 'daughter(2, daughter(1, minC2HDist))',
+                 'daughter(2, daughter(0, minC2TDist))', 'daughter(2, daughter(1, minC2TDist))',
                  'M']
 
     variables2 = ['p', 'pt', 'pz', 'phi',
@@ -248,7 +243,7 @@ if __name__ == "__main__":
                   'daughter(2, daughter(0, E))', 'daughter(2, daughter(1, E))',
                   'daughter(2, daughter(0, clusterTiming))', 'daughter(2, daughter(1, clusterTiming))',
                   'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
-                  'daughter(2, daughter(0, minC2HDist))', 'daughter(2, daughter(1, minC2HDist))']
+                  'daughter(2, daughter(0, minC2TDist))', 'daughter(2, daughter(1, minC2TDist))']
 
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")

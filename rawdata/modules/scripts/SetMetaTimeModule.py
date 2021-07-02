@@ -3,7 +3,7 @@
 
 from basf2 import Module
 from ROOT import Belle2
-from basf2 import B2FATAL, B2ERROR, B2WARNING, B2INFO, B2DEBUG
+from basf2 import B2DEBUG, B2FATAL
 
 
 class SetMetaTimeModule(Module):

@@ -12,11 +12,16 @@
 
 #include <framework/core/Module.h>
 #include <svd/dataobjects/SVDSimHit.h>
-#include <svd/simulation/SVDSignal.h>
+#include <svd/simulation/SVDWaveform.h>
 #include <svd/geometry/SensorInfo.h>
+#include <svd/calibration/SVDNoiseCalibrations.h>
+#include <svd/calibration/SVDPulseShapeCalibrations.h>
+#include <svd/calibration/SVDChargeSimulationCalibrations.h>
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <framework/database/PayloadFile.h>
+#include <svd/dataobjects/SVDEventInfo.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 
 #include <string>
 
@@ -24,18 +29,19 @@
 #include <root/TFile.h>
 #include <root/TTree.h>
 #include <root/TH1D.h>
+#include <root/TH2F.h>
 
 namespace Belle2 {
   namespace SVD {
 
-    /** Map of all signals in one sensor. */
-    typedef std::map<short int, SVDSignal> StripSignals;
+    /** Map of all channels' waveforms in one sensor side. */
+    typedef std::map<short int, SVDWaveform> StripWaveforms;
 
-    /** Signals of u- and v- strips in one sensor. */
-    typedef std::pair<StripSignals, StripSignals> Sensor;
+    /** Waveforms of u- and v- channels in one sensor. */
+    typedef std::pair<StripWaveforms, StripWaveforms> SensorWaveforms;
 
-    /** Map of all signals in all sensors */
-    typedef std::map<VxdID, Sensor> Sensors;
+    /** Map of all waveforms in all sensors */
+    typedef std::map<VxdID, SensorWaveforms> Waveforms;
 
     /** The SVD Digitizer module.
      * This module is responsible for converting the simulated energy
@@ -53,7 +59,7 @@ namespace Belle2 {
       /** Drift the charge inside the silicon.
        * This method will drift the charge inside the silicon along the E/B fieldlines.
        * @param position start position of the charge
-       * @param electrons number of electrons and holes to drift
+       * @param carriers number of electrons and holes to drift
        * @param carrierType electrons or holes
        */
       void driftCharge(const TVector3& position, double carriers, SVD::SensorInfo::CarrierType carrierType);
@@ -116,28 +122,37 @@ namespace Belle2 {
       // 2. Physics
       /** Max. Segment length to use for charge drifting */
       double m_segmentLength = 0.020;
-      /** Width of diffusion cloud for simple drift model (in sigmas) */
-      double m_widthOfDiffusCloud = 3.0;
 
       // 3. Noise
-      /** Whether or not to apply poisson fluctuation of charge */
+      /** Whether or not to apply poisson fluctuation of charge (Fano factor)*/
       bool  m_applyPoisson = true;
-      /** Whether or not to apply Gaussian noise */
-      bool  m_applyNoise = false;
       /** Zero-suppression cut. */
       double m_SNAdjacent = 3.0;
       /** Round ZS cut to nearest ADU */
       bool m_roundZS = true;
-      /** Keek digit if at least m_nSamplesOverZS are over threshold */
-      unsigned short m_nSamplesOverZS = 1;
+      /** Keep digit if at least m_nSamplesOverZS are over threshold */
+      int m_nSamplesOverZS = 1;
       /** (derived from SNAdjacent) Fraction of noisy strips per sensor. */
       double m_noiseFraction = 0.01;
 
       // 4. Timing
-      /** Shaping time of the APV25 shapers.*/
-      double m_shapingTime = 250.0;
-      /** Interval between two waveform samples (30 ns). */
-      double m_samplingTime = 16000. / 509.;
+      /** Hardware Clocks*/
+      DBObjPtr<HardwareClockSettings> m_hwClock;
+      /** Decay time of betaprime waveform U-side.*/
+      double m_betaPrimeDecayTimeU = 250.0;
+      /** Decay time of betaprime waveform V-side.*/
+      double m_betaPrimeDecayTimeV = 250.0;
+      /** Interval between two waveform samples, by default taken from HardwareClockSettings */
+      double m_samplingTime = -1;
+      /** Time window start, excluding trigger bin effect.
+       * This is the parameter used to tune the latency wrt L1 trigger.
+       */
+      double m_startSampling = -2;
+      /** Time window start, including the triggerBin effect.
+       * Starting from this time, signal samples are taken in samplingTime intervals.
+       */
+      double m_initTime = 0;
+
       /** Randomize event times?
        * If set to true, event times will be randomized uniformly from
        * m_minTimeFrame to m_maxTimeFrame.
@@ -152,24 +167,25 @@ namespace Belle2 {
        */
       float m_currentEventTime = 0.0;
 
+      // 5. 3-mixed-6 and 3-sample daqMode
+      /** True if the event should be simulated with 3 sample */
+      bool m_is3sampleEvent = false;
+      /** number of digitized samples read from SVDEventInfo */
+      int m_nAPV25Samples = 6;
 
-      /** Time window start.
-       * Starting from this time, signal samples are taken in samplingTime intervals.
-       */
-      double m_startSampling = -2.0;
-
-      // 5. Reporting
+      // 6. Reporting
       /** Name of the ROOT filename to output statistics */
       std::string m_rootFilename = "";
       /** Store waveform data in the reporting file? */
       bool m_storeWaveforms = false;
-      /** Name of the tab-delimited listing of signals */
+      /** Name of the tab-delimited listing of waveforms */
       std::string m_signalsList = "";
+
 
       // Other data members:
 
-      /** Structure containing signals in all existing sensors */
-      Sensors m_sensors;
+      /** Structure containing waveforms in all existing sensors */
+      Waveforms m_waveforms;
 
       /** Pointer to the SVDSimhit currently digitized */
       const SVDSimHit*   m_currentHit = nullptr;
@@ -178,43 +194,31 @@ namespace Belle2 {
       /** Index of the TrueHit the current hit belongs to */
       int                m_currentTrueHit = -1;
       /** Pointer to the sensor in which the current hit occurred */
-      Sensor*            m_currentSensor = nullptr;
+      SensorWaveforms*            m_currentSensorWaveforms = nullptr;
       /** Pointer to the SensorInfo of the current sensor */
       const SensorInfo*  m_currentSensorInfo = nullptr;
       /** Time of the current SimHit.. */
       double m_currentTime = 0;
       /** Thickness of current sensor (read from m_currentSensorInfo).*/
       double m_sensorThickness = 0.03;
-      /** The depletion voltage of the Silicon sensor */
-      double m_depletionVoltage = 40;
-      /** The bias voltage on the sensor */
-      double m_biasVoltage = 100;
-      /** The backplane capacitanceU wrt. the strips. */
-      double m_backplaneCapacitanceU = 0.1; //pF/cm
-      /** The interstrip capacitanceU for the sensor. */
-      double m_interstripCapacitanceU = 0.7; //pF/cm
-      /** The coupling capacitanceU for the sensor. */
-      double m_couplingCapacitanceU = 15; //pF/cm
-      /** The backplane capacitanceV wrt. the strips. */
-      double m_backplaneCapacitanceV = 0.4; //pF/cm
-      /** The interstrip capacitanceV for the sensor. */
-      double m_interstripCapacitanceV = 0.7; //pF/cm
-      /** The coupling capacitanceV for the sensor. */
-      double m_couplingCapacitanceV = 30; //pF/cm
-      /** ADU equivalent charge for u-strips. */
-      //      double m_aduEquivalentU;
-      /** ADU equivalent charge for v-strips. */
-      //      double m_aduEquivalentV;
-      /** Electronic noise for u-strips. */
-      double m_elNoiseU = 500; //e-
-      /** Electronic noise for v-strips. */
-      double m_elNoiseV = 500; //e-
 
-      //run-dependent MC payloads:
+      /** relative shift in SVDEventInfo obj */
+      int m_relativeShift = 0;
+      /** Starting sample for the selection of 3 samples in 3-mixed-6 */
+      int m_startingSample = 0;
+
+      /** return the starting sample */
+      int getFirstSample(int triggerBin, int relativShift);
+
+      //payloads:
       SVDFADCMaskedStrips m_MaskedStr; /**< FADC masked strip payload*/
       static std::string m_xmlFileName /**< channel mapping xml filename*/;
       DBObjPtr<PayloadFile> m_mapping; /**<channel mapping payload*/
       std::unique_ptr<SVDOnlineToOfflineMap> m_map; /**<channel mapping map*/
+
+      SVDChargeSimulationCalibrations m_ChargeSimCal; /**<SVDChargeSimulationCalibrations calibrations db object*/
+      SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
+      SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShapeCalibrations calibrations db object*/
 
       // ROOT stuff:
       /** Pointer to the ROOT filename for statistics */
@@ -240,6 +244,10 @@ namespace Belle2 {
       TH1D*  m_histDriftTime_e = nullptr;
       /** Histogram showing the drift time of h. */
       TH1D*  m_histDriftTime_h = nullptr;
+      /** Histogram showing the hit time. */
+      TH1D*  m_histHitTime = nullptr;
+      /** Histogram showing the hit time vs TB. */
+      TH2F*  m_histHitTimeTB = nullptr;
 
       /** Histogram showing the Lorentz angles in u (r-phi). */
       TH1D*  m_histLorentz_u = nullptr;

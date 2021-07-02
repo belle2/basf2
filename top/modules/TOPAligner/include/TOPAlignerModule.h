@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
+ * Copyright(C) 2016, 2021 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -11,9 +11,10 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <top/reconstruction/TOPalign.h>
-
+#include <top/reconstruction_cpp/ModuleAlignment.h>
+#include <top/utilities/TrackSelector.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <top/dataobjects/TOPDigit.h>
@@ -21,9 +22,10 @@
 #include <framework/gearbox/Const.h>
 
 #include <string>
+#include <vector>
 
-#include "TFile.h"
-#include "TTree.h"
+#include <TFile.h>
+#include <TTree.h>
 
 namespace Belle2 {
 
@@ -42,7 +44,8 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~TOPAlignerModule();
+    virtual ~TOPAlignerModule()
+    {}
 
     /**
      * Initialize the Module.
@@ -51,21 +54,9 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun() override;
-
-    /**
      * Event processor.
      */
     virtual void event() override;
-
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
 
     /**
      * Termination action.
@@ -75,15 +66,7 @@ namespace Belle2 {
 
   private:
 
-    /**
-     * track selection
-     * @return true if pass selection criteria
-     */
-    bool selectTrack(const TOP::TOPtrack& trk);
-
     // module paramenets
-    double m_minBkgPerBar; /**< minimal assumed background photons per module */
-    double m_scaleN0; /**< scale factor for figure-of-merit N0 */
     int m_targetMid; /**< target module to align. Must be 1 <= Mid <= 16 */
     int m_maxFails; /**< maximum allowed number of failed iterations */
     std::string m_sample; /**< sample type */
@@ -97,13 +80,12 @@ namespace Belle2 {
     double m_stepPosition; /**< step size for translations */
     double m_stepAngle; /**< step size for rotations */
     double m_stepTime; /**< step size for t0 */
-    double m_stepRefind; /**< step size for scaling of refractive index (dn/n) */
-    std::vector<int> m_gridSize; /**< grid size */
     std::vector<double> m_parInit; /**< initial parameter values */
     std::vector<std::string> m_parFixed; /**< names of parameters to be fixed */
 
     // alignment procedure
-    TOP::TOPalign m_align;     /**< alignment object */
+    TOP::ModuleAlignment m_align;  /**< alignment object */
+    TOP::TrackSelector m_selector; /**< track selection utility */
     Const::ChargedStable m_chargedStable = Const::muon; /**< track hypothesis */
     int m_countFails = 0;      /**< counter for failed iterations */
 
@@ -117,6 +99,7 @@ namespace Belle2 {
     std::vector<float> m_vAlignPars;     /**< alignment parameters */
     std::vector<float> m_vAlignParsErr;  /**< error on alignment parameters */
     bool m_valid = false;  /**< true if alignment parameters are valid */
+    int m_numPhot = 0; /**< number of photons used for log likelihood in this iteration */
     float m_x = 0; /**< track: extrapolated hit coordinate in local (module) frame */
     float m_y = 0; /**< track: extrapolated hit coordinate in local (module) frame */
     float m_z = 0; /**< track: extrapolated hit coordinate in local (module) frame */

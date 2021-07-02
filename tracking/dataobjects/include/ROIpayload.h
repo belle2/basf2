@@ -13,7 +13,7 @@
 #include <tracking/dataobjects/ROIrawID.h>
 #include "TObject.h"
 #include <stdint.h>
-#include <boost/spirit/home/support/detail/endian.hpp>
+#include <boost/endian/arithmetic.hpp>
 
 namespace Belle2 {
 
@@ -36,7 +36,7 @@ namespace Belle2 {
 
   public:
     /** Shorthand for 32-bit integer stored in big-endian format */
-    typedef boost::spirit::endian::ubig32_t ubig32_t;
+    using ubig32_t = boost::endian::big_uint32_t;
 
     /** Default constructor.
      */

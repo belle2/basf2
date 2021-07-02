@@ -27,7 +27,8 @@
 #include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
 #include <mdst/dbobjects/TRGGDLDBPrescales.h>
 #include <trg/gdl/dbobjects/TRGGDLDBAlgs.h>
-
+#include <simulation/dataobjects/SimClockState.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 #include <TH1I.h>
 
 namespace Belle2 {
@@ -53,7 +54,9 @@ namespace Belle2 {
                              const std::string& Phase = "Phase",
                              bool algFromDB = true,
                              const std::string& algFilePath = "ftd.alg",
-                             int debugLevel = 0);
+                             int debugLevel = 0,
+                             double timquality_threshold_sfin = 0,
+                             double timquality_threshold_fine = 0);
 
     /// returns TRGGDL object. TRGGDL should be created with specific
     /// configuration before calling this function.
@@ -69,7 +72,9 @@ namespace Belle2 {
            const std::string& Phase,
            bool algFromDB = true,
            const std::string& algFilePath = "ftd.alg",
-           int debugLevel = 0);
+           int debugLevel = 0,
+           double timquality_threshold_sfin = 0,
+           double timquality_threshold_fine = 0);
 
     /// Destructor
     virtual ~TRGGDL();
@@ -144,9 +149,13 @@ namespace Belle2 {
     static TRGState timingDecision(const TRGState& input,
                                    TRGState& registers,
                                    bool& logicStillActive);
+
     bool doprescale(int f);
 
     bool isFiredFTDL(std::vector<bool> input, std::string alg);
+
+    /// Check the content of the DBObjects used by this class.
+    void checkDatabase() const;
 
     std::vector<bool> getInpBits(void) {return _inpBits;}
 
@@ -255,7 +264,13 @@ namespace Belle2 {
     DBObjPtr<TRGGDLDBInputBits> m_InputBitsDB;
     DBObjPtr<TRGGDLDBFTDLBits>  m_FTDLBitsDB;
     DBObjPtr<TRGGDLDBPrescales> m_PrescalesDB;
-    DBObjPtr<TRGGDLDBAlgs> db_algs;
+    DBObjPtr<TRGGDLDBAlgs> m_AlgsDB;
+
+    /// Threshold to determine timing quality flag with MC truth: super fine
+    double _timquality_threshold_sfin;
+
+    /// Threshold to determine timing quality flag with MC truth: fine
+    double _timquality_threshold_fine;
 
     ///
     std::vector<bool> _inpBits;
@@ -268,6 +283,12 @@ namespace Belle2 {
     int getNbitsInp(void) {return _inpBitNames.size();}
 
     bool _algFromDB;
+
+    /** generated hardware clock state */
+    StoreObjPtr<SimClockState> m_simClockState;
+    /** Hardware Clocks*/
+    DBObjPtr<HardwareClockSettings> m_hwClock;
+
 
     friend class TRGGDLModule;
   };

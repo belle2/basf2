@@ -5,7 +5,6 @@
 
 import sys
 import basf2
-import ROOT
 from ROOT.Belle2 import KLMDatabaseImporter, KLMTimeConversion
 
 basf2.set_log_level(basf2.LogLevel.INFO)
@@ -18,8 +17,6 @@ if (len(sys.argv) >= 2):
 dbImporter = KLMDatabaseImporter()
 
 timeConversion = KLMTimeConversion()
-# TDC frequency in GHz
-timeConversion.setTDCFrequency(1.017728000)
 # Time offset in ns.
 timeConversion.setTimeOffset(0)
 # CTIME shift in bits.

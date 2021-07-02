@@ -13,6 +13,7 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCTimeZeros.h>
@@ -113,11 +114,11 @@ namespace Belle2 {
 
       /**
        * Read displacement or (mis)alignment params from text file.
-       * @param[in] Wire position set, i.e. c_Base, c_Misaliged or c_Aligned.
-       * @param[in] Pointer to DB CDCGeometry db object.
+       * @param[in] set Wire position set, i.e. c_Base, c_Misaliged or c_Aligned.
+       * @param[in] geom Pointer to DB CDCGeometry db object.
        */
       //      void readWirePositionParams(EWirePosition set, const CDCGeometry*,  const GearDir);
-      void readWirePositionParams(EWirePosition set, const CDCGeometry*);
+      void readWirePositionParams(EWirePosition set, const CDCGeometry* geom);
 
       /**
        * Set wire alignment params. from DB.
@@ -209,9 +210,14 @@ namespace Belle2 {
       void setT0();
 
       /**
-       * Calculate mean t0 in ns (over all wires)
+       * Calculate mean t0 in ns (over all good wires)
+       * @param minT0 min. of t0 window (ns)
+       * @param maxT0 max. of t0 window (ns)
+       * @param maxIt max. no. of iterations
+       * @param nStdv standard-deviation cut applied for next iteration
+       * @param epsi  criterion for iteration stop (ns)
        */
-      void calcMeanT0();
+      void calcMeanT0(double minT0 = 3800, double maxT0 = 5800, int maxIt = 10, double nStdv = 3, double epsi = 0.1);
 
       //      /**
       //       * Read bad-wires (from a file).
@@ -271,10 +277,20 @@ namespace Belle2 {
       /** Return edep-to-ADC conversion main factor (in count/keV)
        * @param layer no. (0-55)
        * @param cell  no. (0-)
+       * @param costh cosine of incident angle (theta) of particle
        */
-      double getEDepToADCMainFactor(unsigned short layer, unsigned short cell)
+      double getEDepToADCMainFactor(unsigned short layer, unsigned short cell, double costh = 0)
       {
-        return m_eDepToADCParams[layer][cell][0];
+        return m_eDepToADCParams[layer][cell][0] + m_eDepToADCParams[layer][cell][4] * (costh - m_eDepToADCParams[layer][cell][5]);
+      };
+
+      /** Return sigma for extra smearing of edep to ADC conversion
+       * @param layer no. (0-55)
+       * @param cell  no. (0-)
+       */
+      double getEDepToADCSigma(unsigned short layer, unsigned short cell)
+      {
+        return m_eDepToADCParams[layer][cell][6];
       };
 
       //! Generate an xml file used in gearbox
@@ -1006,25 +1022,21 @@ namespace Belle2 {
 
       /**
        * Returns the two closest alpha points for the input track incident angle (alpha).
-       * @param alpha in rad.
        */
       void getClosestAlphaPoints(const double alpha, double& wal, unsigned short points[2], unsigned short lrs[2]) const;
 
       /**
        * Returns the two closest alpha points for sigma for the input track incident angle (alpha). TODO: unify the two getClosestAlphaPoints().
-       * @param alpha in rad.
        */
       void getClosestAlphaPoints4Sgm(const double alpha, double& wal, unsigned short points[2], unsigned short lrs[2]) const;
 
       /**
        * Returns the two closest theta points for the input track incident angle (theta).
-       * @param theta in rad.
        */
       void getClosestThetaPoints(const double alpha, const double theta, double& wth, unsigned short points[2]) const;
 
       /**
        * Returns the two closest theta points for sigma for the input track incident angle (theta).
-       * @param theta in rad. TODO: unify the two getClosestThetaPoints().
        */
       void getClosestThetaPoints4Sgm(const double alpha, const double theta, double& wth, unsigned short points[2]) const;
 
@@ -1126,7 +1138,7 @@ namespace Belle2 {
       float m_FWirPosAlign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. alignment at the forward endplate for each cell; ibid. */
       float m_BWirPosAlign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. alignment at the backward endplate for each cell; ibid. */
       float m_WireSagCoefAlign[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< Wire sag coefficient incl. alignment for each cell; ibid. */
-      float m_eDepToADCParams[MAX_N_SLAYERS][MAX_N_SCELLS][6] = {0}; /*!< edep-to-ADC conv. params. */
+      float m_eDepToADCParams[MAX_N_SLAYERS][MAX_N_SCELLS][7] = {0}; /*!< edep-to-ADC conv. params. */
 
       float m_alphaPoints[maxNAlphaPoints]; /*!< alpha sampling points for xt (rad) */
       float m_thetaPoints[maxNThetaPoints]; /*!< theta sampling points for xt (rad) */
@@ -1170,6 +1182,8 @@ namespace Belle2 {
       DBObjPtr<CDCAlignment>* m_alignmentFromDB; /*!< alignment params. retrieved from DB. */
       DBObjPtr<CDCMisalignment>* m_misalignmentFromDB; /*!< misalignment params. retrieved from DB. */
       DBObjPtr<CDCEDepToADCConversions>* m_eDepToADCConversionsFromDB; /*!< Pointer to edep-to-ADC conv. params. from DB. */
+
+      DBObjPtr<HardwareClockSettings> m_clockSettings; /*!< hardware clock settings */
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
 

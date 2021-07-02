@@ -11,13 +11,11 @@ The base class is Transform.
 __author__ = 'swehle'
 
 
-from .settings import ProTool
+from alignment.fancystuff.settings import ProTool
 
 import numpy as np
 import pandas as pd
-from scipy.interpolate import interp1d, InterpolatedUnivariateSpline
-from scipy.interpolate import UnivariateSpline
-import scipy
+from scipy.interpolate import InterpolatedUnivariateSpline
 
 
 class Transform(ProTool):
@@ -102,7 +100,6 @@ class Transform(ProTool):
         :param y:   class variable [1,0]
 
         """
-        pass
 
     def transform(self, x, set_limits=False):
         """

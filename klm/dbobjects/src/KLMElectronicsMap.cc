@@ -24,10 +24,10 @@ KLMElectronicsMap::~KLMElectronicsMap()
 {
 }
 
-const uint16_t* KLMElectronicsMap::getDetectorChannel(
+const KLMChannelNumber* KLMElectronicsMap::getDetectorChannel(
   KLMElectronicsChannel* electronicsChannel) const
 {
-  std::map<KLMElectronicsChannel, uint16_t>::const_iterator it;
+  std::map<KLMElectronicsChannel, KLMChannelNumber>::const_iterator it;
   it = m_MapElectronicsDetector.find(*electronicsChannel);
   if (it == m_MapElectronicsDetector.end())
     return nullptr;
@@ -35,9 +35,9 @@ const uint16_t* KLMElectronicsMap::getDetectorChannel(
 }
 
 const KLMElectronicsChannel* KLMElectronicsMap::getElectronicsChannel(
-  uint16_t detectorChannel) const
+  KLMChannelNumber detectorChannel) const
 {
-  std::map<uint16_t, KLMElectronicsChannel>::const_iterator it;
+  std::map<KLMChannelNumber, KLMElectronicsChannel>::const_iterator it;
   it = m_MapDetectorElectronics.find(detectorChannel);
   if (it == m_MapDetectorElectronics.end())
     return nullptr;
@@ -45,7 +45,7 @@ const KLMElectronicsChannel* KLMElectronicsMap::getElectronicsChannel(
 }
 
 void KLMElectronicsMap::addChannel(
-  uint16_t detectorChannel, int copper, int slot, int lane, int axis,
+  KLMChannelNumber detectorChannel, int copper, int slot, int lane, int axis,
   int channel)
 {
   KLMElectronicsChannel electronicsChannel(copper, slot, lane, axis, channel);
@@ -63,9 +63,9 @@ void KLMElectronicsMap::addChannel(
             << LogVar("Channel", channel));
     return;
   }
-  m_MapDetectorElectronics.insert(std::pair<uint16_t, KLMElectronicsChannel>(
+  m_MapDetectorElectronics.insert(std::pair<KLMChannelNumber, KLMElectronicsChannel>(
                                     detectorChannel, electronicsChannel));
-  m_MapElectronicsDetector.insert(std::pair<KLMElectronicsChannel, uint16_t>(
+  m_MapElectronicsDetector.insert(std::pair<KLMElectronicsChannel, KLMChannelNumber>(
                                     electronicsChannel, detectorChannel));
 }
 

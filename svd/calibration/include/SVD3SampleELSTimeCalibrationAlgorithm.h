@@ -63,5 +63,3 @@ namespace Belle2 {
     float m_minEntries = 10000; /**< Set the minimun number of entries required in the histograms of layer 3*/
   };
 } // namespace Belle2
-
-

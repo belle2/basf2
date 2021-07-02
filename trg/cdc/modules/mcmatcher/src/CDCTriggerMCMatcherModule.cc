@@ -228,7 +228,7 @@ CDCTriggerMCMatcherModule::event()
     auto range_prTrackIds = prTrackId_by_hitId.equal_range(hitId);
 
     // count for every prTrack that has this hit
-    for (const pair<HitId, TrackId>& hitId_and_prTrackId :
+    for (const pair<HitId, TrackId> hitId_and_prTrackId :
          as_range(range_prTrackIds)) {
       TrackId prTrackId = hitId_and_prTrackId.second;
       B2DEBUG(200, " prTrackId : " <<  prTrackId  << ";  mcTrackId : " <<  mcTrackId);

@@ -110,6 +110,7 @@ TrgEclBhabha::TrgEclBhabha():
 TrgEclBhabha::~TrgEclBhabha()
 {
   delete _TCMap;
+  delete _database;
 }
 //
 //
@@ -166,9 +167,9 @@ bool TrgEclBhabha::GetBhabha00(std::vector<double> PhiRingSum)  //Belle 2D Bhabh
   vector<int> k161 = {2,  8, 9};      // (10) C5+C6+C7
   vector<int> k162 = {2,  9, 10};     // (10) C5+C6+C7
 
-  vector<int> k17 = {2, 14, 15};      // (11) C11+C12 +forward gap
+  //vector<int> k17 = {2, 14, 15};      // (11) C11+C12 +forward gap
 
-  vector<int> k18 = {1, 16};          // (11) B1 + forward gap
+  //vector<int> k18 = {1, 16};          // (11) B1 + forward gap
 
   vector<int> kLOM1 = {2,  2, 3 };    // (1)  F1+F2 + F3 + B1+B2
   vector<int> kLOM2 = {2, 16, 17};    // (1)  F1+F2 + F3 + B1+B2
@@ -310,8 +311,6 @@ bool TrgEclBhabha::GetBhabha00(std::vector<double> PhiRingSum)  //Belle 2D Bhabh
 //========================================================
 bool TrgEclBhabha::GetBhabha01()
 {
-  bool BtoBFlag = false;
-  bool BhabhaFlag = false;
   //
   // Read Cluster Table
   //
@@ -349,10 +348,10 @@ bool TrgEclBhabha::GetBhabha01()
 
   int cl_idx1 = -1;
   int cl_idx2 = -1;
-  BhabhaFlag = false;
+  bool BhabhaFlag = false;
   for (int icluster = 0; icluster < ncluster ; icluster++) {
     for (int jcluster = icluster + 1; jcluster < ncluster; jcluster ++) {
-      BtoBFlag = false;
+      bool BtoBFlag = false;
 
       if (icluster == jcluster) {continue;}
       int lut1 = _database->Get3DBhabhaLUT(MaxTCId[icluster]);
@@ -416,8 +415,6 @@ bool TrgEclBhabha::GetBhabha01()
 //========================================================
 bool TrgEclBhabha::GetBhabha02()
 {
-  bool BtoBFlag = false;
-  bool BhabhaFlag = false;
   //
   // Read Cluster Table
   //
@@ -451,10 +448,10 @@ bool TrgEclBhabha::GetBhabha02()
 
   int cl_idx1 = -1;
   int cl_idx2 = -1;
-  BhabhaFlag = false;
+  bool BhabhaFlag = false;
   for (int icluster = 0; icluster < ncluster ; icluster++) {
-    for (int jcluster = icluster + 1; jcluster < ncluster; jcluster ++) {
-      BtoBFlag = false;
+    for (int jcluster = icluster + 1; jcluster < ncluster; ++jcluster) {
+      bool BtoBFlag = false;
 
       if (icluster == jcluster) {continue;}
       int lut1 = _database->Get3DBhabhaLUT(MaxTCId[icluster]);
@@ -584,6 +581,82 @@ bool TrgEclBhabha::Getmumu()
     }
   }
   return BhabhaFlag;
+}
+//========================================================
+// taub2b selection for tau 1x1 process
+//========================================================
+bool TrgEclBhabha::GetTaub2b(double E_total1to17)
+{
+  //
+  // Read Cluster Table
+  //
+  MaxTCId.clear();
+  ClusterEnergy.clear();
+  ClusterTiming.clear();
+  ClusterPosition.clear();
+
+  m_Taub2bAngleFlag    = 0;
+  m_Taub2bEtotFlag     = 0;
+  m_Taub2bClusterEFlag = 0;
+
+  if (E_total1to17 < m_Taub2bEtotCut) {
+    m_Taub2bEtotFlag = 1;
+  }
+
+  StoreArray<TRGECLCluster> trgeclClusterArray;
+  for (int ii = 0; ii < trgeclClusterArray.getEntries(); ii++) {
+    TRGECLCluster* aTRGECLCluster = trgeclClusterArray[ii];
+    int maxTCId    = aTRGECLCluster->getMaxTCId();
+    double clusterenergy  = aTRGECLCluster->getEnergyDep();
+    ClusterEnergy.push_back(clusterenergy);
+    MaxTCId.push_back(maxTCId);
+  }
+
+  const int ncluster = ClusterEnergy.size();
+
+  for (int icluster = 0; icluster < ncluster ; icluster++) {
+    for (int jcluster = icluster + 1; jcluster < ncluster; jcluster ++) {
+
+      if (icluster == jcluster) {continue;}
+      int lut1 = _database->Get3DBhabhaLUT(MaxTCId[icluster]);
+      int lut2 = _database->Get3DBhabhaLUT(MaxTCId[jcluster]);
+      lut1 >>= 4;
+      lut2 >>= 4;
+      int phi1 = 511 & lut1;
+      int phi2 = 511 & lut2;
+      lut1 >>= 9;
+      lut2 >>= 9;
+      int theta1 = lut1;
+      int theta2 = lut2;
+
+      int dphi = abs(phi1 - phi2);
+      if (dphi > 180) {dphi = 360 - dphi;}
+      int thetaSum = theta1 + theta2;
+
+      if (dphi     > m_Taub2bAngleCut[0] &&
+          dphi     < m_Taub2bAngleCut[1] &&
+          thetaSum > m_Taub2bAngleCut[2] &&
+          thetaSum < m_Taub2bAngleCut[3]) {
+        m_Taub2bAngleFlag++;
+        //
+        if ((ClusterEnergy[icluster] < m_Taub2bClusterECut1 &&
+             ClusterEnergy[jcluster] < m_Taub2bClusterECut2) ||
+            (ClusterEnergy[icluster] < m_Taub2bClusterECut2 &&
+             ClusterEnergy[jcluster] < m_Taub2bClusterECut1)) {
+          m_Taub2bClusterEFlag++;
+        }
+      }
+    }
+  }
+
+  bool Taub2bFlag = false;
+  if (m_Taub2bAngleFlag    > 0 &&
+      m_Taub2bEtotFlag     > 0 &&
+      m_Taub2bClusterEFlag > 0) {
+    Taub2bFlag = true;
+  }
+
+  return Taub2bFlag;
 }
 //========================================================
 //

@@ -59,10 +59,10 @@ V0Fitter::V0Fitter(const std::string& trackFitResultsName, const std::string& v0
   m_copiedRecoTracks.registerRelationTo(m_recoTracks);
 
 
-  B2ASSERT(genfit::MaterialEffects::getInstance()->isInitialized(),
-           "Material effects not set up.  Please use SetupGenfitExtrapolationModule.");
-  B2ASSERT(genfit::FieldManager::getInstance()->isInitialized(),
-           "Magnetic field not set up.  Please use SetupGenfitExtrapolationModule.");
+  B2ASSERT("Material effects not set up.  Please use SetupGenfitExtrapolationModule.",
+           genfit::MaterialEffects::getInstance()->isInitialized());
+  B2ASSERT("Magnetic field not set up.  Please use SetupGenfitExtrapolationModule.",
+           genfit::FieldManager::getInstance()->isInitialized());
 }
 
 void V0Fitter::setFitterMode(int fitterMode)
@@ -83,28 +83,16 @@ void V0Fitter::setFitterMode(int fitterMode)
 }
 
 void V0Fitter::initializeCuts(double beamPipeRadius,
-                              double vertexChi2CutOutside)
+                              double vertexChi2CutOutside,
+                              std::tuple<double, double> invMassRangeKshort,
+                              std::tuple<double, double> invMassRangeLambda,
+                              std::tuple<double, double> invMassRangePhoton)
 {
   m_beamPipeRadius = beamPipeRadius;
   m_vertexChi2CutOutside = vertexChi2CutOutside;
-}
-
-
-bool V0Fitter::rejectCandidate(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus)
-{
-  const TVector3& posPlus = stPlus.getPos();
-  const TVector3& posMinus = stMinus.getPos();
-
-  const double Rstart = std::min(posPlus.Perp(), posMinus.Perp());
-  try {
-    stPlus.extrapolateToCylinder(Rstart);
-    stMinus.extrapolateToCylinder(Rstart);
-  } catch (...) {
-    B2DEBUG(22, "Extrapolation to cylinder failed.");
-    return true;
-  }
-
-  return false;
+  m_invMassRangeKshort = invMassRangeKshort;
+  m_invMassRangeLambda = invMassRangeLambda;
+  m_invMassRangePhoton = invMassRangePhoton;
 }
 
 
@@ -154,6 +142,7 @@ bool V0Fitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit:
     double extralengthMinus = stMinus.extrapolateToPoint(vertexPosition);
     if (extralengthPlus  > 0) hasInnerHitStatus |= 0x1; ///  plus track has hits inside the V0 vertex.
     if (extralengthMinus > 0) hasInnerHitStatus |= 0x2; /// minus track has hits inside the V0 vertex.
+    B2DEBUG(22, "extralengthPlus=" << extralengthPlus << ", extralengthMinus=" << extralengthMinus);
   } catch (...) {
     /// This shouldn't ever happen, but I can see the extrapolation
     /// code trying several windings before giving up, so this happens occasionally.
@@ -176,10 +165,18 @@ double V0Fitter::getBzAtVertex(const TVector3& vertexPosition)
 
 TrackFitResult* V0Fitter::buildTrackFitResult(const genfit::Track& track, const RecoTrack* recoTrack,
                                               const genfit::MeasuredStateOnPlane& msop, const double Bz,
-                                              const Const::ParticleType& trackHypothesis)
+                                              const Const::ParticleType& trackHypothesis,
+                                              const int sharedInnermostCluster)
 {
   const uint64_t hitPatternCDCInitializer = TrackBuilder::getHitPatternCDCInitializer(*recoTrack);
-  const uint32_t hitPatternVXDInitializer = TrackBuilder::getHitPatternVXDInitializer(*recoTrack);
+  uint32_t hitPatternVXDInitializer = TrackBuilder::getHitPatternVXDInitializer(*recoTrack);
+
+  // If the innermost hit is shared among V0 daughters, assign flag in the infoLayer.
+  if (sharedInnermostCluster > 0 && sharedInnermostCluster < 4) {
+    HitPatternVXD hitPatternVXD_forflag = HitPatternVXD(hitPatternVXDInitializer);
+    hitPatternVXD_forflag.setInnermostHitShareStatus(sharedInnermostCluster);
+    hitPatternVXDInitializer = hitPatternVXD_forflag.getInteger();
+  }
 
   TrackFitResult* v0TrackFitResult
     = m_trackFitResults.appendNew(msop.getPos(), msop.getMom(),
@@ -238,9 +235,6 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   /// redo vertex fit after refitting the track(s) with removing innermost hit in the track(s).
   /// Repeat until all the inner hits are removed or the vertex fit fails.
   bool failflag = false;
-  unsigned int nRemoveHitsPlus  = 0;
-  unsigned int nRemoveHitsMinus = 0;
-
   /// PDG code (positive number) used as the track hypothesis in the track fitting.
   const auto trackHypotheses = getTrackHypotheses(v0Hypothesis);
   const int pdg_trackPlus   = trackPlus->getTrackFitResultWithClosestMass(
@@ -248,36 +242,69 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   const int pdg_trackMinus  = trackMinus->getTrackFitResultWithClosestMass(
                                 trackHypotheses.second)->getParticleType().getPDGCode();/// positive number
 
-  RecoTrack* recoTrackPlus_forRefit  = copyRecoTrack(recoTrackPlus, pdg_trackPlus);
-  RecoTrack* recoTrackMinus_forRefit = copyRecoTrack(recoTrackMinus, pdg_trackMinus);
+  RecoTrack* recoTrackPlus_forRefit = nullptr;
+  RecoTrack* recoTrackMinus_forRefit = nullptr;
+  RecoTrack* cache_recoTrackPlus  = nullptr;
+  RecoTrack* cache_recoTrackMinus = nullptr;
 
-  if ((recoTrackPlus_forRefit == nullptr) or (recoTrackMinus_forRefit == nullptr))
-    return false;
-
+  unsigned int count_removeInnerHits = 0;
   while (hasInnerHitStatus != 0) {
+    ++count_removeInnerHits;
     /// If the track has a hit inside the V0 vertex position, use refitted RecoTrack with removing inner hits
     /// in the next V0 vertex fit. Else, use the original RecoTrack.
 
     /// for plus-charged track
     if (hasInnerHitStatus & 0x1) {
-      ++nRemoveHitsPlus;
+      // create a copy of the original RecoTrack w/o track fit
+      recoTrackPlus_forRefit  = copyRecoTrack(recoTrackPlus);
+      if (recoTrackPlus_forRefit == nullptr)
+        return false;
       /// if the track refit fails, break out of this loop and
       /// revert back to the original vertex fit with the original tracks.
-      if (not removeInnerHits(recoTrackPlus, recoTrackPlus_forRefit, pdg_trackPlus, nRemoveHitsPlus)) {
-        failflag = true;
-        break;
+      if (!cache_recoTrackPlus) {
+        if (not removeInnerHits(recoTrackPlus, recoTrackPlus_forRefit, pdg_trackPlus, vertexPos)) {
+          failflag = true;
+          break;
+        }
+      } else {
+        if (not removeInnerHits(cache_recoTrackPlus, recoTrackPlus_forRefit, pdg_trackPlus, vertexPos)) {
+          failflag = true;
+          break;
+        }
       }
+      cache_recoTrackPlus = recoTrackPlus_forRefit;
+    } else if (recoTrackPlus_forRefit == nullptr) {
+      // create a copy of the original RecoTrack w/ track fit (only once)
+      recoTrackPlus_forRefit  = copyRecoTrackAndFit(recoTrackPlus, pdg_trackPlus);
+      if (recoTrackPlus_forRefit == nullptr)
+        return false;
     }
 
     /// for minus-charged track
     if (hasInnerHitStatus & 0x2) {
-      ++nRemoveHitsMinus;
+      // create a copy of the original RecoTrack w/o track fit
+      recoTrackMinus_forRefit = copyRecoTrack(recoTrackMinus);
+      if (recoTrackMinus_forRefit == nullptr)
+        return false;
       /// if the track refit fails, break out of this loop and
       /// revert back to the original vertex fit with the original tracks.
-      if (not removeInnerHits(recoTrackMinus, recoTrackMinus_forRefit, -1 * pdg_trackMinus, nRemoveHitsMinus)) {
-        failflag = true;
-        break;
+      if (!cache_recoTrackMinus) {
+        if (not removeInnerHits(recoTrackMinus, recoTrackMinus_forRefit, pdg_trackMinus, vertexPos)) {
+          failflag = true;
+          break;
+        }
+      } else {
+        if (not removeInnerHits(cache_recoTrackMinus, recoTrackMinus_forRefit, pdg_trackMinus, vertexPos)) {
+          failflag = true;
+          break;
+        }
       }
+      cache_recoTrackMinus = recoTrackMinus_forRefit;
+    } else if (recoTrackMinus_forRefit == nullptr) {
+      // create a copy of the original RecoTrack w/ track fit (only once)
+      recoTrackMinus_forRefit = copyRecoTrackAndFit(recoTrackMinus, pdg_trackMinus);
+      if (recoTrackMinus_forRefit == nullptr)
+        return false;
     }
 
     /// V0 vertex fit
@@ -286,7 +313,12 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
     /// revert back to the original vertex fit with the original tracks.
     if (not vertexFitWithRecoTracks(trackPlus, trackMinus, recoTrackPlus_forRefit, recoTrackMinus_forRefit,
                                     v0Hypothesis, hasInnerHitStatus, vertexPos, false)) {
-      //B2WARNING("vertex refit failed.");
+      B2DEBUG(22, "Vertex refit failed, or rejected by invariant mass cut.");
+      failflag = true;
+      break;
+    }
+    if (count_removeInnerHits >= 5) {
+      B2WARNING("Inner hits remained after " << count_removeInnerHits << " times of removing inner hits!");
       failflag = true;
       break;
     }
@@ -297,7 +329,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
     bool forcestore = true;
     if (not vertexFitWithRecoTracks(trackPlus, trackMinus, recoTrackPlus, recoTrackMinus, v0Hypothesis,
                                     hasInnerHitStatus, vertexPos, forcestore)) {
-      B2WARNING("original vertex fit fails. this should not happen.");
+      B2DEBUG(22, "Original vertex fit fails. Possibly rejected by invariant mass cut.");
       return false;
     }
   }
@@ -360,20 +392,10 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
   genfit::MeasuredStateOnPlane stPlus  = recoTrackPlus->getMeasuredStateOnPlaneFromFirstHit(plusRepresentation);
   genfit::MeasuredStateOnPlane stMinus = recoTrackMinus->getMeasuredStateOnPlaneFromFirstHit(minusRepresentation);
 
-  if (rejectCandidate(stPlus, stMinus)) {
-    return false;
-  }
-
   genfit::GFRaveVertex vert;
   if (not fitGFRaveVertex(gfTrackPlus, gfTrackMinus, vert)) {
     return false;
   }
-
-  /// Update the tracks (genfit::MeasuredStateOnPlane) after vertex
-  ///    fitGFRaveVertex() looks not to give any changes to the input genfit::Track's (I'm not sure..)
-  /// make a clone, not use the reference so that the genfit::MeasuredStateOnPlane and its TrackReps will not be altered.
-  stPlus  = gfTrackPlus.getFittedState();
-  stMinus = gfTrackMinus.getFittedState();
 
   const TVector3& posVert(vert.getPos());
   vertexPos = posVert;
@@ -397,14 +419,44 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
 
   /// store V0
   if (forceStore || hasInnerHitStatus == 0) {
+    /// Before storing, apply invariant mass cut.
+    const genfit::GFRaveTrackParameters* tr0 = vert.getParameters(0);
+    const genfit::GFRaveTrackParameters* tr1 = vert.getParameters(1);
+    TLorentzVector lv0, lv1;
+    /// Reconstruct invariant mass.
+    lv0.SetVectM(tr0->getMom(), trackHypotheses.first.getMass());
+    lv1.SetVectM(tr1->getMom(), trackHypotheses.second.getMass());
+    double v0InvMass = (lv0 + lv1).M();
+    if (v0Hypothesis == Const::Kshort) {
+      if (v0InvMass < std::get<0>(m_invMassRangeKshort) || v0InvMass > std::get<1>(m_invMassRangeKshort)) {
+        B2DEBUG(22, "Kshort vertex rejected, invariant mass out of range.");
+        return false;
+      }
+    } else if (v0Hypothesis == Const::Lambda || v0Hypothesis == Const::antiLambda) {
+      if (v0InvMass < std::get<0>(m_invMassRangeLambda) || v0InvMass > std::get<1>(m_invMassRangeLambda)) {
+        B2DEBUG(22, "Lambda vertex rejected, invariant mass out of range.");
+        return false;
+      }
+    } else if (v0Hypothesis == Const::photon) {
+      if (v0InvMass < std::get<0>(m_invMassRangePhoton) || v0InvMass > std::get<1>(m_invMassRangePhoton)) {
+        B2DEBUG(22, "Photon vertex rejected, invariant mass out of range.");
+        return false;
+      }
+    }
+
+
     /// To build the trackFitResult, use the magnetic field at the origin;
     /// the helix is extrapolated to the IP in a constant magnetic field and material effects are neglected
     /// so that the vertexing tool executed on the MDST object will find again this vertex position
     const TVector3 origin(0, 0, 0);
     const double Bz = getBzAtVertex(origin);
 
-    TrackFitResult* tfrPlusVtx =  buildTrackFitResult(gfTrackPlus, recoTrackPlus, stPlus,  Bz, trackHypotheses.first);
-    TrackFitResult* tfrMinusVtx = buildTrackFitResult(gfTrackMinus, recoTrackMinus, stMinus, Bz, trackHypotheses.second);
+    int sharedInnermostCluster = checkSharedInnermostCluster(recoTrackPlus, recoTrackMinus);
+
+    TrackFitResult* tfrPlusVtx =  buildTrackFitResult(gfTrackPlus, recoTrackPlus, stPlus,  Bz, trackHypotheses.first,
+                                                      sharedInnermostCluster);
+    TrackFitResult* tfrMinusVtx = buildTrackFitResult(gfTrackMinus, recoTrackMinus, stMinus, Bz, trackHypotheses.second,
+                                                      sharedInnermostCluster);
 
     B2DEBUG(20, "Creating new V0.");
     auto v0 = m_v0s.appendNew(std::make_pair(trackPlus, tfrPlusVtx),
@@ -412,12 +464,6 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
 
     if (m_validation) {
       B2DEBUG(24, "Create StoreArray and Output for validation.");
-      const genfit::GFRaveTrackParameters* tr0 = vert.getParameters(0);
-      const genfit::GFRaveTrackParameters* tr1 = vert.getParameters(1);
-      TLorentzVector lv0, lv1;
-      /// Reconstruct invariant mass.
-      lv0.SetVectM(tr0->getMom(), trackHypotheses.first.getMass());
-      lv1.SetVectM(tr1->getMom(), trackHypotheses.second.getMass());
       auto validationV0 = m_validationV0s.appendNew(
                             std::make_pair(trackPlus, tfrPlusVtx),
                             std::make_pair(trackMinus, tfrMinusVtx),
@@ -433,16 +479,22 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
   return true;
 }
 
-RecoTrack* V0Fitter::copyRecoTrack(RecoTrack* origRecoTrack, const int trackPDG)
+RecoTrack* V0Fitter::copyRecoTrack(RecoTrack* origRecoTrack)
+{
+  RecoTrack* newRecoTrack = origRecoTrack->copyToStoreArray(m_copiedRecoTracks);
+  newRecoTrack->addHitsFromRecoTrack(origRecoTrack);
+  newRecoTrack->addRelationTo(origRecoTrack);
+  return newRecoTrack;
+}
+
+RecoTrack* V0Fitter::copyRecoTrackAndFit(RecoTrack* origRecoTrack, const int trackPDG)
 {
   /// original track information
   Const::ChargedStable particleUsedForFitting(std::abs(trackPDG));
   const genfit::AbsTrackRep* origTrackRep = origRecoTrack->getTrackRepresentationForPDG(std::abs(
                                               trackPDG));/// only a positive PDG number is allowed for the input
 
-  RecoTrack* newRecoTrack = origRecoTrack->copyToStoreArray(m_copiedRecoTracks);
-  newRecoTrack->addHitsFromRecoTrack(origRecoTrack);
-  newRecoTrack->addRelationTo(origRecoTrack);
+  RecoTrack* newRecoTrack = copyRecoTrack(origRecoTrack);
 
   /// fit newRecoTrack
   TrackFitter fitter;
@@ -457,37 +509,80 @@ RecoTrack* V0Fitter::copyRecoTrack(RecoTrack* origRecoTrack, const int trackPDG)
   return newRecoTrack;
 }
 
-bool V0Fitter::removeInnerHits(RecoTrack* origRecoTrack, RecoTrack* recoTrack,
-                               const int trackPDG, unsigned int& nRemoveHits)
+bool V0Fitter::removeInnerHits(RecoTrack* prevRecoTrack, RecoTrack* recoTrack,
+                               const int trackPDG, const TVector3& vertexPosition)
 {
+  if (!prevRecoTrack || !recoTrack) {
+    B2ERROR("Input recotrack is nullptr!");
+    return false;
+  }
   /// original track information
   Const::ChargedStable particleUsedForFitting(std::abs(trackPDG));
-  const genfit::AbsTrackRep* origTrackRep = origRecoTrack->getTrackRepresentationForPDG(std::abs(
+  const genfit::AbsTrackRep* prevTrackRep = prevRecoTrack->getTrackRepresentationForPDG(std::abs(
                                               trackPDG));/// only a positive PDG number is allowed for the input
 
   /// disable inner hits
   const std::vector<RecoHitInformation*>& recoHitInformations = recoTrack->getRecoHitInformations(true);/// true for sorted info.
-  if (recoHitInformations.size() < nRemoveHits) {/// N removed hits should not exceed N hits in the track
-    B2WARNING("N removed hits exceeds N hits in the track.");
+  const std::vector<RecoHitInformation*>& prevRecoHitInformations = prevRecoTrack->getRecoHitInformations(
+        true);/// true for sorted info.
+  unsigned int nRemoveHits = 0;
+  if (recoHitInformations.size() != prevRecoHitInformations.size()) {
+    B2WARNING("Copied RecoTrack has different number of hits from its original RecoTrack!");
     return false;
   }
-  for (unsigned int i = 0 ; i < nRemoveHits ; ++i) {
-    recoHitInformations[i]->setUseInFit(false);
+  /// check recohits one by one whether the vertex is outside/inside them
+  for (nRemoveHits = 0; nRemoveHits < recoHitInformations.size(); ++nRemoveHits) {
+    if (!prevRecoHitInformations[nRemoveHits]->useInFit()) {
+      recoHitInformations[nRemoveHits]->setUseInFit(false);
+      continue;
+    }
+    try {
+      /// make a clone, not use the reference so that the genfit::MeasuredStateOnPlane will not be altered.
+      genfit::MeasuredStateOnPlane stPrevRecoHit = prevRecoTrack->getMeasuredStateOnPlaneFromRecoHit(
+                                                     prevRecoHitInformations[nRemoveHits]);
+      /// extrapolate the hit to the V0 vertex position
+      /// the value will be positive (negative) if the direction of the extrapolation is (counter)momentum-wise
+      double extralength = stPrevRecoHit.extrapolateToPoint(vertexPosition);
+      if (extralength > 0) {
+        recoHitInformations[nRemoveHits]->setUseInFit(false);
+      } else
+        break;
+    } catch (NoTrackFitResult()) {
+      B2WARNING("Exception: no FitterInfo assigned for TrackPoint created from this RecoHit.");
+      recoHitInformations[nRemoveHits]->setUseInFit(false);
+      continue;
+    } catch (...) {
+      /// This shouldn't ever happen, but I can see the extrapolation
+      /// code trying several windings before giving up, so this happens occasionally.
+      /// Something more stable would perhaps be desirable.
+      B2DEBUG(22, "Could not extrapolate track to vertex when removing inner hits, aborting.");
+      return false;
+    }
   }
+
+  if (nRemoveHits == 0) {
+    B2WARNING("No hits removed in removeInnerHits, aborted. Use the original RecoTrack.");
+    return false;
+  }
+
+  if (recoHitInformations.size() <= nRemoveHits) {/// N removed hits should not reach N hits in the track
+    B2WARNING("Removed all the RecoHits in the RecoTrack, aborted. Use the original RecoTrack.");
+    return false;
+  }
+
   /// if the last removed hit is a SVD U-hit, remove the next hit (SVD V-hit as the pair) in addition
   ///    note: for the SVD pair hits, U-hit should be first and the V-hit the next in the sorted RecoHitInformation array.
   if (recoHitInformations[nRemoveHits - 1]->getTrackingDetector() == RecoHitInformation::RecoHitDetector::c_SVD) {
-    if (recoHitInformations.size() < nRemoveHits + 1) { /// N removed hits should not exceed N hits in the track
-      B2WARNING("N removed hits exceeds N hits in the track.");
-      return false;
-    }
     if (recoHitInformations[nRemoveHits]->getTrackingDetector() == RecoHitInformation::RecoHitDetector::c_SVD) {
       const SVDCluster* lastRemovedSVDHit = recoHitInformations[nRemoveHits - 1]->getRelatedTo<SVDCluster>();
       const SVDCluster* nextSVDHit        = recoHitInformations[nRemoveHits]  ->getRelatedTo<SVDCluster>();
-      if (lastRemovedSVDHit->getSensorID() == nextSVDHit->getSensorID() &&
-          lastRemovedSVDHit->isUCluster() && !(nextSVDHit->isUCluster())) {
-        recoHitInformations[nRemoveHits]->setUseInFit(false);
-        ++nRemoveHits;
+      if (!lastRemovedSVDHit || !nextSVDHit) B2ERROR("Last/Next SVD hit is null!");
+      else {
+        if (lastRemovedSVDHit->getSensorID() == nextSVDHit->getSensorID() &&
+            lastRemovedSVDHit->isUCluster() && !(nextSVDHit->isUCluster())) {
+          recoHitInformations[nRemoveHits]->setUseInFit(false);
+          ++nRemoveHits;
+        }
       }
     }
   }
@@ -505,15 +600,92 @@ bool V0Fitter::removeInnerHits(RecoTrack* origRecoTrack, RecoTrack* recoTrack,
     }
   }
 
+  B2DEBUG(22, nRemoveHits << " inner hits removed.");
+
   /// fit recoTrack
   TrackFitter fitter;
   if (not fitter.fit(*recoTrack, particleUsedForFitting)) {
-    B2WARNING("track fit failed.");
+    B2WARNING("track fit failed after removing inner hits.");
     /// check fit status of original track
-    if (not origRecoTrack->wasFitSuccessful(origTrackRep))
-      B2WARNING("\t original track fit was also failed.");
+    if (not prevRecoTrack->wasFitSuccessful(prevTrackRep))
+      B2WARNING("\t previous track fit was also failed.");
     return false;
   }
 
   return true;
+}
+
+int V0Fitter::checkSharedInnermostCluster(const RecoTrack* recoTrackPlus, const RecoTrack* recoTrackMinus)
+{
+  /// If 1D- or 2D-hits are shared as the innermost hits among V0 daughters.
+  /// 0x1(0x2) bit in flag represents V/z(U/r-phi)-hit share.
+  int flag = 0; // -1 for exception
+
+  // get the innermost hit for plus/minus-daughter
+  const std::vector<RecoHitInformation*>& recoHitInformationsPlus  = recoTrackPlus->getRecoHitInformations(
+        true); // true for sorted info.
+  const std::vector<RecoHitInformation*>& recoHitInformationsMinus = recoTrackMinus->getRecoHitInformations(
+        true);// true for sorted info.
+  unsigned int iInnermostHitPlus, iInnermostHitMinus;
+  for (iInnermostHitPlus = 0 ; iInnermostHitPlus < recoHitInformationsPlus.size() ; ++iInnermostHitPlus)
+    if (recoHitInformationsPlus[iInnermostHitPlus]->useInFit()) break;
+  for (iInnermostHitMinus = 0 ; iInnermostHitMinus < recoHitInformationsMinus.size() ; ++iInnermostHitMinus)
+    if (recoHitInformationsMinus[iInnermostHitMinus]->useInFit()) break;
+  if (iInnermostHitPlus == recoHitInformationsPlus.size() || iInnermostHitMinus == recoHitInformationsMinus.size()) {
+    B2WARNING("checkSharedInnermostCluster function called for recoTrack including no hit used for fit! This should not happen!");
+    return -1;
+  }
+  const auto& recoHitInfoPlus  = recoHitInformationsPlus[iInnermostHitPlus];
+  const auto& recoHitInfoMinus = recoHitInformationsMinus[iInnermostHitMinus];
+
+  if (recoHitInfoPlus->getTrackingDetector() == recoHitInfoMinus->getTrackingDetector()) {
+    if (recoHitInfoPlus->getTrackingDetector() == RecoHitInformation::c_PXD) {
+      const PXDCluster* clusterPlus = recoHitInfoPlus->getRelatedTo<PXDCluster>();
+      const PXDCluster* clusterMinus = recoHitInfoMinus->getRelatedTo<PXDCluster>();
+      if (clusterPlus == clusterMinus) { // if they share a same PXDCluster, set the flag
+        flag = 3; // PXD cluster is a 2D-hit
+      }
+    } else if (recoHitInfoPlus->getTrackingDetector() == RecoHitInformation::c_SVD) {
+      /// if the innermost hit is a SVD U-hit, check the next hit in addition
+      ///    note: for the SVD pair hits, U-hit should be first and the V-hit the next in the sorted RecoHitInformation array.
+      const SVDCluster* clusterPlus = recoHitInfoPlus->getRelatedTo<SVDCluster>();
+      const SVDCluster* clusterMinus = recoHitInfoMinus->getRelatedTo<SVDCluster>();
+      if (clusterPlus->isUCluster() && clusterMinus->isUCluster()) {
+        if (recoHitInformationsPlus.size() > iInnermostHitPlus + 1
+            && recoHitInformationsMinus.size() > iInnermostHitMinus + 1) { // not to access an array out of boundary
+          const auto& recoHitInfoNextPlus  = recoHitInformationsPlus[iInnermostHitPlus + 1];
+          const auto& recoHitInfoNextMinus = recoHitInformationsMinus[iInnermostHitMinus + 1];
+          // sanity check to access next hits
+          if (recoHitInfoNextPlus->useInFit() && recoHitInfoNextMinus->useInFit()  // this should be satisfied by default
+              && recoHitInfoNextPlus->getTrackingDetector()  == RecoHitInformation::c_SVD
+              && recoHitInfoNextMinus->getTrackingDetector() == RecoHitInformation::c_SVD) {
+            const SVDCluster* clusterNextPlus = recoHitInfoNextPlus->getRelatedTo<SVDCluster>();
+            const SVDCluster* clusterNextMinus = recoHitInfoNextMinus->getRelatedTo<SVDCluster>();
+            if (!(clusterNextPlus->isUCluster()) && !(clusterNextMinus->isUCluster())
+                && clusterPlus->getSensorID() == clusterNextPlus->getSensorID()
+                && clusterMinus->getSensorID() == clusterNextMinus->getSensorID()) {
+              if (clusterPlus == clusterMinus)
+                flag += 2; // SVD U-cluster is shared
+              if (clusterNextPlus == clusterNextMinus)
+                flag += 1; // SVD V-cluster is shared
+            } else {
+              B2WARNING("SVD cluster to be paired is not on V-side, or not on the same sensor.");
+              return -1;
+            }
+          } else {
+            B2WARNING("No SVD cluster to be paired.");
+            return -1;
+          }
+        } else {
+          B2WARNING("Innermost SVD U-cluster is the only hit in a daughter track. This should not happen.");
+          return -1;
+        }
+      } else {
+        B2WARNING("No SVD U-cluster in the innermost cluster.");
+        return -1;
+      }
+    }
+  }
+  return flag;
+
 }

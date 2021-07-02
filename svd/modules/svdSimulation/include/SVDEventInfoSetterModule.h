@@ -18,6 +18,9 @@
 #include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDTriggerType.h>
 #include <simulation/dataobjects/SimClockState.h>
+#include <svd/dbobjects/SVDGlobalConfigParameters.h>
+#include <mdst/dataobjects/TRGSummary.h>
+
 
 namespace Belle2 {
   /**
@@ -41,6 +44,11 @@ namespace Belle2 {
      */
     virtual void initialize() override;
 
+    /** Reads Detector Configuration from DB
+     *  daqMode and relativeShift
+     */
+    virtual void beginRun() override;
+
     /** Stores the SVD event info into the DataStore.
      *
      * Based on the parameters set by the user the current SVD event info
@@ -50,6 +58,11 @@ namespace Belle2 {
 
     std::string m_svdEventInfoName; /**< Name of the SVDEventInfo object */
 
+    /** Name of the StoreObjectPrt TRGSummary */
+    std::string m_objTrgSummaryName = "TRGSummary";
+
+    bool m_useDB; /**<if true reads the configuration from SVDGlobalConfigParameters payload**/
+
   private:
     StoreObjPtr<SVDEventInfo> m_svdEventInfoPtr; /**< Output object. */
     StoreObjPtr<SimClockState> m_simClockState; /**< generated hardware clock state */
@@ -58,8 +71,8 @@ namespace Belle2 {
     int m_runType; /**< run type */
     int m_eventType; /**< event type */
     int m_daqMode; /**< DAQ mode */
-    int m_triggerBin; /**< trigger time */
-    bool m_randomTriggerBin = true; /**< if true randomize trigger bin 0/1/2/3 */
+    int m_triggerBin = -1; /**< trigger bin */
+    int m_fixedTriggerBin = 999; /**< fixed trigger bin */
     uint8_t m_triggerType; /**<  Trigger type content to be set */
 
     bool m_xTalk; /**<  Cross-talk flag to be set */
@@ -71,6 +84,9 @@ namespace Belle2 {
     SVDTriggerType m_SVDTriggerType;  /**<  SVDTriggerType object */
 
     int m_relativeShift; /**< latency difference between the 3- and 6-sample acquired events*/
+
+    DBObjPtr<SVDGlobalConfigParameters> m_svdGlobalConfig;  /**< SVD Global Configuration payload*/
+
   };
 }
 

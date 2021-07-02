@@ -58,6 +58,7 @@
 #include "trg/cdc/Link.h"
 #include "trg/cdc/EventTime.h"
 #include <framework/gearbox/Const.h>
+#include <TObjString.h>
 
 #define NOT_USE_SOCKETLIB
 //#define NOT_SEND
@@ -1075,7 +1076,7 @@ namespace Belle2 {
         else t_layerId = h.getILayer() + 6 * h.getISuperLayer() + 2;
         const unsigned layerId = t_layerId;
         const unsigned wireId = h.getIWire();
-        TCWire& w = *(TCWire*) wire(layerId, wireId);
+        const TCWire& w = * static_cast<const TCWire*>(wire(layerId, wireId));
 
         //...TDC count...
         B2INFO("t0:" << m_cdcp->getT0(WireID(h.getID())) <<
@@ -1143,7 +1144,7 @@ namespace Belle2 {
       }
 
       if (TRGDebug::level() > 2) {
-        StoreArray<CDCSimHit> simHits("CDCSimHits");
+        // StoreArray<CDCSimHit> simHits("CDCSimHits"); //TODO variable is not used, is it ok?
         _clock.dump("detail", TRGDebug::tab());
         _clockFE.dump("detail", TRGDebug::tab());
         if (TRGDebug::level() > 10) {
@@ -1152,8 +1153,8 @@ namespace Belle2 {
             h.dump("detail", TRGDebug::tab(4));
           }
         } else {
-          unsigned nh = 10;
-          if (nh > _hits.size()) nh = _hits.size();
+          //unsigned nh = 10; //TODO these two lines have no impact
+          //if (nh > _hits.size()) nh = _hits.size();
           cout << TRGDebug::tab() << "Dump of the first " << n
                << " hits of a wire" << endl;
           for (unsigned i = 0; i < n; i++) {
@@ -1520,8 +1521,7 @@ namespace Belle2 {
     // }
     //}
 
-    /* cppcheck-suppress variableScope */
-    int trgOutput = 2;
+    const int trgOutput = 2;
     // Store TRG data to TRGSignalBundle.
     // 1 is FE output. 2 is Merger output. 3 is TRG output.
     //...Clock...
@@ -1550,6 +1550,7 @@ namespace Belle2 {
     if (_makeRootFile) {
       saveTRGRawInformation(trgInformations);
       saveCDCHitInformation(hitCdcData);
+      // cppcheck-suppress knownConditionTrueFalse
       if (trgOutput == 2) {
         saveTRGHitInformation(hitTrgData);
       }
@@ -1561,7 +1562,7 @@ namespace Belle2 {
       unsigned t_layerId = hitCdcData[iHit][0] + 50;
       unsigned t_wireId = hitCdcData[iHit][1];
       int t_rawTdc = hitCdcData[iHit][2];
-      TCWire& currentWire = *(TCWire*) wire(t_layerId, t_wireId);
+      const TCWire& currentWire = *static_cast<const TCWire*>(wire(t_layerId, t_wireId));
 
       // Update currentWire._signal
       TRGTime rise = TRGTime(t_rawTdc, true, _clockFE, currentWire.name());
@@ -2292,7 +2293,7 @@ namespace Belle2 {
       // relation to SegmentHits
       vector<TRGCDCLink*> links = track2D->links();
       for (unsigned its = 0; its < links.size(); ++its) {
-        TRGCDCSegment* segment = (TRGCDCSegment*)links[its]->cell();
+        const TRGCDCSegment* segment = static_cast<const TRGCDCSegment*>(links[its]->cell());
         const vector<const CDCTriggerSegmentHit*> storeHits = segment->storeHits();
         for (unsigned ihit = 0; ihit < storeHits.size(); ++ihit) {
           track->addRelationTo(storeHits[ihit]);
@@ -2312,7 +2313,7 @@ namespace Belle2 {
       // relation to SegmentHits
       vector<TRGCDCLink*> links = track2D->links();
       for (unsigned its = 0; its < links.size(); ++its) {
-        TRGCDCSegment* segment = (TRGCDCSegment*)links[its]->cell();
+        const TRGCDCSegment* segment = static_cast<const TRGCDCSegment*>(links[its]->cell());
         const vector<const CDCTriggerSegmentHit*> storeHits = segment->storeHits();
         for (unsigned ihit = 0; ihit < storeHits.size(); ++ihit) {
           track->addRelationTo(storeHits[ihit]);
@@ -2338,7 +2339,7 @@ namespace Belle2 {
       // relation to SegmentHits
       vector<TRGCDCLink*> links = track3D->links();
       for (unsigned its = 0; its < links.size(); ++its) {
-        TRGCDCSegment* segment = (TRGCDCSegment*)links[its]->cell();
+        const TRGCDCSegment* segment = static_cast<const TRGCDCSegment*>(links[its]->cell());
         const vector<const CDCTriggerSegmentHit*> storeHits = segment->storeHits();
         for (unsigned ihit = 0; ihit < storeHits.size(); ++ihit) {
           track->addRelationTo(storeHits[ihit]);
@@ -2469,6 +2470,7 @@ namespace Belle2 {
       unsigned fid = 0;
       unsigned mid = 0;
       unsigned tid = 0;
+      // cppcheck-suppress knownConditionTrueFalse
       if (lid != 0) mid = lid + tid; //jb
       for (unsigned i = 0; i < 5; i++) {
         const string car = TRGUtil::carstring(cdr);
@@ -2819,4 +2821,3 @@ namespace Belle2 {
   }
 
 } // namespace Belle2
-

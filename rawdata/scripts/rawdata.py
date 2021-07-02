@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 from geometry import check_components
-from ROOT import Belle2
 from pxd import add_pxd_packer, add_pxd_unpacker
 from svd import add_svd_packer, add_svd_unpacker
-from iov_conditional import make_conditional_at
 from neurotrigger import add_neuro_2d_unpackers
 
 
@@ -35,33 +33,38 @@ def add_packers(path, components=None):
 
     # CDC
     if components is None or 'CDC' in components:
-        cdcpacker = register_module('CDCPacker')
+        cdcpacker = b2.register_module('CDCPacker')
         path.add_module(cdcpacker)
 
     # ECL
     if components is None or 'ECL' in components:
-        eclpacker = register_module('ECLPacker')
+        eclpacker = b2.register_module('ECLPacker')
         path.add_module(eclpacker)
 
     # TOP
     if components is None or 'TOP' in components:
-        toppacker = register_module('TOPPacker')
+        toppacker = b2.register_module('TOPPacker')
         path.add_module(toppacker)
 
     # ARICH
     if components is None or 'ARICH' in components:
-        arichpacker = register_module('ARICHPacker')
+        arichpacker = b2.register_module('ARICHPacker')
         path.add_module(arichpacker)
 
     # KLM
     if components is None or 'KLM' in components:
-        klmpacker = register_module('KLMPacker')
+        klmpacker = b2.register_module('KLMPacker')
         path.add_module(klmpacker)
 
 
-def add_unpackers(path, components=None):
+def add_unpackers(path, components=None, writeKLMDigitRaws=False, addTOPRelations=False):
     """
     This function adds the raw data unpacker modules to a path.
+
+    :param components: list of geometry components to include reconstruction for, or None for all components.
+    :param writeKLMDigitRaws: flag for creating the KLMDigitRaw object and storing it in the datastore. The KLMDQM
+        module needs it for filling some histograms.
+    :param addTOPRelations: flag for creating relations in TOPUnpacker and TOPRawDigitConverter
     """
 
     # Check components.
@@ -74,6 +77,10 @@ def add_unpackers(path, components=None):
     if "Geometry" not in path:
         path.add_module("Geometry")
 
+    # TTD
+    if 'SimulateEventLevelTriggerTimeInfo' not in path:
+        path.add_module('TTDUnpacker')
+
     # PXD
     if components is None or 'PXD' in components:
         add_pxd_unpacker(path)
@@ -84,46 +91,49 @@ def add_unpackers(path, components=None):
 
     # CDC
     if components is None or 'CDC' in components:
-        cdcunpacker = register_module('CDCUnpacker')
+        cdcunpacker = b2.register_module('CDCUnpacker')
         cdcunpacker.param('enableStoreCDCRawHit', True)
         cdcunpacker.param('enablePrintOut', False)
         path.add_module(cdcunpacker)
 
     # ECL
     if components is None or 'ECL' in components:
-        eclunpacker = register_module('ECLUnpacker')
+        eclunpacker = b2.register_module('ECLUnpacker')
         eclunpacker.param("storeTrigTime", True)
         path.add_module(eclunpacker)
 
     # TOP
     if components is None or 'TOP' in components:
-        topunpacker = register_module('TOPUnpacker')
+        topunpacker = b2.register_module('TOPUnpacker')
+        topunpacker.param('addRelations', addTOPRelations)
         path.add_module(topunpacker)
-        topconverter = register_module('TOPRawDigitConverter')
+        topconverter = b2.register_module('TOPRawDigitConverter')
+        topconverter.param('addRelations', addTOPRelations)
         path.add_module(topconverter)
 
     # ARICH
     if components is None or 'ARICH' in components:
-        arichunpacker = register_module('ARICHUnpacker')
+        arichunpacker = b2.register_module('ARICHUnpacker')
         path.add_module(arichunpacker)
 
     # KLM
     if components is None or 'KLM' in components:
-        klmunpacker = register_module('KLMUnpacker')
+        klmunpacker = b2.register_module('KLMUnpacker')
+        klmunpacker.param('WriteDigitRaws', writeKLMDigitRaws)
         path.add_module(klmunpacker)
 
     # TRG
     if components is None or 'TRG' in components:
 
-        trggdlunpacker = register_module('TRGGDLUnpacker')
+        trggdlunpacker = b2.register_module('TRGGDLUnpacker')
         path.add_module(trggdlunpacker)
-        trggdlsummary = register_module('TRGGDLSummary')
+        trggdlsummary = b2.register_module('TRGGDLSummary')
         path.add_module(trggdlsummary)
-        trgeclunpacker = register_module('TRGECLUnpacker')
+        trgeclunpacker = b2.register_module('TRGECLUnpacker')
         path.add_module(trgeclunpacker)
-        trggrlunpacker = register_module('TRGGRLUnpacker')
+        trggrlunpacker = b2.register_module('TRGGRLUnpacker')
         path.add_module(trggrlunpacker)
-        trgtopunpacker = register_module('TRGTOPUnpacker')
+        trgtopunpacker = b2.register_module('TRGTOPUnpacker')
         path.add_module(trgtopunpacker)
 
         nmod_tsf = [0, 1, 2, 3, 4, 5, 6]
@@ -144,7 +154,7 @@ def add_raw_output(path, filename='raw.root', additionalBranches=None):
     """
     if additionalBranches is None:
         additionalBranches = []
-    output = register_module('RootOutput')
+    output = b2.register_module('RootOutput')
     output.param('outputFileName', filename)
     branches = ['RawPXDs', 'RawSVDs', 'RawCDCs', 'RawTOPs', 'RawARICHs', 'RawECLs', 'RawKLMs']
     branches += additionalBranches
@@ -161,7 +171,7 @@ def add_raw_seqoutput(path, filename='raw.sroot', additionalObjects=None, fileNa
     """
     if additionalObjects is None:
         additionalObjects = []
-    output = register_module('SeqRootOutput')
+    output = b2.register_module('SeqRootOutput')
     output.param('outputFileName', filename)
     output.param('fileNameIsPattern', fileNameIsPattern)
     objects = ['EventMetaData', 'RawPXDs', 'RawSVDs', 'RawCDCs', 'RawTOPs', 'RawARICHs', 'RawECLs', 'RawKLMs']

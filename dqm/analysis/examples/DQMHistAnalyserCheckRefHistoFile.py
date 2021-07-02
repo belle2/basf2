@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 import sys
 argv = sys.argv
 
 # Set the log level to show only error and fatal messages
-set_log_level(LogLevel.ERROR)
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.INFO)
 # set_log_level(LogLevel.DEBUG)
 
 # Create main path
-main = create_path()
+main = b2.create_path()
 
 # Modules
-input = register_module('DQMHistAnalysisInput')
+input = b2.register_module('DQMHistAnalysisInput')
 input.param('HistMemoryPath', argv[1])
 input.param('AutoCanvas', False)
 main.add_module(input)
 
-checker = register_module('DQMHistComparitor')
+checker = b2.register_module('DQMHistComparitor')
 checker.param('HistoList', [
     ['FirstDet/h_HitXPositionCh01', 'ref/FirstDet/h_HitXPositionCh01', 'xdet/test1', '100', '0.9', '0.6', 'test1'],
     ['FirstDet/h_HitYPositionCh01', 'ref/FirstDet/h_HitYPositionCh01', 'ydet/test2', '100', '0.9', '0.6', 'test2'],
@@ -29,10 +29,10 @@ checker.param('HistoList', [
 main.add_module(checker)
 
 
-output = register_module('DQMHistAnalysisOutputRelayMsg')
+output = b2.register_module('DQMHistAnalysisOutputRelayMsg')
 # check that port fit your root canvas server
 output.param('Port', 9192)
 main.add_module(output)
 
 # Process all events
-process(main)
+b2.process(main)

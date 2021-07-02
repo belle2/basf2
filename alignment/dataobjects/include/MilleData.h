@@ -48,6 +48,12 @@ namespace Belle2 {
     /// Are files written with double precision?
     bool hasDoublePrecision() {return m_doublePrecision;}
 
+    /// Add a filename (path) to the file list manually
+    void addFile(const std::string& path)
+    {
+      m_files.push_back(path);
+    }
+
   private:
     /// Use double-precision for binary files
     bool m_doublePrecision{false};

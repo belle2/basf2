@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import unittest
 import os
@@ -38,11 +37,11 @@ class ValidationFunctionstTest(unittest.TestCase):
         os.chdir(cwd)
 
         # in the source folder, we should get a sensible output
-        local_dir = os.environ.get('BELLE2_LOCAL_DIR', None)
+        local_dir = os.environ.get("BELLE2_LOCAL_DIR", None)
         if local_dir:
             ret = validationfunctions.get_compact_git_hash(local_dir)
             self.assertTrue(ret is not None)
-            print("This source code has git hash {}".format(ret))
+            print(f"This source code has git hash {ret}")
 
 
 if __name__ == "__main__":

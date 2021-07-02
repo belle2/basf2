@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2017, 2021 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric                                             *
@@ -11,10 +11,10 @@
 // Own include
 #include <top/modules/TOPCosmicT0Finder/TOPCosmicT0FinderModule.h>
 #include <top/geometry/TOPGeometryPar.h>
-#include <top/reconstruction/TOPreco.h>
-#include <top/reconstruction/TOPtrack.h>
-#include <top/reconstruction/TOPconfigure.h>
-#include <top/reconstruction/TOP1Dpdf.h>
+#include <top/reconstruction_cpp/TOPTrack.h>
+#include <top/reconstruction_cpp/PDFConstructor.h>
+#include <top/reconstruction_cpp/TOPRecoManager.h>
+#include <top/reconstruction_cpp/PDF1Dim.h>
 #include <top/utilities/Chi2MinimumFinder1D.h>
 
 // framework - DataStore
@@ -71,13 +71,8 @@ namespace Belle2 {
              "save histograms to TOPTimeZero", false);
   }
 
-  TOPCosmicT0FinderModule::~TOPCosmicT0FinderModule()
-  {
-  }
-
   void TOPCosmicT0FinderModule::initialize()
   {
-
     // input
 
     StoreArray<TOPDigit> topDigits;
@@ -99,103 +94,75 @@ namespace Belle2 {
     timeZeros.registerRelationTo(tracks);
     timeZeros.registerRelationTo(extHits);
     timeZeros.registerRelationTo(barHits);
-
-    // Configure TOP detector
-
-    TOPconfigure config;
-
-  }
-
-  void TOPCosmicT0FinderModule::beginRun()
-  {
   }
 
   void TOPCosmicT0FinderModule::event()
   {
+    TOPRecoManager::setDefaultTimeWindow();
 
     // select track: if several, choose highest momentum track
 
     StoreArray<Track> tracks;
-    const Track* selectedTrack = 0;
+    const ExtHit* selectedExtHit = 0;
     double p0 = 0;
-    int moduleID = 0;
     for (const auto& track : tracks) {
       const auto extHits = track.getRelationsWith<ExtHit>();
       const ExtHit* extHit0 = 0;
       for (const auto& extHit : extHits) {
-        if (abs(extHit.getPdgCode()) != 13) continue;
+        if (abs(extHit.getPdgCode()) != Const::muon.getPDGCode()) continue;
         if (extHit.getDetectorID() != Const::EDetector::TOP) continue;
+        if (extHit.getCopyID() <= 0) continue;
         double dot = extHit.getPosition() * extHit.getMomentum();
         if (m_useIncomingTrack) {
           if (dot > 0) continue;
-          if (!extHit0) extHit0 = &extHit;
+          if (not extHit0) extHit0 = &extHit;
           if (extHit.getTOF() < extHit0->getTOF()) extHit0 = &extHit;
         } else {
           if (dot < 0) continue;
-          if (!extHit0) extHit0 = &extHit;
+          if (not extHit0) extHit0 = &extHit;
           if (extHit.getTOF() > extHit0->getTOF()) extHit0 = &extHit;
         }
       }
-      if (!extHit0) continue;
+      if (not extHit0) continue;
       double p = extHit0->getMomentum().Mag();
       if (p > p0) {
         p0 = p;
-        selectedTrack = &track;
-        moduleID = abs(extHit0->getCopyID());
+        selectedExtHit = extHit0;
       }
     }
-    if (!selectedTrack) return;
+    if (not selectedExtHit) return;
 
-    if (moduleID == 0) {
-      B2ERROR("moduleID == 0");
-      return;
-    }
+    TOPTrack topTrack(selectedExtHit);
+    if (not topTrack.isValid()) return;
 
-    TOPtrack topTrack(selectedTrack, moduleID, Const::muon);
-    if (!topTrack.isValid()) return;
+    // require minimal number of photon hits
 
-    // select photons: at least m_minHits
+    if (topTrack.getSelectedHits().size() < m_minHits) return;
 
-    StoreArray<TOPDigit> topDigits;
-    std::vector<const TOPDigit*> selDigits;
-    for (const auto& digit : topDigits) {
-      if (digit.getModuleID() != topTrack.getModuleID()) continue;
-      if (digit.getHitQuality() != TOPDigit::c_Good) continue;
-      selDigits.push_back(&digit);
-    }
-    if (selDigits.empty() or selDigits.size() < m_minHits) return;
+    // construct PDF for muon
 
-    // create reconstruction object and set various options
+    PDFConstructor pdfConstructor(topTrack, Const::muon, PDFConstructor::c_Rough);
+    if (not pdfConstructor.isValid()) return;
 
-    int Nhyp = 1;
-    double mass = Const::muon.getMass();
-    int pdg = Const::muon.getPDGCode();
-    TOPreco reco(Nhyp, &mass, &pdg);
-    reco.setPDFoption(TOPreco::c_Rough);
+    // require minimal expected signal
 
-    // add photon hits to reconstruction object
-
-    for (const auto& digit : selDigits) {
-      if (digit->getHitQuality() == TOPDigit::c_Good)
-        reco.addData(digit->getModuleID(), digit->getPixelID(), digit->getTime(),
-                     digit->getTimeError());
-    }
-
-    // construct PDF
-
-    reco.reconstruct(topTrack);
-    if (reco.getFlag() != 1) return;
-    if (reco.getExpectedPhotons() - reco.getExpectedBG() < m_minSignal) return;
+    if (pdfConstructor.getExpectedSignalPhotons() < m_minSignal) return;
 
     // event is accepted for t0 determination
 
     m_acceptedCount++;
 
+    // full time window in which data are taken (smaller time window is used in reconstruction)
+
+    const auto& tdc = TOPGeometryPar::Instance()->getGeometry()->getNominalTDC();
+    double timeWindow = m_feSetting->getReadoutWindows() * tdc.getSyncTimeBase() / TOPNominalTDC::c_syncWindows;
+
     // find rough t0
 
-    TOP1Dpdf pdf1d(reco, topDigits, topTrack.getModuleID(), 1.0); // ~1 ns bin size
-    Chi2MinimumFinder1D roughFinder(pdf1d.getNumBinsT0(), pdf1d.getMinT0(),
-                                    pdf1d.getMaxT0());
+    PDF1Dim pdf1d(pdfConstructor, 1.0, timeWindow);  // ~1 ns bin size
+    pdfConstructor.switchOffDeltaRayPDF(); // to speed-up fine search
+
+    Chi2MinimumFinder1D roughFinder(pdf1d.getNumBinsT0(), pdf1d.getMinT0(), pdf1d.getMaxT0());
     const auto& bins = roughFinder.getBinCenters();
     for (unsigned i = 0; i < bins.size(); i++) {
       double t0 = bins[i];
@@ -205,19 +172,21 @@ namespace Belle2 {
 
     // find precise t0
 
-    const auto& tdc = TOPGeometryPar::Instance()->getGeometry()->getNominalTDC();
-    double timeMin = tdc.getTimeMin() + t0Rough.position;
-    double timeMax = tdc.getTimeMax() + t0Rough.position;
+    double timeMin = TOPRecoManager::getMinTime() + t0Rough.position;
+    double timeMax = TOPRecoManager::getMaxTime() + t0Rough.position;
     double t0min = t0Rough.position - m_timeRange / 2;
     double t0max = t0Rough.position + m_timeRange / 2;
     Chi2MinimumFinder1D finder(m_numBins, t0min, t0max);
     const auto& binCenters = finder.getBinCenters();
+    int numPhotons = 0;
     for (unsigned i = 0; i < binCenters.size(); i++) {
       double t0 = binCenters[i];
-      finder.add(i, -2 * reco.getLogL(t0, timeMin, timeMax, m_sigma));
+      auto LL = pdfConstructor.getLogL(t0, timeMin, timeMax, m_sigma);
+      finder.add(i, -2 * LL.logL);
+      if (i == 0) numPhotons = LL.numPhotons;
     }
     const auto& t0 = finder.getMinimum();
-    if (t0.position < t0min or t0.position > t0max or !t0.valid) return; // out of range
+    if (t0.position < t0min or t0.position > t0max or not t0.valid) return; // out of range
 
     // event t0 is successfully determined
 
@@ -226,8 +195,7 @@ namespace Belle2 {
     // store results
 
     StoreArray<TOPTimeZero> timeZeros;
-    auto* timeZero = timeZeros.appendNew(topTrack.getModuleID(), t0.position, t0.error,
-                                         reco.getNumOfPhotons());
+    auto* timeZero = timeZeros.appendNew(topTrack.getModuleID(), t0.position, t0.error, numPhotons);
     timeZero->addRelationTo(topTrack.getTrack());
     timeZero->addRelationTo(topTrack.getExtHit());
     if (topTrack.getBarHit()) timeZero->addRelationTo(topTrack.getBarHit());
@@ -252,11 +220,9 @@ namespace Belle2 {
       TH1F hits(name.c_str(), "time distribution of photons (t0-subtracted)",
                 pdf.GetNbinsX(), pdf.GetXaxis()->GetXmin(), pdf.GetXaxis()->GetXmax());
       hits.SetXTitle("time [ns]");
-      for (const auto& digit : selDigits) {
-        if (digit->getHitQuality() == TOPDigit::c_Good)
-          hits.Fill(digit->getTime() - t0.position);
+      for (const auto& hit : topTrack.getSelectedHits()) {
+        hits.Fill(hit.time - t0.position);
       }
-
       timeZero->setHistograms(chi2, pdf, hits);
       m_num++;
     }
@@ -264,6 +230,7 @@ namespace Belle2 {
     // subtract T0 in digits
 
     if (m_applyT0) {
+      StoreArray<TOPDigit> topDigits;
       for (auto& digit : topDigits) {
         digit.subtractT0(t0.position);
         double err = digit.getTimeError();
@@ -274,10 +241,6 @@ namespace Belle2 {
 
   }
 
-
-  void TOPCosmicT0FinderModule::endRun()
-  {
-  }
 
   void TOPCosmicT0FinderModule::terminate()
   {

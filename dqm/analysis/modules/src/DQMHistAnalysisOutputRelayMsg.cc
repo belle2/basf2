@@ -67,7 +67,7 @@ void DQMHistAnalysisOutputRelayMsgModule::event()
   char mbstr[100];
   strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
 
-  B2INFO("[" << mbstr << "] sending " << seq->GetEntries() << " objects.");
+  B2INFO("[" << mbstr << "] before sending " << seq->GetEntries() << " objects.");
   bool first_try = true;
   while ((obj = (TObject*)nextkey())) {
     if (obj->IsA()->InheritsFrom("TCanvas")) {
@@ -91,6 +91,9 @@ void DQMHistAnalysisOutputRelayMsgModule::event()
       }
     }
   }
+  now = time(0);
+  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  B2INFO("[" << mbstr << "] after sending " << seq->GetEntries() << " objects.");
 }
 
 void DQMHistAnalysisOutputRelayMsgModule::endRun()

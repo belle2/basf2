@@ -14,7 +14,7 @@
 #    outdir         output directory path
 # -------------------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 import sys
 import os
 from background import add_output
@@ -95,7 +95,7 @@ fname = bgType + '_' + sampleType + '-phase' + str(phase) + '-' + num
 outputFile = outdir + '/' + fname + '.root'
 
 if numEvents == 0:
-    B2ERROR('number of events is 0 -> increase equivTime_us')
+    b2.B2ERROR('number of events is 0 -> increase equivTime_us')
     sys.exit()
 
 # make output directory if it doesn't exist
@@ -105,17 +105,17 @@ if not os.path.exists(outdir):
 
 # log messages
 
-B2RESULT('Events to be generated: ' + str(numEvents) + ' - corresponds to ' + equivTime +
-         ' us of running at ' + str(lumi) + ' /nb/s (phase ' + str(phase) + ')')
-B2RESULT('Output file: ' + outputFile)
+b2.B2RESULT('Events to be generated: ' + str(numEvents) + ' - corresponds to ' + equivTime +
+            ' us of running at ' + str(lumi) + ' /nb/s (phase ' + str(phase) + ')')
+b2.B2RESULT('Output file: ' + outputFile)
 
 
 # Suppress messages and warnings during processing:
-set_log_level(LogLevel.RESULT)
+b2.set_log_level(b2.LogLevel.RESULT)
 
 # Create path
-main = create_path()
-kill = create_path()
+main = b2.create_path()
+kill = b2.create_path()
 
 
 def add_cut(name, minParticles, maxParticles, minTheta, maxTheta=None):
@@ -140,12 +140,12 @@ def add_cut(name, minParticles, maxParticles, minTheta, maxTheta=None):
 
 
 # Event info setter
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [numEvents])
 main.add_module(eventinfosetter)
 
 # Gearbox
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 if phase == 2:
     gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
 elif phase == 31:
@@ -186,7 +186,7 @@ else:
     print("unknown generation setting: {}".format(generator))
 
 # Geant geometry
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 geometry.param('useDB', False)
 addComp = ["MagneticField3dQuadBeamline"]
 # add beast detectors for early phase3
@@ -198,7 +198,7 @@ geometry.param({"excludedComponents": ["MagneticField"],
 main.add_module(geometry)
 
 # Geant simulation
-fullsim = register_module('FullSim')
+fullsim = b2.register_module('FullSim')
 if sampleType == 'study':
     fullsim.param('PhysicsList', 'FTFP_BERT_HP')
     fullsim.param('UICommandsAtIdle', ['/process/inactivate nKiller'])
@@ -207,7 +207,7 @@ if sampleType == 'study':
 main.add_module(fullsim)
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Output
@@ -216,7 +216,7 @@ if phase == 31:
 add_output(main, bgType, realTime, sampleType, phase, fileName=outputFile)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

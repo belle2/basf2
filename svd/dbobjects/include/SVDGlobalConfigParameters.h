@@ -12,7 +12,9 @@
  **************************************************************************/
 
 #pragma once
+#include <framework/database/DBObjPtr.h>
 #include "TObject.h"
+#include "TString.h"
 
 namespace Belle2 {
   /**
@@ -104,7 +106,7 @@ namespace Belle2 {
     /**
      * Set the zero suppression
      * Input:
-     * @param float
+     * @param zeroSuppression value
      *
      */
     void setZeroSuppression(float zeroSuppression)
@@ -115,7 +117,7 @@ namespace Belle2 {
     /**
      * Set the latency
      * Input:
-     * @param int
+     * @param latency value
      *
      */
     void setLatency(float latency)
@@ -127,7 +129,7 @@ namespace Belle2 {
     /**
      * Set the masking bitmap
      * Input:
-     * @param int
+     * @param maskFilter
      *
      */
     void setMaskFilter(int maskFilter)
@@ -138,7 +140,7 @@ namespace Belle2 {
     /**
      * Set the APV Clock units
      * Input:
-     * @param std::string coeff + units [RFC]
+     * @param APVClockUnits
      *
      */
     void setAPVClockInRFCUnits(const std::string& APVClockUnits)
@@ -149,7 +151,7 @@ namespace Belle2 {
     /**
      * Set the HV (in V)
      * Input:
-     * @param float hv
+     * @param hv WARNING, this is one of the HV
      *
      */
     void setHV(float hv)
@@ -159,7 +161,7 @@ namespace Belle2 {
     /**
      * Set the Relative time shift between 3- and 6- sample acquired events in units of APV clock / 4
      * Input:
-     * @param int relative time shift
+     * @param relativeTimeShift
      *
      */
     void setRelativeTimeShift(float relativeTimeShift)

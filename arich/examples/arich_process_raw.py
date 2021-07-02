@@ -24,18 +24,12 @@
 #
 # Author: Luka Santelj
 
-from basf2 import *
+import basf2 as b2
 import os
 from optparse import OptionParser
 from reconstruction import add_cosmics_reconstruction
 home = os.environ['BELLE2_LOCAL_DIR']
 
-reset_database()
-use_database_chain()
-
-# set DB tag with correct merger numbers, etc. (phase3 start)
-use_central_database('online')
-use_central_database('ARICH_phase3_test')
 
 # parameters
 parser = OptionParser()
@@ -51,60 +45,66 @@ parser.add_option('-a', '--arichtrk', dest='arichtrk', default=0)
 parser.add_option('-g', '--gdl', dest='gdl', default=0)
 (options, args) = parser.parse_args()
 
+
+# set specific database tag
+# b2.conditions.override_globaltags(["tagname"])
+# use local database
+# b2.conditions.testing_payloads = ["localdb/database.txt"]
+
 # create paths
-main = create_path()
-store = create_path()
+main = b2.create_path()
+store = b2.create_path()
 
 # root input module
-input_module = register_module('SeqRootInput')
+input_module = b2.register_module('SeqRootInput')
 input_module.param('inputFileName', options.filename)
 # input_module.param('entrySequences',['5100:5300']) # process only range of events
 main.add_module(input_module)
 
 # Histogram manager module
-histo = register_module('HistoManager')
+histo = b2.register_module('HistoManager')
 histo.param('histoFileName', "DQMhistograms.root")  # File to save histograms
 main.add_module(histo)
 
 # build geometry if display option
 if int(options.tracking):
-    gearbox = register_module('Gearbox')
+    gearbox = b2.register_module('Gearbox')
     main.add_module(gearbox)
-    geometry = register_module('Geometry')
+    geometry = b2.register_module('Geometry')
     geometry.param('useDB', 1)
     main.add_module(geometry)
 
 # unpack raw data
-unPacker = register_module('ARICHUnpacker')
+unPacker = b2.register_module('ARICHUnpacker')
 unPacker.param('debug', int(options.debug))
 main.add_module(unPacker)
 
 # create ARICHHits from ARICHDigits
-arichHits = register_module('ARICHFillHits')
+arichHits = b2.register_module('ARICHFillHits')
 # set bitmask for makin hits form digits
 arichHits.param("bitMask", 0xFF)
 main.add_module(arichHits)
 
 if int(options.tracking):
-    cdcunpacker = register_module('CDCUnpacker')
+    cdcunpacker = b2.register_module('CDCUnpacker')
     cdcunpacker.param('xmlMapFileName', "data/cdc/ch_map.dat")
     cdcunpacker.param('enablePrintOut', False)
     main.add_module(cdcunpacker)
     add_cosmics_reconstruction(main, 'CDC', False)
 
 if int(options.gdl):
-    trggdlUnpacker = register_module("TRGGDLUnpacker")
+    trggdlUnpacker = b2.register_module("TRGGDLUnpacker")
     main.add_module(trggdlUnpacker)
-    trggdlsummary = register_module('TRGGDLSummary')
+    trggdlsummary = b2.register_module('TRGGDLSummary')
     main.add_module(trggdlsummary)
 
 # create simple DQM histograms
-arichHists = register_module('ARICHDQM')
+arichHists = b2.register_module('ARICHDQM')
 main.add_module(arichHists)
 
 # store the dataobjects
 if(options.output != ''):
-    output = register_module('RootOutput')
+    output = b2.register_module('RootOutput')
     output.param('outputFileName', options.output)
     branches = ['ARICHDigits', 'ARICHHits', 'ARICHInfo']
     if int(options.tracking):
@@ -118,14 +118,14 @@ if(options.output != ''):
         main.add_module(output)
 
 # show progress
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 if int(options.arichtrk):
     arichHists.if_value('==1', store)
 
 # process
-process(main)
+b2.process(main)
 
 # print stats
-print(statistics)
+print(b2.statistics)

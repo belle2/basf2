@@ -77,7 +77,15 @@ namespace Belle2 {
     /**
      * particle source enumerators
      */
-    enum EParticleSourceObject {c_Undefined, c_Track, c_ECLCluster, c_KLMCluster, c_V0, c_MCParticle, c_Composite};
+    enum EParticleSourceObject {
+      c_Undefined  = 0,
+      c_Track      = 1,
+      c_ECLCluster = 2,
+      c_KLMCluster = 3,
+      c_V0         = 4,
+      c_MCParticle = 5,
+      c_Composite  = 6
+    };
 
     /** describes flavor type, see getFlavorType(). */
     enum EFlavorType {
@@ -183,8 +191,8 @@ namespace Belle2 {
      * @param pdgCode PDG code
      * @param flavorType decay flavor type
      * @param daughterIndices indices of daughters in StoreArray<Particle>
-     * @param particle property
-     * @param daughter particle properties
+     * @param properties particle property
+     * @param daughterProperties daughter particle properties
      * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
      */
     Particle(const TLorentzVector& momentum,
@@ -293,6 +301,12 @@ namespace Belle2 {
     }
 
     /**
+     * Sets 4x6 jacobi matrix
+     * @param jacobiMatrix 4x6 momentum and vertex error matrix (order: px,py,pz,E,x,y,z)
+     */
+    void setJacobiMatrix(const TMatrixF& jacobiMatrix);
+
+    /**
      * Sets 7x7 error matrix
      * @param errMatrix 7x7 momentum and vertex error matrix (order: px,py,pz,E,x,y,z)
      */
@@ -364,8 +378,9 @@ namespace Belle2 {
     /**
      * Removes index of daughter from daughters index array
      * @param daughter pointer to the daughter particle
+     * @param updateType bool whether particle type should be updated if last daughter was removed
      */
-    void removeDaughter(const Particle* daughter);
+    void removeDaughter(const Particle* daughter, const bool updateType = true);
 
     // getters
 
@@ -450,7 +465,8 @@ namespace Belle2 {
      */
     float getEnergy() const
     {
-      return sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz + m_mass * m_mass);
+      return sqrt(m_momentumScale * m_momentumScale * m_px * m_px + m_momentumScale * m_momentumScale * m_py * m_py + m_momentumScale *
+                  m_momentumScale * m_pz * m_pz + m_mass * m_mass);
     }
 
     /**
@@ -786,10 +802,10 @@ namespace Belle2 {
     const MCParticle* getMCParticle() const;
 
     /** Return name of this particle. */
-    virtual std::string getName() const;
+    std::string getName() const override;
 
     /** Return a short summary of this object's contents in HTML format. */
-    virtual std::string getInfoHTML() const;
+    std::string getInfoHTML() const override;
 
     /**
      * Prints the contents of a Particle object to standard output.
@@ -874,6 +890,11 @@ namespace Belle2 {
     }
 
     /**
+     * Returns true if the (track-based) particle is created with its most likely mass hypothesis
+     */
+    bool isMostLikely() const;
+
+    /**
     * Returns the ECLCluster EHypothesisBit for this Particle.
     */
     ECLCluster::EHypothesisBit getECLClusterEHypothesisBit() const
@@ -904,6 +925,10 @@ namespace Belle2 {
     */
     const Particle* getParticleFromGeneralizedIndexString(const std::string& generalizedIndex) const;
 
+    /**
+     * Propagate the photon energy scaling to jacobian elements that were calculated using energy
+     */
+    void updateJacobiMatrix();
 
   private:
 
@@ -919,6 +944,7 @@ namespace Belle2 {
     float m_y;      /**< position component y */
     float m_z;      /**< position component z */
     float m_errMatrix[c_SizeMatrix] = {}; /**< error matrix (1D representation) */
+    float m_jacobiMatrix[c_SizeMatrix] = {}; /**< error matrix (1D representation) */
     float m_pValue;   /**< chi^2 probability of the fit. Default is nan */
     std::vector<int> m_daughterIndices;  /**< daughter particle indices */
     EFlavorType m_flavorType;  /**< flavor type. */
@@ -965,11 +991,22 @@ namespace Belle2 {
     void resetErrorMatrix();
 
     /**
+     * Resets 4x6 error matrix
+     * All elements are set to 0.0
+     */
+    void resetJacobiMatrix();
+
+    /**
      * Stores 7x7 error matrix into private member m_errMatrix
      * @param errMatrix 7x7 error matrix
      */
     void storeErrorMatrix(const TMatrixFSym& errMatrix);
 
+    /**
+     * Stores 4x6 Jacobi matrix into private member m_jacobiMatrix
+     * @param jacobiMatrix 4x6 error matrix
+     */
+    void storeJacobiMatrix(const TMatrixF& jacobiMatrix);
     /**
      * Fill final state particle daughters into a vector
      *
@@ -1005,13 +1042,14 @@ namespace Belle2 {
      */
     int generatePDGCodeFromCharge(const int chargedSign, const Const::ChargedStable& chargedStable);
 
-    ClassDef(Particle, 13); /**< Class to store reconstructed particles. */
+    ClassDefOverride(Particle, 14); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit
     // v10: added m_properties
     // v11: added m_daughterProperties
     // v12: renamed EParticleType m_particleType to EParticleSourceObject m_particleSource
     // v13: added m_momentumScale
+    // v14: added m_jacobiMatrix
 
     friend class ParticleSubset;
   };

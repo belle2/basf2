@@ -7,17 +7,15 @@
 # usage: basf2 cdst_checkT0calibration.py -i <cdst_file.root>
 # ---------------------------------------------------------------------------------------
 
-from basf2 import *
-import sys
+import basf2 as b2
 
-# Global tag
-use_central_database('data_reprocessing_proc7')
+# Global tag: use global tag replay
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Input: cDST file(s) of Bhabha skim, use -i option
-roinput = register_module('RootInput')
+roinput = b2.register_module('RootInput')
 main.add_module(roinput)
 
 # Initialize TOP geometry parameters (creation of Geant geometry is not needed)
@@ -27,17 +25,17 @@ main.add_module('TOPGeometryParInitializer')
 main.add_module('TOPChannelMasker')
 
 # Calibration checker: for dimuon sample replace 'bhabha' with 'dimuon'
-calibrator = register_module('TOPChannelT0Calibrator')
+calibrator = b2.register_module('TOPChannelT0Calibrator')
 calibrator.param('sample', 'bhabha')
 calibrator.param('outputFileName', 'checkT0cal_r*.root')
 main.add_module(calibrator)
 
 # Print progress
-progress = register_module('Progress')
+progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print statistics
-print(statistics)
+print(b2.statistics)

@@ -20,6 +20,7 @@
 #pragma link C++ class vector < pair < unsigned int, vector < pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > > > > >+; // checksum=0x47fe6901, version=6
 #pragma link C++ class pair <unsigned int, double >+; // checksum=0x71a4cb1e, version=-1
 #pragma link C++ class vector < pair <unsigned int, double > >+; // checksum=0x6b073150, version=6
+#pragma link C++ class pair <bool, bool>+; // checksum=0xd82e1600, version=-1
 
 #pragma link C++ class Belle2::ROIid+; // checksum=0x67e7bffd, version=1
 #pragma link C++ class Belle2::ROIpayload+; // checksum=0x24692265, version=2
@@ -32,10 +33,6 @@
 #pragma link C++ class Belle2::SectorMapConfig+; // checksum=0x4ef40736, version=2
 #pragma link C++ class Belle2::hitXP+; // checksum=0xdd9d6ff4, version=1
 #pragma link C++ class Belle2::hitXPDerivate+; // checksum=0xfa2e4b3c, version=1
-#pragma link C++ class Belle2::DATCONSVDDigit+; // checksum=0x45b64e93, version=1
-#pragma link C++ class Belle2::DATCONSVDSpacePoint+; // checksum=0xb78110ca, version=1
-#pragma link C++ class Belle2::DATCONMostProbableHit+; // checksum=0x75b048b2, version=2
-#pragma link C++ class Belle2::DATCONTrack+; // checksum=0xa157a1e1, version=1
 #pragma link C++ class std::vector<Belle2::hitXP>+; // checksum=0x26380ecc, version=6
 #pragma link C++ class std::vector<Belle2::hitXPDerivate>+; // checksum=0x82b91048, version=6
 

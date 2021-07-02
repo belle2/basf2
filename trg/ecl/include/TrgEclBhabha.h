@@ -10,8 +10,7 @@
 //---------------------------------------------------------
 // $Log$
 //---------------------------------------------------------
-#ifndef TRGECLBHABHA_FLAG_
-#define TRGECLBHABHA_FLAG_
+#pragma once
 
 #include <vector>
 
@@ -38,6 +37,12 @@ namespace Belle2 {
     /** Destructor */
     virtual ~TrgEclBhabha();/// Destructor
 
+    /** Copy constructor, deleted. */
+    TrgEclBhabha(TrgEclBhabha&) = delete;
+
+    /** Assignement operator, deleted. */
+    TrgEclBhabha& operator=(TrgEclBhabha&) = delete;
+
   public:
     //!  Belle 2D Bhabha veto method
     bool GetBhabha00(std::vector<double>);
@@ -47,45 +52,65 @@ namespace Belle2 {
     bool GetBhabha02();
     //!  MuMu selection for calibration
     bool Getmumu();
+    //!  Taub2b selection
+    bool GetTaub2b(double);
     //! Output 2D Bhabha combination
     std::vector<double> GetBhabhaComb() {return BhabhaComb ;}
     //! Save
     void save(int);
     //! set 2D Bhabha Energy Threshold
-    void set2DBhabhaThreshold(std::vector<double> i2DBhabhaThresholdFWD,
-                              std::vector<double> i2DBhabhaThresholdBWD)
+    void set2DBhabhaThreshold(const std::vector<double>& i2DBhabhaThresholdFWD,
+                              const std::vector<double>& i2DBhabhaThresholdBWD)
     {
       _2DBhabhaThresholdFWD = i2DBhabhaThresholdFWD;
       _2DBhabhaThresholdBWD = i2DBhabhaThresholdBWD;
     }
     //! set 3D selection Bhabha Energy Threshold
-    void set3DBhabhaSelectionThreshold(std::vector<double> i3DBhabhaSelectionThreshold)
+    void set3DBhabhaSelectionThreshold(const std::vector<double>& i3DBhabhaSelectionThreshold)
     {
       _3DBhabhaSelectionThreshold = i3DBhabhaSelectionThreshold;
     };
     //! set 3D veto Bhabha Energy Threshold
-    void set3DBhabhaVetoThreshold(std::vector<double> i3DBhabhaVetoThreshold)
+    void set3DBhabhaVetoThreshold(const std::vector<double>& i3DBhabhaVetoThreshold)
     {
       _3DBhabhaVetoThreshold = i3DBhabhaVetoThreshold;
     };
     //! set 3D selection Bhabha Energy Angle
-    void set3DBhabhaSelectionAngle(std::vector<double> i3DBhabhaSelectionAngle)
+    void set3DBhabhaSelectionAngle(const std::vector<double>& i3DBhabhaSelectionAngle)
     {
       _3DBhabhaSelectionAngle = i3DBhabhaSelectionAngle;
     };
     //! set 3D veto Bhabha Energy Angle
-    void set3DBhabhaVetoAngle(std::vector<double> i3DBhabhaVetoAngle)
+    void set3DBhabhaVetoAngle(const std::vector<double>& i3DBhabhaVetoAngle)
     {
       _3DBhabhaVetoAngle = i3DBhabhaVetoAngle;
     };
     //! set mumu bit Threshold
     void setmumuThreshold(int mumuThreshold) {_mumuThreshold = mumuThreshold; }
     //! set mumu bit Angle selection
-    void setmumuAngle(std::vector<double>  imumuAngle) {_mumuAngle = imumuAngle; }
+    void setmumuAngle(const std::vector<double>&  imumuAngle) {_mumuAngle = imumuAngle; }
     // set ThetaID (low and high) for 3DBhabhaVetoInTrack
-    void set3DBhabhaVetoInTrackThetaRegion(std::vector<int> i3DBhabhaVetoInTrackThetaRegion)
+    void set3DBhabhaVetoInTrackThetaRegion(const std::vector<int>& i3DBhabhaVetoInTrackThetaRegion)
     {
       m_3DBhabhaVetoInTrackThetaRegion = i3DBhabhaVetoInTrackThetaRegion;
+    }
+    // set 2 Cluster angle selection for tau 1x1 decay
+    // [0], [1] for low and high of dphi, [2], [3] for low and high of Theta Sum
+    void setTaub2bAngleCut(const std::vector<int>& iTaub2bAngleCut)
+    {
+      m_Taub2bAngleCut = iTaub2bAngleCut;
+    }
+    //
+    void setTaub2bEtotCut(const double iTaub2bEtotCut)
+    {
+      m_Taub2bEtotCut = iTaub2bEtotCut;
+    }
+    //
+    void setTaub2bClusterECut(const double iTaub2bClusterECut1,
+                              const double iTaub2bClusterECut2)
+    {
+      m_Taub2bClusterECut1 = iTaub2bClusterECut1;
+      m_Taub2bClusterECut2 = iTaub2bClusterECut2;
     }
     // get trigger bit of flag(1bit) whether two clusters statisfy 3D Bhabha veto
     // are in CDCTRG region in theta (="InTrack") or not
@@ -171,12 +196,19 @@ namespace Belle2 {
       }
       return m_3DBhabhaSelectionClusterTimings[cl_idx];
     }
+    // get taub2b 2 cluster angle cut flag
+    int getTaub2bAngleFlag(void) { return m_Taub2bAngleFlag; }
+    // get total energy(TC theta id=1-17) flag for taub2b
+    int getTaub2bEtotFlag(void) { return m_Taub2bEtotFlag; }
+    // taub2b Cluster energy flag
+    int getTaub2bClusterEFlag(void) { return m_Taub2bClusterEFlag; }
 
   private:
     /** Object of TC Mapping */
-    TrgEclMapping* _TCMap;
+    TrgEclMapping* _TCMap = nullptr;
     /** Object of Trigger ECL DataBase */
-    TrgEclDataBase* _database;
+    // cppcheck-suppress unsafeClassCanLeak
+    TrgEclDataBase* _database = nullptr;
 
     /** Bhabha Combination*/
     std::vector<double> BhabhaComb;
@@ -204,6 +236,19 @@ namespace Belle2 {
     double _mumuThreshold;
     //! mumu bit  Angle
     std::vector<double> _mumuAngle;
+    // taub2b 2 Cluster angle cut
+    std::vector<int> m_Taub2bAngleCut;
+    // taub2b total energy(TC theta id=1-17) cut
+    double m_Taub2bEtotCut;
+    // taub2b Cluster energy cut
+    double m_Taub2bClusterECut1;
+    double m_Taub2bClusterECut2;
+    // taub2b 2 cluster angle cut flag
+    int m_Taub2bAngleFlag;
+    // taub2b total energy(TC theta id=1-17) flag
+    int m_Taub2bEtotFlag;
+    // taub2b Cluster energy flag
+    int m_Taub2bClusterEFlag;
     // trigger bit of flag(1bit) whether two clusters statisfy 3D Bhabha veto
     // are in CDCTRG region in theta (="InTrack") or not
     int                 m_3DBhabhaVetoInTrackFlag;
@@ -218,7 +263,7 @@ namespace Belle2 {
     // theta region(low and high) of 3D Bhbabha veto InTrack
     std::vector<int> m_3DBhabhaVetoInTrackThetaRegion;
     // flag which shows theta position of clusters of 3DBhabha Selection.
-    int m_3DBhabhaSelectionThetaFlag;
+    int m_3DBhabhaSelectionThetaFlag = std::numeric_limits<int>::quiet_NaN();
     // TCIDs of two clusters of 3D Bhabha selection
     std::vector<int>    m_3DBhabhaSelectionClusterTCIds;
     // ThetaIDs of two clusters used for 3D Bhabha selection
@@ -233,5 +278,3 @@ namespace Belle2 {
 //
 //
 } // namespace Belle2
-
-#endif /* TRGECLBhabha_FLAG_ */

@@ -58,8 +58,8 @@ namespace Belle2 {
     /**
      * Sets the prior table for a particle species from the std::vectors of the bin edges and the probability values
      * @param particle the charged stable type of the particle
-     * @param xAxisEdge the std::vector<float> containing the bin edges of the X axis
-     * @param yAxisEdge the std::vector<float> containing the bin edges of the Y axis
+     * @param xAxisEdges the std::vector<float> containing the bin edges of the X axis
+     * @param yAxisEdges the std::vector<float> containing the bin edges of the Y axis
      * @param priorsTable the 2D std::vector<float> containing the prior probabilities
      * @param errorsTable the 2D std::vector<float> containing the errors on prior probabilities
      */
@@ -99,8 +99,8 @@ namespace Belle2 {
      * Sets the axes for the priors table of the selected species.
      * Effectively this is just a wrapper around PIDPriorsTable::setBinEdges()
      * @param particle the charged stable type of the prior's species
-     * @param xAxisEdge the vector of edges of the X axis
-     * @param yAxisEdge the vector of edges of the Y axis
+     * @param xAxisEdges the vector of edges of the X axis
+     * @param yAxisEdges the vector of edges of the Y axis
      */
     void setPriorsAxes(const Const::ChargedStable& particle, std::vector<float> xAxisEdges, std::vector<float> yAxisEdges)
     {

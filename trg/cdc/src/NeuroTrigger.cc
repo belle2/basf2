@@ -248,7 +248,7 @@ NeuroTrigger::setConstants()
 }
 
 void
-NeuroTrigger::initializeCollections(string hitCollectionName, string eventTimeName, std::string et_option)
+NeuroTrigger::initializeCollections(string hitCollectionName, string eventTimeName, const std::string& et_option)
 {
   m_segmentHits.isRequired(hitCollectionName);
   if (!((et_option == "fastestpriority") || (et_option == "zero") || (et_option == "fastest2d"))) {
@@ -578,7 +578,7 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track)
 unsigned long
 NeuroTrigger::getPureDriftThreshold(unsigned isector, const CDCTriggerTrack& track, const bool neurotrackinputmode)
 {
-  CDCTriggerMLP& expert = m_MLPs[isector];
+  const CDCTriggerMLP& expert = m_MLPs[isector];
   unsigned long driftth = 0;
   vector<unsigned> nHits;
   nHits.assign(9, 0);
@@ -628,7 +628,7 @@ NeuroTrigger::getPureDriftThreshold(unsigned isector, const CDCTriggerTrack& tra
 }
 unsigned long NeuroTrigger::getCompleteHitPattern(unsigned isector, const CDCTriggerTrack& track, const bool neurotrackinputmode)
 {
-  CDCTriggerMLP& expert = m_MLPs[isector];
+  const CDCTriggerMLP& expert = m_MLPs[isector];
   unsigned long chitPattern = 0;
   vector<unsigned> nHits;
   nHits.assign(9, 0);
@@ -739,7 +739,7 @@ NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track, co
 vector<unsigned>
 NeuroTrigger::selectHitsHWSim(unsigned isector, const CDCTriggerTrack& track)
 {
-  CDCTriggerMLP& expert = m_MLPs[isector];
+  const CDCTriggerMLP& expert = m_MLPs[isector];
   vector<unsigned> selectedHitIds = {};
   // prepare vectors to keep best drift times, left/right and selected hit IDs
   vector<int> tMin;
@@ -815,7 +815,7 @@ vector<unsigned>
 NeuroTrigger::selectHits(unsigned isector, const CDCTriggerTrack& track,
                          bool returnAllRelevant)
 {
-  CDCTriggerMLP& expert = m_MLPs[isector];
+  const CDCTriggerMLP& expert = m_MLPs[isector];
   vector<unsigned> selectedHitIds = {};
   // prepare vectors to keep best drift times, left/right and selected hit IDs
   vector<int> tMin;
@@ -952,7 +952,7 @@ NeuroTrigger::selectHits(unsigned isector, const CDCTriggerTrack& track,
 vector<float>
 NeuroTrigger::getInputVector(unsigned isector, const vector<unsigned>& hitIds)
 {
-  CDCTriggerMLP& expert = m_MLPs[isector];
+  const CDCTriggerMLP& expert = m_MLPs[isector];
   // prepare empty input vector and vectors to keep best drift times
   vector<float> inputVector;
   inputVector.assign(expert.nNodesLayer(0), 0.);
@@ -983,7 +983,7 @@ NeuroTrigger::getInputVector(unsigned isector, const vector<unsigned>& hitIds)
 }
 
 vector<float>
-NeuroTrigger::runMLP(unsigned isector, vector<float> input)
+NeuroTrigger::runMLP(unsigned isector, const vector<float>& input)
 {
   const CDCTriggerMLP& expert = m_MLPs[isector];
   vector<float> weights = expert.getWeights();

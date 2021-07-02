@@ -8,6 +8,9 @@
 # Email: emma.oxford@desy.de
 # Cuts: None
 # Date: 20200713 (YYYYMMDD)
+#
+# June 2021 Automated: Converted PYTHIA ids
+#   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
 
 #JetSetPar PARJ(21)=0.28 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
 
@@ -51,7 +54,7 @@ ChargeConj K*0sig anti-K*0sig
 Decay vpho
 # Pythia6 definition "32" for "vpho -> q qbar" should be used.
 #   (this is automatically converted to Pythia8 definition "91")
-1.000 c         anti-c          PYTHIA 32;
+1.000 c         anti-c          PYTHIA 91;
 Enddecay
 
 Decay D_s+
@@ -62,4 +65,4 @@ Decay anti-K*0sig
 1.000 K-             pi+          VSS;
 Enddecay
 
-End 
+End

@@ -29,7 +29,8 @@ from pathlib import Path
 import re
 import sys
 
-from termcolor import colored
+from skim.utils.testfiles import DataSample, MCSample
+
 import yaml
 
 
@@ -86,27 +87,27 @@ def verify_dataframe(df, mc):
     # Check assumptions about columns
     if not all(df["dataLevel"].str.match("mdst")):
         raise ValueError("Input LPNs must all be mdst.")
+    if "generalSkimName" in df.columns and len(set(df["generalSkimName"])) > 1:
+        raise ValueError("More than one GeneralSkimName in input data LPNs.")
     if mc and len(set(df["runNumber"])) > 1:
         raise ValueError("More than one run number listed for MC LPNs.")
-    if len(set(df["beamEnergy"])) > 1:
-        # Only print a warning
-        print(
-            colored(
-                "[WARNING] Input LPNs contain more than one beam energy.", "yellow"
-            ),
-            file=sys.stderr,
-        )
 
 
 def to_yaml(data, output=None):
     """Print to screen or file as YAML format."""
+    string = yaml.dump(data, sort_keys=False)
+
+    # Add warning about sample labels
+    warning = "# TODO: Ensure this label matches a sample label in SkimStats.json"
+    string = re.sub("(sampleLabel.*)$", f"\\1  {warning}", string, flags=re.MULTILINE)
+
     if isinstance(output, (str, Path)):
         OutputFilename = Path(output).with_suffix(".yaml")
         with open(OutputFilename, "w") as f:
-            yaml.dump(data, f, sort_keys=False)
-        print(f"[INFO] Wrote YAML file to {OutputFilename}", file=sys.stderr)
+            f.write(string)
+        print(f"Wrote YAML file to {OutputFilename}", file=sys.stderr)
     elif not output:
-        yaml.dump(data, sys.stdout, sort_keys=False)
+        print(string)
 
 
 def main():
@@ -128,20 +129,40 @@ def main():
     # ...and put it all into a lovely dataframe, split by LPN part!
     df = pd.DataFrame([Path(LPN).parts for LPN in LPNs])
     if args.data:
-        columns = dict(
-            enumerate(
-                [
-                    "release",
-                    "DBGT",
-                    "campaign",
-                    "prodNumber",
-                    "expNumber",
-                    "beamEnergy",
-                    "runNumber",
-                    "dataLevel",
-                ]
+        if len(df.columns) == 8:
+            # If eight components to LPN, then we're dealing with the old data LPN schema
+            columns = dict(
+                enumerate(
+                    [
+                        "release",
+                        "DBGT",
+                        "campaign",
+                        "prodNumber",
+                        "expNumber",
+                        "beamEnergy",
+                        "runNumber",
+                        "dataLevel",
+                    ]
+                )
             )
-        )
+        elif len(df.columns) == 9:
+            # If nine components to LPN, then we're dealing with the old data LPN schema,
+            # which includes an additional GeneralSkimName component
+            columns = dict(
+                enumerate(
+                    [
+                        "release",
+                        "DBGT",
+                        "campaign",
+                        "prodNumber",
+                        "expNumber",
+                        "beamEnergy",
+                        "runNumber",
+                        "generalSkimName",
+                        "dataLevel",
+                    ]
+                )
+            )
     else:
         columns = dict(
             enumerate(
@@ -189,9 +210,23 @@ def main():
                 else:
                     label = f"{campaign}_{beamEnergy}_exp{expInteger}r{iGroup+1}"
 
+                if "generalSkimName" in df.columns:
+                    generalSkim = list(group["generalSkimName"])[0]
+                else:
+                    generalSkim = "all"
+
+                # Use sample name encoding from DataSample
+                sampleLabel = DataSample(
+                    location="DUMMY_PATH",
+                    processing=campaign,
+                    experiment=expInteger,
+                    beam_energy=beamEnergy,
+                    general_skim=generalSkim,
+                ).encodeable_name
+
                 # Add everything to our mega dict
                 DataBlocks[label] = {
-                    "sampleLabel": (f"{campaign}_exp{expInteger}" if onres else "???"),
+                    "sampleLabel": sampleLabel,
                     "LPNPrefix": prefix,
                     "inputReleaseNumber": release,
                     "prodNumber": prodNumber,
@@ -202,6 +237,11 @@ def main():
                     "inputDataLevel": "mdst",
                     "runNumbers": list(group["runNumber"]),
                 }
+
+                if "generalSkimName" in df.columns:
+                    DataBlocks[label]["generalSkimName"] = list(
+                        group["generalSkimName"]
+                    )[0]
     else:
         # Extract integers from columns
         df.loc[:, "prodNumber"] = (
@@ -224,9 +264,18 @@ def main():
                 label = f"{campaign}_{MCEventType}{args.bg}"
                 BlockLabel = f"{label}r{iGroup+1}"
 
+                # Use sample name encoding from MCSample
+                sampleLabel = MCSample(
+                    location="DUMMY_PATH",
+                    process=MCEventType,
+                    campaign=campaign,
+                    beam_energy=beamEnergy,
+                    beam_background=args.bg,
+                ).encodeable_name
+
                 # Add everything to our mega dict
                 DataBlocks[BlockLabel] = {
-                    "sampleLabel": label,
+                    "sampleLabel": sampleLabel,
                     "LPNPrefix": prefix,
                     "inputReleaseNumber": release,
                     "mcCampaign": campaign,
@@ -245,13 +294,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    print(
-        colored(
-            (
-                "[WARNING] Please check that the 'sampleLabel' entries in the output "
-                "YAML file match sample labels in skim/scripts/TestFiles.yaml."
-            ),
-            "yellow",
-        ),
-        file=sys.stderr,
-    )

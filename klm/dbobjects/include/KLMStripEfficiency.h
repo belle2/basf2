@@ -19,6 +19,7 @@
 /* C++ headers. */
 #include <cstdint>
 #include <map>
+#include <limits>
 
 namespace Belle2 {
 
@@ -49,10 +50,10 @@ namespace Belle2 {
      * @param efficiency efficiency of the strip
      * @param efficiencyError error on the efficiency of the strip
      */
-    void setEfficiency(uint16_t stripId, float efficiency, float efficiencyError = 0.)
+    void setEfficiency(KLMChannelNumber stripId, float efficiency, float efficiencyError = 0.)
     {
-      m_efficiency.insert(std::pair<uint16_t, float>(stripId, efficiency));
-      m_efficiencyError.insert(std::pair<uint16_t, float>(stripId, efficiencyError));
+      m_efficiency.insert(std::pair<KLMChannelNumber, float>(stripId, efficiency));
+      m_efficiencyError.insert(std::pair<KLMChannelNumber, float>(stripId, efficiencyError));
     }
 
     /**
@@ -68,7 +69,7 @@ namespace Belle2 {
     void setBarrelEfficiency(int section, int sector, int layer, int plane, int strip, float efficiency, float efficiencyError = 0.)
     {
       const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
-      uint16_t stripId = elementNumbers->channelNumberBKLM(section, sector, layer, plane, strip);
+      KLMChannelNumber stripId = elementNumbers->channelNumberBKLM(section, sector, layer, plane, strip);
       setEfficiency(stripId, efficiency, efficiencyError);
     }
 
@@ -85,7 +86,7 @@ namespace Belle2 {
     void setEndcapEfficiency(int section, int sector, int layer, int plane, int strip, float efficiency, float efficiencyError = 0.)
     {
       const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
-      uint16_t stripId = elementNumbers->channelNumberEKLM(section, sector, layer, plane, strip);
+      KLMChannelNumber stripId = elementNumbers->channelNumberEKLM(section, sector, layer, plane, strip);
       setEfficiency(stripId, efficiency, efficiencyError);
     }
 
@@ -93,7 +94,7 @@ namespace Belle2 {
      * Returns efficiency of a given KLM strip using directly the stripId
      * @param stripId KLM strip identifier
      */
-    float getEfficiency(uint16_t stripId) const
+    float getEfficiency(KLMChannelNumber stripId) const
     {
       auto search = m_efficiency.find(stripId);
       if (search == m_efficiency.end())
@@ -112,7 +113,7 @@ namespace Belle2 {
     float getBarrelEfficiency(int section, int sector, int layer, int plane, int strip) const
     {
       const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
-      uint16_t stripId = elementNumbers->channelNumberBKLM(section, sector, layer, plane, strip);
+      KLMChannelNumber stripId = elementNumbers->channelNumberBKLM(section, sector, layer, plane, strip);
       return getEfficiency(stripId);
     }
 
@@ -127,7 +128,7 @@ namespace Belle2 {
     float getEndcapEfficiency(int section, int sector, int layer, int plane, int strip) const
     {
       const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
-      uint16_t stripId = elementNumbers->channelNumberEKLM(section, sector, layer, plane, strip);
+      KLMChannelNumber stripId = elementNumbers->channelNumberEKLM(section, sector, layer, plane, strip);
       return getEfficiency(stripId);
     }
 
@@ -135,7 +136,7 @@ namespace Belle2 {
      * Returns error on efficiency of a given KLM strip using directly the stripId
      * @param stripId KLM strip identifier
      */
-    float getEfficiencyError(uint16_t stripId) const
+    float getEfficiencyError(KLMChannelNumber stripId) const
     {
       auto search = m_efficiencyError.find(stripId);
       if (search == m_efficiencyError.end())
@@ -154,7 +155,7 @@ namespace Belle2 {
     float getBarrelEfficiencyError(int section, int sector, int layer, int plane, int strip) const
     {
       const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
-      uint16_t stripId = elementNumbers->channelNumberBKLM(section, sector, layer, plane, strip);
+      KLMChannelNumber stripId = elementNumbers->channelNumberBKLM(section, sector, layer, plane, strip);
       return getEfficiencyError(stripId);
     }
 
@@ -169,17 +170,17 @@ namespace Belle2 {
     float getEndcapEfficiencyError(int section, int sector, int layer, int plane, int strip) const
     {
       const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
-      uint16_t stripId = elementNumbers->channelNumberEKLM(section, sector, layer, plane, strip);
+      KLMChannelNumber stripId = elementNumbers->channelNumberEKLM(section, sector, layer, plane, strip);
       return getEfficiencyError(stripId);
     }
 
   private:
 
     /** KLM strip efficiency */
-    std::map<uint16_t, float> m_efficiency;
+    std::map<KLMChannelNumber, float> m_efficiency;
 
     /** KLM strip efficiency error */
-    std::map<uint16_t, float> m_efficiencyError;
+    std::map<KLMChannelNumber, float> m_efficiencyError;
 
     /** Class version. */
     ClassDef(KLMStripEfficiency, 1);

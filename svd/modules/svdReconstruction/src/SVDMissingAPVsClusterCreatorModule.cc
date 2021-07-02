@@ -37,19 +37,19 @@ SVDMissingAPVsClusterCreatorModule::SVDMissingAPVsClusterCreatorModule()
   , m_mapping(m_xmlFileName)
 {
   //Set module properties
-  setDescription("This module produces clusters in the middle of a region read by a disabled APV. It can be run only after the SVDSimpleClusterizer because it does not register the SVDClusters StoreArray in the DataStore, but only add clusters.");
+  setDescription("This module produces clusters in the middle of a region read by a disabled APV. It can be run only after the SVDClusterizer because it does not register the SVDClusters StoreArray in the DataStore, but only add clusters.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("Clusters", m_storeClustersName,
            "SVDCluster collection name", string(""));
 
-  addParam("time", m_time, "cluster time", float(0));
-  addParam("timeError", m_timeError, "cluster time error", float(10));
-  addParam("seedCharge", m_seedCharge, "cluster seed charge (in e-)", float(10000));
-  addParam("charge", m_charge, "cluster charge (in e-)", float(20000));
-  addParam("SNR", m_SNR, "cluster SNR", float(15));
-  addParam("size", m_size, "cluster size", int(128));
-  addParam("firstFrame", m_firstFrame, "first frame, needed to build the cluster", int(0));
+  addParam("time", m_time, "fake-cluster time", float(0));
+  addParam("timeError", m_timeError, "fake-cluster time error", float(10));
+  addParam("seedCharge", m_seedCharge, "fake-cluster seed charge (in e-)", float(10000));
+  addParam("charge", m_charge, "fake-cluster charge (in e-)", float(20000));
+  addParam("SNR", m_SNR, "fake-cluster SNR", float(15));
+  addParam("size", m_size, "fake-cluster size", int(128));
+  addParam("firstFrame", m_firstFrame, "first frame, needed to build the fake-cluster", int(0));
   addParam("nFakeClusters", m_nFakeClusters, "number of fake clusters equally distributed in the dead area", int(4));
 }
 
@@ -74,10 +74,10 @@ void SVDMissingAPVsClusterCreatorModule::initialize()
   m_storeClustersName = m_storeClusters.getName();
 
   // Report:
-  B2DEBUG(1, "SVDMissingAPVsClusterCreator Parameters (in default system unit, *=cannot be set directly):");
+  B2DEBUG(29, "SVDMissingAPVsClusterCreator Parameters (in default system unit, *=cannot be set directly):");
 
-  B2DEBUG(1, " 1. COLLECTIONS:");
-  B2DEBUG(1, " -->  SVDClusters:        " << DataStore::arrayName<SVDCluster>(m_storeClustersName));
+  B2DEBUG(29, " 1. COLLECTIONS:");
+  B2DEBUG(29, " -->  SVDClusters:        " << DataStore::arrayName<SVDCluster>(m_storeClustersName));
 }
 
 
@@ -121,17 +121,15 @@ void SVDMissingAPVsClusterCreatorModule::event()
     //position of the first fake cluster:
     float fakeCluster_position = firstStrip_position + fakeCluster_width / 2;
     //store first fake cluster:
-    m_storeClusters.appendNew(SVDCluster(
-                                sensorID, isU, fakeCluster_position, positionError, time, timeError, charge, seedCharge, size, SNR, m_firstFrame
-                              ));
+    m_storeClusters.appendNew(sensorID, isU, fakeCluster_position, positionError, time, timeError, charge, seedCharge, size,
+                              SNR, m_firstFrame);
     //  Store all other Fake Clusters into DataStore
     for (int i = 1; i < m_nFakeClusters; i++) {
       fakeCluster_position = fakeCluster_position + fakeCluster_width;
-      m_storeClusters.appendNew(SVDCluster(
-                                  sensorID, isU, fakeCluster_position, positionError, time, timeError, charge, seedCharge, size, SNR, m_firstFrame
-                                ));
+      m_storeClusters.appendNew(sensorID, isU, fakeCluster_position, positionError, time, timeError, charge, seedCharge, size,
+                                SNR, m_firstFrame);
     }
   }
-  B2DEBUG(1, "Number of clusters: " << m_storeClusters.getEntries());
+  B2DEBUG(29, "Number of clusters: " << m_storeClusters.getEntries());
 }
 

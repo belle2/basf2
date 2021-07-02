@@ -96,6 +96,20 @@ int DqmMemFile::UpdateSharedMem()
   return 0;
 }
 
+int DqmMemFile::ClearSharedMem()
+{
+  if (m_mode == 0) return -1;
+
+  if (m_memfile != NULL) delete m_memfile;
+  m_memfile = new TMemFile(m_name.c_str(), m_buf, m_size * sizeof(int), "RECREATE");
+
+  m_shm->lock();
+  m_memfile->CopyTo((char*)(m_shm->ptr()), m_memfile->GetSize());
+  m_shm->unlock();
+
+  return 0;
+}
+
 TMemFile* DqmMemFile::LoadMemFile()
 {
   if (m_mode == 1) return NULL;

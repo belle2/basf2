@@ -38,13 +38,25 @@ namespace Belle2 {
 
   private:
 
-    /** eventNumber, expNum, runNum */
-    int m_evt, m_exp, m_run;
-    /** event time */
-    double m_time;
-    /** track parameters of the first and second mu */
-    double m_mu0_d0, m_mu0_z0, m_mu0_phi0, m_mu0_tanlambda, m_mu0_omega;
-    double m_mu1_d0, m_mu1_z0, m_mu1_phi0, m_mu1_tanlambda, m_mu1_omega;
+    int m_evt; ///< event number
+    int m_exp; ///< experiment number
+    int m_run; ///< run number
+
+    double m_time; ///< event time
+
+
+    double m_mu0_d0;       ///< d0 track parameter of the first muon in the event
+    double m_mu0_z0;       ///< z0 track parameter of the first muon in the event
+    double m_mu0_phi0;     ///< phi0 track parameter of the first muon in the event
+    double m_mu0_tanlambda;///< tanlambda track parameter of the first muon in the event
+    double m_mu0_omega;    ///< omega track parameter of the first muon in the event
+
+    double m_mu1_d0;       ///< d0 track parameter of the second muon in the event
+    double m_mu1_z0;       ///< z0 track parameter of the second muon in the event
+    double m_mu1_phi0;     ///< phi0 track parameter of the second muon in the event
+    double m_mu1_tanlambda;///< tanlambda track parameter of the second muon in the event
+    double m_mu1_omega;    ///< omega track parameter of the second muon in the event
+
 
     /** Name of the Y4S particle list */
     std::string m_Y4SPListName = "";

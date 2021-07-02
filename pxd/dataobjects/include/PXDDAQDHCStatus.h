@@ -27,7 +27,7 @@ namespace Belle2 {
    * It will record if the data of sensors (readout by this DHC) is useable.
    *
    */
-  class PXDDAQDHCStatus {
+  class PXDDAQDHCStatus final {
   public:
 
     /** Default constructor for the ROOT IO. */
@@ -37,8 +37,11 @@ namespace Belle2 {
      * @param dhcid DHC id
      * @param mask error mask
      */
-    PXDDAQDHCStatus(int dhcid, PXDErrorFlags mask) : m_errorMask(mask),
+    explicit PXDDAQDHCStatus(int dhcid, PXDErrorFlags& mask) : m_errorMask(mask),
       m_critErrorMask(0), m_usable(true), m_dhcID(dhcid), m_rawCount(0), m_redCount(0), m_errorinfo(0) {}
+
+    /** destructor */
+    virtual ~PXDDAQDHCStatus() {};
 
     /** Return Usability of data
      * @return conclusion if data is useable
@@ -47,9 +50,9 @@ namespace Belle2 {
 
     /** Set Error bit mask
      * This should be the OR of error masks of all sub-objects (DHC, DHE)
-     * @param m Bit Mask to set
+     * @param mask Bit Mask to set
      */
-    void setErrorMask(PXDErrorFlags m) { m_errorMask = m; }
+    void setErrorMask(const PXDErrorFlags& mask) { m_errorMask = mask; }
 
     /** Return Error bit mask
      * This is the OR of error masks of all sub-objects (DHC, DHE)
@@ -58,9 +61,9 @@ namespace Belle2 {
     PXDErrorFlags getErrorMask(void) const { return m_errorMask; }
 
     /** Set Critical Error bit mask
-     * @param m Bit Mask to set
+     * @param mask Bit Mask to set
      */
-    void setCritErrorMask(PXDErrorFlags m) { m_critErrorMask = m; }
+    void setCritErrorMask(const PXDErrorFlags& mask) { m_critErrorMask = mask; }
 
     /** Return Critical Error bit mask
      * @return bit mask
@@ -72,7 +75,7 @@ namespace Belle2 {
      * the PXD data from this DHC is not usable for analysis
      * TODO Maybe this decision needs improvement.
      */
-    void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0;}
+    void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == PXDErrorFlags(0);}
 
     /** Get DHC ID */
     unsigned short getDHCID(void) const { return m_dhcID;};
@@ -93,11 +96,11 @@ namespace Belle2 {
     uint32_t getEndErrorInfo(void) const { return m_errorinfo;};
 
     /** set gating info from the DHC END */
-    void setGatedFlag(uint32_t e) { m_gated_mode = e;};
+    void setGatedFlag(bool gm) { m_gated_mode = gm;};
     /** get gating info from the DHC END */
     bool getGatedFlag(void) const { return m_gated_mode;};
     /** set HER/LER gating info from the DHC END */
-    void setGatedHER(uint32_t e) { m_gated_her = e;};
+    void setGatedHER(bool isher) { m_gated_her = isher;};
     /** get HER/LER gating info from the DHC END */
     bool getGatedHER(void) const { return m_gated_her;};
 
@@ -147,7 +150,7 @@ namespace Belle2 {
     std::vector <PXDDAQDHEStatus> m_pxdDHE;
 
     /** necessary for ROOT */
-    ClassDef(PXDDAQDHCStatus, 4);
+    ClassDef(PXDDAQDHCStatus, 5);
 
   }; // class PXDDAQDHCStatus
 

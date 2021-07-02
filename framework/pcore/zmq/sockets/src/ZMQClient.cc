@@ -60,10 +60,10 @@ void ZMQClient::initialize(const std::string& pubSocketAddress, const std::strin
 
   if (AZMQType == ZMQ_DEALER) {
     const std::string uniqueID = std::to_string(getpid());
-    m_socket->setsockopt(ZMQ_IDENTITY, uniqueID.c_str(), uniqueID.length());
+    m_socket->set(zmq::sockopt::routing_id, uniqueID);
   }
 
-  m_socket->setsockopt(ZMQ_LINGER, 0);
+  m_socket->set(zmq::sockopt::linger, 0);
   if (bind) {
     m_socket->bind(socketAddress.c_str());
   } else {
@@ -85,10 +85,10 @@ void ZMQClient::initialize(const std::string& pubSocketAddress, const std::strin
   m_subSocket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_SUB);
 
   m_pubSocket->connect(pubSocketAddress);
-  m_pubSocket->setsockopt(ZMQ_LINGER, 0);
+  m_pubSocket->set(zmq::sockopt::linger, 0);
 
   m_subSocket->connect(subSocketAddress);
-  m_subSocket->setsockopt(ZMQ_LINGER, 0);
+  m_subSocket->set(zmq::sockopt::linger, 0);
 
   B2DEBUG(200, "Having initialized multicast with sub on " << subSocketAddress << " and pub on " << pubSocketAddress);
 
@@ -101,8 +101,10 @@ void ZMQClient::initialize(const std::string& pubSocketAddress, const std::strin
 void ZMQClient::subscribe(EMessageTypes filter)
 {
   B2ASSERT("Can only run this on started clients", m_subSocket);
-  const auto char_filter = static_cast<char>(filter);
-  m_subSocket->setsockopt(ZMQ_SUBSCRIBE, &char_filter, 1);
+  char char_filter[2];
+  char_filter[0] = static_cast<char>(filter);
+  char_filter[1] = 0;
+  m_subSocket->set(zmq::sockopt::subscribe, char_filter);
 }
 
 void ZMQClient::send(zmq::message_t& message) const

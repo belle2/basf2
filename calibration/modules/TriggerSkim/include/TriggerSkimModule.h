@@ -12,6 +12,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <framework/core/Module.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <string>
 #include <map>
@@ -48,5 +49,7 @@ namespace Belle2 {
     boost::optional<int> m_resultOnMissing;
     /** if we don't use random prescale we need counters */
     std::vector<uint32_t> m_prescaleCounters;
+    /** EventMetaData is used to report warning/error messages. */
+    StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
   };
 }

@@ -1,8 +1,31 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-from tracking.path_utils import *
+import basf2 as b2
+
+# Many scripts import these functions from `tracking`, so leave these imports here
+from tracking.path_utils import (  # noqa
+    add_cdc_cr_track_finding,
+    add_cdc_track_finding,
+    add_cr_track_fit_and_track_creator,
+    add_eclcdc_track_finding,
+    add_geometry_modules,
+    add_hit_preparation_modules,
+    add_mc_matcher,
+    add_prune_tracks,
+    add_pxd_cr_track_finding,
+    add_pxd_track_finding,
+    add_svd_track_finding,
+    add_track_fit_and_track_creator,
+    add_prefilter_track_fit_and_track_creator,
+    add_postfilter_track_fit,
+    add_vxd_track_finding_vxdtf2,
+    is_cdc_used,
+    is_ecl_used,
+    is_pxd_used,
+    is_svd_used,
+    use_local_sectormap,
+)
 
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
@@ -12,12 +35,98 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                 add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False):
     """
-    This function adds the standard reconstruction modules for tracking
+    This function adds the **standard tracking reconstruction** modules
+    to a path:
+
+    #. first we find tracks using the CDC hits only, see :ref:`CDC Track Finding<tracking_trackFindingCDC>`
+    #. CDC tracks are extrapolated to SVD and SVD hits are attached, see :ref:`CDC to SVD CKF<tracking_cdc2svd_ckf>`
+    #. remaining  SVD hits are used to find SVD tracks, see :ref:`SVD Track Finding<tracking_trackFindingSVD>`
+    #. SVD tracks are extrapolated to CDC to attach CDC hits, see :ref:`SVD to CDC CKF<tracking_svd2cdc_ckf>`
+    #. SVD and CDC tracks are merged and fitted, see :ref:`Track Fitting<tracking_trackFitting>`
+    #. merged SVD+CDC tracks are extrapolated to PXD to attach PXD hits, see :ref:`SVD to PXD CKF<tracking_svd2pxd_ckf>`
+
+    .. note::
+
+       PXD hits are not available on HLT. At the end of the tracking chain on HLT we have the\
+       :ref:`PXD Region Of Interest Finding<tracking_pxdDataReduction>`, that consists of extrapolating\
+       the tracks on the PXD sensors and defining regions in which we expect to find the hit.\
+       Only fired pixels inside these regions reach Event Builder 2.
+
+    #. after all the tracks from the IP are found, we look for special classes of tracks,\
+    in particular we search for displaced vertices to reconstruct K-short, Lambda and\
+    photon-conversions, see :ref:`V0 Finding<tracking_v0Finding>`
+
+    .. note::
+
+       this last step is not run on HLT
+
+
+    :param path: the path to add the tracking reconstruction modules to
+    :param components: the list of geometry components in use or None for all components.
+    :param pruneTracks: if true, delete all hits except the first and the last in the found tracks.
+    :param skipGeometryAdding: (advanced flag) the tracking modules need the geometry module and will add it,
+        if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
+        determine, if the geometry is already loaded. This flag can be used o just turn off the geometry adding at
+        all (but you will have to add it on your own then).
+    :param skipHitPreparerAdding: (advanced flag) if true, do not add the hit preparation (esp. VXD cluster creation
+        modules. This is useful if they have been added before already.
+    :param mcTrackFinding: if true, use the MC track finders instead of the realistic ones.
+    :param reco_tracks: name of the StoreArray where the reco tracks should be stored
+    :param prune_temporary_tracks: if false, store all information of the single CDC and VXD tracks before merging.
+        If true, prune them.
+    :param fit_tracks: if false, the final track find and the TrackCreator module will no be executed
+    :param use_second_cdc_hits: if true, the second hit information will be used in the CDC track finding.
+    :param trackFitHypotheses: which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    :param use_svd_to_cdc_ckf: if true, add SVD to CDC CKF module.
+    :param use_ecl_to_cdc_ckf: if true, add ECL to CDC CKF module.
+    :param add_cdcTrack_QI: if true, add the MVA track quality estimation
+        to the path that sets the quality indicator property of the found CDC standalone tracks
+    :param add_vxdTrack_QI: if true, add the MVA track quality estimation
+        to the path that sets the quality indicator property of the found VXDTF2 tracks
+        (ATTENTION: Standard triplet QI of VXDTF2 is replaced in this case
+        -> setting this option to 'True' will have some influence on the final track collection)
+    :param add_recoTrack_QI: if true, add the MVA track quality estimation
+        to the path that sets the quality indicator property of all found reco tracks
+        (Both other QIs needed as input.)
+    """
+
+    add_prefilter_tracking_reconstruction(
+        path,
+        components=components,
+        skipGeometryAdding=skipGeometryAdding,
+        mcTrackFinding=mcTrackFinding,
+        trackFitHypotheses=trackFitHypotheses,
+        reco_tracks=reco_tracks,
+        prune_temporary_tracks=prune_temporary_tracks,
+        fit_tracks=fit_tracks,
+        use_second_cdc_hits=use_second_cdc_hits,
+        skipHitPreparerAdding=skipHitPreparerAdding,
+        use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
+        use_ecl_to_cdc_ckf=use_ecl_to_cdc_ckf,
+        add_cdcTrack_QI=add_cdcTrack_QI,
+        add_vxdTrack_QI=add_vxdTrack_QI,
+        add_recoTrack_QI=add_recoTrack_QI)
+
+    add_postfilter_tracking_reconstruction(path,
+                                           components=components,
+                                           pruneTracks=pruneTracks,
+                                           fit_tracks=fit_tracks,
+                                           reco_tracks=reco_tracks,
+                                           prune_temporary_tracks=prune_temporary_tracks)
+
+
+def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdding=False,
+                                          mcTrackFinding=False, trackFitHypotheses=None,
+                                          reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
+                                          use_second_cdc_hits=False, skipHitPreparerAdding=False,
+                                          use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
+                                          add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False):
+    """
+    This function adds the tracking reconstruction modules required to calculate HLT filter decision
     to a path.
 
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
-    :param pruneTracks: Delete all hits except the first and the last in the found tracks.
     :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
         determine, if the geometry is already loaded. This flag can be used o just turn off the geometry adding at
@@ -48,13 +157,13 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         return
 
     if (add_cdcTrack_QI or add_vxdTrack_QI or add_recoTrack_QI) and not fit_tracks:
-        B2ERROR("MVA track qualiy indicator requires `fit_tracks` to be enabled. Turning all off.")
+        b2.B2ERROR("MVA track qualiy indicator requires `fit_tracks` to be enabled. Turning all off.")
         add_cdcTrack_QI = False
         add_vxdTrack_QI = False
         add_recoTrack_QI = False
 
     if add_recoTrack_QI and (not add_cdcTrack_QI or not add_vxdTrack_QI):
-        B2ERROR("RecoTrack qualiy indicator requires CDC and VXD QI as input. Turning it all of.")
+        b2.B2ERROR("RecoTrack qualiy indicator requires CDC and VXD QI as input. Turning it all of.")
         add_cdcTrack_QI = False
         add_vxdTrack_QI = False
         add_recoTrack_QI = False
@@ -89,10 +198,29 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                    use_second_cdc_hits=use_second_cdc_hits)
 
     if fit_tracks:
-        add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
-                                        trackFitHypotheses=trackFitHypotheses,
-                                        reco_tracks=reco_tracks,
-                                        add_mva_quality_indicator=add_recoTrack_QI)
+        add_prefilter_track_fit_and_track_creator(path,
+                                                  trackFitHypotheses=trackFitHypotheses,
+                                                  reco_tracks=reco_tracks,
+                                                  add_mva_quality_indicator=add_recoTrack_QI)
+
+
+def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=False, fit_tracks=True, reco_tracks="RecoTracks",
+                                           prune_temporary_tracks=True):
+    """
+    This function adds the tracking reconstruction modules not required to calculate HLT filter
+    decision to a path.
+
+    :param path: The path to add the tracking reconstruction modules to
+    :param components: the list of geometry components in use or None for all components.
+    :param pruneTracks: Delete all hits except the first and the last in the found tracks.
+    :param fit_tracks: If false, the V0 module module will no be executed
+    :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
+    :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
+        If true, prune them.
+    """
+
+    if fit_tracks:
+        add_postfilter_track_fit(path, components=components, pruneTracks=pruneTracks, reco_tracks=reco_tracks)
 
     if prune_temporary_tracks or pruneTracks:
         path.add_module("PruneRecoHits")
@@ -110,7 +238,7 @@ def add_time_extraction(path, components=None):
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
                                    skip_geometry_adding=False, event_time_extraction=True,
                                    data_taking_period="early_phase3", top_in_counter=False,
-                                   merge_tracks=False, use_second_cdc_hits=False):
+                                   merge_tracks=True, use_second_cdc_hits=False):
     """
     This function adds the reconstruction modules for cr tracking to a path.
 
@@ -132,6 +260,7 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
     :param top_in_counter: time of propagation from the hit point to the PMT in the trigger counter is subtracted
            (assuming PMT is put at -z of the counter).
     """
+
     # make sure CDC is used
     if not is_cdc_used(components):
         return
@@ -212,11 +341,11 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         return
 
     if use_ecl_to_cdc_ckf and not is_cdc_used(components):
-        B2WARNING("ECL CKF cannot be used without CDC. Turning it off.")
+        b2.B2WARNING("ECL CKF cannot be used without CDC. Turning it off.")
         use_ecl_to_cdc_ckf = False
 
     if use_ecl_to_cdc_ckf and not is_ecl_used(components):
-        B2ERROR("ECL CKF cannot be used without ECL. Turning it off.")
+        b2.B2ERROR("ECL CKF cannot be used without ECL. Turning it off.")
         use_ecl_to_cdc_ckf = False
 
     # register EventTrackingInfo
@@ -308,7 +437,7 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_t
 
     else:
         if not is_cdc_used(components):
-            B2FATAL("CDC must be in components")
+            b2.B2FATAL("CDC must be in components")
 
         reco_tracks_from_track_finding = reco_tracks
         if merge_tracks:
@@ -380,7 +509,7 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
 
     # Material effects
     if 'SetupGenfitExtrapolation' not in path:
-        material_effects = register_module('SetupGenfitExtrapolation')
+        material_effects = b2.register_module('SetupGenfitExtrapolation')
         material_effects.set_name(
             'SetupGenfitExtrapolationForPXDDataReduction')
         path.add_module(material_effects)
@@ -393,7 +522,7 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
                                  svd_clusters=svd_cluster)
 
     # TRACK FITTING
-    dafRecoFitter = register_module("DAFRecoFitter")
+    dafRecoFitter = b2.register_module("DAFRecoFitter")
     dafRecoFitter.set_name("SVD-only DAFRecoFitter")
     dafRecoFitter.param('recoTracksStoreArrayName', svd_reco_tracks)
     dafRecoFitter.param('svdHitsStoreArrayName', svd_cluster)
@@ -430,13 +559,13 @@ def add_vxd_standalone_cosmics_finder(
     if 'RegisterEventLevelTrackingInfo' not in path:
         path.add_module('RegisterEventLevelTrackingInfo')
 
-    sp_creator_pxd = register_module('PXDSpacePointCreator')
+    sp_creator_pxd = b2.register_module('PXDSpacePointCreator')
     sp_creator_pxd.param('SpacePoints', pxd_spacepoints_name)
     path.add_module(sp_creator_pxd)
 
     # SVDSpacePointCreator is applied in funtion add_svd_reconstruction
 
-    track_finder = register_module('TrackFinderVXDCosmicsStandalone')
+    track_finder = b2.register_module('TrackFinderVXDCosmicsStandalone')
     track_finder.param('SpacePointTrackCandArrayName', "")
     track_finder.param('SpacePoints', [pxd_spacepoints_name, svd_spacepoints_name])
     track_finder.param('QualityCut', quality_cut)
@@ -444,6 +573,6 @@ def add_vxd_standalone_cosmics_finder(
     track_finder.param('MaxRejectedSPs', max_rejected_sps)
     path.add_module(track_finder)
 
-    converter = register_module('SPTC2RTConverter')
+    converter = b2.register_module('SPTC2RTConverter')
     converter.param('recoTracksStoreArrayName', reco_tracks)
     path.add_module(converter)

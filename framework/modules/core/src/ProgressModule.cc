@@ -5,19 +5,24 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Susanne Koblitz                                          *
  *                                                                        *
+ * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <framework/modules/core/ProgressModule.h>
+
+/* Framework headers. */
+#include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
+
+/* C++ headers. */
 #include <cmath>
 
-using namespace std;
 using namespace Belle2;
 
 REG_MODULE(Progress)
 
-ProgressModule::ProgressModule() : Module(), m_maxOrder(3), m_evtNr(0), m_runNr(0),
-  m_output("Processed: %3d runs, %6d events")
+ProgressModule::ProgressModule() : Module()
 {
   setDescription("Periodically writes the number of processed events/runs to the"
                  " logging system to give a progress indication.\n"
@@ -31,22 +36,23 @@ ProgressModule::ProgressModule() : Module(), m_maxOrder(3), m_evtNr(0), m_runNr(
 
 void ProgressModule::initialize()
 {
-  //Force module logging level to be info
+  // Force module logging level to be c_Info
   setLogLevel(LogConfig::c_Info);
-  m_runNr = m_evtNr = 0;
+  m_totalEvtNr = Environment::Instance().getNumberOfEvents();
 }
 
 void ProgressModule::beginRun()
 {
   ++m_runNr;
-  B2INFO("Begin of new run");
+  B2INFO("Begin of new run.");
 }
 
 void ProgressModule::event()
 {
   ++m_evtNr;
-  //Calculate the order of magnitude
-  int order = (m_evtNr == 0) ? 1 : (int)(min(log10(m_evtNr), (double)m_maxOrder));
-  auto interval = (int)pow(10., order);
-  if (m_evtNr % interval == 0) B2INFO(m_output % m_runNr % m_evtNr);
+  // Calculate the order of magnitude
+  uint32_t order = (m_evtNr == 0) ? 1 : (uint32_t)(std::min(std::log10(m_evtNr), (double)m_maxOrder));
+  uint32_t interval = (uint32_t)std::pow(10., order);
+  if (m_evtNr % interval == 0)
+    B2INFO(m_output % m_runNr % m_evtNr % m_totalEvtNr);
 }

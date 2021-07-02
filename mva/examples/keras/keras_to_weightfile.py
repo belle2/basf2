@@ -6,8 +6,6 @@
 
 from basf2_mva_python_interface.contrib_keras import State
 
-import tensorflow as tf
-import tensorflow.contrib.keras as keras
 
 from keras.models import load_model
 
@@ -34,13 +32,12 @@ if __name__ == "__main__":
     import json
     import numpy as np
 
-    import basf2
     import basf2_mva
     import basf2_mva_util
 
     from keras.layers import Input, Dense
     from keras.models import Model
-    from keras.optimizers import adam
+    from keras.optimizers import Adam
     from keras.losses import binary_crossentropy
     from keras.activations import sigmoid, tanh
     from basf2 import conditions
@@ -65,7 +62,7 @@ if __name__ == "__main__":
     output = Dense(units=1, activation=sigmoid)(net)
 
     model = Model(input, output)
-    model.compile(optimizer=adam(lr=0.01), loss=binary_crossentropy, metrics=['accuracy'])
+    model.compile(optimizer=Adam(lr=0.01), loss=binary_crossentropy, metrics=['accuracy'])
 
     model.fit(data[:, :-1], data[:, -1], batch_size=10, epochs=10)
 
@@ -78,7 +75,7 @@ if __name__ == "__main__":
         dic.update({'isSignal': data[:, -1]})
 
         df = pandas.DataFrame(dic, dtype=np.float32)
-        to_root(df, os.path.join(path, 'data.root'), tree_key='tree')
+        to_root(df, os.path.join(path, 'data.root'), key='tree')
 
         # Saving keras training model
         model.save(os.path.join(path, 'weights.h5'))

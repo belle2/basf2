@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import Path, process
-from ROOT import gSystem
 from sys import argv
 
 main = Path()

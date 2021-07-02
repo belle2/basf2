@@ -3,7 +3,6 @@
 
 from basf2 import create_path, set_log_level, B2ERROR, B2INFO, LogLevel, process, statistics
 import os
-from simulation import add_simulation
 from svd import add_svd_simulation
 import glob
 import sys
@@ -81,6 +80,9 @@ main.add_module('Gearbox')
 # Geometry
 main.add_module('Geometry')
 
+# Simulate the EventLevelTriggerTimeInfo (empty object for now)
+main.add_module('SimulateEventLevelTriggerTimeInfo')
+
 if gatedMode:
     # Beam background mixer
     main.add_module('BeamBkgMixer', backgroundFiles=bg, overallScaleFactor=scaleFactor,
@@ -116,9 +118,12 @@ main.add_module('ECLDigitizer', WaveformMaker=True, CompressionAlgorithm=compres
 # KLM digitization
 main.add_module('KLMDigitizer')
 
+# ECL trigger (generate BGOverlay dataobject for ecl trigger)
+main.add_module('TRGECLBGTCHit')
+
 # Output: digitized hits only
-branches = ['PXDDigits', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
-            'ARICHDigits', 'ECLWaveforms', 'KLMDigits']
+branches = ['EventLevelTriggerTimeInfo', 'PXDDigits', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
+            'ARICHDigits', 'ECLWaveforms', 'KLMDigits', 'TRGECLBGTCHits']
 if gatedMode:
     branches += ['PXDInjectionBGTiming']
 main.add_module('RootOutput', outputFileName='BGforOverlay.root', branchNames=branches)

@@ -1,0 +1,20 @@
+#EventType:2802000060
+#Descriptor: ee->eta_c jpsi
+#Tested: Yes
+#PhysicsWG: Charmonium
+#Responsible: Junhao Yin
+#Email: yinjh2012@korea.ac.kr
+#Date: 20210111
+
+Alias Jpsisig J/psi
+
+Decay vpho
+1.0 eta_c Jpsisig HELAMP 1 0 0 0 -1 0;
+Enddecay
+
+Decay Jpsisig
+0.5 e+ e- VLL;
+0.5 mu+ mu- VLL;
+Enddecay
+
+End

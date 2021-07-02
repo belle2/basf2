@@ -191,7 +191,7 @@ void RawCOPPERFormat::GetNodeName(int n, char* node_name, int bufsize)
     printf("%s", err_buf); fflush(stdout);
     B2FATAL(err_buf); // to reduce multiple error messages
   } else {
-    sprintf(node_name, "cpr%d",
+    sprintf(node_name, "cpr%u",
             (10 * (node_id >> 28) + (node_id >> 24)) * 1000 +
             (node_id & COPPERID_MASK));
   }
@@ -208,7 +208,7 @@ void RawCOPPERFormat::GetNodeName(char* node_name, unsigned int node_id, int buf
     printf("%s", err_buf); fflush(stdout);
     B2FATAL(err_buf); // to reduce multiple error messages
   } else {
-    sprintf(node_name, "cpr%d",
+    sprintf(node_name, "cpr%u",
             (10 * (node_id >> 28) + (node_id >> 24)) * 1000 +
             (node_id & COPPERID_MASK));
   }

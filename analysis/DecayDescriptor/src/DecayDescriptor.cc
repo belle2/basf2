@@ -19,6 +19,7 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <TDatabasePDG.h>
@@ -204,7 +205,7 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
         iPDGCode_daughter_p = mc_test->getPDG();
 
       if (iDaughter_d == 0 && (this->isIgnoreRadiatedPhotons() or this->isIgnoreGamma() or this->isIgnoreBrems())
-          && iPDGCode_daughter_p == 22)
+          && iPDGCode_daughter_p == Const::photon.getPDGCode())
         matches_global.insert(jDaughter_p);
 
       int iMatchResult = m_daughters[iDaughter_d].match(daughter, jDaughter_p);

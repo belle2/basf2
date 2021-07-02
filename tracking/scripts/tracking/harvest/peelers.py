@@ -14,7 +14,9 @@ from ROOT import Belle2
 import basf2
 from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
 
-Belle2.RecoTrack.getRightLeftInformation("Belle2::CDCHit")
+from tracking.validation.utilities import getObjectList
+
+Belle2.RecoTrack.getRightLeftInformation["Belle2::CDCHit"]
 ROOT.gSystem.Load("libtracking")
 #: string formatter that handles missing keys gracefully
 formatter = TolerateMissingKeyFormatter()
@@ -143,19 +145,19 @@ def peel_reco_track_hit_content(reco_track, key="{part_name}"):
         n_pxd_hits = reco_track.getNumberOfPXDHits()
         ndf = 2 * n_pxd_hits + n_svd_hits + n_cdc_hits
 
-        pxd_hits = [hit.getSensorID().getLayerNumber() for hit in reco_track.getPXDHitList()]
+        pxd_hits = [hit.getSensorID().getLayerNumber() for hit in getObjectList(reco_track.getPXDHitList())]
         if pxd_hits:
             first_pxd_layer = min(pxd_hits)
             last_pxd_layer = max(pxd_hits)
-        svd_hits = [hit.getSensorID().getLayerNumber() for hit in reco_track.getSVDHitList()]
+        svd_hits = [hit.getSensorID().getLayerNumber() for hit in getObjectList(reco_track.getSVDHitList())]
         if svd_hits:
             first_svd_layer = min(svd_hits)
             last_svd_layer = max(svd_hits)
-        cdc_hits = [hit.getICLayer() for hit in reco_track.getCDCHitList()]
+        cdc_hits = [hit.getICLayer() for hit in getObjectList(reco_track.getCDCHitList())]
         if cdc_hits:
             first_cdc_layer = min(cdc_hits)
             last_cdc_layer = max(cdc_hits)
-        for hit_info in reco_track.getRelationsWith("RecoHitInformations"):
+        for hit_info in getObjectList(reco_track.getRelationsWith("RecoHitInformations")):
             track_point = reco_track.getCreatedTrackPoint(hit_info)
             if track_point:
                 fitted_state = track_point.getFitterInfo()
@@ -375,7 +377,7 @@ def peel_fit_status(reco_track, key="{part_name}"):
     if reco_track:
         crops["is_fitted"] = reco_track.wasFitSuccessful()
 
-        for rep in reco_track.getRepresentations():
+        for rep in getObjectList(reco_track.getRepresentations()):
             was_successful = reco_track.wasFitSuccessful(rep)
             pdg_code = rep.getPDG()
 
@@ -492,7 +494,7 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
 
 def get_reco_hit_information(reco_track, hit):
     """Helper function for getting the correct reco hit info"""
-    for info in hit.getRelationsFrom("RecoHitInformations"):
+    for info in getObjectList(hit.getRelationsFrom("RecoHitInformations")):
         if info.getRelatedFrom(reco_track.getArrayName()) == reco_track:
             return info
 
@@ -504,8 +506,8 @@ def peel_subdetector_hit_efficiency(mc_reco_track, reco_track, key="{part_name}"
         if not reco_track or not mc_reco_track:
             hit_efficiency = float("nan")
         else:
-            mc_reco_hits = getattr(mc_reco_track, "get{}HitList".format(detector_string.upper()))()
-            if mc_reco_hits.size() == 0:
+            mc_reco_hits = getObjectList(getattr(mc_reco_track, "get{}HitList".format(detector_string.upper()))())
+            if len(mc_reco_hits) == 0:
                 hit_efficiency = float('nan')
             else:
                 mc_reco_hit_size = 0
@@ -518,7 +520,7 @@ def peel_subdetector_hit_efficiency(mc_reco_track, reco_track, key="{part_name}"
 
                     mc_reco_hit_size += 1
 
-                    for reco_hit in getattr(reco_track, "get{}HitList".format(detector_string.upper()))():
+                    for reco_hit in getObjectList(getattr(reco_track, "get{}HitList".format(detector_string.upper()))()):
                         if mc_reco_hit.getArrayIndex() == reco_hit.getArrayIndex():
                             hit_efficiency += 1
                             break
@@ -540,15 +542,15 @@ def peel_subdetector_hit_purity(reco_track, mc_reco_track, key="{part_name}"):
         if not reco_track or not mc_reco_track:
             hit_purity = float("nan")
         else:
-            reco_hits = getattr(reco_track, "get{}HitList".format(detector_string.upper()))()
-            reco_hit_size = reco_hits.size()
+            reco_hits = getObjectList(getattr(reco_track, "get{}HitList".format(detector_string.upper()))())
+            reco_hit_size = len(reco_hits)
 
             if reco_hit_size == 0:
                 hit_purity = float('nan')
             else:
                 hit_purity = 0.
                 for reco_hit in reco_hits:
-                    for mc_reco_hit in getattr(mc_reco_track, "get{}HitList".format(detector_string.upper()))():
+                    for mc_reco_hit in getObjectList(getattr(mc_reco_track, "get{}HitList".format(detector_string.upper()))()):
                         if mc_reco_hit.getArrayIndex() == reco_hit.getArrayIndex():
                             hit_purity += 1
                             break
@@ -668,7 +670,7 @@ def get_seed_track_fit_result(reco_track):
 
 
 def is_correct_rl_information(cdc_hit, reco_track, hit_lookup):
-    rl_info = reco_track.getRightLeftInformation("const Belle2::CDCHit")(cdc_hit)
+    rl_info = reco_track.getRightLeftInformation["const Belle2::CDCHit"](cdc_hit)
     truth_rl_info = hit_lookup.getRLInfo(cdc_hit)
 
     if rl_info == Belle2.RecoHitInformation.c_right and truth_rl_info == 1:

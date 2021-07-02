@@ -1,16 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-import ROOT
+import basf2 as b2
 from ROOT.Belle2 import TOPDatabaseImporter
-from ROOT import gSystem
 import os
 import sys
 import glob
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # Event info setter - execute single event
 main.add_module('EventInfoSetter', evtNumList=[1])
@@ -19,10 +17,10 @@ main.add_module('EventInfoSetter', evtNumList=[1])
 main.add_module('TOPGeometryParInitializer')
 
 # process single event
-process(main)
+b2.process(main)
 
 # define a local database (will be created automatically, if doesn't exist)
-use_local_database('localDB/localDB.txt', readonly=False)
+b2.use_local_database('localDB/localDB.txt', readonly=False)
 
 # and then run the importer
 dbImporter = TOPDatabaseImporter()
@@ -30,7 +28,7 @@ dbImporter = TOPDatabaseImporter()
 # import constants
 fileNames = sorted(glob.glob('masks/*.root'))
 numFiles = len(fileNames)
-if numFiles is 0:
+if numFiles == 0:
     print('No files found')
     sys.exit()
 
@@ -49,9 +47,9 @@ for i, fileName in enumerate(fileNames):
     if expNext > expNo or k == len(fileNames):  # last run in exp or last run in total
         runLast = -1
     elif runLast < runFirst:
-        B2ERROR("first run:", runFirst, "last run:", runLast)
-        B2ERROR("Last run is less than the first one: exiting!")
+        b2.B2ERROR("first run:", runFirst, "last run:", runLast)
+        b2.B2ERROR("Last run is less than the first one: exiting!")
         sys.exit()
     dbImporter.importChannelMask(fileName, expNo, runFirst, runLast)
     os.rename(fileName, fileName.replace('masks/', 'masks/imported/'))
-B2RESULT("Done")
+b2.B2RESULT("Done")

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Script to download the contents of a globaltag of the central database.
@@ -14,7 +13,6 @@ import requests
 import shutil
 import fnmatch
 import re
-import sqlite3
 import functools
 import textwrap
 from urllib.parse import urljoin
@@ -63,7 +61,7 @@ def download_file(db, local_file, remote_file, checksum, iovlist=None):
     with open(local_file, "wb") as out:
         file_req = db._session.get(remote_file, stream=True)
         if file_req.status_code != requests.codes.ok:
-            B2ERROR("Error downloading {0}: {1}".format(file_req.url, file_req.status_code))
+            B2ERROR(f"Error downloading {file_req.url}: {file_req.status_code}")
             return None
         shutil.copyfileobj(file_req.raw, out)
 
@@ -183,7 +181,7 @@ def command_legacydownload(args, db=None):
     for tagname in sorted(tagnames):
         try:
             req = db.request("GET", "/globalTag/{}/globalTagPayloads".format(encode_name(tagname)),
-                             "Downloading list of payloads for {} tag{}".format(tagname, payloadfilter))
+                             f"Downloading list of payloads for {tagname} tag{payloadfilter}")
         except ConditionsDB.RequestError as e:
             B2ERROR(str(e))
             continue

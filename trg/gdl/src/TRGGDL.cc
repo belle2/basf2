@@ -33,6 +33,8 @@
 
 #include <TH1I.h>
 
+#include <stdexcept>
+
 #define N_TIMING_REGISTERS 4
 
 using namespace std;
@@ -69,7 +71,9 @@ namespace Belle2 {
                     const std::string& Phase,
                     bool algFromDB,
                     const std::string& algFilePath,
-                    int debugLevel)
+                    int debugLevel,
+                    double timquality_threshold_sfin,
+                    double timquality_threshold_fine)
   {
     if (_gdl) {
       //delete _gdl;
@@ -84,7 +88,9 @@ namespace Belle2 {
                         Phase,
                         algFromDB,
                         algFilePath,
-                        debugLevel);
+                        debugLevel,
+                        timquality_threshold_sfin,
+                        timquality_threshold_fine);
     } else {
       cout << "TRGGDL::getTRGGDL ... good-bye" << endl;
       //        delete _gdl;
@@ -109,7 +115,9 @@ namespace Belle2 {
                  const std::string& Phase,
                  bool algFromDB,
                  const std::string& algFilePath,
-                 int debugLevel)
+                 int debugLevel,
+                 double timquality_threshold_sfin,
+                 double timquality_threshold_fine)
     : _debugLevel(debugLevel),
       _configFilename(configFile),
       _simulationMode(simulationMode),
@@ -121,6 +129,8 @@ namespace Belle2 {
       _offset(15.3),
       _isb(0),
       _osb(0),
+      _timquality_threshold_sfin(timquality_threshold_sfin),
+      _timquality_threshold_fine(timquality_threshold_fine),
       _algFromDB(algFromDB)
   {
 
@@ -157,8 +167,8 @@ namespace Belle2 {
       for (int i = 0; i < m_FTDLBitsDB->getnoutbit(); i++) {
         B2DEBUG(20, "TRGGDL::initialize, outputBits: " << i << ", " << m_FTDLBitsDB->getoutbitname(i));
       }
-      for (int i = 0; i < db_algs->getnalgs(); i++) {
-        B2DEBUG(20, "TRGGDL::initialize, algs: " << i << ", " << db_algs->getalg(i));
+      for (int i = 0; i < m_AlgsDB->getnalgs(); i++) {
+        B2DEBUG(20, "TRGGDL::initialize, algs: " << i << ", " << m_AlgsDB->getalg(i));
       }
     }
     //if it is firmware simulation, do the cofigurnation
@@ -244,6 +254,13 @@ namespace Belle2 {
     if (!m_FTDLBitsDB)  B2INFO("no database of gdl ftdl bits");
     int N_OutputBits = m_FTDLBitsDB->getnoutbit();
     if (!m_PrescalesDB)  B2INFO("no database of gdl prescale");
+    int N_AlgsBits = m_AlgsDB->getnalgs();
+    if (!m_AlgsDB)  B2INFO("no global database of gdl ftd logics");
+    if (N_OutputBits > N_AlgsBits) {
+      // Why this? This creates a problem in for loops later.
+      B2DEBUG(20, "#Algs and #Ftdl is different");
+      N_OutputBits = N_AlgsBits;
+    }
 
     StoreObjPtr<TRGSummary> GDLResult;
     if (GDLResult) {
@@ -298,8 +315,8 @@ namespace Belle2 {
           L1Summary = 0;
           L1Summary_psnm = 0;
         }
-        std::string alg = _algFromDB ? db_algs->getalg(i) : algs[i];
-        if (_debugLevel > 89) printf("TRGGDL:i(%d), alg(%s)\n", i, db_algs->getalg(i).c_str());
+        std::string alg = _algFromDB ? m_AlgsDB->getalg(i) : algs[i];
+        if (_debugLevel > 89) printf("TRGGDL:i(%d), alg(%s)\n", i, m_AlgsDB->getalg(i).c_str());
         if (isFiredFTDL(_inpBits, alg)) {
           L1Summary |= (1 << (i % 32));
           if (doprescale(m_PrescalesDB->getprescales(i))) {
@@ -312,6 +329,33 @@ namespace Belle2 {
           GDLResult->setPsnmBits(i / 32, L1Summary_psnm);
         }
       }
+
+      //set timing qulaity flag based on MC truth jitter, which is NOT simulated by TSIM
+      TRGSummary::ETimingQuality timQuality = TRGSummary::TTYQ_NONE;
+      double jitter = 0;
+
+      //get true jitter if SimClockState is valid
+      if (m_simClockState.isValid() && m_hwClock.isValid()) {
+
+        jitter = m_simClockState->getRelativeBucketNo() / m_hwClock->getAcceleratorRF(); // in ns
+
+        //set timing quality flag with the jitter
+        if (abs(jitter) < _timquality_threshold_sfin)
+          timQuality = TRGSummary::TTYQ_SFIN;
+        else {
+          if (abs(jitter) < _timquality_threshold_fine)
+            timQuality = TRGSummary::TTYQ_FINE;
+          else
+            timQuality = TRGSummary::TTYQ_CORS;
+        }
+      }
+
+      B2DEBUG(20, "TRGGDL::set timing quality, jitter = " << jitter << ": timQuality =  " << timQuality << " sfin threshold = " <<
+              _timquality_threshold_sfin << " fine threshold = " <<
+              _timquality_threshold_fine);
+
+      //fill the flag to TRGSummary
+      GDLResult->setTimQuality(timQuality);
     }
   }
 
@@ -336,6 +380,12 @@ namespace Belle2 {
     if (!m_FTDLBitsDB)  B2INFO("no database of gdl ftdl bits");
     int N_OutputBits = m_FTDLBitsDB->getnoutbit();
     if (!m_PrescalesDB) B2INFO("no database of gdl prescale");
+    int N_AlgsBits = m_AlgsDB->getnalgs();
+    if (!m_AlgsDB) B2INFO("no database of gdl ftdl bit logic");
+    if (N_OutputBits > N_AlgsBits) {
+      B2DEBUG(20, "#Algs and #FTDL is different");
+      N_OutputBits = N_AlgsBits;
+    }
 
     if (_debugLevel > 19)
       printf("TRGGDL:N_InputBits(%d), N_OutputBits(%d)\n", N_InputBits, N_OutputBits);
@@ -351,22 +401,19 @@ namespace Belle2 {
       _ftdBits.clear();
       _psnBits.clear();
       for (int i = 0; i < N_InputBits; i++) {
-        _inpBits.push_back(GDLResult->testInput(i));
+        bool inputBit;
+        try { inputBit = GDLResult->testInput(i); }
+        catch (const std::exception&) { inputBit = false; }
+        _inpBits.push_back(inputBit);
       }
 
       if (_algFromDB) {
-
-        int L1Summary = 0;
-        int L1Summary_psnm = 0;
-
         for (int i = 0; i < N_OutputBits; i++) {
-          bool ftdl_fired = isFiredFTDL(_inpBits, db_algs->getalg(i));
+          bool ftdl_fired = isFiredFTDL(_inpBits, m_AlgsDB->getalg(i));
           bool psnm_fired = false;
           _ftdBits.push_back(ftdl_fired);
           if (ftdl_fired) {
-            L1Summary |= (1 << i);
             if (doprescale(m_PrescalesDB->getprescales(i))) {
-              L1Summary_psnm |= (1 << i);
               psnm_fired = true;
             }
           }
@@ -376,11 +423,11 @@ namespace Belle2 {
             if (_debugLevel == 971 && ftdl_fired) {
               int i_ehigh    = m_InputBitsDB->getinbitnum("ehigh");
               int i_bha_veto = m_InputBitsDB->getinbitnum("bha_veto");
-              printf("TRGGDL:hie:i=%d,evt=%d,ps=%d,ehigh=%d,bha_veto=%d,ftdl_fired=%d,psnm_fired=%d,i_ehigh=%d,i_bha_veto=%d,obitname=%s\n",
+              printf("TRGGDL:hie:i=%d,evt=%u,ps=%d,ehigh=%d,bha_veto=%d,ftdl_fired=%d,psnm_fired=%d,i_ehigh=%d,i_bha_veto=%d,obitname=%s\n",
                      i, _evt, m_PrescalesDB->getprescales(i),
                      _inpBits[i_ehigh] ? 1 : 0,
                      _inpBits[i_bha_veto] ? 1 : 0,
-                     ftdl_fired ? 1 : 0,
+                     ftdl_fired,
                      psnm_fired ? 1 : 0,
                      i_ehigh,
                      i_bha_veto,
@@ -390,9 +437,6 @@ namespace Belle2 {
         }
 
       } else {
-
-        int L1Summary = 0;
-        int L1Summary_psnm = 0;
         std::string str;
         std::vector<std::string> algs;
         std::ifstream isload(_algFilePath.c_str(), std::ios::in);
@@ -408,9 +452,7 @@ namespace Belle2 {
           bool psnm_fired = false;
           _ftdBits.push_back(ftdl_fired);
           if (ftdl_fired) {
-            L1Summary |= (1 << i);
             if (doprescale(m_PrescalesDB->getprescales(i))) {
-              L1Summary_psnm |= (1 << i);
               psnm_fired = true;
             }
           }
@@ -467,6 +509,7 @@ namespace Belle2 {
               B2DEBUG(20,
                       alg.substr(begin_word, word_length).c_str()
                       << "(" << fired << ")");
+              // cppcheck-suppress knownConditionTrueFalse
               if (((!not_flag && fired) || (not_flag && !fired)) && result_the_term) {
                 return true;
               }
@@ -503,7 +546,6 @@ namespace Belle2 {
         // can be blank (white space) or any delimiter.
         if (reading_word) {
           // end of a word, 'xxxx '
-          reading_word = false;
           if (result_the_term) {
             // worth to try
             bool fired = input[atoi(alg.substr(begin_word, word_length).c_str())];
@@ -967,6 +1009,16 @@ namespace Belle2 {
   {
     for (std::size_t i = 0; i < _psnBits.size(); i++) {
       if (_psnBits[i]) h->Fill(i);
+    }
+  }
+
+  void TRGGDL::checkDatabase() const
+  {
+    // The number of algorithm logics must be equal to the number of output bits.
+    if (m_AlgsDB->getnalgs() != m_FTDLBitsDB->getnoutbit()) {
+      B2FATAL("The number of logics in TRGGDLDBAlgs differs from the number of outpit bits in TRGGDLDBFTDLBits. Please check the content of the IoVs of both payloads."
+              << LogVar("Logics", m_AlgsDB->getnalgs())
+              << LogVar("Output bits", m_FTDLBitsDB->getnoutbit()));
     }
   }
 

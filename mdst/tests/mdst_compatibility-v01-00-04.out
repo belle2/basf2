@@ -33,6 +33,7 @@ Untested method EventLevelTrackingInfo::setNVXDClustersInLayer
 Untested method EventLevelTrackingInfo::setPXDCKFAbortionFlag
 Untested method EventLevelTrackingInfo::setSVDCKFAbortionFlag
 Untested method EventLevelTrackingInfo::setSVDFirstSampleTime
+Untested method EventLevelTrackingInfo::setSVDSpacePointCreatorAbortionFlag
 Untested method EventLevelTrackingInfo::setUnspecifiedTrackFindingFailure
 Untested method EventLevelTrackingInfo::setVXDTF2AbortionFlag
 Untested method PIDLikelihood::getDeltaLogL
@@ -41,13 +42,11 @@ Untested method PIDLikelihood::printArray
 Untested method PIDLikelihood::setLogLikelihood
 Untested method ECLCluster::addHypothesis
 Untested method ECLCluster::addStatus
-Untested method ECLCluster::getHypothesisId
 Untested method ECLCluster::hasStatus
 Untested method ECLCluster::removeHypothesis
 Untested method ECLCluster::removeStatus
 Untested method ECLCluster::setAbsZernike40
 Untested method ECLCluster::setAbsZernike51
-Untested method ECLCluster::setClusterHadronIntensity
 Untested method ECLCluster::setClusterId
 Untested method ECLCluster::setConnectedRegionId
 Untested method ECLCluster::setCovarianceMatrix
@@ -62,6 +61,7 @@ Untested method ECLCluster::setIsTrack
 Untested method ECLCluster::setLAT
 Untested method ECLCluster::setMaxECellId
 Untested method ECLCluster::setMinTrkDistance
+Untested method ECLCluster::setMinTrkDistanceID
 Untested method ECLCluster::setNumberOfCrystals
 Untested method ECLCluster::setNumberOfHadronDigits
 Untested method ECLCluster::setPhi
@@ -92,8 +92,11 @@ Untested method KLMCluster::setLayers
 Untested method KLMCluster::setMomentumMag
 Untested method KLMCluster::setTime
 Untested method TRGSummary::getInfoHTML
+Untested method TRGSummary::getInputBitNumber
+Untested method TRGSummary::getOutputBitNumber
 Untested method TRGSummary::setFtdlBits
 Untested method TRGSummary::setInputBits
+Untested method TRGSummary::setPoissonInInjectionVeto
 Untested method TRGSummary::setPreScale
 Untested method TRGSummary::setPsnmBits
 Untested method TRGSummary::setTRGSummary
@@ -134,6 +137,14 @@ Untested method MCParticle::setSeenInDetector
 Untested method MCParticle::setStatus
 Untested method MCParticle::setValidVertex
 Untested method MCParticle::setVirtual
+Untested method EventLevelTriggerTimeInfo::setBunchNumber
+Untested method EventLevelTriggerTimeInfo::setInvalid
+Untested method EventLevelTriggerTimeInfo::setIsHER
+Untested method EventLevelTriggerTimeInfo::setNoInjection
+Untested method EventLevelTriggerTimeInfo::setRevo2
+Untested method EventLevelTriggerTimeInfo::setTimeSinceLastInjection
+Untested method EventLevelTriggerTimeInfo::setTimeSincePrevTrigger
+Untested method EventLevelTriggerTimeInfo::setValid
 [INFO] ========================================================================
 [INFO] >>> Start new run: 0
 [INFO] ------------------------------------------------------------------------
@@ -1289,7 +1300,6 @@ PIDLikelihood#5:
 ECLCluster#0:
   getAbsZernike40(): 0.881543
   getAbsZernike51(): 0.738281
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (47.3882,48.5937,211.467)
   getConnectedRegionId(): 1
@@ -1314,6 +1324,7 @@ ECLCluster#0:
   getLAT(): 0.0996094
   getMaxECellId(): 0
   getMinTrkDistance(): 155.518
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 0.797958
@@ -1329,7 +1340,6 @@ ECLCluster#0:
   getUncertaintyEnergy(): 0.00205078
   getUncertaintyPhi(): 0.0152344
   getUncertaintyTheta(): 0.00605469
-  getUniqueId(): 105001
   getZernikeMVA(): 0.569336
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1343,7 +1353,6 @@ ECLCluster#0:
 ECLCluster#1:
   getAbsZernike40(): 0.464844
   getAbsZernike51(): 0.372656
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-99.0707,-19.5978,211.009)
   getConnectedRegionId(): 2
@@ -1364,6 +1373,7 @@ ECLCluster#1:
   getLAT(): 0.422852
   getMaxECellId(): 0
   getMinTrkDistance(): 15.625
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 16.0156
   getNumberOfHadronDigits(): 0
   getPhi(): -2.9463
@@ -1380,7 +1390,6 @@ ECLCluster#1:
   getUncertaintyEnergy(): 0.0263672
   getUncertaintyPhi(): 0.00625
   getUncertaintyTheta(): 0.00234375
-  getUniqueId(): 205001
   getZernikeMVA(): 0.533203
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1394,7 +1403,6 @@ ECLCluster#1:
 ECLCluster#2:
   getAbsZernike40(): 0.587695
   getAbsZernike51(): 0.876562
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-135.933,11.8634,198.639)
   getConnectedRegionId(): 3
@@ -1415,6 +1423,7 @@ ECLCluster#2:
   getLAT(): 0.0996094
   getMaxECellId(): 0
   getMinTrkDistance(): 49.0723
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 3.05454
@@ -1430,7 +1439,6 @@ ECLCluster#2:
   getUncertaintyEnergy(): 0.00146484
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.00917969
-  getUniqueId(): 305001
   getZernikeMVA(): 0.494141
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1444,7 +1452,6 @@ ECLCluster#2:
 ECLCluster#3:
   getAbsZernike40(): 0.202539
   getAbsZernike51(): 0.309375
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-136.801,13.1692,164.643)
   getConnectedRegionId(): 4
@@ -1465,6 +1472,7 @@ ECLCluster#3:
   getLAT(): 0.625977
   getMaxECellId(): 0
   getMinTrkDistance(): 18.3105
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
   getPhi(): 3.04562
@@ -1480,7 +1488,6 @@ ECLCluster#3:
   getUncertaintyEnergy(): 0.00703125
   getUncertaintyPhi(): 0.00722656
   getUncertaintyTheta(): 0.00585938
-  getUniqueId(): 405001
   getZernikeMVA(): 0.105469
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1494,7 +1501,6 @@ ECLCluster#3:
 ECLCluster#4:
   getAbsZernike40(): 0.972852
   getAbsZernike51(): 0.616406
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-5.20805,139.222,106.614)
   getConnectedRegionId(): 5
@@ -1515,6 +1521,7 @@ ECLCluster#4:
   getLAT(): 0.161133
   getMaxECellId(): 0
   getMinTrkDistance(): 175.537
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 1.60819
@@ -1530,7 +1537,6 @@ ECLCluster#4:
   getUncertaintyEnergy(): 0.00410156
   getUncertaintyPhi(): 0.00878906
   getUncertaintyTheta(): 0.00722656
-  getUniqueId(): 505001
   getZernikeMVA(): 0.797852
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1544,7 +1550,6 @@ ECLCluster#4:
 ECLCluster#5:
   getAbsZernike40(): 0.303809
   getAbsZernike51(): 0.302344
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-129.533,54.8222,51.2424)
   getConnectedRegionId(): 6
@@ -1565,6 +1570,7 @@ ECLCluster#5:
   getLAT(): 0.355469
   getMaxECellId(): 0
   getMinTrkDistance(): 105.957
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
   getPhi(): 2.74122
@@ -1580,7 +1586,6 @@ ECLCluster#5:
   getUncertaintyEnergy(): 0.00908203
   getUncertaintyPhi(): 0.00664062
   getUncertaintyTheta(): 0.00527344
-  getUniqueId(): 605001
   getZernikeMVA(): 0.333008
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1594,7 +1599,6 @@ ECLCluster#5:
 ECLCluster#6:
   getAbsZernike40(): 0.918066
   getAbsZernike51(): 0.650391
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (2.71374,140.805,24.8401)
   getConnectedRegionId(): 8
@@ -1615,6 +1619,7 @@ ECLCluster#6:
   getLAT(): 0.0214844
   getMaxECellId(): 0
   getMinTrkDistance(): 217.285
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): 1.55153
@@ -1630,7 +1635,6 @@ ECLCluster#6:
   getUncertaintyEnergy(): 0.00292969
   getUncertaintyPhi(): 0.00976562
   getUncertaintyTheta(): 0.00800781
-  getUniqueId(): 805001
   getZernikeMVA(): 0.439453
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1644,7 +1648,6 @@ ECLCluster#6:
 ECLCluster#7:
   getAbsZernike40(): 0.348633
   getAbsZernike51(): 0.375
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (115.322,80.6579,16.8508)
   getConnectedRegionId(): 7
@@ -1665,6 +1668,7 @@ ECLCluster#7:
   getLAT(): 0.273438
   getMaxECellId(): 0
   getMinTrkDistance(): 166.504
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
   getPhi(): 0.610333
@@ -1680,7 +1684,6 @@ ECLCluster#7:
   getUncertaintyEnergy(): 0.00673828
   getUncertaintyPhi(): 0.00742187
   getUncertaintyTheta(): 0.00585938
-  getUniqueId(): 705001
   getZernikeMVA(): 0.80957
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1694,7 +1697,6 @@ ECLCluster#7:
 ECLCluster#8:
   getAbsZernike40(): 0.95625
   getAbsZernike51(): 0.671484
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (104.847,-93.645,-1.96114)
   getConnectedRegionId(): 10
@@ -1715,6 +1717,7 @@ ECLCluster#8:
   getLAT(): 0.142578
   getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): -0.729024
@@ -1731,7 +1734,6 @@ ECLCluster#8:
   getUncertaintyEnergy(): 0.00205078
   getUncertaintyPhi(): 0.0105469
   getUncertaintyTheta(): 0.00898437
-  getUniqueId(): 1005001
   getZernikeMVA(): 0.805664
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1745,7 +1747,6 @@ ECLCluster#8:
 ECLCluster#9:
   getAbsZernike40(): 1.07578
   getAbsZernike51(): 0.386719
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-39.8493,-134.848,-8.32757)
   getConnectedRegionId(): 11
@@ -1766,6 +1767,7 @@ ECLCluster#9:
   getLAT(): 0.236328
   getMaxECellId(): 0
   getMinTrkDistance(): 134.033
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): -1.85813
@@ -1781,7 +1783,6 @@ ECLCluster#9:
   getUncertaintyEnergy(): 0.00439453
   getUncertaintyPhi(): 0.00878906
   getUncertaintyTheta(): 0.00703125
-  getUniqueId(): 1105001
   getZernikeMVA(): 0.833984
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1795,7 +1796,6 @@ ECLCluster#9:
 ECLCluster#10:
   getAbsZernike40(): 1.17539
   getAbsZernike51(): 0.678516
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-35.3413,136.312,-27.0504)
   getConnectedRegionId(): 12
@@ -1816,6 +1816,7 @@ ECLCluster#10:
   getLAT(): 0.125
   getMaxECellId(): 0
   getMinTrkDistance(): 181.885
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 1.82448
@@ -1831,7 +1832,6 @@ ECLCluster#10:
   getUncertaintyEnergy(): 0.00175781
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.00917969
-  getUniqueId(): 1205001
   getZernikeMVA(): 0.78418
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1845,7 +1845,6 @@ ECLCluster#10:
 ECLCluster#11:
   getAbsZernike40(): 1.38955
   getAbsZernike51(): 0.106641
-  getClusterHadronIntensity(): 0
   getClusterId(): 2
   getClusterPosition(): (140.705,3.58911,-46.1838)
   getConnectedRegionId(): 13
@@ -1866,6 +1865,7 @@ ECLCluster#11:
   getLAT(): 0.170898
   getMaxECellId(): 0
   getMinTrkDistance(): 110.352
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 8.39844
   getNumberOfHadronDigits(): 0
   getPhi(): 0.0255024
@@ -1882,7 +1882,6 @@ ECLCluster#11:
   getUncertaintyEnergy(): 0.0108398
   getUncertaintyPhi(): 0.00605469
   getUncertaintyTheta(): 0.00488281
-  getUniqueId(): 1305002
   getZernikeMVA(): 0.0732422
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1896,7 +1895,6 @@ ECLCluster#11:
 ECLCluster#12:
   getAbsZernike40(): 1.24346
   getAbsZernike51(): 0.530859
-  getClusterHadronIntensity(): 0
   getClusterId(): 3
   getClusterPosition(): (140.306,-8.48485,-60.3816)
   getConnectedRegionId(): 13
@@ -1917,6 +1915,7 @@ ECLCluster#12:
   getLAT(): 0.146484
   getMaxECellId(): 0
   getMinTrkDistance(): 108.398
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.22656
   getNumberOfHadronDigits(): 0
   getPhi(): -0.0604005
@@ -1934,7 +1933,6 @@ ECLCluster#12:
   getUncertaintyEnergy(): 0.00644531
   getUncertaintyPhi(): 0.00761719
   getUncertaintyTheta(): 0.00605469
-  getUniqueId(): 1305003
   getZernikeMVA(): 0.151367
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1948,7 +1946,6 @@ ECLCluster#12:
 ECLCluster#13:
   getAbsZernike40(): 0.697266
   getAbsZernike51(): 0.0808594
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (123.088,-67.1176,-77.2865)
   getConnectedRegionId(): 14
@@ -1969,6 +1966,7 @@ ECLCluster#13:
   getLAT(): 0.125977
   getMaxECellId(): 0
   getMinTrkDistance(): 86.1816
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): -0.499215
@@ -1985,7 +1983,6 @@ ECLCluster#13:
   getUncertaintyEnergy(): 0.00410156
   getUncertaintyPhi(): 0.00878906
   getUncertaintyTheta(): 0.00722656
-  getUniqueId(): 1405001
   getZernikeMVA(): 0.294922
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -1999,7 +1996,6 @@ ECLCluster#13:
 ECLCluster#14:
   getAbsZernike40(): 0.939648
   getAbsZernike51(): 0.589453
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (127.869,56.6363,-90.2211)
   getConnectedRegionId(): 15
@@ -2020,6 +2016,7 @@ ECLCluster#14:
   getLAT(): 0.132812
   getMaxECellId(): 0
   getMinTrkDistance(): 171.387
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
   getPhi(): 0.416955
@@ -2035,7 +2032,6 @@ ECLCluster#14:
   getUncertaintyEnergy(): 0.00878906
   getUncertaintyPhi(): 0.00664062
   getUncertaintyTheta(): 0.00546875
-  getUniqueId(): 1505001
   getZernikeMVA(): 0.850586
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2049,7 +2045,6 @@ ECLCluster#14:
 ECLCluster#15:
   getAbsZernike40(): 0.991113
   getAbsZernike51(): 0.501563
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (54.1965,-117.313,-113.805)
   getConnectedRegionId(): 16
@@ -2070,6 +2065,7 @@ ECLCluster#15:
   getLAT(): 0
   getMaxECellId(): 0
   getMinTrkDistance(): 15.1367
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
   getPhi(): -1.13802
@@ -2085,7 +2081,6 @@ ECLCluster#15:
   getUncertaintyEnergy(): 0.00498047
   getUncertaintyPhi(): 0.0113281
   getUncertaintyTheta(): 0.00761719
-  getUniqueId(): 1605001
   getZernikeMVA(): 0.40625
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2099,7 +2094,6 @@ ECLCluster#15:
 ECLCluster#16:
   getAbsZernike40(): 0.10957
   getAbsZernike51(): 0.258984
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-65.8506,-71.5169,-115.167)
   getConnectedRegionId(): 17
@@ -2120,6 +2114,7 @@ ECLCluster#16:
   getLAT(): 0.402344
   getMaxECellId(): 0
   getMinTrkDistance(): 47.8516
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): -2.31497
@@ -2135,7 +2130,6 @@ ECLCluster#16:
   getUncertaintyEnergy(): 0.00205078
   getUncertaintyPhi(): 0.0140625
   getUncertaintyTheta(): 0.00996094
-  getUniqueId(): 1705001
   getZernikeMVA(): 0.363281
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2149,7 +2143,6 @@ ECLCluster#16:
 ECLCluster#17:
   getAbsZernike40(): 0.415039
   getAbsZernike51(): 0.472266
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (40.6597,-64.4135,-116.195)
   getConnectedRegionId(): 18
@@ -2170,6 +2163,7 @@ ECLCluster#17:
   getLAT(): 0.103516
   getMaxECellId(): 0
   getMinTrkDistance(): 45.8984
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -1.00773
@@ -2186,7 +2180,6 @@ ECLCluster#17:
   getUncertaintyEnergy(): 0.00380859
   getUncertaintyPhi(): 0.0123047
   getUncertaintyTheta(): 0.00839844
-  getUniqueId(): 1805001
   getZernikeMVA(): 0.326172
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2200,7 +2193,6 @@ ECLCluster#17:
 ECLCluster#18:
   getAbsZernike40(): 0.655762
   getAbsZernike51(): 0.933984
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-24.9582,-58.2077,-116.598)
   getConnectedRegionId(): 19
@@ -2221,6 +2213,7 @@ ECLCluster#18:
   getLAT(): 0.0439453
   getMaxECellId(): 0
   getMinTrkDistance(): 41.2598
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): -1.97586
@@ -2236,7 +2229,6 @@ ECLCluster#18:
   getUncertaintyEnergy(): 0.00146484
   getUncertaintyPhi(): 0.0148437
   getUncertaintyTheta(): 0.0103516
-  getUniqueId(): 1905001
   getZernikeMVA(): 0.40332
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2250,7 +2242,6 @@ ECLCluster#18:
 ECLCluster#19:
   getAbsZernike40(): 1.35801
   getAbsZernike51(): 0.373828
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (47.3882,48.5937,211.467)
   getConnectedRegionId(): 1
@@ -2276,6 +2267,7 @@ ECLCluster#19:
   getLAT(): 0.0996094
   getMaxECellId(): 0
   getMinTrkDistance(): 155.518
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 0.797958
@@ -2291,7 +2283,6 @@ ECLCluster#19:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 106001
   getZernikeMVA(): 0.430664
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2305,7 +2296,6 @@ ECLCluster#19:
 ECLCluster#20:
   getAbsZernike40(): 1.12227
   getAbsZernike51(): 0.203906
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-99.0707,-19.5978,211.009)
   getConnectedRegionId(): 2
@@ -2326,6 +2316,7 @@ ECLCluster#20:
   getLAT(): 0.431641
   getMaxECellId(): 0
   getMinTrkDistance(): 15.625
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 17.9688
   getNumberOfHadronDigits(): 0
   getPhi(): -2.9463
@@ -2342,7 +2333,6 @@ ECLCluster#20:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 206001
   getZernikeMVA(): 0.466797
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2356,7 +2346,6 @@ ECLCluster#20:
 ECLCluster#21:
   getAbsZernike40(): 1.27998
   getAbsZernike51(): 0.452344
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-135.933,11.8634,198.639)
   getConnectedRegionId(): 3
@@ -2377,6 +2366,7 @@ ECLCluster#21:
   getLAT(): 0.0996094
   getMaxECellId(): 0
   getMinTrkDistance(): 49.0723
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 3.05454
@@ -2392,7 +2382,6 @@ ECLCluster#21:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 306001
   getZernikeMVA(): 0.505859
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2406,7 +2395,6 @@ ECLCluster#21:
 ECLCluster#22:
   getAbsZernike40(): 0.911426
   getAbsZernike51(): 0.183984
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-136.801,13.1692,164.643)
   getConnectedRegionId(): 4
@@ -2427,6 +2415,7 @@ ECLCluster#22:
   getLAT(): 0.625977
   getMaxECellId(): 0
   getMinTrkDistance(): 18.3105
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
   getPhi(): 3.04562
@@ -2442,7 +2431,6 @@ ECLCluster#22:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 406001
   getZernikeMVA(): 0.894531
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2456,7 +2444,6 @@ ECLCluster#22:
 ECLCluster#23:
   getAbsZernike40(): 1.37295
   getAbsZernike51(): 0.323437
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-5.20805,139.222,106.614)
   getConnectedRegionId(): 5
@@ -2477,6 +2464,7 @@ ECLCluster#23:
   getLAT(): 0.161133
   getMaxECellId(): 0
   getMinTrkDistance(): 175.537
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 1.60819
@@ -2492,7 +2480,6 @@ ECLCluster#23:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 506001
   getZernikeMVA(): 0.202148
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2506,7 +2493,6 @@ ECLCluster#23:
 ECLCluster#24:
   getAbsZernike40(): 1.05586
   getAbsZernike51(): 0.315234
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-129.532,54.8218,51.265)
   getConnectedRegionId(): 6
@@ -2527,6 +2513,7 @@ ECLCluster#24:
   getLAT(): 0.466797
   getMaxECellId(): 0
   getMinTrkDistance(): 105.957
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 13.0859
   getNumberOfHadronDigits(): 0
   getPhi(): 2.74122
@@ -2542,7 +2529,6 @@ ECLCluster#24:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 606001
   getZernikeMVA(): 0.666992
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2556,7 +2542,6 @@ ECLCluster#24:
 ECLCluster#25:
   getAbsZernike40(): 1.40615
   getAbsZernike51(): 0.338672
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (2.71374,140.805,24.8401)
   getConnectedRegionId(): 8
@@ -2577,6 +2562,7 @@ ECLCluster#25:
   getLAT(): 0.0214844
   getMaxECellId(): 0
   getMinTrkDistance(): 217.285
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): 1.55153
@@ -2592,7 +2578,6 @@ ECLCluster#25:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 806001
   getZernikeMVA(): 0.560547
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2606,7 +2591,6 @@ ECLCluster#25:
 ECLCluster#26:
   getAbsZernike40(): 1.16709
   getAbsZernike51(): 0.267187
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (115.32,80.6564,16.8436)
   getConnectedRegionId(): 7
@@ -2627,6 +2611,7 @@ ECLCluster#26:
   getLAT(): 0.305664
   getMaxECellId(): 0
   getMinTrkDistance(): 166.504
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 9.96094
   getNumberOfHadronDigits(): 0
   getPhi(): 0.610333
@@ -2642,7 +2627,6 @@ ECLCluster#26:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 706001
   getZernikeMVA(): 0.19043
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2656,7 +2640,6 @@ ECLCluster#26:
 ECLCluster#27:
   getAbsZernike40(): 1.38789
   getAbsZernike51(): 0.319922
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (104.847,-93.645,-1.96114)
   getConnectedRegionId(): 10
@@ -2677,6 +2660,7 @@ ECLCluster#27:
   getLAT(): 0.142578
   getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): -0.729024
@@ -2693,7 +2677,6 @@ ECLCluster#27:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1006001
   getZernikeMVA(): 0.194336
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2707,7 +2690,6 @@ ECLCluster#27:
 ECLCluster#28:
   getAbsZernike40(): 1.39785
   getAbsZernike51(): 0.172266
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-39.8493,-134.848,-8.32757)
   getConnectedRegionId(): 11
@@ -2728,6 +2710,7 @@ ECLCluster#28:
   getLAT(): 0.236328
   getMaxECellId(): 0
   getMinTrkDistance(): 134.033
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): -1.85813
@@ -2743,7 +2726,6 @@ ECLCluster#28:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1106001
   getZernikeMVA(): 0.166016
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2757,7 +2739,6 @@ ECLCluster#28:
 ECLCluster#29:
   getAbsZernike40(): 1.4377
   getAbsZernike51(): 0.315234
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-35.3413,136.312,-27.0504)
   getConnectedRegionId(): 12
@@ -2778,6 +2759,7 @@ ECLCluster#29:
   getLAT(): 0.125
   getMaxECellId(): 0
   getMinTrkDistance(): 181.885
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 1.82448
@@ -2793,7 +2775,6 @@ ECLCluster#29:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1206001
   getZernikeMVA(): 0.21582
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2807,7 +2788,6 @@ ECLCluster#29:
 ECLCluster#30:
   getAbsZernike40(): 0.283887
   getAbsZernike51(): 0.546094
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (140.519,-1.3742,-51.4618)
   getConnectedRegionId(): 13
@@ -2828,6 +2808,7 @@ ECLCluster#30:
   getLAT(): 0.520508
   getMaxECellId(): 0
   getMinTrkDistance(): 108.887
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 17.9688
   getNumberOfHadronDigits(): 0
   getPhi(): -0.00977913
@@ -2845,7 +2826,6 @@ ECLCluster#30:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1306001
   getZernikeMVA(): 0.998047
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2859,7 +2839,6 @@ ECLCluster#30:
 ECLCluster#31:
   getAbsZernike40(): 1.30488
   getAbsZernike51(): 0.105469
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (123.088,-67.1176,-77.2865)
   getConnectedRegionId(): 14
@@ -2880,6 +2859,7 @@ ECLCluster#31:
   getLAT(): 0.125977
   getMaxECellId(): 0
   getMinTrkDistance(): 86.1816
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): -0.499215
@@ -2896,7 +2876,6 @@ ECLCluster#31:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1406001
   getZernikeMVA(): 0.705078
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2910,7 +2889,6 @@ ECLCluster#31:
 ECLCluster#32:
   getAbsZernike40(): 1.37627
   getAbsZernike51(): 0.291797
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (127.869,56.6363,-90.2211)
   getConnectedRegionId(): 15
@@ -2931,6 +2909,7 @@ ECLCluster#32:
   getLAT(): 0.132812
   getMaxECellId(): 0
   getMinTrkDistance(): 171.387
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
   getPhi(): 0.416955
@@ -2946,7 +2925,6 @@ ECLCluster#32:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1506001
   getZernikeMVA(): 0.149414
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -2960,7 +2938,6 @@ ECLCluster#32:
 ECLCluster#33:
   getAbsZernike40(): 1.43271
   getAbsZernike51(): 0.258984
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (54.1965,-117.313,-113.805)
   getConnectedRegionId(): 16
@@ -2981,6 +2958,7 @@ ECLCluster#33:
   getLAT(): 0
   getMaxECellId(): 0
   getMinTrkDistance(): 15.1367
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
   getPhi(): -1.13802
@@ -2996,7 +2974,6 @@ ECLCluster#33:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1606001
   getZernikeMVA(): 0.59375
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -3010,7 +2987,6 @@ ECLCluster#33:
 ECLCluster#34:
   getAbsZernike40(): 0.863281
   getAbsZernike51(): 0.526172
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-65.8506,-71.5169,-115.167)
   getConnectedRegionId(): 17
@@ -3031,6 +3007,7 @@ ECLCluster#34:
   getLAT(): 0.402344
   getMaxECellId(): 0
   getMinTrkDistance(): 47.8516
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): -2.31497
@@ -3046,7 +3023,6 @@ ECLCluster#34:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1706001
   getZernikeMVA(): 0.636719
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -3060,7 +3036,6 @@ ECLCluster#34:
 ECLCluster#35:
   getAbsZernike40(): 1.25342
   getAbsZernike51(): 0.394922
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (40.6597,-64.4135,-116.195)
   getConnectedRegionId(): 18
@@ -3081,6 +3056,7 @@ ECLCluster#35:
   getLAT(): 0.103516
   getMaxECellId(): 0
   getMinTrkDistance(): 45.8984
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -1.00773
@@ -3097,7 +3073,6 @@ ECLCluster#35:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1806001
   getZernikeMVA(): 0.673828
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -3111,7 +3086,6 @@ ECLCluster#35:
 ECLCluster#36:
   getAbsZernike40(): 1.32148
   getAbsZernike51(): 0.510937
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-24.9582,-58.2077,-116.598)
   getConnectedRegionId(): 19
@@ -3132,6 +3106,7 @@ ECLCluster#36:
   getLAT(): 0.0439453
   getMaxECellId(): 0
   getMinTrkDistance(): 41.2598
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): -1.97586
@@ -3147,7 +3122,6 @@ ECLCluster#36:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1906001
   getZernikeMVA(): 0.59668
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -3553,6 +3527,7 @@ TRGSummary:
   getTRGSummary(9): 0
   getTimQuality(): 0
   getTimType(): 15
+  isPoissonInInjectionVeto(): False
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(35)
     pair
@@ -6948,7 +6923,6 @@ PIDLikelihood#7:
 ECLCluster#0:
   getAbsZernike40(): 0.283887
   getAbsZernike51(): 0.737109
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-19.9561,-68.5697,211.502)
   getConnectedRegionId(): 1
@@ -6973,6 +6947,7 @@ ECLCluster#0:
   getLAT(): 0.0107422
   getMaxECellId(): 0
   getMinTrkDistance(): 23.6816
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -1.85401
@@ -6988,7 +6963,6 @@ ECLCluster#0:
   getUncertaintyEnergy(): 0.00820313
   getUncertaintyPhi(): 0.00996094
   getUncertaintyTheta(): 0.00371094
-  getUniqueId(): 105001
   getZernikeMVA(): 0.280273
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7002,7 +6976,6 @@ ECLCluster#0:
 ECLCluster#1:
   getAbsZernike40(): 0.735449
   getAbsZernike51(): 0.648047
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (40.0134,-130.331,203.405)
   getConnectedRegionId(): 2
@@ -7023,6 +6996,7 @@ ECLCluster#1:
   getLAT(): 0.305664
   getMaxECellId(): 0
   getMinTrkDistance(): 60.5469
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 9.96094
   getNumberOfHadronDigits(): 0
   getPhi(): -1.27292
@@ -7039,7 +7013,6 @@ ECLCluster#1:
   getUncertaintyEnergy(): 0.0120117
   getUncertaintyPhi(): 0.00585938
   getUncertaintyTheta(): 0.0046875
-  getUniqueId(): 205001
   getZernikeMVA(): 0.119141
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7053,7 +7026,6 @@ ECLCluster#1:
 ECLCluster#2:
   getAbsZernike40(): 0.74873
   getAbsZernike51(): 0.755859
-  getClusterHadronIntensity(): 0
   getClusterId(): 2
   getClusterPosition(): (50.7777,-126.516,204.258)
   getConnectedRegionId(): 2
@@ -7074,6 +7046,7 @@ ECLCluster#2:
   getLAT(): 0.272461
   getMaxECellId(): 0
   getMinTrkDistance(): 69.0918
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 8.78906
   getNumberOfHadronDigits(): 0
   getPhi(): -1.18912
@@ -7090,7 +7063,6 @@ ECLCluster#2:
   getUncertaintyEnergy(): 0.0120117
   getUncertaintyPhi(): 0.00585938
   getUncertaintyTheta(): 0.0046875
-  getUniqueId(): 205002
   getZernikeMVA(): 0.124023
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7104,7 +7076,6 @@ ECLCluster#2:
 ECLCluster#3:
   getAbsZernike40(): 0.843359
   getAbsZernike51(): 0.878906
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-131.702,-40.0064,159.846)
   getConnectedRegionId(): 4
@@ -7125,6 +7096,7 @@ ECLCluster#3:
   getLAT(): 0.106445
   getMaxECellId(): 0
   getMinTrkDistance(): 104.492
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): -2.84668
@@ -7141,7 +7113,6 @@ ECLCluster#3:
   getUncertaintyEnergy(): 0.00703125
   getUncertaintyPhi(): 0.00722656
   getUncertaintyTheta(): 0.00585938
-  getUniqueId(): 405001
   getZernikeMVA(): 0.681641
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7155,7 +7126,6 @@ ECLCluster#3:
 ECLCluster#4:
   getAbsZernike40(): 1.41777
   getAbsZernike51(): 0.404297
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (25.8941,135.677,146.252)
   getConnectedRegionId(): 5
@@ -7176,6 +7146,7 @@ ECLCluster#4:
   getLAT(): 0.046875
   getMaxECellId(): 0
   getMinTrkDistance(): 157.715
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 1.38221
@@ -7191,7 +7162,6 @@ ECLCluster#4:
   getUncertaintyEnergy(): 0.00322266
   getUncertaintyPhi(): 0.00957031
   getUncertaintyTheta(): 0.0078125
-  getUniqueId(): 505001
   getZernikeMVA(): 0.647461
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7205,7 +7175,6 @@ ECLCluster#4:
 ECLCluster#5:
   getAbsZernike40(): 0.95127
   getAbsZernike51(): 0.137109
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-95.8542,100.024,129.776)
   getConnectedRegionId(): 6
@@ -7226,6 +7195,7 @@ ECLCluster#5:
   getLAT(): 0.330078
   getMaxECellId(): 0
   getMinTrkDistance(): 44.4336
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): 2.33491
@@ -7241,7 +7211,6 @@ ECLCluster#5:
   getUncertaintyEnergy(): 0.00117187
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.009375
-  getUniqueId(): 605001
   getZernikeMVA(): 0.292969
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7255,7 +7224,6 @@ ECLCluster#5:
 ECLCluster#6:
   getAbsZernike40(): 0.00498047
   getAbsZernike51(): 0.199219
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-128.51,-52.051,126.018)
   getConnectedRegionId(): 7
@@ -7276,6 +7244,7 @@ ECLCluster#6:
   getLAT(): 0.352539
   getMaxECellId(): 0
   getMinTrkDistance(): 117.188
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.61719
   getNumberOfHadronDigits(): 0
   getPhi(): -2.75676
@@ -7292,7 +7261,6 @@ ECLCluster#6:
   getUncertaintyEnergy(): 0.00234375
   getUncertaintyPhi(): 0.0103516
   getUncertaintyTheta(): 0.00859375
-  getUniqueId(): 705001
   getZernikeMVA(): 0.0185547
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7306,7 +7274,6 @@ ECLCluster#6:
 ECLCluster#7:
   getAbsZernike40(): 0.481445
   getAbsZernike51(): 0.289453
-  getClusterHadronIntensity(): 0
   getClusterId(): 2
   getClusterPosition(): (-120.189,-69.0792,127.607)
   getConnectedRegionId(): 7
@@ -7327,6 +7294,7 @@ ECLCluster#7:
   getLAT(): 0.400391
   getMaxECellId(): 0
   getMinTrkDistance(): 110.352
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 9.375
   getNumberOfHadronDigits(): 0
   getPhi(): -2.61994
@@ -7345,7 +7313,6 @@ ECLCluster#7:
   getUncertaintyEnergy(): 0.00380859
   getUncertaintyPhi(): 0.00917969
   getUncertaintyTheta(): 0.00742187
-  getUniqueId(): 705002
   getZernikeMVA(): 0.0322266
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7359,7 +7326,6 @@ ECLCluster#7:
 ECLCluster#8:
   getAbsZernike40(): 0.0713867
   getAbsZernike51(): 0.191016
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-114.785,78.267,117.617)
   getConnectedRegionId(): 8
@@ -7380,6 +7346,7 @@ ECLCluster#8:
   getLAT(): 0.412109
   getMaxECellId(): 0
   getMinTrkDistance(): 18.7988
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
   getPhi(): 2.54315
@@ -7398,7 +7365,6 @@ ECLCluster#8:
   getUncertaintyEnergy(): 0.0111328
   getUncertaintyPhi(): 0.00605469
   getUncertaintyTheta(): 0.00488281
-  getUniqueId(): 805001
   getZernikeMVA(): 0.105469
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7412,7 +7378,6 @@ ECLCluster#8:
 ECLCluster#9:
   getAbsZernike40(): 1.5207
   getAbsZernike51(): 0.0363281
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-21.0042,-137.952,99.9571)
   getConnectedRegionId(): 9
@@ -7433,6 +7398,7 @@ ECLCluster#9:
   getLAT(): 0.0361328
   getMaxECellId(): 0
   getMinTrkDistance(): 63.4766
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): -1.72189
@@ -7448,7 +7414,6 @@ ECLCluster#9:
   getUncertaintyEnergy(): 0.00380859
   getUncertaintyPhi(): 0.00917969
   getUncertaintyTheta(): 0.00742187
-  getUniqueId(): 905001
   getZernikeMVA(): 0.345703
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7462,7 +7427,6 @@ ECLCluster#9:
 ECLCluster#10:
   getAbsZernike40(): 1.46094
   getAbsZernike51(): 0.295312
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-130.405,50.2596,93.5169)
   getConnectedRegionId(): 10
@@ -7483,6 +7447,7 @@ ECLCluster#10:
   getLAT(): 0.0322266
   getMaxECellId(): 0
   getMinTrkDistance(): 28.5645
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 2.77372
@@ -7498,7 +7463,6 @@ ECLCluster#10:
   getUncertaintyEnergy(): 0.00292969
   getUncertaintyPhi(): 0.00976562
   getUncertaintyTheta(): 0.00800781
-  getUniqueId(): 1005001
   getZernikeMVA(): 0.560547
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7512,7 +7476,6 @@ ECLCluster#10:
 ECLCluster#11:
   getAbsZernike40(): 1.104
   getAbsZernike51(): 0.316406
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (122.582,68.1436,72.9882)
   getConnectedRegionId(): 11
@@ -7533,6 +7496,7 @@ ECLCluster#11:
   getLAT(): 0.410156
   getMaxECellId(): 0
   getMinTrkDistance(): 229.98
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
   getPhi(): 0.507364
@@ -7550,7 +7514,6 @@ ECLCluster#11:
   getUncertaintyEnergy(): 0.00644531
   getUncertaintyPhi(): 0.00761719
   getUncertaintyTheta(): 0.00605469
-  getUniqueId(): 1105001
   getZernikeMVA(): 0.769531
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7564,7 +7527,6 @@ ECLCluster#11:
 ECLCluster#12:
   getAbsZernike40(): 1.51904
   getAbsZernike51(): 0.0609375
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-117.047,77.9326,59.0372)
   getConnectedRegionId(): 13
@@ -7585,6 +7547,7 @@ ECLCluster#12:
   getLAT(): 0.0419922
   getMaxECellId(): 0
   getMinTrkDistance(): 15.1367
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 2.55417
@@ -7600,7 +7563,6 @@ ECLCluster#12:
   getUncertaintyEnergy(): 0.00498047
   getUncertaintyPhi(): 0.00820313
   getUncertaintyTheta(): 0.00664062
-  getUniqueId(): 1305001
   getZernikeMVA(): 0.34668
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7614,7 +7576,6 @@ ECLCluster#12:
 ECLCluster#13:
   getAbsZernike40(): 0.489746
   getAbsZernike51(): 0.672656
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-62.8263,-125.774,9.77459)
   getConnectedRegionId(): 15
@@ -7635,6 +7596,7 @@ ECLCluster#13:
   getLAT(): 0.337891
   getMaxECellId(): 0
   getMinTrkDistance(): 16.3574
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): -2.03406
@@ -7651,7 +7613,6 @@ ECLCluster#13:
   getUncertaintyEnergy(): 0.00351562
   getUncertaintyPhi(): 0.009375
   getUncertaintyTheta(): 0.00761719
-  getUniqueId(): 1505001
   getZernikeMVA(): 0.109375
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7665,7 +7626,6 @@ ECLCluster#13:
 ECLCluster#14:
   getAbsZernike40(): 1.30156
   getAbsZernike51(): 0.588281
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-140.574,2.88455,-1.61095)
   getConnectedRegionId(): 16
@@ -7686,6 +7646,7 @@ ECLCluster#14:
   getLAT(): 0.0527344
   getMaxECellId(): 0
   getMinTrkDistance(): 92.041
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 3.12108
@@ -7701,7 +7662,6 @@ ECLCluster#14:
   getUncertaintyEnergy(): 0.00292969
   getUncertaintyPhi(): 0.00996094
   getUncertaintyTheta(): 0.00820313
-  getUniqueId(): 1605001
   getZernikeMVA(): 0.707031
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7715,7 +7675,6 @@ ECLCluster#14:
 ECLCluster#15:
   getAbsZernike40(): 0.63252
   getAbsZernike51(): 0.304688
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (114.523,-80.3611,-87.0421)
   getConnectedRegionId(): 18
@@ -7736,6 +7695,7 @@ ECLCluster#15:
   getLAT(): 0.102539
   getMaxECellId(): 0
   getMinTrkDistance(): 204.834
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.32031
   getNumberOfHadronDigits(): 0
   getPhi(): -0.611867
@@ -7752,7 +7712,6 @@ ECLCluster#15:
   getUncertaintyEnergy(): 0.00146484
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.009375
-  getUniqueId(): 1805001
   getZernikeMVA(): 0.0400391
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7766,7 +7725,6 @@ ECLCluster#15:
 ECLCluster#16:
   getAbsZernike40(): 0.763672
   getAbsZernike51(): 0.217969
-  getClusterHadronIntensity(): 0
   getClusterId(): 2
   getClusterPosition(): (124.359,-64.159,-85.9381)
   getConnectedRegionId(): 18
@@ -7787,6 +7745,7 @@ ECLCluster#16:
   getLAT(): 0.0693359
   getMaxECellId(): 0
   getMinTrkDistance(): 215.576
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.71094
   getNumberOfHadronDigits(): 0
   getPhi(): -0.476301
@@ -7803,7 +7762,6 @@ ECLCluster#16:
   getUncertaintyEnergy(): 0.00205078
   getUncertaintyPhi(): 0.0105469
   getUncertaintyTheta(): 0.00898437
-  getUniqueId(): 1805002
   getZernikeMVA(): 0.0341797
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7817,7 +7775,6 @@ ECLCluster#16:
 ECLCluster#17:
   getAbsZernike40(): 0.581055
   getAbsZernike51(): 0.434766
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (126.273,59.7522,-93.4004)
   getConnectedRegionId(): 19
@@ -7838,6 +7795,7 @@ ECLCluster#17:
   getLAT(): 0.25293
   getMaxECellId(): 0
   getMinTrkDistance(): 250
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
   getPhi(): 0.441978
@@ -7853,7 +7811,6 @@ ECLCluster#17:
   getUncertaintyEnergy(): 0.00498047
   getUncertaintyPhi(): 0.00820313
   getUncertaintyTheta(): 0.00664062
-  getUniqueId(): 1905001
   getZernikeMVA(): 0.551758
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7867,7 +7824,6 @@ ECLCluster#17:
 ECLCluster#18:
   getAbsZernike40(): 0.405078
   getAbsZernike51(): 0.423047
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (138.74,17.5307,-88.7801)
   getConnectedRegionId(): 17
@@ -7888,6 +7844,7 @@ ECLCluster#18:
   getLAT(): 0.34375
   getMaxECellId(): 0
   getMinTrkDistance(): 250
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
   getPhi(): 0.125691
@@ -7906,7 +7863,6 @@ ECLCluster#18:
   getUncertaintyEnergy(): 0.0111328
   getUncertaintyPhi(): 0.00605469
   getUncertaintyTheta(): 0.00488281
-  getUniqueId(): 1705001
   getZernikeMVA(): 0.744141
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7920,7 +7876,6 @@ ECLCluster#18:
 ECLCluster#19:
   getAbsZernike40(): 1.07578
   getAbsZernike51(): 0.748828
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (46.5125,108.938,-114.301)
   getConnectedRegionId(): 21
@@ -7941,6 +7896,7 @@ ECLCluster#19:
   getLAT(): 0.112305
   getMaxECellId(): 0
   getMinTrkDistance(): 230.469
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 1.16726
@@ -7957,7 +7913,6 @@ ECLCluster#19:
   getUncertaintyEnergy(): 0.00117187
   getUncertaintyPhi(): 0.0150391
   getUncertaintyTheta(): 0.0103516
-  getUniqueId(): 2105001
   getZernikeMVA(): 0.763672
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -7971,7 +7926,6 @@ ECLCluster#19:
 ECLCluster#20:
   getAbsZernike40(): 0.604297
   getAbsZernike51(): 0.644531
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (112.769,-17.0372,-114.487)
   getConnectedRegionId(): 20
@@ -7992,6 +7946,7 @@ ECLCluster#20:
   getLAT(): 0.352539
   getMaxECellId(): 0
   getMinTrkDistance(): 235.352
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 14.0625
   getNumberOfHadronDigits(): 0
   getPhi(): -0.149947
@@ -8009,7 +7964,6 @@ ECLCluster#20:
   getUncertaintyEnergy(): 0.0199219
   getUncertaintyPhi(): 0.00722656
   getUncertaintyTheta(): 0.00449219
-  getUniqueId(): 2005001
   getZernikeMVA(): 0.796875
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8023,7 +7977,6 @@ ECLCluster#20:
 ECLCluster#21:
   getAbsZernike40(): 1.20527
   getAbsZernike51(): 0.420703
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-19.9561,-68.5697,211.502)
   getConnectedRegionId(): 1
@@ -8049,6 +8002,7 @@ ECLCluster#21:
   getLAT(): 0.0107422
   getMaxECellId(): 0
   getMinTrkDistance(): 23.6816
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -1.85401
@@ -8064,7 +8018,6 @@ ECLCluster#21:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 106001
   getZernikeMVA(): 0.719727
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8078,7 +8031,6 @@ ECLCluster#21:
 ECLCluster#22:
   getAbsZernike40(): 0.700586
   getAbsZernike51(): 0.171094
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (44.3465,-128.825,203.081)
   getConnectedRegionId(): 2
@@ -8099,6 +8051,7 @@ ECLCluster#22:
   getLAT(): 0.526367
   getMaxECellId(): 0
   getMinTrkDistance(): 63.4766
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 19.9219
   getNumberOfHadronDigits(): 0
   getPhi(): -1.23926
@@ -8115,7 +8068,6 @@ ECLCluster#22:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 206001
   getZernikeMVA(): 0.985352
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8129,7 +8081,6 @@ ECLCluster#22:
 ECLCluster#23:
   getAbsZernike40(): 1.35801
   getAbsZernike51(): 0.471094
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-131.702,-40.0064,159.846)
   getConnectedRegionId(): 4
@@ -8150,6 +8101,7 @@ ECLCluster#23:
   getLAT(): 0.106445
   getMaxECellId(): 0
   getMinTrkDistance(): 104.492
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): -2.84668
@@ -8166,7 +8118,6 @@ ECLCluster#23:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 406001
   getZernikeMVA(): 0.318359
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8180,7 +8131,6 @@ ECLCluster#23:
 ECLCluster#24:
   getAbsZernike40(): 1.53232
   getAbsZernike51(): 0.165234
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (25.8941,135.677,146.252)
   getConnectedRegionId(): 5
@@ -8201,6 +8151,7 @@ ECLCluster#24:
   getLAT(): 0.046875
   getMaxECellId(): 0
   getMinTrkDistance(): 157.715
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 1.38221
@@ -8216,7 +8167,6 @@ ECLCluster#24:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 506001
   getZernikeMVA(): 0.352539
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8230,7 +8180,6 @@ ECLCluster#24:
 ECLCluster#25:
   getAbsZernike40(): 1.13057
   getAbsZernike51(): 0.0246094
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-95.8542,100.024,129.776)
   getConnectedRegionId(): 6
@@ -8251,6 +8200,7 @@ ECLCluster#25:
   getLAT(): 0.330078
   getMaxECellId(): 0
   getMinTrkDistance(): 44.4336
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): 2.33491
@@ -8266,7 +8216,6 @@ ECLCluster#25:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 606001
   getZernikeMVA(): 0.707031
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8280,7 +8229,6 @@ ECLCluster#25:
 ECLCluster#26:
   getAbsZernike40(): 0.366895
   getAbsZernike51(): 0.264844
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-123.063,-63.3409,127.465)
   getConnectedRegionId(): 7
@@ -8301,6 +8249,7 @@ ECLCluster#26:
   getLAT(): 0.839844
   getMaxECellId(): 0
   getMinTrkDistance(): 112.061
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 16.9922
   getNumberOfHadronDigits(): 0
   getPhi(): -2.66625
@@ -8319,7 +8268,6 @@ ECLCluster#26:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 706001
   getZernikeMVA(): 0.999023
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8333,7 +8281,6 @@ ECLCluster#26:
 ECLCluster#27:
   getAbsZernike40(): 0.986133
   getAbsZernike51(): 0.183984
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-114.785,78.267,117.617)
   getConnectedRegionId(): 8
@@ -8354,6 +8301,7 @@ ECLCluster#27:
   getLAT(): 0.412109
   getMaxECellId(): 0
   getMinTrkDistance(): 18.7988
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
   getPhi(): 2.54315
@@ -8372,7 +8320,6 @@ ECLCluster#27:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 806001
   getZernikeMVA(): 0.894531
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8386,7 +8333,6 @@ ECLCluster#27:
 ECLCluster#28:
   getAbsZernike40(): 1.56221
   getAbsZernike51(): 0.00703125
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-21.0042,-137.952,99.9571)
   getConnectedRegionId(): 9
@@ -8407,6 +8353,7 @@ ECLCluster#28:
   getLAT(): 0.0361328
   getMaxECellId(): 0
   getMinTrkDistance(): 63.4766
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): -1.72189
@@ -8422,7 +8369,6 @@ ECLCluster#28:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 906001
   getZernikeMVA(): 0.654297
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8436,7 +8382,6 @@ ECLCluster#28:
 ECLCluster#29:
   getAbsZernike40(): 1.54893
   getAbsZernike51(): 0.132422
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-130.405,50.2596,93.5169)
   getConnectedRegionId(): 10
@@ -8457,6 +8402,7 @@ ECLCluster#29:
   getLAT(): 0.0322266
   getMaxECellId(): 0
   getMinTrkDistance(): 28.5645
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 2.77372
@@ -8472,7 +8418,6 @@ ECLCluster#29:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1006001
   getZernikeMVA(): 0.439453
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8486,7 +8431,6 @@ ECLCluster#29:
 ECLCluster#30:
   getAbsZernike40(): 1.2916
   getAbsZernike51(): 0.146484
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (122.582,68.1436,72.9882)
   getConnectedRegionId(): 11
@@ -8507,6 +8451,7 @@ ECLCluster#30:
   getLAT(): 0.410156
   getMaxECellId(): 0
   getMinTrkDistance(): 229.98
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
   getPhi(): 0.507364
@@ -8524,7 +8469,6 @@ ECLCluster#30:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1106001
   getZernikeMVA(): 0.230469
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8538,7 +8482,6 @@ ECLCluster#30:
 ECLCluster#31:
   getAbsZernike40(): 1.55557
   getAbsZernike51(): 0.0140625
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-117.047,77.9326,59.0372)
   getConnectedRegionId(): 13
@@ -8559,6 +8502,7 @@ ECLCluster#31:
   getLAT(): 0.0419922
   getMaxECellId(): 0
   getMinTrkDistance(): 15.1367
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 2.55417
@@ -8574,7 +8518,6 @@ ECLCluster#31:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1306001
   getZernikeMVA(): 0.65332
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8588,7 +8531,6 @@ ECLCluster#31:
 ECLCluster#32:
   getAbsZernike40(): 1.05088
   getAbsZernike51(): 0.0445313
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-62.8263,-125.774,9.77459)
   getConnectedRegionId(): 15
@@ -8609,6 +8551,7 @@ ECLCluster#32:
   getLAT(): 0.337891
   getMaxECellId(): 0
   getMinTrkDistance(): 16.3574
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): -2.03406
@@ -8625,7 +8568,6 @@ ECLCluster#32:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1506001
   getZernikeMVA(): 0.890625
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8639,7 +8581,6 @@ ECLCluster#32:
 ECLCluster#33:
   getAbsZernike40(): 1.50244
   getAbsZernike51(): 0.261328
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-140.574,2.88455,-1.61095)
   getConnectedRegionId(): 16
@@ -8660,6 +8601,7 @@ ECLCluster#33:
   getLAT(): 0.0527344
   getMaxECellId(): 0
   getMinTrkDistance(): 92.041
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 3.12108
@@ -8675,7 +8617,6 @@ ECLCluster#33:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1606001
   getZernikeMVA(): 0.292969
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8689,7 +8630,6 @@ ECLCluster#33:
 ECLCluster#34:
   getAbsZernike40(): 0.00166016
   getAbsZernike51(): 0.120703
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (119.789,-71.7205,-86.1501)
   getConnectedRegionId(): 18
@@ -8710,6 +8650,7 @@ ECLCluster#34:
   getLAT(): 0.751953
   getMaxECellId(): 0
   getMinTrkDistance(): 210.205
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): -0.539482
@@ -8726,7 +8667,6 @@ ECLCluster#34:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1806001
   getZernikeMVA(): 0.999023
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8740,7 +8680,6 @@ ECLCluster#34:
 ECLCluster#35:
   getAbsZernike40(): 1.22686
   getAbsZernike51(): 0.336328
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (126.273,59.7522,-93.4004)
   getConnectedRegionId(): 19
@@ -8761,6 +8700,7 @@ ECLCluster#35:
   getLAT(): 0.25293
   getMaxECellId(): 0
   getMinTrkDistance(): 250
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
   getPhi(): 0.441978
@@ -8776,7 +8716,6 @@ ECLCluster#35:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1906001
   getZernikeMVA(): 0.448242
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8790,7 +8729,6 @@ ECLCluster#35:
 ECLCluster#36:
   getAbsZernike40(): 1.12725
   getAbsZernike51(): 0.331641
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (138.74,17.5307,-88.7801)
   getConnectedRegionId(): 17
@@ -8811,6 +8749,7 @@ ECLCluster#36:
   getLAT(): 0.34375
   getMaxECellId(): 0
   getMinTrkDistance(): 250
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
   getPhi(): 0.125691
@@ -8829,7 +8768,6 @@ ECLCluster#36:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1706001
   getZernikeMVA(): 0.255859
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8843,7 +8781,6 @@ ECLCluster#36:
 ECLCluster#37:
   getAbsZernike40(): 1.43437
   getAbsZernike51(): 0.342187
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (46.5125,108.938,-114.301)
   getConnectedRegionId(): 21
@@ -8864,6 +8801,7 @@ ECLCluster#37:
   getLAT(): 0.112305
   getMaxECellId(): 0
   getMinTrkDistance(): 230.469
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 1.16726
@@ -8880,7 +8818,6 @@ ECLCluster#37:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 2106001
   getZernikeMVA(): 0.236328
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -8894,7 +8831,6 @@ ECLCluster#37:
 ECLCluster#38:
   getAbsZernike40(): 1.19531
   getAbsZernike51(): 0.301172
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (112.769,-17.0372,-114.487)
   getConnectedRegionId(): 20
@@ -8915,6 +8851,7 @@ ECLCluster#38:
   getLAT(): 0.352539
   getMaxECellId(): 0
   getMinTrkDistance(): 235.352
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 14.0625
   getNumberOfHadronDigits(): 0
   getPhi(): -0.149947
@@ -8932,7 +8869,6 @@ ECLCluster#38:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 2006001
   getZernikeMVA(): 0.203125
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -9339,6 +9275,7 @@ TRGSummary:
   getTRGSummary(9): 0
   getTimQuality(): 0
   getTimType(): 15
+  isPoissonInInjectionVeto(): False
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(35)
     pair
@@ -12259,7 +12196,6 @@ PIDLikelihood#4:
 ECLCluster#0:
   getAbsZernike40(): 0.512988
   getAbsZernike51(): 0.807422
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (29.6661,72.2071,211.439)
   getConnectedRegionId(): 1
@@ -12284,6 +12220,7 @@ ECLCluster#0:
   getLAT(): 0.19043
   getMaxECellId(): 0
   getMinTrkDistance(): 139.893
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 9.96094
   getNumberOfHadronDigits(): 0
   getPhi(): 1.18097
@@ -12299,7 +12236,6 @@ ECLCluster#0:
   getUncertaintyEnergy(): 0.00439453
   getUncertaintyPhi(): 0.0123047
   getUncertaintyTheta(): 0.0046875
-  getUniqueId(): 105001
   getZernikeMVA(): 0.712891
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12313,7 +12249,6 @@ ECLCluster#0:
 ECLCluster#1:
   getAbsZernike40(): 0.569434
   getAbsZernike51(): 0.375
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-98.1965,29.983,210.979)
   getConnectedRegionId(): 2
@@ -12334,6 +12269,7 @@ ECLCluster#1:
   getLAT(): 0.46582
   getMaxECellId(): 0
   getMinTrkDistance(): 14.1602
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 12.8906
   getNumberOfHadronDigits(): 0
   getPhi(): 2.84525
@@ -12353,7 +12289,6 @@ ECLCluster#1:
   getUncertaintyEnergy(): 0.0143555
   getUncertaintyPhi(): 0.00800781
   getUncertaintyTheta(): 0.003125
-  getUniqueId(): 205001
   getZernikeMVA(): 0.15332
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12367,7 +12302,6 @@ ECLCluster#1:
 ECLCluster#2:
   getAbsZernike40(): 0.360254
   getAbsZernike51(): 0.528516
-  getClusterHadronIntensity(): 0
   getClusterId(): 2
   getClusterPosition(): (-111.6,32.1547,210.797)
   getConnectedRegionId(): 2
@@ -12388,6 +12322,7 @@ ECLCluster#2:
   getLAT(): 0.399414
   getMaxECellId(): 0
   getMinTrkDistance(): 18.5547
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 2.86107
@@ -12406,7 +12341,6 @@ ECLCluster#2:
   getUncertaintyEnergy(): 0.00380859
   getUncertaintyPhi(): 0.0130859
   getUncertaintyTheta(): 0.00507813
-  getUniqueId(): 205002
   getZernikeMVA(): 0.119141
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12420,7 +12354,6 @@ ECLCluster#2:
 ECLCluster#3:
   getAbsZernike40(): 0.722168
   getAbsZernike51(): 0.672656
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-56.0705,-124.554,194.422)
   getConnectedRegionId(): 3
@@ -12441,6 +12374,7 @@ ECLCluster#3:
   getLAT(): 0.146484
   getMaxECellId(): 0
   getMinTrkDistance(): 154.297
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
   getPhi(): -1.99379
@@ -12457,7 +12391,6 @@ ECLCluster#3:
   getUncertaintyEnergy(): 0.00878906
   getUncertaintyPhi(): 0.00664062
   getUncertaintyTheta(): 0.00527344
-  getUniqueId(): 305001
   getZernikeMVA(): 0.869141
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12471,7 +12404,6 @@ ECLCluster#3:
 ECLCluster#4:
   getAbsZernike40(): 1.20029
   getAbsZernike51(): 0.667969
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-119.281,-74.385,58.7255)
   getConnectedRegionId(): 4
@@ -12492,6 +12424,7 @@ ECLCluster#4:
   getLAT(): 0.114258
   getMaxECellId(): 0
   getMinTrkDistance(): 142.822
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): -2.58399
@@ -12507,7 +12440,6 @@ ECLCluster#4:
   getUncertaintyEnergy(): 0.00322266
   getUncertaintyPhi(): 0.00957031
   getUncertaintyTheta(): 0.0078125
-  getUniqueId(): 405001
   getZernikeMVA(): 0.823242
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12521,7 +12453,6 @@ ECLCluster#4:
 ECLCluster#5:
   getAbsZernike40(): 0.602637
   getAbsZernike51(): 0.556641
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-55.8246,129.201,41.5627)
   getConnectedRegionId(): 5
@@ -12542,6 +12473,7 @@ ECLCluster#5:
   getLAT(): 0.410156
   getMaxECellId(): 0
   getMinTrkDistance(): 17.8223
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
   getPhi(): 1.97864
@@ -12557,7 +12489,6 @@ ECLCluster#5:
   getUncertaintyEnergy(): 0.0123047
   getUncertaintyPhi(): 0.00566406
   getUncertaintyTheta(): 0.0046875
-  getUniqueId(): 505001
   getZernikeMVA(): 0.739258
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12571,7 +12502,6 @@ ECLCluster#5:
 ECLCluster#6:
   getAbsZernike40(): 0.800195
   getAbsZernike51(): 0.652734
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (136.244,-35.5608,26.7756)
   getConnectedRegionId(): 6
@@ -12592,6 +12522,7 @@ ECLCluster#6:
   getLAT(): 0.21875
   getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 15.0391
   getNumberOfHadronDigits(): 0
   getPhi(): -0.255312
@@ -12607,7 +12538,6 @@ ECLCluster#6:
   getUncertaintyEnergy(): 0.0178711
   getUncertaintyPhi(): 0.00488281
   getUncertaintyTheta(): 0.00410156
-  getUniqueId(): 605001
   getZernikeMVA(): 0.899414
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12621,7 +12551,6 @@ ECLCluster#6:
 ECLCluster#7:
   getAbsZernike40(): 0.504687
   getAbsZernike51(): 0.525
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-103.467,95.141,4.3002)
   getConnectedRegionId(): 7
@@ -12642,6 +12571,7 @@ ECLCluster#7:
   getLAT(): 0.261719
   getMaxECellId(): 0
   getMinTrkDistance(): 40.0391
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 2.39809
@@ -12658,7 +12588,6 @@ ECLCluster#7:
   getUncertaintyEnergy(): 0.000878906
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.009375
-  getUniqueId(): 705001
   getZernikeMVA(): 0.661133
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12672,7 +12601,6 @@ ECLCluster#7:
 ECLCluster#8:
   getAbsZernike40(): 0.569434
   getAbsZernike51(): 0.283594
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-127.677,58.8066,1.85992)
   getConnectedRegionId(): 8
@@ -12693,6 +12621,7 @@ ECLCluster#8:
   getLAT(): 0.274414
   getMaxECellId(): 0
   getMinTrkDistance(): 15.625
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 13.0859
   getNumberOfHadronDigits(): 0
   getPhi(): 2.70997
@@ -12709,7 +12638,6 @@ ECLCluster#8:
   getUncertaintyEnergy(): 0.0178711
   getUncertaintyPhi(): 0.00488281
   getUncertaintyTheta(): 0.00410156
-  getUniqueId(): 805001
   getZernikeMVA(): 0.732422
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12723,7 +12651,6 @@ ECLCluster#8:
 ECLCluster#9:
   getAbsZernike40(): 0.864941
   getAbsZernike51(): 0.741797
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (131.491,-50.1864,-19.0327)
   getConnectedRegionId(): 9
@@ -12744,6 +12671,7 @@ ECLCluster#9:
   getLAT(): 0.205078
   getMaxECellId(): 0
   getMinTrkDistance(): 49.0723
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): -0.364608
@@ -12760,7 +12688,6 @@ ECLCluster#9:
   getUncertaintyEnergy(): 0.00117187
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.009375
-  getUniqueId(): 905001
   getZernikeMVA(): 0.779297
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12774,7 +12701,6 @@ ECLCluster#9:
 ECLCluster#10:
   getAbsZernike40(): 0.982812
   getAbsZernike51(): 0.508594
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-117.451,77.2785,-57.5265)
   getConnectedRegionId(): 10
@@ -12795,6 +12721,7 @@ ECLCluster#10:
   getLAT(): 0.275391
   getMaxECellId(): 0
   getMinTrkDistance(): 62.7441
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 2.55964
@@ -12817,7 +12744,6 @@ ECLCluster#10:
   getUncertaintyEnergy(): 0.00878906
   getUncertaintyPhi(): 0.00664062
   getUncertaintyTheta(): 0.00527344
-  getUniqueId(): 1005001
   getZernikeMVA(): 0.806641
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12831,7 +12757,6 @@ ECLCluster#10:
 ECLCluster#11:
   getAbsZernike40(): 1.0542
   getAbsZernike51(): 0.952734
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (51.8253,-120.516,-112.517)
   getConnectedRegionId(): 11
@@ -12852,6 +12777,7 @@ ECLCluster#11:
   getLAT(): 0
   getMaxECellId(): 0
   getMinTrkDistance(): 179.443
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
   getPhi(): -1.16467
@@ -12867,7 +12793,6 @@ ECLCluster#11:
   getUncertaintyEnergy(): 0.000878906
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.009375
-  getUniqueId(): 1105001
   getZernikeMVA(): 0.345703
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12881,7 +12806,6 @@ ECLCluster#11:
 ECLCluster#12:
   getAbsZernike40(): 1.19199
   getAbsZernike51(): 0.455859
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (29.6704,72.2176,211.438)
   getConnectedRegionId(): 1
@@ -12907,6 +12831,7 @@ ECLCluster#12:
   getLAT(): 0.293945
   getMaxECellId(): 0
   getMinTrkDistance(): 139.893
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 13.0859
   getNumberOfHadronDigits(): 0
   getPhi(): 1.18097
@@ -12922,7 +12847,6 @@ ECLCluster#12:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 106001
   getZernikeMVA(): 0.287109
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12936,7 +12860,6 @@ ECLCluster#12:
 ECLCluster#13:
   getAbsZernike40(): 0.871582
   getAbsZernike51(): 0.219141
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-101.675,30.2793,210.936)
   getConnectedRegionId(): 2
@@ -12957,6 +12880,7 @@ ECLCluster#13:
   getLAT(): 0.689453
   getMaxECellId(): 0
   getMinTrkDistance(): 14.1602
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 21.0938
   getNumberOfHadronDigits(): 0
   getPhi(): 2.85215
@@ -12976,7 +12900,6 @@ ECLCluster#13:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 206001
   getZernikeMVA(): 0.981445
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -12990,7 +12913,6 @@ ECLCluster#13:
 ECLCluster#14:
   getAbsZernike40(): 1.32979
   getAbsZernike51(): 0.380859
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-56.0705,-124.554,194.422)
   getConnectedRegionId(): 3
@@ -13011,6 +12933,7 @@ ECLCluster#14:
   getLAT(): 0.146484
   getMaxECellId(): 0
   getMinTrkDistance(): 154.297
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
   getPhi(): -1.99379
@@ -13027,7 +12950,6 @@ ECLCluster#14:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 306001
   getZernikeMVA(): 0.130859
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -13041,7 +12963,6 @@ ECLCluster#14:
 ECLCluster#15:
   getAbsZernike40(): 1.4626
   getAbsZernike51(): 0.303516
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-119.281,-74.385,58.7255)
   getConnectedRegionId(): 4
@@ -13062,6 +12983,7 @@ ECLCluster#15:
   getLAT(): 0.114258
   getMaxECellId(): 0
   getMinTrkDistance(): 142.822
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): -2.58399
@@ -13077,7 +12999,6 @@ ECLCluster#15:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 406001
   getZernikeMVA(): 0.176758
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -13091,7 +13012,6 @@ ECLCluster#15:
 ECLCluster#16:
   getAbsZernike40(): 1.19697
   getAbsZernike51(): 0.267187
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-55.8246,129.201,41.5627)
   getConnectedRegionId(): 5
@@ -13112,6 +13032,7 @@ ECLCluster#16:
   getLAT(): 0.410156
   getMaxECellId(): 0
   getMinTrkDistance(): 17.8223
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
   getPhi(): 1.97864
@@ -13127,7 +13048,6 @@ ECLCluster#16:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 506001
   getZernikeMVA(): 0.260742
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -13141,7 +13061,6 @@ ECLCluster#16:
 ECLCluster#17:
   getAbsZernike40(): 1.30986
   getAbsZernike51(): 0.352734
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (136.244,-35.5608,26.7756)
   getConnectedRegionId(): 6
@@ -13162,6 +13081,7 @@ ECLCluster#17:
   getLAT(): 0.21875
   getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 15.0391
   getNumberOfHadronDigits(): 0
   getPhi(): -0.255312
@@ -13177,7 +13097,6 @@ ECLCluster#17:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 606001
   getZernikeMVA(): 0.100586
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -13191,7 +13110,6 @@ ECLCluster#17:
 ECLCluster#18:
   getAbsZernike40(): 1.23848
   getAbsZernike51(): 0.248437
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-103.467,95.141,4.3002)
   getConnectedRegionId(): 7
@@ -13212,6 +13130,7 @@ ECLCluster#18:
   getLAT(): 0.261719
   getMaxECellId(): 0
   getMinTrkDistance(): 40.0391
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 2.39809
@@ -13228,7 +13147,6 @@ ECLCluster#18:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 706001
   getZernikeMVA(): 0.338867
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -13242,7 +13160,6 @@ ECLCluster#18:
 ECLCluster#19:
   getAbsZernike40(): 1.21689
   getAbsZernike51(): 0.208594
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-127.683,58.7944,1.85992)
   getConnectedRegionId(): 8
@@ -13263,6 +13180,7 @@ ECLCluster#19:
   getLAT(): 0.299805
   getMaxECellId(): 0
   getMinTrkDistance(): 15.625
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 15.0391
   getNumberOfHadronDigits(): 0
   getPhi(): 2.71006
@@ -13279,7 +13197,6 @@ ECLCluster#19:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 806001
   getZernikeMVA(): 0.267578
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -13293,7 +13210,6 @@ ECLCluster#19:
 ECLCluster#20:
   getAbsZernike40(): 1.33809
   getAbsZernike51(): 0.355078
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (131.491,-50.1864,-19.0327)
   getConnectedRegionId(): 9
@@ -13314,6 +13230,7 @@ ECLCluster#20:
   getLAT(): 0.205078
   getMaxECellId(): 0
   getMinTrkDistance(): 49.0723
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): -0.364608
@@ -13330,7 +13247,6 @@ ECLCluster#20:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 906001
   getZernikeMVA(): 0.220703
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -13344,7 +13260,6 @@ ECLCluster#20:
 ECLCluster#21:
   getAbsZernike40(): 1.31484
   getAbsZernike51(): 0.226172
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-117.451,77.2785,-57.5265)
   getConnectedRegionId(): 10
@@ -13365,6 +13280,7 @@ ECLCluster#21:
   getLAT(): 0.275391
   getMaxECellId(): 0
   getMinTrkDistance(): 62.7441
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 2.55964
@@ -13387,7 +13303,6 @@ ECLCluster#21:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1006001
   getZernikeMVA(): 0.193359
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -13401,7 +13316,6 @@ ECLCluster#21:
 ECLCluster#22:
   getAbsZernike40(): 1.36299
   getAbsZernike51(): 0.617578
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (51.8253,-120.516,-112.517)
   getConnectedRegionId(): 11
@@ -13422,6 +13336,7 @@ ECLCluster#22:
   getLAT(): 0
   getMaxECellId(): 0
   getMinTrkDistance(): 179.443
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 1.95312
   getNumberOfHadronDigits(): 0
   getPhi(): -1.16467
@@ -13437,7 +13352,6 @@ ECLCluster#22:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1106001
   getZernikeMVA(): 0.654297
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -13909,6 +13823,7 @@ TRGSummary:
   getTRGSummary(9): 0
   getTimQuality(): 0
   getTimType(): 15
+  isPoissonInInjectionVeto(): False
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(35)
     pair
@@ -19326,7 +19241,6 @@ PIDLikelihood#15:
 ECLCluster#0:
   getAbsZernike40(): 0.456543
   getAbsZernike51(): 0.283594
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-4.10938,-66.2655,211.545)
   getConnectedRegionId(): 1
@@ -19351,6 +19265,7 @@ ECLCluster#0:
   getLAT(): 0.44043
   getMaxECellId(): 0
   getMinTrkDistance(): 34.1797
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): -1.63273
@@ -19367,7 +19282,6 @@ ECLCluster#0:
   getUncertaintyEnergy(): 0.00146484
   getUncertaintyPhi(): 0.0154297
   getUncertaintyTheta(): 0.00625
-  getUniqueId(): 105001
   getZernikeMVA(): 0.175781
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19381,7 +19295,6 @@ ECLCluster#0:
 ECLCluster#1:
   getAbsZernike40(): 0.928027
   getAbsZernike51(): 0.536719
-  getClusterHadronIntensity(): 0
   getClusterId(): 2
   getClusterPosition(): (10.1275,-70.9914,211.507)
   getConnectedRegionId(): 1
@@ -19402,6 +19315,7 @@ ECLCluster#1:
   getLAT(): 0.163086
   getMaxECellId(): 0
   getMinTrkDistance(): 21.7285
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): -1.42909
@@ -19418,7 +19332,6 @@ ECLCluster#1:
   getUncertaintyEnergy(): 0.00263672
   getUncertaintyPhi(): 0.0144531
   getUncertaintyTheta(): 0.00566406
-  getUniqueId(): 105002
   getZernikeMVA(): 0.40332
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19432,7 +19345,6 @@ ECLCluster#1:
 ECLCluster#2:
   getAbsZernike40(): 0.602637
   getAbsZernike51(): 0.349219
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (31.9703,-79.8773,211.256)
   getConnectedRegionId(): 2
@@ -19453,6 +19365,7 @@ ECLCluster#2:
   getLAT(): 0.322266
   getMaxECellId(): 0
   getMinTrkDistance(): 16.6016
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): -1.19008
@@ -19469,7 +19382,6 @@ ECLCluster#2:
   getUncertaintyEnergy(): 0.0046875
   getUncertaintyPhi(): 0.0121094
   getUncertaintyTheta(): 0.0046875
-  getUniqueId(): 205001
   getZernikeMVA(): 0.342773
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19483,7 +19395,6 @@ ECLCluster#2:
 ECLCluster#3:
   getAbsZernike40(): 0.343652
   getAbsZernike51(): 0.154688
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-36.5772,93.4066,211.02)
   getConnectedRegionId(): 3
@@ -19504,6 +19415,7 @@ ECLCluster#3:
   getLAT(): 0.282227
   getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): 1.94403
@@ -19519,7 +19431,6 @@ ECLCluster#3:
   getUncertaintyEnergy(): 0.0046875
   getUncertaintyPhi(): 0.0121094
   getUncertaintyTheta(): 0.0046875
-  getUniqueId(): 305001
   getZernikeMVA(): 0.396484
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19533,7 +19444,6 @@ ECLCluster#3:
 ECLCluster#4:
   getAbsZernike40(): 0.84834
   getAbsZernike51(): 0.0785156
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-65.1753,99.5125,210.764)
   getConnectedRegionId(): 4
@@ -19554,6 +19464,7 @@ ECLCluster#4:
   getLAT(): 0.207031
   getMaxECellId(): 0
   getMinTrkDistance(): 15.8691
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 2.15064
@@ -19569,7 +19480,6 @@ ECLCluster#4:
   getUncertaintyEnergy(): 0.00556641
   getUncertaintyPhi(): 0.0113281
   getUncertaintyTheta(): 0.00429688
-  getUniqueId(): 405001
   getZernikeMVA(): 0.404297
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19583,7 +19493,6 @@ ECLCluster#4:
 ECLCluster#5:
   getAbsZernike40(): 1.11895
   getAbsZernike51(): 0.440625
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-32.7788,134.408,136.922)
   getConnectedRegionId(): 5
@@ -19604,6 +19513,7 @@ ECLCluster#5:
   getLAT(): 0.181641
   getMaxECellId(): 0
   getMinTrkDistance(): 35.1562
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 1.81
@@ -19620,7 +19530,6 @@ ECLCluster#5:
   getUncertaintyEnergy(): 0.00175781
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.00917969
-  getUniqueId(): 505001
   getZernikeMVA(): 0.694336
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19634,7 +19543,6 @@ ECLCluster#5:
 ECLCluster#6:
   getAbsZernike40(): 0.886523
   getAbsZernike51(): 0.482812
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-12.8785,138.226,122.21)
   getConnectedRegionId(): 6
@@ -19655,6 +19563,7 @@ ECLCluster#6:
   getLAT(): 0.0712891
   getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 1.6637
@@ -19672,7 +19581,6 @@ ECLCluster#6:
   getUncertaintyEnergy(): 0.00556641
   getUncertaintyPhi(): 0.00800781
   getUncertaintyTheta(): 0.00644531
-  getUniqueId(): 605001
   getZernikeMVA(): 0.292969
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19686,7 +19594,6 @@ ECLCluster#6:
 ECLCluster#7:
   getAbsZernike40(): 0.771973
   getAbsZernike51(): 0.162891
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (130.784,-50.1035,82.8077)
   getConnectedRegionId(): 7
@@ -19707,6 +19614,7 @@ ECLCluster#7:
   getLAT(): 0.0439453
   getMaxECellId(): 0
   getMinTrkDistance(): 81.2988
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -0.365854
@@ -19722,7 +19630,6 @@ ECLCluster#7:
   getUncertaintyEnergy(): 0.00234375
   getUncertaintyPhi(): 0.0103516
   getUncertaintyTheta(): 0.00859375
-  getUniqueId(): 705001
   getZernikeMVA(): 0.46875
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19736,7 +19643,6 @@ ECLCluster#7:
 ECLCluster#8:
   getAbsZernike40(): 0.793555
   getAbsZernike51(): 0.196875
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (74.8127,-118.645,72.2533)
   getConnectedRegionId(): 8
@@ -19757,6 +19663,7 @@ ECLCluster#8:
   getLAT(): 0.0839844
   getMaxECellId(): 0
   getMinTrkDistance(): 16.1133
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -1.00821
@@ -19772,7 +19679,6 @@ ECLCluster#8:
   getUncertaintyEnergy(): 0.00615234
   getUncertaintyPhi(): 0.0078125
   getUncertaintyTheta(): 0.00625
-  getUniqueId(): 805001
   getZernikeMVA(): 0.204102
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19786,7 +19692,6 @@ ECLCluster#8:
 ECLCluster#9:
   getAbsZernike40(): 0.702246
   getAbsZernike51(): 0.213281
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (133.196,45.7223,23.8517)
   getConnectedRegionId(): 9
@@ -19807,6 +19712,7 @@ ECLCluster#9:
   getLAT(): 0.103516
   getMaxECellId(): 0
   getMinTrkDistance(): 62.9883
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 0.330669
@@ -19822,7 +19728,6 @@ ECLCluster#9:
   getUncertaintyEnergy(): 0.00527344
   getUncertaintyPhi(): 0.00820313
   getUncertaintyTheta(): 0.00664062
-  getUniqueId(): 905001
   getZernikeMVA(): 0.56543
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19836,7 +19741,6 @@ ECLCluster#9:
 ECLCluster#10:
   getAbsZernike40(): 0.879883
   getAbsZernike51(): 0.585938
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-140.502,-5.70114,8.30755)
   getConnectedRegionId(): 12
@@ -19857,6 +19761,7 @@ ECLCluster#10:
   getLAT(): 0.0546875
   getMaxECellId(): 0
   getMinTrkDistance(): 58.8379
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): -3.10104
@@ -19872,7 +19777,6 @@ ECLCluster#10:
   getUncertaintyEnergy(): 0.00380859
   getUncertaintyPhi(): 0.00917969
   getUncertaintyTheta(): 0.00742187
-  getUniqueId(): 1205001
   getZernikeMVA(): 0.633789
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19886,7 +19790,6 @@ ECLCluster#10:
 ECLCluster#11:
   getAbsZernike40(): 0.290527
   getAbsZernike51(): 0.268359
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-125.567,-63.5372,24.3836)
   getConnectedRegionId(): 10
@@ -19907,6 +19810,7 @@ ECLCluster#11:
   getLAT(): 0.356445
   getMaxECellId(): 0
   getMinTrkDistance(): 90.0879
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 11.1328
   getNumberOfHadronDigits(): 0
   getPhi(): -2.67315
@@ -19925,7 +19829,6 @@ ECLCluster#11:
   getUncertaintyEnergy(): 0.00556641
   getUncertaintyPhi(): 0.00800781
   getUncertaintyTheta(): 0.00644531
-  getUniqueId(): 1005001
   getZernikeMVA(): 0.0322266
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19939,7 +19842,6 @@ ECLCluster#11:
 ECLCluster#12:
   getAbsZernike40(): 0.302148
   getAbsZernike51(): 0.307031
-  getClusterHadronIntensity(): 0
   getClusterId(): 2
   getClusterPosition(): (-132.716,-46.6271,15.5521)
   getConnectedRegionId(): 10
@@ -19960,6 +19862,7 @@ ECLCluster#12:
   getLAT(): 0.652344
   getMaxECellId(): 0
   getMinTrkDistance(): 80.8105
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): -2.80373
@@ -19979,7 +19882,6 @@ ECLCluster#12:
   getUncertaintyEnergy(): 0.00556641
   getUncertaintyPhi(): 0.00800781
   getUncertaintyTheta(): 0.00644531
-  getUniqueId(): 1005002
   getZernikeMVA(): 0.0429688
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -19993,7 +19895,6 @@ ECLCluster#12:
 ECLCluster#13:
   getAbsZernike40(): 1.00605
   getAbsZernike51(): 0.924609
-  getClusterHadronIntensity(): 0
   getClusterId(): 3
   getClusterPosition(): (-122.855,-68.3573,6.58935)
   getConnectedRegionId(): 10
@@ -20014,6 +19915,7 @@ ECLCluster#13:
   getLAT(): 0.171875
   getMaxECellId(): 0
   getMinTrkDistance(): 103.271
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.71094
   getNumberOfHadronDigits(): 0
   getPhi(): -2.63385
@@ -20033,7 +19935,6 @@ ECLCluster#13:
   getUncertaintyEnergy(): 0.00205078
   getUncertaintyPhi(): 0.0105469
   getUncertaintyTheta(): 0.00878906
-  getUniqueId(): 1005003
   getZernikeMVA(): 0.0908203
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20047,7 +19948,6 @@ ECLCluster#13:
 ECLCluster#14:
   getAbsZernike40(): 0.127832
   getAbsZernike51(): 0.227344
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-88.7354,108.931,-3.10538)
   getConnectedRegionId(): 13
@@ -20068,6 +19968,7 @@ ECLCluster#14:
   getLAT(): 0.50293
   getMaxECellId(): 0
   getMinTrkDistance(): 20.0195
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 2.25438
@@ -20083,7 +19984,6 @@ ECLCluster#14:
   getUncertaintyEnergy(): 0.00410156
   getUncertaintyPhi(): 0.00898437
   getUncertaintyTheta(): 0.00722656
-  getUniqueId(): 1305001
   getZernikeMVA(): 0.0244141
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20097,7 +19997,6 @@ ECLCluster#14:
 ECLCluster#15:
   getAbsZernike40(): 0.483105
   getAbsZernike51(): 0.342187
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-128.209,57.6569,7.23716)
   getConnectedRegionId(): 11
@@ -20118,6 +20017,7 @@ ECLCluster#15:
   getLAT(): 0.285156
   getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 5.27344
   getNumberOfHadronDigits(): 0
   getPhi(): 2.71898
@@ -20134,7 +20034,6 @@ ECLCluster#15:
   getUncertaintyEnergy(): 0.00292969
   getUncertaintyPhi(): 0.00996094
   getUncertaintyTheta(): 0.00820313
-  getUniqueId(): 1105001
   getZernikeMVA(): 0.0292969
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20148,7 +20047,6 @@ ECLCluster#15:
 ECLCluster#16:
   getAbsZernike40(): 0.112891
   getAbsZernike51(): 0.271875
-  getClusterHadronIntensity(): 0
   getClusterId(): 2
   getClusterPosition(): (-119.667,73.6418,1.56947)
   getConnectedRegionId(): 11
@@ -20169,6 +20067,7 @@ ECLCluster#16:
   getLAT(): 0.458008
   getMaxECellId(): 0
   getMinTrkDistance(): 26.3672
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 4.6875
   getNumberOfHadronDigits(): 0
   getPhi(): 2.58993
@@ -20186,7 +20085,6 @@ ECLCluster#16:
   getUncertaintyEnergy(): 0.00410156
   getUncertaintyPhi(): 0.00898437
   getUncertaintyTheta(): 0.00722656
-  getUniqueId(): 1105002
   getZernikeMVA(): 0.0136719
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20200,7 +20098,6 @@ ECLCluster#16:
 ECLCluster#17:
   getAbsZernike40(): 0.936328
   getAbsZernike51(): 0.628125
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (140.058,-12.6701,-8.6195)
   getConnectedRegionId(): 14
@@ -20221,6 +20118,7 @@ ECLCluster#17:
   getLAT(): 0.0742188
   getMaxECellId(): 0
   getMinTrkDistance(): 15.625
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): -0.0902172
@@ -20236,7 +20134,6 @@ ECLCluster#17:
   getUncertaintyEnergy(): 0.00527344
   getUncertaintyPhi(): 0.00820313
   getUncertaintyTheta(): 0.00664062
-  getUniqueId(): 1405001
   getZernikeMVA(): 0.614258
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20250,7 +20147,6 @@ ECLCluster#17:
 ECLCluster#18:
   getAbsZernike40(): 0.170996
   getAbsZernike51(): 0.291797
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (133.517,-44.4063,-17.3478)
   getConnectedRegionId(): 15
@@ -20271,6 +20167,7 @@ ECLCluster#18:
   getLAT(): 0.458008
   getMaxECellId(): 0
   getMinTrkDistance(): 15.8691
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): -0.321081
@@ -20287,7 +20184,6 @@ ECLCluster#18:
   getUncertaintyEnergy(): 0.00556641
   getUncertaintyPhi(): 0.00800781
   getUncertaintyTheta(): 0.00644531
-  getUniqueId(): 1505001
   getZernikeMVA(): 0.21582
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20301,7 +20197,6 @@ ECLCluster#18:
 ECLCluster#19:
   getAbsZernike40(): 0.408398
   getAbsZernike51(): 0.392578
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (131.846,49.4407,-28.8521)
   getConnectedRegionId(): 16
@@ -20322,6 +20217,7 @@ ECLCluster#19:
   getLAT(): 0.446289
   getMaxECellId(): 0
   getMinTrkDistance(): 60.791
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
   getPhi(): 0.35876
@@ -20337,7 +20233,6 @@ ECLCluster#19:
   getUncertaintyEnergy(): 0.00732422
   getUncertaintyPhi(): 0.00703125
   getUncertaintyTheta(): 0.00566406
-  getUniqueId(): 1605001
   getZernikeMVA(): 0.566406
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20351,7 +20246,6 @@ ECLCluster#19:
 ECLCluster#20:
   getAbsZernike40(): 0.752051
   getAbsZernike51(): 0.485156
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (18.8924,-139.504,-39.8972)
   getConnectedRegionId(): 17
@@ -20372,6 +20266,7 @@ ECLCluster#20:
   getLAT(): 0.191406
   getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): -1.43619
@@ -20387,7 +20282,6 @@ ECLCluster#20:
   getUncertaintyEnergy(): 0.00292969
   getUncertaintyPhi(): 0.00976562
   getUncertaintyTheta(): 0.00800781
-  getUniqueId(): 1705001
   getZernikeMVA(): 0.0859375
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20401,7 +20295,6 @@ ECLCluster#20:
 ECLCluster#21:
   getAbsZernike40(): 0.564453
   getAbsZernike51(): 0.289453
-  getClusterHadronIntensity(): 0
   getClusterId(): 2
   getClusterPosition(): (31.3809,-137.22,-38.918)
   getConnectedRegionId(): 17
@@ -20422,6 +20315,7 @@ ECLCluster#21:
   getLAT(): 0.261719
   getMaxECellId(): 0
   getMinTrkDistance(): 20.752
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 6.83594
   getNumberOfHadronDigits(): 0
   getPhi(): -1.34597
@@ -20437,7 +20331,6 @@ ECLCluster#21:
   getUncertaintyEnergy(): 0.0046875
   getUncertaintyPhi(): 0.00859375
   getUncertaintyTheta(): 0.00683594
-  getUniqueId(): 1705002
   getZernikeMVA(): 0.0996094
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20451,7 +20344,6 @@ ECLCluster#21:
 ECLCluster#22:
   getAbsZernike40(): 1.34307
   getAbsZernike51(): 0.405469
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-139.652,-14.9045,-66.129)
   getConnectedRegionId(): 18
@@ -20472,6 +20364,7 @@ ECLCluster#22:
   getLAT(): 0.117188
   getMaxECellId(): 0
   getMinTrkDistance(): 99.1211
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
   getPhi(): -3.03527
@@ -20487,7 +20380,6 @@ ECLCluster#22:
   getUncertaintyEnergy(): 0.0046875
   getUncertaintyPhi(): 0.00839844
   getUncertaintyTheta(): 0.00683594
-  getUniqueId(): 1805001
   getZernikeMVA(): 0.768555
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20501,7 +20393,6 @@ ECLCluster#22:
 ECLCluster#23:
   getAbsZernike40(): 0
   getAbsZernike51(): 0.260156
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-31.4303,-136.174,-89.3925)
   getConnectedRegionId(): 19
@@ -20522,6 +20413,7 @@ ECLCluster#23:
   getLAT(): 0.594727
   getMaxECellId(): 0
   getMinTrkDistance(): 19.043
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): -1.79763
@@ -20537,7 +20429,6 @@ ECLCluster#23:
   getUncertaintyEnergy(): 0.00585938
   getUncertaintyPhi(): 0.0078125
   getUncertaintyTheta(): 0.00625
-  getUniqueId(): 1905001
   getZernikeMVA(): 0.0498047
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20551,7 +20442,6 @@ ECLCluster#23:
 ECLCluster#24:
   getAbsZernike40(): 0.903125
   getAbsZernike51(): 0.645703
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-89.1801,-82.3992,-114.167)
   getConnectedRegionId(): 20
@@ -20572,6 +20462,7 @@ ECLCluster#24:
   getLAT(): 0.212891
   getMaxECellId(): 0
   getMinTrkDistance(): 74.4629
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
   getPhi(): -2.39569
@@ -20587,7 +20478,6 @@ ECLCluster#24:
   getUncertaintyEnergy(): 0.00849609
   getUncertaintyPhi(): 0.00957031
   getUncertaintyTheta(): 0.00605469
-  getUniqueId(): 2005001
   getZernikeMVA(): 0.786133
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20601,7 +20491,6 @@ ECLCluster#24:
 ECLCluster#25:
   getAbsZernike40(): 0.263965
   getAbsZernike51(): 0.390234
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (3.9689,-68.3483,211.523)
   getConnectedRegionId(): 1
@@ -20627,6 +20516,7 @@ ECLCluster#25:
   getLAT(): 0.600586
   getMaxECellId(): 0
   getMinTrkDistance(): 27.0996
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
   getPhi(): -1.51279
@@ -20643,7 +20533,6 @@ ECLCluster#25:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 106001
   getZernikeMVA(): 0.928711
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20657,7 +20546,6 @@ ECLCluster#25:
 ECLCluster#26:
   getAbsZernike40(): 1.19033
   getAbsZernike51(): 0.217969
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (31.9703,-79.8773,211.256)
   getConnectedRegionId(): 2
@@ -20678,6 +20566,7 @@ ECLCluster#26:
   getLAT(): 0.322266
   getMaxECellId(): 0
   getMinTrkDistance(): 16.6016
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): -1.19008
@@ -20694,7 +20583,6 @@ ECLCluster#26:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 206001
   getZernikeMVA(): 0.657227
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20708,7 +20596,6 @@ ECLCluster#26:
 ECLCluster#27:
   getAbsZernike40(): 0.972852
   getAbsZernike51(): 0.467578
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-36.443,93.8046,211.019)
   getConnectedRegionId(): 3
@@ -20729,6 +20616,7 @@ ECLCluster#27:
   getLAT(): 0.435547
   getMaxECellId(): 0
   getMinTrkDistance(): 15.625
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
   getPhi(): 1.94135
@@ -20744,7 +20632,6 @@ ECLCluster#27:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 306001
   getZernikeMVA(): 0.603516
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20758,7 +20645,6 @@ ECLCluster#27:
 ECLCluster#28:
   getAbsZernike40(): 1.32646
   getAbsZernike51(): 0.101953
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-65.1753,99.5125,210.764)
   getConnectedRegionId(): 4
@@ -20779,6 +20665,7 @@ ECLCluster#28:
   getLAT(): 0.207031
   getMaxECellId(): 0
   getMinTrkDistance(): 15.8691
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 2.15064
@@ -20794,7 +20681,6 @@ ECLCluster#28:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 406001
   getZernikeMVA(): 0.595703
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20808,7 +20694,6 @@ ECLCluster#28:
 ECLCluster#29:
   getAbsZernike40(): 1.40615
   getAbsZernike51(): 0.182812
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-32.7788,134.408,136.922)
   getConnectedRegionId(): 5
@@ -20829,6 +20714,7 @@ ECLCluster#29:
   getLAT(): 0.181641
   getMaxECellId(): 0
   getMinTrkDistance(): 35.1562
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 1.81
@@ -20845,7 +20731,6 @@ ECLCluster#29:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 506001
   getZernikeMVA(): 0.305664
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20859,7 +20744,6 @@ ECLCluster#29:
 ECLCluster#30:
   getAbsZernike40(): 1.37627
   getAbsZernike51(): 0.275391
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-12.8785,138.226,122.21)
   getConnectedRegionId(): 6
@@ -20880,6 +20764,7 @@ ECLCluster#30:
   getLAT(): 0.0712891
   getMaxECellId(): 0
   getMinTrkDistance(): 15.3809
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 1.6637
@@ -20897,7 +20782,6 @@ ECLCluster#30:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 606001
   getZernikeMVA(): 0.707031
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20911,7 +20795,6 @@ ECLCluster#30:
 ECLCluster#31:
   getAbsZernike40(): 1.36465
   getAbsZernike51(): 0.0679687
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (130.784,-50.1035,82.8077)
   getConnectedRegionId(): 7
@@ -20932,6 +20815,7 @@ ECLCluster#31:
   getLAT(): 0.0439453
   getMaxECellId(): 0
   getMinTrkDistance(): 81.2988
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -0.365854
@@ -20947,7 +20831,6 @@ ECLCluster#31:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 706001
   getZernikeMVA(): 0.53125
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -20961,7 +20844,6 @@ ECLCluster#31:
 ECLCluster#32:
   getAbsZernike40(): 1.34473
   getAbsZernike51(): 0.0152344
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (74.8127,-118.645,72.2533)
   getConnectedRegionId(): 8
@@ -20982,6 +20864,7 @@ ECLCluster#32:
   getLAT(): 0.0839844
   getMaxECellId(): 0
   getMinTrkDistance(): 16.1133
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -1.00821
@@ -20997,7 +20880,6 @@ ECLCluster#32:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 806001
   getZernikeMVA(): 0.795898
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -21011,7 +20893,6 @@ ECLCluster#32:
 ECLCluster#33:
   getAbsZernike40(): 1.32314
   getAbsZernike51(): 0.0949219
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (133.196,45.7223,23.8517)
   getConnectedRegionId(): 9
@@ -21032,6 +20913,7 @@ ECLCluster#33:
   getLAT(): 0.103516
   getMaxECellId(): 0
   getMinTrkDistance(): 62.9883
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 0.330669
@@ -21047,7 +20929,6 @@ ECLCluster#33:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 906001
   getZernikeMVA(): 0.43457
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -21061,7 +20942,6 @@ ECLCluster#33:
 ECLCluster#34:
   getAbsZernike40(): 1.39121
   getAbsZernike51(): 0.283594
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-140.502,-5.70114,8.30755)
   getConnectedRegionId(): 12
@@ -21082,6 +20962,7 @@ ECLCluster#34:
   getLAT(): 0.0546875
   getMaxECellId(): 0
   getMinTrkDistance(): 58.8379
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): -3.10104
@@ -21097,7 +20978,6 @@ ECLCluster#34:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1206001
   getZernikeMVA(): 0.366211
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -21111,7 +20991,6 @@ ECLCluster#34:
 ECLCluster#35:
   getAbsZernike40(): 0.391797
   getAbsZernike51(): 0.457031
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-129.249,-54.8335,18.7465)
   getConnectedRegionId(): 10
@@ -21132,6 +21011,7 @@ ECLCluster#35:
   getLAT(): 0.931641
   getMaxECellId(): 0
   getMinTrkDistance(): 85.2051
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 28.9062
   getNumberOfHadronDigits(): 0
   getPhi(): -2.74036
@@ -21154,7 +21034,6 @@ ECLCluster#35:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1006001
   getZernikeMVA(): 1
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -21168,7 +21047,6 @@ ECLCluster#35:
 ECLCluster#36:
   getAbsZernike40(): 0.725488
   getAbsZernike51(): 0.157031
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-86.6533,110.511,-2.98942)
   getConnectedRegionId(): 13
@@ -21189,6 +21067,7 @@ ECLCluster#36:
   getLAT(): 0.614258
   getMaxECellId(): 0
   getMinTrkDistance(): 18.5547
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 2.23578
@@ -21204,7 +21083,6 @@ ECLCluster#36:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1306001
   getZernikeMVA(): 0.975586
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -21218,7 +21096,6 @@ ECLCluster#36:
 ECLCluster#37:
   getAbsZernike40(): 0.262305
   getAbsZernike51(): 0.128906
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-122.623,68.1973,4.00984)
   getConnectedRegionId(): 11
@@ -21239,6 +21116,7 @@ ECLCluster#37:
   getLAT(): 0.887695
   getMaxECellId(): 0
   getMinTrkDistance(): 21.4844
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 9.96094
   getNumberOfHadronDigits(): 0
   getPhi(): 2.63404
@@ -21257,7 +21135,6 @@ ECLCluster#37:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1106001
   getZernikeMVA(): 1
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -21271,7 +21148,6 @@ ECLCluster#37:
 ECLCluster#38:
   getAbsZernike40(): 1.39619
   getAbsZernike51(): 0.326953
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (140.058,-12.6701,-8.6195)
   getConnectedRegionId(): 14
@@ -21292,6 +21168,7 @@ ECLCluster#38:
   getLAT(): 0.0742188
   getMaxECellId(): 0
   getMinTrkDistance(): 15.625
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): -0.0902172
@@ -21307,7 +21184,6 @@ ECLCluster#38:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1406001
   getZernikeMVA(): 0.385742
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -21321,7 +21197,6 @@ ECLCluster#38:
 ECLCluster#39:
   getAbsZernike40(): 0.994434
   getAbsZernike51(): 0.254297
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (133.517,-44.4063,-17.3478)
   getConnectedRegionId(): 15
@@ -21342,6 +21217,7 @@ ECLCluster#39:
   getLAT(): 0.458008
   getMaxECellId(): 0
   getMinTrkDistance(): 15.8691
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): -0.321081
@@ -21358,7 +21234,6 @@ ECLCluster#39:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1506001
   getZernikeMVA(): 0.78418
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -21372,7 +21247,6 @@ ECLCluster#39:
 ECLCluster#40:
   getAbsZernike40(): 1.13555
   getAbsZernike51(): 0.175781
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (131.846,49.4407,-28.8521)
   getConnectedRegionId(): 16
@@ -21393,6 +21267,7 @@ ECLCluster#40:
   getLAT(): 0.446289
   getMaxECellId(): 0
   getMinTrkDistance(): 60.791
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 10.9375
   getNumberOfHadronDigits(): 0
   getPhi(): 0.35876
@@ -21408,7 +21283,6 @@ ECLCluster#40:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1606001
   getZernikeMVA(): 0.433594
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -21422,7 +21296,6 @@ ECLCluster#40:
 ECLCluster#41:
   getAbsZernike40(): 0.766992
   getAbsZernike51(): 0.135937
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (26.6078,-138.121,-39.362)
   getConnectedRegionId(): 17
@@ -21443,6 +21316,7 @@ ECLCluster#41:
   getLAT(): 0.615234
   getMaxECellId(): 0
   getMinTrkDistance(): 17.8223
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
   getPhi(): -1.38049
@@ -21458,7 +21332,6 @@ ECLCluster#41:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1706001
   getZernikeMVA(): 0.991211
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -21472,7 +21345,6 @@ ECLCluster#41:
 ECLCluster#42:
   getAbsZernike40(): 1.49414
   getAbsZernike51(): 0.162891
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-139.652,-14.9045,-66.129)
   getConnectedRegionId(): 18
@@ -21493,6 +21365,7 @@ ECLCluster#42:
   getLAT(): 0.117188
   getMaxECellId(): 0
   getMinTrkDistance(): 99.1211
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
   getPhi(): -3.03527
@@ -21508,7 +21381,6 @@ ECLCluster#42:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1806001
   getZernikeMVA(): 0.231445
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -21522,7 +21394,6 @@ ECLCluster#42:
 ECLCluster#43:
   getAbsZernike40(): 0.815137
   getAbsZernike51(): 0.0480469
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-31.4303,-136.174,-89.3925)
   getConnectedRegionId(): 19
@@ -21543,6 +21414,7 @@ ECLCluster#43:
   getLAT(): 0.594727
   getMaxECellId(): 0
   getMinTrkDistance(): 19.043
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): -1.79763
@@ -21558,7 +21430,6 @@ ECLCluster#43:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1906001
   getZernikeMVA(): 0.950195
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -21572,7 +21443,6 @@ ECLCluster#43:
 ECLCluster#44:
   getAbsZernike40(): 1.33975
   getAbsZernike51(): 0.325781
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-89.1801,-82.3992,-114.167)
   getConnectedRegionId(): 20
@@ -21593,6 +21463,7 @@ ECLCluster#44:
   getLAT(): 0.212891
   getMaxECellId(): 0
   getMinTrkDistance(): 74.4629
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
   getPhi(): -2.39569
@@ -21608,7 +21479,6 @@ ECLCluster#44:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 2006001
   getZernikeMVA(): 0.213867
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -22113,6 +21983,7 @@ TRGSummary:
   getTRGSummary(9): 0
   getTimQuality(): 0
   getTimType(): 15
+  isPoissonInInjectionVeto(): False
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(35)
     pair
@@ -27191,7 +27062,6 @@ PIDLikelihood#11:
 ECLCluster#0:
   getAbsZernike40(): 0.287207
   getAbsZernike51(): 0.557812
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (49.1079,41.838,211.541)
   getConnectedRegionId(): 1
@@ -27216,6 +27086,7 @@ ECLCluster#0:
   getLAT(): 0.0449219
   getMaxECellId(): 0
   getMinTrkDistance(): 14.6484
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): 0.705631
@@ -27231,7 +27102,6 @@ ECLCluster#0:
   getUncertaintyEnergy(): 0.00439453
   getUncertaintyPhi(): 0.0125
   getUncertaintyTheta(): 0.00488281
-  getUniqueId(): 105001
   getZernikeMVA(): 0.303711
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27245,7 +27115,6 @@ ECLCluster#0:
 ECLCluster#1:
   getAbsZernike40(): 1.20693
   getAbsZernike51(): 0.419531
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (115.457,29.3444,210.714)
   getConnectedRegionId(): 3
@@ -27266,6 +27135,7 @@ ECLCluster#1:
   getLAT(): 0.145508
   getMaxECellId(): 0
   getMinTrkDistance(): 55.1758
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 0.248888
@@ -27281,7 +27151,6 @@ ECLCluster#1:
   getUncertaintyEnergy(): 0.00585938
   getUncertaintyPhi(): 0.0111328
   getUncertaintyTheta(): 0.00429688
-  getUniqueId(): 305001
   getZernikeMVA(): 0.858398
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27295,7 +27164,6 @@ ECLCluster#1:
 ECLCluster#2:
   getAbsZernike40(): 0.595996
   getAbsZernike51(): 0.268359
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (134.142,-24.5498,200.473)
   getConnectedRegionId(): 4
@@ -27316,6 +27184,7 @@ ECLCluster#2:
   getLAT(): 0.294922
   getMaxECellId(): 0
   getMinTrkDistance(): 15.8691
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 13.0859
   getNumberOfHadronDigits(): 0
   getPhi(): -0.18101
@@ -27331,7 +27200,6 @@ ECLCluster#2:
   getUncertaintyEnergy(): 0.0146484
   getUncertaintyPhi(): 0.00527344
   getUncertaintyTheta(): 0.00429688
-  getUniqueId(): 405001
   getZernikeMVA(): 0.429688
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27345,7 +27213,6 @@ ECLCluster#2:
 ECLCluster#3:
   getAbsZernike40(): 0.664062
   getAbsZernike51(): 0.1875
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (127.217,52.9094,155.203)
   getConnectedRegionId(): 5
@@ -27366,6 +27233,7 @@ ECLCluster#3:
   getLAT(): 0.237305
   getMaxECellId(): 0
   getMinTrkDistance(): 78.6133
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 15.0391
   getNumberOfHadronDigits(): 0
   getPhi(): 0.394137
@@ -27381,7 +27249,6 @@ ECLCluster#3:
   getUncertaintyEnergy(): 0.0213867
   getUncertaintyPhi(): 0.00449219
   getUncertaintyTheta(): 0.00371094
-  getUniqueId(): 505001
   getZernikeMVA(): 0.723633
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27395,7 +27262,6 @@ ECLCluster#3:
 ECLCluster#4:
   getAbsZernike40(): 0.516309
   getAbsZernike51(): 0.638672
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-101.754,93.6019,140.772)
   getConnectedRegionId(): 6
@@ -27416,6 +27282,7 @@ ECLCluster#4:
   getLAT(): 0.266602
   getMaxECellId(): 0
   getMinTrkDistance(): 164.062
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 14.0625
   getNumberOfHadronDigits(): 0
   getPhi(): 2.3979
@@ -27432,7 +27299,6 @@ ECLCluster#4:
   getUncertaintyEnergy(): 0.0149414
   getUncertaintyPhi(): 0.00527344
   getUncertaintyTheta(): 0.00429688
-  getUniqueId(): 605001
   getZernikeMVA(): 0.905273
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27446,7 +27312,6 @@ ECLCluster#4:
 ECLCluster#5:
   getAbsZernike40(): 0.901465
   getAbsZernike51(): 0.440625
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (15.421,-137.849,126.618)
   getConnectedRegionId(): 7
@@ -27467,6 +27332,7 @@ ECLCluster#5:
   getLAT(): 0.0166016
   getMaxECellId(): 0
   getMinTrkDistance(): 60.5469
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -1.45939
@@ -27484,7 +27350,6 @@ ECLCluster#5:
   getUncertaintyEnergy(): 0.00205078
   getUncertaintyPhi(): 0.0105469
   getUncertaintyTheta(): 0.00898437
-  getUniqueId(): 705001
   getZernikeMVA(): 0.375
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27498,7 +27363,6 @@ ECLCluster#5:
 ECLCluster#6:
   getAbsZernike40(): 0.566113
   getAbsZernike51(): 0.0855469
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (48.4514,-131.349,79.3978)
   getConnectedRegionId(): 8
@@ -27519,6 +27383,7 @@ ECLCluster#6:
   getLAT(): 0.738281
   getMaxECellId(): 0
   getMinTrkDistance(): 32.959
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 8.00781
   getNumberOfHadronDigits(): 0
   getPhi(): -1.21741
@@ -27537,7 +27402,6 @@ ECLCluster#6:
   getUncertaintyEnergy(): 0.00615234
   getUncertaintyPhi(): 0.0078125
   getUncertaintyTheta(): 0.00625
-  getUniqueId(): 805001
   getZernikeMVA(): 0.0185547
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27551,7 +27415,6 @@ ECLCluster#6:
 ECLCluster#7:
   getAbsZernike40(): 1.39121
   getAbsZernike51(): 0.496875
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (100.646,98.2054,58.9982)
   getConnectedRegionId(): 10
@@ -27572,6 +27435,7 @@ ECLCluster#7:
   getLAT(): 0.0253906
   getMaxECellId(): 0
   getMinTrkDistance(): 68.3594
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): 0.773126
@@ -27587,7 +27451,6 @@ ECLCluster#7:
   getUncertaintyEnergy(): 0.00117187
   getUncertaintyPhi(): 0.0107422
   getUncertaintyTheta(): 0.009375
-  getUniqueId(): 1005001
   getZernikeMVA(): 0.585938
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27601,7 +27464,6 @@ ECLCluster#7:
 ECLCluster#8:
   getAbsZernike40(): 0.451562
   getAbsZernike51(): 0.0433594
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (33.8361,136.412,59.0228)
   getConnectedRegionId(): 11
@@ -27622,6 +27484,7 @@ ECLCluster#8:
   getLAT(): 0.258789
   getMaxECellId(): 0
   getMinTrkDistance(): 16.6016
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 1.32766
@@ -27638,7 +27501,6 @@ ECLCluster#8:
   getUncertaintyEnergy(): 0.00498047
   getUncertaintyPhi(): 0.00820313
   getUncertaintyTheta(): 0.00664062
-  getUniqueId(): 1105001
   getZernikeMVA(): 0.177734
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27652,7 +27514,6 @@ ECLCluster#8:
 ECLCluster#9:
   getAbsZernike40(): 0.595996
   getAbsZernike51(): 0.491016
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-134.301,41.1197,64.6755)
   getConnectedRegionId(): 9
@@ -27673,6 +27534,7 @@ ECLCluster#9:
   getLAT(): 0.283203
   getMaxECellId(): 0
   getMinTrkDistance(): 95.2148
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 2.84448
@@ -27688,7 +27550,6 @@ ECLCluster#9:
   getUncertaintyEnergy(): 0.00322266
   getUncertaintyPhi(): 0.00957031
   getUncertaintyTheta(): 0.0078125
-  getUniqueId(): 905001
   getZernikeMVA(): 0.803711
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27702,7 +27563,6 @@ ECLCluster#9:
 ECLCluster#10:
   getAbsZernike40(): 0.655762
   getAbsZernike51(): 0.757031
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-118.279,-75.9684,2.78345)
   getConnectedRegionId(): 13
@@ -27723,6 +27583,7 @@ ECLCluster#10:
   getLAT(): 0.195312
   getMaxECellId(): 0
   getMinTrkDistance(): 64.4531
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): -2.57066
@@ -27738,7 +27599,6 @@ ECLCluster#10:
   getUncertaintyEnergy(): 0.0046875
   getUncertaintyPhi(): 0.00839844
   getUncertaintyTheta(): 0.00683594
-  getUniqueId(): 1305001
   getZernikeMVA(): 0.875
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27752,7 +27612,6 @@ ECLCluster#10:
 ECLCluster#11:
   getAbsZernike40(): 0.0647461
   getAbsZernike51(): 0.171094
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (32.0199,-136.93,11.241)
   getConnectedRegionId(): 12
@@ -27773,6 +27632,7 @@ ECLCluster#11:
   getLAT(): 0.605469
   getMaxECellId(): 0
   getMinTrkDistance(): 59.082
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 11.7188
   getNumberOfHadronDigits(): 0
   getPhi(): -1.34108
@@ -27798,7 +27658,6 @@ ECLCluster#11:
   getUncertaintyEnergy(): 0.019043
   getUncertaintyPhi(): 0.0046875
   getUncertaintyTheta(): 0.00390625
-  getUniqueId(): 1205001
   getZernikeMVA(): 0.015625
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27812,7 +27671,6 @@ ECLCluster#11:
 ECLCluster#12:
   getAbsZernike40(): 0.275586
   getAbsZernike51(): 0.195703
-  getClusterHadronIntensity(): 0
   getClusterId(): 2
   getClusterPosition(): (17.937,-139.481,12.3209)
   getConnectedRegionId(): 12
@@ -27833,6 +27691,7 @@ ECLCluster#12:
   getLAT(): 0.666992
   getMaxECellId(): 0
   getMinTrkDistance(): 57.1289
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 15.8203
   getNumberOfHadronDigits(): 0
   getPhi(): -1.4429
@@ -27858,7 +27717,6 @@ ECLCluster#12:
   getUncertaintyEnergy(): 0.0146484
   getUncertaintyPhi(): 0.00527344
   getUncertaintyTheta(): 0.00429688
-  getUniqueId(): 1205002
   getZernikeMVA(): 0.0136719
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27872,7 +27730,6 @@ ECLCluster#12:
 ECLCluster#13:
   getAbsZernike40(): 0.63584
   getAbsZernike51(): 0.196875
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-140.423,-6.83105,-14.6229)
   getConnectedRegionId(): 14
@@ -27893,6 +27750,7 @@ ECLCluster#13:
   getLAT(): 0.775391
   getMaxECellId(): 0
   getMinTrkDistance(): 16.8457
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 13.0859
   getNumberOfHadronDigits(): 0
   getPhi(): -3.09298
@@ -27909,7 +27767,6 @@ ECLCluster#13:
   getUncertaintyEnergy(): 0.00527344
   getUncertaintyPhi(): 0.00820313
   getUncertaintyTheta(): 0.00664062
-  getUniqueId(): 1405001
   getZernikeMVA(): 0.0332031
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27923,7 +27780,6 @@ ECLCluster#13:
 ECLCluster#14:
   getAbsZernike40(): 0.327051
   getAbsZernike51(): 0.269531
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-25.8304,-138.293,-46.0126)
   getConnectedRegionId(): 15
@@ -27944,6 +27800,7 @@ ECLCluster#14:
   getLAT(): 0.436523
   getMaxECellId(): 0
   getMinTrkDistance(): 16.6016
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
   getPhi(): -1.75545
@@ -27961,7 +27818,6 @@ ECLCluster#14:
   getUncertaintyEnergy(): 0.00761719
   getUncertaintyPhi(): 0.00703125
   getUncertaintyTheta(): 0.00566406
-  getUniqueId(): 1505001
   getZernikeMVA(): 0.255859
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -27975,7 +27831,6 @@ ECLCluster#14:
 ECLCluster#15:
   getAbsZernike40(): 0.692285
   getAbsZernike51(): 0.121875
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-67.9964,-82.8376,-114.759)
   getConnectedRegionId(): 16
@@ -27996,6 +27851,7 @@ ECLCluster#15:
   getLAT(): 0.12207
   getMaxECellId(): 0
   getMinTrkDistance(): 28.3203
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
   getPhi(): -2.25812
@@ -28011,7 +27867,6 @@ ECLCluster#15:
   getUncertaintyEnergy(): 0.0161133
   getUncertaintyPhi(): 0.0078125
   getUncertaintyTheta(): 0.00488281
-  getUniqueId(): 1605001
   getZernikeMVA(): 0.457031
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28025,7 +27880,6 @@ ECLCluster#15:
 ECLCluster#16:
   getAbsZernike40(): 1.04756
   getAbsZernike51(): 0.583594
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-78.606,-42.1904,-115.533)
   getConnectedRegionId(): 18
@@ -28046,6 +27900,7 @@ ECLCluster#16:
   getLAT(): 0.227539
   getMaxECellId(): 0
   getMinTrkDistance(): 55.1758
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 9.96094
   getNumberOfHadronDigits(): 0
   getPhi(): -2.64899
@@ -28063,7 +27918,6 @@ ECLCluster#16:
   getUncertaintyEnergy(): 0.009375
   getUncertaintyPhi(): 0.009375
   getUncertaintyTheta(): 0.00585938
-  getUniqueId(): 1805001
   getZernikeMVA(): 0.811523
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28077,7 +27931,6 @@ ECLCluster#16:
 ECLCluster#17:
   getAbsZernike40(): 0.31875
   getAbsZernike51(): 0.233203
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-43.8474,-78.3622,-115.507)
   getConnectedRegionId(): 17
@@ -28098,6 +27951,7 @@ ECLCluster#17:
   getLAT(): 0.27832
   getMaxECellId(): 0
   getMinTrkDistance(): 10.498
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): -2.08094
@@ -28116,7 +27970,6 @@ ECLCluster#17:
   getUncertaintyEnergy(): 0.00351562
   getUncertaintyPhi(): 0.0125
   getUncertaintyTheta(): 0.00839844
-  getUniqueId(): 1705001
   getZernikeMVA(): 0.429688
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28130,7 +27983,6 @@ ECLCluster#17:
 ECLCluster#18:
   getAbsZernike40(): 1.21191
   getAbsZernike51(): 0.369141
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (49.1079,41.838,211.541)
   getConnectedRegionId(): 1
@@ -28156,6 +28008,7 @@ ECLCluster#18:
   getLAT(): 0.0449219
   getMaxECellId(): 0
   getMinTrkDistance(): 14.6484
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): 0.705631
@@ -28171,7 +28024,6 @@ ECLCluster#18:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 106001
   getZernikeMVA(): 0.696289
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28185,7 +28037,6 @@ ECLCluster#18:
 ECLCluster#19:
   getAbsZernike40(): 1.46094
   getAbsZernike51(): 0.195703
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (115.457,29.3444,210.714)
   getConnectedRegionId(): 3
@@ -28206,6 +28057,7 @@ ECLCluster#19:
   getLAT(): 0.145508
   getMaxECellId(): 0
   getMinTrkDistance(): 55.1758
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): 0.248888
@@ -28221,7 +28073,6 @@ ECLCluster#19:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 306001
   getZernikeMVA(): 0.141602
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28235,7 +28086,6 @@ ECLCluster#19:
 ECLCluster#20:
   getAbsZernike40(): 1.16709
   getAbsZernike51(): 0.282422
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (134.149,-24.5244,200.455)
   getConnectedRegionId(): 4
@@ -28256,6 +28106,7 @@ ECLCluster#20:
   getLAT(): 0.357422
   getMaxECellId(): 0
   getMinTrkDistance(): 15.8691
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 15.0391
   getNumberOfHadronDigits(): 0
   getPhi(): -0.180818
@@ -28271,7 +28122,6 @@ ECLCluster#20:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 406001
   getZernikeMVA(): 0.570312
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28285,7 +28135,6 @@ ECLCluster#20:
 ECLCluster#21:
   getAbsZernike40(): 1.26504
   getAbsZernike51(): 0.135937
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (127.217,52.9094,155.203)
   getConnectedRegionId(): 5
@@ -28306,6 +28155,7 @@ ECLCluster#21:
   getLAT(): 0.237305
   getMaxECellId(): 0
   getMinTrkDistance(): 78.6133
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 15.0391
   getNumberOfHadronDigits(): 0
   getPhi(): 0.394137
@@ -28321,7 +28171,6 @@ ECLCluster#21:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 506001
   getZernikeMVA(): 0.276367
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28335,7 +28184,6 @@ ECLCluster#21:
 ECLCluster#22:
   getAbsZernike40(): 1.23018
   getAbsZernike51(): 0.407812
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-101.754,93.6019,140.772)
   getConnectedRegionId(): 6
@@ -28356,6 +28204,7 @@ ECLCluster#22:
   getLAT(): 0.266602
   getMaxECellId(): 0
   getMinTrkDistance(): 164.062
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 14.0625
   getNumberOfHadronDigits(): 0
   getPhi(): 2.3979
@@ -28372,7 +28221,6 @@ ECLCluster#22:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 606001
   getZernikeMVA(): 0.0947266
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28386,7 +28234,6 @@ ECLCluster#22:
 ECLCluster#23:
   getAbsZernike40(): 1.40449
   getAbsZernike51(): 0.228516
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (15.421,-137.849,126.618)
   getConnectedRegionId(): 7
@@ -28407,6 +28254,7 @@ ECLCluster#23:
   getLAT(): 0.0166016
   getMaxECellId(): 0
   getMinTrkDistance(): 60.5469
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): -1.45939
@@ -28424,7 +28272,6 @@ ECLCluster#23:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 706001
   getZernikeMVA(): 0.625
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28438,7 +28285,6 @@ ECLCluster#23:
 ECLCluster#24:
   getAbsZernike40(): 0.330371
   getAbsZernike51(): 0.065625
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (41.2937,-133.451,78.5088)
   getConnectedRegionId(): 8
@@ -28459,6 +28305,7 @@ ECLCluster#24:
   getLAT(): 0.916992
   getMaxECellId(): 0
   getMinTrkDistance(): 26.8555
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
   getPhi(): -1.27071
@@ -28477,7 +28324,6 @@ ECLCluster#24:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 806001
   getZernikeMVA(): 0.981445
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28491,7 +28337,6 @@ ECLCluster#24:
 ECLCluster#25:
   getAbsZernike40(): 1.53232
   getAbsZernike51(): 0.226172
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (100.646,98.2054,58.9982)
   getConnectedRegionId(): 10
@@ -28512,6 +28357,7 @@ ECLCluster#25:
   getLAT(): 0.0253906
   getMaxECellId(): 0
   getMinTrkDistance(): 68.3594
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 2.92969
   getNumberOfHadronDigits(): 0
   getPhi(): 0.773126
@@ -28527,7 +28373,6 @@ ECLCluster#25:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1006001
   getZernikeMVA(): 0.414062
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28541,7 +28386,6 @@ ECLCluster#25:
 ECLCluster#26:
   getAbsZernike40(): 1.18369
   getAbsZernike51(): 0.192187
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (33.8361,136.412,59.0228)
   getConnectedRegionId(): 11
@@ -28562,6 +28406,7 @@ ECLCluster#26:
   getLAT(): 0.258789
   getMaxECellId(): 0
   getMinTrkDistance(): 16.6016
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 3.90625
   getNumberOfHadronDigits(): 0
   getPhi(): 1.32766
@@ -28578,7 +28423,6 @@ ECLCluster#26:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1106001
   getZernikeMVA(): 0.822266
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28592,7 +28436,6 @@ ECLCluster#26:
 ECLCluster#27:
   getAbsZernike40(): 1.27002
   getAbsZernike51(): 0.222656
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-134.301,41.1197,64.6755)
   getConnectedRegionId(): 9
@@ -28613,6 +28456,7 @@ ECLCluster#27:
   getLAT(): 0.283203
   getMaxECellId(): 0
   getMinTrkDistance(): 95.2148
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 5.07812
   getNumberOfHadronDigits(): 0
   getPhi(): 2.84448
@@ -28628,7 +28472,6 @@ ECLCluster#27:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 906001
   getZernikeMVA(): 0.196289
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28642,7 +28485,6 @@ ECLCluster#27:
 ECLCluster#28:
   getAbsZernike40(): 1.2999
   getAbsZernike51(): 0.471094
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-118.279,-75.9684,2.78345)
   getConnectedRegionId(): 13
@@ -28663,6 +28505,7 @@ ECLCluster#28:
   getLAT(): 0.195312
   getMaxECellId(): 0
   getMinTrkDistance(): 64.4531
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 7.03125
   getNumberOfHadronDigits(): 0
   getPhi(): -2.57066
@@ -28678,7 +28521,6 @@ ECLCluster#28:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1306001
   getZernikeMVA(): 0.125
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28692,7 +28534,6 @@ ECLCluster#28:
 ECLCluster#29:
   getAbsZernike40(): 0.454883
   getAbsZernike51(): 0.0398437
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (26.7217,-137.93,12.0986)
   getConnectedRegionId(): 12
@@ -28713,6 +28554,7 @@ ECLCluster#29:
   getLAT(): 0.923828
   getMaxECellId(): 0
   getMinTrkDistance(): 57.6172
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 38.0859
   getNumberOfHadronDigits(): 0
   getPhi(): -1.37943
@@ -28738,7 +28580,6 @@ ECLCluster#29:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1206001
   getZernikeMVA(): 1
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28752,7 +28593,6 @@ ECLCluster#29:
 ECLCluster#30:
   getAbsZernike40(): 0.659082
   getAbsZernike51(): 0.114844
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-140.392,-7.12643,-14.5056)
   getConnectedRegionId(): 14
@@ -28773,6 +28613,7 @@ ECLCluster#30:
   getLAT(): 0.808594
   getMaxECellId(): 0
   getMinTrkDistance(): 16.8457
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 15.0391
   getNumberOfHadronDigits(): 0
   getPhi(): -3.09088
@@ -28789,7 +28630,6 @@ ECLCluster#30:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1406001
   getZernikeMVA(): 0.966797
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28803,7 +28643,6 @@ ECLCluster#30:
 ECLCluster#31:
   getAbsZernike40(): 1.03262
   getAbsZernike51(): 0.332813
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-25.8304,-138.293,-46.0126)
   getConnectedRegionId(): 15
@@ -28824,6 +28663,7 @@ ECLCluster#31:
   getLAT(): 0.436523
   getMaxECellId(): 0
   getMinTrkDistance(): 16.6016
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 11.9141
   getNumberOfHadronDigits(): 0
   getPhi(): -1.75545
@@ -28841,7 +28681,6 @@ ECLCluster#31:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1506001
   getZernikeMVA(): 0.744141
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28855,7 +28694,6 @@ ECLCluster#31:
 ECLCluster#32:
   getAbsZernike40(): 1.31152
   getAbsZernike51(): 0.0667969
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-67.9964,-82.8376,-114.759)
   getConnectedRegionId(): 16
@@ -28876,6 +28714,7 @@ ECLCluster#32:
   getLAT(): 0.12207
   getMaxECellId(): 0
   getMinTrkDistance(): 28.3203
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 8.98438
   getNumberOfHadronDigits(): 0
   getPhi(): -2.25812
@@ -28891,7 +28730,6 @@ ECLCluster#32:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1606001
   getZernikeMVA(): 0.542969
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28905,7 +28743,6 @@ ECLCluster#32:
 ECLCluster#33:
   getAbsZernike40(): 1.36963
   getAbsZernike51(): 0.283594
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-78.606,-42.1904,-115.533)
   getConnectedRegionId(): 18
@@ -28926,6 +28763,7 @@ ECLCluster#33:
   getLAT(): 0.227539
   getMaxECellId(): 0
   getMinTrkDistance(): 55.1758
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 9.96094
   getNumberOfHadronDigits(): 0
   getPhi(): -2.64899
@@ -28943,7 +28781,6 @@ ECLCluster#33:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1806001
   getZernikeMVA(): 0.188477
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -28957,7 +28794,6 @@ ECLCluster#33:
 ECLCluster#34:
   getAbsZernike40(): 1.15049
   getAbsZernike51(): 0.291797
-  getClusterHadronIntensity(): 0
   getClusterId(): 1
   getClusterPosition(): (-43.8474,-78.3622,-115.507)
   getConnectedRegionId(): 17
@@ -28978,6 +28814,7 @@ ECLCluster#34:
   getLAT(): 0.27832
   getMaxECellId(): 0
   getMinTrkDistance(): 10.498
+  getMinTrkDistanceID(): 65535
   getNumberOfCrystals(): 6.05469
   getNumberOfHadronDigits(): 0
   getPhi(): -2.08094
@@ -28996,7 +28833,6 @@ ECLCluster#34:
   getUncertaintyEnergy(): 0
   getUncertaintyPhi(): 0
   getUncertaintyTheta(): 0
-  getUniqueId(): 1706001
   getZernikeMVA(): 0.570312
   hasFailedFitTime(): False
   hasFailedTimeResolution(): False
@@ -29434,6 +29270,7 @@ TRGSummary:
   getTRGSummary(9): 0
   getTimQuality(): 0
   getTimType(): 15
+  isPoissonInInjectionVeto(): False
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(35)
     pair

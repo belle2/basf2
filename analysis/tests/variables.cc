@@ -20,6 +20,7 @@
 #include <framework/utilities/TestHelpers.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/Const.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
@@ -434,11 +435,11 @@ namespace {
 
       // create the true underlying mcparticles
       auto* true_photon = mcparticles.appendNew(MCParticle());
-      true_photon->setPDG(22);
+      true_photon->setPDG(Const::photon.getPDGCode());
       auto* true_electron = mcparticles.appendNew(MCParticle());
-      true_electron->setPDG(11);
+      true_electron->setPDG(Const::electron.getPDGCode());
       auto* true_pion = mcparticles.appendNew(MCParticle());
-      true_pion->setPDG(-211);
+      true_pion->setPDG(-Const::pion.getPDGCode());
 
       // create the reco clusters
       auto* cl0 = clusters.appendNew(ECLCluster());
@@ -526,9 +527,9 @@ namespace {
 
     graphParticleMother.setPDG(-521);
     graphParticleDaughter1.setPDG(421);
-    graphParticleDaughter2.setPDG(-211);
-    graphParticleGranddaughter1.setPDG(-321);
-    graphParticleGranddaughter2.setPDG(-11);
+    graphParticleDaughter2.setPDG(-Const::pion.getPDGCode());
+    graphParticleGranddaughter1.setPDG(-Const::kaon.getPDGCode());
+    graphParticleGranddaughter2.setPDG(-Const::electron.getPDGCode());
     graphParticleGranddaughter3.setPDG(12);
 
     // Create the two 4-vectors that will factor into calculation, and set a mass that corresponds
@@ -580,7 +581,7 @@ namespace {
 
   TEST_F(MCTruthVariablesTest, ECLMCMatchWeightVariable)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const auto* photon = particles[0];
     const auto* electron = particles[1];
     const auto* pion = particles[2];
@@ -593,7 +594,7 @@ namespace {
 
   TEST_F(MCTruthVariablesTest, ECLBestMCMatchVariables)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const auto* photon = particles[0];
     const auto* electron = particles[1];
     const auto* pion = particles[2];
@@ -601,10 +602,10 @@ namespace {
 
 
     const auto* pdgcode = Manager::Instance().getVariable("clusterBestMCPDG");
-    EXPECT_EQ(pdgcode->function(photon),       22);
-    EXPECT_EQ(pdgcode->function(electron),     11);
-    EXPECT_EQ(pdgcode->function(pion),     11);
-    EXPECT_EQ(pdgcode->function(misid_photon), 11);
+    EXPECT_EQ(pdgcode->function(photon),       Const::photon.getPDGCode());
+    EXPECT_EQ(pdgcode->function(electron),     Const::electron.getPDGCode());
+    EXPECT_EQ(pdgcode->function(pion),     Const::electron.getPDGCode());
+    EXPECT_EQ(pdgcode->function(misid_photon), Const::electron.getPDGCode());
 
     const auto* weight = Manager::Instance().getVariable("clusterBestMCMatchWeight");
     EXPECT_FLOAT_EQ(weight->function(photon),       12.3);
@@ -691,13 +692,13 @@ namespace {
     DataStore::Instance().setInitializeActive(false);
 
     auto* mcParticle = mcParticles.appendNew();
-    mcParticle->setPDG(11);
+    mcParticle->setPDG(Const::electron.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
     auto* p1 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p1->addRelationTo(mcParticle);
 
     mcParticle = mcParticles.appendNew();
-    mcParticle->setPDG(-11);
+    mcParticle->setPDG(-Const::electron.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
     auto* p2 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p2->addRelationTo(mcParticle);
@@ -721,7 +722,7 @@ namespace {
     DataStore::Instance().setInitializeActive(false);
 
     auto* mcParticle = mcParticles2.appendNew();
-    mcParticle->setPDG(22);
+    mcParticle->setPDG(Const::photon.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
     auto* p3 = particles2.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p3->addRelationTo(mcParticle);
@@ -751,7 +752,7 @@ namespace {
     DataStore::Instance().setInitializeActive(false);
 
     auto* mcParticle = mcParticles3.appendNew();
-    mcParticle->setPDG(22);
+    mcParticle->setPDG(Const::photon.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
     auto* p5 = particles3.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p5->addRelationTo(mcParticle);
@@ -1170,9 +1171,9 @@ namespace {
     MCParticleGraph::GraphParticle& graphParticleDaughter2 = mcGraph.addParticle();
 
     graphParticleGrandMother.setPDG(-521);
-    graphParticleMother.setPDG(13);
+    graphParticleMother.setPDG(Const::muon.getPDGCode());
     graphParticleAunt.setPDG(-14);
-    graphParticleDaughter1.setPDG(11);
+    graphParticleDaughter1.setPDG(Const::electron.getPDGCode());
     graphParticleDaughter2.setPDG(14);
 
     graphParticleMother.comesFrom(graphParticleGrandMother);
@@ -1292,16 +1293,16 @@ namespace {
 
     StoreArray<MCParticle> mcParticles;
     auto* mcParticle = mcParticles.appendNew();
-    mcParticle->setPDG(11);
+    mcParticle->setPDG(Const::electron.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
     mcParticle = mcParticles.appendNew();
-    mcParticle->setPDG(22);
+    mcParticle->setPDG(Const::photon.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
     mcParticle = mcParticles.appendNew();
-    mcParticle->setPDG(-11);
+    mcParticle->setPDG(-Const::electron.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
     mcParticle = mcParticles.appendNew();
-    mcParticle->setPDG(11);
+    mcParticle->setPDG(Const::electron.getPDGCode());
 
 
     const Manager::Var* var = Manager::Instance().getVariable("NumberOfMCParticlesInEvent(11)");
@@ -1390,9 +1391,9 @@ namespace {
     MCParticleGraph::GraphParticle& graphParticleDaughter2 = mcGraph.addParticle();
 
     graphParticleGrandMother.setPDG(-521);
-    graphParticleMother.setPDG(13);
+    graphParticleMother.setPDG(Const::muon.getPDGCode());
     graphParticleAunt.setPDG(-14);
-    graphParticleDaughter1.setPDG(11);
+    graphParticleDaughter1.setPDG(Const::electron.getPDGCode());
     graphParticleDaughter2.setPDG(14);
 
     graphParticleMother.comesFrom(graphParticleGrandMother);
@@ -1477,9 +1478,9 @@ namespace {
     MCParticleGraph::GraphParticle& graphParticleDaughter2 = mcGraph.addParticle();
 
     graphParticleGrandMother.setPDG(-521);
-    graphParticleMother.setPDG(13);
+    graphParticleMother.setPDG(Const::muon.getPDGCode());
     graphParticleAunt.setPDG(-14);
-    graphParticleDaughter1.setPDG(11);
+    graphParticleDaughter1.setPDG(Const::electron.getPDGCode());
     graphParticleDaughter2.setPDG(14);
 
     graphParticleMother.comesFrom(graphParticleGrandMother);
@@ -1558,7 +1559,7 @@ namespace {
     graphParticleGrandMother.setPDG(300553);
     graphParticleMother.setPDG(-521);
     graphParticleAunt.setPDG(521);
-    graphParticleDaughter1.setPDG(11);
+    graphParticleDaughter1.setPDG(Const::electron.getPDGCode());
     graphParticleDaughter2.setPDG(-12);
 
     graphParticleGrandMother.setMomentum(0.0, 0.0, 0.4);
@@ -1653,7 +1654,7 @@ namespace {
     graphParticleGrandMother.setPDG(300553);
     graphParticleMother.setPDG(-521);
     graphParticleAunt.setPDG(521);
-    graphParticleDaughter1.setPDG(11);
+    graphParticleDaughter1.setPDG(Const::electron.getPDGCode());
     graphParticleDaughter2.setPDG(-12);
 
     graphParticleGrandMother.setMomentum(0.0, 0.0, 0.4);
@@ -1716,8 +1717,8 @@ namespace {
     MCParticleGraph::GraphParticle& graphParticle1 = mcGraph2.addParticle();
     MCParticleGraph::GraphParticle& graphParticle2 = mcGraph2.addParticle();
 
-    graphParticle1.setPDG(11);
-    graphParticle2.setPDG(-11);
+    graphParticle1.setPDG(Const::electron.getPDGCode());
+    graphParticle2.setPDG(-Const::electron.getPDGCode());
 
     graphParticle1.setMomentum(1.1, 1.3, 1.4);
     graphParticle1.setMomentum(-1.1, -1.3, 1.4);
@@ -1822,7 +1823,7 @@ namespace {
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
+      Particle d(TLorentzVector(-1, 1.0 - 2 * (i % 2), 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -1853,6 +1854,14 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(p), 0);
 
+    var = Manager::Instance().getVariable("daughterDiffOf(1, 0, phi)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -1.5707964);
+
+    var = Manager::Instance().getVariable("daughterDiffOf(1, 0, useCMSFrame(phi))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -1.513103);
+
     EXPECT_B2FATAL(Manager::Instance().getVariable("daughterDiffOf(0, NOTINT, PDG)"));
   }
 
@@ -1874,7 +1883,7 @@ namespace {
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
       auto* mcParticle = mcParticles.appendNew();
-      mcParticle->setPDG((i % 2) ? -11 : 211);
+      mcParticle->setPDG((i % 2) ? -Const::electron.getPDGCode() : Const::pion.getPDGCode());
       mcParticle->setStatus(MCParticle::c_PrimaryParticle);
       newDaughters->addRelationTo(mcParticle);
     }
@@ -1912,7 +1921,7 @@ namespace {
   TEST_F(MetaVariableTest, daughterClusterAngleInBetween)
   {
     // declare all the array we need
-    StoreArray<Particle> particles, particles_noclst;
+    StoreArray<Particle> particles;
     std::vector<int> daughterIndices, daughterIndices_noclst;
 
     //proxy initialize where to declare the needed array
@@ -1985,7 +1994,7 @@ namespace {
   TEST_F(MetaVariableTest, grandDaughterDiffOfs)
   {
     // declare all the array we need
-    StoreArray<Particle> particles, particles_noclst;
+    StoreArray<Particle> particles;
     std::vector<int> daughterIndices0_noclst, daughterIndices1_noclst, daughterIndices2_noclst;
     std::vector<int> daughterIndices0, daughterIndices1, daughterIndices2;
 
@@ -2044,10 +2053,10 @@ namespace {
     const Manager::Var* var_E_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,2,3,E)");
     const Manager::Var* var_ClusterE_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,2,3,clusterE)");
 
-    const Manager::Var* var_ClusterPhi = Manager::Instance().getVariable("grandDaughterDiffOfClusterPhi(0,1,0,0)");
-    const Manager::Var* var_Phi = Manager::Instance().getVariable("grandDaughterDiffOfPhi(0,1,0,0)");
-    const Manager::Var* var_ClusterPhi_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOfClusterPhi(0,1,2,3)");
-    const Manager::Var* var_Phi_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOfPhi(0,1,2,3)");
+    const Manager::Var* var_ClusterPhi = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,0,0,clusterPhi)");
+    const Manager::Var* var_Phi = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,0,0,phi)");
+    const Manager::Var* var_ClusterPhi_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,2,3,clusterPhi)");
+    const Manager::Var* var_Phi_wrongIndexes = Manager::Instance().getVariable("grandDaughterDiffOf(0,1,2,3,phi)");
 
     // when no relations are set between the particles and the eclClusters, nan is expected to be returned for the Cluster- vars
     // no problems are supposed to happen for non-Cluster- vars
@@ -2263,19 +2272,19 @@ namespace {
     DataStore::Instance().setInitializeActive(false);
 
     auto* mcParticle = mcParticles.appendNew();
-    mcParticle->setPDG(11);
+    mcParticle->setPDG(Const::electron.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
     auto* p1 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p1->addRelationTo(mcParticle);
 
     mcParticle = mcParticles.appendNew();
-    mcParticle->setPDG(-11);
+    mcParticle->setPDG(-Const::electron.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
     auto* p2 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p2->addRelationTo(mcParticle);
 
     mcParticle = mcParticles.appendNew();
-    mcParticle->setPDG(22);
+    mcParticle->setPDG(Const::photon.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
     auto* p3 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p3->addRelationTo(mcParticle);
@@ -2460,19 +2469,19 @@ namespace {
 
     // MCParticles
     auto* mcphoton = mcparticles.appendNew();
-    mcphoton->setPDG(22);
+    mcphoton->setPDG(Const::photon.getPDGCode());
     mcphoton->setStatus(MCParticle::c_PrimaryParticle);
 
     auto* mcelectron = mcparticles.appendNew();
-    mcelectron->setPDG(11);
+    mcelectron->setPDG(Const::electron.getPDGCode());
     mcelectron->setStatus(MCParticle::c_PrimaryParticle);
 
     auto* mcanotherelectron = mcparticles.appendNew();
-    mcanotherelectron->setPDG(22);
+    mcanotherelectron->setPDG(Const::photon.getPDGCode());
     mcanotherelectron->setStatus(MCParticle::c_PrimaryParticle);
 
     auto* mcyetanotherelectron = mcparticles.appendNew();
-    mcyetanotherelectron->setPDG(22);
+    mcyetanotherelectron->setPDG(Const::photon.getPDGCode());
     mcyetanotherelectron->setStatus(MCParticle::c_PrimaryParticle);
 
     // particles
@@ -3394,7 +3403,7 @@ namespace {
       momentum_1 = momentum_1 + mom;
 
       auto* mcParticle = mcParticles.appendNew();
-      mcParticle->setPDG((i % 2) ? -11 : 211);
+      mcParticle->setPDG((i % 2) ? -Const::electron.getPDGCode() : Const::pion.getPDGCode());
       mcParticle->setStatus(MCParticle::c_PrimaryParticle);
       mcParticle->set4Vector(mom);
       newDaughters->addRelationTo(mcParticle);
@@ -3422,7 +3431,7 @@ namespace {
       momentum_2 = momentum_2 + mom;
 
       auto* mcParticle = mcParticles.appendNew();
-      mcParticle->setPDG((i % 2) ? -11 : 211);
+      mcParticle->setPDG((i % 2) ? -Const::electron.getPDGCode() : Const::pion.getPDGCode());
       mcParticle->setStatus(MCParticle::c_PrimaryParticle);
       mcParticle->set4Vector(mom);
       newDaughters->addRelationTo(mcParticle);
@@ -3464,14 +3473,11 @@ namespace {
 
     EXPECT_B2FATAL(Manager::Instance().getVariable("mcDaughterDiffOf(0, NOTINT, PDG)"));
 
-
-    // Test mcDaughterDiffOfPhi
-    var = Manager::Instance().getVariable("mcDaughterDiffOfPhi(0, 1)");
+    // Test azimuthal angle as well
+    var = Manager::Instance().getVariable("mcDaughterDiffOf(0, 1, phi)");
     ASSERT_NE(var, nullptr);
     v_test = momentum_2.Vect().DeltaPhi(momentum_1.Vect());
     EXPECT_FLOAT_EQ(var->function(p), v_test);
-
-    EXPECT_B2FATAL(Manager::Instance().getVariable("mcDaughterDiffOfPhi(0, NOTINT)"));
 
   }
 
@@ -3510,19 +3516,19 @@ namespace {
 
     mcg_m.setPDG(421);
     mcg_m.set4Vector(TLorentzVector(7, 7, 7, 7));
-    mcg_d_0.setPDG(-310);
+    mcg_d_0.setPDG(-Const::Kshort.getPDGCode());
     mcg_d_0.set4Vector(TLorentzVector(6, 6, 6, 6));
-    mcg_d_1.setPDG(310);
+    mcg_d_1.setPDG(Const::Kshort.getPDGCode());
     mcg_d_1.set4Vector(TLorentzVector(5, 5, 5, 5));
-    mcg_gd_0_0.setPDG(211);
+    mcg_gd_0_0.setPDG(Const::pion.getPDGCode());
     mcg_gd_0_0.set4Vector(TLorentzVector(4, 4, 4, 4));
-    mcg_gd_0_1.setPDG(-211);
+    mcg_gd_0_1.setPDG(-Const::pion.getPDGCode());
     mcg_gd_0_1.set4Vector(TLorentzVector(3, 3, 3, 3));
-    mcg_gd_1_0.setPDG(211);
+    mcg_gd_1_0.setPDG(Const::pion.getPDGCode());
     mcg_gd_1_0.set4Vector(TLorentzVector(2, 1, 2, 2));
-    mcg_gd_1_1.setPDG(-211);
+    mcg_gd_1_1.setPDG(-Const::pion.getPDGCode());
     mcg_gd_1_1.set4Vector(TLorentzVector(1, 1, 1, 1));
-    mcg_not_child.setPDG(211);
+    mcg_not_child.setPDG(Const::pion.getPDGCode());
     mcg_not_child.set4Vector(TLorentzVector(10, 10, 10, 10));
 
     mcg_d_0.comesFrom(mcg_m);
@@ -3903,12 +3909,12 @@ namespace {
 
     mcg_m.setPDG(521);
     mcg_d_0.setPDG(-411);
-    mcg_d_1.setPDG(211);
-    mcg_gd_0_0.setPDG(310);
-    mcg_gd_0_1.setPDG(-211);
-    mcg_ggd_0_0_0.setPDG(211);
-    mcg_ggd_0_0_1.setPDG(-211);
-    mcg_not_child.setPDG(211);
+    mcg_d_1.setPDG(Const::pion.getPDGCode());
+    mcg_gd_0_0.setPDG(Const::Kshort.getPDGCode());
+    mcg_gd_0_1.setPDG(-Const::pion.getPDGCode());
+    mcg_ggd_0_0_0.setPDG(Const::pion.getPDGCode());
+    mcg_ggd_0_0_1.setPDG(-Const::pion.getPDGCode());
+    mcg_not_child.setPDG(Const::pion.getPDGCode());
 
     mcg_d_0.comesFrom(mcg_m);
     mcg_d_1.comesFrom(mcg_m);
@@ -4165,6 +4171,8 @@ namespace {
     Track mytrack;
     mytrack.setTrackFitResultIndex(Const::electron, 0);
     Track* allTrack = tracks.appendNew(mytrack);
+    Track* noSVDTrack = tracks.appendNew(mytrack);
+    Track* noSVDNoTOPTrack = tracks.appendNew(mytrack);
     Track* noPIDTrack = tracks.appendNew(mytrack);
     Track* dEdxTrack = tracks.appendNew(mytrack);
 
@@ -4177,37 +4185,59 @@ namespace {
     lAll->setLogLikelihood(Const::ECL, Const::electron, 0.14);
     lAll->setLogLikelihood(Const::CDC, Const::electron, 0.12);
     lAll->setLogLikelihood(Const::SVD, Const::electron, 0.1);
-
-    lAll->setLogLikelihood(Const::TOP, Const::pion, 0.2);
-    lAll->setLogLikelihood(Const::ARICH, Const::pion, 0.22);
-    lAll->setLogLikelihood(Const::ECL, Const::pion, 0.24);
-    lAll->setLogLikelihood(Const::CDC, Const::pion, 0.26);
-    lAll->setLogLikelihood(Const::SVD, Const::pion, 0.28);
-
-    lAll->setLogLikelihood(Const::TOP, Const::kaon, 0.3);
-    lAll->setLogLikelihood(Const::ARICH, Const::kaon, 0.32);
-    lAll->setLogLikelihood(Const::ECL, Const::kaon, 0.34);
-    lAll->setLogLikelihood(Const::CDC, Const::kaon, 0.36);
-    lAll->setLogLikelihood(Const::SVD, Const::kaon, 0.38);
-
-    lAll->setLogLikelihood(Const::TOP, Const::proton, 0.4);
-    lAll->setLogLikelihood(Const::ARICH, Const::proton, 0.42);
-    lAll->setLogLikelihood(Const::ECL, Const::proton, 0.44);
-    lAll->setLogLikelihood(Const::CDC, Const::proton, 0.46);
-    lAll->setLogLikelihood(Const::SVD, Const::proton, 0.48);
+    lAll->setLogLikelihood(Const::KLM, Const::electron, 0.01);
 
     lAll->setLogLikelihood(Const::TOP, Const::muon, 0.5);
     lAll->setLogLikelihood(Const::ARICH, Const::muon, 0.52);
     lAll->setLogLikelihood(Const::ECL, Const::muon, 0.54);
     lAll->setLogLikelihood(Const::CDC, Const::muon, 0.56);
     lAll->setLogLikelihood(Const::SVD, Const::muon, 0.58);
+    lAll->setLogLikelihood(Const::KLM, Const::muon, 0.8);
+
+    lAll->setLogLikelihood(Const::TOP, Const::pion, 0.2);
+    lAll->setLogLikelihood(Const::ARICH, Const::pion, 0.22);
+    lAll->setLogLikelihood(Const::ECL, Const::pion, 0.24);
+    lAll->setLogLikelihood(Const::CDC, Const::pion, 0.26);
+    lAll->setLogLikelihood(Const::SVD, Const::pion, 0.28);
+    lAll->setLogLikelihood(Const::KLM, Const::pion, 0.2);
+
+    lAll->setLogLikelihood(Const::TOP, Const::kaon, 0.3);
+    lAll->setLogLikelihood(Const::ARICH, Const::kaon, 0.32);
+    lAll->setLogLikelihood(Const::ECL, Const::kaon, 0.34);
+    lAll->setLogLikelihood(Const::CDC, Const::kaon, 0.36);
+    lAll->setLogLikelihood(Const::SVD, Const::kaon, 0.38);
+    lAll->setLogLikelihood(Const::KLM, Const::kaon, 0.2);
+
+    lAll->setLogLikelihood(Const::TOP, Const::proton, 0.4);
+    lAll->setLogLikelihood(Const::ARICH, Const::proton, 0.42);
+    lAll->setLogLikelihood(Const::ECL, Const::proton, 0.44);
+    lAll->setLogLikelihood(Const::CDC, Const::proton, 0.46);
+    lAll->setLogLikelihood(Const::SVD, Const::proton, 0.48);
+    lAll->setLogLikelihood(Const::KLM, Const::proton, 0.02);
 
     lAll->setLogLikelihood(Const::TOP, Const::deuteron, 0.6);
     lAll->setLogLikelihood(Const::ARICH, Const::deuteron, 0.62);
     lAll->setLogLikelihood(Const::ECL, Const::deuteron, 0.64);
     lAll->setLogLikelihood(Const::CDC, Const::deuteron, 0.66);
     lAll->setLogLikelihood(Const::SVD, Const::deuteron, 0.68);
+    lAll->setLogLikelihood(Const::KLM, Const::deuteron, 0.02);
 
+    // Likelihoods for all detectors but SVD
+    auto* lAllNoSVD = likelihood.appendNew();
+    // Likelihoods for all detectors but SVD and TOP
+    auto* lAllNoSVDNoTOP = likelihood.appendNew();
+
+    for (unsigned int iDet(0); iDet < Const::PIDDetectors::c_size; iDet++) {
+      const auto det =  Const::PIDDetectors::c_set[iDet];
+      for (const auto& hypo : Const::chargedStableSet) {
+        if (det != Const::SVD) {
+          lAllNoSVD->setLogLikelihood(det, hypo, lAll->getLogL(hypo, det));
+          if (det != Const::TOP) {
+            lAllNoSVDNoTOP->setLogLikelihood(det, hypo, lAll->getLogL(hypo, det));
+          }
+        }
+      }
+    }
 
     // Likelihoods for a dEdx only case
     auto* ldEdx = likelihood.appendNew();
@@ -4229,45 +4259,66 @@ namespace {
     ldEdx->setLogLikelihood(Const::CDC, Const::deuteron, 0.66);
     ldEdx->setLogLikelihood(Const::SVD, Const::deuteron, 0.68);
 
-
     allTrack->addRelationTo(lAll);
+    noSVDTrack->addRelationTo(lAllNoSVD);
+    noSVDNoTOPTrack->addRelationTo(lAllNoSVDNoTOP);
     dEdxTrack->addRelationTo(ldEdx);
 
     // Table with the sum(LogL) for several cases
-    //      All  dEdx
-    // e    0.7  0.22
-    // mu   2.7  1.14
-    // pi   1.2  0.54
-    // k    1.7  0.74
-    // p    2.2  0.94
-    // d    3.2  1.34
+    //      All   dEdx  AllNoSVD AllNoSVDNoTOP
+    // e    0.71  0.22  0.61     0.43
+    // mu   3.5   1.14  2.92     2.42
+    // pi   1.4   0.54  1.12     0.92
+    // k    1.9   0.74  1.52     1.22
+    // p    2.22  0.94  1.74     1.34
+    // d    3.22  1.34  2.54     1.94
 
     auto* particleAll = particles.appendNew(allTrack, Const::pion);
+    auto* particleNoSVD = particles.appendNew(noSVDTrack, Const::pion);
+    auto* particleNoSVDNoTOP = particles.appendNew(noSVDNoTOPTrack, Const::pion);
     auto* particledEdx = particles.appendNew(dEdxTrack, Const::pion);
     auto* particleNoID = particles.appendNew(noPIDTrack, Const::pion);
 
-    double numsumexp = std::exp(0.7) + std::exp(2.7) + std::exp(1.2) + std::exp(1.7) + std::exp(2.2) + std::exp(3.2);
+    double numsumexp = std::exp(0.71) + std::exp(3.5) + std::exp(1.4) + std::exp(1.9) + std::exp(2.22) + std::exp(3.22);
+    double numsumexp_noSVD = std::exp(0.61) + std::exp(2.92) + std::exp(1.12) + std::exp(1.52) + std::exp(1.74) + std::exp(2.54);
+    double numsumexp_noSVDNoTOP = std::exp(0.43) + std::exp(2.42) + std::exp(0.92) + std::exp(1.22) + std::exp(1.34) + std::exp(1.94);
 
     // Basic PID quantities. Currently just wrappers for global probability.
-    EXPECT_FLOAT_EQ(electronID(particleAll), std::exp(0.7) / numsumexp);
-    EXPECT_FLOAT_EQ(muonID(particleAll),     std::exp(2.7) / numsumexp);
-    EXPECT_FLOAT_EQ(pionID(particleAll),     std::exp(1.2) / numsumexp);
-    EXPECT_FLOAT_EQ(kaonID(particleAll),     std::exp(1.7) / numsumexp);
-    EXPECT_FLOAT_EQ(protonID(particleAll),   std::exp(2.2) / numsumexp);
-    EXPECT_FLOAT_EQ(deuteronID(particleAll), std::exp(3.2) / numsumexp);
+    EXPECT_FLOAT_EQ(electronID(particleNoSVD), std::exp(0.61) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(muonID(particleNoSVD),     std::exp(2.92) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(pionID(particleNoSVD),     std::exp(1.12) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(kaonID(particleNoSVD),     std::exp(1.52) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(protonID(particleNoSVD),   std::exp(1.74) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(deuteronID(particleNoSVD), std::exp(2.54) / numsumexp_noSVD);
 
     // smart PID that takes the hypothesis into account
-    auto* particleMuonAll = particles.appendNew(allTrack, Const::muon);
-    auto* particleKaonAll = particles.appendNew(allTrack, Const::kaon);
-    auto* particleElectronAll = particles.appendNew(allTrack, Const::electron);
-    auto* particleProtonAll = particles.appendNew(allTrack, Const::proton);
-    auto* particleDeuteronAll = particles.appendNew(allTrack, Const::deuteron);
-    EXPECT_FLOAT_EQ(particleID(particleAll), std::exp(1.2) / numsumexp); // there's already a pion
-    EXPECT_FLOAT_EQ(particleID(particleMuonAll), std::exp(2.7) / numsumexp);
-    EXPECT_FLOAT_EQ(particleID(particleKaonAll), std::exp(1.7) / numsumexp);
-    EXPECT_FLOAT_EQ(particleID(particleElectronAll), std::exp(0.7) / numsumexp);
-    EXPECT_FLOAT_EQ(particleID(particleProtonAll),   std::exp(2.2) / numsumexp);
-    EXPECT_FLOAT_EQ(particleID(particleDeuteronAll), std::exp(3.2) / numsumexp);
+    auto* particleElectronNoSVD = particles.appendNew(noSVDTrack, Const::electron);
+    auto* particleMuonNoSVD = particles.appendNew(noSVDTrack, Const::muon);
+    auto* particleKaonNoSVD = particles.appendNew(noSVDTrack, Const::kaon);
+    auto* particleProtonNoSVD = particles.appendNew(noSVDTrack, Const::proton);
+    auto* particleDeuteronNoSVD = particles.appendNew(noSVDTrack, Const::deuteron);
+
+    EXPECT_FLOAT_EQ(particleID(particleNoSVD), std::exp(1.12) / numsumexp_noSVD); // there's already a pion
+    EXPECT_FLOAT_EQ(particleID(particleElectronNoSVD), std::exp(0.61) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(particleID(particleMuonNoSVD), std::exp(2.92) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(particleID(particleKaonNoSVD), std::exp(1.52) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(particleID(particleProtonNoSVD),   std::exp(1.74) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(particleID(particleDeuteronNoSVD), std::exp(2.54) / numsumexp_noSVD);
+
+    // TEMP: Electron ID w/o the TOP.
+    EXPECT_FLOAT_EQ(electronID_noTOP(particleNoSVDNoTOP), std::exp(0.43) / numsumexp_noSVDNoTOP);
+
+    // Hadron ID vars w/ SVD info included. Only pi, K, p.
+    double numsumexp_had = std::exp(1.4) + std::exp(1.9) + std::exp(2.22);
+    EXPECT_FLOAT_EQ(pionID_SVD(particleAll), std::exp(1.4) / numsumexp_had);
+    EXPECT_FLOAT_EQ(kaonID_SVD(particleAll), std::exp(1.9) / numsumexp_had);
+    EXPECT_FLOAT_EQ(protonID_SVD(particleAll), std::exp(2.22) / numsumexp_had);
+    std::vector<double> v_pi_K {211., 321.};
+    std::vector<double> v_pi_p {211., 2212.};
+    std::vector<double> v_K_p {321., 2212.};
+    EXPECT_FLOAT_EQ(binaryPID_SVD(particleAll, v_pi_K), std::exp(1.4) / (std::exp(1.4) + std::exp(1.9)));
+    EXPECT_FLOAT_EQ(binaryPID_SVD(particleAll, v_pi_p), std::exp(1.4) / (std::exp(1.4) + std::exp(2.22)));
+    EXPECT_FLOAT_EQ(binaryPID_SVD(particleAll, v_K_p), std::exp(1.9) / (std::exp(1.9) + std::exp(2.22)));
 
     // Check what happens if no Likelihood is available
     EXPECT_TRUE(std::isnan(electronID(particleNoID)));
@@ -4279,22 +4330,22 @@ namespace {
 
     //expert stuff: LogL values
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, TOP)")->function(particleAll), 0.18);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, ALL)")->function(particleAll), 0.70);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, ALL)")->function(particleAll), 0.71);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(2212, TOP, CDC)")->function(particleAll), 0.86);
 
     // global probability
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(particleAll),
-                    std::exp(3.2) / numsumexp);
+                    std::exp(3.22) / numsumexp);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(2212, ALL)")->function(particleAll),
-                    std::exp(2.2) / numsumexp);
+                    std::exp(2.22) / numsumexp);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particleAll),
-                    std::exp(1.2) / numsumexp);
+                    std::exp(1.4) / numsumexp);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(321, ALL)")->function(particleAll),
-                    std::exp(1.7) / numsumexp);
+                    std::exp(1.9) / numsumexp);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(13, ALL)")->function(particleAll),
-                    std::exp(2.7) / numsumexp);
+                    std::exp(3.5) / numsumexp);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(11, ALL)")->function(particleAll),
-                    std::exp(0.7) / numsumexp);
+                    std::exp(0.71) / numsumexp);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particledEdx),
                     std::exp(0.54) / (std::exp(0.22) + std::exp(1.14) + std::exp(0.54) + std::exp(0.74) + std::exp(0.94) + std::exp(1.34)));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particledEdx),
@@ -4306,7 +4357,7 @@ namespace {
 
     // binary probability
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ALL)")->function(particleAll),
-                    1.0 / (1.0 + std::exp(2.2 - 1.7)));
+                    1.0 / (1.0 + std::exp(2.22 - 1.9)));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ALL)")->function(particledEdx),
                     1.0 / (1.0 + std::exp(0.94 - 0.74)));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, CDC, SVD)")->function(particleAll),
@@ -4323,14 +4374,18 @@ namespace {
                               particledEdx)));
     //Mostlikely PDG tests:
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG()")->function(particledEdx), 1.00001e+09);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.5, 0.1, 0.1, 0.1, 0.1, 0.1)")->function(particledEdx), 11);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.5, 0.1, 0.1, 0.1, 0.1)")->function(particledEdx), 13);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.5, 0.1, 0.1, 0.1)")->function(particledEdx), 211);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.5, 0.1, 0.1)")->function(particledEdx), 321);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.1, 0.5, 0.1)")->function(particledEdx), 2212);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0, 1., 0, 0, 0, 0)")->function(particledEdx), 13);
-    EXPECT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG()")->function(particleDeuteronAll), 1000010020);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidIsMostLikely(0.5,0.1,0.1,0.1,0.1,0.1)")->function(particleDeuteronAll), 1.0);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.5, 0.1, 0.1, 0.1, 0.1, 0.1)")->function(particledEdx),
+                    Const::electron.getPDGCode());
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.5, 0.1, 0.1, 0.1, 0.1)")->function(particledEdx),
+                    Const::muon.getPDGCode());
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.5, 0.1, 0.1, 0.1)")->function(particledEdx),
+                    Const::pion.getPDGCode());
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.5, 0.1, 0.1)")->function(particledEdx),
+                    Const::kaon.getPDGCode());
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.1, 0.5, 0.1)")->function(particledEdx),
+                    Const::proton.getPDGCode());
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0, 1., 0, 0, 0, 0)")->function(particledEdx),
+                    Const::muon.getPDGCode());
   }
 
   TEST_F(PIDVariableTest, MissingLikelihood)
@@ -4434,7 +4489,7 @@ namespace {
 
       // Insert MC particle logic here
       MCParticle mcKs;
-      mcKs.setPDG(310);
+      mcKs.setPDG(Const::Kshort.getPDGCode());
       mcKs.setProductionVertex(1.0, 1.0, 0.0);
       mcKs.setDecayVertex(4.0, 5.0, 0.0);
       mcKs.setProductionTime(0);
@@ -4521,7 +4576,7 @@ namespace {
   };
   TEST_F(FlightInfoTest, flightDistance)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[1]; //  Ks had flight distance of 5 cm
 
     const Manager::Var* var = Manager::Instance().getVariable("flightDistance");
@@ -4530,7 +4585,7 @@ namespace {
   }
   TEST_F(FlightInfoTest, flightDistanceErr)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[1]; //  Ks had flight distance of 5 cm
 
     const Manager::Var* var = Manager::Instance().getVariable("flightDistanceErr");
@@ -4539,7 +4594,7 @@ namespace {
   }
   TEST_F(FlightInfoTest, flightTime)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[1]; //  Ks had flight time of 0.0427 us (t = d/c * m/p)
 
     const Manager::Var* var = Manager::Instance().getVariable("flightTime");
@@ -4549,7 +4604,7 @@ namespace {
 
   TEST_F(FlightInfoTest, flightTimeErr)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[1]; //  Ks should have positive flight distance uncertainty
 
     const Manager::Var* var = Manager::Instance().getVariable("flightTimeErr");
@@ -4557,10 +4612,9 @@ namespace {
     EXPECT_GT(var->function(newKs), 0.0);
   }
 
-
   TEST_F(FlightInfoTest, flightDistanceOfDaughter)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter Ks had flight distance of 5 cm
 
     const Manager::Var* var = Manager::Instance().getVariable("flightDistanceOfDaughter(1)");
@@ -4573,7 +4627,7 @@ namespace {
   }
   TEST_F(FlightInfoTest, flightDistanceOfDaughterErr)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter Ks should have positive flight distance uncertainty
 
     const Manager::Var* var = Manager::Instance().getVariable("flightDistanceOfDaughterErr(1)");
@@ -4586,7 +4640,7 @@ namespace {
   }
   TEST_F(FlightInfoTest, flightTimeOfDaughter)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter Ks had flight time of 0.0427 us (t = d/c * m/p)
 
     const Manager::Var* var = Manager::Instance().getVariable("flightTimeOfDaughter(1)");
@@ -4601,7 +4655,7 @@ namespace {
   }
   TEST_F(FlightInfoTest, flightTimeOfDaughterErr)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter Ks should have positive flight time uncertainty
 
     const Manager::Var* var = Manager::Instance().getVariable("flightTimeOfDaughterErr(1)");
@@ -4614,7 +4668,7 @@ namespace {
   }
   TEST_F(FlightInfoTest, mcFlightDistanceOfDaughter)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter Ks had flight distance of 5 cm
 
     const Manager::Var* var = Manager::Instance().getVariable("mcFlightDistanceOfDaughter(1)");
@@ -4628,7 +4682,7 @@ namespace {
   }
   TEST_F(FlightInfoTest, mcFlightTimeOfDaughter)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter Ks had flight time of 0.0427 us (t = d/c * m/p)
 
     const Manager::Var* var = Manager::Instance().getVariable("mcFlightTimeOfDaughter(1)");
@@ -4646,7 +4700,7 @@ namespace {
 
   TEST_F(FlightInfoTest, vertexDistance)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKS = particles[1]; // Get KS, as it has both a production and decay vertex
 
     const Manager::Var* var = Manager::Instance().getVariable("vertexDistance");
@@ -4656,7 +4710,7 @@ namespace {
 
   TEST_F(FlightInfoTest, vertexDistanceError)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKS = particles[1]; // Get KS, as it has both a production and decay vertex
 
     const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceErr");
@@ -4666,7 +4720,7 @@ namespace {
 
   TEST_F(FlightInfoTest, vertexDistanceSignificance)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKS = particles[1]; // Get KS, as it has both a production and decay vertex
 
     const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceSignificance");
@@ -4676,7 +4730,7 @@ namespace {
 
   TEST_F(FlightInfoTest, vertexDistanceOfDaughter)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter KS has both a production and decay vertex
 
     const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughter(1, noIP)");
@@ -4694,7 +4748,7 @@ namespace {
 
   TEST_F(FlightInfoTest, vertexDistanceOfDaughterError)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter KS has both a production and decay vertex
 
     const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughterErr(1, noIP)");
@@ -4708,7 +4762,7 @@ namespace {
 
   TEST_F(FlightInfoTest, vertexDistanceOfDaughterSignificance)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter KS has both a production and decay vertex
 
     const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughterSignificance(1, noIP)");
@@ -4737,7 +4791,7 @@ namespace {
 
       // Insert MC particle logic here
       MCParticle mcKs;
-      mcKs.setPDG(310);
+      mcKs.setPDG(Const::Kshort.getPDGCode());
       mcKs.setDecayVertex(4.0, 5.0, 0.0);
       mcKs.setProductionVertex(TVector3(1.0, 2.0, 3.0));
       mcKs.setMassFromPDG();
@@ -4773,7 +4827,7 @@ namespace {
   // MC vertex tests
   TEST_F(VertexVariablesTest, mcDecayVertexX)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had truth decay x is 4.0
 
     const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexX");
@@ -4783,7 +4837,7 @@ namespace {
 
   TEST_F(VertexVariablesTest, mcDecayVertexY)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had truth decay y is 5.0
 
     const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexY");
@@ -4793,7 +4847,7 @@ namespace {
 
   TEST_F(VertexVariablesTest, mcDecayVertexZ)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had truth decay z is 0.0
 
     const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexZ");
@@ -4804,7 +4858,7 @@ namespace {
 
   TEST_F(VertexVariablesTest, mcDecayVertexFromIPDistance)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had truth distance of sqrt(41)
 
     const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexFromIPDistance");
@@ -4814,7 +4868,7 @@ namespace {
 
   TEST_F(VertexVariablesTest, mcDecayVertexRho)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had truth rho of sqrt(41)
 
     const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexRho");
@@ -4824,7 +4878,7 @@ namespace {
 
   TEST_F(VertexVariablesTest, mcProductionVertexX)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had production vertex x of 1.0 cm
 
     const Manager::Var* var = Manager::Instance().getVariable("mcProductionVertexX");
@@ -4834,7 +4888,7 @@ namespace {
 
   TEST_F(VertexVariablesTest, mcProductionVertexY)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had production vertex y of 2.0 cm
 
     const Manager::Var* var = Manager::Instance().getVariable("mcProductionVertexY");
@@ -4844,7 +4898,7 @@ namespace {
 
   TEST_F(VertexVariablesTest, mcProductionVertexZ)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had production vertex z of 3.0 cm
 
     const Manager::Var* var = Manager::Instance().getVariable("mcProductionVertexZ");
@@ -4856,7 +4910,7 @@ namespace {
 
   TEST_F(VertexVariablesTest, prodVertexX)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had production vertex x of 1.0 cm
 
     const Manager::Var* var = Manager::Instance().getVariable("prodVertexX");
@@ -4865,7 +4919,7 @@ namespace {
   }
   TEST_F(VertexVariablesTest, prodVertexY)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had production vertex y of 2.0 cm
 
     const Manager::Var* var = Manager::Instance().getVariable("prodVertexY");
@@ -4874,7 +4928,7 @@ namespace {
   }
   TEST_F(VertexVariablesTest, prodVertexZ)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had production vertex z of 3.0 cm
 
     const Manager::Var* var = Manager::Instance().getVariable("prodVertexZ");
@@ -4886,7 +4940,7 @@ namespace {
 
   TEST_F(VertexVariablesTest, prodVertexCov)
   {
-    StoreArray<Particle> particles;
+    StoreArray<Particle> particles{};
     const Particle* newKs = particles[0]; //  Ks had production vertex covariance xx of .1 cm
 
     //const Manager::Var* var = Manager::Instance().getVariable("prodVertexCovXX");

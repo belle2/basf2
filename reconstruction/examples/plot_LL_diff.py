@@ -16,7 +16,7 @@
 import basf2 as b2
 
 from ROOT import Belle2
-from ROOT import TH1F, TH2F, TCanvas
+from ROOT import TCanvas, TH2F
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 
@@ -65,7 +65,7 @@ class MinModule(b2.Module):
                 mcpart = track.getRelatedTo('MCParticles')
             if not track or not mcpart:
                 # some tracks don't have an mcparticle
-                B2WARNING('problems with track <-> mcparticle relations')
+                b2.B2WARNING('problems with track <-> mcparticle relations')
                 event = Belle2.PyStoreObj('EventMetaData').obj().getEvent()
                 print('event: %d, track: %d' % (event, track.getArrayIndex()))
             else:
@@ -74,7 +74,7 @@ class MinModule(b2.Module):
                 momentum = momentumVec.Mag()
                 if momentum > 3.5:  # cut off
                     continue
-                theta = momentumVec.CosTheta()
+                # theta = momentumVec.CosTheta()
 
                 # particle to compare with pions
                 selectedpart = Belle2.Const.kaon

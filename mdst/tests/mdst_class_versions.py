@@ -16,7 +16,7 @@ from b2test_utils import get_object_with_name, get_streamer_checksums
 #: A mapping name -> version, checksum of the expected objects
 EXPECTED_CHECKSUMS = {
     'Belle2::Const::DetectorSet': (1, 1222446098),
-    'Belle2::ECLCluster': (14, 932603982),
+    'Belle2::ECLCluster': (15, 835771092),
     'Belle2::EventLevelClusteringInfo': (1, 162935545),
     'Belle2::EventLevelTrackingInfo': (2, 1667284927),
     'Belle2::EventMetaData': (4, 2999207747),
@@ -28,7 +28,7 @@ EXPECTED_CHECKSUMS = {
     'Belle2::RelationElement': (1, 1883389510),
     'Belle2::RelationsInterface<TObject>': (0, 3862127315),
     'Belle2::SoftwareTriggerResult': (5, 241059817),
-    'Belle2::TRGSummary': (6, 3829574990),
+    'Belle2::TRGSummary': (7, 1658421299),
     'Belle2::Track': (4, 839781593),
     'Belle2::TrackFitResult': (8, 1247854432),
     'Belle2::V0': (3, 4006259140),

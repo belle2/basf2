@@ -1,5 +1,5 @@
 import basf2
-from iov_conditional import phase_2_conditional, make_conditional_at
+from iov_conditional import make_conditional_at
 
 
 def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=False, direction="backward"):
@@ -53,30 +53,13 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fa
                     ).set_name(f"CDCToSVDSeedCKF_{direction}")
 
 
-def add_pxd_ckf(path, *args, **kwargs):
-    """Function basically calling _add_pxd_ckf_implementation for strict and loose settings (depending on the PXD setup)"""
-    if "PXDSpacePointCreator" not in [m.name() for m in path.modules()]:
-        path.add_module("PXDSpacePointCreator")
-
-    loose_settings_path = basf2.create_path()
-    _add_pxd_ckf_implementation(loose_settings_path, *args, loose_settings=True, **kwargs)
-    strict_settings_path = basf2.create_path()
-    _add_pxd_ckf_implementation(strict_settings_path, *args, loose_settings=False, **kwargs)
-
-    strict_settings_iovs = [(0, 0, 0, -1)]
-    make_conditional_at(path=path, iov_list=strict_settings_iovs,
-                        path_when_in_iov=strict_settings_path, path_when_not_in_iov=loose_settings_path)
-
-
-def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, loose_settings=False, use_mc_truth=False,
-                                filter_cut=0.03, overlap_cut=0.2, use_best_seeds=10, use_best_results=2,
-                                direction="backward"):
+def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, filter_cut=0.03,
+                overlap_cut=0.2, use_best_seeds=10, use_best_results=2, direction="backward"):
     """
     Convenience function to add the PXD ckf to the path.
     :param path: The path to add the module to
     :param svd_cdc_reco_tracks: The name of the already created SVD+CDC reco tracks
     :param pxd_reco_tracks: The name to output the PXD reco tracks to
-    :param loose_settings: If true, use the setup used during early phase 3 (instead of full PXD setup)
     :param use_mc_truth: Use the MC information in the CKF
     :param filter_cut: CKF parameter for MVA state filter
     :param overlap_cut: CKF parameter for MVA overlap filter.
@@ -84,6 +67,9 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, loos
     :param use_best_seeds: CKF parameter for UseNStates
     :param direction: where to extrapolate to. Valid options are forward and backward
     """
+    if "PXDSpacePointCreator" not in [m.name() for m in path.modules()]:
+        path.add_module("PXDSpacePointCreator")
+
     path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_cdc_reco_tracks)
 
     if direction == "forward":
@@ -120,8 +106,8 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, loos
             useBestNInSeed=use_best_results,
         )
 
-    if loose_settings:
-        module_parameters["seedHitJumping"] = 1
+    module_parameters["seedHitJumping"] = -1  # get from payload
+    module_parameters["hitHitJumping"] = 0
 
     path.add_module("ToPXDCKF",
                     advanceHighFilterParameters={"direction": direction},
@@ -196,6 +182,9 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=False, filt
                     writeOutDirection=direction,
                     relationCheckForDirection=direction,
 
+                    seedHitJumping=1,
+                    hitHitJumping=1,
+
                     **module_parameters).set_name(f"CDCToSVDSpacePointCKF_{direction}")
 
 
@@ -227,24 +216,24 @@ def add_cosmics_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fal
         )
     else:
         module_parameters = dict(
-             hitFilter="all",
-             seedFilter="all",
+            hitFilter="all",
+            seedFilter="all",
 
-             firstHighFilter="non_ip_crossing",
-             firstHighFilterParameters={"direction": direction},
-             firstHighUseNStates=0,
+            firstHighFilter="non_ip_crossing",
+            firstHighFilterParameters={"direction": direction},
+            firstHighUseNStates=0,
 
-             secondHighFilter="residual",
-             secondHighFilterParameters={},
-             secondHighUseNStates=use_best_seeds,
+            secondHighFilter="residual",
+            secondHighFilterParameters={},
+            secondHighUseNStates=use_best_seeds,
 
-             thirdHighFilter="residual",
-             thirdHighFilterParameters={},
-             thirdHighUseNStates=use_best_seeds,
+            thirdHighFilter="residual",
+            thirdHighFilterParameters={},
+            thirdHighUseNStates=use_best_seeds,
 
-             filter="weight",
-             filterParameters={},
-             useBestNInSeed=use_best_results,
+            filter="weight",
+            filterParameters={},
+            useBestNInSeed=use_best_results,
         )
 
     path.add_module("CDCToSVDSpacePointCKF",
@@ -260,11 +249,12 @@ def add_cosmics_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fal
                     relationCheckForDirection=direction,
 
                     seedHitJumping=3,
+                    hitHitJumping=1,
                     **module_parameters).set_name(f"CDCToSVDSpacePointCKF_{direction}")
 
 
 def add_cosmics_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, use_best_results=5,
-                        filter_cut=0.03, overlap_cut=0.2, use_best_seeds=10,  direction="backward"):
+                        filter_cut=0.03, overlap_cut=0.2, use_best_seeds=10, direction="backward"):
     """
     Convenience function to add the PXD ckf to the path with cosmics settings valid for phase2 and 3.
     :param path: The path to add the module to
@@ -280,12 +270,18 @@ def add_cosmics_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth
     if "PXDSpacePointCreator" not in [m.name() for m in path.modules()]:
         path.add_module("PXDSpacePointCreator")
 
+    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_cdc_reco_tracks)
+
     if direction == "forward":
         reverse_seed = True
     else:
         reverse_seed = False
 
     if use_mc_truth:
+        path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=True, UseCDCHits=True,
+                        mcRecoTracksStoreArrayName="MCRecoTracks",
+                        prRecoTracksStoreArrayName=svd_cdc_reco_tracks)
+
         module_parameters = dict(
             firstHighFilter="truth",
             secondHighFilter="all",
@@ -313,19 +309,23 @@ def add_cosmics_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth
 
             filterParameters={"cut": overlap_cut, "identifier": "ckf_PXDTrackCombination"},
             useBestNInSeed=use_best_results,
+
+            seedHitJumping=1,
+            hitHitJumping=0,
         )
 
     path.add_module("ToPXDCKF",
-                    inputRecoTrackStoreArrayName=svd_cdc_reco_tracks,
-                    outputRecoTrackStoreArrayName=pxd_reco_tracks,
-                    outputRelationRecoTrackStoreArrayName=svd_cdc_reco_tracks,
-                    relatedRecoTrackStoreArrayName=pxd_reco_tracks,
-
                     advanceHighFilterParameters={"direction": direction},
-                    reverseSeed=reverse_seed,
 
                     writeOutDirection=direction,
+
+                    inputRecoTrackStoreArrayName=svd_cdc_reco_tracks,
+                    relatedRecoTrackStoreArrayName=pxd_reco_tracks,
                     relationCheckForDirection=direction,
 
-                    seedHitJumping=1,
+                    outputRecoTrackStoreArrayName=pxd_reco_tracks,
+                    outputRelationRecoTrackStoreArrayName=svd_cdc_reco_tracks,
+
+                    reverseSeed=reverse_seed,
+                    reverseSeedState=reverse_seed,
                     **module_parameters).set_name(f"ToPXDCKF_{direction}")

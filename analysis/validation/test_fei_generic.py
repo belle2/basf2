@@ -8,21 +8,15 @@
 """
 
 import fei
-from fei.default_channels import get_unittest_channels
 import os
-import sys
 
 import tempfile
 import shutil
 import glob
-import sys
 
 import basf2 as b2
 import modularAnalysis as ma
-from ROOT import Belle2
 import basf2_mva
-import pdg
-from basf2 import conditions
 
 basf2_mva.loadRootDictionary()
 
@@ -39,12 +33,12 @@ particles = fei.get_unittest_channels()
 path = b2.create_path()
 
 ma.inputMdst(environmentType='default',
-             filename=b2.find_file('mdst12.root', 'validation', False),
+             filename=b2.find_file('mdst14.root', 'validation', False),
              path=path)
 
 maxTracks = 12
 empty_path = b2.create_path()
-skimfilter = ma.register_module('VariableToReturnValue')
+skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
 skimfilter.if_value('>{}'.format(maxTracks), empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
@@ -67,7 +61,7 @@ ma.inputMdstList('default', ['./RootOutput.root'], path)
 
 maxTracks = 12
 empty_path = b2.create_path()
-skimfilter = ma.register_module('VariableToReturnValue')
+skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
 skimfilter.if_value('>{}'.format(maxTracks), empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
@@ -98,7 +92,7 @@ ma.inputMdstList('default', ['./RootOutput.root'], path)
 
 maxTracks = 12
 empty_path = b2.create_path()
-skimfilter = ma.register_module('VariableToReturnValue')
+skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
 skimfilter.if_value('>{}'.format(maxTracks), empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
@@ -121,7 +115,7 @@ ma.inputMdstList('default', ['./RootOutput.root'], path)
 
 maxTracks = 12
 empty_path = b2.create_path()
-skimfilter = ma.register_module('VariableToReturnValue')
+skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
 skimfilter.if_value('>{}'.format(maxTracks), empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
@@ -147,7 +141,7 @@ ma.inputMdstList('default', ['./RootOutput.root'], path)
 
 maxTracks = 12
 empty_path = b2.create_path()
-skimfilter = ma.register_module('VariableToReturnValue')
+skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
 skimfilter.if_value('>{}'.format(maxTracks), empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
@@ -161,12 +155,12 @@ assert feistate.stage == 7
 
 path = b2.create_path()
 ma.inputMdst(environmentType='default',
-             filename=b2.find_file('mdst12.root', 'validation', False),
+             filename=b2.find_file('mdst14.root', 'validation', False),
              path=path)
 
 maxTracks = 12
 empty_path = b2.create_path()
-skimfilter = ma.register_module('VariableToReturnValue')
+skimfilter = b2.register_module('VariableToReturnValue')
 skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
 skimfilter.if_value('>{}'.format(maxTracks), empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)

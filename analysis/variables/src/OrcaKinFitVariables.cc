@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2018-2021 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Yu Hu                                                    *
+ * Contributors: Yu Hu, Sam Cunliffe                                      *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,8 +20,7 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
-// Chi2 and Prob -------------------------------------------
-
+    // Chi2 and Prob -------------------------------------------
     double OrcaKinFitChi2(const Particle* part)
     {
       if (part->hasExtraInfo("OrcaKinFitChi2")) return part->getExtraInfo("OrcaKinFitChi2");
@@ -50,8 +49,7 @@ namespace Belle2 {
     }
 
 
-// For 1C fit ------------------------------------------------------------
-
+    // For 1C fit ------------------------------------------------------------
     double UnmeasuredTheta(const Particle* part)
     {
       if (part->hasExtraInfo("OrcaKinFitUnmeasuredTheta")) return part->getExtraInfo("OrcaKinFitUnmeasuredTheta");
@@ -108,16 +106,51 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("OrcaKinFit");
-    REGISTER_VARIABLE("OrcaKinFitChi2", OrcaKinFitChi2, "OrcaKinFit Chi2");
-    REGISTER_VARIABLE("OrcaKinFitProb", OrcaKinFitProb, "OrcaKinFit Prob");
-    REGISTER_VARIABLE("OrcaKinFitErrorCode", ErrorCode, "OrcaKinFit ErrorCode");
-    REGISTER_VARIABLE("OrcaKinFitUnmeasuredTheta", UnmeasuredTheta, "Theta of Unmeasured particle in OrcaKinFit 1C");
-    REGISTER_VARIABLE("OrcaKinFitUnmeasuredPhi", UnmeasuredPhi, "Phi of Unmeasured particle in OrcaKinFit 1C");
-    REGISTER_VARIABLE("OrcaKinFitUnmeasuredE", UnmeasuredE, "energy of Unmeasured particle in OrcaKinFit 1C");
-    REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorTheta", UnmeasuredErrorTheta, "Theta error of Unmeasured particle in OrcaKinFit 1C");
-    REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorPhi", UnmeasuredErrorPhi, "Phi error of Unmeasured particle in OrcaKinFit 1C");
-    REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorE", UnmeasuredErrorE, "energy error of Unmeasured particle in OrcaKinFit 1C");
+    REGISTER_VARIABLE("OrcaKinFitChi2", OrcaKinFitChi2, R"DOC(
+The :math:`\chi^2` returned by the Orca kinematic fitter.
+Returns NaN if Orca was not run.
 
+.. warning:: this is the raw :math:`\chi^2`, not over ndf.
 
+.. seealso:: :ref:`kinfit`
+        )DOC");
+    REGISTER_VARIABLE("OrcaKinFitProb", OrcaKinFitProb, R"DOC(
+The p-value returned by the Orca kinematic fitter.
+Returns NaN if Orca was not run.
+        
+.. seealso:: :ref:`kinfit`
+        )DOC");
+    // TODO: explan the actual error codes
+    REGISTER_VARIABLE("OrcaKinFitErrorCode", ErrorCode, R"DOC(
+The error code returned by the Orca kinematic fitter.
+Returns NaN if Orca was not run.
+        
+.. seealso:: :ref:`kinfit`
+        )DOC");
+    REGISTER_VARIABLE("OrcaKinFitUnmeasuredTheta", UnmeasuredTheta, R"DOC(
+The polar angle of the "unmeasured photon" returned by Orca kinematic fitter for specific 1C fits with the ``addUnmeasuredPhoton`` parameter set.
+I.e. for fits with sufficient constraints remaining to constrain a missing 3-vector.
+Returns NaN if Orca was not run or if the ``addUnmeasuredPhoton`` parameter was not set.
+        
+.. seealso:: :ref:`kinfit`
+        )DOC");
+    REGISTER_VARIABLE("OrcaKinFitUnmeasuredPhi", UnmeasuredPhi, R"DOC(
+The azimuthal angle of the "unmeasured photon" returned by Orca kinematic fitter for specific 1C fits with the ``addUnmeasuredPhoton`` parameter set.
+I.e. for fits with sufficient constraints remaining to constrain a missing 3-vector.
+Returns NaN if Orca was not run or if the ``addUnmeasuredPhoton`` parameter was not set.
+        
+.. seealso:: :ref:`kinfit`
+        )DOC");
+    REGISTER_VARIABLE("OrcaKinFitUnmeasuredE", UnmeasuredE, R"DOC(
+The energy of the "unmeasured photon" returned by Orca kinematic fitter for specific 1C fits with the ``addUnmeasuredPhoton`` parameter set.
+I.e. for fits with sufficient constraints remaining to constrain a missing 3-vector.
+Returns NaN if Orca was not run or if the ``addUnmeasuredPhoton`` parameter was not set.
+        
+.. seealso:: :ref:`kinfit`
+        )DOC");
+    REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorTheta", UnmeasuredErrorTheta,
+                      "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredTheta`.");
+    REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorPhi", UnmeasuredErrorPhi, "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredPhi`.");
+    REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorE", UnmeasuredErrorE, "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredE`.");
   }
 }

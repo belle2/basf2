@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-# -*-  coding: utf-8 -*-
 # Author: Marcel Hohmann (marcel.hohmann@desy.de)
 
 import basf2.core
-from modularAnalysis import inputMdst, tagCurlTracks, process, statistics, register_module
+from basf2 import process, statistics, register_module
+from modularAnalysis import inputMdst, tagCurlTracks
 from stdCharged import stdPi
 import sys
 import os
@@ -29,8 +29,7 @@ inputMdst('default', input_file_name, path=training_path)
 stdPi('all', path=training_path)
 tagCurlTracks('pi+:all', train=True, selectorType='mva', path=training_path)
 
-progress = register_module('ProgressBar')
-training_path.add_module(progress)
+training_path.add_module('ProgressBar')
 
 process(training_path, int(2e5))
 print(statistics)
@@ -41,8 +40,8 @@ data_base_file = here + "/localdb/database.txt"
 
 # upload to global database
 if upload:
-    os.system("conditionsdb upload {TAGNAME} {DATABASEFILE}".format(TAGNAME=tag_name, DATABASEFILE=data_base_file))
+    os.system(f"b2conditionsdb-upload {tag_name} {data_base_file}")
 
 if remove_local_files:
     os.system('rm -r {}'.format(here + '/localdb/'))
-    os.system('rm {}/{}'.format(here, training_file_name))
+    os.system(f'rm {here}/{training_file_name}')

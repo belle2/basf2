@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 # @cond SUPPRESS_DOXYGEN
 
@@ -13,14 +12,14 @@
  to create summaries for a FEI training or application.
 """
 
-
-from generators import get_default_decayfile
+try:
+    from generators import get_default_decayfile
+except ModuleNotFoundError:
+    print("MonitoringBranchingFractions won't work.")
 from basf2_mva_evaluation import plotting
 import basf2_mva_util
 import pickle
-import pdb
 import copy
-import functools
 import math
 import os
 import numpy as np
@@ -47,7 +46,7 @@ def load_config():
     return pickle.load(open('Summary.pickle', 'rb'))
 
 
-class Statistic(object):
+class Statistic:
     """
     This class provides the efficiency, purity and other quantities for a
     given number of true signal candidates, signal candidates and background candidates
@@ -138,13 +137,13 @@ class Statistic(object):
         return Statistic(self.nTrueSig, self.nSig, self.nBg)
 
 
-class MonitoringHist(object):
+class MonitoringHist:
     """
     Reads all TH1F and TH2F from a ROOT file
     and puts them into a more accessible format.
     """
 
-    def __init__(self, filename):
+    def __init__(self, filename, dirname):
         """
         Reads histograms from the given file
         @param filename the name of the ROOT file
@@ -161,9 +160,10 @@ class MonitoringHist(object):
         if not self.valid:
             return
 
-        f = ROOT.TFile(filename)
+        f = ROOT.TFile.Open(filename, 'read')
+        d = f.Get(Belle2.makeROOTCompatible(dirname))
 
-        for key in f.GetListOfKeys():
+        for key in d.GetListOfKeys():
             name = Belle2.invertMakeROOTCompatible(key.GetName())
             hist = key.ReadObj()
             if not (isinstance(hist, ROOT.TH1D) or isinstance(hist, ROOT.TH1F) or
@@ -235,12 +235,12 @@ class MonitoringHist(object):
         return self.centers[name][nonzero[-1]]
 
 
-class MonitoringNTuple(object):
+class MonitoringNTuple:
     """
     Reads the ntuple named variables from a ROOT file
     """
 
-    def __init__(self, filename):
+    def __init__(self, filename, treenameprefix):
         """
         Reads ntuple from the given file
         @param filename the name of the ROOT file
@@ -250,14 +250,14 @@ class MonitoringNTuple(object):
         if not self.valid:
             return
         #: Reference to the ROOT file, so it isn't closed
-        self.f = ROOT.TFile(filename)
+        self.f = ROOT.TFile.Open(filename, 'read')
         #: Reference to the tree named variables inside the ROOT file
-        self.tree = self.f.variables
+        self.tree = self.f.Get(f'{treenameprefix} variables')
         #: Filename so we can use it later
         self.filename = filename
 
 
-class MonitoringModuleStatistics(object):
+class MonitoringModuleStatistics:
     """
     Reads the module statistics for a single particle from the outputted root file
     and puts them into a more accessible format
@@ -268,7 +268,7 @@ class MonitoringModuleStatistics(object):
         Reads the module statistics from the file named Monitor_ModuleStatistics.root
         @param particle the particle for which the statistics are read
         """
-        root_file = ROOT.TFile('Monitor_ModuleStatistics.root')
+        root_file = ROOT.TFile.Open('Monitor_ModuleStatistics.root', 'read')
         persistentTree = root_file.Get('persistent')
         persistentTree.GetEntry(0)
         # Clone() needed so we actually own the object (original dies when tfile is deleted)
@@ -324,8 +324,8 @@ def MonitorCosBDLPlot(particle, filename):
                                    'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
                                   ['unique', 'cosThetaBDl', 'probability', 'signal'])
     for i, cut in enumerate([0.0, 0.01, 0.05, 0.1, 0.2, 0.5]):
-        p = plotting.VerboseDistribution()
-        common = (df['unique'] == 1) & (np.abs(df['cosThetaBDl']) < 10) & (df['probability'] >= cut)
+        p = plotting.VerboseDistribution(range_in_std=5.0)
+        common = (np.abs(df['cosThetaBDl']) < 10) & (df['probability'] >= cut)
         p.add(df, 'cosThetaBDl', common & (df['signal'] == 1), label="Signal")
         p.add(df, 'cosThetaBDl', common & (df['signal'] == 0), label="Background")
         p.finish()
@@ -343,8 +343,8 @@ def MonitorMbcPlot(particle, filename):
                                    'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
                                   ['unique', 'Mbc', 'probability', 'signal'])
     for i, cut in enumerate([0.0, 0.01, 0.05, 0.1, 0.2, 0.5]):
-        p = plotting.VerboseDistribution()
-        common = (df['unique'] == 1) & (df['Mbc'] > 5.23) & (df['probability'] >= cut)
+        p = plotting.VerboseDistribution(range_in_std=5.0)
+        common = (df['Mbc'] > 5.23) & (df['probability'] >= cut)
         p.add(df, 'Mbc', common & (df['signal'] == 1), label="Signal")
         p.add(df, 'Mbc', common & (df['signal'] == 0), label="Background")
         p.finish()
@@ -363,7 +363,6 @@ def MonitorROCPlot(particle, filename):
                                   ['unique', 'probability', 'signal'])
     p = plotting.RejectionOverEfficiency()
     p.add(df, 'probability', df['signal'] == 1, df['signal'] == 0, label='All')
-    p.add(df, 'probability', (df['signal'] == 1) & (df['unique'] == 1), (df['signal'] == 0) & (df['unique'] == 1), label='Unique')
     p.finish()
     p.save(filename + '.png')
 
@@ -378,7 +377,6 @@ def MonitorDiagPlot(particle, filename):
                                   ['unique', 'probability', 'signal'])
     p = plotting.Diagonal()
     p.add(df, 'probability', df['signal'] == 1, df['signal'] == 0)
-    # p.add(df, 'probability', (df['signal'] == 1) & (df['unique'] == 1), (df['signal'] == 0) & (df['unique'] == 1))
     p.finish()
     p.save(filename + '.png')
 
@@ -389,7 +387,7 @@ def MonitoringMCCount(particle):
     @param particle the particle for which the MC counts are read
     @return dictionary with 'sum', 'std', 'avg', 'max', and 'min'
     """
-    root_file = ROOT.TFile('mcParticlesCount.root')
+    root_file = ROOT.TFile.Open('mcParticlesCount.root', 'read')
 
     key = f'NumberOfMCParticlesInEvent({abs(pdg.from_name(particle.name))})'
     Belle2.Variable.Manager
@@ -407,7 +405,7 @@ def MonitoringMCCount(particle):
     return mc_counts
 
 
-class MonitoringBranchingFractions(object):
+class MonitoringBranchingFractions:
     """ Class extracts the branching fractions of a decay channel from the DECAY.DEC file. """
     #: is the monitoring shared
     _shared = None
@@ -474,7 +472,7 @@ class MonitoringBranchingFractions(object):
         branching_fractions = {'UNKOWN': {}}
 
         mother = 'UNKOWN'
-        with open(filename, 'r') as f:
+        with open(filename) as f:
             for line in f:
                 fields = line.split(' ')
                 fields = [x for x in fields if x != '']
@@ -518,7 +516,7 @@ class MonitoringBranchingFractions(object):
         @param branching_fractions
         """
         particles = set(exclusive_branching_fractions.keys())
-        particles.update(set(pdg.conjugate(p) for p in particles if p != pdg.conjugate(p)))
+        particles.update({pdg.conjugate(p) for p in particles if p != pdg.conjugate(p)})
         particles = sorted(particles, key=lambda x: pdg.get(x).Mass())
         inclusive_branching_fractions = copy.deepcopy(exclusive_branching_fractions)
 
@@ -534,7 +532,7 @@ class MonitoringBranchingFractions(object):
         return inclusive_branching_fractions
 
 
-class MonitoringParticle(object):
+class MonitoringParticle:
     """
     Monitoring object containing all the monitoring information
     about a single particle
@@ -584,30 +582,30 @@ class MonitoringParticle(object):
         self.ignored_channels = {}
 
         for channel in self.particle.channels:
-            hist = MonitoringHist(f'Monitor_PreReconstruction_BeforeRanking_{channel.label}.root')
+            hist = MonitoringHist(f'Monitor_PreReconstruction_BeforeRanking.root', f'{channel.label}')
             self.before_ranking[channel.label] = self.calculateStatistic(hist, channel.mvaConfig.target)
-            hist = MonitoringHist(f'Monitor_PreReconstruction_AfterRanking_{channel.label}.root')
+            hist = MonitoringHist(f'Monitor_PreReconstruction_AfterRanking.root', f'{channel.label}')
             self.after_ranking[channel.label] = self.calculateStatistic(hist, channel.mvaConfig.target)
-            hist = MonitoringHist(f'Monitor_MatchParticleList_AfterVertex_{channel.label}.root')
+            hist = MonitoringHist(f'Monitor_PreReconstruction_AfterVertex.root', f'{channel.label}')
             self.after_vertex[channel.label] = self.calculateStatistic(hist, channel.mvaConfig.target)
-            hist = MonitoringHist(f'Monitor_PostReconstruction_AfterMVA_{channel.label}.root')
+            hist = MonitoringHist(f'Monitor_PostReconstruction_AfterMVA.root', f'{channel.label}')
             self.after_classifier[channel.label] = self.calculateStatistic(hist, channel.mvaConfig.target)
             if hist.valid and hist.sum(channel.mvaConfig.target) > 0:
                 self.reconstructed_number_of_channels += 1
                 self.ignored_channels[channel.label] = False
             else:
                 self.ignored_channels[channel.label] = True
-            hist = MonitoringHist(f'Monitor_TrainingData_{channel.label}.root')
+            hist = MonitoringHist(f'Monitor_TrainingData.root', f'{channel.label}')
             self.training_data[channel.label] = hist
 
         plist = removeJPsiSlash(particle.identifier)
-        hist = MonitoringHist(f'Monitor_PostReconstruction_BeforePostCut_{plist}.root')
+        hist = MonitoringHist(f'Monitor_PostReconstruction_BeforePostCut.root', f'{plist}')
         #: Monitoring histogram in PostReconstruction before the postcut
         self.before_postcut = self.calculateStatistic(hist, self.particle.mvaConfig.target)
-        hist = MonitoringHist(f'Monitor_PostReconstruction_BeforeRanking_{plist}.root')
+        hist = MonitoringHist(f'Monitor_PostReconstruction_BeforeRanking.root', f'{plist}')
         #: Monitoring histogram in PostReconstruction before the ranking postcut
         self.before_ranking_postcut = self.calculateStatistic(hist, self.particle.mvaConfig.target)
-        hist = MonitoringHist(f'Monitor_PostReconstruction_AfterRanking_{plist}.root')
+        hist = MonitoringHist(f'Monitor_PostReconstruction_AfterRanking.root', f'{plist}')
         #: Monitoring histogram in PostReconstruction after the ranking postcut
         self.after_ranking_postcut = self.calculateStatistic(hist, self.particle.mvaConfig.target)
         #: Statistic object before unique tagging of signals
@@ -615,7 +613,7 @@ class MonitoringParticle(object):
         #: Statistic object after unique tagging of signals
         self.after_tag = self.calculateUniqueStatistic(hist)
         #: Reference to the final ntuple
-        self.final_ntuple = MonitoringNTuple(f'Monitor_Final_{plist}.root')
+        self.final_ntuple = MonitoringNTuple(f'Monitor_Final.root', f'{plist}')
 
     def calculateStatistic(self, hist, target):
         """

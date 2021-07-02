@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
-"""A simple example calibration that takes one input data list from raw data and performs
-a single calibration."""
+"""
+Calibration of KLM strip efficiency. It provides calibration constants for the KLMSripEfficiency
+database object.
+"""
 
 import basf2
-from prompt import CalibrationSettings
+from prompt import CalibrationSettings, input_data_filters
 
 ##############################
 # REQUIRED VARIABLE #
@@ -15,12 +17,18 @@ from prompt import CalibrationSettings
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
 #: Tells the automated system some details of this script
-settings = CalibrationSettings(name='KLM strip efficiency',
-                               expert_username='depietro',
-                               description=__doc__,
-                               input_data_formats=['cdst'],
-                               input_data_names=['hlt_mumu'],
-                               depends_on=[])
+settings = CalibrationSettings(
+    name='KLM strip efficiency',
+    expert_username='depietro',
+    description=__doc__,
+    input_data_formats=['cdst'],
+    input_data_names=['hlt_mumu'],
+    input_data_filters={
+        'hlt_mumu': [input_data_filters['Run Type']['physics'],
+                     input_data_filters['Data Tag']['mumutight_calib'],
+                     input_data_filters['Data Quality Tag']['Good Or Recoverable']]
+    },
+    depends_on=[])
 
 ##############################
 
@@ -61,16 +69,15 @@ def get_calibrations(input_data, **kwargs):
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!
     # Lets set some limits because this calibration doesn't need that much to run.
-    max_files_per_run = 2
+    # max_files_per_run = 2
 
     # If you are using Raw data there's a chance that input files could have zero events.
     # This causes a B2FATAL in basf2 RootInput so the collector job will fail.
     # Currently we don't have a good way of filtering this on the automated side, so we can check here.
-    min_events_per_file = 1
+    # min_events_per_file = 1
 
     # We filter out any more than 2 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
     # already. This procedure respects that ordering
-    from prompt.utils import filter_by_max_files_per_run
 
     # For testing
     # reduced_file_to_iov_cdst = filter_by_max_files_per_run(file_to_iov_cdst, max_files_per_run, min_events_per_file)
@@ -92,7 +99,6 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     # Algorithm setup
 
-    import ROOT
     from ROOT.Belle2 import KLMStripEfficiencyAlgorithm
 
     alg = KLMStripEfficiencyAlgorithm()
@@ -110,8 +116,10 @@ def get_calibrations(input_data, **kwargs):
     from klm_calibration_utils import get_strip_efficiency_pre_collector_path
 
     if input_files_cdst:
-        coll_cdst = get_collector('hlt_mumu')
-        rec_path_cdst = get_strip_efficiency_pre_collector_path()
+        muon_list_name = 'klmStripEfficiency'
+        coll_cdst = get_collector(input_data_name='hlt_mumu',
+                                  muon_list_name=muon_list_name)
+        rec_path_cdst = get_strip_efficiency_pre_collector_path(muon_list_name=muon_list_name)
 
         collection_cdst = Collection(collector=coll_cdst,
                                      input_files=input_files_cdst,
@@ -136,7 +144,7 @@ def get_calibrations(input_data, **kwargs):
 ##############################
 
 
-def get_collector(input_data_name):
+def get_collector(input_data_name, muon_list_name):
     """
     Return the correct KLMStripEfficiencyCollector module setup for each data type.
     Placed here so it can be different for prompt compared to standard.
@@ -144,7 +152,7 @@ def get_collector(input_data_name):
 
     if input_data_name == 'hlt_mumu':
         return basf2.register_module('KLMStripEfficiencyCollector',
-                                     MuonListName='mu+:klmStripEfficiency',
+                                     MuonListName=f'mu+:{muon_list_name}',
                                      MinimalMatchingDigits=14,
                                      MinimalMatchingDigitsOuterLayers=4,
                                      MinimalMomentumNoOuterLayers=4.0)

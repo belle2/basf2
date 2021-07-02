@@ -133,6 +133,7 @@ int main(int argc, char* argv[])
     ("help,h", "Print this help")
     ("version,v", "Print version string")
     ("info", "Print information about basf2")
+    ("license", "Print the short version of the basf2 license")
     ("modules,m", prog::value<string>()->implicit_value(""),
      "Print a list of all available modules (can be limited to a given package), or give detailed information on a specific module given as an argument (case sensitive).")
     ;
@@ -210,6 +211,8 @@ int main(int argc, char* argv[])
       pythonFile = "basf2/version.py";
     } else if (varMap.count("info")) {
       pythonFile = "basf2_cli/print_info.py";
+    } else if (varMap.count("license")) {
+      pythonFile = "basf2_cli/print_license.py";
     } else if (varMap.count("modules")) {
       string modArgs = varMap["modules"].as<string>();
       if (!modArgs.empty()) {

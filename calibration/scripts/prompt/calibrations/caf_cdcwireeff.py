@@ -1,3 +1,10 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 # -*- coding: utf-8 -*-
 
 """CDC Wire Efficiency and BadWire creator. Creates layer-by-layer and wire-by-wire efficiencies and returns bad wire list"""

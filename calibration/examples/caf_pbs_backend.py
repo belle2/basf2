@@ -1,3 +1,10 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 # This steering file shows example setup for
 # running the CAF using the PBS (qsub) batch system backend with multiple test calibrations.
 # You will need to have data already from running calibration/examples/1_create_sample_DSTs.sh

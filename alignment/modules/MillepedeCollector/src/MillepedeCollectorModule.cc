@@ -1397,7 +1397,7 @@ std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getTwoBodyToLocalTransfo
     dRdpz(2, 2) = (px * px + py * py) / p3;
 
     auto K = 1. / 2. / p + sign * cos(theta) * m * m * (M * M / 4. / m / m - 1.) / M / M / sqrt(m * m * (M * M / 4. / m / m - 1.) *
-             (M * M + p * p) / M / M));
+             (M * M + p * p) / M / M);
 
     B2Vector3D dpdpx = dRdpx * P + R * K * px * B2Vector3D(0., 0., 1.);
     B2Vector3D dpdpy = dRdpy * P + R * K * py * B2Vector3D(0., 0., 1.);

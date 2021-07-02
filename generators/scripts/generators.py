@@ -560,6 +560,90 @@ def add_phokhara_generator(path, finalstate=''):
         B2FATAL("add_phokhara_generator final state not supported: {}".format(finalstate))
 
 
+def add_phokhara_evtgen_combination(
+        path, final_state_particles, user_decay_file,
+        beam_energy_spread=True):
+    """
+    Add combination of PHOKHARA and EvtGen to the path. Phokhara is
+    acting as ISR generator by generating e+ e- -> mu+ mu-, the muon pair is
+    then replaced by a virtual photon. Finally, the virtual photon is
+    decayed by EvtGen.
+
+    Parameters:
+        path (basf2.Path): Path where the generator should be added.
+        final_state_particles (list): List of final-state particles of
+            the virtual-photon decay. It is necessary to define the correct
+            mass threshold in PHOKHARA. For example, for the process
+            e+ e- -> J/psi eta_c, the list should be ['J/psi', 'eta_c'];
+            it does not depend on subsequent J/psi or eta_c decays.
+        user_decay_file (str): Name of EvtGen user decay file. The initial
+            particle must be the virtual photon (vpho).
+    """
+
+    import pdg
+
+    phokhara = path.add_module('PhokharaInput')
+
+    # Generate muons and replace them by a virtual photon.
+    phokhara.param('FinalState', 0)
+    phokhara.param('ReplaceMuonsByVirtualPhoton', True)
+
+    # Simulate beam-energy spread. This performs initialization for every
+    # event, and, thus, very slow, but usually necessary except for testing.
+    phokhara.param('BeamEnergySpread', beam_energy_spread)
+
+    # Soft photon cutoff.
+    phokhara.param('Epsilon', 0.0001)
+
+    # Maximum search.
+    phokhara.param('SearchMax', 5000)
+
+    # Number of generation attempts for event.
+    phokhara.param('nMaxTrials', 25000)
+
+    # Use NNLO.
+    phokhara.param('LO', 1)
+    phokhara.param('NLO', 1)
+
+    # Use ISR only.
+    phokhara.param('QED', 0)
+
+    # No interference.
+    phokhara.param('IFSNLO', 0)
+
+    # Vacuum polarization by Fred Jegerlehner.
+    phokhara.param('Alpha', 1)
+
+    # Do not include narrow resonances.
+    phokhara.param('NarrowRes', 0)
+
+    # Angular ragnes.
+    phokhara.param('ScatteringAngleRangePhoton', [0., 180.])
+    phokhara.param('ScatteringAngleRangeFinalStates', [0., 180.])
+
+    # Minimal invariant mass of the muons and tagged photon combination.
+    phokhara.param('MinInvMassHadronsGamma', 0.)
+
+    # Minimal squared invariant mass of muons (final state).
+    # Force application of this cut.
+    mass = 0
+    for particle in final_state_particles:
+        p = pdg.get(particle)
+        mass = mass + p.Mass()
+    phokhara.param('MinInvMassHadrons', mass * mass)
+    phokhara.param('ForceMinInvMassHadronsCut', True)
+
+    # Maximal squared invariant mass of muons (final state) (st to lagre
+    phokhara.param('MaxInvMassHadrons', 200.0)
+
+    # Minimal photon energy.
+    phokhara.param('MinEnergyGamma', 0.01)
+
+    # EvtGen.
+    evtgen_decay = path.add_module('EvtGenDecay')
+    evtgen_decay.param('UserDecFile', user_decay_file)
+
+
 def add_koralw_generator(path, finalstate='', enableTauDecays=True):
     """
     Add KoralW generator for radiative four fermion final states (only four leptons final states are currently supported).

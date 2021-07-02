@@ -9,18 +9,16 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-#######################################################
-#
-# This script checks if there are asymmetries in the
-# reconstructed impact parameters and in the generated vertex
-# positions of electrons, muons, kaons, pions and protons.
-# As input one needs the path to one or several mdst files.
-# As output the script saves the plots comparing
-# positively and negatively charged particles.
-#
-# Contributor: F. Abudinen (December 2018)
-#
-######################################################
+##########################################################################
+#                                                                        #
+# This script checks if there are asymmetries in the                     #
+# reconstructed impact parameters and in the generated vertex            #
+# positions of electrons, muons, kaons, pions and protons.               #
+# As input one needs the path to one or several mdst files.              #
+# As output the script saves the plots comparing                         #
+# positively and negatively charged particles.                           #
+#                                                                        #
+##########################################################################
 
 
 import basf2 as b2

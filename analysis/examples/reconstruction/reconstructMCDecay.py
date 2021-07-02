@@ -15,8 +15,6 @@
 An example script to find a specific decay chain at MC level.
 """
 
-__authors__ = "Yo Sato"
-
 import basf2
 from modularAnalysis import fillParticleListFromMC, inputMdst, reconstructMCDecay, variablesToNtuple
 from variables import variables as vm  # shorthand for the variable manager instance

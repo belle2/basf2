@@ -8,21 +8,18 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-#######################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to reconstruct the
-# following  decay chain (and c.c. decay chain):
-#
-# D*+ -> D0 pi+
-#        |
-#        +-> K- pi+
-#
-# Contributors: A. Zupanc (June 2014)
-#               I. Komarov (December 2017)
-#
-######################################################
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to reconstruct the                      #
+# following decay chain (and c.c. decay chain):                          #
+#                                                                        #
+# D*+ -> D0 pi+                                                          #
+#        |                                                               #
+#        +-> K- pi+                                                      #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

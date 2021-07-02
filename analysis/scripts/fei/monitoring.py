@@ -10,8 +10,6 @@
 
 # @cond SUPPRESS_DOXYGEN
 
-# Thomas Keck 2017
-
 """
  Contains classes to read in the monitoring output
  and some simple plotting routines.

@@ -8,9 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# William Sutcliffe 2019
-# Mortz Gelb 2017
-
 # Steering file to apply the specfic FEI on Belle II MC, but it can be also easily adapted for converted Belle MC.
 # For reference see Confluence and Thomas Keck's PhD thesis.
 #

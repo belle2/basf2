@@ -8,17 +8,14 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-###################################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to use the Event Shape framework
-# usage : basf2 -i myMDSTFile.root B2A704-EventShape.py
-#
-# Contributors: Umberto Tamponi (October 2018)
-# tamponi@to.infn.it
-#
-####################################################################
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to use the Event Shape framework        #
+# usage : basf2 -i myMDSTFile.root B2A704-EventShape.py                  #
+#                                                                        #
+##########################################################################
 
 
 import basf2 as b2

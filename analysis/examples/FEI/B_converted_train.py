@@ -10,8 +10,6 @@
 
 # Example which can be used to train the FEI
 
-# William Sutcliffe 2019
-
 import os
 
 import basf2 as b2

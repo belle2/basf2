@@ -8,28 +8,29 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-################################################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to load reconstructed
-# final state particles as Particles in case of V0-like particles:
-# - K_S0
-# - Lambda0
-# - (anti-Lambda0)
-#
-# See tutorials/B2A203-LoadV0s.py for the recommended way to load V0-like particles
-#
-# This is a more advanced example.
-# It shows how to create and fill Ks/Lambda0 ParticleLists using V0s as source and
-# create a list of particles combined using the analysis ParticleCombiner module.
-#
-# A combination of this two lists is what is implemented in the standard lists
-# provided and recommended to the users (/analysis/scripts/sdtV0s.py)
-#
-# Contributors: B. Scavino (August 2019)
-#
-################################################################################
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to load reconstructed                   #
+# final state particles as Particles in case of V0-like particles:       #
+# - K_S0                                                                 #
+# - Lambda0                                                              #
+# - (anti-Lambda0)                                                       #
+#                                                                        #
+# See tutorials/B2A203-LoadV0s.py for the recommended way to load        #
+# V0-like particles                                                      #
+#                                                                        #
+# This is a more advanced example.                                       #
+# It shows how to create and fill Ks/Lambda0 ParticleLists using V0s as  #
+# source and create a list of particles combined using the analysis      #
+# ParticleCombiner module.                                               #
+#                                                                        #
+# A combination of this two lists is what is implemented in the standard #
+# lists provided and recommended to the users                            #
+# (/analysis/scripts/sdtV0s.py)                                          #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

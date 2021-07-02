@@ -8,24 +8,21 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-###################################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to perform four momentum constraint
-# fit with the KFit. In this example the following decay chain:
-#
-# Upsilon(4S) -> eta               Upsilon
-#                 |                  |
-#                 +->gamma gamma     +-> u+ u-
-#
-# is reconstructed. The four momentum constraint fit is performed on
-# all final states, and the total four momentum is set at that of cms
-#
-# Contributors: Yu Hu (March 2017)
-# yu.hu@desy.de
-#
-####################################################################
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to perform four momentum constraint     #
+# fit with the KFit. In this example the following decay chain:          #
+#                                                                        #
+# Upsilon(4S) -> eta               Upsilon                               #
+#                 |                  |                                   #
+#                 +->gamma gamma     +-> u+ u-                           #
+#                                                                        #
+# is reconstructed. The four momentum constraint fit is performed on     #
+# all final states, and the total four momentum is set at that of cms    #
+#                                                                        #
+##########################################################################
 
 
 #

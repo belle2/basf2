@@ -8,25 +8,18 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-#######################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to reconstruct the
-# following  decay chain:
-#
-# B0 -> D0 pi0
-#       |
-#       +-> pi0 pi0
-#
-#
-# Note: This example uses the signal MC sample created in
-# MC campaign 3.5, therefore it can be ran only on KEKCC computers.
-#
-# Contributors: A. Zupanc (June 2014)
-#               I. Komarov (December 2017)
-#
-######################################################
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to reconstruct the                      #
+# following  decay chain:                                                #
+#                                                                        #
+# B0 -> D0 pi0                                                           #
+#       |                                                                #
+#       +-> pi0 pi0                                                      #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

@@ -16,8 +16,6 @@ An example script to reconstruct unspecified particles and the use of MC
 matching tools for inclusive analyses with sum-of-exclusive method.
 """
 
-__authors__ = "Sam Cunliffe and Yo Sato"
-
 import basf2
 from modularAnalysis import inputMdst, reconstructDecay, matchMCTruth, \
     copyLists, variablesToNtuple

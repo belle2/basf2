@@ -8,17 +8,14 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-###################################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to use the Event Kinematics framework
-# usage : basf2 -i myMDSTFile.root B2A705-EventKinematics.py
-#
-# Contributors: Frank Meier (March 2020)
-# frank.meier@desy.de
-#
-###################################################################
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to use the Event Kinematics framework   #
+# usage : basf2 -i myMDSTFile.root B2A705-EventKinematics.py             #
+#                                                                        #
+##########################################################################
 
 
 import basf2 as b2

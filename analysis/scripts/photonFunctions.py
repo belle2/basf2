@@ -10,9 +10,6 @@
 """
 Functions that work on photon lists.
 
-Contributor(s): Torben Ferber
-                Sam Cunliffe
-                Michael De Nuccio
 """
 
 from basf2 import create_path

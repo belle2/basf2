@@ -11,8 +11,6 @@
 # The VariablesToNtuple module saves variables from the VariableManager
 # to a candidate-based (or event-based) TTree
 #
-# Thomas Keck and Sam Cunliffe
-#
 # For full documentation please refer to https://software.belle2.org
 # Anything unclear? Ask questions at https://questions.belle2.org
 

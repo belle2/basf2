@@ -8,39 +8,32 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-#######################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to reconstruct the
-# charm meson in various decay modes and print out
-# ParticleList summary at the end:
-# - fraction if events with at least one candidate
-# - overlaps between different lists
-# - ...
-#
-# The following charm meson decays are reconstructed:
-# - D0  -> K- pi+
-#       -> K- pi+ pi0
-#       -> K- pi+ pi+ pi-
-#
-# - D+  -> K- pi+ pi+
-#
-# - Ds+ -> K- K+ pi+
-#
-# Note: This tutorial uses generic MC therefore it can be
-# ran only on KEKCC.
-#
-# Note 2: Running over all samples might take time.
-# Consider manual limit of the number of processed events:
-#
-# > basf2 B2A601-ParticleStats.py -n 1000
-#
-# Contributors: A. Zupanc (June 2014),
-#               I. Komarov (December 2017)
-#               I. Komarov (September 2018)
-#
-################################################################################
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to reconstruct the                      #
+# charm meson in various decay modes and print out                       #
+# ParticleList summary at the end:                                       #
+# - fraction if events with at least one candidate                       #
+# - overlaps between different lists                                     #
+# - ...                                                                  #
+#                                                                        #
+# The following charm meson decays are reconstructed:                    #
+# - D0  -> K- pi+                                                        #
+#       -> K- pi+ pi0                                                    #
+#       -> K- pi+ pi+ pi-                                                #
+#                                                                        #
+# - D+  -> K- pi+ pi+                                                    #
+#                                                                        #
+# - Ds+ -> K- K+ pi+                                                     #
+#                                                                        #
+# Note: Running over all samples might take time.                        #
+# Consider manual limit of the number of processed events:               #
+#                                                                        #
+# > basf2 B2A601-ParticleStats.py -n 1000                                #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

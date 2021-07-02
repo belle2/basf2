@@ -10,13 +10,9 @@
 ##########################################################################
 
 """
-<header>
-  <contact>Vladimir Chekelian; Fernando Abudinen; abudinen@mpp.mpg.de</contact>
-  <description> make Upsilon(4S) ntuple for checks and studies of the generator file:
+make Upsilon(4S) ntuple for checks and studies of the generator file:
 particles: Upsilon(4S), two daughters (i.e. BBbar) and four granddaughters (e.g. B0->Jpsi+K0S)
 variables: mcPDG,M,nDaughters,mcDecayTime,mcLifeTime,mcX,mcY,mcZ,mcE,mcPX,mcPY,mcPZ;
-created 12.02.2019 </description>
-</header>
 """
 
 import basf2 as b2

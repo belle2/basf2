@@ -10,8 +10,6 @@
 
 # An example/test of using the formula() metavariable
 #
-# James Kahn and Sam Cunliffe
-#
 # For full documentation please refer to https://software.belle2.org
 # Anything unclear? Ask questions at https://questions.belle2.org
 

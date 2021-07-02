@@ -10,7 +10,6 @@
 
 """
 Full Event Interpretation framework for Belle II
-Thomas Keck, Christian Pulvermacher 2013-2017
 
 Detailed usage examples can be found in analysis/examples/FEI/
 """

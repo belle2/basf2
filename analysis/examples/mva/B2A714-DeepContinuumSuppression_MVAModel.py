@@ -8,24 +8,24 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-################################################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This describes the keras model for the training in B2A712.
-# To understand the code, the keras documentation is a good starting point.
-# Also have a look at the contrib keras interface in:
-# mva/scripts/basf2_mva_python_interface/contrib_keras.py
-#
-# Additional examples with keras can be found in the folder:
-# mva/examples/keras
-#
-# Also have a look at the Continuum suppression section at https://software.belle2.org
-# The techniques are described in more detail in http://ekp-invenio.physik.uni-karlsruhe.de/record/48934
-#
-# Contributors: D. Weyland (November 2017), P. Goldenzweig (October 2016)
-#
-################################################################################
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This describes the keras model for the training in B2A712.             #
+# To understand the code, the keras documentation is a good starting     #
+# point. Also have a look at the contrib keras interface in:             #
+# mva/scripts/basf2_mva_python_interface/contrib_keras.py                #
+#                                                                        #
+# Additional examples with keras can be found in the folder:             #
+# mva/examples/keras                                                     #
+#                                                                        #
+# Also have a look at the Continuum suppression section at               #
+# https://software.belle2.org                                            #
+# The techniques are described in more detail in                         #
+# http://ekp-invenio.physik.uni-karlsruhe.de/record/48934                #
+#                                                                        #
+##########################################################################
 
 import tensorflow.contrib.keras as keras
 

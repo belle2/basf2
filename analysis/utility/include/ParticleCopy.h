@@ -6,11 +6,6 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #pragma once
-// ******************************************************************
-// Particle copy utility
-// authors: A. Zupanc (anze.zupanc@ijs.si), C. Pulvermacher (christian.pulvermacher@kit.edu)
-// ******************************************************************
-
 
 namespace Belle2 {
   class Particle;

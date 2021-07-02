@@ -8,23 +8,20 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-###################################################################
-# This tutorial demonstrates how to perform vertexfit with Rave
-# and four momentum constraint fit with the OrcaKinFit. In this
-# example the following decay chain:
-#
-# Upsilon(4S) -> gamma    A
-#                         |
-#                         +-> u+ u-
-#
-# is reconstructed. The  vertexfit is performed on u+ u-, and four
-# momentum constraint fit is performed on all final states, and the
-# total four momentum is set at that of cms.
-#
-# Contributors: Yu Hu (July 2018)
-# yu.hu@desy.de
-#
-####################################################################
+##########################################################################
+# This tutorial demonstrates how to perform vertexfit with Rave          #
+# and four momentum constraint fit with the OrcaKinFit. In this          #
+# example the following decay chain:                                     #
+#                                                                        #
+# Upsilon(4S) -> gamma    A                                              #
+#                         |                                              #
+#                         +-> u+ u-                                      #
+#                                                                        #
+# is reconstructed. The vertexfit is performed on u+ u-, and four        #
+# momentum constraint fit is performed on all final states, and the      #
+# total four momentum is set at that of cms.                             #
+#                                                                        #
+##########################################################################
 
 #
 # Import and mdst loading

@@ -8,26 +8,24 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-#######################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to perform Vertex fits
-# using KFit with smeared IP tube constraint.
-# The following  decay chain (and c.c. decay chain):
-#
-# B0 -> J/psi K_S0
-#        |
-#        +-> mu- mu+
-#
-# is reconstructed and the B0 decay vertex is fitted
-#
-# Note: This example is build upon
-# B2A403-KFit-VertexFit.py
-#
-# Contributors: H. Tanigawa (January 2020)
-#
-######################################################
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to perform Vertex fits                  #
+# using KFit with smeared IP tube constraint.                            #
+# The following  decay chain (and c.c. decay chain):                     #
+#                                                                        #
+# B0 -> J/psi K_S0                                                       #
+#        |                                                               #
+#        +-> mu- mu+                                                     #
+#                                                                        #
+# is reconstructed and the B0 decay vertex is fitted                     #
+#                                                                        #
+# Note: This example is build upon                                       #
+# B2A403-KFit-VertexFit.py                                               #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 from modularAnalysis import inputMdst

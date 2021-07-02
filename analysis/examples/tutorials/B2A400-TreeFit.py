@@ -8,31 +8,29 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-#######################################################
-# run 'pydoc3 vertex' for general documentation of vertexing stuff
-#
-# It is recommended to use the TreeFitter for everything as it is the fastest tool
-#
-# If you want to fit precise vertices with nTracks>2 attached and you are
-# interested in the vertex position, TagV COULD BE the better tool as it
-# reweighs the tracks. However, you have to check yourself.
-#
-# This tutorial demonstrates how to perform a fit with
-# the TreeFitter. In this example the following decay chain:
-#
-# B0 -> D0 pi0
-#       |
-#       +-> pi0 pi0
-#
-# is reconstructed.
-#
-# Note: This example is build upon
-# B2A302-B02D0Pi0-D02Pi0Pi0-Reconstruction.py
-#
-# Contributors: J.F.Krohn (2018)
-#               I. Komarov (September 2018)
-#
-######################################################
+##########################################################################
+# run 'pydoc3 vertex' for general documentation of vertexing stuff       #
+#                                                                        #
+# It is recommended to use the TreeFitter for everything as it is the    #
+# fastest tool                                                           #
+#                                                                        #
+# If you want to fit precise vertices with nTracks>2 attached and you    #
+# are interested in the vertex position, TagV COULD BE the better tool   #
+# as it reweighs the tracks. However, you have to check yourself.        #
+#                                                                        #
+# This tutorial demonstrates how to perform a fit with                   #
+# the TreeFitter. In this example the following decay chain:             #
+#                                                                        #
+# B0 -> D0 pi0                                                           #
+#       |                                                                #
+#       +-> pi0 pi0                                                      #
+#                                                                        #
+# is reconstructed.                                                      #
+#                                                                        #
+# Note: This example is build upon                                       #
+# B2A302-B02D0Pi0-D02Pi0Pi0-Reconstruction.py                            #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

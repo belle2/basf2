@@ -8,13 +8,13 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-#######################################################
-#
-# For photon energy bias correction
-# This tutorial demonstrates how to create LooKUpTable and
-# upload it to the database
-#
-######################################################
+##########################################################################
+#                                                                        #
+# For photon energy bias correction                                      #
+# This tutorial demonstrates how to create LooKUpTable and               #
+# upload it to the database                                              #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import random

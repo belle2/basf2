@@ -11,11 +11,7 @@
 
 
 """
- <header>
-   <contact>Fernando Abudinen</contact>
-   <description>This file tests the functionality of sampling needed to train the flavor tagger.
-   </description>
- </header>
+This file tests the functionality of sampling needed to train the flavor tagger.
 """
 
 import b2test_utils

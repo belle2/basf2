@@ -10,10 +10,6 @@
 
 # The variableManager provides helpful tools for managing your variables.
 #
-# Contributors:
-#   Thomas Keck
-#   Kilian Lieret (2020)
-#
 # For full documentation please refer to https://software.belle2.org
 # Anything unclear? Ask questions at https://questions.belle2.org
 

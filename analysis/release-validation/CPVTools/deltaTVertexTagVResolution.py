@@ -22,8 +22,6 @@
 # The VXD requirement has to be either PXD or SVD. The script will then evaluate the
 # vertexing performance if PXD (or SVD) hits are required and if not.
 #
-# Contributors: L. Li Gioi, F. Abudinen (June 2017)
-#
 ###########################################################################################
 
 

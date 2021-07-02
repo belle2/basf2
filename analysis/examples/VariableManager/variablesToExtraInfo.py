@@ -14,8 +14,6 @@
 # also use this to save electron energy (or dielectron q2) before- and after-
 # running Bremsstrahlung correction or similar.
 #
-# Thomas Keck and Sam Cunliffe
-#
 # For full documentation please refer to https://software.belle2.org
 # Anything unclear? Ask questions at https://questions.belle2.org
 

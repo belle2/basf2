@@ -19,8 +19,6 @@
 # * True here means that the target (or targets) of the category are found in a      *
 # * certain event. For more information check Sec. 4.5.3 in BELLE2-PTHESIS-2018-003  *
 #                                                                                    *
-# * Author: Fernando Abudinen                                                        *
-#                                                                                    *
 # ************************************************************************************
 
 from matplotlib.colors import colorConverter

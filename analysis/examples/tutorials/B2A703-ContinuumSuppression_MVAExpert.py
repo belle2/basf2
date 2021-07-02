@@ -8,24 +8,23 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-################################################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial runs over skims of centrally produced B->KsPi0 or continuum MC
-# mdst files and reconstructs B->KsPi0 decays, applies the MVAExpert module,
-# and writes out flat NTuples containing all variables used in the continuum
-# suppression training + the (transformed) network output distribution.
-#
-# This module requires the weightfile produced in B2A702 (MVAFastBDT.root).
-#
-# Usage:
-#   basf2 B2A703-ContinuumSuppression_MVAExpert.py <signal,qqbar>
-#
-# Contributors: P. Goldenzweig (October 2016)
-#               I. Komarov (September 2018)
-#
-################################################################################
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial runs over skims of centrally produced B->KsPi0 or        #
+# continuum MC mdst files and reconstructs B->KsPi0 decays, applies the  #
+# MVAExpert module, and writes out flat NTuples containing all           #
+# variables used in the continuum suppression training + the             #
+# (transformed) network output distribution.                             #
+#                                                                        #
+# This module requires the weightfile produced in B2A702                 #
+# (MVAFastBDT.root).                                                     #
+#                                                                        #
+# Usage:                                                                 #
+#   basf2 B2A703-ContinuumSuppression_MVAExpert.py <signal,qqbar>        #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

@@ -8,30 +8,25 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-########################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to perform Vertex fits
-# using Rave. The following  decay chain (and c.c. decay
-# chain):
-#
-# D*+ -> D0 pi+
-#        |
-#        +-> K- pi+
-#
-# is reconstructed and the D0 and D*+ decay vertices are
-# fitted.
-#
-# Note: This example is build upon
-# B2A301-Dstar2D0Pi-Reconstruction.py
-#
-# Note: This example uses the signal MC sample created in
-# MC campaign 3.5, therefore it can be ran only on KEKCC computers.
-#
-# Contributors: L. Li Gioi (October 2014)
-#
-######################################################
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to perform Vertex fits                  #
+# using Rave. The following  decay chain (and c.c. decay                 #
+# chain):                                                                #
+#                                                                        #
+# D*+ -> D0 pi+                                                          #
+#        |                                                               #
+#        +-> K- pi+                                                      #
+#                                                                        #
+# is reconstructed and the D0 and D*+ decay vertices are                 #
+# fitted.                                                                #
+#                                                                        #
+# Note: This example is build upon                                       #
+# B2A301-Dstar2D0Pi-Reconstruction.py                                    #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 from modularAnalysis import inputMdst

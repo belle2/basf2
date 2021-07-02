@@ -8,22 +8,20 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-################################################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial runs over flat NTuples of reconstructed B->KsPi0 decays,
-# which were created running B2A701. The training and test datasets consist of
-# a mixture of reconstructed Bd->KsPi0 and qqbqr MC. The apply datasets are
-# pure signal and qqbar for running the expert as explained below.
-#
-# Usage:
-#   basf2 B2A702-ContinuumSuppression_MVATrain.py
-#
-# Contributors: P. Goldenzweig (October 2016)
-#               I. Komarov (September 2018)
-#
-################################################################################
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial runs over flat NTuples of reconstructed B->KsPi0 decays, #
+# which were created running B2A701. The training and test datasets      #
+# consist of a mixture of reconstructed Bd->KsPi0 and qqbar MC. The      #
+# apply datasets are pure signal and qqbar for running the expert as     #
+# explained below.                                                       #
+#                                                                        #
+# Usage:                                                                 #
+#   basf2 B2A702-ContinuumSuppression_MVATrain.py                        #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import basf2_mva

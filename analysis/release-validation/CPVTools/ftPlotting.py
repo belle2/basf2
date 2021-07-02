@@ -11,8 +11,6 @@
 
 # @cond SUPPRESS_DOXYGEN
 
-# Thomas Keck 2015
-
 import basf2_mva_util
 from basf2 import B2INFO, B2WARNING
 import basf2_mva_evaluation.histogram as histogram

@@ -10,17 +10,14 @@
 ##########################################################################
 
 """
-<header>
-  <contact>Fernando Abudinen; abudinen@mpp.mpg.de</contact>
-  <description>This file skims events that are useful to test the time dependent CPV analysis tools,
+  This file skims events that are useful to test the time dependent CPV analysis tools,
   i.e. those events where the signal B0 meson is correctly MC matched and where no tracks on the tag side
   belong to the signal side. The variable used for skimming is isRelatedRestOfEventB0Flavor.
   As input one needs a MC mdst file for the signal channel B0sig->J/PsiKs.
   The script reconstructs B0sig->J/PsiKs on the signal side
   and applies the flavor tagger on the ROE.
   The vertex of B0sig is reconstructed (JPsi vertex) and the vertex of B0tag is reconstructed
-  with the TagV module. </description>
-</header>
+  with the TagV module.
 """
 
 import basf2 as b2

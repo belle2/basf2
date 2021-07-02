@@ -14,8 +14,6 @@
 # Well, despair no longer! With so called "aliases", you can define handy short
 # names for your complicated variables.
 #
-# Contributors: Kilian Lieret (2020)
-#
 # For full documentation please refer to https://software.belle2.org
 # Anything unclear? Ask questions at https://questions.belle2.org
 #

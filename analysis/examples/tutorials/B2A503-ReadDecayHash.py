@@ -8,31 +8,29 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-#######################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to write out the
-# decay hash. This allows to store information on
-# the reconstructed and original decay and use it
-# in the offline analysis steps.
-#
-#   J/psi
-#    |
-#    +-> e- e+
-#
-# Notes:
-#  1) No guarantee for collisions in the decayHash.
-#  2) Be careful with the removeRadiativeGammaFlag
-#     parameter. Bremsstrahlung gammas are identified
-#     as follows:
-#     If a decay has more than 2 daughters and pdg of
-#     that daughter is 22. I.e. in a decay like
-#     A -> B C gamma, the gamma would be removed.
-#
-# Contributors: Moritz Gelb (June 2017)
-#
-######################################################
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to write out the                        #
+# decay hash. This allows to store information on                        #
+# the reconstructed and original decay and use it                        #
+# in the offline analysis steps.                                         #
+#                                                                        #
+#   J/psi                                                                #
+#    |                                                                   #
+#    +-> e- e+                                                           #
+#                                                                        #
+# Notes:                                                                 #
+#  1) No guarantee for collisions in the decayHash.                      #
+#  2) Be careful with the removeRadiativeGammaFlag                       #
+#     parameter. Bremsstrahlung gammas are identified                    #
+#     as follows:                                                        #
+#     If a decay has more than 2 daughters and pdg of                    #
+#     that daughter is 22. I.e. in a decay like                          #
+#     A -> B C gamma, the gamma would be removed.                        #
+#                                                                        #
+##########################################################################
 
 import root_pandas
 import decayHash

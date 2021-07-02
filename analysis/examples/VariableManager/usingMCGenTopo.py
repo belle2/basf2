@@ -10,7 +10,6 @@
 
 # This example demonstrates the detailed usage of the parameter lists of variables returned by mc_gen_topo(n).
 # For details on mc_gen_topo(n), please refer to its definition in analysis/scripts/variables/MCGenTopo.py.
-# Xing-Yu Zhou
 
 import basf2
 from modularAnalysis import inputMdst

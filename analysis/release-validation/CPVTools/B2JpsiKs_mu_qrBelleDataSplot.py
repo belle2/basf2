@@ -9,8 +9,8 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# * **********************************  Flavor Tagging   ************************************
-#                                                                                          *
+# ************************************  Flavor Tagging   ***********************************
+# *                                                                                        *
 # * This validation script performs an Splot analysis of Belle Data using mbc as           *
 # * Splot variable in order to extract the qr distribution of signal B0s.                  *
 # * The signal component of Mbc is first fitted on converted Belle MC using a              *
@@ -21,9 +21,7 @@
 # * For more information see Sec. 4.8 in BELLE2-PTHESIS-2018-003                           *
 # * Usage:                                                                                 *
 # *   basf2 B2JpsiKs_mu_qrBelleDataSplot.py RootNtupleFilesMC RootNtupleFilesData treeName *
-#                                                                                          *
-# * Contributors: F. Abudinen (December 2018)                                              *
-#                                                                                          *
+# *                                                                                        *
 # ******************************************************************************************
 
 import math

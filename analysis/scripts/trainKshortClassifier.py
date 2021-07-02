@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Author: Marcel Hohmann (marcel.hohmann@desy.de)
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #

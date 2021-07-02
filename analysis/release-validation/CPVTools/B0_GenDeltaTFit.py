@@ -11,7 +11,6 @@
 
 #######################################################
 #
-#
 # This script checks if the time dependent CP asymmetry has been correctly
 # simulated. It saves the generated times for Bsig and Btag
 # fits the distributions and saves the plots
@@ -22,8 +21,6 @@
 #
 # If you want to use this script for other decay channels
 # you need to modify lines 379-381.
-#
-# Contributor: F. Abudinen (December 2018)
 #
 ######################################################
 

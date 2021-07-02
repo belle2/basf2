@@ -9,8 +9,6 @@
 ##########################################################################
 
 # *************  Flavor Tagging   ************
-# * Authors: Fernando Abudinen, Moritz Gelb  *
-# *.....     and Thomas Keck                 *
 # * This script is needed to train           *
 # * and to test the flavor tagger.           *
 # ********************************************

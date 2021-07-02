@@ -8,13 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-########################################################
-#
-# Author(s): Torben Ferber (ferber@physics.ubc.ca)
-#            Savino Longo (savino.longo@desy.de)
-#
-########################################################
-
 from modularAnalysis import fillParticleList, cutAndCopyList
 
 

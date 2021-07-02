@@ -10,14 +10,13 @@
 ##########################################################################
 
 # **************  Flavor Tagging   **************
-# * Authors: Moritz Gelb & Fernando Abudinen    *
 # *                                             *
 # * This script calculates the paramters charac-*
 # * terizing the performance of the flavor tag- *
 # * ger. It produces as well plots for the qr   *
 # * distribution of the combiners and the dis-  *
 # * tributions of the combiner input variables. *
-#                                               *
+# *                                             *
 # ***********************************************
 
 import ROOT

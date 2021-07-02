@@ -8,15 +8,13 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-############################################################################
-#
-# This is a script that shows how to reconstruct B -> J/psi KL events and
-# recalculate the KL momentum according to the reconstructed direction using
-# kinematical constraints.
-#
-# Contributors: B. Oberhof, benjamin.oberhof@lnf.infn.it
-#
-############################################################################
+##########################################################################
+#                                                                        #
+# This is a script that shows how to reconstruct B -> J/psi KL events    #
+# and recalculate the KL momentum according to the reconstructed         #
+# direction using kinematical constraints.                               #
+#                                                                        #
+##########################################################################
 
 import basf2
 import modularAnalysis as ma

@@ -8,29 +8,25 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-#######################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial exemplifies how a best-candidate selection
-# can be performed using rankByLowest()/rankByHighest() for
-# different variables.
-# The decay channel D0 -> K- pi+ (+ c.c.) is reconstructed,
-# a vertex fit performed and variables dM and chiProb are then
-# used to rank the candidates and saved via the CustomFloats
-# ntuple tool.
-#
-# To look at the results, one might use:
-# ntuple->Scan("D0_dM:D0_chiProb:D0_dM_rank:D0_chiProb_rank:D0_mcErrors")
-#
-#
-# based on B2A403-KFit-VertexFit.py
-#
-# Contributors: C. Pulvermacher
-#               I. Komarov (December 2017)
-#               I. Komarov (September 2018)
-#
-################################################################################
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial exemplifies how a best-candidate selection               #
+# can be performed using rankByLowest()/rankByHighest() for              #
+# different variables.                                                   #
+# The decay channel D0 -> K- pi+ (+ c.c.) is reconstructed,              #
+# a vertex fit performed and variables dM and chiProb are then           #
+# used to rank the candidates and saved via the CustomFloats             #
+# ntuple tool.                                                           #
+#                                                                        #
+# To look at the results, one might use:                                 #
+# D0->Scan("D0_dM:D0_chiProb:D0_dM_rank:D0_chiProb_rank:D0_mcErrors")    #
+#                                                                        #
+#                                                                        #
+# based on B2A403-KFit-VertexFit.py                                      #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

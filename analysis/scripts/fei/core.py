@@ -10,8 +10,6 @@
 
 # @cond SUPPRESS_DOXYGEN
 
-# Thomas Keck 2017
-
 """
  The Full Event Interpretation Algorithm
 

@@ -8,27 +8,22 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-#######################################################
-#
-# This tutorial demonstrates how to perform mass fit with
-# the KFit. In this example the following decay chain:
-#
-# B0 -> D0 pi0
-#       |
-#       +-> pi0 pi0
-#
-# is reconstructed. The mass fits is performed on D0
-# candidates (as well as pi0 candidates by default).
-#
-# Note: This example is build upon
-# B2A302-B02D0Pi0-D02Pi0Pi0-Reconstruction.py
-#
-# Note: This example uses the signal MC sample created in
-# MC campaign 3.5, therefore it can be ran only on KEKCC computers.
-#
-# Contributors: A. Zupanc (June 2014)
-#
-######################################################
+##########################################################################
+#                                                                        #
+# This tutorial demonstrates how to perform mass fit with                #
+# the KFit. In this example the following decay chain:                   #
+#                                                                        #
+# B0 -> D0 pi0                                                           #
+#       |                                                                #
+#       +-> pi0 pi0                                                      #
+#                                                                        #
+# is reconstructed. The mass fits is performed on D0                     #
+# candidates (as well as pi0 candidates by default).                     #
+#                                                                        #
+# Note: This example is build upon                                       #
+# B2A302-B02D0Pi0-D02Pi0Pi0-Reconstruction.py                            #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 from modularAnalysis import inputMdst

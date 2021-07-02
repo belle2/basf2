@@ -8,15 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-########################################################
-#
-# Author(s): Torben Ferber (ferber@physics.ubc.ca)
-#            Savino Longo(savino.longo@desy.de)
-#
-# more documentation: https://confluence.desy.de/x/I3I0Aw
-#
-########################################################
-
 import modularAnalysis as ma
 from stdPhotons import stdPhotons
 from vertex import kFit

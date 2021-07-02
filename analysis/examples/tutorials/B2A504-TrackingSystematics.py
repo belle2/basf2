@@ -1,34 +1,36 @@
 #!/usr/bin/env python3
 
-##########################################################################
-# basf2 (Belle II Analysis Software Framework)                           #
-# Author: The Belle II Collaboration                                     #
-#                                                                        #
-# See git log for contributors and copyright holders.                    #
-# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
-##########################################################################
+############################################################################
+# basf2 (Belle II Analysis Software Framework)                             #
+# Author: The Belle II Collaboration                                       #
+#                                                                          #
+# See git log for contributors and copyright holders.                      #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                    #
+############################################################################
 
-###############################################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to estimate tracking systematic uncertainties for
-# the following decay:
-#
-#   J/psi -> e+  e-
-#
-# The analysers has to specify systematic "test" from the list of tests. The output
-# file contains reconstructed J/psi inv. mass and momentum with corresponding modification.
-#
-# The latest recommendations for tracking systematic uncertainties can be found here:
-# https://confluence.desy.de/display/BI/Tracking+and+Vertexing+Performance
-#
-###############################################################################
+############################################################################
+#                                                                          #
+# Stuck? Ask for help at questions.belle2.org                              #
+#                                                                          #
+# This tutorial demonstrates how to estimate tracking systematic           #
+# uncertainties for the following decay:                                   #
+#                                                                          #
+#   J/psi -> e+  e-                                                        #
+#                                                                          #
+# The analysers has to specify systematic "test" from the list of tests.   #
+# The output file contains reconstructed J/psi inv. mass and momentum      #
+# with corresponding modification.                                         #
+#                                                                          #
+# The latest recommendations for tracking systematic uncertainties can     #
+# be found here:                                                           #
+# https://confluence.desy.de/display/BI/Tracking+and+Vertexing+Performance #
+#                                                                          #
+############################################################################
 
 import basf2 as b2
 import modularAnalysis as ma
 
-# defile systematic tests
+# define systematic tests
 sys_tests = ['def', 'scale', 'scaleUp', 'scaleDown', 'Efficiency']
 
 # Select the systematic variation from the list

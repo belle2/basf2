@@ -8,16 +8,14 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-################################################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to effectively access all ECLClusters via
-# the particle loader
-#
-# Contributors: Torben Ferber (2018)
-#
-################################################################################
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to effectively access all ECLClusters   #
+# via the particle loader                                                #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 from modularAnalysis import inputMdst

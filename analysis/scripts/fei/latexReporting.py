@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-#
-# Thomas Keck 2017
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #

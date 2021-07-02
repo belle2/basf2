@@ -18,12 +18,6 @@ For each particle's track in the input charged stable particle list,
 calculate the minimal distance to the other candidates' tracks at a given detector entry surface.
 """
 
-__author__ = 'Marco Milesi'
-__copyright__ = 'Copyright 2020 - Belle II Collaboration'
-__maintainer__ = 'Marco Milesi'
-__email__ = 'marco.milesi@unimelb.edu.au'
-
-
 import argparse
 
 

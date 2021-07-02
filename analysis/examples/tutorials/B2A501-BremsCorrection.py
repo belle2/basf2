@@ -8,31 +8,27 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-###############################################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to correct for Bremsstrahlung radiation for
-# the following decay:
-#
-#   J/psi
-#    |
-#    +-> e- e+
-#        |  |
-#        |  +-> e+ (gamma)
-#        +-> e- (gamma)
-#
-# Note:
-#
-# The electrons in the corrected list have an attached extraInfo
-# 'bremsCorrected', indicating if the electron was corrected (1) or not (0).
-#
-# Contributors: Moritz Gelb (February 2017)
-#               I. Komarov (December 2017)
-#               I. Komarov (September 2018)
-#               F. Meier (October 2019)
-#
-###############################################################################
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to correct for Bremsstrahlung radiation #
+# for the following decay:                                               #
+#                                                                        #
+#   J/psi                                                                #
+#    |                                                                   #
+#    +-> e- e+                                                           #
+#        |  |                                                            #
+#        |  +-> e+ (gamma)                                               #
+#        +-> e- (gamma)                                                  #
+#                                                                        #
+# Note:                                                                  #
+#                                                                        #
+# The electrons in the corrected list have an attached extraInfo         #
+# 'bremsCorrected', indicating if the electron was corrected (1) or not  #
+#  (0).                                                                  #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

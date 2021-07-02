@@ -10,12 +10,11 @@
 ##########################################################################
 
 # **************  Flavor Tagging   **************
-# * Authors: Fernando Abudinen                  *
 # *                                             *
 # * This script sets global parameters for the  *
 # * evaluation of the flavor tagger's           *
 # * performance.                                *
-#                                               *
+# *                                             *
 # ***********************************************
 
 import ROOT

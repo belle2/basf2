@@ -11,8 +11,6 @@
 # The VariablesToHistogram module saves variables from the VariableManager
 # to TH1F and TH2F here is an example of how to use it.
 #
-# Thomas Keck and Sam Cunliffe
-#
 # For full documentation please refer to https://software.belle2.org
 # Anything unclear? Ask questions at https://questions.belle2.org
 

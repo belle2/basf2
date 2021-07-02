@@ -10,8 +10,6 @@
 
 # @cond SUPPRESS_DOXYGEN
 
-# Thomas Keck 2016
-
 """
  Configuration classes
 

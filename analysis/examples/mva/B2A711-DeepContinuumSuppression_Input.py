@@ -8,23 +8,23 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-################################################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial runs over skims of centrally produced B->KsPi0 and continuum MC
-# mdst files and creates flat NTuples of B->KsPi0 decays, which are used in
-# tutorials B2A712 AND B2A713 for training, testing, and applying the MVAExpert.
-# It's useful to have a look at B2A701-ContinuumSuppression_Input.py first.
-# Also have a look at the Continuum suppression section at https://software.belle2.org
-# The new variables are described in more detail in http://ekp-invenio.physik.uni-karlsruhe.de/record/48934
-#
-# Usage:
-#   basf2 B2A711-DeepContinuumSuppression_Input.py <train,test,apply_signal,apply_qqbar>
-#
-# Contributors: D. Weyland (November 2017), P. Goldenzweig
-#
-################################################################################
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial runs over skims of centrally produced B->KsPi0 and       #
+# continuum MC mdst files and creates flat NTuples of B->KsPi0 decays,   #
+# which are used in tutorials B2A712 AND B2A713 for training, testing,   #
+# and applying the MVAExpert. It's useful to have a look at              #
+# B2A701-ContinuumSuppression_Input.py first. Also have a look at the    #
+# Continuum suppression section at https://software.belle2.org The new   #
+# variables are described in more detail in                              #
+# http://ekp-invenio.physik.uni-karlsruhe.de/record/48934                #
+#                                                                        #
+# Usage: basf2 B2A711-DeepContinuumSuppression_Input.py                  #
+# <train,test,apply_signal,apply_qqbar>                                  #
+#                                                                        #
+##########################################################################
 
 import basf2
 import modularAnalysis as ma

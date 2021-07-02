@@ -8,21 +8,19 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-################################################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial runs over skims of centrally produced B->KsPi0 and continuum MC
-# mdst files and creates flat NTuples of B->KsPi0 decays, which are used in
-# tutorials B2A702 AND B2A703 for training, testing, and applying the MVAExpert.
-#
-# Usage:
-#   basf2 B2A701-ContinuumSuppression_Input.py <train,test,apply_signal,apply_qqbar>
-#
-# Contributors: P. Goldenzweig (October 2016)
-#               I. Komarov (September 2018)
-#
-################################################################################
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial runs over skims of centrally produced B->KsPi0 and       #
+# continuum MC mdst files and creates flat NTuples of B->KsPi0 decays,   #
+# which are used in tutorials B2A702 AND B2A703 for training, testing,   #
+# and applying the MVAExpert.                                            #
+#                                                                        #
+# Usage: basf2 B2A701-ContinuumSuppression_Input.py                      #
+# <train,test,apply_signal,apply_qqbar>                                  #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

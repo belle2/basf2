@@ -8,15 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-########################################################
-#
-# Author(s): B.Oberhof (benjamin.oberhof@lnf.infn.it)
-#
-# more documentation:
-# https://confluence.desy.de/display/BI/Klong+ID
-#
-########################################################
-
 from basf2 import B2FATAL, B2WARNING
 from modularAnalysis import fillParticleList
 

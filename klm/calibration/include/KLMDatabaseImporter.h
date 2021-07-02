@@ -13,6 +13,7 @@
 /* KLM headers. */
 #include <klm/dbobjects/bklm/BKLMAlignment.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
+#include <klm/dbobjects/KLMReconstructionParameters.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
@@ -48,6 +49,12 @@ namespace Belle2 {
      * Import channel status.
      */
     void importChannelStatus(const KLMChannelStatus* channelStatus);
+
+    /**
+     * Import reconstruction parameters.
+     */
+    void importReconstructionParameters(
+      const KLMReconstructionParameters* digitizationParameters);
 
     /**
      * Import scintillator simulation parameters.

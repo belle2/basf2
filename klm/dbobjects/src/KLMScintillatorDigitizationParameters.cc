@@ -15,7 +15,7 @@ using namespace Belle2;
 
 KLMScintillatorDigitizationParameters::KLMScintillatorDigitizationParameters() :
   m_ADCRange(0),
-  m_ADCSamplingTime(0),
+  m_ADCSamplingTDCPeriods(0),
   m_NDigitizations(0),
   m_ADCPedestal(0),
   m_ADCPEAmplitude(0),

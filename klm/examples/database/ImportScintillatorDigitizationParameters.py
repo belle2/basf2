@@ -20,8 +20,8 @@ dbImporter = KLMDatabaseImporter()
 digPar = KLMScintillatorDigitizationParameters()
 # ADC resolution (maximal output value + 1).
 digPar.setADCRange(4096)
-# ADC frequency in GHz.
-digPar.setADCSamplingFrequency(1.017728000)
+# ADC sampling time in TDC periods (frequency is global clock * 8).
+digPar.setADCSamplingTDCPeriods(1)
 # Number of digitizations.
 digPar.setNDigitizations(200)
 # ADC pedestal.

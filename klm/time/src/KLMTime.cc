@@ -9,30 +9,33 @@
  **************************************************************************/
 
 /* Own header. */
-#include <klm/dbobjects/KLMTimeConversion.h>
+#include <klm/time/KLMTime.h>
 
 using namespace Belle2;
 
-KLMTimeConversion::KLMTimeConversion() :
-  m_TDCPeriod(0),
-  m_TimeOffset(0),
-  m_CTimeShift(0)
+KLMTime& KLMTime::Instance()
 {
+  static KLMTime klmElementNumbers;
+  return klmElementNumbers;
 }
 
-KLMTimeConversion::~KLMTimeConversion()
+void KLMTime::updateConstants()
 {
+  m_TDCPeriod =
+    1.0 / m_HardwareClockSettings->getClockFrequency(Const::KLM, "TDC");
+  m_CTimePeriod = 1.0 / m_HardwareClockSettings->getGlobalClockFrequency();
 }
 
-double KLMTimeConversion::getScintillatorTime(int ctime, int triggerCTime) const
+double KLMTime::getScintillatorTime(int ctime, int triggerCTime) const
 {
+  int cTimeShift = m_KLMTimeConversion->getCTimeShift();
   /* Relative time in TDC periods for scintillators. */
   int relativeTime;
   /*
    * All time values were shifted by 2 bits for the phase2 data.
    */
-  int correctedCTime = (ctime << m_CTimeShift) & 0xFFFF;
-  int correctedTriggerCTime = (triggerCTime << m_CTimeShift) & 0xFFFF;
+  int correctedCTime = (ctime << cTimeShift) & 0xFFFF;
+  int correctedTriggerCTime = (triggerCTime << cTimeShift) & 0xFFFF;
   /* Scintillator: 16-bit CTIME. */
   if (correctedCTime <= correctedTriggerCTime)
     relativeTime = correctedCTime - correctedTriggerCTime;
@@ -43,7 +46,7 @@ double KLMTimeConversion::getScintillatorTime(int ctime, int triggerCTime) const
   return relativeTime * m_TDCPeriod;
 }
 
-std::pair<int, double> KLMTimeConversion::getRPCTimes(int ctime, int tdc, int triggerTime) const
+std::pair<int, double> KLMTime::getRPCTimes(int ctime, int tdc, int triggerTime) const
 {
   /* Relative time in TDC periods for RPC hits. */
   int relativeTime = tdc & 0x7FF;
@@ -59,11 +62,19 @@ std::pair<int, double> KLMTimeConversion::getRPCTimes(int ctime, int tdc, int tr
     relativeTime -= trigger;
   else
     relativeTime -= trigger + 0x800;
-  return std::pair<int, double>(ctime - triggerTime, relativeTime * m_TDCPeriod);
+  return std::pair<int, double>(ctime - triggerTime,
+                                relativeTime * m_TDCPeriod);
 }
 
-double KLMTimeConversion::getTimeSimulation(int tdc, bool scintillator) const
+double KLMTime::getTimeSimulation(int tdc, bool scintillator) const
 {
+  double timeOffset = m_KLMTimeConversion->getTimeOffset();
   (void)scintillator;
-  return tdc * m_TDCPeriod + m_TimeOffset;
+  return tdc * m_TDCPeriod + timeOffset;
+}
+
+uint16_t KLMTime::getTDCByTime(double time) const
+{
+  double timeOffset = m_KLMTimeConversion->getTimeOffset();
+  return (time - timeOffset) / m_TDCPeriod;
 }

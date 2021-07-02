@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015  Belle II Collaboration                              *
+ * Copyright(C) 2021  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Kirill Chilikin                                          *
@@ -10,54 +10,55 @@
 
 #pragma once
 
-/* Belle 2 headers. */
-#include <calibration/CalibrationAlgorithm.h>
+/* ROOT headers. */
+#include <TObject.h>
 
 namespace Belle2 {
 
   /**
-   * EKLM time calibration algorithm.
+   * Class to store KLM reconstruction parameters in the database.
    */
-  class EKLMTimeCalibrationAlgorithm : public CalibrationAlgorithm {
+  class KLMReconstructionParameters : public TObject {
 
   public:
 
     /**
-     * Event (hit): time, distance from hit to SiPM.
-     */
-    struct Event {
-      float time;   /**< Time. */
-      float dist;   /**< Distance. */
-      float npe;    /**< Number of photoelectrons. */
-    };
-
-    /**
      * Constructor.
      */
-    EKLMTimeCalibrationAlgorithm();
+    KLMReconstructionParameters()
+    {
+    }
 
     /**
      * Destructor.
      */
-    ~EKLMTimeCalibrationAlgorithm();
-
-    /**
-     * Calibration.
-     */
-    CalibrationAlgorithm::EResult calibrate() override;
-
-    /**
-     * Turn on debug mode (prints histograms).
-     */
-    void setDebug()
+    ~KLMReconstructionParameters()
     {
-      m_Debug = true;
+    }
+
+    /**
+     * Whether multi-strip digits are enabled.
+     */
+    bool multiStripDigitsEnabled() const
+    {
+      return m_MultiStripDigitsEnabled;
+    }
+
+    /**
+     * Set whether multi-strip digits are enabled.
+     */
+    void setMultiStripDigitsEnabled(bool enabled)
+    {
+      m_MultiStripDigitsEnabled = enabled;
     }
 
   private:
 
-    /** Debug mode. */
-    bool m_Debug;
+    /** Whether multi-strip digits are enabled. */
+    bool m_MultiStripDigitsEnabled = false;
+
+    /** Class version. */
+    ClassDef(Belle2::KLMReconstructionParameters, 2);
 
   };
 

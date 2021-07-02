@@ -214,7 +214,6 @@ class CDCLayerConstraints(Constraints):
         self.r_scale = r_scale
         #: Constraint for z-scale
         self.z_scale = z_scale
-        pass
 
     def generate(self):
         """Generate constraints from CDC geometry
@@ -246,7 +245,6 @@ class CDCLayerConstraints(Constraints):
             for par in self.parameter:
                 if par[0] == 16:
                     continue
-                # f.write("Constraint  0. ! %s \n" % (par[1]))
                 const = Constraint()
 
                 nTot = 0
@@ -254,11 +252,9 @@ class CDCLayerConstraints(Constraints):
                     nlyr = sl[1]
                     for lyr in range(nlyr):
                         label = cdc_layer_label(nTot + lyr, par[0])
-                        # f.write(" %10i  1.0\n" % (label))
                         const.add(label, 1.0)
                     nTot += nlyr
 
-                #  f.write('\n')
                 consts.append(const)
 
         if self.twist:
@@ -266,7 +262,6 @@ class CDCLayerConstraints(Constraints):
             for par in self.parameter:
                 if par[0] != 16:
                     continue
-                # f.write("Constraint  0. ! %s \n" % (par[1]))
                 const = Constraint()
 
                 nTot = 0
@@ -274,7 +269,6 @@ class CDCLayerConstraints(Constraints):
                     nlyr = sl[1]
                     for lyr in range(nlyr):
                         label = cdc_layer_label(nTot + lyr, par[0])
-                        # f.write(" %10i  1.0\n" % (label))
                         const.add(label, 1.0)
                     nTot += nlyr
 
@@ -284,7 +278,6 @@ class CDCLayerConstraints(Constraints):
         if self.z_offset:
             #  stereo layers (Z offset)
             par = self.parameter[2]
-            # f.write("Constraint  0. ! %s (Z offset)\n" % (par[1]))
             const = Constraint()
 
             nTot = 0
@@ -298,7 +291,6 @@ class CDCLayerConstraints(Constraints):
                     rWire = rInner
                     for lyr in range(nlyr):
                         label = cdc_layer_label(nTot + lyr, par[0])
-                        # f.write(" %10i  %f\n" % (label, stereo * rWire))
                         const.add(label, stereo * rWire)
                         rWire += dr
                 nTot += nlyr
@@ -309,7 +301,6 @@ class CDCLayerConstraints(Constraints):
         if self.r_scale:
             #  all layers 2nd
             for par in self.parameter[:2]:
-                # f.write("Constraint  0. ! %s (2nd, radial scale)\n" % (par[1]))
                 const = Constraint()
 
                 nTot = 0
@@ -318,17 +309,14 @@ class CDCLayerConstraints(Constraints):
                     for lyr in range(nlyr):
                         label = cdc_layer_label(nTot + lyr, par[0])
                         der = cmp(2. * float(nTot + lyr) + 0.5, float(nLayer))
-                        # f.write(" %10i  %3.1f\n" % (label, der))
                         const.add(label, der)
                     nTot += nlyr
 
-                #  f.write('\n')
                 consts.append(const)
 
         if self.z_scale:
             #  stereo layers (Z -scale)
             par = self.parameter[5]
-            # f.write("Constraint  0. ! %s (Z scale)\n" % (par[1]))
             const = Constraint()
             nTot = 0
             for sl in self.cdc:
@@ -337,7 +325,6 @@ class CDCLayerConstraints(Constraints):
                 if stereo != 0.:
                     for lyr in range(nlyr):
                         label = cdc_layer_label(nTot + lyr, par[0])
-                        # f.write(" %10i  %f\n" % (label, stereo))
                         const.add(label, stereo)
                 nTot += nlyr
 
@@ -438,7 +425,7 @@ class CDCWireConstraints(Constraints):
         super(CDCWireConstraints, self).__init__(filename)
         #: List of layers for whose wires to generate the constraints. None = all layers
         if layers is None:
-            layers = [lyr for lyr in range(0, 56)]
+            layers = list(range(0, 56))
         self.layers = layers
         #: 6 x 56 (6/layer) constraints. Sum(dX_B/dY_B/drot_B/dX_FB/dY_FB/drot_FB)=0 for all wires in each layer
         #  -> removes the basic unconstrained DoF when aligning wires and layers simultaneously.
@@ -457,7 +444,6 @@ class CDCWireConstraints(Constraints):
         if hemisphere is None:
             hemispehere = []
         self.hemisphere = hemisphere
-        pass
 
     def configure_collector(self, collector):
         """Enables wire-by-wire derivatives in collector

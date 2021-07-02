@@ -73,7 +73,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   // This function gives you the vector of ExpRuns that were requested for this execution only
   auto expRuns = getRunList();
 
-  // Or you can inspect all the input files to get the full RunRange
+  // Do not use full data range - would not work with SequentialRunByRun strategy:
   //auto expRuns = getRunListFromAllData();
 
   int undeterminedParams = 0;

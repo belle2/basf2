@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """Tool to add or update the copyright and license statement to source files"""
 
 import argparse
 import glob
 import re
 import difflib
+import os
 
 
 # Copyright and license statements
@@ -47,15 +56,30 @@ if __name__ == "__main__":
     # Determine list of files
     files = []
     for entry in arguments.file:
-        files += glob.glob(entry, recursive=arguments.recursive)
-        if arguments.recursive:
-            files += glob.glob('**/' + entry, recursive=True)
+        files += glob.glob(f'{entry}/**', recursive=arguments.recursive)
+        #if arguments.recursive:
+        #    files += glob.glob('**/' + entry, recursive=True)
 
     # Open each file
     for file_name in files:
 
+        if os.path.isdir(file_name):
+            continue
+
+        bad_extensions = ('.root', '.sroot', '.xml', '.rst', '.txt', '.dat', '.data', '.j2', '.jinja2', '.json', '.yaml', '.sh', '.svg', '.csv', '.png', '.pdf', '.jpg', '.ipynb', '.dec', '.log', '.out', '.err')
+        if file_name.lower().endswith(bad_extensions):
+            continue
+
+        bad_files = ('SConscript', 'linkdef.h', '.librarians')
+        if any(bad_file in file_name for bad_file in bad_files):
+            continue
+
         with open(file_name, 'r') as source:
-            text = source.read()
+            try:
+                text = source.read()
+            except Exception:
+                print(f'Problematic file {file_name}, skipping it.')
+                continue
 
         # C or python?
         copyright_statement, re_copyright = (copyright_statement_C, re_copyright_C)

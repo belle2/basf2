@@ -86,6 +86,12 @@ if __name__ == "__main__":
         if arguments.type != 'C' and (arguments.type == 'python' or file_name.endswith('.py') or re_copyright_python.search(text) is not None):
             copyright_statement, re_copyright = (copyright_statement_python, re_copyright_python)
 
+        # Check if this is a python tool
+        if '/tools/' in file_name:
+            if not file_name.endswith(('.cc', '.C', '.h')):
+                if re_shebang.search(text):
+                    copyright_statement, re_copyright = (copyright_statement_python, re_copyright_python)
+
         # Existing statement?
         match = re_copyright.search(text)
         if match:

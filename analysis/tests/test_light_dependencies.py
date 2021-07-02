@@ -21,7 +21,7 @@ from time import time
 Check that no light-release-breaking dependencies have been added.
 
 If you are failing this test you have managed to break light builds, please
-check with the light release manager (Frank Meier) for more information.
+check with the light release manager for more information.
 """
 
 

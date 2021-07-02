@@ -12,10 +12,6 @@
 Script to get the integrated luminosity of a set of runs
 """
 
-__author__ = "Stefano Lacaprara, Alberto Martini"
-__email__ = "stefano.lacaprara@pd.infn.it, alberto.martini@roma3.infn.it"
-
-
 import argparse
 import getpass
 import re

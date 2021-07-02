@@ -1576,7 +1576,6 @@ namespace Belle2 {
         TLorentzVector Y_cm = T.rotateLabToCms() * particle->get4Vector();
         TLorentzVector neu_cm = missing4Vector(particle, maskName, option);
 
-        // Recycled code from Uwe Gebauer <uwe.gebauer@phys.uni-goettingen.de>
         double e_beam = T.getCMSEnergy() / 2.0;
 
         //just to make the formula simpler

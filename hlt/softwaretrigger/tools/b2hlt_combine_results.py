@@ -20,9 +20,6 @@ import root_pandas
 import pandas as pd
 import numpy as np
 
-__author__ = "Sam Cunliffe"
-__email__ = "sam.cunliffe@desy.de"
-
 PRESCALE_ROW = 4
 
 

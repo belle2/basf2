@@ -26,9 +26,6 @@ namespace Belle2 {
       /// Expose the parameters.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
-      /// set BField value for estimator
-      void beginRun() override;
-
     private:
       /// cut on the POCA distance in xy obtained from the helixFitEstimator
       double m_param_helixFitPocaDCut = 1.0;

@@ -72,8 +72,10 @@ def run_nsmd(nsmdir, port, nsmhost):
 # Kill NSMD
 
 def kill_nsmd(port, nsmhost):
+    # In the line below, b2code-style-fix changes '{print \$2}'
+    # into '{print \\$2}'. To avoid this, noqa is necessary.
     cmd = 'ssh ' + nsmhost + ' "ps -fC nsmd2 | grep ' + port \
-        + "| awk '{print \\$2}' \" > temp.pid"
+        + "| awk '{print \$2}' \" > temp.pid"  # noqa
 #    cmd = "ssh -v " + nsmhost + " \"ps -fC nsmd2 | grep " + port + "| awk '{printf(\"klll \%d\", \$2)} | sh' \""
 #    print cmd
     p = subprocess.Popen(cmd, shell=True)

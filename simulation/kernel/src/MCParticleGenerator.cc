@@ -1,17 +1,10 @@
-/*****************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                        *
- * Copyright(C) 2010-2011  Belle II Collaboration                            *
- *                                                                           *
- * Author: The Belle II Collaboration                                        *
- * Contributors: Andreas Moll, Martin Ritter, Doris Kim, Romulus Godang,     *
- *               Marko Staric                                                *
- *                                                                           *
- * This software is provided "as is" without any warranty.                   *
- *                                                                           *
- * 7/28/13 Modified (addToG4) to (addToG4 && mcParticle.getLifetime() != 0.0)*
- * to deal with the resonance particles that enter the detector in GEANT4    *
- * by R. Godang and Doris Kim                                                *
- *****************************************************************************/
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include <simulation/kernel/MCParticleGenerator.h>
 

@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # The example of running grl and gdl of L1 trigger, conjunction with tsim_subdetectors.py
 # basf2 tsim_grl_gdl.py -i inputrootfile -o outputrootfile
 # the inputrootfile should be the output file of tsim_subdetectors.py

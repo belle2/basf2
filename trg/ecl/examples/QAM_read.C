@@ -1,3 +1,10 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 void draw_QAM(TString m_file,TString m_pdf, TString m_title,TString m_Xaxis, TString m_Yaxis, Int_t m_startrun, Int_t m_endrun, Double_t m_min, Double_t m_max);
 
 void QAM_read(TString m_file){

@@ -1,3 +1,10 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 /* This program loads a set of trained MLPs from a rootfile
  * and saves the weights to a textfile with fixed point precision.
  *

@@ -1,5 +1,13 @@
 #! /bin/tcsh
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # change to your DESY account name
 BELLE2_USER=USERNAME
 # change if you want a different directory name for basf2 installation

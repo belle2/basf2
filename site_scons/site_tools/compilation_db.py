@@ -1,3 +1,10 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 # Adapted from
 # https://github.com/mongodb/mongo/blob/8dd6d4755734ed37c1b98dfdefce3ca6bc65f1f6/site_scons/site_tools/compilation_db.py
 

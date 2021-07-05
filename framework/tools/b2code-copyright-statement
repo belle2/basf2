@@ -68,12 +68,12 @@ if __name__ == "__main__":
             continue
 
         # Ignore the files that have the following extensions
-        bad_extensions = ('.root', '.sroot', '.xml', '.rst', '.txt', '.dat', '.data', '.j2', '.jinja2', '.json', '.yaml', '.sh', '.svg', '.csv', '.png', '.pdf', '.jpg', '.ipynb', '.dec', '.log', '.out', '.err', '.pdl', '.md', '.rstinclude', '.drawio', '.limits', '.fit', '.html', '.js', '.css', '.map', '.pptx', '.docx', '.raw', '.hwd', '.conf', '.yml', '.pyc', '.woff', '.woff2', '.eot', '.ttf')
+        bad_extensions = ('.root', '.sroot', '.xml', '.rst', '.txt', '.dat', '.data', '.j2', '.jinja2', '.json', '.yaml', '.sh', '.svg', '.csv', '.png', '.pdf', '.jpg', '.ipynb', '.dec', '.log', '.out', '.err', '.pdl', '.md', '.rstinclude', '.drawio', '.limits', '.fit', '.html', '.js', '.css', '.map', '.pptx', '.docx', '.raw', '.hwd', '.conf', '.yml', '.pyc', '.woff', '.woff2', '.eot', '.ttf', '.mac')
         if file_name.lower().endswith(bad_extensions):
             continue
 
         # Ignore the following files
-        bad_files = ('sconstruct', 'sconscript', 'linkdef.h', '.librarians', 'readme', 'makefile', 'dockerfile', 'doxyfile', 'site_scons/sphinx/conf.py')
+        bad_files = ('sconstruct', 'sconscript', 'linkdef.h', '.librarians', 'readme', 'makefile', 'dockerfile', 'doxyfile', 'matplotlibrc', 'site_scons/sphinx/conf.py')
 	# and the following paths
         bad_paths = ('online_book/basf2/steering_files/', 'site_scons/sphinx/_themes/sphinx_rtd_theme/')
         bad_things = bad_files + bad_paths

@@ -5,11 +5,10 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 /* ---------------------------------------------------------------------- *\
 
    bootmgt.c - boot MGT FINESSE prototype bitmap file
-
-   Mikihiko Nakao, KEK IPNS
 
    2009042100  retry option
    2009101600  parallel version based on confmgt6.c

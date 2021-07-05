@@ -7,7 +7,7 @@
  **************************************************************************/
 // revisions
 //
-// 20191119 nakao - following currently unused functions are removed
+// 20191119 - following currently unused functions are removed
 // void NSMCommunicator::callContext()
 //   handling nsmlib_recv inside a user program is against the usage of NSM2
 // const std::string NSMCommunicator::getNodeHost(const std::string& nodename)

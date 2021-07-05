@@ -14,7 +14,7 @@
   20140304 a simple #define can be used
   20131229 stdint.h definitions are added
   20140428 nsmparse_malloc fix
-  20140902 memset fix (T.Konno)
+  20140902 memset fix
   20140903 n_same fix for nested struct
   20140917 -1 to skip revision check
   20140918 nsmparse_struct fix (uninitialized malloc for ->next)

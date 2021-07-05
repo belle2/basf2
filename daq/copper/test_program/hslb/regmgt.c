@@ -5,11 +5,10 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 /* ---------------------------------------------------------------------- *\
 
    regmgt.c - MGT FINESSE prototype register access
-
-   Mikihiko Nakao, KEK IPNS
 
    2009042100  first version
    2009110400  32-bit registers

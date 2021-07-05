@@ -8,16 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# ************************************************************************#
-# BASF2 (Belle Analysis Framework 2)                                      #
-# Copyright(C) 2019 - Belle II Collaboration                              #
-#                                                                         #
-# Author: The Belle II Collaboration                                      #
-# Contributors: Nils Braun                                                #
-#                                                                         #
-# This software is provided "as is" without any warranty.                 #
-# ************************************************************************#
-
 import zmq
 from argparse import ArgumentParser
 from zmq_daq.utils import get_monitor_table, normalize_addresses, write_monitoring, show_monitoring

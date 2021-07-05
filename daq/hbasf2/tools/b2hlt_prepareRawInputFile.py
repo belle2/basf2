@@ -8,16 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# ************************************************************************#
-# BASF2 (Belle Analysis Framework 2)                                      #
-# Copyright(C) 2019 - Belle II Collaboration                              #
-#                                                                         #
-# Author: The Belle II Collaboration                                      #
-# Contributors: Nils Braun                                                #
-#                                                                         #
-# This software is provided "as is" without any warranty.                 #
-# ************************************************************************#
-
 import basf2
 from softwaretrigger.constants import HLT_INPUT_OBJECTS, EXPRESSRECO_INPUT_OBJECTS
 

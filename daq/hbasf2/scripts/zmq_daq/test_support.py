@@ -5,6 +5,7 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 # This file includes utilities for the unittests and is not needed during production cases
 import atexit
 import json

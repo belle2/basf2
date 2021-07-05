@@ -5,13 +5,8 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-/////////////////////////////////////////////////////////////////////// 
-//		Name:fileconfig.c				     //	
-//		Purpose: configurate the parameters on CDC FEE 	     //	
-//		Author: Sun Dehui				     //			
-//		History: Nakao (mgtreg.c)			     //	
-//		Version:   0.1                                       //
-///////////////////////////////////////////////////////////////////////
+
+// Purpose: configurate the parameters on CDC FEE
 
 #include <stdio.h>
 #include <sys/types.h>

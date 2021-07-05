@@ -9,12 +9,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-######################################################
-#
-#
-# Example steering file - 2011 Belle II Collaboration
-######################################################
-
 import basf2 as b2
 
 b2.set_log_level(b2.LogLevel.INFO)

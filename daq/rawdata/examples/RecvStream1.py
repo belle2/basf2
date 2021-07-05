@@ -11,7 +11,7 @@
 
 ######################################################
 #
-# RecvStream0.py : DAQ comoponent running on a readout PC.
+# RecvStream1.py : DAQ comoponent running on a readout PC.
 # This component receive data from eb0 and send data to eb1tx.
 #
 ######################################################

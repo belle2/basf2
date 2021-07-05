@@ -7,7 +7,7 @@
  **************************************************************************/
 #include "daq/slc/nsm/NSMMessage.h"
 
-// 20191004 nakao
+// 20191004
 // duplicating the NSM2 library function in a user function
 // NSMMessage::read(NSMcontext* nsmc)
 // is really a bad idea, need to be revised.

@@ -1,16 +1,10 @@
 /**************************************************************************
-* BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2016 - Belle II Collaboration                             *
-*                                                                        *
-* Author: The Belle II Collaboration                                     *
-* Contributors: Thomas Lueck                                             *
-*                                                                        *
-* this is a modified copy of                                             *
-* tracking/trackFindingVXD/filterTools/include/ObserverCheckMCPurity.h   *
-*                                                                        *
-*                                                                        *
-* This software is provided "as is" without any warranty.                *
-**************************************************************************/
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include <tracking/trackFindingVXD/filterTools/ObserverCheckFilters.h>
 

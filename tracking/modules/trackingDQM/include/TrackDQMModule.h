@@ -1,9 +1,14 @@
 /**************************************************************************
- * basf2 (Belle II Analysis Software Framework)                           *
- * Author: The Belle II Collaboration                                     *
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
- * See git log for contributors and copyright holders.                    *
- * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Peter Kodys, Jachym Bartik                               *
+ *                                                                        *
+ * Prepared for track quality check                                       *
+ * Prepared for Phase 2 and Belle II geometry                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once

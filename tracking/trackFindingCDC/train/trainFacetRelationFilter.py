@@ -1,14 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-##########################################################################
-# basf2 (Belle II Analysis Software Framework)                           #
-# Author: The Belle II Collaboration                                     #
-#                                                                        #
-# See git log for contributors and copyright holders.                    #
-# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
-##########################################################################
-
 # This is for training a mva classifier for relations between hit triplets
 # It performs a tip better than the current default chi2 filter
 # However run time is quite a bit slower which is why it wont be used in the standard chain.

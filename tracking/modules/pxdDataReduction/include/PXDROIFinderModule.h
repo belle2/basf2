@@ -1,9 +1,11 @@
 /**************************************************************************
- * basf2 (Belle II Analysis Software Framework)                           *
- * Author: The Belle II Collaboration                                     *
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2011 - Belle II Collaboration                             *
  *                                                                        *
- * See git log for contributors and copyright holders.                    *
- * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Giulia Casarosa, Eugenio Paoloni                         *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 /* Additional Info:
 * This Module is in an early stage of developement. The comments are mainly for temporal purposes

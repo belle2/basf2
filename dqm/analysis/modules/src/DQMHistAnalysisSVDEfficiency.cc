@@ -191,7 +191,6 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
       if (denU < m_statThreshold) {
         m_effUstatus = lowStat;
-        break; // break loop if one of sensor collected less then m_statThreshold
       } else {
         if ((effU - erreffU <= m_effWarning) && (effU - erreffU > m_effError)) {
           m_effUstatus = warning;
@@ -235,7 +234,6 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
       if (denV < m_statThreshold) {
         m_effVstatus = lowStat;
-        break; // break loop if one of sensor collected less then m_statThreshold
       } else {
         if ((effV - erreffV <= m_effWarning) && (effV - erreffV > m_effError)) {
           m_effVstatus = warning;

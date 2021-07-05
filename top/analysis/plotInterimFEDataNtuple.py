@@ -11,7 +11,6 @@
 
 # ---------------------------------------------------------------------------------------
 # draw summary plots from output of makeInterimFEDataNtuple module (run******_slot**_ana.root)
-# Contibutors: Maeda Yosuke and Umberto Tamponi
 #
 # Usage: basf2 plotInterimFEDataNtuple <output root file of makeInterimFEDataNtuple.py> (to be called in this steering file)
 # ---------------------------------------------------------------------------------------

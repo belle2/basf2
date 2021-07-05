@@ -12,9 +12,6 @@
 # ------------------------------------------------------------------------
 # Tools to fit the laser timing distribution and plot the results.
 # This code is intended for studying the TOP time resolution
-#
-# Contributors: Umberto Tamponi (tamponi@to.infn.it)
-#
 # ------------------------------------------------------------------------
 
 

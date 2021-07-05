@@ -17,8 +17,6 @@
 #        sample = dimuon/bhabha (D = dimuon)
 #
 # Note: input data or databases must be well calibrated (including moduleT0 and commonT0)
-#
-# author: M. Staric
 # ---------------------------------------------------------------------------------------
 
 import sys

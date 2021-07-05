@@ -14,8 +14,6 @@
 # data type: cdst hlt_bhabha
 #
 # usage: basf2 run_BS13d_calibration_bhabha.py expNo runFirst runLast
-#
-# author: M. Staric
 # ---------------------------------------------------------------------------------------
 
 import sys

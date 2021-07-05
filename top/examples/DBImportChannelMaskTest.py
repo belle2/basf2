@@ -11,7 +11,6 @@
 
 # --------------------------------------------------------------------------------
 # Generate a random channel mask for given fraction of dead / fraction of noisy
-#   Sam Cunliffe, Jan Strube
 # --------------------------------------------------------------------------------
 
 import basf2 as b2

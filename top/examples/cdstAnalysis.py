@@ -10,9 +10,6 @@
 ##########################################################################
 
 # Example of writing TOP cdst variable information using analysis package tools
-#
-# Sam Cunliffe (sam.cunliffe@desy.de)
-# November 2018
 
 from basf2 import create_path, use_central_database, process, statistics
 from modularAnalysis import variablesToNtuple

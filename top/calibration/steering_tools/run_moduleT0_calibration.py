@@ -15,8 +15,6 @@
 #
 # usage: basf2 run_moduleT0_calibration.py expNo runFirst runLast [sample]
 #        sample = bhabha/dimuon (D = bhabha)
-#
-# author: M. Staric
 # ---------------------------------------------------------------------------------------
 
 import sys

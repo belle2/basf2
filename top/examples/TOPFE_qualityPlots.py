@@ -9,9 +9,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Jan and Alyssa's waveform analysis script for FE data
-# Jan Strube, Sam Cunliffe, Alyssa Loos
-
 import basf2 as b2
 from ROOT import Belle2, gROOT
 from ROOT import TNtuple, TFile, TH1F, TCanvas, TGraph, gStyle

@@ -9,15 +9,11 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import basf2 as b2
-
 # ---------------------------------------------------------------
 # Simulation of the laser system including a double pulse
-#
-# Contributors: Marko Staric
-#               Stefano Lacaprara
-#               Umberto Tamponi
 # ---------------------------------------------------------------
+
+import basf2 as b2
 
 
 def addSource(x, angle, slotID, path):

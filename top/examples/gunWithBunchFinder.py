@@ -9,17 +9,17 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import basf2 as b2
-from tracking import add_tracking_reconstruction
-from reconstruction import add_dedx_modules
-from simulation import add_svd_simulation
-
 # --------------------------------------------------------------------
 # Example of using TOP reconstruction with bunch finder
 # needs reconstructed tracks (Tracks), extrapolated to TOP (ExtHits)
 # log likelihoods in TOPLikelihoods
 # relation from Tracks to TOPLikelihoods
 # --------------------------------------------------------------------
+
+import basf2 as b2
+from tracking import add_tracking_reconstruction
+from reconstruction import add_dedx_modules
+from simulation import add_svd_simulation
 
 # Suppress messages and warnings during processing:
 b2.set_log_level(b2.LogLevel.ERROR)

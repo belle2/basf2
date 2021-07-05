@@ -18,7 +18,6 @@ from ROOT import TH2F, TFile
 #
 # ------------------------------------------------------------------------
 # Simple module to study the width and amplitude of all the topdigits
-# Umberto Tamponi (tamponi@to.infn.it)
 #
 # usage: basf2 checkHitHeightAndWidth.py run_number output_name.root
 #        the run number accepts wildcards

@@ -15,7 +15,6 @@ import os
 
 # --------------------------------------------------------------------------
 # Example of using TOPTriggerDigitizer to make time stamps for trigger input
-# M. Staric, October 2017
 # --------------------------------------------------------------------------
 
 # Create path

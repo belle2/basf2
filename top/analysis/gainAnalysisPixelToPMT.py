@@ -11,7 +11,6 @@
 
 # ---------------------------------------------------------------------------------------
 # convert an output root file of pixel-by-pixel gain analysis data to pmt-by-pmt format
-# Contibutors: Maeda Yosuke (KMI, Nagoya Univ.)
 #
 # Usage: basf2 gainAnalysisPixelToPMT.py inputRoot(pixel-by-pixel result) outputRoot [maxHitTiming=-8.] [nMinEntries=100]
 # ---------------------------------------------------------------------------------------

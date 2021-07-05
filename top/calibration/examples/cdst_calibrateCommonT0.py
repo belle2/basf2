@@ -11,7 +11,6 @@
 
 # ---------------------------------------------------------------------------------------
 # Calibrate common T0 with Bhabha (or dimuon) events using new constants from DB
-# (M. Staric, 2019-07-10)
 #
 # usage: basf2 cdst_calibrateCommonT0.py experiment run
 #   job: bsub -q s "basf2 cdst_calibrateCommonT0.py experiment run"

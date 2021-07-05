@@ -14,8 +14,6 @@
 # data type: cdst
 #
 # usage: basf2 run_channelMask_calibration.py expNo runFirst runLast
-#
-# author: M. Staric
 # ---------------------------------------------------------------------------------------
 
 import sys

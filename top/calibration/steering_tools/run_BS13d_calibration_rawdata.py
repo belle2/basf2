@@ -14,8 +14,6 @@
 # data type: raw data
 #
 # usage: basf2 run_BS13d_calibration_rawdata.py expNo runFirst runLast
-#
-# author: M. Staric
 # ---------------------------------------------------------------------------------------
 
 import sys

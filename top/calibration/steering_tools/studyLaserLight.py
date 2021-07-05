@@ -13,8 +13,6 @@
 # Module to produce the laser time histograms that serve as input to the laser
 # resolution fitter
 #
-# Contributors: Umberto Tamponi (tamponi@to.infn.it)
-#
 # usage: basf2 studyLaserResolution.py dbaddress (path|none) type (local|pocket|root)
 #                                      output_name.root path_to_sroot run1 run2 ... runN
 #        The run number accepts wildcards

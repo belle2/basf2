@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-#
-# Usage: basf2 runTOPTBCComparator.py calSetList.txt
-#
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -11,6 +8,9 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
+# Usage: basf2 runTOPTBCComparator.py calSetList.txt
+
 import basf2 as b2
 import sys
 

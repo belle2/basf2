@@ -9,16 +9,16 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+# ------------------------------------------------------------------------
+# example of making histograms of pixel hits coming from individual fibers
+# needs as input the file produced by top/analysis/simLaserCalibration.py
+# ------------------------------------------------------------------------
+
 import basf2 as b2
 import os
 import sys
 from ROOT import Belle2
 from ROOT import TH2F, TFile
-
-# ------------------------------------------------------------------------
-# example of making histograms of pixel hits coming from individual fibers
-# needs as input the file produced by top/analysis/simLaserCalibration.py
-# ------------------------------------------------------------------------
 
 inputFile = 'laserSimulation.root'
 if not os.path.exists(inputFile):

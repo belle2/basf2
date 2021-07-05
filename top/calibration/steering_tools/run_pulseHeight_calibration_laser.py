@@ -14,8 +14,6 @@
 # data type: local runs with laser
 #
 # usage: basf2 run_pulseHeight_calibration_laser.py expNo run_1 run_2 ... run_n
-#
-# author: M. Staric
 # ---------------------------------------------------------------------------------------
 
 import sys

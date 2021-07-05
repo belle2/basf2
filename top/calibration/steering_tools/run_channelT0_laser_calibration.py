@@ -14,8 +14,6 @@
 # data type: local runs with laser
 #
 # usage: basf2 run_channelT0_laser_calibration.py expNo run_1 run_2 ... run_n
-#
-# authors: U. Tamponi, M. Staric
 # ---------------------------------------------------------------------------------------
 
 import basf2

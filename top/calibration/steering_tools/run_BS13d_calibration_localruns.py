@@ -14,8 +14,6 @@
 # data type: local runs (laser, singe-pulse or double-pulse)
 #
 # usage: basf2 run_BS13d_calibration_localruns.py expNo runFirst runLast
-#
-# author: M. Staric
 # ---------------------------------------------------------------------------------------
 
 import sys

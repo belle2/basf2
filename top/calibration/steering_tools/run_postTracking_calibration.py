@@ -18,8 +18,6 @@
 # usage: basf2 run_postTracking_calibration.py expNo runFirst runLast [sample method]
 #        sample = bhabha/dimuon (D = bhabha)
 #        method = BF/LL (D = BF)
-#
-# author: M. Staric
 # ---------------------------------------------------------------------------------------
 
 import sys

@@ -9,17 +9,13 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import basf2 as b2
-
 # ---------------------------------------------------------------
 # example of using OpticalGun to simulate the TOP laser calibration
 # system. Nine sources are located outside of the prism, in front
 # of its slanted face, pointing to the PMTs
-#
-# Contributors: Marko Staric
-#               Stefano Lacaprara
-#               Umberto Tamponi
 # ---------------------------------------------------------------
+
+import basf2 as b2
 
 
 def addSource(x, angle, slotID, path):

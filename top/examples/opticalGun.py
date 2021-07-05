@@ -9,17 +9,13 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import basf2 as b2
-
 # ---------------------------------------------------------------
 # Example of usage of the OpticalGun module.
 # It simulates two sources at the left and right side of prism,
 # outside quartz, pointed towards the PMTs
-#
-# Contibutors: Marko Staric
-#              Umberto Tamponi
 # ---------------------------------------------------------------
 
+import basf2 as b2
 
 # Create path
 main = b2.create_path()

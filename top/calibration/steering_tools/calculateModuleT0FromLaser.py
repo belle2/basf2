@@ -16,8 +16,6 @@
 # Usage: basf2 checkCalibrationOnCalpulseRun.py  <reference slot (1-16)>
 #        <reference channel (0-511)>  <input_file.root>  <output_file.root>
 #
-# Contributors: Umberto Tamponi (tamponi@to.infn.it)
-#
 # ---------------------------------------------------------------------------------------
 
 from ROOT import TFile, TTree

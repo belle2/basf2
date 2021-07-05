@@ -8,9 +8,9 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 """
 genPixelLikelihoods.py
-Author: Connor Hainje
 
 A sample script that demonstrates how to collect data using the TOPPixelLikelihood
 data object.

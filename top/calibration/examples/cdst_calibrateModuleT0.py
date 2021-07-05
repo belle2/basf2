@@ -12,7 +12,6 @@
 # ---------------------------------------------------------------------------------------
 # Calibrate module T0 with Bhabha (or dimuon) events using likelihood method
 # Note: this method works correctly only if initial calibration is reasonably good
-# (M. Staric, 2019-07-10)
 #
 # usage: basf2 cdst_calibrateModuleT0.py experiment runFirst runLast
 #   job: bsub -q l "basf2 cdst_calibrateModuleT0.py experiment runFirst runLast"

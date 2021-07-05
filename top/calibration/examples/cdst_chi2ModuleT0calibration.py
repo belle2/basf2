@@ -11,7 +11,6 @@
 
 # --------------------------------------------------------------------------------
 # Calibrate module T0 with Bhabha's or dimuons using time difference between slots
-# (M. Staric, 2019-07-10)
 #
 # usage: basf2 cdst_chi2ModuleT0calibration.py experiment runFirst runLast
 #   job: bsub -q l "basf2 cdst_chi2ModuleT0calibration.py experiment runFirst runLast"

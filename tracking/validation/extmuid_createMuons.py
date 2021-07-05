@@ -15,9 +15,6 @@
 #    using the ParticleGun for ext and muid validation. (No     #
 #    background hits overlaid.)                                 #
 #                                                               #
-#    written by Leo Piilonen, VT                                #
-#    piilonen@vt.edu                                            #
-#                                                               #
 #################################################################
 
 """

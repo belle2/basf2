@@ -14,9 +14,6 @@
 #     script creates efficiency vs pt plots and stores them     #
 #     in a root file                                            #
 #                                                               #
-#    written by Michael Ziegler, KIT                            #
-#    michael.ziegler2@kit.edu                                   #
-#                                                               #
 #################################################################
 
 """

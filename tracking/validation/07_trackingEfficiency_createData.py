@@ -14,9 +14,6 @@
 #    script to simulate 10 charged muon tracks with             #
 #    fixed transverse momentum using the ParticleGun            #
 #                                                               #
-#    written by Michael Ziegler, KIT                            #
-#    michael.ziegler2@kit.edu                                   #
-#                                                               #
 #################################################################
 
 """

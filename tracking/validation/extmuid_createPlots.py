@@ -14,9 +14,6 @@
 #     Create ext and muid validation plots and store them       #
 #     in a root file                                            #
 #                                                               #
-#    written by Leo Piilonen, VT                                #
-#    piilonen@vt.edu                                            #
-#                                                               #
 #################################################################
 
 """

@@ -5,6 +5,7 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 from trackfindingcdc.cdcdisplay.svgdrawing import attributemaps
 import bisect
 from datetime import datetime

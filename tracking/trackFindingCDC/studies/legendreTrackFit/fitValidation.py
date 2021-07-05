@@ -5,6 +5,7 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 from tracking import modules
 from tracking.run.event_generation import StandardEventGenerationRun
 import sys

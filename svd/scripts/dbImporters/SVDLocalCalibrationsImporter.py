@@ -92,7 +92,6 @@ run = int(run)
 
 class dbImporterModule(b2.Module):
     """
-    :author: Laura Zani
     Module to call the importer methods for the payloads creation from XML file
     :param calibfile: path to the xml file containing the local calibrations
     :type calibfile: string

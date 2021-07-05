@@ -17,10 +17,7 @@
 #  after the KLMUnpacker module!
 #
 #  Usually we need to process only 10k events per run.
-#
-#  Contact: Giacomo De Pietro (2018)
-#           giacomo.depietro@roma3.infn.it
-#
+
 ########################################################
 
 import glob

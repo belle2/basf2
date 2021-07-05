@@ -23,9 +23,6 @@
 #  Note that the KLMMuidLikelihood variables are intended
 #  to be used by experts for calibration studies!
 #
-#  Contact: Giacomo De Pietro (2018)
-#           giacomo.depietro@roma3.infn.it
-#
 ########################################################
 
 import basf2

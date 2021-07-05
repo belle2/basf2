@@ -94,10 +94,6 @@ class calibrateGlobalT0Offline(b2.Module):
     * The histogram of the bunch finder time offset
     * The fit function
     * The fit parameters ina tree format (usefuly when merging several files)
-
-    **Contributors**
-    * Marko Staric
-    * Umberto Tamponi
     """
 
     def initialize(self):

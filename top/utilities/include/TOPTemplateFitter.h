@@ -22,7 +22,6 @@ namespace Belle2 {
     /**
      * @brief Class to perform template fit on TOP waveform data
      * Minimzation method is described here http://wwwa1.kph.uni-mainz.de/Vorlesungen/SS11/Statistik/
-     * @author Tobias Weber
      */
     class TOPTemplateFitter {
 

@@ -1,14 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Giulia Casarosa                                          *
  *                                                                        *
- * The module is used to create a TTree to study the number of strips     *
- * fired per event per APV chip.                                          *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #include <svd/modules/svdPerformance/SVDMaxStripTTreeModule.h>

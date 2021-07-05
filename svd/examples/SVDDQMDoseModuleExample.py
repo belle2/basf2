@@ -14,6 +14,14 @@
 # 2020 Belle II Collaboration
 #
 ########################################################################
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 """Uses the SVDDQMDose module and makes a rootfile with the histos."""
 import argparse
 import os

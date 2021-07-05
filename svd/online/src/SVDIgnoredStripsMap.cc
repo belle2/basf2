@@ -1,11 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Giulia Casarosa, Eugenio Paoloni                         *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #include <svd/online/SVDIgnoredStripsMap.h>
@@ -59,22 +57,22 @@ SVDIgnoredStripsMap::SVDIgnoredStripsMap(const string& xmlFilename):
   try {
     // traverse the xml tree: navigate through the daughters of <SVD>
     VxdID sensorID;
-    for (ptree::value_type const & layer : propertyTree.get_child("SVD"))
+    for (ptree::value_type const& layer : propertyTree.get_child("SVD"))
       if (layer.first == "layer") {
         sensorID.setLayerNumber(static_cast<unsigned short>(layer.second.get<int>("<xmlattr>.n")));
-        for (ptree::value_type const & ladder : layer.second)
+        for (ptree::value_type const& ladder : layer.second)
           if (ladder.first == "ladder") {
             sensorID.setLadderNumber(static_cast<unsigned short>(ladder.second.get<int>("<xmlattr>.n")));
-            for (ptree::value_type const & sensor : ladder.second)
+            for (ptree::value_type const& sensor : ladder.second)
               if (sensor.first == "sensor") {
                 sensorID.setSensorNumber(static_cast<unsigned short>(sensor.second.get<int>("<xmlattr>.n")));
-                for (ptree::value_type const & side : sensor.second)
+                for (ptree::value_type const& side : sensor.second)
                   if (side.first == "side") {
                     std::string tagSide = side.second.get<std::string>("<xmlattr>.side");
                     sensorID.setSegmentNumber((tagSide == "U" || tagSide == "u") ? 1 : 0);
                     // We have complete VxdID, now we read the list of strips.
                     IgnoredStripsSet strips;
-                    for (ptree::value_type const & tag : side.second)
+                    for (ptree::value_type const& tag : side.second)
                       if (tag.first == "strip") {
                         strips.insert(tag.second.get<unsigned short>("<xmlattr>.stripNo"));
                       } else if (tag.first == "stripsFromTo") {

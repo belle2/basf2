@@ -1,13 +1,12 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #ifndef SERVER_BASE_H
 #define SERVER_BASE_H
-//+
-// File : RFServerBase.h
-// Description : Base class to construct RFARM server applications
-//               The class can be fed to RFNSM to hook up functions
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 24 - Jul - 2013
-//-
 
 #include "daq/rfarm/manager/RfNodeInfo.h"
 #include <nsm2/nsm2.h>

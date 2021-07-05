@@ -1,10 +1,10 @@
-//+
-// File : rfgetconf.cc
-// Description : Retrieve configuration for given item
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 27 - Mar - 2015
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include <cstdlib>
 #include <stdio.h>

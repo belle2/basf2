@@ -1,10 +1,10 @@
-//+
-// File : genrawsend.h
-// Description : Generate Pseudo raw data and send it via socket
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 3 - Sep - 2010
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #ifndef GEN_RAW_SEND_H
 #define GEN_RAW_SEND_H

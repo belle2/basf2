@@ -1,12 +1,12 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #ifndef RFSHAREDMEM_H
 #define RFSHAREDMEM_H
-//+
-// File : RFSharedMem.h
-// Description : Shared Memory manager for RFARM node control
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 20 - June - 2013
-//-
 
 #define RFSHM_MAX_PROCESS 100
 #define RFSHM_TYPE_SOCK2RB 1

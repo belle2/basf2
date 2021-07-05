@@ -1,10 +1,10 @@
-//+
-// File : RFMaster.cc
-// Description : Master node of RFARM
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 31 - Jul - 2013
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include "daq/rfarm/manager/RFMaster.h"
 #include "daq/rfarm/manager/RFNSM.h"

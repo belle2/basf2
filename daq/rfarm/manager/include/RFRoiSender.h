@@ -1,11 +1,11 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #pragma once
-//+
-// File : RFRoiSender.h
-// Description : DQM server for RFARM
-//
-// Author : Ryosuke Itoh, KEK
-// Date : 14 - Jun - 2013
-//-
 
 #include "daq/rfarm/manager/RFConf.h"
 #include "daq/rfarm/manager/RFSharedMem.h"

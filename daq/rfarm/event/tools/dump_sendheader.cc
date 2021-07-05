@@ -1,10 +1,10 @@
-//+
-// File : dump_sendheader.cc
-// Description : dump SendHeader reading data from input stream
-//
-// Date : 16 - Dec - 2015
-// Author : Ryosuke Itoh, IPNS, KEK
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include <stdio.h>
 #include <unistd.h>

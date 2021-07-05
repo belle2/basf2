@@ -1,12 +1,12 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #ifndef RFLOGMANAGER_H
 #define RFLOGMANAGER_H
-//+
-// File : RFLogManager.h
-// Description : Various logging functions
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 12 - Jul - 2013
-//-
 
 #include <stdio.h>
 

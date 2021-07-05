@@ -1,10 +1,10 @@
-//+
-// File : Ds2RawFileModule.h
-// Description : Stream DataStore contents and place in in RingBuffer
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 26 - Apr - 2012
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #ifndef Belle2_Ds2RawFileModule_h
 #define Belle2_Ds2RawFileModule_h

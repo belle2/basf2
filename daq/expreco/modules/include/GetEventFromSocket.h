@@ -1,10 +1,10 @@
-//+
-// File : GetEventFromSocket.h
-// Description : Module to receive event from socket
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 13 - Jan - 2021
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #ifndef GET_EVENT_FROM_SOCKET_MODULE_H
 #define GET_EVENT_FROM_SOCKET_MODULE_H

@@ -1,12 +1,12 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #ifndef RFUNITINFO_H
 #define RFUNITINFO_H
-//+
-// File : RfUnitInfo.h
-// Description : Unit information format file for NSM
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 25 - June - 2013
-//-
 
 // Node info placed in NSM shared memory
 namespace Belle2 {

@@ -1,10 +1,10 @@
-//+
-// File : EvReduction.cc
-// Description : Module to restore DataStore from RingBuffer
-//
-// Author : Satoru YAMADA, IPNS, KEK
-// Date : 14 - Jan - 2016
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include <daq/rfarm/event/modules/EvReduction.h>
 #include <TSystem.h>

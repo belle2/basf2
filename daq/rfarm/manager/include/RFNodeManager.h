@@ -1,12 +1,12 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #ifndef RFNODEMANAGER_H
 #define RFNODEMANAGER_H
-//+
-// File : RFNodeManager.h
-// Description : Base class for various RFARM node control
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 20 - June - 2013
-//-
 
 #include
 namespace Belle2 {

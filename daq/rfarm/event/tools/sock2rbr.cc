@@ -1,11 +1,10 @@
-//+
-// File : sock2rbr.cc
-// Description : Get an event from RingBuffer and send it to socket
-//               Reverse connection
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 25 - Jul - 2013
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #include <string>
 
 #include <stdio.h>

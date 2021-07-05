@@ -1,12 +1,12 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #ifndef EVENT_SAMPLER_H
 #define EVENT_SAMPLER_H
-//+
-// File : EventSampler.h
-// Description : Fetch events from event processes and place them in a RingBuffer
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 31 - Jul - 2017
-//-
 
 #include <string>
 #include <vector>

@@ -1,11 +1,10 @@
-//+
-// File : RevRb2Sock.cc
-// Description : Send events in RingBuffer to Socket
-//               Reverse Direction
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 25 - Jul - 2013
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include "daq/rfarm/event/RevRb2Sock.h"
 

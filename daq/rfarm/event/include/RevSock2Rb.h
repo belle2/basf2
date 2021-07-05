@@ -1,11 +1,10 @@
-//+
-// File : Sock2Rb.h
-// Description : Receive an event from EvtSocket and place it in Rbuf.
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 10 - Dec - 2002, Orignal for RFARM
-//        26 - Apr - 2012, for Belle II RFARM
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include <string>
 

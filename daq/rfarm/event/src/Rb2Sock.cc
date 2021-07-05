@@ -1,10 +1,10 @@
-//+
-// File : Rb2Sock.cc
-// Description : Send events in RingBuffer to Socket
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 26 - Apr - 2012
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include "daq/rfarm/event/Rb2Sock.h"
 

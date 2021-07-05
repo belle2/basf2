@@ -1,10 +1,10 @@
-//+
-// File : DqmMemFile.cc
-// Description : Basic tools to pass ROOT histograms over shared memory
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 13 - Jan - 2016
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include "daq/dqm/DqmMemFile.h"
 #include <framework/pcore/MsgHandler.h>

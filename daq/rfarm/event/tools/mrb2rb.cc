@@ -1,10 +1,10 @@
-//+
-// File : mrb2rb.cc
-// Description : copy events from multiple RingBuffers to a single RingBuffer
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 5 - Aug - 2014
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include <vector>
 

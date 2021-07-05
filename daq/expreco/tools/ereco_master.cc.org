@@ -1,6 +1,3 @@
-//+
-// ereco_master.cc
-//-
 #include "daq/expreco/ERecoMasterCallback.h"
 #include "daq/expreco/ERecoRunControlCallback.h"
 

@@ -1,11 +1,10 @@
-//+
-// File : ERecoEventSampler.cc
-// Description : Receive events from Storage and distribute them to
-//                 processing nodes
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 31 - Jul - 2017
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include "daq/expreco/ERecoEventSampler.h"
 

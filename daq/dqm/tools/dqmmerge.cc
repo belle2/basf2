@@ -1,10 +1,10 @@
-//+
-// File : dqmmerge.cc
-// Description : Merge DQM histogram files
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 29 - Aug - 2016
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>

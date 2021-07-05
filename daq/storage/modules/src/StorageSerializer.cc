@@ -1,12 +1,10 @@
-//+
-// File : StorageSerializer.cc
-// Description : Sequential ROOT output module for pbasf2
-//
-// Author : Tomoyuki Konno, Tokyo Metropolitan Univerisity
-// Date : 13 - Aug - 2010
-//         6 - Sep - 2012,  Use of DataStoreStreamer, clean up
-//         9 - Dec - 2013, Modification for DAQ use
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include <daq/storage/modules/StorageSerializer.h>
 

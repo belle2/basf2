@@ -1,11 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015-2016  Belle II Collaboration                         *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Tobias Schlüter, Thomas Hauth, Nils Braun                *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/eventTimeExtraction/findlets/FullGridDriftLengthTrackTimeExtractor.h>
 #include <tracking/eventTimeExtraction/findlets/BaseEventTimeExtractor.icc.h>

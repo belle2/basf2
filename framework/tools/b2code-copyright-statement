@@ -66,12 +66,19 @@ if __name__ == "__main__":
         if os.path.isdir(file_name):
             continue
 
-        bad_extensions = ('.root', '.sroot', '.xml', '.rst', '.txt', '.dat', '.data', '.j2', '.jinja2', '.json', '.yaml', '.sh', '.svg', '.csv', '.png', '.pdf', '.jpg', '.ipynb', '.dec', '.log', '.out', '.err', '.pdl', '.md', '.rstinclude', '.drawio', '.limits', '.fit', '.html', '.js', '.css', '.map')
+        # Ignore the files that have the following extensions
+        bad_extensions = ('.root', '.sroot', '.xml', '.rst', '.txt', '.dat', '.data', '.j2', '.jinja2', '.json', '.yaml', '.sh', '.svg', '.csv', '.png', '.pdf', '.jpg', '.ipynb', '.dec', '.log', '.out', '.err', '.pdl', '.md', '.rstinclude', '.drawio', '.limits', '.fit', '.html', '.js', '.css', '.map', '.pptx', '.docx', '.raw', '.hwd', '.conf', '.yml', '.org')
         if file_name.lower().endswith(bad_extensions):
             continue
 
-        bad_files = ('SConscript', 'linkdef.h', '.librarians')
-        if any(bad_file in file_name for bad_file in bad_files):
+        # Ignore the following files
+        bad_files = ('sconscript', 'linkdef.h', '.librarians', 'readme', 'makefile', 'dockerfile')
+        if any(bad_file in file_name.lower() for bad_file in bad_files):
+            continue
+
+        # Ignore the files located in these paths
+        bad_paths = ('online_book/basf2/steering_files/')
+        if any(bad_path in file_name for bad_path in bad_paths):
             continue
 
         with open(file_name, 'r') as source:

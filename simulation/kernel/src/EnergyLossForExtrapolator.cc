@@ -6,8 +6,6 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
-
 #include <simulation/kernel/EnergyLossForExtrapolator.h>
 
 #include <CLHEP/Units/PhysicalConstants.h>

@@ -12,14 +12,9 @@
 """
 This script saves Bremsstrahlung photons in MCParticles.
 
-<header>
-  <contact>dorisykim@ssu.ac.kr</contact>
-  <description>
-      Saves 100 generic BBbar events with EvtGen + Bremsstrahlungi photons created by Geant4 in MCParticles.
-      The corresponding secondaryPhysicsProcess ID is 3, which is defined as fBremsstrahlung in G4EmProcessSubType.h.
-      The detector simulation mixed with background, trigger simulation, and standard reconstruction are done.
-  </description>
-</header>
+Saves 100 generic BBbar events with EvtGen + Bremsstrahlungi photons created by Geant4 in MCParticles.
+The corresponding secondaryPhysicsProcess ID is 3, which is defined as fBremsstrahlung in G4EmProcessSubType.h.
+The detector simulation mixed with background, trigger simulation, and standard reconstruction are done.
 """
 
 import basf2 as b2

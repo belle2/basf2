@@ -17,14 +17,9 @@ facilities provided by Geant4. These get compiled out in the opt version of the
 externals so this only works with the debug externals. It was intended as a
 validation script but due to this problem it was moved to examples
 
-<header>
-  <contact>ritter</contact>
-  <description>
-      Generate detailed timing information of the simulation when simulating
-      100 EvtGen events.
-      WARNING: Does not work in parallel processing mode
-  </description>
-</header>
+Generate detailed timing information of the simulation when simulating
+100 EvtGen events.
+WARNING: Does not work in parallel processing mode
 """
 
 import os

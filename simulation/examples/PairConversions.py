@@ -12,13 +12,8 @@
 """
 This script saves e+ or e- from photon conversions into a pair in MCParticles.
 
-<header>
-  <contact>dorisykim@ssu.ac.kr</contact>
-  <description>
-      Saves 100 EvtGen events + secondary e+ or e- from pair conversions created by Geant4 in MCParticles.
-      The corresponding secondaryPhysicsProcess ID is 14, which is defined as fGammaConversion in G4EmProcessSubType.h.
-  </description>
-</header>
+Saves 100 EvtGen events + secondary e+ or e- from pair conversions created by Geant4 in MCParticles.
+The corresponding secondaryPhysicsProcess ID is 14, which is defined as fGammaConversion in G4EmProcessSubType.h.
 """
 
 import basf2 as b2

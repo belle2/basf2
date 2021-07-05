@@ -12,12 +12,7 @@
 """
 This script saves all the secondary particles in MCParticles.
 
-<header>
-  <contact>dorisykim@ssu.ac.kr</contact>
-  <description>
-      Saves 100 EvtGen events + all the secondary particles created by Geant4 in MCParticles.
-  </description>
-</header>
+Saves 100 EvtGen events + all the secondary particles created by Geant4 in MCParticles.
 """
 
 import basf2 as b2

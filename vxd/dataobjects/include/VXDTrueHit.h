@@ -1,11 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2014  Belle II Collaboration                         *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Peter Kvasnicka, Martin Ritter             *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #pragma once
@@ -55,7 +53,8 @@ namespace Belle2 {
     VXDTrueHit(
       VxdID sensorID, float* posEntry, float* posMidPoint, float* posExit,
       float* momEntry, float* momMidPoint, float* momExit, float energyDep, float globalTime):
-      RelationsObject(), m_sensorID(sensorID), m_energyDep(energyDep), m_globalTime(globalTime) {
+      RelationsObject(), m_sensorID(sensorID), m_energyDep(energyDep), m_globalTime(globalTime)
+    {
       std::copy_n(posEntry, 3, m_positionEntry);
       std::copy_n(posMidPoint, 3, m_positionMidPoint);
       std::copy_n(posExit, 3, m_positionExit);

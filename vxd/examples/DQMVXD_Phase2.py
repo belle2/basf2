@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#############################################################
-# Simple steering file to demonstrate how to run:
-#   PXD, SVD, VXD and Track DQM on BelleII or Phase2 geometry
-#   for ExpressReco on-line use Min modules without analysis
-#   Base on module from Martin Ritter:
-#               tracking/examples/DQMTracking_Phase2.py
-# Contributors: Peter Kodys                                              *
-#############################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 import basf2 as b2
 from simulation import add_simulation

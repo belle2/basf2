@@ -1,27 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#############################################################
-# This steering file to see DQM - basic of VXD sensors
-# and correlations
-#
-# Sample of external file, 100 particlegun or BBbar events.
-#                    (default is particlegun)
-#
-# Usage: basf2 DQMCorrelations.py
-#      ( basf2 DQMCorrelations.py -- --h )
-#
-# Input: external file or None (simulation)
-# Output: histograms: VXD_DQM_Histograms.root or custom...
-#
-# This is running ExpressRecoDQM modules for PXD/SVD and VXD (PXD-SVD correlations)
-#
-# Contributors: Peter Kodys
-#
-# Repairing broken script: Benjamin Schwenker (19. May 2018)
-#
-# Example steering file - 2017 Belle II Collaboration
-#############################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 import basf2 as b2
 

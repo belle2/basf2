@@ -196,7 +196,7 @@ If this doesn't work you can find the files in ``/sw/belle2/examples-data/starte
 
     .. literalinclude:: steering_files/090_cs.py
         :language: python
-        :lines: -33
+        :lines: -34
 
 
 .. admonition:: Exercise
@@ -221,7 +221,7 @@ If this doesn't work you can find the files in ``/sw/belle2/examples-data/starte
 
     .. literalinclude:: steering_files/090_cs.py
         :language: python
-        :lines: 34-43
+        :lines: 35-44
 
 
 .. admonition:: Exercise
@@ -240,7 +240,7 @@ If this doesn't work you can find the files in ``/sw/belle2/examples-data/starte
 
     .. literalinclude:: steering_files/090_cs.py
         :language: python
-        :lines: 45-61
+        :lines: 46-62
 
 Now that we have created our ntuple, we can look at the data and see how well the variables suppress continuum.
 

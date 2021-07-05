@@ -13,9 +13,6 @@
 #                                                               #
 #    set of scripts to analyse  Y(4S) events                    #
 #                                                               #
-#    written by Giulia Casarosa, INFN Pisa                      #
-#    giulia.casarosa@pi.infn.it                                 #
-#                                                               #
 # USAGE:
 #
 # > mkdir release/workdir

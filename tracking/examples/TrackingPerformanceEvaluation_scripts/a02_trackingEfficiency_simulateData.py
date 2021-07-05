@@ -13,9 +13,6 @@
 #                                                               #
 #    script to simulate 10k Y(4S) events                        #
 #                                                               #
-#    written by Giulia Casarosa, INFN Pisa                      #
-#    giulia.casarosa@pi.infn.it                                 #
-#                                                               #
 # USAGE:
 #
 # reported in a01_trackingEfficiency_createData.py

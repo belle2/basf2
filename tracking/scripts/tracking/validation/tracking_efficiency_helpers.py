@@ -14,17 +14,7 @@
 #    function to simulate 10 charged muon tracks with           #
 #    fixed transverse momentum using the ParticleGun            #
 #                                                               #
-#    written by Michael Ziegler, KIT                            #
-#    michael.ziegler2@kit.edu                                   #
-#                                                               #
 #################################################################
-
-"""
-<header>
-<contact>Michael Ziegler, michael.ziegler2@kit.edu</contact>
-<description> To be filled by the contact person</description>
-</header>
-"""
 
 from simulation import add_simulation
 from reconstruction import add_reconstruction

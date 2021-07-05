@@ -5,6 +5,7 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 # Nice display features imports
 from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 from tracking.harvest.harvesting import HarvestingModule

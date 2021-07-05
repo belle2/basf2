@@ -5,13 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
- * Contributors: Patrick Ecker                                      *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
 
 #pragma once
 

@@ -13,9 +13,6 @@
 #                                                               #
 #    produce tracking validation plots                          #
 #                                                               #
-#    written by Giulia Casarosa, Pisa                           #
-#    giulia.casarosa@pi.infn.it                                 #
-#                                                               #
 # USAGE:
 #
 # reported in a01_trackingEfficiency_createData.py

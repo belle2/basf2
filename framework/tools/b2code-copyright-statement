@@ -55,10 +55,11 @@ if __name__ == "__main__":
 
     # Determine list of files
     files = []
-    for entry in arguments.file:
-        files += glob.glob(f'{entry}/**', recursive=arguments.recursive)
-        #if arguments.recursive:
-        #    files += glob.glob('**/' + entry, recursive=True)
+    if arguments.recursive:
+        for entry in arguments.file:
+            files += glob.glob(f'{entry}/**', recursive=arguments.recursive)
+    else:
+        files = arguments.file
 
     # Open each file
     for file_name in files:
@@ -78,8 +79,9 @@ if __name__ == "__main__":
 
         # Ignore the files located in these paths
         bad_paths = ('online_book/basf2/steering_files/')
-        if any(bad_path in file_name for bad_path in bad_paths):
-            continue
+        for bad_path in bad_paths:
+            if bad_path in file_name:
+                continue
 
         with open(file_name, 'r') as source:
             try:

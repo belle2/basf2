@@ -5,18 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : TRGTOPSlotTiming.cc
-// Section  : TRG TOP
-// Owner    : Tong Pang   Vladimir Savinov
-// Email    : top16@pitt.edu, vladimirsavinov@gmail.com
-//---------------------------------------------------------------
-// Description : A class to represent TRG TOP slot-level timing decision
-//---------------------------------------------------------------
-// $Log$
-//---------------------------------------------------------------
 
 #include "trg/top/dataobjects/TRGTOPSlotTiming.h"
 

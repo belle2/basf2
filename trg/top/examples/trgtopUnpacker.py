@@ -1,12 +1,4 @@
 #!/usr/bin/env python
-#
-# -----------------------------------------------------------------------------------
-#
-#                        TOP L1 trigger Unpacker module
-#
-#    usage : %> basf2 trgtopUnpacker.py [input sroot file name]
-#
-# -----------------------------------------------------------------------------------
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -15,6 +7,15 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
+# -----------------------------------------------------------------------------------
+#
+#                        TOP L1 trigger Unpacker module
+#
+#    usage : %> basf2 trgtopUnpacker.py [input sroot file name]
+#
+# -----------------------------------------------------------------------------------
+
 import basf2 as b2
 
 import sys

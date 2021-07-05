@@ -5,18 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Filename : TRGGDL.cc
-// Section  : TRG GDL
-// Owner    : Yoshihito Iwasaki, Chunhua Li
-// Email    : yoshihito.iwasaki@kek.jp, chunha.li@unimelb.edu.au
-//-----------------------------------------------------------------------------
-// Description : A class to represent GDL.
-//-----------------------------------------------------------------------------
-// 0.00 : 2013/12/13 : First version
-//-----------------------------------------------------------------------------
 
 #define TRG_SHORT_NAMES
 #define TRGGDL_SHORT_NAMES

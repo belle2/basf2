@@ -5,17 +5,9 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Filename : Hough3DFinder.h
-// Section  : TRG CDC
-// Owner    : Jaebak Kim
-// Email    : jbkim@hep.korea.ac.kr
+
 //-----------------------------------------------------------------------------
 // Description : A class to find 3D tracks using Hough algorithm
-//-----------------------------------------------------------------------------
-// $Log$
 //-----------------------------------------------------------------------------
 
 #ifndef TRGCDCHough3DFinder_FLAG_

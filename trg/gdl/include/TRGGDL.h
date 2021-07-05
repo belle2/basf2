@@ -5,18 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Filename : TRGGDL.h
-// Section  : TRG GDL
-// Owner    : Yoshihito Iwasaki, Chunhua Li
-// Email    : yoshihito.iwasaki@kek.jp, chunhua.li@unimelb.edu.au
-//-----------------------------------------------------------------------------
-// Description : A class to represent GDL.
-//-----------------------------------------------------------------------------
-// $Log$
-//-----------------------------------------------------------------------------
 
 #ifndef TRGGDL_FLAG_
 #define TRGGDL_FLAG_

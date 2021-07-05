@@ -5,18 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : trgcdctsfUnpackerModule.cc
-// Section  : TRG CDCTSF
-// Owner    :
-// Email    :
-//---------------------------------------------------------------
-// Description : TRG CDCTSF Unpacker Module
-//---------------------------------------------------------------
-// 1.00 : 2017/07/26 : First version
-//---------------------------------------------------------------
 
 #include <trg/cdc/modules/trgcdctsfUnpacker/trgcdctsfUnpackerModule.h>
 #include <bitset>

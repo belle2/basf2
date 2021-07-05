@@ -5,18 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : TRGGRLUnpackerModule.h
-// Section  : TRG GRL
-// Owner    : Yun-Tsung Lai
-// Email    : ytlai@post.kek.jp
-//---------------------------------------------------------------
-// Description : TRGGRLUnpacker Module
-//---------------------------------------------------------------
-// $Log$
-//---------------------------------------------------------------
 
 #ifndef TRGGRLUNPACKER_H
 #define TRGGRLUNPACKER_H

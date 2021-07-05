@@ -5,18 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Filename : TRGGRLProjectsModule.h
-// Section  : TRG GRL
-// Owner    : Chunhua Li
-// Email    : chunhua.li@unimelb.edu.au
-//-----------------------------------------------------------------------------
-// Description : A trigger module for GRL
-//-----------------------------------------------------------------------------
-// 0.00 : 2017/03/01 : First version
-//-----------------------------------------------------------------------------
 
 #ifndef TRGGRLProjectsModule_H
 #define TRGGRLProjectsModule_H

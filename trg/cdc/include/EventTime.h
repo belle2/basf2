@@ -5,18 +5,11 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Filename : EventTime.h
-// Section  : TRG CDC
-// Owner    : KyungTae KIM (K.U.)
-// Email    : ktkim@hep.korea.ac.kr
+
 //-----------------------------------------------------------------------------
 // Description : A class to get Event Time information
 //-----------------------------------------------------------------------------
-// $Log$
-//-----------------------------------------------------------------------------
+
 #ifndef TRGCDCEventTime_FLAG_
 #define TRGCDCEventTime_FLAG_
 

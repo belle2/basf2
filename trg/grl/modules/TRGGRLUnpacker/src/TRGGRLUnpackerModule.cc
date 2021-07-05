@@ -5,18 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : TRGGRLUnpackerModule.cc
-// Section  :
-// Owner    :
-// Email    :
-//---------------------------------------------------------------
-// Description : TRGGRLUnpacker Module
-//---------------------------------------------------------------
-// $Log$
-//---------------------------------------------------------------
 
 #include <trg/grl/modules/TRGGRLUnpacker/TRGGRLUnpackerModule.h>
 

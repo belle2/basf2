@@ -5,18 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Filename : TRGGDLModule.h
-// Section  : TRG GDL
-// Owner    : Yoshihito Iwasaki
-// Email    : yoshihito.iwasaki@kek.jp
-//-----------------------------------------------------------------------------
-// Description : A trigger module for GDL
-//-----------------------------------------------------------------------------
-// 0.00 : 2013/12/13 : First version
-//-----------------------------------------------------------------------------
 
 #ifndef TRGGDLModule_H
 #define TRGGDLModule_H

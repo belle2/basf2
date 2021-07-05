@@ -5,17 +5,9 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Filename : TRGCDCTSStreamModule.h
-// Section  : TRG CDC
-// Owner    : Yoshihito Iwasaki
-// Email    : yoshihito.iwasaki@kek.jp
+
 //-----------------------------------------------------------------------------
 // Description : A trigger module for CDC
-//-----------------------------------------------------------------------------
-// 0.00 : 2010/10/08 : First version
 //-----------------------------------------------------------------------------
 
 #ifndef TRGCDCTSStreamModule_H

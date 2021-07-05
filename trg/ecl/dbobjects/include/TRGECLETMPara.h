@@ -5,18 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------
-// Filename : TRGECLETMPara.h
-// Section  : TRG ECL
-// Owner    : HanEol Cho/Insoo Lee/Yuuji Unno
-// Email    : hecho@hep.hanyang.ac.kr/islee@hep.hanyang.ac.kr / yunno@post.kek.jp
-//-----------------------------------------------------------
-// Description : A class to represent ECL.
-//-----------------------------------------------------------
-// $Log$
-//-----------------------------------------------------------
 
 #ifndef TRGECLETMPARA_H
 #define TRGECLETMPARA_H

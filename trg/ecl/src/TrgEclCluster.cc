@@ -5,13 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : TrgEclCluster.cc
-// Section  : TRG ECL
-// Owner    : InSoo Lee/Yuuji Unno
-// Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
+
 //---------------------------------------------------------------
 // Description :
 // -A class to make cluster from TC Hit
@@ -33,10 +27,6 @@
 //
 // -The limit number of Cluster is 6 due to hardware limitation (ETM)
 // -The cluster information (energy, timing) is saved in the order of barrel, forward endcap and backwrd endcap
-//---------------------------------------------------------------
-// $Log$
-// 2018-07-30 : Add the limit number of Cluster (defult : 6)
-// 2020-05-13 : Bug Fixed for BWD ICN by SungHyun Kim
 //---------------------------------------------------------------
 
 #define TRG_SHORT_NAMES

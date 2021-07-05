@@ -5,18 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------
-// Filename : TRGECLBadRun.h
-// Section  : TRG ECL
-// Owner    : HanEol Cho/InSu Lee/Yuuji Unno
-// Email    : hecho@hep.hanyang.ac.kr / islee@hep.hanyang.ac.kr / yunno@post.kek.jp
-//-----------------------------------------------------------
-// Description : A class to represent ECL.
-//-----------------------------------------------------------
-// $Log$
-//-----------------------------------------------------------
+
 
 #ifndef TRGECLBADRUN_H
 #define TRGECLBADRUN_H

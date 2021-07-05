@@ -5,17 +5,9 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Filename : HoughPlaneMulti2.h
-// Section  : TRG CDC
-// Owner    : Yoshihito Iwasaki
-// Email    : yoshihito.iwasaki@kek.jp
+
 //-----------------------------------------------------------------------------
 // Description : A class to represent multi Hough parameter planes (version 2)
-//-----------------------------------------------------------------------------
-// $Log$
 //-----------------------------------------------------------------------------
 
 #ifndef TRGCDCHoughPlaneMulti2_FLAG_

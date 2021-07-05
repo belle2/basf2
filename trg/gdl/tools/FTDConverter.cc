@@ -5,21 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Trigger Utility program
-//-----------------------------------------------------------------------------
-// Filename : FTDConverter.cc
-// Section  : TRG GDL
-// Owner    : Yoshi Iwasaki
-// Email    : yoshihito.iwasaki@kek.jp
-//-----------------------------------------------------------------------------
-// Description : To generate FTD algorithm file from verilog source
-//-----------------------------------------------------------------------------
-// Version |    Date     | Explanation of changes
-//   00.00 | 16-Jan-2014 | Creation
-//-----------------------------------------------------------------------------
 
 #include <fstream>
 #include <iostream>

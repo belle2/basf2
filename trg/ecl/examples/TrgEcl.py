@@ -1,12 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# -------------------------------------------------------------------------------------------------------
-#            TSim-ecl example code.
-# -------------------------------------------------------------------------------------------------------
-#        In order to test Tsim-ecl code, you need a root file which has ECLHit table.(after Gsim)
-#        ex)
-#        commend > basf2 TrgEcl.py [Name of Gsim root file] [Name of output root file]
-# -------------------------------------------------------------------------------------------------------
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -15,6 +8,15 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
+# -------------------------------------------------------------------------------------------------------
+#            TSim-ecl example code.
+# -------------------------------------------------------------------------------------------------------
+#        In order to test Tsim-ecl code, you need a root file which has ECLHit table.(after Gsim)
+#        ex)
+#        commend > basf2 TrgEcl.py [Name of Gsim root file] [Name of output root file]
+# -------------------------------------------------------------------------------------------------------
+
 import basf2 as b2
 from L1trigger import add_trigger_simulation
 ################

@@ -5,21 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : trgeclUnpackerModule.h
-// Section  : TRG ECL
-// Owner    : SungHyun Kim
-// Email    : sungnhyun.kim@belle2.org
-//---------------------------------------------------------------
-// Description : TRG ECL Unpacker Module
-//---------------------------------------------------------------
-// 1.00 : 2017/05/06 : First version
-// 1.01 : 2017/07/17 : Add FTSW clock from FAM, fine timing
-// 2.00 : 2018/02/17 : 8 window data (ETM Ver. 100)
-// 3.00 : 2018/07/31 : ETM version dependence included
-//---------------------------------------------------------------
 
 #ifndef TRGECLUNPACKER_H
 #define TRGECLUNPACKER_H

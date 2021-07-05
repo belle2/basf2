@@ -5,19 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------
-// Filename : TRGGRLInfo.h
-// Section  : TRG GRL
-// Owner    : Ke LI, Junhao Yin, Chunhua Li
-// Email    : like@ihep.ac.cn, yinjh@ihep.ac.cn,
-//            chunhua.li@unimelb.edu.au
-//-----------------------------------------------------------
-// Description : A class to save TRG GRL information of event.
-//-----------------------------------------------------------
-// $Log$
-//-----------------------------------------------------------
+
 #pragma once
 #include <TObject.h>
 

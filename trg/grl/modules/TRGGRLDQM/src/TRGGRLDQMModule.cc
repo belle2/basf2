@@ -5,18 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : TRGGRLDQMModule.cc
-// Section  : TRG GRL
-// Owner    : Yun-Tsung Lai
-// Email    : ytlai@post.kek.jp
-//---------------------------------------------------------------
-// Description : DQM module for TRGGRL
-//---------------------------------------------------------------
-// 1.00 : 2019/06/14 : First version
-//---------------------------------------------------------------
+
 #include <trg/grl/modules/TRGGRLDQM/TRGGRLDQMModule.h>
 
 #include <framework/datastore/StoreObjPtr.h>

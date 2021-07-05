@@ -9,9 +9,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-#
-# 2014/01/28 : YI : 1st version
-
 import basf2 as b2
 import os
 

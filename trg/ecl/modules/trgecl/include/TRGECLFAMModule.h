@@ -5,18 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//---------------------------------------------------------
-// $Id$
-//---------------------------------------------------------
-// Filename : TRGECLFAMModule.h
-// Section  : TRG ECL
-// Owner    : InSu Lee/Yuuji Unno
-// Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
-//---------------------------------------------------------
-// Description : A trigger module for TRG ECL
-//---------------------------------------------------------
-// 0.00 : 2011/11/12 : First version
-//---------------------------------------------------------
 
 #ifndef TRGECLFAMModule_H
 #define TRGECLFAMModule_H

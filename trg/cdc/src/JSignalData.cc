@@ -5,18 +5,9 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-// Intentionally void
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Filename : JSignalData.cc
-// Section  : TRG CDC
-// Owner    : Jaebak KIM (K.U.)
-// Email    : jbkim@hep.korea.ac.kr
+
 //-----------------------------------------------------------------------------
 // Description : A class for SignalData in CDC Trigger for 3D tracker.
-//-----------------------------------------------------------------------------
-// $Log$
 //-----------------------------------------------------------------------------
 
 #define TRG_SHORT_NAMES

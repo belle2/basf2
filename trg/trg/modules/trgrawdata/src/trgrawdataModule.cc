@@ -5,18 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : trgrawdataModule.cc
-// Section  : TRG GDL DST
-// Owner    :
-// Email    :
-//---------------------------------------------------------------
-// Description : A trigger module for TRG GDL DST
-//---------------------------------------------------------------
-// 1.00 : 2017/05/08 : First version
-//---------------------------------------------------------------
 
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 #include <trg/trg/modules/trgrawdata/trgrawdataModule.h>

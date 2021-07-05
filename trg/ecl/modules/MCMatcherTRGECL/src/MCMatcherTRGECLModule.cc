@@ -5,20 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//---------------------------------------------------------
-// $Id$
-//---------------------------------------------------------
-// Filename : MCMatcherTRGECLModule.h
-// Section  : TRG ECL
-// Owner    : InSoo Lee/Yuuji Unno
-// Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
-//---------------------------------------------------------
-// Description : A MC Matching module for TRG ECL
-//---------------------------------------------------------
-// 0.00 : 2014/12/22 : First version
-//                     Relation between MCParicle and
-//                     TRGECLHit.
-//---------------------------------------------------------
+
 #include <trg/ecl/modules/MCMatcherTRGECL/MCMatcherTRGECLModule.h>
 
 //framework headers

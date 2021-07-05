@@ -1,12 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------------
-#
-#                      GDL trigger DST Module
-#
-#    usage : %> basf2 trggdlDST.py [input sroot file name]
-#
-# -----------------------------------------------------------------------------------
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -15,6 +8,14 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
+# -----------------------------------------------------------------------------------
+#
+#                      GDL trigger DST Module
+#
+#    usage : %> basf2 trggdlDST.py [input sroot file name]
+#
+# -----------------------------------------------------------------------------------
 
 import basf2 as b2
 ################

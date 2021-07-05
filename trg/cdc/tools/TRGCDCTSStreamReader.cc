@@ -5,17 +5,9 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Filename : TRGCDCTSStreamReader.cc
-// Section  : TRG CDC
-// Owner    : Yoshihito Iwasaki
-// Email    : yoshihito.iwasaki@kek.jp
+
 //-----------------------------------------------------------------------------
 // Description : A program to read Track Segment (TS) stream data
-//-----------------------------------------------------------------------------
-// $Log$
 //-----------------------------------------------------------------------------
 
 #define TRG_SHORT_NAMES

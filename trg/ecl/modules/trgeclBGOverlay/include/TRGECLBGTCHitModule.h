@@ -5,18 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//---------------------------------------------------------
-// $Id$
-//---------------------------------------------------------
-// Filename : TRGECLBGTCHITModule.h
-// Section  : TRG ECL
-// Owner    : InSu Lee/Yuuji Unno
-// Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
-//---------------------------------------------------------
-// Description : A trigger module for TRG ECL
-//---------------------------------------------------------
-// 0.00 : 2021/06/xx : First version
-//---------------------------------------------------------
+
 #pragma once
 
 #include <string>

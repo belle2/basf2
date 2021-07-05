@@ -5,16 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : TRGGRLDQMModule.h
-// Section  : TRG GRL
-// Owner    : Yun-Tsung Lai
-// Email    : ytlai@post.kek.jp
-//---------------------------------------------------------------
-// Description : DQM module for TRGGRL
-//---------------------------------------------------------------
+
 #ifndef TRCGRLDQMMODULE_h
 #define TRCGRLDQMMODULE_h
 

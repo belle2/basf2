@@ -5,18 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------
-// Filename : TRGGRLInnerTrack.h
-// Section  : TRG GRL
-// Owner    : Taichiro Koga
-// Email    : taichiro@post.kek.jp
-//-----------------------------------------------------------
-// Description : storeArray for TRG GRL CDC-KLM matching.
-//-----------------------------------------------------------
-// $Log$
-//-----------------------------------------------------------
 
 #ifndef TRGGRLInnerTrack_H
 #define TRGGRLInnerTrack_H

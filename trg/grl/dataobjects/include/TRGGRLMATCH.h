@@ -5,18 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------
-// Filename : TRGGRLMATCH.h
-// Section  : TRG GRL
-// Owner    : Ke LI / Junhao Yin
-// Email    : like@ihep.ac.cn / yinjh@ihep.ac.cn
-//-----------------------------------------------------------
-// Description : storeArray for TRG GRL, only the match info.
-//-----------------------------------------------------------
-// $Log$
-//-----------------------------------------------------------
 
 #ifndef TRGGRLMATCH_H
 #define TRGGRLMATCH_H

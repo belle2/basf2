@@ -5,18 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------
-// Filename : TRGECLUnpackerSumStore.h
-// Section  : TRG ECL
-// Owner    : SungHyun Kim
-// Email    : sunghyun.kim@belle2.org
-//-----------------------------------------------------------
-// Description : A class to represent TRG ECL Summary.
-//-----------------------------------------------------------
-// $Log$
-//-----------------------------------------------------------
+
 #ifndef TRGECLUNPACKERSUMSTORE_H
 #define TRGECLUNPACKERSUMSTORE_H
 

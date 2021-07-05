@@ -1,12 +1,4 @@
 #!/usr/bin/env python
-#
-# -----------------------------------------------------------------------------------
-#
-#                        CDCTrg Hough ETF  module
-#
-#    usage : %> basf2 HoughETF.py -i [input root file name]
-#
-# -----------------------------------------------------------------------------------
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -15,6 +7,15 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
+# -----------------------------------------------------------------------------------
+#
+#                        CDCTrg Hough ETF  module
+#
+#    usage : %> basf2 HoughETF.py -i [input root file name]
+#
+# -----------------------------------------------------------------------------------
+
 import basf2 as b2
 from ROOT import Belle2
 

@@ -5,18 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Filename : TRGBoard.h
-// Section  : TRG
-// Owner    : Yoshihito Iwasaki
-// Email    : yoshihito.iwasaki@kek.jp
-//-----------------------------------------------------------------------------
-// Description : A class to represent a trigger board
-//-----------------------------------------------------------------------------
-// $Log$
-//-----------------------------------------------------------------------------
 
 #ifndef TRGBoard_FLAG_
 #define TRGBoard_FLAG_

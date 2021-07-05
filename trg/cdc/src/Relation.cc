@@ -5,17 +5,9 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Filename : Relation.cc
-// Section  : TrackBase
-// Owner    : Yoshihito Iwasaki
-// Email    : yoshihito.iwasaki@kek.jp
+
 //-----------------------------------------------------------------------------
 // Description : A class to represent relations between TrackBase and MC track
-//-----------------------------------------------------------------------------
-// $Log$
 //-----------------------------------------------------------------------------
 
 #define TRGCDC_SHORT_NAMES

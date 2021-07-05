@@ -6,28 +6,6 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : TRGECLQAMModule.cc
-// Section  : TRG ECL
-// Owner    : HanEol Cho
-// Email    : hecho@hep.hanyang.ac.kr & insoo.lee@belle2.org
-//---------------------------------------------------------------
-// Description : Quality Assurance Monitor Module for TRG ECL
-//               Check data quality run by run
-//
-//              Checking variables
-//             - ECLTRG Total Energy peak and width
-//             - ECLTRG Caltiming peak and width
-//             - ECLTRG Cluster Energy peak and width
-//             - Low Hit TC (Less than 0.1 x Average ) in Forward, Backward endcap and Barrel
-//
-//
-//---------------------------------------------------------------
-// 1.00 : 2018/11/29 : First version
-// 2.00 : 2019/08/08 : Second version
-//---------------------------------------------------------------
 //framework headers
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>

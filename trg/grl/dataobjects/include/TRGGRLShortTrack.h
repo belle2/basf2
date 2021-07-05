@@ -5,18 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------
-// Filename : TRGGRLShortTrack.h
-// Section  : TRG GRL
-// Owner    : Yun-Tsung Lai
-// Email    : ytlai@post.kek.jp
-//-----------------------------------------------------------
-// Description : storeArray for TRG GRL CDC-KLM matching.
-//-----------------------------------------------------------
-// $Log$
-//-----------------------------------------------------------
 
 #ifndef TRGGRLShortTrack_H
 #define TRGGRLShortTrack_H

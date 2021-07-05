@@ -5,19 +5,9 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Filename : Merger.cc
-// Section  : TRG CDC
-// Owner    : Yoshihito Iwasaki
-// Email    : yoshihito.iwasaki@kek.jp
+
 //-----------------------------------------------------------------------------
 // Description : A class to represent a CDC Merger board
-//-----------------------------------------------------------------------------
-// $Log$
-// 2013,1005 first working verion 0.00
-//      1014 added the unpacker part
 //-----------------------------------------------------------------------------
 
 #define TRGCDC_SHORT_NAMES

@@ -5,18 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Filename : TRGBitStream.h
-// Section  : TRG
-// Owner    : Yoshihito Iwasaki
-// Email    : yoshihito.iwasaki@kek.jp
-//-----------------------------------------------------------------------------
-// Description : A class to represent a bit stream.
-//-----------------------------------------------------------------------------
-// $Log$
-//-----------------------------------------------------------------------------
 
 #ifndef TRGBitStream_FLAG_
 #define TRGBitStream_FLAG_

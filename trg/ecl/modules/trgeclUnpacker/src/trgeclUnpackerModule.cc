@@ -5,28 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : trgeclUnpackerModule.cc
-// Section  : TRG ECL
-// Owner    : SungHyun Kim
-// Email    : sungnhyun.kim@belle2.org
-//---------------------------------------------------------------
-// Description : TRG ECL Unpacker Module
-//---------------------------------------------------------------
-// 1.00 : 2017/05/06 : First version
-// 1.01 : 2017/07/17 : Add FTSW clock from FAM, fine timing (ETM Ver. old_89)
-// 2.00 : 2018/02/17 : 8 window data (ETM Ver. 100)
-// 3.00 : 2018/07/31 : ETM version dependence included
-// 3.01 : 2019/02/25 : Trigger bit modify
-// 3.01 : 2019/05/10 : Update Trigger summary contaning Cluster information
-// 3.02 : 2019/06/24 : 20GeV ECL BST bit
-// 3.03 : 2019/10/07 : New Lowmulti (12 & 13) bit
-// 4.00 : 2019/10/11 : Summary totally change
-// 4.01 : 2020/03/13 : Bug fixed. (Bug : SumStore always save only one TRG info. in latest window)
-// 4.02 : 2020/03/30 : Bug fixed. (Bug : vector sorting does not support '>=' => '>')
-//---------------------------------------------------------------
 
 #include <trg/ecl/modules/trgeclUnpacker/trgeclUnpackerModule.h>
 

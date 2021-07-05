@@ -5,18 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------
-// Filename : TrgEclMapping.h
-// Section  : TRG ECL
-// Owner    : InSoo Lee/Yuuji Unno
-// Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
-//-----------------------------------------------------------
-// Description : A class to represent TRG ECL.
-//-----------------------------------------------------------
-// $Log$
-//-----------------------------------------------------------
 
 #ifndef TRGECLTCMAPPING_FLAG_
 #define TRGECLTCMAPPING_FLAG_

@@ -5,16 +5,10 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
-# python >= 2.7
 
 # =============================== b2vcd ===============================
 # Convert Belle2Link data into human-readable Value Change Dump file
 # =====================================================================
-
-# 2017 Belle II Collaboration
-# author: Tzu-An Sheng
-# tasheng@hep1.phys.ntu.edu.tw
-
 
 from __future__ import print_function
 import pickle

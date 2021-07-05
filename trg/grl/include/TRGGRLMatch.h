@@ -5,16 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Filename : TRGGRLMatch.h
-// Section  : TRG CDC
-// Owner    : Yun-Tsung Lai
-// Email    : ytlai@hep1.phys.ntu.edu.tw
-//-----------------------------------------------------------------------------
-// $Log$
-//-----------------------------------------------------------------------------
 
 #include "framework/datastore/StoreArray.h"
 #include "trg/cdc/Track.h"

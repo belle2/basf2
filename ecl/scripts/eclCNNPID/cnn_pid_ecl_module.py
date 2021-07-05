@@ -126,10 +126,10 @@ class CNN_PID_ECL(b2.Module):
 
                         particle.addExtraInfo(variable_pion, prob_CNN_pion)
                         particle.addExtraInfo(variable_muon, prob_CNN_muon)
-                        b2.B2INFO(f'{variable_pion}: {prob_CNN_pion}')
-                        b2.B2INFO(f'{variable_muon}: {prob_CNN_muon}')
+                        b2.B2DEBUG(f'{variable_pion}: {prob_CNN_pion}')
+                        b2.B2DEBUG(f'{variable_muon}: {prob_CNN_muon}')
                     else:
-                        b2.B2WARNING('Track is either outside ECL Barrel or Pt outside [0.2, 1.0] GeV/c. No CNN value.')
+                        b2.B2DEBUG('Track is either outside ECL Barrel or Pt outside [0.2, 1.0] GeV/c. No CNN value.')
                         return(np.nan, np.nan)
 
     def getExtCell(self, track):
@@ -147,6 +147,8 @@ class CNN_PID_ECL(b2.Module):
             if abs(extHit.getDetectorID()) != myDetID:
                 continue
             if abs(extHit.getStatus()) != Belle2.ExtHitStatus.EXT_EXIT:
+                continue
+            if extHit.isBackwardPropagated():
                 continue
             copyid = extHit.getCopyID()
             if copyid == -1:
@@ -253,11 +255,6 @@ class CNN_PID_ECL(b2.Module):
         model_name, params_model = self.model_cnn_name()
         model = ConvNet(params_model)
         model = model.to(self.device)
-
-        # The following 3 lines requires to have the payload
-        # payload = model_name
-        # accessor = Belle2.DBAccessorBase(Belle2.DBStoreEntry.c_RawFile, payload, True)
-        # checkpoint = accessor.getFilename()
 
         model.load_state_dict(torch.load(
             f'/afs/desy.de/user/n/narimani/dust/{model_name}.pt'))

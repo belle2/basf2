@@ -5,12 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-/*
- * eToADU.cc
- *
- *  Created on: Jan 10, 2014
- *      Author: kvasnicka
- */
 
 #include <iostream>
 #include <math.h>

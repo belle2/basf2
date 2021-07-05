@@ -13,12 +13,9 @@
 #
 # Test script to produce SVD DQM plots
 #
-# Author:  Giulia Casarosa
-#
 # Usage: basf2 executionTime.py [tag-string]
 #        tag-string is a tring to identify the output file
 #
-# 2020 Belle II Collaboration
 #############################################################
 
 import sys

@@ -7,14 +7,6 @@
  **************************************************************************/
 #ifndef SVD_DUMP_MODULE_H
 #define SVD_DUMP_MODULE_H
-//+
-// File : svdClsHistoManagerModule.h
-// Description : A module to create histogram ROOT file
-//             : for SVD clusterizer study
-//
-// Author : Katsuro Nakamura, KEK
-// Date : 15 - May - 2014
-//-
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>

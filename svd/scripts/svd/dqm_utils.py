@@ -9,10 +9,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Contributors: Ludovico Massaccesi
-#
-# Copyright 2021 Belle II Collaboration
-#
 # Utilities to add SVD DQM modules to a path.
 
 

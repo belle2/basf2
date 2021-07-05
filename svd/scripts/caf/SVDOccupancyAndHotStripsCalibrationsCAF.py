@@ -5,12 +5,12 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 ##########################################################
 # Python script to test the collector and
 # algorithm function to port SVDOCcupancyCalibrations to CAF
 # usage: basf2 SVDOccupancyAndHotStripsCalibrationsCAF.py \
 # -i "/group/belle2/dataprod/Data/Raw/e00<expNum>/r02324<runNum>/sub00/*.HLT*"
-# Laura Zani (September 2019)
 ############################################################
 
 import basf2 as b2

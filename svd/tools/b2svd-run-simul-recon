@@ -11,9 +11,6 @@
 
 '''Tool to run SVD-only simulation and reconstruction. No output is produced unless --root_output is used.'''
 
-__author__ = 'Giulia Casarosa'
-__copyright__ = '2021 - Belle II Collaboration'
-
 
 import basf2 as b2
 from ROOT import Belle2

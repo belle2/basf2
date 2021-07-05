@@ -10,9 +10,7 @@
 ##########################################################################
 
 """
-Created on Sun Feb  8 12:39:00 2015
 Alternative version with stacked bars
-@author: kvasnicka
 """
 
 import numpy as np

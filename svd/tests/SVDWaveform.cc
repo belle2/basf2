@@ -6,8 +6,6 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-
-
 #include <framework/dataobjects/RelationElement.h>
 #include <svd/simulation/SVDWaveform.h>
 #include <gtest/gtest.h>

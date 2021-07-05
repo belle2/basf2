@@ -13,14 +13,11 @@
 #
 # Test script to produce SVD DQM plots from raw data
 #
-# Author:  Giulia Casarosa
-#
 # Usage: basf2 runSVDDQM_rawData.py -i "<path/to/file.root>"
 #
 # the rootfiles MUST contain RAW DATA
 # you need the dqm (and daq) packages
 #
-# 2020 Belle II Collaboration
 #############################################################
 
 import basf2 as b2

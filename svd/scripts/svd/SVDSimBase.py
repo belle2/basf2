@@ -14,8 +14,6 @@ SVDSimBase.py
 ==========
 The module contains basic functions for generation and analysis of SVD strip data.
 
-:author: Peter Kvasnicka
-
 Description:
 This is a set of utility functions and constant declarations for simulation of SVD strip data
 to use in training timing networks or for other purposes. These include wave functions (gamma,

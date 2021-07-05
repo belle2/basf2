@@ -12,9 +12,6 @@
 '''Tool used to generate cluster position error scale factors payload,
 for the desired algorithm (supported: CoGOnly, OldDefault)'''
 
-__author__ = 'Giulia Casarosa'
-__copyright__ = '2021 - Belle II Collaboration'
-
 
 import basf2 as b2
 from ROOT import Belle2

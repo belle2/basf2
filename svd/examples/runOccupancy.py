@@ -13,11 +13,8 @@
 #
 # Test script to produce SVD DQM plots
 #
-# Author:  Giulia Casarosa
-#
 # Usage: basf2 runEventT0DQM.py -i "<path/to/file.root>"
 #
-# 2020 Belle II Collaboration
 #############################################################
 
 import glob

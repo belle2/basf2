@@ -403,8 +403,8 @@ continuum events, simply add a cut on the continuum probability at the end.
     :class: toggle xhint stacked
 
     The training script does not require creating a basf2 path and hence has no
-    `basf2.process()` at the end. The script is sufficient when the
-    `basf2_mva.teacher()` is defined.
+    ``basf2.process()`` at the end. The script is sufficient when the
+    ``basf2_mva.teacher()`` is defined.
 
 .. admonition:: Solution
     :class: toggle solution
@@ -425,9 +425,9 @@ like this:
          identifier="MVAFastBDT.root"
          )
 
-This would create the variable :b2:var:`extraInfo(ContinuumProbability)`, which
+This would create the variable ``extraInfo(ContinuumProbability)``, which
 should be added as an output variable to the Ntuples. The actual suppression
-then narrows down to putting a cut on the :b2:var:`extraInfo(ContinuumProbability)`
+then narrows down to putting a cut on the ``extraInfo(ContinuumProbability)``
 in the very same way that we previously did a cut on R2 in previous exercise. 
 
 .. admonition:: Exercise
@@ -437,7 +437,7 @@ in the very same way that we previously did a cut on R2 in previous exercise.
     probability into the Ntuples. Use the data files and reconstruction from the
     previous exercises.
     
-    Plot the distribution of the :b2:var:`extraInfo(ContinuumProbability)`
+    Plot the distribution of the ``extraInfo(ContinuumProbability)``
     for continuum and non-continuum events, as defined by the `isContinuumEvent` 
     (similarly to what was done before with :b2:var:`R2`).
 
@@ -445,7 +445,7 @@ in the very same way that we previously did a cut on R2 in previous exercise.
     :class: toggle xhint stacked
 
     The steering file would be same as in the previous exercises, just with the path.add_module("MVAExpert", ...)
-    added at the end. Don't forget to replace the :b2:var:`path` to :b2:var:`main` or 
+    added at the end. Don't forget to replace the ``path`` to ``main`` or 
     whatever is the name of your basf2 path
 
 .. admonition:: Hint

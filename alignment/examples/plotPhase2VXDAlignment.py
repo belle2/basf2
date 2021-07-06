@@ -2,6 +2,14 @@
 # -*- coding: utf-8 -*-
 # *****************************************************************************
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # title           : plotVXDALignmentPayloadPhase2.py
 # description     : Produce png file loaded from localdb for phase 2
 # author          : Jakub Kandra (jakub.kandra@karlov.mff.cuni.cz)

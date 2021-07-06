@@ -1,27 +1,32 @@
 #!/usr/bin/env python3
 
-#######################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to include the flavor
-# tagging user interface into your analysis.
-# The following decay chain:
-#
-# B0 -> J/psi Ks
-#        |    |
-#        |    +-> pi+ pi-
-#        |
-#        +-> mu- mu+
-#
-# is the reconstructed B0. The qr value, i.e. the
-# flavor*dilution factor of the not reconstructed B0,
-# is saved as extraInfo to the reconstructed B0.
-#
-# Contributors: F. Abudinen & Moritz Gelb (February 2015)
-#               I. Komarov (September 2018)
-#
-######################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to include the flavor                   #
+# tagging user interface into your analysis.                             #
+# The following decay chain:                                             #
+#                                                                        #
+# B0 -> J/psi Ks                                                         #
+#        |    |                                                          #
+#        |    +-> pi+ pi-                                                #
+#        |                                                               #
+#        +-> mu- mu+                                                     #
+#                                                                        #
+# is the reconstructed B0. The qr value, i.e. the                        #
+# flavor*dilution factor of the not reconstructed B0,                    #
+# is saved as extraInfo to the reconstructed B0.                         #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

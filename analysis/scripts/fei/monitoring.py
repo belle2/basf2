@@ -1,8 +1,14 @@
 #!/usr/bin/env python
 
-# @cond SUPPRESS_DOXYGEN
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
-# Thomas Keck 2017
+# @cond SUPPRESS_DOXYGEN
 
 """
  Contains classes to read in the monitoring output

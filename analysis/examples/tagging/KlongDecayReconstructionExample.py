@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
 
-############################################################################
-#
-# This is a script that shows how to reconstruct B -> J/psi KL events and
-# recalculate the KL momentum according to the reconstructed direction using
-# kinematical constraints.
-#
-# Contributors: B. Oberhof, benjamin.oberhof@lnf.infn.it
-#
-############################################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# This is a script that shows how to reconstruct B -> J/psi KL events    #
+# and recalculate the KL momentum according to the reconstructed         #
+# direction using kinematical constraints.                               #
+#                                                                        #
+##########################################################################
 
 import basf2
 import modularAnalysis as ma

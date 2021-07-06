@@ -32,6 +32,7 @@ namespace Belle2 {
       /// Parent class
       using Super = TrackFindingCDC::Findlet<VXDHoughState, std::vector<VXDHoughState*>>;
 
+      /// Map that contains the "friend" sensors for each SVD L6 sensor
       typedef std::map<VxdID, std::vector<VxdID>> friendSensorMap;
 
     public:
@@ -156,6 +157,7 @@ namespace Belle2 {
       /// (rhs.second - lhs.second) * 16384 < rhs.first - lhs.first
       /// we get the formula below
       struct paircompare {
+        /// comparison operator for the active HS sector map
         bool operator()(const std::pair<uint, uint>& lhs, const std::pair<uint, uint>& rhs) const
         {return ((int)rhs.second - (int)lhs.second) * 16384 < (int)rhs.first - (int)lhs.first;}
       };

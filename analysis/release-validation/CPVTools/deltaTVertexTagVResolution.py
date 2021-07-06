@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 ###########################################################################################
 #
 # This validation script performs a fit of DeltaT, DeltaTErr, Dz for B0_sig and
@@ -13,8 +21,6 @@
 #
 # The VXD requirement has to be either PXD or SVD. The script will then evaluate the
 # vertexing performance if PXD (or SVD) hits are required and if not.
-#
-# Contributors: L. Li Gioi, F. Abudinen (June 2017)
 #
 ###########################################################################################
 

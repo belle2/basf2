@@ -1,18 +1,24 @@
 #!/usr/bin/env python3
 
-#############################################################
-#
-# This tutorial demonstrates how to perform 4C fit with
-# the orcakinfit. In this example the following decay chain:
-#
-# e+ e- ->  mu+ mu-
-#
-# is reconstructed. The 4C kinematic fit is performed on
-# the non-radiative muon pairs
-#
-# Contributors: Torben Ferber (2017)
-#
-#############################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# This tutorial demonstrates how to perform 4C fit with                  #
+# the orcakinfit. In this example the following decay chain:             #
+#                                                                        #
+# e+ e- ->  mu+ mu-                                                      #
+#                                                                        #
+# is reconstructed. The 4C kinematic fit is performed on                 #
+# the non-radiative muon pairs                                           #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 from modularAnalysis import inputMdst

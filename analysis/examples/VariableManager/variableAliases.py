@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # Tired of using long names like ``genUpsilon4S(daughter(0, daughter(0, PDG)))``
 # (which become even less readable in its ROOT compatible form as demonstrated
 # in variableManager.py)?
 # Well, despair no longer! With so called "aliases", you can define handy short
 # names for your complicated variables.
-#
-# Contributors: Kilian Lieret (2020)
 #
 # For full documentation please refer to https://software.belle2.org
 # Anything unclear? Ask questions at https://questions.belle2.org

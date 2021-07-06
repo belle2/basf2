@@ -1,22 +1,29 @@
 #!/usr/bin/env python3
 
-######################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to perform detector simulation
-# and reconstruction (track finding+track fitting+ecl reconstruction+...)
-# on a previously generated events.
-#
-# See simulation examples for more details
-#
-# The processed events are saved to the output ROOT file that
-# now contain in addition to the generated particles
-# (MCParticle objects stored in the StoreArray<MCParticle>) also
-# reconstructed MDST objects (Track/ECLCluster/KLMCluster/...).
-# Contributors: A. Zupanc (June 2014) I. Komarov (2018)
-#
-######################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to perform detector simulation and      #
+# reconstruction (track finding+track fitting+ecl reconstruction+...)    #
+# on a previously generated events.                                      #
+#                                                                        #
+# See simulation examples for more details                               #
+#                                                                        #
+# The processed events are saved to the output ROOT file that            #
+# now contain in addition to the generated particles                     #
+# (MCParticle objects stored in the StoreArray<MCParticle>) also         #
+# reconstructed MDST objects (Track/ECLCluster/KLMCluster/...).          #
+#                                                                        #
+##########################################################################
 import basf2 as b2
 import mdst as mdst
 import simulation as si
@@ -24,7 +31,7 @@ import reconstruction as re
 import modularAnalysis as ma
 
 # We previously generated events but we want to simulate them with the
-# currently best values, not whatever whas valid back then. So we have to
+# currently best values, not whatever was valid back then. So we have to
 # disable reuse of the same globaltag from when the events were generated
 b2.conditions.disable_globaltag_replay()
 

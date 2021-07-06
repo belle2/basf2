@@ -1,3 +1,10 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #pragma once
 
 #include <framework/datastore/SelectSubset.h>
@@ -17,7 +24,8 @@ namespace Belle2 {
     void removeParticlesNotInLists(const std::vector<std::string>& listNames);
 
     /** select Particles for which f returns true, discard others */
-    void select(std::function<bool (const Particle*)> f) {
+    void select(std::function<bool (const Particle*)> f)
+    {
       const std::map<int, int>& oldToNewMap = copySetWithRelations(f);
 
       if (m_inheritToSelf) {

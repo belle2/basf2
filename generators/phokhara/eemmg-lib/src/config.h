@@ -1,4 +1,3 @@
-/** @cond EEMMG */
 
 /* Define to a macro mangling the given C identifier (in lower and upper
    case), which must not contain underscores, for linking with Fortran. */
@@ -28,4 +27,3 @@
 /* use libqcdloop for scalar integrals */
 #define USE_QCDLOOP "1"
 
-/** @endcond EEMMG */

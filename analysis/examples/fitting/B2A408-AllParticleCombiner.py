@@ -1,28 +1,31 @@
 #!/usr/bin/env python3
 
-#############################################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to combine all particles from an input
-# particle list, in this particular example to determine the PV position. The
-# following  decay chain (and c.c. decay chain)
-#
-# D*+ -> D0 pi+
-#        |
-#        +-> K- pi+
-#
-# is reconstructed beforehand and the D0 and D*+ decay vertices are fitted.
-#
-# Note: This example is build upon B2A301-Dstar2D0Pi-Reconstruction.py
-#
-# Note: This example uses the signal MC sample created with release-01-00-00
-#
-# Contributors: A. Zupanc (June 2014)
-#               I. Komarov (December 2017)
-#               F. Meier (March 2019)
-#
-#############################################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to combine all particles from an input  #
+# particle list, in this particular example to determine the PV          #
+# position. The following decay chain (and c.c. decay chain)             #
+#                                                                        #
+# D*+ -> D0 pi+                                                          #
+#        |                                                               #
+#        +-> K- pi+                                                      #
+#                                                                        #
+# is reconstructed beforehand and the D0 and D*+ decay vertices are      #
+# fitted.                                                                #
+#                                                                        #
+# Note: This example is build upon B2A301-Dstar2D0Pi-Reconstruction.py   #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 from modularAnalysis import applyCuts

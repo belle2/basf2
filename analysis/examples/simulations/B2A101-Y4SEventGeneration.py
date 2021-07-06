@@ -1,25 +1,31 @@
 #!/usr/bin/env python3
 
-######################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# Y(4S) -> BBbar event generation
-#
-# This tutorial demonstrates how to generate
-#
-# e+e- -> Y(4S) -> BBbar
-#
-# events with EvtGen in BASF2, where the decay of Y(4S)
-# is specified by the given .dec file.
-#
-# The generated events are saved to the output ROOT file.
-# In each event the generated particles (MCParticle objects)
-# are stored in the StoreArray<MCParticle>.
-#
-# Contributors: A. Zupanc (June 2014), I.Komarov (Sept. 2018)
-#
-######################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# Y(4S) -> BBbar event generation                                        #
+#                                                                        #
+# This tutorial demonstrates how to generate                             #
+#                                                                        #
+# e+e- -> Y(4S) -> BBbar                                                 #
+#                                                                        #
+# events with EvtGen in BASF2, where the decay of Y(4S)                  #
+# is specified by the given .dec file.                                   #
+#                                                                        #
+# The generated events are saved to the output ROOT file.                #
+# In each event the generated particles (MCParticle objects)             #
+# are stored in the StoreArray<MCParticle>.                              #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import generators as ge

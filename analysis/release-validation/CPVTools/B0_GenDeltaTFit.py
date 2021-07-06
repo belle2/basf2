@@ -1,8 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 #######################################################
-#
 #
 # This script checks if the time dependent CP asymmetry has been correctly
 # simulated. It saves the generated times for Bsig and Btag
@@ -14,8 +21,6 @@
 #
 # If you want to use this script for other decay channels
 # you need to modify lines 379-381.
-#
-# Contributor: F. Abudinen (December 2018)
 #
 ######################################################
 

@@ -1,15 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # **************  Flavor Tagging   **************
-# * Authors: Moritz Gelb & Fernando Abudinen    *
 # *                                             *
 # * This script calculates the paramters charac-*
 # * terizing the performance of the flavor tag- *
 # * ger. It produces as well plots for the qr   *
 # * distribution of the combiners and the dis-  *
 # * tributions of the combiner input variables. *
-#                                               *
+# *                                             *
 # ***********************************************
 
 import ROOT

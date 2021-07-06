@@ -1,25 +1,31 @@
 #!/usr/bin/env python3
 
-# ######################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to perform detector simulation
-# and reconstruction (track finding+track fitting+ecl reconstruction+...)
-# on a previously generated events with beam background mixing.
-#
-# In this example Beam Background is added. See
-# B2A103-SimulateAndReconstruct-withoutBeamBkg.py to check
-# how to simulate+reconstruct without beam background.
-#
-# The processed events are saved to the output ROOT file that
-# now contain in addition to the generated particles
-# (MCParticle objects stored in the StoreArray<MCParticle>) also
-# reconstructed MDST objects (Track/ECLCluster/KLMCluster/...).
-# Contributors: A. Zupanc (June 2014)
-#               U. Tamponi (October 2019)
-#
-# #####################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+# ########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to perform detector simulation and      #
+# reconstruction (track finding+track fitting+ecl reconstruction+...)    #
+# on a previously generated events with beam background mixing.          #
+#                                                                        #
+# In this example Beam Background is added. See                          #
+# B2A103-SimulateAndReconstruct-withoutBeamBkg.py to check               #
+# how to simulate+reconstruct without beam background.                   #
+#                                                                        #
+# The processed events are saved to the output ROOT file that            #
+# now contain in addition to the generated particles                     #
+# (MCParticle objects stored in the StoreArray<MCParticle>) also         #
+# reconstructed MDST objects (Track/ECLCluster/KLMCluster/...).          #
+#                                                                        #
+# ########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

@@ -1,36 +1,38 @@
 #!/usr/bin/env python3
 
-#########################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial shows how to apply event based selections
-# before filling particle lists, to reject useless events
-# without further processing. In this case the cut is on
-# the R2 variable, which for bb events is below 0.3,
-# while in continuum events can reach larger values.
-#
-# The example A305 demonstrates how to reconstruct the
-# B meson decay with missing energy, e.g. :
-#
-# Y(4S) -> Btag- Bsig+
-#                 |
-#                 +-> mu+ nu
-#
-# The original example has been modified to apply the
-# event based selection, and the ntuples are filled
-# also with the R2EventLevel variable.
-# While signal/charged samples have R2 distributions below
-# 0.3, ccbar sample has a larger distribution and the
-# initial selection reduces the processing time.
-#
-# Contributors: A. Zupanc (June 2014)
-#               S. Spataro (October 2017)
-#               I. Komarov (December 2017)
-#               I. Komarov (September 2018)
-#               I. Komarov (September 2019)
-#
-################################################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial shows how to apply event based selections                #
+# before filling particle lists, to reject useless events                #
+# without further processing. In this case the cut is on                 #
+# the R2 variable, which for bb events is below 0.3,                     #
+# while in continuum events can reach larger values.                     #
+#                                                                        #
+# The example A305 demonstrates how to reconstruct the                   #
+# B meson decay with missing energy, e.g. :                              #
+#                                                                        #
+# Y(4S) -> Btag- Bsig+                                                   #
+#                 |                                                      #
+#                 +-> mu+ nu                                             #
+#                                                                        #
+# The original example has been modified to apply the                    #
+# event based selection, and the ntuples are filled                      #
+# also with the R2EventLevel variable.                                   #
+# While signal/charged samples have R2 distributions below               #
+# 0.3, ccbar sample has a larger distribution and the                    #
+# initial selection reduces the processing time.                         #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

@@ -1,45 +1,49 @@
 #!/usr/bin/env python3
 
-#######################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to reconstruct the
-# B meson decay with missing energy, e.g. :
-#
-# Y(4S) -> Btag- Bsig+
-#                 |
-#                 +-> mu+ nu
-#
-# First the Btag candidate is reconstructed in the
-# following decay chain:
-#
-# Btag- -> D0 pi-
-#          |
-#          +-> K- pi+
-#          +-> K- pi+ pi0
-#          +-> K- pi+ pi+ pi-
-#          +-> K- K+
-#          +-> pi- pi+
-#
-# The signature of signal B meson decay is single muon,
-# therefore by reconstructing the muon one already reconstructs
-# the signal B.
-#
-# Once, Btag and Bsig candidates are reconstructed the
-# RestOfEvent is filled for each BtagBsig combination
-# with the remaining charged particles, photons and neutral
-# hadrons that are not used to reconstruct Btag or Bsig.
-# The RestOfEvent object is then used as an input for E_extra,
-# MissingMass^2, etc. variables.
-# At last, the signal neutrino is reconstructed as a particle
-# using missing momentum of the event.
-#
-# Contributors: A. Zupanc (June 2014)
-#               I. Komarov (September 2018)
-#               S. Bilokin (July 2019)
-#
-################################################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to reconstruct the                      #
+# B meson decay with missing energy, e.g. :                              #
+#                                                                        #
+# Y(4S) -> Btag- Bsig+                                                   #
+#                 |                                                      #
+#                 +-> mu+ nu                                             #
+#                                                                        #
+# First the Btag candidate is reconstructed in the                       #
+# following decay chain:                                                 #
+#                                                                        #
+# Btag- -> D0 pi-                                                        #
+#          |                                                             #
+#          +-> K- pi+                                                    #
+#          +-> K- pi+ pi0                                                #
+#          +-> K- pi+ pi+ pi-                                            #
+#          +-> K- K+                                                     #
+#          +-> pi- pi+                                                   #
+#                                                                        #
+# The signature of signal B meson decay is single muon,                  #
+# therefore by reconstructing the muon one already reconstructs          #
+# the signal B.                                                          #
+#                                                                        #
+# Once, Btag and Bsig candidates are reconstructed the                   #
+# RestOfEvent is filled for each BtagBsig combination                    #
+# with the remaining charged particles, photons and neutral              #
+# hadrons that are not used to reconstruct Btag or Bsig.                 #
+# The RestOfEvent object is then used as an input for E_extra,           #
+# MissingMass^2, etc. variables.                                         #
+# At last, the signal neutrino is reconstructed as a particle            #
+# using missing momentum of the event.                                   #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

@@ -1,36 +1,35 @@
 #!/usr/bin/env python3
 
-#######################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to reconstruct the
-# following  decay chain:
-#
-# B0 -> rho gamma
-#       |
-#       +-> pi+ pi-
-#
-# and construct pi0/eta veto for the signal photon. In this
-# example the pi0 veto is constructed in the following
-# way:
-# - for each B0 -> rho gamma candidate
-#     i) combine photon (gamma) used in the reconstruction
-#        of the B0 candidate with all other soft photons defined
-#        in analysis/scripts/modularAnalysis.py
-#    ii) find pi0/eta candidate with highest pi0/eta probability
-#   iii) write value of pi0/eta probability
-#
-# Note: This example uses the signal MC sample created in
-# MC campaign 9, therefore it can be ran only on KEKCC computers.
-#
-# Contributors: A. Zupanc (June 2014)
-#               K. Ota (Oct 2017)
-#               I. Komarov (December 2017)
-#               I. Komarov (September 2018)
-#               Y. Sato (October 2020)
-#
-################################################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to reconstruct the                      #
+# following  decay chain:                                                #
+#                                                                        #
+# B0 -> rho gamma                                                        #
+#       |                                                                #
+#       +-> pi+ pi-                                                      #
+#                                                                        #
+# and construct pi0/eta veto for the signal photon. In this              #
+# example the pi0 veto is constructed in the following                   #
+# way:                                                                   #
+# - for each B0 -> rho gamma candidate                                   #
+#     i) combine photon (gamma) used in the reconstruction               #
+#        of the B0 candidate with all other soft photons defined         #
+#        in analysis/scripts/modularAnalysis.py                          #
+#    ii) find pi0/eta candidate with highest pi0/eta probability         #
+#   iii) write value of pi0/eta probability                              #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

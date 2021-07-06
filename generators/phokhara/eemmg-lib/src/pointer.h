@@ -1,4 +1,3 @@
-/** @cond EEMMG */
 /*
  * pointer.h - smart pointer and array classes
  *
@@ -178,4 +177,3 @@ class Test: public SRefCnt
 };
 
 */
-/** @endcond EEMMG */

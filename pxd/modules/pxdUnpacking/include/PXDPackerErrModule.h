@@ -31,6 +31,7 @@ namespace Belle2 {
       enum {PACKER_NUM_ROWS = 768};
       enum {PACKER_NUM_COLS = 250};
 
+      /** enumeration of the error masks */
       enum myerrormasks : __uint128_t {
         c_NO_ERROR = __uint128_t(0),
         c_ALL_ERROR = ~ c_NO_ERROR,

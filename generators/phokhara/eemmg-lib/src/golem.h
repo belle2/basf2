@@ -1,4 +1,3 @@
-/** @cond EEMMG */
 /*
  * cache.h - golem-mode header
  *
@@ -74,4 +73,3 @@ private:
 };
 
 #endif /* QUL_GOLEM_H */
-/** @endcond EEMMG */

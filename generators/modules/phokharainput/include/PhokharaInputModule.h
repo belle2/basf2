@@ -58,16 +58,20 @@ namespace Belle2 {
     int m_nMaxTrials; /**< Events before loop is aborted. */
     int m_nSearchMax; /**< Events used to search maximum of differential cross section. */
 
-    int m_LO;  /**< LO: 1ph(0, default), Born: 0ph(1), only Born: 0ph(-1) */
-    int m_NLO;  /**< NLO, for 1ph only: off (0, default), on (1) */
+    int m_weighted;  /**< generate weighted events */
+    int m_LO;  /**< LO: ph0  Born: 1ph(0), Born: 0ph(1), only Born: 0ph(-1) */
+    int m_NLO;  /**< 1 photon : Born(0), NLO(1) */
+    int m_fullNLO;  /**< full NLO : No(0), Yes(1) */
     int m_QED;  /**< ISR only(0), ISR+FSR(1), ISR+INT+FSR(2) */
-    int m_NLOIFI;  /**< IFSNLO: no(0), yes(1) */
+    int m_IFSNLO;  /**< IFSNLO: no(0), yes(1) */
     int m_alpha;  /**< vacuum polarization switch: off (0), on (1,[by Fred Jegerlehner]), on (2,[by Thomas Teubner]) */
     int m_pionff;  /**< FF_pion: KS PionFormFactor(0),GS old (1),GS new (2) */
     int m_pionstructure;  /**< for pi+pi- only: f0+f0(600): K+K- model(0), "no structure" model(1), no f0+f0(600)(2), f0 KLOE(3) */
     int m_kaonff;  /**< FF_kaon: KaonFormFactor constrained(0), KaonFormFactor unconstrained(1) KaonFormFactor old(2) */
     int m_narres;  /**< narr_res: no narrow resonances (0), J/psi (1) and psi(2S) (2) only for m_finalState = 0,1,6,7 */
     int m_protonff;  /**< ProtonFormFactor old(0), ProtonFormFactor new(1) */
+    int m_chi_sw;  /**< chi_sw: Radiative return(0), Chi production(1), Radiative return + Chi production (2) */
+    int m_be_r;  /**< be_r: without beam resolution(0), with beam resolution(1) */
 
     double m_cmsEnergy = -1.0; /**< CMS energy. */
     std::vector<double> m_ScatteringAngleRangePhoton; /**< Minimal/Maximal photon angle/missing momentum angle. */
@@ -78,19 +82,14 @@ namespace Belle2 {
     double m_MaxInvMassHadrons; /**< m_MaxInvMassHadrons [GeV^2] */
     double m_MinEnergyGamma; /**< m_MinEnergyGamma [GeV]. */
 
-//     int m_finalState; /**< Final state: mu+mu-(0), pi+pi-(1), 2pi0pi+pi-(2), 2pi+2pi-(3), ppbar(4), nnbar(5), K+K-(6), K0K0bar(7), pi+pi-pi0(8), lamb(->pi-p)lambbar(->pi+pbar)(9), eta pi+ pi- (10) */
     double m_epsilon; /**< Soft/hard photon separator*/
+    double m_beamres; /**< beam resolution for chi2 studies*/
     std::string m_ParameterFile; /**< file that holds all resonance parameters*/
-//     std::string m_InputFile; /**< file that holds all input parameters - NOT USED IN BELLE II IMPLEMENTATION!!!*/
     bool m_BeamEnergySpread; /**< Simulate beam-energy spread. */
 
     /** Variables */
     Phokhara m_generator;   /**< The Phokhara generator. */
     MCParticleGraph m_mcGraph; /**< The MCParticle graph object. */
-
-    /** Variables */
-//     TFile* m_fileExtraInfo;
-//     TH1D* m_th1dSDif;
 
     template <typename T>
     std::vector<T> make_vector(T const& t1, T const& t2);  /**< make_vector. */

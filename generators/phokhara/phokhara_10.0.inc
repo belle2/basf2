@@ -1,8 +1,8 @@
       implicit none 
 c ------------------ couplings, masses, momenta -------------------
       double precision pi,gev2nbarn,gev2pbarn,alpha,me,mmu,
-     & mpi,mpi0,Sp,ebeam,rmass(10),momenta(15,0:3),mp,mnt,mKp,mKn,
-     & mlamb,meta
+     & mpi,mpi0,Sp,ebeam,rmass(10),momenta(16,0:3),mp,mnt,mKp,mKn,
+     & mlamb,meta,GFermi,sinthW2
 c ------------------------ Kaons commons  -------------------------
       double precision m_phi0_Kp,g_phi0_Kp,m_phi1_Kp,g_phi1_Kp,
      & m_phi2_Kp,g_phi2_Kp,m_phi3_Kp,g_phi3_Kp,m_om0_Kp,g_om0_Kp,
@@ -73,14 +73,14 @@ c ------------------------ generation -----------------------------
       real*8 onemb2c2
 c -------------------------- flags --------------------------------
       integer nlo,ph0,pion,fsr,fsrnlo,ivac,FF_Pion,f0_model,FF_kaon,
-     &        narr_res,FF_pp
+     &        narr_res,FF_pp,chi_sw,chi_pion,be_r,FF_Pgg,nlo2
 c ------------------------ vacuum ---------------------------------
       complex*16 cvac_s,cvac_s_pi,cvac_s_pi1
 c -----------------------------------------------------------------
 c ------------------ couplings, masses, momenta -------------------
       common /ctes/pi,gev2nbarn,gev2pbarn,alpha,me,mmu,mpi,mpi0,Sp,mp,
      & ebeam,ver_s,rmass,momenta,cvac_s,mnt,mKp,mKn,cvac_s_pi,
-     & cvac_s_pi1,mlamb,meta
+     & cvac_s_pi1,mlamb,meta,GFermi,sinthW2
 c ---------------------- Kaons commons ----------------------------
       common/mass_gamm_Kp/m_phi0_Kp,g_phi0_Kp,m_phi1_Kp,g_phi1_Kp,
      & m_phi2_Kp,g_phi2_Kp,m_phi3_Kp,g_phi3_Kp,m_om0_Kp,g_om0_Kp,
@@ -144,7 +144,7 @@ c --------------------------- Maxima ---------------------------------
       common /maxima/  Mmax,gross,klein,tr,count,iprint
 c --------------------------- flags ----------------------------------
       common/flags/nlo,ph0,pion,fsr,fsrnlo,ivac,FF_Pion,f0_model,
-     & FF_kaon,narr_res,FF_pp
+     & FF_kaon,narr_res,FF_pp,chi_sw,chi_pion,be_r,FF_Pgg,nlo2
 c ------------------------ generation -----------------------------
       common /generation/onemb2c2
 c-----------------------Nucleons Common FF_pp=1-------------------------
@@ -171,3 +171,41 @@ c-----------------------Nucleons Common FF_pp=1-------------------------
      & mrho_pp4,gammarho_pp4,momega_pp4,gammaomega_pp4,
      & par1,par2,par3,par4,par5,par6,par7,par8,
      2    par9,par10,par11,par12,par13,par14,par15,par16
+c----------------Chi production common-----------------------------------------
+      real*8 mchic1,gamchic1,c_chi,c_chipsi,gamchiee,
+     & mchic2,gamchic2,c_chi2,c_chi2psi,gamchiee2,ac,m2c,aj,
+     & apsi
+      complex*16 gg1,gg2
+      common/chi_prod/ mchic1,gamchic1,c_chi,c_chipsi,gg1,
+     & gamchiee,
+     & mchic2,gamchic2,c_chi2,c_chi2psi,gamchiee2,gg2,ac,m2c,
+     & aj,apsi
+c----------beam resolution---------------------------------------------------------
+      real*8 beamres
+      common/rozm/ beamres
+c-----------------------------------------------------------------------
+      real*8 hv1,A1pi0,A2pi0,Fsmv2Hv2,A1eta,A1etaP,fsmv1,H_om,F_om,
+     1 F_phi,fchir,A_pi_phiom,A_eta_phiom
+      real*8 GammaTotalrho_c,GammaTotalrho_c2,GammaTotalrho_c3,
+     1 GammaTotalomega_c,GammaTotalomega_c2,GammaTotalomega_c3,
+     2 GammaTotalphi_c,GammaTotalphi_c2,GammaTotalphi_c3
+      real*8 Mrho_c,Momega_c,Mphi_c,
+     1 Mrho_pr,Momega_pr,Mphi_pr,
+     2 Mrho_dpr,Momega_dpr,Mphi_dpr
+      real*8 metaf,metaP,mpi0f
+      real*8 Cq_c,Cs_c,Cq_P,Cs_P
+      real*8 A3pi0,A3eta,A3etaP
+      common/pscalars/hv1,A1pi0,A2pi0,Fsmv2Hv2,A1eta,A1etaP,fsmv1,H_om,
+     1 F_om,F_phi,fchir,A_pi_phiom, A_eta_phiom,
+     2 GammaTotalrho_c,GammaTotalrho_c2,GammaTotalrho_c3,
+     2 GammaTotalomega_c,GammaTotalomega_c2,GammaTotalomega_c3,
+     3 GammaTotalphi_c,GammaTotalphi_c2,GammaTotalphi_c3,
+     4 Mrho_c,Momega_c,Mphi_c,
+     5 Mrho_pr,Momega_pr,Mphi_pr,
+     6 Mrho_dpr,Momega_dpr,Mphi_dpr,metaf,metaP,mpi0f,
+     7 Cq_c,Cs_c,Cq_P,Cs_P,A3pi0,A3eta,A3etaP
+c-------------------common quad momenta--------------------------------
+       real*16 piq,Sp_q,w_q,ebeam_q,Qjp_q,Qp2s_q,
+     1 mpi_q,mjp_q,gamjp_q,el_m2q,me_q,alpha_q
+       common/quad_param/ piq,Sp_q,w_q,ebeam_q,Qjp_q,Qp2s_q,
+     1 mpi_q,mjp_q,gamjp_q,el_m2q,me_q,alpha_q

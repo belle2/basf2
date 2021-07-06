@@ -1,18 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################
-#
-# This script checks if there are asymmetries in the
-# reconstructed impact parameters and in the generated vertex
-# positions of electrons, muons, kaons, pions and protons.
-# As input one needs the path to one or several mdst files.
-# As output the script saves the plots comparing
-# positively and negatively charged particles.
-#
-# Contributor: F. Abudinen (December 2018)
-#
-######################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# This script checks if there are asymmetries in the                     #
+# reconstructed impact parameters and in the generated vertex            #
+# positions of electrons, muons, kaons, pions and protons.               #
+# As input one needs the path to one or several mdst files.              #
+# As output the script saves the plots comparing                         #
+# positively and negatively charged particles.                           #
+#                                                                        #
+##########################################################################
 
 
 import basf2 as b2

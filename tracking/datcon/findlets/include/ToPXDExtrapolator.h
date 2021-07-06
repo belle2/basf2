@@ -54,7 +54,7 @@ namespace Belle2 {
     /// extrapolate the v-track to the two PXD layers
     /// @param tanLambda azimtutal angle of the track
     /// @param layer PXD layer to extrapolate to
-    /// @param uExtrapolations vector containing the extrapolated positions in u
+    /// @param vExtrapolations vector containing the extrapolated positions in v
     void extrapolateVTrack(const long tanLambda, const uint layer,
                            std::vector<std::pair<VxdID, long>>& vExtrapolations);
 

@@ -1,29 +1,34 @@
 #!/usr/bin/env python3
 
-#######################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to reconstruct the
-# following decay chain involving several decay modes:
-#
-# B- -> D0 pi-
-#       |
-#       +-> K- pi+
-#       +-> K- pi+ pi0
-#       +-> K- pi+ pi+
-#       +-> K- K+
-#       +-> pi- pi+
-#
-# Note: This reconstruction is performed on generated level
-# to speed up the reconstruction during the tutorial. However,
-# the reconstruction can as well be performed using reconstructed
-# final state particles.
-#
-# Contributors: A. Zupanc (June 2014)
-#               I. Komarov (September 2018)
-#
-################################################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to reconstruct the                      #
+# following decay chain involving several decay modes:                   #
+#                                                                        #
+# B- -> D0 pi-                                                           #
+#       |                                                                #
+#       +-> K- pi+                                                       #
+#       +-> K- pi+ pi0                                                   #
+#       +-> K- pi+ pi+                                                   #
+#       +-> K- K+                                                        #
+#       +-> pi- pi+                                                      #
+#                                                                        #
+# Note: This reconstruction is performed on generated level              #
+# to speed up the reconstruction during the tutorial. However,           #
+# the reconstruction can as well be performed using reconstructed        #
+# final state particles.                                                 #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

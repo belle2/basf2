@@ -1,16 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Mikihiko Nakao (KEK), Pablo Goldenzweig (KIT),          *
- *                Umberto Tamponi (tamponi@to.infn.it)                    *
  *                                                                        *
- * Original module writen by M. Nakao for Belle                           *
- * Ported to Belle II by P. Goldenzweig                                   *
- * Modified by U. Tamponi                                                 *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #include <analysis/ContinuumSuppression/FoxWolfram.h>

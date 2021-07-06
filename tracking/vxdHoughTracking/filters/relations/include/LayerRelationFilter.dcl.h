@@ -36,6 +36,7 @@ namespace Belle2 {
       /// Expose the parameters of the filter
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
+      /// Get the weight of the relation between from and to
       TrackFindingCDC::Weight operator()(const VXDHoughState& from, const VXDHoughState& to) final;
 
       /// Initialize the maximal ladder cache

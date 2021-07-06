@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 
-# Thomas Keck 2016
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 # The mva package has a builtin sideband subtraction mechanism.
 # If your data and mc do not match, you can use the MetaOptions to do a meta-training.

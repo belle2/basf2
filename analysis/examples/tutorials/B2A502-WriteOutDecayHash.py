@@ -1,25 +1,30 @@
 #!/usr/bin/env python3
 
-#######################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to write out the
-# decay hash. This allows to store information on
-# the reconstructed and original decay and use it
-# in the offline analysis steps.
-#
-#   J/psi
-#    |
-#    +-> e- e+
-#
-# Notes:
-#  1) No guarantee for collisions!
-#
-# Contributors: Moritz Gelb (June 2017)
-#               I. Komarov (September 2018)
-#
-################################################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to write out the                        #
+# decay hash. This allows to store information on                        #
+# the reconstructed and original decay and use it                        #
+# in the offline analysis steps.                                         #
+#                                                                        #
+#   J/psi                                                                #
+#    |                                                                   #
+#    +-> e- e+                                                           #
+#                                                                        #
+# Notes:                                                                 #
+#  1) No guarantee for collisions!                                       #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

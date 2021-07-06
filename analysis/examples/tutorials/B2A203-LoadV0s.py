@@ -1,25 +1,30 @@
 #!/usr/bin/env python3
 
-################################################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to load reconstructed
-# final state particles as Particles in case of V0-like particles:
-# - K_S0
-# - Lambda0
-# - (anti-Lambda0)
-#
-# The recommended way to do this is to use the standard
-# lists provided in the script: analysis/scripts/stdV0s.py:
-#
-#    stdKshorts(prioritiseV0, fitter, path)
-#    stdLambdas(prioritiseV0, fitter, path)
-#
-# Contributors: B. Scavino (August 2018)
-#               I. Komarov (September 2018)
-#
-################################################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to load reconstructed                   #
+# final state particles as Particles in case of V0-like particles:       #
+# - K_S0                                                                 #
+# - Lambda0                                                              #
+# - (anti-Lambda0)                                                       #
+#                                                                        #
+# The recommended way to do this is to use the standard                  #
+# lists provided in the script: analysis/scripts/stdV0s.py:              #
+#                                                                        #
+#    stdKshorts(prioritiseV0, fitter, path)                              #
+#    stdLambdas(prioritiseV0, fitter, path)                              #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

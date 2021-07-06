@@ -1,29 +1,32 @@
 #!/usr/bin/env python3
 
-#######################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates how to perform Vertex fits
-# using Rave and how to use TagV and save Delta t.
-# The following  decay chain:
-#
-# B0 -> J/psi Ks
-#        |    |
-#        |    +-> pi+ pi-
-#        |
-#        +-> mu+ mu-
-#
-# is reconstructed B0 vertex is fitted using the two m
-# the side vertex is fittes and Delta t (in ps.) is
-# calculated
-#
-# Note: This example uses the signal MC sample created in
-# MC campaign 5, therefore it can be ran only on KEKCC computers.
-#
-# Contributors: L. Li Gioi (October 2014)
-#
-######################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# Stuck? Ask for help at questions.belle2.org                            #
+#                                                                        #
+# This tutorial demonstrates how to perform Vertex fits                  #
+# using Rave and how to use TagV and save Delta t.                       #
+# The following  decay chain:                                            #
+#                                                                        #
+# B0 -> J/psi Ks                                                         #
+#        |    |                                                          #
+#        |    +-> pi+ pi-                                                #
+#        |                                                               #
+#        +-> mu+ mu-                                                     #
+#                                                                        #
+# is reconstructed B0 vertex is fitted using the two m                   #
+# the side vertex is fitted and Delta t (in ps.) is                      #
+# calculated                                                             #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 from modularAnalysis import inputMdst

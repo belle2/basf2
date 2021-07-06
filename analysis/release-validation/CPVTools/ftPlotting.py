@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# @cond SUPPRESS_DOXYGEN
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
-# Thomas Keck 2015
+# @cond SUPPRESS_DOXYGEN
 
 import basf2_mva_util
 from basf2 import B2INFO, B2WARNING

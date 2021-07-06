@@ -20,10 +20,10 @@ namespace Belle2 {
     float sum = m_BGWeight + m_deltaRayWeight;
     for (const auto& w : m_weights) sum += w;
     float prob = sum * gRandom->Rndm();
-    float cum = 0;
+    float cumul = 0;
     for (size_t i = 0; i < m_weights.size(); i++) {
-      cum += m_weights[i];
-      if (prob < cum) return &m_peaks[i];
+      cumul += m_weights[i];
+      if (prob < cumul) return &m_peaks[i];
     }
     return 0;
   }

@@ -75,7 +75,7 @@ void TheKillerModule::event()
     case EMethod::c_exit:
       std::exit(m_parameter);
     case EMethod::c_exception:
-      throw std::runtime_error("DIE! DIE! DIE!");
+      throw std::runtime_error("This is a runtime error kindly provided by TheKiller module.");
     case EMethod::c_signal:
       if (raise(m_parameter) != 0) B2FATAL("Invalid signal number" << LogVar("signal", m_parameter));
       break;

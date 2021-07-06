@@ -57,7 +57,7 @@ namespace Belle2 {
     /** Equality operator */
     bool operator==(const MCInitialParticles& b) const
     {
-      // FIXME: Ah, bloody hell. sin(x) returns slightly different values on
+      // FIXME: sin(x) returns slightly different values on
       // different platforms in some cases so we cannot just do an equality
       // comparison. We need to do this more elegantly, this is just for
       // testing if it solves all problems

@@ -199,16 +199,16 @@ class PythonLogJSON(unittest.TestCase):
 
     def test_loginfo(self):
         """Make sure all loginfo settings are honored in json output"""
-        cum_info = 0
+        cumul_info = 0
         # level is always added
-        cum_keys = {"level"}
+        cumul_keys = {"level"}
         # go through all loginfo values and check if the correct field is in
         # the json, once separately and also cumulative
         for val, key in basf2.LogInfo.values.items():
-            cum_info |= val
+            cumul_info |= val
             key = key.name.lower()
-            cum_keys.add(key)
-            for info, keys in (val, {"level", key}), (cum_info, cum_keys):
+            cumul_keys.add(key)
+            for info, keys in (val, {"level", key}), (cumul_info, cumul_keys):
                 basf2.logging.set_info(basf2.LogLevel.INFO, info)
                 logobject = self.getLogMessage("simple")
                 self.assertEqual(set(logobject.keys()), keys)

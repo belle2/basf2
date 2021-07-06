@@ -68,7 +68,7 @@ def argparser():
     parser.add_argument("--global_tag_append",
                         type=str,
                         nargs="+",
-                        default=["chargedpidmva_rel-05_test", getAnalysisGlobaltag()],
+                        default=[getAnalysisGlobaltag()],
                         help="List of names of conditions DB global tag(s) to append on top of GT replay.\n"
                         "NB: these GTs will have lowest priority.\n"
                         "Pass a space-separated list of names.")

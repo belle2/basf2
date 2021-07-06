@@ -3,6 +3,6 @@ import os
 Import('env')
 
 env['SUBLIB'] = True
-env['LIBS'] = ['$ROOT_LIBS', 'mdst_dataobjects', 'framework', 'eemmgisr', 'eemmgisrfsr', 'eemmg5', 'gfortran']
+env['LIBS'] = ['$ROOT_LIBS', 'mdst_dataobjects', 'framework', 'eemmgisr', 'eemmgisrfsr', 'eemmg5', 'qcdloop1', 'gfortran']
 
 Return('env')

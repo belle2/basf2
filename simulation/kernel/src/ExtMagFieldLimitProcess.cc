@@ -47,8 +47,7 @@ G4double ExtMagFieldLimitProcess::GetMeanFreePath(const G4Track&, G4double, G4Fo
 
 G4double ExtMagFieldLimitProcess::PostStepGetPhysicalInteractionLength(const G4Track& aTrack, G4double, G4ForceCondition* condition)
 {
-  /* cppcheck-suppress ctunullpointer */
-  /* cppcheck-suppress nullPointer */
+  // cppcheck-suppress [nullPointer, ctunullpointer]
   *condition = NotForced;
   G4double stepLength = kInfinity;
   if (m_field != 0) {

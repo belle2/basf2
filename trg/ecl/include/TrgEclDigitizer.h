@@ -71,9 +71,9 @@ namespace Belle2 {
     double TCTiming_tot[576];
 
     // background TC Energy [GeV]
-    double TCBGEnergy[576][80];
+    // double TCBGEnergy[576][80];
     // backgrond TC Timing [GeV]
-    double TCBGTiming[576][80];
+    // double TCBGTiming[576][80];
 
     /** Input  TC energy[GeV] */
     double TCRawEnergy[576][60];

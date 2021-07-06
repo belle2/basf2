@@ -468,10 +468,10 @@ void MicrotpcStudyModule::event()
     else trID = mcpart.getTrackID();
     int detNb = -1;
     int nhit = 0;
-    for (const auto& shit : SimHits) {
-      if (shit.gettkID() == trID) {
-        detNb = shit.getdetNb(); nhit++;
-        kin = shit.gettkKEnergy() / 1000;
+    for (const auto& sHit : SimHits) {
+      if (sHit.gettkID() == trID) {
+        detNb = sHit.getdetNb(); nhit++;
+        kin = sHit.gettkKEnergy() / 1000;
       }
     }
 

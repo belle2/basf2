@@ -282,7 +282,7 @@ class ToFlat(Transform):
         :param x_flat:  x value in the flat distribution
         :return:        x value on the original axis (approx)
         """
-        x_cum = np.linspace(self.min, self.max, self.n_bins * 50)
-        for xx in x_cum:
+        x_cumul = np.linspace(self.min, self.max, self.n_bins * 50)
+        for xx in x_cumul:
             if self.cdf.spline(xx) > x_flat:
                 return xx

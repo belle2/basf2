@@ -1,3 +1,10 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 //..For each location, offset MC to find best fit to data distribution.
 //  Print out the resulting fit (data overlaid with shifted MC) and
 //  record resulting difference in 2D and 1D plots as a function of location

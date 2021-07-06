@@ -1,10 +1,13 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 //+
 // File : DQMHistAnalysisOutputFile.cc
 // Description : DQM Analysis, dump histograms to file (as reference histograms)
-//
-// Author : B. Spruck
-// Date : 25 - Mar - 2017
-// based on work from Tomoyuki Konno, Tokyo Metropolitan Univerisity
 //-
 
 

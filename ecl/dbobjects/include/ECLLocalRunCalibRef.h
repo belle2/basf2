@@ -1,16 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019 - Belle II Collaboration                             *
- *                                                                        *
- * ECLLocalRunCalibRef                                                    *
- *                                                                        *
- * This class is designed to store reference marks to database for        *
- * ECL local run calibration.                                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Sergei Gribanov                                          *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #pragma once
 

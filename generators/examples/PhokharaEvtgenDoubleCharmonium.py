@@ -1,17 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-########################################################
-# 100 e+ e- -> J/psi eta_c events are generated using PHOKHARA + EvtGen
-# generator combination
-#
-# Author: Kirill Chilikin
-#
-# This is an example of expert usage with setting and explanation of individual
-# generator parameters. If you just need to generate using the default settings,
-# please use generators.add_phokhara_evtgen_combination().
-# Example can be found in generators/validation/PhokharaEvtgenGenerate.py.
-########################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+# 100 e+ e- -> J/psi eta_c events are generated using PHOKHARA + EvtGen  #
+# generator combination                                                  #
+#                                                                        #
+# This is an example of expert usage with setting and explanation of     #
+# individual generator parameters. If you just need to generate using    #
+# the default settings, please use                                       #
+# generators.add_phokhara_evtgen_combination(). Example can be found in  #
+# generators/validation/PhokharaEvtgenGenerate.py.                       #
+##########################################################################
 
 import basf2
 import beamparameters

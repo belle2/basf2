@@ -1,17 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
- *                                                                        *
- * Belle II Local Maximum Finder (LMF). Two stage procedure: First it     *
- * searches a local maximum (energy higher than all neighbours and above  *
- * threshold) and second it uses a method  for different                  *
- * particle types to decide if the local maximum is a candidate. Each     *
- * candidate will result in one shower/cluster in the end.                *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #pragma once

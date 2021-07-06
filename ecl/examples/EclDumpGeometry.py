@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 ################################################################################
 #
 # Write out the location and direction of all ECL crystals. Uses information
@@ -12,8 +20,6 @@
 # newGeom = 1 will read it from global tag ecl_alignment
 # newGeom = 2 reads the payload from localdb;
 # If not specified, the payload will be taken from the global tag of "inputFile.root"
-#
-# (c) Christopher Hearty, 2020 (hearty@physics.ubc.ca)
 #
 ################################################################################
 

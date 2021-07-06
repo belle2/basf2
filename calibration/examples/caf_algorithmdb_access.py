@@ -1,3 +1,10 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 # This steering file shows off algorithms accessing database constants
 # from within the CAF. There's actually no special changes to the CAF script,
 # we're just going to use algorithms that do this accessing.

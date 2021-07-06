@@ -1,10 +1,14 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 //+
 // File : DQMHistAnalysisPXDInjection.h
 // Description : DQM module, which gives occupancies in time after injection
 // PXD specific per module plots without EPICS export
-//
-// Author: Björn Spruck
-// Date : Now
 //-
 
 #pragma once

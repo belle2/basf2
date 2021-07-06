@@ -1,22 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019 - Belle II Collaboration                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Christopher Hearty   hearty@physics.ubc.ca               *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
- *                                                                        *
- * - Read in payloads energy calibration payloads from specified          *
- *   global tag (default ECL_energy_calibrations) or localdb, if present. *
- * - Combine to create new ECLCrystalEnergy                               *
- * - Write new ECLCrystalEnergy to localdb, with iov exp,run,-1,-1        *
- * - Compare new version to existing version and store histograms to      *
- *   ECLCrystalEnergy_exp_run.root                                        *
- *                                                                        *
- *   Usage: eclCrystalEnergy exp run [globaltag [writeToDB]]              *
- *   Set option argument writeToDB = 0 to not write output to database    *
- *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #include <framework/database/DBImportObjPtr.h>

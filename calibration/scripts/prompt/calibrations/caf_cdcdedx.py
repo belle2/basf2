@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """
 Airflow script for automatic CDC dEdx calibration. It is currently for the electron based
 calibration, where at present only RunGain, Cosine and WireGain are implimented. The remaining
@@ -7,10 +15,8 @@ two 2D and 1D will be implimented in the near future.
 
 Second part called "Hadron calibration" are not compitable with CAF/AirFlow
 and will be done offline for a while.
-
-Author: Jitendra Kumar
-Contact: jkumar@andrew.cmu.edu
 """
+
 import ROOT
 from ROOT import gSystem
 from ROOT.Belle2 import CDCDedxRunGainAlgorithm, CDCDedxCosineAlgorithm, CDCDedxWireGainAlgorithm

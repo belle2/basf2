@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """This steering file shows how to use the EclDatabaseImport
    to import dummy data (as TH1) into a payload ROOT file.
 
@@ -15,11 +23,6 @@ import basf2 as b2
 import ROOT
 from ROOT.Belle2 import ECLDatabaseImporter
 
-__authors__ = ['Torben Ferber', 'Alon Hershenhorn',
-               'Frank Meier']
-__copyright__ = 'Copyright 2018 - Belle II Collaboration'
-__maintainer__ = '--'
-__emails__ = '--'
 
 if len(sys.argv) != 3:
     print('Usage: basf2 {} inputFile outputFile'.format(sys.argv[0]))

@@ -1,9 +1,13 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 //+
 // File : DQMHistAnalysisPXDCM.h
 // Description : DAQM Analysis for PXD Common Modes
-//
-// Author : Bjoern Spruck, University Mainz
-// Date : 2018
 //-
 
 #pragma once

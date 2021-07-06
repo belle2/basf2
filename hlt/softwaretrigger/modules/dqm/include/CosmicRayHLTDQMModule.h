@@ -1,9 +1,13 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 //+
 // File : CosmicRayHLTDQMModule.h
 // Description : Module to monitor the reconstruction of cosmic ray on hlt
-//
-// Author : Chunhua LI
-// Date :  19 - May - 2017
 //-
 
 #pragma once

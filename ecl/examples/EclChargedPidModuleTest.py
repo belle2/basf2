@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """This steering file tests the 'ECLChargedPID' module.
 
 Input:
@@ -25,11 +33,6 @@ Usage:
 """
 
 import basf2 as b2
-
-__author__ = 'Marco Milesi'
-__copyright__ = 'Copyright 2019 - Belle II Collaboration'
-__maintainer__ = 'Marco Milesi'
-__email__ = 'marco.milesi@unimelb.edu.au'
 
 # Create path. Register necessary modules to this path.
 mainPath = b2.create_path()

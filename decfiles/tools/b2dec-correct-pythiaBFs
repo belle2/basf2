@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """
 Helper script that reads the decay file and saves a new decay file where the automatically
 created hadronic B meson decay modes (pythia/jetset) are rescaled such that the total B meson
 BF is compatible with 1 (up to a certain precision, at the moment of this script creation O~1e-7)
 """
-__author__ = 'Stephan Duell'
-__copyright__ = '2020 - Belle II Collaboration'
-
 
 import basf2
 import argparse

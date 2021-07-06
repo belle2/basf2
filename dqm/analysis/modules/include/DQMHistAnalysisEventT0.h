@@ -1,9 +1,13 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 //+
 // File : DQMHistAnalysisEventT0.h
 // Description : module for DQM histogram analysis of trigger jitter
-//
-// Author : Giulia Casarosa (PI),
-// Date : 20181128
 //-
 
 #pragma once

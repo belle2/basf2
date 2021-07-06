@@ -1,11 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019 - Belle II Collaboration                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Andrea Fodor                               *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 // Own include
@@ -137,7 +135,7 @@ namespace Belle2 {
             m_segmentMap.insert(std::pair<int, int>(cid, 3));
             m_crystalsInSegment[3] += 1;
           }
-        } else if (cid > 1152 && cid < 7777) {
+        } else if (cid < 7777) {
           if (z > 0) {
             if (phi > 0.7853 && phi < 2.356) {
               m_segmentMap.insert(std::pair<int, int>(cid, 4));

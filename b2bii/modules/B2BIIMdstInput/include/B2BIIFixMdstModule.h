@@ -1,3 +1,10 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 //
 // $Id: B2BIIFixMdst.h 11331 2011-07-25 11:58:12Z hitoshi $
 //

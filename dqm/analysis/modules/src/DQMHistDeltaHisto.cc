@@ -1,9 +1,13 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 //+
 // File : DQMHistDeltaHisto.cc
 // Description : DQM Histogram analysis module to generate delta histograms
-//
-// Author : Boqun Wang, MPI for physics
-// Date : yesterday
 //-
 
 

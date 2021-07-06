@@ -1,6 +1,13 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # Test for some modules in the current HLT reconstruction path
-#
-# Author: Nils Braun
+
 import basf2
 from softwaretrigger.processing import add_hlt_processing
 

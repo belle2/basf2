@@ -1,15 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
- *                                                                        *
- * This module calculates shower shape variables.                         *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
- *               Guglielmo De Nardo (denardo@na.infn.it)                  *
- *               Alon Hershenhorn   (hershen@phas.ubc.ca)                 *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #pragma once
 

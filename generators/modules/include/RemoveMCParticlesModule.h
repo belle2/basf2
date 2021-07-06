@@ -1,11 +1,9 @@
 /**************************************************************************
- * Belle II detector background library                                   *
- * Copyright(C) 2011-2012  Belle II Collaboration                         *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter, Marko Petric                              *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #pragma once

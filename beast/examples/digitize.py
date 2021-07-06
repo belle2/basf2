@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 import basf2 as b2
 from optparse import OptionParser
 
@@ -12,9 +20,6 @@ from optparse import OptionParser
 # by uncommenting root output module lines
 #
 # run as: basf2 beast/examples/digitize.py -- -f inputfile -o outputfile
-#
-# Author: Luka Santelj
-# Date: 15.2.2018
 # --------------------------------------------------------------------
 
 parser = OptionParser()

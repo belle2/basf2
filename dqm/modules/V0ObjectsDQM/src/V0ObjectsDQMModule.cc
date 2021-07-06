@@ -1,9 +1,13 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 //+
 // File : V0ObjectsDQMModule.cc
 // Description : Module to monitor displaced vertices on HLT
-//
-// Author : Bryan Fulsom, PNNL
-// Date : 2019-01-17
 //-
 
 #include <dqm/modules/V0ObjectsDQM/V0ObjectsDQMModule.h>

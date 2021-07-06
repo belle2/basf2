@@ -1,9 +1,13 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 //+
 // File : DQMHistAnalysisPXDTrackCharge.h
 // Description : DQM Analysis for PXD Tracked Cluster Charges
-//
-// Author : Bjoern Spruck, University Mainz
-// Date : 2019
 //-
 
 #pragma once

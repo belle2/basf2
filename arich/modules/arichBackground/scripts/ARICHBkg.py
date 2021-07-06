@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 #
 # This is example script to run extract ARICH background relevant data
 # from prepared background samples. In runs ARICHBackground module and
@@ -8,8 +16,6 @@
 #
 # Please check and adjust input file list and method, as this example is
 # specific for background files produced by Nakayama-san.
-#
-# Author: Luka Santelj
 #
 
 import sys

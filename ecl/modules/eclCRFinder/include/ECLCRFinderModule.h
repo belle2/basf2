@@ -1,20 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
- *                                                                        *
- * Belle II Connected Region Finder (CRF). Starting with 'seed' cells     *
- * above an energy energyCut0. Add neighbouring crystals above energyCut2.*
- * If neighbouring crystal is above energyCut1, repeat this. Timing cuts  *
- * can be set for each digit type and the energy cuts can be made         *
- * background dependent using the event-by-event background measurements. *
- * Digits with failed time fits automatically pass timing cuts by default.*
- * The CRF must run once before the splitters and splitters must only use *
- * digits contained in a CR. Digits from different CRs must not be mixed. *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #pragma once

@@ -1,11 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Igal Jaegle                                              *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #include <beast/microtpc/modules/MicrotpcStudyModule.h>
@@ -470,10 +468,10 @@ void MicrotpcStudyModule::event()
     else trID = mcpart.getTrackID();
     int detNb = -1;
     int nhit = 0;
-    for (const auto& shit : SimHits) {
-      if (shit.gettkID() == trID) {
-        detNb = shit.getdetNb(); nhit++;
-        kin = shit.gettkKEnergy() / 1000;
+    for (const auto& sHit : SimHits) {
+      if (sHit.gettkID() == trID) {
+        detNb = sHit.getdetNb(); nhit++;
+        kin = sHit.gettkKEnergy() / 1000;
       }
     }
 

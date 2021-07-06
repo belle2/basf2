@@ -1,3 +1,10 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 /***********************************************************************
  * Script plots ARICH memory usage testing                             *
  *                                                                     *
@@ -11,8 +18,7 @@
  * > python3 ../utility/scripts/convert_npz_to_ASCII.py --npzfile=ARICHStandAlone_memory.npz --arrayname total_memory
  * > root -l ../utility/scripts/convert_npz_ASCII_to_root.C"(\"total_memory.dat\")"
  *                                                                     *
- *Author: Leonid Burmistrov (Fri Jun 15 22:13:34 JST 2018)             *
-***********************************************************************/
+ ***********************************************************************/
 
 //root
 #include <TROOT.h>

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-###############################################################
-#
-# Generate 100 events using KKMC+PYTHIA from generators/scripts
-#
-# Contributor(s): Torben Ferber (torben.ferber@desy.de)
-#
-###############################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 import basf2
 from generators import add_continuum_generator

@@ -1,3 +1,10 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #include "ecl/geometry/BelleLathe.h"
 
 #include "globals.hh"
@@ -881,15 +888,15 @@ G4bool BelleLathe::CalculateExtent(const EAxis A,
 
   bool res = fshape->CalculateExtent(A, bb, T, pMin, pMax);
   double srfmin = kInfinity, srfmax = -srfmin;
-  bool shit = surfhit(srfmin, srfmax);
+  bool sHit = surfhit(srfmin, srfmax);
   double diff = kCarTolerance;
   diff = 10;
   //  if (abs(pmin - pMin) > diff || abs(pmax - pMax) > diff || hit != res) {
-  if ((abs(pmin - srfmin) > diff || abs(pmax - srfmax) > diff) && shit) {
+  if ((abs(pmin - srfmin) > diff || abs(pmax - srfmax) > diff) && sHit) {
     cout << "===================================\n";
     cout << GetName() << " " << fcache.size() << " " << fphi << " " << fdphi << " " << ftwopi << "\n";
     cout << hit << " " << res << " " << b1 << " " << b2 << "\n";
-    if (shit) {
+    if (sHit) {
       cout << "ss " << srfmin << " " << srfmax << "\n";
     } else {
       cout << "ss : not in bounding box" << "\n";

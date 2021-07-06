@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 from ROOT import PyConfig
 PyConfig.IgnoreCommandLineOptions = True  # noqa
 PyConfig.StartGuiThread = False  # noqa
@@ -11,9 +19,6 @@ import uproot
 import root_pandas
 import pandas as pd
 import numpy as np
-
-__author__ = "Sam Cunliffe"
-__email__ = "sam.cunliffe@desy.de"
 
 PRESCALE_ROW = 4
 

@@ -1,20 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-########################################################
-# This is a steering
-# file which shows all usage options for the hepevt file reader module in the
-# generators package. The generated particles are taken from an input file and
-# fed through the Geant4 simulation and the output is stored in a root file.
-#
-# The different options for the HepEvtReader are explained below.
-# Uncomment/comment different lines to get the wanted settings
-#
-# NOTE: if you want to use the event numbers from the HepEvt file, have a look
-# at HepEvtReaderMaster.py.
-#
-# Example steering file - 2011 Belle II Collaboration
-########################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 import basf2
 from beamparameters import add_beamparameters

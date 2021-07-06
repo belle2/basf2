@@ -1,9 +1,14 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 //+
 // File : B2BIIMCParticlesMonitorModule.cc
 // Description : A module to plot MCParticles monitor histograms in basf2
 //
-// Contributors: Hulya Atmacan
-// Date : November 21, 2015
 //-
 
 #include <b2bii/modules/B2BIIMCParticlesMonitor/B2BIIMCParticlesMonitorModule.h>

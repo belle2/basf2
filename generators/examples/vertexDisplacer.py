@@ -1,20 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-##############################################################################
-# Example steering file using the GeneratedVertexDisplacerModule.
-# The displacer module is added between the generator and the detector
-# simulation. It displaces the decay vertex of the specified particles
-# and the production vertex of all subsequent daughters.
-#
-# Possible options include exponential, fixed and flat lifetimes. The
-# lifetime may be passed in cm (c*tau) or ns (tau). Different lifetimes
-# can be specified in case of  multiple displaced particle types.
-#
-# Can be used e.g. for signal generation in long-lived particle searches.
-#
-# Contact: sascha.dreyer@desy.de
-##############################################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 from basf2 import *
 from simulation import add_simulation

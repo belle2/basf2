@@ -1,9 +1,13 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 //+
 // File : DQMHistAnalysisExampleFlags.cc
 // Description : Example code, creates a new "flag" histo in DQM analysis
-//
-// Author : Bjoern Spruck, Univerisity Mainz
-// Date : 2017
 //-
 
 

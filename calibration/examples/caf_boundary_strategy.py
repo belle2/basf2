@@ -1,3 +1,10 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 # You will need to have data already from running
 # calibration/examples/1_create_sample_DSTs.sh or just make your own
 # and change the input data below.

@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """Dump digit information for pure CsI vs CsI(Tl)
    using 'ParticleGun' to generate single particles
    enabling pure CsI digitization
@@ -20,11 +28,6 @@ from simulation import add_simulation
 from reconstruction import add_reconstruction
 from reconstruction import add_mdst_output
 from beamparameters import add_beamparameters
-
-__authors__ = ['Guglielmo De Nardo', 'Abtin Narimani Charan']
-__copyright__ = 'Copyright 2020 - Belle II Collaboration'
-__maintainer__ = 'Abtin Narimani Charan'
-__email__ = 'abtin.narimani.charan@desy.de'
 
 
 def argparser():

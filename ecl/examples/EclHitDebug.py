@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """This steering file shows how to use 'ECLHitDebug'
    module to dump ECL-related quantities in an ntuple.
 
@@ -19,11 +27,6 @@ from simulation import add_simulation
 from reconstruction import add_tracking_reconstruction
 from reconstruction import add_ecl_modules
 
-__authors__ = ['Poyuan Chen', 'Benjamin Oberhof',
-               'Torben Ferber']
-__copyright__ = 'Copyright 2016 - Belle II Collaboration'
-__maintainer__ = 'Abtin Narimani Charan'
-__email__ = 'abtin.narimani.charan@desy.de'
 
 # Create path. Register necessary modules to this path.
 mainPath = b2.create_path()

@@ -1,19 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-##############################################################################
-# This steering file which shows all usage options for the cosmics module
-# in the generators package. The generated particles from the cosmic generator
-# are stored in a ROOT file.
-#
-# The different options for the particle gun are explained below.
-# Uncomment/comment different lines to get the wanted settings
-#
-# Example steering file - 2011 Belle II Collaboration
-#
-# Contributor(s): Torben Ferber (torben.ferber@desy.de)
-#
-##############################################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 import basf2
 

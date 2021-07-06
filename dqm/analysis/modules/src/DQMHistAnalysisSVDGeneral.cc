@@ -1,9 +1,13 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 //+
 // File : DQMHistAnalysisSVDGeneral.cc
 // Description : module for DQM histogram analysis of SVD sensors occupancies
-//
-// Author : Giulia Casarosa (PI), Gaetano De Marino (PI), Luigi Corona (PI)
-// Date : 20181127
 //-
 
 

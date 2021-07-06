@@ -1,3 +1,10 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 /*
   This macro produces ARICH background plots.
 
@@ -7,10 +14,7 @@
   It is assumed file names contain source of background ...RBB,BHWide...,...
 
   !! IMPORTANT
-  set the correct time size of each background sample!  (in line 37)
-
-  Author: Luka Santelj
-  Contributor: Manca Mrvar, Leonid Burmistrov
+  set the correct time size of each background sample!  (in line 42)
 */
 
 #include <iostream>
@@ -128,13 +132,13 @@ void BeamBack_arich(std::string path = "/gpfs/home/belle/mmanca/basf2/background
   Belle2::ARICHChannelHist* mapsNeutrons[9];
   Belle2::ARICHChannelHist* mapsDose[9];
 
-  TString tits[9] = {"RBB", "BHWide", "Touschek_HER", "Touschek_LER", "Coulomb_HER", "Coulomb_LER", "twoPhoton", "brems", "total"};
+  TString tHist[9] = {"RBB", "BHWide", "Touschek_HER", "Touschek_LER", "Coulomb_HER", "Coulomb_LER", "twoPhoton", "brems", "total"};
 
   for (int i = 0; i < 9; i++) {
-    mapsPhotons[i] = new Belle2::ARICHChannelHist("photonFlux_" + tits[i], "photons / cm^2 / s - " + tits[i], 1);
-    mapsNeutrons[i] = new Belle2::ARICHChannelHist("neutronFlux_" + tits[i],
-                                                   "1MeV eq. neutron flux /cm2 / year (x 10^{11}) - " + tits[i], 1);
-    mapsDose[i] = new Belle2::ARICHChannelHist("radDose_" + tits[i], "radiation dose [gray/year] - " + tits[i], 1);
+    mapsPhotons[i] = new Belle2::ARICHChannelHist("photonFlux_" + tHist[i], "photons / cm^2 / s - " + tHist[i], 1);
+    mapsNeutrons[i] = new Belle2::ARICHChannelHist("neutronFlux_" + tHist[i],
+                                                   "1MeV eq. neutron flux /cm2 / year (x 10^{11}) - " + tHist[i], 1);
+    mapsDose[i] = new Belle2::ARICHChannelHist("radDose_" + tHist[i], "radiation dose [gray/year] - " + tHist[i], 1);
   }
 
 

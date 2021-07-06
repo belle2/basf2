@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """This steering file creates ECL DQM histograms from
    input SeqRoot file
 
@@ -14,10 +22,6 @@ Usage:
 
 import basf2 as b2
 
-__author__ = 'Dmitry Matvienko'
-__copyright__ = 'Copyright 2019 - Belle II Collaboration'
-__maintainer__ = 'Dmitry Matvienko'
-__email__ = 'd.v.matvienko@inp.nsk.su'
 
 # Create path. Register necessary modules to this path.
 mainPath = b2.create_path()

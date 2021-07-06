@@ -9,7 +9,7 @@ import basf2
 import math
 import random
 from collections import defaultdict
-import modularAnalysis as anal
+import modularAnalysis as ma
 from ROOT import Belle2
 
 
@@ -109,13 +109,13 @@ path.add_module("EventInfoSetter", evtNumList=10)
 # and put some electrons in there
 path.add_module(Generator())
 # load these electrons
-anal.fillParticleListFromMC("e-", "", path=path)
+ma.fillParticleListFromMC("e-", "", path=path)
 # and sort them ...
-anal.rankByHighest("e-", "M", path=path)
-anal.rankByHighest("e-", "px", allowMultiRank=False, outputVariable="px_high_single", path=path)
-anal.rankByHighest("e-", "px", allowMultiRank=True, outputVariable="px_high_multi", path=path)
-anal.rankByLowest("e-", "py", allowMultiRank=False, outputVariable="py_low_single", path=path)
-anal.rankByLowest("e-", "py", allowMultiRank=True, outputVariable="py_low_multi", path=path)
+ma.rankByHighest("e-", "M", path=path)
+ma.rankByHighest("e-", "px", allowMultiRank=False, outputVariable="px_high_single", path=path)
+ma.rankByHighest("e-", "px", allowMultiRank=True, outputVariable="px_high_multi", path=path)
+ma.rankByLowest("e-", "py", allowMultiRank=False, outputVariable="py_low_single", path=path)
+ma.rankByLowest("e-", "py", allowMultiRank=True, outputVariable="py_low_multi", path=path)
 # and also check sorting
 path.add_module(RankChecker())
 
@@ -140,9 +140,9 @@ class NumBestChecker(basf2.Module):
 
 
 # create a new list
-anal.fillParticleListFromMC('e-:numBest', '', path=path)
+ma.fillParticleListFromMC('e-:numBest', '', path=path)
 # sort the list, using numBest
-anal.rankByHighest('e-:numBest', 'p', numBest=numBest_value, path=path)
+ma.rankByHighest('e-:numBest', 'p', numBest=numBest_value, path=path)
 # and check that numBest worked as expected
 path.add_module(NumBestChecker())
 

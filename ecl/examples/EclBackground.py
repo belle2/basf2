@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """This steering file is an example of how to use 'ECLBackground' module.
 There are generally 8 different data sets for each background campaign:
     - RBB HER
@@ -26,11 +34,6 @@ found here:
 import subprocess
 import basf2 as b2
 from reconstruction import add_ecl_modules
-
-__authors__ = ['Samuel Rudy de Jong', 'Torben Ferber']
-__copyright__ = 'Copyright 2017 - Belle II Collaboration'
-__maintainer__ = '--'
-__email__ = '--'
 
 # Create path. Register necessary modules to this path.
 mainPath = b2.create_path()

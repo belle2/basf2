@@ -1,10 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # Compare the length of decay description measured in number of lines
 # (excluding comments and empty lines) as well as the sum of the decay
 # mode branching fractions.
-# Authors: Kirill Chilikin, Stephan Duell
 
 import re
 import basf2

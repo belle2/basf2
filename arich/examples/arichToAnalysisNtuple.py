@@ -1,18 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-################################################################################
-#
-# This example demonstrates how to reconstruct the K_S0 decay and append detailed arich
-# information to daughter pions in the analysis output ntuple
-# As input CDST file is needed (no arich info except likelihoods is available in mdst!)
-#
-# See https://confluence.desy.de/display/BI/Usage+of+arichToNtuple+module
-# for more details, including description of all arich variables that are added to ntuple
-#
-# Contributors: Luka Santelj (Feb 2020)
-#               (luka.santelj@ijs.si)
-################################################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# This example demonstrates how to reconstruct the K_S0 decay and append #
+# detailed arich information to daughter pions in the analysis output    #
+# ntuple As input CDST file is needed (no arich info except likelihoods  #
+# is available in mdst!)                                                 #
+#                                                                        #
+# See                                                                    #
+# https://confluence.desy.de/display/BI/Usage+of+arichToNtuple+module    #
+# for more details, including description of all arich variables that    #
+# are added to ntuple                                                    #
+#                                                                        #
+##########################################################################
 
 import basf2 as b2
 import modularAnalysis as ma

@@ -1,3 +1,10 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 //-----------------------------------------------------
 //..Use muon pairs from muPairAlignment.py to fill TProfiles of energy
 //  in the most energetic crystal (e1) vs location throughout the ECL, measured in

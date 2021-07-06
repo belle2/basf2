@@ -1,15 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
- *                                                                        *
- * Description : DQM module, which fits many PXD histograms and writes    *
- *               out fit parameters in new histograms                     *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Bjoern Spruck, Peter Kodys                               *
  *                                                                        *
- * Prepared for Belle II geometry                                         *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #include "dqm/analysis/modules/DQMHistAnalysisPXDER.h"

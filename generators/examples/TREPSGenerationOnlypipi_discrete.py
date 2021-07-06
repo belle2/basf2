@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-########################################################
-# Run TREPS to generate e+e- -> e+e-pi+pi- events
-#
-# wListTable file is used and UseDiscreteAndSortedW is True.
-# W distribution of generated events will be discrete and sorted.
-# This is useful to hadronic two-photon analysis.
-#
-# Example steering file
-########################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 import basf2
 from basf2 import set_log_level, LogLevel, process, statistics

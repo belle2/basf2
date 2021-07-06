@@ -1,15 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014 - Belle II Collaboration                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Poyuan Chen                                              *
- *               Alexandre Beaulieu                                       *
- * This software is provided "as is" without any warranty.                *
  *                                                                        *
- * 7/31: Poyuan                                                           *
- * 2014/10/24: ABeaulieu: adapted from the ECL package to BEAST CsI       *
- *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #ifndef CSIGEOMETRYPAR_H
 #define CSIGEOMETRYPAR_H

@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # Example script for processing of raw data
 # It converts arich raw data to arichDigits and arichHits
 # Using "-t 1" option the cdc tracks are also reconstructed and stored into
@@ -20,9 +28,6 @@
 # "-t 1" include CDC track reconstruction (reconstructed tracks are stored into output )
 # "-a 1" store only data from events with track hit in arich
 # "-g 1" include GDL unpacker to have TRGSummary
-#
-#
-# Author: Luka Santelj
 
 import basf2 as b2
 import os

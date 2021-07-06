@@ -1,3 +1,10 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 # ECL Physics channels
 ECL_PHYSICS = [
     "filter Elab gt 0.3 plus 3 others with Elab gt 0.18 plus no clust with Ecms gt 2.0",

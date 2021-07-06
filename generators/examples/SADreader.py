@@ -1,33 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# This steering file
-# shows all options for the simulation of background events fed from SAD input
-# files.
-#
-# Please note: The SAD input file contains weighted particles, in the following
-# called 'SAD particles'. Thus, one particle in the input file doesn't
-# correspond to one 'real' particle in an event. In order to simulate the
-# background for your subdetector, you have two possibilities:
-#
-# a) Create unweighted events by setting the 'ReadMode' to 1 and 'ReadoutTime'
-# to the correct readout time of your subdetector. Then run over ALL events in
-# the input file. The result will be a ROOT file containing all particles which
-# hit your subdetector during one readout frame/cycle of your subdetector.
-#
-# b) Create weighted events by setting the 'ReadMode' to 0. Run over ALL events
-# in the input file. Each event will contain one MonteCarlo track, carrying the
-# weight information. Using this information you can then scale the result to
-# your subdetector readout time.
-#
-# Which one you choose depends on the background studies you would like to
-# perform. For example, if you are interested in the details of your
-# subdetector occupancy, it is recommended to choose a). On the other hand, if
-# you are interested in the flux or rate of the background hitting your
-# subdetector, you can choose b).
-#
-# Example steering file - 2012 Belle II Collaboration
-########################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 from basf2 import set_log_level, LogLevel, register_module, create_path, process, statistics
 

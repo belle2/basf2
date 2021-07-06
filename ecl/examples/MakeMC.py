@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """This steering file shows how to generate particle gun
    MC samples in DST root format for ECL charged PID analysis.
 
@@ -22,13 +30,6 @@ import argparse
 import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
-
-__authors__ = ['Benjamin Oberhof', 'Elisa Manoni',
-               'Caitlin MacQueen', 'Marco Milesi',
-               'Abtin Narimani Charan']
-__copyright__ = 'Copyright 2020 - Belle II Collaboration'
-__maintainer__ = 'Abtin Narimani Charan'
-__email__ = 'abtin.narimani.charan@desy.de'
 
 
 def argparser():

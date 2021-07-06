@@ -1,9 +1,13 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 //+
 // File : V0ObjectsDQMModule.h
 // Description : Module to monitor displaced vertices
-//
-// Author : Bryan Fulsom PNNL
-// Date : 2019-01-17
 //-
 
 #include <framework/core/HistoModule.h>

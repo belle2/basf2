@@ -1,29 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2020 - Belle II Collaboration                             *
- *                                                                        *
- * SVD Data Quality Monitor creates monitoring variables and pack them to *
- * the Monitoring Objects, which are used as input to the Mirabelle       *
- * on the online system to show run by run dynamic of the variables.      *
- * This module provides higher level analyses on collected SVD DQM        *
- *  histograms:                                                           *
- * - SVDExpReco/SVDDQM_StripCountsU, SVDExpReco/SVDDQM_StripCountsV       *
- * - SVDExpReco/SVDDQM_nEvents                                            *
- * - SVDEfficiency/TrackHitsU, SVDEfficiency/MatchedHitsU                 *
- * - SVDEfficiency/TrackHitsV, SVDEfficiency/MatchedHitsV                 *
- * - SVDClsTrk/SVDTRK_ClusterChargeU3, SVDClsTrk/SVDTRK_ClusterChargeV3   *
- * - SVDClsTrk/SVDTRK_ClusterChargeU456                                   *
- * - SVDClsTrk/SVDTRK_ClusterChargeV456                                   *
- * - SVDClsTrk/SVDTRK_ClusterSNRU3, SVDClsTrk/SVDTRK_ClusterSNRV3         *
- * - SVDClsTrk/SVDTRK_ClusterSNRU456, SVDClsTrk/SVDTRK_ClusterSNRV456     *
- * - SVDClsTrk/SVDTRK_ClusterTimeU3, SVDClsTrk/SVDTRK_ClusterTimeV3       *
- * - SVDClsTrk/SVDTRK_ClusterSNRU456, SVDClsTrk/SVDTRK_ClusterSNRV456     *
- * - SVDClsTrk/SVDTRK_StripMaxBinUAll, SVDClsTrk/SVDTRK_StripMaxBinVAll   *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Karol Adamczyk (Karol.Adamczyk@ifj.edu.pl)               *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #include <dqm/analysis/modules/DQMHistAnalysisSVDOnMiraBelle.h>

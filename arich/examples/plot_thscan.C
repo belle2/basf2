@@ -1,7 +1,13 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 /*
  * Plots histograms from ARICHRateCal module
  * run as: "root -l histogram_file.root plot_thscan.C"
- * By: Tomoyuki Konno
  */
 
 TCanvas* newTCanvas(const char* cname,

@@ -1,14 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # -------------------------------------------------------------------------------------
 # Example steering file for beast2 simulation
 # Builds beast2 geometry and uses particle gun module to shoot particles
 # Uncomment the lines related to the display module to show the detector geometry
 # Simulation output hits are stored into "beast_test.root"
-#
-# Author: Luka Santelj
-# Date: 15.2.2018
 # -------------------------------------------------------------------------------------
 
 import basf2 as b2

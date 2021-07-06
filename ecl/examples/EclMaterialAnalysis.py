@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """This steering file shows how to use EclDataAnalysis
    module to dump ECL related quantities in an ntuple
    starting from dst root file.
@@ -16,12 +24,6 @@ import argparse
 import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
-
-__authors__ = ['Benjamin Oberhof', 'Elisa Manoni',
-               'Abtin Narimani Charan']
-__copyright__ = 'Copyright 2020 - Belle II Collaboration'
-__maintainer__ = '--'
-__email__ = '--'
 
 
 def argparser():

@@ -1,3 +1,10 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 """
 ---------------------------------------------------------------------------
 Script to convert plots from npz format to ASCII - used for the memory testing
@@ -12,8 +19,6 @@ Script to convert plots from npz format to ASCII - used for the memory testing
 > python3 ../utility/scripts/convert_npz_to_ASCII.py --npzfile=ARICHStandAlone_memory.npz --dump
 > python3 ../utility/scripts/convert_npz_to_ASCII.py --npzfile=ARICHStandAlone_memory.npz --arrayname total_memory
 > root -l ../utility/scripts/convert_npz_ASCII_to_root.C"(\"total_memory.dat\")"
-
-Author: Leonid Burmistrov (Fri Jun 15 14:58:32 JST 2018)
 ---------------------------------------------------------------------------
 """
 

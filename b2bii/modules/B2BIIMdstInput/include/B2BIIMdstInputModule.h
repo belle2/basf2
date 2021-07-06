@@ -1,9 +1,14 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 //+
 // File : B2BIIMdstInputModule.h
 // Description : A module to read Panther record in basf2 from Belle MDST file
 //
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 16 - Feb - 2015
 //-
 
 #pragma once

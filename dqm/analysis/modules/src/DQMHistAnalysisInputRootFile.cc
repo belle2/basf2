@@ -1,10 +1,14 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 //+
 // File : DQMHistAnalysisInputRootFile.cc
 // Description : Module for offline testing of histogram analysis code.
 //               Root file containing DQM histograms can be used as input.
-//
-// Author : Boqun Wang
-// Date : Jun - 2018
 //-
 
 

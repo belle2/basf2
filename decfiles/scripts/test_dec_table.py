@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Descriptor: script to test decay tables
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -10,13 +9,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-"""
-<header>
-  <output>../test.dst.root</output>
-  <contact>morda@pd.infn.it</contact>
-</header>
-"""
-
+# Descriptor: script to test decay tables
 
 import basf2 as b2
 from simulation import add_simulation

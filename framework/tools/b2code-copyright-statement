@@ -68,7 +68,7 @@ if __name__ == "__main__":
             continue
 
         # Ignore the files that have the following extensions
-        bad_extensions = ('.root', '.sroot', '.xml', '.rst', '.txt', '.dat', '.data', '.j2', '.jinja2', '.json', '.yaml', '.sh', '.svg', '.csv', '.png', '.pdf', '.jpg', '.ipynb', '.dec', '.log', '.out', '.err', '.pdl', '.md', '.rstinclude', '.drawio', '.limits', '.fit', '.html', '.js', '.css', '.map', '.pptx', '.docx', '.raw', '.hwd', '.conf', '.yml', '.pyc', '.woff', '.woff2', '.eot', '.ttf', '.mac')
+        bad_extensions = ('.root', '.sroot', '.xml', '.rst', '.txt', '.dat', '.data', '.j2', '.jinja2', '.json', '.yaml', '.sh', '.svg', '.csv', '.png', '.pdf', '.jpg', '.ipynb', '.dec', '.log', '.out', '.err', '.pdl', '.md', '.rstinclude', '.drawio', '.limits', '.fit', '.html', '.js', '.css', '.map', '.pptx', '.docx', '.raw', '.hwd', '.conf', '.yml', '.pyc', '.woff', '.woff2', '.eot', '.ttf', '.mac', '.alg', '.inp', '.oup', '.rb', '.lgc', '.vhd', '.kumac', '.v', '.opi', '.coe', '.patch')
         if file_name.lower().endswith(bad_extensions):
             continue
 

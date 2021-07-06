@@ -15,9 +15,6 @@
 # Evaluation of VXDTF1.
 #
 # Usage: basf2 evaluateVXDTF1.py -i <inputFileName>
-#
-#
-# Contributors: Jonas Wagner
 #####################################################################
 
 

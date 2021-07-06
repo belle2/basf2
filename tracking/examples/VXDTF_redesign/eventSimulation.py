@@ -30,8 +30,6 @@
 # e.g: basf2 'eventSimulation.py 12354 ./datadir/'
 # will result in setting the random seed to 12354 and the output will
 # be written to './datadir/'
-#
-# Contributors: Jonas Wagner, Felix Metzner, Thomas Lueck
 #####################################################################
 
 

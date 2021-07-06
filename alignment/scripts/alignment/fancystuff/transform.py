@@ -16,7 +16,6 @@ The base class is Transform.
 
 
 """
-__author__ = 'swehle'
 
 
 from alignment.fancystuff.settings import ProTool

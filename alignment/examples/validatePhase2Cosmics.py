@@ -13,8 +13,6 @@
 
 # title           : 3_ValidationCosmics.py
 # description     : Validation of cosmic tracks in phase II
-# author          : Jakub Kandra (jakub.kandra@karlov.mff.cuni.cz)
-# date            : 8. 2. 2018
 
 # *****************************************************************************
 

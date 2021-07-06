@@ -9,12 +9,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-"""
-Created on Sun Feb  8 12:39:00 2015
-Plot (mis)alignment of PXD and SVD
-@author: kvasnicka
-"""
-
 import numpy as np
 import pandas as pd
 import math

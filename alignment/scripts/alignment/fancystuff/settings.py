@@ -14,7 +14,6 @@
 The logger for all classes in the distribution is defined here.
 
 """
-__author__ = 'swehle'
 
 import logging
 import matplotlib.pyplot as plt

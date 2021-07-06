@@ -14,7 +14,6 @@
 In the tools collection all plotting tools are gathered.
 
 """
-__author__ = 'swehle'
 
 from alignment.fancystuff import transform
 from alignment.fancystuff.settings import create_figure

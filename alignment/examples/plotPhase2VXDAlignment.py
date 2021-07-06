@@ -12,11 +12,6 @@
 
 # title           : plotVXDALignmentPayloadPhase2.py
 # description     : Produce png file loaded from localdb for phase 2
-# author          : Jakub Kandra (jakub.kandra@karlov.mff.cuni.cz)
-# date            : 8. 2. 2018
-
-# *****************************************************************************
-
 
 import sys
 import numpy as np

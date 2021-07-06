@@ -72,7 +72,7 @@ void PXDRawHitMaskingModule::event()
     // Zero-suppression cut
     if (it.getCharge() < m_0cut) continue;
 
-    // We need some protection against crap data
+    // We need some protection against bad data
     if (sensorID.getLayerNumber() && sensorID.getLadderNumber() && sensorID.getSensorNumber()) {
       if (PXDPixelMasker::getInstance().pixelOK(sensorID, it.getColumn(), it.getRow())) {
         m_pxdRawHitOut.appendNew(it);

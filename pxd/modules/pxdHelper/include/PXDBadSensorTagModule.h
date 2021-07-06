@@ -22,7 +22,7 @@ namespace Belle2 {
     /** The PXD bad sensor tagger module.
      *
      * This module flags sensors/modules (by DHE id) with broken data content
-     * (e.g. daq says data is o.k., but content is crap
+     * (e.g. daq says data is o.k., but content is bad)
      *
      */
 

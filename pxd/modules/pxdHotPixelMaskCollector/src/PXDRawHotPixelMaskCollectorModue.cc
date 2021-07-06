@@ -119,7 +119,7 @@ void PXDRawHotPixelMaskCollectorModule::collect() // Do your event() stuff here
     }
     if (!usability[sensorID]) continue;// masked as bad sensor data
 
-    // We need some protection against crap data
+    // We need some protection against hot data
     if (!goodHit(rawhit)) continue;
 
     // Zero-suppression cut

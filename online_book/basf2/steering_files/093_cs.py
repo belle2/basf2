@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import basf2 as b2
 import modularAnalysis as ma
 import stdPi0s
@@ -43,18 +42,17 @@ ma.appendROEMasks(list_name="B0", mask_tuples=[cleanMask], path=main)
 
 ma.buildContinuumSuppression(list_name="B0", roe_mask="cleanMask", path=main)
 
-simpleCSVariables = [
-    "R2",
-    "thrustBm",
-    "thrustOm",
-    "cosTBTO",
-    "cosTBz",
-]
+main.add_module(
+    "MVAExpert",
+    listNames=["B0"],
+    extraInfoName="ContinuumProbability",
+    identifier="MVAFastBDT.root",  # name of the weightfile used
+)
 
 ma.variablesToNtuple(
     decayString="B0",
-    variables=simpleCSVariables + ["Mbc", "isContinuumEvent"],
-    filename="ContinuumSuppression.root",
+    variables=["ContinuumProbability", "isContinuumEvent"],
+    filename="ContinuumSuppression_applied.root",
     treename="tree",
     path=main,
 )

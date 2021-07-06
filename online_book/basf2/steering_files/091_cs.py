@@ -9,15 +9,15 @@ main = b2.create_path()
 ma.inputMdstList(
     environmentType="default",
     filelist=[
-        b2.find_file("starterkit/2021/B02ks0pi0_sample.root",
-                     data_type="examples"),
-        b2.find_file("starterkit/2021/uubar_sample.root",
-                     data_type="examples"),
+        b2.find_file(
+            "starterkit/2021/B02ks0pi0_sample.root", data_type="examples"
+        ),
+        b2.find_file("starterkit/2021/uubar_sample.root", data_type="examples"),
     ],
     path=main,
 )
 
-stdPi0s.stdPi0s(path=main, listtype="eff60_Jan2020")
+stdPi0s.stdPi0s(path=main, listtype="eff60_May2020")
 ma.fillParticleList(
     decayString="pi+:good", cut="chiProb > 0.001 and pionID > 0.5", path=main
 )
@@ -27,7 +27,7 @@ ma.reconstructDecay(
 )
 
 ma.reconstructDecay(
-    decayString="B0  -> K_S0 pi0:eff60_Jan2020",
+    decayString="B0  -> K_S0 pi0:eff60_May2020",
     cut="5.1 < Mbc < 5.3 and abs(deltaE) < 2",
     path=main,
 )
@@ -74,7 +74,7 @@ simpleCSVariables = [
     "CleoConeCS(6)",
     "CleoConeCS(7)",
     "CleoConeCS(8)",
-    "CleoConeCS(9)"
+    "CleoConeCS(9)",
 ]
 
 ma.variablesToNtuple(

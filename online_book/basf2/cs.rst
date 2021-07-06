@@ -6,13 +6,14 @@ Continuum Suppression (CS)
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**:
+    **Teaching**: 1 hour
 
-    **Exercises**:
+    **Exercises**: 1,5 hours
 
     **Prerequisites**:
 
-    	* None
+    	* :ref:`onlinebook_basf2_introduction` lesson
+    	* :ref:`onlinebook_roe` lesson
 
     **Questions**:
 
@@ -320,31 +321,64 @@ Fortunately, there is a solution to this: Boosted Decision Trees!
 Continuum suppression using Boosted Decision Trees
 __________________________________________________
 
-Boosted Decision Trees (BDT) are a specific type of a machine learning model used for classification tasks. Its goal is to predict the value of a target variable based on the values of the input variables.
+Boosted Decision Trees (BDT) are a specific type of a machine learning model
+used for classification tasks. Its goal is to predict the value of a target
+variable based on the values of the input variables.
 
-The name "decision tree" refers to the general structure: the classification is done with a series of "decisions". Decisions are logical operations (like ">", "<", "=", etc.) on the input variables of each data point, by the outcome of which the data points are separated into groups. Each outcome has a separate line of decisions following it. Maximum number of such decisions is called the "tree depth".
+The name "decision tree" refers to the general structure: the classification is
+done with a series of "decisions". Decisions are logical operations (like ">",
+"<", "=", etc.) on the input variables of each data point, by the outcome of
+which the data points are separated into groups. Each outcome has a separate
+line of decisions following it. Maximum number of such decisions is called the
+"tree depth".
 
-The word "boosted" refers to the specific way the tree is formed: gradient boosting. Gradient boosting means, that a final tree is made by combining a series of smaller trees of a fixed depth.
+The word "boosted" refers to the specific way the tree is formed: gradient
+boosting. Gradient boosting means, that a final tree is made by combining a
+series of smaller trees of a fixed depth.
 
-The reader is welcome to consult the Wikipedia pages on `Decision Tree Learning <https://en.wikipedia.org/wiki/Decision_tree_learning>`_ and `Gradient Tree Boosting <https://en.wikipedia.org/wiki/Gradient_boosting#Gradient_tree_boosting>`_ for a more detailed overview. 
+.. seealso:: The reader is welcome to consult the Wikipedia pages on `Decision
+    Tree Learning <https://en.wikipedia.org/wiki/Decision_tree_learning>`_ and 
+    `Gradient Tree Boosting 
+    <https://en.wikipedia.org/wiki/Gradient_boosting#Gradient_tree_boosting>`_
+    for a more detailed overview. The details on the implementation of the
+    FastBDT at Belle are in this `article
+    <https://link.springer.com/article/10.1007/s41781-017-0002-8>`_ and the 
+    source can be found `here <https://github.com/thomaskeck/FastBDT/>`_.  
 
-In our case BDT is used directly to distinguish between continuum and non-continuum events. The target variable is the "continuum probability" - the probability of an event being a continuum event. The input variables can be in principle any varible that distinguishes between continuum and non-continuum events. The recommended variables and the most used are the ones introduced in the previous lesson as well as others from the :ref:`analysis/doc/ContinuumSuppression:Continuum Suppression` variable group in the :ref:`analysis/doc/index-01-analysis:Variables`. As BDT is a supervised machine learning method, there are three steps needed to put it to use:
+In our case BDT is used directly to distinguish between continuum and
+non-continuum events. The target variable is the "continuum probability" - the
+probability of an event being a continuum event. The input variables can be in
+principle any varible that distinguishes between continuum and non-continuum
+events. The recommended variables and the most used are the ones introduced in
+the previous lesson as well as others from the
+:ref:`analysis/doc/ContinuumSuppression:Continuum Suppression` variable group in
+the :ref:`analysis/doc/index-01-analysis:Variables`. As BDT is a supervised
+machine learning method, there are three steps needed to put it to use:
 
 1. Create learning dataset.
 2. Make the algorithm "learn" and output a decision tree, that we can use.
 3. Run the raw data over a trained decision tree.
 
-When passing data over the last step, the BDT will write out a continuum probability, which then can be stored in the Ntuples. The actual cutting out of the continuum at the end narrows down to putting a selection criteria on the continuum probability. 
+When passing over data in the last step, the BDT will write out a continuum
+probability, which then can be stored in the Ntuples. The actually remove
+continuum events, simply add a cut on the continuum probability at the end. 
 
 .. admonition:: Exercise
     :class: exercise stacked
     
-    In the three initial exercises of this chapter you've learned how to create Ntuples for continuum suppression. For creating the Ntuples for the BDT training one would need to do the very same, but normally more different continuum suppression variables are needed. This time create the dataset following the procedure from previous exercises, but also include KSFW moments and CLEO cones into the Ntuples.
+    In the three initial exercises of this chapter you've learned how to create
+    Ntuples for continuum suppression. For creating the Ntuples for the BDT training
+    one would need to do the very same, but normally more different continuum
+    suppression variables are needed. This time create the dataset following the
+    procedure from previous exercises, but also include KSFW moments and CLEO cones
+    into the Ntuples.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    You can use the code from the previous exercises. You would only have to add the new variables to the ``simpleCSVariables``. See the documentation on the variables in :ref:`analysis/doc/ContinuumSuppression:Continuum suppression`. 
+    You can use the code from the previous exercises. You would only have to add
+    the new variables to the ``simpleCSVariables``. See the documentation on the
+    variables in :ref:`analysis/doc/ContinuumSuppression:Continuum suppression`. 
 
 
 .. admonition:: Solution
@@ -353,26 +387,138 @@ When passing data over the last step, the BDT will write out a continuum probabi
     .. literalinclude:: steering_files/091_cs.py
                :language: python
 
+
 .. admonition:: Exercise
     :class: exercise stacked
+    
+    Let us now create the script to train BDT using Ntuples that we've just
+    created. The training tools are implemented in basf2 within the
+    :ref:`mva/doc/index-01-mva:MVA package`. One needs to configure the global
+    options and then perform the training (see :ref:`mva/doc/index-01-mva:globaloptions`
+    and :ref:`mva/doc/index-01-mva:Fitting / Howto perform a training`
+    respectively). Using the examples given in the links write down the script
+    to perform the training.
+    
+.. admonition:: Hint
+    :class: toggle xhint stacked
 
-    Let us now create the script to train BDT using Ntuples that we've just created. The training tools are implemented in basf2 within the :ref:`mva/doc/index-01-mva:MVA package`. One needs to configure the global options and then perform the training (see :ref:`mva/doc/index-01-mva:globaloptions` and :ref:`mva/doc/index-01-mva:Fitting / Howto perform a training` respectively). Using the examples given in the links write down the script to perform the training.
+    The training script does not require creating a basf2 path and hence has no
+    `basf2.process()` at the end. The script is sufficient when the
+    `basf2_mva.teacher()` is defined.
+
 .. admonition:: Solution
     :class: toggle solution
 
     .. literalinclude:: steering_files/092_cs.py
                 :language: python
 
-To use the trained weights one should put the MVA-expert module after building the continuum suppression in the main steering file. In our case this would look like this:
+To use the trained weights one should put the MVA-expert module after building
+the continuum suppression in the main steering file. In our case this looks
+like this:
 
 .. code-block:: python
 
-    path.add_module('MVAExpert',
-             listNames=['B0'],
-             extraInfoName='ContinuumProbability',
-             identifier='MVAFastBDT.root')
+    path.add_module(
+         "MVAExpert",
+         listNames=["B0"],
+         extraInfoName="ContinuumProbability",
+         identifier="MVAFastBDT.root"
+         )
 
-This would create the variable `extraInfo(ContinuumProbability)`, which should be added as an output variable to the Ntuples. The actual suppression then narrows down to putting a cut on the `extraInfo(ContinuumProbability)` in the very same way that we previously did a cut on R2 in previous exercise. 
+This would create the variable :b2:var:`extraInfo(ContinuumProbability)`, which
+should be added as an output variable to the Ntuples. The actual suppression
+then narrows down to putting a cut on the :b2:var:`extraInfo(ContinuumProbability)`
+in the very same way that we previously did a cut on R2 in previous exercise. 
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    Create a steering file that runs over the data and outputs the continuum
+    probability into the Ntuples. Use the data files and reconstruction from the
+    previous exercises.
+    
+    Plot the distribution of the :b2:var:`extraInfo(ContinuumProbability)`
+    for continuum and non-continuum events, as defined by the `isContinuumEvent` 
+    (similarly to what was done before with :b2:var:`R2`).
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    The steering file would be same as in the previous exercises, just with the path.add_module("MVAExpert", ...)
+    added at the end. Don't forget to replace the :b2:var:`path` to :b2:var:`main` or 
+    whatever is the name of your basf2 path
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    The plotting script would be the same, as for R2 in the previous exercises,
+    but with the `R2` being replaced with continuum probability. Be aware, that
+    upon writing down into the Ntuples "(" and ")" get converted into "__bo" and 
+    "__bc" respectively, so the actual name for the continuum probability variable
+    would be ``extraInfo__boContinuumProbability__bc`` and **NOT**
+    ``extraInfo(ContinuumProbability)``
+
+    You can always check the content of the dataframe into which you import data
+    from a root file by simply writing its name in a new code block of a jupyter notebook
+    or by running this code snippet:
+
+    .. code-block:: python
+
+        import pandas as pd
+        for col in <yourdataframename>.columns:
+        print(col)
+
+.. admonition:: Solution 
+    :class: toggle solution
+
+    The steering file:
+
+    .. literalinclude:: steering_files/093_cs.py
+        :language: python
+    
+    The plotting code:
+
+    .. code-block:: python
+
+        # Include this only if running in a Jupyter notebook
+        %matplotlib inline
+
+        import matplotlib.pyplot as plt
+        from root_pandas import read_root
+
+        df = read_root('ContinuumSuppression_applied.root')
+
+        fig, ax = plt.subplots()
+
+        signal_df = df.query('(isContinuumEvent == 0.0)')
+        continuum_df = df.query('(isContinuumEvent == 1.0)')
+
+        n, bins, patches = ax.hist(signal_df['extraInfo__boContinuumProbability__bc'], bins=30, range=(0, 1), label='Not Continuum', histtype='step')
+        n, bins, patches = ax.hist(continuum_df['extraInfo__boContinuumProbability__bc'], bins=30, range=(0, 1), label='Continuum', histtype='step')
+        ax.set_xlabel('ContinuumProbability')
+        ax.set_ylabel('Total number of candidates')
+        ax.legend()
+        fig.savefig('ContinuumProbability.pdf')
+    
+    The resulting plot should look similar to this one:
+
+    .. figure:: figs/ContinuumProbability_uubar.png
+        :width: 40em
+        :align: center
+
+
+In these exercises we've used continuum suppression on files, that we were
+originally training the BDT on. Therefore the performance of the continuum 
+suppression with this BDT training weightfile is expected to be better in this
+particular dataset, than on the datasets generated independently.
+
+Normally in an analysis a smaller dataset is used to train the BDT. The training
+dataset should be large enough for the performance on the trained and testing 
+data to be roughly the same. Once this is achieved, one would then use the trained
+weightfile further on in the analysis to apply the continuum suppression.
+
+There are exceptions, when a loose R2 cut is used (e.g. in this `Belle II paper <https://arxiv.org/abs/2008.08819>`_ ).
+This might be done for practical reasons such as dealing with a low amount of data. 
 
 .. include:: ../lesson_footer.rstinclude
 

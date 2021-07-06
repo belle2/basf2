@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 ########################################################
 #
 #  This steering file shows how to correctly "load"
@@ -14,9 +22,6 @@
 #
 #  Note that the KLMMuidLikelihood variables are intended
 #  to be used by experts for calibration studies!
-#
-#  Contact: Giacomo De Pietro (2018)
-#           giacomo.depietro@roma3.infn.it
 #
 ########################################################
 

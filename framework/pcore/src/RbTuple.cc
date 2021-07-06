@@ -1,10 +1,10 @@
-//+
-// File : rbtuple.cc
-// Description : Collect histograms from multiple processes
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 21 - Apr - 2009
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include <framework/core/HistoModule.h>
 #include <framework/pcore/RbTuple.h>

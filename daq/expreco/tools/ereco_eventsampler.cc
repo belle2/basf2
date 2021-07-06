@@ -1,11 +1,10 @@
-//+
-// File : ereco_eventsampler.cc
-// Description : Sample events from each ERECO processing nodes and
-//               put them in a ring buffer
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 14 - May - 2017
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #include <string>
 
 #include <stdio.h>

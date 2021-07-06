@@ -1,6 +1,13 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #include "daq/slc/nsm/NSMMessage.h"
 
-// 20191004 nakao
+// 20191004
 // duplicating the NSM2 library function in a user function
 // NSMMessage::read(NSMcontext* nsmc)
 // is really a bad idea, need to be revised.

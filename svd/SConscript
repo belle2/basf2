@@ -5,6 +5,7 @@ env['LIBS'] = [
     'genfit2', '$ROOT_LIBS', 'Geom', 'vxd', 'vxd_dbobjects',
     'vxd_dataobjects', 'mva_dataobjects',
     'svd_dataobjects', 'mdst_dataobjects',
+    'simulation_dataobjects',
     'calibration','calibration_dataobjects', 
 ]
 

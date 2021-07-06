@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# ------------------------------------------------------------
-#
-# Minimal steering file to simulate the awesome detector
-#
-# Contributors: Martin Ritter
-#               Giacomo De Pietro
-#               Umberto Tamponi
-#
-# ------------------------------------------------------------
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+'''
+Minimal steering file to simulate the awesome detector.
+'''
 
 import basf2 as b2
 

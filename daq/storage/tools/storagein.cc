@@ -1,10 +1,10 @@
-//+
-// File : rawfile2rb.cc
-// Description : Read raw data dump file and put record in RingBuffer
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 25 - Sep - 2013
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include <unistd.h>
 #include <cstdlib>

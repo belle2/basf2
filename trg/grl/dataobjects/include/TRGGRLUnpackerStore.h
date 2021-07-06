@@ -1,15 +1,11 @@
-//-----------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------
-// Filename : TRGGRLUnpackerStore.h
-// Section  : TRG GRL
-// Owner    : Yun-Tsung Lai
-// Email    : ytlai@post.kek.jp
-//-----------------------------------------------------------
-// Description : A dataobject for TRGGRLUnpacker.
-//-----------------------------------------------------------
-// $Log$
-//-----------------------------------------------------------
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 #ifndef TRGGRLUNPACKERSTORE_H
 #define TRGGRLUNPACKERSTORE_H
 

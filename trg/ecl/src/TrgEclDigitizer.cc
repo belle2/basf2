@@ -1,16 +1,11 @@
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : TrgEclDigitizer.cc
-// Section  : TRG ECL
-// Owner    : InSoo Lee/Yuuji Unno
-// Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
-//---------------------------------------------------------------
-// Description : A class to represent TRG ECL
-//---------------------------------------------------------------
-// $Log$
-// 2017-02-16 : v01
-//---------------------------------------------------------------
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 

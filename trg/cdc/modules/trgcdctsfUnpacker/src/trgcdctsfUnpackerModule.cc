@@ -1,15 +1,10 @@
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : trgcdctsfUnpackerModule.cc
-// Section  : TRG CDCTSF
-// Owner    :
-// Email    :
-//---------------------------------------------------------------
-// Description : TRG CDCTSF Unpacker Module
-//---------------------------------------------------------------
-// 1.00 : 2017/07/26 : First version
-//---------------------------------------------------------------
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include <trg/cdc/modules/trgcdctsfUnpacker/trgcdctsfUnpackerModule.h>
 #include <bitset>

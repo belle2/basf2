@@ -1,6 +1,13 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 // revisions
 //
-// 20191119 nakao - following currently unused functions are removed
+// 20191119 - following currently unused functions are removed
 // void NSMCommunicator::callContext()
 //   handling nsmlib_recv inside a user program is against the usage of NSM2
 // const std::string NSMCommunicator::getNodeHost(const std::string& nodename)

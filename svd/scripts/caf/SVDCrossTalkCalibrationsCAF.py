@@ -1,8 +1,14 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 ############################################################
 # Python script to test the collector and
 # algorithm function to port SVDCrossTalkCalibrations to CAF
-#
-# James Webb (Nov. 2019)
 ############################################################
 
 import basf2 as b2

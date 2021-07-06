@@ -1,11 +1,10 @@
-//+
-// File : MsgHandler.cc
-// Description : Encode/Decode EvtMessage
-//
-// Author : SooHyung Lee, Ryosuke Itoh
-// Date : 31 - Jul - 2008
-// Modified : 4 - Jun - 2010
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #pragma once
 

@@ -1,10 +1,10 @@
-//+
-// File : SeqRootMerger.cc
-// Description : Module to receive data from eb2rx and store online disk
-//
-// Author : Tomoyuki Konno, Tokyo Metropolitan University
-// Date : 16 - Oct - 2013
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include <daq/storage/modules/SeqRootMergerModule.h>
 

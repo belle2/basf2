@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # Simple basf2 steering file that creates mc file with PXDSimHits and
 # EventMetaData needed for PXD gain calibration.
 #
@@ -15,8 +23,6 @@
 # for run=3360 in exp=3 being part of the phase2 campaign.
 #
 # basf2 create_mcrun.py -- --tag='Calibration_Offline_Development'  --expNo=3 --runNo=3360 --setNo=0
-#
-# author: benjamin.schwenker@phys.uni-goettingen.de
 
 
 import glob

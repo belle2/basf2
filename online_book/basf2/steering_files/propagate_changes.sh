@@ -12,8 +12,6 @@
 # IMPORTANT NOTE: THIS IS A BIT FRAGILE, SO MAKE SURE TO CHECK
 # THAT THIS SCRIPT WORKS AS INTENDED!
 
-# Contributors: Kilian Lieret
-
 changed_file=$1
 target_files="${@:2}"
 tmp_patch_name="patch.tmp"

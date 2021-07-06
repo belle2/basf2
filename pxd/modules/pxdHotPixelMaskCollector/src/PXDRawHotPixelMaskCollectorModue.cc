@@ -1,11 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Benjamin Schwenker, Peter Kodys                          *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #include <pxd/modules/pxdHotPixelMaskCollector/PXDRawHotPixelMaskCollectorModule.h>
@@ -121,7 +119,7 @@ void PXDRawHotPixelMaskCollectorModule::collect() // Do your event() stuff here
     }
     if (!usability[sensorID]) continue;// masked as bad sensor data
 
-    // We need some protection against crap data
+    // We need some protection against hot data
     if (!goodHit(rawhit)) continue;
 
     // Zero-suppression cut

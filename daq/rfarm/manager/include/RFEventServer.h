@@ -1,13 +1,12 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #ifndef RFEVENTSERVER_H
 #define RFEVENTSERVER_H
-//+
-// File : RFEventServer.h
-// Description : Receive events from EVB1 and distribute them
-//               to processing nodes
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 24 - June - 2013
-//-
 
 #include <string>
 

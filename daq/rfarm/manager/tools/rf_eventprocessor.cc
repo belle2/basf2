@@ -1,12 +1,10 @@
-//+
-// File : RFEventServer.cc
-// Description : Receive data from event builder 1 and distribute them to
-//               Processing nodes
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 24 - June - 2013
-// Daet : 17 - Oct - 2013, Special version for DESY test nodes
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 //#define DESY
 

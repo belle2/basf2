@@ -1,17 +1,10 @@
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : TRGECLRawdataAnalysisModule.cc
-// Section  : TRG ECL
-// Owner    : InSoo Lee / Yuuji Unno / SungHyun Kim
-// Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp / sunghun.kim@belle2.org
-//---------------------------------------------------------------
-// Description : A trigger module for TRG ECL
-//---------------------------------------------------------------
-// 1.00 : 2017/08/01 : ECL Trigger Raw data analyzer.
-//                     Save Cluster information
-//                     using  Unpacker version 1.1
-//---------------------------------------------------------------
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 //trg package headers
 #include "trg/trg/Debug.h"

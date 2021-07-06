@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """
 SVD Database importer.
 Script to Import Calibrations into a local DB
@@ -84,7 +92,6 @@ run = int(run)
 
 class dbImporterModule(b2.Module):
     """
-    :author: Laura Zani
     Module to call the importer methods for the payloads creation from XML file
     :param calibfile: path to the xml file containing the local calibrations
     :type calibfile: string

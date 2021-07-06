@@ -1,18 +1,12 @@
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : trgcdctsfUnpackerModule.h
-// Section  : TRG TRG
-// Owner    :
-// Email    :
-//---------------------------------------------------------------
-// Description : TRG TRG Unpacker Module
-//---------------------------------------------------------------
-// 1.00 : 2017/07/28 : First version
-//---------------------------------------------------------------
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
-#ifndef TRGCDCTSFUNPACKER_H
-#define TRGCDCTSFUNPACKER_H
+#pragma once
 
 #include <string>
 
@@ -1890,5 +1884,3 @@ namespace Belle2 {
     };
   }
 } // end namespace Belle2
-
-#endif // TRGCDCTSFUnpackerModule_H

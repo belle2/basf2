@@ -1,10 +1,10 @@
-//+
-// File : rf_monitor.cc
-// Description : Monitors data flow in RFARM using NSM
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 26 - Nov - 2013
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include <cstdlib>
 #include <cstring>

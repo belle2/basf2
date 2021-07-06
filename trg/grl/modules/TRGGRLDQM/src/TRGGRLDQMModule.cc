@@ -1,15 +1,11 @@
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : TRGGRLDQMModule.cc
-// Section  : TRG GRL
-// Owner    : Yun-Tsung Lai
-// Email    : ytlai@post.kek.jp
-//---------------------------------------------------------------
-// Description : DQM module for TRGGRL
-//---------------------------------------------------------------
-// 1.00 : 2019/06/14 : First version
-//---------------------------------------------------------------
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 #include <trg/grl/modules/TRGGRLDQM/TRGGRLDQMModule.h>
 
 #include <framework/datastore/StoreObjPtr.h>

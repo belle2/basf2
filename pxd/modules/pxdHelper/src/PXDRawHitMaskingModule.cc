@@ -1,11 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019 - Belle II Collaboration                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Bjoern.Spruck@belle2.org                                 *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #include <pxd/modules/pxdHelper/PXDRawHitMaskingModule.h>
@@ -74,7 +72,7 @@ void PXDRawHitMaskingModule::event()
     // Zero-suppression cut
     if (it.getCharge() < m_0cut) continue;
 
-    // We need some protection against crap data
+    // We need some protection against bad data
     if (sensorID.getLayerNumber() && sensorID.getLadderNumber() && sensorID.getSensorNumber()) {
       if (PXDPixelMasker::getInstance().pixelOK(sensorID, it.getColumn(), it.getRow())) {
         m_pxdRawHitOut.appendNew(it);

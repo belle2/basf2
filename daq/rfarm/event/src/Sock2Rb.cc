@@ -1,10 +1,10 @@
-//+
-// File : Sock2Rb.cc
-// Description : Receive events from Socket and place them in Rbuf
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 26 - Apr - 2012
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include "daq/rfarm/event/Sock2Rb.h"
 

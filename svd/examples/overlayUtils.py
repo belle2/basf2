@@ -1,18 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 #############################################################
 #
 # Test script to produce SVD DQM plots
-#
-# Author:  Giulia Casarosa
 #
 # Usage: basf2 overlayUtils.py [cosmics, xTalk, user-defined]
 #        user-defined rootfiles are also usable
 #        but you need to specify the path to the rootfiles as
 #        third argument of overlay_svd_data()
 #
-# 2020 Belle II Collaboration
 #############################################################
 
 import sys

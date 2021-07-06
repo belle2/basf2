@@ -1,16 +1,11 @@
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : TrgEclDigitizer.h
-// Section  : TRG ECL
-// Owner    : InSu Lee / Yuuji Unno
-// Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
-//---------------------------------------------------------------
-// Description : A class to represent TRG ECL
-//---------------------------------------------------------------
-// $Log$
-// 2017-02-16 : v01
-//---------------------------------------------------------------
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 #pragma once
 
 #include <TObject.h>
@@ -76,9 +71,9 @@ namespace Belle2 {
     double TCTiming_tot[576];
 
     // background TC Energy [GeV]
-    double TCBGEnergy[576][80];
+    // double TCBGEnergy[576][80];
     // backgrond TC Timing [GeV]
-    double TCBGTiming[576][80];
+    // double TCBGTiming[576][80];
 
     /** Input  TC energy[GeV] */
     double TCRawEnergy[576][60];

@@ -1,15 +1,10 @@
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Filename : TRGArea2D.h
-// Section  : TRG
-// Owner    : Yoshihito Iwasaki
-// Email    : yoshihito.iwasaki@kek.jp
-//-----------------------------------------------------------------------------
-// Description : A class to represent a 2D area.
-//-----------------------------------------------------------------------------
-// $Log$
-//-----------------------------------------------------------------------------
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include "trg/trg/Area2D.h"
 

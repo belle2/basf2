@@ -1,15 +1,10 @@
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Filename : TRGGRLMatch.cc
-// Section  : TRG GRL
-// Owner    : Yoshihito Iwasaki
-// Email    : yoshihito.iwasaki@kek.jp
-//-----------------------------------------------------------------------------
-// Description : A class to represent a track helix parameter in Belle style
-//-----------------------------------------------------------------------------
-// $Log$
-//-----------------------------------------------------------------------------
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include "trg/trg/Signal.h"
 #include "trg/cdc/Track.h"

@@ -1,24 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """
-<header>
-  <contact>thomas.hauth@kit.edu</contact>
-  <output>Selected via command line</output>
-  <description>Generic script to run the tracking validation code on-top of a root file containing
-  simulated events. This can speed up the development process allows for an easier reproducibility
-  in single events.
+Generic script to run the tracking validation code on-top of a root file containing
+simulated events. This can speed up the development process allows for an easier reproducibility
+in single events.
 
-  Example to run only the cellular automaton track finder in the CDC:
+Example to run only the cellular automaton track finder in the CDC:
 
-  python tracking/examples/TrackingValidation.py -i <input.root> -o <output.root> -m TrackFinderCDCAutomaton
+python tracking/examples/TrackingValidation.py -i <input.root> -o <output.root> -m TrackFinderCDCAutomaton
 
-  Example to run the full reconstruction:
+Example to run the full reconstruction:
 
-  python tracking/examples/TrackingValidation.py -i <input.root> -o <output.root> -m FullReco
-
-  </description>
-</header>
+python tracking/examples/TrackingValidation.py -i <input.root> -o <output.root> -m FullReco
 """
 
 import ROOT

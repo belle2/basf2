@@ -1,11 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter                                            *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #include <framework/modules/core/TheKillerModule.h>
@@ -77,7 +75,7 @@ void TheKillerModule::event()
     case EMethod::c_exit:
       std::exit(m_parameter);
     case EMethod::c_exception:
-      throw std::runtime_error("DIE! DIE! DIE!");
+      throw std::runtime_error("This is a runtime error kindly provided by TheKiller module.");
     case EMethod::c_signal:
       if (raise(m_parameter) != 0) B2FATAL("Invalid signal number" << LogVar("signal", m_parameter));
       break;

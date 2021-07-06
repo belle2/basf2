@@ -1,22 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+# ------------------------------------------------------------------------
+# Module to study the features of the double pulse used for the TOP calibration.
+# To be used to determine the TBC quality and precision
+#
+# usage: basf2 studyTBCResolution.py dbaddress (path|none) type (local|pocket) output_name.root path_to_sroot run1 run2 ... runN
+#        The run number accepts wildcards
+# ------------------------------------------------------------------------
+
 import basf2 as b2
 import sys
 import glob
 from ROOT import Belle2
 from ROOT import TH1F, TH2F, TF1, TFile, TGraphErrors
-
-#
-# ------------------------------------------------------------------------
-# Module to study the features of the double pulse used for the TOP calibration.
-# To be used to determine the TBC quality and precision
-#
-# Contributors: Umberto Tamponi (tamponi@to.infn.it)
-#
-# usage: basf2 studyTBCResolution.py dbaddress (path|none) type (local|pocket) output_name.root path_to_sroot run1 run2 ... runN
-#        The run number accepts wildcards
-# ------------------------------------------------------------------------
 
 
 class TOPTBCResolution(b2.Module):

@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # -----------------------------------------------------------------------------------
 #
 #                        CDCTRGT3D Unpacker and Converter
@@ -8,6 +16,7 @@
 #    usage : %> basf2 trgcdct3dUnpackerConverter -i [input sroot file name] -o [output root file name]
 #
 # -----------------------------------------------------------------------------------
+
 import basf2
 import ROOT.Belle2
 

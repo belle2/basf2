@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# /***************************************************************************
-#  *   BASF2 (Belle Analysis Framework 2)                                    *
-#  *                                                                         *
-#  *   This script contains the definitions of the standard particle lists   *
-#  *   used in the reconstruction of control channels and analyses for       *
-#  *   data validation.                                                      *
-#  *                                                                         *
-#  *   Contributors: Fernando Abudinen, Chiara La Licata, Niharika Rout.     *
-#  *                                                                         *
-#  ***************************************************************************/
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 import modularAnalysis as ma
 from stdPi0s import stdPi0s

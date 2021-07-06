@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 
 # This steering file steers fills cluster position residuals and pulls with truehits to
 # test the cluster position estimator payloads from CAF.
 #
 # Execute as: basf2 test_cluster_position_estimator.py
-#
-# author: benjamin.schwenker@phys.uni-goettingen.de
 
 import math
 import basf2 as b2

@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 ########################################################################
 #
 # Test script for the SVDDQMDose module.
-#
-# Author: Ludovico Massaccesi
 #
 # Usage:
 #   basf2 SVDDQMDoseModuleExample.py -- file.root [file2.root ...] \
@@ -11,10 +18,10 @@
 #
 # The rootfiles MUST contain RAW DATA.
 #
-# 2020 Belle II Collaboration
-#
 ########################################################################
+
 """Uses the SVDDQMDose module and makes a rootfile with the histos."""
+
 import argparse
 import os
 import basf2 as b2

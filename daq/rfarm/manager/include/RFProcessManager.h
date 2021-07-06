@@ -1,11 +1,11 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #pragma once
-//+
-// File : RFProcessManager.h
-// Description : Manages process forking for RFARM control clients
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 20 - June - 2013
-//-
 
 #include <stdio.h>
 #include <sys/types.h>

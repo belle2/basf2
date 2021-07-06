@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 import basf2 as b2
 import sys
 import glob
@@ -10,7 +18,6 @@ from ROOT import TH2F, TFile
 #
 # ------------------------------------------------------------------------
 # Simple module to study the width and amplitude of all the topdigits
-# Umberto Tamponi (tamponi@to.infn.it)
 #
 # usage: basf2 checkHitHeightAndWidth.py run_number output_name.root
 #        the run number accepts wildcards

@@ -1,12 +1,12 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #ifndef EVTSOCKET_H
 #define EVTSOCKET_H
-//+
-// File : EvtSocket.h
-// Description : Socket I/O interface for EvtMessage
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 4 - Aug - 2011
-//-
 
 #include <string>
 

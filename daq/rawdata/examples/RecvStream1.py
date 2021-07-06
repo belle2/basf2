@@ -1,9 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 ######################################################
 #
-# RecvStream0.py : DAQ comoponent running on a readout PC.
+# RecvStream1.py : DAQ comoponent running on a readout PC.
 # This component receive data from eb0 and send data to eb1tx.
 #
 ######################################################

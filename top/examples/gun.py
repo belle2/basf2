@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import basf2 as b2
-from tracking import add_tracking_reconstruction
-from simulation import add_svd_simulation
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 # --------------------------------------------------------------------
 # Example of using TOP reconstruction
@@ -11,6 +15,10 @@ from simulation import add_svd_simulation
 # log likelihoods in TOPLikelihoods
 # relation from Tracks to TOPLikelihoods
 # --------------------------------------------------------------------
+
+import basf2 as b2
+from tracking import add_tracking_reconstruction
+from simulation import add_svd_simulation
 
 # Suppress messages and warnings during processing:
 b2.set_log_level(b2.LogLevel.ERROR)

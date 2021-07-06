@@ -1,10 +1,10 @@
-//+
-// File : MonitorDataCOPPER.cc
-// Description : Module to monitor raw data
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 2 - Aug - 2013
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #include <daq/rawdata/modules/MonitorDataCOPPER.h>
 #include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawECL.h>

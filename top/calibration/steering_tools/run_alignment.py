@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # ---------------------------------------------------------------------------------------
 # CAF calibration script: module alignment
 # data type: cdst (dimuon or bhabha)
@@ -9,8 +17,6 @@
 #        sample = dimuon/bhabha (D = dimuon)
 #
 # Note: input data or databases must be well calibrated (including moduleT0 and commonT0)
-#
-# author: M. Staric
 # ---------------------------------------------------------------------------------------
 
 import sys

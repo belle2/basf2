@@ -1,11 +1,10 @@
-//+
-// File : RFDqmServer.cc
-// Description : DQM server for RFARM to accumulate histograms
-//               in a TMapFile
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 4 - Sep - 2013
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include "daq/rfarm/manager/RFDqmServer.h"
 

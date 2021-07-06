@@ -1,22 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 #################################################################
 #                                                               #
 #    function to simulate 10 charged muon tracks with           #
 #    fixed transverse momentum using the ParticleGun            #
 #                                                               #
-#    written by Michael Ziegler, KIT                            #
-#    michael.ziegler2@kit.edu                                   #
-#                                                               #
 #################################################################
-
-"""
-<header>
-<contact>Michael Ziegler, michael.ziegler2@kit.edu</contact>
-<description> To be filled by the contact person</description>
-</header>
-"""
 
 from simulation import add_simulation
 from reconstruction import add_reconstruction

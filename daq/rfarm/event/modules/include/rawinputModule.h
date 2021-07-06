@@ -1,10 +1,10 @@
-//+
-// File : rawinput.h
-// Description : Sequential ROOT I/O input module
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 2 - Dec - 2013
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #ifndef RAW_INPUT_H
 #define RAW_INPUT_H

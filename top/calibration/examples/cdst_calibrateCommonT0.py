@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # ---------------------------------------------------------------------------------------
 # Calibrate common T0 with Bhabha (or dimuon) events using new constants from DB
-# (M. Staric, 2019-07-10)
 #
 # usage: basf2 cdst_calibrateCommonT0.py experiment run
 #   job: bsub -q s "basf2 cdst_calibrateCommonT0.py experiment run"
@@ -87,10 +94,6 @@ class calibrateGlobalT0Offline(b2.Module):
     * The histogram of the bunch finder time offset
     * The fit function
     * The fit parameters ina tree format (usefuly when merging several files)
-
-    **Contributors**
-    * Marko Staric
-    * Umberto Tamponi
     """
 
     def initialize(self):

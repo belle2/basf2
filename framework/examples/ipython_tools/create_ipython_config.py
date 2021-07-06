@@ -1,9 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Skript to create or edit your ipython config to use a port and not open a browser window
-# when starting.
-# Please ensure you have the newest jupyter notebook version installed (greater/equal than 4.0.0).
-#
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+'''
+Script to create or edit your ipython config to use a port and not open a browser window
+when starting. Please ensure you have the newest jupyter notebook version installed
+(greater/equal than 4.0.0).
+'''
 
 from jinja2 import Template
 import os

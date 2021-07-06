@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import basf2 as b2
-from basf2 import conditions as b2conditions
-import rawdata as raw
-import tracking as trk
-import simulation as sim
-import glob
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 ##################################################################################
 #
@@ -14,6 +16,12 @@ import glob
 #
 ###################################################################################
 
+import basf2 as b2
+from basf2 import conditions as b2conditions
+import rawdata as raw
+import tracking as trk
+import simulation as sim
+import glob
 
 useSimulation = True
 

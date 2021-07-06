@@ -1,10 +1,10 @@
-//+
-// File : TrackAnaModule.h
-// Description : Module to check reconstructed tracks
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 29 - Jul - 2016
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #ifndef TRACKANAMODULE_H
 #define TRACKANAMODULE_H

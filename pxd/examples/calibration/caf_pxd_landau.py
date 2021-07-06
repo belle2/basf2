@@ -1,3 +1,11 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # This steering file computes PXD calibrations for hot pixels, dead pixels, hit occupancy and
 # energy loss (gain). The script uses the CAF framework. This script uses by default the
 # SequentialRunByRun strategy and is designed to try to compute new calibration constants
@@ -34,8 +42,6 @@
 # b2conditionsdb upload Calibration_Offline_Development ./database.txt
 #
 # The option --help provides extensive help for the b2conditionsdb tool.
-#
-# author: benjamin.schwenker@pyhs.uni-goettingen.de
 
 
 import argparse

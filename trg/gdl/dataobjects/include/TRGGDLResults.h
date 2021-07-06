@@ -1,15 +1,11 @@
-//-----------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------
-// Filename : TRGGDLResults.h
-// Section  : TRG GDL
-// Owner    : Chunhua Li
-// Email    : chunhua.li@unimelb.edu.au
-//-----------------------------------------------------------
-// Description : A class to save TRG GDL information of event.
-//-----------------------------------------------------------
-// $Log$
-//-----------------------------------------------------------
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 #pragma once
 #include <TObject.h>
 

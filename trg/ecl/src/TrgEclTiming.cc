@@ -1,15 +1,11 @@
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : TrgEclTiming.cc
-// Section  : TRG ECL
-// Owner    : InSu Lee/Yuuji Unno
-// Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
-//---------------------------------------------------------------
-// Description : A class to represent TRG ECL
-//---------------------------------------------------------------
-// $Log$
-//---------------------------------------------------------------
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 #define TRG_SHORT_NAMES
 #define TRGECLCLUSTER_SHORT_NAMES
 #include <framework/gearbox/Unit.h>

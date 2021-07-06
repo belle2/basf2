@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 import os
 import sys
 import subprocess
@@ -64,8 +72,10 @@ def run_nsmd(nsmdir, port, nsmhost):
 # Kill NSMD
 
 def kill_nsmd(port, nsmhost):
+    # In the line below, b2code-style-fix changes '{print \$2}'
+    # into '{print \\$2}'. To avoid this, noqa is necessary.
     cmd = 'ssh ' + nsmhost + ' "ps -fC nsmd2 | grep ' + port \
-        + "| awk '{print \$2}' \" > temp.pid"
+        + "| awk '{print \$2}' \" > temp.pid"  # noqa
 #    cmd = "ssh -v " + nsmhost + " \"ps -fC nsmd2 | grep " + port + "| awk '{printf(\"klll \%d\", \$2)} | sh' \""
 #    print cmd
     p = subprocess.Popen(cmd, shell=True)

@@ -1,15 +1,10 @@
-//-----------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------
-// Filename : TRGECLDigi.h
-// Section  : TRG ECL
-// Owner    : InSu Lee/Yuuji Unno
-// Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
-//-----------------------------------------------------------
-// Description : A class to represent ECL.
-//-----------------------------------------------------------
-// $Log$
-//-----------------------------------------------------------
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #ifndef TRGECLTIMING_H
 #define TRGECLTIMING_H

@@ -1,10 +1,11 @@
-//+
-// File : CheckErrorEvent.cc
-// Description : Module to get data from DataStore and send it to another network node
-//
-// Author : Satoru Yamada Itoh, IPNS, KEK
-// Date : 2 - Jul. - 2016
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 #include <rawdata/modules/CheckErrorEvent.h>
 
 using namespace std;

@@ -1,16 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2012  Belle II Collaboration                         *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Martin Heck, Martin Ritter, Thomas Kuhr    *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
-
-/**************************************************************************
- * This file contains the implementations for Unit.h and Const.h to avoid *
- * problems with the order of the initialization of constants.            *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #include <framework/gearbox/Unit.h>

@@ -1,15 +1,10 @@
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Filename : TRGGDL.h
-// Section  : TRG GDL
-// Owner    : Yoshihito Iwasaki, Chunhua Li
-// Email    : yoshihito.iwasaki@kek.jp, chunhua.li@unimelb.edu.au
-//-----------------------------------------------------------------------------
-// Description : A class to represent GDL.
-//-----------------------------------------------------------------------------
-// $Log$
-//-----------------------------------------------------------------------------
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #ifndef TRGGDL_FLAG_
 #define TRGGDL_FLAG_

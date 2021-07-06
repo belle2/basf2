@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # ---------------------------------------------------------------------------------------
 # CAF calibration script: pulse height distributions and threshold efficiencies
 # data type: raw data
 #
 # usage: basf2 run_pulseHeight_calibration_rawdata.py expNo runFirst runLast
-#
-# author: M. Staric
 # ---------------------------------------------------------------------------------------
 
 import sys

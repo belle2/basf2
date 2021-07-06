@@ -1,9 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # ---------------------------------------------------------------------------------------
 # convert an output root file of pixel-by-pixel gain analysis data to pmt-by-pmt format
-# Contibutors: Maeda Yosuke (KMI, Nagoya Univ.)
 #
 # Usage: basf2 gainAnalysisPixelToPMT.py inputRoot(pixel-by-pixel result) outputRoot [maxHitTiming=-8.] [nMinEntries=100]
 # ---------------------------------------------------------------------------------------

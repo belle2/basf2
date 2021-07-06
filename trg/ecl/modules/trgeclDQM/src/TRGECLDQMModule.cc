@@ -1,14 +1,11 @@
-// $Id$
-//---------------------------------------------------------------
-// Filename : TRGECLModule.cc
-// Section  : TRG ECL
-// Owner    : InSoo Lee / Yuuji Unno
-// Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
-//---------------------------------------------------------------
-// Description : A trigger module for TRG ECL
-//---------------------------------------------------------------
-// 1.00 : 2017/05/08 : First version
-//---------------------------------------------------------------
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 #include <trg/ecl/modules/trgeclDQM/TRGECLDQMModule.h>
 #include <trg/ecl/TrgEclMapping.h>
 #include <trg/ecl/TrgEclCluster.h>

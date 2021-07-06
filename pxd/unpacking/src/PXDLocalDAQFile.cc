@@ -1,10 +1,10 @@
-//+
-// File : PXDLocalDAQFile.cc
-// Description : Sequential file I/O privitives with file blocking
-//
-// Author : Bjoern Spruck/ Maiko Takahashi
-// Date : 2020
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include <pxd/unpacking/PXDLocalDAQFile.h>
 #include <framework/logging/Logger.h>

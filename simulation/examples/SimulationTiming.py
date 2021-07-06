@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """
 This script determines the time spent in each part of the simulation. It does
 that by assigning regions to the geometry created by each creator and then
@@ -9,14 +17,9 @@ facilities provided by Geant4. These get compiled out in the opt version of the
 externals so this only works with the debug externals. It was intended as a
 validation script but due to this problem it was moved to examples
 
-<header>
-  <contact>ritter</contact>
-  <description>
-      Generate detailed timing information of the simulation when simulating
-      100 EvtGen events.
-      WARNING: Does not work in parallel processing mode
-  </description>
-</header>
+Generate detailed timing information of the simulation when simulating
+100 EvtGen events.
+WARNING: Does not work in parallel processing mode
 """
 
 import os

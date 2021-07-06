@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 #################################################################
 #                                                               #
 #     script creates efficiency vs pt plots and stores them     #
 #     in a root file                                            #
-#                                                               #
-#    written by Michael Ziegler, KIT                            #
-#    michael.ziegler2@kit.edu                                   #
 #                                                               #
 #################################################################
 

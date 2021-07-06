@@ -1,9 +1,13 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#
-# contributors: G. Casarosa, T. Lueck
-#
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 #
 # utils to measure the per-event execution time of all modules

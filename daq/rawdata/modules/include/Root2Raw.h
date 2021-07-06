@@ -1,10 +1,10 @@
-//+
-// File : Root2Raw.h
-// Description : Module to convert recorded ROOT raw data into raw data file
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 4 - Jun - 2014
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #ifndef ROOT2RAW_H
 #define ROOT2RAW_H

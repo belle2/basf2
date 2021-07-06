@@ -1,16 +1,10 @@
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : TRGECLTimingCalibration.cc
-// Section  : TRG ECL
-// Owner    : YoungJun Kim
-// Email    : rladudwns118@korea.ac.kr
-//---------------------------------------------------------------
-// Description : TRGECL TC time offset calibration Module for TRG ECL
-//
-//---------------------------------------------------------------
-// 1.00 : 2019/06/26 : First version
-//---------------------------------------------------------------
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include "trg/ecl/modules/trgeclTimingCal/TrgEclTimingCalibration.h"
 

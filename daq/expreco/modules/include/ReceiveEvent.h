@@ -1,10 +1,10 @@
-//+
-// File : ReceiveEvent.h
-// Description : Module to restore DataStore in RingBuffer
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 17 - Dec - 2013
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #ifndef RECEIVE_EVENT_MODULE_H
 #define RECEIVE_EVENT_MODULE_H

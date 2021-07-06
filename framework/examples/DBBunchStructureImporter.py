@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # Import bunch structure payload for master GT.
 # Create payload taking information from the RunDB.
 # Usage: basf2 DBBunchStructureImporter.py <minexp> <minrun> <maxexp> <maxrun>

@@ -1,14 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 ########################################################
 #
 #  This steering file shows how to correctly test
 #  the reconstruction chain of the BKLM only
 #  (no KLMClusters or Muid related modules are used).
-#
-#  Contact: Giacomo De Pietro (2018)
-#           giacomo.depietro@roma3.infn.it
 #
 ########################################################
 

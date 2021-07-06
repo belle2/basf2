@@ -1,20 +1,10 @@
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : TRGECLFAMModule.cc
-// Section  : TRG ECL
-// Owner    : InSoo Lee/Yuuji Unno
-// Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
-//---------------------------------------------------------------
-// Description : A trigger module for TRG ECL
-// The FAM module of ECL Trigger simulation
-// This odule convert crystal Hits to TC Hit and shape the signal,
-// then measure TC energy and timing.
-// Raw TC Hit information is saved on TRGECHDigi0 table(before shaping).
-// Measured TC Hit information is save on TRGECLHit table.
-//---------------------------------------------------------------
-// 1.00 : 2012/05/24 : First version
-//---------------------------------------------------------------
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #define TRGECLFAM_SHORT_NAMES
 

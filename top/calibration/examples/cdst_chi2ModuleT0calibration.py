@@ -1,9 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # --------------------------------------------------------------------------------
 # Calibrate module T0 with Bhabha's or dimuons using time difference between slots
-# (M. Staric, 2019-07-10)
 #
 # usage: basf2 cdst_chi2ModuleT0calibration.py experiment runFirst runLast
 #   job: bsub -q l "basf2 cdst_chi2ModuleT0calibration.py experiment runFirst runLast"

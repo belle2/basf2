@@ -1,13 +1,12 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #ifndef FLOWSTAT_H
 #define FLOWSTAT_H
-//+
-// File : RFFlowStat.h
-// Description : Calculate data flow statistics and put them in
-//               RfNodeInfo structure
-//
-// Author : Ryosuke Itoh, KEK
-// Date : 21 - Aug - 2013
-//-
 
 #include <sys/time.h>
 

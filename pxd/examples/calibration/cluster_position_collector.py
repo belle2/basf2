@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # This steering file steers the collectors for the training of the PXD cluster
 # position estimator running the CAF.
 #
@@ -11,8 +19,6 @@
 #
 # Full set of training sources for PXD requires starting the script 4x wiht clusterkinds
 # 0-3.
-#
-# author: benjamin.schwenker@phys.uni-goettingen.de
 
 import basf2 as b2
 

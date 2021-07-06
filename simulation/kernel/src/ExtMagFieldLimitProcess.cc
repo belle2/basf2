@@ -1,12 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2011  Belle II Collaboration                         *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Leo Piilonen                                             *
- * Derived from: G4ErrorMagFieldLimitProcess.cc                           *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #include <simulation/kernel/ExtMagFieldLimitProcess.h>
@@ -50,8 +47,7 @@ G4double ExtMagFieldLimitProcess::GetMeanFreePath(const G4Track&, G4double, G4Fo
 
 G4double ExtMagFieldLimitProcess::PostStepGetPhysicalInteractionLength(const G4Track& aTrack, G4double, G4ForceCondition* condition)
 {
-  /* cppcheck-suppress ctunullpointer */
-  /* cppcheck-suppress nullPointer */
+  // cppcheck-suppress [nullPointer, ctunullpointer]
   *condition = NotForced;
   G4double stepLength = kInfinity;
   if (m_field != 0) {

@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 #############################################################
 # This steering file generates, simulates, and reconstructs
 # a sample of 10 BBbar events.
@@ -9,8 +17,6 @@
 #
 # Input: None
 # Output: output.root, mdst.root
-#
-# Example steering file - 2017 Belle II Collaboration
 #############################################################
 
 import basf2 as b2

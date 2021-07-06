@@ -1,7 +1,13 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 # Example script to run dEdx validation module for bhabha or radbhabha or hadron skims
 # configure distination of file and set variable --> var
-# Commited on : Feb 21, 2019 >> Jitendra Kumar
 
 
 import basf2

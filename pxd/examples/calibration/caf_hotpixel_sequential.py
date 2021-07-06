@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # This steering file computes PXD hotpixel and deadpixel masks from root formatted raw data
 # running the CAF
 #
@@ -19,8 +27,6 @@
 # b2conditionsdb upload Calibration_Offline_Development ./database.txt
 #
 # The option --help provides extensive help for the b2conditionsdb tool.
-#
-# author: benjamin.schwenker@phys.uni-goettingen.de
 
 import argparse
 from caf.strategies import SequentialRunByRun

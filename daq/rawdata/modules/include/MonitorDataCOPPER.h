@@ -1,12 +1,12 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #ifndef MONITOR_DATACOPPER_H
 #define MONITOR_DATACOPPER_H
-//+
-// File : MonitorDataCOPPER.h
-// Description : Module to monitor raw data accumulating histos
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date :  5 - Sep - 2013
-//-
 
 #include <stdlib.h>
 #include <sys/time.h>

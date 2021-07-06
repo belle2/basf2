@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # Returns a dictionary that maps an electronicsID to a detector moduleID.
 # The information here was captured from the B2DEBUG printout from bklmUnpacker
 # for experiment 3 run 4794 and then reformatted to suit python.

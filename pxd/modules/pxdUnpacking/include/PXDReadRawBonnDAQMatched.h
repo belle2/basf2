@@ -1,11 +1,10 @@
-//+
-// File : PXDReadRawBonnDAQMatched.h
-// Description : Module to Load BonnDAQ file and store it as RawPXD in Data Store
-// This is meant for lab use (standalone testing, debugging) without an event builder.
-//
-// Author : Bjoern Spruck
-// Date : 16.05.2019
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #pragma once
 

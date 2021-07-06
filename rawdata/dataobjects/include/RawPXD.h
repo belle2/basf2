@@ -1,11 +1,10 @@
-//+
-// File : RawPXD.h
-// Description : pseudo raw data of PXD for test
-//
-// Author : Bjoern Spruck / Klemens Lautenbach
-// Date : 13 - Jul - 2013
-// Updated 17.7.2015
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #ifndef RAWPXD_H
 #define RAWPXD_H

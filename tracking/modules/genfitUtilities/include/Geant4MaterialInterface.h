@@ -1,9 +1,10 @@
-/* Copyright 2014, Ludwig-Maximilians-Universität München,
-   Authors: Tobias Schlüter, Thomas Hauth
-
-   Provided as part of the Belle II software framework basf2.  Its
-   licenses apply.
-*/
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #pragma once
 

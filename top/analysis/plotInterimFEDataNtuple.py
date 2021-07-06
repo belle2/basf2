@@ -1,9 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # ---------------------------------------------------------------------------------------
 # draw summary plots from output of makeInterimFEDataNtuple module (run******_slot**_ana.root)
-# Contibutors: Maeda Yosuke and Umberto Tamponi
 #
 # Usage: basf2 plotInterimFEDataNtuple <output root file of makeInterimFEDataNtuple.py> (to be called in this steering file)
 # ---------------------------------------------------------------------------------------

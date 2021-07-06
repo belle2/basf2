@@ -1,11 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jakob Lettenbichler                                      *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #pragma once
@@ -21,13 +19,15 @@ namespace Belle2 {
   namespace VXDTFRawSecMapTypedef { // all typedefs for tracking/dataobjects/VXDTFRawSecMap.h
 
     // VXDTFRawSecMap:
-    typedef std::list< double > CutoffValues; /**< contains all cutoff-Values collected during run, is a list since it has to be sorted in the end */
+    typedef std::list< double >
+    CutoffValues; /**< contains all cutoff-Values collected during run, is a list since it has to be sorted in the end */
     typedef std::pair<unsigned int, CutoffValues> CutoffPack; /**< .first is code of filter, .second is CutoffValue */
     typedef std::vector< CutoffPack > FriendValues; /**< stores all Cutoffs */
     typedef std::pair<unsigned int, FriendValues > FriendPack; /**< .first is secID of current Friend, second is FriendValue */
     typedef std::vector< FriendPack > SectorValues; /**< stores all Friends */
     typedef std::pair<unsigned int, SectorValues> SectorPack; /**< .first is secID of current sector, second is SectorValue */
-    typedef std::vector < SectorPack > StrippedRawSecMap; /**< stores all Sectors and a raw version of the data (no calculated cutoffs yet)*/
+    typedef std::vector < SectorPack >
+    StrippedRawSecMap; /**< stores all Sectors and a raw version of the data (no calculated cutoffs yet)*/
     typedef std::vector< unsigned int > IDVector; /**< stores IDs of sectors or friends or layerIDs */
     typedef std::pair<unsigned int, double> SectorDistance; /**< stores distance to origin (.second) for sector (.first) */
     typedef std::vector< SectorDistance > SectorDistancesMap; /**< stores vector of SectorDistanceInfo */
@@ -50,6 +50,7 @@ namespace Belle2 {
   }
 
   namespace PassDataTypedef {
-    typedef std::pair<bool, double> Filter; /**< defines whether current filter is allowed (.first) and whether the cutoffvalues shall be tuned (.second).  */
+    typedef std::pair<bool, double>
+    Filter; /**< defines whether current filter is allowed (.first) and whether the cutoffvalues shall be tuned (.second).  */
   }
 } //Belle2 namespace

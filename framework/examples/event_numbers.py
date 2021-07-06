@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 ######################################################
 # This steering file shows how to run the framework
 # for different experiment, run and event numbers.
@@ -12,8 +20,6 @@
 # Experiment 73, Run 10, 2 Events
 # Experiment 73, Run 20, 5 Events
 # Experiment 73, Run 30, 3 Events
-#
-# Example steering file - 2011 Belle II Collaboration
 ######################################################
 
 from basf2 import Path, process

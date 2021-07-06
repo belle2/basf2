@@ -1,10 +1,10 @@
-//+
-// File : DesSerPrePCMain.h
-// Description : Base class for Module to receive data from outside and store it to DataStore
-//
-// Author : Satoru Yamada Itoh, IPNS, KEK
-// Date : 2 - Aug - 2013
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #ifndef DESSERMAIN_H
 #define DESSERMAIN_H

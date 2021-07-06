@@ -1,11 +1,10 @@
-//+
-// File : RFConf.cc
-// Description : Access to configuration file
-//
-// Author : Ryosuke Itoh, KEK
-// Date : 13- June - 2013
-// Note : Code recycled from Nakao's d2 library
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include "daq/rfarm/manager/RFConf.h"
 

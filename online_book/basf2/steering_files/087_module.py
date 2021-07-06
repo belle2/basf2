@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-
 import basf2 as b2
 from ROOT import Belle2
 

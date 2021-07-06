@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 #################################################################
 #                                                               #
 #    Script to simulate 2000 charged-muon single-track events   #
 #    using the ParticleGun for BKLM and EKLM validation.        #
-#                                                               #
-#    written by Leo Piilonen, VT                                #
-#    piilonen@vt.edu                                            #
 #                                                               #
 #################################################################
 

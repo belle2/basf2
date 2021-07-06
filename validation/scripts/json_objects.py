@@ -1,16 +1,23 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 import json
 import enum
 import functools
 
 # todo: shouldn't I call super().__init__() or similar to make sure that I
 # execute code from mother classes?? This seems to only have been done for
-# some of the subclasses here... /klieret
+# some of the subclasses here...
 
 """
 Define datatypes for later serialization by json
 """
 
-# todo: write a short overview over the many classes and their relationships here /klieret
+# todo: write a short overview over the many classes and their relationships here
 
 # ==============================================================================
 # Data classes

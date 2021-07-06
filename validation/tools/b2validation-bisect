@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """
 Utility script to be used in conjunction with the git bisect functionality
 [1]_ to search for degradations in validation variables. To use it, you can
@@ -37,8 +45,6 @@ below 0.93, the following snippet can be used::
   git bisect bad <first bad release>
   git bisect run bisect_validation.py --script 13_trackingEfficiency_createPlots.py
       --check-quantity "results/current/tracking/TrackingValidation.root:hEfficiency[mean_y]:>:0.93"
-
-:Authors: Thomas Hauth
 
 .. [1] http://git-scm.com/docs/git-bisect
 """

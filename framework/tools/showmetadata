@@ -1,4 +1,12 @@
 #!/bin/bash
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 OLD=showmetadata
 NEW=b2file-metadata-show
 echo -e "\033[0;31mAttention:\033[0m ${OLD} has been renamed to ${NEW}.

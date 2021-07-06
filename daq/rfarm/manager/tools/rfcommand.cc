@@ -1,10 +1,10 @@
-//+
-// File : rfcommand.cc
-// Description : Send command to a specified RFARM node
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 2 - Apr - 2015
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include <stdio.h>
 #include <unistd.h>

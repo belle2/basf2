@@ -1,11 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kodys, Peter Kvasnicka                             *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #pragma once
@@ -228,21 +226,21 @@ namespace Belle2 {
         return getSensorIndex(sensorID);
       }
       /** Return index of sensor in plots.
-        * Use for only PXD sensor counting, without SVD.
-        * @param layer layer position of sensor
-        * @param ladder ladder position of sensor
-        * @param sensor sensor position of sensor
-        * @return Index of sensor in plots.
-        */
+       * Use for only PXD sensor counting, without SVD.
+       * @param layer layer position of sensor
+       * @param ladder ladder position of sensor
+       * @param sensor sensor position of sensor
+       * @return Index of sensor in plots.
+       */
       int getPXDSensorIndex(int layer, int ladder, int sensor) const
       {
         return getSensorIndex(VxdID(layer, ladder, sensor));
       }
 
       /** Return index of a PXD sensor in plots.
-        * Use for only PXD sensor counting, without SVD.
-        * @param pxdIndex Index of sensor in plots.
-        */
+       * Use for only PXD sensor counting, without SVD.
+       * @param pxdIndex Index of sensor in plots.
+       */
       VxdID getSensorIDFromPXDIndex(int pxdIndex) const
       {
         return m_listOfSensors[pxdIndex];
@@ -254,7 +252,7 @@ namespace Belle2 {
       /** Return PXD chip index in the list of PXD chips.
         * 1-based chip numbering.
         * @param sensorID VxdID of the sensor
-        * @param isU true for u side of the sensor (DCD)
+      * @param isU true for u side of the sensor (DCD)
         * @param chip Chip position on sensor - DCDs or Switchers
         * @return Index of sensor in plots.
         */
@@ -269,13 +267,13 @@ namespace Belle2 {
       }
 
       /** Return PXD chip index in the list of PXD chips.
-        * @param layer layer position of sensor
-        * @param ladder ladder position of sensor
-        * @param sensor sensor position of sensor
-        * @param isU true for u side of the sensor (DCD)
-        * @param chip Chip number on sensor (DCD or switcher, 1-based)
-        * @return Index of sensor in plots.
-        */
+       * @param layer layer position of sensor
+       * @param ladder ladder position of sensor
+       * @param sensor sensor position of sensor
+       * @param isU true for u side of the sensor (DCD)
+       * @param chip Chip number on sensor (DCD or switcher, 1-based)
+       * @return Index of sensor in plots.
+       */
       int getPXDChipIndex(int layer, int ladder, int sensor, bool isU, int chip) const
       {
         return getPXDChipIndex(VxdID(layer, ladder, sensor), isU, chip);
@@ -313,20 +311,20 @@ namespace Belle2 {
        * SVD sensor indexing
        *********************************************************************/
       /** Return index of SVD sensor in plots.
-        * This is solely SVD counting starting from 0.
-        * @param sensorID VxdID of the sensor
-        * @return Index of sensor in plots.
-        */
+       * This is solely SVD counting starting from 0.
+       * @param sensorID VxdID of the sensor
+       * @return Index of sensor in plots.
+       */
       int getSVDSensorIndex(VxdID sensorID) const
       {
         return (getSensorIndex(sensorID) - m_firstSVDIndex);
       }
 
       /** Return index of SVD sensor in plots.
-        * This is solely SVD counting starting from 0.
-        * @param layer layer position of sensor
-        * @param ladder ladder position of sensor
-        * @param sensor sensor position of sensor
+       * This is solely SVD counting starting from 0.
+       * @param layer layer position of sensor
+       * @param ladder ladder position of sensor
+       * @param sensor sensor position of sensor
         * @return Index of sensor in plots.
         */
       int getSVDSensorIndex(int layer, int ladder, int sensor) const
@@ -335,9 +333,9 @@ namespace Belle2 {
       }
 
       /** Return VxdID for SVD index of sensor in plots.
-        * Uses SVD sensor count, without PXD.
-        * @param svdIndex Index of the SVD sensor.
-        */
+       * Uses SVD sensor count, without PXD.
+       * @param svdIndex Index of the SVD sensor.
+       */
       VxdID getSensorIDFromSVDIndex(int svdIndex) const
       {
         return m_listOfSensors[m_firstSVDIndex + svdIndex];
@@ -348,11 +346,11 @@ namespace Belle2 {
        ********************************************************************/
 
       /** Return SVD chip index in the list of SVD chips.
-        * @param sensorID VxdID of the sensor
-        * @param isU true for u side of the sensor
-        * @param chip Chip position on sensor (1-based)
-        * @return Index of sensor in plots.
-        */
+       * @param sensorID VxdID of the sensor
+       * @param isU true for u side of the sensor
+       * @param chip Chip position on sensor (1-based)
+       * @return Index of sensor in plots.
+       */
       int getSVDChipIndex(VxdID sensorID, bool isU, int chip) const
       {
         VxdID chipID(sensorID);
@@ -367,22 +365,22 @@ namespace Belle2 {
       }
 
       /** Return SVD chip index in the list of SVD chips.
-        * @param layer layer position of sensor
-        * @param ladder ladder position of sensor
-        * @param sensor sensor position of sensor
-        * @param isU true for u side of the sensor
-        * @param chip Chip position on sensor (1-based)
-        * @return Index of sensor in plots.
-        */
+       * @param layer layer position of sensor
+       * @param ladder ladder position of sensor
+       * @param sensor sensor position of sensor
+       * @param isU true for u side of the sensor
+       * @param chip Chip position on sensor (1-based)
+       * @return Index of sensor in plots.
+       */
       int getSVDChipIndex(int layer, int ladder, int sensor, bool isU, int chip) const
       {
         return getSVDChipIndex(VxdID(layer, ladder, sensor), isU, chip);
       }
 
       /** Return chipID (VxdID with side and chipNo) for index in the list. .
-        * @param svdChipIndex Index in the list of SVD sensors.
-        * @return chipID: VxdID with chip number/side encoded in segment part.
-        */
+       * @param svdChipIndex Index in the list of SVD sensors.
+       * @return chipID: VxdID with chip number/side encoded in segment part.
+       */
       VxdID getChipIDFromSVDIndex(int svdChipIndex) const
       {
         return m_listOfSVDChips[svdChipIndex];
@@ -422,9 +420,9 @@ namespace Belle2 {
        * Layer indexing
        ********************************************************************/
       /** Return index of layer in plots.
-        * @param layer layer number.
-        * @return Index of layer in plots.
-        */
+       * @param layer layer number.
+       * @return Index of layer in plots.
+       */
       int getLayerIndex(unsigned short layer) const
       {
         return std::distance(
@@ -434,9 +432,9 @@ namespace Belle2 {
       }
 
       /** Return layer number for list index
-        * @param index List index of the layer
-        * @return Layer number
-        */
+       * @param index List index of the layer
+       * @return Layer number
+       */
       unsigned short getLayerNumberFromLayerIndex(int index) const
       {
         return m_listOfLayers[index];

@@ -1,11 +1,10 @@
-//+
-// File : svdClsHistoManagerModule.cc
-// Description : A module to create histogram ROOT file
-//             : for SVD clusterizer study
-//
-// Author : Katsuro Nakamura, KEK
-// Date : 15 - May - 2014
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include <svd/modules/svdDump/svdDumpModule.h>
 

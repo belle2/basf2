@@ -1,13 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """Example showing the use of the RetentionCheck module
 
 To run the example, simply do
 
     basf2 exampleOfRetentionCheck.py -n 100
 """
-
-__authors__ = "Cyrille Praz"
 
 import basf2 as b2
 import modularAnalysis as ma

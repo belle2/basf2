@@ -1,5 +1,13 @@
 #! /bin/tcsh
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 if ( $#argv<2 ) then
   echo "Usage: restart_nsmd.csh unitname configname"
   exit -1

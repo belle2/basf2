@@ -1,12 +1,12 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #ifndef HISTOSERVER_H
 #define HISTOSERVER_H
-//+
-// File : HistoServer.h
-// Description : Histogram Server
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 18 - Dec - 2012
-//-
 
 #include <string>
 

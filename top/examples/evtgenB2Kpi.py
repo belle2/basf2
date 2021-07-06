@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import basf2 as b2
-import os
-from simulation import add_simulation
-from reconstruction import add_reconstruction
-from reconstruction import add_mdst_output
-import glob
-from ROOT import Belle2
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 # ----------------------------------------------------------------------------------
 # Example of generating signal MC (B0 -> K- pi+, one of the benchmarks for TOP)
@@ -17,6 +17,14 @@ from ROOT import Belle2
 #  - mdst format, suitable for physics studies (analysis package)
 #  - flat ntuple, suitable for TOP efficiency studies
 # ----------------------------------------------------------------------------------
+
+import basf2 as b2
+import os
+from simulation import add_simulation
+from reconstruction import add_reconstruction
+from reconstruction import add_mdst_output
+import glob
+from ROOT import Belle2
 
 # Suppress messages and warnings during processing:
 b2.set_log_level(b2.LogLevel.ERROR)

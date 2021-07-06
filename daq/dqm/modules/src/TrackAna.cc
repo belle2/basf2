@@ -1,10 +1,10 @@
-//+
-// File : GenAnaModule.cc
-// Description : Module to show particle info
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 25 - Feb - 2015
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include <daq/dqm/modules/TrackAna.h>
 

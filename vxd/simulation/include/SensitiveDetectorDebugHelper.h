@@ -1,12 +1,10 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter                                            *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
- N**************************************************************************/
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #pragma once
 #ifndef VXD_SIMULATION_SENSITIVEDETECTORDEBUGHELPER_H
@@ -47,7 +45,8 @@ namespace Belle2 {
       /** Write the information normally used when creating SimHits to the entry */
       void addSimHit(const VXDSimHit* simhit, int startPoint, int endPoint);
       /** Finish the entry by calling Fill() */
-      void finishTraversal() {
+      void finishTraversal()
+      {
         m_tree->Fill();
       }
     private:
@@ -58,7 +57,8 @@ namespace Belle2 {
       /** Singleton class: no assignment operator */
       SensitiveDetectorDebugHelper& operator=(const SensitiveDetectorDebugHelper&) = delete;
       /** Destructor: write root file */
-      ~SensitiveDetectorDebugHelper() {
+      ~SensitiveDetectorDebugHelper()
+      {
         m_tree->Write();
         m_file->Close();
       }
@@ -102,7 +102,7 @@ namespace Belle2 {
         /** number of values used in stepInfo */
         int   stepN;
         /** values for the step points */
-        double stepInfo[SIZE_STEP* MAX_STEPS];
+        double stepInfo[SIZE_STEP * MAX_STEPS];
 
         /** number of values used in trueInfo */
         int   trueN;
@@ -112,12 +112,12 @@ namespace Belle2 {
         /** number of values used in edepInfo */
         int edepN;
         /** values for the energy deposition */
-        double edepInfo[SIZE_EDEP* MAX_EDEP];
+        double edepInfo[SIZE_EDEP * MAX_EDEP];
 
         /** number of values used in simhitInfo */
         int simhitN;
         /** values for the simhits */
-        double simhitInfo[SIZE_HITS* MAX_HITS];
+        double simhitInfo[SIZE_HITS * MAX_HITS];
       } m_info; /**< object to store all variables */
     };
   }

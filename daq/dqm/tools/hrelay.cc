@@ -1,10 +1,10 @@
-//+
-// File : hrelay.cc
-// Description : A server to collect histograms over network
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 23 - Apr - 2013
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>

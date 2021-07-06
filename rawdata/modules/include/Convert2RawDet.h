@@ -1,10 +1,10 @@
-//+
-// File : Convert2RawDet.h
-// Description : Module to convert from RawCOPPER or RawDataBlock to RawDetector objects
-//
-// Author : Satoru Yamada Itoh, IPNS, KEK
-// Date : 24 - Oct - 2014
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #ifndef CONVERT2RAWDET_H
 #define CONVERT2RAWDET_H

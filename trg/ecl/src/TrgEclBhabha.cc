@@ -1,10 +1,11 @@
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : TrgEclBhabha.cc
-// Section  : TRG ECL
-// Owner    : InSoo Lee/Yuuji Unno
-// Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 //---------------------------------------------------------------
 // Description : A class to tag Bhabha Veto
 //
@@ -45,10 +46,6 @@
 //  165 degree < (CM Theta Cluster 1 + CM Theta Cluster 2 ) < 190 degree
 //  Boths Cluster CM E < 2 GeV  and One of cluster CM E < 2 GeV
 //
-//
-//---------------------------------------------------------------
-// $Log$ 2018-08-24 First Version
-// $Log$ 2019-05-13 Update selection bhabha and mumu
 //---------------------------------------------------------------
 
 #define TRG_SHORT_NAMES

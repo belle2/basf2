@@ -1,12 +1,12 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #ifndef EVTSOCKETMAN_H
 #define EVTSOCKETMAN_H
-//+
-// File : EvtSocketManager.h
-// Description : Class to manage multiple EvtSocket connection using select()
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 19 - Feb - 2013
-//-
 
 #include <vector>
 

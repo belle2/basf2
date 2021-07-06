@@ -1,11 +1,13 @@
-/////////////////////////////////////////////////////////////////////////////////// 
-//              Name:fileconfig.c                                                 // 
-//              Purpose: configurate and readback the parameters on CDC FEE       // 
-//              Author: Sun Dehui                                                 //                 
-//              History: Nakao (regmgt.c)                                         //
-//			 write only version  2010.10.12                           // 
-//              Version:   0.2                                                    //
-////////////////////////////////////////////////////////////////////////////////////
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
+// Purpose: configurate and readback the parameters on CDC FEE
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>

@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 
 # This steering script steers the production of ROOT tuples for beast.
 #
@@ -12,8 +20,6 @@
 #
 # This will compute tuples run-by-run for all runs between runLow and runHigh for the
 # given experiment number.
-#
-# author: benjamin.schwenker@pyhs.uni-goettingen.de
 
 import multiprocessing
 import SetMetaTimeModule

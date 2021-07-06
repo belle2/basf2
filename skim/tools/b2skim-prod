@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 """\
 .. Note::
    This tool is intended for use by skim production managers, not by skim liaisons.
@@ -139,10 +147,6 @@ for producing a production request and combined steering file is as follows:
 
     $ %(prog)s Registry_MC13.yaml SkimStats.json -N 1 -l ewp_local.py -s EWP --data -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
 """
-
-__author__ = "Phil Grace, Racha Cheaib"
-__email__ = "philip.grace@adelaide.edu.au, rachac@mail.ubc.ca"
-
 
 import argparse
 from functools import lru_cache

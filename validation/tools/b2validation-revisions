@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """
 Tool to do for each git commit in a specific range:
 - check out the commit (configurable if you want to run git stash and git stash pop before and afterwards)
@@ -25,8 +33,6 @@ the ``zeroSupressedMeanY`` of the ``TNtuple hEfficiency`` in the file
 ``~/basf2/tracking/validation/results/current/tracking/TrackingValidation.root``.
 
 The options ``--script`` and ``--check-quantity`` can be given more than once.
-
-:Authors: The Belle II Collaboration. Contributors: Nils Braun, Thomas Hauth
 """
 from collections import defaultdict
 

@@ -1,10 +1,10 @@
-//+
-// File : DeSerializerPC.cc
-// Description : Module to read COPPER FIFO and store it to DataStore
-//
-// Author : Satoru Yamada Itoh, IPNS, KEK
-// Date : 2 - Aug - 2013
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #ifndef DESERIALIZERCOPPER_H
 #define DESERIALIZERCOPPER_H

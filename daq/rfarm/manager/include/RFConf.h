@@ -1,12 +1,12 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #ifndef RFCONF_H
 #define RFCONF_H
-//+
-// File : RFConf.h
-// Description : Configuration Manager for RFARM
-//
-// Author : Ryosuke Itoh, KEK
-// Date : 12 - Jun - 2013
-//-
 
 #include <stdio.h>
 

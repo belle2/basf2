@@ -1,14 +1,13 @@
-//-----------------------------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------------------------
-// Filename : TRGCDCModule.h
-// Section  : TRG CDC
-// Owner    : Yoshihito Iwasaki
-// Email    : yoshihito.iwasaki@kek.jp
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 //-----------------------------------------------------------------------------
 // Description : A trigger module for CDC
-//-----------------------------------------------------------------------------
-// 0.00 : 2010/10/08 : First version
 //-----------------------------------------------------------------------------
 
 #ifndef TRGCDCModule_H

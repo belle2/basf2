@@ -1,3 +1,10 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 /*
   nsmparse.c for NSM2
 
@@ -7,7 +14,7 @@
   20140304 a simple #define can be used
   20131229 stdint.h definitions are added
   20140428 nsmparse_malloc fix
-  20140902 memset fix (T.Konno)
+  20140902 memset fix
   20140903 n_same fix for nested struct
   20140917 -1 to skip revision check
   20140918 nsmparse_struct fix (uninitialized malloc for ->next)

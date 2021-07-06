@@ -1,8 +1,4 @@
 #----------------------------------------------------------------
-# File Name 	: physics.mac
-# Owner         : KyungTae Kim (K.U.)                                                           
-# Email         : ktkim@hep.korea.ac.kr                                                         
-#----------------------------------------------------------------
 # Description : macro for turning off the physics processes in G4
 #----------------------------------------------------------------
 

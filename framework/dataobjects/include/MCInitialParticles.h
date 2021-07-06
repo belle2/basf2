@@ -1,11 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter                                            *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #pragma once
@@ -59,7 +57,7 @@ namespace Belle2 {
     /** Equality operator */
     bool operator==(const MCInitialParticles& b) const
     {
-      // FIXME: Ah, bloody hell. sin(x) returns slightly different values on
+      // FIXME: sin(x) returns slightly different values on
       // different platforms in some cases so we cannot just do an equality
       // comparison. We need to do this more elegantly, this is just for
       // testing if it solves all problems

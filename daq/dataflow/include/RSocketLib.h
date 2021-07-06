@@ -1,12 +1,12 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #ifndef RSOCKETLIB_H
 #define RSOCKETLIB_H
-//+
-// File : socketlib.h
-// Description : Class to handle a socket
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 18 - Aug - 2000
-//-
 
 #include <netinet/in.h>
 

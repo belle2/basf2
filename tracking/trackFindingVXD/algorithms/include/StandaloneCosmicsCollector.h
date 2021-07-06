@@ -1,11 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Felix Metzner                                            *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #pragma once
 
@@ -97,9 +95,9 @@ namespace Belle2 {
         fitting = doLineFit(minSPs);
         if (not fitting) {return false;}
         if (m_reducedChi2 > qualityCut) {
-          B2DEBUG(20, "Refitting without sp with index " << m_shittiest.second
-                  << " and chi2 contribution " << m_shittiest.first << "...");
-          m_spacePoints.erase(m_spacePoints.begin() + m_shittiest.second);
+          B2DEBUG(20, "Refitting without sp with index " << m_largestChi2.second
+                  << " and chi2 contribution " << m_largestChi2.first << "...");
+          m_spacePoints.erase(m_spacePoints.begin() + m_largestChi2.second);
           rejected++;
         }
         if (rejected > maxRejected) { B2DEBUG(20, "Rejected " << rejected << "!"); return false; }
@@ -234,8 +232,8 @@ namespace Belle2 {
       // Calculating reduced chi2 value of the line fit using the distances of the SpacePoints to the obtained line and
       // keeping the m_spacePoints index and the chi2 contribution of the SpacePoint with the largest contribution.
       m_reducedChi2 = 0;
-      m_shittiest = std::pair<double, int>(0., 0);
-      int shit_index = 0;
+      m_largestChi2 = std::pair<double, int>(0., 0);
+      int largestChi2_index = 0;
       for (const auto& sp : m_spacePoints) {
         Eigen::Matrix<double, 3, 1> origin(sp->getPosition().X(), sp->getPosition().Y(), sp->getPosition().Z());
         plane = Eigen::Hyperplane<double, 3>(e.normalized(), origin);
@@ -245,11 +243,11 @@ namespace Belle2 {
         double delta_chi2 = (point - origin).transpose() * (point - origin);
         m_reducedChi2 += delta_chi2;
 
-        if (delta_chi2 > m_shittiest.first) {
-          m_shittiest.first = delta_chi2;
-          m_shittiest.second = shit_index;
+        if (delta_chi2 > m_largestChi2.first) {
+          m_largestChi2.first = delta_chi2;
+          m_largestChi2.second = largestChi2_index;
         }
-        shit_index++;
+        largestChi2_index++;
       }
 
       m_reducedChi2 *= 1. / nHits;
@@ -353,7 +351,7 @@ namespace Belle2 {
      * first: contribution to the total chi2 value of the last fit
      * second: index of the SpacePoint with this largest contribution in the vector m_spacePoints.
      */
-    std::pair<double, int> m_shittiest = std::pair<double, int>(0., 0);
+    std::pair<double, int> m_largestChi2 = std::pair<double, int>(0., 0);
 
     /// Start point obtained by the last performed line fit.
     std::vector<double> m_start {0., 0., 0.};

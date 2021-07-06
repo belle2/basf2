@@ -1,15 +1,11 @@
-//-----------------------------------------------------------
-// $Id$
-//-----------------------------------------------------------
-// Filename : TRGTOPSlotTiming.h
-// Section  : TRG TOP
-// Owner    : Tong Pang  Vladimir Savinov
-// Email    : top16@pitt.edu, vladimirsavinov@gmail.com
-//-----------------------------------------------------------
-// Description : A class to represent TOP L1 slot-level timing decision
-//-----------------------------------------------------------
-// $Log$
-//-----------------------------------------------------------
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 #ifndef TRGTOPSLOTTIMING_H
 #define TRGTOPSLOTTIMING_H
 

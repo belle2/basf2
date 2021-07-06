@@ -1,11 +1,10 @@
-//+
-// File : storageoutput.h
-// Description : Sequential ROOT I/O output module for DAQ
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 13 - Aug - 2010
-//        9  - Dec - 2013 ; update for DAQ
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #ifndef STORAGE_OUTPUT_H
 #define STORAGE_OUTPUT_H

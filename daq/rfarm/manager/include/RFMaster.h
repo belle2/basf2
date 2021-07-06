@@ -1,12 +1,12 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #ifndef RF_MASTER_H
 #define RF_MASTER_H
-//+
-// File : RFMaster.h
-// Description : Master node for RFARM
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 31 - Jul - 2013
-//-
 
 #include "daq/rfarm/manager/RFConf.h"
 #include "daq/rfarm/manager/RFSharedMem.h"

@@ -1,10 +1,10 @@
-//+
-// File : DeSerializerPC.cc
-// Description : Module to receive data from eb0 and send it to eb1tx
-//
-// Author : Satoru Yamada Itoh, IPNS, KEK
-// Date : 2 - Aug - 2013
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include <daq/rawdata/modules/DeSerializerPC.h>
 #include <daq/dataobjects/SendHeader.h>

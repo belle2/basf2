@@ -1,10 +1,11 @@
-//---------------------------------------------------------------
-// $Id$
-//---------------------------------------------------------------
-// Filename : TrgEcl.cc
-// Section  : TRG ECL
-// Owner    : InSoo Lee / Yuuji Unno
-// Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 //---------------------------------------------------------------
 // Description : A class to represent TRG ECL
 //---------------------------------------------------------------------------------
@@ -51,13 +52,6 @@
 //                   |      1 |  88 downto 87 | 3D Bhabha selection theta flag
 //                   |      1 |         89    | ecltaub2b for 1x1 tau process (110<delta phi(CM)<250, 130<Thata Sum(CM)<230, Etot1to17(Lab)<7GeV, E(1CL)(Lab)<1.9GeV)
 // ---------------------------------------------------------------------------------
-//
-//---------------------------------------------------------------
-// $Log$
-// 2017-02-23 version 1.0
-// 2019-05-13 version 2.0 for Phase 3
-// 2020-05-13 version 2.1 for Bug fixing
-//---------------------------------------------------------------
 
 #define TRG_SHORT_NAMES
 #define TRGECL_SHORT_NAMES

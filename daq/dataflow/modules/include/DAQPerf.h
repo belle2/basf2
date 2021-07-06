@@ -1,10 +1,10 @@
-//+
-// File : DAQPerf.h
-// Description : Module to measure data transfer performance
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 4 - Jan - 2012
-//-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #ifndef DAQPERF_H
 #define DAQPERF_H

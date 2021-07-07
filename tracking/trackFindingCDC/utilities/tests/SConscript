@@ -1,0 +1,8 @@
+Import('env')
+
+env['LIBS'] = [
+    '$ROOT_LIBS',
+    '$PYTHON_LIBS',
+    ]
+
+Return('env')

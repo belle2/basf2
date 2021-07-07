@@ -1,0 +1,31 @@
+# EventType: 1790020055
+# Descriptor: [Upsilon6S_pipiPHSP_Y1S]
+# NickName: Upsilon6S_pipiPHSP_Y1S
+# Cuts: None
+# Documentation: Decay for Y(6S) physics
+# PhysicsWG: Bottomonium
+# Tested: Yes
+# Responsible: Bryan Fulsom
+# Email: bryan.fulsom@pnnl.gov
+# Date: 20161101
+#
+# June 2021 Automated: Converted PYTHIA ids
+#   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
+
+Decay Upsilon(6S)
+1.0 pi+ pi- Upsilon PHSP;
+Enddecay
+
+Decay Upsilon
+0.023800000 e+ e- PHOTOS VLL; #[Reconstructed PDG2011]
+0.024800000 mu+ mu- PHOTOS VLL; #[Reconstructed PDG2011]
+0.026000000 tau+ tau- VLL; #[Reconstructed PDG2011]
+0.008700000 d anti-d PYTHIA 91; #[Reconstructed PDG2011], all qqbar have been corrected to 1/4 ratio
+0.034900000 u anti-u PYTHIA 91; #[Reconstructed PDG2011]
+0.008700000 s anti-s PYTHIA 91; #[Reconstructed PDG2011]
+0.034900000 c anti-c PYTHIA 91; #[Reconstructed PDG2011]
+0.816000000 g g g PYTHIA 92; #[Reconstructed PDG2011] PDG says: 0.817
+0.022000000 gamma g g PYTHIA 92; #[Reconstructed PDG2011] PDG says: 0.022
+Enddecay
+
+End

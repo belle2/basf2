@@ -1,0 +1,131 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+import sys
+import ROOT
+import os
+
+def printUsage():
+    print(f'Usage: {os.path.basename(__file__)} OUTPUT_FILE INPUT_FILE1 [INPUT_FILE2 ...]')
+    print('')
+    print(' Like hadd for most .root files,  but if a file only contains persistent.ProcessStatistics')
+    print(' (and possibly FileMetaData, EventMetaData), these objects are merged into a single')
+    print(' statistics object in the output file, other branches are discarded.')
+
+
+def is_statistics_file(tfile):
+    """return True if and only if tfile only contains ProcessStatistics as non-default branch"""
+    eventTree = tfile.Get('tree')
+    if eventTree:
+        eventList = eventTree.GetListOfBranches()
+        if eventList.GetEntries() != 1:
+            return False
+        if eventList.At(0).GetName() != 'EventMetaData':
+            return False
+
+    persistentTree = tfile.Get('persistent')
+    if not persistentTree:
+        return False
+    persistentList = [b.GetName() for b in persistentTree.GetListOfBranches()]
+    if persistentList == ['ProcessStatistics'] or sorted(persistentList) == ['FileMetaData', 'ProcessStatistics']:
+        return True
+    return False
+
+def is_monitor_ntuple_file(tfile):
+    if 'Monitor_Final' in tfile.GetName():
+        return True
+    else:
+        return False
+
+def is_training_ntuple_file(tfile):
+    if 'training_input' in tfile.GetName():
+        return True
+    else:
+        return False
+
+def doMerge(outFile, inFiles):
+    out = ROOT.TFile.Open(outFile, 'NEW')
+    if not out:
+        print('Error: output file "%s" already exists!' % outFile)
+        sys.exit(1)
+
+    inTree = ROOT.TChain('persistent')
+    for f in inFiles:
+        # AddFile() does not perform wildcard expansion (iirc)
+        inTree.AddFile(f)
+    inTree.GetEntry(0)
+    # Clone() needed so we actually own the object
+    stats = inTree.ProcessStatistics.Clone()
+
+    # merge statistics from all persistent trees into 'stats'
+    numEntries = inTree.GetEntries()
+    print("Merging %d files into %s..." % (numEntries, outFile))
+    for i in range(1, numEntries):
+        inTree.GetEntry(i)
+        stats.merge(inTree.ProcessStatistics)
+    print("done, saving.")
+
+    #print stats.getStatisticsString()
+    out.cd()
+    outTree = ROOT.TTree('persistent', 'persistent')
+    outTree.Branch('ProcessStatistics', stats)
+    outTree.Fill()
+    outTree.Write()
+    out.Close()
+
+def doMergeNtuple(outFile, inFiles):
+    first_input = ROOT.TFile.Open(inFiles[0],'read')
+    tchains = [ROOT.TChain(k.GetName()) for k in first_input.GetListOfKeys()]
+
+    output = ROOT.TFile.Open(outFile,'recreate')
+
+    for t in tchains:
+        for f in inFiles:
+            t.Add(f)
+        t.Write(t.GetName(), ROOT.TObject.kOverwrite)
+
+    output.Close()
+
+if len(sys.argv) < 3:
+    printUsage()
+    sys.exit(1)
+
+outFile = sys.argv[1]
+
+if os.path.isfile(outFile) and not is_training_ntuple_file(ROOT.TFile.Open(outFile, 'read')):
+    os.remove(outFile)
+
+inFiles = sys.argv[2:]
+
+ROOT.gSystem.Load('libdataobjects')
+
+# pick first input file to check what we want to do
+filename = inFiles[0]
+tfile = ROOT.TFile.Open(filename, 'read')
+print(f'Preparing merging for {outFile}')
+if is_statistics_file(tfile):
+    print('Is a statistics file')
+    doMerge(outFile, inFiles)
+elif is_monitor_ntuple_file(tfile):
+    print('Is a monitor ntuple file')
+    doMergeNtuple(outFile, inFiles)
+elif is_training_ntuple_file(tfile):
+    print('Is a training ntuple file')
+    import subprocess
+    if os.path.exists(outFile):
+        print(f'\t{outFile} exists already! Appending...')
+        ret = subprocess.call(['hadd', '-a', outFile] + inFiles)
+    else:
+        ret = subprocess.call(['hadd', outFile] + inFiles)
+else:
+    print('Is a histogram file')
+    import subprocess
+    ret = subprocess.call(['hadd', outFile] + inFiles)
+    sys.exit(ret)

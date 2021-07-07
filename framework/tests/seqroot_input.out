@@ -1,0 +1,2158 @@
+[INFO] Steering file: framework/tests/seqroot_input.py
+[INFO] The random number seed is set to "something important"
+Trying 01-ok.sroot ...
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+[INFO] ========================================================================
+[INFO] >>> Start new run: 1
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        0        RUN:        1        EVT:        2
+[INFO] ============================================================================
+[INFO] DataStore collections in event 2
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:        6
+[INFO] ============================================================================
+[INFO] DataStore collections in event 6
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 33
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 
+[INFO] EXP:        0        RUN:        1        EVT:        5
+[INFO] ============================================================================
+[INFO] DataStore collections in event 5
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 37
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 
+truehit 1 => hits 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 
+[INFO] EXP:        0        RUN:        1        EVT:        9
+[INFO] ============================================================================
+[INFO] DataStore collections in event 9
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 31
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 
+[INFO] EXP:        0        RUN:        1        EVT:       10
+[INFO] ============================================================================
+[INFO] DataStore collections in event 10
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 56
+[INFO] PXDTrueHit[]         PXDTrueHits                3
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 
+truehit 1 => hits 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 
+truehit 2 => hits 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 
+[INFO] EXP:        0        RUN:        1        EVT:       11
+[INFO] ============================================================================
+[INFO] DataStore collections in event 11
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 71
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 
+truehit 1 => hits 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 
+[INFO] EXP:        0        RUN:        1        EVT:        8
+[INFO] ============================================================================
+[INFO] DataStore collections in event 8
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:       12
+[INFO] ============================================================================
+[INFO] DataStore collections in event 12
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 76
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 
+truehit 1 => hits 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 
+[INFO] EXP:        0        RUN:        1        EVT:        0
+[INFO] ============================================================================
+[INFO] DataStore collections in event 0
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 31
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 
+truehit 1 => hits 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 
+[INFO] EXP:        0        RUN:        1        EVT:       13
+[INFO] ============================================================================
+[INFO] DataStore collections in event 13
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 70
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 
+truehit 1 => hits 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 
+[INFO] EXP:        0        RUN:        1        EVT:       15
+[INFO] ============================================================================
+[INFO] DataStore collections in event 15
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:       16
+[INFO] ============================================================================
+[INFO] DataStore collections in event 16
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 66
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 
+truehit 1 => hits 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 
+[INFO] EXP:        0        RUN:        1        EVT:        7
+[INFO] ============================================================================
+[INFO] DataStore collections in event 7
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 54
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 
+truehit 1 => hits 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 
+[INFO] EXP:        0        RUN:        1        EVT:        6
+[INFO] ============================================================================
+[INFO] DataStore collections in event 6
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 62
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 
+truehit 1 => hits 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 
+[INFO] EXP:        0        RUN:        1        EVT:        3
+[INFO] ============================================================================
+[INFO] DataStore collections in event 3
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 80
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 
+truehit 1 => hits 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 
+[INFO] EXP:        0        RUN:        1        EVT:        8
+[INFO] ============================================================================
+[INFO] DataStore collections in event 8
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 46
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 
+truehit 1 => hits 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 
+[INFO] EXP:        0        RUN:        1        EVT:        9
+[INFO] ============================================================================
+[INFO] DataStore collections in event 9
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 35
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 
+[INFO] EXP:        0        RUN:        1        EVT:       12
+[INFO] ============================================================================
+[INFO] DataStore collections in event 12
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:        4
+[INFO] ============================================================================
+[INFO] DataStore collections in event 4
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 32
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 
+[INFO] EXP:        0        RUN:        1        EVT:       11
+[INFO] ============================================================================
+[INFO] DataStore collections in event 11
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 32
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 
+[INFO] EXP:        0        RUN:        1        EVT:       10
+[INFO] ============================================================================
+[INFO] DataStore collections in event 10
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 39
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 
+truehit 1 => hits 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 
+[INFO] EXP:        0        RUN:        1        EVT:       16
+[INFO] ============================================================================
+[INFO] DataStore collections in event 16
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 68
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+truehit 1 => hits 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 
+[INFO] EXP:        0        RUN:        1        EVT:       13
+[INFO] ============================================================================
+[INFO] DataStore collections in event 13
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 64
+[INFO] PXDTrueHit[]         PXDTrueHits                3
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
+truehit 1 => hits 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 
+truehit 2 => hits 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 
+[INFO] EXP:        0        RUN:        1        EVT:       17
+[INFO] ============================================================================
+[INFO] DataStore collections in event 17
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 
+truehit 1 => hits 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:       18
+[INFO] ============================================================================
+[INFO] DataStore collections in event 18
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 33
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 
+[INFO] EXP:        0        RUN:        1        EVT:       14
+[INFO] ============================================================================
+[INFO] DataStore collections in event 14
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 40
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 
+truehit 1 => hits 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 
+[INFO] EXP:        0        RUN:        1        EVT:       15
+[INFO] ============================================================================
+[INFO] DataStore collections in event 15
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 40
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
+truehit 1 => hits 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 
+[INFO] EXP:        0        RUN:        1        EVT:        2
+[INFO] ============================================================================
+[INFO] DataStore collections in event 2
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:        6
+[INFO] ============================================================================
+[INFO] DataStore collections in event 6
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 33
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 
+[INFO] EXP:        0        RUN:        1        EVT:        5
+[INFO] ============================================================================
+[INFO] DataStore collections in event 5
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 37
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 
+truehit 1 => hits 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 
+[INFO] EXP:        0        RUN:        1        EVT:        9
+[INFO] ============================================================================
+[INFO] DataStore collections in event 9
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 31
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 
+[INFO] EXP:        0        RUN:        1        EVT:       10
+[INFO] ============================================================================
+[INFO] DataStore collections in event 10
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 56
+[INFO] PXDTrueHit[]         PXDTrueHits                3
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 
+truehit 1 => hits 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 
+truehit 2 => hits 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 
+[INFO] EXP:        0        RUN:        1        EVT:       11
+[INFO] ============================================================================
+[INFO] DataStore collections in event 11
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 71
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 
+truehit 1 => hits 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 
+[INFO] EXP:        0        RUN:        1        EVT:        8
+[INFO] ============================================================================
+[INFO] DataStore collections in event 8
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:       12
+[INFO] ============================================================================
+[INFO] DataStore collections in event 12
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 76
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 
+truehit 1 => hits 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 
+[INFO] EXP:        0        RUN:        1        EVT:        0
+[INFO] ============================================================================
+[INFO] DataStore collections in event 0
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 31
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 
+truehit 1 => hits 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 
+[INFO] EXP:        0        RUN:        1        EVT:       13
+[INFO] ============================================================================
+[INFO] DataStore collections in event 13
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 70
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 
+truehit 1 => hits 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 
+[INFO] EXP:        0        RUN:        1        EVT:       15
+[INFO] ============================================================================
+[INFO] DataStore collections in event 15
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:       16
+[INFO] ============================================================================
+[INFO] DataStore collections in event 16
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 66
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 
+truehit 1 => hits 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 
+[INFO] EXP:        0        RUN:        1        EVT:        7
+[INFO] ============================================================================
+[INFO] DataStore collections in event 7
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 54
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 
+truehit 1 => hits 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 
+[INFO] EXP:        0        RUN:        1        EVT:        6
+[INFO] ============================================================================
+[INFO] DataStore collections in event 6
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 62
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 
+truehit 1 => hits 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 
+[INFO] EXP:        0        RUN:        1        EVT:        3
+[INFO] ============================================================================
+[INFO] DataStore collections in event 3
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 80
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 
+truehit 1 => hits 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 
+[INFO] EXP:        0        RUN:        1        EVT:        8
+[INFO] ============================================================================
+[INFO] DataStore collections in event 8
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 46
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 
+truehit 1 => hits 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 
+[INFO] EXP:        0        RUN:        1        EVT:        9
+[INFO] ============================================================================
+[INFO] DataStore collections in event 9
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 35
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 
+[INFO] EXP:        0        RUN:        1        EVT:       12
+[INFO] ============================================================================
+[INFO] DataStore collections in event 12
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:        4
+[INFO] ============================================================================
+[INFO] DataStore collections in event 4
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 32
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 
+[INFO] EXP:        0        RUN:        1        EVT:       11
+[INFO] ============================================================================
+[INFO] DataStore collections in event 11
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 32
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 
+[INFO] EXP:        0        RUN:        1        EVT:       10
+[INFO] ============================================================================
+[INFO] DataStore collections in event 10
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 39
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 
+truehit 1 => hits 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 
+[INFO] EXP:        0        RUN:        1        EVT:       16
+[INFO] ============================================================================
+[INFO] DataStore collections in event 16
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 68
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+truehit 1 => hits 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 
+[INFO] EXP:        0        RUN:        1        EVT:       13
+[INFO] ============================================================================
+[INFO] DataStore collections in event 13
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 64
+[INFO] PXDTrueHit[]         PXDTrueHits                3
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
+truehit 1 => hits 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 
+truehit 2 => hits 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 
+[INFO] EXP:        0        RUN:        1        EVT:       17
+[INFO] ============================================================================
+[INFO] DataStore collections in event 17
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 
+truehit 1 => hits 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:       18
+[INFO] ============================================================================
+[INFO] DataStore collections in event 18
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 33
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 
+[INFO] EXP:        0        RUN:        1        EVT:       14
+[INFO] ============================================================================
+[INFO] DataStore collections in event 14
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 40
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 
+truehit 1 => hits 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 
+[INFO] EXP:        0        RUN:        1        EVT:       15
+[INFO] ============================================================================
+[INFO] DataStore collections in event 15
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 40
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
+truehit 1 => hits 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 1
+[INFO] ========================================================================
+Trying 02-1+1b.sroot ...
+[INFO] Starting event processing, random seed is set to 'something important'
+[ERROR] SeqFile::read() basic_ios::clear: iostream error: couldn't read next record size
+[FATAL] SeqRootInput : Error in reading first event
+Trying 03-1+5b.sroot ...
+[INFO] Starting event processing, random seed is set to 'something important'
+[ERROR] SeqFile::read() basic_ios::clear: iostream error: could only read 1 bytes, expected 3971
+[FATAL] SeqRootInput : Error in reading first event
+Trying 04-2+1b.sroot ...
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+[INFO] ========================================================================
+[INFO] >>> Start new run: 1
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        0        RUN:        1        EVT:        2
+[INFO] ============================================================================
+[INFO] DataStore collections in event 2
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[ERROR] SeqFile::read() basic_ios::clear: iostream error: couldn't read next record size
+[ERROR] SeqRootInput : file read error
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 1
+[INFO] ========================================================================
+Trying 05-2+5b.sroot ...
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+[INFO] ========================================================================
+[INFO] >>> Start new run: 1
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        0        RUN:        1        EVT:        2
+[INFO] ============================================================================
+[INFO] DataStore collections in event 2
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[ERROR] SeqFile::read() basic_ios::clear: iostream error: could only read 1 bytes, expected 3882
+[ERROR] SeqRootInput : file read error
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 1
+[INFO] ========================================================================
+Trying 05-ok.sroot.gz ...
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+[INFO] ========================================================================
+[INFO] >>> Start new run: 1
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        0        RUN:        1        EVT:        2
+[INFO] ============================================================================
+[INFO] DataStore collections in event 2
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:        6
+[INFO] ============================================================================
+[INFO] DataStore collections in event 6
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 33
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 
+[INFO] EXP:        0        RUN:        1        EVT:        5
+[INFO] ============================================================================
+[INFO] DataStore collections in event 5
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 37
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 
+truehit 1 => hits 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 
+[INFO] EXP:        0        RUN:        1        EVT:        9
+[INFO] ============================================================================
+[INFO] DataStore collections in event 9
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 31
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 
+[INFO] EXP:        0        RUN:        1        EVT:       10
+[INFO] ============================================================================
+[INFO] DataStore collections in event 10
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 56
+[INFO] PXDTrueHit[]         PXDTrueHits                3
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 
+truehit 1 => hits 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 
+truehit 2 => hits 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 
+[INFO] EXP:        0        RUN:        1        EVT:       11
+[INFO] ============================================================================
+[INFO] DataStore collections in event 11
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 71
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 
+truehit 1 => hits 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 
+[INFO] EXP:        0        RUN:        1        EVT:        8
+[INFO] ============================================================================
+[INFO] DataStore collections in event 8
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:       12
+[INFO] ============================================================================
+[INFO] DataStore collections in event 12
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 76
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 
+truehit 1 => hits 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 
+[INFO] EXP:        0        RUN:        1        EVT:        0
+[INFO] ============================================================================
+[INFO] DataStore collections in event 0
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 31
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 
+truehit 1 => hits 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 
+[INFO] EXP:        0        RUN:        1        EVT:       13
+[INFO] ============================================================================
+[INFO] DataStore collections in event 13
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 70
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 
+truehit 1 => hits 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 
+[INFO] EXP:        0        RUN:        1        EVT:       15
+[INFO] ============================================================================
+[INFO] DataStore collections in event 15
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:       16
+[INFO] ============================================================================
+[INFO] DataStore collections in event 16
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 66
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 
+truehit 1 => hits 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 
+[INFO] EXP:        0        RUN:        1        EVT:        7
+[INFO] ============================================================================
+[INFO] DataStore collections in event 7
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 54
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 
+truehit 1 => hits 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 
+[INFO] EXP:        0        RUN:        1        EVT:        6
+[INFO] ============================================================================
+[INFO] DataStore collections in event 6
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 62
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 
+truehit 1 => hits 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 
+[INFO] EXP:        0        RUN:        1        EVT:        3
+[INFO] ============================================================================
+[INFO] DataStore collections in event 3
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 80
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 
+truehit 1 => hits 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 
+[INFO] EXP:        0        RUN:        1        EVT:        8
+[INFO] ============================================================================
+[INFO] DataStore collections in event 8
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 46
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 
+truehit 1 => hits 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 
+[INFO] EXP:        0        RUN:        1        EVT:        9
+[INFO] ============================================================================
+[INFO] DataStore collections in event 9
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 35
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 
+[INFO] EXP:        0        RUN:        1        EVT:       12
+[INFO] ============================================================================
+[INFO] DataStore collections in event 12
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:        4
+[INFO] ============================================================================
+[INFO] DataStore collections in event 4
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 32
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 
+[INFO] EXP:        0        RUN:        1        EVT:       11
+[INFO] ============================================================================
+[INFO] DataStore collections in event 11
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 32
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 
+[INFO] EXP:        0        RUN:        1        EVT:       10
+[INFO] ============================================================================
+[INFO] DataStore collections in event 10
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 39
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 
+truehit 1 => hits 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 
+[INFO] EXP:        0        RUN:        1        EVT:       16
+[INFO] ============================================================================
+[INFO] DataStore collections in event 16
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 68
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+truehit 1 => hits 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 
+[INFO] EXP:        0        RUN:        1        EVT:       13
+[INFO] ============================================================================
+[INFO] DataStore collections in event 13
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 64
+[INFO] PXDTrueHit[]         PXDTrueHits                3
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
+truehit 1 => hits 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 
+truehit 2 => hits 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 
+[INFO] EXP:        0        RUN:        1        EVT:       17
+[INFO] ============================================================================
+[INFO] DataStore collections in event 17
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 
+truehit 1 => hits 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:       18
+[INFO] ============================================================================
+[INFO] DataStore collections in event 18
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 33
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 
+[INFO] EXP:        0        RUN:        1        EVT:       14
+[INFO] ============================================================================
+[INFO] DataStore collections in event 14
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 40
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 
+truehit 1 => hits 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 
+[INFO] EXP:        0        RUN:        1        EVT:       15
+[INFO] ============================================================================
+[INFO] DataStore collections in event 15
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 40
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
+truehit 1 => hits 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 
+[INFO] EXP:        0        RUN:        1        EVT:        2
+[INFO] ============================================================================
+[INFO] DataStore collections in event 2
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:        6
+[INFO] ============================================================================
+[INFO] DataStore collections in event 6
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 33
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 
+[INFO] EXP:        0        RUN:        1        EVT:        5
+[INFO] ============================================================================
+[INFO] DataStore collections in event 5
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 37
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 
+truehit 1 => hits 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 
+[INFO] EXP:        0        RUN:        1        EVT:        9
+[INFO] ============================================================================
+[INFO] DataStore collections in event 9
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 31
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 
+[INFO] EXP:        0        RUN:        1        EVT:       10
+[INFO] ============================================================================
+[INFO] DataStore collections in event 10
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 56
+[INFO] PXDTrueHit[]         PXDTrueHits                3
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 
+truehit 1 => hits 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 
+truehit 2 => hits 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 
+[INFO] EXP:        0        RUN:        1        EVT:       11
+[INFO] ============================================================================
+[INFO] DataStore collections in event 11
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 71
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 
+truehit 1 => hits 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 
+[INFO] EXP:        0        RUN:        1        EVT:        8
+[INFO] ============================================================================
+[INFO] DataStore collections in event 8
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:       12
+[INFO] ============================================================================
+[INFO] DataStore collections in event 12
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 76
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 
+truehit 1 => hits 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 
+[INFO] EXP:        0        RUN:        1        EVT:        0
+[INFO] ============================================================================
+[INFO] DataStore collections in event 0
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 31
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 
+truehit 1 => hits 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 
+[INFO] EXP:        0        RUN:        1        EVT:       13
+[INFO] ============================================================================
+[INFO] DataStore collections in event 13
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 70
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 
+truehit 1 => hits 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 
+[INFO] EXP:        0        RUN:        1        EVT:       15
+[INFO] ============================================================================
+[INFO] DataStore collections in event 15
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:       16
+[INFO] ============================================================================
+[INFO] DataStore collections in event 16
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 66
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 
+truehit 1 => hits 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 
+[INFO] EXP:        0        RUN:        1        EVT:        7
+[INFO] ============================================================================
+[INFO] DataStore collections in event 7
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 54
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 
+truehit 1 => hits 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 
+[INFO] EXP:        0        RUN:        1        EVT:        6
+[INFO] ============================================================================
+[INFO] DataStore collections in event 6
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 62
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 
+truehit 1 => hits 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 
+[INFO] EXP:        0        RUN:        1        EVT:        3
+[INFO] ============================================================================
+[INFO] DataStore collections in event 3
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 80
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 
+truehit 1 => hits 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 
+[INFO] EXP:        0        RUN:        1        EVT:        8
+[INFO] ============================================================================
+[INFO] DataStore collections in event 8
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 46
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 
+truehit 1 => hits 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 
+[INFO] EXP:        0        RUN:        1        EVT:        9
+[INFO] ============================================================================
+[INFO] DataStore collections in event 9
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 35
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 
+[INFO] EXP:        0        RUN:        1        EVT:       12
+[INFO] ============================================================================
+[INFO] DataStore collections in event 12
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:        4
+[INFO] ============================================================================
+[INFO] DataStore collections in event 4
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 32
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 
+[INFO] EXP:        0        RUN:        1        EVT:       11
+[INFO] ============================================================================
+[INFO] DataStore collections in event 11
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 32
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 
+[INFO] EXP:        0        RUN:        1        EVT:       10
+[INFO] ============================================================================
+[INFO] DataStore collections in event 10
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 39
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 
+truehit 1 => hits 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 
+[INFO] EXP:        0        RUN:        1        EVT:       16
+[INFO] ============================================================================
+[INFO] DataStore collections in event 16
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 68
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+truehit 1 => hits 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 
+[INFO] EXP:        0        RUN:        1        EVT:       13
+[INFO] ============================================================================
+[INFO] DataStore collections in event 13
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 64
+[INFO] PXDTrueHit[]         PXDTrueHits                3
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
+truehit 1 => hits 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 
+truehit 2 => hits 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 
+[INFO] EXP:        0        RUN:        1        EVT:       17
+[INFO] ============================================================================
+[INFO] DataStore collections in event 17
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 
+truehit 1 => hits 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:       18
+[INFO] ============================================================================
+[INFO] DataStore collections in event 18
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 33
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 
+[INFO] EXP:        0        RUN:        1        EVT:       14
+[INFO] ============================================================================
+[INFO] DataStore collections in event 14
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 40
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 
+truehit 1 => hits 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 
+[INFO] EXP:        0        RUN:        1        EVT:       15
+[INFO] ============================================================================
+[INFO] DataStore collections in event 15
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 40
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
+truehit 1 => hits 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 1
+[INFO] ========================================================================
+Trying 06-1+1b.sroot.gz ...
+[INFO] Starting event processing, random seed is set to 'something important'
+[ERROR] SeqFile::read() basic_ios::clear: iostream error: couldn't read next record size
+[FATAL] SeqRootInput : Error in reading first event
+Trying 07-1+5b.sroot.gz ...
+[INFO] Starting event processing, random seed is set to 'something important'
+[ERROR] SeqFile::read() basic_ios::clear: iostream error: could only read 1 bytes, expected 3971
+[FATAL] SeqRootInput : Error in reading first event
+Trying 08-nogz.sroot.gz ...
+[INFO] Starting event processing, random seed is set to 'something important'
+[ERROR] SeqFile::read() cannot read file: gzip error: iostream error
+[FATAL] SeqRootInput : Error in reading first event
+Trying 09-cut.sroot.gz ...
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+[INFO] ========================================================================
+[INFO] >>> Start new run: 1
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        0        RUN:        1        EVT:        2
+[INFO] ============================================================================
+[INFO] DataStore collections in event 2
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:        6
+[INFO] ============================================================================
+[INFO] DataStore collections in event 6
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 33
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 
+[INFO] EXP:        0        RUN:        1        EVT:        5
+[INFO] ============================================================================
+[INFO] DataStore collections in event 5
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 37
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 
+truehit 1 => hits 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 
+[INFO] EXP:        0        RUN:        1        EVT:        9
+[INFO] ============================================================================
+[INFO] DataStore collections in event 9
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 31
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+truehit 1 => hits 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 
+[INFO] EXP:        0        RUN:        1        EVT:       10
+[INFO] ============================================================================
+[INFO] DataStore collections in event 10
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 56
+[INFO] PXDTrueHit[]         PXDTrueHits                3
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 
+truehit 1 => hits 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 
+truehit 2 => hits 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 
+[INFO] EXP:        0        RUN:        1        EVT:       11
+[INFO] ============================================================================
+[INFO] DataStore collections in event 11
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 71
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 
+truehit 1 => hits 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 
+[INFO] EXP:        0        RUN:        1        EVT:        8
+[INFO] ============================================================================
+[INFO] DataStore collections in event 8
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[INFO] EXP:        0        RUN:        1        EVT:       12
+[INFO] ============================================================================
+[INFO] DataStore collections in event 12
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 76
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 
+truehit 1 => hits 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 
+[INFO] EXP:        0        RUN:        1        EVT:        0
+[INFO] ============================================================================
+[INFO] DataStore collections in event 0
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 31
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 
+truehit 1 => hits 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 
+[INFO] EXP:        0        RUN:        1        EVT:       13
+[INFO] ============================================================================
+[INFO] DataStore collections in event 13
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 70
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 
+truehit 1 => hits 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 
+[INFO] EXP:        0        RUN:        1        EVT:       15
+[INFO] ============================================================================
+[INFO] DataStore collections in event 15
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
+[ERROR] SeqFile::read() gzip error: iostream error: could only read 0 bytes, expected 6819
+[ERROR] SeqRootInput : file read error
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 1
+[INFO] ========================================================================
+Trying 10-max.sroot ...
+[INFO] Starting event processing, random seed is set to 'something important'
+[ERROR] SeqFile::read() buffer too small, need at least 2147483647 bytes
+[FATAL] SeqRootInput : Error in reading first event
+Trying 11-no-permission.sroot ...
+[INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] SeqFile: error opening '11-no-permission.sroot': Permission denied, trying again with '.gz'
+[ERROR] SeqFile: error opening '11-no-permission.sroot': No such file or directory
+[FATAL] SeqRootInput : Error in opening input file : 11-no-permission.sroot
+Trying nosuchfile.sroot ...
+[INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] SeqFile: error opening 'nosuchfile.sroot': No such file or directory, trying again with '.gz'
+[ERROR] SeqFile: error opening 'nosuchfile.sroot': No such file or directory
+[FATAL] SeqRootInput : Error in opening input file : nosuchfile.sroot
+Trying /nosuchdir/file.sroot ...
+[INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] SeqFile: error opening '/nosuchdir/file.sroot': No such file or directory, trying again with '.gz'
+[ERROR] SeqFile: error opening '/nosuchdir/file.sroot': No such file or directory
+[FATAL] SeqRootInput : Error in opening input file : /nosuchdir/file.sroot

@@ -1,0 +1,246 @@
+Changes in the analysis package
+-------------------------------
+
+TreeFitter
+++++++++++
+
+* Fix the :math:`\phi`-dependent loss of performance for displaced vertices (:issue:`BII-4753`).  
+
+Flavor Tagger
++++++++++++++
+
+* Default Expert (testing mode) does not create repositories and does not save weight files locally. 
+  It only loads the payloads directly from the database using the database payload names
+  as mva identifiers.
+* BtagToWBosonVariables adapted to work with the new ROE.
+* All release validation and performance evaluation scripts added to ``$BELLE2_RELEASE_DIR/analysis/release-validation/CPVTools``.
+* The flavor tagger creates and adds default aliases into the collection list ``flavor_tagging``.
+
+Vertex Fitting
+++++++++++++++
+
+* Added IP tube constraint to KFit.
+
+* The parameter confidenceLevel of the :b2:mod:`ParticleVertexFitter` now always
+  rejects the particle candidates with a p-value lower than the specified one.
+  Specifically, setting confidenceLevel to 0 does not reject candidates with
+  p-value equal to 0 anymore. Thus, the meaning of this parameter is now
+  the same as for the :b2:mod:`TreeFitter`.
+
+FEI
++++
+
+* Removed the backward compatibility layer (``pid_renaming_oktober_2017``). 
+  Only FEI trainings from release-02 are supported. 
+  Please update to ``FEIv4_2018_MC9_release_02_00_01`` or newer.
+
+Variables
++++++++++
+
+.. warning:: we overhauled the helicity variables and added new ones to replace the ``NtupleHelicityTool``.
+   We renamed ``cosHelicityAngle`` to :b2:var:`cosHelicityAngleMomentum`,
+   ``cosHelicityAnglePi0Dalitz`` to :b2:var:`cosHelicityAngleMomentumPi0Dalitz`, and
+   ``cosHelicityAngleIfCMSIsTheMother`` to :b2:var:`cosHelicityAngleBeamMomentum`.
+   We added the variables :b2:var:`cosHelicityAngle` and :b2:var:`cosAcoplanarityAngle`
+   defining them as the PDG 2018, p. 722.
+
+* The function to create variable aliases for particles selected from a decay
+  string has been fixed and extended to allow better customization (:issue:`BII-4437`)
+
+  .. seealso:: `variables.utils.create_aliases_for_selected()`
+
+* Added a variable that returns the distance between a KLMCluster and its associated Track :b2:var:`klmClusterTrackDistance`
+
+* Access to tag vertexing quality indicators for resolution function study, :b2:var:`TagVNDF`, :b2:var:`TagVChi2`, and :b2:var:`TagVChi2IP`.
+
+* Statistically correct combination of p-values :b2:var:`pValueCombination`
+
+* Added the meta variable :b2:var:`clusterHasFailedTiming` to check if
+  the ECL cluster's timing fit failed.
+
+* Added the meta variable :b2:var:`clusterHasFailedErrorTiming` to
+  check if the calculation of the ECL cluster's error on the timing failed.
+
+* The chi2 and ndf from KFit vertices are stored as extraInfo for debugging.
+
+* Added :b2:var:`trackFitHypothesisPDG` which returns the PDG code of the successful track fit hypothesis 
+  that was used to create this particle (that might be different from the PDG code of the particle list)
+
+* Added variables for 2D Armenteros-Podolanski plot, :b2:var:`ArmenterosLongitudinalMomentumAsymmetry`, 
+  :b2:var:`ArmenterosDaughter1Qt`, and :b2:var:`ArmenterosDaughter2Qt`
+
+* Fall-back value changed from zero to NaN for several track variables.
+
+* Added :b2:var:`sourceObjectIsInList` which checks whether there are particles from the same underlying track or cluster in a given particle list. 
+  Similar to :b2:var:`isInList` but a tighter check.
+
+* Added :b2:var:`isCloneOfSignalSide` and :b2:var:`hasAncestorFromSignalSide`  variables to monitor the clone particle
+  contamination in ROE. These variables use generator information.
+
+* The variables for the fast reco HLT trigger stage have been removed,
+  as we are currently not planning to have it in the early data taking.
+
+* The event-based variable ``KLMEnergy`` is removed. It is completely meaningless (:issue:`BII-5002`).
+
+* The variables ( :b2:var:`dx`, :b2:var:`dy`, :b2:var:`dz`, :b2:var:`dr`, :b2:var:`dphi`, :b2:var:`dcosTheta` ) are now with respect to the interaction point (as documented). 
+  This now makes them different with respect to the cartesian position ( :b2:var:`x`, :b2:var:`y`, :b2:var:`z` ) with respect to the origin..
+  This is similarly true for ( :b2:var:`mcDecayVertexFromIPX`, :b2:var:`mcDecayVertexFromIPY`, :b2:var:`mcDecayVertexFromIPZ` )  versus ( :b2:var:`mcDecayVertexX`, :b2:var:`mcDecayVertexY` and :b2:var:`mcDecayVertexZ` ).
+
+* Added the meta variable :b2:var:`eclClusterSpecialTrackMatched` to check if
+  any track related to an ECL cluster satisfies certain criteria. It can be used
+  to apply an individual track-cluster matching.
+
+* Added missing error variables :b2:var:`DeltaZErr` and :b2:var:`DeltaBoostErr`. 
+  Fixed bug in TagV error functions.
+
+* Replaced :b2:var:`pValue` (tracking variable) with :b2:var:`chiProb` (vertexing variable) 
+  in the collection of vertexing variables.
+
+* Replaced :b2:var:`pValue` (always the track-fit pvalue) with :b2:var:`chiProb` (context-dependent :math:`\chi^2` probability variable) in the vertexing variable collection.
+ 
+
+* Added the meta variables :b2:var:`averageValueInList` and
+  :b2:var:`medianValueInList` which calculate the arithmetic mean and median of
+  a given variable in a given particle list.
+
+* Removed ``nECLClusters`` (:issue:`BII-4476`).
+  The number of ``ECLClusters`` is not a good measure for anything except the age of the input mdst file.
+  Recent changes to the handling of ECLClusters and their hypotheses have changed this (already arbitrary) 
+  number to another (equally arbitrary but different) number.
+
+  .. hint::
+	For most common use cases, the recommended alternative is the total number of photons
+        (unique photon hypothesis clusters) in the event:
+
+	.. code-block:: python
+
+		from variables import variables
+		from stdPhotons import stdPhotons
+		stdPhotons("cdc", path=mypath) # creates the all and cdc lists
+                variables.addAlias("nPhotonsAll", "nParticlesInList(gamma:all)")
+                variables.addAlias("nPhotonsCDC", "nParticlesInList(gamma:cdc)")
+                variables.addAlias("totalPhotonEECL", "totalEnergyOfParticlesInList(gamma:all)")
+
+* Deprecated ``clusterHypothesis`` following changes to the ECLCluster storage on mdst. 
+  Please use :b2:var:`clusterHasNPhotons` and :b2:var:`clusterHasNeutralHadron`.
+
+* Removed ``ClusterHadronIntensity`` and ``clusterUniqueID``.
+
+* Added helix extrapolation from charged tracks.
+
+* Added :b2:var:`clusterMdstIndex` variable to get ECLCluster mdst index for particles that do not originate from ECLCluster.
+
+* Added a convenience :b2:var:`M2`, that returns the invariant mass squared of a given Particle (determined from the particle's 4-momentum vector).
+
+* Added :b2:var:`eclClusterOnlyInvariantMass`, that returns the invariant mass of the particles, computed with cluster information
+
+* Added :b2:var:`grandDaughterDiffOf`,  :b2:var:`grandDaughterDiffOfPhi`, and  :b2:var:`grandDaughterDiffOfClusterPhi`.
+  They behave like :b2:var:`daughterDiffOf`, but use grandDaughters' information rather than daughters'.
+
+* Renamed ``ClusterHasPulseShapeDiscrimination`` to :b2:var:`clusterHasPulseShapeDiscrimination`, 
+  ``PulseShapeDiscriminationMVA`` to :b2:var:`clusterPulseShapeDiscriminationMVA`, 
+  and ``ClusterNumberOfHadronDigits`` to :b2:var`clusterNumberOfHadronDigits`.
+
+* Removed the misleading variable ``McFlavorOfTagSide``.
+
+* Added a variable :b2:var:`mcFlavorOfOtherB` which returns the tag-side flavor by checking the other Upsilon4S
+  daughter without using the ROE. This variable is part of the default ``flavor_tagging`` collection.
+
+* The name of the variable ``MCTagBFlavor`` changed to :b2:var:`internalTagVMCFlavor`. 
+  It should be used only by experts for debugging.
+
+* Added MC flight information variables, :b2:var:`mcFlightDistance` and :b2:var:`mcFlightTime`
+
+
+Modules
++++++++
+
+* Added the new module :b2:mod:`AllParticleCombiner` which is also available via the
+  function `modularAnalysis.combineAllParticles`. It creates a new Particle as
+  the combination of all unique Particles from the passed input ParticleLists.
+
+* The :b2:mod:`ParticleLoader` can load `RestOfEvent` as a particle
+  using a new function `modularAnalysis.fillParticleListFromROE`.
+  This ROE particle can be combined with any other particle or written down
+  using usual variables.
+
+  Another option is to load missing momentum as a particle by supplementing
+  ``useMissing = True`` argument to the function, mentioned above.
+
+* Fixed a bug in the :b2:mod:`BestCandidateSelection` module: When
+  ``allowMultiRank=True`` there always at least two candidates with rank of one,
+  even if they didn't have the same variable value (:issue:`BII-4460`)
+
+  This affects all users of `modularAnalysis.rankByLowest()` and
+  `modularAnalysis.rankByHighest()` if they passed ``allowMultiRank=True``
+
+* Fixed a bug in the :b2:mod:`BestCandidateSelection` module: now the
+  ``numBest`` parameter works as expected. 
+
+* Removal of the unsupported ECLClusterInfoModule.
+
+* Added `vertex.fitPseudo` function and a pseudo vertex fitting module
+  to add a covariance matrix when a vertex fit is not possible. E.g. for :math:`\pi^0` decays.
+
+* Added the new module :b2:mod:`SignalSideVariablesToDaughterExtraInfo`. It adds
+  ExtraInfo to a specified particle (typically a daughter on the signal side).
+  The corresponding information is calculated in the RestOfEvent so it is
+  supposed to be executed only in for_each ROE paths.
+
+* Fixed a bug and extended the functionality of the :b2:mod:`RestOfEventBuilder` module.
+  When providing a ParticleList of composite particles as an additional source
+  for building the ROE, the composite particles are now decomposed and their
+  final state daughters are added to the ROE (unless they are part of the
+  signal side or already present in the ROE). Previously, composite particles
+  were not decomposed and the first composite particle of the first
+  ParticleList of composite particles (and only this one) was always added to
+  the ROE.
+
+* The module ``VertexFitUpdateDaughters`` now always updates
+  the daughters (as advertised).
+
+
+Modular Analysis
+++++++++++++++++
+
+* A new boolean argument has been added to the function
+  `modularAnalysis.buildRestOfEvent`. It is called ``belle_sources`` and should be
+  switched to True (default is False) if you are analyzing converted Belle MC or
+  data. It triggers the ROE to be constructed from all tracks and from Belle's
+  specific gamma:mdst list.
+
+* Added signal region function `modularAnalysis.signalRegion`. By default,
+  this function enables a new variable ``isSignalRegion`` and excludes the
+  defined area when processing is done on data.
+
+Standard Particle Lists
++++++++++++++++++++++++
+
+* Updated V0 lists. The standard list became the merged list, a combined list of particles
+  coming from V0 objects merged with a list of particles combined using the analysis 
+  :b2:mod:`ParticleCombiner` module.
+
+  `stdV0s.stdKshorts` returns a Ks list called ``K_S0:merged``
+  `stdV0s.stdLambdas` returns a Lambda list called ``Lambda0:merged``
+
+  mergedKshorts() and mergedLambdas() are now deprecated, and return the standard lists.
+  
+* The definition of the standard V0 lists slightly changed. 
+  For Lambdas, the modularAnalysis.markDuplicate() function is now used to detect duplicates
+  among the same list (V0 and ReconstructDecay), rather than between different lists.
+  For Ks, the modularAnalysis.markDuplicate() function is no longer used.
+
+* Updated V0 lists by making them explicitly call the appropriate vertex fit.
+
+* Fixed a bug in the merged Lambda list, which used an incorrect mass window.
+
+* Fix the `stdKlongs.stdKlongs` lists.
+
+* Updated charged standard PID cut values to reflect the correct efficiencies.
+  This recovers the efficiency loss reported in :issue:`BIIDP-1065`.
+
+Tutorials
++++++++++
+
+* Fix B2A202 to load Klongs as advertised.
+* Fix B2A801 to use JPsiKs as signal channel and to show how to run on Belle data/MC. Central database global tag updated.

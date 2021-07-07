@@ -1,0 +1,9 @@
+import model sm
+generate MGGENERATE
+output MGOUTPUT
+launch
+MGRUNDCARD
+set ebeam1 MGBEAMENERGY
+set ebeam2 MGBEAMENERGY
+set nevents MGNEVENTS
+set iseed MGSEED

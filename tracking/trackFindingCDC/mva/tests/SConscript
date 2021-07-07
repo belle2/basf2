@@ -1,0 +1,12 @@
+Import('env')
+
+# Use the common libraries of the track finder for the test compilation
+env['LIBS'] = [
+    'tracking_trackFindingCDC',
+    'framework',
+    'boost_python',
+    '$ROOT_LIBS',
+    '$PYTHON_LIBS',
+    ]
+
+Return('env')

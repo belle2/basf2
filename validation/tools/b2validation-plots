@@ -1,0 +1,188 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+# Normal imports
+import argparse
+import os
+import sys
+
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
+
+from validationplots import create_plots
+import validationfunctions
+
+
+def get_argument_parser():
+    """ Define the accepted command line flags and read them in """
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-r",
+        "--revisions",
+        help="Takes a list of revisions (separated by spaces) and generates "
+             "the plots for them",
+        type=str,
+        nargs='*'
+    )
+    parser.add_argument(
+        "-f",
+        "--force",
+        help="Regenerates plots even if the requested combination exists "
+             "already",
+        action='store_true'
+    )
+    parser.add_argument(
+        "--popular",
+        help="Creates several sets of plots for popular combinations of "
+             "revisions.",
+        action="store_true",
+        dest="popular"
+    )
+
+    return parser
+
+
+def get_popular_revision_combinations(work_folder):
+    """ Returns several combinations of available revisions that we might
+    want to pre-build on the server.
+
+    Returns:
+        List[List of revisions (str)]
+    """
+    available = sorted(
+        validationfunctions.available_revisions(work_folder),
+        reverse=True
+    )
+    available_releases = [
+        revision for revision in available
+        if revision.startswith("release") or revision.startswith("prerelease")
+    ]
+    available_builds = [
+        revision for revision in available
+        if revision.startswith("build")
+    ]
+    available_nightlies = [
+        revision for revision in available
+        if revision.startswith("nightly")
+    ]
+
+    def atindex_or_none(lst, index):
+        """ Returns item at index from lst or None"""
+        try:
+            return lst[index]
+        except IndexError:
+            return None
+
+    def remove_duplicates_lstlst(lstlst):
+        """ Removes duplicate lists in a list of lists """
+        # If we didn't care about the order:
+        # return list(map(list, set(map(tuple, lstlst))))
+        # would do the job. But we do care, or at least it is very
+        # relevant which revision is first (because it gets taken
+        # as reference)
+        ret = []
+        for lst in lstlst:
+            if lst not in ret:
+                ret.append(lst)
+        return ret
+
+    # Return value
+    ret = [
+        # All revisions
+        ["reference"] + sorted(available),
+
+        # Latest X + reference
+        ["reference", atindex_or_none(available_releases, 0)],
+        ["reference", atindex_or_none(available_builds, 0)],
+        ["reference", atindex_or_none(available_nightlies, 0)],
+
+        # All latest + reference
+        ["reference"] + sorted(list(filter(
+            None,
+            [
+                atindex_or_none(available_releases, 0),
+                atindex_or_none(available_builds, 0),
+                atindex_or_none(available_nightlies, 0)
+            ]
+        ))),
+
+        # All nightlies + reference
+        ["reference"] + sorted(available_nightlies)
+    ]
+
+    # Remove all Nones from the sublists
+    ret = [
+        list(filter(None, comb)) for comb in ret
+    ]
+    # Remove all empty lists
+    ret = list(filter(None, ret))
+
+    # Remove duplicates
+    ret = remove_duplicates_lstlst(ret)
+
+    if not ret:
+        sys.exit("No revisions seem to be available. Exit.")
+
+    print("Plots for the following combinations of revisions will be created:")
+    for r in ret:
+        print(" * " + ", ".join(r))
+    print()
+
+    return ret
+
+
+if __name__ == "__main__":
+    # Only execute the program if a basf2 release is set up!
+    if os.environ.get('BELLE2_RELEASE_DIR', None) is None and os.environ.get('BELLE2_LOCAL_DIR', None) is None:
+        sys.exit('Error: No basf2 release set up!')
+
+    args = get_argument_parser().parse_args()
+
+    # Go to the html directory and call the create_plots function
+    save_dir = os.path.abspath(os.getcwd())
+
+    if not os.path.exists("results"):
+        print(
+            "Please run b2validation before running b2validation-plots.",
+            file=sys.stderr
+        )
+        sys.exit(164)
+
+    if not os.path.exists("html"):
+        os.mkdir("html")
+
+    os.chdir('html')
+
+    if not args.popular:
+        # Generate plot for the revisions specified in CLI
+        create_plots(
+            revisions=args.revisions,
+            force=args.force,
+            work_folder=save_dir
+        )
+    else:
+        # Generate several sets of plots
+        # Type: List[List of revisions]
+        revision_combinations = get_popular_revision_combinations(save_dir)
+        if args.revisions:
+            print(
+                "Warning: --revisions has no effect when --popular is "
+                "specified.",
+                file=sys.stderr
+            )
+        for revision_combination in revision_combinations:
+            create_plots(
+                revisions=revision_combination,
+                force=args.force,
+                work_folder=save_dir
+            )
+
+    # restore original working directory
+    os.chdir(save_dir)

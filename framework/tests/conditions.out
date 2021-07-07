@@ -1,0 +1,574 @@
+[INFO] Steering file: framework/tests/conditions.py
+[INFO] The random number seed is set to "something important"
+[INFO] >>> check exp 0: []...)
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.1" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12701/
+MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.1" 200 -
+[INFO] Conditions data: configured globaltag is localtest
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=0 HTTP/1.1" 200 -
+[ERROR] Cannot find payload in any of the configured global tags
+	name = BeamParameters
+	globaltags = localtest
+	experiment = 0
+	run = 0
+[FATAL] 1 ERROR(S) occurred! The processing of events will not be started.
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+Redirect Server: "GET /v2/globalTagStatus HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.0" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12702/
+Redirect Server: "GET /v2/globalTag/localtest HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.0" 200 -
+[INFO] Conditions data: configured globaltag is localtest
+Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=0 HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=0 HTTP/1.0" 200 -
+[ERROR] Cannot find payload in any of the configured global tags
+	name = BeamParameters
+	globaltags = localtest
+	experiment = 0
+	run = 0
+[FATAL] 1 ERROR(S) occurred! The processing of events will not be started.
+[INFO] >>> check exp 1: [{ "foo": { } }]...)
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.1" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12701/
+MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.1" 200 -
+[INFO] Conditions data: configured globaltag is localtest
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=1&runNumber=0 HTTP/1.1" 200 -
+[ERROR] Conditions Database: Problem parsing payload information.
+	globaltag = localtest
+	server url = http://localhost:12701/
+	error = [json.exception.out_of_range.403] key 'payload' not found
+[ERROR] Conditions data: Problem with payload metadata, trying to fall back to next provider ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+Redirect Server: "GET /v2/globalTagStatus HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.0" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12702/
+Redirect Server: "GET /v2/globalTag/localtest HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.0" 200 -
+[INFO] Conditions data: configured globaltag is localtest
+Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=1&runNumber=0 HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=1&runNumber=0 HTTP/1.0" 200 -
+[ERROR] Conditions Database: Problem parsing payload information.
+	globaltag = localtest
+	server url = http://localhost:12702/
+	error = [json.exception.out_of_range.403] key 'payload' not found
+[ERROR] Conditions data: Problem with payload metadata, trying to fall back to next provider ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] >>> check exp 2: [{ "foo...)
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.1" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12701/
+MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.1" 200 -
+[INFO] Conditions data: configured globaltag is localtest
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=2&runNumber=0 HTTP/1.1" 200 -
+[ERROR] Conditions Database: Problem parsing payload information.
+	globaltag = localtest
+	server url = http://localhost:12701/
+	error = [json.exception.parse_error.101] parse error at line 1, column 8: syntax error while parsing object key - invalid string: missing closing quote; last read: '"foo'; expected string literal
+[ERROR] Conditions data: Problem with payload metadata, trying to fall back to next provider ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+Redirect Server: "GET /v2/globalTagStatus HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.0" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12702/
+Redirect Server: "GET /v2/globalTag/localtest HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.0" 200 -
+[INFO] Conditions data: configured globaltag is localtest
+Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=2&runNumber=0 HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=2&runNumber=0 HTTP/1.0" 200 -
+[ERROR] Conditions Database: Problem parsing payload information.
+	globaltag = localtest
+	server url = http://localhost:12702/
+	error = [json.exception.parse_error.101] parse error at line 1, column 8: syntax error while parsing object key - invalid string: missing closing quote; last read: '"foo'; expected string literal
+[ERROR] Conditions data: Problem with payload metadata, trying to fall back to next provider ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] >>> check exp 3: [{
+        "payload"...)
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.1" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12701/
+MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.1" 200 -
+[INFO] Conditions data: configured globaltag is localtest
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=0 HTTP/1.1" 200 -
+MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
+[DEBUG:30] DBEntry changed
+	name = BeamParameters
+	revision = 1
+	checksum = 2447fbcf76419fbbc7c6d015ef507769
+	filename = ${cwd}/db-cache/24/BeamParameters_r1.root
+	validity = 3,0,3,0
+[INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
+   HER=(0.290583, 0, 6.99797, 7.004), 
+   LER=(0.166035, 0, -3.99855, 4.002), 
+   CMS=(0.456618, 0, 2.99942, 11.006), 
+   VTX=(0, 0, 0), 
+   CovHER=diag(2.63169e-05, 0, 0)
+   CovLER=diag(5.64063e-06, 0, 0)
+   CovVTX=[(4.10916e-07, 0, -2.64802e-06), (0, 1.7405e-11, 0), (-2.64802e-06, 0, 0.000237962)]
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=1 HTTP/1.1" 200 -
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=2 HTTP/1.1" 404 -
+[ERROR] Conditions Database: Problem parsing payload information.
+	globaltag = localtest
+	server url = http://localhost:12701/
+	error = The requested URL returned error: 404
+[ERROR] Conditions data: Problem with payload metadata, trying to fall back to next provider ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+Redirect Server: "GET /v2/globalTagStatus HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.0" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12702/
+Redirect Server: "GET /v2/globalTag/localtest HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.0" 200 -
+[INFO] Conditions data: configured globaltag is localtest
+Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=0 HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=0 HTTP/1.0" 200 -
+MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
+[DEBUG:30] DBEntry changed
+	name = BeamParameters
+	revision = 1
+	checksum = 2447fbcf76419fbbc7c6d015ef507769
+	filename = ${cwd}/db-cache/24/BeamParameters_r1.root
+	validity = 3,0,3,0
+[INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
+   HER=(0.290583, 0, 6.99797, 7.004), 
+   LER=(0.166035, 0, -3.99855, 4.002), 
+   CMS=(0.456618, 0, 2.99942, 11.006), 
+   VTX=(0, 0, 0), 
+   CovHER=diag(2.63169e-05, 0, 0)
+   CovLER=diag(5.64063e-06, 0, 0)
+   CovVTX=[(4.10916e-07, 0, -2.64802e-06), (0, 1.7405e-11, 0), (-2.64802e-06, 0, 0.000237962)]
+Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=1 HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=1 HTTP/1.0" 200 -
+Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=2 HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=2 HTTP/1.0" 404 -
+[ERROR] Conditions Database: Problem parsing payload information.
+	globaltag = localtest
+	server url = http://localhost:12702/
+	error = The requested URL returned error: 404
+[ERROR] Conditions data: Problem with payload metadata, trying to fall back to next provider ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] >>> check exp 4: [{
+        "payload"...)
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.1" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12701/
+MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.1" 200 -
+[INFO] Conditions data: configured globaltag is localtest
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=4&runNumber=0 HTTP/1.1" 200 -
+MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
+[WARNING] Conditions Database: checksum mismatch after download. Trying once more in a temporary file
+	name = BeamParameters
+	revision = 1
+	filename = ${cwd}/db-cache/00/BeamParameters_r1.root
+[ERROR] Conditions Database: failure downloading url
+	url = http://127.0.0.1:12701/dbstore_BeamParameters_rev_1.root
+	error = checksum mismatch
+MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
+[ERROR] Conditions data: Could not find file for payload
+	name = BeamParameters
+	revision = 1
+	checksum = 00[wrong checksum]
+	globaltag = localtest
+[DEBUG:30] DBEntry changed
+	name = BeamParameters
+	revision = 1
+	checksum = 00[wrong checksum]
+	filename = 
+	validity = 4,0,4,0
+[FATAL] 2 ERROR(S) occurred! The processing of events will not be started.
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+Redirect Server: "GET /v2/globalTagStatus HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.0" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12702/
+Redirect Server: "GET /v2/globalTag/localtest HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.0" 200 -
+[INFO] Conditions data: configured globaltag is localtest
+Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=4&runNumber=0 HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=4&runNumber=0 HTTP/1.0" 200 -
+MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
+[WARNING] Conditions Database: checksum mismatch after download. Trying once more in a temporary file
+	name = BeamParameters
+	revision = 1
+	filename = ${cwd}/db-cache/00/BeamParameters_r1.root
+[ERROR] Conditions Database: failure downloading url
+	url = http://127.0.0.1:12701/dbstore_BeamParameters_rev_1.root
+	error = checksum mismatch
+MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
+[ERROR] Conditions data: Could not find file for payload
+	name = BeamParameters
+	revision = 1
+	checksum = 00[wrong checksum]
+	globaltag = localtest
+[DEBUG:30] DBEntry changed
+	name = BeamParameters
+	revision = 1
+	checksum = 00[wrong checksum]
+	filename = 
+	validity = 4,0,4,0
+[FATAL] 2 ERROR(S) occurred! The processing of events will not be started.
+[INFO] >>> check exp 5: [{
+        "payload"...)
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.1" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12701/
+MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.1" 200 -
+[INFO] Conditions data: configured globaltag is localtest
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=5&runNumber=0 HTTP/1.1" 200 -
+MockConditionsDB: "GET /dbstore_BeamParameters_rev_2.root HTTP/1.1" 404 -
+[ERROR] Conditions Database: failure downloading url
+	url = http://127.0.0.1:12701/dbstore_BeamParameters_rev_2.root
+	error = The requested URL returned error: 404
+MockConditionsDB: "GET /dbstore_BeamParameters_rev_2.root HTTP/1.1" 404 -
+[ERROR] Conditions Database: failure downloading url
+	url = http://127.0.0.1:12701/dbstore_BeamParameters_rev_2.root
+	error = The requested URL returned error: 404
+[ERROR] Conditions data: Could not find file for payload
+	name = BeamParameters
+	revision = 2
+	checksum = 00[missing]
+	globaltag = localtest
+[DEBUG:30] DBEntry changed
+	name = BeamParameters
+	revision = 2
+	checksum = 00[missing]
+	filename = 
+	validity = 5,0,5,0
+[FATAL] 3 ERROR(S) occurred! The processing of events will not be started.
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+Redirect Server: "GET /v2/globalTagStatus HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.0" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12702/
+Redirect Server: "GET /v2/globalTag/localtest HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.0" 200 -
+[INFO] Conditions data: configured globaltag is localtest
+Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=5&runNumber=0 HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=5&runNumber=0 HTTP/1.0" 200 -
+MockConditionsDB: "GET /dbstore_BeamParameters_rev_2.root HTTP/1.1" 404 -
+[ERROR] Conditions Database: failure downloading url
+	url = http://127.0.0.1:12701/dbstore_BeamParameters_rev_2.root
+	error = The requested URL returned error: 404
+MockConditionsDB: "GET /dbstore_BeamParameters_rev_2.root HTTP/1.1" 404 -
+[ERROR] Conditions Database: failure downloading url
+	url = http://127.0.0.1:12701/dbstore_BeamParameters_rev_2.root
+	error = The requested URL returned error: 404
+[ERROR] Conditions data: Could not find file for payload
+	name = BeamParameters
+	revision = 2
+	checksum = 00[missing]
+	globaltag = localtest
+[DEBUG:30] DBEntry changed
+	name = BeamParameters
+	revision = 2
+	checksum = 00[missing]
+	filename = 
+	validity = 5,0,5,0
+[FATAL] 3 ERROR(S) occurred! The processing of events will not be started.
+[INFO] >>> check exp 6: [{
+        "payload"...)
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.1" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12701/
+MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.1" 200 -
+[INFO] Conditions data: configured globaltag is localtest
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=0 HTTP/1.1" 200 -
+MockConditionsDB: "GET /dbstore_BeamParameters_rev_3.root HTTP/1.1" 200 -
+[DEBUG:30] DBEntry changed
+	name = BeamParameters
+	revision = 3
+	checksum = 2447fbcf76419fbbc7c6d015ef507769
+	filename = ${cwd}/db-cache/24/BeamParameters_r3.root
+	validity = 6,0,6,0
+[INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
+   HER=(0.290583, 0, 6.99797, 7.004), 
+   LER=(0.166035, 0, -3.99855, 4.002), 
+   CMS=(0.456618, 0, 2.99942, 11.006), 
+   VTX=(0, 0, 0), 
+   CovHER=diag(2.63169e-05, 0, 0)
+   CovLER=diag(5.64063e-06, 0, 0)
+   CovVTX=[(4.10916e-07, 0, -2.64802e-06), (0, 1.7405e-11, 0), (-2.64802e-06, 0, 0.000237962)]
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=1 HTTP/1.1" 200 -
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=2 HTTP/1.1" 404 -
+[ERROR] Conditions Database: Problem parsing payload information.
+	globaltag = localtest
+	server url = http://localhost:12701/
+	error = The requested URL returned error: 404
+[ERROR] Conditions data: Problem with payload metadata, trying to fall back to next provider ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+Redirect Server: "GET /v2/globalTagStatus HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.0" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12702/
+Redirect Server: "GET /v2/globalTag/localtest HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.0" 200 -
+[INFO] Conditions data: configured globaltag is localtest
+Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=0 HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=0 HTTP/1.0" 200 -
+MockConditionsDB: "GET /dbstore_BeamParameters_rev_3.root HTTP/1.1" 200 -
+[DEBUG:30] DBEntry changed
+	name = BeamParameters
+	revision = 3
+	checksum = 2447fbcf76419fbbc7c6d015ef507769
+	filename = ${cwd}/db-cache/24/BeamParameters_r3.root
+	validity = 6,0,6,0
+[INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
+   HER=(0.290583, 0, 6.99797, 7.004), 
+   LER=(0.166035, 0, -3.99855, 4.002), 
+   CMS=(0.456618, 0, 2.99942, 11.006), 
+   VTX=(0, 0, 0), 
+   CovHER=diag(2.63169e-05, 0, 0)
+   CovLER=diag(5.64063e-06, 0, 0)
+   CovVTX=[(4.10916e-07, 0, -2.64802e-06), (0, 1.7405e-11, 0), (-2.64802e-06, 0, 0.000237962)]
+Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=1 HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=1 HTTP/1.0" 200 -
+Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=2 HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=2 HTTP/1.0" 404 -
+[ERROR] Conditions Database: Problem parsing payload information.
+	globaltag = localtest
+	server url = http://localhost:12702/
+	error = The requested URL returned error: 404
+[ERROR] Conditions data: Problem with payload metadata, trying to fall back to next provider ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] >>> check exp 7
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.1" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12701/
+MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.1" 200 -
+[INFO] Conditions data: configured globaltag is localtest
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=0 HTTP/1.1" 404 -
+[ERROR] Conditions Database: Problem parsing payload information.
+	globaltag = localtest
+	server url = http://localhost:12701/
+	error = The requested URL returned error: 404
+[ERROR] Conditions data: Problem with payload metadata, trying to fall back to next provider ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+Redirect Server: "GET /v2/globalTagStatus HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.0" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12702/
+Redirect Server: "GET /v2/globalTag/localtest HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.0" 200 -
+[INFO] Conditions data: configured globaltag is localtest
+Redirect Server: "GET /v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=0 HTTP/1.1" 308 -
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=0 HTTP/1.0" 404 -
+[ERROR] Conditions Database: Problem parsing payload information.
+	globaltag = localtest
+	server url = http://localhost:12702/
+	error = The requested URL returned error: 404
+[ERROR] Conditions data: Problem with payload metadata, trying to fall back to next provider ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] >>> check that a invalid global tag or a misspelled global tag actually throw errors
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.1" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12701/
+MockConditionsDB: "GET /v2/globalTag/newgt HTTP/1.1" 200 -
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = newgt
+	status = NEW
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[FATAL] Conditions data: Problems with globaltag configuration, cannot continue
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.1" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12701/
+MockConditionsDB: "GET /v2/globalTag/invalidgt HTTP/1.1" 200 -
+[ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
+	globaltag = invalidgt
+	status = INVALID
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+[FATAL] Conditions data: Problems with globaltag configuration, cannot continue
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.1" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12701/
+MockConditionsDB: "GET /v2/globalTag/horriblymisspelled HTTP/1.1" 404 -
+[ERROR] Conditions Database: Cannot download information on global tag. Usually this means it doesn't exist and you misspelled the name
+	server url = http://localhost:12701/
+	globaltag = horriblymisspelled
+[FATAL] Conditions data: Problems with globaltag configuration, cannot continue
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.1" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12701/
+MockConditionsDB: "GET /v2/globalTag/h%CD%8C%CC%89e%CD%86%CD%A8%CC%8F%CD%8B%CC%95%CC%B3%CC%9E%CC%9E%20%CC%80%CD%A1%CD%8D%CD%9A%CC%B1%CC%B0c%CD%9Fo%CD%9B%D2%89%CC%9F%CC%B0%CC%AB%CD%94%CC%9F%CC%AA%CC%A0m%CC%80%CD%AF%CC%BF%CD%8C%CD%A8%CC%83%CD%86%CC%B4e%CD%A8%CD%AC%CC%91%CD%8C%CC%83%CC%A1%CD%85%CC%A6%CC%A6%CD%96%CC%B3%CD%89%CC%97t%CD%8C%CC%B0%CC%9D%CD%88%CD%9A%CD%8D%CC%B3%CD%87h%CD%83%CC%8C%CC%83%CC%93%CC%80%CC%89%CD%9C%CC%AD%CC%9C%CC%99%CC%A6%CC%A3%21%CC%88%CC%BF%CC%92%CC%80%CD%A2%CC%B1%CC%9E%CC%BB%21%CC%8B%CC%BD%CC%8D%CC%88%CD%90%CD%AB%CD%8F%CC%A0%CD%85%CC%B9%CC%BA%CC%9C%CC%AC%CD%8D HTTP/1.1" 404 -
+[ERROR] Conditions Database: Cannot download information on global tag. Usually this means it doesn't exist and you misspelled the name
+	server url = http://localhost:12701/
+	globaltag = h͌̉e̳̞̞͆ͨ̏͋̕ ͍͚̱̰̀͡c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢!̋̽̍̈͐ͫ͏̠̹̺̜̬͍ͅ
+[FATAL] Conditions data: Problems with globaltag configuration, cannot continue
+[INFO] >>> check retry on 503 errors
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.1" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12701/
+MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.1" 200 -
+[INFO] Conditions data: configured globaltag is localtest
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0 HTTP/1.1" 503 -
+[WARNING] Could not download url, retrying ...
+	url = http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0
+	error = The requested URL returned error: 503
+	try = 1
+	waiting time = 1
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0 HTTP/1.1" 503 -
+[WARNING] Could not download url, retrying ...
+	url = http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0
+	error = The requested URL returned error: 503
+	try = 2
+	waiting time = 1.9732459927339243
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0 HTTP/1.1" 503 -
+[WARNING] Could not download url, retrying ...
+	url = http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0
+	error = The requested URL returned error: 503
+	try = 3
+	waiting time = 4.4257193624731359
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0 HTTP/1.1" 503 -
+[ERROR] Conditions Database: Problem parsing payload information.
+	globaltag = localtest
+	server url = http://localhost:12701/
+	error = The requested URL returned error: 503
+[ERROR] Conditions data: Problem with payload metadata, trying to fall back to next provider ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] >>> check again without retries
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.1" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12701/
+MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.1" 200 -
+[INFO] Conditions data: configured globaltag is localtest
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0 HTTP/1.1" 503 -
+[ERROR] Conditions Database: Problem parsing payload information.
+	globaltag = localtest
+	server url = http://localhost:12701/
+	error = The requested URL returned error: 503
+[ERROR] Conditions data: Problem with payload metadata, trying to fall back to next provider ...
+[FATAL] Conditions data: No more metadata providers available
+[INFO] >>> try to open localhost on port 0, this should always be refused
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+[WARNING] Conditions data: Metadata provider not usable, trying next one ...
+	provider = http://localhost:0
+	error = URL using bad/illegal format or missing URL
+[FATAL] Conditions data: No more metadata providers available
+[INFO] >>> and once more with a non existing host name to check for lookup errors
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+[WARNING] Conditions data: Metadata provider not usable, trying next one ...
+	provider = http://nosuchurl/
+	error = Could not resolve host: nosuchurl
+[FATAL] Conditions data: No more metadata providers available
+[INFO] >>> and once more with a non existing protocol
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+[FATAL] Conditions data: Unknown metadata protocol, only supported protocols for payload metadata are file, http, https
+	protocol = nosuchproto
+[INFO] >>> and once more with a totally bogus url
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+[WARNING] Conditions data: Metadata provider not usable, trying next one ...
+	provider = h͌̉e̳̞̞͆ͨ̏͋̕ ͍͚̱̰̀͡c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢!̋̽̍̈͐ͫ͏̠̹̺̜̬͍ͅ
+	error = unable to open database file
+[FATAL] Conditions data: No more metadata providers available
+[INFO] >>> try to have a list of servers from environment variable
+    We expect that it fails over to the third server, {mock_host}, but then succeeds
+
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+[WARNING] Conditions data: Metadata provider not usable, trying next one ...
+	provider = http://localhost:0
+	error = URL using bad/illegal format or missing URL
+[WARNING] Conditions data: Metadata provider not usable, trying next one ...
+	provider = http://h͌̉e̳̞̞͆ͨ̏͋̕c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢
+	error = Could not resolve host: h͌̉e̳̞̞͆ͨ̏͋̕c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.1" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12701/
+MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.1" 200 -
+[INFO] Conditions data: configured globaltag is localtest
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=0 HTTP/1.1" 200 -
+MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
+[DEBUG:30] DBEntry changed
+	name = BeamParameters
+	revision = 1
+	checksum = 2447fbcf76419fbbc7c6d015ef507769
+	filename = ${cwd}/db-cache/24/BeamParameters_r1.root
+	validity = 3,0,3,0
+[INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
+   HER=(0.290583, 0, 6.99797, 7.004), 
+   LER=(0.166035, 0, -3.99855, 4.002), 
+   CMS=(0.456618, 0, 2.99942, 11.006), 
+   VTX=(0, 0, 0), 
+   CovHER=diag(2.63169e-05, 0, 0)
+   CovLER=diag(5.64063e-06, 0, 0)
+   CovVTX=[(4.10916e-07, 0, -2.64802e-06), (0, 1.7405e-11, 0), (-2.64802e-06, 0, 0.000237962)]
+[INFO] >>> try to have a list of servers from steering file
+    We expect that it fails over to the third server, {mock_host}, but then succeeds
+
+[WARNING] basf2.set_central_serverlist() is deprecated, please use basf2.conditions.metadata_providers instead
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+[WARNING] Conditions data: Metadata provider not usable, trying next one ...
+	provider = http://localhost:0
+	error = URL using bad/illegal format or missing URL
+[WARNING] Conditions data: Metadata provider not usable, trying next one ...
+	provider = http://h͌̉e̳̞̞͆ͨ̏͋̕c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢
+	error = Could not resolve host: h͌̉e̳̞̞͆ͨ̏͋̕c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢
+MockConditionsDB: "GET /v2/globalTagStatus HTTP/1.1" 200 -
+[INFO] Conditions Database: found working server
+	url = http://localhost:12701/
+MockConditionsDB: "GET /v2/globalTag/localtest HTTP/1.1" 200 -
+[INFO] Conditions data: configured globaltag is localtest
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=0 HTTP/1.1" 200 -
+MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
+[DEBUG:30] DBEntry changed
+	name = BeamParameters
+	revision = 1
+	checksum = 2447fbcf76419fbbc7c6d015ef507769
+	filename = ${cwd}/db-cache/24/BeamParameters_r1.root
+	validity = 3,0,3,0
+[INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
+   HER=(0.290583, 0, 6.99797, 7.004), 
+   LER=(0.166035, 0, -3.99855, 4.002), 
+   CMS=(0.456618, 0, 2.99942, 11.006), 
+   VTX=(0, 0, 0), 
+   CovHER=diag(2.63169e-05, 0, 0)
+   CovLER=diag(5.64063e-06, 0, 0)
+   CovVTX=[(4.10916e-07, 0, -2.64802e-06), (0, 1.7405e-11, 0), (-2.64802e-06, 0, 0.000237962)]

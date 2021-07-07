@@ -1,0 +1,18 @@
+Import('env')
+
+env['TOOLS_LIBS']['rf_eventserver'] = ['daq', 'framework', '$ROOT_LIBS', 'nsm2_basf2' ]
+env['TOOLS_LIBS']['rf_eventprocessor'] = ['daq', 'framework', '$ROOT_LIBS', 'nsm2_basf2' ]
+env['TOOLS_LIBS']['rf_outputserver'] = ['daq', 'framework', '$ROOT_LIBS', 'nsm2_basf2' ]
+env['TOOLS_LIBS']['rf_dqmserver'] = ['daq', 'framework', '$ROOT_LIBS', 'nsm2_basf2' ]
+env['TOOLS_LIBS']['rf_roisender'] = ['daq', 'framework', '$ROOT_LIBS', 'nsm2_basf2' ]
+env['TOOLS_LIBS']['rf_master'] = ['daq', 'framework', '$ROOT_LIBS', 'pthread', 'nsm2_basf2']
+env['TOOLS_LIBS']['rf_master_local'] = ['daq', 'framework', '$ROOT_LIBS', 'nsm2_basf2']
+env['TOOLS_LIBS']['rfctl'] = ['nsm2_basf2', 'readline', 'curses']
+env['TOOLS_LIBS']['nodedump'] = ['daq', 'framework']
+env['TOOLS_LIBS']['rf_monitor'] = ['daq', 'framework', 'nsm2_basf2']
+env['TOOLS_LIBS']['rfgetconf'] = ['daq', 'framework']
+env['TOOLS_LIBS']['rfcommand'] = ['daq', 'framework', 'nsm2_basf2']
+env['TOOLS_LIBS']['createshm'] = ['daq', 'framework']
+env['TOOLS_LIBS']['removeshm'] = ['daq', 'framework']
+
+Return('env')

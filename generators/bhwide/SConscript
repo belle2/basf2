@@ -1,0 +1,10 @@
+import os
+
+Import('env')
+
+env['SUBLIB'] = True
+env['LIBS'] = ['$ROOT_LIBS', 'mdst_dataobjects', 'framework', 'gfortran']
+
+env.Append(FORTRANFLAGS=['-O3', '-fno-automatic', '-ffixed-line-length-none'])
+
+Return('env')

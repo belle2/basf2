@@ -1,0 +1,755 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<Materials>
+    
+  <Material name="TOPSiO2" desc="Corning 7980">
+    <state>Solid</state>
+    <density unit="g/cm3">2.201</density>
+    <Components>   
+      <Element fraction="0.5326">O</Element> 
+      <Element fraction="0.4674">Si</Element>     
+    </Components>  
+    <Property name="ABSLENGTH" unit="eV" desc="bulk absorption length in mm"> 
+      <!-- absorption length = 151 m (lambda/405 nm)^4  -->
+      <value energy="1.4">3454.07e3</value>
+      <value energy="1.5">2621.07e3</value>
+      <value energy="1.6">2024.71e3</value>
+      <value energy="1.7">1588.72e3</value>
+      <value energy="1.8">1264.02e3</value>
+      <value energy="1.9">1018.19e3</value>
+      <value energy="2.0">829.323e3</value>
+      <value energy="2.1">682.286e3</value>
+      <value energy="2.2">566.439e3</value>
+      <value energy="2.3">474.168e3</value>
+      <value energy="2.4">399.944e3</value>
+      <value energy="2.5">339.691e3</value>
+      <value energy="2.6">290.369e3</value>
+      <value energy="2.7">249.683e3</value>
+      <value energy="2.8">215.88e3</value>
+      <value energy="2.9">187.608e3</value>
+      <value energy="3.0">163.817e3</value>
+      <value energy="3.1">143.68e3</value>
+      <value energy="3.2">126.545e3</value>
+      <value energy="3.3">111.889e3</value>
+      <value energy="3.4">99.2953e3</value>
+      <value energy="3.5">88.4244e3</value>
+      <value energy="3.6">79.0013e3</value>
+      <value energy="3.7">70.8007e3</value>
+      <value energy="3.8">63.637e3</value>
+      <value energy="3.9">57.3569e3</value>
+      <value energy="4.0">51.8327e3</value>
+    </Property>
+    <Property name="RINDEX" unit="eV"> 
+      <!-- Sellmeier equation (K. Matsuoka, nov-2018) -->
+      <!-- parameters from the specs of Corning HPFS 7980 -->
+      <!-- B = (0.683740494, 0.420323613, 0.585027480) -->
+      <!-- C = (0.00460352869, 0.0133968856, 64.4932732) -->
+      <value energy="1.4">1.4519638145013711</value>
+      <value energy="1.41">1.4520560338964266</value>
+      <value energy="1.42">1.4521479141166624</value>
+      <value energy="1.43">1.4522394772801428</value>
+      <value energy="1.44">1.452330744739226</value>
+      <value energy="1.45">1.4524217371132078</value>
+      <value energy="1.46">1.452512474319353</value>
+      <value energy="1.47">1.4526029756024088</value>
+      <value energy="1.48">1.4526932595626842</value>
+      <value energy="1.49">1.452783344182774</value>
+      <value energy="1.5">1.452873246853002</value>
+      <value energy="1.51">1.452962984395655</value>
+      <value energy="1.52">1.453052573088071</value>
+      <value energy="1.53">1.4531420286846444</value>
+      <value energy="1.54">1.453231366437805</value>
+      <value energy="1.55">1.4533206011180282</value>
+      <value energy="1.56">1.4534097470329237</value>
+      <value energy="1.57">1.4534988180454524</value>
+      <value energy="1.58">1.4535878275913208</value>
+      <value energy="1.59">1.4536767886955861</value>
+      <value energy="1.6">1.4537657139885232</value>
+      <value energy="1.61">1.453854615720784</value>
+      <value energy="1.62">1.4539435057778876</value>
+      <value energy="1.63">1.4540323956940753</value>
+      <value energy="1.64">1.4541212966655603</value>
+      <value energy="1.65">1.4542102195632052</value>
+      <value energy="1.66">1.4542991749446517</value>
+      <value energy="1.67">1.454388173065934</value>
+      <value energy="1.68">1.4544772238925958</value>
+      <value energy="1.69">1.4545663371103408</value>
+      <value energy="1.7">1.4546555221352342</value>
+      <value energy="1.71">1.454744788123479</value>
+      <value energy="1.72">1.4548341439807864</value>
+      <value energy="1.73">1.4549235983713629</value>
+      <value energy="1.74">1.4550131597265255</value>
+      <value energy="1.75">1.4551028362529685</value>
+      <value energy="1.76">1.455192635940696</value>
+      <value energy="1.77">1.4552825665706342</value>
+      <value energy="1.78">1.4553726357219392</value>
+      <value energy="1.79">1.455462850779017</value>
+      <value energy="1.8">1.455553218938262</value>
+      <value energy="1.81">1.4556437472145345</value>
+      <value energy="1.82">1.455734442447383</value>
+      <value energy="1.83">1.4558253113070263</value>
+      <value energy="1.84">1.4559163603001037</value>
+      <value energy="1.85">1.456007595775205</value>
+      <value energy="1.86">1.4560990239281892</value>
+      <value energy="1.87">1.4561906508073028</value>
+      <value energy="1.88">1.4562824823181024</value>
+      <value energy="1.89">1.456374524228195</value>
+      <value energy="1.9">1.4564667821718</value>
+      <value energy="1.91">1.4565592616541434</value>
+      <value energy="1.92">1.4566519680556889</value>
+      <value energy="1.93">1.4567449066362128</value>
+      <value energy="1.94">1.456838082538734</value>
+      <value energy="1.95">1.4569315007932957</value>
+      <value energy="1.96">1.457025166320617</value>
+      <value energy="1.97">1.4571190839356085</value>
+      <value energy="1.98">1.457213258350765</value>
+      <value energy="1.99">1.4573076941794367</value>
+      <value energy="2.0">1.4574023959389861</value>
+      <value energy="2.01">1.4574973680538326</value>
+      <value energy="2.02">1.4575926148583926</value>
+      <value energy="2.03">1.4576881405999147</value>
+      <value energy="2.04">1.457783949441221</value>
+      <value energy="2.05">1.45788004546335</value>
+      <value energy="2.06">1.4579764326681126</value>
+      <value energy="2.07">1.4580731149805584</value>
+      <value energy="2.08">1.458170096251361</value>
+      <value energy="2.09">1.458267380259122</value>
+      <value energy="2.1">1.4583649707125967</value>
+      <value energy="2.11">1.4584628712528493</value>
+      <value energy="2.12">1.4585610854553326</value>
+      <value energy="2.13">1.4586596168319013</value>
+      <value energy="2.14">1.4587584688327602</value>
+      <value energy="2.15">1.4588576448483468</value>
+      <value energy="2.16">1.4589571482111552</value>
+      <value energy="2.17">1.459056982197498</value>
+      <value energy="2.18">1.4591571500292158</value>
+      <value energy="2.19">1.4592576548753289</value>
+      <value energy="2.2">1.459358499853638</value>
+      <value energy="2.21">1.4594596880322739</value>
+      <value energy="2.22">1.4595612224311993</value>
+      <value energy="2.23">1.4596631060236624</value>
+      <value energy="2.24">1.4597653417376062</value>
+      <value energy="2.25">1.4598679324570345</value>
+      <value energy="2.26">1.4599708810233356</value>
+      <value energy="2.27">1.4600741902365648</value>
+      <value energy="2.28">1.4601778628566888</value>
+      <value energy="2.29">1.4602819016047917</value>
+      <value energy="2.3">1.4603863091642464</value>
+      <value energy="2.31">1.460491088181848</value>
+      <value energy="2.32">1.4605962412689169</value>
+      <value energy="2.33">1.4607017710023653</value>
+      <value energy="2.34">1.4608076799257357</value>
+      <value energy="2.35">1.4609139705502086</value>
+      <value energy="2.36">1.4610206453555774</value>
+      <value energy="2.37">1.4611277067911994</value>
+      <value energy="2.38">1.461235157276917</value>
+      <value energy="2.39">1.4613429992039528</value>
+      <value energy="2.4">1.4614512349357796</value>
+      <value energy="2.41">1.4615598668089647</value>
+      <value energy="2.42">1.4616688971339926</value>
+      <value energy="2.43">1.4617783281960615</value>
+      <value energy="2.44">1.4618881622558606</value>
+      <value energy="2.45">1.4619984015503231</value>
+      <value energy="2.46">1.4621090482933612</value>
+      <value energy="2.47">1.4622201046765786</value>
+      <value energy="2.48">1.462331572869965</value>
+      <value energy="2.49">1.4624434550225704</value>
+      <value energy="2.5">1.462555753263163</value>
+      <value energy="2.51">1.462668469700868</value>
+      <value energy="2.52">1.4627816064257908</value>
+      <value energy="2.53">1.4628951655096212</value>
+      <value energy="2.54">1.4630091490062243</value>
+      <value energy="2.55">1.4631235589522154</value>
+      <value energy="2.56">1.463238397367518</value>
+      <value energy="2.57">1.4633536662559101</value>
+      <value energy="2.58">1.463469367605555</value>
+      <value energy="2.59">1.4635855033895178</value>
+      <value energy="2.6">1.4637020755662702</value>
+      <value energy="2.61">1.463819086080183</value>
+      <value energy="2.62">1.4639365368620043</value>
+      <value energy="2.63">1.4640544298293265</value>
+      <value energy="2.64">1.4641727668870428</value>
+      <value energy="2.65">1.464291549927792</value>
+      <value energy="2.66">1.4644107808323907</value>
+      <value energy="2.67">1.4645304614702588</value>
+      <value energy="2.68">1.46465059369983</value>
+      <value energy="2.69">1.4647711793689566</value>
+      <value energy="2.7">1.4648922203153025</value>
+      <value energy="2.71">1.4650137183667271</value>
+      <value energy="2.72">1.4651356753416613</value>
+      <value energy="2.73">1.4652580930494734</value>
+      <value energy="2.74">1.465380973290827</value>
+      <value energy="2.75">1.465504317858031</value>
+      <value energy="2.76">1.465628128535383</value>
+      <value energy="2.77">1.4657524070995007</value>
+      <value energy="2.78">1.4658771553196508</value>
+      <value energy="2.79">1.4660023749580675</value>
+      <value energy="2.8">1.4661280677702653</value>
+      <value energy="2.81">1.4662542355053445</value>
+      <value energy="2.82">1.4663808799062896</value>
+      <value energy="2.83">1.466508002710263</value>
+      <value energy="2.84">1.4666356056488896</value>
+      <value energy="2.85">1.4667636904485393</value>
+      <value energy="2.86">1.466892258830599</value>
+      <value energy="2.87">1.467021312511743</value>
+      <value energy="2.88">1.4671508532041957</value>
+      <value energy="2.89">1.4672808826159882</value>
+      <value energy="2.9">1.4674114024512135</value>
+      <value energy="2.91">1.4675424144102707</value>
+      <value energy="2.92">1.4676739201901108</value>
+      <value energy="2.93">1.4678059214844723</value>
+      <value energy="2.94">1.4679384199841155</value>
+      <value energy="2.95">1.4680714173770506</value>
+      <value energy="2.96">1.4682049153487637</value>
+      <value energy="2.97">1.4683389155824342</value>
+      <value energy="2.98">1.4684734197591534</value>
+      <value energy="2.99">1.4686084295581359</value>
+      <value energy="3.0">1.4687439466569265</value>
+      <value energy="3.01">1.4688799727316069</value>
+      <value energy="3.02">1.469016509456995</value>
+      <value energy="3.03">1.469153558506842</value>
+      <value energy="3.04">1.4692911215540285</value>
+      <value energy="3.05">1.4694292002707514</value>
+      <value energy="3.06">1.469567796328715</value>
+      <value energy="3.07">1.4697069113993124</value>
+      <value energy="3.08">1.4698465471538076</value>
+      <value energy="3.09">1.4699867052635147</value>
+      <value energy="3.1">1.470127387399971</value>
+      <value energy="3.11">1.470268595235112</value>
+      <value energy="3.12">1.4704103304414389</value>
+      <value energy="3.13">1.4705525946921874</value>
+      <value energy="3.14">1.470695389661492</value>
+      <value energy="3.15">1.4708387170245478</value>
+      <value energy="3.16">1.4709825784577701</value>
+      <value energy="3.17">1.4711269756389536</value>
+      <value energy="3.18">1.471271910247425</value>
+      <value energy="3.19">1.4714173839641982</value>
+      <value energy="3.2">1.4715633984721237</value>
+      <value energy="3.21">1.4717099554560389</value>
+      <value energy="3.22">1.4718570566029143</value>
+      <value energy="3.23">1.4720047036019976</value>
+      <value energy="3.24">1.4721528981449585</value>
+      <value energy="3.25">1.472301641926028</value>
+      <value energy="3.26">1.47245093664214</value>
+      <value energy="3.27">1.4726007839930684</value>
+      <value energy="3.28">1.472751185681561</value>
+      <value energy="3.29">1.4729021434134777</value>
+      <value energy="3.3">1.4730536588979215</value>
+      <value energy="3.31">1.4732057338473703</value>
+      <value energy="3.32">1.4733583699778063</value>
+      <value energy="3.33">1.473511569008847</value>
+      <value energy="3.34">1.4736653326638691</value>
+      <value energy="3.35">1.4738196626701374</value>
+      <value energy="3.36">1.4739745607589287</value>
+      <value energy="3.37">1.4741300286656545</value>
+      <value energy="3.38">1.4742860681299839</value>
+      <value energy="3.39">1.4744426808959654</value>
+      <value energy="3.4">1.4745998687121464</value>
+      <value energy="3.41">1.4747576333316923</value>
+      <value energy="3.42">1.474915976512504</value>
+      <value energy="3.43">1.4750749000173364</value>
+      <value energy="3.44">1.4752344056139128</value>
+      <value energy="3.45">1.4753944950750415</value>
+      <value energy="3.46">1.4755551701787293</value>
+      <value energy="3.47">1.4757164327082946</value>
+      <value energy="3.48">1.4758782844524811</value>
+      <value energy="3.49">1.476040727205569</value>
+      <value energy="3.5">1.476203762767486</value>
+      <value energy="3.51">1.476367392943918</value>
+      <value energy="3.52">1.4765316195464186</value>
+      <value energy="3.53">1.4766964443925188</value>
+      <value energy="3.54">1.476861869305834</value>
+      <value energy="3.55">1.4770278961161736</value>
+      <value energy="3.56">1.4771945266596462</value>
+      <value energy="3.57">1.4773617627787685</value>
+      <value energy="3.58">1.4775296063225702</value>
+      <value energy="3.59">1.4776980591466993</value>
+      <value energy="3.6">1.477867123113529</value>
+      <value energy="3.61">1.47803680009226</value>
+      <value energy="3.62">1.478207091959028</value>
+      <value energy="3.63">1.4783780005970046</value>
+      <value energy="3.64">1.4785495278965033</value>
+      <value energy="3.65">1.4787216757550816</value>
+      <value energy="3.66">1.4788944460776439</value>
+      <value energy="3.67">1.4790678407765445</value>
+      <value energy="3.68">1.4792418617716905</value>
+      <value energy="3.69">1.4794165109906425</value>
+      <value energy="3.7">1.4795917903687181</value>
+      <value energy="3.71">1.479767701849093</value>
+      <value energy="3.72">1.4799442473829016</value>
+      <value energy="3.73">1.4801214289293398</value>
+      <value energy="3.74">1.4802992484557658</value>
+      <value energy="3.75">1.4804777079378002</value>
+      <value energy="3.76">1.4806568093594283</value>
+      <value energy="3.77">1.4808365547131</value>
+      <value energy="3.78">1.4810169459998315</value>
+      <value energy="3.79">1.4811979852293047</value>
+      <value energy="3.8">1.4813796744199696</value>
+      <value energy="3.81">1.481562015599144</value>
+      <value energy="3.82">1.481745010803114</value>
+      <value energy="3.83">1.481928662077236</value>
+      <value energy="3.84">1.4821129714760353</value>
+      <value energy="3.85">1.4822979410633097</value>
+      <value energy="3.86">1.482483572912228</value>
+      <value energy="3.87">1.4826698691054327</value>
+      <value energy="3.88">1.48285683173514</value>
+      <value energy="3.89">1.4830444629032413</value>
+      <value energy="3.9">1.4832327647214056</value>
+      <value energy="3.91">1.4834217393111788</value>
+      <value energy="3.92">1.4836113888040885</value>
+      <value energy="3.93">1.4838017153417429</value>
+      <value energy="3.94">1.483992721075935</value>
+      <value energy="3.95">1.4841844081687436</value>
+      <value energy="3.96">1.4843767787926374</value>
+      <value energy="3.97">1.4845698351305756</value>
+      <value energy="3.98">1.4847635793761136</value>
+      <value energy="3.99">1.4849580137335043</value>
+      <value energy="4.0">1.4851531404178029</value>
+    </Property> 
+  </Material>
+
+  <Material name="TOPglueNOA61">
+    <!-- composition not known -->
+    <state>Solid</state>
+    <density unit="g/cm3">1.29</density>
+    <Components>   
+      <Element fraction="0.6">C</Element>     
+      <Element fraction="0.1">H</Element>     
+      <Element fraction="0.3">O</Element> 
+    </Components>  
+    <Property name="RINDEX" unit="eV"> 
+      <value energy="1.4">1.54772</value>
+      <value energy="1.5">1.54918</value>
+      <value energy="1.6">1.55072</value>
+      <value energy="1.7">1.55234</value>
+      <value energy="1.8">1.55403</value>
+      <value energy="1.9">1.5558</value>
+      <value energy="2.0">1.55764</value>
+      <value energy="2.1">1.55954</value>
+      <value energy="2.2">1.56151</value>
+      <value energy="2.3">1.56352</value>
+      <value energy="2.4">1.5656</value>
+      <value energy="2.5">1.56771</value>
+      <value energy="2.6">1.56987</value>
+      <value energy="2.7">1.57206</value>
+      <value energy="2.8">1.57428</value>
+      <value energy="2.9">1.57653</value>
+      <value energy="3.0">1.5788</value>
+      <value energy="3.1">1.58107</value>
+      <value energy="3.2">1.58335</value>
+      <value energy="3.3">1.58563</value>
+      <value energy="3.4">1.5879</value>
+      <value energy="3.5">1.59015</value>
+      <value energy="3.6">1.59238</value>
+      <value energy="3.7">1.59458</value>
+      <value energy="3.8">1.59674</value>
+      <value energy="3.9">1.59886</value>
+      <value energy="4.0">1.60092</value>
+    </Property> 
+  </Material>
+
+  <Material name="TOPglueEpotek301-2">
+    <!-- composition not known, density not known -->
+    <state>Solid</state>
+    <density unit="g/cm3">1.29</density>
+    <Components>   
+      <Element fraction="0.6">C</Element>     
+      <Element fraction="0.1">H</Element>     
+      <Element fraction="0.3">O</Element> 
+    </Components>  
+    <Property name="RINDEX" unit="eV"> 
+      <value energy="1.4">1.43239</value>
+      <value energy="1.5">1.48425</value>
+      <value energy="1.6">1.51568</value>
+      <value energy="1.7">1.53477</value>
+      <value energy="1.8">1.5464</value>
+      <value energy="1.9">1.5536</value>
+      <value energy="2.0">1.55827</value>
+      <value energy="2.1">1.56156</value>
+      <value energy="2.2">1.56419</value>
+      <value energy="2.3">1.56663</value>
+      <value energy="2.4">1.56911</value>
+      <value energy="2.5">1.57181</value>
+      <value energy="2.6">1.57479</value>
+      <value energy="2.7">1.57808</value>
+      <value energy="2.8">1.58169</value>
+      <value energy="2.9">1.58561</value>
+      <value energy="3.0">1.5898</value>
+      <value energy="3.1">1.59424</value>
+      <value energy="3.2">1.5989</value>
+      <value energy="3.3">1.60375</value>
+      <value energy="3.4">1.60876</value>
+      <value energy="3.5">1.6139</value>
+      <value energy="3.6">1.61915</value>
+      <value energy="3.7">1.62448</value>
+      <value energy="3.8">1.62987</value>
+      <value energy="3.9">1.63531</value>
+      <value energy="4.0">1.64077</value>
+    </Property> 
+  </Material>
+
+  <Material name="TOPBorosilicateGlass">
+    <state>Solid</state>
+    <density unit="g/cm3">2.23</density>
+    <Components>   
+      <Element fraction="0.3776">Si</Element> 
+      <Element fraction="0.5925">O</Element>     
+      <Element fraction="0.0068">Na</Element>     
+      <Element fraction="0.0123">B</Element>     
+      <Element fraction="0.0108">Al</Element>     
+    </Components>  
+    <Property name="RINDEX" unit="eV"> 
+      <value energy="1.4">1.50923</value>
+      <value energy="1.5">1.51026</value>
+      <value energy="1.6">1.51129</value>
+      <value energy="1.7">1.51232</value>
+      <value energy="1.8">1.51337</value>
+      <value energy="1.9">1.51444</value>
+      <value energy="2.0">1.51554</value>
+      <value energy="2.1">1.51668</value>
+      <value energy="2.2">1.51786</value>
+      <value energy="2.3">1.51909</value>
+      <value energy="2.4">1.52036</value>
+      <value energy="2.5">1.52168</value>
+      <value energy="2.6">1.52306</value>
+      <value energy="2.7">1.5245</value>
+      <value energy="2.8">1.52599</value>
+      <value energy="2.9">1.52755</value>
+      <value energy="3.0">1.52916</value>
+      <value energy="3.1">1.53085</value>
+      <value energy="3.2">1.5326</value>
+      <value energy="3.3">1.53443</value>
+      <value energy="3.4">1.53632</value>
+      <value energy="3.5">1.5383</value>
+      <value energy="3.6">1.54035</value>
+      <value energy="3.7">1.54248</value>
+      <value energy="3.8">1.54471</value>
+      <value energy="3.9">1.54701</value>
+      <value energy="4.0">1.54942</value>
+    </Property> 
+  </Material>
+    
+  <Material name="TOPWavelengthFilterIHU340">
+    <!-- composition not known, density not known -->
+    <!-- using data for borosilicate glass -->
+    <state>Solid</state>
+    <density unit="g/cm3">2.23</density>
+    <Components>   
+      <Element fraction="0.3776">Si</Element> 
+      <Element fraction="0.5925">O</Element>     
+      <Element fraction="0.0068">Na</Element>     
+      <Element fraction="0.0123">B</Element>     
+      <Element fraction="0.0108">Al</Element>     
+    </Components>  
+    <Property name="ABSLENGTH" unit="eV" desc="bulk absorption length in mm"> 
+      <!-- absorption length calculated from bulk transmittance of 2.5 mm thick filter -->
+      <!-- bulk transmittance data points obtained from Okuto-san, September 2018 -->
+      <!-- cross-checked with Isuzu glass data sheets, (Matsuoka November 2018) -->
+      <value energy="1.40000">50.0</value>
+      <value energy="1.50000">80.0</value>
+      <value energy="1.63158">94.8984</value>
+      <value energy="1.65333">98.7447</value>
+      <value energy="1.67568">102.912</value>
+      <value energy="1.69863">107.441</value>
+      <value energy="1.72222">112.382</value>
+      <value energy="1.74648">123.746</value>
+      <value energy="1.77143">123.746</value>
+      <value energy="1.79710">137.635</value>
+      <value energy="1.82353">145.805</value>
+      <value energy="1.85075">154.997</value>
+      <value energy="1.87879">165.414</value>
+      <value energy="1.90769">177.318</value>
+      <value energy="1.93750">191.055</value>
+      <value energy="1.96825">191.055</value>
+      <value energy="2.00000">207.081</value>
+      <value energy="2.03279">207.081</value>
+      <value energy="2.06667">207.081</value>
+      <value energy="2.10169">226.02</value>
+      <value energy="2.13793">226.02</value>
+      <value energy="2.17544">248.748</value>
+      <value energy="2.21429">248.748</value>
+      <value energy="2.25455">276.526</value>
+      <value energy="2.29630">276.526</value>
+      <value energy="2.33962">311.248</value>
+      <value energy="2.38462">311.248</value>
+      <value energy="2.43137">311.248</value>
+      <value energy="2.48000">355.891</value>
+      <value energy="2.53061">355.891</value>
+      <value energy="2.58333">355.891</value>
+      <value energy="2.63830">311.248</value>
+      <value energy="2.69565">311.248</value>
+      <value energy="2.75556">311.248</value>
+      <value energy="2.81818">311.248</value>
+      <value energy="2.88372">276.526</value>
+      <value energy="2.95238">248.748</value>
+      <value energy="3.02439">276.526</value>
+      <value energy="3.10000">248.748</value>
+      <value energy="3.17949">191.055</value>
+      <value energy="3.26316">123.746</value>
+      <value energy="3.35135">61.2415</value>
+      <value energy="3.44444">28.1433</value>
+      <value energy="3.54286">11.4597</value>
+      <value energy="3.64706">4.28525</value>
+      <value energy="3.75758">1.55334</value>
+      <value energy="3.87500">0.604571</value>
+      <value energy="4.00000">0</value>
+    </Property> 
+    <Property name="RINDEX" unit="eV"> 
+      <!-- from Isuzu glass data sheets (Matsuoka, November 2018) -->
+      <value energy="1.377778">1.511</value>
+      <value energy="1.458824">1.514</value>
+      <value energy="1.55">1.512</value>
+      <value energy="1.653333">1.513</value>
+      <value energy="1.675676">1.513</value>
+      <value energy="1.69863">1.514</value>
+      <value energy="1.722222">1.512</value>
+      <value energy="1.746479">1.513</value>
+      <value energy="1.771429">1.512</value>
+      <value energy="1.797101">1.513</value>
+      <value energy="1.823529">1.512</value>
+      <value energy="1.850746">1.513</value>
+      <value energy="1.878788">1.514</value>
+      <value energy="1.907692">1.515</value>
+      <value energy="1.9375">1.515</value>
+      <value energy="1.968254">1.515</value>
+      <value energy="2.0">1.515</value>
+      <value energy="2.032787">1.517</value>
+      <value energy="2.066667">1.516</value>
+      <value energy="2.101695">1.516</value>
+      <value energy="2.137931">1.517</value>
+      <value energy="2.175439">1.517</value>
+      <value energy="2.214286">1.517</value>
+      <value energy="2.254545">1.518</value>
+      <value energy="2.296296">1.518</value>
+      <value energy="2.339623">1.519</value>
+      <value energy="2.384615">1.519</value>
+      <value energy="2.431373">1.519</value>
+      <value energy="2.48">1.521</value>
+      <value energy="2.530612">1.522</value>
+      <value energy="2.583333">1.522</value>
+      <value energy="2.638298">1.524</value>
+      <value energy="2.695652">1.524</value>
+      <value energy="2.755556">1.526</value>
+      <value energy="2.818182">1.526</value>
+      <value energy="2.883721">1.526</value>
+      <value energy="2.952381">1.526</value>
+      <value energy="3.02439">1.527</value>
+      <value energy="3.1">1.530</value>
+      <value energy="3.179487">1.534</value>
+      <value energy="3.263158">1.536</value>
+      <value energy="3.351351">1.533</value>
+      <value energy="3.444444">1.534</value>
+      <value energy="3.542857">1.539</value>
+      <value energy="3.647059">1.547</value>
+      <value energy="3.757576">1.542</value>
+      <value energy="3.875">1.552</value>
+      <value energy="4.0">1.549</value>
+    </Property> 
+  </Material>
+
+  <Material name="TOPSiliconeCookie">
+    <state>Solid</state>
+    <density unit="g/cm3">1.02</density>
+    <Components>   
+      <Element fraction="0.378">Si</Element>
+      <Element fraction="0.216">O</Element>  
+      <Element fraction="0.324">C</Element>  
+      <Element fraction="0.082">H</Element>  
+    </Components>  
+    <Property name="RINDEX" unit="eV"> 
+      <!-- energy dependence unknown, using the one for 590 nm (Matsuoka, Nov. 2018 -->
+      <value energy="1.4">1.406</value>
+      <value energy="2.0">1.406</value>
+      <value energy="3.0">1.406</value>
+      <value energy="4.0">1.406</value>
+    </Property> 
+    <Property name="ABSLENGTH" unit="eV" desc="bulk absorption length in mm"> 
+      <!-- energy dependence unknown -->
+      <!-- transmittance > 94% @ 314 nm for 4.6 mm thickness (Matsuoka, Nov 2018) -->
+      <!-- abslength = 1000 mm ==> T = 99.5% for 1.9 mm -->
+      <value energy="1.4">1000.0</value>
+      <value energy="2.0">1000.0</value>
+      <value energy="3.0">1000.0</value>
+      <value energy="4.0">1000.0</value>
+    </Property> 
+  </Material>
+  
+  <Material name="TOPPMTBialkali">
+    <!-- these data are used for photocathode although it's not bialkali -->
+    <!-- not very important at the moment, to be replaced later -->
+    <state>Solid</state>
+    <density unit="g/cm3">7.84</density>
+    <Components>   
+      <Element fraction="0.2349">K</Element>
+      <Element fraction="0.3993">Sb</Element>  
+      <Element fraction="0.3658">Cs</Element>  
+    </Components>  
+    <Property name="RINDEX" unit="eV"> 
+      <value energy="1.4">1.50923</value>
+      <value energy="1.5">1.51026</value>
+      <value energy="1.6">1.51129</value>
+      <value energy="1.7">1.51232</value>
+      <value energy="1.8">1.51337</value>
+      <value energy="1.9">1.51444</value>
+      <value energy="2.0">1.51554</value>
+      <value energy="2.1">1.51668</value>
+      <value energy="2.2">1.51786</value>
+      <value energy="2.3">1.51909</value>
+      <value energy="2.4">1.52036</value>
+      <value energy="2.5">1.52168</value>
+      <value energy="2.6">1.52306</value>
+      <value energy="2.7">1.5245</value>
+      <value energy="2.8">1.52599</value>
+      <value energy="2.9">1.52755</value>
+      <value energy="3.0">1.52916</value>
+      <value energy="3.1">1.53085</value>
+      <value energy="3.2">1.5326</value>
+      <value energy="3.3">1.53443</value>
+      <value energy="3.4">1.53632</value>
+      <value energy="3.5">1.5383</value>
+      <value energy="3.6">1.54035</value>
+      <value energy="3.7">1.54248</value>
+      <value energy="3.8">1.54471</value>
+      <value energy="3.9">1.54701</value>
+      <value energy="4.0">1.54942</value>
+    </Property> 
+  </Material>
+    
+  <Material name="TOPPMTBottom">
+    <!-- silicone potting at the bottom of PMT (Matsuoka, November 2018)-->
+    <state>Solid</state>
+    <density unit="g/cm3">1.04</density>
+    <Components>
+      <Element fraction="0.08">H</Element>
+      <Element fraction="0.32">C</Element>
+      <Element fraction="0.22">O</Element>
+      <Element fraction="0.38">Si</Element>
+    </Components> 
+  </Material>
+    
+  <Material name="TOPPCB">
+    <state>Solid</state>
+    <density unit="g/cm3">1.85</density>
+    <Components>   
+      <Element fraction="0.14">Cu</Element>
+      <Element fraction="0.02">Fe</Element>
+      <Element fraction="0.02">Sn</Element>
+      <Element fraction="0.01">Ta</Element>
+      <Element fraction="0.01">Al</Element>
+      <Element fraction="0.30">O</Element>
+      <Element fraction="0.05">H</Element>
+      <Element fraction="0.05">N</Element>
+      <Element fraction="0.30">Si</Element>
+      <Element fraction="0.05">C</Element>
+      <Element fraction="0.04">Sb</Element>
+      <Element fraction="0.01">Zn</Element>            
+    </Components>  
+  </Material>
+    
+  <Material name="TOPBoardStack">
+    <state>Solid</state>
+    <density unit="g/cm3">1.22</density>
+    <Components>   
+      <Element fraction="0.496">Cu</Element>
+      <Element fraction="0.187">Al</Element>
+      <Element fraction="0.060">Fe</Element>
+      <Element fraction="0.006">Sn</Element>
+      <Element fraction="0.003">Ta</Element>
+      <Element fraction="0.094">O</Element>
+      <Element fraction="0.015">H</Element>
+      <Element fraction="0.015">N</Element>
+      <Element fraction="0.094">Si</Element>
+      <Element fraction="0.015">C</Element>
+      <Element fraction="0.012">Sb</Element>
+      <Element fraction="0.003">Zn</Element>            
+    </Components>  
+  </Material>
+    
+  <Material name="TOPPMTCase">
+    <!-- Kovar, data from Wikipedia -->
+    <state>Solid</state>
+    <density unit="g/cm3">8.0</density>
+    <Components>   
+      <Element fraction="0.535">Fe</Element>       
+      <Element fraction="0.290">Ni</Element>       
+      <Element fraction="0.170">Co</Element>       
+      <Element fraction="0.002">Si</Element>       
+      <Element fraction="0.003">Mn</Element>       
+    </Components>  
+  </Material>
+    
+  <Material name="TOPAir"> 
+    <state>Gas</state>
+    <density unit="g/cm3">1.22e-3</density> 
+    <Components>   
+      <Element fraction="0.78">N</Element> 
+      <Element fraction="0.21">O</Element>  
+      <Element fraction="0.01">Ar</Element>       
+    </Components>        
+    <Property name="RINDEX" unit="eV"> 
+      <value energy="1.0">1.000274</value>
+      <value energy="2.0">1.000277</value>
+      <value energy="3.0">1.000282</value>
+      <value energy="4.0">1.000290</value>         
+    </Property> 
+  </Material> 
+    
+  <Material name="TOPVacuum"> 
+    <state>Gas</state>
+    <density unit="g/cm3">1.0e-12</density> 
+    <Components>   
+      <Element fraction="0.78">N</Element> 
+      <Element fraction="0.21">O</Element>  
+      <Element fraction="0.01">Ar</Element>       
+    </Components>        
+  </Material> 
+    
+  <Material name="TOPQBB"> 
+    <state>Solid</state>
+    <density unit="g/cm3">0.053</density> 
+    <Components>   
+      <Element fraction="1.0">Al</Element>      
+    </Components>        
+  </Material> 
+
+  <Material name="TOPColdPlate"> 
+    <state>Solid</state>
+    <density unit="g/cm3">4.35</density> 
+    <Components>   
+      <Element fraction="0.5">Al</Element>      
+      <Element fraction="0.5">Cu</Element>      
+    </Components>        
+  </Material> 
+
+  <Material name="TOPBrokenGlue"> 
+    <state>Gas</state>
+    <density unit="g/cm3">1.22e-3</density> 
+    <Components>   
+      <Element fraction="0.78">N</Element> 
+      <Element fraction="0.21">O</Element>  
+      <Element fraction="0.01">Ar</Element>       
+    </Components>        
+    <Property name="RINDEX" unit="eV"> 
+      <value energy="1.0">1.000274</value>
+      <value energy="2.0">1.000277</value>
+      <value energy="3.0">1.000282</value>
+      <value energy="4.0">1.000290</value>         
+    </Property> 
+  </Material> 
+    
+  <Material name="TOPPeelOffCookie"> 
+    <state>Gas</state>
+    <density unit="g/cm3">1.22e-3</density> 
+    <Components>   
+      <Element fraction="0.78">N</Element> 
+      <Element fraction="0.21">O</Element>  
+      <Element fraction="0.01">Ar</Element>       
+    </Components>        
+    <Property name="RINDEX" unit="eV"> 
+      <value energy="1.0">1.000274</value>
+      <value energy="2.0">1.000277</value>
+      <value energy="3.0">1.000282</value>
+      <value energy="4.0">1.000290</value>         
+    </Property> 
+  </Material> 
+  
+</Materials> 

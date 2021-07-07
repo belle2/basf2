@@ -1,0 +1,14 @@
+#
+# This is a template for basf_if/Makefile.link_options.in
+#
+LIB_PATH_LIST = $(packagedir)/lib/so $(packagedir)/lib $(BUILD_TOP_DIR)/lib/so $(BUILD_TOP_DIR)/lib
+
+ifneq "$(BELLE_LIB_DIR)" ""
+LIB_PATH_LIST += $(BELLE_LIB_DIR)/so $(BELLE_LIB_DIR)
+endif
+
+BELLE_LIBS = -l$(PACKAGE)
+
+LINK_ARGS = $(NOT_TARGETS) $(patsubst %,-L%,$(LIB_PATH_LIST)) $(BELLE_LIBS) \
+	-lbenergy
+#../bin/$(PACKAGE).so:$(BELLE_LIBS)

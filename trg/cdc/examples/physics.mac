@@ -1,0 +1,33 @@
+#----------------------------------------------------------------
+# File Name 	: physics.mac
+# Owner         : KyungTae Kim (K.U.)                                                           
+# Email         : ktkim@hep.korea.ac.kr                                                         
+#----------------------------------------------------------------
+# Description : macro for turning off the physics processes in G4
+#----------------------------------------------------------------
+
+
+/control/verbose 2
+
+#for muons
+/process/inactivate muIoni
+/process/inactivate muMsc
+/process/inactivate muBrems
+/process/inactivate muPairProd
+/process/inactivate CoulombScat
+
+#for hadrons
+/process/inactivate hIoni
+/process/inactivate msc
+/process/inactivate hBrems
+/process/inactivate hPairProd
+
+#for electrons
+#/process/inactivate eIoni
+#/process/inactivate eBrem
+
+#/porcess/inactivate ionIoni
+#for every
+#/process/inactivate Decay
+#/process/inactivate Transportation
+#/process/list

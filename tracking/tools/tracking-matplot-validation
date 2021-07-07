@@ -1,0 +1,221 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""Replot the validation plots with matplotlib.
+
+Currently not the full variety of ValidationPlots is reflected here.
+"""
+import os
+import fnmatch
+
+import ROOT
+
+import tracking.root_utils as root_utils
+from tracking.utilities import DefaultHelpArgumentParser
+import tracking.validation.matplotting
+import matplotlib.pyplot as plt
+
+import logging
+
+
+def get_logger():
+    """Get the logger instance of this module"""
+    return logging.getLogger(__name__)
+
+
+def main():
+    """Main function"""
+    logging.basicConfig(level=logging.INFO)
+
+    # Argument parser that gives a help full message on error,
+    # which includes the options that are valid.
+    argument_parser = DefaultHelpArgumentParser()
+
+    argument_parser.add_argument(
+        "-l",
+        "--list",
+        action="store_true",
+        help="Only list all plotable objects instead of plotting them."
+        )
+
+    argument_parser.add_argument(
+        "-o",
+        "--output-dir-path",
+        default=None,
+        help="Path to the output folder"
+        )
+
+    argument_parser.add_argument(
+        "-f",
+        "--flat",
+        action="store_true",
+        help="Do not generate subfolders."
+        )
+
+    argument_parser.add_argument(
+        "-t",
+        "--target-format",
+        default="png",
+        help="Image format to be generated. E.g. png, jpg, ..."
+        )
+
+    argument_parser.add_argument(
+        "--no-legend",
+        dest="legend",
+        action="store_false",
+        help="Switch off the by side legend. E.g. png, jpg, ..."
+        )
+
+    argument_parser.add_argument(
+        "-s",
+        "--style",
+        default=None,
+        action="append",
+        help="The matplotlib style to be used. Can be the name of a mplstyle file. May be given multiple times to override options"
+        )
+
+    argument_parser.add_argument(
+        "tfile",
+        type=ROOT.TFile,
+        help="File name of the ROOT file to be looked at"
+        )
+
+    argument_parser.add_argument(
+        "prefix_pattern",
+        default="",
+        nargs='?',
+        help="Glob pattern of objects to be selected"
+        )
+
+    arguments = argument_parser.parse_args()
+
+    if hasattr(arguments, "prefix_pattern"):
+        tobject_path_pattern = arguments.prefix_pattern + "*"
+    else:
+        tobject_path_pattern = "*"
+
+    if arguments.list:
+        root_ls(arguments.tfile,
+                tobject_path_pattern=tobject_path_pattern)
+    else:
+        save_plots(arguments.tfile,
+                   tobject_path_pattern=tobject_path_pattern,
+                   output_dir_path=arguments.output_dir_path,
+                   flat=arguments.flat,
+                   style=arguments.style,
+                   legend=arguments.legend,
+                   image_format=arguments.target_format)
+
+
+def root_ls(tfile, tobject_path_pattern):
+    """Lists all TObjects in the given directory"""
+
+    for tdirectory, tobjects, tdirectories in root_utils.root_walk(tfile):
+        # The full path including file prefix
+        full_path = tdirectory.GetPath()
+        tfile_prefix, tdirectory_path = full_path.split(":/")
+
+        for tobject in tobjects:
+            tobject_name = tobject.GetName()
+            tobject_path = os.path.join(tdirectory_path, tobject_name)
+
+            # Glob like pattern matching
+            if not fnmatch.fnmatch(tobject_path, tobject_path_pattern):
+                continue
+
+            print(tobject_path)
+
+
+def save_plots(tfile,
+               output_dir_path=None,
+               tobject_path_pattern="*",
+               flat=False,
+               style=None,
+               legend=None,
+               image_format="png"):
+    """Walks through a open tfile and plot all plotable objects with matplotlib
+
+    Parameters
+    ----------
+    tfile : ROOT.TFile
+        ROOT file to walk through
+    output_dir_path : str, optional
+        Path to the directory where the plots should be created.
+        Defaults name of the TFile without extension.
+    tobject_path_patter : str, optional
+        Glob pattern that must match the path to the TObject
+        Useful to select only a specific TObject or a TDirectory in the file
+        Defaults to "*" which matches all TObjects
+    flat : bool, optional
+        Indicates if to plots shall be organised in folders
+        mirroring the folder structure of the TFile or if they should be placed
+        in the output directory directly.
+        Defaults to false meaning subfolders are created.
+    style : list(str)
+        Matplotlib style identifiers to be used for plotting.
+        Defaults to None meaning the standard style is used.
+    image_format : str, optional
+        Desired output format. Valid values include "png", "pdf", "eps", "svg", ...
+        Defaults to "png".
+    """
+
+    if output_dir_path is None:
+        tfile_path = tfile.GetName()
+        tfile_basename = os.path.basename(tfile_path)
+        tfile_extensionless_basename, _ = os.path.splitext(tfile_basename)
+        output_dir_path = tfile_extensionless_basename
+
+    if not os.path.isdir(output_dir_path):
+        print("Make dirs", output_dir_path)
+        os.makedirs(output_dir_path)
+
+    image_extension = "." + image_format
+
+    for tdirectory, tobjects, tdirectories in root_utils.root_walk(tfile):
+        # The full path including file prefix
+        full_path = tdirectory.GetPath()
+        tfile_prefix, tdirectory_path = full_path.split(":/")
+
+        is_plotable = tracking.validation.matplotting.is_plotable
+        plotables = [tobject for tobject in tobjects if is_plotable(tobject)]
+
+        for plotable in plotables:
+            tobject_name = plotable.GetName()
+            tobject_path = os.path.join(tdirectory_path, tobject_name)
+
+            # Glob like pattern matching
+            if not fnmatch.fnmatch(tobject_path, tobject_path_pattern):
+                continue
+
+            print("Plotting", tobject_path)
+
+            image_extensionless_basename = plotable.GetName()
+            image_file_name = image_extensionless_basename + image_extension
+
+            if flat:
+                image_file_path = os.path(output_dir_path, image_file_name)
+            else:
+                image_dir_path = os.path.join(output_dir_path, tdirectory_path)
+                if not os.path.isdir(image_dir_path):
+                    print("Make dirs", image_dir_path)
+                    os.makedirs(image_dir_path)
+                image_file_path = os.path.join(image_dir_path, image_file_name)
+
+            try:
+                fig = tracking.validation.matplotting.plot(plotable, legend=legend, style=style)
+                fig.savefig(image_file_path, bbox_inches='tight', pad_inches=0.2, dpi=200)
+                plt.close(fig)
+            except Exception as e:
+                get_logger().exception(e)
+
+
+if __name__ == "__main__":
+    main()

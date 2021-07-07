@@ -1,0 +1,163 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""\
+Generate skim steering files.
+
+This tool is for if you really need a steering file, and :ref:`b2skim-run <b2skim-run>`
+doesn't cut it (such as if you are testing your skim on the grid).
+"""
+
+import argparse
+
+import jinja2
+
+from basf2 import find_file
+from skim.utils.misc import resolve_skim_modules
+from skim.registry import Registry
+
+
+def get_argument_parser():
+    parser = argparse.ArgumentParser(description=__doc__)
+
+    parser.add_argument(
+        "skims",
+        choices=Registry.names + Registry.modules,
+        nargs="+",
+        metavar="Skim|Module",
+        help=(
+            "Skim/s to produce a steering file for. If more than one skim is provided, "
+            "then a combined steering file is produced. If a module name is passed, "
+            "the combined steering file will contain all skims in that module."
+        ),
+    )
+
+    parser.add_argument(
+        "-o",
+        "--output-script-name",
+        dest="OutputFilename",
+        metavar="OutputFilename",
+        nargs="?",
+        default="",
+        help=(
+            "Location to output steering file. If flag not given, code is printed to "
+            "screen. If flag is given with no arguments, writes to a file "
+            "in the current directory using a default name."
+        ),
+    )
+
+    parser.add_argument(
+        "--data",
+        action="store_true",
+        help=(
+            "Pass this flag if intending to run this skim on data, so that MC "
+            "quantities are not saved in the output."
+        ),
+    )
+
+    parser.add_argument(
+        "--no-stats",
+        action="store_true",
+        help=(
+            "If flag passed, ``print(b2.statistics)`` will not be included at the end "
+            "of the steering file."
+        ),
+    )
+
+    parser.add_argument(
+        "--skimmed-mdst-output",
+        action="store_true",
+        help=(
+            "If flag passed, save a single MDST containing events which pass at "
+            "least one of the skims."
+        ),
+    )
+
+    parser.add_argument(
+        "--no-user-hints",
+        action="store_true",
+        help=(
+            "If flag passed, the steering file will not include a comment explaining "
+            "how to add modules to the path after building the skim lists."
+        ),
+    )
+
+    parser.add_argument(
+        "--no-backward-compatibility",
+        action="store_true",
+        help=(
+            "If this flag is not passed, the steering file will include additional "
+            "imports wrapped in a try-except block, in order to be work with both "
+            "release 5 and 6."
+        ),
+    )
+
+    parser.add_argument(
+        "--local-module",
+        help=(
+            "[EXPERT FLAG] Name of local module to import skim functions from. Script "
+            "will fail if skims come from more than one module."
+        ),
+    )
+
+    return parser
+
+
+def output(CodeString, *, OutputFilename, skims):
+    SkimName = skims[0] if len(skims) == 1 else ", ".join(skims) + " combined"
+
+    if OutputFilename == "":
+        # -o flag was not passed
+        print(CodeString)
+    elif OutputFilename is None:
+        # -o flag was passed with no argument
+        if len(skims) == 1:
+            OutputFilename = f"{SkimName}.py"
+        else:
+            OutputFilename = "CombinedSkim.py"
+
+        with open(OutputFilename, "w") as f:
+            f.write(CodeString)
+
+        print(f"Steering file for {SkimName} skim written to {OutputFilename}")
+    else:
+        # -o flag was passed with argument
+        with open(OutputFilename, "w") as f:
+            f.write(CodeString)
+        print(f"Steering file for {SkimName} skim written to {OutputFilename}")
+
+
+def main():
+    parser = get_argument_parser()
+    args = parser.parse_args()
+
+    skims, modules = resolve_skim_modules(args.skims, LocalModule=args.local_module)
+
+    loader = jinja2.FileSystemLoader(find_file("skim/tools/resources"))
+    env = jinja2.Environment(loader=loader)
+    env.lstrip_blocks = True
+
+    template = env.get_template("skim_steering_file_template.jinja2")
+    CodeString = template.render(
+        skims=skims,
+        modules=modules,
+        data=args.data,
+        stats=(not args.no_stats),
+        hints=(not args.no_user_hints),
+        mdstOutput=args.skimmed_mdst_output,
+        backward_compatibility=(not args.no_backward_compatibility)
+    )
+
+    output(CodeString, OutputFilename=args.OutputFilename, skims=skims)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,5 @@
+Import('env')                                                                                                                             
+      
+env['LIBS'] = ['framework', 'RaveBase', 'CLHEP', 'genfit2', 'mdst_dataobjects']
+      
+Return('env')  

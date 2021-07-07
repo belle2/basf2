@@ -1,0 +1,76 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+Import('env')
+
+env['SUBLIB'] = True
+env['LIBS'] = ['framework', '$ROOT_LIBS']
+
+import subprocess
+import os
+
+# local modifications?
+modifications = False
+
+head_commitid = dict()
+release_dir_vars = ['BELLE2_LOCAL_DIR', 'BELLE2_RELEASE_DIR']
+for var in release_dir_vars:
+    if var not in os.environ:
+        continue
+    reldir = os.environ[var]
+    with open(os.devnull, 'w') as devnull:
+        proc = subprocess.Popen(['git', '-C', reldir, 'rev-parse', 'HEAD'], stdout=subprocess.PIPE, stderr=devnull)
+        head_commitid[var] = proc.communicate()[0].strip().decode()
+        if proc.returncode != 0 or len(head_commitid[var]) != 40:
+            # release dir is set, but we couldn't get a commit id -> not tracked
+            # shouldn't happen for local dirs, but is OK for central (we'll use .release content)
+            try:
+                head_commitid[var] = open(os.path.join(reldir, '.release')).readline().strip().decode()
+            except:
+                if 'BELLE2_RELEASE' in os.environ:
+                   head_commitid[var] = os.environ['BELLE2_RELEASE']
+                else:
+                   head_commitid[var] = reldir
+            if var == 'BELLE2_LOCAL_DIR' or head_commitid[var].lower() == 'head':
+                head_commitid[var] = ''
+
+        # check for modifications, ignoring untracked files
+        proc = subprocess.Popen(['git', '-C', reldir, 'status', '-uno', '--porcelain'], stdout=subprocess.PIPE, stderr=devnull)
+        changes = proc.communicate()[0].strip().decode()
+        if len(changes) != 0:
+            modifications = True
+
+        # get tag for current commit and use it instead of the commit ID if it's a release or build
+        proc = subprocess.Popen(['git', '-C', reldir, 'describe', '--exact', '--match', 'release*'], stdout=subprocess.PIPE, stderr=devnull)
+        release_version = proc.communicate()[0].strip().decode()
+        if proc.returncode != 0:  # try build tag instead
+            proc = subprocess.Popen(['git', '-C', reldir, 'describe', '--exact', '--match', 'build*'], stdout=subprocess.PIPE, stderr=devnull)
+            release_version = proc.communicate()[0].strip().decode()
+            if proc.returncode != 0:
+                release_version = 'HEAD'
+
+        if release_version != 'HEAD':
+            head_commitid[var] = release_version
+
+# combined commit ID
+identifier = None
+if len(head_commitid) == 2:
+    if head_commitid['BELLE2_RELEASE_DIR'] != head_commitid['BELLE2_LOCAL_DIR']:
+        identifier = head_commitid['BELLE2_RELEASE_DIR'] + '+' + head_commitid['BELLE2_LOCAL_DIR']
+    else:
+        identifier = head_commitid['BELLE2_RELEASE_DIR']
+elif 'BELLE2_LOCAL_DIR' in head_commitid:
+    identifier = head_commitid['BELLE2_LOCAL_DIR']
+elif 'BELLE2_RELEASE_DIR' in head_commitid:
+    # compilation only happens in local dir, so this normally never happens.
+    identifier = head_commitid['BELLE2_RELEASE_DIR']
+else:
+    print('both central & local dir seem not to be git repositories, but we failed to detect this earlier. Please report this.')
+    identifier = ''
+if identifier != '' and modifications:
+    identifier += '-modified'
+
+env.Append(CPPDEFINES={'GIT_COMMITID': '\\"' + identifier + '\\"'})
+
+
+Return('env')

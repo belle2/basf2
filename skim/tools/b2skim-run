@@ -1,0 +1,173 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""General steering file for running skims."""
+
+import argparse
+import sys
+from textwrap import indent
+
+import basf2 as b2
+import modularAnalysis as ma
+from skim import CombinedSkim
+from skim.registry import Registry
+
+
+class _HelpAction(argparse._HelpAction):
+    """Help action which prints the help strings of all subparsers."""
+    def __call__(self, parser, namespace, values, option_string=None):
+        parser.print_help()
+
+        subparsers_actions = [
+            action for action in parser._actions
+            if isinstance(action, argparse._SubParsersAction)]
+
+        for subparsers_action in subparsers_actions:
+            for choice, subparser in subparsers_action.choices.items():
+                print(f"\nhelp for subcommand '{choice}':")
+                print(indent(subparser.format_help(), " "*2))
+
+        parser.exit()
+
+
+class CustomHelpFormatter(argparse.HelpFormatter):
+    """Custom formatter for argparse which prints the valid choices for an
+    argument in the help string.
+    """
+
+    def _get_help_string(self, action):
+        if action.choices:
+            return (
+                action.help + " Valid options are: " + ", ".join(action.choices) + "."
+            )
+        else:
+            return action.help
+
+
+class CustomArgumentParser(argparse.ArgumentParser):
+    """Argument parser which propogates help formatter to all subparsers."""
+
+    def __init__(self, **kwargs):
+        kwargs["formatter_class"] = CustomHelpFormatter
+        super(CustomArgumentParser, self).__init__(**kwargs)
+
+    def error(self, message):
+        sys.stderr.write(f"Error: {message}\n")
+        self.print_help()
+        sys.exit(2)
+
+
+def get_argument_parser():
+    parser = CustomArgumentParser(description=__doc__, add_help=False)
+    parser.add_argument("-h", "--help", action=_HelpAction, help="Show a full help message.")
+    subparsers = parser.add_subparsers(
+        dest="action", help="Run just one skim, or multiple skims at once.",
+    )
+    subparsers.required = True
+
+    single = subparsers.add_parser("single", help="Run a single skim.")
+
+    single.add_argument(
+        "skim", choices=Registry.names, metavar="Skim", help="Skim to run.",
+    )
+
+    single.add_argument(
+        "-o",
+        "--output-udst-name",
+        dest="OutputFilename",
+        metavar="Output uDST location",
+        help="Location of output uDST file.",
+    )
+
+    combined = subparsers.add_parser(
+        "combined", help="Run several skims as a combined steering file.",
+    )
+
+    combined.add_argument(
+        "skims",
+        nargs="+",
+        choices=Registry.names,
+        metavar="Skim",
+        help="List of skims to run as a combined skim.",
+    )
+
+    module = subparsers.add_parser("module", help="Run all skims in a module.")
+
+    module.add_argument(
+        "module",
+        choices=Registry.modules,
+        metavar="module",
+        help="Skim module to run all skims for as combined steering file.",
+    )
+
+    for subparser in [single, combined, module]:
+        subparser.add_argument(
+            "-n",
+            "--max-input-events",
+            dest="MaxInputEvents",
+            metavar="MaxInputEvents",
+            type=int,
+            help="Maximum number of input events to process.",
+        )
+        subparser.add_argument(
+            "-i",
+            "--input-file-list",
+            dest="InputFileList",
+            metavar="InputFileList",
+            nargs="+",
+            help="Input file list",
+        )
+        subparser.add_argument(
+            "--data",
+            action="store_true",
+            help=(
+                "Pass this flag if intending to run this skim on data, so that MC "
+                "quantities are not saved in the output."
+            ),
+        )
+
+    return parser
+
+
+def main():
+    parser = get_argument_parser()
+    args = parser.parse_args()
+
+    path = b2.Path()
+
+    # Get the list of skims to run from the argument parsers
+    if args.action == "single":
+        SkimFunction = Registry.get_skim_function(args.skim)
+        Skim = SkimFunction(OutputFileName=args.OutputFilename, mc=(not args.data))
+    elif args.action == "combined":
+        skims = list({*args.skims})
+        if sorted(skims) != sorted(args.skims):
+            b2.B2FATAL("Attempting to run a skim twice!")
+        SkimObjects = [Registry.get_skim_function(skim)() for skim in skims]
+        Skim = CombinedSkim(*SkimObjects, mc=(not args.data))
+    elif args.action == "module":
+        SkimObjects = [
+            Registry.get_skim_function(skim)()
+            for skim in Registry.get_skims_in_module(args.module)
+        ]
+        Skim = CombinedSkim(*SkimObjects, mc=(not args.data))
+
+    InputFileList = args.InputFileList or Skim.TestFiles
+    ma.inputMdstList("default", InputFileList, path=path)
+    Skim(path)
+
+    MaxInputEvents = args.MaxInputEvents or 0
+    b2.process(path, max_event=MaxInputEvents)
+    print(b2.statistics())
+
+
+if __name__ == "__main__":
+    main()

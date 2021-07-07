@@ -1,0 +1,12 @@
+import os
+
+Import('env')
+
+env['SUBLIB'] = True
+env['LIBS'] = ['$ROOT_LIBS', 'mdst_dataobjects', 'framework',
+               'eemmgisr', 'eemmgisrfsr', 'eemmg5', 'qcdloop1', 'gfortran']
+
+env['ADDITIONAL_SOURCES'] = ['belle2_phokhara_interface.f90']
+env.Depends(target = 'phokhara_10.0.f', dependency = 'belle2_phokhara_interface.f90')
+
+Return('env')

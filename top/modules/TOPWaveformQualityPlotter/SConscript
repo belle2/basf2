@@ -1,0 +1,3 @@
+Import('env')
+env['LIBS'] = ['framework', '$ROOT_LIBS', 'top_dataobjects']
+Return('env')

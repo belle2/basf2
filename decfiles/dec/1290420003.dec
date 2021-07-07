@@ -1,0 +1,27 @@
+# EventType: 1290420003
+# Descriptor: [B+ -> Xs mu+ mu-]cc
+# NickName: Bu_Xsmumu_lowpF
+# Documentation: Rare b->s l+ l- process. pF = 0.422 GeV
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Yo Sato
+# Email: yosato@epx.phys.tohoku.ac.jp
+# Cuts: None
+# Date: 20200825
+#
+#
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.0  Xsu mu+ mu- PHOTOS BTOXSLL 4.8 0.2 0.0 0.422;
+Enddecay
+#
+Decay B-sig
+1.0  anti-Xsu mu+ mu- PHOTOS BTOXSLL 4.8 0.2 0.0 0.422;
+Enddecay
+#
+End

@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""Tool to reset the non-reproducible root file metadata: UUID and datimes.
+It can also reset the initial file name stored in the file itself, but
+(WARNING!) this can corrupt the root file.
+"""
+
+import argparse
+from B2Tools.b2root import normalize_file
+
+
+def get_argument_parser():
+    """
+    Return an ArgumentParser with all defined arguments
+    """
+
+    # Specify the possible arguments
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    output_group = parser.add_mutually_exclusive_group()
+    output_group.add_argument('--output', '-o', type=str, default=None,
+                              help='Name of the output root file, default is basename_normalized.ext')
+    output_group.add_argument('--in-place', '-i', default=False, action='store_true',
+                              help='Overwrite the input file')
+    parser.add_argument('--name', '-n', type=str, default=None,
+                        help='The file name to be stored in the file, default is to not change it')
+    parser.add_argument('--root-version', '-r', type=int, default=None,
+                        help='The root version number to be set, default is to not change it')
+    parser.add_argument('filename', help='Name of the input root file')
+    return parser
+
+
+if __name__ == "__main__":
+    parser = get_argument_parser()
+    args = parser.parse_args()
+    normalize_file(args.filename, args.output, args.in_place, args.name, args.root_version)

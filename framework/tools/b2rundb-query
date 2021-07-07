@@ -1,0 +1,105 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+from rundb import RunDB
+from argparse import ArgumentParser
+
+import pandas as pd
+from tabulate import tabulate
+
+
+def get_argument_parser():
+    parser = ArgumentParser(description="""
+This tool allows to perform simple queries to the rundb.
+
+This works in any python installation with python version >=3.5 and the requests
+package installed
+    """)
+    parser.add_argument("--user", help="Username, corresponds to your DESY credentials.", required=False)
+    parser.add_argument("--min-experiment", help="Only query entries after or equal the given experiment number.", default=7)
+    parser.add_argument("--max-experiment", help="Only query entries before or equal the given experiment number.", default=99)
+    parser.add_argument("--run-type", help="", choices=["null", "physics", "cosmic", "beam", "debug", "hlttest", "unknown"], required=False)
+    parser.add_argument("--min-run", help="Only query entries after or equal the given run number.", default=1)
+    parser.add_argument("--max-run", help="Only query entries before or equal the given run number.", default=9999)
+    parser.add_argument(
+        "--min-date",
+        help="Only query entries after or equal the given date (iso8601 date string, e.g. 2020-05-06)",
+        required=False)
+    parser.add_argument(
+        "--max-date",
+        help="Only query entries before or equal the given date (iso8601 date string, e.g. 2020-05-06)",
+        required=False)
+
+    parser.add_argument(
+        "--variables",
+        help="""
+List of variables which will be printed for each run which fulfills the query.
+For available variables in the rundb see the available choices.
+Note that not all variables do necessarily have a value assigned to it.
+    """,
+        nargs="+",
+        default=[
+            "experiment",
+            "run",
+            "run_type",
+            "hlt_mode"],
+        choices=[
+            "ler",
+            "her",
+            "statistics",
+            "detectors",
+            "background",
+            "computing",
+            "duration",
+            "extra_data",
+            "quality_flags",
+            "quality_shifter",
+            "quality_expert",
+            "incident_size",
+            "incident_url",
+            "experiment",
+            "run",
+            "time_start",
+            "time_stop",
+            "time_run",
+            "run_type",
+            "stop_reason",
+            "hlt_mode",
+            "roi_filtering"])
+    return parser
+
+
+if __name__ == "__main__":
+
+    args = get_argument_parser().parse_args()
+
+    rundb = RunDB(username=args.user)
+    # get the list of runs, all parameters are forwarded as get request
+    # parameters. expand=True makes the server return full run info with all
+    # sub objects, not just the short one and store them in a pandas.DataFrame.
+    # For possible arguments and properties
+    # https://rundb.belle2.org/rest/v1/swagger/
+    df = pd.DataFrame(rundb.get_run_info(
+        min_experiment=args.min_experiment,
+        max_experiment=args.max_experiment,
+        run_type=args.run_type,
+        min_run=args.min_run,
+        max_run=args.max_run,
+        min_date=args.min_date,
+        max_date=args.max_date,
+        expand=True,
+        ))
+
+    print(tabulate(
+        df[args.variables],
+        showindex=False,
+        headers='keys',
+        tablefmt='plain'
+        ))

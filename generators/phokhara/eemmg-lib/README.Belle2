@@ -1,0 +1,2 @@
+Compilation is performed by scons using the provided SConscript, the Makefiles 
+are ignored and just included for completeness.

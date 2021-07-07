@@ -1,0 +1,2 @@
+.. automodule:: pdg
+   :members:

@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang='en-GB'>
+<head>
+  <meta charset='utf-8'>
+  <title>Belle II Validation</title>
+  <link
+      href='https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700'
+      rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/jquery-ui.css">
+  <link rel="stylesheet" href="css/jquery-ui.theme.css">
+  <link rel="stylesheet" href="css/magnific-popup.css">
+</head>
+
+<body>
+<div id='wrap'>
+
+  <div id='navigation_scroll'>
+    <div id='navigation'>
+      <div id='menu'>
+        <div>
+          <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+              <td width="36%" align="left"><img id="menu_main_logo" src="images/belle2-logo.png"></td>
+              <td align="left" id="menu_main_text">Belle II <br>Validation</td>
+            </tr>
+          </table>
+        </div>
+        <div class='revisions menuhead' title="A tag, also called revision, is one version of the software. In this submenu you can select the revisions that should be shown (checkboxes). The two revisions that are compared against each other are shown bold.">
+          <img src="images/list.png" alt="Revisions">&nbsp; Revisions
+        </div>
+        <div id='revisions' class='submenu underlineditems'
+             style='display: block; position: relative;'>
+          Loading ...
+        </div>
+
+        <div class='menuhead' title="Links with additional information. Suggestions welcome.">
+          <img src="images/link.png" alt="Useful links">&nbsp; Useful links
+
+        </div>
+        <div class="trivial-submenu">
+          <div><a target="_blank" href="https://confluence.desy.de/display/BI/Software+Validation" title="Introduction to the validation package (confluence).">Read the friendly manual</a></div>
+          <div><a target="_blank" href="https://confluence.desy.de/display/BI/News" title="News about the validation package and website (confluence)">News</a></div>
+          <div><a target="_blank" href="https://confluence.desy.de/display/BI/Checklist" title="Checklist: What to check before adding a new validation plot etc.">Checklists</a></div>
+          <div><a target="_blank" href="https://confluence.desy.de/display/BI/Validation+FAQ" title="Frequently asked questions (confluence)">FAQ</a></div>
+          <div><a target="_blank" href="https://questions.belle2.org/questions/scope:all/sort:activity-desc/tags:validation/" title="Questions with the tag 'validation' (questions.belle2.org)">Validation@questions.belle2</a></div>
+          <div><a target="_blank" href="https://confluence.desy.de/display/BI/Validation+Monitoring%2C+How-to" title="Useful information for Software Quality Shifters (confluence)">How-to for SWQShifters</a></div>
+          <div><a target="_blank" href="https://agira.desy.de/browse/BII-3309" title="Entry point for issues opened by Software Quality Shifters (confluence)">JIRA issue for SWQShifters</a></div>
+          <div><a target="_blank" href="https://agira.desy.de/secure/CreateIssue!default.jspa" title="Report a bug about the validation package in general or this website (use 'JIRA issue for SWQShifters' if the bug is about a specific plot or package).">Report bug</a></div>
+          <div><a target="_blank" href="https://agira.desy.de/issues/?filter=14707" title="Open issues/bugs concerning the validation package or this website (JIRA)">Open issues/known bugs</a></div>
+          <div><a target="_blank" href="https://confluence.desy.de/display/BI/Validation%3A+Developer+information" title="Information for developers of the validation package (confluence)">Developer Information</a></div>
+        </div>
+
+        <div class='packages menuhead'  title="Software package selection submenu. Packages only show up if at least one of their scripts have run.">
+          <img src="images/cubes.png" alt="Packages">&nbsp; Packages
+        </div>
+        <div id='packages' class='packages_submenu'>
+          Loading ...
+        </div>
+        <div class="menuhead" title="The color scheme governing the border of the plots">
+          <img src="images/list.png" alt="Palette">
+          &nbsp;Palette
+        </div>
+        <div class="trivial-submenu " id="palette">
+          <div class="swatch-line-header" title="Border color of plots that are not marked as expert plots.">Non-expert plot</div>
+          <div title="The chi2 comparison of the reference and newest revision returned a p value below the error level: The two distributions do not match.">
+            <span class="swatch" id="swatch-fail-nonexpert">x</span>
+            <span class="swatch-text">Comparison Fail</span>
+          </div>
+          <div class="swatch-line"  title="The chi2 comparison of the reference and newest revision returned a p value below the warning level: The two distributions seem to differ somewhat.">
+            <span class="swatch" id="swatch-warn-nonexpert">!</span>
+            <span class="swatch-text">Comparison Warn</span>
+          </div>
+          <div class="swatch-line"  title="The chi2 comparison of the reference and newest revision returned a p value above the warning level: The two distributions seem to match.">
+            <span class="swatch" id="swatch-pass-nonexpert">o</span>
+            <span class="swatch-text">Comparison Pass</span>
+          </div>
+          <div class="swatch-line" title="No chi2 comparison was performed. Perhaps there is no reference, the ROOT object doesn't support comparison or the comparison was manually deactivated.">
+            <span class="swatch" id="swatch-nocomp-nonexpert">?</span>
+            <span class="swatch-text">No comparison</span>
+          </div>
+          <div class="swatch-line-header" title="Border color of plots that are marked as expert plots.">Expert plot</div>
+          <div class="swatch-line"  title="The chi2 comparison of the reference and newest revision returned a p value below the warning level: The two distributions seem to differ somewhat.">
+            <span class="swatch" id="swatch-fail">x</span>
+            <span class="swatch-text">Comparison Fail</span>
+          </div>
+          <div class="swatch-line" title="The chi2 comparison of the reference and newest revision returned a p value above the warning level: The two distributions seem to match.">
+            <span class="swatch" id="swatch-warn">!</span>
+            <span class="swatch-text">Comparison Warn</span>
+          </div>
+          <div class="swatch-line" title="The chi2 comparison of the reference and newest revision returned a p value above the warning level: The two distributions seem to match.">
+            <span class="swatch" id="swatch-pass">o</span>
+            <span class="swatch-text">Comparison Pass</span>
+          </div>
+          <div class="swatch-line" title="No chi2 comparison was performed. Perhaps there is no reference, the ROOT object doesn't support comparison or the comparison was manually deactivated.">
+            <span class="swatch" id="swatch-nocomp">?</span>
+            <span class="swatch-text">No comparison</span>
+          </div>
+        </div>
+        <div class="menuhead" title="Information about the server running this site.">
+          <img src="images/link.png" alt="systeminfo">&nbsp; System Info
+        </div>
+        <div class="system-submenu" id="systeminfo">
+          Loading...
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div id='content_scroll'>
+    <div id='content'>Loading ...</div>
+  </div>
+</div>
+
+<!-- external library code -->
+
+<!-- ractive js templating engine -->
+<script src='js/external/ractive.min.js'></script>
+<script src='js/external/ractive-transitions-fade.js'></script>
+
+<!-- all jquery related stuff -->
+<script src="js/external/jquery-1.11.1.min.js" type="text/javascript"></script>
+<script src="js/external/jquery-ui.min.js" type="text/javascript"></script>
+<script src="js/external/jquery.magnific-popup.min.js"></script>
+
+<!-- latex support -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML" async></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {inlineMath: [['$','$']]}
+  });
+  // Add a hook that sets a global variable to true once it is fully loaded.
+  MathJax.Hub.Register.StartupHook(
+    "End",
+    function () {
+      latexRenderingLoaded = true;
+    }
+  );
+</script>
+
+<!-- own code -->
+<script src="js/create-plots-waiting.js" type="text/javascript"></script>
+<script src="js/ractive-support.js" type="text/javascript"></script>
+<script src="js/validation-loading.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+    $( document ).ready(function() {
+        console.log("Document loaded, starting RestAPI calls");
+        setSystemInfo();
+        loadRevisions();
+    });
+</script>
+</body>
+</html>

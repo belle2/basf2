@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<SuperKEKB>
+  <circumference unit="m">3016.315</circumference>
+  <numofBunches descr="number of bunches per ring">2500</numofBunches> 
+  <luminosity>8.0e35</luminosity>
+  <LER>
+    <energy unit="GeV">4.0</energy>
+    <energyError unit="GeV">0.002375</energyError>
+    <angle unit="rad">-0.0415</angle>
+    <sigmaX unit="um" descr="horizontal beam size">10.2</sigmaX>
+    <sigmaY unit="nm" descr="vertical beam size">59</sigmaY>
+    <sigmaZ unit="mm" descr="bunch length">6.0</sigmaZ>
+  </LER>
+  <HER>
+    <energy unit="GeV">7.0</energy>
+    <energyError unit="GeV">0.00513</energyError>
+    <angle unit="rad">0.0415</angle>
+    <sigmaX unit="um" descr="horizontal beam size">7.75</sigmaX>
+    <sigmaY unit="nm" descr="vertical beam size">59</sigmaY>
+    <sigmaZ unit="mm" descr="bunch length">5.0</sigmaZ>
+  </HER>
+</SuperKEKB>

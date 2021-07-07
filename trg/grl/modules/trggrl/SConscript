@@ -1,0 +1,6 @@
+Import('env')
+
+env['LIBS'] = ['framework', '$ROOT_LIBS', 'analysis_utility', 'trg', 'trg_cdc_dataobjects', 'trg_ecl_dataobjects', 'trg_grl_dataobjects', 'trg_klm_dataobjects', 'mdst_dbobjects']
+#print env.Dump()
+
+Return('env')

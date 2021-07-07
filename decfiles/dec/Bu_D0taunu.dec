@@ -1,0 +1,23 @@
+# EventType: 12560000 
+# Descriptor: [B+ -> anti-D0 tau+ nu_tau]cc
+# NickName: Bu_D0taunu
+# Documentation: Test B-> D tau nu 
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Phillip Urquijo
+# Email: purquijo@unimelb.edu.au
+# Cuts: None
+# Date: 20150109
+#
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+0.50 anti-D0  tau+  nu_tau  PHOTOS  ISGW2; 
+Enddecay
+CDecay B-sig
+
+End

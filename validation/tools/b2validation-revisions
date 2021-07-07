@@ -1,0 +1,208 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""
+Tool to do for each git commit in a specific range:
+- check out the commit (configurable if you want to run git stash and git stash pop before and afterwards)
+- run ``scons`` or not (configurable)
+- run a script (given on command line)
+- extract the ``meanX``, the ``meanY`` and the ``zeroSupressedMeanY`` from variables from ROOT files (also configured on the commandline)
+- write all variables together with their git hash and git log message into a pandas DataFrame and this dataframe into the ``results.pkl`` file as a pickle stream.
+
+For example if you want to examine some commits related to tracking, you can use:
+
+.. code-block::
+
+    b2validation-revisions 5e066d31b391bb240cb2b381e67c5488681a8ec6 05d5bf078a45f6af8022bf06b398213d0bc2409d \
+      --check-quantity ~/basf2/tracking/validation/results/current/TrackingValidation.root:hEfficiency \
+      --script "validate_basf2 -s *_trackingEfficiency_*.py"
+
+which will run through all commits from
+``5e066d31b391bb240cb2b381e67c5488681a8ec6`` to
+``05d5bf078a45f6af8022bf06b398213d0bc2409d``
+and execute ``validate_basf2 -s *_trackingEfficiency_*.py`` for each of them.
+Then it will extract the ``meanX``, the ``meanY`` and
+the ``zeroSupressedMeanY`` of the ``TNtuple hEfficiency`` in the file
+``~/basf2/tracking/validation/results/current/tracking/TrackingValidation.root``.
+
+The options ``--script`` and ``--check-quantity`` can be given more than once.
+"""
+from collections import defaultdict
+
+import ROOT
+import basf2
+
+from subprocess import CalledProcessError, check_call
+import argparse
+import pickle
+import pandas as pd
+import quantity_extract
+
+from validation_tools import helpers
+helpers.fix_root_command_line()
+
+
+def extract_fom_from_histogram(file_name, fom_name):
+    # Read in the given root file and export the information to the results
+    root_file = ROOT.TFile(file_name)
+    print(file_name)
+    if not root_file.IsOpen():
+        print(f"Cannot open ROOT file {file_name}")
+        return None
+
+    results = {}
+
+    for result_key in fom_name:
+        root_obj = root_file.Get(result_key)
+
+        qe = quantity_extract.RootQuantityExtract()
+        results = qe.extract(root_obj)
+        # update keys with the fom's name
+        results = {
+            result_key + "_" + key: value
+            for (key, value) in results.items()
+        }
+
+    root_file.Close()
+    return results
+
+
+def get_fom_from_file(script_name, file_names_and_fom, git_commit_hash,
+                      skip_compiling=False, use_stash=True):
+    repo = helpers.get_basf2_repo()
+
+    results = {}
+
+    # Checkout git (stash or not stash)
+    print(f"Checking out git hash {git_commit_hash}.")
+
+    try:
+        helpers.checkout_git_revision(git_commit_hash, repo=repo,
+                                      use_stash=use_stash)
+    except:
+        return results
+
+    results.update({"git_hash": git_commit_hash})
+
+    # Compile repo
+    if not skip_compiling:
+        print("Compiling...")
+        helpers.compile_basf2(["-j8"])
+
+    # Execute script
+    if script_name is not None:
+        script_command = " && ".join(script_name)
+        print(f"Running the script {script_command}...")
+        try:
+            check_call(script_command, shell=True)
+        except CalledProcessError:
+            basf2.B2ERROR("Error in executing the script.")
+            return results
+
+    # Extract results
+    if file_names_and_fom is not None:
+        print("Checking the results...")
+        for file_name in file_names_and_fom:
+            results.update(extract_fom_from_histogram(
+                file_name,
+                file_names_and_fom[file_name])
+            )
+
+    return results
+
+
+def get_argument_parser():
+    """ Define the accepted command line flags """
+    # setup argument parser options
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        'git_start_hash',
+        help='Start git hash to check.'
+    )
+
+    parser.add_argument(
+        'git_end_hash',
+        help='End git hash to check.'
+    )
+
+    parser.add_argument(
+        '--skip-compile',
+        action='store_true',
+        default=False,
+        help='Do not trigger a compile, useful for saving time when setting '
+             'up the quantity checks.'
+    )
+
+    parser.add_argument(
+        '--use-stash',
+        action='store_true',
+        default=True,
+        help='Use a git stash and a git stash pop before and after the git '
+             'checkout.'
+    )
+
+    parser.add_argument(
+        '--check-quantity',
+        action="append",
+        default=[],
+        help='Check for a quantity in validation files'
+    )
+
+    parser.add_argument(
+        '--script',
+        action="append",
+        help='Name of validation script to run after the compile and before '
+             'the quantity check. Only this validation script and all scripts '
+             'it depends on are executed.'
+    )
+    return parser
+
+if __name__ == "__main__":
+
+    args = get_argument_parser().parse_args()
+    argsVar = vars(args)
+
+    # see if quantities must be checked and
+    # make sure the expression can be properly parsed
+    file_names_and_fom = defaultdict(list)
+    for c_string in argsVar["check_quantity"]:
+        file_name, fom_name = c_string.split(":")
+        file_names_and_fom[file_name].append(fom_name)
+
+    git_start_hash = argsVar["git_start_hash"]
+    git_end_hash = argsVar["git_end_hash"]
+
+    print(f"Going through git repository from "
+          f"{git_start_hash} to {git_end_hash}.")
+    git_hashs = helpers.get_git_hashes_between(git_end_hash, git_start_hash)
+
+    print(f"There are {len(git_hashs)} commits in this range.")
+
+    results = []
+    for git_hash in git_hashs:
+        results.append(get_fom_from_file(
+            script_name=argsVar["script"],
+            file_names_and_fom=file_names_and_fom,
+            git_commit_hash=git_hash,
+            skip_compiling=argsVar["skip_compile"],
+            use_stash=argsVar["use_stash"])
+        )
+
+        # Temporarily save the results into a file
+        with open("tmp.pkl", "wb") as f:
+            pickle.dump(results, f)
+
+    print("Finished.")
+    results = pd.DataFrame(results)
+
+    with open("result.pkl", "wb") as f:
+        pickle.dump(results, f)
+
+    print(results)

@@ -1,0 +1,114 @@
+# Weight and geometry files #
+# ######################### #
+*.xml
+*.class.C
+*.root
+
+# Exceptions #
+# ########## #
+
+# Validation references are allowed.
+!*/validation/*.root
+
+# Some tests and examples may need event files, classifiers and / or geometry files as input.
+!*/tests/**
+!*/examples/**
+
+# Former default place to store geometry and weight files - Deprecated
+!**/data/**
+
+
+# Plotting output file #
+# #################### #
+*.png
+*.svg
+*.jpeg
+*.jpg
+*.pdf
+*.eps
+
+
+# Exceptions #
+# ########## #
+
+# Validation web page may contain some images
+!validation/html_static/**
+
+# The daq package contains some image files
+!daq/**/doc/**
+!daq/slc/extra/javalib/**
+
+
+# External resources #
+# ################## #
+
+# Presumably manages its own .gitignore file
+!genfit2/code2/**
+
+
+# Local modifications #
+# ################### #
+/SConstruct
+/.release
+
+
+# Basf2 compile folders #
+# ##################### #
+/bin/
+/build
+/config.log
+/data/
+/include/
+/lib/
+/modules/
+/.sconf_temp/
+/.sconsign.dblite
+/compile_commands.json
+
+
+# Validation / Run artefacts #
+# ########################## #
+centraldb/
+localdb/
+Belle2FileCatalog.xml
+/results/
+/html/
+/runtimes.dat
+/runtimes-old.dat
+
+
+# Python byte code #
+# ################ #
+*.py[cod]
+
+
+# Auxilliary files #
+# ################ #
+*.orig
+*.rej
+*.bak
+*.patch
+
+
+# Editor temporaries #
+# ################## #
+.#*
+*~
+*#
+*.swp
+.ipynb_checkpoints/
+-
+._*
+
+# Editor configuration #
+# #################### #
+.dir-locals.el
+.project
+.idea
+.vscode
+.gdb_history
+
+# Compiler output #
+# ############### #
+*.o
+*.os

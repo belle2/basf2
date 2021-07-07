@@ -1,0 +1,23 @@
+Import('env')
+
+# Mark this folder a sub-library
+env.Dictionary()['SUBLIB'] = True
+
+env['LIBS'] = ['tracking_dataobjects',
+               'cdc_dataobjects',
+               'ecl',
+               'framework',
+               'genfit2',
+               'ir',
+               'klm', 'klm_dataobjects', 'klm_dbobjects',
+               'mdst_dataobjects',
+               'pxd_dataobjects',
+               'simulation',
+               'structure_dbobjects',
+               'svd_dataobjects',
+               'CLHEP',
+               '$GEANT4_LIBS',
+               '$ROOT_LIBS',
+              ]
+
+Return('env')

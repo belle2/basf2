@@ -1,0 +1,6 @@
+Import('env')
+
+env['LIBS'] = [ 'framework', 'rawdata_dataobjects' ]
+
+Return('env')
+

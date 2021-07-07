@@ -1,0 +1,8 @@
+Import('env')
+
+env['LIBS'] = ['klm_dataobjects', 
+               'framework', 
+               'rawdata_dataobjects',
+               '$ROOT_LIBS']
+
+Return('env')

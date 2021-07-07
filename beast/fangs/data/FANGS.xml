@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="FANGS">
+  <Creator library="beast">FANGSCreator</Creator>
+  <Content>
+    <PixelThreshold>810</PixelThreshold>
+    <PixelThresholdRMS>150</PixelThresholdRMS>
+    <ChipColumnNb>80</ChipColumnNb>
+    <ChipColumnX>1</ChipColumnX>
+    <ChipRowNb>336</ChipRowNb>
+    <ChipRowY>0.84</ChipRowY>
+    <PixelTimeBinNb>256</PixelTimeBinNb>
+    <PixelTimeBin>25</PixelTimeBin>
+    <TOTA1>118.25</TOTA1>
+    <TOTB1>-17.2194</TOTB1>
+    <TOTC1>35.7857</TOTC1>
+    <TOTQ1>75</TOTQ1>
+    <TOTA2>493.11</TOTA2>
+    <TOTB2>19.1809</TOTB2>
+    <TOTC2>771.924</TOTC2>
+    <TOTQ2>75</TOTQ2>
+    <Workfct>3.6</Workfct>
+    <Fanofac>0.1</Fanofac>
+    <sensor_width>0.02</sensor_width>
+    <v_sensor>0.023</v_sensor>
+    <shape name="FANGS" type="box">
+      <length unit="mm">170</length>
+      <width unit="mm">28.7</width>
+      <height unit="mm">3.55</height>
+      <r unit="mm">24.63</r>
+      <z unit="mm">19</z>
+      <u unit="mm">4.35</u>
+      <phi unit="deg">90 180 270</phi>
+      <shape name="support" type="box">
+        <material>FANGS-Support</material>
+        <length unit="mm">170</length>
+        <width unit="mm">28.7</width>
+        <height unit="mm">2</height>
+        <top unit="mm">0</top>
+      </shape>
+      <shape name="flex" type="box">
+        <shape name="flex-glue" type="box">
+          <material>FANGS-Epoxy</material>
+          <length unit="mm">170</length>
+          <width unit="mm">8</width>
+          <height unit="um">50</height>
+        </shape>
+        <material>FANGS-Flex</material>
+        <length unit="mm">170</length>
+        <width unit="mm">8</width>
+        <height unit="um">550</height>
+        <top unit="mm">3.0</top>
+        <u unit="mm">10.25</u>
+      </shape>
+      <shape name="SensorPack" type="box">
+        <length unit="mm">20</length>
+        <width unit="mm">20</width>
+        <height unit="um">500</height>
+        <top unit="mm">3.0</top>
+        <z unit="cm">-4.6, -2.4, -0.2, 2.0, 4.2</z>
+        <u unit="mm">-4.35</u>
+        <shape name="FE-I4-glue" type="box">
+          <material>FANGS-Epoxy</material>
+          <length unit="mm">20</length>
+          <width unit="mm">20</width>
+          <height unit="um">50</height>
+          <top unit="mm">0</top>
+        </shape>
+        <shape name="FE-I4" type="box">
+          <material>FANGS-Sensor</material>
+          <length unit="mm">20</length>
+          <width unit="mm">20</width>
+          <height unit="um">150</height>
+          <top unit="um">50</top>
+        </shape>
+        <shape name="Bumps" type="box">
+          <material>FANGS-Bumps</material>
+          <length unit="mm">18</length>
+          <width unit="mm">17</width>
+          <height unit="um">25</height>
+          <top unit="um">200</top>
+          <u unit="mm">-0.5</u>
+        </shape>
+        <shape name="Sensor" type="box">
+          <material>FANGS-Sensor</material>
+          <active>true</active>
+          <length unit="mm">20</length>
+          <width unit="mm">19</width>
+          <height unit="um">245</height>
+          <top unit="um">225</top>
+          <u unit="mm">-0.5</u>
+        </shape>
+      </shape>
+    </shape>
+  </Content>
+</DetectorComponent>

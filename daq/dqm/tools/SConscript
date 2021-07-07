@@ -1,0 +1,17 @@
+Import('env')
+
+env['TOOLS_LIBS']['hserver'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['hrelay'] = ['daq', 'framework', '$ROOT_LIBS' ]
+#env['TOOLS_LIBS']['maptest'] = ['daq', 'framework','$ROOT_LIBS' ]
+env['TOOLS_LIBS']['maptest'] = ['daq', 'framework', '$ROOT_LIBS', 'libNew' ]
+env['TOOLS_LIBS']['tmemtest'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['tmemread'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['hdump'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['hcollect'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['dqmmerge'] = ['daq', 'framework', '$ROOT_LIBS' ]
+#env['TOOLS_LIBS']['hprod'] = ['daq', 'framework', 'libNew', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['dqmmaster'] = ['daq', 'nsm2_basf2', 'pthread']
+env['TOOLS_LIBS']['hsendfile'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['hsendcommand'] = ['daq', 'framework', '$ROOT_LIBS' ]
+
+Return('env')

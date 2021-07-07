@@ -1,0 +1,25 @@
+# EventType: 1290001004
+# Descriptor: [B+ -> Xs gamma]cc
+# NickName: Bu_Xsgamma
+# Documentation: Rare b->s gamma process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Phillip Urquijo
+# Email: purquijo@unimelb.edu.au
+# Cuts: None
+# Date: 20151103
+#
+#
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.0  Xsu gamma  PHOTOS BTOXSGAMMA 2 ; 
+Enddecay
+CDecay B-sig
+
+#
+End

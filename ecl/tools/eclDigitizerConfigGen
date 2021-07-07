@@ -1,0 +1,379 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##########################################################################
+#                                                                        #
+# Program that records covariance matrices and other                     #
+# parameters in ECL-WF.root file that is used by ECLDigitizer            #
+# module in ECL simulation                                               #
+# (based on ecldigitconfigfile.cc)                                       #
+#                                                                        #
+# USAGE: see printUsageInfo function for usage information               #
+##########################################################################
+
+import sys
+import os
+import ROOT
+from ROOT import Belle2
+from array import array
+
+def printUsageInfo():
+    """
+    Print usage information
+    """
+    print("""
+eclDigitizerConfigGen: Script to generate ECL-WF.root file used by ECLDigitizer module
+
+Usage: eclDigitizerConfigGen covmat_path tid_path
+  covmat_path    Path to files with inverse covariance matrices, for example
+                 ~avbobrov/eclshaper_sp/file/run02320_2_feb20_noise
+  tid_path       Path to files with time shift data, for example
+                 ~avbobrov/eclshaper_sp/file/tid
+""")
+
+def main():
+    """
+    """
+
+    if len(sys.argv) < 3:
+        printUsageInfo()
+        exit(2)
+
+    #=== Load ECL channel mapper
+    mapper = Belle2.ECL.ECLChannelMapper()
+    mapper.initFromFile()
+    #=== Load mapping to 217 groups of Cell IDs with similar covariance matrices
+    f = open(Belle2.FileSystem.findFile('/data/ecl/CIdToEclData.txt'), 'r')
+    groups = []
+    for line in f.readlines():
+        if len(line.strip()) == 0: continue
+        cid0, group = [int(x) for x in line.split()]
+        new_len = group + 1
+        while new_len > len(groups): groups.append(list())
+        groups[group].append(cid0 + 1)
+
+    #=== Load covariance matrix data
+
+    # Folder with inverse covariance matrices and waveform parameters
+    PATH_PREFIX = sys.argv[1]#'/home/belle/avbobrov/eclshaper_sp/file/run02320_2_feb20_noise'
+    # Folder with time shift data
+    PATH_PREFIX_TID = sys.argv[2]#'/home/belle/avbobrov/eclshaper_sp/file/tid'
+
+    # Cell ID-indexed list (0..8735) of ECLWaveformData objects
+    # (waveform parameters and inv cov matrices)
+    wf_data_by_cid = [None] * 8736
+    # Shaper ID-indexed list (0..8736) of ECLWFAlgoParams objects
+    # (fit algorithm parameters)
+    algo_params_by_cid = [None] * 8736
+
+    for cpr_id in range(1, 26+1):
+        crate_pair = copperIDToCrateID(cpr_id)
+        for board_id in range(24):
+            crate_id = crate_pair[board_id // 12]
+            shaper_id = board_id % 12 + 1
+            if crate_id > 36 and shaper_id > 10: continue
+            if crate_id > 44 and shaper_id > 8: continue
+            path = f'{PATH_PREFIX}/{cpr_id}/{board_id}/'
+            wf_data_list, algo_params = readShaperDSPConfig(path, shaper_id, board_id)
+            #=== Apply time shift to adjust waveform parameters
+            path = f'{PATH_PREFIX_TID}/{cpr_id}/{board_id}/tim_{board_id}.txt'
+            wf_data_list = adjustParameters(path, wf_data_list)
+            
+            for channel in range(16):
+                cid = mapper.getCellId(crate_id, shaper_id, channel+1)
+                if cid <= 0 or cid > 8736: continue
+                wf_data_by_cid[cid - 1] = wf_data_list[channel]
+                algo_params_by_cid[cid - 1] = algo_params
+
+    noise_data = Belle2.ECLNoiseData()
+    for idx in range(noise_data.c_nElements):
+        a = getRow(idx, 31)
+        b = getCol(idx, 31)
+        noise_data.m_matrixElement[idx] = par_vmat[a][b]
+
+    #=== Data saving
+
+    f_out = ROOT.TFile('ECL-WF.root', 'recreate')
+    t1 = ROOT.TTree("EclWF", "Waveform and covariance matrix")
+    t2 = ROOT.TTree("EclAlgo", "Fitting algorithm parameters")
+    t3 = ROOT.TTree("EclNoise", "Electronic noise matrix")
+
+    t1.Branch("CovarianceM", Belle2.ECLWaveformData())
+    ncellId1 = array('i', [1])
+    cellId1  = array('i', [1] * 8736)
+    t1.Branch("ncellId", ncellId1, "ncellId/I");
+    t1.Branch("cellId", cellId1, 'cellId[ncellId]/I')
+
+    t2.Branch("Algopars", Belle2.ECLWFAlgoParams())
+    ncellId2 = array('i', [0])
+    cellId2  = array('i', [1] * 8736)
+    t2.Branch("ncellId", ncellId2, "ncellId/I");
+    t2.Branch("cellId", cellId2, 'cellId[ncellId]/I')
+
+    t3.Branch("NoiseM", Belle2.ECLNoiseData())
+    ncellId3 = array('i', [0])
+    cellId3  = array('i', [0])
+    t3.Branch("ncellId", ncellId3, "ncellId/I");
+    t3.Branch("cellId", cellId3, 'cellId[ncellId]/I')
+
+    #==== Calculate average for each group
+
+    for group in groups:
+        ncellId = len(group)
+        ncellId1[0] = ncellId
+        ncellId2[0] = ncellId
+        matrix_elems  = [0] * Belle2.ECLWaveformData.c_nElements
+        waveform_pars = [0] * Belle2.ECLWaveformData.c_nParams
+        algo_params = None
+        for i, cid in enumerate(group):
+            if algo_params == None:
+                algo_params = algo_params_by_cid[cid - 1]
+            wf_data = wf_data_by_cid[cid - 1]
+            for idx in range(wf_data.c_nElements):
+                matrix_elems[idx] += wf_data.getMatrixElement(idx)
+            for idx in range(wf_data.c_nParams):
+                waveform_pars[idx] += wf_data.getWaveformPar(idx)
+            cellId1 [i] = cid
+            cellId2 [i] = cid
+        if algo_params == None: continue
+        wf_data = Belle2.ECLWaveformData()
+        for idx in range(wf_data.c_nElements):
+            wf_data.setMatrixElement(idx, matrix_elems[idx] / ncellId)
+        for idx in range(wf_data.c_nParams):
+            wf_data.setWaveformPar(idx, waveform_pars[idx] / ncellId)
+        t1.SetBranchAddress("CovarianceM", ROOT.AddressOf(wf_data))
+        t2.SetBranchAddress("Algopars", ROOT.AddressOf(algo_params))
+        t1.Fill()
+        t2.Fill()
+
+    t3.SetBranchAddress("NoiseM", ROOT.AddressOf(noise_data))
+    t3.Fill()
+
+    t1.Write()
+    t2.Write()
+    t3.Write()
+    f_out.Close()
+
+################################################
+
+def readShaperDSPConfig(dir_path, shaper_id, board_id):
+    """
+    @param dir_path    Path to the directory with covariance matrix, shape
+                       parameters and parameters for waveform processing
+    @param shaper_id   ID of shaperDSP board (1..12)
+    @param board_id    ID of shaperDSP board in copper (0..23)
+    @return Tuple ([list of ECLWaveformData], ECLWFAlgoParams)
+    """
+    wf_data_list = []
+
+    raw_pars = readShapeParams(f'{dir_path}/panr_{shaper_id}.dat')
+    for channel in range(16):
+        # raw_matr = readMatrix(f'{dir_path}/inmcor_{channel}.dat')
+        raw_matr = readMatrix(f'{dir_path}/inmcor_{channel}.dat')
+        wf_data = Belle2.ECLWaveformData()
+        # Store inverse covariance matrix
+        for idx in range(wf_data.c_nElements):
+            a = getRow(idx)
+            b = getCol(idx)
+            wf_data.setMatrixElement(idx, raw_matr[a][b])
+        default_pars = [None, 0.5, 0.6483, 0.4017, 0.3741, 0.8494, 0.00144547, 4.7071, 0.8156, 0.5556, 0.2752]
+        # Store shape parameters
+        for idx in range(wf_data.c_nParams):
+            # FIXME: There are 11 parameters, not sure where the last one supposed to go.
+            wf_data.setWaveformPar(idx, raw_pars[channel][idx+1])
+            # wf_data.setWaveformPar(idx, default_pars[idx+1])
+        wf_data_list.append(wf_data)
+
+    dsp_utils = Belle2.ECL.ECLDspUtilities
+    dsp = dsp_utils.readEclDsp(f'{dir_path}/dsp{board_id:02}.dat', 0)
+
+    algo_params = Belle2.ECLWFAlgoParams()
+    algo_params.ka           = ord(dsp.getka())
+    algo_params.kb           = ord(dsp.getkb())
+    algo_params.kc           = ord(dsp.getkc())
+    algo_params.y0Startr     = ord(dsp.gety0Startr()) + 16
+    algo_params.chiThresh    = dsp.getchiThresh()
+    algo_params.k1Chi        = ord(dsp.getk1())
+    algo_params.k2Chi        = ord(dsp.getk2())
+    # algo_params.hitThresh    = dsp.gethT()
+    algo_params.hitThresh    = 100
+    algo_params.lowAmpThresh = dsp.getlAT() - 128
+
+    # FIXME: Skip threshould is negative for some reason
+    # algo_params.skipThresh   = dsp.getsT() - 128
+    algo_params.skipThresh   = -20
+
+    return wf_data_list, algo_params
+
+
+def adjustParameters(path, wf_data_list):
+    """
+    Adjust parameters based on time shift data
+    """
+    # Waveform shaper parameters, taken from PhotonMCPar11 array, from ecl/tools/eclDigitizerConfigGen
+    default_parameters = [0.5, 0.648324, 0.401711, 0.374167, 0.849417, 0.00144548, 4.70722, 0.815639, 0.555605, 0.2752]
+    timeshifts = [float(x) for x in open(path).readlines()]
+    for wf_data, shift in zip(wf_data_list, timeshifts):
+        # t0 = wf_data.getWaveformPar(0)
+        # wf_data.setWaveformPar(0, t0 + shift - 72./2304.)
+        for i, par in enumerate(default_parameters):
+            wf_data.setWaveformPar(i, par)
+    return wf_data_list
+
+
+################################################
+
+def getRow(a, row_count=16):
+    """
+    @param a     Index used in packed covariance matrix
+    @return Matrix row corresponding to specific index
+    """
+    # row|  a:
+    # -----------------
+    #  0 |  0      
+    #  1 |  1 2    
+    #  2 |  3 4 5  
+    #  3 |  6 7 8 9
+    # ...|         
+    # -----------------
+    # col:  0 1 2 3 ...
+    # -----------------
+    if a < 0:
+        return -1
+    if a >= row_count * (row_count + 1) // 2:
+        return -1
+    row = -1
+    for i in range(16):
+        max_a_at_row = (i + 1) * (i + 2) // 2
+        if a < max_a_at_row:
+            row = i
+            break
+    return row
+
+def getCol(a, row_count=16):
+    """
+    @param a     Index used in packed covariance matrix
+    @return Matrix column corresponding to specific index
+    """
+    # row|  a:
+    # -----------------
+    #  0 |  0      
+    #  1 |  1 2    
+    #  2 |  3 4 5  
+    #  3 |  6 7 8 9
+    # ...|         
+    # -----------------
+    # col:  0 1 2 3 ...
+    # -----------------
+    if a < 0:
+        return -1
+    if a >= row_count * (row_count + 1) // 2:
+        return -1
+    col = -1
+    for i in range(row_count):
+        max_a_at_row = (i + 1) * (i + 2) // 2
+        if a < max_a_at_row:
+            col = a - i * (i + 1) // 2
+            break
+    return col
+
+def printMatrix(matrix, nrows):
+    """
+    Print lower triangle of the matrix
+    using numbering sequence used in
+    ECLWaveformData
+    """
+    nelements = nrows * (nrows + 1) // 2
+    prev_a = -1
+    for idx in range(nelements):
+        a = getRow(idx)
+        b = getCol(idx)
+        if prev_a != a:
+            print()
+            prev_a = a
+        print('%9.2e' % matrix[a][b], end=' ')
+
+
+def readMatrix(fname):
+    """
+    Read covariance matrix
+    """
+    with open(fname) as f:
+        matr = []
+        for line in f.readlines()[:16]:
+            matr.append([float(x) for x in line.split()])
+        return matr
+
+def readShapeParams(fname):
+    """
+    Read fit parameters
+    """
+    with open(fname) as f:
+        lines = f.readlines()
+        # time_shift = float(lines[0])
+        pars = []
+        for line in lines[1:17]:
+            # Parameters for specific channel of shaper board
+            ch_pars = [float(x) for x in line.split()]
+            ch_pars[1] += 0.25
+            pars.append(ch_pars)
+        return pars
+
+def copperIDToCrateID(cpr_id):
+    """
+    @param cpr_id   Ordinal ECL COPPER ID (1..26)
+    @return Pair of ECL crate IDs (1..52)
+    """
+    if cpr_id <= 18: return [cpr_id * 2 - 1, cpr_id * 2]
+    return [cpr_id + 18, cpr_id + 26]
+
+################################################
+# ECL NOISE DATA
+
+par_vmat = [
+  [ 3.7421890e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ 2.3000690e-01, 2.9909840e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ -1.3080280e-03, 2.9275420e-01, 2.3547880e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ -1.1187620e-01, 7.9271060e-02, 2.5876040e-01, 2.3182400e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ -8.9043590e-02, -7.3288660e-02, 7.3667100e-02, 2.6195730e-01, 2.3093170e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ -3.1746960e-02, -8.5953160e-02, -7.4380120e-02, 8.0350670e-02, 2.6405940e-01, 2.2696520e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ 2.5790630e-03, -4.2404220e-02, -9.1190030e-02, -7.3073500e-02, 8.2190800e-02, 2.5937040e-01, 2.2902850e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ 1.1706650e-02, -6.0437690e-03, -4.6543940e-02, -9.2237390e-02, -6.7980100e-02, 7.9883190e-02, 2.5576430e-01, 2.3048010e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ 5.2791750e-03, 7.3584680e-03, -9.1680320e-03, -4.0477280e-02, -8.5167550e-02, -6.8960090e-02, 7.9615790e-02, 2.6272700e-01, 2.2659670e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ -2.7234810e-03, 7.6854350e-03, 7.3870300e-03, -1.5748630e-03, -3.7431840e-02, -8.6361930e-02, -7.1186920e-02, 8.4427120e-02, 2.5761590e-01, 2.2628580e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ -4.8001330e-03, 3.7249190e-04, 5.7445500e-03, 6.2892080e-03, 1.2794980e-04, -4.4020030e-02, -9.4132710e-02, -6.5592440e-02, 7.9605540e-02, 2.5897260e-01, 2.2759290e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ -1.9747340e-04, -1.0856600e-03, -2.9537980e-03, 1.2521320e-03, 9.2468480e-03, -7.9964520e-03, -5.0048620e-02, -8.6173260e-02, -6.9401890e-02, 8.5095670e-02, 2.5553720e-01, 2.2827970e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ 2.2961840e-03, 5.1713580e-03, -9.9831220e-03, -4.8582790e-03, 5.6818920e-03, 2.5234470e-03, -1.1992620e-02, -4.3354460e-02, -8.8238830e-02, -6.3690040e-02, 7.4933660e-02, 2.6035110e-01, 2.2954150e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ 1.9911500e-03, 5.6928930e-03, -6.5999590e-03, -5.1220450e-03, 1.3726110e-03, 2.6638390e-03, 6.0810940e-03, -5.5482670e-03, -4.4492380e-02, -8.4784940e-02, -7.4847700e-02, 8.0023210e-02, 2.5971760e-01, 2.2579760e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ -2.8168460e-03, -1.5596470e-03, -3.5920740e-04, -1.5568680e-03, -3.0999980e-03, 4.0532330e-03, 5.9865620e-03, 7.5426870e-03, -5.0801370e-03, -4.4410850e-02, -8.9069310e-02, -7.1986760e-02, 8.3717220e-02, 2.5525320e-01, 2.3127400e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ -6.2721110e-03, -7.3843720e-03, 4.4293180e-03, -3.1976570e-04, -9.5977030e-03, 4.7985730e-03, 1.3091160e-03, 6.2075590e-03, 1.0678170e-02, -3.9102230e-03, -3.8850100e-02, -9.0111270e-02, -7.2134940e-02, 8.1626010e-02, 2.6625160e-01, 2.3085280e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ -8.6380870e-03, -8.7524700e-03, 2.2211860e-03, -2.0377460e-03, -1.1674680e-02, 9.5736500e-04, -4.6511550e-03, 1.1878210e-03, 8.2732240e-03, 1.1068450e-02, -2.4557110e-03, -3.9989100e-02, -9.6560530e-02, -6.7282040e-02, 8.6545660e-02, 2.6266760e-01, 2.2867910e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ -5.0006910e-03, -5.3271550e-03, 2.8122650e-03, -3.3844180e-03, -1.2066290e-02, -5.0215660e-03, -5.9443560e-03, -7.7641110e-03, 6.8881110e-04, 1.1126780e-02, 3.5682230e-03, -1.5581290e-03, -4.9215720e-02, -8.7495330e-02, -6.9457910e-02, 8.3078790e-02, 2.5626930e-01, 2.2815010e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ -2.8006430e-03, -1.8326510e-03, 4.2013250e-03, -7.3136040e-03, -7.2753960e-03, -1.2072630e-02, -4.9111860e-03, -1.2910630e-02, -7.4327140e-03, 1.7809370e-03, 3.5908200e-03, 9.9266630e-03, -6.1830250e-03, -4.3952940e-02, -9.4068760e-02, -6.9196380e-02, 7.4456340e-02, 2.6240600e-01, 2.2787320e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ -5.3262280e-03, 1.0013970e-03, 2.7988670e-03, -7.0614570e-03, -1.2011950e-03, -1.0057020e-02, -2.0390070e-03, -9.7144740e-03, -1.1931430e-02, -4.3344790e-03, -1.0781390e-04, 4.9748730e-03, 7.6804310e-03, -7.0118680e-03, -4.9857660e-02, -9.0621760e-02, -7.3404560e-02, 8.7933660e-02, 2.6087080e-01, 2.2861880e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ -8.0181630e-03, -4.9711830e-04, -4.1150970e-03, -7.1515530e-04, 3.4825090e-03, -5.7702340e-03, -2.7436930e-04, -3.0197620e-03, -7.0143680e-03, 1.9427750e-04, -4.9010800e-03, 8.0104930e-04, 5.2002340e-03, 7.9739980e-03, -5.1064490e-03, -4.4475750e-02, -8.8433030e-02, -6.6086290e-02, 7.9523210e-02, 2.6124720e-01, 2.2560000e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ -8.3994180e-03, 1.7126790e-03, -7.4873680e-03, 1.2178530e-03, 1.7478160e-03, -4.8931630e-03, -2.6458510e-03, 2.1648390e-03, -1.1115890e-03, 2.2563300e-03, -4.1913370e-03, -1.8302860e-03, 1.9013060e-03, 1.0287630e-02, 9.4747190e-03, -3.1773300e-03, -4.4333930e-02, -8.9549180e-02, -7.0587700e-02, 8.2035590e-02, 2.5992680e-01, 2.2710300e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ -5.3834890e-03, 2.2494540e-04, -6.6540030e-03, 9.9553950e-04, -3.4951750e-03, -6.3159040e-03, -2.7434850e-03, 3.1578660e-03, 1.1148350e-03, -3.6016090e-03, -3.0389420e-03, -2.4136690e-03, -4.2965950e-04, 4.0942390e-03, 9.4291110e-03, 1.3586890e-02, -6.0214740e-03, -4.9719230e-02, -9.1375190e-02, -7.3945560e-02, 8.5397150e-02, 2.6079940e-01, 2.2696250e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ 2.5065560e-03, -3.8069260e-03, -6.7662800e-04, -2.3149350e-03, -4.6083060e-03, -7.5430530e-03, 1.6668370e-04, -6.3735420e-03, -3.1789190e-03, -7.7085180e-03, -5.2746390e-03, 1.7362840e-03, -9.6647280e-04, -2.9666610e-03, 1.4076840e-03, 1.2331600e-02, 5.9475350e-03, -1.1358520e-02, -4.4444720e-02, -9.5015340e-02, -6.8087640e-02, 8.5311790e-02, 2.5924030e-01, 2.2694380e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ 3.6664960e-03, -5.9755790e-03, 1.1686970e-03, -3.2539950e-03, -5.1949060e-03, -7.4019820e-04, 2.9363740e-03, -1.0248240e-02, -2.6863790e-03, -5.4554580e-03, -6.1217710e-03, -2.0915870e-03, -4.4379890e-03, -4.6429420e-03, -6.0521850e-03, 6.9500020e-03, 2.0054410e-03, 1.0426860e-02, -3.7424950e-03, -4.6205980e-02, -9.1165860e-02, -6.6677650e-02, 8.0329110e-02, 2.5543810e-01, 2.3034990e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ 9.3078260e-05, -3.3525630e-03, 7.1849010e-04, -8.6913580e-03, -5.3926540e-03, -1.7520550e-03, 4.3132800e-03, -7.0162730e-03, -5.4201340e-03, 6.8684810e-05, -5.7997490e-03, -1.6304960e-03, -3.7536150e-03, -3.3821230e-03, -8.6243110e-03, -8.5879090e-04, -5.9199840e-03, 1.1289290e-02, 1.2017320e-02, -7.8448640e-03, -4.8806090e-02, -8.8978310e-02, -7.1498770e-02, 8.1850020e-02, 2.5965610e-01, 2.2584000e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ -3.9975890e-03, -1.9684830e-03, -2.9398390e-03, -1.0742950e-02, -5.7260550e-04, -6.4837480e-03, -4.1097970e-04, -4.0319450e-03, -8.4026530e-03, -2.5424590e-04, -3.9595570e-04, -1.2657450e-03, -2.3319600e-03, -1.7530350e-03, -5.0691880e-03, -7.0347300e-03, -6.0129350e-03, 4.8913850e-03, 5.5869180e-03, 6.8177870e-03, -5.5931780e-03, -4.4098010e-02, -8.8670600e-02, -6.4754300e-02, 7.7477840e-02, 2.5689540e-01, 2.2915040e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ -4.4068680e-03, -6.3513130e-03, -3.2901120e-03, -8.6245530e-03, 5.1832430e-04, -6.5335830e-03, -4.8460790e-03, -6.2148260e-03, -2.5604090e-03, -5.7988390e-03, 5.4880520e-04, -3.5538550e-03, -2.1809030e-03, -1.1549950e-03, -5.6306170e-03, -7.8568590e-03, -6.0848720e-04, -1.8847850e-03, -6.0237990e-03, 1.1852250e-02, 1.3302270e-02, -7.1505840e-03, -4.1669270e-02, -8.8059120e-02, -7.1328220e-02, 8.0681230e-02, 2.6154300e-01, 2.2745840e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00],
+  [ -1.5461320e-04, -1.1682510e-02, -7.9529830e-03, -1.3080170e-05, -1.2187170e-03, -7.0621350e-03, -6.8091830e-03, -3.7288430e-03, 4.7856920e-03, -8.9847700e-03, -4.5388100e-03, -4.1014860e-03, -3.6393970e-03, -5.8545800e-03, -5.6582780e-03, -5.2623870e-03, 5.0993990e-03, -6.7282240e-03, -1.0117930e-02, 6.4603410e-03, 3.5110150e-03, 3.1667650e-03, -5.7096600e-03, -4.7129750e-02, -9.0150530e-02, -6.9686500e-02, 8.3052490e-02, 2.5950580e-01, 2.2833470e-01, 0.0000000e+00, 0.0000000e+00],
+  [ 1.0202740e-03, -9.5381150e-03, -8.9831140e-03, 1.3487770e-03, -7.1046240e-03, -1.1002140e-02, 3.8150150e-04, -4.7184470e-03, 4.4583300e-03, -7.8033130e-03, -8.4168570e-03, -3.4055110e-03, -3.3224790e-03, -7.6967760e-03, -8.7475620e-03, -1.2469270e-03, 1.8047480e-03, -7.2658010e-03, -8.3518510e-03, 3.5113370e-04, -1.0644220e-02, 2.0328100e-03, 3.6619910e-03, -9.2137200e-03, -4.5310810e-02, -8.9684530e-02, -7.0173430e-02, 8.2865370e-02, 2.6143560e-01, 2.2800430e-01, 0.0000000e+00],
+  [ 5.3032550e-04, -3.7301180e-03, -1.1787730e-02, -1.3807920e-03, -5.6132690e-03, -1.1913140e-02, 9.5198650e-04, -1.1367470e-02, 2.2965180e-03, -5.7564360e-03, -9.0643900e-03, -5.9737380e-03, -3.9860480e-03, -5.9836610e-03, -1.1576390e-02, -2.3590400e-03, -4.7896110e-03, -1.5279510e-03, -7.4392120e-03, -1.8085080e-03, -1.3247650e-02, -5.4693190e-04, 5.4005680e-04, 4.9617630e-03, -7.2788800e-03, -4.5880410e-02, -9.1447090e-02, -6.8188230e-02, 8.2035530e-02, 2.5516690e-01, 2.2805310e-01]
+]
+
+################################################
+
+if __name__ == '__main__':
+    main()
+

@@ -1,0 +1,175 @@
+[INFO] Steering file: framework/tests/local_database_file.py
+testing '\n'
+testing 'dbstore/empty 1 -1,-1,-1,-1\n'
+[('empty', -1, -1, -1, -1, 'dbstore_empty_rev_1.root')]
+[DEBUG:39] Found testing payload
+	storage file = database-01.txt
+	name = empty
+	revision/md5 = 1
+	iov = -1,-1,-1,-1
+testing 'dbstore/good 1 0,0,-1,-1\n'
+[('good', 0, 0, -1, -1, 'dbstore_good_rev_1.root')]
+[DEBUG:39] Found testing payload
+	storage file = database-02.txt
+	name = good
+	revision/md5 = 1
+	iov = 0,0,-1,-1
+testing 'dbstore/good_tabs\t1\t0,0,-1,-1\n'
+[('good_tabs', 0, 0, -1, -1, 'dbstore_good_tabs_rev_1.root')]
+[DEBUG:39] Found testing payload
+	storage file = database-03.txt
+	name = good_tabs
+	revision/md5 = 1
+	iov = 0,0,-1,-1
+testing 'dbstore/good_many_spaces              1\t\t\t\t\t\t\t0,1,2,3\n'
+[('good_many_spaces', 0, 1, 2, 3, 'dbstore_good_many_spaces_rev_1.root')]
+[DEBUG:39] Found testing payload
+	storage file = database-04.txt
+	name = good_many_spaces
+	revision/md5 = 1
+	iov = 0,1,2,3
+testing 'dbstore/good_with_comment 1 0,1,2,3 # comment\n'
+[('good_with_comment', 0, 1, 2, 3, 'dbstore_good_with_comment_rev_1.root')]
+[DEBUG:39] Found testing payload
+	storage file = database-05.txt
+	name = good_with_comment
+	revision/md5 = 1
+	iov = 0,1,2,3
+testing 'dbstory/good_with_md5 0123456789ABCDEF 0,1,2,3\n'
+[('good_with_md5', 0, 1, 2, 3, 'dbstore_good_with_md5_rev_0123456789ABCDEF.root')]
+[DEBUG:39] Found testing payload
+	storage file = database-06.txt
+	name = good_with_md5
+	revision/md5 = 0123456789ABCDEF
+	iov = 0,1,2,3
+testing 'dbstore/no_revision 0,1,2,3\n'
+[ERROR] database-07.txt:1 error: line must be of the form 'dbstore/<payloadname> <revision> <firstExp>,<firstRun>,<finalExp>,<finalRun>'
+[FATAL] Problem reading testing payloads storage
+	storage file = database-07.txt
+	line = 1
+	error = line must be of the form 'dbstore/<payloadname> <revision> <firstExp>,<firstRun>,<finalExp>,<finalRun>'
+[DEBUG:31] DataStore::reset(): Removing all elements from DataStore
+ ... message repeated 1 times
+testing 'no_package 1 0,0,-1,-1\n'
+[ERROR] database-08.txt:1 error: payload name must be of the form dbstore/<payloadname>
+[FATAL] Problem reading testing payloads storage
+	storage file = database-08.txt
+	line = 1
+	error = payload name must be of the form dbstore/<payloadname>
+[DEBUG:31] DataStore::reset(): Removing all elements from DataStore
+ ... message repeated 1 times
+testing 'dbstore/no_iov 1\n'
+[ERROR] database-09.txt:1 error: line must be of the form 'dbstore/<payloadname> <revision> <firstExp>,<firstRun>,<finalExp>,<finalRun>'
+[FATAL] Problem reading testing payloads storage
+	storage file = database-09.txt
+	line = 1
+	error = line must be of the form 'dbstore/<payloadname> <revision> <firstExp>,<firstRun>,<finalExp>,<finalRun>'
+[DEBUG:31] DataStore::reset(): Removing all elements from DataStore
+ ... message repeated 1 times
+testing 'dbstore/iov_only_1 1 0\n'
+[ERROR] database-10.txt:1 error: IoV needs to be four values (firstExp,firstRun,finalExp,finalRun)
+[FATAL] Problem reading testing payloads storage
+	storage file = database-10.txt
+	line = 1
+	error = IoV needs to be four values (firstExp,firstRun,finalExp,finalRun)
+[DEBUG:31] DataStore::reset(): Removing all elements from DataStore
+ ... message repeated 1 times
+testing 'dbstore/iov_only_2 1 0,0\n'
+[ERROR] database-11.txt:1 error: IoV needs to be four values (firstExp,firstRun,finalExp,finalRun)
+[FATAL] Problem reading testing payloads storage
+	storage file = database-11.txt
+	line = 1
+	error = IoV needs to be four values (firstExp,firstRun,finalExp,finalRun)
+[DEBUG:31] DataStore::reset(): Removing all elements from DataStore
+ ... message repeated 1 times
+testing 'dbstore/iov_only_3 1 0,0,0\n'
+[ERROR] database-12.txt:1 error: IoV needs to be four values (firstExp,firstRun,finalExp,finalRun)
+[FATAL] Problem reading testing payloads storage
+	storage file = database-12.txt
+	line = 1
+	error = IoV needs to be four values (firstExp,firstRun,finalExp,finalRun)
+[DEBUG:31] DataStore::reset(): Removing all elements from DataStore
+ ... message repeated 1 times
+testing 'dbstore/bad_with_spaces_02 1    0 ,1,2,3\n'
+[ERROR] database-13.txt:1 error: line must be of the form 'dbstore/<payloadname> <revision> <firstExp>,<firstRun>,<finalExp>,<finalRun>'
+[FATAL] Problem reading testing payloads storage
+	storage file = database-13.txt
+	line = 1
+	error = IoV needs to be four values (firstExp,firstRun,finalExp,finalRun)
+[DEBUG:31] DataStore::reset(): Removing all elements from DataStore
+ ... message repeated 1 times
+testing 'dbstore/bad_with_spaces_11 1    0, 1,2,3\n'
+[ERROR] database-14.txt:1 error: line must be of the form 'dbstore/<payloadname> <revision> <firstExp>,<firstRun>,<finalExp>,<finalRun>'
+[FATAL] Problem reading testing payloads storage
+	storage file = database-14.txt
+	line = 1
+	error = IoV needs to be four values (firstExp,firstRun,finalExp,finalRun)
+[DEBUG:31] DataStore::reset(): Removing all elements from DataStore
+ ... message repeated 1 times
+testing 'dbstore/bad_with_spaces_12 1    0,1 ,2,3\n'
+[ERROR] database-15.txt:1 error: line must be of the form 'dbstore/<payloadname> <revision> <firstExp>,<firstRun>,<finalExp>,<finalRun>'
+[FATAL] Problem reading testing payloads storage
+	storage file = database-15.txt
+	line = 1
+	error = IoV needs to be four values (firstExp,firstRun,finalExp,finalRun)
+[DEBUG:31] DataStore::reset(): Removing all elements from DataStore
+ ... message repeated 1 times
+testing 'dbstore/bad_with_spaces_21 1    0,1, 2,3\n'
+[ERROR] database-16.txt:1 error: line must be of the form 'dbstore/<payloadname> <revision> <firstExp>,<firstRun>,<finalExp>,<finalRun>'
+[FATAL] Problem reading testing payloads storage
+	storage file = database-16.txt
+	line = 1
+	error = IoV needs to be four values (firstExp,firstRun,finalExp,finalRun)
+[DEBUG:31] DataStore::reset(): Removing all elements from DataStore
+ ... message repeated 1 times
+testing 'dbstore/bad_with_spaces_22 1    0,1,2 ,3\n'
+[ERROR] database-17.txt:1 error: line must be of the form 'dbstore/<payloadname> <revision> <firstExp>,<firstRun>,<finalExp>,<finalRun>'
+[FATAL] Problem reading testing payloads storage
+	storage file = database-17.txt
+	line = 1
+	error = IoV needs to be four values (firstExp,firstRun,finalExp,finalRun)
+[DEBUG:31] DataStore::reset(): Removing all elements from DataStore
+ ... message repeated 1 times
+testing 'dbstore/bad_with_spaces_31 1    0,1,2, 3\n'
+[ERROR] database-18.txt:1 error: line must be of the form 'dbstore/<payloadname> <revision> <firstExp>,<firstRun>,<finalExp>,<finalRun>'
+[FATAL] Problem reading testing payloads storage
+	storage file = database-18.txt
+	line = 1
+	error = experiment and run numbers must be integers
+[DEBUG:31] DataStore::reset(): Removing all elements from DataStore
+ ... message repeated 1 times
+testing 'dbstore/bad_text_exp1 1 exp1,0,0,0\n'
+[ERROR] database-19.txt:1 error: experiment and run numbers must be integers
+[FATAL] Problem reading testing payloads storage
+	storage file = database-19.txt
+	line = 1
+	error = experiment and run numbers must be integers
+[DEBUG:31] DataStore::reset(): Removing all elements from DataStore
+ ... message repeated 1 times
+testing 'dbstore/bad_text_run1 1 0,run1,0,0\n'
+[ERROR] database-20.txt:1 error: experiment and run numbers must be integers
+[FATAL] Problem reading testing payloads storage
+	storage file = database-20.txt
+	line = 1
+	error = experiment and run numbers must be integers
+[DEBUG:31] DataStore::reset(): Removing all elements from DataStore
+ ... message repeated 1 times
+testing 'dbstore/bad_text_exp2 1 0,0,exp2,0\n'
+[ERROR] database-21.txt:1 error: experiment and run numbers must be integers
+[FATAL] Problem reading testing payloads storage
+	storage file = database-21.txt
+	line = 1
+	error = experiment and run numbers must be integers
+[DEBUG:31] DataStore::reset(): Removing all elements from DataStore
+ ... message repeated 1 times
+testing 'dbstore/bad_text_run2 1 0,0,0,run2\n'
+[ERROR] database-22.txt:1 error: experiment and run numbers must be integers
+[FATAL] Problem reading testing payloads storage
+	storage file = database-22.txt
+	line = 1
+	error = experiment and run numbers must be integers
+[DEBUG:31] DataStore::reset(): Removing all elements from DataStore
+ ... message repeated 1 times
+testing '#only comment\n'
+testing '    # and with whitespace\n'
+testing '\t#including tabs\n'

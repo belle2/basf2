@@ -1,0 +1,397 @@
+#! /usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+'''
+Tool to generate a ROOT file with ECL DQM reference histograms and save information about references in the database.
+
+Brief instruction how to use this script:
+
+1. Create a dqm analysis file from a raw dqm file.
+basf2 dqm/analysis/examples/eclDQManalysis.py raw_filename DQM_Path/analysis_filename
+where default 'DQM_Path' name should be '/group/belle2/group/detector/ECL/tmp/DQManalysis'
+
+2. Run this script
+b2ecl-dqm-ref [-h] [--file FILE] exp run.
+
+3. Move output file to 'daq_dqm_gui' repository.
+
+'''
+
+import argparse
+import ROOT
+import sqlite3
+import os
+import re
+import sys
+import shutil
+from datetime import datetime
+
+#---------------- DEFINE PATHS -----------------------
+
+#default_input_path = "/group/belle2/phase3/dqm/dqmsrv1/e{exp:04}/dqmhisto/hltdqm_e{exp:04}r{run:06}.root"
+default_input_path = "/group/belle2/group/detector/ECL/tmp/DQManalysis/hltdqm_e{exp:04}r{run:06}.root"
+default_output_file_cosmic = "ECL_DQM_REF_COSMIC.root"
+default_output_file_beam = "ECL_DQM_REF_BEAM.root"
+
+previous_ref_set = "/group/belle2/group/detector/ECL/tmp/DQManalysis/past_{r_type}.root"
+
+path_to_database = "/group/belle2/group/detector/ECL/ecl_references.db"
+
+#-----------------------------------------------------
+
+#---------------- DEFINE FUNCTIONS ----------------
+
+# returns list of default reference histograms
+def get_histograms(exp):
+      if exp == 10:
+            return ['ECL/cid', 'ECL/cid_Thr5MeV', 'ECL/cid_Thr10MeV', 'ECL/cid_Thr50MeV',
+                  'ECL/quality', 'ECL/trigtag1', 'ECL/adc_hits',
+                  'ECL/edep',
+                  'ECL/time_barrel_Thr50MeV', 'ECL/time_endcaps_Thr50MeV',
+                  'ECL/ncev', 'ECL/ncev_Thr10MeV']
+
+      elif exp > 10:
+            return ['ECL/cid_Thr0MeV','ECL/cid_Thr5MeV','ECL/cid_Thr10MeV',
+                  'ECL/cid_Thr50MeV',
+                  'ECL/quality', 'ECL/quality_other', 'ECL/trigtag1', 'ECL/adc_hits',
+                  'ECL/edep_Thr0MeV', 'ECL/edep_Thr5MeV', 'ECL/edep_Thr7MeV',
+                  'ECL/time_barrel_Thr5MeV', 'ECL/time_endcaps_Thr5MeV',
+                  'ECL/time_barrel_Thr10MeV', 'ECL/time_endcaps_Thr10MeV',
+                  'ECL/time_barrel_Thr50MeV', 'ECL/time_endcaps_Thr50MeV',
+                  'ECL/ncev_Thr0MeV', 'ECL/ncev_Thr5MeV', 'ECL/ncev_Thr10MeV', 'ECL/ncev_Thr50MeV',
+                  'ECL/wf_cid_psd', 'ECL/wf_cid_logic', 'ECL/wf_cid_rand', 'ECL/wf_cid_dphy','ECL/wf_cid_other']
+
+
+# select histograms names according to the given numbers and ranges
+def select_hists(istr, default_hists):
+    
+    selected = []
+    
+    max_n = len(default_hists)
+    if str(istr).split(',')[0].strip() == 'all':
+        selected += default_hists
+        return selected
+
+    if istr.split(',')[0].strip() == 'none':
+        selected = []
+        return selected
+    
+    for part in istr.split(','):
+    
+        if part.strip() == '':
+            continue
+    
+        if re.fullmatch(r'\d+\s*-\s*\d+', part.strip()):
+            start = int(part.split('-')[0].strip())
+            end = int(part.split('-')[1].strip())
+            if start == 0 or end > max_n or start >= end:
+                print('Incorrect interval:', part.strip())
+                sys.exit(1)
+            
+            for i in range(start - 1, end):
+                if default_hists[i] not in selected:
+                    selected.append(default_hists[i])
+        
+            continue
+    
+        if re.fullmatch(r'\d+', part.strip()):
+        
+            n = int(part.strip())
+            if n > max_n or n == 0:
+                print('Incorrect number:', n)
+                sys.exit(1)
+            
+            if default_hists[n-1] not in selected:
+                selected.append(default_hists[n-1])
+        
+            continue
+                
+        print('Incorrect: ', part)
+        sys.exit(1)
+            
+    return selected
+
+#add histograms names not from the default list
+def add_other_hists(istr, selected):
+    
+    new_selected = []
+    new_selected += selected
+    
+    if istr.split(',')[0].strip() == 'n':
+        return new_selected
+    
+    for part in istr.split(','):
+    
+        if part.strip() == '':
+            continue
+            
+        if re.fullmatch(r'.+/.+', part.strip()):
+
+        	if part.strip() not in new_selected:
+        		new_selected.append(part.strip())
+        else:
+        	print("Incorrect:", part.strip())
+        	new_selected = []
+        	new_selected += selected
+        	return new_selected
+
+    return new_selected
+
+#delete new data from DB if error
+def delete_data(new_set_id):
+	conn = sqlite3.connect(path_to_database)
+	curs = conn.cursor()
+	curs.execute("pragma foreign_keys = ON") #enable foreign key constraint
+
+	curs.execute("delete from reference_sets where id=?", (new_set_id,))
+
+	conn.commit()
+	conn.close()
+
+
+#print list with default histograms
+def print_3_columns(mylist):
+    
+    enumerated = []
+    for i, item in enumerate(mylist):
+        enumerated.append(str(i+1)+'.'+item)
+    
+    l = len(mylist)
+    one_col = l//3
+    first = []
+    second = []
+    third = []
+    
+    if l%3 == 0:
+        first += enumerated[:one_col]
+        second += enumerated[one_col:one_col*2]
+        third += enumerated[one_col*2:]
+        
+    if l%3 == 1:
+        first += enumerated[:one_col+1]
+        second += enumerated[one_col+1:one_col*2+1]
+        second.append("")
+        third += enumerated[one_col*2+1:]
+        third.append("")
+        
+    if l%3 == 2:
+        first += enumerated[:one_col+1]
+        second += enumerated[one_col+1:one_col*2+2]
+        third += enumerated[one_col*2+2:]
+        third.append("")
+        
+    for f,s,t in zip(first, second, third):
+        print('{:<29}{:<29}{:<}'.format(f,s,t))
+
+#-----------------------------------------------------
+
+#---------------- PARSE PARAMETERS -------------------
+
+if not os.path.isfile(path_to_database):
+    print("Incorrect path to database file")
+    sys.exit(1)
+
+parser = argparse.ArgumentParser()
+parser.add_argument('exp', type=str, help='Experiment number')
+parser.add_argument('run', type=str, help='Run number')
+parser.add_argument('--file', default="", type=str, help='DQM file w/ input histograms')
+args = parser.parse_args()
+
+#experiment and run
+exp = int(args.exp, 0)
+run = int(args.run, 0)
+
+if args.file == "":
+    args.file = default_input_path.format(exp=exp, run=run) 
+print("FILE:", args.file)
+
+#get list of all reference histohrams names for selected exp
+default_ref_hists = get_histograms(exp)
+
+#-----------------------------------------------------
+
+#---------------- SELECT NEW HISTOGRAMS --------------
+
+print('Default reference histograms for '+str(exp)+' experiment:\n')
+print_3_columns(default_ref_hists)
+
+print('''Please enter histograms numbers or ranges (example: 1, 2, 5 - 10) 
+	or "all" for all default histograms / "none" to leave previous version:''')
+input_str = input()
+
+selected_hists = select_hists(input_str, default_ref_hists)
+
+print('Add other histograms? (Enter "n" if not or names in format <folder>/<name>): ')
+other_hists = input()
+selected_hists = add_other_hists(other_hists, selected_hists)
+
+print("Save following histograms? (y/n) : ")
+print(selected_hists)
+answ = input()
+if answ != 'y':
+	print("Reference histograms were not updated")
+	sys.exit(0)
+
+print('Please enter a run type (cosmic / beam / beam_off_resonance):')
+given_type = input()
+
+if given_type.strip() in ['cosmic', 'beam', 'beam_off_resonance']:
+	run_type = given_type.strip()
+else:
+	print('Incorrect type:', given_type)
+	print("Reference histograms were not updated")
+	sys.exit(1)
+#-----------------------------------------------------
+
+#-------- COMPARE SELECTED WITH PREVIOUS SET (DB)-----
+
+#go to the database and select all histogram names from the previous version
+conn = sqlite3.connect('file:'+path_to_database+'?mode=ro', uri=True) #uri style for read-only connection
+curs = conn.cursor()
+
+#get last set id for the current run_type 
+curs.execute('''select id from reference_sets 
+where type like ?
+order by creation_date desc limit 1''', 
+(run_type.split('_')[0]+'%',))
+res = curs.fetchone()
+
+if res is not None:
+    last_set_id = int(res[0])
+
+    #get histograms from the last set
+    curs.execute("select exp, run, name from ref_histograms where set_id=?", (last_set_id, ))
+    old_hists = curs.fetchall()
+
+    conn.close()
+
+else: #no entries in DB
+    conn.close()
+    old_hists = []
+    print("First entry with given run type, no previous sets")
+
+#compare selected histograms with previous reference set version
+missing_hists = [] #"missing_hists" contains exp, run, name for each histogram
+for hist in old_hists: 
+    if hist[2] not in selected_hists:
+        missing_hists.append(hist)
+print("Missing histograms will be taken from the previous set (exp, run, name):")
+print(missing_hists)
+
+#-----------------------------------------------------
+
+#------------------- SAVE NEW SET IN THE DB ----------
+
+conn = sqlite3.connect(path_to_database)
+curs = conn.cursor()
+
+curs.execute("pragma foreign_keys = ON") #enable foreign key constraint
+conn.isolation_level = None #disable autocommit mode
+
+curs.execute("begin") #begin transaction
+try:
+	curs.execute("insert into reference_sets(creation_date, type) values (?,  ?)", 
+	(str(datetime.utcnow()).split('.')[0], run_type))
+
+	curs.execute('''select id from reference_sets 
+	where type=?
+	order by creation_date desc limit 1''', 
+	(run_type,))
+	new_set_id = int(curs.fetchone()[0])
+
+	for hist in selected_hists:
+		curs.execute("insert into ref_histograms(set_id, exp, run, name) values (?,?,?,?)",
+		(new_set_id, exp, run, hist))
+	#print("selected added to db")
+
+	for hist in missing_hists:
+		curs.execute("insert into ref_histograms(set_id, exp, run, name) values (?,?,?,?)",
+		(new_set_id, hist[0], hist[1], hist[2]))
+	#print("missing added to db")
+
+	curs.execute("commit")
+
+except sqlite3.Error as err:
+	print('Work with database failed')
+	print("Error:", err)
+	curs.execute("rollback")
+	conn.close()
+
+	print("Reference histograms were not updated")
+	sys.exit(1)
+
+conn.close()
+
+#-----------------------------------------------------
+
+#----------- GET AND SAVE HISTOGRAMS (ROOT) ----------
+
+if run_type == 'cosmic':
+	output_file_path = default_output_file_cosmic
+elif run_type == 'beam' or run_type == 'beam_off_resonance':
+	output_file_path = default_output_file_beam
+
+#dict "name":TH1
+hist_objects = {}
+
+try:
+	#get ROOT hist objects for selected histograms
+	input_file = ROOT.TFile.Open(args.file,"READ")
+	#input_file.cd("ref/ECL/")
+	for name in selected_hists:
+                canvas = input_file.FindObjectAny('ECL/'+'c_'+name.split('/')[1])
+                hist_objects[name.split('/')[1]] = canvas.GetPrimitive(name)
+		#hist_objects[name.split('/')[1]] = input_file.FindObjectAny(name.split('/')[1])		
+
+	#do not attach histograms to the input .root file
+	for name in hist_objects:
+		#print(name) 
+		hist_objects[name].SetDirectory(0)
+
+	input_file.Close()
+
+	#add missing histograms objects
+	input_file = ROOT.TFile.Open(previous_ref_set.format(r_type = run_type))
+	#input_file = ROOT.TFile.Open('./past_'+run_type+'.root')
+	input_file.cd("ECL")
+	for hist in missing_hists:
+		hist_objects[hist[2].split('/')[1]] = input_file.FindObjectAny(hist[2].split('/')[1])
+		#print(hist[2].split('/')[1])
+		hist_objects[hist[2].split('/')[1]].SetDirectory(0)
+	input_file.Close()
+
+	#add all histograms to output file
+	output_file = ROOT.TFile.Open(output_file_path,"RECREATE")
+	dir = output_file.mkdir("ECL");
+	dir.cd()
+
+	for name in hist_objects:
+    	    hist_objects[name].SetName(name)
+    	    hist_objects[name].Write()
+
+	output_file.Close()
+
+	shutil.copyfile('./'+output_file_path, previous_ref_set.format(r_type = run_type))
+
+except Exception as err:
+	print("Error:", err)
+	delete_data(new_set_id)
+	print("Reference histograms were not updated")
+	sys.exit(1)
+
+print(output_file_path, "file was created successfully.")
+
+#-----------------------------------------------------
+
+print('''Please move the output file to your local "daq_dqm_gui" repository and push changes to the remote origin repository.
+
+Please remove the analysis file used as input if you do not need it anymore.''')
+
+#-----------------------------------------------------

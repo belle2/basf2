@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Detector desc="Parameters of detector plane and detector module" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="ARICH-Hapd.xml"/>
+  <Plane> 
+    <zPosition desc="Z position of detector plane (HAPD window z position)" unit="mm">201.5</zPosition>
+    <nSegments desc="number of detector segments">6</nSegments>
+    <Rings>
+      <Ring id="1">
+	<r desc="radius of ring (center of HAPD)" unit="mm">573.5</r>
+	<nModules desc="number of module in ring" unit="mm">42</nModules>
+      </Ring>
+       <Ring id="2">
+	 <r desc="radius of ring (center of HAPD)" unit="mm">658.1</r>
+         <nModules desc="number of module in ring" unit="mm">48</nModules>
+       </Ring>       
+       <Ring id="3">
+         <r desc="radius of ring (center of HAPD)" unit="mm">743.7</r>
+         <nModules desc="number of module in ring" unit="mm">54</nModules>
+       </Ring>
+       <Ring id="4">
+         <r desc="radius of ring (center of HAPD)" unit="mm">828.68</r>
+        <nModules desc="number of module in ring" unit="mm">60</nModules>
+      </Ring>
+       <Ring id="5">
+         <r desc="radius of ring (center of HAPD)" unit="mm">913.05</r>
+         <nModules desc="number of module in ring" unit="mm">66</nModules>
+       </Ring>
+       <Ring id="6">
+         <r desc="radius of ring (center of HAPD)" unit="mm">997.94</r>
+         <nModules desc="number of module in ring" unit="mm">72</nModules>
+       </Ring>
+       <Ring id="7">
+         <r desc="radius of ring (center of HAPD)" unit="mm">1081.85</r>
+         <nModules desc="number of module in ring" unit="mm">78</nModules>
+       </Ring>
+    </Rings>
+  </Plane>
+  
+  <supportPlate>
+    <outerRadius desc="Outer radius of support plate" unit="mm">1132</outerRadius>
+    <innerRadius desc="Inner radius of support plate" unit="mm">435</innerRadius>    
+    <thickness desc="thickness of support plate" unit="mm">2</thickness>    
+    <zPosition desc="zPosition of support plate (start in Z)" unit="mm">236.0</zPosition>    
+    <moduleHoleSize desc="module hole size in aluminum plate" unit="mm">69.0</moduleHoleSize>    
+    <material desc="material of support plate">Al</material>
+    <backWallHeight desc="height of the back (electronics side) walls between slots" unit="mm">20</backWallHeight>    
+    <backWallThickness desc="thickness of the back (electronics side) walls between slots" unit="mm">2</backWallThickness>    
+  </supportPlate>
+
+
+</Detector>

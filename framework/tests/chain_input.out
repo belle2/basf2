@@ -1,0 +1,1709 @@
+[INFO] Steering file: framework/tests/chain_input.py
+[INFO] The random number seed is set to "something important"
+[INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] Input files metadata all have empty globaltag setting, globaltag replay not possible
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+[INFO] ========================================================================
+[INFO] >>> Start new run: 1
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        0        RUN:        1        EVT:        2
+[INFO] ============================================================================
+[INFO] DataStore collections in event 2
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 1 => hit 17
+truehit 1 => hit 18
+truehit 1 => hit 19
+truehit 1 => hit 20
+truehit 1 => hit 21
+truehit 1 => hit 22
+truehit 1 => hit 23
+truehit 1 => hit 24
+truehit 1 => hit 25
+truehit 1 => hit 26
+truehit 1 => hit 27
+truehit 1 => hit 28
+truehit 1 => hit 29
+truehit 1 => hit 30
+truehit 1 => hit 31
+truehit 1 => hit 32
+truehit 1 => hit 33
+[INFO] EXP:        0        RUN:        1        EVT:        6
+[INFO] ============================================================================
+[INFO] DataStore collections in event 6
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 33
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 1 => hit 16
+truehit 1 => hit 17
+truehit 1 => hit 18
+truehit 1 => hit 19
+truehit 1 => hit 20
+truehit 1 => hit 21
+truehit 1 => hit 22
+truehit 1 => hit 23
+truehit 1 => hit 24
+truehit 1 => hit 25
+truehit 1 => hit 26
+truehit 1 => hit 27
+truehit 1 => hit 28
+truehit 1 => hit 29
+truehit 1 => hit 30
+truehit 1 => hit 31
+truehit 1 => hit 32
+[INFO] EXP:        0        RUN:        1        EVT:        5
+[INFO] ============================================================================
+[INFO] DataStore collections in event 5
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 37
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 0 => hit 17
+truehit 0 => hit 18
+truehit 1 => hit 19
+truehit 1 => hit 20
+truehit 1 => hit 21
+truehit 1 => hit 22
+truehit 1 => hit 23
+truehit 1 => hit 24
+truehit 1 => hit 25
+truehit 1 => hit 26
+truehit 1 => hit 27
+truehit 1 => hit 28
+truehit 1 => hit 29
+truehit 1 => hit 30
+truehit 1 => hit 31
+truehit 1 => hit 32
+truehit 1 => hit 33
+truehit 1 => hit 34
+truehit 1 => hit 35
+truehit 1 => hit 36
+[INFO] EXP:        0        RUN:        1        EVT:        9
+[INFO] ============================================================================
+[INFO] DataStore collections in event 9
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 31
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 1 => hit 16
+truehit 1 => hit 17
+truehit 1 => hit 18
+truehit 1 => hit 19
+truehit 1 => hit 20
+truehit 1 => hit 21
+truehit 1 => hit 22
+truehit 1 => hit 23
+truehit 1 => hit 24
+truehit 1 => hit 25
+truehit 1 => hit 26
+truehit 1 => hit 27
+truehit 1 => hit 28
+truehit 1 => hit 29
+truehit 1 => hit 30
+[INFO] EXP:        0        RUN:        1        EVT:       10
+[INFO] ============================================================================
+[INFO] DataStore collections in event 10
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 56
+[INFO] PXDTrueHit[]         PXDTrueHits                3
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 0 => hit 17
+truehit 0 => hit 18
+truehit 1 => hit 19
+truehit 1 => hit 20
+truehit 1 => hit 21
+truehit 1 => hit 22
+truehit 1 => hit 23
+truehit 1 => hit 24
+truehit 1 => hit 25
+truehit 1 => hit 26
+truehit 1 => hit 27
+truehit 1 => hit 28
+truehit 1 => hit 29
+truehit 1 => hit 30
+truehit 1 => hit 31
+truehit 1 => hit 32
+truehit 1 => hit 33
+truehit 1 => hit 34
+truehit 1 => hit 35
+truehit 1 => hit 36
+truehit 2 => hit 37
+truehit 2 => hit 38
+truehit 2 => hit 39
+truehit 2 => hit 40
+truehit 2 => hit 41
+truehit 2 => hit 42
+truehit 2 => hit 43
+truehit 2 => hit 44
+truehit 2 => hit 45
+truehit 2 => hit 46
+truehit 2 => hit 47
+truehit 2 => hit 48
+truehit 2 => hit 49
+truehit 2 => hit 50
+truehit 2 => hit 51
+truehit 2 => hit 52
+truehit 2 => hit 53
+truehit 2 => hit 54
+truehit 2 => hit 55
+[INFO] EXP:        0        RUN:        1        EVT:       11
+[INFO] ============================================================================
+[INFO] DataStore collections in event 11
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 71
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 0 => hit 17
+truehit 0 => hit 18
+truehit 0 => hit 19
+truehit 0 => hit 20
+truehit 0 => hit 21
+truehit 0 => hit 22
+truehit 0 => hit 23
+truehit 0 => hit 24
+truehit 0 => hit 25
+truehit 0 => hit 26
+truehit 0 => hit 27
+truehit 0 => hit 28
+truehit 0 => hit 29
+truehit 0 => hit 30
+truehit 0 => hit 31
+truehit 0 => hit 32
+truehit 0 => hit 33
+truehit 0 => hit 34
+truehit 0 => hit 35
+truehit 1 => hit 36
+truehit 1 => hit 37
+truehit 1 => hit 38
+truehit 1 => hit 39
+truehit 1 => hit 40
+truehit 1 => hit 41
+truehit 1 => hit 42
+truehit 1 => hit 43
+truehit 1 => hit 44
+truehit 1 => hit 45
+truehit 1 => hit 46
+truehit 1 => hit 47
+truehit 1 => hit 48
+truehit 1 => hit 49
+truehit 1 => hit 50
+truehit 1 => hit 51
+truehit 1 => hit 52
+truehit 1 => hit 53
+truehit 1 => hit 54
+truehit 1 => hit 55
+truehit 1 => hit 56
+truehit 1 => hit 57
+truehit 1 => hit 58
+truehit 1 => hit 59
+truehit 1 => hit 60
+truehit 1 => hit 61
+truehit 1 => hit 62
+truehit 1 => hit 63
+truehit 1 => hit 64
+truehit 1 => hit 65
+truehit 1 => hit 66
+truehit 1 => hit 67
+truehit 1 => hit 68
+truehit 1 => hit 69
+truehit 1 => hit 70
+[INFO] EXP:        0        RUN:        1        EVT:        8
+[INFO] ============================================================================
+[INFO] DataStore collections in event 8
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 1 => hit 17
+truehit 1 => hit 18
+truehit 1 => hit 19
+truehit 1 => hit 20
+truehit 1 => hit 21
+truehit 1 => hit 22
+truehit 1 => hit 23
+truehit 1 => hit 24
+truehit 1 => hit 25
+truehit 1 => hit 26
+truehit 1 => hit 27
+truehit 1 => hit 28
+truehit 1 => hit 29
+truehit 1 => hit 30
+truehit 1 => hit 31
+truehit 1 => hit 32
+truehit 1 => hit 33
+[INFO] EXP:        0        RUN:        1        EVT:       12
+[INFO] ============================================================================
+[INFO] DataStore collections in event 12
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 76
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 0 => hit 17
+truehit 0 => hit 18
+truehit 0 => hit 19
+truehit 0 => hit 20
+truehit 0 => hit 21
+truehit 0 => hit 22
+truehit 0 => hit 23
+truehit 0 => hit 24
+truehit 0 => hit 25
+truehit 0 => hit 26
+truehit 0 => hit 27
+truehit 0 => hit 28
+truehit 0 => hit 29
+truehit 0 => hit 30
+truehit 0 => hit 31
+truehit 0 => hit 32
+truehit 0 => hit 33
+truehit 0 => hit 34
+truehit 0 => hit 35
+truehit 0 => hit 36
+truehit 0 => hit 37
+truehit 0 => hit 38
+truehit 0 => hit 39
+truehit 1 => hit 40
+truehit 1 => hit 41
+truehit 1 => hit 42
+truehit 1 => hit 43
+truehit 1 => hit 44
+truehit 1 => hit 45
+truehit 1 => hit 46
+truehit 1 => hit 47
+truehit 1 => hit 48
+truehit 1 => hit 49
+truehit 1 => hit 50
+truehit 1 => hit 51
+truehit 1 => hit 52
+truehit 1 => hit 53
+truehit 1 => hit 54
+truehit 1 => hit 55
+truehit 1 => hit 56
+truehit 1 => hit 57
+truehit 1 => hit 58
+truehit 1 => hit 59
+truehit 1 => hit 60
+truehit 1 => hit 61
+truehit 1 => hit 62
+truehit 1 => hit 63
+truehit 1 => hit 64
+truehit 1 => hit 65
+truehit 1 => hit 66
+truehit 1 => hit 67
+truehit 1 => hit 68
+truehit 1 => hit 69
+truehit 1 => hit 70
+truehit 1 => hit 71
+truehit 1 => hit 72
+truehit 1 => hit 73
+truehit 1 => hit 74
+truehit 1 => hit 75
+[INFO] EXP:        0        RUN:        1        EVT:        0
+[INFO] ============================================================================
+[INFO] DataStore collections in event 0
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 31
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 1 => hit 15
+truehit 1 => hit 16
+truehit 1 => hit 17
+truehit 1 => hit 18
+truehit 1 => hit 19
+truehit 1 => hit 20
+truehit 1 => hit 21
+truehit 1 => hit 22
+truehit 1 => hit 23
+truehit 1 => hit 24
+truehit 1 => hit 25
+truehit 1 => hit 26
+truehit 1 => hit 27
+truehit 1 => hit 28
+truehit 1 => hit 29
+truehit 1 => hit 30
+[INFO] EXP:        0        RUN:        1        EVT:       13
+[INFO] ============================================================================
+[INFO] DataStore collections in event 13
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 70
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 0 => hit 17
+truehit 0 => hit 18
+truehit 0 => hit 19
+truehit 0 => hit 20
+truehit 0 => hit 21
+truehit 0 => hit 22
+truehit 0 => hit 23
+truehit 0 => hit 24
+truehit 0 => hit 25
+truehit 0 => hit 26
+truehit 0 => hit 27
+truehit 0 => hit 28
+truehit 0 => hit 29
+truehit 0 => hit 30
+truehit 0 => hit 31
+truehit 0 => hit 32
+truehit 0 => hit 33
+truehit 0 => hit 34
+truehit 1 => hit 35
+truehit 1 => hit 36
+truehit 1 => hit 37
+truehit 1 => hit 38
+truehit 1 => hit 39
+truehit 1 => hit 40
+truehit 1 => hit 41
+truehit 1 => hit 42
+truehit 1 => hit 43
+truehit 1 => hit 44
+truehit 1 => hit 45
+truehit 1 => hit 46
+truehit 1 => hit 47
+truehit 1 => hit 48
+truehit 1 => hit 49
+truehit 1 => hit 50
+truehit 1 => hit 51
+truehit 1 => hit 52
+truehit 1 => hit 53
+truehit 1 => hit 54
+truehit 1 => hit 55
+truehit 1 => hit 56
+truehit 1 => hit 57
+truehit 1 => hit 58
+truehit 1 => hit 59
+truehit 1 => hit 60
+truehit 1 => hit 61
+truehit 1 => hit 62
+truehit 1 => hit 63
+truehit 1 => hit 64
+truehit 1 => hit 65
+truehit 1 => hit 66
+truehit 1 => hit 67
+truehit 1 => hit 68
+truehit 1 => hit 69
+[INFO] EXP:        0        RUN:        1        EVT:       15
+[INFO] ============================================================================
+[INFO] DataStore collections in event 15
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 1 => hit 17
+truehit 1 => hit 18
+truehit 1 => hit 19
+truehit 1 => hit 20
+truehit 1 => hit 21
+truehit 1 => hit 22
+truehit 1 => hit 23
+truehit 1 => hit 24
+truehit 1 => hit 25
+truehit 1 => hit 26
+truehit 1 => hit 27
+truehit 1 => hit 28
+truehit 1 => hit 29
+truehit 1 => hit 30
+truehit 1 => hit 31
+truehit 1 => hit 32
+truehit 1 => hit 33
+[INFO] EXP:        0        RUN:        1        EVT:       16
+[INFO] ============================================================================
+[INFO] DataStore collections in event 16
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 66
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 0 => hit 17
+truehit 0 => hit 18
+truehit 0 => hit 19
+truehit 0 => hit 20
+truehit 0 => hit 21
+truehit 0 => hit 22
+truehit 0 => hit 23
+truehit 0 => hit 24
+truehit 0 => hit 25
+truehit 0 => hit 26
+truehit 0 => hit 27
+truehit 0 => hit 28
+truehit 0 => hit 29
+truehit 0 => hit 30
+truehit 0 => hit 31
+truehit 0 => hit 32
+truehit 1 => hit 33
+truehit 1 => hit 34
+truehit 1 => hit 35
+truehit 1 => hit 36
+truehit 1 => hit 37
+truehit 1 => hit 38
+truehit 1 => hit 39
+truehit 1 => hit 40
+truehit 1 => hit 41
+truehit 1 => hit 42
+truehit 1 => hit 43
+truehit 1 => hit 44
+truehit 1 => hit 45
+truehit 1 => hit 46
+truehit 1 => hit 47
+truehit 1 => hit 48
+truehit 1 => hit 49
+truehit 1 => hit 50
+truehit 1 => hit 51
+truehit 1 => hit 52
+truehit 1 => hit 53
+truehit 1 => hit 54
+truehit 1 => hit 55
+truehit 1 => hit 56
+truehit 1 => hit 57
+truehit 1 => hit 58
+truehit 1 => hit 59
+truehit 1 => hit 60
+truehit 1 => hit 61
+truehit 1 => hit 62
+truehit 1 => hit 63
+truehit 1 => hit 64
+truehit 1 => hit 65
+[INFO] EXP:        0        RUN:        1        EVT:        7
+[INFO] ============================================================================
+[INFO] DataStore collections in event 7
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 54
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 0 => hit 17
+truehit 0 => hit 18
+truehit 0 => hit 19
+truehit 0 => hit 20
+truehit 0 => hit 21
+truehit 0 => hit 22
+truehit 0 => hit 23
+truehit 0 => hit 24
+truehit 0 => hit 25
+truehit 0 => hit 26
+truehit 1 => hit 27
+truehit 1 => hit 28
+truehit 1 => hit 29
+truehit 1 => hit 30
+truehit 1 => hit 31
+truehit 1 => hit 32
+truehit 1 => hit 33
+truehit 1 => hit 34
+truehit 1 => hit 35
+truehit 1 => hit 36
+truehit 1 => hit 37
+truehit 1 => hit 38
+truehit 1 => hit 39
+truehit 1 => hit 40
+truehit 1 => hit 41
+truehit 1 => hit 42
+truehit 1 => hit 43
+truehit 1 => hit 44
+truehit 1 => hit 45
+truehit 1 => hit 46
+truehit 1 => hit 47
+truehit 1 => hit 48
+truehit 1 => hit 49
+truehit 1 => hit 50
+truehit 1 => hit 51
+truehit 1 => hit 52
+truehit 1 => hit 53
+[INFO] EXP:        0        RUN:        1        EVT:        6
+[INFO] ============================================================================
+[INFO] DataStore collections in event 6
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 62
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 0 => hit 17
+truehit 0 => hit 18
+truehit 0 => hit 19
+truehit 0 => hit 20
+truehit 0 => hit 21
+truehit 0 => hit 22
+truehit 0 => hit 23
+truehit 0 => hit 24
+truehit 0 => hit 25
+truehit 0 => hit 26
+truehit 0 => hit 27
+truehit 0 => hit 28
+truehit 0 => hit 29
+truehit 0 => hit 30
+truehit 0 => hit 31
+truehit 1 => hit 32
+truehit 1 => hit 33
+truehit 1 => hit 34
+truehit 1 => hit 35
+truehit 1 => hit 36
+truehit 1 => hit 37
+truehit 1 => hit 38
+truehit 1 => hit 39
+truehit 1 => hit 40
+truehit 1 => hit 41
+truehit 1 => hit 42
+truehit 1 => hit 43
+truehit 1 => hit 44
+truehit 1 => hit 45
+truehit 1 => hit 46
+truehit 1 => hit 47
+truehit 1 => hit 48
+truehit 1 => hit 49
+truehit 1 => hit 50
+truehit 1 => hit 51
+truehit 1 => hit 52
+truehit 1 => hit 53
+truehit 1 => hit 54
+truehit 1 => hit 55
+truehit 1 => hit 56
+truehit 1 => hit 57
+truehit 1 => hit 58
+truehit 1 => hit 59
+truehit 1 => hit 60
+truehit 1 => hit 61
+[INFO] EXP:        0        RUN:        1        EVT:        3
+[INFO] ============================================================================
+[INFO] DataStore collections in event 3
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 80
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 0 => hit 17
+truehit 0 => hit 18
+truehit 0 => hit 19
+truehit 0 => hit 20
+truehit 0 => hit 21
+truehit 0 => hit 22
+truehit 0 => hit 23
+truehit 0 => hit 24
+truehit 0 => hit 25
+truehit 0 => hit 26
+truehit 0 => hit 27
+truehit 0 => hit 28
+truehit 0 => hit 29
+truehit 0 => hit 30
+truehit 0 => hit 31
+truehit 0 => hit 32
+truehit 0 => hit 33
+truehit 0 => hit 34
+truehit 0 => hit 35
+truehit 0 => hit 36
+truehit 0 => hit 37
+truehit 0 => hit 38
+truehit 0 => hit 39
+truehit 1 => hit 40
+truehit 1 => hit 41
+truehit 1 => hit 42
+truehit 1 => hit 43
+truehit 1 => hit 44
+truehit 1 => hit 45
+truehit 1 => hit 46
+truehit 1 => hit 47
+truehit 1 => hit 48
+truehit 1 => hit 49
+truehit 1 => hit 50
+truehit 1 => hit 51
+truehit 1 => hit 52
+truehit 1 => hit 53
+truehit 1 => hit 54
+truehit 1 => hit 55
+truehit 1 => hit 56
+truehit 1 => hit 57
+truehit 1 => hit 58
+truehit 1 => hit 59
+truehit 1 => hit 60
+truehit 1 => hit 61
+truehit 1 => hit 62
+truehit 1 => hit 63
+truehit 1 => hit 64
+truehit 1 => hit 65
+truehit 1 => hit 66
+truehit 1 => hit 67
+truehit 1 => hit 68
+truehit 1 => hit 69
+truehit 1 => hit 70
+truehit 1 => hit 71
+truehit 1 => hit 72
+truehit 1 => hit 73
+truehit 1 => hit 74
+truehit 1 => hit 75
+truehit 1 => hit 76
+truehit 1 => hit 77
+truehit 1 => hit 78
+truehit 1 => hit 79
+[INFO] EXP:        0        RUN:        1        EVT:        8
+[INFO] ============================================================================
+[INFO] DataStore collections in event 8
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 46
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 0 => hit 17
+truehit 0 => hit 18
+truehit 0 => hit 19
+truehit 0 => hit 20
+truehit 0 => hit 21
+truehit 0 => hit 22
+truehit 1 => hit 23
+truehit 1 => hit 24
+truehit 1 => hit 25
+truehit 1 => hit 26
+truehit 1 => hit 27
+truehit 1 => hit 28
+truehit 1 => hit 29
+truehit 1 => hit 30
+truehit 1 => hit 31
+truehit 1 => hit 32
+truehit 1 => hit 33
+truehit 1 => hit 34
+truehit 1 => hit 35
+truehit 1 => hit 36
+truehit 1 => hit 37
+truehit 1 => hit 38
+truehit 1 => hit 39
+truehit 1 => hit 40
+truehit 1 => hit 41
+truehit 1 => hit 42
+truehit 1 => hit 43
+truehit 1 => hit 44
+truehit 1 => hit 45
+[INFO] EXP:        0        RUN:        1        EVT:        9
+[INFO] ============================================================================
+[INFO] DataStore collections in event 9
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 35
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 1 => hit 17
+truehit 1 => hit 18
+truehit 1 => hit 19
+truehit 1 => hit 20
+truehit 1 => hit 21
+truehit 1 => hit 22
+truehit 1 => hit 23
+truehit 1 => hit 24
+truehit 1 => hit 25
+truehit 1 => hit 26
+truehit 1 => hit 27
+truehit 1 => hit 28
+truehit 1 => hit 29
+truehit 1 => hit 30
+truehit 1 => hit 31
+truehit 1 => hit 32
+truehit 1 => hit 33
+truehit 1 => hit 34
+[INFO] EXP:        0        RUN:        1        EVT:       12
+[INFO] ============================================================================
+[INFO] DataStore collections in event 12
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 1 => hit 17
+truehit 1 => hit 18
+truehit 1 => hit 19
+truehit 1 => hit 20
+truehit 1 => hit 21
+truehit 1 => hit 22
+truehit 1 => hit 23
+truehit 1 => hit 24
+truehit 1 => hit 25
+truehit 1 => hit 26
+truehit 1 => hit 27
+truehit 1 => hit 28
+truehit 1 => hit 29
+truehit 1 => hit 30
+truehit 1 => hit 31
+truehit 1 => hit 32
+truehit 1 => hit 33
+[INFO] EXP:        0        RUN:        1        EVT:        4
+[INFO] ============================================================================
+[INFO] DataStore collections in event 4
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 32
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 1 => hit 16
+truehit 1 => hit 17
+truehit 1 => hit 18
+truehit 1 => hit 19
+truehit 1 => hit 20
+truehit 1 => hit 21
+truehit 1 => hit 22
+truehit 1 => hit 23
+truehit 1 => hit 24
+truehit 1 => hit 25
+truehit 1 => hit 26
+truehit 1 => hit 27
+truehit 1 => hit 28
+truehit 1 => hit 29
+truehit 1 => hit 30
+truehit 1 => hit 31
+[INFO] EXP:        0        RUN:        1        EVT:       11
+[INFO] ============================================================================
+[INFO] DataStore collections in event 11
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 32
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 1 => hit 16
+truehit 1 => hit 17
+truehit 1 => hit 18
+truehit 1 => hit 19
+truehit 1 => hit 20
+truehit 1 => hit 21
+truehit 1 => hit 22
+truehit 1 => hit 23
+truehit 1 => hit 24
+truehit 1 => hit 25
+truehit 1 => hit 26
+truehit 1 => hit 27
+truehit 1 => hit 28
+truehit 1 => hit 29
+truehit 1 => hit 30
+truehit 1 => hit 31
+[INFO] EXP:        0        RUN:        1        EVT:       10
+[INFO] ============================================================================
+[INFO] DataStore collections in event 10
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 39
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 0 => hit 17
+truehit 0 => hit 18
+truehit 0 => hit 19
+truehit 1 => hit 20
+truehit 1 => hit 21
+truehit 1 => hit 22
+truehit 1 => hit 23
+truehit 1 => hit 24
+truehit 1 => hit 25
+truehit 1 => hit 26
+truehit 1 => hit 27
+truehit 1 => hit 28
+truehit 1 => hit 29
+truehit 1 => hit 30
+truehit 1 => hit 31
+truehit 1 => hit 32
+truehit 1 => hit 33
+truehit 1 => hit 34
+truehit 1 => hit 35
+truehit 1 => hit 36
+truehit 1 => hit 37
+truehit 1 => hit 38
+[INFO] EXP:        0        RUN:        1        EVT:       16
+[INFO] ============================================================================
+[INFO] DataStore collections in event 16
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 68
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 0 => hit 17
+truehit 0 => hit 18
+truehit 0 => hit 19
+truehit 0 => hit 20
+truehit 0 => hit 21
+truehit 0 => hit 22
+truehit 0 => hit 23
+truehit 0 => hit 24
+truehit 0 => hit 25
+truehit 0 => hit 26
+truehit 0 => hit 27
+truehit 0 => hit 28
+truehit 0 => hit 29
+truehit 0 => hit 30
+truehit 0 => hit 31
+truehit 0 => hit 32
+truehit 0 => hit 33
+truehit 1 => hit 34
+truehit 1 => hit 35
+truehit 1 => hit 36
+truehit 1 => hit 37
+truehit 1 => hit 38
+truehit 1 => hit 39
+truehit 1 => hit 40
+truehit 1 => hit 41
+truehit 1 => hit 42
+truehit 1 => hit 43
+truehit 1 => hit 44
+truehit 1 => hit 45
+truehit 1 => hit 46
+truehit 1 => hit 47
+truehit 1 => hit 48
+truehit 1 => hit 49
+truehit 1 => hit 50
+truehit 1 => hit 51
+truehit 1 => hit 52
+truehit 1 => hit 53
+truehit 1 => hit 54
+truehit 1 => hit 55
+truehit 1 => hit 56
+truehit 1 => hit 57
+truehit 1 => hit 58
+truehit 1 => hit 59
+truehit 1 => hit 60
+truehit 1 => hit 61
+truehit 1 => hit 62
+truehit 1 => hit 63
+truehit 1 => hit 64
+truehit 1 => hit 65
+truehit 1 => hit 66
+truehit 1 => hit 67
+[INFO] EXP:        0        RUN:        1        EVT:       13
+[INFO] ============================================================================
+[INFO] DataStore collections in event 13
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 64
+[INFO] PXDTrueHit[]         PXDTrueHits                3
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 0 => hit 17
+truehit 0 => hit 18
+truehit 0 => hit 19
+truehit 0 => hit 20
+truehit 1 => hit 21
+truehit 1 => hit 22
+truehit 1 => hit 23
+truehit 1 => hit 24
+truehit 1 => hit 25
+truehit 1 => hit 26
+truehit 1 => hit 27
+truehit 1 => hit 28
+truehit 1 => hit 29
+truehit 1 => hit 30
+truehit 1 => hit 31
+truehit 1 => hit 32
+truehit 1 => hit 33
+truehit 1 => hit 34
+truehit 1 => hit 35
+truehit 1 => hit 36
+truehit 1 => hit 37
+truehit 1 => hit 38
+truehit 1 => hit 39
+truehit 1 => hit 40
+truehit 1 => hit 41
+truehit 2 => hit 42
+truehit 2 => hit 43
+truehit 2 => hit 44
+truehit 2 => hit 45
+truehit 2 => hit 46
+truehit 2 => hit 47
+truehit 2 => hit 48
+truehit 2 => hit 49
+truehit 2 => hit 50
+truehit 2 => hit 51
+truehit 2 => hit 52
+truehit 2 => hit 53
+truehit 2 => hit 54
+truehit 2 => hit 55
+truehit 2 => hit 56
+truehit 2 => hit 57
+truehit 2 => hit 58
+truehit 2 => hit 59
+truehit 2 => hit 60
+truehit 2 => hit 61
+truehit 2 => hit 62
+truehit 2 => hit 63
+[INFO] EXP:        0        RUN:        1        EVT:       17
+[INFO] ============================================================================
+[INFO] DataStore collections in event 17
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 34
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 0 => hit 17
+truehit 1 => hit 18
+truehit 1 => hit 19
+truehit 1 => hit 20
+truehit 1 => hit 21
+truehit 1 => hit 22
+truehit 1 => hit 23
+truehit 1 => hit 24
+truehit 1 => hit 25
+truehit 1 => hit 26
+truehit 1 => hit 27
+truehit 1 => hit 28
+truehit 1 => hit 29
+truehit 1 => hit 30
+truehit 1 => hit 31
+truehit 1 => hit 32
+truehit 1 => hit 33
+[INFO] EXP:        0        RUN:        1        EVT:       18
+[INFO] ============================================================================
+[INFO] DataStore collections in event 18
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 33
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 1 => hit 16
+truehit 1 => hit 17
+truehit 1 => hit 18
+truehit 1 => hit 19
+truehit 1 => hit 20
+truehit 1 => hit 21
+truehit 1 => hit 22
+truehit 1 => hit 23
+truehit 1 => hit 24
+truehit 1 => hit 25
+truehit 1 => hit 26
+truehit 1 => hit 27
+truehit 1 => hit 28
+truehit 1 => hit 29
+truehit 1 => hit 30
+truehit 1 => hit 31
+truehit 1 => hit 32
+[INFO] EXP:        0        RUN:        1        EVT:       14
+[INFO] ============================================================================
+[INFO] DataStore collections in event 14
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 40
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 0 => hit 17
+truehit 0 => hit 18
+truehit 0 => hit 19
+truehit 1 => hit 20
+truehit 1 => hit 21
+truehit 1 => hit 22
+truehit 1 => hit 23
+truehit 1 => hit 24
+truehit 1 => hit 25
+truehit 1 => hit 26
+truehit 1 => hit 27
+truehit 1 => hit 28
+truehit 1 => hit 29
+truehit 1 => hit 30
+truehit 1 => hit 31
+truehit 1 => hit 32
+truehit 1 => hit 33
+truehit 1 => hit 34
+truehit 1 => hit 35
+truehit 1 => hit 36
+truehit 1 => hit 37
+truehit 1 => hit 38
+truehit 1 => hit 39
+[INFO] EXP:        0        RUN:        1        EVT:       15
+[INFO] ============================================================================
+[INFO] DataStore collections in event 15
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] RelationContainer    PXDTrueHitsToPXDSimHits
+[INFO] PXDSimHit[]          PXDSimHits                 40
+[INFO] PXDTrueHit[]         PXDTrueHits                2
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+truehit 0 => hit 0
+truehit 0 => hit 1
+truehit 0 => hit 2
+truehit 0 => hit 3
+truehit 0 => hit 4
+truehit 0 => hit 5
+truehit 0 => hit 6
+truehit 0 => hit 7
+truehit 0 => hit 8
+truehit 0 => hit 9
+truehit 0 => hit 10
+truehit 0 => hit 11
+truehit 0 => hit 12
+truehit 0 => hit 13
+truehit 0 => hit 14
+truehit 0 => hit 15
+truehit 0 => hit 16
+truehit 0 => hit 17
+truehit 0 => hit 18
+truehit 0 => hit 19
+truehit 0 => hit 20
+truehit 1 => hit 21
+truehit 1 => hit 22
+truehit 1 => hit 23
+truehit 1 => hit 24
+truehit 1 => hit 25
+truehit 1 => hit 26
+truehit 1 => hit 27
+truehit 1 => hit 28
+truehit 1 => hit 29
+truehit 1 => hit 30
+truehit 1 => hit 31
+truehit 1 => hit 32
+truehit 1 => hit 33
+truehit 1 => hit 34
+truehit 1 => hit 35
+truehit 1 => hit 36
+truehit 1 => hit 37
+truehit 1 => hit 38
+truehit 1 => hit 39
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 1
+[INFO] ========================================================================

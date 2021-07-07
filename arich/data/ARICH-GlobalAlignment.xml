@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GlobalAlignment>
+  <x desc="diplacement in x" unit="mm">0.0</x>
+  <y desc="displacement in y" unit="mm">0.0</y>
+  <z desc="displacement in z" unit="mm">0.0</z>
+  <alpha desc="x angle displacement" unit="deg">0.0</alpha>
+  <beta desc="y angle displacement" unit="deg">0.0</beta>
+  <gamma desc="z angle displacement" unit="deg">0.0</gamma>
+</GlobalAlignment>
+
+<!--GlobalAlignment>
+  <"Phase2 - by Tamechika-san">
+  <x desc="diplacement in x" unit="mm">-0.82</x>
+  <y desc="displacement in y" unit="mm">0.35</y>
+  <z desc="displacement in z" unit="mm">1.79</z>
+  <alpha desc="x angle displacement" unit="deg">0.054</alpha>
+  <beta desc="y angle displacement" unit="deg">0.103</beta>
+  <gamma desc="z angle displacement" unit="deg">-0.013</gamma>   
+</GlobalAlignment-->

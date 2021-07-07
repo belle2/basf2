@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<SimulationParameters>
+  
+  <qeScale desc="Scaling factor for quantum efficiency curve for photons internally reflected in HAPD window">1.0</qeScale>
+  <windowAbsorbtion desc="Probability that internally reflected photon in the HAPD window is absorbed (killed)">0.0</windowAbsorbtion>
+  <chipNegativeCrosstalk desc="Factor to suppress p.e. detection efficiency due to reverse polarized crosstalk between chip channels">0.2</chipNegativeCrosstalk>
+  <colEff>0.8</colEff>
+  
+  <QE>
+    <peakQE desc="peak QE" unit="nm">0.50</peakQE>
+    <LambdaFirst unit="nm">250</LambdaFirst>
+    <LambdaStep unit="nm">10</LambdaStep>
+    <Qeffi component="point-0"> <qe>0.40</qe> </Qeffi>
+    <Qeffi component="point-1"> <qe>0.40</qe> </Qeffi> 
+    <Qeffi component="point-2"> <qe>0.563</qe> </Qeffi>
+    <Qeffi component="point-3"> <qe>0.717</qe> </Qeffi>
+    <Qeffi component="point-4"> <qe>0.828</qe> </Qeffi>
+    <Qeffi component="point-5"> <qe>0.894</qe> </Qeffi>
+    <Qeffi component="point-6"> <qe>0.951</qe> </Qeffi>
+    <Qeffi component="point-7"> <qe>0.980</qe> </Qeffi>
+    <Qeffi component="point-8"> <qe>0.994</qe> </Qeffi>
+    <Qeffi component="point-9"> <qe>1.00</qe> </Qeffi>
+    <Qeffi component="point-10"> <qe>1.00</qe> </Qeffi>
+    <Qeffi component="point-11"> <qe>0.994</qe> </Qeffi>
+    <Qeffi component="point-12"> <qe>0.988</qe> </Qeffi>
+    <Qeffi component="point-13"> <qe>0.980</qe> </Qeffi>
+    <Qeffi component="point-14"> <qe>0.971</qe> </Qeffi>
+    <Qeffi component="point-15"> <qe>0.957</qe> </Qeffi>
+    <Qeffi component="point-16"> <qe>0.934</qe> </Qeffi>
+    <Qeffi component="point-17"> <qe>0.906</qe> </Qeffi>
+    <Qeffi component="point-18"> <qe>0.874</qe> </Qeffi>
+    <Qeffi component="point-19"> <qe>0.840</qe> </Qeffi>
+    <Qeffi component="point-20"> <qe>0.800</qe> </Qeffi>
+    <Qeffi component="point-21"> <qe>0.751</qe> </Qeffi>
+    <Qeffi component="point-22"> <qe>0.697</qe> </Qeffi>
+    <Qeffi component="point-23"> <qe>0.628</qe> </Qeffi>
+    <Qeffi component="point-24"> <qe>0.563</qe> </Qeffi>
+    <Qeffi component="point-25"> <qe>0.497</qe> </Qeffi>
+    <Qeffi component="point-26"> <qe>0.437</qe> </Qeffi>
+    <Qeffi component="point-27"> <qe>0.380</qe> </Qeffi>
+    <Qeffi component="point-28"> <qe>0.331</qe> </Qeffi>
+    <Qeffi component="point-29"> <qe>0.283</qe> </Qeffi>
+    <Qeffi component="point-30"> <qe>0.237</qe> </Qeffi>
+    <Qeffi component="point-31"> <qe>0.200</qe> </Qeffi>
+    <Qeffi component="point-32"> <qe>0.166</qe> </Qeffi>
+    <Qeffi component="point-33"> <qe>0.137</qe> </Qeffi>
+    <Qeffi component="point-34"> <qe>0.117</qe> </Qeffi>
+    <Qeffi component="point-35"> <qe>0.094</qe> </Qeffi>
+    <Qeffi component="point-36"> <qe>0.074</qe> </Qeffi>
+    <Qeffi component="point-37"> <qe>0.054</qe> </Qeffi>
+    <Qeffi component="point-38"> <qe>0.040</qe> </Qeffi>
+    <Qeffi component="point-39"> <qe>0.028</qe> </Qeffi>
+    <Qeffi component="point-40"> <qe>0.017</qe> </Qeffi>
+    <Qeffi component="point-41"> <qe>0.011</qe> </Qeffi>
+    <Qeffi component="point-42"> <qe>0.006</qe> </Qeffi>
+    <Qeffi component="point-43"> <qe>0.003</qe> </Qeffi>
+    <Qeffi component="point-44"> <qe>0.000</qe> </Qeffi>
+  </QE>
+  
+</SimulationParameters>

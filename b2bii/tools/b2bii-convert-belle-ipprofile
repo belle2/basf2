@@ -1,0 +1,261 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""
+Convert Beam energy and IPProfile from Belle database to Belle II Conditions
+database payloads.
+
+This script will try to convert the Belle information for all known runs of
+Belle data and create a directory containing all the payload files and a text
+file containing the validity for each payload.
+
+There are many Belle runs which don't have Benergy or IPProfile data so there
+will be a lot of messages starting with `ERR    : ` from the belle library if
+the data cannot be found. These can be safely ignored:
+
+* If Benergy is missing the run will be skipped and added to the
+  ``missing_benergy.txt`` in the output directory.
+* If IPProfile is missing the BeamSpot/BeamParameters will be created with NaN
+  for the IP position, and the run will be added to the
+  ``missing_ip.txt`` in the output directory.
+
+This script requires access to the BELLE postgres database so it should be run on
+KEKCC or proper port forwarding needs to be setup and BELLE_POSTGRESS_SERVER
+needs to point to it prior to running this script.
+"""
+
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
+import basf2 as b2
+from b2biiConversion import setupBelleDatabaseServer
+import argparse
+import sys
+import os
+import shutil
+import time
+import subprocess
+import numpy as np
+import multiprocessing
+from conditions_db.testing_payloads import parse_testing_payloads_file
+from collections import defaultdict
+
+
+class TCPWaiter(b2.Module):
+    """
+    Apparently the belle one software doesn't believe in reusing TCP connections
+    so if we convert too fast we will run out of available ports until the
+    database gets around to send the final FIN which seems to be much slower
+    than we can convert. So let's monitor the number of open ports and wait if
+    the number gets too high
+    """
+    def __init__(self, delay=10, max_open=30000):
+        super().__init__()
+        self._last = time.time() - delay
+        self._delay = delay
+        self._max_open = max_open
+
+    def event(self):
+        now = time.time()
+        if now - self._last < self._delay:
+            return
+
+        while True:
+            open_ports = int(subprocess.check_output("wc -l < /proc/net/tcp", shell=True))
+            if open_ports < self._max_open:
+                break
+            b2.B2WARNING(f"Waiting for ports to free up, currently {open_ports}>{self._max_open}")
+            time.sleep(self._delay)
+
+        self._last = time.time()
+
+
+def get_argument_parser():
+    """Return a parser for all the arguments"""
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("-j", "--jobs", default=1, type=int,
+                        help="number of simultaneous jobs to run for conversion")
+    parser.add_argument("--delete", default=False, action="store_true",
+                        help="delete existing output directory")
+    parser.add_argument("-o", "--output", default="belle_beamparams",
+                        help="output directory (default: %(default)s)")
+    parser.add_argument("--run-data", default=None,
+                        help="Alternate file containing a list of all runs to convert. "
+                        "If not given the default data/b2bii/belle-runs.txt is used")
+    parser.add_argument("--exclude", default=None,
+                        help="File containing exp,run numbers per line to exclude from conversion.")
+    parser.add_argument("--exp", default=None, type=int,
+                        help="If present limit the conversion to all runs in this experiment")
+    parser.add_argument("--skipCollisionBoostVector", default=False, action="store_true",
+                        help="Skip the CollisionBoostVector payload")
+    parser.add_argument("--skipBeamParameters", default=False, action="store_true",
+                        help="Skip the BeamParameters payload")
+    parser.add_argument("--skipCollisionInvariantMass", default=False, action="store_true",
+                        help="Skip the CollisionInvariantMass payload")
+    parser.add_argument("--skipBeamSpot", default=False, action="store_true",
+                        help="Skip the BeamSpot payload")
+
+    return parser
+
+
+def run_data(filename, **argk):
+    """Get the belle run information from a text file
+
+    This function assumes that the file contains the run information in comma
+    separated values exp, run and used numpy.loadtxt to load the data from that
+    file. All additional arguments are passed on to that function.
+
+    Returns:
+        a set() with (exp, run) values
+
+    Parameters:
+        filename (str): name of the file to read
+    """
+    data = np.loadtxt(filename, dtype=int, delimiter=',', **argk)
+    return {(int(e[0]), int(e[1])) for e in data}
+
+
+def run_conversion(rundata):
+    """Run conversion for all runs in rundata
+
+    Parameters:
+        rundata (list(tuple(int,int)): List of exp, run values
+    """
+    global missing_benergy, missing_ip
+    experiments = [e[0] for e in rundata]
+    runs = [e[1] for e in rundata]
+    events = [1]*len(runs)
+
+    # get rid of some annoying messages about random seed and globaltags
+    b2.logging.log_level = b2.LogLevel.WARNING
+
+    # and create and run the conversion path
+    main = b2.Path()
+    main.add_module("EventInfoSetter", expList=experiments, runList=runs, evtNumList=events)
+    main.add_module(TCPWaiter())
+    main.add_module("B2BIIConvertBeamParams", mcFlag=1, missingBenergy=missing_benergy, missingIp=missing_ip, logLevel=b2.LogLevel.INFO)
+    if args.skipBeamParameters:
+       	b2.set_module_parameters(main, "B2BIIConvertBeamParams", storeBeamParameters=False)
+    if args.skipCollisionInvariantMass:
+       	b2.set_module_parameters(main, "B2BIIConvertBeamParams", storeCollisionInvariantMass=False)
+    if args.skipCollisionBoostVector:
+       	b2.set_module_parameters(main, "B2BIIConvertBeamParams", storeCollisionBoostVector=False)
+    if args.skipBeamSpot:
+       	b2.set_module_parameters(main, "B2BIIConvertBeamParams", storeBeamSpot=False)
+    b2.process(main)
+    # and revert to normal logging
+    b2.logging.log_level = b2.LogLevel.INFO
+    return len(runs)
+
+
+if __name__ == "__main__":
+    args = get_argument_parser().parse_args()
+
+    if args.jobs < 1:
+        b2.B2FATAL("number of jobs cannot be smaller than one")
+
+    if args.delete:
+        shutil.rmtree(args.output, True)
+
+    # setup the Belle database server unless it's already setup
+    if "BELLE_POSTGRES_SERVER" not in os.environ:
+        setupBelleDatabaseServer()
+
+    # create output directory
+    os.makedirs(args.output, exist_ok=True)
+    # and remember where to put information
+    db_file = os.path.join(args.output, "database.txt")
+    missing_benergy = os.path.join(args.output, "missing_benergy.txt")
+    missing_ip = os.path.join(args.output, "missing_ip.txt")
+    # specfiy where to store new payloads
+    b2.conditions.expert_settings(save_payloads=db_file)
+    # disable database access, we only create, don't use
+    b2.conditions.metadata_providers = []
+    b2.conditions.payload_providers = []
+
+    # get list of runs
+    belle_runs = b2.find_file("data/b2bii/belle-runs.txt") if args.run_data is None else args.run_data
+    if not os.path.exists(belle_runs):
+        b2.B2FATAL(f"Cannot find run data file {belle_runs}")
+    rundata = run_data(belle_runs, usecols=(0, 1))
+    b2.B2INFO(f"{len(rundata)} runs in total")
+
+    if args.exp is not None:
+        rundata = set(e for e in rundata if e[0] == args.exp)
+        b2.B2INFO(f"{len(rundata)} runs for experiment {args.exp}")
+
+    # and subtract all excluded runs from that
+    subtract = [
+        (db_file, f"existing in database file {db_file}", (2, 3)),
+        (missing_benergy, f"runs we know don't have benergy data from {missing_benergy}", (0, 1)),
+    ]
+
+    if args.exclude is not None:
+        if not os.path.exists(args.exclude):
+            b2.B2FATAL(f"exclusion file {args.exclude} doesn't exist")
+        subtract.insert(0, (args.exclude, f"excluded runs from {args.exclude}", (0, 1)))
+
+    for filename, message, columns in subtract:
+        if os.path.exists(filename):
+            rundata -= run_data(filename, usecols=columns)
+            b2.B2INFO(f"{len(rundata)} runs after removing {message}")
+
+    # check if there's anything left to do
+    if len(rundata) > 0:
+        converted = 0
+        # if so run conversion on all runs
+        rundata = list(sorted(rundata))
+        if args.jobs > 1:
+            rundata = [rundata[i::args.jobs] for i in range(args.jobs)]
+            with multiprocessing.Pool(args.jobs, maxtasksperchild=1) as pool:
+               converted = sum(pool.map(run_conversion, rundata))
+        else:
+            converted = run_conversion(rundata)
+
+        b2.B2INFO(f"Conversion finished, converted {converted} runs")
+
+    b2.B2INFO("Optimizing database file")
+    # ok, data is converted, let's write an optimized database file:
+    payloads = parse_testing_payloads_file(db_file)
+    # we want a set of all iovs per unique payload (same name and checksum)
+    all_iovs = defaultdict(set)
+    # and a set of all revisions per unique payload (same name and checksum)
+    checksums = defaultdict(set)
+
+    for p in sorted(payloads):
+        # and remember all iovs for all revisions
+        all_iovs[p.module, p.revision].add(p.iov_tuple)
+
+    # ok, now let's write normalized file by concatenating all
+    # iovs if they are consecutive
+    final_iovs = []
+    for (name, revision), iovs in all_iovs.items():
+        # with sorted iovs we can check pairwise if the next one can be merged.
+        # Also add one useless iov so we don't have to add the last one after the
+        # loop since we extend prev until we find something incompatible so the last
+        # thing we find after all iovs is something guaranteed incompatible
+        iovs = sorted(iovs) + [(None, None, None, None)]
+        prev = iovs.pop(0)
+        for iov in iovs:
+            if (prev[2], prev[3]+1) == iov[:2]:
+                # compatible, yaay, merge
+                prev = prev[:2] + iov[2:]
+            else:
+                # not compatible, add what we had and continue looking for the next
+                # match
+                final_iovs.append((name, revision, prev))
+                prev = iov
+    # sort by payload name, iov
+    final_iovs.sort(key=lambda x: (x[0], x[2]))
+    # and write payload file
+    with open(os.path.join(args.output, "database-optimized.txt"), "w") as f:
+        for name, revision, iov in final_iovs:
+            iov = ",".join(map(str, iov))
+            f.write(f"dbstore/{name} {revision} {iov}\n")

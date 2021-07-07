@@ -1,0 +1,116 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+import os
+import sys
+import os.path
+
+import tracking.utilities as utilities
+import tracking.root_utils as root_utils
+
+from trackfindingcdc.mva.train import ClassificationOverview
+
+import ROOT.TFile
+
+import logging
+
+
+def main():
+    argument_parser = utilities.DefaultHelpArgumentParser()
+
+    argument_parser.add_argument(
+        "records_file_path",
+        help="ROOT file containing the TTree of records on which to train a boosted decision tree.",
+    )
+
+    argument_parser.add_argument(
+        "-t",
+        "--input-tree-name",
+        default="records",
+        help="Name of the input TTree in the ROOT file",
+    )
+
+    argument_parser.add_argument(
+        "--truth",
+	default=None,
+        help="Variables containing the truth",
+    )
+
+    argument_parser.add_argument(
+        "-v",
+        "--vars",
+	nargs="*",
+	default=[],
+        help="Variables to use for the classification",
+    )
+
+    argument_parser.add_argument(
+        "-f",
+        "--filters",
+	nargs="*",
+	default=[],
+        help="Variables on which the input shall be filter before making the classification.",
+    )
+
+    argument_parser.add_argument(
+        "-g",
+        "--groupbys",
+	nargs="*",
+	default=[],
+        help="Variable names to group by and to execute the classification over each subgroup",
+    )
+
+    argument_parser.add_argument(
+        "-a",
+        "--auxiliaries",
+	nargs="*",
+	default=[],
+        help="Variable names to show auxiliary distribiutions",
+    )
+
+    argument_parser.add_argument(
+        "-s",
+        "--show",
+        action="store_true",
+        help="Show the overview immediatly."
+        )
+
+    arguments = argument_parser.parse_args()
+
+    records_file_path = arguments.records_file_path
+    input_tree_name = arguments.input_tree_name
+
+    with root_utils.root_open(records_file_path) as records_tfile:
+        input_tree = records_tfile.Get(input_tree_name)
+
+        records_folder_path, records_file_name = os.path.split(records_file_path)
+        records_file_basename, ext = os.path.splitext(records_file_name)
+
+        overview_file_name = records_file_basename + ".overview" + ext
+        overview_file_path = os.path.join(records_folder_path, overview_file_name)
+
+        overview = ClassificationOverview(overview_file_path,
+                                          truth_name=arguments.truth,
+                                          select=arguments.vars,
+                                          groupbys=arguments.groupbys,
+                                          auxiliaries=arguments.auxiliaries,
+                                          filters=arguments.filters,
+                                          )
+        overview.train(input_tree)
+
+    if arguments.show:
+        with root_utils.root_open(overview_file_path) as tfile:
+            root_utils.root_browse(tfile)
+            input("Press enter to close.")
+
+if __name__ == "__main__":
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')
+    main()

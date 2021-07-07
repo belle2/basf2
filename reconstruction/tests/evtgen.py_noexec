@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+# This script checks if the standard reconstruction runs without
+# error for at least a few events
+
+import basf2
+from simulation import add_simulation
+
+basf2.set_random_seed(12345)
+path = basf2.create_path()
+path.add_module("EventInfoSetter", evtNumList=[10])
+path.add_module("EvtGenInput")
+add_simulation(path)
+path.add_module('RootOutput', outputFileName='evtgen_bbar.root')
+
+basf2.process(path)

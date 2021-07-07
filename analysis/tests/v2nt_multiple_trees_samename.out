@@ -1,0 +1,32 @@
+[INFO] Steering file: analysis/tests/v2nt_multiple_trees_samename.py
+[INFO] The random number seed is set to "1337"
+[INFO] Starting event processing, random seed is set to '1337'
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: e+:all (e-:all)
+[INFO]    -> MDST source: Tracks
+[FATAL] Tree with the name "variables" already exists in the file "ntuple.root"
+
+You probably want to either set the output fileName or the treeName to something else:
+
+   from modularAnalysis import variablesToNtuple
+   variablesToNtuple('pi+:all', ['p'], treename='pions', filename='variablesToNtuple.root')
+   variablesToNtuple('gamma:all', ['p'], treename='photons', filename='variablesToNtuple.root') # two trees, same file
+
+ == Or ==
+   from modularAnalysis import variablesToNtuple
+   variablesToNtuple('pi+:all', ['p'], filename='pions.root')
+   variablesToNtuple('gamma:all', ['p'], filename='photons.root') # two files
+
+[INFO] Starting event processing, random seed is set to '1337'
+[ERROR] The required object 'e+' (durability: event) does not exist. Maybe you forgot the module that registers it?
+[FATAL] 1 ERROR(S) occurred! The processing of events will not be started.
+[INFO] Starting event processing, random seed is set to '1337'
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: e+:all (e-:all)
+[INFO]    -> MDST source: Tracks
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
+[INFO]    -> MDST source: Tracks
+[INFO] Writing NTuple secondtree
+[INFO] Writing NTuple intermediate
+[INFO] Writing NTuple firsttree

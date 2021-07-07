@@ -1,0 +1,45 @@
+#### Import channel mask to local database
+arich/utility/scripts/ARICHImportChannelMaskToDB.py  -f DQMhistograms.root --hname ARICHDQM/chHit --firstexp=3 --firstrun=2300 --lastexp=4 --lastrun=10
+####  Installation Data for Database (ARICHDatabaseImporter.py)
+
+All data can be found at: https://stash.desy.de/projects/B2G/repos/arich_database
+Data for classes: ARICHAerogelInfo, ARICHAsicInfo, ARICHFebTest, ARICHHapdQA, ARICHHapdQE, ARICHHapdInfo
+
+#### Importing and exporting data to/from DB
+
+For each class there are functions "importClass" and "exportClass".
+Data can be saved in local database and central database (PNNL: http://belle2db.hep.pnnl.gov/ui/index.html?).
+
+
+#### Exporting data from CENTRAL DB
+
+1.) Central (Conditions) DB: http://belle2db.hep.pnnl.gov/ui/index.html?
+2.) To get the data, use steering file ARICHDatabaseImporter_export.py in arich/examples
+3.) There is a command use_central_database() at the top of the steering file:
+- You can choose whether you want to access data from global tag “ARICH” or “test_ARICHReconstruction” 
+- At the bottom of the steering file there are different functions that export data:
+	- Uncomment what data you want to get
+	- For now, you can use: dbImporter.exportAerogelInfo(), dbImporter.exportHapdQE(), dbImporter.exportHapdQA(), dbImporter.exportBadChannels(), dbImporter.exportHapdInfo()
+4.) Export functions:
+- They can be found in ARICHDatabaseImporter.cc in arich/calibration
+- They get elements of TClonesArray (dbobjects)
+- Functions loop over elements
+- They print some parameters using getters from dbobjects:
+	- This can be changed for usage in other modules
+	- Two functions are simple examples of usage of data from the DB:
+		- getBiasVoltagesForHapdChip(std::string serialNumber): Function that calculates bias voltage at gain = 40 for each chip
+		- getMyParams(std::string aeroSerialNumber): Function that returns refractive index, thickness and transmission length of aerogel
+
+
+#### Importing data to the LOCAL or CENTRAL DB
+
+1.) To import the data, use steering file ARICHDatabaseImporter_import.py in arich/examples
+2.) Choose between commands:
+	- use_local_database("test_database.txt", "test_payloads") for local database (first argument is the name of txt file where IOVs from all payloads are written, second argument is the name of folder where payloads are stored)
+	- use_central_database("ARICH", LogLevel.ERROR) for database at PNNL
+3.) Uncomment "import" functions at the bottom of steering file - you can import as many classes at the same time as you want
+
+
+#### Exporting data from the LOCAL DB
+
+Exporting data from the LOCAL DB is similar to exporting data from the central DB (check instructions above). The only difference is that you have to use command use_local_database("test_database.txt", "test_payloads") in steering file ARICHDatabaseImporter_export.py. Make sure arguments are the same as when storing the data.

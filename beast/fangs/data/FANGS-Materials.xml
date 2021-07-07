@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- define our own special Materials -->
+<Materials>
+  <Material name="FANGS-Support">
+    <Components>
+      <Material>Al</Material>
+    </Components>
+  </Material>
+  <Material name="FANGS-Sensor">
+    <Components>
+      <Material>Si</Material>
+    </Components>
+  </Material>
+  <Material name="FANGS-Flex">
+    <Components>
+      <Material>Kapton</Material>
+    </Components>
+  </Material>
+
+  <Material name="FANGS-Solder">
+    <state>solid</state>
+    <Components>
+      <Material fraction="0.96">Sn</Material>
+      <Material fraction="0.04">Ag</Material>
+    </Components>
+  </Material>
+  <Material name="FANGS-Bumps">
+    <Components>
+      <Material fraction="0.033">FANGS-Solder</Material>
+      <Material fraction="0.967">Air</Material>
+    </Components>
+  </Material>
+
+  <Material name="FANGS-Epoxy">
+    <density unit="g/cm3">1.13</density>
+    <state>Solid</state>
+    <Components>
+      <Element fraction="0.4390">C</Element>
+      <Element fraction="0.0732">O</Element>
+      <Element fraction="0.4878">H</Element>
+    </Components>
+  </Material>
+</Materials>

@@ -1,0 +1,111 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+import os
+import sys
+import time
+
+from rfarmutil import *
+
+argvs = sys.argv
+argc = len(argvs)
+
+if argc<=2:
+    print "Usage : start_hlt unit_name configname"
+    sys.exit()
+
+unitname = argvs[1]
+#configname = "PHASE2"
+configname = argvs[2]
+
+# Open PID file
+path = os.environ["HOME"]+"/pid." + argvs[1]
+pidfile = open ( path, mode="w" )
+
+# Start local RFARM
+#cmd = "start_rfarm_local " + configname
+#p = subprocess.Popen(cmd, shell=True)
+#p.wait()
+#pidfile.write ( str(p.pid)+"\n" )
+
+# detector hlt?
+if unitname.find ('_') != 0:
+    detector = unitname[unitname.find('_')+1:]
+else:
+    detector = unitname
+
+# Start rf_master
+cmd = "rf_master " + unitname + " -d"
+p = subprocess.Popen(cmd, shell=True)
+p.wait()
+#cmd = "ps -ef | grep \'rf_master " + argvs[1] + " \' | awk \'{print $2}\' "
+cmd = "ps -ef | grep \'rf_master " + unitname + " \' | awk \'{print $2 \" \" $8}\' | grep rf_master | awk \'{print $1}\' "
+print cmd
+p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+#p = subprocess.Popen(cmd, shell=True)
+p.wait()
+mypid = p.stdout.read();
+print "rf_master pid = "+mypid
+#pidfile.write ( "rf_master " + mypid )
+pidfile.write ( mypid )
+
+# Start runcontrold
+cmd = "runcontrold rc_" + unitname + " -d"
+p = subprocess.Popen(cmd, shell=True)
+p.wait()
+cmd = "ps -ef | grep \'runcontrold rc_" + unitname + " \' | awk \'{print $2 \" \" $8}\' | grep runcontrold | awk \'{print $1}\' "
+#cmd = "ps -ef | grep \'runcontrold rc_" + argvs[1] + " \' | awk \'{print $2 \" \" $8}\' "
+p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+#p = subprocess.Popen(cmd, shell=True)
+p.wait()
+mypid = p.stdout.read();
+print "runcontrold pid = "+mypid
+#pidfile.write ( "runcontrold " + mypid  )
+pidfile.write ( mypid  )
+
+# Start nsmbridged
+if detector.find('hlt') == 0  :
+    cmd = "nsmbridged b" + argvs[1] + " -d"
+    p = subprocess.Popen(cmd, shell=True)
+    p.wait()
+    cmd = "ps -ef | grep \'nsmbridged b" + unitname + " \' | awk \'{print $2 \" \" $8}\' | grep nsmbridged | awk \'{print $1}\' "
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p.wait()
+    mypid = p.stdout.read();
+    print "nsmbridged pid = "+mypid
+#pidfile.write ( "nsmbridged " + mypid )
+    pidfile.write ( mypid )
+else:
+    pidfile.write ( "-1\n" )
+
+# Start event builder
+#cmd = "ssh hltin \"eb1rxd eb1_" + argvs[1] + " -d \" </dev/null > ~/log/socketmonitord/sockhltin.log &"
+cmd = "ssh hltin \"eb1rxd eb1_" + detector + " -d \" </dev/null > ~/log/socketmonitord/sockhltin.log &"
+print cmd
+p = subprocess.Popen(cmd, shell=True)
+p.wait();
+time.sleep(5);
+#cmd = "ssh hltin \"ps -ef | grep \'eb1rxd eb1\_' \" | awk \'{print $2 \" \" $8}\' | grep eb1rxd | awk \'{p#rint $1}\' > temp"
+
+cmd = "ssh hltin \"ps -ef | grep \'eb1rxd eb1_" + detector + "\' \" | awk \'{print $2 \" \" $8}\' | grep eb1rxd | awk \'{print $1}\' > temp"
+
+print cmd
+p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+p.wait();
+resultfile = open ( "temp" )
+respid = resultfile.read();
+print "eb1rxd pid (hltin) = " + respid
+#pidfile.write ( "eb1rxd " + respid  )
+pidfile.write ( respid  )
+resultfile.close()
+
+pidfile.close()
+

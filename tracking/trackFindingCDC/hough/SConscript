@@ -1,0 +1,14 @@
+Import('env')
+
+import os
+
+# env.Prepend(CCFLAGS = ['-O1'])
+# env.Append(CCFLAGS = ['-O1'])
+env.Append(CCFLAGS = ['-g'])
+
+env['LIBS'] = [
+    'genfit2',
+    'simulation_dataobjects'
+    ]
+
+Return('env')

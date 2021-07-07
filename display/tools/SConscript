@@ -1,0 +1,5 @@
+Import('env')
+
+env['TOOLS_LIBS']['b2display'] = ['stdc++', 'framework']
+
+Return('env')

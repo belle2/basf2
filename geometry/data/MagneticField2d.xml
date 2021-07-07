@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="MagneticField2d" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">
+	<Description>The magnetic field description for the Belle II Detector</Description>
+	<Version>0</Version>
+        <Creator>GeoMagneticField</Creator>
+	<Content>
+		<!-- The components of the Belle II magnetic field -->		
+		<Components>
+			<!-- Radial solenoid magnetic field map
+			     The magnetic field map is stored as a grid in cylindrical coordinates.
+			     It is defined by a minimum radius and a maximum radius, a minimum z and
+			     a maximum z value, a pitch size in both, r and z, and the number of grid
+			     points. The ZOffset is used to account for the fact that the acceleration
+			     group defines 0 to be in the center of the detector, while the detector
+			     group defines the IP to be the center. This offset will shift the values
+                             from the magnetic field map file to fit inside the region given by the
+                             ZMin and ZMax values. The filename points to the zip file containing the
+                             magnetic field map.
+			-->
+			<Component type="Radial">
+				<NumberGridPointsR>175</NumberGridPointsR>
+				<GridPitchR unit="cm">1.0</GridPitchR>
+				<RadiusMin unit="cm">0.0</RadiusMin>
+				<RadiusMax unit="cm">174.0</RadiusMax>
+				<NumberGridPointsZ>801</NumberGridPointsZ>
+				<GridPitchZ unit="cm">1.0</GridPitchZ>
+				<ZMin unit="cm">-353.0</ZMin>
+				<ZMax unit="cm">447.0</ZMax>
+				<ZOffset unit="cm">47.0</ZOffset>
+                                <SlotRMin unit="cm">130.0</SlotRMin>
+                                <EndyokeZMin unit="cm">230.0</EndyokeZMin>
+                                <GapHeight unit="cm">4.4</GapHeight>
+                                <IronPlateThickness unit="cm">4.7</IronPlateThickness>
+ 				<MapFilename>geometry/SolenoidFieldMap.dat.gz</MapFilename>
+			</Component>
+			<!-- Magnetic field map outside of solenoid
+			     Data of field map is from Belle library.
+			-->
+                        <Component type="Klm1">
+                                <NumberBarrelLayers>15</NumberBarrelLayers>
+                                <NumberEndcapLayers>14</NumberEndcapLayers>
+                                <BarrelRadiusMin unit="cm">201.9</BarrelRadiusMin>
+                                <BarrelZMax unit="cm">222.0</BarrelZMax>
+                                <EdncapRadiusMin unit="cm">174.0</EdncapRadiusMin>
+                                <EndcapZMin unit="cm">230.0</EndcapZMin>
+                                <BarrelGapHeightLayer0>4.14555</BarrelGapHeightLayer0>
+                                <EndcapGapHeight unit="cm">4.4</EndcapGapHeight>
+                                <BarrelIronThickness unit="cm">4.6689</BarrelIronThickness>
+                                <DLayer unit="cm">9.1</DLayer>
+                                <ZOffset unit="cm">47.0</ZOffset>
+                                <MapFilename>geometry/KLMFieldMap_belle1.dat</MapFilename>
+                        </Component>
+		</Components>
+	</Content>
+</DetectorComponent>

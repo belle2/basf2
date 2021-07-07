@@ -1,0 +1,14 @@
+To train a sector map for VXDTF2 one has to execute the following python scripts with basf2, in that order:
+eventSimulation.py
+trainingPreparation.py
+trainSecMap.py
+
+For a more detailed description on how to use them please refer to the comments within those files.
+
+
+The default geometry assumed is the one of Belle2. If one sets the environmental variable
+USE_BEAST2_GEOMETRY
+(e.g. by 'export USE_BEAST2_GEOMETRY=something' or 'setenv USE_BEAST2_GEOMETRY something'), BEFORE running
+the scripts, for each of the above mentioned python scripts the 
+Beast Phase 2 geometry is assumed. 
+

@@ -1,0 +1,32 @@
+# EventType: 4190010003
+# Descriptor: [Upsilon6S_piZb10650_rhoetab]
+# NickName: Upsilon6S_piZb10650_rhoetab
+# Cuts: None
+# Documentation: Decay for Y(6S) physics
+# PhysicsWG: Bottomonium
+# Tested: Yes
+# Responsible: Bryan Fulsom
+# Email: bryan.fulsom@pnnl.gov
+# Date: 20161101
+#
+# June 2021 Automated: Converted PYTHIA ids
+#   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
+
+Decay Upsilon(6S)
+0.5 pi+ Zb(10650)- PHSP;
+0.5 pi- Zb(10650)+ PHSP;
+Enddecay
+
+Decay Zb(10650)-
+1.0 rho- eta_b PHSP;
+Enddecay
+
+Decay Zb(10650)+
+1.0 rho+ eta_b PHSP;
+Enddecay
+
+Decay eta_b
+1.0 g g PHOTOS PYTHIA 91;
+Enddecay
+
+End

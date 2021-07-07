@@ -1,0 +1,5 @@
+Import('env')
+
+env['LIBS'] = ['mdst_dataobjects', 'framework', 'HepMC', 'HepMCfio']
+
+Return('env')

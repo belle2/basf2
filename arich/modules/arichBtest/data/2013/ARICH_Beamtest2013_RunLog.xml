@@ -1,0 +1,3199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<DetectorComponent name="ARICHBtest" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Creator library="arich">ARICHBtestCreator</Creator>
+  <Content type="beamtest">
+ <xi:include href="ARICH_Beamtest2013_Materials.xml"/>
+ <xi:include href="ARICH_Beamtest2013_Setup.xml"/>
+ 
+ 
+
+  
+<run>
+<author>rok</author>
+<runno>0</runno>
+<neve>0</neve>
+<calibration></calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130520191726</datum>
+</run>
+
+
+<run>
+<author>S. Iwata</author>
+<runno>1</runno>
+<neve>0</neve>
+<calibration></calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130520212902</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>2</runno>
+<neve>0</neve>
+<calibration>test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> This run is DAQ test.</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130520213302</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>3</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130520221906</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>4</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130520221938</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>5</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130520222000</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>6</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130520222022</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>7</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1></comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130520222045</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>8</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130520232321</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>9</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521114426</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>10</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<comment1>date is 20, may 2013 </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521114540</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>11</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>junk</daqqa1>
+<comment1> No beam data</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521114633</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>12</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>junk</daqqa1>
+<comment1> no bema data</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521114701</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>13</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>junk</daqqa1>
+<comment1> no beam data</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521114741</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>14</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>junk</daqqa1>
+<comment1> no beam data</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521114821</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>15</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>junk</daqqa1>
+<comment1> no beam data</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521114855</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>16</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>junk</daqqa1>
+<comment1> no beam data</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521114952</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>17</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>junk</daqqa1>
+<comment1> no beam data</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521115022</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>18</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1>1</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>junk</daqqa1>
+<comment1> no beam data</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521115103</datum>
+</run>
+
+
+<run>
+<author>Iwata</author>
+<runno>19</runno>
+<neve>582562</neve>
+<calibration>testing settings</calibration>
+<setup1>2</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521145424</datum>
+</run>
+
+
+<run>
+<author>Iwata</author>
+<runno>20</runno>
+<neve>66045</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521173059</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>21</runno>
+<neve>12303</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> hdcycle:20, trgdelay:8</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521174111</datum>
+</run>
+
+
+<run>
+<author>Iwata</author>
+<runno>22</runno>
+<neve>51619</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521181848</datum>
+</run>
+
+
+<run>
+<author>Iwata</author>
+<runno>24</runno>
+<neve>0</neve>
+<calibration>30383</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>same</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<comment1>rerun after resetting HAPD4 threshold to 170mV</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521183110</datum>
+</run>
+
+
+<run>
+<author>Iwata</author>
+<runno>23</runno>
+<neve>30383</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<comment1>delay 6</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521183255</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>25</runno>
+<neve>57824</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> hdcycle:20, trgdelay:7
+new parameter for HAPD4 is loaded</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521220103</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>26</runno>
+<neve>331081</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>hdcycle:20, trgdelay:7
+threshold voltage for HAPD4 set to 90 mV (others are not change, 200 mV)</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130521220343</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>27</runno>
+<neve>32575</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> hdcycle:10, trgdelay:7</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522093104</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>28</runno>
+<neve>31003</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>hdcycle:10, trgdelay10</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522093143</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>29</runno>
+<neve>31664</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> hdcycle:10, trgdelay:8</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522093237</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>30</runno>
+<neve>33960</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> hdcycle:10, trgdelay:6</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522093335</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>31</runno>
+<neve>30531</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> hdcycle:10, trgdelay:5</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522093441</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>32</runno>
+<neve>35064</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>hdcycle:5, trgdelay:5</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522093544</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>33</runno>
+<neve>30329</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>hdcycle:5, trgdelay:6</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522093621</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>34</runno>
+<neve>30385</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> hdcycle:5, trgdelay:7</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522093658</datum>
+</run>
+
+
+<run>
+<comment><![CDATA[]]></comment>
+<datum>20130522134639</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>35</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522172002</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>36</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522172042</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>37</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522172056</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>38</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522172112</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>39</runno>
+<neve>0</neve>
+<calibration>scintillator rating test</calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1>it was used to measure beam rate by trigger scintillators.</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522172433</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>40</runno>
+<neve>128515</neve>
+<calibration>electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>offset calibrated</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522181340</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>41</runno>
+<neve>198067</neve>
+<calibration>electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>offset calibrated</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522181454</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>42</runno>
+<neve>34563</neve>
+<calibration>electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>changed 
+shaping time: shortest
+hdcycle 10
+trgdelay 6</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522181634</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>43</runno>
+<neve>27123</neve>
+<calibration>electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>changed shaping time: shortest 
+hdcycle 20
+trgdelay 7</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522181749</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>44</runno>
+<neve>12044</neve>
+<calibration>electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>changed shaping time: shortest 
+hdcycle 30
+trgdelay 7</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522181844</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>45</runno>
+<neve>12553</neve>
+<calibration>electronics Scan</calibration>
+<setup1>3</setup1>
+<aerogel1>PDR20-3a(U), PDR11-4a(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>beam momentum 5.4 GeV
+changed shaping time: shortest 
+hdcycle 10 
+trgdelay 6</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522182152</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>46</runno>
+<neve>472232</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>REM5-5(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522182502</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>47</runno>
+<neve>592580</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>BTR13-5(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522182605</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>48</runno>
+<neve>670586</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>BTR16-21(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522182650</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>49</runno>
+<neve>549672</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>REM2-3(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522184700</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>50</runno>
+<neve>0</neve>
+<calibration></calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522190510</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>51</runno>
+<neve>557977</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>REM2-17(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522195722</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>52</runno>
+<neve>559336</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>REM5-11(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522204104</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>53</runno>
+<neve>2074070</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>REM2-3(U), REM2-17(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130522233619</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>54</runno>
+<neve>605081</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523001317</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>55</runno>
+<neve>26777</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>HTP12-9(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>junk</daqqa1>
+<comment1>HAPD#4 is not working
+(others are normal data)</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523162222</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>56</runno>
+<neve>36844</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>HTP12-9(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>junk</daqqa1>
+<comment1>HAPD#4 is not working
+(others are normal)</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523162354</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>57</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523162420</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>58</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523162436</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>59</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523162452</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>60</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523162515</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>61</runno>
+<neve>0</neve>
+<calibration>DAQ test</calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523162541</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>62</runno>
+<neve>0</neve>
+<calibration></calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1>forgot loading parameters to SA-board</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523162631</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>63</runno>
+<neve>905374</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3</setup1>
+<aerogel1>HTP12-9(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>SA-board offset was re-calibrated (basic-04)</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523162847</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>64</runno>
+<neve>380514</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3a</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>loaded new parameters for SA-board
+
+aerogel holder position is moved to x=+4.5 cm</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523163048</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>65</runno>
+<neve>378336</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3a</setup1>
+<aerogel1>REM2-3(U), REM2-17(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+4.5 cm
+y=+-0</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523183558</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>66</runno>
+<neve>373570</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3b</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+6.0 cm
+y=+2.0 cm</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523184404</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>67</runno>
+<neve>412756</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3c</setup1>
+<aerogel1>REM2-3(U), REM2-17(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+-0 cm
+y=-5.0 cm</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523184614</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>68</runno>
+<neve>455232</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3c</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+-0 cm
+y=-5.0 cm</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523193714</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>69</runno>
+<neve>399481</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3c</setup1>
+<aerogel1>BTR16-21(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=0 cm
+y=-5.0 cm</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523210222</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>70</runno>
+<neve>375076</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3c</setup1>
+<aerogel1>BTR13-5(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+y=-5.0 cm
+x=0 cm</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523231841</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>71</runno>
+<neve>1202168</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3c</setup1>
+<aerogel1>REM5-11(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=0 cm
+y=-5.0 cm</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130523231953</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>72</runno>
+<neve>431858</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3d</setup1>
+<aerogel1>REM5-11(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+4.5 cm
+0 cm
+(same as previous run)</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130524001046</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>73</runno>
+<neve>488013</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3b</setup1>
+<aerogel1>REM2-3(U), REM2-17(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+6.0 cm
+y=+2.0 cm
+distance between the surface of up stream side of aerogel and the HAPD window = 19.9 cm</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130524002554</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>74</runno>
+<neve>389875</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3d</setup1>
+<aerogel1>BTR13-5(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+4.5 cm
+y=0 cm</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130524102445</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>75</runno>
+<neve>372216</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3b</setup1>
+<aerogel1>REM5-11(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+6.0 cm
+y=+2.0 cm
+d=</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130524115616</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>76</runno>
+<neve>418610</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3b</setup1>
+<aerogel1>BTR13-5(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+6.0 cm
+y=+2.0 cm
+d=20.0 cm</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130524132705</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>77</runno>
+<neve>445826</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3d</setup1>
+<aerogel1>REM5-5(U), N/A(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+4.5cm
+y=0 cm
+d=20.0 cm</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130524133420</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>78</runno>
+<neve>697465</neve>
+<calibration>Aerogel study</calibration>
+<setup1>3d</setup1>
+<aerogel1>REM5-5(U), BTR16-21(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>aerogel holder position
+x=+4.5 cm
+y=0 cm
+d=20.0 cm</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130524135949</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>79</runno>
+<neve>321884</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>HV scan</type1>
+<daqqa1>ok</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130524161722</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>80</runno>
+<neve>330744</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>HV scan</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias scan +10 V from Run79</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130524175007</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>81</runno>
+<neve>201242</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias +20 V
+param: neutron-03a</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130525205602</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>82</runno>
+<neve>205228</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias +20 V
+HV 7 kV
+param: neutron-03a</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130525205934</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>83</runno>
+<neve>225517</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias +30 V
+HV 7 kV
+param: neutron-04</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130525210105</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>84</runno>
+<neve>202955</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias +30 V
+HV 7 kV
+3-sigma of noise
+neutron-04a</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526023436</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>85</runno>
+<neve>204289</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias +30 V
+HV 7 kV
+2.5-sigma
+neutron-04b</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526023805</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>86</runno>
+<neve>204208</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias +30
+HV 7 kV
+hdcycle 5
+trgdelay 6
+2.5-sigma
+param neutron-04b</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526105006</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>87</runno>
+<neve>221666</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias +30
+HV 7 kV
+hdcycle 7
+trgdelay 6
+2.5-sigma
+param neutron-04b</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526110050</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>88</runno>
+<neve>202565</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<comment1>Bias +30
+HV 7 kV
+hdcycle 20
+trgdelay 7
+2.5-sigma
+param neutron-04b</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526110232</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>89</runno>
+<neve>203094</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias +30
+HV 7 kV
+hdcycle 10
+trgdelay 6
+2-sigma
+param neutron-04c</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526111158</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>90</runno>
+<neve>1503752</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias +30
+HV 7 kV
+hdcycle 7
+trgdelay 5
+2.5-sigma
+param neutron-04b</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526111832</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>91</runno>
+<neve>202470</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias +30
+HV 7.5 kV (for all HAPDs)
+hdcycle 10
+trgdelay 6
+2.5-sigma
+param neutron-05</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526112515</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>92</runno>
+<neve>203146</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias +30
+HV 8 kV (for #3,4)
+hdcycle 10
+trgdelay 6
+2.5-sigma
+param neutron-06</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526113016</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>93</runno>
+<neve>0</neve>
+<calibration></calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526113147</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>94</runno>
+<neve>201313</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias +30
+HV 7 kV (for #3,4)
+hdcycle 10
+trgdelay 6
+2.5-sigma
+param neutron-07</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526144102</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>94</runno>
+<neve>201313</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias +40 V
+HV 7 kV (for #3,4)
+hdcycle 10
+trgdelay 6
+2.5-sigma
+param neutron-07</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526145704</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>95</runno>
+<neve>207791</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias +40 V
+HV 8 kV (for #3,4)
+hdcycle 10
+trgdelay 6
+2.5-sigma
+param neutron-08</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526150255</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>96</runno>
+<neve>294229</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias +40 V
+HV 8.5 kV (for #3,4)
+hdcycle 10
+trgdelay 6
+2.5-sigma
+param neutron-09</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526152451</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>97</runno>
+<neve>203086</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias effective-gain40
+HV 8.5 kV (for #3,4)
+hdcycle 10
+trgdelay 6
+2.5-sigma
+param neutron-10</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526153437</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>98</runno>
+<neve>203839</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias effective-gain40
+HV 7 kV (for #3,4)
+hdcycle 10
+trgdelay 6
+2.5-sigma
+param neutron-11</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526154707</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>99</runno>
+<neve>2037343</neve>
+<calibration>No aerogel</calibration>
+<setup1>4</setup1>
+<aerogel1>w/o</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias effective-gain40
+HV 7 kV (for #3,4)
+hdcycle 10
+trgdelay 6
+2.5-sigma
+param neutron-11</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526155031</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>100</runno>
+<neve>203441</neve>
+<calibration>No aerogel</calibration>
+<setup1>4</setup1>
+<aerogel1>w/o</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias effective-gain40
+HV 8.5 kV (for #3,4)
+hdcycle 10
+trgdelay 6
+2.5-sigma
+param neutron-11</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526155241</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>101</runno>
+<neve>1131145</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>5</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>changed HAPD
+#3: KA058
+#4: KA003
+
+Bias nominal(+0 V)
+HV 7 kV (for #3,4)
+hdcycle 10
+trgdelay 6
+2.5-sigma
+param neutron-12
+</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526160707</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>102</runno>
+<neve>201500</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>5</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias +0 V 
+HV 8.5 kV (for #3,4) 
+hdcycle 10 
+trgdelay 6 
+2.5-sigma 
+param neutron-13</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526161750</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>103</runno>
+<neve>202980</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>5</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias effective-gain40 
+HV 8.5 kV (for #3,4) 
+hdcycle 10 
+trgdelay 6 
+2.5-sigma 
+param neutron-14</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526162228</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>104</runno>
+<neve>206109</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>5</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias effective-gain40 
+HV 7 kV (for #3,4) 
+hdcycle 10 
+trgdelay 6 
+2.5-sigma 
+param neutron-15</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526163927</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>105</runno>
+<neve>0</neve>
+<calibration></calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526164343</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>106</runno>
+<neve>214066</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>6</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>swapped #3 and #4
+Bias effective-gain40 
+HV 8.5 kV (for #3,4) 
+hdcycle 10 
+trgdelay 6 
+2.5-sigma 
+param neutron-16</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526164848</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>107</runno>
+<neve>202212</neve>
+<calibration>No aerogel</calibration>
+<setup1>6</setup1>
+<aerogel1>w/o</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>without aerogel 
+others are same as previous run</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526170026</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>108</runno>
+<neve>201826</neve>
+<calibration>No aerogel</calibration>
+<setup1>3</setup1>
+<aerogel1>w/o</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>without aerogel 
+standard HAPD configuration</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526170551</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>109</runno>
+<neve>206364</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>7</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>changed HAPD
+#3: KA067
+#4: KA079
+
+Bias +30 V
+HV 7 kV
+param neutron-17</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526171208</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>110</runno>
+<neve>201574</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>6</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>changed HAPD
+#3: KA067
+#4: KA079
+
+Bias +30 V
+HV 8.5kV
+param neutron-18</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526175703</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>110</runno>
+<neve>201574</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>7</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>[corrected log]
+
+Bias +30 V
+HV 8.5kV
+param neutron-18</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526175919</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>111</runno>
+<neve>203038</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>7</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias +30 V
+HV 8.5kV
+param neutron-19(#3), neutron-18(#4)</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526181959</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>111</runno>
+<neve>203038</neve>
+<calibration>Irradiated HAPD study</calibration>
+<setup1>7</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>[corrected log]
+Bias effective-gain40
+HV 8.5kV
+param neutron-19(#3), neutron-18(#4)</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526182803</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>112</runno>
+<neve>201530</neve>
+<calibration>HAPD study</calibration>
+<setup1>8</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Mirror study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>changed HAPD
+#3: SHP077
+#4: KA078
+
+Bias nominal
+HV 7 kV
+param basic-06</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526190602</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>113</runno>
+<neve>200730</neve>
+<calibration>HAPD study</calibration>
+<setup1>8</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias nominal
+HV 8.5 kV
+param basic-06a</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526191915</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>114</runno>
+<neve>0</neve>
+<calibration></calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1></comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526192845</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>115</runno>
+<neve>202338</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias effective-gain40
+HV 7 kV
+param neutron-sh1(#3), neutron-sh1a(#4)
+hdcycle 20
+trgdelay 7</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526193801</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>116</runno>
+<neve>139634</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias effective-gain40
+HV 7 kV
+param neutron-sh4(#3), neutron-sh2(#4)
+hdcycle/trgdelay 20/7(#3), 20/9(#4)
+</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526204642</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>117</runno>
+<neve>105850</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias effective-gain40
+HV 7 kV
+param neutron-sh4(#3), neutron-sh2(#4)
+sh/cyc/dly 1/20/7(#3), 3/20/5(#4)</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526214101</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>118</runno>
+<neve>0</neve>
+<calibration></calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<daqqa1>junk</daqqa1>
+<comment1> </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526215323</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>119</runno>
+<neve>147149</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias effective-gain40
+HV 7 kV
+#4 neutron-sh6, sh 3, cyc 30, dly 7</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526215515</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>120</runno>
+<neve>127208</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias effective-gain40
+HV 8.5 kV
+#4 neutron-sh7, sh 3, cyc 20, dly 7</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526215954</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>121</runno>
+<neve>0</neve>
+<calibration></calibration>
+<setup1></setup1>
+<aerogel1></aerogel1>
+<mirror>0</mirror>
+<rotation>0</rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>junk</daqqa1>
+<comment1></comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526220256</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>122</runno>
+<neve>125143</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias effective-gain40
+HV 8.5 kV
+#4 neutron-sh7, sh 3, cyc 30, dly 7</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526220703</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>123</runno>
+<neve>123417</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias effective-gain40
+HV 8.5 kV
+#4 neutron-sh7, sh 1, cyc 20, dly 7</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526221234</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>124</runno>
+<neve>130213</neve>
+<calibration>Electronics Scan</calibration>
+<setup1>4</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>Bias effective-gain40
+HV 8.5 kV
+#4 neutron-sh10, sh 1, cyc 30, dly 7</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526222556</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>125</runno>
+<neve>207414</neve>
+<calibration>Best combination run</calibration>
+<setup1>9</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>changed HAPD arrangement
+#1 SHP118
+#2 SHP077
+#3 KA041
+#4 KA058
+#5 SHP078
+#6 KA025
+
+Bias nominal
+HV 7 kV
+basic-07
+</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526223425</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>126</runno>
+<neve>201930</neve>
+<calibration>Best combination run</calibration>
+<setup1>9</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>HV scan</type1>
+<daqqa1>ok</daqqa1>
+<comment1>HV 7.5 kV</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526223652</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>127</runno>
+<neve>207662</neve>
+<calibration>Best combination run</calibration>
+<setup1>9</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>HV scan</type1>
+<daqqa1>ok</daqqa1>
+<comment1>HV 8 kV</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526224404</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>128</runno>
+<neve>205446</neve>
+<calibration>Best combination run</calibration>
+<setup1>9</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>HV scan</type1>
+<daqqa1>ok</daqqa1>
+<comment1>#1,2,3,5,6 HV 8 kV
+#4 HV 8.5 kV</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526224659</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>129</runno>
+<neve>223789</neve>
+<calibration>Best combination run</calibration>
+<setup1>9</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>HV scan</type1>
+<daqqa1>ok</daqqa1>
+<comment1>HV 6.5 kV</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526225801</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>130</runno>
+<neve>145207</neve>
+<calibration>Best combination run</calibration>
+<setup1>9</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>HV scan</type1>
+<daqqa1>ok</daqqa1>
+<comment1>HV 6 kV</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526225938</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>131</runno>
+<neve>213137</neve>
+<calibration>Best combination run</calibration>
+<setup1>9</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>HV scan</type1>
+<daqqa1>ok</daqqa1>
+<comment1>HV 5.5 kV</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526230145</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>132</runno>
+<neve>217107</neve>
+<calibration>Best combination run</calibration>
+<setup1>9</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>HV scan</type1>
+<daqqa1>ok</daqqa1>
+<comment1>HV 5 kV</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526230345</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>133</runno>
+<neve>205843</neve>
+<calibration>Best combination run</calibration>
+<setup1>9</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>HV scan</type1>
+<daqqa1>ok</daqqa1>
+<comment1>HV 4.5 kV</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526230631</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>134</runno>
+<neve>202588</neve>
+<calibration>Best combination run</calibration>
+<setup1>9</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>HV scan</type1>
+<daqqa1>ok</daqqa1>
+<comment1>HV 4 kV</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526231256</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>135</runno>
+<neve>150460</neve>
+<calibration>Best combination run</calibration>
+<setup1>9</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>HV scan</type1>
+<daqqa1>ok</daqqa1>
+<comment1>HV 3.5 kV</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526231407</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>136</runno>
+<neve>150586</neve>
+<calibration>Best combination run</calibration>
+<setup1>9</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>HV scan</type1>
+<daqqa1>ok</daqqa1>
+<comment1>HV 3 kV</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526231545</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>137</runno>
+<neve>155510</neve>
+<calibration>Best combination run</calibration>
+<setup1>9</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>HV scan</type1>
+<daqqa1>ok</daqqa1>
+<comment1>HV 2 kV</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526232954</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>138</runno>
+<neve>155362</neve>
+<calibration>Best combination run</calibration>
+<setup1>9</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>HV scan</type1>
+<daqqa1>ok</daqqa1>
+<comment1>HV 2.5 kV</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526233036</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>139</runno>
+<neve>160549</neve>
+<calibration>Best combination run</calibration>
+<setup1>9</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>HV scan</type1>
+<daqqa1>ok</daqqa1>
+<comment1>HV 1.5 kV</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526233249</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>140</runno>
+<neve>152346</neve>
+<calibration>Best combination run</calibration>
+<setup1>9</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>HV scan</type1>
+<daqqa1>ok</daqqa1>
+<comment1>HV 1 kV</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526233539</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>141</runno>
+<neve>205589</neve>
+<calibration>Best combination run</calibration>
+<setup1>9</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>HV scan</type1>
+<daqqa1>ok</daqqa1>
+<comment1>HV OFF (0 V)</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526233708</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>142</runno>
+<neve>152335</neve>
+<calibration>Best combination run</calibration>
+<setup1>9</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>HV 7 kV
+loaded offset parameters by old script(adjust_offset.pl) </comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526234042</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>143</runno>
+<neve>200948</neve>
+<calibration>No aerogel</calibration>
+<setup1>9</setup1>
+<aerogel1>w/o</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Aerogel study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>without aerogel
+HV 7 kV</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130526234819</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>144</runno>
+<neve>200910</neve>
+<calibration>No aerogel</calibration>
+<setup1>9</setup1>
+<aerogel1>w/o</aerogel1>
+<mirror>0</mirror>
+<rotation>0 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>other</type1>
+<daqqa1>ok</daqqa1>
+<comment1>without aerogel 
+HV 8.5 kV</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130527114736</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>145</runno>
+<neve>213411</neve>
+<calibration>Mirror study</calibration>
+<setup1>9</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>1</mirror>
+<rotation>30 </rotation>
+<positionx>0</positionx>
+<positiony>0</positiony>
+<type1>Mirror study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>put on flat-mirror
+whole HAPD system is initial state and rotated with 30 
+
+HV 7 kV
+basic-07
+</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130527115547</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>146</runno>
+<neve>216940</neve>
+<calibration>Mirror study</calibration>
+<setup1>9a</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>1</mirror>
+<rotation>30 </rotation>
+<positionx unit="mm">20</positionx>
+<positiony>0</positiony>
+<type1>Mirror study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>whole HAPD system xH move to +2.0 cm
+(the center of ) aerogel holder xA move to -2.0 cm</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130527120028</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>147</runno>
+<neve>231264</neve>
+<calibration>Mirror study</calibration>
+<setup1>9b</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>1</mirror>
+<rotation>30 </rotation>
+<positionx unit="mm">40</positionx>
+<positiony>0</positiony>
+<type1>Mirror study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>xH move to +4.0 cm
+xA move to -4.0 cm</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130527120246</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>148</runno>
+<neve>252025</neve>
+<calibration>Mirror study</calibration>
+<setup1>9c</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>1</mirror>
+<rotation>30 </rotation>
+<positionx unit="mm">58</positionx>
+<positiony>0</positiony>
+<type1>Mirror study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>xH move to +5.8 cm
+xA move to -5.8 cm</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130527120410</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>148</runno>
+<neve>252025</neve>
+<calibration>Mirror study</calibration>
+<setup1>9d</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>1</mirror>
+<rotation>30</rotation>
+<positionx unit="mm">60</positionx>
+<positiony>0</positiony>
+<type1>Mirror study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>[corrected log]
+xH move to +6.0 cm
+xA move to -6.0 cm</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130527120826</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>149</runno>
+<neve>207751</neve>
+<calibration>Mirror study</calibration>
+<setup1>9e</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>1</mirror>
+<rotation>30 </rotation>
+<positionx unit="mm">78</positionx>
+<positiony>0</positiony>
+<type1>Mirror study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>xH move to +7.8 cm
+xA move to -7.8 cm</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130527121016</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>150</runno>
+<neve>218227</neve>
+<calibration>Mirror study</calibration>
+<setup1>9f</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>1</mirror>
+<rotation>30 </rotation>
+<positionx unit="mm">100</positionx>
+<positiony>0</positiony>
+<type1>Mirror study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>xH move to +10.0 cm
+xA move to -10.0 cm</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130527121250</datum>
+</run>
+
+
+<run>
+<author>S.Iwata</author>
+<runno>151</runno>
+<neve>234326</neve>
+<calibration>Mirror study</calibration>
+<setup1>9g</setup1>
+<aerogel1>REM5-5(U), BTR13-5(D)</aerogel1>
+<mirror>1</mirror>
+<rotation>30 </rotation>
+<positionx unit="mm">120</positionx>
+<positiony>0</positiony>
+<type1>Mirror study</type1>
+<daqqa1>ok</daqqa1>
+<comment1>xH move to +12.0 cm
+xA move to -12.0 cm
+MWPC HV are changed</comment1>
+<comment><![CDATA[]]></comment>
+<datum>20130527121552</datum>
+</run>
+
+</Content>
+</DetectorComponent>

@@ -1,0 +1,18 @@
+Import('env')
+
+env['TOOLS_LIBS']['b2klm-execute-masking'] = ['framework',
+                                              'klm', 'klm_dataobjects',
+                                              'stdc++', 
+                                              '$ROOT_LIBS']
+
+env['TOOLS_LIBS']['b2klm-indexToNumber'] = ['framework',
+                                            'klm', 'klm_dataobjects',
+                                            'stdc++', 
+                                            '$ROOT_LIBS']
+
+env['TOOLS_LIBS']['b2klm-numberToIndex'] = ['framework',
+                                            'klm', 'klm_dataobjects',
+                                            'stdc++', 
+                                            '$ROOT_LIBS']
+
+Return('env')

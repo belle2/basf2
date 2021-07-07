@@ -1,0 +1,10 @@
+Import('env')
+
+env['LIBS'] = ['geometry_dbobjects', 'geometry', 'framework']
+
+# check if we have GDML support
+conf = Configure(env)
+if conf.CheckHeader('G4GDMLParser.hh', language="C++"):
+    env.Append(CPPDEFINES="HAS_GDML")
+
+Return('env')

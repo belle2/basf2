@@ -1,0 +1,6 @@
+12100001 | Bu_rho0rho+ | [B+ -> rho0 rho+]cc
+11721000 | Bu_Xulnu=cocktail | [B+ -> Xu0 l+ nu]cc
+12560000 | Bu_D0taunu | [B+ -> anti-D0 tau+ nu_tau]cc
+11100222 | Bd_rho0gamma | [B0 -> rho0 gamma]cc
+12581030 | Bu_Dst0enu | [ B+ -> anti-D*0 e+ nu_e ]cc
+11102400 | Bd_pipipi0=CPV | [B0 -> pi+ pi- pi0]cc

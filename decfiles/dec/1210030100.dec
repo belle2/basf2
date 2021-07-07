@@ -1,0 +1,27 @@
+# EventType: 1210030100
+# Descriptor: [B+ -> [KS0 -> pi+ pi-] pi+]
+# NickName: Bu_Kspi+_Kstopi+pi-
+# Documentation: BtoCharmless Phase 3 data validation studies.
+# Tested:
+# PhysicsWG: BtoCharmless
+# Responsible: Benedikt Wach
+# Email: wach@mpp.mpg.de
+# Cuts: None
+# Date: 20190607
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B+ B-sig VSS;
+Enddecay
+
+Decay B+sig
+1.0 K_S0 pi+ PHOTOS PHSP;
+Enddecay
+CDecay B-sig
+
+Decay K_S0
+1.0 pi+ pi- PHOTOS PHSP;
+Enddecay
+
+End
+

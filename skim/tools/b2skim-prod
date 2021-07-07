@@ -1,0 +1,1098 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+"""\
+.. Note::
+   This tool is intended for use by skim production managers, not by skim liaisons.
+
+``%(prog)s`` is a tool for producing grid production requests in the format required by the
+`production system <https://confluence.desy.de/display/BI/Production+Definition>`_, and
+also generating combined steering files.
+
+YAML files are used by this tool to define the LPNs of datasets. Below are examples of
+valid YAML entries for data and MC. The tool :ref:`lpns2yaml.py<lpns2yaml>` is provided
+to create these YAML files from a list of LPNs.
+
+.. code-block:: yaml
+
+    ## Example of a YAML file for data:
+    proc9_exp3r1:
+        sampleLabel: proc9_exp3  # This label must match a skim sample in TestFiles.yaml
+        LPNPrefix: /belle/Data
+        inputReleaseNumber: release-03-02-02
+        prodNumber: prod00008530
+        inputDBGlobalTag: DB00000654
+        procNumber: proc9
+        experimentNumber: e0003
+        beamEnergy: 4S
+        inputDataLevel: mdst
+        runNumbers:
+            - r02724
+            - r02801
+            - r02802
+
+    proc9_exp3r2:
+        sampleLabel: proc9_exp3
+        LPNPrefix: /belle/Data
+        inputReleaseNumber: release-03-02-02
+        # prodNumber, inputDBGlobalTag, experimentNumber, and runNumbers can be integers
+        prodNumber: 8530
+        inputDBGlobalTag: 654
+        procNumber: proc9
+        experimentNumber: 3
+        beamEnergy: 4S
+        inputDataLevel: mdst
+        runNumbers:
+            - 3237
+            - 3238
+            - 3239
+
+
+    ## Example of a YAML file for MC:
+    MC12b_mixed:
+        sampleLabel: MC12_mixedBGx1
+        LPNPrefix: /belle/MC
+        inputReleaseNumber: release-03-01-00
+        inputDBGlobalTag: DB00000547
+        mcCampaign: MC12b
+        prodNumber: prod00007392
+        experimentNumber: s00/e1003
+        beamEnergy: 4S
+        mcType: mixed
+        mcBackground: BGx1
+        inputDataLevel: mdst
+        runNumber: r00000
+
+    MC12b_charged:
+        sampleLabel: MC12_chargedBGx1
+        LPNPrefix: /belle/MC
+        inputReleaseNumber: release-03-01-00
+        # inputDBGlobalTag, prodNumber, and runNumber can be integers
+        inputDBGlobalTag: 547
+        mcCampaign: MC12b
+        prodNumber:
+            - 7799  # prodNumber can be a list
+            - 7802
+        experimentNumber: s00/e1003
+        beamEnergy: 4S
+        mcType: charged
+        mcBackground: BGx1
+        inputDataLevel: mdst
+        runNumber: 0
+
+To produce JSON files for a list of combined skims, pass this tool the YAML file and the
+names of the skims. The other required arguments include the skim campaign,
+intended release to be used, and base directory of the repository to output the JSON
+files in.
+
+This tool is designed to work with the ``SkimStats.json`` output of
+``b2skim-stats-print`` (see :ref:`testing-skims`). The YAML files can be used to specify
+which sample statistics are to be used for each dataset, with the keyword
+``sampleLabel``---this must match one of the sample labels used by the skim statistics
+tools. ``SkimStats.json`` must be present in the current directory when this tool is
+run.
+
+Production requests cannot be produced without resource usage estimates, so the pipeline
+for producing a production request and combined steering file is as follows:
+
+1. Put together a YAML file defining which single skims comprise each combined skim. For
+   example,
+
+   .. code-block:: yaml
+
+       # contents of CombinedSkims.yaml
+       EWP:
+         - BtoXll
+         - BtoXll_LFV
+         - BtoXgamma
+       Tau:
+         - TauLFV
+         - TauGeneric
+         - TauThrust
+
+2. Pass this combined skim definition to
+   :ref:`b2skim-stats-submit<b2skim-stats-submit>`, and produce JSON output of
+   :ref:`b2skim-stats-print<b2skim-stats-print>`
+
+  .. code-block::
+
+      $ b2skim-stats-submit -c CombinedSkims.yaml EWP Tau
+      # wait for LSF jobs to complete...
+      $ b2skim-stats-print -c EWP Tau -J
+
+3. The output ``SkimStats.json`` can then be used to produce production JSON files for
+   the EWP and Tau combined skims, and will construct a steering files for the specified
+   combined skims.
+
+
+--epilog--
+.. rubric:: Example usage
+
+* Produce requests for EWP and feiSLCombined skims on proc9::
+
+    $ %(prog)s Registry_proc9.yaml SkimStats.json -s EWP feiSLCombined --data -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
+
+* Produce requests for EWP on MC13, with one LPN per JSON file::
+
+    $ %(prog)s Registry_MC13.yaml SkimStats.json -N 1 -s EWP --data -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
+
+* Produce requests for EWP on MC13, using local skim module script::
+
+    $ %(prog)s Registry_MC13.yaml SkimStats.json -N 1 -l ewp_local.py -s EWP --data -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
+"""
+
+import argparse
+from functools import lru_cache
+from itertools import product, zip_longest
+import json
+from pathlib import Path
+import re
+import sys
+import yaml
+
+import jinja2
+
+from basf2 import B2ERROR, B2INFO, B2WARNING, find_file
+from conditions_db import ConditionsDB, encode_name
+from skim import CombinedSkim
+from skim.registry import Registry
+from skim.utils.misc import resolve_skim_modules
+
+
+def read_registry_yaml(sampleRegistryYaml, mc):
+    """Load in the YAML file as a dict. Checks that all expected values
+    present before proceeding.
+
+    Args:
+        sampleRegistryYaml (str): Location of the registry YAML file to read in.
+        mc (bool): Are these JSON files being produced for MC skims?
+
+    Returns:
+        sampleRegistry (dict): The input data/MC registry as a dict.
+
+    .. note::
+
+        The YAML file needs to contain certain values for this to work. The
+        top-level names are used throughout this script as labels for each set
+        of data/MC. The key "sampleLabel" must correspond to a sample label used
+        in `b2skim-stats-print`, so that the performance statistics can be
+        retrieved from ``SkimStats.json``. The remaining keys are used to
+        construct the LPNs of the input datasets.
+    """
+    with open(sampleRegistryYaml) as sampleRegistryFile:
+        sampleRegistry = yaml.safe_load(sampleRegistryFile)
+
+    verify_registry(sampleRegistry, mc)
+
+    return sampleRegistry
+
+
+@lru_cache()
+def get_skim_stats_dict(SkimStatsJson):
+    """Read in the JSON output of ``b2skim-stats-print`` into a dict.
+
+    Parameters:
+        SkimStatsJson (str): Path to the JSON output of `b2skim-stats-print`.
+
+    Returns:
+        skimStats (dict): A dict containing the tested skim statistics.
+        CombinedSkimDefinitions (dict(list)): A data structure defining which single
+            skims are included in each combined skim.
+    """
+    with open(SkimStatsJson) as skimStatsFile:
+        JSONContents = json.load(skimStatsFile)
+
+    skimStats = JSONContents["stats"]
+    CombinedSkimDefinitions = JSONContents.get("CombinedSkims", {})
+
+    return skimStats, CombinedSkimDefinitions
+
+
+def verify_registry(sampleRegistry, mc):
+    """Check that the registry contains all the values that are expected. If a
+    value is missing, print an error and exit.
+
+    Args:
+        sampleRegistry (dict): The input data/MC registry as a dict.
+        mc (bool): Are these JSON files being produced for MC skims?
+    """
+    expectedMCEntries = [
+        "sampleLabel",
+        "LPNPrefix",
+        "inputReleaseNumber",
+        "inputDBGlobalTag",
+        "mcCampaign",
+        "prodNumber",
+        "experimentNumber",
+        "beamEnergy",
+        "inputDataLevel",
+        "mcType",
+        "mcBackground",
+        "runNumber",
+    ]
+    expectedDataEntries = [
+        "LPNPrefix",
+        "inputReleaseNumber",
+        "inputDBGlobalTag",
+        "procNumber",
+        "prodNumber",
+        "experimentNumber",
+        "beamEnergy",
+        "inputDataLevel",
+        "runNumbers",
+    ]
+
+    missingEntries = []
+    if mc:
+        missingEntries = [
+            (sampleLabel, expectedEntry)
+            for (sampleLabel, sampleInfo) in sampleRegistry.items()
+            for expectedEntry in expectedMCEntries
+            if expectedEntry not in sampleInfo.keys()
+        ]
+    else:
+        missingEntries = [
+            (sampleLabel, expectedEntry)
+            for (sampleLabel, sampleInfo) in sampleRegistry.items()
+            for expectedEntry in expectedDataEntries
+            if expectedEntry not in sampleInfo.keys()
+        ]
+
+    if missingEntries:
+        for sampleLabel, missingEntry in missingEntries:
+            B2ERROR(f"Missing entry {missingEntry} for registry entry {sampleLabel}.")
+        sys.exit(1)
+
+
+def verify_stats_dict(args, sampleRegistry, skimStatsDict):
+    """Verify that the required statistics are present in the stats dict. If any
+    issues are found, print an error and exit.
+
+    Args:
+        args (argparse.ArgumentParser): An argparser expected to contain values for
+            campaign name and list of skims. Can also be any object which has these as
+            attributes.
+        sampleRegistry (dict): The input data/MC registry as a dict.
+        skimStatsDict (dict): A dict containing the tested skim statistics.
+    """
+    skims = args.skims
+    statistics = ["cpuTimePerEvent", "udstSizePerInputEvent"]
+    sampleLabels = [sampleInfo["sampleLabel"] for sampleInfo in sampleRegistry.values()]
+
+    # Verify that all the requested skims have statistics listed
+    missingSkims = [skim for skim in skims if skim not in skimStatsDict.keys()]
+    if missingSkims:
+        for missingSkim in missingSkims:
+            B2ERROR(
+                f"Cannot find stats for {missingSkim} skim in skim stats JSON file.\n"
+                "          Perhaps you misspelled it or forgot to produce the\n"
+                "          stats with `b2skim-stats-print`?"
+            )
+        sys.exit(1)
+
+    # Verify that all the requested samples were tested, and returned non-None values.
+    # Try to access the values bit-by-bit, so that the exact problem can be printed out.
+    for skim, statistic, sampleLabel in product(skims, statistics, sampleLabels):
+        try:
+            singleSkimStatsDict = skimStatsDict[skim]
+        except KeyError:
+            B2ERROR(
+                f"Stats for {skim} skim could not be found in skim stats JSON file. "
+                "Perhaps you forgot to print the stats for this skim?"
+            )
+            sys.exit(1)
+
+        try:
+            statDict = singleSkimStatsDict[statistic]
+        except KeyError:
+            B2ERROR(
+                f"No entry found for {statistic} for {skim} skim in input stats JSON "
+                "file."
+            )
+            sys.exit(1)
+
+        try:
+            statValue = statDict[sampleLabel]
+            if statValue is None:
+                B2ERROR(
+                    f"The value for {statistic} for {skim} skim on {sampleLabel} sample"
+                    "is `None`! This value is required for the produced JSON files."
+                )
+                sys.exit(1)
+        except KeyError:
+            # Make a list of all available sample labels that can be used
+            AllSampleLabels = {
+                sampleLabel
+                for stat in statistics
+                for sampleLabel in skimStatsDict[skim][stat]
+            }
+            SampleLabelString = "    - " + "\n    - ".join(sorted(AllSampleLabels))
+
+            B2ERROR(
+                f"One or more of the blocks in {args.sampleRegistryYaml} has a "
+                f"'sampleLabel' of '{sampleLabel}', but this does not correspond to any"
+                f" of the sample labels in {args.SkimStatsJson}\n\n"
+                "To solve this, either:\n"
+                f" a) produce stats for the sample '{sampleLabel}' and retry "
+                "b2skim-prod with the resulting stats JSON file, or\n"
+                f" b) change the sampleLabel values in {args.sampleRegistryYaml} to match "
+                f"the existing labels:\n{SampleLabelString}"
+            )
+            sys.exit(1)
+
+
+def group_iterable(iterable, GroupSize):
+    """Produce an iterator of iterators, where the individual iterators have a maximum
+    length `GroupSize`.
+
+    If, say, `GroupSize` is 10, and there are 35 elements in `iterable`, then the sublists
+    will contain, respectively, 10, 10, 10, and 5 elements.
+
+    Args:
+        iterable (list): List of values to be chunked into sublists.
+        GroupSize (int): Size of individual iterators.
+
+    Returns:
+        IteratorIterable (list(list)): A list containing all the same elements as the
+            original `iterable`, but reorganised into lists of a capped length.
+    """
+    args = [iter(iterable)] * GroupSize
+    IteratorIterable = [
+        [element for element in sublist if element is not None]
+        for sublist in zip_longest(*args)
+    ]
+    return IteratorIterable
+
+
+def get_base_directory(args):
+    """Read the output base directory from the argparse arguments, and return
+    that location as a `pathlib.Path` object. Checks that the given directory
+    exists, and will print an error and exits if it is not.
+
+    Args:
+        args (argparse.ArgumentParser): An argument parser assumed to have the
+            attribute `output_base_directory`.
+
+    Returns:
+        baseDirectory (pathlib.Path): The path of the base directory.
+    """
+    baseDirectory = Path(args.output_base_directory)
+    if baseDirectory.is_dir():
+        return baseDirectory
+    else:
+        B2ERROR(f"{args.output_base_directory} is not an existing directory.")
+        sys.exit(1)
+
+
+def get_output_directory(args, sampleRegistry):
+    """Construct the output directory for the JSON files based on the given base
+    directory.
+
+    Args:
+        args (argparse.ArgumentParser): An argument parser assumed to have the
+            attributes `output_base_directory` and `release`.
+        sampleRegistry (dict): The input data/MC registry as a dict.
+
+    Returns:
+        outputDirectory (pathlib.Path): The directory to write the JSON files into.
+    """
+    baseDirectory = get_base_directory(args)
+    DBGlobalTag = get_DBGlobalTag_argparse_wrapper(args.release, args.DBGlobalTagRelease)
+    beamEnergy = get_beam_energy_from_registry(sampleRegistry)
+
+    return Path(baseDirectory, "skim", args.campaign, args.release, DBGlobalTag, beamEnergy)
+
+
+def get_lpn_list(sampleInfo, mc):
+    """Construct the list of LPNs of a set of samples in the sample registry.
+
+    Args:
+        sampleInfo (dict): Dict of the sample registry. Registry format is
+            explained in documentation of `read_registry_yaml`.
+        mc (bool): Are these JSON files being produced for MC skims?
+
+    Returns:
+        LPNList (list): List of LPNs to be used for this set of jobs.
+    """
+    if mc:
+        # Allow looping over prod numbers
+        if isinstance(sampleInfo["prodNumber"], list):
+            prodNumbers = sampleInfo["prodNumber"]
+        else:
+            prodNumbers = [sampleInfo["prodNumber"]]
+
+        # Allow prod numbers, run number and database global tag ID to just be
+        # numbers in YAML file (without *e.g.* prod0000 at start). This will pad each
+        # number with the correct number of zeros, and add the correct letters at the
+        # front.
+
+        # Allow prod numbers, run numbers and database global tag ID to just be numbers
+        # in YAML file (without *e.g.* prod00.. at start). This will pad a number with
+        # the correct number of zeros, and add the correct letters at the front.
+        prodNumbers = [
+            str(n) if str(n).startswith("prod") else "prod" + str(n).zfill(8)
+            for n in prodNumbers
+        ]
+
+        if not str(sampleInfo["inputDBGlobalTag"]).startswith("DB"):
+            sampleInfo["inputDBGlobalTag"] = "DB" + str(
+                sampleInfo["inputDBGlobalTag"]
+            ).zfill(8)
+
+        if not str(sampleInfo["runNumber"]).startswith("r"):
+            sampleInfo["runNumber"] = "r" + str(sampleInfo["runNumber"]).zfill(5)
+
+        LPNList = [
+            str(
+                Path(
+                    sampleInfo["LPNPrefix"],
+                    sampleInfo["inputReleaseNumber"],
+                    sampleInfo["inputDBGlobalTag"],
+                    sampleInfo["mcCampaign"],
+                    prodNumber,
+                    sampleInfo["experimentNumber"],
+                    sampleInfo["beamEnergy"],
+                    sampleInfo["runNumber"],
+                    sampleInfo["mcType"],
+                    sampleInfo["inputDataLevel"],
+                )
+            )
+            for prodNumber in prodNumbers
+        ]
+    else:
+        # Allow prod number, experiment number, run numbers and database global tag ID
+        # to just be numbers in YAML file (without *e.g.* prod0000 at start). This will
+        # pad each number with the correct number of zeros, and add the correct letters
+        # at the front.
+        if not str(sampleInfo["prodNumber"]).startswith("prod"):
+            sampleInfo["prodNumber"] = "prod" + str(sampleInfo["prodNumber"]).zfill(8)
+
+        if not str(sampleInfo["inputDBGlobalTag"]).startswith("DB"):
+            sampleInfo["inputDBGlobalTag"] = "DB" + str(
+                sampleInfo["inputDBGlobalTag"]
+            ).zfill(8)
+
+        if not str(sampleInfo["experimentNumber"]).startswith("e"):
+            sampleInfo["experimentNumber"] = "e" + str(
+                sampleInfo["experimentNumber"]
+            ).zfill(4)
+
+        sampleInfo["runNumbers"] = [
+            str(n) if str(n).startswith("r") else "r" + str(n).zfill(5)
+            for n in sampleInfo["runNumbers"]
+        ]
+
+        LPNList = [
+            str(
+                Path(
+                    sampleInfo["LPNPrefix"],
+                    sampleInfo["inputReleaseNumber"],
+                    sampleInfo["inputDBGlobalTag"],
+                    sampleInfo["procNumber"],
+                    sampleInfo["prodNumber"],
+                    sampleInfo["experimentNumber"],
+                    sampleInfo["beamEnergy"],
+                    run,
+                    # For backward compatibility, allow 'generalSkimName' to be missing
+                    # from block in input YAML file
+                    *(
+                        (sampleInfo["generalSkimName"], sampleInfo["inputDataLevel"])
+                        if "generalSkimName" in sampleInfo
+                        else (sampleInfo["inputDataLevel"],)
+                    )
+                )
+            )
+            for run in sampleInfo["runNumbers"]
+        ]
+
+    return LPNList
+
+
+@lru_cache()
+def get_DBGlobalTag(releaseNumber, try_earlier=True):
+    """Query the conditions database for the global tag to be used with a release.
+    This function will look for global tags associated with all releases between
+    the given release and the latest major release prior to it.
+
+    * If only one global tag is used, then that is returned.
+
+    * If more than one global tag is found, then the user ir prompted to select
+      the one they want to use.
+
+    * If no global tags are found, then an error is printed, and the script exits.
+
+    Args:
+        releaseNumber (str): The label of the release being used for the skims.
+        try_earlier (bool): Count back releases to last major release. If False, only
+            try the release passed, and return a ``RuntimeError`` if no associated
+            global tag is found.
+
+    Returns:
+        DBGlobalTag (str): the database global tag, in the format DBxxxxxxxx.
+    """
+    db = ConditionsDB()
+
+    if not try_earlier:
+        try:
+            # Only try the exact release passed
+            req = db.request("GET", f"/globalTag/{encode_name(releaseNumber)}")
+            globalTagID = req.json()["globalTagId"]
+            return "DB" + str(globalTagID).zfill(8)
+        except ConditionsDB.RequestError as e:
+            raise RuntimeError(f"Could not find global tag for {releaseNumber}.") from e
+
+    r = re.compile("^release(-[0-9]{2}){3}$")
+    if not r.match(releaseNumber):
+        B2ERROR("Release number must be of the form 'release-XX-XX-XX'.")
+        sys.exit(1)
+
+    initialReleaseNumber = releaseNumber  # noqa F841
+
+    _, majorNumber, minorNumber, patchNumber = releaseNumber.split("-")
+    patchNumber = int(patchNumber)
+    minorNumber = int(minorNumber)
+
+    globalTags = []
+
+    while minorNumber >= 0:
+        releaseNumber = (
+            f"release-{majorNumber}-{str(minorNumber).zfill(2)}-"
+            f"{str(patchNumber).zfill(2)}"
+        )
+
+        try:
+            req = db.request("GET", f"/globalTag/{encode_name(releaseNumber)}")
+            globalTagID = req.json()["globalTagId"]
+
+            DBGlobalTag = "DB" + str(globalTagID).zfill(8)
+
+            globalTags.append((DBGlobalTag, releaseNumber))
+
+        except ConditionsDB.RequestError:
+            # B2WARNING(f"Could not find global tag for {releaseNumber}.")
+            pass
+
+        if patchNumber == 0:
+            # Decrease minor release number, set patch release number to 5
+            # (can be set higher to check for more patch releases)
+            minorNumber -= 1
+            patchNumber = 5
+        else:
+            patchNumber -= 1
+
+    if len(globalTags) == 1:
+        # If only one available, use that
+        DBGlobalTag, releaseNumber = globalTags[0]
+        B2INFO(
+            f"Using conditions database global tag {DBGlobalTag} for {releaseNumber}."
+        )
+        return DBGlobalTag
+
+    elif len(globalTags) >= 1:
+        # If multiple available, ask user what they want
+        nGlobalTags = len(globalTags)
+        B2INFO(
+            "Multiple conditions database global tags found.\n"
+            f"Please select (one of 1--{nGlobalTags})."
+        )
+        for iGlobalTag, (DBGlobalTag, releaseNumber) in enumerate(globalTags):
+            print(f"  [{iGlobalTag+1}] {releaseNumber}: {DBGlobalTag}")
+
+        # Wait for user to select a global tag
+        while True:
+            selection = input()
+            try:
+                selection = int(selection) - 1
+            except ValueError:
+                pass
+
+            if selection in range(nGlobalTags):
+                break
+
+        DBGlobalTag, releaseNumber = globalTags[selection]
+        B2INFO(
+            f"Using conditions database global tag {DBGlobalTag} for {releaseNumber}."
+        )
+        return DBGlobalTag
+
+    else:
+        # If none available, throw an error
+        B2ERROR(
+            "Could not find any conditions database global tags for releases between\n"
+            f"release-{majorNumber}-{minorNumber}-00 and {initialReleaseNumber}."
+        )
+        sys.exit(1)
+
+
+def get_DBGlobalTag_argparse_wrapper(releaseNumber, DBGlobalTagRelease):
+    """Wrapper around get_DBGlobalTag to parse release and DBGlobalTagRelease arguments."""
+
+    if DBGlobalTagRelease:
+        return get_DBGlobalTag(DBGlobalTagRelease, try_earlier=False)
+
+    return get_DBGlobalTag(releaseNumber)
+
+
+def get_beam_energy_from_registry(sampleRegistry):
+    """Read the input YAML file and retrieve the list of beam energies. Check
+    for whether more than one beam energy is listed in the registry. Prints an
+    error and exits if this is the case.
+
+    Args:
+        sampleRegistry (dict): The input data registry as a dict.
+
+    Returns:
+        beamEnergy (str): The beam energy as listed in the registry.
+    """
+    beamEnergies = [prod["beamEnergy"] for prod in sampleRegistry.values()]
+    uniqueBeamEnergies = set(beamEnergies)
+
+    if len(uniqueBeamEnergies) == 1:
+        return list(uniqueBeamEnergies)[0]
+    else:
+        B2ERROR("More than one beam energy listed in input YAML file!")
+        sys.exit(1)
+
+
+def strip_campaign(label):
+    """Remove anything that looks like an MC campaign from the beginning of a label.
+    This function could be extended to also strip "procX" or "bucketY" from labels.
+
+    Args:
+        label (str): A sample label.
+
+    Returns:
+        labelWithoutCampaign (str): The same sample label, but without the MC campaign
+            at the beginning.
+    """
+    # This regex makes the following replacements:
+    #   MC13a_ccbar --> ccbar
+    #   M13_ccbar   --> ccbar
+    #   M13b_ccbar  --> ccbar
+    #   MC12ccbar   --> ccbar
+    #   MC11accbar  --> accbar (will not remove the 'a' in this case)
+    MCCampaignRegex = r"^MC?[0-9]{2}(_|[a-z]_)?"
+    return re.sub(MCCampaignRegex, "", label)
+
+
+def get_skim_output_datalevel(skim):
+    func = Registry.get_skim_function(skim)
+    return "mdst" if func.produces_mdst_by_default else "udst"
+
+
+def get_individual_skims(SkimName, CombinedSkimDefinitions):
+    """
+    Resolve ``SkimName`` into a list of individual skims.
+
+    If ``SkimName`` exists as a skim name in the registry, assume that that is what we
+    want. Otherwise, retrieve the list of individual skims from
+    ``CombinedSkimDefinitions``.
+    """
+    if SkimName in Registry.names:
+        SingleSkims = [SkimName]
+    else:
+        SingleSkims = CombinedSkimDefinitions[SkimName]
+
+    return SingleSkims
+
+
+def produce_on_tau_samples(skims):
+    """
+    Determine whether the combined skim should be produced on taupair samples, based on
+    the values of `BaseSkim.produce_on_tau_samples`. The values of
+    `BaseSkim.produce_on_tau_samples` must be either all True or all False.
+
+    Parameters:
+        skims (list(str)): List of skim names in combined skim.
+
+    Returns:
+        ProduceOnTau (bool): True if combined skim should be produced on taupair samples.
+    """
+    # Create the CombinedSkim object, and try to access produce_on_tau_samples.
+    # If the skims contain a mix of True and False, then the CombinedSkim method will
+    # raise a ValueError, and the user will be made aware of the problem.
+    SkimObject = CombinedSkim(*[Registry.get_skim_function(skim)() for skim in skims])
+    return SkimObject.produce_on_tau_samples
+
+
+def make_data_description_block(skims, sampleInfo):
+    DataDescription = []
+    GeneralSkim = sampleInfo.get("generalSkimName", None)
+
+    for skim in skims:
+        DescriptionDict = {
+            "": skim,
+            "SkimDecayMode": Registry.encode_skim_name(skim),
+            "DataLevel": get_skim_output_datalevel(skim),
+        }
+
+        if GeneralSkim is not None:
+            DescriptionDict["GeneralSkimName"] = GeneralSkim
+        DataDescription.append(DescriptionDict)
+
+    return DataDescription
+
+
+def warn_local_script(args):
+    """If a local script is given print a warning that a local script will be used.
+
+    Args:
+        args (argparse.ArgumentParser): An argparser expected to contain values
+            `mc`,
+    """
+    if not args.local_skim_script:
+        return
+
+    if args.mc:
+        dataOrMC = "MC"
+    else:
+        dataOrMC = "data"
+
+    skimScript = args.local_skim_script
+    if not skimScript.endswith(".py"):
+        skimScript += ".py"
+
+    localScriptDirectory = str(
+        Path(dataOrMC, args.campaign, args.release, "SkimScripts")
+    )
+
+    for skimName in args.skims:
+        B2WARNING(
+            f"Using local skim script! Please make sure to place sandbox file {skimScript}\n"
+            f"          in {Path(args.output_base_directory, localScriptDirectory).resolve()}"
+        )
+
+
+def make_combined_steering_file(
+    SkimName, CombinedSkimDefinitions, SteeringFileDirectory, mc, LocalModule=None,
+):
+    """Construct a steering file for the requested combined skim."""
+    SteeringFileDirectory = Path(SteeringFileDirectory)
+    SteeringFileDirectory.mkdir(parents=True, exist_ok=True)
+    SteeringFile = SteeringFileDirectory / f"{SkimName}_Skim.py"
+
+    SingleSkims = get_individual_skims(SkimName, CombinedSkimDefinitions)
+
+    try:
+        skims, modules = resolve_skim_modules(SingleSkims, LocalModule=LocalModule)
+    except ValueError:
+        B2ERROR(
+            f"Local module {LocalModule} specified, but combined skim {SkimName} uses\n"
+            "        more than one skim module. Not sure what to do in this situation, so \n"
+            f"        please modify {SteeringFile} yourself."
+        )
+        skims, modules = resolve_skim_modules(SingleSkims)
+
+    loader = jinja2.FileSystemLoader(find_file("skim/tools/resources"))
+    env = jinja2.Environment(loader=loader)
+    env.lstrip_blocks = True
+
+    template = env.get_template("skim_steering_file_template.jinja2")
+    CodeString = template.render(
+        skims=skims,
+        modules=modules,
+        data=(not mc),
+        stats=False,
+        hints=False,
+        mdstOutput=False,
+        backward_compatibility=True,
+    )
+
+    with open(SteeringFile, "w") as f:
+        f.write(CodeString)
+
+    B2INFO(f"Steering file for {SkimName} combined skim written to {SteeringFile}")
+
+
+def make_request_dict(
+    args, sampleRegistry, skimName, sampleLabel, LPNList, LPNBlockIdentifier=None,
+):
+    """Construct a dict for one skim and one set of data. Dict contains all the
+    required fields for skim production.
+
+    Args:
+        args (argparse.ArgumentParser): An argparser expected to contain values for
+            campaign name and list of skims. Can also be any object which has these as
+            attributes.
+        sampleRegistry (dict): The input data registry as a dict.
+        skimName (str): The name of the combined group of skims (*e.g.* feiSLCombined, BtoCharm).
+        sampleLabel (str): Label in the registry for group of data in this job.
+        LPNList (list): List of LPNs to include in the JSON file.
+        LPNBlockIdentifier (str): Extra identifier to be appended to filenames and prod
+            names to make sure they are unique.
+
+    Returns:
+        skimRequestDict (dict): A dict ready to be saved as a JSON file.
+    """
+    sampleInfo = sampleRegistry[sampleLabel]
+    # Get label used by `b2skim-stats-print`
+    statsSampleLabel = sampleInfo["sampleLabel"]
+
+    # Append the identifier if we need to
+    if LPNBlockIdentifier:
+        sampleLabel += LPNBlockIdentifier
+
+    skimStatsDict, CombinedSkimDefinitions = get_skim_stats_dict(args.SkimStatsJson)
+    verify_stats_dict(args, sampleRegistry, skimStatsDict)
+
+    individualSkims = get_individual_skims(skimName, CombinedSkimDefinitions)
+
+    if args.mc:
+        fabricationType = "MCSkim"
+        LPNPrefix = "/belle/MC"
+    else:
+        fabricationType = "DataSkim"
+        LPNPrefix = "/belle/Data"
+
+    SkimScriptsDirectory = f"skim/{args.campaign}/{args.release}/SkimScripts"
+    skimRequestDict = {
+        "FabricationType": fabricationType,
+        "ProductionName": f"{args.campaign}_{skimName}_{strip_campaign(sampleLabel)}",
+        "ProductionGroup": "skim",
+        "Description": f"{args.campaign} {skimName} skim on {sampleLabel}.",
+        "Release": args.release,
+        "DBGlobalTag": get_DBGlobalTag_argparse_wrapper(args.release, args.DBGlobalTagRelease),
+        "Campaign": args.campaign,
+        "BeamEnergy": get_beam_energy_from_registry(sampleRegistry),
+        "TargetFileSize": 1024,
+        "ExpectedEventCPUTime": (
+            skimStatsDict[skimName]["HS06TimePerEvent"][statsSampleLabel]
+        ),
+        "ExpectedEventSize": (
+            skimStatsDict[skimName]["udstSizePerInputEvent"][statsSampleLabel]
+        ),
+        "InputSandboxFilePrefix": SkimScriptsDirectory,
+        "InputData": LPNList,
+        "Priority": 8,
+        "SteeringFile": f"{skimName}_Skim.py",
+        "SteeringFilePrefix": SkimScriptsDirectory,
+        "LPNPrefix": LPNPrefix,
+        "DataDescription": make_data_description_block(individualSkims, sampleInfo)
+    }
+
+    # We only want the MCEventType to include the beam background level if the sample is BGx0
+    if args.mc:
+        skimRequestDict["MCEventType"] = sampleInfo["mcType"].rstrip("BGx1")
+        if sampleInfo["mcBackground"] == "BGx0" and not sampleInfo["mcType"].endswith(
+            "BGx0"
+        ):
+            skimRequestDict["MCEventType"] += "BGx0"
+
+    if args.local_skim_script:
+        # Read in the name of the local skim module from the arguments
+        skimScript = args.local_skim_script
+        if not skimScript.endswith(".py"):
+            skimScript += ".py"
+
+        skimRequestDict["InputSandboxFile"] = [skimScript]
+        skimRequestDict["InputSandboxFilePrefix"] = SkimScriptsDirectory
+
+    return skimRequestDict
+
+
+def write_json_files(sampleRegistry, args, outputDirectory):
+    """Generate the dicts for each skim and registry entry, and write each to its own JSON file.
+
+    Args:
+        sampleRegistry (dict): The input data registry as a dict.
+        args (argparse.ArgumentParser): An argparser expected to contain values for
+            campaign name and list of skims.
+        outputDirectory (pathlib.Path, str): The location to save the JSON files.
+    """
+
+    if args.lpns_per_json:
+        B2INFO(
+            f"Producing JSON files with {args.lpns_per_json} "
+            f"LPN{'s'*(args.lpns_per_json>1)} per JSON file."
+        )
+
+    for skimName in args.skims:
+        _, CombinedSkimDefinitions = get_skim_stats_dict(args.SkimStatsJson)
+        SteeringFileDirectory = Path(
+            get_base_directory(args), "skim", args.campaign, args.release, "SkimScripts"
+        )
+        make_combined_steering_file(
+            skimName,
+            CombinedSkimDefinitions,
+            SteeringFileDirectory,
+            mc=args.mc,
+            LocalModule=args.local_skim_script,
+        )
+
+        for sampleLabel, sampleInfo in sampleRegistry.items():
+            # Skip taupair sample if the combined skim is not to be produced on taupair
+            if (
+                    "taupair" in sampleLabel and
+                    not produce_on_tau_samples(
+                        get_individual_skims(skimName, CombinedSkimDefinitions)
+                    )
+            ):
+                continue
+
+            SampleLPNList = get_lpn_list(sampleInfo, args.mc)
+
+            # Make a list of LPN lists so that we can optionally have a maximum number
+            # of LPNs per JSON file.
+            if args.lpns_per_json:
+                LPNLists = group_iterable(SampleLPNList, args.lpns_per_json)
+            else:
+                LPNLists = [SampleLPNList]
+
+            # MC campaign number is likely already in skim campaign name, so don't include it in sample label
+            sampleLabelForFilename = strip_campaign(sampleLabel)
+
+            for LPNBlockNumber, LPNList in enumerate(LPNLists):
+
+                # If we have broken up the LPNs into some number per JSON file, then we
+                # need to add some more letters and numbers to keep our prod names and
+                # filenames unique.
+                if args.lpns_per_json:
+                    LPNBlockIdentifier = (
+                        f"_b{LPNBlockNumber + args.StartingBatchNumber}"
+                    )
+                    outputFileName = f"{args.campaign}_{skimName}_{sampleLabelForFilename}{LPNBlockIdentifier}.json"
+                elif args.StartingBatchNumber > 1:
+                    LPNBlockIdentifier = f"_b{args.StartingBatchNumber}"
+                    outputFileName = f"{args.campaign}_{skimName}_{sampleLabelForFilename}{LPNBlockIdentifier}.json"
+                else:
+                    LPNBlockIdentifier = ""
+                    outputFileName = (
+                        f"{args.campaign}_{skimName}_{sampleLabelForFilename}.json"
+                    )
+
+                outputFilePath = Path(outputDirectory, outputFileName)
+
+                skimRequestDict = make_request_dict(
+                    args,
+                    sampleRegistry,
+                    skimName,
+                    sampleLabel,
+                    LPNList,
+                    LPNBlockIdentifier,
+                )
+
+                # NOTE: commented out, because it's noisy and a tad useless
+                # if outputFilePath.exists():
+                #     B2WARNING(f"Overwriting {outputFilePath}")
+                with open(outputFilePath, "w") as outputFile:
+                    json.dump(skimRequestDict, outputFile, indent=4)
+
+
+def get_argument_parser():
+    """Define the argument parser.
+
+    Returns:
+        parser (argparse.ArgumentParser): A parser which defines the skim
+            campaign, release number, and starting prod number.
+    """
+    description, epilog = __doc__.split("--epilog--")
+    parser = argparse.ArgumentParser(
+        description=description,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=epilog,
+    )
+
+    parser.add_argument(
+        "sampleRegistryYaml",
+        help="YAML file defining the samples produce JSON files for.",
+    )
+    parser.add_argument(
+        "SkimStatsJson", help="The JSON output file of b2skim-stats-print.",
+    )
+    parser.add_argument(
+        "-s",
+        "--skims",
+        required=True,
+        nargs="+",
+        metavar="CombinedSkim",
+        help="List of skims to produce request files for."
+    )
+    parser.add_argument(
+        "-o",
+        "--output-base-directory",
+        required=True,
+        help="Base directory for output. "
+        "This should be the base directory of the ``B2P/MC`` or ``B2P/data`` repo.",
+    )
+    parser.add_argument(
+        "-c",
+        "--campaign",
+        required=True,
+        help="Name of the campaign, *e.g.* SKIMDATAx1.",
+    )
+    parser.add_argument(
+        "-r",
+        "--release",
+        required=True,
+        help="The basf2 to release to be used, *e.g.* release-04-00-03.",
+    )
+    parser.add_argument(
+        "--DBGlobalTagRelease",
+        help=(
+            "Release number to use associated DB global tag for. If provided, the "
+            "script will try to find the global tag and raise an error if none is "
+            "found. Otherwise, a range of global tags will be searched for, and the "
+            "user will be presented with a prompt to select the one they want."
+        ),
+    )
+    parser.add_argument(
+        "-l",
+        "--local-skim-script",
+        help="File name of the local skim script to use, if any. *e.g.* ``ewp_local.py``. "
+        "Should not include any path before the file name.",
+    )
+    parser.add_argument(
+        "-N",
+        "--lpns-per-json",
+        type=int,
+        help="Restrict number of LPNs in each JSON file to given number.",
+    )
+    parser.add_argument(
+        "-b",
+        "--starting-batch-number",
+        default=1,
+        type=int,
+        dest="StartingBatchNumber",
+        help="Starting number to count from for batch label appended to prod names.",
+    )
+
+    mcDataGroup = parser.add_mutually_exclusive_group(required=True)
+    mcDataGroup.add_argument(
+        "--mc", "--MC", action="store_true", help="Produce JSON files for MC."
+    )
+    mcDataGroup.add_argument(
+        "--data", "--Data", action="store_true", help="Produce JSON files for data."
+    )
+
+    return parser
+
+
+def main():
+    """Reads in the YAML file, and creates the JSON files."""
+    parser = get_argument_parser()
+    args = parser.parse_args()
+
+    sampleRegistry = read_registry_yaml(args.sampleRegistryYaml, args.mc)
+
+    outputDirectory = get_output_directory(args, sampleRegistry)
+    outputDirectory.mkdir(parents=True, exist_ok=True)
+
+    write_json_files(sampleRegistry, args, outputDirectory)
+
+    warn_local_script(args)
+    SampleString = "".join([f"\n        - {s}" for s in sampleRegistry.keys()])
+    B2INFO(
+        f"Successfully generated {', '.join(args.skims)} JSON files for samples: {SampleString}"
+    )
+    B2INFO(f"The JSON files were saved to {outputDirectory}")
+
+
+if __name__ == "__main__":
+    main()

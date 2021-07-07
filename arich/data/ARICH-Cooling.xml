@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coolingPipe desc="Parameters of cooling system">
+  <cooling desc="Parameters of cooling system">
+    <material desc="Material of cooling pipe">SUS316LTP-S</material>
+    <Rmin desc="Size of cooling system pipe : inner radius" unit="mm">2.2</Rmin>
+    <Rmax desc="Size of cooling system pipe : outer radius" unit="mm">3.2</Rmax>
+    <!-- cooling system object geometry ID -->
+    <!-- 1 -> G4Tubs  -->
+    <!-- 2 -> G4Torus -->
+    <coolingGeometryID>
+      2 2 1 1 1 2 2 1 1 1 2 2 1 1 1 2 2 1 1 1 2 2 1 1 1 2 2 1 1 1
+    </coolingGeometryID>
+    <!-- Lengs of the cooling system object with geometry ID -->
+    <coolingL>
+      718.274 823.603 172 249 421 718.274 823.603 172 249 421 718.274 823.603 172 249 421 718.274 823.603 172 249 421 718.274 823.603 172 249 421 718.274 823.603 172 249 421
+    </coolingL>
+    <!-- Azimuthal angle of the cooling system object center in polar coordinate system in deg -->
+    <coolingPosPhi>
+      30 27.7013 0.287129 55.023 59.7074 90 92.2987 119.713 64.977 60.2926 150 152.299 179.713 124.977 120.293 210 207.701 180.287 235.023 239.707 270 272.299 299.713 244.977 240.293 330 332.299 359.713 304.977 300.293
+    </coolingPosPhi>
+    <!-- Radial distance (r, pho) of the cooling system object center in polar coordinate system in deg -->
+    <coolingPosR>
+      705 877 791 1006.5 920.5 705 877 791 1006.5 920.5 705 877 791 1006.5 920.5 705 877 791 1006.5 920.5 705 877 791 1006.5 920.5 705 877 791 1006.5 920.5
+    </coolingPosR>
+    <!-- Azimuthal angle of rotation aroud Z - axis of the cooling system object in polar coordinate system in deg -->
+    <coolinRotationAngle>
+      30 27.7013 0.287129 55.023 59.7074 90 92.2987 119.713 64.977 60.2926 150 152.299 179.713 124.977 120.293 210 207.701 180.287 235.023 239.707 270 272.299 299.713 244.977 240.293 330 332.299 359.713 304.977 300.293
+    </coolinRotationAngle>
+  </cooling>
+  <coolingEnvelope desc="Parameters of cooling system assembly envelope">
+    <!-- Detector support plate + 4 mm -->
+    <outerRadius desc="Outer radius of cooling system assembly envelope" unit="mm">1136</outerRadius>
+    <!-- Same as detector support plate -->
+    <innerRadius desc="Inner radius of cooling system assembly envelope" unit="mm">435</innerRadius>
+    <!-- The assembly envelope 0.5 mm thicker than merger PCB -->
+    <thickness desc="Thickness of cooling system assembly envelope" unit="mm">7</thickness>
+    <x0 desc="x0 of the cooling system assembly envelope center" unit="mm">0</x0>
+    <y0 desc="y0 of the cooling system assembly envelope center" unit="mm">0</y0>
+    <!--            263.75 +                      2.5/2.0 +                       7.0/2.0 + 0.5 = 269.0 -->
+    <!-- mergerEnvelope.z0 + mergerEnvelope.thickness/2.0 + coolingEnvelope.thickness/2.0 + 0.5 -->
+    <!-- We need to subtract half length of the ARICH envelope since we define position within ARICH envelope frame -->
+    <!-- 269.0 - 280/2 = 129.0 -->
+    <z0 desc="z0 of the cooling system assembly envelope center" unit="mm">129.0</z0>
+  </coolingEnvelope>
+  <coolingTestPlate desc="Parameters of cooling test plates">
+    <!-- Please note that ARICH detector envelope does not have enough 
+	 space for 8 mm thick cooling test plate (5.5 mm is only available). 
+	 For this reason the material assigned to the volume (aluminum, copper) 
+	 will have a bigger dencity for effective descrption of the material. -->
+    <material desc="Material of cooling test plate">ARICH_cooling_plate_Al</material>
+    <materialColdTube desc="Material of cold tube">ARICH_cold_tube_Cu</materialColdTube>
+    <!-- Please note the sizes given for x, y, z are before the rotation -->
+    <lengthX desc="Size of cooling test plates (x)" unit="mm">304.8</lengthX>
+    <lengthY desc="Size of cooling test plates (y)" unit="mm">95.3</lengthY>
+    <lengthZ desc="Size of cooling test plates (z)" unit="mm">5</lengthZ>
+    <!-- Cold tubes are inside the aluminum boxes of the tests plates -->
+    <coldTubeR desc="Outer radius of cold tubes" unit="mm">1.5</coldTubeR>
+    <!-- The volume of cold tubes subtracted from plates -->
+    <coldTubeSubtractedR desc="Outer radius of subtracted tubes for cold tube" unit="mm">1.9375</coldTubeSubtractedR>
+    <coldTubeWallThickness desc="Cold tube wall thickness" unit="mm">0.4375</coldTubeWallThickness>
+    <depthColdTubeInPlate desc="Depth of the cold tube in the cooling plate" unit="mm">1.5</depthColdTubeInPlate>
+    <coldTubeSpacing desc="Distance from center of the cold tube to edge of cooling plate" unit="mm">8</coldTubeSpacing>
+    <!-- distance between two cold tubes is two time bigger (16 mm)-->
+    <coldTubeNumber desc="number of cold tubes in one plate ">6</coldTubeNumber>
+    <!-- Rho of the cooling test plates center in polar coordinate system in mm -->
+    <coolingTestPlatePosR>
+      970 970
+    </coolingTestPlatePosR>
+    <!-- Azimuthal angle of the cooling test plates center in polar coordinate system in deg -->
+    <coolingTestPlatePosPhi>
+      11.25 331.875
+    </coolingTestPlatePosPhi>
+    <!-- Z placement of the cooling test plates center within ARICH mother volume in mm -->
+    <!--                  280/2 - 0.25 -                      5.0/2 = 137.25 -->
+    <!-- ARICHenvelope.length/2 - 0.25 - coolingTestPlate.lengthZ/2 -->
+    <coolingTestPlatePosZ0>
+      137.25 137.25
+    </coolingTestPlatePosZ0>
+  </coolingTestPlate>
+</coolingPipe>

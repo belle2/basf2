@@ -1,0 +1,27 @@
+# EventType: 1210111000
+# Descriptor: [B- -> mu- anti-nu_mu gamma]cc
+# NickName: Bu_munugamma
+# Documentation: SM B-> mu nu gamma signal MC  
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Moritz Gelb
+# Email: moritz.gelb@kit.edu
+# Cuts: None
+# Date: 20161001
+#
+#
+
+# Upsilon(4S) decay
+Decay Upsilon(4S)
+0.5 B+sig B-   VSS;
+0.5 B+   B-sig VSS;
+Enddecay
+
+Decay B-sig
+1.0 mu-  anti-nu_mu gamma PHOTOS  LNUGAMMA 0.35 3.0 5.0 0;
+Enddecay
+
+CDecay B+sig
+
+End
+

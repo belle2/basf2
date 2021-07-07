@@ -1,0 +1,11 @@
+Import('env')
+
+env['LIBS'] = [
+    'tracking_trackFindingCDC',
+    'genfit2',
+    'framework',
+    '$ROOT_LIBS',
+    'cdc_dataobjects',
+    ]
+
+Return('env')

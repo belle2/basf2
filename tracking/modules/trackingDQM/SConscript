@@ -1,0 +1,5 @@
+Import('env')
+
+env['LIBS'] = ['vxd', 'tracking_dqmUtils', 'framework', 'mdst_dataobjects']
+
+Return('env')

@@ -1,0 +1,23 @@
+# EventType: 12100001
+# Descriptor: [B+ -> rho0 rho+]cc
+# NickName: Bu_rho0rho+
+# Documentation: Test B->VV process, nothing forced
+# Tested: Yes
+# PhysicsWG: HAD
+# Responsible: Phillip Urquijo
+# Email: purquijo@unimelb.edu.au
+# Cuts: None
+# Date: 20150109
+#
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.0 rho+    rho0  SVV_HELAMP 0.0 0.0 1.0 0.0 0.0 0.0; 
+Enddecay
+CDecay B-sig
+
+End

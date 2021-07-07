@@ -1,0 +1,30 @@
+# EventType: 4110840006
+# Descriptor: [vpho_piZb10610_piY1Sll]
+# NickName: vpho_piZb10610_piY1Sll 
+# Cuts: None
+# Documentation:
+# PhysicsWG: Bottomonium
+# Tested: Yes
+# Responsible: Bryan Fulsom
+# Email: bryan.fulsom@pnnl.gov
+# Date: 20170223
+
+Decay vpho
+0.5 pi+ Zb(10610)- PHSP;
+0.5 pi- Zb(10610)+ PHSP;
+Enddecay
+
+Decay Zb(10610)-
+1.0 pi- Upsilon PHSP;
+Enddecay
+
+Decay Zb(10610)+
+1.0 pi+ Upsilon PHSP;
+Enddecay
+
+Decay Upsilon
+0.500 e+ e- PHOTOS VLL; #[Reconstructed PDG2011]
+0.500 mu+ mu- PHOTOS VLL; #[Reconstructed PDG2011]
+Enddecay
+
+End

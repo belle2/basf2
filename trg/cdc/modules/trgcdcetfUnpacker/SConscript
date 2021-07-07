@@ -1,0 +1,3 @@
+Import('env')
+env['LIBS'] = ['framework', 'trg_cdc_dataobjects','rawdata_dataobjects']
+Return('env')

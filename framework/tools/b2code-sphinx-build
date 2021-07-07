@@ -1,0 +1,71 @@
+#!/bin/bash
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+# make sure belle2 is setup
+if [ -z ${BELLE2_LOCAL_DIR} ] && [ -z ${BELLE2_RELEASE_DIR} ]; then
+  echo "Please setup the Belle 2 Software before calling this script by sourcing b2setup"
+  exit 1
+fi
+# take release directory or local directory as base
+SOFTWARE_DIR=${BELLE2_RELEASE_DIR:-${BELLE2_LOCAL_DIR}}
+
+OUTPUT="build"
+TARGET="html"
+EXTRA_SPHINX_ARGS=""
+POSITIONAL=()
+while [[ $# -gt 0 ]]; do
+    key="$1"
+    case $key in
+        --light)
+        EXTRA_SPHINX_ARGS+="-t light"
+        shift
+        ;;
+        -t|--target)
+        TARGET=$2
+        shift 2
+        ;;
+        -o|--output-dir)
+        OUTPUT=$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$2")
+        shift 2
+        ;;
+        -h|--help)
+        cat <<EOT
+This script will run sphinx with the appropriate arguments to build the user
+documentation.
+
+Optional Arguments:
+  --light           Create documentation only for the light release, that is only
+                    for the packages included in a light release build.
+  -t TARGET, --target TARGET
+                    Documentation format to generate. If not given the default
+                    will be "html". Available options are "html", "latex", "json"
+  -h, --help        Show this help message
+  -o, --output-dir  Where to put the documentation. If not given the default is
+                    the build directory in the software/release directory
+
+All other options will be forwarded to ``sphinx-build``
+
+EOT
+        exit 1
+        ;;
+        *)    # unknown option, forward to sphinx-build
+        POSITIONAL+=("$1") # save it in an array for later
+        shift # past argument
+        ;;
+    esac
+done
+set -- "${POSITIONAL[@]}" # restore positional parameters
+
+# go to software dir
+cd ${SOFTWARE_DIR}
+# make sure the link to the tools exists
+ln -sfT ${BELLE2_TOOLS}/doc build/tools_doc
+# and run sphinx and forward all extra arguments
+sphinx-build -ENT -b ${TARGET} -c site_scons/sphinx -d ${OUTPUT}/doctrees . ${OUTPUT}/${TARGET} ${EXTRA_SPHINX_ARGS} "$@"

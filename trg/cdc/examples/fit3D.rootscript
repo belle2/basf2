@@ -1,0 +1,286 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+#include "Riostream.h"
+#include <vector>
+#include <math.h>
+#include <TROOT.h> //General stuff
+#include <TApplication.h> //For compiling code with graphics
+#include <TStyle.h> //For gStyle
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TSystem.h> //For gSystem
+#include <TFile.h>
+#include <TTree.h>
+#include <TClonesArray.h>
+#include <TVectorD.h>
+#include <TGraph.h>
+#include <TLegend.h>
+#include <TH1F.h>
+#include <TH3F.h>
+#include <TH3D.h>
+#include <TCanvas.h>
+#include <TBranch.h>
+#include <Riostream.h>
+#include <TString.h>
+#include <TLegend.h>
+#include <TRandom3.h>
+#include <TMath.h>
+#include <math.h>
+#include <TColor.h>
+#include <vector>
+#include <sstream>
+#include <algorithm>
+#define __CINT__
+#include "../cdc/src/Fitter3DUtility.cc"
+
+void fit3D(){
+
+  //This should be deleted
+  gROOT->Reset();
+  gROOT->SetStyle("Plain");
+  gStyle->SetOptStat(111111111);
+  gStyle->SetOptFit(1111111111);
+  gStyle->SetStatFontSize(0.05);
+
+  gROOT->ProcessLine(".L ../cdc/src/Fitter3DUtility.cc");
+
+  int RUN = 0;
+  int GRAPHON = 1;
+  cout<<"RUN: "<<RUN<<endl;
+
+  TH1F* hpt00    = new TH1F("histpT","Plot of pT",93,0,7.0);
+  TH1F* hpt01    = new TH1F("hpt01","",93,0,7.0);
+  TH1F* hphi00   = new TH1F("hphi00","",90,0,360);
+  TH1F* hphi01   = new TH1F("hphi01","",90,0,360);
+  TH1F* hz00     = new TH1F("histz0","Plot of z0",98,-25,25);
+  TH1F* hz01     = new TH1F("histz1","Plot of z0",98,-25,25);
+  hz00->GetXaxis()->SetTitle("cm");
+  TH1F* htheta00 = new TH1F("htheta00","",130,20,150);
+  TH1F* htheta01 = new TH1F("htheta01","",130,20,150);
+  hphi00->SetMinimum(0);
+  hpt00->SetMinimum(0);
+
+
+  Double_t phi[9];
+  Double_t zz[4];
+  Double_t arcS[4];
+  Double_t ezz[4];
+  Double_t err[4];
+  Double_t rrz[4];
+  Double_t phiz[4];
+  Int_t IsST = 4;
+  Int_t IsAx = 5;
+  const double Trg_PI = 3.141592653589793;
+
+  Double_t z0;
+  Double_t mcZ0;
+  Double_t cot;
+  Double_t ztheta;
+  Double_t mcTheta;
+  Double_t sig_z0;
+  Double_t zchi2;
+
+
+  Double_t phi2;
+
+  Double_t pchi2;
+
+  Double_t rr_conv[4];
+  Double_t iezz2[4];
+
+  TFile* inFile = new TFile("Fitter3D.root");
+  TTree* inTree = (TTree*)inFile->Get("m_treeTrackFitter3D");
+  TTree* inTree2 = (TTree*)inFile->Get("m_treeConstantsFitter3D");
+
+  TClonesArray* tSTrackFitter3D = new TClonesArray("TVectorD");
+  TClonesArray* mcTrackFitter3D = new TClonesArray("TVectorD");
+  inTree->SetBranchAddress("tSTrackFitter3D", &tSTrackFitter3D);
+  inTree->SetBranchAddress("mcTrackFitter3D", &mcTrackFitter3D);
+
+  TVectorD* geometryFitter3D = new TVectorD(17);
+  inTree2->SetBranchAddress("geometryFitter3D", &geometryFitter3D);
+
+  TVectorD* errorFitter3D = new TVectorD(9);
+  inTree2->SetBranchAddress("errorFitter3D", &errorFitter3D); 
+
+  inTree2->GetEntry(0);
+
+  Double_t rr[9] = {0.188,0.4016,0.620,0.8384,1.0568,0.2934,0.5128,0.7312,0.9496};
+  double anglest[4]={0.0702778, -0.06176, 0.069542, -0.07489};
+  double ztostraw[4]={-0.508184,-0.645228,-0.687681,-0.730134}; 
+
+  // Set geometry
+  for(int i=0; i<9; i++){
+    rr[i] = (*geometryFitter3D)[i];
+  }
+  for(int i=0; i<4; i++){
+    anglest[i] = (*geometryFitter3D)[i+9];
+    ztostraw[i] = (*geometryFitter3D)[i+13];
+  }
+
+  // Set input errors
+  Double_t phierror[5]={0.0085106,0.0039841,0.0025806,0.0019084,0.001514};
+  Double_t zerror[]={0.0319263,0.028765,0.0290057,0.0396206};
+
+  for(int i=0;i<5;i++){
+    phierror[i]=0.012/sqrt(12)/rr[i];
+  }
+
+  for(int i=0; i<5; i++){
+    phierror[i] = (*errorFitter3D)[i];
+  }
+  for(int i=0; i<4; i++){
+    zerror[i] = (*errorFitter3D)[i+5];
+  }
+  
+
+  TVectorD tSPhi(9);
+  // [0]=pt, [1]=phi0, [2]=z0, [3]=cot, [4]=charge
+  TVectorD mcPar(5);
+
+  Int_t eventNum = 0;
+  Int_t totalInput = inTree->GetEntriesFast();
+
+  while (1) {
+
+    eventNum += 1;
+    if (eventNum-1==totalInput) break;
+    inTree->GetEntry(eventNum-1);
+
+    // Get the values from the tree.
+    if (tSTrackFitter3D->GetEntriesFast()==0) continue;
+    tSPhi = *(TVectorD*)tSTrackFitter3D->At(0);
+    if (mcTrackFitter3D->GetEntriesFast()==0) continue;
+    mcPar = *(TVectorD*)mcTrackFitter3D->At(0);
+    
+    // Convert TVectorD to array
+    for( int i=0; i<9; i++){
+      phi[i] = tSPhi[i];
+    }
+    
+    if(eventNum%1000==0) cout<<eventNum<<endl;
+
+    int mysign = findSign(phi);
+
+    Double_t myphi0;
+    Double_t rho;
+    rPhiFit(rr,phi,phierror,rho,myphi0);
+    Double_t pt = 0.3*rho*1.5;
+    Double_t mcPt = mcPar[0];
+    Double_t mcPhi0 = mcPar[1];
+
+    //Start of my fitter
+    for(int i=0; i<4; i++){
+      zz[i]=calZ(mysign, anglest[i], ztostraw[i],  rr[i+5], phi[i+5], rho, myphi0);
+      rr_conv[i]=rr[i+5];
+      iezz2[i] = 1/zerror[i]/zerror[i];
+    }   
+
+    // Calculate s
+    for(int i=0; i<4; i++){
+      arcS[i]=calS(rho,rr_conv[i]);
+    }   
+
+    //Change rho into real rho
+    //rho = mcPt/0.3/1.5;
+
+    rSFit(iezz2,arcS,zz,z0,cot);
+
+    myphi0 = myphi0*180/Trg_PI;
+    mcPhi0 = mcPhi0*180/Trg_PI;
+
+    ztheta=Trg_PI/2.-atan(cot);
+    ztheta*=180./Trg_PI;
+    mcTheta = Trg_PI/2.-atan(mcPar[3]);
+    mcTheta *= 180./Trg_PI;
+
+    mcZ0 = mcPar[2];
+
+    //this should be deleted
+    hpt00->Fill(pt);
+    hpt01->Fill(mcPt);
+    hphi00->Fill(myphi0);
+    hphi01->Fill(mcPhi0);
+    htheta00->Fill(ztheta);
+    htheta01->Fill(mcTheta);
+    hz00->Fill(z0*100);
+    hz01->Fill(mcZ0*100);
+    if(RUN!=0){if(eventNum==int(RUN)) break;}
+  }
+
+  //this should be deleted
+
+  cout<<"z0 mean: "<<hz00->GetMean()<<endl;
+  cout<<"z0 RMS:  "<<hz00->GetRMS()<<endl;
+  //cout<<hphi02->GetMean()<<endl;
+
+  if(GRAPHON==1){
+    TLegend* leg_hist;
+
+    TCanvas *c1 = new TCanvas("c1","",1000,500);
+    c1->Divide(2,2);  
+    c1->cd(1); 
+    hpt00->Draw();
+    hpt01->SetLineColor(2);
+    hpt01->Draw("same");
+    leg_hist = new TLegend(0.78,0.51,0.95,0.38);
+    leg_hist->AddEntry(hpt00,"Fitted pT","l");
+    leg_hist->AddEntry(hpt01,"Real pT","l");
+    leg_hist->Draw();
+
+
+    c1->cd(2); 
+    hphi00->Draw();
+    hphi01->SetLineColor(2);
+    hphi01->Draw("same");
+    /*
+    leg_hist = new TLegend(0.78,0.51,0.95,0.38);
+    leg_hist->AddEntry(hphi00,"Fitted phi0","l");
+    leg_hist->AddEntry(hphi01,"Real phi0","l");
+    leg_hist->Draw();
+    */
+
+    c1->cd(3);
+    hz00->Fit("gaus");
+    hz00->Draw();
+    hz01->SetLineColor(2);
+    hz01->Draw("same");
+    /*
+    leg_hist = new TLegend(0.78,0.51,0.95,0.38);
+    leg_hist->AddEntry(hz00,"Fitted z0","l");
+    leg_hist->AddEntry(hz01,"Real z0","l");
+    leg_hist->Draw();
+    */
+
+    c1->cd(4); 
+    htheta00->Draw();
+    htheta01->SetLineColor(2);
+    htheta01->Draw("same");
+    /*
+    leg_hist = new TLegend(0.78,0.51,0.95,0.38);
+    leg_hist->AddEntry(hz00,"Fitted theta","l");
+    leg_hist->AddEntry(hz01,"Real theta","l");
+    leg_hist->Draw();
+    */
+
+  }
+
+}
+
+void StandaloneApplication(int argc, char** argv){
+  fit3D();
+} 
+  
+int main(int argc, char** argv){
+  gROOT->Reset();
+  TApplication app("Root Application" , &argc , argv) ;
+  StandaloneApplication(app.Argc(), app.Argv());
+  app.Run();
+  return 0;
+} 
+

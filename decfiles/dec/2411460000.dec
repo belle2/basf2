@@ -1,0 +1,28 @@
+# EventType: 2411460000
+# Descriptor: [ee -> pi+pi-psi(2S)] are generated via ISR
+# NickName: ISR_pi+pi-psi(2S)
+# Documentation: Control channel for analysis package
+# Tested: Yes 
+# PhysicsWG: Charmonium
+# Responsible: Sen Jia
+# Email: jiasen@buaa.edu.cn
+# Cuts: None 
+# Date: 20170427
+#
+Decay vpho
+1.0   Upsilon(4S) gamma VECTORISR -1 1;
+Enddecay
+#
+Decay Upsilon(4S)
+1.0   pi+ pi- psi(2S) PHSP;
+Enddecay
+#
+Decay psi(2S)
+1.0   J/psi pi+ pi- VVPIPI;  
+Enddecay
+#
+Decay J/psi
+1.0   mu+  mu-  PHOTOS  VLL;
+Enddecay
+#
+End

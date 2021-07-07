@@ -1,0 +1,4 @@
+Import('env')
+env['SUBLIB'] = True
+env['LIBS'] = ['$ROOT_LIBS']
+Return('env')

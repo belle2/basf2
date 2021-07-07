@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="CLAW">
+  <Creator library="beast">CLAWCreator</Creator>
+  <Content>
+    <!-- normally, parameters should be defined with a unit attribute. This
+         enables automatic conversion to the default framework unit --> 
+    <stepSize unit="um">200</stepSize>
+    <!--if we don't supply a unit there can be no conversion but is still valid -->
+    <divisions>32</divisions>
+    <!-- valid values for false are: "", "0", "off", "false" (case
+         insensitive), everything else will be interpreted as true -->
+    <foo>true</foo>
+    <!-- we can also have arrays as parameters which makes it easy to get a
+         number of values as vector<double>.  The numbers can be divided by
+         whitespace, comma or semi-colon -->
+    <bar unit="cm">1 2
+    </bar>
+    <ScintCell>16</ScintCell>
+    <TimeStep>0.8</TimeStep>
+    <MinTime>0.0</MinTime>
+    <MaxTime>600.0</MaxTime>
+    <Ethres>0.0</Ethres>
+    <Ethres>0.0</Ethres>
+    <ConvFac>1.0</ConvFac>
+
+    <Active>
+      <Material>CLAW-Material</Material>
+      <z_claw unit="cm">0.0</z_claw>
+      <r_claw unit="cm">5.5</r_claw>
+      <!--r_claw unit="cm">3.1</r_claw-->
+      <ThetaZ unit="deg">0.0</ThetaZ>
+      <Phi unit="deg">135.0</Phi>
+      <dx_board unit="cm">2.7</dx_board>
+      <dy_board unit="cm">16.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">2.7</dx_scint>
+      <dy_scint unit="cm">2.0</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
+    </Active>
+
+    <Active>
+      <Material>CLAW-Material</Material>
+      <z_claw unit="cm">0.0</z_claw>
+      <r_claw unit="cm">5.5</r_claw>
+      <!--r_claw unit="cm">3.1</r_claw-->
+      <ThetaZ unit="deg">0.0</ThetaZ>
+      <Phi unit="deg">225.0</Phi>
+      <dx_board unit="cm">2.7</dx_board>
+      <dy_board unit="cm">16.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">2.7</dx_scint>
+      <dy_scint unit="cm">2.0</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
+    </Active>
+
+  </Content>
+</DetectorComponent>

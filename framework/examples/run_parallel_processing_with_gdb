@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+if [ $# -lt 1 ]
+then
+  echo "Usage: $0 basf2 [args]"
+  echo "Starts basf2 with given args (should include -pN) and attaches gdb to process you specify using PROCTYPE (edit $0). This is repeated until the process crashes."
+  exit 1
+fi
+
+
+#set to input/worker/output
+PROCTYPE="input"
+
+while true
+do
+  echo "starting"
+  echo "" > out
+  "$@" > out 2> err &
+  while ! grep -m1 "${PROCTYPE}.*forked" out
+  do
+    #stop after first fail
+    if ! jobs %% >/dev/null
+    then
+      break 2
+    fi
+
+    #sleep 1
+  done
+  #ok, found something to attach to.
+  ATTACH_TO=`grep -m1 "${PROCTYPE}.*forked" out | grep -o "pid = .*" | awk '{print ( $(NF) ) }' | tr -d '\r\n'`
+  echo "Attaching to $ATTACH_TO"
+
+  echo "set \$_exitcode = -1
+attach $ATTACH_TO
+cont
+if \$_exitcode != -1
+  quit
+end" > /tmp/gdb_script
+  gdb -x /tmp/gdb_script
+
+  #stop after first fail
+  wait || break
+done

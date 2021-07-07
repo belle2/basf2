@@ -1,0 +1,32 @@
+#!/bin/bash
+# Runs the basf2_mva_teacher tool as a job on the cluster
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+rf=`mktemp -u`
+f=$(basename $rf)
+echo "Use $f as temporary file"
+printf " %q" basf2_mva_teacher "$@" > "$f" 
+cat "$f"
+chmod +x ./"$f"
+
+#wait 1-20s to not run into issues with the batch system (low system limits)
+sleep `echo $RANDOM | sed -e 's/\\(.\\)\\(.*\\)/\1.\2/g'`
+sleep `echo $RANDOM | sed -e 's/\\(.\\)\\(.*\\)/\1.\2/g'`
+echo ""
+echo bsub -K -q sx -e "$f".elog -o "$f".log "$f"
+bsub -K -q sx -e "$f".elog -o "$f".log ./"$f"
+# Print log files, so FEI finds MVA ranking
+# It is possible that we have to wait for the log file,
+# because it may take some time to move the log file from the cluster to disk
+while [ ! -f "$f".log ]; do sleep 1; done
+cat "$f".log
+while [ ! -f "$f".elog ]; do sleep 1; done
+cat "$f".elog
+#rm $f

@@ -1,0 +1,5 @@
+Import('env')
+
+env['TOOLS_LIBS']['framework-pcore-monitor_ringbuffers'] = ['framework']
+
+Return('env')

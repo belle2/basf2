@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<DisplacedGeometry descr="displacement parameters of TOP modules">
+
+  <!-- initializers for class TOPGeoModuleDisplacement -->
+  <!-- see: top/dbobjects/include/TOPGeoModuleDisplacement.h -->
+  <!-- below only an example for slot 1 -->
+  <!-- add as many slots as needed. To activate, set SwitchON to 1 -->
+  <!-- before running simulation check for possible overlaps -->
+
+  <SwitchON descr="set to 1 to enable">0</SwitchON>
+  
+  <Slot ID="1">
+    <x unit="mm">0.0</x>
+    <y unit="mm">0.0</y>
+    <z unit="mm">0.0</z>
+    <alpha unit="mrad">0.0</alpha>
+    <beta unit="mrad">0.0</beta>
+    <gamma unit="mrad">0.0</gamma>
+  </Slot>
+  
+</DisplacedGeometry>

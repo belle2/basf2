@@ -1,0 +1,26 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+#include "daq/expreco/ERecoMasterCallback.h"
+#include "daq/expreco/ERecoRunControlCallback.h"
+
+#include <daq/slc/base/ConfigFile.h>
+#include <daq/slc/runcontrol/RCNodeDaemon.h>
+#include <daq/slc/system/Daemon.h>
+
+using namespace Belle2;
+
+int main(int argc, char** argv)
+{
+  if (Daemon::start(argv[1], argc, argv, 1, "<config>")) {
+    ConfigFile config("slowcontrol", argv[1]);
+    ERecoMasterCallback* callback = new ERecoMasterCallback(config);
+    RCCallback* callback2 = new ERecoRunControlCallback(callback);
+    RCNodeDaemon(config, callback, callback2).run();
+  }
+  return 0;
+}

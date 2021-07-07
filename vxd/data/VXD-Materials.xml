@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Materials>
+  <Material name="PXD-DockBox">
+    <state>Solid</state>
+    <!--
+         DockBox Material is kind of sketchy at the moment:
+         Design shows a target weight of around 4.5kg but the contributions by different
+         Materials are not easily known. For PXD we assume around 1.2kg of this to be cables
+         which we now assume 50% PVC and 50% insulation. So in the End we want
+         3.3kg Al, 0.6kg Cu, 0.6kg P.V.C
+         Now just apply fancy scaling of how much volume would be occupied using the standard
+         Elements and fill the rest with air
+    -->
+    <Components>
+      <Material fraction="0.100">POLYVINYL_CHLORIDE</Material>
+      <Material fraction="0.014">Cu</Material>
+      <Material fraction="0.254">Al</Material>
+      <Material fraction="0.632">Air</Material>
+    </Components>
+  </Material>
+  <Material name="SVD-DockBox">
+    <state>Solid</state>
+    <!--
+         For now just assume the same weights as for PXD. PXD box is a bit tighter in packing.
+         But since SVD crate has copper cooling plate the amount of copper is probably higher.
+    -->
+    <Components>
+      <Material fraction="0.062">POLYVINYL_CHLORIDE</Material>
+      <Material fraction="0.009">Cu</Material>
+      <Material fraction="0.163">Al</Material>
+      <Material fraction="0.766">Air</Material>
+    </Components>
+  </Material>
+
+  <Material name="VXD-DiamondSensor">
+    <state>Solid</state>
+    <density unit="g/cm3">3.515</density>
+    <Components>
+      <Material>C</Material>
+    </Components>
+  </Material>
+</Materials>

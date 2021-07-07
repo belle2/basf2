@@ -1,0 +1,10 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'cdc_dataobjects',
+               'genfit2', '$ROOT_LIBS', 'EG', 'svd', 'pxd',
+               'alignment_dataobjects', 'calibration', 'calibration_dataobjects',
+               'klm_dataobjects', 'klm_dbobjects', 'klm', 'cdc', 'alignment_dbobjects',
+               'vxd', 'mdst_dbobjects', 'boost_python']
+
+Return('env')
+

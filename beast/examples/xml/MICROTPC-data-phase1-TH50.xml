@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="MICROTPC">
+<Creator library="beast">MICROTPCCreator</Creator>
+<Content>
+<stepSize unit="um">200</stepSize>
+<divisions>32</divisions>
+<foo>true</foo>
+<bar unit="mm">1 
+</bar>
+<LookAtRec>0</LookAtRec>
+<GEMGain1>30</GEMGain1>
+<GEMGain2>50</GEMGain2>
+<GEMGainRMS1>0.2</GEMGainRMS1>
+<GEMGainRMS2>0.2</GEMGainRMS2>
+<ScaleGain1>10</ScaleGain1>
+<ScaleGain2>10</ScaleGain2>
+<GEMpitch>0.014</GEMpitch>
+<PixelThreshold>2700</PixelThreshold>
+<PixelThresholdRMS>150</PixelThresholdRMS>
+<ChipColumnNb>80</ChipColumnNb>
+<ChipColumnX>1</ChipColumnX>
+<ChipRowNb>336</ChipRowNb>
+<ChipRowY>0.84</ChipRowY>
+<PixelTimeBinNb>256</PixelTimeBinNb>
+<PixelTimeBin>25</PixelTimeBin>
+<TOTA1>5.34813e+03</TOTA1>
+<TOTB1>-3.12738e+01</TOTB1>
+<TOTC1>1.14566e+05</TOTC1>
+<TOTQ1>54.</TOTQ1>
+<TOTA2>2.64672e+01</TOTA2>
+<TOTB2>-5.21407e+00</TOTB2>
+<TOTC2>9.65855e+02</TOTC2>
+<TOTQ2>54.</TOTQ2>
+<Workfct>35.075</Workfct>
+<Fanofac>0.19</Fanofac>
+<GasAbs>0.05</GasAbs>
+<P_vessel>1</P_vessel>
+<z_DG>12.0</z_DG>
+<z_TG>0.28</z_TG>
+<z_CG>0.34</z_CG>
+<Dt_DG>0.0128233</Dt_DG>
+<Dt_TG>0.0153198</Dt_TG>
+<Dt_CG>0.01436818</Dt_CG>
+<Dl_DG>0.0123371</Dl_DG>
+<Dl_TG>0.0131141</Dl_TG>
+<Dl_CG>0.0132903</Dl_CG>
+<v_DG>0.00103182</v_DG>
+<v_TG>0.004079</v_TG>
+<v_CG>0.00390826</v_CG>
+<Active>
+<MaterialVessel>MICROTPC-Material</MaterialVessel>
+<MaterialGas>MICROTPC-Material</MaterialGas>
+<ScaleGas>MICROTPC-Material</ScaleGas>
+<MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+<Material>MICROTPC-Material</Material>
+<dx_Vessel unit="cm">15.0</dx_Vessel>
+<dy_Vessel unit="cm">10.4</dy_Vessel>
+<dz_Vessel unit="cm">31.0</dz_Vessel>
+<AngleX unit="deg">0.0</AngleX>
+<AngleZ unit="deg">90.0</AngleZ>
+<TPCpos_x unit="cm">-47.04700</TPCpos_x>
+<TPCpos_y unit="cm">5.93894</TPCpos_y>
+<TPCpos_z unit="cm">37.70000</TPCpos_z>
+</Active>
+</Content>
+</DetectorComponent>
+

@@ -1,0 +1,390 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+"""
+A script to submit small skim test jobs, and save the output in a form to be
+read by ``b2skim-stats-print``.
+"""
+
+import argparse
+from datetime import datetime as dt
+from functools import lru_cache
+from getpass import getuser
+import json
+from os import getenv
+from pathlib import Path
+import re
+from shlex import quote
+from socket import gethostname
+import subprocess
+from termcolor import cprint
+
+from git import Repo
+import yaml
+
+from basf2 import find_file
+from skim.registry import Registry
+from skim.utils.misc import get_eventN
+from skim.utils.testfiles import TestSampleList
+
+
+class CustomHelpFormatter(argparse.HelpFormatter):
+    """Custom formatter for argparse which prints the valid choices for an
+    argument in the help string.
+    """
+
+    def _get_help_string(self, action):
+        if action.choices:
+            return (
+                action.help + " Valid options are: " + ", ".join(action.choices) + "."
+            )
+        else:
+            return action.help
+
+
+def required_length(*, min=None, max=None):
+    """Custom action for argparse to enforce a minimum number of arguments to an option."""
+
+    class RequiredLength(argparse.Action):
+        def __call__(self, parser, args, values, option_string=None):
+            if min is not None and max is None:
+                if len(values) < min:
+                    msg = f"Argument '{self.dest}' requires at least {min} arguments."
+                    raise argparse.ArgumentTypeError(msg)
+            elif min is None and max is not None:
+                if len(values) > max:
+                    msg = f"Argument '{self.dest}' requires at most {max} arguments."
+                    raise argparse.ArgumentTypeError(msg)
+            elif min is not None and max is not None:
+                if len(values) < min or len(values) > max:
+                    msg = f"Argument '{self.dest}' requires between {min} and {max} arguments."
+                    raise argparse.ArgumentTypeError(msg)
+            setattr(args, self.dest, values)
+
+    return RequiredLength
+
+
+def getArgumentParser():
+    """Construct the argument parser.
+
+    Returns:
+        parser (argparse.ArgumentParser): An argument parser which obtains its
+            list of valid skim names from `skim.registry`.
+    """
+    parser = argparse.ArgumentParser(
+        description=(
+            "Submits test jobs for a given set of skims, and saves the output in a "
+            "format to be read by ``b2skim-stats-print``. One or more standalone or "
+            "combined skim names must be provided."
+        ),
+        formatter_class=CustomHelpFormatter,
+    )
+
+    SkimSelector = parser.add_mutually_exclusive_group(required=True)
+    SkimSelector.add_argument(
+        "-s",
+        "--single",
+        nargs="+",
+        default=[],
+        choices=["all"] + Registry.names,
+        metavar="skim",
+        help="List of individual skims to run.",
+    )
+    SkimSelector.add_argument(
+        "-c",
+        "--combined",
+        nargs="+",
+        action=required_length(min=2),
+        metavar=("YAMLFile", "CombinedSkim"),
+        help=(
+            "List of combined skims to run. This flag expects as its first argument "
+            "the path to a YAML defining the combined skims. All remaining arguments "
+            "are the combined skims to test. The YAML file is simply a mapping of "
+            "combined skim names to the invidivual skims comprising them. For example, "
+            "``feiSL: [feiSLB0, feiSLBplus]``."
+        ),
+    )
+
+    CustomSamples = parser.add_mutually_exclusive_group()
+    CustomSamples.add_argument(
+        "--custom-samples",
+        nargs="+",
+        metavar="Filename",
+        help=(
+            "Filenames of custom samples to test in addition to standard data and MC files."
+        )
+    )
+    CustomSamples.add_argument(
+        "--sample-yaml",
+        metavar="Filename",
+        help=(
+            "YAML file containing a list of samples to test on. "
+            "File must conform to the schema defined in "
+            "``skim/tools/resources/test_samples_schema.json`` (see examples in "
+            "``/group/belle2/dataprod/MC/SkimTraining/SampleLists``). "
+            "If argument not passed, defaults to "
+            "``/group/belle2/dataprod/MC/SkimTraining/SampleLists/TestFiles.yaml``."
+        )
+    )
+
+    parser.add_argument(
+        "-n",
+        type=int,
+        default=10000,
+        metavar="nEventsPerSample",
+        dest="nEventsPerSample",
+        help=(
+            "Number of events to run per sample. This input can be any positive "
+            "number, but the actual number events run is limited to the size of the "
+            "test files (~200,000 for MC files and ~20,000 for data files)."
+        ),
+    )
+    parser.add_argument(
+        "--dry-run",
+        "--dry",
+        action="store_true",
+        help="Print the submission commands, but don't run them.",
+    )
+
+    sampleGroup = parser.add_mutually_exclusive_group()
+    sampleGroup.add_argument(
+        "--mc-only", action="store_true", help="Test on only MC samples."
+    )
+    sampleGroup.add_argument(
+        "--data-only", action="store_true", help="Test on only data samples."
+    )
+    sampleGroup.add_argument(
+        "--custom-only", action="store_true", help="Test on only custom samples."
+    )
+
+    return parser
+
+
+def get_tag(repo):
+    """Get the current tag name by comparing commit hashes. If not at a tag, return None."""
+    def try_tag_commit(tag):
+        # try-except here to avoid weird issues that come up with some of the build-release tags
+        try:
+            return tag.commit
+        except UnicodeDecodeError:
+            pass
+    HEAD = repo.head.commit
+    tags = repo.tags
+    tag = next((tag for tag in tags if try_tag_commit(tag) == HEAD), None)
+    return tag
+
+
+def write_stats_metadata(logDirectory, samples, CombinedSkimDefinitions={}):
+    """Write a short file containing details about when and how this test was run."""
+    UserInfo = {
+        "user": getuser(),
+        "site": gethostname(),
+        "datetime_UTC": str(dt.utcnow()),
+    }
+
+    ReleaseDirectory = getenv("BELLE2_RELEASE_DIR")
+    LocalDirectory = getenv("BELLE2_LOCAL_DIR")
+
+    GitInfo = {}
+    if ReleaseDirectory:
+        GitInfo["RunWith"] = "central release"
+        GitInfo["release"] = Path(ReleaseDirectory).stem
+
+    elif LocalDirectory:
+        GitInfo["RunWith"] = "local checkout"
+
+        # Get the status of the git repo
+        repo = Repo(LocalDirectory)
+        tag = get_tag(repo)
+        if repo.head.is_detached:
+            GitInfo["HeadDetached"] = True
+            if tag:
+                GitInfo["tag"] = str(tag)
+        else:
+            GitInfo["branch"] = str(repo.active_branch)
+
+        GitInfo["commit"] = str(repo.head.commit)
+        GitInfo["UncommitedLocalChanges"] = repo.is_dirty()
+
+    # Put it all together and write to file
+    metadata = {"WhoAndWhen": UserInfo, "GitInfo": GitInfo}
+    metadata["Samples"] = samples.SampleDict
+    if CombinedSkimDefinitions:
+        metadata["CombinedSkims"] = CombinedSkimDefinitions
+
+    with open(logDirectory / "metadata.json", "w") as f:
+        json.dump(metadata, f, indent=2)
+
+
+def verify_combined_skims(CombinedSkimDefinitions, SkimsToRun, filename):
+    """Perform basic checks on combined skim definitions to catch issues early."""
+    # Check all the requested combined skims are defined in the YAML file
+    unrecognised = set(SkimsToRun).difference(CombinedSkimDefinitions)
+    if unrecognised:
+        raise ValueError(
+            f"Unrecognised combined skim name{'s'*(len(unrecognised)>1)}: {', '.join(unrecognised)}."
+        )
+
+    for CombinedSkimName in CombinedSkimDefinitions.keys():
+        if CombinedSkimName in Registry.names:
+            raise ValueError(
+                f"Combined skim name '{CombinedSkimName}' in {filename} conflicts with a registered skim."
+            )
+
+    for CombinedSkim, skims in CombinedSkimDefinitions.items():
+        # Check input YAML file only contains skims listed in registry
+        for skim in skims:
+            if skim not in Registry.names:
+                raise ValueError(
+                    f"Combined skim {CombinedSkim} contains unrecognised skim: {skim}."
+                )
+
+        # Check input YAML file does not list a skim twice in one combined skim
+        duplicates = set([s for s in skims if skims.count(s) > 1])
+        if duplicates:
+            raise ValueError(
+                f"Duplicates in combined skim {CombinedSkim}: {', '.join(duplicates)}."
+            )
+
+
+def submit_jobs(skims, samples, nEventsPerSample, DryRun, *, CombinedSkimDefinitions={}):
+    """Submit ``bsub`` jobs for each skim and for each test sample.
+
+    Warns if any of the ``bsub`` submissions returned a non-zero exit code.
+    Otherwise, prints a message summarising the job submission.
+
+    Args:
+        skims (list): A list of skim names to be run.
+        samples (list(skim.testfiles.Sample)): A list of samples to be tested.
+        nEventsPerSample (int): The number of events per file to run on.
+        DryRun (bool): Print the submission commands, but don't run anything.
+        CombinedSkimDefinitions (dict(list)): A data structure specifyign which
+            individual skims comprise the combined skims. If this argument is provided,
+            then this function will assume we are running combined skims.
+    """
+    if CombinedSkimDefinitions:
+        logDirectory = Path("log", "combined").resolve()
+    else:
+        logDirectory = Path("log", "single").resolve()
+
+    logDirectory.mkdir(parents=True, exist_ok=True)
+
+    write_stats_metadata(logDirectory, samples, CombinedSkimDefinitions)
+
+    # Set up a cache for the metadata query, to reduce number of calls
+    get_cached_eventN = lru_cache()(get_eventN)
+
+    runner = find_file(str(Path("skim", "tools", "b2skim-run")))
+
+    for skim in skims:
+        jobIDs = []
+        returnCodes = []
+
+        for sample in samples:
+            sampleFile = sample.location
+
+            if not Path(sampleFile).exists():
+                raise FileNotFoundError(f"Could not find test file {sampleFile}.")
+
+            OutputDirectory = Path(logDirectory, skim, str(sample))
+            OutputDirectory.mkdir(exist_ok=True, parents=True)
+
+            logFile = OutputDirectory / "job.out"
+            errFile = OutputDirectory / "job.err"
+            jsonFile = OutputDirectory / "job.json"
+
+            # Check that the number of events asked for doesn't exceed the number of events in the test file.
+            # Removing this may confuse the stats printer.
+            nTestEvents = min(nEventsPerSample, get_cached_eventN(sampleFile))
+
+            if CombinedSkimDefinitions:
+                arguments = [
+                    "bsub", "-q", "l", "-oo", logFile, "-e", errFile, "-J",
+                    f"{skim} {sample}", "basf2", runner, "--job-information", jsonFile, "-n",
+                    str(nTestEvents), "-i", str(sampleFile), "--", "combined",
+                    *CombinedSkimDefinitions[skim]
+                ]
+            else:
+                arguments = [
+                    "bsub", "-q", "l", "-oo", logFile, "-e", errFile, "-J",
+                    f"{skim} {sample}", "basf2", runner, "--job-information", jsonFile, "-n",
+                    str(nTestEvents), "-i", str(sampleFile), "--", "single", skim
+                ]
+
+            if DryRun:
+                print(" ".join([quote(str(arg)) for arg in arguments]) + "\n")
+                continue
+
+            process = subprocess.run(
+                arguments,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                cwd=OutputDirectory,
+            )
+
+            jobIDs.append(re.findall(r"\d+", str(process.stdout))[0])
+            returnCodes.append(process.returncode)
+
+        if any(returnCodes):
+            cprint(
+                f"An error occurred while submitting jobs for {skim} skim.", "red"
+            )
+        elif jobIDs:
+            SamplesString = ', '.join(f"'{s.printable_name}'" for s in samples)
+            print(
+                f"Running {skim} skim on {nEventsPerSample} events from test samples of {SamplesString}. Job IDs:\n  "
+                + "\n  ".join(jobIDs)
+            )
+
+    print(
+        f"Log files will be written to {str(logDirectory)}. "
+        "Once these jobs have finished, please run `b2skim-stats-print` "
+        f"from the directory {str(Path.cwd().resolve())}."
+    )
+
+
+if __name__ == "__main__":
+    parser = getArgumentParser()
+    args = parser.parse_args()
+
+    samples = TestSampleList(SampleYAML=args.sample_yaml)
+    # Update samples with custom samples, if given explicitly
+    if args.custom_samples:
+        extra_samples = TestSampleList(
+            SampleDict={"Custom": [{"location": f} for f in args.custom_samples]}
+        )
+        samples = TestSampleList(SampleList=[*samples, *extra_samples])
+
+    if args.mc_only:
+        samples = TestSampleList(SampleList=samples.mc_samples)
+    if args.data_only:
+        samples = TestSampleList(SampleList=samples.data_samples)
+    if args.custom_only:
+        samples = TestSampleList(SampleList=samples.custom_samples)
+
+    if args.single:
+        skims = args.single
+        if skims == ["all"]:
+            skims = Registry.names
+        elif "all" in skims:
+            raise ValueError("Cannot pass both 'all' and a list of skim names.")
+
+        submit_jobs(skims, samples, args.nEventsPerSample, args.dry_run)
+    else:
+        with open(args.combined[0]) as YAMLFile:
+            CombinedSkimDefinitions = yaml.safe_load(YAMLFile)
+        skims = args.combined[1:]
+        if skims == ["all"]:
+            skims = CombinedSkimDefinitions.keys()
+        elif "all" in skims:
+            raise ValueError("Cannot pass both 'all' and a list of skim names.")
+
+        verify_combined_skims(CombinedSkimDefinitions, skims, filename=args.combined[0])
+        submit_jobs(skims, samples, args.nEventsPerSample, args.dry_run, CombinedSkimDefinitions=CombinedSkimDefinitions)

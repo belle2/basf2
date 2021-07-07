@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- define our own special Materials -->
+<Materials>
+  <Material name="BGO-Material">
+    <density unit="g/cm3">2.5</density>
+    <!-- (optional) State can be one of Gas, Liquid, Solid, Undefined, case insensitive  -->
+    <state>Solid</state>
+    <!-- (optional) Temperature in K, if omitted, the standard value is used (273.15) -->
+    <temperature>273.15</temperature>
+    <!-- (optional) Pressure in atm, if omitted, 1.0 is used -->
+    <pressure>1.0</pressure>
+    <!-- Components of the Material, can be any combination of Elements and Materials
+         All chemical elements are predefined as Element and Material.
+         If you combine only materials you don't have to specify the density above since it can be calculated
+         automatically -->
+    <Components>
+      <Element fraction="0.75">Si</Element>
+      <Element fraction="0.20">Ga</Element>
+      <Material fraction="0.05">Al</Material>
+    </Components>
+  </Material>
+
+  <Material name="StainlessSteel304">
+    <density unit="g/cm3">0.03</density>
+    <Components>
+       <Element fraction="0.76">Fe</Element>
+       <Element fraction="0.13">Cr</Element>
+       <Element fraction="0.11">Ni</Element>
+    </Components>
+  </Material>
+
+  <Material name="G10">
+    <density unit="g/cm3">1.7</density>
+    <Components>
+       <Element fraction="0.2802">Si</Element>
+       <Element fraction="0.3874">O</Element>
+       <Element fraction="0.304">C</Element>
+       <Element fraction="0.0284">H</Element>
+    </Components>
+  </Material>
+
+  <Material name="ststeel">
+    <density unit="g/cm3">7.7</density>
+    <Components>
+       <Element fraction="0.04">C</Element>
+       <Element fraction="0.88">Fe</Element>
+       <Element fraction="0.08">Co</Element>
+    </Components>
+  </Material>
+
+  <Material name="AusteniticStainlessSteel">
+    <density unit="g/cm3">8.02</density>
+    <Components>
+       <Element fraction="0.68">Fe</Element>
+       <Element fraction="0.19">Cr</Element>
+       <Element fraction="0.10">Ni</Element>
+       <Element fraction="0.02">Mn</Element>
+       <Element fraction="0.01">Si</Element>
+    </Components>
+  </Material>
+
+  <Material name="MaterialVessel">
+    <density unit="g/cm3">7.7</density>
+    <Components>
+       <Element fraction="0.0003">C</Element>
+       <Element fraction="0.02">Mn</Element>
+       <Element fraction="0.00045">P</Element>
+       <Element fraction="0.0003">S</Element>
+       <Element fraction="0.0075">Si</Element>
+       <Element fraction="0.19">Cr</Element>
+       <Element fraction="0.10">Ni</Element>
+       <Element fraction="0.001">N</Element>
+       <Element fraction="0.68045">Fe</Element>
+    </Components>
+  </Material>
+
+  <Material name="ststeel304L">
+    <density unit="g/cm3">7.7</density>
+    <Components>
+       <Element fraction="0.0003">C</Element>
+       <Element fraction="0.02">Mn</Element>
+       <Element fraction="0.00045">P</Element>
+       <Element fraction="0.0003">S</Element>
+       <Element fraction="0.0075">Si</Element>
+       <Element fraction="0.19">Cr</Element>
+       <Element fraction="0.10">Ni</Element>
+       <Element fraction="0.001">N</Element>
+       <Element fraction="0.68045">Fe</Element>
+    </Components>
+  </Material>
+
+  <Material name="meatCuScreen">
+    <density unit="g/cm3">8.95</density>
+    <Components>
+       <Element fraction="0.9">Cu</Element>
+       <Element fraction="0.1">Zn</Element>
+    </Components>
+  </Material>
+
+  <Material name="Kovar">
+    <density unit="g/cm3">8.36</density>
+    <Components>
+       <Element fraction="0.536">Fe</Element>
+       <Element fraction="0.29">Ni</Element>
+       <Element fraction="0.17">Co</Element>
+       <Element fraction="0.003">Mn</Element>
+       <Element fraction="0.001">Si</Element>
+    </Components>
+  </Material>
+
+  <Material name="Quartz">
+    <density unit="g/cm3">2.64</density>
+    <Components>
+       <Element fraction="0.536">Si</Element>
+       <Element fraction="0.29">Ni</Element>
+       <Element fraction="0.17">Co</Element>
+       <Element fraction="0.003">Mn</Element>
+       <Element fraction="0.001">Si</Element>
+    </Components>
+  </Material>
+</Materials>

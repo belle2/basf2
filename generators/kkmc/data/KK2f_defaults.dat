@@ -1,0 +1,402 @@
+BeginX
+********************************************************************************
+********************************************************************************
+**                                                                            **
+**                   DEAFAULT INPUT DATA for KK Monte Carlo                   **
+**                  >>>>> Never edit this file directly <<<<<                 **
+**            Your actual input data should be in a separate file.            **
+**            The defaults will then be overwriten,  if necessary.            **
+**                                                                            **
+**                           !!!!IMPORTANT!!!!                                **
+** The data marked with  \\\\\\ are for special tests or dip-switches tuning  **
+** the Monte Carlo integrations, they SHOULD BE NEVER CHANGED by the user,    **
+** without consulting the author of the program.                              **
+** Changing them may lead to nonsense  results.                               **
+**                                                                            **
+********************************************************************************
+********************************************************************************
+*     Generalities of the Monte-Carlo (low level)
+*indx_____data______ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0
+*     Center-of-mass energy [GeV]
+    1        100.0e0      cmsene =xpar( 1)  Average Center of mass energy [GeV]
+    2        0.000e0      DelEne =xpar( 2)  Beam energy spread [GeV]
+    3              5      ninp   =xpar( 3)  Input  unit number (not used)
+    4             16      nout   =xpar( 4)  Output unit number
+*     PrintOut from generator
+    5              0      LevPri =xpar( 5)  PrintOut Level 0,1,2
+    6              1      Ie1Pri =xpar( 6)  PrintOut Start point
+    7              1      Ie2Pri =xpar( 7)  PrintOut End   point
+*     At present all internal monitoring fits into (idyfs+1,idyfs+100)
+    8            600\\\\\\IdYFS\\\\\\\\\\\\\pointer for internal histos\\\\\\\\\
+*indx______data_____ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0
+    9          1.0e0      WtMax =xpar( 9)   Maximum weight for rejection
+*     KeyWgt=0 we get constant and for KeyWgt=1 variable weight events
+   10              0      KeyWgt=xpar(10) Deafault is 0
+*     IdeWgt IDENT of the EEX principal weight, not for CEEX! NEVER TOUCH IT!
+   11             74\\\\\\IdeWgt\\\\\\\\\\Deafault is 74, for O(alf3) M.E.\\\\\\
+*     KeyELW=0,1 Type of Elewctroweak corrections, KeyElw=0 only for tests
+   12              1      KeyELW=xpar(12) Deafault is 1, for Dizet
+*     KeyRes=0,1 Experim. R used to model rate of decay of gamma* and decay
+   13              0      KeyRes=xpar(13) =0 no RRes, =1 RRes on, =2 RRes+Photos
+*     Minimum and maximum v, where v = 1-sprim/s, v=1 alowed
+   16           1e-5      vvmin =xpar(16)  may  be put to  vvmin < 1e-5
+** IMPORTANT: vmax is the cut on v=1-s'/s where s' is not the mass^2 of the 
+** final state ffbar mass^2 but of the virtual object after ISR emission,
+** and before FSR emission. It is obviously unphysical cut due to ISR*FSR interf.
+   17            1e0      vvmax =xpar(17)  if 1e0 then reduced inside program
+   18           1e-3\\\\\\delfac\\\\\\\\\\\FSR cut eps=vvmin*delfac\\\\\\\\\\\\\
+   19            100\\\\\\hard-wired maximum photon multiplicity\\\\\\\\\\\\\\\\
+********************************************************************************
+**    EQD/EW bremsstrahlung flags/data
+   20              1      KeyISR=xpar(20)  Default is  1, for beams       |<<<<|
+   21              1      KeyFSR=xpar(21)  Default is  1, for all final fermions
+*indx_____data______ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0
+**\\\\KeyPia = 0, NO   removal of FSR photons below emin=Ene*delta in CMS\\\\\\\
+**\\\\KeyPia = 1, WITH removal of FSR photons below emin=Ene*delta in CMS\\\\\\\
+   22              1\\\\\\KeyPia\\\\\\\\\\\Default is  1\\\\\\\\\\\\\\\\\\\\\\\\
+**\\\\SPECIAL tests: fixed ISR multiplicity\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+   23              0\\\\\\mltISR\\\\\\\\\\\Default is  0\\\\\\\\\\\\\\\\\\\\\\\\
+**\\\\SPECIAL tests: fixed FSR multiplicity\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+   24              0\\\\\\mltFSR\\\\\\\\\\\Default is  0\\\\\\\\\\\\\\\\\\\\\\\\
+**\\\\SPECIAL tests: fixed v=vmax\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+   25              0      KeyFix Type of ISR, =0,1ormal, =2 beamsstrahlung
+*(\\\\SPECIAL tests: mass terms in crude MC photon distrib.\\\\\\\\\\\\\\\\\\\\\
+   26              0\\\\\\KeyWtm\\\\\\\\\\ Default is  0\\\\\\\\\\\\\\\\\\\\\\\\
+**    Interference ISR/FSR to be ON/OFF
+   27              2      KeyINT=xpar(27)  Default is  2
+**    New exponentiation CEEX is now default, at least for leptons, see vmaxGPS
+**    which overrules KeyGPS for each type of final fermion
+   28              1      KeyGPS=xpar(28)  Default is  1
+**    Photon emission from final QUARKS
+   29              1      KeyQSR=xpar(29)  Default is  1
+**    Coupling constants etc.
+   30  137.0359895e0      alfinv=xpar(30)  Inverse of alpha_QED at q^2=0
+   31    389.37966e3      gnanob=xpar(31)  GeV^(-2)  --> NanoBarn conversion
+   32     1.16639e-5      Gfermi=xpar(32)  Fermi coupling ( 1.16639e-5  [GeV^(-2)])
+********************************************************************************
+**     Technical cuts and internal parameters
+**\\\\\\\\\\\\\\\Enhancement factor for Crude photon multiplicity\\\\\\\\\\\\\\\
+   40         1.25e0\\\\\\Xenph =xpar(40)\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+   41          1.e-9      vcut1 =xpar(41)\\Techn.cut: \\\\\\\\\\\\\\\\\\\\\\\\\\
+   42          5.e-2      vcut2 =xpar(42)\\Techn.cut: \\\\\\\\\\\\\\\\\\\\\\\\\\
+   43            0e0      vcut3 =xpar(43)\\Techn.cut: unused\\\\\\\\\\\\\\\\\\\\
+********************************************************************************
+**     QCD flags/data
+**     Hardonization/showering flag, KeyHad=0,1 => hadronization OFF,ON.
+   50              1      KeyHad=xpar(50)  Default is  1
+**     Minimum mass [GeV] for hadronization/showering
+   51        0.200e0      HadMin=xpar(51)
+**
+   52        0.118e0      alfQCD=xpar(52)  alpha_QCD
+**
+   53            1e0      KeyQCD=xpar(53)  Final state QCD factor ON/OFF, Default=1
+********************************************************************************
+** Note that for beam polariz. being active the CEEX has to be ON, see vmaxGPS and KeyGPS
+** Beam polarization may require adjustment of WtWax, check overweighted events in output
+   61            0e0      spin1x  polarization vector beam 1
+   62            0e0      spin1y  polarization vector beam 1
+   63            0e0      spin1z  polarization vector beam 1
+   64            0e0      spin1x  polarization vector beam 2
+   65            0e0      spin1y  polarization vector beam 2
+   66            0e0      spin1z  polarization vector beam 2
+********************************************************************************
+* Beamstrahlung parameters for Thorsten Ohl's package CIRCE 
+   71          350e0      IRCroots   sqrt(s) [GeV] discrete values 350,500,800GeV
+   72            3e0      IRCacc     
+   73            5e0      IRCver     version
+   74     19980505e0      IRCdat     date
+   75            1e0      IRCxchat   printout level
+**\\\\\writing vegas grid on the disk, KeyGrid=-1 create and dump, =+1 read\\\\\
+   76            0e0  KeyGrid=0 create, not read, default\\\\\\\\\\\\\\\\\\\\\\\
+********************************************************************************
+*indx_____data______ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0
+**     Define process
+**     Beam flavour code
+  400             11      KFini = xpar(400) dont change it                |<<<<|
+**     LIST of Final state flavours to be generated randomly according
+**     to QED corrected x-sections, at least one line/item should be present.
+**     (Remember that electron has incomplete M.E. and top might be too heavy.)
+*  401              1      KFfin, d
+*  402              1      KFfin, u
+*  403              1      KFfin, s
+*  404              1      KFfin, c
+*  405              1      KFfin, b
+***406              1      KFfin, t quark !!! do not use it!!!!
+*  411              1      KFfin, electron
+*  412              1      KFfin, neutrino electron
+*  413              1      KFfin, muon
+*  414              1      KFfin, neutrino muon
+*  415              1      KFfin, tau
+*  416              1      KFfin, neutrino tau
+********************************************************************************
+**                   Input for matrix element
+*indx_______________ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0
+**\\\\\KeyZet = 0, pure QED\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+**\\\\\KeyZet = 1, Z-boson and gamma are ON\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+**\\\\\KeyZet =-1, Z width Gamma is constant (only for CEEX)\\\\\\\\\\\\\\\\\\\\
+**\\\\\KeyZet = 9, pure Z exchange\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+**\\\\\KeyZet =-2, Artificial constant x-section for SPECIAL test runs\\\\\\\\\\
+  501              1\\\\\\KeyZet=xpar(501)  default is 1\\\\\\\\\\\\\\\\\\\\\\\\
+*indx_______________ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0
+** Mass and width of Z-boson [GeV]
+  502       91.187e0      MZ  =xpar(502)  PDG 1996
+**     sin(thetaW)**2 where thetaW is electroweak mixing angle
+  503    .22276773e0      SwSq  =xpar(503) sin_squared of EW angle, from Dizet
+  504   2.50072032e0      GammZ =xpar(504) Z width, from Dizet
+  505     80.37787e0      MW    =xpar(505) W mass,  from Dizet
+  506   2.08825837e0      GammW =xpar(506) W width, from Dizet
+  510          1e-60      MasPhot=xpar(510) photon mass, IR regulator 
+********************************************************************************
+**     PROPERTIES of Quarks and Leptons
+**     i-th position  in xpar(i) according to i = 500+10*KFlavour +j
+****** d-quark
+  511              1      KFlavour
+  512              3      NColor
+  513             -1      3*Q   =3*charge
+  514             -1      2*T3L =2*Isospin for Left component
+  515              0      2*helicity, 0 for unpolarized
+  516        0.010e0      mass [GeV] (5-15MeV in PDG)
+  516        0.100e0      Constituent mass, for comparison with KoralZ !!!!!!!
+  517          5.0e0      WtMax Maximum weight for rejection d-quark
+**518         0.99e0      auxiliary parameter vmaxGPS d-quark
+  518        20.00e0      auxiliary parameter, MinMassCEEX = min. mass for CEEX
+****** u-quark
+  521              2      KFlavour
+  522              3      NColor
+  523              2      3*Q   =3*charge
+  524              1      2*T3L =2*Isospin for Left component
+  525              0      2*helicity, 0 for unpolarized
+  526        0.005e0      mass [GeV] (2-8MeV in PDG)
+  526        0.100e0      Constituent mass, for comparison with KoralZ !!!!!!!
+  527          5.0e0      WtMax Maximum weight for rejection u-quark
+**528         0.99e0      auxiliary parameter vmaxGPS u-quark
+  528        20.00e0      auxiliary parameter, MinMassCEEX = min. mass for CEEX
+*indx_______________ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0
+****** s-quark
+  531              3      KFlavour
+  532              3      NColor
+  533             -1      3*Q   =3*charge
+  534             -1      2*T3L =2*Isospin for Left component
+  535              0      2*helicity, 0 for unpolarized
+  536        0.200e0      mass [GeV] (100-300MeV in PDG)
+  537          5.0e0      WtMax Maximum weight for rejection s-quark
+**538         0.99e0      auxiliary parameter vmaxGPS s-quark
+  538        20.00e0      auxiliary parameter, MinMassCEEX = min. mass for CEEX
+****** c-quark
+  541              4      KFlavour
+  542              3      NColor
+  543              2      3*Q   =3*charge
+  544              1      2*T3L =2*Isospin for Left component
+  545              0      2*helicity, 0 for unpolarized
+  546        1.300e0      mass [GeV] (1.0-1.6 GeV in PDG)
+  547          5.0e0      WtMax Maximum weight for rejection c-quark
+**548         0.99e0      auxiliary parameter vmaxGPS c-quark
+  548        20.00e0      auxiliary parameter, MinMassCEEX = min. mass for CEEX
+*indx_______________ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0
+****** b-quark
+  551              5      KFlavour
+  552              3      NColor
+  553             -1      3*Q   =3*charge
+  554             -1      2*T3L =2*Isospin for Left component
+  555              0      2*helicity, 0 for unpolarized
+  556        4.200e0      mass [GeV] (4.1-4.5 GeV in PDG)
+  556        4.500e0      for comparison with KoarlZ
+  557          5.0e0      WtMax Maximum weight for rejection b-quark
+**558         0.99e0      auxiliary parameter vmaxGPS b-quark
+  558        20.00e0      auxiliary parameter, MinMassCEEX = min. mass for CEEX
+****** t-quark
+  561              6      KFlavour
+  562              3      NColor
+  563              2      3*Q   =3*charge
+  564              1      2*T3L =2*Isospin for Left component
+  565              0      2*helicity, 0 for unpolarized
+  566        175.0e0      mass [GeV] (170-190GeV in PDG)
+  567          5.0e0      WtMax Maximum weight for rejection t-quark
+**568         0.99e0      auxiliary parameter vmaxGPS t-quark
+  568          0.0e0      auxiliary parameter, MinMassCEEX = min. mass for CEEX
+*indx_______________ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0
+****** electron
+  611             11      KFlavour
+  612              1      NColor
+  613             -3      3*Q   =3*charge
+  614             -1      2*T3L =2*Isospin for Left component
+  615              0      2*helicity
+  616    0.510999e-3      mass [GeV]   (0.51099907 MeV)
+  617          8.0e0      WtMax Maximum weight for rejection electron
+**618         0.99e0      auxiliary parameter vmaxGPS
+  618          0.0e0      auxiliary parameter, MinMassCEEX = min. mass for CEEX
+****** neutrino electron         ----- NOT ACTIVE ------
+  621             12      KFlavour
+  622              1      NColor
+  623              0      3*Q   =3*charge
+  624              1      2*T3L =2*Isospin for Left component
+  625              0      2*helicity
+  626          1e-30      mass [GeV]
+  627          3.5e0      WtMax Maximum weight for rejection neutrino electron
+**628          1.0e0      auxiliary parameter vmaxGPS, CEEX always on
+  628          0.0e0      auxiliary parameter, MinMassCEEX = min. mass for CEEX
+*indx_______________ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0
+****** muon
+  631             13      KFlavour
+  632              1      NColor
+  633             -3      3*Q   =3*charge
+  634             -1      2*T3L =2*Isospin for Left component
+  635              0      2*helicity
+  636    0.1056583e0      mass [GeV]   (0.1056583 GeV)
+  637          8.0e0      WtMax Maximum weight for rejection muon
+**638        0.999e0      auxiliary parameter vmaxGPS, CEEX up to a point
+**638    6.3245553e0      MinMassCEEX = min. mass for CEEX, <- 0.999 at 200GeV
+  638          1.0e0      auxiliary parameter, MinMassCEEX = min. mass for CEEX
+****** neutrino muon
+  641             14      KFlavour
+  642              1      NColor
+  643              0      3*Q   =3*charge
+  644              1      2*T3L =2*Isospin for Left component
+  645              0      2*helicity
+  646          1e-30      mass [GeV]
+  647          3.5e0      WtMax Maximum weight for rejection neutrino muon
+**648          1.0e0      auxiliary parameter vmaxGPS, CEEX always on
+  648          0.0e0      auxiliary parameter, MinMassCEEX = min. mass for CEEX
+*indx_______________ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0
+****** tau
+  651             15      KFlavour
+  652              1      NColor
+  653             -3      3*Q   =3*charge
+  654             -1      2*T3L =2*Isospin for Left component
+  655              0      2*helicity
+  656        1.777e0      mass [GeV]   (1.777 GeV)
+  657          8.0e0      WtMax Maximum weight for rejection tau
+**658          1.0e0      auxiliary parameter vmaxGPS, CEEX always on
+  658          0.0e0      auxiliary parameter, MinMassCEEX = min. mass for CEEX
+****** neutrino tau
+  661             16      KFlavour
+  662              1      NColor
+  663              0      3*Q   =3*charge
+  664              1      2*T3L =2*Isospin for Left component
+  665              0      2*helicity
+  666          1e-30      mass [GeV]
+  667          3.5e0      WtMax Maximum weight for rejection neutrino tau
+**668          1.0e0      auxiliary parameter vmaxGPS, CEEX always on
+  668          0.0e0      auxiliary parameter, MinMassCEEX = min. mass for CEEX
+********************************************************************************
+*****                                                                       ****
+*****                Entries 800-999 reserved for Electroweak libraries     ****
+*****                                                                       ****
+********************************************************************************
+*indx_____data______ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0
+  801              1     Ibox=0,1, EW boxes off,on,    input for Dizet
+  805          100e0      amh   =xpar(805) Higgs mass, input for Dizet
+  806          175e0      amtop =xpar(806) Top mass,   input for Dizet
+  808 128.86674175e0   alfinvMZ =xpar(808) alfQED(MZ), input for Dizet
+  809        0.125e0   alfQCDMZ =xpar(809) alfQCD(MZ), input for Dizet
+*      DIZET flags NPAR(i)=NPAR(900+i)
+  901              1  Ihvp  ! =1,2,3  (Jegerlehner/Eidelman, Jegerlehner(1988), Burkhardt etal.)
+  902              4  Iamt4 ! =0,1,2,3,4 (=4 the best, Degrassi/Gambino)
+  903              3  Iqcd  ! =1,2,3  (approx/fast/lep1, exact/Slow!/Bardin/, exact/fast/Kniehl)
+  904              1  Imoms ! =0,1    (=1 W mass recalculated)
+  905              0  Imass ! =0,1    (=1 test only, effective quark masses)
+  906              0  Iscre ! =0,1,2  ( Remainder terms, 
+  907              3  Ialem ! =1,3 or 0,2, (for 1,3 DALH5 not input)
+  908              0  Imask ! =0,1 (=0: Quark masses everywhere; =1 Phys. threshold in the ph.sp.)
+  909              0  Iscal ! =0,1,2,3  ( Kniehl=1,2,3, Sirlin=4)
+  910              2  Ibarb ! =-1,0,1,2 ( Barbieri???)
+  911              1  Iftjr ! =0,1      ( FTJR corrections)
+  912              0  Ifacr ! =0,1,2,3  ( Expansion of delta_r; =0 none; =3 fully, unrecommed.)
+  913              0  Ifact ! =0,1,2,3,4,5 (Expansion of kappa; =0 none )
+  914              0  Ihigs ! =0,1      ( Leading Higgs contribution resummation)
+  915              1  Iafmt ! =0,1      (=0 for old ZF)
+*       Additional parameters of 6.x version
+  916              1  Iewlc ! =0,1   (???)
+  917              1  Iczak ! =0,1   (Czarnecki/Kuehn corrections)
+  918              1  Ihig2 ! =0,1   (Two-loop higgs  corrections off,on) 
+  919              3  Iale2 ! =1,2,3 (Two-loop constant corrections in delta_alpha)
+  920              2  Igfer ! =0,1,2 (QED corrections for fermi constant)
+  921              1  Iddzz ! =0,1   (??? DD-ZZ game, internal flag)
+********************************************************************************
+*****                                                                       ****
+*****                Entries 2000-2999 reserved for Tauola                  ****
+*****                                                                       ****
+********************************************************************************
+**  Jak=-1       No decay
+**  Jak=0        Inclusive, 1.e. Jak=1,2,3,4,5,6,7,8...
+**  Jak=1,2,3    electron,mu,pi  decays
+**  Jak=4,5,6,7  rho,a1,K,K*     decays
+**  Jak=8...     see list of branchings below
+ 2001            0e0      Jak1   =xpar(71)  First  Tau decay mask
+ 2002            0e0      Jak2   =xpar(72)  Second Tau decay mask
+ 2003           15e0      idff   =xpar(72)  PDG ident of the first tau
+ 2004            1e0      itdkRC =xpar(74)  QED rad. switch in leptonic decays
+ 2005        0.001e0      xk0dec =xpar(75)  IR-cut for QED rad. in leptonic decays
+ 2006            1e0      KeyA1  =xpar(76)  Type of a1 current
+ 2007        0.975e0\\\\\\Cosine of  Cabibo angle, dont change it\\\\\\\\\\\\\\
+ 2008            1e0      GV in tau decay
+ 2009           -1e0      GA in tau decay
+**  Coefficients to fix ratio of:
+**    BRA1  -- A1 3CHARGED/ A1 1CHARGED 2 NEUTRALS MATRIX ELEMENTS (MASLESS LIM.)
+**    BRK0  -- PROBABILITY OF K0 TO BE KS
+**    BRK0B -- PROBABILITY OF K0B TO BE KS
+**    BRKS  -- RATIO OF COEFFICIENTS FOR K*--> K0 PI-
+**  All coefficents should be in the range (0.0,1.0)
+**  They meaning is probability of the first choice only if one
+**  neglects mass-phase space effects
+ 2010          0.5e0      BRA1   in 3 pion tau dec. BR of PI+PI-PI- (vs PI-PI0PI0
+ 2011       0.6667e0      BRKS   in K* tau dec. BR of BR of K+PI0 (vs PI+K0
+ 2012          0.5e0      BRK0   Probability of K0 to be KS
+ 2013          0.5e0      BRK0B  Probability of K0B to be KS
+**  Tau branching ratios for selection of decay chanel in MC series.
+**  Data below are from PDG July 1998. 
+**  They do not need to summ up to unity. MC corrects for this.
+**  !!! WARNING!!!  They do not match the model actually used in the present version of Tauola, 
+**                  however, for many applications they might be sufficiently good.
+**  !!! IMPORTANT HINT !!!!
+**           Entry 2101 set smaller than -1e0 will activate internal defaults of Tauola.
+**           In such a case all input from 2008-2122 will be IGNORED
+ 2101      17.810e-2      TAU-  -->   E-               
+ 2102      17.370e-2      TAU-  -->  MU-               
+ 2103      11.080e-2      TAU-  -->  PI-
+ 2104      25.320e-2      TAU-  -->  PI-, PI0
+ 2105      18.380e-2      TAU-  -->  A1-(two subch: 2PI-PI+= 9.23%, PI-2PI0=9.15%)
+ 2106       0.710e-2      TAU-  -->   K-
+ 2107       1.350e-2      TAU-  -->  K*- (two subch:  K-PI0= 0.52%, K0PI- =0.83%)
+ 2108       4.350e-2      TAU-  --> 2PI-,  PI0,  PI+   
+ 2109       1.110e-2      TAU-  --> 3PI0,        PI-   
+ 2110       0.011e-2      TAU-  --> 2PI-,  PI+, 2PI0   
+ 2111       0.075e-2      TAU-  --> 3PI-, 2PI+,        
+ 2112       0.022e-2      TAU-  --> 3PI-, 2PI+,  PI0   
+ 2113       0.029e-2      TAU-  --> 2PI-,  PI+, 3PI0   
+ 2114       0.161e-2      TAU-  -->  K-, PI-,  K+      
+ 2115       0.121e-2      TAU-  -->  K0, PI-, K0B      
+ 2116       0.151e-2      TAU-  -->  K-,  K0, PI0      
+ 2117       0.080e-2      TAU-  --> PI0, PI0,  K-      
+ 2118       0.180e-2      TAU-  -->  K-, PI-, PI+      
+ 2119       0.390e-2      TAU-  --> PI-, K0B, PI0      
+ 2120       0.174e-2      TAU-  --> ETA, PI-, PI0      
+ 2121       0.050e-2      TAU-  --> PI-, PI0, GAM      ???? from MC
+ 2122       0.159e-2      TAU-  -->  K-,  K0           
+** !!! Tau branching ratios all equal!!! for starting the true work on br. ratios
+*2101       1.0000e0      TAU-  -->   E-               
+*2102       1.0000e0      TAU-  -->  MU-               
+*2103       1.0000e0      TAU-  -->  PI-               
+*2104       1.0000e0      TAU-  -->  PI-, PI0          
+*2105       1.0000e0      TAU-  -->  A1- (two subch)   
+*2106       1.0000e0      TAU-  -->   K-               
+*2107       1.0000e0      TAU-  -->  K*- (two subch)   
+*2108       1.0000e0      TAU-  --> 2PI-,  PI0,  PI+   
+*2109       1.0000e0      TAU-  --> 3PI0,        PI-   
+*2110       1.0000e0      TAU-  --> 2PI-,  PI+, 2PI0   
+*2111       1.0000e0      TAU-  --> 3PI-, 2PI+,        
+*2112       1.0000e0      TAU-  --> 3PI-, 2PI+,  PI0   
+*2113       1.0000e0      TAU-  --> 2PI-,  PI+, 3PI0   
+*2114       1.0000e0      TAU-  -->  K-, PI-,  K+      
+*2115       1.0000e0      TAU-  -->  K0, PI-, K0B      
+*2116       1.0000e0      TAU-  -->  K-,  K0, PI0      
+*2117       1.0000e0      TAU-  --> PI0, PI0,  K-      
+*2118       1.0000e0      TAU-  -->  K-, PI-, PI+      
+*2119       1.0000e0      TAU-  --> PI-, K0B, PI0      
+*2120       1.0000e0      TAU-  --> ETA, PI-, PI0      
+*2121       1.0000e0      TAU-  --> PI-, PI0, GAM      
+*2122       1.0000e0      TAU-  -->  K-,  K0           
+********************************************************************************
+*****                   End of data for Tauola                              ****
+********************************************************************************
+EndX

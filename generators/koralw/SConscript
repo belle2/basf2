@@ -1,0 +1,15 @@
+import os
+
+Import('env')
+
+env['SUBLIB'] = True
+# apparently this fortran library has a strange linking problem in debug mode
+# which I do not understand and also google is unhelpful. But it can be avoided
+# by not being so strict when linking. Feels like a bug in ld or gcc but I'm not
+# quite sure
+env['LINKFLAGS'] = []
+env['LIBS'] = ['$ROOT_LIBS', 'mdst_dataobjects', 'framework', 'gfortran']
+
+env.Append(LINKFLAGS=["-Wl,--version-script=" + File("symbols.map").abspath])
+
+Return('env')

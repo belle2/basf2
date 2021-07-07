@@ -1,0 +1,83 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+import os
+import sys
+import subprocess
+
+from rfarmutil import *
+
+argvs = sys.argv
+argc = len(argvs)
+
+conffile = argvs[1]
+
+# Base directory and unit name
+unitdir = get_rfgetconf(conffile, 'system', 'unitdir_base' )
+basedir = get_rfgetconf(conffile, 'system', 'execdir_base' )
+
+# Create base directories
+if not os.path.exists ( unitdir ):
+    os.mkdir ( unitdir )
+os.mkdir ( unitdir+"/run")
+os.mkdir ( unitdir+"/nsm")
+
+# Setup run directory
+if not os.path.exists ( basedir+'/distributor' ):
+    os.mkdir ( basedir+'/distributor' )
+if not os.path.exists ( basedir+'/collector' ):
+    os.mkdir ( basedir+'/collector' )
+if not os.path.exists ( basedir+'/dqmserver' ):
+    os.mkdir ( basedir+'/dqmserver' )
+if not os.path.exists ( basedir+'/roisender' ):
+    os.mkdir ( basedir+'/roisender' )
+if not os.path.exists ( basedir+'/master' ):
+    os.mkdir ( basedir+'/master' )
+
+# Setup scripts
+subprocess.call ( ["copy_scripts", conffile] )
+subprocess.call ( ["setup_evpscripts", conffile] )
+
+# Symbolic link configuration file
+cfname = conffile + ".conf"
+fullcfname = os.environ.get('RFARM_CONFDIR') + cfname
+os.chdir ( basedir )
+if (os.path.exists(cfname)):
+    os.remove(cfname)
+    os.symlink( fullcfname, cfname )
+
+# Symbolic link to rfnodeinfo.h
+srcinfo = os.environ.get("BELLE2_LOCAL_DIR") + "/daq/rfarm/run/nsmdata/rfnodeinfo.h"
+os.chdir ( basedir + '/distributor' )
+os.symlink ( srcinfo, 'rfnodeinfo.h' )
+os.chdir ( basedir + '/collector' )
+os.symlink ( srcinfo, 'rfnodeinfo.h' )
+os.chdir ( basedir + '/master' )
+os.symlink ( srcinfo, 'rfnodeinfo.h' )
+os.chdir ( basedir + '/dqmserver' )
+os.symlink ( srcinfo, 'rfnodeinfo.h' )
+os.chdir ( basedir + '/roisender' )
+os.symlink ( srcinfo, 'rfnodeinfo.h' )
+
+nodebase = get_rfgetconf(conffile, 'processor', 'nodebase')
+nnodes = int(get_rfgetconf(conffile, 'processor', 'nnodes'))
+procid = int(get_rfgetconf(conffile, 'processor', 'idbase'))
+badlist = get_rfgetconf(conffile, 'processor', 'badlist')
+id = int(get_rfgetconf(conffile, 'processor', 'idbase'))
+
+for i in range(procid, procid + nnodes):
+    nodeid = '%2.2d' % i
+    if badlist.find(nodeid) == -1:
+        nodename = nodebase + nodeid
+        if not os.path.exists(basedir + '/evp_' + nodename):
+            os.mkdir(basedir + '/evp_' + nodename)
+        os.chdir(basedir + '/evp_' + nodename)
+        os.symlink( srcinfo, 'rfnodeinfo.h' )

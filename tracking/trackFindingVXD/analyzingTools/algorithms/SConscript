@@ -1,0 +1,22 @@
+Import('env')
+
+#print(" now in analyzingTools!")
+
+import os
+
+## Mark this folder as a sub library
+#env['SUBLIB'] = True
+##env.Dictionary()['SUBLIB'] = True
+
+
+env['LIBS'] = [
+    #'genfit2', 
+    #'pxd_dataobjects', 
+    'svd_dataobjects', 
+    #'vxd',
+    #'vxd_dataobjects', 
+    #'framework', 
+    'tracking',
+    #'tracking_trackFindingCDC', # actually not needed, but if not added, it doesn't compile...
+    ]
+Return('env')

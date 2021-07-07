@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created: Vishal-->
+<!--
+   <Name>ECLFirstCorrection</Name>
+   <Description>ECL gamma correction based on theta and Energy </Description>
+   ecl/modules/eclRecShower/src ==> ECLReconstructorModule.cc
+-->
+
+<ECLFirstCorrection>
+  
+  <ThetaBins>
+    <ThetaBins id="1">
+      <ThetaStart unit="deg">0</ThetaStart>
+      <ThetaEnd unit="deg">32.2</ThetaEnd>
+      <Polynomial1>9.56670E-01</Polynomial1>
+      <Polynomial2>-2.28268E-03</Polynomial2>
+      <Polynomial3>-2.23364E-03</Polynomial3>
+      <Polynomial4>2.41601E-04</Polynomial4>
+    </ThetaBins>
+    
+    <ThetaBins id="2">
+      <ThetaStart unit="deg">32.2</ThetaStart>
+      <ThetaEnd  unit="deg">35.0</ThetaEnd>
+      <Polynomial1>9.39221E-01</Polynomial1>
+      <Polynomial2>-6.01211E-03</Polynomial2>
+      <Polynomial3>-1.01388E-03</Polynomial3>
+      <Polynomial4>2.21742E-04</Polynomial4>
+    </ThetaBins>
+    
+    <ThetaBins id="3">
+      <ThetaStart unit="deg">35.0</ThetaStart>
+      <ThetaEnd  unit="deg">37.5</ThetaEnd>
+      <Polynomial1>9.47695E-01</Polynomial1>
+      <Polynomial2>-4.00680E-03</Polynomial2>
+      <Polynomial3>-6.62361E-04</Polynomial3>
+      <Polynomial4>3.51879E-04</Polynomial4>
+    </ThetaBins>
+    
+    <ThetaBins id="4">
+      <ThetaStart unit="deg">37.5</ThetaStart>
+      <ThetaEnd  unit="deg">40.0</ThetaEnd>
+      <Polynomial1>9.46688E-01</Polynomial1>
+      <Polynomial2>-2.83932E-03</Polynomial2>
+      <Polynomial3>-6.50563E-04</Polynomial3>
+      <Polynomial4>2.73304E-04</Polynomial4>
+    </ThetaBins>
+    
+    <ThetaBins id="5">
+      <ThetaStart unit="deg">40.0</ThetaStart>
+      <ThetaEnd  unit="deg">42.5</ThetaEnd>
+      <Polynomial1>9.51124E-01</Polynomial1>
+      <Polynomial2>-3.64272E-03</Polynomial2>
+      <Polynomial3>-1.03425E-03</Polynomial3>
+      <Polynomial4>2.14907E-04</Polynomial4>
+    </ThetaBins>
+    
+    <ThetaBins id="6">
+      <ThetaStart unit="deg">42.5</ThetaStart>
+      <ThetaEnd  unit="deg">45.0</ThetaEnd>
+      <Polynomial1>9.53309E-01</Polynomial1>
+      <Polynomial2>-2.62172E-03</Polynomial2>
+      <Polynomial3>-8.97187E-04</Polynomial3>
+      <Polynomial4>3.51823E-04</Polynomial4>
+    </ThetaBins>
+    
+    <ThetaBins id="7">
+      <ThetaStart unit="deg">45.0</ThetaStart>
+      <ThetaEnd  unit="deg">55.0</ThetaEnd>
+      <Polynomial1>9.53309E-01</Polynomial1>
+      <Polynomial2>-2.62172E-03</Polynomial2>
+      <Polynomial3>-8.97187E-04</Polynomial3>
+      <Polynomial4>3.51823E-04</Polynomial4>
+    </ThetaBins>
+    
+    <ThetaBins id="8">
+      <ThetaStart unit="deg">55.0</ThetaStart>
+      <ThetaEnd  unit="deg">65.0</ThetaEnd>
+      <Polynomial1>9.58557E-01</Polynomial1>
+      <Polynomial2>-2.44004E-03</Polynomial2>
+      <Polynomial3>-1.49555E-03</Polynomial3>
+      <Polynomial4>1.41088E-04</Polynomial4>
+    </ThetaBins>
+    
+    <ThetaBins id="9">
+      <ThetaStart unit="deg">65.0</ThetaStart>
+      <ThetaEnd  unit="deg">75.0</ThetaEnd>
+      <Polynomial1>9.60535E-01</Polynomial1>
+      <Polynomial2>-2.77543E-03</Polynomial2>
+      <Polynomial3>-1.44099E-03</Polynomial3>
+      <Polynomial4>2.44692E-04</Polynomial4>
+    </ThetaBins>
+    
+    <ThetaBins id="10">
+      <ThetaStart unit="deg">75.0</ThetaStart>
+      <ThetaEnd  unit="deg">85.0</ThetaEnd>
+      <Polynomial1>9.61075E-01</Polynomial1>
+      <Polynomial2>-3.09389E-03</Polynomial2>
+      <Polynomial3>-1.45289E-03</Polynomial3>
+      <Polynomial4>2.16016E-04</Polynomial4>
+    </ThetaBins>
+    
+    <ThetaBins id="11">
+      <ThetaStart unit="deg">85.0</ThetaStart>
+      <ThetaEnd  unit="deg">95.0</ThetaEnd>
+      <Polynomial1>9.60538E-01</Polynomial1>
+      <Polynomial2>-3.35572E-03</Polynomial2>
+      <Polynomial3>-1.36629E-03</Polynomial3>
+      <Polynomial4>2.30296E-04</Polynomial4>
+    </ThetaBins>
+    
+    <ThetaBins id="12">
+      <ThetaStart unit="deg">95.0</ThetaStart>
+      <ThetaEnd  unit="deg">105.0</ThetaEnd>
+      <Polynomial1>9.61748E-01</Polynomial1>
+      <Polynomial2>-4.30415E-03</Polynomial2>
+      <Polynomial3>-1.05225E-03</Polynomial3>
+      <Polynomial4>3.59288E-04</Polynomial4>
+    </ThetaBins>
+    
+    <ThetaBins id="13">
+      <ThetaStart unit="deg">105.0</ThetaStart>
+      <ThetaEnd  unit="deg">115.0</ThetaEnd>
+      <Polynomial1>9.61925E-01</Polynomial1>
+      <Polynomial2>-4.44564E-03</Polynomial2>
+      <Polynomial3>-1.13480E-03</Polynomial3>
+      <Polynomial4>2.55418E-04</Polynomial4>
+    </ThetaBins>
+
+    <ThetaBins id="14">
+      <ThetaStart unit="deg">115.0</ThetaStart>
+      <ThetaEnd  unit="deg">128.7</ThetaEnd>
+      <Polynomial1>9.58142E-01</Polynomial1>
+      <Polynomial2>-4.75945E-03</Polynomial2>
+      <Polynomial3>-6.66410E-04</Polynomial3>
+      <Polynomial4>4.77996E-04</Polynomial4>
+    </ThetaBins>
+    
+    <ThetaBins id="15">
+      <ThetaStart unit="deg">128.7</ThetaStart>
+      <ThetaEnd  unit="deg">180.0</ThetaEnd>
+      <Polynomial1>9.49364E-01</Polynomial1>
+      <Polynomial2>-3.31338E-03</Polynomial2>
+      <Polynomial3>-2.25274E-03</Polynomial3>
+      <Polynomial4>1.43136E-04</Polynomial4>
+    </ThetaBins>
+
+  </ThetaBins>
+   
+</ECLFirstCorrection>
+
+

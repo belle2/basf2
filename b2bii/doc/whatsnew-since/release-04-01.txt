@@ -1,0 +1,18 @@
+Changes in the b2bii package since release-04-01
+------------------------------------------------
+
+ .. warning:: ``b2biiConversion.setupB2BIIDatabase()`` will be deprecated soon. 
+
+convertBelleMdstToBelleIIMdst
++++++++++++++++++++++++++++++
+
+ * Added a switch to deactivate ``nisKsFinder``.
+ * Renamed ``applyHadronBJSkim`` to ``applySkim``, and added switches to deactivate ``HadronA`` and ``HadronB`` skims.
+ * Added a switch to deactivate converting ``RecTrg_Summary3`` table.
+
+Conversion
+++++++++++
+
+ * Removed ``convertECLCrystalEnergies()`` and ``convertExtHits()`` in the conversion.
+ * Added mass-constraint fit information of ``pi0:mdst``, including chiSquared, ndf and pValue as ``extraInfo()``.
+ * Added ``m_final(3)`` in ``RecTrg_Summary3`` table as ``eventExtraInfo(rectrg_summary3_m_final)``.

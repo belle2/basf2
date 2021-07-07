@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="HeavyMetalShield" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<Creator library="vxd">HeavyMetalShieldCreator</Creator>
+	<Content>
+
+		<Shield name="Backward" description="IR HeavyMetalShield in backwards direction (-z)">
+			<Material>W</Material>
+			<Plane>
+				<posZ unit="mm">-410</posZ>
+				<innerRadius unit="mm">42.5</innerRadius>
+				<outerRadius unit="mm">104.5</outerRadius>  
+			</Plane>
+			<Plane>
+				<posZ unit="mm">-400</posZ>
+				<innerRadius unit="mm">42.5</innerRadius>
+				<outerRadius unit="mm">104.5</outerRadius>  
+			</Plane>
+			<Plane>
+				<posZ unit="mm">-400</posZ>
+				<innerRadius unit="mm">42.5</innerRadius>
+				<outerRadius unit="mm">84.7</outerRadius>  
+			</Plane>
+			<Plane>
+				<posZ unit="mm">-390</posZ>
+				<innerRadius unit="mm">42.5</innerRadius>
+				<outerRadius unit="mm">84.7</outerRadius>  
+			</Plane>
+			<Plane>
+				<posZ unit="mm">-390</posZ>
+				<innerRadius unit="mm">42.5</innerRadius>
+				<outerRadius unit="mm">58</outerRadius>  
+			</Plane>
+			<Plane>
+				<posZ unit="mm">-380</posZ>
+				<innerRadius unit="mm">42.5</innerRadius>
+				<outerRadius unit="mm">58</outerRadius>  
+			</Plane>
+			<Plane>
+				<posZ unit="mm">-280</posZ>
+				<innerRadius unit="mm">23.68</innerRadius>
+				<outerRadius unit="mm">39.18</outerRadius>  
+			</Plane>
+			<Plane>
+				<posZ unit="mm">-280</posZ>
+				<innerRadius unit="mm">0</innerRadius>
+				<outerRadius unit="mm">39.18</outerRadius>  
+			</Plane>
+			<Plane>
+				<posZ unit="mm">-210</posZ>
+				<innerRadius unit="mm">0</innerRadius>
+				<outerRadius unit="mm">26</outerRadius>  
+			</Plane>
+			<Plane>
+				<posZ unit="mm">-160</posZ>
+				<innerRadius unit="mm">0</innerRadius>
+				<outerRadius unit="mm">26</outerRadius>  
+			</Plane>
+			<Cutout>
+				<width unit="mm">61</width>
+				<height unit="mm">31</height>
+				<depth unit="mm">100</depth>
+			</Cutout>
+		</Shield>
+
+		<Shield name="Forward" description="IR HeavyMetalShield in forwards direction (+z)">
+			<Material>W</Material>
+			<Plane>
+				<posZ unit="mm">198</posZ>
+				<innerRadius unit="mm">0</innerRadius>
+				<outerRadius unit="mm">28</outerRadius>  
+			</Plane>
+			<Plane>
+				<posZ unit="mm">300.5</posZ>
+				<innerRadius unit="mm">0</innerRadius>
+				<outerRadius unit="mm">28</outerRadius> 
+			</Plane>
+			<Plane>
+				<posZ unit="mm">349.5</posZ>
+				<innerRadius unit="mm">0</innerRadius>
+				<outerRadius unit="mm">35.43</outerRadius> 
+			</Plane>
+			<Plane>
+				<!-- G4 vizualizer bug overcome -->
+				<posZ unit="mm">349.51</posZ>
+				<innerRadius unit="mm">27.4</innerRadius>
+				<outerRadius unit="mm">35.43</outerRadius> 
+			</Plane>
+			<Plane>
+				<!-- G4 vizualizer bug overcome -->
+				<posZ unit="mm">349.52</posZ>
+				<innerRadius unit="mm">27.4</innerRadius>
+				<outerRadius unit="mm">42.54</outerRadius> 
+			</Plane>
+			<Plane>
+				<posZ unit="mm">450</posZ>
+				<innerRadius unit="mm">42.5</innerRadius>
+				<outerRadius unit="mm">58</outerRadius> 
+			</Plane>
+			<Plane>
+				<posZ unit="mm">460</posZ>
+				<innerRadius unit="mm">42.5</innerRadius>
+				<outerRadius unit="mm">58</outerRadius> 
+			</Plane>
+			<Plane>
+				<posZ unit="mm">460</posZ>
+				<innerRadius unit="mm">42.5</innerRadius>
+				<outerRadius unit="mm">84.574</outerRadius> 
+			</Plane>
+			<Plane>
+				<posZ unit="mm">470</posZ>
+				<innerRadius unit="mm">42.5</innerRadius>
+				<outerRadius unit="mm">84.574</outerRadius> 
+			</Plane>
+			<Plane>
+				<posZ unit="mm">470</posZ>
+				<innerRadius unit="mm">42.5</innerRadius>
+				<outerRadius unit="mm">104.65</outerRadius> 
+			</Plane>
+			<Plane>
+				<posZ unit="mm">480</posZ>
+				<innerRadius unit="mm">42.5</innerRadius>
+				<outerRadius unit="mm">104.65</outerRadius> 
+			</Plane>
+			<Cutout>
+				<width unit="mm">70</width>
+				<height unit="mm">31</height>
+				<depth unit="mm">151.5</depth>
+			</Cutout>
+		</Shield>
+
+	</Content>
+</DetectorComponent>

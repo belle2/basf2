@@ -1,0 +1,55 @@
+<!-- This governs the packages side bar -->
+
+{{#packages}}
+{{#if visible}}
+<div>
+  <!-- This span prevents a newline btw. the status graphic and the name -->
+  <span style="white-space: nowrap">
+		{{#if fail_count > 0 || comparison_error_shifter > 0 || ( show_expert_plots && comparison_error > 0 ) }}
+			<span
+          title="{{ fail_count }} validation scripts of this package failed to execute and {{ #if show_expert_plots }}{{comparison_error}}{{ else }}{{ comparison_error_shifter }}{{ /if }} comparisons failed"
+          class="fail_count_greater_zero">
+				{{ fail_count }}|{{ #if show_expert_plots }}{{comparison_error}}{{ else }}{{ comparison_error_shifter }}{{ /if }}
+			</span>
+		{{else}}
+			<span
+          title="All validation scripts in this category executed with success"
+          class="fail_count_zero">
+				OK
+			</span>
+		{{/if}}
+		<a on-click="load_validation_plots" href="#load" class="pkg_container_head">{{ name }} »</a>
+	</span>
+  <!-- hide the sub-sections by default and only show if the user clicks, set display: block -->
+  <div class="pkg_container pkg_tracking" style="display: {{display_setting}};">
+    <!--iterate over plot files contained in this package -->
+    {{#plotfiles}}
+    <!-- This span prevents a newline btw. the status graphic and the name -->
+    {{#if show_shifter || show_expert_plots }}
+    <span class="package_root_file">
+			{{#if comparison_error_shifter > 0 || ( show_expert_plots && comparison_error > 0 ) }}
+				<span class="fail_count_greater_zero_rootfile" title="{{ #if show_expert_plots }}{{comparison_error}}{{ else }}{{ comparison_error_shifter }}{{ /if }} comparisons failed" >
+          {{ #if show_expert_plots }}{{comparison_error}}{{ else }}{{ comparison_error_shifter }}{{ /if }}
+        </span>
+			{{else}}
+				<span
+            title="All comparisons succeeded"
+            class="fail_count_zero_rootfile">
+					OK
+				</span>
+			{{/if}}
+			<a title="{{ title }}" href="#{{package}}-{{rootfile}}">{{ rootfile }}</a>
+    </span>
+    {{ /if }}
+    {{/plotfiles}}
+    {{! give output if there are no plot files at all }}
+    {{^plotfiles}}
+    No output files
+    {{/plotfiles}}
+  </div>
+</div>
+{{/if}}
+{{/packages}}
+{{^packages}}
+No packages loaded
+{{/packages}}

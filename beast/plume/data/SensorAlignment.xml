@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<SensorAlignment>
+  <ladder id="CC4">
+    <side id="strait">
+      <sensor>
+	<id>5</id>
+	<x unit="mm">-13.0463</x>
+	<y unit="mm">12.0925</y>
+	<alpha unit="rad">0.00168714</alpha>
+      </sensor>
+      <sensor>
+	<id>4</id>
+	<x unit="mm">-34.7987</x>
+	<y unit="mm">12.0865</y>
+	<alpha unit="rad">0.00230362</alpha>
+      </sensor>
+      <sensor>
+	<id>3</id>
+	<x unit="mm">-56.5978</x>
+	<y unit="mm">12.0873</y>
+	<alpha unit="rad">-0.00207921</alpha>
+      </sensor>
+      <sensor>
+	<id>2</id>
+	<x unit="mm">-78.3385</x>
+	<y unit="mm">12.1008</y>
+	<alpha unit="rad">0.00126681</alpha>
+      </sensor>
+      <sensor>
+	<id>1</id>
+	<x unit="mm">-100.117</x>
+	<y unit="mm">12.0957</y>
+	<alpha unit="rad">-0.000583084</alpha>
+      </sensor>
+      <sensor>
+	<id>0</id>
+	<x unit="mm">-121.939</x>
+	<y unit="mm">12.1197</y>
+	<alpha unit="rad">-0.0020178</alpha>
+      </sensor>
+    </side>
+
+    <side id="mirror">
+      <sensor>
+	<id>5</id>
+	<x unit="mm">-13.0858</x>
+	<y unit="mm">-11.829</y>
+	<alpha unit="rad">0.00030567</alpha>
+      </sensor>
+      <sensor>
+	<id>4</id>
+	<x unit="mm">-34.8825</x>
+	<y unit="mm">-11.895</y>
+	<alpha unit="rad">-0.000450215</alpha>
+      </sensor>
+      <sensor>
+	<id>3</id>
+	<x unit="mm">-56.6535</x>
+	<y unit="mm">-11.8752</y>
+	<alpha unit="rad">0.000311274</alpha>
+      </sensor>
+      <sensor>
+	<id>2</id>
+	<x unit="mm">-78.4105</x>
+	<y unit="mm">-12.0225</y>
+	<alpha unit="rad">0.000191481</alpha>
+      </sensor>
+      <sensor>
+	<id>1</id>
+	<x unit="mm">-100.174</x>
+	<y unit="mm">-12.0855</y>
+	<alpha unit="rad">-7.93947e-06</alpha>
+      </sensor>
+      <sensor>
+	<id>0</id>
+	<x unit="mm">-121.934</x>
+	<y unit="mm">-12.05</y>
+	<alpha unit="rad">0.000174668</alpha>
+      </sensor>
+    </side>
+  </ladder>
+  
+  <ladder id="CC5">
+    <side id="strait">
+      <sensor>
+	<id>5</id>
+	<x unit="mm">-13.0315</x>
+	<y unit="mm">12.2855</y>
+	<alpha unit="rad">-0.000287689</alpha>
+      </sensor>
+      <sensor>
+	<id>4</id>
+	<x unit="mm">-34.6525</x>
+	<y unit="mm">12.2675</y>
+	<alpha unit="rad">-0.00132169</alpha>
+      </sensor>
+      <sensor>
+	<id>3</id>
+	<x unit="mm">-56.5743</x>
+	<y unit="mm">12.2758</y>
+	<alpha unit="rad">0.000265739</alpha>
+      </sensor>
+      <sensor>
+	<id>2</id>
+	<x unit="mm">-78.3372</x>
+	<y unit="mm">12.2908</y>
+	<alpha unit="rad">-0.000524005</alpha>
+      </sensor>
+      <sensor>
+	<id>1</id>
+	<x unit="mm">-100.126</x>
+	<y unit="mm">12.2575</y>
+	<alpha unit="rad">0.000175602</alpha>
+      </sensor>
+      <sensor>
+	<id>0</id>
+	<x unit="mm">-122.02</x>
+	<y unit="mm">12.1562</y>
+	<alpha unit="rad">0.0067493</alpha>
+      </sensor>
+    </side>
+
+    <side id="mirror">
+      <sensor>
+	<id>5</id>
+	<x unit="mm">-13.165</x>
+	<y unit="mm">-12.292</y>
+	<alpha unit="rad">0.00061601</alpha>
+      </sensor>
+      <sensor>
+	<id>4</id>
+	<x unit="mm">-34.9222</x>
+	<y unit="mm">-12.2823</y>
+	<alpha unit="rad">-0.000575378</alpha>
+      </sensor>
+      <sensor>
+	<id>3</id>
+	<x unit="mm">-56.6672</x>
+	<y unit="mm">-12.2927</y>
+	<alpha unit="rad">-5.74444e-05</alpha>
+      </sensor>
+      <sensor>
+	<id>2</id>
+	<x unit="mm">-78.4185</x>
+	<y unit="mm">-12.282</y>
+	<alpha unit="rad">-0.000353073</alpha>
+      </sensor>
+      <sensor>
+	<id>1</id>
+	<x unit="mm">-100.209</x>
+	<y unit="mm">-12.276</y>
+	<alpha unit="rad">0.000120026</alpha>
+      </sensor>
+      <sensor>
+	<id>0</id>
+	<x unit="mm">-122.033</x>
+	<y unit="mm">-12.2787</y>
+	<alpha unit="rad">0.000684663</alpha>
+      </sensor>
+    </side>
+  </ladder>  
+</SensorAlignment>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="VXDService" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Creator library="vxd">VXDServiceCreator</Creator>
+  <Content>
+    <DockBoxes>
+      <RecordBackground>false</RecordBackground>
+      <!-- Define dimensions for PXD DockBox, identifier is the BeamBackHit identifier if RecordBackground is set to true -->
+      <BoxType name="PXD" identifier="300">
+        <material>PXD-DockBox</material>
+        <width unit="mm">130.5</width>
+        <length unit="mm">415</length>
+        <height unit="mm">89</height>
+      </BoxType>
+      <!-- Define dimensions for PXD DockBox -->
+      <BoxType name="SVD" identifier="300">
+        <material>SVD-DockBox</material>
+        <width unit="mm">203</width>
+        <length unit="mm">410</length>
+        <height unit="mm">90</height>
+      </BoxType>
+      <!-- Define envelope for forward DockBox position -->
+      <Position name="forward">
+        <minZ unit="mm">1645</minZ>
+        <maxZ unit="mm">2060</maxZ>
+        <minR unit="mm">300</minR>
+        <maxR unit="mm">403</maxR>
+        <divisions>10</divisions>
+        <!-- Define which boxes go at which position. There are only three SVD
+             boxes in forward direction but there are always 5 PXD boxes -->
+        <slots type="SVD">2 6 8</slots>
+        <slots type="PXD">1 3 5 7 9</slots>
+      </Position>
+      <!-- Define envelope for backward DockBox position -->
+      <Position name="backward">
+        <minZ unit="mm">-1410</minZ>
+        <maxZ unit="mm">-995</maxZ>
+        <minR unit="mm">344</minR>
+        <maxR unit="mm">446</maxR>
+        <divisions>10</divisions>
+        <slots type="SVD">0 2 4 6 8</slots>
+        <slots type="PXD">1 3 5 7 9</slots>
+      </Position>
+    </DockBoxes>
+  </Content>
+</DetectorComponent>

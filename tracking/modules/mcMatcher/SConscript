@@ -1,0 +1,11 @@
+Import('env')
+
+env['LIBS'] = [
+    'framework',
+    'mdst_dataobjects',
+    'pxd_dataobjects',
+    'svd_dataobjects',
+    'cdc_dataobjects',
+    'tracking_dataobjects',
+    ]
+Return('env')

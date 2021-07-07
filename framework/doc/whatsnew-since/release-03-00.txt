@@ -1,0 +1,70 @@
+Changes in the framework package
+--------------------------------
+
+Job Information File
+++++++++++++++++++++
+
+basf2 has a new command line parameter ``--job-information=<filename>`` to
+create a json file with some statistics on the processing and detailed
+information on all created output files.
+
+.. seealso:: `BELLE2-NOTE-TE-2017-012: Software and Computing Interface <https://docs.belle2.org/record/609>`_
+
+
+Python Interface
+++++++++++++++++
+
+* Additional utility function `b2test_utils.check_error_free` used to
+  automate a code quality (or indeed any) tool check. It requires
+  execution without any output as part of the unit tests. For example the
+  analysis package now requires no doxygen or cppcheck warnings.
+* Additional utility function `b2test_utils.configure_logging_for_tests` to
+  improve reproducibility of log output for testing purposes by replacing
+  certain setup dependent names of directories with placeholders.
+* The `Pager <terminal_utils.Pager>` class has been moved to a new module
+  `terminal_utils` which now also contains a new class `InputEditor
+  <terminal_utils.InputEditor>` to open a editor when asking the user for a
+  long message similar to ``git commit``
+* The compatibility imports of `sys`, `os` and the ``fw`` object have been
+  removed from `basf2`. Every method which was previously part of the ``fw``
+  object is now just a function in the `basf2` module.
+
+Core Framework
+++++++++++++++
+
+* Addition of helpful ``StoreArray::hasRelationTo`` and
+  ``StoreArray::hasRelationFrom`` methods.
+* Deprecated static methods to register ``StoreArray`` instances have been
+  removed.
+
+Command line Tools
+++++++++++++++++++
+
+* :ref:`b2file-metadata-add <b2file-metadata-add>` will now only update the
+  file in the FileCatalog if it is already registered. It will also now
+  correctly remove the old LFN from the file catalog.
+* :ref:`b2file-merge <b2file-merge>` will by default no longer register files
+  in the file catalog. You can either supply ``--add-to-catalog`` as argument
+  or run ``b2file-catalog-add`` on the output file. Use the latter if you want
+  to write scripts which work also with older releases.
+* :ref:`b2file-normalize <b2file-normalize>` has been added to remove
+  timestamps and similar non-reproducible features from ROOT files.
+* :ref:`b2file-remove-branches <b2file-remove-branches>` has been added to
+  remove obsolete branches from old files.
+* the commands of the `b2conditionsdb <b2conditionsdb>` tool are now also
+  available with dashed version, e.g. ``b2conditionsb-tag-show``
+* A number of old tool names which were kept for compatibility have been
+  removed. The old tool names still exist but raise an error pointing to the
+  new name.
+
+Modules
++++++++
+
+* b2:mod:`RootOutput` module: changed default value for ``updateFileCatalog``
+  to False. This will avoid creating ``Belle2FileCatalog.xml`` or warning about
+  overwriting entries in the file catalog by default. The file catalog is only
+  needed when loading parent files and can always be created later using
+  ``b2file-catalog-add``
+
+  .. seealso::
+     :ref:`b2file-catalog-add <b2file-catalog-add>`

@@ -1,0 +1,28 @@
+# -*- coding: utf-8 -*-
+#vim: syntax=python
+
+Import('env')
+
+env['LIBS'] = [
+    #'pxd',
+    #'svd',
+    #'pxd_dataobjects',
+    #'svd_dataobjects',
+    #'tracking_trackFindingVXD_analyzingTools',
+    #'tracking_spacePointCreation_sptcNetwork',
+    #'tracking_trackFindingCDC', # actually not needed, but if not added, it doesn't compile...
+    #'tracking',
+    ##'tracking_dataobjects',
+    #'tracking_spacePointCreation_sptcNetwork',
+    #'vxd', 'vxd_dataobjects', 
+    'framework',
+    #'Geom',
+    '$ROOT_LIBS',
+    #'genfit2',
+    ##'boost_chrono',
+    ##'$PYTHON_LIBS',
+    #'mdst_dataobjects',
+ 
+    ]
+
+Return('env')

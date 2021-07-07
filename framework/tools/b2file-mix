@@ -1,0 +1,288 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""\
+This program is inteded to merge a set of basf2 output files and to make them
+look like one run of mixed data. The events from the different files will be
+added together by picking a random input file for each event. All events will be
+added exactly once and the relative order of events from the same input file
+will be the same but they will be mixed between files.
+
+The EventMetaData of the events will be modified so that the output file will
+have continously numbered events starting at 1 (or at --start-event=N). The
+experiment and run number will be set to the same value for all events and can
+be chosen using the --exp/--run parameter. In contrast, with --keep-eventinfo the
+original event and run numbers will be kept. This can lead to duplicate event
+numbers and should only be used if all input files have different event numbers.
+
+The amount of events in the output file can be limited with -n. In this case events
+are randomly sampled from all files throughout the files but the relative order
+still remains sequential: events from one file will be in the order they were in
+that file even if there are gaps.
+
+The random seed can be specified to have a fixed order for the output events. To
+allow reproducing this process the lfn of all input files is added to the
+DataDescription of the output file. Together with the random seed which is
+stored in the output file the mixing procedure can be repeated.
+"""
+
+import sys
+import os
+import basf2
+import argparse
+import random
+import time
+from collections import defaultdict
+from ROOT import PyConfig
+# why does ROOT try to parse the comman line arguments? *sigh*
+PyConfig.IgnoreCommandLineOptions = True
+PyConfig.StartGuiThread = False
+import ROOT
+
+
+def create_argumentparser():
+    """Create an argument parser with all defined arguments"""
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--output", "-o", default="shuffled.root", type=str,
+                        help="output file containing the final events")
+    parser.add_argument("--exp", default=0, type=int,
+                        help="the experiment number to set for the output file")
+    parser.add_argument("--run", default=0, type=int,
+                        help="the run number to set for the output file")
+    parser.add_argument("-f", "--overwrite", default=False, action="store_true",
+                        help="overwrite output file if it exists")
+    parser.add_argument("inputfile", nargs="+", type=str, metavar="INPUTFILE",
+                        help="input filenames containing the events")
+    parser.add_argument("--seed", type=str, default=None,
+                        help="Random seed to use for shuffling, can be used to "
+                        "reproduce the event order from a previous run")
+    parser.add_argument("--start-event", type=int, default=1, help="Event number of the first event in the final file. Other events will be numbered sequentially")
+    parser.add_argument("--globaltags", type=str, default=None, help="Globaltags to put in the final file. If not given the globaltags from the first input file will be used.")
+    parser.add_argument("-n", "--output-events", type=int, default=None, help="Limit the events in the output file to be maximum this value")
+    parser.add_argument("--exclude", type=str, default=[], action="append",
+                        help="Branch names to exclude from the output file")
+    parser.add_argument("--keep-eventinfo", default=False, action="store_true",
+                        help="Keep the exp,run,event numbers as they are in the original files")
+    return parser
+
+
+def open_rootfile(filename):
+    """Open a basf2 output root file and return a tuple (event_tree,
+    FileMetaData, TFile) if everything is ok, None if there was any error"""
+    try:
+        tfile = ROOT.TFile.Open(filename)
+        if not tfile or tfile.IsZombie():
+            raise Exception("Can not open file")
+        events = tfile.Get("tree")
+        if not isinstance(events, ROOT.TTree) or events.GetEntries() == 0:
+            raise Exception("Cannot find any events")
+        persistent = tfile.Get("persistent")
+        if not isinstance(persistent, ROOT.TTree) or persistent.GetEntries() == 0:
+            raise Exception("Cannot find persistent entries")
+        persistent.GetEntry(0)
+        try:
+            filemeta = getattr(persistent, "FileMetaData")
+        except AttributeError as e:
+            raise Exception("Cannot find FileMetaData")
+    except Exception as e:
+        basf2.B2ERROR(f"{filename}: {e}")
+        return None
+
+    return (events, filemeta, tfile)
+
+
+def get_branchnames(tree):
+    """Get the list of all branch names in the tree"""
+    return [e.GetName() for e in tree.GetListOfBranches()]
+
+
+def sort_by_entryindex(indexlist):
+    """Sort the file,entry list by entries but keep the order of file indices
+    the same. Just make sure we read the events in order from their respective files"""
+    event_indices = defaultdict(list)
+    for fileindex, entry  in indexlist:
+        event_indices[fileindex].append(entry)
+
+    for entries in event_indices.values():
+        entries.sort()
+
+    return [(file, event_indices[file].pop(0)) for file, _ in indexlist]
+
+
+if __name__ == "__main__":
+    # load the framework_io library because it contains helper functions to fill the
+    # FileMetaData
+    ROOT.gSystem.Load('libframework_io')
+    ROOT.gROOT.LoadMacro(basf2.find_file("include/framework/io/RootIOUtilities.h"))
+
+    parser = create_argumentparser()
+    args = parser.parse_args()
+    if os.path.exists(args.output) and not args.overwrite:
+        basf2.B2FATAL(f"Output file '{args.output}' already exists, please specify -f to overwrite")
+
+    if args.seed is not None:
+        basf2.set_random_seed(args.seed)
+
+    # open all input files
+    inputfiles = [open_rootfile(e) for e in args.inputfile]
+    if None in inputfiles:
+        basf2.B2FATAL("Errors while opening input files, giving up")
+    inputevents = [e[0] for e in inputfiles]
+
+    # check that all branch names are equal to the first file and prepare a list
+    # which contains the input file index and the entry number once for each event
+    # in that file
+    indexlist = []
+    branch_names = get_branchnames(inputevents[0])
+    for index, events in enumerate(inputevents):
+        # check branches
+        if get_branchnames(events) != branch_names:
+            basf2.B2FATAL("branches in input file {} are different, cannot continue".format(args.inputfile[index]))
+        # get number of entries
+        entries = events.GetEntries()
+        indexlist += [(index, e) for e in range(entries)]
+        basf2.B2INFO("{}: found {} events".format(args.inputfile[index], entries))
+
+    basf2.B2INFO(f"Found a total of {len(indexlist)} events in {len(inputevents)} files, shuffling ...")
+    # make sure events are randomized.
+    random.shuffle(indexlist, ROOT.gRandom.Rndm)
+
+    if args.output_events is not None and args.output_events < len(indexlist):
+        indexlist = indexlist[:args.output_events]
+
+    # now sort the entries in each file again because we want to keep relative
+    # order per file
+    indexlist = sort_by_entryindex(indexlist)
+
+    # open output file
+    output = ROOT.TFile.Open(args.output, "RECREATE")
+    if not output:
+        basf2.B2FATAL(f"Cannot create output file '{args.output}'")
+
+    # maybe remove branches from input trees?
+    if args.exclude:
+        for input_tree in inputevents:
+            for branch in args.exclude:
+                input_tree.SetBranchStatus(branch + '*', 0)
+
+    output.cd()
+    # create the tree by cloning the one in the first input file
+    output_tree = inputevents[0].CloneTree(0)
+
+    total_events = len(indexlist)
+    basf2.B2INFO(f"Merging {total_events} events into '{args.output}'")
+
+    # start merging file: indexlist contains the index of the input file once
+    # for each event in that file. So we just need to loop over that list and,
+    # load the next entry from the file specified by the index and write it into
+    # the output tree
+
+    # check how many digits in the number of total_events to format progress
+    # correctly
+    total_events_len = len(str(total_events))
+    # last time we printed updates, so far never
+    last_time = 0
+
+    def progress(evt):
+        """Show progress so user knows how long to wait till it's done"""
+        global last_time
+        curr_time = time.clock()
+        # show at most one update per second and let it run for a few events to
+        # get buffers warmed up
+        if (curr_time-last_time) > 2 and evt >= 10:
+            elapsed = curr_time - start
+            eta = (elapsed/evt)*(total_events-evt)
+            basf2.B2INFO("{:{len}d}/{} events done ({:5.2f}%), approx {:.0f} seconds remaining".format(
+                evt, total_events, 100*evt/total_events, eta, len=total_events_len))
+            last_time = curr_time
+
+    low = (9999, 9999, 99999)
+    high = (0, 0, 0)
+    next_entry = [0] * len(inputfiles)
+    for evtNr, (file_index, event_index) in enumerate(indexlist):
+        # make sure GetEntry loads it into the output tree, but this is only necessary
+        # if there is more than one input file
+        if len(inputfiles) > 1:
+            inputevents[file_index].CopyAddresses(output_tree)
+        # and get the entry
+        inputevents[file_index].GetEntry(event_index)
+        meta = output_tree.EventMetaData
+        if not args.keep_eventinfo:
+            # now adjust the event metadata
+            meta.setExperiment(args.exp)
+            meta.setRun(args.run)
+            meta.setEvent(evtNr+args.start_event)
+            meta.setSubrun(0)
+        else:
+            evt = (meta.getExperiment(), meta.getRun(), meta.getEvent())
+            low = min(low, evt)
+            high = max(high, evt)
+        # make sure parent Lfn is not set since we modify the event meta parent
+        # reading would not work
+        meta.setParentLfn("")
+        # fill the event
+        output_tree.Fill()
+        # finally let's have some progress
+        if evtNr == 0:
+            start = time.clock()
+        progress(evtNr)
+
+    # done, print final timing
+    end = time.clock()
+    elapsed = end - start
+    basf2.B2INFO("Finished in {:.2f} seconds, {:.3f} milliseconds per event".format(elapsed, elapsed*1000/len(indexlist)))
+
+    # create event index
+    ROOT.Belle2.RootIOUtilities.buildIndex(output_tree)
+
+    # create the file metadata
+    filemeta = ROOT.Belle2.FileMetaData()
+    # as usual lfn gets set to absolute pathname by us and can be modified by
+    # addmetadata later
+    filemeta.setLfn(os.path.abspath(args.output))
+    filemeta.setNEvents(total_events)
+    if args.keep_eventinfo:
+        filemeta.setLow(*low)
+        filemeta.setHigh(*high)
+    else:
+        filemeta.setLow(args.exp, args.run, args.start_event)
+        filemeta.setHigh(args.exp, args.run, total_events + args.start_event - 1)
+    filemeta.setRandomSeed(basf2.get_random_seed())
+    # let's remember the command line as "steering file"
+    filemeta.setSteering(os.path.basename(sys.argv[0]) + " " + " ".join(sys.argv[1:]))
+    # and the globaltag ... take globaltags from the first input file if no explicit tag is given
+    if args.globaltags is None:
+        args.globaltags = inputfiles[0][1].getDatabaseGlobalTag()
+    filemeta.setDatabaseGlobalTag(args.globaltags)
+    # Now let's loop over the input files to get the total number of MC events
+    # this file corresponds to and all the global tags used
+    total_mcevents = 0
+    for index, (events, meta, tfile) in enumerate(inputfiles):
+        total_mcevents += meta.getMcEvents()
+        # make it a bit easer to fine the input files again by adding them to
+        # the data description. Also add the number of events
+        filemeta.setDataDescription(f"inputfile_{index}_lfn", meta.getLfn())
+        filemeta.setDataDescription(f"inputfile_{index}_events", str(meta.getNEvents()))
+
+    filemeta.setMcEvents(total_mcevents)
+    # we could add the order of the events to the datadescription but this is a
+    # very long string so leave it for now
+    # filemeta.setDataDescription("eventorder", repr(indexlist))
+    # set date/site/user/commit id
+    ROOT.Belle2.RootIOUtilities.setCreationData(filemeta)
+
+    # write file metadata
+    persistent = ROOT.TTree("persistent", "persistent")
+    persistent.Branch("FileMetaData", filemeta)
+    persistent.Fill()
+
+    # Close the output
+    output.Write()
+    output.Close()

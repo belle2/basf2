@@ -1,0 +1,22 @@
+# EventType: 1120600000
+# Descriptor: [B0 -> tau+ tau-]cc
+# NickName: Bd_tautau
+# Documentation: SM B-> tau tau signal with SLL model, taus decay as they like
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Sam Cunliffe
+# Email: sam.cunliffe@desy.de
+# Cuts: None
+# Date: 20170614
+#
+Decay Upsilon(4S)
+0.5 		B0sig 		anti-B0 VSS;
+0.5 		anti-B0sig 	B0 	VSS;
+Enddecay
+#
+Decay B0sig
+1.000		tau+		tau-		SLL;
+Enddecay
+CDecay anti-B0sig
+#
+End

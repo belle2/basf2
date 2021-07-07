@@ -1,0 +1,213 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""\
+Generate skim validation scripts.
+"""
+
+import argparse
+from contextlib import contextmanager
+import os
+import re
+import sys
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+import jinja2
+from termcolor import cprint
+
+import basf2 as b2
+from skim.registry import Registry
+
+
+class CustomHelpFormatter(argparse.HelpFormatter):
+    """Custom formatter for argparse which prints the valid choices for an
+    argument in the help string.
+    """
+
+    def _get_help_string(self, action):
+        if action.choices:
+            return (
+                action.help + " Valid options are: " + ", ".join(action.choices) + "."
+            )
+        else:
+            return action.help
+
+
+@contextmanager
+def suppress_stdout():
+    with open(os.devnull, "w") as devnull:
+        old_stdout = sys.stdout
+        sys.stdout = devnull
+        try:
+            yield
+        finally:
+            sys.stdout = old_stdout
+
+
+def get_argument_parser():
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=CustomHelpFormatter
+    )
+
+    skim = parser.add_mutually_exclusive_group(required=True)
+    skim.add_argument(
+        "--skims",
+        choices=Registry.names,
+        metavar="SKIM",
+        nargs="+",
+        help="Skims to produce a validation file for.",
+    )
+    skim.add_argument(
+        "--all",
+        action="store_true",
+        help=(
+            "Delete all existing validation scripts and reproduce validation scripts "
+            "for all skims with a ``validation_histograms`` method defined. "
+            "This option implies the ``--in-place`` flag."
+        ),
+    )
+
+    output = parser.add_mutually_exclusive_group()
+    output.add_argument(
+        "-o",
+        "--output-directory",
+        dest="directory",
+        help=(
+            "Directory to output steering file. Defaults to current working directory."
+        ),
+    )
+
+    parser.add_argument(
+        "--in-place",
+        action="store_true",
+        help="Overwrite scripts in ``skim/validation/``.",
+    )
+
+    return parser
+
+
+def check_local_release_setup():
+    if "BELLE2_LOCAL_DIR" not in os.environ:
+        raise OSError(
+            "Cannot use --all or --in-place flags with central release set up. "
+            "Please manually specify the output locations using -o/--output-directory."
+        )
+
+
+def check_has_validation_method(skim):
+    SkimObject = Registry.get_skim_function(skim)()
+    if SkimObject._method_unchanged("validation_histograms"):
+        raise ValueError(f"No validation_histograms method defined for {skim}.")
+
+
+def get_output_validation_files(skim):
+    """
+    Create a dummy path using the ``validation_histograms`` method of the passed skim
+    and search through that path to find the output ROOT file names.
+    """
+
+    # Temporarily redirect STDOUT to /dev/null, else this script is incredibly noisy.
+    # Also create a temporary directory just in case validation_histograms tries to
+    # access a ROOT file.
+    with suppress_stdout(), TemporaryDirectory():
+        path = b2.Path()
+        SkimFunction = Registry.get_skim_function(skim)
+        SkimObject = SkimFunction(validation=True, udstOutput=False)
+        SkimObject.build_lists(path)
+        SkimObject.validation_histograms(path)
+
+    OutputFiles = [
+        param.values
+        for module in path.modules()
+        if module.type() == "VariablesToHistogram"
+        for param in module.available_params()
+        if param.name == "fileName"
+    ]
+
+    # Remove duplicates before returning
+    return list(dict.fromkeys(OutputFiles))
+
+
+def get_contact(skim):
+    SkimObject = Registry.get_skim_function(skim)
+    contact = SkimObject.__contact__
+    if "@" not in contact:
+        raise ValueError(f"{skim}.__contact__ must contain an email address.")
+
+    try:
+        email = re.findall(r"<(.*)>", contact)[0]
+        return email
+    except IndexError:
+        # Assume the contact string is just the email address (which it shouldn't be...)
+        return contact
+
+
+def get_output_directory(directory, in_place):
+    if in_place:
+        check_local_release_setup()
+        return Path(b2.find_file("skim/validation"))
+    return Path(directory or ".").resolve()
+
+
+def output(CodeString, *, directory, skim):
+    OutputFilename = directory / f"{skim}.py"
+    with open(OutputFilename, "w") as f:
+        f.write(CodeString)
+
+    os.chmod(OutputFilename, 0o755)  # make file executable
+    cprint(f"Wrote {skim} validation script", "green")
+
+
+def main():
+    b2.set_log_level(b2.LogLevel.ERROR)
+
+    parser = get_argument_parser()
+    args = parser.parse_args()
+    if args.all:
+        args.in_place = True
+
+    loader = jinja2.FileSystemLoader(b2.find_file("skim/tools/resources"))
+    env = jinja2.Environment(loader=loader)
+
+    template = env.get_template("skim_validation_file_template.jinja2")
+
+    directory = get_output_directory(args.directory, args.in_place)
+    print(f"Writing files to {directory}")
+
+    if args.all:
+        # Delete all Python files in skim/validation/
+        check_local_release_setup()
+        scripts = Path(b2.find_file("skim/validation")).glob("*.py")
+        for script in scripts:
+            script.unlink()
+
+    skims = args.skims or Registry.names
+    for skim in skims:
+        try:
+            check_has_validation_method(skim)
+        except ValueError as e:
+            if not args.all:
+                cprint(e, "red")
+            continue
+
+        CodeString = template.render(
+            skim=skim,
+            module=Registry.get_skim_module(skim),
+            contact=get_contact(skim),
+            output=get_output_validation_files(skim),
+        )
+
+        output(CodeString, directory=directory, skim=skim)
+
+
+if __name__ == "__main__":
+    main()

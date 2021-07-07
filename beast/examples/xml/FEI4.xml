@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="FEI4">
+  <Creator library="beast">FEI4Creator</Creator>
+  <Content>
+    <!-- normally, parameters should be defined with a unit attribute. This
+         enables automatic conversion to the default framework unit --> 
+    <stepSize unit="um">200</stepSize>
+    <!--if we don't supply a unit there can be no conversion but is still valid -->
+    <divisions>32</divisions>
+    <!-- valid values for false are: "", "0", "off", "false" (case
+         insensitive), everything else will be interpreted as true -->
+    <foo>true</foo>
+    <!-- we can also have arrays as parameters which makes it easy to get a
+         number of values as vector<double>.  The numbers can be divided by
+         whitespace, comma or semi-colon -->
+    <bar_fei4 unit="mm">1 
+    </bar_fei4>
+
+    <Active>
+      <Material>SRSENSOR-Materials</Material>
+      <MaterialFEI4>SRSENSOR-Materials</MaterialFEI4>
+      <x_fei4 unit="cm">0.0</x_fei4>
+      <y_fei4 unit="cm">0.0</y_fei4>
+      <z_fei4 unit="cm">-50.0</z_fei4>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">0.0</AngleZ>
+      <fei4_dx unit="cm">5.0</fei4_dx>
+      <fei4_dy unit="cm">5.0</fei4_dy>
+      <fei4_dz unit="cm">5.0</fei4_dz>
+   </Active>
+
+  </Content>
+</DetectorComponent>

@@ -1,0 +1,16 @@
+fs ee
+ecms 1.02
+thmin 20.
+thmax 160
+zmax 10.
+emin 0.4d0
+nev 1000000.
+path test-run/
+ntuple no
+model matched
+seed 845113
+nsearch 500000
+sdmax 0.100E-17
+sprb1 0.0001d0
+sprb2 0.0001d0
+run

@@ -1,0 +1,257 @@
+<!---------------------------------------------------------------------------->
+<!-- TOOLBOX ON TOP -->
+<!---------------------------------------------------------------------------->
+
+<div id="topmost_viewselection">
+  <input id="check_show_overview" type="checkbox" checked='{{show_overview}}'>
+  <label for="check_show_overview">Compact View</label>
+  <input id="check_show_expert_plots" type="checkbox" checked='{{show_expert_plots}}' onchange="renderLatex(); packagePaneExpertToggle();">
+  <label for="check_show_expert_plots">Expert Content</label>
+</div>
+
+<!-- temporary announcements -->
+<span id="includeBanner"></span>
+
+<!---------------------------------------------------------------------------->
+<!-- PLOTS LOADING OVERLAY -->
+<!-- This will be hidden, unless we're currently reloading plots... -->
+<!---------------------------------------------------------------------------->
+
+<div id="outer">
+  <div id="table-container">
+    <div id="table-cell">
+      <img src="images/refresh.png" alt="Loading...">
+      <h1>Images are being created!</h1>
+      <h2 id="plot_creation_progress"></h2>
+      <h2 id="plot_creation_package"></h2>
+    </div>
+  </div>
+</div>
+
+<!---------------------------------------------------------------------------->
+<!-- MAIN CONTENT -->
+<!---------------------------------------------------------------------------->
+
+{{#packages}}
+<div intro="fade">
+  <!-- Overview over package -->
+  <!-------------------------------------------------------------------------->
+
+  <h1>Package: {{ name }}</h1>
+
+  <h2>Script Files</h2>
+  {{>scriptfiles_accordion}}
+  <br>
+
+  <!-- Looping over all plotfiles -->
+  <!-------------------------------------------------------------------------->
+
+  {{#plotfiles}}
+  {{#if show_shifter || show_expert_plots }}
+  <a name="{{package}}-{{rootfile}}"></a>
+  <div class="wrap_rootfile">
+    <!-- Header -->
+    <!------------>
+    <h2>Result File: {{rootfile}}
+      {{#if !has_reference}}
+        <span class="no_reference">[No reference]</span>
+      {{/if}}
+    </h2>
+    {{ #if newest_revision }}
+      <div class="downloads">
+          <b>Downloads: </b>
+          {{ #compared_revision:i_revision}}
+            {{ #if (compared_revision[i_revision] != 'reference') }}
+              <span style="margin-right:0.5em">
+                <a href="../results/{{compared_revision[i_revision]}}/{{package}}/{{rootfile}}.root">
+                  {{compared_revision[i_revision]}}
+                </a>
+              </span>
+            {{ /if }}
+          {{ /compared_revision }}
+      </div>
+    {{ /if }}
+    {{#if description }}
+    <b>Description: </b>
+    {{ description }}
+    {{ /if }}
+    <br>
+
+    <!-- If we have html content: -->
+    <!------------------------------>
+    {{#html_content}}
+    <div class="wrap_boxes">
+      <h3 class="persistent-header">HTML Content: {{title}}</h3>
+      <div>
+        {{{html_content}}}
+      </div>
+    </div>
+    {{/html_content}}
+
+    <!-- If we show ntuples: -->
+    <!------------------------->
+    {{#ntuples}}
+    {{#if !is_expert || show_expert_plots }}
+    <div class="wrap_boxes">
+      <h3 class="persistent-header">NTuple: <code>{{title}}</code></h3>
+      <table class="ntuple_table" id={{title}}></table>
+      <script type="text/javascript">
+          fillNtupleTable("{{title}}","{{json_file_path}}");
+      </script>
+      {{>ntuple_description}}
+    </div>
+    {{/if}}
+    {{/ntuples}}
+
+    <!-- If we show plots: -->
+    <!----------------------->
+    {{#if !show_overview}}
+    {{>plot_full_view}}
+    {{else}}
+    {{>plot_matrix}}
+    {{/if}}
+  </div>
+  {{ /if }}
+  {{/plotfiles}}
+</div>
+{{/packages}}
+
+<!---------------------------------------------------------------------------->
+<!-- THINGS TO BE INCLUDED ABOVE -->
+<!-- (cf. ractive 'partial' keyword) -->
+<!---------------------------------------------------------------------------->
+
+<!---------------------------------------------------------------------------->
+<!-- Scriptfiles accordions -->
+<!---------------------------------------------------------------------------->
+
+{{#partial scriptfiles_accordion}}
+<div id="accordion_script_files">
+  <h3>Failed Scripts</h3>
+  <div >
+    <div id="no_failed_scripts">No failed scripts</div>
+    {{#scriptfiles}}
+    {{#if status == "failed" }}
+    <div class="failed_script">
+      <code>{{name}}</code> - {{status}} (exit code: {{return_code}}) -
+      <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a>
+    </div>
+    {{/if}}
+    {{/scriptfiles}}
+  </div>
+  <h3>Finished Scripts</h3>
+  <div>
+    <div id="no_finished_scripts">No finished scripts</div>
+    {{#scriptfiles}}
+    {{#if status == "finished" }}
+    <div class="finished_script">
+      <code>{{name}}</code> - {{status}} (exit code: {{return_code}}) -
+      <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">log</a>
+    </div>
+    {{/if}}
+    {{/scriptfiles}}
+  </div>
+  <h3>Skipped Scripts</h3>
+  <div>
+    <div id="no_skipped_scripts">No skipped scripts</div>
+    {{#scriptfiles}}
+    {{#if status == "skipped" }}
+    <div class="skipped_script"><code>{{name}}</code> - {{status}}</div>
+    {{/if}}
+    {{/scriptfiles}}
+  </div>
+</div>
+{{/partial}}
+
+<!---------------------------------------------------------------------------->
+<!-- Plot matrix -->
+<!---------------------------------------------------------------------------->
+
+{{#partial plot_matrix}}
+<section intro="fade" class="persistent-area">
+  <div class="plot_matrix">
+    {{#plots}}
+    {{#if !is_expert || show_expert_plots }}
+    <div class="plot_matrix_item">
+      <a class="open-popup-link" id="trigger-popup-{{unique_id}}" href="#popup-{{unique_id}}">
+        <img class="plot_matrix_image" onclick="triggerPopup('trigger-popup-{{unique_id}}');" height="150px" width="210px" src="../{{ plot_path }}{{ png_filename }}">
+      </a>
+    </div>
+    {{! hidden segment which is only shown (as a popup) if the user clicks on the element}}
+    <div id="popup-{{unique_id}}" class="white-popup mfp-hide">
+      <a target="_blank" href="../{{ plot_path }}{{ pdf_filename }}">
+        <img class="plot_matrix_image" src="../{{ plot_path }}{{ png_filename }}">
+      </a>
+      {{>plot_description}}
+    </div>
+    {{/if}}
+    {{/plots}}
+  </div>
+</section>
+{{/partial}}
+
+<!---------------------------------------------------------------------------->
+<!-- Plot full view -->
+<!---------------------------------------------------------------------------->
+
+{{#partial plot_full_view}}
+<section intro="fade" class="persistent-area">
+  {{#plots}}
+  {{#if !is_expert || show_expert_plots }}
+  <!-- put in extra div -->
+  <div class="wrap_boxes">
+    <h2 class="persistent-header">Plot: {{ title }}</h2>
+    <div class="object">
+      <!-- todo: ../ should be removed for final deployment -->
+      <a target="_blank" href="../{{ plot_path }}{{ pdf_filename }}">
+        <img width="{{width}}" height="{{height}}" src="../{{ plot_path }}{{ png_filename }}">
+      </a>
+    </div>
+    {{>plot_description}}
+  </div>
+  {{/if}}
+  {{/plots}}
+</section>
+{{/partial}}
+
+<!---------------------------------------------------------------------------->
+<!-- Plot description -->
+<!---------------------------------------------------------------------------->
+
+{{#partial plot_description}}
+<div class="wrap_boxes_descriptions">
+  <span><strong>Package: </strong>{{ package }}</span><br>
+  <span><strong>Description: </strong>{{{ description }}}</span><br>
+  <span><strong>ROOT file: </strong> <code>{{ rootfile }}.root</code></span><br>
+  <span><strong>Comparison: </strong>{{{ comparison_text }}}</span><br>
+  {{! if the warning has not been set, no pvalue is available either }}
+  <span><strong>Contact: </strong>{{ contact }}</span><br>
+  <span><strong>Check for: </strong>{{ check }}</span><br>
+  <!-- todo: share this plot -->
+</div>
+{{/partial}}
+
+<!---------------------------------------------------------------------------->
+<!-- NTuple description -->
+<!---------------------------------------------------------------------------->
+
+{{#partial ntuple_description}}
+<div class="wrap_boxes_descriptions">
+  <span><strong>Package: </strong>{{ package }}</span><br>
+  <span><strong>Description: </strong>{{{ description }}}</span><br>
+  <span><strong>Contact: </strong>{{ contact }}</span><br>
+  <span><strong>Check for: </strong>{{ check }}</span><br>
+  <!-- todo: share this plot -->
+</div>
+{{/partial}}
+
+<script>
+  $(function(){
+      $.get("banner.html")
+          .done(function() {
+              $("#includeBanner").load("banner.html");
+          }).fail(function() {
+          // not exists code
+      })
+  });
+</script>

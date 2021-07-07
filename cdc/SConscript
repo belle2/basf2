@@ -1,0 +1,9 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'geometry', 'simulation', 'calibration',
+               '$ROOT_LIBS', 'Geom', 'EG', 'cdc_dataobjects',
+               '$GEANT4_LIBS', 'CLHEP', 'mdst_dataobjects', 'simulation_dataobjects', "boost_iostreams"]
+
+#env.Append(CPPDEFINES = {'CDC_DEBUG':None})
+
+Return('env')

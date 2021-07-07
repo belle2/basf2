@@ -1,0 +1,134 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+'''Tool used to mask the (very) hot channels in KLM DQM reference plots.'''
+
+
+import basf2
+import argparse
+import os
+
+
+def arg_parser():
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--exp',
+                        required=True,
+                        type=int,
+                        help='experiment number',
+                        metavar='EXP_NUMBER')
+    parser.add_argument('--run',
+                        required=True,
+                        type=int,
+                        help='run number',
+                        metavar='RUN_NUMBER')
+    parser.add_argument('-i', '--input',
+                        default='KLMDQM.root',
+                        type=str,
+                        help='input file name',
+                        metavar='INPUT_FILE')
+    parser.add_argument('-o', '--output',
+                        default='KLMDQM_Masked.root',
+                        type=str,
+                        help='output file name',
+                        metavar='OUTPUT_FILE')
+    parser.add_argument('--globaltags',
+                        required=True,
+                        type=str,
+                        nargs='+',
+                        help='Global Tags to be used',
+                        metavar='GT')
+    return parser
+
+
+if __name__ == "__main__":
+
+    #####################################################
+    # Part 0: setup
+
+    # Argument parsing
+    args = arg_parser().parse_args()
+    exp_number = args.exp
+    run_number = args.run
+    input_file = args.input
+    output_file = args.output
+    globaltags = args.globaltags
+
+    # Check that input and output file names are correct
+    print()
+    if not os.path.exists(input_file):
+        basf2.B2FATAL('The input file does not exist.')
+    if not output_file.endswith('.root'):
+        basf2.B2FATAL('Please provide a valid .root output file name.')
+    if input_file == output_file:
+        basf2.B2FATAL('Input file name and output file name must differ.')
+    command = f'cp {input_file} {output_file}'
+    basf2.B2INFO(f'The following command will be executed: {command}')
+    if (os.system(command) != 0):
+        basf2.B2FATAL(f'The command "{command}" aborted during its execution.')
+
+    # Set the Global Tags
+    basf2.conditions.override_globaltags(globaltags)
+
+    # Set the logging options, including a temporary log file
+    log_file = 'log.tmp'
+    basf2.logging.log_level = basf2.LogLevel.INFO
+    basf2.logging.add_file(log_file)
+
+    #####################################################
+    # Part 1: run the KLM analysis module
+
+    # Create path
+    main = basf2.Path()
+
+    # Input
+    main.add_module('DQMHistAnalysisInputRootFile',
+                    Experiment=exp_number,
+                    RunList=[run_number],
+                    EventsList=[1],
+                    FileList=[output_file],
+                    SelectHistograms=['KLM/*'],
+                    EventInterval=1)
+
+    # Analysis module
+    analysis = basf2.register_module('DQMHistAnalysisKLM')
+    analysis.logging.log_level = basf2.LogLevel.DEBUG
+    analysis.logging.debug_level = 20
+    main.add_module(analysis)
+
+    # Process events
+    basf2.process(path=main)
+
+    #####################################################
+    # Part 2: mask the channels with b2klm-execute-masking
+
+    print()
+
+    # Open the log file to record the channels to be masked
+    line_marker = 'KLM@MaskMe'
+    channels = []
+    file = open(log_file)
+    for line in file:
+        if line_marker in line:
+            debug, marker, channel, *garbage = line.split()
+            channels.append(channel)
+    file.close()
+    os.remove(log_file)
+
+    # Finally, launch the command to mask the channels
+    if not channels:
+        basf2.B2INFO('There are no channels to mask, nothing to do.')
+    else:
+        command = f'b2klm-execute-masking {output_file} '
+        command += ' '.join(channels)
+        basf2.B2INFO(f'The following command will be executed: {command}')
+        if (os.system(command) != 0):
+            basf2.B2FATAL(f'The command "{command}" aborted during its execution.')

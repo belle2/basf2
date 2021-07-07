@@ -1,0 +1,264 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+###################################################################################
+#                                                                                 #
+# eclDSPWriter converts DSP coefficients between multiple formats.                #
+#                                                                                 #
+# Usage: eclDSPWriter input_files output_path                                     #
+#   input_files: one of three options to access DSP data:                         #
+#     path/to/folder                Path to folder with crate??/dsp??.dat files   #
+#     localdb/database.txt,exp,run  Path to local database                        #
+#     db://GLOBAL_TAG,exp,run       global tag from ConditionsDB                  #
+#                                                                                 #
+#   output_path: one of two options to output DSP data:                           #
+#     path/to/folder                Path to folder where crate??/dsp??.dat files  #
+#                                   will be saved                                 #
+#     localdb/database.txt,expLow,runLow,expHigh,runHigh  Path to local database  #
+#                                                                                 #
+###################################################################################
+
+################################################
+# IMPORT MODULES
+################################################
+
+import sys, os
+import ROOT
+
+ROOT.gSystem.Load('libframework')
+ROOT.gInterpreter.Declare('#include <framework/database/Configuration.h>')
+
+from ROOT import Belle2, TClonesArray
+from ROOT.Belle2 import ECL, ECLDspData, Conditions, EventMetaData
+from ROOT.Belle2.Conditions import Configuration
+from ROOT.Belle2.ECL import ECLDspUtilities
+from ROOT.Belle2.ECL.ECLDspUtilities import readEclDsp, writeEclDsp
+
+################################################
+# SET PARAMETERS
+################################################
+
+# Separation of ECLDspData payloads into groups by ECL crate ID.
+CRATE_GROUPS = [
+        [1, 18],
+        [19, 36],
+        [37, 52]
+]
+
+################################################
+
+
+def main():
+    """
+    """
+
+    if len(sys.argv) < 3:
+        print()
+        print('Usage: eclDSPWriter input_files output_path')
+        print('  input_files: one of three options to access DSP data:')
+        print('    path/to/folder                Path to folder with crate??/dsp??.dat files')
+        print('    localdb/database.txt,exp,run  Path to local database')
+        print('    db://GLOBAL_TAG,exp,run       global tag from ConditionsDB')
+        print()
+        print('  output_path: one of two options to output DSP data:')
+        print('    path/to/folder                Path to folder where crate??/dsp??.dat files')
+        print('                                  will be saved')
+        print('    localdb/database.txt,expLow,runLow,expHigh,runHigh  Path to local database')
+        print()
+        exit(2)
+    input_arg = sys.argv[1]
+    output_arg = sys.argv[2]
+    if input_arg.startswith('db://'):
+        tag, exp, run = input_arg.lstrip('db://').split(',')
+        dsp_data = ecldspFromDB(tag, int(exp), int(run))
+    elif ',' in input_arg:
+        path, exp, run = input_arg.split(',')
+        dsp_data = ecldspFromRoot(path, int(exp), int(run))
+    else:
+        path = input_arg
+        dsp_data = ecldspFromDat(path)
+
+    if ',' in output_arg or output_arg.endswith('database.txt'):
+        args = output_arg.split(',')
+        path = args[0]
+        exp, run, expHigh, runHigh = 0, 0, -1, -1
+        if len(args) > 1: exp     = int(args[1])
+        if len(args) > 2: run     = int(args[2])
+        if len(args) > 3: expHigh = int(args[3])
+        if len(args) > 4: runHigh = int(args[4])
+        ecldspToRoot(path, dsp_data, exp, run, expHigh, runHigh)
+    else:
+        path = output_arg
+        ecldspToDat(path, dsp_data)
+
+################################################
+# AUXILLARY FUNCTIONS
+################################################
+
+def ecldspFromDat(path_list):
+    """
+    Read 52*12 files with dsp data and convert them to payload objects.
+    @param path_list    Either string to folder with DSP files or
+                        list of such folders, from highest to lowest priority
+                        (if DSP file is missing for one of the boards in
+                        high-priority path, one from lower priority is used)
+    """
+    if isinstance(path_list, str):
+        return ecldspFromDat([path_list])
+
+    dsp_list = []
+    for crate in range(1, 52 + 1):
+        for board in range(1, 12 + 1):
+            file_path = getEclDspFile(path_list, crate, board)
+            board_number = (crate - 1) * 12 + board
+            dsp_list.append(readEclDsp(file_path, board_number))
+    return dsp_list
+
+
+def ecldspToDat(path, dsp_list):
+    """Convert payload objects to *.dat files
+       @param path      Folder where 52*12 dat files will be saved.
+       @param dsp_list  List of ECLDspData objects
+    """
+    for crate in range(1, 52 + 1):
+        folder = path + '/crate%02d/' % crate
+        ensureDir(folder)
+        for board in range(1, 12 + 1):
+            file_path = folder + '/dsp%02d.dat' % board
+            board_number = (crate - 1) * 12 + board
+            dsp_data = dsp_list[board_number - 1]
+            # Open+close the file to make sure at least empty file exists
+            open(file_path, 'a').close()
+            if board > 10 and crate > 36:
+                continue
+            if board > 8 and crate > 44:
+                continue
+            writeEclDsp(file_path, dsp_data)
+
+def ecldspFromRoot(localdb_path, exp, run):
+    """
+    Load ECLDspData objects from localdb
+    @param localdb_path Path to database.txt in localdb folder
+    @param exp          Experiment number
+    @param run          Run number
+    """
+    db  = Belle2.Database.Instance()
+    cfg = Configuration.getInstance()
+    db.reset()
+    cfg.prependTestingPayloadLocation(localdb_path)
+
+    dsp_list = []
+
+    for i in range(len(CRATE_GROUPS)):
+        payload_name = 'ECLDSPPars{}'.format(i)
+        query = Belle2.Database.DBQuery(payload_name)
+        found = db.getData(EventMetaData(1, run, exp), query)
+
+        if not found:
+            raise ValueError('Could not find %s for (%d, %d)' % (payload_name, exp, run))
+
+        payload_file = ROOT.TFile.Open(query.filename, 'read')
+        obj = payload_file.Get(payload_name)
+        for dsp in obj:
+            dsp_list.append(dsp)
+        payload_file.Close()
+
+    return dsp_list
+
+def ecldspToRoot(localdb_path, dsp_list, exp, run, expEnd = -1, runEnd = -1):
+    """
+    Write ECLDspData objects to local database.
+    They are separated into three payloads according to CRATE_GROUPS list.
+    ECLDspPars0, ECLDSPPars1, ECLDSPPars2
+    @param localdb_path Path to database.txt in localdb folder
+    @param exp          First experiment number in IntervalOfValidity
+    @param run          First run number in IntervalOfValidity
+    @param expEnd       Last experiment number in IntervalOfValidity
+    @param runEnd       Last run number in IntervalOfValidity
+    """
+    db = Belle2.Database.Instance()
+    cfg = Configuration.getInstance()
+    db.reset()
+    cfg.setNewPayloadLocation(localdb_path)
+
+    dsp_pars = []
+    dsp_id = 0
+
+    for crate_min, crate_max in CRATE_GROUPS:
+        size = (crate_max - crate_min + 1) * 12
+        payload = TClonesArray('Belle2::ECLDspData', size)
+        for i in range(size):
+            payload[i] = dsp_list[dsp_id]
+            dsp_id += 1
+        dsp_pars.append(payload)
+
+    for i, payload in enumerate(dsp_pars):
+        payload_name = 'ECLDSPPars{}'.format(i)
+        iov = Belle2.IntervalOfValidity(exp, run, expEnd, runEnd)
+        db.storeData(payload_name, payload, iov)
+
+def ecldspFromDB(db_tag, exp, run):
+    """
+    Load ECLDspData objects from ConditionsDB
+    @param db_tag       ConditionsDB global tag name
+    @param exp          Experiment number
+    @param run          Run number
+    """
+    db = Belle2.Database.Instance()
+    cfg = Configuration.getInstance()
+    db.reset()
+    cfg.appendGlobalTag(db_tag)
+
+    dsp_list = []
+
+    for i in range(len(CRATE_GROUPS)):
+        payload_name = 'ECLDSPPars{}'.format(i)
+        query = Belle2.Database.DBQuery(payload_name)
+        found = db.getData(EventMetaData(1, run, exp), query)
+
+        if not found:
+            raise ValueError('Could not find %s for (%d, %d)' % (payload_name, exp, run))
+
+        payload_file = ROOT.TFile.Open(query.filename, 'read')
+        obj = payload_file.Get(payload_name)
+        for dsp in obj:
+            dsp_list.append(dsp)
+        payload_file.Close()
+
+    return dsp_list
+
+################################################
+# AUXILLARY FUNCTIONS
+
+def getEclDspFile(path_list, crate, board):
+    """
+    Return file path to dsp file for specific crate and shaper board
+    """
+    for path in path_list:
+        file_path = path + 'crate%02d/dsp%02d.dat' % (crate, board)
+        if not os.path.exists(file_path):
+            continue
+        return file_path
+    raise ValueError('No DSP data for crate%02d, board%02d' % (crate, board))
+
+def ensureDir(file_path):
+    """
+    If directory doesn't exist, create it.
+    """
+    directory = os.path.dirname(file_path)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+################################################
+
+if __name__ == '__main__':
+    main()
+

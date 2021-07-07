@@ -1,0 +1,3 @@
+Import('env')
+env['TOOLS_LIBS']['create_dedx_PDFs'] = ['framework', 'framework_io', '$ROOT_LIBS']
+Return('env')

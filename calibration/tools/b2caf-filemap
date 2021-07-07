@@ -1,0 +1,140 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+#############################################################################
+# You have several options about how to make a mapping of file paths -> IoV
+#
+# In order of most efficient -> least efficient
+#
+# 1. Get the mapping from some outside source of information like a
+#    database/file catalog. Then turn it into a dictionary.
+#    Right now you are unlikely to do this.
+#
+# 2. If you know the file name or the directory it is stored in contains the
+#    IoV information you don't need to call b2file-metadata-show. You could just parse
+#    the file path instead. This is much faster.
+#
+# 3. Call b2file-metadata-show on each file, but try to do it in a multiprocessed way.
+
+import re
+from pprint import PrettyPrinter
+pp = PrettyPrinter(indent=2)
+
+regex = None
+
+def filter_filepath(filepath):
+    """
+    Returns True if a file path returns a value from regex.search(filepath)
+    """
+    return bool(regex.search(filepath))
+
+# Here's how to do 2.
+
+
+def from_raw_data_file_paths(file_path_patterns):
+    from caf.utils import find_absolute_file_paths, parse_raw_data_iov
+    # First get the absolute file paths from the patterns
+    file_paths = find_absolute_file_paths(file_path_patterns)
+    # Now remove bad runs using our filter function if necessary
+    if regex:
+        import itertools
+        file_paths = list(itertools.filterfalse(filter_filepath, file_paths))
+
+    file_to_iov = {}
+    # Now loop over them and parse the IoVs out by looking at their directory/filenames
+    for file_path in file_paths:
+        file_to_iov[file_path] = parse_raw_data_iov(file_path)
+    return file_to_iov
+
+
+# Here's how to do 3.
+
+def from_metadata_of_files(file_path_patterns):
+
+    from caf.utils import make_file_to_iov_dictionary
+
+    def run_with_multiprocessing(max_processes):
+        """
+        Creates the file_to_iov dictionary but using a Pool object to control the number of subprocesses.
+        Note that even though we're using a ThreadPool, we aren't bound by the GIL because we are subprocessing to
+        run b2file-metadata-show in each Thread.
+
+        Uses filter_filepath to filter out files selected by our glob pattern.
+        """
+        from multiprocessing.pool import ThreadPool
+        tp = ThreadPool(processes=max_processes)
+        if regex:
+            mapping = make_file_to_iov_dictionary(file_path_patterns, polling_time=20, pool=tp, filterfalse=filter_filepath)
+        else:
+            mapping = make_file_to_iov_dictionary(file_path_patterns, polling_time=20, pool=tp)
+        tp.close()
+        tp.join()
+        return mapping
+
+    return run_with_multiprocessing(max_processes=4)
+
+
+# Define a map of our possible argparse choices to functions that run them
+function_map = {"raw": from_raw_data_file_paths,
+                "metadata": from_metadata_of_files}
+
+
+def get_argparser():
+    import argparse
+    parser = argparse.ArgumentParser(formatter_class = argparse.ArgumentDefaultsHelpFormatter,
+                                     description="Make a mapping file of file paths -> IoV. "
+                                                 "Outputs a dictionary in a pickle file to --output-file.")
+    parser.add_argument("filepath_pattern", help="""The file path pattern that will be passed to glob. """
+                        """Selects the files to use in the map. """
+                        """e.g. "/hsm/belle2/bdata/Data/Raw/e0003/r0495[5,6]\*/\*\*/\*.root" """)
+    parser.add_argument("--method", "-m", help="The method by which you want to create the mapping. "
+                        "If your files are from '/hsm/belle2/bdata/Data/Raw' then you can try to use 'raw'. "
+                        "This is much faster as it generates the IoVs by using the directory structure of raw files. "
+                        "The 'metadata' option should work for all file paths but is slower as it has to use "
+                        "b2file-metadata-show to get the IoV of the files.",
+                        choices=function_map.keys(), default="metadata")
+    parser.add_argument("--output-file", "-f", help="The output file that will contain the pickled file -> IoV map.",
+                        default="file_iov_map.pkl")
+    parser.add_argument("--filter-regex", "-re", help="A regular expression that will be applied to every filepath. "
+                        "Any filepath returning a value evaluating to True will be removed from the filepath list "
+                        " before the IoV map is generated. Use this to filter out specific files. We are using Python's "
+                        "'re' package with re.compile('regex').search(filepath). e.g. Use '.bad' to remove all filepaths "
+                        "containing the string '.bad' anywhere in them.")
+    parser.add_argument("--print-map", "-p", help="Prints the file -> IoV map to stdout as well.", action="store_true")
+    return parser
+
+
+def main():
+    # Do argument parsing
+    parser = get_argparser()
+    args = parser.parse_args()
+
+    # Get a regex object for inside the filter function
+    if args.filter_regex:
+        global regex
+        regex = re.compile(args.filter_regex)
+
+    # Run the method we asked for from command line
+    file_to_iov = function_map[args.method]([args.filepath_pattern])
+
+    if args.print_map:
+        print("Created the file to IoV map:")
+        pp.pprint(file_to_iov)
+
+    # Save for later use
+    import pickle
+    with open(args.output_file, 'bw') as iov_map_file:
+        pickle.dump(file_to_iov, iov_map_file)
+        print("Saved the file to ioV map to file '{}'.".format(args.output_file))
+
+if __name__ == "__main__":
+    import sys
+    sys.exit(main())

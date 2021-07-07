@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Shields desc="Parameters of CDC neutron shields">
+  <!--        
+  <Shield id="0">
+    <Name>NeutronShield</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">295.0</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">295.0</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">305.0</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">305.0</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">200.0</Thickness>
+    <PosZ desc="Z position near IP" unit="mm">-715.0</PosZ>
+  </Shield>
+  -->
+</Shields>
+

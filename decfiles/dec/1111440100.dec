@@ -1,0 +1,34 @@
+# EventType: 1111440100
+# Descriptor: [B0 -> (KS0 -> pi+ pi-) (J/psi(1S) -> mu+ mu-)]
+# NickName: Bd_JpsiKS_mumu
+# Documentation: Control channel for analysis package
+# Tested: Yes
+# Physics WG: TDCPV
+# Responsible: L. Li Gioi
+# Cuts: None
+# Date: 20190208
+#
+#
+Alias        K_S0sig   K_S0
+ChargeConj   K_S0sig   K_S0sig
+#
+#
+#
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0	             	VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+1.000   K_S0sig      J/psisig   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0. -1.0 0.;
+Enddecay
+CDecay anti-B0sig
+#
+Decay K_S0sig
+1.000        pi+       pi-                 PHSP;
+Enddecay
+#
+Decay J/psisig
+1.000         mu+       mu-            PHOTOS VLL;
+Enddecay
+#
+End

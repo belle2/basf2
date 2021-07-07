@@ -1,0 +1,84 @@
+#=========================================================
+# EventType: 1163300002
+# Descriptor: B -> D* tau nu (emu)against semi Btag PR
+# NickName: Bd_Dsttaunu_emu_pr
+# Documentation: decay mode for sensitivity studies
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Romulus Godang
+# Email: godang@southalabama.edu
+# Cuts: None
+# Date: 20161214
+#=========================================================
+#
+Alias SigB0 B0
+Alias SigAntiB0 anti-B0
+Alias MyTau+ tau+
+Alias MyTau- tau-
+Alias MyK0 K0
+Alias Myanti-K0 anti-K0
+Alias MyKs K_S0
+Alias MyD0 D0
+Alias Myanti-D0 anti-D0
+Alias MyD+ D+
+Alias MyD- D-
+Alias MyD*+ D*+
+Alias MyD*- D*-
+#
+#
+ChargeConj SigB0 SigAntiB0
+#
+Decay Upsilon(4S)
+1.000 B0 anti-B0 SigB0 SigAntiB0        VSS_BMIX  dm;
+Enddecay
+#
+# Force Btag (anti-B0) decays to D* ell nu_tau
+#
+Decay anti-B0
+0.50   MyD*+    e-   anti-nu_e        PHOTOS HQET 0.77 1.33 0.92;
+0.50   MyD*+    mu-  anti-nu_mu       PHOTOS HQET 0.77 1.33 0.92;
+Enddecay
+#
+Decay B0
+0.50   MyD*-    e+   nu_e             PHOTOS HQET 0.77 1.33 0.92;
+0.50   MyD*-    mu+  nu_mu            PHOTOS HQET 0.77 1.33 0.92;
+Enddecay
+#
+# Force Bsig (B0) decays to D* tau nu_tau (tau->e/mu)
+#
+Decay SigB0
+1.0000 MyD*-     MyTau+ nu_tau          ISGW2;
+Enddecay
+#
+Decay SigAntiB0
+1.0000 MyD*+     MyTau- anti-nu_tau     ISGW2;
+Enddecay
+#
+Decay MyTau+
+0.50    e+      nu_e    anti-nu_tau     PHOTOS  TAULNUNU;
+0.50    mu+     nu_mu   anti-nu_tau     PHOTOS  TAULNUNU;
+Enddecay
+#
+Decay MyTau-
+0.50    e-      anti-nu_e       nu_tau  PHOTOS  TAULNUNU;
+0.50    mu-     anti-nu_mu      nu_tau  PHOTOS  TAULNUNU;
+Enddecay
+#
+#
+Decay MyD*+
+1.00    MyD0  pi+                     VSS;
+Enddecay
+#
+Decay MyD*-
+1.00    Myanti-D0 pi-                 VSS;
+Enddecay
+#
+Decay MyD0
+1.00   K-  pi+                        PHSP;
+Enddecay
+#
+Decay Myanti-D0
+1.00   K+  pi-                        PHSP;
+Enddecay
+#
+End

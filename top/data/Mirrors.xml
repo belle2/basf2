@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Mirrors descr="geometry parameters of mirrors">
+
+  <Mirror SerialNumber="SN-002">
+    <Module descr="module construction number">1</Module>
+    <Vendor>Exelis</Vendor>
+    <Material>TOPSiO2</Material>
+    <Length unit="mm">100.12</Length>
+    <Width unit="mm">449.88</Width>
+    <Thickness unit="mm">20.09</Thickness>
+    <Radius unit="mm">6500.15</Radius>
+    <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
+    <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
+    <OpticalSurface>QuartzSurface_1</OpticalSurface>
+    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
+    <Surface name="Mirror coating">
+      <Properties>
+        <Property name="REFLECTIVITY" unit="eV">
+          <value energy="1.0">0.8781</value>
+          <value energy="2.0">0.8781</value>
+          <value energy="3.0">0.8781</value>
+          <value energy="4.0">0.8781</value>
+          <value energy="5.0">0.8781</value>
+        </Property>
+      </Properties>
+      <Type>dielectric_metal</Type>
+      <Finish>polished</Finish>
+      <Model>glisur</Model>
+    </Surface>
+  </Mirror>
+
+  <Mirror SerialNumber="SN-003">
+    <Module descr="module construction number">3</Module>
+    <Vendor>Exelis</Vendor>
+    <Material>TOPSiO2</Material>
+    <Length unit="mm">100.13</Length>
+    <Width unit="mm">449.87</Width>
+    <Thickness unit="mm">20.09</Thickness>
+    <Radius unit="mm">6503.11</Radius>
+    <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
+    <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
+    <OpticalSurface>QuartzSurface_3</OpticalSurface>
+    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
+    <Surface name="Mirror coating">
+      <Properties>
+        <Property name="REFLECTIVITY" unit="eV">
+          <value energy="1.0">0.8843</value>
+          <value energy="2.0">0.8843</value>
+          <value energy="3.0">0.8843</value>
+          <value energy="4.0">0.8843</value>
+          <value energy="5.0">0.8843</value>
+        </Property>
+      </Properties>
+      <Type>dielectric_metal</Type>
+      <Finish>polished</Finish>
+      <Model>glisur</Model>
+    </Surface>
+  </Mirror>
+
+  <Mirror SerialNumber="SN-004">
+    <Module descr="module construction number">2</Module>
+    <Vendor>Exelis</Vendor>
+    <Material>TOPSiO2</Material>
+    <Length unit="mm">100.11</Length>
+    <Width unit="mm">449.89</Width>
+    <Thickness unit="mm">20.08</Thickness>
+    <Radius unit="mm">6499.54</Radius>
+    <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
+    <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
+    <OpticalSurface>QuartzSurface_2</OpticalSurface>
+    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
+    <Surface name="Mirror coating">
+      <Properties>
+        <Property name="REFLECTIVITY" unit="eV">
+          <value energy="1.0">0.8776</value>
+          <value energy="2.0">0.8776</value>
+          <value energy="3.0">0.8776</value>
+          <value energy="4.0">0.8776</value>
+          <value energy="5.0">0.8776</value>
+        </Property>
+      </Properties>
+      <Type>dielectric_metal</Type>
+      <Finish>polished</Finish>
+      <Model>glisur</Model>
+    </Surface>
+  </Mirror>
+
+  <Mirror SerialNumber="SN-006">
+    <Module descr="module construction number">4</Module>
+    <Vendor>Exelis</Vendor>
+    <Material>TOPSiO2</Material>
+    <Length unit="mm">100.12</Length>
+    <Width unit="mm">449.98</Width>
+    <Thickness unit="mm">20.08</Thickness>
+    <Radius unit="mm">6504.60</Radius>
+    <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
+    <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
+    <OpticalSurface>QuartzSurface_4</OpticalSurface>
+    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
+    <Surface name="Mirror coating">
+      <Properties>
+        <Property name="REFLECTIVITY" unit="eV">
+          <value energy="1.0">0.8585</value>
+          <value energy="2.0">0.8585</value>
+          <value energy="3.0">0.8585</value>
+          <value energy="4.0">0.8585</value>
+          <value energy="5.0">0.8585</value>
+        </Property>
+      </Properties>
+      <Type>dielectric_metal</Type>
+      <Finish>polished</Finish>
+      <Model>glisur</Model>
+    </Surface>
+  </Mirror>
+
+  <Mirror SerialNumber="SN-007">
+    <Module descr="module construction number">5</Module>
+    <Vendor>Exelis</Vendor>
+    <Material>TOPSiO2</Material>
+    <Length unit="mm">100.09</Length>
+    <Width unit="mm">449.98</Width>
+    <Thickness unit="mm">20.08</Thickness>
+    <Radius unit="mm">6503.16</Radius>
+    <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
+    <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
+    <OpticalSurface>QuartzSurface_5</OpticalSurface>
+    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
+    <Surface name="Mirror coating">
+      <Properties>
+        <Property name="REFLECTIVITY" unit="eV">
+          <value energy="1.0">0.8194</value>
+          <value energy="2.0">0.8194</value>
+          <value energy="3.0">0.8194</value>
+          <value energy="4.0">0.8194</value>
+          <value energy="5.0">0.8194</value>
+        </Property>
+      </Properties>
+      <Type>dielectric_metal</Type>
+      <Finish>polished</Finish>
+      <Model>glisur</Model>
+    </Surface>
+  </Mirror>
+
+  <Mirror SerialNumber="SN-008">
+    <Module descr="module construction number">6</Module>
+    <Vendor>Exelis</Vendor>
+    <Material>TOPSiO2</Material>
+    <Length unit="mm">100.11</Length>
+    <Width unit="mm">449.98</Width>
+    <Thickness unit="mm">20.08</Thickness>
+    <Radius unit="mm">6505.25</Radius>
+    <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
+    <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
+    <OpticalSurface>QuartzSurface_6</OpticalSurface>
+    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
+    <Surface name="Mirror coating">
+      <Properties>
+        <Property name="REFLECTIVITY" unit="eV">
+          <value energy="1.0">0.8233</value>
+          <value energy="2.0">0.8233</value>
+          <value energy="3.0">0.8233</value>
+          <value energy="4.0">0.8233</value>
+          <value energy="5.0">0.8233</value>
+        </Property>
+      </Properties>
+      <Type>dielectric_metal</Type>
+      <Finish>polished</Finish>
+      <Model>glisur</Model>
+    </Surface>
+  </Mirror>
+
+  <Mirror SerialNumber="SN-010">
+    <Module descr="module construction number">7</Module>
+    <Vendor>Exelis</Vendor>
+    <Material>TOPSiO2</Material>
+    <Length unit="mm">100.12</Length>
+    <Width unit="mm">450.05</Width>
+    <Thickness unit="mm">20.09</Thickness>
+    <Radius unit="mm">6507.20</Radius>
+    <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
+    <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
+    <OpticalSurface>QuartzSurface_7</OpticalSurface>
+    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
+    <Surface name="Mirror coating">
+      <Properties>
+        <Property name="REFLECTIVITY" unit="eV">
+          <value energy="1.0">0.8513</value>
+          <value energy="2.0">0.8513</value>
+          <value energy="3.0">0.8513</value>
+          <value energy="4.0">0.8513</value>
+          <value energy="5.0">0.8513</value>
+        </Property>
+      </Properties>
+      <Type>dielectric_metal</Type>
+      <Finish>polished</Finish>
+      <Model>glisur</Model>
+    </Surface>
+  </Mirror>
+
+  <Mirror SerialNumber="SN-011">
+    <Module descr="module construction number">8</Module>
+    <Vendor>Exelis</Vendor>
+    <Material>TOPSiO2</Material>
+    <Length unit="mm">100.13</Length>
+    <Width unit="mm">450.05</Width>
+    <Thickness unit="mm">20.09</Thickness>
+    <Radius unit="mm">6505.43</Radius>
+    <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
+    <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
+    <OpticalSurface>QuartzSurface_8</OpticalSurface>
+    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
+    <Surface name="Mirror coating">
+      <Properties>
+        <Property name="REFLECTIVITY" unit="eV">
+          <value energy="1.0">0.8513</value>
+          <value energy="2.0">0.8513</value>
+          <value energy="3.0">0.8513</value>
+          <value energy="4.0">0.8513</value>
+          <value energy="5.0">0.8513</value>
+        </Property>
+      </Properties>
+      <Type>dielectric_metal</Type>
+      <Finish>polished</Finish>
+      <Model>glisur</Model>
+    </Surface>
+  </Mirror>
+
+  <Mirror SerialNumber="SN-012">
+    <Module descr="module construction number">10</Module>
+    <Vendor>Exelis</Vendor>
+    <Material>TOPSiO2</Material>
+    <Length unit="mm">100.10</Length>
+    <Width unit="mm">450.04</Width>
+    <Thickness unit="mm">20.09</Thickness>
+    <Radius unit="mm">6502.32</Radius>
+    <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
+    <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
+    <OpticalSurface>QuartzSurface_10</OpticalSurface>
+    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
+    <Surface name="Mirror coating">
+      <Properties>
+        <Property name="REFLECTIVITY" unit="eV">
+          <value energy="1.0">0.8521</value>
+          <value energy="2.0">0.8521</value>
+          <value energy="3.0">0.8521</value>
+          <value energy="4.0">0.8521</value>
+          <value energy="5.0">0.8521</value>
+        </Property>
+      </Properties>
+      <Type>dielectric_metal</Type>
+      <Finish>polished</Finish>
+      <Model>glisur</Model>
+    </Surface>
+  </Mirror>
+
+  <Mirror SerialNumber="SN-013">
+    <Module descr="module construction number">11</Module>
+    <Vendor>Exelis</Vendor>
+    <Material>TOPSiO2</Material>
+    <Length unit="mm">100.13</Length>
+    <Width unit="mm">449.99</Width>
+    <Thickness unit="mm">20.09</Thickness>
+    <Radius unit="mm">6507.46</Radius>
+    <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
+    <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
+    <OpticalSurface>QuartzSurface_11</OpticalSurface>
+    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
+    <Surface name="Mirror coating">
+      <Properties>
+        <Property name="REFLECTIVITY" unit="eV">
+          <value energy="1.0">0.8587</value>
+          <value energy="2.0">0.8587</value>
+          <value energy="3.0">0.8587</value>
+          <value energy="4.0">0.8587</value>
+          <value energy="5.0">0.8587</value>
+        </Property>
+      </Properties>
+      <Type>dielectric_metal</Type>
+      <Finish>polished</Finish>
+      <Model>glisur</Model>
+    </Surface>
+  </Mirror>
+
+  <Mirror SerialNumber="SN-014">
+    <Module descr="module construction number">12</Module>
+    <Vendor>Exelis</Vendor>
+    <Material>TOPSiO2</Material>
+    <Length unit="mm">100.12</Length>
+    <Width unit="mm">449.98</Width>
+    <Thickness unit="mm">20.09</Thickness>
+    <Radius unit="mm">6513.36</Radius>
+    <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
+    <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
+    <OpticalSurface>QuartzSurface_12</OpticalSurface>
+    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
+    <Surface name="Mirror coating">
+      <Properties>
+        <Property name="REFLECTIVITY" unit="eV">
+          <value energy="1.0">0.8507</value>
+          <value energy="2.0">0.8507</value>
+          <value energy="3.0">0.8507</value>
+          <value energy="4.0">0.8507</value>
+          <value energy="5.0">0.8507</value>
+        </Property>
+      </Properties>
+      <Type>dielectric_metal</Type>
+      <Finish>polished</Finish>
+      <Model>glisur</Model>
+    </Surface>
+  </Mirror>
+
+  <Mirror SerialNumber="SN-015">
+    <Module descr="module construction number">13</Module>
+    <Vendor>Exelis</Vendor>
+    <Material>TOPSiO2</Material>
+    <Length unit="mm">100.12</Length>
+    <Width unit="mm">449.97</Width>
+    <Thickness unit="mm">20.09</Thickness>
+    <Radius unit="mm">6508.32</Radius>
+    <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
+    <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
+    <OpticalSurface>QuartzSurface_13</OpticalSurface>
+    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
+    <Surface name="Mirror coating">
+      <Properties>
+        <Property name="REFLECTIVITY" unit="eV">
+          <value energy="1.0">0.8486</value>
+          <value energy="2.0">0.8486</value>
+          <value energy="3.0">0.8486</value>
+          <value energy="4.0">0.8486</value>
+          <value energy="5.0">0.8486</value>
+        </Property>
+      </Properties>
+      <Type>dielectric_metal</Type>
+      <Finish>polished</Finish>
+      <Model>glisur</Model>
+    </Surface>
+  </Mirror>
+
+  <Mirror SerialNumber="SN-016">
+    <Module descr="module construction number">14</Module>
+    <Vendor>Exelis</Vendor>
+    <Material>TOPSiO2</Material>
+    <Length unit="mm">100.13</Length>
+    <Width unit="mm">449.96</Width>
+    <Thickness unit="mm">20.09</Thickness>
+    <Radius unit="mm">6502.49</Radius>
+    <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
+    <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
+    <OpticalSurface>QuartzSurface_14</OpticalSurface>
+    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
+    <Surface name="Mirror coating">
+      <Properties>
+        <Property name="REFLECTIVITY" unit="eV">
+          <value energy="1.0">0.8504</value>
+          <value energy="2.0">0.8504</value>
+          <value energy="3.0">0.8504</value>
+          <value energy="4.0">0.8504</value>
+          <value energy="5.0">0.8504</value>
+        </Property>
+      </Properties>
+      <Type>dielectric_metal</Type>
+      <Finish>polished</Finish>
+      <Model>glisur</Model>
+    </Surface>
+  </Mirror>
+
+  <Mirror SerialNumber="SN-017">
+    <Module descr="module construction number">9</Module>
+    <Vendor>Exelis</Vendor>
+    <Material>TOPSiO2</Material>
+    <Length unit="mm">100.07</Length>
+    <Width unit="mm">450.00</Width>
+    <Thickness unit="mm">20.08</Thickness>
+    <Radius unit="mm">6506.98</Radius>
+    <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
+    <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
+    <OpticalSurface>QuartzSurface_9</OpticalSurface>
+    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
+    <Surface name="Mirror coating">
+      <Properties>
+        <Property name="REFLECTIVITY" unit="eV">
+          <value energy="1.0">0.8553</value>
+          <value energy="2.0">0.8553</value>
+          <value energy="3.0">0.8553</value>
+          <value energy="4.0">0.8553</value>
+          <value energy="5.0">0.8553</value>
+        </Property>
+      </Properties>
+      <Type>dielectric_metal</Type>
+      <Finish>polished</Finish>
+      <Model>glisur</Model>
+    </Surface>
+  </Mirror>
+
+  <Mirror SerialNumber="SN-018">
+    <Module descr="module construction number">15</Module>
+    <Vendor>Exelis</Vendor>
+    <Material>TOPSiO2</Material>
+    <Length unit="mm">100.03</Length>
+    <Width unit="mm">449.96</Width>
+    <Thickness unit="mm">20.08</Thickness>
+    <Radius unit="mm">6514.26</Radius>
+    <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
+    <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
+    <OpticalSurface>QuartzSurface_15</OpticalSurface>
+    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
+    <Surface name="Mirror coating">
+      <Properties>
+        <Property name="REFLECTIVITY" unit="eV">
+          <value energy="1.0">0.8559</value>
+          <value energy="2.0">0.8559</value>
+          <value energy="3.0">0.8559</value>
+          <value energy="4.0">0.8559</value>
+          <value energy="5.0">0.8559</value>
+        </Property>
+      </Properties>
+      <Type>dielectric_metal</Type>
+      <Finish>polished</Finish>
+      <Model>glisur</Model>
+    </Surface>
+  </Mirror>
+
+  <Mirror SerialNumber="SN-019">
+    <Module descr="module construction number">16</Module>
+    <Vendor>Exelis</Vendor>
+    <Material>TOPSiO2</Material>
+    <Length unit="mm">100.12</Length>
+    <Width unit="mm">449.98</Width>
+    <Thickness unit="mm">20.08</Thickness>
+    <Radius unit="mm">6507.82</Radius>
+    <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
+    <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
+    <OpticalSurface>QuartzSurface_16</OpticalSurface>
+    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
+    <Surface name="Mirror coating">
+      <Properties>
+        <Property name="REFLECTIVITY" unit="eV">
+          <value energy="1.0">0.8640</value>
+          <value energy="2.0">0.8640</value>
+          <value energy="3.0">0.8640</value>
+          <value energy="4.0">0.8640</value>
+          <value energy="5.0">0.8640</value>
+        </Property>
+      </Properties>
+      <Type>dielectric_metal</Type>
+      <Finish>polished</Finish>
+      <Model>glisur</Model>
+    </Surface>
+  </Mirror>
+
+  <Mirror SerialNumber="SN-020">
+    <Module descr="module construction number">17</Module>
+    <Vendor>Exelis</Vendor>
+    <Material>TOPSiO2</Material>
+    <Length unit="mm">100.10</Length>
+    <Width unit="mm">449.97</Width>
+    <Thickness unit="mm">20.08</Thickness>
+    <Radius unit="mm">6521.72</Radius>
+    <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
+    <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
+    <OpticalSurface>QuartzSurface_17</OpticalSurface>
+    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
+    <Surface name="Mirror coating">
+      <Properties>
+        <Property name="REFLECTIVITY" unit="eV">
+          <value energy="1.0">0.8715</value>
+          <value energy="2.0">0.8715</value>
+          <value energy="3.0">0.8715</value>
+          <value energy="4.0">0.8715</value>
+          <value energy="5.0">0.8715</value>
+        </Property>
+      </Properties>
+      <Type>dielectric_metal</Type>
+      <Finish>polished</Finish>
+      <Model>glisur</Model>
+    </Surface>
+  </Mirror>
+
+</Mirrors>

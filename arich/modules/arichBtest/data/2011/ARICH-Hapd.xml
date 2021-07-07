@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module name="HAPD" desc="Parameters of HAPD module">
+  <wallMaterial desc="Material of HAPD wall">ARICH_Ceramics</wallMaterial>
+  <moduleXSize desc="Module size in X (length)" unit="mm">75</moduleXSize>
+  <moduleZSize desc="Module size in Z (height)" unit="mm">30</moduleZSize>
+  <moduleWallThickness desc="Thickess of HAPD wall" unit="mm">3</moduleWallThickness>	
+  <windowMaterial desc="Material of detector window">ARICH_HAPDQuartz</windowMaterial> 
+  <windowThickness desc="Thickness of HAPD window" unit="mm">3</windowThickness> 
+  <padSize desc="Size of HAPD pad" unit="mm">5.1</padSize>
+  <chipGap desc="Gap between the APD chips" unit="mm">1.5</chipGap>
+  <padXNum desc="Number of pads in one direction">12</padXNum>
+  <Bottom desc="Parameters of HAPD bottom plane (to imitate APD chips)">
+    <thickness desc="Thickness of the HAPD reflective bottom" unit="mm">0.5</thickness>
+    <material desc="Material of HAPD reflective bottom">ARICH_Silicon</material> 
+    <Surface name="bottomSurface" desc="Surface of APDs is reflective">
+      <Properties>
+	<Property name="REFLECTIVITY" unit="eV">
+	  <value energy="1.0">1</value> 
+	  <value energy="5.8">1</value>
+	</Property>
+      </Properties>
+      <Type>dielectric_metal</Type>
+      <Finish>polished</Finish>
+      <Model>glisur</Model>
+    </Surface>
+  </Bottom>
+  <Board desc="Parameters of HAPD pcb">	
+   <material desc="Material of pcb">HAPD_pcb</material>
+   <size desc="Size of pcb" unit="mm">75</size>
+   <thickness desc="Thickenss of pcb" unit="mm">2</thickness>
+  </Board>
+</Module>

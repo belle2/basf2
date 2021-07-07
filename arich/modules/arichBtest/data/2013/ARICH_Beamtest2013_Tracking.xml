@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<tracking>
+
+<!-- ++++++++++++++++++++++++++++++++  -->
+<shift>
+  <x  unit="mm" >+19.5</x>
+  <y  unit="mm" >+11.0</y>
+  <z  unit="mm" >-256</z>
+
+  <run id="145">
+    <x unit="mm">60</x>
+    <y unit="mm">21</y>
+    <z unit="mm">0</z>
+  </run>
+</shift>
+
+<mwpc id="0">
+
+<tdc desc="Mapping of the tdc channels to the position wires">
+<y><up>17</up><down>16</down></y>
+<x><left>19</left> <right>18</right></x>
+<anode>8</anode>	
+</tdc>
+
+<slope><y>+0.26</y><x>+0.2392</x></slope>
+
+<offset><y>0</y><x>+15</x></offset>
+
+
+
+<tdccut>
+<y><min>100</min><max>140</max></y>
+<x><min>90</min><max>140</max></x>
+</tdccut>
+<material>HAPD_pcb</material>
+<size><x  unit="mm">200</x><y  unit="mm">75</y><z  unit="mm">2</z></size>
+<position><x  unit="mm">14</x><y  unit="mm">-1</y><z  unit="mm">-151</z></position>
+</mwpc>
+<!-- ++++++++++++++++++++++++++++++++  -->
+<mwpc id="1">
+
+<tdc desc="Mapping of the tdc channels to the position wires">
+<y><up>23</up><down>22</down></y>
+<x><left>20</left> <right>21</right></x>
+<anode>9</anode>	
+</tdc>
+
+<slope><y>+0.2397</y><x>+0.26</x></slope>
+
+<offset><y>2</y><x>-2</x></offset>
+
+<tdccut>
+<y><min>90</min><max>140</max></y>
+<x><min>120</min><max>160</max></x>
+</tdccut>
+<material>HAPD_pcb</material>
+<size><x  unit="mm">200</x><y  unit="mm">75</y><z  unit="mm">2</z></size>
+<position><x  unit="mm" >-1</x><y  unit="mm">-4</y><z  unit="mm">-28</z></position>
+</mwpc>
+<!-- ++++++++++++++++++++++++++++++++  -->
+<mwpc id="2">
+
+<tdc desc="Mapping of the tdc channels to the position wires">
+<y><up>27</up><down>26</down></y>
+<x><left>25</left> <right>24</right></x>
+<anode>10</anode>	
+</tdc>
+
+<slope><y>+0.2397</y><x>+0.26</x></slope>
+
+<offset><y>-6</y><x>0</x></offset>
+
+<tdccut>
+<y><min>40</min><max>130</max></y>
+<x><min>40</min><max>130</max></x>
+</tdccut>
+<material>HAPD_pcb</material>
+<size><x  unit="mm">200</x><y  unit="mm">75</y><z  unit="mm">2</z></size>
+<position><x  unit="mm">0</x><y  unit="mm">4</y><z  unit="mm">529</z></position>
+</mwpc>
+
+<!-- ++++++++++++++++++++++++++++++++  -->
+<mwpc id="3">
+
+<tdc desc="Mapping of the tdc channels to the position wires">
+<y><up>28</up><down>29</down></y>
+<x><left>31</left> <right>30</right></x>
+<anode>11</anode>	
+</tdc>
+
+<slope><y>+0.2397</y><x>+0.26</x></slope>
+
+<offset><y>-3</y><x>-6</x></offset>
+
+<tdccut>
+<y><min>40</min><max>130</max></y>
+<x><min>40</min><max>140</max></x>
+</tdccut>
+<material>HAPD_pcb</material>
+<size><x  unit="mm">200</x><y  unit="mm">75</y><z  unit="mm">2</z></size>
+<position><x  unit="mm">-6</x><y  unit="mm">2</y><z  unit="mm">645</z></position>
+</mwpc>
+
+</tracking>

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<setup  desc="Parameters of beamtest setup" xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<ExperimentalBox>
+      <xSize desc="xsize" unit="mm">1000</xSize>
+      <ySize desc="ysize" unit="mm">500</ySize>
+      <zSize desc="zsize" unit="mm">2000</zSize>
+      <material desc="aRICH envelope material: should be air with specified refractive index">ARICH_Vacuum</material>
+      <beamcenter desc="Position of the beam center on the hapd experimental box = reference point " ><x  unit="mm">0</x><y  unit="mm">198</y><z  unit="mm">200</z></beamcenter>
+</ExperimentalBox>
+
+<Frame>
+      <xSize desc="Starting z position of aRICH envelope" unit="mm">400</xSize>
+      <ySize desc="Ending z position of aRICH envelope" unit="mm">300</ySize>
+      <zSize desc="Ending z position of aRICH envelope" unit="mm">300</zSize>
+      <material desc="aRICH envelope material: should be air with specified refractive index">ARICH_Vacuum</material>
+      <position desc="position of the rotation point"><x  unit="mm">-53</x><y  unit="mm"   desc="-180+203">23</y><z  unit="mm">210</z></position>
+</Frame>
+  
+<aerogel>
+ 	<row id="PDR20-3a(U), N/A(D)">			<aerogel type="upstream">PDR20-3a</aerogel></row>
+ 	<row id="PDR11-4a(U), N/A(D)">			<aerogel type="upstream">PDR11-4a</aerogel></row>
+ 	<row id="BTR3-2a(U), N/A(D)">				<aerogel type="upstream">BTR3-2a</aerogel></row>
+ 	<row id="BTR13-5(U), N/A(D)">				<aerogel type="upstream">BTR13-5</aerogel></row>
+ 	<row id="BTR16-21(U), N/A(D)">			<aerogel type="upstream">BTR16-21</aerogel></row>
+ 	<row id="REM2-3(U), N/A(D)">				<aerogel type="upstream">REM2-3</aerogel></row>
+ 	<row id="REM2-17(U), N/A(D)">				<aerogel type="upstream">REM2-17</aerogel></row>
+ 	<row id="REM2-4(U), N/A(D)">				<aerogel type="upstream">REM2-4</aerogel></row>
+ 	<row id="REM2-11(U), N/A(D)">				<aerogel type="upstream">REM5-11</aerogel></row>
+ 	<row id="REM5-5(U), N/A(D)"> 				<aerogel type="upstream">REM5-5</aerogel></row>
+ 	<row id="HTP12-9(U), N/A(D)">				<aerogel type="upstream">HTP12-9</aerogel></row>
+ 	<row id="REM5-21(U), N/A(D)">	      <aerogel type="upstream">REM5-21</aerogel></row>
+ 	<row id="PDR20-3a(U), PDR11-4a(D)"> <aerogel type="upstream">PDR20-3a</aerogel><aerogel type="downstream">PDR11-4a</aerogel></row>
+ 	<row id="BTR3-2a(U), PDR11-4a(D)">  <aerogel type="upstream">BTR3-2a</aerogel> <aerogel type="downstream">PDR11-4a</aerogel></row>
+ 	<row id="REM2-3(U), REM2-17(D)">    <aerogel type="upstream">REM2-3</aerogel>  <aerogel type="downstream">REM2-17</aerogel></row>
+ 	<row id="REM5-11(U), REM5-21(D)">   <aerogel type="upstream">REM5-11</aerogel> <aerogel type="downstream">REM5-21</aerogel></row>
+ 	<row id="REM2-4(U), REM13-5(D)">    <aerogel type="upstream">REM2-4</aerogel>	 <aerogel type="downstream">BTR13-5</aerogel></row>
+ 	<row id="REM5-11(U), BTR13-5(D)">   <aerogel type="upstream">REM5-11</aerogel> <aerogel type="downstream">BTR13-5</aerogel></row>
+ 	<row id="REM5-5(U), BTR13-5(D)">    <aerogel type="upstream">REM5-5</aerogel>  <aerogel type="downstream">BTR13-5</aerogel></row>
+ 	<row id="REM12-9(U), BTR13-5(D)">	  <aerogel type="upstream">REM12-9</aerogel> <aerogel type="downstream">BTR13-5</aerogel></row>
+ 	<row id="REM2-4(U), BTR16-21(D)">	 	<aerogel type="upstream">REM2-4</aerogel>  <aerogel type="downstream">BTR16-21</aerogel></row>
+ 	<row id="REM5-11(U), BTR16-21(D)">	<aerogel type="upstream">REM5-11</aerogel> <aerogel type="downstream">BTR16-21</aerogel></row>
+ 	<row id="REM5-5(U), BTR16-21(D)">	 	<aerogel type="upstream">REM5-5</aerogel>  <aerogel type="downstream">BTR16-21</aerogel></row>
+ 	<row id="REM12-9(U), BTR16-21(D)">	<aerogel type="upstream">REM12-9</aerogel> <aerogel type="downstream">BTR16-21</aerogel></row>
+</aerogel>
+
+<aerogelinfo>
+	<row id="PDR20-3a"><refind>1.0548</refind> <trlen unit="mm">40</trlen><thickness  unit="mm">20.0</thickness></row>
+	<row id="PDR11-4a"><refind>1.0653</refind> <trlen unit="mm">45</trlen><thickness  unit="mm">19.9</thickness></row>
+	<row id="BTR3-2a"><refind>1.0515</refind> <trlen unit="mm">40</trlen><thickness  unit="mm">19.8</thickness></row>
+	<row id="BTR13-5"><refind>1.0592</refind> <trlen unit="mm">59</trlen><thickness  unit="mm">20.3</thickness></row>
+	<row id="BTR16-21"><refind>1.0597</refind> <trlen unit="mm">58</trlen><thickness  unit="mm">19.9</thickness></row>
+	<row id="REM2-3"><refind>1.0464</refind> <trlen unit="mm">42</trlen><thickness  unit="mm">20.2</thickness></row>
+	<row id="REM2-17"><refind>1.0548</refind> <trlen unit="mm">34</trlen><thickness  unit="mm">19.9</thickness></row>
+	<row id="REM2-4"><refind>1.0463</refind> <trlen unit="mm">45</trlen><thickness  unit="mm">20.2</thickness></row>
+	<row id="REM5-11"><refind>1.0457</refind> <trlen unit="mm">48</trlen><thickness  unit="mm">20.3</thickness></row>
+	<row id="REM5-5"><refind>1.0467</refind> <trlen unit="mm">47</trlen><thickness  unit="mm">20.3</thickness></row>
+	<row id="HTP12-9"><refind>1.0496</refind> <trlen unit="mm">38</trlen><thickness  unit="mm">20.3</thickness></row>
+	<row id="REM5-21"><refind>1.0539</refind> <trlen unit="mm">38</trlen><thickness  unit="mm">20.4</thickness></row>
+</aerogelinfo>
+
+<hapd desc="HAPDSetup in run log, setup of the HAPD and the frame.">
+	<row id="1"> <comment>DAQ test</comment>
+		<aerogeldx unit="mm">0</aerogeldx> 
+		<framedx unit="mm">0</framedx> 
+		<rotation unit="degree">0</rotation> 
+		<setup>1</setup>
+	</row>		
+	<row id="2"> <comment>First hits, 21/05/2013, central HAPD dead</comment>
+		<aerogeldx unit="mm">0</aerogeldx> 
+		<setup>2</setup>
+	</row>		
+	<row id="3"> <comment>21-23/05/2013 New central HAPD</comment>
+		<aerogeldx unit="mm">0</aerogeldx> 
+		<setup>3</setup>
+	</row>
+	<row id="3a"> <comment>Aerogel moved</comment>
+		<aerogeldx unit="mm">-4.0</aerogeldx> 
+		<setup>3</setup>
+	</row>
+	<row id="3b"> <comment>Aerogel moved</comment>
+		<aerogeldx unit="mm">-6.0</aerogeldx> 
+		<aerogeldy unit="mm">2.0</aerogeldy> 
+		<setup>3</setup> 
+	</row>
+	<row id="3c"> <comment>Aerogel moved</comment>
+		<aerogeldx unit="mm">0</aerogeldx> 
+		<aerogeldy unit="mm">-5.0</aerogeldy> 
+		<setup>3</setup> 
+	</row>
+	<row id="3d"> <comment>Aerogel moved</comment>
+		<aerogeldx unit="mm">-4.5</aerogeldx> 
+		<aerogeldy unit="mm">0.0</aerogeldy> 
+		<setup>3</setup> 
+	</row>
+	<row id="4"> <comment>Irradiation test, positions: as initial</comment>
+		<aerogeldx unit="mm">0</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy> 		
+		<setup>4</setup> 
+	</row>
+	<row id="5"> <comment>Aerogel moved</comment>
+		<aerogeldx unit="mm">0</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy> 		
+		<setup>5</setup> 
+	</row>
+	<row id="6"> <comment>Aerogel moved</comment>
+		<aerogeldx unit="mm">0</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy> 		
+		<setup>6</setup> 
+	</row>
+	<row id="7"> <comment>Aerogel moved</comment>
+		<aerogeldx unit="mm">0</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy> 		
+		<setup>7</setup> 
+	</row>
+	<row id="8"> <comment>Aerogel moved</comment>
+		<aerogeldx unit="mm">0</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy> 		
+		<setup>8</setup> 
+	</row>
+	<row id="9"> <comment>Mirror study, positions: as initial</comment>
+		<aerogeldx unit="mm">0</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy>
+		<rotation unit="degree">-30</rotation> 		
+		<setup>9</setup> 
+	</row>
+	<row id="9a"> <comment>Mirror study, positions: as initial</comment>
+		<aerogeldx unit="mm">20</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy>
+		<setup>9</setup>
+		<framedx unit="mm">-20</framedx>
+		<rotation unit="degree">-30</rotation>
+	</row>
+	<row id="9b"> <comment>Mirror study, positions: as initial</comment>
+		<aerogeldx unit="mm">40</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy>
+		<setup>9</setup>
+		<framedx>-40</framedx>
+		<rotation unit="degree">-30</rotation>
+		</row>
+	<row id="9c"> <comment>Mirror study, positions: as initial</comment>
+		<aerogeldx unit="mm">58</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy>
+		<framedx>58</framedx>
+		<rotation unit="degree">-30</rotation> 		
+		<setup>9</setup> 
+		</row>
+	<row id="9d"> <comment>Mirror study, positions: as initial</comment>
+		<aerogeldx unit="mm">60</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy>
+		<framedx>-60</framedx>
+		<rotation unit="degree">-30</rotation>
+		<setup>9</setup> 
+		</row>
+	<row id="9e"> <comment>Mirror study, positions: as initial</comment>
+		<aerogeldx unit="mm">78</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy> 		
+		<framedx>-78</framedx>
+		<rotation unit="degree">-30</rotation>
+		<setup>9</setup> </row>
+	<row id="9f"> <comment>Mirror study, positions: as initial</comment>
+		<aerogeldx unit="mm">100</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy> 		
+		<framedx>-100</framedx>
+		<rotation unit="degree">-30</rotation>
+		<setup>9</setup> </row>
+	<row id="9g"> <comment>Mirror study, positions: as initial</comment>
+		<aerogeldx unit="mm">120</aerogeldx> 
+		<aerogeldy unit="mm">0</aerogeldy> 		
+		<framedx>-120</framedx>
+		<rotation unit="degree">-30</rotation>
+		<setup>9</setup> </row>
+</hapd>
+
+
+
+<xi:include href="ARICH_Beamtest2013_PhotonDetector.xml"/>
+<xi:include href="ARICH_Beamtest2013_Mirrors.xml"/>
+
+
+<Aerogel desc="Parameter of aRICH aerogel layers">
+      <tileXSize desc="Size of wedge aerogel tile (maximal size in r direction)" unit="mm">100</tileXSize>  
+      <tileYSize desc="Size of wedge aerogel tile (maximal size in phi direction)" unit="mm">100</tileYSize>        
+      <tileXPos unit="mm">53.0</tileXPos>
+      <tileYPos unit="mm">0.0</tileYPos>
+      <tileZPos desc="Z position of aerogel plane(beginning)" unit="mm">0.0</tileZPos>
+    </Aerogel>
+    
+
+<!-- ++++++++++++++++++++++++++++++++  -->
+
+
+<xi:include href="ARICH_Beamtest2013_Tracking.xml"/>
+<xi:include href="ARICH_Beamtest2013_HapdElectronicChannelMap.xml"/>
+<xi:include href="ARICH_Beamtest2013_HapdPositions.xml"/>
+</setup>
+

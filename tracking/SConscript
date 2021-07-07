@@ -1,0 +1,23 @@
+# -*- coding: utf-8 -*-
+# vim: syntax=python
+
+Import('env')
+
+env['LIBS'] = [
+    'alignment',
+    'tracking_dataobjects',
+    'pxd', 'pxd_dataobjects',
+    'svd', 'svd_dataobjects',
+    'cdc', 'cdc_dataobjects',
+    'klm_dataobjects',
+    'mdst_dataobjects',
+    'mva_dataobjects',
+    'mva',
+    'framework',
+    'genfit2',
+    'EG',
+    '$ROOT_LIBS',
+    'FastBDT_shared'
+    ]
+
+Return('env')

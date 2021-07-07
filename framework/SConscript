@@ -1,0 +1,17 @@
+Import('env')
+
+env['LIBS'] = ['$ROOT_LIBS', 'ROOTTPython',
+               'EG', # for TDatabasePDG
+               'XMLIO', # for TBufferXML
+               'boost_python', 'boost_filesystem', 'boost_iostreams', 'boost_system',
+               '$PYTHON_LIBS', '$XML_LIBS', '$MYSQL_LIBS' , '$PGSQL_LIBS',
+               'rt', # for clock_gettime() on some systems
+               'zmq',
+               'curl', # for REST API access to the database
+               '$SQLITE_LIBS', # for local conditions metadata
+               ]
+
+# Macros to limit the variations of the utilities/sha3hash implementation
+env.Append(CPPDEFINES=["KeccakP200_excluded", "KeccakP400_excluded", "KeccakP800_excluded"])
+
+Return('env')

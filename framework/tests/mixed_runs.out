@@ -1,0 +1,18 @@
+[INFO] Steering file: framework/tests/mixed_runs.py
+[INFO] The random number seed is set to "something important"
+[INFO] (20000) Begin of new run.
+[INFO] (20000) Processed:   1 runs,      1/    12 events.
+[INFO] (20000) Processed:   1 runs,      2/    12 events.
+[INFO] (20000) Begin of new run.
+[INFO] (20000) Processed:   2 runs,      3/    12 events.
+[INFO] (20000) Processed:   2 runs,      4/    12 events.
+[INFO] (20000) Begin of new run.
+[INFO] (20000) Processed:   3 runs,      5/    12 events.
+[INFO] (20000) Processed:   3 runs,      6/    12 events.
+[INFO] (20000) Begin of new run.
+[INFO] (20000) Processed:   4 runs,      7/    12 events.
+[INFO] (20000) Processed:   4 runs,      8/    12 events.
+[INFO] (20000) Begin of new run.
+[INFO] (20000) Processed:   5 runs,      9/    12 events.
+[INFO] (20000) Processed:   5 runs,     10/    12 events.
+[INFO] (20000) Begin of new run.

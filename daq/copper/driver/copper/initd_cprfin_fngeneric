@@ -1,0 +1,41 @@
+#!/bin/bash
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+# Script to load/unload cprfin_fngeneric devices
+
+. /etc/init.d/functions
+
+# See how we were called.
+case "$1" in
+  start)
+        action $"Loading cprfin_fngeneric device driver: " \
+	insmod ./cprfin_fngeneric/cprfin_fngeneric.ko
+	action $"Making nodes: " ./cprfin_fngeneric/mkdevs.sh
+        ;;
+  stop)
+        action $"Unloading cprfin_fngeneric device drivers: " \
+           rmmod cprfin_fngeneric
+        ;;
+  status)
+        # nothing
+        :
+        ;;
+  restart|reload)
+        # nothing
+        :
+        ;;
+  *)
+        # do not advertise unreasonable commands that there is no reason
+        # to use with this device
+        echo $"Usage: $0 {start|stop|status|restart|reload}"
+        exit 1
+esac
+
+exit 0

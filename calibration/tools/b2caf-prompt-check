@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""
+This tool checks the consistency of the calibration scripts in ``calibration/scripts/prompt/calibrations/``.
+The details are found by inspecting the `settings <prompt.CalibrationSettings>` variable of the
+calibration scripts.
+It checks for duplicate calibration names and for circular dependencies/missing scripts via ImportError.
+"""
+
+import ROOT
+ROOT.PyConfig.IgnoreCommandLineOptions = True
+
+import basf2
+from basf2 import B2ERROR, B2INFO, B2WARNING
+from pathlib import Path
+
+from prompt import prompt_script_package, prompt_script_dir 
+
+def get_all_script_paths():
+    script_path = Path(basf2.find_file(prompt_script_dir))
+    return script_path.glob("*.py")
+
+
+def get_script_settings(name):
+    import importlib
+    cal_module = importlib.import_module(prompt_script_package + Path(name).stem)
+    return cal_module.settings
+
+
+def get_argparser():
+    """Setup the argparser for this command line tool"""
+    import argparse
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
+                                     description=f"Checks the current scripts in ``{prompt_script_dir}`` for problems."
+                                    )
+    return parser
+
+
+def main():
+    parser = get_argparser()
+    args = parser.parse_args()
+    all_script_paths = [p.name for p in get_all_script_paths()]
+    calibration_names = []
+    broken_scripts = []
+    for script_path in all_script_paths:
+        try:
+            calibration_names.append(get_script_settings(script_path).name)
+        except ImportError:
+            B2ERROR(f"An ImportError was encountered while importing the settings variable from '{script_path}'. "
+                     "You may have a circular dependency with another script in it's 'depends_on' attribute.")
+            broken_scripts.append(script_path)
+        if broken_scripts:
+            B2ERROR("Due to errors importing the settings variables we cannot check for duplicate calibration names.")
+            return 1
+    else:
+        B2INFO("All 'settings' variables imported successfully.")
+
+    if len(calibration_names) != len(set(calibration_names)):
+        B2WARNING("Duplicate calibration name(s) found in settings!!!")
+        from collections import Counter
+        c = Counter(calibration_names)
+        for name, count in c.items():
+            if count > 1:
+                print(f"{name} was used {count} times in the prompt scripts.")
+        return 1
+    B2INFO("No duplicate calibration names found.")
+
+
+if __name__ == "__main__":
+    import sys
+    sys.exit(main())

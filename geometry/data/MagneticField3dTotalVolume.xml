@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="MagneticField" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="true">
+	<Description>The magnetic field description for the Belle II Detector</Description>
+	<Version>0</Version>
+        <Creator>GeoMagneticField</Creator>
+	<Content>
+		<!-- The components of the Belle II magnetic field -->		
+		<Components>
+			<!-- 3d magnetic field map
+			     The magnetic field map is stored as a grid in r:phi:z:Br:Bphi:Bz.
+			     It is defined by a minimum radius and a maximum radius, a minimum z and
+			     a maximum z value, a pitch size in both, r, and z and the number of grid
+			     points. The ZOffset is used to account for the fact that the acceleration
+			     group defines 0 to be in the center of the detector, while the detector
+			     group defines the IP to be the center. This offset will shift the values
+                             from the magnetic field map file to fit inside the region given by the
+                             ZMin and ZMax values. The filename points to the zip file containing the
+                             magnetic field map.
+			-->
+                        <!-- Tracking volume (include TOP) with fine grid
+                             * r [m]    : [0.000, 1.200],   dr = 0.010    
+                             * phi [deg]: [0, 360],         dphi = 2      
+                             * z [m]    : [-1.000, 2.000],  dz = 0.010    
+                        -->
+                        <Component type="3d">
+                                <NumberGridPointsR>121</NumberGridPointsR>
+                                <GridPitchR unit="m">0.010</GridPitchR>
+                                <RadiusMin unit="m">0.000</RadiusMin>
+                                <RadiusMax unit="m">1.200</RadiusMax>
+                                <ExcludeRadiusMin unit="m">0.000</ExcludeRadiusMin>
+                                <ExcludeRadiusMax unit="m">0.000</ExcludeRadiusMax>
+                                <NumberGridPointsPhi>91</NumberGridPointsPhi>
+                                <GridPitchPhi unit="deg">2</GridPitchPhi>
+                                <NumberGridPointsZ>301</NumberGridPointsZ>
+                                <GridPitchZ unit="m">0.010</GridPitchZ>
+                                <ZMin unit="m">-1.000</ZMin>
+                                <ZMax unit="m">2.000</ZMax>
+                                <ExcludeZMin unit="m">0.000</ExcludeZMin>
+                                <ExcludeZMax unit="m">0.000</ExcludeZMax>
+                                <ZOffset unit="m">0.000</ZOffset>
+				<BiasRadiusMin unit="m">0.000</BiasRadiusMin>
+                                <BiasRadiusMax unit="m">0.000</BiasRadiusMax>
+				<BiasBr>1.000</BiasBr>
+				<BiasBphi>1.000</BiasBphi>
+				<BiasBz>1.000</BiasBz>
+                                <MirrorPhi>1</MirrorPhi>
+                                <enableInterpolation>1</enableInterpolation>
+                                <EnableCoordinate>rphiz</EnableCoordinate>
+                                <MapFilename>geometry/MagneticField3d_TrackingVolume-150302-01-05_cylindrical.dat.gz</MapFilename>
+                        </Component>
+			<!-- Total Belle2 detector volume with coarse grid, excluding tracking volume
+			     * r [m]    : [0.000, 4.200],   dr = 0.040
+			     * phi [deg]: [0, 360],         dphi = 2
+			     * z [m]    : [-3.280, 4.200],  dz = 0.040
+			-->
+			<Component type="3d">
+				<NumberGridPointsR>106</NumberGridPointsR>
+				<GridPitchR unit="m">0.040</GridPitchR>
+				<RadiusMin unit="m">0.000</RadiusMin>
+				<RadiusMax unit="m">4.200</RadiusMax>
+				<ExcludeRadiusMin unit="m">0.000</ExcludeRadiusMin>
+                                <ExcludeRadiusMax unit="m">1.200</ExcludeRadiusMax>
+				<NumberGridPointsPhi>91</NumberGridPointsPhi>
+                                <GridPitchPhi unit="deg">2</GridPitchPhi>
+				<NumberGridPointsZ>188</NumberGridPointsZ>
+				<GridPitchZ unit="m">0.040</GridPitchZ>
+				<ZMin unit="m">-3.280</ZMin>
+				<ZMax unit="m">4.200</ZMax>
+				<ExcludeZMin unit="m">-1.000</ExcludeZMin>
+                                <ExcludeZMax unit="m">2.000</ExcludeZMax>
+				<ZOffset unit="m">0.000</ZOffset>
+				<BiasRadiusMin unit="m">0.000</BiasRadiusMin>
+                                <BiasRadiusMax unit="m">0.000</BiasRadiusMax>
+				<BiasBr>1.000</BiasBr>
+				<BiasBphi>1.000</BiasBphi>
+                                <BiasBz>1.000</BiasBz>
+                                <MirrorPhi>1</MirrorPhi>
+                                <enableInterpolation>1</enableInterpolation>
+                                <EnableCoordinate>rphiz</EnableCoordinate>
+ 				<MapFilename>geometry/MagneticField3d_TotalVolume-150302-01-04_cylindrical.dat.gz</MapFilename>
+			</Component>
+		</Components>
+	</Content>
+</DetectorComponent>

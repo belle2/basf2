@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Detector xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Name>Belle2Detector</Name>
+  <Description>The Belle II detector</Description>
+  <Global>
+    <material>Air</material>
+    <width  unit="m">8.0</width>
+    <length unit="m">40.0</length>
+    <height unit="m">8.0</height>
+  </Global>
+
+  <!-- Define materials -->
+  <xi:include href="BasicMaterials.xml"/>
+  <xi:include href="../structure/STR-Materials.xml"/>
+  <xi:include href="../ir/IR-Materials.xml"/>
+  <xi:include href="../vxd/VXD-Materials.xml"/>
+  <xi:include href="../pxd/PXD-Materials.xml"/>
+  <xi:include href="../svd/SVD-Materials.xml"/>
+  <xi:include href="../cdc/CDC-Materials.xml"/>
+  <xi:include href="../top/TOP-Materials.xml"/>
+  <xi:include href="../arich/ARICH-Materials.xml"/>
+  <xi:include href="../ecl/ECL-Materials.xml"/>
+  <xi:include href="../bklm/BKLM-Materials.xml"/>
+  <xi:include href="../eklm/EKLMMaterials.xml"/>
+
+  <xi:include href="../beast/bgo/BGO-Materials.xml"/>
+  <xi:include href="../beast/microtpc/MICROTPC-Materials.xml"/>
+  <xi:include href="../beast/he3tube/HE3TUBE-Materials.xml"/> 
+  <xi:include href="../beast/pindiode/PINDIODE-Materials.xml"/>
+  <xi:include href="../beast/cave/CAVE-Materials.xml"/>
+  <xi:include href="../beast/ph1bpipe/PH1BPIPE-Materials.xml"/>
+  <xi:include href="../beast/ph1sustr/PH1SUSTR-Materials.xml"/>
+  <xi:include href="../beast/srsensor/SRSENSOR-Materials.xml"/>
+  <xi:include href="../beast/csi/CSI-Materials.xml"/>
+  <xi:include href="../beast/beamabort/BEAMABORT-Materials.xml"/>
+  
+  <!-- Accelerator -->
+  <xi:include href="SuperKEKB.xml"/>
+
+  <!-- Subdedectors -->
+
+  <xi:include href="../ir/FarBeamLine.xml"/>
+ 
+  <xi:include href="../beast/ph1bpipe/PH1BPIPE.xml"/>
+  <xi:include href="../beast/cave/CAVE.xml"/>
+  <xi:include href="../beast/ph1sustr/PH1SUSTR.xml"/>
+  
+  <xi:include href="../beast/bgo/BGO-phase1.xml"/>
+  <xi:include href="../beast/pindiode/PINDIODE-phase1.xml"/>   
+  <xi:include href="../beast/microtpc/MICROTPC-phase1.xml"/>
+  <xi:include href="../beast/he3tube/HE3TUBE-phase1.xml"/>
+  
+  <!--xi:include href="../beast/srsensor/SRSENSOR.xml"/-->
+  <xi:include href="../beast/csi/CSI.xml"/>
+  <xi:include href="../beast/beamabort/BEAMABORT-phase1.xml"/>
+  
+</Detector>

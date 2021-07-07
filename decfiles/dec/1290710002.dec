@@ -1,0 +1,56 @@
+# EventType: 1290710002
+# Descriptor: [B+ -> Xu0 l+ nu]cc
+# NickName: Bu_Xulnu=cocktail
+# Documentation: Cocktail of charmless semileptonic B decays
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Phillip Urquijo
+# Email: purquijo@unimelb.edu.au
+# Cuts: None
+# Date: 20150109
+#
+#
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+0.000078   pi0     e+      nu_e             PHOTOS  BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #[FF values from HFLAV 2016]
+0.000038   eta     e+      nu_e             PHOTOS  ISGW2; #[PDG2017]
+0.000158   rho0    e+      nu_e             PHOTOS  BCL -0.861 1.444 0.266 0.378 0.165 0.291 0.718 0.384 0.331 -0.876 1.907; #[FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288)]
+0.000119   omega   e+      nu_e             PHOTOS  BCL -0.963 1.849 0.242 0.269 -0.039 0.250 0.517 -0.045 0.304 -0.920 1.901; #[FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1205.6245)]
+0.000023   eta'   e+   nu_e                 PHOTOS  ISGW2; #[PDG2017]
+0.002140   Xu0   e+  nu_e                   VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
+
+#
+0.000078   pi0     mu+     nu_mu            PHOTOS  BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #[FF values from HFLAV 2016]
+0.000038   eta     mu+     nu_mu            PHOTOS  ISGW2; #[PDG2017]
+0.000158   rho0    mu+     nu_mu            PHOTOS  BCL -0.861 1.444 0.266 0.378 0.165 0.291 0.718 0.384 0.331 -0.876 1.907; #[FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1005.3288)]
+0.000119   omega   mu+     nu_mu            PHOTOS  BCL -0.963 1.849 0.242 0.269 -0.039 0.250 0.517 -0.045 0.304 -0.920 1.901; #[FF values from a combined fit on LCSR prediction (1203.1359) and measurements from Belle (1306.2781) and BaBar (1205.6245)]
+0.000023   eta'   mu+  nu_mu                PHOTOS  ISGW2; #[PDG2017]
+0.002140   Xu0   mu+  nu_mu                 VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
+
+#
+0.000030   pi0    tau+ nu_tau              ISGW2;
+0.000012   eta    tau+ nu_tau              ISGW2;
+0.000042   rho0   tau+ nu_tau              ISGW2;
+0.000042   omega   tau+ nu_tau              ISGW2;
+0.000018   eta'   tau+ nu_tau              ISGW2;
+0.000046   a_10    tau+ nu_tau              ISGW2;
+0.000027   b_10    tau+ nu_tau              ISGW2;
+0.000004   a_00    tau+ nu_tau              ISGW2;
+0.000002   f_0     tau+ nu_tau              ISGW2;
+0.000002   f'_0    tau+ nu_tau              ISGW2;
+0.000023   f_1     tau+ nu_tau              ISGW2;
+0.000023   f'_1    tau+ nu_tau              ISGW2;
+0.000013   h_1     tau+ nu_tau              ISGW2;
+0.000013   h'_1    tau+ nu_tau              ISGW2;
+0.000020   f_2     tau+ nu_tau              ISGW2;
+0.000020   f'_2    tau+ nu_tau              ISGW2;
+Enddecay
+CDecay B-sig
+
+
+End

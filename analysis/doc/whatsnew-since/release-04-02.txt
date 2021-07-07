@@ -1,0 +1,258 @@
+Changes in the analysis package since release-04-02
+---------------------------------------------------
+
+ .. warning:: Global includes like ``from basf2 import *`` are almost completely removed from the analysis package.
+
+Vertex Fitting
+++++++++++++++
+
+ .. warning:: The convenience function for the :b2:mod:`TreeFitter` module has
+    been renamed from ``vertexTree`` to :func:`vertex.treeFit`.
+
+ .. warning:: The KFit convenience functions have been merged to the new
+    function :func:`vertex.kFit`. One of its input arguments is ``fit_type``,
+    which specifies whether you want to perform a mass fit
+    (``fit_type=mass``), a vertex fit (``fit_type=vertex``), a
+    mass-constrained vertex fit (``fit_type=massvertex``), or a vertex fit
+    with the mother constrained to the beam four-momentum
+    (``fit_type=fourC``).
+
+ * Added ``smearing`` parameter to `vertex.kFit`.
+   When you perform a vertex fit with an IP tube constraint (``fit_type=vertex`` and ``constraint=iptube``), the IP profile is
+   smeared by the given value.
+   The IP tube is defined by a neutral track pointing towards the boost direction starting from the smeared IP profile.
+   Setting ``smearing=0`` gives the original ``iptube`` option, which is an elongated ellipsoid in boost direction.
+
+ * Fixed TreeFitter bias on V0s by propagating the correct TrackFitResult from V0 daughters (see :issue:`BII-6336`).
+
+ * Added ``FeedthroughParticle`` and ``InternalTrack`` to `vertex.treeFit`.
+   This now provides compatibility of TreeFitter with the bremsstrahlung recovery modules.
+   In principle, TreeFitter can now be used for decays for which Bremsstrahlung correction has been applied. However, there are
+   massive performance issues. Do not blindly use TreeFit but cross-check your results with KFit. Further improvements are planned.
+
+Standard Particle Lists
++++++++++++++++++++++++
+
+ * The list label ``"all"`` is now forbidden from use with cuts. This can introduce some very subtle bugs in user scripts.
+   The following code will no longer work:
+
+   .. code-block:: python
+
+	fillParticleList("gamma:all", "clusterE > 0.02", path=mypath)
+
+   Instead you should replace it with a meaningful name of your choice. For example:
+
+   .. code-block:: python
+
+	fillParticleList("gamma:myMinimumThresholdList", "clusterE > 0.02", path=mypath)
+
+
+ * Added stdHyperons.py, this analysis script reconstructs the standard hyperons Xi-, Xi0, and Omega-.
+   	 
+   * New functions include `stdXi`, `stdXi0`, `stdOmega`, `goodXi`, `goodXi0`, and `goodOmega`
+   * All documentation for this optimization and usage can be found at `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/1337/files/BELLE2-NOTE-PH-2019-011.pdf>`_
+
+ * The default vertex fitter for the V0 lists `stdKshorts` and `stdLambdas` has been changed from ``Rave`` to ``TreeFit``.
+   However, a new option called ``fitter`` has been added that allows to change the vertex fitter back to `raveFit` or to `kFit`.
+   This change is motivated by a much faster execution time (see :issue:`BII-5699`) and a compatible performance as summarized
+   `here <https://indico.belle2.org/event/1684/contributions/9245/attachments/4576/7096/V0VertexFitting_workshopSummary.pdf>`_.
+ * Added a new standard list `stdCharged.stdMostLikely` which creates 5 mutually-exclusive lists of track-based particles under
+   their most likely hypothesis.
+ * Moved the KlId check from :b2:mod:`ParticleLoader` to `stdKlongs`. This modification does not change the definition of the
+   ``K_L0:all`` list and, in general, of the user-defined :math:`K_{L}^0` lists.
+ * Removed the functions ``mergedKshorts`` and ``mergedLambdas``, which returned the standard V0 lists anyway.
+ * Removed the deprecated pi0 lists ``pi0:loose`` and ``pi0:veryloose``
+ * stdPi0s and stdPhotons updated to match Jan2020 recommendations.  Naming scheme updated to indicate date of optimization.
+
+Variables
++++++++++
+
+  .. note:: All variables will return a quietNaN instead of -999 or other out-of-the-sky numbers in case of errors.
+     To study the failures use the meta variable `ifNANgiveX`, which replaces nan with a value of your choice.
+
+ .. warning:: The variables :b2:var:`decayAngle`, :b2:var:`daughterAngle` and :b2:var:`pointingAngle` now return an angle instead of a cosine.
+
+ * Renamed ``mcDX``, ``mcDY``, ``mcDZ``, and ``mcDRho`` to :b2:var:`mcDecayVertexFromIPX`, :b2:var:`mcDecayVertexFromIPY`,
+   :b2:var:`mcDecayVertexFromIPZ`, and :b2:var:`mcDecayVertexFromIPRho`.
+ * Renamed ``mdstSource`` to :b2:var:`uniqueParticleIdentifier`.
+ * Renamed ``MCDeltaT`` to :b2:var:`mcDeltaT`
+ * Renamed ``mcX``, ``mcY``, ``mcZ``, and ``mcRho`` to :b2:var:`mcDecayVertexX`, :b2:var:`mcDecayVertexY`,
+   :b2:var:`mcDecayVertexZ`, and :b2:var:`mcDecayVertexRho`.
+ * Renamed ``mcProdVertexX``, ``mcProdVertexY``, and ``mcProdVertexZ`` to :b2:var:`mcProductionVertexX`,
+   :b2:var:`mcProductionVertexY`, and :b2:var:`mcProductionVertexZ`.
+ * Renamed ``mcProdVertexDX``, ``mcProdVertexDY``, and ``mcProdVertexDZ`` to :b2:var:`mcProductionVertexFromIPX`,
+   :b2:var:`mcProductionVertexFromIPY`, and :b2:var:`mcProductionVertexFromIPZ`.
+ * Renamed ``mcDistance`` to :b2:var:`mcDecayVertexFromIPDistance`.
+ * Added :b2:var:`varForFirstMCAncestorOfType` variable that returns requested variable of the first gen-level
+   ancestor of the given type.
+ * Now vertex variables ``dr, dx, dy, dz, dphi, dcosTheta...`` take into account the nontrivial
+   transformation of track parameters relative to IP when used for tracks.
+   `dr` did not center at zero before and now it does.
+ * Added :b2:var:`isDescendantOfList` and :b2:var:`isMCDescendantOfList` meta variables that allow to check whether the
+   particle is the descendant of the list (or if it is matched to the descendant of the list) at any generation.
+   The variables have recursive search inside, they extend :b2:var:`isDaughterOfList` and :b2:var:`isGrandDaughterOfList`.
+ * Renamed some `RestOfEvent` variables for consistency across the `VariableManager`.
+   Variables starting ``WE_XXX``, ``ROE_XXX``, and ``Rec_XXX`` are now ``weXXX``, ``roeXXX``, and ``recXXX``.
+   For example ``ROE_deltae`` is now :b2:var:`roeDeltae`.
+ * Fixed calculation of :b2:var:`cosHelicityAngleMomentum` for decays with bremscorrected electrons
+ * Fixed :b2:var:`clusterEoP` for particles with Bremsstrahlung correction by adding the energy of the added photon(s)
+ * Added :b2:var:`isSignalAcceptBremsPhotons` to ignore any reconstructed brems photons.
+
+  .. note:: This is not the generator-level match (see :issue:`BII-5741`) but simply ignores photons added by the :b2:mod:`BremsFinder`.
+
+ * Added :b2:var:`useTagSideRecoilRestFrame`, which allows variables to be calculated in the rest frame
+   recoiling against the tag side B meson. This variable is intended to be used on Upsilon(4S) particle lists
+   only. The variable gives access to the signal B rest frame in semi-leptonic decays, where the four momentum
+   of the signal B can not be entirely reconstructed due to the presence of neutrinos in the decay.
+ * Added new variables for fully-inclusive analysis: :b2:var:`nDaughterPhotons`, :b2:var:`nDaughterCharged` etc., which allow to
+   count specific daughters easily, and :b2:var:`daughterAverageOf`, which is similar to the :b2:var:`daughterSumOf`, but outputs
+   the mean value of a variable.
+ * Fixed :b2:var:`goodBelleKshort`, now it returns ``extraInfo(goodKs)`` if the variable exists.
+ * Added two new variables :b2:var:`pidMostLikelyPDG` which is the PDG code of the most likely hypothesis for this track, and
+   :b2:var:`pidIsMostLikely` which returns true if the particle *is* under its most likely hypothesis.
+ * Added PID prior hypothesis to the :b2:var:`pidMostLikelyPDG` and the :b2:var:`pidIsMostLikely` variables.
+ * Added several variables that related to the quality of the tag B vertex fit and the tracks used in that fit:
+   :b2:var:`TagVNFitTracks`, :b2:var:`TagVDistanceToConstraint`, :b2:var:`TagVDistanceToConstraintErr`,
+   :b2:var:`TagTrackMomentumX`, :b2:var:`TagTrackMomentumX`, :b2:var:`TagTrackMomentumZ`,
+   :b2:var:`TagTrackRaveWeight`, :b2:var:`TagTrackDistanceToConstraint`,
+   :b2:var:`TagTrackDistanceToConstraintErr`, :b2:var:`TagTrackDistanceToTagV`, :b2:var:`TagTrackDistanceToTagVErr`,
+   :b2:var:`TagTrackTrueDistanceToTagV`. Meta-variables can be used to compute the average, weighted average, min or max
+   of these variables, e.g. by doing ``TagTrackAverage(TagTrackTrueDistanceToTagV)`` 
+ * Added ``mcDeltaL`` describing the true distance between Sig and Tag
+   vertices in the Y(4S) boost direction
+ * Added ``mcDeltaTapprox`` to get :b2:var:`mcDeltaT` in the kinematic
+   approximation, i.e. based on ``mcDeltaL`` variable
+ * Added :b2:var:`pidChargedBDTScore` and :b2:var:`pidPairChargedBDTScore` for global and binary BDT-based charged particle
+   identification, respectively. Require booking the `ChargedPidMVAMulticlass` (`ChargedPidMVA`) module in the path.
+ * Bug fix for the `isCloneTrack` variable. Antiparticles have been falsely classified which is now fixed (see :issue:`BII-5973`)
+ * Added :b2:var:`isChargedBEvent` and :b2:var:`isUnmixedBEvent` variables
+ * The variables `daughterAngle` and ``daughterAngleInBetween`` have been merged using the name of the former but the extended
+   functionality of the latter.
+ * Removed the variable ``SigMBF``, which was supposed to return the mass significance before a vertex fit but was only a
+   pseudo-significance.
+
+ .. hint:: It is recommended to use `variablesToExtraInfo` prior to a vertex fit to access pre-fit values,
+           not only for mass significances but also for vertex positions, etc.
+
+ * Fixed truth kinematic variables (`mcPX`, `mcPY`, ...) to respect the current reference frame, so that they can be accessed not
+   only in the lab frame but for example as well in the CMS frame using `useCMSFrame`.
+ * Extended functionality of recoil kinematics variables (`pxRecoil`, `pyRecoil`, ...) to be usable with any requested frame.
+ * Added :b2:var:`isFromV0` to identify particles that come from tracking-level V0's (as opposed to those created at
+   analysis-level using `modularAnalysis.reconstructDecay`).
+ * Removed ``isExtendedSignal`` whose exact behavior is mirrored by `isSignalAcceptWrongFSPs`.
+ * Added the new variable collection ``event_kinematics`` which contains all variables available after running the
+   `EventKinematics` module.
+ * Added :b2:var:`unmask`, which unmasks certain indicated bits in a variable (set certain bits in a variable to zero).
+ * Added a new variable util ``create_isSignal_alias`` which creates customized :b2:var:`isSignal`, accepting certain match errors.
+ * Removed the previously deprecated variable ``clusterHypothesis``.
+ * Added :b2:var:`firstCDCLayer`, returns the ID of the CDC layer closest to the IP with a hit attributed to the particles track 
+ * Added the new variable collection ``cluster_average``. It contains the cluster variables that can only be executed for
+   particles with daughters, currently :b2:var:`maxWeightedDistanceFromAverageECLTime` and :b2:var:`weightedAverageECLTime`.
+ * Added a variable for TDCPV resolution study :b2:var:`DeltaTRes` and legacy Belle :b2:var:`DeltaTBelle`.
+ * Added :b2:var:`genIPX`, :b2:var:`genIPY`, and :b2:var:`genIPZ`; the generator-level IP.
+ * Clarified the documentation of the **measured** interaction point variables (:b2:var:`IPX` ff).
+
+Modules
++++++++
+
+ * When merging ParticleLists using the :b2:mod:`ParticleListManipulator` (`modularAnalysis.copyLists`) duplicates (not
+   multiple candidates) are removed on a first-come, first-served basis, i.e. the order of the input particles matters.
+   Now, the new parameter ``variable`` can be provided to determine which duplicate should be preferred. The logic is the
+   same as for the :b2:mod:`BestCandidateSelection` module. Furthermore, duplicates, which differ only by the order of
+   their daughter particles, are now identified.
+ * The :b2:mod:`ParticleLoader` can create neutron particle lists now. ECL
+   cluster with the hadron hypothesis as well as KLM cluster are used as source.
+ * Tweaks to the :b2:mod:`ParticleLoader` for how it creates particles from V0s, it now preserves the link to the mdst object.
+   These changes are all under-the-hood and require no actions by users.
+ * In :b2:mod:`TreeFitter` bugfix in mass constraint: chi2 correctly calculated now.
+ * In :b2:mod:`TreeFitter` change of initialisation values increases performance in all fits with tracks.
+ * In :b2:mod:`TreeFitter` max iterations set to 100, increases efficiency slightly in many cases.
+ * Removed module ``CreateBsigFromFullRecoBtag``
+ * In BtubeCreator module, functionality to associate Btube to user's chosen B is added.
+ * Removed module ``FSRCorrection`` in favour of `BremsFinder` and `BelleBremRecovery`.
+ * In `ChargedPidMVA` module, remove handling of particle list modified by the removed ``FSRCorrection`` module.
+ * In `ChargedPidMVA` module, apply MVA category cuts retrieved from the DB payload.
+ * Added `ChargedPidMVAMulticlass` module to allow performing global PID (one-vs-rest), using an MVA trained in multi-class mode.
+ * Added a :b2:mod:`BremsFinder` to unpack the bremsstrahlung relations provided by tracking.
+
+  .. hint:: This tool is the recommended way to correct for bremsstrahlung photons in Belle II analyses.
+
+ * Modified `writePi0EtaVeto` function and added `oldwritePi0EtaVeto` function. The weight files used in release-03 were not
+   available in release-04.
+   The latter uses old weight files optimized with MC9, while new weight files, which are optimized with MC12, are used in
+   `writePi0EtaVeto`
+ * Enabled to select daughters which will be used to perform fitting with KFit. One can use the selector ``^`` to select daughters.
+ * KFit can be used to fit vertices of fully-inclusive particles, for which it ignores the daughters without defined p-value. 
+ * :b2:mod:`RestOfEventBuilder`, :b2:mod:`EventKinematics` and :b2:mod:`EventShapeCalculator` modules can use most likely charged
+   particle hypothesis according to PID information.
+ * Added the :b2:mod:`ParticleCombinerFromMC` module and the `reconstructMCDecay` to find and create ``ParticleList`` from a given
+   :ref:`DecayString`.
+   They can be used instead of the :b2:mod:`MCDecayFinder` and `findMCDecay` which are not fully tested and maintained.
+ * In :b2:mod:`TagVertex` added Btube as a possible constraint for the tag B vertex fit. The ``useFitAlgorithm`` parameter in the
+   module is replaced by ``constraintType`` (which can be set to ``tube``) and ``trackFindingType``. All computations done in the
+   module are now using double precision.
+   The module is also updated to allow for the computations of new variables related to the tracks used in the tag vertex fit.
+ * Added a :b2:mod:`InclusiveDstarReconstruction` to inclusively reconstruct D* mesons by estimating the four vector using slow
+   pions.
+ * In the `TagV` function, added the possibility to use KFit instead of Rave to perform the tag vertex fit.
+ * Both flavor taggers support ROE masks. Added new maskName argument.
+ * Added new :ref:`DecayString` grammar for ``c_AddedRecoBremsPhoton``, ``c_DecayInFlight``, and ``c_MisID``. If one uses
+   ``?addbrems`` in own DecayString, ``c_AddedRecoBremsPhoton`` is ignored, thus :b2:var:`isSignal` works as
+   :b2:var:`isSignalAcceptBremsPhotons`.
+   One can add ``(decay)`` and/or ``(misID)`` to the beginning of the particle name to accept ``c_DecayInFlight`` and/or
+   ``c_MisID``.
+   The following is an example, :code:`'reconstructDecay('D0:sig -> (misID)K-:loose (decay)pi+:loose', '', path=mypath)'`
+
+ * Modified `modularAnalysis.matchMCTruth` to work always recursively. Once one calls `modularAnalysis.matchMCTruth` for a
+   particle, the MC Matching is done for not only the particle but also all daughters of the particle correctly.
+   This modification does not change the MC Matching of the particle for which `modularAnalysis.matchMCTruth` is called.
+ * Added feature to add multiple TTrees to the same output file via the :b2:mod:`VariablesToEventBasedTree` module.
+ * Rest Of Event can be created using MCParticles using `modularAnalysis.buildRestOfEventFromMC`
+ * Removed ``-->``, ``=>``, and ``==>`` from the list of allowed arrow types for the `DecayString`.
+ * In :b2:mod:`TagVertex` module, added the possibility to use the truth information from the tag particles in the vertex fit. The
+   option :code:`useTruthInFit = True` switches that on.
+ * In :b2:mod:`TagVertex` module, implemented an internal change: tag particles are loaded as ``Particle`` object from the ``ROE``
+   and not anymore as ``TrackFitResult``. This should have no effect to users.
+ * Added a warning to the `ParticleCombiner` module for decay strings violating electric charge conservation which can be turned
+   off by setting ``allowChargeViolation=True``.
+ * In :b2:mod:`TagVertex` module, added the possibility to perform vertex fit with the tag particle tracks rolled back to their primary vertex points. The
+   option :code:`useRollBack = True` switches that on.
+ * Added an argument to the `ParticleCombiner` module that allows to deactivate the automatic reconstruction of the
+   charge-conjugated mode. In `reconstructDecay` the option is called ``chargeConjugation``, which is ``True`` by default.
+ * The MC matching with the :ref:`DecayString` properly works in hierarchical decay. For example,
+
+   .. code-block:: python
+
+        from modularAnalysis import reconstructDecay, matchMCTruth
+        reconstructDecay('B0:signal      -> mu+ mu- ... ?gamma',   '', path=mypath)
+        reconstructDecay('B0:generic     -> D*-:Dpi pi+:all',      '', path=mypath)
+        reconstructDecay('Upsilon(4S):BB -> B0:generic B0:signal', '', path=mypath)
+        matchMCTruth('Upsilon(4S)', path=mypath)
+
+   In the above case, missing daughters (massive FSP and gamma) of ``B0:signal`` are accepted for not only ``B0:signal`` but also ``Upsilon(4S)``, so that `isSignal` can be 1.
+   Another example,
+
+   .. code-block:: python
+
+        reconstructDecay('D-:pipi0 -> pi-:all pi0:all',      '', path=mypath)
+	reconstructDecay('B0:Dpi   -> D-:pipi0 pi+:all ...', '', path=mypath)
+        matchMCTruth('B0:Dpi', path=mypath)
+
+   In this case, one wants to accept missing massive daughters in ``B0:Dpi`` decay but not in ``D-:pipi0`` decay.
+   So, if the decay of ``D-:pipi0`` in the MC truth level is ``D- -> pi+ pi- pi- pi0``, `isSignal` of ``D-:pipi0`` and ``B0:Dpi`` will be 0, 
+   since there are missing daughters in ``D-:pipi0`` decay. If one wants to accept missing daughters in ``D-:pipi0``, please use the 
+   :ref:`DecayString` grammar in the reconstruction of ``D-:pipi0`` or use `isSignalAcceptMissing` variable instead of `isSignal`.
+
+Utilities and core objects
+++++++++++++++++++++++++++
+
+ * A set of functions ``DistanceTools`` has been added to compute distances between (straight) tracks and vertices.
+ * Added a relation between Track-based Particles and TrackFitResults.
+ * Added a ``getTrackFitResult`` method to Particle.
+ * Added a function to retrieve electric charge of a particle based on its pdg code.
+ * Added a ``RotationTools.h`` file with few functions related to rotation
+
+Tutorials and Examples
+++++++++++++++++++++++
+
+ * Added a tutorial about creating aliases (``examples/VariableManager/variableAliases.py``)

@@ -1,0 +1,12 @@
+Import('env')
+
+# env['CONTINUE'] = False
+
+env['LIBS'] = ['framework', '$ROOT_LIBS']
+#env.Append(CPPDEFINES = {'TRG_DEBUG':None})
+#env.Append(CPPDEFINES = {'TRG_DISPLAY':None})
+#env.ParseConfig('pkg-config --cflags --libs gtkmm-2.4')
+#print env.Dump()
+
+Return('env')
+

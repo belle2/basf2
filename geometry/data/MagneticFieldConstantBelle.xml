@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="MagneticFieldConstantBelle" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">
+  <Description>The magnetic field description for the Belle Detector</Description>
+  <Version>0</Version>
+  <Creator>GeoMagneticField</Creator>
+  <Content>
+    <!-- The components of the Belle magnetic field -->
+    <Components>
+      <!-- Homogeneous magnetic field -->
+      <Component type="Constant">
+        <X>0.0</X>
+        <Y>0.0</Y>
+        <Z>1.5</Z>
+        <MaxR unit="mm">0.0</MaxR>
+        <MinZ unit="m">-4000.0</MinZ>
+        <MaxZ unit="m">4000.0</MaxZ>
+      </Component>
+    </Components>
+  </Content>
+</DetectorComponent>

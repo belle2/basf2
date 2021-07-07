@@ -1,0 +1,6 @@
+#pragma link off all globals;
+#pragma link off all classes;
+#pragma link off all functions;
+#pragma link C++ nestedclasses;
+
+#pragma link C++ class Belle2::TrackFindingCDC::AutomatonCell+; // checksum=0x9f120b48, version=-1

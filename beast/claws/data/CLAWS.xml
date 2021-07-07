@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="CLAWS">
+  <Creator library="beast">CLAWSCreator</Creator>
+  
+  <Content>
+    <Ethres>0.05</Ethres>
+
+    <ScintCell>16</ScintCell>
+    <TimeStep unit="ns">0.8</TimeStep> 
+    <MinTime>0.0</MinTime>
+    <MaxTime unit="ms">1.0</MaxTime>
+    <PEthres>1.0</PEthres>
+    <Ethres>0.05</Ethres>
+    <C_keV_to_MIP>805.5</C_keV_to_MIP>
+    <C_MIP_to_PE>27</C_MIP_to_PE>
+
+    <stepLength unit="um">50</stepLength>
+    <shape name="CLAWS" type="box">
+      <length unit="mm">200</length>
+      <width unit="mm">23</width>
+      <height unit="mm">5.2</height>
+      <r unit="mm">36.1</r>
+      <z unit="mm">21</z>
+      <u unit="mm">0</u>
+      <phi unit="deg">135, 225</phi>
+
+      <shape name="Board" type="box">
+        <material>G10</material>
+        <length unit="mm">200</length>
+        <width unit="mm">23</width>
+        <height unit="mm">2</height>
+        <top unit="mm">0</top>
+      </shape>
+      <shape name="Cover" type="box">
+        <material>CLAWS-Cover</material>
+        <length unit="mm">20.2</length>
+        <width unit="mm">20.2</width>
+        <height unit="mm">3.2</height>
+        <top unit="mm">2</top>
+        <z unit="mm">77.0, 55.0, 33.0, 11., -11., -33.0, -55.0, -77.0</z>
+        <shape name="Scintillator" type="box">
+          <active>true</active>
+          <material>Polystyrene</material>
+          <length unit="mm">20</length>
+          <width unit="mm">20</width>
+          <height unit="mm">3</height>
+          <top unit="mm">0.1</top>
+        </shape>
+      </shape>
+    </shape>
+  </Content>
+</DetectorComponent>

@@ -1,0 +1,6 @@
+Import('env')
+
+env['LIBS'] = ['framework']
+#print env.Dump()
+
+Return('env')

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SimulationParameters>
+  <HitTimeMax desc="Maximum global time for a recorded hit" unit="ns">32000</HitTimeMax>
+  <RPCStripMultiplicity>
+    <Phi>
+      <Division id="0">
+        <Weight multiplicity="1">844950</Weight>
+        <Weight multiplicity="2">118387</Weight>
+        <Weight multiplicity="3"> 39053</Weight>
+        <Weight multiplicity="4">  3785</Weight>
+      </Division>
+      <Division id="1">
+        <Weight multiplicity="1">684029</Weight>
+        <Weight multiplicity="2">148487</Weight>
+        <Weight multiplicity="3"> 36498</Weight>
+        <Weight multiplicity="4">  3763</Weight>
+      </Division>
+      <Division id="2">
+        <Weight multiplicity="1">513808</Weight>
+        <Weight multiplicity="2">217797</Weight>
+        <Weight multiplicity="3"> 34805</Weight>
+        <Weight multiplicity="4">  4007</Weight>
+      </Division>
+      <Division id="3">
+        <Weight multiplicity="1">309884</Weight>
+        <Weight multiplicity="2">348114</Weight>
+        <Weight multiplicity="3"> 33736</Weight>
+        <Weight multiplicity="4">  4151</Weight>
+      </Division>
+      <Division id="4">
+        <Weight multiplicity="1">144984</Weight>
+        <Weight multiplicity="2">510842</Weight>
+        <Weight multiplicity="3"> 33120</Weight>
+        <Weight multiplicity="4">  4614</Weight>
+      </Division>
+    </Phi>
+    <Z>
+      <Division id="0">
+        <Weight multiplicity="1">771589</Weight>
+        <Weight multiplicity="2">145162</Weight>
+        <Weight multiplicity="3"> 61141</Weight>
+        <Weight multiplicity="4">  6945</Weight>
+      </Division>
+      <Division id="1">
+        <Weight multiplicity="1">591559</Weight>
+        <Weight multiplicity="2">172550</Weight>
+        <Weight multiplicity="3"> 52663</Weight>
+        <Weight multiplicity="4">  6351</Weight>
+      </Division>
+      <Division id="2">
+        <Weight multiplicity="1">436281</Weight>
+        <Weight multiplicity="2">257491</Weight>
+        <Weight multiplicity="3"> 51890</Weight>
+        <Weight multiplicity="4">  6905</Weight>
+      </Division>
+      <Division id="3">
+        <Weight multiplicity="1">243331</Weight>
+        <Weight multiplicity="2">411704</Weight>
+        <Weight multiplicity="3"> 49431</Weight>
+        <Weight multiplicity="4">  7286</Weight>
+      </Division>
+      <Division id="4">
+        <Weight multiplicity="1">113533</Weight>
+        <Weight multiplicity="2">573758</Weight>
+        <Weight multiplicity="3"> 47143</Weight>
+        <Weight multiplicity="4">  8092</Weight>
+      </Division>
+    </Z>
+  </RPCStripMultiplicity>
+</SimulationParameters>

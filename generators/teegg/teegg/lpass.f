@@ -1,0 +1,6 @@
+
+CDECK  ID>, LPASS.  
+      LOGICAL FUNCTION LPASS(DUMMY)
+      LPASS=.TRUE.
+      RETURN
+      END

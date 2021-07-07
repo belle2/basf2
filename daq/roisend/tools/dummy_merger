@@ -1,0 +1,21 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+import os
+import sys
+import subprocess
+
+argvs = sys.argv
+argc = len(argvs)
+
+#with open('/dev/null', 'w') as f:
+with open('dummyout.dat', 'w') as f:
+    p = subprocess.call ( ['nc', '-l', argvs[3]], stdout=f, stderr=f )

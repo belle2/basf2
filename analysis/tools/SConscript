@@ -1,0 +1,13 @@
+Import('env')
+
+env['TOOLS_LIBS']['externTeacher'] = ['stdc++', 'framework', 'analysis', 'boost_program_options', '$ROOT_LIBS']
+
+env['TOOLS_LIBS']['basf2_mva_teacher'] = ['stdc++', 'framework', 'analysis', 'boost_program_options', '$ROOT_LIBS']
+env['TOOLS_LIBS']['basf2_mva_expert'] = ['stdc++', 'framework', 'analysis', 'boost_program_options', '$ROOT_LIBS']
+env['TOOLS_LIBS']['basf2_mva_upload'] = ['stdc++', 'framework', 'analysis', 'boost_program_options', '$ROOT_LIBS']
+env['TOOLS_LIBS']['basf2_mva_download'] = ['stdc++', 'framework', 'analysis', 'boost_program_options', '$ROOT_LIBS']
+
+
+env['TOOLS_LIBS']['b2variable-cut-parser'] = ['stdc++', 'framework', 'analysis', 'analysis_dataobjects', '$ROOT_LIBS']
+
+Return('env')

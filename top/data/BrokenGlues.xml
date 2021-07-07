@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<BrokenGlues descr="definition of broken (delaminated) glues">
+  <!-- glue ID's:      -->
+  <!--   1 bar-mirror  -->
+  <!--   2 bar-bar     -->
+  <!--   3 prism-bar   -->
+  
+  <SwitchON descr="set to 1 to enable">0</SwitchON>
+
+  <material descr="material to simulate broken region">TOPBrokenGlue</material>
+  
+  <Slot ID="5">
+    <Glue ID="1">
+      <fraction>0.3</fraction>
+      <angle unit="deg">60</angle>
+    </Glue>
+    <Glue ID="3">
+      <fraction>0.2</fraction>
+      <angle unit="deg">10</angle>
+    </Glue>
+  </Slot>
+
+  <Slot ID="8">
+    <Glue ID="2">
+      <fraction>0.7</fraction>
+      <angle unit="deg">230</angle>
+    </Glue>
+  </Slot>
+  
+</BrokenGlues>

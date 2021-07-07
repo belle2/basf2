@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- define our own special Materials -->
+<Materials>
+  <Material name="CLAWS-Cover">
+    <Components>
+      <Material fraction="0.02">Al</Material>
+      <Material fraction="0.98">Mylar</Material>
+    </Components>
+  </Material>
+</Materials>
+
+

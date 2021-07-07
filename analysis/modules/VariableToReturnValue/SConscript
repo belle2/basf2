@@ -1,0 +1,6 @@
+Import('env')
+
+env['LIBS'] = ['analysis', 'framework']
+
+Return('env')
+

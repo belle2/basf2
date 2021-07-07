@@ -1,0 +1,662 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+#include "Riostream.h"
+#include <vector>
+#include <TROOT.h> //General stuff
+#include <TApplication.h> //For compiling code with graphics
+#include <TStyle.h> //For gStyle
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TSystem.h> //For gSystem
+#include <TFile.h>
+#include <TTree.h>
+#include <TClonesArray.h>
+#include <TVectorD.h>
+#include <TGraph.h>
+#include <TLegend.h>
+#include <TH1F.h>
+#include <TH3F.h>
+#include <TH3D.h>
+#include <TCanvas.h>
+#include <TBranch.h>
+#include <Riostream.h>
+#include <TString.h>
+#include <TLegend.h>
+#include <TRandom3.h>
+#include <TMath.h>
+#include <TColor.h>
+#include <vector>
+#include <sstream>
+#include <algorithm>
+#include <cmath>
+#define __CINT__
+#include "../cdc/src/Fitter3DUtility.cc"
+
+void hough3D(){
+
+  //This should be deleted
+  gROOT->Reset();
+  gROOT->SetStyle("Plain");
+  gStyle->SetOptStat(111111111);
+  gStyle->SetOptFit(1111111111);
+  gStyle->SetStatFontSize(0.05);
+
+  gROOT->ProcessLine(".L ../cdc/src/Fitter3DUtility.cc");
+
+  int RUN = 0;
+  bool GRAPHON = 1;
+  bool FIT3DGRAPH = 1;
+  bool HOUGHGRAPH = 0;
+  cout<<"RUN: "<<RUN<<endl;
+
+  TH1F* hpt00    = new TH1F("histpT","Plot of pT",93,0,7.0);
+  TH1F* hpt01    = new TH1F("hpt01","",93,0,7.0);
+  TH1F* hphi00   = new TH1F("hphi00","",90,0,360);
+  TH1F* hphi01   = new TH1F("hphi01","",90,0,360);
+  TH1F* hz00     = new TH1F("histz0","Plot of z0",98,-25,25);
+  TH1F* hz01     = new TH1F("histz1","Plot of z0",98,-25,25);
+  TH1F* hz02     = new TH1F("histz2","Plot of z0",98,-25,25);
+  hz00->GetXaxis()->SetTitle("cm");
+  TH1F* htheta00 = new TH1F("htheta00","",130,20,150);
+  TH1F* htheta01 = new TH1F("htheta01","",130,20,150);
+  TH1F* htheta02 = new TH1F("htheta02","",130,20,150);
+  hphi00->SetMinimum(0);
+  hpt00->SetMinimum(0);
+
+  const double Trg_PI = 3.141592653589793;
+
+  TFile* inFile = new TFile("Fitter3D.root");
+  TTree* inTree = (TTree*)inFile->Get("m_treeTrackFitter3D");
+  TTree* inTree2 = (TTree*)inFile->Get("m_treeConstantsFitter3D");
+
+  TClonesArray* tSTrackFitter3D = new TClonesArray("TVectorD");
+  TClonesArray* szTrackFitter3D = new TClonesArray("TVectorD");
+  TClonesArray* mcTrackFitter3D = new TClonesArray("TVectorD");
+  TClonesArray* fitTrackFitter3D = new TClonesArray("TVectorD");
+  TClonesArray* stTSsTrackFitter3D = new TClonesArray("TVectorD");
+
+  inTree->SetBranchAddress("tSTrackFitter3D", &tSTrackFitter3D);
+  inTree->SetBranchAddress("szTrackFitter3D", &szTrackFitter3D);
+  inTree->SetBranchAddress("fitTrackFitter3D", &fitTrackFitter3D);
+  inTree->SetBranchAddress("mcTrackFitter3D", &mcTrackFitter3D);
+  inTree->SetBranchAddress("stTSsTrackFitter3D", &stTSsTrackFitter3D);
+
+  // For values from root
+  TVectorD tSPhi(9);
+  TVectorD szHit(8);
+  TVectorD mcPar(5);
+  TVectorD fitPar(5);
+  TVectorD stTSs(100);
+
+  TVectorD* geometryFitter3D = new TVectorD(17);
+  inTree2->SetBranchAddress("geometryFitter3D", &geometryFitter3D);
+
+  TVectorD* errorFitter3D = new TVectorD(9);
+  inTree2->SetBranchAddress("errorFitter3D", &errorFitter3D); 
+
+  inTree2->GetEntry(0);
+
+  // Values to set from root
+  Double_t rr[9] = {0.188,0.4016,0.620,0.8384,1.0568,0.2934,0.5128,0.7312,0.9496};
+  double anglest[4]={0.0702778, -0.06176, 0.069542, -0.07489};
+  double ztostraw[4]={-0.508184,-0.645228,-0.687681,-0.730134}; 
+
+  // Set geometry
+  for(int i=0; i<9; i++){
+    rr[i] = (*geometryFitter3D)[i];
+  }
+  for(int i=0; i<4; i++){
+    anglest[i] = (*geometryFitter3D)[i+9];
+    ztostraw[i] = (*geometryFitter3D)[i+13];
+  }
+
+  // Set input errors
+  Double_t phierror[5]={0.0085106,0.0039841,0.0025806,0.0019084,0.001514};
+  Double_t zerror[]={0.0319263,0.028765,0.0290057,0.0396206};
+  for(int i=0;i<5;i++){
+    phierror[i]=0.012/sqrt(12.)/rr[i];
+  }
+
+  for(int i=0; i<5; i++){
+    phierror[i] = (*errorFitter3D)[i];
+  }
+  for(int i=0; i<4; i++){
+    zerror[i] = (*errorFitter3D)[i+5];
+  }
+  
+
+  Int_t eventNum = 0;
+  Int_t totalInput = inTree->GetEntriesFast();
+
+  Double_t mcPt;
+  Double_t mcPhi0;
+  Double_t mcZ0;
+  Double_t mcTheta;
+  int mcCharge;
+
+  int mysign;
+  Double_t rho;
+  Double_t pt;
+  Double_t fitPhi0;
+  Double_t z0;
+  Double_t cot;
+  Double_t ztheta;
+
+  Double_t phi[9];
+  Double_t zz[4];
+  Double_t arcS[4];
+
+  Double_t rr_conv[4];
+  Double_t iezz2[4];
+
+  // Hough Variables
+  double cotStart = -3;
+  double cotEnd = -cotStart;
+  double z0Start = -2;
+  double z0End = -z0Start;
+  // Must be odd
+  //const int nCotSteps = 1001;
+  //const int nZ0Steps = 1001;
+  const int nCotSteps = 101;
+  const int nZ0Steps = 501;
+  // Hough Mesh
+  double cotStepSize = cotEnd/((nCotSteps-1)/2);
+  double z0StepSize = z0End/((nZ0Steps-1)/2);
+  double tempCotStart;
+  double tempCotEnd;
+  double tempZ01;
+  double tempZ02;
+  double tempZ0Start;
+  double tempZ0End;
+  double actualCot;
+  double actualZ0;
+  // [cot,z0]
+  
+  // Allocate memory for houghMesh;
+  float ***houghMesh3;
+  houghMesh3 = new float**[nCotSteps];
+  for(int i=0; i<nCotSteps; i++) {
+    houghMesh3[i] = new float*[nZ0Steps];
+    for(int j=0; j<nZ0Steps; j++){
+      houghMesh3[i][j] = new float[4];
+    }
+  }
+  //// Delocate memory for houghMesh3;
+  //for(int i=0; i<nCotSteps; i++){
+  //  for(int j=0; j<nZ0Steps; j++){
+  //    delete [] houghMesh3[i][j];
+  //  }
+  //  delete [] houghMesh3[i];
+  //}
+  //delete [] houghMesh3;
+  // For finding min diff for houghFinder
+  bool houghMesh[nCotSteps][nZ0Steps][4];
+  int houghMesh2[nCotSteps][nZ0Steps];
+
+  float houghMesh4[nCotSteps][nZ0Steps];
+
+  float minDiffHough = 0;
+
+  int tempHoughZ0;
+  int tempRealHoughZ0;
+  double houghMaxZ0;
+  // Finder
+  double houghMax;
+  double maxCot;
+  double maxZ0;
+  double minCot;
+  double minZ0;
+  // Best vote
+  double bestCot;
+  double bestZ0;
+
+  // Hough mesh 2D histogram
+  TH2F* hhough00 = new TH2F("histhough0","histhough0",nCotSteps,cotStart-cotStepSize/2,cotEnd+cotStepSize/2
+                                                     ,nZ0Steps,z0Start-z0StepSize/2,z0End+z0StepSize/2);
+  hhough00->SetMarkerStyle(20);
+  hhough00->SetMarkerSize(.6);
+  // pre Transformation 2D histogram
+  TH2F* hsz00 = new TH2F("histsz0","",1000,0.2,1.5,1000,-1.5,1.5);
+  hsz00->SetMarkerStyle(20);
+  hsz00->SetMarkerSize(.6);
+
+  const int nEvents = inTree->GetEntries();
+  cout<<"Number of events: "<<nEvents<<endl;
+
+  // s,z graph 4*RUN
+  double* ssx = new double[4*nEvents];
+  double* zzy = new double[4*nEvents];
+  delete [] ssx;
+  delete [] zzy;
+  //double ssx[40000];
+  //double zzy[40000];
+
+  while (1) {
+
+    eventNum += 1;
+    if(eventNum<RUN) continue;
+    if(RUN!=0){if(eventNum>int(RUN)) break;}
+    if (eventNum-1==totalInput) break;
+    if(eventNum%1000==0) cout<<eventNum<<endl;
+    inTree->GetEntry(eventNum-1);
+
+    // Get the values from the tree. Need to loop over tracks later
+    if (tSTrackFitter3D->GetEntriesFast()==0) continue;
+    tSPhi = *(TVectorD*)tSTrackFitter3D->At(0);
+    if (szTrackFitter3D->GetEntriesFast()==0) continue;
+    szHit = *(TVectorD*)szTrackFitter3D->At(0);
+    if (fitTrackFitter3D->GetEntriesFast()==0) continue;
+    fitPar = *(TVectorD*)fitTrackFitter3D->At(0);
+    if (mcTrackFitter3D->GetEntriesFast()==0) continue;
+    mcPar = *(TVectorD*)mcTrackFitter3D->At(0);
+    if (stTSsTrackFitter3D->GetEntriesFast()==0) continue;
+    stTSs = *(TVectorD*)stTSsTrackFitter3D->At(0);
+    
+    // Convert TVectorD to array
+    for( int i=0; i<9; i++){
+      phi[i] = tSPhi[i];
+    }
+
+    //mysign = findSign(phi);
+    //rPhiFit(rr,phi,phierror,rho,fitPhi0);
+    //pt = 0.3*rho*1.5;
+    
+    // Get values from root file to speed up things
+    pt =  fitPar[0];
+    rho = fitPar[0]/0.3/1.5;
+    fitPhi0 = fitPar[1];
+    z0 = fitPar[2];
+    cot = fitPar[3];
+    mysign = fitPar[4];
+
+    // Get values from root file
+    mcPt = mcPar[0];
+    mcPhi0 = mcPar[1];
+    mcZ0 = mcPar[2];
+    mcCharge = mcPar[3];
+
+    // Need to change this for all track candidates
+    for(int i=0; i<4; i++){
+      arcS[i] = szHit[i];
+      zz[i] = szHit[i+4];
+      //cout<<"st1: "<<phi[i+5]<<endl;
+      //cout<<"ArcS1: "<<arcS[i]<<endl;
+      //cout<<"Z1: "<<zz[i]<<endl;
+    }
+
+    // Change Track candidates to arcS and z plane
+    // Initialize tSArcS and tSZ
+    double tSArcS[100];
+    double tSZ[100];
+    // Change to arcS and Z plane
+    for(int i=0; i<100; i++){
+      if(stTSs[i]!=999.){
+        //zz[i]=calZ(mysign, anglest[i], ztostraw[i],  rr[i+5], phi[i+5], rho, fitPhi0);
+        //arcS[i]=calS(rho,rr_conv[i]);
+        //cout<<"stTS["<<int(i/25)<<"]: "<<stTSs[i]<<endl;
+        tSArcS[i] = calS(rho, rr[int(i/25)+5]);
+        //cout<<"st2: "<<stTSs[i]<<endl;
+        //cout<<"ArcS2: "<<tSArcS[i]<<endl;
+        tSZ[i] = calZ(mysign, anglest[int(i/25)], ztostraw[int(i/25)], rr[int(i/25)+5], stTSs[i], rho, fitPhi0);
+        //cout<<"Z2: "<<tSZ[i]<<endl;
+      } else {
+        tSArcS[i] = stTSs[i];
+        tSZ[i] = stTSs[i];
+      }
+    }
+
+    // Start of the Hough Finder
+    // Clear HoughMesh, HoughMesh2, HoughMesh3
+    for(int i=0; i<nCotSteps; i++){
+      for(int j=0; j<nZ0Steps; j++){
+        for(int k=0; k<4; k++){
+          houghMesh3[i][j][k] = 999;
+          houghMesh[i][j][k] = 0;
+        }
+        houghMesh2[i][j] = 0;
+        houghMesh4[i][j] = 0.;
+      }
+    }
+
+    // Fill Hough mesh.
+    for(Int_t cotStep=0;cotStep<nCotSteps;cotStep++){
+      //Find cotStep range.
+      tempCotStart=(cotStep-0.5)*cotStepSize+cotStart;
+      tempCotEnd=(cotStep+0.5)*cotStepSize+cotStart;
+      //cout<<"tempCotStart: "<<tempCotStart<<" tempCotEnd: "<<tempCotEnd<<endl;
+
+      for(Int_t iTS=0; iTS<100; iTS++){
+        if(tSArcS[iTS]==999.) continue;
+        if(tSZ[iTS]==999.) continue;
+        //Find z0 for cot
+        tempZ01=-tSArcS[iTS]*tempCotStart+tSZ[iTS];
+        tempZ02=-tSArcS[iTS]*tempCotEnd+tSZ[iTS];
+        //Find start and end of range z0
+        if(tempZ01<tempZ02){
+          tempZ0Start=tempZ01;
+          tempZ0End=tempZ02;
+        }
+        else{
+          tempZ0Start=tempZ02;
+          tempZ0End=tempZ01;
+        }
+        //cout<<"z0Start: "<<tempZ0Start<<endl;
+        //cout<<"z0End: "<<tempZ0End<<endl;
+        //Do proper rounding for plus and minus values
+        if(tempZ0Start>0){
+          tempZ0Start=int(tempZ0Start/z0StepSize+0.5);
+        }
+        else{
+          tempZ0Start=int(tempZ0Start/z0StepSize-0.5);
+        }
+        if(tempZ0End>0){
+          tempZ0End=int(tempZ0End/z0StepSize+0.5);
+        }
+        else{
+          tempZ0End=int(tempZ0End/z0StepSize-0.5);
+        }
+
+        //Vote for the mesh
+        for(int z0Step=tempZ0Start;z0Step<=tempZ0End;z0Step++){
+          //Cut off if z0Step is bigger or smaller than z0 limit
+          if(z0Step>(nZ0Steps-1)/2 || z0Step<-(nZ0Steps-1)/2) continue;
+
+          //Change temHoughZ0 if minus
+          if(z0Step<0){
+            tempHoughZ0=(nZ0Steps-1)/2-z0Step;
+          }
+          else{ tempHoughZ0 = z0Step; }
+
+          //Change back tempHoughz0 if minus
+          if(tempHoughZ0>(nZ0Steps-1)/2){
+            tempRealHoughZ0=(nZ0Steps-1)/2-tempHoughZ0; 
+          } else {
+            tempRealHoughZ0 = tempHoughZ0;
+          }
+          //Change to actual value
+          actualCot=cotStep*cotStepSize+cotStart;
+          actualZ0=tempRealHoughZ0*z0StepSize;
+          //cout<<"actualCot: "<<actualCot<<" actualZ0: "<<actualZ0<<endl;
+
+
+          houghMesh[cotStep][tempHoughZ0][int(iTS/25)]=1;
+          // For houghFinder third version
+          minDiffHough = abs(actualCot*tSArcS[iTS]+actualZ0-tSZ[iTS]);
+          if(houghMesh3[cotStep][tempHoughZ0][int(iTS/25)]>minDiffHough){
+            houghMesh3[cotStep][tempHoughZ0][int(iTS/25)]=minDiffHough;
+          }
+        }
+      }
+    }
+
+    // Filling houghMesh. Combines the seperate houghMeshs per layer
+    for(int houghCot=0;houghCot<nCotSteps;houghCot++){
+      for(int houghZ0=0;houghZ0<nZ0Steps;houghZ0++){
+        //Change back tempHoughz0 if minus
+        if(houghZ0>(nZ0Steps-1)/2){
+          tempRealHoughZ0=(nZ0Steps-1)/2-houghZ0; 
+        } else {
+          tempRealHoughZ0 = houghZ0;
+        }
+        //Change to actual value
+        actualCot=houghCot*cotStepSize+cotStart;
+        actualZ0=tempRealHoughZ0*z0StepSize;
+
+        
+
+        for(int layer=0; layer<4; layer++){
+          houghMesh2[houghCot][houghZ0] += houghMesh[houghCot][houghZ0][layer];
+          if(houghMesh3[houghCot][houghZ0][layer] != 999) houghMesh4[houghCot][houghZ0] += houghMesh3[houghCot][houghZ0][layer];
+          if(houghMesh[houghCot][houghZ0][layer]==1) hhough00->Fill(actualCot,actualZ0);
+        } // End of combining votes
+      } // End loop for houghZ0
+    } // End loop for houghCot
+
+     
+    // Find highest vote
+    // Second Version
+    // Compare all votes. Pick one that has small z0
+    minZ0 = 9999;
+    minDiffHough = 9999;
+    houghMax=0;
+    for(int houghCot=0;houghCot<nCotSteps;houghCot++){
+      for(int houghZ0=0;houghZ0<nZ0Steps;houghZ0++){
+        // Changes back values for minus
+        if(houghZ0>(nZ0Steps-1)/2){
+          tempHoughZ0=(nZ0Steps-1)/2-houghZ0; 
+        }
+        else{ tempHoughZ0=houghZ0;}
+        // Find highest vote
+        if(houghMax<houghMesh2[houghCot][houghZ0]){
+          houghMax=houghMesh2[houghCot][houghZ0];
+          // If highest vote changes, need to initialize minZ0, minDiffHough
+          minZ0 = 9999;
+          minDiffHough = 9999;
+        }
+        // When highest vote
+        if(houghMax==houghMesh2[houghCot][houghZ0]){
+          // For second hough version
+          // When z0 is minimum
+          //if(minZ0>abs(tempHoughZ0)) {
+          //  cout<<"minZ0: "<<minZ0<<" tempHoughZ0: "<<tempHoughZ0<<endl;
+          //  minZ0 = tempHoughZ0;
+          //  bestCot = houghCot;
+          //  bestZ0 = tempHoughZ0;
+          //}
+          // For third hough version
+          // When minDiffHough is minimum
+          if(minDiffHough>houghMesh4[houghCot][houghZ0]){
+            minDiffHough = houghMesh4[houghCot][houghZ0];
+            bestCot = houghCot;
+            bestZ0 = tempHoughZ0;
+          }
+        }
+      } // End of houghZ0 loop
+    } // End of houghCot loop
+    //cout<<"bestCot: "<<bestCot<<" bestZ0: "<<bestZ0<<" "<<"#Votes: "<<houghMax<<endl;
+    //cout<<"foundCot: "<<bestCot*cotStepSize+cotStart<<" foundZ0: "<<bestZ0*z0StepSize<<endl;
+    //cout<<"mcCot: "<<mcPar[3]<<" mcZ0: "<<mcZ0<<endl;
+
+    hz02->Fill(bestZ0*z0StepSize*100);
+    htheta02->Fill((Trg_PI/2.-atan(bestCot*cotStepSize+cotStart))*180./Trg_PI);
+
+    // Third Version
+    // Compare all votes. Pick one that has small chi^2
+    
+    //// First Version
+    // Finds the middle point of all the max votes
+    //maxCot=-9999;
+    //maxZ0=-9999;
+    //minCot=9999;
+    //minZ0=9999;
+    //houghMax=0;
+    //for(int houghCot=0;houghCot<nCotSteps;houghCot++){
+    //  for(int houghZ0=0;houghZ0<nZ0Steps;houghZ0++){
+    //    //Changes back values for minus
+    //    if(houghZ0>(nZ0Steps-1)/2){
+    //      tempHoughZ0=(nZ0Steps-1)/2-houghZ0; 
+    //    }
+    //    else{ tempHoughZ0=houghZ0;}
+    //    //For new max
+    //    if(houghMax<houghMesh[houghCot][houghZ0]){
+    //      houghMax=houghMesh[houghCot][houghZ0];
+    //      maxCot=houghCot;
+    //      maxZ0=tempHoughZ0;
+    //      minCot=houghCot;
+    //      minZ0=tempHoughZ0;
+    //    }
+    //    //For finding middle point between the max range of max votes.
+    //    if(houghMax==houghMesh[houghCot][houghZ0]){
+    //      if(maxCot<houghCot) maxCot=houghCot;
+    //      if(maxZ0<tempHoughZ0) maxZ0=tempHoughZ0;
+    //      if(minCot>houghCot) minCot=houghCot;
+    //      if(minZ0>tempHoughZ0) minZ0=tempHoughZ0;
+    //    }
+    //    //if(houghMesh[houghCot][houghZ0]>=3) cout<<houghCot<<" "<<houghZ0<<" "<<houghMesh[houghCot][houghZ0]<<endl;
+    //  }
+    //}
+    //cout<<"minCot: "<<minCot<<" "<<"maxCot: "<<maxCot<<" "<<"minZ0: "<<minZ0<<" "<<"maxZ0: "<<maxZ0<<" "<<"#Votes: "<<houghMax<<endl;
+    //cout<<"foundCot: "<<(minCot+maxCot)/2*cotStepSize+cotStart<<" foundZ0: "<<(minZ0+maxZ0)/2*z0StepSize<<endl;
+    //cout<<"zz[0]:  "<<zz[0]<<" zz[1]:  "<<zz[1]<<" zz[2]:  "<<zz[2]<<" zz[3]:  "<<zz[3]<<endl;
+    //cout<<"zz1[0]: "<<noApproxZ1[0]<<" zz1[1]: "<<noApproxZ1[1]<<" zz1[2]: "<<noApproxZ1[2]<<" zz1[3]: "<<noApproxZ1[3]<<endl;
+    //cout<<"zz2[0]: "<<noApproxZ2[0]<<" zz2[1]: "<<noApproxZ2[1]<<" zz2[2]: "<<noApproxZ2[2]<<" zz2[3]: "<<noApproxZ2[3]<<endl;
+    //cout<<"realzz[0]: "<<real_zz[0]<<" realzz[1]: "<<real_zz[1]<<" realzz[2]: "<<real_zz[2]<<" realzz[3]: "<<real_zz[3]<<endl;
+    //cout<<"realss[0]: "<<real_ss[0]<<" realss[1]: "<<real_ss[1]<<" realss[2]: "<<real_ss[2]<<" realss[3]: "<<real_ss[3]<<endl;
+
+    // Finds the related TS from bestCot and bestZ0
+    // Find z from bestCot and bestZ0 (arcS is dependent to pT)
+    double foundZ[4];
+    double foundPhiSt[4];
+    for(int i=0; i<4; i++){
+     //foundZ[i] = bestCot*arcS[i]+bestZ0; 
+     foundZ[i] = (bestCot*cotStepSize+cotStart)*tSArcS[i*25]+(bestZ0*z0StepSize); 
+    }
+
+    // Change values to MC
+    //mysign = mcPar[4];
+    //rho = mcPar[0]/0.3/1.5;
+    //fitPhi0 = mcPar[1];
+    //cout<<"zz[0]: "<<zz[0]<<" zz[1]: "<<zz[1]<<" zz[2]: "<<zz[2]<<" zz[3]: "<<zz[3]<<endl;
+    //cout<<"foundZ[0]: "<<foundZ[0]<<" foundZ[1]: "<<foundZ[1]<<" foundZ[2]: "<<foundZ[2]<<" foundZ[3]: "<<foundZ[3]<<endl;
+
+    // Find phiSt from foundZ
+    for(int i=0; i<4; i++){
+      foundPhiSt[i] = fitPhi0+mysign*acos(rr[i+5]/2/rho)+2*asin((ztostraw[i]-foundZ[i])*tan(anglest[i])/2/rr[i+5]); 
+      if(foundPhiSt[i]>2*Trg_PI) foundPhiSt[i]-=2*Trg_PI;
+      if(foundPhiSt[i]<0) foundPhiSt[i]+=2*Trg_PI;
+    }
+    //cout<<"PhiSt[0]: "<<phi[5]<<" PhiSt[1]: "<<phi[6]<<" PhiSt[2]: "<<phi[7]<<" PhiSt[3]: "<<phi[8]<<endl;
+    //cout<<"FoundPhiSt[0]: "<<foundPhiSt[0]<<" FoundPhiSt[1]: "<<foundPhiSt[1]<<" FoundPhiSt[2]: "<<foundPhiSt[2]<<" FoundPhiSt[3]: "<<foundPhiSt[3]<<endl;
+    for(int i=0; i<100; i++){
+      if(stTSs[i]==999.) continue;
+      //cout<<"stTSs["<<int(i/25)<<"]: "<<stTSs[i]<<endl;
+    }
+
+    // Find closest phi out of canidates
+    double minDiff[4]={999,999,999,999};
+    double bestTS[4]={999,999,999,999};
+    for(int i=0; i<100; i++){
+      if(stTSs[i]==999.) continue;
+      if(minDiff[int(i/25)]> abs(foundPhiSt[int(i/25)]-stTSs[i])){
+        minDiff[int(i/25)] = abs(foundPhiSt[int(i/25)]-stTSs[i]);
+        bestTS[int(i/25)] = stTSs[i];
+      }
+    }
+    //cout<<"BestPhiSt[0]: "<<bestTS[0]<<" BestPhiSt[1]: "<<bestTS[1]<<" BestPhiSt[2]: "<<bestTS[2]<<" BestPhiSt[3]: "<<bestTS[3]<<endl;
+    
+
+    //Start of my fitter
+    for(int i=0; i<4; i++){
+      zz[i]=calZ(mysign, anglest[i], ztostraw[i],  rr[i+5], bestTS[i], rho, fitPhi0);
+      rr_conv[i]=rr[i+5];
+      iezz2[i] = 1/zerror[i]/zerror[i];
+    }   
+    // Calculate s
+    for(int i=0; i<4; i++){
+      arcS[i]=calS(rho,rr[i+5]);
+    }   
+    // Change rho into real rho
+    rSFit(iezz2,arcS,zz,z0,cot);
+
+    // Change units
+    fitPhi0 = fitPhi0*180/Trg_PI;
+    mcPhi0 = mcPhi0*180/Trg_PI;
+    ztheta=Trg_PI/2.-atan(cot);
+    ztheta*=180./Trg_PI;
+    mcTheta = Trg_PI/2.-atan(mcPar[3]);
+    mcTheta *= 180./Trg_PI;
+
+    //this should be deleted
+    hpt00->Fill(pt);
+    hpt01->Fill(mcPt);
+    hphi00->Fill(fitPhi0);
+    hphi01->Fill(mcPhi0);
+    htheta00->Fill(ztheta);
+    htheta01->Fill(mcTheta);
+    hz00->Fill(z0*100);
+    hz01->Fill(mcZ0*100);
+  }
+
+  //this should be deleted
+
+  cout<<"z0 mean: "<<hz00->GetMean()<<endl;
+  cout<<"z0 RMS:  "<<hz00->GetRMS()<<endl;
+  //cout<<hphi02->GetMean()<<endl;
+
+  if(GRAPHON==1){
+    TLegend* leg_hist;
+
+    if(FIT3DGRAPH==1){
+      TCanvas *c1 = new TCanvas("c1","",1000,500);
+      c1->Divide(2,2);  
+      c1->cd(1); 
+      hpt00->Draw();
+      hpt01->SetLineColor(2);
+      hpt01->Draw("same");
+      leg_hist = new TLegend(0.78,0.51,0.95,0.38);
+      leg_hist->AddEntry(hpt00,"Fitted pT","l");
+      leg_hist->AddEntry(hpt01,"Real pT","l");
+      leg_hist->Draw();
+
+
+      c1->cd(2); 
+      hphi00->Draw();
+      hphi01->SetLineColor(2);
+      hphi01->Draw("same");
+      leg_hist = new TLegend(0.78,0.51,0.95,0.38);
+      leg_hist->AddEntry(hphi00,"Fitted phi0","l");
+      leg_hist->AddEntry(hphi01,"Real phi0","l");
+      leg_hist->Draw();
+
+      c1->cd(3);
+      //hz00->Fit("gaus");
+      hz00->SetMaximum(max(hz02->GetMaximum(),hz00->GetMaximum())*1.1);
+      hz00->Draw();
+      hz01->SetLineColor(2);
+      hz01->Draw("same");
+      hz02->SetLineColor(4);
+      hz02->Draw("same");
+      leg_hist = new TLegend(0.78,0.51,0.95,0.38);
+      leg_hist->AddEntry(hz00,"Fitted z0","l");
+      leg_hist->AddEntry(hz01,"Real z0","l");
+      leg_hist->AddEntry(hz02,"Found z0","l");
+      leg_hist->Draw();
+
+      c1->cd(4); 
+      htheta00->SetMaximum(max(htheta02->GetMaximum(),htheta00->GetMaximum())*1.1);
+      htheta00->Draw();
+      htheta01->SetLineColor(2);
+      htheta01->Draw("same");
+      htheta02->SetLineColor(4);
+      htheta02->Draw("same");
+      leg_hist = new TLegend(0.78,0.51,0.95,0.38);
+      leg_hist->AddEntry(htheta00,"Fitted theta","l");
+      leg_hist->AddEntry(htheta01,"Real theta","l");
+      leg_hist->AddEntry(htheta02,"Found theta","l");
+      leg_hist->Draw();
+    }
+    if( HOUGHGRAPH == 1){
+      TCanvas* c3 = new TCanvas("c3","",1000,500);
+      hhough00->Draw("colz");
+    }
+
+  }
+
+}
+
+void StandaloneApplication(int argc, char** argv){
+    hough3D();
+}
+
+int main(int argc, char** argv){
+    gROOT->Reset();
+    TApplication app("Root Application" , &argc , argv) ;
+    StandaloneApplication(app.Argc(), app.Argv());
+    app.Run();
+    return 0;
+}

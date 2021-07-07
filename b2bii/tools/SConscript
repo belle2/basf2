@@ -1,0 +1,6 @@
+Import('env')
+
+env['TOOLS_LIBS']['numberOfEventsInBelleMdst'] = ['framework', 'boost_program_options', 'belle_legacy', 'b2bii']
+env['TOOLS_LIBS']['numberOfEventsInBelle2Mdst'] = ['framework', 'boost_program_options']
+
+Return('env')

@@ -1,0 +1,11 @@
+Import('env')
+
+if (FindFile('ARICHGeometryPar.cc', '../../../arich/geometry/src/')) is not None:
+   env.Append(CPPDEFINES=['DOARICH'])
+   env['LIBS'] = ['framework', 'arich', 'ecl_dataobjects', 'simulation_dataobjects', 'mdst_dataobjects',
+                  'Geom', '$ROOT_LIBS']
+else:
+   env['LIBS'] = ['framework', 'ecl_dataobjects', 'simulation_dataobjects', 'mdst_dataobjects',
+                  'Geom', '$ROOT_LIBS']
+
+Return('env')

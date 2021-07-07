@@ -1,0 +1,299 @@
+*//////////////////////////////////////////////////////////////////////////////////////
+*//                                                                                  //
+*//          Pseudoclass BStra                                                       //
+*//                                                                                  //
+*//                                                                                  //
+*//   Foam is now the basic MC sampler for beamstrahlung and ISR.                    //
+*//   Notes: BStra.fias internal rejection procedure,                                 //
+*//   consequently, normalization is determined by average weight, which is monitored//
+*//   by MBrB                                                                        //
+*//////////////////////////////////////////////////////////////////////////////////////
+
+      SUBROUTINE BStra_Initialize(KeyGrid,Xcrude)
+*//////////////////////////////////////////////////////////////////////////////////////
+*//   Initialization phase                                                           //
+*//////////////////////////////////////////////////////////////////////////////////////
+      IMPLICIT NONE
+      INCLUDE 'BStra.fi'
+      INCLUDE 'BXformat.h'
+      INTEGER            KeyGrid
+      DOUBLE PRECISION   XCrude
+      INTEGER  k,j
+      DOUBLE PRECISION   XsCru(10), WMList(10)
+      DOUBLE PRECISION   XsectA, XsectB,  XsectC
+      DOUBLE PRECISION   ErrelA,  ErrelB,  ErrelC
+      DOUBLE PRECISION   BornV_RhoFoamA, BornV_RhoFoamB, BornV_RhoFoamC
+      EXTERNAL           BornV_RhoFoamA, BornV_RhoFoamB, BornV_RhoFoamC
+      DOUBLE PRECISION   XXXene, vvmax
+      INTEGER            nCallsA,  nCallsB,  nCallsC
+      INTEGER            IterMaxA, IterMaxB, IterMaxC,  Idyfs,  IdBra, Nbin
+*-------------------------------
+      m_out     = 16
+      m_Nevgen  =  0
+*//////////////////////////////////////////////////////////////////////////////////////
+*// Mode=-1 creation+dump, =+1 reading, =0 creation without dump (default)           //
+*//////////////////////////////////////////////////////////////////////////////////////
+      m_ModeA  =   KeyGrid
+      m_ModeB  =   KeyGrid
+      m_ModeC  =   KeyGrid
+*
+      CALL KarLud_GetXXXene(XXXene)
+*
+      IF(m_ModeA.EQ.2) WMList(1) = 1.00d0
+      IF(m_ModeB.EQ.2) WMList(2) = 1.00d0
+      IF(m_ModeC.EQ.2) WMList(3) = 1.00d0
+*
+      CALL KarLud_Getvvmax(vvmax)
+*//////////////////////////////////////////////////////////////////////////////////////
+      XsectA   = 1d-100
+      XsectB   = 1d-100
+      XsectC   = 1d-100
+      ErrelA   = 1d0
+      ErrelB   = 1d0
+      ErrelC   = 1d0
+*//////////////////////////////////////////////////////////////////////////////////////
+*//   1-dimensional case                                                             //
+*//////////////////////////////////////////////////////////////////////////////////////
+      WRITE(*,*) '*****************************************************************'
+      WRITE(*,*) '****** BE PATIENT FoamA CREATING GRID FOR BEAMSTRAHLUNG *********'
+      WRITE(*,*) '*****************************************************************'
+      CALL FoamA_SetKdim(       1) ! No of dimensions<5
+      CALL FoamA_SetnBuf(    1000) ! Length of buffer<5000,  =Maximum No. of cells
+      CALL FoamA_SetnSampl(  1000) ! No. of MC sampling inside single cell, default=100
+      CALL FoamA_SetnBin(       4) ! No of bins for edge explorations
+      CALL FoamA_SetEvPerBin(  25) ! No. of equiv. MC events per bin
+      CALL FoamA_SetOptEdge(    0) ! OptEdge excludes vertices
+      CALL FoamA_SetOptRanIni(  0) ! No internal initialization of rand.num.gen
+      CALL FoamA_SetOptRanLux( -1) ! Ranmar choosen
+      CALL FoamA_SetChat(       1) ! printout level =0,1,2
+      CALL FoamA_Initialize(BornV_RhoFoamA)
+*//////////////////////////////////////////////////////////////////////////////////////
+*//   2-dimensional case                                                             //
+*//////////////////////////////////////////////////////////////////////////////////////
+      WRITE(*,*) '*****************************************************************'
+      WRITE(*,*) '****** BE PATIENT FoamB CREATING GRID FOR BEAMSTRAHLUNG *********'
+      WRITE(*,*) '*****************************************************************'
+      CALL FoamB_SetKdim(       2) ! No of dimensions<5
+      CALL FoamB_SetnBuf(    2000) ! Length of buffer<5000,  =Maximum No. of cells
+      CALL FoamB_SetnSampl(  2000) ! No. of MC sampling inside single cell, default=100
+      CALL FoamB_SetnBin(       4) ! No of bins for edge explorations
+      CALL FoamB_SetEvPerBin(  25) ! No. of equiv. MC events per bin
+      CALL FoamB_SetOptEdge(    0) ! OptEdge excludes vertices
+      CALL FoamB_SetOptRanIni(  0) ! No internal initialization of rand.num.gen
+      CALL FoamB_SetOptRanLux( -1) ! Ranmar choosen
+      CALL FoamB_SetChat(       1) ! printout level =0,1,2
+      CALL FoamB_Initialize(BornV_RhoFoamB)
+*     Debug plotting; nbuf=250 is maximum for ploting cell boundries
+      OPEN(23,FILE='./map.tex')
+      CALL FoamB_PltBegin(23)
+      CALL FoamB_PltVert
+      CALL FoamB_PltCell        ! nbuf<250
+      CALL FoamB_PltEnd
+*//////////////////////////////////////////////////////////////////////////////////////
+*//   3-dimensional case                                                             //
+*//////////////////////////////////////////////////////////////////////////////////////
+      WRITE(*,*) '*****************************************************************'
+      WRITE(*,*) '****** BE PATIENT FoamC CREATING GRID FOR BEAMSTRAHLUNG *********'
+      WRITE(*,*) '*****************************************************************'
+      CALL FoamC_SetKdim(       3) ! No. of dimensions<5
+      CALL FoamC_SetnBuf(    5000) ! Length of buffer<5000,  =Maximum No. of cells
+      CALL FoamC_SetnSampl(  5000) ! No. of MC sampling inside single cell, default=100
+      CALL FoamC_SetnBin(       4) ! No of bins for edge explorations
+      CALL FoamC_SetEvPerBin(  25) ! No. of equiv. MC events per bin
+      CALL FoamC_SetOptEdge(    0) ! OptEdge excludes vertices
+      CALL FoamC_SetOptRanIni(  0) ! No internal initialization of rand.num.gen
+      CALL FoamC_SetOptRanLux( -1) ! Ranmar choosen
+      CALL FoamC_SetChat(       1) ! printout level =0,1,2
+      CALL FoamC_Initialize(BornV_RhoFoamC)
+*//////////////////////////////////////////////////////////////////////////////////////
+*//   The best Vegas Integral estimators from initialization (grid building) phase   //
+*//////////////////////////////////////////////////////////////////////////////////////
+      CALL FoamA_GetTotPrim( XsectA) ! Integral estimate from Initialization
+      ErrelA  = ErrelA/XsectA
+      CALL FoamB_GetTotPrim( XsectB) ! Integral estimate from Initialization
+      ErrelB  = ErrelB/XsectB
+      CALL FoamC_GetTotPrim( XsectC) ! Integral estimate from Initialization
+      ErrelC  = ErrelC/XsectC
+
+      m_XGridB =  XsectA+XsectB+XsectC ! is it really used ?????
+      m_EGridB =  DSQRT( (ErrelA*XsectA)**2 +(ErrelB*XsectB)**2 +(ErrelC*XsectC)**2)
+      m_EGridB =  m_EGridB/m_XGridB
+*
+      WRITE(m_out,bxope)
+      WRITE(m_out,bxtxt) '  BStra  Initializator                '
+      WRITE(m_out,bxtxt) '  Grid initialization finished        '
+      WRITE(m_out,bxl1g) XsectA ,    'XsectA  1-dimen.  ','XsectA','**'
+      WRITE(m_out,bxl1g) XsectB ,    'XsectB  2-dimen.  ','XsectB','**'
+      WRITE(m_out,bxl1g) XsectC ,    'XsectC  3-dimen.  ','XsectC','**'
+      WRITE(m_out,bxl1f) ErrelA  ,   'ErrelA  1-dimen.  ','ErrelA','**'
+      WRITE(m_out,bxl1f) ErrelB  ,   'ErrelB  2-dimen.  ','ErrelB','**'
+      WRITE(m_out,bxl1f) ErrelC  ,   'ErrelC  3-dimen.  ','ErrelC','**'
+      WRITE(m_out,bxl1g) m_XGridB,   'XGridB  total.    ','XGridB','**'
+      WRITE(m_out,bxl1f) m_EGridB,   'EGridB, rel. total','EGridB','**'
+      WRITE(m_out,bxclo)
+*//////////////////////////////////////////////////////////////////////////////////////
+*//     Calculate Crude Xcru(i), i=1,2,3,  branch per branch                         //
+*//////////////////////////////////////////////////////////////////////////////////////
+      CALL FoamA_GetTotPrim(XsCru(1)) ! get crude normalization for MC
+      CALL FoamB_GetTotPrim(XsCru(2)) ! get crude normalization for MC
+      CALL FoamC_GetTotPrim(XsCru(3)) ! get crude normalization for MC
+*//////////////////////////////////////////////////////////////////////////////////////
+*//   Initialization of MBrB, the own copy of a brancher                             //
+*//////////////////////////////////////////////////////////////////////////////////////
+      CALL KK2f_GetIdyfs(Idyfs)
+      IdBra = Idyfs+200
+      CALL MBrB_Initialize(m_out,IdBra,50, 1d0, 'MBrB: Bstra main weight$')
+      Nbin  = 500
+      CALL MBrB_AddBranch(1, Nbin, WMList(1), 'MBrB: next branch A  !!! $')
+      CALL MBrB_AddBranch(2, Nbin, WMList(2), 'MBrB: next branch B  !!! $')
+      CALL MBrB_AddBranch(3, Nbin, WMList(3), 'MBrB: next branch C  !!! $')
+      CALL MBrB_SetXSList(XsCru)
+      CALL MBrB_GetXCrude(m_XCrude)
+*//////////////////////////////////////////////////////////////////////////////////////
+*// Because in Bstra we have internal rejection loop we send to Karlud and KK2f      //
+*// the best estimator of integral we have at this moment                            // 
+*// It will be used for histogram normalization (sometimes)                          // 
+*// Note that xsection from KK2f_finalize uses m_XCrude*<wt)> or m_XGridB            //
+*//////////////////////////////////////////////////////////////////////////////////////
+      XCrude   = m_XGridB
+      WRITE(m_out,bxope)
+      WRITE(m_out,bxtxt) '  BStra  Initializator, PreGeneration '
+      WRITE(m_out,bxl1g) XsCru(1) ,   'XsCru(1)  1-dimen.  ','XsCru(1) ','**'
+      WRITE(m_out,bxl1g) XsCru(2) ,   'XsCru(2)  2-dimen.  ','XsCru(2) ','**'
+      WRITE(m_out,bxl1g) XsCru(3) ,   'XsCru(3)  3-dimen.  ','XsCru(3) ','**'
+      WRITE(m_out,bxl1f) WMlist(1) ,  'WMlist(1) 1-dimen.  ','WMlist(1)','**'
+      WRITE(m_out,bxl1f) WMlist(2) ,  'WMlist(2) 2-dimen.  ','WMlist(2)','**'
+      WRITE(m_out,bxl1f) WMlist(3) ,  'WMlist(3) 3-dimen.  ','WMlist(3)','**'
+      WRITE(m_out,bxl1g) m_XCrude ,   'XCrude   total      ','XCrude   ','**'
+      WRITE(m_out,bxclo)
+      END
+
+      SUBROUTINE BStra_Make(vv, x1, x2, MCwt)
+*//////////////////////////////////////////////////////////////////////////////////////
+*//   Genearete set of 3 ISR variables for beamsstrahlung ISR                        //
+*//////////////////////////////////////////////////////////////////////////////////////
+      IMPLICIT NONE
+      INCLUDE 'BStra.fi'
+      DOUBLE PRECISION  vv, x1, x2, MCwt, x, Wt_KF
+      DOUBLE PRECISION  BornV_RhoFoamA, BornV_RhoFoamB, BornV_RhoFoamC
+      EXTERNAL          BornV_RhoFoamA, BornV_RhoFoamB, BornV_RhoFoamC
+      REAL              Qrand(10)        ! for PseuMar
+      INTEGER           Itype
+      DOUBLE PRECISION  rand
+*-------------------------------------------------------------------------------
+ 100  CONTINUE
+      m_Nevgen  =  m_Nevgen +1
+      CALL MBrB_GenKF(Itype, Wt_KF)
+      IF(     Itype .EQ. 1 ) THEN
+         CALL FoamA_MakeEvent(BornV_RhoFoamA) ! generate MC event
+         CALL FoamA_GetMCwt(  MCwt) ! get MC weight
+      ELSEIF( Itype .EQ. 2 ) THEN
+         CALL FoamB_MakeEvent(BornV_RhoFoamB) ! generate MC event
+         CALL FoamB_GetMCwt(  MCwt) ! get MC weight
+      ELSEIF( Itype .EQ. 3 ) THEN
+         CALL FoamC_MakeEvent(BornV_RhoFoamC) ! generate MC event
+         CALL FoamC_GetMCwt(  MCwt) ! get MC weight
+      ELSE
+         WRITE(m_out,*) '+++++ STOP in BStra_Make '
+         WRITE(    *,*) '+++++ STOP in BStra_Make '
+         STOP 
+      ENDIF
+      CALL BornV_GetVXX(vv,x1,x2)
+* random swap, necessary because FoamB integrand is asymmetric
+      CALL PseuMar_MakeVec(Qrand,2)
+      IF( Qrand(1) .LT. 0.5d0 ) THEN
+         x  = x1
+         x1 = x2
+         x2 = x
+      ENDIF
+      MCwt = MCwt *Wt_KF
+* Rejection
+      rand = Qrand(2)
+      CALL MBrB_Fill(MCwt   ,rand)
+      IF(rand .GT. MCwt) GOTO 100
+      MCwt = 1d0
+      END                       ! BStra_Make
+
+      SUBROUTINE BStra_GetXCrude(XCrude)
+*//////////////////////////////////////////////////////////////////////////////////////
+*//   Get TRUE crude integraml                                                       //
+*//////////////////////////////////////////////////////////////////////////////////////
+      IMPLICIT NONE
+      INCLUDE 'BStra.fi'
+      DOUBLE PRECISION   XCrude
+      XCrude   = m_XCrude
+      END                       ! BStra_GetXCrude
+
+      SUBROUTINE BStra_Finalize(Integ,Errel)
+*//////////////////////////////////////////////////////////////////////////////
+*//                                                                          //
+*//   Provides Crude integral at the end of MC generation based on <wt>      //
+*//                                                                          //
+*//////////////////////////////////////////////////////////////////////////////
+      IMPLICIT NONE
+      INCLUDE 'BStra.fi'
+      INCLUDE 'BXformat.h'
+      DOUBLE PRECISION     Integ,Errel
+      DOUBLE PRECISION     IntegMC,ErrelMC
+      DOUBLE PRECISION     AverWt, WtSup
+*-----------------------------------------------------------------------------
+      CALL MBrB_MgetAve(AverWt, ErRelMC, WtSup)
+      IntegMC= m_XCrude*AverWt
+      Integ  = IntegMC
+      ErRel  = ErRelMC
+      WRITE(m_out,bxope)
+      WRITE(m_out,bxtxt) '  BStra  Finalize MC results     '
+      WRITE(m_out,bxl1g) IntegMC,   'MC integral   ','IntegMC','**'
+      WRITE(m_out,bxl1f) ErRelMC,   'relat. error  ','ErRelMC','**'
+      WRITE(m_out,bxl1f) WtSup,     'maximum wt    ','WtSup  ','**'
+      WRITE(m_out,bxtxt) '  From grid building (initializ.)'  
+      WRITE(m_out,bxl1g) m_XGridB,   'XGridB  total.    ','XGridB','**'
+      WRITE(m_out,bxl1f) m_EGridB,   'EGridB, rel. total','EGridB','**'
+      WRITE(m_out,bxclo)
+* Print more on the main weight
+      CALL MBrB_Print0
+* Print even more on the weight in each branch!
+      CALL MBrB_Print1
+      END       ! BStra_Finalize
+
+      SUBROUTINE BStra_GetXGridB(XGridB,EGridB)
+*//////////////////////////////////////////////////////////////////////////////////////
+*//   Get TRUE crude integram                                                        //
+*//////////////////////////////////////////////////////////////////////////////////////
+      IMPLICIT NONE
+      INCLUDE 'BStra.fi'
+      DOUBLE PRECISION     XGridB,EGridB
+      XGridB   = m_XGridB
+      EGridB   = m_EGridB
+      END                       ! BStra_GetXGridB
+
+      SUBROUTINE BStra_GetIntegMC(IntegMC,ErRelMC)
+*//////////////////////////////////////////////////////////////////////////////////////
+*//   Get TRUE Monte Carlo run Integral and errors                                   //
+*//////////////////////////////////////////////////////////////////////////////////////
+      IMPLICIT NONE
+      INCLUDE 'BStra.fi'
+      DOUBLE PRECISION     IntegMC,ErRelMC
+      DOUBLE PRECISION     AverWt,WtSup
+      CALL MBrB_MgetAve(AverWt, ErRelMC, WtSup)
+      IntegMC= m_XCrude*AverWt
+      END                       ! BStra_GetIntegMC
+
+      SUBROUTINE BStra_GetAveWt(AveWt,RatWt)
+*//////////////////////////////////////////////////////////////////////////////
+*//                                                                          //
+*//////////////////////////////////////////////////////////////////////////////
+      IMPLICIT NONE
+      INCLUDE 'BStra.fi'
+      DOUBLE PRECISION     AveWt,RatWt
+      DOUBLE PRECISION     AverWt, ErRela, WtSup
+*-----------------------------------------------------------------------------
+      CALL MBrB_MgetAve(AverWt, ErRela, WtSup)
+      AveWt = AverWt
+      RatWt = AverWt/WtSup
+      END
+*//////////////////////////////////////////////////////////////////////////////////////
+*//                                                                                  //
+*//          END of Pseudoclass BStra                                                //
+*//                                                                                  //
+*//////////////////////////////////////////////////////////////////////////////////////

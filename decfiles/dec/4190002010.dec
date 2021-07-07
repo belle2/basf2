@@ -1,0 +1,44 @@
+# EventType: 4190002010
+# Descriptor: [Upsilon6S_pi0Zb10650_pi0hb3p]
+# NickName: Upsilon6S_pi0Zb10650_pi0hb3p
+# Cuts: None
+# Documentation: Decay for Y(6S) physics
+# PhysicsWG: Bottomonium
+# Tested: Yes
+# Responsible: Bryan Fulsom
+# Email: bryan.fulsom@pnnl.gov
+# Date: 20161101
+#
+# June 2021 Automated: Converted PYTHIA ids
+#   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
+
+Decay Upsilon(6S)
+1.0 pi0 Zb(10650)0 PHSP;
+Enddecay
+
+Decay Zb(10650)0
+1.0 pi0 h_b(3P) PHSP;
+Enddecay
+
+#Godfrey and Moats arXiv:1507.00024
+#Note hb(2P) predictions were off by ~2x, hard to be sure if these are correct
+Decay h_b(3P)
+0.05 gamma eta_b HELAMP 1.0 0.0 1.0 0.0;
+0.10 gamma eta_b(2S) HELAMP 1.0 0.0 1.0 0.0;
+0.11 gamma eta_b(3S) HELAMP 1.0 0.0 1.0 0.0;
+0.74 g g g PHOTOS PYTHIA 92;
+Enddecay
+
+Decay eta_b
+1.0 g g PHOTOS PYTHIA 91;
+Enddecay
+
+Decay eta_b(2S)
+1.0 g g PHOTOS PYTHIA 91;
+Enddecay
+
+Decay eta_b(3S)
+1.0 g g PHOTOS PYTHIA 91;
+Enddecay
+
+End

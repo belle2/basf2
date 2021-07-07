@@ -1,0 +1,130 @@
+[INFO] Steering file: framework/tests/merge_files.py
+running check_01_existing: Check that merging a non exsiting file fails
+[ERROR] input file "/test1.root": Could not open file
+[WARNING] File "test2.root" is empty.
+[WARNING] All Files were empty
+check_01_existing passed
+running check_02_nonroot: Check that merging fails on non-root input files
+[ERROR] input file "test1.root": Could not open file
+check_02_nonroot passed
+running check_03_overwrite: Check that overwriting fails if -f is missing
+[ERROR] Output file exists, use -f to force overwriting it
+[WARNING] File "test1.root" is empty.
+[WARNING] All Files were empty
+check_03_overwrite passed
+running check_04_access: Check that it fails if we cannot create output file
+[WARNING] File "test1.root" is empty.
+[WARNING] All Files were empty
+[ERROR] Could not create output file "/nosuchdir/foo"
+check_04_access passed
+running check_05_release: Check that it fails if the releases are different
+[WARNING] File "test1.root" is empty.
+[ERROR] Release in "test2.root" differs from previous files: other_release != test_release
+[WARNING] File "test2.root" is empty.
+check_05_release passed
+running check_06_empty_release: Check that merging fails with empty release valuses
+[WARNING] File "test1.root" is empty.
+[ERROR] Cannot determine release used to create "test2.root"
+check_06_empty_release passed
+running check_07_modified_release: Check that merging modified release gives warning about that but merging should work
+[WARNING] File "test1.root" is empty.
+[WARNING] File "test2.root" created with modified software test_release-modified: cannot verify that files are compatible
+[WARNING] File "test2.root" is empty.
+[WARNING] All Files were empty
+check_07_modified_release passed
+running check_08_duplicate_seed: Check that we get a warning for identical seeds but merging should work
+[WARNING] File "test1.root" is empty.
+[WARNING] File "test2.root" is empty.
+[WARNING] Duplicate Random Seed: "seed1" present in more then one file
+[WARNING] All Files were empty
+check_08_duplicate_seed passed
+running check_09_different_steering: Check that merging fails if the steering file is different
+[WARNING] File "test1.root" is empty.
+[ERROR] Steering file for "test2.root" differs from previous files.
+[WARNING] File "test2.root" is empty.
+check_09_different_steering passed
+running check_10_different_globaltag: Check that merging fails if the global tag is different
+[WARNING] File "test1.root" is empty.
+[ERROR] Database globalTag in "test2.root" differs from previous files: other_globaltag != test_globaltag
+[WARNING] File "test2.root" is empty.
+check_10_different_globaltag passed
+running check_11_branches: Check that merging fails if the branches in the event tree are different
+[INFO] Steering file: steering-test1.root.py
+[INFO] Steering file: steering-test2.root.py
+[ERROR] Branches in "test2.root" differ from "test1.root"
+check_11_branches passed
+running check_12_hadded: Check that merging fails if the file has more then one entry in the persistent tree
+hadd Target file: test11.root
+hadd compression setting for all output: 1
+hadd Source file 1: test1.root
+hadd Source file 2: test1.root
+hadd Target path: test11.root:/
+[ERROR] input file "test11.root": Expected exactly one entry in persistent tree, found 2
+check_12_hadded passed
+running check_13_nopersistent: Check that merging fails without persistent tree
+[ERROR] input file "test1.root": No persistent tree found
+check_13_nopersistent passed
+running check_14_noeventtree: Check that merging fails without event tree
+[ERROR] input file "test1.root": No event tree found
+check_14_noeventtree passed
+running check_15_noeventbranches: Check that merging fails without event tree
+[ERROR] input file "test1.root": Could not find any branches in event tree
+check_15_noeventbranches passed
+running check_16_nonmergeable: Check that merging fails it there a ron mergeable persistent trees
+[ERROR] Branch "AnotherMetaData" in persistent tree not inheriting from Mergable
+[WARNING] File "test1.root" is empty.
+check_16_nonmergeable passed
+running check_17_checkparentLFN: Check that parent LFN get merged correctly
+[WARNING] File "test1.root" is empty.
+[WARNING] File "test2.root" is empty.
+[WARNING] All Files were empty
+check_17_checkparentLFN passed
+running check_18_checkEventNr: Check that event and mc numbers are summed correctly
+check_18_checkEventNr passed
+running check_19_lowhigh: Check that the low/high event numbers are merged correctly
+[WARNING] File "test0.root" is empty.
+[WARNING] File "test0.root" is empty.
+[WARNING] File "test0.root" is empty.
+[WARNING] File "test0.root" is empty.
+[WARNING] File "test0.root" is empty.
+[WARNING] File "test0.root" is empty.
+[WARNING] File "test0.root" is empty.
+[WARNING] File "test0.root" is empty.
+[WARNING] File "test0.root" is empty.
+[WARNING] File "test0.root" is empty.
+[WARNING] File "test0.root" is empty.
+check_19_lowhigh passed
+running check_20_test_file: Check that a merged file passes the b2file-check program
+[INFO] Steering file: steering-test1.root.py
+[INFO] Steering file: steering-test2.root.py
+check_20_test_file passed
+running check_21_eventmetadata: Check that merged files has all the correct even infos
+[INFO] Steering file: steering-test1.root.py
+[INFO] Steering file: steering-test2.root.py
+[WARNING] Duplicate Random Seed: "test1" present in more then one file
+[WARNING] Multiple different users created input files: user1, user2
+check_21_eventmetadata passed
+running check_22_real_mc: Check that merging fails if real and MC data are mixed
+[WARNING] File "test1.root" is empty.
+[ERROR] Type (real/MC) for "test2.root" differs from previous files.
+[WARNING] File "test2.root" is empty.
+check_22_real_mc passed
+running check_23_legacy_ip: Check that we can merge if the Legacy_IP_Information is inconsistent
+[WARNING] File "test1.root" is empty.
+[WARNING] File "test2.root" is empty.
+[WARNING] All Files were empty
+check_23_legacy_ip passed
+running check_24_legacy_ip_middle: Check that we can merge if the Legacy_IP_Information is inconsistent
+[WARNING] File "test1.root" is empty.
+[WARNING] File "test2.root" is empty.
+[WARNING] All Files were empty
+check_24_legacy_ip_middle passed
+running check_25_legacy_ip_only: Check that we can merge if the Legacy_IP_Information is inconsistent
+[WARNING] File "test1.root" is empty.
+[WARNING] File "test2.root" is empty.
+[WARNING] All Files were empty
+check_25_legacy_ip_only passed
+running check_XX_filemetaversion: Check that the Version of the FileMetaData hasn't changed.
+    If this check fails please check that the changes to FileMetaData don't
+    affect merge_basf2_files and adapt the correct version number here.
+check_XX_filemetaversion passed

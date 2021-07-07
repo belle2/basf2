@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rootnode xmlns:ifctl="urn:X-belle2:interface-control" ifctl:uniqueHash="TestXMLHash" ifctl:nodeId="nw6pVMdq">
+	<MER color="green" ifctl:nodeId="kzquS42i">
+		<someChild ifctl:nodeId="lPO6PVch">AContent</someChild>
+		<someChild ifctl:nodeId="heYXCqdz">BContent</someChild>
+	</MER>
+	<LER ifctl:existstate="remove_all" ifctl:nodeId="m4AaNhtI1793"/>
+	<HER ifctl:nodeId="q5gm6l6M">
+		<energy ifctl:existstate="modify" ifctl:nodeId="uhb324jGHr4" ifctl:refnode="m4AaNhtI1801">8.55</energy>
+	</HER>
+</rootnode>

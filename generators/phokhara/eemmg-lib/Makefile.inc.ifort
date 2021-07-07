@@ -1,0 +1,25 @@
+
+# Makefile.inc for intel compilers
+
+CXX = icpc
+F77 = ifort
+
+# create dynamic libraries
+CXXFLAGS = -O2 -fPIC -DHAVE_CONFIG_H
+FFLAGS = -O2 -fPIC
+LIB_LDFLAGS = -nofor_main -shared -Wl,-no-undefined -Wl,-export-dynamic
+BIN_LDFLAGS = -Wl,-rpath=.
+LIBEXT=.so
+
+# create static libraries
+#CXXFLAGS = -O2 -DHAVE_CONFIG_H
+#FFLAGS = -O2
+#LIB_LDFLAGS = -Wl,-no-undefined -Wl,-export-dynamic
+#BIN_LDFLAGS = -lstdc++ -Wl,-Bstatic
+#LIBEXT=.a
+
+datarootdir = ${HOME}
+LN_S = ln -s
+SED = sed
+SYMBOL_PREFIX =
+HAVE_LD_VERSION_SCRIPT = yes
